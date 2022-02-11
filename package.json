@@ -8,10 +8,16 @@
     "@mui/material": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "axios": "^0.25.0",
+    "env-cmd": "^10.1.0",
+    "formik": "^2.2.9",
     "react": "latest",
     "react-dom": "latest",
+    "react-query": "^3.34.14",
+    "react-router": "^6.2.1",
     "react-scripts": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "yup": "^0.32.11"
   },
   "scripts": {
     "start": "react-scripts start",
