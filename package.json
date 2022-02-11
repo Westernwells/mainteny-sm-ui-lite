@@ -9,6 +9,7 @@
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "axios": "^0.25.0",
+    "date-fns": "^2.28.0",
     "env-cmd": "^10.1.0",
     "formik": "^2.2.9",
     "react": "latest",
