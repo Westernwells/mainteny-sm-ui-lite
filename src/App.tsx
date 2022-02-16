@@ -4,16 +4,12 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 
-export default function App() {
-  return (
-    <Container maxWidth="sm">
-      <Box sx={{ my: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-      SMU Lite
-        </Typography>
-     
-
-      </Box>
-    </Container>
-  );
-}
+export const App = () => (
+  <Container maxWidth="sm">
+    <Box sx={{my: 4}}>
+      <Typography variant="h4" component="h1" gutterBottom>
+        SMU Lite
+      </Typography>
+    </Box>
+  </Container>
+);
