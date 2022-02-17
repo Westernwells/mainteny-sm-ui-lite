@@ -1,16 +1,11 @@
-import * as React from 'react';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
+import {BrowserRouter} from 'react-router-dom';
+import {Loading} from 'components/Loading';
+import {Router} from 'routes';
+import './styles.css';
 
 export const App = () => (
-  <Container maxWidth="sm">
-    {console.log(process.env.REACT_APP_API_URL, '&^^^^^^^^^^^$$$$$$$$$$$$$')}
-    <Box sx={{my: 4}}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        SMU Lite
-      </Typography>
-    </Box>
-  </Container>
+  <BrowserRouter basename={process.env.REACT_APP_BASE_URL}>
+    <Loading />
+    <Router />
+  </BrowserRouter>
 );
