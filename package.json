@@ -25,6 +25,10 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "start:stage": "env-cmd -f .env.stage react-scripts start",
+    "start:prod": "env-cmd -f .env.prod react-scripts start",
+    "build:stage": "env-cmd -f .env.stage react-scripts build",
+    "build:prod": "env-cmd -f .env.prod react-scripts build",
     "lint": "eslint --fix \"./src/**/*.{js,jsx,ts,tsx,json}\"",
     "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
   },

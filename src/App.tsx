@@ -6,6 +6,7 @@ import Link from '@mui/material/Link';
 
 export const App = () => (
   <Container maxWidth="sm">
+    {console.log(process.env.REACT_APP_API_URL, '&^^^^^^^^^^^$$$$$$$$$$$$$')}
     <Box sx={{my: 4}}>
       <Typography variant="h4" component="h1" gutterBottom>
         SMU Lite
