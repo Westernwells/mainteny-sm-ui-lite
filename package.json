@@ -35,7 +35,7 @@
     "lint": "eslint --fix \"./src/**/*.{js,jsx,ts,tsx,json}\"",
     "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "check-types": "tsc --pretty --noEmit",
-    "check-format": "prettier --check .",
+    "check-format": "prettier --check \"./src/**/*.{js,jsx,ts,tsx,json}\"",
     "check-lint": "eslint . --ext ts --ext tsx --ext js"
   },
   "browserslist": {
