@@ -74,7 +74,7 @@ variables:
       "payload={
       \"channel\": \"#release-notifications\",
       \"username\": \"ReleaseBot\",
-      \"text\": \"*Property Manager UI $STACK Release* :rocket:\n
+      \"text\": \"*Service Manager UI Lite $STACK Release* :rocket:\n
       *Git commit Message*: $CI_COMMIT_MESSAGE\n
       *Git commit ID*: <https://gitlab.com/mainteny/applications/sm-ui-lite/-/commit/$CI_COMMIT_SHA|$CI_COMMIT_SHORT_SHA>
       \",
