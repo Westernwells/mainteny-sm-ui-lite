@@ -1,13 +1,168 @@
-# You can override the included template(s) by including variable overrides
-# SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
-# Secret Detection customization: https://docs.gitlab.com/ee/user/application_security/secret_detection/#customizing-settings
-# Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
-# Container Scanning customization: https://docs.gitlab.com/ee/user/application_security/container_scanning/#customizing-the-container-scanning-settings
-# Note that environment variables can be set in several places
-# See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
 stages:
-- test
-sast:
-  stage: test
-include:
-- template: Security/SAST.gitlab-ci.yml
+  - lint
+  - build-project
+  - build-images
+  - deploy
+
+variables:
+  DOCKER_REGISTRY: 155174012160.dkr.ecr.eu-central-1.amazonaws.com
+  DOCKER_DRIVER: overlay
+  IMAGE_SUFFIX: ${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_ID}
+
+.build-project: &build-template
+  stage: build-project
+  image: node:lts-gallium
+  script:
+    - yarn prepare_env
+    - yarn install --frozen-lockfile
+    - yarn build:${ENV}
+  artifacts:
+    paths:
+      - build/
+      - Dockerfile
+      - nginx.prod.conf
+      - nginx.stage.conf
+
+.build-images: &build-image-template
+  stage: build-images
+  variables:
+    GIT_STRATEGY: none
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: ['']
+  before_script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"credsStore\":\"ecr-login\",\"credHelpers\":{\"$DOCKER_REGISTRY\":\"ecr-login\"}}" > /kaniko/.docker/config.json
+  script:
+    - >
+      /kaniko/executor
+      --cache=true
+      --context $CI_PROJECT_DIR 
+      --dockerfile Dockerfile 
+      --destination ${DOCKER_REGISTRY}/sm-lite:${IMAGE_SUFFIX}-${ENV}
+      --build-arg ENV=${ENV}
+
+.deploy_project: &deploy-template
+  stage: deploy
+  allow_failure: false
+  image: node:lts-gallium
+  before_script:
+    - curl -fsSL https://get.pulumi.com/ | bash # Install Pulumi
+    - export PATH=$PATH:$HOME/.pulumi/bin
+    - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" # Install AWS CLI
+    - unzip -qq awscliv2.zip
+    - ./aws/install
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/mainteny/infra/kubeapps
+    - cd kubeapps
+    - npm ci
+    - pulumi login s3://mainteny-pulumi-state
+  variables:
+    ENV: stage
+    CACHE_PATH: /sm-lite-test*
+  script:
+    - echo "Deploying ${IMAGE_SUFFIX} on environment $STACK"
+    - pulumi stack select sm-lite.$STACK
+    - pulumi config set --path "mainteny:k8sConfig.services[0].image" ${DOCKER_REGISTRY}/sm-lite:${IMAGE_SUFFIX}-${IMAGE_ENV}
+    - pulumi config set mainteny:version ${CI_COMMIT_SHORT_SHA}_$(date '+%Y%m%d')
+    - pulumi config set mainteny:deploymentTimeStamp "$(date)"
+    - pulumi up -y
+    - pulumi stack select cdn.$ENV
+    - aws cloudfront create-invalidation --distribution-id $(pulumi stack output distributionId) --paths "$CACHE_PATH"
+    - >-
+      curl -X POST
+      --data-urlencode
+      "payload={
+      \"channel\": \"#release-notifications\",
+      \"username\": \"ReleaseBot\",
+      \"text\": \"*Property Manager UI $STACK Release* :rocket:\n
+      *Git commit Message*: $CI_COMMIT_MESSAGE\n
+      *Git commit ID*: <https://gitlab.com/mainteny/applications/sm-ui-lite/-/commit/$CI_COMMIT_SHA|$CI_COMMIT_SHORT_SHA>
+      \",
+      \"icon_emoji\": \":rocket:\"
+       }" $SLACK_WEBHOOK_URL
+  rules:
+    - if: '$CI_MERGE_REQUEST_ID'
+      when: never
+
+lint-project:
+  stage: lint
+  image: node:lts-gallium
+  script:
+    - yarn install --frozen-lockfile
+    - yarn check-format
+    - yarn check-types
+    - yarn check-lint
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      when: never
+    - when: always
+
+build-stage:
+  <<: *build-template
+  variables:
+    ENV: stage
+    PUBLIC_URL: /sm-lite-test
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      when: never
+    - when: on_success
+
+build-prod:
+  <<: *build-template
+  rules:
+    - if: $CI_COMMIT_REF_NAME == 'main'
+      when: on_success
+      variables:
+        ENV: prod
+        PUBLIC_URL: /sm-lite
+    - when: never
+
+build-stage-image:
+  <<: *build-image-template
+  dependencies:
+    - build-stage
+  rules:
+    - if: $CI_COMMIT_REF_NAME == 'main'
+      when: on_success
+      variables:
+        ENV: stage
+    - when: never
+
+build-prod-image:
+  <<: *build-image-template
+  dependencies:
+    - build-prod
+  rules:
+    - if: $CI_COMMIT_REF_NAME == 'main'
+      when: on_success
+      variables:
+        ENV: prod
+    - when: never
+
+deploy-stage:
+  <<: *deploy-template
+  dependencies:
+    - build-stage-image
+  rules:
+    - if: "$CI_COMMIT_REF_NAME == 'main'"
+      variables:
+        ENV: stage
+        STACK: test.stage
+        IMAGE_ENV: stage
+        CACHE_PATH: /sm-lite-test*
+      when: on_success
+    - when: never
+
+deploy-production:
+  <<: *deploy-template
+  dependencies:
+    - build-prod-image
+  rules:
+    - if: "$CI_COMMIT_REF_NAME == 'main'"
+      variables:
+        ENV: stage
+        STACK: stage
+        IMAGE_ENV: prod
+        CACHE_PATH: /sm-lite*
+      when: manual
+    - when: never
