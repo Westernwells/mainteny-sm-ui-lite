@@ -1,6 +1,6 @@
 import {UserSession} from 'models/session';
 
-const USER_LOCALSTORAGE_KEY = 'mainteny_pm_user';
+const USER_LOCALSTORAGE_KEY = 'mainteny_sm_user';
 
 // helper to get user from localstorage
 export function getStoredUser(): UserSession | null {
