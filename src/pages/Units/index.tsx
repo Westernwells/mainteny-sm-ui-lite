@@ -19,8 +19,7 @@ import Slide from '@mui/material/Slide';
 import useTheme from '@mui/material/styles/useTheme';
 import {elevatorResponse, elevatorsByAddressList} from './dummyData';
 import {UnitSection} from './UnitSection';
-// TODO: Units map view
-// import {UnitsMapsView} from './UnitsMapsView';
+import {UnitsMapsView} from './UnitsMapsView';
 import {UnitColumns} from './UnitColumns';
 
 interface FormikFields {
@@ -87,8 +86,6 @@ export const MyUnits = () => {
     setAvailability(range);
   };
 
-  // const {mutate: logIssue, isLoading} = useLogIssue();
-
   const formik = useFormik<FormikFields>({
     initialValues: {
       description: '',
@@ -98,9 +95,7 @@ export const MyUnits = () => {
     onSubmit: async (values, {resetForm}) => {
       const body = {...values, elevatorId: values?.elevator?.id};
       delete body.elevator;
-      // await logIssue(body);
       // setModalOpen(false);
-      setDrawerOpen(false);
       resetForm();
     },
     validationSchema,
@@ -181,18 +176,16 @@ export const MyUnits = () => {
               <UnitSection
                 key={elevatorsByAddress.address.id}
                 elevatorsByAddress={elevatorsByAddress}
-                setDrawerOpen={setDrawerOpen}
                 setField={formik.setFieldValue}
               />
             ))}
           </Box>
         </>
       ) : (
-        // <UnitsMapsView
-        //   elevatorsByAddressList={elevatorsByAddressList}
-        //   centerCoord={elevatorResponse?.centerCoord}
-        // />
-        <div>Map view</div>
+        <UnitsMapsView
+          elevatorsByAddressList={elevatorsByAddressList}
+          centerCoord={elevatorResponse?.centerCoord}
+        />
       )}
     </Box>
   );

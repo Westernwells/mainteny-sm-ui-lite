@@ -16,7 +16,6 @@ import {ElevatorStatus, ElevatorView} from '../../models/elevator';
 export interface UnitsSectionProperty {
   // TODO: Check this 'any' type
   elevatorsByAddress: ElevatorsByAddress | any;
-  setDrawerOpen: (state: boolean) => void;
   setField: (
     field: string,
     value: any,
@@ -26,7 +25,6 @@ export interface UnitsSectionProperty {
 
 export const UnitSection = ({
   elevatorsByAddress,
-  setDrawerOpen,
   setField,
 }: UnitsSectionProperty) => {
   const theme = useTheme();
@@ -34,7 +32,6 @@ export const UnitSection = ({
 
   const handleClick = (elevator: ElevatorView) => {
     setField('elevator', elevator);
-    setDrawerOpen(true);
   };
 
   return (

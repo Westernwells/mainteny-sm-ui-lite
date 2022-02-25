@@ -25,6 +25,14 @@ export const Router = () => (
         }
       />
       <Route
+        path="/units/:id"
+        element={
+          <PageLayout excludeDefaultSpacing overflowY>
+            <TempHomePage />
+          </PageLayout>
+        }
+      />
+      <Route
         path="/contracts"
         element={
           <PageLayout>
