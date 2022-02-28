@@ -7,6 +7,7 @@ import {PasswordReset} from 'pages/PasswordReset';
 import {MyUnits} from 'pages/Units';
 import {UnitsDetail} from 'pages/UnitDetails';
 import {Invoices} from 'pages/Invoices';
+import {InvoiceDetails} from 'pages/InvoiceDetails';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -52,6 +53,15 @@ export const Router = () => (
           </PageLayout>
         }
       />
+      <Route
+        path="/invoices/:id"
+        element={
+          <PageLayout overflowY>
+            <InvoiceDetails />
+          </PageLayout>
+        }
+      />
+
       <Route
         path="/customers"
         element={

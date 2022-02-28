@@ -21,6 +21,7 @@ export const Invoices = () => {
   const [amount, setAmount] = useState<number[][]>([]);
   const [status, setStatus] = useState<string[]>([]);
   const [rows, setRows] = useState<GridRowsProp>([]);
+  // TODO: Create Invoice model for invoices with 'Order number' and 'Service type'
   // const {data: invoiceResource} = useInvoices(
   //   {
   //     pageIndex: page.pageIndex,
