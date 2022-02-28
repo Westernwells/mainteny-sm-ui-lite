@@ -5,6 +5,7 @@ import {PageLayout} from 'components/PageLayout';
 import {Login} from 'pages/Login';
 import {PasswordReset} from 'pages/PasswordReset';
 import {MyUnits} from 'pages/Units';
+import {UnitsDetail} from 'pages/UnitDetails';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -28,7 +29,7 @@ export const Router = () => (
         path="/units/:id"
         element={
           <PageLayout excludeDefaultSpacing overflowY>
-            <TempHomePage />
+            <UnitsDetail />
           </PageLayout>
         }
       />
