@@ -6,6 +6,7 @@ import {Login} from 'pages/Login';
 import {PasswordReset} from 'pages/PasswordReset';
 import {MyUnits} from 'pages/Units';
 import {UnitsDetail} from 'pages/UnitDetails';
+import {Contracts} from 'pages/Contracts';
 import {Invoices} from 'pages/Invoices';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
 import {ProtectedRoutes} from './ProtectedRoutes';
@@ -39,9 +40,7 @@ export const Router = () => (
         path="/contracts"
         element={
           <PageLayout>
-            <div>
-              <h2>Contracts</h2>
-            </div>
+            <Contracts />
           </PageLayout>
         }
       />
@@ -68,6 +67,16 @@ export const Router = () => (
           <PageLayout>
             <div>
               <h2>Customers</h2>
+            </div>
+          </PageLayout>
+        }
+      />
+      <Route
+        path="/customers/:id"
+        element={
+          <PageLayout>
+            <div>
+              <h2>Customer Details</h2>
             </div>
           </PageLayout>
         }
