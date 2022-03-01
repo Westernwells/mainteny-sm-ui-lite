@@ -7,6 +7,7 @@ import {PasswordReset} from 'pages/PasswordReset';
 import {MyUnits} from 'pages/Units';
 import {UnitsDetail} from 'pages/UnitDetails';
 import {Contracts} from 'pages/Contracts';
+import {ContractDetails} from 'pages/ContractDetails';
 import {Invoices} from 'pages/Invoices';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
 import {ProtectedRoutes} from './ProtectedRoutes';
@@ -20,6 +21,7 @@ export const Router = () => (
     </Route>
     <Route element={<ProtectedRoutes />}>
       <Route path="/" element={<Navigate to="/units" />} />
+
       <Route
         path="/units"
         element={
@@ -36,6 +38,7 @@ export const Router = () => (
           </PageLayout>
         }
       />
+
       <Route
         path="/contracts"
         element={
@@ -44,6 +47,15 @@ export const Router = () => (
           </PageLayout>
         }
       />
+      <Route
+        path="/contracts/:id"
+        element={
+          <PageLayout overflowY>
+            <ContractDetails />
+          </PageLayout>
+        }
+      />
+
       <Route
         path="/invoices"
         element={
