@@ -14,7 +14,7 @@ export const DataGridLayout = ({rows, columns}: Props) => {
   return (
     <Box
       sx={{
-        height: 'max(400px, 73vh) !important',
+        height: 'max(400px, 73vh)',
         py: '1em',
         maxHeight: '73vh',
         width: '100%',
@@ -32,7 +32,6 @@ export const DataGridLayout = ({rows, columns}: Props) => {
 
           '& *:focus, & *:focus-within': {
             '& *': {
-              border: 'none !important',
               outline: 'none !important',
             },
           },
@@ -51,48 +50,32 @@ export const DataGridLayout = ({rows, columns}: Props) => {
 
           '& .MuiDataGrid-row, & .MuiDataGrid-columnHeaders': {
             backgroundColor: theme.palette.common.white,
-
             borderRadius: '4px',
           },
-
-          '& .MuiDataGrid-columnHeaders': {
-            maxHeight: 'initial !important',
-            minHeight: 'initial !important',
-            lineHeight: 'initial !important',
-            alignItems: 'flex-end',
-
-            '& .MuiDataGrid-columnHeadersInner': {
-              p: '0 !important',
-
-              '& .MuiDataGrid-columnHeaderTitleContainer': {
-                py: '.5em !important',
-              },
+          '& .MuiDataGrid-columnHeaders, & .MuiDataGrid-row, & .MuiDataGrid-cell':
+            {
+              maxHeight: 'initial !important',
+              minHeight: 'initial !important',
+              lineHeight: 'initial !important',
             },
+
+          '& .MuiDataGrid-columnHeaderTitleContainer': {
+            py: '.5em',
           },
 
           '& .MuiDataGrid-row': {
             my: '.5em',
-            maxHeight: 'initial !important',
-            minHeight: 'initial !important',
-            lineHeight: 'initial !important',
             cursor: 'pointer',
 
             '& .MuiDataGrid-cell': {
-              maxHeight: 'initial !important',
-              minHeight: 'initial !important',
-              lineHeight: 'initial !important',
-              py: '.75em !important',
-              pl: '1em !important',
+              py: '.75em ',
+              pl: '1em ',
             },
           },
 
-          '& .Mui-selected': {
-            backgroundColor: `${theme.palette.common.white} !important`,
+          '.MuiDataGrid-row:hover': {
+            backgroundColor: theme.palette.secondary.outlinedHoverBg,
           },
-        },
-
-        '& .MuiDataGrid-footerContainer': {
-          display: 'none',
         },
       }}
     >
