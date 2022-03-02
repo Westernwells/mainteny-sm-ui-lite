@@ -1,0 +1,230 @@
+import {ContractView} from 'models/contract';
+
+export const staticContractDetails: any = {
+  id: 'b7d1c60c-c15a-4f46-ac2c-b5f99342fce0',
+  propertyOwner: {
+    id: 'ef1eb196-249b-4697-9876-f67910ca7d1b',
+    name: 'BASF',
+    role: 'Property Manager',
+    address: {
+      id: '0c063ee4-f9da-481b-ab7c-da703f342cfc',
+      fullName: 'Weidenweg 53, 10247 Berlin, Germany',
+      countryCode: 'DE',
+      location: {longitude: 13.454064, latitude: 52.5188984},
+    },
+    serviceCompany: {
+      id: '9d85be2d-ceb9-4b19-a350-9f512b4b57e4',
+      name: 'Maintenance Experts GmbH',
+      contact: {
+        phone: '+4791924282',
+        email: 'prasad@mainteny.com',
+        url: 'https://maintenance-experts.de',
+      },
+      language: 'en-us',
+      settings: {
+        nightlyShuffleEnabled: true,
+        companyDispatchStrategy: 'BIG_BANG',
+        totalYearlyVacationDaysAllowed: 30,
+        dateFormat: 'dd/MM/yyyy',
+        emailAddresses: [],
+        emailBasedServiceOrderProvider: 'NONE',
+        serviceOrderAssignmentContactChannels: {EMERGENCY: ['PHONE_CALL']},
+      },
+      search:
+        '[name:maintenance experts gmbh] [email:prasad@mainteny.com] [phone:+4791924282] [url:https://maintenance-experts.de]',
+      meta: {
+        createdAt: '2021-05-31T08:32:55.193896Z',
+        lastUpdatedAt: '2021-05-31T08:32:55.193897Z',
+        state: 'ACTIVE',
+      },
+    },
+    contact: {phone: '50957289', email: 'email@company.com'},
+    labels: [],
+    additionalInfo: {priority: 'NONE'},
+    search:
+      '[name:basf] [address:weidenweg 53, 10247 berlin, germany de] [email:email@company.com] [phone:50957289]',
+    meta: {
+      createdAt: '2021-06-01T12:09:42.058121Z',
+      lastUpdatedAt: '2021-06-01T12:10:04.605910Z',
+      state: 'ACTIVE',
+    },
+  },
+  serviceCompany: {
+    id: '9d85be2d-ceb9-4b19-a350-9f512b4b57e4',
+    name: 'Maintenance Experts GmbH',
+    role: 'Service Company',
+    contact: {
+      phone: '+4791924282',
+      email: 'prasad@mainteny.com',
+      url: 'https://maintenance-experts.de',
+    },
+    language: 'en-us',
+    settings: {
+      nightlyShuffleEnabled: true,
+      companyDispatchStrategy: 'BIG_BANG',
+      totalYearlyVacationDaysAllowed: 30,
+      dateFormat: 'dd/MM/yyyy',
+      emailAddresses: [],
+      emailBasedServiceOrderProvider: 'NONE',
+      serviceOrderAssignmentContactChannels: {EMERGENCY: ['PHONE_CALL']},
+    },
+    search:
+      '[name:maintenance experts gmbh] [email:prasad@mainteny.com] [phone:+4791924282] [url:https://maintenance-experts.de]',
+    meta: {
+      createdAt: '2021-05-31T08:32:55.193896Z',
+      lastUpdatedAt: '2021-05-31T08:32:55.193897Z',
+      state: 'ACTIVE',
+    },
+  },
+  number: 'CNT000442',
+  type: 'BASIC',
+  elevators: [
+    {
+      id: 'aac14b99-3f8e-43e4-aa93-4f5e1ea1b119',
+      contractId: 'b7d1c60c-c15a-4f46-ac2c-b5f99342fce0',
+      elevator: {
+        id: '3e2bc9e9-c795-4ba5-b5b7-613e49420c4e',
+        number: '442',
+        model: 'Orona',
+        type: '-',
+        capacity: '-',
+        category: 'BOARDING_BRIDGE',
+        technicianNumber: 1,
+        address: {
+          id: '0c063ee4-f9da-481b-ab7c-da703f342cfc',
+          fullName: 'Weidenweg 53, 10247 Berlin, Germany',
+          countryCode: 'DE',
+          location: {longitude: 13.454064, latitude: 52.5188984},
+        },
+        propertyOwner: {
+          id: 'ef1eb196-249b-4697-9876-f67910ca7d1b',
+          name: 'BASF',
+          address: {
+            id: '0c063ee4-f9da-481b-ab7c-da703f342cfc',
+            fullName: 'Weidenweg 53, 10247 Berlin, Germany',
+            countryCode: 'DE',
+            location: {longitude: 13.454064, latitude: 52.5188984},
+          },
+          serviceCompany: {
+            id: '9d85be2d-ceb9-4b19-a350-9f512b4b57e4',
+            name: 'Maintenance Experts GmbH',
+            contact: {
+              phone: '+4791924282',
+              email: 'prasad@mainteny.com',
+              url: 'https://maintenance-experts.de',
+            },
+            language: 'en-us',
+            settings: {
+              nightlyShuffleEnabled: true,
+              companyDispatchStrategy: 'BIG_BANG',
+              totalYearlyVacationDaysAllowed: 30,
+              dateFormat: 'dd/MM/yyyy',
+              emailAddresses: [],
+              emailBasedServiceOrderProvider: 'NONE',
+              serviceOrderAssignmentContactChannels: {
+                EMERGENCY: ['PHONE_CALL'],
+              },
+            },
+            search:
+              '[name:maintenance experts gmbh] [email:prasad@mainteny.com] [phone:+4791924282] [url:https://maintenance-experts.de]',
+            meta: {
+              createdAt: '2021-05-31T08:32:55.193896Z',
+              lastUpdatedAt: '2021-05-31T08:32:55.193897Z',
+              state: 'ACTIVE',
+            },
+          },
+          contact: {phone: '50957289', email: 'email@company.com'},
+          labels: [],
+          additionalInfo: {priority: 'NONE'},
+          search:
+            '[name:basf] [address:weidenweg 53, 10247 berlin, germany de] [email:email@company.com] [phone:50957289]',
+          meta: {
+            createdAt: '2021-06-01T12:09:42.058121Z',
+            lastUpdatedAt: '2021-06-01T12:10:04.605910Z',
+            state: 'ACTIVE',
+          },
+        },
+        lastVisitDate: '2021-03-02',
+        serviceTime: 60,
+        status: 'RUNNING',
+        properties: [
+          {
+            id: '742fb1b1-57c0-49f3-9635-20271b5174e9',
+            elevatorId: '3e2bc9e9-c795-4ba5-b5b7-613e49420c4e',
+            key: 'Appointment Time',
+            value: '07:00:00 - 16:00:00',
+          },
+          {
+            id: '6c0350dd-867b-465d-8a6b-1f24e261b4aa',
+            elevatorId: '3e2bc9e9-c795-4ba5-b5b7-613e49420c4e',
+            key: 'Team',
+            value: '1',
+          },
+          {
+            id: 'f2757cb0-a68e-48ca-b833-9a2b4bb39b3a',
+            elevatorId: '3e2bc9e9-c795-4ba5-b5b7-613e49420c4e',
+            key: 'Appointment Day of the Week',
+            value: 'Mo,Tu,We,Th,Fr',
+          },
+          {
+            id: '41b42388-10c1-419a-9539-6ea607ce010b',
+            elevatorId: '3e2bc9e9-c795-4ba5-b5b7-613e49420c4e',
+            key: 'Appointment Notification Due',
+            value: '0',
+          },
+          {
+            id: 'ec261b49-40bf-4334-92f7-0a945b5f893e',
+            elevatorId: '3e2bc9e9-c795-4ba5-b5b7-613e49420c4e',
+            key: 'Number of Technicians',
+            value: '1',
+          },
+          {
+            id: '2d638260-3d0c-40fd-b2e2-cadc1eec5c4a',
+            elevatorId: '3e2bc9e9-c795-4ba5-b5b7-613e49420c4e',
+            key: 'Notify Customer',
+            value: 'No',
+          },
+          {
+            id: '9b8a8589-425b-456a-a62b-deae7a340f59',
+            elevatorId: '3e2bc9e9-c795-4ba5-b5b7-613e49420c4e',
+            key: 'Category',
+            value: 'Fluggastbrücke',
+          },
+        ],
+        timeRules: [],
+        labels: [],
+        requiredSkills: [],
+        additionalInfo: {
+          priority: 'NONE',
+          isServiceOrderGenerationEnabled: true,
+        },
+        search:
+          '[address:weidenweg 53, 10247 berlin, germany de] [propertyowner:basf] [status:running] [number:442] [model:orona] [type:-] [capacity:-] [category:boarding_bridge]',
+        meta: {
+          createdAt: '2021-06-01T12:10:04.892575Z',
+          lastUpdatedAt: '2021-06-01T12:10:04.892575Z',
+          state: 'ACTIVE',
+        },
+      },
+    },
+  ],
+  visitsNumber: 4,
+  sla: 0,
+  spendingLimit: 0,
+  price: 9400,
+  hourlyRate: 0,
+  currency: 'EUR',
+  startTime: '2020-12-03T00:00:00Z',
+  endTime: '2023-01-01T00:00:00Z',
+  timePreference: [],
+  status: 'VALID',
+  labels: [],
+  additionalInfo: {expiringNotificationSent: false},
+  search:
+    '[propertyowner:basf] [contracttype:basic] [currency:eur] [status:valid]',
+  meta: {
+    createdAt: '2021-06-01T12:10:05.216700Z',
+    lastUpdatedAt: '2021-06-01T12:10:05.216700Z',
+    state: 'ACTIVE',
+  },
+};
