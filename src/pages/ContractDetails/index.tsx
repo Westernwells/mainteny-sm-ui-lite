@@ -26,11 +26,11 @@ export const ContractDetails = () => {
   const {id: contractId} = useParams();
   const theme = useTheme();
   const navigate = useNavigate();
-  const {data: contractDetails, isLoading} = staticContractDetails;
+  const contractDetails = staticContractDetails;
+  const isLoading = false;
   // const {data: contractDetails, isLoading} = useFetchContractDetails(
   //   contractId!,
   // );
-
   const totalContractDays =
     !isLoading &&
     differenceInDays(
