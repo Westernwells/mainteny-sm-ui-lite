@@ -21,6 +21,8 @@ interface Props {
   mapViewActive?: boolean;
   showFilter: boolean;
   setShowFilter: (state: boolean) => void;
+  hideViewOption?: boolean;
+  hideFilter?: boolean;
 }
 
 export const Widget = ({
@@ -32,6 +34,8 @@ export const Widget = ({
   mapViewActive,
   showFilter,
   setShowFilter,
+  hideViewOption = false,
+  hideFilter = false,
 }: Props) => {
   const navigate = useNavigate();
   const theme = useTheme();
@@ -39,30 +43,32 @@ export const Widget = ({
   return (
     <Box>
       <Box display="flex">
-        <Box display="flex" mr={3}>
-          <Button
-            onClick={() => setShowFilter(!showFilter)}
-            disableRipple
-            size={theme.breakpoints.down('md') ? 'small' : 'large'}
-            sx={{
-              backgroundColor: showFilter
-                ? theme.palette.action.selected
-                : theme.palette.primary.outlinedHoverBg,
-              border: 'none',
-              py: 1,
-              height: 48,
-              ':hover': {
+        {!hideFilter ? (
+          <Box display="flex" mr={3}>
+            <Button
+              onClick={() => setShowFilter(!showFilter)}
+              disableRipple
+              size={theme.breakpoints.down('md') ? 'small' : 'large'}
+              sx={{
+                backgroundColor: showFilter
+                  ? theme.palette.action.selected
+                  : theme.palette.primary.outlinedHoverBg,
                 border: 'none',
-              },
-            }}
-            variant="outlined"
-            startIcon={<FilterListIcon />}
-          >
-            <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
-              Filter
-            </Typography>
-          </Button>
-        </Box>
+                py: 1,
+                height: 48,
+                ':hover': {
+                  border: 'none',
+                },
+              }}
+              variant="outlined"
+              startIcon={<FilterListIcon />}
+            >
+              <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
+                Filter
+              </Typography>
+            </Button>
+          </Box>
+        ) : null}
 
         <Box mr={3}>
           <Searchnput
@@ -70,89 +76,44 @@ export const Widget = ({
             onValueChanged={onSearchTextChanged}
           />
         </Box>
-        <Box>
+        {!hideViewOption ? (
           <ButtonGroup variant="outlined" size="small" sx={{height: 48}}>
-            {btnGroupType && btnGroupType === BtnGroupType.ICON ? (
-              <>
-                <Button
-                  disableRipple
-                  variant="outlined"
-                  onClick={() => (closeMapView ? closeMapView() : () => {})}
-                  sx={{
-                    background: !mapViewActive
-                      ? theme.palette.action.selected
-                      : '#fff',
-                    '&:hover': {
-                      background: !mapViewActive
-                        ? theme.palette.action.selected
-                        : '#fff',
-                    },
-                  }}
-                >
-                  <FormatListBulletedIcon />
-                </Button>
-
-                <Button
-                  disableRipple
-                  onClick={() => (openMapView ? openMapView() : () => {})}
-                  sx={{
-                    background: mapViewActive
-                      ? theme.palette.action.selected
-                      : '#fff',
-                    '&:hover': {
-                      background: mapViewActive
-                        ? theme.palette.action.selected
-                        : '#fff',
-                    },
-                  }}
-                  variant="outlined"
-                >
-                  <GridViewIcon />
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  disableRipple
-                  variant="outlined"
-                  size={theme.breakpoints.down('md') ? 'small' : undefined}
-                  onClick={() => (closeMapView ? closeMapView() : () => {})}
-                  sx={{
-                    background: !mapViewActive
-                      ? theme.palette.action.selected
-                      : '#fff',
-                  }}
-                >
-                  <Typography
-                    variant="largeBtnText"
-                    sx={{textTransform: 'capitalize'}}
-                  >
-                    List View
-                  </Typography>
-                </Button>
-
-                <Button
-                  disableRipple
-                  size={theme.breakpoints.down('md') ? 'small' : undefined}
-                  variant="outlined"
-                  sx={{
-                    background: mapViewActive
-                      ? theme.palette.action.selected
-                      : '#fff',
-                  }}
-                  onClick={() => (openMapView ? openMapView() : () => {})}
-                >
-                  <Typography
-                    variant="largeBtnText"
-                    sx={{textTransform: 'capitalize'}}
-                  >
-                    Map View
-                  </Typography>
-                </Button>
-              </>
-            )}
+            <Button
+              disableRipple
+              variant="outlined"
+              onClick={() => (closeMapView ? closeMapView() : () => {})}
+              sx={{
+                background: !mapViewActive
+                  ? theme.palette.action.selected
+                  : '#fff',
+                '&:hover': {
+                  background: !mapViewActive
+                    ? theme.palette.action.selected
+                    : '#fff',
+                },
+              }}
+            >
+              <FormatListBulletedIcon />
+            </Button>
+            <Button
+              disableRipple
+              onClick={() => (openMapView ? openMapView() : () => {})}
+              sx={{
+                background: mapViewActive
+                  ? theme.palette.action.selected
+                  : '#fff',
+                '&:hover': {
+                  background: mapViewActive
+                    ? theme.palette.action.selected
+                    : '#fff',
+                },
+              }}
+              variant="outlined"
+            >
+              <GridViewIcon />
+            </Button>
           </ButtonGroup>
-        </Box>
+        ) : null}
       </Box>
     </Box>
   );

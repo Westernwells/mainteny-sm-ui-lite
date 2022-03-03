@@ -7,6 +7,7 @@ import {PasswordReset} from 'pages/PasswordReset';
 import {MyUnits} from 'pages/Units';
 import {UnitsDetail} from 'pages/UnitDetails';
 import {Contracts} from 'pages/Contracts';
+import {Customer} from 'pages/Customer';
 import {ContractDetails} from 'pages/ContractDetails';
 import {Invoices} from 'pages/Invoices';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
@@ -77,9 +78,7 @@ export const Router = () => (
         path="/customers"
         element={
           <PageLayout>
-            <div>
-              <h2>Customers</h2>
-            </div>
+            <Customer />
           </PageLayout>
         }
       />
