@@ -42,7 +42,7 @@ export const InvoiceDetails = () => {
           disabled={!downloadUrl}
           size="small"
           onClick={() =>
-            downloadUrl ? window.open(downloadUrl[0], '_self') : null
+            downloadUrl ? window.open(downloadUrl[0], '_blank') : null
           }
           startIcon={
             <FileDownloadIcon
