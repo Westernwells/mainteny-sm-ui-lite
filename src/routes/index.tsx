@@ -1,5 +1,3 @@
-import {TempHomePage} from 'pages/TempHomePage';
-
 import {Navigate, Route, Routes} from 'react-router-dom';
 import {PageLayout} from 'components/PageLayout';
 import {Login} from 'pages/Login';

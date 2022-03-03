@@ -114,7 +114,12 @@ export const columns: GridColDef[] = [
         //     window.open(downloadUrlPaths, '_self');
         //   }
         // }}
-        onClick={() => console.log('Action: DOWNLOAD')}
+        onClick={() =>
+          window.open(
+            `${process.env.REACT_APP_BASE_URL}/INV000128.pdf`,
+            '_blank',
+          )
+        }
       />
     ),
   },
