@@ -6,12 +6,11 @@ import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
+import {
+  useContractElevatorCount,
+  useQueryContract,
+} from 'hooks/reactQuery/useContract';
 import {columns, makeRows} from './ContractsDataGridProps';
-// import {
-//   useContractElevatorCount,
-//   useQueryContract,
-// } from '../../hooks/reactQuery/useContract';
-import {staticContracts, contractWithUnits} from './data';
 import {ContractOrderField, ContractView} from '../../models/contract';
 import {ElevatorView} from '../../models/elevator';
 import {BtnGroupType, Order, Resource} from '../../models/misc';
@@ -25,32 +24,31 @@ interface ContractRecord {
 }
 
 export const Contracts = () => {
-  const [_search, setSearch] = useState('');
-  const [_page, setPage] = useState(makePage(0, pageSize));
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(makePage(0, pageSize));
   const [showFilter, setShowFilter] = useState(false);
-  const [_expiryDate, setExpiryDate] = useState<string[]>([]);
-  const [_contractor, setContractor] = useState<string[]>([]);
-  const [_cost, setCost] = useState<number[][]>([]);
+  const [expiryDate, setExpiryDate] = useState<string[]>([]);
+  const [contractor, setContractor] = useState<string[]>([]);
+  const [cost, setCost] = useState<number[][]>([]);
   const [contractorFilterItems, setConractorFileterItems] = useState<string[]>(
     [],
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const {data: _contractResource = createEmptyResource<ContractView>(10)} =
-    staticContracts;
-  // const {data: contractResource = createEmptyResource<ContractView>(10)} =
-  //   useQueryContract(
-  //     {
-  //       order: Order.DESC,
-  //       orderBy: ContractOrderField.CREATED_TIME,
-  //       pageIndex: page.pageIndex,
-  //       pageSize: page.pageSize,
-  //       query: search,
-  //     },
-  //     {expiryDate, contractor, price: cost},
-  //   );
-  // const {data: contractWithUnits} = useContractElevatorCount(
-  //   contractResource.data,
-  // );
+
+  const {data: contractResource = createEmptyResource<ContractView>(10)} =
+    useQueryContract(
+      {
+        order: Order.DESC,
+        orderBy: ContractOrderField.CREATED_TIME,
+        pageIndex: page.pageIndex,
+        pageSize: page.pageSize,
+        query: search,
+      },
+      {expiryDate, contractor, price: cost},
+    );
+  const {data: contractWithUnits} = useContractElevatorCount(
+    contractResource.data,
+  );
 
   const costRangeConvertor = (selectedItems: string[]) => {
     const range: number[][] = [];
