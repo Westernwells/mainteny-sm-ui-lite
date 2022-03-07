@@ -91,13 +91,13 @@ export const useContractElevatorCount = (contracts: ContractView[]) => {
   );
 };
 
-const fetchContractDetails = async (contractId: string) =>
-  // TODO: make API call to fetch Contract Details
-
-  // const response = await axiosClient.get<ContractView>(
-  //   `/api/contracts/${contractId}`,
-  // );
-  Promise.resolve(staticContractDetails);
+const fetchContractDetails = async (contractId: string) => {
+  const response = await axiosClient.get<ContractView>(
+    `/api/contracts/${contractId}`,
+  );
+  console.log(response.data, '%%%^^&&%$$$');
+  return response.data;
+};
 export const useContractDetails = (contractId: string) =>
   useQuery([qk.contractDetails, contractId], () =>
     fetchContractDetails(contractId),

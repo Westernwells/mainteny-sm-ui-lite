@@ -69,7 +69,9 @@ export const ContractDetails = () => {
             containerStyles={{pt: '1em'}}
             header={
               <Box display="flex" justifyContent="space-between">
-                <Typography variant="subtitle1">#CNT000128</Typography>
+                <Typography variant="subtitle1">
+                  {contractDetails?.number}
+                </Typography>
                 <StatusChip
                   color="success"
                   label="In Effect"
@@ -160,20 +162,18 @@ export const ContractDetails = () => {
             }
           >
             <ContractParties
-              companyName={contractDetails?.propertyOwner.address.fullName}
+              companyName={contractDetails?.serviceCompany.name}
               personName={contractDetails?.serviceCompany.name}
               email={contractDetails?.serviceCompany.contact.email}
-              partyRole={contractDetails?.serviceCompany.role}
               partyType="Contractor"
               chipColor="info"
               chipTextColor={theme.palette.info.main}
               chipBgColor={theme.palette.info.outlinedHoverBg}
             />
             <ContractParties
-              companyName={contractDetails?.propertyOwner.address.fullName}
+              companyName={contractDetails?.propertyOwner.name}
               personName={contractDetails?.propertyOwner.name}
               email={contractDetails?.propertyOwner.contact.email}
-              partyRole={contractDetails?.propertyOwner.role}
               partyType="Customer"
               chipColor="info"
               chipTextColor={theme.palette.info.main}
