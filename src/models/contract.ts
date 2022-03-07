@@ -54,11 +54,12 @@ export interface Contract {
 }
 
 export interface QueryContractParams {
-  order?: Order;
-  orderBy?: ContractOrderField;
-  pageIndex?: number;
-  pageSize?: number;
-  query?: string;
+  order: Order;
+  orderBy: ContractOrderField;
+  pageIndex: number;
+  pageSize: number;
+  query: string;
+  serviceCompanyId: string;
   status?: string[];
 }
 

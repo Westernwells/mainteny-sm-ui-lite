@@ -117,13 +117,14 @@ const staticData = {
   },
 };
 
-const fetchServiceManager = async (username: string) =>
-  // TODO: Fetch API data
-  //   const response: AxiosResponse<ServiceManager> = await axiosClient({
-  //     method: 'GET',
-  //     url: `/api/users/propertyManager/${username}`,
-  //   });
-  staticData;
+const fetchServiceManager = async (username: string) => {
+  // TODO: This is a temporary solution,
+  const response: AxiosResponse<ServiceManager> = await axiosClient({
+    method: 'GET',
+    url: `/api/sessions/runAs/${username}`,
+  });
+  return response.data;
+};
 export const useServiceManager = () => {
   const {user} = useUserSession();
   return useQuery(
