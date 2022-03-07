@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
-// import {useFetchContractDetails} from 'hooks/reactQuery/useContract';
+import {useContractDetails} from 'hooks/reactQuery/useContract';
 import Tooltip from '@mui/material/Tooltip';
 import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 import useTheme from '@mui/material/styles/useTheme';
@@ -13,8 +13,6 @@ import {BackAction} from 'components/BackAction';
 import {toDate} from 'utils/datetime';
 import {differenceInDays, intervalToDuration, isBefore} from 'date-fns';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-// TODO: Dummy import
-import {staticContractDetails} from './data';
 import {ContractBasic} from './ContractBasic';
 import {ContractParties} from './ContractParties';
 import {ContractScope} from './ContractScope';
@@ -26,11 +24,7 @@ export const ContractDetails = () => {
   const {id: contractId} = useParams();
   const theme = useTheme();
   const navigate = useNavigate();
-  const contractDetails = staticContractDetails;
-  const isLoading = false;
-  // const {data: contractDetails, isLoading} = useFetchContractDetails(
-  //   contractId!,
-  // );
+  const {data: contractDetails, isLoading} = useContractDetails(contractId!);
   const totalContractDays =
     !isLoading &&
     differenceInDays(

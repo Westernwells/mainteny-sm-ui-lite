@@ -6,12 +6,11 @@ import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
+import {
+  useContractElevatorCount,
+  useQueryContract,
+} from 'hooks/reactQuery/useContract';
 import {columns, makeRows} from './ContractsDataGridProps';
-// import {
-//   useContractElevatorCount,
-//   useQueryContract,
-// } from '../../hooks/reactQuery/useContract';
-import {staticContracts, contractWithUnits} from './data';
 import {ContractOrderField, ContractView} from '../../models/contract';
 import {ElevatorView} from '../../models/elevator';
 import {BtnGroupType, Order, Resource} from '../../models/misc';
@@ -35,22 +34,21 @@ export const Contracts = () => {
     [],
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
+
   const {data: contractResource = createEmptyResource<ContractView>(10)} =
-    staticContracts;
-  // const {data: contractResource = createEmptyResource<ContractView>(10)} =
-  //   useQueryContract(
-  //     {
-  //       order: Order.DESC,
-  //       orderBy: ContractOrderField.CREATED_TIME,
-  //       pageIndex: page.pageIndex,
-  //       pageSize: page.pageSize,
-  //       query: search,
-  //     },
-  //     {expiryDate, contractor, price: cost},
-  //   );
-  // const {data: contractWithUnits} = useContractElevatorCount(
-  //   contractResource.data,
-  // );
+    useQueryContract(
+      {
+        order: Order.DESC,
+        orderBy: ContractOrderField.CREATED_TIME,
+        pageIndex: page.pageIndex,
+        pageSize: page.pageSize,
+        query: search,
+      },
+      {expiryDate, contractor, price: cost},
+    );
+  const {data: contractWithUnits} = useContractElevatorCount(
+    contractResource.data,
+  );
 
   const costRangeConvertor = (selectedItems: string[]) => {
     const range: number[][] = [];
