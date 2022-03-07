@@ -1,4 +1,6 @@
-export const invoiceResource = {
+import {Resource} from '../../models/misc';
+
+export const invoices: Resource<any> = {
   data: [
     {
       id: 'c986b9b9-da45-4ff9-8675-4ea0491fac8b',
