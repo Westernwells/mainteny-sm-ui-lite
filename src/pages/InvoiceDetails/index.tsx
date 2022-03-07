@@ -92,6 +92,11 @@ export const InvoiceDetails = () => {
                           ? invoice.totalAmount.amount /
                               10 ** invoice.totalAmount.fractionDigits!
                           : 0,
+                        {
+                          currency: invoice
+                            ? invoice.totalAmount.currency
+                            : 'EUR',
+                        },
                       )}`}
                   />
                   <StatusChip

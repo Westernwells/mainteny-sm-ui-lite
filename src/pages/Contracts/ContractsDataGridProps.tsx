@@ -9,7 +9,8 @@ import {
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import {formatDate, toDate} from '../../utils/datetime';
+import {formatCurrency} from 'utils/currency';
+import {formatDate, toDate} from 'utils/datetime';
 
 const defaultProps = {
   editable: false,
@@ -104,7 +105,9 @@ export const makeRows = (contracts: any): GridRowsProp =>
         contractor: item.serviceCompany.name,
         contractNumber: item.number,
         units: item.units,
-        cost: `${item.price} €`,
+        cost: `${formatCurrency(item ? item.price! : 0, {
+          currency: item.currency,
+        })}`,
         expiryDate: formatDate(item.endTime),
         navigateTo: item.id,
       }))
