@@ -1,5 +1,6 @@
 export const data = [
   {
+    id: '1',
     name: 'Hotel NH Berlin City',
     number: '7893001',
     address: 'Rathausstraße 2-3, 10367 Berlin',
@@ -8,6 +9,7 @@ export const data = [
     status: 'Invite',
   },
   {
+    id: '2',
     name: 'Hotel NH Berlin City',
     number: '7893001',
     address: 'Rathausstraße 2-3, 10367 Berlin',
@@ -16,6 +18,7 @@ export const data = [
     status: 'Invite',
   },
   {
+    id: '3',
     name: 'Hotel NH Berlin City',
     number: '7893001',
     address: 'Rathausstraße 2-3, 10367 Berlin',
@@ -24,6 +27,7 @@ export const data = [
     status: 'Invite',
   },
   {
+    id: '4',
     name: 'Hotel NH Berlin City',
     number: '7893001',
     address: 'Rathausstraße 2-3, 10367 Berlin',
@@ -32,6 +36,7 @@ export const data = [
     status: 'Invite',
   },
   {
+    id: '5',
     name: 'Hotel NH Berlin City',
     number: '7893001',
     address: 'Rathausstraße 2-3, 10367 Berlin',
@@ -40,6 +45,7 @@ export const data = [
     status: 'Invite',
   },
   {
+    id: '6',
     name: 'Hotel NH Berlin City',
     number: '7893001',
     address: 'Rathausstraße 2-3, 10367 Berlin',
@@ -48,6 +54,7 @@ export const data = [
     status: 'Invite',
   },
   {
+    id: '7',
     name: 'Hotel NH Berlin City',
     number: '7893001',
     address: 'Rathausstraße 2-3, 10367 Berlin',
@@ -56,6 +63,7 @@ export const data = [
     status: 'Invite',
   },
   {
+    id: '8',
     name: 'Hotel NH Berlin City',
     number: '7893001',
     address: 'Rathausstraße 2-3, 10367 Berlin',

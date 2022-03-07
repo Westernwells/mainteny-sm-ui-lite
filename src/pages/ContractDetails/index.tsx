@@ -13,6 +13,7 @@ import {BackAction} from 'components/BackAction';
 import {toDate} from 'utils/datetime';
 import {differenceInDays, intervalToDuration, isBefore} from 'date-fns';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import {BasicDetailsCard} from 'components/BasicDetailsCard';
 // TODO: Dummy import
 import {staticContractDetails} from './data';
 import {ContractBasic} from './ContractBasic';
@@ -69,7 +70,7 @@ export const ContractDetails = () => {
         }}
       >
         <Grid xs={8} item>
-          <ContractCard
+          <BasicDetailsCard
             minHeight="12rem"
             containerStyles={{pt: '1em'}}
             header={
@@ -90,7 +91,7 @@ export const ContractDetails = () => {
               costPerYear={contractDetails?.price}
               type={contractDetails?.type.toLowerCase()}
             />
-          </ContractCard>
+          </BasicDetailsCard>
 
           <ContractCard
             containerStyles={{mt: '1em', pt: '1em'}}

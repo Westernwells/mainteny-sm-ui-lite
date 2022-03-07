@@ -25,17 +25,17 @@ interface ContractRecord {
 }
 
 export const Contracts = () => {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(makePage(0, pageSize));
+  const [_search, setSearch] = useState('');
+  const [_page, setPage] = useState(makePage(0, pageSize));
   const [showFilter, setShowFilter] = useState(false);
-  const [expiryDate, setExpiryDate] = useState<string[]>([]);
-  const [contractor, setContractor] = useState<string[]>([]);
-  const [cost, setCost] = useState<number[][]>([]);
+  const [_expiryDate, setExpiryDate] = useState<string[]>([]);
+  const [_contractor, setContractor] = useState<string[]>([]);
+  const [_cost, setCost] = useState<number[][]>([]);
   const [contractorFilterItems, setConractorFileterItems] = useState<string[]>(
     [],
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const {data: contractResource = createEmptyResource<ContractView>(10)} =
+  const {data: _contractResource = createEmptyResource<ContractView>(10)} =
     staticContracts;
   // const {data: contractResource = createEmptyResource<ContractView>(10)} =
   //   useQueryContract(

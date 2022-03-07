@@ -9,6 +9,7 @@ import {UnitsDetail} from 'pages/UnitDetails';
 import {Contracts} from 'pages/Contracts';
 import {Customer} from 'pages/Customer';
 import {ContractDetails} from 'pages/ContractDetails';
+import {CustomerDetails} from 'pages/CustomerDetails/indext';
 import {Invoices} from 'pages/Invoices';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
 import {ProtectedRoutes} from './ProtectedRoutes';
@@ -85,10 +86,8 @@ export const Router = () => (
       <Route
         path="/customers/:id"
         element={
-          <PageLayout>
-            <div>
-              <h2>Customer Details</h2>
-            </div>
+          <PageLayout overflowY>
+            <CustomerDetails />
           </PageLayout>
         }
       />
