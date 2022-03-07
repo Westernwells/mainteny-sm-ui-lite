@@ -3,10 +3,7 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import useTheme from '@mui/material/styles/useTheme';
 import axios from 'axios';
-// import {
-//   useInvoiceDetail,
-//   useInvoiceDownloadUrl,
-// } from 'hooks/reactQuery/useInvoice';
+import {useInvoiceDetail} from 'hooks/reactQuery/useInvoice';
 import {StatusChip} from 'components/StatusChip';
 import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
 import {CardProps} from 'components/CardProps';
@@ -22,15 +19,15 @@ import {Invoice} from './Invoice';
 import {RelatedTo} from './RelatedTo';
 
 export const InvoiceDetails = () => {
-  // const {id: invoiceId} = useParams();
-  // const {data: invoice} = useInvoiceDetail(invoiceId);
+  const {id: invoiceId} = useParams();
+  const {data: invoice} = useInvoiceDetail(invoiceId);
+  // TODO: Fetch Download URL
+
   // const {data: downloadUrl} = useDownloadUrl(
   //   invoice?.additionalInfo.pdfPath ? [invoice?.additionalInfo.pdfPath] : [],
   // );
-  // console.log(downloadUrl, '!!!!!!!!!!!');
-
-  // TODO: Fetch Download URL
   const downloadUrl = [`${process.env.REACT_APP_BASE_URL}/INV000128.pdf`];
+
   const theme = useTheme();
 
   return (

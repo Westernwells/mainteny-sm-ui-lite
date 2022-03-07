@@ -8,10 +8,9 @@ import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {BtnGroupType} from 'models/misc';
 import {InvoiceStatus, InvoiceStatusView} from 'models/invoice';
+import {useInvoices} from 'hooks/reactQuery/useInvoice';
 import {columns, makeRows} from './InvoicesDataGridProps';
 import {makePage} from '../../utils/paging-utils';
-import {invoiceResource} from './dummyData';
-// import {useInvoices} from '../../hooks/reactQuery/useInvoice';
 import {Widget} from '../../components/Widget';
 
 export const Invoices = () => {
@@ -22,15 +21,15 @@ export const Invoices = () => {
   const [status, setStatus] = useState<string[]>([]);
   const [rows, setRows] = useState<GridRowsProp>([]);
   // TODO: Create Invoice model for invoices with 'Order number' and 'Service type'
-  // const {data: invoiceResource} = useInvoices(
-  //   {
-  //     pageIndex: page.pageIndex,
-  //     pageSize: page.pageSize,
-  //     query: search,
-  //     status: [InvoiceStatus.PAID, InvoiceStatus.NOT_PAID],
-  //   },
-  //   {amount, status},
-  // );
+  const {data: invoiceResource} = useInvoices(
+    {
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+      query: search,
+      status: [InvoiceStatus.PAID, InvoiceStatus.NOT_PAID],
+    },
+    {},
+  );
 
   const amountRangeConvertor = (selectedItems: string[]) => {
     const range: number[][] = [];
