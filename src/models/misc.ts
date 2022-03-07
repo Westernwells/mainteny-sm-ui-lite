@@ -165,6 +165,7 @@ export interface DateRange {
 export interface Fee {
   amount: number;
   currency: string;
+  fractionDigits: number;
 }
 
 export enum Priority {

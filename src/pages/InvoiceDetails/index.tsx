@@ -17,6 +17,7 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import Button from '@mui/material/Button';
 import {formatDate, getDateObject} from 'utils/datetime';
 import {InvoiceStatus, InvoiceStatusView} from 'models/invoice';
+import {formatCurrency} from 'utils/currency';
 import {InvoiceCard} from './InvoiceCard';
 import {Invoice} from './Invoice';
 import {RelatedTo} from './RelatedTo';
@@ -55,7 +56,7 @@ export const InvoiceDetails = () => {
             header={
               <Box display="flex" justifyContent="space-between">
                 <Box>
-                  <Typography variant="subtitle1">#INV000128</Typography>
+                  <Typography variant="subtitle1">{invoice?.number}</Typography>
                   <Typography
                     variant="body2"
                     sx={{color: theme.palette.text.secondary}}
@@ -85,9 +86,13 @@ export const InvoiceDetails = () => {
                     containerStyles={{mr: '0.5em'}}
                     iconBackground={theme.palette.success.outlinedHoverBg}
                     iconMaxHeight="3rem"
-                    bodyText={`${invoice?.totalAmount.amount.toLocaleString()} ${
-                      invoice?.totalAmount.currency
-                    }`}
+                    bodyText={`
+                      ${formatCurrency(
+                        invoice
+                          ? invoice.totalAmount.amount /
+                              10 ** invoice.totalAmount.fractionDigits!
+                          : 0,
+                      )}`}
                   />
                   <StatusChip
                     label={

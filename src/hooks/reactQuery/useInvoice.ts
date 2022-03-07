@@ -57,8 +57,6 @@ export const fetchInvoice = async (invoiceId: string) => {
   const response = await axiosClient.get<InvoiceView>(
     `/api/invoices/${invoiceId}`,
   );
-  console.log(response, '&&&&&&&');
-
   return response.data;
 };
 
