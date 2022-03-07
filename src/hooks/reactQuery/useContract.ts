@@ -95,7 +95,6 @@ const fetchContractDetails = async (contractId: string) => {
   const response = await axiosClient.get<ContractView>(
     `/api/contracts/${contractId}`,
   );
-  console.log(response.data, '%%%^^&&%$$$');
   return response.data;
 };
 export const useContractDetails = (contractId: string) =>

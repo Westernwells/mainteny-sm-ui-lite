@@ -11,9 +11,10 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {StatusChip} from 'components/StatusChip';
 import {BackAction} from 'components/BackAction';
 import {toDate} from 'utils/datetime';
-import {differenceInDays, intervalToDuration, isBefore} from 'date-fns';
+import {differenceInDays, isBefore} from 'date-fns';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {BasicDetailsCard} from 'components/BasicDetailsCard';
+import {formatCurrency} from 'utils/currency';
 import {ContractBasic} from './ContractBasic';
 import {ContractParties} from './ContractParties';
 import {ContractScope} from './ContractScope';
@@ -84,7 +85,12 @@ export const ContractDetails = () => {
             <ContractBasic
               startTime={contractDetails?.startTime}
               endTime={contractDetails?.endTime}
-              costPerYear={contractDetails?.price}
+              costPerYear={formatCurrency(
+                contractDetails ? contractDetails.price! : 0,
+                {
+                  currency: contractDetails?.currency || 'EUR',
+                },
+              )}
               type={contractDetails?.type.toLowerCase()}
             />
           </BasicDetailsCard>
