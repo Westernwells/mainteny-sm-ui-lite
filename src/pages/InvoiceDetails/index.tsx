@@ -12,8 +12,11 @@ import {HistoryCard} from 'pages/UnitDetails/Tabs/ServiceHistoryTab/HistoryCard'
 import {BackAction} from 'components/BackAction';
 import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 // import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import Button from '@mui/material/Button';
+import {formatDate, getDateObject} from 'utils/datetime';
+import {InvoiceStatus, InvoiceStatusView} from 'models/invoice';
 import {InvoiceCard} from './InvoiceCard';
 import {Invoice} from './Invoice';
 import {RelatedTo} from './RelatedTo';
@@ -21,13 +24,10 @@ import {RelatedTo} from './RelatedTo';
 export const InvoiceDetails = () => {
   const {id: invoiceId} = useParams();
   const {data: invoice} = useInvoiceDetail(invoiceId);
-  // TODO: Fetch Download URL
 
-  // const {data: downloadUrl} = useDownloadUrl(
-  //   invoice?.additionalInfo.pdfPath ? [invoice?.additionalInfo.pdfPath] : [],
-  // );
-  const downloadUrl = [`${process.env.REACT_APP_BASE_URL}/INV000128.pdf`];
-
+  const {data: downloadUrl} = useDownloadUrl(
+    invoice?.additionalInfo.pdfPath ? [invoice?.additionalInfo.pdfPath] : [],
+  );
   const theme = useTheme();
 
   return (
@@ -60,7 +60,11 @@ export const InvoiceDetails = () => {
                     variant="body2"
                     sx={{color: theme.palette.text.secondary}}
                   >
-                    Generated on 24 Sep 2021
+                    Generated on{' '}
+                    {formatDate(
+                      getDateObject(invoice?.meta.createdAt),
+                      'dd MMM YYY',
+                    )}
                   </Typography>
                 </Box>
 
@@ -70,19 +74,37 @@ export const InvoiceDetails = () => {
                     bodyTextVariant="subtitle1"
                     icon={
                       <MonetizationOnOutlinedIcon
-                        color="success"
+                        color={
+                          invoice?.status === InvoiceStatus.PAID
+                            ? 'success'
+                            : 'warning'
+                        }
                         sx={{width: '1.25rem', height: '1.25rem'}}
                       />
                     }
                     containerStyles={{mr: '0.5em'}}
                     iconBackground={theme.palette.success.outlinedHoverBg}
                     iconMaxHeight="3rem"
-                    bodyText="9,700 EUR"
+                    bodyText={`${invoice?.totalAmount.amount.toLocaleString()} ${
+                      invoice?.totalAmount.currency
+                    }`}
                   />
                   <StatusChip
-                    label="Paid"
-                    textColor={theme.palette.success.main}
-                    bgColor={theme.palette.success.outlinedHoverBg}
+                    label={
+                      invoice?.status === InvoiceStatus.PAID
+                        ? InvoiceStatusView.PAID
+                        : InvoiceStatusView.NOT_PAID
+                    }
+                    textColor={
+                      invoice?.status === InvoiceStatus.PAID
+                        ? theme.palette.success.main
+                        : theme.palette.warning.main
+                    }
+                    bgColor={
+                      invoice?.status === InvoiceStatus.PAID
+                        ? theme.palette.success.outlinedHoverBg
+                        : theme.palette.warning.outlinedHoverBg
+                    }
                   />
                 </Box>
               </Box>
