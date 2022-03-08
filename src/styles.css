@@ -1,2 +1,40 @@
 html {
+  font-size: 16px;
+}
+
+html::-webkit-scrollbar {
+  width: 0;
+  background: 'transparent';
+}
+
+/* mobile */
+
+@media screen and (min-width: 0px) {
+  html {
+    font-size: 10px;
+  }
+}
+
+/* tablet */
+
+@media screen and (min-width: 640px) {
+  html {
+    font-size: 12px;
+  }
+}
+
+/* laptop */
+
+@media screen and (min-width: 1024px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* desktop */
+
+@media screen and (min-width: 1200px) {
+  html {
+    font-size: 16px;
+  }
 }
