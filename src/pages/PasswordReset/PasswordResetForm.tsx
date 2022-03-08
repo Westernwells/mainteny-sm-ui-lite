@@ -52,7 +52,8 @@ export const PasswordResetForm = ({
               <InputAdornment
                 position="start"
                 onClick={() => setShowPassword(!showPassword)}
-                sx={{cursor: 'pointer'}}>
+                sx={{cursor: 'pointer'}}
+              >
                 <RemoveRedEye />
               </InputAdornment>
             ),
@@ -69,7 +70,8 @@ export const PasswordResetForm = ({
                 ml={1}
                 color={
                   password.length >= 6 ? 'body1' : 'rgba(143, 155, 179, 0.5)'
-                }>
+                }
+              >
                 Atleast 6 characters
               </Typography>
             </Box>
@@ -83,7 +85,8 @@ export const PasswordResetForm = ({
                 ml={1}
                 color={
                   password.match(/\d/) ? 'body1' : 'rgba(143, 155, 179, 0.5)'
-                }>
+                }
+              >
                 Minimum 1 number
               </Typography>
             </Box>
@@ -105,7 +108,8 @@ export const PasswordResetForm = ({
                 <InputAdornment
                   position="start"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  sx={{cursor: 'pointer'}}>
+                  sx={{cursor: 'pointer'}}
+                >
                   <RemoveRedEye />
                 </InputAdornment>
               ),
@@ -123,7 +127,8 @@ export const PasswordResetForm = ({
               setHeading('Confirm your new password');
             }}
             size="large"
-            endIcon={<ArrowForward />}>
+            endIcon={<ArrowForward />}
+          >
             Next
           </Button>
         ) : (
@@ -134,7 +139,8 @@ export const PasswordResetForm = ({
               variant="contained"
               size="large"
               onClick={() => navigate('/login?authType=reset')}
-              endIcon={<ArrowForward />}>
+              endIcon={<ArrowForward />}
+            >
               Go
             </Button>
             <Button
@@ -145,7 +151,8 @@ export const PasswordResetForm = ({
                 setHeading('Set a new password');
               }}
               size="large"
-              startIcon={<ArrowBack />}>
+              startIcon={<ArrowBack />}
+            >
               Back
             </Button>
           </Box>
