@@ -32,6 +32,11 @@ export const PasswordResetForm = ({
   return (
     <Box mt={3} display="flex" justifyContent="center" width="100%">
       <form style={{width: '18rem'}} onSubmit={handleSubmit}>
+        <Typography variant="body1" textAlign="center" my={4}>
+          {!reEnterPassword
+            ? 'Set a new password'
+            : 'Confirm your new password'}
+        </Typography>
         <TextField
           disabled={reEnterPassword}
           id="password"
