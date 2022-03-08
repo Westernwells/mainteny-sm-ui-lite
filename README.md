@@ -75,11 +75,16 @@ If you aren't satisfied with the build tool and configuration choices, you can `
 
 ## Roadmap
 
-> Add Roadmap here
+- Employees Management - Allowing service managers to have an overview of technicians, their availability, holidays, working hours etc.
+- Invoice Creation workflow - Allowing service managers to verify details and create invoices out of a completed order.
+- Service Orders & Scheduling - Allowing service managers to schedule incoming orders and have an overview of the automated schedule provided by Mainteny's algorithm. The service orders will also be presented in a swimlane view for better UX.
+- KPI Dashboard - A home/dashboard page for service managers to be informed about their key KPIs and action items. They include order completion metrics, to-dos etc.
+- Proposals and Proposal Creation workflow - Proposals are an important way for service managers to convice customers and get revenue. These proposals could ideally be for a repair work.
+
 
 ## Contributing
 
-> Add contributing guidelines here
+Please create a branch out of main for any contributions and send a merge request to the frontend team (Ayo & Suraj).
 
 ## Project status
 
