@@ -1,7 +1,11 @@
 import {Navigate, Route, Routes} from 'react-router-dom';
 import {PageLayout} from 'components/PageLayout';
 import {Login} from 'pages/Login';
-import {PasswordReset} from 'pages/PasswordReset';
+import {
+  PasswordAuthenticate,
+  PasswordRequest,
+  PasswordReset,
+} from 'pages/PasswordReset';
 import {MyUnits} from 'pages/Units';
 import {UnitsDetail} from 'pages/UnitDetails';
 import {Contracts} from 'pages/Contracts';
@@ -17,7 +21,16 @@ export const Router = () => (
   <Routes>
     <Route element={<AuthRoutes />}>
       <Route path="/login" element={<Login />} />
-      <Route path="/reset-password" element={<PasswordReset />} />
+      <Route
+        path="/reset-password"
+        element={<Navigate to="/reset-password/request" />}
+      />
+      <Route path="/reset-password/request" element={<PasswordRequest />} />
+      <Route
+        path="/reset-password/authenticate"
+        element={<PasswordAuthenticate />}
+      />
+      <Route path="/reset-password/reset" element={<PasswordReset />} />
     </Route>
     <Route element={<ProtectedRoutes />}>
       <Route path="/" element={<Navigate to="/units" />} />
