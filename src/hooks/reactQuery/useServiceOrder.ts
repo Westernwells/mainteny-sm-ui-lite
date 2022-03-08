@@ -213,7 +213,6 @@ export function useServiceOrders(params: any) {
     () =>
       fetchServiceOrders({
         ...params,
-        status: [],
         serviceCompanyId: user!.userAccount.serviceCompany.id,
         orderBy: ServiceOrderOrderField.CREATED_TIME,
         order: Order.DESC,

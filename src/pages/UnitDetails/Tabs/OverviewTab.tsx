@@ -1,32 +1,20 @@
-import {
-  Elevator,
-  ElevatorMaintenanceHistoryView as ServiceHistoryView,
-} from 'models/elevator';
-import {
-  ServiceOrderOrderField,
-  ServiceOrderType,
-  ServiceOrderView,
-} from 'models/service-order';
+import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
 import useTheme from '@mui/material/styles/useTheme';
 import {Order} from 'models/misc';
 import Grid from '@mui/material/Grid';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-// import {useIssueHistory} from 'hooks/reactQuery/useIssueHistory';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {endOfMonth, endOfYear, startOfDay, startOfYear} from 'date-fns';
+import {endOfMonth, startOfDay, startOfYear} from 'date-fns';
 import {toRestDateTime} from 'utils/datetime';
 import {useParams} from 'react-router-dom';
 import {ReactComponent as Escalator} from 'assets/icons/Escalator.svg';
 import {PageCard} from 'components/PageCard';
+import {useServiceHistory} from 'hooks/reactQuery/useServiceHistory';
+import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {
-  user,
-  issueHistory,
-  serviceHistories,
-  runningServiceOrders,
-} from './dummyData';
-// import {useServiceHistory} from 'hooks/reactQuery/useServiceHistory';
-// import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
-// import {usePropertyManager} from 'hooks/reactQuery/usePropertyManager';
+  useElevatorById,
+  useElevatorMaintainers,
+} from 'hooks/reactQuery/useElevator';
 import {ElevatorAvailabilitySection} from '../ElevatorAvailabilitySection';
 import {ElevatorBasicSection} from '../ElevatorBasicSection';
 import {TechnicianSection} from '../TechnicianSection';
@@ -35,60 +23,36 @@ import {ServiceHistory} from '../ServiceHistory';
 
 const pageSize = 10;
 
-interface Props {
-  // TODO: Resolve 'any' type here
-  elevator?: Elevator | any;
-  // TODO: Resolve 'any' type here
-  maintainers: MaintainerView[] | any;
-}
-
-export const OverviewTab = ({elevator, maintainers}: Props) => {
+export const OverviewTab = () => {
   const {id: elevatorId} = useParams();
   const theme = useTheme();
-  // TODO: user reactQuery hooks to fetch data
-  // const {data: user} = usePropertyManager();
-  // const {data: issueHistory = createEmptyResource<ServiceOrderView>(pageSize)} =
-  //   useIssueHistory({
-  //     elevatorIds: elevatorId,
-  //     start: startOfYear(new Date()).toISOString(),
-  //     end: endOfYear(new Date()).toISOString(),
-  //     pageSize,
-  //     pageIndex: 0,
-  //     serviceCompanyId: user?.userAccount.serviceCompany.id,
-  //     query: '',
-  //     types: [
-  //       ServiceOrderType.CALLOUT,
-  //       ServiceOrderType.EMERGENCY,
-  //       ServiceOrderType.REPAIR,
-  //     ],
-  //     status: [],
-  //     orderBy: ServiceOrderOrderField.CREATED_TIME,
-  //     order: Order.DESC,
-  //   });
 
-  // const {
-  //   data: serviceHistories = createEmptyResource<ServiceHistoryView>(pageSize),
-  // } = useServiceHistory(makePage(0, 10), elevatorId);
+  const {data: elevator} = useElevatorById(elevatorId);
 
-  // const {
-  //   data: runningServiceOrders = createEmptyResource<ServiceOrderView>(
-  //     pageSize,
-  //   ),
-  // } = useServiceOrders({
-  //   elevatorIds: elevatorId,
-  //   start: toRestDateTime(startOfDay(new Date())),
-  //   end: toRestDateTime(endOfMonth(new Date())),
-  //   pageSize: 2,
-  //   pageIndex: 0,
-  //   query: '',
-  // });
+  const {data: maintainers = []} = useElevatorMaintainers(elevatorId);
+
+  const {
+    data: serviceOrders = createEmptyResource<ServiceOrderView>(pageSize),
+  } = useServiceOrders({
+    elevatorIds: elevatorId,
+    start: startOfDay(new Date()).toISOString(),
+    end: endOfMonth(new Date()).toISOString(),
+    pageSize,
+    pageIndex: 0,
+    query: '',
+    status: [
+      ServiceOrderStatus.SCHEDULED,
+      ServiceOrderStatus.COMPLETED,
+      ServiceOrderStatus.IN_PROGRESS,
+    ],
+  });
   return (
     <>
       <Grid container spacing={2} sx={{mt: '1em'}}>
         <Grid item xs={4}>
           <ElevatorBasicSection
             elevator={elevator}
-            serviceOrder={runningServiceOrders.data[0]}
+            serviceOrder={serviceOrders.data[0]}
             rows={[
               {
                 leftLabel: elevator?.model,
@@ -153,14 +117,15 @@ export const OverviewTab = ({elevator, maintainers}: Props) => {
 
       <Grid container sx={{mt: '1em'}}>
         <Grid item xs={12}>
-          <PageCard contentPadding="1.5em" headerLabel="Service History">
-            <ServiceHistory
-              bodyContainerStyle={{
-                borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-              }}
-            />
-            {[1, 2, 3, 4, 5, 6, 7].map((item) => (
+          <PageCard
+            contentPadding="1.5em"
+            headerLabel="All Services"
+            minHeight="10rem"
+          >
+            {serviceOrders.data.map((serviceOrder) => (
               <ServiceHistory
+                key={serviceOrder.id}
+                serviceOrder={serviceOrder}
                 bodyContainerStyle={{
                   borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
                 }}

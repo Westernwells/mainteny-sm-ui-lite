@@ -1,17 +1,25 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import {ServiceOrderType} from 'models/service-order';
+import {ServiceOrderView} from 'models/service-order';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import Grid from '@mui/material/Grid';
+import {formatDate} from 'utils/datetime';
+import {ServiceOrderStatusIcons} from 'components/ServiceOrderStatusIcons';
+import {ServiceOrderStatusText} from 'components/ServiceOrderStatusText';
+import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 
 interface Props {
   bodyContainerStyle?: {[key: string]: string | number};
   minHeight?: number | string;
+  serviceOrder: ServiceOrderView;
 }
 
-export const ServiceHistory = ({bodyContainerStyle, minHeight}: Props) => {
+export const ServiceHistory = ({
+  bodyContainerStyle,
+  minHeight,
+  serviceOrder,
+}: Props) => {
   const theme = useTheme();
   return (
     <Grid
@@ -24,57 +32,48 @@ export const ServiceHistory = ({bodyContainerStyle, minHeight}: Props) => {
     >
       <Grid xs={3} item>
         <Box display="flex">
-          <Typography variant="subtitle1">24 Sep 2021, </Typography>
+          <Typography variant="subtitle1" sx={{mr: '0.3em'}}>
+            {formatDate(serviceOrder.schedules[0].startTime, 'dd MMM YYY')},
+          </Typography>
           <Typography
             variant="body2"
             sx={{mt: '0.35em', color: theme.palette.text.secondary}}
           >
-            {' '}
-            {' 5PM - 6PM'}
+            {`${formatDate(
+              serviceOrder.schedules[0].startTime,
+              'ha',
+            )} - ${formatDate(serviceOrder.schedules[0].endTime, 'ha')}`}
           </Typography>
         </Box>
       </Grid>
       <Grid xs={2} item>
         <Box display="flex">
-          <Box>
+          <Box sx={{mt: '0.1em', mr: '0.3em'}}>
             <ServiceOrderIcons
-              serviceOrderType={ServiceOrderType.REGULAR}
+              serviceOrderType={serviceOrder.type}
               style={{
                 width: '0.8em',
                 height: '0.8em',
-                marginRight: '0.3em',
-                mt: '0.2em',
               }}
             />
           </Box>
           <Box>
-            <Typography variant="caption">Maintenance</Typography>
+            <ServiceOrderTypeText serviceOrderType={serviceOrder.type} />
           </Box>
         </Box>
       </Grid>
 
       <Grid xs={5} item>
-        <Typography variant="caption">
-          Checked the inner shaft of the elevator engine door and did...
-        </Typography>
+        <Typography variant="caption">{serviceOrder.description}</Typography>
       </Grid>
 
       <Grid xs={2} item>
         <Box display="flex" justifyContent="flex-end">
           <Box mr="0.4em">
-            <Typography
-              variant="chip"
-              color={theme.palette.text.secondary}
-              sx={{textTransform: 'capitalize'}}
-            >
-              Completed
-            </Typography>
+            <ServiceOrderStatusText serviceOrderStatus={serviceOrder.status} />
           </Box>
           <Box>
-            <CheckCircleIcon
-              color="success"
-              sx={{mt: '0.3em', height: '0.833rem', width: '0.833rem'}}
-            />
+            <ServiceOrderStatusIcons serviceOrderStatus={serviceOrder.status} />
           </Box>
         </Box>
       </Grid>
