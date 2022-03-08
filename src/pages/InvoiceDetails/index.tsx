@@ -130,7 +130,27 @@ export const InvoiceDetails = () => {
             headerContainerStyle={{pb: '0.5em'}}
           >
             <RelatedTo>
-              <HistoryCard removeShadows />
+              <HistoryCard
+                serviceOrder={invoice?.serviceOrder}
+                headerTitle={formatDate(
+                  invoice?.serviceOrder.schedules[0].startTime,
+                  'dd MMM YYY',
+                )}
+                subtitle={`${formatDate(
+                  invoice?.serviceOrder.schedules[0].startTime,
+                  'ha',
+                )} - ${formatDate(
+                  invoice?.serviceOrder.schedules[0].endTime,
+                  'ha',
+                )}`}
+                description={invoice?.serviceOrder.description}
+                containerStyles={{borderRadius: 0}}
+                showPointer
+                removeShadows
+                bodyContainerStyle={{
+                  borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+                }}
+              />
             </RelatedTo>
           </InvoiceCard>
 
