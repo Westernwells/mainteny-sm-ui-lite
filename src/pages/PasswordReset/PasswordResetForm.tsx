@@ -107,7 +107,7 @@ export const PasswordResetForm = ({
               startAdornment: (
                 <InputAdornment
                   position="start"
-                  onClick={() => setShowConfirmPassword(!showPassword)}
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   sx={{cursor: 'pointer'}}
                 >
                   <RemoveRedEye />
