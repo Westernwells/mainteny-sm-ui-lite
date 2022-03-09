@@ -63,7 +63,8 @@ export const PasswordRequestForm = ({
             sx={{width: '100%'}}
             variant="contained"
             size="large"
-            endIcon={<ArrowForward />}>
+            endIcon={<ArrowForward />}
+          >
             Get Reset Code
           </Button>
           <Button
