@@ -1,8 +1,6 @@
 import React, {useState} from 'react';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import ArrowBack from '@mui/icons-material/ArrowBack';
-import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
-import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import EmailIcon from '@mui/icons-material/Email';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -61,13 +59,11 @@ export const PasswordRequestForm = ({
         />
         <Box mt={5}>
           <Button
+            type="submit"
             disabled={!!(!email || emailError)}
             sx={{width: '100%'}}
             variant="contained"
             size="large"
-            type="submit"
-            // TODO: check this
-            onClick={() => navigate('/reset-password/authenticate')}
             endIcon={<ArrowForward />}
           >
             Get Reset Code

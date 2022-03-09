@@ -17,26 +17,25 @@ interface Props {
   password: string;
   passwordError: string | undefined;
   confirmPassword: string;
+  setHeading: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const PasswordResetForm = ({
   handleSubmit,
   handleChange,
+  handleBlur,
   password,
   passwordError,
   confirmPassword,
-  handleBlur,
+  setHeading,
 }: Props) => {
   const [reEnterPassword, setReEnterPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   return (
     <Box mt={3} display="flex" justifyContent="center" width="100%">
       <form style={{width: '18rem'}} onSubmit={handleSubmit}>
-        <Typography variant="body1" textAlign="center" my={4}>
-          {!reEnterPassword
-            ? 'Set a new password'
-            : 'Confirm your new password'}
-        </Typography>
         <TextField
           disabled={reEnterPassword}
           id="password"
@@ -44,13 +43,17 @@ export const PasswordResetForm = ({
           label="Password"
           size="medium"
           fullWidth
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           onChange={handleChange}
           onBlur={handleBlur}
           value={password}
           InputProps={{
             startAdornment: (
-              <InputAdornment position="start">
+              <InputAdornment
+                position="start"
+                onClick={() => setShowPassword(!showPassword)}
+                sx={{cursor: 'pointer'}}
+              >
                 <RemoveRedEye />
               </InputAdornment>
             ),
@@ -96,13 +99,17 @@ export const PasswordResetForm = ({
             label="Re enter password"
             size="medium"
             fullWidth
-            type="password"
+            type={showConfirmPassword ? 'text' : 'password'}
             onChange={handleChange}
             onBlur={handleBlur}
             value={confirmPassword}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start">
+                <InputAdornment
+                  position="start"
+                  onClick={() => setShowConfirmPassword(!showPassword)}
+                  sx={{cursor: 'pointer'}}
+                >
                   <RemoveRedEye />
                 </InputAdornment>
               ),
@@ -115,7 +122,10 @@ export const PasswordResetForm = ({
             disabled={!!(!password || passwordError)}
             sx={{marginTop: 5, width: '100%'}}
             variant="contained"
-            onClick={() => setReEnterPassword(!reEnterPassword)}
+            onClick={() => {
+              setReEnterPassword(!reEnterPassword);
+              setHeading('Confirm your new password');
+            }}
             size="large"
             endIcon={<ArrowForward />}
           >
@@ -136,7 +146,10 @@ export const PasswordResetForm = ({
             <Button
               sx={{width: '100%', marginTop: 1}}
               variant="outlined"
-              onClick={() => setReEnterPassword(!reEnterPassword)}
+              onClick={() => {
+                setReEnterPassword(!reEnterPassword);
+                setHeading('Set a new password');
+              }}
               size="large"
               startIcon={<ArrowBack />}
             >
