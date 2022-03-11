@@ -23,7 +23,7 @@ module.exports = {
       'import/prefer-default-export': 'off',
       'react/jsx-fragments': 'off',
       'react/jsx-filename-extension': [1, {extensions: ['.tsx']}],
-      'no-unused-vars': 'off',
+      'no-unused-vars': 2,
       '@typescript-eslint/no-unused-vars': 'off', // TODO: enable it later
       'no-shadow': 'off',
       'no-param-reassign': 0,
