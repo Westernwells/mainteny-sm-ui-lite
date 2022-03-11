@@ -43,6 +43,7 @@ export const Contracts = () => {
         pageIndex: page.pageIndex,
         pageSize: page.pageSize,
         query: search,
+        status: [],
       },
       {expiryDate, contractor, price: cost},
     );

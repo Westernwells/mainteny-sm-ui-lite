@@ -11,9 +11,10 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {StatusChip} from 'components/StatusChip';
 import {BackAction} from 'components/BackAction';
 import {toDate} from 'utils/datetime';
-import {differenceInDays, intervalToDuration, isBefore} from 'date-fns';
+import {differenceInDays, isBefore} from 'date-fns';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {BasicDetailsCard} from 'components/BasicDetailsCard';
+import {formatCurrency} from 'utils/currency';
 import {ContractBasic} from './ContractBasic';
 import {ContractParties} from './ContractParties';
 import {ContractScope} from './ContractScope';
@@ -69,7 +70,9 @@ export const ContractDetails = () => {
             containerStyles={{pt: '1em'}}
             header={
               <Box display="flex" justifyContent="space-between">
-                <Typography variant="subtitle1">#CNT000128</Typography>
+                <Typography variant="subtitle1">
+                  {contractDetails?.number}
+                </Typography>
                 <StatusChip
                   color="success"
                   label="In Effect"
@@ -82,7 +85,12 @@ export const ContractDetails = () => {
             <ContractBasic
               startTime={contractDetails?.startTime}
               endTime={contractDetails?.endTime}
-              costPerYear={contractDetails?.price}
+              costPerYear={formatCurrency(
+                contractDetails ? contractDetails.price! : 0,
+                {
+                  currency: contractDetails?.currency || 'EUR',
+                },
+              )}
               type={contractDetails?.type.toLowerCase()}
             />
           </BasicDetailsCard>
@@ -160,20 +168,18 @@ export const ContractDetails = () => {
             }
           >
             <ContractParties
-              companyName={contractDetails?.propertyOwner.address.fullName}
+              companyName={contractDetails?.serviceCompany.name}
               personName={contractDetails?.serviceCompany.name}
               email={contractDetails?.serviceCompany.contact.email}
-              partyRole={contractDetails?.serviceCompany.role}
               partyType="Contractor"
               chipColor="info"
               chipTextColor={theme.palette.info.main}
               chipBgColor={theme.palette.info.outlinedHoverBg}
             />
             <ContractParties
-              companyName={contractDetails?.propertyOwner.address.fullName}
+              companyName={contractDetails?.propertyOwner.name}
               personName={contractDetails?.propertyOwner.name}
               email={contractDetails?.propertyOwner.contact.email}
-              partyRole={contractDetails?.propertyOwner.role}
               partyType="Customer"
               chipColor="info"
               chipTextColor={theme.palette.info.main}

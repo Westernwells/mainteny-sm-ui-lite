@@ -1,6 +1,4 @@
 import Box from '@mui/material/Box';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import useTheme from '@mui/material/styles/useTheme';
@@ -8,7 +6,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 interface Props {
   alertIcon?: JSX.Element;
-  message: string;
+  message: string | null;
   status?: 'error' | 'info' | 'success' | 'warning';
 }
 

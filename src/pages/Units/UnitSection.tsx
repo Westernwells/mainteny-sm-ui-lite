@@ -14,25 +14,12 @@ import {formatDate, toDate} from '../../utils/datetime';
 import {ElevatorStatus, ElevatorView} from '../../models/elevator';
 
 export interface UnitsSectionProperty {
-  // TODO: Check this 'any' type
-  elevatorsByAddress: ElevatorsByAddress | any;
-  setField: (
-    field: string,
-    value: any,
-    shouldValidate?: boolean | undefined,
-  ) => Promise<void> | Promise<FormikErrors<any>>;
+  elevatorsByAddress: ElevatorsByAddress;
 }
 
-export const UnitSection = ({
-  elevatorsByAddress,
-  setField,
-}: UnitsSectionProperty) => {
+export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
   const theme = useTheme();
   const navigate = useNavigate();
-
-  const handleClick = (elevator: ElevatorView) => {
-    setField('elevator', elevator);
-  };
 
   return (
     <Box
@@ -50,8 +37,8 @@ export const UnitSection = ({
           {elevatorsByAddress.address.fullName}
         </Typography>
       </Box>
-      {/* TODO: Check this 'any' type */}
-      {elevatorsByAddress.elevators.map((elevatorOrder: any) => (
+
+      {elevatorsByAddress.elevators.map((elevatorOrder) => (
         <Grid
           key={elevatorOrder.elevator.id}
           container

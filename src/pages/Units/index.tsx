@@ -1,23 +1,19 @@
-import React, {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import Box from '@mui/material/Box';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Typography from '@mui/material/Typography';
 import {ElevatorView} from 'models/elevator';
 
 import {Widget} from 'components/Widget';
-import Modal from '@mui/material/Modal';
+import {useFetchServiceOrdersByElevators} from 'hooks/reactQuery/useServiceOrder';
 import Fade from '@mui/material/Fade';
-import Drawer from '@mui/material/Drawer';
-import {useFormik} from 'formik';
+import {TablePagination} from '@mui/material';
 import * as Yup from 'yup';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
+import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {BtnGroupType} from 'models/misc';
 import {FilterFields} from 'components/FilterFields';
-import Slide from '@mui/material/Slide';
 import useTheme from '@mui/material/styles/useTheme';
-import {elevatorResponse, elevatorsByAddressList} from './dummyData';
 import {UnitSection} from './UnitSection';
 import {UnitsMapsView} from './UnitsMapsView';
 import {UnitColumns} from './UnitColumns';
@@ -28,36 +24,27 @@ interface FormikFields {
   moreInformation: string;
 }
 
-const validationSchema = Yup.object().shape({
-  description: Yup.string().required('description is required'),
-});
-
 export const MyUnits = () => {
   const fallback = useRef({
     elevator: createEmptyResource<ElevatorView>(10),
     centerCoord: {longitude: 0, latitude: 0},
   }).current;
   const [search, setSearch] = useState('');
-  const [page, setPage] = useState(makePage(0, 10)); // TODO: implement paging
+  const [page, _setPage] = useState(makePage(0, 10)); // TODO: implement paging
   const [showFilter, setShowFilter] = useState(false);
   const [availability, setAvailability] = useState<number[][]>([]);
   const [status, setStatus] = useState<string[]>([]);
   const [nextVisit, setNextVisit] = useState<string[]>([]);
   const [showMapview, setShowMapview] = useState(false);
-  const [issuElevator, setIssueElevator] = useState();
-  const [sliderValue, setSliderValue] = useState<number[]>([20, 37]);
-  const [logIssueDate, setLogIssueDate] = useState<Date | null>(null);
-  const [logIssueTime, setLogIssueTime] = useState<Date | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
 
-  // const {data: elevatorResponse = fallback} = useAllElevators(search, page, {
-  //   status,
-  // });
-  // const {data: elevatorsByAddressList} = useFetchServiceOrdersByElevators(
-  //   elevatorResponse.elevator,
-  //   {nextVisit, availabilityRange: availability},
-  // );
+  const {data: elevatorResponse = fallback} = useAllElevators(search, page, {
+    status,
+  });
+  const {data: elevatorsByAddressList} = useFetchServiceOrdersByElevators(
+    elevatorResponse.elevator,
+    {nextVisit, availabilityRange: availability},
+  );
 
   const availabilityRangeConvertor = (selectedItems: string[]) => {
     const range: number[][] = [];
@@ -85,21 +72,6 @@ export const MyUnits = () => {
     });
     setAvailability(range);
   };
-
-  const formik = useFormik<FormikFields>({
-    initialValues: {
-      description: '',
-      elevator: undefined,
-      moreInformation: '',
-    },
-    onSubmit: async (values, {resetForm}) => {
-      const body = {...values, elevatorId: values?.elevator?.id};
-      delete body.elevator;
-      // setModalOpen(false);
-      resetForm();
-    },
-    validationSchema,
-  });
 
   const onSearchTextChanged = (value: string) => {
     setSearch(value);
@@ -176,10 +148,23 @@ export const MyUnits = () => {
               <UnitSection
                 key={elevatorsByAddress.address.id}
                 elevatorsByAddress={elevatorsByAddress}
-                setField={formik.setFieldValue}
               />
             ))}
           </Box>
+          <TablePagination
+            sx={{
+              '& .MuiTablePagination-selectLabel': {
+                color: theme.palette.text.secondary,
+              },
+            }}
+            component="div"
+            count={elevatorResponse.elevator.total}
+            page={elevatorResponse.elevator.page.pageIndex}
+            // TODO: Implement paging
+            onPageChange={() => console.log('page change')}
+            rowsPerPage={elevatorResponse.elevator.page.pageSize}
+            //  onRowsPerPageChange={handleChangeRowsPerPage}
+          />
         </>
       ) : (
         <UnitsMapsView

@@ -11,6 +11,7 @@ import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import {StatusChip} from 'components/StatusChip';
 // import {fetchDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {InvoiceStatus, InvoiceStatusView} from 'models/invoice';
+import {formatCurrency} from 'utils/currency';
 import {formatDate, toDate} from '../../utils/datetime';
 
 const defaultProps = {
@@ -132,7 +133,14 @@ export const makeRows = (invoices: any): GridRowsProp =>
         invoiceDate: formatDate(toDate(item.issuedDate), 'dd MMM YYY'),
         invoiceNumber: item.number,
         serviceCompany: item.serviceCompany.name,
-        amount: `${item.totalAmount.amount} ${item.totalAmount.currency}`,
+        amount: `${formatCurrency(
+          item
+            ? item.totalAmount.amount / 10 ** item.totalAmount.fractionDigits!
+            : 0,
+          {
+            currency: item.totalAmount.currency,
+          },
+        )}`,
         status: item.status,
         actions: {
           pdfPath: item.additionalInfo.pdfPath,

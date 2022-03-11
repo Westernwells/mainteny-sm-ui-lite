@@ -31,6 +31,7 @@ module.exports = {
       'no-use-before-define': 'off',
       '@typescript-eslint/no-use-before-define': ['error'],
       'no-console': 'off',
+      'react/no-array-index-key': 'off',
       'react/require-default-props': 'off',
       'react/jsx-props-no-spreading': 'off',
       'react/function-component-definition': [

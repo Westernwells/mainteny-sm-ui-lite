@@ -9,7 +9,7 @@ import TocIcon from '@mui/icons-material/Toc';
 interface Props {
   startTime?: string;
   endTime?: string;
-  costPerYear?: number;
+  costPerYear?: string;
   type?: string;
 }
 
@@ -29,7 +29,7 @@ export const ContractBasic = ({
         containerStyles={{mr: '0.5em'}}
         iconBackground={theme.palette.info.outlinedHoverBg}
         iconMaxHeight="3rem"
-        bodyText={costPerYear ? `${costPerYear.toLocaleString()} EUR` : ''}
+        bodyText={costPerYear || ''}
       />
 
       <CardProps

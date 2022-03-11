@@ -70,7 +70,7 @@ export const Widget = ({
           </Box>
         ) : null}
 
-        <Box mr={3}>
+        <Box mr={!hideViewOption ? 3 : 0}>
           <Searchnput
             placeholder={searchPlaceholder}
             onValueChanged={onSearchTextChanged}

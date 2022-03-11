@@ -18,13 +18,6 @@ export interface ElevatorsByAddress {
 }
 
 // TODO: this is the mocked call to get date in the future
-export function calculateNextVisitDate(
-  serviceOrder: ServiceOrder | ServiceOrderView,
-): Date {
-  const schedule = getDateObject(serviceOrder.schedules[0].startTime);
-  const startDateTime = setMinutes(
-    setHours(new Date(), schedule.getHours()),
-    schedule.getMinutes(),
-  );
-  return addDays(startDateTime, schedule.getDate());
+export function calculateNextVisitDate(time: string): Date {
+  return getDateObject(time);
 }
