@@ -1,12 +1,5 @@
-import Axios, {Method} from 'axios';
+import Axios from 'axios';
 import {getStoredUser} from 'userStorage';
-
-interface RequestConfig<T = any, K = any> {
-  url: string;
-  method: Method;
-  data?: T;
-  params?: K;
-}
 
 const header = {} as any;
 const user = getStoredUser();
