@@ -46,13 +46,11 @@ export const options = {
     },
   },
 };
-/* eslint-disable no-unused-vars */
 enum TimeFrame {
   LAST_7_DAYS = 'LAST 7 DAYS',
   LAST_14_DAYS = 'LAST 14 DAYS',
   LAST_21_DAYS = 'LAST 21 DAYS',
 }
-/* eslint-enable no-unused-vars */
 function formatDates(timeFrame: TimeFrame): Date[] {
   let number: number;
   switch (timeFrame) {
@@ -86,7 +84,7 @@ function generateLabels(timeFrame: TimeFrame) {
 }
 
 function generateData(timeFrame: TimeFrame) {
-  return formatDates(timeFrame).map((day) => _.random(100, 800)); // eslint-disable-line
+  return formatDates(timeFrame).map(() => _.random(100, 800));
 }
 
 export const ElevatorAvailabilitySection = () => {

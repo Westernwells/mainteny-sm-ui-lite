@@ -22,7 +22,7 @@ const MenuProps = {
 
 interface Props {
   options: string[];
-  getSelectedValue(item: string[]): any; //eslint-disable-line
+  getSelectedValue(item: string[]): any;
   label: string;
   multiple?: boolean;
 }

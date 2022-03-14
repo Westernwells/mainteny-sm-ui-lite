@@ -13,7 +13,6 @@ import {ElevatorStatus} from '../../models/elevator';
 export interface UnitsSectionProperty {
   // TODO: Check this 'any' type
   elevatorsByAddress: ElevatorsByAddress | any;
-  /* eslint-disable no-unused-vars */
   setField: (
     field: string,
     value: any,
@@ -26,8 +25,7 @@ export const UnitSection = ({
   setField,
 }: UnitsSectionProperty) => {
   const navigate = useNavigate();
-  /* eslint-enable no-unused-vars */
-
+  console.log(typeof setField);
   return (
     <Box
       sx={{

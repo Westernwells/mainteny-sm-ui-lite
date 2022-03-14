@@ -113,14 +113,15 @@ const staticData = {
     state: 'ACTIVE',
   },
 };
-/* eslint-disable no-unused-vars */
-const fetchServiceManager = async (username: string) =>
+const fetchServiceManager = async (username: string) => {
   // TODO: Fetch API data
+  console.log(username);
   //   const response: AxiosResponse<ServiceManager> = await axiosClient({
   //     method: 'GET',
   //     url: `/api/users/propertyManager/${username}`,
   //   });
-  staticData;
+  return staticData;
+};
 export const useServiceManager = () => {
   const {user} = useUserSession();
   return useQuery(
@@ -131,4 +132,3 @@ export const useServiceManager = () => {
     },
   );
 };
-/* eslint-enable no-unused-vars */

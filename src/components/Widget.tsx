@@ -7,23 +7,20 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import GridViewIcon from '@mui/icons-material/GridView';
 import Button from '@mui/material/Button';
 import {Searchnput} from './SearchInput';
-import {BtnGroupType} from '../models/misc';
 
 interface Props {
-  btnGroupType?: BtnGroupType;
   searchPlaceholder?: string;
-  onSearchTextChanged?: (text: string) => void; // eslint-disable-line
+  onSearchTextChanged?: (text: string) => void;
   openMapView?: () => void;
   closeMapView?: () => void;
   mapViewActive?: boolean;
   showFilter: boolean;
-  setShowFilter: (state: boolean) => void; // eslint-disable-line
+  setShowFilter: (state: boolean) => void;
   hideViewOption?: boolean;
   hideFilter?: boolean;
 }
 
 export const Widget = ({
-  btnGroupType, // eslint-disable-line
   searchPlaceholder,
   onSearchTextChanged,
   openMapView,

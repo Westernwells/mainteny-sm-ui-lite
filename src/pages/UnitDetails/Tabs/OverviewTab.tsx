@@ -142,15 +142,13 @@ export const OverviewTab = ({elevator, maintainers}: Props) => {
                 borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
               }}
             />
-            {/* eslint-disable no-unused-vars */}
-            {[1, 2, 3, 4, 5, 6, 7].map((item) => (
+            {[1, 2, 3, 4, 5, 6, 7].map(() => (
               <ServiceHistory
                 bodyContainerStyle={{
                   borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
                 }}
               />
             ))}
-            {/* eslint-enable no-unused-vars */}
           </PageCard>
         </Grid>
       </Grid>

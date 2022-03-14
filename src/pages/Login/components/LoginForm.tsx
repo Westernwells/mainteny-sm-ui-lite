@@ -9,9 +9,9 @@ import EmailSharp from '@mui/icons-material/EmailSharp';
 import CircularProgress from '@mui/material/CircularProgress';
 
 interface Props {
-  handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void; // eslint-disable-line
-  handleChange: (e: React.ChangeEvent<any>) => void; // eslint-disable-line
-  handleBlur: (e: React.FocusEvent<any, Element>) => void; // eslint-disable-line
+  handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
+  handleChange: (e: React.ChangeEvent<any>) => void;
+  handleBlur: (e: React.FocusEvent<any, Element>) => void;
   email: string;
   emailTouched: boolean | undefined;
   emailError: string | undefined;

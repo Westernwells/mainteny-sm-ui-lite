@@ -8,11 +8,6 @@ export enum State {
   DELETED = 'DELETED',
 }
 
-export enum BtnGroupType {
-  ICON = 'ICON',
-  TEXT = 'TEXT',
-}
-
 export enum DispatchStrategy {
   BIG_BANG = 'BIG_BANG',
   ASSIGNMENT_WEIGHTS = 'ASSIGNMENT_WEIGHTS',

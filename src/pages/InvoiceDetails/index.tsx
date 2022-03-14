@@ -17,7 +17,8 @@ import {RelatedTo} from './RelatedTo';
 
 export const InvoiceDetails = () => {
   const {id: invoiceId} = useParams();
-  const {data: invoice} = useInvoiceDetail(invoiceId); // eslint-disable-line
+  const {data: invoice} = useInvoiceDetail(invoiceId);
+  console.log(invoice);
   // TODO: Fetch Download URL
 
   // const {data: downloadUrl} = useDownloadUrl(

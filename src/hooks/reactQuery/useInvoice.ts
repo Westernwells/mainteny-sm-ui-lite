@@ -11,13 +11,12 @@ import {useServiceManager} from './useServiceManager';
 
 // TODO: make API call to fetch Invoices
 const staticInvoices = invoices;
-/* eslint-disable no-unused-vars */
 export const fetchInvoices = async (
   params: QueryInvoiceParams,
   id: string,
-): Promise<Resource<InvoiceView>> =>
+): Promise<Resource<InvoiceView>> => {
   // TODO: make API call to fetch Invoices
-
+  console.log(params, id);
   // const response = await axiosClient.get<Resource<InvoiceView>>(
   //   `/api/propertyOwners/${id}/invoices`,
   //   {
@@ -25,10 +24,12 @@ export const fetchInvoices = async (
   //     paramsSerializer,
   //   },
   // );
-  Promise.resolve(staticInvoices);
+  return Promise.resolve(staticInvoices);
+};
 
 const filterInvoices = (invoicesRes: Resource<InvoiceView>, filters: {}) => {
   const result = {...invoicesRes};
+  console.log(filters);
   // TODO: Filter code goes here
   return result;
 };
@@ -58,18 +59,18 @@ export function useInvoices(
 // TODO: make API call to fetch Invoices
 const staticInvoiceDetails = invoiceDetail;
 
-export const fetchInvoice = async (invoiceId: string) =>
+export const fetchInvoice = async (invoiceId: string) => {
   // TODO: make API call to fetch Invoice Details
-
+  console.log(invoiceId);
   // const response = await axiosClient.get<InvoiceView>(
   //   `/api/invoices/${invoiceId}`,
   // );
 
-  Promise.resolve(staticInvoiceDetails);
+  return Promise.resolve(staticInvoiceDetails);
+};
 
 export function useInvoiceDetail(invoiceId?: string) {
   return useQuery(qk.invoiceById, () => fetchInvoice(invoiceId!), {
     enabled: !!invoiceId,
   });
 }
-/* eslint-enable no-unused-vars */

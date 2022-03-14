@@ -20,18 +20,19 @@ import {CustomerDetailsWidgets} from './CustomerDetailsWidgets';
 
 export const CustomerDetails = () => {
   const theme = useTheme();
-  const [_expiryDate, setExpiryDate] = useState<string[]>([]); // eslint-disable-line
-  const [showFilter, _setShowFilter] = useState(false); // eslint-disable-line
-  const [_contractor, setContractor] = useState<string[]>([]); // eslint-disable-line
-  const [_cost, setCost] = useState<number[][]>([]); // eslint-disable-line
+  const [_expiryDate, setExpiryDate] = useState<string[]>([]);
+  const [showFilter] = useState(false);
+  const [_contractor, setContractor] = useState<string[]>([]);
+  const [_cost, setCost] = useState<number[][]>([]);
   const [contractorFilterItems, setConractorFileterItems] = useState<string[]>(
     [],
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
-  /* eslint-disable no-unused-vars */
   const {data: contractResource = createEmptyResource<ContractView>(10)} =
     staticContracts;
-  /* eslint-enable no-unused-vars */
+
+  console.log(_expiryDate, _contractor, _cost, contractResource);
+
   useEffect(() => {
     const options: string[] = [];
     console.log('test');

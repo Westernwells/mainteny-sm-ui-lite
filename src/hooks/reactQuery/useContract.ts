@@ -11,10 +11,9 @@ import {ContractView, QueryContractParams} from 'models/contract';
 import {Resource, RestError} from 'models/misc';
 import {useServiceManager} from './useServiceManager';
 
-export const fetchContractElevatorCount = async (
-  contractId: string[], // eslint-disable-line
-) =>
+export const fetchContractElevatorCount = async (contractId: string[]) => {
   // TODO: make API call to fetch Contracts
+  console.log(contractId);
 
   // const response = await axiosClient.get<{[key: string]: number}>(
   //   `/api/contracts/elevators/count`,
@@ -23,15 +22,15 @@ export const fetchContractElevatorCount = async (
   //     paramsSerializer,
   //   },
   // );
-
-  Promise.resolve(staticContractElevatorCount);
+  return Promise.resolve(staticContractElevatorCount);
+};
 
 export const fetchContracts = async (
-  id: string, // eslint-disable-line
-  params: QueryContractParams, // eslint-disable-line
-) =>
+  id: string,
+  params: QueryContractParams,
+) => {
   // TODO: make API call to fetch Contracts
-
+  console.log(id, params);
   // const response = await axiosClient.get<Resource<ContractView>>(
   //   `/api/propertyOwners/${id}/contracts`,
   //   {
@@ -40,11 +39,12 @@ export const fetchContracts = async (
   //   },
   // );
 
-  Promise.resolve(staticContracts);
-/* eslint-disable no-unused-vars */
+  return Promise.resolve(staticContracts);
+};
+
 const filterContracts = (contractsRes: Resource<ContractView>, filter: {}) => {
-  /* eslint-enable no-unused-vars */
   const result = {...contractsRes};
+  console.log(filter);
   // TODO: Filter code goes here
   return result;
 };
@@ -91,15 +91,14 @@ export const useContractElevatorCount = (contracts: ContractView[]) => {
   );
 };
 
-const fetchContractDetails = async (
-  contractId: string, // eslint-disable-line
-) =>
+const fetchContractDetails = async (contractId: string) => {
   // TODO: make API call to fetch Contract Details
-
+  console.log(contractId);
   // const response = await axiosClient.get<ContractView>(
   //   `/api/contracts/${contractId}`,
   // );
-  Promise.resolve(staticContractDetails);
+  return Promise.resolve(staticContractDetails);
+};
 export const useContractDetails = (contractId: string) =>
   useQuery([qk.contractDetails, contractId], () =>
     fetchContractDetails(contractId),

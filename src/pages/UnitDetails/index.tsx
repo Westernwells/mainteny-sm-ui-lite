@@ -20,7 +20,7 @@ import {elevator, maintainers} from './dummyData';
 import {OverviewTab} from './Tabs/OverviewTab';
 import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
 
-const pageSize = 10; // eslint-disable-line
+const pageSize = 10;
 
 const useStyles = makeStyles(() => {
   const theme = useTheme();
@@ -75,18 +75,16 @@ const a11yProps = (index: number) => ({
   'aria-controls': `simple-tabpanel-${index}`,
 });
 
-// TODO: enable the rule again
-// eslint-disable-next-line
 export const UnitsDetail = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const classes = useStyles();
-  const {id: elevatorId} = useParams(); // eslint-disable-line
+  const {id: elevatorId} = useParams();
   const [value, setValue] = useState(0);
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
-
+  console.log(elevatorId, pageSize);
   // TODO: user reactQuery hooks to fetch data
   // const {data: elevator} = useElevatorById(elevatorId);
 

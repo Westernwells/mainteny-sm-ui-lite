@@ -7,7 +7,7 @@ import * as _ from 'lodash';
 
 interface Props {
   placeholder?: string;
-  onValueChanged?: (value: string) => void; //eslint-disable-line
+  onValueChanged?: (value: string) => void;
 }
 
 export const Searchnput = ({placeholder, onValueChanged}: Props) => {
