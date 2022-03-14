@@ -1,9 +1,6 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import {Theme} from '@mui/material/styles';
-import {useNavigate} from 'react-router-dom';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import makeStyles from '@mui/styles/makeStyles';
 import useTheme from '@mui/material/styles/useTheme';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
@@ -15,18 +12,18 @@ import {BtnGroupType} from '../models/misc';
 interface Props {
   btnGroupType?: BtnGroupType;
   searchPlaceholder?: string;
-  onSearchTextChanged?: (text: string) => void;
+  onSearchTextChanged?: (text: string) => void; // eslint-disable-line
   openMapView?: () => void;
   closeMapView?: () => void;
   mapViewActive?: boolean;
   showFilter: boolean;
-  setShowFilter: (state: boolean) => void;
+  setShowFilter: (state: boolean) => void; // eslint-disable-line
   hideViewOption?: boolean;
   hideFilter?: boolean;
 }
 
 export const Widget = ({
-  btnGroupType,
+  btnGroupType, // eslint-disable-line
   searchPlaceholder,
   onSearchTextChanged,
   openMapView,
@@ -37,7 +34,6 @@ export const Widget = ({
   hideViewOption = false,
   hideFilter = false,
 }: Props) => {
-  const navigate = useNavigate();
   const theme = useTheme();
 
   return (

@@ -8,7 +8,6 @@ import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import Grid from '@mui/material/Grid';
 import {PageCard} from 'components/PageCard';
-import Icon from '@mui/material/Icon';
 import * as _ from 'lodash';
 import {
   BarElement,
@@ -21,7 +20,6 @@ import {
 } from 'chart.js';
 import {Bar} from 'react-chartjs-2';
 
-import {ReactComponent as Elevation} from '../../assets/icons/Elevation.svg';
 import {SplitButton} from '../../components/SplitButton';
 import {formatDate} from '../../utils/datetime';
 
@@ -48,13 +46,13 @@ export const options = {
     },
   },
 };
-
+/* eslint-disable no-unused-vars */
 enum TimeFrame {
   LAST_7_DAYS = 'LAST 7 DAYS',
   LAST_14_DAYS = 'LAST 14 DAYS',
   LAST_21_DAYS = 'LAST 21 DAYS',
 }
-
+/* eslint-enable no-unused-vars */
 function formatDates(timeFrame: TimeFrame): Date[] {
   let number: number;
   switch (timeFrame) {
@@ -88,7 +86,7 @@ function generateLabels(timeFrame: TimeFrame) {
 }
 
 function generateData(timeFrame: TimeFrame) {
-  return formatDates(timeFrame).map((day) => _.random(100, 800));
+  return formatDates(timeFrame).map((day) => _.random(100, 800)); // eslint-disable-line
 }
 
 export const ElevatorAvailabilitySection = () => {

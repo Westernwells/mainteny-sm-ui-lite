@@ -1,8 +1,6 @@
 import {useQuery} from 'react-query';
-import * as _ from 'lodash';
 import {useCallback} from 'react';
 import {queryKeys as qk} from 'reactQuery/constants';
-import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 // FIXME: Dummy Import
 import {invoices} from 'pages/Invoices/data';
 import {invoiceDetail} from 'pages/InvoiceDetails/data';
@@ -13,7 +11,7 @@ import {useServiceManager} from './useServiceManager';
 
 // TODO: make API call to fetch Invoices
 const staticInvoices = invoices;
-
+/* eslint-disable no-unused-vars */
 export const fetchInvoices = async (
   params: QueryInvoiceParams,
   id: string,
@@ -74,3 +72,4 @@ export function useInvoiceDetail(invoiceId?: string) {
     enabled: !!invoiceId,
   });
 }
+/* eslint-enable no-unused-vars */

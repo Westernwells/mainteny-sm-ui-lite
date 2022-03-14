@@ -1,21 +1,19 @@
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
-import Button from '@mui/material/Button';
 import Elevator from '@mui/icons-material/Elevator';
 import Grid from '@mui/material/Grid';
-import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/system/Box';
-import Chip from '@mui/material/Chip';
 import {StatusChip} from 'components/StatusChip';
 import {FormikErrors} from 'formik';
 import {ElevatorsByAddress} from './Models';
 import {formatDate, toDate} from '../../utils/datetime';
-import {ElevatorStatus, ElevatorView} from '../../models/elevator';
+import {ElevatorStatus} from '../../models/elevator';
 
 export interface UnitsSectionProperty {
   // TODO: Check this 'any' type
   elevatorsByAddress: ElevatorsByAddress | any;
+  /* eslint-disable no-unused-vars */
   setField: (
     field: string,
     value: any,
@@ -27,12 +25,8 @@ export const UnitSection = ({
   elevatorsByAddress,
   setField,
 }: UnitsSectionProperty) => {
-  const theme = useTheme();
   const navigate = useNavigate();
-
-  const handleClick = (elevator: ElevatorView) => {
-    setField('elevator', elevator);
-  };
+  /* eslint-enable no-unused-vars */
 
   return (
     <Box

@@ -1,7 +1,6 @@
 import {ReactChild, ReactNode} from 'react';
 import Box from '@mui/material/Box';
 import useTheme from '@mui/material/styles/useTheme';
-import {Elevator} from 'models/elevator';
 import Typography from '@mui/material/Typography';
 
 export interface Props {

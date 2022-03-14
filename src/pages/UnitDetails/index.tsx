@@ -5,17 +5,12 @@ import makeStyles from '@mui/styles/makeStyles';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
-import {Theme} from '@mui/material/styles';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import EngineeringOutlinedIcon from '@mui/icons-material/EngineeringOutlined';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import useTheme from '@mui/material/styles/useTheme';
-import {startOfDay, endOfMonth} from 'date-fns';
-import {toRestDateTime} from 'utils/datetime';
-import {ServiceOrderView} from 'models/service-order';
-import {createEmptyResource} from 'utils/paging-utils';
 import {elevator, maintainers} from './dummyData';
 // import {
 //   useElevatorById,
@@ -25,7 +20,7 @@ import {elevator, maintainers} from './dummyData';
 import {OverviewTab} from './Tabs/OverviewTab';
 import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
 
-const pageSize = 10;
+const pageSize = 10; // eslint-disable-line
 
 const useStyles = makeStyles(() => {
   const theme = useTheme();
@@ -86,7 +81,7 @@ export const UnitsDetail = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const classes = useStyles();
-  const {id: elevatorId} = useParams();
+  const {id: elevatorId} = useParams(); // eslint-disable-line
   const [value, setValue] = useState(0);
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);

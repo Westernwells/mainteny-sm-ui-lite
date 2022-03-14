@@ -101,6 +101,7 @@ export const columns: GridColDef[] = [
     renderHeader: (params) => (
       <Typography variant="subtitle2">{params.colDef.headerName}</Typography>
     ),
+    /* eslint-disable no-unused-vars */
     renderCell: (params) => (
       <FileDownloadOutlinedIcon
         sx={{color: '#2196F3'}}
@@ -122,6 +123,7 @@ export const columns: GridColDef[] = [
         }
       />
     ),
+    /* eslint-enable no-unused-vars */
   },
 ];
 

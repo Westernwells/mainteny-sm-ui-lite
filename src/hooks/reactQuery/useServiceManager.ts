@@ -1,8 +1,5 @@
-import {AxiosResponse} from 'axios';
-import {ServiceManager} from 'models/serviceManager';
 import {useQuery} from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
-import {axiosClient} from 'utils/axios-utils';
 import {useUserSession} from './useUserSession';
 
 const staticData = {
@@ -116,7 +113,7 @@ const staticData = {
     state: 'ACTIVE',
   },
 };
-
+/* eslint-disable no-unused-vars */
 const fetchServiceManager = async (username: string) =>
   // TODO: Fetch API data
   //   const response: AxiosResponse<ServiceManager> = await axiosClient({
@@ -134,3 +131,4 @@ export const useServiceManager = () => {
     },
   );
 };
+/* eslint-enable no-unused-vars */

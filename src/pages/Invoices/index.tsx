@@ -15,10 +15,12 @@ import {Widget} from '../../components/Widget';
 
 export const Invoices = () => {
   const [search, setSearch] = useState('');
-  const [page, setPage] = useState(makePage(0, 10)); // TODO: implement paging
+  /* eslint-disable no-unused-vars */
+  const [page, _setPage] = useState(makePage(0, 10)); // TODO: implement paging
   const [showFilter, setShowFilter] = useState(false);
-  const [amount, setAmount] = useState<number[][]>([]);
-  const [status, setStatus] = useState<string[]>([]);
+  const [_amount, setAmount] = useState<number[][]>([]);
+  const [_status, setStatus] = useState<string[]>([]);
+  /* eslint-enable no-unused-vars */
   const [rows, setRows] = useState<GridRowsProp>([]);
   // TODO: Create Invoice model for invoices with 'Order number' and 'Service type'
   const {data: invoiceResource} = useInvoices(

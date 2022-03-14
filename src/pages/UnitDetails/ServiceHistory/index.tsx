@@ -5,7 +5,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {ServiceOrderType} from 'models/service-order';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import Grid from '@mui/material/Grid';
-
+/* eslint-disable no-unused-vars */
 interface Props {
   bodyContainerStyle?: {[key: string]: string | number};
   minHeight?: number | string;
@@ -81,3 +81,4 @@ export const ServiceHistory = ({bodyContainerStyle, minHeight}: Props) => {
     </Grid>
   );
 };
+/* eslint-enable no-unused-vars */

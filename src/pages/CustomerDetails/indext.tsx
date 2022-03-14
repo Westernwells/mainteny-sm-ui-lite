@@ -14,22 +14,24 @@ import {GridRowsProp} from '@mui/x-data-grid';
 import {staticContracts, contractWithUnits} from 'pages/Contracts/data';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {columns, makeRows} from 'pages/Contracts/ContractsDataGridProps';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging-utils';
 import {ContractView} from 'models/contract';
 import {CustomerDetailsWidgets} from './CustomerDetailsWidgets';
 
 export const CustomerDetails = () => {
   const theme = useTheme();
-  const [_expiryDate, setExpiryDate] = useState<string[]>([]);
-  const [showFilter, _setShowFilter] = useState(false);
-  const [_contractor, setContractor] = useState<string[]>([]);
-  const [_cost, setCost] = useState<number[][]>([]);
+  const [_expiryDate, setExpiryDate] = useState<string[]>([]); // eslint-disable-line
+  const [showFilter, _setShowFilter] = useState(false); // eslint-disable-line
+  const [_contractor, setContractor] = useState<string[]>([]); // eslint-disable-line
+  const [_cost, setCost] = useState<number[][]>([]); // eslint-disable-line
   const [contractorFilterItems, setConractorFileterItems] = useState<string[]>(
     [],
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
+  /* eslint-disable no-unused-vars */
   const {data: contractResource = createEmptyResource<ContractView>(10)} =
     staticContracts;
+  /* eslint-enable no-unused-vars */
   useEffect(() => {
     const options: string[] = [];
     console.log('test');

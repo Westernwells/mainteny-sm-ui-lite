@@ -1,5 +1,3 @@
-import {ElevatorsByAddress} from './Models';
-
 export const elevatorResponse = {
   elevator: {
     data: [

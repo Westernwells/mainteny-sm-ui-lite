@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import TextField from '@mui/material/TextField';
@@ -10,9 +9,9 @@ import EmailSharp from '@mui/icons-material/EmailSharp';
 import CircularProgress from '@mui/material/CircularProgress';
 
 interface Props {
-  handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
-  handleChange: (e: React.ChangeEvent<any>) => void;
-  handleBlur: (e: React.FocusEvent<any, Element>) => void;
+  handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void; // eslint-disable-line
+  handleChange: (e: React.ChangeEvent<any>) => void; // eslint-disable-line
+  handleBlur: (e: React.FocusEvent<any, Element>) => void; // eslint-disable-line
   email: string;
   emailTouched: boolean | undefined;
   emailError: string | undefined;

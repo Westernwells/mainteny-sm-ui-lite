@@ -1,5 +1,6 @@
 import React from 'react';
 
+/* eslint-disable no-unused-vars */
 declare module '@mui/material/styles' {
   interface TypographyVariants {
     largeBtnText: React.CSSProperties;
@@ -69,3 +70,4 @@ declare module '@mui/material/Button' {
 // ButtonPropsVariantOverrides
 
 // ButtonPropsColorOverrides
+/* eslint-enable no-unused-vars */

@@ -8,7 +8,7 @@ import {data as customers} from './data';
 import {columns, makeRows} from './CustomerDataGridProps';
 
 export const Customer = () => {
-  const [search, setSearch] = useState('');
+  const [_search, setSearch] = useState(''); // eslint-disable-line
   const [showFilter, setShowFilter] = useState(false);
   const [rows, setRows] = useState<GridRowsProp>([]);
 

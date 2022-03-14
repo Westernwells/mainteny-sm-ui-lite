@@ -1,13 +1,12 @@
-import {ReactNode} from 'react';
+import React, {ReactNode} from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import {Typography} from '@mui/material';
 import useTheme from '@mui/material/styles/useTheme';
 
 interface Props {
   children: ReactNode;
   containerStyle?: {[key: string]: string | number};
-  setShowFilter: (state: boolean) => void;
+  setShowFilter: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const FilterFields = ({

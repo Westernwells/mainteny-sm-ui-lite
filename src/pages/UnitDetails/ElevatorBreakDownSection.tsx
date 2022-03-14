@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import useTheme from '@mui/material/styles/useTheme';
 import Divider from '@mui/material/Divider';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {ScrollableCard} from 'components/ScrollableCard';
@@ -40,7 +39,7 @@ const breakdownHistory = [
 
 // TODO: we do not have the model in backend yet
 export const ElevatorBreakDownSection = ({elevatorId}: Props) => {
-  const theme = useTheme();
+  console.log('Elevator:', elevatorId);
   return (
     <ScrollableCard
       renderIcon={() => <Elevation />}

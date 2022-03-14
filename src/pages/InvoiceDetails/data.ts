@@ -1,27 +1,3 @@
-import {ElevatorCategory, ElevatorStatus} from 'models/elevator';
-import {Address, Meta, Priority, State} from 'models/misc';
-import {
-  ServiceOrderStatus,
-  ServiceOrderType,
-  ServiceOrderView,
-} from 'models/service-order';
-
-const meta: Meta = {
-  createdAt: '2021-01-12',
-  creator: 'mainteny-admin',
-  lastUpdatedAt: '2021-01-12',
-  state: State.ACTIVE,
-};
-const address: Address = {
-  id: 'add-001',
-  fullName: 'McDonald',
-  countryCode: 'DE',
-  location: {
-    longitude: 0,
-    latitude: 0,
-  },
-};
-
 export const invoiceDetail = {
   id: 'c986b9b9-da45-4ff9-8675-4ea0491fac8b',
   number: 'INV000006',

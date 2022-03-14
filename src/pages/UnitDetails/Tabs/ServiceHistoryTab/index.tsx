@@ -94,6 +94,7 @@ export const ServiceHistoryTab = () => {
             />
           </Box>
           <Box sx={{height: '55vh', overflowY: 'scroll'}}>
+            {/* eslint-disable no-unused-vars */}
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((history) => (
               <HistoryCard
                 containerStyles={{borderRadius: 0}}
@@ -102,6 +103,7 @@ export const ServiceHistoryTab = () => {
                 }}
               />
             ))}
+            {/* eslint-enable no-unused-vars */}
           </Box>
         </PageCard>
       </Grid>

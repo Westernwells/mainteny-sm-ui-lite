@@ -10,10 +10,6 @@ import {useAuth} from 'hooks/useAuth';
 import {AuthLayout} from 'components/AuthLayout';
 import {LoginForm} from './components/LoginForm';
 
-interface Props {
-  startPageLoad: () => void;
-}
-
 const validationSchema = Yup.object().shape({
   email: Yup.string()
     .email('Enter a valid email')

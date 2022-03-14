@@ -3,7 +3,7 @@ import {useIsFetching, useIsMutating} from 'react-query';
 import LoadingBar, {LoadingBarRef} from 'react-top-loading-bar';
 
 interface LoadingProps extends LoadingBarRef {
-  continuousStart: (startingValue?: number, refreshRate?: number) => void;
+  continuousStart(startingValue?: number, refreshRate?: number): any; //eslint-disable-line
 }
 
 export const Loading = () => {

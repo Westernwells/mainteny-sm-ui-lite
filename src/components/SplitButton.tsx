@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 interface Props {
   options: string[];
   selectedOption: string;
-  onSelectedOptionChanged: (option: string) => void;
+  onSelectedOptionChanged: (option: string) => void; // eslint-disable-line
   variant?: 'text' | 'contained' | 'outlined' | undefined;
   selectionStyle?: {[key: string]: string | number};
   disableRipple?: boolean;

@@ -1,21 +1,16 @@
-import React, {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import Box from '@mui/material/Box';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Typography from '@mui/material/Typography';
 import {ElevatorView} from 'models/elevator';
 
 import {Widget} from 'components/Widget';
-import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
-import Drawer from '@mui/material/Drawer';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {BtnGroupType} from 'models/misc';
 import {FilterFields} from 'components/FilterFields';
-import Slide from '@mui/material/Slide';
 import useTheme from '@mui/material/styles/useTheme';
 import {elevatorResponse, elevatorsByAddressList} from './dummyData';
 import {UnitSection} from './UnitSection';
@@ -31,7 +26,7 @@ interface FormikFields {
 const validationSchema = Yup.object().shape({
   description: Yup.string().required('description is required'),
 });
-
+/* eslint-disable no-unused-vars */
 export const MyUnits = () => {
   const fallback = useRef({
     elevator: createEmptyResource<ElevatorView>(10),
@@ -190,3 +185,4 @@ export const MyUnits = () => {
     </Box>
   );
 };
+/* eslint-disable no-unused-vars */

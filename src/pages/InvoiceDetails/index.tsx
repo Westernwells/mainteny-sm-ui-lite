@@ -2,7 +2,6 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import useTheme from '@mui/material/styles/useTheme';
-import axios from 'axios';
 import {useInvoiceDetail} from 'hooks/reactQuery/useInvoice';
 import {StatusChip} from 'components/StatusChip';
 import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
@@ -12,15 +11,13 @@ import {HistoryCard} from 'pages/UnitDetails/Tabs/ServiceHistoryTab/HistoryCard'
 import {BackAction} from 'components/BackAction';
 import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-// import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import Button from '@mui/material/Button';
 import {InvoiceCard} from './InvoiceCard';
 import {Invoice} from './Invoice';
 import {RelatedTo} from './RelatedTo';
 
 export const InvoiceDetails = () => {
   const {id: invoiceId} = useParams();
-  const {data: invoice} = useInvoiceDetail(invoiceId);
+  const {data: invoice} = useInvoiceDetail(invoiceId); // eslint-disable-line
   // TODO: Fetch Download URL
 
   // const {data: downloadUrl} = useDownloadUrl(

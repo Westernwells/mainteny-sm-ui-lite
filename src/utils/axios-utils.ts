@@ -1,12 +1,14 @@
 import Axios, {Method} from 'axios';
 import {getStoredUser} from 'userStorage';
 
+/* eslint-disable no-unused-vars */
 interface RequestConfig<T = any, K = any> {
   url: string;
   method: Method;
   data?: T;
   params?: K;
 }
+/* eslint-enable no-unused-vars */
 
 const header = {} as any;
 const user = getStoredUser();

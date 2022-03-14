@@ -6,7 +6,7 @@ import {differenceInMinutes} from 'date-fns';
 
 interface UseUserSession {
   user?: UserSession | null;
-  updateUser: (user: UserSession) => void;
+  updateUser: (user: UserSession) => void; // eslint-disable-line
   clearUser: () => void;
 }
 
