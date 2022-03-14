@@ -7,11 +7,11 @@ import Tooltip from '@mui/material/Tooltip';
 import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 import useTheme from '@mui/material/styles/useTheme';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import {useNavigate, useParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import {StatusChip} from 'components/StatusChip';
 import {BackAction} from 'components/BackAction';
 import {toDate} from 'utils/datetime';
-import {differenceInDays, intervalToDuration, isBefore} from 'date-fns';
+import {differenceInDays, isBefore} from 'date-fns';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {BasicDetailsCard} from 'components/BasicDetailsCard';
 import {ContractBasic} from './ContractBasic';
@@ -24,7 +24,6 @@ import {ContractCard} from './ContractCard';
 export const ContractDetails = () => {
   const {id: contractId} = useParams();
   const theme = useTheme();
-  const navigate = useNavigate();
   const {data: contractDetails, isLoading} = useContractDetails(contractId!);
   const totalContractDays =
     !isLoading &&
@@ -61,8 +60,7 @@ export const ContractDetails = () => {
         spacing={2}
         sx={{
           pb: '1em',
-        }}
-      >
+        }}>
         <Grid xs={8} item>
           <BasicDetailsCard
             minHeight="12rem"
@@ -77,8 +75,7 @@ export const ContractDetails = () => {
                   bgColor={theme.palette.success.outlinedHoverBg}
                 />
               </Box>
-            }
-          >
+            }>
             <ContractBasic
               startTime={contractDetails?.startTime}
               endTime={contractDetails?.endTime}
@@ -108,8 +105,7 @@ export const ContractDetails = () => {
                       },
                     },
                   }}
-                  arrow
-                >
+                  arrow>
                   <ErrorOutlineIcon
                     sx={{
                       mt: '0.25em',
@@ -120,8 +116,7 @@ export const ContractDetails = () => {
                   />
                 </Tooltip>
               </Box>
-            }
-          >
+            }>
             <ContractScope />
           </ContractCard>
 
@@ -145,8 +140,7 @@ export const ContractDetails = () => {
                       },
                     },
                   }}
-                  arrow
-                >
+                  arrow>
                   <ErrorOutlineIcon
                     sx={{
                       mt: '0.25em',
@@ -157,8 +151,7 @@ export const ContractDetails = () => {
                   />
                 </Tooltip>
               </Box>
-            }
-          >
+            }>
             <ContractParties
               companyName={contractDetails?.propertyOwner.address.fullName}
               personName={contractDetails?.serviceCompany.name}
@@ -187,8 +180,7 @@ export const ContractDetails = () => {
             containerStyles={{minHeight: '26vh', py: '1em'}}
             header={
               <Typography variant="subtitle1">Contract Timeline</Typography>
-            }
-          >
+            }>
             {unUsedContractDays > 0 && unUsedContractDays <= 30 ? (
               <Alert
                 variant="filled"
@@ -197,8 +189,7 @@ export const ContractDetails = () => {
                   mb: '1em',
                   background: theme.palette.warning.outlinedHoverBg,
                   color: theme.palette.warning.main,
-                }}
-              >
+                }}>
                 Contract expires in {unUsedContractDays} days!
               </Alert>
             ) : null}
@@ -216,8 +207,7 @@ export const ContractDetails = () => {
             containerStyles={{mt: '1em', py: '1em'}}
             header={
               <Typography variant="subtitle1">Payment Details</Typography>
-            }
-          >
+            }>
             <ContractPaymentDetails
               name={contractDetails?.propertyOwner.name}
             />

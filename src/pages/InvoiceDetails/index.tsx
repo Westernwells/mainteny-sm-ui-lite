@@ -2,7 +2,6 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import useTheme from '@mui/material/styles/useTheme';
-import axios from 'axios';
 import {useInvoiceDetail} from 'hooks/reactQuery/useInvoice';
 import {StatusChip} from 'components/StatusChip';
 import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
@@ -12,8 +11,6 @@ import {HistoryCard} from 'pages/UnitDetails/Tabs/ServiceHistoryTab/HistoryCard'
 import {BackAction} from 'components/BackAction';
 import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-// import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import Button from '@mui/material/Button';
 import {InvoiceCard} from './InvoiceCard';
 import {Invoice} from './Invoice';
 import {RelatedTo} from './RelatedTo';
@@ -21,6 +18,7 @@ import {RelatedTo} from './RelatedTo';
 export const InvoiceDetails = () => {
   const {id: invoiceId} = useParams();
   const {data: invoice} = useInvoiceDetail(invoiceId);
+  console.log(invoice);
   // TODO: Fetch Download URL
 
   // const {data: downloadUrl} = useDownloadUrl(
@@ -58,8 +56,7 @@ export const InvoiceDetails = () => {
                   <Typography variant="subtitle1">#INV000128</Typography>
                   <Typography
                     variant="body2"
-                    sx={{color: theme.palette.text.secondary}}
-                  >
+                    sx={{color: theme.palette.text.secondary}}>
                     Generated on 24 Sep 2021
                   </Typography>
                 </Box>
@@ -86,8 +83,7 @@ export const InvoiceDetails = () => {
                   />
                 </Box>
               </Box>
-            }
-          >
+            }>
             <Invoice downloadUrl={downloadUrl ? downloadUrl[0] : null} />
           </InvoiceCard>
         </Grid>
@@ -95,8 +91,7 @@ export const InvoiceDetails = () => {
         <Grid item xs={4}>
           <InvoiceCard
             header={<Typography variant="subtitle1">Related To</Typography>}
-            headerContainerStyle={{pb: '0.5em'}}
-          >
+            headerContainerStyle={{pb: '0.5em'}}>
             <RelatedTo>
               <HistoryCard removeShadows />
             </RelatedTo>
@@ -105,8 +100,7 @@ export const InvoiceDetails = () => {
           <InvoiceCard
             containerStyles={{mt: '1em'}}
             header={<Typography variant="subtitle1">Work Report</Typography>}
-            headerContainerStyle={{pb: '0.5em'}}
-          >
+            headerContainerStyle={{pb: '0.5em'}}>
             <RelatedTo>
               <Typography>
                 10 / 6-2020: Secured lift and counterweight for disconnection of

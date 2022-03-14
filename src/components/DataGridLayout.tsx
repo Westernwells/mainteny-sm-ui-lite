@@ -77,8 +77,7 @@ export const DataGridLayout = ({rows, columns}: Props) => {
             backgroundColor: theme.palette.secondary.outlinedHoverBg,
           },
         },
-      }}
-    >
+      }}>
       <DataGrid
         rows={rows}
         columns={columns}

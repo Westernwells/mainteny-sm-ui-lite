@@ -38,8 +38,7 @@ export const LocationPin = ({
       display="flex"
       flexDirection="column"
       style={{color: 'black'}}
-      padding={1}
-    >
+      padding={1}>
       <Box display="flex">
         <Box>
           <Typography variant="subtitle2">
@@ -55,8 +54,7 @@ export const LocationPin = ({
             label={
               <Typography
                 variant="largeBtnText"
-                sx={{textTransform: 'capitalize'}}
-              >
+                sx={{textTransform: 'capitalize'}}>
                 {`${elevatorOrderPair.elevator.status.charAt(
                   0,
                 )}${elevatorOrderPair.elevator.status.slice(1).toLowerCase()}`}
@@ -93,8 +91,7 @@ export const LocationPin = ({
         variant="outlined"
         size="small"
         style={{marginTop: '2rem'}}
-        onClick={() => navigate(`/units/${elevatorOrderPair.elevator.id}`)}
-      >
+        onClick={() => navigate(`/units/${elevatorOrderPair.elevator.id}`)}>
         More details
       </Button>
     </Box>
@@ -106,8 +103,7 @@ export const LocationPin = ({
         fill: () => theme.palette.common.white,
         stroke: () => theme.palette.divider,
         strokeWidth: 1,
-      }}
-    >
+      }}>
       <Slide direction="down" timeout={700} in unmountOnExit>
         <Box>
           {selectedLocation?.longitude ===
@@ -125,8 +121,7 @@ export const LocationPin = ({
               }}
               title={renderTooltipDetail()}
               arrow
-              placement="top"
-            >
+              placement="top">
               <Pin />
             </Tooltip>
           ) : (

@@ -32,8 +32,7 @@ export const PageCard = ({
       sx={{
         minHeight: minHeight || '26rem',
         boxShadow: '0px 4px 15px rgba(144, 144, 144, 0.2)',
-      }}
-    >
+      }}>
       <CardHeader
         sx={{
           background: theme.palette.inputBackground.main,
@@ -53,8 +52,7 @@ export const PageCard = ({
             sx={{
               color: theme.palette.action.active,
               ...headerTextOverrideStyles,
-            }}
-          >
+            }}>
             {headerLabel}
           </Typography>
         }
@@ -62,8 +60,7 @@ export const PageCard = ({
       <CardContent
         sx={{
           px: contentPadding || 'default',
-        }}
-      >
+        }}>
         {children}
       </CardContent>
     </Card>

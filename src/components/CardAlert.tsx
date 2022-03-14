@@ -1,6 +1,4 @@
 import Box from '@mui/material/Box';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import useTheme from '@mui/material/styles/useTheme';
@@ -19,8 +17,7 @@ export const CardAlert = ({alertIcon, message, status}: Props) => {
       <Alert
         sx={{mt: '2em'}}
         icon={alertIcon || <CalendarTodayIcon />}
-        severity={status || 'info'}
-      >
+        severity={status || 'info'}>
         <Typography variant="chip" color={theme.palette.info.infoAlert}>
           {message}
         </Typography>

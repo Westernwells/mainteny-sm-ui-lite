@@ -10,10 +10,6 @@ import {useAuth} from 'hooks/useAuth';
 import {AuthLayout} from 'components/AuthLayout';
 import {LoginForm} from './components/LoginForm';
 
-interface Props {
-  startPageLoad: () => void;
-}
-
 const validationSchema = Yup.object().shape({
   email: Yup.string()
     .email('Enter a valid email')
@@ -45,8 +41,7 @@ export const Login = () => {
             display="flex"
             flexDirection="column"
             justifyContent="flex-end"
-            mr={2}
-          >
+            mr={2}>
             <CheckMark />
           </Box>
           <Typography variant="h4" mt={7}>

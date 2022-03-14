@@ -63,13 +63,11 @@ export const SplitButton = ({
         variant={variant || 'contained'}
         ref={anchorRef}
         aria-label="split button"
-        size={size || 'medium'}
-      >
+        size={size || 'medium'}>
         <Button
           disableRipple={disableRipple}
           onClick={handleClick}
-          sx={{...(selectionStyle || null)}}
-        >
+          sx={{...(selectionStyle || null)}}>
           <Typography sx={{textTransform: 'capitalize'}}>
             {' '}
             {selectedOption}
@@ -81,8 +79,7 @@ export const SplitButton = ({
           aria-expanded={open ? 'true' : undefined}
           aria-label="select merge strategy"
           aria-haspopup="menu"
-          onClick={handleToggle}
-        >
+          onClick={handleToggle}>
           <ArrowDropDownIcon />
         </Button>
       </ButtonGroup>
@@ -91,16 +88,14 @@ export const SplitButton = ({
         anchorEl={anchorRef.current}
         role={undefined}
         transition
-        disablePortal
-      >
+        disablePortal>
         {({TransitionProps, placement}) => (
           <Grow
             {...TransitionProps}
             style={{
               transformOrigin:
                 placement === 'bottom' ? 'center top' : 'center bottom',
-            }}
-          >
+            }}>
             <Paper>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList id="split-button-menu">
@@ -110,8 +105,7 @@ export const SplitButton = ({
                       selected={options[index] === selectedOption}
                       onClick={(event) =>
                         handleMenuItemClick(event, options[index])
-                      }
-                    >
+                      }>
                       <Typography sx={{textTransform: 'capitalize'}}>
                         {' '}
                         {option}

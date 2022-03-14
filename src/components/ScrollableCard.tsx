@@ -1,7 +1,6 @@
 import {ReactChild, ReactNode} from 'react';
 import Box from '@mui/material/Box';
 import useTheme from '@mui/material/styles/useTheme';
-import {Elevator} from 'models/elevator';
 import Typography from '@mui/material/Typography';
 
 export interface Props {
@@ -47,15 +46,13 @@ export const ScrollableCard = ({
         pb: 3,
         px: 2,
         ...containerStyles,
-      }}
-    >
+      }}>
       <Box
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
           ...headerStyles,
-        }}
-      >
+        }}>
         {renderHeaderText ? renderHeaderText() : null}
         {renderIcon ? renderIcon() : null}
       </Box>
@@ -63,8 +60,7 @@ export const ScrollableCard = ({
       <Box
         pt={2}
         height={contentHeight}
-        sx={{overflowY: disableScroll ? 'visible' : 'scroll'}}
-      >
+        sx={{overflowY: disableScroll ? 'visible' : 'scroll'}}>
         {children}
       </Box>
 
@@ -74,8 +70,7 @@ export const ScrollableCard = ({
           textAlign="center"
           color={theme.palette.info.main}
           sx={{cursor: 'pointer'}}
-          onClick={onMoreClick || (() => {})}
-        >
+          onClick={onMoreClick || (() => {})}>
           More...
         </Typography>
       ) : null}

@@ -1,11 +1,9 @@
 import Box from '@mui/material/Box';
 import Language from '@mui/icons-material/Language';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
 import AppBar from '@mui/material/AppBar';
-import {Link, useNavigate} from 'react-router-dom';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import useTheme from '@mui/material/styles/useTheme';
 
@@ -15,7 +13,6 @@ import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
 import {useAuth} from 'hooks/useAuth';
 
 export const AppTopBar = () => {
-  const navigate = useNavigate();
   const theme = useTheme();
   const {signout} = useAuth();
 
@@ -35,8 +32,7 @@ export const AppTopBar = () => {
         boxShadow: '0px 4px 15px rgba(144, 144, 144, 0.2)',
         paddingRight: '2.5rem',
         paddingLeft: '3rem',
-      }}
-    >
+      }}>
       <Box display="flex" justifyContent="space-between" pt={2} pb={1}>
         <Logo width={155.22} height={32} />
 
@@ -44,8 +40,7 @@ export const AppTopBar = () => {
           <Box
             display="flex"
             justifyContent="space-between"
-            alignItems="center"
-          >
+            alignItems="center">
             <Box display="flex" mt={1} alignItems="center">
               <Language sx={{color: '#231F20'}} />
               <Typography
@@ -53,8 +48,7 @@ export const AppTopBar = () => {
                 color="#8F9BB3"
                 fontSize={12}
                 fontWeight={500}
-                letterSpacing={0.14}
-              >
+                letterSpacing={0.14}>
                 ENG
               </Typography>
             </Box>
@@ -68,8 +62,7 @@ export const AppTopBar = () => {
                 marginTop: 1,
                 color: '#FF4B55',
                 cursor: 'pointer',
-              }}
-            >
+              }}>
               <NotificationsNoneIcon color="primary" />
             </Badge>
             {/* </Link> */}
@@ -82,8 +75,7 @@ export const AppTopBar = () => {
                   color="#222B45"
                   variant="subtitle1"
                   gutterBottom={false}
-                  sx={{textTransform: 'capitalize'}}
-                >
+                  sx={{textTransform: 'capitalize'}}>
                   {user?.userAccount.firstName} {user?.userAccount.lastName}
                 </Typography>
                 <Typography
@@ -93,8 +85,7 @@ export const AppTopBar = () => {
                     fontSize: '0.875rem',
                     padding: 0,
                     color: theme.palette.text.secondary,
-                  }}
-                >
+                  }}>
                   {user?.userAccount.roles[0]
                     .split('_')
                     .join(' ')
