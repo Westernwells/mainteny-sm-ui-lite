@@ -28,14 +28,12 @@ export const Searchnput = ({placeholder, onValueChanged}: Props) => {
         boxShadow: 0,
         width: '23rem',
         border: '1px solid #E4E9F2',
-      }}
-    >
+      }}>
       <IconButton
         type="submit"
         sx={{p: '10px'}}
         aria-label="search"
-        onClick={(e) => e.preventDefault()}
-      >
+        onClick={(e) => e.preventDefault()}>
         <SearchIcon />
       </IconButton>
       <InputBase

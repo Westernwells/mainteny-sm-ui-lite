@@ -32,8 +32,7 @@ export const HistoryCardHeader = ({
           {isDetailCard ? (
             <Typography
               variant="body2"
-              sx={{mr: '0.4em', color: theme.palette.text.secondary}}
-            >
+              sx={{mr: '0.4em', color: theme.palette.text.secondary}}>
               {subtitle || '5:30 PM to 6:30 PM'}
             </Typography>
           ) : null}
@@ -82,8 +81,7 @@ export const HistoryCardHeader = ({
             <Typography
               variant="chip"
               color={theme.palette.text.secondary}
-              sx={{textTransform: 'capitalize'}}
-            >
+              sx={{textTransform: 'capitalize'}}>
               Completed
             </Typography>
           </Box>

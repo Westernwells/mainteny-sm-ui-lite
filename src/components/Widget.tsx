@@ -57,8 +57,7 @@ export const Widget = ({
                 },
               }}
               variant="outlined"
-              startIcon={<FilterListIcon />}
-            >
+              startIcon={<FilterListIcon />}>
               <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
                 Filter
               </Typography>
@@ -87,8 +86,7 @@ export const Widget = ({
                     ? theme.palette.action.selected
                     : '#fff',
                 },
-              }}
-            >
+              }}>
               <FormatListBulletedIcon />
             </Button>
             <Button
@@ -104,8 +102,7 @@ export const Widget = ({
                     : '#fff',
                 },
               }}
-              variant="outlined"
-            >
+              variant="outlined">
               <GridViewIcon />
             </Button>
           </ButtonGroup>

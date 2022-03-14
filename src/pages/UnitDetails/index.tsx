@@ -118,16 +118,14 @@ export const UnitsDetail = () => {
     <Box
       sx={{
         pb: '1em',
-      }}
-    >
+      }}>
       <Box
         sx={{
           display: 'flex',
           paddingTop: 2,
           paddingLeft: '35px',
           mt: 10,
-        }}
-      >
+        }}>
         <ArrowBack
           onClick={() => navigate(-1)}
           sx={{
@@ -141,8 +139,7 @@ export const UnitsDetail = () => {
           className={classes.tabs}
           value={value}
           onChange={handleChange}
-          textColor="secondary"
-        >
+          textColor="secondary">
           {tabItems.map((item, index) => (
             <Tab
               key={`${item.label}`}
@@ -166,8 +163,7 @@ export const UnitsDetail = () => {
                       left: '50%',
                       transform: 'translateX(-50%)',
                     },
-                  }}
-                >
+                  }}>
                   <Box className="item-icon">{item.icon}</Box>
                   <Typography mb={1} sx={{ml: 1}} variant="subtitle1">
                     {item.label}
@@ -189,8 +185,7 @@ export const UnitsDetail = () => {
             width: 0,
             background: 'transparent',
           },
-        }}
-      >
+        }}>
         {tabPanel()}
       </Box>
     </Box>

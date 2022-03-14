@@ -67,8 +67,7 @@ export const ServiceHistoryTab = () => {
             mx: 'default',
             height: 'default',
           }}
-          headerActionIcon={<MoreVertIcon />}
-        >
+          headerActionIcon={<MoreVertIcon />}>
           <Box display="flex" mb="0.8em" px="1rem">
             <Box mr="1em">
               <SplitButton

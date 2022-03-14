@@ -26,8 +26,7 @@ export const ContractCard = ({
       border: 'none',
       minHeight,
       ...containerStyles,
-    }}
-  >
+    }}>
     <CardHeader
       sx={{pb: '1.5em'}}
       action={

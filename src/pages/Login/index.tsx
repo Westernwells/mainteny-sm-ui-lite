@@ -41,8 +41,7 @@ export const Login = () => {
             display="flex"
             flexDirection="column"
             justifyContent="flex-end"
-            mr={2}
-          >
+            mr={2}>
             <CheckMark />
           </Box>
           <Typography variant="h4" mt={7}>

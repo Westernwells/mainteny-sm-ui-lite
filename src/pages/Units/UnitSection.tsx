@@ -37,8 +37,7 @@ export const UnitSection = ({
         paddingBottom: 0.5,
         marginTop: 1,
         borderRadius: '4px 4px 0px 0px',
-      }}
-    >
+      }}>
       <Box pl={3}>
         <Typography variant="largeBtnText" mt={1} color="textSecondary">
           {elevatorsByAddress.address.fullName}
@@ -56,8 +55,7 @@ export const UnitSection = ({
             '&:hover': {background: 'rgba(0, 209, 255, 0.08)'},
             minHeight: '3rem',
             alignItems: 'center',
-          }}
-        >
+          }}>
           <Grid
             item
             xs={3}
@@ -65,8 +63,7 @@ export const UnitSection = ({
             onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
               e.preventDefault();
               navigate(`/units/${elevatorOrder.elevator.id}`);
-            }}
-          >
+            }}>
             <Box display="flex" alignItems="center">
               <Elevator style={{marginRight: '10px'}} />
               <Typography variant="subtitle1">
@@ -83,8 +80,7 @@ export const UnitSection = ({
               display: 'flex',
               justifyContent: 'flex-end',
               alignItems: 'center',
-            }}
-          >
+            }}>
             <Grid item xs={2}>
               <Typography variant="largeBtnText">
                 {elevatorOrder.elevator.lastVisitDate || 'N/A'}
@@ -109,8 +105,7 @@ export const UnitSection = ({
                   elevatorOrder.elevator.availability < 100
                     ? 'textWarning'
                     : 'textSuccess'
-                }
-              >
+                }>
                 <Box display="flex" justifyContent="center">
                   {elevatorOrder.elevator.availability}%
                 </Box>

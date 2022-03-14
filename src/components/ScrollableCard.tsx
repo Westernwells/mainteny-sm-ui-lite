@@ -46,15 +46,13 @@ export const ScrollableCard = ({
         pb: 3,
         px: 2,
         ...containerStyles,
-      }}
-    >
+      }}>
       <Box
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
           ...headerStyles,
-        }}
-      >
+        }}>
         {renderHeaderText ? renderHeaderText() : null}
         {renderIcon ? renderIcon() : null}
       </Box>
@@ -62,8 +60,7 @@ export const ScrollableCard = ({
       <Box
         pt={2}
         height={contentHeight}
-        sx={{overflowY: disableScroll ? 'visible' : 'scroll'}}
-      >
+        sx={{overflowY: disableScroll ? 'visible' : 'scroll'}}>
         {children}
       </Box>
 
@@ -73,8 +70,7 @@ export const ScrollableCard = ({
           textAlign="center"
           color={theme.palette.info.main}
           sx={{cursor: 'pointer'}}
-          onClick={onMoreClick || (() => {})}
-        >
+          onClick={onMoreClick || (() => {})}>
           More...
         </Typography>
       ) : null}

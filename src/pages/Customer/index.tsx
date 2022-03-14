@@ -33,8 +33,7 @@ export const Customer = () => {
           hideViewOption
           hideFilter
         />
-      }
-    >
+      }>
       <DataGridLayout rows={rows} columns={columns} />
     </PageOverviewLayout>
   );

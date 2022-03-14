@@ -17,8 +17,7 @@ export const CardAlert = ({alertIcon, message, status}: Props) => {
       <Alert
         sx={{mt: '2em'}}
         icon={alertIcon || <CalendarTodayIcon />}
-        severity={status || 'info'}
-      >
+        severity={status || 'info'}>
         <Typography variant="chip" color={theme.palette.info.infoAlert}>
           {message}
         </Typography>

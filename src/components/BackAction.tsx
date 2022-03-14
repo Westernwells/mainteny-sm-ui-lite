@@ -16,8 +16,7 @@ export const BackAction = ({label}: Props) => {
       <Box
         mr={2}
         sx={{cursor: 'pointer', mt: '0.2em'}}
-        onClick={() => navigate(-1)}
-      >
+        onClick={() => navigate(-1)}>
         <ArrowBackIosNewIcon sx={{color: theme.palette.action.active}} />
       </Box>
       <Typography variant="h5">{label}</Typography>

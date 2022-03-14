@@ -21,8 +21,7 @@ export const FilterFields = ({
       <Typography
         onClick={() => setShowFilter(false)}
         mt={2}
-        sx={{cursor: 'pointer', color: theme.palette.info.main}}
-      >
+        sx={{cursor: 'pointer', color: theme.palette.info.main}}>
         Clear all
       </Typography>
     </Box>

@@ -19,8 +19,7 @@ export const ContractCosts = ({price, currency}: Props) => {
         flexDirection: 'column',
         alignItems: 'center',
         borderRadius: '20px',
-      }}
-    >
+      }}>
       <Typography variant="h4" color="primary">
         {price?.toLocaleString('en-US', {
           style: 'currency',

@@ -73,8 +73,7 @@ export const LoginForm = ({
                 <InputAdornment
                   position="start"
                   onClick={() => setShowPassword(!showPassword)}
-                  sx={{cursor: 'pointer'}}
-                >
+                  sx={{cursor: 'pointer'}}>
                   <RemoveRedEye />
                 </InputAdornment>
               ),
@@ -84,8 +83,7 @@ export const LoginForm = ({
             <Button
               variant="text"
               color="info"
-              sx={{textTransform: 'capitalize'}}
-            >
+              sx={{textTransform: 'capitalize'}}>
               Forgot Password?
             </Button>
           </Box>
@@ -105,8 +103,7 @@ export const LoginForm = ({
             ) : (
               <ArrowForward />
             )
-          }
-        >
+          }>
           Login
         </Button>
       </form>

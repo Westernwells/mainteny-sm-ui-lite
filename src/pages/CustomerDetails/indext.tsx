@@ -63,8 +63,7 @@ export const CustomerDetails = () => {
       <BasicDetailsCard
         minHeight="12rem"
         headerStyles={{pb: '0'}}
-        header={<Typography variant="subtitle1">#785371</Typography>}
-      >
+        header={<Typography variant="subtitle1">#785371</Typography>}>
         <Box display="flex" flexWrap="wrap">
           <CardProps
             label="CUSTOMER NAME"
