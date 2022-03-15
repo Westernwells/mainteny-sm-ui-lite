@@ -49,7 +49,7 @@ export const Customer = () => {
           hideFilter
         />
       }>
-      <DataGridLayout rows={rows} columns={columns} />
+      <DataGridLayout rows={rows} columns={columns} hideFooter />
     </PageOverviewLayout>
   );
 };
