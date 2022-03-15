@@ -22,7 +22,7 @@ export const MyUnits = () => {
     centerCoord: {longitude: 0, latitude: 0},
   }).current;
   const [search, setSearch] = useState('');
-  const [page] = useState(makePage(0, 10)); // TODO: implement paging
+  const [page] = useState(makePage(0, 50)); // TODO: implement paging
   const [showFilter, setShowFilter] = useState(false);
   const [availability, setAvailability] = useState<number[][]>([]);
   const [status, setStatus] = useState<string[]>([]);

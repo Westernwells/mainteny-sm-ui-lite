@@ -16,7 +16,7 @@ import {Order} from '../../models/misc';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
 import {Widget} from '../../components/Widget';
 
-const pageSize = 10;
+const pageSize = 50;
 
 export const Contracts = () => {
   const [search, setSearch] = useState('');

@@ -6,7 +6,11 @@ import {queryKeys as qk} from 'reactQuery/constants';
 import {staticContracts} from 'pages/Contracts/data';
 
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
-import {ContractView, QueryContractParams} from 'models/contract';
+import {
+  ContractFilters,
+  ContractView,
+  QueryContractParams,
+} from 'models/contract';
 import {Resource, RestError, WithOptional} from 'models/misc';
 import {useUserSession} from './useUserSession';
 
@@ -38,17 +42,43 @@ export const fetchContracts = async (
 
 Promise.resolve(staticContracts);
 
-const filterContracts = (contractsRes: Resource<ContractView>, filter: {}) => {
-  const result = {...contractsRes};
-  console.log(filter);
-  // TODO: Filter code goes here
+export const filterByPrice = (
+  contractsRes: Resource<ContractView>,
+  price: number[][],
+) => {
+  let mergedResult = [] as ContractView[];
+
+  const inRange = (item: number, range: number[][]) => {
+    let result = false;
+    range.forEach((interval) => {
+      if (item >= interval[0] && item < interval[1]) {
+        result = true;
+      }
+    });
+    return result;
+  };
+  mergedResult = contractsRes.data.filter((item) => inRange(item.price, price));
+  return mergedResult;
+};
+
+const filterContracts = (
+  contractsRes: Resource<ContractView>,
+  filter: ContractFilters,
+) => {
+  let result = {...contractsRes};
+  if (filter.price.length) {
+    if (filter.price.length) {
+      const prices = filterByPrice(result, filter.price);
+      result = {...result, data: prices, total: prices.length};
+    }
+  }
   return result;
 };
 
 export const useQueryContract = (
   params: WithOptional<QueryContractParams, 'serviceCompanyId'>,
   // TODO: Write 'interface' for filter object
-  filter: {},
+  filter: ContractFilters,
 ) => {
   const {user} = useUserSession();
   return useQuery<Resource<ContractView>, RestError, Resource<ContractView>>(

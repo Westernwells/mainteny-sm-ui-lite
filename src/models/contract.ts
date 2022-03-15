@@ -141,3 +141,9 @@ export interface ContractRecord {
   contract: ContractView;
   elevators: ElevatorView[];
 }
+
+export interface ContractFilters {
+  contractor: string[];
+  expiryDate: string[];
+  price: number[][];
+}
