@@ -1,5 +1,5 @@
 import {useCallback} from 'react';
-import {useQuery} from 'react-query';
+import {useQuery, UseQueryOptions} from 'react-query';
 import * as _ from 'lodash';
 import getCenter from 'geolib/es/getCenter';
 import {AxiosResponse} from 'axios';
@@ -112,6 +112,7 @@ export function useAllElevators(
   query: string,
   page: Page,
   filter: {status: string[]},
+  options?: UseQueryOptions<any, any, any>,
 ) {
   const {user} = useUserSession();
   return useQuery<
@@ -127,6 +128,7 @@ export function useAllElevators(
     ],
     () => fetchElevators(query, page, user!.userAccount.serviceCompany.id),
     {
+      ...options,
       enabled: !!user,
       select: useCallback(
         (elevatorResponse: Resource<ElevatorView>) => {

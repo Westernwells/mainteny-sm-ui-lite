@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, MouseEvent, ChangeEvent} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {ElevatorView} from 'models/elevator';
@@ -16,13 +16,15 @@ import {UnitSection} from './UnitSection';
 import {UnitsMapsView} from './UnitsMapsView';
 import {UnitColumns} from './UnitColumns';
 
+const pageInfo = makePage(0, 3);
+
 export const MyUnits = () => {
   const fallback = useRef({
     elevator: createEmptyResource<ElevatorView>(10),
     centerCoord: {longitude: 0, latitude: 0},
   }).current;
   const [search, setSearch] = useState('');
-  const [page] = useState(makePage(0, 50)); // TODO: implement paging
+  const [page, setPage] = useState(pageInfo);
   const [showFilter, setShowFilter] = useState(false);
   const [availability, setAvailability] = useState<number[][]>([]);
   const [status, setStatus] = useState<string[]>([]);
@@ -30,12 +32,18 @@ export const MyUnits = () => {
   const [showMapview, setShowMapview] = useState(false);
   const theme = useTheme();
 
-  const {data: elevatorResponse = fallback} = useAllElevators(search, page, {
-    status,
-  });
+  const {data: elevatorResponse = fallback} = useAllElevators(
+    search,
+    page,
+    {
+      status,
+    },
+    {keepPreviousData: true},
+  );
   const {data: elevatorsByAddressList} = useFetchServiceOrdersByElevators(
     elevatorResponse.elevator,
     {nextVisit, availabilityRange: availability},
+    {keepPreviousData: true},
   );
 
   const availabilityRangeConvertor = (selectedItems: string[]) => {
@@ -71,6 +79,13 @@ export const MyUnits = () => {
 
   const closeMapView = () => {
     setShowMapview(false);
+  };
+
+  const handlePageChange = (
+    _e: MouseEvent<HTMLButtonElement> | null,
+    newPage: number,
+  ) => {
+    setPage({...page, pageIndex: newPage});
   };
 
   useEffect(() => {
@@ -145,11 +160,17 @@ export const MyUnits = () => {
             }}
             component="div"
             count={elevatorResponse.elevator.total}
-            page={elevatorResponse.elevator.page.pageIndex}
-            // TODO: Implement paging
-            onPageChange={() => console.log('page change')}
-            rowsPerPage={elevatorResponse.elevator.page.pageSize}
-            //  onRowsPerPageChange={handleChangeRowsPerPage}
+            page={page.pageIndex}
+            onPageChange={handlePageChange}
+            rowsPerPage={page.pageSize}
+            onRowsPerPageChange={(
+              event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+            ) =>
+              setPage({
+                pageSize: parseInt(event.target.value, 10),
+                pageIndex: 0,
+              })
+            }
           />
         </>
       ) : (
