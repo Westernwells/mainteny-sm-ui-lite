@@ -65,10 +65,6 @@ export const MyUnits = () => {
     setAvailability(range);
   };
 
-  const onSearchTextChanged = (value: string) => {
-    setSearch(value);
-  };
-
   const openMapView = () => {
     setShowMapview(true);
   };
@@ -93,7 +89,7 @@ export const MyUnits = () => {
         <Box>
           <Widget
             searchPlaceholder="Try ‘Schindler’ or ‘Mitsubishi’"
-            onSearchTextChanged={onSearchTextChanged}
+            getSearchValue={(val: string) => setSearch(val)}
             openMapView={openMapView}
             closeMapView={closeMapView}
             mapViewActive={showMapview}

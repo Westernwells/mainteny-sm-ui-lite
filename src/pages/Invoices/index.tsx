@@ -78,7 +78,7 @@ export const Invoices = () => {
         <Box mt={1}>
           <Widget
             searchPlaceholder="Try 'INV000001'"
-            onSearchTextChanged={setSearch}
+            getSearchValue={(val: string) => setSearch(val)}
             setShowFilter={setShowFilter}
             showFilter={showFilter}
           />

@@ -16,7 +16,7 @@ import {Order} from '../../models/misc';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
 import {Widget} from '../../components/Widget';
 
-const pageSize = 50;
+const pageSize = 10;
 
 export const Contracts = () => {
   const [search, setSearch] = useState('');
@@ -108,7 +108,7 @@ export const Contracts = () => {
         <Box mt={1}>
           <Widget
             searchPlaceholder="Try 'Astralift BV'"
-            onSearchTextChanged={setSearch}
+            getSearchValue={(val: string) => setSearch(val)}
             setShowFilter={setShowFilter}
             showFilter={showFilter}
           />

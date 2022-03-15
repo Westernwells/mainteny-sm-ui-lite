@@ -25,7 +25,7 @@ export const Customer = () => {
       renderWidget={
         <Widget
           searchPlaceholder="Try 'Astralift BV'"
-          onSearchTextChanged={setSearch}
+          getSearchValue={(val: string) => setSearch(val)}
           setShowFilter={setShowFilter}
           showFilter={showFilter}
           hideViewOption

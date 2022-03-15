@@ -1,3 +1,5 @@
+import {useEffect, useState} from 'react';
+import {createEmptyResource, makePage} from 'utils/paging-utils';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -9,23 +11,50 @@ import useTheme from '@mui/material/styles/useTheme';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import {useParams} from 'react-router-dom';
 import {StatusChip} from 'components/StatusChip';
+import {DataGridLayout} from 'components/DataGridLayout';
 import {BackAction} from 'components/BackAction';
 import {toDate} from 'utils/datetime';
 import {differenceInDays, isBefore} from 'date-fns';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import {GridRowsProp} from '@mui/x-data-grid';
+import {Widget} from 'components/Widget';
 import {BasicDetailsCard} from 'components/BasicDetailsCard';
+import {useAllElevators} from 'hooks/reactQuery/useElevator';
+import {ElevatorView} from 'models/elevator';
+import {columns, makeRows} from 'pages/Units/unitDataGridProp';
 import {formatCurrency} from 'utils/currency';
 import {ContractBasic} from './ContractBasic';
 import {ContractParties} from './ContractParties';
 import {ContractScope} from './ContractScope';
-import {ContractPaymentDetails} from './ContractPaymentDetails';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
 
 export const ContractDetails = () => {
   const {id: contractId} = useParams();
   const theme = useTheme();
+  const [search, setSearch] = useState('');
+  const [page] = useState(makePage(0, 10)); // TODO: implement paging
+  const [showFilter, setShowFilter] = useState(false);
+  const [rows, setRows] = useState<GridRowsProp>([]);
   const {data: contractDetails, isLoading} = useContractDetails(contractId!);
+  const {
+    data: {elevator} = {
+      elevator: createEmptyResource<ElevatorView>(10),
+      centerCoord: {longitude: 0, latitude: 0},
+    },
+  } = useAllElevators(search, page, {
+    status: [],
+  });
+
+  useEffect(() => {
+    console.log(elevator, '***************');
+    if (elevator.data) {
+      setRows(makeRows(elevator));
+    } else {
+      setRows([]);
+    }
+  }, [elevator]);
+
   const totalContractDays =
     !isLoading &&
     differenceInDays(
@@ -207,19 +236,29 @@ export const ContractDetails = () => {
               totalContractDays={totalContractDays}
             />
           </ContractCard>
-
-          <ContractCard
-            minHeight="25vh"
-            containerStyles={{mt: '1em', py: '1em'}}
-            header={
-              <Typography variant="subtitle1">Payment Details</Typography>
-            }>
-            <ContractPaymentDetails
-              name={contractDetails?.propertyOwner.name}
-            />
-          </ContractCard>
         </Grid>
       </Grid>
+
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        maxWidth="100%"
+        sx={{mt: '3em'}}>
+        <Box sx={{mb: 4, mt: 1}}>
+          <Typography variant="h4">Units</Typography>
+        </Box>
+        <Box>
+          <Widget
+            searchPlaceholder="Try ‘Schindler’ or ‘Mitsubishi’"
+            getSearchValue={(val: string) => setSearch(val)}
+            setShowFilter={setShowFilter}
+            showFilter={showFilter}
+            hideViewOption
+          />
+        </Box>
+      </Box>
+
+      <DataGridLayout rows={rows} columns={columns} />
     </Box>
   );
 };

@@ -105,16 +105,6 @@ export const columns: GridColDef[] = [
     renderCell: () => (
       <FileDownloadOutlinedIcon
         sx={{color: '#2196F3'}}
-        // onClick={async () => {
-        //   const downloadUrls = await fetchDownloadUrl(
-        //     params.value.pdfPath,
-        //     params.value.serviceCompanyId,
-        //   );
-        //   const downloadUrlPaths = downloadUrls[params.value.pdfPath];
-        //   if (downloadUrlPaths) {
-        //     window.open(downloadUrlPaths, '_self');
-        //   }
-        // }}
         onClick={() =>
           window.open(
             `${process.env.REACT_APP_BASE_URL}/INV000128.pdf`,

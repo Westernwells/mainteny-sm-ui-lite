@@ -10,7 +10,6 @@ import {Searchnput} from './SearchInput';
 
 interface Props {
   searchPlaceholder?: string;
-  onSearchTextChanged?: (text: string) => void;
   openMapView?: () => void;
   closeMapView?: () => void;
   mapViewActive?: boolean;
@@ -18,11 +17,11 @@ interface Props {
   setShowFilter: (state: boolean) => void;
   hideViewOption?: boolean;
   hideFilter?: boolean;
+  getSearchValue?: (val: string) => void;
 }
 
 export const Widget = ({
   searchPlaceholder,
-  onSearchTextChanged,
   openMapView,
   closeMapView,
   mapViewActive,
@@ -30,6 +29,7 @@ export const Widget = ({
   setShowFilter,
   hideViewOption = false,
   hideFilter = false,
+  getSearchValue,
 }: Props) => {
   const theme = useTheme();
 
@@ -65,7 +65,9 @@ export const Widget = ({
         <Box mr={!hideViewOption ? 3 : 0}>
           <Searchnput
             placeholder={searchPlaceholder}
-            onValueChanged={onSearchTextChanged}
+            onValueChanged={(value: string) =>
+              getSearchValue && getSearchValue(value)
+            }
           />
         </Box>
         {!hideViewOption ? (
