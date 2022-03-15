@@ -24,16 +24,14 @@ export const MaintenanceBasicInfo = ({
         display: 'flex',
         justifyContent: 'center',
         mr: '1em',
-      }}
-    >
+      }}>
       {icon}
     </Box>
     <Box>
       <Box>
         <Typography
           variant="caption"
-          sx={{color: (theme) => theme.palette.text.secondary}}
-        >
+          sx={{color: (theme) => theme.palette.text.secondary}}>
           {label}
         </Typography>
       </Box>

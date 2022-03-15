@@ -1,15 +1,12 @@
 import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
 import useTheme from '@mui/material/styles/useTheme';
-import {Order} from 'models/misc';
 import Grid from '@mui/material/Grid';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {endOfMonth, startOfDay, startOfYear} from 'date-fns';
-import {toRestDateTime} from 'utils/datetime';
+import {createEmptyResource} from 'utils/paging-utils';
+import {endOfMonth, startOfDay} from 'date-fns';
 import {useParams} from 'react-router-dom';
 import {ReactComponent as Escalator} from 'assets/icons/Escalator.svg';
 import {PageCard} from 'components/PageCard';
-import {useServiceHistory} from 'hooks/reactQuery/useServiceHistory';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {
   useElevatorById,
@@ -18,7 +15,6 @@ import {
 import {ElevatorAvailabilitySection} from '../ElevatorAvailabilitySection';
 import {ElevatorBasicSection} from '../ElevatorBasicSection';
 import {TechnicianSection} from '../TechnicianSection';
-import {MaintainerView} from '../../../models/technician';
 import {ServiceHistory} from '../ServiceHistory';
 
 const pageSize = 10;
@@ -120,8 +116,7 @@ export const OverviewTab = () => {
           <PageCard
             contentPadding="1.5em"
             headerLabel="All Services"
-            minHeight="10rem"
-          >
+            minHeight="10rem">
             {serviceOrders.data.map((serviceOrder) => (
               <ServiceHistory
                 key={serviceOrder.id}

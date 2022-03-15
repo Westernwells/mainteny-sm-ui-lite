@@ -7,22 +7,14 @@ import {Widget} from 'components/Widget';
 import {useFetchServiceOrdersByElevators} from 'hooks/reactQuery/useServiceOrder';
 import Fade from '@mui/material/Fade';
 import {TablePagination} from '@mui/material';
-import * as Yup from 'yup';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
-import {BtnGroupType} from 'models/misc';
 import {FilterFields} from 'components/FilterFields';
 import useTheme from '@mui/material/styles/useTheme';
 import {UnitSection} from './UnitSection';
 import {UnitsMapsView} from './UnitsMapsView';
 import {UnitColumns} from './UnitColumns';
-
-interface FormikFields {
-  description: string;
-  elevator?: ElevatorView;
-  moreInformation: string;
-}
 
 export const MyUnits = () => {
   const fallback = useRef({
@@ -30,7 +22,7 @@ export const MyUnits = () => {
     centerCoord: {longitude: 0, latitude: 0},
   }).current;
   const [search, setSearch] = useState('');
-  const [page, _setPage] = useState(makePage(0, 10)); // TODO: implement paging
+  const [page] = useState(makePage(0, 10)); // TODO: implement paging
   const [showFilter, setShowFilter] = useState(false);
   const [availability, setAvailability] = useState<number[][]>([]);
   const [status, setStatus] = useState<string[]>([]);
@@ -107,7 +99,6 @@ export const MyUnits = () => {
             mapViewActive={showMapview}
             setShowFilter={setShowFilter}
             showFilter={showFilter}
-            btnGroupType={BtnGroupType.ICON}
           />
         </Box>
       </Box>
@@ -142,8 +133,7 @@ export const MyUnits = () => {
         <>
           <UnitColumns />
           <Box
-            sx={{height: '69vh', overflowY: 'scroll', paddingBottom: '1rem'}}
-          >
+            sx={{height: '69vh', overflowY: 'scroll', paddingBottom: '1rem'}}>
             {elevatorsByAddressList?.map((elevatorsByAddress) => (
               <UnitSection
                 key={elevatorsByAddress.address.id}

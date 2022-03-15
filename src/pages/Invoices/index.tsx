@@ -6,7 +6,6 @@ import {GridRowsProp} from '@mui/x-data-grid';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {DataGridLayout} from 'components/DataGridLayout';
-import {BtnGroupType} from 'models/misc';
 import {InvoiceStatus, InvoiceStatusView} from 'models/invoice';
 import {useInvoices} from 'hooks/reactQuery/useInvoice';
 import {columns, makeRows} from './InvoicesDataGridProps';
@@ -15,10 +14,10 @@ import {Widget} from '../../components/Widget';
 
 export const Invoices = () => {
   const [search, setSearch] = useState('');
-  const [page, setPage] = useState(makePage(0, 10)); // TODO: implement paging
+  const [page] = useState(makePage(0, 10)); // TODO: implement paging
   const [showFilter, setShowFilter] = useState(false);
-  const [amount, setAmount] = useState<number[][]>([]);
-  const [status, setStatus] = useState<string[]>([]);
+  const [_amount, setAmount] = useState<number[][]>([]);
+  const [_status, setStatus] = useState<string[]>([]);
   const [rows, setRows] = useState<GridRowsProp>([]);
   // TODO: Create Invoice model for invoices with 'Order number' and 'Service type'
   const {data: invoiceResource} = useInvoices(
@@ -30,7 +29,7 @@ export const Invoices = () => {
     },
     {},
   );
-
+  console.log(_amount, _status);
   const amountRangeConvertor = (selectedItems: string[]) => {
     const range: number[][] = [];
     selectedItems.forEach((item) => {
@@ -78,7 +77,6 @@ export const Invoices = () => {
         </Box>
         <Box mt={1}>
           <Widget
-            btnGroupType={BtnGroupType.ICON}
             searchPlaceholder="Try 'INV000001'"
             onSearchTextChanged={setSearch}
             setShowFilter={setShowFilter}

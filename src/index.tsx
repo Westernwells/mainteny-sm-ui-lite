@@ -21,8 +21,7 @@ ReactDOM.render(
           vertical: 'top',
           horizontal: 'right',
         }}
-        maxSnack={3}
-      >
+        maxSnack={3}>
         <App />
       </SnackbarProvider>
       <ReactQueryDevtools />

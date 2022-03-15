@@ -12,8 +12,7 @@ export const HistoryAttachments = () => (
         mr: '1em',
 
         mt: '0.5em',
-      }}
-    >
+      }}>
       <img
         src={`${process.env.REACT_APP_BASE_URL}/images/1.png`}
         alt=""
@@ -28,8 +27,7 @@ export const HistoryAttachments = () => (
         borderRadius: 1,
         mr: '1em',
         mt: '0.5em',
-      }}
-    >
+      }}>
       <img
         src={`${process.env.REACT_APP_BASE_URL}/images/2.png`}
         alt=""
@@ -44,8 +42,7 @@ export const HistoryAttachments = () => (
         borderRadius: 1,
         mr: '1em',
         mt: '0.5em',
-      }}
-    >
+      }}>
       <img
         src={`${process.env.REACT_APP_BASE_URL}/images/3.png`}
         alt=""
@@ -60,8 +57,7 @@ export const HistoryAttachments = () => (
         borderRadius: 1,
         mr: '1em',
         mt: '0.5em',
-      }}
-    >
+      }}>
       <img
         src={`${process.env.REACT_APP_BASE_URL}/images/4.png`}
         alt=""

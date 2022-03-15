@@ -8,7 +8,6 @@ import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import Grid from '@mui/material/Grid';
 import {PageCard} from 'components/PageCard';
-import Icon from '@mui/material/Icon';
 import * as _ from 'lodash';
 import {
   BarElement,
@@ -21,7 +20,6 @@ import {
 } from 'chart.js';
 import {Bar} from 'react-chartjs-2';
 
-import {ReactComponent as Elevation} from '../../assets/icons/Elevation.svg';
 import {SplitButton} from '../../components/SplitButton';
 import {formatDate} from '../../utils/datetime';
 
@@ -88,7 +86,7 @@ function generateLabels(timeFrame: TimeFrame) {
 }
 
 function generateData(timeFrame: TimeFrame) {
-  return formatDates(timeFrame).map((day) => _.random(100, 800));
+  return formatDates(timeFrame).map(() => _.random(100, 800));
 }
 
 export const ElevatorAvailabilitySection = () => {
@@ -121,20 +119,17 @@ export const ElevatorAvailabilitySection = () => {
           background: '#fff',
           borderRadius: '8px',
           height: '100%',
-        }}
-      >
+        }}>
         <Box sx={{px: '20px'}} pt="0.1em">
           <Box
             display="flex"
             sx={{
               px: '2em',
-            }}
-          >
+            }}>
             <Typography
               variant="h5"
               mr="0.5em"
-              color={theme.palette.success.main}
-            >
+              color={theme.palette.success.main}>
               98%
             </Typography>
             <Typography variant="caption" mr="3em" mt="0.3em" flexGrow={1}>
@@ -156,8 +151,7 @@ export const ElevatorAvailabilitySection = () => {
               display="flex"
               justifyContent="space-between"
               ml="70px"
-              mr="35px"
-            >
+              mr="35px">
               <Typography>{format(getStartDate(), 'MMM')}</Typography>
               <Typography>{format(getEndDate(), 'MMM')}</Typography>
             </Box>
@@ -184,8 +178,7 @@ export const ElevatorAvailabilitySection = () => {
 
               <Typography
                 variant="tableHeaderText"
-                sx={{color: theme.palette.text.secondary, mt: '0.5em'}}
-              >
+                sx={{color: theme.palette.text.secondary, mt: '0.5em'}}>
                 {`${formatDate(getStartDate())} - ${formatDate(getEndDate())}`}
               </Typography>
 

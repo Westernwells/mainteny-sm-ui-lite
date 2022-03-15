@@ -30,13 +30,11 @@ export const ElevatorBasicSection = ({
         <Box
           key={`${item}-${index}`}
           display="flex"
-          mt={index !== 0 ? '1.3em' : undefined}
-        >
+          mt={index !== 0 ? '1.3em' : undefined}>
           <Box
             display="flex"
             width="15rem"
-            flexGrow={index === 0 ? 1 : 'unset'}
-          >
+            flexGrow={index === 0 ? 1 : 'unset'}>
             <Box mr="0.5em" mt="0.3em">
               <Box
                 sx={{background: theme.palette.background.default}}
@@ -44,8 +42,7 @@ export const ElevatorBasicSection = ({
                 height="2.8rem"
                 display="flex"
                 justifyContent="center"
-                alignItems="center"
-              >
+                alignItems="center">
                 {item.leftIcon}
               </Box>
             </Box>
@@ -56,14 +53,12 @@ export const ElevatorBasicSection = ({
                   index === 0
                     ? theme.palette.primary.main
                     : theme.palette.text.secondary
-                }
-              >
+                }>
                 {item.leftLabel}
               </Typography>
               <Typography
                 variant={index === 0 ? 'caption' : 'body1'}
-                color={theme.palette.primary.main}
-              >
+                color={theme.palette.primary.main}>
                 {item.leftValue}
               </Typography>
             </Box>
@@ -87,16 +82,14 @@ export const ElevatorBasicSection = ({
                   height="2.8rem"
                   display="flex"
                   justifyContent="center"
-                  alignItems="center"
-                >
+                  alignItems="center">
                   {item.rightIcon}
                 </Box>
               </Box>
               <Box>
                 <Typography
                   variant="caption"
-                  color={theme.palette.text.secondary}
-                >
+                  color={theme.palette.text.secondary}>
                   {item.rightLabel}
                 </Typography>
                 <Typography variant="body1" color={theme.palette.primary.main}>

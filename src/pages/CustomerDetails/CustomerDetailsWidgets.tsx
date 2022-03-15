@@ -22,8 +22,7 @@ export const CustomerDetailsWidgets = ({containerStyle}: Props) => {
             px: '0.5em',
             color: '#fff',
             width: '30%',
-          }}
-        >
+          }}>
           <Typography sx={{textAlign: 'center'}}>Contracts (13)</Typography>
         </Box>
 
@@ -34,12 +33,10 @@ export const CustomerDetailsWidgets = ({containerStyle}: Props) => {
             px: '0.5em',
             color: '#000',
             width: '30%',
-          }}
-        >
+          }}>
           <Typography
             sx={{textAlign: 'center', color: grey[900]}}
-            component={InputLabel}
-          >
+            component={InputLabel}>
             Units (50)
           </Typography>
         </Box>

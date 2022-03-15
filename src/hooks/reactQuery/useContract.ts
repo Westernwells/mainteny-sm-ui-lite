@@ -1,9 +1,8 @@
 import {useCallback} from 'react';
 import {useQuery} from 'react-query';
-import * as _ from 'lodash';
+// import * as _ from 'lodash';
 import {queryKeys as qk} from 'reactQuery/constants';
 // FIXME: Dummy Import
-import {staticContractDetails} from 'pages/ContractDetails/data';
 import {staticContracts} from 'pages/Contracts/data';
 
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
@@ -41,6 +40,7 @@ Promise.resolve(staticContracts);
 
 const filterContracts = (contractsRes: Resource<ContractView>, filter: {}) => {
   const result = {...contractsRes};
+  console.log(filter);
   // TODO: Filter code goes here
   return result;
 };

@@ -21,7 +21,6 @@ import {
   ServiceOrderStatus,
   ServiceOrderView,
 } from 'models/service-order';
-import {formatDate} from 'utils/datetime';
 // import {MaintenanceBasicInfo} from './ServiceBasicInfo';
 import {formatDistance, isAfter, isToday} from 'date-fns';
 import {calculateNextVisitDate} from 'pages/Units/Models';
@@ -68,6 +67,7 @@ interface ExpandMoreProps extends IconButtonProps {
 
 const ExpandMore = styled((props: ExpandMoreProps) => {
   const {expand, ...other} = props;
+  console.log(expand);
   return <IconButton {...other} />;
 })(({theme, expand}) => ({
   transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
@@ -157,8 +157,7 @@ export const HistoryCard = ({
         border: selected ? `1px solid ${theme.palette.secondary.main}` : 'none',
         minHeight,
         ...containerStyles,
-      }}
-    >
+      }}>
       <CardHeader
         sx={{pb: '0.4em'}}
         action={
@@ -181,8 +180,7 @@ export const HistoryCard = ({
           py: 0,
           mt: isDetailCard ? '2em' : 'default',
           ...bodyContainerStyle,
-        }}
-      >
+        }}>
         {noContent && !reportIsLoading ? (
           <HitoryCardEmptyState label={message} />
         ) : null}
@@ -257,8 +255,7 @@ export const HistoryCard = ({
         <>
           <CardActions
             disableSpacing
-            sx={{display: 'flex', justifyContent: 'center', mt: '0.5em'}}
-          >
+            sx={{display: 'flex', justifyContent: 'center', mt: '0.5em'}}>
             <ExpandMore expand={expanded} onClick={handleExpandClick}>
               <ExpandMoreIcon />
             </ExpandMore>

@@ -1,12 +1,10 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import useTheme from '@mui/material/styles/useTheme';
 import Divider from '@mui/material/Divider';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {ScrollableCard} from 'components/ScrollableCard';
 import {ReactComponent as Elevation} from '../../assets/icons/Elevation.svg';
 import {ReactComponent as ArrowDownward} from '../../assets/icons/ArrowDownward.svg';
-// import {breakDownHistoryResource} from '../../hooks/reactQuery/useIssueHistory';
 import {formatDate} from '../../utils/datetime';
 
 interface Props {
@@ -40,7 +38,7 @@ const breakdownHistory = [
 
 // TODO: we do not have the model in backend yet
 export const ElevatorBreakDownSection = ({elevatorId}: Props) => {
-  const theme = useTheme();
+  console.log(elevatorId);
   return (
     <ScrollableCard
       renderIcon={() => <Elevation />}
@@ -49,8 +47,7 @@ export const ElevatorBreakDownSection = ({elevatorId}: Props) => {
         <Typography variant="h6">
           Breakdown History ({breakdownHistory.length})
         </Typography>
-      )}
-    >
+      )}>
       <Box pt={2}>
         {breakdownHistory.map((history) => (
           <Box
@@ -62,8 +59,7 @@ export const ElevatorBreakDownSection = ({elevatorId}: Props) => {
               pb: 3,
               px: 3,
               mb: 2,
-            }}
-          >
+            }}>
             <Box
               sx={{
                 display: 'flex',
@@ -71,8 +67,7 @@ export const ElevatorBreakDownSection = ({elevatorId}: Props) => {
                 alignItems: 'center',
                 pt: '24px',
                 pb: '5px',
-              }}
-            >
+              }}>
               <Typography variant="h6" mr={3}>
                 {formatDate(history.datetime)}
               </Typography>

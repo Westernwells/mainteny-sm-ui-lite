@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import TextField from '@mui/material/TextField';
@@ -74,8 +73,7 @@ export const LoginForm = ({
                 <InputAdornment
                   position="start"
                   onClick={() => setShowPassword(!showPassword)}
-                  sx={{cursor: 'pointer'}}
-                >
+                  sx={{cursor: 'pointer'}}>
                   <RemoveRedEye />
                 </InputAdornment>
               ),
@@ -85,8 +83,7 @@ export const LoginForm = ({
             <Button
               variant="text"
               color="info"
-              sx={{textTransform: 'capitalize'}}
-            >
+              sx={{textTransform: 'capitalize'}}>
               Forgot Password?
             </Button>
           </Box>
@@ -106,8 +103,7 @@ export const LoginForm = ({
             ) : (
               <ArrowForward />
             )
-          }
-        >
+          }>
           Login
         </Button>
       </form>

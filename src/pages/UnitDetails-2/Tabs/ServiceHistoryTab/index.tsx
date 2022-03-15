@@ -67,8 +67,7 @@ export const ServiceHistoryTab = () => {
             mx: 'default',
             height: 'default',
           }}
-          headerActionIcon={<MoreVertIcon />}
-        >
+          headerActionIcon={<MoreVertIcon />}>
           <Box display="flex" mb="0.8em" px="1rem">
             <Box mr="1em">
               <SplitButton
@@ -94,7 +93,7 @@ export const ServiceHistoryTab = () => {
             />
           </Box>
           <Box sx={{height: '55vh', overflowY: 'scroll'}}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((history) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(() => (
               <HistoryCard
                 containerStyles={{borderRadius: 0}}
                 bodyContainerStyle={{

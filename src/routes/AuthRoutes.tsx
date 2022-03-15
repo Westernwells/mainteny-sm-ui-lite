@@ -1,4 +1,4 @@
-import {Navigate, Outlet, useLocation, useNavigate} from 'react-router-dom';
+import {Navigate, Outlet, useLocation} from 'react-router-dom';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 interface Location {

@@ -1,5 +1,5 @@
 import {useQuery} from 'react-query';
-import * as _ from 'lodash';
+// import * as _ from 'lodash';
 import {useCallback} from 'react';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
@@ -28,6 +28,7 @@ export const fetchInvoices = async (
 const filterInvoices = (invoicesRes: Resource<InvoiceView>, filters: {}) => {
   const result = {...invoicesRes};
   // TODO: Filter code goes here
+  console.log(filters);
   return result;
 };
 

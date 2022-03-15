@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import Box from '@mui/material/Box';
-import {useParams, useNavigate} from 'react-router-dom';
-import makeStyles from '@mui/styles/makeStyles';
+import {useNavigate} from 'react-router-dom';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
@@ -45,15 +44,13 @@ export const UnitsDetail = () => {
     <Box
       sx={{
         pb: '1em',
-      }}
-    >
+      }}>
       <Box
         sx={{
           display: 'flex',
           paddingLeft: '35px',
           mt: 11,
-        }}
-      >
+        }}>
         <ArrowBack
           onClick={() => navigate(-1)}
           sx={{
@@ -73,8 +70,7 @@ export const UnitsDetail = () => {
           }}
           value={value}
           onChange={(e: any, newValue: number) => setValue(newValue)}
-          textColor="secondary"
-        >
+          textColor="secondary">
           {tabItems.map((item, index) => (
             <Tab
               key={`${item.label}`}
@@ -98,8 +94,7 @@ export const UnitsDetail = () => {
                       left: '50%',
                       transform: 'translateX(-50%)',
                     },
-                  }}
-                >
+                  }}>
                   <Box className="item-icon">{item.icon}</Box>
                   <Typography mb={1} sx={{ml: 1}} variant="subtitle1">
                     {item.label}
@@ -137,8 +132,7 @@ export const UnitsDetail = () => {
             width: 0,
             background: 'transparent',
           },
-        }}
-      >
+        }}>
         <TabsBody value={value} index={0}>
           <OverviewTab />
         </TabsBody>

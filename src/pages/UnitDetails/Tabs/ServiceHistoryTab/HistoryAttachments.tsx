@@ -17,8 +17,7 @@ export const HistoryAttachments = ({downloadUrl}: Props) => (
           mr: '1em',
 
           mt: '0.5em',
-        }}
-      >
+        }}>
         <img
           src={item}
           alt=""

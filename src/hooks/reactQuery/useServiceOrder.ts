@@ -14,13 +14,13 @@ import {
 } from 'date-fns';
 import {queryKeys} from 'reactQuery/constants';
 import {ServiceCompanyTimeUnit} from 'models/service-company';
-import {toDate, toRestDate, toRestDateTime} from 'utils/datetime';
+import {toDate, toRestDate} from 'utils/datetime';
 import {
   ServiceOrderOrderField,
   ServiceOrderReport,
   ServiceOrderView,
 } from '../../models/service-order';
-import {Order, Resource, RestError, OrderBy} from '../../models/misc';
+import {Order, Resource, RestError} from '../../models/misc';
 import {
   ElevatorAvailability,
   ElevatorAvailabilityParams,

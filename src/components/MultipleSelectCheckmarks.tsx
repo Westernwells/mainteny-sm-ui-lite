@@ -8,7 +8,6 @@ import FormControl from '@mui/material/FormControl';
 import ListItemText from '@mui/material/ListItemText';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
-import {maxHeight} from '@mui/system';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -20,24 +19,6 @@ const MenuProps = {
     },
   },
 };
-
-const names = [
-  'Oliver Hansen',
-  'Van Henry',
-  'April Tucker',
-  'Ralph Hubbard',
-  'Omar Alexander',
-  'Carlos Abbott',
-  'Miriam Wagner',
-  'Bradley Wilkerson',
-  'Virginia Andrews',
-  'Kelly Snyder',
-];
-
-interface Option {
-  label: string;
-  value: string;
-}
 
 interface Props {
   options: string[];
@@ -84,10 +65,9 @@ export const MultipleSelectCheckmarks = ({
           value={selectedItems}
           onChange={handleChange}
           input={<OutlinedInput sx={{background: '#fff'}} label={label} />}
-          renderValue={(selected) => selectedItems.join(',')}
+          renderValue={() => selectedItems.join(',')}
           MenuProps={MenuProps}
-          size="small"
-        >
+          size="small">
           {!multiple ? (
             <MenuItem
               disableTouchRipple
@@ -96,8 +76,7 @@ export const MultipleSelectCheckmarks = ({
                 overflow: 'hidden',
                 backgroundColor: '#fff !important',
               }}
-              value=""
-            >
+              value="">
               <ListItemText
                 sx={{
                   textAlign: 'end',

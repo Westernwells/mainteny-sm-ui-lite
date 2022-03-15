@@ -7,7 +7,7 @@ import {UnitsDetail} from 'pages/UnitDetails';
 import {Contracts} from 'pages/Contracts';
 import {Customer} from 'pages/Customer';
 import {ContractDetails} from 'pages/ContractDetails';
-import {CustomerDetails} from 'pages/CustomerDetails/indext';
+import {CustomerDetails} from 'pages/CustomerDetails';
 import {Invoices} from 'pages/Invoices';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
 import {ProtectedRoutes} from './ProtectedRoutes';
