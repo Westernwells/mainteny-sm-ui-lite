@@ -1,21 +1,12 @@
 import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
+import {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {PasswordRequestForm} from './PasswordRequestForm';
 import {PasswordAuthenticateForm} from './PasswordAuthenticateForm';
 import {PasswordResetForm} from './PasswordResetForm';
 import {AuthLayout} from '../../components/AuthLayout';
-
-const validationSchema = Yup.object().shape({
-  email: Yup.string()
-    .email('Enter a valid email')
-    .required('Email is required'),
-  password: Yup.string()
-    .required('field is required')
-    .min(6, 'must be atleast 6 characters')
-    .matches(/\d/, 'must contain 1 digit'),
-});
 
 const requestValidationSchema = Yup.object().shape({
   email: Yup.string()
@@ -24,11 +15,13 @@ const requestValidationSchema = Yup.object().shape({
 });
 
 export const PasswordRequest = () => {
+  const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
-      email: 'aa@aa.co',
+      email: '',
     },
     onSubmit: (values) => {
+      navigate('/reset-password/authenticate');
       console.log(values);
     },
     validationSchema: requestValidationSchema,
@@ -36,23 +29,9 @@ export const PasswordRequest = () => {
 
   return (
     <AuthLayout>
-      <Box display="flex" justifyContent="center">
-        <Box
-          display="flex"
-          flexDirection="column"
-          justifyContent="flex-end"
-          mr={2}>
-          {/* <CheckMark /> */}
-        </Box>
-        <Typography variant="h5" mt={7} textAlign="center">
-          Forgot Password
-        </Typography>
-      </Box>
-
-      {/* <Typography variant="h6" mt={5} textAlign="center">
-        Set a new password
-      </Typography> */}
-
+      <Typography variant="h5" mt={7} textAlign="center">
+        Forgot Password
+      </Typography>
       <PasswordRequestForm
         handleChange={formik.handleChange}
         handleSubmit={formik.handleSubmit}
@@ -65,40 +44,52 @@ export const PasswordRequest = () => {
   );
 };
 
+const authValidationSchema = Yup.object().shape({
+  pin: Yup.string()
+    .min(6, 'Reset code must be at least 6 characters')
+    .max(6, 'Reset code must be at most 6 characters')
+    .required('Pin is required'),
+});
+
 export const PasswordAuthenticate = () => {
+  const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
       pin: '',
     },
     onSubmit: (values) => {
+      navigate('/reset-password/reset');
       console.log(values);
     },
-    validationSchema,
+    validationSchema: authValidationSchema,
   });
 
   return (
     <AuthLayout>
-      <Box display="flex" justifyContent="center">
-        <Typography variant="h5" mt={7} textAlign="center">
-          Forgot Password
-        </Typography>
-      </Box>
-
-      {/* <Typography variant="h6" mt={5} textAlign="center">
-        Set a new password
-      </Typography> */}
-
+      <Typography variant="h5" mt={7} textAlign="center">
+        Forgot Password
+      </Typography>
       <PasswordAuthenticateForm
         handleChange={formik.handleChange}
         handleSubmit={formik.handleSubmit}
         handleBlur={formik.handleBlur}
         pin={formik.values.pin}
+        pinError={formik.errors.pin}
+        pinTouched={formik.touched.pin}
       />
     </AuthLayout>
   );
 };
 
+const resetValidationSchema = Yup.object().shape({
+  password: Yup.string()
+    .required('field is required')
+    .min(6, 'must be atleast 6 characters')
+    .matches(/\d/, 'must contain 1 digit'),
+});
+
 export const PasswordReset = () => {
+  const [heading, setHeading] = useState('Set a new password');
   const formik = useFormik({
     initialValues: {
       password: '',
@@ -107,28 +98,14 @@ export const PasswordReset = () => {
     onSubmit: (values) => {
       console.log(values);
     },
-    validationSchema,
+    validationSchema: resetValidationSchema,
   });
 
   return (
     <AuthLayout>
-      <Box display="flex" justifyContent="center">
-        <Box
-          display="flex"
-          flexDirection="column"
-          justifyContent="flex-end"
-          mr={2}>
-          {/* <CheckMark /> */}
-        </Box>
-        <Typography variant="h5" mt={7} textAlign="center">
-          Forgot Password
-        </Typography>
-      </Box>
-
-      {/* <Typography variant="h6" mt={5} textAlign="center">
-        Set a new password
-      </Typography> */}
-
+      <Typography variant="h5" my={7} textAlign="center">
+        {heading}
+      </Typography>
       <PasswordResetForm
         handleChange={formik.handleChange}
         handleSubmit={formik.handleSubmit}
@@ -136,6 +113,7 @@ export const PasswordReset = () => {
         passwordError={formik.errors.password}
         handleBlur={formik.handleBlur}
         confirmPassword={formik.values.confirmPassword}
+        setHeading={setHeading}
       />
     </AuthLayout>
   );

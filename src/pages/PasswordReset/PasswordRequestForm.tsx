@@ -58,13 +58,11 @@ export const PasswordRequestForm = ({
         />
         <Box mt={5}>
           <Button
+            type="submit"
             disabled={!!(!email || emailError)}
             sx={{width: '100%'}}
             variant="contained"
             size="large"
-            type="submit"
-            // TODO: check this
-            onClick={() => navigate('/reset-password/authenticate')}
             endIcon={<ArrowForward />}>
             Get Reset Code
           </Button>
