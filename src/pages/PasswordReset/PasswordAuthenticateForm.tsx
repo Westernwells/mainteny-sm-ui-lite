@@ -32,8 +32,7 @@ export const PasswordAuthenticateForm = ({
           variant="body1"
           color="text.secondary"
           textAlign="center"
-          my={4}
-        >
+          my={4}>
           Please enter the reset code we sent to your email address.
         </Typography>
 
@@ -57,8 +56,7 @@ export const PasswordAuthenticateForm = ({
             sx={{width: '100%'}}
             variant="contained"
             size="large"
-            endIcon={<ArrowForward />}
-          >
+            endIcon={<ArrowForward />}>
             Reset Password
           </Button>
           <Button
@@ -66,8 +64,7 @@ export const PasswordAuthenticateForm = ({
             variant="text"
             onClick={() => navigate(-1)}
             size="large"
-            startIcon={<ArrowBack />}
-          >
+            startIcon={<ArrowBack />}>
             Back
           </Button>
           <Typography color="text.secondary" textAlign="center" mt={5}>
