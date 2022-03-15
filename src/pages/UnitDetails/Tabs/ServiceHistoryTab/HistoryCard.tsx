@@ -21,7 +21,6 @@ import {
   ServiceOrderStatus,
   ServiceOrderView,
 } from 'models/service-order';
-import {formatDate} from 'utils/datetime';
 // import {MaintenanceBasicInfo} from './ServiceBasicInfo';
 import {formatDistance, isAfter, isToday} from 'date-fns';
 import {calculateNextVisitDate} from 'pages/Units/Models';
@@ -68,6 +67,7 @@ interface ExpandMoreProps extends IconButtonProps {
 
 const ExpandMore = styled((props: ExpandMoreProps) => {
   const {expand, ...other} = props;
+  console.log(expand);
   return <IconButton {...other} />;
 })(({theme, expand}) => ({
   transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',

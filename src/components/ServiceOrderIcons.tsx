@@ -1,5 +1,4 @@
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import SyncIcon from '@mui/icons-material/Sync';
 import {ServiceOrderType} from '../models/service-order';
 import {ReactComponent as EmergencyIcon} from '../assets/icons/Emergency.svg';
 import {ReactComponent as RegularIcon} from '../assets/icons/Regular.svg';

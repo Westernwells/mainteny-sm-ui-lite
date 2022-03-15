@@ -1,6 +1,5 @@
 import {ReactNode} from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import {Typography} from '@mui/material';
 import useTheme from '@mui/material/styles/useTheme';
 

@@ -13,6 +13,7 @@ interface Props {
 
 export const ServiceHistory = ({bodyContainerStyle, minHeight}: Props) => {
   const theme = useTheme();
+  console.log(minHeight);
   return (
     <Grid
       container
@@ -20,6 +21,7 @@ export const ServiceHistory = ({bodyContainerStyle, minHeight}: Props) => {
         borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
         pt: '1.5em',
         pb: '0.5em',
+        ...bodyContainerStyle,
       }}
     >
       <Grid xs={3} item>

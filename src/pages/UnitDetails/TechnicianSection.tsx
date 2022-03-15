@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import {Fragment, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 
 import Typography from '@mui/material/Typography';
@@ -8,7 +8,6 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import CallOutlinedIcon from '@mui/icons-material/CallOutlined';
 import Avatar from '@mui/material/Avatar';
 import useTheme from '@mui/material/styles/useTheme';
-import {EmptyItem} from 'components/EmptyItem';
 import {PageCard} from 'components/PageCard';
 
 import technicianImage from 'assets/images/avatar.png';

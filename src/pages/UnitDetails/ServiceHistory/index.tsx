@@ -21,6 +21,7 @@ export const ServiceHistory = ({
   serviceOrder,
 }: Props) => {
   const theme = useTheme();
+  console.log(minHeight);
   return (
     <Grid
       container
@@ -28,6 +29,7 @@ export const ServiceHistory = ({
         borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
         pt: '1.5em',
         pb: '0.5em',
+        ...bodyContainerStyle,
       }}
     >
       <Grid xs={3} item>

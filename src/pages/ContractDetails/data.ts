@@ -1,5 +1,3 @@
-import {ContractView} from 'models/contract';
-
 export const staticContractDetails: any = {
   id: 'b7d1c60c-c15a-4f46-ac2c-b5f99342fce0',
   propertyOwner: {

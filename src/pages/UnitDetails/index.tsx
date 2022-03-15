@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import Box from '@mui/material/Box';
-import {useParams, useNavigate} from 'react-router-dom';
-import makeStyles from '@mui/styles/makeStyles';
+import {useNavigate} from 'react-router-dom';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';

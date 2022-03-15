@@ -1,12 +1,10 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import useTheme from '@mui/material/styles/useTheme';
 import Divider from '@mui/material/Divider';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {ScrollableCard} from 'components/ScrollableCard';
 import {ReactComponent as Elevation} from '../../assets/icons/Elevation.svg';
 import {ReactComponent as ArrowDownward} from '../../assets/icons/ArrowDownward.svg';
-// import {breakDownHistoryResource} from '../../hooks/reactQuery/useIssueHistory';
 import {formatDate} from '../../utils/datetime';
 
 interface Props {
@@ -40,7 +38,7 @@ const breakdownHistory = [
 
 // TODO: we do not have the model in backend yet
 export const ElevatorBreakDownSection = ({elevatorId}: Props) => {
-  const theme = useTheme();
+  console.log(elevatorId);
   return (
     <ScrollableCard
       renderIcon={() => <Elevation />}

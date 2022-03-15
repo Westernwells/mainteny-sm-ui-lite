@@ -1,32 +1,13 @@
-import {
-  Elevator,
-  ElevatorMaintenanceHistoryView as ServiceHistoryView,
-} from 'models/elevator';
-import {
-  ServiceOrderOrderField,
-  ServiceOrderType,
-  ServiceOrderView,
-} from 'models/service-order';
+import {Elevator} from 'models/elevator';
+
 import useTheme from '@mui/material/styles/useTheme';
-import {Order} from 'models/misc';
 import Grid from '@mui/material/Grid';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 // import {useIssueHistory} from 'hooks/reactQuery/useIssueHistory';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {endOfMonth, endOfYear, startOfDay, startOfYear} from 'date-fns';
-import {toRestDateTime} from 'utils/datetime';
 import {useParams} from 'react-router-dom';
 import {ReactComponent as Escalator} from 'assets/icons/Escalator.svg';
 import {PageCard} from 'components/PageCard';
-import {
-  user,
-  issueHistory,
-  serviceHistories,
-  runningServiceOrders,
-} from './dummyData';
-// import {useServiceHistory} from 'hooks/reactQuery/useServiceHistory';
-// import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
-// import {usePropertyManager} from 'hooks/reactQuery/usePropertyManager';
+import {runningServiceOrders} from './dummyData';
 import {ElevatorAvailabilitySection} from '../ElevatorAvailabilitySection';
 import {ElevatorBasicSection} from '../ElevatorBasicSection';
 import {TechnicianSection} from '../TechnicianSection';
@@ -44,6 +25,7 @@ interface Props {
 
 export const OverviewTab = ({elevator, maintainers}: Props) => {
   const {id: elevatorId} = useParams();
+  console.log(elevatorId, pageSize);
   const theme = useTheme();
   // TODO: user reactQuery hooks to fetch data
   // const {data: user} = usePropertyManager();
@@ -159,7 +141,7 @@ export const OverviewTab = ({elevator, maintainers}: Props) => {
                 borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
               }}
             />
-            {[1, 2, 3, 4, 5, 6, 7].map((item) => (
+            {[1, 2, 3, 4, 5, 6, 7].map(() => (
               <ServiceHistory
                 bodyContainerStyle={{
                   borderBottom: '1px solid rgba(0, 0, 0, 0.12)',

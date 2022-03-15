@@ -16,7 +16,6 @@ import Collapse from '@mui/material/Collapse';
 import CardActions from '@mui/material/CardActions';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {styled} from '@mui/material/styles';
-// import {MaintenanceBasicInfo} from './ServiceBasicInfo';
 import {HistoryCardHeader} from './HistoryCardHeader';
 
 interface Props {
@@ -49,6 +48,7 @@ interface ExpandMoreProps extends IconButtonProps {
 
 const ExpandMore = styled((props: ExpandMoreProps) => {
   const {expand, ...other} = props;
+  console.log(expand);
   return <IconButton {...other} />;
 })(({theme, expand}) => ({
   transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',

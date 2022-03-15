@@ -7,7 +7,7 @@ import Tooltip from '@mui/material/Tooltip';
 import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 import useTheme from '@mui/material/styles/useTheme';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import {useNavigate, useParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import {StatusChip} from 'components/StatusChip';
 import {BackAction} from 'components/BackAction';
 import {toDate} from 'utils/datetime';
@@ -25,7 +25,6 @@ import {ContractCard} from './ContractCard';
 export const ContractDetails = () => {
   const {id: contractId} = useParams();
   const theme = useTheme();
-  const navigate = useNavigate();
   const {data: contractDetails, isLoading} = useContractDetails(contractId!);
   const totalContractDays =
     !isLoading &&

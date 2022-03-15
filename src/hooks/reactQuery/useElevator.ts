@@ -7,14 +7,7 @@ import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {queryKeys} from 'reactQuery/constants';
 
 import {Elevator, ElevatorView} from '../../models/elevator';
-import {
-  Location,
-  Page,
-  Priority,
-  Resource,
-  RestError,
-  State,
-} from '../../models/misc';
+import {Location, Page, Resource, RestError} from '../../models/misc';
 import {MaintainerView} from '../../models/technician';
 import {useUserSession} from './useUserSession';
 

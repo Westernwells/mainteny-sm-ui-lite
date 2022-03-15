@@ -1,7 +1,6 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {ServiceOrderStatus, ServiceOrderType} from 'models/service-order';
 
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';

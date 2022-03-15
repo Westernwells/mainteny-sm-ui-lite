@@ -11,7 +11,7 @@ import {
   useServiceOrderReport,
   useServiceOrders,
 } from 'hooks/reactQuery/useServiceOrder';
-import {formatDate, getDateObject, toRestDateTime} from 'utils/datetime';
+import {formatDate, getDateObject} from 'utils/datetime';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import {startOfDay, getYear, eachYearOfInterval, endOfYear} from 'date-fns';
