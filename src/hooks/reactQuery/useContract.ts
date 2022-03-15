@@ -1,9 +1,8 @@
 import {useCallback} from 'react';
 import {useQuery} from 'react-query';
+import * as _ from 'lodash';
 // import * as _ from 'lodash';
 import {queryKeys as qk} from 'reactQuery/constants';
-// FIXME: Dummy Import
-import {staticContracts} from 'pages/Contracts/data';
 
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
@@ -12,6 +11,14 @@ import {
   QueryContractParams,
 } from 'models/contract';
 import {Resource, RestError, WithOptional} from 'models/misc';
+import {
+  addDays,
+  endOfDay,
+  isWithinInterval,
+  startOfDay,
+  subDays,
+} from 'date-fns';
+import {toDate} from 'utils/datetime';
 import {useUserSession} from './useUserSession';
 
 export const fetchContractElevatorCount = async (contractId: string[]) => {
@@ -25,22 +32,81 @@ export const fetchContractElevatorCount = async (contractId: string[]) => {
   return response.data;
 };
 
-export const fetchContracts = async (
-  id: string,
-  params: QueryContractParams,
+const filterByExpiryData = (
+  contractsRes: Resource<ContractView>,
+  expiryDate: string[],
 ) => {
-  const response = await axiosClient.get<Resource<ContractView>>(
-    `/api/contracts`,
-    {
-      params,
-      paramsSerializer,
-    },
-  );
+  let mergedResult = [] as ContractView[];
+  let start: Date;
+  let end: Date;
 
-  return response.data;
+  let contractMap = {} as {[key: string]: ContractView[]};
+  // TODO: Find a better solution to this
+  expiryDate.forEach((item) => {
+    switch (item) {
+      case 'Last 14 days': // TODO: create an enum
+        start = startOfDay(subDays(new Date(), 14));
+        end = endOfDay(new Date());
+        break;
+      case 'Today':
+        start = startOfDay(new Date());
+        end = endOfDay(new Date());
+        break;
+      case 'Next 7 days':
+        start = startOfDay(new Date());
+        end = endOfDay(addDays(new Date(), 7));
+        break;
+      case 'Next 14 days':
+        start = startOfDay(new Date());
+        end = endOfDay(addDays(new Date(), 14));
+        break;
+      default:
+        break;
+    }
+
+    contractsRes.data.forEach((contract) => {
+      if (isWithinInterval(toDate(contract.endTime), {start, end})) {
+        contractMap = {
+          ...contractMap,
+          [item]: contractMap[item]
+            ? [...contractMap[item], contract]
+            : [contract],
+        };
+      }
+    });
+  });
+
+  expiryDate
+    .map((item) => contractMap[item])
+    .filter((item) => item)
+    .forEach((item) => {
+      const diff = _.differenceBy(mergedResult, item, 'id');
+      mergedResult = [...diff, ...item];
+    });
+
+  return mergedResult;
 };
 
-Promise.resolve(staticContracts);
+export const filterByContractor = (
+  contractsRes: Resource<ContractView>,
+  contractors: string[],
+) => {
+  let mergedResult = [] as ContractView[];
+  const contractsByContractor = _.groupBy(
+    contractsRes.data,
+    (contract) => contract.serviceCompany.name,
+  );
+
+  contractors
+    .map((contractor) => contractsByContractor[contractor])
+    .filter((item) => item)
+    .forEach((item) => {
+      const diff = _.differenceBy(mergedResult, item, 'id');
+      mergedResult = [...diff, ...item];
+    });
+
+  return mergedResult;
+};
 
 export const filterByPrice = (
   contractsRes: Resource<ContractView>,
@@ -66,13 +132,31 @@ const filterContracts = (
   filter: ContractFilters,
 ) => {
   let result = {...contractsRes};
+  if (filter.expiryDate.length) {
+    const expiryDates = filterByExpiryData(contractsRes, filter.expiryDate);
+    result = {...result, data: expiryDates, total: expiryDates.length};
+  }
+
   if (filter.price.length) {
-    if (filter.price.length) {
-      const prices = filterByPrice(result, filter.price);
-      result = {...result, data: prices, total: prices.length};
-    }
+    const prices = filterByPrice(result, filter.price);
+    result = {...result, data: prices, total: prices.length};
   }
   return result;
+};
+
+export const fetchContracts = async (
+  id: string,
+  params: QueryContractParams,
+) => {
+  const response = await axiosClient.get<Resource<ContractView>>(
+    `/api/contracts`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+
+  return response.data;
 };
 
 export const useQueryContract = (
