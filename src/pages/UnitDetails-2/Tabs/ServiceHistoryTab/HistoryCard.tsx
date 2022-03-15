@@ -92,8 +92,7 @@ export const HistoryCard = ({
         borderBottomLeftRadius: removeBottomLeftRadius ? 0 : 'default',
         minHeight,
         ...containerStyles,
-      }}
-    >
+      }}>
       <CardHeader
         sx={{pb: '0.4em'}}
         action={
@@ -114,8 +113,7 @@ export const HistoryCard = ({
           py: 0,
           mt: isDetailCard ? '2em' : 'default',
           ...bodyContainerStyle,
-        }}
-      >
+        }}>
         <Typography variant={isDetailCard ? 'body1' : 'caption'}>
           Checked the inner shaft of the elevator engine door....
         </Typography>
@@ -173,8 +171,7 @@ export const HistoryCard = ({
         <>
           <CardActions
             disableSpacing
-            sx={{display: 'flex', justifyContent: 'center', mt: '0.5em'}}
-          >
+            sx={{display: 'flex', justifyContent: 'center', mt: '0.5em'}}>
             <ExpandMore expand={expanded} onClick={handleExpandClick}>
               <ExpandMoreIcon />
             </ExpandMore>

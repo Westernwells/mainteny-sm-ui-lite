@@ -21,8 +21,7 @@ export const Invoice = ({containerStyle, downloadUrl}: Props) => {
           p: '1em',
           width: '44vw',
           ...containerStyle,
-        }}
-      >
+        }}>
         <Box width="100%">
           <Document file={downloadUrl}>
             <Page renderTextLayer={false} pageNumber={1} />

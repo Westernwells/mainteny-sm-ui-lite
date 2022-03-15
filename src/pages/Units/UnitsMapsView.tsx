@@ -29,8 +29,7 @@ export const UnitsMapsView = ({centerCoord, elevatorsByAddressList}: Props) => {
         center={
           centerCoord && {lat: centerCoord.latitude, lng: centerCoord.longitude}
         }
-        zoom={12}
-      >
+        zoom={12}>
         {/* TODO: Resolve 'any' type here */}
         {elevatorsByAddressList?.map((elevatorsByAddress: any) => (
           <LocationPin

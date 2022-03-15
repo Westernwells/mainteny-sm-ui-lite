@@ -30,8 +30,7 @@ export const ServiceHistory = ({
         pt: '1.5em',
         pb: '0.5em',
         ...bodyContainerStyle,
-      }}
-    >
+      }}>
       <Grid xs={3} item>
         <Box display="flex">
           <Typography variant="subtitle1" sx={{mr: '0.3em'}}>
@@ -39,8 +38,7 @@ export const ServiceHistory = ({
           </Typography>
           <Typography
             variant="body2"
-            sx={{mt: '0.35em', color: theme.palette.text.secondary}}
-          >
+            sx={{mt: '0.35em', color: theme.palette.text.secondary}}>
             {`${formatDate(
               serviceOrder.schedules[0].startTime,
               'ha',

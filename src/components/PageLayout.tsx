@@ -26,8 +26,7 @@ export const PageLayout = ({
         width: 0,
         background: 'transparent',
       },
-    }}
-  >
+    }}>
     <AppTopBar />
     {!excludeSidebar ? (
       <Box sx={{maxWidth: '20%'}}>
@@ -41,8 +40,7 @@ export const PageLayout = ({
         px: !excludeDefaultSpacing ? 5 : null,
         // pb: '1em',
         // border: '2px solid red'
-      }}
-    >
+      }}>
       {children}
     </Box>
   </Box>

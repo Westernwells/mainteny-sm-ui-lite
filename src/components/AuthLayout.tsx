@@ -53,8 +53,7 @@ export const AuthLayout = ({children}: Props) => {
             width="100%"
             textAlign="center"
             paddingLeft={4}
-            paddingRight={4}
-          >
+            paddingRight={4}>
             The unified Application made for Service Managers with smart job
             assignments, real-time overview of Units under Maintenance (UuM) and
             out-of-the-box ERP Integrations!

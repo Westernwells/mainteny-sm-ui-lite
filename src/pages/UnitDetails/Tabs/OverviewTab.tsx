@@ -116,8 +116,7 @@ export const OverviewTab = () => {
           <PageCard
             contentPadding="1.5em"
             headerLabel="All Services"
-            minHeight="10rem"
-          >
+            minHeight="10rem">
             {serviceOrders.data.map((serviceOrder) => (
               <ServiceHistory
                 key={serviceOrder.id}

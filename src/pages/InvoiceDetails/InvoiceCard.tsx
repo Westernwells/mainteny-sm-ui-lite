@@ -28,8 +28,7 @@ export const InvoiceCard = ({
       border: 'none',
       minHeight,
       ...containerStyles,
-    }}
-  >
+    }}>
     <CardHeader
       sx={{pb: '1.5em', ...headerContainerStyle}}
       action={

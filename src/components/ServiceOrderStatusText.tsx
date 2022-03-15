@@ -34,8 +34,7 @@ export const ServiceOrderStatusText = ({
     <Typography
       variant="chip"
       color={theme.palette.text.secondary || color}
-      sx={{textTransform: 'capitalize', ...style}}
-    >
+      sx={{textTransform: 'capitalize', ...style}}>
       {renderStatus()}
     </Typography>
   );

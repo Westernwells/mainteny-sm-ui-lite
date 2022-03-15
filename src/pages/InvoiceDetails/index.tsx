@@ -56,8 +56,7 @@ export const InvoiceDetails = () => {
                   <Typography variant="subtitle1">{invoice?.number}</Typography>
                   <Typography
                     variant="body2"
-                    sx={{color: theme.palette.text.secondary}}
-                  >
+                    sx={{color: theme.palette.text.secondary}}>
                     Generated on{' '}
                     {formatDate(
                       getDateObject(invoice?.meta.createdAt),
@@ -115,8 +114,7 @@ export const InvoiceDetails = () => {
                   />
                 </Box>
               </Box>
-            }
-          >
+            }>
             <Invoice downloadUrl={downloadUrl ? downloadUrl[0] : null} />
           </InvoiceCard>
         </Grid>
@@ -124,8 +122,7 @@ export const InvoiceDetails = () => {
         <Grid item xs={4}>
           <InvoiceCard
             header={<Typography variant="subtitle1">Related To</Typography>}
-            headerContainerStyle={{pb: '0.5em'}}
-          >
+            headerContainerStyle={{pb: '0.5em'}}>
             <RelatedTo>
               <HistoryCard
                 serviceOrder={invoice?.serviceOrder}
@@ -154,8 +151,7 @@ export const InvoiceDetails = () => {
           <InvoiceCard
             containerStyles={{mt: '1em'}}
             header={<Typography variant="subtitle1">Work Report</Typography>}
-            headerContainerStyle={{pb: '0.5em'}}
-          >
+            headerContainerStyle={{pb: '0.5em'}}>
             <RelatedTo>
               <Typography>
                 10 / 6-2020: Secured lift and counterweight for disconnection of

@@ -90,8 +90,7 @@ export const TechnicianSection = ({maintainers}: TechnicianSectionProp) => {
         <Box
           key={`${item}-${index}`}
           display="flex"
-          mt={index !== 0 ? '1.3em' : undefined}
-        >
+          mt={index !== 0 ? '1.3em' : undefined}>
           <Box mr="1.2em">
             {index === 0 ? (
               <Box>
@@ -108,8 +107,7 @@ export const TechnicianSection = ({maintainers}: TechnicianSectionProp) => {
                 height="2.8rem"
                 display="flex"
                 justifyContent="center"
-                alignItems="center"
-              >
+                alignItems="center">
                 {item.icon}
               </Box>
             )}
@@ -121,8 +119,7 @@ export const TechnicianSection = ({maintainers}: TechnicianSectionProp) => {
                 index === 0
                   ? theme.palette.primary.main
                   : theme.palette.text.secondary
-              }
-            >
+              }>
               {item.label}
             </Typography>
             <Typography
@@ -131,8 +128,7 @@ export const TechnicianSection = ({maintainers}: TechnicianSectionProp) => {
                 index === 0
                   ? theme.palette.text.secondary
                   : theme.palette.primary.main
-              }
-            >
+              }>
               {item.value}
             </Typography>
           </Box>

@@ -12,8 +12,7 @@ export const HitoryCardEmptyState = ({label}: Props) => (
     display="flex"
     justifyContent="center"
     alignItems="center"
-    flexDirection="column"
-  >
+    flexDirection="column">
     <Typography variant="subtitle2">{label}</Typography>
     <Box>
       <TechnicianIcon

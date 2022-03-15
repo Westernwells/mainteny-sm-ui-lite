@@ -38,8 +38,7 @@ export const HistoryCardHeader = ({
           {isDetailCard ? (
             <Typography
               variant="body2"
-              sx={{mr: '0.4em', color: theme.palette.text.secondary}}
-            >
+              sx={{mr: '0.4em', color: theme.palette.text.secondary}}>
               {subtitle || ''}
             </Typography>
           ) : null}

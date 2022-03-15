@@ -47,8 +47,7 @@ export const ElevatorBreakDownSection = ({elevatorId}: Props) => {
         <Typography variant="h6">
           Breakdown History ({breakdownHistory.length})
         </Typography>
-      )}
-    >
+      )}>
       <Box pt={2}>
         {breakdownHistory.map((history) => (
           <Box
@@ -60,8 +59,7 @@ export const ElevatorBreakDownSection = ({elevatorId}: Props) => {
               pb: 3,
               px: 3,
               mb: 2,
-            }}
-          >
+            }}>
             <Box
               sx={{
                 display: 'flex',
@@ -69,8 +67,7 @@ export const ElevatorBreakDownSection = ({elevatorId}: Props) => {
                 alignItems: 'center',
                 pt: '24px',
                 pb: '5px',
-              }}
-            >
+              }}>
               <Typography variant="h6" mr={3}>
                 {formatDate(history.datetime)}
               </Typography>

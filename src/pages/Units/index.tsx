@@ -133,8 +133,7 @@ export const MyUnits = () => {
         <>
           <UnitColumns />
           <Box
-            sx={{height: '69vh', overflowY: 'scroll', paddingBottom: '1rem'}}
-          >
+            sx={{height: '69vh', overflowY: 'scroll', paddingBottom: '1rem'}}>
             {elevatorsByAddressList?.map((elevatorsByAddress) => (
               <UnitSection
                 key={elevatorsByAddress.address.id}

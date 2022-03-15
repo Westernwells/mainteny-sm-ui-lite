@@ -67,8 +67,7 @@ export const MultipleSelectCheckmarks = ({
           input={<OutlinedInput sx={{background: '#fff'}} label={label} />}
           renderValue={() => selectedItems.join(',')}
           MenuProps={MenuProps}
-          size="small"
-        >
+          size="small">
           {!multiple ? (
             <MenuItem
               disableTouchRipple
@@ -77,8 +76,7 @@ export const MultipleSelectCheckmarks = ({
                 overflow: 'hidden',
                 backgroundColor: '#fff !important',
               }}
-              value=""
-            >
+              value="">
               <ListItemText
                 sx={{
                   textAlign: 'end',

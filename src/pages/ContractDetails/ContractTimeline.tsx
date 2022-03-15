@@ -34,8 +34,7 @@ export const ContractTimeline = ({
             width: '3rem',
             height: '3rem',
             borderRadius: '50%',
-          }}
-        >
+          }}>
           <AssignmentOutlinedIcon color="success" />
         </Box>
         <Box>
@@ -53,8 +52,7 @@ export const ContractTimeline = ({
           flexDirection: 'column',
           alignItems: 'center',
           maxWidth: '3rem',
-        }}
-      >
+        }}>
         <Box
           sx={{
             borderLeft: `3px solid ${theme.palette.primary.main}`,
@@ -88,8 +86,7 @@ export const ContractTimeline = ({
             width: '3rem',
             height: '3rem',
             borderRadius: '50%',
-          }}
-        >
+          }}>
           <DownloadDoneIcon sx={{color: theme.palette.text.secondary}} />
         </Box>
         <Box>
