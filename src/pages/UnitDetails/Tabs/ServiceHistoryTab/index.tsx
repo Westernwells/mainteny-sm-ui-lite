@@ -1,5 +1,8 @@
 import {useCallback, useEffect, useState} from 'react';
 import Grid from '@mui/material/Grid';
+import {EmptyIllustration} from 'components/EmptyIllustration';
+import HideImageIcon from '@mui/icons-material/HideImage';
+import useTheme from '@mui/material/styles/useTheme';
 import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
@@ -24,6 +27,7 @@ import {HistoryAttachments} from './HistoryAttachments';
 const pageSize = 10;
 
 export const ServiceHistoryTab = () => {
+  const theme = useTheme();
   const {id: elevatorId} = useParams();
   const [selectedYear, setSelectedYear] = useState(
     getYear(new Date()).toString(),
@@ -193,13 +197,29 @@ export const ServiceHistoryTab = () => {
             removeServiceOrderType
             removeServiceOrderStatus
             showMoreReportDetails={!!serviceOrderReport.length}
-            showMoreSection
+            showActionSection
             containerStyles={{
               pt: '0.5em',
             }}
             handleExpandClick={handleExpandClick}
             expanded={expanded}
-            collapsedChildren={<HistoryAttachments downloadUrl={downloadUrl} />}
+            collapsedChildren={
+              downloadUrl?.length ? (
+                <HistoryAttachments downloadUrl={downloadUrl} />
+              ) : (
+                <EmptyIllustration
+                  label="No image attachments are added to the work report!"
+                  labelStyle={{mt: '1em', color: theme.palette.text.secondary}}
+                  labelVariant="subtitle2"
+                  icon={
+                    <HideImageIcon
+                      color="primary"
+                      sx={{width: '2.875rem', height: '2.875rem'}}
+                    />
+                  }
+                />
+              )
+            }
             headerTitle="Work Report"
             subtitle={currentReportDate || 'Awaiting completion of visit'}
           />
