@@ -10,6 +10,7 @@ import {useParams} from 'react-router-dom';
 import {ReactComponent as Escalator} from 'assets/icons/Escalator.svg';
 import {PageCard} from 'components/PageCard';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
+import {EmptyIllustration} from 'components/EmptyIllustration';
 import {
   useElevatorById,
   useElevatorMaintainers,
@@ -135,7 +136,11 @@ export const OverviewTab = ({getServiceHistoryTabIndex}: Props) => {
                 </Box>
 
                 <Box
-                  sx={{textDecoration: 'underline', cursor: 'pointer'}}
+                  sx={{
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                    display: serviceOrders.data.length ? 'block' : 'none',
+                  }}
                   onClick={() =>
                     getServiceHistoryTabIndex && getServiceHistoryTabIndex(1)
                   }>
@@ -150,15 +155,16 @@ export const OverviewTab = ({getServiceHistoryTabIndex}: Props) => {
               </Box>
             }
             minHeight="10rem">
-            {serviceOrders.data.map((serviceOrder) => (
-              <ServiceHistory
-                key={serviceOrder.id}
-                serviceOrder={serviceOrder}
-                bodyContainerStyle={{
-                  borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-                }}
-              />
-            ))}
+            {!serviceOrders.data.length ? (
+              <EmptyIllustration label="No service history entries made so far!" />
+            ) : (
+              serviceOrders.data.map((serviceOrder) => (
+                <ServiceHistory
+                  key={serviceOrder.id}
+                  serviceOrder={serviceOrder}
+                />
+              ))
+            )}
           </PageCard>
         </Grid>
       </Grid>
