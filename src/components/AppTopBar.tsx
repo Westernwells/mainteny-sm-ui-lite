@@ -11,6 +11,7 @@ import AvatarImg from 'assets/images/avatar.png';
 import {ReactComponent as LogoutIcon} from 'assets/icons/Logout.svg';
 import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
 import {useAuth} from 'hooks/useAuth';
+import {Link} from 'react-router-dom';
 
 export const AppTopBar = () => {
   const theme = useTheme();
@@ -52,20 +53,20 @@ export const AppTopBar = () => {
                 ENG
               </Typography>
             </Box>
-            {/* <Link to="/notifications"> */}
-            <Badge
-              badgeContent={1}
-              overlap="circular"
-              color="error"
-              sx={{
-                marginLeft: 4,
-                marginTop: 1,
-                color: '#FF4B55',
-                cursor: 'pointer',
-              }}>
-              <NotificationsNoneIcon color="primary" />
-            </Badge>
-            {/* </Link> */}
+            <Link to="/notifications">
+              <Badge
+                badgeContent={1}
+                overlap="circular"
+                color="error"
+                sx={{
+                  marginLeft: 4,
+                  marginTop: 1,
+                  color: '#FF4B55',
+                  cursor: 'pointer',
+                }}>
+                <NotificationsNoneIcon color="primary" />
+              </Badge>
+            </Link>
 
             {/* <Link to="/settings" style={{textDecoration: 'none'}}> */}
             <Box ml={8} display="flex" alignItems="center">
