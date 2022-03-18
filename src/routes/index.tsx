@@ -10,6 +10,7 @@ import {ContractDetails} from 'pages/ContractDetails';
 import {CustomerDetails} from 'pages/CustomerDetails';
 import {Invoices} from 'pages/Invoices';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
+import {Notifications} from 'pages/Notifications';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -86,6 +87,14 @@ export const Router = () => (
         element={
           <PageLayout overflowY>
             <CustomerDetails />
+          </PageLayout>
+        }
+      />
+      <Route
+        path="/notifications"
+        element={
+          <PageLayout excludeSidebar overflowY excludeDefaultSpacing>
+            <Notifications />
           </PageLayout>
         }
       />
