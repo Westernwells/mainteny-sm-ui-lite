@@ -1,7 +1,6 @@
 import {useCallback} from 'react';
-import {useQuery} from 'react-query';
+import {useQuery, UseQueryOptions} from 'react-query';
 import * as _ from 'lodash';
-// import * as _ from 'lodash';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {useNavigate} from 'react-router';
 
@@ -164,6 +163,7 @@ export const useQueryContract = (
   params: WithOptional<QueryContractParams, 'serviceCompanyId'>,
   // TODO: Write 'interface' for filter object
   filter: ContractFilters,
+  options?: UseQueryOptions<any, any, any>,
 ) => {
   const {user} = useUserSession();
   return useQuery<Resource<ContractView>, RestError, Resource<ContractView>>(
@@ -174,6 +174,7 @@ export const useQueryContract = (
         serviceCompanyId: user!.userAccount.serviceCompany.id,
       }),
     {
+      ...options,
       enabled: !!user,
       select: useCallback(
         (contractsRes: Resource<ContractView>) => {
@@ -186,12 +187,16 @@ export const useQueryContract = (
   );
 };
 
-export const useContractElevatorCount = (contracts: ContractView[]) => {
+export const useContractElevatorCount = (
+  contracts: ContractView[],
+  options?: UseQueryOptions<{[key: string]: number}, RestError, ContractView[]>,
+) => {
   const contractIds = contracts.map((contract) => contract.id);
-  return useQuery(
+  return useQuery<{[key: string]: number}, RestError, ContractView[]>(
     [qk.fetchContractElevatorCount, contractIds],
     () => fetchContractElevatorCount(contractIds),
     {
+      ...options,
       enabled: !!contracts.length,
       select: useCallback(
         (data) =>
