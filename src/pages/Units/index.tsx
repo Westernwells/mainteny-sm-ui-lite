@@ -16,7 +16,7 @@ import {UnitSection} from './UnitSection';
 import {UnitsMapsView} from './UnitsMapsView';
 import {UnitColumns} from './UnitColumns';
 
-const pageInfo = makePage(0, 3);
+const pageInfo = makePage(0, 50);
 
 export const MyUnits = () => {
   const fallback = useRef({
