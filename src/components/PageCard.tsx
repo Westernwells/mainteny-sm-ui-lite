@@ -5,7 +5,6 @@ import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 
 import IconButton from '@mui/material/IconButton';
-import useTheme from '@mui/material/styles/useTheme';
 
 export interface Props {
   children: ReactNode;
@@ -25,9 +24,7 @@ export const PageCard = ({
   headerActionIcon,
   minHeight,
   contentPadding,
-}: Props) => {
-  const theme = useTheme();
-  return (
+}: Props) => (
     <Card
       sx={{
         minHeight: minHeight || '26rem',
@@ -35,7 +32,6 @@ export const PageCard = ({
       }}>
       <CardHeader
         sx={{
-          background: theme.palette.inputBackground.main,
           height: '2rem',
           mt: '1em',
           mx: '0.5em',
@@ -50,7 +46,6 @@ export const PageCard = ({
           <Typography
             variant="subtitle2"
             sx={{
-              color: theme.palette.action.active,
               ...headerTextOverrideStyles,
             }}>
             {headerLabel}
@@ -65,4 +60,3 @@ export const PageCard = ({
       </CardContent>
     </Card>
   );
-};
