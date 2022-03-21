@@ -14,7 +14,7 @@ export const Recover = () => {
   const [email, setEmail] = useState<string>('');
 
   const {request, reset} = useRecoverPassword();
-  console.log(typeof reset, email);
+
   const requestValidationSchema = Yup.object().shape({
     email: Yup.string()
       .email('Enter a valid email')

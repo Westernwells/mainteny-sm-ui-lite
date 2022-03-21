@@ -13,7 +13,7 @@ export const useRecoverPassword = (): UseRecoverPassword => {
 
   const request = async (email: string, snackbar = false): Promise<void> => {
     try {
-      const {data: response, status} = await axiosClient({
+      const {status} = await axiosClient({
         url: `/api/users/${email}/forgetPassword/token`,
         method: 'POST',
       });
@@ -25,7 +25,6 @@ export const useRecoverPassword = (): UseRecoverPassword => {
         } else {
           navigate('/recover?type=reset');
         }
-        console.log(response);
       }
     } catch (error: any) {
       if (error?.response.status === 400) {
@@ -38,7 +37,7 @@ export const useRecoverPassword = (): UseRecoverPassword => {
   };
   const reset = async (token: string, password: string): Promise<void> => {
     try {
-      const {data: response, status} = await axiosClient({
+      const {status} = await axiosClient({
         url: `/api/users/forgetPassword/reset?password=${password}&token=${token}`,
         method: 'POST',
       });
@@ -47,7 +46,6 @@ export const useRecoverPassword = (): UseRecoverPassword => {
           variant: 'success',
         });
         navigate('/login?authType=reset');
-        console.log(response);
       }
     } catch (error: any) {
       if (error?.response.status === 400) {
