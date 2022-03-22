@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
+import CircularProgress from '@mui/material/CircularProgress';
 import {useRecoverPassword} from 'hooks/useRecoverPassword';
 import {AuthLayout} from 'components/AuthLayout';
 
@@ -26,6 +27,7 @@ interface Props {
   confirmPasswordError: string | undefined;
   confirmPasswordTouched: boolean | undefined;
   email: string;
+  loading: boolean;
 }
 
 export const PasswordReset = ({
@@ -42,6 +44,7 @@ export const PasswordReset = ({
   confirmPasswordError,
   confirmPasswordTouched,
   email,
+  loading,
 }: Props) => {
   const [reEnterPassword, setReEnterPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -100,7 +103,13 @@ export const PasswordReset = ({
                   sx={{width: '100%'}}
                   variant="contained"
                   size="large"
-                  endIcon={<ArrowForward />}>
+                  endIcon={
+                    loading ? (
+                      <CircularProgress size={20} sx={{color: 'gray'}} />
+                    ) : (
+                      <ArrowForward />
+                    )
+                  }>
                   Reset Password
                 </Button>
                 <Button
@@ -234,7 +243,13 @@ export const PasswordReset = ({
                     sx={{width: '100%'}}
                     variant="contained"
                     size="large"
-                    endIcon={<ArrowForward />}>
+                    endIcon={
+                      loading ? (
+                        <CircularProgress size={20} sx={{color: 'gray'}} />
+                      ) : (
+                        <ArrowForward />
+                      )
+                    }>
                     Go
                   </Button>
                   <Button

@@ -13,7 +13,7 @@ export const Recover = () => {
 
   const [email, setEmail] = useState<string>('');
 
-  const {request, reset} = useRecoverPassword();
+  const {request, reset, loading} = useRecoverPassword();
 
   const requestValidationSchema = Yup.object().shape({
     email: Yup.string()
@@ -73,6 +73,7 @@ export const Recover = () => {
       confirmPasswordError={resetForm.errors.confirmPassword}
       confirmPasswordTouched={resetForm.touched.confirmPassword}
       email={email}
+      loading={loading}
     />
   ) : (
     <PasswordRequest
@@ -82,6 +83,7 @@ export const Recover = () => {
       email={requestForm.values.email}
       emailError={requestForm.errors.email}
       emailTouched={requestForm.touched.email}
+      loading={loading}
     />
   );
 };

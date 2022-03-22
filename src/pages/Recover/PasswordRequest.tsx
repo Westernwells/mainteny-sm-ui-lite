@@ -7,6 +7,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 import {useNavigate} from 'react-router-dom';
 import {AuthLayout} from 'components/AuthLayout';
 
@@ -17,6 +18,7 @@ interface Props {
   email: string;
   emailError: string | undefined;
   emailTouched: boolean | undefined;
+  loading: boolean;
 }
 
 export const PasswordRequest = ({
@@ -26,6 +28,7 @@ export const PasswordRequest = ({
   email,
   emailError,
   emailTouched,
+  loading,
 }: Props) => {
   const navigate = useNavigate();
   return (
@@ -68,7 +71,13 @@ export const PasswordRequest = ({
               sx={{width: '100%'}}
               variant="contained"
               size="large"
-              endIcon={<ArrowForward />}>
+              endIcon={
+                loading ? (
+                  <CircularProgress size={20} sx={{color: 'gray'}} />
+                ) : (
+                  <ArrowForward />
+                )
+              }>
               Get Reset Code
             </Button>
             <Button
