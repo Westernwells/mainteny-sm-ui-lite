@@ -13,12 +13,17 @@ export const useRecoverPassword = (): UseRecoverPassword => {
 
   const request = async (email: string, snackbar = false): Promise<void> => {
     try {
-      const {status} = await axiosClient({
-        url: `/api/users/${email}/forgetPassword/token`,
-        method: 'POST',
+      const {data} = await axiosClient({
+        url: `/api/users/${email}`,
       });
-      if (status === 200) {
-        if (snackbar) {
+
+      if (data?.roles.includes('SERVICE_MANAGER')) {
+        const {status} = await axiosClient({
+          url: `/api/users/${email}/forgetPassword/token`,
+          method: 'POST',
+        });
+
+        if (status === 200 && snackbar) {
           enqueueSnackbar('Code sent successfully', {
             variant: 'success',
           });
@@ -31,7 +36,12 @@ export const useRecoverPassword = (): UseRecoverPassword => {
         enqueueSnackbar('User account not found', {
           variant: 'error',
         });
+      } else {
+        enqueueSnackbar('Invalid account', {
+          variant: 'error',
+        });
       }
+
       console.error(error);
     }
   };
@@ -41,6 +51,7 @@ export const useRecoverPassword = (): UseRecoverPassword => {
         url: `/api/users/forgetPassword/reset?password=${password}&token=${token}`,
         method: 'POST',
       });
+
       if (status === 200) {
         enqueueSnackbar('Password reset successfully', {
           variant: 'success',
@@ -53,6 +64,7 @@ export const useRecoverPassword = (): UseRecoverPassword => {
           variant: 'error',
         });
       }
+
       console.error(error);
     }
   };
