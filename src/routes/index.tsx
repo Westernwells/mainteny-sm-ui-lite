@@ -1,7 +1,7 @@
 import {Navigate, Route, Routes} from 'react-router-dom';
 import {PageLayout} from 'components/PageLayout';
 import {Login} from 'pages/Login';
-import {PasswordReset} from 'pages/PasswordReset';
+import {Recover} from 'pages/Recover';
 import {MyUnits} from 'pages/Units';
 import {UnitsDetail} from 'pages/UnitDetails';
 import {Contracts} from 'pages/Contracts';
@@ -18,7 +18,9 @@ export const Router = () => (
   <Routes>
     <Route element={<AuthRoutes />}>
       <Route path="/login" element={<Login />} />
-      <Route path="/reset-password" element={<PasswordReset />} />
+      {/* <Route path="/recover" element={<Navigate to="/recover" />} /> */}
+      <Route path="/recover" element={<Recover />} />
+      {/* <Route path="/recover" element={<Recover />} /> */}
     </Route>
     <Route element={<ProtectedRoutes />}>
       <Route path="/" element={<Navigate to="/units" />} />
