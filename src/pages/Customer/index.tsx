@@ -2,22 +2,39 @@ import {PageOverviewLayout} from 'components/PageOverviewLayout';
 import {useEffect, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
+import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {PropertyOwner} from 'models/propertyManager';
+import {
+  useQueryCustomers,
+  useQueryCustomertElevatorNumbers,
+} from 'hooks/reactQuery/useCustomers';
 import {Widget} from '../../components/Widget';
-import {data as customers} from './data';
 import {columns, makeRows} from './CustomerDataGridProps';
 
 export const Customer = () => {
-  const [_search, setSearch] = useState('');
+  const [search, setSearch] = useState('');
   const [showFilter, setShowFilter] = useState(false);
+  const [page] = useState(makePage(0, 10));
   const [rows, setRows] = useState<GridRowsProp>([]);
-  console.log(_search);
+
+  const {data: customerResource = createEmptyResource<PropertyOwner>(10)} =
+    useQueryCustomers({
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+      query: search,
+    });
+
+  const {data: customersWithUnits} = useQueryCustomertElevatorNumbers(
+    customerResource.data,
+  );
+
   useEffect(() => {
-    if (customers) {
-      setRows(makeRows(customers));
+    if (customersWithUnits) {
+      setRows(makeRows(customersWithUnits));
     } else {
       setRows([]);
     }
-  }, [customers]);
+  }, [customersWithUnits]);
 
   return (
     <PageOverviewLayout

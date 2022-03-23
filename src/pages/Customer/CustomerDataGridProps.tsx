@@ -118,11 +118,11 @@ export const makeRows = (customers: any): GridRowsProp =>
     ? customers.map((item: any, index: number) => ({
         id: index,
         name: item.name,
-        number: item.number,
-        address: item.address,
+        number: 234,
+        address: item.address.fullName,
         units: item.units,
-        phone: item.phone,
-        access: item.status,
+        phone: item.contact.phone,
+        access: 'Invite',
         navigateTo: item.id,
       }))
     : console.error('No Data');
