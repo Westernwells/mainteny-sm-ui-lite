@@ -11,6 +11,7 @@ import {CustomerDetails} from 'pages/CustomerDetails';
 import {Invoices} from 'pages/Invoices';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
 import {Notifications} from 'pages/Notifications';
+import {PageNotFound} from 'pages/PageNotFound';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -92,11 +93,21 @@ export const Router = () => (
           </PageLayout>
         }
       />
+
       <Route
         path="/notifications"
         element={
           <PageLayout excludeSidebar overflowY excludeDefaultSpacing>
             <Notifications />
+          </PageLayout>
+        }
+      />
+
+      <Route
+        path="*"
+        element={
+          <PageLayout excludeSidebar overflowY excludeDefaultSpacing>
+            <PageNotFound />
           </PageLayout>
         }
       />

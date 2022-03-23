@@ -3,6 +3,7 @@ import {useQuery} from 'react-query';
 import {useCallback} from 'react';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
+import {useNavigate} from 'react-router';
 // FIXME: Dummy Import
 
 import {Resource, RestError} from 'models/misc';
@@ -62,7 +63,12 @@ export const fetchInvoice = async (invoiceId: string) => {
 };
 
 export function useInvoiceDetail(invoiceId?: string) {
+  const navigate = useNavigate();
+  console.log(typeof navigate);
   return useQuery(qk.invoiceById, () => fetchInvoice(invoiceId!), {
     enabled: !!invoiceId,
+    onError: (e: any) => {
+      if (e.response.status === 500) navigate('/404');
+    },
   });
 }
