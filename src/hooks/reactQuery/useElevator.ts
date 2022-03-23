@@ -5,6 +5,7 @@ import getCenter from 'geolib/es/getCenter';
 import {AxiosResponse} from 'axios';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {queryKeys} from 'reactQuery/constants';
+import {useNavigate} from 'react-router';
 
 import {Elevator, ElevatorView} from '../../models/elevator';
 import {Location, Page, Resource, RestError} from '../../models/misc';
@@ -84,14 +85,19 @@ const filterElevator = (
   return result;
 };
 
-export const useElevatorById = (elevatorId?: string) =>
-  useQuery(
+export const useElevatorById = (elevatorId?: string) => {
+  const navigate = useNavigate();
+  return useQuery(
     [queryKeys.elevatorById, elevatorId],
     () => fetchElevator(elevatorId!),
     {
       enabled: !!elevatorId,
+      onError: (e: any) => {
+        if (e.response.status === 500) navigate('/404');
+      },
     },
   );
+};
 
 export const useElevatorMaintainers = (elevatorId?: string) =>
   useQuery(

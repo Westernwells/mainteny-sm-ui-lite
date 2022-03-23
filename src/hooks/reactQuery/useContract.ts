@@ -3,6 +3,7 @@ import {useQuery} from 'react-query';
 import * as _ from 'lodash';
 // import * as _ from 'lodash';
 import {queryKeys as qk} from 'reactQuery/constants';
+import {useNavigate} from 'react-router';
 
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
@@ -211,7 +212,15 @@ const fetchContractDetails = async (contractId: string) => {
   );
   return response.data;
 };
-export const useContractDetails = (contractId: string) =>
-  useQuery([qk.contractDetails, contractId], () =>
-    fetchContractDetails(contractId),
+export const useContractDetails = (contractId: string) => {
+  const navigate = useNavigate();
+  return useQuery(
+    [qk.contractDetails, contractId],
+    () => fetchContractDetails(contractId),
+    {
+      onError: (e: any) => {
+        if (e.response.status === 500) navigate('/404');
+      },
+    },
   );
+};
