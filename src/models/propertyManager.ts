@@ -10,6 +10,7 @@ export interface PropertyOwner {
   contact: Contact;
   search: string;
   meta: Meta;
+  units?: number;
 }
 
 export interface PropertyManager {
@@ -17,4 +18,11 @@ export interface PropertyManager {
   propertyOwner: PropertyOwner;
   userAccount: UserAccount;
   meta: Meta;
+}
+
+export interface QueryPropertyOwnersParams {
+  pageIndex: number;
+  pageSize: number;
+  query: string;
+  serviceCompanyId: string;
 }

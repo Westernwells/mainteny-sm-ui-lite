@@ -19,4 +19,6 @@ export const queryKeys = {
   invoiceById: 'invoiceById',
   invoiceDownloadUrl: 'invoiceDownloadUrl',
   queryServiceManager: 'queryServiceManager',
+  queryCustomers: 'queryCustomers',
+  fetchCustomerElevatorNumbers: 'fetchCustomerElevatorNumbers',
 };
