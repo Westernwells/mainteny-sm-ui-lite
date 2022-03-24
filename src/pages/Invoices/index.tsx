@@ -1,8 +1,9 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, MouseEvent, ChangeEvent} from 'react';
 import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
 import Typography from '@mui/material/Typography';
 import {GridRowsProp} from '@mui/x-data-grid';
+import TablePagination from '@mui/material/TablePagination';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {DataGridLayout} from 'components/DataGridLayout';
@@ -12,9 +13,11 @@ import {columns, makeRows} from './InvoicesDataGridProps';
 import {makePage} from '../../utils/paging-utils';
 import {Widget} from '../../components/Widget';
 
+const pageSize = 50;
+
 export const Invoices = () => {
   const [search, setSearch] = useState('');
-  const [page] = useState(makePage(0, 10)); // TODO: implement paging
+  const [page, setPage] = useState(makePage(0, pageSize)); // TODO: implement paging
   const [showFilter, setShowFilter] = useState(false);
   const [_amount, setAmount] = useState<number[][]>([]);
   const [_status, setStatus] = useState<string[]>([]);
@@ -132,7 +135,27 @@ export const Invoices = () => {
           </FilterFields>
         </Box>
       </Fade>
-      <DataGridLayout rows={rows} columns={columns} />
+      <DataGridLayout rows={rows} columns={columns} hideFooter />
+      <TablePagination
+        sx={{
+          '& .MuiTablePagination-selectLabel': {
+            color: 'text.secondary',
+          },
+        }}
+        component="div"
+        count={invoiceResource?.total || 0}
+        page={page.pageIndex}
+        onPageChange={(
+          event: MouseEvent<HTMLButtonElement> | null,
+          newPage: number,
+        ) => setPage({...page, pageIndex: newPage})}
+        rowsPerPage={page.pageSize}
+        onRowsPerPageChange={(
+          event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+        ) =>
+          setPage({pageSize: parseInt(event.target.value, 10), pageIndex: 0})
+        }
+      />
     </Box>
   );
 };

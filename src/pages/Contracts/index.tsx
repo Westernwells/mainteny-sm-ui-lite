@@ -1,8 +1,9 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, MouseEvent, ChangeEvent} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Fade from '@mui/material/Fade';
 import {GridRowsProp} from '@mui/x-data-grid';
+import TablePagination from '@mui/material/TablePagination';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
@@ -20,7 +21,7 @@ const pageSize = 10;
 
 export const Contracts = () => {
   const [search, setSearch] = useState('');
-  const [page] = useState(makePage(0, pageSize));
+  const [page, setPage] = useState(makePage(0, pageSize));
   const [showFilter, setShowFilter] = useState(false);
   const [expiryDate, setExpiryDate] = useState<string[]>([]);
   const [contractor, setContractor] = useState<string[]>([]);
@@ -41,9 +42,11 @@ export const Contracts = () => {
         status: [],
       },
       {expiryDate, contractor, price: cost},
+      {keepPreviousData: true},
     );
   const {data: contractWithUnits} = useContractElevatorCount(
     contractResource.data,
+    {keepPreviousData: true},
   );
 
   const costRangeConvertor = (selectedItems: string[]) => {
@@ -149,7 +152,27 @@ export const Contracts = () => {
           </FilterFields>
         </Box>
       </Fade>
-      <DataGridLayout rows={rows} columns={columns} />
+      <DataGridLayout hideFooter rows={rows} columns={columns} />
+      <TablePagination
+        sx={{
+          '& .MuiTablePagination-selectLabel': {
+            color: 'text.secondary',
+          },
+        }}
+        component="div"
+        count={contractResource.total}
+        page={page.pageIndex}
+        onPageChange={(
+          event: MouseEvent<HTMLButtonElement> | null,
+          newPage: number,
+        ) => setPage({...page, pageIndex: newPage})}
+        rowsPerPage={page.pageSize}
+        onRowsPerPageChange={(
+          event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+        ) =>
+          setPage({pageSize: parseInt(event.target.value, 10), pageIndex: 0})
+        }
+      />
     </Box>
   );
 };
