@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState, MouseEvent, ChangeEvent} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {ElevatorView} from 'models/elevator';
@@ -6,12 +6,11 @@ import {ElevatorView} from 'models/elevator';
 import {Widget} from 'components/Widget';
 import {useFetchServiceOrdersByElevators} from 'hooks/reactQuery/useServiceOrder';
 import Fade from '@mui/material/Fade';
-import {TablePagination} from '@mui/material';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {FilterFields} from 'components/FilterFields';
-import useTheme from '@mui/material/styles/useTheme';
+import {CustomPagination} from 'components/CustomPagination';
 import {UnitSection} from './UnitSection';
 import {UnitsMapsView} from './UnitsMapsView';
 import {UnitColumns} from './UnitColumns';
@@ -25,12 +24,12 @@ export const MyUnits = () => {
   }).current;
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(pageInfo);
+  const [pageCount, setPageCount] = useState(0);
   const [showFilter, setShowFilter] = useState(false);
   const [availability, setAvailability] = useState<number[][]>([]);
   const [status, setStatus] = useState<string[]>([]);
   const [nextVisit, setNextVisit] = useState<string[]>([]);
   const [showMapview, setShowMapview] = useState(false);
-  const theme = useTheme();
 
   const {data: elevatorResponse = fallback} = useAllElevators(
     search,
@@ -81,12 +80,11 @@ export const MyUnits = () => {
     setShowMapview(false);
   };
 
-  const handlePageChange = (
-    _e: MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
-  ) => {
-    setPage({...page, pageIndex: newPage});
-  };
+  useEffect(() => {
+    if (elevatorsByAddressList) {
+      setPageCount(Math.ceil(elevatorResponse.elevator.total / page.pageSize));
+    }
+  }, [elevatorsByAddressList, page]);
 
   useEffect(() => {
     if (!showFilter) {
@@ -144,7 +142,11 @@ export const MyUnits = () => {
         <>
           <UnitColumns />
           <Box
-            sx={{height: '69vh', overflowY: 'scroll', paddingBottom: '1rem'}}>
+            sx={{
+              height: 'max(400px, 55vh)',
+              maxHeight: '73vh',
+              overflowY: 'scroll',
+            }}>
             {elevatorsByAddressList?.map((elevatorsByAddress) => (
               <UnitSection
                 key={elevatorsByAddress.address.id}
@@ -152,26 +154,20 @@ export const MyUnits = () => {
               />
             ))}
           </Box>
-          <TablePagination
-            sx={{
-              '& .MuiTablePagination-selectLabel': {
-                color: theme.palette.text.secondary,
-              },
-            }}
-            component="div"
-            count={elevatorResponse.elevator.total}
-            page={page.pageIndex}
-            onPageChange={handlePageChange}
-            rowsPerPage={page.pageSize}
-            onRowsPerPageChange={(
-              event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-            ) =>
-              setPage({
-                pageSize: parseInt(event.target.value, 10),
-                pageIndex: 0,
-              })
-            }
-          />
+          {console.log()}
+          {pageCount ? (
+            <CustomPagination
+              pageSize={page.pageSize}
+              handlePageSizeChange={(newPageSize: number) =>
+                setPage({...page, pageSize: newPageSize})
+              }
+              handlePageChange={(newPage: number) => {
+                setPage({...page, pageIndex: newPage - 1});
+              }}
+              pageCount={pageCount}
+              totalRows={elevatorResponse.elevator.total}
+            />
+          ) : null}
         </>
       ) : (
         <UnitsMapsView

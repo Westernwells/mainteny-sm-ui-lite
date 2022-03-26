@@ -1,16 +1,16 @@
-import {useEffect, useState, MouseEvent, ChangeEvent} from 'react';
+import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
 import Typography from '@mui/material/Typography';
 import {GridRowsProp} from '@mui/x-data-grid';
-import TablePagination from '@mui/material/TablePagination';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {DataGridLayout} from 'components/DataGridLayout';
-import {InvoiceStatus, InvoiceStatusView} from 'models/invoice';
+import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
 import {useInvoices} from 'hooks/reactQuery/useInvoice';
+import {CustomPagination} from 'components/CustomPagination';
 import {columns, makeRows} from './InvoicesDataGridProps';
-import {makePage} from '../../utils/paging-utils';
+import {createEmptyResource, makePage} from '../../utils/paging-utils';
 import {Widget} from '../../components/Widget';
 
 const pageSize = 50;
@@ -22,16 +22,18 @@ export const Invoices = () => {
   const [_amount, setAmount] = useState<number[][]>([]);
   const [_status, setStatus] = useState<string[]>([]);
   const [rows, setRows] = useState<GridRowsProp>([]);
+  const [pageCount, setPageCount] = useState(0);
   // TODO: Create Invoice model for invoices with 'Order number' and 'Service type'
-  const {data: invoiceResource} = useInvoices(
-    {
-      pageIndex: page.pageIndex,
-      pageSize: page.pageSize,
-      query: search,
-      status: [InvoiceStatus.PAID, InvoiceStatus.NOT_PAID],
-    },
-    {},
-  );
+  const {data: invoiceResource = createEmptyResource<InvoiceView>(10)} =
+    useInvoices(
+      {
+        pageIndex: page.pageIndex,
+        pageSize: page.pageSize,
+        query: search,
+        status: [InvoiceStatus.PAID, InvoiceStatus.NOT_PAID],
+      },
+      {},
+    );
   console.log(_amount, _status);
   const amountRangeConvertor = (selectedItems: string[]) => {
     const range: number[][] = [];
@@ -71,6 +73,10 @@ export const Invoices = () => {
       setStatus([]);
     }
   }, [invoiceResource, showFilter]);
+
+  useEffect(() => {
+    setPageCount(Math.ceil(invoiceResource.total / page.pageSize));
+  }, [invoiceResource, pageSize]);
 
   return (
     <Box>
@@ -136,26 +142,19 @@ export const Invoices = () => {
         </Box>
       </Fade>
       <DataGridLayout rows={rows} columns={columns} hideFooter />
-      <TablePagination
-        sx={{
-          '& .MuiTablePagination-selectLabel': {
-            color: 'text.secondary',
-          },
-        }}
-        component="div"
-        count={invoiceResource?.total || 0}
-        page={page.pageIndex}
-        onPageChange={(
-          event: MouseEvent<HTMLButtonElement> | null,
-          newPage: number,
-        ) => setPage({...page, pageIndex: newPage})}
-        rowsPerPage={page.pageSize}
-        onRowsPerPageChange={(
-          event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-        ) =>
-          setPage({pageSize: parseInt(event.target.value, 10), pageIndex: 0})
-        }
-      />
+      {pageCount ? (
+        <CustomPagination
+          pageSize={page.pageSize}
+          handlePageSizeChange={(newPageSize: number) =>
+            setPage({...page, pageSize: newPageSize})
+          }
+          handlePageChange={(newPage: number) => {
+            setPage({...page, pageIndex: newPage - 1});
+          }}
+          pageCount={pageCount}
+          totalRows={invoiceResource?.total}
+        />
+      ) : null}
     </Box>
   );
 };
