@@ -11,7 +11,7 @@ interface Props {
 export const PageOverviewLayout = ({children, renderWidget, label}: Props) => (
   <Box>
     <Box display="flex" justifyContent="space-between">
-      <Box sx={{mb: 4}}>
+      <Box sx={{mb: 3}}>
         <Typography variant="h4">{label}</Typography>
       </Box>
       <Box>{renderWidget || null}</Box>

@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import Elevator from '@mui/icons-material/Elevator';
+import WorkOutlinedIcon from '@mui/icons-material/WorkOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
@@ -140,6 +141,20 @@ export const AppDrawer = () => {
         setSelectedIndex(index);
         setSelectedPath('/customers');
         navigate('/customers');
+      },
+    },
+    {
+      text: 'Employees',
+      icon: <WorkOutlinedIcon sx={{color: '#fff'}} />,
+      path: '/employees',
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/employees');
+        navigate('/employees');
       },
     },
   ];

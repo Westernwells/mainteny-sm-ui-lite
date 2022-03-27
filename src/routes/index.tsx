@@ -13,6 +13,7 @@ import {Invoices} from 'pages/Invoices';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
 import {Notifications} from 'pages/Notifications';
 import {PageNotFound} from 'pages/PageNotFound';
+import {Employees} from 'pages/Employee';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -112,6 +113,20 @@ export const Router = () => {
               </Helmet>
               <PageLayout overflowY>
                 <InvoiceDetails />
+              </PageLayout>
+            </>
+          }
+        />
+
+        <Route
+          path="/employees"
+          element={
+            <>
+              <Helmet>
+                <title>{`Employees - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout>
+                <Employees />
               </PageLayout>
             </>
           }

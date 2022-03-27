@@ -1,8 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import {ElevatorView} from 'models/elevator';
-
 import {Widget} from 'components/Widget';
 import {useFetchServiceOrdersByElevators} from 'hooks/reactQuery/useServiceOrder';
 import Fade from '@mui/material/Fade';
@@ -10,6 +8,7 @@ import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {FilterFields} from 'components/FilterFields';
+import {PageOverviewLayout} from 'components/PageOverviewLayout';
 import {CustomPagination} from 'components/CustomPagination';
 import {UnitSection} from './UnitSection';
 import {UnitsMapsView} from './UnitsMapsView';
@@ -94,24 +93,19 @@ export const MyUnits = () => {
     }
   }, [showFilter]);
   return (
-    <Box>
-      <Box display="flex" justifyContent="space-between" maxWidth="100%">
-        <Box sx={{mb: 4, mt: 1}}>
-          <Typography variant="h4">Units</Typography>
-        </Box>
-        <Box>
-          <Widget
-            searchPlaceholder="Try ‘Schindler’ or ‘Mitsubishi’"
-            getSearchValue={(val: string) => setSearch(val)}
-            openMapView={openMapView}
-            closeMapView={closeMapView}
-            mapViewActive={showMapview}
-            setShowFilter={setShowFilter}
-            showFilter={showFilter}
-          />
-        </Box>
-      </Box>
-
+    <PageOverviewLayout
+      label="Units"
+      renderWidget={
+        <Widget
+          searchPlaceholder="Try ‘Schindler’ or ‘Mitsubishi’"
+          getSearchValue={(val: string) => setSearch(val)}
+          openMapView={openMapView}
+          closeMapView={closeMapView}
+          mapViewActive={showMapview}
+          setShowFilter={setShowFilter}
+          showFilter={showFilter}
+        />
+      }>
       <Fade in={showFilter} unmountOnExit>
         <Box>
           <FilterFields setShowFilter={setShowFilter}>
@@ -175,6 +169,6 @@ export const MyUnits = () => {
           centerCoord={elevatorResponse?.centerCoord}
         />
       )}
-    </Box>
+    </PageOverviewLayout>
   );
 };

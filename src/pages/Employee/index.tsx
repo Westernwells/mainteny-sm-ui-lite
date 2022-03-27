@@ -1,0 +1,115 @@
+import {DataGridLayout} from 'components/DataGridLayout';
+import {PageOverviewLayout} from 'components/PageOverviewLayout';
+import {Widget} from 'components/Widget';
+import {
+  useFetchTechniciansByUserAccounts,
+  useQueryTechnicianEvents,
+} from 'hooks/reactQuery/useTechnician';
+import {useQueryUserAccounts} from 'hooks/reactQuery/useUserAccount';
+import {EmployeesView} from 'models/employee';
+import {Resource, TechnicianEventType} from 'models/misc';
+import {Role, UserAccountView} from 'models/user';
+import {useEffect, useState} from 'react';
+import {createEmptyResource, makePage} from 'utils/paging-utils';
+import * as _ from 'lodash';
+import {TechnicianEventPair, TechnicianView} from 'models/technician';
+import {toRestDateTime} from 'utils/datetime';
+import {addDays, endOfDay, startOfDay} from 'date-fns';
+import {GridRowsProp} from '@mui/x-data-grid';
+import {columns, makeRows} from './EmployeeDataGridProps';
+
+export const Employees = () => {
+  const [page] = useState(makePage(0, 20));
+  const [search, setSearch] = useState('');
+  const [showFilter, setShowFilter] = useState(false);
+  const [rows, setRows] = useState<GridRowsProp>([]);
+  const [employeeResource, setEmployeeResource] = useState(
+    createEmptyResource<EmployeesView>(20),
+  );
+  const {data: userAccountResource = createEmptyResource<UserAccountView>(20)} =
+    useQueryUserAccounts({
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+      query: search,
+      roles: [Role.SERVICE_MANAGER, Role.TECHNICIAN],
+    });
+
+  const {data: technicians = []} = useFetchTechniciansByUserAccounts(
+    userAccountResource.data,
+  );
+  const {data: technicianEvents} = useQueryTechnicianEvents({
+    start: toRestDateTime(startOfDay(addDays(new Date(), 1))),
+    end: toRestDateTime(endOfDay(addDays(new Date(), 1))),
+    pageIndex: page.pageIndex,
+    pageSize: page.pageSize,
+    eventType: [TechnicianEventType.HOLIDAY, TechnicianEventType.SICK_LEAVE],
+  });
+
+  useEffect(() => {
+    let userData: Resource<EmployeesView> = {
+      total: userAccountResource.total,
+      data: [],
+      page: {
+        pageIndex: userAccountResource.page.pageIndex,
+        pageSize: userAccountResource.page.pageSize,
+      },
+    };
+
+    const techniciansByUserAccountId = _.groupBy(
+      technicians,
+      (technician: TechnicianView) => technician.userAccount.id,
+    );
+
+    const eventByTechnicianId = _.groupBy(
+      technicianEvents?.data,
+      (event: TechnicianEventPair) => event.technicianId,
+    );
+
+    userAccountResource.data.forEach((item) => {
+      if (techniciansByUserAccountId[item.id]) {
+        const technician = techniciansByUserAccountId[item.id][0];
+        userData = {
+          ...userData,
+          data: [
+            ...userData.data,
+            {
+              ...technician,
+              events:
+                eventByTechnicianId[technician.id] &&
+                eventByTechnicianId[technician.id][0].eventViews,
+            },
+          ],
+        };
+      } else {
+        userData = {
+          ...userData,
+          data: [...userData.data, {userAccount: item}],
+        };
+      }
+    });
+
+    setEmployeeResource(userData);
+  }, [technicians, userAccountResource]);
+
+  useEffect(() => {
+    setRows(makeRows(employeeResource.data));
+  }, [employeeResource]);
+
+  return (
+    <PageOverviewLayout
+      label="Employees"
+      renderWidget={
+        <Widget
+          searchPlaceholder="Try 'Astralift BV'"
+          getSearchValue={(val: string) => setSearch(val)}
+          setShowFilter={setShowFilter}
+          showFilter={showFilter}
+          btnLabel="New Employee"
+          showNewBtn
+          hideFilter
+        />
+      }>
+      <DataGridLayout rows={rows} columns={columns} hideFooter />
+    </PageOverviewLayout>
+  );
+};

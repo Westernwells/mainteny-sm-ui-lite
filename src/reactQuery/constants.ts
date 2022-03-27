@@ -21,4 +21,7 @@ export const queryKeys = {
   queryServiceManager: 'queryServiceManager',
   queryCustomers: 'queryCustomers',
   fetchCustomerElevatorNumbers: 'fetchCustomerElevatorNumbers',
+  queryUserAccounts: 'queryUserAccounts',
+  fetchTechnicians: 'fetchTechnicians',
+  queryTechniciansEvents: 'queryTechniciansEvents',
 };

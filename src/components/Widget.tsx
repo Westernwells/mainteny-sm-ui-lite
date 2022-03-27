@@ -1,43 +1,61 @@
+/* eslint-disable */
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import useTheme from '@mui/material/styles/useTheme';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import GridViewIcon from '@mui/icons-material/GridView';
 import Button from '@mui/material/Button';
+import AddIcon from '@mui/icons-material/Add';
+import ToggleButton from '@mui/material/ToggleButton';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
+
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+
 import {Searchnput} from './SearchInput';
+import {useState} from 'react';
 
 interface Props {
   searchPlaceholder?: string;
   openMapView?: () => void;
   closeMapView?: () => void;
-  mapViewActive?: boolean;
   showFilter: boolean;
   setShowFilter: (state: boolean) => void;
   hideViewOption?: boolean;
+  hideSearchInput?: boolean;
   hideFilter?: boolean;
   getSearchValue?: (val: string) => void;
+  showNewBtn?: boolean;
+  btnLabel?: string;
 }
 
 export const Widget = ({
   searchPlaceholder,
   openMapView,
   closeMapView,
-  mapViewActive,
   showFilter,
   setShowFilter,
   hideViewOption = false,
   hideFilter = false,
+  showNewBtn = false,
+  hideSearchInput = false,
+  btnLabel = '',
   getSearchValue,
 }: Props) => {
   const theme = useTheme();
+  const [view, setView] = useState('list');
+
+  const handleViewChange = (
+    event: React.MouseEvent<HTMLElement>,
+    nextView: string,
+  ) => {
+    setView(nextView);
+  };
 
   return (
     <Box>
       <Box display="flex">
         {!hideFilter ? (
-          <Box display="flex" mr={3}>
+          <Box display="flex" mr="1em" my="0.3em">
             <Button
               onClick={() => setShowFilter(!showFilter)}
               disableRipple
@@ -48,7 +66,7 @@ export const Widget = ({
                   : theme.palette.primary.outlinedHoverBg,
                 border: 'none',
                 py: 1,
-                height: 48,
+                height: 40,
                 ':hover': {
                   border: 'none',
                 },
@@ -62,49 +80,48 @@ export const Widget = ({
           </Box>
         ) : null}
 
-        <Box mr={!hideViewOption ? 3 : 0}>
-          <Searchnput
-            placeholder={searchPlaceholder}
-            onValueChanged={(value: string) =>
-              getSearchValue && getSearchValue(value)
-            }
-          />
-        </Box>
+        {!hideSearchInput ? (
+          <Box mr={!hideViewOption ? '1em' : 0}>
+            <Searchnput
+              placeholder={searchPlaceholder}
+              onValueChanged={(value: string) =>
+                getSearchValue && getSearchValue(value)
+              }
+            />
+          </Box>
+        ) : null}
         {!hideViewOption ? (
-          <ButtonGroup variant="outlined" size="small" sx={{height: 48}}>
-            <Button
-              disableRipple
-              variant="outlined"
-              onClick={() => (closeMapView ? closeMapView() : () => {})}
-              sx={{
-                background: !mapViewActive
-                  ? theme.palette.action.selected
-                  : '#fff',
-                '&:hover': {
-                  background: !mapViewActive
-                    ? theme.palette.action.selected
-                    : '#fff',
-                },
-              }}>
-              <FormatListBulletedIcon />
-            </Button>
-            <Button
-              disableRipple
-              onClick={() => (openMapView ? openMapView() : () => {})}
-              sx={{
-                background: mapViewActive
-                  ? theme.palette.action.selected
-                  : '#fff',
-                '&:hover': {
-                  background: mapViewActive
-                    ? theme.palette.action.selected
-                    : '#fff',
-                },
-              }}
-              variant="outlined">
-              <GridViewIcon />
-            </Button>
-          </ButtonGroup>
+          <ToggleButtonGroup
+            color="secondary"
+            //  sx={{color: theme.palette.action.selected}}
+
+            value={view}
+            exclusive
+            onChange={handleViewChange}>
+            <ToggleButton
+              value="list"
+              aria-label="list"
+              onClick={() => (closeMapView ? closeMapView() : () => {})}>
+              <ViewListIcon />
+            </ToggleButton>
+            <ToggleButton
+              value="module"
+              aria-label="module"
+              onClick={() => (openMapView ? openMapView() : () => {})}>
+              <FormatAlignLeftIcon />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        ) : null}
+
+        {showNewBtn ? (
+          <Button
+            variant="contained"
+            color="primary"
+            size={theme.breakpoints.down('md') ? 'small' : 'large'}
+            startIcon={<AddIcon />}
+            sx={{ml: '1em'}}>
+            {btnLabel}
+          </Button>
         ) : null}
       </Box>
     </Box>

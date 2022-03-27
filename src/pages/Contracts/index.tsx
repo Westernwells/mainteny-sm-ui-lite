@@ -1,6 +1,5 @@
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import Fade from '@mui/material/Fade';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
@@ -13,6 +12,7 @@ import {
 import {ContractOrderField, ContractView} from 'models/contract';
 import {Order} from 'models/misc';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {PageOverviewLayout} from 'components/PageOverviewLayout';
 import {Widget} from 'components/Widget';
 import {CustomPagination} from 'components/CustomPagination';
 import {columns, makeRows} from './ContractsDataGridProps';
@@ -108,20 +108,16 @@ export const Contracts = () => {
   }, [contractResource, pageSize]);
 
   return (
-    <Box>
-      <Box display="flex" justifyContent="space-between">
-        <Box sx={{mb: 4}}>
-          <Typography variant="h4">Contracts</Typography>
-        </Box>
-        <Box mt={1}>
-          <Widget
-            searchPlaceholder="Try 'Astralift BV'"
-            getSearchValue={(val: string) => setSearch(val)}
-            setShowFilter={setShowFilter}
-            showFilter={showFilter}
-          />
-        </Box>
-      </Box>
+    <PageOverviewLayout
+      label="Contracts"
+      renderWidget={
+        <Widget
+          searchPlaceholder="Try 'Astralift BV'"
+          getSearchValue={(val: string) => setSearch(val)}
+          setShowFilter={setShowFilter}
+          showFilter={showFilter}
+        />
+      }>
       <Fade in={showFilter} unmountOnExit>
         <Box>
           <FilterFields setShowFilter={setShowFilter}>
@@ -173,6 +169,6 @@ export const Contracts = () => {
           />
         ) : null}
       </Box>
-    </Box>
+    </PageOverviewLayout>
   );
 };
