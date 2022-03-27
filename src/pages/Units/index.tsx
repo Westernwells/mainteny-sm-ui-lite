@@ -101,7 +101,6 @@ export const MyUnits = () => {
           getSearchValue={(val: string) => setSearch(val)}
           openMapView={openMapView}
           closeMapView={closeMapView}
-          mapViewActive={showMapview}
           setShowFilter={setShowFilter}
           showFilter={showFilter}
         />
