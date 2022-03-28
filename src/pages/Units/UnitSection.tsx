@@ -54,7 +54,7 @@ export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
             }}>
             <Box display="flex" alignItems="center">
               <Elevator style={{marginRight: '10px'}} />
-              <Typography variant="subtitle1">
+              <Typography variant="body2">
                 {elevatorOrder.elevator.model}
               </Typography>
             </Box>
@@ -70,13 +70,13 @@ export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
               alignItems: 'center',
             }}>
             <Grid item xs={2}>
-              <Typography variant="largeBtnText">
+              <Typography variant="body2">
                 {elevatorOrder.elevator.lastVisitDate || 'N/A'}
               </Typography>
             </Grid>
 
             <Grid item xs={2}>
-              <Typography variant="largeBtnText">
+              <Typography variant="body2">
                 {' '}
                 {(elevatorOrder.serviceOrder &&
                   formatDate(
@@ -88,7 +88,7 @@ export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
 
             <Grid item xs={2}>
               <Typography
-                variant="largeBtnText"
+                variant="body2"
                 color={
                   elevatorOrder.elevator.availability < 100
                     ? 'textWarning'

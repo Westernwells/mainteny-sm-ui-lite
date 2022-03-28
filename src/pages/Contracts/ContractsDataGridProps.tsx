@@ -13,10 +13,14 @@ import {formatDate} from 'utils/datetime';
 const defaultProps = {
   editable: false,
   renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2">{params.colDef.headerName}</Typography>
+    <Typography variant="subtitle2" color="textSecondary">
+      {params.colDef.headerName}
+    </Typography>
   ),
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="subtitle2">{params.value}</Typography>
+    <Typography variant="body2" mx="0.5em">
+      {params.value}
+    </Typography>
   ),
 };
 const defaultAlignment: {
@@ -85,7 +89,9 @@ export const columns: GridColDef[] = [
     ...defaultAlignment,
 
     renderHeader: (params) => (
-      <Typography variant="subtitle2">{params.colDef.headerName}</Typography>
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName}
+      </Typography>
     ),
     renderCell: () => (
       <FileDownloadOutlinedIcon
@@ -102,7 +108,7 @@ export const makeRows = (contracts: any): GridRowsProp =>
         id: index,
         contractor: item.serviceCompany.name,
         contractNumber: item.number,
-        units: item.units,
+        units: item.units || '-',
         cost: `${formatCurrency(item ? item.price! : 0, {
           currency: item.currency,
         })}`,

@@ -282,6 +282,7 @@ export const theme = createTheme({
             letterSpacing: '0.15px',
           },
         },
+
         {
           props: {variant: 'mediumBtnText'},
           style: {

@@ -17,10 +17,14 @@ import {formatDate, toDate} from '../../utils/datetime';
 const defaultProps = {
   editable: false,
   renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2">{params.colDef.headerName}</Typography>
+    <Typography variant="subtitle2" color="textSecondary">
+      {params.colDef.headerName}
+    </Typography>
   ),
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="subtitle2">{params.value}</Typography>
+    <Typography variant="body2" mx="0.5em">
+      {params.value}
+    </Typography>
   ),
 };
 const defaultAlignment: {
@@ -38,7 +42,7 @@ export const columns: GridColDef[] = [
     field: 'invoiceDate',
     headerName: 'INVOICE DATE',
     type: 'string',
-    flex: 2,
+    flex: 1,
     headerAlign: 'left',
     ...defaultProps,
   },
@@ -53,7 +57,7 @@ export const columns: GridColDef[] = [
     field: 'serviceCompany',
     headerName: 'SERVICE COMPANY',
     type: 'string',
-    flex: 1.5,
+    flex: 2,
     ...defaultProps,
   },
   {
@@ -70,7 +74,9 @@ export const columns: GridColDef[] = [
     ...defaultAlignment,
     editable: false,
     renderHeader: (params: GridColumnHeaderParams) => (
-      <Typography variant="subtitle2">{params.colDef.headerName}</Typography>
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName}
+      </Typography>
     ),
     renderCell: (params: GridRenderCellParams<any, any, any>) => {
       const theme = useTheme();
@@ -100,7 +106,9 @@ export const columns: GridColDef[] = [
     ...defaultAlignment,
 
     renderHeader: (params) => (
-      <Typography variant="subtitle2">{params.colDef.headerName}</Typography>
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName}
+      </Typography>
     ),
     renderCell: () => (
       <FileDownloadOutlinedIcon
