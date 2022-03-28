@@ -1,4 +1,4 @@
-/* eslint-disable */
+import React, {useState} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -12,7 +12,6 @@ import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 import {Searchnput} from './SearchInput';
-import {useState} from 'react';
 
 interface Props {
   searchPlaceholder?: string;
