@@ -1,9 +1,8 @@
-import {useEffect, useState, MouseEvent, ChangeEvent} from 'react';
+import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Fade from '@mui/material/Fade';
 import {GridRowsProp} from '@mui/x-data-grid';
-import TablePagination from '@mui/material/TablePagination';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
@@ -11,27 +10,30 @@ import {
   useContractElevatorCount,
   useQueryContract,
 } from 'hooks/reactQuery/useContract';
+import {ContractOrderField, ContractView} from 'models/contract';
+import {Order} from 'models/misc';
+import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {Widget} from 'components/Widget';
+import {CustomPagination} from 'components/CustomPagination';
 import {columns, makeRows} from './ContractsDataGridProps';
-import {ContractOrderField, ContractView} from '../../models/contract';
-import {Order} from '../../models/misc';
-import {createEmptyResource, makePage} from '../../utils/paging-utils';
-import {Widget} from '../../components/Widget';
 
-const pageSize = 10;
+const pageSize = 25;
 
 export const Contracts = () => {
   const [search, setSearch] = useState('');
+
   const [page, setPage] = useState(makePage(0, pageSize));
   const [showFilter, setShowFilter] = useState(false);
   const [expiryDate, setExpiryDate] = useState<string[]>([]);
   const [contractor, setContractor] = useState<string[]>([]);
   const [cost, setCost] = useState<number[][]>([]);
+  const [pageCount, setPageCount] = useState(0);
   const [contractorFilterItems, setConractorFileterItems] = useState<string[]>(
     [],
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
 
-  const {data: contractResource = createEmptyResource<ContractView>(10)} =
+  const {data: contractResource = createEmptyResource<ContractView>(pageSize)} =
     useQueryContract(
       {
         order: Order.DESC,
@@ -78,7 +80,6 @@ export const Contracts = () => {
 
   useEffect(() => {
     const options: string[] = [];
-    console.log('test');
 
     if (contractWithUnits) {
       // TODO: Resolve 'any' here
@@ -101,6 +102,10 @@ export const Contracts = () => {
       setCost([]);
     }
   }, [contractWithUnits, showFilter]);
+
+  useEffect(() => {
+    setPageCount(Math.ceil(contractResource.total / page.pageSize));
+  }, [contractResource, pageSize]);
 
   return (
     <Box>
@@ -152,27 +157,22 @@ export const Contracts = () => {
           </FilterFields>
         </Box>
       </Fade>
-      <DataGridLayout hideFooter rows={rows} columns={columns} />
-      <TablePagination
-        sx={{
-          '& .MuiTablePagination-selectLabel': {
-            color: 'text.secondary',
-          },
-        }}
-        component="div"
-        count={contractResource.total}
-        page={page.pageIndex}
-        onPageChange={(
-          event: MouseEvent<HTMLButtonElement> | null,
-          newPage: number,
-        ) => setPage({...page, pageIndex: newPage})}
-        rowsPerPage={page.pageSize}
-        onRowsPerPageChange={(
-          event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-        ) =>
-          setPage({pageSize: parseInt(event.target.value, 10), pageIndex: 0})
-        }
-      />
+      <Box>
+        <DataGridLayout hideFooter rows={rows} columns={columns} />
+        {pageCount ? (
+          <CustomPagination
+            pageSize={page.pageSize}
+            handlePageSizeChange={(newPageSize: number) =>
+              setPage({...page, pageSize: newPageSize})
+            }
+            handlePageChange={(newPage: number) => {
+              setPage({...page, pageIndex: newPage - 1});
+            }}
+            pageCount={pageCount}
+            totalRows={contractResource.total}
+          />
+        ) : null}
+      </Box>
     </Box>
   );
 };

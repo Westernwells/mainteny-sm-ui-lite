@@ -1,6 +1,4 @@
 import {DataGrid, GridColDef, GridRowsProp} from '@mui/x-data-grid';
-import useTheme from '@mui/material/styles/useTheme';
-import {Box} from '@mui/system';
 import {useNavigate} from 'react-router-dom';
 
 interface Props {
@@ -10,105 +8,62 @@ interface Props {
 }
 
 export const DataGridLayout = ({rows, columns, hideFooter = false}: Props) => {
-  const theme = useTheme();
   const navigate = useNavigate();
   return (
-    <Box
+    <DataGrid
       sx={{
-        height: 'max(400px, 73vh) !important',
-        py: '1em',
+        height: 'max(400px, 60vh) !important',
         maxHeight: '73vh',
         width: '100%',
+        my: '0.5em',
 
-        '& > *': {
-          border: 'none !important',
-          backgroundColor: 'transparent',
-          color: theme.palette.text.primary,
+        borderLeft: 'none',
+        borderRight: 'none',
+        borderTop: 'none',
+        borderBottom: '2px solid #F0F4F5',
+        '& .MuiDataGrid-row': {
+          background: '#fff',
+          cursor: 'pointer',
         },
-
+        '& .MuiDataGrid-panelHeader': {
+          background: 'red',
+        },
+        '& .MuiDataGrid-columnHeaders': {
+          background: '#fff',
+          borderBottom: '2px solid #F0F4F5',
+        },
+        '& .MuiDataGrid-columnSeparator': {
+          display: 'none',
+        },
         '& .MuiDataGrid-main': {
-          '& *': {
-            borderBottomColor: 'transparent !important',
-          },
-
+          background: '#fff',
           '& *:focus, & *:focus-within': {
             '& *': {
-              border: 'none !important',
-              outline: 'none !important',
+              outline: 'none',
+              cursor: 'pointer',
             },
-          },
-
-          '& .MuiDataGrid-columnSeparator': {
-            display: 'none',
-          },
-
-          '& .MuiDataGrid-sortIcon': {
-            color: theme.palette.secondary.main,
-          },
-
-          '& .MuiDataGrid-virtualScroller': {
-            mt: '3em !important',
-          },
-
-          '& .MuiDataGrid-row, & .MuiDataGrid-columnHeaders': {
-            backgroundColor: theme.palette.common.white,
-
-            borderRadius: '4px',
-          },
-
-          '& .MuiDataGrid-columnHeaders': {
-            maxHeight: 'initial !important',
-            minHeight: 'initial !important',
-            lineHeight: 'initial !important',
-            alignItems: 'flex-end',
-
-            '& .MuiDataGrid-columnHeadersInner': {
-              p: '0 !important',
-
-              '& .MuiDataGrid-columnHeaderTitleContainer': {
-                py: '.5em !important',
-              },
-            },
-          },
-
-          '& .MuiDataGrid-row': {
-            my: '.5em',
-            maxHeight: 'initial !important',
-            minHeight: 'initial !important',
-            lineHeight: 'initial !important',
-            cursor: 'pointer',
-
-            '& .MuiDataGrid-cell': {
-              maxHeight: 'initial !important',
-              minHeight: 'initial !important',
-              lineHeight: 'initial !important',
-              py: '.75em !important',
-              pl: '1em !important',
-            },
-          },
-
-          '& .Mui-selected': {
-            backgroundColor: `${theme.palette.common.white} !important`,
           },
         },
-
-        '& .MuiTablePagination-root .MuiTablePagination-selectLabel': {
-          color: 'theme.palette.text.secondary',
+        '& .MuiDataGrid-columnHeader:focus-within, & .MuiDataGrid-columnHeader:focus ':
+          {
+            outline: 'none',
+            border: 'none',
+          },
+        '& .MuiDataGrid-cell': {
+          borderBottom: '2px solid #F0F4F5',
         },
-      }}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        disableSelectionOnClick
-        disableColumnFilter
-        hideFooter={hideFooter}
-        onCellClick={(params, e) => {
-          e.preventDefault();
-          if (params.field !== 'actions') {
-            navigate(params.row.navigateTo);
-          }
-        }}
-      />
-    </Box>
+      }}
+      rows={rows}
+      columns={columns}
+      disableSelectionOnClick
+      disableColumnFilter
+      hideFooter={hideFooter}
+      onCellClick={(params, e) => {
+        e.preventDefault();
+        if (params.field !== 'actions') {
+          navigate(params.row.navigateTo);
+        }
+      }}
+    />
   );
 };
