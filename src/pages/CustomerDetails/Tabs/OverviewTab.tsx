@@ -9,9 +9,16 @@ import Typography from '@mui/material/Typography';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
+import {formatDate, getDateObject} from 'utils/datetime';
+import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 
-export const OverviewTab = () => {
+interface Props {
+  customerId?: string;
+}
+
+export const OverviewTab = ({customerId}: Props) => {
   const theme = useTheme();
+  const {data: customer} = useGetCustomer(customerId);
   return (
     // <BackAction label="Customer Details" />
     <BasicDetailsCard
@@ -25,7 +32,7 @@ export const OverviewTab = () => {
           containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
           iconBackground={theme.palette.info.outlinedHoverBg}
           iconMaxHeight="3rem"
-          bodyText="Hotel NH Berlin City"
+          bodyText={customer?.name || ''}
         />
 
         <CardProps
@@ -34,7 +41,7 @@ export const OverviewTab = () => {
           containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
           iconBackground={theme.palette.info.outlinedHoverBg}
           iconMaxHeight="3rem"
-          bodyText="+49 30 557570"
+          bodyText={customer?.contact.phone || ''}
         />
 
         <CardProps
@@ -43,7 +50,14 @@ export const OverviewTab = () => {
           containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
           iconBackground={theme.palette.info.outlinedHoverBg}
           iconMaxHeight="3rem"
-          bodyText="21 June, 2020"
+          bodyText={
+            customer
+              ? (formatDate(
+                  getDateObject(customer.meta.createdAt),
+                  'dd MMMM yyy',
+                ) as string)
+              : ''
+          }
         />
 
         <CardProps
@@ -52,7 +66,7 @@ export const OverviewTab = () => {
           containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
           iconBackground={theme.palette.info.outlinedHoverBg}
           iconMaxHeight="3rem"
-          bodyText="Rathausstraße 2-3, 10367 Berlin"
+          bodyText={customer?.address.fullName || ''}
         />
 
         <CardProps
@@ -61,7 +75,7 @@ export const OverviewTab = () => {
           containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
           iconBackground={theme.palette.info.outlinedHoverBg}
           iconMaxHeight="3rem"
-          bodyText="johncranston@hotelnh.com"
+          bodyText={customer?.contact.email || ''}
         />
       </Box>
     </BasicDetailsCard>

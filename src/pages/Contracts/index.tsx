@@ -15,6 +15,7 @@ import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {PageOverviewLayout} from 'components/PageOverviewLayout';
 import {Widget} from 'components/Widget';
 import {CustomPagination} from 'components/CustomPagination';
+import {costRangeConvertor as crConverter} from 'utils/contract-utils';
 import {columns, makeRows} from './ContractsDataGridProps';
 
 const pageSize = 25;
@@ -28,7 +29,7 @@ export const Contracts = () => {
   const [contractor, setContractor] = useState<string[]>([]);
   const [cost, setCost] = useState<number[][]>([]);
   const [pageCount, setPageCount] = useState(0);
-  const [contractorFilterItems, setConractorFileterItems] = useState<string[]>(
+  const [contractorFilterItems, setContractorFilterItems] = useState<string[]>(
     [],
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -48,33 +49,10 @@ export const Contracts = () => {
     );
   const {data: contractWithUnits} = useContractElevatorCount(
     contractResource.data,
-    {keepPreviousData: true},
   );
 
   const costRangeConvertor = (selectedItems: string[]) => {
-    const range: number[][] = [];
-    selectedItems.forEach((item) => {
-      switch (item) {
-        case 'Below 1000 €':
-          range.push([0, 1000]);
-          break;
-
-        case '1000 - 3000 €':
-          range.push([1000, 3000]);
-          break;
-
-        case '3000 - 5000 €':
-          range.push([3000, 5000]);
-          break;
-
-        case 'Above 5000 €':
-          range.push([5000, 99999]);
-          break;
-
-        default:
-          break;
-      }
-    });
+    const range = crConverter(selectedItems);
     setCost(range);
   };
 
@@ -95,7 +73,7 @@ export const Contracts = () => {
     } else {
       setRows([]);
     }
-    setConractorFileterItems([...contractorFilterItems, ...options]);
+    setContractorFilterItems([...contractorFilterItems, ...options]);
     if (!showFilter) {
       setExpiryDate([]);
       setContractor([]);
@@ -155,7 +133,7 @@ export const Contracts = () => {
       </Fade>
       <Box>
         <DataGridLayout hideFooter rows={rows} columns={columns} />
-        {pageCount ? (
+        {pageCount && page.pageSize < contractResource.total ? (
           <CustomPagination
             pageSize={page.pageSize}
             handlePageSizeChange={(newPageSize: number) =>

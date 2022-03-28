@@ -1,6 +1,6 @@
 import {Client, ClientView} from './client';
 import {ServiceCompany, ServiceCompanyView} from './service-company';
-import {Meta, Order, TimeWindowRecord, TimeWindowType} from './misc';
+import {Meta, Order, OrderBy, TimeWindowRecord, TimeWindowType} from './misc';
 import {Elevator, ElevatorView} from './elevator';
 
 export enum ContractStatus {
@@ -146,4 +146,14 @@ export interface ContractFilters {
   contractor: string[];
   expiryDate: string[];
   price: number[][];
+}
+
+export interface CustomerContractParams {
+  order: Order;
+  orderBy: ContractOrderField;
+  pageIndex: number;
+  pageSize: number;
+  query: string;
+  serviceCompanyId: string;
+  status?: ContractStatus;
 }

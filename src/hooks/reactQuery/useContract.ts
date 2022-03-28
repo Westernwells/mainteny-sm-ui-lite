@@ -1,13 +1,14 @@
 import {useCallback} from 'react';
 import {useQuery, UseQueryOptions} from 'react-query';
 import * as _ from 'lodash';
-import {queryKeys as qk} from 'reactQuery/constants';
+import {queryKeys as qk, queryKeys} from 'reactQuery/constants';
 import {useNavigate} from 'react-router';
 
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
   ContractFilters,
   ContractView,
+  CustomerContractParams,
   QueryContractParams,
 } from 'models/contract';
 import {Resource, RestError, WithOptional} from 'models/misc';
@@ -226,6 +227,46 @@ export const useContractDetails = (contractId: string) => {
       onError: (e: any) => {
         if (e.response.status === 500) navigate('/404');
       },
+    },
+  );
+};
+
+export const fetchContractByCustomer = async (
+  params: WithOptional<CustomerContractParams, 'serviceCompanyId'>,
+  id: string,
+) => {
+  const response = await axiosClient.get<Resource<ContractView>>(
+    `/api/propertyOwners/${id}/serviceCompanyContracts`,
+    {params, paramsSerializer},
+  );
+  return response.data;
+};
+
+export const useFetchContractsByCustomer = (
+  params: WithOptional<CustomerContractParams, 'serviceCompanyId'>,
+  filter: ContractFilters,
+  id?: string,
+
+  options?: any,
+) => {
+  const {user} = useUserSession();
+  params = {
+    ...params,
+    serviceCompanyId: user?.userAccount.serviceCompany.id,
+  };
+  return useQuery(
+    [queryKeys.queryContractByCustomer, params, id],
+    () => fetchContractByCustomer(params, id!),
+    {
+      enabled: !!id && !!user,
+      ...options,
+      select: useCallback(
+        (contractsRes: Resource<ContractView>) => {
+          const filterResult = filterContracts(contractsRes, filter);
+          return filterResult;
+        },
+        [filter],
+      ),
     },
   );
 };

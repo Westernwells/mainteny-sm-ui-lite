@@ -2,7 +2,7 @@ import {Resource, WithOptional} from 'models/misc';
 import {PropertyOwner, QueryPropertyOwnersParams} from 'models/propertyManager';
 import {useCallback} from 'react';
 import {useQuery} from 'react-query';
-import {queryKeys as qks} from 'reactQuery/constants';
+import {queryKeys as qks, queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useUserSession} from './useUserSession';
 
@@ -68,3 +68,15 @@ export const useQueryCustomers = (
     },
   );
 };
+
+export const getCustomer = async (id: string) => {
+  const response = await axiosClient.get<PropertyOwner>(
+    `/api/propertyOwners/${id}`,
+  );
+  return response.data;
+};
+
+export const useGetCustomer = (id?: string) =>
+  useQuery([queryKeys.getCustomer, id], () => getCustomer(id!), {
+    enabled: !!id,
+  });
