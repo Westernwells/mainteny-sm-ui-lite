@@ -41,7 +41,7 @@ export const Tabs = ({
         sx={{
           display: 'flex',
           paddingLeft: '35px',
-          mt: 11,
+          // mt: 11,
         }}>
         <ArrowBack
           onClick={() => navigate(-1)}

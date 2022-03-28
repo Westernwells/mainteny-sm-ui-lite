@@ -1,9 +1,10 @@
 import {useState} from 'react';
-import {Tabs} from 'components/Tab';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import EngineeringOutlinedIcon from '@mui/icons-material/EngineeringOutlined';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
+
 import {TabsBody} from 'components/TabsBody';
+import {Tabs} from 'components/Tab';
 import {OverviewTab} from './Tabs/OverviewTab';
 import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
 
@@ -22,8 +23,6 @@ const tabItems = [
   },
 ];
 
-// TODO: enable the rule again
-// eslint-disable-next-line
 export const UnitsDetail = () => {
   const [value, setValue] = useState(0);
 
