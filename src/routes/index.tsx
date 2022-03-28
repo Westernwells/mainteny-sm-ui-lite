@@ -57,7 +57,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Unit Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout excludeDefaultSpacing overflowY>
+              <PageLayout overflowY>
                 <UnitsDetail />
               </PageLayout>
             </>
