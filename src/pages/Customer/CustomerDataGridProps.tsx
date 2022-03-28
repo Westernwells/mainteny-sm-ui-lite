@@ -13,10 +13,14 @@ import {theme} from 'theme';
 const defaultProps = {
   editable: false,
   renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2">{params.colDef.headerName}</Typography>
+    <Typography variant="subtitle2" color="textSecondary">
+      {params.colDef.headerName}
+    </Typography>
   ),
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="subtitle2">{params.value}</Typography>
+    <Typography variant="body2" mx="0.5em">
+      {params.value}
+    </Typography>
   ),
 };
 const defaultAlignment: {
@@ -49,9 +53,9 @@ export const columns: GridColDef[] = [
     field: 'address',
     headerName: 'ADDRESS',
     type: 'number',
-    flex: 2,
-    headerAlign: 'center',
-    align: 'center',
+    flex: 3,
+    headerAlign: 'left',
+    align: 'left',
     ...defaultProps,
   },
   {
@@ -65,7 +69,9 @@ export const columns: GridColDef[] = [
     field: 'phone',
     headerName: 'PHONE',
     type: 'string',
-    ...defaultAlignment,
+    flex: 1,
+    headerAlign: 'left',
+    align: 'left',
     ...defaultProps,
   },
   {
@@ -74,6 +80,7 @@ export const columns: GridColDef[] = [
     type: 'string',
     ...defaultAlignment,
     ...defaultProps,
+    flex: 2,
 
     renderCell: (params) => (
       <StatusChip

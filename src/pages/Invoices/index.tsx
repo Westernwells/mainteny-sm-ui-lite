@@ -13,7 +13,7 @@ import {columns, makeRows} from './InvoicesDataGridProps';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
 import {Widget} from '../../components/Widget';
 
-const pageSize = 50;
+const pageSize = 10;
 
 export const Invoices = () => {
   const [search, setSearch] = useState('');

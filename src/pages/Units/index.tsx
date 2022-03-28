@@ -147,7 +147,6 @@ export const MyUnits = () => {
               />
             ))}
           </Box>
-          {console.log()}
           {pageCount ? (
             <CustomPagination
               pageSize={page.pageSize}

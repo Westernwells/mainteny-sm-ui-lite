@@ -11,6 +11,18 @@ export const DataGridLayout = ({rows, columns, hideFooter = false}: Props) => {
   const navigate = useNavigate();
   return (
     <DataGrid
+      headerHeight={50}
+      rows={rows}
+      columns={columns}
+      disableSelectionOnClick
+      disableColumnFilter
+      hideFooter={hideFooter}
+      onCellClick={(params, e) => {
+        e.preventDefault();
+        if (params.field !== 'actions') {
+          navigate(params.row.navigateTo);
+        }
+      }}
       sx={{
         height: 'max(400px, 60vh) !important',
         maxHeight: '73vh',
@@ -24,9 +36,6 @@ export const DataGridLayout = ({rows, columns, hideFooter = false}: Props) => {
         '& .MuiDataGrid-row': {
           background: '#fff',
           cursor: 'pointer',
-        },
-        '& .MuiDataGrid-panelHeader': {
-          background: 'red',
         },
         '& .MuiDataGrid-columnHeaders': {
           background: '#fff',
@@ -52,17 +61,6 @@ export const DataGridLayout = ({rows, columns, hideFooter = false}: Props) => {
         '& .MuiDataGrid-cell': {
           borderBottom: '2px solid #F0F4F5',
         },
-      }}
-      rows={rows}
-      columns={columns}
-      disableSelectionOnClick
-      disableColumnFilter
-      hideFooter={hideFooter}
-      onCellClick={(params, e) => {
-        e.preventDefault();
-        if (params.field !== 'actions') {
-          navigate(params.row.navigateTo);
-        }
       }}
     />
   );

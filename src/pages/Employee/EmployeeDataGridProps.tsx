@@ -15,10 +15,14 @@ import {StatusChip} from 'components/StatusChip';
 const defaultProps = {
   editable: false,
   renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2">{params.colDef.headerName}</Typography>
+    <Typography variant="subtitle2" color="textSecondary">
+      {params.colDef.headerName}
+    </Typography>
   ),
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="subtitle2">{params.value}</Typography>
+    <Typography variant="body2" mx="0.5em">
+      {params.value}
+    </Typography>
   ),
 };
 const defaultAlignment: {
@@ -38,20 +42,26 @@ export const columns: GridColDef[] = [
     type: 'string',
     flex: 2,
     headerAlign: 'left',
+    align: 'left',
     ...defaultProps,
   },
   {
     field: 'role',
     headerName: 'ROLE',
     type: 'string',
-    ...defaultAlignment,
+    flex: 1,
+    headerAlign: 'left',
+    align: 'left',
     ...defaultProps,
     renderCell: (params) => {
       const role = (params.value as string)
         .split(' ')
         .map((item) => `${item[0]}${item.slice(1).toLowerCase()}`);
       return (
-        <Typography variant="subtitle2" sx={{textTransform: 'capitalize'}}>
+        <Typography
+          variant="body2"
+          mx="0.5em"
+          sx={{textTransform: 'capitalize'}}>
           {role.join(' ')}
         </Typography>
       );
@@ -62,15 +72,17 @@ export const columns: GridColDef[] = [
     headerName: 'ADDRESS',
     type: 'number',
     flex: 4,
-    headerAlign: 'center',
-    align: 'center',
+    headerAlign: 'left',
+    align: 'left',
     ...defaultProps,
   },
   {
     field: 'phone',
     headerName: 'PHONE NUMBER',
     type: 'string',
-    ...defaultAlignment,
+    flex: 1,
+    headerAlign: 'left',
+    align: 'left',
     ...defaultProps,
   },
   {
