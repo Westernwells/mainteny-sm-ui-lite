@@ -19,7 +19,7 @@ export interface UserAccount {
   firstName: string;
   lastName: string;
   photoUrl: string;
-  roles: string[];
+  roles: Role[];
   serviceCompany: ServiceCompany;
   contact: Contact;
   status: UserAccountStatus;
@@ -32,7 +32,7 @@ export interface UserAccountView {
   firstName: string;
   lastName: string;
   photoUrl: string;
-  roles: string[];
+  roles: Role[];
   serviceCompany: ServiceCompanyView;
   status: UserAccountStatus;
   contact: Contact;
@@ -45,7 +45,7 @@ export interface UserAccountSimpleView {
   firstName: string;
   lastName: string;
   photoUrl: string;
-  roles: string[];
+  roles: Role[];
   status: UserAccountStatus;
   contact: Contact;
   meta: Meta;

@@ -1,13 +1,13 @@
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
-import Typography from '@mui/material/Typography';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
 import {useInvoices} from 'hooks/reactQuery/useInvoice';
+import {PageOverviewLayout} from 'components/PageOverviewLayout';
 import {CustomPagination} from 'components/CustomPagination';
 import {columns, makeRows} from './InvoicesDataGridProps';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
@@ -79,20 +79,16 @@ export const Invoices = () => {
   }, [invoiceResource, pageSize]);
 
   return (
-    <Box>
-      <Box display="flex" justifyContent="space-between">
-        <Box sx={{mb: 4}}>
-          <Typography variant="h4">Invoices</Typography>
-        </Box>
-        <Box mt={1}>
-          <Widget
-            searchPlaceholder="Try 'INV000001'"
-            getSearchValue={(val: string) => setSearch(val)}
-            setShowFilter={setShowFilter}
-            showFilter={showFilter}
-          />
-        </Box>
-      </Box>
+    <PageOverviewLayout
+      label="Invoices"
+      renderWidget={
+        <Widget
+          searchPlaceholder="Try 'INV000001'"
+          getSearchValue={(val: string) => setSearch(val)}
+          setShowFilter={setShowFilter}
+          showFilter={showFilter}
+        />
+      }>
       <Fade in={showFilter} unmountOnExit>
         <Box>
           <FilterFields setShowFilter={setShowFilter}>
@@ -155,6 +151,6 @@ export const Invoices = () => {
           totalRows={invoiceResource?.total}
         />
       ) : null}
-    </Box>
+    </PageOverviewLayout>
   );
 };

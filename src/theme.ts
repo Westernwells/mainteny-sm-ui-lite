@@ -354,6 +354,15 @@ export const theme = createTheme({
         },
       ],
     },
+    MuiToggleButton: {
+      styleOverrides: {
+        root: {
+          '&.Mui-selected': {
+            color: '#222B45',
+          },
+        },
+      },
+    },
   },
 });
 

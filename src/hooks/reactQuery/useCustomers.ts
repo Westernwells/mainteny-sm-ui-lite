@@ -19,11 +19,8 @@ export const fetchCustomerElevatorNumbers = async (
   return response.data;
 };
 
-export const useQueryCustomertElevatorNumbers = (
-  customers: PropertyOwner[],
-) => {
+export const useFetchCustomerElevatorNumbers = (customers: PropertyOwner[]) => {
   const propertyOwnerIds = customers.map((customer) => customer.id);
-  // console.log(propertyOwnerIds, '~~~~~~~~~~~~~')
 
   return useQuery(
     [qks.fetchCustomerElevatorNumbers, propertyOwnerIds],

@@ -5,8 +5,8 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {PropertyOwner} from 'models/propertyManager';
 import {
+  useFetchCustomerElevatorNumbers,
   useQueryCustomers,
-  useQueryCustomertElevatorNumbers,
 } from 'hooks/reactQuery/useCustomers';
 import {Widget} from '../../components/Widget';
 import {columns, makeRows} from './CustomerDataGridProps';
@@ -24,7 +24,7 @@ export const Customer = () => {
       query: search,
     });
 
-  const {data: customersWithUnits} = useQueryCustomertElevatorNumbers(
+  const {data: customersWithUnits} = useFetchCustomerElevatorNumbers(
     customerResource.data,
   );
 
