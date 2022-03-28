@@ -21,7 +21,6 @@ export const OverviewTab = () => {
       <Box display="flex" flexWrap="wrap">
         <CardProps
           label="CUSTOMER NAME"
-          bodyTextVariant="subtitle1"
           icon={<HomeWorkIcon sx={{color: theme.palette.info.dark}} />}
           containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
           iconBackground={theme.palette.info.outlinedHoverBg}
@@ -31,7 +30,6 @@ export const OverviewTab = () => {
 
         <CardProps
           label="PHONE NUMBER"
-          bodyTextVariant="subtitle1"
           icon={<LocalPhoneIcon sx={{color: theme.palette.info.dark}} />}
           containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
           iconBackground={theme.palette.info.outlinedHoverBg}
@@ -41,7 +39,6 @@ export const OverviewTab = () => {
 
         <CardProps
           label="CUSTOMER SINCE"
-          bodyTextVariant="subtitle1"
           icon={<WorkIcon sx={{color: theme.palette.info.dark}} />}
           containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
           iconBackground={theme.palette.info.outlinedHoverBg}
@@ -51,7 +48,6 @@ export const OverviewTab = () => {
 
         <CardProps
           label="ADDRESS"
-          bodyTextVariant="subtitle1"
           icon={<HomeIcon sx={{color: theme.palette.info.dark}} />}
           containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
           iconBackground={theme.palette.info.outlinedHoverBg}
@@ -61,7 +57,6 @@ export const OverviewTab = () => {
 
         <CardProps
           label="EMAIL ID"
-          bodyTextVariant="subtitle1"
           icon={<EmailIcon sx={{color: theme.palette.info.dark}} />}
           containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
           iconBackground={theme.palette.info.outlinedHoverBg}

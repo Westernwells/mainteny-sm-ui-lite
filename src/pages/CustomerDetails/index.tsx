@@ -77,9 +77,6 @@ export const CustomerDetails = () => {
           <OverviewTab />
         </TabsBody>
       </Tabs>
-
-      {/* <CustomerDetailsWidgets containerStyle={{ mb: '1.5em'}} /> */}
-      <DataGridLayout rows={rows} columns={columns} />
     </Box>
   );
 };

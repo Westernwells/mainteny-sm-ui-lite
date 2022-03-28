@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 interface Props {
   icon: JSX.Element;
   label: string;
-  bodyTextVariant: any;
+  bodyTextVariant?: any;
   titleTextVariant?: any;
   iconBackground?: string;
   bodyText: string;
@@ -38,14 +38,12 @@ export const CardProps = ({
       <Box>
         <Typography
           variant={titleTextVariant || 'caption'}
-          sx={{color: (theme) => theme.palette.text.secondary}}>
+          color="textSecondary">
           {label}
         </Typography>
       </Box>
       <Box>
-        <Typography variant={bodyTextVariant || 'subtitle1'}>
-          {bodyText}
-        </Typography>
+        <Typography variant={bodyTextVariant || 'body2'}>{bodyText}</Typography>
       </Box>
     </Box>
   </Box>
