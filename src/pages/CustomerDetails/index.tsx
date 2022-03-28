@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import {TabsBody} from 'components/TabsBody';
@@ -7,12 +6,10 @@ import ElevatorIcon from '@mui/icons-material/Elevator';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {staticContracts, contractWithUnits} from 'pages/Contracts/data';
-import {DataGridLayout} from 'components/DataGridLayout';
-import {columns, makeRows} from 'pages/Contracts/ContractsDataGridProps';
+import {makeRows} from 'pages/Contracts/ContractsDataGridProps';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import {createEmptyResource} from 'utils/paging-utils';
 import {ContractView} from 'models/contract';
-import {CustomerDetailsWidgets} from './CustomerDetailsWidgets';
 import {OverviewTab} from './Tabs/OverviewTab';
 
 const tabItems = [
