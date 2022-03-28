@@ -1,7 +1,6 @@
 import WorkIcon from '@mui/icons-material/Work';
 import HomeIcon from '@mui/icons-material/Home';
 import EmailIcon from '@mui/icons-material/Email';
-// import {BackAction} from 'components/BackAction';
 import {CardProps} from 'components/CardProps';
 import HomeWorkIcon from '@mui/icons-material/HomeWork';
 import {BasicDetailsCard} from 'components/BasicDetailsCard';
@@ -20,7 +19,6 @@ export const OverviewTab = ({customerId}: Props) => {
   const theme = useTheme();
   const {data: customer} = useGetCustomer(customerId);
   return (
-    // <BackAction label="Customer Details" />
     <BasicDetailsCard
       minHeight="12rem"
       headerStyles={{pb: '0'}}
@@ -28,6 +26,7 @@ export const OverviewTab = ({customerId}: Props) => {
       <Box display="flex" flexWrap="wrap">
         <CardProps
           label="CUSTOMER NAME"
+          bodyTextVariant="body2"
           icon={<HomeWorkIcon sx={{color: theme.palette.info.dark}} />}
           containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
           iconBackground={theme.palette.info.outlinedHoverBg}
@@ -37,6 +36,7 @@ export const OverviewTab = ({customerId}: Props) => {
 
         <CardProps
           label="PHONE NUMBER"
+          bodyTextVariant="body2"
           icon={<LocalPhoneIcon sx={{color: theme.palette.info.dark}} />}
           containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
           iconBackground={theme.palette.info.outlinedHoverBg}
@@ -46,6 +46,7 @@ export const OverviewTab = ({customerId}: Props) => {
 
         <CardProps
           label="CUSTOMER SINCE"
+          bodyTextVariant="body2"
           icon={<WorkIcon sx={{color: theme.palette.info.dark}} />}
           containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
           iconBackground={theme.palette.info.outlinedHoverBg}
@@ -62,6 +63,7 @@ export const OverviewTab = ({customerId}: Props) => {
 
         <CardProps
           label="ADDRESS"
+          bodyTextVariant="body2"
           icon={<HomeIcon sx={{color: theme.palette.info.dark}} />}
           containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
           iconBackground={theme.palette.info.outlinedHoverBg}
@@ -71,6 +73,7 @@ export const OverviewTab = ({customerId}: Props) => {
 
         <CardProps
           label="EMAIL ID"
+          bodyTextVariant="body2"
           icon={<EmailIcon sx={{color: theme.palette.info.dark}} />}
           containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
           iconBackground={theme.palette.info.outlinedHoverBg}

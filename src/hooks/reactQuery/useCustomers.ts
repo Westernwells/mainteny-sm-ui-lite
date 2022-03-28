@@ -19,7 +19,10 @@ export const fetchCustomerElevatorNumbers = async (
   return response.data;
 };
 
-export const useFetchCustomerElevatorNumbers = (customers: PropertyOwner[]) => {
+export const useFetchCustomerElevatorNumbers = (
+  customers: PropertyOwner[],
+  options?: any,
+) => {
   const propertyOwnerIds = customers.map((customer) => customer.id);
 
   return useQuery(
@@ -36,6 +39,7 @@ export const useFetchCustomerElevatorNumbers = (customers: PropertyOwner[]) => {
 
         [customers],
       ),
+      ...options,
     },
   );
 };
@@ -53,6 +57,7 @@ export const queryCustomers = async (params: QueryPropertyOwnersParams) => {
 
 export const useQueryCustomers = (
   params: WithOptional<QueryPropertyOwnersParams, 'serviceCompanyId'>,
+  options?: any,
 ) => {
   const {user} = useUserSession();
 
@@ -64,6 +69,7 @@ export const useQueryCustomers = (
         serviceCompanyId: user!.userAccount.serviceCompany.id,
       }),
     {
+      ...options,
       enabled: !!user,
     },
   );

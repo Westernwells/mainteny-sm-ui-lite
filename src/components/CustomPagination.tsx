@@ -82,7 +82,7 @@ export const CustomPagination = ({
         </Box>
         <Pagination
           count={pageCount || 10}
-          defaultPage={page.pageIndex + 1}
+          defaultPage={1}
           shape="rounded"
           onChange={(event: React.ChangeEvent<unknown>, newPage: number) => {
             event.preventDefault();

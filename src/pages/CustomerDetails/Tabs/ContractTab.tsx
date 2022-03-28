@@ -47,11 +47,12 @@ export const ContractTab = ({customerId}: Props) => {
       },
       {expiryDate, contractor, price: cost},
       customerId,
-      {keepPrevious: true},
+      {keepPreviousData: true},
     );
 
   const {data: contractWithUnits} = useContractElevatorCount(
     contractResource.data,
+    {keepPreviousData: true},
   );
 
   useEffect(() => {

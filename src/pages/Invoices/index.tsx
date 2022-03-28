@@ -6,9 +6,12 @@ import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
-import {useInvoices} from 'hooks/reactQuery/useInvoice';
+import {queryKeys as qks} from 'reactQuery/constants';
+import {fetchInvoices, useInvoices} from 'hooks/reactQuery/useInvoice';
 import {PageOverviewLayout} from 'components/PageOverviewLayout';
 import {CustomPagination} from 'components/CustomPagination';
+import {useQueryClient} from 'react-query';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {columns, makeRows} from './InvoicesDataGridProps';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
 import {Widget} from '../../components/Widget';
@@ -16,13 +19,17 @@ import {Widget} from '../../components/Widget';
 const pageSize = 10;
 
 export const Invoices = () => {
+  const queryClient = useQueryClient();
+  const {user} = useUserSession();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize)); // TODO: implement paging
   const [showFilter, setShowFilter] = useState(false);
-  const [_amount, setAmount] = useState<number[][]>([]);
-  const [_status, setStatus] = useState<string[]>([]);
+  const [amount, setAmount] = useState<number[][]>([]);
+  const [status, setStatus] = useState<string[]>([]);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
+
+  console.log(amount, status);
   // TODO: Create Invoice model for invoices with 'Order number' and 'Service type'
   const {data: invoiceResource = createEmptyResource<InvoiceView>(10)} =
     useInvoices(
@@ -33,8 +40,27 @@ export const Invoices = () => {
         status: [InvoiceStatus.PAID, InvoiceStatus.NOT_PAID],
       },
       {},
+      {keepPreviousData: true},
     );
-  console.log(_amount, _status);
+
+  //  prefetch next page when page changes
+  useEffect(() => {
+    // assume increment of page by one
+    const nextPage = page.pageIndex + 1;
+    const newPageInfo = {pageIndex: nextPage, pageSize: page.pageSize};
+    const params = {
+      pageIndex: newPageInfo.pageIndex,
+      pageSize: newPageInfo.pageSize,
+      query: search,
+      status: [InvoiceStatus.PAID, InvoiceStatus.NOT_PAID],
+    };
+    if (user && invoiceResource) {
+      queryClient.prefetchQuery([qks.fetchInvoices, params], () =>
+        fetchInvoices(params, user.userAccount.serviceCompany.id),
+      );
+    }
+  }, [queryClient, page, search, user, invoiceResource]);
+
   const amountRangeConvertor = (selectedItems: string[]) => {
     const range: number[][] = [];
     selectedItems.forEach((item) => {

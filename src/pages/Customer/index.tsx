@@ -8,24 +8,30 @@ import {
   useFetchCustomerElevatorNumbers,
   useQueryCustomers,
 } from 'hooks/reactQuery/useCustomers';
+import {CustomPagination} from 'components/CustomPagination';
 import {Widget} from '../../components/Widget';
 import {columns, makeRows} from './CustomerDataGridProps';
 
 export const Customer = () => {
   const [search, setSearch] = useState('');
   const [showFilter, setShowFilter] = useState(false);
-  const [page] = useState(makePage(0, 10));
+  const [page, setPage] = useState(makePage(0, 10));
   const [rows, setRows] = useState<GridRowsProp>([]);
+  const [pageCount, setPageCount] = useState(0);
 
   const {data: customerResource = createEmptyResource<PropertyOwner>(10)} =
-    useQueryCustomers({
-      pageIndex: page.pageIndex,
-      pageSize: page.pageSize,
-      query: search,
-    });
+    useQueryCustomers(
+      {
+        pageIndex: page.pageIndex,
+        pageSize: page.pageSize,
+        query: search,
+      },
+      {keepPreviousData: true},
+    );
 
   const {data: customersWithUnits} = useFetchCustomerElevatorNumbers(
     customerResource.data,
+    {keepPreviousData: true},
   );
 
   useEffect(() => {
@@ -35,6 +41,10 @@ export const Customer = () => {
       setRows([]);
     }
   }, [customersWithUnits]);
+
+  useEffect(() => {
+    setPageCount(Math.ceil(customerResource.total / page.pageSize));
+  }, [customerResource, page.pageSize]);
 
   return (
     <PageOverviewLayout
@@ -50,6 +60,19 @@ export const Customer = () => {
         />
       }>
       <DataGridLayout rows={rows} columns={columns} hideFooter />
+      {pageCount && page.pageSize < customerResource.total ? (
+        <CustomPagination
+          pageSize={page.pageSize}
+          handlePageSizeChange={(newPageSize: number) =>
+            setPage({...page, pageSize: newPageSize})
+          }
+          handlePageChange={(newPage: number) => {
+            setPage({...page, pageIndex: newPage - 1});
+          }}
+          pageCount={pageCount}
+          totalRows={customerResource.total}
+        />
+      ) : null}
     </PageOverviewLayout>
   );
 };

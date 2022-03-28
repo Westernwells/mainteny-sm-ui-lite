@@ -49,6 +49,7 @@ export const Contracts = () => {
     );
   const {data: contractWithUnits} = useContractElevatorCount(
     contractResource.data,
+    {keepPreviousData: true},
   );
 
   const costRangeConvertor = (selectedItems: string[]) => {
@@ -83,7 +84,7 @@ export const Contracts = () => {
 
   useEffect(() => {
     setPageCount(Math.ceil(contractResource.total / page.pageSize));
-  }, [contractResource, pageSize]);
+  }, [contractResource, page.pageSize]);
 
   return (
     <PageOverviewLayout
