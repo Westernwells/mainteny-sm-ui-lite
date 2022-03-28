@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {MouseEvent, useState} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -44,7 +44,7 @@ export const Widget = ({
   const [view, setView] = useState('list');
 
   const handleViewChange = (
-    event: React.MouseEvent<HTMLElement>,
+    event: MouseEvent<HTMLElement>,
     nextView: string,
   ) => {
     setView(nextView);
@@ -92,8 +92,6 @@ export const Widget = ({
         {!hideViewOption ? (
           <ToggleButtonGroup
             color="secondary"
-            //  sx={{color: theme.palette.action.selected}}
-
             value={view}
             exclusive
             onChange={handleViewChange}>

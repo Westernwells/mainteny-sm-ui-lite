@@ -2,7 +2,7 @@ import {Resource, WithOptional} from 'models/misc';
 import {PropertyOwner, QueryPropertyOwnersParams} from 'models/propertyManager';
 import {useCallback} from 'react';
 import {useQuery} from 'react-query';
-import {queryKeys as qks} from 'reactQuery/constants';
+import {queryKeys as qks, queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useUserSession} from './useUserSession';
 
@@ -19,7 +19,10 @@ export const fetchCustomerElevatorNumbers = async (
   return response.data;
 };
 
-export const useFetchCustomerElevatorNumbers = (customers: PropertyOwner[]) => {
+export const useFetchCustomerElevatorNumbers = (
+  customers: PropertyOwner[],
+  options?: any,
+) => {
   const propertyOwnerIds = customers.map((customer) => customer.id);
 
   return useQuery(
@@ -36,6 +39,7 @@ export const useFetchCustomerElevatorNumbers = (customers: PropertyOwner[]) => {
 
         [customers],
       ),
+      ...options,
     },
   );
 };
@@ -53,6 +57,7 @@ export const queryCustomers = async (params: QueryPropertyOwnersParams) => {
 
 export const useQueryCustomers = (
   params: WithOptional<QueryPropertyOwnersParams, 'serviceCompanyId'>,
+  options?: any,
 ) => {
   const {user} = useUserSession();
 
@@ -64,7 +69,20 @@ export const useQueryCustomers = (
         serviceCompanyId: user!.userAccount.serviceCompany.id,
       }),
     {
+      ...options,
       enabled: !!user,
     },
   );
 };
+
+export const getCustomer = async (id: string) => {
+  const response = await axiosClient.get<PropertyOwner>(
+    `/api/propertyOwners/${id}`,
+  );
+  return response.data;
+};
+
+export const useGetCustomer = (id?: string) =>
+  useQuery([queryKeys.getCustomer, id], () => getCustomer(id!), {
+    enabled: !!id,
+  });

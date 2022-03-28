@@ -37,13 +37,15 @@ export function useInvoices(
   params: QueryInvoiceParams,
   // TODO: Write 'interface' for filter object
   filters: {},
+  options?: any,
 ) {
   const {user} = useUserSession();
   return useQuery<Resource<InvoiceView>, RestError>(
-    [qk.fetchInvoice, params, user?.userAccount.id],
+    [qk.fetchInvoices, params, user?.userAccount.id],
     () => fetchInvoices(params, user!.userAccount.serviceCompany.id),
     {
       enabled: !!user,
+      ...options,
       select: useCallback(
         (invoicesRes: Resource<InvoiceView>) => {
           const filterResult = filterInvoices(invoicesRes, filters);
