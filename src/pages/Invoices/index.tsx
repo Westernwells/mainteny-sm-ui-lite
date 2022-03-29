@@ -5,6 +5,7 @@ import {GridRowsProp} from '@mui/x-data-grid';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {DataGridLayout} from 'components/DataGridLayout';
+import {ServiceOrderType} from 'models/service-order';
 import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
 import {queryKeys as qks} from 'reactQuery/constants';
 import {fetchInvoices, useInvoices} from 'hooks/reactQuery/useInvoice';
@@ -25,11 +26,11 @@ export const Invoices = () => {
   const [page, setPage] = useState(makePage(0, pageSize)); // TODO: implement paging
   const [showFilter, setShowFilter] = useState(false);
   const [amount, setAmount] = useState<number[][]>([]);
-  const [status, setStatus] = useState<string[]>([]);
+  const [status, setStatus] = useState<InvoiceStatus>();
+  const [serviceType, setServiceType] = useState<ServiceOrderType[]>([]);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
 
-  console.log(amount, status);
   // TODO: Create Invoice model for invoices with 'Order number' and 'Service type'
   const {data: invoiceResource = createEmptyResource<InvoiceView>(10)} =
     useInvoices(
@@ -39,7 +40,7 @@ export const Invoices = () => {
         query: search,
         status: [InvoiceStatus.PAID, InvoiceStatus.NOT_PAID],
       },
-      {},
+      {amount: amount[0], status, serviceType},
       {keepPreviousData: true},
     );
 
@@ -96,7 +97,8 @@ export const Invoices = () => {
     }
     if (!showFilter) {
       setAmount([]);
-      setStatus([]);
+      setStatus(undefined);
+      setServiceType([]);
     }
   }, [invoiceResource, showFilter]);
 
@@ -120,14 +122,9 @@ export const Invoices = () => {
           <FilterFields setShowFilter={setShowFilter}>
             <MultipleSelectCheckmarks
               label="Invoice Date"
-              options={['This Week', 'Next Week', 'Next Month']}
+              options={['This Week', 'Last Week', 'Last Month']}
               getSelectedValue={(item) => console.log(item)}
               multiple={false}
-            />
-            <MultipleSelectCheckmarks
-              label="Service Company"
-              options={['Maintenance Experts Gmbh', 'Maintenance Masters']}
-              getSelectedValue={(item) => console.log(item)}
             />
             <MultipleSelectCheckmarks
               label="Total Amount"
@@ -140,25 +137,43 @@ export const Invoices = () => {
               getSelectedValue={(item) => amountRangeConvertor(item)}
               multiple={false}
             />
-
             <MultipleSelectCheckmarks
               label="Status"
               options={Object.values(InvoiceStatusView).map((value) => value)}
-              getSelectedValue={(items) =>
-                setStatus(
-                  items.map((item) =>
-                    item === 'Paid'
-                      ? InvoiceStatus.PAID
-                      : InvoiceStatus.NOT_PAID,
-                  ),
-                )
+              getSelectedValue={(items: string[]) =>
+                items.length
+                  ? items[0] === 'Paid'
+                    ? setStatus(InvoiceStatus.PAID)
+                    : setStatus(InvoiceStatus.NOT_PAID)
+                  : setStatus(undefined)
               }
               multiple={false}
             />
             <MultipleSelectCheckmarks
               label="Service Type"
               options={['Maintenance', 'Repair', 'Callout', 'Emergency']}
-              getSelectedValue={(item) => console.log(item)}
+              getSelectedValue={(items) => {
+                const value: ServiceOrderType[] = [];
+                items.forEach((item) => {
+                  switch (item) {
+                    case 'Maintenance':
+                      value.push(ServiceOrderType.REGULAR);
+                      break;
+                    case 'Repair':
+                      value.push(ServiceOrderType.REPAIR);
+                      break;
+                    case 'Callout':
+                      value.push(ServiceOrderType.CALLOUT);
+                      break;
+                    case 'Emergency':
+                      value.push(ServiceOrderType.EMERGENCY);
+                      break;
+                    default:
+                      break;
+                  }
+                });
+                setServiceType(value);
+              }}
             />
           </FilterFields>
         </Box>

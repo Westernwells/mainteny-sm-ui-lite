@@ -1,5 +1,5 @@
 import {useQuery} from 'react-query';
-// import * as _ from 'lodash';
+import * as _ from 'lodash';
 import {useCallback} from 'react';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
@@ -7,7 +7,12 @@ import {useNavigate} from 'react-router';
 // FIXME: Dummy Import
 
 import {Resource, RestError} from 'models/misc';
-import {InvoiceView, QueryInvoiceParams} from 'models/invoice';
+import {
+  InvoiceView,
+  QueryInvoiceParams,
+  InvoiceFilters,
+  InvoiceStatus,
+} from 'models/invoice';
 import {useUserSession} from './useUserSession';
 
 // TODO: make API call to fetch Invoices
@@ -26,17 +31,77 @@ export const fetchInvoices = async (
   return response.data;
 };
 
-const filterInvoices = (invoicesRes: Resource<InvoiceView>, filters: {}) => {
-  const result = {...invoicesRes};
-  // TODO: Filter code goes here
-  console.log(filters);
+export const filterByAmount = (
+  invoicesRes: Resource<InvoiceView>,
+  amount: InvoiceFilters['amount'],
+) =>
+  invoicesRes.data.filter((item) => {
+    const value =
+      item.totalAmount.amount / 10 ** item.totalAmount.fractionDigits!;
+    return value >= amount[0] && value <= amount[1];
+  });
+
+export const filterByStatus = (
+  invoicesRes: Resource<InvoiceView>,
+  status: InvoiceStatus,
+) => {
+  const filterResult = [] as InvoiceView[];
+  const invoiceStatusMap = _.groupBy(invoicesRes.data, (item) => item.status);
+
+  if (invoiceStatusMap[status]) {
+    invoiceStatusMap[status].forEach((item) => {
+      filterResult.push(item);
+    });
+  }
+
+  return filterResult;
+};
+
+export const filterByServiceType = (
+  invoicesRes: Resource<InvoiceView>,
+  serviceType: InvoiceFilters['serviceType'],
+) => {
+  let filterResult = [] as InvoiceView[];
+  const invoiceServiceTypeMap = _.groupBy(
+    invoicesRes.data,
+    (item) => item.serviceOrder.type,
+  );
+
+  serviceType
+    .map((item) => invoiceServiceTypeMap[item])
+    .filter((item) => item)
+    .forEach((item) => {
+      filterResult = [...filterResult, ...item];
+    });
+
+  return filterResult;
+};
+
+const filterInvoices = (
+  invoicesRes: Resource<InvoiceView>,
+  filters: InvoiceFilters,
+) => {
+  let result = {...invoicesRes};
+
+  if (filters.amount) {
+    const amounts = filterByAmount(result, filters.amount);
+    result = {...result, data: amounts, total: amounts.length};
+  }
+  if (filters.status) {
+    const status = filterByStatus(result, filters.status);
+    result = {...result, data: status, total: status.length};
+  }
+  if (filters.serviceType.length) {
+    const serviceTypes = filterByServiceType(result, filters.serviceType);
+    result = {...result, data: serviceTypes, total: serviceTypes.length};
+  }
   return result;
 };
 
 export function useInvoices(
   params: QueryInvoiceParams,
   // TODO: Write 'interface' for filter object
-  filters: {},
+  filters: InvoiceFilters,
   options?: any,
 ) {
   const {user} = useUserSession();
