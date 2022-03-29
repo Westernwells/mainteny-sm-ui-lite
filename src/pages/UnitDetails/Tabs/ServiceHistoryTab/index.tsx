@@ -6,6 +6,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
+import {EmptySection} from 'components/EmptySection';
 import {SplitButton} from 'components/SplitButton';
 import Box from '@mui/material/Box';
 import {PageCard} from 'components/PageCard';
@@ -155,6 +156,16 @@ export const ServiceHistoryTab = () => {
     }
     return setSelectedStatus([]);
   };
+
+  if (!serviceOrders.data.length) {
+    return (
+      <EmptySection
+        label="No service history entries made so far!"
+        size="large"
+        containerStyle={{mt: 12}}
+      />
+    );
+  }
 
   return (
     <Grid container spacing={2}>
