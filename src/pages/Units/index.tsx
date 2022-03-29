@@ -4,16 +4,13 @@ import Typography from '@mui/material/Typography';
 import {ElevatorView} from 'models/elevator';
 
 import {Widget} from 'components/Widget';
-import {useFetchServiceOrdersByElevators} from 'hooks/reactQuery/useServiceOrder';
 import Fade from '@mui/material/Fade';
-import {TablePagination} from '@mui/material';
+import {useFormik} from 'formik';
 import * as Yup from 'yup';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging-utils';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
-import {useAllElevators} from 'hooks/reactQuery/useElevator';
-import {BtnGroupType} from 'models/misc';
 import {FilterFields} from 'components/FilterFields';
-import useTheme from '@mui/material/styles/useTheme';
+import {elevatorResponse, elevatorsByAddressList} from './dummyData';
 import {UnitSection} from './UnitSection';
 import {UnitsMapsView} from './UnitsMapsView';
 import {UnitColumns} from './UnitColumns';
@@ -24,27 +21,29 @@ interface FormikFields {
   moreInformation: string;
 }
 
+const validationSchema = Yup.object().shape({
+  description: Yup.string().required('description is required'),
+});
 export const MyUnits = () => {
   const fallback = useRef({
     elevator: createEmptyResource<ElevatorView>(10),
     centerCoord: {longitude: 0, latitude: 0},
   }).current;
-  const [search, setSearch] = useState('');
-  const [page, _setPage] = useState(makePage(0, 10)); // TODO: implement paging
+  const [_search, setSearch] = useState('');
+  // const [_page, _setPage] = useState(makePage(0, 10)); // TODO: implement paging
   const [showFilter, setShowFilter] = useState(false);
-  const [availability, setAvailability] = useState<number[][]>([]);
-  const [status, setStatus] = useState<string[]>([]);
-  const [nextVisit, setNextVisit] = useState<string[]>([]);
+  const [_availability, setAvailability] = useState<number[][]>([]);
+  const [_status, setStatus] = useState<string[]>([]);
+  const [_nextVisit, setNextVisit] = useState<string[]>([]);
   const [showMapview, setShowMapview] = useState(false);
-  const theme = useTheme();
-
-  const {data: elevatorResponse = fallback} = useAllElevators(search, page, {
-    status,
-  });
-  const {data: elevatorsByAddressList} = useFetchServiceOrdersByElevators(
-    elevatorResponse.elevator,
-    {nextVisit, availabilityRange: availability},
-  );
+  console.log(fallback, _search, _availability, _status, _nextVisit);
+  // const {data: elevatorResponse = fallback} = useAllElevators(search, page, {
+  //   status,
+  // });
+  // const {data: elevatorsByAddressList} = useFetchServiceOrdersByElevators(
+  //   elevatorResponse.elevator,
+  //   {nextVisit, availabilityRange: availability},
+  // );
 
   const availabilityRangeConvertor = (selectedItems: string[]) => {
     const range: number[][] = [];
@@ -72,6 +71,21 @@ export const MyUnits = () => {
     });
     setAvailability(range);
   };
+
+  const formik = useFormik<FormikFields>({
+    initialValues: {
+      description: '',
+      elevator: undefined,
+      moreInformation: '',
+    },
+    onSubmit: async (values, {resetForm}) => {
+      const body = {...values, elevatorId: values?.elevator?.id};
+      delete body.elevator;
+      // setModalOpen(false);
+      resetForm();
+    },
+    validationSchema,
+  });
 
   const onSearchTextChanged = (value: string) => {
     setSearch(value);
@@ -107,7 +121,6 @@ export const MyUnits = () => {
             mapViewActive={showMapview}
             setShowFilter={setShowFilter}
             showFilter={showFilter}
-            btnGroupType={BtnGroupType.ICON}
           />
         </Box>
       </Box>
@@ -142,29 +155,15 @@ export const MyUnits = () => {
         <>
           <UnitColumns />
           <Box
-            sx={{height: '69vh', overflowY: 'scroll', paddingBottom: '1rem'}}
-          >
+            sx={{height: '69vh', overflowY: 'scroll', paddingBottom: '1rem'}}>
             {elevatorsByAddressList?.map((elevatorsByAddress) => (
               <UnitSection
                 key={elevatorsByAddress.address.id}
                 elevatorsByAddress={elevatorsByAddress}
+                setField={formik.setFieldValue}
               />
             ))}
           </Box>
-          <TablePagination
-            sx={{
-              '& .MuiTablePagination-selectLabel': {
-                color: theme.palette.text.secondary,
-              },
-            }}
-            component="div"
-            count={elevatorResponse.elevator.total}
-            page={elevatorResponse.elevator.page.pageIndex}
-            // TODO: Implement paging
-            onPageChange={() => console.log('page change')}
-            rowsPerPage={elevatorResponse.elevator.page.pageSize}
-            //  onRowsPerPageChange={handleChangeRowsPerPage}
-          />
         </>
       ) : (
         <UnitsMapsView

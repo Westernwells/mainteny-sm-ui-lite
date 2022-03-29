@@ -1,8 +1,5 @@
-import {AxiosResponse} from 'axios';
-import {ServiceManager} from 'models/serviceManager';
 import {useQuery} from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
-import {axiosClient} from 'utils/axios-utils';
 import {useUserSession} from './useUserSession';
 
 const staticData = {
@@ -116,14 +113,14 @@ const staticData = {
     state: 'ACTIVE',
   },
 };
-
 const fetchServiceManager = async (username: string) => {
-  // TODO: This is a temporary solution,
-  const response: AxiosResponse<ServiceManager> = await axiosClient({
-    method: 'GET',
-    url: `/api/sessions/runAs/${username}`,
-  });
-  return response.data;
+  // TODO: Fetch API data
+  console.log(username);
+  //   const response: AxiosResponse<ServiceManager> = await axiosClient({
+  //     method: 'GET',
+  //     url: `/api/users/propertyManager/${username}`,
+  //   });
+  return staticData;
 };
 export const useServiceManager = () => {
   const {user} = useUserSession();

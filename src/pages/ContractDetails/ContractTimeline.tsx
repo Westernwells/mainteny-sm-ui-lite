@@ -3,8 +3,7 @@ import Typography from '@mui/material/Typography';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import DownloadDoneIcon from '@mui/icons-material/DownloadDone';
 import useTheme from '@mui/material/styles/useTheme';
-// import {CustomCard} from 'components/CustomCard';
-import {formatDate, toDate} from 'utils/datetime';
+import {formatDate} from 'utils/datetime';
 import {ContractView} from 'models/contract';
 
 interface Props {
@@ -35,8 +34,7 @@ export const ContractTimeline = ({
             width: '3rem',
             height: '3rem',
             borderRadius: '50%',
-          }}
-        >
+          }}>
           <AssignmentOutlinedIcon color="success" />
         </Box>
         <Box>
@@ -54,8 +52,7 @@ export const ContractTimeline = ({
           flexDirection: 'column',
           alignItems: 'center',
           maxWidth: '3rem',
-        }}
-      >
+        }}>
         <Box
           sx={{
             borderLeft: `3px solid ${theme.palette.primary.main}`,
@@ -89,8 +86,7 @@ export const ContractTimeline = ({
             width: '3rem',
             height: '3rem',
             borderRadius: '50%',
-          }}
-        >
+          }}>
           <DownloadDoneIcon sx={{color: theme.palette.text.secondary}} />
         </Box>
         <Box>

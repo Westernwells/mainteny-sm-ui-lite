@@ -1,19 +1,14 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import {Theme} from '@mui/material/styles';
-import {useNavigate} from 'react-router-dom';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import makeStyles from '@mui/styles/makeStyles';
 import useTheme from '@mui/material/styles/useTheme';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import GridViewIcon from '@mui/icons-material/GridView';
 import Button from '@mui/material/Button';
 import {Searchnput} from './SearchInput';
-import {BtnGroupType} from '../models/misc';
 
 interface Props {
-  btnGroupType?: BtnGroupType;
   searchPlaceholder?: string;
   onSearchTextChanged?: (text: string) => void;
   openMapView?: () => void;
@@ -26,7 +21,6 @@ interface Props {
 }
 
 export const Widget = ({
-  btnGroupType,
   searchPlaceholder,
   onSearchTextChanged,
   openMapView,
@@ -37,7 +31,6 @@ export const Widget = ({
   hideViewOption = false,
   hideFilter = false,
 }: Props) => {
-  const navigate = useNavigate();
   const theme = useTheme();
 
   return (
@@ -61,8 +54,7 @@ export const Widget = ({
                 },
               }}
               variant="outlined"
-              startIcon={<FilterListIcon />}
-            >
+              startIcon={<FilterListIcon />}>
               <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
                 Filter
               </Typography>
@@ -91,8 +83,7 @@ export const Widget = ({
                     ? theme.palette.action.selected
                     : '#fff',
                 },
-              }}
-            >
+              }}>
               <FormatListBulletedIcon />
             </Button>
             <Button
@@ -108,8 +99,7 @@ export const Widget = ({
                     : '#fff',
                 },
               }}
-              variant="outlined"
-            >
+              variant="outlined">
               <GridViewIcon />
             </Button>
           </ButtonGroup>

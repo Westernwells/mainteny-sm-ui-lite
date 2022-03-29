@@ -1,5 +1,3 @@
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
 import {CardProps} from 'components/CardProps';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
@@ -12,23 +10,6 @@ interface Props {
 
 export const ContractPaymentDetails = ({name}: Props) => {
   const theme = useTheme();
-
-  const paymentDetails = (field: string) => {
-    switch (field) {
-      case 'Name':
-        return <Typography variant="largeBtnText">Christ Andersson</Typography>;
-      case 'IBAN':
-        return (
-          <Typography variant="largeBtnText">
-            SE87 3000 0000 0101 2345 67890{' '}
-          </Typography>
-        );
-      case 'BIC':
-        return <Typography variant="largeBtnText">DEUTDEFF</Typography>;
-      default:
-        return null;
-    }
-  };
 
   return (
     <>

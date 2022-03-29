@@ -2,22 +2,15 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import useTheme from '@mui/material/styles/useTheme';
-import axios from 'axios';
 import {useInvoiceDetail} from 'hooks/reactQuery/useInvoice';
 import {StatusChip} from 'components/StatusChip';
 import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
 import {CardProps} from 'components/CardProps';
 import {useParams} from 'react-router-dom';
+import {HistoryCard} from 'pages/UnitDetails/Tabs/ServiceHistoryTab/HistoryCard';
 import {BackAction} from 'components/BackAction';
 import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {HistoryCard} from 'pages/UnitDetails/Tabs/ServiceHistoryTab/HistoryCard';
-// import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import Button from '@mui/material/Button';
-import {formatDate, getDateObject} from 'utils/datetime';
-import {InvoiceStatus, InvoiceStatusView} from 'models/invoice';
-import {formatCurrency} from 'utils/currency';
 import {InvoiceCard} from './InvoiceCard';
 import {Invoice} from './Invoice';
 import {RelatedTo} from './RelatedTo';
@@ -25,10 +18,14 @@ import {RelatedTo} from './RelatedTo';
 export const InvoiceDetails = () => {
   const {id: invoiceId} = useParams();
   const {data: invoice} = useInvoiceDetail(invoiceId);
+  console.log(invoice);
+  // TODO: Fetch Download URL
 
-  const {data: downloadUrl} = useDownloadUrl(
-    invoice?.additionalInfo.pdfPath ? [invoice?.additionalInfo.pdfPath] : [],
-  );
+  // const {data: downloadUrl} = useDownloadUrl(
+  //   invoice?.additionalInfo.pdfPath ? [invoice?.additionalInfo.pdfPath] : [],
+  // );
+  const downloadUrl = [`${process.env.REACT_APP_BASE_URL}/INV000128.pdf`];
+
   const theme = useTheme();
 
   return (
@@ -56,16 +53,11 @@ export const InvoiceDetails = () => {
             header={
               <Box display="flex" justifyContent="space-between">
                 <Box>
-                  <Typography variant="subtitle1">{invoice?.number}</Typography>
+                  <Typography variant="subtitle1">#INV000128</Typography>
                   <Typography
                     variant="body2"
-                    sx={{color: theme.palette.text.secondary}}
-                  >
-                    Generated on{' '}
-                    {formatDate(
-                      getDateObject(invoice?.meta.createdAt),
-                      'dd MMM YYY',
-                    )}
+                    sx={{color: theme.palette.text.secondary}}>
+                    Generated on 24 Sep 2021
                   </Typography>
                 </Box>
 
@@ -75,51 +67,23 @@ export const InvoiceDetails = () => {
                     bodyTextVariant="subtitle1"
                     icon={
                       <MonetizationOnOutlinedIcon
-                        color={
-                          invoice?.status === InvoiceStatus.PAID
-                            ? 'success'
-                            : 'warning'
-                        }
+                        color="success"
                         sx={{width: '1.25rem', height: '1.25rem'}}
                       />
                     }
                     containerStyles={{mr: '0.5em'}}
                     iconBackground={theme.palette.success.outlinedHoverBg}
                     iconMaxHeight="3rem"
-                    bodyText={`
-                      ${formatCurrency(
-                        invoice
-                          ? invoice.totalAmount.amount /
-                              10 ** invoice.totalAmount.fractionDigits!
-                          : 0,
-                        {
-                          currency: invoice
-                            ? invoice.totalAmount.currency
-                            : 'EUR',
-                        },
-                      )}`}
+                    bodyText="9,700 EUR"
                   />
                   <StatusChip
-                    label={
-                      invoice?.status === InvoiceStatus.PAID
-                        ? InvoiceStatusView.PAID
-                        : InvoiceStatusView.NOT_PAID
-                    }
-                    textColor={
-                      invoice?.status === InvoiceStatus.PAID
-                        ? theme.palette.success.main
-                        : theme.palette.warning.main
-                    }
-                    bgColor={
-                      invoice?.status === InvoiceStatus.PAID
-                        ? theme.palette.success.outlinedHoverBg
-                        : theme.palette.warning.outlinedHoverBg
-                    }
+                    label="Paid"
+                    textColor={theme.palette.success.main}
+                    bgColor={theme.palette.success.outlinedHoverBg}
                   />
                 </Box>
               </Box>
-            }
-          >
+            }>
             <Invoice downloadUrl={downloadUrl ? downloadUrl[0] : null} />
           </InvoiceCard>
         </Grid>
@@ -127,38 +91,16 @@ export const InvoiceDetails = () => {
         <Grid item xs={4}>
           <InvoiceCard
             header={<Typography variant="subtitle1">Related To</Typography>}
-            headerContainerStyle={{pb: '0.5em'}}
-          >
+            headerContainerStyle={{pb: '0.5em'}}>
             <RelatedTo>
-              <HistoryCard
-                serviceOrder={invoice?.serviceOrder}
-                headerTitle={formatDate(
-                  invoice?.serviceOrder.schedules[0].startTime,
-                  'dd MMM YYY',
-                )}
-                subtitle={`${formatDate(
-                  invoice?.serviceOrder.schedules[0].startTime,
-                  'ha',
-                )} - ${formatDate(
-                  invoice?.serviceOrder.schedules[0].endTime,
-                  'ha',
-                )}`}
-                description={invoice?.serviceOrder.description}
-                containerStyles={{borderRadius: 0}}
-                showPointer
-                removeShadows
-                bodyContainerStyle={{
-                  borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-                }}
-              />
+              <HistoryCard removeShadows />
             </RelatedTo>
           </InvoiceCard>
 
           <InvoiceCard
             containerStyles={{mt: '1em'}}
             header={<Typography variant="subtitle1">Work Report</Typography>}
-            headerContainerStyle={{pb: '0.5em'}}
-          >
+            headerContainerStyle={{pb: '0.5em'}}>
             <RelatedTo>
               <Typography>
                 10 / 6-2020: Secured lift and counterweight for disconnection of

@@ -1,26 +1,31 @@
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
-import Button from '@mui/material/Button';
 import Elevator from '@mui/icons-material/Elevator';
 import Grid from '@mui/material/Grid';
-import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/system/Box';
-import Chip from '@mui/material/Chip';
 import {StatusChip} from 'components/StatusChip';
 import {FormikErrors} from 'formik';
 import {ElevatorsByAddress} from './Models';
 import {formatDate, toDate} from '../../utils/datetime';
-import {ElevatorStatus, ElevatorView} from '../../models/elevator';
+import {ElevatorStatus} from '../../models/elevator';
 
 export interface UnitsSectionProperty {
-  elevatorsByAddress: ElevatorsByAddress;
+  // TODO: Check this 'any' type
+  elevatorsByAddress: ElevatorsByAddress | any;
+  setField: (
+    field: string,
+    value: any,
+    shouldValidate?: boolean | undefined,
+  ) => Promise<void> | Promise<FormikErrors<any>>;
 }
 
-export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
-  const theme = useTheme();
+export const UnitSection = ({
+  elevatorsByAddress,
+  setField,
+}: UnitsSectionProperty) => {
   const navigate = useNavigate();
-
+  console.log(typeof setField);
   return (
     <Box
       sx={{
@@ -30,15 +35,14 @@ export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
         paddingBottom: 0.5,
         marginTop: 1,
         borderRadius: '4px 4px 0px 0px',
-      }}
-    >
+      }}>
       <Box pl={3}>
         <Typography variant="largeBtnText" mt={1} color="textSecondary">
           {elevatorsByAddress.address.fullName}
         </Typography>
       </Box>
-
-      {elevatorsByAddress.elevators.map((elevatorOrder) => (
+      {/* TODO: Check this 'any' type */}
+      {elevatorsByAddress.elevators.map((elevatorOrder: any) => (
         <Grid
           key={elevatorOrder.elevator.id}
           container
@@ -49,8 +53,7 @@ export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
             '&:hover': {background: 'rgba(0, 209, 255, 0.08)'},
             minHeight: '3rem',
             alignItems: 'center',
-          }}
-        >
+          }}>
           <Grid
             item
             xs={3}
@@ -58,8 +61,7 @@ export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
             onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
               e.preventDefault();
               navigate(`/units/${elevatorOrder.elevator.id}`);
-            }}
-          >
+            }}>
             <Box display="flex" alignItems="center">
               <Elevator style={{marginRight: '10px'}} />
               <Typography variant="subtitle1">
@@ -76,8 +78,7 @@ export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
               display: 'flex',
               justifyContent: 'flex-end',
               alignItems: 'center',
-            }}
-          >
+            }}>
             <Grid item xs={2}>
               <Typography variant="largeBtnText">
                 {elevatorOrder.elevator.lastVisitDate || 'N/A'}
@@ -102,8 +103,7 @@ export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
                   elevatorOrder.elevator.availability < 100
                     ? 'textWarning'
                     : 'textSuccess'
-                }
-              >
+                }>
                 <Box display="flex" justifyContent="center">
                   {elevatorOrder.elevator.availability}%
                 </Box>

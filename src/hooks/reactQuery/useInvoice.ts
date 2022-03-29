@@ -1,32 +1,35 @@
 import {useQuery} from 'react-query';
-import * as _ from 'lodash';
 import {useCallback} from 'react';
 import {queryKeys as qk} from 'reactQuery/constants';
-import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 // FIXME: Dummy Import
+import {invoices} from 'pages/Invoices/data';
+import {invoiceDetail} from 'pages/InvoiceDetails/data';
 
 import {Resource, RestError} from 'models/misc';
 import {InvoiceView, QueryInvoiceParams} from 'models/invoice';
-import {useUserSession} from './useUserSession';
+import {useServiceManager} from './useServiceManager';
 
 // TODO: make API call to fetch Invoices
-
+const staticInvoices = invoices;
 export const fetchInvoices = async (
   params: QueryInvoiceParams,
   id: string,
 ): Promise<Resource<InvoiceView>> => {
-  const response = await axiosClient.get<Resource<InvoiceView>>(
-    `/api/serviceCompanies/${id}/invoices`,
-    {
-      params,
-      paramsSerializer,
-    },
-  );
-  return response.data;
+  // TODO: make API call to fetch Invoices
+  console.log(params, id);
+  // const response = await axiosClient.get<Resource<InvoiceView>>(
+  //   `/api/propertyOwners/${id}/invoices`,
+  //   {
+  //     params,
+  //     paramsSerializer,
+  //   },
+  // );
+  return Promise.resolve(staticInvoices);
 };
 
 const filterInvoices = (invoicesRes: Resource<InvoiceView>, filters: {}) => {
   const result = {...invoicesRes};
+  console.log(filters);
   // TODO: Filter code goes here
   return result;
 };
@@ -36,10 +39,10 @@ export function useInvoices(
   // TODO: Write 'interface' for filter object
   filters: {},
 ) {
-  const {user} = useUserSession();
+  const {data: user} = useServiceManager();
   return useQuery<Resource<InvoiceView>, RestError>(
-    [qk.fetchInvoice, params, user?.userAccount.id],
-    () => fetchInvoices(params, user!.userAccount.serviceCompany.id),
+    [qk.fetchInvoices, params, user?.id],
+    () => fetchInvoices(params, user!.serviceManager.id),
     {
       enabled: !!user,
       select: useCallback(
@@ -53,11 +56,17 @@ export function useInvoices(
   );
 }
 
+// TODO: make API call to fetch Invoices
+const staticInvoiceDetails = invoiceDetail;
+
 export const fetchInvoice = async (invoiceId: string) => {
-  const response = await axiosClient.get<InvoiceView>(
-    `/api/invoices/${invoiceId}`,
-  );
-  return response.data;
+  // TODO: make API call to fetch Invoice Details
+  console.log(invoiceId);
+  // const response = await axiosClient.get<InvoiceView>(
+  //   `/api/invoices/${invoiceId}`,
+  // );
+
+  return Promise.resolve(staticInvoiceDetails);
 };
 
 export function useInvoiceDetail(invoiceId?: string) {

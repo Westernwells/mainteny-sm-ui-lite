@@ -17,17 +17,21 @@ interface Props {
   password: string;
   passwordError: string | undefined;
   confirmPassword: string;
+  setHeading: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const PasswordResetForm = ({
   handleSubmit,
   handleChange,
+  handleBlur,
   password,
   passwordError,
   confirmPassword,
-  handleBlur,
+  setHeading,
 }: Props) => {
   const [reEnterPassword, setReEnterPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   return (
     <Box mt={3} display="flex" justifyContent="center" width="100%">
@@ -39,13 +43,16 @@ export const PasswordResetForm = ({
           label="Password"
           size="medium"
           fullWidth
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           onChange={handleChange}
           onBlur={handleBlur}
           value={password}
           InputProps={{
             startAdornment: (
-              <InputAdornment position="start">
+              <InputAdornment
+                position="start"
+                onClick={() => setShowPassword(!showPassword)}
+                sx={{cursor: 'pointer'}}>
                 <RemoveRedEye />
               </InputAdornment>
             ),
@@ -62,8 +69,7 @@ export const PasswordResetForm = ({
                 ml={1}
                 color={
                   password.length >= 6 ? 'body1' : 'rgba(143, 155, 179, 0.5)'
-                }
-              >
+                }>
                 Atleast 6 characters
               </Typography>
             </Box>
@@ -77,8 +83,7 @@ export const PasswordResetForm = ({
                 ml={1}
                 color={
                   password.match(/\d/) ? 'body1' : 'rgba(143, 155, 179, 0.5)'
-                }
-              >
+                }>
                 Minimum 1 number
               </Typography>
             </Box>
@@ -91,13 +96,16 @@ export const PasswordResetForm = ({
             label="Re enter password"
             size="medium"
             fullWidth
-            type="password"
+            type={showConfirmPassword ? 'text' : 'password'}
             onChange={handleChange}
             onBlur={handleBlur}
             value={confirmPassword}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start">
+                <InputAdornment
+                  position="start"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  sx={{cursor: 'pointer'}}>
                   <RemoveRedEye />
                 </InputAdornment>
               ),
@@ -110,10 +118,12 @@ export const PasswordResetForm = ({
             disabled={!!(!password || passwordError)}
             sx={{marginTop: 5, width: '100%'}}
             variant="contained"
-            onClick={() => setReEnterPassword(!reEnterPassword)}
+            onClick={() => {
+              setReEnterPassword(!reEnterPassword);
+              setHeading('Confirm your new password');
+            }}
             size="large"
-            endIcon={<ArrowForward />}
-          >
+            endIcon={<ArrowForward />}>
             Next
           </Button>
         ) : (
@@ -124,17 +134,18 @@ export const PasswordResetForm = ({
               variant="contained"
               size="large"
               onClick={() => navigate('/login?authType=reset')}
-              endIcon={<ArrowForward />}
-            >
+              endIcon={<ArrowForward />}>
               Go
             </Button>
             <Button
               sx={{width: '100%', marginTop: 1}}
               variant="outlined"
-              onClick={() => setReEnterPassword(!reEnterPassword)}
+              onClick={() => {
+                setReEnterPassword(!reEnterPassword);
+                setHeading('Set a new password');
+              }}
               size="large"
-              startIcon={<ArrowBack />}
-            >
+              startIcon={<ArrowBack />}>
               Back
             </Button>
           </Box>

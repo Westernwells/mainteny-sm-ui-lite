@@ -1,63 +1,63 @@
 import {useCallback} from 'react';
 import {useQuery} from 'react-query';
-import * as _ from 'lodash';
 import {queryKeys as qk} from 'reactQuery/constants';
 // FIXME: Dummy Import
 import {staticContractDetails} from 'pages/ContractDetails/data';
-import {staticContracts} from 'pages/Contracts/data';
-
-import {axiosClient, paramsSerializer} from 'utils/axios-utils';
+import {
+  staticContracts,
+  staticContractElevatorCount,
+} from 'pages/Contracts/data';
 import {ContractView, QueryContractParams} from 'models/contract';
-import {Resource, RestError, WithOptional} from 'models/misc';
-import {useUserSession} from './useUserSession';
+import {Resource, RestError} from 'models/misc';
+import {useServiceManager} from './useServiceManager';
 
 export const fetchContractElevatorCount = async (contractId: string[]) => {
-  const response = await axiosClient.get<{[key: string]: number}>(
-    `/api/contracts/elevators/count`,
-    {
-      params: {contractId},
-      paramsSerializer,
-    },
-  );
-  return response.data;
+  // TODO: make API call to fetch Contracts
+  console.log(contractId);
+
+  // const response = await axiosClient.get<{[key: string]: number}>(
+  //   `/api/contracts/elevators/count`,
+  //   {
+  //     params: {contractId},
+  //     paramsSerializer,
+  //   },
+  // );
+  return Promise.resolve(staticContractElevatorCount);
 };
 
 export const fetchContracts = async (
   id: string,
   params: QueryContractParams,
 ) => {
-  const response = await axiosClient.get<Resource<ContractView>>(
-    `/api/contracts`,
-    {
-      params,
-      paramsSerializer,
-    },
-  );
+  // TODO: make API call to fetch Contracts
+  console.log(id, params);
+  // const response = await axiosClient.get<Resource<ContractView>>(
+  //   `/api/propertyOwners/${id}/contracts`,
+  //   {
+  //     params,
+  //     paramsSerializer,
+  //   },
+  // );
 
-  return response.data;
+  return Promise.resolve(staticContracts);
 };
-
-Promise.resolve(staticContracts);
 
 const filterContracts = (contractsRes: Resource<ContractView>, filter: {}) => {
   const result = {...contractsRes};
+  console.log(filter);
   // TODO: Filter code goes here
   return result;
 };
 
 export const useQueryContract = (
-  params: WithOptional<QueryContractParams, 'serviceCompanyId'>,
+  params: QueryContractParams,
   // TODO: Write 'interface' for filter object
   filter: {},
 ) => {
-  const {user} = useUserSession();
+  const {data: user} = useServiceManager();
   return useQuery<Resource<ContractView>, RestError, Resource<ContractView>>(
     [qk.contracts, params],
-    () =>
-      fetchContracts(user!.userAccount.id, {
-        ...params,
-        serviceCompanyId: user!.userAccount.serviceCompany.id,
-      }),
+    () => fetchContracts(user!.serviceManager.id, params),
     {
       enabled: !!user,
       select: useCallback(
@@ -92,10 +92,12 @@ export const useContractElevatorCount = (contracts: ContractView[]) => {
 };
 
 const fetchContractDetails = async (contractId: string) => {
-  const response = await axiosClient.get<ContractView>(
-    `/api/contracts/${contractId}`,
-  );
-  return response.data;
+  // TODO: make API call to fetch Contract Details
+  console.log(contractId);
+  // const response = await axiosClient.get<ContractView>(
+  //   `/api/contracts/${contractId}`,
+  // );
+  return Promise.resolve(staticContractDetails);
 };
 export const useContractDetails = (contractId: string) =>
   useQuery([qk.contractDetails, contractId], () =>

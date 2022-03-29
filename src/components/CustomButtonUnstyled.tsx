@@ -36,8 +36,7 @@ export const CustomButtonUnstyled = ({
       },
     }}
     startIcon={startIcon}
-    endIcon={endIcon}
-  >
+    endIcon={endIcon}>
     {label}
   </Button>
 );

@@ -14,14 +14,14 @@ import {GridRowsProp} from '@mui/x-data-grid';
 import {staticContracts, contractWithUnits} from 'pages/Contracts/data';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {columns, makeRows} from 'pages/Contracts/ContractsDataGridProps';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging-utils';
 import {ContractView} from 'models/contract';
 import {CustomerDetailsWidgets} from './CustomerDetailsWidgets';
 
 export const CustomerDetails = () => {
   const theme = useTheme();
   const [_expiryDate, setExpiryDate] = useState<string[]>([]);
-  const [showFilter, _setShowFilter] = useState(false);
+  const [showFilter] = useState(false);
   const [_contractor, setContractor] = useState<string[]>([]);
   const [_cost, setCost] = useState<number[][]>([]);
   const [contractorFilterItems, setConractorFileterItems] = useState<string[]>(
@@ -30,6 +30,9 @@ export const CustomerDetails = () => {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const {data: contractResource = createEmptyResource<ContractView>(10)} =
     staticContracts;
+
+  console.log(_expiryDate, _contractor, _cost, contractResource);
+
   useEffect(() => {
     const options: string[] = [];
     console.log('test');
@@ -61,8 +64,7 @@ export const CustomerDetails = () => {
       <BasicDetailsCard
         minHeight="12rem"
         headerStyles={{pb: '0'}}
-        header={<Typography variant="subtitle1">#785371</Typography>}
-      >
+        header={<Typography variant="subtitle1">#785371</Typography>}>
         <Box display="flex" flexWrap="wrap">
           <CardProps
             label="CUSTOMER NAME"

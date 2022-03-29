@@ -102,7 +102,7 @@ export const columns: GridColDef[] = [
     renderHeader: (params) => (
       <Typography variant="subtitle2">{params.colDef.headerName}</Typography>
     ),
-    renderCell: (params) => (
+    renderCell: () => (
       <FileDownloadOutlinedIcon
         sx={{color: '#2196F3'}}
         // onClick={async () => {
