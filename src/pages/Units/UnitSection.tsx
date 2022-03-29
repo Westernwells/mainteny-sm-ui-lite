@@ -5,27 +5,17 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/system/Box';
 import {StatusChip} from 'components/StatusChip';
-import {FormikErrors} from 'formik';
 import {ElevatorsByAddress} from './Models';
 import {formatDate, toDate} from '../../utils/datetime';
 import {ElevatorStatus} from '../../models/elevator';
 
 export interface UnitsSectionProperty {
-  // TODO: Check this 'any' type
-  elevatorsByAddress: ElevatorsByAddress | any;
-  setField: (
-    field: string,
-    value: any,
-    shouldValidate?: boolean | undefined,
-  ) => Promise<void> | Promise<FormikErrors<any>>;
+  elevatorsByAddress: ElevatorsByAddress;
 }
 
-export const UnitSection = ({
-  elevatorsByAddress,
-  setField,
-}: UnitsSectionProperty) => {
+export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
   const navigate = useNavigate();
-  console.log(typeof setField);
+
   return (
     <Box
       sx={{
@@ -41,8 +31,8 @@ export const UnitSection = ({
           {elevatorsByAddress.address.fullName}
         </Typography>
       </Box>
-      {/* TODO: Check this 'any' type */}
-      {elevatorsByAddress.elevators.map((elevatorOrder: any) => (
+
+      {elevatorsByAddress.elevators.map((elevatorOrder) => (
         <Grid
           key={elevatorOrder.elevator.id}
           container
@@ -64,7 +54,7 @@ export const UnitSection = ({
             }}>
             <Box display="flex" alignItems="center">
               <Elevator style={{marginRight: '10px'}} />
-              <Typography variant="subtitle1">
+              <Typography variant="body2">
                 {elevatorOrder.elevator.model}
               </Typography>
             </Box>
@@ -80,13 +70,13 @@ export const UnitSection = ({
               alignItems: 'center',
             }}>
             <Grid item xs={2}>
-              <Typography variant="largeBtnText">
+              <Typography variant="body2">
                 {elevatorOrder.elevator.lastVisitDate || 'N/A'}
               </Typography>
             </Grid>
 
             <Grid item xs={2}>
-              <Typography variant="largeBtnText">
+              <Typography variant="body2">
                 {' '}
                 {(elevatorOrder.serviceOrder &&
                   formatDate(
@@ -98,7 +88,7 @@ export const UnitSection = ({
 
             <Grid item xs={2}>
               <Typography
-                variant="largeBtnText"
+                variant="body2"
                 color={
                   elevatorOrder.elevator.availability < 100
                     ? 'textWarning'

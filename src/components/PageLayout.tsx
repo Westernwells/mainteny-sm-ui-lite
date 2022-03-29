@@ -19,9 +19,8 @@ export const PageLayout = ({
   <Box
     maxWidth="100%"
     display="flex"
-    minHeight="100vh"
+    height="100vh"
     sx={{
-      // We can design a custom scrollbar here, we can also make showing scrollbar optional
       overflowY: overflowY ? 'scroll' : 'hidden',
       '::-webkit-scrollbar': {
         width: 0,

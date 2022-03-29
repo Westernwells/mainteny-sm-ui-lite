@@ -10,7 +10,6 @@ interface Props {
   personName?: string;
   companyName?: string;
   email?: string;
-  partyRole?: string;
   partyType?: string;
   containerStyle?: {[key: string]: string | number};
   chipTextColor?: string;
@@ -33,7 +32,6 @@ export const ContractParties = ({
   personName,
   companyName,
   email,
-  partyRole,
   partyType,
   containerStyle,
   chipTextColor,
@@ -48,12 +46,6 @@ export const ContractParties = ({
         <Box display="flex" flexDirection="column">
           <Typography variant="subtitle1" sx={{display: 'block'}}>
             {personName || ''}
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{display: 'block'}}
-            color="textSecondary">
-            {partyRole || ''}
           </Typography>
         </Box>
       </Box>

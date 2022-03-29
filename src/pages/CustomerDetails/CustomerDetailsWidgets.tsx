@@ -45,7 +45,6 @@ export const CustomerDetailsWidgets = ({containerStyle}: Props) => {
         <Widget
           hideViewOption
           searchPlaceholder="Try 'Astralift BV'"
-          onSearchTextChanged={() => {}}
           setShowFilter={() => {}}
           showFilter={false}
         />

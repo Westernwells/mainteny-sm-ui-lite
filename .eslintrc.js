@@ -24,13 +24,14 @@ module.exports = {
     'react/jsx-fragments': 'off',
     'react/jsx-filename-extension': [1, {extensions: ['.tsx']}],
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error'], // TODO: enable it later
+    '@typescript-eslint/no-unused-vars': ['error'],
     'no-shadow': 'off',
     'no-param-reassign': 0,
     '@typescript-eslint/no-shadow': ['error'],
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': ['error'],
     'no-console': 'off',
+    'react/no-array-index-key': 'off',
     'react/require-default-props': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react/function-component-definition': [

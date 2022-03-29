@@ -1,6 +1,5 @@
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import Fade from '@mui/material/Fade';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
@@ -10,27 +9,32 @@ import {
   useContractElevatorCount,
   useQueryContract,
 } from 'hooks/reactQuery/useContract';
+import {ContractOrderField, ContractView} from 'models/contract';
+import {Order} from 'models/misc';
+import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {PageOverviewLayout} from 'components/PageOverviewLayout';
+import {Widget} from 'components/Widget';
+import {CustomPagination} from 'components/CustomPagination';
+import {costRangeConvertor as crConverter} from 'utils/contract-utils';
 import {columns, makeRows} from './ContractsDataGridProps';
-import {ContractOrderField, ContractView} from '../../models/contract';
-import {Order} from '../../models/misc';
-import {createEmptyResource, makePage} from '../../utils/paging-utils';
-import {Widget} from '../../components/Widget';
 
-const pageSize = 10;
+const pageSize = 25;
 
 export const Contracts = () => {
   const [search, setSearch] = useState('');
-  const [page] = useState(makePage(0, pageSize));
+
+  const [page, setPage] = useState(makePage(0, pageSize));
   const [showFilter, setShowFilter] = useState(false);
   const [expiryDate, setExpiryDate] = useState<string[]>([]);
   const [contractor, setContractor] = useState<string[]>([]);
   const [cost, setCost] = useState<number[][]>([]);
-  const [contractorFilterItems, setConractorFileterItems] = useState<string[]>(
+  const [pageCount, setPageCount] = useState(0);
+  const [contractorFilterItems, setContractorFilterItems] = useState<string[]>(
     [],
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
 
-  const {data: contractResource = createEmptyResource<ContractView>(10)} =
+  const {data: contractResource = createEmptyResource<ContractView>(pageSize)} =
     useQueryContract(
       {
         order: Order.DESC,
@@ -41,41 +45,20 @@ export const Contracts = () => {
         status: [],
       },
       {expiryDate, contractor, price: cost},
+      {keepPreviousData: true},
     );
   const {data: contractWithUnits} = useContractElevatorCount(
     contractResource.data,
+    {keepPreviousData: true},
   );
 
   const costRangeConvertor = (selectedItems: string[]) => {
-    const range: number[][] = [];
-    selectedItems.forEach((item) => {
-      switch (item) {
-        case 'Below 1000 €':
-          range.push([0, 1000]);
-          break;
-
-        case '1000 - 3000 €':
-          range.push([1000, 3000]);
-          break;
-
-        case '3000 - 5000 €':
-          range.push([3000, 5000]);
-          break;
-
-        case 'Above 5000 €':
-          range.push([5000, 99999]);
-          break;
-
-        default:
-          break;
-      }
-    });
+    const range = crConverter(selectedItems);
     setCost(range);
   };
 
   useEffect(() => {
     const options: string[] = [];
-    console.log('test');
 
     if (contractWithUnits) {
       // TODO: Resolve 'any' here
@@ -91,7 +74,7 @@ export const Contracts = () => {
     } else {
       setRows([]);
     }
-    setConractorFileterItems([...contractorFilterItems, ...options]);
+    setContractorFilterItems([...contractorFilterItems, ...options]);
     if (!showFilter) {
       setExpiryDate([]);
       setContractor([]);
@@ -99,21 +82,21 @@ export const Contracts = () => {
     }
   }, [contractWithUnits, showFilter]);
 
+  useEffect(() => {
+    setPageCount(Math.ceil(contractResource.total / page.pageSize));
+  }, [contractResource, page.pageSize]);
+
   return (
-    <Box>
-      <Box display="flex" justifyContent="space-between">
-        <Box sx={{mb: 4}}>
-          <Typography variant="h4">Contracts</Typography>
-        </Box>
-        <Box mt={1}>
-          <Widget
-            searchPlaceholder="Try 'Astralift BV'"
-            onSearchTextChanged={setSearch}
-            setShowFilter={setShowFilter}
-            showFilter={showFilter}
-          />
-        </Box>
-      </Box>
+    <PageOverviewLayout
+      label="Contracts"
+      renderWidget={
+        <Widget
+          searchPlaceholder="Try 'Astralift BV'"
+          getSearchValue={(val: string) => setSearch(val)}
+          setShowFilter={setShowFilter}
+          showFilter={showFilter}
+        />
+      }>
       <Fade in={showFilter} unmountOnExit>
         <Box>
           <FilterFields setShowFilter={setShowFilter}>
@@ -149,7 +132,22 @@ export const Contracts = () => {
           </FilterFields>
         </Box>
       </Fade>
-      <DataGridLayout rows={rows} columns={columns} />
-    </Box>
+      <Box>
+        <DataGridLayout hideFooter rows={rows} columns={columns} />
+        {pageCount && page.pageSize < contractResource.total ? (
+          <CustomPagination
+            pageSize={page.pageSize}
+            handlePageSizeChange={(newPageSize: number) =>
+              setPage({...page, pageSize: newPageSize})
+            }
+            handlePageChange={(newPage: number) => {
+              setPage({...page, pageIndex: newPage - 1});
+            }}
+            pageCount={pageCount}
+            totalRows={contractResource.total}
+          />
+        ) : null}
+      </Box>
+    </PageOverviewLayout>
   );
 };

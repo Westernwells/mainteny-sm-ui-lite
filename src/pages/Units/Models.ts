@@ -1,6 +1,5 @@
-import {addDays, setHours, setMinutes} from 'date-fns';
 import {ElevatorView} from '../../models/elevator';
-import {ServiceOrder, ServiceOrderView} from '../../models/service-order';
+import {ServiceOrderView} from '../../models/service-order';
 import {Address} from '../../models/misc';
 import {getDateObject} from '../../utils/datetime';
 

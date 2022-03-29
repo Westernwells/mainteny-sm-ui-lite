@@ -1,49 +1,48 @@
 import {useEffect, useRef, useState} from 'react';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import {ElevatorView} from 'models/elevator';
-
 import {Widget} from 'components/Widget';
+import {useFetchServiceOrdersByElevators} from 'hooks/reactQuery/useServiceOrder';
 import Fade from '@mui/material/Fade';
-import {useFormik} from 'formik';
-import * as Yup from 'yup';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
+import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {FilterFields} from 'components/FilterFields';
-import {elevatorResponse, elevatorsByAddressList} from './dummyData';
+import {PageOverviewLayout} from 'components/PageOverviewLayout';
+import {CustomPagination} from 'components/CustomPagination';
 import {UnitSection} from './UnitSection';
 import {UnitsMapsView} from './UnitsMapsView';
 import {UnitColumns} from './UnitColumns';
 
-interface FormikFields {
-  description: string;
-  elevator?: ElevatorView;
-  moreInformation: string;
-}
+const pageInfo = makePage(0, 50);
 
-const validationSchema = Yup.object().shape({
-  description: Yup.string().required('description is required'),
-});
 export const MyUnits = () => {
   const fallback = useRef({
     elevator: createEmptyResource<ElevatorView>(10),
     centerCoord: {longitude: 0, latitude: 0},
   }).current;
-  const [_search, setSearch] = useState('');
-  // const [_page, _setPage] = useState(makePage(0, 10)); // TODO: implement paging
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(pageInfo);
+  const [pageCount, setPageCount] = useState(0);
   const [showFilter, setShowFilter] = useState(false);
-  const [_availability, setAvailability] = useState<number[][]>([]);
-  const [_status, setStatus] = useState<string[]>([]);
-  const [_nextVisit, setNextVisit] = useState<string[]>([]);
+  const [availability, setAvailability] = useState<number[][]>([]);
+  const [status, setStatus] = useState<string[]>([]);
+  const [nextVisit, setNextVisit] = useState<string[]>([]);
   const [showMapview, setShowMapview] = useState(false);
-  console.log(fallback, _search, _availability, _status, _nextVisit);
-  // const {data: elevatorResponse = fallback} = useAllElevators(search, page, {
-  //   status,
-  // });
-  // const {data: elevatorsByAddressList} = useFetchServiceOrdersByElevators(
-  //   elevatorResponse.elevator,
-  //   {nextVisit, availabilityRange: availability},
-  // );
+
+  const {data: elevatorResponse = fallback} = useAllElevators(
+    search,
+    page,
+    {
+      status,
+    },
+    {keepPreviousData: true},
+  );
+  const {data: elevatorsByAddressList} = useFetchServiceOrdersByElevators(
+    elevatorResponse.elevator,
+    {nextVisit, availabilityRange: availability},
+    {keepPreviousData: true},
+  );
 
   const availabilityRangeConvertor = (selectedItems: string[]) => {
     const range: number[][] = [];
@@ -72,25 +71,6 @@ export const MyUnits = () => {
     setAvailability(range);
   };
 
-  const formik = useFormik<FormikFields>({
-    initialValues: {
-      description: '',
-      elevator: undefined,
-      moreInformation: '',
-    },
-    onSubmit: async (values, {resetForm}) => {
-      const body = {...values, elevatorId: values?.elevator?.id};
-      delete body.elevator;
-      // setModalOpen(false);
-      resetForm();
-    },
-    validationSchema,
-  });
-
-  const onSearchTextChanged = (value: string) => {
-    setSearch(value);
-  };
-
   const openMapView = () => {
     setShowMapview(true);
   };
@@ -100,6 +80,12 @@ export const MyUnits = () => {
   };
 
   useEffect(() => {
+    if (elevatorsByAddressList) {
+      setPageCount(Math.ceil(elevatorResponse.elevator.total / page.pageSize));
+    }
+  }, [elevatorsByAddressList, page]);
+
+  useEffect(() => {
     if (!showFilter) {
       setStatus([]);
       setNextVisit([]);
@@ -107,24 +93,18 @@ export const MyUnits = () => {
     }
   }, [showFilter]);
   return (
-    <Box>
-      <Box display="flex" justifyContent="space-between" maxWidth="100%">
-        <Box sx={{mb: 4, mt: 1}}>
-          <Typography variant="h4">Units</Typography>
-        </Box>
-        <Box>
-          <Widget
-            searchPlaceholder="Try ‘Schindler’ or ‘Mitsubishi’"
-            onSearchTextChanged={onSearchTextChanged}
-            openMapView={openMapView}
-            closeMapView={closeMapView}
-            mapViewActive={showMapview}
-            setShowFilter={setShowFilter}
-            showFilter={showFilter}
-          />
-        </Box>
-      </Box>
-
+    <PageOverviewLayout
+      label="Units"
+      renderWidget={
+        <Widget
+          searchPlaceholder="Try ‘Schindler’ or ‘Mitsubishi’"
+          getSearchValue={(val: string) => setSearch(val)}
+          openMapView={openMapView}
+          closeMapView={closeMapView}
+          setShowFilter={setShowFilter}
+          showFilter={showFilter}
+        />
+      }>
       <Fade in={showFilter} unmountOnExit>
         <Box>
           <FilterFields setShowFilter={setShowFilter}>
@@ -155,15 +135,31 @@ export const MyUnits = () => {
         <>
           <UnitColumns />
           <Box
-            sx={{height: '69vh', overflowY: 'scroll', paddingBottom: '1rem'}}>
+            sx={{
+              height: 'max(400px, 55vh)',
+              maxHeight: '73vh',
+              overflowY: 'scroll',
+            }}>
             {elevatorsByAddressList?.map((elevatorsByAddress) => (
               <UnitSection
                 key={elevatorsByAddress.address.id}
                 elevatorsByAddress={elevatorsByAddress}
-                setField={formik.setFieldValue}
               />
             ))}
           </Box>
+          {pageCount ? (
+            <CustomPagination
+              pageSize={page.pageSize}
+              handlePageSizeChange={(newPageSize: number) =>
+                setPage({...page, pageSize: newPageSize})
+              }
+              handlePageChange={(newPage: number) => {
+                setPage({...page, pageIndex: newPage - 1});
+              }}
+              pageCount={pageCount}
+              totalRows={elevatorResponse.elevator.total}
+            />
+          ) : null}
         </>
       ) : (
         <UnitsMapsView
@@ -171,6 +167,6 @@ export const MyUnits = () => {
           centerCoord={elevatorResponse?.centerCoord}
         />
       )}
-    </Box>
+    </PageOverviewLayout>
   );
 };

@@ -5,58 +5,68 @@ import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 
 import IconButton from '@mui/material/IconButton';
+import useTheme from '@mui/material/styles/useTheme';
 
 export interface Props {
   children: ReactNode;
-  headerLabel: string;
   headerContainerOverrideStyles?: {[key: string]: string | number};
   headerTextOverrideStyles?: {[key: string]: string | number};
   headerActionIcon?: JSX.Element;
   minHeight?: number | string;
   contentPadding?: string | number;
+  headerLabel?: string;
+  customHeader?: JSX.Element;
 }
 
 export const PageCard = ({
   children,
-  headerLabel,
+  headerLabel = '',
   headerContainerOverrideStyles,
   headerTextOverrideStyles,
   headerActionIcon,
   minHeight,
   contentPadding,
-}: Props) => (
-  <Card
-    sx={{
-      minHeight: minHeight || '26rem',
-      boxShadow: '0px 4px 15px rgba(144, 144, 144, 0.2)',
-    }}>
-    <CardHeader
+  customHeader,
+}: Props) => {
+  const theme = useTheme();
+  return (
+    <Card
       sx={{
-        height: '2rem',
-        mt: '1em',
-        mx: '0.5em',
-        ...headerContainerOverrideStyles,
-      }}
-      action={
-        headerActionIcon ? (
-          <IconButton aria-label="settings">{headerActionIcon}</IconButton>
-        ) : null
-      }
-      title={
-        <Typography
-          variant="subtitle2"
-          sx={{
-            ...headerTextOverrideStyles,
-          }}>
-          {headerLabel}
-        </Typography>
-      }
-    />
-    <CardContent
-      sx={{
-        px: contentPadding || 'default',
+        minHeight: minHeight || '26rem',
+        boxShadow: '0px 4px 15px rgba(144, 144, 144, 0.2)',
       }}>
-      {children}
-    </CardContent>
-  </Card>
-);
+      <CardHeader
+        sx={{
+          background: theme.palette.inputBackground.main,
+          height: '2rem',
+          mt: '1em',
+          mx: '0.5em',
+          ...headerContainerOverrideStyles,
+        }}
+        action={
+          headerActionIcon ? (
+            <IconButton aria-label="settings">{headerActionIcon}</IconButton>
+          ) : null
+        }
+        title={
+          customHeader || (
+            <Typography
+              variant="subtitle1"
+              sx={{
+                color: theme.palette.text.primary,
+                ...headerTextOverrideStyles,
+              }}>
+              {headerLabel}
+            </Typography>
+          )
+        }
+      />
+      <CardContent
+        sx={{
+          px: contentPadding || 'default',
+        }}>
+        {children}
+      </CardContent>
+    </Card>
+  );
+};

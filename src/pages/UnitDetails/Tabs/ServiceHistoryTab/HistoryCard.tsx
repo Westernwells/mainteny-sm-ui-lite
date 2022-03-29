@@ -16,8 +16,17 @@ import Collapse from '@mui/material/Collapse';
 import CardActions from '@mui/material/CardActions';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {styled} from '@mui/material/styles';
+import {
+  ServiceOrderReport,
+  ServiceOrderStatus,
+  ServiceOrderView,
+} from 'models/service-order';
 // import {MaintenanceBasicInfo} from './ServiceBasicInfo';
+import {formatDistance, isAfter, isToday} from 'date-fns';
+import {calculateNextVisitDate} from 'pages/Units/Models';
+import {useEffect, useState} from 'react';
 import {HistoryCardHeader} from './HistoryCardHeader';
+import {HitoryCardEmptyState} from './HitoryCardEmptyState';
 
 interface Props {
   bodyContainerStyle?: {[key: string]: string | number};
@@ -33,14 +42,23 @@ interface Props {
   removeBottomRightRadius?: boolean;
   removeServiceOrderType?: boolean;
   removeServiceOrderStatus?: boolean;
-  headerTitle?: string;
-  subtitle?: string;
+  headerTitle?: string | null;
+  subtitle?: string | null;
   showMoreReportDetails?: boolean;
   showAlert?: boolean;
   collapsedChildren?: JSX.Element | null;
   expanded?: boolean;
   handleExpandClick?: () => void;
-  showMoreSection?: true;
+  showActionSection?: true;
+  showPointer?: boolean;
+  selected?: boolean;
+  onCardSelect?: () => void;
+  serviceOrder?: ServiceOrderView;
+  serviceOrderReport?: ServiceOrderReport;
+  description?: string;
+  noContent?: boolean;
+  reportIsLoading?: boolean;
+  scheduledTime?: string;
 }
 
 interface ExpandMoreProps extends IconButtonProps {
@@ -76,21 +94,67 @@ export const HistoryCard = ({
   subtitle,
   showMoreReportDetails,
   showAlert,
-  showMoreSection,
+  showActionSection,
   collapsedChildren = null,
   expanded = false,
   handleExpandClick = () => {},
+  showPointer,
+  selected,
+  onCardSelect = () => {},
+  serviceOrder,
+  serviceOrderReport,
+  description,
+  noContent,
+  reportIsLoading,
+  scheduledTime,
 }: Props) => {
   const theme = useTheme();
+  const [duration, setDuration] = useState<string[]>([]);
+  const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (serviceOrderReport) {
+      const timeString = serviceOrderReport
+        ? serviceOrderReport.actualServiceTime / 60
+        : 0;
+      const date = new Date(0, 0);
+      date.setMinutes(+timeString * 60);
+
+      const d = date.toTimeString().slice(0, 5).split(':');
+      setDuration(d);
+    }
+  }, [serviceOrderReport]);
+
+  useEffect(() => {
+    if (serviceOrder) {
+      let msg = '';
+      const serviceDate = new Date(serviceOrder!.schedules[0].startTime);
+      const technician = `${serviceOrder?.schedules[0].technician.userAccount.firstName} ${serviceOrder?.schedules[0].technician.userAccount.lastName}`;
+      if (isAfter(serviceDate, new Date())) {
+        msg = `${technician} will be visiting your location in ${formatDistance(
+          calculateNextVisitDate(serviceOrder?.schedules[0].startTime!),
+          new Date(),
+        )}`;
+      } else if (isToday(serviceDate)) {
+        msg = `${technician} will visit your location today`;
+      }
+
+      setMessage(msg);
+    }
+  }, [serviceOrder]);
+
   return (
     <Card
+      onClick={onCardSelect}
       sx={{
-        border: 'none',
         boxShadow: removeShadows ? 'none' : 'default',
         borderTopLeftRadius: removeTopLeftRadius ? 0 : 'default',
         borderTopRightRadius: removeTopRightRadius ? 0 : 'default',
         borderBottomRightRadius: removeBottomRightRadius ? 0 : 'default',
         borderBottomLeftRadius: removeBottomLeftRadius ? 0 : 'default',
+        cursor: showPointer ? 'pointer' : 'default',
+        background: selected ? theme.palette.secondary.outlinedHoverBg : null,
+        border: selected ? `1px solid ${theme.palette.secondary.main}` : 'none',
         minHeight,
         ...containerStyles,
       }}>
@@ -106,6 +170,8 @@ export const HistoryCard = ({
             removeServiceOrderStatus={removeServiceOrderStatus}
             headerTitle={headerTitle}
             subtitle={subtitle}
+            serviceOrderType={serviceOrder?.type}
+            serviceOrderStatus={serviceOrder?.status}
           />
         }
       />
@@ -115,60 +181,77 @@ export const HistoryCard = ({
           mt: isDetailCard ? '2em' : 'default',
           ...bodyContainerStyle,
         }}>
-        <Typography variant={isDetailCard ? 'body1' : 'caption'}>
-          Checked the inner shaft of the elevator engine door....
-        </Typography>
-
-        {showTimeCategory ? (
-          <Box display="flex" mt="2.5em">
-            <CardProps
-              label="Scheduled Time"
-              bodyTextVariant="subtitle1"
-              icon={<LockClockIcon color="info" />}
-              iconBackground={theme.palette.info.outlinedHoverBg}
-              bodyText="24 Sep 2021, 5 PM - 7PM "
-            />
-            <CardProps
-              label="Preferred Time"
-              bodyTextVariant="body1"
-              icon={<AccessTimeIcon color="warning" />}
-              iconBackground={theme.palette.warning.outlinedHoverBg}
-              bodyText="24 Sep 2021, 3PM"
-            />
-          </Box>
+        {noContent && !reportIsLoading ? (
+          <HitoryCardEmptyState label={message} />
         ) : null}
+        {reportIsLoading ? (
+          <Typography>Loading</Typography>
+        ) : (
+          <>
+            <Typography variant={isDetailCard ? 'body1' : 'caption'}>
+              {description}
+            </Typography>
 
-        {showMoreReportDetails ? (
-          <Box display="flex" mt="2.5em">
-            <CardProps
-              label="Technician"
-              bodyTextVariant="body1"
-              icon={<PersonOutlineOutlinedIcon color="info" />}
-              iconBackground={theme.palette.info.outlinedHoverBg}
-              bodyText="John Doe"
-            />
-            <CardProps
-              label="Cost"
-              bodyTextVariant="caption"
-              icon={<MonetizationOnOutlinedIcon color="success" />}
-              iconBackground={theme.palette.success.outlinedHoverBg}
-              bodyText="9,700 EUR"
-            />
+            {showTimeCategory ? (
+              <Box display="flex" mt="2.5em">
+                <CardProps
+                  label="Scheduled Time"
+                  bodyTextVariant="subtitle1"
+                  icon={<LockClockIcon color="info" />}
+                  iconBackground={theme.palette.info.outlinedHoverBg}
+                  bodyText={scheduledTime || ''}
+                />
+                <CardProps
+                  label="Preferred Time"
+                  bodyTextVariant="body1"
+                  icon={<AccessTimeIcon color="warning" />}
+                  iconBackground={theme.palette.warning.outlinedHoverBg}
+                  bodyText="24 Sep 2021, 3PM"
+                />
+              </Box>
+            ) : null}
 
-            <CardProps
-              label="Duration"
-              bodyTextVariant="body1"
-              icon={<TimerOutlinedIcon color="warning" />}
-              iconBackground={theme.palette.warning.outlinedHoverBg}
-              bodyText="45 mins"
-            />
-          </Box>
-        ) : null}
-        {showAlert ? (
-          <CardAlert message="Chris Anderson will be visiting your location in the next 20 minutes" />
-        ) : null}
+            {showMoreReportDetails ? (
+              <Box display="flex" mt="2.5em">
+                <CardProps
+                  label="Technician"
+                  bodyTextVariant="body1"
+                  icon={<PersonOutlineOutlinedIcon color="info" />}
+                  iconBackground={theme.palette.info.outlinedHoverBg}
+                  bodyText={`${serviceOrder?.schedules[0].technician.userAccount.firstName}
+                 ${serviceOrder?.schedules[0].technician.userAccount.lastName}`}
+                />
+                <CardProps
+                  label="Cost"
+                  bodyTextVariant="caption"
+                  icon={<MonetizationOnOutlinedIcon color="success" />}
+                  iconBackground={theme.palette.success.outlinedHoverBg}
+                  bodyText={
+                    serviceOrderReport?.fee.amount
+                      ? `${serviceOrderReport?.fee.amount} EUR`
+                      : '0 EUR'
+                  }
+                />
+
+                <CardProps
+                  label="Duration"
+                  bodyTextVariant="body1"
+                  icon={<TimerOutlinedIcon color="warning" />}
+                  iconBackground={theme.palette.warning.outlinedHoverBg}
+                  bodyText={`${+duration[0]}hrs ${
+                    Number(duration[1]) > 0 ? `${+duration[1]}mins` : ''
+                  }`}
+                />
+              </Box>
+            ) : null}
+            {showAlert &&
+            serviceOrder?.status === ServiceOrderStatus.SCHEDULED ? (
+              <CardAlert message={message} />
+            ) : null}
+          </>
+        )}
       </CardContent>
-      {showMoreSection ? (
+      {!noContent && showActionSection ? (
         <>
           <CardActions
             disableSpacing

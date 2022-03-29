@@ -47,7 +47,7 @@ export const ContractTimeline = ({
 
       <Box
         sx={{
-          height: '25vh',
+          height: '63.5vh',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',

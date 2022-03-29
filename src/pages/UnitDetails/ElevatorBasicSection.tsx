@@ -30,8 +30,7 @@ export const ElevatorBasicSection = ({
         <Box
           key={`${item}-${index}`}
           display="flex"
-          mt={index !== 0 ? '1.3em' : undefined}
-        >
+          mt={index !== 0 ? '1.3em' : undefined}>
           <Box
             display="flex"
             width="15rem"

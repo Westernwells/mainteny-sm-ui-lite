@@ -1,5 +1,5 @@
 import {useCallback} from 'react';
-import {useQuery} from 'react-query';
+import {useQuery, UseQueryOptions} from 'react-query';
 import * as _ from 'lodash';
 import {AxiosResponse} from 'axios';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
@@ -14,13 +14,13 @@ import {
 } from 'date-fns';
 import {queryKeys} from 'reactQuery/constants';
 import {ServiceCompanyTimeUnit} from 'models/service-company';
-import {toDate, toRestDate, toRestDateTime} from 'utils/datetime';
+import {toDate, toRestDate} from 'utils/datetime';
 import {
   ServiceOrderOrderField,
   ServiceOrderReport,
   ServiceOrderView,
 } from '../../models/service-order';
-import {Order, Resource, RestError, OrderBy} from '../../models/misc';
+import {Order, Resource, RestError} from '../../models/misc';
 import {
   ElevatorAvailability,
   ElevatorAvailabilityParams,
@@ -224,6 +224,7 @@ export function useServiceOrders(params: any) {
 export function useFetchServiceOrdersByElevators(
   elevatorRes: Resource<ElevatorView>,
   filter: {nextVisit: string[]; availabilityRange: number[][]},
+  options?: UseQueryOptions<any, any, any>,
 ) {
   const {user} = useUserSession();
   const elevatorIds = elevatorRes?.data.map((elevator) => elevator.id);
@@ -250,6 +251,7 @@ export function useFetchServiceOrdersByElevators(
         order: Order.DESC,
       }),
     {
+      ...options,
       enabled: !!user && !!availability,
       select: useCallback(
         (serviceOrderView: Resource<ServiceOrderView>) => {

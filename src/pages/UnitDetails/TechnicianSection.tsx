@@ -90,8 +90,7 @@ export const TechnicianSection = ({maintainers}: TechnicianSectionProp) => {
         <Box
           key={`${item}-${index}`}
           display="flex"
-          mt={index !== 0 ? '1.3em' : undefined}
-        >
+          mt={index !== 0 ? '1.3em' : undefined}>
           <Box mr="1.2em">
             {index === 0 ? (
               <Box>

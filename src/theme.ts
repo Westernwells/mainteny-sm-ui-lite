@@ -282,6 +282,7 @@ export const theme = createTheme({
             letterSpacing: '0.15px',
           },
         },
+
         {
           props: {variant: 'mediumBtnText'},
           style: {
@@ -353,6 +354,15 @@ export const theme = createTheme({
           },
         },
       ],
+    },
+    MuiToggleButton: {
+      styleOverrides: {
+        root: {
+          '&.Mui-selected': {
+            color: '#222B45',
+          },
+        },
+      },
     },
   },
 });

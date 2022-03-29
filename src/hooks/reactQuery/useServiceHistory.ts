@@ -1,5 +1,3 @@
-import {ServiceOrderType} from 'models/service-order';
-import {useCallback} from 'react';
 import {useQuery} from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';

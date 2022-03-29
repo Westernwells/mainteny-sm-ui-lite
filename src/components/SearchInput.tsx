@@ -28,6 +28,7 @@ export const Searchnput = ({placeholder, onValueChanged}: Props) => {
         boxShadow: 0,
         width: '23rem',
         border: '1px solid #E4E9F2',
+        height: 48,
       }}>
       <IconButton
         type="submit"

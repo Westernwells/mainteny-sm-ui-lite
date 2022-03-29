@@ -1,20 +1,14 @@
 import {useCallback} from 'react';
-import {useQuery} from 'react-query';
+import {useQuery, UseQueryOptions} from 'react-query';
 import * as _ from 'lodash';
 import getCenter from 'geolib/es/getCenter';
 import {AxiosResponse} from 'axios';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {queryKeys} from 'reactQuery/constants';
+import {useNavigate} from 'react-router';
 
 import {Elevator, ElevatorView} from '../../models/elevator';
-import {
-  Location,
-  Page,
-  Priority,
-  Resource,
-  RestError,
-  State,
-} from '../../models/misc';
+import {Location, Page, Resource, RestError} from '../../models/misc';
 import {MaintainerView} from '../../models/technician';
 import {useUserSession} from './useUserSession';
 
@@ -91,14 +85,19 @@ const filterElevator = (
   return result;
 };
 
-export const useElevatorById = (elevatorId?: string) =>
-  useQuery(
+export const useElevatorById = (elevatorId?: string) => {
+  const navigate = useNavigate();
+  return useQuery(
     [queryKeys.elevatorById, elevatorId],
     () => fetchElevator(elevatorId!),
     {
       enabled: !!elevatorId,
+      onError: (e: any) => {
+        if (e.response.status === 500) navigate('/404');
+      },
     },
   );
+};
 
 export const useElevatorMaintainers = (elevatorId?: string) =>
   useQuery(
@@ -113,6 +112,7 @@ export function useAllElevators(
   query: string,
   page: Page,
   filter: {status: string[]},
+  options?: UseQueryOptions<any, any, any>,
 ) {
   const {user} = useUserSession();
   return useQuery<
@@ -128,6 +128,7 @@ export function useAllElevators(
     ],
     () => fetchElevators(query, page, user!.userAccount.serviceCompany.id),
     {
+      ...options,
       enabled: !!user,
       select: useCallback(
         (elevatorResponse: Resource<ElevatorView>) => {

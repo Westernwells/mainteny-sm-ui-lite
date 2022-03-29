@@ -1,68 +1,48 @@
+import {useState} from 'react';
 import Box from '@mui/material/Box';
-import React from 'react';
+import {CustomProgress} from 'components/CustomProgress';
 
-export const HistoryAttachments = () => (
-  <Box sx={{display: 'flex', flexWrap: 'wrap'}}>
+interface Props {
+  downloadUrl?: string[];
+}
+
+export const HistoryAttachments = ({downloadUrl}: Props) => {
+  const [loaded, setLoaded] = useState(false);
+  return (
     <Box
       sx={{
-        width: '10.0625rem',
-        height: '7.5rem',
-
-        borderRadius: 1,
-        mr: '1em',
-
-        mt: '0.5em',
+        display: 'flex',
+        flexWrap: 'wrap',
       }}>
-      <img
-        src={`${process.env.REACT_APP_BASE_URL}/images/1.png`}
-        alt=""
-        style={{objectFit: 'cover', height: '100%', width: '100%'}}
-      />
-    </Box>
-    <Box
-      sx={{
-        width: '10.0625rem',
-        height: '7.5rem',
+      {!loaded ? (
+        <Box sx={{display: 'flex', justifyContent: 'center', width: '100%'}}>
+          <CustomProgress />
+        </Box>
+      ) : null}
+      {downloadUrl?.map((item, index) => (
+        <Box
+          sx={{
+            width: '10.0625rem',
+            height: '7.5rem',
+            visibility: !loaded ? 'hidden' : 'visible',
 
-        borderRadius: 1,
-        mr: '1em',
-        mt: '0.5em',
-      }}>
-      <img
-        src={`${process.env.REACT_APP_BASE_URL}/images/2.png`}
-        alt=""
-        style={{objectFit: 'cover', height: '100%', width: '100%'}}
-      />
-    </Box>
-    <Box
-      sx={{
-        width: '10.0625rem',
-        height: '7.5rem',
+            borderRadius: 1,
+            mr: '1em',
 
-        borderRadius: 1,
-        mr: '1em',
-        mt: '0.5em',
-      }}>
-      <img
-        src={`${process.env.REACT_APP_BASE_URL}/images/3.png`}
-        alt=""
-        style={{objectFit: 'cover', height: '100%', width: '100%'}}
-      />
+            mt: '0.5em',
+          }}>
+          <img
+            src={item}
+            alt=""
+            style={{objectFit: 'cover', height: '100%', width: '100%'}}
+            onLoad={() => {
+              if (downloadUrl.length === index + 1) {
+                setLoaded(true);
+              }
+            }}
+          />
+        </Box>
+      ))}
     </Box>
-    <Box
-      sx={{
-        width: '10.0625rem',
-        height: '7.5rem',
-
-        borderRadius: 1,
-        mr: '1em',
-        mt: '0.5em',
-      }}>
-      <img
-        src={`${process.env.REACT_APP_BASE_URL}/images/4.png`}
-        alt=""
-        style={{objectFit: 'cover', height: '100%', width: '100%'}}
-      />
-    </Box>
-  </Box>
-);
+  );
+};

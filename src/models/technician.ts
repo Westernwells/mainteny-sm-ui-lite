@@ -1,4 +1,10 @@
-import {Address, Meta, TechnicianEventType, TimeWindowRecord} from './misc';
+import {
+  Address,
+  Meta,
+  TechnicianEventType,
+  TimeWindowRecord,
+  TimeWindowType,
+} from './misc';
 import {UserAccountSimpleView, UserAccountView} from './user';
 import {ServiceOrderType} from './service-order';
 
@@ -15,7 +21,7 @@ export interface TechnicianAdditionalInfo {
 export interface Technician {
   id: string;
   address: Address;
-  workingHours: TechnicianTimeWindowRecord[];
+  workingHours: TechnicianWorkingHours[];
   userAccount: UserAccountView;
   meta: Meta;
 }
@@ -26,9 +32,11 @@ export interface TechEventAdditionalInfo {
 
 export interface TechnicianView {
   id: string;
-  address: Address;
   userAccount: UserAccountView;
-  workingHours: TechnicianTimeWindowRecord[];
+  address: Address;
+  isOnline: boolean;
+  additionalInfo: TechnicianAdditionalInfo;
+  workingHours: TechnicianWorkingHours[];
   meta: Meta;
 }
 
@@ -72,4 +80,38 @@ export interface TechnicianWithUnAvailabilityView {
   time: string;
   totalHours: string;
   eventType: string;
+}
+
+export interface TechnicianWorkingHours {
+  fromTime: string;
+  toTime: string;
+  type: TimeWindowType;
+}
+
+export interface TechnicianAdditionalInfo {
+  leftVacationDays: number;
+}
+
+export interface TechniciansEventsParams {
+  pageIndex: number;
+  pageSize: number;
+  end: string;
+  start: string;
+  eventType: string[];
+}
+
+export interface TechnicianEventPair {
+  technicianId: string;
+  eventViews: TechnicianEventView[];
+}
+
+export interface TechnicianEventView {
+  startTime: string;
+  endTime: string;
+  eventType: TechnicianEventType;
+  id: string;
+  meta: Meta;
+  notes: string;
+  technician: TechnicianSimpleView;
+  durationInDays: number;
 }
