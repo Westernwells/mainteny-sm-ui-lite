@@ -8,6 +8,10 @@ import {
 import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import {ReactComponent as EmergencyIcon} from 'assets/icons/Emergency.svg';
+import {ReactComponent as RegularIcon} from 'assets/icons/Regular.svg';
+import {ReactComponent as CalloutIcon} from 'assets/icons/Callout.svg';
 import {StatusChip} from 'components/StatusChip';
 // import {fetchDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {InvoiceStatus, InvoiceStatusView} from 'models/invoice';
@@ -54,11 +58,74 @@ export const columns: GridColDef[] = [
     ...defaultProps,
   },
   {
-    field: 'serviceCompany',
-    headerName: 'SERVICE COMPANY',
+    field: 'orderNumber',
+    headerName: 'ORDER NUMBER',
     type: 'string',
-    flex: 2,
+    ...defaultAlignment,
     ...defaultProps,
+  },
+  {
+    field: 'propertyOwner',
+    headerName: 'CUSTOMER',
+    type: 'string',
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+  {
+    field: 'serviceType',
+    headerName: 'SERVICE TYPE',
+    type: 'string',
+    flex: 1,
+    editable: false,
+    renderHeader: (params: GridColumnHeaderParams) => (
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName}
+      </Typography>
+    ),
+    renderCell: (params: GridRenderCellParams<any, any, any>) => {
+      switch (params.value) {
+        case 'REGULAR':
+          return (
+            <Typography
+              variant="body2"
+              mx="0.5em"
+              display="flex"
+              alignItems="center"
+              gap=".5em">
+              <RegularIcon /> Maintenance
+            </Typography>
+          );
+        case 'REPAIR':
+          return (
+            <Typography
+              variant="body2"
+              mx="0.5em"
+              display="flex"
+              alignItems="center">
+              <SettingsOutlinedIcon sx={{color: '#ED6C02'}} /> Repair
+            </Typography>
+          );
+        case 'EMERGENCY':
+          return (
+            <Typography variant="body2" mx="0.5em">
+              <EmergencyIcon /> Emergency
+            </Typography>
+          );
+        case 'CALLOUT':
+          return (
+            <Typography variant="body2" mx="0.5em">
+              <CalloutIcon /> Callout
+            </Typography>
+          );
+        default:
+          return (
+            <Typography variant="body2" mx="0.5em">
+              {' '}
+              -{' '}
+            </Typography>
+          );
+      }
+    },
   },
   {
     field: 'amount',
@@ -130,7 +197,9 @@ export const makeRows = (invoices: any): GridRowsProp =>
         id: index,
         invoiceDate: formatDate(toDate(item.issuedDate), 'dd MMM YYY'),
         invoiceNumber: item.number,
-        serviceCompany: item.serviceCompany.name,
+        orderNumber: item.serviceOrder.number,
+        propertyOwner: item.propertyOwner.name,
+        serviceType: item.serviceOrder.type,
         amount: `${formatCurrency(
           item
             ? item.totalAmount.amount / 10 ** item.totalAmount.fractionDigits!
