@@ -5,6 +5,7 @@ import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
+import {EmptySection} from 'components/EmptySection';
 import {OverviewTab} from './Tabs/OverviewTab';
 import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
 
@@ -36,6 +37,14 @@ export const UnitsDetail = () => {
 
       <TabsBody value={value} index={1}>
         <ServiceHistoryTab />
+      </TabsBody>
+
+      <TabsBody value={value} index={2}>
+        <EmptySection
+          label="Data will be available here only for IoT enabled elevators!"
+          size="large"
+          containerStyle={{mt: 12}}
+        />
       </TabsBody>
     </Tabs>
   );
