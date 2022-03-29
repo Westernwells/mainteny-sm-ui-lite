@@ -1,7 +1,7 @@
 import {Fee, Meta} from './misc';
 import {PropertyOwner} from './propertyManager';
 import {ServiceCompanySimpleView} from './service-company';
-import {ServiceOrderView} from './service-order';
+import {ServiceOrderView, ServiceOrderType} from './service-order';
 
 export enum InvoiceStatus {
   PAID = 'PAID',
@@ -49,4 +49,10 @@ export interface QueryInvoiceParams {
   pageSize: number;
   query: string;
   status: InvoiceStatus[];
+}
+
+export interface InvoiceFilters {
+  amount: [number, number] | number[];
+  status?: InvoiceStatus;
+  serviceType: ServiceOrderType[];
 }
