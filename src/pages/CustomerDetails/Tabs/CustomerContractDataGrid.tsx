@@ -5,15 +5,18 @@ import {
   GridRenderCellParams,
   GridRowsProp,
 } from '@mui/x-data-grid';
+import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import {formatCurrency} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
+import {ContractStatus, ContractView} from 'models/contract';
+import {StatusChip} from 'components/StatusChip';
 
 const defaultProps = {
   editable: false,
   renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
+    <Typography variant="tableHeaderText" color="textSecondary">
       {params.colDef.headerName}
     </Typography>
   ),
@@ -35,23 +38,16 @@ const defaultAlignment: {
 
 export const columns: GridColDef[] = [
   {
-    field: 'contractor',
-    headerName: 'CONTRACTOR',
+    field: 'contractNumber',
+    headerName: 'CONTRACT ID',
     type: 'string',
-    flex: 2,
+    flex: 1,
     headerAlign: 'left',
     ...defaultProps,
   },
   {
-    field: 'contractNumber',
-    headerName: 'CONTRACT NO',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
     field: 'units',
-    headerName: 'UNITS',
+    headerName: 'NUMBER OF UNITS',
     type: 'number',
     ...defaultAlignment,
     ...defaultProps,
@@ -64,12 +60,75 @@ export const columns: GridColDef[] = [
     ...defaultProps,
   },
   {
+    field: 'startDate',
+    headerName: 'START DATE',
+    type: 'string',
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+  {
     field: 'expiryDate',
     headerName: 'EXPIRY DATE',
     type: 'string',
     ...defaultAlignment,
     ...defaultProps,
   },
+
+  {
+    field: 'contractType',
+    headerName: 'CONTRACT TYPE',
+    type: 'string',
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+
+  {
+    field: 'status',
+    headerName: 'STATUS',
+    type: 'string',
+    ...defaultAlignment,
+    editable: false,
+    renderHeader: (params: GridColumnHeaderParams) => (
+      <Typography variant="tableHeaderText" color="textSecondary">
+        {params.colDef.headerName}
+      </Typography>
+    ),
+    renderCell: (params: GridRenderCellParams<any, any, any>) => {
+      const theme = useTheme();
+      switch (params.value) {
+        case ContractStatus.VALID:
+          return (
+            <StatusChip
+              label={ContractStatus.VALID}
+              bgColor={theme.palette.success.main}
+            />
+          );
+        case ContractStatus.PENDING:
+          return (
+            <StatusChip
+              label={ContractStatus.PENDING}
+              bgColor={theme.state?.ratingActive}
+            />
+          );
+        default:
+          return (
+            <StatusChip
+              label={ContractStatus.EXPIRED}
+              bgColor={theme.palette.error.main}
+            />
+          );
+      }
+    },
+  },
+
+  {
+    field: 'contractType',
+    headerName: 'CONTRACT TYPE',
+    type: 'string',
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+
   {
     field: 'actions',
     headerName: 'ACTIONS',
@@ -104,14 +163,16 @@ export const columns: GridColDef[] = [
 
 export const makeRows = (contracts: any): GridRowsProp =>
   contracts
-    ? contracts.map((item: any, index: number) => ({
+    ? contracts.map((item: ContractView, index: number) => ({
         id: index,
-        contractor: item.serviceCompany.name,
         contractNumber: item.number,
         units: item.units || '-',
         cost: `${formatCurrency(item ? item.price! : 0, {
           currency: item.currency,
         })}`,
+        status: item.status,
+        contractType: item.type[0] + item.type.slice(1).toLowerCase(),
+        startDate: formatDate(item.startTime),
         expiryDate: formatDate(item.endTime),
         navigateTo: item.id,
       }))
