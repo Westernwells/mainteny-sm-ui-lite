@@ -13,10 +13,11 @@ export interface Props {
   headerTextOverrideStyles?: {[key: string]: string | number};
   headerActionIcon?: JSX.Element;
   minHeight?: number | string;
-  contentPadding?: string | number;
+  // contentPadding?: string | number;
   headerLabel?: string;
   customHeader?: JSX.Element;
   containerStyles?: {[key: string]: string | number};
+  contentContainerStyles?: {[key: string]: string | number};
 }
 
 export const PageCard = ({
@@ -27,8 +28,9 @@ export const PageCard = ({
   headerTextOverrideStyles,
   headerActionIcon,
   minHeight,
-  contentPadding,
+  // contentPadding,
   customHeader,
+  contentContainerStyles,
 }: Props) => {
   const theme = useTheme();
   return (
@@ -65,7 +67,8 @@ export const PageCard = ({
       />
       <CardContent
         sx={{
-          px: contentPadding || 'default',
+          mx: '0.5em',
+          ...contentContainerStyles,
         }}>
         {children}
       </CardContent>

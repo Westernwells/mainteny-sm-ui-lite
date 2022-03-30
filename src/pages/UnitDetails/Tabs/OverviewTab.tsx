@@ -133,7 +133,7 @@ export const OverviewTab = ({
       <Grid container sx={{mt: '1em'}}>
         <Grid item xs={12}>
           <PageCard
-            contentPadding="1.5em"
+            contentContainerStyles={{p: '1.5em'}}
             headerContainerOverrideStyles={{backgroundColor: '#fff'}}
             customHeader={
               <Box display="flex" justifyContent="space-between">

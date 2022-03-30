@@ -11,8 +11,10 @@ import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import {formatDate, getDateObject} from 'utils/datetime';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
-import {useEffect} from 'react';
+
 import {PageCard} from 'components/PageCard';
+import {Searchnput} from 'components/SearchInput';
+import {useEffect, useState} from 'react';
 
 interface Props {
   customerId?: string;
@@ -22,6 +24,43 @@ interface Props {
 export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
   const theme = useTheme();
   const {data: customer} = useGetCustomer(customerId);
+  const [basicDetails, setBasicDetails] = useState<BasicDetails>();
+
+  useEffect(() => {
+    if (customer) {
+      setBasicDetails({
+        ...basicDetails,
+        name: {
+          label: 'CUSTOMER NAME',
+          value: customer.name,
+          icon: <HomeWorkIcon sx={{color: theme.palette.info.dark}} />,
+        },
+        phone: {
+          label: 'PHONE NUMBER',
+          value: customer.contact.phone,
+          icon: <LocalPhoneIcon sx={{color: theme.palette.info.dark}} />,
+        },
+        address: {
+          label: 'ADDRESS',
+          value: customer.address.fullName,
+          icon: <HomeIcon sx={{color: theme.palette.info.dark}} />,
+        },
+        email: {
+          label: 'EMAIL ID',
+          value: customer.contact.email,
+          icon: <EmailIcon sx={{color: theme.palette.info.dark}} />,
+        },
+        startDate: {
+          label: 'CUSTOMER SINCE',
+          value: formatDate(
+            getDateObject(customer.meta.createdAt),
+            'dd MMMM yyy',
+          ) as string,
+          icon: <WorkIcon sx={{color: theme.palette.info.dark}} />,
+        },
+      });
+    }
+  }, [customer]);
 
   useEffect(() => {
     if (getCustomerName && customer) {
@@ -35,62 +74,18 @@ export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
       headerStyles={{pb: '0'}}
       header={<Typography variant="subtitle1">Basic Details</Typography>}>
       <Box display="flex" flexWrap="wrap">
-        <CardProps
-          label="CUSTOMER NAME"
-          bodyTextVariant="body2"
-          icon={<HomeWorkIcon sx={{color: theme.palette.info.dark}} />}
-          containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
-          iconMaxHeight="3rem"
-          bodyText={customer?.name || ''}
-        />
-
-        <CardProps
-          label="PHONE NUMBER"
-          bodyTextVariant="body2"
-          icon={<LocalPhoneIcon sx={{color: theme.palette.info.dark}} />}
-          containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
-          iconMaxHeight="3rem"
-          bodyText={customer?.contact.phone || ''}
-        />
-
-        <CardProps
-          label="CUSTOMER SINCE"
-          bodyTextVariant="body2"
-          icon={<WorkIcon sx={{color: theme.palette.info.dark}} />}
-          containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
-          iconMaxHeight="3rem"
-          bodyText={
-            customer
-              ? (formatDate(
-                  getDateObject(customer.meta.createdAt),
-                  'dd MMMM yyy',
-                ) as string)
-              : ''
-          }
-        />
-
-        <CardProps
-          label="ADDRESS"
-          bodyTextVariant="body2"
-          icon={<HomeIcon sx={{color: theme.palette.info.dark}} />}
-          containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
-          iconMaxHeight="3rem"
-          bodyText={customer?.address.fullName || ''}
-        />
-
-        <CardProps
-          label="EMAIL ID"
-          bodyTextVariant="body2"
-          icon={<EmailIcon sx={{color: theme.palette.info.dark}} />}
-          containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
-          iconMaxHeight="3rem"
-          bodyText={customer?.contact.email || ''}
-        />
+        {basicDetails &&
+          Object.keys(basicDetails).map((item) => (
+            <CardProps
+              label={basicDetails[item as keyof BasicDetails].label}
+              bodyTextVariant="body2"
+              icon={basicDetails[item as keyof BasicDetails].icon}
+              containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
+              iconBackground={theme.palette.info.outlinedHoverBg}
+              iconMaxHeight="3rem"
+              bodyText={basicDetails[item as keyof BasicDetails].value}
+            />
+          ))}
       </Box>
     </BasicDetailsCard>
   );
@@ -103,17 +98,30 @@ export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
           <PageCard
             headerContainerOverrideStyles={{backgroundColor: '#fff'}}
             customHeader={
-              <Box>
-                <Typography
-                  variant="subtitle1"
-                  sx={{
-                    color: theme.palette.text.primary,
-                  }}>
-                  Units(500)
-                </Typography>
+              <Box display="flex" justifyContent="space-between">
+                <Box display="flex">
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      color: theme.palette.text.primary,
+                    }}>
+                    Units
+                  </Typography>
+                  <Typography variant="subtitle1" color="textSecondary">
+                    (500)
+                  </Typography>
+                </Box>
+                <Searchnput
+                  size="small"
+                  placeholder="Search"
+                  containerStyle={{
+                    background: theme.palette.inputBackground.main,
+                    width: '12rem',
+                  }}
+                />
               </Box>
             }>
-            <Typography>hello</Typography>
+            <Typography>sksks</Typography>
           </PageCard>
         </Grid>
 
@@ -130,7 +138,7 @@ export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
                 </Typography>
               </Box>
             }>
-            <Typography>hello</Typography>
+            <Typography>ksks</Typography>
           </PageCard>
         </Grid>
       </Grid>

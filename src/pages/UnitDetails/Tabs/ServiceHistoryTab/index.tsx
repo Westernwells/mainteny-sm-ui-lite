@@ -277,7 +277,7 @@ export const ServiceHistoryTab = () => {
       <Grid item xs={4}>
         <PageCard
           headerLabel="All Services"
-          contentPadding="0rem"
+          contentContainerStyles={{p: 0, mx: 0}}
           headerContainerOverrideStyles={{
             background: 'none',
             mt: 'default',
