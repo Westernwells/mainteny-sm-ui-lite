@@ -31,7 +31,6 @@ export const Customer = () => {
 
   const {data: customersWithUnits} = useFetchCustomerElevatorNumbers(
     customerResource.data,
-    {keepPreviousData: true},
   );
 
   useEffect(() => {
