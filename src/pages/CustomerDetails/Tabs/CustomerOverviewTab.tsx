@@ -1,6 +1,7 @@
 import WorkIcon from '@mui/icons-material/Work';
 import HomeIcon from '@mui/icons-material/Home';
 import EmailIcon from '@mui/icons-material/Email';
+import Grid from '@mui/material/Grid';
 import {CardProps} from 'components/CardProps';
 import HomeWorkIcon from '@mui/icons-material/HomeWork';
 import {BasicDetailsCard} from 'components/BasicDetailsCard';
@@ -11,6 +12,7 @@ import Box from '@mui/material/Box';
 import {formatDate, getDateObject} from 'utils/datetime';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {useEffect} from 'react';
+import {PageCard} from 'components/PageCard';
 
 interface Props {
   customerId?: string;
@@ -27,7 +29,7 @@ export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
     }
   }, [customer]);
 
-  return (
+  const renderBasicDetails = () => (
     <BasicDetailsCard
       minHeight="12rem"
       headerStyles={{pb: '0'}}
@@ -91,5 +93,47 @@ export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
         />
       </Box>
     </BasicDetailsCard>
+  );
+
+  return (
+    <Box>
+      {renderBasicDetails()}
+      <Grid container spacing={2} sx={{mt: '1em'}}>
+        <Grid item xs={6}>
+          <PageCard
+            headerContainerOverrideStyles={{backgroundColor: '#fff'}}
+            customHeader={
+              <Box>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    color: theme.palette.text.primary,
+                  }}>
+                  Units(500)
+                </Typography>
+              </Box>
+            }>
+            <Typography>hello</Typography>
+          </PageCard>
+        </Grid>
+
+        <Grid item xs={6}>
+          <PageCard
+            customHeader={
+              <Box>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    color: theme.palette.text.primary,
+                  }}>
+                  Units(500)
+                </Typography>
+              </Box>
+            }>
+            <Typography>hello</Typography>
+          </PageCard>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
