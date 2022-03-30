@@ -49,7 +49,6 @@ export const Contracts = () => {
     );
   const {data: contractWithUnits} = useContractElevatorCount(
     contractResource.data,
-    {keepPreviousData: true},
   );
 
   const costRangeConvertor = (selectedItems: string[]) => {
