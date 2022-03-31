@@ -317,7 +317,7 @@ export const theme = createTheme({
         {
           props: {variant: 'tableHeaderText'},
           style: {
-            fontFamily: 'Roboto',
+            fontFamily: 'Open Sans',
             fontWeight: 500,
             fontSize: '0.875rem',
             lineHeight: 1.7,
@@ -327,7 +327,7 @@ export const theme = createTheme({
         {
           props: {variant: 'alertTitleText'},
           style: {
-            fontFamily: 'Roboto',
+            fontFamily: 'Open Sans',
             fontWeight: 500,
             fontSize: '1rem',
             lineHeight: 1.5,
@@ -337,7 +337,7 @@ export const theme = createTheme({
         {
           props: {variant: 'helperText'},
           style: {
-            fontFamily: 'Roboto',
+            fontFamily: 'Open Sans',
             fontWeight: 400,
             fontSize: '0.75rem',
             lineHeight: 1.66,

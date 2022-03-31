@@ -13,7 +13,7 @@ import {formatDate} from 'utils/datetime';
 const defaultProps = {
   editable: false,
   renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
+    <Typography variant="tableHeaderText" color="textSecondary">
       {params.colDef.headerName}
     </Typography>
   ),
@@ -89,7 +89,7 @@ export const columns: GridColDef[] = [
     ...defaultAlignment,
 
     renderHeader: (params) => (
-      <Typography variant="subtitle2" color="textSecondary">
+      <Typography variant="tableHeaderText" color="textSecondary">
         {params.colDef.headerName}
       </Typography>
     ),
