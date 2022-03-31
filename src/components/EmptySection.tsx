@@ -1,6 +1,7 @@
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import {ReactComponent as EmptyIllustration} from 'assets/illustrations/LaptopIcon.svg';
+import {ReactComponent as LaptopIllustration} from 'assets/illustrations/Laptop.svg';
+import {ReactComponent as ClipboardIllustration} from 'assets/illustrations/Clipboard.svg';
 
 interface Props {
   label: string;
@@ -8,6 +9,7 @@ interface Props {
   containerStyle?: {[key: string]: string | number};
   labelStyle?: {[key: string]: string | number};
   labelVariant?: any;
+  illustration?: string;
 }
 
 export const EmptySection = ({
@@ -16,11 +18,22 @@ export const EmptySection = ({
   containerStyle,
   labelStyle,
   labelVariant,
+  illustration = 'laptop',
 }: Props) => {
   const Width = {
     small: '128px',
     medium: '192px',
     large: '256px',
+  };
+  const getIllustration = (variant: string) => {
+    switch (variant) {
+      case 'clipboard':
+        return (
+          <ClipboardIllustration style={{width: '100%', height: '100%'}} />
+        );
+      default:
+        return <LaptopIllustration style={{width: '100%', height: '100%'}} />;
+    }
   };
   return (
     <Box
@@ -30,9 +43,7 @@ export const EmptySection = ({
       gap="1em"
       mt={3}
       sx={{...containerStyle}}>
-      <Box width={Width[size]}>
-        <EmptyIllustration style={{width: '100%', height: '100%'}} />
-      </Box>
+      <Box width={Width[size]}>{getIllustration(illustration)}</Box>
       <Typography
         variant={labelVariant || 'subtitle2'}
         textAlign="center"
