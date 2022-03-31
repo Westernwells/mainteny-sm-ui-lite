@@ -6,8 +6,9 @@ import ElevatorIcon from '@mui/icons-material/Elevator';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import {useParams} from 'react-router';
-import {OverviewTab} from './Tabs/OverviewTab';
-import {ContractTab} from './Tabs/ContractTab';
+import {CustomerOverviewTab} from './Tabs/CustomerOverviewTab';
+import {ContractTab} from './Tabs/ContractsTab';
+import {UnitsTab} from './Tabs/UnitsTab';
 
 const tabItems = [
   {
@@ -27,16 +28,21 @@ const tabItems = [
 export const CustomerDetails = () => {
   const [tabValue, setTabValue] = useState(0);
   const {id: customerId} = useParams();
+  const [customerName, setCustomerName] = useState('');
   return (
     <Box>
       <Tabs
         tabItems={tabItems}
-        getCurrentTabIndex={(index) => setTabValue(index)}>
+        getCurrentTabIndex={(index) => setTabValue(index)}
+        backBtnLabel={customerName}>
         <TabsBody value={tabValue} index={0}>
-          <OverviewTab customerId={customerId} />
+          <CustomerOverviewTab
+            customerId={customerId}
+            getCustomerName={(name) => setCustomerName(name)}
+          />
         </TabsBody>
         <TabsBody value={tabValue} index={1}>
-          <div />
+          <UnitsTab customerId={customerId} />
         </TabsBody>
 
         <TabsBody value={tabValue} index={2}>

@@ -21,7 +21,10 @@ import {Widget} from 'components/Widget';
 import {BasicDetailsCard} from 'components/BasicDetailsCard';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {ElevatorView} from 'models/elevator';
-import {columns, makeRows} from 'pages/Units/unitDataGridProp';
+import {
+  columns,
+  makeRows,
+} from 'pages/CustomerDetails/Tabs/CustomerUnitDataGrid';
 import {formatCurrency} from 'utils/currency';
 import {ContractBasic} from './ContractBasic';
 import {ContractParties} from './ContractParties';
@@ -47,7 +50,6 @@ export const ContractDetails = () => {
   });
 
   useEffect(() => {
-    console.log(elevator, '***************');
     if (elevator.data) {
       setRows(makeRows(elevator));
     } else {

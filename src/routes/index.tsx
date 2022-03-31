@@ -6,14 +6,14 @@ import {Recover} from 'pages/Recover';
 import {MyUnits} from 'pages/Units';
 import {UnitsDetail} from 'pages/UnitDetails';
 import {Contracts} from 'pages/Contracts';
-import {Customer} from 'pages/Customer';
+import {Customer} from 'pages/Customers';
 import {ContractDetails} from 'pages/ContractDetails';
 import {CustomerDetails} from 'pages/CustomerDetails';
 import {Invoices} from 'pages/Invoices';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
 import {Notifications} from 'pages/Notifications';
 import {PageNotFound} from 'pages/PageNotFound';
-import {Employees} from 'pages/Employee';
+import {Employees} from 'pages/Employees';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 

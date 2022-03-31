@@ -2,6 +2,7 @@ import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
 import useTheme from '@mui/material/styles/useTheme';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import {useEffect} from 'react';
 import Box from '@mui/material/Box';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import {createEmptyResource} from 'utils/paging-utils';
@@ -22,11 +23,15 @@ import {ServiceHistory} from '../ServiceHistory';
 
 interface Props {
   getServiceHistoryTabIndex?: (value: number) => void;
+  getCustomerName?: (value: string) => void;
 }
 
 const pageSize = 10;
 
-export const OverviewTab = ({getServiceHistoryTabIndex}: Props) => {
+export const OverviewTab = ({
+  getServiceHistoryTabIndex,
+  getCustomerName,
+}: Props) => {
   const {id: elevatorId} = useParams();
   const theme = useTheme();
 
@@ -49,6 +54,13 @@ export const OverviewTab = ({getServiceHistoryTabIndex}: Props) => {
       ServiceOrderStatus.IN_PROGRESS,
     ],
   });
+
+  useEffect(() => {
+    if (getCustomerName && elevator) {
+      getCustomerName(elevator.propertyOwner.name);
+    }
+  }, [elevator]);
+
   return (
     <>
       <Grid container spacing={2} sx={{mt: '1em'}}>

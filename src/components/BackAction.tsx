@@ -6,13 +6,14 @@ import {useNavigate} from 'react-router-dom';
 
 interface Props {
   label: string;
+  containerStyle?: {[key: string]: string | number};
 }
 
-export const BackAction = ({label}: Props) => {
+export const BackAction = ({label, containerStyle}: Props) => {
   const theme = useTheme();
   const navigate = useNavigate();
   return (
-    <Box display="flex" sx={{mb: '1em'}}>
+    <Box display="flex" sx={{mb: '1em', ...containerStyle}}>
       <Box
         mr={2}
         sx={{cursor: 'pointer', mt: '0.2em'}}

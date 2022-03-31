@@ -231,7 +231,7 @@ export const useContractDetails = (contractId: string) => {
   );
 };
 
-export const fetchContractByCustomer = async (
+export const queryCustomerContract = async (
   params: WithOptional<CustomerContractParams, 'serviceCompanyId'>,
   id: string,
 ) => {
@@ -242,11 +242,10 @@ export const fetchContractByCustomer = async (
   return response.data;
 };
 
-export const useFetchContractsByCustomer = (
+export const useuseQueryCustomerContracts = (
   params: WithOptional<CustomerContractParams, 'serviceCompanyId'>,
   filter: ContractFilters,
   id?: string,
-
   options?: any,
 ) => {
   const {user} = useUserSession();
@@ -255,8 +254,8 @@ export const useFetchContractsByCustomer = (
     serviceCompanyId: user?.userAccount.serviceCompany.id,
   };
   return useQuery(
-    [queryKeys.queryContractByCustomer, params, id],
-    () => fetchContractByCustomer(params, id!),
+    [queryKeys.queryCustomerContract, params, id],
+    () => queryCustomerContract(params, id!),
     {
       enabled: !!id && !!user,
       ...options,
