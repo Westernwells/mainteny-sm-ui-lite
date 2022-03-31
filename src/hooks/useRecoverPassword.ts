@@ -17,24 +17,18 @@ export const useRecoverPassword = (): UseRecoverPassword => {
   const request = async (email: string, snackbar = false): Promise<void> => {
     setLoading(true);
     try {
-      const {data} = await axiosClient({
-        url: `/api/users/${email}`,
+      const {status} = await axiosClient({
+        url: `/api/users/${email}/forgetPassword/token`,
+        method: 'POST',
       });
+      setLoading(false);
 
-      if (data?.roles.includes('SERVICE_MANAGER')) {
-        const {status} = await axiosClient({
-          url: `/api/users/${email}/forgetPassword/token`,
-          method: 'POST',
+      if (status === 200 && snackbar) {
+        enqueueSnackbar('Code sent successfully', {
+          variant: 'success',
         });
-        setLoading(false);
-
-        if (status === 200 && snackbar) {
-          enqueueSnackbar('Code sent successfully', {
-            variant: 'success',
-          });
-        } else {
-          navigate('/recover?type=reset');
-        }
+      } else {
+        navigate('/recover?type=reset');
       }
     } catch (error: any) {
       if (error?.response.status === 400) {
