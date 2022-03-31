@@ -15,7 +15,7 @@ import {StatusChip} from 'components/StatusChip';
 const defaultProps = {
   editable: false,
   renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
+    <Typography variant="tableHeaderText" color="textSecondary">
       {params.colDef.headerName}
     </Typography>
   ),
