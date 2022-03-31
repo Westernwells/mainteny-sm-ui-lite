@@ -1,6 +1,6 @@
 import {
   useContractElevatorCount,
-  useFetchContractsByCustomer,
+  useuseQueryCustomerContracts,
 } from 'hooks/reactQuery/useContract';
 import {ContractOrderField, ContractView} from 'models/contract';
 import {Order} from 'models/misc';
@@ -37,7 +37,7 @@ export const ContractTab = ({customerId}: Props) => {
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
   const {data: contractResource = createEmptyResource<ContractView>(10)} =
-    useFetchContractsByCustomer(
+    useuseQueryCustomerContracts(
       {
         query: search,
         orderBy: ContractOrderField.EXPIRY_TIME,

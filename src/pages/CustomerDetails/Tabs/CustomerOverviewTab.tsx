@@ -10,19 +10,28 @@ import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import {formatDate, getDateObject} from 'utils/datetime';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
+import {useEffect} from 'react';
 
 interface Props {
   customerId?: string;
+  getCustomerName?: (value: string) => void;
 }
 
-export const OverviewTab = ({customerId}: Props) => {
+export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
   const theme = useTheme();
   const {data: customer} = useGetCustomer(customerId);
+
+  useEffect(() => {
+    if (getCustomerName && customer) {
+      getCustomerName(customer.name);
+    }
+  }, [customer]);
+
   return (
     <BasicDetailsCard
       minHeight="12rem"
       headerStyles={{pb: '0'}}
-      header={<Typography variant="subtitle1">#785371</Typography>}>
+      header={<Typography variant="subtitle1">Basic Details</Typography>}>
       <Box display="flex" flexWrap="wrap">
         <CardProps
           label="CUSTOMER NAME"

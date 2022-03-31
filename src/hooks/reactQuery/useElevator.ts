@@ -6,8 +6,11 @@ import {AxiosResponse} from 'axios';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {queryKeys} from 'reactQuery/constants';
 import {useNavigate} from 'react-router';
-
-import {Elevator, ElevatorView} from '../../models/elevator';
+import {
+  CustomerElevatorParams,
+  Elevator,
+  ElevatorView,
+} from '../../models/elevator';
 import {Location, Page, Resource, RestError} from '../../models/misc';
 import {MaintainerView} from '../../models/technician';
 import {useUserSession} from './useUserSession';
@@ -150,3 +153,30 @@ export function useAllElevators(
     },
   );
 }
+
+export const queryCustomerElevator = async (
+  params: CustomerElevatorParams,
+
+  id?: string,
+) => {
+  const response = await axiosClient.get<Resource<ElevatorView>>(
+    `/api/propertyOwners/${id}/elevators`,
+    {params, paramsSerializer},
+  );
+  return response.data;
+};
+
+export const useQueryCustomerElevator = (
+  params: CustomerElevatorParams,
+  filter: any,
+  id?: string,
+  options?: any,
+) =>
+  useQuery(
+    [queryKeys.queryUnitsByCustomer, id],
+    () => queryCustomerElevator(params, id!),
+    {
+      enabled: !!id,
+      ...options,
+    },
+  );

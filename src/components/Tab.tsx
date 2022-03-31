@@ -1,11 +1,12 @@
 import {ReactNode, useState} from 'react';
 import Box from '@mui/material/Box';
-import {useNavigate} from 'react-router-dom';
+// import {useNavigate} from 'react-router-dom';
 import MuiTabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
-import ArrowBack from '@mui/icons-material/ArrowBack';
+// import ArrowBack from '@mui/icons-material/ArrowBack';
 import useTheme from '@mui/material/styles/useTheme';
+import {BackAction} from './BackAction';
 
 interface TabItems {
   label: string;
@@ -15,6 +16,7 @@ interface TabItems {
 interface Props {
   children: ReactNode;
   tabItems: TabItems[];
+  backBtnLabel?: string;
   getCurrentTabIndex?: (index: number) => void;
 }
 
@@ -27,10 +29,11 @@ export const Tabs = ({
   children,
   tabItems,
   getCurrentTabIndex = () => {},
+  backBtnLabel = '',
 }: Props) => {
   const [value, setValue] = useState(0);
   const theme = useTheme();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   return (
     <Box
@@ -41,17 +44,15 @@ export const Tabs = ({
         sx={{
           display: 'flex',
           paddingLeft: '35px',
+          // maxHeight: '50px'
+
           // mt: 11,
         }}>
-        <ArrowBack
-          onClick={() => navigate(-1)}
-          sx={{
-            cursor: 'pointer',
-            color: theme.palette.text.secondary,
-            my: 'auto',
-            mr: '40px',
-          }}
+        <BackAction
+          label={backBtnLabel}
+          containerStyle={{mt: '0.5em', mr: '3em'}}
         />
+
         <MuiTabs
           sx={{
             '& .MuiTabs-indicator': {

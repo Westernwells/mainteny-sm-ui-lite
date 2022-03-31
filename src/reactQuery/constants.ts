@@ -25,5 +25,6 @@ export const queryKeys = {
   fetchTechnicians: 'fetchTechnicians',
   queryTechniciansEvents: 'queryTechniciansEvents',
   getCustomer: 'getCustomer',
-  queryContractByCustomer: 'queryContractByCustomer',
+  queryCustomerContract: 'queryCustomerContract',
+  queryUnitsByCustomer: 'queryUnitsByCustomer',
 };

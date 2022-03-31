@@ -5,9 +5,7 @@ import {
   GridRenderCellParams,
   GridRowModel,
 } from '@mui/x-data-grid';
-
 import Typography from '@mui/material/Typography';
-
 import {StatusChip} from 'components/StatusChip';
 import {ElevatorStatus, ElevatorView} from 'models/elevator';
 import {Resource} from 'models/misc';
@@ -15,10 +13,14 @@ import {Resource} from 'models/misc';
 const defaultProps = {
   editable: false,
   renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2">{params.colDef.headerName}</Typography>
+    <Typography variant="subtitle2" color="textSecondary">
+      {params.colDef.headerName}
+    </Typography>
   ),
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="subtitle2">{params.value}</Typography>
+    <Typography variant="body2" mx="0.5em">
+      {params.value}
+    </Typography>
   ),
 };
 const defaultAlignment: {
@@ -68,7 +70,9 @@ export const columns: GridColDef[] = [
     ...defaultAlignment,
     editable: false,
     renderHeader: (params: GridColumnHeaderParams) => (
-      <Typography variant="subtitle2">{params.colDef.headerName}</Typography>
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName}
+      </Typography>
     ),
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
@@ -89,9 +93,7 @@ export const makeRows = (
         unitNumber: item.number,
         address: item.address.fullName,
         lastVisit: item.lastVisitDate,
-
         status: item.status,
-
         navigateTo: `/units/${item.id}`,
       }))
     : [];

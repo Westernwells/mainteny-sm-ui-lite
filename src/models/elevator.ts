@@ -171,3 +171,8 @@ export interface AttachmentResource {
   elevatorMaintenanceHistoryId: string;
   fileResource: FileResource;
 }
+export interface CustomerElevatorParams {
+  pageIndex: number;
+  pageSize: number;
+  query: string;
+}
