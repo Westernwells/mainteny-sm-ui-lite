@@ -41,7 +41,6 @@ export const MyUnits = () => {
   const {data: elevatorsByAddressList} = useFetchServiceOrdersByElevators(
     elevatorResponse.elevator,
     {nextVisit, availabilityRange: availability},
-    {keepPreviousData: true},
   );
 
   const availabilityRangeConvertor = (selectedItems: string[]) => {

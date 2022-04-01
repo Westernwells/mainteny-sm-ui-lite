@@ -1,6 +1,6 @@
 import {
   useContractElevatorCount,
-  useuseQueryCustomerContracts,
+  useUseQueryCustomerContracts,
 } from 'hooks/reactQuery/useContract';
 import {ContractOrderField, ContractView} from 'models/contract';
 import {Order} from 'models/misc';
@@ -24,7 +24,7 @@ interface Props {
   customerId?: string;
 }
 
-export const ContractTab = ({customerId}: Props) => {
+export const ContractsTab = ({customerId}: Props) => {
   const [page, setPage] = useState(makePage(0, 10));
   const [search, setSearch] = useState('');
   const [showFilter, setShowFilter] = useState(false);
@@ -37,7 +37,7 @@ export const ContractTab = ({customerId}: Props) => {
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
   const {data: contractResource = createEmptyResource<ContractView>(10)} =
-    useuseQueryCustomerContracts(
+    useUseQueryCustomerContracts(
       {
         query: search,
         orderBy: ContractOrderField.EXPIRY_TIME,
@@ -45,8 +45,8 @@ export const ContractTab = ({customerId}: Props) => {
         pageIndex: page.pageIndex,
         pageSize: page.pageSize,
       },
-      {expiryDate, contractor, price: cost},
       customerId,
+      {expiryDate, contractor, price: cost},
       {keepPreviousData: true},
     );
 
