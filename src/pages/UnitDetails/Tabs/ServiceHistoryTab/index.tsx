@@ -1,11 +1,13 @@
 import {useCallback, useEffect, useState} from 'react';
 import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 import {EmptyIllustration} from 'components/EmptyIllustration';
 import HideImageIcon from '@mui/icons-material/HideImage';
 import useTheme from '@mui/material/styles/useTheme';
 import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
+import {EmptySection} from 'components/EmptySection';
 import {SplitButton} from 'components/SplitButton';
 import Box from '@mui/material/Box';
 import {PageCard} from 'components/PageCard';
@@ -34,6 +36,7 @@ export const ServiceHistoryTab = () => {
   );
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   const [selectedStatusView, setSelectedStatusView] = useState('All');
+  const [isEmpty, setIsEmpty] = useState<boolean>(false);
 
   const [expanded, setExpanded] = useState<boolean>();
   const [selectedOrder, setSelectedOrder] = useState<ServiceOrderView>();
@@ -44,6 +47,21 @@ export const ServiceHistoryTab = () => {
   const [currentScheduleTime, setCurrentScheduleTime] = useState<string | null>(
     null,
   );
+  const {
+    data: totalServiceOrders = createEmptyResource<ServiceOrderView>(100),
+  } = useServiceOrders({
+    elevatorIds: elevatorId,
+    start: startOfYear(new Date('2000')).toISOString(),
+    end: endOfYear(new Date(getYear(new Date()).toString())).toISOString(),
+    pageSize: 1,
+    // pageIndex: 0,
+    query: '',
+    status: [
+      ServiceOrderStatus.SCHEDULED,
+      ServiceOrderStatus.COMPLETED,
+      ServiceOrderStatus.IN_PROGRESS,
+    ],
+  });
   const {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(pageSize),
   } = useServiceOrders({
@@ -102,6 +120,7 @@ export const ServiceHistoryTab = () => {
     if (serviceOrders) {
       setSelectedOrder(serviceOrders.data[0]);
     }
+    setIsEmpty(serviceOrders.data.length === 0);
   }, [serviceOrders]);
 
   const getYears = useCallback(() => {
@@ -156,74 +175,104 @@ export const ServiceHistoryTab = () => {
     return setSelectedStatus([]);
   };
 
+  const resetFilters = () => {
+    setSelectedYear(getYear(new Date()).toString());
+    setSelectedStatus([]);
+    setSelectedStatusView('All');
+  };
+
+  if (!totalServiceOrders.total) {
+    return (
+      <EmptySection
+        label="No service history entries made so far!"
+        size="large"
+        containerStyle={{mt: 12}}
+      />
+    );
+  }
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={8}>
-        <HistoryBasicDetails>
-          <HistoryCard
-            showTimeCategory
-            // noContent={!selectedOrder}
-            serviceOrder={selectedOrder}
-            headerTitle={currentScheduleDate || null}
-            description={selectedOrder?.description}
-            scheduledTime={
-              currentScheduleDate && currentScheduleTime
-                ? `${currentScheduleDate}, ${currentScheduleTime}`
-                : ''
-            }
-            minHeight="30vh"
-            isDetailCard
-            removeBottomLeftRadius
-            removeBottomRightRadius
-            showAlert
-            headerActionIcon={<MoreVertIcon />}
-            subtitle={currentScheduleTime || null}
-            containerStyles={{
-              borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-              pt: '0.5em',
-            }}
-          />
-        </HistoryBasicDetails>
-        <HistoryReport>
-          <HistoryCard
-            serviceOrder={selectedOrder}
-            noContent={!serviceOrderReport.length}
-            serviceOrderReport={serviceOrderReport[0]}
-            reportIsLoading={serviceOrderReportLoading}
-            minHeight="30vh"
-            isDetailCard
-            removeTopLeftRadius
-            removeTopRightRadius
-            removeServiceOrderType
-            removeServiceOrderStatus
-            showMoreReportDetails={!!serviceOrderReport.length}
-            showActionSection
-            containerStyles={{
-              pt: '0.5em',
-            }}
-            handleExpandClick={handleExpandClick}
-            expanded={expanded}
-            collapsedChildren={
-              downloadUrl?.length ? (
-                <HistoryAttachments downloadUrl={downloadUrl} />
-              ) : (
-                <EmptyIllustration
-                  label="No image attachments are added to the work report!"
-                  labelStyle={{mt: '1em', color: theme.palette.text.secondary}}
-                  labelVariant="subtitle2"
-                  icon={
-                    <HideImageIcon
-                      color="primary"
-                      sx={{width: '2.875rem', height: '2.875rem'}}
+        {isEmpty ? (
+          <PageCard minHeight="100%">
+            <EmptySection
+              label="No service history entries for the applied filters!"
+              containerStyle={{mt: 12}}
+            />
+          </PageCard>
+        ) : (
+          <>
+            <HistoryBasicDetails>
+              <HistoryCard
+                showTimeCategory
+                // noContent={!selectedOrder}
+                serviceOrder={selectedOrder}
+                headerTitle={currentScheduleDate || null}
+                description={selectedOrder?.description}
+                scheduledTime={
+                  currentScheduleDate && currentScheduleTime
+                    ? `${currentScheduleDate}, ${currentScheduleTime}`
+                    : ''
+                }
+                minHeight="30vh"
+                isDetailCard
+                removeBottomLeftRadius
+                removeBottomRightRadius
+                showAlert
+                headerActionIcon={<MoreVertIcon />}
+                subtitle={currentScheduleTime || null}
+                containerStyles={{
+                  borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+                  pt: '0.5em',
+                }}
+              />
+            </HistoryBasicDetails>
+            <HistoryReport>
+              <HistoryCard
+                serviceOrder={selectedOrder}
+                noContent={!serviceOrderReport.length}
+                serviceOrderReport={serviceOrderReport[0]}
+                reportIsLoading={serviceOrderReportLoading}
+                minHeight="30vh"
+                isDetailCard
+                removeTopLeftRadius
+                removeTopRightRadius
+                removeServiceOrderType
+                removeServiceOrderStatus
+                showMoreReportDetails={!!serviceOrderReport.length}
+                showActionSection
+                containerStyles={{
+                  pt: '0.5em',
+                }}
+                handleExpandClick={handleExpandClick}
+                expanded={expanded}
+                collapsedChildren={
+                  downloadUrl?.length ? (
+                    <HistoryAttachments downloadUrl={downloadUrl} />
+                  ) : (
+                    <EmptyIllustration
+                      label="No image attachments are added to the work report!"
+                      labelStyle={{
+                        mt: '1em',
+                        color: theme.palette.text.secondary,
+                      }}
+                      labelVariant="subtitle2"
+                      icon={
+                        <HideImageIcon
+                          color="primary"
+                          sx={{width: '2.875rem', height: '2.875rem'}}
+                        />
+                      }
                     />
-                  }
-                />
-              )
-            }
-            headerTitle="Work Report"
-            subtitle={currentReportDate || 'Awaiting completion of visit'}
-          />
-        </HistoryReport>
+                  )
+                }
+                headerTitle="Work Report"
+                subtitle={currentReportDate || 'Awaiting completion of visit'}
+              />
+            </HistoryReport>
+          </>
+        )}
       </Grid>
       <Grid item xs={4}>
         <PageCard
@@ -258,31 +307,49 @@ export const ServiceHistoryTab = () => {
               onSelectedOptionChanged={onStatusSelect}
             />
           </Box>
-          <Box sx={{height: '55vh', overflowY: 'scroll'}}>
-            {serviceOrders.data.map((serviceOrder: ServiceOrderView) => (
-              <HistoryCard
-                serviceOrder={serviceOrder}
-                headerTitle={formatDate(
-                  serviceOrder.schedules[0].startTime,
-                  'dd MMM YYY',
-                )}
-                subtitle={`${formatDate(
-                  serviceOrder?.schedules[0].startTime,
-                  'ha',
-                )} - ${formatDate(serviceOrder?.schedules[0].endTime, 'ha')}`}
-                description={serviceOrder.description}
-                key={serviceOrder.id}
-                selected={serviceOrder.id === selectedOrder?.id}
-                onCardSelect={() => setSelectedOrder(serviceOrder)}
-                containerStyles={{borderRadius: 0}}
-                showPointer
-                removeShadows
-                bodyContainerStyle={{
-                  borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-                }}
+          {isEmpty ? (
+            <Box
+              sx={{height: '55vh'}}
+              display="flex"
+              flexDirection="column"
+              alignItems="center">
+              <EmptySection
+                label="No service history entries for the applied filters!"
+                illustration="clipboard"
+                size="small"
+                containerStyle={{mt: 8, mb: 2}}
               />
-            ))}
-          </Box>
+              <Button variant="contained" onClick={resetFilters}>
+                Reset Filters
+              </Button>
+            </Box>
+          ) : (
+            <Box sx={{height: '55vh', overflowY: 'scroll'}}>
+              {serviceOrders.data.map((serviceOrder: ServiceOrderView) => (
+                <HistoryCard
+                  serviceOrder={serviceOrder}
+                  headerTitle={formatDate(
+                    serviceOrder.schedules[0].startTime,
+                    'dd MMM YYY',
+                  )}
+                  subtitle={`${formatDate(
+                    serviceOrder?.schedules[0].startTime,
+                    'ha',
+                  )} - ${formatDate(serviceOrder?.schedules[0].endTime, 'ha')}`}
+                  description={serviceOrder.description}
+                  key={serviceOrder.id}
+                  selected={serviceOrder.id === selectedOrder?.id}
+                  onCardSelect={() => setSelectedOrder(serviceOrder)}
+                  containerStyles={{borderRadius: 0}}
+                  showPointer
+                  removeShadows
+                  bodyContainerStyle={{
+                    borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+                  }}
+                />
+              ))}
+            </Box>
+          )}
         </PageCard>
       </Grid>
     </Grid>
