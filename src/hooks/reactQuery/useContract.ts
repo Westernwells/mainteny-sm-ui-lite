@@ -242,10 +242,10 @@ export const queryCustomerContract = async (
   return response.data;
 };
 
-export const useuseQueryCustomerContracts = (
+export const useUseQueryCustomerContracts = (
   params: WithOptional<CustomerContractParams, 'serviceCompanyId'>,
-  filter: ContractFilters,
   id?: string,
+  filter?: ContractFilters | null,
   options?: any,
 ) => {
   const {user} = useUserSession();
@@ -261,8 +261,11 @@ export const useuseQueryCustomerContracts = (
       ...options,
       select: useCallback(
         (contractsRes: Resource<ContractView>) => {
-          const filterResult = filterContracts(contractsRes, filter);
-          return filterResult;
+          if (filter) {
+            const filterResult = filterContracts(contractsRes, filter);
+            return filterResult;
+          }
+          return contractsRes;
         },
         [filter],
       ),

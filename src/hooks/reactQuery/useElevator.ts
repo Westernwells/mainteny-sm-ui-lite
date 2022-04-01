@@ -173,7 +173,7 @@ export const useQueryCustomerElevator = (
   options?: any,
 ) =>
   useQuery(
-    [queryKeys.queryUnitsByCustomer, id],
+    [queryKeys.queryUnitsByCustomer, params, id],
     () => queryCustomerElevator(params, id!),
     {
       enabled: !!id,

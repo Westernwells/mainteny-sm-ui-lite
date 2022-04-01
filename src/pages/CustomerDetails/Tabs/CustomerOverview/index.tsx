@@ -1,3 +1,4 @@
+import {useEffect, useState} from 'react';
 import WorkIcon from '@mui/icons-material/Work';
 import HomeIcon from '@mui/icons-material/Home';
 import EmailIcon from '@mui/icons-material/Email';
@@ -14,17 +15,36 @@ import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 
 import {PageCard} from 'components/PageCard';
 import {Searchnput} from 'components/SearchInput';
-import {useEffect, useState} from 'react';
+import {OverviewUnitsCard} from './OverviewUnitsCard';
+import {OverviewContractsCard} from './OverviewContractsCard';
 
 interface Props {
   customerId?: string;
   getCustomerName?: (value: string) => void;
 }
 
+interface BasicDetailsValue {
+  label: string;
+  value: string;
+  icon: JSX.Element;
+}
+
+interface BasicDetails {
+  name: BasicDetailsValue;
+  phone: BasicDetailsValue;
+  startDate: BasicDetailsValue;
+  address: BasicDetailsValue;
+  email: BasicDetailsValue;
+}
+
 export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
   const theme = useTheme();
   const {data: customer} = useGetCustomer(customerId);
   const [basicDetails, setBasicDetails] = useState<BasicDetails>();
+  const [unitQuery, setUnitQuery] = useState('');
+  const [contractQuery, setContractQuery] = useState('');
+  const [totalUnits, setTotalUnits] = useState(0);
+  const [totalContracts, setTotalContracts] = useState(0);
 
   useEffect(() => {
     if (customer) {
@@ -70,10 +90,11 @@ export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
 
   const renderBasicDetails = () => (
     <BasicDetailsCard
-      minHeight="12rem"
+      minHeight="11rem"
       headerStyles={{pb: '0'}}
+      containerStyles={{}}
       header={<Typography variant="subtitle1">Basic Details</Typography>}>
-      <Box display="flex" flexWrap="wrap">
+      <Box display="flex" flexWrap="wrap" mt="-1em">
         {basicDetails &&
           Object.keys(basicDetails).map((item) => (
             <CardProps
@@ -96,6 +117,8 @@ export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
       <Grid container spacing={2} sx={{mt: '1em'}}>
         <Grid item xs={6}>
           <PageCard
+            minHeight="25vh"
+            containerStyles={{height: '45vh'}}
             headerContainerOverrideStyles={{backgroundColor: '#fff'}}
             customHeader={
               <Box display="flex" justifyContent="space-between">
@@ -108,11 +131,54 @@ export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
                     Units
                   </Typography>
                   <Typography variant="subtitle1" color="textSecondary">
-                    (500)
+                    ({totalUnits})
                   </Typography>
                 </Box>
                 <Searchnput
                   size="small"
+                  placeholder="Search"
+                  onValueChanged={(value) => setUnitQuery(value)}
+                  containerStyle={{
+                    background: theme.palette.inputBackground.main,
+                    width: '12rem',
+                  }}
+                />
+              </Box>
+            }>
+            <OverviewUnitsCard
+              getTotalUnits={(val) => setTotalUnits(val)}
+              customerId={customerId}
+              query={unitQuery}
+            />
+            {totalUnits > 3 ? (
+              <Box>
+                <Typography>See more</Typography>
+              </Box>
+            ) : null}
+          </PageCard>
+        </Grid>
+
+        <Grid item xs={6}>
+          <PageCard
+            minHeight="25vh"
+            containerStyles={{height: '45vh'}}
+            customHeader={
+              <Box display="flex" justifyContent="space-between">
+                <Box display="flex">
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      color: theme.palette.text.primary,
+                    }}>
+                    Contracts
+                  </Typography>
+                  <Typography variant="subtitle1" color="textSecondary">
+                    ({totalContracts})
+                  </Typography>
+                </Box>
+                <Searchnput
+                  size="small"
+                  onValueChanged={(value) => setContractQuery(value)}
                   placeholder="Search"
                   containerStyle={{
                     background: theme.palette.inputBackground.main,
@@ -121,24 +187,16 @@ export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
                 />
               </Box>
             }>
-            <Typography>sksks</Typography>
-          </PageCard>
-        </Grid>
-
-        <Grid item xs={6}>
-          <PageCard
-            customHeader={
+            <OverviewContractsCard
+              getTotalContracts={(val) => setTotalContracts(val)}
+              customerId={customerId}
+              query={contractQuery}
+            />
+            {totalUnits > 3 ? (
               <Box>
-                <Typography
-                  variant="subtitle1"
-                  sx={{
-                    color: theme.palette.text.primary,
-                  }}>
-                  Units(500)
-                </Typography>
+                <Typography>See more</Typography>
               </Box>
-            }>
-            <Typography>ksks</Typography>
+            ) : null}
           </PageCard>
         </Grid>
       </Grid>

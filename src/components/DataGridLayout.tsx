@@ -5,9 +5,17 @@ interface Props {
   rows: GridRowsProp;
   columns: GridColDef[];
   hideFooter?: boolean;
+  height?: string;
+  containerStyle?: {[key: string]: string | number};
 }
 
-export const DataGridLayout = ({rows, columns, hideFooter = false}: Props) => {
+export const DataGridLayout = ({
+  rows,
+  columns,
+  hideFooter = false,
+  height,
+  containerStyle,
+}: Props) => {
   const navigate = useNavigate();
   return (
     <DataGrid
@@ -24,7 +32,7 @@ export const DataGridLayout = ({rows, columns, hideFooter = false}: Props) => {
         }
       }}
       sx={{
-        height: 'max(400px, 60vh) !important',
+        height: height || 'max(400px, 60vh) !important',
         maxHeight: '73vh',
         width: '100%',
         my: '0.5em',
@@ -61,6 +69,7 @@ export const DataGridLayout = ({rows, columns, hideFooter = false}: Props) => {
         '& .MuiDataGrid-cell': {
           borderBottom: '2px solid #F0F4F5',
         },
+        ...containerStyle,
       }}
     />
   );
