@@ -21,6 +21,7 @@ import {OverviewContractsCard} from './OverviewContractsCard';
 interface Props {
   customerId?: string;
   getCustomerName?: (value: string) => void;
+  getCurrentTabIndex?: (val: number) => void;
 }
 
 interface BasicDetailsValue {
@@ -37,7 +38,11 @@ interface BasicDetails {
   email: BasicDetailsValue;
 }
 
-export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
+export const CustomerOverviewTab = ({
+  customerId,
+  getCustomerName,
+  getCurrentTabIndex,
+}: Props) => {
   const theme = useTheme();
   const {data: customer} = useGetCustomer(customerId);
   const [basicDetails, setBasicDetails] = useState<BasicDetails>();
@@ -130,7 +135,10 @@ export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
                     }}>
                     Units
                   </Typography>
-                  <Typography variant="subtitle1" color="textSecondary">
+                  <Typography
+                    variant="subtitle1"
+                    color="textSecondary"
+                    ml="0.3em">
                     ({totalUnits})
                   </Typography>
                 </Box>
@@ -151,8 +159,12 @@ export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
               query={unitQuery}
             />
             {totalUnits > 3 ? (
-              <Box>
-                <Typography>See more</Typography>
+              <Box
+                sx={{textAlign: 'center', cursor: 'pointer'}}
+                onClick={() => getCurrentTabIndex && getCurrentTabIndex(1)}>
+                <Typography variant="caption" color={theme.palette.info.main}>
+                  see more
+                </Typography>
               </Box>
             ) : null}
           </PageCard>
@@ -193,8 +205,12 @@ export const CustomerOverviewTab = ({customerId, getCustomerName}: Props) => {
               query={contractQuery}
             />
             {totalUnits > 3 ? (
-              <Box>
-                <Typography>See more</Typography>
+              <Box
+                sx={{textAlign: 'center', cursor: 'pointer'}}
+                onClick={() => getCurrentTabIndex && getCurrentTabIndex(2)}>
+                <Typography variant="caption" color={theme.palette.info.main}>
+                  see more
+                </Typography>
               </Box>
             ) : null}
           </PageCard>

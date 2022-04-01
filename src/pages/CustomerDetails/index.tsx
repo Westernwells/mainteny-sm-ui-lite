@@ -39,6 +39,7 @@ export const CustomerDetails = () => {
           <CustomerOverviewTab
             customerId={customerId}
             getCustomerName={(name) => setCustomerName(name)}
+            getCurrentTabIndex={(index) => setTabValue(index)}
           />
         </TabsBody>
         <TabsBody value={tabValue} index={1}>

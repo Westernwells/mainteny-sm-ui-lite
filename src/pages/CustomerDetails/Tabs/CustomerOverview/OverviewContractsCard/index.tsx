@@ -33,7 +33,6 @@ export const OverviewContractsCard = ({
       customerId,
     );
   useEffect(() => {
-    console.log(contractResource, '1!!!!@@@@@@');
     setRows(makeRows(contractResource));
     if (getTotalContracts) {
       getTotalContracts(contractResource.total);
