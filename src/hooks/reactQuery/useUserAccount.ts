@@ -21,13 +21,17 @@ export const queryUserAccouts = async (
   return response.data;
 };
 
-export const useQueryUserAccounts = (params: EmployeeQueryParams) => {
+export const useQueryUserAccounts = (
+  params: EmployeeQueryParams,
+  options?: any,
+) => {
   const {user} = useUserSession();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
   return useQuery(
     [qks.queryUserAccounts, params],
     () => queryUserAccouts(params, serviceCompanyId!),
     {
+      ...options,
       enabled: !!serviceCompanyId,
     },
   );

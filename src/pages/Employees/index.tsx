@@ -17,23 +17,27 @@ import {toRestDateTime} from 'utils/datetime';
 import {addDays, endOfDay, startOfDay} from 'date-fns';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {columns, makeRows} from './EmployeeDataGridProps';
+import {CustomPagination} from '../../components/CustomPagination';
 
 export const Employees = () => {
-  const [page] = useState(makePage(0, 20));
+  const [page, setPage] = useState(makePage(0, 10));
+  const [pageCount, setPageCount] = useState(0);
   const [search, setSearch] = useState('');
   const [showFilter, setShowFilter] = useState(false);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [employeeResource, setEmployeeResource] = useState(
-    createEmptyResource<EmployeesView>(20),
+    createEmptyResource<EmployeesView>(10),
   );
   const {data: userAccountResource = createEmptyResource<UserAccountView>(20)} =
-    useQueryUserAccounts({
-      pageIndex: page.pageIndex,
-      pageSize: page.pageSize,
-      query: search,
-      roles: [Role.SERVICE_MANAGER, Role.TECHNICIAN],
-    });
-
+    useQueryUserAccounts(
+      {
+        pageIndex: page.pageIndex,
+        pageSize: page.pageSize,
+        query: search,
+        roles: [Role.SERVICE_MANAGER, Role.TECHNICIAN],
+      },
+      {keepPreviousData: true},
+    );
   const {data: technicians = []} = useFetchTechniciansByUserAccounts(
     userAccountResource.data,
   );
@@ -95,6 +99,10 @@ export const Employees = () => {
     setRows(makeRows(employeeResource.data));
   }, [employeeResource]);
 
+  useEffect(() => {
+    setPageCount(Math.ceil(userAccountResource.total / page.pageSize));
+  }, [userAccountResource, page.pageSize]);
+
   return (
     <PageOverviewLayout
       label="Employees"
@@ -110,6 +118,19 @@ export const Employees = () => {
         />
       }>
       <DataGridLayout rows={rows} columns={columns} hideFooter />
+      {!!pageCount && (
+        <CustomPagination
+          pageSize={page.pageSize}
+          handlePageSizeChange={(newPageSize: number) =>
+            setPage({...page, pageSize: newPageSize})
+          }
+          handlePageChange={(newPage: number) => {
+            setPage({...page, pageIndex: newPage - 1});
+          }}
+          pageCount={pageCount}
+          totalRows={userAccountResource.total}
+        />
+      )}
     </PageOverviewLayout>
   );
 };
