@@ -63,7 +63,13 @@ export const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
         label={params.value}
-        color={params.value === ElevatorStatus.RUNNING ? 'success' : 'error'}
+        color={
+          params.value === ElevatorStatus.RUNNING
+            ? 'success'
+            : params.value === ElevatorStatus.BROKEN
+            ? 'warning'
+            : 'error'
+        }
       />
     ),
   },
