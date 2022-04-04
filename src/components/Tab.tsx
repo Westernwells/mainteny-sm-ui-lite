@@ -1,4 +1,4 @@
-import {ReactNode, useState} from 'react';
+import {ReactNode} from 'react';
 import Box from '@mui/material/Box';
 import MuiTabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -15,7 +15,8 @@ interface Props {
   children: ReactNode;
   tabItems: TabItems[];
   backBtnLabel?: string;
-  getCurrentTabIndex?: (index: number) => void;
+  onChange?: (tabIndex: number) => void;
+  currentIndex?: number;
 }
 
 const a11yProps = (index: number) => ({
@@ -26,11 +27,18 @@ const a11yProps = (index: number) => ({
 export const Tabs = ({
   children,
   tabItems,
-  getCurrentTabIndex = () => {},
+  onChange = () => {},
   backBtnLabel = '',
+  currentIndex = 0,
 }: Props) => {
-  const [value, setValue] = useState(0);
+  // const [value, setValue] = useState(0);
   const theme = useTheme();
+
+  // useEffect(() => {
+  //   if(getCurrentTabIndex) {
+  //     getCurrentTabIndex(value);
+  //   }
+  // }, [value])
 
   return (
     <Box
@@ -58,10 +66,14 @@ export const Tabs = ({
               backgroundColor: 'transparent',
             },
           }}
-          value={value}
+          value={currentIndex}
           onChange={(e: any, newValue: number) => {
-            getCurrentTabIndex(newValue);
-            setValue(newValue);
+            // getCurrentTabIndex(newValue);
+            if (onChange) {
+              onChange(newValue);
+            }
+
+            // setValue(newValue);
           }}
           textColor="secondary">
           {tabItems.map((item, index) => (

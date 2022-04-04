@@ -31,7 +31,8 @@ export const UnitsDetail = () => {
   return (
     <Tabs
       tabItems={tabItems}
-      getCurrentTabIndex={(index) => setValue(index)}
+      currentIndex={value}
+      onChange={(index) => setValue(index)}
       backBtnLabel={customerName}>
       <TabsBody value={value} index={0}>
         <OverviewTab

@@ -33,7 +33,8 @@ export const CustomerDetails = () => {
     <Box>
       <Tabs
         tabItems={tabItems}
-        getCurrentTabIndex={(index) => setTabValue(index)}
+        currentIndex={tabValue}
+        onChange={(index) => setTabValue(index)}
         backBtnLabel={customerName}>
         <TabsBody value={tabValue} index={0}>
           <CustomerOverviewTab
