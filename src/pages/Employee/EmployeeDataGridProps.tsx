@@ -163,8 +163,8 @@ export const columns: GridColDef[] = [
     },
   },
   {
-    field: 'message',
-    headerName: 'MESSAGE',
+    field: 'email',
+    headerName: 'EMAIL',
     editable: false,
     sortable: false,
     disableColumnMenu: true,
@@ -172,7 +172,9 @@ export const columns: GridColDef[] = [
     ...defaultAlignment,
 
     renderHeader: (params) => (
-      <Typography variant="subtitle2">{params.colDef.headerName}</Typography>
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName}
+      </Typography>
     ),
     renderCell: () => (
       <SendIcon
