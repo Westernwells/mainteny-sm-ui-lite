@@ -6,11 +6,13 @@ import {
   GridRowsProp,
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
-import MailIcon from '@mui/icons-material/Mail';
-import {theme} from 'theme';
 import {EmployeesView} from 'models/employee';
+import Box from '@mui/material/Box';
 import {TechnicianEventType} from 'models/misc';
-import {StatusChip} from 'components/StatusChip';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import {ReactComponent as ThermometerIcon} from 'assets/icons/Thermometer.svg';
+import {ReactComponent as SunIcon} from 'assets/icons/Sun.svg';
+import SendIcon from '@mui/icons-material/Send';
 
 const defaultProps = {
   editable: false,
@@ -96,35 +98,73 @@ export const columns: GridColDef[] = [
     field: 'availability',
     headerName: 'AVAILABILITY',
     type: 'string',
-    ...defaultAlignment,
+    flex: 1,
+    headerAlign: 'left',
+    align: 'left',
     ...defaultProps,
 
-    renderCell: (params) => (
-      <StatusChip
-        color="success"
-        label={`${(params.value as string)[0]}${(params.value as string)
-          .slice(1)
-          .toLowerCase()}`}
-        bgColor={
-          params.value === TechnicianEventType.HOLIDAY
-            ? theme.palette.warning.main
-            : theme.palette.success.main
-        }
-      />
-    ),
+    renderCell: (params) => {
+      switch (params.value) {
+        case TechnicianEventType.HOLIDAY:
+          return (
+            <Box display="flex" mx="0.5em">
+              <Box>
+                <SunIcon
+                  style={{
+                    height: '16.5px',
+                    width: '0.9375rem',
+                    marginTop: '0.1em',
+                  }}
+                />
+              </Box>
+              <Box>
+                <Typography variant="body2" ml="0.5em">
+                  Holiday
+                </Typography>
+              </Box>
+            </Box>
+          );
+        case TechnicianEventType.SICK_LEAVE:
+          return (
+            <Box display="flex">
+              <Box>
+                <ThermometerIcon
+                  style={{
+                    height: '16.5px',
+                    width: '0.9375rem',
+                    marginTop: '0.1em',
+                  }}
+                />
+              </Box>
+              <Box>
+                <Typography variant="body2" ml="0.5em">
+                  Sick
+                </Typography>
+              </Box>
+            </Box>
+          );
+        default:
+          return (
+            <Box display="flex">
+              <Box>
+                <CalendarTodayIcon
+                  sx={{height: 16.5, width: '0.9375rem', marginTop: '0.1em'}}
+                />
+              </Box>
+              <Box>
+                {' '}
+                <Typography variant="body2" ml="0.5em">
+                  Available
+                </Typography>
+              </Box>
+            </Box>
+          );
+      }
+    },
   },
   {
     field: 'message',
     headerName: 'MESSAGE',
-    // TODO: Actions not working as expected
-    // type: 'actions',
-    // getActions: (params: GridRowParams) => [
-    //   <GridActionsCellItem
-    //     icon={<FileDownloadOutlinedIcon sx={{color: '#2196F3'}} />}
-    //     onClick={() => console.log('ACTION: Click', params.id)}
-    //     label="Download"
-    //   />,
-    // ],
     editable: false,
     sortable: false,
     disableColumnMenu: true,
@@ -135,7 +175,7 @@ export const columns: GridColDef[] = [
       <Typography variant="subtitle2">{params.colDef.headerName}</Typography>
     ),
     renderCell: () => (
-      <MailIcon
+      <SendIcon
         sx={{color: '#2196F3'}}
         onClick={() => console.log('ACTION: Download')}
       />
