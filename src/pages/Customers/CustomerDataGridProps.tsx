@@ -6,7 +6,7 @@ import {
   GridRowsProp,
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
-import MailIcon from '@mui/icons-material/Mail';
+import SendIcon from '@mui/icons-material/Send';
 import {StatusChip} from 'components/StatusChip';
 import {theme} from 'theme';
 import IconButton from '@mui/material/IconButton';
@@ -122,7 +122,7 @@ export const columns: GridColDef[] = [
         onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
           e.stopPropagation();
         }}>
-        <MailIcon sx={{color: '#2196F3'}} />
+        <SendIcon sx={{color: '#2196F3'}} />
       </IconButton>
     ),
   },
