@@ -7,7 +7,7 @@ interface Props {
   bodyTextVariant?: any;
   titleTextVariant?: any;
   iconBackground?: string;
-  bodyText: string;
+  bodyText: string | JSX.Element;
   iconMaxHeight?: string | number;
   containerStyles?: {[key: string]: string | number};
 }
@@ -42,9 +42,15 @@ export const CardProps = ({
           {label}
         </Typography>
       </Box>
-      <Box>
-        <Typography variant={bodyTextVariant || 'body2'}>{bodyText}</Typography>
-      </Box>
+      {typeof bodyText === 'string' ? (
+        <Box>
+          <Typography variant={bodyTextVariant || 'body2'}>
+            {bodyText}
+          </Typography>
+        </Box>
+      ) : (
+        bodyText
+      )}
     </Box>
   </Box>
 );

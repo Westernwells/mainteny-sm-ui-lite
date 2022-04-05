@@ -28,6 +28,7 @@ export interface Technician {
 
 export interface TechEventAdditionalInfo {
   leftVacationDays: number;
+  assignedServiceOrderTypes?: ServiceOrderType[];
 }
 
 export interface TechnicianView {
