@@ -6,13 +6,11 @@ import {
   GridRowsProp,
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
-import ReplyAllIcon from '@mui/icons-material/ReplyAll';
-import EditIcon from '@mui/icons-material/Edit';
-import MoreIcon from '@mui/icons-material/MoreVert';
-import useTheme from '@mui/material/styles/useTheme';
+import {useTheme} from '@mui/material';
 import {StatusChip} from 'components/StatusChip';
 import {formatDate} from 'utils/datetime';
 import {QuotationStatus} from 'models/quotation';
+import {Actions} from './Actions';
 
 const defaultProps = {
   editable: false,
@@ -44,12 +42,14 @@ export const columns: GridColDef[] = [
     type: 'string',
     flex: 1,
     headerAlign: 'left',
+    sortable: false,
     ...defaultProps,
   },
   {
     field: 'customer',
     headerName: 'CUSTOMER NAME',
     type: 'string',
+    sortable: false,
     ...defaultAlignment,
     ...defaultProps,
   },
@@ -58,6 +58,7 @@ export const columns: GridColDef[] = [
     headerName: 'ADDRESS',
     type: 'string',
     flex: 1,
+    sortable: false,
     headerAlign: 'left',
     ...defaultProps,
   },
@@ -74,6 +75,7 @@ export const columns: GridColDef[] = [
     type: 'string',
     ...defaultAlignment,
     editable: false,
+    sortable: false,
     renderHeader: (params: GridColumnHeaderParams) => (
       <Typography variant="tableHeaderText" color="textSecondary">
         {params.colDef.headerName}
@@ -116,25 +118,7 @@ export const columns: GridColDef[] = [
         {params.colDef.headerName}
       </Typography>
     ),
-    renderCell: (params) => (
-      <>
-        {params.row.status === 'SENT' ? (
-          <ReplyAllIcon
-            sx={{color: '#2196F3'}}
-            onClick={() => console.log('ACTION: Download')}
-          />
-        ) : (
-          <EditIcon
-            sx={{color: '#2196F3'}}
-            onClick={() => console.log('ACTION: Download')}
-          />
-        )}
-        <MoreIcon
-          sx={{color: '#2196F3', marginLeft: '.5em'}}
-          onClick={() => console.log('ACTION: Download')}
-        />
-      </>
-    ),
+    renderCell: (params) => <Actions status={params.row.status} />,
   },
 ];
 
