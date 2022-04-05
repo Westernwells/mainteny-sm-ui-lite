@@ -18,7 +18,7 @@ const tabItems = [
     icon: <ManageSearchIcon />,
   },
   {
-    label: 'Units',
+    label: 'Schedule',
     icon: <ElevatorIcon />,
   },
   {
