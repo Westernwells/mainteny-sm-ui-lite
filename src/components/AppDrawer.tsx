@@ -9,6 +9,7 @@ import WorkOutlinedIcon from '@mui/icons-material/WorkOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import {useLocation, useNavigate} from 'react-router-dom';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -155,6 +156,20 @@ export const AppDrawer = () => {
         setSelectedIndex(index);
         setSelectedPath('/employees');
         navigate('/employees');
+      },
+    },
+    {
+      text: 'Quotations',
+      icon: <RequestQuoteIcon sx={{color: '#fff'}} />,
+      path: '/quotations',
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/quotations');
+        navigate('/quotations');
       },
     },
   ];
