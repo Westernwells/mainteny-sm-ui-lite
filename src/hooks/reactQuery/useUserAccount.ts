@@ -36,3 +36,15 @@ export const useQueryUserAccounts = (
     },
   );
 };
+
+export const getUserAccount = async (username: string) => {
+  const response = await axiosClient.get<UserAccountView>(
+    `/api/users/${username}`,
+  );
+  return response.data;
+};
+
+export const useGetUserAccount = (username?: string) =>
+  useQuery([qks.getUserAccount, username], () => getUserAccount(username!), {
+    enabled: !!username,
+  });

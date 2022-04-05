@@ -13,6 +13,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import {ReactComponent as ThermometerIcon} from 'assets/icons/Thermometer.svg';
 import {ReactComponent as SunIcon} from 'assets/icons/Sun.svg';
 import SendIcon from '@mui/icons-material/Send';
+import {capitalize} from 'utils/utils';
 
 const defaultProps = {
   editable: false,
@@ -51,20 +52,19 @@ export const columns: GridColDef[] = [
     field: 'role',
     headerName: 'ROLE',
     type: 'string',
-    flex: 1,
+    flex: 2,
     headerAlign: 'left',
     align: 'left',
     ...defaultProps,
     renderCell: (params) => {
-      const role = (params.value as string)
-        .split(' ')
-        .map((item) => `${item[0]}${item.slice(1).toLowerCase()}`);
+      // [0].split('_').join(' ')
+      const role = capitalize(params.value);
       return (
         <Typography
           variant="body2"
           mx="0.5em"
           sx={{textTransform: 'capitalize'}}>
-          {role.join(' ')}
+          {role}
         </Typography>
       );
     },
@@ -190,7 +190,7 @@ export const makeRows = (employees: any): GridRowsProp =>
     ? employees.map((item: EmployeesView, index: number) => ({
         id: index,
         name: `${item.userAccount.firstName} ${item.userAccount.lastName}`,
-        role: item.userAccount.roles[0].split('_').join(' '),
+        role: item.userAccount.roles,
         address: item.address?.fullName || '-',
         phone: item.userAccount.contact.phone,
         shift:
@@ -198,6 +198,6 @@ export const makeRows = (employees: any): GridRowsProp =>
             ? `${item.workingHours[0].fromTime} - ${item.workingHours[0].toTime}`
             : '-',
         availability: item.events ? item.events[0].eventType : 'Available',
-        navigateTo: item.userAccount.username,
+        navigateTo: `details/${item.userAccount.username}`,
       }))
     : console.error('No Data');

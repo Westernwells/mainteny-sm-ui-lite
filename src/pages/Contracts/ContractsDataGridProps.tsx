@@ -113,6 +113,6 @@ export const makeRows = (contracts: any): GridRowsProp =>
           currency: item.currency,
         })}`,
         expiryDate: formatDate(item.endTime),
-        navigateTo: item.id,
+        navigateTo: `details/${item.id}`,
       }))
     : console.error('No Data');

@@ -86,3 +86,19 @@ export const useQueryTechnicianEvents = (params: TechniciansEventsParams) => {
     },
   );
 };
+
+export const getTechnician = async (username: string) => {
+  const response = await axiosClient.get<TechnicianView[]>(
+    `/api/users/technicians`,
+    {
+      params: {username},
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useGetTechnician = (username: string | null) =>
+  useQuery([qks.getTechnician, username], () => getTechnician(username!), {
+    enabled: !!username,
+  });
