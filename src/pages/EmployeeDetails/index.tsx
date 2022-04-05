@@ -2,12 +2,12 @@ import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
-import ElevatorIcon from '@mui/icons-material/Elevator';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
+import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import {useParams} from 'react-router';
 import {useGetUserAccount} from 'hooks/reactQuery/useUserAccount';
 import {useGetTechnician} from 'hooks/reactQuery/useTechnician';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import {Role} from 'models/user';
 import {EmployeesView} from 'models/employee';
 import {EmployeeOverview} from './Tabs/EmployeeOverview';
@@ -19,11 +19,11 @@ const tabItems = [
   },
   {
     label: 'Schedule',
-    icon: <ElevatorIcon />,
+    icon: <CalendarTodayIcon />,
   },
   {
-    label: 'Contracts',
-    icon: <FileCopyIcon />,
+    label: 'Holiday',
+    icon: <WbSunnyIcon />,
   },
 ];
 
