@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import {TabsBody} from 'components/TabsBody';
