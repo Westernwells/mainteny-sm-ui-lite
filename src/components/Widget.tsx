@@ -1,4 +1,4 @@
-import {MouseEvent, useState} from 'react';
+import {useState} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -43,13 +43,6 @@ export const Widget = ({
   const theme = useTheme();
   const [view, setView] = useState('list');
 
-  const handleViewChange = (
-    event: MouseEvent<HTMLElement>,
-    nextView: string,
-  ) => {
-    setView(nextView);
-  };
-
   return (
     <Box>
       <Box display="flex">
@@ -90,21 +83,27 @@ export const Widget = ({
           </Box>
         ) : null}
         {!hideViewOption ? (
-          <ToggleButtonGroup
-            color="secondary"
-            value={view}
-            exclusive
-            onChange={handleViewChange}>
+          <ToggleButtonGroup color="secondary" value={view} exclusive>
             <ToggleButton
               value="list"
               aria-label="list"
-              onClick={() => (closeMapView ? closeMapView() : () => {})}>
+              onClick={() => {
+                setView('list');
+                if (closeMapView) {
+                  closeMapView();
+                }
+              }}>
               <ViewListIcon />
             </ToggleButton>
             <ToggleButton
               value="module"
               aria-label="module"
-              onClick={() => (openMapView ? openMapView() : () => {})}>
+              onClick={() => {
+                setView('module');
+                if (openMapView) {
+                  openMapView();
+                }
+              }}>
               <FormatAlignLeftIcon />
             </ToggleButton>
           </ToggleButtonGroup>
