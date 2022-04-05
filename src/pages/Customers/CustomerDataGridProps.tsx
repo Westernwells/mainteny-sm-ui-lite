@@ -9,6 +9,8 @@ import Typography from '@mui/material/Typography';
 import MailIcon from '@mui/icons-material/Mail';
 import {StatusChip} from 'components/StatusChip';
 import {theme} from 'theme';
+import IconButton from '@mui/material/IconButton';
+import React from 'react';
 
 const defaultProps = {
   editable: false,
@@ -91,7 +93,7 @@ export const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'actions',
+    field: 'email',
     headerName: 'ACTIONS',
     // TODO: Actions not working as expected
     // type: 'actions',
@@ -113,11 +115,15 @@ export const columns: GridColDef[] = [
         {params.colDef.headerName}
       </Typography>
     ),
-    renderCell: () => (
-      <MailIcon
-        sx={{color: '#2196F3'}}
-        onClick={() => console.log('ACTION: Download')}
-      />
+    renderCell: (params) => (
+      <IconButton
+        component="a"
+        href={`mailto:${params.value}`}
+        onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+          e.stopPropagation();
+        }}>
+        <MailIcon sx={{color: '#2196F3'}} />
+      </IconButton>
     ),
   },
 ];
@@ -133,5 +139,6 @@ export const makeRows = (customers: any): GridRowsProp =>
         phone: item.contact.phone,
         access: 'Invite',
         navigateTo: `details/${item.id}`,
+        email: item.contact.email,
       }))
     : console.error('No Data');
