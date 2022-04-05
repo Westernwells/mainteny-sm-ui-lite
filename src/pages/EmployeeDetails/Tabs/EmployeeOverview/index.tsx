@@ -61,7 +61,7 @@ export const EmployeeOverview = ({employee}: Props) => {
             employee && employee.workingHours?.length
               ? `${capitalize([employee.workingHours[0].type])} ${
                   employee.workingHours[0].fromTime
-                }-${employee.workingHours[0].toTime}`
+                } - ${employee.workingHours[0].toTime}`
               : '-',
           icon: <TimerOutlinedIcon sx={{color: theme.palette.info.dark}} />,
         },
