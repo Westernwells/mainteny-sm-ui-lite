@@ -50,7 +50,7 @@ export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
             sx={{cursor: 'pointer'}}
             onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
               e.preventDefault();
-              navigate(`/units/${elevatorOrder.elevator.id}`);
+              navigate(`details/${elevatorOrder.elevator.id}`);
             }}>
             <Box display="flex" alignItems="center">
               <Elevator style={{marginRight: '10px'}} />

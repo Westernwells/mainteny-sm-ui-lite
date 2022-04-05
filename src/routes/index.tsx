@@ -14,6 +14,7 @@ import {InvoiceDetails} from 'pages/InvoiceDetails';
 import {Notifications} from 'pages/Notifications';
 import {PageNotFound} from 'pages/PageNotFound';
 import {Employees} from 'pages/Employee';
+import {EmployeeDetails} from 'pages/EmployeeDetails';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -51,7 +52,7 @@ export const Router = () => {
           }
         />
         <Route
-          path="/units/:id"
+          path="/units/details/:id"
           element={
             <>
               <Helmet>
@@ -78,7 +79,7 @@ export const Router = () => {
           }
         />
         <Route
-          path="/contracts/:id"
+          path="/contracts/details/:id"
           element={
             <>
               <Helmet>
@@ -105,7 +106,7 @@ export const Router = () => {
           }
         />
         <Route
-          path="/invoices/:id"
+          path="/invoices/details/:id"
           element={
             <>
               <Helmet>
@@ -133,6 +134,20 @@ export const Router = () => {
         />
 
         <Route
+          path="/employees/details/:id"
+          element={
+            <>
+              <Helmet>
+                <title>{`Employee Details - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout overflowY>
+                <EmployeeDetails />
+              </PageLayout>
+            </>
+          }
+        />
+
+        <Route
           path="/customers"
           element={
             <>
@@ -146,7 +161,7 @@ export const Router = () => {
           }
         />
         <Route
-          path="/customers/:id"
+          path="/customers/details/:id"
           element={
             <>
               <Helmet>

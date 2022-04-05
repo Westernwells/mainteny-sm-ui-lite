@@ -27,4 +27,6 @@ export const queryKeys = {
   getCustomer: 'getCustomer',
   queryCustomerContract: 'queryCustomerContract',
   queryUnitsByCustomer: 'queryUnitsByCustomer',
+  getTechnician: 'getTechnician',
+  getUserAccount: 'getUserAccount',
 };
