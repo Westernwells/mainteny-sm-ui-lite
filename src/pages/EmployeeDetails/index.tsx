@@ -2,12 +2,12 @@ import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
-import ElevatorIcon from '@mui/icons-material/Elevator';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
+import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import {useParams} from 'react-router';
 import {useGetUserAccount} from 'hooks/reactQuery/useUserAccount';
 import {useGetTechnician} from 'hooks/reactQuery/useTechnician';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import {Role} from 'models/user';
 import {EmployeesView} from 'models/employee';
 import {EmployeeOverview} from './Tabs/EmployeeOverview';
@@ -18,12 +18,12 @@ const tabItems = [
     icon: <ManageSearchIcon />,
   },
   {
-    label: 'Units',
-    icon: <ElevatorIcon />,
+    label: 'Schedule',
+    icon: <CalendarTodayIcon />,
   },
   {
-    label: 'Contracts',
-    icon: <FileCopyIcon />,
+    label: 'Holiday',
+    icon: <WbSunnyIcon />,
   },
 ];
 
@@ -32,7 +32,7 @@ export const EmployeeDetails = () => {
   const {id: username} = useParams();
   const {data: userAccount} = useGetUserAccount(username);
   const [employee, setEmployee] = useState<EmployeesView>();
-  const {data: technician = []} = useGetTechnician(
+  const {data: technician} = useGetTechnician(
     userAccount && userAccount.roles.includes(Role.TECHNICIAN)
       ? userAccount.username
       : null,
@@ -42,7 +42,7 @@ export const EmployeeDetails = () => {
     if (
       userAccount &&
       userAccount.roles.includes(Role.TECHNICIAN) &&
-      technician.length
+      technician
     ) {
       userData = {...technician[0]};
     } else {
@@ -51,6 +51,7 @@ export const EmployeeDetails = () => {
 
     setEmployee(userData);
   }, [technician, userAccount]);
+
   return (
     <Box>
       <Tabs

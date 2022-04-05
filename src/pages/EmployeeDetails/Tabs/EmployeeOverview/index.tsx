@@ -15,6 +15,8 @@ import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import {capitalize} from 'utils/utils';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
+import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 
 interface Props {
   employee?: EmployeesView;
@@ -22,7 +24,7 @@ interface Props {
 
 interface BasicDetailsValue {
   label: string;
-  value: string;
+  value: string | JSX.Element;
   icon: JSX.Element;
 }
 
@@ -53,12 +55,13 @@ export const EmployeeOverview = ({employee}: Props) => {
           icon: <HomeIcon sx={{color: theme.palette.info.dark}} />,
         },
         shiftTime: {
+          // TODO: display order shift time in a toolt ipe
           label: 'SHIFT TIME',
           value:
             employee && employee.workingHours?.length
               ? `${capitalize([employee.workingHours[0].type])} ${
                   employee.workingHours[0].fromTime
-                }-${employee.workingHours[0].toTime}`
+                } - ${employee.workingHours[0].toTime}`
               : '-',
           icon: <TimerOutlinedIcon sx={{color: theme.palette.info.dark}} />,
         },
@@ -69,7 +72,34 @@ export const EmployeeOverview = ({employee}: Props) => {
         },
         assignedOrderTypes: {
           label: 'ASSIGNED ORDER TYPES',
-          value: 'Emergency',
+          value:
+            employee &&
+            employee.additionalInfo &&
+            employee.additionalInfo.assignedServiceOrderTypes?.length ? (
+              <Box display="flex">
+                {employee.additionalInfo?.assignedServiceOrderTypes?.map(
+                  (orderType) => (
+                    <Box display="flex" mr="0.4em">
+                      <Box mr="0.4em">
+                        <ServiceOrderIcons
+                          serviceOrderType={orderType}
+                          style={{width: '0.875rem', height: '0.75rem'}}
+                        />
+                      </Box>
+                      <Box mt="0.05em">
+                        <ServiceOrderTypeText
+                          variant="body2"
+                          serviceOrderType={orderType}
+                          capitalizeText
+                        />
+                      </Box>
+                    </Box>
+                  ),
+                )}
+              </Box>
+            ) : (
+              '-'
+            ),
           icon: <CalendarTodayIcon sx={{color: theme.palette.info.dark}} />,
         },
       });
@@ -77,11 +107,7 @@ export const EmployeeOverview = ({employee}: Props) => {
   }, [employee]);
 
   const renderBasicDetails = () => (
-    <BasicDetailsCard
-      minHeight="11rem"
-      headerStyles={{pb: '0'}}
-      containerStyles={{}}
-      header="">
+    <BasicDetailsCard minHeight="11rem" bodyContainerStyle={{height: '11rem'}}>
       <Grid container>
         <Grid item xs={2}>
           <Box
@@ -92,30 +118,34 @@ export const EmployeeOverview = ({employee}: Props) => {
               width: '80%',
             }}>
             <Box
-              sx={{width: '100%', display: 'flex', justifyContent: 'center'}}>
+              sx={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}>
+              <Avatar
+                alt=""
+                src=""
+                variant="circular"
+                sx={{
+                  width: '80px',
+                  height: '80px',
+                  aspectRatio: '1',
+                }}
+              />
               <Box>
-                <Avatar
-                  alt=""
-                  src=""
-                  variant="circular"
-                  sx={{
-                    width: '80px',
-                    height: '80px',
-                    aspectRatio: '1',
-                  }}
-                />
-                <Box>
-                  <Typography variant="subtitle1">
-                    {employee
-                      ? `${employee?.userAccount.firstName}  ${employee?.userAccount.lastName}`
-                      : ''}
-                  </Typography>
-                  <Typography variant="subtitle2" color="textSecondary">
-                    {employee
-                      ? `${capitalize(employee?.userAccount.roles)}`
-                      : ''}
-                  </Typography>
-                </Box>
+                <Typography variant="subtitle1" textAlign="center">
+                  {employee
+                    ? `${employee?.userAccount.firstName}  ${employee?.userAccount.lastName}`
+                    : ''}
+                </Typography>
+                <Typography
+                  variant="subtitle2"
+                  color="textSecondary"
+                  textAlign="center">
+                  {employee ? `${capitalize(employee?.userAccount.roles)}` : ''}
+                </Typography>
               </Box>
             </Box>
             <Divider
@@ -143,9 +173,16 @@ export const EmployeeOverview = ({employee}: Props) => {
           </Box>
         </Grid>
       </Grid>
-      <Box display="flex" justifyContent="flex-end">
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          mb: '4em',
+          color: theme.palette.info.dark,
+          cursor: 'pointer',
+        }}>
         {/* TODO: @Suraj, please update this to use an actual button */}
-        <Typography>Edit</Typography>
+        <Typography variant="subtitle2">Edit</Typography>
       </Box>
     </BasicDetailsCard>
   );

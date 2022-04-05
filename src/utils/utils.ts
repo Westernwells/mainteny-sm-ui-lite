@@ -1,4 +1,4 @@
-export const capitalize = (role: string[]) => {
+export const capitalize = (role: any[]) => {
   let roles = '';
   role.forEach((value: string, index: number) => {
     const item = value

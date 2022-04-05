@@ -9,7 +9,7 @@ interface Props {
   containerStyles?: {[key: string]: string | number};
   headerStyles?: {[key: string]: string | number};
   minHeight?: string | number;
-  header: string | JSX.Element;
+  header?: string | JSX.Element;
   headerActionIcon?: JSX.Element;
   children: ReactNode;
 }
@@ -30,12 +30,12 @@ export const BasicDetailsCard = ({
       ...containerStyles,
     }}>
     <CardHeader
-      sx={{pb: '1.5em', ...headerStyles}}
+      sx={{pb: header ? '1.5em' : '0', ...headerStyles}}
       action={
         headerActionIcon ? <IconButton>{headerActionIcon}</IconButton> : null
       }
-      title={header}
+      title={header || undefined}
     />
-    <CardContent sx={{...bodyContainerStyle}}>{children}</CardContent>
+    <CardContent sx={{py: '0', ...bodyContainerStyle}}>{children}</CardContent>
   </Card>
 );
