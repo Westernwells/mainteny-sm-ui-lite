@@ -95,15 +95,6 @@ export const columns: GridColDef[] = [
   {
     field: 'email',
     headerName: 'ACTIONS',
-    // TODO: Actions not working as expected
-    // type: 'actions',
-    // getActions: (params: GridRowParams) => [
-    //   <GridActionsCellItem
-    //     icon={<FileDownloadOutlinedIcon sx={{color: '#2196F3'}} />}
-    //     onClick={() => console.log('ACTION: Click', params.id)}
-    //     label="Download"
-    //   />,
-    // ],
     editable: false,
     sortable: false,
     disableColumnMenu: true,
@@ -118,9 +109,9 @@ export const columns: GridColDef[] = [
     renderCell: (params) => (
       <IconButton
         component="a"
-        href={`mailto:${params.value}`}
         onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
           e.stopPropagation();
+          window.open(`mailto:${params.value}`, '_blank');
         }}>
         <SendIcon sx={{color: '#2196F3'}} />
       </IconButton>

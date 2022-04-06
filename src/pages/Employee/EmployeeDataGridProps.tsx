@@ -181,9 +181,9 @@ export const columns: GridColDef[] = [
     renderCell: (params) => (
       <IconButton
         component="a"
-        href={`mailto:${params.value}`}
         onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
           e.stopPropagation();
+          window.open(`mailto:${params.value}`, '_blank');
         }}>
         <SendIcon sx={{color: '#2196F3'}} />
       </IconButton>
