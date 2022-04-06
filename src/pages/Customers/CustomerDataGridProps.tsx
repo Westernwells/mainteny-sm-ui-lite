@@ -6,9 +6,11 @@ import {
   GridRowsProp,
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
-import MailIcon from '@mui/icons-material/Mail';
+import SendIcon from '@mui/icons-material/Send';
 import {StatusChip} from 'components/StatusChip';
 import {theme} from 'theme';
+import IconButton from '@mui/material/IconButton';
+import React from 'react';
 
 const defaultProps = {
   editable: false,
@@ -91,17 +93,8 @@ export const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'actions',
+    field: 'email',
     headerName: 'ACTIONS',
-    // TODO: Actions not working as expected
-    // type: 'actions',
-    // getActions: (params: GridRowParams) => [
-    //   <GridActionsCellItem
-    //     icon={<FileDownloadOutlinedIcon sx={{color: '#2196F3'}} />}
-    //     onClick={() => console.log('ACTION: Click', params.id)}
-    //     label="Download"
-    //   />,
-    // ],
     editable: false,
     sortable: false,
     disableColumnMenu: true,
@@ -113,11 +106,15 @@ export const columns: GridColDef[] = [
         {params.colDef.headerName}
       </Typography>
     ),
-    renderCell: () => (
-      <MailIcon
-        sx={{color: '#2196F3'}}
-        onClick={() => console.log('ACTION: Download')}
-      />
+    renderCell: (params) => (
+      <IconButton
+        component="a"
+        onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+          e.stopPropagation();
+          window.open(`mailto:${params.value}`, '_blank');
+        }}>
+        <SendIcon sx={{color: '#2196F3'}} />
+      </IconButton>
     ),
   },
 ];
@@ -133,5 +130,6 @@ export const makeRows = (customers: any): GridRowsProp =>
         phone: item.contact.phone,
         access: 'Invite',
         navigateTo: `details/${item.id}`,
+        email: item.contact.email,
       }))
     : console.error('No Data');

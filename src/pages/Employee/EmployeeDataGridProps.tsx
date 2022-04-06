@@ -14,6 +14,8 @@ import {ReactComponent as ThermometerIcon} from 'assets/icons/Thermometer.svg';
 import {ReactComponent as SunIcon} from 'assets/icons/Sun.svg';
 import SendIcon from '@mui/icons-material/Send';
 import {capitalize} from 'utils/utils';
+import IconButton from '@mui/material/IconButton';
+import React from 'react';
 
 const defaultProps = {
   editable: false,
@@ -176,11 +178,15 @@ export const columns: GridColDef[] = [
         {params.colDef.headerName}
       </Typography>
     ),
-    renderCell: () => (
-      <SendIcon
-        sx={{color: '#2196F3'}}
-        onClick={() => console.log('ACTION: Download')}
-      />
+    renderCell: (params) => (
+      <IconButton
+        component="a"
+        onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+          e.stopPropagation();
+          window.open(`mailto:${params.value}`, '_blank');
+        }}>
+        <SendIcon sx={{color: '#2196F3'}} />
+      </IconButton>
     ),
   },
 ];
@@ -199,5 +205,6 @@ export const makeRows = (employees: any): GridRowsProp =>
             : '-',
         availability: item.events ? item.events[0].eventType : 'Available',
         navigateTo: `details/${item.userAccount.username}`,
+        email: item.userAccount.username,
       }))
     : console.error('No Data');
