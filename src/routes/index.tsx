@@ -11,10 +11,11 @@ import {ContractDetails} from 'pages/ContractDetails';
 import {CustomerDetails} from 'pages/CustomerDetails';
 import {Invoices} from 'pages/Invoices';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
-import {Notifications} from 'pages/Notifications';
-import {PageNotFound} from 'pages/PageNotFound';
 import {Employees} from 'pages/Employee';
 import {EmployeeDetails} from 'pages/EmployeeDetails';
+import {Quotations} from 'pages/Quotations';
+import {Notifications} from 'pages/Notifications';
+import {PageNotFound} from 'pages/PageNotFound';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -120,6 +121,32 @@ export const Router = () => {
         />
 
         <Route
+          path="/customers"
+          element={
+            <>
+              <Helmet>
+                <title>{`Customers - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout overflowY>
+                <Customer />
+              </PageLayout>
+            </>
+          }
+        />
+        <Route
+          path="/customers/details/:id"
+          element={
+            <>
+              <Helmet>
+                <title>{`Customer Details - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout overflowY>
+                <CustomerDetails />
+              </PageLayout>
+            </>
+          }
+        />
+        <Route
           path="/employees"
           element={
             <>
@@ -148,27 +175,42 @@ export const Router = () => {
         />
 
         <Route
-          path="/customers"
+          path="/quotations"
           element={
             <>
               <Helmet>
-                <title>{`Customers - ${titleTail}`}</title>
+                <title>{`Quotations - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout overflowY>
-                <Customer />
+              <PageLayout>
+                <Quotations />
               </PageLayout>
             </>
           }
         />
+
         <Route
-          path="/customers/details/:id"
+          path="/employees"
           element={
             <>
               <Helmet>
-                <title>{`Customer Details - ${titleTail}`}</title>
+                <title>{`Employees - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout overflowY>
-                <CustomerDetails />
+              <PageLayout>
+                <Employees />
+              </PageLayout>
+            </>
+          }
+        />
+
+        <Route
+          path="/quotations"
+          element={
+            <>
+              <Helmet>
+                <title>{`Quotations - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout>
+                <Quotations />
               </PageLayout>
             </>
           }
