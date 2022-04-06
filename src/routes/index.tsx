@@ -189,6 +189,34 @@ export const Router = () => {
         />
 
         <Route
+          path="/employees"
+          element={
+            <>
+              <Helmet>
+                <title>{`Employees - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout>
+                <Employees />
+              </PageLayout>
+            </>
+          }
+        />
+
+        <Route
+          path="/quotations"
+          element={
+            <>
+              <Helmet>
+                <title>{`Quotations - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout>
+                <Quotations />
+              </PageLayout>
+            </>
+          }
+        />
+
+        <Route
           path="/notifications"
           element={
             <>
