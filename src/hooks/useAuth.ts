@@ -42,6 +42,15 @@ export const useAuth = (): UseAuth => {
       console.log(status, '######');
 
       if (user?.token) {
+        if (!user.userAccount.roles.includes('SERVICE_MANAGER')) {
+          enqueueSnackbar(
+            'Uh oh! As a Property Manager, please login at https://app.mainteny.com/pm/',
+            {
+              variant: 'warning',
+            },
+          );
+          return;
+        }
         axiosClient.defaults.headers.common.Authorization = `Bearer ${user.token}`;
         // update stored user data
         updateUser(user);
