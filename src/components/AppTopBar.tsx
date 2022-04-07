@@ -7,24 +7,17 @@ import AppBar from '@mui/material/AppBar';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import useTheme from '@mui/material/styles/useTheme';
 
-import AvatarImg from 'assets/images/avatar.png';
 import {ReactComponent as LogoutIcon} from 'assets/icons/Logout.svg';
 import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
 import {useAuth} from 'hooks/useAuth';
 import {Link} from 'react-router-dom';
+import {useUserSession} from '../hooks/reactQuery/useUserSession';
 
 export const AppTopBar = () => {
   const theme = useTheme();
   const {signout} = useAuth();
-
-  // TODO: Use react-query hooks to fetch user data
-  const user = {
-    userAccount: {
-      firstName: 'Bruce',
-      lastName: 'Wayne',
-      roles: ['SERVICE_MANAGER'],
-    },
-  };
+  const {user} = useUserSession();
+  const fullName = `${user?.userAccount.firstName} ${user?.userAccount.lastName}`;
   return (
     <AppBar
       sx={{
@@ -70,14 +63,14 @@ export const AppTopBar = () => {
 
             {/* <Link to="/settings" style={{textDecoration: 'none'}}> */}
             <Box ml={8} display="flex" alignItems="center">
-              <Avatar alt="Bruce Wayne" src={AvatarImg} />
+              <Avatar alt={fullName} src={user?.userAccount.photoUrl} />
               <Box ml={2}>
                 <Typography
                   color="#222B45"
                   variant="subtitle1"
                   gutterBottom={false}
                   sx={{textTransform: 'capitalize'}}>
-                  {user?.userAccount.firstName} {user?.userAccount.lastName}
+                  {fullName}
                 </Typography>
                 <Typography
                   variant="subtitle2"
