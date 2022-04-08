@@ -44,7 +44,7 @@ export const useAuth = (): UseAuth => {
       if (user?.token) {
         if (!user.userAccount.roles.includes('SERVICE_MANAGER')) {
           enqueueSnackbar(
-            'Uh oh! As a Property Manager, please login at https://app.mainteny.com/pm/',
+            `Uh oh! As a Property Manager, please login at ${process.env.REACT_APP_PMUI_URL}`,
             {
               variant: 'warning',
             },
