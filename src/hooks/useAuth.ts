@@ -3,6 +3,8 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import {axiosClient} from 'utils/axios-utils';
 import {useSnackbar} from 'notistack';
 import {useUserSession} from './reactQuery/useUserSession';
+import {UserSession} from '../models/session';
+import {Role} from '../models/user';
 
 interface UseAuth {
   signin: (email: string, password: string) => Promise<void>;
@@ -33,16 +35,18 @@ export const useAuth = (): UseAuth => {
   ): Promise<void> => {
     try {
       setLoading(true);
-      const {data: user, status} = await axiosClient({
-        url: urlEndpoint,
-        method: 'POST',
-        data: {username: email, password},
-      });
+      const {data: user, status} = await axiosClient.post<UserSession>(
+        urlEndpoint,
+        {
+          username: email,
+          password,
+        },
+      );
 
       console.log(status, '######');
 
       if (user?.token) {
-        if (!user.userAccount.roles.includes('SERVICE_MANAGER')) {
+        if (!user.userAccount.roles.includes(Role.SERVICE_MANAGER)) {
           enqueueSnackbar(
             `Uh oh! As a Property Manager, please login at ${process.env.REACT_APP_PMUI_URL}`,
             {
