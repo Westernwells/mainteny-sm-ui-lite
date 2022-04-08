@@ -25,7 +25,7 @@ export const ElevatorBasicSection = ({
 }: ElevatorBasicSectionProp) => {
   const theme = useTheme();
   return (
-    <PageCard headerLabel="Unit Details">
+    <PageCard headerLabel="Unit Details" minHeight="30rem">
       {rows.map((item, index) => (
         <Box
           key={`${item}-${index}`}
@@ -48,7 +48,7 @@ export const ElevatorBasicSection = ({
             </Box>
             <Box>
               <Typography
-                variant={index === 0 ? 'subtitle1' : 'caption'}
+                variant={index === 0 ? 'subtitle2' : 'caption'}
                 color={
                   index === 0
                     ? theme.palette.primary.main
@@ -57,7 +57,7 @@ export const ElevatorBasicSection = ({
                 {item.leftLabel}
               </Typography>
               <Typography
-                variant={index === 0 ? 'caption' : 'body1'}
+                variant={index === 0 ? 'caption' : 'body2'}
                 color={theme.palette.primary.main}>
                 {item.leftValue}
               </Typography>
@@ -92,7 +92,7 @@ export const ElevatorBasicSection = ({
                   color={theme.palette.text.secondary}>
                   {item.rightLabel}
                 </Typography>
-                <Typography variant="body1" color={theme.palette.primary.main}>
+                <Typography variant="body2" color={theme.palette.primary.main}>
                   {item.rightValue}
                 </Typography>
               </Box>

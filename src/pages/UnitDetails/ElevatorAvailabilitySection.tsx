@@ -118,7 +118,7 @@ export const ElevatorAvailabilitySection = ({noStats}: Props) => {
     return days[days.length - 1];
   }
   return (
-    <PageCard headerLabel="Stats">
+    <PageCard headerLabel="Stats" minHeight="30rem">
       {!noStats ? (
         <EmptySection label="Stats will appear here if the unit is IoT enabled!" />
       ) : (
