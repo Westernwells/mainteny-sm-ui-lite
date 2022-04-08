@@ -75,8 +75,8 @@ export const useQueryCustomers = (
         serviceCompanyId: user!.userAccount.serviceCompany.id,
       }),
     {
-      ...options,
       enabled: !!user,
+      ...options,
     },
   );
 };

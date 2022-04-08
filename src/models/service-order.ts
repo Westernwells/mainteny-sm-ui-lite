@@ -263,3 +263,15 @@ export type OptionalCreateNonScheduledBody = WithOptional<
   | 'serviceCompanyId'
   | 'elevatorId'
 >;
+
+export interface ServiceOrderScheduleParams {
+  elevatorIds?: string[];
+  end: string;
+  start: string;
+  pageIndex: number;
+  pageSize: number;
+  query: string;
+  status?: ServiceOrderStatus[];
+  serviceCompanyId?: string;
+  technicianIds?: string[];
+}
