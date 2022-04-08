@@ -19,6 +19,7 @@ export const PageLayout = ({
   <Box
     maxWidth="100%"
     display="flex"
+    minHeight="100vh"
     sx={{
       overflowY: overflowY ? 'scroll' : 'hidden',
       '::-webkit-scrollbar': {
