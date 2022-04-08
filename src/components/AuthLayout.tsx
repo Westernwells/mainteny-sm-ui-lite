@@ -23,11 +23,11 @@ export const AuthLayout = ({children}: Props) => {
   const classes = useStyles();
 
   return (
-    <Box display="flex" height="100vh" sx={{backgroundColor: '#fff'}}>
+    <Box display="flex" minHeight="100vh" sx={{backgroundColor: '#fff'}}>
       <Box
         className={classes.leftBackground}
         width="38vw"
-        height="100%"
+        minHeight="100%"
         position="relative"
         display="flex"
         pt="15rem"
