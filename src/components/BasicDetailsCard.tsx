@@ -26,7 +26,7 @@ export const BasicDetailsCard = ({
   <Card
     sx={{
       border: 'none',
-      minHeight,
+      minHeight: minHeight || '5rem',
       ...containerStyles,
     }}>
     <CardHeader
@@ -36,6 +36,8 @@ export const BasicDetailsCard = ({
       }
       title={header || undefined}
     />
-    <CardContent sx={{py: '0', ...bodyContainerStyle}}>{children}</CardContent>
+    <CardContent sx={{py: '0', minHeight: '5rem', ...bodyContainerStyle}}>
+      {children}
+    </CardContent>
   </Card>
 );

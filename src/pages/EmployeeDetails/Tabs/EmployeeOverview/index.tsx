@@ -107,7 +107,7 @@ export const EmployeeOverview = ({employee}: Props) => {
   }, [employee]);
 
   const renderBasicDetails = () => (
-    <BasicDetailsCard minHeight="11rem" bodyContainerStyle={{height: '11rem'}}>
+    <BasicDetailsCard>
       <Grid container>
         <Grid item xs={2}>
           <Box
@@ -156,7 +156,7 @@ export const EmployeeOverview = ({employee}: Props) => {
           </Box>
         </Grid>
         <Grid item xs={10}>
-          <Box display="flex" flexWrap="wrap" mt="-1em">
+          <Box display="flex" flexWrap="wrap">
             {basicDetails &&
               Object.keys(basicDetails).map((item, index) => (
                 <CardProps
@@ -177,7 +177,6 @@ export const EmployeeOverview = ({employee}: Props) => {
         sx={{
           display: 'flex',
           justifyContent: 'flex-end',
-          mb: '4em',
           color: theme.palette.info.dark,
           cursor: 'pointer',
         }}>
