@@ -19,7 +19,6 @@ export const PageLayout = ({
   <Box
     maxWidth="100%"
     display="flex"
-    height="100vh"
     sx={{
       overflowY: overflowY ? 'scroll' : 'hidden',
       '::-webkit-scrollbar': {
@@ -38,8 +37,6 @@ export const PageLayout = ({
         flexGrow: 1,
         pt: !excludeDefaultSpacing ? 12 : null,
         px: !excludeDefaultSpacing ? 5 : null,
-        // pb: '1em',
-        // border: '2px solid red'
       }}>
       {children}
     </Box>
