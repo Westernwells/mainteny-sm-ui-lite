@@ -135,9 +135,9 @@ export const MyUnits = () => {
           <UnitColumns />
           <Box
             sx={{
-              height: 'max(400px, 55vh)',
-              maxHeight: '73vh',
+              flexGrow: 1,
               overflowY: 'scroll',
+              height: '1px',
             }}>
             {elevatorsByAddressList?.map((elevatorsByAddress) => (
               <UnitSection

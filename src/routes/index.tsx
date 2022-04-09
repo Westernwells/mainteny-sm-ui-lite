@@ -59,7 +59,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Unit Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout overflowY>
+              <PageLayout pageScrollable>
                 <UnitsDetail />
               </PageLayout>
             </>
@@ -86,7 +86,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Contract Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout overflowY>
+              <PageLayout pageScrollable>
                 <ContractDetails />
               </PageLayout>
             </>
@@ -113,7 +113,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Invoice Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout overflowY>
+              <PageLayout pageScrollable>
                 <InvoiceDetails />
               </PageLayout>
             </>
@@ -127,7 +127,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Customers - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout overflowY>
+              <PageLayout pageScrollable>
                 <Customer />
               </PageLayout>
             </>
@@ -140,7 +140,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Customer Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout overflowY>
+              <PageLayout pageScrollable>
                 <CustomerDetails />
               </PageLayout>
             </>
@@ -167,7 +167,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Employee Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout overflowY>
+              <PageLayout pageScrollable>
                 <EmployeeDetails />
               </PageLayout>
             </>
@@ -223,7 +223,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Notifications - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout excludeSidebar overflowY excludeDefaultSpacing>
+              <PageLayout excludeSidebar pageScrollable excludeDefaultSpacing>
                 <Notifications />
               </PageLayout>
             </>
@@ -237,7 +237,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Page not found! - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout excludeSidebar overflowY excludeDefaultSpacing>
+              <PageLayout excludeSidebar pageScrollable excludeDefaultSpacing>
                 <PageNotFound />
               </PageLayout>
             </>

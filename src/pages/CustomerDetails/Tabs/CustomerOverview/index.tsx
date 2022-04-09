@@ -97,6 +97,7 @@ export const CustomerOverviewTab = ({
     <BasicDetailsCard
       minHeight="11rem"
       headerStyles={{pb: '0'}}
+      bodyContainerStyle={{height: '9rem'}}
       header={<Typography variant="subtitle1">Basic Details</Typography>}>
       <Box display="flex" flexWrap="wrap" mt="-1em">
         {basicDetails &&
