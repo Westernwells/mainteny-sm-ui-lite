@@ -156,14 +156,18 @@ export const Employees = () => {
           />
           {!!pageCount && (
             <CustomPagination
-            pageSize={page.pageSize}
-            pageIndex={page.pageIndex}
-            handlePageSizeChange={(newPageSize: number) =>
-              setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
-            }
-            handlePageChange={(newPage: number) =>
-              setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-            }
+              pageSize={page.pageSize}
+              pageIndex={page.pageIndex}
+              handlePageSizeChange={(newPageSize: number) =>
+                setQueryParams(
+                  formatSearchParamsPageSize(newPageSize, queryParams),
+                )
+              }
+              handlePageChange={(newPage: number) =>
+                setQueryParams(
+                  formatSearchParamsPageIndex(newPage, queryParams),
+                )
+              }
               pageCount={pageCount}
               totalRows={userAccountResource.total}
             />
