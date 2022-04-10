@@ -18,7 +18,7 @@ import {CustomPagination} from 'components/CustomPagination';
 import {costRangeConvertor as crConverter} from 'utils/contract-utils';
 import {columns, makeRows} from './ContractsDataGridProps';
 
-const pageSize = 10;
+const pageSize = 25;
 
 export const Contracts = () => {
   const [search, setSearch] = useState('');

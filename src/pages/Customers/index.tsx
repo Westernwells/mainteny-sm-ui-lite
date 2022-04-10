@@ -12,22 +12,25 @@ import {CustomPagination} from 'components/CustomPagination';
 import {Widget} from '../../components/Widget';
 import {columns, makeRows} from './CustomerDataGridProps';
 
+const pageSize = 25;
+
 export const Customer = () => {
   const [search, setSearch] = useState('');
   const [showFilter, setShowFilter] = useState(false);
-  const [page, setPage] = useState(makePage(0, 10));
+  const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
 
-  const {data: customerResource = createEmptyResource<PropertyOwner>(10)} =
-    useQueryCustomers(
-      {
-        pageIndex: page.pageIndex,
-        pageSize: page.pageSize,
-        query: search,
-      },
-      {keepPreviousData: true},
-    );
+  const {
+    data: customerResource = createEmptyResource<PropertyOwner>(pageSize),
+  } = useQueryCustomers(
+    {
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+      query: search,
+    },
+    {keepPreviousData: true},
+  );
 
   const {data: customersWithUnits} = useFetchCustomerElevatorNumbers(
     customerResource.data,

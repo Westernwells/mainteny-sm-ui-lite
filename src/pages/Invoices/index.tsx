@@ -17,7 +17,7 @@ import {columns, makeRows} from './InvoicesDataGridProps';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
 import {Widget} from '../../components/Widget';
 
-const pageSize = 10;
+const pageSize = 25;
 
 export const Invoices = () => {
   const queryClient = useQueryClient();
@@ -32,7 +32,7 @@ export const Invoices = () => {
   const [pageCount, setPageCount] = useState(0);
 
   // TODO: Create Invoice model for invoices with 'Order number' and 'Service type'
-  const {data: invoiceResource = createEmptyResource<InvoiceView>(10)} =
+  const {data: invoiceResource = createEmptyResource<InvoiceView>(pageSize)} =
     useInvoices(
       {
         pageIndex: page.pageIndex,
