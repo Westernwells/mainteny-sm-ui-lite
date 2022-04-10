@@ -22,8 +22,8 @@ const pageSize = 25;
 export const Customer = () => {
   const [search, setSearch] = useState('');
   const [showFilter, setShowFilter] = useState(false);
-  const [page, setPage] = useState(makePage(0, pageSize));
   const [queryParams, setQueryParams] = useSearchParams();
+  const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
 
