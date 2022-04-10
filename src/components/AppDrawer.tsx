@@ -99,7 +99,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/units');
-        navigate('/units?pageIndex=1&pageSize=10');
+        navigate('/units?pageIndex=1&pageSize=25');
       },
     },
     {
@@ -113,7 +113,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/contracts');
-        navigate('/contracts?pageIndex=1&pageSize=10');
+        navigate('/contracts?pageIndex=1&pageSize=25');
       },
     },
     {
@@ -127,7 +127,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/invoices');
-        navigate('/invoices?pageIndex=1&pageSize=10');
+        navigate('/invoices?pageIndex=1&pageSize=25');
       },
     },
     {
@@ -141,7 +141,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/customers');
-        navigate('/customers?pageIndex=1&pageSize=10');
+        navigate('/customers?pageIndex=1&pageSize=25');
       },
     },
     {
@@ -155,7 +155,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/employees');
-        navigate('/employees?pageIndex=1&pageSize=10');
+        navigate('/employees?pageIndex=1&pageSize=25');
       },
     },
     {
@@ -169,7 +169,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/quotations');
-        navigate('/quotations?pageIndex=1&pageSize=10');
+        navigate('/quotations?pageIndex=1&pageSize=25');
       },
     },
   ];
