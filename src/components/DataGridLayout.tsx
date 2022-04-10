@@ -33,10 +33,10 @@ export const DataGridLayout = ({
         flexGrow: 1,
       }}>
       <DataGrid
-      components={{
-        LoadingOverlay: LinearProgress,
-      }}
-      loading={loading}
+        components={{
+          LoadingOverlay: LinearProgress,
+        }}
+        loading={loading}
         headerHeight={50}
         rows={rows}
         columns={columns}
@@ -69,10 +69,11 @@ export const DataGridLayout = ({
             display: 'none',
           },
           '& .MuiDataGrid-main': {
+            '.MuiLinearProgress-root': {
+              top: 50,
+              zIndex: 1,
+            },
             '& *:focus, & *:focus-within': {
-              '.MuiLinearProgress-root': {
-                top: 50,
-              },
               '& *': {
                 outline: 'none',
                 cursor: 'pointer',
