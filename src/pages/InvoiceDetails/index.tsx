@@ -1,4 +1,3 @@
-/* eslint-disable */
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
@@ -17,10 +16,10 @@ import {formatDate, getDateObject} from 'utils/datetime';
 import {InvoiceStatus, InvoiceStatusView} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
 import {Progress} from 'components/Progress';
+import {PdfGenerationStatus} from 'models/misc';
 import {InvoiceCard} from './InvoiceCard';
 import {Invoice} from './Invoice';
 import {RelatedTo} from './RelatedTo';
-import {PdfGenerationStatus} from 'models/misc';
 
 export const InvoiceDetails = () => {
   const {id: invoiceId} = useParams();
