@@ -132,7 +132,7 @@ export const fetchInvoice = async (invoiceId: string) => {
 export function useInvoiceDetail(invoiceId?: string) {
   const navigate = useNavigate();
   console.log(typeof navigate);
-  return useQuery(qk.invoiceById, () => fetchInvoice(invoiceId!), {
+  return useQuery([qk.invoiceById, invoiceId], () => fetchInvoice(invoiceId!), {
     enabled: !!invoiceId,
     onError: (e: any) => {
       if (e.response.status === 500) navigate('/404');

@@ -1,4 +1,4 @@
-import {Fee, Meta} from './misc';
+import {Fee, Meta, PdfGenerationStatus} from './misc';
 import {PropertyOwner} from './propertyManager';
 import {ServiceCompanySimpleView} from './service-company';
 import {ServiceOrderView, ServiceOrderType} from './service-order';
@@ -24,7 +24,7 @@ export interface InvoiceItem {
 
 export interface InvoiceAdditionalInfo {
   dueDate: string;
-  pdfGenerationStatus: string;
+  pdfGenerationStatus: PdfGenerationStatus;
   pdfPath: string;
 }
 

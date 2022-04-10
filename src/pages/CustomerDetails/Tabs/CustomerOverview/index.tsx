@@ -12,6 +12,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import {formatDate, getDateObject} from 'utils/datetime';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
+import {Progress} from 'components/Progress';
 
 import {PageCard} from 'components/PageCard';
 import {Searchnput} from 'components/SearchInput';
@@ -44,7 +45,7 @@ export const CustomerOverviewTab = ({
   getCurrentTabIndex,
 }: Props) => {
   const theme = useTheme();
-  const {data: customer} = useGetCustomer(customerId);
+  const {data: customer, isLoading} = useGetCustomer(customerId);
   const [basicDetails, setBasicDetails] = useState<BasicDetails>();
   const [unitQuery, setUnitQuery] = useState('');
   const [contractQuery, setContractQuery] = useState('');
@@ -115,6 +116,10 @@ export const CustomerOverviewTab = ({
       </Box>
     </BasicDetailsCard>
   );
+
+  if (isLoading) {
+    return <Progress />;
+  }
 
   return (
     <Box>

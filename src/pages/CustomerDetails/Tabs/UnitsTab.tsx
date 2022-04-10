@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {DataGridLayout} from 'components/DataGridLayout';
+import {Progress} from 'components/Progress';
 
 import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
@@ -26,17 +27,19 @@ export const UnitsTab = ({customerId}: Props) => {
   const [status, setStatus] = useState<string[]>([]);
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const {data: elevatorResource = createEmptyResource<ElevatorView>(10)} =
-    useQueryCustomerElevator(
-      {
-        query: search,
-        pageIndex: page.pageIndex,
-        pageSize: page.pageSize,
-      },
-      {status},
-      customerId,
-      {keepPreviousData: true},
-    );
+  const {
+    data: elevatorResource = createEmptyResource<ElevatorView>(10),
+    isLoading,
+  } = useQueryCustomerElevator(
+    {
+      query: search,
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+    },
+    {status},
+    customerId,
+    {keepPreviousData: true},
+  );
 
   useEffect(() => {
     setPageCount(Math.ceil(elevatorResource.total / page.pageSize));
@@ -71,27 +74,31 @@ export const UnitsTab = ({customerId}: Props) => {
           </FilterFields>
         </Box>
       </Fade>
-      <Box>
-        <DataGridLayout
-          hideFooter
-          rows={rows}
-          columns={columns}
-          height="60vh"
-        />
-        {pageCount && page.pageSize < elevatorResource.total ? (
-          <CustomPagination
-            pageSize={page.pageSize}
-            handlePageSizeChange={(newPageSize: number) =>
-              setPage({...page, pageSize: newPageSize})
-            }
-            handlePageChange={(newPage: number) => {
-              setPage({...page, pageIndex: newPage - 1});
-            }}
-            pageCount={pageCount}
-            totalRows={elevatorResource.total}
+      {isLoading ? (
+        <Progress />
+      ) : (
+        <>
+          <DataGridLayout
+            hideFooter
+            rows={rows}
+            columns={columns}
+            height="60vh"
           />
-        ) : null}
-      </Box>
+          {pageCount && page.pageSize < elevatorResource.total ? (
+            <CustomPagination
+              pageSize={page.pageSize}
+              handlePageSizeChange={(newPageSize: number) =>
+                setPage({...page, pageSize: newPageSize})
+              }
+              handlePageChange={(newPage: number) => {
+                setPage({...page, pageIndex: newPage - 1});
+              }}
+              pageCount={pageCount}
+              totalRows={elevatorResource.total}
+            />
+          ) : null}
+        </>
+      )}
     </PageOverviewLayout>
   );
 };

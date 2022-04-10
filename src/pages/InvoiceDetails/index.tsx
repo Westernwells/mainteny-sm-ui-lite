@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
@@ -15,18 +16,24 @@ import {HistoryCard} from 'pages/UnitDetails/Tabs/ServiceHistoryTab/HistoryCard'
 import {formatDate, getDateObject} from 'utils/datetime';
 import {InvoiceStatus, InvoiceStatusView} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
+import {Progress} from 'components/Progress';
 import {InvoiceCard} from './InvoiceCard';
 import {Invoice} from './Invoice';
 import {RelatedTo} from './RelatedTo';
+import {PdfGenerationStatus} from 'models/misc';
 
 export const InvoiceDetails = () => {
   const {id: invoiceId} = useParams();
-  const {data: invoice} = useInvoiceDetail(invoiceId);
+  const {data: invoice, isLoading, isFetched} = useInvoiceDetail(invoiceId);
 
   const {data: downloadUrl} = useDownloadUrl(
-    invoice?.additionalInfo.pdfPath ? [invoice?.additionalInfo.pdfPath] : [],
+    isFetched ? [invoice!.additionalInfo.pdfPath] : [],
   );
   const theme = useTheme();
+
+  if (isLoading) {
+    return <Progress />;
+  }
 
   return (
     <Box>
@@ -53,13 +60,13 @@ export const InvoiceDetails = () => {
             header={
               <Box display="flex" justifyContent="space-between">
                 <Box>
-                  <Typography variant="subtitle1">{invoice?.number}</Typography>
+                  <Typography variant="subtitle1">{invoice!.number}</Typography>
                   <Typography
                     variant="body2"
                     sx={{color: theme.palette.text.secondary}}>
                     Generated on{' '}
                     {formatDate(
-                      getDateObject(invoice?.meta.createdAt),
+                      getDateObject(invoice!.meta.createdAt),
                       'dd MMM YYY',
                     )}
                   </Typography>
@@ -72,7 +79,7 @@ export const InvoiceDetails = () => {
                     icon={
                       <MonetizationOnOutlinedIcon
                         color={
-                          invoice?.status === InvoiceStatus.PAID
+                          invoice!.status === InvoiceStatus.PAID
                             ? 'success'
                             : 'warning'
                         }
@@ -85,29 +92,29 @@ export const InvoiceDetails = () => {
                     bodyText={`
                       ${formatCurrency(
                         invoice
-                          ? invoice.totalAmount.amount /
-                              10 ** invoice.totalAmount.fractionDigits!
+                          ? invoice!.totalAmount.amount /
+                              10 ** invoice!.totalAmount.fractionDigits!
                           : 0,
                         {
                           currency: invoice
-                            ? invoice.totalAmount.currency
+                            ? invoice!.totalAmount.currency
                             : 'EUR',
                         },
                       )}`}
                   />
                   <StatusChip
                     label={
-                      invoice?.status === InvoiceStatus.PAID
+                      invoice!.status === InvoiceStatus.PAID
                         ? InvoiceStatusView.PAID
                         : InvoiceStatusView.NOT_PAID
                     }
                     textColor={
-                      invoice?.status === InvoiceStatus.PAID
+                      invoice!.status === InvoiceStatus.PAID
                         ? theme.palette.success.main
                         : theme.palette.warning.main
                     }
                     bgColor={
-                      invoice?.status === InvoiceStatus.PAID
+                      invoice!.status === InvoiceStatus.PAID
                         ? theme.palette.success.outlinedHoverBg
                         : theme.palette.warning.outlinedHoverBg
                     }
@@ -115,7 +122,10 @@ export const InvoiceDetails = () => {
                 </Box>
               </Box>
             }>
-            <Invoice downloadUrl={downloadUrl ? downloadUrl[0] : null} />
+            {invoice!.additionalInfo.pdfGenerationStatus ===
+            PdfGenerationStatus.DONE ? (
+              <Invoice downloadUrl={downloadUrl ? downloadUrl[0] : null} />
+            ) : null}
           </InvoiceCard>
         </Grid>
 
@@ -125,19 +135,19 @@ export const InvoiceDetails = () => {
             headerContainerStyle={{pb: '0.5em'}}>
             <RelatedTo>
               <HistoryCard
-                serviceOrder={invoice?.serviceOrder}
+                serviceOrder={invoice!.serviceOrder}
                 headerTitle={formatDate(
-                  invoice?.serviceOrder.schedules[0].startTime,
+                  invoice!.serviceOrder.schedules[0].startTime,
                   'dd MMM YYY',
                 )}
                 subtitle={`${formatDate(
-                  invoice?.serviceOrder.schedules[0].startTime,
+                  invoice!.serviceOrder.schedules[0].startTime,
                   'ha',
                 )} - ${formatDate(
-                  invoice?.serviceOrder.schedules[0].endTime,
+                  invoice!.serviceOrder.schedules[0].endTime,
                   'ha',
                 )}`}
-                description={invoice?.serviceOrder.description}
+                description={invoice!.serviceOrder.description}
                 containerStyles={{borderRadius: 0}}
                 showPointer
                 removeShadows
