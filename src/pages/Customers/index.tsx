@@ -4,6 +4,7 @@ import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {PropertyOwner} from 'models/propertyManager';
+import {Progress} from 'components/Progress';
 import {
   useFetchCustomerElevatorNumbers,
   useQueryCustomers,
@@ -38,9 +39,14 @@ export const Customer = () => {
     {keepPreviousData: true},
   );
 
-  const {data: customersWithUnits} = useFetchCustomerElevatorNumbers(
-    customerResource.data,
-  );
+  const {
+    data: customersWithUnits,
+    isLoading,
+    isFetching,
+    isIdle,
+  } = useFetchCustomerElevatorNumbers(customerResource.data, {
+    keepPreviousData: true,
+  });
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
@@ -77,21 +83,36 @@ export const Customer = () => {
           hideFilter
         />
       }>
-      <DataGridLayout rows={rows} columns={columns} hideFooter />
-      {pageCount && page.pageSize < customerResource.total ? (
-        <CustomPagination
-          pageSize={page.pageSize}
-          pageIndex={page.pageIndex}
-          handlePageSizeChange={(newPageSize: number) =>
-            setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
-          }
-          handlePageChange={(newPage: number) =>
-            setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-          }
-          pageCount={pageCount}
-          totalRows={customerResource.total}
-        />
-      ) : null}
+      {isIdle || isLoading ? (
+        <Progress />
+      ) : (
+        <>
+          <DataGridLayout
+            rows={rows}
+            columns={columns}
+            loading={isFetching}
+            hideFooter
+          />
+          {pageCount && page.pageSize < customerResource.total ? (
+            <CustomPagination
+              pageSize={page.pageSize}
+              pageIndex={page.pageIndex}
+              handlePageSizeChange={(newPageSize: number) =>
+                setQueryParams(
+                  formatSearchParamsPageSize(newPageSize, queryParams),
+                )
+              }
+              handlePageChange={(newPage: number) =>
+                setQueryParams(
+                  formatSearchParamsPageIndex(newPage, queryParams),
+                )
+              }
+              pageCount={pageCount}
+              totalRows={customerResource.total}
+            />
+          ) : null}
+        </>
+      )}
     </PageOverviewLayout>
   );
 };

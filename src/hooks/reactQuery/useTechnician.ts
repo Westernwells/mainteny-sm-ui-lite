@@ -1,5 +1,5 @@
 import {endOfDay, startOfDay} from 'date-fns';
-import {Resource} from 'models/misc';
+import {Resource, RestError} from 'models/misc';
 import {
   TechnicianEventPair,
   TechnicianEventView,
@@ -7,7 +7,7 @@ import {
   TechnicianView,
 } from 'models/technician';
 import {Role, UserAccountView} from 'models/user';
-import {useQuery} from 'react-query';
+import {useQuery, UseQueryOptions} from 'react-query';
 import {queryKeys as qks} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {toRestDateTime} from 'utils/datetime';
@@ -46,18 +46,22 @@ export const useFetchTechnicians = (usernames: string[]) =>
     },
   );
 
-export const useFetchTechniciansByUserAccounts = (users: UserAccountView[]) => {
+export const useFetchTechniciansByUserAccounts = (
+  users: UserAccountView[],
+  options?: UseQueryOptions<TechnicianView[], RestError, TechnicianView[]>,
+) => {
   const usernames = users
     .map((user) =>
       user.roles.includes(Role.TECHNICIAN) ? user.username : null,
     )
     .filter((x): x is string => !!x);
 
-  return useQuery(
+  return useQuery<TechnicianView[], RestError, TechnicianView[]>(
     [qks.fetchTechnicians, usernames],
     () => fetchTechnicians(usernames!),
     {
       enabled: !!usernames.length,
+      ...options,
     },
   );
 };
@@ -76,13 +80,25 @@ export const queryTechnicianEvents = async (
   return response.data;
 };
 
-export const useQueryTechnicianEvents = (params: TechniciansEventsParams) => {
+export const useQueryTechnicianEvents = (
+  params: TechniciansEventsParams,
+  options?: UseQueryOptions<
+    Resource<TechnicianEventPair>,
+    RestError,
+    Resource<TechnicianEventPair>
+  >,
+) => {
   const {user} = useUserSession();
-  return useQuery(
+  return useQuery<
+    Resource<TechnicianEventPair>,
+    RestError,
+    Resource<TechnicianEventPair>
+  >(
     [qks.queryTechniciansEvents, params, user?.userAccount.serviceCompany.id],
     () => queryTechnicianEvents(user!.userAccount.serviceCompany.id, params),
     {
       enabled: !!user,
+      ...options,
     },
   );
 };

@@ -16,6 +16,7 @@ import {
   formatSearchParamsPageSize,
 } from 'utils/utils';
 import {useSearchParams} from 'react-router-dom';
+import {Progress} from 'components/Progress';
 import {useQueryClient} from 'react-query';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {columns, makeRows} from './InvoicesDataGridProps';
@@ -38,17 +39,20 @@ export const Invoices = () => {
   const [pageCount, setPageCount] = useState(0);
 
   // TODO: Create Invoice model for invoices with 'Order number' and 'Service type'
-  const {data: invoiceResource = createEmptyResource<InvoiceView>(pageSize)} =
-    useInvoices(
-      {
-        pageIndex: page.pageIndex,
-        pageSize: page.pageSize,
-        query: search,
-        status: [InvoiceStatus.PAID, InvoiceStatus.NOT_PAID],
-      },
-      {amount: amount[0], status, serviceType},
-      {keepPreviousData: true},
-    );
+  const {
+    data: invoiceResource = createEmptyResource<InvoiceView>(10),
+    isLoading,
+    isFetching,
+  } = useInvoices(
+    {
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+      query: search,
+      status: [InvoiceStatus.PAID, InvoiceStatus.NOT_PAID],
+    },
+    {amount: amount[0], status, serviceType},
+    {keepPreviousData: true},
+  );
 
   //  prefetch next page when page changes
   useEffect(() => {
@@ -194,21 +198,36 @@ export const Invoices = () => {
           </FilterFields>
         </Box>
       </Fade>
-      <DataGridLayout rows={rows} columns={columns} hideFooter />
-      {pageCount ? (
-        <CustomPagination
-          pageSize={page.pageSize}
-          pageIndex={page.pageIndex}
-          handlePageSizeChange={(newPageSize: number) =>
-            setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
-          }
-          handlePageChange={(newPage: number) =>
-            setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-          }
-          pageCount={pageCount}
-          totalRows={invoiceResource?.total}
-        />
-      ) : null}
+      {isLoading ? (
+        <Progress />
+      ) : (
+        <>
+          <DataGridLayout
+            rows={rows}
+            columns={columns}
+            loading={isFetching}
+            hideFooter
+          />
+          {pageCount ? (
+            <CustomPagination
+              pageSize={page.pageSize}
+              pageIndex={page.pageIndex}
+              handlePageSizeChange={(newPageSize: number) =>
+                setQueryParams(
+                  formatSearchParamsPageSize(newPageSize, queryParams),
+                )
+              }
+              handlePageChange={(newPage: number) =>
+                setQueryParams(
+                  formatSearchParamsPageIndex(newPage, queryParams),
+                )
+              }
+              pageCount={pageCount}
+              totalRows={invoiceResource?.total}
+            />
+          ) : null}
+        </>
+      )}
     </PageOverviewLayout>
   );
 };
