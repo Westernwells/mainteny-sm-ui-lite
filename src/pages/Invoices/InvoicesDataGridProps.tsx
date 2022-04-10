@@ -68,7 +68,8 @@ export const columns: GridColDef[] = [
     field: 'propertyOwner',
     headerName: 'CUSTOMER',
     type: 'string',
-    ...defaultAlignment,
+    flex: 1.5,
+    headerAlign: 'left',
     ...defaultProps,
   },
   {

@@ -79,6 +79,7 @@ export const DataGridLayout = ({
             },
           '& .MuiDataGrid-cell': {
             borderBottom: '2px solid #F0F4F5',
+            whiteSpace: 'normal',
           },
           ...containerStyle,
           ...rest,
