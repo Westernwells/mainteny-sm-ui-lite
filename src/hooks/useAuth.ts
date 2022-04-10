@@ -46,7 +46,12 @@ export const useAuth = (): UseAuth => {
         // update stored user data
         updateUser(user);
         if (location.state?.from) {
-          navigate(`/${location.state.from.pathname}`, {replace: true});
+          navigate(
+            `/${location.state.from.pathname}${
+              location.state.from.search ? location.state.from.search : ''
+            }`,
+            {replace: true},
+          );
         } else {
           navigate('/units', {replace: true});
         }
@@ -73,7 +78,7 @@ export const useAuth = (): UseAuth => {
 
   const signout = (): void => {
     clearUser();
-    navigate('/', {replace: true}); // This resets the location state
+    navigate('/login', {replace: true}); // This resets the location state
   };
 
   // Return the user object and auth methods

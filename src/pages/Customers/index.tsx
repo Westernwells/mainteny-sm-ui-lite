@@ -8,6 +8,11 @@ import {
   useFetchCustomerElevatorNumbers,
   useQueryCustomers,
 } from 'hooks/reactQuery/useCustomers';
+import {useSearchParams} from 'react-router-dom';
+import {
+  formatSearchParamsPageIndex,
+  formatSearchParamsPageSize,
+} from 'utils/utils';
 import {CustomPagination} from 'components/CustomPagination';
 import {Widget} from '../../components/Widget';
 import {columns, makeRows} from './CustomerDataGridProps';
@@ -18,6 +23,7 @@ export const Customer = () => {
   const [search, setSearch] = useState('');
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(makePage(0, pageSize));
+  const [queryParams, setQueryParams] = useSearchParams();
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
 
@@ -35,6 +41,16 @@ export const Customer = () => {
   const {data: customersWithUnits} = useFetchCustomerElevatorNumbers(
     customerResource.data,
   );
+
+  useEffect(() => {
+    const currentParams = Object.fromEntries([...queryParams]);
+
+    setPage({
+      ...page,
+      pageSize: Number(currentParams.pageSize),
+      pageIndex: Number(currentParams.pageIndex) - 1,
+    });
+  }, [queryParams]);
 
   useEffect(() => {
     if (customersWithUnits) {
@@ -65,12 +81,13 @@ export const Customer = () => {
       {pageCount && page.pageSize < customerResource.total ? (
         <CustomPagination
           pageSize={page.pageSize}
+          pageIndex={page.pageIndex}
           handlePageSizeChange={(newPageSize: number) =>
-            setPage({...page, pageSize: newPageSize})
+            setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
           }
-          handlePageChange={(newPage: number) => {
-            setPage({...page, pageIndex: newPage - 1});
-          }}
+          handlePageChange={(newPage: number) =>
+            setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+          }
           pageCount={pageCount}
           totalRows={customerResource.total}
         />

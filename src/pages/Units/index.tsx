@@ -10,6 +10,11 @@ import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {FilterFields} from 'components/FilterFields';
 import {PageOverviewLayout} from 'components/PageOverviewLayout';
 import {CustomPagination} from 'components/CustomPagination';
+import {
+  formatSearchParamsPageIndex,
+  formatSearchParamsPageSize,
+} from 'utils/utils';
+import {useSearchParams} from 'react-router-dom';
 import {UnitSection} from './UnitSection';
 import {UnitsMapsView} from './UnitsMapsView';
 import {UnitColumns} from './UnitColumns';
@@ -21,6 +26,7 @@ export const MyUnits = () => {
     elevator: createEmptyResource<ElevatorView>(10),
     centerCoord: {longitude: 0, latitude: 0},
   }).current;
+  const [queryParams, setQueryParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(pageInfo);
   const [pageCount, setPageCount] = useState(0);
@@ -77,6 +83,16 @@ export const MyUnits = () => {
   const closeMapView = () => {
     setShowMapview(false);
   };
+
+  useEffect(() => {
+    const currentParams = Object.fromEntries([...queryParams]);
+
+    setPage({
+      ...page,
+      pageSize: Number(currentParams.pageSize),
+      pageIndex: Number(currentParams.pageIndex) - 1,
+    });
+  }, [queryParams]);
 
   useEffect(() => {
     if (elevatorsByAddressList) {
@@ -149,12 +165,17 @@ export const MyUnits = () => {
           {pageCount ? (
             <CustomPagination
               pageSize={page.pageSize}
+              pageIndex={page.pageIndex}
               handlePageSizeChange={(newPageSize: number) =>
-                setPage({...page, pageSize: newPageSize})
+                setQueryParams(
+                  formatSearchParamsPageSize(newPageSize, queryParams),
+                )
               }
-              handlePageChange={(newPage: number) => {
-                setPage({...page, pageIndex: newPage - 1});
-              }}
+              handlePageChange={(newPage: number) =>
+                setQueryParams(
+                  formatSearchParamsPageIndex(newPage, queryParams),
+                )
+              }
               pageCount={pageCount}
               totalRows={elevatorResponse.elevator.total}
             />

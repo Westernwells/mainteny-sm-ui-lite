@@ -12,6 +12,11 @@ import {Role, UserAccountView} from 'models/user';
 import {useEffect, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import * as _ from 'lodash';
+import {
+  formatSearchParamsPageIndex,
+  formatSearchParamsPageSize,
+} from 'utils/utils';
+import {useSearchParams} from 'react-router-dom';
 import {TechnicianEventPair, TechnicianView} from 'models/technician';
 import {toRestDateTime} from 'utils/datetime';
 import {addDays, endOfDay, startOfDay} from 'date-fns';
@@ -22,7 +27,8 @@ import {CustomPagination} from '../../components/CustomPagination';
 const pageSize = 25;
 
 export const Employees = () => {
-  const [page, setPage] = useState(makePage(0, 25));
+  const [page, setPage] = useState(makePage(0, pageSize));
+  const [queryParams, setQueryParams] = useSearchParams();
   const [pageCount, setPageCount] = useState(0);
   const [search, setSearch] = useState('');
   const [showFilter, setShowFilter] = useState(false);
@@ -51,6 +57,16 @@ export const Employees = () => {
     pageSize: page.pageSize,
     eventType: [TechnicianEventType.HOLIDAY, TechnicianEventType.SICK_LEAVE],
   });
+
+  useEffect(() => {
+    const currentParams = Object.fromEntries([...queryParams]);
+
+    setPage({
+      ...page,
+      pageSize: Number(currentParams.pageSize),
+      pageIndex: Number(currentParams.pageIndex) - 1,
+    });
+  }, [queryParams]);
 
   useEffect(() => {
     let userData: Resource<EmployeesView> = {
@@ -124,12 +140,13 @@ export const Employees = () => {
       {!!pageCount && (
         <CustomPagination
           pageSize={page.pageSize}
+          pageIndex={page.pageIndex}
           handlePageSizeChange={(newPageSize: number) =>
-            setPage({...page, pageSize: newPageSize})
+            setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
           }
-          handlePageChange={(newPage: number) => {
-            setPage({...page, pageIndex: newPage - 1});
-          }}
+          handlePageChange={(newPage: number) =>
+            setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+          }
           pageCount={pageCount}
           totalRows={userAccountResource.total}
         />
