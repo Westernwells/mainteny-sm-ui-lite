@@ -15,7 +15,7 @@ export const UnitColumns = () => (
     }}>
     <Grid container sx={{pl: 2}}>
       <Grid item xs={3}>
-        <Typography variant="tableHeaderText" color="textSecondary">
+        <Typography variant="subtitle2" color="textSecondary">
           UNIT NAME
         </Typography>
       </Grid>
@@ -26,19 +26,19 @@ export const UnitColumns = () => (
         spacing={2}
         sx={{display: 'flex', justifyContent: 'flex-end'}}>
         <Grid item xs={2}>
-          <Typography variant="tableHeaderText" color="textSecondary">
+          <Typography variant="subtitle2" color="textSecondary">
             LAST VISIT
           </Typography>
         </Grid>
 
         <Grid item xs={2}>
-          <Typography variant="tableHeaderText" color="textSecondary">
+          <Typography variant="subtitle2" color="textSecondary">
             NEXT VISIT
           </Typography>
         </Grid>
 
         <Grid item xs={2}>
-          <Typography variant="tableHeaderText" color="textSecondary">
+          <Typography variant="subtitle2" color="textSecondary">
             <Box display="flex" justifyContent="center">
               AVAILABILITY
             </Box>
@@ -46,7 +46,7 @@ export const UnitColumns = () => (
         </Grid>
 
         <Grid item xs={2}>
-          <Typography variant="tableHeaderText" color="textSecondary">
+          <Typography variant="subtitle2" color="textSecondary">
             <Box display="flex" justifyContent="center">
               STATUS
             </Box>
