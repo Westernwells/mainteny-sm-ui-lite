@@ -48,7 +48,6 @@ export const ShiftTime = () => {
     setShifts(shifts.slice(0, -1));
   };
 
-  console.log(shifts[0].workDays);
   return (
     <>
       {shifts.map((shift, index) => (
@@ -57,10 +56,11 @@ export const ShiftTime = () => {
           display="flex"
           gap="1em"
           alignItems="flex-end"
-          mt="2em">
+          mt="1em">
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <TimePicker
               label="Start Time"
+              ampm={false}
               value={shift.fromTime}
               disabled={index < shifts.length - 1}
               onChange={(newValue) => {
@@ -75,6 +75,7 @@ export const ShiftTime = () => {
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <TimePicker
               label="End Time"
+              ampm={false}
               value={shift.toTime}
               disabled={index < shifts.length - 1}
               onChange={(newValue) => {

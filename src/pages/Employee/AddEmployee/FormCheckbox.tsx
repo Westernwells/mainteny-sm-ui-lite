@@ -11,8 +11,8 @@ interface Props {
 }
 
 export const FormCheckbox = ({options, onChange}: Props) => (
-  <Box sx={{display: 'flex'}}>
-    <FormControl sx={{m: 3}} component="fieldset" variant="standard">
+  <Box sx={{display: 'flex', mx: '.25em'}}>
+    <FormControl component="fieldset" variant="standard">
       <FormGroup
         sx={{
           display: 'grid',
