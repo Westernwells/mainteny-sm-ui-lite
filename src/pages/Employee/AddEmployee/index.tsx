@@ -137,7 +137,9 @@ export const AddEmployee = () => {
 
         {roles.includes(convertToText(Role.TECHNICIAN)) && (
           <>
-            <Typography variant="h6">Order Types</Typography>
+            <Typography variant="h6" my=".75em">
+              Order Types
+            </Typography>
 
             <FormCheckbox
               options={[
@@ -189,7 +191,9 @@ export const AddEmployee = () => {
               onChange={handleCheckbox}
             />
 
-            <Typography variant="h6">Shift Time</Typography>
+            <Typography variant="h6" my=".75em">
+              Shift Time
+            </Typography>
 
             <ShiftTime />
           </>
