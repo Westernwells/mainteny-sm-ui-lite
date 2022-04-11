@@ -131,22 +131,22 @@ export const Contracts = () => {
           </FilterFields>
         </Box>
       </Fade>
-      <Box>
-        <DataGridLayout hideFooter rows={rows} columns={columns} />
-        {pageCount && page.pageSize < contractResource.total ? (
-          <CustomPagination
-            pageSize={page.pageSize}
-            handlePageSizeChange={(newPageSize: number) =>
-              setPage({...page, pageSize: newPageSize})
-            }
-            handlePageChange={(newPage: number) => {
-              setPage({...page, pageIndex: newPage - 1});
-            }}
-            pageCount={pageCount}
-            totalRows={contractResource.total}
-          />
-        ) : null}
-      </Box>
+
+      <DataGridLayout hideFooter rows={rows} columns={columns} />
+
+      {pageCount && page.pageSize < contractResource.total ? (
+        <CustomPagination
+          pageSize={page.pageSize}
+          handlePageSizeChange={(newPageSize: number) =>
+            setPage({...page, pageSize: newPageSize})
+          }
+          handlePageChange={(newPage: number) => {
+            setPage({...page, pageIndex: newPage - 1});
+          }}
+          pageCount={pageCount}
+          totalRows={contractResource.total}
+        />
+      ) : null}
     </PageOverviewLayout>
   );
 };

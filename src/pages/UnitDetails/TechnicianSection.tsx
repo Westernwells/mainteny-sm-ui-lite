@@ -85,7 +85,9 @@ export const TechnicianSection = ({maintainers}: TechnicianSectionProp) => {
   }, [technician]);
 
   return (
-    <PageCard headerLabel={`Technician (${technician ? 1 : 0})`}>
+    <PageCard
+      headerLabel={`Technician (${technician ? 1 : 0})`}
+      minHeight="30rem">
       {rows?.map((item, index) => (
         <Box
           key={`${item}-${index}`}
@@ -114,7 +116,7 @@ export const TechnicianSection = ({maintainers}: TechnicianSectionProp) => {
           </Box>
           <Box>
             <Typography
-              variant={index === 0 ? 'subtitle1' : 'caption'}
+              variant={index === 0 ? 'subtitle2' : 'caption'}
               color={
                 index === 0
                   ? theme.palette.primary.main
@@ -123,7 +125,7 @@ export const TechnicianSection = ({maintainers}: TechnicianSectionProp) => {
               {item.label}
             </Typography>
             <Typography
-              variant={index === 0 ? 'body2' : 'body1'}
+              variant="body2"
               color={
                 index === 0
                   ? theme.palette.text.secondary

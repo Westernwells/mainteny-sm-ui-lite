@@ -72,7 +72,12 @@ export const UnitsTab = ({customerId}: Props) => {
         </Box>
       </Fade>
       <Box>
-        <DataGridLayout hideFooter rows={rows} columns={columns} />
+        <DataGridLayout
+          hideFooter
+          rows={rows}
+          columns={columns}
+          height="60vh"
+        />
         {pageCount && page.pageSize < elevatorResource.total ? (
           <CustomPagination
             pageSize={page.pageSize}

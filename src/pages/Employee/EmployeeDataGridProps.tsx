@@ -20,7 +20,7 @@ import React from 'react';
 const defaultProps = {
   editable: false,
   renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="tableHeaderText" color="textSecondary">
+    <Typography variant="subtitle2" color="textSecondary">
       {params.colDef.headerName}
     </Typography>
   ),

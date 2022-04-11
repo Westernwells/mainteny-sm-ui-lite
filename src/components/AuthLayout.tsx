@@ -23,16 +23,15 @@ export const AuthLayout = ({children}: Props) => {
   const classes = useStyles();
 
   return (
-    <Box display="flex" height="100vh" sx={{backgroundColor: '#fff'}}>
+    <Box display="flex" minHeight="100vh" sx={{backgroundColor: '#fff'}}>
       <Box
         className={classes.leftBackground}
         width="38vw"
-        height="100%"
+        minHeight="100%"
         position="relative"
         display="flex"
-        pt="15rem"
-        // alignItems="center"
-      >
+        justifyContent="center"
+        alignItems="center">
         <Box style={{position: 'absolute', top: 0, left: 0, right: 0}}>
           <PolygonTop width="100%" />
         </Box>
@@ -64,7 +63,11 @@ export const AuthLayout = ({children}: Props) => {
         </Box>
       </Box>
 
-      <Box display="flex" flexGrow={1} justifyContent="center" mt={23}>
+      <Box
+        display="flex"
+        flexGrow={1}
+        justifyContent="center"
+        alignItems="center">
         <Box>
           <Box display="flex" justifyContent="center">
             <Logo />

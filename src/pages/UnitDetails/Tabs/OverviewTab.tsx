@@ -122,10 +122,10 @@ export const OverviewTab = ({
             ]}
           />
         </Grid>
-        <Grid item xs={3} zeroMinWidth>
+        <Grid item xs={4} zeroMinWidth>
           <TechnicianSection maintainers={maintainers} />
         </Grid>
-        <Grid item xs={5}>
+        <Grid item xs={4}>
           <ElevatorAvailabilitySection />
         </Grid>
       </Grid>
@@ -139,7 +139,7 @@ export const OverviewTab = ({
               <Box display="flex" justifyContent="space-between">
                 <Box>
                   <Typography
-                    variant="subtitle1"
+                    variant="subtitle2"
                     sx={{
                       color: theme.palette.text.primary,
                     }}>
@@ -157,7 +157,7 @@ export const OverviewTab = ({
                     getServiceHistoryTabIndex && getServiceHistoryTabIndex(1)
                   }>
                   <Typography
-                    variant="subtitle1"
+                    variant="subtitle2"
                     sx={{
                       color: theme.palette.primary.light,
                     }}>

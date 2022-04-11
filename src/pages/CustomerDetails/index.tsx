@@ -1,5 +1,4 @@
 import {useState} from 'react';
-import Box from '@mui/material/Box';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import ElevatorIcon from '@mui/icons-material/Elevator';
@@ -30,26 +29,24 @@ export const CustomerDetails = () => {
   const {id: customerId} = useParams();
   const [customerName, setCustomerName] = useState('');
   return (
-    <Box>
-      <Tabs
-        tabItems={tabItems}
-        currentIndex={tabValue}
-        onChange={(index) => setTabValue(index)}
-        backBtnLabel={customerName}>
-        <TabsBody value={tabValue} index={0}>
-          <CustomerOverviewTab
-            customerId={customerId}
-            getCustomerName={(name) => setCustomerName(name)}
-            getCurrentTabIndex={(index) => setTabValue(index)}
-          />
-        </TabsBody>
-        <TabsBody value={tabValue} index={1}>
-          <UnitsTab customerId={customerId} />
-        </TabsBody>
-        <TabsBody value={tabValue} index={2}>
-          <ContractsTab customerId={customerId} />
-        </TabsBody>
-      </Tabs>
-    </Box>
+    <Tabs
+      tabItems={tabItems}
+      currentIndex={tabValue}
+      onChange={(index) => setTabValue(index)}
+      backBtnLabel={customerName}>
+      <TabsBody value={tabValue} index={0}>
+        <CustomerOverviewTab
+          customerId={customerId}
+          getCustomerName={(name) => setCustomerName(name)}
+          getCurrentTabIndex={(index) => setTabValue(index)}
+        />
+      </TabsBody>
+      <TabsBody value={tabValue} index={1}>
+        <UnitsTab customerId={customerId} />
+      </TabsBody>
+      <TabsBody value={tabValue} index={2}>
+        <ContractsTab customerId={customerId} />
+      </TabsBody>
+    </Tabs>
   );
 };

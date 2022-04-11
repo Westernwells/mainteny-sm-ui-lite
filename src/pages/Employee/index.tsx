@@ -19,25 +19,28 @@ import {GridRowsProp} from '@mui/x-data-grid';
 import {columns, makeRows} from './EmployeeDataGridProps';
 import {CustomPagination} from '../../components/CustomPagination';
 
+const pageSize = 25;
+
 export const Employees = () => {
-  const [page, setPage] = useState(makePage(0, 10));
+  const [page, setPage] = useState(makePage(0, 25));
   const [pageCount, setPageCount] = useState(0);
   const [search, setSearch] = useState('');
   const [showFilter, setShowFilter] = useState(false);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [employeeResource, setEmployeeResource] = useState(
-    createEmptyResource<EmployeesView>(10),
+    createEmptyResource<EmployeesView>(pageSize),
   );
-  const {data: userAccountResource = createEmptyResource<UserAccountView>(20)} =
-    useQueryUserAccounts(
-      {
-        pageIndex: page.pageIndex,
-        pageSize: page.pageSize,
-        query: search,
-        roles: [Role.SERVICE_MANAGER, Role.TECHNICIAN],
-      },
-      {keepPreviousData: true},
-    );
+  const {
+    data: userAccountResource = createEmptyResource<UserAccountView>(pageSize),
+  } = useQueryUserAccounts(
+    {
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+      query: search,
+      roles: [Role.SERVICE_MANAGER, Role.TECHNICIAN],
+    },
+    {keepPreviousData: true},
+  );
   const {data: technicians = []} = useFetchTechniciansByUserAccounts(
     userAccountResource.data,
   );

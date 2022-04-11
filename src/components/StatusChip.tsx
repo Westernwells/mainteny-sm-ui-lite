@@ -36,7 +36,7 @@ export const StatusChip = ({
     }}
     color={color}
     label={
-      <Typography variant="largeBtnText" sx={{textTransform: 'capitalize'}}>
+      <Typography variant="chip" sx={{textTransform: 'capitalize'}}>
         {`${label.charAt(0)}${label.slice(1).toLowerCase()}`}
       </Typography>
     }

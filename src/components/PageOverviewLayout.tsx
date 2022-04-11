@@ -9,7 +9,7 @@ interface Props {
 }
 
 export const PageOverviewLayout = ({children, renderWidget, label}: Props) => (
-  <Box>
+  <>
     <Box display="flex" justifyContent="space-between">
       <Box sx={{mb: 3}}>
         <Typography variant="h4">{label}</Typography>
@@ -17,5 +17,5 @@ export const PageOverviewLayout = ({children, renderWidget, label}: Props) => (
       <Box>{renderWidget || null}</Box>
     </Box>
     {children}
-  </Box>
+  </>
 );

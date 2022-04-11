@@ -69,13 +69,13 @@ export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
               justifyContent: 'flex-end',
               alignItems: 'center',
             }}>
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <Typography variant="body2">
                 {elevatorOrder.elevator.lastVisitDate || 'N/A'}
               </Typography>
             </Grid>
 
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <Typography variant="body2">
                 {' '}
                 {(elevatorOrder.serviceOrder &&
@@ -86,21 +86,7 @@ export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
               </Typography>
             </Grid>
 
-            <Grid item xs={2}>
-              <Typography
-                variant="body2"
-                color={
-                  elevatorOrder.elevator.availability < 100
-                    ? 'textWarning'
-                    : 'textSuccess'
-                }>
-                <Box display="flex" justifyContent="center">
-                  {elevatorOrder.elevator.availability}%
-                </Box>
-              </Typography>
-            </Grid>
-
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <Box display="flex" justifyContent="center">
                 <StatusChip
                   label={elevatorOrder.elevator.status}
