@@ -17,6 +17,12 @@ export const ScheduleBodyCell = ({label, children, ...rest}: Props) => (
       paddingInline: 0,
       maxWidth: '120px',
       minWidth: '120px',
+      ':first-child': {
+        position: 'sticky',
+        left: 0,
+        zIndex: 2,
+        background: '#fff',
+      },
     }}
     {...rest}>
     {label || children || null}
