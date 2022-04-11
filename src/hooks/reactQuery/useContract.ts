@@ -145,10 +145,7 @@ const filterContracts = (
   return result;
 };
 
-export const fetchContracts = async (
-  id: string,
-  params: QueryContractParams,
-) => {
+export const queryContracts = async (params: QueryContractParams) => {
   const response = await axiosClient.get<Resource<ContractView>>(
     `/api/contracts`,
     {
@@ -164,13 +161,17 @@ export const useQueryContract = (
   params: WithOptional<QueryContractParams, 'serviceCompanyId'>,
   // TODO: Write 'interface' for filter object
   filter: ContractFilters,
-  options?: UseQueryOptions<any, any, any>,
+  options?: UseQueryOptions<
+    Resource<ContractView>,
+    RestError,
+    Resource<ContractView>
+  >,
 ) => {
   const {user} = useUserSession();
   return useQuery<Resource<ContractView>, RestError, Resource<ContractView>>(
     [qk.contracts, params],
     () =>
-      fetchContracts(user!.userAccount.id, {
+      queryContracts({
         ...params,
         serviceCompanyId: user!.userAccount.serviceCompany.id,
       }),

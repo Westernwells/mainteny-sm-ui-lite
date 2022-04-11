@@ -5,10 +5,7 @@ import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
-import {
-  useContractElevatorCount,
-  useQueryContract,
-} from 'hooks/reactQuery/useContract';
+import {useQueryContract} from 'hooks/reactQuery/useContract';
 import {ContractOrderField, ContractView} from 'models/contract';
 import {Order} from 'models/misc';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
@@ -20,6 +17,7 @@ import {
 } from 'utils/utils';
 import {useSearchParams} from 'react-router-dom';
 import {CustomPagination} from 'components/CustomPagination';
+import {Progress} from 'components/Progress';
 import {costRangeConvertor as crConverter} from 'utils/contract-utils';
 import {columns, makeRows} from './ContractsDataGridProps';
 
@@ -40,7 +38,9 @@ export const Contracts = () => {
   const [rows, setRows] = useState<GridRowsProp>([]);
 
   const {
-    data: contractResource = createEmptyResource<ContractView>(page.pageSize),
+    data: contractResource = createEmptyResource<ContractView>(10),
+    isLoading,
+    isFetching,
   } = useQueryContract(
     {
       order: Order.DESC,
@@ -52,9 +52,6 @@ export const Contracts = () => {
     },
     {expiryDate, contractor, price: cost},
     {keepPreviousData: true},
-  );
-  const {data: contractWithUnits} = useContractElevatorCount(
-    contractResource.data,
   );
 
   useEffect(() => {
@@ -74,28 +71,24 @@ export const Contracts = () => {
 
   useEffect(() => {
     const options: string[] = [];
+    // TODO: Resolve 'any' here
+    contractResource.data.forEach((item: any) => {
+      if (
+        !options.includes(item.serviceCompany.name) &&
+        !contractorFilterItems.includes(item.serviceCompany.name)
+      ) {
+        options.push(item.serviceCompany.name);
+      }
+    });
+    setRows(makeRows(contractResource.data));
 
-    if (contractWithUnits) {
-      // TODO: Resolve 'any' here
-      contractWithUnits?.forEach((item: any) => {
-        if (
-          !options.includes(item.serviceCompany.name) &&
-          !contractorFilterItems.includes(item.serviceCompany.name)
-        ) {
-          options.push(item.serviceCompany.name);
-        }
-      });
-      setRows(makeRows(contractWithUnits));
-    } else {
-      setRows([]);
-    }
     setContractorFilterItems([...contractorFilterItems, ...options]);
     if (!showFilter) {
       setExpiryDate([]);
       setContractor([]);
       setCost([]);
     }
-  }, [contractWithUnits, showFilter]);
+  }, [contractResource, showFilter]);
 
   useEffect(() => {
     setPageCount(Math.ceil(contractResource.total / page.pageSize));
@@ -147,25 +140,36 @@ export const Contracts = () => {
           </FilterFields>
         </Box>
       </Fade>
-      <>
-        <DataGridLayout hideFooter rows={rows} columns={columns} />
-        {pageCount && page.pageSize < contractResource.total ? (
-          <CustomPagination
-            pageSize={page.pageSize}
-            pageIndex={page.pageIndex}
-            handlePageSizeChange={(newPageSize: number) =>
-              setQueryParams(
-                formatSearchParamsPageSize(newPageSize, queryParams),
-              )
-            }
-            handlePageChange={(newPage: number) =>
-              setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-            }
-            pageCount={pageCount}
-            totalRows={contractResource.total}
+      {isLoading ? (
+        <Progress />
+      ) : (
+        <>
+          <DataGridLayout
+            hideFooter
+            rows={rows}
+            columns={columns}
+            loading={isFetching}
           />
-        ) : null}
-      </>
+          {pageCount && page.pageSize < contractResource.total ? (
+            <CustomPagination
+              pageSize={page.pageSize}
+              pageIndex={page.pageIndex}
+              handlePageSizeChange={(newPageSize: number) =>
+                setQueryParams(
+                  formatSearchParamsPageSize(newPageSize, queryParams),
+                )
+              }
+              handlePageChange={(newPage: number) =>
+                setQueryParams(
+                  formatSearchParamsPageIndex(newPage, queryParams),
+                )
+              }
+              pageCount={pageCount}
+              totalRows={contractResource.total}
+            />
+          ) : null}
+        </>
+      )}
     </PageOverviewLayout>
   );
 };

@@ -179,5 +179,12 @@ export interface Fee {
   currency: string;
 }
 
+export enum PdfGenerationStatus {
+  DONE = 'DONE',
+  ERROR = 'ERROR',
+  INIT = 'INIT',
+  RUNNING = 'RUNNING',
+}
+
 export type WithOptional<T, K extends keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;

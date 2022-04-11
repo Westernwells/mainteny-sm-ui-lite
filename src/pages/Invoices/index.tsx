@@ -7,8 +7,7 @@ import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {ServiceOrderType} from 'models/service-order';
 import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
-import {queryKeys as qks} from 'reactQuery/constants';
-import {fetchInvoices, useInvoices} from 'hooks/reactQuery/useInvoice';
+import {useInvoices} from 'hooks/reactQuery/useInvoice';
 import {PageOverviewLayout} from 'components/PageOverviewLayout';
 import {CustomPagination} from 'components/CustomPagination';
 import {
@@ -16,8 +15,7 @@ import {
   formatSearchParamsPageSize,
 } from 'utils/utils';
 import {useSearchParams} from 'react-router-dom';
-import {useQueryClient} from 'react-query';
-import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {Progress} from 'components/Progress';
 import {columns, makeRows} from './InvoicesDataGridProps';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
 import {Widget} from '../../components/Widget';
@@ -25,8 +23,6 @@ import {Widget} from '../../components/Widget';
 const pageSize = 25;
 
 export const Invoices = () => {
-  const queryClient = useQueryClient();
-  const {user} = useUserSession();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [queryParams, setQueryParams] = useSearchParams();
@@ -37,36 +33,20 @@ export const Invoices = () => {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
 
-  // TODO: Create Invoice model for invoices with 'Order number' and 'Service type'
-  const {data: invoiceResource = createEmptyResource<InvoiceView>(pageSize)} =
-    useInvoices(
-      {
-        pageIndex: page.pageIndex,
-        pageSize: page.pageSize,
-        query: search,
-        status: [InvoiceStatus.PAID, InvoiceStatus.NOT_PAID],
-      },
-      {amount: amount[0], status, serviceType},
-      {keepPreviousData: true},
-    );
-
-  //  prefetch next page when page changes
-  useEffect(() => {
-    // assume increment of page by one
-    const nextPage = page.pageIndex + 1;
-    const newPageInfo = {pageIndex: nextPage, pageSize: page.pageSize};
-    const params = {
-      pageIndex: newPageInfo.pageIndex,
-      pageSize: newPageInfo.pageSize,
+  const {
+    data: invoiceResource = createEmptyResource<InvoiceView>(10),
+    isLoading,
+    isFetching,
+  } = useInvoices(
+    {
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
       query: search,
       status: [InvoiceStatus.PAID, InvoiceStatus.NOT_PAID],
-    };
-    if (user && invoiceResource) {
-      queryClient.prefetchQuery([qks.fetchInvoices, params], () =>
-        fetchInvoices(params, user.userAccount.serviceCompany.id),
-      );
-    }
-  }, [queryClient, page, search, user, invoiceResource]);
+    },
+    {amount: amount[0], status, serviceType},
+    {keepPreviousData: true},
+  );
 
   const amountRangeConvertor = (selectedItems: string[]) => {
     const range: number[][] = [];
@@ -194,21 +174,36 @@ export const Invoices = () => {
           </FilterFields>
         </Box>
       </Fade>
-      <DataGridLayout rows={rows} columns={columns} hideFooter />
-      {pageCount ? (
-        <CustomPagination
-          pageSize={page.pageSize}
-          pageIndex={page.pageIndex}
-          handlePageSizeChange={(newPageSize: number) =>
-            setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
-          }
-          handlePageChange={(newPage: number) =>
-            setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-          }
-          pageCount={pageCount}
-          totalRows={invoiceResource?.total}
-        />
-      ) : null}
+      {isLoading ? (
+        <Progress />
+      ) : (
+        <>
+          <DataGridLayout
+            rows={rows}
+            columns={columns}
+            loading={isFetching}
+            hideFooter
+          />
+          {pageCount ? (
+            <CustomPagination
+              pageSize={page.pageSize}
+              pageIndex={page.pageIndex}
+              handlePageSizeChange={(newPageSize: number) =>
+                setQueryParams(
+                  formatSearchParamsPageSize(newPageSize, queryParams),
+                )
+              }
+              handlePageChange={(newPage: number) =>
+                setQueryParams(
+                  formatSearchParamsPageIndex(newPage, queryParams),
+                )
+              }
+              pageCount={pageCount}
+              totalRows={invoiceResource?.total}
+            />
+          ) : null}
+        </>
+      )}
     </PageOverviewLayout>
   );
 };

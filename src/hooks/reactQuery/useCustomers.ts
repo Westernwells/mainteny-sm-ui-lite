@@ -1,7 +1,7 @@
-import {Resource, WithOptional} from 'models/misc';
+import {Resource, RestError, WithOptional} from 'models/misc';
 import {PropertyOwner, QueryPropertyOwnersParams} from 'models/propertyManager';
 import {useCallback} from 'react';
-import {useQuery} from 'react-query';
+import {useQuery, UseQueryOptions} from 'react-query';
 import {queryKeys as qks, queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useUserSession} from './useUserSession';
@@ -21,11 +21,17 @@ export const fetchCustomerElevatorNumbers = async (
 
 export const useFetchCustomerElevatorNumbers = (
   customers: PropertyOwner[],
-  options?: any,
+  options?: UseQueryOptions<
+    {
+      [key: string]: number;
+    },
+    RestError,
+    PropertyOwner[]
+  >,
 ) => {
   const propertyOwnerIds = customers.map((customer) => customer.id);
 
-  return useQuery(
+  return useQuery<{[key: string]: number}, RestError, PropertyOwner[]>(
     [qks.fetchCustomerElevatorNumbers, propertyOwnerIds],
     () => fetchCustomerElevatorNumbers(propertyOwnerIds),
     {

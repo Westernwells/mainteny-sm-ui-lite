@@ -7,6 +7,7 @@ import {Order} from 'models/misc';
 import {useEffect, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {DataGridLayout} from 'components/DataGridLayout';
+import {Progress} from 'components/Progress';
 
 import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
@@ -36,19 +37,21 @@ export const ContractsTab = ({customerId}: Props) => {
     [],
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const {data: contractResource = createEmptyResource<ContractView>(10)} =
-    useUseQueryCustomerContracts(
-      {
-        query: search,
-        orderBy: ContractOrderField.EXPIRY_TIME,
-        order: Order.ASC,
-        pageIndex: page.pageIndex,
-        pageSize: page.pageSize,
-      },
-      customerId,
-      {expiryDate, contractor, price: cost},
-      {keepPreviousData: true},
-    );
+  const {
+    data: contractResource = createEmptyResource<ContractView>(10),
+    isLoading,
+  } = useUseQueryCustomerContracts(
+    {
+      query: search,
+      orderBy: ContractOrderField.EXPIRY_TIME,
+      order: Order.ASC,
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+    },
+    customerId,
+    {expiryDate, contractor, price: cost},
+    {keepPreviousData: true},
+  );
 
   const {data: contractWithUnits} = useContractElevatorCount(
     contractResource.data,
@@ -135,22 +138,31 @@ export const ContractsTab = ({customerId}: Props) => {
           </FilterFields>
         </Box>
       </Fade>
-
-      <DataGridLayout hideFooter rows={rows} columns={columns} height="60vh" />
-
-      {pageCount && page.pageSize < contractResource.total ? (
-        <CustomPagination
-          pageSize={page.pageSize}
-          handlePageSizeChange={(newPageSize: number) =>
-            setPage({...page, pageSize: newPageSize})
-          }
-          handlePageChange={(newPage: number) => {
-            setPage({...page, pageIndex: newPage - 1});
-          }}
-          pageCount={pageCount}
-          totalRows={contractResource.total}
-        />
-      ) : null}
+      {isLoading ? (
+        <Progress />
+      ) : (
+        <>
+          <DataGridLayout
+            hideFooter
+            rows={rows}
+            columns={columns}
+            height="60vh"
+          />
+          {pageCount && page.pageSize < contractResource.total ? (
+            <CustomPagination
+              pageSize={page.pageSize}
+              handlePageSizeChange={(newPageSize: number) =>
+                setPage({...page, pageSize: newPageSize})
+              }
+              handlePageChange={(newPage: number) => {
+                setPage({...page, pageIndex: newPage - 1});
+              }}
+              pageCount={pageCount}
+              totalRows={contractResource.total}
+            />
+          ) : null}
+        </>
+      )}
     </PageOverviewLayout>
   );
 };

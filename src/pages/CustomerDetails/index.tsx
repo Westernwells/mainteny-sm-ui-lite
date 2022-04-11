@@ -28,6 +28,7 @@ export const CustomerDetails = () => {
   const [tabValue, setTabValue] = useState(0);
   const {id: customerId} = useParams();
   const [customerName, setCustomerName] = useState('');
+
   return (
     <Tabs
       tabItems={tabItems}

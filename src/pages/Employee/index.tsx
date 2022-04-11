@@ -17,6 +17,7 @@ import {
   formatSearchParamsPageSize,
 } from 'utils/utils';
 import {useSearchParams} from 'react-router-dom';
+import {Progress} from 'components/Progress';
 import {TechnicianEventPair, TechnicianView} from 'models/technician';
 import {toRestDateTime} from 'utils/datetime';
 import {addDays, endOfDay, startOfDay} from 'date-fns';
@@ -47,9 +48,15 @@ export const Employees = () => {
     },
     {keepPreviousData: true},
   );
-  const {data: technicians = []} = useFetchTechniciansByUserAccounts(
-    userAccountResource.data,
-  );
+
+  const {
+    data: technicians = [],
+    isLoading,
+    isFetching,
+    isIdle,
+  } = useFetchTechniciansByUserAccounts(userAccountResource.data, {
+    keepPreviousData: true,
+  });
   const {data: technicianEvents} = useQueryTechnicianEvents({
     start: toRestDateTime(startOfDay(addDays(new Date(), 1))),
     end: toRestDateTime(endOfDay(addDays(new Date(), 1))),
@@ -136,20 +143,36 @@ export const Employees = () => {
           hideFilter
         />
       }>
-      <DataGridLayout rows={rows} columns={columns} hideFooter />
-      {!!pageCount && (
-        <CustomPagination
-          pageSize={page.pageSize}
-          pageIndex={page.pageIndex}
-          handlePageSizeChange={(newPageSize: number) =>
-            setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
-          }
-          handlePageChange={(newPage: number) =>
-            setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-          }
-          pageCount={pageCount}
-          totalRows={userAccountResource.total}
-        />
+      {isIdle || isLoading ? (
+        <Progress />
+      ) : (
+        <>
+          {' '}
+          <DataGridLayout
+            rows={rows}
+            columns={columns}
+            loading={isFetching}
+            hideFooter
+          />
+          {!!pageCount && (
+            <CustomPagination
+              pageSize={page.pageSize}
+              pageIndex={page.pageIndex}
+              handlePageSizeChange={(newPageSize: number) =>
+                setQueryParams(
+                  formatSearchParamsPageSize(newPageSize, queryParams),
+                )
+              }
+              handlePageChange={(newPage: number) =>
+                setQueryParams(
+                  formatSearchParamsPageIndex(newPage, queryParams),
+                )
+              }
+              pageCount={pageCount}
+              totalRows={userAccountResource.total}
+            />
+          )}
+        </>
       )}
     </PageOverviewLayout>
   );
