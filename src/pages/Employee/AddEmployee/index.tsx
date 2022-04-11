@@ -16,14 +16,12 @@ import {ReactComponent as EmergencyIcon} from 'assets/icons/Emergency.svg';
 import {ReactComponent as RegularIcon} from 'assets/icons/Regular.svg';
 import {ReactComponent as CalloutIcon} from 'assets/icons/Callout.svg';
 
+import {convertToText, convertToMacro} from 'utils/utils';
+
 import {FormInput} from './FormInput';
 import {FormSelect} from './FormSelect';
 import {FormCheckbox} from './FormCheckbox';
 import {ShiftTime} from './ShiftTime';
-
-// type UserRoles = Exclude<Role, Role.ADMIN>;
-
-// TODO: Split and join user roles
 
 export const AddEmployee = () => {
   const [address, setAddress] = useState(null);
@@ -37,10 +35,6 @@ export const AddEmployee = () => {
     callout: true,
   });
 
-  //   const [shiftTime, setShiftTime] = useState([
-  //     {fromTime: '00:00', toTime: '00:00', dayType: 'WEEKDAY'},
-  //   ]);
-
   const handleRoleChange = (event: SelectChangeEvent<typeof roles>) => {
     const {
       target: {value},
@@ -53,7 +47,12 @@ export const AddEmployee = () => {
       [event.target.name]: event.target.checked,
     });
   };
-  console.log(ServiceOrderType, TimeWindowType);
+  console.log(
+    ServiceOrderType,
+    TimeWindowType,
+    convertToText(Role.SERVICE_MANAGER),
+    convertToMacro('Service Manager'),
+  );
   return (
     <form onSubmit={() => console.log('SUBMIT')}>
       <Box>
@@ -130,11 +129,13 @@ export const AddEmployee = () => {
           id="rolesSelect"
           label="Roles"
           value={roles}
-          options={Object.keys(Role).filter((role) => role !== 'ADMIN')}
+          options={Object.keys(Role)
+            .filter((role) => role !== 'ADMIN')
+            .map((role) => convertToText(role))}
           onChange={handleRoleChange}
         />
 
-        {roles.includes(Role.TECHNICIAN) && (
+        {roles.includes(convertToText(Role.TECHNICIAN)) && (
           <>
             <Typography variant="h6">Order Types</Typography>
 

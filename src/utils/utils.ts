@@ -30,3 +30,12 @@ export const formatSearchParamsPageSize = (
   const currentParams = Object.fromEntries([...queryParams]);
   return {...currentParams, pageSize: newPageSize.toString()};
 };
+export const convertToText = (macro: string) =>
+  macro
+    .toLowerCase()
+    .split('_')
+    .join(' ')
+    .replace(/\w\S*/g, (w) => w.replace(/^\w/, (c) => c.toUpperCase()));
+
+export const convertToMacro = (text: string) =>
+  text.toUpperCase().split(' ').join('_');
