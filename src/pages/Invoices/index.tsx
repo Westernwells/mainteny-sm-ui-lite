@@ -11,6 +11,11 @@ import {queryKeys as qks} from 'reactQuery/constants';
 import {fetchInvoices, useInvoices} from 'hooks/reactQuery/useInvoice';
 import {PageOverviewLayout} from 'components/PageOverviewLayout';
 import {CustomPagination} from 'components/CustomPagination';
+import {
+  formatSearchParamsPageIndex,
+  formatSearchParamsPageSize,
+} from 'utils/utils';
+import {useSearchParams} from 'react-router-dom';
 import {useQueryClient} from 'react-query';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {columns, makeRows} from './InvoicesDataGridProps';
@@ -23,7 +28,8 @@ export const Invoices = () => {
   const queryClient = useQueryClient();
   const {user} = useUserSession();
   const [search, setSearch] = useState('');
-  const [page, setPage] = useState(makePage(0, pageSize)); // TODO: implement paging
+  const [page, setPage] = useState(makePage(0, pageSize));
+  const [queryParams, setQueryParams] = useSearchParams();
   const [showFilter, setShowFilter] = useState(false);
   const [amount, setAmount] = useState<number[][]>([]);
   const [status, setStatus] = useState<InvoiceStatus>();
@@ -88,6 +94,16 @@ export const Invoices = () => {
     });
     setAmount(range);
   };
+
+  useEffect(() => {
+    const currentParams = Object.fromEntries([...queryParams]);
+
+    setPage({
+      ...page,
+      pageSize: Number(currentParams.pageSize),
+      pageIndex: Number(currentParams.pageIndex) - 1,
+    });
+  }, [queryParams]);
 
   useEffect(() => {
     if (invoiceResource?.data) {
@@ -182,12 +198,13 @@ export const Invoices = () => {
       {pageCount ? (
         <CustomPagination
           pageSize={page.pageSize}
+          pageIndex={page.pageIndex}
           handlePageSizeChange={(newPageSize: number) =>
-            setPage({...page, pageSize: newPageSize})
+            setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
           }
-          handlePageChange={(newPage: number) => {
-            setPage({...page, pageIndex: newPage - 1});
-          }}
+          handlePageChange={(newPage: number) =>
+            setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+          }
           pageCount={pageCount}
           totalRows={invoiceResource?.total}
         />
