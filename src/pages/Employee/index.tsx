@@ -19,10 +19,13 @@ import {
 import {useSearchParams} from 'react-router-dom';
 import {Progress} from 'components/Progress';
 import {TechnicianEventPair, TechnicianView} from 'models/technician';
+import {SideDrawer} from 'components/SideDrawer';
 import {toRestDateTime} from 'utils/datetime';
 import {addDays, endOfDay, startOfDay} from 'date-fns';
 import {GridRowsProp} from '@mui/x-data-grid';
+import {Button} from '@mui/material';
 import {columns, makeRows} from './EmployeeDataGridProps';
+import {AddEmployee} from './AddEmployee';
 import {CustomPagination} from '../../components/CustomPagination';
 
 const pageSize = 25;
@@ -34,6 +37,7 @@ export const Employees = () => {
   const [search, setSearch] = useState('');
   const [showFilter, setShowFilter] = useState(false);
   const [rows, setRows] = useState<GridRowsProp>([]);
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [employeeResource, setEmployeeResource] = useState(
     createEmptyResource<EmployeesView>(pageSize),
   );
@@ -139,6 +143,7 @@ export const Employees = () => {
           setShowFilter={setShowFilter}
           showFilter={showFilter}
           btnLabel="New Employee"
+          btnOnClick={() => setIsDrawerOpen(true)}
           showNewBtn
           hideFilter
         />
@@ -174,6 +179,13 @@ export const Employees = () => {
           )}
         </>
       )}
+      <SideDrawer
+        open={isDrawerOpen}
+        setOpen={setIsDrawerOpen}
+        header="Add Employee"
+        footer={<Button variant="contained">Add Employee</Button>}
+        body={<AddEmployee />}
+      />
     </PageOverviewLayout>
   );
 };
