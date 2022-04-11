@@ -25,27 +25,19 @@ export const UnitColumns = () => (
         xs={9}
         spacing={2}
         sx={{display: 'flex', justifyContent: 'flex-end'}}>
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <Typography variant="subtitle2" color="textSecondary">
             LAST VISIT
           </Typography>
         </Grid>
 
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <Typography variant="subtitle2" color="textSecondary">
             NEXT VISIT
           </Typography>
         </Grid>
 
-        <Grid item xs={2}>
-          <Typography variant="subtitle2" color="textSecondary">
-            <Box display="flex" justifyContent="center">
-              AVAILABILITY
-            </Box>
-          </Typography>
-        </Grid>
-
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <Typography variant="subtitle2" color="textSecondary">
             <Box display="flex" justifyContent="center">
               STATUS
