@@ -8,15 +8,13 @@ import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import LocationIcon from '@mui/icons-material/LocationOn';
 import {Role} from 'models/user';
-import {ServiceOrderType} from 'models/service-order';
-import {TimeWindowType} from 'models/misc';
 
 import RepairIcon from '@mui/icons-material/SettingsOutlined';
 import {ReactComponent as EmergencyIcon} from 'assets/icons/Emergency.svg';
 import {ReactComponent as RegularIcon} from 'assets/icons/Regular.svg';
 import {ReactComponent as CalloutIcon} from 'assets/icons/Callout.svg';
 
-import {convertToText, convertToMacro} from 'utils/utils';
+import {convertToText} from 'utils/utils';
 
 import {FormInput} from './FormInput';
 import {FormSelect} from './FormSelect';
@@ -47,12 +45,7 @@ export const AddEmployee = () => {
       [event.target.name]: event.target.checked,
     });
   };
-  console.log(
-    ServiceOrderType,
-    TimeWindowType,
-    convertToText(Role.SERVICE_MANAGER),
-    convertToMacro('Service Manager'),
-  );
+
   return (
     <form onSubmit={() => console.log('SUBMIT')}>
       <Box>
