@@ -31,14 +31,7 @@ export const Tabs = ({
   backBtnLabel = '',
   currentIndex = 0,
 }: Props) => {
-  // const [value, setValue] = useState(0);
   const theme = useTheme();
-
-  // useEffect(() => {
-  //   if(getCurrentTabIndex) {
-  //     getCurrentTabIndex(value);
-  //   }
-  // }, [value])
 
   return (
     <Box
@@ -132,6 +125,7 @@ export const Tabs = ({
       <Box
         sx={{
           px: '2.5em',
+          width: '100%',
           mt: 2,
           '::-webkit-scrollbar': {
             width: 0,

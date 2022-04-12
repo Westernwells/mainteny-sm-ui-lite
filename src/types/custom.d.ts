@@ -9,6 +9,8 @@ declare module '@mui/material/styles' {
     alertTitleText: React.CSSProperties;
     helperText: React.CSSProperties;
     chip: React.CSSProperties;
+    badge: React.CSSProperties;
+    tooltip: React.CSSProperties;
   }
 
   // allow configuration using `createTheme`
@@ -20,10 +22,13 @@ declare module '@mui/material/styles' {
     alertTitleText?: React.CSSProperties;
     helperText?: React.CSSProperties;
     chip?: React.CSSProperties;
+    badge?: React.CSSProperties;
+    tooltip?: React.CSSProperties;
   }
 
   interface CustomPalleteColor {
     outlinedHoverBg?: string;
+    containedHoverBackground?: string;
     infoAlert?: string;
   }
   interface PaletteColor extends CustomPalleteColor {}
@@ -57,6 +62,8 @@ declare module '@mui/material/Typography' {
     alertTitleText: true;
     helperText: true;
     chip: true;
+    badge: true;
+    tooltip: true;
   }
 }
 

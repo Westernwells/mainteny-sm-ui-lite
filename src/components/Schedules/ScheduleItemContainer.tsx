@@ -6,7 +6,7 @@ interface Props {
   label?: string;
 }
 
-export const ScheduleOrderContainer = ({children, label, ...rest}: Props) => (
+export const ScheduleItemContainer = ({children, label, ...rest}: Props) => (
   <Box {...rest} component="div" sx={{position: 'relative'}}>
     {label || children || null}
   </Box>

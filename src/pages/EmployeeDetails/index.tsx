@@ -1,5 +1,4 @@
 import {useEffect, useState} from 'react';
-import Box from '@mui/material/Box';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
@@ -54,28 +53,26 @@ export const EmployeeDetails = () => {
   }, [technician, userAccount]);
 
   return (
-    <Box>
-      <Tabs
-        tabItems={tabItems}
-        currentIndex={tabValue}
-        onChange={(index) => setTabValue(index)}
-        backBtnLabel={
-          employee
-            ? `${employee?.userAccount.firstName} 
+    <Tabs
+      tabItems={tabItems}
+      currentIndex={tabValue}
+      onChange={(index) => setTabValue(index)}
+      backBtnLabel={
+        employee
+          ? `${employee?.userAccount.firstName} 
               
               ${employee?.userAccount.lastName}`
-            : ''
-        }>
-        <TabsBody value={tabValue} index={0}>
-          <EmployeeOverview employee={employee} />
-        </TabsBody>
-        <TabsBody value={tabValue} index={1}>
-          <Schedule technicianId={technician && technician[0].id} />
-        </TabsBody>
-        <TabsBody value={tabValue} index={2}>
-          {null}
-        </TabsBody>
-      </Tabs>
-    </Box>
+          : ''
+      }>
+      <TabsBody value={tabValue} index={0}>
+        <EmployeeOverview employee={employee} />
+      </TabsBody>
+      <TabsBody value={tabValue} index={1}>
+        <Schedule technicianId={technician && technician[0].id} />
+      </TabsBody>
+      <TabsBody value={tabValue} index={2}>
+        {null}
+      </TabsBody>
+    </Tabs>
   );
 };

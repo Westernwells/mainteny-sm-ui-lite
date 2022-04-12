@@ -15,6 +15,8 @@ export const theme = createTheme({
       dark: '#00A0CC',
       contrastText: '#FFFFFF',
       outlinedHoverBg: 'rgba(0, 209, 255, 0.08)',
+      containedHoverBackground:
+        'linear-gradient(0deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), #00D1FF',
     },
     text: {
       primary: '#222B45',
@@ -351,6 +353,23 @@ export const theme = createTheme({
             fontSize: '0.8125rem',
             lineHeight: 0.72,
             letterSpacing: '0.16px',
+          },
+        },
+        {
+          props: {variant: 'badge'},
+          style: {
+            fontWeight: 500,
+            fontSize: '0.75rem',
+            lineHeight: 1.25,
+            letterSpacing: '0.14px',
+          },
+        },
+        {
+          props: {variant: 'tooltip'},
+          style: {
+            fontWeight: 500,
+            fontSize: '0.625rem',
+            lineHeight: 0.875,
           },
         },
       ],

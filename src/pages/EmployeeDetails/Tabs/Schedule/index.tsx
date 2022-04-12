@@ -1,36 +1,21 @@
-/* eslint-disable */
-import React, {
-  ReactNode,
-  RefObject,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
+import {useEffect, useState} from 'react';
+import useTheme from '@mui/material/styles/useTheme';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
-import {daysTime, twentyFourHourTime} from 'utils/utils';
+import {twentyFourHourTime} from 'utils/utils';
 import * as _ from 'lodash';
-import Box, {BoxProps} from '@mui/material/Box';
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {
+  addDays,
   differenceInMinutes,
   eachDayOfInterval,
-  endOfWeek,
-  getDay,
+  endOfMonth,
   startOfDay,
-  startOfWeek,
+  startOfMonth,
+  subDays,
 } from 'date-fns';
-import {
-  formatDate,
-  getDateObject,
-  setDateTime,
-  toRestDateTime,
-} from 'utils/datetime';
-import {styled} from '@mui/material/styles';
-import {TypographyVariant} from '@mui/material';
-import {serviceOrder} from './data';
+import {formatDate, getDateObject, toRestDateTime} from 'utils/datetime';
 import {useQueryServiceOrderSchedules} from 'hooks/reactQuery/useServiceOrder';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {ServiceOrderView} from 'models/service-order';
@@ -40,72 +25,59 @@ import {ScheduleRow} from 'components/Schedules/ScheduleRow';
 import {ScheduleHeaderCell} from 'components/Schedules/ScheduleHeaderCell';
 import {ScheduleBody} from 'components/Schedules/ScheduleBody';
 import {ScheduleBodyCell} from 'components/Schedules/ScheduleBodyCell';
-import {ScheduleOrderContainer} from 'components/Schedules/ScheduleOrderContainer';
-import ScheduleOrder from 'components/Schedules/ScheduleOrder';
+import {ScheduleItemContainer} from 'components/Schedules/ScheduleItemContainer';
+import {ScheduleItem} from 'components/Schedules/ScheduleItem';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import {grey} from '@mui/material/colors';
 
 interface Props {
   technicianId?: string;
 }
 
-interface ScheduleGridItemProps extends BoxProps {
-  label?: string | null;
-  variant?: TypographyVariant;
-  children?: ReactNode;
-}
-
-interface OrderProps extends BoxProps {
-  refId?: string;
-  label?: string | null;
-  innerRef?: (ele: HTMLDivElement) => HTMLDivElement;
-  variant?: TypographyVariant;
-  children?: ReactNode;
-  showMarker?: {[key: string]: any};
-  setOrderRendered?: (val: {[key: string]: boolean}) => void;
-  orderRendered: {[key: string]: boolean};
-  orderId?: string | null;
-  gridItemRef: React.MutableRefObject<{[key: string]: HTMLDivElement}>;
-}
-
-const gridHeight = 65;
 const gridWidth = 120;
-const dateFormat = 'dd MMMM YYY';
-
-const orderTypeColor: {[key: string]: string} = {
-  REGULAR: '#00D68F',
-  EMERGENCY: '#FFAA00',
-  REPAIR: '#2A19A5',
-  CALLOUT: 'purple',
-};
+const dateFormat = 'dd MMMM yy';
 
 export const Schedule = ({technicianId}: Props) => {
+  const theme = useTheme();
   const [orders, setOrders] = useState<{[key: string]: ServiceOrderView[]}>({});
-  const [orderRendered, setOrderRendered] = useState<{[key: string]: boolean}>(
-    {},
-  );
+  const [tableHeader, setTableHeader] = useState<string[]>([]);
   const [page] = useState(makePage(0, 100));
-  const startOfWeekDay = startOfWeek(new Date());
-  const endOfWeekDay = endOfWeek(new Date());
-  const [timeMap, setTimeMap] = useState<{[key: string]: string[]}[]>([]);
-  const [showMarker, setShowMarker] = useState<{
-    [key: string]: any;
-  }>({});
-  const gridItemRef = useRef<{[key: string]: HTMLDivElement}>({});
-  const gridColumnContainerRef = useRef<HTMLDivElement | null>(null);
-  const interval = eachDayOfInterval({
-    start: startOfWeekDay,
-    end: endOfWeekDay,
+  const [monthPair, setMonthPair] = useState({
+    startOfMonthDay: startOfMonth(new Date()),
+    endOfMonthDay: endOfMonth(new Date()),
   });
+  const [bodyRow, setBodyRow] = useState<{[key: string]: string[]}[]>([]);
+  const [monthInterval, setMonthInterval] = useState(
+    eachDayOfInterval({
+      start: monthPair.startOfMonthDay,
+      end: monthPair.endOfMonthDay,
+    }),
+  );
+
   const {data: serviceOrders = createEmptyResource<ServiceOrderView>(10)} =
     useQueryServiceOrderSchedules({
-      end: toRestDateTime(endOfWeekDay),
-      start: toRestDateTime(startOfWeekDay),
+      end: toRestDateTime(monthPair.endOfMonthDay),
+      start: toRestDateTime(monthPair.startOfMonthDay),
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: '',
       technicianIds: technicianId ? [technicianId] : [],
     });
 
-  // console.log(serviceOrders, '"?+++++++++++++++===========>>>');
+  const serviceOrderStatusColor: {[key: string]: string} = {
+    SCHEDULED: '#00D1FF',
+    IN_PROGRESS: theme.state?.ratingActive as string,
+    COMPLETED: theme.palette.success.main,
+    CANCELLED: grey[600],
+    EXPIRED: theme.palette.error.main,
+  };
+
+  useEffect(() => {
+    const monthBegins = formatDate(monthPair.startOfMonthDay, 'dd MMM');
+    const montEnds = formatDate(monthPair.endOfMonthDay, 'dd MMM');
+    setTableHeader([`${monthBegins} - ${montEnds}`, ...twentyFourHourTime]);
+  }, [monthInterval]);
 
   useEffect(() => {
     const ordersByDate = _.groupBy(serviceOrders.data, (serviceOrder) =>
@@ -115,30 +87,30 @@ export const Schedule = ({technicianId}: Props) => {
       ),
     );
 
+    // Group holidays to the same time
+
     setOrders(ordersByDate);
   }, [serviceOrders]);
 
   useEffect(() => {
-    const result = interval.map((item) => {
-      const key = formatDate(item, dateFormat);
-      return {[key!]: twentyFourHourTime};
-    });
-
-    setTimeMap(result);
-  }, []);
+    if (tableHeader.length) {
+      const result = monthInterval.map((item) => {
+        const key = formatDate(item, dateFormat);
+        return {[key!]: tableHeader};
+      });
+      setBodyRow(result);
+    }
+  }, [tableHeader]);
 
   const calculatePosition = (startDateTime: string) => {
     const morningTime = startOfDay(new Date(startDateTime));
     const orderStartTime = getDateObject(startDateTime);
-    // console.log(orderStartTime, ';;;;;;>>' , morningTime, )
     const result =
       gridWidth * (differenceInMinutes(orderStartTime, morningTime) / 60);
-    // console.log(result, '}}}}}}}}}}')
-    return result + 'px';
+    return `${result}px`;
   };
 
   const calculateWidth = (order: ServiceOrderView) => {
-    // console.log(order, '???????///');
     const startDateTime = order.schedules[0].startTime;
     const endDateTime = order.schedules[0].endTime;
     const width =
@@ -149,74 +121,137 @@ export const Schedule = ({technicianId}: Props) => {
         60) *
       gridWidth;
 
-    return width + 'px';
+    return `${width}px`;
   };
+
+  useEffect(() => {
+    const interval = eachDayOfInterval({
+      start: monthPair.startOfMonthDay,
+      end: monthPair.endOfMonthDay,
+    });
+
+    setMonthInterval(interval);
+  }, [monthPair]);
+
+  const nextMonth = () => {
+    const firstDayOfNextMonth = addDays(monthPair.endOfMonthDay, 1);
+    const endOfNextMonth = endOfMonth(firstDayOfNextMonth);
+    setMonthPair({
+      ...monthPair,
+      startOfMonthDay: firstDayOfNextMonth,
+      endOfMonthDay: endOfNextMonth,
+    });
+  };
+
+  const prevMonth = () => {
+    const endOfPrevMonth = subDays(monthPair.startOfMonthDay, 1);
+    const firstDayOfPrevMonth = startOfMonth(endOfPrevMonth);
+    setMonthPair({
+      ...monthPair,
+      startOfMonthDay: firstDayOfPrevMonth,
+      endOfMonthDay: endOfPrevMonth,
+    });
+  };
+
+  const scheduleControls = (item: string) => (
+    <Box>
+      <Box sx={{display: 'flex'}}>
+        <Box onClick={() => prevMonth()} sx={{cursor: 'pointer'}}>
+          <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
+        </Box>
+
+        <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
+          {item}
+        </Typography>
+        <Box onClick={() => nextMonth()} sx={{cursor: 'pointer'}}>
+          <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
+        </Box>
+      </Box>
+    </Box>
+  );
 
   return (
     <Card
       sx={{
         border: 'none',
         overflowY: 'scroll',
-        height: '80vh',
+        height: '75vh',
       }}>
-      {/* {console.log(interval)} */}
-      <CardHeader sx={{pb: '0'}} title="Header" />
-      <CardContent sx={{width: '84vw', overflowX: 'scroll'}}>
+      <CardContent sx={{overflowX: 'scroll', padding: 0}}>
         <ScheduleContainer>
           <ScheduleHeader>
             <ScheduleRow>
-              {twentyFourHourTime.map((item, index) => (
-                <ScheduleHeaderCell key={index} label={item} />
-              ))}
+              {tableHeader.map((item, index) => {
+                if (index === 0) {
+                  return (
+                    <ScheduleHeaderCell key={index}>
+                      {scheduleControls(item)}
+                    </ScheduleHeaderCell>
+                  );
+                }
+                return (
+                  <ScheduleHeaderCell
+                    cellWidth={gridWidth}
+                    key={index}
+                    label={item}
+                  />
+                );
+              })}
             </ScheduleRow>
           </ScheduleHeader>
           <ScheduleBody>
-            {timeMap.map((dayRow, rowIndex) => {
-              return (
-                <ScheduleRow key={rowIndex}>
-                  {Object.keys(dayRow).map((key) => {
-                    return dayRow[key].map((item, index) => {
-                      if (index === 0) {
-                        return (
-                          <ScheduleBodyCell
-                            key={`${rowIndex}-${index}`}
-                            label={key}
-                          />
-                        );
-                      }
+            {bodyRow.map((dayRow, rowIndex) => (
+              <ScheduleRow key={rowIndex}>
+                {Object.keys(dayRow).map((key) =>
+                  dayRow[key].map((item, index) => {
+                    if (index === 0) {
+                      return (
+                        <ScheduleBodyCell
+                          cellWidth={gridWidth}
+                          key={`${rowIndex}-${index}`}
+                          label={key}
+                        />
+                      );
+                    }
 
-                      if (index === 1) {
-                        return Object.keys(orders).map((xKey) => {
-                          console.log(key, key === xKey, '>>>>>>>>>>>.', xKey);
-                          if (xKey === key) {
-                            return (
-                              <ScheduleBodyCell key={`${rowIndex}-${index}`}>
-                                <ScheduleOrderContainer>
-                                  {orders[xKey].map((order) => {
-                                    // console.log(order, '>>>>>>>>>>>.', xKey);
-                                    return (
-                                      <ScheduleOrder
-                                        key={`${xKey}-${index}`}
-                                        label={order.id}
-                                        width={calculateWidth(order)}
-                                        marginLeft={calculatePosition(
-                                          order.schedules[0].startTime,
-                                        )}
-                                      />
-                                    );
-                                  })}
-                                </ScheduleOrderContainer>
-                              </ScheduleBodyCell>
-                            );
-                          }
-                        });
-                      }
-                      return <ScheduleBodyCell key={`${rowIndex}-${index}`} />;
-                    });
-                  })}
-                </ScheduleRow>
-              );
-            })}
+                    if (index === 1) {
+                      return Object.keys(orders).map((xKey) => {
+                        if (xKey === key) {
+                          return (
+                            <ScheduleBodyCell
+                              key={`${rowIndex}-${index}`}
+                              cellWidth={gridWidth}>
+                              <ScheduleItemContainer>
+                                {orders[xKey].map((order) => (
+                                  // console.log(order, '>>>>>>>>>>>.', xKey);
+                                  <ScheduleItem
+                                    key={`${order.id}`}
+                                    title={order.elevator.propertyOwner.name}
+                                    subtitle={
+                                      order.elevator.propertyOwner.address
+                                        .fullName
+                                    }
+                                    width={calculateWidth(order)}
+                                    cardStatusAccent={
+                                      serviceOrderStatusColor[order.status]
+                                    }
+                                    marginLeft={calculatePosition(
+                                      order.schedules[0].startTime,
+                                    )}
+                                  />
+                                ))}
+                              </ScheduleItemContainer>
+                            </ScheduleBodyCell>
+                          );
+                        }
+                        return null;
+                      });
+                    }
+                    return <ScheduleBodyCell key={`${rowIndex}-${index}`} />;
+                  }),
+                )}
+              </ScheduleRow>
+            ))}
           </ScheduleBody>
         </ScheduleContainer>
       </CardContent>

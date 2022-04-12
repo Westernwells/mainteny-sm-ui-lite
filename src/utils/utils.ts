@@ -43,7 +43,6 @@ export const convertToText = (macro: string) =>
 export const convertToMacro = (text: string) =>
   text.toUpperCase().split(' ').join('_');
 export const twentyFourHourTime = [
-  'This week',
   '00:00',
   '01:00',
   '02:00',

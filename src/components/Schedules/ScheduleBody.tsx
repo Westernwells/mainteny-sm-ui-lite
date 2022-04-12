@@ -1,7 +1,8 @@
 import {ReactNode} from 'react';
 import Box from '@mui/material/Box';
+import {TypographyProps} from '@mui/material/Typography';
 
-interface Props {
+interface Props extends TypographyProps {
   children?: ReactNode;
   label?: string;
 }
