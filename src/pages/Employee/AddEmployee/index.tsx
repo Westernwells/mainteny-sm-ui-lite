@@ -154,7 +154,7 @@ export const AddEmployee = () => {
                   name: 'repair',
                   label: (
                     <Box display="flex" alignItems="center">
-                      <RepairIcon sx={{color: '#ED6C02', height: '.75em'}} />
+                      <RepairIcon sx={{color: 'amber.main', height: '.75em'}} />
                       <Typography variant="body2">Repair</Typography>
                     </Box>
                   ),
