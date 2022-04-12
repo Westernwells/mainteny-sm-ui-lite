@@ -5,13 +5,13 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import {Theme, useTheme} from '@mui/material/styles';
 
-interface Props {
+interface Props<T> {
   labelId: string;
   label: string;
   id: string;
   value: string[];
   options: string[];
-  onChange: (event: SelectChangeEvent<any[]>) => void;
+  onChange: (event: SelectChangeEvent<T[]>) => void;
 }
 
 const ITEM_HEIGHT = 48;
@@ -41,7 +41,7 @@ export const FormSelect = ({
   value,
   options,
   onChange,
-}: Props) => {
+}: Props<string>) => {
   const theme = useTheme();
 
   return (

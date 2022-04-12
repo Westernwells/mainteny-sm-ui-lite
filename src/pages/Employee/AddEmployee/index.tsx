@@ -39,6 +39,7 @@ export const AddEmployee = () => {
     } = event;
     setRoles(typeof value === 'string' ? value.split(',') : value);
   };
+
   const handleCheckbox = (event: ChangeEvent<HTMLInputElement>) => {
     setOrderTypes({
       ...orderTypes,
