@@ -43,8 +43,8 @@ export const ScheduleItem = ({
       }}>
       {children || title ? (
         <Box sx={{display: 'flex', flexDirection: 'column', my: '0.5em'}}>
-          <Box sx={{px: '0.5em'}}>
-            {titleLeftAdornment}
+          <Box sx={{px: '0.5em', display: 'flex'}}>
+            <Box> {titleLeftAdornment}</Box>
             <Typography
               component="div"
               variant="badge"
@@ -52,6 +52,7 @@ export const ScheduleItem = ({
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
+                marginLeft: '0.5em',
               }}>
               {title}
             </Typography>

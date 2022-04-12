@@ -30,6 +30,7 @@ import {ScheduleItem} from 'components/Schedules/ScheduleItem';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {grey} from '@mui/material/colors';
+import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 
 interface Props {
   technicianId?: string;
@@ -226,6 +227,12 @@ export const Schedule = ({technicianId}: Props) => {
                                   // console.log(order, '>>>>>>>>>>>.', xKey);
                                   <ScheduleItem
                                     key={`${order.id}`}
+                                    titleLeftAdornment={
+                                      <ServiceOrderIcons
+                                        style={{fontSize: '5rem'}}
+                                        serviceOrderType={order.type}
+                                      />
+                                    }
                                     title={order.elevator.propertyOwner.name}
                                     subtitle={
                                       order.elevator.propertyOwner.address

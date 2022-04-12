@@ -11,6 +11,7 @@ export const ScheduleContainer = ({children, ...rest}: Props) => (
     sx={{
       borderCollapse: 'separate',
       borderSpacing: 0,
+      position: 'relative',
     }}
     {...rest}>
     {children}
