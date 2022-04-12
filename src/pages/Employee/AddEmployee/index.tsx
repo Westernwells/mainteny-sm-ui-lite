@@ -47,7 +47,7 @@ export const AddEmployee = () => {
   };
 
   return (
-    <form onSubmit={() => console.log('SUBMIT')}>
+    <form onSubmit={() => {}}>
       <Box>
         <Box display="flex" gap="1em">
           <FormInput id="firstName" label="First Name" placeholder="Blake" />
