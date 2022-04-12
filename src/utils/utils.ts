@@ -30,6 +30,8 @@ export const formatSearchParamsPageSize = (
   const currentParams = Object.fromEntries([...queryParams]);
   return {...currentParams, pageSize: newPageSize.toString()};
 };
+
+// Converts macro to text, eg: 'SERVICE_MANAGER' -> 'Service Manager'
 export const convertToText = (macro: string) =>
   macro
     .toLowerCase()
@@ -37,5 +39,6 @@ export const convertToText = (macro: string) =>
     .join(' ')
     .replace(/\w\S*/g, (w) => w.replace(/^\w/, (c) => c.toUpperCase()));
 
+// Converts text to macro, eg: 'Service Manager' -> 'SERVICE_MANAGER'
 export const convertToMacro = (text: string) =>
   text.toUpperCase().split(' ').join('_');

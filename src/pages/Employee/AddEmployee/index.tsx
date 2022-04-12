@@ -145,7 +145,7 @@ export const AddEmployee = () => {
                       <RegularIcon style={{height: '1.25em'}} />
                       <Typography variant="body2" ml=".25em">
                         Maintenance
-                      </Typography>{' '}
+                      </Typography>
                     </Box>
                   ),
                 },
