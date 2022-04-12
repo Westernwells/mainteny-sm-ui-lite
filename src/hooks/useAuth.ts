@@ -53,7 +53,7 @@ export const useAuth = (): UseAuth => {
             {replace: true},
           );
         } else {
-          navigate('/units', {replace: true});
+          navigate('/units?pageIndex=1&pageSize=25', {replace: true});
         }
       }
     } catch (errorResponse: any) {
