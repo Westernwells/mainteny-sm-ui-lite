@@ -8,7 +8,8 @@ import {ServiceOrderView} from 'models/service-order';
 import {Schedule} from 'components/Schedules';
 import {ScheduleItem} from 'components/Schedules/ScheduleItem';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
-import {useServiceOrderTypeColor} from 'hooks/useServiceOrderTypeColor';
+import {useServiceOrderStatusColor} from 'hooks/useServiceOrderStatusColor';
+import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicator';
 
 interface Props {
   technicianId?: string;
@@ -17,7 +18,7 @@ interface Props {
 const dateFormat = 'dd MMMM yy';
 
 export const ScheduleTab = ({technicianId}: Props) => {
-  const [serviceOrderTypeColor] = useServiceOrderTypeColor();
+  const [serviceOrderStatusColor] = useServiceOrderStatusColor();
   const [monthPair, setMonthPair] = useState<{[key: string]: Date}>({
     startOfMonthDay: startOfMonth(new Date()),
     endOfMonthDay: endOfMonth(new Date()),
@@ -46,28 +47,31 @@ export const ScheduleTab = ({technicianId}: Props) => {
   }, [serviceOrders]);
 
   return (
-    <Schedule
-      getMonthPair={(pair) => setMonthPair(pair)}
-      scheduleItems={orders}
-      renderCellItem={(order: ServiceOrderView, calWidth, calcPosition) => (
-        <ScheduleItem
-          key={`${order.id}`}
-          titleLeftAdornment={
-            <ServiceOrderIcons
-              style={{fontSize: '5rem'}}
-              serviceOrderType={order.type}
-            />
-          }
-          title={order.elevator.propertyOwner.name}
-          subtitle={order.elevator.propertyOwner.address.fullName}
-          width={calWidth(
-            order.schedules[0].startTime,
-            order.schedules[0].endTime,
-          )}
-          cardStatusAccent={serviceOrderTypeColor[order.status]}
-          position={calcPosition(order.schedules[0].startTime)}
-        />
-      )}
-    />
+    <>
+      <ServiceOrderStatusIndicator />
+      <Schedule
+        getMonthPair={(pair) => setMonthPair(pair)}
+        scheduleItems={orders}
+        renderCellItem={(order: ServiceOrderView, calWidth, calcPosition) => (
+          <ScheduleItem
+            key={`${order.id}`}
+            titleLeftAdornment={
+              <ServiceOrderIcons
+                style={{fontSize: '5rem'}}
+                serviceOrderType={order.type}
+              />
+            }
+            title={order.elevator.propertyOwner.name}
+            subtitle={order.elevator.propertyOwner.address.fullName}
+            width={calWidth(
+              order.schedules[0].startTime,
+              order.schedules[0].endTime,
+            )}
+            cardStatusAccent={serviceOrderStatusColor[order.status]}
+            position={calcPosition(order.schedules[0].startTime)}
+          />
+        )}
+      />
+    </>
   );
 };

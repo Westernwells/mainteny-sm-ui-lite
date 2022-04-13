@@ -148,7 +148,7 @@ export const Schedule = ({
       sx={{
         border: 'none',
         overflowY: 'scroll',
-        height: '75vh',
+        height: '72vh',
       }}>
       <CardContent sx={{overflowX: 'scroll', padding: 0}}>
         <ScheduleContainer>

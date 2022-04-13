@@ -78,3 +78,6 @@ export const daysTime: {[key: number]: string[]}[] = [
   {5: twentyFourHourTime},
   {6: twentyFourHourTime},
 ];
+
+export const removeFromArray = (remove: any[], from: any[]) =>
+  from.filter((item) => !remove.includes(item));

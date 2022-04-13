@@ -1,4 +1,4 @@
-import {Box} from '@mui/system';
+import Box from '@mui/material/Box';
 import {ReactElement} from 'react';
 import {AppDrawer} from './AppDrawer';
 import {AppTopBar} from './AppTopBar';
