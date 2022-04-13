@@ -19,6 +19,7 @@ import Typography from '@mui/material/Typography';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import Fade from '@mui/material/Fade';
 
 const drawerWidth = '12.5rem';
 
@@ -250,8 +251,11 @@ export const AppDrawer = () => {
               key={text}>
               <ListItemIcon sx={{minWidth: 0, pr: '1em'}}>{icon}</ListItemIcon>
               <ListItemText
-                sx={{display: open ? 'block' : 'none'}}
-                primary={<Typography variant="subtitle1">{text}</Typography>}
+                primary={
+                  <Fade in={open}>
+                    <Typography variant="subtitle1">{text}</Typography>
+                  </Fade>
+                }
               />
             </ListItemButton>
           ))}
