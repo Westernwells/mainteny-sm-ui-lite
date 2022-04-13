@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import useTheme from '@mui/material/styles/useTheme';
 import {useQueryServiceOrderSchedules} from 'hooks/reactQuery/useServiceOrder';
 import * as _ from 'lodash';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
@@ -9,7 +8,7 @@ import {ServiceOrderView} from 'models/service-order';
 import {Schedule} from 'components/Schedules';
 import {ScheduleItem} from 'components/Schedules/ScheduleItem';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
-import {grey} from '@mui/material/colors';
+import {useServiceOrderTypeColor} from 'hooks/useServiceOrderTypeColor';
 
 interface Props {
   technicianId?: string;
@@ -18,7 +17,7 @@ interface Props {
 const dateFormat = 'dd MMMM yy';
 
 export const ScheduleTab = ({technicianId}: Props) => {
-  const theme = useTheme();
+  const [serviceOrderTypeColor] = useServiceOrderTypeColor();
   const [monthPair, setMonthPair] = useState<{[key: string]: Date}>({
     startOfMonthDay: startOfMonth(new Date()),
     endOfMonthDay: endOfMonth(new Date()),
@@ -34,14 +33,6 @@ export const ScheduleTab = ({technicianId}: Props) => {
       query: '',
       technicianIds: technicianId ? [technicianId] : [],
     });
-
-  const serviceOrderStatusColor: {[key: string]: string} = {
-    SCHEDULED: '#00D1FF',
-    IN_PROGRESS: theme.state?.ratingActive as string,
-    COMPLETED: theme.palette.success.main,
-    CANCELLED: grey[600],
-    EXPIRED: theme.palette.error.main,
-  };
 
   useEffect(() => {
     const ordersByDate = _.groupBy(serviceOrders.data, (serviceOrder) =>
@@ -73,7 +64,7 @@ export const ScheduleTab = ({technicianId}: Props) => {
             order.schedules[0].startTime,
             order.schedules[0].endTime,
           )}
-          cardStatusAccent={serviceOrderStatusColor[order.status]}
+          cardStatusAccent={serviceOrderTypeColor[order.status]}
           position={calcPosition(order.schedules[0].startTime)}
         />
       )}
