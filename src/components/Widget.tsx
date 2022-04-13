@@ -25,6 +25,7 @@ interface Props {
   getSearchValue?: (val: string) => void;
   showNewBtn?: boolean;
   btnLabel?: string;
+  btnOnClick?: () => void;
 }
 
 export const Widget = ({
@@ -39,6 +40,7 @@ export const Widget = ({
   hideSearchInput = false,
   btnLabel = '',
   getSearchValue,
+  btnOnClick,
 }: Props) => {
   const theme = useTheme();
   const [view, setView] = useState('list');
@@ -115,7 +117,8 @@ export const Widget = ({
             color="primary"
             size={theme.breakpoints.down('md') ? 'small' : 'large'}
             startIcon={<AddIcon />}
-            sx={{ml: '1em'}}>
+            sx={{ml: '1em'}}
+            onClick={() => (btnOnClick ? btnOnClick() : () => {})}>
             {btnLabel}
           </Button>
         ) : null}
