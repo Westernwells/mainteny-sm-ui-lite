@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {ReactNode} from 'react';
 import useTheme from '@mui/material/styles/useTheme';
 import {grey} from '@mui/material/colors';

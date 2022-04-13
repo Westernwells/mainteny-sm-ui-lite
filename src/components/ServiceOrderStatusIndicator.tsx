@@ -1,4 +1,3 @@
-/* eslint-disable */
 import Box from '@mui/material/Box';
 import {ServiceOrderStatus} from 'models/service-order';
 import {useRef} from 'react';

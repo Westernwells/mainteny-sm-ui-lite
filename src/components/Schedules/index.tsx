@@ -8,9 +8,9 @@ import {
   addDays,
   differenceInMinutes,
   eachDayOfInterval,
-  endOfMonth,
+  endOfWeek,
   startOfDay,
-  startOfMonth,
+  startOfWeek,
   subDays,
 } from 'date-fns';
 import {formatDate, getDateObject} from 'utils/datetime';
@@ -23,6 +23,7 @@ import {ScheduleBodyCell} from 'components/Schedules/ScheduleBodyCell';
 import {ScheduleItemContainer} from 'components/Schedules/ScheduleItemContainer';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import {WeekPair} from 'models/misc';
 
 interface Props {
   scheduleItems: {[key: string]: any[]};
@@ -31,48 +32,57 @@ interface Props {
     calcWidth: (startDateTime: string, endDateTime: string) => string,
     calcPosition: (startDateTime: string) => string,
   ) => void;
-  getMonthPair?: (monthPair: {
-    startOfMonthDay: Date;
-    endOfMonthDay: Date;
-  }) => void;
+  getWeekPair?: (weekPair: WeekPair) => void;
 }
 
 const gridWidth = 120;
 const dateFormat = 'dd MMMM yy';
 
 export const Schedule = ({
-  getMonthPair,
+  getWeekPair,
   scheduleItems,
   renderCellItem,
 }: Props) => {
   const [tableHeader, setTableHeader] = useState<string[]>([]);
-  const [monthPair, setMonthPair] = useState({
-    startOfMonthDay: startOfMonth(new Date()),
-    endOfMonthDay: endOfMonth(new Date()),
+  const [weekPair, setWeekPair] = useState<WeekPair>({
+    startOfWeekDay: startOfWeek(new Date()),
+    endOfWeekDay: endOfWeek(new Date()),
   });
   const [bodyRow, setBodyRow] = useState<{[key: string]: string[]}[]>([]);
-  const [monthInterval, setMonthInterval] = useState(
+  const [weekInterval, setWeekInterval] = useState(
     eachDayOfInterval({
-      start: monthPair.startOfMonthDay,
-      end: monthPair.endOfMonthDay,
+      start: weekPair.startOfWeekDay,
+      end: weekPair.endOfWeekDay,
     }),
   );
 
   useEffect(() => {
-    const monthBegins = formatDate(monthPair.startOfMonthDay, 'dd MMM');
-    const montEnds = formatDate(monthPair.endOfMonthDay, 'dd MMM');
-    setTableHeader([`${monthBegins} - ${montEnds}`, ...twentyFourHourTime]);
-  }, [monthInterval]);
+    const weekBegins = formatDate(weekPair.startOfWeekDay, 'dd MMM');
+    const weekEnds = formatDate(weekPair.endOfWeekDay, 'dd MMM');
+    setTableHeader([`${weekBegins} - ${weekEnds}`, ...twentyFourHourTime]);
+  }, [weekInterval]);
 
   useEffect(() => {
     if (tableHeader.length) {
-      const result = monthInterval.map((item) => {
+      const result = weekInterval.map((item) => {
         const key = formatDate(item, dateFormat);
         return {[key!]: tableHeader};
       });
       setBodyRow(result);
     }
   }, [tableHeader]);
+
+  useEffect(() => {
+    const interval = eachDayOfInterval({
+      start: weekPair.startOfWeekDay,
+      end: weekPair.endOfWeekDay,
+    });
+
+    setWeekInterval(interval);
+    if (getWeekPair) {
+      getWeekPair(weekPair);
+    }
+  }, [weekPair]);
 
   const calculatePosition = (startDateTime: string) => {
     const morningTime = startOfDay(new Date(startDateTime));
@@ -94,35 +104,23 @@ export const Schedule = ({
     return `${width}px`;
   };
 
-  useEffect(() => {
-    const interval = eachDayOfInterval({
-      start: monthPair.startOfMonthDay,
-      end: monthPair.endOfMonthDay,
-    });
-
-    setMonthInterval(interval);
-    if (getMonthPair) {
-      getMonthPair(monthPair);
-    }
-  }, [monthPair]);
-
   const nextMonth = () => {
-    const firstDayOfNextMonth = addDays(monthPair.endOfMonthDay, 1);
-    const endOfNextMonth = endOfMonth(firstDayOfNextMonth);
-    setMonthPair({
-      ...monthPair,
-      startOfMonthDay: firstDayOfNextMonth,
-      endOfMonthDay: endOfNextMonth,
+    const firstDayOfNextWeek = addDays(weekPair.endOfWeekDay, 1);
+    const endOfNextWeek = endOfWeek(firstDayOfNextWeek);
+    setWeekPair({
+      ...weekPair,
+      startOfWeekDay: firstDayOfNextWeek,
+      endOfWeekDay: endOfNextWeek,
     });
   };
 
   const prevMonth = () => {
-    const endOfPrevMonth = subDays(monthPair.startOfMonthDay, 1);
-    const firstDayOfPrevMonth = startOfMonth(endOfPrevMonth);
-    setMonthPair({
-      ...monthPair,
-      startOfMonthDay: firstDayOfPrevMonth,
-      endOfMonthDay: endOfPrevMonth,
+    const endOfPrevWeek = subDays(weekPair.startOfWeekDay, 1);
+    const firstDayOfPrevWeek = startOfWeek(endOfPrevWeek);
+    setWeekPair({
+      ...weekPair,
+      startOfWeekDay: firstDayOfPrevWeek,
+      endOfWeekDay: endOfPrevWeek,
     });
   };
 

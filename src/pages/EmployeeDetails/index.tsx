@@ -10,7 +10,6 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import {Role} from 'models/user';
 import {EmployeesView} from 'models/employee';
 import {EmployeeOverview} from './Tabs/EmployeeOverview';
-// import {Schedule} from '../../components/Schedules';
 import {ScheduleTab} from './Tabs/ScheduleTab';
 
 const tabItems = [
@@ -38,6 +37,7 @@ export const EmployeeDetails = () => {
       ? userAccount.username
       : null,
   );
+
   useEffect(() => {
     let userData: EmployeesView | undefined;
     if (

@@ -3,13 +3,14 @@ import {useQueryServiceOrderSchedules} from 'hooks/reactQuery/useServiceOrder';
 import * as _ from 'lodash';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {formatDate, getDateObject, toRestDateTime} from 'utils/datetime';
-import {endOfMonth, startOfMonth} from 'date-fns';
+import {endOfWeek, startOfWeek} from 'date-fns';
 import {ServiceOrderView} from 'models/service-order';
 import {Schedule} from 'components/Schedules';
 import {ScheduleItem} from 'components/Schedules/ScheduleItem';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {useServiceOrderStatusColor} from 'hooks/useServiceOrderStatusColor';
 import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicator';
+import {WeekPair} from 'models/misc';
 
 interface Props {
   technicianId?: string;
@@ -19,16 +20,16 @@ const dateFormat = 'dd MMMM yy';
 
 export const ScheduleTab = ({technicianId}: Props) => {
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();
-  const [monthPair, setMonthPair] = useState<{[key: string]: Date}>({
-    startOfMonthDay: startOfMonth(new Date()),
-    endOfMonthDay: endOfMonth(new Date()),
+  const [weekPair, setWeekPair] = useState<WeekPair>({
+    startOfWeekDay: startOfWeek(new Date()),
+    endOfWeekDay: endOfWeek(new Date()),
   });
   const [orders, setOrders] = useState<{[key: string]: ServiceOrderView[]}>({});
   const [page] = useState(makePage(0, 100));
   const {data: serviceOrders = createEmptyResource<ServiceOrderView>(10)} =
     useQueryServiceOrderSchedules({
-      end: toRestDateTime(monthPair?.endOfMonthDay),
-      start: toRestDateTime(monthPair?.startOfMonthDay),
+      end: toRestDateTime(weekPair?.endOfWeekDay),
+      start: toRestDateTime(weekPair?.startOfWeekDay),
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: '',
@@ -50,7 +51,7 @@ export const ScheduleTab = ({technicianId}: Props) => {
     <>
       <ServiceOrderStatusIndicator />
       <Schedule
-        getMonthPair={(pair) => setMonthPair(pair)}
+        getWeekPair={(pair) => setWeekPair(pair)}
         scheduleItems={orders}
         renderCellItem={(order: ServiceOrderView, calWidth, calcPosition) => (
           <ScheduleItem
@@ -62,7 +63,7 @@ export const ScheduleTab = ({technicianId}: Props) => {
               />
             }
             title={order.elevator.propertyOwner.name}
-            subtitle={order.elevator.propertyOwner.address.fullName}
+            subtitle={order.elevator.address.fullName}
             width={calWidth(
               order.schedules[0].startTime,
               order.schedules[0].endTime,

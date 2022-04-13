@@ -193,5 +193,10 @@ export enum PdfGenerationStatus {
   RUNNING = 'RUNNING',
 }
 
+export interface WeekPair {
+  startOfWeekDay: Date;
+  endOfWeekDay: Date;
+}
+
 export type WithOptional<T, K extends keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
