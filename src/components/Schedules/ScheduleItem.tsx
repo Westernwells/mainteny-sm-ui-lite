@@ -25,7 +25,6 @@ export const ScheduleItem = ({
   cardStatusAccent,
   ...rest
 }: Props) => {
-  console.log(cardStatusAccent, '@@@@###');
   const theme = useTheme();
   return (
     <Box

@@ -20,8 +20,6 @@ export const ScheduleBodyCell = ({
       textAlign: 'left',
       border: '0.5px solid #F1F5F9',
       height: '70px',
-      // paddingBlock: '8px',
-      // paddingInline: 0,
       minWidth: cellWidth,
       ':first-child': {
         position: 'sticky',

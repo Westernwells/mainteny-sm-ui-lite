@@ -55,7 +55,7 @@ export const ScheduleTab = ({technicianId}: Props) => {
         scheduleItems={orders}
         renderCellItem={(order: ServiceOrderView, calWidth, calcPosition) => (
           <ScheduleItem
-            key={`${order.id}`}
+            key={order.id}
             titleLeftAdornment={
               <ServiceOrderIcons
                 style={{fontSize: '5rem'}}
