@@ -42,6 +42,10 @@ export const convertToText = (macro: string) =>
 // Converts text to macro, eg: 'Service Manager' -> 'SERVICE_MANAGER'
 export const convertToMacro = (text: string) =>
   text.toUpperCase().split(' ').join('_');
+
+export const removeFromList = (remove: any[], from: any[]) =>
+  from.filter((item) => !remove.includes(item));
+
 export const twentyFourHourTime = [
   '00:00',
   '01:00',
@@ -78,6 +82,3 @@ export const daysTime: {[key: number]: string[]}[] = [
   {5: twentyFourHourTime},
   {6: twentyFourHourTime},
 ];
-
-export const removeFromArray = (remove: any[], from: any[]) =>
-  from.filter((item) => !remove.includes(item));

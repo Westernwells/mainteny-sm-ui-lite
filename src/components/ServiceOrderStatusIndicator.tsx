@@ -1,12 +1,12 @@
 import Box from '@mui/material/Box';
 import {ServiceOrderStatus} from 'models/service-order';
 import {useRef} from 'react';
-import {removeFromArray} from 'utils/utils';
+import {removeFromList} from 'utils/utils';
 import {ServiceOrderStatusText} from './ServiceOrderStatusText';
 
 export const ServiceOrderStatusIndicator = () => {
   const statuses = useRef(
-    removeFromArray(
+    removeFromList(
       ['ALL', 'INIT', 'READY_TO_SCHEDULE', 'SCHEDULING'],
       Object.values(ServiceOrderStatus),
     ),
