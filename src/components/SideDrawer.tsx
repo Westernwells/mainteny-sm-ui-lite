@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ReactNode} from 'react';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -9,9 +9,9 @@ import {Close} from '@mui/icons-material';
 interface Props {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  body: JSX.Element;
-  header?: JSX.Element | string;
-  footer?: JSX.Element;
+  body: ReactNode;
+  header?: ReactNode;
+  footer?: ReactNode;
 }
 
 export const SideDrawer = ({open, setOpen, body, header, footer}: Props) => (
