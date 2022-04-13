@@ -10,7 +10,8 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import {Role} from 'models/user';
 import {EmployeesView} from 'models/employee';
 import {EmployeeOverview} from './Tabs/EmployeeOverview';
-import {Schedule} from './Tabs/Schedule';
+// import {Schedule} from '../../components/Schedules';
+import {ScheduleTab} from './Tabs/ScheduleTab';
 
 const tabItems = [
   {
@@ -68,7 +69,8 @@ export const EmployeeDetails = () => {
         <EmployeeOverview employee={employee} />
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
-        <Schedule technicianId={technician && technician[0].id} />
+        <ScheduleTab technicianId={technician && technician[0].id} />
+        {/* <Schedule technicianId={technician && technician[0].id} /> */}
       </TabsBody>
       <TabsBody value={tabValue} index={2}>
         {null}

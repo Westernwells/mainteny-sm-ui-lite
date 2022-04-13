@@ -8,7 +8,7 @@ interface Props {
   title?: string;
   subtitle?: string;
   width?: string;
-  marginLeft?: string;
+  position?: string;
   height?: string;
   titleLeftAdornment?: JSX.Element;
   cardStatusAccent?: string;
@@ -18,7 +18,7 @@ export const ScheduleItem = ({
   children,
   title,
   width,
-  marginLeft,
+  position,
   titleLeftAdornment,
   subtitle,
   height,
@@ -38,7 +38,7 @@ export const ScheduleItem = ({
         background: theme.palette.secondary.outlinedHoverBg,
         overflowX: 'hidden',
         width,
-        marginLeft,
+        marginLeft: position,
         borderLeft: `2px solid ${cardStatusAccent}`,
       }}>
       {children || title ? (
