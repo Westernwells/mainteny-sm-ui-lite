@@ -1,5 +1,4 @@
 import {useEffect, useState} from 'react';
-import Box from '@mui/material/Box';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
@@ -11,6 +10,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import {Role} from 'models/user';
 import {EmployeesView} from 'models/employee';
 import {EmployeeOverview} from './Tabs/EmployeeOverview';
+import {ScheduleTab} from './Tabs/ScheduleTab';
 
 const tabItems = [
   {
@@ -37,6 +37,7 @@ export const EmployeeDetails = () => {
       ? userAccount.username
       : null,
   );
+
   useEffect(() => {
     let userData: EmployeesView | undefined;
     if (
@@ -53,28 +54,27 @@ export const EmployeeDetails = () => {
   }, [technician, userAccount]);
 
   return (
-    <Box>
-      <Tabs
-        tabItems={tabItems}
-        currentIndex={tabValue}
-        onChange={(index) => setTabValue(index)}
-        backBtnLabel={
-          employee
-            ? `${employee?.userAccount.firstName} 
+    <Tabs
+      tabItems={tabItems}
+      currentIndex={tabValue}
+      onChange={(index) => setTabValue(index)}
+      backBtnLabel={
+        employee
+          ? `${employee?.userAccount.firstName} 
               
               ${employee?.userAccount.lastName}`
-            : ''
-        }>
-        <TabsBody value={tabValue} index={0}>
-          <EmployeeOverview employee={employee} />
-        </TabsBody>
-        <TabsBody value={tabValue} index={1}>
-          {null}
-        </TabsBody>
-        <TabsBody value={tabValue} index={2}>
-          {null}
-        </TabsBody>
-      </Tabs>
-    </Box>
+          : ''
+      }>
+      <TabsBody value={tabValue} index={0}>
+        <EmployeeOverview employee={employee} />
+      </TabsBody>
+      <TabsBody value={tabValue} index={1}>
+        <ScheduleTab technicianId={technician && technician[0].id} />
+        {/* <Schedule technicianId={technician && technician[0].id} /> */}
+      </TabsBody>
+      <TabsBody value={tabValue} index={2}>
+        {null}
+      </TabsBody>
+    </Tabs>
   );
 };

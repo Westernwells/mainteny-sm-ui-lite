@@ -1,6 +1,6 @@
 import React from 'react';
 import Chip from '@mui/material/Chip';
-import Box from '@mui/system/Box';
+import Box from '@mui/material/Box';
 import Slide from '@mui/material/Slide';
 import Typography from '@mui/material/Typography';
 import {useNavigate} from 'react-router-dom';

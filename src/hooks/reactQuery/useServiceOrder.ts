@@ -18,6 +18,7 @@ import {toDate, toRestDate} from 'utils/datetime';
 import {
   ServiceOrderOrderField,
   ServiceOrderReport,
+  ServiceOrderScheduleParams,
   ServiceOrderView,
 } from '../../models/service-order';
 import {Order, Resource, RestError} from '../../models/misc';
@@ -254,6 +255,7 @@ export function useFetchServiceOrdersByElevators(
       ...options,
       enabled: !!user && !!availability,
       select: useCallback(
+        // TODO: refactor into a function
         (serviceOrderView: Resource<ServiceOrderView>) => {
           const filterResult = filterServiceOrder(serviceOrderView, filter);
           let response = groupElevatorByAddressList(
@@ -289,3 +291,32 @@ export function useFetchServiceOrdersByElevators(
     },
   );
 }
+
+export const queryServiceOrderSchedules = async (
+  params: ServiceOrderScheduleParams,
+) => {
+  const response = await axiosClient.get<Resource<ServiceOrderView>>(
+    `/api/serviceOrders/schedule/orders`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useQueryServiceOrderSchedules = (
+  params: ServiceOrderScheduleParams,
+  options?: any,
+) => {
+  const {user} = useUserSession();
+  return useQuery(
+    [queryKeys.fetchServiceOrders, params, user!.userAccount.serviceCompany.id],
+    () =>
+      queryServiceOrderSchedules({
+        ...params,
+        serviceCompanyId: user!.userAccount.serviceCompany.id,
+      }),
+    {enabled: !!user && !!params.technicianIds?.length, ...options},
+  );
+};

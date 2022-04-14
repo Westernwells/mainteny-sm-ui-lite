@@ -78,8 +78,8 @@ export const EmployeeOverview = ({employee}: Props) => {
             employee.additionalInfo.assignedServiceOrderTypes?.length ? (
               <Box display="flex">
                 {employee.additionalInfo?.assignedServiceOrderTypes?.map(
-                  (orderType) => (
-                    <Box display="flex" mr="0.4em">
+                  (orderType, index) => (
+                    <Box display="flex" mr="0.4em" key={index}>
                       <Box mr="0.4em">
                         <ServiceOrderIcons
                           serviceOrderType={orderType}

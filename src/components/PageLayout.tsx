@@ -1,4 +1,4 @@
-import {Box} from '@mui/system';
+import Box from '@mui/material/Box';
 import {ReactElement} from 'react';
 import {AppDrawer} from './AppDrawer';
 import {AppTopBar} from './AppTopBar';
@@ -20,6 +20,7 @@ export const PageLayout = ({
     sx={{
       display: 'flex',
       flexDirection: 'column',
+      maxWidth: '100vw',
       ...(pageScrollable
         ? {minHeight: '100vh', overflowY: 'scroll'}
         : {height: '100vh', overflowY: 'hidden'}),
@@ -27,19 +28,20 @@ export const PageLayout = ({
     <Box>
       <AppTopBar />
     </Box>
-    <Box sx={{display: 'flex', flexGrow: 1}}>
+    <Box sx={{display: 'flex', flexGrow: 1, width: '100%'}}>
       {!excludeSidebar ? (
-        <Box sx={{maxWidth: '20%'}}>
+        <Box>
           <AppDrawer />
         </Box>
       ) : null}
       <Box
         sx={{
-          flexGrow: 1,
           pt: !excludeDefaultSpacing ? 12 : null,
-          px: !excludeDefaultSpacing ? 5 : null,
+          mx: !excludeDefaultSpacing ? '2.2em' : null,
         }}
         display="flex"
+        flexGrow="1"
+        width="80%"
         flexDirection="column">
         {children}
       </Box>

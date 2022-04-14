@@ -19,8 +19,9 @@ import Typography from '@mui/material/Typography';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import Fade from '@mui/material/Fade';
 
-const drawerWidth = '13.06rem';
+const drawerWidth = '12.5rem';
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
@@ -54,7 +55,7 @@ const DrawerHeader = styled('div')(({theme}) => ({
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== 'open',
 })(({theme, open}) => ({
-  width: drawerWidth,
+  minWidth: 50,
   flexShrink: 0,
   whiteSpace: 'nowrap',
   boxSizing: 'border-box',
@@ -223,6 +224,7 @@ export const AppDrawer = () => {
               style={{
                 borderTopLeftRadius: '6px',
                 borderBottomLeftRadius: '6px',
+
                 paddingTop: 15,
                 paddingBottom: 15,
                 ...(index !== selectedIndex
@@ -247,9 +249,13 @@ export const AppDrawer = () => {
                   }),
               }}
               key={text}>
-              <ListItemIcon>{icon}</ListItemIcon>
+              <ListItemIcon sx={{minWidth: 0, pr: '1em'}}>{icon}</ListItemIcon>
               <ListItemText
-                primary={<Typography variant="subtitle1">{text}</Typography>}
+                primary={
+                  <Fade in={open}>
+                    <Typography variant="subtitle1">{text}</Typography>
+                  </Fade>
+                }
               />
             </ListItemButton>
           ))}
