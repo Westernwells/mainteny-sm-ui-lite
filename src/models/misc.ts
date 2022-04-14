@@ -179,6 +179,13 @@ export interface Fee {
   currency: string;
 }
 
+export interface Price {
+  amount: number;
+  grossAmount: number;
+  currency: string;
+  vat: number;
+}
+
 export enum PdfGenerationStatus {
   DONE = 'DONE',
   ERROR = 'ERROR',

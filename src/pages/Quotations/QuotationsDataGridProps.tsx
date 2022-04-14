@@ -35,6 +35,26 @@ const defaultAlignment: {
   align: 'center',
 };
 
+const getQuotationStatusStyles = (
+  status: string,
+): {
+  label: string;
+  color: 'success' | 'warning' | 'error' | 'info' | 'default';
+} => {
+  switch (status) {
+    case QuotationStatus.ACCEPTED:
+      return {label: 'Accepted', color: 'success'};
+    case QuotationStatus.DRAFT:
+      return {label: 'Draft', color: 'warning'};
+    case QuotationStatus.REJECTED:
+      return {label: 'Denied', color: 'error'};
+    case QuotationStatus.SENT_TO_CLIENT:
+      return {label: 'Sent', color: 'info'};
+    default:
+      return {label: '-', color: 'default'};
+  }
+};
+
 export const columns: GridColDef[] = [
   {
     field: 'number',
@@ -91,8 +111,8 @@ export const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <Chip
         variant="outlined"
-        label={params.value === QuotationStatus.SENT ? 'Sent' : 'Draft'}
-        color={params.value === QuotationStatus.SENT ? 'success' : 'warning'}
+        label={getQuotationStatusStyles(params.value).label}
+        color={getQuotationStatusStyles(params.value).color}
       />
     ),
   },

@@ -101,7 +101,7 @@ export const data: Resource<any> = {
         currency: 'EUR',
         fractionDigits: 2,
       },
-      status: 'SENT',
+      status: 'SENT_TO_CLIENT',
       createdDate: '2021-06-01T12:11:40.663815Z',
       search: '[]',
       meta: {
