@@ -10,6 +10,7 @@ import {QuotationView} from 'models/quotation';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {PageOverviewLayout} from 'components/PageOverviewLayout';
 import {Widget} from 'components/Widget';
+import {Progress} from 'components/Progress';
 import {CustomPagination} from 'components/CustomPagination';
 import {columns, makeRows} from './QuotationsDataGridProps';
 
@@ -26,6 +27,8 @@ export const Quotations = () => {
 
   const {
     data: quotationsResource = createEmptyResource<QuotationView>(pageSize),
+    isLoading,
+    isFetching,
   } = useQuotations(
     {
       pageIndex: page.pageIndex,
@@ -39,7 +42,7 @@ export const Quotations = () => {
 
   useEffect(() => {
     if (quotationsResource) {
-      setRows(makeRows(quotationsResource.data));
+      setRows(makeRows(quotationsResource));
     } else {
       setRows([]);
     }
@@ -75,22 +78,31 @@ export const Quotations = () => {
           </FilterFields>
         </Box>
       </Fade>
-      <Box>
-        <DataGridLayout hideFooter rows={rows} columns={columns} />
-        {pageCount && page.pageSize < quotationsResource.total ? (
-          <CustomPagination
-            pageSize={page.pageSize}
-            handlePageSizeChange={(newPageSize: number) =>
-              setPage({...page, pageSize: newPageSize})
-            }
-            handlePageChange={(newPage: number) => {
-              setPage({...page, pageIndex: newPage - 1});
-            }}
-            pageCount={pageCount}
-            totalRows={quotationsResource.total}
+      {isLoading ? (
+        <Progress />
+      ) : (
+        <>
+          <DataGridLayout
+            hideFooter
+            rows={rows}
+            columns={columns}
+            loading={isFetching}
           />
-        ) : null}
-      </Box>
+          {pageCount && page.pageSize < quotationsResource.total ? (
+            <CustomPagination
+              pageSize={page.pageSize}
+              handlePageSizeChange={(newPageSize: number) =>
+                setPage({...page, pageSize: newPageSize})
+              }
+              handlePageChange={(newPage: number) => {
+                setPage({...page, pageIndex: newPage - 1});
+              }}
+              pageCount={pageCount}
+              totalRows={quotationsResource.total}
+            />
+          ) : null}
+        </>
+      )}
     </PageOverviewLayout>
   );
 };

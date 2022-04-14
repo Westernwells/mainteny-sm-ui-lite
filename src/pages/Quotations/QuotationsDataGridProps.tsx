@@ -6,10 +6,11 @@ import {
   GridRowsProp,
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
-import {useTheme} from '@mui/material';
-import {StatusChip} from 'components/StatusChip';
+import Chip from '@mui/material/Chip';
 import {formatDate} from 'utils/datetime';
-import {QuotationStatus} from 'models/quotation';
+import {formatCurrency} from 'utils/currency';
+import {QuotationStatus, QuotationView} from 'models/quotation';
+import {Resource} from 'models/misc';
 import {Actions} from './Actions';
 
 const defaultProps = {
@@ -35,14 +36,32 @@ const defaultAlignment: {
   align: 'center',
 };
 
+const getQuotationStatusStyles = (
+  status: string,
+): {
+  label: string;
+  color: 'success' | 'warning' | 'error' | 'info' | 'default';
+} => {
+  switch (status) {
+    case QuotationStatus.ACCEPTED:
+      return {label: 'Accepted', color: 'success'};
+    case QuotationStatus.DRAFT:
+      return {label: 'Draft', color: 'warning'};
+    case QuotationStatus.REJECTED:
+      return {label: 'Denied', color: 'error'};
+    case QuotationStatus.SENT_TO_CLIENT:
+      return {label: 'Sent', color: 'info'};
+    default:
+      return {label: '-', color: 'default'};
+  }
+};
+
 export const columns: GridColDef[] = [
   {
     field: 'number',
     headerName: 'QUOTATION NO',
     type: 'string',
-    flex: 1,
-    headerAlign: 'left',
-    sortable: false,
+    ...defaultAlignment,
     ...defaultProps,
   },
   {
@@ -50,21 +69,29 @@ export const columns: GridColDef[] = [
     headerName: 'CUSTOMER NAME',
     type: 'string',
     sortable: false,
-    ...defaultAlignment,
+    flex: 2,
+    headerAlign: 'left',
     ...defaultProps,
   },
   {
     field: 'address',
     headerName: 'ADDRESS',
     type: 'string',
-    flex: 1,
     sortable: false,
+    flex: 3,
     headerAlign: 'left',
     ...defaultProps,
   },
   {
     field: 'createdDate',
     headerName: 'CREATED DATE',
+    type: 'string',
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+  {
+    field: 'amount',
+    headerName: 'TOTAL PRICE',
     type: 'string',
     ...defaultAlignment,
     ...defaultProps,
@@ -81,19 +108,13 @@ export const columns: GridColDef[] = [
         {params.colDef.headerName}
       </Typography>
     ),
-    renderCell: (params: GridRenderCellParams<any, any, any>) => {
-      const theme = useTheme();
-      return (
-        <StatusChip
-          label={params.value === QuotationStatus.SENT ? 'Sent' : 'Draft'}
-          bgColor={
-            params.value === QuotationStatus.SENT
-              ? theme.palette.success.main
-              : theme.state?.ratingActive
-          }
-        />
-      );
-    },
+    renderCell: (params: GridRenderCellParams<any, any, any>) => (
+      <Chip
+        variant="outlined"
+        label={getQuotationStatusStyles(params.value).label}
+        color={getQuotationStatusStyles(params.value).color}
+      />
+    ),
   },
   {
     field: 'actions',
@@ -122,15 +143,17 @@ export const columns: GridColDef[] = [
   },
 ];
 
-export const makeRows = (quotations: any): GridRowsProp =>
-  quotations
-    ? quotations.map((item: any, index: number) => ({
-        id: index,
-        number: item.number,
-        customer: item.propertyOwner.name,
-        address: item.propertyOwner.address.fullName,
-        createdDate: formatDate(item.createdDate),
-        status: item.status,
-        navigateTo: item.id,
-      }))
-    : console.error('No Data');
+export const makeRows = (quotations: Resource<QuotationView>): GridRowsProp =>
+  quotations &&
+  quotations.data.map((item: QuotationView, index: number) => ({
+    id: index,
+    number: item.number,
+    customer: item.elevator.propertyOwner.name,
+    address: item.elevator.propertyOwner.address.fullName,
+    createdDate: formatDate(item.meta.createdAt),
+    amount: `${formatCurrency(item ? item.totalSalesPrice.amount : 0, {
+      currency: item.totalSalesPrice.currency,
+    })}`,
+    status: item.status,
+    navigateTo: `details/${item.id}`,
+  }));
