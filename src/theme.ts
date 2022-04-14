@@ -356,12 +356,12 @@ export const theme = createTheme({
           },
         },
         {
-          props: {variant: 'badge'},
+          props: {variant: 'inputLabel'},
           style: {
-            fontWeight: 500,
+            fontWeight: 400,
             fontSize: '0.75rem',
-            lineHeight: 1.25,
-            letterSpacing: '0.14px',
+            lineHeight: 0.75,
+            letterSpacing: '0.15px',
           },
         },
         {

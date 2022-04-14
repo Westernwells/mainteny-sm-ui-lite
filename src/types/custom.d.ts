@@ -9,7 +9,7 @@ declare module '@mui/material/styles' {
     alertTitleText: React.CSSProperties;
     helperText: React.CSSProperties;
     chip: React.CSSProperties;
-    badge: React.CSSProperties;
+    inputLabel: React.CSSProperties;
     tooltip: React.CSSProperties;
   }
 
@@ -22,7 +22,7 @@ declare module '@mui/material/styles' {
     alertTitleText?: React.CSSProperties;
     helperText?: React.CSSProperties;
     chip?: React.CSSProperties;
-    badge?: React.CSSProperties;
+    inputLabel?: React.CSSProperties;
     tooltip?: React.CSSProperties;
   }
 
@@ -62,7 +62,7 @@ declare module '@mui/material/Typography' {
     alertTitleText: true;
     helperText: true;
     chip: true;
-    badge: true;
+    inputLabel: true;
     tooltip: true;
   }
 }

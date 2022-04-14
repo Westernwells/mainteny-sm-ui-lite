@@ -1,16 +1,18 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useQueryServiceOrderSchedules} from 'hooks/reactQuery/useServiceOrder';
 import * as _ from 'lodash';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {formatDate, getDateObject, toRestDateTime} from 'utils/datetime';
 import {endOfWeek, startOfWeek} from 'date-fns';
 import {ServiceOrderView} from 'models/service-order';
+
 import {Schedule} from 'components/Schedules';
 import {ScheduleItem} from 'components/Schedules/ScheduleItem';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {useServiceOrderStatusColor} from 'hooks/useServiceOrderStatusColor';
 import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicator';
 import {WeekPair} from 'models/misc';
+import {OrderDetails} from './OrderDetails';
 
 interface Props {
   technicianId?: string;
@@ -57,10 +59,7 @@ export const ScheduleTab = ({technicianId}: Props) => {
           <ScheduleItem
             key={order.id}
             titleLeftAdornment={
-              <ServiceOrderIcons
-                style={{fontSize: '5rem'}}
-                serviceOrderType={order.type}
-              />
+              <ServiceOrderIcons serviceOrderType={order.type} />
             }
             title={order.elevator.propertyOwner.name}
             subtitle={order.elevator.address.fullName}
@@ -68,6 +67,7 @@ export const ScheduleTab = ({technicianId}: Props) => {
               order.schedules[0].startTime,
               order.schedules[0].endTime,
             )}
+            tooltip={<OrderDetails order={order} />}
             cardStatusAccent={serviceOrderStatusColor[order.status]}
             position={calcPosition(order.schedules[0].startTime)}
           />
