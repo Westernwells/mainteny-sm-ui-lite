@@ -37,7 +37,10 @@ export const Router = () => {
         <Route path="/recover" element={<Recover />} />
       </Route>
       <Route element={<ProtectedRoutes />}>
-        <Route path="/" element={<Navigate to="/units" />} />
+        <Route
+          path="/"
+          element={<Navigate to="/units?pageIndex=1&pageSize=25" />}
+        />
 
         <Route
           path="/units"
