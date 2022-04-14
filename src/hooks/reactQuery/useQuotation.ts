@@ -8,15 +8,12 @@ import {
   QuotationFilters,
   QuotationView,
 } from 'models/quotation';
-// TODO: Dummy import
 import {useUserSession} from './useUserSession';
 
 export const fetchQuotations = async (
   params: QueryQuotationParams,
   id: string,
 ): Promise<Resource<QuotationView>> => {
-  // TODO: Make API call to fetch data
-
   const response = await axiosClient.get<Resource<QuotationView>>(
     `/api/serviceCompanies/${id}/quotations`,
     {
