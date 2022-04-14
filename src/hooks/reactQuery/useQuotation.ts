@@ -2,14 +2,13 @@ import {useCallback} from 'react';
 import {useQuery} from 'react-query';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {Resource, RestError} from 'models/misc';
-// import {axiosClient, paramsSerializer} from 'utils/axios-utils';
+import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
   QueryQuotationParams,
   QuotationFilters,
   QuotationView,
 } from 'models/quotation';
 // TODO: Dummy import
-import {data as staticData} from 'pages/Quotations/data';
 import {useUserSession} from './useUserSession';
 
 export const fetchQuotations = async (
@@ -18,16 +17,15 @@ export const fetchQuotations = async (
 ): Promise<Resource<QuotationView>> => {
   // TODO: Make API call to fetch data
 
-  //   const response = await axiosClient.get<Resource<QuotationView>>(
-  //     `/api/serviceCompanies/${id}/quotations`,
-  //     {
-  //       params,
-  //       paramsSerializer,
-  //     },
-  //   );
-  console.log(typeof params, id);
+  const response = await axiosClient.get<Resource<QuotationView>>(
+    `/api/serviceCompanies/${id}/quotations`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
 
-  return Promise.resolve(staticData);
+  return response.data;
 };
 
 const filterQuotations = (

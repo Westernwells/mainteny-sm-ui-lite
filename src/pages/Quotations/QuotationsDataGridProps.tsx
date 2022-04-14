@@ -9,7 +9,8 @@ import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import {formatDate} from 'utils/datetime';
 import {formatCurrency} from 'utils/currency';
-import {QuotationStatus} from 'models/quotation';
+import {QuotationStatus, QuotationView} from 'models/quotation';
+import {Resource} from 'models/misc';
 import {Actions} from './Actions';
 
 const defaultProps = {
@@ -143,23 +144,17 @@ export const columns: GridColDef[] = [
   },
 ];
 
-export const makeRows = (quotations: any): GridRowsProp =>
-  quotations
-    ? quotations.map((item: any, index: number) => ({
-        id: index,
-        number: item.number,
-        customer: item.propertyOwner.name,
-        address: item.propertyOwner.address.fullName,
-        createdDate: formatDate(item.createdDate),
-        amount: `${formatCurrency(
-          item
-            ? item.totalAmount.amount / 10 ** item.totalAmount.fractionDigits!
-            : 0,
-          {
-            currency: item.totalAmount.currency,
-          },
-        )}`,
-        status: item.status,
-        navigateTo: `details/${item.id}`,
-      }))
-    : console.error('No Data');
+export const makeRows = (quotations: Resource<QuotationView>): GridRowsProp =>
+  quotations &&
+  quotations.data.map((item: QuotationView, index: number) => ({
+    id: index,
+    number: item.number,
+    customer: item.elevator.propertyOwner.name,
+    address: item.elevator.propertyOwner.address.fullName,
+    createdDate: formatDate(item.meta.createdAt),
+    amount: `${formatCurrency(item ? item.totalSalesPrice.amount : 0, {
+      currency: item.totalSalesPrice.currency,
+    })}`,
+    status: item.status,
+    navigateTo: `details/${item.id}`,
+  }));

@@ -42,7 +42,7 @@ export const Quotations = () => {
 
   useEffect(() => {
     if (quotationsResource) {
-      setRows(makeRows(quotationsResource.data));
+      setRows(makeRows(quotationsResource));
     } else {
       setRows([]);
     }
