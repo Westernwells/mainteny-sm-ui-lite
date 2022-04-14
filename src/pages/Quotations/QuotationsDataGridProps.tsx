@@ -6,9 +6,9 @@ import {
   GridRowsProp,
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
-import {useTheme} from '@mui/material';
-import {StatusChip} from 'components/StatusChip';
+import Chip from '@mui/material/Chip';
 import {formatDate} from 'utils/datetime';
+import {formatCurrency} from 'utils/currency';
 import {QuotationStatus} from 'models/quotation';
 import {Actions} from './Actions';
 
@@ -70,6 +70,13 @@ export const columns: GridColDef[] = [
     ...defaultProps,
   },
   {
+    field: 'amount',
+    headerName: 'TOTAL PRICE',
+    type: 'string',
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+  {
     field: 'status',
     headerName: 'STATUS',
     type: 'string',
@@ -81,19 +88,13 @@ export const columns: GridColDef[] = [
         {params.colDef.headerName}
       </Typography>
     ),
-    renderCell: (params: GridRenderCellParams<any, any, any>) => {
-      const theme = useTheme();
-      return (
-        <StatusChip
-          label={params.value === QuotationStatus.SENT ? 'Sent' : 'Draft'}
-          bgColor={
-            params.value === QuotationStatus.SENT
-              ? theme.palette.success.main
-              : theme.state?.ratingActive
-          }
-        />
-      );
-    },
+    renderCell: (params: GridRenderCellParams<any, any, any>) => (
+      <Chip
+        variant="outlined"
+        label={params.value === QuotationStatus.SENT ? 'Sent' : 'Draft'}
+        color={params.value === QuotationStatus.SENT ? 'success' : 'warning'}
+      />
+    ),
   },
   {
     field: 'actions',
@@ -130,7 +131,15 @@ export const makeRows = (quotations: any): GridRowsProp =>
         customer: item.propertyOwner.name,
         address: item.propertyOwner.address.fullName,
         createdDate: formatDate(item.createdDate),
+        amount: `${formatCurrency(
+          item
+            ? item.totalAmount.amount / 10 ** item.totalAmount.fractionDigits!
+            : 0,
+          {
+            currency: item.totalAmount.currency,
+          },
+        )}`,
         status: item.status,
-        navigateTo: item.id,
+        navigateTo: `details/${item.id}`,
       }))
     : console.error('No Data');
