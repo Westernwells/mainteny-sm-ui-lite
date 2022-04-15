@@ -79,6 +79,7 @@ export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
               <Typography variant="body2">
                 {' '}
                 {(elevatorOrder.serviceOrder &&
+                  elevatorOrder.serviceOrder.schedules.length &&
                   formatDate(
                     toDate(elevatorOrder.serviceOrder.schedules[0].startTime),
                   )) ||
