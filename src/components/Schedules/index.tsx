@@ -91,13 +91,12 @@ export const Schedule = ({
     const m = formatDate(date, 'm');
     const scrollWidth = gridWidth * (Number(h) + Number(m) / 60);
 
-    // elementRef.current.scrollLeft = scrollWidth;
     const timeout = window.setTimeout(() => {
       if (elementRef.current) {
         elementRef.current.scroll({
           left: scrollWidth,
-          behavior: 'smooth'
-        })
+          behavior: 'smooth',
+        });
       }
     }, 500);
 
