@@ -59,7 +59,10 @@ export const ScheduleTab = ({technicianId}: Props) => {
           <ScheduleItem
             key={order.id}
             titleLeftAdornment={
-              <ServiceOrderIcons serviceOrderType={order.type} />
+              <ServiceOrderIcons
+                serviceOrderType={order.type}
+                style={{fontSize: '1rem'}}
+              />
             }
             title={order.elevator.propertyOwner.name}
             subtitle={order.elevator.address.fullName}
