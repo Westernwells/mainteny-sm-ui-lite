@@ -3,18 +3,76 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import {BackAction} from 'components/BackAction';
-import {InputLabel, OutlinedInput} from '@mui/material';
+import {IconButton, InputLabel, OutlinedInput} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import {SelectButton} from './SelectButton';
 import {Label} from './Label';
 import {QuotationLayout} from './QuotationLayout';
 import {BottomDrawer} from './BottomDrawer';
 import {QuotationModal} from './QuotationModal';
+import {CustomerDataGrid} from './DataGrid/CustomerDataGrid';
+import {CustomerView, UnitView} from './model';
+import {UnitDataGrid} from './DataGrid/UnitDataGrid';
+
+const SelectCard = ({
+  header,
+  body,
+  onClose,
+}: {
+  header: string;
+  body: string[];
+  onClose: () => void;
+}) => (
+  <Box
+    display="flex"
+    bgcolor="grey.200"
+    alignItems="center"
+    justifyContent="space-between"
+    px="1em"
+    py=".5em"
+    border="1px solid"
+    borderColor="inputBackground.main"
+    borderRadius="4px">
+    <Box>
+      <Typography variant="body2">{header}</Typography>
+      {body.map((content) => (
+        <Typography
+          key={content}
+          variant="caption"
+          color="textSecondary"
+          display="block">
+          {content}
+        </Typography>
+      ))}
+    </Box>
+    <IconButton onClick={onClose}>
+      <CloseIcon />
+    </IconButton>
+  </Box>
+);
 
 export const QuotationDetails = () => {
   const [isDrawerOpen] = useState<boolean>(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleModalOpen = () => setIsModalOpen(true);
-  const handleModalClose = () => setIsModalOpen(false);
+
+  const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
+  const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
+  const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
+
+  const [customer, setCustomer] = useState<CustomerView | null>(null);
+  const [unit, setUnit] = useState<UnitView | null>(null);
+
+  const handleSelectCustomer = (row: CustomerView) => {
+    setCustomer(row);
+    setIsCustomerModalOpen(false);
+  };
+
+  const handleSelectUnit = (row: UnitView) => {
+    setUnit(row);
+    setIsUnitModalOpen(false);
+  };
+
+  // const handleModalOpen = () => setIsModalOpen(true);
+  // const handleModalClose = () => setIsModalOpen(false);
 
   return (
     <>
@@ -38,11 +96,34 @@ export const QuotationDetails = () => {
           <Box flexGrow={2} display="flex" flexDirection="column" gap="1em">
             <Box>
               <Label text="To" />
-              <SelectButton text="Select Customer" onClick={handleModalOpen} />
+              {customer ? (
+                <SelectCard
+                  header={customer.name}
+                  body={[customer.address, customer.phone]}
+                  onClose={() => setCustomer(null)}
+                />
+              ) : (
+                <SelectButton
+                  text="Select Customer"
+                  onClick={() => setIsCustomerModalOpen(true)}
+                />
+              )}
             </Box>
             <Box>
               <Label text="  Unit Details" />
-              <SelectButton text="Select Unit" onClick={handleModalOpen} />
+
+              {unit ? (
+                <SelectCard
+                  header={unit.unitName}
+                  body={[unit.address]}
+                  onClose={() => setUnit(null)}
+                />
+              ) : (
+                <SelectButton
+                  text="Select Unit"
+                  onClick={() => setIsUnitModalOpen(true)}
+                />
+              )}
             </Box>
           </Box>
           <Box
@@ -108,7 +189,7 @@ export const QuotationDetails = () => {
             <Typography variant="body2">1</Typography>
             <SelectButton
               text="Select Article"
-              onClick={handleModalOpen}
+              onClick={() => setIsArticleModalOpen(true)}
               sxContainer={{flexGrow: 1}}
             />
           </Box>
@@ -121,13 +202,27 @@ export const QuotationDetails = () => {
         </Box>
       </QuotationLayout>
 
-      <BottomDrawer isOpen={isDrawerOpen} />
       <QuotationModal
-        isOpen={isModalOpen}
-        onClose={handleModalClose}
+        isOpen={isCustomerModalOpen}
+        onClose={() => setIsCustomerModalOpen(false)}
         header="Select Customer">
+        <CustomerDataGrid setRowItem={handleSelectCustomer} />
+      </QuotationModal>
+
+      <QuotationModal
+        isOpen={isUnitModalOpen}
+        onClose={() => setIsUnitModalOpen(false)}
+        header="Select Unit">
+        <UnitDataGrid setRowItem={handleSelectUnit} />
+      </QuotationModal>
+
+      <QuotationModal
+        isOpen={isArticleModalOpen}
+        onClose={() => setIsArticleModalOpen(false)}
+        header="Select Article">
         TABLE DATA
       </QuotationModal>
+      <BottomDrawer isOpen={isDrawerOpen} />
     </>
   );
 };
