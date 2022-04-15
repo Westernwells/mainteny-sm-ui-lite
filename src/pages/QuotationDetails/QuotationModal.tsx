@@ -5,6 +5,7 @@ import Fade from '@mui/material/Fade';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import {Searchnput} from 'components/SearchInput';
 
 interface Props {
   children: ReactNode;
@@ -34,8 +35,6 @@ export const QuotationModal = ({
           width: 'min(1024px , 80%)',
           pb: '1em',
           ml: '1.7em',
-          minHeight: '30%',
-          maxHeight: '56%',
           top: '50%',
           left: '50%',
           overflow: 'hidden',
@@ -59,8 +58,14 @@ export const QuotationModal = ({
         </Box>
         <Box
           px="1em"
+          pt=".5em"
+          display="flex"
+          flexDirection="column"
+          minHeight="max(50vh, 300px)"
+          //   maxHeight="56vh"
           sx={{overflowY: isScrollable ? 'scroll' : 'hidden'}}
           flexGrow={1}>
+          <Searchnput placeholder="search" size="medium" />
           {children}
         </Box>
       </Box>
