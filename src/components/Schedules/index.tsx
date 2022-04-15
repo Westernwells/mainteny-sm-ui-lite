@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import {twentyFourHourTime} from 'utils/utils';
@@ -44,6 +44,7 @@ export const Schedule = ({
   renderCellItem,
 }: Props) => {
   const [tableHeader, setTableHeader] = useState<string[]>([]);
+  const elementRef = useRef<HTMLInputElement | undefined>();
   const [weekPair, setWeekPair] = useState<WeekPair>({
     startOfWeekDay: startOfWeek(new Date()),
     endOfWeekDay: endOfWeek(new Date()),
@@ -83,6 +84,27 @@ export const Schedule = ({
       getWeekPair(weekPair);
     }
   }, [weekPair]);
+
+  useEffect(() => {
+    const date = getDateObject(new Date());
+    const h = formatDate(date, 'H');
+    const m = formatDate(date, 'm');
+    const scrollWidth = gridWidth * (Number(h) + Number(m) / 60);
+
+    // elementRef.current.scrollLeft = scrollWidth;
+    const timeout = window.setTimeout(() => {
+      if (elementRef.current) {
+        elementRef.current.scroll({
+          left: scrollWidth,
+          behavior: 'smooth'
+        })
+      }
+    }, 500);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [bodyRow]);
 
   const calculatePosition = (startDateTime: string) => {
     const morningTime = startOfDay(new Date(startDateTime));
@@ -148,73 +170,75 @@ export const Schedule = ({
         overflowY: 'scroll',
         height: '72vh',
       }}>
-      <CardContent sx={{overflowX: 'scroll', padding: 0}}>
-        <ScheduleContainer>
-          <ScheduleHeader>
-            <ScheduleRow>
-              {tableHeader.map((item, index) => {
-                if (index === 0) {
+      <Box ref={elementRef} sx={{overflowX: 'scroll'}}>
+        <CardContent sx={{padding: 0}}>
+          <ScheduleContainer>
+            <ScheduleHeader>
+              <ScheduleRow>
+                {tableHeader.map((item, index) => {
+                  if (index === 0) {
+                    return (
+                      <ScheduleHeaderCell key={index}>
+                        {scheduleControls(item)}
+                      </ScheduleHeaderCell>
+                    );
+                  }
                   return (
-                    <ScheduleHeaderCell key={index}>
-                      {scheduleControls(item)}
-                    </ScheduleHeaderCell>
+                    <ScheduleHeaderCell
+                      cellWidth={gridWidth}
+                      key={index}
+                      label={item}
+                    />
                   );
-                }
-                return (
-                  <ScheduleHeaderCell
-                    cellWidth={gridWidth}
-                    key={index}
-                    label={item}
-                  />
-                );
-              })}
-            </ScheduleRow>
-          </ScheduleHeader>
-          <ScheduleBody>
-            {bodyRow.map((dayRow, rowIndex) => (
-              <ScheduleRow key={rowIndex}>
-                {Object.keys(dayRow).map((key) =>
-                  dayRow[key].map((item, index) => {
-                    if (index === 0) {
-                      return (
-                        <ScheduleBodyCell
-                          cellWidth={gridWidth}
-                          key={`${rowIndex}-${index}`}
-                          label={key}
-                        />
-                      );
-                    }
-
-                    if (index === 1) {
-                      return Object.keys(scheduleItems).map((xKey) => {
-                        if (xKey === key) {
-                          return (
-                            <ScheduleBodyCell
-                              key={`${rowIndex}-${index}`}
-                              cellWidth={gridWidth}>
-                              <ScheduleItemContainer>
-                                {scheduleItems[xKey].map((scheduleItem) =>
-                                  renderCellItem(
-                                    scheduleItem,
-                                    calculateWidth,
-                                    calculatePosition,
-                                  ),
-                                )}
-                              </ScheduleItemContainer>
-                            </ScheduleBodyCell>
-                          );
-                        }
-                        return null;
-                      });
-                    }
-                    return <ScheduleBodyCell key={`${rowIndex}-${index}`} />;
-                  }),
-                )}
+                })}
               </ScheduleRow>
-            ))}
-          </ScheduleBody>
-        </ScheduleContainer>
-      </CardContent>
+            </ScheduleHeader>
+            <ScheduleBody>
+              {bodyRow.map((dayRow, rowIndex) => (
+                <ScheduleRow key={rowIndex}>
+                  {Object.keys(dayRow).map((key) =>
+                    dayRow[key].map((item, index) => {
+                      if (index === 0) {
+                        return (
+                          <ScheduleBodyCell
+                            cellWidth={gridWidth}
+                            key={`${rowIndex}-${index}`}
+                            label={key}
+                          />
+                        );
+                      }
+
+                      if (index === 1) {
+                        return Object.keys(scheduleItems).map((xKey) => {
+                          if (xKey === key) {
+                            return (
+                              <ScheduleBodyCell
+                                key={`${rowIndex}-${index}`}
+                                cellWidth={gridWidth}>
+                                <ScheduleItemContainer>
+                                  {scheduleItems[xKey].map((scheduleItem) =>
+                                    renderCellItem(
+                                      scheduleItem,
+                                      calculateWidth,
+                                      calculatePosition,
+                                    ),
+                                  )}
+                                </ScheduleItemContainer>
+                              </ScheduleBodyCell>
+                            );
+                          }
+                          return null;
+                        });
+                      }
+                      return <ScheduleBodyCell key={`${rowIndex}-${index}`} />;
+                    }),
+                  )}
+                </ScheduleRow>
+              ))}
+            </ScheduleBody>
+          </ScheduleContainer>
+        </CardContent>
+      </Box>
     </Card>
   );
 };
