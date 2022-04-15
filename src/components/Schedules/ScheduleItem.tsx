@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import Box from '@mui/material/Box';
 import {ReactElement} from 'react';
 import useTheme from '@mui/material/styles/useTheme';
@@ -43,6 +44,7 @@ export const ScheduleItem = ({
         marginLeft: position,
         borderLeft: `2px solid ${cardStatusAccent}`,
         cursor: 'pointer',
+        overflowY: 'hidden',
       }}>
       <Tooltip title={tooltip} placement="top">
         {children || (

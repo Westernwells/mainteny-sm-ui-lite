@@ -167,7 +167,7 @@ export const Schedule = ({
       sx={{
         border: 'none',
         overflowY: 'scroll',
-        height: '72vh',
+        height: '76vh',
       }}>
       <Box ref={elementRef} sx={{overflowX: 'scroll'}}>
         <CardContent sx={{padding: 0}}>
