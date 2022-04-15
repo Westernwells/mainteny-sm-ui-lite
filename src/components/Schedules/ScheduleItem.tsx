@@ -1,4 +1,3 @@
-/*eslint-disable*/
 import Box from '@mui/material/Box';
 import {ReactElement} from 'react';
 import useTheme from '@mui/material/styles/useTheme';
