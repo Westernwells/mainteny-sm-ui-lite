@@ -13,8 +13,9 @@ export const ServiceOrderStatusIndicator = () => {
   ).current;
   return (
     <Box display="flex" mb="0.8em" justifyContent="flex-end">
-      {statuses.map((status) => (
+      {statuses.map((status: ServiceOrderStatus, index: number) => (
         <ServiceOrderStatusText
+          key={index}
           serviceOrderStatus={status}
           showLeftAdornment
           sx={{mr: '1em'}}
