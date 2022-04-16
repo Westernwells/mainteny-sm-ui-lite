@@ -32,6 +32,6 @@ export const ScheduleBodyCell = ({
       },
     }}
     {...rest}>
-    <Typography variant="smallBtnText">{label || children || null}</Typography>
+    {children || <Typography variant="subtitle2">{label}</Typography> || null}
   </Box>
 );

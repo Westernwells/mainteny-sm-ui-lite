@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import Box, {BoxProps} from '@mui/material/Box';
 
 interface Props extends BoxProps {
-  label?: string | JSX.Element;
+  label?: string;
   children?: ReactNode;
   cellWidth?: string | number;
 }
@@ -24,7 +24,7 @@ export const ScheduleHeaderCell = ({
         border: '0.5px solid #F1F5F9',
         borderTop: 'none',
         textAlign: 'left',
-        height: '70px',
+        height: '60px',
         width: cellWidth,
         color: grey[500], // TODO: add to theme
         ':first-child': {
@@ -39,11 +39,8 @@ export const ScheduleHeaderCell = ({
         },
       }}
       {...rest}>
-      {typeof label === 'string' ? (
-        <Typography variant="tableHeaderText">{label}</Typography>
-      ) : (
-        children
-      )}
+      {children || <Typography variant="tableHeaderText">{label}</Typography> ||
+        null}
     </Box>
   );
 };

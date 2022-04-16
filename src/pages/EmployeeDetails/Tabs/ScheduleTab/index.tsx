@@ -2,8 +2,13 @@ import {useEffect, useState} from 'react';
 import {useQueryServiceOrderSchedules} from 'hooks/reactQuery/useServiceOrder';
 import * as _ from 'lodash';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {formatDate, getDateObject, toRestDateTime} from 'utils/datetime';
-import {endOfWeek, startOfWeek} from 'date-fns';
+import {
+  formatDate,
+  getDateObject,
+  getEndOfWeek,
+  getStartOfWeek,
+  toRestDateTime,
+} from 'utils/datetime';
 import {ServiceOrderView} from 'models/service-order';
 
 import {Schedule} from 'components/Schedules';
@@ -23,8 +28,8 @@ const dateFormat = 'dd MMMM yy';
 export const ScheduleTab = ({technicianId}: Props) => {
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();
   const [weekPair, setWeekPair] = useState<WeekPair>({
-    startOfWeekDay: startOfWeek(new Date()),
-    endOfWeekDay: endOfWeek(new Date()),
+    startOfWeekDay: getStartOfWeek(new Date(), 1),
+    endOfWeekDay: getEndOfWeek(new Date(), 1),
   });
   const [orders, setOrders] = useState<{[key: string]: ServiceOrderView[]}>({});
   const [page] = useState(makePage(0, 100));

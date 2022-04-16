@@ -1,4 +1,4 @@
-import {format, parseISO} from 'date-fns';
+import {endOfWeek, format, parseISO, startOfWeek} from 'date-fns';
 
 export function getDateObject(input: any): Date {
   const type = typeof input;
@@ -12,6 +12,16 @@ export function getDateObject(input: any): Date {
 
   return <Date>input;
 }
+
+export const getStartOfWeek = (
+  date: Date,
+  weekStart?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | undefined,
+) => startOfWeek(date, {weekStartsOn: weekStart});
+
+export const getEndOfWeek = (
+  date: Date,
+  weekStart?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | undefined,
+) => endOfWeek(date, {weekStartsOn: weekStart});
 
 export function formatDate(input?: String | Date, formatType?: string) {
   if (!input) {
