@@ -188,6 +188,10 @@ export const Schedule = ({
         border: 'none',
         overflowY: 'scroll',
         maxHeight: '76vh',
+        '&::-webkit-scrollbar': {
+          width: 0,
+          background: 'transparent',
+        },
       }}>
       <Box
         ref={elementRef}
