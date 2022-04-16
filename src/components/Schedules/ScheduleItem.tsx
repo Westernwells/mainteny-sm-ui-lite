@@ -43,6 +43,7 @@ export const ScheduleItem = ({
         marginLeft: position,
         borderLeft: `2px solid ${cardStatusAccent}`,
         cursor: 'pointer',
+        overflowY: 'hidden',
       }}>
       <Tooltip title={tooltip} placement="top">
         {children || (

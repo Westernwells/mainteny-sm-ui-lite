@@ -8,12 +8,15 @@ import {
   addDays,
   differenceInMinutes,
   eachDayOfInterval,
-  endOfWeek,
   startOfDay,
-  startOfWeek,
   subDays,
 } from 'date-fns';
-import {formatDate, getDateObject} from 'utils/datetime';
+import {
+  formatDate,
+  getDateObject,
+  getEndOfWeek,
+  getStartOfWeek,
+} from 'utils/datetime';
 import {ScheduleContainer} from 'components/Schedules/ScheduleContainer';
 import {ScheduleHeader} from 'components/Schedules/ScheduleHeader';
 import {ScheduleRow} from 'components/Schedules/ScheduleRow';
@@ -24,6 +27,7 @@ import {ScheduleItemContainer} from 'components/Schedules/ScheduleItemContainer'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {WeekPair} from 'models/misc';
+import {grey} from '@mui/material/colors';
 
 interface Props {
   scheduleItems: {[key: string]: any[]};
@@ -46,8 +50,8 @@ export const Schedule = ({
   const [tableHeader, setTableHeader] = useState<string[]>([]);
   const elementRef = useRef<HTMLInputElement | undefined>();
   const [weekPair, setWeekPair] = useState<WeekPair>({
-    startOfWeekDay: startOfWeek(new Date()),
-    endOfWeekDay: endOfWeek(new Date()),
+    startOfWeekDay: getStartOfWeek(new Date(), 1),
+    endOfWeekDay: getEndOfWeek(new Date(), 1),
   });
   const [bodyRow, setBodyRow] = useState<{[key: string]: string[]}[]>([]);
   const [weekInterval, setWeekInterval] = useState(
@@ -127,7 +131,7 @@ export const Schedule = ({
 
   const nextMonth = () => {
     const firstDayOfNextWeek = addDays(weekPair.endOfWeekDay, 1);
-    const endOfNextWeek = endOfWeek(firstDayOfNextWeek);
+    const endOfNextWeek = getEndOfWeek(firstDayOfNextWeek, 1);
     setWeekPair({
       ...weekPair,
       startOfWeekDay: firstDayOfNextWeek,
@@ -137,7 +141,7 @@ export const Schedule = ({
 
   const prevMonth = () => {
     const endOfPrevWeek = subDays(weekPair.startOfWeekDay, 1);
-    const firstDayOfPrevWeek = startOfWeek(endOfPrevWeek);
+    const firstDayOfPrevWeek = getStartOfWeek(endOfPrevWeek, 1);
     setWeekPair({
       ...weekPair,
       startOfWeekDay: firstDayOfPrevWeek,
@@ -162,14 +166,47 @@ export const Schedule = ({
     </Box>
   );
 
+  const renderScheduleDate = (item: string) => (
+    <>
+      <Typography component="div" variant="subtitle2">
+        {item}
+      </Typography>
+      <Typography
+        component="div"
+        variant="caption"
+        mt="-0.5em"
+        ml="0.2em"
+        sx={{color: grey[600]}}>
+        {formatDate(new Date(item), 'EEEE')}
+      </Typography>
+    </>
+  );
+
   return (
     <Card
       sx={{
         border: 'none',
         overflowY: 'scroll',
-        height: '72vh',
+        maxHeight: '76vh',
       }}>
-      <Box ref={elementRef} sx={{overflowX: 'scroll'}}>
+      <Box
+        ref={elementRef}
+        sx={{
+          overflowX: 'scroll',
+          '&::-webkit-scrollbar': {
+            height: '0.5em',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#f1f1f1',
+            borderRadius: '100vw',
+            marginInline: '0.5em',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: '#888',
+            borderRadius: '100vw',
+            width: '2em',
+          },
+        }}>
         <CardContent sx={{padding: 0}}>
           <ScheduleContainer>
             <ScheduleHeader>
@@ -201,9 +238,9 @@ export const Schedule = ({
                         return (
                           <ScheduleBodyCell
                             cellWidth={gridWidth}
-                            key={`${rowIndex}-${index}`}
-                            label={key}
-                          />
+                            key={`${rowIndex}-${index}`}>
+                            {renderScheduleDate(key)}
+                          </ScheduleBodyCell>
                         );
                       }
 
