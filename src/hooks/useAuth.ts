@@ -71,7 +71,6 @@ export const useAuth = (): UseAuth => {
       }
     } catch (errorResponse: any) {
       if (errorResponse?.response.status === 400) {
-        console.log('#########');
         enqueueSnackbar('Incorrect email or password', {
           variant: 'error',
         });

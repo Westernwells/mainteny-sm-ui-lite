@@ -25,6 +25,7 @@ import {
   columns,
   makeRows,
 } from 'pages/CustomerDetails/Tabs/CustomerUnitDataGrid';
+import {Progress} from 'components/Progress';
 import {formatCurrency} from 'utils/currency';
 import {ContractBasic} from './ContractBasic';
 import {ContractParties} from './ContractParties';
@@ -76,6 +77,10 @@ export const ContractDetails = () => {
     !isLoading && isBefore(new Date(), toDate(contractDetails?.endTime))
       ? differenceInDays(toDate(contractDetails?.endTime), new Date())
       : 0;
+
+  if (isLoading) {
+    return <Progress />;
+  }
 
   return (
     <Box>

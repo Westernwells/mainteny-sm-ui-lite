@@ -1,15 +1,18 @@
 import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
+import Box, {BoxProps} from '@mui/material/Box';
 import {ReactComponent as LaptopIllustration} from 'assets/illustrations/Laptop.svg';
 import {ReactComponent as ClipboardIllustration} from 'assets/illustrations/Clipboard.svg';
+import Button from '@mui/material/Button';
 
-interface Props {
+interface Props extends BoxProps {
   label: string;
   size?: 'small' | 'medium' | 'large';
   containerStyle?: {[key: string]: string | number};
   labelStyle?: {[key: string]: string | number};
   labelVariant?: any;
   illustration?: string;
+  showActionBtn?: boolean;
+  btnLabel?: string;
 }
 
 export const EmptySection = ({
@@ -19,6 +22,8 @@ export const EmptySection = ({
   labelStyle,
   labelVariant,
   illustration = 'laptop',
+  btnLabel = '',
+  showActionBtn = false,
 }: Props) => {
   const Width = {
     small: '128px',
@@ -40,6 +45,7 @@ export const EmptySection = ({
       display="flex"
       flexDirection="column"
       alignItems="center"
+      justifyContent="center"
       gap="1em"
       mt={3}
       sx={{...containerStyle}}>
@@ -50,6 +56,11 @@ export const EmptySection = ({
         sx={{...labelStyle}}>
         {label}
       </Typography>
+      {showActionBtn ? (
+        <Button sx={{textTransform: 'capitalize'}} variant="contained">
+          {btnLabel}
+        </Button>
+      ) : null}
     </Box>
   );
 };

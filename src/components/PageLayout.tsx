@@ -23,7 +23,7 @@ export const PageLayout = ({
       maxWidth: '100vw',
       ...(pageScrollable
         ? {minHeight: '100vh', overflowY: 'scroll'}
-        : {height: '100vh', overflowY: 'hidden'}),
+        : {height: '98vh', overflowY: 'hidden'}),
     }}>
     <Box>
       <AppTopBar />

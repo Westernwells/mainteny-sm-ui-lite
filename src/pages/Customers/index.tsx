@@ -15,6 +15,7 @@ import {
   formatSearchParamsPageSize,
 } from 'utils/utils';
 import {CustomPagination} from 'components/CustomPagination';
+import {EmptySection} from 'components/EmptySection';
 import {Widget} from '../../components/Widget';
 import {columns, makeRows} from './CustomerDataGridProps';
 
@@ -44,6 +45,7 @@ export const Customer = () => {
     isLoading,
     isFetching,
     isIdle,
+    isFetched,
   } = useFetchCustomerElevatorNumbers(customerResource.data, {
     keepPreviousData: true,
   });
@@ -70,6 +72,24 @@ export const Customer = () => {
     setPageCount(Math.ceil(customerResource.total / page.pageSize));
   }, [customerResource, page.pageSize]);
 
+  if (isFetched && !customerResource.total) {
+    return (
+      <EmptySection
+        label="No customers yet. Create a new one to view here"
+        showActionBtn
+        btnLabel="Add Customer"
+        containerStyle={{
+          height: '100%',
+          mb: '10em',
+        }}
+      />
+    );
+  }
+
+  if (isIdle || isLoading) {
+    return <Progress />;
+  }
+
   return (
     <PageOverviewLayout
       label="Customers"
@@ -83,36 +103,30 @@ export const Customer = () => {
           hideFilter
         />
       }>
-      {isIdle || isLoading ? (
-        <Progress />
-      ) : (
-        <>
-          <DataGridLayout
-            rows={rows}
-            columns={columns}
-            loading={isFetching}
-            hideFooter
+      <>
+        <DataGridLayout
+          rows={rows}
+          columns={columns}
+          loading={isFetching}
+          hideFooter
+        />
+        {pageCount && page.pageSize < customerResource.total ? (
+          <CustomPagination
+            pageSize={page.pageSize}
+            pageIndex={page.pageIndex}
+            handlePageSizeChange={(newPageSize: number) =>
+              setQueryParams(
+                formatSearchParamsPageSize(newPageSize, queryParams),
+              )
+            }
+            handlePageChange={(newPage: number) =>
+              setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+            }
+            pageCount={pageCount}
+            totalRows={customerResource.total}
           />
-          {pageCount && page.pageSize < customerResource.total ? (
-            <CustomPagination
-              pageSize={page.pageSize}
-              pageIndex={page.pageIndex}
-              handlePageSizeChange={(newPageSize: number) =>
-                setQueryParams(
-                  formatSearchParamsPageSize(newPageSize, queryParams),
-                )
-              }
-              handlePageChange={(newPage: number) =>
-                setQueryParams(
-                  formatSearchParamsPageIndex(newPage, queryParams),
-                )
-              }
-              pageCount={pageCount}
-              totalRows={customerResource.total}
-            />
-          ) : null}
-        </>
-      )}
+        ) : null}
+      </>
     </PageOverviewLayout>
   );
 };

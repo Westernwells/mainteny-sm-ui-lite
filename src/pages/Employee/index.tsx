@@ -24,6 +24,7 @@ import {toRestDateTime} from 'utils/datetime';
 import {addDays, endOfDay, startOfDay} from 'date-fns';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {Button} from '@mui/material';
+import {EmptySection} from 'components/EmptySection';
 import {columns, makeRows} from './EmployeeDataGridProps';
 import {AddEmployee} from './AddEmployee';
 import {CustomPagination} from '../../components/CustomPagination';
@@ -58,6 +59,7 @@ export const Employees = () => {
     isLoading,
     isFetching,
     isIdle,
+    isFetched,
   } = useFetchTechniciansByUserAccounts(userAccountResource.data, {
     keepPreviousData: true,
   });
@@ -133,6 +135,24 @@ export const Employees = () => {
     setPageCount(Math.ceil(userAccountResource.total / page.pageSize));
   }, [userAccountResource, page.pageSize]);
 
+  if (isFetched && !userAccountResource.total) {
+    return (
+      <EmptySection
+        label="No employees yet. Create a new one to view here"
+        showActionBtn
+        btnLabel="Add Employee"
+        containerStyle={{
+          height: '100%',
+          mb: '10em',
+        }}
+      />
+    );
+  }
+
+  if (isIdle || isLoading) {
+    return <Progress />;
+  }
+
   return (
     <PageOverviewLayout
       label="Employees"
@@ -148,37 +168,32 @@ export const Employees = () => {
           hideFilter
         />
       }>
-      {isIdle || isLoading ? (
-        <Progress />
-      ) : (
-        <>
-          {' '}
-          <DataGridLayout
-            rows={rows}
-            columns={columns}
-            loading={isFetching}
-            hideFooter
+      <>
+        {' '}
+        <DataGridLayout
+          rows={rows}
+          columns={columns}
+          loading={isFetching}
+          hideFooter
+        />
+        {!!pageCount && (
+          <CustomPagination
+            pageSize={page.pageSize}
+            pageIndex={page.pageIndex}
+            handlePageSizeChange={(newPageSize: number) =>
+              setQueryParams(
+                formatSearchParamsPageSize(newPageSize, queryParams),
+              )
+            }
+            handlePageChange={(newPage: number) =>
+              setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+            }
+            pageCount={pageCount}
+            totalRows={userAccountResource.total}
           />
-          {!!pageCount && (
-            <CustomPagination
-              pageSize={page.pageSize}
-              pageIndex={page.pageIndex}
-              handlePageSizeChange={(newPageSize: number) =>
-                setQueryParams(
-                  formatSearchParamsPageSize(newPageSize, queryParams),
-                )
-              }
-              handlePageChange={(newPage: number) =>
-                setQueryParams(
-                  formatSearchParamsPageIndex(newPage, queryParams),
-                )
-              }
-              pageCount={pageCount}
-              totalRows={userAccountResource.total}
-            />
-          )}
-        </>
-      )}
+        )}
+      </>
+
       <SideDrawer
         open={isDrawerOpen}
         setOpen={setIsDrawerOpen}
