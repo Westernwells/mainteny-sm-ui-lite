@@ -129,7 +129,7 @@ export const UnitDataGrid = ({setRowItem}: Props) => (
     <DataGridLayout
       rows={rows}
       columns={columns}
-      onCellClick={(params: any) => setRowItem(params.row)}
+      onCellClick={(params) => setRowItem(params.row)}
       hideFooter
     />
   </Box>
