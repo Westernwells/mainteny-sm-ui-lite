@@ -128,6 +128,7 @@ export const QuotationDetails = () => {
                   inputFormat="MM/dd/yyyy"
                   value={date}
                   onChange={handleDateChange}
+                  maxDate={new Date()}
                   renderInput={(params) => (
                     <TextField size="small" fullWidth {...params} />
                   )}
