@@ -12,9 +12,10 @@ interface Props {
 export const SelectButton = ({text, onClick, sxContainer}: Props) => (
   <Box
     bgcolor="inputBackground.main"
-    py="1.5em"
+    minHeight="5em"
     display="flex"
     justifyContent="center"
+    alignItems="center"
     border="1px dashed"
     borderColor="text.disabled"
     sx={sxContainer}>

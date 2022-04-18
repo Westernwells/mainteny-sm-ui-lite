@@ -2,57 +2,31 @@ import {useState} from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
+import {Button, InputLabel, OutlinedInput, TextField} from '@mui/material';
+import DatePicker from '@mui/lab/DatePicker';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import AddIcon from '@mui/icons-material/Add';
 import {BackAction} from 'components/BackAction';
-import {IconButton, InputLabel, OutlinedInput} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import {SelectButton} from './SelectButton';
-import {Label} from './Label';
-import {QuotationLayout} from './QuotationLayout';
-import {BottomDrawer} from './BottomDrawer';
-import {QuotationModal} from './QuotationModal';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {SelectButton} from './Components/SelectButton';
+import {SelectCard} from './Components/SelectCard';
+import {Label} from './Components/Label';
+import {QuotationLayout} from './Components/QuotationLayout';
+import {BottomDrawer} from './Components/BottomDrawer';
+import {QuotationModal} from './Components/QuotationModal';
+import {Article} from './Components/Article';
 import {CustomerDataGrid} from './DataGrid/CustomerDataGrid';
-import {CustomerView, UnitView} from './model';
 import {UnitDataGrid} from './DataGrid/UnitDataGrid';
-
-const SelectCard = ({
-  header,
-  body,
-  onClose,
-}: {
-  header: string;
-  body: string[];
-  onClose: () => void;
-}) => (
-  <Box
-    display="flex"
-    bgcolor="grey.200"
-    alignItems="center"
-    justifyContent="space-between"
-    px="1em"
-    py=".5em"
-    border="1px solid"
-    borderColor="inputBackground.main"
-    borderRadius="4px">
-    <Box>
-      <Typography variant="body2">{header}</Typography>
-      {body.map((content) => (
-        <Typography
-          key={content}
-          variant="caption"
-          color="textSecondary"
-          display="block">
-          {content}
-        </Typography>
-      ))}
-    </Box>
-    <IconButton onClick={onClose}>
-      <CloseIcon />
-    </IconButton>
-  </Box>
-);
+import {ArticleDataGrid} from './DataGrid/ArticleDataGrid';
+import {ArticleView, CustomerView, UnitView} from './model';
 
 export const QuotationDetails = () => {
   const [isDrawerOpen] = useState<boolean>(true);
+
+  const {user} = useUserSession();
+
+  const [date, setDate] = useState<Date | null>(new Date());
 
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
@@ -60,6 +34,11 @@ export const QuotationDetails = () => {
 
   const [customer, setCustomer] = useState<CustomerView | null>(null);
   const [unit, setUnit] = useState<UnitView | null>(null);
+  const [articles, setArticles] = useState<ArticleView[]>([]);
+
+  const handleDateChange = (newDate: Date | null) => {
+    setDate(newDate);
+  };
 
   const handleSelectCustomer = (row: CustomerView) => {
     setCustomer(row);
@@ -71,8 +50,17 @@ export const QuotationDetails = () => {
     setIsUnitModalOpen(false);
   };
 
-  // const handleModalOpen = () => setIsModalOpen(true);
-  // const handleModalClose = () => setIsModalOpen(false);
+  const handleSelectArticle = (row: ArticleView) => {
+    if (articles.filter((item) => item === row).length === 0) {
+      setArticles([...articles, row]);
+    }
+    setIsArticleModalOpen(false);
+  };
+
+  const deleteArticle = (article: ArticleView) => {
+    const newArticles = articles.filter((item) => item !== article);
+    setArticles(newArticles);
+  };
 
   return (
     <>
@@ -92,8 +80,8 @@ export const QuotationDetails = () => {
           </Typography>
         </Typography>
 
-        <Box display="flex" mt="1em">
-          <Box flexGrow={2} display="flex" flexDirection="column" gap="1em">
+        <Box display="flex" mt="1em" gap="1em">
+          <Box flexGrow={1} display="flex" flexDirection="column" gap="1em">
             <Box>
               <Label text="To" />
               {customer ? (
@@ -127,8 +115,7 @@ export const QuotationDetails = () => {
             </Box>
           </Box>
           <Box
-            flexGrow={1}
-            px="1em"
+            width="40%"
             display="flex"
             flexDirection="column"
             justifyContent="space-between">
@@ -136,19 +123,37 @@ export const QuotationDetails = () => {
               <InputLabel>
                 <Label text="Date Created" />
               </InputLabel>
-              <OutlinedInput size="small" fullWidth />
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DatePicker
+                  inputFormat="MM/dd/yyyy"
+                  value={date}
+                  onChange={handleDateChange}
+                  renderInput={(params) => (
+                    <TextField size="small" fullWidth {...params} />
+                  )}
+                />
+              </LocalizationProvider>
             </Box>
             <Box>
               <InputLabel>
                 <Label text="Quotation Number" />
               </InputLabel>
-              <OutlinedInput size="small" fullWidth />
+              <OutlinedInput
+                size="small"
+                defaultValue="QT-123456"
+                disabled
+                fullWidth
+              />
             </Box>
             <Box>
               <InputLabel>
                 <Label text="Created By" />
               </InputLabel>
-              <OutlinedInput size="small" fullWidth />
+              <OutlinedInput
+                size="small"
+                defaultValue={`${user?.userAccount.firstName} ${user?.userAccount.lastName}`}
+                fullWidth
+              />
             </Box>
           </Box>
         </Box>
@@ -165,14 +170,20 @@ export const QuotationDetails = () => {
           mt="1em"
           borderRadius="4px"
           p=".5em">
-          <Box display="flex" alignItems="center" gap="1em" px=".5em">
+          <Box
+            px=".5em"
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: '3ch 2fr repeat(4, 10ch)',
+              placeItems: 'center',
+              gap: '.5em',
+            }}>
             <Label text="No" />
-            <Label text="Description" sx={{flexGrow: 1}} />
-            <Label text="Subject" />
+            <Label text="Description" sx={{justifySelf: 'start'}} />
             <Label text="Quantity" />
             <Label text="Unit" />
             <Label text="Unit Price" />
-            <Box>
+            <Box sx={{justifySelf: 'end'}}>
               <Label text="Total Price" sx={{display: 'block'}} />
               <Label text="(excl VAT)" />
             </Box>
@@ -181,17 +192,87 @@ export const QuotationDetails = () => {
             bgcolor="grey.50"
             borderRadius="4px"
             display="flex"
-            alignItems="center"
+            flexDirection="column"
             my="1em"
-            gap="1em"
-            boxShadow="0px 4px 15px 0px #90909033"
-            p=".5em">
-            <Typography variant="body2">1</Typography>
-            <SelectButton
-              text="Select Article"
-              onClick={() => setIsArticleModalOpen(true)}
-              sxContainer={{flexGrow: 1}}
-            />
+            gap="1em">
+            {articles.map((item, index) => (
+              <Article
+                key={item.articleNumber}
+                article={item}
+                index={index + 1}
+                deleteArticle={deleteArticle}
+              />
+            ))}
+            {articles.length ? (
+              <>
+                <Button
+                  variant="contained"
+                  size="small"
+                  sx={{alignSelf: 'self-start'}}
+                  startIcon={<AddIcon />}
+                  onClick={() => setIsArticleModalOpen(true)}>
+                  Article
+                </Button>
+                <Box borderTop="1px solid" borderColor="grey.300">
+                  <Box
+                    p="1em"
+                    pl="50%"
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(2, 1fr)',
+                      justifyItems: 'end',
+                    }}>
+                    <Typography>
+                      Total Price
+                      <Typography
+                        variant="caption"
+                        component="span"
+                        ml="1ch"
+                        sx={{color: 'text.secondary'}}>
+                        (excl VAT)
+                      </Typography>
+                    </Typography>
+
+                    <Typography>€ 34,600</Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{color: 'text.secondary'}}>
+                      VAT(10%)
+                    </Typography>
+                    <Typography>€ 6,800</Typography>
+                  </Box>
+                  <Box
+                    bgcolor="grey.700"
+                    borderRadius="4px"
+                    p="1em"
+                    pl="50%"
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(2, 1fr)',
+                      justifyItems: 'end',
+                    }}>
+                    <Typography sx={{color: 'primary.contrastText'}}>
+                      Total Price
+                      <Typography variant="caption" component="span" ml="1ch">
+                        (incl VAT)
+                      </Typography>
+                    </Typography>
+                    <Typography sx={{color: 'primary.contrastText'}}>
+                      € 40,200
+                    </Typography>
+                  </Box>
+                </Box>
+              </>
+            ) : (
+              <Box display="flex" alignItems="center" my="1em" gap="1em">
+                <Typography variant="body2">1</Typography>
+                <SelectButton
+                  text="Select Article"
+                  onClick={() => setIsArticleModalOpen(true)}
+                  sxContainer={{flexGrow: 1}}
+                />
+              </Box>
+            )}
           </Box>
         </Box>
         <Box mt="1em">
@@ -220,7 +301,7 @@ export const QuotationDetails = () => {
         isOpen={isArticleModalOpen}
         onClose={() => setIsArticleModalOpen(false)}
         header="Select Article">
-        TABLE DATA
+        <ArticleDataGrid setRowItem={handleSelectArticle} />
       </QuotationModal>
       <BottomDrawer isOpen={isDrawerOpen} />
     </>
