@@ -63,7 +63,7 @@ export const FormSelect = ({
         id={id}
         value={value}
         onChange={onChange}
-        input={<OutlinedInput placeholder="Role" />}
+        input={<OutlinedInput placeholder="Role" id="roles" />}
         MenuProps={MenuProps}>
         {options.map((option) => (
           <MenuItem

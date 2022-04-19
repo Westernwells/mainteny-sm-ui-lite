@@ -1,3 +1,4 @@
+import {ChangeEvent} from 'react';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
@@ -7,6 +8,7 @@ interface Props {
   label: string;
   placeholder: string;
   value?: string | number;
+  onChange?: (e: ChangeEvent<any>) => void;
   inputProps?: any;
   params?: any;
 }
@@ -16,6 +18,7 @@ export const FormInput = ({
   label,
   placeholder,
   value,
+  onChange,
   inputProps,
   params,
 }: Props) => (
@@ -35,6 +38,7 @@ export const FormInput = ({
       placeholder={placeholder}
       id={id}
       value={value}
+      onChange={onChange}
       InputProps={inputProps}
       {...params}
     />
