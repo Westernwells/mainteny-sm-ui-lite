@@ -3,6 +3,8 @@ import {
   DataGrid,
   DataGridProps,
   GridColDef,
+  GridEventListener,
+  GridEvents,
   GridRowsProp,
 } from '@mui/x-data-grid';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -15,6 +17,7 @@ interface Props extends DataGridProps {
   height?: string;
   containerStyle?: {[key: string]: string | number};
   loading?: boolean;
+  onCellClick?: GridEventListener<GridEvents.cellClick>;
 }
 
 export const DataGridLayout = ({
@@ -24,6 +27,7 @@ export const DataGridLayout = ({
   height,
   containerStyle,
   loading,
+  onCellClick,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
@@ -43,12 +47,15 @@ export const DataGridLayout = ({
         disableSelectionOnClick
         disableColumnFilter
         hideFooter={hideFooter}
-        onCellClick={(params, e) => {
-          e.preventDefault();
-          if (params.field !== 'actions') {
-            navigate(params.row.navigateTo);
-          }
-        }}
+        onCellClick={
+          onCellClick ||
+          ((params, e) => {
+            e.preventDefault();
+            if (params.field !== 'actions') {
+              navigate(params.row.navigateTo);
+            }
+          })
+        }
         sx={{
           height,
           width: '100%',
