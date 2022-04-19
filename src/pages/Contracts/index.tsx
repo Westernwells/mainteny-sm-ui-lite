@@ -17,6 +17,7 @@ import {
 } from 'utils/utils';
 import {useSearchParams} from 'react-router-dom';
 import {CustomPagination} from 'components/CustomPagination';
+import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
 import {costRangeConvertor as crConverter} from 'utils/contract-utils';
 import {columns, makeRows} from './ContractsDataGridProps';
@@ -41,6 +42,7 @@ export const Contracts = () => {
     data: contractResource = createEmptyResource<ContractView>(10),
     isLoading,
     isFetching,
+    isFetched,
   } = useQueryContract(
     {
       order: Order.DESC,
@@ -94,6 +96,24 @@ export const Contracts = () => {
     setPageCount(Math.ceil(contractResource.total / page.pageSize));
   }, [contractResource, page.pageSize]);
 
+  if (isFetched && !contractResource.total) {
+    return (
+      <EmptySection
+        label="No contracts yet. Create a new one to view here"
+        showActionBtn
+        btnLabel="Add Contract"
+        containerStyle={{
+          height: '100%',
+          mb: '10em',
+        }}
+      />
+    );
+  }
+
+  if (isLoading) {
+    return <Progress />;
+  }
+
   return (
     <PageOverviewLayout
       label="Contracts"
@@ -140,36 +160,31 @@ export const Contracts = () => {
           </FilterFields>
         </Box>
       </Fade>
-      {isLoading ? (
-        <Progress />
-      ) : (
-        <>
-          <DataGridLayout
-            hideFooter
-            rows={rows}
-            columns={columns}
-            loading={isFetching}
+
+      <>
+        <DataGridLayout
+          hideFooter
+          rows={rows}
+          columns={columns}
+          loading={isFetching}
+        />
+        {pageCount && page.pageSize < contractResource.total ? (
+          <CustomPagination
+            pageSize={page.pageSize}
+            pageIndex={page.pageIndex}
+            handlePageSizeChange={(newPageSize: number) =>
+              setQueryParams(
+                formatSearchParamsPageSize(newPageSize, queryParams),
+              )
+            }
+            handlePageChange={(newPage: number) =>
+              setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+            }
+            pageCount={pageCount}
+            totalRows={contractResource.total}
           />
-          {pageCount && page.pageSize < contractResource.total ? (
-            <CustomPagination
-              pageSize={page.pageSize}
-              pageIndex={page.pageIndex}
-              handlePageSizeChange={(newPageSize: number) =>
-                setQueryParams(
-                  formatSearchParamsPageSize(newPageSize, queryParams),
-                )
-              }
-              handlePageChange={(newPage: number) =>
-                setQueryParams(
-                  formatSearchParamsPageIndex(newPage, queryParams),
-                )
-              }
-              pageCount={pageCount}
-              totalRows={contractResource.total}
-            />
-          ) : null}
-        </>
-      )}
+        ) : null}
+      </>
     </PageOverviewLayout>
   );
 };

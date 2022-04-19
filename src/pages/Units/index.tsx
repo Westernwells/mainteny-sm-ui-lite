@@ -10,6 +10,8 @@ import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {FilterFields} from 'components/FilterFields';
 import {PageOverviewLayout} from 'components/PageOverviewLayout';
 import {CustomPagination} from 'components/CustomPagination';
+import {Progress} from 'components/Progress';
+import {EmptySection} from 'components/EmptySection';
 import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
@@ -44,7 +46,12 @@ export const MyUnits = () => {
     },
     {keepPreviousData: true},
   );
-  const {data: elevatorsByAddressList} = useFetchServiceOrdersByElevators(
+  const {
+    data: elevatorsByAddressList,
+    isLoading,
+    isIdle,
+    isFetched,
+  } = useFetchServiceOrdersByElevators(
     elevatorResponse.elevator,
     {nextVisit, availabilityRange: availability},
     {keepPreviousData: true},
@@ -108,6 +115,25 @@ export const MyUnits = () => {
       setAvailability([]);
     }
   }, [showFilter]);
+
+  if (isFetched && !elevatorResponse.elevator.total) {
+    return (
+      <EmptySection
+        label="No Elevators yet. Create a new one to view here"
+        showActionBtn
+        btnLabel="Add Elevator"
+        containerStyle={{
+          height: '100%',
+          mb: '10em',
+        }}
+      />
+    );
+  }
+
+  if (isIdle || isLoading) {
+    return <Progress />;
+  }
+
   return (
     <PageOverviewLayout
       label="Units"

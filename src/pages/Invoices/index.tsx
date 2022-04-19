@@ -16,6 +16,7 @@ import {
 } from 'utils/utils';
 import {useSearchParams} from 'react-router-dom';
 import {Progress} from 'components/Progress';
+import {EmptySection} from 'components/EmptySection';
 import {columns, makeRows} from './InvoicesDataGridProps';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
 import {Widget} from '../../components/Widget';
@@ -37,6 +38,7 @@ export const Invoices = () => {
     data: invoiceResource = createEmptyResource<InvoiceView>(10),
     isLoading,
     isFetching,
+    isFetched,
   } = useInvoices(
     {
       pageIndex: page.pageIndex,
@@ -88,19 +90,38 @@ export const Invoices = () => {
   useEffect(() => {
     if (invoiceResource?.data) {
       setRows(makeRows(invoiceResource));
-    } else {
-      setRows([]);
     }
+  }, [invoiceResource]);
+
+  useEffect(() => {
     if (!showFilter) {
       setAmount([]);
       setStatus(undefined);
       setServiceType([]);
     }
-  }, [invoiceResource, showFilter]);
+  }, [showFilter]);
 
   useEffect(() => {
     setPageCount(Math.ceil(invoiceResource.total / page.pageSize));
   }, [invoiceResource, pageSize]);
+
+  if (isFetched && !invoiceResource.total) {
+    return (
+      <EmptySection
+        label="No invoices yet. Create a new one to view here"
+        showActionBtn
+        btnLabel="Add Invoice"
+        containerStyle={{
+          height: '100%',
+          mb: '10em',
+        }}
+      />
+    );
+  }
+
+  if (isLoading) {
+    return <Progress />;
+  }
 
   return (
     <PageOverviewLayout
@@ -174,36 +195,31 @@ export const Invoices = () => {
           </FilterFields>
         </Box>
       </Fade>
-      {isLoading ? (
-        <Progress />
-      ) : (
-        <>
-          <DataGridLayout
-            rows={rows}
-            columns={columns}
-            loading={isFetching}
-            hideFooter
+
+      <>
+        <DataGridLayout
+          rows={rows}
+          columns={columns}
+          loading={isFetching}
+          hideFooter
+        />
+        {pageCount ? (
+          <CustomPagination
+            pageSize={page.pageSize}
+            pageIndex={page.pageIndex}
+            handlePageSizeChange={(newPageSize: number) =>
+              setQueryParams(
+                formatSearchParamsPageSize(newPageSize, queryParams),
+              )
+            }
+            handlePageChange={(newPage: number) =>
+              setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+            }
+            pageCount={pageCount}
+            totalRows={invoiceResource?.total}
           />
-          {pageCount ? (
-            <CustomPagination
-              pageSize={page.pageSize}
-              pageIndex={page.pageIndex}
-              handlePageSizeChange={(newPageSize: number) =>
-                setQueryParams(
-                  formatSearchParamsPageSize(newPageSize, queryParams),
-                )
-              }
-              handlePageChange={(newPage: number) =>
-                setQueryParams(
-                  formatSearchParamsPageIndex(newPage, queryParams),
-                )
-              }
-              pageCount={pageCount}
-              totalRows={invoiceResource?.total}
-            />
-          ) : null}
-        </>
-      )}
+        ) : null}
+      </>
     </PageOverviewLayout>
   );
 };
