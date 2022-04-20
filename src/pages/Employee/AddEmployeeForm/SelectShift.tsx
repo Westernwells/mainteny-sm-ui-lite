@@ -1,4 +1,5 @@
-import React from 'react';
+import {useEffect, useState} from 'react';
+import {useFormikContext} from 'formik';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -10,40 +11,65 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import TimePicker from '@mui/lab/TimePicker';
 import {TimeWindowType} from 'models/misc';
-import {convertToText} from 'utils/utils';
-import {Shift} from './model';
+import {convertToMacro, convertToText} from 'utils/utils';
+import {Shift, EmployeeAccountData} from './model';
 
-interface Props {
-  shifts: Shift<Date | null>[];
-  setShifts: React.Dispatch<React.SetStateAction<Shift<Date | null>[]>>;
-}
-export const ShiftTime = ({shifts, setShifts}: Props) => {
+export const SelectShift = () => {
   const workDays = Object.values(TimeWindowType).map((item) =>
     convertToText(item),
   );
 
+  const defaultTime = {
+    fromTime: new Date(0, 0, 0, 7, 0),
+    toTime: new Date(0, 0, 0, 18, 0),
+  };
+
+  const convertToLocaleTimeString = (date: Date) =>
+    date.toLocaleTimeString('de-DE', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+  const [shifts, setShifts] = useState<Shift<Date | null>[]>([
+    {
+      ...defaultTime,
+      type: convertToText(TimeWindowType.WEEKDAY),
+    },
+  ]);
+
+  const {setFieldValue} = useFormikContext<EmployeeAccountData>();
+
   const handleAddShift = () => {
-    const selectedWorkDays = shifts.map((shift) => shift.workDays);
-    setShifts([
-      ...shifts,
+    const selectedWorkDays = shifts.map((shift) => shift.type);
+    setShifts((prev) => [
+      ...prev,
       {
-        fromTime: new Date(0, 0, 0, 7, 0),
-        toTime: new Date(0, 0, 0, 18, 0),
-        workDays: workDays.filter(
-          (item) => !selectedWorkDays.includes(item),
-        )[0],
+        ...defaultTime,
+        type: workDays.filter((item) => !selectedWorkDays.includes(item))[0],
       },
     ]);
   };
 
   const handleRemoveShift = () => {
-    setShifts(shifts.slice(0, -1));
+    setShifts((prev) => prev.slice(0, -1));
   };
+
+  useEffect(() => {
+    setFieldValue(
+      'shifts',
+      shifts.map((item) => ({
+        fromTime: item.fromTime && convertToLocaleTimeString(item.fromTime),
+        toTime: item.toTime && convertToLocaleTimeString(item.toTime),
+        type: convertToMacro(item.type),
+      })),
+    );
+  }, [shifts]);
+
   return (
     <>
       {shifts.map((shift, index) => (
         <Box
-          key={shift.workDays}
+          key={shift.type}
           display="flex"
           gap="1em"
           alignItems="flex-end"
@@ -93,21 +119,21 @@ export const ShiftTime = ({shifts, setShifts}: Props) => {
             <Select
               labelId="shiftDaySelect-label"
               id="shiftDaySelect"
-              value={shift.workDays}
+              value={shift.type}
               label="Day"
               size="small"
               disabled={index < shifts.length - 1}
               onChange={(event: SelectChangeEvent) => {
                 const oldShifts = shifts.filter((item) => item !== shift);
                 const newShift = shift;
-                newShift.workDays = event.target.value;
+                newShift.type = event.target.value;
                 setShifts([...oldShifts, newShift]);
               }}>
               {workDays.map((item) => (
                 <MenuItem
                   value={item}
                   key={item}
-                  disabled={shifts.map((s) => s.workDays).includes(item)}>
+                  disabled={shifts.map((s) => s.type).includes(item)}>
                   {item}
                 </MenuItem>
               ))}
