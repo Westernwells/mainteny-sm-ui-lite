@@ -10,11 +10,19 @@ interface Props {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   body: ReactNode;
+  isScrollable?: boolean;
   header?: ReactNode;
   footer?: ReactNode;
 }
 
-export const SideDrawer = ({open, setOpen, body, header, footer}: Props) => (
+export const SideDrawer = ({
+  open,
+  setOpen,
+  body,
+  isScrollable,
+  header,
+  footer,
+}: Props) => (
   <Drawer
     anchor="right"
     open={open}
@@ -23,34 +31,46 @@ export const SideDrawer = ({open, setOpen, body, header, footer}: Props) => (
     PaperProps={{
       sx: {
         width: '32em',
-        pt: 12,
-        px: 2,
         color: 'text.primary',
         background: 'white',
-        maxHeight: '100vh',
       },
     }}>
-    <Box display="flex" justifyContent="space-between" alignItems="center">
-      <Typography variant="h5" textTransform="capitalize">
-        {header}
-      </Typography>
-      <IconButton onClick={() => setOpen(false)}>
-        <Close />
-      </IconButton>
-    </Box>
-
     <Box
-      role="presentation"
-      my="2em"
-      sx={{overflowY: 'scroll', height: '80%', maxHeight: '80%', pr: 1}}>
-      {body}
-    </Box>
+      height="100vh"
+      maxHeight="100vh"
+      pt={12}
+      pb={2}
+      px={2}
+      display="flex"
+      flexDirection="column"
+      justifyContent="space-between">
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Typography variant="h5" textTransform="capitalize">
+          {header}
+        </Typography>
+        <IconButton onClick={() => setOpen(false)}>
+          <Close />
+        </IconButton>
+      </Box>
 
-    <Box display="flex" justifyContent="flex-end" gap="1em">
-      <Button onClick={() => setOpen(false)} sx={{color: 'text.secondary'}}>
-        Cancel
-      </Button>
-      {footer}
+      <Box
+        role="presentation"
+        flexGrow={1}
+        sx={{
+          overflowY: isScrollable ? 'scroll' : 'initial',
+          pr: 1,
+        }}>
+        {body}
+      </Box>
+
+      {footer && (
+        <Box display="flex" justifyContent="flex-end" gap="1em">
+          <Button onClick={() => setOpen(false)} sx={{color: 'text.secondary'}}>
+            Cancel
+          </Button>
+          {footer}
+        </Box>
+      )}
     </Box>
   </Drawer>
 );

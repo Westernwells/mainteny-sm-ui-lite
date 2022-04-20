@@ -3,7 +3,7 @@ import {CreateUserAccountData} from 'models/user';
 export interface Shift<T> {
   fromTime: T;
   toTime: T;
-  workDays: string;
+  type: string;
 }
 
 export type EmployeeAccountData = Partial<CreateUserAccountData> & {
@@ -11,6 +11,12 @@ export type EmployeeAccountData = Partial<CreateUserAccountData> & {
   roles: string[];
   serviceOrderTypes: string[];
   shifts: Shift<string | undefined>[];
-  // TODO: resolve 'any' here
-  address: any;
+  address: {
+    countryCode: string;
+    fullName: string;
+    location: {
+      latitude: number;
+      longitude: number;
+    };
+  } | null;
 };
