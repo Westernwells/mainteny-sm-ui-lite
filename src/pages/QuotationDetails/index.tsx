@@ -9,6 +9,7 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import AddIcon from '@mui/icons-material/Add';
 import {BackAction} from 'components/BackAction';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {roundCurrency} from 'utils/currency';
 import {SelectButton} from './Components/SelectButton';
 import {SelectCard} from './Components/SelectCard';
 import {Label} from './Components/Label';
@@ -249,13 +250,15 @@ export const QuotationDetails = () => {
                       </Typography>
                     </Typography>
 
-                    <Typography>{`€ ${totalPrice}`}</Typography>
+                    <Typography>{`€ ${totalPrice.toFixed(2)}`}</Typography>
                     <Typography
                       variant="caption"
                       sx={{color: 'text.secondary'}}>
                       VAT(10%)
                     </Typography>
-                    <Typography>{`€ ${totalPrice / 10}`}</Typography>
+                    <Typography>{`€ ${(totalPrice / 10).toFixed(
+                      2,
+                    )}`}</Typography>
                   </Box>
                   <Box
                     bgcolor="grey.700"
@@ -274,7 +277,7 @@ export const QuotationDetails = () => {
                       </Typography>
                     </Typography>
                     <Typography sx={{color: 'primary.contrastText'}}>
-                      {`€ ${totalPrice * 1.1}`}
+                      {`€ ${roundCurrency(totalPrice * 1.1, 2).toFixed(2)}`}
                     </Typography>
                   </Box>
                 </Box>

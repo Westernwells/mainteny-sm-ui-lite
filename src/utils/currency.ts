@@ -9,3 +9,6 @@ export const formatCurrency = (
     currency: 'EUR',
     ...options,
   });
+
+export const roundCurrency = (value: number, precision?: number) =>
+  Math.round(value * 10 ** (precision || 0)) / 10 ** (precision || 0);
