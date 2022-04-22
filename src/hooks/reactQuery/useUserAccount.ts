@@ -69,18 +69,25 @@ export const useAddEmployeeAccount = () => {
       const {status} = await axiosClient.post(urlEndpoint, requestBody);
 
       if (status === 200) {
-        enqueueSnackbar('Account created successfully', {
-          variant: 'success',
-        });
+        enqueueSnackbar(
+          `User account for ${accountData.firstName} created successfully!`,
+          {
+            variant: 'success',
+          },
+        );
         if (onSuccess) {
           onSuccess();
         }
       }
     } catch (error: any) {
       console.error(error);
-      enqueueSnackbar(error.response?.message || 'Failed to create account', {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        error.response?.message ||
+          'Sorry! User account creation failed. Please try again.',
+        {
+          variant: 'error',
+        },
+      );
     }
   };
 
