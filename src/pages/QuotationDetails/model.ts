@@ -24,4 +24,5 @@ export interface ArticleView {
   unitPrice: string;
   // TODO: Remove this later
   unitPriceNumber: number;
+  quantity: number;
 }
