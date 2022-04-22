@@ -33,8 +33,8 @@ export const AddEmployee = ({open, setOpen}: Props) => {
     /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
   const validationSchema = Yup.object().shape({
-    firstName: Yup.string().required('This field is required'),
-    lastName: Yup.string().required('This field is required'),
+    firstName: Yup.string().required('First name is required'),
+    lastName: Yup.string().required('Last name is required'),
     username: Yup.string()
       .email('Enter a valid email')
       .required('Email is required'),
