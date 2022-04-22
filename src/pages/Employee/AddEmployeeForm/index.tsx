@@ -91,7 +91,7 @@ export const AddEmployeeForm = () => {
           {
             id: 'phone',
             label: 'Phone',
-            placeholder: '49 987654987654',
+            placeholder: '49 17163 995801',
             value: values.phone,
             InputProps: {
               startAdornment: (
