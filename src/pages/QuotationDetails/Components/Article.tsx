@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -11,15 +11,35 @@ interface Props {
   article: ArticleView;
   index: number;
   deleteArticle: (article: ArticleView) => void;
+  setArticles: React.Dispatch<React.SetStateAction<ArticleView[]>>;
 }
 
-export const Article = ({article, index, deleteArticle}: Props) => {
+export const Article = ({
+  article,
+  index,
+  deleteArticle,
+  setArticles,
+}: Props) => {
   const [quantity, setQuantity] = useState(1);
   const [description, setDescription] = useState<string | null>(null);
 
   const handleDescriptionChange = (e: any) => {
     setDescription(e.target.value);
   };
+
+  useEffect(() => {
+    article.quantity = quantity;
+
+    setArticles((prev) => {
+      const newArticles = prev.filter(
+        (item) => item.articleNumber !== article.articleNumber,
+      );
+
+      newArticles.push(article);
+
+      return newArticles;
+    });
+  }, [quantity]);
 
   return (
     <Box boxShadow="0px 4px 15px 0px #90909033" py="1em">

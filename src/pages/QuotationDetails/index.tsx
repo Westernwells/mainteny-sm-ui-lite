@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -36,6 +36,8 @@ export const QuotationDetails = () => {
   const [unit, setUnit] = useState<UnitView | null>(null);
   const [articles, setArticles] = useState<ArticleView[]>([]);
 
+  const [totalPrice, setTotalPrice] = useState(0);
+
   const handleDateChange = (newDate: Date | null) => {
     setDate(newDate);
   };
@@ -61,6 +63,18 @@ export const QuotationDetails = () => {
     const newArticles = articles.filter((item) => item !== article);
     setArticles(newArticles);
   };
+
+  useEffect(() => {
+    if (articles.length) {
+      const sum = 0;
+
+      setTotalPrice(
+        articles
+          .map((article) => article.quantity * article.unitPriceNumber)
+          .reduce((prevValue, currentValue) => prevValue + currentValue, sum),
+      );
+    }
+  }, [articles]);
 
   return (
     <>
@@ -202,6 +216,7 @@ export const QuotationDetails = () => {
                 article={item}
                 index={index + 1}
                 deleteArticle={deleteArticle}
+                setArticles={setArticles}
               />
             ))}
             {articles.length ? (
@@ -234,13 +249,13 @@ export const QuotationDetails = () => {
                       </Typography>
                     </Typography>
 
-                    <Typography>€ 34,600</Typography>
+                    <Typography>{`€ ${totalPrice}`}</Typography>
                     <Typography
                       variant="caption"
                       sx={{color: 'text.secondary'}}>
                       VAT(10%)
                     </Typography>
-                    <Typography>€ 6,800</Typography>
+                    <Typography>{`€ ${totalPrice / 10}`}</Typography>
                   </Box>
                   <Box
                     bgcolor="grey.700"
@@ -259,7 +274,7 @@ export const QuotationDetails = () => {
                       </Typography>
                     </Typography>
                     <Typography sx={{color: 'primary.contrastText'}}>
-                      € 40,200
+                      {`€ ${totalPrice * 1.1}`}
                     </Typography>
                   </Box>
                 </Box>

@@ -96,6 +96,7 @@ const rows: GridRowsProp = [
     description: 'Renew hanging cable',
     unitPrice: '€ 7,700',
     unitPriceNumber: 7700,
+    quantity: 1,
   },
   {
     id: 2,
@@ -106,6 +107,7 @@ const rows: GridRowsProp = [
     description: 'Main control board renewal',
     unitPrice: '€ 4,200',
     unitPriceNumber: 4200,
+    quantity: 1,
   },
   {
     id: 3,
@@ -116,6 +118,7 @@ const rows: GridRowsProp = [
     description: 'Renew elevator control ',
     unitPrice: '€ 5,032',
     unitPriceNumber: 5032,
+    quantity: 1,
   },
   {
     id: 4,
@@ -126,6 +129,7 @@ const rows: GridRowsProp = [
     description: 'Main control board renewal',
     unitPrice: '€ 729',
     unitPriceNumber: 729,
+    quantity: 1,
   },
   {
     id: 5,
@@ -136,6 +140,7 @@ const rows: GridRowsProp = [
     description: 'Installation and Inspection control of Junction box',
     unitPrice: '€ 333',
     unitPriceNumber: 333,
+    quantity: 1,
   },
 ];
 
