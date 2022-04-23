@@ -41,14 +41,10 @@ export const ContractDetails = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const {data: contractDetails, isLoading} = useContractDetails(contractId!);
-  const {
-    data: {elevator} = {
-      elevator: createEmptyResource<ElevatorView>(10),
-      centerCoord: {longitude: 0, latitude: 0},
-    },
-  } = useAllElevators(search, page, {
-    status: [],
-  });
+  const {data: elevator = createEmptyResource<ElevatorView>(10)} =
+    useAllElevators(search, page, {
+      status: [],
+    });
 
   useEffect(() => {
     if (elevator.data) {

@@ -35,7 +35,9 @@
     "react-router-dom": "^6.2.1",
     "react-scripts": "latest",
     "react-top-loading-bar": "^2.1.0",
+    "supercluster": "^7.1.5",
     "typescript": "latest",
+    "use-supercluster": "^0.4.0",
     "yup": "^0.32.11"
   },
   "scripts": {
@@ -70,6 +72,7 @@
     "@types/google-map-react": "^2.1.5",
     "@types/react-helmet": "^6.1.5",
     "@types/react-pdf": "^5.0.9",
+    "@types/supercluster": "^7.1.0",
     "@typescript-eslint/eslint-plugin": "^5.12.0",
     "@typescript-eslint/parser": "^5.12.0",
     "eslint": "^8.2.0",

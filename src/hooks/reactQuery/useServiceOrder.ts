@@ -222,6 +222,8 @@ export function useServiceOrders(params: any) {
   );
 }
 
+// TODO: currently not in uae, we migght have to remove
+// if we realise we'll never need it again
 export function useFetchServiceOrdersByElevators(
   elevatorRes: Resource<ElevatorView>,
   filter: {nextVisit: string[]; availabilityRange: number[][]},
@@ -244,7 +246,7 @@ export function useFetchServiceOrdersByElevators(
         end,
         pageSize: 500,
         pageIndex: 0,
-        // elevatorIds,
+        elevatorIds,
         query: '',
         serviceCompanyId: user!.userAccount.serviceCompany.id,
         status: [],
@@ -252,8 +254,8 @@ export function useFetchServiceOrdersByElevators(
         order: Order.DESC,
       }),
     {
-      ...options,
       enabled: !!user && !!availability,
+      ...options,
       select: useCallback(
         // TODO: refactor into a function
         (serviceOrderView: Resource<ServiceOrderView>) => {

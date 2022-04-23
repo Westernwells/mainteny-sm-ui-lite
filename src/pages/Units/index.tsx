@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from 'react';
 import Box from '@mui/material/Box';
 import {ElevatorView} from 'models/elevator';
 import {Widget} from 'components/Widget';
-import {useFetchServiceOrdersByElevators} from 'hooks/reactQuery/useServiceOrder';
+import * as _ from 'lodash';
 import Fade from '@mui/material/Fade';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
@@ -16,16 +16,19 @@ import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
 } from 'utils/utils';
+import {getCenter} from 'geolib';
+import {Location, Resource} from 'models/misc';
 import {useSearchParams} from 'react-router-dom';
 import {UnitSection} from './UnitSection';
 import {UnitsMapsView} from './UnitsMapsView';
 import {UnitColumns} from './UnitColumns';
+import {ElevatorByAddr} from './Models';
 
 const pageInfo = makePage(0, 50);
 
 export const MyUnits = () => {
   const fallback = useRef({
-    elevator: createEmptyResource<ElevatorView>(10),
+    elevatorByAddress: {} as ElevatorByAddr,
     centerCoord: {longitude: 0, latitude: 0},
   }).current;
   const [queryParams, setQueryParams] = useSearchParams();
@@ -33,12 +36,24 @@ export const MyUnits = () => {
   const [page, setPage] = useState(pageInfo);
   const [pageCount, setPageCount] = useState(0);
   const [showFilter, setShowFilter] = useState(false);
-  const [availability, setAvailability] = useState<number[][]>([]);
   const [status, setStatus] = useState<string[]>([]);
-  const [nextVisit, setNextVisit] = useState<string[]>([]);
   const [showMapview, setShowMapview] = useState(false);
+  const [elevatorView, setElevatorView] = useState<{
+    elevatorByAddress: ElevatorByAddr;
+    centerCoord: Location;
+  }>(fallback);
 
-  const {data: elevatorResponse = fallback} = useAllElevators(
+  const {
+    data: {total: totalElevators} = createEmptyResource<ElevatorView>(10),
+  } = useAllElevators('', makePage(0, 1), {
+    status: [],
+  });
+
+  const {
+    data: elevatorResponse = createEmptyResource<ElevatorView>(10),
+    isLoading,
+    isFetched,
+  } = useAllElevators(
     search,
     page,
     {
@@ -46,51 +61,31 @@ export const MyUnits = () => {
     },
     {keepPreviousData: true},
   );
-  const {
-    data: elevatorsByAddressList,
-    isLoading,
-    isIdle,
-    isFetched,
-  } = useFetchServiceOrdersByElevators(
-    elevatorResponse.elevator,
-    {nextVisit, availabilityRange: availability},
-    {keepPreviousData: true},
-  );
 
-  const availabilityRangeConvertor = (selectedItems: string[]) => {
-    const range: number[][] = [];
-    selectedItems.forEach((item) => {
-      switch (item) {
-        case 'Under 40%':
-          range.push([0, 40]);
-          // '40 - 60%', '60 - 80%', 'Above 80%'
-          break;
-        case '40 - 60%':
-          range.push([40, 60]);
+  const groupElevatorByAddressList = (elevatorRes?: Resource<ElevatorView>) => {
+    const elevatorMap = _.groupBy(
+      elevatorRes?.data,
+      (elevator: ElevatorView) => elevator.address.fullName,
+    );
 
-          break;
-        case '60 - 80%':
-          range.push([60, 80]);
-
-          break;
-        case 'Above 80%':
-          range.push([80, 100]);
-
-          break;
-        default:
-          break;
-      }
-    });
-    setAvailability(range);
+    return elevatorMap;
   };
 
-  const openMapView = () => {
-    setShowMapview(true);
-  };
+  useEffect(() => {
+    if (!isLoading) {
+      const latLng = elevatorResponse?.data.map((elevator: ElevatorView) => ({
+        latitude: elevator.address.location.latitude,
+        longitude: elevator.address.location.longitude,
+      }));
+      const centerCoord = getCenter(latLng) as unknown as Location;
+      const result = groupElevatorByAddressList(elevatorResponse);
 
-  const closeMapView = () => {
-    setShowMapview(false);
-  };
+      setElevatorView({
+        elevatorByAddress: result,
+        centerCoord,
+      });
+    }
+  }, [isLoading, elevatorResponse]);
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
@@ -103,20 +98,18 @@ export const MyUnits = () => {
   }, [queryParams]);
 
   useEffect(() => {
-    if (elevatorsByAddressList) {
-      setPageCount(Math.ceil(elevatorResponse.elevator.total / page.pageSize));
+    if (elevatorResponse) {
+      setPageCount(Math.ceil(elevatorResponse.total / page.pageSize));
     }
-  }, [elevatorsByAddressList, page]);
+  }, [elevatorResponse, page]);
 
   useEffect(() => {
     if (!showFilter) {
       setStatus([]);
-      setNextVisit([]);
-      setAvailability([]);
     }
   }, [showFilter]);
 
-  if (isFetched && !elevatorResponse.elevator.total) {
+  if (isFetched && !totalElevators) {
     return (
       <EmptySection
         label="No Elevators yet. Create a new one to view here"
@@ -130,7 +123,15 @@ export const MyUnits = () => {
     );
   }
 
-  if (isIdle || isLoading) {
+  const openMapView = () => {
+    setShowMapview(true);
+  };
+
+  const closeMapView = () => {
+    setShowMapview(false);
+  };
+
+  if (isLoading) {
     return <Progress />;
   }
 
@@ -140,7 +141,9 @@ export const MyUnits = () => {
       renderWidget={
         <Widget
           searchPlaceholder="Try ‘Schindler’ or ‘Mitsubishi’"
-          getSearchValue={(val: string) => setSearch(val)}
+          getSearchValue={(val: string) => {
+            setSearch(val);
+          }}
           openMapView={openMapView}
           closeMapView={closeMapView}
           setShowFilter={setShowFilter}
@@ -151,13 +154,6 @@ export const MyUnits = () => {
         <Box>
           <FilterFields setShowFilter={setShowFilter}>
             <MultipleSelectCheckmarks
-              label="Availability"
-              options={['Under 40%', '40 - 60%', '60 - 80%', 'Above 80%']}
-              getSelectedValue={(item) => availabilityRangeConvertor(item)}
-              multiple={false}
-            />
-
-            <MultipleSelectCheckmarks
               label="Status"
               options={['RUNNING', 'STOPPED']}
               getSelectedValue={(item) => setStatus(item)}
@@ -166,7 +162,7 @@ export const MyUnits = () => {
             <MultipleSelectCheckmarks
               label="Upcoming visits"
               options={['This week', 'Next week', 'Next month']}
-              getSelectedValue={(item) => setNextVisit(item)}
+              getSelectedValue={() => {}}
               multiple={false}
             />
           </FilterFields>
@@ -182,10 +178,11 @@ export const MyUnits = () => {
               overflowY: 'scroll',
               height: '1px',
             }}>
-            {elevatorsByAddressList?.map((elevatorsByAddress) => (
+            {Object.keys(elevatorView.elevatorByAddress).map((key) => (
               <UnitSection
-                key={elevatorsByAddress.address.id}
-                elevatorsByAddress={elevatorsByAddress}
+                key={key}
+                address={key}
+                elevators={elevatorView.elevatorByAddress[key]}
               />
             ))}
           </Box>
@@ -204,14 +201,15 @@ export const MyUnits = () => {
                 )
               }
               pageCount={pageCount}
-              totalRows={elevatorResponse.elevator.total}
+              totalRows={elevatorResponse.total}
             />
           ) : null}
         </>
       ) : (
         <UnitsMapsView
-          elevatorsByAddressList={elevatorsByAddressList}
-          centerCoord={elevatorResponse?.centerCoord}
+          defaultCenterCoord={elevatorView?.centerCoord}
+          search={search}
+          status={status}
         />
       )}
     </PageOverviewLayout>
