@@ -7,6 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import Elevator from '@mui/icons-material/Elevator';
 import WorkOutlinedIcon from '@mui/icons-material/WorkOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
@@ -171,6 +172,20 @@ export const AppDrawer = () => {
         setSelectedIndex(index);
         setSelectedPath('/quotations');
         navigate('/quotations?pageIndex=1&pageSize=25');
+      },
+    },
+    {
+      text: 'Orders',
+      icon: <LocalShippingIcon sx={{color: '#fff'}} />,
+      path: '/orders',
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/orders');
+        navigate('/orders?pageIndex=1&pageSize=25');
       },
     },
   ];

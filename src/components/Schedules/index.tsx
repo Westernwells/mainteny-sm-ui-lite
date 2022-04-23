@@ -166,11 +166,12 @@ export const Schedule = ({
     </Box>
   );
 
-  const renderScheduleDate = (item: string) => (
+  const renderScheduleLabel = (item: string) => (
     <>
       <Typography component="div" variant="subtitle2">
         {item}
       </Typography>
+      {console.log(item, '~~~~!!!!')}
       <Typography
         component="div"
         variant="caption"
@@ -243,7 +244,7 @@ export const Schedule = ({
                           <ScheduleBodyCell
                             cellWidth={gridWidth}
                             key={`${rowIndex}-${index}`}>
-                            {renderScheduleDate(key)}
+                            {renderScheduleLabel(key)}
                           </ScheduleBodyCell>
                         );
                       }

@@ -17,6 +17,7 @@ import {Quotations} from 'pages/Quotations';
 import {QuotationDetails} from 'pages/QuotationDetails';
 import {Notifications} from 'pages/Notifications';
 import {PageNotFound} from 'pages/PageNotFound';
+import {ServiceOrders} from 'pages/ServiceOrders';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -201,6 +202,20 @@ export const Router = () => {
               </Helmet>
               <PageLayout pageScrollable>
                 <QuotationDetails />
+              </PageLayout>
+            </>
+          }
+        />
+
+        <Route
+          path="/orders"
+          element={
+            <>
+              <Helmet>
+                <title>{`Service Orders - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout>
+                <ServiceOrders />
               </PageLayout>
             </>
           }

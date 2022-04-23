@@ -17,6 +17,7 @@ interface Props {
   backBtnLabel?: string;
   onChange?: (tabIndex: number) => void;
   currentIndex?: number;
+  hideBackIcon?: boolean;
 }
 
 const a11yProps = (index: number) => ({
@@ -27,6 +28,7 @@ const a11yProps = (index: number) => ({
 export const Tabs = ({
   children,
   tabItems,
+  hideBackIcon,
   onChange = () => {},
   backBtnLabel = '',
   currentIndex = 0,
@@ -42,14 +44,13 @@ export const Tabs = ({
         sx={{
           display: 'flex',
           paddingLeft: '35px',
-          // maxHeight: '50px'
-
-          // mt: 11,
         }}>
-        <BackAction
-          label={backBtnLabel}
-          containerStyle={{mt: '0.5em', mr: '3em'}}
-        />
+        {!hideBackIcon ? (
+          <BackAction
+            label={backBtnLabel}
+            containerStyle={{mt: '0.5em', mr: '3em'}}
+          />
+        ) : null}
 
         <MuiTabs
           sx={{
