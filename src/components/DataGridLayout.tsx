@@ -1,4 +1,3 @@
-/* eslint-disable */
 import Box from '@mui/material/Box';
 import {
   DataGrid,
