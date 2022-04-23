@@ -1,39 +1,32 @@
-import React from 'react';
-import Chip from '@mui/material/Chip';
+import {ReactElement} from 'react';
 import Box from '@mui/material/Box';
-import Slide from '@mui/material/Slide';
 import Typography from '@mui/material/Typography';
 import {useNavigate} from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import useTheme from '@mui/material/styles/useTheme';
 import {ReactComponent as Pin} from '../assets/icons/Pin.svg';
-import {Location} from '../models/misc';
-import {ElevatorsByAddress} from '../pages/Units/Models';
-import {ElevatorStatus} from '../models/elevator';
+import {ElevatorStatus, ElevatorView} from '../models/elevator';
 import {formatDate} from '../utils/datetime';
+import {StatusIndicator} from './StatusIndicator';
 
 interface Props {
-  elevatorsByAddress: ElevatorsByAddress;
+  elevator?: ElevatorView;
   lat: number;
   lng: number;
-  onPinClick: () => void;
-  selectedLocation?: Location;
+  children?: ReactElement;
 }
 
 export const LocationPin = ({
-  elevatorsByAddress,
+  elevator: elevatorItem,
   lat,
   lng,
-  onPinClick,
-  selectedLocation,
+  children,
 }: Props) => {
   console.log(`lat = ${lat}, lng = ${lng}`);
-  // TODO: there are multiple elevators sharing the same address, pick the first one for demo
-  const elevatorOrderPair = elevatorsByAddress.elevators[0];
   const theme = useTheme();
   const navigate = useNavigate();
-  const renderTooltipDetail = () => (
+  const renderTooltipDetail = (elevator: ElevatorView) => (
     <Box
       display="flex"
       flexDirection="column"
@@ -41,94 +34,104 @@ export const LocationPin = ({
       padding={1}>
       <Box display="flex">
         <Box>
-          <Typography variant="subtitle2">
-            {elevatorOrderPair.elevator.address.fullName}
-          </Typography>
-          <Typography variant="subtitle2">
-            {elevatorOrderPair.elevator.capacity}
+          <Typography variant="caption" mt="1em">
+            Company: <br />{' '}
+            <Typography color="text.secondary">
+              {elevator.propertyOwner.name}
+            </Typography>
           </Typography>
         </Box>
+
         <Box>
-          <Chip
-            sx={{py: 2}}
-            label={
-              <Typography
-                variant="largeBtnText"
-                sx={{textTransform: 'capitalize'}}>
-                {`${elevatorOrderPair.elevator.status.charAt(
-                  0,
-                )}${elevatorOrderPair.elevator.status.slice(1).toLowerCase()}`}
-              </Typography>
-            }
+          <StatusIndicator
             color={
-              elevatorOrderPair.elevator.status === ElevatorStatus.RUNNING
-                ? 'success'
-                : 'error'
+              elevator.status === ElevatorStatus.RUNNING ? 'success' : 'error'
             }
-            size="medium"
-          />
+            containerStyles={{ml: '5em'}}>
+            <Typography variant="caption">
+              {`${elevator.status.charAt(0)}${elevator.status
+                .slice(1)
+                .toLowerCase()}`}
+            </Typography>
+          </StatusIndicator>
         </Box>
       </Box>
-      <Box display="flex" justifyContent="space-between">
+      <Box display="flex" justifyContent="space-between" mt="1em">
         <Box>
-          <Typography variant="subtitle2">Last Visit:</Typography>
-          <Typography variant="subtitle2">
-            {formatDate(elevatorOrderPair.elevator.lastVisitDate)}
+          <Typography variant="caption">
+            Elevator Address: <br />
+            <Typography
+              color="text.secondary"
+              sx={{whiteSpace: 'wrap', width: '98%', display: 'inline-block'}}>
+              {elevator.address.fullName}
+            </Typography>
           </Typography>
         </Box>
         <Box>
-          <Typography variant="subtitle2">Next Visit:</Typography>
-          {elevatorOrderPair.serviceOrder && (
-            <Typography variant="subtitle2">
-              {formatDate(
-                elevatorOrderPair.serviceOrder.schedules[0].startTime,
-              )}
+          <Typography variant="caption" mt="1em">
+            Capacity: <br />{' '}
+            <Typography color="text.secondary">{elevator.capacity}</Typography>
+          </Typography>
+        </Box>
+      </Box>
+      <Box display="flex" justifyContent="space-between" mt="1em">
+        <Box>
+          <Typography variant="caption">
+            Last Visit: <br />{' '}
+            <Typography color="text.secondary">
+              {' '}
+              {formatDate(elevator.lastVisitDate)}
             </Typography>
-          )}
+          </Typography>
+        </Box>
+        <Box>
+          <Typography variant="caption">
+            Next Visit: <br />
+            {elevator.nextVisitDate && (
+              <Typography color="text.secondary">
+                {' '}
+                {formatDate(elevator.nextVisitDate)}
+              </Typography>
+            )}
+          </Typography>
         </Box>
       </Box>
       <Button
         variant="outlined"
         size="small"
         style={{marginTop: '2rem'}}
-        onClick={() => navigate(`/units/${elevatorOrderPair.elevator.id}`)}>
+        onClick={() => navigate(`/units/details/${elevator.id}`)}>
         More details
       </Button>
     </Box>
   );
   return (
     <Box
-      onClick={onPinClick}
       sx={{
         fill: () => theme.palette.common.white,
         stroke: () => theme.palette.divider,
         strokeWidth: 1,
       }}>
-      <Slide direction="down" timeout={700} in unmountOnExit>
+      {children || (
         <Box>
-          {selectedLocation?.longitude ===
-          elevatorOrderPair.elevator.address.location.longitude ? (
-            <Tooltip
-              componentsProps={{
-                tooltip: {
-                  sx: {
-                    bgcolor: 'common.white',
-                    '& .MuiTooltip-arrow': {
-                      color: 'common.black',
-                    },
+          <Tooltip
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  bgcolor: 'common.white',
+                  '& .MuiTooltip-arrow': {
+                    color: 'common.black',
                   },
                 },
-              }}
-              title={renderTooltipDetail()}
-              arrow
-              placement="top">
-              <Pin />
-            </Tooltip>
-          ) : (
+              },
+            }}
+            title={renderTooltipDetail(elevatorItem!)}
+            arrow
+            placement="top">
             <Pin />
-          )}
+          </Tooltip>
         </Box>
-      </Slide>
+      )}
     </Box>
   );
 };

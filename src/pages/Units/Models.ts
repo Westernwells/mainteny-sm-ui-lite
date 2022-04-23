@@ -13,6 +13,10 @@ export interface ElevatorsByAddress {
   address: Address;
 }
 
+export interface ElevatorByAddr {
+  [key: string]: ElevatorView[];
+}
+
 // TODO: this is the mocked call to get date in the future
 export function calculateNextVisitDate(time: string): Date {
   return getDateObject(time);

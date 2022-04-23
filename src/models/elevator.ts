@@ -75,6 +75,7 @@ export interface ElevatorView {
   address: Address;
   propertyOwner: ClientSimpleView;
   lastVisitDate: string;
+  nextVisitDate: string;
   serviceTime: number;
   status: ElevatorStatus;
   labels: [];

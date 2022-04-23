@@ -5,15 +5,14 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/system/Box';
 import {StatusChip} from 'components/StatusChip';
-import {ElevatorsByAddress} from './Models';
-import {formatDate, toDate} from '../../utils/datetime';
-import {ElevatorStatus} from '../../models/elevator';
+import {ElevatorStatus, ElevatorView} from '../../models/elevator';
 
 export interface UnitsSectionProperty {
-  elevatorsByAddress: ElevatorsByAddress;
+  elevators: ElevatorView[];
+  address: string;
 }
 
-export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
+export const UnitSection = ({elevators, address}: UnitsSectionProperty) => {
   const navigate = useNavigate();
 
   return (
@@ -28,13 +27,13 @@ export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
       }}>
       <Box pl={3}>
         <Typography variant="largeBtnText" mt={1} color="textSecondary">
-          {elevatorsByAddress.address.fullName}
+          {address}
         </Typography>
       </Box>
 
-      {elevatorsByAddress.elevators.map((elevatorOrder) => (
+      {elevators.map((elevator) => (
         <Grid
-          key={elevatorOrder.elevator.id}
+          key={elevator.id}
           container
           sx={{
             paddingTop: 0.5,
@@ -50,13 +49,11 @@ export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
             sx={{cursor: 'pointer'}}
             onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
               e.preventDefault();
-              navigate(`details/${elevatorOrder.elevator.id}`);
+              navigate(`details/${elevator.id}`);
             }}>
             <Box display="flex" alignItems="center">
               <Elevator style={{marginRight: '10px'}} />
-              <Typography variant="body2">
-                {elevatorOrder.elevator.model}
-              </Typography>
+              <Typography variant="body2">{elevator.model}</Typography>
             </Box>
           </Grid>
           <Grid
@@ -71,28 +68,23 @@ export const UnitSection = ({elevatorsByAddress}: UnitsSectionProperty) => {
             }}>
             <Grid item xs={3}>
               <Typography variant="body2">
-                {elevatorOrder.elevator.lastVisitDate || 'N/A'}
+                {elevator.lastVisitDate || 'N/A'}
               </Typography>
             </Grid>
 
             <Grid item xs={3}>
               <Typography variant="body2">
                 {' '}
-                {(elevatorOrder.serviceOrder &&
-                  elevatorOrder.serviceOrder.schedules.length &&
-                  formatDate(
-                    toDate(elevatorOrder.serviceOrder.schedules[0].startTime),
-                  )) ||
-                  ''}
+                {elevator.nextVisitDate || ''}
               </Typography>
             </Grid>
 
             <Grid item xs={3}>
               <Box display="flex" justifyContent="center">
                 <StatusChip
-                  label={elevatorOrder.elevator.status}
+                  label={elevator.status}
                   color={
-                    elevatorOrder.elevator.status === ElevatorStatus.RUNNING
+                    elevator.status === ElevatorStatus.RUNNING
                       ? 'success'
                       : 'error'
                   }
