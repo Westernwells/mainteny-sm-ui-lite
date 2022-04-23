@@ -174,6 +174,6 @@ export const makeRows = (contracts: any): GridRowsProp =>
         contractType: item.type[0] + item.type.slice(1).toLowerCase(),
         startDate: formatDate(item.startTime),
         expiryDate: formatDate(item.endTime),
-        navigateTo: item.id,
+        navigateTo: `/contracts/details/${item.id}`,
       }))
     : console.error('No Data');

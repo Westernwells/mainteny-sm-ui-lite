@@ -143,9 +143,9 @@ export interface ContractRecord {
 }
 
 export interface ContractFilters {
-  contractor: string[];
-  expiryDate: string[];
-  price: number[][];
+  contractor?: string[];
+  expiryDate?: string[];
+  price?: number[][];
 }
 
 export interface CustomerContractParams {

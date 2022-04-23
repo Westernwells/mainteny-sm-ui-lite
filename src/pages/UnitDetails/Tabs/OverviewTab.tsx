@@ -23,14 +23,14 @@ import {ServiceHistory} from '../ServiceHistory';
 
 interface Props {
   getServiceHistoryTabIndex?: (value: number) => void;
-  getCustomerName?: (value: string) => void;
+  getUnitName?: (value: string) => void;
 }
 
 const pageSize = 10;
 
 export const OverviewTab = ({
   getServiceHistoryTabIndex,
-  getCustomerName,
+  getUnitName,
 }: Props) => {
   const {id: elevatorId} = useParams();
   const theme = useTheme();
@@ -56,8 +56,8 @@ export const OverviewTab = ({
   });
 
   useEffect(() => {
-    if (getCustomerName && elevator) {
-      getCustomerName(elevator.propertyOwner.name);
+    if (getUnitName && elevator) {
+      getUnitName(elevator.model);
     }
   }, [elevator]);
 

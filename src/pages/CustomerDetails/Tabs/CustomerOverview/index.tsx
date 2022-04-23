@@ -102,8 +102,9 @@ export const CustomerOverviewTab = ({
       header={<Typography variant="subtitle1">Basic Details</Typography>}>
       <Box display="flex" flexWrap="wrap" mt="-1em">
         {basicDetails &&
-          Object.keys(basicDetails).map((item) => (
+          Object.keys(basicDetails).map((item, index) => (
             <CardProps
+              key={index}
               label={basicDetails[item as keyof BasicDetails].label}
               bodyTextVariant="body2"
               icon={basicDetails[item as keyof BasicDetails].icon}
@@ -127,8 +128,7 @@ export const CustomerOverviewTab = ({
       <Grid container spacing={2} sx={{mt: '1em'}}>
         <Grid item xs={6}>
           <PageCard
-            minHeight="25vh"
-            containerStyles={{height: '45vh'}}
+            minHeight="5vh"
             headerContainerOverrideStyles={{backgroundColor: '#fff'}}
             customHeader={
               <Box display="flex" justifyContent="space-between">
@@ -177,8 +177,7 @@ export const CustomerOverviewTab = ({
 
         <Grid item xs={6}>
           <PageCard
-            minHeight="25vh"
-            containerStyles={{height: '45vh'}}
+            minHeight="5vh"
             customHeader={
               <Box display="flex" justifyContent="space-between">
                 <Box display="flex">

@@ -133,12 +133,12 @@ const filterContracts = (
   filter: ContractFilters,
 ) => {
   let result = {...contractsRes};
-  if (filter.expiryDate.length) {
+  if (filter.expiryDate?.length) {
     const expiryDates = filterByExpiryData(contractsRes, filter.expiryDate);
     result = {...result, data: expiryDates, total: expiryDates.length};
   }
 
-  if (filter.price.length) {
+  if (filter.price?.length) {
     const prices = filterByPrice(result, filter.price);
     result = {...result, data: prices, total: prices.length};
   }

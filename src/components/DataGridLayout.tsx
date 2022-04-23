@@ -9,15 +9,23 @@ import {
 } from '@mui/x-data-grid';
 import LinearProgress from '@mui/material/LinearProgress';
 import {useNavigate} from 'react-router-dom';
+import {CustomPagination} from './CustomPagination';
 
 interface Props extends DataGridProps {
   rows: GridRowsProp;
   columns: GridColDef[];
   hideFooter?: boolean;
-  height?: string;
+  height?: string | number;
   containerStyle?: {[key: string]: string | number};
   loading?: boolean;
   onCellClick?: GridEventListener<GridEvents.cellClick>;
+  pageSize?: number;
+  pageIndex?: number;
+  handlePageSizeChange?: (pageSize: number) => any;
+  handlePageChange?: (pageSize: number) => any;
+  pageCount?: number;
+  totalRows?: number;
+  fullHeight?: boolean;
 }
 
 export const DataGridLayout = ({
@@ -28,17 +36,37 @@ export const DataGridLayout = ({
   containerStyle,
   loading,
   onCellClick,
+  pageSize,
+  pageIndex,
+  handlePageSizeChange = (n: number) => n,
+  handlePageChange = (n: number) => n,
+  pageCount,
+  totalRows,
+  fullHeight = true,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
+
+  const renderFooter = () => (
+    <CustomPagination
+      pageSize={pageSize}
+      pageIndex={pageIndex}
+      handlePageSizeChange={handlePageSizeChange}
+      handlePageChange={handlePageChange}
+      pageCount={pageCount}
+      totalRows={totalRows}
+    />
+  );
   return (
     <Box
       sx={{
-        flexGrow: 1,
+        flexGrow: fullHeight ? 1 : 'unset',
+        ...(!fullHeight && {height}),
       }}>
       <DataGrid
         components={{
           LoadingOverlay: LinearProgress,
+          Footer: renderFooter,
         }}
         loading={loading}
         headerHeight={50}
@@ -57,7 +85,6 @@ export const DataGridLayout = ({
           })
         }
         sx={{
-          height,
           width: '100%',
           my: '0.5em',
           borderLeft: 'none',

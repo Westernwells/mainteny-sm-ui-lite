@@ -14,7 +14,6 @@ import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
 } from 'utils/utils';
-import {CustomPagination} from 'components/CustomPagination';
 import {EmptySection} from 'components/EmptySection';
 import {Widget} from '../../components/Widget';
 import {columns, makeRows} from './CustomerDataGridProps';
@@ -28,6 +27,14 @@ export const Customer = () => {
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
+
+  const {
+    data: {total: totalCustomer} = createEmptyResource<PropertyOwner>(pageSize),
+  } = useQueryCustomers({
+    pageIndex: 0,
+    pageSize: 1,
+    query: '',
+  });
 
   const {
     data: customerResource = createEmptyResource<PropertyOwner>(pageSize),
@@ -72,10 +79,10 @@ export const Customer = () => {
     setPageCount(Math.ceil(customerResource.total / page.pageSize));
   }, [customerResource, page.pageSize]);
 
-  if (isFetched && !customerResource.total) {
+  if (isFetched && !totalCustomer) {
     return (
       <EmptySection
-        label="No customers yet. Create a new one to view here"
+        label="No customers have been created yet. Please click the button below to create one!"
         showActionBtn
         btnLabel="Add Customer"
         containerStyle={{
@@ -103,30 +110,22 @@ export const Customer = () => {
           hideFilter
         />
       }>
-      <>
-        <DataGridLayout
-          rows={rows}
-          columns={columns}
-          loading={isFetching}
-          hideFooter
-        />
-        {pageCount && page.pageSize < customerResource.total ? (
-          <CustomPagination
-            pageSize={page.pageSize}
-            pageIndex={page.pageIndex}
-            handlePageSizeChange={(newPageSize: number) =>
-              setQueryParams(
-                formatSearchParamsPageSize(newPageSize, queryParams),
-              )
-            }
-            handlePageChange={(newPage: number) =>
-              setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-            }
-            pageCount={pageCount}
-            totalRows={customerResource.total}
-          />
-        ) : null}
-      </>
+      <DataGridLayout
+        rows={rows}
+        columns={columns}
+        loading={isFetching}
+        hideFooter={pageCount <= 1}
+        pageSize={page.pageSize}
+        pageIndex={page.pageIndex}
+        handlePageSizeChange={(newPageSize: number) =>
+          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+        }
+        handlePageChange={(newPage: number) =>
+          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+        }
+        pageCount={pageCount}
+        totalRows={customerResource.total}
+      />
     </PageOverviewLayout>
   );
 };

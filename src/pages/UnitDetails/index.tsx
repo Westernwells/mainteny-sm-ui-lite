@@ -26,18 +26,18 @@ const tabItems = [
 
 export const UnitsDetail = () => {
   const [value, setValue] = useState(0);
-  const [customerName, setCustomerName] = useState('');
+  const [unitName, setUnitName] = useState('');
 
   return (
     <Tabs
       tabItems={tabItems}
       currentIndex={value}
       onChange={(index) => setValue(index)}
-      backBtnLabel={customerName}>
+      backBtnLabel={unitName}>
       <TabsBody value={value} index={0}>
         <OverviewTab
           getServiceHistoryTabIndex={(tabIndex: number) => setValue(tabIndex)}
-          getCustomerName={(name) => setCustomerName(name)}
+          getUnitName={(name) => setUnitName(name)}
         />
       </TabsBody>
 
