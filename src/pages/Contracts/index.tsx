@@ -16,7 +16,6 @@ import {
   formatSearchParamsPageSize,
 } from 'utils/utils';
 import {useSearchParams} from 'react-router-dom';
-import {CustomPagination} from 'components/CustomPagination';
 import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
 import {costRangeConvertor as crConverter} from 'utils/contract-utils';
@@ -37,6 +36,19 @@ export const Contracts = () => {
     [],
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
+
+  const {data: {total: totalContract} = createEmptyResource<ContractView>(10)} =
+    useQueryContract(
+      {
+        order: Order.DESC,
+        orderBy: ContractOrderField.CREATED_TIME,
+        pageIndex: 0,
+        pageSize: 1,
+        query: '',
+        status: [],
+      },
+      {},
+    );
 
   const {
     data: contractResource = createEmptyResource<ContractView>(10),
@@ -85,21 +97,16 @@ export const Contracts = () => {
     setRows(makeRows(contractResource.data));
 
     setContractorFilterItems([...contractorFilterItems, ...options]);
-    if (!showFilter) {
-      setExpiryDate([]);
-      setContractor([]);
-      setCost([]);
-    }
   }, [contractResource, showFilter]);
 
   useEffect(() => {
     setPageCount(Math.ceil(contractResource.total / page.pageSize));
   }, [contractResource, page.pageSize]);
 
-  if (isFetched && !contractResource.total) {
+  if (isFetched && !totalContract) {
     return (
       <EmptySection
-        label="No contracts yet. Create a new one to view here"
+        label="No contracts have been created yet. Please click the button below to create one!"
         showActionBtn
         btnLabel="Add Contract"
         containerStyle={{
@@ -161,30 +168,22 @@ export const Contracts = () => {
         </Box>
       </Fade>
 
-      <>
-        <DataGridLayout
-          hideFooter
-          rows={rows}
-          columns={columns}
-          loading={isFetching}
-        />
-        {pageCount && page.pageSize < contractResource.total ? (
-          <CustomPagination
-            pageSize={page.pageSize}
-            pageIndex={page.pageIndex}
-            handlePageSizeChange={(newPageSize: number) =>
-              setQueryParams(
-                formatSearchParamsPageSize(newPageSize, queryParams),
-              )
-            }
-            handlePageChange={(newPage: number) =>
-              setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-            }
-            pageCount={pageCount}
-            totalRows={contractResource.total}
-          />
-        ) : null}
-      </>
+      <DataGridLayout
+        hideFooter={pageCount <= 1}
+        rows={rows}
+        columns={columns}
+        loading={isFetching}
+        pageSize={page.pageSize}
+        pageIndex={page.pageIndex}
+        handlePageSizeChange={(newPageSize: number) =>
+          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+        }
+        handlePageChange={(newPage: number) =>
+          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+        }
+        pageCount={pageCount}
+        totalRows={contractResource.total}
+      />
     </PageOverviewLayout>
   );
 };

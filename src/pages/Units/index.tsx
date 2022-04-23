@@ -112,7 +112,7 @@ export const MyUnits = () => {
   if (isFetched && !totalElevators) {
     return (
       <EmptySection
-        label="No Elevators yet. Create a new one to view here"
+        label="No elevators have been created yet. Please click the button below to create one!"
         showActionBtn
         btnLabel="Add Elevator"
         containerStyle={{
@@ -186,7 +186,7 @@ export const MyUnits = () => {
               />
             ))}
           </Box>
-          {pageCount ? (
+          {pageCount <= 1 ? (
             <CustomPagination
               pageSize={page.pageSize}
               pageIndex={page.pageIndex}

@@ -9,7 +9,6 @@ import {ServiceOrderType} from 'models/service-order';
 import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
 import {useInvoices} from 'hooks/reactQuery/useInvoice';
 import {PageOverviewLayout} from 'components/PageOverviewLayout';
-import {CustomPagination} from 'components/CustomPagination';
 import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
@@ -34,6 +33,18 @@ export const Invoices = () => {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
 
+  const {data: {total: totalInvoice} = createEmptyResource<InvoiceView>(10)} =
+    useInvoices(
+      {
+        pageIndex: 0,
+        pageSize: 1,
+        query: search,
+        status: [InvoiceStatus.PAID, InvoiceStatus.NOT_PAID],
+      },
+      {amount: [], serviceType: []},
+      {keepPreviousData: true},
+    );
+
   const {
     data: invoiceResource = createEmptyResource<InvoiceView>(10),
     isLoading,
@@ -49,33 +60,6 @@ export const Invoices = () => {
     {amount: amount[0], status, serviceType},
     {keepPreviousData: true},
   );
-
-  const amountRangeConvertor = (selectedItems: string[]) => {
-    const range: number[][] = [];
-    selectedItems.forEach((item) => {
-      switch (item) {
-        case 'Below 1000 EUR':
-          range.push([0, 1000]);
-          break;
-
-        case '1000 - 3000 EUR':
-          range.push([1000, 3000]);
-          break;
-
-        case '3000 - 5000 EUR':
-          range.push([3000, 5000]);
-          break;
-
-        case 'Above 5000 EUR':
-          range.push([5000, 99999]);
-          break;
-
-        default:
-          break;
-      }
-    });
-    setAmount(range);
-  };
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
@@ -105,10 +89,37 @@ export const Invoices = () => {
     setPageCount(Math.ceil(invoiceResource.total / page.pageSize));
   }, [invoiceResource, pageSize]);
 
-  if (isFetched && !invoiceResource.total) {
+  const amountRangeConvertor = (selectedItems: string[]) => {
+    const range: number[][] = [];
+    selectedItems.forEach((item) => {
+      switch (item) {
+        case 'Below 1000 EUR':
+          range.push([0, 1000]);
+          break;
+
+        case '1000 - 3000 EUR':
+          range.push([1000, 3000]);
+          break;
+
+        case '3000 - 5000 EUR':
+          range.push([3000, 5000]);
+          break;
+
+        case 'Above 5000 EUR':
+          range.push([5000, 99999]);
+          break;
+
+        default:
+          break;
+      }
+    });
+    setAmount(range);
+  };
+
+  if (isFetched && !totalInvoice) {
     return (
       <EmptySection
-        label="No invoices yet. Create a new one to view here"
+        label="No invoices have been created yet. Please click the button below to create one!"
         showActionBtn
         btnLabel="Add Invoice"
         containerStyle={{
@@ -196,30 +207,22 @@ export const Invoices = () => {
         </Box>
       </Fade>
 
-      <>
-        <DataGridLayout
-          rows={rows}
-          columns={columns}
-          loading={isFetching}
-          hideFooter
-        />
-        {pageCount ? (
-          <CustomPagination
-            pageSize={page.pageSize}
-            pageIndex={page.pageIndex}
-            handlePageSizeChange={(newPageSize: number) =>
-              setQueryParams(
-                formatSearchParamsPageSize(newPageSize, queryParams),
-              )
-            }
-            handlePageChange={(newPage: number) =>
-              setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-            }
-            pageCount={pageCount}
-            totalRows={invoiceResource?.total}
-          />
-        ) : null}
-      </>
+      <DataGridLayout
+        rows={rows}
+        columns={columns}
+        loading={isFetching}
+        hideFooter={pageCount <= 1}
+        pageSize={page.pageSize}
+        pageIndex={page.pageIndex}
+        handlePageSizeChange={(newPageSize: number) =>
+          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+        }
+        handlePageChange={(newPage: number) =>
+          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+        }
+        pageCount={pageCount}
+        totalRows={invoiceResource?.total}
+      />
     </PageOverviewLayout>
   );
 };

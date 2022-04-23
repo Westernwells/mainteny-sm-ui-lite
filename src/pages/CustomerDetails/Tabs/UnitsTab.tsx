@@ -10,8 +10,8 @@ import {FilterFields} from 'components/FilterFields';
 
 import {PageOverviewLayout} from 'components/PageOverviewLayout';
 import {Widget} from 'components/Widget';
-import {CustomPagination} from 'components/CustomPagination';
 import {GridRowsProp} from '@mui/x-data-grid';
+import {EmptySection} from 'components/EmptySection';
 import {ElevatorView} from 'models/elevator';
 import {useQueryCustomerElevator} from 'hooks/reactQuery/useElevator';
 import {columns, makeRows} from './CustomerUnitDataGrid';
@@ -27,9 +27,20 @@ export const UnitsTab = ({customerId}: Props) => {
   const [status, setStatus] = useState<string[]>([]);
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
+  const {data: {total: totalUnits} = createEmptyResource<ElevatorView>(10)} =
+    useQueryCustomerElevator(
+      {
+        query: '',
+        pageIndex: 0,
+        pageSize: 1,
+      },
+      null,
+      customerId,
+    );
   const {
     data: elevatorResource = createEmptyResource<ElevatorView>(10),
     isLoading,
+    isFetched,
   } = useQueryCustomerElevator(
     {
       query: search,
@@ -51,6 +62,20 @@ export const UnitsTab = ({customerId}: Props) => {
       setStatus([]);
     }
   }, [elevatorResource, showFilter]);
+
+  if (isFetched && !totalUnits) {
+    return (
+      <EmptySection
+        label="No units yet. Create a new one to view here"
+        showActionBtn
+        btnLabel="Add Contract"
+        containerStyle={{
+          height: '100%',
+          mb: '10em',
+        }}
+      />
+    );
+  }
 
   return (
     <PageOverviewLayout
@@ -77,27 +102,22 @@ export const UnitsTab = ({customerId}: Props) => {
       {isLoading ? (
         <Progress />
       ) : (
-        <>
-          <DataGridLayout
-            hideFooter
-            rows={rows}
-            columns={columns}
-            height="60vh"
-          />
-          {pageCount && page.pageSize < elevatorResource.total ? (
-            <CustomPagination
-              pageSize={page.pageSize}
-              handlePageSizeChange={(newPageSize: number) =>
-                setPage({...page, pageSize: newPageSize})
-              }
-              handlePageChange={(newPage: number) => {
-                setPage({...page, pageIndex: newPage - 1});
-              }}
-              pageCount={pageCount}
-              totalRows={elevatorResource.total}
-            />
-          ) : null}
-        </>
+        <DataGridLayout
+          fullHeight={false}
+          height={400}
+          hideFooter={pageCount <= 1}
+          rows={rows}
+          columns={columns}
+          pageSize={page.pageSize}
+          handlePageSizeChange={(newPageSize: number) =>
+            setPage({...page, pageSize: newPageSize})
+          }
+          handlePageChange={(newPage: number) => {
+            setPage({...page, pageIndex: newPage - 1});
+          }}
+          pageCount={pageCount}
+          totalRows={elevatorResource.total}
+        />
       )}
     </PageOverviewLayout>
   );

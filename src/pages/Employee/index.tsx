@@ -27,7 +27,6 @@ import {Button} from '@mui/material';
 import {EmptySection} from 'components/EmptySection';
 import {columns, makeRows} from './EmployeeDataGridProps';
 import {AddEmployee} from './AddEmployee';
-import {CustomPagination} from '../../components/CustomPagination';
 
 const pageSize = 25;
 
@@ -42,6 +41,17 @@ export const Employees = () => {
   const [employeeResource, setEmployeeResource] = useState(
     createEmptyResource<EmployeesView>(pageSize),
   );
+  const {
+    data: {total: totalEmployee} = createEmptyResource<UserAccountView>(
+      pageSize,
+    ),
+  } = useQueryUserAccounts({
+    pageIndex: 0,
+    pageSize: 1,
+    query: '',
+    roles: [Role.SERVICE_MANAGER, Role.TECHNICIAN],
+  });
+
   const {
     data: userAccountResource = createEmptyResource<UserAccountView>(pageSize),
   } = useQueryUserAccounts(
@@ -135,10 +145,10 @@ export const Employees = () => {
     setPageCount(Math.ceil(userAccountResource.total / page.pageSize));
   }, [userAccountResource, page.pageSize]);
 
-  if (isFetched && !userAccountResource.total) {
+  if (isFetched && !totalEmployee) {
     return (
       <EmptySection
-        label="No employees yet. Create a new one to view here"
+        label="No employees have been created yet. Please click the button below to create one!"
         showActionBtn
         btnLabel="Add Employee"
         containerStyle={{
@@ -168,31 +178,22 @@ export const Employees = () => {
           hideFilter
         />
       }>
-      <>
-        {' '}
-        <DataGridLayout
-          rows={rows}
-          columns={columns}
-          loading={isFetching}
-          hideFooter
-        />
-        {!!pageCount && (
-          <CustomPagination
-            pageSize={page.pageSize}
-            pageIndex={page.pageIndex}
-            handlePageSizeChange={(newPageSize: number) =>
-              setQueryParams(
-                formatSearchParamsPageSize(newPageSize, queryParams),
-              )
-            }
-            handlePageChange={(newPage: number) =>
-              setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-            }
-            pageCount={pageCount}
-            totalRows={userAccountResource.total}
-          />
-        )}
-      </>
+      <DataGridLayout
+        rows={rows}
+        columns={columns}
+        loading={isFetching}
+        hideFooter={pageCount <= 1}
+        pageSize={page.pageSize}
+        pageIndex={page.pageIndex}
+        handlePageSizeChange={(newPageSize: number) =>
+          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+        }
+        handlePageChange={(newPage: number) =>
+          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+        }
+        pageCount={pageCount}
+        totalRows={userAccountResource.total}
+      />
 
       <SideDrawer
         open={isDrawerOpen}

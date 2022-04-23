@@ -42,7 +42,8 @@ export const OverviewContractsCard = ({
   return (
     <Box>
       <DataGridLayout
-        height="30vh"
+        fullHeight={false}
+        height={230}
         hideFooter
         rows={rows}
         columns={columns}
