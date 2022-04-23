@@ -186,7 +186,7 @@ export const MyUnits = () => {
               />
             ))}
           </Box>
-          {pageCount <= 1 ? (
+          {pageCount > 1 ? (
             <CustomPagination
               pageSize={page.pageSize}
               pageIndex={page.pageIndex}
