@@ -198,14 +198,16 @@ export const Schedule = ({
     <Card
       sx={{
         border: 'none',
-        overflowY: 'scroll',
         maxHeight: '76vh',
       }}>
       <Box
         ref={elementRef}
         sx={{
+          overflow: 'scroll',
+          height: '76vh',
           '&::-webkit-scrollbar': {
             height: '0.5em',
+            width: '0.5em',
           },
           '&::-webkit-scrollbar-track': {
             background: '#f1f1f1',
@@ -215,10 +217,9 @@ export const Schedule = ({
           '&::-webkit-scrollbar-thumb': {
             background: '#888',
             borderRadius: '100vw',
-            width: '2em',
           },
         }}>
-        <CardContent sx={{padding: 0, overflowX: 'scroll', height: '76vh'}}>
+        <CardContent sx={{padding: 0}}>
           <ScheduleContainer>
             <ScheduleHeader>
               <ScheduleRow>
