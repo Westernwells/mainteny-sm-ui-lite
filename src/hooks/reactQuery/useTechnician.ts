@@ -1,6 +1,7 @@
 import {endOfDay, startOfDay} from 'date-fns';
 import {Resource, RestError} from 'models/misc';
 import {
+  QueryTechniciansParams,
   TechnicianEventPair,
   TechnicianEventView,
   TechniciansEventsParams,
@@ -118,3 +119,31 @@ export const useGetTechnician = (username: string | null) =>
   useQuery([qks.getTechnician, username], () => getTechnician(username!), {
     enabled: !!username,
   });
+
+export const queryServiceCompanyTechnicians = async (
+  serviceCompanyId: string,
+  params: QueryTechniciansParams,
+) => {
+  const response = await axiosClient.get<Resource<TechnicianView>>(
+    `/api/serviceCompanies/${serviceCompanyId}/technicians`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useQueryServiceCompanyTechnicians = (
+  params: QueryTechniciansParams,
+) => {
+  const {user} = useUserSession();
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+  return useQuery(
+    [qks.queryServiceCompanyTechnicians, serviceCompanyId],
+    () => queryServiceCompanyTechnicians(serviceCompanyId!, params),
+    {
+      enabled: !!user,
+    },
+  );
+};

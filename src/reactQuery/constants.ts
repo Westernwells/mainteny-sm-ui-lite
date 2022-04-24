@@ -4,7 +4,6 @@ export const queryKeys = {
   contractsByElevatorMap: 'contractsByElevatorMap',
   contractDetails: 'contractDetails',
   propertyManager: 'propertyManager',
-  // TODO: Added service manager
   serviceManager: 'serviceManager',
   fetchAllElevators: 'fetchAllElevators',
   fetchElevatorMaintenanceHistory: 'fetchElevatorMaintenanceHistory',
@@ -30,4 +29,5 @@ export const queryKeys = {
   queryUnitsByCustomer: 'queryUnitsByCustomer',
   getTechnician: 'getTechnician',
   getUserAccount: 'getUserAccount',
+  queryServiceCompanyTechnicians: 'queryServiceCompanyTechnicians',
 };

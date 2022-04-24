@@ -319,6 +319,6 @@ export const useQueryServiceOrderSchedules = (
         ...params,
         serviceCompanyId: user!.userAccount.serviceCompany.id,
       }),
-    {enabled: !!user && !!params.technicianIds?.length, ...options},
+    {enabled: !!user, ...options},
   );
 };

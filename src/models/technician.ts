@@ -93,6 +93,12 @@ export interface TechnicianAdditionalInfo {
   leftVacationDays: number;
 }
 
+export interface QueryTechniciansParams {
+  pageIndex: number;
+  pageSize: number;
+  query: string;
+}
+
 export interface TechniciansEventsParams {
   pageIndex: number;
   pageSize: number;

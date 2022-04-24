@@ -37,6 +37,9 @@ interface Props {
     calcPosition: (startDateTime: string) => string,
   ) => void;
   getWeekPair?: (weekPair: WeekPair) => void;
+  labelType?: 'date' | 'people';
+  headerLabelTitle?: string;
+  bodyLabel?: string[];
 }
 
 const gridWidth = 120;
@@ -46,6 +49,9 @@ export const Schedule = ({
   getWeekPair,
   scheduleItems,
   renderCellItem,
+  labelType = 'date',
+  headerLabelTitle = 'Technicians',
+  bodyLabel = [],
 }: Props) => {
   const [tableHeader, setTableHeader] = useState<string[]>([]);
   const elementRef = useRef<HTMLInputElement | undefined>();
@@ -62,18 +68,27 @@ export const Schedule = ({
   );
 
   useEffect(() => {
-    const weekBegins = formatDate(weekPair.startOfWeekDay, 'dd MMM');
-    const weekEnds = formatDate(weekPair.endOfWeekDay, 'dd MMM');
-    setTableHeader([`${weekBegins} - ${weekEnds}`, ...twentyFourHourTime]);
-  }, [weekInterval]);
+    if (labelType === 'date') {
+      const weekBegins = formatDate(weekPair.startOfWeekDay, 'dd MMM');
+      const weekEnds = formatDate(weekPair.endOfWeekDay, 'dd MMM');
+      setTableHeader([`${weekBegins} - ${weekEnds}`, ...twentyFourHourTime]);
+    } else {
+      setTableHeader([headerLabelTitle, ...twentyFourHourTime]);
+    }
+  }, [weekInterval, headerLabelTitle]);
 
   useEffect(() => {
     if (tableHeader.length) {
-      const result = weekInterval.map((item) => {
-        const key = formatDate(item, dateFormat);
-        return {[key!]: tableHeader};
-      });
-      setBodyRow(result);
+      if (labelType === 'date') {
+        const result = weekInterval.map((item) => {
+          const key = formatDate(item, dateFormat);
+          return {[key!]: tableHeader};
+        });
+        setBodyRow(result);
+      } else {
+        const result = bodyLabel?.map((label) => ({[label]: tableHeader}));
+        setBodyRow(result);
+      }
     }
   }, [tableHeader]);
 
@@ -167,20 +182,16 @@ export const Schedule = ({
   );
 
   const renderScheduleLabel = (item: string) => (
-    <>
-      <Typography component="div" variant="subtitle2">
-        {item}
+    <Typography component="div" variant="subtitle2">
+      {item} <br />
+      <Typography variant="caption" sx={{color: grey[600]}}>
+        {labelType === 'date'
+          ? formatDate(new Date(item), 'EEEE')
+          : scheduleItems[item]
+          ? `${scheduleItems[item].length} Orders`
+          : '0 Order'}
       </Typography>
-      {console.log(item, '~~~~!!!!')}
-      <Typography
-        component="div"
-        variant="caption"
-        mt="-0.5em"
-        ml="0.2em"
-        sx={{color: grey[600]}}>
-        {formatDate(new Date(item), 'EEEE')}
-      </Typography>
-    </>
+    </Typography>
   );
 
   return (
@@ -189,15 +200,10 @@ export const Schedule = ({
         border: 'none',
         overflowY: 'scroll',
         maxHeight: '76vh',
-        '&::-webkit-scrollbar': {
-          width: 0,
-          background: 'transparent',
-        },
       }}>
       <Box
         ref={elementRef}
         sx={{
-          overflowX: 'scroll',
           '&::-webkit-scrollbar': {
             height: '0.5em',
           },
@@ -212,7 +218,7 @@ export const Schedule = ({
             width: '2em',
           },
         }}>
-        <CardContent sx={{padding: 0}}>
+        <CardContent sx={{padding: 0, overflowX: 'scroll', height: '76vh'}}>
           <ScheduleContainer>
             <ScheduleHeader>
               <ScheduleRow>

@@ -76,7 +76,7 @@ export const ServiceHistoryTab = () => {
       ServiceOrderStatus.COMPLETED,
       ServiceOrderStatus.IN_PROGRESS,
     ],
-  }); // TODO: Use Infinite scroll
+  });
   const {data: serviceOrderReport = [], isLoading: serviceOrderReportLoading} =
     useServiceOrderReport({
       serviceOrderId: selectedOrder?.id || '',

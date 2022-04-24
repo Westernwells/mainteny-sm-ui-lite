@@ -27,14 +27,16 @@ export const ScheduleHeaderCell = ({
         height: '60px',
         width: cellWidth,
         color: grey[500], // TODO: add to theme
+        position: 'sticky',
+        top: 0,
+        background: '#fff',
+        zIndex: 2,
         ':first-child': {
-          position: 'sticky',
           left: 0,
-          zIndex: 2,
+          zIndex: 3,
           pl: '1em',
           minWidth: '11.5rem',
           maxWidth: '11.5rem',
-          background: '#fff',
           color: theme.palette.primary.main,
         },
       }}
