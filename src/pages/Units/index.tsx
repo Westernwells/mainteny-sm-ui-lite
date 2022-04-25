@@ -33,6 +33,7 @@ export const MyUnits = () => {
   }).current;
   const [queryParams, setQueryParams] = useSearchParams();
   const [search, setSearch] = useState('');
+  // const [mapSearch, setMapSearch] = useState('');
   const [page, setPage] = useState(pageInfo);
   const [pageCount, setPageCount] = useState(0);
   const [showFilter, setShowFilter] = useState(false);
@@ -130,6 +131,8 @@ export const MyUnits = () => {
   const closeMapView = () => {
     setShowMapview(false);
   };
+
+  console.log(isLoading, '>>>>>><<<<');
 
   if (isLoading) {
     return <Progress />;

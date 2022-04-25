@@ -12,12 +12,16 @@ import {useServiceOrderStatusColor} from 'hooks/useServiceOrderStatusColor';
 import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicator';
 
 import {OrderDetails} from 'components/OrderDetails';
-import {addDays, endOfDay, startOfDay} from 'date-fns';
+import {endOfDay, startOfDay} from 'date-fns';
 import {TechnicianView} from 'models/technician';
 import {useQueryServiceCompanyTechnicians} from 'hooks/reactQuery/useTechnician';
 import {Progress} from 'components/Progress';
 
-export const ServiceOrderScheduleTab = () => {
+interface Props {
+  searchQuery: string;
+}
+
+export const ServiceOrderScheduleTab = ({searchQuery}: Props) => {
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();
   const [orders, setOrders] = useState<{[key: string]: ServiceOrderView[]}>({});
   const [page] = useState(makePage(0, 500));
@@ -27,14 +31,14 @@ export const ServiceOrderScheduleTab = () => {
   } = useQueryServiceCompanyTechnicians({
     pageIndex: 0,
     pageSize: 500,
-    query: '',
+    query: searchQuery,
   });
   const {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(10),
     isLoading,
   } = useQueryServiceOrderSchedules({
-    end: toRestDateTime(addDays(endOfDay(new Date()), 1)),
-    start: toRestDateTime(addDays(startOfDay(new Date()), 1)),
+    end: toRestDateTime(endOfDay(new Date())),
+    start: toRestDateTime(startOfDay(new Date())),
     pageIndex: page.pageIndex,
     pageSize: page.pageSize,
     query: '',

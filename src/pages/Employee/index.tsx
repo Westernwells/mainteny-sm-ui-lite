@@ -174,6 +174,7 @@ export const Employees = () => {
           btnOnClick={() => setIsDrawerOpen(true)}
           showNewBtn
           hideFilter
+          hideViewOption
         />
       }>
       <DataGridLayout

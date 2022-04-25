@@ -206,8 +206,8 @@ export const Schedule = ({
           overflow: 'scroll',
           height: '76vh',
           '&::-webkit-scrollbar': {
-            height: '0.5em',
-            width: '0.5em',
+            height: '0.2em',
+            width: '0.2em',
           },
           '&::-webkit-scrollbar-track': {
             background: '#f1f1f1',
@@ -217,6 +217,7 @@ export const Schedule = ({
           '&::-webkit-scrollbar-thumb': {
             background: '#888',
             borderRadius: '100vw',
+            height: '1em',
           },
         }}>
         <CardContent sx={{padding: 0}}>

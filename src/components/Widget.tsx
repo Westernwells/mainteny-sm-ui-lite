@@ -26,6 +26,7 @@ interface Props {
   showNewBtn?: boolean;
   btnLabel?: string;
   btnOnClick?: () => void;
+  containerStyles?: {[key: string]: string | number};
 }
 
 export const Widget = ({
@@ -41,88 +42,87 @@ export const Widget = ({
   btnLabel = '',
   getSearchValue,
   btnOnClick,
+  containerStyles,
 }: Props) => {
   const theme = useTheme();
   const [view, setView] = useState('list');
 
   return (
-    <Box>
-      <Box display="flex">
-        {!hideFilter ? (
-          <Box display="flex" mr="1em" my="0.3em">
-            <Button
-              onClick={() => setShowFilter(!showFilter)}
-              disableRipple
-              size={theme.breakpoints.down('md') ? 'small' : 'large'}
-              sx={{
-                backgroundColor: showFilter
-                  ? theme.palette.action.selected
-                  : theme.palette.primary.outlinedHoverBg,
-                border: 'none',
-                py: 1,
-                height: 40,
-                ':hover': {
-                  border: 'none',
-                },
-              }}
-              variant="outlined"
-              startIcon={<FilterListIcon />}>
-              <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
-                Filter
-              </Typography>
-            </Button>
-          </Box>
-        ) : null}
-
-        {!hideSearchInput ? (
-          <Box mr={!hideViewOption ? '1em' : 0}>
-            <Searchnput
-              placeholder={searchPlaceholder}
-              onValueChanged={(value: string) =>
-                getSearchValue && getSearchValue(value)
-              }
-            />
-          </Box>
-        ) : null}
-        {!hideViewOption ? (
-          <ToggleButtonGroup color="secondary" value={view} exclusive>
-            <ToggleButton
-              value="list"
-              aria-label="list"
-              onClick={() => {
-                setView('list');
-                if (closeMapView) {
-                  closeMapView();
-                }
-              }}>
-              <ViewListIcon />
-            </ToggleButton>
-            <ToggleButton
-              value="module"
-              aria-label="module"
-              onClick={() => {
-                setView('module');
-                if (openMapView) {
-                  openMapView();
-                }
-              }}>
-              <FormatAlignLeftIcon />
-            </ToggleButton>
-          </ToggleButtonGroup>
-        ) : null}
-
-        {showNewBtn ? (
+    <Box display="flex" sx={{...containerStyles}}>
+      {!hideFilter ? (
+        <Box display="flex" mr="1em" my="0.3em">
           <Button
-            variant="contained"
-            color="primary"
+            onClick={() => setShowFilter(!showFilter)}
+            disableRipple
             size={theme.breakpoints.down('md') ? 'small' : 'large'}
-            startIcon={<AddIcon />}
-            sx={{ml: '1em'}}
-            onClick={() => (btnOnClick ? btnOnClick() : () => {})}>
-            {btnLabel}
+            sx={{
+              backgroundColor: showFilter
+                ? theme.palette.action.selected
+                : theme.palette.primary.outlinedHoverBg,
+              border: 'none',
+              py: 1,
+              height: 40,
+              ':hover': {
+                border: 'none',
+              },
+            }}
+            variant="outlined"
+            startIcon={<FilterListIcon />}>
+            <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
+              Filter
+            </Typography>
           </Button>
-        ) : null}
-      </Box>
+        </Box>
+      ) : null}
+
+      {!hideSearchInput ? (
+        <Box mr={!hideViewOption ? '1em' : 0}>
+          <Searchnput
+            placeholder={searchPlaceholder}
+            onValueChanged={(value: string) =>
+              getSearchValue && getSearchValue(value)
+            }
+          />
+        </Box>
+      ) : null}
+      {!hideViewOption ? (
+        <ToggleButtonGroup color="secondary" value={view} exclusive>
+          <ToggleButton
+            value="list"
+            aria-label="list"
+            onClick={() => {
+              setView('list');
+              if (closeMapView) {
+                closeMapView();
+              }
+            }}>
+            <ViewListIcon />
+          </ToggleButton>
+          <ToggleButton
+            value="module"
+            aria-label="module"
+            onClick={() => {
+              setView('module');
+              if (openMapView) {
+                openMapView();
+              }
+            }}>
+            <FormatAlignLeftIcon />
+          </ToggleButton>
+        </ToggleButtonGroup>
+      ) : null}
+
+      {showNewBtn ? (
+        <Button
+          variant="contained"
+          color="primary"
+          size={theme.breakpoints.down('md') ? 'small' : 'large'}
+          startIcon={<AddIcon />}
+          sx={{ml: '1em'}}
+          onClick={() => (btnOnClick ? btnOnClick() : () => {})}>
+          {btnLabel}
+        </Button>
+      ) : null}
     </Box>
   );
 };

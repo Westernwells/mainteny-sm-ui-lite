@@ -95,6 +95,7 @@ export const Quotations = () => {
           getSearchValue={(val: string) => setSearch(val)}
           setShowFilter={setShowFilter}
           showFilter={showFilter}
+          hideViewOption
         />
       }>
       <Fade in={showFilter} unmountOnExit>
