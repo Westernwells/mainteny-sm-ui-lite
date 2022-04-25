@@ -3,7 +3,6 @@ import Box from '@mui/material/Box';
 import {ElevatorView} from 'models/elevator';
 import {Widget} from 'components/Widget';
 import * as _ from 'lodash';
-import Fade from '@mui/material/Fade';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
@@ -153,24 +152,20 @@ export const MyUnits = () => {
           showFilter={showFilter}
         />
       }>
-      <Fade in={showFilter} unmountOnExit>
-        <Box>
-          <FilterFields setShowFilter={setShowFilter}>
-            <MultipleSelectCheckmarks
-              label="Status"
-              options={['RUNNING', 'STOPPED']}
-              getSelectedValue={(item) => setStatus(item)}
-            />
+      <FilterFields showFilter={showFilter} setShowFilter={setShowFilter}>
+        <MultipleSelectCheckmarks
+          label="Status"
+          options={['RUNNING', 'STOPPED']}
+          getSelectedValue={(item) => setStatus(item)}
+        />
 
-            <MultipleSelectCheckmarks
-              label="Upcoming visits"
-              options={['This week', 'Next week', 'Next month']}
-              getSelectedValue={() => {}}
-              multiple={false}
-            />
-          </FilterFields>
-        </Box>
-      </Fade>
+        <MultipleSelectCheckmarks
+          label="Upcoming visits"
+          options={['This week', 'Next week', 'Next month']}
+          getSelectedValue={() => {}}
+          multiple={false}
+        />
+      </FilterFields>
 
       {!showMapview ? (
         <>

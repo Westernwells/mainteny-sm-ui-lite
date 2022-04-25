@@ -167,16 +167,20 @@ export const Schedule = ({
   const scheduleControls = (item: string) => (
     <Box>
       <Box sx={{display: 'flex'}}>
-        <Box onClick={() => prevMonth()} sx={{cursor: 'pointer'}}>
-          <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
-        </Box>
+        {labelType === 'date' ? (
+          <Box onClick={() => prevMonth()} sx={{cursor: 'pointer'}}>
+            <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
+          </Box>
+        ) : null}
 
         <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
           {item}
         </Typography>
-        <Box onClick={() => nextMonth()} sx={{cursor: 'pointer'}}>
-          <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
-        </Box>
+        {labelType === 'date' ? (
+          <Box onClick={() => nextMonth()} sx={{cursor: 'pointer'}}>
+            <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
+          </Box>
+        ) : null}
       </Box>
     </Box>
   );
@@ -188,7 +192,9 @@ export const Schedule = ({
         {labelType === 'date'
           ? formatDate(new Date(item), 'EEEE')
           : scheduleItems[item]
-          ? `${scheduleItems[item].length} Orders`
+          ? `${scheduleItems[item].length} ${
+              scheduleItems[item].length < 2 ? ' Order' : ' Orders'
+            }`
           : '0 Order'}
       </Typography>
     </Typography>

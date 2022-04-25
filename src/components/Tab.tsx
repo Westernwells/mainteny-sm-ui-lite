@@ -19,6 +19,7 @@ interface Props {
   currentIndex?: number;
   hideBackIcon?: boolean;
   renderWidget?: JSX.Element;
+  pageTitle?: string;
 }
 
 const a11yProps = (index: number) => ({
@@ -31,6 +32,7 @@ export const Tabs = ({
   tabItems,
   hideBackIcon,
   renderWidget,
+  pageTitle,
   onChange = () => {},
   backBtnLabel = '',
   currentIndex = 0,
@@ -46,6 +48,9 @@ export const Tabs = ({
         sx={{
           display: 'flex',
         }}>
+        <Typography variant="h5" mt="0.5em" mr="3em">
+          {pageTitle || ''}
+        </Typography>
         {!hideBackIcon ? (
           <BackAction
             label={backBtnLabel}
@@ -55,6 +60,8 @@ export const Tabs = ({
 
         <MuiTabs
           sx={{
+            flexGrow: 1,
+            // border: '1px solid red',
             '& .MuiTabs-indicator': {
               display: 'flex',
               justifyContent: 'center',
@@ -123,7 +130,7 @@ export const Tabs = ({
         <Box
           sx={{
             display: 'flex',
-            flexGrow: 1,
+
             justifyContent: 'flex-end',
           }}>
           {renderWidget || null}

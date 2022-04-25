@@ -8,9 +8,6 @@ import {useEffect, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {Progress} from 'components/Progress';
-
-import Box from '@mui/material/Box';
-import Fade from '@mui/material/Fade';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
 
@@ -131,41 +128,38 @@ export const ContractsTab = ({customerId}: Props) => {
           hideViewOption
         />
       }>
-      <Fade in={showFilter} unmountOnExit>
-        <Box>
-          <FilterFields setShowFilter={setShowFilter}>
-            <MultipleSelectCheckmarks
-              label="Expiry Date"
-              options={[
-                'Last 14 days', // TODO: Create an enum to handle this
-                'Today',
-                'Next 7 days',
-                'Next 14 days',
-              ]}
-              getSelectedValue={(item) => setExpiryDate(item)}
-              multiple={false}
-            />
+      <FilterFields showFilter={showFilter} setShowFilter={setShowFilter}>
+        <MultipleSelectCheckmarks
+          label="Expiry Date"
+          options={[
+            'Last 14 days', // TODO: Create an enum to handle this
+            'Today',
+            'Next 7 days',
+            'Next 14 days',
+          ]}
+          getSelectedValue={(item) => setExpiryDate(item)}
+          multiple={false}
+        />
 
-            <MultipleSelectCheckmarks
-              label="Contractor"
-              options={contractorFilterItems}
-              getSelectedValue={(item) => setContractor(item)}
-            />
+        <MultipleSelectCheckmarks
+          label="Contractor"
+          options={contractorFilterItems}
+          getSelectedValue={(item) => setContractor(item)}
+        />
 
-            <MultipleSelectCheckmarks
-              label="Cost/year"
-              options={[
-                'Below 1000 €',
-                '1000 - 3000 €',
-                '3000 - 5000 €',
-                'Above 5000 €',
-              ]}
-              getSelectedValue={(item) => costRangeConvertor(item)}
-              multiple={false}
-            />
-          </FilterFields>
-        </Box>
-      </Fade>
+        <MultipleSelectCheckmarks
+          label="Cost/year"
+          options={[
+            'Below 1000 €',
+            '1000 - 3000 €',
+            '3000 - 5000 €',
+            'Above 5000 €',
+          ]}
+          getSelectedValue={(item) => costRangeConvertor(item)}
+          multiple={false}
+        />
+      </FilterFields>
+
       {isLoading ? (
         <Progress />
       ) : (

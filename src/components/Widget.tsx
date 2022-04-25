@@ -8,6 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ToggleButton from '@mui/material/ToggleButton';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
+import {capitalize} from 'lodash';
 
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
@@ -120,7 +121,7 @@ export const Widget = ({
           startIcon={<AddIcon />}
           sx={{ml: '1em'}}
           onClick={() => (btnOnClick ? btnOnClick() : () => {})}>
-          {btnLabel}
+          {capitalize(btnLabel)}
         </Button>
       ) : null}
     </Box>

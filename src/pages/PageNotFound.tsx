@@ -5,8 +5,6 @@ import {useNavigate} from 'react-router';
 
 export const PageNotFound = () => {
   const message1 = `Sorry, this page doesn't exist 😟`;
-  const message2 = `Kindly check the URL for any misspell
-  or click the button below to go to our home page 🤗`;
   const navigate = useNavigate();
   return (
     <Box
@@ -19,9 +17,6 @@ export const PageNotFound = () => {
       <TechnicianIllustration />
       <Typography variant="h4" textAlign="center" mt={6}>
         {message1}
-      </Typography>
-      <Typography variant="h4" textAlign="center">
-        {message2}
       </Typography>
       <Box mt={6}>
         <Button

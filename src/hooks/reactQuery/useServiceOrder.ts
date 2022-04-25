@@ -297,6 +297,7 @@ export function useFetchServiceOrdersByElevators(
 export const queryServiceOrderSchedules = async (
   params: ServiceOrderScheduleParams,
 ) => {
+  console.log(params, '~~~!!@@');
   const response = await axiosClient.get<Resource<ServiceOrderView>>(
     `/api/serviceOrders/schedule/orders`,
     {
@@ -312,6 +313,7 @@ export const useQueryServiceOrderSchedules = (
   options?: any,
 ) => {
   const {user} = useUserSession();
+
   return useQuery(
     [queryKeys.fetchServiceOrders, params, user!.userAccount.serviceCompany.id],
     () =>

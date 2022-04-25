@@ -6,24 +6,27 @@ import useTheme from '@mui/material/styles/useTheme';
 interface Props {
   children: ReactNode;
   containerStyle?: {[key: string]: string | number};
-  setShowFilter: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowFilter: (val: boolean) => void;
+  showFilter?: boolean;
 }
 
 export const FilterFields = ({
   children,
   containerStyle,
   setShowFilter,
+  showFilter = true,
 }: Props) => {
   const theme = useTheme();
-  return (
-    <Box display="flex" justifyContent="space-between" sx={{...containerStyle}}>
+
+  return showFilter ? (
+    <Box display="flex" sx={{...containerStyle}}>
       <Box display="flex">{children}</Box>
       <Typography
         onClick={() => setShowFilter(false)}
-        mt={2}
+        mt="0.5em"
         sx={{cursor: 'pointer', color: theme.palette.info.main}}>
         Clear all
       </Typography>
     </Box>
-  );
+  ) : null;
 };

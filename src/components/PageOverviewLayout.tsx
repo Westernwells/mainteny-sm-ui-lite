@@ -10,10 +10,10 @@ interface Props {
 
 export const PageOverviewLayout = ({children, renderWidget, label}: Props) => (
   <>
-    <Box display="flex" justifyContent="space-between">
-      <Box sx={{mb: 3}}>
-        <Typography variant="h4">{label}</Typography>
-      </Box>
+    <Box display="flex" justifyContent="space-between" mb="1em">
+      <Typography variant="h5" mt="0.3em">
+        {label}
+      </Typography>
       <Box>{renderWidget || null}</Box>
     </Box>
     {children}

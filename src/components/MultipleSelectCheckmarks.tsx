@@ -22,7 +22,7 @@ const MenuProps = {
 
 interface Props {
   options: string[];
-  getSelectedValue(item: string[]): any;
+  getSelectedValue?: (item: string[]) => void;
   label: string;
   multiple?: boolean;
 }
@@ -57,7 +57,7 @@ export const MultipleSelectCheckmarks = ({
   }, [selectedItems]);
   return (
     <Box mb={3}>
-      <FormControl sx={{m: 1, width: '13.75rem'}}>
+      <FormControl size="small" sx={{mr: '0.5em', width: '13.75rem'}}>
         <InputLabel id={label}>{label}</InputLabel>
         <Select
           id={label}
@@ -66,13 +66,12 @@ export const MultipleSelectCheckmarks = ({
           onChange={handleChange}
           input={<OutlinedInput sx={{background: '#fff'}} label={label} />}
           renderValue={() => selectedItems.join(',')}
-          MenuProps={MenuProps}
-          size="small">
+          MenuProps={MenuProps}>
           {!multiple ? (
             <MenuItem
               disableTouchRipple
               sx={{
-                height: '1em',
+                // height: '1em',
                 overflow: 'hidden',
                 backgroundColor: '#fff !important',
               }}

@@ -12,38 +12,59 @@ const tabItems = [
     icon: <CalendarTodayIcon />,
   },
   {
-    label: 'Units',
+    label: 'List',
     icon: <ListAltIcon />,
   },
 ];
 
 export const ServiceOrders = () => {
   const [tabValue, setTabValue] = useState(0);
-  const [search, setSearch] = useState('');
-  const [showFilter, setShowFilter] = useState(false);
+  const [scheduleQuery, setScheduleQuery] = useState('');
+  // const [showFilter, setShowFilter] = useState(false);
+  const [showScheduleFilter, setShowScheduleFilter] = useState(false);
+  // const [scheduleFilter, setScheduleFilter] = useState();
+
+  const renderScheduleWidget = () => (
+    <Widget
+      searchPlaceholder=""
+      getSearchValue={(val: string) => setScheduleQuery(val)}
+      setShowFilter={setShowScheduleFilter}
+      showFilter={showScheduleFilter}
+      btnLabel="New Order"
+      showNewBtn
+      hideViewOption
+    />
+  );
+
+  const renderListWidget = () => <div />;
+
+  const renderWidget = (tabIndex: number) => {
+    switch (tabIndex) {
+      case 0:
+        return renderScheduleWidget();
+      case 1:
+        return renderListWidget();
+      default:
+        return renderScheduleWidget();
+    }
+  };
 
   return (
     <Tabs
       hideBackIcon
       tabItems={tabItems}
       currentIndex={tabValue}
-      renderWidget={
-        <Widget
-          searchPlaceholder=""
-          getSearchValue={(val: string) => setSearch(val)}
-          setShowFilter={setShowFilter}
-          showFilter={showFilter}
-          btnLabel="New Order"
-          showNewBtn
-          hideViewOption
-        />
-      }
+      pageTitle="Service Orders"
+      renderWidget={renderWidget(tabValue)}
       onChange={(index) => {
         setTabValue(index);
-        setSearch('');
       }}>
       <TabsBody value={tabValue} index={0}>
-        <ServiceOrderScheduleTab searchQuery={search} />
+        <ServiceOrderScheduleTab
+          searchQuery={scheduleQuery}
+          setShowFilter={setShowScheduleFilter}
+          showFilter={showScheduleFilter}
+        />
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
         {null}

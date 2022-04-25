@@ -4,7 +4,11 @@ import {useRef} from 'react';
 import {removeFromList} from 'utils/utils';
 import {ServiceOrderStatusText} from './ServiceOrderStatusText';
 
-export const ServiceOrderStatusIndicator = () => {
+interface Props {
+  containerStyles?: {[key: string]: string | number};
+}
+
+export const ServiceOrderStatusIndicator = ({containerStyles}: Props) => {
   const statuses = useRef(
     removeFromList(
       ['ALL', 'INIT', 'READY_TO_SCHEDULE', 'SCHEDULING'],
@@ -12,7 +16,11 @@ export const ServiceOrderStatusIndicator = () => {
     ),
   ).current;
   return (
-    <Box display="flex" mb="0.8em" justifyContent="flex-end">
+    <Box
+      display="flex"
+      mb="0.8em"
+      justifyContent="flex-end"
+      sx={{...containerStyles}}>
       {statuses.map((status: ServiceOrderStatus, index: number) => (
         <ServiceOrderStatusText
           key={index}

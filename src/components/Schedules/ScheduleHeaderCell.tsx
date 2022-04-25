@@ -31,7 +31,7 @@ export const ScheduleHeaderCell = ({
         top: 0,
         background: '#fff',
         zIndex: 2,
-        ':first-child': {
+        ':first-of-type': {
           left: 0,
           zIndex: 3,
           pl: '1em',
