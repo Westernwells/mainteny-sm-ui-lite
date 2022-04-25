@@ -13,9 +13,11 @@ Service Manager also known as Mainteny Manager is the unified application made f
 
 ## Continuous Delivery
 
-Staging: [staging.mainteny.com/sm-lite-test](https://staging.mainteny.com/sm-test/)
+Developer Testing: [staging.mainteny.com/sm-lite-test](https://staging.mainteny.com/sm-lite-test)
 
-Production: [staging.mainteny.com/sm-lite](https://staging.mainteny.com/sm/)
+Staging: [staging.mainteny.com/sm-lite](https://staging.mainteny.com/sm-lite/)
+
+Production: [app.mainteny.com/sm-lite](https://app.mainteny.com/sm/)
 
 ## Installation
 
