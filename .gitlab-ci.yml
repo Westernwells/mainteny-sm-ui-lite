@@ -139,7 +139,8 @@ build-prod-image:
         ENV: prod
     - when: never
 
-deploy-stage:
+# To Do: Remove this stage
+deploy-development:
   <<: *deploy-template
   dependencies:
     - build-stage-image
@@ -153,6 +154,20 @@ deploy-stage:
       when: on_success
     - when: never
 
+deploy-stage:
+  <<: *deploy-template
+  dependencies:
+    - build-stage-image
+  rules:
+    - if: "$CI_COMMIT_REF_NAME == 'main'"
+      variables:
+        ENV: stage
+        STACK: stage
+        IMAGE_ENV: stage
+        CACHE_PATH: /sm-lite*
+      when: on_success
+    - when: never
+
 deploy-production:
   <<: *deploy-template
   dependencies:
@@ -160,9 +175,9 @@ deploy-production:
   rules:
     - if: "$CI_COMMIT_REF_NAME == 'main'"
       variables:
-        ENV: stage
-        STACK: stage
+        ENV: prod
+        STACK: prod
         IMAGE_ENV: prod
-        CACHE_PATH: /sm-lite*
+        CACHE_PATH: /sm*
       when: manual
     - when: never
