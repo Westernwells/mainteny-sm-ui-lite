@@ -1,5 +1,5 @@
 import {ReactElement} from 'react';
-import Box from '@mui/material/Box';
+import Box, {BoxProps} from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {useNavigate} from 'react-router-dom';
 import Button from '@mui/material/Button';
@@ -10,7 +10,7 @@ import {ElevatorStatus, ElevatorView} from '../models/elevator';
 import {formatDate} from '../utils/datetime';
 import {StatusIndicator} from './StatusIndicator';
 
-interface Props {
+interface Props extends BoxProps {
   elevator?: ElevatorView;
   lat: number;
   lng: number;
@@ -19,24 +19,26 @@ interface Props {
 
 export const LocationPin = ({
   elevator: elevatorItem,
-  lat,
-  lng,
+  lat, // eslint-disable-line
+  lng /* eslint-disable-line */, //we had to disable this rule, we do not need this props but react google maps require us to pass it
   children,
 }: Props) => {
-  console.log(`lat = ${lat}, lng = ${lng}`);
   const theme = useTheme();
   const navigate = useNavigate();
   const renderTooltipDetail = (elevator: ElevatorView) => (
     <Box
+      component="div"
       display="flex"
       flexDirection="column"
       style={{color: 'black'}}
       padding={1}>
-      <Box display="flex">
-        <Box>
+      <Box display="flex" justifyContent="space-between">
+        <Box sx={{flexGrow: 1}}>
           <Typography variant="caption" mt="1em">
             Company: <br />{' '}
-            <Typography color="text.secondary">
+            <Typography
+              color="text.secondary"
+              sx={{whiteSpace: 'wrap', mr: '0.5em'}}>
               {elevator.propertyOwner.name}
             </Typography>
           </Typography>
@@ -57,12 +59,12 @@ export const LocationPin = ({
         </Box>
       </Box>
       <Box display="flex" justifyContent="space-between" mt="1em">
-        <Box>
+        <Box sx={{flexGrow: 1}}>
           <Typography variant="caption">
             Elevator Address: <br />
             <Typography
               color="text.secondary"
-              sx={{whiteSpace: 'wrap', width: '98%', display: 'inline-block'}}>
+              sx={{whiteSpace: 'wrap', mr: '0.5em'}}>
               {elevator.address.fullName}
             </Typography>
           </Typography>
@@ -75,7 +77,7 @@ export const LocationPin = ({
         </Box>
       </Box>
       <Box display="flex" justifyContent="space-between" mt="1em">
-        <Box>
+        <Box sx={{flexGrow: 1}}>
           <Typography variant="caption">
             Last Visit: <br />{' '}
             <Typography color="text.secondary">
