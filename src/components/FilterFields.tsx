@@ -8,12 +8,14 @@ interface Props {
   containerStyle?: {[key: string]: string | number};
   setShowFilter: (val: boolean) => void;
   showFilter?: boolean;
+  hideClear?: boolean;
 }
 
 export const FilterFields = ({
   children,
   containerStyle,
   setShowFilter,
+  hideClear,
   showFilter = true,
 }: Props) => {
   const theme = useTheme();
@@ -21,12 +23,14 @@ export const FilterFields = ({
   return showFilter ? (
     <Box display="flex" sx={{...containerStyle}}>
       <Box display="flex">{children}</Box>
-      <Typography
-        onClick={() => setShowFilter(false)}
-        mt="0.5em"
-        sx={{cursor: 'pointer', color: theme.palette.info.main}}>
-        Clear all
-      </Typography>
+      {!hideClear ? (
+        <Typography
+          onClick={() => setShowFilter(false)}
+          mt="0.5em"
+          sx={{cursor: 'pointer', color: theme.palette.info.main}}>
+          Clear all
+        </Typography>
+      ) : null}
     </Box>
   ) : null;
 };

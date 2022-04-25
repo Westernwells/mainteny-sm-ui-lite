@@ -61,7 +61,6 @@ export const Tabs = ({
         <MuiTabs
           sx={{
             flexGrow: 1,
-            // border: '1px solid red',
             '& .MuiTabs-indicator': {
               display: 'flex',
               justifyContent: 'center',

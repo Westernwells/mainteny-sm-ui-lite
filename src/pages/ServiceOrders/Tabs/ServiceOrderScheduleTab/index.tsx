@@ -10,7 +10,7 @@ import {Schedule} from 'components/Schedules';
 import {ScheduleItem} from 'components/Schedules/ScheduleItem';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {useServiceOrderStatusColor} from 'hooks/useServiceOrderStatusColor';
-import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicator';
+// import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicator';
 
 import {OrderDetails} from 'components/OrderDetails';
 import {endOfDay, startOfDay} from 'date-fns';
@@ -20,6 +20,7 @@ import {Progress} from 'components/Progress';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {capitalize} from 'lodash';
+import {Switch} from 'components/Switch';
 
 interface Props {
   searchQuery?: string;
@@ -68,7 +69,10 @@ export const ServiceOrderScheduleTab = ({
   }, [serviceOrders]);
 
   const renderFilterItems = () => (
-    <FilterFields showFilter={showFilter} setShowFilter={setShowFilter}>
+    <FilterFields
+      showFilter={showFilter}
+      setShowFilter={setShowFilter}
+      hideClear>
       <MultipleSelectCheckmarks
         label="Status"
         options={Object.values(ServiceOrderStatus).map((option) =>
@@ -90,9 +94,10 @@ export const ServiceOrderScheduleTab = ({
 
   return (
     <>
-      <Box sx={{display: 'flex', justifyConteny: 'space-between'}}>
+      <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
         {renderFilterItems()}
-        <ServiceOrderStatusIndicator containerStyles={{flexGrow: 1}} />
+        <Switch label="Show Unassigned Orders" />
+        {/* <ServiceOrderStatusIndicator containerStyles={{flexGrow: 1}} /> */}
       </Box>
       {isLoading || technicianLoading ? (
         <Progress />

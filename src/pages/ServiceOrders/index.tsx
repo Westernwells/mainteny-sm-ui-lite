@@ -33,6 +33,7 @@ export const ServiceOrders = () => {
       btnLabel="New Order"
       showNewBtn
       hideViewOption
+      hideSearchInput
     />
   );
 

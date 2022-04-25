@@ -8,10 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ToggleButton from '@mui/material/ToggleButton';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
-import {capitalize} from 'lodash';
-
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-
 import {Searchnput} from './SearchInput';
 
 interface Props {
@@ -51,7 +48,7 @@ export const Widget = ({
   return (
     <Box display="flex" sx={{...containerStyles}}>
       {!hideFilter ? (
-        <Box display="flex" mr="1em" my="0.3em">
+        <Box display="flex">
           <Button
             onClick={() => setShowFilter(!showFilter)}
             disableRipple
@@ -61,8 +58,7 @@ export const Widget = ({
                 ? theme.palette.action.selected
                 : theme.palette.primary.outlinedHoverBg,
               border: 'none',
-              py: 1,
-              height: 40,
+              py: '0.5em',
               ':hover': {
                 border: 'none',
               },
@@ -77,7 +73,7 @@ export const Widget = ({
       ) : null}
 
       {!hideSearchInput ? (
-        <Box mr={!hideViewOption ? '1em' : 0}>
+        <Box ml="0.8em">
           <Searchnput
             placeholder={searchPlaceholder}
             onValueChanged={(value: string) =>
@@ -87,7 +83,11 @@ export const Widget = ({
         </Box>
       ) : null}
       {!hideViewOption ? (
-        <ToggleButtonGroup color="secondary" value={view} exclusive>
+        <ToggleButtonGroup
+          color="secondary"
+          value={view}
+          exclusive
+          sx={{ml: '0.8em'}}>
           <ToggleButton
             value="list"
             aria-label="list"
@@ -117,11 +117,14 @@ export const Widget = ({
         <Button
           variant="contained"
           color="primary"
-          size={theme.breakpoints.down('md') ? 'small' : 'large'}
+          size="large"
           startIcon={<AddIcon />}
-          sx={{ml: '1em'}}
+          sx={{
+            textTransform: 'capitalize',
+            ml: '0.8em',
+          }}
           onClick={() => (btnOnClick ? btnOnClick() : () => {})}>
-          {capitalize(btnLabel)}
+          {btnLabel}
         </Button>
       ) : null}
     </Box>
