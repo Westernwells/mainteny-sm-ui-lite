@@ -140,7 +140,7 @@ export const MyUnits = () => {
       label="Units"
       renderWidget={
         <Widget
-          searchPlaceholder="Try ‘Schindler’ or ‘Mitsubishi’"
+          searchPlaceholder="Search company name, unit model"
           getSearchValue={(val: string) => {
             setSearch(val);
           }}
