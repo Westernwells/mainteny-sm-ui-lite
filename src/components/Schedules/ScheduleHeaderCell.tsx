@@ -36,7 +36,7 @@ export const ScheduleHeaderCell = ({
           zIndex: 3,
           pl: '1em',
           minWidth: '11.5rem',
-          maxWidth: '11.5rem',
+          maxWidth: '15rem',
           color: theme.palette.primary.main,
         },
       }}

@@ -140,7 +140,7 @@ export const useQueryServiceCompanyTechnicians = (
   const {user} = useUserSession();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
   return useQuery(
-    [qks.queryServiceCompanyTechnicians, serviceCompanyId],
+    [qks.queryServiceCompanyTechnicians, serviceCompanyId, params],
     () => queryServiceCompanyTechnicians(serviceCompanyId!, params),
     {
       enabled: !!user,

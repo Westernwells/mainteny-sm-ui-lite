@@ -3,38 +3,39 @@ import Box from '@mui/material/Box';
 import {useQueryServiceOrderSchedules} from 'hooks/reactQuery/useServiceOrder';
 import * as _ from 'lodash';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {toRestDateTime} from 'utils/datetime';
+import {getWhen, toRestDateTime} from 'utils/datetime';
 import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
 
 import {Schedule} from 'components/Schedules';
 import {ScheduleItem} from 'components/Schedules/ScheduleItem';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {useServiceOrderStatusColor} from 'hooks/useServiceOrderStatusColor';
-// import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicator';
 
 import {OrderDetails} from 'components/OrderDetails';
-import {endOfDay, startOfDay} from 'date-fns';
+import {addDays, endOfDay, startOfDay, subDays} from 'date-fns';
 import {TechnicianView} from 'models/technician';
 import {useQueryServiceCompanyTechnicians} from 'hooks/reactQuery/useTechnician';
-import {Progress} from 'components/Progress';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {capitalize} from 'lodash';
 import {Switch} from 'components/Switch';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import Typography from '@mui/material/Typography';
 
 interface Props {
-  searchQuery?: string;
   showFilter?: boolean;
   setShowFilter?: (val: boolean) => void;
 }
 
 export const ServiceOrderScheduleTab = ({
-  searchQuery = '',
   showFilter = false,
   setShowFilter = () => {},
 }: Props) => {
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();
+  const [technicianSearch, setTechnicianSearch] = useState('');
   const [orders, setOrders] = useState<{[key: string]: ServiceOrderView[]}>({});
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedOrderStatus, setSelectedOrderStatus] = useState<
     ServiceOrderStatus[] | []
   >([]);
@@ -45,19 +46,17 @@ export const ServiceOrderScheduleTab = ({
   } = useQueryServiceCompanyTechnicians({
     pageIndex: 0,
     pageSize: 500,
-    query: searchQuery,
+    query: technicianSearch,
   });
-  const {
-    data: serviceOrders = createEmptyResource<ServiceOrderView>(10),
-    isLoading,
-  } = useQueryServiceOrderSchedules({
-    end: toRestDateTime(endOfDay(new Date())),
-    start: toRestDateTime(startOfDay(new Date())),
-    pageIndex: page.pageIndex,
-    pageSize: page.pageSize,
-    query: searchQuery,
-    status: selectedOrderStatus,
-  });
+  const {data: serviceOrders = createEmptyResource<ServiceOrderView>(10)} =
+    useQueryServiceOrderSchedules({
+      end: toRestDateTime(endOfDay(currentDate)),
+      start: toRestDateTime(startOfDay(currentDate)),
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+      query: '',
+      status: selectedOrderStatus,
+    });
 
   useEffect(() => {
     const groupByTechnician = _.groupBy(
@@ -67,6 +66,14 @@ export const ServiceOrderScheduleTab = ({
     );
     setOrders(groupByTechnician);
   }, [serviceOrders]);
+
+  const nextDay = () => {
+    setCurrentDate(addDays(currentDate, 1));
+  };
+
+  const prevDay = () => {
+    setCurrentDate(subDays(currentDate, 1));
+  };
 
   const renderFilterItems = () => (
     <FilterFields
@@ -92,46 +99,70 @@ export const ServiceOrderScheduleTab = ({
     </FilterFields>
   );
 
+  const renderControls = () => (
+    <Box
+      sx={{
+        display: 'flex',
+        background: '#fff',
+        py: '0.5em',
+        px: '1em',
+        minWidth: '10rem',
+        justifyContent: 'space-between',
+      }}>
+      <Box onClick={() => prevDay()} sx={{cursor: 'pointer'}}>
+        <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
+      </Box>
+      <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
+        {getWhen(currentDate, 'dd.MM.yyyy')}
+      </Typography>
+      <Box onClick={() => nextDay()} sx={{cursor: 'pointer'}}>
+        <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
+      </Box>
+    </Box>
+  );
+
   return (
     <>
-      <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-        {renderFilterItems()}
-        <Switch label="Show Unassigned Orders" />
-        {/* <ServiceOrderStatusIndicator containerStyles={{flexGrow: 1}} /> */}
+      <Box sx={{display: 'flex', justifyContent: 'space-between', mb: '0.5em'}}>
+        <Box>{renderControls()}</Box>
+        <Box sx={{display: 'flex', justifyContent: 'flex-end', flexGrow: 1}}>
+          {renderFilterItems()}
+          <Switch label="Show Unassigned Orders" />
+        </Box>
+        {/* <ServiceOrderStatusIndicator containerStyles={{flexGrow: 1}} /> TODO: ADD to card footer */}
       </Box>
-      {isLoading || technicianLoading ? (
-        <Progress />
-      ) : (
-        <Schedule
-          scheduleItems={orders}
-          labelType="people"
-          headerLabelTitle={`Technicians (${technicianResource.total})`}
-          bodyLabel={technicianResource.data.map(
-            (technician) =>
-              `${technician.userAccount.firstName} ${technician.userAccount.lastName}`,
-          )}
-          renderCellItem={(order: ServiceOrderView, calWidth, calcPosition) => (
-            <ScheduleItem
-              key={order.id}
-              titleLeftAdornment={
-                <ServiceOrderIcons
-                  serviceOrderType={order.type}
-                  style={{fontSize: '1rem'}}
-                />
-              }
-              title={order.elevator.propertyOwner.name}
-              subtitle={order.elevator.address.fullName}
-              width={calWidth(
-                order.schedules[0].startTime,
-                order.schedules[0].endTime,
-              )}
-              tooltip={<OrderDetails order={order} />}
-              cardStatusAccent={serviceOrderStatusColor[order.status]}
-              position={calcPosition(order.schedules[0].startTime)}
-            />
-          )}
-        />
-      )}
+
+      <Schedule
+        scheduleItems={orders}
+        loading={technicianLoading}
+        labelType="people"
+        searchPlaceholder="Search technician"
+        handleSearch={(value) => setTechnicianSearch(value)}
+        bodyLabel={technicianResource.data.map(
+          (technician) =>
+            `${technician.userAccount.firstName} ${technician.userAccount.lastName}`,
+        )}
+        renderCellItem={(order: ServiceOrderView, calWidth, calcPosition) => (
+          <ScheduleItem
+            key={order.id}
+            titleLeftAdornment={
+              <ServiceOrderIcons
+                serviceOrderType={order.type}
+                style={{fontSize: '1rem'}}
+              />
+            }
+            title={order.elevator.propertyOwner.name}
+            subtitle={order.elevator.address.fullName}
+            width={calWidth(
+              order.schedules[0].startTime,
+              order.schedules[0].endTime,
+            )}
+            tooltip={<OrderDetails order={order} />}
+            cardStatusAccent={serviceOrderStatusColor[order.status]}
+            position={calcPosition(order.schedules[0].startTime)}
+          />
+        )}
+      />
     </>
   );
 };

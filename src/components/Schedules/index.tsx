@@ -28,6 +28,9 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {WeekPair} from 'models/misc';
 import {grey} from '@mui/material/colors';
+import {SearchInput} from 'components/SearchInput';
+import useTheme from '@mui/material/styles/useTheme';
+import {Progress} from 'components/Progress';
 
 interface Props {
   scheduleItems: {[key: string]: any[]};
@@ -38,8 +41,10 @@ interface Props {
   ) => void;
   getWeekPair?: (weekPair: WeekPair) => void;
   labelType?: 'date' | 'people';
-  headerLabelTitle?: string;
+  searchPlaceholder?: string;
   bodyLabel?: string[];
+  handleSearch?: (val: string) => void;
+  loading?: boolean;
 }
 
 const gridWidth = 120;
@@ -50,9 +55,12 @@ export const Schedule = ({
   scheduleItems,
   renderCellItem,
   labelType = 'date',
-  headerLabelTitle = 'Technicians',
+  searchPlaceholder = 'Search',
   bodyLabel = [],
+  handleSearch,
+  loading = false,
 }: Props) => {
+  const theme = useTheme();
   const [tableHeader, setTableHeader] = useState<string[]>([]);
   const elementRef = useRef<HTMLInputElement | undefined>();
   const [weekPair, setWeekPair] = useState<WeekPair>({
@@ -73,12 +81,12 @@ export const Schedule = ({
       const weekEnds = formatDate(weekPair.endOfWeekDay, 'dd MMM');
       setTableHeader([`${weekBegins} - ${weekEnds}`, ...twentyFourHourTime]);
     } else {
-      setTableHeader([headerLabelTitle, ...twentyFourHourTime]);
+      setTableHeader([searchPlaceholder, ...twentyFourHourTime]);
     }
-  }, [weekInterval, headerLabelTitle]);
+  }, [weekInterval, searchPlaceholder]);
 
   useEffect(() => {
-    if (tableHeader.length) {
+    if (tableHeader.length && !loading) {
       if (labelType === 'date') {
         const result = weekInterval.map((item) => {
           const key = formatDate(item, dateFormat);
@@ -90,7 +98,7 @@ export const Schedule = ({
         setBodyRow(result);
       }
     }
-  }, [tableHeader]);
+  }, [tableHeader, loading]);
 
   useEffect(() => {
     const interval = eachDayOfInterval({
@@ -164,26 +172,34 @@ export const Schedule = ({
     });
   };
 
-  const scheduleControls = (item: string) => (
-    <Box>
+  const scheduleControls = (item: string) =>
+    labelType === 'date' ? (
       <Box sx={{display: 'flex'}}>
-        {labelType === 'date' ? (
-          <Box onClick={() => prevMonth()} sx={{cursor: 'pointer'}}>
-            <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
-          </Box>
-        ) : null}
+        <Box onClick={() => prevMonth()} sx={{cursor: 'pointer'}}>
+          <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
+        </Box>
 
         <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
           {item}
         </Typography>
-        {labelType === 'date' ? (
-          <Box onClick={() => nextMonth()} sx={{cursor: 'pointer'}}>
-            <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
-          </Box>
-        ) : null}
+
+        <Box onClick={() => nextMonth()} sx={{cursor: 'pointer'}}>
+          <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
+        </Box>
       </Box>
-    </Box>
-  );
+    ) : (
+      <SearchInput
+        placeholder={searchPlaceholder}
+        size="small"
+        onValueChanged={(searchValue) =>
+          handleSearch && handleSearch(searchValue)
+        }
+        containerStyle={{
+          background: theme.palette.inputBackground.main,
+          width: '90%',
+        }}
+      />
+    );
 
   const renderScheduleLabel = (item: string) => (
     <Typography component="div" variant="subtitle2">
@@ -248,49 +264,55 @@ export const Schedule = ({
                 })}
               </ScheduleRow>
             </ScheduleHeader>
-            <ScheduleBody>
-              {bodyRow.map((dayRow, rowIndex) => (
-                <ScheduleRow key={rowIndex}>
-                  {Object.keys(dayRow).map((key) =>
-                    dayRow[key].map((item, index) => {
-                      if (index === 0) {
-                        return (
-                          <ScheduleBodyCell
-                            cellWidth={gridWidth}
-                            key={`${rowIndex}-${index}`}>
-                            {renderScheduleLabel(key)}
-                          </ScheduleBodyCell>
-                        );
-                      }
+            {loading ? (
+              <Progress />
+            ) : (
+              <ScheduleBody>
+                {bodyRow.map((dayRow, rowIndex) => (
+                  <ScheduleRow key={rowIndex}>
+                    {Object.keys(dayRow).map((key) =>
+                      dayRow[key].map((item, index) => {
+                        if (index === 0) {
+                          return (
+                            <ScheduleBodyCell
+                              cellWidth={gridWidth}
+                              key={`${rowIndex}-${index}`}>
+                              {renderScheduleLabel(key)}
+                            </ScheduleBodyCell>
+                          );
+                        }
 
-                      if (index === 1) {
-                        return Object.keys(scheduleItems).map((xKey) => {
-                          if (xKey === key) {
-                            return (
-                              <ScheduleBodyCell
-                                key={`${rowIndex}-${index}`}
-                                cellWidth={gridWidth}>
-                                <ScheduleItemContainer>
-                                  {scheduleItems[xKey].map((scheduleItem) =>
-                                    renderCellItem(
-                                      scheduleItem,
-                                      calculateWidth,
-                                      calculatePosition,
-                                    ),
-                                  )}
-                                </ScheduleItemContainer>
-                              </ScheduleBodyCell>
-                            );
-                          }
-                          return null;
-                        });
-                      }
-                      return <ScheduleBodyCell key={`${rowIndex}-${index}`} />;
-                    }),
-                  )}
-                </ScheduleRow>
-              ))}
-            </ScheduleBody>
+                        if (index === 1) {
+                          return Object.keys(scheduleItems).map((xKey) => {
+                            if (xKey === key) {
+                              return (
+                                <ScheduleBodyCell
+                                  key={`${rowIndex}-${index}`}
+                                  cellWidth={gridWidth}>
+                                  <ScheduleItemContainer>
+                                    {scheduleItems[xKey].map((scheduleItem) =>
+                                      renderCellItem(
+                                        scheduleItem,
+                                        calculateWidth,
+                                        calculatePosition,
+                                      ),
+                                    )}
+                                  </ScheduleItemContainer>
+                                </ScheduleBodyCell>
+                              );
+                            }
+                            return null;
+                          });
+                        }
+                        return (
+                          <ScheduleBodyCell key={`${rowIndex}-${index}`} />
+                        );
+                      }),
+                    )}
+                  </ScheduleRow>
+                ))}
+              </ScheduleBody>
+            )}
           </ScheduleContainer>
         </CardContent>
       </Box>

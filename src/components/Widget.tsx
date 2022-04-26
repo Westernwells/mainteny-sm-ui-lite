@@ -9,7 +9,7 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import {Searchnput} from './SearchInput';
+import {SearchInput} from './SearchInput';
 
 interface Props {
   searchPlaceholder?: string;
@@ -74,7 +74,7 @@ export const Widget = ({
 
       {!hideSearchInput ? (
         <Box ml="0.8em">
-          <Searchnput
+          <SearchInput
             placeholder={searchPlaceholder}
             onValueChanged={(value: string) =>
               getSearchValue && getSearchValue(value)

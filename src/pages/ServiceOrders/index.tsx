@@ -19,7 +19,6 @@ const tabItems = [
 
 export const ServiceOrders = () => {
   const [tabValue, setTabValue] = useState(0);
-  const [scheduleQuery, setScheduleQuery] = useState('');
   // const [showFilter, setShowFilter] = useState(false);
   const [showScheduleFilter, setShowScheduleFilter] = useState(false);
   // const [scheduleFilter, setScheduleFilter] = useState();
@@ -27,7 +26,6 @@ export const ServiceOrders = () => {
   const renderScheduleWidget = () => (
     <Widget
       searchPlaceholder=""
-      getSearchValue={(val: string) => setScheduleQuery(val)}
       setShowFilter={setShowScheduleFilter}
       showFilter={showScheduleFilter}
       btnLabel="New Order"
@@ -62,7 +60,6 @@ export const ServiceOrders = () => {
       }}>
       <TabsBody value={tabValue} index={0}>
         <ServiceOrderScheduleTab
-          searchQuery={scheduleQuery}
           setShowFilter={setShowScheduleFilter}
           showFilter={showScheduleFilter}
         />
