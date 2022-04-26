@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -11,32 +11,23 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import TimePicker from '@mui/lab/TimePicker';
 import {TimeWindowType} from 'models/misc';
 import {convertToText} from 'utils/utils';
+import {Shift} from './model';
 
-interface Shift {
-  fromTime: Date | null;
-  toTime: Date | null;
-  workDays: string;
+interface Props {
+  shifts: Shift<Date | null>[];
+  setShifts: React.Dispatch<React.SetStateAction<Shift<Date | null>[]>>;
 }
-
-export const ShiftTime = () => {
+export const ShiftTime = ({shifts, setShifts}: Props) => {
   const workDays = Object.values(TimeWindowType).map((item) =>
     convertToText(item),
   );
-
-  const [shifts, setShifts] = useState<Shift[]>([
-    {
-      fromTime: new Date(0, 0, 0, 9, 0),
-      toTime: new Date(0, 0, 0, 18, 0),
-      workDays: workDays[0],
-    },
-  ]);
 
   const handleAddShift = () => {
     const selectedWorkDays = shifts.map((shift) => shift.workDays);
     setShifts([
       ...shifts,
       {
-        fromTime: new Date(0, 0, 0, 9, 0),
+        fromTime: new Date(0, 0, 0, 7, 0),
         toTime: new Date(0, 0, 0, 18, 0),
         workDays: workDays.filter(
           (item) => !selectedWorkDays.includes(item),
@@ -44,10 +35,10 @@ export const ShiftTime = () => {
       },
     ]);
   };
+
   const handleRemoveShift = () => {
     setShifts(shifts.slice(0, -1));
   };
-
   return (
     <>
       {shifts.map((shift, index) => (
