@@ -19,11 +19,9 @@ import {
 import {useSearchParams} from 'react-router-dom';
 import {Progress} from 'components/Progress';
 import {TechnicianEventPair, TechnicianView} from 'models/technician';
-import {SideDrawer} from 'components/SideDrawer';
 import {toRestDateTime} from 'utils/datetime';
 import {addDays, endOfDay, startOfDay} from 'date-fns';
 import {GridRowsProp} from '@mui/x-data-grid';
-import {Button} from '@mui/material';
 import {EmptySection} from 'components/EmptySection';
 import {columns, makeRows} from './EmployeeDataGridProps';
 import {AddEmployee} from './AddEmployee';
@@ -195,13 +193,7 @@ export const Employees = () => {
         totalRows={userAccountResource.total}
       />
 
-      <SideDrawer
-        open={isDrawerOpen}
-        setOpen={setIsDrawerOpen}
-        header="Add Employee"
-        footer={<Button variant="contained">Add Employee</Button>}
-        body={<AddEmployee />}
-      />
+      <AddEmployee open={isDrawerOpen} setOpen={setIsDrawerOpen} />
     </PageOverviewLayout>
   );
 };

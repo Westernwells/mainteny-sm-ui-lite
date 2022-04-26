@@ -51,8 +51,7 @@ export const FormSelect = ({
         shrink
         sx={{
           bgcolor: 'white',
-          color: 'text.primary',
-          paddingInline: '.5em',
+          paddingInline: '.5em 2em',
         }}>
         {label}
       </InputLabel>
@@ -63,7 +62,7 @@ export const FormSelect = ({
         id={id}
         value={value}
         onChange={onChange}
-        input={<OutlinedInput placeholder="Role" />}
+        input={<OutlinedInput id="roles" />}
         MenuProps={MenuProps}>
         {options.map((option) => (
           <MenuItem
