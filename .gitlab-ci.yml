@@ -112,10 +112,10 @@ build-prod:
   rules:
     - if: $CI_COMMIT_REF_NAME == 'main'
       when: on_success
-      variables:
-        ENV: prod
-        PUBLIC_URL: /sm-lite
     - when: never
+  variables:
+    ENV: prod
+    PUBLIC_URL: /sm-lite
 
 build-stage-image:
   <<: *build-image-template
