@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import Elevator from '@mui/icons-material/Elevator';
-import PersonIcon from '@mui/icons-material/Person';
+import BusinessIcon from '@mui/icons-material/Business';
 import MenuIcon from '@mui/icons-material/Menu';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
@@ -106,7 +106,7 @@ export const AppDrawer = () => {
     },
     {
       text: 'Customers',
-      icon: <PeopleAltIcon sx={{color: '#fff'}} />,
+      icon: <BusinessIcon sx={{color: '#fff'}} />,
       path: '/customers',
       onClick: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -135,7 +135,7 @@ export const AppDrawer = () => {
 
     {
       text: 'Employees',
-      icon: <PersonIcon sx={{color: '#fff'}} />,
+      icon: <PeopleAltIcon sx={{color: '#fff'}} />,
       path: '/employees',
       onClick: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
