@@ -14,6 +14,7 @@ interface Props {
   titleLeftAdornment?: JSX.Element;
   cardStatusAccent?: string;
   tooltip: ReactElement;
+  containerStyle?: {[key: string]: string | number};
 }
 
 export const ScheduleItem = ({
@@ -26,6 +27,7 @@ export const ScheduleItem = ({
   height,
   cardStatusAccent,
   tooltip,
+  containerStyle,
   ...rest
 }: Props) => {
   const theme = useTheme();
@@ -40,10 +42,12 @@ export const ScheduleItem = ({
         background: theme.palette.secondary.outlinedHoverBg,
         overflowX: 'hidden',
         width,
-        marginLeft: position,
+        transform: `translateX(${position})`,
+        // marginLeft: position,
         borderLeft: `2px solid ${cardStatusAccent}`,
         cursor: 'pointer',
         overflowY: 'hidden',
+        ...containerStyle,
       }}>
       <Tooltip title={tooltip} placement="top">
         {children || (

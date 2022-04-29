@@ -1,4 +1,12 @@
-import {endOfWeek, format, parseISO, startOfWeek} from 'date-fns';
+import {
+  endOfWeek,
+  format,
+  isToday,
+  isTomorrow,
+  isYesterday,
+  parseISO,
+  startOfWeek,
+} from 'date-fns';
 
 export function getDateObject(input: any): Date {
   const type = typeof input;
@@ -73,3 +81,19 @@ export function timeToMinutes(time: string): number {
   const minutes = parseInt(parts[1], 10);
   return hour * 60 + minutes;
 }
+
+export const getWhen = (date: Date, formatStr: string) => {
+  if (isToday(date)) {
+    return 'Today';
+  }
+
+  if (isTomorrow(date)) {
+    return 'Tomorrow';
+  }
+
+  if (isYesterday(date)) {
+    return 'Yesterday';
+  }
+
+  return formatDate(date, formatStr);
+};

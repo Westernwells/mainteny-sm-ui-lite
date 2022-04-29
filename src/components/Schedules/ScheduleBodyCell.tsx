@@ -21,14 +21,16 @@ export const ScheduleBodyCell = ({
       border: '0.5px solid #F1F5F9',
       height: '70px',
       minWidth: cellWidth,
-      ':first-child': {
+      maxWidth: cellWidth,
+
+      ':first-of-type': {
         position: 'sticky',
         left: 0,
         zIndex: 2,
         background: '#fff',
         pl: '1em',
-        minWidth: '150px',
-        maxWidth: '150px',
+        minWidth: '11.5rem',
+        maxWidth: '15rem',
       },
     }}
     {...rest}>

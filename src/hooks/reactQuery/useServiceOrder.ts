@@ -17,6 +17,7 @@ import {ServiceCompanyTimeUnit} from 'models/service-company';
 import {toDate, toRestDate} from 'utils/datetime';
 import {
   ServiceOrderOrderField,
+  ServiceOrderQueryParams,
   ServiceOrderReport,
   ServiceOrderScheduleParams,
   ServiceOrderView,
@@ -35,7 +36,7 @@ interface ServiceOrderReportPayload {
 }
 
 export const fetchServiceOrders = async (
-  params: any,
+  params: ServiceOrderQueryParams,
 ): Promise<Resource<ServiceOrderView>> => {
   const response: AxiosResponse<Resource<ServiceOrderView>> =
     await axiosClient.get(`/api/serviceOrders`, {
@@ -207,9 +208,20 @@ export function useServiceOrderReport(params: ServiceOrderReportPayload) {
   );
 }
 
-export function useServiceOrders(params: any) {
+export function useServiceOrders(
+  params: ServiceOrderQueryParams,
+  options?: UseQueryOptions<
+    Resource<ServiceOrderView>,
+    RestError,
+    Resource<ServiceOrderView>
+  >,
+) {
   const {user} = useUserSession();
-  return useQuery<Resource<ServiceOrderView>, RestError>(
+  return useQuery<
+    Resource<ServiceOrderView>,
+    RestError,
+    Resource<ServiceOrderView>
+  >(
     [queryKeys.fetchServiceOrders, params, user!.userAccount.serviceCompany.id],
     () =>
       fetchServiceOrders({
@@ -218,7 +230,7 @@ export function useServiceOrders(params: any) {
         orderBy: ServiceOrderOrderField.CREATED_TIME,
         order: Order.DESC,
       }),
-    {enabled: !!user && !!params.elevatorIds},
+    {enabled: !!user, ...options},
   );
 }
 
@@ -227,7 +239,11 @@ export function useServiceOrders(params: any) {
 export function useFetchServiceOrdersByElevators(
   elevatorRes: Resource<ElevatorView>,
   filter: {nextVisit: string[]; availabilityRange: number[][]},
-  options?: UseQueryOptions<any, any, any>,
+  options?: UseQueryOptions<
+    Resource<ServiceOrderView>,
+    RestError,
+    ElevatorsByAddress[]
+  >,
 ) {
   const {user} = useUserSession();
   const elevatorIds = elevatorRes?.data.map((elevator) => elevator.id);
@@ -312,6 +328,7 @@ export const useQueryServiceOrderSchedules = (
   options?: any,
 ) => {
   const {user} = useUserSession();
+
   return useQuery(
     [queryKeys.fetchServiceOrders, params, user!.userAccount.serviceCompany.id],
     () =>
@@ -319,6 +336,6 @@ export const useQueryServiceOrderSchedules = (
         ...params,
         serviceCompanyId: user!.userAccount.serviceCompany.id,
       }),
-    {enabled: !!user && !!params.technicianIds?.length, ...options},
+    {enabled: !!user, ...options},
   );
 };

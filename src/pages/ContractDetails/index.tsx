@@ -84,7 +84,7 @@ export const ContractDetails = () => {
         <BackAction label="Contract Details" />
         <CustomButtonUnstyled
           label="Download Contract"
-          size="small"
+          size="medium"
           startIcon={<FileDownloadIcon color="primary" />}
         />
       </Box>
@@ -215,7 +215,8 @@ export const ContractDetails = () => {
         </Grid>
         <Grid xs={4} item>
           <ContractCard
-            containerStyles={{minHeight: '26vh', py: '1em'}}
+            containerStyles={{height: '100%', py: '1em'}}
+            bodyContainerStyle={{height: '100%'}}
             header={
               <Typography variant="subtitle1">Contract Timeline</Typography>
             }>

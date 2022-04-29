@@ -55,7 +55,7 @@ export const EmployeeOverview = ({employee}: Props) => {
           icon: <HomeIcon sx={{color: theme.palette.info.dark}} />,
         },
         shiftTime: {
-          // TODO: display order shift time in a toolt ipe
+          // TODO: display order shift time in a tooltip
           label: 'SHIFT TIME',
           value:
             employee && employee.workingHours?.length

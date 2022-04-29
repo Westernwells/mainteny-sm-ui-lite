@@ -31,7 +31,7 @@ interface Props {
   containerStyle?: {[key: string]: string | number};
 }
 
-export const Searchnput = ({
+export const SearchInput = ({
   placeholder,
   onValueChanged,
   size,

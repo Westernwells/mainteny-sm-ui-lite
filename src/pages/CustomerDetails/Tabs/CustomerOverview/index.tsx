@@ -15,7 +15,7 @@ import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {Progress} from 'components/Progress';
 
 import {PageCard} from 'components/PageCard';
-import {Searchnput} from 'components/SearchInput';
+import {SearchInput} from 'components/SearchInput';
 import {OverviewUnitsCard} from './OverviewUnitsCard';
 import {OverviewContractsCard} from './OverviewContractsCard';
 
@@ -147,7 +147,7 @@ export const CustomerOverviewTab = ({
                     ({totalUnits})
                   </Typography>
                 </Box>
-                <Searchnput
+                <SearchInput
                   size="small"
                   placeholder="Search"
                   onValueChanged={(value) => setUnitQuery(value)}
@@ -192,7 +192,7 @@ export const CustomerOverviewTab = ({
                     ({totalContracts})
                   </Typography>
                 </Box>
-                <Searchnput
+                <SearchInput
                   size="small"
                   onValueChanged={(value) => setContractQuery(value)}
                   placeholder="Search"

@@ -17,6 +17,9 @@ interface Props {
   backBtnLabel?: string;
   onChange?: (tabIndex: number) => void;
   currentIndex?: number;
+  hideBackIcon?: boolean;
+  renderWidget?: JSX.Element;
+  pageTitle?: string;
 }
 
 const a11yProps = (index: number) => ({
@@ -27,6 +30,9 @@ const a11yProps = (index: number) => ({
 export const Tabs = ({
   children,
   tabItems,
+  hideBackIcon,
+  renderWidget,
+  pageTitle,
   onChange = () => {},
   backBtnLabel = '',
   currentIndex = 0,
@@ -41,18 +47,20 @@ export const Tabs = ({
       <Box
         sx={{
           display: 'flex',
-          paddingLeft: '35px',
-          // maxHeight: '50px'
-
-          // mt: 11,
         }}>
-        <BackAction
-          label={backBtnLabel}
-          containerStyle={{mt: '0.5em', mr: '3em'}}
-        />
+        <Typography variant="h5" mt="0.5em" mr="3em">
+          {pageTitle || ''}
+        </Typography>
+        {!hideBackIcon ? (
+          <BackAction
+            label={backBtnLabel}
+            containerStyle={{mt: '0.5em', mr: '3em'}}
+          />
+        ) : null}
 
         <MuiTabs
           sx={{
+            flexGrow: 1,
             '& .MuiTabs-indicator': {
               display: 'flex',
               justifyContent: 'center',
@@ -61,12 +69,9 @@ export const Tabs = ({
           }}
           value={currentIndex}
           onChange={(e: any, newValue: number) => {
-            // getCurrentTabIndex(newValue);
             if (onChange) {
               onChange(newValue);
             }
-
-            // setValue(newValue);
           }}
           textColor="secondary">
           {tabItems.map((item, index) => (
@@ -121,10 +126,17 @@ export const Tabs = ({
             />
           ))}
         </MuiTabs>
+        <Box
+          sx={{
+            display: 'flex',
+
+            justifyContent: 'flex-end',
+          }}>
+          {renderWidget || null}
+        </Box>
       </Box>
       <Box
         sx={{
-          px: '2.5em',
           width: '100%',
           mt: 2,
           '::-webkit-scrollbar': {

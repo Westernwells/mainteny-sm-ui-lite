@@ -1,6 +1,4 @@
 import {useEffect, useState} from 'react';
-import Box from '@mui/material/Box';
-import Fade from '@mui/material/Fade';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
@@ -48,6 +46,7 @@ export const Contracts = () => {
         status: [],
       },
       {},
+      {keepPreviousData: true},
     );
 
   const {
@@ -130,43 +129,40 @@ export const Contracts = () => {
           getSearchValue={(val: string) => setSearch(val)}
           setShowFilter={setShowFilter}
           showFilter={showFilter}
+          hideViewOption
         />
       }>
-      <Fade in={showFilter} unmountOnExit>
-        <Box>
-          <FilterFields setShowFilter={setShowFilter}>
-            <MultipleSelectCheckmarks
-              label="Expiry Date"
-              options={[
-                'Last 14 days', // TODO: Create an enum to handle this
-                'Today',
-                'Next 7 days',
-                'Next 14 days',
-              ]}
-              getSelectedValue={(item) => setExpiryDate(item)}
-              multiple={false}
-            />
+      <FilterFields showFilter={showFilter} setShowFilter={setShowFilter}>
+        <MultipleSelectCheckmarks
+          label="Expiry Date"
+          options={[
+            'Last 14 days', // TODO: Create an enum to handle this
+            'Today',
+            'Next 7 days',
+            'Next 14 days',
+          ]}
+          getSelectedValue={(item) => setExpiryDate(item)}
+          multiple={false}
+        />
 
-            <MultipleSelectCheckmarks
-              label="Contractor"
-              options={contractorFilterItems}
-              getSelectedValue={(item) => setContractor(item)}
-            />
+        <MultipleSelectCheckmarks
+          label="Contractor"
+          options={contractorFilterItems}
+          getSelectedValue={(item) => setContractor(item)}
+        />
 
-            <MultipleSelectCheckmarks
-              label="Cost/year"
-              options={[
-                'Below 1000 €',
-                '1000 - 3000 €',
-                '3000 - 5000 €',
-                'Above 5000 €',
-              ]}
-              getSelectedValue={(item) => costRangeConvertor(item)}
-              multiple={false}
-            />
-          </FilterFields>
-        </Box>
-      </Fade>
+        <MultipleSelectCheckmarks
+          label="Cost/year"
+          options={[
+            'Below 1000 €',
+            '1000 - 3000 €',
+            '3000 - 5000 €',
+            'Above 5000 €',
+          ]}
+          getSelectedValue={(item) => costRangeConvertor(item)}
+          multiple={false}
+        />
+      </FilterFields>
 
       <DataGridLayout
         hideFooter={pageCount <= 1}

@@ -3,7 +3,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box, {BoxProps} from '@mui/material/Box';
 
 interface Props extends BoxProps {
-  height?: string;
+  height?: string | number;
 }
 
 export const Progress = ({height, ...rest}: Props) => (

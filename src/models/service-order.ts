@@ -5,7 +5,7 @@ import {
 } from './service-company';
 import {AttachmentResource, Elevator, ElevatorSimpleView} from './elevator';
 import {Contract, ContractSimpleView} from './contract';
-import {Fee, JobStatus, Meta, Priority, WithOptional} from './misc';
+import {Fee, JobStatus, Meta, Order, Priority, WithOptional} from './misc';
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount} from './user';
 
@@ -274,4 +274,19 @@ export interface ServiceOrderScheduleParams {
   status?: ServiceOrderStatus[];
   serviceCompanyId?: string;
   technicianIds?: string[];
+}
+
+export interface ServiceOrderQueryParams {
+  elevatorIds?: string[];
+  end: string;
+  start: string;
+  pageIndex: number;
+  pageSize: number;
+  query: string;
+  status?: ServiceOrderStatus[];
+  serviceCompanyId?: string;
+  technicianIds?: string[];
+  order?: Order;
+  orderBy?: ServiceOrderOrderField;
+  types?: ServiceOrderType[];
 }

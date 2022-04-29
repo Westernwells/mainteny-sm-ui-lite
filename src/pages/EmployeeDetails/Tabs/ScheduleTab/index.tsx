@@ -17,7 +17,7 @@ import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {useServiceOrderStatusColor} from 'hooks/useServiceOrderStatusColor';
 import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicator';
 import {WeekPair} from 'models/misc';
-import {OrderDetails} from './OrderDetails';
+import {OrderDetails} from 'components/OrderDetails';
 
 interface Props {
   technicianId?: string;
