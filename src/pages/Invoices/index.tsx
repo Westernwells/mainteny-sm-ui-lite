@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
 import {GridRowsProp} from '@mui/x-data-grid';
@@ -26,6 +26,7 @@ export const Invoices = () => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [queryParams, setQueryParams] = useSearchParams();
+  const totalInvoiceRef = useRef(0);
   const [showFilter, setShowFilter] = useState(false);
   const [amount, setAmount] = useState<number[][]>([]);
   const [status, setStatus] = useState<InvoiceStatus>();
@@ -33,23 +34,12 @@ export const Invoices = () => {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
 
-  const {data: {total: totalInvoice} = createEmptyResource<InvoiceView>(10)} =
-    useInvoices(
-      {
-        pageIndex: 0,
-        pageSize: 1,
-        query: search,
-        status: [InvoiceStatus.PAID, InvoiceStatus.NOT_PAID],
-      },
-      {amount: [], serviceType: []},
-      {keepPreviousData: true},
-    );
-
   const {
     data: invoiceResource = createEmptyResource<InvoiceView>(10),
     isLoading,
     isFetching,
     isFetched,
+    isIdle,
   } = useInvoices(
     {
       pageIndex: page.pageIndex,
@@ -60,6 +50,8 @@ export const Invoices = () => {
     {amount: amount[0], status, serviceType},
     {keepPreviousData: true},
   );
+
+  totalInvoiceRef.current = invoiceResource.total;
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
@@ -116,7 +108,11 @@ export const Invoices = () => {
     setAmount(range);
   };
 
-  if (isFetched && !totalInvoice) {
+  if (isIdle || isLoading) {
+    return <Progress />;
+  }
+
+  if (isFetched && !totalInvoiceRef.current) {
     return (
       <EmptySection
         label="No invoices have been created yet. Please click the button below to create one!"
@@ -128,10 +124,6 @@ export const Invoices = () => {
         }}
       />
     );
-  }
-
-  if (isLoading) {
-    return <Progress />;
   }
 
   return (

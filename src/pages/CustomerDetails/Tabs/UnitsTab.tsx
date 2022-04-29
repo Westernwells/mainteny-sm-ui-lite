@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {Progress} from 'components/Progress';
@@ -24,19 +24,10 @@ export const UnitsTab = ({customerId}: Props) => {
   const [page, setPage] = useState(makePage(0, 10));
   const [search, setSearch] = useState('');
   const [showFilter, setShowFilter] = useState(false);
+  const totalUnitsRef = useRef(0);
   const [status, setStatus] = useState<string[]>([]);
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const {data: {total: totalUnits} = createEmptyResource<ElevatorView>(10)} =
-    useQueryCustomerElevator(
-      {
-        query: '',
-        pageIndex: 0,
-        pageSize: 1,
-      },
-      null,
-      customerId,
-    );
   const {
     data: elevatorResource = createEmptyResource<ElevatorView>(10),
     isLoading,
@@ -52,6 +43,8 @@ export const UnitsTab = ({customerId}: Props) => {
     {keepPreviousData: true},
   );
 
+  totalUnitsRef.current = elevatorResource.total;
+
   useEffect(() => {
     setPageCount(Math.ceil(elevatorResource.total / page.pageSize));
   }, [elevatorResource, page.pageSize]);
@@ -63,7 +56,7 @@ export const UnitsTab = ({customerId}: Props) => {
     }
   }, [elevatorResource, showFilter]);
 
-  if (isFetched && !totalUnits) {
+  if (isFetched && !totalUnitsRef.current) {
     return (
       <EmptySection
         label="No units yet. Create a new one to view here"

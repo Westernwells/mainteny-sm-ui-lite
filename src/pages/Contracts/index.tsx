@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
@@ -25,6 +25,7 @@ export const Contracts = () => {
   const [search, setSearch] = useState('');
   const [queryParams, setQueryParams] = useSearchParams();
   const [page, setPage] = useState(makePage(0, pageSize));
+  const totalContractRef = useRef(0);
   const [showFilter, setShowFilter] = useState(false);
   const [expiryDate, setExpiryDate] = useState<string[]>([]);
   const [contractor, setContractor] = useState<string[]>([]);
@@ -35,25 +36,12 @@ export const Contracts = () => {
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
 
-  const {data: {total: totalContract} = createEmptyResource<ContractView>(10)} =
-    useQueryContract(
-      {
-        order: Order.DESC,
-        orderBy: ContractOrderField.CREATED_TIME,
-        pageIndex: 0,
-        pageSize: 1,
-        query: '',
-        status: [],
-      },
-      {},
-      {keepPreviousData: true},
-    );
-
   const {
     data: contractResource = createEmptyResource<ContractView>(10),
     isLoading,
     isFetching,
     isFetched,
+    isIdle,
   } = useQueryContract(
     {
       order: Order.DESC,
@@ -66,6 +54,8 @@ export const Contracts = () => {
     {expiryDate, contractor, price: cost},
     {keepPreviousData: true},
   );
+
+  totalContractRef.current = contractResource.total;
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
@@ -102,7 +92,7 @@ export const Contracts = () => {
     setPageCount(Math.ceil(contractResource.total / page.pageSize));
   }, [contractResource, page.pageSize]);
 
-  if (isFetched && !totalContract) {
+  if (isFetched && !totalContractRef.current) {
     return (
       <EmptySection
         label="No contracts have been created yet. Please click the button below to create one!"
@@ -116,7 +106,7 @@ export const Contracts = () => {
     );
   }
 
-  if (isLoading) {
+  if (isIdle || isLoading) {
     return <Progress />;
   }
 

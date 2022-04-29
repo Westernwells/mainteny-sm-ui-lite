@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import ToggleButton from '@mui/material/ToggleButton';
 import ViewListIcon from '@mui/icons-material/ViewList';
-import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
+import GridViewIcon from '@mui/icons-material/GridView';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import {SearchInput} from './SearchInput';
 
@@ -108,7 +108,7 @@ export const Widget = ({
                 openMapView();
               }
             }}>
-            <FormatAlignLeftIcon />
+            <GridViewIcon />
           </ToggleButton>
         </ToggleButtonGroup>
       ) : null}

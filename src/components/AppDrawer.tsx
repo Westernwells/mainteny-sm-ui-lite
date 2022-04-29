@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import Elevator from '@mui/icons-material/Elevator';
-import WorkOutlinedIcon from '@mui/icons-material/WorkOutlined';
+import PersonIcon from '@mui/icons-material/Person';
 import MenuIcon from '@mui/icons-material/Menu';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
@@ -105,34 +105,6 @@ export const AppDrawer = () => {
       },
     },
     {
-      text: 'Contracts',
-      icon: <FileCopyIcon sx={{color: '#fff'}} />,
-      path: '/contracts',
-      onClick: (
-        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-        index: number,
-      ) => {
-        e.preventDefault();
-        setSelectedIndex(index);
-        setSelectedPath('/contracts');
-        navigate('/contracts?pageIndex=1&pageSize=25');
-      },
-    },
-    {
-      text: 'Invoices',
-      icon: <PaymentsIcon sx={{color: '#fff'}} />,
-      path: '/invoices',
-      onClick: (
-        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-        index: number,
-      ) => {
-        e.preventDefault();
-        setSelectedIndex(index);
-        setSelectedPath('/invoices');
-        navigate('/invoices?pageIndex=1&pageSize=25');
-      },
-    },
-    {
       text: 'Customers',
       icon: <PeopleAltIcon sx={{color: '#fff'}} />,
       path: '/customers',
@@ -147,8 +119,23 @@ export const AppDrawer = () => {
       },
     },
     {
+      text: 'Contracts',
+      icon: <FileCopyIcon sx={{color: '#fff'}} />,
+      path: '/contracts',
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/contracts');
+        navigate('/contracts?pageIndex=1&pageSize=25');
+      },
+    },
+
+    {
       text: 'Employees',
-      icon: <WorkOutlinedIcon sx={{color: '#fff'}} />,
+      icon: <PersonIcon sx={{color: '#fff'}} />,
       path: '/employees',
       onClick: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -172,6 +159,20 @@ export const AppDrawer = () => {
         setSelectedIndex(index);
         setSelectedPath('/quotations');
         navigate('/quotations?pageIndex=1&pageSize=25');
+      },
+    },
+    {
+      text: 'Invoices',
+      icon: <PaymentsIcon sx={{color: '#fff'}} />,
+      path: '/invoices',
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/invoices');
+        navigate('/invoices?pageIndex=1&pageSize=25');
       },
     },
     {

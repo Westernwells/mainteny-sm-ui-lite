@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import {EmptyIllustration} from 'components/EmptyIllustration';
@@ -37,7 +37,7 @@ export const ServiceHistoryTab = () => {
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   const [selectedStatusView, setSelectedStatusView] = useState('All');
   const [isEmpty, setIsEmpty] = useState<boolean>(false);
-
+  const totalServiceOrdersRef = useRef(0);
   const [expanded, setExpanded] = useState<boolean>();
   const [selectedOrder, setSelectedOrder] = useState<ServiceOrderView>();
   const [currentReportDate, setCurrentReportDate] = useState<string>();
@@ -47,21 +47,6 @@ export const ServiceHistoryTab = () => {
   const [currentScheduleTime, setCurrentScheduleTime] = useState<string | null>(
     null,
   );
-  const {
-    data: totalServiceOrders = createEmptyResource<ServiceOrderView>(100),
-  } = useServiceOrders({
-    elevatorIds: elevatorId ? [elevatorId] : undefined,
-    start: startOfYear(new Date('2000')).toISOString(),
-    end: endOfYear(new Date(getYear(new Date()).toString())).toISOString(),
-    pageSize: 1,
-    pageIndex: 0,
-    query: '',
-    status: [
-      ServiceOrderStatus.SCHEDULED,
-      ServiceOrderStatus.COMPLETED,
-      ServiceOrderStatus.IN_PROGRESS,
-    ],
-  });
   const {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(pageSize),
   } = useServiceOrders({
@@ -92,6 +77,8 @@ export const ServiceHistoryTab = () => {
   );
 
   const {data: elevator} = useElevatorById(elevatorId);
+
+  totalServiceOrdersRef.current = serviceOrders.total;
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -183,7 +170,7 @@ export const ServiceHistoryTab = () => {
     setSelectedStatusView('All');
   };
 
-  if (!totalServiceOrders.total) {
+  if (!totalServiceOrdersRef.current) {
     return (
       <EmptySection
         label="No service history entries made so far!"

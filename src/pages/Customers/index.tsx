@@ -1,5 +1,5 @@
 import {PageOverviewLayout} from 'components/PageOverviewLayout';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
@@ -24,17 +24,10 @@ export const Customer = () => {
   const [search, setSearch] = useState('');
   const [showFilter, setShowFilter] = useState(false);
   const [queryParams, setQueryParams] = useSearchParams();
+  const totalCustomerRef = useRef(0);
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
-
-  const {
-    data: {total: totalCustomer} = createEmptyResource<PropertyOwner>(pageSize),
-  } = useQueryCustomers({
-    pageIndex: 0,
-    pageSize: 1,
-    query: '',
-  });
 
   const {
     data: customerResource = createEmptyResource<PropertyOwner>(pageSize),
@@ -46,6 +39,7 @@ export const Customer = () => {
     },
     {keepPreviousData: true},
   );
+  totalCustomerRef.current = customerResource.total;
 
   const {
     data: customersWithUnits,
@@ -79,7 +73,11 @@ export const Customer = () => {
     setPageCount(Math.ceil(customerResource.total / page.pageSize));
   }, [customerResource, page.pageSize]);
 
-  if (isFetched && !totalCustomer) {
+  if (isIdle || isLoading) {
+    return <Progress />;
+  }
+
+  if (isFetched && !totalCustomerRef.current) {
     return (
       <EmptySection
         label="No customers have been created yet. Please click the button below to create one!"
@@ -91,10 +89,6 @@ export const Customer = () => {
         }}
       />
     );
-  }
-
-  if (isIdle || isLoading) {
-    return <Progress />;
   }
 
   return (

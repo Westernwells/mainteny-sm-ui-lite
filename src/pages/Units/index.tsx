@@ -34,6 +34,7 @@ export const MyUnits = () => {
   const [search, setSearch] = useState('');
   // const [mapSearch, setMapSearch] = useState('');
   const [page, setPage] = useState(pageInfo);
+  const totalUnitsRef = useRef(0);
   const [pageCount, setPageCount] = useState(0);
   const [showFilter, setShowFilter] = useState(false);
   const [status, setStatus] = useState<string[]>([]);
@@ -42,12 +43,6 @@ export const MyUnits = () => {
     elevatorByAddress: ElevatorByAddr;
     centerCoord: Location;
   }>(fallback);
-
-  const {
-    data: {total: totalElevators} = createEmptyResource<ElevatorView>(10),
-  } = useAllElevators('', makePage(0, 1), {
-    status: [],
-  });
 
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
@@ -61,6 +56,8 @@ export const MyUnits = () => {
     },
     {keepPreviousData: true},
   );
+
+  totalUnitsRef.current = elevatorResponse.total;
 
   const groupElevatorByAddressList = (elevatorRes?: Resource<ElevatorView>) => {
     const elevatorMap = _.groupBy(
@@ -109,7 +106,7 @@ export const MyUnits = () => {
     }
   }, [showFilter]);
 
-  if (isFetched && !totalElevators) {
+  if (isFetched && !totalUnitsRef.current) {
     return (
       <EmptySection
         label="No elevators have been created yet. Please click the button below to create one!"
@@ -130,8 +127,6 @@ export const MyUnits = () => {
   const closeMapView = () => {
     setShowMapview(false);
   };
-
-  console.log(isLoading, '>>>>>><<<<');
 
   if (isLoading) {
     return <Progress />;

@@ -4,7 +4,7 @@ import {
 } from 'hooks/reactQuery/useContract';
 import {ContractOrderField, ContractView} from 'models/contract';
 import {Order} from 'models/misc';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {Progress} from 'components/Progress';
@@ -25,6 +25,7 @@ interface Props {
 export const ContractsTab = ({customerId}: Props) => {
   const [page, setPage] = useState(makePage(0, 10));
   const [search, setSearch] = useState('');
+  const totalContractsRef = useRef(0);
   const [showFilter, setShowFilter] = useState(false);
   const [expiryDate, setExpiryDate] = useState<string[]>([]);
   const [contractor, setContractor] = useState<string[]>([]);
@@ -34,17 +35,6 @@ export const ContractsTab = ({customerId}: Props) => {
     [],
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const {data: {total: totalContract} = createEmptyResource<ContractView>(10)} =
-    useUseQueryCustomerContracts(
-      {
-        query: '',
-        orderBy: ContractOrderField.EXPIRY_TIME,
-        order: Order.ASC,
-        pageIndex: 0,
-        pageSize: 11,
-      },
-      customerId,
-    );
 
   const {
     data: contractResource = createEmptyResource<ContractView>(10),
@@ -67,6 +57,8 @@ export const ContractsTab = ({customerId}: Props) => {
     contractResource.data,
     {keepPreviousData: true},
   );
+
+  totalContractsRef.current = contractResource.total;
 
   useEffect(() => {
     const options: string[] = [];
@@ -102,7 +94,7 @@ export const ContractsTab = ({customerId}: Props) => {
     setCost(range);
   };
 
-  if (isFetched && !totalContract) {
+  if (isFetched && !totalContractsRef.current) {
     return (
       <EmptySection
         label="No contracts yet. Create a new one to view here"
