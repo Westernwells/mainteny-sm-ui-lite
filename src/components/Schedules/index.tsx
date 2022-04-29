@@ -127,7 +127,7 @@ export const Schedule = ({
     return () => {
       clearTimeout(timeout);
     };
-  }, [bodyRow]);
+  }, []);
 
   const calculatePosition = (startDateTime: string) => {
     const morningTime = startOfDay(new Date(startDateTime));
