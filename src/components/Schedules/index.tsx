@@ -222,13 +222,14 @@ export const Schedule = ({
         border: 'none',
         // maxHeight: '76vh',
         ...containerStyles,
+        height: '100%',
         // width: '100%'
       }}>
       <Box
         ref={elementRef}
         sx={{
           overflow: 'scroll',
-          height: '76vh',
+          // height: '76vh',
           '&::-webkit-scrollbar': {
             height: '0.2em',
             width: '0.2em',

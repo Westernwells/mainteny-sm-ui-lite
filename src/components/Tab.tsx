@@ -43,6 +43,9 @@ export const Tabs = ({
     <Box
       sx={{
         pb: '1em',
+        display: 'flex',
+        flexDirection: 'column',
+        flexGrow: 1,
       }}>
       <Box
         sx={{
@@ -138,6 +141,10 @@ export const Tabs = ({
       <Box
         sx={{
           width: '100%',
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          outline: '1px solid red',
           mt: 2,
           '::-webkit-scrollbar': {
             width: 0,

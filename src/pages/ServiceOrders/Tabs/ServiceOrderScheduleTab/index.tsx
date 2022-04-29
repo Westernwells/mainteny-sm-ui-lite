@@ -124,7 +124,7 @@ export const ServiceOrderScheduleTab = ({
   );
 
   return (
-    <>
+    <Box sx={{flexGrow: 1, display: 'flex', flexDirection: 'column'}}>
       <Box sx={{display: 'flex', justifyContent: 'space-between', mb: '0.5em'}}>
         <Box>{renderControls()}</Box>
         <Box sx={{display: 'flex', justifyContent: 'flex-end', flexGrow: 1}}>
@@ -137,14 +137,14 @@ export const ServiceOrderScheduleTab = ({
         {/* <ServiceOrderStatusIndicator containerStyles={{flexGrow: 1}} /> TODO: ADD to card footer */}
       </Box>
 
-      <Box sx={{display: 'flex', maxHeight: '76vh'}}>
+      <Box sx={{display: 'flex', flexGrow: 1}}>
         <Schedule
           scheduleItems={orders}
           loading={technicianLoading}
           labelType="people"
           searchPlaceholder="Search technician"
           handleSearch={(value) => setTechnicianSearch(value)}
-          containerStyles={{}}
+          containerStyles={{outline: '2px solid red'}}
           bodyLabel={technicianResource.data.map(
             (technician) =>
               `${technician.userAccount.firstName} ${technician.userAccount.lastName}`,
@@ -176,6 +176,6 @@ export const ServiceOrderScheduleTab = ({
           />
         ) : null}
       </Box>
-    </>
+    </Box>
   );
 };
