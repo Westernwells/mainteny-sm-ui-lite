@@ -43,14 +43,20 @@ export const Tabs = ({
     <Box
       sx={{
         pb: '1em',
+        display: 'flex',
+        flexDirection: 'column',
+        flexGrow: 1,
       }}>
       <Box
         sx={{
           display: 'flex',
         }}>
-        <Typography variant="h5" mt="0.5em" mr="3em">
-          {pageTitle || ''}
-        </Typography>
+        {pageTitle ? (
+          <Typography variant="h5" mt="0.5em" mr="3em">
+            {pageTitle}
+          </Typography>
+        ) : null}
+
         {!hideBackIcon ? (
           <BackAction
             label={backBtnLabel}
@@ -138,6 +144,9 @@ export const Tabs = ({
       <Box
         sx={{
           width: '100%',
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
           mt: 2,
           '::-webkit-scrollbar': {
             width: 0,

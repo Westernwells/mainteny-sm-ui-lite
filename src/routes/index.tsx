@@ -132,7 +132,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Customers - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout pageScrollable>
+              <PageLayout>
                 <Customer />
               </PageLayout>
             </>
@@ -145,7 +145,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Customer Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout pageScrollable>
+              <PageLayout>
                 <CustomerDetails />
               </PageLayout>
             </>

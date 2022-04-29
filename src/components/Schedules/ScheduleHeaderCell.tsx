@@ -25,7 +25,8 @@ export const ScheduleHeaderCell = ({
         borderTop: 'none',
         textAlign: 'left',
         height: '60px',
-        width: cellWidth,
+        minWidth: cellWidth,
+        maxWidth: cellWidth,
         color: grey[500], // TODO: add to theme
         position: 'sticky',
         top: 0,

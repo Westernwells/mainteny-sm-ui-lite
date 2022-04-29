@@ -4,7 +4,6 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {Progress} from 'components/Progress';
 
 import Box from '@mui/material/Box';
-import Fade from '@mui/material/Fade';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
 
@@ -21,7 +20,7 @@ interface Props {
 }
 
 export const UnitsTab = ({customerId}: Props) => {
-  const [page, setPage] = useState(makePage(0, 10));
+  const [page, setPage] = useState(makePage(0, 25));
   const [search, setSearch] = useState('');
   const [showFilter, setShowFilter] = useState(false);
   const totalUnitsRef = useRef(0);
@@ -82,7 +81,7 @@ export const UnitsTab = ({customerId}: Props) => {
           hideViewOption
         />
       }>
-      <Fade in={showFilter} unmountOnExit>
+      {showFilter ? (
         <Box>
           <FilterFields setShowFilter={setShowFilter}>
             <MultipleSelectCheckmarks
@@ -92,13 +91,11 @@ export const UnitsTab = ({customerId}: Props) => {
             />
           </FilterFields>
         </Box>
-      </Fade>
+      ) : null}
       {isLoading ? (
         <Progress />
       ) : (
         <DataGridLayout
-          fullHeight={false}
-          height={400}
           hideFooter={pageCount <= 1}
           rows={rows}
           columns={columns}

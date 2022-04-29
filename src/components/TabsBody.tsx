@@ -7,6 +7,14 @@ interface Props {
   children: React.ReactNode | null;
 }
 
-export const TabsBody = ({value, index, children}: Props) => (
-  <Box>{value === index ? children : null}</Box>
-);
+export const TabsBody = ({value, index, children}: Props) =>
+  value === index ? (
+    <Box
+      sx={{
+        flexGrow: 1,
+        display: 'flex',
+        flexDirection: 'column',
+      }}>
+      {children}
+    </Box>
+  ) : null;
