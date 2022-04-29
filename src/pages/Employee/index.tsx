@@ -9,7 +9,7 @@ import {useQueryUserAccounts} from 'hooks/reactQuery/useUserAccount';
 import {EmployeesView} from 'models/employee';
 import {Resource, TechnicianEventType} from 'models/misc';
 import {Role, UserAccountView} from 'models/user';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import * as _ from 'lodash';
 import {
@@ -31,6 +31,7 @@ const pageSize = 25;
 export const Employees = () => {
   const [page, setPage] = useState(makePage(0, pageSize));
   const [queryParams, setQueryParams] = useSearchParams();
+  const totalEmployeeRef = useRef(0);
   const [pageCount, setPageCount] = useState(0);
   const [search, setSearch] = useState('');
   const [showFilter, setShowFilter] = useState(false);
@@ -39,16 +40,6 @@ export const Employees = () => {
   const [employeeResource, setEmployeeResource] = useState(
     createEmptyResource<EmployeesView>(pageSize),
   );
-  const {
-    data: {total: totalEmployee} = createEmptyResource<UserAccountView>(
-      pageSize,
-    ),
-  } = useQueryUserAccounts({
-    pageIndex: 0,
-    pageSize: 1,
-    query: '',
-    roles: [Role.SERVICE_MANAGER, Role.TECHNICIAN],
-  });
 
   const {
     data: userAccountResource = createEmptyResource<UserAccountView>(pageSize),
@@ -71,6 +62,7 @@ export const Employees = () => {
   } = useFetchTechniciansByUserAccounts(userAccountResource.data, {
     keepPreviousData: true,
   });
+
   const {data: technicianEvents} = useQueryTechnicianEvents({
     start: toRestDateTime(startOfDay(addDays(new Date(), 1))),
     end: toRestDateTime(endOfDay(addDays(new Date(), 1))),
@@ -78,6 +70,8 @@ export const Employees = () => {
     pageSize: page.pageSize,
     eventType: [TechnicianEventType.HOLIDAY, TechnicianEventType.SICK_LEAVE],
   });
+
+  totalEmployeeRef.current = userAccountResource.total;
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
@@ -143,7 +137,7 @@ export const Employees = () => {
     setPageCount(Math.ceil(userAccountResource.total / page.pageSize));
   }, [userAccountResource, page.pageSize]);
 
-  if (isFetched && !totalEmployee) {
+  if (isFetched && !totalEmployeeRef.current) {
     return (
       <EmptySection
         label="No employees have been created yet. Please click the button below to create one!"
@@ -166,7 +160,7 @@ export const Employees = () => {
       label="Employees"
       renderWidget={
         <Widget
-          searchPlaceholder="Try 'Astralift BV'"
+          searchPlaceholder="Search name, role, address, phone"
           getSearchValue={(val: string) => setSearch(val)}
           setShowFilter={setShowFilter}
           showFilter={showFilter}

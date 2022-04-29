@@ -135,18 +135,12 @@ export const InvoiceDetails = () => {
             <RelatedTo>
               <HistoryCard
                 serviceOrder={invoice!.serviceOrder}
-                headerTitle={formatDate(
-                  invoice!.serviceOrder.schedules[0].startTime,
-                  'dd MMM YYY',
-                )}
+                headerTitle={formatDate('2022-04-26T15:01:00')}
                 subtitle={`${formatDate(
-                  invoice!.serviceOrder.schedules[0].startTime,
+                  '2022-04-26T15:01:00',
                   'ha',
-                )} - ${formatDate(
-                  invoice!.serviceOrder.schedules[0].endTime,
-                  'ha',
-                )}`}
-                description={invoice!.serviceOrder.description}
+                )} - ${formatDate('2022-04-26T16:00:00', 'ha')}`}
+                description="Broken Shaft door, engine not working"
                 containerStyles={{borderRadius: 0}}
                 showPointer
                 removeShadows

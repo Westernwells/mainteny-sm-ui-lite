@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
 import {GridRowsProp} from '@mui/x-data-grid';
@@ -18,25 +18,11 @@ const pageSize = 25;
 
 export const Quotations = () => {
   const [search, setSearch] = useState('');
-
+  const totalQuotationsRef = useRef(0);
   const [page, setPage] = useState(makePage(0, pageSize));
   const [showFilter, setShowFilter] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const {
-    data: {total: totalQuotations} = createEmptyResource<QuotationView>(
-      pageSize,
-    ),
-  } = useQuotations(
-    {
-      pageIndex: 0,
-      pageSize: 1,
-      query: '',
-      status: [],
-    },
-    {},
-  );
-
   const {
     data: quotationsResource = createEmptyResource<QuotationView>(pageSize),
     isLoading,
@@ -53,6 +39,8 @@ export const Quotations = () => {
     {keepPreviousData: true},
   );
 
+  totalQuotationsRef.current = quotationsResource.total;
+
   useEffect(() => {
     if (quotationsResource) {
       setRows(makeRows(quotationsResource));
@@ -68,7 +56,7 @@ export const Quotations = () => {
     setPageCount(Math.ceil(quotationsResource.total / page.pageSize));
   }, [quotationsResource, page.pageSize]);
 
-  if (isFetched && !totalQuotations) {
+  if (isFetched && !totalQuotationsRef.current) {
     return (
       <EmptySection
         label="No quotations have been created yet. Please click the button below to create one!"
