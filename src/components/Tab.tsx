@@ -144,7 +144,6 @@ export const Tabs = ({
           flexGrow: 1,
           display: 'flex',
           flexDirection: 'column',
-          outline: '1px solid red',
           mt: 2,
           '::-webkit-scrollbar': {
             width: 0,

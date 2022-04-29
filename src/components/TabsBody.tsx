@@ -14,7 +14,6 @@ export const TabsBody = ({value, index, children}: Props) =>
         flexGrow: 1,
         display: 'flex',
         flexDirection: 'column',
-        outline: '2px solid blue',
       }}>
       {children}
     </Box>

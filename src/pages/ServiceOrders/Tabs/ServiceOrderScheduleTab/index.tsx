@@ -42,14 +42,12 @@ export const ServiceOrderScheduleTab = ({
     ServiceOrderStatus[] | []
   >([]);
   const [page] = useState(makePage(0, 500));
-  const {
-    data: technicianResource = createEmptyResource<TechnicianView>(10),
-    isLoading: technicianLoading,
-  } = useQueryServiceCompanyTechnicians({
-    pageIndex: 0,
-    pageSize: 500,
-    query: technicianSearch,
-  });
+  const {data: technicianResource = createEmptyResource<TechnicianView>(10)} =
+    useQueryServiceCompanyTechnicians({
+      pageIndex: 0,
+      pageSize: 500,
+      query: technicianSearch,
+    });
   const {data: serviceOrders = createEmptyResource<ServiceOrderView>(10)} =
     useQueryServiceOrderSchedules({
       end: toRestDateTime(endOfDay(currentDate)),
@@ -137,14 +135,12 @@ export const ServiceOrderScheduleTab = ({
         {/* <ServiceOrderStatusIndicator containerStyles={{flexGrow: 1}} /> TODO: ADD to card footer */}
       </Box>
 
-      <Box sx={{display: 'flex', flexGrow: 1}}>
+      <Box sx={{display: 'flex', flexGrow: 1, height: 0}}>
         <Schedule
           scheduleItems={orders}
-          loading={technicianLoading}
           labelType="people"
           searchPlaceholder="Search technician"
           handleSearch={(value) => setTechnicianSearch(value)}
-          containerStyles={{outline: '2px solid red'}}
           bodyLabel={technicianResource.data.map(
             (technician) =>
               `${technician.userAccount.firstName} ${technician.userAccount.lastName}`,
