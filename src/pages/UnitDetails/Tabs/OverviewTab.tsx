@@ -63,7 +63,7 @@ export const OverviewTab = ({
 
   return (
     <>
-      <Grid container spacing={2} sx={{mt: '1em'}}>
+      <Grid container spacing={2}>
         <Grid item xs={4}>
           <ElevatorBasicSection
             elevator={elevator}

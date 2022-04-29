@@ -51,9 +51,12 @@ export const Tabs = ({
         sx={{
           display: 'flex',
         }}>
-        <Typography variant="h5" mt="0.5em" mr="3em">
-          {pageTitle || ''}
-        </Typography>
+        {pageTitle ? (
+          <Typography variant="h5" mt="0.5em" mr="3em">
+            {pageTitle}
+          </Typography>
+        ) : null}
+
         {!hideBackIcon ? (
           <BackAction
             label={backBtnLabel}

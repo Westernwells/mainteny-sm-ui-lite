@@ -156,8 +156,6 @@ export const ContractsTab = ({customerId}: Props) => {
         <Progress />
       ) : (
         <DataGridLayout
-          fullHeight={false}
-          height={400}
           hideFooter={pageCount <= 1}
           rows={rows}
           columns={columns}
