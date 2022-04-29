@@ -23,6 +23,7 @@ export const CardProps = ({
   containerStyles,
 }: Props) => (
   <Box display="flex" width="100%" sx={{...containerStyles}}>
+    {/* remove width to make this component more generic */}
     <Box
       sx={{
         background: iconBackground,

@@ -1,12 +1,24 @@
 import Button, {ButtonProps} from '@mui/material/Button';
 import {ReactNode} from 'react';
 
+const btnSize = {
+  small: '1.5rem',
+  medium: '2.5rem',
+  large: 'default',
+};
+
 interface Props extends ButtonProps {
   label?: string;
   children?: ReactNode;
+  style?: {[key: string]: string | number};
 }
 
-export const CustomButtonUnstyled = ({label, children, ...rest}: Props) => (
+export const CustomButtonUnstyled = ({
+  label,
+  children,
+  style,
+  ...rest
+}: Props) => (
   <Button
     disableRipple
     disableFocusRipple
@@ -16,11 +28,12 @@ export const CustomButtonUnstyled = ({label, children, ...rest}: Props) => (
       textTransform: 'capitalize',
       background: 'transparent',
       border: '1px solid rgba(15, 76, 100, 0.5)',
-      height: rest.size === 'small' ? '2.5rem' : 'default',
+      height: rest.size && btnSize[rest.size] ? btnSize[rest.size] : 'default',
       px: '1.5em',
       '&:hover': {
         background: 'transparent',
       },
+      ...style,
     }}
     {...rest}>
     {children || label}

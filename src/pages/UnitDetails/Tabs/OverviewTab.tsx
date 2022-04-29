@@ -42,7 +42,7 @@ export const OverviewTab = ({
   const {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(pageSize),
   } = useServiceOrders({
-    elevatorIds: elevatorId,
+    elevatorIds: elevatorId ? [elevatorId] : undefined,
     start: startOfYear(new Date()).toISOString(),
     end: endOfYear(new Date()).toISOString(),
     pageSize,

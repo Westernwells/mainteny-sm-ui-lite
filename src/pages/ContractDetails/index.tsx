@@ -84,7 +84,7 @@ export const ContractDetails = () => {
         <BackAction label="Contract Details" />
         <CustomButtonUnstyled
           label="Download Contract"
-          size="small"
+          size="medium"
           startIcon={<FileDownloadIcon color="primary" />}
         />
       </Box>

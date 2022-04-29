@@ -50,11 +50,11 @@ export const ServiceHistoryTab = () => {
   const {
     data: totalServiceOrders = createEmptyResource<ServiceOrderView>(100),
   } = useServiceOrders({
-    elevatorIds: elevatorId,
+    elevatorIds: elevatorId ? [elevatorId] : undefined,
     start: startOfYear(new Date('2000')).toISOString(),
     end: endOfYear(new Date(getYear(new Date()).toString())).toISOString(),
     pageSize: 1,
-    // pageIndex: 0,
+    pageIndex: 0,
     query: '',
     status: [
       ServiceOrderStatus.SCHEDULED,
@@ -65,17 +65,19 @@ export const ServiceHistoryTab = () => {
   const {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(pageSize),
   } = useServiceOrders({
-    elevatorIds: elevatorId,
+    elevatorIds: elevatorId ? [elevatorId] : undefined,
     start: startOfYear(new Date(selectedYear)).toISOString(),
     end: endOfYear(new Date(selectedYear)).toISOString(),
     pageSize: 50,
     pageIndex: 0,
     query: '',
-    status: selectedStatus.length || [
-      ServiceOrderStatus.SCHEDULED,
-      ServiceOrderStatus.COMPLETED,
-      ServiceOrderStatus.IN_PROGRESS,
-    ],
+    status: selectedStatus.length
+      ? (selectedStatus as ServiceOrderStatus[])
+      : [
+          ServiceOrderStatus.SCHEDULED,
+          ServiceOrderStatus.COMPLETED,
+          ServiceOrderStatus.IN_PROGRESS,
+        ],
   });
   const {data: serviceOrderReport = [], isLoading: serviceOrderReportLoading} =
     useServiceOrderReport({

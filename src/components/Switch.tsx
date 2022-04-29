@@ -1,14 +1,32 @@
-import * as React from 'react';
+import {ChangeEvent, useEffect, useState} from 'react';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import MuiSwitch from '@mui/material/Switch';
 
 interface Props {
-  label: string;
+  label?: string;
+  getValue?: (val: boolean) => void;
 }
 
-export const Switch = ({label}: Props) => (
-  <FormGroup>
-    <FormControlLabel control={<MuiSwitch defaultChecked />} label={label} />
-  </FormGroup>
-);
+export const Switch = ({label = '', getValue}: Props) => {
+  const [checked, setChecked] = useState(true);
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setChecked(event.target.checked);
+  };
+
+  useEffect(() => {
+    if (getValue) {
+      getValue(checked);
+    }
+  }, [checked]);
+
+  return (
+    <FormGroup>
+      <FormControlLabel
+        control={<MuiSwitch checked={checked} onChange={handleChange} />}
+        label={label}
+      />
+    </FormGroup>
+  );
+};

@@ -22,6 +22,7 @@ import {Switch} from 'components/Switch';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Typography from '@mui/material/Typography';
+import {UnAssignedServiceOrders} from './UnAssigedServiceOrder';
 
 interface Props {
   showFilter?: boolean;
@@ -36,6 +37,7 @@ export const ServiceOrderScheduleTab = ({
   const [technicianSearch, setTechnicianSearch] = useState('');
   const [orders, setOrders] = useState<{[key: string]: ServiceOrderView[]}>({});
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [switchActive, setSwitchActive] = useState(false);
   const [selectedOrderStatus, setSelectedOrderStatus] = useState<
     ServiceOrderStatus[] | []
   >([]);
@@ -127,42 +129,53 @@ export const ServiceOrderScheduleTab = ({
         <Box>{renderControls()}</Box>
         <Box sx={{display: 'flex', justifyContent: 'flex-end', flexGrow: 1}}>
           {renderFilterItems()}
-          <Switch label="Show Unassigned Orders" />
+          <Switch
+            getValue={(value) => setSwitchActive(value)}
+            label="Show Unassigned Orders"
+          />
         </Box>
         {/* <ServiceOrderStatusIndicator containerStyles={{flexGrow: 1}} /> TODO: ADD to card footer */}
       </Box>
 
-      <Schedule
-        scheduleItems={orders}
-        loading={technicianLoading}
-        labelType="people"
-        searchPlaceholder="Search technician"
-        handleSearch={(value) => setTechnicianSearch(value)}
-        bodyLabel={technicianResource.data.map(
-          (technician) =>
-            `${technician.userAccount.firstName} ${technician.userAccount.lastName}`,
-        )}
-        renderCellItem={(order: ServiceOrderView, calWidth, calcPosition) => (
-          <ScheduleItem
-            key={order.id}
-            titleLeftAdornment={
-              <ServiceOrderIcons
-                serviceOrderType={order.type}
-                style={{fontSize: '1rem'}}
-              />
-            }
-            title={order.elevator.propertyOwner.name}
-            subtitle={order.elevator.address.fullName}
-            width={calWidth(
-              order.schedules[0].startTime,
-              order.schedules[0].endTime,
-            )}
-            tooltip={<OrderDetails order={order} />}
-            cardStatusAccent={serviceOrderStatusColor[order.status]}
-            position={calcPosition(order.schedules[0].startTime)}
+      <Box sx={{display: 'flex', maxHeight: '76vh'}}>
+        <Schedule
+          scheduleItems={orders}
+          loading={technicianLoading}
+          labelType="people"
+          searchPlaceholder="Search technician"
+          handleSearch={(value) => setTechnicianSearch(value)}
+          containerStyles={{}}
+          bodyLabel={technicianResource.data.map(
+            (technician) =>
+              `${technician.userAccount.firstName} ${technician.userAccount.lastName}`,
+          )}
+          renderCellItem={(order: ServiceOrderView, calWidth, calcPosition) => (
+            <ScheduleItem
+              key={order.id}
+              titleLeftAdornment={
+                <ServiceOrderIcons
+                  serviceOrderType={order.type}
+                  style={{fontSize: '1rem'}}
+                />
+              }
+              title={order.elevator.propertyOwner.name}
+              subtitle={order.elevator.address.fullName}
+              width={calWidth(
+                order.schedules[0].startTime,
+                order.schedules[0].endTime,
+              )}
+              tooltip={<OrderDetails order={order} />}
+              cardStatusAccent={serviceOrderStatusColor[order.status]}
+              position={calcPosition(order.schedules[0].startTime)}
+            />
+          )}
+        />
+        {switchActive ? (
+          <UnAssignedServiceOrders
+            containerStyles={{width: '55%', ml: '0.5em'}}
           />
-        )}
-      />
+        ) : null}
+      </Box>
     </>
   );
 };

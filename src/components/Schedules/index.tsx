@@ -29,7 +29,6 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {WeekPair} from 'models/misc';
 import {grey} from '@mui/material/colors';
 import {SearchInput} from 'components/SearchInput';
-import useTheme from '@mui/material/styles/useTheme';
 import {Progress} from 'components/Progress';
 
 interface Props {
@@ -45,6 +44,7 @@ interface Props {
   bodyLabel?: string[];
   handleSearch?: (val: string) => void;
   loading?: boolean;
+  containerStyles?: {[key: string]: string | number};
 }
 
 const gridWidth = 120;
@@ -59,8 +59,8 @@ export const Schedule = ({
   bodyLabel = [],
   handleSearch,
   loading = false,
+  containerStyles,
 }: Props) => {
-  const theme = useTheme();
   const [tableHeader, setTableHeader] = useState<string[]>([]);
   const elementRef = useRef<HTMLInputElement | undefined>();
   const [weekPair, setWeekPair] = useState<WeekPair>({
@@ -195,7 +195,7 @@ export const Schedule = ({
           handleSearch && handleSearch(searchValue)
         }
         containerStyle={{
-          background: theme.palette.inputBackground.main,
+          background: '#fff',
           width: '90%',
         }}
       />
@@ -220,7 +220,9 @@ export const Schedule = ({
     <Card
       sx={{
         border: 'none',
-        maxHeight: '76vh',
+        // maxHeight: '76vh',
+        ...containerStyles,
+        // width: '100%'
       }}>
       <Box
         ref={elementRef}

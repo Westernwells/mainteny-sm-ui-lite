@@ -41,7 +41,7 @@ export const InvoiceDetails = () => {
         <CustomButtonUnstyled
           label="Download Invoice"
           disabled={!downloadUrl}
-          size="small"
+          size="medium"
           onClick={() =>
             downloadUrl ? window.open(downloadUrl[0], '_blank') : null
           }

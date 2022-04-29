@@ -21,6 +21,8 @@ export const ScheduleBodyCell = ({
       border: '0.5px solid #F1F5F9',
       height: '70px',
       minWidth: cellWidth,
+      maxWidth: cellWidth,
+
       ':first-of-type': {
         position: 'sticky',
         left: 0,
