@@ -87,7 +87,8 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
         headerContainerOverrideStyles={{
           background: 'none',
           pb: 0,
-          mx: '0',
+          mx: 0,
+          pt: 0,
           height: 'default',
         }}>
         <Box sx={{px: '0.5em'}}>
