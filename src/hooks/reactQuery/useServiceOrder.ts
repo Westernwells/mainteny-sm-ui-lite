@@ -1,5 +1,5 @@
 import {useCallback} from 'react';
-import {useQuery, UseQueryOptions} from 'react-query';
+import {useInfiniteQuery, useQuery, UseQueryOptions} from 'react-query';
 import * as _ from 'lodash';
 import {AxiosResponse} from 'axios';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
@@ -233,6 +233,37 @@ export function useServiceOrders(
     {enabled: !!user, ...options},
   );
 }
+
+export const useInfiniteServiceOrders = (params: ServiceOrderQueryParams) => {
+  const {user} = useUserSession();
+  return useInfiniteQuery(
+    queryKeys.infiniteServiceOrders,
+    ({
+      pageParam = {
+        ...params,
+        serviceCompanyId: user!.userAccount.serviceCompany.id,
+        orderBy: ServiceOrderOrderField.CREATED_TIME,
+        order: Order.DESC,
+      },
+    }) => fetchServiceOrders(pageParam),
+    {
+      getNextPageParam: (lastPage) => {
+        const currentTotal =
+          (lastPage.page.pageIndex + 1) * lastPage.page.pageSize;
+        if (currentTotal < lastPage.total) {
+          return {
+            ...params,
+            serviceCompanyId: user!.userAccount.serviceCompany.id,
+            orderBy: ServiceOrderOrderField.CREATED_TIME,
+            order: Order.DESC,
+            pageIndex: lastPage.page.pageIndex + 1,
+          };
+        }
+        return undefined;
+      },
+    },
+  );
+};
 
 // TODO: currently not in uae, we migght have to remove
 // if we realise we'll never need it again
