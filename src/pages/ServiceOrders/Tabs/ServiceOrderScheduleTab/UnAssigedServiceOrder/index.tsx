@@ -36,6 +36,39 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
     orderBy: ServiceOrderOrderField.CREATED_TIME,
   });
 
+  useEffect(() => {
+    if (inView) {
+      const currentTotal =
+        (serviceOrders.page.pageIndex + 1) * serviceOrders.page.pageSize;
+      if (currentTotal < serviceOrders.total) {
+        setHasMore(true);
+        setPage({...page, pageIndex: serviceOrders.page.pageIndex + 1});
+      } else {
+        setHasMore(false);
+      }
+    }
+  }, [inView]);
+
+  useEffect(() => {
+    if (search) {
+      if (page.pageIndex) {
+        setPage({...page, pageIndex: 0});
+      }
+    }
+  }, [search]);
+
+  console.log('@@@');
+  useEffect(() => {
+    if (page.pageIndex === 0) {
+      setServiceOrdersView(serviceOrders);
+    } else {
+      setServiceOrdersView({
+        ...serviceOrders,
+        data: [...serviceOrdersView.data, ...serviceOrders.data],
+      });
+    }
+  }, [serviceOrders]);
+
   return (
     <Box sx={{...containerStyles}} {...rest}>
       <PageCard
