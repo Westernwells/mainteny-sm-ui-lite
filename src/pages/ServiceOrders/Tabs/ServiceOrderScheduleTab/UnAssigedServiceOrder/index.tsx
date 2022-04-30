@@ -63,7 +63,6 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
     }
   }, [search]);
 
-  console.log('@@@');
   useEffect(() => {
     if (page.pageIndex === 0) {
       setServiceOrdersView(serviceOrders);
