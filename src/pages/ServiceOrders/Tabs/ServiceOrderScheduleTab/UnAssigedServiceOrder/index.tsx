@@ -1,5 +1,5 @@
 import Box, {BoxProps} from '@mui/material/Box';
-import React, {useState} from 'react';
+import {useEffect, useState} from 'react';
 import Typography from '@mui/material/Typography';
 import {SearchInput} from 'components/SearchInput';
 import {PageCard} from 'components/PageCard';
@@ -10,12 +10,11 @@ import {
   ServiceOrderView,
 } from 'models/service-order';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
+import {useInView} from 'react-intersection-observer';
 import {endOfDay, startOfMonth} from 'date-fns';
-import {createEmptyResource} from 'utils/paging-utils';
-import {Order} from 'models/misc';
+import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {Order, Resource} from 'models/misc';
 import {OrderDetails} from './OrderDetails';
-
-const pageSize = 50;
 
 interface Props extends BoxProps {
   containerStyles?: {[key: string]: string | number};
@@ -23,13 +22,20 @@ interface Props extends BoxProps {
 
 export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
   const [search, setSearch] = useState('');
+  const {ref, inView} = useInView();
+  const [page, setPage] = useState(makePage(0, 50));
+  const [hasMore, setHasMore] = useState(false);
+  const [serviceOrdersView, setServiceOrdersView] = useState<
+    Resource<ServiceOrderView>
+  >(createEmptyResource<ServiceOrderView>(page.pageSize));
+
   const {
-    data: serviceOrders = createEmptyResource<ServiceOrderView>(pageSize),
+    data: serviceOrders = createEmptyResource<ServiceOrderView>(page.pageSize),
   } = useServiceOrders({
     end: endOfDay(new Date()).toISOString(),
     start: startOfMonth(new Date()).toISOString(), // we should show unsassigned orders for a couople month
-    pageSize,
-    pageIndex: 0,
+    pageSize: page.pageSize,
+    pageIndex: page.pageIndex,
     query: search,
     status: [ServiceOrderStatus.READY_TO_SCHEDULE, ServiceOrderStatus.INIT],
     order: Order.ASC,
@@ -115,9 +121,15 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
               height: '1em',
             },
           }}>
-          {serviceOrders.data.map((serviceOrder) => (
-            <OrderDetails serviceOrder={serviceOrder} />
+          {serviceOrdersView.data.map((serviceOrder) => (
+            <Box ref={ref}>
+              <OrderDetails serviceOrder={serviceOrder} />
+            </Box>
           ))}
+
+          {page.pageIndex > 0 && hasMore ? (
+            <Typography variant="smallBtnText"> Loading more... </Typography>
+          ) : null}
         </Box>
       </PageCard>
     </Box>
