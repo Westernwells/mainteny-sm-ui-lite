@@ -26,9 +26,11 @@ export const CustomButtonUnstyled = ({
     variant="text"
     sx={{
       textTransform: 'capitalize',
+      display: 'flex',
       background: 'transparent',
       border: '1px solid rgba(15, 76, 100, 0.5)',
-      height: rest.size && btnSize[rest.size] ? btnSize[rest.size] : 'default',
+      minHeight:
+        rest.size && btnSize[rest.size] ? btnSize[rest.size] : 'default',
       px: '1.5em',
       '&:hover': {
         background: 'transparent',
