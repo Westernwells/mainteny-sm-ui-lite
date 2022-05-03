@@ -12,6 +12,7 @@ import {PageCard} from 'components/PageCard';
 
 import technicianImage from 'assets/images/avatar.png';
 import {MaintainerView, TechnicianView} from 'models/technician';
+import {TechnSectionStyles as sx} from './styles';
 
 export interface TechnicianSectionProp {
   maintainers: MaintainerView[];
@@ -46,38 +47,17 @@ export const TechnicianSection = ({maintainers}: TechnicianSectionProp) => {
         {
           label: 'company',
           value: technician.userAccount.serviceCompany.name, // TODO use dynamic data
-          icon: (
-            <BadgeOutlinedIcon
-              sx={{
-                width: '1.125rem',
-                color: theme.palette.text.primary,
-              }}
-            />
-          ),
+          icon: <BadgeOutlinedIcon sx={sx.icon} />,
         },
         {
           label: 'Email',
           value: `${technician?.userAccount.contact.email}`,
-          icon: (
-            <EmailOutlinedIcon
-              sx={{
-                width: '1.125rem',
-                color: theme.palette.text.primary,
-              }}
-            />
-          ),
+          icon: <EmailOutlinedIcon sx={sx.icon} />,
         },
         {
           label: 'Phone',
           value: `${technician?.userAccount.contact.phone}`,
-          icon: (
-            <CallOutlinedIcon
-              sx={{
-                width: '1.125rem',
-                color: theme.palette.text.primary,
-              }}
-            />
-          ),
+          icon: <CallOutlinedIcon sx={sx.icon} />,
         },
       ];
       setRows(result);
@@ -96,22 +76,10 @@ export const TechnicianSection = ({maintainers}: TechnicianSectionProp) => {
           <Box mr="1.2em">
             {index === 0 ? (
               <Box>
-                <Avatar
-                  alt="Tech"
-                  src={technicianImage}
-                  sx={{width: '3.125rem', height: '3.125rem'}}
-                />
+                <Avatar alt="Tech" src={technicianImage} sx={sx.avatar} />
               </Box>
             ) : (
-              <Box
-                sx={{background: theme.palette.background.default}}
-                width="3rem"
-                height="2.8rem"
-                display="flex"
-                justifyContent="center"
-                alignItems="center">
-                {item.icon}
-              </Box>
+              <Box sx={sx.iconContainer}>{item.icon}</Box>
             )}
           </Box>
           <Box>
