@@ -118,7 +118,6 @@ export const CustomPagination = ({
             },
             '& .MuiPaginationItem-page': {
               border: 0,
-              // background: 'red'
             },
           }}
         />
