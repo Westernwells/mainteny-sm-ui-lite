@@ -29,7 +29,6 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {WeekPair} from 'models/misc';
 import {grey} from '@mui/material/colors';
 import {SearchInput} from 'components/SearchInput';
-// import { CardActions } from '@mui/material';
 
 interface Props {
   scheduleItems: {[key: string]: any[]};
