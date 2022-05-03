@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {ReactNode, useEffect, useRef, useState} from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import {twentyFourHourTime} from 'utils/utils';
@@ -29,6 +29,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {WeekPair} from 'models/misc';
 import {grey} from '@mui/material/colors';
 import {SearchInput} from 'components/SearchInput';
+// import { CardActions } from '@mui/material';
 
 interface Props {
   scheduleItems: {[key: string]: any[]};
@@ -43,6 +44,7 @@ interface Props {
   bodyLabel?: string[];
   handleSearch?: (val: string) => void;
   containerStyles?: {[key: string]: string | number};
+  cardFooter?: ReactNode;
 }
 
 const gridWidth = 120;
@@ -57,6 +59,7 @@ export const Schedule = ({
   bodyLabel = [],
   handleSearch,
   containerStyles,
+  cardFooter,
 }: Props) => {
   const [tableHeader, setTableHeader] = useState<string[]>([]);
   const elementRef = useRef<HTMLInputElement | undefined>();
@@ -225,6 +228,9 @@ export const Schedule = ({
         sx={{
           overflow: 'scroll',
           height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
           '&::-webkit-scrollbar': {
             height: '0.2em',
             width: '0.2em',
@@ -308,6 +314,20 @@ export const Schedule = ({
             </ScheduleBody>
           </ScheduleContainer>
         </CardContent>
+
+        {cardFooter ? (
+          <Box
+            sx={{
+              position: 'sticky',
+              left: 0,
+              bottom: 0,
+              zIndex: 5,
+              background: '#fff',
+              pt: '0.8em',
+            }}>
+            {cardFooter}
+          </Box>
+        ) : null}
       </Box>
     </Card>
   );

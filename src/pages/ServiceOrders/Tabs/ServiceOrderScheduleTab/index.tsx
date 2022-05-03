@@ -21,6 +21,7 @@ import {capitalize} from 'lodash';
 import {Switch} from 'components/Switch';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicator';
 import Typography from '@mui/material/Typography';
 import {UnAssignedServiceOrders} from './UnAssigedServiceOrder';
 
@@ -137,6 +138,9 @@ export const ServiceOrderScheduleTab = ({
 
       <Box sx={{display: 'flex', flexGrow: 1, height: 0}}>
         <Schedule
+          cardFooter={
+            <ServiceOrderStatusIndicator containerStyles={{flexGrow: 1}} />
+          }
           scheduleItems={orders}
           labelType="people"
           searchPlaceholder="Search technician"
