@@ -29,6 +29,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {WeekPair} from 'models/misc';
 import {grey} from '@mui/material/colors';
 import {SearchInput} from 'components/SearchInput';
+import {styles as sx} from './styles';
 
 interface Props {
   scheduleItems: {[key: string]: any[]};
@@ -216,35 +217,8 @@ export const Schedule = ({
   );
 
   return (
-    <Card
-      sx={{
-        border: 'none',
-        ...containerStyles,
-        height: '100%',
-      }}>
-      <Box
-        ref={elementRef}
-        sx={{
-          overflow: 'scroll',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          '&::-webkit-scrollbar': {
-            height: '0.2em',
-            width: '0.2em',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: '#f1f1f1',
-            borderRadius: '100vw',
-            marginInline: '0.5em',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: '#888',
-            borderRadius: '100vw',
-            height: '1em',
-          },
-        }}>
+    <Card sx={[sx.card, {...containerStyles}]}>
+      <Box ref={elementRef} sx={sx.mainContainer}>
         <CardContent sx={{padding: 0}}>
           <ScheduleContainer>
             <ScheduleHeader>
@@ -314,19 +288,7 @@ export const Schedule = ({
           </ScheduleContainer>
         </CardContent>
 
-        {cardFooter ? (
-          <Box
-            sx={{
-              position: 'sticky',
-              left: 0,
-              bottom: 0,
-              zIndex: 5,
-              background: '#fff',
-              pt: '0.8em',
-            }}>
-            {cardFooter}
-          </Box>
-        ) : null}
+        {cardFooter ? <Box sx={sx.footerContainer}>{cardFooter}</Box> : null}
       </Box>
     </Card>
   );
