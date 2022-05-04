@@ -1,268 +1,45 @@
-import {useEffect, useState} from 'react';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import Alert from '@mui/material/Alert';
-import {useContractDetails} from 'hooks/reactQuery/useContract';
-import Tooltip from '@mui/material/Tooltip';
+import {useState} from 'react';
+import {TabsBody} from 'components/TabsBody';
+import {Tabs} from 'components/Tab';
 import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
-import useTheme from '@mui/material/styles/useTheme';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import {useParams} from 'react-router-dom';
-import {StatusChip} from 'components/StatusChip';
-import {DataGridLayout} from 'components/DataGridLayout';
-import {BackAction} from 'components/BackAction';
-import {toDate} from 'utils/datetime';
-import {differenceInDays, isBefore} from 'date-fns';
+import ElevatorIcon from '@mui/icons-material/Elevator';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import {GridRowsProp} from '@mui/x-data-grid';
-import {Widget} from 'components/Widget';
-import {BasicDetailsCard} from 'components/BasicDetailsCard';
-import {useAllElevators} from 'hooks/reactQuery/useElevator';
-import {ElevatorView} from 'models/elevator';
-import {
-  columns,
-  makeRows,
-} from 'pages/CustomerDetails/Tabs/CustomerUnitDataGrid';
-import {Progress} from 'components/Progress';
-import {formatCurrency} from 'utils/currency';
-import {ContractBasic} from './ContractBasic';
-import {ContractParties} from './ContractParties';
-import {ContractScope} from './ContractScope';
-import {ContractTimeline} from './ContractTimeline';
-import {ContractCard} from './ContractCard';
+import {UnitsTab} from './Tabs/UnitsTab';
+import {ContractOverview} from './Tabs/ContractOverview';
+
+const tabItems = [
+  {
+    label: 'Overview',
+    icon: <ManageSearchIcon />,
+  },
+  {
+    label: 'Units',
+    icon: <ElevatorIcon />,
+  },
+];
 
 export const ContractDetails = () => {
-  const {id: contractId} = useParams();
-  const theme = useTheme();
-  const [search, setSearch] = useState('');
-  const [page] = useState(makePage(0, 10)); // TODO: implement paging
-  const [showFilter, setShowFilter] = useState(false);
-  const [rows, setRows] = useState<GridRowsProp>([]);
-  const {data: contractDetails, isLoading} = useContractDetails(contractId!);
-  const {data: elevator = createEmptyResource<ElevatorView>(10)} =
-    useAllElevators(search, page, {
-      status: [],
-    });
-
-  useEffect(() => {
-    if (elevator.data) {
-      setRows(makeRows(elevator));
-    } else {
-      setRows([]);
-    }
-  }, [elevator]);
-
-  const totalContractDays =
-    !isLoading &&
-    differenceInDays(
-      toDate(contractDetails?.endTime),
-      toDate(contractDetails?.startTime),
-    );
-
-  const usedContractDays =
-    !isLoading && isBefore(new Date(), toDate(contractDetails?.endTime))
-      ? differenceInDays(new Date(), toDate(contractDetails?.startTime))
-      : differenceInDays(
-          toDate(contractDetails?.endTime),
-          toDate(contractDetails?.startTime),
-        );
-
-  const unUsedContractDays =
-    !isLoading && isBefore(new Date(), toDate(contractDetails?.endTime))
-      ? differenceInDays(toDate(contractDetails?.endTime), new Date())
-      : 0;
-
-  if (isLoading) {
-    return <Progress />;
-  }
-
+  const [tabValue, setTabValue] = useState(0);
   return (
-    <Box>
-      <Box display="flex" justifyContent="space-between" mb="0.5em">
-        <BackAction label="Contract Details" />
+    <Tabs
+      tabItems={tabItems}
+      currentIndex={tabValue}
+      onChange={(index) => setTabValue(index)}
+      backBtnLabel="Contract Details"
+      renderWidget={
         <CustomButtonUnstyled
           label="Download Contract"
           size="medium"
           startIcon={<FileDownloadIcon color="primary" />}
         />
-      </Box>
-      <Grid
-        container
-        spacing={2}
-        sx={{
-          pb: '1em',
-        }}>
-        <Grid xs={8} item>
-          <BasicDetailsCard
-            minHeight="12rem"
-            containerStyles={{pt: '1em'}}
-            header={
-              <Box display="flex" justifyContent="space-between">
-                <Typography variant="subtitle1">
-                  {contractDetails?.number}
-                </Typography>
-                <StatusChip
-                  color="success"
-                  label="In Effect"
-                  textColor={theme.palette.success.main}
-                  bgColor={theme.palette.success.outlinedHoverBg}
-                />
-              </Box>
-            }>
-            <ContractBasic
-              startTime={contractDetails?.startTime}
-              endTime={contractDetails?.endTime}
-              costPerYear={formatCurrency(
-                contractDetails ? contractDetails.price! : 0,
-                {
-                  currency: contractDetails?.currency || 'EUR',
-                },
-              )}
-              type={contractDetails?.type.toLowerCase()}
-            />
-          </BasicDetailsCard>
-
-          <ContractCard
-            containerStyles={{mt: '1em', pt: '1em'}}
-            minHeight="13rem"
-            header={
-              <Box display="flex">
-                <Typography variant="subtitle1" mr="0.5em">
-                  Scope of Work
-                </Typography>
-                <Tooltip
-                  title="All the work and materials that are included in the contract"
-                  placement="bottom-start"
-                  componentsProps={{
-                    tooltip: {
-                      sx: {
-                        bgcolor: 'common.black',
-                        '& .MuiTooltip-arrow': {
-                          color: 'common.black',
-                        },
-                      },
-                    },
-                  }}
-                  arrow>
-                  <ErrorOutlineIcon
-                    sx={{
-                      mt: '0.25em',
-                      width: '1.04rem',
-                      height: '1.04rem',
-                      color: theme.palette.action.active,
-                    }}
-                  />
-                </Tooltip>
-              </Box>
-            }>
-            <ContractScope />
-          </ContractCard>
-
-          <ContractCard
-            containerStyles={{mt: '1em', py: '1em'}}
-            header={
-              <Box display="flex">
-                <Typography variant="subtitle1" mr="0.5em">
-                  Parties
-                </Typography>
-                <Tooltip
-                  title="Entities signing the contract"
-                  placement="bottom-start"
-                  componentsProps={{
-                    tooltip: {
-                      sx: {
-                        bgcolor: 'common.black',
-                        '& .MuiTooltip-arrow': {
-                          color: 'common.black',
-                        },
-                      },
-                    },
-                  }}
-                  arrow>
-                  <ErrorOutlineIcon
-                    sx={{
-                      mt: '0.25em',
-                      width: '1.04rem',
-                      height: '1.04rem',
-                      color: theme.palette.action.active,
-                    }}
-                  />
-                </Tooltip>
-              </Box>
-            }>
-            <ContractParties
-              companyName={contractDetails?.serviceCompany.name}
-              personName={contractDetails?.serviceCompany.name}
-              email={contractDetails?.serviceCompany.contact.email}
-              partyType="Contractor"
-              chipColor="info"
-              chipTextColor={theme.palette.info.main}
-              chipBgColor={theme.palette.info.outlinedHoverBg}
-            />
-            <ContractParties
-              companyName={contractDetails?.propertyOwner.name}
-              personName={contractDetails?.propertyOwner.name}
-              email={contractDetails?.propertyOwner.contact.email}
-              partyType="Customer"
-              chipColor="info"
-              chipTextColor={theme.palette.info.main}
-              chipBgColor={theme.palette.info.outlinedHoverBg}
-              containerStyle={{mt: '3em'}}
-            />
-          </ContractCard>
-        </Grid>
-        <Grid xs={4} item>
-          <ContractCard
-            containerStyles={{height: '100%', py: '1em'}}
-            bodyContainerStyle={{height: '100%'}}
-            header={
-              <Typography variant="subtitle1">Contract Timeline</Typography>
-            }>
-            {unUsedContractDays > 0 && unUsedContractDays <= 30 ? (
-              <Alert
-                variant="filled"
-                severity="warning"
-                sx={{
-                  mb: '1em',
-                  background: theme.palette.warning.outlinedHoverBg,
-                  color: theme.palette.warning.main,
-                }}>
-                Contract expires in {unUsedContractDays} days!
-              </Alert>
-            ) : null}
-
-            <ContractTimeline
-              contractDetails={contractDetails}
-              unUsedContractDays={unUsedContractDays}
-              usedContractDays={usedContractDays}
-              totalContractDays={totalContractDays}
-            />
-          </ContractCard>
-        </Grid>
-      </Grid>
-
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        maxWidth="100%"
-        sx={{mt: '3em'}}>
-        <Box sx={{mb: 4, mt: 1}}>
-          <Typography variant="h4">Units</Typography>
-        </Box>
-        <Box>
-          <Widget
-            searchPlaceholder="Try ‘Schindler’ or ‘Mitsubishi’"
-            getSearchValue={(val: string) => setSearch(val)}
-            setShowFilter={setShowFilter}
-            showFilter={showFilter}
-            hideViewOption
-          />
-        </Box>
-      </Box>
-
-      <DataGridLayout rows={rows} columns={columns} />
-    </Box>
+      }>
+      <TabsBody value={tabValue} index={0}>
+        <ContractOverview />
+      </TabsBody>
+      <TabsBody value={tabValue} index={1}>
+        <UnitsTab />
+      </TabsBody>
+    </Tabs>
   );
 };
