@@ -91,7 +91,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Contract Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout pageScrollable>
+              <PageLayout>
                 <ContractDetails />
               </PageLayout>
             </>
