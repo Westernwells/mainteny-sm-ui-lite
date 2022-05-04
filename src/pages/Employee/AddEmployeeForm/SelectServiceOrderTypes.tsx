@@ -8,9 +8,9 @@ import {ReactComponent as EmergencyIcon} from 'assets/icons/Emergency.svg';
 import {ReactComponent as RegularIcon} from 'assets/icons/Regular.svg';
 import {ReactComponent as CalloutIcon} from 'assets/icons/Callout.svg';
 
+import {FormCheckbox} from 'components/form//FormCheckbox';
 import {ServiceOrderType} from 'models/service-order';
 import {EmployeeAccountData} from './model';
-import {FormCheckbox} from './FormCheckbox';
 
 export const SelectServiceOrderTypes = () => {
   const [serviceOrderTypes, setServiceOrderTypes] = useState({

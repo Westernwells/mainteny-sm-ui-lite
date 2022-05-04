@@ -1,0 +1,101 @@
+import React from 'react';
+import {Formik} from 'formik';
+import * as Yup from 'yup';
+import {useNavigate} from 'react-router';
+import {SideDrawer} from 'components/SideDrawer';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useEmployeeAccount} from 'hooks/reactQuery/useUserAccount';
+import {EmployeesView} from 'models/employee';
+import {Role} from 'models/user';
+import {EditEmployeeForm} from './EditEmployeeForm';
+import {EmployeeAccountData} from './EditEmployeeForm/model';
+
+// TODO: Use common components for both Add Employee and Edit Employee
+
+interface Props {
+  employee: EmployeesView;
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const EditEmployee = ({employee, open, setOpen}: Props) => {
+  const navigate = useNavigate();
+  const {user} = useUserSession();
+  const {updateEmployeeAccount} = useEmployeeAccount();
+  const initialValues: EmployeeAccountData = {
+    username: employee.userAccount.username,
+    firstName: employee.userAccount.firstName,
+    lastName: employee.userAccount.lastName,
+    phone:
+      employee.userAccount.contact.phone.split('+')[1] ||
+      employee.userAccount.contact.phone,
+    email: employee.userAccount.contact.email,
+    roles: employee.userAccount.roles,
+    address:
+      employee.userAccount.roles.includes(Role.TECHNICIAN) && employee.address
+        ? {
+            fullName: employee.address.fullName,
+            countryCode: employee.address.countryCode,
+            location: {
+              longitude: employee.address.location.longitude,
+              latitude: employee.address.location.latitude,
+            },
+          }
+        : null,
+    addressFullName:
+      employee.userAccount.roles.includes(Role.TECHNICIAN) &&
+      employee.address &&
+      employee.address.fullName,
+    serviceOrderTypes:
+      employee.userAccount.roles.includes(Role.TECHNICIAN) &&
+      employee.additionalInfo
+        ? employee.additionalInfo.assignedServiceOrderTypes || []
+        : [],
+    shifts:
+      employee.userAccount.roles.includes(Role.TECHNICIAN) &&
+      employee.workingHours
+        ? employee.workingHours.map((item) => ({
+            fromTime: item.fromTime,
+            toTime: item.toTime,
+            type: item.type,
+          }))
+        : [],
+    serviceCompanyId: user?.userAccount.serviceCompany.id,
+  };
+
+  const phoneValidationRE =
+    /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+
+  const validationSchema = Yup.object().shape({
+    firstName: Yup.string().required('First name is required'),
+    lastName: Yup.string().required('Last name is required'),
+    email: Yup.string()
+      .email('Enter a valid email')
+      .required('Email is required'),
+    phone: Yup.string()
+      .required('Phone number is required')
+      .matches(phoneValidationRE, 'Phone number is not valid'),
+  });
+
+  return (
+    <SideDrawer
+      open={open}
+      setOpen={setOpen}
+      header="Edit Employee"
+      body={
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={async (values, {resetForm}) => {
+            updateEmployeeAccount(values, () => {
+              resetForm();
+              setOpen(false);
+              navigate(0);
+            });
+          }}>
+          <EditEmployeeForm />
+        </Formik>
+      }
+    />
+  );
+};

@@ -36,7 +36,7 @@ export const Employees = () => {
   const [search, setSearch] = useState('');
   const [showFilter, setShowFilter] = useState(false);
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [employeeResource, setEmployeeResource] = useState(
     createEmptyResource<EmployeesView>(pageSize),
   );
