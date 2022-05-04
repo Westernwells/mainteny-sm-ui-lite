@@ -4,8 +4,8 @@ import AddressAutocomplete from 'mui-address-autocomplete';
 import Box from '@mui/material/Box';
 import LocationIcon from '@mui/icons-material/LocationOn';
 import Typography from '@mui/material/Typography';
+import {FormInput} from 'components/form/FormInput';
 import {EmployeeAccountData} from './model';
-import {FormInput} from './FormInput';
 
 export const SelectAddress = () => {
   const [address, setAddress] = useState<any>(null);

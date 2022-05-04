@@ -8,7 +8,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EyeIcon from '@mui/icons-material/RemoveRedEye';
 import {Role} from 'models/user';
-import {FormInput} from './FormInput';
+import {FormInput} from 'components/form/FormInput';
 import {SelectShift} from './SelectShift';
 import {EmployeeAccountData} from './model';
 import {SelectEmployeeRole} from './SelectEmployeeRole';

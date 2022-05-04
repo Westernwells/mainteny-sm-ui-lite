@@ -13,10 +13,12 @@ import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 import {capitalize} from 'utils/utils';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
+import {EditEmployee} from './EditEmployee';
 
 interface Props {
   employee?: EmployeesView;
@@ -39,6 +41,7 @@ interface BasicDetails {
 export const EmployeeOverview = ({employee}: Props) => {
   const theme = useTheme();
   const [basicDetails, setBasicDetails] = useState<BasicDetails>();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
     if (employee) {
@@ -180,9 +183,17 @@ export const EmployeeOverview = ({employee}: Props) => {
           color: theme.palette.info.dark,
           cursor: 'pointer',
         }}>
-        {/* TODO: @Suraj, please update this to use an actual button */}
-        <Typography variant="subtitle2">Edit</Typography>
+        <Button onClick={() => setIsDrawerOpen(true)}>
+          <Typography variant="subtitle2">Edit</Typography>
+        </Button>
       </Box>
+      {employee && (
+        <EditEmployee
+          employee={employee}
+          open={isDrawerOpen}
+          setOpen={setIsDrawerOpen}
+        />
+      )}
     </BasicDetailsCard>
   );
   return <Box>{renderBasicDetails()}</Box>;

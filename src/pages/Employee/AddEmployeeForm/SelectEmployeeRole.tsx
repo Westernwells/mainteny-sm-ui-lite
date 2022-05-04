@@ -3,8 +3,8 @@ import {useFormikContext} from 'formik';
 import {SelectChangeEvent} from '@mui/material';
 import {Role} from 'models/user';
 import {convertToMacro, convertToText} from 'utils/utils';
+import {FormSelect} from 'components/form/FormSelect';
 import {EmployeeAccountData} from './model';
-import {FormSelect} from './FormSelect';
 
 export const SelectEmployeeRole = () => {
   const [roles, setRoles] = useState<string[]>([]);

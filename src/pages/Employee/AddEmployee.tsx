@@ -3,9 +3,11 @@ import {Formik} from 'formik';
 import * as Yup from 'yup';
 import {SideDrawer} from 'components/SideDrawer';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {useAddEmployeeAccount} from 'hooks/reactQuery/useUserAccount';
+import {useEmployeeAccount} from 'hooks/reactQuery/useUserAccount';
 import {AddEmployeeForm} from './AddEmployeeForm';
 import {EmployeeAccountData} from './AddEmployeeForm/model';
+
+// TODO: Use common components for both Add Employee and Edit Employee
 
 interface Props {
   open: boolean;
@@ -14,7 +16,7 @@ interface Props {
 
 export const AddEmployee = ({open, setOpen}: Props) => {
   const {user} = useUserSession();
-  const {addEmployeeAccount} = useAddEmployeeAccount();
+  const {addEmployeeAccount} = useEmployeeAccount();
 
   const initialValues: EmployeeAccountData = {
     firstName: '',
