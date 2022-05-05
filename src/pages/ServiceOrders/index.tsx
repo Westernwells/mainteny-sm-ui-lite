@@ -5,6 +5,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import {Widget} from 'components/Widget';
 import {ServiceOrderScheduleTab} from './Tabs/ServiceOrderScheduleTab';
+import {ServiceOrderList} from './Tabs/ServiceOrderList.tsx';
 
 const tabItems = [
   {
@@ -21,6 +22,7 @@ export const ServiceOrders = () => {
   const [tabValue, setTabValue] = useState(0);
   // const [showFilter, setShowFilter] = useState(false);
   const [showScheduleFilter, setShowScheduleFilter] = useState(false);
+  const [showListFilter, setShowListFilter] = useState(false);
   // const [scheduleFilter, setScheduleFilter] = useState();
 
   const renderScheduleWidget = () => (
@@ -35,7 +37,17 @@ export const ServiceOrders = () => {
     />
   );
 
-  const renderListWidget = () => <div />;
+  const renderListWidget = () => (
+    <Widget
+      searchPlaceholder=""
+      setShowFilter={setShowListFilter}
+      showFilter={showListFilter}
+      btnLabel="New Order"
+      showNewBtn
+      hideViewOption
+      hideSearchInput
+    />
+  );
 
   const renderWidget = (tabIndex: number) => {
     switch (tabIndex) {
@@ -65,7 +77,10 @@ export const ServiceOrders = () => {
         />
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
-        {null}
+        <ServiceOrderList
+          setShowFilter={setShowListFilter}
+          showFilter={showListFilter}
+        />
       </TabsBody>
     </Tabs>
   );

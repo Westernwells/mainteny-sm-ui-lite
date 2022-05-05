@@ -6,6 +6,7 @@ import {formatDistance} from 'date-fns';
 import {PageCard} from 'components/PageCard';
 import useTheme from '@mui/material/styles/useTheme';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import {convertToText} from 'utils/utils';
 import {Elevator, ElevatorStatus} from '../../models/elevator';
 import {ServiceOrder, ServiceOrderView} from '../../models/service-order';
 import {formatDate} from '../../utils/datetime';
@@ -66,7 +67,7 @@ export const ElevatorBasicSection = ({
 
           {index === 0 ? (
             <StatusChip
-              label={elevator ? elevator.status : ''}
+              label={elevator ? convertToText(elevator.status) : ''}
               color={
                 elevator?.status === ElevatorStatus.RUNNING
                   ? 'success'

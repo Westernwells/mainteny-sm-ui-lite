@@ -121,7 +121,7 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
             },
           }}>
           {serviceOrdersView.data.map((serviceOrder) => (
-            <Box ref={ref}>
+            <Box ref={ref} key={serviceOrder.id}>
               <OrderDetails serviceOrder={serviceOrder} />
             </Box>
           ))}

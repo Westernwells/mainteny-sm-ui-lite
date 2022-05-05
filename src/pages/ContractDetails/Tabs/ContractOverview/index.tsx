@@ -66,12 +66,7 @@ export const ContractOverview = () => {
                 <Typography variant="subtitle1">
                   {contractDetails?.number}
                 </Typography>
-                <StatusChip
-                  color="success"
-                  label="In Effect"
-                  textColor={theme.palette.success.main}
-                  bgColor={theme.palette.success.outlinedHoverBg}
-                />
+                <StatusChip color="success" label="In Effect" />
               </Box>
             }>
             <ContractBasic
@@ -161,8 +156,6 @@ export const ContractOverview = () => {
               email={contractDetails?.serviceCompany.contact.email}
               partyType="Contractor"
               chipColor="info"
-              chipTextColor={theme.palette.info.main}
-              chipBgColor={theme.palette.info.outlinedHoverBg}
             />
             <ContractParties
               companyName={contractDetails?.propertyOwner.name}
@@ -170,9 +163,6 @@ export const ContractOverview = () => {
               email={contractDetails?.propertyOwner.contact.email}
               partyType="Customer"
               chipColor="info"
-              chipTextColor={theme.palette.info.main}
-              chipBgColor={theme.palette.info.outlinedHoverBg}
-              containerStyle={{mt: '3em'}}
             />
           </ContractCard>
         </Grid>

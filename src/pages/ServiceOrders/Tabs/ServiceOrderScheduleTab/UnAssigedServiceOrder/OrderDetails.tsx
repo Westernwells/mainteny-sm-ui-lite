@@ -20,7 +20,7 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => (
       <Box sx={{display: 'flex'}}>
         <ServiceOrderIcons
           serviceOrderType={serviceOrder.type}
-          style={{width: '1.14rem', height: '1.02rem', mt: '0.2em'}}
+          style={{width: '1.14rem', height: '1.02rem', mt: '0.1em'}}
         />
         <Typography
           variant="smallBtnText"

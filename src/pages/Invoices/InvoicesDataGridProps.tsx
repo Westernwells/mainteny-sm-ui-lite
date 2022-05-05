@@ -9,6 +9,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import {StatusChip} from 'components/StatusChip';
+import {convertToText} from 'utils/utils';
 // import {fetchDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {InvoiceStatus, InvoiceStatusView} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
@@ -148,14 +149,15 @@ export const columns: GridColDef[] = [
         <StatusChip
           label={
             params.value === InvoiceStatus.PAID
-              ? InvoiceStatusView.PAID
-              : InvoiceStatusView.NOT_PAID
+              ? convertToText(InvoiceStatusView.PAID)
+              : convertToText(InvoiceStatusView.NOT_PAID)
           }
-          bgColor={
-            params.value === InvoiceStatus.PAID
-              ? theme.palette.success.main
-              : theme.state?.ratingActive
-          }
+          style={{
+            color:
+              params.value === InvoiceStatus.PAID
+                ? theme.palette.success.main
+                : (theme.state?.ratingActive as string),
+          }}
         />
       );
     },

@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {useQueryServiceOrderSchedules} from 'hooks/reactQuery/useServiceOrder';
+import {useQueryServiceOrderScheduled} from 'hooks/reactQuery/useServiceOrder';
 import * as _ from 'lodash';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {
@@ -34,7 +34,7 @@ export const ScheduleTab = ({technicianId}: Props) => {
   const [orders, setOrders] = useState<{[key: string]: ServiceOrderView[]}>({});
   const [page] = useState(makePage(0, 100));
   const {data: serviceOrders = createEmptyResource<ServiceOrderView>(10)} =
-    useQueryServiceOrderSchedules({
+    useQueryServiceOrderScheduled({
       end: toRestDateTime(weekPair?.endOfWeekDay),
       start: toRestDateTime(weekPair?.startOfWeekDay),
       pageIndex: page.pageIndex,
