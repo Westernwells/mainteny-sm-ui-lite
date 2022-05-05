@@ -66,12 +66,7 @@ export const ContractOverview = () => {
                 <Typography variant="subtitle1">
                   {contractDetails?.number}
                 </Typography>
-                <StatusChip
-                  color="success"
-                  label="In Effect"
-                  textColor={theme.palette.success.main}
-                  bgColor={theme.palette.success.outlinedHoverBg}
-                />
+                <StatusChip color="success" label="In Effect" />
               </Box>
             }>
             <ContractBasic
