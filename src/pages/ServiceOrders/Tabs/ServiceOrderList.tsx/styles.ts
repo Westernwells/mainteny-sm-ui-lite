@@ -2,7 +2,7 @@ import {experimental_sx as sx} from '@mui/system';
 import {theme} from 'theme';
 
 export const olStyles = {
-  orderStatus: {
+  orderStatus: sx({
     '& .MuiChip-label': {
       px: '0.5em',
     },
@@ -18,5 +18,5 @@ export const olStyles = {
       width: '7rem',
       fontSize: '0.8125rem',
     },
-  },
+  }),
 };

@@ -9,7 +9,7 @@ const statusWidth = {
 
 interface Props {
   label: string | ReactNode;
-  style?: {[key: string]: string | number | object};
+  style?: {[key: string]: any};
   length?: 'short' | 'medium' | 'long';
   size?: 'small' | 'medium';
   color?:
