@@ -156,8 +156,6 @@ export const ContractOverview = () => {
               email={contractDetails?.serviceCompany.contact.email}
               partyType="Contractor"
               chipColor="info"
-              chipTextColor={theme.palette.info.main}
-              chipBgColor={theme.palette.info.outlinedHoverBg}
             />
             <ContractParties
               companyName={contractDetails?.propertyOwner.name}
@@ -165,9 +163,6 @@ export const ContractOverview = () => {
               email={contractDetails?.propertyOwner.contact.email}
               partyType="Customer"
               chipColor="info"
-              chipTextColor={theme.palette.info.main}
-              chipBgColor={theme.palette.info.outlinedHoverBg}
-              containerStyle={{mt: '3em'}}
             />
           </ContractCard>
         </Grid>

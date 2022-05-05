@@ -72,6 +72,7 @@ export const ContractParties = ({
     <Grid item xs={3}>
       <StatusChip
         color={chipColor}
+        length="long"
         label={partyType ? convertToText(partyType) : ''}
         style={{px: '1em'}}
       />
