@@ -1,12 +1,17 @@
 import Chip from '@mui/material/Chip';
-import Typography from '@mui/material/Typography';
+import {ReactNode} from 'react';
+
+const statusWidth = {
+  short: '6rem',
+  medium: '8rem',
+  long: '10rem',
+};
 
 interface Props {
-  label: string;
-  bgColor?: string;
-  textColor?: string;
-  style?: {[key: string]: string | number};
-  variant?: 'filled' | 'outlined';
+  label: string | ReactNode;
+  style?: {[key: string]: string | number | object};
+  length?: 'short' | 'medium' | 'long';
+  size?: 'small' | 'medium';
   color?:
     | 'default'
     | 'primary'
@@ -17,29 +22,12 @@ interface Props {
     | 'warning';
 }
 
-export const StatusChip = ({
-  label,
-  bgColor,
-  color,
-  textColor,
-  variant,
-  style,
-}: Props) => (
+export const StatusChip = ({label, color, length, style, size}: Props) => (
   <Chip
-    variant={variant || 'filled'}
-    sx={{
-      py: 2,
-      color: textColor || '#fff',
-      minWidth: '5.75rem',
-      backgroundColor: bgColor,
-      ...style,
-    }}
+    sx={{width: length ? statusWidth[length] : statusWidth.short, ...style}}
+    variant="outlined"
+    label={label}
     color={color}
-    label={
-      <Typography variant="chip" sx={{textTransform: 'capitalize'}}>
-        {`${label.charAt(0)}${label.slice(1).toLowerCase()}`}
-      </Typography>
-    }
-    size="medium"
+    size={size && size}
   />
 );

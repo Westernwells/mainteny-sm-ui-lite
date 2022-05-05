@@ -12,6 +12,7 @@ import {formatCurrency} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
 import {ContractStatus, ContractView} from 'models/contract';
 import {StatusChip} from 'components/StatusChip';
+import {convertToText} from 'utils/utils';
 
 const defaultProps = {
   editable: false,
@@ -99,22 +100,22 @@ export const columns: GridColDef[] = [
         case ContractStatus.VALID:
           return (
             <StatusChip
-              label={ContractStatus.VALID}
-              bgColor={theme.palette.success.main}
+              label={convertToText(ContractStatus.VALID)}
+              color="success"
             />
           );
         case ContractStatus.PENDING:
           return (
             <StatusChip
-              label={ContractStatus.PENDING}
-              bgColor={theme.state?.ratingActive}
+              label={convertToText(ContractStatus.PENDING)}
+              style={{color: theme.state?.ratingActive as string}}
             />
           );
         default:
           return (
             <StatusChip
-              label={ContractStatus.EXPIRED}
-              bgColor={theme.palette.error.main}
+              label={convertToText(ContractStatus.EXPIRED)}
+              color="error"
             />
           );
       }

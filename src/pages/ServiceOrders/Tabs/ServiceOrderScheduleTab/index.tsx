@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
-import {useQueryServiceOrderSchedules} from 'hooks/reactQuery/useServiceOrder';
+import {useQueryServiceOrderScheduled} from 'hooks/reactQuery/useServiceOrder';
 import * as _ from 'lodash';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {getWhen, toRestDateTime} from 'utils/datetime';
@@ -17,7 +17,6 @@ import {TechnicianView} from 'models/technician';
 import {useQueryServiceCompanyTechnicians} from 'hooks/reactQuery/useTechnician';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
-import {capitalize} from 'lodash';
 import {Switch} from 'components/Switch';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -50,7 +49,7 @@ export const ServiceOrderScheduleTab = ({
       query: technicianSearch,
     });
   const {data: serviceOrders = createEmptyResource<ServiceOrderView>(10)} =
-    useQueryServiceOrderSchedules({
+    useQueryServiceOrderScheduled({
       end: toRestDateTime(endOfDay(currentDate)),
       start: toRestDateTime(startOfDay(currentDate)),
       pageIndex: page.pageIndex,
@@ -84,7 +83,7 @@ export const ServiceOrderScheduleTab = ({
       <MultipleSelectCheckmarks
         label="Status"
         options={Object.values(ServiceOrderStatus).map((option) =>
-          capitalize(option).split('_').join(' '),
+          _.capitalize(option).split('_').join(' '),
         )}
         getSelectedValue={(item) => {
           let orderStatus = item.map((val) =>

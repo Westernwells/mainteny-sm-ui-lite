@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import {StatusChip} from 'components/StatusChip';
 import {ElevatorStatus, ElevatorView} from 'models/elevator';
 import {Resource} from 'models/misc';
+import {convertToText} from 'utils/utils';
 
 const defaultProps = {
   editable: false,
@@ -76,7 +77,7 @@ export const columns: GridColDef[] = [
     ),
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
-        label={params.value}
+        label={convertToText(params.value)}
         color={params.value === ElevatorStatus.RUNNING ? 'success' : 'error'}
       />
     ),

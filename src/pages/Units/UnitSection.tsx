@@ -5,6 +5,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/system/Box';
 import {StatusChip} from 'components/StatusChip';
+import {convertToText} from 'utils/utils';
 import {ElevatorStatus, ElevatorView} from '../../models/elevator';
 
 export interface UnitsSectionProperty {
@@ -82,7 +83,7 @@ export const UnitSection = ({elevators, address}: UnitsSectionProperty) => {
             <Grid item xs={3}>
               <Box display="flex" justifyContent="center">
                 <StatusChip
-                  label={elevator.status}
+                  label={convertToText(elevator.status)}
                   color={
                     elevator.status === ElevatorStatus.RUNNING
                       ? 'success'

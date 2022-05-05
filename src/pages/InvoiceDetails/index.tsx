@@ -10,6 +10,7 @@ import {useParams} from 'react-router-dom';
 import {BackAction} from 'components/BackAction';
 import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import {convertToText} from 'utils/utils';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {HistoryCard} from 'pages/UnitDetails/Tabs/ServiceHistoryTab/HistoryCard';
 import {formatDate, getDateObject} from 'utils/datetime';
@@ -104,18 +105,13 @@ export const InvoiceDetails = () => {
                   <StatusChip
                     label={
                       invoice!.status === InvoiceStatus.PAID
-                        ? InvoiceStatusView.PAID
-                        : InvoiceStatusView.NOT_PAID
+                        ? convertToText(InvoiceStatusView.PAID)
+                        : convertToText(InvoiceStatusView.NOT_PAID)
                     }
-                    textColor={
+                    color={
                       invoice!.status === InvoiceStatus.PAID
-                        ? theme.palette.success.main
-                        : theme.palette.warning.main
-                    }
-                    bgColor={
-                      invoice!.status === InvoiceStatus.PAID
-                        ? theme.palette.success.outlinedHoverBg
-                        : theme.palette.warning.outlinedHoverBg
+                        ? 'success'
+                        : 'warning'
                     }
                   />
                 </Box>

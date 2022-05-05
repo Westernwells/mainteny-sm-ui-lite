@@ -8,9 +8,9 @@ import {
 import Typography from '@mui/material/Typography';
 import SendIcon from '@mui/icons-material/Send';
 import {StatusChip} from 'components/StatusChip';
-import {theme} from 'theme';
 import IconButton from '@mui/material/IconButton';
 import React from 'react';
+import {convertToText} from 'utils/utils';
 
 const defaultProps = {
   editable: false,
@@ -85,11 +85,7 @@ export const columns: GridColDef[] = [
     flex: 2,
 
     renderCell: (params) => (
-      <StatusChip
-        color="success"
-        label={params.value}
-        bgColor={theme.palette.success.main}
-      />
+      <StatusChip color="success" label={convertToText(params.value)} />
     ),
   },
   {

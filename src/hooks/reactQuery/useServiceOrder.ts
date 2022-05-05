@@ -323,7 +323,7 @@ export const queryServiceOrderSchedules = async (
   return response.data;
 };
 
-export const useQueryServiceOrderSchedules = (
+export const useQueryServiceOrderScheduled = (
   params: ServiceOrderScheduleParams,
   options?: any,
 ) => {

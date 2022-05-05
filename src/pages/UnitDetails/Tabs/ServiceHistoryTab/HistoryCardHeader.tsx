@@ -65,7 +65,7 @@ export const HistoryCardHeader = ({
       <Box display="flex">
         {isDetailCard && !removeServiceOrderType ? (
           <Box display="flex" mr="1em">
-            <Box mt="0.1em">
+            <Box mt="0.2em">
               <ServiceOrderIcons
                 serviceOrderType={serviceOrderType}
                 style={{

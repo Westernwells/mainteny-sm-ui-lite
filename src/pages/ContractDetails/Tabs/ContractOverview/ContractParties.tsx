@@ -5,6 +5,7 @@ import Avatar from '@mui/material/Avatar';
 import {ServiceCompanyView} from 'models/service-company';
 import {ClientView} from 'models/client';
 import {StatusChip} from 'components/StatusChip';
+import {convertToText} from 'utils/utils';
 
 interface Props {
   personName?: string;
@@ -12,8 +13,6 @@ interface Props {
   email?: string;
   partyType?: string;
   containerStyle?: {[key: string]: string | number};
-  chipTextColor?: string;
-  chipBgColor?: string;
   chipColor?:
     | 'default'
     | 'primary'
@@ -34,8 +33,6 @@ export const ContractParties = ({
   email,
   partyType,
   containerStyle,
-  chipTextColor,
-  chipBgColor,
   chipColor,
 }: Props) => (
   <Grid container sx={{...containerStyle}}>
@@ -75,9 +72,7 @@ export const ContractParties = ({
     <Grid item xs={3}>
       <StatusChip
         color={chipColor}
-        label={partyType || ''}
-        textColor={chipTextColor}
-        bgColor={chipBgColor}
+        label={partyType ? convertToText(partyType) : ''}
         style={{px: '1em'}}
       />
     </Grid>
