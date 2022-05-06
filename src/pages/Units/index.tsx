@@ -1,14 +1,14 @@
 import {useEffect, useRef, useState} from 'react';
-import Box from '@mui/material/Box';
 import {ElevatorView} from 'models/elevator';
 import {Widget} from 'components/Widget';
 import * as _ from 'lodash';
+import {GridRowsProp} from '@mui/x-data-grid';
+import {DataGridLayout} from 'components/DataGridLayout';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {FilterFields} from 'components/FilterFields';
 import {PageOverviewLayout} from 'components/PageOverviewLayout';
-import {CustomPagination} from 'components/CustomPagination';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {
@@ -18,10 +18,9 @@ import {
 import {getCenter} from 'geolib';
 import {Location, Resource} from 'models/misc';
 import {useSearchParams} from 'react-router-dom';
-import {UnitSection} from './UnitSection';
+import {columns, makeRows} from './UnitsDataGridProps';
 import {UnitsMapsView} from './UnitsMapsView';
-import {UnitColumns} from './UnitColumns';
-import {ElevatorByAddr} from './Models';
+import {DataGridElevatorView, ElevatorByAddr} from './Models';
 
 const pageInfo = makePage(0, 50);
 
@@ -36,6 +35,7 @@ export const MyUnits = () => {
   const [page, setPage] = useState(pageInfo);
   const totalUnitsRef = useRef(0);
   const [pageCount, setPageCount] = useState(0);
+  const [rows, setRows] = useState<GridRowsProp>([]);
   const [showFilter, setShowFilter] = useState(false);
   const [status, setStatus] = useState<string[]>([]);
   const [showMapview, setShowMapview] = useState(false);
@@ -48,6 +48,7 @@ export const MyUnits = () => {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
     isLoading,
     isFetched,
+    isFetching,
   } = useAllElevators(
     search,
     page,
@@ -67,6 +68,33 @@ export const MyUnits = () => {
 
     return elevatorMap;
   };
+
+  const flatenn = (elevators: {[key: string]: ElevatorView[]}) => {
+    let prevAdddressId = '';
+    const flatArray: DataGridElevatorView[] = [];
+    Object.keys(elevators).forEach((key) => {
+      elevators[key].forEach((elevator) => {
+        const {address} = elevator;
+        const showAddress = address.id !== prevAdddressId;
+        flatArray.push({showAddress, ...elevator});
+        prevAdddressId = address.id;
+      });
+    });
+    return flatArray;
+  };
+
+  useEffect(() => {
+    if (elevatorView.elevatorByAddress) {
+      const flatArr = flatenn(elevatorView.elevatorByAddress);
+      setRows(
+        makeRows({
+          elevators: flatArr,
+        }),
+      );
+    } else {
+      setRows([]);
+    }
+  }, [elevatorView]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -163,41 +191,22 @@ export const MyUnits = () => {
       </FilterFields>
 
       {!showMapview ? (
-        <>
-          <UnitColumns />
-          <Box
-            sx={{
-              flexGrow: 1,
-              overflowY: 'scroll',
-              height: '1px',
-            }}>
-            {Object.keys(elevatorView.elevatorByAddress).map((key) => (
-              <UnitSection
-                key={key}
-                address={key}
-                elevators={elevatorView.elevatorByAddress[key]}
-              />
-            ))}
-          </Box>
-          {pageCount > 1 ? (
-            <CustomPagination
-              pageSize={page.pageSize}
-              pageIndex={page.pageIndex}
-              handlePageSizeChange={(newPageSize: number) =>
-                setQueryParams(
-                  formatSearchParamsPageSize(newPageSize, queryParams),
-                )
-              }
-              handlePageChange={(newPage: number) =>
-                setQueryParams(
-                  formatSearchParamsPageIndex(newPage, queryParams),
-                )
-              }
-              pageCount={pageCount}
-              totalRows={elevatorResponse.total}
-            />
-          ) : null}
-        </>
+        <DataGridLayout
+          hideFooter={pageCount <= 1}
+          rows={rows}
+          columns={columns}
+          loading={isFetching}
+          pageSize={page.pageSize}
+          pageIndex={page.pageIndex}
+          handlePageSizeChange={(newPageSize: number) =>
+            setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+          }
+          handlePageChange={(newPage: number) =>
+            setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+          }
+          pageCount={pageCount}
+          totalRows={elevatorResponse.total}
+        />
       ) : (
         <UnitsMapsView
           defaultCenterCoord={elevatorView?.centerCoord}
