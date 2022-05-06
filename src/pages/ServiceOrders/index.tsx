@@ -20,10 +20,9 @@ const tabItems = [
 
 export const ServiceOrders = () => {
   const [tabValue, setTabValue] = useState(0);
-  // const [showFilter, setShowFilter] = useState(false);
   const [showScheduleFilter, setShowScheduleFilter] = useState(false);
   const [showListFilter, setShowListFilter] = useState(false);
-  // const [scheduleFilter, setScheduleFilter] = useState();
+  const [listSearch, setListSearch] = useState('');
 
   const renderScheduleWidget = () => (
     <Widget
@@ -39,13 +38,13 @@ export const ServiceOrders = () => {
 
   const renderListWidget = () => (
     <Widget
-      searchPlaceholder=""
+      searchPlaceholder="Search order type, customer, address"
+      getSearchValue={(search) => setListSearch(search)}
       setShowFilter={setShowListFilter}
       showFilter={showListFilter}
       btnLabel="New Order"
       showNewBtn
       hideViewOption
-      hideSearchInput
     />
   );
 
@@ -80,6 +79,7 @@ export const ServiceOrders = () => {
         <ServiceOrderList
           setShowFilter={setShowListFilter}
           showFilter={showListFilter}
+          searchQuery={listSearch}
         />
       </TabsBody>
     </Tabs>

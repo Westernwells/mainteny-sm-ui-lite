@@ -24,11 +24,13 @@ import {columns, makeRows} from './ServiceOrderDataGridProps';
 interface Props {
   showFilter?: boolean;
   setShowFilter?: (val: boolean) => void;
+  searchQuery: string;
 }
 
 export const ServiceOrderList = ({
   showFilter = false,
   setShowFilter = () => {},
+  searchQuery,
 }: Props) => {
   const [page, setPage] = useState(makePage(0, 25));
   // const [search, setSearch] = useState('');
@@ -55,7 +57,7 @@ export const ServiceOrderList = ({
       start: startOfDay(subDays(currentDate, 30)).toISOString(),
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
-      query: '',
+      query: searchQuery,
       status: selectedOrderStatus,
       types: selectedOrderTypes,
     },
