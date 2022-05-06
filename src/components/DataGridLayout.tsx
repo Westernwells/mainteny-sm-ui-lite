@@ -47,6 +47,17 @@ export const DataGridLayout = ({
 }: Props) => {
   const navigate = useNavigate();
 
+  const rowClassNames: any[string] = [];
+  rows.forEach((item) => {
+    if (item.showHeader) {
+      rowClassNames[`& .MuiDataGrid-rowHeading-${item.id}`] = {
+        '&::before': {
+          content: `"${item.headerText}"`,
+        },
+      };
+    }
+  });
+
   const renderFooter = () => (
     <CustomPagination
       pageSize={pageSize}
@@ -84,20 +95,27 @@ export const DataGridLayout = ({
             }
           })
         }
+        getRowClassName={(params) =>
+          params.row.showHeader
+            ? `MuiDataGrid-rowHeading-common MuiDataGrid-rowHeading-${params.row.id}`
+            : ''
+        }
         sx={{
           width: '100%',
           my: '0.5em',
           borderLeft: 'none',
           borderRight: 'none',
           borderTop: 'none',
-          borderBottom: '2px solid #F0F4F5',
+          borderBottom: '2px solid',
+          borderColor: 'background.default',
           '& .MuiDataGrid-row': {
-            background: '#fff',
+            background: 'white',
             cursor: 'pointer',
           },
           '& .MuiDataGrid-columnHeaders': {
-            background: '#fff',
-            borderBottom: '2px solid #F0F4F5',
+            background: 'white',
+            borderBottom: '2px solid',
+            borderColor: 'background.default',
           },
           '& .MuiDataGrid-columnSeparator': {
             display: 'none',
@@ -120,9 +138,31 @@ export const DataGridLayout = ({
               border: 'none',
             },
           '& .MuiDataGrid-cell': {
-            borderBottom: '2px solid #F0F4F5',
+            borderBottom: '2px solid ',
+            borderColor: 'background.default',
             whiteSpace: 'normal',
           },
+
+          '.MuiDataGrid-rowHeading-common': {
+            marginTop: 'calc(2em + 4px)',
+            position: 'relative',
+            '&::before': {
+              position: 'absolute',
+              width: '100%',
+              top: '-2em',
+              paddingLeft: '.75em',
+              borderTop: '2px solid',
+              borderColor: 'background.default',
+              borderBottom: '2px solid white',
+              background: 'white',
+              color: 'text.secondary',
+              fontWeight: 600,
+              fontSize: '0.9375rem',
+              lineHeight: 1.73,
+              letterSpacing: '0.15px',
+            },
+          },
+          ...rowClassNames,
           ...containerStyle,
           ...rest,
         }}
