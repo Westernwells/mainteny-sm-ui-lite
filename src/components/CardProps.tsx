@@ -22,7 +22,7 @@ export const CardProps = ({
   iconMaxHeight,
   containerStyles,
 }: Props) => (
-  <Box display="flex" width="100%" sx={{...containerStyles}}>
+  <Box display="flex" sx={{...containerStyles}}>
     {/* remove width to make this component more generic */}
     <Box
       sx={{

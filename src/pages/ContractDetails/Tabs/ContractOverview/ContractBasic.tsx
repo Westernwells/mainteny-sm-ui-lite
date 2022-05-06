@@ -21,7 +21,7 @@ export const ContractBasic = ({
 }: Props) => {
   const theme = useTheme();
   return (
-    <Box display="flex">
+    <Box display="flex" justifyContent="space-between">
       <CardProps
         label="Cost per Year"
         bodyTextVariant="subtitle1"
@@ -37,7 +37,6 @@ export const ContractBasic = ({
         bodyTextVariant="subtitle1"
         icon={<TodayIcon color="info" />}
         iconBackground={theme.palette.info.outlinedHoverBg}
-        containerStyles={{flexGrow: 1}}
         iconMaxHeight="3rem"
         bodyText={`${startTime && formatDate(toDate(startTime), 'dd MMM YYY')}
         -

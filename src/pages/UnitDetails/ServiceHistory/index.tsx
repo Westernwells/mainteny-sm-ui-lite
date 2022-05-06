@@ -51,10 +51,7 @@ export const ServiceHistory = ({
           <Box sx={{mt: '0.2em', mr: '0.3em'}}>
             <ServiceOrderIcons
               serviceOrderType={serviceOrder.type}
-              style={{
-                width: '0.8em',
-                height: '0.8em',
-              }}
+              size='small'
             />
           </Box>
           <Box>

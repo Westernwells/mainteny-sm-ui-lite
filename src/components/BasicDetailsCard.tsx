@@ -1,15 +1,15 @@
+import {ReactNode} from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';
-import {ReactNode} from 'react';
 
 interface Props {
   bodyContainerStyle?: {[key: string]: string | number};
   containerStyles?: {[key: string]: string | number};
   headerStyles?: {[key: string]: string | number};
   minHeight?: string | number;
-  header?: string | JSX.Element;
+  header?: string | ReactNode;
   headerActionIcon?: JSX.Element;
   children: ReactNode;
 }

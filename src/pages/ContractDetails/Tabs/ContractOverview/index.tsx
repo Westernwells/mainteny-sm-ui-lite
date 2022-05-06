@@ -61,6 +61,7 @@ export const ContractOverview = () => {
           <BasicDetailsCard
             minHeight="12rem"
             containerStyles={{pt: '1em'}}
+            bodyContainerStyle={{}}
             header={
               <Box display="flex" justifyContent="space-between">
                 <Typography variant="subtitle1">

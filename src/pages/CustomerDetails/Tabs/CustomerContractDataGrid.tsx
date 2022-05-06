@@ -108,7 +108,7 @@ export const columns: GridColDef[] = [
           return (
             <StatusChip
               label={convertToText(ContractStatus.PENDING)}
-              style={{color: theme.state?.ratingActive as string}}
+              style={{color: theme.state.ratingActive}}
             />
           );
         default:

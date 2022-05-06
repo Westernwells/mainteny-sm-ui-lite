@@ -106,7 +106,6 @@ export const CustomerOverviewTab = ({
             <CardProps
               key={index}
               label={basicDetails[item as keyof BasicDetails].label}
-              bodyTextVariant="body2"
               icon={basicDetails[item as keyof BasicDetails].icon}
               containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
               iconBackground={theme.palette.info.outlinedHoverBg}

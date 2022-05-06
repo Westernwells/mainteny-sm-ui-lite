@@ -43,9 +43,10 @@ declare module '@mui/material/styles' {
   interface PaletteOptions extends CustomPalette {}
 
   interface CustomTheme {
-    state?: {
-      hover?: string;
-      ratingActive?: string;
+    state: {
+      hover: string;
+      ratingActive: string;
+      aubergine: string;
     };
   }
 

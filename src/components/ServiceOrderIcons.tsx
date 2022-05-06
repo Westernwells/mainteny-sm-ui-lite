@@ -8,17 +8,18 @@ import {ServiceOrderType} from '../models/service-order';
 interface Props {
   serviceOrderType?: ServiceOrderType;
   style?: {[key: string]: string | number};
+  size?: 'inherit' | 'large' | 'medium' | 'small';
 }
-export const ServiceOrderIcons = ({serviceOrderType, style}: Props) => {
+export const ServiceOrderIcons = ({serviceOrderType, style, size}: Props) => {
   switch (serviceOrderType) {
     case ServiceOrderType.REPAIR:
-      return <SettingsIcon sx={{color: amber[800], ...style}} />;
+      return <SettingsIcon fontSize={size} sx={{color: amber[800], ...style}} />;
     case ServiceOrderType.REGULAR:
-      return <LoopIcon color="secondary" sx={{...style}} />;
+      return <LoopIcon fontSize={size} color="secondary" sx={{...style}} />;
     case ServiceOrderType.EMERGENCY:
-      return <ReportProblemIcon color="error" sx={{...style}} />;
+      return <ReportProblemIcon fontSize={size} color="error" sx={{...style}} />;
     case ServiceOrderType.CALLOUT:
-      return <WifiCallingIcon sx={{color: grey[800], ...style}} />;
+      return <WifiCallingIcon fontSize={size} sx={{color: grey[800], ...style}} />;
     default:
       return null;
   }

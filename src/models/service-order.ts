@@ -72,6 +72,7 @@ export interface ServiceOrder {
   search: string;
   meta: Meta;
   additionalInfo: ServiceOrderAdditionalInfo;
+  serviceTime: number;
 }
 
 export interface ServiceOrderAdditionalInfo {

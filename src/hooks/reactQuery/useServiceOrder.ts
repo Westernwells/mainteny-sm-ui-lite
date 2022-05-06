@@ -16,6 +16,7 @@ import {queryKeys} from 'reactQuery/constants';
 import {ServiceCompanyTimeUnit} from 'models/service-company';
 import {toDate, toRestDate} from 'utils/datetime';
 import {
+  ServiceOrder,
   ServiceOrderOrderField,
   ServiceOrderQueryParams,
   ServiceOrderReport,
@@ -34,43 +35,6 @@ import {useUserSession} from './useUserSession';
 interface ServiceOrderReportPayload {
   serviceOrderId: string | string[];
 }
-
-export const fetchServiceOrders = async (
-  params: ServiceOrderQueryParams,
-): Promise<Resource<ServiceOrderView>> => {
-  const response: AxiosResponse<Resource<ServiceOrderView>> =
-    await axiosClient.get(`/api/serviceOrders`, {
-      params,
-      paramsSerializer,
-    });
-  return response.data;
-};
-
-export const fetchServiceOrderReport = async (
-  params: ServiceOrderReportPayload,
-) => {
-  const response = await axiosClient.get<ServiceOrderReport[]>(
-    `/api/serviceOrders/reports`,
-    {
-      params,
-      paramsSerializer,
-    },
-  );
-  return response.data;
-};
-
-export const fetchElevatorAvailability = async (
-  params: ElevatorAvailabilityParams,
-) => {
-  const response = await axiosClient.get<ElevatorAvailability>(
-    `/api/availabilities/elevators`,
-    {
-      params,
-      paramsSerializer,
-    },
-  );
-  return response.data;
-};
 
 const filterByNextVisit = (
   serviceOrderViewRes: Resource<ServiceOrderView>,
@@ -184,6 +148,19 @@ const groupElevatorByAddressList = (
   return elevatorByAddressList;
 };
 
+export const fetchElevatorAvailability = async (
+  params: ElevatorAvailabilityParams,
+) => {
+  const response = await axiosClient.get<ElevatorAvailability>(
+    `/api/availabilities/elevators`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
 export const useFetchElevatorAvailability = (elevatorIds: string[]) => {
   const params = {
     elevatorId: elevatorIds,
@@ -200,6 +177,19 @@ export const useFetchElevatorAvailability = (elevatorIds: string[]) => {
   );
 };
 
+export const fetchServiceOrderReport = async (
+  params: ServiceOrderReportPayload,
+) => {
+  const response = await axiosClient.get<ServiceOrderReport[]>(
+    `/api/serviceOrders/reports`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
 export function useServiceOrderReport(params: ServiceOrderReportPayload) {
   return useQuery<ServiceOrderReport[], RestError>(
     [queryKeys.fetchServiceOrderReport, params],
@@ -208,13 +198,20 @@ export function useServiceOrderReport(params: ServiceOrderReportPayload) {
   );
 }
 
+export const queryServiceOrders = async (
+  params: ServiceOrderQueryParams,
+): Promise<Resource<ServiceOrderView>> => {
+  const response: AxiosResponse<Resource<ServiceOrderView>> =
+    await axiosClient.get(`/api/serviceOrders`, {
+      params,
+      paramsSerializer,
+    });
+  return response.data;
+};
+
 export function useServiceOrders(
   params: ServiceOrderQueryParams,
-  options?: UseQueryOptions<
-    Resource<ServiceOrderView>,
-    RestError,
-    Resource<ServiceOrderView>
-  >,
+  options?: UseQueryOptions<any, any, any>,
 ) {
   const {user} = useUserSession();
   return useQuery<
@@ -222,9 +219,9 @@ export function useServiceOrders(
     RestError,
     Resource<ServiceOrderView>
   >(
-    [queryKeys.fetchServiceOrders, params, user!.userAccount.serviceCompany.id],
+    [queryKeys.querySeviceOrders, params, user!.userAccount.serviceCompany.id],
     () =>
-      fetchServiceOrders({
+      queryServiceOrders({
         ...params,
         serviceCompanyId: user!.userAccount.serviceCompany.id,
         orderBy: ServiceOrderOrderField.CREATED_TIME,
@@ -252,12 +249,12 @@ export function useFetchServiceOrdersByElevators(
   const end = startOfDay(addDays(new Date(), 30)).toISOString();
   return useQuery<Resource<ServiceOrderView>, RestError, ElevatorsByAddress[]>(
     [
-      queryKeys.fetchServiceOrders,
+      queryKeys.querySeviceOrders,
       elevatorIds,
       user!.userAccount.serviceCompany.id,
     ],
     () =>
-      fetchServiceOrders({
+      queryServiceOrders({
         start,
         end,
         pageSize: 500,
@@ -330,7 +327,7 @@ export const useQueryServiceOrderScheduled = (
   const {user} = useUserSession();
 
   return useQuery(
-    [queryKeys.fetchServiceOrders, params, user!.userAccount.serviceCompany.id],
+    [queryKeys.querySeviceOrders, params, user!.userAccount.serviceCompany.id],
     () =>
       queryServiceOrderSchedules({
         ...params,
@@ -339,3 +336,24 @@ export const useQueryServiceOrderScheduled = (
     {enabled: !!user, ...options},
   );
 };
+
+export const getServiceOrderDetails = async (
+  serviceOrderId: string,
+): Promise<ServiceOrder> => {
+  const response: AxiosResponse<ServiceOrder> = await axiosClient.get(
+    `/api/serviceOrders/${serviceOrderId}`,
+  );
+  return response.data;
+};
+
+// it is okay to use pass any,information is for react-query & not us.Passing correct types makes simple function gigantic
+export function useServiceOrderDetails(
+  serviceOrderId?: string,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<ServiceOrder, RestError, ServiceOrder>(
+    [queryKeys.getServiceOrderDetails, serviceOrderId],
+    () => getServiceOrderDetails(serviceOrderId!),
+    {enabled: !!serviceOrderId, ...options},
+  );
+}
