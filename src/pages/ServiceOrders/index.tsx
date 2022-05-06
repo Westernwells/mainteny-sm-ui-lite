@@ -23,7 +23,6 @@ export const ServiceOrders = () => {
   const [showScheduleFilter, setShowScheduleFilter] = useState(false);
   const [showListFilter, setShowListFilter] = useState(false);
   const [listSearch, setListSearch] = useState('');
-  // const [scheduleFilter, setScheduleFilter] = useState();
 
   const renderScheduleWidget = () => (
     <Widget
