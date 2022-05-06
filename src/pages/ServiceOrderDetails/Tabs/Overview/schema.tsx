@@ -55,3 +55,44 @@ export const orderInfo = (serviceOrderDetails: ServiceOrder) => {
   };
 };
 
+export const unitInfo = (serviceOrderDetails: ServiceOrder) => {
+  const theme = useTheme();
+  return {
+    address: {
+      label: 'ADDRESS',
+      value: serviceOrderDetails.elevator.address.fullName,
+      icon: <HomeIcon sx={{color: theme.palette.info.dark}} />,
+    },
+    type: {
+      label: 'TYPE',
+      value: serviceOrderDetails.elevator.type,
+      icon: <PeopleIcon sx={{color: theme.palette.info.dark}} />,
+    },
+    status: {
+      label: 'CAPACITY',
+      value: serviceOrderDetails.elevator.capacity,
+      icon: <PeopleAltIcon sx={{color: theme.palette.info.dark}} />,
+    },
+    createdOn: {
+      label: 'MODEL',
+      value: serviceOrderDetails.elevator.model,
+      icon: <ElevatorIcon sx={{color: theme.palette.info.dark}} />,
+    },
+    dueDate: {
+      label: 'LAST VISIT',
+      value: formatDate(
+        new Date(serviceOrderDetails.lastVisitDate),
+        'dd.MM.yyyy',
+      ),
+      icon: <PermContactCalendarIcon sx={{color: theme.palette.info.dark}} />,
+    },
+    technician: {
+      label: 'SERVICE TIME',
+      value:
+        serviceOrderDetails.status === ServiceOrderStatus.COMPLETED
+          ? convertMinsToHM(serviceOrderDetails.serviceTime)
+          : '-',
+      icon: <TimerIcon sx={{color: theme.palette.info.dark}} />,
+    },
+  };
+};

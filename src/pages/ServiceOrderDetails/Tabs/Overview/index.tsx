@@ -19,7 +19,9 @@ export const Overview = () => {
     <Grid>
       <Grid item xs={8}>
         <OrderInfoCard serviceOrderDetails={serviceOrderDetails!} />
-       
+        <Box mt="1em">
+          <UnitInfoCard serviceOrderDetails={serviceOrderDetails!} />
+        </Box>
       </Grid>
     </Grid>
   );
