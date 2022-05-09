@@ -1,3 +1,5 @@
+import {ReactNode} from 'react';
+
 export interface RestError {
   errorCode: string;
   message: string;
@@ -200,3 +202,9 @@ export interface WeekPair {
 
 export type WithOptional<T, K extends keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
+
+export interface BasicDetailsValue {
+  label: string;
+  value: string | ReactNode;
+  icon: JSX.Element;
+}

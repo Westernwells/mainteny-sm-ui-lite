@@ -30,7 +30,7 @@ const tabItems = [
 export const EmployeeDetails = () => {
   const [tabValue, setTabValue] = useState(0);
   const {id: username} = useParams();
-  const {data: userAccount} = useGetUserAccount(username);
+  const {data: userAccount, isLoading} = useGetUserAccount(username);
   const [employee, setEmployee] = useState<EmployeesView>();
   const {data: technician} = useGetTechnician(
     userAccount && userAccount.roles.includes(Role.TECHNICIAN)
@@ -66,7 +66,7 @@ export const EmployeeDetails = () => {
           : ''
       }>
       <TabsBody value={tabValue} index={0}>
-        <EmployeeOverview employee={employee} />
+        <EmployeeOverview employee={employee} isLoading={isLoading} />
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
         <ScheduleTab technicianId={technician && technician[0].id} />
