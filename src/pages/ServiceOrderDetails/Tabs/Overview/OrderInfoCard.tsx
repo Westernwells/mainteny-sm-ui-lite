@@ -20,6 +20,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const orderInfo = useRef(orderInfoSchema(serviceOrderDetails)).current;
   return (
     <BasicDetailsCard
+      containerStyles={{display: 'flex', flexDirection: 'column'}}
       headerActionIcon={<MoreVertIcon sx={{color: theme.state.aubergine}} />}
       header={
         <Box>
@@ -54,9 +55,14 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
           />
         ))}
       </Box>
-      <Button variant="contained" size="small" sx={{px: '2.5em', mt: '1em'}}>
-        Schedule
-      </Button>
+      <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+        <Button variant="text" size="small" sx={{px: '2.5em', mt: '1em'}}>
+          Cancel
+        </Button>
+        <Button variant="contained" size="small" sx={{px: '2.5em', mt: '1em'}}>
+          Schedule
+        </Button>
+      </Box>
     </BasicDetailsCard>
   );
 };

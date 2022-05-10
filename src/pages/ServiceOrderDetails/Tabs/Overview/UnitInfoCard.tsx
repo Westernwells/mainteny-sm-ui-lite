@@ -4,7 +4,6 @@ import Typography from '@mui/material/Typography';
 import {BasicDetailsCard} from 'components/BasicDetailsCard';
 import useTheme from '@mui/material/styles/useTheme';
 import {convertToText} from 'utils/utils';
-import Button from '@mui/material/Button';
 import {CardProps} from 'components/CardProps';
 import {ServiceOrder} from 'models/service-order';
 import {unitInfo as unitInfoSchema} from './schema';
@@ -18,6 +17,7 @@ export const UnitInfoCard = ({serviceOrderDetails}: Props) => {
   const unitInfo = useRef(unitInfoSchema(serviceOrderDetails)).current;
   return (
     <BasicDetailsCard
+      containerStyles={{height: '100%'}}
       header={
         <Box>
           <Typography variant="subtitle1">Unit Info</Typography>
@@ -41,9 +41,6 @@ export const UnitInfoCard = ({serviceOrderDetails}: Props) => {
           />
         ))}
       </Box>
-      <Button variant="contained" size="small" sx={{px: '2.5em', mt: '1em'}}>
-        Schedule
-      </Button>
     </BasicDetailsCard>
   );
 };

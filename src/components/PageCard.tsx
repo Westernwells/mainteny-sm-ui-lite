@@ -36,7 +36,7 @@ export const PageCard = ({
   return (
     <Card
       sx={{
-        minHeight: minHeight || '26rem',
+        minHeight,
         boxShadow: '0px 4px 15px rgba(144, 144, 144, 0.2)',
         ...containerStyles,
       }}>

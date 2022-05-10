@@ -17,6 +17,7 @@ import {ServiceCompanyTimeUnit} from 'models/service-company';
 import {toDate, toRestDate} from 'utils/datetime';
 import {
   ServiceOrder,
+  ServiceOrderActivityView,
   ServiceOrderOrderField,
   ServiceOrderQueryParams,
   ServiceOrderReport,
@@ -354,6 +355,27 @@ export function useServiceOrderDetails(
   return useQuery<ServiceOrder, RestError, ServiceOrder>(
     [queryKeys.getServiceOrderDetails, serviceOrderId],
     () => getServiceOrderDetails(serviceOrderId!),
+    {enabled: !!serviceOrderId, ...options},
+  );
+}
+
+const getServiceOrderActivities = async (serviceOrderId: string) => {
+  const response: AxiosResponse<ServiceOrderActivityView[]> =
+    await axiosClient.get(`/api/serviceOrders/${serviceOrderId}/activities`);
+  return response.data;
+};
+
+export function useServiceOrderActivities(
+  serviceOrderId?: string,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<
+    ServiceOrderActivityView[],
+    RestError,
+    ServiceOrderActivityView[]
+  >(
+    [queryKeys.serviceOrderActivity, serviceOrderId],
+    () => getServiceOrderActivities(serviceOrderId!),
     {enabled: !!serviceOrderId, ...options},
   );
 }
