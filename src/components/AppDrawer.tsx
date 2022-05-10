@@ -186,7 +186,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/orders');
-        navigate('/orders?pageIndex=1&pageSize=25');
+        navigate('/orders?pageIndex=1&pageSize=25&tab=0');
       },
     },
   ];
