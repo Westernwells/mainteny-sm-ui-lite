@@ -5,8 +5,8 @@ import {ServiceOrderStatus, ServiceOrderType} from 'models/service-order';
 
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
-import {ServiceOrderStatusText} from 'components/ServiceOrderStatusText';
 import {ServiceOrderStatusIcons} from 'components/ServiceOrderStatusIcons';
+import {getServiceOrderStatusText} from 'utils/service-order-utils';
 
 interface Props {
   isDetailCard?: boolean;
@@ -82,7 +82,9 @@ export const HistoryCardHeader = ({
         ) : null}
         {!removeServiceOrderStatus ? (
           <Box mr="0.4em">
-            <ServiceOrderStatusText serviceOrderStatus={serviceOrderStatus} />
+            <Typography variant="chip">
+              {getServiceOrderStatusText(serviceOrderStatus!)}
+            </Typography>
           </Box>
         ) : null}
 

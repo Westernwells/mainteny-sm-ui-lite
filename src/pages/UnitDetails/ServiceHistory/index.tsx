@@ -6,8 +6,9 @@ import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import Grid from '@mui/material/Grid';
 import {formatDate} from 'utils/datetime';
 import {ServiceOrderStatusIcons} from 'components/ServiceOrderStatusIcons';
-import {ServiceOrderStatusText} from 'components/ServiceOrderStatusText';
+// import {ServiceOrderStatusText} from 'components/ServiceOrderStatusText';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
+import {getServiceOrderStatusText} from 'utils/service-order-utils';
 
 interface Props {
   bodyContainerStyle?: {[key: string]: string | number};
@@ -51,7 +52,7 @@ export const ServiceHistory = ({
           <Box sx={{mt: '0.2em', mr: '0.3em'}}>
             <ServiceOrderIcons
               serviceOrderType={serviceOrder.type}
-              size='small'
+              size="small"
             />
           </Box>
           <Box>
@@ -67,7 +68,9 @@ export const ServiceHistory = ({
       <Grid xs={2} item>
         <Box display="flex" justifyContent="flex-end">
           <Box mr="0.4em">
-            <ServiceOrderStatusText serviceOrderStatus={serviceOrder.status} />
+            <Typography variant="chip">
+              {getServiceOrderStatusText(serviceOrder.status)}
+            </Typography>
           </Box>
           <Box>
             <ServiceOrderStatusIcons serviceOrderStatus={serviceOrder.status} />
