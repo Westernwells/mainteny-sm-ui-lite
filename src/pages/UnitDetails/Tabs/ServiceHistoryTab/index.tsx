@@ -182,7 +182,7 @@ export const ServiceHistoryTab = () => {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={8}>
+      <Grid item md={8} xs={12}>
         {isEmpty ? (
           <PageCard minHeight="100%">
             <EmptySection
@@ -263,7 +263,7 @@ export const ServiceHistoryTab = () => {
           </>
         )}
       </Grid>
-      <Grid item xs={4}>
+      <Grid item md={4} xs={12}>
         <PageCard
           headerLabel="All Services"
           contentContainerStyles={{p: 0, mx: 0}}

@@ -64,7 +64,7 @@ export const OverviewTab = ({
   return (
     <>
       <Grid container spacing={2}>
-        <Grid item xs={4}>
+        <Grid item xs={6} md={4}>
           <ElevatorBasicSection
             elevator={elevator}
             serviceOrder={serviceOrders.data[0]}
@@ -122,10 +122,10 @@ export const OverviewTab = ({
             ]}
           />
         </Grid>
-        <Grid item xs={4} zeroMinWidth>
+        <Grid item xs={6} md={4} zeroMinWidth>
           <TechnicianSection maintainers={maintainers} />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} md={4}>
           <ElevatorAvailabilitySection />
         </Grid>
       </Grid>
