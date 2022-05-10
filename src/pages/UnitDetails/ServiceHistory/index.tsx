@@ -8,7 +8,7 @@ import {formatDate} from 'utils/datetime';
 import {ServiceOrderStatusIcons} from 'components/ServiceOrderStatusIcons';
 // import {ServiceOrderStatusText} from 'components/ServiceOrderStatusText';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
-import {getServiceOrderStatusText} from 'utils/service-order-utils';
+import {serviceOrderStatusToString} from 'utils/service-order-utils';
 
 interface Props {
   bodyContainerStyle?: {[key: string]: string | number};
@@ -69,7 +69,7 @@ export const ServiceHistory = ({
         <Box display="flex" justifyContent="flex-end">
           <Box mr="0.4em">
             <Typography variant="chip">
-              {getServiceOrderStatusText(serviceOrder.status)}
+              {serviceOrderStatusToString(serviceOrder.status)}
             </Typography>
           </Box>
           <Box>

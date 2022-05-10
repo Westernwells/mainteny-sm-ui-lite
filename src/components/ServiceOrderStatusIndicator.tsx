@@ -4,7 +4,7 @@ import {useServiceOrderStatusColor} from 'hooks/useServiceOrderStatusColor';
 import {ServiceOrderStatus} from 'models/service-order';
 import {useRef} from 'react';
 import {removeFromList} from 'utils/utils';
-import {getServiceOrderStatusText} from 'utils/service-order-utils';
+import {serviceOrderStatusToString} from 'utils/service-order-utils';
 
 interface Props {
   containerStyles?: {[key: string]: string | number};
@@ -41,7 +41,7 @@ export const ServiceOrderStatusIndicator = ({containerStyles}: Props) => {
             />
 
             <Typography variant="chip">
-              {getServiceOrderStatusText(status)}
+              {serviceOrderStatusToString(status)}
             </Typography>
           </Box>
         );

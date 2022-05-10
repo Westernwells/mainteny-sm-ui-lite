@@ -11,7 +11,7 @@ import ElevatorIcon from '@mui/icons-material/Elevator';
 import PermContactCalendarIcon from '@mui/icons-material/PermContactCalendar';
 import TimerIcon from '@mui/icons-material/Timer';
 import {ServiceOrder, ServiceOrderStatus} from 'models/service-order';
-import {getServiceOrderStatusText} from 'utils/service-order-utils';
+import {serviceOrderStatusToString} from 'utils/service-order-utils';
 import {convertMinsToHM, formatDate} from 'utils/datetime';
 
 export const orderInfo = (serviceOrderDetails: ServiceOrder) => {
@@ -29,7 +29,7 @@ export const orderInfo = (serviceOrderDetails: ServiceOrder) => {
     },
     status: {
       label: 'STATUS',
-      value: getServiceOrderStatusText(serviceOrderDetails.status),
+      value: serviceOrderStatusToString(serviceOrderDetails.status),
       icon: <InfoIcon sx={{color: theme.palette.info.dark}} />,
     },
     createdOn: {
