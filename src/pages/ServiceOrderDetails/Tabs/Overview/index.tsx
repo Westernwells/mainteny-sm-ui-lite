@@ -67,13 +67,21 @@ export const Overview = () => {
         </Box>
       </Grid>
 
-      <Grid item sm={12} md={4} sx={{height: '100%', width: '100%'}}>
+      <Grid
+        item
+        sm={12}
+        md={4}
+        sx={{
+          [theme.breakpoints.up('md')]: {
+            height: '100%',
+          },
+          width: '100%',
+        }}>
         <PageCard
           headerLabel="Timeline"
           containerStyles={{
-            // minHeight: 2,
-            // maxHeight: '100%',
-            height: '100%',
+            minHeight: 2,
+            maxHeight: '100%',
             overflowY: 'scroll',
           }}>
           <Box sx={{height: '100%'}}>
