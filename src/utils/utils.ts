@@ -23,6 +23,14 @@ export const formatSearchParamsPageIndex = (
   return {...currentParams, pageIndex: pageIndex.toString()};
 };
 
+export const formatSearchParams = (
+  options: {[key: string]: string},
+  queryParams: URLSearchParams,
+) => {
+  const currentParams = Object.fromEntries([...queryParams]);
+  return {...currentParams, ...options};
+};
+
 export const formatSearchParamsPageSize = (
   newPageSize: number,
   queryParams: URLSearchParams,

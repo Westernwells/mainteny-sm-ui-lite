@@ -200,6 +200,8 @@ export const HistoryCard = ({
                   icon={<LockClockIcon color="info" />}
                   iconBackground={theme.palette.info.outlinedHoverBg}
                   bodyText={scheduledTime || ''}
+                  containerStyles={{mr: '5em'}}
+                  iconMaxHeight="3rem"
                 />
                 <CardProps
                   label="Preferred Time"
@@ -212,7 +214,7 @@ export const HistoryCard = ({
             ) : null}
 
             {showMoreReportDetails ? (
-              <Box display="flex" mt="2.5em">
+              <Box display="flex" mt="2.5em" justifyContent="space-between">
                 <CardProps
                   label="Technician"
                   bodyTextVariant="body1"

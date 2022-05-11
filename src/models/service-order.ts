@@ -7,7 +7,7 @@ import {AttachmentResource, Elevator, ElevatorSimpleView} from './elevator';
 import {Contract, ContractSimpleView} from './contract';
 import {Fee, JobStatus, Meta, Order, Priority, WithOptional} from './misc';
 import {Technician, TechnicianSimpleView} from './technician';
-import {UserAccount} from './user';
+import {UserAccount, UserAccountSimpleView} from './user';
 
 export enum ServiceOrderStatus {
   ALL = 'ALL',
@@ -72,6 +72,7 @@ export interface ServiceOrder {
   search: string;
   meta: Meta;
   additionalInfo: ServiceOrderAdditionalInfo;
+  serviceTime: number;
 }
 
 export interface ServiceOrderAdditionalInfo {
@@ -289,4 +290,14 @@ export interface ServiceOrderQueryParams {
   order?: Order;
   orderBy?: ServiceOrderOrderField;
   types?: ServiceOrderType[];
+}
+
+export interface ServiceOrderActivityView {
+  actionTime: string;
+  actionType: string;
+  data: string;
+  description: string;
+  id: string;
+  serviceOrderId: string;
+  userAccount: UserAccountSimpleView;
 }

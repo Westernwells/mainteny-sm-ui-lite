@@ -157,6 +157,7 @@ export const theme = createTheme({
   state: {
     hover: 'rgba(15, 76, 100, 0.08)',
     ratingActive: '#FFB400',
+    aubergine: '#231F20',
   },
   components: {
     MuiButton: {

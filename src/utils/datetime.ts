@@ -97,3 +97,11 @@ export const getWhen = (date: Date, formatStr: string) => {
 
   return formatDate(date, formatStr);
 };
+
+export const convertMinsToHM = (minutes: number) => {
+  const timeString = minutes / 60;
+  const date = new Date(0, 0);
+  date.setMinutes(+timeString * 60);
+  const hm = date.toTimeString().slice(0, 5).split(':');
+  return `${+hm[0]}hrs ${Number(hm[1]) > 0 ? `${+hm[1]}mins` : ''}`;
+};

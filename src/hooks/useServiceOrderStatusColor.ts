@@ -6,7 +6,7 @@ export const useServiceOrderStatusColor = () => {
   const theme = useTheme();
   const [serviceOrderTypeColor] = useState<{[key: string]: string}>({
     SCHEDULED: '#00D1FF',
-    IN_PROGRESS: theme.state?.ratingActive as string,
+    IN_PROGRESS: theme.state.ratingActive,
     COMPLETED: theme.palette.success.main,
     CANCELLED: grey[600],
     EXPIRED: theme.palette.error.main,

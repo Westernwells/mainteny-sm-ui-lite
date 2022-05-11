@@ -182,7 +182,15 @@ export const ServiceHistoryTab = () => {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={8}>
+      <Grid
+        item
+        md={8}
+        xs={12}
+        sx={{
+          [theme.breakpoints.up('md')]: {
+            height: '100%',
+          },
+        }}>
         {isEmpty ? (
           <PageCard minHeight="100%">
             <EmptySection
@@ -191,11 +199,12 @@ export const ServiceHistoryTab = () => {
             />
           </PageCard>
         ) : (
-          <>
+          <Box sx={{height: '100%'}}>
             <HistoryBasicDetails>
               <HistoryCard
                 showTimeCategory
                 // noContent={!selectedOrder}
+
                 serviceOrder={selectedOrder}
                 headerTitle={currentScheduleDate || null}
                 description={selectedOrder?.description}
@@ -214,6 +223,7 @@ export const ServiceHistoryTab = () => {
                 containerStyles={{
                   borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
                   pt: '0.5em',
+                  minHeight: 2,
                 }}
               />
             </HistoryBasicDetails>
@@ -233,6 +243,7 @@ export const ServiceHistoryTab = () => {
                 showActionSection
                 containerStyles={{
                   pt: '0.5em',
+                  minHeight: 2,
                 }}
                 handleExpandClick={handleExpandClick}
                 expanded={expanded}
@@ -260,13 +271,22 @@ export const ServiceHistoryTab = () => {
                 subtitle={currentReportDate || 'Awaiting completion of visit'}
               />
             </HistoryReport>
-          </>
+          </Box>
         )}
       </Grid>
-      <Grid item xs={4}>
+      <Grid
+        item
+        md={4}
+        xs={12}
+        sx={{
+          [theme.breakpoints.up('md')]: {
+            height: '100%',
+          },
+        }}>
         <PageCard
           headerLabel="All Services"
           contentContainerStyles={{p: 0, mx: 0}}
+          containerStyles={{height: '100%'}}
           headerContainerOverrideStyles={{
             background: 'none',
             mt: 'default',
@@ -313,7 +333,14 @@ export const ServiceHistoryTab = () => {
               </Button>
             </Box>
           ) : (
-            <Box sx={{height: '55vh', overflowY: 'scroll'}}>
+            <Box
+              sx={{
+                overflowY: 'scroll',
+                minHeight: 2,
+                [theme.breakpoints.up('md')]: {
+                  maxHeight: '46vh',
+                },
+              }}>
               {serviceOrders.data.map((serviceOrder: ServiceOrderView) => (
                 <HistoryCard
                   serviceOrder={serviceOrder}

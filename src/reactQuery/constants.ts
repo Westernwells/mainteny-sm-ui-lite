@@ -7,7 +7,7 @@ export const queryKeys = {
   serviceManager: 'serviceManager',
   fetchAllElevators: 'fetchAllElevators',
   fetchElevatorMaintenanceHistory: 'fetchElevatorMaintenanceHistory',
-  fetchServiceOrders: 'fetchServiceOrders',
+  querySeviceOrders: 'querySeviceOrders',
   fetchElevatorAvailability: 'fetchElevatorAvailability',
   elevatorById: 'elevatorById',
   maintainerByElevatorId: 'maintainerByElevatorId',
@@ -30,4 +30,6 @@ export const queryKeys = {
   getTechnician: 'getTechnician',
   getUserAccount: 'getUserAccount',
   queryServiceCompanyTechnicians: 'queryServiceCompanyTechnicians',
+  getServiceOrderDetails: 'getServiceOrderDetails',
+  serviceOrderActivity: 'serviceOrderActivity',
 };

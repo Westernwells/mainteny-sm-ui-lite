@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import {ReactNode} from 'react';
 
 interface Props {
   icon: JSX.Element;
@@ -7,7 +8,7 @@ interface Props {
   bodyTextVariant?: any;
   titleTextVariant?: any;
   iconBackground?: string;
-  bodyText: string | JSX.Element;
+  bodyText: string | JSX.Element | ReactNode;
   iconMaxHeight?: string | number;
   containerStyles?: {[key: string]: string | number};
 }
@@ -22,7 +23,7 @@ export const CardProps = ({
   iconMaxHeight,
   containerStyles,
 }: Props) => (
-  <Box display="flex" width="100%" sx={{...containerStyles}}>
+  <Box display="flex" sx={{...containerStyles}}>
     {/* remove width to make this component more generic */}
     <Box
       sx={{

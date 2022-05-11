@@ -156,7 +156,7 @@ export const columns: GridColDef[] = [
             color:
               params.value === InvoiceStatus.PAID
                 ? theme.palette.success.main
-                : (theme.state?.ratingActive as string),
+                : theme.state.ratingActive,
           }}
         />
       );

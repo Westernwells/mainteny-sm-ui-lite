@@ -19,6 +19,10 @@ import {
   formatSearchParamsPageSize,
 } from 'utils/utils';
 import {Progress} from 'components/Progress';
+import {
+  serviceOrderStatusToEnum,
+  serviceOrderStatusToString,
+} from 'utils/service-order-utils';
 import {columns, makeRows} from './ServiceOrderDataGridProps';
 
 interface Props {
@@ -82,22 +86,46 @@ export const ServiceOrderList = ({
     setPageCount(Math.ceil(serviceOrdersResource.total / page.pageSize));
   }, [serviceOrdersResource, page.pageSize]);
 
+  const renderServiceOrderStatusList = () => {
+    let mappedOptions: string[] = [];
+    Object.values(ServiceOrderStatus).forEach((option) => {
+      const val = serviceOrderStatusToString(option);
+      if (!mappedOptions.includes(val)) {
+        mappedOptions = [...mappedOptions, val];
+      }
+    });
+    return mappedOptions;
+  };
+
+  const getSelectedStatusValues = (items: string[]) => {
+    let orderStatus: ServiceOrderStatus[] = [];
+    items.forEach((val) => {
+      if (val === 'Unscheduled') {
+        orderStatus = [
+          ...orderStatus,
+          ServiceOrderStatus.INIT,
+          ServiceOrderStatus.READY_TO_SCHEDULE,
+          ServiceOrderStatus.SCHEDULING,
+        ];
+      } else {
+        orderStatus = [
+          ...orderStatus,
+          serviceOrderStatusToEnum(val) as ServiceOrderStatus,
+        ];
+      }
+    });
+    if (orderStatus.includes(ServiceOrderStatus.ALL)) {
+      orderStatus = [];
+    }
+    setSelectedOrderStatus(orderStatus as ServiceOrderStatus[]);
+  };
+
   const renderFilterItems = () => (
     <FilterFields showFilter={showFilter} setShowFilter={setShowFilter}>
       <MultipleSelectCheckmarks
         label="Status"
-        options={Object.values(ServiceOrderStatus).map((option) =>
-          _.capitalize(option).split('_').join(' '),
-        )}
-        getSelectedValue={(item) => {
-          let orderStatus = item.map((val) =>
-            val.split(' ').join('_').toUpperCase(),
-          );
-          if (orderStatus.includes(ServiceOrderStatus.ALL)) {
-            orderStatus = [];
-          }
-          setSelectedOrderStatus(orderStatus as ServiceOrderStatus[]);
-        }}
+        options={renderServiceOrderStatusList()}
+        getSelectedValue={getSelectedStatusValues}
         multiple
       />
 

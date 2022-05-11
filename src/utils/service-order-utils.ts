@@ -17,7 +17,7 @@ export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
   }
 };
 
-export const getServiceOrderStatusText = (status: ServiceOrderStatus) => {
+export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
   switch (status) {
     case ServiceOrderStatus.SCHEDULED:
       return 'Pending';
@@ -29,6 +29,23 @@ export const getServiceOrderStatusText = (status: ServiceOrderStatus) => {
       return 'Expired';
     case ServiceOrderStatus.COMPLETED:
       return 'Completed';
+    default:
+      return 'Unscheduled';
+  }
+};
+
+export const serviceOrderStatusToEnum = (status: string) => {
+  switch (status) {
+    case 'Pending':
+      return ServiceOrderStatus.SCHEDULED;
+    case 'Ongoing':
+      return ServiceOrderStatus.IN_PROGRESS;
+    case 'Cancelled':
+      return ServiceOrderStatus.CANCELLED;
+    case 'Expired':
+      return ServiceOrderStatus.EXPIRED;
+    case 'Completed':
+      return ServiceOrderStatus.COMPLETED;
     default:
       return 'Unscheduled';
   }

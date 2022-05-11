@@ -11,7 +11,7 @@ import {ServiceOrderView} from 'models/service-order';
 import {convertToText} from 'utils/utils';
 import {
   getServiceOrderStatusColor,
-  getServiceOrderStatusText,
+  serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {StatusChip} from 'components/StatusChip';
@@ -49,10 +49,7 @@ export const columns: GridColDef[] = [
     ...defaultProps,
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <Box sx={{display: 'flex'}}>
-        <ServiceOrderIcons
-          serviceOrderType={params.value}
-          style={{mt: '0.05em', height: '1.145rem', width: '0.989rem'}}
-        />
+        <ServiceOrderIcons serviceOrderType={params.value} size="small" />
         <Typography variant="body2" mx="0.5em">
           {convertToText(params.value)}
         </Typography>
@@ -116,7 +113,7 @@ export const columns: GridColDef[] = [
       <StatusChip
         color={getServiceOrderStatusColor(params.value)}
         style={sx.orderStatus}
-        label={getServiceOrderStatusText(params.value)}
+        label={serviceOrderStatusToString(params.value)}
       />
     ),
   },

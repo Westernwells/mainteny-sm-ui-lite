@@ -18,6 +18,7 @@ import {QuotationDetails} from 'pages/QuotationDetails';
 import {Notifications} from 'pages/Notifications';
 import {PageNotFound} from 'pages/PageNotFound';
 import {ServiceOrders} from 'pages/ServiceOrders';
+import {ServiceOrderDetails} from 'pages/ServiceOrderDetails';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -216,6 +217,34 @@ export const Router = () => {
               </Helmet>
               <PageLayout>
                 <ServiceOrders />
+              </PageLayout>
+            </>
+          }
+        />
+
+        <Route
+          path="/orders/details/:id"
+          element={
+            <>
+              <Helmet>
+                <title>{`Service Orders - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout>
+                <ServiceOrderDetails />
+              </PageLayout>
+            </>
+          }
+        />
+
+        <Route
+          path="/notifications"
+          element={
+            <>
+              <Helmet>
+                <title>{`Notifications - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout excludeSidebar pageScrollable excludeDefaultSpacing>
+                <Notifications />
               </PageLayout>
             </>
           }

@@ -1,0 +1,120 @@
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import {
+  useServiceOrderActivities,
+  useServiceOrderDetails,
+} from 'hooks/reactQuery/useServiceOrder';
+import {useParams} from 'react-router';
+import {Progress} from 'components/Progress';
+import {PageCard} from 'components/PageCard';
+
+import useTheme from '@mui/material/styles/useTheme';
+import {Timeline} from 'components/Timeline';
+import Typography from '@mui/material/Typography';
+import ComputerIcon from '@mui/icons-material/Computer';
+import PersonIcon from '@mui/icons-material/Person';
+import {formatDate} from 'utils/datetime';
+import {OrderInfoCard} from './OrderInfoCard';
+import {UnitInfoCard} from './UnitInfoCard';
+
+export const Overview = () => {
+  console.log('');
+  const theme = useTheme();
+  const {id: orderId} = useParams();
+  const {data: serviceOrderDetails, isLoading} =
+    useServiceOrderDetails(orderId);
+  const {data: serviceOrderActivities = []} =
+    useServiceOrderActivities(orderId);
+
+  const iconType = (icon: string) => {
+    switch (icon) {
+      case 'system':
+        return <ComputerIcon fontSize="small" color="action" />;
+      case 'people':
+        return <PersonIcon fontSize="small" color="action" />;
+      default:
+        return null;
+    }
+  };
+
+  if (isLoading) {
+    return <Progress />;
+  }
+  return (
+    <Grid container spacing={2} sx={{height: '100%', overflowY: 'scroll'}}>
+      <Grid
+        item
+        sm={12}
+        md={8}
+        sx={{
+          [theme.breakpoints.up('md')]: {
+            height: '100%',
+          },
+        }}>
+        <Box
+          sx={{
+            height: '100%',
+            overflowY: 'scroll',
+            display: 'flex',
+            flexDirection: 'column',
+          }}>
+          <Box>
+            <OrderInfoCard serviceOrderDetails={serviceOrderDetails!} />
+          </Box>
+          <Box mt="1em" flexGrow={1}>
+            <UnitInfoCard serviceOrderDetails={serviceOrderDetails!} />
+          </Box>
+        </Box>
+      </Grid>
+
+      <Grid
+        item
+        sm={12}
+        md={4}
+        sx={{
+          [theme.breakpoints.up('md')]: {
+            height: '100%',
+          },
+          width: '100%',
+        }}>
+        <PageCard
+          headerLabel="Timeline"
+          containerStyles={{
+            // minHeight: 2,
+            // maxHeight: '100%',
+            height: '100%',
+            overflowY: 'scroll',
+          }}>
+          <Box sx={{height: '100%'}}>
+            {serviceOrderActivities.map((activity, index) => {
+              const dateString = new Date(activity.actionTime);
+              const date = formatDate(dateString, 'dd MMM yyyy');
+              const time = formatDate(dateString, 'HH:mm');
+              return (
+                <Timeline
+                  value={serviceOrderActivities.length - index}
+                  hideLeftBorder={
+                    !!(index === serviceOrderActivities.length - 1)
+                  }
+                  containerStyle={{pt: index > 0 ? '1em' : 'initial'}}
+                  header={`${date} (${time})`}
+                  body={activity.description}
+                  footer={
+                    <Typography component="div" display="flex">
+                      {iconType(activity.userAccount ? 'people' : 'system')}
+                      <Typography variant="caption" component="div" ml="0.5em">
+                        {activity.userAccount
+                          ? `${activity.userAccount.firstName} ${activity.userAccount.lastName}`
+                          : 'System'}
+                      </Typography>
+                    </Typography>
+                  }
+                />
+              );
+            })}
+          </Box>
+        </PageCard>
+      </Grid>
+    </Grid>
+  );
+};
