@@ -338,7 +338,7 @@ export const ServiceHistoryTab = () => {
                 overflowY: 'scroll',
                 minHeight: 2,
                 [theme.breakpoints.up('md')]: {
-                  maxHeight: '50vh',
+                  maxHeight: '46vh',
                 },
               }}>
               {serviceOrders.data.map((serviceOrder: ServiceOrderView) => (
