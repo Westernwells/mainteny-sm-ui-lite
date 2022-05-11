@@ -6,7 +6,6 @@ import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import Grid from '@mui/material/Grid';
 import {formatDate} from 'utils/datetime';
 import {ServiceOrderStatusIcons} from 'components/ServiceOrderStatusIcons';
-// import {ServiceOrderStatusText} from 'components/ServiceOrderStatusText';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {serviceOrderStatusToString} from 'utils/service-order-utils';
 

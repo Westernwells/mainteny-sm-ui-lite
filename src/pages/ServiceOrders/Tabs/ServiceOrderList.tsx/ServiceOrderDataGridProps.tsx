@@ -49,11 +49,7 @@ export const columns: GridColDef[] = [
     ...defaultProps,
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <Box sx={{display: 'flex'}}>
-        <ServiceOrderIcons
-          serviceOrderType={params.value}
-          size="small"
-          // style={{mt: '0.05em', height: '1.145rem', width: '0.989rem'}}
-        />
+        <ServiceOrderIcons serviceOrderType={params.value} size="small" />
         <Typography variant="body2" mx="0.5em">
           {convertToText(params.value)}
         </Typography>
