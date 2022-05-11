@@ -80,8 +80,9 @@ export const Overview = () => {
         <PageCard
           headerLabel="Timeline"
           containerStyles={{
-            minHeight: 2,
-            maxHeight: '100%',
+            // minHeight: 2,
+            // maxHeight: '100%',
+            height: '100%',
             overflowY: 'scroll',
           }}>
           <Box sx={{height: '100%'}}>
