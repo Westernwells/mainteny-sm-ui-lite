@@ -42,6 +42,7 @@ export const columns: GridColDef[] = [
     type: 'string',
     flex: 2,
     headerAlign: 'left',
+    cellClassName: 'truncateText',
     ...defaultProps,
   },
   {
@@ -58,6 +59,7 @@ export const columns: GridColDef[] = [
     flex: 3,
     headerAlign: 'left',
     align: 'left',
+    cellClassName: 'truncateText',
     ...defaultProps,
   },
   {
@@ -74,6 +76,7 @@ export const columns: GridColDef[] = [
     flex: 1,
     headerAlign: 'left',
     align: 'left',
+    cellClassName: 'nowrap',
     ...defaultProps,
   },
   {

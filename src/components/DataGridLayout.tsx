@@ -162,6 +162,20 @@ export const DataGridLayout = ({
               letterSpacing: '0.15px',
             },
           },
+          '.nowrap': {
+            whiteSpace: 'nowrap',
+          },
+          '.truncateText': {
+            '& p': {
+              overflow: 'hidden',
+              textOverflow: 'ellipsis ',
+              display: '-webkit-box',
+              maxWidth: '100%',
+              // Limit to number of lines
+              WebkitLineClamp: '2 ',
+              WebkitBoxOrient: 'vertical',
+            },
+          },
           ...rowClassNames,
           ...containerStyle,
           ...rest,
