@@ -13,13 +13,19 @@ interface Props {
 export const ServiceOrderIcons = ({serviceOrderType, style, size}: Props) => {
   switch (serviceOrderType) {
     case ServiceOrderType.REPAIR:
-      return <SettingsIcon fontSize={size} sx={{color: amber[800], ...style}} />;
+      return (
+        <SettingsIcon fontSize={size} sx={{color: amber[800], ...style}} />
+      );
     case ServiceOrderType.REGULAR:
       return <LoopIcon fontSize={size} color="secondary" sx={{...style}} />;
     case ServiceOrderType.EMERGENCY:
-      return <ReportProblemIcon fontSize={size} color="error" sx={{...style}} />;
+      return (
+        <ReportProblemIcon fontSize={size} color="error" sx={{...style}} />
+      );
     case ServiceOrderType.CALLOUT:
-      return <WifiCallingIcon fontSize={size} sx={{color: grey[800], ...style}} />;
+      return (
+        <WifiCallingIcon fontSize={size} sx={{color: grey[800], ...style}} />
+      );
     default:
       return null;
   }

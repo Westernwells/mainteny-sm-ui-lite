@@ -1,11 +1,10 @@
-import React, {useRef} from 'react';
+import {useRef} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {BasicDetailsCard} from 'components/BasicDetailsCard';
 import EditIcon from '@mui/icons-material/Edit';
 import useTheme from '@mui/material/styles/useTheme';
 import Button from '@mui/material/Button';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {convertToText} from 'utils/utils';
 import {CardProps} from 'components/CardProps';
 import {ServiceOrder, ServiceOrderStatus} from 'models/service-order';

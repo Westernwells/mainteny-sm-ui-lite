@@ -24,7 +24,7 @@ module.exports = {
     'react/jsx-fragments': 'off',
     'react/jsx-filename-extension': [1, {extensions: ['.tsx']}],
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': 1,
+    '@typescript-eslint/no-unused-vars': ['error'],
     'no-shadow': 'off',
     'no-param-reassign': 0,
     '@typescript-eslint/no-shadow': ['error'],

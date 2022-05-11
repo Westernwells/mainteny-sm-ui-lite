@@ -20,7 +20,7 @@ interface Props {
   hideBackIcon?: boolean;
   renderWidget?: JSX.Element;
   pageTitle?: string;
-  tabStyle?: {[key:string]: string | number}
+  tabStyle?: {[key: string]: string | number};
 }
 
 const a11yProps = (index: number) => ({
@@ -37,7 +37,7 @@ export const Tabs = ({
   onChange = () => {},
   backBtnLabel = '',
   currentIndex = 0,
-  tabStyle
+  tabStyle,
 }: Props) => {
   const theme = useTheme();
 
@@ -74,7 +74,7 @@ export const Tabs = ({
               justifyContent: 'center',
               backgroundColor: 'transparent',
             },
-            ...tabStyle
+            ...tabStyle,
           }}
           value={currentIndex}
           onChange={(e: any, newValue: number) => {
