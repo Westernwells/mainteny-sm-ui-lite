@@ -1,4 +1,4 @@
-import {useRef} from 'react';
+import {useRef, useState} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {BasicDetailsCard} from 'components/BasicDetailsCard';
@@ -7,6 +7,8 @@ import useTheme from '@mui/material/styles/useTheme';
 import Button from '@mui/material/Button';
 import {convertToText} from 'utils/utils';
 import {CardProps} from 'components/CardProps';
+import {Confirm} from 'components/Confirm';
+import {useCancelServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {ServiceOrder, ServiceOrderStatus} from 'models/service-order';
 import {orderInfo as orderInfoSchema} from './schema';
 
@@ -17,6 +19,8 @@ interface Props {
 export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const theme = useTheme();
   const orderInfo = useRef(orderInfoSchema(serviceOrderDetails)).current;
+  const {mutate: cancelServiceOrder} = useCancelServiceOrders();
+  const [openConfirm, setOpenConfirm] = useState(false);
 
   const renderRescheduleUnassignBtnGroup = () =>
     [ServiceOrderStatus.SCHEDULED, ServiceOrderStatus.IN_PROGRESS].includes(
@@ -42,8 +46,11 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
       ServiceOrderStatus.SCHEDULING,
     ].includes(serviceOrderDetails.status) ? (
       <>
-        {' '}
-        <Button variant="text" size="small" sx={{px: '2.5em', mt: '1em'}}>
+        <Button
+          variant="text"
+          size="small"
+          sx={{px: '2.5em', mt: '1em'}}
+          onClick={() => setOpenConfirm(true)}>
           Cancel
         </Button>
         <Button variant="contained" size="small" sx={{px: '2.5em', mt: '1em'}}>
@@ -93,6 +100,16 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         {renderCancelScheduleBtnGroup()}
         {renderRescheduleUnassignBtnGroup()}
       </Box>
+      <Confirm
+        open={openConfirm}
+        onConfirm={() => {
+          cancelServiceOrder(serviceOrderDetails.id);
+          setOpenConfirm(false);
+        }}
+        onClose={() => setOpenConfirm(false)}
+        title="Confirm"
+        content="Do you want to cancel the service order?"
+      />
     </BasicDetailsCard>
   );
 };

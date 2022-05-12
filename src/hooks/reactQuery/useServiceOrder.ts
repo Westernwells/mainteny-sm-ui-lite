@@ -1,5 +1,10 @@
 import {useCallback} from 'react';
-import {useQuery, UseQueryOptions} from 'react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from 'react-query';
 import * as _ from 'lodash';
 import {AxiosResponse} from 'axios';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
@@ -15,6 +20,7 @@ import {
 import {queryKeys} from 'reactQuery/constants';
 import {ServiceCompanyTimeUnit} from 'models/service-company';
 import {toDate, toRestDate} from 'utils/datetime';
+import {useSnackbar} from 'notistack';
 import {
   ServiceOrder,
   ServiceOrderActivityView,
@@ -24,7 +30,7 @@ import {
   ServiceOrderScheduleParams,
   ServiceOrderView,
 } from '../../models/service-order';
-import {Order, Resource, RestError} from '../../models/misc';
+import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
   ElevatorAvailability,
   ElevatorAvailabilityParams,
@@ -379,3 +385,31 @@ export function useServiceOrderActivities(
     {enabled: !!serviceOrderId, ...options},
   );
 }
+
+const cancelServiceOrders = async (serviceOrderId: string) => {
+  await axiosClient.put<StringValue>(
+    `/api/serviceOrders/${serviceOrderId}/cancel`,
+  );
+};
+
+export const useCancelServiceOrders = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    (serviceOrderId: string) => cancelServiceOrders(serviceOrderId),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        enqueueSnackbar('Service order cancelled', {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
