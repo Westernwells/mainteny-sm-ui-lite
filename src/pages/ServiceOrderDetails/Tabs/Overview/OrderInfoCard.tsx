@@ -24,7 +24,8 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const orderInfo = useRef(orderInfoSchema(serviceOrderDetails)).current;
   const {mutate: cancelServiceOrder} = useCancelServiceOrders();
   const {mutate: unscheduleServiceOrder} = useUnscheduleServiceOrders();
-  const [openConfirm, setOpenConfirm] = useState(false);
+  const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
+  const [openUnscheduleConfirm, setOpenUnscheduleConfirm] = useState(false);
 
   const renderRescheduleUnassignBtnGroup = () =>
     [ServiceOrderStatus.SCHEDULED, ServiceOrderStatus.IN_PROGRESS].includes(
@@ -41,7 +42,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
           variant="outlined"
           size="small"
           sx={{px: '2.5em', mt: '1em'}}
-          onClick={() => setOpenConfirm(true)}>
+          onClick={() => setOpenUnscheduleConfirm(true)}>
           Unschedule
         </Button>
       </>
@@ -58,7 +59,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
           variant="text"
           size="small"
           sx={{px: '2.5em', mt: '1em'}}
-          onClick={() => setOpenConfirm(true)}>
+          onClick={() => setOpenCancelConfirm(true)}>
           Cancel
         </Button>
         <Button variant="contained" size="small" sx={{px: '2.5em', mt: '1em'}}>
@@ -109,22 +110,22 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         {renderRescheduleUnassignBtnGroup()}
       </Box>
       <Confirm
-        open={openConfirm}
+        open={openCancelConfirm}
         onConfirm={() => {
           cancelServiceOrder(serviceOrderDetails.id);
-          setOpenConfirm(false);
+          setOpenCancelConfirm(false);
         }}
-        onClose={() => setOpenConfirm(false)}
+        onClose={() => setOpenCancelConfirm(false)}
         title="Confirm"
         content="Do you want to cancel the service order?"
       />
       <Confirm
-        open={openConfirm}
+        open={openUnscheduleConfirm}
         onConfirm={() => {
           unscheduleServiceOrder(serviceOrderDetails.id);
-          setOpenConfirm(false);
+          setOpenUnscheduleConfirm(false);
         }}
-        onClose={() => setOpenConfirm(false)}
+        onClose={() => setOpenUnscheduleConfirm(false)}
         title="Confirm"
         content="Do you want to unschedule the service order?"
       />
