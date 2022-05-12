@@ -1,4 +1,4 @@
-import {useRef, useState} from 'react';
+import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {BasicDetailsCard} from 'components/BasicDetailsCard';
@@ -21,11 +21,18 @@ interface Props {
 
 export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const theme = useTheme();
-  const orderInfo = useRef(orderInfoSchema(serviceOrderDetails)).current;
+  // let orderInfo = useRef(orderInfoSchema(serviceOrderDetails)).current;
+  const [orderInfo, setOrderInfo] = useState(
+    orderInfoSchema(serviceOrderDetails),
+  );
   const {mutate: cancelServiceOrder} = useCancelServiceOrders();
   const {mutate: unscheduleServiceOrder} = useUnscheduleServiceOrders();
   const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
   const [openUnscheduleConfirm, setOpenUnscheduleConfirm] = useState(false);
+
+  useEffect(() => {
+    setOrderInfo(orderInfoSchema(serviceOrderDetails));
+  }, [serviceOrderDetails]);
 
   const renderRescheduleUnassignBtnGroup = () =>
     [ServiceOrderStatus.SCHEDULED, ServiceOrderStatus.IN_PROGRESS].includes(

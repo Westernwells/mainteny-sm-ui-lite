@@ -91,6 +91,7 @@ export const Overview = () => {
               const time = formatDate(dateString, 'HH:mm');
               return (
                 <Timeline
+                  key={index}
                   value={serviceOrderActivities.length - index}
                   hideLeftBorder={
                     !!(index === serviceOrderActivities.length - 1)
