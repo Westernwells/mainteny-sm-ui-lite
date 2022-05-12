@@ -8,7 +8,10 @@ import Button from '@mui/material/Button';
 import {convertToText} from 'utils/utils';
 import {CardProps} from 'components/CardProps';
 import {Confirm} from 'components/Confirm';
-import {useCancelServiceOrders} from 'hooks/reactQuery/useServiceOrder';
+import {
+  useCancelServiceOrders,
+  useUnscheduleServiceOrders,
+} from 'hooks/reactQuery/useServiceOrder';
 import {ServiceOrder, ServiceOrderStatus} from 'models/service-order';
 import {orderInfo as orderInfoSchema} from './schema';
 
@@ -20,6 +23,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const theme = useTheme();
   const orderInfo = useRef(orderInfoSchema(serviceOrderDetails)).current;
   const {mutate: cancelServiceOrder} = useCancelServiceOrders();
+  const {mutate: unscheduleServiceOrder} = useUnscheduleServiceOrders();
   const [openConfirm, setOpenConfirm] = useState(false);
 
   const renderRescheduleUnassignBtnGroup = () =>
@@ -31,10 +35,14 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
           variant="contained"
           size="small"
           sx={{px: '2.5em', mt: '1em', mr: '1em'}}>
-          Rescheduled
+          Reschedule
         </Button>
-        <Button variant="outlined" size="small" sx={{px: '2.5em', mt: '1em'}}>
-          Unscheduled
+        <Button
+          variant="outlined"
+          size="small"
+          sx={{px: '2.5em', mt: '1em'}}
+          onClick={() => setOpenConfirm(true)}>
+          Unschedule
         </Button>
       </>
     ) : null;
@@ -109,6 +117,16 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         onClose={() => setOpenConfirm(false)}
         title="Confirm"
         content="Do you want to cancel the service order?"
+      />
+      <Confirm
+        open={openConfirm}
+        onConfirm={() => {
+          unscheduleServiceOrder(serviceOrderDetails.id);
+          setOpenConfirm(false);
+        }}
+        onClose={() => setOpenConfirm(false)}
+        title="Confirm"
+        content="Do you want to unschedule the service order?"
       />
     </BasicDetailsCard>
   );

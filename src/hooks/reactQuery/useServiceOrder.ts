@@ -400,7 +400,37 @@ export const useCancelServiceOrders = () => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
         enqueueSnackbar('Service order cancelled', {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+const unschedulerServiceOrder = async (serviceOrderId: string) => {
+  await axiosClient.put<StringValue>(
+    `/api/serviceOrders/${serviceOrderId}/unschedule`,
+  );
+};
+
+export const useUnscheduleServiceOrders = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    (serviceOrderId: string) => unschedulerServiceOrder(serviceOrderId),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        enqueueSnackbar('Service order unscheduled', {
           variant: 'success',
         });
       },
