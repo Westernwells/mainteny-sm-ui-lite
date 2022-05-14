@@ -18,7 +18,6 @@ import {OrderInfoCard} from './OrderInfoCard';
 import {UnitInfoCard} from './UnitInfoCard';
 
 export const Overview = () => {
-  console.log('');
   const theme = useTheme();
   const {id: orderId} = useParams();
   const {data: serviceOrderDetails, isLoading} =
@@ -87,7 +86,7 @@ export const Overview = () => {
           <Box sx={{height: '100%'}}>
             {serviceOrderActivities.map((activity, index) => {
               const dateString = new Date(activity.actionTime);
-              const date = formatDate(dateString, 'dd MMM yyyy');
+              const date = formatDate(dateString, 'dd.MM.yyyy');
               const time = formatDate(dateString, 'HH:mm');
               return (
                 <Timeline

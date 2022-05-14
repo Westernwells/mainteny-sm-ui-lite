@@ -24,7 +24,7 @@ export const orderInfo = (serviceOrderDetails: ServiceOrder) =>
     },
     people: {
       label: 'CUSTOMER',
-      value: serviceOrderDetails.elevator.propertyOwner.address.fullName,
+      value: serviceOrderDetails.elevator.propertyOwner.name,
       icon: <PeopleIcon sx={{color: theme.palette.info.dark}} />,
     },
     status: {
