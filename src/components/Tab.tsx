@@ -18,7 +18,7 @@ interface Props {
   onChange?: (tabIndex: number) => void;
   currentIndex?: number;
   hideBackIcon?: boolean;
-  renderWidget?: JSX.Element;
+  renderWidget?: JSX.Element | null;
   pageTitle?: string;
   tabStyle?: {[key: string]: string | number};
 }
@@ -32,7 +32,7 @@ export const Tabs = ({
   children,
   tabItems,
   hideBackIcon,
-  renderWidget,
+  renderWidget = null,
   pageTitle,
   onChange = () => {},
   backBtnLabel = '',
@@ -141,7 +141,7 @@ export const Tabs = ({
 
             justifyContent: 'flex-end',
           }}>
-          {renderWidget || null}
+          {renderWidget}
         </Box>
       </Box>
       <Box

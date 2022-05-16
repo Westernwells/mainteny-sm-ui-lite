@@ -7,9 +7,8 @@ import Box from '@mui/material/Box';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
 
-import {PageOverviewLayout} from 'components/PageOverviewLayout';
-import {Widget} from 'components/Widget';
 import {GridRowsProp} from '@mui/x-data-grid';
+import {TabContentContainer} from 'components/TabContentContainer';
 import {EmptySection} from 'components/EmptySection';
 import {ElevatorView} from 'models/elevator';
 import {useQueryCustomerElevator} from 'hooks/reactQuery/useElevator';
@@ -17,12 +16,19 @@ import {columns, makeRows} from './CustomerUnitDataGrid';
 
 interface Props {
   customerId?: string;
+  searchQuery: string;
+  showFilter?: boolean;
+  setShowFilter?: (val: boolean) => void;
 }
 
-export const UnitsTab = ({customerId}: Props) => {
+export const UnitsTab = ({
+  customerId,
+  searchQuery,
+  showFilter,
+  setShowFilter = () => {},
+}: Props) => {
   const [page, setPage] = useState(makePage(0, 25));
-  const [search, setSearch] = useState('');
-  const [showFilter, setShowFilter] = useState(false);
+  // const [search, setSearch] = useState('');
   const totalUnitsRef = useRef(0);
   const [status, setStatus] = useState<string[]>([]);
   const [pageCount, setPageCount] = useState(0);
@@ -33,7 +39,7 @@ export const UnitsTab = ({customerId}: Props) => {
     isFetched,
   } = useQueryCustomerElevator(
     {
-      query: search,
+      query: searchQuery,
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
     },
@@ -69,29 +75,21 @@ export const UnitsTab = ({customerId}: Props) => {
     );
   }
 
+  const renderFilterItems = () => (
+    <FilterFields showFilter={showFilter} setShowFilter={setShowFilter}>
+      <MultipleSelectCheckmarks
+        label="Status"
+        options={['RUNNING', 'STOPPED']}
+        getSelectedValue={(item) => setStatus(item)}
+      />
+    </FilterFields>
+  );
+
   return (
-    <PageOverviewLayout
-      label=""
-      renderWidget={
-        <Widget
-          searchPlaceholder="Try 'Astralift BV'"
-          getSearchValue={(val: string) => setSearch(val)}
-          setShowFilter={setShowFilter}
-          showFilter={showFilter}
-          hideViewOption
-        />
-      }>
-      {showFilter ? (
-        <Box>
-          <FilterFields setShowFilter={setShowFilter}>
-            <MultipleSelectCheckmarks
-              label="Status"
-              options={['RUNNING', 'STOPPED']}
-              getSelectedValue={(item) => setStatus(item)}
-            />
-          </FilterFields>
-        </Box>
-      ) : null}
+    <TabContentContainer>
+      <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+        {renderFilterItems()}
+      </Box>
       {isLoading ? (
         <Progress />
       ) : (
@@ -110,6 +108,6 @@ export const UnitsTab = ({customerId}: Props) => {
           totalRows={elevatorResource.total}
         />
       )}
-    </PageOverviewLayout>
+    </TabContentContainer>
   );
 };

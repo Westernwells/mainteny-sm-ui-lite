@@ -15,8 +15,8 @@ interface Props {
   searchPlaceholder?: string;
   openMapView?: () => void;
   closeMapView?: () => void;
-  showFilter: boolean;
-  setShowFilter: (state: boolean) => void;
+  showFilter?: boolean;
+  setShowFilter?: (state: boolean) => void;
   hideViewOption?: boolean;
   hideSearchInput?: boolean;
   hideFilter?: boolean;
@@ -32,7 +32,7 @@ export const Widget = ({
   openMapView,
   closeMapView,
   showFilter,
-  setShowFilter,
+  setShowFilter = () => {},
   hideViewOption = false,
   hideFilter = false,
   showNewBtn = false,
