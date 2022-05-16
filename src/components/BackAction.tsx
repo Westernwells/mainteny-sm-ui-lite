@@ -20,7 +20,7 @@ export const BackAction = ({label, containerStyle}: Props) => {
         onClick={() => navigate(-1)}>
         <ArrowBackIosNewIcon sx={{color: theme.palette.action.active}} />
       </Box>
-      <Typography variant="h5">{label}</Typography>
+      {label ? <Typography variant="h5">{label}</Typography> : null}
     </Box>
   );
 };

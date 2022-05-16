@@ -21,6 +21,7 @@ interface Props {
   renderWidget?: JSX.Element | null;
   pageTitle?: string;
   tabStyle?: {[key: string]: string | number};
+  label?: string;
 }
 
 const a11yProps = (index: number) => ({
@@ -138,7 +139,6 @@ export const Tabs = ({
         <Box
           sx={{
             display: 'flex',
-
             justifyContent: 'flex-end',
           }}>
           {renderWidget}

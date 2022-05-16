@@ -48,17 +48,18 @@ export const Widget = ({
   return (
     <Box display="flex" sx={{...containerStyles}}>
       {!hideFilter ? (
-        <Box display="flex">
+        <Box>
           <Button
             onClick={() => setShowFilter(!showFilter)}
             disableRipple
-            size={theme.breakpoints.down('md') ? 'small' : 'large'}
+            // size="small"
             sx={{
               backgroundColor: showFilter
                 ? theme.palette.action.selected
                 : theme.palette.primary.outlinedHoverBg,
               border: 'none',
-              py: '0.5em',
+
+              py: '1em',
               ':hover': {
                 border: 'none',
               },
