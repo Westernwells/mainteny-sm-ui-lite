@@ -36,9 +36,9 @@ interface Props {
 }
 
 const validationSchema = Yup.object().shape({
-  date: Yup.string().required('date is required'),
-  startTime: Yup.string().required('start time is required'),
-  endTime: Yup.string().required('end time is required'),
+  date: Yup.string().nullable().required('date is required'),
+  startTime: Yup.string().nullable().required('start time is required'),
+  endTime: Yup.string().nullable().required('end time is required'),
 });
 
 export const ScheduleDialog = ({
@@ -115,6 +115,8 @@ export const ScheduleDialog = ({
     debouncedChangeHandler(newValue);
   };
 
+  console.log();
+
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
       <Dialog
@@ -144,7 +146,13 @@ export const ScheduleDialog = ({
               onInputChange={onInputChange}
               inputValue={queryView}
               renderInput={(params) => (
-                <TextField {...params} label="Assign To" name="technicianId" />
+                <TextField
+                  {...params}
+                  label="Assign To"
+                  name="technicianId"
+                  error={!!formik.errors.technicianId}
+                  helperText={formik.errors.technicianId}
+                />
               )}
             />
 
@@ -166,11 +174,7 @@ export const ScheduleDialog = ({
                 }}>
                 <DatePicker
                   defaultDate={defaultStartDate}
-                  inputError={
-                    formik.touched.date && formik.errors.date
-                      ? formik.errors.date
-                      : ''
-                  }
+                  inputError={formik.errors.date ? formik.errors.date : ''}
                   containerStyles={{mr: '1em'}}
                   getSelectedDate={(date) => {
                     formik.setValues({
@@ -185,9 +189,7 @@ export const ScheduleDialog = ({
                 <TimePicker
                   defaultTime={defaultStartDate}
                   inputError={
-                    formik.touched.startTime && formik.errors.startTime
-                      ? formik.errors.startTime
-                      : ''
+                    formik.errors.startTime ? formik.errors.startTime : ''
                   }
                   containerStyles={{mr: '1em'}}
                   getSelectedTime={(time) => {
@@ -203,9 +205,7 @@ export const ScheduleDialog = ({
                 <TimePicker
                   defaultTime={defaultEndDate}
                   inputError={
-                    formik.touched.endTime && formik.errors.endTime
-                      ? formik.errors.endTime
-                      : ''
+                    formik.errors.endTime ? formik.errors.endTime : ''
                   }
                   getSelectedTime={(time) => {
                     // setSelectedEndTime(time)
