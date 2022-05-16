@@ -52,7 +52,6 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const [formValid, setFormValid] = useState(false);
   const {t} = useTranslation();
 
-
   useEffect(() => {
     setOrderInfo(orderInfoSchema(serviceOrderDetails));
   }, [serviceOrderDetails]);
@@ -135,14 +134,14 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
           onClick={() => setOpenDialog(true)}
           size="small"
           sx={{px: '2.5em', mt: '1em', mr: '1em'}}>
-             {t('Reschedule')}
+          {t('Reschedule')}
         </Button>
         <Button
           variant="outlined"
           size="small"
           sx={{px: '2.5em', mt: '1em'}}
           onClick={() => setOpenUnscheduleConfirm(true)}>
-                {t('Unschedule')}
+          {t('Unschedule')}
         </Button>
       </>
     ) : null;
@@ -159,14 +158,14 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
           size="small"
           sx={{px: '2.5em', mt: '1em'}}
           onClick={() => setOpenCancelConfirm(true)}>
-              {t('Cancel')}
+          {t('Cancel')}
         </Button>
         <Button
           variant="contained"
           size="small"
           sx={{px: '2.5em', mt: '1em'}}
           onClick={() => setOpenDialog(true)}>
-             {t('Schedule')}
+          {t('Schedule')}
         </Button>
       </>
     ) : null;
