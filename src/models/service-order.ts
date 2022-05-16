@@ -301,3 +301,15 @@ export interface ServiceOrderActivityView {
   serviceOrderId: string;
   userAccount: UserAccountSimpleView;
 }
+
+export interface RedispatchParams {
+  technicianId: string;
+  serviceOrderId: string;
+}
+
+export interface CreateServiceOrderBody {
+  endTime: string;
+  startTime: string;
+  technicianIds: string[];
+  type: JobScheduleType;
+}

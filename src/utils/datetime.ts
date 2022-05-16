@@ -31,7 +31,7 @@ export const getEndOfWeek = (
   weekStart?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | undefined,
 ) => endOfWeek(date, {weekStartsOn: weekStart});
 
-export function formatDate(input?: String | Date, formatType?: string) {
+export function formatDate(input?: string | Date, formatType?: string) {
   if (!input) {
     return undefined;
   }

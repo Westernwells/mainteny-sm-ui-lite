@@ -4,7 +4,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import MuiSwitch from '@mui/material/Switch';
 
 interface Props {
-  label?: string;
+  label?: string | JSX.Element;
   getValue?: (val: boolean) => void;
 }
 

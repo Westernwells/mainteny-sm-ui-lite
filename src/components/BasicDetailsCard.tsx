@@ -27,6 +27,7 @@ export const BasicDetailsCard = ({
     sx={{
       border: 'none',
       minHeight: minHeight || '5rem',
+      boxShadow: '0px 4px 15px rgba(144, 144, 144, 0.2)',
       ...containerStyles,
     }}>
     <CardHeader

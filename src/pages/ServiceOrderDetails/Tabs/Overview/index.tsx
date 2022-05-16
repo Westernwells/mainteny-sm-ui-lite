@@ -18,7 +18,6 @@ import {OrderInfoCard} from './OrderInfoCard';
 import {UnitInfoCard} from './UnitInfoCard';
 
 export const Overview = () => {
-  console.log('');
   const theme = useTheme();
   const {id: orderId} = useParams();
   const {data: serviceOrderDetails, isLoading} =
@@ -79,19 +78,19 @@ export const Overview = () => {
         }}>
         <PageCard
           headerLabel="Timeline"
+          headerContainerOverrideStyles={{pl: '0.3em'}}
           containerStyles={{
-            // minHeight: 2,
-            // maxHeight: '100%',
             height: '100%',
             overflowY: 'scroll',
           }}>
           <Box sx={{height: '100%'}}>
             {serviceOrderActivities.map((activity, index) => {
               const dateString = new Date(activity.actionTime);
-              const date = formatDate(dateString, 'dd MMM yyyy');
+              const date = formatDate(dateString, 'dd.MM.yyyy');
               const time = formatDate(dateString, 'HH:mm');
               return (
                 <Timeline
+                  key={index}
                   value={serviceOrderActivities.length - index}
                   hideLeftBorder={
                     !!(index === serviceOrderActivities.length - 1)

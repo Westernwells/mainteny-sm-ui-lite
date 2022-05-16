@@ -1,5 +1,10 @@
 import {useCallback} from 'react';
-import {useQuery, UseQueryOptions} from 'react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from 'react-query';
 import * as _ from 'lodash';
 import {AxiosResponse} from 'axios';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
@@ -15,7 +20,10 @@ import {
 import {queryKeys} from 'reactQuery/constants';
 import {ServiceCompanyTimeUnit} from 'models/service-company';
 import {toDate, toRestDate} from 'utils/datetime';
+import {useSnackbar} from 'notistack';
 import {
+  CreateServiceOrderBody,
+  RedispatchParams,
   ServiceOrder,
   ServiceOrderActivityView,
   ServiceOrderOrderField,
@@ -24,7 +32,7 @@ import {
   ServiceOrderScheduleParams,
   ServiceOrderView,
 } from '../../models/service-order';
-import {Order, Resource, RestError} from '../../models/misc';
+import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
   ElevatorAvailability,
   ElevatorAvailabilityParams,
@@ -379,3 +387,138 @@ export function useServiceOrderActivities(
     {enabled: !!serviceOrderId, ...options},
   );
 }
+
+const cancelServiceOrders = async (serviceOrderId: string) => {
+  await axiosClient.put<StringValue>(
+    `/api/serviceOrders/${serviceOrderId}/cancel`,
+  );
+};
+
+export const useCancelServiceOrders = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    (serviceOrderId: string) => cancelServiceOrders(serviceOrderId),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        enqueueSnackbar('Service order cancelled', {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+const unschedulerServiceOrder = async (serviceOrderId: string) => {
+  await axiosClient.put<StringValue>(
+    `/api/serviceOrders/${serviceOrderId}/unschedule`,
+  );
+};
+
+export const useUnscheduleServiceOrders = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    (serviceOrderId: string) => unschedulerServiceOrder(serviceOrderId),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        enqueueSnackbar('Service order unscheduled', {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+const redispatchServiceOrders = async (
+  technicianId: string,
+  serviceOrderId: string,
+) => {
+  await axiosClient.post<StringValue>(
+    `/api/dispatch/technicians/${technicianId}/serviceOrders/redispatch`,
+    {},
+    {
+      params: {serviceOrderId},
+      paramsSerializer,
+    },
+  );
+};
+
+export const useRedispatchServiceOrders = (successMsg: string) => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    ({technicianId, serviceOrderId}: RedispatchParams) =>
+      redispatchServiceOrders(technicianId, serviceOrderId),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+const createServiceOrder = async (
+  body: CreateServiceOrderBody,
+  serviceOrderId: string,
+) => {
+  await axiosClient.put<StringValue>(
+    `/api/serviceOrders/${serviceOrderId}/jobSchedule`,
+    {...body},
+  );
+};
+
+export const useCreateServiceOrder = (successMsg: string) => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    ({
+      body,
+      serviceOrderId,
+    }: {
+      body: CreateServiceOrderBody;
+      serviceOrderId: string;
+    }) => createServiceOrder(body, serviceOrderId),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
