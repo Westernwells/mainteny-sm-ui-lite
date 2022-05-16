@@ -1,11 +1,7 @@
 import Axios from 'axios';
 import {getStoredUser} from 'userStorage';
 
-const header = {} as any;
 const user = getStoredUser();
-if (user) {
-  header.Authorization = `Bearer ${user.token}`;
-}
 
 export const axiosClient = Axios.create({
   baseURL: process.env.REACT_APP_API_URL,
@@ -13,7 +9,6 @@ export const axiosClient = Axios.create({
     Accept: 'application/json',
     'Content-Type': 'application/json',
     source: 'WEB',
-    // ...header,
   },
 });
 if (user) {

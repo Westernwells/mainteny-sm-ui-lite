@@ -6,18 +6,38 @@ import Badge from '@mui/material/Badge';
 import AppBar from '@mui/material/AppBar';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import useTheme from '@mui/material/styles/useTheme';
-
+import i18n from 'i18n';
 import {ReactComponent as LogoutIcon} from 'assets/icons/Logout.svg';
 import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
 import {useAuth} from 'hooks/useAuth';
 import {Link} from 'react-router-dom';
+import {useEffect, useState} from 'react';
+import {axiosClient} from 'utils/axios-utils';
+import {useQueryClient} from 'react-query';
+import {languageMap} from 'utils/utils';
 import {useUserSession} from '../hooks/reactQuery/useUserSession';
+import {MenuBtn} from './MenuBtn';
 
 export const AppTopBar = () => {
   const theme = useTheme();
+  const [selectedLng, setSelectedLng] = useState('');
   const {signout} = useAuth();
   const {user} = useUserSession();
   const fullName = `${user?.userAccount.firstName} ${user?.userAccount.lastName}`;
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const {language} = i18n;
+    setSelectedLng(language.split('-')[0].toUpperCase());
+  }, []);
+
+  const changeLanguage = (lang: string, label: string) => {
+    setSelectedLng(label);
+    i18n.changeLanguage(lang);
+    axiosClient.defaults.headers.common.language = languageMap[lang];
+    queryClient.resetQueries();
+  };
+
   return (
     <AppBar
       sx={{
@@ -36,15 +56,20 @@ export const AppTopBar = () => {
             justifyContent="space-between"
             alignItems="center">
             <Box display="flex" mt={1} alignItems="center">
-              <Language sx={{color: '#231F20'}} />
-              <Typography
-                variant="body2"
-                color="#8F9BB3"
-                fontSize={12}
-                fontWeight={500}
-                letterSpacing={0.14}>
-                ENG
-              </Typography>
+              <MenuBtn
+                startIcon={<Language sx={{color: '#231F20'}} />}
+                label={selectedLng}
+                menu={[
+                  {
+                    label: 'English',
+                    action: () => changeLanguage('en-US', 'EN'),
+                  },
+                  {
+                    label: 'Deutsch',
+                    action: () => changeLanguage('de-DE', 'DE'),
+                  },
+                ]}
+              />
             </Box>
             <Link to="/notifications">
               <Badge
@@ -61,7 +86,6 @@ export const AppTopBar = () => {
               </Badge>
             </Link>
 
-            {/* <Link to="/settings" style={{textDecoration: 'none'}}> */}
             <Box ml={8} display="flex" alignItems="center">
               <Avatar alt={fullName} src={user?.userAccount.photoUrl} />
               <Box ml={2}>

@@ -19,6 +19,7 @@ import {
   ServiceOrder,
   ServiceOrderStatus,
 } from 'models/service-order';
+import {useTranslation} from 'react-i18next';
 import {formatDate, setDateTime} from 'utils/datetime';
 import {ScheduleForm} from 'pages/ServiceOrderDetails/models';
 import {FormikErrors} from 'formik';
@@ -49,6 +50,8 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const [form, setForm] = useState<ScheduleForm>({} as ScheduleForm);
   const [formError, setFormErrors] = useState<FormikErrors<ScheduleForm>>();
   const [formValid, setFormValid] = useState(false);
+  const {t} = useTranslation();
+
 
   useEffect(() => {
     setOrderInfo(orderInfoSchema(serviceOrderDetails));
@@ -132,14 +135,14 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
           onClick={() => setOpenDialog(true)}
           size="small"
           sx={{px: '2.5em', mt: '1em', mr: '1em'}}>
-          Reschedule
+             {t('Reschedule')}
         </Button>
         <Button
           variant="outlined"
           size="small"
           sx={{px: '2.5em', mt: '1em'}}
           onClick={() => setOpenUnscheduleConfirm(true)}>
-          Unschedule
+                {t('Unschedule')}
         </Button>
       </>
     ) : null;
@@ -156,14 +159,14 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
           size="small"
           sx={{px: '2.5em', mt: '1em'}}
           onClick={() => setOpenCancelConfirm(true)}>
-          Cancel
+              {t('Cancel')}
         </Button>
         <Button
           variant="contained"
           size="small"
           sx={{px: '2.5em', mt: '1em'}}
           onClick={() => setOpenDialog(true)}>
-          Schedule
+             {t('Schedule')}
         </Button>
       </>
     ) : null;
@@ -196,7 +199,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         {Object.values(orderInfo).map((item, index) => (
           <CardProps
             key={`${index}`}
-            label={item.label}
+            label={t(item.label)}
             icon={item.icon}
             bodyText={convertToText(item.value!)}
             containerStyles={{mb: '0.5em', width: '27%'}}

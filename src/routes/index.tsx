@@ -19,11 +19,19 @@ import {Notifications} from 'pages/Notifications';
 import {PageNotFound} from 'pages/PageNotFound';
 import {ServiceOrders} from 'pages/ServiceOrders';
 import {ServiceOrderDetails} from 'pages/ServiceOrderDetails';
+import {axiosClient} from 'utils/axios-utils';
+import {languageMap} from 'utils/utils';
+import i18n from 'i18next';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
 export const Router = () => {
   const titleTail = 'Service Manager Portal';
+  const {language} = i18n;
+
+  if (language) {
+    axiosClient.defaults.headers.common.language = languageMap[language];
+  }
 
   return (
     <Routes>
