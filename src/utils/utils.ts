@@ -90,3 +90,8 @@ export const daysTime: {[key: number]: string[]}[] = [
   {5: twentyFourHourTime},
   {6: twentyFourHourTime},
 ];
+
+export const languageMap: {[key: string]: string} = {
+  'en-US': 'en-us',
+  'de-DE': 'de-de',
+};

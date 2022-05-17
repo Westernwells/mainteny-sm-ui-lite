@@ -1,0 +1,46 @@
+import Button, {ButtonProps} from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import {MouseEvent, useState} from 'react';
+
+interface MenuProps {
+  label: string;
+  action: (event: MouseEvent<HTMLLIElement>) => void;
+}
+
+interface Props extends ButtonProps {
+  label: string;
+  menu: MenuProps[];
+  startIcon: JSX.Element;
+}
+
+export const MenuBtn = ({label, menu, startIcon, ...rest}: Props) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <div>
+      <Button startIcon={startIcon} onClick={handleClick} {...rest}>
+        {label}
+      </Button>
+      <Menu
+        id="basic-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          'aria-labelledby': 'basic-button',
+        }}>
+        {menu.map((item) => (
+          <MenuItem onClick={item.action}>{item.label}</MenuItem>
+        ))}
+      </Menu>
+    </div>
+  );
+};

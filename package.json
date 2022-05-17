@@ -22,6 +22,9 @@
     "formik": "^2.2.9",
     "geolib": "^3.3.3",
     "google-map-react": "^2.1.10",
+    "i18next": "^21.8.2",
+    "i18next-browser-languagedetector": "^6.1.4",
+    "i18next-http-backend": "^1.4.0",
     "lodash": "^4.17.21",
     "mui-address-autocomplete": "^2.0.4",
     "notistack": "^2.0.3",
@@ -30,6 +33,7 @@
     "react-chartjs-2": "^4.0.1",
     "react-dom": "latest",
     "react-helmet": "^6.1.0",
+    "react-i18next": "^11.16.9",
     "react-intersection-observer": "^9.1.0",
     "react-pdf": "^5.7.1",
     "react-query": "^3.34.14",
@@ -40,7 +44,8 @@
     "supercluster": "^7.1.5",
     "typescript": "latest",
     "use-supercluster": "^0.4.0",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "zustand": "^4.0.0-rc.1"
   },
   "scripts": {
     "prepare_env": "node create_env.mjs",

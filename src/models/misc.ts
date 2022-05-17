@@ -1,4 +1,5 @@
 import {ReactNode} from 'react';
+import {GetState, SetState} from 'zustand';
 
 export interface RestError {
   errorCode: string;
@@ -122,8 +123,8 @@ export enum SaveMode {
 }
 
 export enum Language {
-  EN_US = 'en-us',
-  DE_DE = 'de-de',
+  'en-US' = 'en-us',
+  'de-DE' = 'de-de',
 }
 
 export enum Order {
@@ -208,3 +209,8 @@ export interface BasicDetailsValue {
   value: string | ReactNode;
   icon: JSX.Element;
 }
+
+export type StoreSlice<T extends object, E extends object = T> = (
+  set: SetState<E extends T ? E : E & T>,
+  get: GetState<E extends T ? E : E & T>,
+) => T;
