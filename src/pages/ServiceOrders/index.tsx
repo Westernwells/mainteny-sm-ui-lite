@@ -1,10 +1,10 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import {Widget} from 'components/Widget';
-import {useSearchParams} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {formatSearchParams} from 'utils/utils';
 import {ServiceOrderScheduleTab} from './Tabs/ServiceOrderScheduleTab';
 import {ServiceOrderList} from './Tabs/ServiceOrderList.tsx';
@@ -26,6 +26,14 @@ export const ServiceOrders = () => {
   const [showListFilter, setShowListFilter] = useState(false);
   const [listSearch, setListSearch] = useState('');
   const [queryParams, setQueryParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const menu = useRef([
+    {label: 'Emergency', action: () => navigate('/orders/new?type=emergency')},
+    {label: 'Callout', action: () => {}},
+    {label: 'Repair', action: () => {}},
+    {label: 'Regular', action: () => {}},
+  ]).current;
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
@@ -38,7 +46,8 @@ export const ServiceOrders = () => {
       setShowFilter={setShowScheduleFilter}
       showFilter={showScheduleFilter}
       btnLabel="New Order"
-      showNewBtn
+      menu={menu}
+      showMenuActionBtn
       hideViewOption
       hideSearchInput
     />
@@ -50,8 +59,9 @@ export const ServiceOrders = () => {
       getSearchValue={(search) => setListSearch(search)}
       setShowFilter={setShowListFilter}
       showFilter={showListFilter}
+      menu={menu}
       btnLabel="New Order"
-      showNewBtn
+      showMenuActionBtn
       hideViewOption
     />
   );

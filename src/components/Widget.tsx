@@ -9,7 +9,9 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import {MenuBtnProps} from 'models/misc';
 import {SearchInput} from './SearchInput';
+import {MenuBtn} from './MenuBtn';
 
 interface Props {
   searchPlaceholder?: string;
@@ -21,10 +23,12 @@ interface Props {
   hideSearchInput?: boolean;
   hideFilter?: boolean;
   getSearchValue?: (val: string) => void;
-  showNewBtn?: boolean;
+  showActionBtn?: boolean;
+  showMenuActionBtn?: Boolean;
   btnLabel?: string;
   btnOnClick?: () => void;
   containerStyles?: {[key: string]: string | number};
+  menu?: MenuBtnProps[];
 }
 
 export const Widget = ({
@@ -35,12 +39,14 @@ export const Widget = ({
   setShowFilter = () => {},
   hideViewOption = false,
   hideFilter = false,
-  showNewBtn = false,
+  showActionBtn = false,
   hideSearchInput = false,
   btnLabel = '',
   getSearchValue,
   btnOnClick,
   containerStyles,
+  showMenuActionBtn,
+  menu,
 }: Props) => {
   const theme = useTheme();
   const [view, setView] = useState('list');
@@ -48,34 +54,30 @@ export const Widget = ({
   return (
     <Box display="flex" sx={{...containerStyles}}>
       {!hideFilter ? (
-        <Box>
-          <Button
-            onClick={() => setShowFilter(!showFilter)}
-            disableRipple
-            // size="small"
-            sx={{
-              backgroundColor: showFilter
-                ? theme.palette.action.selected
-                : theme.palette.primary.outlinedHoverBg,
+        <Button
+          onClick={() => setShowFilter(!showFilter)}
+          disableRipple
+          sx={{
+            backgroundColor: showFilter
+              ? theme.palette.action.selected
+              : theme.palette.primary.outlinedHoverBg,
+            border: 'none',
+            ':hover': {
               border: 'none',
-
-              py: '1em',
-              ':hover': {
-                border: 'none',
-              },
-            }}
-            variant="outlined"
-            startIcon={<FilterListIcon />}>
-            <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
-              Filter
-            </Typography>
-          </Button>
-        </Box>
+            },
+          }}
+          variant="outlined"
+          startIcon={<FilterListIcon />}>
+          <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
+            Filter
+          </Typography>
+        </Button>
       ) : null}
 
       {!hideSearchInput ? (
         <Box ml="0.8em">
           <SearchInput
+            containerStyle={{height: '100%'}}
             placeholder={searchPlaceholder}
             onValueChanged={(value: string) =>
               getSearchValue && getSearchValue(value)
@@ -114,7 +116,7 @@ export const Widget = ({
         </ToggleButtonGroup>
       ) : null}
 
-      {showNewBtn ? (
+      {showActionBtn ? (
         <Button
           variant="contained"
           color="primary"
@@ -127,6 +129,24 @@ export const Widget = ({
           onClick={() => (btnOnClick ? btnOnClick() : () => {})}>
           {btnLabel}
         </Button>
+      ) : null}
+
+      {showMenuActionBtn && menu ? (
+        <MenuBtn
+          startIcon={<AddIcon />}
+          label={btnLabel}
+          menu={menu}
+          size="large"
+          color="primary"
+          sx={{
+            textTransform: 'capitalize',
+            ml: '0.8em',
+            py: '0.7em',
+          }}
+          variant="contained"
+          disableRipple
+          disableFocusRipple
+        />
       ) : null}
     </Box>
   );

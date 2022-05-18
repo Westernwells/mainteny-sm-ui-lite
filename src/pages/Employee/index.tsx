@@ -166,7 +166,7 @@ export const Employees = () => {
           showFilter={showFilter}
           btnLabel="New Employee"
           btnOnClick={() => setIsDrawerOpen(true)}
-          showNewBtn
+          showActionBtn
           hideFilter
           hideViewOption
         />

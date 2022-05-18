@@ -23,6 +23,8 @@ import {ServiceOrderDetails} from 'pages/ServiceOrderDetails';
 import {axiosClient} from 'utils/axios-utils';
 import {languageMap} from 'utils/utils';
 import i18n from 'i18next';
+
+import {NewServiceOrder} from 'pages/NewServiceOrder';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -254,6 +256,20 @@ export const Router = () => {
               </Helmet>
               <PageLayout>
                 <ServiceOrderDetails />
+              </PageLayout>
+            </>
+          }
+        />
+
+        <Route
+          path="/orders/new"
+          element={
+            <>
+              <Helmet>
+                <title>{`New service order - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout>
+                <NewServiceOrder />
               </PageLayout>
             </>
           }
