@@ -148,7 +148,6 @@ export const CustomerOverviewTab = ({
                   </Typography>
                 </Box>
                 <SearchInput
-                  size="small"
                   placeholder="Search"
                   onValueChanged={(value) => setUnitQuery(value)}
                   containerStyle={{
@@ -193,7 +192,6 @@ export const CustomerOverviewTab = ({
                   </Typography>
                 </Box>
                 <SearchInput
-                  size="small"
                   onValueChanged={(value) => setContractQuery(value)}
                   placeholder="Search"
                   containerStyle={{

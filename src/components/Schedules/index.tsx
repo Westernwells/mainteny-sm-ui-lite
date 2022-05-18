@@ -190,7 +190,6 @@ export const Schedule = ({
     ) : (
       <SearchInput
         placeholder={searchPlaceholder}
-        size="small"
         onValueChanged={(searchValue) =>
           handleSearch && handleSearch(searchValue)
         }

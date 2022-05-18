@@ -93,7 +93,6 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
         <Box sx={{px: '0.5em'}}>
           <SearchInput
             placeholder="Search Unassigned Orders"
-            size="small"
             onValueChanged={(searchValue) => setSearch(searchValue)}
             containerStyle={{
               background: '#fff',
