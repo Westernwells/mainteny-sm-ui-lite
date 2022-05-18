@@ -55,7 +55,7 @@ export const Contracts = () => {
     {keepPreviousData: true},
   );
 
-  totalContractRef.current = contractResource.total;
+  totalContractRef.current = totalContractRef.current || contractResource.total;
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);

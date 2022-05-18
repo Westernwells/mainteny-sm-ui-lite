@@ -57,8 +57,8 @@ export const MyUnits = () => {
     },
     {keepPreviousData: true},
   );
-
-  totalUnitsRef.current = elevatorResponse.total;
+  // set this value only once
+  totalUnitsRef.current = totalUnitsRef.current || elevatorResponse.total;
 
   const groupElevatorByAddressList = (elevatorRes?: Resource<ElevatorView>) => {
     const elevatorMap = _.groupBy(
