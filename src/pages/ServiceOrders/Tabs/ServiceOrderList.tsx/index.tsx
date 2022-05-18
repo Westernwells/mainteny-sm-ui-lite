@@ -70,7 +70,6 @@ export const ServiceOrderList = ({
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
-
     setPage({
       ...page,
       pageSize: Number(currentParams.pageSize),

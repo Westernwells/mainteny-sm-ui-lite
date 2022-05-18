@@ -42,7 +42,8 @@ export const Quotations = () => {
     {keepPreviousData: true},
   );
 
-  totalQuotationsRef.current = quotationsResource.total;
+  totalQuotationsRef.current =
+    totalQuotationsRef.current || quotationsResource.total;
 
   useEffect(() => {
     if (quotationsResource) {

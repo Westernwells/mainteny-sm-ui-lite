@@ -51,7 +51,7 @@ export const Invoices = () => {
     {keepPreviousData: true},
   );
 
-  totalInvoiceRef.current = invoiceResource.total;
+  totalInvoiceRef.current = totalInvoiceRef.current || invoiceResource.total;
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);

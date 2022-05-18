@@ -71,7 +71,8 @@ export const Employees = () => {
     eventType: [TechnicianEventType.HOLIDAY, TechnicianEventType.SICK_LEAVE],
   });
 
-  totalEmployeeRef.current = userAccountResource.total;
+  totalEmployeeRef.current =
+    totalEmployeeRef.current || userAccountResource.total;
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
