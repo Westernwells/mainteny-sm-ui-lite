@@ -95,7 +95,7 @@ export const CustomPagination = ({
 
         <Pagination
           count={pageCount || 10}
-          page={pageIndex ? pageIndex + 1 : 1}
+          page={pageIndex || 1}
           shape="rounded"
           variant="outlined"
           onChange={(event: React.ChangeEvent<unknown>, newPage: number) => {
@@ -103,7 +103,7 @@ export const CustomPagination = ({
             if (handlePageChange) {
               handlePageChange(newPage);
             }
-            setPage({...page, pageIndex: newPage - 1});
+            setPage({...page, pageIndex: newPage});
           }}
           sx={{
             mt: '0.3em',

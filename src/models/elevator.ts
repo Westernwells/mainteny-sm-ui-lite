@@ -177,3 +177,26 @@ export interface CustomerElevatorParams {
   pageSize: number;
   query: string;
 }
+
+export interface ElevatorDataGrid {
+  address: string;
+  showAddress: boolean;
+}
+
+export interface ElevatorOrderPair {
+  elevator: ElevatorView;
+  serviceOrder?: ServiceOrderView;
+}
+
+export interface ElevatorsByAddress {
+  elevators: ElevatorOrderPair[];
+  address: Address;
+}
+
+export interface ElevatorByAddr {
+  [key: string]: ElevatorView[];
+}
+
+export interface DataGridElevatorView extends ElevatorView {
+  showAddress: boolean;
+}

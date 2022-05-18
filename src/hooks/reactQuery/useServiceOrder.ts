@@ -36,9 +36,11 @@ import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
   ElevatorAvailability,
   ElevatorAvailabilityParams,
+  ElevatorOrderPair,
+  ElevatorsByAddress,
   ElevatorView,
 } from '../../models/elevator';
-import {ElevatorOrderPair, ElevatorsByAddress} from '../../pages/Units/Models';
+// import {ElevatorOrderPair, ElevatorsByAddress} from '../../pages/Units/Models';
 import {useUserSession} from './useUserSession';
 
 interface ServiceOrderReportPayload {

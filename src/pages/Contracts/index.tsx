@@ -160,7 +160,7 @@ export const Contracts = () => {
         columns={columns}
         loading={isFetching}
         pageSize={page.pageSize}
-        pageIndex={page.pageIndex}
+        pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
           setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
         }

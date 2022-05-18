@@ -112,7 +112,7 @@ export const Customer = () => {
         loading={isFetching}
         hideFooter={pageCount <= 1}
         pageSize={page.pageSize}
-        pageIndex={page.pageIndex}
+        pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
           setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
         }

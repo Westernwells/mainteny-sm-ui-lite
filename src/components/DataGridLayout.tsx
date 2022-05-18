@@ -5,6 +5,7 @@ import {
   GridColDef,
   GridEventListener,
   GridEvents,
+  GridRowParams,
   GridRowsProp,
 } from '@mui/x-data-grid';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -28,6 +29,7 @@ interface Props extends DataGridProps {
   totalRows?: number;
   fullHeight?: boolean;
   noRowsEmptySection?: JSX.Element;
+  isRowSelectable?: (params: GridRowParams) => boolean;
 }
 
 export const DataGridLayout = ({
@@ -46,6 +48,7 @@ export const DataGridLayout = ({
   totalRows,
   fullHeight = true,
   noRowsEmptySection,
+  isRowSelectable,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
@@ -98,6 +101,7 @@ export const DataGridLayout = ({
         headerHeight={50}
         rows={rows}
         columns={columns}
+        isRowSelectable={isRowSelectable}
         disableSelectionOnClick
         disableColumnFilter
         hideFooter={hideFooter}
