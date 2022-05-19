@@ -5,7 +5,6 @@ import Fade from '@mui/material/Fade';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import {SearchInput} from 'components/SearchInput';
 
 interface Props {
   children: ReactNode;
@@ -15,7 +14,7 @@ interface Props {
   isScrollable?: boolean;
 }
 
-export const QuotationModal = ({
+export const SelectModal = ({
   children,
   isOpen,
   onClose,
@@ -62,10 +61,8 @@ export const QuotationModal = ({
           display="flex"
           flexDirection="column"
           minHeight="max(50vh, 300px)"
-          //   maxHeight="56vh"
           sx={{overflowY: isScrollable ? 'scroll' : 'hidden'}}
           flexGrow={1}>
-          <SearchInput placeholder="search" size="medium" />
           {children}
         </Box>
       </Box>

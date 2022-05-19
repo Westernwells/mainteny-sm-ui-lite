@@ -17,7 +17,7 @@ export interface ArticleAdditionalInfo {
   pictureUrls: string[];
 }
 
-export interface AritcleView {
+export interface ArticleView {
   additionalInfo: ArticleAdditionalInfo;
   category: string;
   description: string;
@@ -33,18 +33,18 @@ export interface AritcleView {
   type: ArticleType;
   unit: string;
   unitPurchasePrice: Price;
-  unitSalesPrice: Price;
+  unitSellingPrice: Price;
 }
 
-export interface AritcleViewItem {
-  article: AritcleView;
+export interface ArticleViewItem {
+  article: ArticleView;
   quantity: number;
 }
 
 export interface Article {
-  items: ArticleAdditionalInfo;
+  additionalInfo: ArticleAdditionalInfo;
   category: string;
-  childArticles: AritcleViewItem[];
+  childArticles?: ArticleViewItem[];
   description: string;
   id: string;
   manufacture: string;
@@ -58,5 +58,11 @@ export interface Article {
   type: ArticleType;
   unit: string;
   unitPurchasePrice: Price;
-  unitSalesPrice: Price;
+  unitSellingPrice: Price;
+}
+
+export interface QueryArticleParams {
+  pageIndex: number;
+  pageSize: number;
+  query: string;
 }

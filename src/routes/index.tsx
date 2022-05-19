@@ -14,6 +14,7 @@ import {InvoiceDetails} from 'pages/InvoiceDetails';
 import {Employees} from 'pages/Employee';
 import {EmployeeDetails} from 'pages/EmployeeDetails';
 import {Quotations} from 'pages/Quotations';
+import {NewQuotation} from 'pages/QuotationDetails/NewQuotation';
 import {QuotationDetails} from 'pages/QuotationDetails';
 import {Notifications} from 'pages/Notifications';
 import {PageNotFound} from 'pages/PageNotFound';
@@ -197,6 +198,20 @@ export const Router = () => {
               </Helmet>
               <PageLayout>
                 <Quotations />
+              </PageLayout>
+            </>
+          }
+        />
+
+        <Route
+          path="/quotations/new"
+          element={
+            <>
+              <Helmet>
+                <title>{`New Quotation - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout pageScrollable>
+                <NewQuotation />
               </PageLayout>
             </>
           }

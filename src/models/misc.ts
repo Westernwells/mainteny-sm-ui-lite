@@ -177,7 +177,13 @@ export interface StringValueResponse {
   value: string;
 }
 
+// TODO: Fix duplicate names
 export interface Fee {
+  amount: number;
+  currency: string;
+}
+
+export interface Money {
   amount: number;
   currency: string;
 }

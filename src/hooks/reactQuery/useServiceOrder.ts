@@ -228,7 +228,7 @@ export function useServiceOrders(
     RestError,
     Resource<ServiceOrderView>
   >(
-    [queryKeys.querySeviceOrders, params, user!.userAccount.serviceCompany.id],
+    [queryKeys.queryServiceOrders, params, user!.userAccount.serviceCompany.id],
     () =>
       queryServiceOrders({
         ...params,
@@ -258,7 +258,7 @@ export function useFetchServiceOrdersByElevators(
   const end = startOfDay(addDays(new Date(), 30)).toISOString();
   return useQuery<Resource<ServiceOrderView>, RestError, ElevatorsByAddress[]>(
     [
-      queryKeys.querySeviceOrders,
+      queryKeys.queryServiceOrders,
       elevatorIds,
       user!.userAccount.serviceCompany.id,
     ],
@@ -336,7 +336,7 @@ export const useQueryServiceOrderScheduled = (
   const {user} = useUserSession();
 
   return useQuery(
-    [queryKeys.querySeviceOrders, params, user!.userAccount.serviceCompany.id],
+    [queryKeys.queryServiceOrders, params, user!.userAccount.serviceCompany.id],
     () =>
       queryServiceOrderSchedules({
         ...params,
