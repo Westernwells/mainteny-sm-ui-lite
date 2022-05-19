@@ -141,7 +141,7 @@ export const ServiceOrderScheduleTab = ({
             <ServiceOrderStatusIndicator containerStyles={{flexGrow: 1}} />
           }
           scheduleItems={orders}
-          labelType="people"
+          scheduleType="people"
           searchPlaceholder="Search technician"
           handleSearch={(value) => setTechnicianSearch(value)}
           bodyLabel={technicianResource.data.map(

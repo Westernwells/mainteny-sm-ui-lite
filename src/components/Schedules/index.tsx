@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {ReactNode, useEffect, useRef, useState} from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -28,23 +29,27 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {WeekPair} from 'models/misc';
 import {grey} from '@mui/material/colors';
+import {ServiceOrderView} from 'models/service-order';
 import {SearchInput} from 'components/SearchInput';
 import {styles as sx} from './styles';
+import {ScheduleControls} from './ScheduleControls';
 
 interface Props {
-  scheduleItems: {[key: string]: any[]};
+  scheduleItems: {[key: string]: ServiceOrderView[]};
   renderCellItem: (
     cellItem: any,
     calcWidth: (startDateTime: string, endDateTime: string) => string,
     calcPosition: (startDateTime: string) => string,
   ) => void;
   getWeekPair?: (weekPair: WeekPair) => void;
-  labelType?: 'date' | 'people';
+  scheduleType?: 'date' | 'people' | 'default';
+  defaultTypeLabel?: string;
   searchPlaceholder?: string;
   bodyLabel?: string[];
   handleSearch?: (val: string) => void;
   containerStyles?: {[key: string]: string | number};
   cardFooter?: ReactNode;
+  makeLabelSelectable?: boolean;
 }
 
 const gridWidth = 120;
@@ -54,12 +59,14 @@ export const Schedule = ({
   getWeekPair,
   scheduleItems,
   renderCellItem,
-  labelType = 'date',
+  scheduleType = 'default',
   searchPlaceholder = 'Search',
   bodyLabel = [],
   handleSearch,
   containerStyles,
   cardFooter,
+  defaultTypeLabel = '',
+  makeLabelSelectable,
 }: Props) => {
   const [tableHeader, setTableHeader] = useState<string[]>([]);
   const elementRef = useRef<HTMLInputElement | undefined>();
@@ -75,19 +82,23 @@ export const Schedule = ({
     }),
   );
 
+  console.log(scheduleType, '.......');
+
   useEffect(() => {
-    if (labelType === 'date') {
+    if (scheduleType === 'date') {
       const weekBegins = formatDate(weekPair.startOfWeekDay, 'dd MMM');
       const weekEnds = formatDate(weekPair.endOfWeekDay, 'dd MMM');
       setTableHeader([`${weekBegins} - ${weekEnds}`, ...twentyFourHourTime]);
-    } else {
+    } else if (scheduleType === 'people') {
       setTableHeader([searchPlaceholder, ...twentyFourHourTime]);
+    } else {
+      setTableHeader([defaultTypeLabel, ...twentyFourHourTime]);
     }
-  }, [weekInterval, searchPlaceholder]);
+  }, [weekInterval, searchPlaceholder, scheduleType]);
 
   useEffect(() => {
     if (tableHeader.length) {
-      if (labelType === 'date') {
+      if (scheduleType === 'date') {
         const result = weekInterval.map((item) => {
           const key = formatDate(item, dateFormat);
           return {[key!]: tableHeader};
@@ -172,39 +183,46 @@ export const Schedule = ({
     });
   };
 
-  const scheduleControls = (item: string) =>
-    labelType === 'date' ? (
-      <Box sx={{display: 'flex'}}>
-        <Box onClick={() => prevMonth()} sx={{cursor: 'pointer'}}>
-          <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
-        </Box>
+  const scheduleControls = (item: string) => {
+    if (scheduleType === 'date') {
+      return (
+        <Box sx={{display: 'flex'}}>
+          <Box onClick={() => prevMonth()} sx={{cursor: 'pointer'}}>
+            <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
+          </Box>
 
-        <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
-          {item}
-        </Typography>
+          <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
+            {item}
+          </Typography>
 
-        <Box onClick={() => nextMonth()} sx={{cursor: 'pointer'}}>
-          <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
+          <Box onClick={() => nextMonth()} sx={{cursor: 'pointer'}}>
+            <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
+          </Box>
         </Box>
-      </Box>
-    ) : (
-      <SearchInput
-        placeholder={searchPlaceholder}
-        onValueChanged={(searchValue) =>
-          handleSearch && handleSearch(searchValue)
-        }
-        containerStyle={{
-          background: '#fff',
-          width: '90%',
-        }}
-      />
-    );
+      );
+    }
+
+    if (scheduleType === 'people') {
+      return (
+        <SearchInput
+          placeholder={searchPlaceholder}
+          onValueChanged={(searchValue) =>
+            handleSearch && handleSearch(searchValue)
+          }
+          containerStyle={{
+            background: '#fff',
+            width: '90%',
+          }}
+        />
+      );
+    }
+  };
 
   const renderScheduleLabel = (item: string) => (
     <Typography component="div" variant="subtitle2">
       {item} <br />
       <Typography variant="caption" sx={{color: grey[600]}}>
-        {labelType === 'date'
+        {scheduleType === 'date'
           ? formatDate(new Date(item), 'EEEE')
           : scheduleItems[item]
           ? `${scheduleItems[item].length} ${
@@ -226,7 +244,17 @@ export const Schedule = ({
                   if (index === 0) {
                     return (
                       <ScheduleHeaderCell key={index}>
-                        {scheduleControls(item)}
+                        {/* <ScheduleControls
+                          item={item}
+                          prevMonth={prevMonth}
+                          nextMonth={nextMonth}
+                          getSearchValue={(searchValue) =>
+                            handleSearch && handleSearch(searchValue)
+                          }
+                          searchPlaceholder={searchPlaceholder}
+                          scheduleType={scheduleType}
+                        /> */}
+                        {scheduleControls(item)} 
                       </ScheduleHeaderCell>
                     );
                   }
@@ -247,7 +275,9 @@ export const Schedule = ({
                   {Object.keys(dayRow).map((key) =>
                     dayRow[key].map((item, index) => {
                       if (index === 0) {
-                        return (
+                        const technician = scheduleItems[key];
+                        console.log(technician, '<<<<<<<>>>>>>>>.......');
+                        return scheduleType === 'default' ? null : (
                           <ScheduleBodyCell
                             cellWidth={gridWidth}
                             key={`${rowIndex}-${index}`}>

@@ -1,3 +1,4 @@
+import Box from '@mui/material/Box';
 import Button, {ButtonProps} from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -21,7 +22,7 @@ export const MenuBtn = ({label, menu, startIcon, ...rest}: Props) => {
   };
 
   return (
-    <div>
+    <Box>
       <Button startIcon={startIcon} onClick={handleClick} {...rest}>
         {label}
       </Button>
@@ -38,6 +39,6 @@ export const MenuBtn = ({label, menu, startIcon, ...rest}: Props) => {
           </MenuItem>
         ))}
       </Menu>
-    </div>
+    </Box>
   );
 };

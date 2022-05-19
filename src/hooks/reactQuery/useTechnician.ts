@@ -2,6 +2,7 @@ import {endOfDay, startOfDay} from 'date-fns';
 import {Resource, RestError} from 'models/misc';
 import {
   QueryTechniciansParams,
+  RecommendTechnicianPayload,
   TechnicianEventPair,
   TechnicianEventView,
   TechniciansEventsParams,
@@ -145,5 +146,29 @@ export const useQueryServiceCompanyTechnicians = (
     {
       enabled: !!user,
     },
+  );
+};
+
+export const fetchRecommendedTechnician = async (
+  params: RecommendTechnicianPayload,
+  serviceCompanyId: string,
+) => {
+  const response = await axiosClient.get<TechnicianView[]>(
+    `/api/dispatch/serviceCompanies/${serviceCompanyId}/technicians/recommendation`,
+    {params, paramsSerializer},
+  );
+  return response.data;
+};
+
+export const useFetchRecommendedTechnician = (
+  params: RecommendTechnicianPayload,
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {user} = useUserSession();
+  const serviceCompanyId = user!.userAccount.serviceCompany.id;
+  return useQuery<TechnicianView[]>(
+    [qks.fetchRecommendedTechnicians, serviceCompanyId, params],
+    () => fetchRecommendedTechnician(params, serviceCompanyId),
+    {enabled: !!serviceCompanyId, ...options},
   );
 };

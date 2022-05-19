@@ -81,7 +81,7 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
         contentContainerStyles={{height: '100%', mx: 0, px: 0, pt: '0.4em'}}
         customHeader={
           <Typography sx={{}} variant="subtitle2" color="textSecondary">
-            Unassigned Orders (12)
+            Unassigned Orders ({serviceOrders.total})
           </Typography>
         }
         headerContainerOverrideStyles={{

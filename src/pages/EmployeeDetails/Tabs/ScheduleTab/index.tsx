@@ -60,6 +60,7 @@ export const ScheduleTab = ({technicianId}: Props) => {
       <Schedule
         getWeekPair={(pair) => setWeekPair(pair)}
         scheduleItems={orders}
+        scheduleType='date'
         renderCellItem={(order: ServiceOrderView, calWidth, calcPosition) => (
           <ScheduleItem
             key={order.id}

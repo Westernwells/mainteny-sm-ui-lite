@@ -1,4 +1,4 @@
-import {ReactNode, useState} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import MuiStepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -12,6 +12,8 @@ interface Props {
   containerStyles?: {[key: string]: any};
   handleCancel?: () => void;
   handleSubmit?: () => void;
+  getActiveStep?: (val: number) => void;
+  disableNextBtn?: boolean;
 }
 
 export const Stepper = ({
@@ -20,6 +22,8 @@ export const Stepper = ({
   containerStyles,
   handleCancel = () => {},
   handleSubmit = () => {},
+  getActiveStep,
+  disableNextBtn,
 }: Props) => {
   const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
@@ -31,6 +35,12 @@ export const Stepper = ({
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
+
+  useEffect(() => {
+    if (getActiveStep) {
+      getActiveStep(activeStep);
+    }
+  }, [activeStep]);
 
   return (
     <Box sx={{...containerStyles}}>
@@ -74,6 +84,7 @@ export const Stepper = ({
             <Box sx={{flex: '1 1 auto'}} />
             <Button
               variant="contained"
+              disabled={disableNextBtn}
               onClick={
                 activeStep === steps.length - 1 ? handleSubmit : handleNext
               }>
