@@ -10,6 +10,7 @@ import {
 import LinearProgress from '@mui/material/LinearProgress';
 import {useNavigate} from 'react-router-dom';
 import {CustomPagination} from './CustomPagination';
+import {EmptySection} from './EmptySection';
 
 interface Props extends DataGridProps {
   rows: GridRowsProp;
@@ -26,6 +27,7 @@ interface Props extends DataGridProps {
   pageCount?: number;
   totalRows?: number;
   fullHeight?: boolean;
+  noRowsEmptySection?: JSX.Element;
 }
 
 export const DataGridLayout = ({
@@ -43,6 +45,7 @@ export const DataGridLayout = ({
   pageCount,
   totalRows,
   fullHeight = true,
+  noRowsEmptySection,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
@@ -68,6 +71,17 @@ export const DataGridLayout = ({
       totalRows={totalRows}
     />
   );
+
+  const noRowsOverlay = () =>
+    noRowsEmptySection || (
+      <EmptySection
+        illustration="clipboard"
+        size="tiny"
+        containerStyle={{my: 'auto'}}
+        label="There are no rows for the applied filters!"
+      />
+    );
+
   return (
     <Box
       sx={{
@@ -78,6 +92,7 @@ export const DataGridLayout = ({
         components={{
           LoadingOverlay: LinearProgress,
           Footer: renderFooter,
+          NoRowsOverlay: noRowsOverlay,
         }}
         loading={loading}
         headerHeight={50}

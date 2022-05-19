@@ -5,22 +5,22 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {ArticleView} from '../model';
+import {QuotationItem} from 'models/quotation';
 
 interface Props {
-  article: ArticleView;
+  quotationItem: QuotationItem;
   index: number;
-  deleteArticle: (article: ArticleView) => void;
-  setArticles: React.Dispatch<React.SetStateAction<ArticleView[]>>;
+  deleteRow: (item: QuotationItem) => void;
+  setRow: React.Dispatch<React.SetStateAction<QuotationItem[]>>;
 }
 
-export const Article = ({
-  article,
+export const QuotationRow = ({
+  quotationItem,
   index,
-  deleteArticle,
-  setArticles,
+  deleteRow,
+  setRow,
 }: Props) => {
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(quotationItem.quantity);
   const [description, setDescription] = useState<string | null>(null);
 
   const handleDescriptionChange = (e: any) => {
@@ -28,17 +28,11 @@ export const Article = ({
   };
 
   useEffect(() => {
-    article.quantity = quantity;
+    quotationItem.quantity = quantity;
 
-    setArticles((prev) => {
-      const newArticles = prev.filter(
-        (item) => item.articleNumber !== article.articleNumber,
-      );
-
-      newArticles.push(article);
-
-      return newArticles;
-    });
+    setRow((prev) =>
+      prev.map((item) => (item.id === quotationItem.id ? quotationItem : item)),
+    );
   }, [quantity]);
 
   return (
@@ -54,7 +48,7 @@ export const Article = ({
         <Box>{index}</Box>
         <Box sx={{justifySelf: 'stretch'}}>
           <TextField
-            value={article.description}
+            value={quotationItem.article.description}
             size="small"
             fullWidth
             sx={{width: '100%'}}
@@ -83,7 +77,7 @@ export const Article = ({
         />
         <TextField defaultValue="pau" size="small" sx={{maxWidth: '10ch'}} />
         <TextField
-          value={article.unitPriceNumber}
+          value={quotationItem.unitSellingPrice.amount}
           size="small"
           sx={{maxWidth: '10ch'}}
           InputProps={{
@@ -91,7 +85,7 @@ export const Article = ({
           }}
         />
         <TextField
-          value={article.unitPriceNumber * quantity}
+          value={quotationItem.unitSellingPrice.amount * quantity}
           size="small"
           disabled
           sx={{maxWidth: '10ch', justifySelf: 'end'}}
@@ -113,7 +107,7 @@ export const Article = ({
           size="small"
           color="error"
           endIcon={<DeleteIcon />}
-          onClick={() => deleteArticle(article)}
+          onClick={() => deleteRow(quotationItem)}
           sx={{textTransform: 'capitalize', mx: '.5em'}}>
           Delete Article
         </Button>

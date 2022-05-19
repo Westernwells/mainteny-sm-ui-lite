@@ -7,10 +7,10 @@ import {
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 import Elevator from '@mui/icons-material/Elevator';
-import {ElevatorStatus} from 'models/elevator';
 import Chip from '@mui/material/Chip';
 import {formatDate} from 'utils/datetime';
 import {convertToText} from 'utils/utils';
+import {getElevatorStatusChipColor} from 'utils/elevator-utils';
 import {DataGridElevatorView} from './Models';
 
 const defaultProps = {
@@ -34,19 +34,6 @@ const defaultAlignment: {
   headerAlign: 'center',
   align: 'center',
 };
-
-function getElevatorStatusChipColor(status: ElevatorStatus) {
-  switch (status) {
-    case ElevatorStatus.RUNNING:
-      return 'success';
-    case ElevatorStatus.BROKEN:
-      return 'error';
-    case ElevatorStatus.STOPPED:
-      return 'warning';
-    default:
-      return 'default';
-  }
-}
 
 export const columns: GridColDef[] = [
   {

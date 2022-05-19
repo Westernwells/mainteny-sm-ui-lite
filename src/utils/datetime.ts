@@ -8,6 +8,8 @@ import {
   startOfWeek,
 } from 'date-fns';
 
+export const DEFAULT_DATE_FORMAT = 'dd.MM.yyyy';
+
 export function getDateObject(input: any): Date {
   const type = typeof input;
   if (type === 'string') {
@@ -37,7 +39,7 @@ export function formatDate(input?: string | Date, formatType?: string) {
   }
   return formatType
     ? format(getDateObject(input), formatType)
-    : format(getDateObject(input), 'yyyy-MM-dd');
+    : format(getDateObject(input), DEFAULT_DATE_FORMAT);
 }
 
 export function setDateTime(date: Date, hourMinute: string): Date {

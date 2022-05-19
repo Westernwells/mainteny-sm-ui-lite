@@ -12,6 +12,7 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import SendIcon from '@mui/icons-material/Send';
 import CopyAllIcon from '@mui/icons-material/CopyAll';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import {QuotationStatus} from 'models/quotation';
 
 interface Props {
   status: string;
@@ -28,17 +29,19 @@ export const Actions = ({status}: Props) => {
   };
   return (
     <>
-      {status === 'SENT' ? (
-        <IconButton onClick={() => console.log('ACTION: RESEND')}>
-          <ReplyAllIcon sx={{color: '#2196F3', transform: 'rotate(180deg)'}} />
+      {status === QuotationStatus.SENT_TO_CLIENT ? (
+        <IconButton size="small" onClick={() => console.log('ACTION: RESEND')}>
+          <ReplyAllIcon
+            sx={{color: 'action.active', transform: 'rotate(180deg)'}}
+          />
         </IconButton>
       ) : (
-        <IconButton onClick={() => console.log('ACTION: EDIT')}>
-          <EditIcon sx={{color: '#2196F3'}} />
+        <IconButton size="small" onClick={() => console.log('ACTION: EDIT')}>
+          <EditIcon sx={{color: 'action.active'}} />
         </IconButton>
       )}
-      <IconButton onClick={handleClick} sx={{ml: '.5em'}}>
-        <MoreIcon sx={{color: '#2196F3'}} />
+      <IconButton size="small" onClick={handleClick} sx={{ml: '.25em'}}>
+        <MoreIcon sx={{color: 'action.active'}} />
       </IconButton>
       <Menu
         id="actions-menu"
@@ -56,17 +59,19 @@ export const Actions = ({status}: Props) => {
           vertical: 'top',
           horizontal: 'right',
         }}>
-        {status !== 'SENT' && (
-          <MenuItem onClick={handleClose}>
-            <ListItemIcon>
-              <SendIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>
-              <Typography variant="body2">Send</Typography>
-            </ListItemText>
-          </MenuItem>
+        {status !== QuotationStatus.SENT_TO_CLIENT && (
+          <>
+            <MenuItem onClick={handleClose}>
+              <ListItemIcon>
+                <SendIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>
+                <Typography variant="body2">Send</Typography>
+              </ListItemText>
+            </MenuItem>
+            <Divider />
+          </>
         )}
-        {status !== 'SENT' && <Divider />}
 
         <MenuItem onClick={handleClose}>
           <ListItemIcon>

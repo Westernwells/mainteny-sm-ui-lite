@@ -1,4 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
+import {useNavigate} from 'react-router';
 import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
 import {GridRowsProp} from '@mui/x-data-grid';
@@ -17,6 +18,8 @@ import {columns, makeRows} from './QuotationsDataGridProps';
 const pageSize = 25;
 
 export const Quotations = () => {
+  const navigate = useNavigate();
+
   const [search, setSearch] = useState('');
   const totalQuotationsRef = useRef(0);
   const [page, setPage] = useState(makePage(0, pageSize));
@@ -62,6 +65,7 @@ export const Quotations = () => {
         label="No quotations have been created yet. Please click the button below to create one!"
         showActionBtn
         btnLabel="Add Quotation"
+        btnAction={() => navigate('new')}
         containerStyle={{
           height: '100%',
           mb: '10em',
@@ -83,6 +87,9 @@ export const Quotations = () => {
           getSearchValue={(val: string) => setSearch(val)}
           setShowFilter={setShowFilter}
           showFilter={showFilter}
+          btnLabel="New Quotation"
+          btnOnClick={() => navigate('new')}
+          showNewBtn
           hideViewOption
         />
       }>

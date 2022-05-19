@@ -1,28 +1,48 @@
 import {useEffect, useState} from 'react';
+import {useParams} from 'react-router';
+import {useFormik} from 'formik';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
 import {Button, InputLabel, OutlinedInput, TextField} from '@mui/material';
 import DatePicker from '@mui/lab/DatePicker';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import AddIcon from '@mui/icons-material/Add';
 import {BackAction} from 'components/BackAction';
+import {A4Layout} from 'components/A4Layout';
+import {SelectModal} from 'components/SelectModal';
+import {SelectButton} from 'components/SelectButton';
+import {SelectCard} from 'components/SelectCard';
+import {Progress} from 'components/Progress';
+import {EmptySection} from 'components/EmptySection';
+import {Elevator, ElevatorView} from 'models/elevator';
+import {PropertyOwner} from 'models/propertyManager';
+import {ClientSimpleView} from 'models/client';
+import {ArticleView} from 'models/article';
+import {QuotationItem, UpdateQuotation} from 'models/quotation';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useQuotation, useQuotationDetails} from 'hooks/reactQuery/useQuotation';
 import {roundCurrency} from 'utils/currency';
-import {SelectButton} from './Components/SelectButton';
-import {SelectCard} from './Components/SelectCard';
 import {Label} from './Components/Label';
-import {QuotationLayout} from './Components/QuotationLayout';
 import {BottomDrawer} from './Components/BottomDrawer';
-import {QuotationModal} from './Components/QuotationModal';
-import {Article} from './Components/Article';
-import {CustomerDataGrid} from './DataGrid/CustomerDataGrid';
-import {UnitDataGrid} from './DataGrid/UnitDataGrid';
-import {ArticleDataGrid} from './DataGrid/ArticleDataGrid';
-import {ArticleView, CustomerView, UnitView} from './model';
+import {QuotationRow} from './Components/QuotationRow';
+import {CustomersDataGrid} from './DataGrid/CustomersDataGrid';
+import {UnitsDataGrid} from './DataGrid/UnitsDataGrid';
+import {ArticlesDataGrid} from './DataGrid/ArticlesDataGrid';
 
 export const QuotationDetails = () => {
+  const {id: quotationId} = useParams();
+
+  const {
+    data: quotation,
+    isIdle,
+    isLoading,
+    isFetched,
+    refetch,
+  } = useQuotationDetails(quotationId);
+
+  const {updateQuotation} = useQuotation();
+
   const [isDrawerOpen] = useState<boolean>(true);
 
   const {user} = useUserSession();
@@ -33,77 +53,169 @@ export const QuotationDetails = () => {
   const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
 
-  const [customer, setCustomer] = useState<CustomerView | null>(null);
-  const [unit, setUnit] = useState<UnitView | null>(null);
-  const [articles, setArticles] = useState<ArticleView[]>([]);
+  const [customer, setCustomer] = useState<
+    PropertyOwner | ClientSimpleView | null
+  >(null);
+  const [unit, setUnit] = useState<ElevatorView | Elevator | null>(null);
+  const [quotationItems, setQuotationItems] = useState<QuotationItem[]>([]);
 
   const [totalPrice, setTotalPrice] = useState(0);
+
+  const initialValues: UpdateQuotation = {
+    description: '',
+    elevatorId: '',
+    items: [],
+  };
+
+  const formik = useFormik({
+    initialValues,
+    onSubmit: (values) => {
+      if (quotationId) {
+        updateQuotation(quotationId, values, () =>
+          console.log('Quotation Updated'),
+        );
+      }
+    },
+  });
 
   const handleDateChange = (newDate: Date | null) => {
     setDate(newDate);
   };
 
-  const handleSelectCustomer = (row: CustomerView) => {
+  const handleSelectCustomer = (row: PropertyOwner) => {
     setCustomer(row);
     setIsCustomerModalOpen(false);
   };
 
-  const handleSelectUnit = (row: UnitView) => {
+  const handleSelectUnit = (row: ElevatorView) => {
     setUnit(row);
     setIsUnitModalOpen(false);
   };
 
-  const handleSelectArticle = (row: ArticleView) => {
-    if (articles.filter((item) => item === row).length === 0) {
-      setArticles([...articles, row]);
+  const handleSelectQuotationItem = (row: ArticleView) => {
+    const articleViewToQuotationItem = (
+      article: ArticleView,
+    ): QuotationItem => ({
+      article,
+      additionalInfo: {},
+      id: article.id,
+      quantity: 0,
+      quotationId: '',
+      unitSellingPrice: article.unitSellingPrice,
+    });
+    if (
+      quotationItems.filter((item) => item.article.id === row.id).length === 0
+    ) {
+      setQuotationItems([...quotationItems, articleViewToQuotationItem(row)]);
     }
     setIsArticleModalOpen(false);
   };
 
-  const deleteArticle = (article: ArticleView) => {
-    const newArticles = articles.filter((item) => item !== article);
-    setArticles(newArticles);
+  const deleteQuotationItem = (item: QuotationItem) => {
+    const newItems = quotationItems.filter((i) => i !== item);
+    setQuotationItems(newItems);
   };
 
   useEffect(() => {
-    if (articles.length) {
+    // TODO: Fix refetching issues
+    refetch();
+  }, []);
+
+  useEffect(() => {
+    if (quotationItems.length) {
       const sum = 0;
 
       setTotalPrice(
-        articles
-          .map((article) => article.quantity * article.unitPriceNumber)
+        quotationItems
+          .map((item) => item.quantity * item.unitSellingPrice.amount)
           .reduce((prevValue, currentValue) => prevValue + currentValue, sum),
       );
     }
-  }, [articles]);
+    formik.setFieldValue(
+      'items',
+      quotationItems.map((item) => ({
+        articleId: item.article.id,
+        quantity: item.quantity,
+        sellingVat: item.article.unitSellingPrice.vat,
+        unitSellingPrice: {
+          amount: item.article.unitSellingPrice.amount,
+          currency: item.article.unitSellingPrice.currency,
+        },
+      })),
+      true,
+    );
+  }, [quotationItems]);
 
-  return (
-    <>
-      <Box display="flex" alignItems="center" gap="1em">
-        <BackAction label="QT-123456" containerStyle={{my: 'auto'}} />
-        <Typography variant="body1" color="textSecondary">
-          New Quotation
-        </Typography>
-        <Chip label="Draft" variant="outlined" color="warning" />
-      </Box>
+  useEffect(() => {
+    if (isFetched && quotation) {
+      setUnit(quotation.elevator);
+      setCustomer(quotation.elevator.propertyOwner);
+      setQuotationItems(quotation.items);
+      formik.setFieldValue('description', quotation.description, true);
+      formik.setFieldValue('items', quotation.items, true);
+    }
+  }, [isFetched]);
 
-      <QuotationLayout>
-        <Typography variant="subtitle1" mt="1em">
-          Gradler Fordertechnik
-          <Typography component="span" variant="caption">
-            &nbsp; GmbH Ahornstrabe 21 14959 Trebbin of Thryow
-          </Typography>
-        </Typography>
+  useEffect(() => {
+    if (unit) {
+      setCustomer(unit.propertyOwner);
+      formik.setFieldValue('elevatorId', unit.id, true);
+    }
+  }, [unit]);
 
-        <Box display="flex" mt="1em" gap="1em">
-          <Box flexGrow={1} display="flex" flexDirection="column" gap="1em">
+  if (isIdle || isLoading) {
+    return <Progress />;
+  }
+
+  return !quotation ? (
+    <EmptySection label="Quotation not found!" />
+  ) : (
+    <Box>
+      <BackAction label={quotation.number} containerStyle={{my: 'auto'}} />
+
+      <A4Layout>
+        <Box display="flex" justifyContent="space-between" mt="1em">
+          <Box>
+            <Typography variant="subtitle1">
+              {user?.userAccount.serviceCompany.name || ''}
+            </Typography>
+            <Typography component="span" variant="caption">
+              {user &&
+                'businessAddress' in user.userAccount.serviceCompany &&
+                user.userAccount.serviceCompany.businessAddress?.fullName}
+            </Typography>
+          </Box>
+          <Box textAlign="end">
+            <Typography component="span" variant="caption">
+              Quotation Number
+            </Typography>
+            <Typography variant="subtitle1">{quotation.number}</Typography>
+          </Box>
+        </Box>
+
+        <Box display="flex" mt="1em" gap="2em">
+          <Box flexGrow={1} display="flex" flexDirection="column" gap="2em">
             <Box>
               <Label text="To" />
               {customer ? (
                 <SelectCard
-                  header={customer.name}
-                  body={[customer.address, customer.phone]}
-                  onClose={() => setCustomer(null)}
+                  header={
+                    <Typography variant="body2">{customer.name}</Typography>
+                  }
+                  body={
+                    <>
+                      <Typography variant="caption">
+                        {customer.address.fullName}
+                      </Typography>
+                      <Typography variant="caption" component="p">
+                        {customer.contact.phone}
+                      </Typography>
+                    </>
+                  }
+                  onClose={() => {
+                    setCustomer(null);
+                    setUnit(null);
+                  }}
                 />
               ) : (
                 <SelectButton
@@ -117,8 +229,12 @@ export const QuotationDetails = () => {
 
               {unit ? (
                 <SelectCard
-                  header={unit.unitName}
-                  body={[unit.address]}
+                  header={<Typography variant="body2">{unit.model}</Typography>}
+                  body={
+                    <Typography variant="caption">
+                      {unit.address.fullName}
+                    </Typography>
+                  }
                   onClose={() => setUnit(null)}
                 />
               ) : (
@@ -133,51 +249,48 @@ export const QuotationDetails = () => {
             width="40%"
             display="flex"
             flexDirection="column"
-            justifyContent="space-between">
-            <Box>
-              <InputLabel>
-                <Label text="Date Created" />
-              </InputLabel>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DatePicker
-                  inputFormat="MM/dd/yyyy"
-                  value={date}
-                  onChange={handleDateChange}
-                  maxDate={new Date()}
-                  renderInput={(params) => (
-                    <TextField size="small" fullWidth {...params} />
-                  )}
-                />
-              </LocalizationProvider>
-            </Box>
-            <Box>
-              <InputLabel>
-                <Label text="Quotation Number" />
-              </InputLabel>
-              <OutlinedInput
-                size="small"
-                defaultValue="QT-123456"
-                disabled
-                fullWidth
+            gap="2em"
+            mt="1.5em">
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DatePicker
+                inputFormat="dd.MM.yyyy"
+                label="Date Created"
+                value={date}
+                onChange={handleDateChange}
+                maxDate={new Date()}
+                renderInput={(params) => (
+                  <TextField size="small" fullWidth {...params} />
+                )}
               />
-            </Box>
-            <Box>
-              <InputLabel>
-                <Label text="Created By" />
-              </InputLabel>
-              <OutlinedInput
-                size="small"
-                defaultValue={`${user?.userAccount.firstName} ${user?.userAccount.lastName}`}
-                fullWidth
-              />
-            </Box>
+            </LocalizationProvider>
+            <TextField
+              label="Created By"
+              size="small"
+              defaultValue={`${user?.userAccount.firstName} ${user?.userAccount.lastName}`}
+              fullWidth
+            />
           </Box>
         </Box>
         <Box mt="1em">
           <InputLabel>
             <Label text="Subject" />
           </InputLabel>
-          <OutlinedInput minRows={4} multiline fullWidth />
+          <TextField size="small" minRows={1} multiline fullWidth />
+        </Box>
+        <Box mt="1em">
+          <InputLabel>
+            <Label text="Description" />
+          </InputLabel>
+          <OutlinedInput
+            size="small"
+            id="description"
+            value={formik.values.description}
+            onChange={formik.handleChange}
+            minRows={2}
+            maxRows={6}
+            multiline
+            fullWidth
+          />
         </Box>
         <Box
           bgcolor="grey.50"
@@ -211,16 +324,16 @@ export const QuotationDetails = () => {
             flexDirection="column"
             my="1em"
             gap="1em">
-            {articles.map((item, index) => (
-              <Article
-                key={item.articleNumber}
-                article={item}
+            {quotationItems.map((item, index) => (
+              <QuotationRow
+                key={item.id}
+                quotationItem={item}
                 index={index + 1}
-                deleteArticle={deleteArticle}
-                setArticles={setArticles}
+                deleteRow={deleteQuotationItem}
+                setRow={setQuotationItems}
               />
             ))}
-            {articles.length ? (
+            {quotationItems.length ? (
               <>
                 <Button
                   variant="contained"
@@ -294,35 +407,49 @@ export const QuotationDetails = () => {
             )}
           </Box>
         </Box>
-        <Box mt="1em">
+        <Box my="1.5em">
           <InputLabel>
             <Label text="Additional Information" />
           </InputLabel>
-          <OutlinedInput minRows={2} multiline fullWidth />
+          <TextField size="small" minRows={2} multiline fullWidth />
         </Box>
-      </QuotationLayout>
+      </A4Layout>
 
-      <QuotationModal
+      <SelectModal
         isOpen={isCustomerModalOpen}
         onClose={() => setIsCustomerModalOpen(false)}
         header="Select Customer">
-        <CustomerDataGrid setRowItem={handleSelectCustomer} />
-      </QuotationModal>
+        <CustomersDataGrid setRowItem={handleSelectCustomer} />
+      </SelectModal>
 
-      <QuotationModal
+      <SelectModal
         isOpen={isUnitModalOpen}
         onClose={() => setIsUnitModalOpen(false)}
         header="Select Unit">
-        <UnitDataGrid setRowItem={handleSelectUnit} />
-      </QuotationModal>
+        <UnitsDataGrid
+          setRowItem={handleSelectUnit}
+          searchCustomer={customer?.name}
+        />
+      </SelectModal>
 
-      <QuotationModal
+      <SelectModal
         isOpen={isArticleModalOpen}
         onClose={() => setIsArticleModalOpen(false)}
         header="Select Article">
-        <ArticleDataGrid setRowItem={handleSelectArticle} />
-      </QuotationModal>
-      <BottomDrawer isOpen={isDrawerOpen} />
-    </>
+        <ArticlesDataGrid setRowItem={handleSelectQuotationItem} />
+      </SelectModal>
+      <BottomDrawer
+        isOpen={isDrawerOpen}
+        isValid={
+          !!(
+            formik.values.description &&
+            formik.values.elevatorId &&
+            formik.values.items.length &&
+            unit !== null
+          )
+        }
+        onSubmit={formik.handleSubmit}
+      />
+    </Box>
   );
 };

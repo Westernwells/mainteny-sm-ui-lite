@@ -18,11 +18,9 @@ export const SelectButton = ({text, onClick, sxContainer}: Props) => (
     alignItems="center"
     border="1px dashed"
     borderColor="text.disabled"
+    borderRadius=".25em"
     sx={sxContainer}>
-    <Button
-      variant="outlined"
-      onClick={onClick}
-      sx={{textTransform: 'capitalize'}}>
+    <Button variant="outlined" onClick={onClick}>
       {text}
     </Button>
   </Box>

@@ -44,13 +44,13 @@ const getQuotationStatusStyles = (
 } => {
   switch (status) {
     case QuotationStatus.ACCEPTED:
-      return {label: 'Accepted', color: 'success'};
+      return {label: 'Accepted', color: 'warning'};
     case QuotationStatus.DRAFT:
-      return {label: 'Draft', color: 'warning'};
+      return {label: 'Draft', color: 'default'};
     case QuotationStatus.REJECTED:
       return {label: 'Denied', color: 'error'};
     case QuotationStatus.SENT_TO_CLIENT:
-      return {label: 'Sent', color: 'info'};
+      return {label: 'Sent', color: 'success'};
     default:
       return {label: '-', color: 'default'};
   }
@@ -110,7 +110,9 @@ export const columns: GridColDef[] = [
     ),
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <Chip
+        size="small"
         variant="outlined"
+        sx={{minWidth: '8ch', px: '.25em'}}
         label={getQuotationStatusStyles(params.value).label}
         color={getQuotationStatusStyles(params.value).color}
       />
