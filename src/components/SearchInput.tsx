@@ -4,6 +4,7 @@ import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import * as _ from 'lodash';
+import {useTheme} from '@mui/material/styles';
 
 const height = {
   small: 30,
@@ -38,6 +39,7 @@ export const SearchInput = ({
   width,
   containerStyle,
 }: Props) => {
+  const theme = useTheme();
   const debouncedChangeHandler = useCallback(
     _.debounce((e) => {
       onValueChanged?.(e.nativeEvent.target.value);
@@ -54,6 +56,10 @@ export const SearchInput = ({
         alignItems: 'center',
         boxShadow: 0,
         width: width || '23rem',
+        [theme.breakpoints.down('md')]: {
+          height: '100%',
+          width: '15rem',
+        },
         border: '1px solid #E4E9F2',
         height: size ? height[size] : height.medium,
         ...containerStyle,

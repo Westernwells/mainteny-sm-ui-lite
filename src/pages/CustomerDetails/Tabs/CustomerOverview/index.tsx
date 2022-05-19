@@ -13,6 +13,7 @@ import Box from '@mui/material/Box';
 import {formatDate, getDateObject} from 'utils/datetime';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {Progress} from 'components/Progress';
+import {TabContentContainer} from 'components/TabContentContainer';
 
 import {PageCard} from 'components/PageCard';
 import {SearchInput} from 'components/SearchInput';
@@ -122,7 +123,7 @@ export const CustomerOverviewTab = ({
   }
 
   return (
-    <Box>
+    <TabContentContainer>
       {renderBasicDetails()}
       <Grid container spacing={2} sx={{mt: '1em'}}>
         <Grid item xs={6}>
@@ -219,6 +220,6 @@ export const CustomerOverviewTab = ({
           </PageCard>
         </Grid>
       </Grid>
-    </Box>
+    </TabContentContainer>
   );
 };

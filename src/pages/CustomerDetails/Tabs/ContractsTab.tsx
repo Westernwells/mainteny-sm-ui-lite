@@ -10,9 +10,9 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {Progress} from 'components/Progress';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
+import {TabContentContainer} from 'components/TabContentContainer';
+import Box from '@mui/material/Box';
 
-import {PageOverviewLayout} from 'components/PageOverviewLayout';
-import {Widget} from 'components/Widget';
 import {costRangeConvertor as crConverter} from 'utils/contract-utils';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {EmptySection} from 'components/EmptySection';
@@ -20,13 +20,19 @@ import {columns, makeRows} from './CustomerContractDataGrid';
 
 interface Props {
   customerId?: string;
+  searchQuery: string;
+  showFilter?: boolean;
+  setShowFilter?: (val: boolean) => void;
 }
 
-export const ContractsTab = ({customerId}: Props) => {
+export const ContractsTab = ({
+  customerId,
+  searchQuery,
+  showFilter,
+  setShowFilter = () => {},
+}: Props) => {
   const [page, setPage] = useState(makePage(0, 10));
-  const [search, setSearch] = useState('');
   const totalContractsRef = useRef(0);
-  const [showFilter, setShowFilter] = useState(false);
   const [expiryDate, setExpiryDate] = useState<string[]>([]);
   const [contractor, setContractor] = useState<string[]>([]);
   const [cost, setCost] = useState<number[][]>([]);
@@ -42,7 +48,7 @@ export const ContractsTab = ({customerId}: Props) => {
     isFetched,
   } = useUseQueryCustomerContracts(
     {
-      query: search,
+      query: searchQuery,
       orderBy: ContractOrderField.EXPIRY_TIME,
       order: Order.ASC,
       pageIndex: page.pageIndex,
@@ -108,49 +114,45 @@ export const ContractsTab = ({customerId}: Props) => {
     );
   }
 
+  const renderFilterItems = () => (
+    <FilterFields showFilter={showFilter} setShowFilter={setShowFilter}>
+      <MultipleSelectCheckmarks
+        label="Expiry Date"
+        options={[
+          'Last 14 days', // TODO: Create an enum to handle this
+          'Today',
+          'Next 7 days',
+          'Next 14 days',
+        ]}
+        getSelectedValue={(item) => setExpiryDate(item)}
+        multiple={false}
+      />
+
+      <MultipleSelectCheckmarks
+        label="Contractor"
+        options={contractorFilterItems}
+        getSelectedValue={(item) => setContractor(item)}
+      />
+
+      <MultipleSelectCheckmarks
+        label="Cost/year"
+        options={[
+          'Below 1000 €',
+          '1000 - 3000 €',
+          '3000 - 5000 €',
+          'Above 5000 €',
+        ]}
+        getSelectedValue={(item) => costRangeConvertor(item)}
+        multiple={false}
+      />
+    </FilterFields>
+  );
+
   return (
-    <PageOverviewLayout
-      label=""
-      renderWidget={
-        <Widget
-          searchPlaceholder="Try 'Astralift BV'"
-          getSearchValue={(val: string) => setSearch(val)}
-          setShowFilter={setShowFilter}
-          showFilter={showFilter}
-          hideViewOption
-        />
-      }>
-      <FilterFields showFilter={showFilter} setShowFilter={setShowFilter}>
-        <MultipleSelectCheckmarks
-          label="Expiry Date"
-          options={[
-            'Last 14 days', // TODO: Create an enum to handle this
-            'Today',
-            'Next 7 days',
-            'Next 14 days',
-          ]}
-          getSelectedValue={(item) => setExpiryDate(item)}
-          multiple={false}
-        />
-
-        <MultipleSelectCheckmarks
-          label="Contractor"
-          options={contractorFilterItems}
-          getSelectedValue={(item) => setContractor(item)}
-        />
-
-        <MultipleSelectCheckmarks
-          label="Cost/year"
-          options={[
-            'Below 1000 €',
-            '1000 - 3000 €',
-            '3000 - 5000 €',
-            'Above 5000 €',
-          ]}
-          getSelectedValue={(item) => costRangeConvertor(item)}
-          multiple={false}
-        />
-      </FilterFields>
+    <TabContentContainer>
+      <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+        {renderFilterItems()}
+      </Box>
 
       {isLoading ? (
         <Progress />
@@ -170,6 +172,6 @@ export const ContractsTab = ({customerId}: Props) => {
           totalRows={contractResource.total}
         />
       )}
-    </PageOverviewLayout>
+    </TabContentContainer>
   );
 };
