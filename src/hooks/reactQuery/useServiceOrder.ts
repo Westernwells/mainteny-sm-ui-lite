@@ -333,12 +333,12 @@ export const queryServiceOrderSchedules = async (
 
 export const useQueryServiceOrderScheduled = (
   params: ServiceOrderScheduleParams,
-  options?: any,
+  options?: UseQueryOptions<any, any, any>,
 ) => {
   const {user} = useUserSession();
 
-  return useQuery(
-    [queryKeys.queryServiceOrders, params, user!.userAccount.serviceCompany.id],
+  return useQuery<Resource<ServiceOrderView>>(
+    [queryKeys.querySeviceOrders, params, user!.userAccount.serviceCompany.id],
     () =>
       queryServiceOrderSchedules({
         ...params,
@@ -524,4 +524,3 @@ export const useCreateServiceOrder = (successMsg: string) => {
     },
   );
 };
-

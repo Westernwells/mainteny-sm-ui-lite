@@ -31,17 +31,21 @@ export const ScheduleTab = ({technicianId}: Props) => {
     startOfWeekDay: getStartOfWeek(new Date(), 1),
     endOfWeekDay: getEndOfWeek(new Date(), 1),
   });
+
   const [orders, setOrders] = useState<{[key: string]: ServiceOrderView[]}>({});
   const [page] = useState(makePage(0, 100));
   const {data: serviceOrders = createEmptyResource<ServiceOrderView>(10)} =
-    useQueryServiceOrderScheduled({
-      end: toRestDateTime(weekPair?.endOfWeekDay),
-      start: toRestDateTime(weekPair?.startOfWeekDay),
-      pageIndex: page.pageIndex,
-      pageSize: page.pageSize,
-      query: '',
-      technicianIds: technicianId ? [technicianId] : [],
-    });
+    useQueryServiceOrderScheduled(
+      {
+        end: toRestDateTime(weekPair?.endOfWeekDay),
+        start: toRestDateTime(weekPair?.startOfWeekDay),
+        pageIndex: page.pageIndex,
+        pageSize: page.pageSize,
+        query: '',
+        technicianIds: technicianId ? [technicianId] : [],
+      },
+      {keepPreviousData: true},
+    );
 
   useEffect(() => {
     const ordersByDate = _.groupBy(serviceOrders.data, (serviceOrder) =>
@@ -60,7 +64,7 @@ export const ScheduleTab = ({technicianId}: Props) => {
       <Schedule
         getWeekPair={(pair) => setWeekPair(pair)}
         scheduleItems={orders}
-        scheduleType='date'
+        scheduleType="date"
         renderCellItem={(order: ServiceOrderView, calWidth, calcPosition) => (
           <ScheduleItem
             key={order.id}

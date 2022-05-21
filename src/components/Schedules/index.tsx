@@ -1,14 +1,16 @@
 /* eslint-disable */
-import {ReactNode, useEffect, useRef, useState} from 'react';
+import {ReactNode, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import {twentyFourHourTime} from 'utils/utils';
 import Box from '@mui/material/Box';
+import * as _ from 'lodash';
 import Typography from '@mui/material/Typography';
 import {
   addDays,
   differenceInMinutes,
   eachDayOfInterval,
+  endOfDay,
   startOfDay,
   subDays,
 } from 'date-fns';
@@ -33,8 +35,13 @@ import {ServiceOrderView} from 'models/service-order';
 import {SearchInput} from 'components/SearchInput';
 import {styles as sx} from './styles';
 import {ScheduleControls} from './ScheduleControls';
+import {ScheduleLabel} from './ScheduleLabel';
+import CardHeader from '@mui/material/CardHeader';
+import {useTheme} from '@mui/material/styles';
+import {TechnicianView} from 'models/technician';
 
 interface Props {
+  technicians?: TechnicianView[];
   scheduleItems: {[key: string]: ServiceOrderView[]};
   renderCellItem: (
     cellItem: any,
@@ -47,9 +54,16 @@ interface Props {
   searchPlaceholder?: string;
   bodyLabel?: string[];
   handleSearch?: (val: string) => void;
-  containerStyles?: {[key: string]: string | number};
+  containerStyles?: {[key: string]: any};
+  footerContainerStyles?: {[key: string]: any};
   cardFooter?: ReactNode;
   makeLabelSelectable?: boolean;
+  labelWidth?: string;
+  cellHeight?: string;
+  getCheckedValue?: (checked: boolean, value: string) => void;
+  cardHeaderLabel?: string;
+  customCardHeader?: JSX.Element;
+  checkedValues?: string[];
 }
 
 const gridWidth = 120;
@@ -67,7 +81,16 @@ export const Schedule = ({
   cardFooter,
   defaultTypeLabel = '',
   makeLabelSelectable,
+  labelWidth,
+  getCheckedValue,
+  cellHeight,
+  cardHeaderLabel,
+  customCardHeader,
+  footerContainerStyles,
+  technicians,
+  checkedValues = [],
 }: Props) => {
+  const theme = useTheme();
   const [tableHeader, setTableHeader] = useState<string[]>([]);
   const elementRef = useRef<HTMLInputElement | undefined>();
   const [weekPair, setWeekPair] = useState<WeekPair>({
@@ -81,8 +104,22 @@ export const Schedule = ({
       end: weekPair.endOfWeekDay,
     }),
   );
+  weekInterval.map((item) => formatDate(item, dateFormat));
 
-  console.log(scheduleType, '.......');
+  const [lookupDate, setLookupDate] = useState<any>(
+    _.groupBy(
+      weekInterval.map((item) => formatDate(item, dateFormat)),
+      (item) => item,
+    ),
+  );
+
+  const [lookupTechnician, setLookupTechnician] = useState<{
+    [key: string]: TechnicianView[];
+  }>({});
+
+  useEffect(() => {
+    setLookupTechnician(_.groupBy(technicians, (technician) => technician.id));
+  }, [technicians]);
 
   useEffect(() => {
     if (scheduleType === 'date') {
@@ -105,23 +142,35 @@ export const Schedule = ({
         });
         setBodyRow(result);
       } else {
-        const result = bodyLabel?.map((label) => ({[label]: tableHeader}));
+        const result = Object.keys(lookupTechnician)?.map((key) => ({
+          [key]: tableHeader,
+        }));
         setBodyRow(result);
+        // const result = bodyLabel?.map((label) => ({[label]: tableHeader}));
+        // setBodyRow(result);
       }
     }
-  }, [tableHeader, bodyLabel]);
+  }, [tableHeader, weekInterval, lookupTechnician]);
 
   useEffect(() => {
     const interval = eachDayOfInterval({
       start: weekPair.startOfWeekDay,
       end: weekPair.endOfWeekDay,
     });
-
     setWeekInterval(interval);
     if (getWeekPair) {
       getWeekPair(weekPair);
     }
   }, [weekPair]);
+
+  useEffect(() => {
+    setLookupDate(
+      _.groupBy(
+        weekInterval.map((item) => formatDate(item, dateFormat)),
+        (item) => item,
+      ),
+    );
+  }, [weekInterval]);
 
   useEffect(() => {
     const date = getDateObject(new Date());
@@ -164,7 +213,7 @@ export const Schedule = ({
   };
 
   const nextMonth = () => {
-    const firstDayOfNextWeek = addDays(weekPair.endOfWeekDay, 1);
+    const firstDayOfNextWeek = startOfDay(addDays(weekPair.endOfWeekDay, 1));
     const endOfNextWeek = getEndOfWeek(firstDayOfNextWeek, 1);
     setWeekPair({
       ...weekPair,
@@ -174,7 +223,7 @@ export const Schedule = ({
   };
 
   const prevMonth = () => {
-    const endOfPrevWeek = subDays(weekPair.startOfWeekDay, 1);
+    const endOfPrevWeek = endOfDay(subDays(weekPair.startOfWeekDay, 1));
     const firstDayOfPrevWeek = getStartOfWeek(endOfPrevWeek, 1);
     setWeekPair({
       ...weekPair,
@@ -183,58 +232,30 @@ export const Schedule = ({
     });
   };
 
-  const scheduleControls = (item: string) => {
-    if (scheduleType === 'date') {
-      return (
-        <Box sx={{display: 'flex'}}>
-          <Box onClick={() => prevMonth()} sx={{cursor: 'pointer'}}>
-            <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
-          </Box>
-
-          <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
-            {item}
-          </Typography>
-
-          <Box onClick={() => nextMonth()} sx={{cursor: 'pointer'}}>
-            <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
-          </Box>
-        </Box>
-      );
-    }
-
-    if (scheduleType === 'people') {
-      return (
-        <SearchInput
-          placeholder={searchPlaceholder}
-          onValueChanged={(searchValue) =>
-            handleSearch && handleSearch(searchValue)
-          }
-          containerStyle={{
-            background: '#fff',
-            width: '90%',
-          }}
-        />
-      );
-    }
-  };
-
-  const renderScheduleLabel = (item: string) => (
-    <Typography component="div" variant="subtitle2">
-      {item} <br />
-      <Typography variant="caption" sx={{color: grey[600]}}>
-        {scheduleType === 'date'
-          ? formatDate(new Date(item), 'EEEE')
-          : scheduleItems[item]
-          ? `${scheduleItems[item].length} ${
-              scheduleItems[item].length < 2 ? ' Order' : ' Orders'
-            }`
-          : '0 Order'}
-      </Typography>
-    </Typography>
-  );
-
   return (
     <Card sx={[sx.card, {...containerStyles}]}>
+      {customCardHeader || cardHeaderLabel ? (
+        <CardHeader
+          sx={{
+            minHeight: '0',
+            // mt: '1em',
+            // mx: '0.5em',
+            // ...headerContainerOverrideStyles,
+          }}
+          title={
+            customCardHeader || (
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  color: theme.palette.text.primary,
+                }}>
+                {cardHeaderLabel}
+              </Typography>
+            )
+          }
+        />
+      ) : null}
+
       <Box ref={elementRef} sx={sx.mainContainer}>
         <CardContent sx={{padding: 0}}>
           <ScheduleContainer>
@@ -243,8 +264,8 @@ export const Schedule = ({
                 {tableHeader.map((item, index) => {
                   if (index === 0) {
                     return (
-                      <ScheduleHeaderCell key={index}>
-                        {/* <ScheduleControls
+                      <ScheduleHeaderCell key={index} labelWidth={labelWidth}>
+                        <ScheduleControls
                           item={item}
                           prevMonth={prevMonth}
                           nextMonth={nextMonth}
@@ -253,8 +274,7 @@ export const Schedule = ({
                           }
                           searchPlaceholder={searchPlaceholder}
                           scheduleType={scheduleType}
-                        /> */}
-                        {scheduleControls(item)} 
+                        />
                       </ScheduleHeaderCell>
                     );
                   }
@@ -275,13 +295,25 @@ export const Schedule = ({
                   {Object.keys(dayRow).map((key) =>
                     dayRow[key].map((item, index) => {
                       if (index === 0) {
-                        const technician = scheduleItems[key];
-                        console.log(technician, '<<<<<<<>>>>>>>>.......');
-                        return scheduleType === 'default' ? null : (
+                        const label =
+                          scheduleType === 'date'
+                            ? lookupDate[key]
+                            : `${lookupTechnician[key][0].userAccount.firstName} ${lookupTechnician[key][0].userAccount.lastName}`;
+                        return (
                           <ScheduleBodyCell
                             cellWidth={gridWidth}
+                            cellHeight={cellHeight}
                             key={`${rowIndex}-${index}`}>
-                            {renderScheduleLabel(key)}
+                            <ScheduleLabel
+                              id={key}
+                              checkboxValue={key}
+                              makeLabelSelectable={makeLabelSelectable}
+                              getCheckedValue={getCheckedValue}
+                              scheduleType={scheduleType}
+                              scheduleItems={scheduleItems}
+                              item={label || ''}
+                              checkedValues={checkedValues}
+                            />
                           </ScheduleBodyCell>
                         );
                       }
@@ -291,6 +323,7 @@ export const Schedule = ({
                           if (xKey === key) {
                             return (
                               <ScheduleBodyCell
+                                cellHeight={cellHeight}
                                 key={`${rowIndex}-${index}`}
                                 cellWidth={gridWidth}>
                                 <ScheduleItemContainer>
@@ -308,7 +341,12 @@ export const Schedule = ({
                           return null;
                         });
                       }
-                      return <ScheduleBodyCell key={`${rowIndex}-${index}`} />;
+                      return (
+                        <ScheduleBodyCell
+                          cellHeight={cellHeight}
+                          key={`${rowIndex}-${index}`}
+                        />
+                      );
                     }),
                   )}
                 </ScheduleRow>
@@ -317,7 +355,11 @@ export const Schedule = ({
           </ScheduleContainer>
         </CardContent>
 
-        {cardFooter ? <Box sx={sx.footerContainer}>{cardFooter}</Box> : null}
+        {cardFooter ? (
+          <Box sx={[sx.footerContainer, footerContainerStyles || {}]}>
+            {cardFooter}
+          </Box>
+        ) : null}
       </Box>
     </Card>
   );

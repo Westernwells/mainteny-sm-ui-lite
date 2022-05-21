@@ -11,11 +11,12 @@ import {columns, makeRows} from './UnitDataGridProps';
 
 interface Props {
   getSelectedUnitId: (val: string) => void;
+  currentUnitId?: string;
 }
 
-const pageInfo = makePage(0, 50);
+const pageInfo = makePage(0, 10);
 
-export const SelectUnit = ({getSelectedUnitId}: Props) => {
+export const SelectUnit = ({getSelectedUnitId, currentUnitId}: Props) => {
   const [search, setSearch] = useState('');
   const totalUnitsRef = useRef(0);
   const [page, setPage] = useState(pageInfo);
@@ -37,6 +38,12 @@ export const SelectUnit = ({getSelectedUnitId}: Props) => {
   );
   // set this value only once
   totalUnitsRef.current = totalUnitsRef.current || elevatorResponse.total;
+
+  useEffect(() => {
+    if (currentUnitId) {
+      setActiveUnitId(currentUnitId);
+    }
+  }, []);
 
   useEffect(() => {
     setRows(makeRows(elevatorResponse.data));

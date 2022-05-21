@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import {SearchInput} from 'components/SearchInput';
 
 interface Props {
-  scheduleType: string;
+  scheduleType: 'date' | 'people' | 'default';
   item: string;
   prevMonth: () => void;
   nextMonth: () => void;
@@ -21,38 +21,46 @@ export const ScheduleControls = ({
   searchPlaceholder,
   getSearchValue,
 }: Props) => {
-  if (scheduleType === 'date') {
-    return (
-      <Box sx={{display: 'flex'}}>
-        <Box onClick={() => prevMonth()} sx={{cursor: 'pointer'}}>
-          <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
-        </Box>
-
-        <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
-          {item}
-        </Typography>
-
-        <Box onClick={() => nextMonth()} sx={{cursor: 'pointer'}}>
-          <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
-        </Box>
+  const renderDateContols = () => (
+    <Box sx={{display: 'flex'}}>
+      <Box onClick={() => prevMonth()} sx={{cursor: 'pointer'}}>
+        <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
       </Box>
-    );
+
+      <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
+        {item}
+      </Typography>
+
+      <Box onClick={() => nextMonth()} sx={{cursor: 'pointer'}}>
+        <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
+      </Box>
+    </Box>
+  );
+
+  const renderSearch = () => (
+    <SearchInput
+      placeholder={searchPlaceholder}
+      onValueChanged={(searchValue) =>
+        getSearchValue && getSearchValue(searchValue)
+      }
+      containerStyle={{
+        background: '#fff',
+        width: '90%',
+      }}
+    />
+  );
+
+  const renderDefault = () => (
+    <Typography variant="subtitle2">{item}</Typography>
+  );
+
+  if (scheduleType === 'date') {
+    return renderDateContols();
   }
 
   if (scheduleType === 'people') {
-    return (
-      <SearchInput
-        placeholder={searchPlaceholder}
-        onValueChanged={(searchValue) =>
-          getSearchValue && getSearchValue(searchValue)
-        }
-        containerStyle={{
-          background: '#fff',
-          width: '90%',
-        }}
-      />
-    );
+    return renderSearch();
   }
 
-  return <Box>{item}</Box>;
+  return renderDefault();
 };

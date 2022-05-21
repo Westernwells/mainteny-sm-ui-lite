@@ -24,7 +24,7 @@ export const ScheduleItem = ({
   position,
   titleLeftAdornment,
   subtitle,
-  height,
+  height = '50px',
   cardStatusAccent,
   tooltip,
   containerStyle,
@@ -36,14 +36,14 @@ export const ScheduleItem = ({
       {...rest}
       component="div"
       sx={{
-        position: 'absolute',
-        height: height || '50px',
+        gridColumn: 1,
+        gridRow: 1,
+        height,
         top: '-24px',
         background: theme.palette.secondary.outlinedHoverBg,
         overflowX: 'hidden',
         width,
         transform: `translateX(${position})`,
-        // marginLeft: position,
         borderLeft: `2px solid ${cardStatusAccent}`,
         cursor: 'pointer',
         overflowY: 'hidden',
