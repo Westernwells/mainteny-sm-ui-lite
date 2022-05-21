@@ -6,10 +6,7 @@ import * as _ from 'lodash';
 import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {TechnicianView} from 'models/technician';
-import {
-  useFetchRecommendedTechnician,
-  useQueryServiceCompanyTechnicians,
-} from 'hooks/reactQuery/useTechnician';
+import {useFetchRecommendedTechnician} from 'hooks/reactQuery/useTechnician';
 import {useQueryServiceOrderScheduled} from 'hooks/reactQuery/useServiceOrder';
 import {endOfDay, startOfDay} from 'date-fns';
 import {toRestDateTime} from 'utils/datetime';
@@ -25,8 +22,10 @@ import {AddTechnicianDialog} from './AddTechnicianDialog';
 interface Props {
   elevatorId?: string;
   getSelectedTechniciansIds?: (val: string[]) => void;
-  currentSelectedTechnicianIds: string[];
-  getSelectedTechniciansNames?: (val: string[]) => void;
+  initialSelectedTechnicians: TechnicianView[];
+  getSelectedTechnicians?: (val: TechnicianView[]) => void;
+  getRecommendedTechnicianView?: (val: TechnicianView[]) => void;
+  initialRecommendedTechnicians: TechnicianView[];
 }
 
 interface CheckBoxState {
@@ -36,13 +35,15 @@ interface CheckBoxState {
 
 export const SelectTechnician = ({
   elevatorId,
-  getSelectedTechniciansIds,
-  currentSelectedTechnicianIds,
-  getSelectedTechniciansNames,
+  getSelectedTechnicians,
+  getRecommendedTechnicianView,
+  initialRecommendedTechnicians,
+  initialSelectedTechnicians,
 }: Props) => {
   const time = useRef(toRestDateTime(new Date())).current;
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();
   const [openDialog, setOpenDialog] = useState(false);
+
   const [newTechnician, setNewTechnician] = useState<TechnicianView | null>(
     null,
   );
@@ -55,8 +56,9 @@ export const SelectTechnician = ({
 
   const [orders, setOrders] = useState<{[key: string]: ServiceOrderView[]}>({});
   const [page] = useState(makePage(0, 500));
-  const [recommendedTechniaiciansView, setRecommendedTechniciansView] =
-    useState<TechnicianView[]>([]);
+  const [recommendedTechniciansView, setRecommendedTechniciansView] = useState<
+    TechnicianView[]
+  >(initialRecommendedTechnicians);
   const {data: recommendedTechnicians = []} = useFetchRecommendedTechnician(
     {
       time,
@@ -75,25 +77,21 @@ export const SelectTechnician = ({
     });
 
   useEffect(() => {
-    setSelectedTechnicianIds(currentSelectedTechnicianIds);
+    if (getRecommendedTechnicianView) {
+      getRecommendedTechnicianView(recommendedTechniciansView);
+    }
+  }, [recommendedTechniciansView]);
+
+  useEffect(() => {
+    setSelectedTechnicianIds(initialSelectedTechnicians.map((item) => item.id));
   }, []);
 
   useEffect(() => {
-    if (getSelectedTechniciansIds) {
-      getSelectedTechniciansIds(selectedTechnicianIds);
-    }
-  }, [selectedTechnicianIds]);
-
-  useEffect(() => {
-    if (getSelectedTechniciansNames) {
-      const result = recommendedTechniaiciansView
-        .filter((item) => selectedTechnicianIds.includes(item.id))
-        .map(
-          (item) =>
-            `${item.userAccount.firstName} ${item.userAccount.lastName}`,
-        );
-
-      getSelectedTechniciansNames(result);
+    if (getSelectedTechnicians) {
+      const result = recommendedTechniciansView.filter((item) =>
+        selectedTechnicianIds.includes(item.id),
+      );
+      getSelectedTechnicians(result);
     }
   }, [selectedTechnicianIds]);
 
@@ -106,17 +104,22 @@ export const SelectTechnician = ({
   }, [serviceOrders]);
 
   useEffect(() => {
-    setRecommendedTechniciansView(recommendedTechnicians);
+    const ids = recommendedTechnicians.map((item) => item.id);
+    const result = recommendedTechniciansView.filter(
+      (item) => !ids.includes(item.id),
+    );
+
+    setRecommendedTechniciansView([...recommendedTechnicians, ...result]);
   }, [recommendedTechnicians]);
 
   useEffect(() => {
     if (newTechnician) {
-      const technicianExist = recommendedTechniaiciansView.filter(
+      const technicianExist = recommendedTechniciansView.filter(
         (item) => item.id === newTechnician.id,
       );
       if (!technicianExist.length) {
         setRecommendedTechniciansView([
-          ...recommendedTechniaiciansView,
+          ...recommendedTechniciansView,
           newTechnician,
         ]);
       }
@@ -178,7 +181,7 @@ export const SelectTechnician = ({
         getCheckedValue={getCheckedValue}
         defaultTypeLabel="Recommended Technician"
         labelWidth="15rem"
-        technicians={recommendedTechniaiciansView}
+        technicians={recommendedTechniciansView}
         checkedValues={selectedTechnicianIds}
         renderCellItem={(order: ServiceOrderView, calWidth, calcPosition) => (
           <ScheduleItem

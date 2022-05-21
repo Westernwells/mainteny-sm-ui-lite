@@ -1,6 +1,7 @@
 /* eslint-disable */
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
+import {ElevatorView} from 'models/elevator';
 import {TechnicianView} from 'models/technician';
 import {useEffect, useState} from 'react';
 import {AddDescription} from '../AddDescription';
@@ -11,29 +12,35 @@ const steps = ['Select Unit', 'Select Technicians', 'Add Description'];
 
 export const NewEmergency = () => {
   const [activeStep, setActiveStep] = useState(0);
-  const [selectedUnitId, setSelectedUnitId] = useState<string>();
+  const [selectedUnit, setSelectedUnit] = useState<ElevatorView>();
   const [disableNextBtn, setDisableNextBtn] = useState(false);
-  const [selectedTechniciansName, setSelectedTechniciansName] = useState<
-    string[]
+  const [description, setDescription] = useState('');
+  const [recommendedTechnicians, setRecommendedTechnicians] = useState<
+    TechnicianView[]
   >([]);
-  const [selectedTechniciansId, setSelectedTechniciansId] = useState<string[]>(
-    [],
+  const [selectedTechnicians, setSelectedTechnicians] = useState<
+    TechnicianView[]
+  >([]);
+
+  console.log(
+    selectedTechnicians,
+    selectedUnit,
+    description,
+    '!!!@@@##$$)))$($($$(#(#',
   );
-  console.log(selectedTechniciansId, '!!!@@@@@@@##____');
 
   useEffect(() => {
-    if (activeStep === 0 && !selectedUnitId) {
+    if (activeStep === 0 && !selectedUnit) {
       return setDisableNextBtn(true);
     }
 
-    if (activeStep === 1 && !selectedTechniciansId.length) {
+    if (activeStep === 1 && !selectedTechnicians.length) {
       return setDisableNextBtn(true);
     }
 
     setDisableNextBtn(false);
-  }, [activeStep, selectedUnitId, selectedTechniciansId]);
+  }, [activeStep, selectedUnit, selectedTechnicians]);
 
-  console.log(selectedUnitId);
   return (
     <Stepper
       disableNextBtn={disableNextBtn}
@@ -42,6 +49,7 @@ export const NewEmergency = () => {
       containerStyles={{
         mt: '3em',
         flexGrow: 1,
+        ml: '0',
         display: 'flex',
         flexDirection: 'column',
       }}>
@@ -49,27 +57,31 @@ export const NewEmergency = () => {
         {activeStep === 0 ? (
           <FlexContainer containerStyle={{mt: '2em'}}>
             <SelectUnit
-              getSelectedUnitId={(val) => setSelectedUnitId(val)}
-              currentUnitId={selectedUnitId}
+              getSelectedUnit={(val) => setSelectedUnit(val)}
+              initialSelectedUnit={selectedUnit}
             />
           </FlexContainer>
         ) : null}
         {activeStep === 1 ? (
           <FlexContainer containerStyle={{mt: '2em'}}>
             <SelectTechnician
-              elevatorId={selectedUnitId}
-              getSelectedTechniciansIds={(val) => setSelectedTechniciansId(val)}
-              getSelectedTechniciansNames={(val) =>
-                setSelectedTechniciansName(val)
+              elevatorId={selectedUnit?.id}
+              getSelectedTechnicians={(val) => setSelectedTechnicians(val)}
+              getRecommendedTechnicianView={(val) =>
+                setRecommendedTechnicians(val)
               }
-              currentSelectedTechnicianIds={selectedTechniciansId}
+              initialRecommendedTechnicians={recommendedTechnicians}
+              initialSelectedTechnicians={selectedTechnicians}
             />
           </FlexContainer>
         ) : null}
 
         {activeStep === 2 ? (
           <FlexContainer containerStyle={{mt: '2em'}}>
-            <AddDescription />
+            <AddDescription
+              getDescription={(val) => setDescription(val)}
+              initialDescription={description}
+            />
           </FlexContainer>
         ) : null}
       </FlexContainer>

@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {GridCellParams, GridRowsProp} from '@mui/x-data-grid';
@@ -10,18 +11,20 @@ import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {columns, makeRows} from './UnitDataGridProps';
 
 interface Props {
-  getSelectedUnitId: (val: string) => void;
-  currentUnitId?: string;
+  getSelectedUnit: (val?: ElevatorView) => void;
+  initialSelectedUnit?: ElevatorView;
 }
 
 const pageInfo = makePage(0, 10);
 
-export const SelectUnit = ({getSelectedUnitId, currentUnitId}: Props) => {
+export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
   const [search, setSearch] = useState('');
   const totalUnitsRef = useRef(0);
   const [page, setPage] = useState(pageInfo);
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const [activeUnitId, setActiveUnitId] = useState('');
+  const [selectedUnit, setSelectedUnit] = useState<ElevatorView | undefined>(
+    initialSelectedUnit,
+  );
   const [pageCount, setPageCount] = useState(0);
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
@@ -40,12 +43,6 @@ export const SelectUnit = ({getSelectedUnitId, currentUnitId}: Props) => {
   totalUnitsRef.current = totalUnitsRef.current || elevatorResponse.total;
 
   useEffect(() => {
-    if (currentUnitId) {
-      setActiveUnitId(currentUnitId);
-    }
-  }, []);
-
-  useEffect(() => {
     setRows(makeRows(elevatorResponse.data));
   }, [elevatorResponse]);
 
@@ -54,10 +51,10 @@ export const SelectUnit = ({getSelectedUnitId, currentUnitId}: Props) => {
   }, [elevatorResponse, page.pageSize]);
 
   useEffect(() => {
-    if (getSelectedUnitId) {
-      getSelectedUnitId(activeUnitId);
+    if (getSelectedUnit) {
+      getSelectedUnit(selectedUnit);
     }
-  }, [activeUnitId]);
+  }, [selectedUnit]);
 
   return (
     <>
@@ -73,10 +70,10 @@ export const SelectUnit = ({getSelectedUnitId, currentUnitId}: Props) => {
       <DataGridLayout
         hideFooter={pageCount <= 1}
         rows={rows}
-        columns={columns(activeUnitId)}
-        onCellClick={(params: GridCellParams) =>
-          setActiveUnitId(params.row.elevator.id)
-        }
+        columns={columns(selectedUnit?.id || '')}
+        onCellClick={(params: GridCellParams) => {
+          setSelectedUnit(params.row.elevator);
+        }}
         loading={isFetching}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}

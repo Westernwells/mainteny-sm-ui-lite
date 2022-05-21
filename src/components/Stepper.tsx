@@ -52,7 +52,14 @@ export const Stepper = ({
               optional?: ReactNode;
             } = {};
             return (
-              <Step key={label} {...stepProps}>
+              <Step
+                key={label}
+                {...stepProps}
+                sx={{
+                  '&:first-of-type': {
+                    pl: 0,
+                  },
+                }}>
                 <StepLabel {...labelProps}>{label}</StepLabel>
               </Step>
             );
