@@ -73,7 +73,10 @@ export const Stepper = ({
             {activeStep > 0 ? (
               <>
                 <Button
-                  onClick={handleCancel}
+                  onClick={() => {
+                    setActiveStep(0);
+                    handleCancel();
+                  }}
                   sx={{mr: '1.5em', color: theme.palette.text.secondary}}
                   variant="text">
                   Cancel

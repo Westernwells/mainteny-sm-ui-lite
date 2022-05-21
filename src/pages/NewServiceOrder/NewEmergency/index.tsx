@@ -22,13 +22,6 @@ export const NewEmergency = () => {
     TechnicianView[]
   >([]);
 
-  console.log(
-    selectedTechnicians,
-    selectedUnit,
-    description,
-    '!!!@@@##$$)))$($($$(#(#',
-  );
-
   useEffect(() => {
     if (activeStep === 0 && !selectedUnit) {
       return setDisableNextBtn(true);
@@ -41,8 +34,17 @@ export const NewEmergency = () => {
     setDisableNextBtn(false);
   }, [activeStep, selectedUnit, selectedTechnicians]);
 
+  const handleCancel = () => {
+    setActiveStep(0);
+    setSelectedUnit(undefined);
+    setRecommendedTechnicians([]);
+    setSelectedTechnicians([]);
+    setDescription('');
+  };
+
   return (
     <Stepper
+      handleCancel={handleCancel}
       disableNextBtn={disableNextBtn}
       getActiveStep={(val) => setActiveStep(val)}
       steps={steps}
