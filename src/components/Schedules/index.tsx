@@ -229,9 +229,6 @@ export const Schedule = ({
         <CardHeader
           sx={{
             minHeight: '0',
-            // mt: '1em',
-            // mx: '0.5em',
-            // ...headerContainerOverrideStyles,
           }}
           title={
             customCardHeader || (
