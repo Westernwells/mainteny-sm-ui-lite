@@ -1,9 +1,7 @@
-/* eslint-disable */
 import {useCallback, useEffect, useRef, useState} from 'react';
 import Typography from '@mui/material/Typography';
-import {PageCard} from 'components/PageCard';
 import * as _ from 'lodash';
-import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
+import {ServiceOrderView} from 'models/service-order';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {TechnicianView} from 'models/technician';
 import {useFetchRecommendedTechnician} from 'hooks/reactQuery/useTechnician';
@@ -21,7 +19,6 @@ import {AddTechnicianDialog} from './AddTechnicianDialog';
 
 interface Props {
   elevatorId?: string;
-  getSelectedTechniciansIds?: (val: string[]) => void;
   initialSelectedTechnicians: TechnicianView[];
   getSelectedTechnicians?: (val: TechnicianView[]) => void;
   getRecommendedTechnicianView?: (val: TechnicianView[]) => void;
@@ -141,8 +138,6 @@ export const SelectTechnician = ({
     (checked, value) => setCheckboxState({checked, value}),
     [],
   );
-
-  // console.log(selectedTechnicianIds,'#####')
 
   return (
     <>

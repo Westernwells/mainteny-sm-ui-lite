@@ -1,4 +1,3 @@
-/*eslint-disable*/
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {GridCellParams, GridRowsProp} from '@mui/x-data-grid';

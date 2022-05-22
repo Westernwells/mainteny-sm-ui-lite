@@ -1,5 +1,4 @@
-/* eslint-disable */
-import {ReactNode, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {ReactNode, useEffect, useRef, useState} from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import {twentyFourHourTime} from 'utils/utils';
@@ -27,18 +26,14 @@ import {ScheduleHeaderCell} from 'components/Schedules/ScheduleHeaderCell';
 import {ScheduleBody} from 'components/Schedules/ScheduleBody';
 import {ScheduleBodyCell} from 'components/Schedules/ScheduleBodyCell';
 import {ScheduleItemContainer} from 'components/Schedules/ScheduleItemContainer';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {WeekPair} from 'models/misc';
-import {grey} from '@mui/material/colors';
 import {ServiceOrderView} from 'models/service-order';
-import {SearchInput} from 'components/SearchInput';
-import {styles as sx} from './styles';
-import {ScheduleControls} from './ScheduleControls';
-import {ScheduleLabel} from './ScheduleLabel';
 import CardHeader from '@mui/material/CardHeader';
 import {useTheme} from '@mui/material/styles';
 import {TechnicianView} from 'models/technician';
+import {styles as sx} from './styles';
+import {ScheduleControls} from './ScheduleControls';
+import {ScheduleLabel} from './ScheduleLabel';
 
 interface Props {
   technicians?: TechnicianView[];
@@ -52,7 +47,6 @@ interface Props {
   scheduleType?: 'date' | 'people' | 'default';
   defaultTypeLabel?: string;
   searchPlaceholder?: string;
-  bodyLabel?: string[];
   handleSearch?: (val: string) => void;
   containerStyles?: {[key: string]: any};
   footerContainerStyles?: {[key: string]: any};
@@ -75,7 +69,6 @@ export const Schedule = ({
   renderCellItem,
   scheduleType = 'default',
   searchPlaceholder = 'Search',
-  bodyLabel = [],
   handleSearch,
   containerStyles,
   cardFooter,
@@ -146,8 +139,6 @@ export const Schedule = ({
           [key]: tableHeader,
         }));
         setBodyRow(result);
-        // const result = bodyLabel?.map((label) => ({[label]: tableHeader}));
-        // setBodyRow(result);
       }
     }
   }, [tableHeader, weekInterval, lookupTechnician]);

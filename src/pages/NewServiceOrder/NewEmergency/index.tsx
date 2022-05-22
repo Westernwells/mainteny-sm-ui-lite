@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {ElevatorView} from 'models/elevator';
@@ -31,7 +30,7 @@ export const NewEmergency = () => {
       return setDisableNextBtn(true);
     }
 
-    setDisableNextBtn(false);
+    return setDisableNextBtn(false);
   }, [activeStep, selectedUnit, selectedTechnicians]);
 
   const handleCancel = () => {

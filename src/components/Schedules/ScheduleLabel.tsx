@@ -1,12 +1,8 @@
-/* eslint-disable */
-import {ChangeEvent, useCallback, useState} from 'react';
-import Box from '@mui/material/Box';
+import {ChangeEvent, useCallback} from 'react';
 import {grey} from '@mui/material/colors';
 import Typography from '@mui/material/Typography';
 import {ServiceOrderView} from 'models/service-order';
 import {formatDate} from 'utils/datetime';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 
 interface Props {
