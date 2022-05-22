@@ -106,6 +106,7 @@ export const SelectServiceOrderTypes = () => {
         <FormCheckbox
           checked={serviceOrderTypes[option.name].checked}
           name={option.name}
+          key={option.name}
           label={option.label}
           handleChange={handleCheckbox}
         />

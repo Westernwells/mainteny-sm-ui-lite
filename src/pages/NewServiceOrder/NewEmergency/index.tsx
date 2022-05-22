@@ -1,8 +1,13 @@
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
+import {useAssignmentBasedOrder} from 'hooks/reactQuery/useServiceOrder';
 import {ElevatorView} from 'models/elevator';
 import {TechnicianView} from 'models/technician';
 import {useEffect, useState} from 'react';
+import {ServiceOrderPriority, ServiceOrderType} from 'models/service-order';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {toRestDateTime} from 'utils/datetime';
+import {useNavigate} from 'react-router';
 import {AddDescription} from '../AddDescription';
 import {SelectTechnician} from '../SelectTechnician';
 import {SelectUnit} from '../SelectUnit';
@@ -13,7 +18,12 @@ export const NewEmergency = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [selectedUnit, setSelectedUnit] = useState<ElevatorView>();
   const [disableNextBtn, setDisableNextBtn] = useState(false);
+  const {user} = useUserSession();
+  const navigate = useNavigate();
   const [description, setDescription] = useState('');
+  const {mutateAsync: createEmergencyOrder} = useAssignmentBasedOrder(
+    'Emergency order created',
+  );
   const [recommendedTechnicians, setRecommendedTechnicians] = useState<
     TechnicianView[]
   >([]);
@@ -41,9 +51,28 @@ export const NewEmergency = () => {
     setDescription('');
   };
 
+  const createNewEmergencyOrder = async () => {
+    const serviceCompanyId = user?.userAccount.serviceCompany.id!;
+    const body = {
+      description,
+      elevatorId: selectedUnit!.id,
+      externalId: '',
+      priority: ServiceOrderPriority.A,
+      serviceCompanyId,
+      technicianIds: selectedTechnicians.map((item) => item.id),
+      time: toRestDateTime(new Date()),
+      type: ServiceOrderType.EMERGENCY,
+    };
+    await createEmergencyOrder(body);
+    navigate('/orders?pageIndex=1&pageSize=25&tab=1');
+  };
+
   return (
     <Stepper
       handleCancel={handleCancel}
+      handleSubmit={async () => {
+        await createNewEmergencyOrder();
+      }}
       disableNextBtn={disableNextBtn}
       getActiveStep={(val) => setActiveStep(val)}
       steps={steps}
@@ -82,6 +111,8 @@ export const NewEmergency = () => {
             <AddDescription
               getDescription={(val) => setDescription(val)}
               initialDescription={description}
+              selectedUnit={selectedUnit}
+              selectedTechnicians={selectedTechnicians}
             />
           </FlexContainer>
         ) : null}

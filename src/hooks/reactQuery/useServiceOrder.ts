@@ -22,6 +22,7 @@ import {ServiceCompanyTimeUnit} from 'models/service-company';
 import {toDate, toRestDate} from 'utils/datetime';
 import {useSnackbar} from 'notistack';
 import {
+  AssignmentBasedOrderBody,
   CreateServiceOrderBody,
   RedispatchParams,
   ServiceOrder,
@@ -511,6 +512,32 @@ export const useCreateServiceOrder = (successMsg: string) => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+const createAssignmentBasedOrder = async (body: AssignmentBasedOrderBody) => {
+  await axiosClient.post<StringValue>('/api/serviceOrders/assignmentBased', {
+    ...body,
+  });
+};
+
+export const useAssignmentBasedOrder = (successMsg: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    (body: AssignmentBasedOrderBody) => createAssignmentBasedOrder(body),
+    {
+      onSuccess: () => {
         enqueueSnackbar(successMsg, {
           variant: 'success',
         });

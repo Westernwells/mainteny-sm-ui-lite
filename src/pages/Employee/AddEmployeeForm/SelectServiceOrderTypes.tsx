@@ -9,7 +9,6 @@ import {ReactComponent as RegularIcon} from 'assets/icons/Regular.svg';
 import {ReactComponent as CalloutIcon} from 'assets/icons/Callout.svg';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 
-// import {FormCheckbox} from 'components/form//FormCheckbox';
 import {ServiceOrderType} from 'models/service-order';
 import {EmployeeAccountData} from './model';
 
@@ -93,6 +92,7 @@ export const SelectServiceOrderTypes = () => {
         <FormCheckbox
           checked={serviceOrderTypes[option.name].checked}
           name={option.name}
+          key={option.name}
           label={option.label}
           handleChange={handleCheckbox}
         />
