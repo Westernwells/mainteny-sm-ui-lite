@@ -1,6 +1,8 @@
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
+import {grey} from '@mui/material/colors';
+// import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import {FormInput} from 'components/form/FormInput';
 import {PageCard} from 'components/PageCard';
 import React, {useEffect, useState} from 'react';
 
@@ -35,14 +37,15 @@ export const AddDescription = ({
           </Typography>
         }
         containerStyles={{mt: '2em'}}>
-        <TextField
-          value={description}
-          id="pin"
-          name="pin"
-          size="medium"
-          fullWidth
-          type="text"
-          onChange={(e) => setDescription(e.target.value)}
+        <FormInput
+          props={{
+            sx: {background: grey[50], border: 'none'},
+            value: description,
+            size: 'medium',
+            fullWidth: true,
+            type: 'text',
+            onChange: (e) => setDescription(e.target.value),
+          }}
         />
       </PageCard>
     </>

@@ -5,7 +5,9 @@ import {grey} from '@mui/material/colors';
 import Typography from '@mui/material/Typography';
 import {ServiceOrderView} from 'models/service-order';
 import {formatDate} from 'utils/datetime';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import {FormCheckbox} from 'components/form/FormCheckbox';
 
 interface Props {
   scheduleType: 'date' | 'people' | 'default';
@@ -28,12 +30,10 @@ export const ScheduleLabel = ({
   id,
   checkedValues = [],
 }: Props) => {
-  const [checked, setChecked] = useState(false);
   const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     if (getCheckedValue) {
       getCheckedValue(event.target.checked, event.target.value);
     }
-    setChecked(event.target.checked);
   }, []);
 
   const renderSubLabel = () => (
@@ -49,19 +49,12 @@ export const ScheduleLabel = ({
   );
 
   const renderSelectableLabel = () => (
-    <Box sx={{display: 'flex'}}>
-      <Checkbox
-        checked={checkedValues.includes(checkboxValue)}
-        value={checkboxValue}
-        onChange={handleChange}
-      />
-      <Typography
-        component="div"
-        variant="subtitle2"
-        sx={{display: 'flex', alignItems: 'center'}}>
-        {item}
-      </Typography>
-    </Box>
+    <FormCheckbox
+      checked={checkedValues.includes(checkboxValue)}
+      value={checkboxValue}
+      handleChange={handleChange}
+      label={item}
+    />
   );
 
   if (makeLabelSelectable) {
