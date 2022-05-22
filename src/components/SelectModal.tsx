@@ -5,7 +5,7 @@ import Fade from '@mui/material/Fade';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import { SearchInput } from './SearchInput';
+import {SearchInput} from './SearchInput';
 
 interface Props {
   children: ReactNode;
