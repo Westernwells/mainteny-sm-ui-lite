@@ -27,8 +27,6 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
   const [pageCount, setPageCount] = useState(0);
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
-    // isLoading,
-    // isFetched,
     isFetching,
   } = useAllElevators(
     search,
@@ -38,7 +36,7 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
     },
     {keepPreviousData: true},
   );
-  // set this value only once
+  // sets this value only once
   totalUnitsRef.current = totalUnitsRef.current || elevatorResponse.total;
 
   useEffect(() => {

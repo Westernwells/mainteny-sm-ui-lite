@@ -41,7 +41,6 @@ import {
   ElevatorsByAddress,
   ElevatorView,
 } from '../../models/elevator';
-// import {ElevatorOrderPair, ElevatorsByAddress} from '../../pages/Units/Models';
 import {useUserSession} from './useUserSession';
 
 interface ServiceOrderReportPayload {
