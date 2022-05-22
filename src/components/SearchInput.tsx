@@ -17,7 +17,6 @@ export const SearchInput = ({
   width,
   containerStyle,
 }: Props) => {
-  const theme = useTheme();
   const debouncedChangeHandler = useCallback(
     _.debounce((e) => {
       onValueChanged?.(e.nativeEvent.target.value);

@@ -90,7 +90,7 @@ export const Quotations = () => {
           showFilter={showFilter}
           btnLabel="New Quotation"
           btnOnClick={() => navigate('new')}
-          showNewBtn
+          showActionBtn
           hideViewOption
         />
       }>
