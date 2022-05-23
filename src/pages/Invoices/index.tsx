@@ -51,7 +51,7 @@ export const Invoices = () => {
     {keepPreviousData: true},
   );
 
-  totalInvoiceRef.current = invoiceResource.total;
+  totalInvoiceRef.current = totalInvoiceRef.current || invoiceResource.total;
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
@@ -206,7 +206,7 @@ export const Invoices = () => {
         loading={isFetching}
         hideFooter={pageCount <= 1}
         pageSize={page.pageSize}
-        pageIndex={page.pageIndex}
+        pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
           setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
         }

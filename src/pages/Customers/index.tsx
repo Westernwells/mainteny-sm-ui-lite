@@ -31,6 +31,7 @@ export const Customer = () => {
 
   const {
     data: customerResource = createEmptyResource<PropertyOwner>(pageSize),
+    isFetched: customerResourceFetched,
   } = useQueryCustomers(
     {
       pageIndex: page.pageIndex,
@@ -39,15 +40,16 @@ export const Customer = () => {
     },
     {keepPreviousData: true},
   );
-  totalCustomerRef.current = customerResource.total;
+  totalCustomerRef.current = totalCustomerRef.current || customerResource.total;
 
   const {
-    data: customersWithUnits,
+    data: customersWithUnits = [],
     isLoading,
     isFetching,
     isIdle,
     isFetched,
   } = useFetchCustomerElevatorNumbers(customerResource.data, {
+    enabled: customerResourceFetched,
     keepPreviousData: true,
   });
 
@@ -110,7 +112,7 @@ export const Customer = () => {
         loading={isFetching}
         hideFooter={pageCount <= 1}
         pageSize={page.pageSize}
-        pageIndex={page.pageIndex}
+        pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
           setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
         }

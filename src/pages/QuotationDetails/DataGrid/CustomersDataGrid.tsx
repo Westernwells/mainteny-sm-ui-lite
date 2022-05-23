@@ -160,7 +160,6 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
     <>
       <SearchInput
         placeholder="search"
-        size="medium"
         onValueChanged={(value) => setSearch(value)}
       />
       <Box display="flex" flexGrow={1} sx={styles.scrollBar}>

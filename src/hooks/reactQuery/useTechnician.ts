@@ -2,6 +2,7 @@ import {endOfDay, startOfDay} from 'date-fns';
 import {Resource, RestError} from 'models/misc';
 import {
   QueryTechniciansParams,
+  RecommendTechnicianPayload,
   TechnicianEventPair,
   TechnicianEventView,
   TechniciansEventsParams,
@@ -136,14 +137,62 @@ export const queryServiceCompanyTechnicians = async (
 
 export const useQueryServiceCompanyTechnicians = (
   params: QueryTechniciansParams,
+  options?: UseQueryOptions<any, any, any>,
 ) => {
   const {user} = useUserSession();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
-  return useQuery(
+  return useQuery<Resource<TechnicianView>>(
     [qks.queryServiceCompanyTechnicians, serviceCompanyId, params],
     () => queryServiceCompanyTechnicians(serviceCompanyId!, params),
     {
       enabled: !!user,
+      ...options,
     },
   );
 };
+
+export const fetchDispatchRecommendedTechnician = async (
+  params: RecommendTechnicianPayload,
+  serviceCompanyId: string,
+) => {
+  const response = await axiosClient.get<TechnicianView[]>(
+    `/api/dispatch/serviceCompanies/${serviceCompanyId}/technicians/recommendation`,
+    {params, paramsSerializer},
+  );
+  return response.data;
+};
+
+export const useFetchDispatchRecommendedTechnician = (
+  params: RecommendTechnicianPayload,
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {user} = useUserSession();
+  const serviceCompanyId = user!.userAccount.serviceCompany.id;
+  return useQuery<TechnicianView[]>(
+    [qks.fetchDispatchRecommendedTechnicians, serviceCompanyId, params],
+    () => fetchDispatchRecommendedTechnician(params, serviceCompanyId),
+    {enabled: !!serviceCompanyId, ...options},
+  );
+};
+
+export const fetchRecommendedTechnician = async (
+  elevatorId: string,
+  params: RecommendTechnicianPayload,
+) => {
+  const response = await axiosClient.get<TechnicianView[]>(
+    `/api/elevators/${elevatorId}/technicianRecommendation`,
+    {params, paramsSerializer},
+  );
+  return response.data;
+};
+
+export const useFetchRecommendedTechnician = (
+  params: RecommendTechnicianPayload,
+  elevatorId?: string,
+  options?: UseQueryOptions<any, any, any>,
+) =>
+  useQuery<TechnicianView[]>(
+    [qks.fetchRecommendedTechnicians, elevatorId, params],
+    () => fetchRecommendedTechnician(elevatorId!, params),
+    {enabled: !!elevatorId, ...options},
+  );

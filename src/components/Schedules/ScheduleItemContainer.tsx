@@ -7,7 +7,7 @@ interface Props {
 }
 
 export const ScheduleItemContainer = ({children, label, ...rest}: Props) => (
-  <Box {...rest} component="div" sx={{position: 'relative'}}>
+  <Box {...rest} component="div" sx={{display: 'grid'}}>
     {label || children || null}
   </Box>
 );

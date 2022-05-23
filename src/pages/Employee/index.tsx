@@ -71,7 +71,8 @@ export const Employees = () => {
     eventType: [TechnicianEventType.HOLIDAY, TechnicianEventType.SICK_LEAVE],
   });
 
-  totalEmployeeRef.current = userAccountResource.total;
+  totalEmployeeRef.current =
+    totalEmployeeRef.current || userAccountResource.total;
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
@@ -166,7 +167,7 @@ export const Employees = () => {
           showFilter={showFilter}
           btnLabel="New Employee"
           btnOnClick={() => setIsDrawerOpen(true)}
-          showNewBtn
+          showActionBtn
           hideFilter
           hideViewOption
         />
@@ -177,7 +178,7 @@ export const Employees = () => {
         loading={isFetching}
         hideFooter={pageCount <= 1}
         pageSize={page.pageSize}
-        pageIndex={page.pageIndex}
+        pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
           setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
         }

@@ -8,12 +8,14 @@ interface Props extends BoxProps {
   label?: string;
   children?: ReactNode;
   cellWidth?: string | number;
+  labelWidth?: string;
 }
 
 export const ScheduleHeaderCell = ({
   label,
   children,
   cellWidth = '120px',
+  labelWidth,
   ...rest
 }: Props) => {
   const theme = useTheme();
@@ -36,8 +38,7 @@ export const ScheduleHeaderCell = ({
           left: 0,
           zIndex: 3,
           pl: '1em',
-          minWidth: '11.5rem',
-          maxWidth: '15rem',
+          minWidth: labelWidth || '11.5rem',
           color: theme.palette.primary.main,
         },
       }}

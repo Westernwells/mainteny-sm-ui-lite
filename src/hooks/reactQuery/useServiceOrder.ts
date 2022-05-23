@@ -22,6 +22,7 @@ import {ServiceCompanyTimeUnit} from 'models/service-company';
 import {toDate, toRestDate} from 'utils/datetime';
 import {useSnackbar} from 'notistack';
 import {
+  AssignmentBasedOrderBody,
   CreateServiceOrderBody,
   RedispatchParams,
   ServiceOrder,
@@ -36,9 +37,10 @@ import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
   ElevatorAvailability,
   ElevatorAvailabilityParams,
+  ElevatorOrderPair,
+  ElevatorsByAddress,
   ElevatorView,
 } from '../../models/elevator';
-import {ElevatorOrderPair, ElevatorsByAddress} from '../../pages/Units/Models';
 import {useUserSession} from './useUserSession';
 
 interface ServiceOrderReportPayload {
@@ -331,12 +333,12 @@ export const queryServiceOrderSchedules = async (
 
 export const useQueryServiceOrderScheduled = (
   params: ServiceOrderScheduleParams,
-  options?: any,
+  options?: UseQueryOptions<any, any, any>,
 ) => {
   const {user} = useUserSession();
 
-  return useQuery(
-    [queryKeys.queryServiceOrders, params, user!.userAccount.serviceCompany.id],
+  return useQuery<Resource<ServiceOrderView>>(
+    [queryKeys.querySeviceOrders, params, user!.userAccount.serviceCompany.id],
     () =>
       queryServiceOrderSchedules({
         ...params,
@@ -509,6 +511,32 @@ export const useCreateServiceOrder = (successMsg: string) => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+const createAssignmentBasedOrder = async (body: AssignmentBasedOrderBody) => {
+  await axiosClient.post<StringValue>('/api/serviceOrders/assignmentBased', {
+    ...body,
+  });
+};
+
+export const useAssignmentBasedOrder = (successMsg: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    (body: AssignmentBasedOrderBody) => createAssignmentBasedOrder(body),
+    {
+      onSuccess: () => {
         enqueueSnackbar(successMsg, {
           variant: 'success',
         });

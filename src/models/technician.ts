@@ -122,3 +122,8 @@ export interface TechnicianEventView {
   technician: TechnicianSimpleView;
   durationInDays: number;
 }
+
+export interface RecommendTechnicianPayload {
+  count: number;
+  time: string;
+}

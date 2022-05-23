@@ -1,16 +1,13 @@
+import Box from '@mui/material/Box';
 import Button, {ButtonProps} from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import {MenuBtnProps} from 'models/misc';
 import {MouseEvent, useState} from 'react';
-
-interface MenuProps {
-  label: string;
-  action: (event: MouseEvent<HTMLLIElement>) => void;
-}
 
 interface Props extends ButtonProps {
   label: string;
-  menu: MenuProps[];
+  menu: MenuBtnProps[];
   startIcon: JSX.Element;
 }
 
@@ -25,22 +22,23 @@ export const MenuBtn = ({label, menu, startIcon, ...rest}: Props) => {
   };
 
   return (
-    <div>
+    <Box>
       <Button startIcon={startIcon} onClick={handleClick} {...rest}>
         {label}
       </Button>
       <Menu
-        id="basic-menu"
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
         MenuListProps={{
           'aria-labelledby': 'basic-button',
         }}>
-        {menu.map((item) => (
-          <MenuItem onClick={item.action}>{item.label}</MenuItem>
+        {menu.map((item, index) => (
+          <MenuItem key={index} onClick={item.action}>
+            {item.label}
+          </MenuItem>
         ))}
       </Menu>
-    </div>
+    </Box>
   );
 };

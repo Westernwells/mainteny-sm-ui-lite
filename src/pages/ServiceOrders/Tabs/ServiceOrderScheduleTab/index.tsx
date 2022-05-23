@@ -49,22 +49,24 @@ export const ServiceOrderScheduleTab = ({
       query: technicianSearch,
     });
   const {data: serviceOrders = createEmptyResource<ServiceOrderView>(10)} =
-    useQueryServiceOrderScheduled({
-      end: toRestDateTime(endOfDay(currentDate)),
-      start: toRestDateTime(startOfDay(currentDate)),
-      pageIndex: page.pageIndex,
-      pageSize: page.pageSize,
-      query: '',
-      status: selectedOrderStatus,
-    });
+    useQueryServiceOrderScheduled(
+      {
+        end: toRestDateTime(endOfDay(currentDate)),
+        start: toRestDateTime(startOfDay(currentDate)),
+        pageIndex: page.pageIndex,
+        pageSize: page.pageSize,
+        query: '',
+        status: selectedOrderStatus,
+      },
+      {keepPreviousData: true},
+    );
 
   useEffect(() => {
-    const groupByTechnician = _.groupBy(
+    const groupByTechnicianId = _.groupBy(
       serviceOrders.data,
-      (serviceOrder) =>
-        `${serviceOrder.schedules[0].technician.userAccount.firstName} ${serviceOrder.schedules[0].technician.userAccount.lastName}`,
+      (serviceOrder) => serviceOrder.schedules[0].technician.id,
     );
-    setOrders(groupByTechnician);
+    setOrders(groupByTechnicianId);
   }, [serviceOrders]);
 
   const nextDay = () => {
@@ -141,13 +143,10 @@ export const ServiceOrderScheduleTab = ({
             <ServiceOrderStatusIndicator containerStyles={{flexGrow: 1}} />
           }
           scheduleItems={orders}
-          labelType="people"
+          scheduleType="people"
           searchPlaceholder="Search technician"
           handleSearch={(value) => setTechnicianSearch(value)}
-          bodyLabel={technicianResource.data.map(
-            (technician) =>
-              `${technician.userAccount.firstName} ${technician.userAccount.lastName}`,
-          )}
+          technicians={technicianResource.data}
           renderCellItem={(order: ServiceOrderView, calWidth, calcPosition) => (
             <ScheduleItem
               key={order.id}

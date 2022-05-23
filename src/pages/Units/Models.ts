@@ -1,26 +1,5 @@
 import {ElevatorView} from '../../models/elevator';
-import {ServiceOrderView} from '../../models/service-order';
-import {Address} from '../../models/misc';
 import {getDateObject} from '../../utils/datetime';
-
-export interface ElevatorDataGrid {
-  address: string;
-  showAddress: boolean;
-}
-
-export interface ElevatorOrderPair {
-  elevator: ElevatorView;
-  serviceOrder?: ServiceOrderView;
-}
-
-export interface ElevatorsByAddress {
-  elevators: ElevatorOrderPair[];
-  address: Address;
-}
-
-export interface ElevatorByAddr {
-  [key: string]: ElevatorView[];
-}
 
 export interface DataGridElevatorView extends ElevatorView {
   showAddress: boolean;

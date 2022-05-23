@@ -6,12 +6,14 @@ interface Props extends BoxProps {
   children?: ReactNode;
   label?: string;
   cellWidth?: string | number;
+  cellHeight?: string;
 }
 
 export const ScheduleBodyCell = ({
   label,
   children,
   cellWidth = '120px',
+  cellHeight = '70px',
   ...rest
 }: Props) => (
   <Box
@@ -19,7 +21,7 @@ export const ScheduleBodyCell = ({
     sx={{
       textAlign: 'left',
       border: '0.5px solid #F1F5F9',
-      height: '70px',
+      height: cellHeight,
       minWidth: cellWidth,
       maxWidth: cellWidth,
 

@@ -42,7 +42,8 @@ export const Quotations = () => {
     {keepPreviousData: true},
   );
 
-  totalQuotationsRef.current = quotationsResource.total;
+  totalQuotationsRef.current =
+    totalQuotationsRef.current || quotationsResource.total;
 
   useEffect(() => {
     if (quotationsResource) {
@@ -89,7 +90,7 @@ export const Quotations = () => {
           showFilter={showFilter}
           btnLabel="New Quotation"
           btnOnClick={() => navigate('new')}
-          showNewBtn
+          showActionBtn
           hideViewOption
         />
       }>

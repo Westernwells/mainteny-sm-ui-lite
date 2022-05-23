@@ -9,6 +9,13 @@ import {Fee, JobStatus, Meta, Order, Priority, WithOptional} from './misc';
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
 
+export enum ServiceOrderPriority {
+  A = 'A',
+  B = 'B',
+  C = 'C',
+  NONE = 'NONE',
+}
+
 export enum ServiceOrderStatus {
   ALL = 'ALL',
   INIT = 'INIT',
@@ -312,4 +319,17 @@ export interface CreateServiceOrderBody {
   startTime: string;
   technicianIds: string[];
   type: JobScheduleType;
+}
+
+export interface AssignmentBasedOrderBody {
+  description?: string;
+  elevatorId: string;
+  externalId: string;
+  labels?: string[];
+  moreInformation?: string;
+  priority: ServiceOrderPriority;
+  serviceCompanyId: string;
+  technicianIds: string[];
+  time: string;
+  type: ServiceOrderType;
 }

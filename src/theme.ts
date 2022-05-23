@@ -112,10 +112,6 @@ export const theme = createTheme({
       fontSize: '1rem',
       lineHeight: 1.6,
       letterSpacing: '0.15px',
-      // [breakpoints.down("xs")]: {
-      //   fontSize: "3rem",
-      //   color: 'red'
-      // }
     },
     subtitle1: {
       fontWeight: 600,

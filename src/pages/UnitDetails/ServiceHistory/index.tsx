@@ -48,7 +48,7 @@ export const ServiceHistory = ({
       </Grid>
       <Grid xs={2} item>
         <Box display="flex">
-          <Box sx={{mt: '0.2em', mr: '0.3em'}}>
+          <Box sx={{mr: '0.3em', display: 'flex', alignItems: 'center'}}>
             <ServiceOrderIcons
               serviceOrderType={serviceOrder.type}
               size="small"

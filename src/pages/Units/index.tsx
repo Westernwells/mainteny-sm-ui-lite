@@ -1,5 +1,6 @@
+// TODO: @suraj we don't need to group elevator by address here because there is no grouping on the UI
 import {useEffect, useRef, useState} from 'react';
-import {ElevatorView} from 'models/elevator';
+import {ElevatorByAddr, ElevatorView} from 'models/elevator';
 import {Widget} from 'components/Widget';
 import * as _ from 'lodash';
 import {GridRowsProp} from '@mui/x-data-grid';
@@ -20,7 +21,7 @@ import {Location, Resource} from 'models/misc';
 import {useSearchParams} from 'react-router-dom';
 import {columns, makeRows} from './UnitsDataGridProps';
 import {UnitsMapsView} from './UnitsMapsView';
-import {DataGridElevatorView, ElevatorByAddr} from './Models';
+import {DataGridElevatorView} from './Models';
 
 const pageInfo = makePage(0, 50);
 
@@ -31,7 +32,6 @@ export const MyUnits = () => {
   }).current;
   const [queryParams, setQueryParams] = useSearchParams();
   const [search, setSearch] = useState('');
-  // const [mapSearch, setMapSearch] = useState('');
   const [page, setPage] = useState(pageInfo);
   const totalUnitsRef = useRef(0);
   const [pageCount, setPageCount] = useState(0);
@@ -57,8 +57,8 @@ export const MyUnits = () => {
     },
     {keepPreviousData: true},
   );
-
-  totalUnitsRef.current = elevatorResponse.total;
+  // set this value only once
+  totalUnitsRef.current = totalUnitsRef.current || elevatorResponse.total;
 
   const groupElevatorByAddressList = (elevatorRes?: Resource<ElevatorView>) => {
     const elevatorMap = _.groupBy(
@@ -197,7 +197,7 @@ export const MyUnits = () => {
           columns={columns}
           loading={isFetching}
           pageSize={page.pageSize}
-          pageIndex={page.pageIndex}
+          pageIndex={page.pageIndex + 1}
           handlePageSizeChange={(newPageSize: number) =>
             setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
           }

@@ -1,4 +1,4 @@
-import {ReactNode} from 'react';
+import {MouseEvent, ReactNode} from 'react';
 import {GetState, SetState} from 'zustand';
 
 export interface RestError {
@@ -220,3 +220,8 @@ export type StoreSlice<T extends object, E extends object = T> = (
   set: SetState<E extends T ? E : E & T>,
   get: GetState<E extends T ? E : E & T>,
 ) => T;
+
+export interface MenuBtnProps {
+  label: string;
+  action: (event: MouseEvent<HTMLLIElement>) => void;
+}

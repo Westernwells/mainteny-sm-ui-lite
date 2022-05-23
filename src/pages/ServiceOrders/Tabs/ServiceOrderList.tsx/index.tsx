@@ -70,7 +70,6 @@ export const ServiceOrderList = ({
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
-
     setPage({
       ...page,
       pageSize: Number(currentParams.pageSize),
@@ -162,7 +161,7 @@ export const ServiceOrderList = ({
         columns={columns}
         loading={isFetching}
         pageSize={page.pageSize}
-        pageIndex={page.pageIndex}
+        pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
           setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
         }
