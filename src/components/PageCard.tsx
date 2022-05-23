@@ -43,7 +43,7 @@ export const PageCard = ({
       {customHeader || headerLabel ? (
         <CardHeader
           sx={{
-            height: '2rem',
+            minHeight: '2rem',
             mt: '1em',
             mx: '0.5em',
             ...headerContainerOverrideStyles,

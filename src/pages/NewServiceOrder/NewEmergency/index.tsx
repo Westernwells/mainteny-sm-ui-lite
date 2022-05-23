@@ -9,10 +9,10 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {toRestDateTime} from 'utils/datetime';
 import {useNavigate} from 'react-router';
 import {AddDescription} from '../AddDescription';
-import {SelectTechnician} from '../SelectTechnician';
+import {SelectTechnicians} from '../SelectTechnicians';
 import {SelectUnit} from '../SelectUnit';
 
-const steps = ['Select Unit', 'Select Technicians', 'Add Description'];
+const steps = ['Select unit', 'Select technicians', 'Add description'];
 
 export const NewEmergency = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -94,7 +94,7 @@ export const NewEmergency = () => {
         ) : null}
         {activeStep === 1 ? (
           <FlexContainer containerStyle={{mt: '2em'}}>
-            <SelectTechnician
+            <SelectTechnicians
               defaultOption="immediate"
               elevatorId={selectedUnit?.id}
               getSelectedTechnicians={(val) => setSelectedTechnicians(val)}

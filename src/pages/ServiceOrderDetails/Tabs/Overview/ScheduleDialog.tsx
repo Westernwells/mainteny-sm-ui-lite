@@ -115,8 +115,6 @@ export const ScheduleDialog = ({
     debouncedChangeHandler(newValue);
   };
 
-  console.log();
-
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
       <Dialog
@@ -174,8 +172,13 @@ export const ScheduleDialog = ({
                 }}>
                 <DatePicker
                   defaultDate={defaultStartDate}
-                  inputError={formik.errors.date ? formik.errors.date : ''}
+                  inputError={
+                    formik.errors.date && formik.touched.date
+                      ? formik.errors.date
+                      : ''
+                  }
                   containerStyles={{mr: '1em'}}
+                  handleBlur={formik.handleBlur}
                   getSelectedDate={(date) => {
                     formik.setValues({
                       ...formik.values,
@@ -189,8 +192,11 @@ export const ScheduleDialog = ({
                 <TimePicker
                   defaultTime={defaultStartDate}
                   inputError={
-                    formik.errors.startTime ? formik.errors.startTime : ''
+                    formik.errors.startTime && formik.touched.startTime
+                      ? formik.errors.startTime
+                      : ''
                   }
+                  handleBlur={formik.handleBlur}
                   containerStyles={{mr: '1em'}}
                   getSelectedTime={(time) => {
                     formik.setValues({
@@ -205,8 +211,11 @@ export const ScheduleDialog = ({
                 <TimePicker
                   defaultTime={defaultEndDate}
                   inputError={
-                    formik.errors.endTime ? formik.errors.endTime : ''
+                    formik.errors.endTime && formik.touched.endTime
+                      ? formik.errors.endTime
+                      : ''
                   }
+                  handleBlur={formik.handleBlur}
                   getSelectedTime={(time) => {
                     // setSelectedEndTime(time)
                     formik.setValues({

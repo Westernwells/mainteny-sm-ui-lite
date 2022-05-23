@@ -1,3 +1,4 @@
+/*eslint-disable */
 import {SyntheticEvent, useCallback, useEffect, useState} from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -6,17 +7,18 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
+// import TextField from '@mui/material/TextField';
+// import Autocomplete from '@mui/material/Autocomplete';
 import * as _ from 'lodash';
 import {useQueryServiceCompanyTechnicians} from 'hooks/reactQuery/useTechnician';
 import {createEmptyResource} from 'utils/paging-utils';
 import {TechnicianView} from 'models/technician';
 import Box from '@mui/material/Box';
+import {TechnicianAutoComplete} from './TechnicianAutoComplete';
 
 interface Props {
   open?: boolean;
-  showSwitch?: boolean;
+  // showSwitch?: boolean;
   getDialogState?: (val: boolean) => void;
   getTechnician?: (val: TechnicianView | null) => void;
 }
@@ -31,19 +33,19 @@ export const AddTechnicianDialog = ({
   const [queryView, setQueryView] = useState('');
   const [technician, setTechnician] = useState<TechnicianView | null>(null);
 
-  const {data: techniciansResource = createEmptyResource(10)} =
-    useQueryServiceCompanyTechnicians({
-      pageIndex: 0,
-      pageSize: 3,
-      query,
-    });
+  // const {data: techniciansResource = createEmptyResource(10)} =
+  //   useQueryServiceCompanyTechnicians({
+  //     pageIndex: 0,
+  //     pageSize: 3,
+  //     query,
+  //   });
 
-  const debouncedChangeHandler = useCallback(
-    _.debounce((newValue: string) => {
-      setQuery(newValue);
-    }, 1),
-    [],
-  );
+  // const debouncedChangeHandler = useCallback(
+  //   _.debounce((newValue: string) => {
+  //     setQuery(newValue);
+  //   }, 1),
+  //   [],
+  // );
 
   useEffect(() => {
     if (open) {
@@ -57,10 +59,10 @@ export const AddTechnicianDialog = ({
     }
   }, [showModal]);
 
-  const onInputChange = (e: SyntheticEvent, newValue: string) => {
-    setQueryView(newValue);
-    debouncedChangeHandler(newValue);
-  };
+  // const onInputChange = (e: SyntheticEvent, newValue: string) => {
+  //   setQueryView(newValue);
+  //   debouncedChangeHandler(newValue);
+  // };
 
   const onSave = () => {
     if (getTechnician) {
@@ -81,7 +83,12 @@ export const AddTechnicianDialog = ({
         <DialogTitle id="alert-dialog-title">Add Technician</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description" component="div">
-            <Autocomplete
+            <TechnicianAutoComplete
+              getTechnician={(value) => setTechnician(value)}
+              label="Assign To"
+              getQuery={(val) => setQueryView(val)}
+            />
+            {/* <Autocomplete
               size="small"
               clearOnBlur={false}
               disablePortal
@@ -99,7 +106,7 @@ export const AddTechnicianDialog = ({
               renderInput={(params) => (
                 <TextField {...params} label="Assign To" name="technicianId" />
               )}
-            />
+            /> */}
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{mt: '1.5em'}}>

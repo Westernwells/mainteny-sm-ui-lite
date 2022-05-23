@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {useCallback, useEffect, useRef, useState} from 'react';
 import Typography from '@mui/material/Typography';
 import * as _ from 'lodash';
@@ -18,7 +19,10 @@ import Button from '@mui/material/Button';
 import RadioGroup from '@mui/material/RadioGroup';
 import useTheme from '@mui/material/styles/useTheme';
 import {AddTechnicianDialog} from './AddTechnicianDialog';
-import {RecommendedTechnicianSchedule} from './RecommendedTechnicianSchedule';
+import {ContainerCard} from './ContainerCard';
+import {ScheduleForm} from './ScheduleForm';
+import {PageCard} from 'components/PageCard';
+import {TechnicianSchedule} from './TechnicianSchedule';
 
 interface Props {
   elevatorId?: string;
@@ -37,7 +41,7 @@ interface CheckBoxState {
 
 const constant = {
   IMMEDIATE: 'immediate',
-  TIMEANDTECHNICIAN: 'timeAndTechnician',
+  SCHEDULE_TECHNICIAN: 'schedule technician',
 };
 
 const options = [
@@ -48,14 +52,14 @@ const options = [
       ' Select a technician for attending this service order immediately',
   },
   {
-    value: constant.TIMEANDTECHNICIAN,
+    value: constant.SCHEDULE_TECHNICIAN,
     label: 'Choose a Date, Time & Technician',
     subText: `Select a specific date, time and technician and update the
     technician&apos;s schedule for that day`,
   },
 ];
 
-export const SelectTechnician = ({
+export const SelectTechnicians = ({
   elevatorId,
   getSelectedTechnicians,
   getRecommendedTechnicianView,
@@ -168,59 +172,83 @@ export const SelectTechnician = ({
     [],
   );
 
+  const cardHeader = () => (
+    <Box sx={{}}>
+      {showOptions ? (
+        <RadioGroup name="radio-buttons-group">
+          <Box sx={{display: 'flex'}}>
+            {options.map((option) => (
+              <Box
+                key={option.label}
+                sx={{
+                  width: '32%',
+                  mr: '1em',
+                  px: '1em',
+                  border: `1px solid ${theme.palette.primary.outlinedHoverBg}`,
+                  borderRadius: 2,
+                }}>
+                <FormRadio
+                  value={option.value}
+                  handleChange={(e) => setSelectedOptions(e.target.value)}
+                  label={option.label}
+                  radioProps={{
+                    sx: {color: theme.palette.text.secondary},
+                  }}
+                />
+                <Typography variant="body1" color="text.secondary">
+                  {option.subText}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </RadioGroup>
+      ) : null}
+
+      {selectedOptions === constant.IMMEDIATE ? (
+        <>
+          <Typography variant="h6" sx={{mt: showOptions ? '2em' : undefined}}>
+            Choose Technicians
+          </Typography>
+          <Typography variant="body1" component="div" color="text.secondary">
+            Selected technicians below will be contacted by phone automatically
+          </Typography>
+        </>
+      ) : null}
+    </Box>
+  );
+
+  const renderCellItem = (
+    order: ServiceOrderView,
+    calcWidth: (startDateTime: string, endDateTime: string) => string,
+    calcPosition: (startDateTime: string) => string,
+  ) => {
+    return (
+      <ScheduleItem
+        key={order.id}
+        height="30px"
+        titleLeftAdornment={
+          <ServiceOrderIcons
+            serviceOrderType={order.type}
+            style={{fontSize: '1rem'}}
+          />
+        }
+        title={order.elevator.propertyOwner.name}
+        subtitle={order.elevator.address.fullName}
+        width={calcWidth(
+          order.schedules[0].startTime,
+          order.schedules[0].endTime,
+        )}
+        tooltip={<OrderDetails order={order} />}
+        cardStatusAccent={serviceOrderStatusColor[order.status]}
+        position={calcPosition(order.schedules[0].startTime)}
+      />
+    );
+  };
+
   return (
     <>
-      <RecommendedTechnicianSchedule
-        customCardHeader={
-          <Box sx={{}}>
-            {showOptions ? (
-              <RadioGroup name="radio-buttons-group">
-                <Box sx={{display: 'flex'}}>
-                  {options.map((option) => (
-                    <Box
-                      key={option.label}
-                      sx={{
-                        width: '32%',
-                        mr: '1em',
-                        px: '1em',
-                        border: `1px solid ${theme.palette.primary.outlinedHoverBg}`,
-                        borderRadius: 2,
-                      }}>
-                      <FormRadio
-                        value={option.value}
-                        handleChange={(e) => setSelectedOptions(e.target.value)}
-                        label={option.label}
-                        radioProps={{
-                          sx: {color: theme.palette.text.secondary},
-                        }}
-                      />
-                      <Typography variant="body1" color="text.secondary">
-                        {option.subText}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-              </RadioGroup>
-            ) : null}
-
-            {selectedOptions === constant.IMMEDIATE ? (
-              <>
-                <Typography
-                  variant="h6"
-                  sx={{mt: showOptions ? '2em' : undefined}}>
-                  Choose Technicians
-                </Typography>
-                <Typography
-                  variant="body1"
-                  component="div"
-                  color="text.secondary">
-                  Selected technicians below will be contacted by phone
-                  automatically
-                </Typography>
-              </>
-            ) : null}
-          </Box>
-        }
+      <ContainerCard
+        customCardHeader={cardHeader()}
         containerStyles={{
           boxShadow: 'none',
           border: 'none',
@@ -244,37 +272,28 @@ export const SelectTechnician = ({
               </Button>
             </Box>
           ) : null
-        }
-        cellHeight="50px"
-        scheduleItems={orders}
-        hideSchedule={selectedOptions !== constant.IMMEDIATE}
-        getCheckedValue={getCheckedValue}
-        defaultTypeLabel="Recommended Technician"
-        labelWidth="15rem"
-        technicians={recommendedTechniciansView}
-        checkedValues={selectedTechnicianIds}
-        renderCellItem={(order: ServiceOrderView, calWidth, calcPosition) => (
-          <ScheduleItem
-            key={order.id}
-            height="30px"
-            titleLeftAdornment={
-              <ServiceOrderIcons
-                serviceOrderType={order.type}
-                style={{fontSize: '1rem'}}
-              />
-            }
-            title={order.elevator.propertyOwner.name}
-            subtitle={order.elevator.address.fullName}
-            width={calWidth(
-              order.schedules[0].startTime,
-              order.schedules[0].endTime,
-            )}
-            tooltip={<OrderDetails order={order} />}
-            cardStatusAccent={serviceOrderStatusColor[order.status]}
-            position={calcPosition(order.schedules[0].startTime)}
+        }>
+        {selectedOptions === constant.IMMEDIATE ? (
+          <TechnicianSchedule
+            scheduleItems={orders}
+            renderCellItem={renderCellItem}
+            defaultTypeLabel="Recommended Technician"
+            labelWidth="15rem"
+            getCheckedValue={getCheckedValue}
+            cellHeight="50px"
+            technicians={recommendedTechniciansView}
+            checkedValues={selectedTechnicianIds}
           />
-        )}
-      />
+        ) : null}
+        {selectedOptions === constant.SCHEDULE_TECHNICIAN ? (
+          <ScheduleForm
+            defaultEndDate={null}
+            defaultStartDate={null}
+            defaultTechnician={null}
+          />
+        ) : null}
+      </ContainerCard>
+
       <AddTechnicianDialog
         open={openDialog}
         getDialogState={(state) => setOpenDialog(state)}

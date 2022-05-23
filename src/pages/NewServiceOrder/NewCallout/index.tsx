@@ -9,13 +9,13 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {toRestDateTime} from 'utils/datetime';
 import {useNavigate} from 'react-router';
 import {AddDescription} from '../AddDescription';
-import {SelectTechnician} from '../SelectTechnician';
+import {SelectTechnicians} from '../SelectTechnicians';
 import {SelectUnit} from '../SelectUnit';
 
 const steps = [
-  'Select Unit',
-  'Select, Date, Time & Technician',
-  'Add Description',
+  'Select unit',
+  'Select, date, time & technician',
+  'Add description',
 ];
 
 export const NewCallout = () => {
@@ -98,7 +98,7 @@ export const NewCallout = () => {
         ) : null}
         {activeStep === 1 ? (
           <FlexContainer containerStyle={{mt: '2em'}}>
-            <SelectTechnician
+            <SelectTechnicians
               showOptions
               elevatorId={selectedUnit?.id}
               getSelectedTechnicians={(val) => setSelectedTechnicians(val)}
