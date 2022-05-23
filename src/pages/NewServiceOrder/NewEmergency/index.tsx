@@ -95,6 +95,7 @@ export const NewEmergency = () => {
         {activeStep === 1 ? (
           <FlexContainer containerStyle={{mt: '2em'}}>
             <SelectTechnician
+              defaultOption="immediate"
               elevatorId={selectedUnit?.id}
               getSelectedTechnicians={(val) => setSelectedTechnicians(val)}
               getRecommendedTechnicianView={(val) =>

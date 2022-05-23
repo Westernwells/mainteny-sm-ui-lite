@@ -66,6 +66,7 @@ export const theme = createTheme({
     },
     inputBackground: {main: '#F7F9FC'},
     amber: {main: '#FF8F00', light: '#FFF8E1'},
+    eden: {main: 'rgba(15, 76, 100)', light: 'gba(15, 76, 100, 0.5)'},
     // Used by `getContrastText()` to maximize the contrast between
     // the background and the text.
     contrastThreshold: 3,

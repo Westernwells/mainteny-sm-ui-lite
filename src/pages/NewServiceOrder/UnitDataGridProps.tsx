@@ -8,8 +8,8 @@ import {
 import Typography from '@mui/material/Typography';
 import {ElevatorView} from 'models/elevator';
 import {formatDate} from 'utils/datetime';
-import Radio from '@mui/material/Radio';
 import Box from '@mui/material/Box';
+import {FormRadio} from 'components/form/FormRadio';
 
 const defaultProps = {
   editable: false,
@@ -47,13 +47,18 @@ export const columns = (activeId: string): GridColDef[] => [
     ),
     renderCell: (params: GridRenderCellParams<any, ElevatorView, any>) => (
       <Box sx={{display: 'flex'}}>
-        <Radio value={params.row.id} checked={params.row.id === activeId} />
-        <Typography
-          variant="body2"
-          component="div"
-          sx={{display: 'flex', alignItems: 'center'}}>
-          {params.value || '-'}
-        </Typography>
+        <FormRadio
+          value={params.row.id}
+          checked={params.row.id === activeId}
+          label={
+            <Typography
+              variant="body2"
+              component="div"
+              sx={{display: 'flex', alignItems: 'center'}}>
+              {params.value || '-'}
+            </Typography>
+          }
+        />
       </Box>
     ),
   },

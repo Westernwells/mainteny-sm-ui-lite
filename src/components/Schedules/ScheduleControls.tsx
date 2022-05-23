@@ -5,21 +5,21 @@ import Typography from '@mui/material/Typography';
 import {SearchInput} from 'components/SearchInput';
 
 interface Props {
-  scheduleType: 'date' | 'people' | 'default';
+  scheduleType?: 'date' | 'people' | 'default';
   item: string;
-  prevMonth: () => void;
-  nextMonth: () => void;
-  searchPlaceholder: string;
+  prevMonth?: () => void;
+  nextMonth?: () => void;
+  searchPlaceholder?: string;
   getSearchValue?: (val: string) => void;
 }
 
 export const ScheduleControls = ({
-  scheduleType,
+  scheduleType = 'default',
   item,
-  prevMonth,
-  nextMonth,
-  searchPlaceholder,
-  getSearchValue,
+  prevMonth = () => {},
+  nextMonth = () => {},
+  searchPlaceholder = '',
+  getSearchValue = () => {},
 }: Props) => {
   const renderDateContols = () => (
     <Box sx={{display: 'flex'}}>

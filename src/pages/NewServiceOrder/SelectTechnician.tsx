@@ -8,14 +8,17 @@ import {useFetchRecommendedTechnician} from 'hooks/reactQuery/useTechnician';
 import {useQueryServiceOrderScheduled} from 'hooks/reactQuery/useServiceOrder';
 import {endOfDay, startOfDay} from 'date-fns';
 import {toRestDateTime} from 'utils/datetime';
-import {Schedule} from 'components/Schedules';
 import {ScheduleItem} from 'components/Schedules/ScheduleItem';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {OrderDetails} from 'components/OrderDetails';
 import {useServiceOrderStatusColor} from 'hooks/useServiceOrderStatusColor';
 import Box from '@mui/material/Box';
+import {FormRadio} from 'components/form/FormRadio';
 import Button from '@mui/material/Button';
+import RadioGroup from '@mui/material/RadioGroup';
+import useTheme from '@mui/material/styles/useTheme';
 import {AddTechnicianDialog} from './AddTechnicianDialog';
+import {RecommendedTechnicianSchedule} from './RecommendedTechnicianSchedule';
 
 interface Props {
   elevatorId?: string;
@@ -23,6 +26,8 @@ interface Props {
   getSelectedTechnicians?: (val: TechnicianView[]) => void;
   getRecommendedTechnicianView?: (val: TechnicianView[]) => void;
   initialRecommendedTechnicians: TechnicianView[];
+  showOptions?: boolean;
+  defaultOption?: string;
 }
 
 interface CheckBoxState {
@@ -30,14 +35,38 @@ interface CheckBoxState {
   value: string;
 }
 
+const constant = {
+  IMMEDIATE: 'immediate',
+  TIMEANDTECHNICIAN: 'timeAndTechnician',
+};
+
+const options = [
+  {
+    value: constant.IMMEDIATE,
+    label: 'Immediate',
+    subText:
+      ' Select a technician for attending this service order immediately',
+  },
+  {
+    value: constant.TIMEANDTECHNICIAN,
+    label: 'Choose a Date, Time & Technician',
+    subText: `Select a specific date, time and technician and update the
+    technician&apos;s schedule for that day`,
+  },
+];
+
 export const SelectTechnician = ({
   elevatorId,
   getSelectedTechnicians,
   getRecommendedTechnicianView,
   initialRecommendedTechnicians,
   initialSelectedTechnicians,
+  showOptions,
+  defaultOption = '',
 }: Props) => {
+  const theme = useTheme();
   const time = useRef(toRestDateTime(new Date())).current;
+  const [selectedOptions, setSelectedOptions] = useState<string>(defaultOption);
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -141,38 +170,84 @@ export const SelectTechnician = ({
 
   return (
     <>
-      <Schedule
+      <RecommendedTechnicianSchedule
         customCardHeader={
           <Box sx={{}}>
-            <Typography sx={{}} variant="h6">
-              Choose Technicians
-            </Typography>
-            <Typography variant="body1" component="div" color="text.secondary">
-              Selected technicians below will be contacted by phone
-              automatically
-            </Typography>
+            {showOptions ? (
+              <RadioGroup name="radio-buttons-group">
+                <Box sx={{display: 'flex'}}>
+                  {options.map((option) => (
+                    <Box
+                      key={option.label}
+                      sx={{
+                        width: '32%',
+                        mr: '1em',
+                        px: '1em',
+                        border: `1px solid ${theme.palette.primary.outlinedHoverBg}`,
+                        borderRadius: 2,
+                      }}>
+                      <FormRadio
+                        value={option.value}
+                        handleChange={(e) => setSelectedOptions(e.target.value)}
+                        label={option.label}
+                        radioProps={{
+                          sx: {color: theme.palette.text.secondary},
+                        }}
+                      />
+                      <Typography variant="body1" color="text.secondary">
+                        {option.subText}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </RadioGroup>
+            ) : null}
+
+            {selectedOptions === constant.IMMEDIATE ? (
+              <>
+                <Typography
+                  variant="h6"
+                  sx={{mt: showOptions ? '2em' : undefined}}>
+                  Choose Technicians
+                </Typography>
+                <Typography
+                  variant="body1"
+                  component="div"
+                  color="text.secondary">
+                  Selected technicians below will be contacted by phone
+                  automatically
+                </Typography>
+              </>
+            ) : null}
           </Box>
         }
         containerStyles={{
           boxShadow: 'none',
           border: 'none',
+          flexGrow: 1,
+          height: 0,
+          display: 'flex',
+          flexDirection: 'column',
         }}
+        contentContainerStyle={{flexGrow: 1, height: 0}}
         footerContainerStyles={{
           flexGrow: 1,
         }}
         cardFooter={
-          <Box sx={{ml: '1.5em'}}>
-            <Button
-              variant="outlined"
-              sx={{bgcolor: 'white'}}
-              onClick={() => setOpenDialog(true)}>
-              Add More
-            </Button>
-          </Box>
+          selectedOptions === constant.IMMEDIATE ? (
+            <Box sx={{ml: '1.5em'}}>
+              <Button
+                variant="outlined"
+                sx={{bgcolor: 'white'}}
+                onClick={() => setOpenDialog(true)}>
+                Add More
+              </Button>
+            </Box>
+          ) : null
         }
         cellHeight="50px"
         scheduleItems={orders}
-        makeLabelSelectable
+        hideSchedule={selectedOptions !== constant.IMMEDIATE}
         getCheckedValue={getCheckedValue}
         defaultTypeLabel="Recommended Technician"
         labelWidth="15rem"
