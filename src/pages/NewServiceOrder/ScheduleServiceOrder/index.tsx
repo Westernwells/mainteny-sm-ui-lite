@@ -2,6 +2,7 @@ import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {
   useAssignmentBasedOrder,
+  useCreateNonScheduledServiceOrder,
   useCreateScheduledServiceOrder,
 } from 'hooks/reactQuery/useServiceOrder';
 import {ElevatorView} from 'models/elevator';
@@ -55,6 +56,8 @@ export const ScheduleServiceOrder = ({type}: Props) => {
 
   const {mutateAsync: createScheduledServiceOrder} =
     useCreateScheduledServiceOrder('Order scheduled successfully');
+  const {mutateAsync: createNonScheduledServiceOrder} =
+    useCreateNonScheduledServiceOrder('Order created successfully');
 
   const [recommendedTechnicians, setRecommendedTechnicians] = useState<
     TechnicianView[]
@@ -174,16 +177,41 @@ export const ScheduleServiceOrder = ({type}: Props) => {
     navigate('/orders?pageIndex=1&pageSize=25&tab=1');
   };
 
+  const createNonScheduledOrder = async () => {
+    const serviceCompanyId = user?.userAccount.serviceCompany.id!;
+    const dueDate = formatDate(dueFormValue?.date!, 'yyy-MM-dd')!;
+    const body = {
+      description,
+      elevatorId: selectedUnit!.id,
+      externalId: '',
+      priority: ServiceOrderPriority.A,
+      serviceCompanyId,
+      type,
+      dueDate,
+    };
+
+    await createNonScheduledServiceOrder(body);
+    navigate('/orders?pageIndex=1&pageSize=25&tab=1');
+  };
+
+  const handleSubmit = async () => {
+    if (selectedRadioOption === RadioOptions.IMMEDIATE) {
+      await createNewImmediateCalloutOrder();
+    }
+
+    if (selectedRadioOption === RadioOptions.DUE_DATE) {
+      await createNonScheduledOrder();
+    }
+
+    if (selectedRadioOption === RadioOptions.SCHEDULE_TECHNICIAN) {
+      await createScheduledOrder();
+    }
+  };
+
   return (
     <Stepper
       handleCancel={handleCancel}
-      handleSubmit={async () => {
-        if (selectedRadioOption === RadioOptions.IMMEDIATE) {
-          await createNewImmediateCalloutOrder();
-        } else {
-          await createScheduledOrder();
-        }
-      }}
+      handleSubmit={() => handleSubmit()}
       disableNextBtn={disableNextBtn}
       getActiveStep={(val) => setActiveStep(val)}
       steps={steps}

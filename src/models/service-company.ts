@@ -1,22 +1,6 @@
-import {ContractStatus, ContractType} from './contract';
-import {ElevatorView} from './elevator';
-import {
-  Address,
-  CompanyContact,
-  Language,
-  Meta,
-  Priority,
-  Settings,
-  TechnicianEventType,
-} from './misc';
-import {
-  JobScheduleType,
-  ServiceOrderAdditionalInfo,
-  ServiceOrderStatus,
-  ServiceOrderSummary,
-  ServiceOrderType,
-} from './service-order';
-import {Technician, TechnicianEventView} from './technician';
+import {Address, CompanyContact, Language, Meta, Settings} from './misc';
+import {ServiceOrderSummary} from './service-order';
+import {TechnicianEventView} from './technician';
 
 export enum ServiceCompanyTimeUnit {
   DAILY = 'DAILY',
