@@ -24,7 +24,11 @@ const steps = [
   'Add description',
 ];
 
-export const NewCallout = () => {
+interface Props {
+  type: Exclude<ServiceOrderType, ServiceOrderType.EMERGENCY>;
+}
+
+export const NewScheduledOrder = ({type}: Props) => {
   const [activeStep, setActiveStep] = useState(0);
   const [selectedUnit, setSelectedUnit] = useState<ElevatorView>();
   const [disableNextBtn, setDisableNextBtn] = useState(false);
@@ -80,7 +84,7 @@ export const NewCallout = () => {
       serviceCompanyId,
       technicianIds: selectedTechnicians.map((item) => item.id),
       time: toRestDateTime(new Date()),
-      type: ServiceOrderType.CALLOUT,
+      type,
     };
     await createImmediateCalloutOrder(body);
     navigate('/orders?pageIndex=1&pageSize=25&tab=1');
@@ -111,8 +115,6 @@ export const NewCallout = () => {
       // endTime: string;
       // startTime: string;
     };
-
-    console.log(body, '!!!!!@@');
     // await createScheduledServiceOrder(body)
   };
 
@@ -149,6 +151,7 @@ export const NewCallout = () => {
           <FlexContainer containerStyle={{mt: '2em'}}>
             <SelectTechnicians
               showOptions
+              type={type}
               elevatorId={selectedUnit?.id}
               getFormValue={(val) => setFormValue(val)}
               getRecommendedTechnicianView={(val) =>

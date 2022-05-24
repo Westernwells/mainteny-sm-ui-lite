@@ -2,7 +2,7 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import Typography from '@mui/material/Typography';
 import * as _ from 'lodash';
-import {ServiceOrderView} from 'models/service-order';
+import {ServiceOrderType, ServiceOrderView} from 'models/service-order';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {TechnicianView} from 'models/technician';
 import {useFetchRecommendedTechnician} from 'hooks/reactQuery/useTechnician';
@@ -38,6 +38,7 @@ interface Props {
   getFormValue?: (form: ScheduleTechnicianForm) => void;
   formIsErrored?: (value: boolean) => void;
   getSelectedRadioOption?: (val: string) => void;
+  type?: Exclude<ServiceOrderType, ServiceOrderType.EMERGENCY>;
 }
 
 interface CheckBoxState {
@@ -45,7 +46,7 @@ interface CheckBoxState {
   value: string;
 }
 
-const options = [
+const otherOptions = [
   {
     value: constant.IMMEDIATE,
     label: 'Immediate',
@@ -60,6 +61,16 @@ const options = [
   },
 ];
 
+const calloutOptions = [
+  {
+    value: constant.IMMEDIATE,
+    label: 'Immediate',
+    subText:
+      ' Select a technician for attending this service order immediately',
+  },
+  ...otherOptions,
+];
+
 export const SelectTechnicians = ({
   elevatorId,
   getSelectedTechnicians,
@@ -68,11 +79,15 @@ export const SelectTechnicians = ({
   initialSelectedTechnicians,
   showOptions,
   defaultOption = '',
+  type,
   getFormValue = () => {},
   formIsErrored,
   getSelectedRadioOption,
 }: Props) => {
   const theme = useTheme();
+  const options = useRef(
+    type === ServiceOrderType.CALLOUT ? calloutOptions : otherOptions,
+  ).current;
   const time = useRef(toRestDateTime(new Date())).current;
   const [selectedOptions, setSelectedOptions] = useState<string>(defaultOption);
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();

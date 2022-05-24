@@ -3,8 +3,9 @@ import {FlexContainer} from 'components/FlexContainer';
 import {useRef} from 'react';
 import {useNavigate} from 'react-router';
 import {useSearchParams} from 'react-router-dom';
+import {ServiceOrderType} from 'models/service-order';
 import {convertToText} from 'utils/utils';
-import {NewCallout} from './NewCallout';
+import {NewScheduledOrder} from './NewScheduledOrder';
 import {NewEmergency} from './NewEmergency';
 
 export const NewServiceOrder = () => {
@@ -24,7 +25,9 @@ export const NewServiceOrder = () => {
         ]}
       />
       {currentParams.type === 'emergency' ? <NewEmergency /> : null}
-      {currentParams.type === 'callout' ? <NewCallout /> : null}
+      {currentParams.type === 'callout' ? (
+        <NewScheduledOrder type={ServiceOrderType.CALLOUT} />
+      ) : null}
     </FlexContainer>
   );
 };
