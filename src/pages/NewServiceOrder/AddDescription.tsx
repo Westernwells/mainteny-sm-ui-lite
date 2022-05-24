@@ -1,17 +1,19 @@
-import Box from '@mui/material/Box';
 import {grey} from '@mui/material/colors';
 import Typography from '@mui/material/Typography';
 import {FormInput} from 'components/form/FormInput';
 import {PageCard} from 'components/PageCard';
 import {ElevatorView} from 'models/elevator';
 import {TechnicianView} from 'models/technician';
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
+import {Summary, SummaryItem} from './Summary';
 
 interface Props {
   getDescription?: (val: string) => void;
   initialDescription?: string;
   selectedUnit?: ElevatorView;
   selectedTechnicians?: TechnicianView[];
+  selectedDateString?: string;
+  selectedTimeString?: string;
 }
 
 export const AddDescription = ({
@@ -19,6 +21,8 @@ export const AddDescription = ({
   initialDescription = '',
   selectedUnit,
   selectedTechnicians = [],
+  selectedDateString,
+  selectedTimeString,
 }: Props) => {
   const [description, setDescription] = useState(initialDescription);
 
@@ -28,35 +32,38 @@ export const AddDescription = ({
     }
   }, [description]);
 
-  const summaryList = (value: string) => (
-    <Typography key={value} variant="body2" color="grey.700" sx={{mt: '0.2em'}}>
-      {value}
-    </Typography>
-  );
-
   return (
     <>
       {selectedUnit ? (
-        <Box>
-          <Typography variant="subtitle2" color="grey.700">
-            Selected Unit
-          </Typography>
-          {summaryList(selectedUnit?.model)}
-        </Box>
+        <Summary label=" Selected unit">
+          <SummaryItem value={selectedUnit.model} />
+        </Summary>
       ) : null}
 
       {selectedTechnicians.length ? (
-        <Box sx={{mt: '1em'}}>
-          <Typography variant="subtitle2" color="grey.700">
-            Selected Technician
-          </Typography>
-          {selectedTechnicians.map((item) =>
-            summaryList(
-              `${item.userAccount.firstName} ${item.userAccount.lastName}`,
-            ),
-          )}
-        </Box>
+        <Summary label="Selected technician" containerStyle={{mt: '1em'}}>
+          {selectedTechnicians.map((item) => (
+            <SummaryItem
+              key={item.id}
+              value={`${item.userAccount.firstName} ${item.userAccount.lastName}`}
+            />
+          ))}
+        </Summary>
       ) : null}
+
+      {selectedDateString || selectedTimeString ? (
+        <Summary label="Selected date and time" containerStyle={{mt: '1em'}}>
+          {selectedDateString ? (
+            <SummaryItem
+              value={`${selectedDateString} ${
+                selectedTimeString ? ` at ${selectedTimeString}` : ''
+              }`}
+              containerStyle={{display: 'inline-block'}}
+            />
+          ) : null}
+        </Summary>
+      ) : null}
+
       <PageCard
         customHeader={
           <Typography variant="subtitle2" color="grey.700">
