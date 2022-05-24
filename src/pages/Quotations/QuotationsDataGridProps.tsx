@@ -6,7 +6,7 @@ import {
   GridRowsProp,
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
-import Chip from '@mui/material/Chip';
+import {StatusChip} from 'components/StatusChip';
 import {formatDate} from 'utils/datetime';
 import {formatCurrency} from 'utils/currency';
 import {QuotationStatus, QuotationView} from 'models/quotation';
@@ -109,12 +109,11 @@ export const columns: GridColDef[] = [
       </Typography>
     ),
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
-      <Chip
-        size="small"
-        variant="outlined"
-        sx={{minWidth: '8ch', px: '.25em'}}
+      <StatusChip
         label={getQuotationStatusStyles(params.value).label}
         color={getQuotationStatusStyles(params.value).color}
+        variant="filled"
+        maxChars={9}
       />
     ),
   },
@@ -153,8 +152,8 @@ export const makeRows = (quotations: Resource<QuotationView>): GridRowsProp =>
     customer: item.elevator.propertyOwner.name,
     address: item.elevator.propertyOwner.address.fullName,
     createdDate: formatDate(item.meta.createdAt),
-    amount: `${formatCurrency(item ? item.totalSalesPrice.amount : 0, {
-      currency: item.totalSalesPrice.currency,
+    amount: `${formatCurrency(item ? item.totalAmount.grossAmount : 0, {
+      currency: item.totalAmount.currency,
     })}`,
     status: item.status,
     navigateTo: `details/${item.id}`,

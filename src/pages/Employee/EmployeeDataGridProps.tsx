@@ -185,7 +185,7 @@ export const columns: GridColDef[] = [
           e.stopPropagation();
           window.open(`mailto:${params.value}`, '_blank');
         }}>
-        <SendIcon sx={{color: '#2196F3'}} />
+        <SendIcon sx={{color: 'action.active'}} />
       </IconButton>
     ),
   },

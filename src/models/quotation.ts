@@ -36,7 +36,7 @@ export interface QuotationView {
   externalId: string;
   description: string;
   status: QuotationStatus;
-  totalSalesPrice: Price;
+  totalAmount: Price;
   additionalInfo: QuotationAdditionalInfo;
   search: string;
   meta: Meta;
