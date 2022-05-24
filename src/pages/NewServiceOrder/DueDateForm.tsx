@@ -5,13 +5,12 @@ import {useFormik} from 'formik';
 import {useEffect} from 'react';
 import * as Yup from 'yup';
 import {DueDateFormProps} from './models';
-// import {constant} from './utils';
 
 interface Props {
   defaultStartDate: Date | null;
   getDueDateFormValues?: (value: DueDateFormProps) => void;
   containerStyles?: {[key: string]: any};
-  dueFormIsErrored?: (value: boolean) => void;
+  dueDateFormIsErrored?: (value: boolean) => void;
 }
 
 const validationSchema = Yup.object().shape({
@@ -22,7 +21,7 @@ export const DueDateForm = ({
   defaultStartDate,
   getDueDateFormValues,
   containerStyles,
-  dueFormIsErrored,
+  dueDateFormIsErrored,
 }: Props) => {
   const formik = useFormik<DueDateFormProps>({
     initialValues: {
@@ -39,8 +38,8 @@ export const DueDateForm = ({
   }, [formik.values]);
 
   useEffect(() => {
-    if (dueFormIsErrored) {
-      dueFormIsErrored(!!Object.keys(formik.errors).length);
+    if (dueDateFormIsErrored) {
+      dueDateFormIsErrored(!!Object.keys(formik.errors).length);
     }
   }, [formik.errors]);
 

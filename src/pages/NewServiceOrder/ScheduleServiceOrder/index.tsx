@@ -44,12 +44,11 @@ export const ScheduleServiceOrder = ({type}: Props) => {
   const [description, setDescription] = useState('');
   const [scheduleFormValue, setScheduleFormValue] =
     useState<ScheduleTechnicianForm | null>(null);
-  const [dueFormValue, setDueFormValue] = useState<DueDateFormProps | null>(
-    null,
-  );
+  const [dueDateFormValue, setdueDateFormValue] =
+    useState<DueDateFormProps | null>(null);
   const [scheduleFormErrored, setScheduleFormErrored] =
     useState<boolean>(false);
-  const [dueFormErrored, setDueFormErrored] = useState<boolean>(false);
+  const [dueDateFormErrored, setdueDateFormErrored] = useState<boolean>(false);
   const {mutateAsync: createImmediateCalloutOrder} = useAssignmentBasedOrder(
     'Order created successfully',
   );
@@ -86,7 +85,7 @@ export const ScheduleServiceOrder = ({type}: Props) => {
     if (
       activeStep === 1 &&
       selectedRadioOption === RadioOptions.DUE_DATE &&
-      dueFormErrored
+      dueDateFormErrored
     ) {
       return setDisableNextBtn(true);
     }
@@ -105,14 +104,14 @@ export const ScheduleServiceOrder = ({type}: Props) => {
     selectedUnit,
     selectedTechnicians,
     scheduleFormErrored,
-    dueFormErrored,
+    dueDateFormErrored,
   ]);
 
   useEffect(() => {
     let dateString;
     let timeString;
     if (selectedRadioOption === RadioOptions.DUE_DATE) {
-      dateString = formatDate(dueFormValue?.date!, 'dd.MM.yyy');
+      dateString = formatDate(dueDateFormValue?.date!, 'dd.MM.yyy');
     }
     if (selectedRadioOption === RadioOptions.SCHEDULE_TECHNICIAN) {
       dateString = formatDate(scheduleFormValue?.date!, 'dd.MM.yyy');
@@ -123,7 +122,7 @@ export const ScheduleServiceOrder = ({type}: Props) => {
     }
     setSelectedDateString(dateString);
     setSelectedTimeString(timeString);
-  }, [scheduleFormValue, dueFormValue]);
+  }, [scheduleFormValue, dueDateFormValue]);
 
   const handleCancel = () => {
     setActiveStep(0);
@@ -179,7 +178,7 @@ export const ScheduleServiceOrder = ({type}: Props) => {
 
   const createNonScheduledOrder = async () => {
     const serviceCompanyId = user?.userAccount.serviceCompany.id!;
-    const dueDate = formatDate(dueFormValue?.date!, 'yyy-MM-dd')!;
+    const dueDate = formatDate(dueDateFormValue?.date!, 'yyy-MM-dd')!;
     const body = {
       description,
       elevatorId: selectedUnit!.id,
@@ -238,7 +237,7 @@ export const ScheduleServiceOrder = ({type}: Props) => {
               type={type}
               elevatorId={selectedUnit?.id}
               getScheduleFormValue={(val) => setScheduleFormValue(val)}
-              getDueDateFormValues={(val) => setDueFormValue(val)}
+              getDueDateFormValues={(val) => setdueDateFormValue(val)}
               getRecommendedTechnicianView={(val) =>
                 setRecommendedTechnicians(val)
               }
@@ -246,7 +245,7 @@ export const ScheduleServiceOrder = ({type}: Props) => {
               getSelectedTechnicians={(val) => setSelectedTechnicians(val)}
               defaultOption={selectedRadioOption}
               scheduleFormIsErrored={(val) => setScheduleFormErrored(val)}
-              dueFormIsErrored={(val) => setDueFormErrored(val)}
+              dueDateFormIsErrored={(val) => setdueDateFormErrored(val)}
               initialRecommendedTechnicians={recommendedTechnicians}
               initialSelectedTechnicians={selectedTechnicians}
             />

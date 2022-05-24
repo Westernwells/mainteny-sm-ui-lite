@@ -37,7 +37,7 @@ interface Props {
   getScheduleFormValue?: (form: ScheduleTechnicianForm) => void;
   getDueDateFormValues?: (form: DueDateFormProps) => void;
   scheduleFormIsErrored?: (value: boolean) => void;
-  dueFormIsErrored?: (value: boolean) => void;
+  dueDateFormIsErrored?: (value: boolean) => void;
   getSelectedRadioOption?: (val?: RadioOptions) => void;
   type?: Exclude<ServiceOrderType, ServiceOrderType.EMERGENCY>;
 }
@@ -83,7 +83,7 @@ export const SelectTechnicians = ({
   getScheduleFormValue = () => {},
   getDueDateFormValues = () => {},
   scheduleFormIsErrored,
-  dueFormIsErrored,
+  dueDateFormIsErrored,
   getSelectedRadioOption,
 }: Props) => {
   const theme = useTheme();
@@ -336,8 +336,8 @@ export const SelectTechnicians = ({
             getDueDateFormValues={(form: DueDateFormProps) =>
               getDueDateFormValues(form)
             }
-            dueFormIsErrored={(val) =>
-              dueFormIsErrored && dueFormIsErrored(val)
+            dueDateFormIsErrored={(val) =>
+              dueDateFormIsErrored && dueDateFormIsErrored(val)
             }
             containerStyles={{pl: '1em', mt: '2em', maxWidth: '30%'}} // containerStyles,
           />
