@@ -1,28 +1,12 @@
-/* eslint-disable */
-import {ReactNode, useEffect, useRef, useState} from 'react';
+import {ReactNode, useEffect, useRef} from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import {twentyFourHourTime} from 'utils/utils';
 import Box from '@mui/material/Box';
-import * as _ from 'lodash';
 import Typography from '@mui/material/Typography';
-import {differenceInMinutes, startOfDay} from 'date-fns';
 import {formatDate, getDateObject} from 'utils/datetime';
-import {ScheduleContainer} from 'components/Schedules/ScheduleContainer';
-import {ScheduleHeader} from 'components/Schedules/ScheduleHeader';
-import {ScheduleRow} from 'components/Schedules/ScheduleRow';
-import {ScheduleHeaderCell} from 'components/Schedules/ScheduleHeaderCell';
-import {ScheduleBody} from 'components/Schedules/ScheduleBody';
-import {ScheduleBodyCell} from 'components/Schedules/ScheduleBodyCell';
-import {ScheduleItemContainer} from 'components/Schedules/ScheduleItemContainer';
-import {ServiceOrderView} from 'models/service-order';
 import CardHeader from '@mui/material/CardHeader';
 import {useTheme} from '@mui/material/styles';
-import {TechnicianView} from 'models/technician';
 import {styles as sx} from 'components/Schedules/styles';
-import {ScheduleControls} from 'components/Schedules/ScheduleControls';
-import {ScheduleLabel} from 'components/Schedules/ScheduleLabel';
-import {TechnicianSchedule} from './TechnicianSchedule';
 
 interface Props {
   containerStyles?: {[key: string]: any};

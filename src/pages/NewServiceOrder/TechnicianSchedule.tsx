@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {useEffect, useRef, useState} from 'react';
 
 import {twentyFourHourTime} from 'utils/utils';
@@ -15,7 +14,6 @@ import {ScheduleBody} from 'components/Schedules/ScheduleBody';
 import {ScheduleBodyCell} from 'components/Schedules/ScheduleBodyCell';
 import {ScheduleItemContainer} from 'components/Schedules/ScheduleItemContainer';
 import {ServiceOrderView} from 'models/service-order';
-import {useTheme} from '@mui/material/styles';
 import {TechnicianView} from 'models/technician';
 import {ScheduleControls} from 'components/Schedules/ScheduleControls';
 import {ScheduleLabel} from 'components/Schedules/ScheduleLabel';

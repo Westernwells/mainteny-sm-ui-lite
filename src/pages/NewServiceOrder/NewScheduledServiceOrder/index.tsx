@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {
@@ -28,7 +27,7 @@ interface Props {
   type: Exclude<ServiceOrderType, ServiceOrderType.EMERGENCY>;
 }
 
-export const NewScheduledOrder = ({type}: Props) => {
+export const NewScheduledServiceOrder = ({type}: Props) => {
   const [activeStep, setActiveStep] = useState(0);
   const [selectedUnit, setSelectedUnit] = useState<ElevatorView>();
   const [disableNextBtn, setDisableNextBtn] = useState(false);

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {useCallback, useEffect, useRef, useState} from 'react';
 import Typography from '@mui/material/Typography';
 import * as _ from 'lodash';
@@ -18,12 +17,11 @@ import {FormRadio} from 'components/form/FormRadio';
 import Button from '@mui/material/Button';
 import RadioGroup from '@mui/material/RadioGroup';
 import useTheme from '@mui/material/styles/useTheme';
+import Divider from '@mui/material/Divider';
 import {AddTechnicianDialog} from './AddTechnicianDialog';
+import {TechnicianSchedule} from './TechnicianSchedule';
 import {ContainerCard} from './ContainerCard';
 import {ScheduleForm} from './ScheduleForm';
-import {PageCard} from 'components/PageCard';
-import {TechnicianSchedule} from './TechnicianSchedule';
-import Divider from '@mui/material/Divider';
 import {ScheduleTechnicianForm} from './models';
 import {constant} from './utils';
 
@@ -220,7 +218,9 @@ export const SelectTechnicians = ({
                     handleChange={(e) => {
                       setSelectedOptions(e.target.value);
                       setSelectedTechnicianIds([]);
-                      getSelectedTechnicians && getSelectedTechnicians([]);
+                      if (getSelectedTechnicians) {
+                        getSelectedTechnicians([]);
+                      }
                     }}
                     label={option.label}
                     radioProps={{
@@ -255,29 +255,27 @@ export const SelectTechnicians = ({
     order: ServiceOrderView,
     calcWidth: (startDateTime: string, endDateTime: string) => string,
     calcPosition: (startDateTime: string) => string,
-  ) => {
-    return (
-      <ScheduleItem
-        key={order.id}
-        height="30px"
-        titleLeftAdornment={
-          <ServiceOrderIcons
-            serviceOrderType={order.type}
-            style={{fontSize: '1rem'}}
-          />
-        }
-        title={order.elevator.propertyOwner.name}
-        subtitle={order.elevator.address.fullName}
-        width={calcWidth(
-          order.schedules[0].startTime,
-          order.schedules[0].endTime,
-        )}
-        tooltip={<OrderDetails order={order} />}
-        cardStatusAccent={serviceOrderStatusColor[order.status]}
-        position={calcPosition(order.schedules[0].startTime)}
-      />
-    );
-  };
+  ) => (
+    <ScheduleItem
+      key={order.id}
+      height="30px"
+      titleLeftAdornment={
+        <ServiceOrderIcons
+          serviceOrderType={order.type}
+          style={{fontSize: '1rem'}}
+        />
+      }
+      title={order.elevator.propertyOwner.name}
+      subtitle={order.elevator.address.fullName}
+      width={calcWidth(
+        order.schedules[0].startTime,
+        order.schedules[0].endTime,
+      )}
+      tooltip={<OrderDetails order={order} />}
+      cardStatusAccent={serviceOrderStatusColor[order.status]}
+      position={calcPosition(order.schedules[0].startTime)}
+    />
+  );
 
   return (
     <>
@@ -333,9 +331,11 @@ export const SelectTechnicians = ({
             }}
             getFormValues={(form: ScheduleTechnicianForm) => {
               getFormValue(form);
-              form.technicianId
-                ? setSelectedTechnicianIds([form.technicianId])
-                : setSelectedTechnicianIds([]);
+              if (form.technicianId) {
+                setSelectedTechnicianIds([form.technicianId]);
+              } else {
+                setSelectedTechnicianIds([]);
+              }
             }}
           />
         ) : null}

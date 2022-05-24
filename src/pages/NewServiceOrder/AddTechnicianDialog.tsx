@@ -1,5 +1,4 @@
-/*eslint-disable */
-import {SyntheticEvent, useCallback, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -7,16 +6,12 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
-import * as _ from 'lodash';
-import {useQueryServiceCompanyTechnicians} from 'hooks/reactQuery/useTechnician';
-import {createEmptyResource} from 'utils/paging-utils';
 import {TechnicianView} from 'models/technician';
 import Box from '@mui/material/Box';
 import {TechnicianAutoComplete} from './TechnicianAutoComplete';
 
 interface Props {
   open?: boolean;
-  // showSwitch?: boolean;
   getDialogState?: (val: boolean) => void;
   getTechnician?: (val: TechnicianView | null) => void;
 }
@@ -26,7 +21,6 @@ export const AddTechnicianDialog = ({
   getDialogState,
   getTechnician,
 }: Props) => {
-  const [query, setQuery] = useState<string>('');
   const [showModal, setShowModal] = useState(false);
   const [queryView, setQueryView] = useState('');
   const [technician, setTechnician] = useState<TechnicianView | null>(null);

@@ -5,7 +5,7 @@ import {useNavigate} from 'react-router';
 import {useSearchParams} from 'react-router-dom';
 import {ServiceOrderType} from 'models/service-order';
 import {convertToText} from 'utils/utils';
-import {NewScheduledOrder} from './NewScheduledOrder';
+import {NewScheduledServiceOrder} from './NewScheduledServiceOrder';
 import {NewEmergency} from './NewEmergency';
 
 export const NewServiceOrder = () => {
@@ -26,7 +26,7 @@ export const NewServiceOrder = () => {
       />
       {currentParams.type === 'emergency' ? <NewEmergency /> : null}
       {currentParams.type === 'callout' ? (
-        <NewScheduledOrder type={ServiceOrderType.CALLOUT} />
+        <NewScheduledServiceOrder type={ServiceOrderType.CALLOUT} />
       ) : null}
     </FlexContainer>
   );
