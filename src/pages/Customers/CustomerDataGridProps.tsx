@@ -88,7 +88,12 @@ export const columns: GridColDef[] = [
     flex: 2,
 
     renderCell: (params) => (
-      <StatusChip color="success" label={convertToText(params.value)} />
+      <StatusChip
+        label={convertToText(params.value)}
+        color="success"
+        variant="filled"
+        maxChars={8}
+      />
     ),
   },
   {
@@ -112,7 +117,7 @@ export const columns: GridColDef[] = [
           e.stopPropagation();
           window.open(`mailto:${params.value}`, '_blank');
         }}>
-        <SendIcon sx={{color: 'info.main'}} />
+        <SendIcon sx={{color: 'action.active'}} />
       </IconButton>
     ),
   },

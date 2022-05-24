@@ -2,16 +2,27 @@ import Chip from '@mui/material/Chip';
 import {ReactNode} from 'react';
 
 const statusWidth = {
+  auto: 'auto',
   short: '6rem',
   medium: '8rem',
   long: '10rem',
 };
 
+const statusColor = {
+  default: 'grey.400',
+  primary: 'primary.main',
+  secondary: 'secondary.main',
+  error: 'error.light',
+  info: 'text.secondary',
+  success: 'success.main',
+  warning: 'warning.light',
+};
 interface Props {
   label: string | ReactNode;
   style?: {[key: string]: any};
-  length?: 'short' | 'medium' | 'long';
+  length?: 'short' | 'medium' | 'long' | 'auto';
   size?: 'small' | 'medium';
+  variant?: 'outlined' | 'filled';
   color?:
     | 'default'
     | 'primary'
@@ -20,14 +31,31 @@ interface Props {
     | 'info'
     | 'success'
     | 'warning';
+  maxChars?: number;
 }
 
-export const StatusChip = ({label, color, length, style, size}: Props) => (
+export const StatusChip = ({
+  label,
+  style,
+  maxChars,
+  size = 'small',
+  color = 'default',
+  variant = 'outlined',
+  length = 'auto',
+}: Props) => (
   <Chip
-    sx={{width: length ? statusWidth[length] : statusWidth.short, ...style}}
-    variant="outlined"
+    sx={{
+      bgcolor: variant === 'filled' ? statusColor[color] : undefined,
+      borderColor: variant === 'outlined' ? statusColor[color] : undefined,
+      color:
+        variant === 'outlined' ? statusColor[color] : 'primary.contrastText',
+      width: maxChars ? `calc(${maxChars}ch + .5em)` : statusWidth[length],
+      boxShadow: 0,
+      px: '0.25em',
+      ...style,
+    }}
+    variant={variant}
     label={label}
-    color={color}
-    size={size && size}
+    size={size}
   />
 );

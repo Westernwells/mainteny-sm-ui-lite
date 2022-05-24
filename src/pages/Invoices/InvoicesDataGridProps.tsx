@@ -5,7 +5,6 @@ import {
   GridRenderCellParams,
   GridRowsProp,
 } from '@mui/x-data-grid';
-import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import {StatusChip} from 'components/StatusChip';
@@ -143,24 +142,17 @@ export const columns: GridColDef[] = [
         {params.colDef.headerName}
       </Typography>
     ),
-    renderCell: (params: GridRenderCellParams<any, any, any>) => {
-      const theme = useTheme();
-      return (
-        <StatusChip
-          label={
-            params.value === InvoiceStatus.PAID
-              ? convertToText(InvoiceStatusView.PAID)
-              : convertToText(InvoiceStatusView.NOT_PAID)
-          }
-          style={{
-            color:
-              params.value === InvoiceStatus.PAID
-                ? theme.palette.success.main
-                : theme.state.ratingActive,
-          }}
-        />
-      );
-    },
+    renderCell: (params: GridRenderCellParams<any, any, any>) => (
+      <StatusChip
+        label={
+          params.value === InvoiceStatus.PAID
+            ? convertToText(InvoiceStatusView.PAID)
+            : convertToText(InvoiceStatusView.NOT_PAID)
+        }
+        variant="filled"
+        color={params.value === InvoiceStatus.PAID ? 'success' : 'warning'}
+      />
+    ),
   },
   {
     field: 'actions',
@@ -178,7 +170,7 @@ export const columns: GridColDef[] = [
     ),
     renderCell: () => (
       <FileDownloadOutlinedIcon
-        sx={{color: '#2196F3'}}
+        sx={{color: 'action.active'}}
         onClick={() =>
           window.open(
             `${process.env.REACT_APP_BASE_URL}/INV000128.pdf`,

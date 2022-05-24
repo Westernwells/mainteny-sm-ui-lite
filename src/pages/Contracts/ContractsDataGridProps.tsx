@@ -95,7 +95,7 @@ export const columns: GridColDef[] = [
     ),
     renderCell: () => (
       <FileDownloadOutlinedIcon
-        sx={{color: '#2196F3'}}
+        sx={{color: 'action.active'}}
         onClick={() => console.log('ACTION: Download')}
       />
     ),

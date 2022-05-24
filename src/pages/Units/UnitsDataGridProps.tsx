@@ -7,7 +7,7 @@ import {
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 import Elevator from '@mui/icons-material/Elevator';
-import Chip from '@mui/material/Chip';
+import {StatusChip} from 'components/StatusChip';
 import {formatDate} from 'utils/datetime';
 import {convertToText} from 'utils/utils';
 import {getElevatorStatusChipColor} from 'utils/elevator-utils';
@@ -109,8 +109,8 @@ export const columns: GridColDef[] = [
       </Typography>
     ),
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
-      <Chip
-        variant="outlined"
+      <StatusChip
+        variant="filled"
         label={convertToText(params.value)}
         color={getElevatorStatusChipColor(params.value)}
       />
