@@ -334,22 +334,18 @@ export interface AssignmentBasedOrderBody {
   type: ServiceOrderType;
 }
 
-export interface ScheduleServiceOrderBody {
-  // "description": "string",
-  // "elevatorId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  // "endTime": "2022-05-24T01:20:54.893Z",
-  // "externalId": "string",
-  // "labels": [
-  //   "string"
-  // ],
-  // "moreInformation": "string",
-  // "priority": "A",
-  // "requireReschedule": true,
-  // "requireTechnicianNotification": true,
-  // "serviceCompanyId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  // "startTime": "2022-05-24T01:20:54.893Z",
-  // "technicianIds": [
-  //   "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-  // ],
-  // "type": "CALLOUT"
+export interface CreateScheduledServiceOrderBody {
+  description: string;
+  elevatorId: string;
+  endTime: string;
+  externalId: string;
+  labels?: string[];
+  moreInformation?: string;
+  priority: ServiceOrderPriority;
+  requireReschedule: boolean;
+  requireTechnicianNotification: boolean;
+  serviceCompanyId: string;
+  startTime: string;
+  technicianIds: string[];
+  type: ServiceOrderType;
 }

@@ -1,13 +1,16 @@
 /* eslint-disable */
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
-import {useAssignmentBasedOrder} from 'hooks/reactQuery/useServiceOrder';
+import {
+  useAssignmentBasedOrder,
+  useCreateScheduledServiceOrder,
+} from 'hooks/reactQuery/useServiceOrder';
 import {ElevatorView} from 'models/elevator';
 import {TechnicianView} from 'models/technician';
 import {useEffect, useState} from 'react';
 import {ServiceOrderPriority, ServiceOrderType} from 'models/service-order';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {toRestDateTime} from 'utils/datetime';
+import {formatDate, setDateTime, toRestDateTime} from 'utils/datetime';
 import {useNavigate} from 'react-router';
 import {AddDescription} from '../AddDescription';
 import {SelectTechnicians} from '../SelectTechnicians';
@@ -34,8 +37,12 @@ export const NewCallout = () => {
   );
   const [formErrored, setFormErrored] = useState<boolean>(false);
   const {mutateAsync: createImmediateCalloutOrder} = useAssignmentBasedOrder(
-    'Callout order created',
+    'Order created successfully',
   );
+
+  const {mutateAsync: createScheduledServiceOrder} =
+    useCreateScheduledServiceOrder('Order scheduled successfully');
+
   const [recommendedTechnicians, setRecommendedTechnicians] = useState<
     TechnicianView[]
   >([]);
@@ -79,12 +86,44 @@ export const NewCallout = () => {
     navigate('/orders?pageIndex=1&pageSize=25&tab=1');
   };
 
+  const createScheduledCalloutOrder = async () => {
+    const serviceCompanyId = user?.userAccount.serviceCompany.id!;
+    const startTime = setDateTime(
+      formValue!.date!,
+      formatDate(formValue!.startTime!, 'HH:mm')!,
+    ).toISOString();
+    const endTime = setDateTime(
+      formValue!.date!,
+      formatDate(formValue!.endTime!, 'HH:mm')!,
+    ).toISOString();
+    const body = {
+      description,
+      elevatorId: selectedUnit!.id,
+      externalId: '',
+      priority: ServiceOrderPriority.A,
+      serviceCompanyId,
+      technicianIds: selectedTechnicians.map((item) => item.id),
+      type: ServiceOrderType.CALLOUT,
+      requireReschedule: true,
+      requireTechnicianNotification: true,
+      startTime,
+      endTime,
+      // endTime: string;
+      // startTime: string;
+    };
+
+    console.log(body, '!!!!!@@');
+    // await createScheduledServiceOrder(body)
+  };
+
   return (
     <Stepper
       handleCancel={handleCancel}
       handleSubmit={async () => {
         if (selectedRadioOption === constant.IMMEDIATE) {
           await createNewImmediateCalloutOrder();
+        } else {
+          await createScheduledCalloutOrder();
         }
       }}
       disableNextBtn={disableNextBtn}

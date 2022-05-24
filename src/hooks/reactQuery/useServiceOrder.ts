@@ -32,6 +32,7 @@ import {
   ServiceOrderReport,
   ServiceOrderScheduleParams,
   ServiceOrderView,
+  CreateScheduledServiceOrderBody,
 } from '../../models/service-order';
 import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
@@ -535,6 +536,35 @@ export const useAssignmentBasedOrder = (successMsg: string) => {
   const {enqueueSnackbar} = useSnackbar();
   return useMutation(
     (body: AssignmentBasedOrderBody) => createAssignmentBasedOrder(body),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+const createScheduledServiceOrder = async (
+  body: CreateScheduledServiceOrderBody,
+) => {
+  await axiosClient.post<StringValue>('/api/serviceOrders/scheduled', {
+    ...body,
+  });
+};
+
+export const useCreateScheduledServiceOrder = (successMsg: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    (body: CreateScheduledServiceOrderBody) =>
+      createScheduledServiceOrder(body),
     {
       onSuccess: () => {
         enqueueSnackbar(successMsg, {
