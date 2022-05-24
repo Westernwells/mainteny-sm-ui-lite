@@ -23,7 +23,7 @@ import {toDate, toRestDate} from 'utils/datetime';
 import {useSnackbar} from 'notistack';
 import {
   AssignmentBasedOrderBody,
-  CreateServiceOrderBody,
+  UpdateServiceOrderBody,
   RedispatchParams,
   ServiceOrder,
   ServiceOrderActivityView,
@@ -32,6 +32,7 @@ import {
   ServiceOrderReport,
   ServiceOrderScheduleParams,
   ServiceOrderView,
+  CreateScheduledServiceOrderBody,
 } from '../../models/service-order';
 import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
@@ -486,8 +487,8 @@ export const useRedispatchServiceOrders = (successMsg: string) => {
   );
 };
 
-const createServiceOrder = async (
-  body: CreateServiceOrderBody,
+const updateServiceOrder = async (
+  body: UpdateServiceOrderBody,
   serviceOrderId: string,
 ) => {
   await axiosClient.put<StringValue>(
@@ -496,7 +497,7 @@ const createServiceOrder = async (
   );
 };
 
-export const useCreateServiceOrder = (successMsg: string) => {
+export const useUpdateServiceOrder = (successMsg: string) => {
   const queryClient = useQueryClient();
   const {enqueueSnackbar} = useSnackbar();
   return useMutation(
@@ -504,9 +505,9 @@ export const useCreateServiceOrder = (successMsg: string) => {
       body,
       serviceOrderId,
     }: {
-      body: CreateServiceOrderBody;
+      body: UpdateServiceOrderBody;
       serviceOrderId: string;
-    }) => createServiceOrder(body, serviceOrderId),
+    }) => updateServiceOrder(body, serviceOrderId),
     {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
@@ -535,6 +536,35 @@ export const useAssignmentBasedOrder = (successMsg: string) => {
   const {enqueueSnackbar} = useSnackbar();
   return useMutation(
     (body: AssignmentBasedOrderBody) => createAssignmentBasedOrder(body),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+const createScheduledServiceOrder = async (
+  body: CreateScheduledServiceOrderBody,
+) => {
+  await axiosClient.post<StringValue>('/api/serviceOrders/scheduled', {
+    ...body,
+  });
+};
+
+export const useCreateScheduledServiceOrder = (successMsg: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    (body: CreateScheduledServiceOrderBody) =>
+      createScheduledServiceOrder(body),
     {
       onSuccess: () => {
         enqueueSnackbar(successMsg, {

@@ -30,7 +30,7 @@ export const ServiceOrders = () => {
 
   const menu = useRef([
     {label: 'Emergency', action: () => navigate('/orders/new?type=emergency')},
-    {label: 'Callout', action: () => {}},
+    {label: 'Callout', action: () => navigate('/orders/new?type=callout')},
     {label: 'Repair', action: () => {}},
     {label: 'Regular', action: () => {}},
   ]).current;

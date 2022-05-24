@@ -314,7 +314,7 @@ export interface RedispatchParams {
   serviceOrderId: string;
 }
 
-export interface CreateServiceOrderBody {
+export interface UpdateServiceOrderBody {
   endTime: string;
   startTime: string;
   technicianIds: string[];
@@ -331,5 +331,21 @@ export interface AssignmentBasedOrderBody {
   serviceCompanyId: string;
   technicianIds: string[];
   time: string;
+  type: ServiceOrderType;
+}
+
+export interface CreateScheduledServiceOrderBody {
+  description: string;
+  elevatorId: string;
+  endTime: string;
+  externalId: string;
+  labels?: string[];
+  moreInformation?: string;
+  priority: ServiceOrderPriority;
+  requireReschedule: boolean;
+  requireTechnicianNotification: boolean;
+  serviceCompanyId: string;
+  startTime: string;
+  technicianIds: string[];
   type: ServiceOrderType;
 }

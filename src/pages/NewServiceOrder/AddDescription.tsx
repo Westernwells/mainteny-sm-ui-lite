@@ -29,7 +29,7 @@ export const AddDescription = ({
   }, [description]);
 
   const summaryList = (value: string) => (
-    <Typography variant="body2" color="grey.700" sx={{mt: '0.2em'}}>
+    <Typography key={value} variant="body2" color="grey.700" sx={{mt: '0.2em'}}>
       {value}
     </Typography>
   );

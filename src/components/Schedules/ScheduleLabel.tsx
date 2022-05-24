@@ -6,8 +6,8 @@ import {formatDate} from 'utils/datetime';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 
 interface Props {
-  scheduleType: 'date' | 'people' | 'default';
-  item: string;
+  scheduleType?: 'date' | 'people' | 'default';
+  item?: string;
   scheduleItems: {[key: string]: ServiceOrderView[]};
   makeLabelSelectable?: boolean;
   checkboxValue?: string;
@@ -17,12 +17,12 @@ interface Props {
 }
 
 export const ScheduleLabel = ({
-  scheduleType,
-  item,
+  scheduleType = 'default',
+  item = '',
   scheduleItems,
   makeLabelSelectable,
   checkboxValue = '',
-  getCheckedValue,
+  getCheckedValue = () => {},
   id,
   checkedValues = [],
 }: Props) => {

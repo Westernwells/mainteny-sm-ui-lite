@@ -40,31 +40,34 @@ export const PageCard = ({
         boxShadow: '0px 4px 15px rgba(144, 144, 144, 0.2)',
         ...containerStyles,
       }}>
-      <CardHeader
-        sx={{
-          height: '2rem',
-          mt: '1em',
-          mx: '0.5em',
-          ...headerContainerOverrideStyles,
-        }}
-        action={
-          headerActionIcon ? (
-            <IconButton aria-label="settings">{headerActionIcon}</IconButton>
-          ) : null
-        }
-        title={
-          customHeader || (
-            <Typography
-              variant="subtitle2"
-              sx={{
-                color: theme.palette.text.primary,
-                ...headerTextOverrideStyles,
-              }}>
-              {headerLabel}
-            </Typography>
-          )
-        }
-      />
+      {customHeader || headerLabel ? (
+        <CardHeader
+          sx={{
+            minHeight: '2rem',
+            mt: '1em',
+            mx: '0.5em',
+            ...headerContainerOverrideStyles,
+          }}
+          action={
+            headerActionIcon ? (
+              <IconButton aria-label="settings">{headerActionIcon}</IconButton>
+            ) : null
+          }
+          title={
+            customHeader || (
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  color: theme.palette.text.primary,
+                  ...headerTextOverrideStyles,
+                }}>
+                {headerLabel}
+              </Typography>
+            )
+          }
+        />
+      ) : null}
+
       <CardContent
         sx={{
           mx: '0.5em',

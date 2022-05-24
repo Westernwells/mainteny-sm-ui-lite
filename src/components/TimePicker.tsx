@@ -1,9 +1,8 @@
-import * as React from 'react';
 import TextField from '@mui/material/TextField';
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {TimePicker as MuiTimePicker} from '@mui/x-date-pickers/TimePicker';
-import {useEffect} from 'react';
+import {FocusEvent, useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 
 interface Props {
@@ -13,6 +12,8 @@ interface Props {
   containerStyles?: {[key: string]: any};
   inputName: string;
   inputError?: string;
+  fieldStyles?: {[key: string]: any};
+  handleBlur?: (e: FocusEvent<any, Element>) => void;
 }
 
 export const TimePicker = ({
@@ -22,8 +23,10 @@ export const TimePicker = ({
   containerStyles,
   inputName,
   inputError,
+  handleBlur,
+  fieldStyles,
 }: Props) => {
-  const [value, setValue] = React.useState<Date | null>(null);
+  const [value, setValue] = useState<Date | null>(null);
 
   useEffect(() => {
     if (defaultTime) {
@@ -53,8 +56,10 @@ export const TimePicker = ({
               size="small"
               {...params}
               name={inputName}
+              sx={{...fieldStyles}}
               error={!!inputError}
               helperText={inputError}
+              onBlur={handleBlur}
             />
           )}
         />
