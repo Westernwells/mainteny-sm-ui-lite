@@ -64,6 +64,7 @@ export const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
         label={convertToText(params.value)}
+        variant="filled"
         color={
           params.value === ElevatorStatus.RUNNING
             ? 'success'

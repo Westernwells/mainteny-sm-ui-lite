@@ -114,6 +114,7 @@ export const columns: GridColDef[] = [
         color={getServiceOrderStatusColor(params.value)}
         style={sx.orderStatus}
         label={serviceOrderStatusToString(params.value)}
+        variant="filled"
       />
     ),
   },
