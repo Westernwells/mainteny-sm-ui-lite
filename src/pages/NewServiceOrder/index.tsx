@@ -31,6 +31,10 @@ export const NewServiceOrder = () => {
       {currentParams.type === 'repair' ? (
         <ScheduleServiceOrder type={ServiceOrderType.REPAIR} />
       ) : null}
+
+      {currentParams.type === 'regular' ? (
+        <ScheduleServiceOrder type={ServiceOrderType.REGULAR} />
+      ) : null}
     </FlexContainer>
   );
 };
