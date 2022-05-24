@@ -193,7 +193,8 @@ export const makeRows = (invoices: any): GridRowsProp =>
         // serviceType: item.serviceOrder.type,
         amount: `${formatCurrency(
           item
-            ? item.totalAmount.amount / 10 ** item.totalAmount.fractionDigits!
+            ? item.totalAmount.netAmount /
+                10 ** item.totalAmount.fractionDigits!
             : 0,
           {
             currency: item.totalAmount.currency,

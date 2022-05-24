@@ -37,7 +37,7 @@ export const filterByAmount = (
 ) =>
   invoicesRes.data.filter((item) => {
     const value =
-      item.totalAmount.amount / 10 ** item.totalAmount.fractionDigits!;
+      item.totalAmount.netAmount / 10 ** item.totalAmount.fractionDigits!;
     return value >= amount[0] && value <= amount[1];
   });
 

@@ -107,9 +107,12 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
         manufacturer: item.manufacture,
         description: item.description,
         price: `${formatCurrency(
-          item ? item.unitSellingPrice.grossAmount! : 0,
+          item
+            ? item.unitSellingAmount.netAmount /
+                10 ** item.unitSellingAmount.fractionDigits!
+            : 0,
           {
-            currency: item.unitSellingPrice.currency,
+            currency: item.unitSellingAmount.currency,
           },
         )}`,
         article: item,

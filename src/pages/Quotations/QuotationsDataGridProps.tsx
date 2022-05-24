@@ -152,9 +152,14 @@ export const makeRows = (quotations: Resource<QuotationView>): GridRowsProp =>
     customer: item.elevator.propertyOwner.name,
     address: item.elevator.propertyOwner.address.fullName,
     createdDate: formatDate(item.meta.createdAt),
-    amount: `${formatCurrency(item ? item.totalAmount.grossAmount : 0, {
-      currency: item.totalAmount.currency,
-    })}`,
+    amount: `${formatCurrency(
+      item
+        ? item.totalAmount.netAmount / 10 ** item.totalAmount.fractionDigits!
+        : 0,
+      {
+        currency: item.totalAmount.currency,
+      },
+    )}`,
     status: item.status,
     navigateTo: `details/${item.id}`,
   }));

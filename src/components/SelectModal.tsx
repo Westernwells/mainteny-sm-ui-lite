@@ -5,7 +5,6 @@ import Fade from '@mui/material/Fade';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import {SearchInput} from './SearchInput';
 
 interface Props {
   children: ReactNode;
@@ -64,7 +63,6 @@ export const SelectModal = ({
           minHeight="max(50vh, 300px)"
           sx={{overflowY: isScrollable ? 'scroll' : 'hidden'}}
           flexGrow={1}>
-          <SearchInput placeholder="search" />
           {children}
         </Box>
       </Box>

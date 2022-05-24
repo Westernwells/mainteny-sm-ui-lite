@@ -77,7 +77,7 @@ export const QuotationRow = ({
         />
         <TextField defaultValue="pau" size="small" sx={{maxWidth: '10ch'}} />
         <TextField
-          value={quotationItem.unitSellingPrice.amount}
+          value={quotationItem.unitAmount.netAmount}
           size="small"
           sx={{maxWidth: '10ch'}}
           InputProps={{
@@ -85,7 +85,7 @@ export const QuotationRow = ({
           }}
         />
         <TextField
-          value={quotationItem.unitSellingPrice.amount * quantity}
+          value={quotationItem.unitAmount.netAmount * quantity}
           size="small"
           disabled
           sx={{maxWidth: '10ch', justifySelf: 'end'}}

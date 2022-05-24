@@ -101,7 +101,7 @@ export const QuotationDetails = () => {
       id: article.id,
       quantity: 0,
       quotationId: '',
-      unitSellingPrice: article.unitSellingPrice,
+      unitAmount: article.unitSellingAmount,
     });
     if (
       quotationItems.filter((item) => item.article.id === row.id).length === 0
@@ -127,7 +127,7 @@ export const QuotationDetails = () => {
 
       setTotalPrice(
         quotationItems
-          .map((item) => item.quantity * item.unitSellingPrice.amount)
+          .map((item) => item.quantity * item.unitAmount.netAmount)
           .reduce((prevValue, currentValue) => prevValue + currentValue, sum),
       );
     }
@@ -136,10 +136,10 @@ export const QuotationDetails = () => {
       quotationItems.map((item) => ({
         articleId: item.article.id,
         quantity: item.quantity,
-        sellingVat: item.article.unitSellingPrice.vat,
+        sellingVat: item.article.unitSellingAmount.vat,
         unitSellingPrice: {
-          amount: item.article.unitSellingPrice.amount,
-          currency: item.article.unitSellingPrice.currency,
+          amount: item.article.unitSellingAmount.netAmount,
+          currency: item.article.unitSellingAmount.currency,
         },
       })),
       true,

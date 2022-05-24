@@ -1,4 +1,4 @@
-import {Fee, Meta, PdfGenerationStatus} from './misc';
+import {Amount, Fee, Meta, PdfGenerationStatus} from './misc';
 import {PropertyOwner} from './propertyManager';
 import {ServiceCompanySimpleView} from './service-company';
 import {ServiceOrderView, ServiceOrderType} from './service-order';
@@ -32,7 +32,7 @@ export interface InvoiceView {
   id: string;
   number: string;
   description: string;
-  totalAmount: Fee;
+  totalAmount: Amount;
   issuedDate: string;
   status: InvoiceStatus;
   serviceCompany: ServiceCompanySimpleView;
