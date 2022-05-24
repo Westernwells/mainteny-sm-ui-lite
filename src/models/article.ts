@@ -1,4 +1,4 @@
-import {Meta, Price} from './misc';
+import {Amount, Meta, Price} from './misc';
 
 export enum ArticleType {
   PACKAGE = 'PACKAGE',
@@ -32,8 +32,8 @@ export interface ArticleView {
   supplier: string;
   type: ArticleType;
   unit: string;
-  unitPurchasePrice: Price;
-  unitSellingPrice: Price;
+  unitPurchaseAmount: Amount;
+  unitSellingAmount: Amount;
 }
 
 export interface ArticleViewItem {
@@ -57,8 +57,8 @@ export interface Article {
   supplier: string;
   type: ArticleType;
   unit: string;
-  unitPurchasePrice: Price;
-  unitSellingPrice: Price;
+  unitPurchaseAmount: Amount;
+  unitSellingAmount: Amount;
 }
 
 export interface QueryArticleParams {

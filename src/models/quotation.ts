@@ -1,6 +1,6 @@
 import {Article} from './article';
 import {Elevator} from './elevator';
-import {Meta, Money, Price} from './misc';
+import {Amount, Meta, Money} from './misc';
 import {ServiceCompanySimpleView} from './service-company';
 
 export enum QuotationStatus {
@@ -18,7 +18,7 @@ export interface QuotationItem {
   id: string;
   quantity: number;
   quotationId: string;
-  unitSellingPrice: Price;
+  unitAmount: Amount;
 }
 
 export interface QuotationItemRecord {
@@ -36,7 +36,7 @@ export interface QuotationView {
   externalId: string;
   description: string;
   status: QuotationStatus;
-  totalAmount: Price;
+  totalAmount: Amount;
   additionalInfo: QuotationAdditionalInfo;
   search: string;
   meta: Meta;

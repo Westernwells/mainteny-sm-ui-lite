@@ -92,7 +92,7 @@ export const InvoiceDetails = () => {
                     bodyText={`
                       ${formatCurrency(
                         invoice
-                          ? invoice!.totalAmount.amount /
+                          ? invoice!.totalAmount.netAmount /
                               10 ** invoice!.totalAmount.fractionDigits!
                           : 0,
                         {
