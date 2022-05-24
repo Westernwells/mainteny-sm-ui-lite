@@ -112,10 +112,10 @@ export const NewScheduledOrder = ({type}: Props) => {
       requireTechnicianNotification: true,
       startTime,
       endTime,
-      // endTime: string;
-      // startTime: string;
     };
-    // await createScheduledServiceOrder(body)
+    console.log(body);
+    await createScheduledServiceOrder(body);
+    navigate('/orders?pageIndex=1&pageSize=25&tab=1');
   };
 
   return (

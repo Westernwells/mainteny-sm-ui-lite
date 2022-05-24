@@ -48,12 +48,6 @@ interface CheckBoxState {
 
 const otherOptions = [
   {
-    value: constant.IMMEDIATE,
-    label: 'Immediate',
-    subText:
-      ' Select a technician for attending this service order immediately',
-  },
-  {
     value: constant.SCHEDULE_TECHNICIAN,
     label: 'Choose a Date, Time & Technician',
     subText: `Select a specific date, time and technician and update the
