@@ -10,9 +10,11 @@ interface Props {
   getSelectedDate: (state: Date | null) => void;
   label: string;
   containerStyles?: {[key: string]: any};
+  fieldStyles?: {[key: string]: any};
   inputName: string;
   inputError?: string;
   handleBlur?: (e: FocusEvent<any, Element>) => void;
+  minDate?: Date;
 }
 
 export const DatePicker = ({
@@ -23,6 +25,8 @@ export const DatePicker = ({
   containerStyles,
   inputError,
   handleBlur,
+  fieldStyles,
+  minDate,
 }: Props) => {
   const [value, setValue] = useState<Date | null>(null);
 
@@ -44,6 +48,7 @@ export const DatePicker = ({
           inputFormat="dd.MM.yyy"
           label={label}
           value={value}
+          minDate={minDate}
           onChange={(newValue) => {
             setValue(newValue);
           }}
@@ -52,6 +57,7 @@ export const DatePicker = ({
               size="small"
               {...params}
               name={inputName}
+              sx={{...fieldStyles}}
               error={!!inputError}
               helperText={inputError}
               onBlur={handleBlur}

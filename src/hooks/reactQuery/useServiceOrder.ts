@@ -23,7 +23,7 @@ import {toDate, toRestDate} from 'utils/datetime';
 import {useSnackbar} from 'notistack';
 import {
   AssignmentBasedOrderBody,
-  CreateServiceOrderBody,
+  UpdateServiceOrderBody,
   RedispatchParams,
   ServiceOrder,
   ServiceOrderActivityView,
@@ -486,8 +486,8 @@ export const useRedispatchServiceOrders = (successMsg: string) => {
   );
 };
 
-const createServiceOrder = async (
-  body: CreateServiceOrderBody,
+const updateServiceOrder = async (
+  body: UpdateServiceOrderBody,
   serviceOrderId: string,
 ) => {
   await axiosClient.put<StringValue>(
@@ -496,7 +496,7 @@ const createServiceOrder = async (
   );
 };
 
-export const useCreateServiceOrder = (successMsg: string) => {
+export const useUpdateServiceOrder = (successMsg: string) => {
   const queryClient = useQueryClient();
   const {enqueueSnackbar} = useSnackbar();
   return useMutation(
@@ -504,9 +504,9 @@ export const useCreateServiceOrder = (successMsg: string) => {
       body,
       serviceOrderId,
     }: {
-      body: CreateServiceOrderBody;
+      body: UpdateServiceOrderBody;
       serviceOrderId: string;
-    }) => createServiceOrder(body, serviceOrderId),
+    }) => updateServiceOrder(body, serviceOrderId),
     {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);

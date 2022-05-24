@@ -90,23 +90,7 @@ export const ContainerCard = ({
       ) : null}
 
       <Box ref={elementRef} sx={[sx.mainContainer, {...contentContainerStyle}]}>
-        <CardContent sx={{padding: 0}}>
-          {children}
-          {
-            // !hideSchedule ? (
-            //   // <TechnicianSchedule
-            //   //   scheduleItems={scheduleItems}
-            //   //   renderCellItem={renderCellItem}
-            //   //   defaultTypeLabel={defaultTypeLabel}
-            //   //   labelWidth={labelWidth}
-            //   //   getCheckedValue={getCheckedValue}
-            //   //   cellHeight={cellHeight}
-            //   //   technicians={technicians}
-            //   //   checkedValues = {checkedValues}
-            //   // />
-            // ) : null
-          }
-        </CardContent>
+        <CardContent sx={{padding: 0}}>{children}</CardContent>
 
         {cardFooter ? (
           <Box sx={[sx.footerContainer, footerContainerStyles || {}]}>

@@ -12,6 +12,7 @@ interface Props {
   containerStyles?: {[key: string]: any};
   inputName: string;
   inputError?: string;
+  fieldStyles?: {[key: string]: any};
   handleBlur?: (e: FocusEvent<any, Element>) => void;
 }
 
@@ -23,6 +24,7 @@ export const TimePicker = ({
   inputName,
   inputError,
   handleBlur,
+  fieldStyles,
 }: Props) => {
   const [value, setValue] = useState<Date | null>(null);
 
@@ -54,6 +56,7 @@ export const TimePicker = ({
               size="small"
               {...params}
               name={inputName}
+              sx={{...fieldStyles}}
               error={!!inputError}
               helperText={inputError}
               onBlur={handleBlur}

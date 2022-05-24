@@ -1,4 +1,10 @@
-import {SyntheticEvent, useCallback, useEffect, useState} from 'react';
+import {
+  FocusEvent,
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import * as _ from 'lodash';
@@ -10,12 +16,18 @@ interface Props {
   getTechnician?: (val: TechnicianView | null) => void;
   getQuery?: (val: string) => void;
   label?: string;
+  fieldStyles?: {[key: string]: any};
+  inputError?: string;
+  handleBlur?: (e: FocusEvent<any, Element>) => void;
 }
 
 export const TechnicianAutoComplete = ({
   getTechnician,
   label = '',
   getQuery = () => {},
+  fieldStyles,
+  inputError,
+  handleBlur,
 }: Props) => {
   const [query, setQuery] = useState<string>('');
   const [queryView, setQueryView] = useState('');
@@ -58,7 +70,7 @@ export const TechnicianAutoComplete = ({
       clearOnBlur={false}
       disablePortal
       id="combo-box-demo"
-      sx={{minWidth: 500, minHeight: 100}}
+      sx={{minHeight: 100}}
       options={techniciansResource.data}
       onChange={(event: any, newValue: TechnicianView | null) => {
         setTechnician(newValue);
@@ -69,7 +81,15 @@ export const TechnicianAutoComplete = ({
       onInputChange={onInputChange}
       inputValue={queryView}
       renderInput={(params) => (
-        <TextField {...params} label={label} name="technicianId" />
+        <TextField
+          {...params}
+          label={label}
+          name="technicianId"
+          sx={{...fieldStyles}}
+          error={!!inputError}
+          helperText={inputError}
+          onBlur={handleBlur}
+        />
       )}
     />
   );

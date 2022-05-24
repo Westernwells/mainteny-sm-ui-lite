@@ -10,7 +10,7 @@ import {CardProps} from 'components/CardProps';
 import {Confirm} from 'components/Confirm';
 import {
   useCancelServiceOrders,
-  useCreateServiceOrder,
+  useUpdateServiceOrder,
   useRedispatchServiceOrders,
   useUnscheduleServiceOrders,
 } from 'hooks/reactQuery/useServiceOrder';
@@ -40,8 +40,8 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const {mutate: rescheduleServiceOrder} = useRedispatchServiceOrders(
     'Service order rescheduled successfully',
   );
-  const {mutate: scheduleServiceOrder} = useCreateServiceOrder(
-    'Service order created successfully',
+  const {mutate: scheduleServiceOrder} = useUpdateServiceOrder(
+    'Service order scheduled successfully',
   );
   const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
   const [openUnscheduleConfirm, setOpenUnscheduleConfirm] = useState(false);

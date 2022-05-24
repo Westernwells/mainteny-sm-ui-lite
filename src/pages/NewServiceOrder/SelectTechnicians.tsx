@@ -23,26 +23,27 @@ import {ContainerCard} from './ContainerCard';
 import {ScheduleForm} from './ScheduleForm';
 import {PageCard} from 'components/PageCard';
 import {TechnicianSchedule} from './TechnicianSchedule';
+import Divider from '@mui/material/Divider';
+import {ScheduleTechnicianForm} from './models';
+import {constant} from './utils';
 
 interface Props {
   elevatorId?: string;
-  initialSelectedTechnicians: TechnicianView[];
+  initialSelectedTechnicians?: TechnicianView[];
   getSelectedTechnicians?: (val: TechnicianView[]) => void;
   getRecommendedTechnicianView?: (val: TechnicianView[]) => void;
-  initialRecommendedTechnicians: TechnicianView[];
+  initialRecommendedTechnicians?: TechnicianView[];
   showOptions?: boolean;
   defaultOption?: string;
+  getFormValue?: (form: ScheduleTechnicianForm) => void;
+  formIsErrored?: (value: boolean) => void;
+  getSelectedRadioOption?: (val: string) => void;
 }
 
 interface CheckBoxState {
   checked: boolean;
   value: string;
 }
-
-const constant = {
-  IMMEDIATE: 'immediate',
-  SCHEDULE_TECHNICIAN: 'schedule technician',
-};
 
 const options = [
   {
@@ -67,6 +68,9 @@ export const SelectTechnicians = ({
   initialSelectedTechnicians,
   showOptions,
   defaultOption = '',
+  getFormValue = () => {},
+  formIsErrored,
+  getSelectedRadioOption,
 }: Props) => {
   const theme = useTheme();
   const time = useRef(toRestDateTime(new Date())).current;
@@ -88,7 +92,7 @@ export const SelectTechnicians = ({
   const [page] = useState(makePage(0, 500));
   const [recommendedTechniciansView, setRecommendedTechniciansView] = useState<
     TechnicianView[]
-  >(initialRecommendedTechnicians);
+  >(initialRecommendedTechnicians || []);
   const {data: recommendedTechnicians = []} = useFetchRecommendedTechnician(
     {
       time,
@@ -113,15 +117,22 @@ export const SelectTechnicians = ({
   }, [recommendedTechniciansView]);
 
   useEffect(() => {
-    setSelectedTechnicianIds(initialSelectedTechnicians.map((item) => item.id));
+    setSelectedTechnicianIds(
+      initialSelectedTechnicians
+        ? initialSelectedTechnicians.map((item) => item.id)
+        : [],
+    );
   }, []);
 
   useEffect(() => {
     if (getSelectedTechnicians) {
-      const result = recommendedTechniciansView.filter((item) =>
-        selectedTechnicianIds.includes(item.id),
-      );
-      getSelectedTechnicians(result);
+      if (selectedOptions === constant.IMMEDIATE) {
+        const result = recommendedTechniciansView.filter((item) =>
+          selectedTechnicianIds.includes(item.id),
+        );
+
+        getSelectedTechnicians(result);
+      }
     }
   }, [selectedTechnicianIds]);
 
@@ -157,6 +168,12 @@ export const SelectTechnicians = ({
   }, [newTechnician]);
 
   useEffect(() => {
+    if (getSelectedRadioOption) {
+      getSelectedRadioOption(selectedOptions);
+    }
+  }, [selectedOptions]);
+
+  useEffect(() => {
     if (!Object.keys(checkboxState).length) return;
     if (!selectedTechnicianIds.includes(checkboxState.value)) {
       setSelectedTechnicianIds([...selectedTechnicianIds, checkboxState.value]);
@@ -175,33 +192,41 @@ export const SelectTechnicians = ({
   const cardHeader = () => (
     <Box sx={{}}>
       {showOptions ? (
-        <RadioGroup name="radio-buttons-group">
-          <Box sx={{display: 'flex'}}>
-            {options.map((option) => (
-              <Box
-                key={option.label}
-                sx={{
-                  width: '32%',
-                  mr: '1em',
-                  px: '1em',
-                  border: `1px solid ${theme.palette.primary.outlinedHoverBg}`,
-                  borderRadius: 2,
-                }}>
-                <FormRadio
-                  value={option.value}
-                  handleChange={(e) => setSelectedOptions(e.target.value)}
-                  label={option.label}
-                  radioProps={{
-                    sx: {color: theme.palette.text.secondary},
-                  }}
-                />
-                <Typography variant="body1" color="text.secondary">
-                  {option.subText}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-        </RadioGroup>
+        <>
+          <RadioGroup name="radio-buttons-group">
+            <Box sx={{display: 'flex'}}>
+              {options.map((option) => (
+                <Box
+                  key={option.label}
+                  sx={{
+                    width: '32%',
+                    mr: '1em',
+                    px: '1em',
+                    border: `1px solid ${theme.palette.primary.outlinedHoverBg}`,
+                    borderRadius: 2,
+                  }}>
+                  <FormRadio
+                    value={option.value}
+                    checked={selectedOptions === option.value}
+                    handleChange={(e) => {
+                      setSelectedOptions(e.target.value);
+                      setSelectedTechnicianIds([]);
+                      getSelectedTechnicians && getSelectedTechnicians([]);
+                    }}
+                    label={option.label}
+                    radioProps={{
+                      sx: {color: theme.palette.text.secondary},
+                    }}
+                  />
+                  <Typography variant="body1" color="text.secondary">
+                    {option.subText}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </RadioGroup>
+          <Divider sx={{mt: '1.5em'}} />
+        </>
       ) : null}
 
       {selectedOptions === constant.IMMEDIATE ? (
@@ -287,9 +312,22 @@ export const SelectTechnicians = ({
         ) : null}
         {selectedOptions === constant.SCHEDULE_TECHNICIAN ? (
           <ScheduleForm
+            containerStyles={{pl: '1em', mt: '2em', maxWidth: '30%'}}
             defaultEndDate={null}
             defaultStartDate={null}
             defaultTechnician={null}
+            formIsErrored={(val) => formIsErrored && formIsErrored(val)}
+            getTechnician={(val) => {
+              if (getSelectedTechnicians && val) {
+                getSelectedTechnicians([val]);
+              }
+            }}
+            getFormValues={(form: ScheduleTechnicianForm) => {
+              getFormValue(form);
+              form.technicianId
+                ? setSelectedTechnicianIds([form.technicianId])
+                : setSelectedTechnicianIds([]);
+            }}
           />
         ) : null}
       </ContainerCard>

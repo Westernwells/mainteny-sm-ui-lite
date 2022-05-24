@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {useAssignmentBasedOrder} from 'hooks/reactQuery/useServiceOrder';
@@ -11,6 +12,8 @@ import {useNavigate} from 'react-router';
 import {AddDescription} from '../AddDescription';
 import {SelectTechnicians} from '../SelectTechnicians';
 import {SelectUnit} from '../SelectUnit';
+import {ScheduleTechnicianForm} from '../models';
+import {constant} from '../utils';
 
 const steps = [
   'Select unit',
@@ -22,9 +25,14 @@ export const NewCallout = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [selectedUnit, setSelectedUnit] = useState<ElevatorView>();
   const [disableNextBtn, setDisableNextBtn] = useState(false);
+  const [selectedRadioOption, setSelectedRadioOption] = useState('');
   const {user} = useUserSession();
   const navigate = useNavigate();
   const [description, setDescription] = useState('');
+  const [formValue, setFormValue] = useState<ScheduleTechnicianForm | null>(
+    null,
+  );
+  const [formErrored, setFormErrored] = useState<boolean>(false);
   const {mutateAsync: createImmediateCalloutOrder} = useAssignmentBasedOrder(
     'Callout order created',
   );
@@ -45,7 +53,7 @@ export const NewCallout = () => {
     }
 
     return setDisableNextBtn(false);
-  }, [activeStep, selectedUnit, selectedTechnicians]);
+  }, [activeStep, selectedUnit, selectedTechnicians, formErrored]);
 
   const handleCancel = () => {
     setActiveStep(0);
@@ -75,7 +83,9 @@ export const NewCallout = () => {
     <Stepper
       handleCancel={handleCancel}
       handleSubmit={async () => {
-        await createNewImmediateCalloutOrder();
+        if (selectedRadioOption === constant.IMMEDIATE) {
+          await createNewImmediateCalloutOrder();
+        }
       }}
       disableNextBtn={disableNextBtn}
       getActiveStep={(val) => setActiveStep(val)}
@@ -101,10 +111,14 @@ export const NewCallout = () => {
             <SelectTechnicians
               showOptions
               elevatorId={selectedUnit?.id}
-              getSelectedTechnicians={(val) => setSelectedTechnicians(val)}
+              getFormValue={(val) => setFormValue(val)}
               getRecommendedTechnicianView={(val) =>
                 setRecommendedTechnicians(val)
               }
+              getSelectedRadioOption={(val) => setSelectedRadioOption(val)}
+              getSelectedTechnicians={(val) => setSelectedTechnicians(val)}
+              defaultOption={selectedRadioOption}
+              formIsErrored={(val) => setFormErrored(val)}
               initialRecommendedTechnicians={recommendedTechnicians}
               initialSelectedTechnicians={selectedTechnicians}
             />
