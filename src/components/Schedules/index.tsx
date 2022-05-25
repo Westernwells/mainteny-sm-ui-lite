@@ -204,9 +204,6 @@ export const Schedule = ({
     };
   }, []);
 
-  //   return `${width}px`;
-  // };
-
   const nextMonth = () => {
     const firstDayOfNextWeek = startOfDay(addDays(weekPair.endOfWeekDay, 1));
     const endOfNextWeek = getEndOfWeek(firstDayOfNextWeek, 1);
@@ -249,7 +246,7 @@ export const Schedule = ({
       ) : null}
 
       <Box ref={elementRef} sx={sx.mainContainer}>
-        <CardContent sx={{padding: 0}}>
+        <CardContent sx={{padding: 0, width: '100%'}}>
           <ScheduleContainer>
             <ScheduleHeader>
               <ScheduleRow>

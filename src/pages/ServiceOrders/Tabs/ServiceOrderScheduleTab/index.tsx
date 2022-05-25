@@ -138,6 +138,7 @@ export const ServiceOrderScheduleTab = ({
 
       <Box sx={{display: 'flex', flexGrow: 1, height: 0}}>
         <Schedule
+          containerStyles={{flexGrow: 1}}
           cardFooter={
             <ServiceOrderStatusIndicator containerStyles={{flexGrow: 1}} />
           }
