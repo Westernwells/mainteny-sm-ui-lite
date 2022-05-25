@@ -1,11 +1,12 @@
 import {
   Address,
+  AddressRecord,
   Meta,
   TechnicianEventType,
   TimeWindowRecord,
   TimeWindowType,
 } from './misc';
-import {UserAccountSimpleView, UserAccountView} from './user';
+import {UserAccountSimpleView, UserAccountView, UserView} from './user';
 import {ServiceOrderType} from './service-order';
 
 export interface TechnicianTimeWindowRecord extends TimeWindowRecord {
@@ -25,6 +26,17 @@ export interface Technician {
   userAccount: UserAccountView;
   meta: Meta;
 }
+
+export interface TechnicianUserData {
+  technicianId: string;
+  address: AddressRecord;
+  workingHours: TechnicianTimeWindowRecord[];
+  isOnline: Boolean;
+  additionalInfo: TechnicianAdditionalInfo;
+  meta: Meta;
+}
+// use related view example api api/users
+export interface TechnicianUserView extends UserView<TechnicianUserData> {}
 
 export interface TechEventAdditionalInfo {
   leftVacationDays: number;

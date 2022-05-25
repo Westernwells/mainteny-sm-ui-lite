@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {DataGridLayout} from 'components/DataGridLayout';
 import {PageOverviewLayout} from 'components/PageOverviewLayout';
 import {Widget} from 'components/Widget';
@@ -8,7 +9,7 @@ import {
 import {useQueryUserAccounts} from 'hooks/reactQuery/useUserAccount';
 import {EmployeesView} from 'models/employee';
 import {Resource, TechnicianEventType} from 'models/misc';
-import {Role, UserAccountView} from 'models/user';
+import {CommonUserView, Role, UserAccountView} from 'models/user';
 import {useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import * as _ from 'lodash';
@@ -18,13 +19,18 @@ import {
 } from 'utils/utils';
 import {useSearchParams} from 'react-router-dom';
 import {Progress} from 'components/Progress';
-import {TechnicianEventPair, TechnicianView} from 'models/technician';
+import {
+  TechnicianEventPair,
+  TechnicianUserData,
+  TechnicianView,
+} from 'models/technician';
 import {toRestDateTime} from 'utils/datetime';
 import {addDays, endOfDay, startOfDay} from 'date-fns';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {EmptySection} from 'components/EmptySection';
 import {columns, makeRows} from './EmployeeDataGridProps';
 import {AddEmployee} from './AddEmployee';
+import Box from '@mui/material/Box';
 
 const pageSize = 25;
 
@@ -42,7 +48,11 @@ export const Employees = () => {
   );
 
   const {
-    data: userAccountResource = createEmptyResource<UserAccountView>(pageSize),
+    data: userAccountResource = createEmptyResource<CommonUserView>(pageSize),
+    isFetched,
+    isIdle,
+    isLoading,
+    isFetching,
   } = useQueryUserAccounts(
     {
       pageIndex: page.pageIndex,
@@ -53,15 +63,19 @@ export const Employees = () => {
     {keepPreviousData: true},
   );
 
-  const {
-    data: technicians = [],
-    isLoading,
-    isFetching,
-    isIdle,
-    isFetched,
-  } = useFetchTechniciansByUserAccounts(userAccountResource.data, {
-    keepPreviousData: true,
-  });
+  console.log(userAccountResource, '###$%%%%%%');
+
+  // return <Box>Hello</Box>
+
+  // const {
+  //   data: technicians = [],
+  //   isLoading,
+  //   isFetching,
+  //   isIdle,
+  //   isFetched,
+  // } = useFetchTechniciansByUserAccounts(userAccountResource.data, {
+  //   keepPreviousData: true,
+  // });
 
   const {data: technicianEvents} = useQueryTechnicianEvents({
     start: toRestDateTime(startOfDay(addDays(new Date(), 1))),
@@ -94,45 +108,58 @@ export const Employees = () => {
       },
     };
 
-    const techniciansByUserAccountId = _.groupBy(
-      technicians,
-      (technician: TechnicianView) => technician.userAccount.id,
-    );
+    // const techniciansByUserAccountId = _.groupBy(
+    //   technicians,
+    //   (technician: TechnicianView) => technician.userAccount.id,
+    // );
 
     const eventByTechnicianId = _.groupBy(
       technicianEvents?.data,
       (event: TechnicianEventPair) => event.technicianId,
     );
 
-    userAccountResource.data.forEach((item) => {
-      if (techniciansByUserAccountId[item.id]) {
-        const technician = techniciansByUserAccountId[item.id][0];
-        userData = {
-          ...userData,
-          data: [
-            ...userData.data,
-            {
-              ...technician,
-              events:
-                eventByTechnicianId[technician.id] &&
-                eventByTechnicianId[technician.id][0].eventViews,
-            },
-          ],
-        };
-      } else {
-        userData = {
-          ...userData,
-          data: [...userData.data, {userAccount: item}],
-        };
+    userAccountResource.data.map((item) => {
+      if (item.userAccount.roles.includes(Role.TECHNICIAN)) {
       }
+      // if(item.userData.)
     });
 
+    // userAccountResource.data.forEach((item) => {
+    //   if (techniciansByUserAccountId[item.id]) {
+    //     const technician = techniciansByUserAccountId[item.id][0];
+    //     userData = {
+    //       ...userData,
+    //       data: [
+    //         ...userData.data,
+    //         {
+    //           ...technician,
+    //           events:
+    //             eventByTechnicianId[technician.id] &&
+    //             eventByTechnicianId[technician.id][0].eventViews,
+    //         },
+    //       ],
+    //     };
+    //   } else {
+    //     userData = {
+    //       ...userData,
+    //       data: [...userData.data, {userAccount: item}],
+    //     };
+    //   }
+    // });
+
     setEmployeeResource(userData);
-  }, [technicians, userAccountResource]);
+  }, [
+    // technicians,
+    userAccountResource,
+  ]);
 
   useEffect(() => {
-    setRows(makeRows(employeeResource.data));
-  }, [employeeResource]);
+    const eventByTechnicianId = _.groupBy(
+      technicianEvents?.data,
+      (event: TechnicianEventPair) => event.technicianId,
+    );
+    setRows(makeRows(userAccountResource.data, eventByTechnicianId));
+  }, [userAccountResource]);
 
   useEffect(() => {
     setPageCount(Math.ceil(userAccountResource.total / page.pageSize));

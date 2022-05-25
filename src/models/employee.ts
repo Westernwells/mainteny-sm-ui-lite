@@ -5,9 +5,9 @@ import {
   TechnicianView,
   TechnicianWorkingHours,
 } from './technician';
-import {Role, UserAccountView} from './user';
+import {Role, UserAccountView, UserView} from './user';
 
-export interface EmployeeQueryParams {
+export interface UserQueryParams {
   pageIndex: number;
   pageSize: number;
   query: string;
