@@ -36,7 +36,7 @@ const defaultAlignment: {
   align: 'center',
 };
 
-const getQuotationStatusStyles = (
+export const getQuotationStatusStyles = (
   status: string,
 ): {
   label: string;
@@ -113,6 +113,7 @@ export const columns: GridColDef[] = [
         label={getQuotationStatusStyles(params.value).label}
         color={getQuotationStatusStyles(params.value).color}
         variant="filled"
+        size="small"
         maxChars={9}
       />
     ),
@@ -120,15 +121,6 @@ export const columns: GridColDef[] = [
   {
     field: 'actions',
     headerName: 'ACTIONS',
-    // TODO: Actions not working as expected
-    // type: 'actions',
-    // getActions: (params: GridRowParams) => [
-    //   <GridActionsCellItem
-    //     icon={<FileDownloadOutlinedIcon sx={{color: '#2196F3'}} />}
-    //     onClick={() => console.log('ACTION: Click', params.id)}
-    //     label="Download"
-    //   />,
-    // ],
     editable: false,
     sortable: false,
     disableColumnMenu: true,
@@ -140,7 +132,12 @@ export const columns: GridColDef[] = [
         {params.colDef.headerName}
       </Typography>
     ),
-    renderCell: (params) => <Actions status={params.row.status} />,
+    renderCell: (params) => (
+      <Actions
+        status={params.row.status}
+        quotationId={params.row.quotationId}
+      />
+    ),
   },
 ];
 
@@ -148,6 +145,7 @@ export const makeRows = (quotations: Resource<QuotationView>): GridRowsProp =>
   quotations &&
   quotations.data.map((item: QuotationView, index: number) => ({
     id: index,
+    quotationId: item.id,
     number: item.number,
     customer: item.elevator.propertyOwner.name,
     address: item.elevator.propertyOwner.address.fullName,

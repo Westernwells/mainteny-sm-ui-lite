@@ -1,48 +1,60 @@
 import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router';
+// import {useNavigate} from 'react-router';
+import {useSearchParams} from 'react-router-dom';
 import {useFormik} from 'formik';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import {Button, InputLabel, TextField} from '@mui/material';
-import DatePicker from '@mui/lab/DatePicker';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import AddIcon from '@mui/icons-material/Add';
+import DraftsIcon from '@mui/icons-material/Drafts';
 import {BackAction} from 'components/BackAction';
+import {Progress} from 'components/Progress';
 import {A4Layout} from 'components/A4Layout';
 import {SelectModal} from 'components/SelectModal';
 import {SelectButton} from 'components/SelectButton';
 import {SelectCard} from 'components/SelectCard';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {useQuotation} from 'hooks/reactQuery/useQuotation';
-import {roundCurrency} from 'utils/currency';
-import {CreateQuotation, QuotationItem} from 'models/quotation';
+import {
+  useCreateQuotation,
+  useQuotationDetails,
+} from 'hooks/reactQuery/useQuotation';
+import {formatCurrency} from 'utils/currency';
+import {CreateQuotation, QuotationItemRecord} from 'models/quotation';
 import {ElevatorView} from 'models/elevator';
 import {PropertyOwner} from 'models/propertyManager';
 import {ClientSimpleView} from 'models/client';
 import {ArticleView} from 'models/article';
 import {WithOptional} from 'models/misc';
+import {formatDate} from 'utils/datetime';
 import {Label} from './Components/Label';
 import {BottomDrawer} from './Components/BottomDrawer';
 import {QuotationRow} from './Components/QuotationRow';
 import {CustomersDataGrid} from './DataGrid/CustomersDataGrid';
 import {UnitsDataGrid} from './DataGrid/UnitsDataGrid';
 import {ArticlesDataGrid} from './DataGrid/ArticlesDataGrid';
+import {QuotationHeader} from './Components/QuotationHeader';
 
 const DEFAULT_DESCRIPTION = `Dear, Customer.
 
 We thank you for the inquiry and would like to offer you our best services for the maintenance of above mentioned unit.`;
 
 export const NewQuotation = () => {
-  const navigate = useNavigate();
+  const [queryParams] = useSearchParams();
+  const [quotationId] = useState(queryParams.get('id'));
+  const {
+    data: quotation,
+    isFetched,
+    isIdle,
+    isLoading,
+  } = useQuotationDetails(quotationId !== null ? quotationId : '');
 
   const {user} = useUserSession();
 
-  const {newQuotation} = useQuotation();
+  const {mutate: createNewQuotation} = useCreateQuotation();
 
   const [isDrawerOpen] = useState<boolean>(true);
 
-  const [date, setDate] = useState<Date | null>(new Date());
+  const [publish, setPublish] = useState(false);
 
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
@@ -52,24 +64,28 @@ export const NewQuotation = () => {
     PropertyOwner | ClientSimpleView | null
   >(null);
   const [unit, setUnit] = useState<ElevatorView | null>(null);
-  const [quotationItems, setQuotationItems] = useState<QuotationItem[]>([]);
+  const [quotationItems, setQuotationItems] = useState<QuotationItemRecord[]>(
+    [],
+  );
 
   const [totalPrice, setTotalPrice] = useState(0);
+  const [totalVat, setTotalVat] = useState(0);
 
-  const initialValues: WithOptional<CreateQuotation, 'serviceCompanyId'> = {
+  const initialValues: CreateQuotation = {
+    subject: '',
     description: DEFAULT_DESCRIPTION,
     elevatorId: '',
+    moreInfo: '',
     items: [],
+    serviceCompanyId: '',
   };
 
   const formik = useFormik({
     initialValues,
-    onSubmit: (values) => newQuotation(values, () => navigate('/quotations')),
+    onSubmit: (values) => {
+      createNewQuotation({data: values, publish});
+    },
   });
-
-  const handleDateChange = (newDate: Date | null) => {
-    setDate(newDate);
-  };
 
   const handleSelectCustomer = (row: PropertyOwner) => {
     setCustomer(row);
@@ -84,26 +100,57 @@ export const NewQuotation = () => {
   const handleSelectQuotationItem = (row: ArticleView) => {
     const articleViewToQuotationItem = (
       article: ArticleView,
-    ): QuotationItem => ({
-      article,
-      additionalInfo: {},
-      id: article.id,
+    ): QuotationItemRecord => ({
+      articleId: article.id,
+      articleUnit: article.unit,
+      description: article.description,
+      name: article.name,
       quantity: 1,
-      quotationId: '',
       unitAmount: article.unitSellingAmount,
     });
     if (
-      quotationItems.filter((item) => item.article.id === row.id).length === 0
+      quotationItems.filter((item) => item.articleId === row.id).length === 0
     ) {
       setQuotationItems([...quotationItems, articleViewToQuotationItem(row)]);
     }
     setIsArticleModalOpen(false);
   };
 
-  const deleteQuotationItem = (item: QuotationItem) => {
+  const deleteQuotationItem = (item: QuotationItemRecord) => {
     const newItems = quotationItems.filter((i) => i !== item);
     setQuotationItems(newItems);
   };
+
+  useEffect(() => {
+    if (user && user.userAccount) {
+      formik.setFieldValue(
+        'serviceCompanyId',
+        user.userAccount.serviceCompany.id,
+        true,
+      );
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (isFetched && quotation) {
+      setQuotationItems(
+        quotation.items.map(
+          (i): QuotationItemRecord => ({
+            articleId: i.article.id,
+            description: i.description || i.article.description,
+            name: i.name || i.article.name,
+            articleUnit: i.article.unit,
+            quantity: i.quantity,
+            unitAmount: i.unitAmount,
+          }),
+        ),
+      );
+      formik.setFieldValue('subject', quotation.subject, true);
+      formik.setFieldValue('description', quotation.description, true);
+      formik.setFieldValue('moreInfo', quotation.moreInfo, true);
+      formik.setFieldValue('items', quotation.items, true);
+    }
+  }, [isFetched]);
 
   useEffect(() => {
     if (unit) {
@@ -113,35 +160,57 @@ export const NewQuotation = () => {
   }, [unit]);
 
   useEffect(() => {
-    // TODO: Fix total price
     if (quotationItems.length) {
       const sum = 0;
+      const vat = 0;
 
       setTotalPrice(
         quotationItems
-          .map((item) => item.quantity * item.unitAmount.netAmount)
+          .map(
+            (item) =>
+              item.quantity *
+              (item.unitAmount.netAmount /
+                10 ** item.unitAmount.fractionDigits!),
+          )
           .reduce((prevValue, currentValue) => prevValue + currentValue, sum),
       );
 
-      formik.setFieldValue(
-        'items',
-        quotationItems.map((item) => ({
-          articleId: item.article.id,
-          quantity: item.quantity,
-          sellingVat: item.article.unitSellingAmount.vat,
-          unitSellingPrice: {
-            amount: item.article.unitSellingAmount.netAmount,
-            currency: item.article.unitSellingAmount.currency,
-          },
-        })),
-        true,
+      setTotalVat(
+        quotationItems
+          .map(
+            (item) =>
+              item.quantity *
+              (item.unitAmount.vat / 10 ** item.unitAmount.fractionDigits!),
+          )
+          .reduce((prevValue, currentValue) => prevValue + currentValue, vat),
       );
     }
+    formik.setFieldValue(
+      'items',
+      quotationItems.map(
+        (item): WithOptional<QuotationItemRecord, 'articleUnit'> => ({
+          articleId: item.articleId,
+          description: item.description,
+          name: item.name,
+          quantity: item.quantity,
+          unitAmount: item.unitAmount,
+        }),
+      ),
+      true,
+    );
   }, [quotationItems]);
+
+  if (quotationId && (isIdle || isLoading)) {
+    return <Progress />;
+  }
 
   return (
     <Box>
-      <BackAction label="New Quotation" containerStyle={{my: 'auto'}} />
+      <BackAction
+        label="New Quotation"
+        containerStyle={{my: 'auto'}}
+        path="/quotations?pageIndex=1&pageSize=25"
+      />
 
       <A4Layout>
         <Box mt="1em">
@@ -158,7 +227,7 @@ export const NewQuotation = () => {
         <Box display="flex" mt="1em" gap="2em">
           <Box flexGrow={1} display="flex" flexDirection="column" gap="2em">
             <Box>
-              <Label text="To" />
+              <Label text="Customer Details" />
               {customer ? (
                 <SelectCard
                   header={
@@ -187,7 +256,7 @@ export const NewQuotation = () => {
               )}
             </Box>
             <Box>
-              <Label text="  Unit Details" />
+              <Label text="Unit Details" />
 
               {unit ? (
                 <SelectCard
@@ -213,31 +282,30 @@ export const NewQuotation = () => {
             flexDirection="column"
             gap="2em"
             mt="1.5em">
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
-                inputFormat="dd.MM.yyyy"
-                label="Date Created"
-                value={date}
-                onChange={handleDateChange}
-                maxDate={new Date()}
-                renderInput={(params) => (
-                  <TextField size="small" fullWidth {...params} />
-                )}
-              />
-            </LocalizationProvider>
-            <TextField
-              label="Created By"
-              size="small"
-              defaultValue={`${user?.userAccount.firstName} ${user?.userAccount.lastName}`}
-              fullWidth
-            />
+            <Box>
+              <Label text="Date Created" />
+              <Typography>{formatDate(new Date())}</Typography>
+            </Box>
+            <Box>
+              <Label text="Created By" />
+              <Typography>{`${user?.userAccount.firstName} ${user?.userAccount.lastName}`}</Typography>
+            </Box>
           </Box>
         </Box>
         <Box mt="1em">
           <InputLabel>
             <Label text="Subject" />
           </InputLabel>
-          <TextField size="small" minRows={1} maxRows={3} multiline fullWidth />
+          <TextField
+            size="small"
+            id="subject"
+            value={formik.values.subject}
+            onChange={formik.handleChange}
+            minRows={1}
+            maxRows={3}
+            multiline
+            fullWidth
+          />
         </Box>
         <Box mt="1em">
           <InputLabel>
@@ -261,24 +329,7 @@ export const NewQuotation = () => {
           mt="1em"
           borderRadius="4px"
           p=".5em">
-          <Box
-            px=".5em"
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: '3ch 2fr repeat(4, 10ch)',
-              placeItems: 'center',
-              gap: '.5em',
-            }}>
-            <Label text="No" />
-            <Label text="Description" sx={{justifySelf: 'start'}} />
-            <Label text="Quantity" />
-            <Label text="Unit" />
-            <Label text="Unit Price" />
-            <Box sx={{justifySelf: 'end'}}>
-              <Label text="Total Price" sx={{display: 'block'}} />
-              <Label text="(excl VAT)" />
-            </Box>
-          </Box>
+          <QuotationHeader />
           <Box
             bgcolor="grey.50"
             borderRadius="4px"
@@ -288,7 +339,7 @@ export const NewQuotation = () => {
             gap="1em">
             {quotationItems.map((item, index) => (
               <QuotationRow
-                key={item.id}
+                key={item.articleId}
                 quotationItem={item}
                 index={index + 1}
                 deleteRow={deleteQuotationItem}
@@ -325,15 +376,17 @@ export const NewQuotation = () => {
                       </Typography>
                     </Typography>
 
-                    <Typography>{`€ ${totalPrice.toFixed(2)}`}</Typography>
+                    <Typography>
+                      {formatCurrency(totalPrice, {currency: 'EUR'})}
+                    </Typography>
                     <Typography
                       variant="caption"
-                      sx={{color: 'text.secondary'}}>
-                      VAT(10%)
+                      sx={{color: 'text.secondary', alignSelf: 'end'}}>
+                      VAT
                     </Typography>
-                    <Typography>{`€ ${(totalPrice / 10).toFixed(
-                      2,
-                    )}`}</Typography>
+                    <Typography>
+                      {formatCurrency(totalVat, {currency: 'EUR'})}
+                    </Typography>
                   </Box>
                   <Box
                     bgcolor="grey.700"
@@ -352,7 +405,7 @@ export const NewQuotation = () => {
                       </Typography>
                     </Typography>
                     <Typography sx={{color: 'primary.contrastText'}}>
-                      {`€ ${roundCurrency(totalPrice * 1.1, 2).toFixed(2)}`}
+                      {formatCurrency(totalPrice + totalVat, {currency: 'EUR'})}
                     </Typography>
                   </Box>
                 </Box>
@@ -373,7 +426,16 @@ export const NewQuotation = () => {
           <InputLabel>
             <Label text="Additional Information" />
           </InputLabel>
-          <TextField size="small" minRows={2} multiline fullWidth />
+          <TextField
+            size="small"
+            id="moreInfo"
+            value={formik.values.moreInfo}
+            onChange={formik.handleChange}
+            minRows={2}
+            maxRows={4}
+            multiline
+            fullWidth
+          />
         </Box>
       </A4Layout>
 
@@ -403,15 +465,31 @@ export const NewQuotation = () => {
 
       <BottomDrawer
         isOpen={isDrawerOpen}
+        primaryButtonLabel="save"
+        primaryButtonAction={() => {
+          setPublish(false);
+          formik.handleSubmit();
+        }}
+        listItems={[
+          {
+            label: 'Save & Send',
+            icon: <DraftsIcon />,
+            onClick: () => {
+              setPublish(true);
+              formik.handleSubmit();
+            },
+          },
+        ]}
         isValid={
           !!(
             formik.values.description &&
+            formik.values.subject &&
+            formik.values.moreInfo &&
             formik.values.elevatorId &&
             formik.values.items.length &&
             unit !== null
           )
         }
-        onSubmit={formik.handleSubmit}
       />
     </Box>
   );

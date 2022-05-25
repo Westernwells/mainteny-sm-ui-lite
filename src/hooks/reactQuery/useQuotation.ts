@@ -1,9 +1,9 @@
 import {useCallback} from 'react';
-import {useQuery} from 'react-query';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {useSnackbar} from 'notistack';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {useNavigate} from 'react-router';
-import {Resource, RestError, WithOptional} from 'models/misc';
+import {Resource, RestError} from 'models/misc';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
   CreateQuotation,
@@ -85,70 +85,120 @@ export function useQuotationDetails(quotationId?: string) {
   );
 }
 
-export const useQuotation = () => {
+export const postPublishQuotation = async (id: string) => {
+  await axiosClient.post(`api/quotations/${id}/publish`);
+};
+
+export const usePublishQuotation = () => {
+  const queryClient = useQueryClient();
   const {enqueueSnackbar} = useSnackbar();
-  const {user} = useUserSession();
-  const newQuotation = async (
-    requestData: WithOptional<CreateQuotation, 'serviceCompanyId'>,
-    onSuccess?: () => void,
-  ) => {
-    const urlEndpoint = `api/quotations`;
-    try {
-      if (user && requestData) {
-        requestData.serviceCompanyId = user.userAccount.serviceCompany.id;
-        const {status} = await axiosClient.post(urlEndpoint, requestData);
+  const navigate = useNavigate();
 
-        if (status === 200) {
-          enqueueSnackbar(`Quotation created successfully!`, {
-            variant: 'success',
-          });
-          if (onSuccess) {
-            onSuccess();
-          }
-        }
-      }
-    } catch (error: any) {
-      console.error(error);
-      enqueueSnackbar(
-        error.response?.message ||
-          'Sorry! Quotation creation failed. Please try again.',
-        {
+  return useMutation(
+    (quotationId: string) => postPublishQuotation(quotationId),
+    {
+      onSuccess: (_, quotationId) => {
+        queryClient.invalidateQueries([qk.fetchQuotations]);
+        queryClient.invalidateQueries([qk.quotationById]);
+        enqueueSnackbar(`Quotation sent client!`, {
+          variant: 'success',
+        });
+        navigate(`/quotations/details/${quotationId}`);
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again!', {
           variant: 'error',
-        },
-      );
-    }
-  };
+        });
+      },
+    },
+  );
+};
 
-  const updateQuotation = async (
-    id: string,
-    requestData: UpdateQuotation,
-    onSuccess?: () => void,
-  ) => {
-    const urlEndpoint = `api/quotations/${id}`;
-    try {
-      if (requestData && id) {
-        const {status} = await axiosClient.put(urlEndpoint, requestData);
+export const postQuotation = async (
+  body: CreateQuotation,
+  publish: boolean,
+) => {
+  const {data} = await axiosClient.post<{value: string}>(
+    'api/quotations',
+    body,
+  );
+  return {data, publish};
+};
 
-        if (status === 200) {
-          enqueueSnackbar(`Quotation updated successfully!`, {
-            variant: 'success',
-          });
-          if (onSuccess) {
-            onSuccess();
-          }
+export const useCreateQuotation = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  const navigate = useNavigate();
+  const {mutate: publishQuotation} = usePublishQuotation();
+
+  return useMutation(
+    ({data, publish}: {data: CreateQuotation; publish: boolean}) =>
+      postQuotation(data, publish),
+    {
+      onSuccess: ({data, publish}) => {
+        queryClient.invalidateQueries([qk.fetchQuotations]);
+        queryClient.invalidateQueries([qk.quotationById]);
+        enqueueSnackbar(`Quotation created successfully!`, {
+          variant: 'success',
+        });
+        if (publish) {
+          publishQuotation(data.value);
+        } else {
+          navigate('/quotations?pageIndex=1&pageSize=25');
         }
-      }
-    } catch (error: any) {
-      console.error(error);
-      enqueueSnackbar(
-        error.response?.message ||
-          'Sorry! Failed to update quotation. Please try again.',
-        {
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again!', {
           variant: 'error',
-        },
-      );
-    }
-  };
+        });
+      },
+    },
+  );
+};
 
-  return {newQuotation, updateQuotation};
+export const putQuotation = async (
+  body: UpdateQuotation,
+  id: string,
+  publish: boolean,
+) => {
+  await axiosClient.put(`api/quotations/${id}`, body);
+  return publish;
+};
+
+export const useUpdateQuotation = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  const {mutate: publishQuotation} = usePublishQuotation();
+
+  return useMutation(
+    ({
+      data,
+      quotationId,
+      publish,
+    }: {
+      data: UpdateQuotation;
+      quotationId: string;
+      publish: boolean;
+    }) => putQuotation(data, quotationId, publish),
+    {
+      onSuccess: (_, {publish, quotationId}) => {
+        queryClient.invalidateQueries([qk.fetchQuotations]);
+        queryClient.invalidateQueries([qk.quotationById]);
+        enqueueSnackbar(`Quotation updated successfully!`, {
+          variant: 'success',
+        });
+        if (publish) {
+          publishQuotation(quotationId);
+        }
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again!', {
+          variant: 'error',
+        });
+      },
+    },
+  );
 };

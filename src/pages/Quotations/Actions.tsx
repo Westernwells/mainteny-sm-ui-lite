@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {useNavigate} from 'react-router';
 import Divider from '@mui/material/Divider';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -13,14 +14,18 @@ import SendIcon from '@mui/icons-material/Send';
 import CopyAllIcon from '@mui/icons-material/CopyAll';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {QuotationStatus} from 'models/quotation';
+import {usePublishQuotation} from 'hooks/reactQuery/useQuotation';
 
 interface Props {
   status: string;
+  quotationId: string;
 }
 
-export const Actions = ({status}: Props) => {
+export const Actions = ({status, quotationId}: Props) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const navigate = useNavigate();
+  const {mutate: publishQuotation} = usePublishQuotation();
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
@@ -30,13 +35,17 @@ export const Actions = ({status}: Props) => {
   return (
     <>
       {status === QuotationStatus.SENT_TO_CLIENT ? (
-        <IconButton size="small" onClick={() => console.log('ACTION: RESEND')}>
+        <IconButton
+          size="small"
+          onClick={() => console.log('RESEND QUOTATION')}>
           <ReplyAllIcon
             sx={{color: 'action.active', transform: 'rotate(180deg)'}}
           />
         </IconButton>
       ) : (
-        <IconButton size="small" onClick={() => console.log('ACTION: EDIT')}>
+        <IconButton
+          size="small"
+          onClick={() => navigate(`/quotations/details/${quotationId}`)}>
           <EditIcon sx={{color: 'action.active'}} />
         </IconButton>
       )}
@@ -60,20 +69,27 @@ export const Actions = ({status}: Props) => {
           horizontal: 'right',
         }}>
         {status !== QuotationStatus.SENT_TO_CLIENT && (
-          <>
-            <MenuItem onClick={handleClose}>
-              <ListItemIcon>
-                <SendIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>
-                <Typography variant="body2">Send</Typography>
-              </ListItemText>
-            </MenuItem>
-            <Divider />
-          </>
+          <MenuItem
+            onClick={() => {
+              publishQuotation(quotationId);
+              handleClose();
+            }}>
+            <ListItemIcon>
+              <SendIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>
+              <Typography variant="body2">Send</Typography>
+            </ListItemText>
+          </MenuItem>
         )}
 
-        <MenuItem onClick={handleClose}>
+        {status !== QuotationStatus.SENT_TO_CLIENT && <Divider />}
+
+        <MenuItem
+          onClick={() => {
+            navigate(`/quotations/new?id=${quotationId}`);
+            handleClose();
+          }}>
           <ListItemIcon>
             <CopyAllIcon fontSize="small" />
           </ListItemIcon>
@@ -82,7 +98,14 @@ export const Actions = ({status}: Props) => {
           </ListItemText>
         </MenuItem>
 
-        <MenuItem onClick={handleClose}>
+        <MenuItem
+          onClick={() => {
+            window.open(
+              `${process.env.REACT_APP_BASE_URL}/QuotationPDF.pdf`,
+              '_blank',
+            );
+            handleClose();
+          }}>
           <ListItemIcon>
             <FileDownloadIcon fontSize="small" />
           </ListItemIcon>

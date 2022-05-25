@@ -104,7 +104,7 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
         number: item.number,
         type: item.type,
         model: item.model,
-        manufacturer: item.manufacture,
+        manufacturer: item.manufacturer,
         description: item.description,
         price: `${formatCurrency(
           item

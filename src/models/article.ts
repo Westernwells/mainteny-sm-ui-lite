@@ -22,7 +22,7 @@ export interface ArticleView {
   category: string;
   description: string;
   id: string;
-  manufacture: string;
+  manufacturer: string;
   meta: Meta;
   model: string;
   name: string;
@@ -47,7 +47,7 @@ export interface Article {
   childArticles?: ArticleViewItem[];
   description: string;
   id: string;
-  manufacture: string;
+  manufacturer: string;
   meta: Meta;
   model: string;
   name: string;
