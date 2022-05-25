@@ -5,13 +5,14 @@ import {useNavigate} from 'react-router';
 import {useSearchParams} from 'react-router-dom';
 import {ServiceOrderType} from 'models/service-order';
 import {convertToText} from 'utils/utils';
-import {ScheduleServiceOrder} from './ScheduleServiceOrder';
 import {NewEmergency} from './NewEmergency';
+import {ScheduleServiceOrder} from './ScheduleServiceOrder';
 
 export const NewServiceOrder = () => {
   const [queryParams] = useSearchParams();
   const currentParams = useRef(Object.fromEntries([...queryParams])).current;
   const navigate = useNavigate();
+
   return (
     <FlexContainer>
       <BreadCrumbs

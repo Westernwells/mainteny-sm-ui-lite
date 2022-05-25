@@ -1,7 +1,10 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import useTheme from '@mui/material/styles/useTheme';
 import {GridCellParams, GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
+import {EmptySection} from 'components/EmptySection';
+import {PageCard} from 'components/PageCard';
 import {SearchInput} from 'components/SearchInput';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {ElevatorView} from 'models/elevator';
@@ -17,6 +20,7 @@ interface Props {
 const pageInfo = makePage(0, 10);
 
 export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
+  const theme = useTheme();
   const [search, setSearch] = useState('');
   const totalUnitsRef = useRef(0);
   const [page, setPage] = useState(pageInfo);
@@ -52,6 +56,53 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
       getSelectedUnit(selectedUnit);
     }
   }, [selectedUnit]);
+
+  if (!totalUnitsRef.current) {
+    return (
+      <PageCard
+        containerStyles={{
+          display: 'flex',
+          flexDirection: 'column',
+          flexGrow: 1,
+        }}
+        headerLabel="Choose unit"
+        customHeader={
+          <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+            <Typography variant="h6" component="div">
+              Choose unit
+            </Typography>
+            <SearchInput
+              placeholder="search"
+              containerStyle={{
+                background: '#fff',
+                border: `1px solid ${theme.palette.text.secondary}`,
+              }}
+            />
+          </Box>
+        }
+        contentContainerStyles={{
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <EmptySection
+          illustration="clipboard"
+          showActionBtn
+          btnLabel="Add New"
+          btnAction={() => {}}
+          size="tiny"
+          containerStyle={{
+            height: '100%',
+            width: '50%',
+          }}
+          label='Sorry, we couldn"t find any unit that matches the search text. If you like to add a new unit, 
+please click the button below'
+        />
+      </PageCard>
+    );
+  }
 
   return (
     <>

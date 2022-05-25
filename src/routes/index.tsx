@@ -22,6 +22,7 @@ import {ServiceOrders} from 'pages/ServiceOrders';
 import {ServiceOrderDetails} from 'pages/ServiceOrderDetails';
 import {axiosClient} from 'utils/axios-utils';
 import {languageMap} from 'utils/utils';
+import {NewUnit} from 'pages/NewServiceOrder/NewUnit';
 import i18n from 'i18next';
 
 import {NewServiceOrder} from 'pages/NewServiceOrder';
@@ -270,6 +271,20 @@ export const Router = () => {
               </Helmet>
               <PageLayout>
                 <NewServiceOrder />
+              </PageLayout>
+            </>
+          }
+        />
+
+        <Route
+          path="/units/new"
+          element={
+            <>
+              <Helmet>
+                <title>{`New service order - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout>
+                <NewUnit />
               </PageLayout>
             </>
           }

@@ -10,7 +10,7 @@ interface Props extends BoxProps {
   containerStyle?: {[key: string]: string | number};
   labelStyle?: {[key: string]: string | number};
   labelVariant?: any;
-  illustration?: string;
+  illustration?: 'clipboard' | 'laptop';
   showActionBtn?: boolean;
   btnLabel?: string;
   btnAction?: () => void;
