@@ -1,12 +1,15 @@
 import {useEffect, useState} from 'react';
-import {useParams} from 'react-router';
+import {useNavigate, useParams} from 'react-router';
 import {useFormik} from 'formik';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import {Button, InputLabel, OutlinedInput, TextField} from '@mui/material';
-import DatePicker from '@mui/lab/DatePicker';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import {
+  Button,
+  Grid,
+  InputLabel,
+  OutlinedInput,
+  TextField,
+} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import {BackAction} from 'components/BackAction';
 import {A4Layout} from 'components/A4Layout';
@@ -15,39 +18,59 @@ import {SelectButton} from 'components/SelectButton';
 import {SelectCard} from 'components/SelectCard';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
+import {StatusChip} from 'components/StatusChip';
+import {PageCard} from 'components/PageCard';
+import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import DraftsIcon from '@mui/icons-material/Drafts';
+import CopyAllIcon from '@mui/icons-material/CopyAll';
+
 import {Elevator, ElevatorView} from 'models/elevator';
 import {PropertyOwner} from 'models/propertyManager';
 import {ClientSimpleView} from 'models/client';
 import {ArticleView} from 'models/article';
-import {QuotationItem, UpdateQuotation} from 'models/quotation';
+import {
+  QuotationItemRecord,
+  QuotationStatus,
+  UpdateQuotation,
+} from 'models/quotation';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {useQuotation, useQuotationDetails} from 'hooks/reactQuery/useQuotation';
-import {roundCurrency} from 'utils/currency';
+import {
+  useQuotationDetails,
+  useUpdateQuotation,
+} from 'hooks/reactQuery/useQuotation';
+import {formatCurrency} from 'utils/currency';
+import {formatDate} from 'utils/datetime';
+import {WithOptional} from 'models/misc';
+import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps';
 import {Label} from './Components/Label';
 import {BottomDrawer} from './Components/BottomDrawer';
 import {QuotationRow} from './Components/QuotationRow';
 import {CustomersDataGrid} from './DataGrid/CustomersDataGrid';
 import {UnitsDataGrid} from './DataGrid/UnitsDataGrid';
 import {ArticlesDataGrid} from './DataGrid/ArticlesDataGrid';
+import {QuotationHeader} from './Components/QuotationHeader';
+import {PDFContainer} from './Components/PDFContainer';
 
 export const QuotationDetails = () => {
   const {id: quotationId} = useParams();
+
+  const navigate = useNavigate();
 
   const {
     data: quotation,
     isIdle,
     isLoading,
     isFetched,
-    refetch,
   } = useQuotationDetails(quotationId);
 
-  const {updateQuotation} = useQuotation();
+  const {mutate: updateQuotation} = useUpdateQuotation();
 
-  const [isDrawerOpen] = useState<boolean>(true);
+  const [isDrawerOpen] = useState(true);
+
+  const [publish, setPublish] = useState(false);
 
   const {user} = useUserSession();
-
-  const [date, setDate] = useState<Date | null>(new Date());
 
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
@@ -57,13 +80,18 @@ export const QuotationDetails = () => {
     PropertyOwner | ClientSimpleView | null
   >(null);
   const [unit, setUnit] = useState<ElevatorView | Elevator | null>(null);
-  const [quotationItems, setQuotationItems] = useState<QuotationItem[]>([]);
+  const [quotationItems, setQuotationItems] = useState<QuotationItemRecord[]>(
+    [],
+  );
 
   const [totalPrice, setTotalPrice] = useState(0);
+  const [totalVat, setTotalVat] = useState(0);
 
   const initialValues: UpdateQuotation = {
+    subject: '',
     description: '',
     elevatorId: '',
+    moreInfo: '',
     items: [],
   };
 
@@ -71,16 +99,10 @@ export const QuotationDetails = () => {
     initialValues,
     onSubmit: (values) => {
       if (quotationId) {
-        updateQuotation(quotationId, values, () =>
-          console.log('Quotation Updated'),
-        );
+        updateQuotation({data: values, quotationId, publish});
       }
     },
   });
-
-  const handleDateChange = (newDate: Date | null) => {
-    setDate(newDate);
-  };
 
   const handleSelectCustomer = (row: PropertyOwner) => {
     setCustomer(row);
@@ -95,53 +117,64 @@ export const QuotationDetails = () => {
   const handleSelectQuotationItem = (row: ArticleView) => {
     const articleViewToQuotationItem = (
       article: ArticleView,
-    ): QuotationItem => ({
-      article,
-      additionalInfo: {},
-      id: article.id,
-      quantity: 0,
-      quotationId: '',
+    ): QuotationItemRecord => ({
+      articleId: article.id,
+      articleUnit: article.unit,
+      description: article.description,
+      name: article.name,
+      quantity: 1,
       unitAmount: article.unitSellingAmount,
     });
     if (
-      quotationItems.filter((item) => item.article.id === row.id).length === 0
+      quotationItems.filter((item) => item.articleId === row.id).length === 0
     ) {
       setQuotationItems([...quotationItems, articleViewToQuotationItem(row)]);
     }
     setIsArticleModalOpen(false);
   };
 
-  const deleteQuotationItem = (item: QuotationItem) => {
+  const deleteQuotationItem = (item: QuotationItemRecord) => {
     const newItems = quotationItems.filter((i) => i !== item);
     setQuotationItems(newItems);
   };
 
   useEffect(() => {
-    // TODO: Fix refetching issues
-    refetch();
-  }, []);
-
-  useEffect(() => {
     if (quotationItems.length) {
       const sum = 0;
+      const vat = 0;
 
       setTotalPrice(
         quotationItems
-          .map((item) => item.quantity * item.unitAmount.netAmount)
+          .map(
+            (item) =>
+              item.quantity *
+              (item.unitAmount.netAmount /
+                10 ** item.unitAmount.fractionDigits!),
+          )
           .reduce((prevValue, currentValue) => prevValue + currentValue, sum),
+      );
+
+      setTotalVat(
+        quotationItems
+          .map(
+            (item) =>
+              item.quantity *
+              (item.unitAmount.vat / 10 ** item.unitAmount.fractionDigits!),
+          )
+          .reduce((prevValue, currentValue) => prevValue + currentValue, vat),
       );
     }
     formik.setFieldValue(
       'items',
-      quotationItems.map((item) => ({
-        articleId: item.article.id,
-        quantity: item.quantity,
-        sellingVat: item.article.unitSellingAmount.vat,
-        unitSellingPrice: {
-          amount: item.article.unitSellingAmount.netAmount,
-          currency: item.article.unitSellingAmount.currency,
-        },
-      })),
+      quotationItems.map(
+        (item): WithOptional<QuotationItemRecord, 'articleUnit'> => ({
+          articleId: item.articleId,
+          description: item.description,
+          name: item.name,
+          quantity: item.quantity,
+          unitAmount: item.unitAmount,
+        }),
+      ),
       true,
     );
   }, [quotationItems]);
@@ -150,8 +183,21 @@ export const QuotationDetails = () => {
     if (isFetched && quotation) {
       setUnit(quotation.elevator);
       setCustomer(quotation.elevator.propertyOwner);
-      setQuotationItems(quotation.items);
+      setQuotationItems(
+        quotation.items.map(
+          (i): QuotationItemRecord => ({
+            articleId: i.article.id,
+            description: i.description || i.article.description,
+            name: i.name || i.article.name,
+            articleUnit: i.article.unit,
+            quantity: i.quantity,
+            unitAmount: i.unitAmount,
+          }),
+        ),
+      );
+      formik.setFieldValue('subject', quotation.subject, true);
       formik.setFieldValue('description', quotation.description, true);
+      formik.setFieldValue('moreInfo', quotation.moreInfo, true);
       formik.setFieldValue('items', quotation.items, true);
     }
   }, [isFetched]);
@@ -167,12 +213,109 @@ export const QuotationDetails = () => {
     return <Progress />;
   }
 
+  if (
+    isFetched &&
+    quotation &&
+    quotation.status === QuotationStatus.SENT_TO_CLIENT
+  ) {
+    return (
+      <Box>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          gap="1em">
+          <BackAction
+            label={quotation.number}
+            containerStyle={{my: 'auto'}}
+            path="/quotations?pageIndex=1&pageSize=25"
+          />
+          <Box ml="auto">
+            <StatusChip
+              label={getQuotationStatusStyles(quotation.status).label}
+              color={getQuotationStatusStyles(quotation.status).color}
+              size="small"
+              variant="filled"
+            />
+          </Box>
+          <CustomButtonUnstyled
+            label="Download Quotation"
+            size="medium"
+            onClick={() =>
+              window.open(
+                `${process.env.REACT_APP_BASE_URL}/QuotationPDF.pdf`,
+                '_blank',
+              )
+            }
+            startIcon={<FileDownloadIcon color="primary" />}
+          />
+        </Box>
+        <Grid container width="100%" columnGap={1} mt="2.5em" mb="2em">
+          <Grid item xs={8}>
+            <PDFContainer />
+          </Grid>
+          <Grid item flexGrow={1}>
+            <PageCard
+              headerLabel="Service Order"
+              contentContainerStyles={{
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}>
+              <Box>
+                <Label text="Quotation Number" sx={{color: 'text.main'}} />
+                <Typography variant="subtitle1" color="primary.main">
+                  {quotation.number}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Created on {formatDate(quotation.meta.createdAt)}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  component="p">
+                  By
+                  {` ${user?.userAccount.firstName} ${user?.userAccount.lastName}`}
+                </Typography>
+              </Box>
+              <StatusChip
+                label={getQuotationStatusStyles(quotation.status).label}
+                color={getQuotationStatusStyles(quotation.status).color}
+                size="small"
+                variant="filled"
+              />
+            </PageCard>
+          </Grid>
+        </Grid>
+        <BottomDrawer
+          isOpen={isDrawerOpen}
+          primaryButtonLabel="Duplicate"
+          primaryButtonAction={() => {
+            if (quotationId) navigate(`/quotations/new?id=${quotationId}`);
+          }}
+          listItems={[]}
+          isValid
+        />
+      </Box>
+    );
+  }
+
   return !quotation ? (
     <EmptySection label="Quotation not found!" />
   ) : (
     <Box>
-      <BackAction label={quotation.number} containerStyle={{my: 'auto'}} />
-
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <BackAction
+          label={quotation.number}
+          containerStyle={{my: 'auto'}}
+          path="/quotations?pageIndex=1&pageSize=25"
+        />
+        <StatusChip
+          label={getQuotationStatusStyles(quotation.status).label}
+          color={getQuotationStatusStyles(quotation.status).color}
+          size="small"
+          variant="filled"
+        />
+      </Box>
       <A4Layout>
         <Box display="flex" justifyContent="space-between" mt="1em">
           <Box>
@@ -196,7 +339,7 @@ export const QuotationDetails = () => {
         <Box display="flex" mt="1em" gap="2em">
           <Box flexGrow={1} display="flex" flexDirection="column" gap="2em">
             <Box>
-              <Label text="To" />
+              <Label text="Customer Details" />
               {customer ? (
                 <SelectCard
                   header={
@@ -209,6 +352,13 @@ export const QuotationDetails = () => {
                       </Typography>
                       <Typography variant="caption" component="p">
                         {customer.contact.phone}
+                      </Typography>
+                      <Typography variant="subtitle2" component="p">
+                        Customer Number
+                      </Typography>
+                      {/* TODO: Show customer number */}
+                      <Typography variant="caption" component="p">
+                        C-7893001
                       </Typography>
                     </>
                   }
@@ -225,15 +375,23 @@ export const QuotationDetails = () => {
               )}
             </Box>
             <Box>
-              <Label text="  Unit Details" />
+              <Label text="Unit Details" />
 
               {unit ? (
                 <SelectCard
                   header={<Typography variant="body2">{unit.model}</Typography>}
                   body={
-                    <Typography variant="caption">
-                      {unit.address.fullName}
-                    </Typography>
+                    <>
+                      <Typography variant="caption">
+                        {unit.address.fullName}
+                      </Typography>
+                      <Typography variant="subtitle2" component="p">
+                        Unit Number
+                      </Typography>
+                      <Typography variant="caption" component="p">
+                        {unit.number}
+                      </Typography>
+                    </>
                   }
                   onClose={() => setUnit(null)}
                 />
@@ -251,31 +409,30 @@ export const QuotationDetails = () => {
             flexDirection="column"
             gap="2em"
             mt="1.5em">
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
-                inputFormat="dd.MM.yyyy"
-                label="Date Created"
-                value={date}
-                onChange={handleDateChange}
-                maxDate={new Date()}
-                renderInput={(params) => (
-                  <TextField size="small" fullWidth {...params} />
-                )}
-              />
-            </LocalizationProvider>
-            <TextField
-              label="Created By"
-              size="small"
-              defaultValue={`${user?.userAccount.firstName} ${user?.userAccount.lastName}`}
-              fullWidth
-            />
+            <Box>
+              <Label text="Date Created" />
+              <Typography>{formatDate(quotation.meta.createdAt)}</Typography>
+            </Box>
+            <Box>
+              <Label text="Created By" />
+              <Typography>{`${user?.userAccount.firstName} ${user?.userAccount.lastName}`}</Typography>
+            </Box>
           </Box>
         </Box>
         <Box mt="1em">
           <InputLabel>
             <Label text="Subject" />
           </InputLabel>
-          <TextField size="small" minRows={1} multiline fullWidth />
+          <TextField
+            size="small"
+            id="subject"
+            value={formik.values.subject}
+            onChange={formik.handleChange}
+            minRows={1}
+            maxRows={3}
+            multiline
+            fullWidth
+          />
         </Box>
         <Box mt="1em">
           <InputLabel>
@@ -299,24 +456,7 @@ export const QuotationDetails = () => {
           mt="1em"
           borderRadius="4px"
           p=".5em">
-          <Box
-            px=".5em"
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: '3ch 2fr repeat(4, 10ch)',
-              placeItems: 'center',
-              gap: '.5em',
-            }}>
-            <Label text="No" />
-            <Label text="Description" sx={{justifySelf: 'start'}} />
-            <Label text="Quantity" />
-            <Label text="Unit" />
-            <Label text="Unit Price" />
-            <Box sx={{justifySelf: 'end'}}>
-              <Label text="Total Price" sx={{display: 'block'}} />
-              <Label text="(excl VAT)" />
-            </Box>
-          </Box>
+          <QuotationHeader />
           <Box
             bgcolor="grey.50"
             borderRadius="4px"
@@ -326,7 +466,7 @@ export const QuotationDetails = () => {
             gap="1em">
             {quotationItems.map((item, index) => (
               <QuotationRow
-                key={item.id}
+                key={item.articleId}
                 quotationItem={item}
                 index={index + 1}
                 deleteRow={deleteQuotationItem}
@@ -363,15 +503,17 @@ export const QuotationDetails = () => {
                       </Typography>
                     </Typography>
 
-                    <Typography>{`€ ${totalPrice.toFixed(2)}`}</Typography>
+                    <Typography>
+                      {formatCurrency(totalPrice, {currency: 'EUR'})}
+                    </Typography>
                     <Typography
                       variant="caption"
-                      sx={{color: 'text.secondary'}}>
-                      VAT(10%)
+                      sx={{color: 'text.secondary', alignSelf: 'end'}}>
+                      VAT
                     </Typography>
-                    <Typography>{`€ ${(totalPrice / 10).toFixed(
-                      2,
-                    )}`}</Typography>
+                    <Typography>
+                      {formatCurrency(totalVat, {currency: 'EUR'})}
+                    </Typography>
                   </Box>
                   <Box
                     bgcolor="grey.700"
@@ -390,7 +532,7 @@ export const QuotationDetails = () => {
                       </Typography>
                     </Typography>
                     <Typography sx={{color: 'primary.contrastText'}}>
-                      {`€ ${roundCurrency(totalPrice * 1.1, 2).toFixed(2)}`}
+                      {formatCurrency(totalPrice + totalVat, {currency: 'EUR'})}
                     </Typography>
                   </Box>
                 </Box>
@@ -411,7 +553,16 @@ export const QuotationDetails = () => {
           <InputLabel>
             <Label text="Additional Information" />
           </InputLabel>
-          <TextField size="small" minRows={2} multiline fullWidth />
+          <TextField
+            size="small"
+            id="moreInfo"
+            value={formik.values.moreInfo}
+            onChange={formik.handleChange}
+            minRows={2}
+            maxRows={4}
+            multiline
+            fullWidth
+          />
         </Box>
       </A4Layout>
 
@@ -440,15 +591,49 @@ export const QuotationDetails = () => {
       </SelectModal>
       <BottomDrawer
         isOpen={isDrawerOpen}
+        primaryButtonLabel="Send"
+        primaryButtonAction={() => {
+          setPublish(true);
+          formik.handleSubmit();
+        }}
+        listItems={[
+          {
+            label: 'Save Draft',
+            icon: <DraftsIcon />,
+            onClick: () => {
+              setPublish(false);
+              formik.handleSubmit();
+            },
+            showBorder: true,
+          },
+          {
+            label: 'Duplicate',
+            icon: <CopyAllIcon />,
+            onClick: () => {
+              navigate(`/quotations/new?id=${quotationId}`);
+            },
+          },
+          {
+            label: 'Download',
+            icon: <FileDownloadIcon />,
+            onClick: () => {
+              window.open(
+                `${process.env.REACT_APP_BASE_URL}/QuotationPDF.pdf`,
+                '_blank',
+              );
+            },
+          },
+        ]}
         isValid={
           !!(
             formik.values.description &&
+            formik.values.subject &&
+            formik.values.moreInfo &&
             formik.values.elevatorId &&
             formik.values.items.length &&
             unit !== null
           )
         }
-        onSubmit={formik.handleSubmit}
       />
     </Box>
   );

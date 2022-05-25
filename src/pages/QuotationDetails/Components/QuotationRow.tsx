@@ -5,13 +5,13 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {QuotationItem} from 'models/quotation';
+import {QuotationItemRecord} from 'models/quotation';
 
 interface Props {
-  quotationItem: QuotationItem;
+  quotationItem: QuotationItemRecord;
   index: number;
-  deleteRow: (item: QuotationItem) => void;
-  setRow: React.Dispatch<React.SetStateAction<QuotationItem[]>>;
+  deleteRow: (item: QuotationItemRecord) => void;
+  setRow: React.Dispatch<React.SetStateAction<QuotationItemRecord[]>>;
 }
 
 export const QuotationRow = ({
@@ -20,20 +20,72 @@ export const QuotationRow = ({
   deleteRow,
   setRow,
 }: Props) => {
+  const [name, setName] = useState(quotationItem.name);
+  const [description, setDescription] = useState<string>(
+    quotationItem.description,
+  );
   const [quantity, setQuantity] = useState(quotationItem.quantity);
-  const [description, setDescription] = useState<string | null>(null);
+  const [price, setPrice] = useState(
+    quotationItem.unitAmount.netAmount /
+      10 ** quotationItem.unitAmount.fractionDigits!,
+  );
 
   const handleDescriptionChange = (e: any) => {
     setDescription(e.target.value);
+  };
+
+  const handleNameChange = (e: any) => {
+    setName(e.target.value);
+  };
+
+  const handlePriceChange = (e: any) => {
+    setPrice(e.target.value);
   };
 
   useEffect(() => {
     quotationItem.quantity = quantity;
 
     setRow((prev) =>
-      prev.map((item) => (item.id === quotationItem.id ? quotationItem : item)),
+      prev.map((item) =>
+        item.articleId === quotationItem.articleId ? quotationItem : item,
+      ),
     );
   }, [quantity]);
+
+  useEffect(() => {
+    quotationItem.description = description;
+
+    setRow((prev) =>
+      prev.map((item) =>
+        item.articleId === quotationItem.articleId ? quotationItem : item,
+      ),
+    );
+  }, [description]);
+
+  useEffect(() => {
+    quotationItem.name = name;
+
+    setRow((prev) =>
+      prev.map((item) =>
+        item.articleId === quotationItem.articleId ? quotationItem : item,
+      ),
+    );
+  }, [name]);
+
+  useEffect(() => {
+    quotationItem.unitAmount.netAmount =
+      price * 10 ** quotationItem.unitAmount.fractionDigits!;
+    quotationItem.unitAmount.vat =
+      price *
+      (quotationItem.unitAmount.percentageVat / 100) *
+      10 ** quotationItem.unitAmount.fractionDigits!;
+
+    setRow((prev) =>
+      prev.map((item) =>
+        item.articleId === quotationItem.articleId ? quotationItem : item,
+      ),
+    );
+  }, [price]);
 
   return (
     <Box boxShadow="0px 4px 15px 0px #90909033" py="1em">
@@ -48,22 +100,34 @@ export const QuotationRow = ({
         <Box>{index}</Box>
         <Box sx={{justifySelf: 'stretch'}}>
           <TextField
-            value={quotationItem.article.description}
+            value={name}
+            onChange={handleNameChange}
             size="small"
             fullWidth
             sx={{width: '100%'}}
           />
           {description && (
             <TextField
+              size="small"
               multiline
               fullWidth
               value={description}
-              maxRows={3}
+              minRows={2}
+              maxRows={4}
               onChange={handleDescriptionChange}
               sx={{mt: '.5em'}}
             />
           )}
         </Box>
+        <TextField
+          value={price}
+          onChange={handlePriceChange}
+          size="small"
+          sx={{maxWidth: '10ch'}}
+          InputProps={{
+            startAdornment: <InputAdornment position="start">€</InputAdornment>,
+          }}
+        />
         <TextField
           value={quantity}
           onChange={(e) =>
@@ -75,20 +139,20 @@ export const QuotationRow = ({
           size="small"
           sx={{maxWidth: '10ch'}}
         />
-        <TextField defaultValue="pau" size="small" sx={{maxWidth: '10ch'}} />
         <TextField
-          value={quotationItem.unitAmount.netAmount}
+          defaultValue={quotationItem.articleUnit}
           size="small"
           sx={{maxWidth: '10ch'}}
-          InputProps={{
-            startAdornment: <InputAdornment position="start">€</InputAdornment>,
-          }}
+          disabled
         />
         <TextField
-          value={quotationItem.unitAmount.netAmount * quantity}
+          value={price * quantity}
           size="small"
           disabled
           sx={{maxWidth: '10ch', justifySelf: 'end'}}
+          InputProps={{
+            startAdornment: <InputAdornment position="start">€</InputAdornment>,
+          }}
         />
       </Box>
       <Box sx={{float: 'right', mt: '1em'}}>
@@ -98,7 +162,7 @@ export const QuotationRow = ({
             endIcon={<EditIcon />}
             onClick={() => setDescription(' ')}
             sx={{
-              textTransform: 'capitalize',
+              bgcolor: '#00D1FF14',
             }}>
             Add Description
           </Button>
@@ -108,7 +172,7 @@ export const QuotationRow = ({
           color="error"
           endIcon={<DeleteIcon />}
           onClick={() => deleteRow(quotationItem)}
-          sx={{textTransform: 'capitalize', mx: '.5em'}}>
+          sx={{bgcolor: '#FF182F14', mx: '.5em'}}>
           Delete Article
         </Button>
       </Box>

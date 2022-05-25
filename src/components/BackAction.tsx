@@ -7,9 +7,10 @@ import {useNavigate} from 'react-router-dom';
 interface Props {
   label: string;
   containerStyle?: {[key: string]: string | number};
+  path?: string;
 }
 
-export const BackAction = ({label, containerStyle}: Props) => {
+export const BackAction = ({label, containerStyle, path}: Props) => {
   const theme = useTheme();
   const navigate = useNavigate();
   return (
@@ -17,7 +18,7 @@ export const BackAction = ({label, containerStyle}: Props) => {
       <Box
         mr={2}
         sx={{cursor: 'pointer', mt: '0.2em'}}
-        onClick={() => navigate(-1)}>
+        onClick={() => (path ? navigate(path) : navigate(-1))}>
         <ArrowBackIosNewIcon sx={{color: theme.palette.action.active}} />
       </Box>
       {label ? <Typography variant="h5">{label}</Typography> : null}

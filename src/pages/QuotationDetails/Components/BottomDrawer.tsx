@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {ReactNode, useState} from 'react';
 import Drawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -12,17 +12,36 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import PreviewIcon from '@mui/icons-material/Preview';
-import CopyAllIcon from '@mui/icons-material/CopyAll';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import DraftsIcon from '@mui/icons-material/Drafts';
+// import CopyAllIcon from '@mui/icons-material/CopyAll';
+// import FileDownloadIcon from '@mui/icons-material/FileDownload';
+// import DraftsIcon from '@mui/icons-material/Drafts';
+import {useTheme} from '@mui/material';
+
+interface ListMenu {
+  label: string;
+  icon: ReactNode;
+  onClick: () => void;
+  showBorder?: boolean;
+}
 
 interface Props {
   isOpen: boolean;
   isValid: boolean;
-  onSubmit: () => void;
+  primaryButtonLabel: string;
+  primaryButtonAction: () => void;
+  listItems: ListMenu[];
+  showSecondaryButton?: boolean;
 }
 
-export const BottomDrawer = ({isOpen, isValid, onSubmit}: Props) => {
+export const BottomDrawer = ({
+  isOpen,
+  isValid,
+  primaryButtonLabel,
+  primaryButtonAction,
+  listItems,
+  showSecondaryButton,
+}: Props) => {
+  const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: any) => {
@@ -50,39 +69,49 @@ export const BottomDrawer = ({isOpen, isValid, onSubmit}: Props) => {
         justifyContent="flex-end"
         gap={2}
         sx={{my: 'auto', px: '4em'}}>
-        <Button
-          variant="outlined"
-          disabled={!isValid}
-          startIcon={<PreviewIcon />}
-          onClick={onSubmit}>
-          preview
-        </Button>
-        <ButtonGroup
-          variant="contained"
-          aria-label="button group"
-          disableElevation
-          sx={{
-            '& .Mui-disabled': {
-              bgcolor: 'action.disabledBackground',
-            },
-          }}>
-          <Button type="submit" disabled={!isValid} onClick={onSubmit}>
-            Send to client
-          </Button>
-          <IconButton
+        {showSecondaryButton && (
+          <Button
+            variant="outlined"
             disabled={!isValid}
-            onClick={handleClick}
-            sx={{
-              color: 'primary.contrastText',
-              bgcolor: isValid ? 'primary.main' : 'green',
-              borderRadius: '0 4px 4px 0',
-              overflow: 'hidden',
-              '&:hover': {
-                bgcolor: 'primary.dark',
-              },
-            }}>
-            <MoreIcon />
-          </IconButton>
+            startIcon={<PreviewIcon />}
+            onClick={() =>
+              window.open(
+                `${process.env.REACT_APP_BASE_URL}/QuotationPDF.pdf`,
+                '_blank',
+              )
+            }>
+            preview
+          </Button>
+        )}
+        <ButtonGroup variant="contained">
+          <Button
+            type="submit"
+            disabled={!isValid}
+            onClick={primaryButtonAction}>
+            {primaryButtonLabel}
+          </Button>
+          {listItems.length > 0 && (
+            <IconButton
+              disabled={!isValid}
+              onClick={handleClick}
+              style={{
+                backgroundColor: `${
+                  isValid
+                    ? theme.palette.primary.main
+                    : theme.palette.action.disabledBackground
+                }`,
+              }}
+              sx={{
+                color: 'primary.contrastText',
+                borderRadius: '0 4px 4px 0',
+                overflow: 'hidden',
+                '&:hover': {
+                  bgcolor: 'primary.dark',
+                },
+              }}>
+              <MoreIcon />
+            </IconButton>
+          )}
         </ButtonGroup>
       </Box>
       <Menu
@@ -101,34 +130,21 @@ export const BottomDrawer = ({isOpen, isValid, onSubmit}: Props) => {
           vertical: 'bottom',
           horizontal: 'right',
         }}>
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon>
-            <DraftsIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>
-            <Typography variant="body2">Save Draft</Typography>
-          </ListItemText>
-        </MenuItem>
-
-        <Divider />
-
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon>
-            <CopyAllIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>
-            <Typography variant="body2">Duplicate</Typography>
-          </ListItemText>
-        </MenuItem>
-
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon>
-            <FileDownloadIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>
-            <Typography variant="body2">Download</Typography>
-          </ListItemText>
-        </MenuItem>
+        {listItems.map((item, index) => (
+          <Box key={`${item.label}-${index}`}>
+            <MenuItem
+              onClick={() => {
+                item.onClick();
+                handleClose();
+              }}>
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText>
+                <Typography variant="body2">{item.label}</Typography>
+              </ListItemText>
+            </MenuItem>
+            {item.showBorder && <Divider />}
+          </Box>
+        ))}
       </Menu>
     </Drawer>
   );
