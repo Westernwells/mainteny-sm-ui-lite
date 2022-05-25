@@ -11,6 +11,7 @@ import {useNavigate} from 'react-router';
 import {AddDescription} from '../AddDescription';
 import {SelectTechnicians} from '../SelectTechnicians';
 import {SelectUnit} from '../SelectUnit';
+import {RadioOptions} from '../models';
 
 const steps = ['Select unit', 'Select technicians', 'Add description'];
 
@@ -95,7 +96,7 @@ export const NewEmergency = () => {
         {activeStep === 1 ? (
           <FlexContainer containerStyle={{mt: '2em'}}>
             <SelectTechnicians
-              defaultOption="immediate"
+              defaultOption={RadioOptions.IMMEDIATE}
               elevatorId={selectedUnit?.id}
               getSelectedTechnicians={(val) => setSelectedTechnicians(val)}
               getRecommendedTechnicianView={(val) =>

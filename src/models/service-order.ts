@@ -5,7 +5,7 @@ import {
 } from './service-company';
 import {AttachmentResource, Elevator, ElevatorSimpleView} from './elevator';
 import {Contract, ContractSimpleView} from './contract';
-import {Fee, JobStatus, Meta, Order, Priority, WithOptional} from './misc';
+import {Fee, JobStatus, Meta, Order} from './misc';
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
 
@@ -87,7 +87,7 @@ export interface ServiceOrderAdditionalInfo {
   appointmentNotificationDueDate?: string;
   appointmentNotificationRequired: boolean;
   appointmentNotificationSent: boolean;
-  priority: Priority;
+  priority: ServiceOrderPriority;
 }
 
 export interface ServiceOrderView {
@@ -171,47 +171,11 @@ export interface ServiceOrderScheduleSimpleView {
   createdAt: string;
 }
 
-export interface CreateAssignmentBasedServiceOrder {
-  description: string;
-  elevatorId: string;
-  externalId: string;
-  serviceCompanyId: string;
-  serviceManager: string;
-  technicianIds: string[];
-  time: string;
-  type: string;
-  priority: Priority;
-}
-
-export interface CreateNonScheduledServiceOrder {
-  description: string;
-  dueDate: string;
-  elevatorId: string;
-  externalId: string;
-  serviceCompanyId: string;
-  type: string;
-  priority: Priority;
-}
-
-export interface CreateScheduledServiceOrder {
-  description: string;
-  elevatorId: string;
-  endTime: string;
-  externalId: string;
-  requireReschedule: boolean;
-  requireTechnicianNotification: boolean;
-  serviceCompanyId: string;
-  startTime: string;
-  technicianIds: string[];
-  type: string;
-  priority: Priority;
-}
-
 export interface UpdateServiceOrder {
   id: string;
   externalId: string;
   description: string;
-  priority: Priority;
+  priority: ServiceOrderPriority;
 }
 
 export interface UpdateJobSchedule {
@@ -251,26 +215,6 @@ export interface ServiceOrderReport {
   serviceOrderId: string;
   fee: Fee;
 }
-
-export interface CreateNonScheduledServiceOrder {
-  description: string;
-  dueDate: string;
-  elevatorId: string;
-  externalId: string;
-  serviceCompanyId: string;
-  type: string;
-  priority: Priority;
-}
-
-export type OptionalCreateNonScheduledBody = WithOptional<
-  CreateNonScheduledServiceOrder,
-  | 'dueDate'
-  | 'externalId'
-  | 'priority'
-  | 'type'
-  | 'serviceCompanyId'
-  | 'elevatorId'
->;
 
 export interface ServiceOrderScheduleParams {
   elevatorIds?: string[];
@@ -347,5 +291,17 @@ export interface CreateScheduledServiceOrderBody {
   serviceCompanyId: string;
   startTime: string;
   technicianIds: string[];
+  type: ServiceOrderType;
+}
+
+export interface CreateNonScheduledServiceOrderBody {
+  description: string;
+  dueDate: string;
+  elevatorId: string;
+  externalId: string;
+  labels?: string[];
+  moreInformation?: string;
+  priority: ServiceOrderPriority;
+  serviceCompanyId: string;
   type: ServiceOrderType;
 }

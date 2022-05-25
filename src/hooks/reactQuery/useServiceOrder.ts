@@ -33,6 +33,7 @@ import {
   ServiceOrderScheduleParams,
   ServiceOrderView,
   CreateScheduledServiceOrderBody,
+  CreateNonScheduledServiceOrderBody,
 } from '../../models/service-order';
 import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
@@ -565,6 +566,35 @@ export const useCreateScheduledServiceOrder = (successMsg: string) => {
   return useMutation(
     (body: CreateScheduledServiceOrderBody) =>
       createScheduledServiceOrder(body),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+const createNonScheduledServiceOrder = async (
+  body: CreateNonScheduledServiceOrderBody,
+) => {
+  await axiosClient.post<StringValue>('/api/serviceOrders/nonscheduled', {
+    ...body,
+  });
+};
+
+export const useCreateNonScheduledServiceOrder = (successMsg: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    (body: CreateNonScheduledServiceOrderBody) =>
+      createNonScheduledServiceOrder(body),
     {
       onSuccess: () => {
         enqueueSnackbar(successMsg, {

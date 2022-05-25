@@ -22,8 +22,9 @@ import {AddTechnicianDialog} from './AddTechnicianDialog';
 import {TechnicianSchedule} from './TechnicianSchedule';
 import {ContainerCard} from './ContainerCard';
 import {ScheduleForm} from './ScheduleForm';
-import {ScheduleTechnicianForm} from './models';
-import {constant} from './utils';
+import {DueDateFormProps, RadioOptions, ScheduleTechnicianForm} from './models';
+import {DueDateForm} from './DueDateForm';
+// import {constant} from './utils';
 
 interface Props {
   elevatorId?: string;
@@ -32,10 +33,12 @@ interface Props {
   getRecommendedTechnicianView?: (val: TechnicianView[]) => void;
   initialRecommendedTechnicians?: TechnicianView[];
   showOptions?: boolean;
-  defaultOption?: string;
-  getFormValue?: (form: ScheduleTechnicianForm) => void;
-  formIsErrored?: (value: boolean) => void;
-  getSelectedRadioOption?: (val: string) => void;
+  defaultOption?: RadioOptions;
+  getScheduleFormValue?: (form: ScheduleTechnicianForm) => void;
+  getDueDateFormValues?: (form: DueDateFormProps) => void;
+  scheduleFormIsErrored?: (value: boolean) => void;
+  dueDateFormIsErrored?: (value: boolean) => void;
+  getSelectedRadioOption?: (val?: RadioOptions) => void;
   type?: Exclude<ServiceOrderType, ServiceOrderType.EMERGENCY>;
 }
 
@@ -46,7 +49,12 @@ interface CheckBoxState {
 
 const otherOptions = [
   {
-    value: constant.SCHEDULE_TECHNICIAN,
+    value: RadioOptions.DUE_DATE,
+    label: 'Select a due date',
+    subText: `Select a date before which this service order has to be completed`,
+  },
+  {
+    value: RadioOptions.SCHEDULE_TECHNICIAN,
     label: 'Choose a Date, Time & Technician',
     subText: `Select a specific date, time and technician and update the
     technician&apos;s schedule for that day`,
@@ -55,7 +63,7 @@ const otherOptions = [
 
 const calloutOptions = [
   {
-    value: constant.IMMEDIATE,
+    value: RadioOptions.IMMEDIATE,
     label: 'Immediate',
     subText:
       ' Select a technician for attending this service order immediately',
@@ -70,10 +78,12 @@ export const SelectTechnicians = ({
   initialRecommendedTechnicians,
   initialSelectedTechnicians,
   showOptions,
-  defaultOption = '',
+  defaultOption,
   type,
-  getFormValue = () => {},
-  formIsErrored,
+  getScheduleFormValue = () => {},
+  getDueDateFormValues = () => {},
+  scheduleFormIsErrored,
+  dueDateFormIsErrored,
   getSelectedRadioOption,
 }: Props) => {
   const theme = useTheme();
@@ -81,7 +91,9 @@ export const SelectTechnicians = ({
     type === ServiceOrderType.CALLOUT ? calloutOptions : otherOptions,
   ).current;
   const time = useRef(toRestDateTime(new Date())).current;
-  const [selectedOptions, setSelectedOptions] = useState<string>(defaultOption);
+  const [selectedOption, setSelectedOption] = useState<
+    RadioOptions | undefined
+  >(defaultOption);
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -133,7 +145,7 @@ export const SelectTechnicians = ({
 
   useEffect(() => {
     if (getSelectedTechnicians) {
-      if (selectedOptions === constant.IMMEDIATE) {
+      if (selectedOption === RadioOptions.IMMEDIATE) {
         const result = recommendedTechniciansView.filter((item) =>
           selectedTechnicianIds.includes(item.id),
         );
@@ -176,9 +188,9 @@ export const SelectTechnicians = ({
 
   useEffect(() => {
     if (getSelectedRadioOption) {
-      getSelectedRadioOption(selectedOptions);
+      getSelectedRadioOption(selectedOption);
     }
-  }, [selectedOptions]);
+  }, [selectedOption]);
 
   useEffect(() => {
     if (!Object.keys(checkboxState).length) return;
@@ -214,9 +226,9 @@ export const SelectTechnicians = ({
                   }}>
                   <FormRadio
                     value={option.value}
-                    checked={selectedOptions === option.value}
+                    checked={selectedOption === option.value}
                     handleChange={(e) => {
-                      setSelectedOptions(e.target.value);
+                      setSelectedOption(e.target.value as RadioOptions);
                       setSelectedTechnicianIds([]);
                       if (getSelectedTechnicians) {
                         getSelectedTechnicians([]);
@@ -238,7 +250,7 @@ export const SelectTechnicians = ({
         </>
       ) : null}
 
-      {selectedOptions === constant.IMMEDIATE ? (
+      {selectedOption === RadioOptions.IMMEDIATE ? (
         <>
           <Typography variant="h6" sx={{mt: showOptions ? '2em' : undefined}}>
             Choose Technicians
@@ -294,7 +306,7 @@ export const SelectTechnicians = ({
           flexGrow: 1,
         }}
         cardFooter={
-          selectedOptions === constant.IMMEDIATE ? (
+          selectedOption === RadioOptions.IMMEDIATE ? (
             <Box sx={{ml: '1.5em'}}>
               <Button
                 variant="outlined"
@@ -305,7 +317,7 @@ export const SelectTechnicians = ({
             </Box>
           ) : null
         }>
-        {selectedOptions === constant.IMMEDIATE ? (
+        {selectedOption === RadioOptions.IMMEDIATE ? (
           <TechnicianSchedule
             scheduleItems={orders}
             renderCellItem={renderCellItem}
@@ -317,20 +329,36 @@ export const SelectTechnicians = ({
             checkedValues={selectedTechnicianIds}
           />
         ) : null}
-        {selectedOptions === constant.SCHEDULE_TECHNICIAN ? (
+
+        {selectedOption === RadioOptions.DUE_DATE ? (
+          <DueDateForm
+            defaultStartDate={null}
+            getDueDateFormValues={(form: DueDateFormProps) =>
+              getDueDateFormValues(form)
+            }
+            dueDateFormIsErrored={(val) =>
+              dueDateFormIsErrored && dueDateFormIsErrored(val)
+            }
+            containerStyles={{pl: '1em', mt: '2em', maxWidth: '30%'}} // containerStyles,
+          />
+        ) : null}
+        {selectedOption === RadioOptions.SCHEDULE_TECHNICIAN ? (
           <ScheduleForm
             containerStyles={{pl: '1em', mt: '2em', maxWidth: '30%'}}
             defaultEndDate={null}
+            currentRadioOption={selectedOption}
             defaultStartDate={null}
             defaultTechnician={null}
-            formIsErrored={(val) => formIsErrored && formIsErrored(val)}
+            scheduleFormIsErrored={(val) =>
+              scheduleFormIsErrored && scheduleFormIsErrored(val)
+            }
             getTechnician={(val) => {
               if (getSelectedTechnicians && val) {
                 getSelectedTechnicians([val]);
               }
             }}
-            getFormValues={(form: ScheduleTechnicianForm) => {
-              getFormValue(form);
+            getScheduleFormValues={(form: ScheduleTechnicianForm) => {
+              getScheduleFormValue(form);
               if (form.technicianId) {
                 setSelectedTechnicianIds([form.technicianId]);
               } else {

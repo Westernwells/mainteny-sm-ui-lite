@@ -6,18 +6,20 @@ import {useFormik} from 'formik';
 import {TechnicianView} from 'models/technician';
 import {useEffect} from 'react';
 import * as Yup from 'yup';
-import {ScheduleTechnicianForm} from './models';
+import {RadioOptions, ScheduleTechnicianForm} from './models';
 import {TechnicianAutoComplete} from './TechnicianAutoComplete';
+// import {constant} from './utils';
 
 interface Props {
   defaultStartDate: Date | null;
   defaultEndDate: Date | null;
   defaultTechnician: TechnicianView | null;
-  getFormValues?: (value: ScheduleTechnicianForm) => void;
+  getScheduleFormValues?: (value: ScheduleTechnicianForm) => void;
   getTechnician?: (val: TechnicianView | null) => void;
   getQuery?: (val: string) => void;
   containerStyles?: {[key: string]: any};
-  formIsErrored?: (value: boolean) => void;
+  scheduleFormIsErrored?: (value: boolean) => void;
+  currentRadioOption: RadioOptions;
 }
 
 const validationSchema = Yup.object().shape({
@@ -31,11 +33,12 @@ export const ScheduleForm = ({
   defaultStartDate,
   defaultEndDate,
   defaultTechnician,
-  getFormValues,
+  getScheduleFormValues,
   containerStyles,
   getTechnician,
   getQuery,
-  formIsErrored,
+  scheduleFormIsErrored,
+  currentRadioOption,
 }: Props) => {
   const formik = useFormik<ScheduleTechnicianForm>({
     initialValues: {
@@ -49,14 +52,14 @@ export const ScheduleForm = ({
   });
 
   useEffect(() => {
-    if (getFormValues) {
-      getFormValues({...formik.values});
+    if (getScheduleFormValues) {
+      getScheduleFormValues({...formik.values});
     }
   }, [formik.values]);
 
   useEffect(() => {
-    if (formIsErrored) {
-      formIsErrored(!!Object.keys(formik.errors).length);
+    if (scheduleFormIsErrored) {
+      scheduleFormIsErrored(!!Object.keys(formik.errors).length);
     }
   }, [formik.errors]);
 
@@ -80,70 +83,73 @@ export const ScheduleForm = ({
         label="Due date"
         inputName="date"
       />
+      {currentRadioOption === RadioOptions.SCHEDULE_TECHNICIAN ? (
+        <>
+          <Box sx={{display: 'flex', mt: '1.4em'}}>
+            <TimePicker
+              defaultTime={defaultStartDate}
+              inputError={
+                formik.errors.startTime && formik.touched.startTime
+                  ? formik.errors.startTime
+                  : ''
+              }
+              handleBlur={formik.handleBlur}
+              containerStyles={{mr: '1em'}}
+              getSelectedTime={(time) => {
+                formik.setValues({
+                  ...formik.values,
+                  startTime: time,
+                });
+              }}
+              label="Start Time"
+              inputName="startTime"
+            />
 
-      <Box sx={{display: 'flex', mt: '1.4em'}}>
-        <TimePicker
-          defaultTime={defaultStartDate}
-          inputError={
-            formik.errors.startTime && formik.touched.startTime
-              ? formik.errors.startTime
-              : ''
-          }
-          handleBlur={formik.handleBlur}
-          containerStyles={{mr: '1em'}}
-          getSelectedTime={(time) => {
-            formik.setValues({
-              ...formik.values,
-              startTime: time,
-            });
-          }}
-          label="Start Time"
-          inputName="startTime"
-        />
-
-        <TimePicker
-          defaultTime={defaultEndDate}
-          inputError={
-            formik.errors.endTime && formik.touched.endTime
-              ? formik.errors.endTime
-              : ''
-          }
-          handleBlur={formik.handleBlur}
-          getSelectedTime={(time) => {
-            formik.setValues({
-              ...formik.values,
-              endTime: time,
-            });
-          }}
-          label="End Time"
-          inputName="endTime"
-        />
-      </Box>
-      <Box sx={{mt: '1.4em'}}>
-        <TechnicianAutoComplete
-          inputError={
-            formik.errors.technicianId && formik.touched.technicianId
-              ? formik.errors.technicianId
-              : ''
-          }
-          handleBlur={formik.handleBlur}
-          getTechnician={(value) => {
-            formik.setValues({
-              ...formik.values,
-              technicianId: value ? value.id : null,
-            });
-            if (getTechnician) {
-              getTechnician(value);
-            }
-          }}
-          label="Assign To"
-          getQuery={(val) => {
-            if (getQuery) {
-              getQuery(val);
-            }
-          }}
-        />
-      </Box>
+            <TimePicker
+              defaultTime={defaultEndDate}
+              inputError={
+                formik.errors.endTime && formik.touched.endTime
+                  ? formik.errors.endTime
+                  : ''
+              }
+              handleBlur={formik.handleBlur}
+              getSelectedTime={(time) => {
+                formik.setValues({
+                  ...formik.values,
+                  endTime: time,
+                });
+              }}
+              label="End Time"
+              inputName="endTime"
+            />
+          </Box>
+          <Box sx={{mt: '1.4em'}}>
+            <TechnicianAutoComplete
+              inputError={
+                formik.errors.technicianId && formik.touched.technicianId
+                  ? formik.errors.technicianId
+                  : ''
+              }
+              handleBlur={formik.handleBlur}
+              getTechnician={(value) => {
+                formik.setValues({
+                  ...formik.values,
+                  technicianId: value ? value.id : null,
+                });
+                if (getTechnician) {
+                  getTechnician(value);
+                }
+              }}
+              label="Assign To"
+              getQuery={(val) => {
+                if (getQuery) {
+                  getQuery(val);
+                }
+              }}
+            />
+          </Box>
+        </>
+      ) : null}
     </Box>
   );
 };

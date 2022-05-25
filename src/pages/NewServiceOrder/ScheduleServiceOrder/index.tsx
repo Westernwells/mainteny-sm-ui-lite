@@ -2,6 +2,7 @@ import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {
   useAssignmentBasedOrder,
+  useCreateNonScheduledServiceOrder,
   useCreateScheduledServiceOrder,
 } from 'hooks/reactQuery/useServiceOrder';
 import {ElevatorView} from 'models/elevator';
@@ -14,8 +15,11 @@ import {useNavigate} from 'react-router';
 import {AddDescription} from '../AddDescription';
 import {SelectTechnicians} from '../SelectTechnicians';
 import {SelectUnit} from '../SelectUnit';
-import {ScheduleTechnicianForm} from '../models';
-import {constant} from '../utils';
+import {
+  DueDateFormProps,
+  RadioOptions,
+  ScheduleTechnicianForm,
+} from '../models';
 
 const steps = [
   'Select unit',
@@ -27,24 +31,32 @@ interface Props {
   type: Exclude<ServiceOrderType, ServiceOrderType.EMERGENCY>;
 }
 
-export const NewScheduledServiceOrder = ({type}: Props) => {
+export const ScheduleServiceOrder = ({type}: Props) => {
   const [activeStep, setActiveStep] = useState(0);
   const [selectedUnit, setSelectedUnit] = useState<ElevatorView>();
   const [disableNextBtn, setDisableNextBtn] = useState(false);
-  const [selectedRadioOption, setSelectedRadioOption] = useState('');
+  const [selectedDateString, setSelectedDateString] = useState<string>();
+  const [selectedTimeString, setSelectedTimeString] = useState<string>();
+  const [selectedRadioOption, setSelectedRadioOption] =
+    useState<RadioOptions>();
   const {user} = useUserSession();
   const navigate = useNavigate();
   const [description, setDescription] = useState('');
-  const [formValue, setFormValue] = useState<ScheduleTechnicianForm | null>(
-    null,
-  );
-  const [formErrored, setFormErrored] = useState<boolean>(false);
+  const [scheduleFormValue, setScheduleFormValue] =
+    useState<ScheduleTechnicianForm | null>(null);
+  const [dueDateFormValue, setdueDateFormValue] =
+    useState<DueDateFormProps | null>(null);
+  const [scheduleFormErrored, setScheduleFormErrored] =
+    useState<boolean>(false);
+  const [dueDateFormErrored, setdueDateFormErrored] = useState<boolean>(false);
   const {mutateAsync: createImmediateCalloutOrder} = useAssignmentBasedOrder(
     'Order created successfully',
   );
 
   const {mutateAsync: createScheduledServiceOrder} =
     useCreateScheduledServiceOrder('Order scheduled successfully');
+  const {mutateAsync: createNonScheduledServiceOrder} =
+    useCreateNonScheduledServiceOrder('Order created successfully');
 
   const [recommendedTechnicians, setRecommendedTechnicians] = useState<
     TechnicianView[]
@@ -58,12 +70,59 @@ export const NewScheduledServiceOrder = ({type}: Props) => {
       return setDisableNextBtn(true);
     }
 
-    if (activeStep === 1 && !selectedTechnicians.length) {
+    if (activeStep === 1 && !selectedRadioOption) {
+      return setDisableNextBtn(true);
+    }
+
+    if (
+      activeStep === 1 &&
+      selectedRadioOption === RadioOptions.IMMEDIATE &&
+      !selectedTechnicians.length
+    ) {
+      return setDisableNextBtn(true);
+    }
+
+    if (
+      activeStep === 1 &&
+      selectedRadioOption === RadioOptions.DUE_DATE &&
+      dueDateFormErrored
+    ) {
+      return setDisableNextBtn(true);
+    }
+
+    if (
+      activeStep === 1 &&
+      selectedRadioOption === RadioOptions.SCHEDULE_TECHNICIAN &&
+      scheduleFormErrored
+    ) {
       return setDisableNextBtn(true);
     }
 
     return setDisableNextBtn(false);
-  }, [activeStep, selectedUnit, selectedTechnicians, formErrored]);
+  }, [
+    activeStep,
+    selectedUnit,
+    selectedTechnicians,
+    scheduleFormErrored,
+    dueDateFormErrored,
+  ]);
+
+  useEffect(() => {
+    let dateString;
+    let timeString;
+    if (selectedRadioOption === RadioOptions.DUE_DATE) {
+      dateString = formatDate(dueDateFormValue?.date!, 'dd.MM.yyy');
+    }
+    if (selectedRadioOption === RadioOptions.SCHEDULE_TECHNICIAN) {
+      dateString = formatDate(scheduleFormValue?.date!, 'dd.MM.yyy');
+      timeString = `${formatDate(
+        scheduleFormValue?.startTime!,
+        'HH:mm',
+      )}-${formatDate(scheduleFormValue?.startTime!, 'HH:mm')}`;
+    }
+    setSelectedDateString(dateString);
+    setSelectedTimeString(timeString);
+  }, [scheduleFormValue, dueDateFormValue]);
 
   const handleCancel = () => {
     setActiveStep(0);
@@ -89,15 +148,15 @@ export const NewScheduledServiceOrder = ({type}: Props) => {
     navigate('/orders?pageIndex=1&pageSize=25&tab=1');
   };
 
-  const createScheduledCalloutOrder = async () => {
+  const createScheduledOrder = async () => {
     const serviceCompanyId = user?.userAccount.serviceCompany.id!;
     const startTime = setDateTime(
-      formValue!.date!,
-      formatDate(formValue!.startTime!, 'HH:mm')!,
+      scheduleFormValue!.date!,
+      formatDate(scheduleFormValue!.startTime!, 'HH:mm')!,
     ).toISOString();
     const endTime = setDateTime(
-      formValue!.date!,
-      formatDate(formValue!.endTime!, 'HH:mm')!,
+      scheduleFormValue!.date!,
+      formatDate(scheduleFormValue!.endTime!, 'HH:mm')!,
     ).toISOString();
     const body = {
       description,
@@ -106,27 +165,52 @@ export const NewScheduledServiceOrder = ({type}: Props) => {
       priority: ServiceOrderPriority.A,
       serviceCompanyId,
       technicianIds: selectedTechnicians.map((item) => item.id),
-      type: ServiceOrderType.CALLOUT,
+      type,
       requireReschedule: true,
       requireTechnicianNotification: true,
       startTime,
       endTime,
     };
-    console.log(body);
+
     await createScheduledServiceOrder(body);
     navigate('/orders?pageIndex=1&pageSize=25&tab=1');
+  };
+
+  const createNonScheduledOrder = async () => {
+    const serviceCompanyId = user?.userAccount.serviceCompany.id!;
+    const dueDate = formatDate(dueDateFormValue?.date!, 'yyy-MM-dd')!;
+    const body = {
+      description,
+      elevatorId: selectedUnit!.id,
+      externalId: '',
+      priority: ServiceOrderPriority.A,
+      serviceCompanyId,
+      type,
+      dueDate,
+    };
+
+    await createNonScheduledServiceOrder(body);
+    navigate('/orders?pageIndex=1&pageSize=25&tab=1');
+  };
+
+  const handleSubmit = async () => {
+    if (selectedRadioOption === RadioOptions.IMMEDIATE) {
+      await createNewImmediateCalloutOrder();
+    }
+
+    if (selectedRadioOption === RadioOptions.DUE_DATE) {
+      await createNonScheduledOrder();
+    }
+
+    if (selectedRadioOption === RadioOptions.SCHEDULE_TECHNICIAN) {
+      await createScheduledOrder();
+    }
   };
 
   return (
     <Stepper
       handleCancel={handleCancel}
-      handleSubmit={async () => {
-        if (selectedRadioOption === constant.IMMEDIATE) {
-          await createNewImmediateCalloutOrder();
-        } else {
-          await createScheduledCalloutOrder();
-        }
-      }}
+      handleSubmit={() => handleSubmit()}
       disableNextBtn={disableNextBtn}
       getActiveStep={(val) => setActiveStep(val)}
       steps={steps}
@@ -152,14 +236,16 @@ export const NewScheduledServiceOrder = ({type}: Props) => {
               showOptions
               type={type}
               elevatorId={selectedUnit?.id}
-              getFormValue={(val) => setFormValue(val)}
+              getScheduleFormValue={(val) => setScheduleFormValue(val)}
+              getDueDateFormValues={(val) => setdueDateFormValue(val)}
               getRecommendedTechnicianView={(val) =>
                 setRecommendedTechnicians(val)
               }
               getSelectedRadioOption={(val) => setSelectedRadioOption(val)}
               getSelectedTechnicians={(val) => setSelectedTechnicians(val)}
               defaultOption={selectedRadioOption}
-              formIsErrored={(val) => setFormErrored(val)}
+              scheduleFormIsErrored={(val) => setScheduleFormErrored(val)}
+              dueDateFormIsErrored={(val) => setdueDateFormErrored(val)}
               initialRecommendedTechnicians={recommendedTechnicians}
               initialSelectedTechnicians={selectedTechnicians}
             />
@@ -173,6 +259,8 @@ export const NewScheduledServiceOrder = ({type}: Props) => {
               initialDescription={description}
               selectedUnit={selectedUnit}
               selectedTechnicians={selectedTechnicians}
+              selectedDateString={selectedDateString || ''}
+              selectedTimeString={selectedTimeString || ''}
             />
           </FlexContainer>
         ) : null}

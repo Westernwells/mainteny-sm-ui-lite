@@ -79,6 +79,7 @@ export const columns: GridColDef[] = [
       <StatusChip
         label={convertToText(params.value)}
         color={params.value === ElevatorStatus.RUNNING ? 'success' : 'error'}
+        variant="filled"
       />
     ),
   },
