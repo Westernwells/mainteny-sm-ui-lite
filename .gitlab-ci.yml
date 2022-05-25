@@ -58,7 +58,7 @@ variables:
     - pulumi login s3://mainteny-pulumi-state
   variables:
     ENV: stage
-    CACHE_PATH: /sm-lite-test*
+    CACHE_PATH: /sm-lite*
   script:
     - echo "Deploying ${IMAGE_SUFFIX} on environment $STACK"
     - pulumi stack select sm-lite.$STACK
@@ -101,7 +101,7 @@ build-stage:
   <<: *build-template
   variables:
     ENV: stage
-    PUBLIC_URL: /sm-lite-test
+    PUBLIC_URL: /sm-lite
   rules:
     - if: $CI_MERGE_REQUEST_ID
       when: never
@@ -139,21 +139,6 @@ build-prod-image:
         ENV: prod
     - when: never
 
-# To Do: Remove this stage
-deploy-development:
-  <<: *deploy-template
-  dependencies:
-    - build-stage-image
-  rules:
-    - if: "$CI_COMMIT_REF_NAME == 'main'"
-      variables:
-        ENV: stage
-        STACK: test.stage
-        IMAGE_ENV: stage
-        CACHE_PATH: /sm-lite-test*
-      when: on_success
-    - when: never
-
 deploy-stage:
   <<: *deploy-template
   dependencies:
@@ -178,6 +163,6 @@ deploy-production:
         ENV: prod
         STACK: prod
         IMAGE_ENV: prod
-        CACHE_PATH: /sm*
+        CACHE_PATH: /sm-lite*
       when: manual
     - when: never
