@@ -185,7 +185,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Employee Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout pageScrollable>
+              <PageLayout>
                 <EmployeeDetails />
               </PageLayout>
             </>

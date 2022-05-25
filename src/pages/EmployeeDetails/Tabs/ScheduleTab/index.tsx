@@ -18,6 +18,7 @@ import {useServiceOrderStatusColor} from 'hooks/useServiceOrderStatusColor';
 import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicator';
 import {WeekPair} from 'models/misc';
 import {OrderDetails} from 'components/OrderDetails';
+import {FlexContainer} from 'components/FlexContainer';
 
 interface Props {
   technicianId?: string;
@@ -59,13 +60,13 @@ export const ScheduleTab = ({technicianId}: Props) => {
   }, [serviceOrders]);
 
   return (
-    <>
+    <FlexContainer containerStyle={{height: 0}}>
       <ServiceOrderStatusIndicator />
       <Schedule
         getWeekPair={(pair) => setWeekPair(pair)}
         scheduleItems={orders}
         scheduleType="date"
-        renderCellItem={(order: ServiceOrderView, calWidth, calcPosition) => (
+        renderCellItem={(order: ServiceOrderView, width, position) => (
           <ScheduleItem
             key={order.id}
             titleLeftAdornment={
@@ -76,16 +77,13 @@ export const ScheduleTab = ({technicianId}: Props) => {
             }
             title={order.elevator.propertyOwner.name}
             subtitle={order.elevator.address.fullName}
-            width={calWidth(
-              order.schedules[0].startTime,
-              order.schedules[0].endTime,
-            )}
+            width={width}
             tooltip={<OrderDetails order={order} />}
             cardStatusAccent={serviceOrderStatusColor[order.status]}
-            position={calcPosition(order.schedules[0].startTime)}
+            position={position}
           />
         )}
       />
-    </>
+    </FlexContainer>
   );
 };

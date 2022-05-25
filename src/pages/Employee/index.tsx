@@ -72,12 +72,14 @@ export const Employees = () => {
   }, [queryParams]);
 
   useEffect(() => {
-    const eventByTechnicianId = _.groupBy(
-      technicianEvents?.data,
-      (event: TechnicianEventPair) => event.technicianId,
-    );
-    setRows(makeRows(userAccountResource.data, eventByTechnicianId));
-  }, [userAccountResource]);
+    if (!isLoading) {
+      const eventByTechnicianId = _.groupBy(
+        technicianEvents?.data,
+        (event: TechnicianEventPair) => event.technicianId,
+      );
+      setRows(makeRows(userAccountResource.data, eventByTechnicianId));
+    }
+  }, [userAccountResource, isLoading]);
 
   useEffect(() => {
     setPageCount(Math.ceil(userAccountResource.total / page.pageSize));

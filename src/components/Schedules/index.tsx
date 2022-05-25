@@ -7,7 +7,6 @@ import * as _ from 'lodash';
 import Typography from '@mui/material/Typography';
 import {
   addDays,
-  differenceInMinutes,
   eachDayOfInterval,
   endOfDay,
   startOfDay,
@@ -34,14 +33,16 @@ import {TechnicianView} from 'models/technician';
 import {styles as sx} from './styles';
 import {ScheduleControls} from './ScheduleControls';
 import {ScheduleLabel} from './ScheduleLabel';
+import {ScheduledItemGroup} from './model';
+import {getItemPosition, getItemWidth} from './utils';
 
 interface Props {
   technicians?: TechnicianView[];
   scheduleItems: {[key: string]: ServiceOrderView[]};
   renderCellItem: (
     cellItem: any,
-    calcWidth: (startDateTime: string, endDateTime: string) => string,
-    calcPosition: (startDateTime: string) => string,
+    width: string,
+    position: {x: string; y: string},
   ) => void;
   getWeekPair?: (weekPair: WeekPair) => void;
   scheduleType?: 'date' | 'people' | 'default';
@@ -86,6 +87,8 @@ export const Schedule = ({
   const theme = useTheme();
   const [tableHeader, setTableHeader] = useState<string[]>([]);
   const elementRef = useRef<HTMLInputElement | undefined>();
+  const [scheduleItemGroup, setScheduleItemGroup] =
+    useState<ScheduledItemGroup>({});
   const [weekPair, setWeekPair] = useState<WeekPair>({
     startOfWeekDay: getStartOfWeek(new Date(), 1),
     endOfWeekDay: getEndOfWeek(new Date(), 1),
@@ -109,6 +112,24 @@ export const Schedule = ({
   const [lookupTechnician, setLookupTechnician] = useState<{
     [key: string]: TechnicianView[];
   }>({});
+
+  useEffect(() => {
+    const result: ScheduledItemGroup = {};
+    Object.keys(scheduleItems).forEach((key) => {
+      const items = scheduleItems[key];
+      result[key] = {};
+      items.forEach((item) => {
+        const hr = formatDate(new Date(item.schedules[0].startTime), 'HH')!;
+        if (result[key][hr]) {
+          result[key][hr] = [...result[key][hr], item.id];
+        } else {
+          result[key][hr] = [item.id];
+        }
+      });
+    });
+
+    setScheduleItemGroup(result);
+  }, [scheduleItems]);
 
   useEffect(() => {
     setLookupTechnician(_.groupBy(technicians, (technician) => technician.id));
@@ -183,25 +204,8 @@ export const Schedule = ({
     };
   }, []);
 
-  const calculatePosition = (startDateTime: string) => {
-    const morningTime = startOfDay(new Date(startDateTime));
-    const orderStartTime = getDateObject(startDateTime);
-    const result =
-      gridWidth * (differenceInMinutes(orderStartTime, morningTime) / 60);
-    return `${result}px`;
-  };
-
-  const calculateWidth = (startDateTime: string, endDateTime: string) => {
-    const width =
-      (differenceInMinutes(
-        getDateObject(endDateTime),
-        getDateObject(startDateTime),
-      ) /
-        60) *
-      gridWidth;
-
-    return `${width}px`;
-  };
+  //   return `${width}px`;
+  // };
 
   const nextMonth = () => {
     const firstDayOfNextWeek = startOfDay(addDays(weekPair.endOfWeekDay, 1));
@@ -318,8 +322,21 @@ export const Schedule = ({
                                   {scheduleItems[xKey].map((scheduleItem) =>
                                     renderCellItem(
                                       scheduleItem,
-                                      calculateWidth,
-                                      calculatePosition,
+                                      getItemWidth({
+                                        startDateTime:
+                                          scheduleItem.schedules[0].startTime,
+                                        endDateTime:
+                                          scheduleItem.schedules[0].endTime,
+                                        gridWidth,
+                                      }),
+                                      getItemPosition({
+                                        scheduleItemGroup,
+                                        startDateTime:
+                                          scheduleItem.schedules[0].startTime,
+                                        rowKey: xKey,
+                                        orderId: scheduleItem.id,
+                                        gridWidth,
+                                      }),
                                     ),
                                   )}
                                 </ScheduleItemContainer>

@@ -24,7 +24,6 @@ import {ContainerCard} from './ContainerCard';
 import {ScheduleForm} from './ScheduleForm';
 import {DueDateFormProps, RadioOptions, ScheduleTechnicianForm} from './models';
 import {DueDateForm} from './DueDateForm';
-// import {constant} from './utils';
 
 interface Props {
   elevatorId?: string;
@@ -265,8 +264,8 @@ export const SelectTechnicians = ({
 
   const renderCellItem = (
     order: ServiceOrderView,
-    calcWidth: (startDateTime: string, endDateTime: string) => string,
-    calcPosition: (startDateTime: string) => string,
+    width: string,
+    position: {x: string; y: string},
   ) => (
     <ScheduleItem
       key={order.id}
@@ -279,13 +278,10 @@ export const SelectTechnicians = ({
       }
       title={order.elevator.propertyOwner.name}
       subtitle={order.elevator.address.fullName}
-      width={calcWidth(
-        order.schedules[0].startTime,
-        order.schedules[0].endTime,
-      )}
+      width={width}
       tooltip={<OrderDetails order={order} />}
       cardStatusAccent={serviceOrderStatusColor[order.status]}
-      position={calcPosition(order.schedules[0].startTime)}
+      position={position}
     />
   );
 
@@ -336,7 +332,7 @@ export const SelectTechnicians = ({
             getDueDateFormValues={(form: DueDateFormProps) =>
               getDueDateFormValues(form)
             }
-            dueDateFormIsErrored={(val) =>
+            dueDateFormIsErrored={(val: boolean) =>
               dueDateFormIsErrored && dueDateFormIsErrored(val)
             }
             containerStyles={{pl: '1em', mt: '2em', maxWidth: '30%'}} // containerStyles,

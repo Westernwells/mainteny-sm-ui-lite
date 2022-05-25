@@ -134,7 +134,6 @@ export const ServiceOrderScheduleTab = ({
             label="Show Unassigned Orders"
           />
         </Box>
-        {/* <ServiceOrderStatusIndicator containerStyles={{flexGrow: 1}} /> TODO: ADD to card footer */}
       </Box>
 
       <Box sx={{display: 'flex', flexGrow: 1, height: 0}}>
@@ -147,7 +146,7 @@ export const ServiceOrderScheduleTab = ({
           searchPlaceholder="Search technician"
           handleSearch={(value) => setTechnicianSearch(value)}
           technicians={technicianResource.data}
-          renderCellItem={(order: ServiceOrderView, calWidth, calcPosition) => (
+          renderCellItem={(order: ServiceOrderView, width, position) => (
             <ScheduleItem
               key={order.id}
               titleLeftAdornment={
@@ -158,13 +157,10 @@ export const ServiceOrderScheduleTab = ({
               }
               title={order.elevator.propertyOwner.name}
               subtitle={order.elevator.address.fullName}
-              width={calWidth(
-                order.schedules[0].startTime,
-                order.schedules[0].endTime,
-              )}
+              width={width}
               tooltip={<OrderDetails order={order} />}
               cardStatusAccent={serviceOrderStatusColor[order.status]}
-              position={calcPosition(order.schedules[0].startTime)}
+              position={position}
             />
           )}
         />

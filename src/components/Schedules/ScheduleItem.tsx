@@ -9,7 +9,7 @@ interface Props {
   title?: string;
   subtitle?: string;
   width?: string;
-  position?: string;
+  position?: {x: string; y: string};
   height?: string;
   titleLeftAdornment?: JSX.Element;
   cardStatusAccent?: string;
@@ -37,13 +37,13 @@ export const ScheduleItem = ({
       component="div"
       sx={{
         gridColumn: 1,
-        gridRow: 1,
+        gridRow: Number(position?.y),
         height,
-        top: '-24px',
         background: theme.palette.secondary.outlinedHoverBg,
         overflowX: 'hidden',
         width,
-        transform: `translateX(${position})`,
+        transform: `translateX(${position?.x})`,
+        marginTop: '0.5em',
         borderLeft: `2px solid ${cardStatusAccent}`,
         cursor: 'pointer',
         overflowY: 'hidden',
