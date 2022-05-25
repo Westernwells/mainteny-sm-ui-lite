@@ -1,6 +1,6 @@
 import {AddressRecord, Contact, Meta} from './misc';
 import {ServiceCompany} from './service-company';
-import {UserAccount} from './user';
+import {UserAccount, UserView} from './user';
 
 // TODO: Validate this model
 export interface Manager {
@@ -19,3 +19,5 @@ export interface ServiceManager {
   userAccount: UserAccount;
   meta: Meta;
 }
+
+export interface ServiceManagerUserView extends UserView<any> {}

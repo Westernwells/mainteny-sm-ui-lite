@@ -1,14 +1,10 @@
 import {DataGridLayout} from 'components/DataGridLayout';
 import {PageOverviewLayout} from 'components/PageOverviewLayout';
 import {Widget} from 'components/Widget';
-import {
-  useFetchTechniciansByUserAccounts,
-  useQueryTechnicianEvents,
-} from 'hooks/reactQuery/useTechnician';
+import {useQueryTechnicianEvents} from 'hooks/reactQuery/useTechnician';
 import {useQueryUserAccounts} from 'hooks/reactQuery/useUserAccount';
-import {EmployeesView} from 'models/employee';
-import {Resource, TechnicianEventType} from 'models/misc';
-import {Role, UserAccountView} from 'models/user';
+import {TechnicianEventType} from 'models/misc';
+import {CommonUserView, Role} from 'models/user';
 import {useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import * as _ from 'lodash';
@@ -18,7 +14,7 @@ import {
 } from 'utils/utils';
 import {useSearchParams} from 'react-router-dom';
 import {Progress} from 'components/Progress';
-import {TechnicianEventPair, TechnicianView} from 'models/technician';
+import {TechnicianEventPair} from 'models/technician';
 import {toRestDateTime} from 'utils/datetime';
 import {addDays, endOfDay, startOfDay} from 'date-fns';
 import {GridRowsProp} from '@mui/x-data-grid';
@@ -37,12 +33,13 @@ export const Employees = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [employeeResource, setEmployeeResource] = useState(
-    createEmptyResource<EmployeesView>(pageSize),
-  );
 
   const {
-    data: userAccountResource = createEmptyResource<UserAccountView>(pageSize),
+    data: userAccountResource = createEmptyResource<CommonUserView>(pageSize),
+    isFetched,
+    isIdle,
+    isLoading,
+    isFetching,
   } = useQueryUserAccounts(
     {
       pageIndex: page.pageIndex,
@@ -52,16 +49,6 @@ export const Employees = () => {
     },
     {keepPreviousData: true},
   );
-
-  const {
-    data: technicians = [],
-    isLoading,
-    isFetching,
-    isIdle,
-    isFetched,
-  } = useFetchTechniciansByUserAccounts(userAccountResource.data, {
-    keepPreviousData: true,
-  });
 
   const {data: technicianEvents} = useQueryTechnicianEvents({
     start: toRestDateTime(startOfDay(addDays(new Date(), 1))),
@@ -85,54 +72,12 @@ export const Employees = () => {
   }, [queryParams]);
 
   useEffect(() => {
-    let userData: Resource<EmployeesView> = {
-      total: userAccountResource.total,
-      data: [],
-      page: {
-        pageIndex: userAccountResource.page.pageIndex,
-        pageSize: userAccountResource.page.pageSize,
-      },
-    };
-
-    const techniciansByUserAccountId = _.groupBy(
-      technicians,
-      (technician: TechnicianView) => technician.userAccount.id,
-    );
-
     const eventByTechnicianId = _.groupBy(
       technicianEvents?.data,
       (event: TechnicianEventPair) => event.technicianId,
     );
-
-    userAccountResource.data.forEach((item) => {
-      if (techniciansByUserAccountId[item.id]) {
-        const technician = techniciansByUserAccountId[item.id][0];
-        userData = {
-          ...userData,
-          data: [
-            ...userData.data,
-            {
-              ...technician,
-              events:
-                eventByTechnicianId[technician.id] &&
-                eventByTechnicianId[technician.id][0].eventViews,
-            },
-          ],
-        };
-      } else {
-        userData = {
-          ...userData,
-          data: [...userData.data, {userAccount: item}],
-        };
-      }
-    });
-
-    setEmployeeResource(userData);
-  }, [technicians, userAccountResource]);
-
-  useEffect(() => {
-    setRows(makeRows(employeeResource.data));
-  }, [employeeResource]);
+    setRows(makeRows(userAccountResource.data, eventByTechnicianId));
+  }, [userAccountResource]);
 
   useEffect(() => {
     setPageCount(Math.ceil(userAccountResource.total / page.pageSize));

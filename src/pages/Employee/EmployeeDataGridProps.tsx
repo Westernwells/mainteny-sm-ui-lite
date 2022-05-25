@@ -3,10 +3,10 @@ import {
   GridColDef,
   GridColumnHeaderParams,
   GridRenderCellParams,
-  GridRowsProp,
+  GridRowModel,
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
-import {EmployeesView} from 'models/employee';
+// import {EmployeesView} from 'models/employee';
 import Box from '@mui/material/Box';
 import {TechnicianEventType} from 'models/misc';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
@@ -16,6 +16,8 @@ import SendIcon from '@mui/icons-material/Send';
 import {capitalize} from 'utils/utils';
 import IconButton from '@mui/material/IconButton';
 import React from 'react';
+import {CommonUserView, Role} from 'models/user';
+import {TechnicianEventPair} from 'models/technician';
 
 const defaultProps = {
   editable: false,
@@ -36,8 +38,8 @@ const defaultAlignment: {
   align: GridAlignment;
 } = {
   flex: 1,
-  headerAlign: 'center',
-  align: 'center',
+  headerAlign: 'left',
+  align: 'left',
 };
 
 export const columns: GridColDef[] = [
@@ -45,19 +47,17 @@ export const columns: GridColDef[] = [
     field: 'name',
     headerName: 'Name',
     type: 'string',
-    flex: 2,
-    headerAlign: 'left',
-    align: 'left',
+    ...defaultAlignment,
     ...defaultProps,
+    flex: 2,
   },
   {
     field: 'role',
     headerName: 'ROLE',
     type: 'string',
-    flex: 2,
-    headerAlign: 'left',
-    align: 'left',
+    ...defaultAlignment,
     ...defaultProps,
+    flex: 2,
     renderCell: (params) => {
       // [0].split('_').join(' ')
       const role = capitalize(params.value);
@@ -75,19 +75,17 @@ export const columns: GridColDef[] = [
     field: 'address',
     headerName: 'ADDRESS',
     type: 'number',
-    flex: 4,
-    headerAlign: 'left',
-    align: 'left',
+    ...defaultAlignment,
     ...defaultProps,
+    flex: 4,
   },
   {
     field: 'phone',
     headerName: 'PHONE NUMBER',
     type: 'string',
-    flex: 1,
-    headerAlign: 'left',
-    align: 'left',
+    ...defaultAlignment,
     ...defaultProps,
+    flex: 2,
   },
   {
     field: 'shift',
@@ -100,9 +98,7 @@ export const columns: GridColDef[] = [
     field: 'availability',
     headerName: 'AVAILABILITY',
     type: 'string',
-    flex: 1,
-    headerAlign: 'left',
-    align: 'left',
+    ...defaultAlignment,
     ...defaultProps,
 
     renderCell: (params) => {
@@ -167,11 +163,12 @@ export const columns: GridColDef[] = [
   {
     field: 'email',
     headerName: 'EMAIL',
+    ...defaultAlignment,
+    ...defaultProps,
     editable: false,
     sortable: false,
     disableColumnMenu: true,
     disableExport: true,
-    ...defaultAlignment,
 
     renderHeader: (params) => (
       <Typography variant="subtitle2" color="textSecondary">
@@ -191,20 +188,35 @@ export const columns: GridColDef[] = [
   },
 ];
 
-export const makeRows = (employees: any): GridRowsProp =>
-  employees
-    ? employees.map((item: EmployeesView, index: number) => ({
-        id: index,
-        name: `${item.userAccount.firstName} ${item.userAccount.lastName}`,
-        role: item.userAccount.roles,
-        address: item.address?.fullName || '-',
-        phone: item.userAccount.contact.phone,
-        shift:
-          item.workingHours && item.workingHours.length
-            ? `${item.workingHours[0].fromTime} - ${item.workingHours[0].toTime}`
-            : '-',
-        availability: item.events ? item.events[0].eventType : 'Available',
-        navigateTo: `details/${item.userAccount.username}`,
-        email: item.userAccount.username,
-      }))
-    : console.error('No Data');
+export const makeRows = (
+  employees: CommonUserView[],
+  techniciansEvents: {[key: string]: TechnicianEventPair[]},
+): GridRowModel<{[key: string]: any}[]> => {
+  console.log('');
+  return employees
+    ? employees.map((item: CommonUserView, index: number) => {
+        let shift = '-';
+        let event = 'Available';
+        if (item.userAccount.roles.includes(Role.TECHNICIAN)) {
+          shift = item.userData.workingHours.length
+            ? `${item.userData.workingHours[0].fromTime} - ${item.userData.workingHours[0].toTime}`
+            : '-';
+          event = techniciansEvents[item.userData.technicianId]
+            ? techniciansEvents[item.userData.technicianId][0].eventViews[0]
+                .eventType
+            : 'Available';
+        }
+        return {
+          id: index,
+          name: `${item.userAccount.firstName} ${item.userAccount.lastName}`,
+          role: item.userAccount.roles,
+          address: item.userData.address?.fullName || '-',
+          phone: item.userAccount.contact.phone,
+          shift,
+          availability: event,
+          navigateTo: `details/${item.userAccount.username}`,
+          email: item.userAccount.username,
+        };
+      })
+    : [];
+};
