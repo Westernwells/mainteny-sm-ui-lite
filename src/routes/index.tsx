@@ -26,6 +26,7 @@ import {NewUnit} from 'pages/NewServiceOrder/NewUnit';
 import i18n from 'i18next';
 
 import {NewServiceOrder} from 'pages/NewServiceOrder';
+import {Articles} from 'pages/Articles';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -291,14 +292,14 @@ export const Router = () => {
         />
 
         <Route
-          path="/notifications"
+          path="/articles"
           element={
             <>
               <Helmet>
-                <title>{`Notifications - ${titleTail}`}</title>
+                <title>{`Quotations - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout excludeSidebar pageScrollable excludeDefaultSpacing>
-                <Notifications />
+              <PageLayout>
+                <Articles />
               </PageLayout>
             </>
           }
