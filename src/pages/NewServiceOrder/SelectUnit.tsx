@@ -115,7 +115,7 @@ please click the button below'
     <>
       <Box display="flex" justifyContent="space-between">
         <Typography variant="h6" component="div">
-          Choose Unit
+          Select unit
         </Typography>
         <SearchInput
           placeholder="Search"
