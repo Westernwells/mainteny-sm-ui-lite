@@ -15,6 +15,7 @@ import {ScheduleControls} from 'components/Schedules/ScheduleControls';
 import {ScheduleLabel} from 'components/Schedules/ScheduleLabel';
 import {ScheduledItemGroup} from 'components/Schedules/model';
 import {getItemPosition, getItemWidth} from 'components/Schedules/utils';
+import {isBefore} from 'date-fns';
 
 interface Props {
   technicians?: TechnicianView[];
@@ -59,13 +60,22 @@ export const TechnicianSchedule = ({
     Object.keys(scheduleItems).forEach((key) => {
       const items = scheduleItems[key];
       result[key] = {};
+      let previousOrder: ServiceOrderView | null = null;
+
       items.forEach((item) => {
-        const hr = formatDate(new Date(item.schedules[0].startTime), 'HH')!;
-        if (result[key][hr]) {
-          result[key][hr] = [...result[key][hr], item.id];
+        if (previousOrder) {
+          const previousEndTime = new Date(previousOrder.schedules[0].endTime);
+          const currentOrderStartTime = new Date(item.schedules[0].startTime);
+          if (isBefore(currentOrderStartTime, previousEndTime)) {
+            const previousOrderNextLevel = result[key][previousOrder.id];
+            result[key][item.id] = previousOrderNextLevel + 1;
+          } else {
+            result[key][item.id] = 1;
+          }
         } else {
-          result[key][hr] = [item.id];
+          result[key][item.id] = 1;
         }
+        previousOrder = item;
       });
     });
 
@@ -108,18 +118,6 @@ export const TechnicianSchedule = ({
       clearTimeout(timeout);
     };
   }, []);
-
-  // const calculateWidth = (startDateTime: string, endDateTime: string) => {
-  //   const width =
-  //     (differenceInMinutes(
-  //       getDateObject(endDateTime),
-  //       getDateObject(startDateTime),
-  //     ) /
-  //       60) *
-  //     gridWidth;
-
-  //   return `${width}px`;
-  // };
 
   return (
     <ScheduleContainer>

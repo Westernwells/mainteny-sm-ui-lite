@@ -19,6 +19,7 @@ import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicato
 import {WeekPair} from 'models/misc';
 import {OrderDetails} from 'components/OrderDetails';
 import {FlexContainer} from 'components/FlexContainer';
+import {sortOrderByTime} from 'utils/service-order-utils';
 
 interface Props {
   technicianId?: string;
@@ -49,7 +50,8 @@ export const ScheduleTab = ({technicianId}: Props) => {
     );
 
   useEffect(() => {
-    const ordersByDate = _.groupBy(serviceOrders.data, (serviceOrder) =>
+    const sortedOrder = sortOrderByTime(serviceOrders.data);
+    const ordersByDate = _.groupBy(sortedOrder, (serviceOrder) =>
       formatDate(
         getDateObject(serviceOrder.schedules[0].startTime),
         dateFormat,

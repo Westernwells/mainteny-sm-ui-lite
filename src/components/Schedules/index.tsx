@@ -9,6 +9,7 @@ import {
   addDays,
   eachDayOfInterval,
   endOfDay,
+  isBefore,
   startOfDay,
   subDays,
 } from 'date-fns';
@@ -118,18 +119,32 @@ export const Schedule = ({
     Object.keys(scheduleItems).forEach((key) => {
       const items = scheduleItems[key];
       result[key] = {};
+      let previousOrder: ServiceOrderView | null = null;
+      console.log(scheduleItems, '>>>>>>>>>>>>');
+
       items.forEach((item) => {
-        const hr = formatDate(new Date(item.schedules[0].startTime), 'HH')!;
-        if (result[key][hr]) {
-          result[key][hr] = [...result[key][hr], item.id];
+        if (previousOrder) {
+          const previousEndTime = new Date(previousOrder.schedules[0].endTime);
+          const currentOrderStartTime = new Date(item.schedules[0].startTime);
+          // console.log(item, '+++++++++________', previousOrder)
+          if (isBefore(currentOrderStartTime, previousEndTime)) {
+            // console.log(previousOrder,'=========>', item)
+            const previousOrderNextLevel = result[key][previousOrder.id];
+            result[key][item.id] = previousOrderNextLevel + 1;
+          } else {
+            result[key][item.id] = 1;
+          }
         } else {
-          result[key][hr] = [item.id];
+          result[key][item.id] = 1;
         }
+        previousOrder = item;
       });
     });
 
     setScheduleItemGroup(result);
   }, [scheduleItems]);
+
+  console.log(scheduleItems, '&&&&^^^^^$$');
 
   useEffect(() => {
     setLookupTechnician(_.groupBy(technicians, (technician) => technician.id));
@@ -204,7 +219,7 @@ export const Schedule = ({
     };
   }, []);
 
-  const nextMonth = () => {
+  const nextWeek = () => {
     const firstDayOfNextWeek = startOfDay(addDays(weekPair.endOfWeekDay, 1));
     const endOfNextWeek = getEndOfWeek(firstDayOfNextWeek, 1);
     setWeekPair({
@@ -214,7 +229,7 @@ export const Schedule = ({
     });
   };
 
-  const prevMonth = () => {
+  const prevWeek = () => {
     const endOfPrevWeek = endOfDay(subDays(weekPair.startOfWeekDay, 1));
     const firstDayOfPrevWeek = getStartOfWeek(endOfPrevWeek, 1);
     setWeekPair({
@@ -256,8 +271,8 @@ export const Schedule = ({
                       <ScheduleHeaderCell key={index} labelWidth={labelWidth}>
                         <ScheduleControls
                           item={item}
-                          prevMonth={prevMonth}
-                          nextMonth={nextMonth}
+                          prevWeek={prevWeek}
+                          nextWeek={nextWeek}
                           getSearchValue={(searchValue) =>
                             handleSearch && handleSearch(searchValue)
                           }

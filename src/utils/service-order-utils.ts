@@ -1,4 +1,6 @@
-import {ServiceOrderStatus} from 'models/service-order';
+import {differenceInMinutes} from 'date-fns';
+import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
+import {toDate} from './datetime';
 
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
   switch (status) {
@@ -49,4 +51,14 @@ export const serviceOrderStatusToEnum = (status: string) => {
     default:
       return 'Unscheduled';
   }
+};
+
+export const sortOrderByTime = (serviceOrder: ServiceOrderView[]) => {
+  const res = serviceOrder.sort((a, b) =>
+    differenceInMinutes(
+      toDate(a.schedules[0].startTime),
+      toDate(b.schedules[0].startTime),
+    ),
+  );
+  return res;
 };

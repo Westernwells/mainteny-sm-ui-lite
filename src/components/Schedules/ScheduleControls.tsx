@@ -7,8 +7,8 @@ import {SearchInput} from 'components/SearchInput';
 interface Props {
   scheduleType?: 'date' | 'people' | 'default';
   item: string;
-  prevMonth?: () => void;
-  nextMonth?: () => void;
+  prevWeek?: () => void;
+  nextWeek?: () => void;
   searchPlaceholder?: string;
   getSearchValue?: (val: string) => void;
 }
@@ -16,14 +16,14 @@ interface Props {
 export const ScheduleControls = ({
   scheduleType = 'default',
   item,
-  prevMonth = () => {},
-  nextMonth = () => {},
+  prevWeek = () => {},
+  nextWeek = () => {},
   searchPlaceholder = '',
   getSearchValue = () => {},
 }: Props) => {
   const renderDateContols = () => (
     <Box sx={{display: 'flex'}}>
-      <Box onClick={() => prevMonth()} sx={{cursor: 'pointer'}}>
+      <Box onClick={() => prevWeek()} sx={{cursor: 'pointer'}}>
         <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
       </Box>
 
@@ -31,7 +31,7 @@ export const ScheduleControls = ({
         {item}
       </Typography>
 
-      <Box onClick={() => nextMonth()} sx={{cursor: 'pointer'}}>
+      <Box onClick={() => nextWeek()} sx={{cursor: 'pointer'}}>
         <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
       </Box>
     </Box>

@@ -21,6 +21,7 @@ import {Switch} from 'components/Switch';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicator';
+import {sortOrderByTime} from 'utils/service-order-utils';
 import Typography from '@mui/material/Typography';
 import {UnAssignedServiceOrders} from './UnAssigedServiceOrder';
 
@@ -62,8 +63,9 @@ export const ServiceOrderScheduleTab = ({
     );
 
   useEffect(() => {
+    const sortedOrder = sortOrderByTime(serviceOrders.data);
     const groupByTechnicianId = _.groupBy(
-      serviceOrders.data,
+      sortedOrder,
       (serviceOrder) => serviceOrder.schedules[0].technician.id,
     );
     setOrders(groupByTechnicianId);

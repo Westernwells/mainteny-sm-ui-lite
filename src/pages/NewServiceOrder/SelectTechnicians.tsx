@@ -18,6 +18,7 @@ import Button from '@mui/material/Button';
 import RadioGroup from '@mui/material/RadioGroup';
 import useTheme from '@mui/material/styles/useTheme';
 import Divider from '@mui/material/Divider';
+import {sortOrderByTime} from 'utils/service-order-utils';
 import {AddTechnicianDialog} from './AddTechnicianDialog';
 import {TechnicianSchedule} from './TechnicianSchedule';
 import {ContainerCard} from './ContainerCard';
@@ -155,8 +156,9 @@ export const SelectTechnicians = ({
   }, [selectedTechnicianIds]);
 
   useEffect(() => {
+    const sortedOrder = sortOrderByTime(serviceOrders.data);
     const groupByTechnicianId = _.groupBy(
-      serviceOrders.data,
+      sortedOrder,
       (serviceOrder) => serviceOrder.schedules[0].technician.id,
     );
     setOrders(groupByTechnicianId);

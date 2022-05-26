@@ -1,5 +1,5 @@
 import {startOfDay, differenceInMinutes} from 'date-fns';
-import {getDateObject, formatDate} from 'utils/datetime';
+import {getDateObject} from 'utils/datetime';
 import {ScheduledItemGroup} from './model';
 
 interface PositionOptions {
@@ -8,6 +8,7 @@ interface PositionOptions {
   rowKey: string;
   orderId: string;
   gridWidth: number;
+  nextOrderStartTime?: string;
 }
 
 interface WidthOptions {
@@ -28,11 +29,12 @@ export const getItemPosition = ({
     const orderStartTime = getDateObject(startDateTime);
     const x =
       gridWidth * (differenceInMinutes(orderStartTime, morningTime) / 60);
-    const nestedKey = formatDate(new Date(startDateTime), 'HH')!;
-    const group = scheduleItemGroup[rowKey][nestedKey];
-    const itemIndex = group.indexOf(orderId);
-
-    return {x: `${x}px`, y: `${itemIndex + 1}`};
+    // console.log(rowKey, '<<<<<<<!!!!!!!!<>>>>>>')
+    if (scheduleItemGroup[rowKey]) {
+      const group = scheduleItemGroup[rowKey];
+      const itemNestLevel = group[orderId];
+      return {x: `${x}px`, y: `${itemNestLevel}`};
+    }
   }
   return {x: '0px', y: '0px'};
 };
