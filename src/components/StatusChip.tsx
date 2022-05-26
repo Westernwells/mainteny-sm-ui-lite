@@ -40,7 +40,7 @@ export const StatusChip = ({
   maxChars,
   size = 'small',
   color = 'default',
-  variant = 'outlined',
+  variant = 'filled',
   length = 'auto',
 }: Props) => (
   <Chip
@@ -49,7 +49,7 @@ export const StatusChip = ({
       borderColor: variant === 'outlined' ? statusColor[color] : undefined,
       color:
         variant === 'outlined' ? statusColor[color] : 'primary.contrastText',
-      width: maxChars ? `calc(${maxChars}ch + .5em)` : statusWidth[length],
+      minWidth: maxChars ? `calc(${maxChars}ch + .5em)` : statusWidth[length],
       boxShadow: 0,
       px: '0.25em',
       ...style,
