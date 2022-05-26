@@ -23,7 +23,7 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import Fade from '@mui/material/Fade';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 
-const drawerWidth = '12.5rem';
+const drawerWidth = '15rem';
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
@@ -57,7 +57,7 @@ const DrawerHeader = styled('div')(({theme}) => ({
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== 'open',
 })(({theme, open}) => ({
-  minWidth: 50,
+  width: drawerWidth,
   flexShrink: 0,
   whiteSpace: 'nowrap',
   boxSizing: 'border-box',
