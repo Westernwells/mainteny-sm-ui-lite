@@ -21,6 +21,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import Fade from '@mui/material/Fade';
+import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 
 const drawerWidth = '12.5rem';
 
@@ -187,6 +188,20 @@ export const AppDrawer = () => {
         setSelectedIndex(index);
         setSelectedPath('/orders');
         navigate('/orders?pageIndex=1&pageSize=25&tab=0');
+      },
+    },
+    {
+      text: 'Articles & Packages',
+      icon: <HomeRepairServiceIcon sx={{color: '#fff'}} />,
+      path: '/articles',
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/articles');
+        navigate('/articles?pageIndex=1&pageSize=25&tab=0');
       },
     },
   ];
