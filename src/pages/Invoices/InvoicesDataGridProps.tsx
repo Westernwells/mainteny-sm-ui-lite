@@ -1,5 +1,6 @@
 import {
   GridAlignment,
+  GridCellClassNamePropType,
   GridColDef,
   GridColumnHeaderParams,
   GridRenderCellParams,
@@ -8,9 +9,10 @@ import {
 import Typography from '@mui/material/Typography';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import {StatusChip} from 'components/StatusChip';
-import {convertToText} from 'utils/utils';
+import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
+import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 // import {fetchDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {InvoiceStatus, InvoiceStatusView} from 'models/invoice';
+import {InvoiceStatus} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
 import {formatDate, toDate} from '../../utils/datetime';
 
@@ -31,13 +33,58 @@ const defaultAlignment: {
   flex: number;
   headerAlign: GridAlignment;
   align: GridAlignment;
+  cellClassName: GridCellClassNamePropType;
 } = {
   flex: 1,
   headerAlign: 'center',
   align: 'center',
+  cellClassName: 'nowrap',
+};
+
+export const getInvoiceStatusStyles = (
+  status: string,
+): {
+  label: string;
+  color:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'error'
+    | 'info'
+    | 'success'
+    | 'warning';
+} => {
+  switch (status) {
+    case InvoiceStatus.PAID:
+      return {label: 'Paid', color: 'success'};
+    case InvoiceStatus.DRAFT:
+      return {label: 'Draft', color: 'default'};
+    case InvoiceStatus.EXPIRED:
+      return {label: 'Expired', color: 'error'};
+    case InvoiceStatus.NOT_PAID:
+      return {label: 'Unpaid', color: 'primary'};
+    default:
+      return {label: '-', color: 'default'};
+  }
 };
 
 export const columns: GridColDef[] = [
+  {
+    field: 'invoiceNumber',
+    headerName: 'INVOICE NUMBER',
+    type: 'string',
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+  {
+    field: 'propertyOwner',
+    headerName: 'CUSTOMER',
+    type: 'string',
+    flex: 1.5,
+    headerAlign: 'left',
+    cellClassName: 'truncateText',
+    ...defaultProps,
+  },
   {
     field: 'invoiceDate',
     headerName: 'INVOICE DATE',
@@ -46,84 +93,41 @@ export const columns: GridColDef[] = [
     headerAlign: 'left',
     ...defaultProps,
   },
+
   {
-    field: 'invoiceNumber',
-    headerName: 'INVOICE NUMBER',
+    field: 'orderNumber',
+    headerName: 'ORDER NUMBER',
     type: 'string',
     ...defaultAlignment,
     ...defaultProps,
   },
-  // {
-  //   field: 'orderNumber',
-  //   headerName: 'ORDER NUMBER',
-  //   type: 'string',// TODO: Add this when api gets updated
-  //   ...defaultAlignment,
-  //   ...defaultProps,
-  // },
+
   {
-    field: 'propertyOwner',
-    headerName: 'CUSTOMER',
+    field: 'serviceType',
+    headerName: 'SERVICE TYPE',
     type: 'string',
     flex: 1.5,
+    editable: false,
     headerAlign: 'left',
-    ...defaultProps,
+    renderHeader: (params: GridColumnHeaderParams) => (
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName}
+      </Typography>
+    ),
+    renderCell: (params: GridRenderCellParams<any, any, any>) => (
+      <>
+        <ServiceOrderIcons
+          serviceOrderType={params.row.serviceType}
+          size="small"
+        />
+        <ServiceOrderTypeText
+          serviceOrderType={params.row.serviceType}
+          capitalizeText
+          variant="body2"
+        />
+      </>
+    ),
   },
-  // {    // TODO: Add this when api gets updated
-  //   field: 'serviceType',
-  //   headerName: 'SERVICE TYPE',
-  //   type: 'string',
-  //   flex: 1,
-  //   editable: false,
-  //   renderHeader: (params: GridColumnHeaderParams) => (
-  //     <Typography variant="subtitle2" color="textSecondary">
-  //       {params.colDef.headerName}
-  //     </Typography>
-  //   ),
-  //   renderCell: (params: GridRenderCellParams<any, any, any>) => {
-  //     switch (params.value) {
-  //       case 'REGULAR':
-  //         return (
-  //           <Typography
-  //             variant="body2"
-  //             mx="0.5em"
-  //             display="flex"
-  //             alignItems="center"
-  //             gap=".5em">
-  //             <RegularIcon /> Maintenance
-  //           </Typography>
-  //         );
-  //       case 'REPAIR':
-  //         return (
-  //           <Typography
-  //             variant="body2"
-  //             mx="0.5em"
-  //             display="flex"
-  //             alignItems="center">
-  //             <SettingsOutlinedIcon sx={{color: '#ED6C02'}} /> Repair
-  //           </Typography>
-  //         );
-  //       case 'EMERGENCY':
-  //         return (
-  //           <Typography variant="body2" mx="0.5em">
-  //             <EmergencyIcon /> Emergency
-  //           </Typography>
-  //         );
-  //       case 'CALLOUT':
-  //         return (
-  //           <Typography variant="body2" mx="0.5em">
-  //             <CalloutIcon /> Callout
-  //           </Typography>
-  //         );
-  //       default:
-  //         return (
-  //           <Typography variant="body2" mx="0.5em">
-  //             {' '}
-  //             -{' '}
-  //           </Typography>
-  //         );
-  //     }
-  //   },
-  // },
   {
     field: 'amount',
     headerName: 'TOTAL AMOUNT',
@@ -144,13 +148,9 @@ export const columns: GridColDef[] = [
     ),
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
-        label={
-          params.value === InvoiceStatus.PAID
-            ? convertToText(InvoiceStatusView.PAID)
-            : convertToText(InvoiceStatusView.NOT_PAID)
-        }
-        variant="filled"
-        color={params.value === InvoiceStatus.PAID ? 'success' : 'warning'}
+        label={getInvoiceStatusStyles(params.value).label}
+        color={getInvoiceStatusStyles(params.value).color}
+        maxChars={8}
       />
     ),
   },
@@ -186,11 +186,11 @@ export const makeRows = (invoices: any): GridRowsProp =>
   invoices.data
     ? invoices.data.map((item: any, index: number) => ({
         id: index,
-        invoiceDate: formatDate(toDate(item.issuedDate), 'dd MMM YYY'),
+        invoiceDate: formatDate(toDate(item.issuedDate)),
         invoiceNumber: item.number,
-        // orderNumber: item.serviceOrder.number,
+        orderNumber: item.serviceOrder.number,
         propertyOwner: item.propertyOwner.name,
-        // serviceType: item.serviceOrder.type,
+        serviceType: item.serviceOrder.type,
         amount: `${formatCurrency(
           item
             ? item.totalAmount.netAmount /

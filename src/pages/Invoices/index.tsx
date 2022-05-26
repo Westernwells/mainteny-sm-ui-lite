@@ -1,4 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
+import {useNavigate} from 'react-router';
 import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
 import {GridRowsProp} from '@mui/x-data-grid';
@@ -23,6 +24,7 @@ import {Widget} from '../../components/Widget';
 const pageSize = 25;
 
 export const Invoices = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [queryParams, setQueryParams] = useSearchParams();
@@ -135,6 +137,9 @@ export const Invoices = () => {
           getSearchValue={(val: string) => setSearch(val)}
           setShowFilter={setShowFilter}
           showFilter={showFilter}
+          showActionBtn
+          btnLabel="New Invoice"
+          btnOnClick={() => navigate('new')}
           hideViewOption
         />
       }>

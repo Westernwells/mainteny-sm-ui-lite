@@ -6,6 +6,8 @@ import {ServiceOrderView, ServiceOrderType} from './service-order';
 export enum InvoiceStatus {
   PAID = 'PAID',
   NOT_PAID = 'NOT_PAID',
+  DRAFT = 'DRAFT',
+  EXPIRED = 'EXPIRED',
 }
 
 export enum InvoiceStatusView {
