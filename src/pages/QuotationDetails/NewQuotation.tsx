@@ -20,7 +20,7 @@ import {
 } from 'hooks/reactQuery/useQuotation';
 import {formatCurrency} from 'utils/currency';
 import {CreateQuotation, QuotationItemRecord} from 'models/quotation';
-import {ElevatorView} from 'models/elevator';
+import {Elevator, ElevatorView} from 'models/elevator';
 import {PropertyOwner} from 'models/propertyManager';
 import {ClientSimpleView} from 'models/client';
 import {ArticleView} from 'models/article';
@@ -34,7 +34,7 @@ import {UnitsDataGrid} from './DataGrid/UnitsDataGrid';
 import {ArticlesDataGrid} from './DataGrid/ArticlesDataGrid';
 import {QuotationHeader} from './Components/QuotationHeader';
 
-const DEFAULT_DESCRIPTION = `Dear, Customer.
+const DEFAULT_DESCRIPTION = `Dear Customer,
 
 We thank you for the inquiry and would like to offer you our best services for the maintenance of above mentioned unit.`;
 
@@ -63,7 +63,7 @@ export const NewQuotation = () => {
   const [customer, setCustomer] = useState<
     PropertyOwner | ClientSimpleView | null
   >(null);
-  const [unit, setUnit] = useState<ElevatorView | null>(null);
+  const [unit, setUnit] = useState<ElevatorView | Elevator | null>(null);
   const [quotationItems, setQuotationItems] = useState<QuotationItemRecord[]>(
     [],
   );
@@ -145,12 +145,14 @@ export const NewQuotation = () => {
           }),
         ),
       );
+      setUnit(quotation.elevator);
       formik.setFieldValue('subject', quotation.subject, true);
       formik.setFieldValue('description', quotation.description, true);
       formik.setFieldValue('moreInfo', quotation.moreInfo, true);
-      formik.setFieldValue('items', quotation.items, true);
     }
   }, [isFetched]);
+
+  console.log(formik.values);
 
   useEffect(() => {
     if (unit) {
