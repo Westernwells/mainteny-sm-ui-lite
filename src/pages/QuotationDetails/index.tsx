@@ -250,13 +250,26 @@ export const QuotationDetails = () => {
             startIcon={<FileDownloadIcon color="primary" />}
           />
         </Box>
-        <Grid container width="100%" columnGap={1} mt="2.5em" mb="2em">
+        <Grid container width="100%" mt="2.5em" mb="2em" gap={2}>
           <Grid item xs={8}>
             <PDFContainer />
           </Grid>
-          <Grid item flexGrow={1}>
+          <Grid item xs sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
             <PageCard
               headerLabel="Service Order"
+              contentContainerStyles={{
+                display: 'flex',
+                gap: '1em',
+                alignItems: 'center',
+                flexDirection: 'column',
+              }}>
+              <Typography variant="subtitle2" textAlign="center">
+                You haven’t created Service Order for this Quotation
+              </Typography>
+              <CustomButtonUnstyled label="Create Service Order" size="small" />
+            </PageCard>
+            <PageCard
+              headerLabel="Quotation Details"
               contentContainerStyles={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -275,6 +288,17 @@ export const QuotationDetails = () => {
                   component="p">
                   By
                   {` ${user?.userAccount.firstName} ${user?.userAccount.lastName}`}
+                </Typography>
+                <Label
+                  text="Total Amount (incl VAT)"
+                  sx={{color: 'text.main'}}
+                />
+                <Typography variant="subtitle1" color="primary.main">
+                  {formatCurrency(
+                    quotation.totalAmount.grossAmount /
+                      10 ** quotation.totalAmount.fractionDigits!,
+                    {currency: quotation.totalAmount.currency},
+                  )}
                 </Typography>
               </Box>
               <StatusChip
