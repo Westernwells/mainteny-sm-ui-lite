@@ -34,6 +34,7 @@ export const PageLayout = ({
           <AppDrawer />
         </Box>
       ) : null}
+      <Box width="4.5rem" />
       <Box
         sx={{
           pt: !excludeDefaultSpacing ? 12 : null,

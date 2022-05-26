@@ -3,13 +3,9 @@ import {Theme, CSSObject} from '@mui/material/styles';
 import styled from '@mui/material/styles/styled';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
-import IconButton from '@mui/material/IconButton';
 import Elevator from '@mui/icons-material/Elevator';
 import BusinessIcon from '@mui/icons-material/Business';
-import MenuIcon from '@mui/icons-material/Menu';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import {useLocation, useNavigate} from 'react-router-dom';
 import List from '@mui/material/List';
@@ -46,14 +42,6 @@ const closedMixin = (theme: Theme): CSSObject => ({
   },
 });
 
-const DrawerHeader = styled('div')(({theme}) => ({
-  display: 'flex',
-  justifyContent: 'flex-end',
-  marginLeft: theme.spacing(4),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-}));
-
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== 'open',
 })(({theme, open}) => ({
@@ -61,6 +49,8 @@ const Drawer = styled(MuiDrawer, {
   flexShrink: 0,
   whiteSpace: 'nowrap',
   boxSizing: 'border-box',
+  position: 'absolute',
+  zIndex: 1000,
   ...(open && {
     ...openedMixin(theme),
     '& .MuiDrawer-paper': openedMixin(theme),
@@ -73,7 +63,7 @@ const Drawer = styled(MuiDrawer, {
 
 export const AppDrawer = () => {
   const [open, setOpen] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const setSelectedIndex = useState(0)[1];
   const [selectedPath, setSelectedPath] = useState('/units');
   const location = useLocation();
   const navigate = useNavigate();
@@ -209,6 +199,8 @@ export const AppDrawer = () => {
   return (
     <Box sx={{display: 'flex'}}>
       <Drawer
+        onMouseEnter={() => handleDrawerOpen()}
+        onMouseLeave={() => handleDrawerClose()}
         variant="permanent"
         open={open}
         PaperProps={{
@@ -217,54 +209,14 @@ export const AppDrawer = () => {
             color: '#fff',
           },
         }}>
-        <DrawerHeader>
-          {open ? (
-            <>
-              <IconButton onClick={handleDrawerClose} edge="start" sx={{}}>
-                <ArrowBackIosNewIcon />
-              </IconButton>
-              <IconButton
-                aria-label="open drawer"
-                onClick={handleDrawerClose}
-                edge="start"
-                sx={{fontSize: ''}}>
-                <MenuIcon />
-              </IconButton>
-            </>
-          ) : (
-            <>
-              <IconButton
-                aria-label="open drawer"
-                onClick={handleDrawerOpen}
-                edge="start"
-                sx={{}}>
-                <MenuIcon />
-              </IconButton>
-
-              <IconButton onClick={handleDrawerOpen} edge="start" sx={{}}>
-                <ArrowForwardIos />
-              </IconButton>
-            </>
-          )}
-        </DrawerHeader>
         <List>
           {drawerList.map(({text, icon, onClick, path}, index) => (
             <ListItemButton
               onClick={(e) => onClick(e, index)}
               selected={!!selectedPath.includes(path)}
               style={{
-                borderTopLeftRadius: '6px',
-                borderBottomLeftRadius: '6px',
-
                 paddingTop: 15,
                 paddingBottom: 15,
-                ...(index !== selectedIndex
-                  ? {
-                      borderLeft: '8px',
-                      borderLeftStyle: 'solid',
-                      borderColor: 'rgba(9, 83, 105, 0)',
-                    }
-                  : null),
                 ...(open
                   ? {
                       marginLeft: '5px',
