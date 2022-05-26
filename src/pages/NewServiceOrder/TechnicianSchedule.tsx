@@ -1,10 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
-
 import {twentyFourHourTime} from 'utils/utils';
-
 import * as _ from 'lodash';
-
-import {differenceInMinutes, startOfDay} from 'date-fns';
 import {formatDate, getDateObject} from 'utils/datetime';
 import {ScheduleContainer} from 'components/Schedules/ScheduleContainer';
 import {ScheduleHeader} from 'components/Schedules/ScheduleHeader';
@@ -17,17 +13,19 @@ import {ServiceOrderView} from 'models/service-order';
 import {TechnicianView} from 'models/technician';
 import {ScheduleControls} from 'components/Schedules/ScheduleControls';
 import {ScheduleLabel} from 'components/Schedules/ScheduleLabel';
+import {ScheduledItemGroup} from 'components/Schedules/model';
+import {getItemPosition, getItemWidth} from 'components/Schedules/utils';
+import {isBefore} from 'date-fns';
 
 interface Props {
   technicians?: TechnicianView[];
   scheduleItems: {[key: string]: ServiceOrderView[]};
   renderCellItem: (
     cellItem: any,
-    calcWidth: (startDateTime: string, endDateTime: string) => string,
-    calcPosition: (startDateTime: string) => string,
+    width: string,
+    position: {x: string; y: string},
   ) => void;
   defaultTypeLabel?: string;
-  // makeLabelSelectable?: boolean;
   labelWidth?: string;
   cellHeight?: string;
   getCheckedValue?: (checked: boolean, value: string) => void;
@@ -47,7 +45,8 @@ export const TechnicianSchedule = ({
   technicians,
   checkedValues = [],
 }: Props) => {
-  // const theme = useTheme();
+  const [scheduleItemGroup, setScheduleItemGroup] =
+    useState<ScheduledItemGroup>({});
   const [tableHeader, setTableHeader] = useState<string[]>([]);
   const elementRef = useRef<HTMLInputElement | undefined>();
   const [bodyRow, setBodyRow] = useState<{[key: string]: string[]}[]>([]);
@@ -55,6 +54,33 @@ export const TechnicianSchedule = ({
   const [lookupTechnician, setLookupTechnician] = useState<{
     [key: string]: TechnicianView[];
   }>({});
+
+  useEffect(() => {
+    const result: ScheduledItemGroup = {};
+    Object.keys(scheduleItems).forEach((key) => {
+      const items = scheduleItems[key];
+      result[key] = {};
+      let previousOrder: ServiceOrderView | null = null;
+
+      items.forEach((item) => {
+        if (previousOrder) {
+          const previousEndTime = new Date(previousOrder.schedules[0].endTime);
+          const currentOrderStartTime = new Date(item.schedules[0].startTime);
+          if (isBefore(currentOrderStartTime, previousEndTime)) {
+            const previousOrderNextLevel = result[key][previousOrder.id];
+            result[key][item.id] = previousOrderNextLevel + 1;
+          } else {
+            result[key][item.id] = 1;
+          }
+        } else {
+          result[key][item.id] = 1;
+        }
+        previousOrder = item;
+      });
+    });
+
+    setScheduleItemGroup(result);
+  }, [scheduleItems]);
 
   useEffect(() => {
     setLookupTechnician(_.groupBy(technicians, (technician) => technician.id));
@@ -92,26 +118,6 @@ export const TechnicianSchedule = ({
       clearTimeout(timeout);
     };
   }, []);
-
-  const calculatePosition = (startDateTime: string) => {
-    const morningTime = startOfDay(new Date(startDateTime));
-    const orderStartTime = getDateObject(startDateTime);
-    const result =
-      gridWidth * (differenceInMinutes(orderStartTime, morningTime) / 60);
-    return `${result}px`;
-  };
-
-  const calculateWidth = (startDateTime: string, endDateTime: string) => {
-    const width =
-      (differenceInMinutes(
-        getDateObject(endDateTime),
-        getDateObject(startDateTime),
-      ) /
-        60) *
-      gridWidth;
-
-    return `${width}px`;
-  };
 
   return (
     <ScheduleContainer>
@@ -173,8 +179,22 @@ export const TechnicianSchedule = ({
                             {scheduleItems[xKey].map((scheduleItem) =>
                               renderCellItem(
                                 scheduleItem,
-                                calculateWidth,
-                                calculatePosition,
+                                getItemWidth({
+                                  startDateTime:
+                                    scheduleItem.schedules[0].startTime,
+                                  endDateTime:
+                                    scheduleItem.schedules[0].endTime,
+                                  gridWidth,
+                                }),
+                                getItemPosition({
+                                  scheduleItemGroup,
+                                  startDateTime:
+                                    scheduleItem.schedules[0].startTime,
+                                  rowKey: xKey,
+                                  orderId: scheduleItem.id,
+                                  gridWidth,
+                                }),
+                                // calculatePosition,
                               ),
                             )}
                           </ScheduleItemContainer>

@@ -10,6 +10,7 @@ import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {ElevatorView} from 'models/elevator';
 import {useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {Progress} from 'components/Progress';
 import {columns, makeRows} from './UnitDataGridProps';
 
 interface Props {
@@ -32,6 +33,8 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
     isFetching,
+    isLoading,
+    isIdle,
   } = useAllElevators(
     search,
     page,
@@ -56,6 +59,10 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
       getSelectedUnit(selectedUnit);
     }
   }, [selectedUnit]);
+
+  if (isIdle || isLoading) {
+    return <Progress />;
+  }
 
   if (!totalUnitsRef.current) {
     return (
@@ -108,7 +115,7 @@ please click the button below'
     <>
       <Box display="flex" justifyContent="space-between">
         <Typography variant="h6" component="div">
-          Choose Unit
+          Select unit
         </Typography>
         <SearchInput
           placeholder="Search"

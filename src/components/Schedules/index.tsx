@@ -7,9 +7,9 @@ import * as _ from 'lodash';
 import Typography from '@mui/material/Typography';
 import {
   addDays,
-  differenceInMinutes,
   eachDayOfInterval,
   endOfDay,
+  isBefore,
   startOfDay,
   subDays,
 } from 'date-fns';
@@ -34,14 +34,16 @@ import {TechnicianView} from 'models/technician';
 import {styles as sx} from './styles';
 import {ScheduleControls} from './ScheduleControls';
 import {ScheduleLabel} from './ScheduleLabel';
+import {ScheduledItemGroup} from './model';
+import {getItemPosition, getItemWidth} from './utils';
 
 interface Props {
   technicians?: TechnicianView[];
   scheduleItems: {[key: string]: ServiceOrderView[]};
   renderCellItem: (
     cellItem: any,
-    calcWidth: (startDateTime: string, endDateTime: string) => string,
-    calcPosition: (startDateTime: string) => string,
+    width: string,
+    position: {x: string; y: string},
   ) => void;
   getWeekPair?: (weekPair: WeekPair) => void;
   scheduleType?: 'date' | 'people' | 'default';
@@ -86,6 +88,8 @@ export const Schedule = ({
   const theme = useTheme();
   const [tableHeader, setTableHeader] = useState<string[]>([]);
   const elementRef = useRef<HTMLInputElement | undefined>();
+  const [scheduleItemGroup, setScheduleItemGroup] =
+    useState<ScheduledItemGroup>({});
   const [weekPair, setWeekPair] = useState<WeekPair>({
     startOfWeekDay: getStartOfWeek(new Date(), 1),
     endOfWeekDay: getEndOfWeek(new Date(), 1),
@@ -109,6 +113,38 @@ export const Schedule = ({
   const [lookupTechnician, setLookupTechnician] = useState<{
     [key: string]: TechnicianView[];
   }>({});
+
+  useEffect(() => {
+    const result: ScheduledItemGroup = {};
+    Object.keys(scheduleItems).forEach((key) => {
+      const items = scheduleItems[key];
+      result[key] = {};
+      let previousOrder: ServiceOrderView | null = null;
+      console.log(scheduleItems, '>>>>>>>>>>>>');
+
+      items.forEach((item) => {
+        if (previousOrder) {
+          const previousEndTime = new Date(previousOrder.schedules[0].endTime);
+          const currentOrderStartTime = new Date(item.schedules[0].startTime);
+          // console.log(item, '+++++++++________', previousOrder)
+          if (isBefore(currentOrderStartTime, previousEndTime)) {
+            // console.log(previousOrder,'=========>', item)
+            const previousOrderNextLevel = result[key][previousOrder.id];
+            result[key][item.id] = previousOrderNextLevel + 1;
+          } else {
+            result[key][item.id] = 1;
+          }
+        } else {
+          result[key][item.id] = 1;
+        }
+        previousOrder = item;
+      });
+    });
+
+    setScheduleItemGroup(result);
+  }, [scheduleItems]);
+
+  console.log(scheduleItems, '&&&&^^^^^$$');
 
   useEffect(() => {
     setLookupTechnician(_.groupBy(technicians, (technician) => technician.id));
@@ -183,27 +219,7 @@ export const Schedule = ({
     };
   }, []);
 
-  const calculatePosition = (startDateTime: string) => {
-    const morningTime = startOfDay(new Date(startDateTime));
-    const orderStartTime = getDateObject(startDateTime);
-    const result =
-      gridWidth * (differenceInMinutes(orderStartTime, morningTime) / 60);
-    return `${result}px`;
-  };
-
-  const calculateWidth = (startDateTime: string, endDateTime: string) => {
-    const width =
-      (differenceInMinutes(
-        getDateObject(endDateTime),
-        getDateObject(startDateTime),
-      ) /
-        60) *
-      gridWidth;
-
-    return `${width}px`;
-  };
-
-  const nextMonth = () => {
+  const nextWeek = () => {
     const firstDayOfNextWeek = startOfDay(addDays(weekPair.endOfWeekDay, 1));
     const endOfNextWeek = getEndOfWeek(firstDayOfNextWeek, 1);
     setWeekPair({
@@ -213,7 +229,7 @@ export const Schedule = ({
     });
   };
 
-  const prevMonth = () => {
+  const prevWeek = () => {
     const endOfPrevWeek = endOfDay(subDays(weekPair.startOfWeekDay, 1));
     const firstDayOfPrevWeek = getStartOfWeek(endOfPrevWeek, 1);
     setWeekPair({
@@ -245,7 +261,7 @@ export const Schedule = ({
       ) : null}
 
       <Box ref={elementRef} sx={sx.mainContainer}>
-        <CardContent sx={{padding: 0}}>
+        <CardContent sx={{padding: 0, width: '100%'}}>
           <ScheduleContainer>
             <ScheduleHeader>
               <ScheduleRow>
@@ -255,8 +271,8 @@ export const Schedule = ({
                       <ScheduleHeaderCell key={index} labelWidth={labelWidth}>
                         <ScheduleControls
                           item={item}
-                          prevMonth={prevMonth}
-                          nextMonth={nextMonth}
+                          prevWeek={prevWeek}
+                          nextWeek={nextWeek}
                           getSearchValue={(searchValue) =>
                             handleSearch && handleSearch(searchValue)
                           }
@@ -318,8 +334,21 @@ export const Schedule = ({
                                   {scheduleItems[xKey].map((scheduleItem) =>
                                     renderCellItem(
                                       scheduleItem,
-                                      calculateWidth,
-                                      calculatePosition,
+                                      getItemWidth({
+                                        startDateTime:
+                                          scheduleItem.schedules[0].startTime,
+                                        endDateTime:
+                                          scheduleItem.schedules[0].endTime,
+                                        gridWidth,
+                                      }),
+                                      getItemPosition({
+                                        scheduleItemGroup,
+                                        startDateTime:
+                                          scheduleItem.schedules[0].startTime,
+                                        rowKey: xKey,
+                                        orderId: scheduleItem.id,
+                                        gridWidth,
+                                      }),
                                     ),
                                   )}
                                 </ScheduleItemContainer>
