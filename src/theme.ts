@@ -261,7 +261,6 @@ export const theme = createTheme({
         root: {
           '&.Mui-selected': {
             background: '#457892',
-            borderLeft: '8px solid #222B45',
             boxSizing: 'border-box',
           },
         },
