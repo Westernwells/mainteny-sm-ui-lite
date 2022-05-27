@@ -14,7 +14,7 @@ export const BackAction = ({label, containerStyle, path}: Props) => {
   const theme = useTheme();
   const navigate = useNavigate();
   return (
-    <Box display="flex" sx={{mb: '1em', ...containerStyle}}>
+    <Box display="flex" sx={{...containerStyle}}>
       <Box
         mr={2}
         sx={{cursor: 'pointer', mt: '0.2em'}}

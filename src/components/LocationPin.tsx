@@ -2,13 +2,13 @@ import {ReactElement} from 'react';
 import Box, {BoxProps} from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {useNavigate} from 'react-router-dom';
-import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import useTheme from '@mui/material/styles/useTheme';
 import {ReactComponent as Pin} from '../assets/icons/Pin.svg';
 import {ElevatorStatus, ElevatorView} from '../models/elevator';
 import {formatDate} from '../utils/datetime';
 import {StatusIndicator} from './StatusIndicator';
+import {CustomButtonUnstyled} from './CustomButtonUnstyled';
 
 interface Props extends BoxProps {
   elevator?: ElevatorView;
@@ -98,13 +98,16 @@ export const LocationPin = ({
           </Typography>
         </Box>
       </Box>
-      <Button
-        variant="outlined"
-        size="small"
-        style={{marginTop: '2rem'}}
-        onClick={() => navigate(`/units/details/${elevator.id}`)}>
-        More details
-      </Button>
+
+      <CustomButtonUnstyled
+        label="More details"
+        buttonProps={{
+          variant: 'outlined',
+          size: 'small',
+          sx: {marginTop: '2rem'},
+          onClick: () => navigate(`/units/details/${elevator.id}`),
+        }}
+      />
     </Box>
   );
   return (

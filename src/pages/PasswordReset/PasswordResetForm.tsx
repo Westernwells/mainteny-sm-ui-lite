@@ -6,9 +6,9 @@ import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import {useNavigate} from 'react-router-dom';
+import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 
 interface Props {
   handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -114,40 +114,48 @@ export const PasswordResetForm = ({
         )}
 
         {!reEnterPassword ? (
-          <Button
-            disabled={!!(!password || passwordError)}
-            sx={{marginTop: 5, width: '100%'}}
-            variant="contained"
-            onClick={() => {
-              setReEnterPassword(!reEnterPassword);
-              setHeading('Confirm your new password');
+          <CustomButtonUnstyled
+            label="Next"
+            buttonProps={{
+              disabled: !!(!password || passwordError),
+              sx: {marginTop: 5, width: '100%'},
+              variant: 'contained',
+              onClick: () => {
+                setReEnterPassword(!reEnterPassword);
+                setHeading('Confirm your new password');
+              },
+              size: 'large',
+              endIcon: <ArrowForward />,
             }}
-            size="large"
-            endIcon={<ArrowForward />}>
-            Next
-          </Button>
+          />
         ) : (
           <Box mt={5}>
-            <Button
-              disabled={!!(!password || passwordError)}
-              sx={{width: '100%'}}
-              variant="contained"
-              size="large"
-              onClick={() => navigate('/login?authType=reset')}
-              endIcon={<ArrowForward />}>
-              Go
-            </Button>
-            <Button
-              sx={{width: '100%', marginTop: 1}}
-              variant="outlined"
-              onClick={() => {
-                setReEnterPassword(!reEnterPassword);
-                setHeading('Set a new password');
+            <CustomButtonUnstyled
+              label="Go"
+              buttonProps={{
+                disabled: !!(!password || passwordError),
+                sx: {width: '100%'},
+                variant: 'contained',
+                onClick: () => navigate('/login?authType=reset'),
+                size: 'large',
+                endIcon: <ArrowForward />,
               }}
-              size="large"
-              startIcon={<ArrowBack />}>
-              Back
-            </Button>
+            />
+
+            <CustomButtonUnstyled
+              label="Back"
+              buttonProps={{
+                disabled: !!(!password || passwordError),
+                sx: {width: '100%', marginTop: 1},
+                variant: 'outlined',
+                onClick: () => {
+                  setReEnterPassword(!reEnterPassword);
+                  setHeading('Set a new password');
+                },
+                size: 'large',
+                startIcon: <ArrowBack />,
+              }}
+            />
           </Box>
         )}
       </form>

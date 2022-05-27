@@ -46,8 +46,10 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => (
 
     <CustomButtonUnstyled
       label="Assign technician"
-      size="small"
       style={{px: '0.5em', mt: '0.7em'}}
+      buttonProps={{
+        size: 'small',
+      }}
     />
 
     <Divider sx={{mt: '1.5em'}} />

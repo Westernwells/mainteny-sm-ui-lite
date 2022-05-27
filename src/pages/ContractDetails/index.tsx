@@ -30,8 +30,18 @@ export const ContractDetails = () => {
       renderWidget={
         <CustomButtonUnstyled
           label="Download Contract"
-          size="medium"
-          startIcon={<FileDownloadIcon color="primary" />}
+          style={{
+            textTransform: 'capitalize',
+            background: 'transparent',
+            border: '1px solid rgba(15, 76, 100, 0.5)',
+            px: '1.5em',
+            '&:hover': {
+              background: 'transparent',
+            },
+          }}
+          buttonProps={{
+            startIcon: <FileDownloadIcon color="primary" sx={{}} />,
+          }}
         />
       }>
       <TabsBody value={tabValue} index={0}>

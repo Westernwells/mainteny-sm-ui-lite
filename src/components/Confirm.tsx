@@ -1,10 +1,10 @@
-import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
+import {CustomButtonUnstyled} from './CustomButtonUnstyled';
 
 interface Props {
   open?: boolean;
@@ -27,14 +27,24 @@ export const Confirm = ({open, onConfirm, onClose, title, content}: Props) => (
       </DialogContentText>
     </DialogContent>
     <DialogActions>
-      <Button onClick={onClose}>
+      <CustomButtonUnstyled
+        label="Create Service Order"
+        buttonProps={{
+          onClick: onClose,
+        }}>
         <Typography variant="subtitle2" color="text.secondary">
           No
         </Typography>
-      </Button>
-      <Button onClick={onConfirm} autoFocus>
+      </CustomButtonUnstyled>
+
+      <CustomButtonUnstyled
+        label="Create Service Order"
+        buttonProps={{
+          onClick: onConfirm,
+          autoFocus: true,
+        }}>
         <Typography variant="subtitle2">Yes</Typography>
-      </Button>
+      </CustomButtonUnstyled>
     </DialogActions>
   </Dialog>
 );

@@ -3,9 +3,9 @@ import ArrowForward from '@mui/icons-material/ArrowForward';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import {Link, useNavigate} from 'react-router-dom';
+import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 
 interface Props {
   handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -50,23 +50,26 @@ export const PasswordAuthenticateForm = ({
         />
 
         <Box mt={5}>
-          <Button
-            type="submit"
-            disabled={!!(!pin || pinError)}
-            sx={{width: '100%'}}
-            variant="contained"
-            size="large"
-            endIcon={<ArrowForward />}>
-            Reset Password
-          </Button>
-          <Button
-            sx={{width: '100%', marginTop: 1}}
-            variant="text"
-            onClick={() => navigate(-1)}
-            size="large"
-            startIcon={<ArrowBack />}>
-            Back
-          </Button>
+          <CustomButtonUnstyled
+            label="Reset Password"
+            buttonProps={{
+              type: 'submit',
+              disabled: !!(!pin || pinError),
+              sx: {width: '100%'},
+              variant: 'contained',
+              size: 'large',
+              endIcon: <ArrowForward />,
+            }}
+          />
+          <CustomButtonUnstyled
+            label="Back"
+            buttonProps={{
+              sx: {width: '100%', marginTop: 1},
+              onClick: () => navigate(-1),
+              size: 'large',
+              startIcon: <ArrowBack />,
+            }}
+          />
           <Typography color="text.secondary" textAlign="center" mt={5}>
             Did not receive the code?
             <Link to="/reset-password" style={{textDecoration: 'none'}}>

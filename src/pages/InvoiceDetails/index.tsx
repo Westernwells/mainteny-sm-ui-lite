@@ -41,17 +41,18 @@ export const InvoiceDetails = () => {
         <BackAction label="Invoice Details" />
         <CustomButtonUnstyled
           label="Download Invoice"
-          disabled={!downloadUrl}
-          size="medium"
-          onClick={() =>
-            downloadUrl ? window.open(downloadUrl[0], '_blank') : null
-          }
-          startIcon={
-            <FileDownloadIcon
-              sx={{opacity: !downloadUrl ? '0.1' : '1'}}
-              color="primary"
-            />
-          }
+          buttonProps={{
+            disabled: !downloadUrl,
+            onClick: () =>
+              downloadUrl ? window.open(downloadUrl[0], '_blank') : null,
+
+            startIcon: (
+              <FileDownloadIcon
+                sx={{opacity: !downloadUrl ? '0.1' : '1'}}
+                color="primary"
+              />
+            ),
+          }}
         />
       </Box>
       <Grid container spacing={2}>

@@ -6,12 +6,12 @@ import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
 import CircularProgress from '@mui/material/CircularProgress';
 import {useRecoverPassword} from 'hooks/useRecoverPassword';
 import {AuthLayout} from 'components/AuthLayout';
+import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 
 interface Props {
   handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -97,29 +97,30 @@ export const PasswordReset = ({
               />
 
               <Box mt={5}>
-                <Button
-                  onClick={() => handleSwap(true, 1)}
-                  disabled={!!(!token || tokenError)}
-                  sx={{width: '100%'}}
-                  variant="contained"
-                  size="large"
-                  endIcon={
-                    loading ? (
+                <CustomButtonUnstyled
+                  label="Reset Password"
+                  buttonProps={{
+                    onClick: () => handleSwap(true, 1),
+                    disabled: !!(!token || tokenError),
+                    sx: {width: '100%'},
+                    variant: 'contained',
+                    size: 'large',
+                    endIcon: loading ? (
                       <CircularProgress size={20} sx={{color: 'gray'}} />
                     ) : (
                       <ArrowForward />
-                    )
-                  }>
-                  Reset Password
-                </Button>
-                <Button
-                  sx={{width: '100%', marginTop: 1}}
-                  variant="text"
-                  onClick={() => navigate(-1)}
-                  size="large"
-                  startIcon={<ArrowBack />}>
-                  Back
-                </Button>
+                    ),
+                  }}
+                />
+                <CustomButtonUnstyled
+                  label="Back"
+                  buttonProps={{
+                    sx: {width: '100%', marginTop: 1},
+                    onClick: () => navigate(-1),
+                    size: 'large',
+                    startIcon: <ArrowBack />,
+                  }}
+                />
                 <Typography color="text.secondary" textAlign="center" mt={5}>
                   Did not receive the code?
                   <Typography
@@ -221,48 +222,53 @@ export const PasswordReset = ({
                 />
               )}
               {!reEnterPassword ? (
-                <Button
-                  disabled={!!(!password || passwordError)}
-                  sx={{marginTop: 5, width: '100%'}}
-                  variant="contained"
-                  onClick={() => {
-                    setReEnterPassword(!reEnterPassword);
-                    handleSwap(swap, 2);
+                <CustomButtonUnstyled
+                  label="Next"
+                  buttonProps={{
+                    disabled: !!(!password || passwordError),
+                    sx: {marginTop: 5, width: '100%'},
+                    variant: 'contained',
+                    onClick: () => {
+                      setReEnterPassword(!reEnterPassword);
+                      handleSwap(swap, 2);
+                    },
+                    size: 'large',
+                    endIcon: <ArrowForward />,
                   }}
-                  size="large"
-                  endIcon={<ArrowForward />}>
-                  Next
-                </Button>
+                />
               ) : (
                 <Box mt={5}>
-                  <Button
-                    type="submit"
-                    disabled={
-                      !!(confirmPasswordTouched && confirmPasswordError)
-                    }
-                    sx={{width: '100%'}}
-                    variant="contained"
-                    size="large"
-                    endIcon={
-                      loading ? (
+                  <CustomButtonUnstyled
+                    label="Go"
+                    buttonProps={{
+                      type: 'submit',
+                      disabled: !!(
+                        confirmPasswordTouched && confirmPasswordError
+                      ),
+
+                      sx: {width: '100%'},
+                      variant: 'contained',
+                      size: 'large',
+                      endIcon: loading ? (
                         <CircularProgress size={20} sx={{color: 'gray'}} />
                       ) : (
                         <ArrowForward />
-                      )
-                    }>
-                    Go
-                  </Button>
-                  <Button
-                    sx={{width: '100%', marginTop: 1}}
-                    variant="outlined"
-                    onClick={() => {
-                      setReEnterPassword(!reEnterPassword);
-                      handleSwap(swap, 1);
+                      ),
                     }}
-                    size="large"
-                    startIcon={<ArrowBack />}>
-                    Back
-                  </Button>
+                  />
+                  <CustomButtonUnstyled
+                    label="Back"
+                    buttonProps={{
+                      sx: {width: '100%', marginTop: 1},
+                      variant: 'outlined',
+                      onClick: () => {
+                        setReEnterPassword(!reEnterPassword);
+                        handleSwap(swap, 1);
+                      },
+                      size: 'large',
+                      startIcon: <ArrowBack />,
+                    }}
+                  />
                 </Box>
               )}
             </>

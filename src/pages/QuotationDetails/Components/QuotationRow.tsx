@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {QuotationItemRecord} from 'models/quotation';
+import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 
 interface Props {
   quotationItem: QuotationItemRecord;
@@ -157,24 +157,30 @@ export const QuotationRow = ({
       </Box>
       <Box sx={{float: 'right', mt: '1em'}}>
         {!description && (
-          <Button
-            size="small"
-            endIcon={<EditIcon />}
-            onClick={() => setDescription(' ')}
-            sx={{
-              bgcolor: '#00D1FF14',
-            }}>
-            Add Description
-          </Button>
+          <CustomButtonUnstyled
+            label="Add Description"
+            buttonProps={{
+              size: 'small',
+              endIcon: <EditIcon />,
+              onClick: () => setDescription(' '),
+              sx: {
+                bgcolor: '#00D1FF14',
+              },
+            }}
+          />
         )}
-        <Button
-          size="small"
-          color="error"
-          endIcon={<DeleteIcon />}
-          onClick={() => deleteRow(quotationItem)}
-          sx={{bgcolor: '#FF182F14', mx: '.5em'}}>
-          Delete Article
-        </Button>
+        <CustomButtonUnstyled
+          label=" Delete Article"
+          buttonProps={{
+            color: 'error',
+            endIcon: <DeleteIcon />,
+            onClick: () => deleteRow(quotationItem),
+            sx: {
+              bgcolor: '#FF182F14',
+              mx: '.5em',
+            },
+          }}
+        />
       </Box>
     </Box>
   );

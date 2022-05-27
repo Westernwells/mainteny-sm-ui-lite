@@ -1,5 +1,4 @@
 import {SyntheticEvent, useCallback, useEffect, useState} from 'react';
-import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -19,6 +18,7 @@ import {TimePicker} from 'components/TimePicker';
 import {FormikErrors, useFormik} from 'formik';
 import {ScheduleForm} from 'pages/ServiceOrderDetails/models';
 import * as Yup from 'yup';
+import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 
 interface Props {
   open?: boolean;
@@ -231,14 +231,22 @@ export const ScheduleDialog = ({
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{mt: '1.5em'}}>
-          <Button onClick={onCancel}>
+          <CustomButtonUnstyled
+            buttonProps={{
+              onClick: onCancel,
+            }}>
             <Typography variant="subtitle2" color="text.secondary">
               Cancel
             </Typography>
-          </Button>
-          <Button onClick={onSave} autoFocus disabled={disableSaveBtn}>
+          </CustomButtonUnstyled>
+          <CustomButtonUnstyled
+            buttonProps={{
+              onClick: onSave,
+              autoFocus: true,
+              disabled: disableSaveBtn,
+            }}>
             <Typography variant="subtitle2">Save</Typography>
-          </Button>
+          </CustomButtonUnstyled>
         </DialogActions>
       </Dialog>
     </Box>

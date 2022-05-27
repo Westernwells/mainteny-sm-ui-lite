@@ -14,8 +14,9 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import PreviewIcon from '@mui/icons-material/Preview';
 // import CopyAllIcon from '@mui/icons-material/CopyAll';
 // import FileDownloadIcon from '@mui/icons-material/FileDownload';
-// import DraftsIcon from '@mui/icons-material/Drafts';
+// import DraftsIcon from '@mui/icons-material/Drafts';\
 import {useTheme} from '@mui/material';
+import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 
 interface ListMenu {
   label: string;
@@ -70,18 +71,19 @@ export const BottomDrawer = ({
         gap={2}
         sx={{my: 'auto', px: '4em'}}>
         {showSecondaryButton && (
-          <Button
-            variant="outlined"
-            disabled={!isValid}
-            startIcon={<PreviewIcon />}
-            onClick={() =>
-              window.open(
-                `${process.env.REACT_APP_BASE_URL}/QuotationPDF.pdf`,
-                '_blank',
-              )
-            }>
-            preview
-          </Button>
+          <CustomButtonUnstyled
+            label="preview"
+            buttonProps={{
+              variant: 'outlined',
+              disabled: !isValid,
+              startIcon: <PreviewIcon />,
+              onClick: () =>
+                window.open(
+                  `${process.env.REACT_APP_BASE_URL}/QuotationPDF.pdf`,
+                  '_blank',
+                ),
+            }}
+          />
         )}
         <ButtonGroup variant="contained">
           <Button
@@ -90,6 +92,7 @@ export const BottomDrawer = ({
             onClick={primaryButtonAction}>
             {primaryButtonLabel}
           </Button>
+
           {listItems.length > 0 && (
             <IconButton
               disabled={!isValid}

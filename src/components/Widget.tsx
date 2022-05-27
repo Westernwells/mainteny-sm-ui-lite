@@ -3,7 +3,6 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import useTheme from '@mui/material/styles/useTheme';
-import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import ToggleButton from '@mui/material/ToggleButton';
 import ViewListIcon from '@mui/icons-material/ViewList';
@@ -12,6 +11,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import {MenuBtnProps} from 'models/misc';
 import {SearchInput} from './SearchInput';
 import {MenuBtn} from './MenuBtn';
+import {CustomButtonUnstyled} from './CustomButtonUnstyled';
 
 interface Props {
   searchPlaceholder?: string;
@@ -54,24 +54,25 @@ export const Widget = ({
   return (
     <Box display="flex" sx={{...containerStyles}}>
       {!hideFilter ? (
-        <Button
-          onClick={() => setShowFilter(!showFilter)}
-          disableRipple
-          sx={{
-            backgroundColor: showFilter
-              ? theme.palette.action.selected
-              : theme.palette.primary.outlinedHoverBg,
-            border: 'none',
-            ':hover': {
+        <CustomButtonUnstyled
+          buttonProps={{
+            onClick: () => setShowFilter(!showFilter),
+            sx: {
+              backgroundColor: showFilter
+                ? theme.palette.action.selected
+                : theme.palette.primary.outlinedHoverBg,
               border: 'none',
+              ':hover': {
+                border: 'none',
+              },
             },
-          }}
-          variant="outlined"
-          startIcon={<FilterListIcon />}>
+            variant: 'outlined',
+            startIcon: <FilterListIcon />,
+          }}>
           <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
             Filter
           </Typography>
-        </Button>
+        </CustomButtonUnstyled>
       ) : null}
 
       {!hideSearchInput ? (
@@ -117,18 +118,23 @@ export const Widget = ({
       ) : null}
 
       {showActionBtn ? (
-        <Button
-          variant="contained"
-          color="primary"
-          size="large"
-          startIcon={<AddIcon />}
-          sx={{
-            textTransform: 'capitalize',
-            ml: '0.8em',
-          }}
-          onClick={() => (btnOnClick ? btnOnClick() : () => {})}>
-          {btnLabel}
-        </Button>
+        <CustomButtonUnstyled
+          label="Filter"
+          buttonProps={{
+            onClick: () => (btnOnClick ? btnOnClick() : () => {}),
+            sx: {
+              textTransform: 'capitalize',
+              ml: '0.8em',
+            },
+            variant: 'contained',
+            color: 'primary',
+            size: 'small',
+            startIcon: <AddIcon />,
+          }}>
+          <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
+            {btnLabel}
+          </Typography>
+        </CustomButtonUnstyled>
       ) : null}
 
       {showMenuActionBtn && menu ? (

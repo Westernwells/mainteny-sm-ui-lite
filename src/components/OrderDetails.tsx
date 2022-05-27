@@ -1,11 +1,11 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import {formatDate} from 'utils/datetime';
 import {ServiceOrderView} from 'models/service-order';
 import useTheme from '@mui/material/styles/useTheme';
+import {CustomButtonUnstyled} from './CustomButtonUnstyled';
 
 interface Props {
   order: ServiceOrderView;
@@ -87,15 +87,17 @@ export const OrderDetails = ({order}: Props) => {
           mt: '0.5em',
         }}
         component="span">
-        <Button
-          variant="contained"
-          size="small"
-          sx={{
-            textTransform: 'capitalize',
-            px: '2em',
-          }}>
-          View Details
-        </Button>
+        <CustomButtonUnstyled
+          label="View Details"
+          buttonProps={{
+            variant: 'contained',
+            size: 'small',
+            sx: {
+              textTransform: 'capitalize',
+              px: '2em',
+            },
+          }}
+        />
       </Box>
     </Box>
   );

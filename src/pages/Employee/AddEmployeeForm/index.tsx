@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import {useFormikContext} from 'formik';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
 import EmailIcon from '@mui/icons-material/Email';
@@ -9,6 +8,7 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import EyeIcon from '@mui/icons-material/RemoveRedEye';
 import {Role} from 'models/user';
 import {FormInput} from 'components/form/FormInput';
+import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 import {SelectShift} from './SelectShift';
 import {EmployeeAccountData} from './model';
 import {SelectEmployeeRole} from './SelectEmployeeRole';
@@ -153,23 +153,28 @@ export const AddEmployeeForm = () => {
         )}
       </Box>
       <Box display="flex" justifyContent="end" gap="1em">
-        <Button onClick={handleReset} sx={{color: 'text.secondary'}}>
-          Clear
-        </Button>
-        <Button
-          variant="contained"
-          type="submit"
-          disabled={
-            !isValid ||
-            values.roles.length === 0 ||
-            (!values.address &&
-              !(
-                values.roles.length === 1 &&
-                values.roles.includes('SERVICE_MANAGER')
-              ))
-          }>
-          Add Employee
-        </Button>
+        <CustomButtonUnstyled
+          label="Clear"
+          buttonProps={{onClick: handleReset, sx: {color: 'text.secondary'}}}
+        />
+
+        <CustomButtonUnstyled
+          label="Add Employee"
+          buttonProps={{
+            onClick: handleReset,
+            sx: {color: 'text.secondary'},
+            variant: 'contained',
+            type: 'submit',
+            disabled:
+              !isValid ||
+              values.roles.length === 0 ||
+              (!values.address &&
+                !(
+                  values.roles.length === 1 &&
+                  values.roles.includes('SERVICE_MANAGER')
+                )),
+          }}
+        />
       </Box>
     </Box>
   );

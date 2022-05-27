@@ -8,10 +8,10 @@ import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import {capitalize} from 'utils/utils';
 import {Progress} from 'components/Progress';
 import {BasicDetailsValue} from 'models/misc';
+import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 import {EditEmployee} from './EditEmployee';
 import {employeeDetailSchema} from './schema';
 
@@ -109,9 +109,12 @@ export const EmployeeOverview = ({employee, isLoading}: Props) => {
           color: theme.palette.info.dark,
           cursor: 'pointer',
         }}>
-        <Button onClick={() => setIsDrawerOpen(true)}>
+        <CustomButtonUnstyled
+          buttonProps={{
+            onClick: () => setIsDrawerOpen(true),
+          }}>
           <Typography variant="subtitle2">Edit</Typography>
-        </Button>
+        </CustomButtonUnstyled>
       </Box>
       {employee && (
         <EditEmployee

@@ -2,8 +2,8 @@ import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
-import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
+import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 
 export const NotificationCard = () => {
   const theme = useTheme();
@@ -54,9 +54,11 @@ export const NotificationCard = () => {
       </Box>
       <Box ml={11}>
         <Box mt={6} display="flex" justifyContent="space-between">
-          <Button
-            size="small"
-            sx={{backgroundColor: theme.palette.primary.outlinedHoverBg}}>
+          <CustomButtonUnstyled
+            label="View Contract"
+            buttonProps={{
+              sx: {backgroundColor: theme.palette.primary.outlinedHoverBg},
+            }}>
             <Typography
               variant="smallBtnText"
               sx={{
@@ -66,7 +68,8 @@ export const NotificationCard = () => {
               }}>
               View Contract
             </Typography>
-          </Button>
+          </CustomButtonUnstyled>
+
           <Chip
             label={
               <Typography variant="smallBtnText">contrat expiry</Typography>

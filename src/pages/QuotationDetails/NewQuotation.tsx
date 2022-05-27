@@ -4,7 +4,7 @@ import {useSearchParams} from 'react-router-dom';
 import {useFormik} from 'formik';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import {Button, InputLabel, TextField} from '@mui/material';
+import {InputLabel, TextField} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import {BackAction} from 'components/BackAction';
@@ -25,6 +25,7 @@ import {PropertyOwner} from 'models/propertyManager';
 import {ClientSimpleView} from 'models/client';
 import {ArticleView} from 'models/article';
 import {WithOptional} from 'models/misc';
+import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 import {formatDate} from 'utils/datetime';
 import {Label} from './Components/Label';
 import {BottomDrawer} from './Components/BottomDrawer';
@@ -360,14 +361,15 @@ export const NewQuotation = () => {
             ))}
             {quotationItems.length ? (
               <>
-                <Button
-                  variant="contained"
-                  size="small"
-                  sx={{alignSelf: 'self-start'}}
-                  startIcon={<AddIcon />}
-                  onClick={() => setIsArticleModalOpen(true)}>
-                  Article
-                </Button>
+                <CustomButtonUnstyled
+                  label="Article"
+                  buttonProps={{
+                    variant: 'contained',
+                    sx: {alignSelf: 'self-start'},
+                    startIcon: <AddIcon />,
+                    onClick: () => setIsArticleModalOpen(true),
+                  }}
+                />
                 <Box borderTop="1px solid" borderColor="grey.300">
                   <Box
                     p="1em"

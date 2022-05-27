@@ -1,7 +1,6 @@
 import {useEffect, useState} from 'react';
 import {useFormikContext} from 'formik';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
@@ -12,6 +11,7 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import TimePicker from '@mui/lab/TimePicker';
 import {TimeWindowType} from 'models/misc';
 import {convertToMacro, convertToText} from 'utils/utils';
+import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
 import {Shift, EmployeeAccountData} from './model';
 
 export const SelectShift = () => {
@@ -143,32 +143,34 @@ export const SelectShift = () => {
       ))}
 
       <Box mt="1em">
-        <Button
-          variant="outlined"
-          color="info"
-          size="small"
-          onClick={handleAddShift}
-          disabled={shifts.length === workDays.length}
-          sx={{
-            mr: '1em',
-            borderColor: 'info.main',
-            bgcolor: 'transparent',
-          }}>
-          Add
-        </Button>
-        <Button
-          variant="outlined"
-          color="error"
-          size="small"
-          onClick={handleRemoveShift}
-          disabled={shifts.length === 1}
-          sx={{
-            mr: '1em',
-            borderColor: 'error.main',
-            bgcolor: 'transparent',
-          }}>
-          Remove
-        </Button>
+        <CustomButtonUnstyled
+          label="Add"
+          buttonProps={{
+            variant: 'outlined',
+            color: 'info',
+            onClick: handleAddShift,
+            disabled: shifts.length === workDays.length,
+            sx: {
+              mr: '1em',
+              borderColor: 'info.main',
+              bgcolor: 'transparent',
+            },
+          }}
+        />
+        <CustomButtonUnstyled
+          label="Remove"
+          buttonProps={{
+            variant: 'outlined',
+            color: 'error',
+            onClick: handleRemoveShift,
+            disabled: shifts.length === 1,
+            sx: {
+              mr: '1em',
+              borderColor: 'error.main',
+              bgcolor: 'transparent',
+            },
+          }}
+        />
       </Box>
     </>
   );
