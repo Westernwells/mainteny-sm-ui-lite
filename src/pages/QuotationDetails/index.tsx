@@ -1,15 +1,10 @@
 import {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router';
+import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import {
-  Button,
-  Grid,
-  InputLabel,
-  OutlinedInput,
-  TextField,
-} from '@mui/material';
+import {Button, Grid, InputLabel, TextField} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import {BackAction} from 'components/BackAction';
 import {A4Layout} from 'components/A4Layout';
@@ -95,8 +90,14 @@ export const QuotationDetails = () => {
     items: [],
   };
 
+  const validationSchema = Yup.object().shape({
+    subject: Yup.string().required('Subject is required'),
+    description: Yup.string().required('Description is required'),
+  });
+
   const formik = useFormik({
     initialValues,
+    validationSchema,
     onSubmit: (values) => {
       if (quotationId) {
         updateQuotation({data: values, quotationId, publish});
@@ -363,7 +364,7 @@ export const QuotationDetails = () => {
         <Box display="flex" mt="1em" gap="2em">
           <Box flexGrow={1} display="flex" flexDirection="column" gap="2em">
             <Box>
-              <Label text="Customer Details" />
+              <Label text="Customer Details" required />
               {customer ? (
                 <SelectCard
                   header={
@@ -399,7 +400,7 @@ export const QuotationDetails = () => {
               )}
             </Box>
             <Box>
-              <Label text="Unit Details" />
+              <Label text="Unit Details" required />
 
               {unit ? (
                 <SelectCard
@@ -445,13 +446,16 @@ export const QuotationDetails = () => {
         </Box>
         <Box mt="1em">
           <InputLabel>
-            <Label text="Subject" />
+            <Label text="Subject" required />
           </InputLabel>
           <TextField
             size="small"
             id="subject"
             value={formik.values.subject}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={!!(formik.touched.subject && formik.errors.subject)}
+            helperText={formik.touched.subject && formik.errors.subject}
             minRows={1}
             maxRows={3}
             multiline
@@ -460,13 +464,16 @@ export const QuotationDetails = () => {
         </Box>
         <Box mt="1em">
           <InputLabel>
-            <Label text="Description" />
+            <Label text="Description" required />
           </InputLabel>
-          <OutlinedInput
+          <TextField
             size="small"
             id="description"
             value={formik.values.description}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={!!(formik.touched.description && formik.errors.description)}
+            helperText={formik.touched.description && formik.errors.description}
             minRows={2}
             maxRows={6}
             multiline
