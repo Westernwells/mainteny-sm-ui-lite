@@ -8,7 +8,7 @@ import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlin
 import {CardProps} from 'components/CardProps';
 import {useParams} from 'react-router-dom';
 import {BackAction} from 'components/BackAction';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {convertToText} from 'utils/utils';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
@@ -39,7 +39,7 @@ export const InvoiceDetails = () => {
     <Box>
       <Box display="flex" justifyContent="space-between" mb="0.5em">
         <BackAction label="Invoice Details" />
-        <CustomButtonUnstyled
+        <Button
           label="Download Invoice"
           buttonProps={{
             disabled: !downloadUrl,

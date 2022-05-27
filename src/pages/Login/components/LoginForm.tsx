@@ -7,7 +7,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Box from '@mui/material/Box';
 import EmailSharp from '@mui/icons-material/EmailSharp';
 import CircularProgress from '@mui/material/CircularProgress';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 
 interface Props {
   handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -82,7 +82,7 @@ export const LoginForm = ({
           />
           <Box display="flex" justifyContent="flex-end" mt={1}>
             <Link to="/recover" style={{textDecoration: 'none'}}>
-              <CustomButtonUnstyled
+              <Button
                 label="Forgot Password?"
                 buttonProps={{
                   sx: {color: 'text.secondary', textTransform: 'capitalize'},
@@ -93,7 +93,7 @@ export const LoginForm = ({
           </Box>
         </Box>
 
-        <CustomButtonUnstyled
+        <Button
           label="Login"
           buttonProps={{
             sx: {marginTop: 5, width: '100%'},

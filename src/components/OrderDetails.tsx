@@ -5,7 +5,7 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import {formatDate} from 'utils/datetime';
 import {ServiceOrderView} from 'models/service-order';
 import useTheme from '@mui/material/styles/useTheme';
-import {CustomButtonUnstyled} from './CustomButtonUnstyled';
+import {Button} from './Button';
 
 interface Props {
   order: ServiceOrderView;
@@ -87,7 +87,7 @@ export const OrderDetails = ({order}: Props) => {
           mt: '0.5em',
         }}
         component="span">
-        <CustomButtonUnstyled
+        <Button
           label="View Details"
           buttonProps={{
             variant: 'contained',

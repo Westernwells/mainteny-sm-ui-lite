@@ -8,7 +8,7 @@ import {ReactComponent as Pin} from '../assets/icons/Pin.svg';
 import {ElevatorStatus, ElevatorView} from '../models/elevator';
 import {formatDate} from '../utils/datetime';
 import {StatusIndicator} from './StatusIndicator';
-import {CustomButtonUnstyled} from './CustomButtonUnstyled';
+import {Button} from './Button';
 
 interface Props extends BoxProps {
   elevator?: ElevatorView;
@@ -99,7 +99,7 @@ export const LocationPin = ({
         </Box>
       </Box>
 
-      <CustomButtonUnstyled
+      <Button
         label="More details"
         buttonProps={{
           variant: 'outlined',

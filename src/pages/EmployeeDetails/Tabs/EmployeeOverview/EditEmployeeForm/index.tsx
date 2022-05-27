@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import PhoneIcon from '@mui/icons-material/Phone';
 import {Role} from 'models/user';
 import {FormInput} from 'components/form/FormInput';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 import {SelectShift} from './SelectShift';
 import {EmployeeAccountData} from './model';
 import {SelectAddress} from './SelectAddress';
@@ -131,7 +131,7 @@ export const EditEmployeeForm = () => {
                   justifyContent="space-between"
                   alignItems="center">
                   <Typography>{values.addressFullName}</Typography>
-                  <CustomButtonUnstyled
+                  <Button
                     label="Change"
                     buttonProps={{
                       onClick: () => setIsVisible(true),
@@ -153,14 +153,14 @@ export const EditEmployeeForm = () => {
         )}
       </Box>
       <Box display="flex" justifyContent="end" gap="1em">
-        <CustomButtonUnstyled
+        <Button
           label="Reset"
           buttonProps={{
             onClick: handleReset,
             sx: {color: 'text.secondary'},
           }}
         />
-        <CustomButtonUnstyled
+        <Button
           label="Save Changes"
           buttonProps={{
             variant: 'contained',

@@ -18,7 +18,7 @@ import {TimePicker} from 'components/TimePicker';
 import {FormikErrors, useFormik} from 'formik';
 import {ScheduleForm} from 'pages/ServiceOrderDetails/models';
 import * as Yup from 'yup';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 
 interface Props {
   open?: boolean;
@@ -231,22 +231,22 @@ export const ScheduleDialog = ({
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{mt: '1.5em'}}>
-          <CustomButtonUnstyled
+          <Button
             buttonProps={{
               onClick: onCancel,
             }}>
             <Typography variant="subtitle2" color="text.secondary">
               Cancel
             </Typography>
-          </CustomButtonUnstyled>
-          <CustomButtonUnstyled
+          </Button>
+          <Button
             buttonProps={{
               onClick: onSave,
               autoFocus: true,
               disabled: disableSaveBtn,
             }}>
             <Typography variant="subtitle2">Save</Typography>
-          </CustomButtonUnstyled>
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

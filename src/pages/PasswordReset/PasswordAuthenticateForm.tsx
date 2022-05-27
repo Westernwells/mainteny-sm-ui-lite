@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import {Link, useNavigate} from 'react-router-dom';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 
 interface Props {
   handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -50,7 +50,7 @@ export const PasswordAuthenticateForm = ({
         />
 
         <Box mt={5}>
-          <CustomButtonUnstyled
+          <Button
             label="Reset Password"
             buttonProps={{
               type: 'submit',
@@ -61,7 +61,7 @@ export const PasswordAuthenticateForm = ({
               endIcon: <ArrowForward />,
             }}
           />
-          <CustomButtonUnstyled
+          <Button
             label="Back"
             buttonProps={{
               sx: {width: '100%', marginTop: 1},

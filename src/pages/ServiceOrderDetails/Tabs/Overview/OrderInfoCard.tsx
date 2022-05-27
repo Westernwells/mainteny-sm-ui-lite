@@ -21,7 +21,7 @@ import {
 import {useTranslation} from 'react-i18next';
 import {formatDate, setDateTime} from 'utils/datetime';
 import {ScheduleForm} from 'pages/ServiceOrderDetails/models';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 import {FormikErrors} from 'formik';
 import {orderInfo as orderInfoSchema} from './schema';
 import {ScheduleDialog} from './ScheduleDialog';
@@ -129,7 +129,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
       serviceOrderDetails.status,
     ) ? (
       <>
-        <CustomButtonUnstyled
+        <Button
           label={t('Reschedule')}
           buttonProps={{
             variant: 'contained',
@@ -138,7 +138,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
             sx: {px: '2.5em', mt: '1em', mr: '1em'},
           }}
         />
-        <CustomButtonUnstyled
+        <Button
           label={t('Unschedule')}
           buttonProps={{
             variant: 'contained',
@@ -156,14 +156,14 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
       ServiceOrderStatus.SCHEDULING,
     ].includes(serviceOrderDetails.status) ? (
       <>
-        <CustomButtonUnstyled
+        <Button
           label={t('Cancel')}
           buttonProps={{
             onClick: () => setOpenCancelConfirm(true),
             sx: {px: '2.5em', mt: '1em'},
           }}
         />
-        <CustomButtonUnstyled
+        <Button
           label={t('Schedule')}
           buttonProps={{
             onClick: () => setOpenDialog(true),

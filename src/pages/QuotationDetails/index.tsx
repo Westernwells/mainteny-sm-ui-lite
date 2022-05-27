@@ -15,7 +15,7 @@ import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {StatusChip} from 'components/StatusChip';
 import {PageCard} from 'components/PageCard';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import CopyAllIcon from '@mui/icons-material/CopyAll';
@@ -239,7 +239,7 @@ export const QuotationDetails = () => {
               variant="filled"
             />
           </Box>
-          <CustomButtonUnstyled
+          <Button
             label="Download Quotation"
             buttonProps={{
               onClick: () =>
@@ -268,7 +268,7 @@ export const QuotationDetails = () => {
               <Typography variant="subtitle2" textAlign="center">
                 You haven’t created Service Order for this Quotation
               </Typography>
-              <CustomButtonUnstyled
+              <Button
                 label="Create Service Order"
                 buttonProps={{
                   size: 'small',
@@ -512,7 +512,7 @@ export const QuotationDetails = () => {
             ))}
             {quotationItems.length ? (
               <>
-                <CustomButtonUnstyled
+                <Button
                   label="Article"
                   buttonProps={{
                     variant: 'contained',

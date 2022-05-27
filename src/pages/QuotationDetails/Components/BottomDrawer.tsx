@@ -2,7 +2,7 @@ import {ReactNode, useState} from 'react';
 import Drawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-import Button from '@mui/material/Button';
+import MuiButton from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -16,7 +16,7 @@ import PreviewIcon from '@mui/icons-material/Preview';
 // import FileDownloadIcon from '@mui/icons-material/FileDownload';
 // import DraftsIcon from '@mui/icons-material/Drafts';\
 import {useTheme} from '@mui/material';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 
 interface ListMenu {
   label: string;
@@ -71,7 +71,7 @@ export const BottomDrawer = ({
         gap={2}
         sx={{my: 'auto', px: '4em'}}>
         {showSecondaryButton && (
-          <CustomButtonUnstyled
+          <Button
             label="preview"
             buttonProps={{
               variant: 'outlined',
@@ -86,12 +86,12 @@ export const BottomDrawer = ({
           />
         )}
         <ButtonGroup variant="contained">
-          <Button
+          <MuiButton
             type="submit"
             disabled={!isValid}
             onClick={primaryButtonAction}>
             {primaryButtonLabel}
-          </Button>
+          </MuiButton>
 
           {listItems.length > 0 && (
             <IconButton

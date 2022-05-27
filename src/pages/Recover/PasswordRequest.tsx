@@ -9,7 +9,7 @@ import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import {useNavigate} from 'react-router-dom';
 import {AuthLayout} from 'components/AuthLayout';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 
 interface Props {
   handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -65,7 +65,7 @@ export const PasswordRequest = ({
             }}
           />
           <Box mt={5}>
-            <CustomButtonUnstyled
+            <Button
               label="Get Reset Code"
               buttonProps={{
                 type: 'submit',
@@ -80,7 +80,7 @@ export const PasswordRequest = ({
                 ),
               }}
             />
-            <CustomButtonUnstyled
+            <Button
               label="Back"
               buttonProps={{
                 onClick: () => navigate('/login'),

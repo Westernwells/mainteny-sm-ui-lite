@@ -4,7 +4,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
-import {CustomButtonUnstyled} from './CustomButtonUnstyled';
+import {Button} from './Button';
 
 interface Props {
   open?: boolean;
@@ -27,7 +27,7 @@ export const Confirm = ({open, onConfirm, onClose, title, content}: Props) => (
       </DialogContentText>
     </DialogContent>
     <DialogActions>
-      <CustomButtonUnstyled
+      <Button
         label="Create Service Order"
         buttonProps={{
           onClick: onClose,
@@ -35,16 +35,16 @@ export const Confirm = ({open, onConfirm, onClose, title, content}: Props) => (
         <Typography variant="subtitle2" color="text.secondary">
           No
         </Typography>
-      </CustomButtonUnstyled>
+      </Button>
 
-      <CustomButtonUnstyled
+      <Button
         label="Create Service Order"
         buttonProps={{
           onClick: onConfirm,
           autoFocus: true,
         }}>
         <Typography variant="subtitle2">Yes</Typography>
-      </CustomButtonUnstyled>
+      </Button>
     </DialogActions>
   </Dialog>
 );

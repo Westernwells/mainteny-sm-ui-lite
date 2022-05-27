@@ -3,7 +3,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import Chip from '@mui/material/Chip';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 
 export const NotificationCard = () => {
   const theme = useTheme();
@@ -54,7 +54,7 @@ export const NotificationCard = () => {
       </Box>
       <Box ml={11}>
         <Box mt={6} display="flex" justifyContent="space-between">
-          <CustomButtonUnstyled
+          <Button
             label="View Contract"
             buttonProps={{
               sx: {backgroundColor: theme.palette.primary.outlinedHoverBg},
@@ -68,7 +68,7 @@ export const NotificationCard = () => {
               }}>
               View Contract
             </Typography>
-          </CustomButtonUnstyled>
+          </Button>
 
           <Chip
             label={

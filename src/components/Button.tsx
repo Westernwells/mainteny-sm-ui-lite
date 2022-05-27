@@ -1,4 +1,4 @@
-import Button, {ButtonProps} from '@mui/material/Button';
+import MuiButton, {ButtonProps} from '@mui/material/Button';
 import {ReactNode} from 'react';
 
 interface Props {
@@ -8,13 +8,8 @@ interface Props {
   buttonProps: ButtonProps;
 }
 
-export const CustomButtonUnstyled = ({
-  label,
-  children,
-  style,
-  buttonProps,
-}: Props) => (
-  <Button
+export const Button = ({label, children, style, buttonProps}: Props) => (
+  <MuiButton
     disableRipple
     disableFocusRipple
     disableElevation
@@ -25,5 +20,5 @@ export const CustomButtonUnstyled = ({
     }}
     {...buttonProps}>
     {children || label}
-  </Button>
+  </MuiButton>
 );

@@ -5,7 +5,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {QuotationItemRecord} from 'models/quotation';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 
 interface Props {
   quotationItem: QuotationItemRecord;
@@ -157,7 +157,7 @@ export const QuotationRow = ({
       </Box>
       <Box sx={{float: 'right', mt: '1em'}}>
         {!description && (
-          <CustomButtonUnstyled
+          <Button
             label="Add Description"
             buttonProps={{
               size: 'small',
@@ -169,7 +169,7 @@ export const QuotationRow = ({
             }}
           />
         )}
-        <CustomButtonUnstyled
+        <Button
           label=" Delete Article"
           buttonProps={{
             color: 'error',

@@ -11,7 +11,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import CircularProgress from '@mui/material/CircularProgress';
 import {useRecoverPassword} from 'hooks/useRecoverPassword';
 import {AuthLayout} from 'components/AuthLayout';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 
 interface Props {
   handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -97,7 +97,7 @@ export const PasswordReset = ({
               />
 
               <Box mt={5}>
-                <CustomButtonUnstyled
+                <Button
                   label="Reset Password"
                   buttonProps={{
                     onClick: () => handleSwap(true, 1),
@@ -112,7 +112,7 @@ export const PasswordReset = ({
                     ),
                   }}
                 />
-                <CustomButtonUnstyled
+                <Button
                   label="Back"
                   buttonProps={{
                     sx: {width: '100%', marginTop: 1},
@@ -222,7 +222,7 @@ export const PasswordReset = ({
                 />
               )}
               {!reEnterPassword ? (
-                <CustomButtonUnstyled
+                <Button
                   label="Next"
                   buttonProps={{
                     disabled: !!(!password || passwordError),
@@ -238,7 +238,7 @@ export const PasswordReset = ({
                 />
               ) : (
                 <Box mt={5}>
-                  <CustomButtonUnstyled
+                  <Button
                     label="Go"
                     buttonProps={{
                       type: 'submit',
@@ -256,7 +256,7 @@ export const PasswordReset = ({
                       ),
                     }}
                   />
-                  <CustomButtonUnstyled
+                  <Button
                     label="Back"
                     buttonProps={{
                       sx: {width: '100%', marginTop: 1},

@@ -6,7 +6,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import {TechnicianView} from 'models/technician';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 import Box from '@mui/material/Box';
 import {TechnicianAutoComplete} from './TechnicianAutoComplete';
 
@@ -65,7 +65,7 @@ export const AddTechnicianDialog = ({
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{mt: '1.5em'}}>
-          <CustomButtonUnstyled
+          <Button
             buttonProps={{
               onClick: onSave,
               autoFocus: true,
@@ -74,13 +74,13 @@ export const AddTechnicianDialog = ({
             <Typography variant="subtitle2" color="text.secondary">
               Cancel
             </Typography>
-          </CustomButtonUnstyled>
-          <CustomButtonUnstyled
+          </Button>
+          <Button
             buttonProps={{
               onClick: onCancel,
             }}>
             <Typography variant="subtitle2">Add</Typography>
-          </CustomButtonUnstyled>
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

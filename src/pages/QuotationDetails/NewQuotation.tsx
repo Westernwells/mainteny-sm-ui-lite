@@ -25,7 +25,7 @@ import {PropertyOwner} from 'models/propertyManager';
 import {ClientSimpleView} from 'models/client';
 import {ArticleView} from 'models/article';
 import {WithOptional} from 'models/misc';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 import {formatDate} from 'utils/datetime';
 import {Label} from './Components/Label';
 import {BottomDrawer} from './Components/BottomDrawer';
@@ -361,7 +361,7 @@ export const NewQuotation = () => {
             ))}
             {quotationItems.length ? (
               <>
-                <CustomButtonUnstyled
+                <Button
                   label="Article"
                   buttonProps={{
                     variant: 'contained',

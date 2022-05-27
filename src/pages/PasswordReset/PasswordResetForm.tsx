@@ -8,7 +8,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import {useNavigate} from 'react-router-dom';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 
 interface Props {
   handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -114,7 +114,7 @@ export const PasswordResetForm = ({
         )}
 
         {!reEnterPassword ? (
-          <CustomButtonUnstyled
+          <Button
             label="Next"
             buttonProps={{
               disabled: !!(!password || passwordError),
@@ -130,7 +130,7 @@ export const PasswordResetForm = ({
           />
         ) : (
           <Box mt={5}>
-            <CustomButtonUnstyled
+            <Button
               label="Go"
               buttonProps={{
                 disabled: !!(!password || passwordError),
@@ -142,7 +142,7 @@ export const PasswordResetForm = ({
               }}
             />
 
-            <CustomButtonUnstyled
+            <Button
               label="Back"
               buttonProps={{
                 disabled: !!(!password || passwordError),

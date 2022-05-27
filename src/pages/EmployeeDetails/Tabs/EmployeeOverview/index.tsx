@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import {capitalize} from 'utils/utils';
 import {Progress} from 'components/Progress';
 import {BasicDetailsValue} from 'models/misc';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 import {EditEmployee} from './EditEmployee';
 import {employeeDetailSchema} from './schema';
 
@@ -109,12 +109,12 @@ export const EmployeeOverview = ({employee, isLoading}: Props) => {
           color: theme.palette.info.dark,
           cursor: 'pointer',
         }}>
-        <CustomButtonUnstyled
+        <Button
           buttonProps={{
             onClick: () => setIsDrawerOpen(true),
           }}>
           <Typography variant="subtitle2">Edit</Typography>
-        </CustomButtonUnstyled>
+        </Button>
       </Box>
       {employee && (
         <EditEmployee

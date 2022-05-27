@@ -17,7 +17,7 @@ import {FormRadio} from 'components/form/FormRadio';
 import RadioGroup from '@mui/material/RadioGroup';
 import useTheme from '@mui/material/styles/useTheme';
 import Divider from '@mui/material/Divider';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 import {sortOrderByTime} from 'utils/service-order-utils';
 import {AddTechnicianDialog} from './AddTechnicianDialog';
 import {TechnicianSchedule} from './TechnicianSchedule';
@@ -306,7 +306,7 @@ export const SelectTechnicians = ({
         cardFooter={
           selectedOption === RadioOptions.IMMEDIATE ? (
             <Box sx={{ml: '1.5em'}}>
-              <CustomButtonUnstyled
+              <Button
                 label="Add More"
                 buttonProps={{
                   variant: 'outlined',

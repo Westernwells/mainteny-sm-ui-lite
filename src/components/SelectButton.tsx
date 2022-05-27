@@ -1,7 +1,7 @@
 import {MouseEventHandler} from 'react';
 import Box from '@mui/material/Box';
 import {SxProps, Theme} from '@mui/system';
-import {CustomButtonUnstyled} from './CustomButtonUnstyled';
+import {Button} from './Button';
 
 interface Props {
   text: string;
@@ -20,7 +20,7 @@ export const SelectButton = ({text, onClick, sxContainer}: Props) => (
     borderColor="text.disabled"
     borderRadius=".25em"
     sx={sxContainer}>
-    <CustomButtonUnstyled
+    <Button
       label={text}
       buttonProps={{
         variant: 'outlined',

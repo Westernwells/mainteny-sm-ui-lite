@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -28,7 +28,7 @@ export const ContractDetails = () => {
       onChange={(index) => setTabValue(index)}
       backBtnLabel="Contract Details"
       renderWidget={
-        <CustomButtonUnstyled
+        <Button
           label="Download Contract"
           style={{
             textTransform: 'capitalize',

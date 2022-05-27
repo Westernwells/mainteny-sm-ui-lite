@@ -18,7 +18,7 @@ import {
 import {formatDate, getDateObject} from 'utils/datetime';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 import {getYear, eachYearOfInterval, endOfYear, startOfYear} from 'date-fns';
 import {useParams} from 'react-router-dom';
 import {HistoryCard} from './HistoryCard';
@@ -328,7 +328,7 @@ export const ServiceHistoryTab = () => {
                 size="small"
                 containerStyle={{mt: 8, mb: 2}}
               />
-              <CustomButtonUnstyled
+              <Button
                 label="Reset Filters"
                 buttonProps={{
                   variant: 'contained',

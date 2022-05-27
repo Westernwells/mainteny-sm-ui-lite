@@ -1,7 +1,7 @@
 import {Typography} from '@mui/material';
 import Box from '@mui/material/Box';
 import {ReactComponent as TechnicianIllustration} from 'assets/illustrations/technician.svg';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 import {useNavigate} from 'react-router';
 
 export const PageNotFound = () => {
@@ -20,7 +20,7 @@ export const PageNotFound = () => {
         {message1}
       </Typography>
       <Box mt={6}>
-        <CustomButtonUnstyled
+        <Button
           label="Home"
           buttonProps={{
             variant: 'contained',

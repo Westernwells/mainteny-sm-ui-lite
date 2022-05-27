@@ -8,7 +8,7 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import EyeIcon from '@mui/icons-material/RemoveRedEye';
 import {Role} from 'models/user';
 import {FormInput} from 'components/form/FormInput';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 import {SelectShift} from './SelectShift';
 import {EmployeeAccountData} from './model';
 import {SelectEmployeeRole} from './SelectEmployeeRole';
@@ -153,12 +153,12 @@ export const AddEmployeeForm = () => {
         )}
       </Box>
       <Box display="flex" justifyContent="end" gap="1em">
-        <CustomButtonUnstyled
+        <Button
           label="Clear"
           buttonProps={{onClick: handleReset, sx: {color: 'text.secondary'}}}
         />
 
-        <CustomButtonUnstyled
+        <Button
           label="Add Employee"
           buttonProps={{
             onClick: handleReset,

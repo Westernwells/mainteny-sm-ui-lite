@@ -11,7 +11,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import {MenuBtnProps} from 'models/misc';
 import {SearchInput} from './SearchInput';
 import {MenuBtn} from './MenuBtn';
-import {CustomButtonUnstyled} from './CustomButtonUnstyled';
+import {Button} from './Button';
 
 interface Props {
   searchPlaceholder?: string;
@@ -54,7 +54,7 @@ export const Widget = ({
   return (
     <Box display="flex" sx={{...containerStyles}}>
       {!hideFilter ? (
-        <CustomButtonUnstyled
+        <Button
           buttonProps={{
             onClick: () => setShowFilter(!showFilter),
             sx: {
@@ -72,7 +72,7 @@ export const Widget = ({
           <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
             Filter
           </Typography>
-        </CustomButtonUnstyled>
+        </Button>
       ) : null}
 
       {!hideSearchInput ? (
@@ -118,7 +118,7 @@ export const Widget = ({
       ) : null}
 
       {showActionBtn ? (
-        <CustomButtonUnstyled
+        <Button
           label="Filter"
           buttonProps={{
             onClick: () => (btnOnClick ? btnOnClick() : () => {}),
@@ -134,7 +134,7 @@ export const Widget = ({
           <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
             {btnLabel}
           </Typography>
-        </CustomButtonUnstyled>
+        </Button>
       ) : null}
 
       {showMenuActionBtn && menu ? (

@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import {Close} from '@mui/icons-material';
-import {CustomButtonUnstyled} from './CustomButtonUnstyled';
+import {Button} from './Button';
 
 interface Props {
   open: boolean;
@@ -65,7 +65,7 @@ export const SideDrawer = ({
 
       {footer && (
         <Box display="flex" justifyContent="flex-end" gap="1em">
-          <CustomButtonUnstyled
+          <Button
             label="Cancel"
             buttonProps={{
               onClick: () => setOpen(false),

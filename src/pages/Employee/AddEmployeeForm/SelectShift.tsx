@@ -11,7 +11,7 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import TimePicker from '@mui/lab/TimePicker';
 import {TimeWindowType} from 'models/misc';
 import {convertToMacro, convertToText} from 'utils/utils';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 import {Shift, EmployeeAccountData} from './model';
 
 export const SelectShift = () => {
@@ -143,7 +143,7 @@ export const SelectShift = () => {
       ))}
 
       <Box mt="1em">
-        <CustomButtonUnstyled
+        <Button
           label="Add"
           buttonProps={{
             variant: 'outlined',
@@ -157,7 +157,7 @@ export const SelectShift = () => {
             },
           }}
         />
-        <CustomButtonUnstyled
+        <Button
           label="Remove"
           buttonProps={{
             variant: 'outlined',
