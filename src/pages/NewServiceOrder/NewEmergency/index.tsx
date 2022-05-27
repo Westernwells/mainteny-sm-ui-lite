@@ -4,7 +4,7 @@ import {useAssignmentBasedOrder} from 'hooks/reactQuery/useServiceOrder';
 import {ElevatorView} from 'models/elevator';
 import {TechnicianView} from 'models/technician';
 import {useEffect, useState} from 'react';
-import {ServiceOrderPriority, ServiceOrderType} from 'models/service-order';
+import {Priority, ServiceOrderType} from 'models/service-order';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {toRestDateTime} from 'utils/datetime';
 import {useNavigate} from 'react-router';
@@ -58,7 +58,7 @@ export const NewEmergency = () => {
       description,
       elevatorId: selectedUnit!.id,
       externalId: '',
-      priority: ServiceOrderPriority.A,
+      priority: Priority.A,
       serviceCompanyId,
       technicianIds: selectedTechnicians.map((item) => item.id),
       time: toRestDateTime(new Date()),

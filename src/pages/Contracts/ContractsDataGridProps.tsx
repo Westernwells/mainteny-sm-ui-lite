@@ -73,15 +73,6 @@ export const columns: GridColDef[] = [
   {
     field: 'actions',
     headerName: 'ACTIONS',
-    // TODO: Actions not working as expected
-    // type: 'actions',
-    // getActions: (params: GridRowParams) => [
-    //   <GridActionsCellItem
-    //     icon={<FileDownloadOutlinedIcon sx={{color: '#2196F3'}} />}
-    //     onClick={() => console.log('ACTION: Click', params.id)}
-    //     label="Download"
-    //   />,
-    // ],
     editable: false,
     sortable: false,
     disableColumnMenu: true,
