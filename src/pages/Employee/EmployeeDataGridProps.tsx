@@ -74,7 +74,7 @@ export const columns: GridColDef[] = [
   {
     field: 'address',
     headerName: 'ADDRESS',
-    type: 'number',
+    type: 'string',
     ...defaultAlignment,
     ...defaultProps,
     flex: 4,
@@ -90,7 +90,7 @@ export const columns: GridColDef[] = [
   {
     field: 'shift',
     headerName: 'SHIFT',
-    type: 'number',
+    type: 'string',
     ...defaultAlignment,
     ...defaultProps,
   },

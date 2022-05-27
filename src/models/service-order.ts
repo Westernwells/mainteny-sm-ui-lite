@@ -9,7 +9,7 @@ import {Fee, JobStatus, Meta, Order} from './misc';
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
 
-export enum ServiceOrderPriority {
+export enum Priority {
   A = 'A',
   B = 'B',
   C = 'C',
@@ -87,7 +87,7 @@ export interface ServiceOrderAdditionalInfo {
   appointmentNotificationDueDate?: string;
   appointmentNotificationRequired: boolean;
   appointmentNotificationSent: boolean;
-  priority: ServiceOrderPriority;
+  priority: Priority;
 }
 
 export interface ServiceOrderView {
@@ -175,7 +175,7 @@ export interface UpdateServiceOrder {
   id: string;
   externalId: string;
   description: string;
-  priority: ServiceOrderPriority;
+  priority: Priority;
 }
 
 export interface UpdateJobSchedule {
@@ -271,7 +271,7 @@ export interface AssignmentBasedOrderBody {
   externalId: string;
   labels?: string[];
   moreInformation?: string;
-  priority: ServiceOrderPriority;
+  priority: Priority;
   serviceCompanyId: string;
   technicianIds: string[];
   time: string;
@@ -285,7 +285,7 @@ export interface CreateScheduledServiceOrderBody {
   externalId: string;
   labels?: string[];
   moreInformation?: string;
-  priority: ServiceOrderPriority;
+  priority: Priority;
   requireReschedule: boolean;
   requireTechnicianNotification: boolean;
   serviceCompanyId: string;
@@ -301,7 +301,7 @@ export interface CreateNonScheduledServiceOrderBody {
   externalId: string;
   labels?: string[];
   moreInformation?: string;
-  priority: ServiceOrderPriority;
+  priority: Priority;
   serviceCompanyId: string;
   type: ServiceOrderType;
 }

@@ -1,6 +1,6 @@
 import {Address, AddressRecord, Fee, Meta, Priority, StringMap} from './misc';
 import {Client, ClientSimpleView} from './client';
-import {TechnicianSimpleView} from './technician';
+import {TechnicianSimpleView, TechnicianView} from './technician';
 import {FileResource} from './media';
 import {ServiceCompanyTimeUnit} from './service-company';
 import {ServiceOrderView} from './service-order';
@@ -32,6 +32,14 @@ export enum ElevatorCategory {
 export interface ElevatorAdditionalInfo {
   priority: Priority;
   isServiceOrderGenerationEnabled: boolean;
+  deviceIds: string[];
+  dueDate: string;
+  serviceOrderGenerationEnabled: boolean;
+}
+
+export interface ElevatorMaintainerRecord {
+  technician: TechnicianView;
+  weight: number;
 }
 
 export interface ElevatorProperty {
@@ -80,6 +88,7 @@ export interface ElevatorView {
   status: ElevatorStatus;
   labels: [];
   additionalInfo: ElevatorAdditionalInfo;
+  assignments: ElevatorMaintainerRecord[];
   search: string;
   meta: Meta;
 }
