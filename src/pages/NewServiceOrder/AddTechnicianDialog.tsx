@@ -1,5 +1,4 @@
 import {useEffect, useState} from 'react';
-import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -7,6 +6,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import {TechnicianView} from 'models/technician';
+import {Button} from 'components/Button';
 import Box from '@mui/material/Box';
 import {TechnicianAutoComplete} from './TechnicianAutoComplete';
 
@@ -65,12 +65,20 @@ export const AddTechnicianDialog = ({
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{mt: '1.5em'}}>
-          <Button onClick={onCancel}>
+          <Button
+            buttonProps={{
+              onClick: onSave,
+              autoFocus: true,
+              disabled: !queryView,
+            }}>
             <Typography variant="subtitle2" color="text.secondary">
               Cancel
             </Typography>
           </Button>
-          <Button onClick={onSave} autoFocus disabled={!queryView}>
+          <Button
+            buttonProps={{
+              onClick: onCancel,
+            }}>
             <Typography variant="subtitle2">Add</Typography>
           </Button>
         </DialogActions>

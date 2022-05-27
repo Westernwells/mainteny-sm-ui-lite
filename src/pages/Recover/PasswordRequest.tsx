@@ -5,11 +5,11 @@ import EmailIcon from '@mui/icons-material/Email';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import {useNavigate} from 'react-router-dom';
 import {AuthLayout} from 'components/AuthLayout';
+import {Button} from 'components/Button';
 
 interface Props {
   handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -66,28 +66,31 @@ export const PasswordRequest = ({
           />
           <Box mt={5}>
             <Button
-              type="submit"
-              disabled={!!(!email || emailError)}
-              sx={{width: '100%'}}
-              variant="contained"
-              size="large"
-              endIcon={
-                loading ? (
+              label="Get Reset Code"
+              buttonProps={{
+                type: 'submit',
+                disabled: !!(!email || emailError),
+                sx: {width: '100%'},
+                variant: 'contained',
+                size: 'large',
+                endIcon: loading ? (
                   <CircularProgress size={20} sx={{color: 'gray'}} />
                 ) : (
                   <ArrowForward />
-                )
-              }>
-              Get Reset Code
-            </Button>
+                ),
+              }}
+            />
             <Button
-              sx={{width: '100%', marginTop: 1}}
-              variant="text"
-              onClick={() => navigate('/login')}
-              size="large"
-              startIcon={<ArrowBack />}>
-              Back
-            </Button>
+              label="Back"
+              buttonProps={{
+                onClick: () => navigate('/login'),
+
+                sx: {width: '100%'},
+                variant: 'contained',
+                size: 'large',
+                startIcon: <ArrowBack />,
+              }}
+            />
           </Box>
         </form>
       </Box>

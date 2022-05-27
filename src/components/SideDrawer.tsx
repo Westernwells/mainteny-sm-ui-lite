@@ -1,10 +1,10 @@
 import React, {ReactNode} from 'react';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import {Close} from '@mui/icons-material';
+import {Button} from './Button';
 
 interface Props {
   open: boolean;
@@ -65,9 +65,13 @@ export const SideDrawer = ({
 
       {footer && (
         <Box display="flex" justifyContent="flex-end" gap="1em">
-          <Button onClick={() => setOpen(false)} sx={{color: 'text.secondary'}}>
-            Cancel
-          </Button>
+          <Button
+            label="Cancel"
+            buttonProps={{
+              onClick: () => setOpen(false),
+              sx: {color: 'text.secondary'},
+            }}
+          />
           {footer}
         </Box>
       )}

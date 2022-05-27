@@ -14,10 +14,10 @@ import {OrderDetails} from 'components/OrderDetails';
 import {useServiceOrderStatusColor} from 'hooks/useServiceOrderStatusColor';
 import Box from '@mui/material/Box';
 import {FormRadio} from 'components/form/FormRadio';
-import Button from '@mui/material/Button';
 import RadioGroup from '@mui/material/RadioGroup';
 import useTheme from '@mui/material/styles/useTheme';
 import Divider from '@mui/material/Divider';
+import {Button} from 'components/Button';
 import {sortOrderByTime} from 'utils/service-order-utils';
 import {AddTechnicianDialog} from './AddTechnicianDialog';
 import {TechnicianSchedule} from './TechnicianSchedule';
@@ -307,11 +307,13 @@ export const SelectTechnicians = ({
           selectedOption === RadioOptions.IMMEDIATE ? (
             <Box sx={{ml: '1.5em'}}>
               <Button
-                variant="outlined"
-                sx={{bgcolor: 'white'}}
-                onClick={() => setOpenDialog(true)}>
-                Add More
-              </Button>
+                label="Add More"
+                buttonProps={{
+                  variant: 'outlined',
+                  sx: {bgcolor: 'white'},
+                  onClick: () => setOpenDialog(true),
+                }}
+              />
             </Box>
           ) : null
         }>

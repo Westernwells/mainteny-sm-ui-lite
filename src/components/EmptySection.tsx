@@ -2,7 +2,7 @@ import Typography from '@mui/material/Typography';
 import Box, {BoxProps} from '@mui/material/Box';
 import {ReactComponent as LaptopIllustration} from 'assets/illustrations/Laptop.svg';
 import {ReactComponent as ClipboardIllustration} from 'assets/illustrations/Clipboard.svg';
-import Button from '@mui/material/Button';
+import {Button} from './Button';
 
 interface Props extends BoxProps {
   label: string;
@@ -61,9 +61,12 @@ export const EmptySection = ({
       </Typography>
       {showActionBtn ? (
         <Button
-          sx={{textTransform: 'capitalize'}}
-          variant="contained"
-          onClick={btnAction}>
+          label="Create Service Order"
+          buttonProps={{
+            onClick: btnAction,
+            variant: 'contained',
+            size: 'medium',
+          }}>
           {btnLabel}
         </Button>
       ) : null}

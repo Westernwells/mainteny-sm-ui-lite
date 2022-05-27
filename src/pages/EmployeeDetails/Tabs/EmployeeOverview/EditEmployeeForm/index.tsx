@@ -1,12 +1,12 @@
 import React from 'react';
 import {useFormikContext} from 'formik';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
 import PhoneIcon from '@mui/icons-material/Phone';
 import {Role} from 'models/user';
 import {FormInput} from 'components/form/FormInput';
+import {Button} from 'components/Button';
 import {SelectShift} from './SelectShift';
 import {EmployeeAccountData} from './model';
 import {SelectAddress} from './SelectAddress';
@@ -131,7 +131,12 @@ export const EditEmployeeForm = () => {
                   justifyContent="space-between"
                   alignItems="center">
                   <Typography>{values.addressFullName}</Typography>
-                  <Button onClick={() => setIsVisible(true)}>Change</Button>
+                  <Button
+                    label="Change"
+                    buttonProps={{
+                      onClick: () => setIsVisible(true),
+                    }}
+                  />
                 </Box>
               </>
             )}
@@ -148,12 +153,20 @@ export const EditEmployeeForm = () => {
         )}
       </Box>
       <Box display="flex" justifyContent="end" gap="1em">
-        <Button onClick={handleReset} sx={{color: 'text.secondary'}}>
-          Reset
-        </Button>
-        <Button variant="contained" type="submit">
-          Save Changes
-        </Button>
+        <Button
+          label="Reset"
+          buttonProps={{
+            onClick: handleReset,
+            sx: {color: 'text.secondary'},
+          }}
+        />
+        <Button
+          label="Save Changes"
+          buttonProps={{
+            variant: 'contained',
+            type: 'submit',
+          }}
+        />
       </Box>
     </Box>
   );

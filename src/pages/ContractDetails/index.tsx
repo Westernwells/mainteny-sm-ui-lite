@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -28,10 +28,20 @@ export const ContractDetails = () => {
       onChange={(index) => setTabValue(index)}
       backBtnLabel="Contract Details"
       renderWidget={
-        <CustomButtonUnstyled
+        <Button
           label="Download Contract"
-          size="medium"
-          startIcon={<FileDownloadIcon color="primary" />}
+          style={{
+            textTransform: 'capitalize',
+            background: 'transparent',
+            border: '1px solid rgba(15, 76, 100, 0.5)',
+            px: '1.5em',
+            '&:hover': {
+              background: 'transparent',
+            },
+          }}
+          buttonProps={{
+            startIcon: <FileDownloadIcon color="primary" sx={{}} />,
+          }}
         />
       }>
       <TabsBody value={tabValue} index={0}>

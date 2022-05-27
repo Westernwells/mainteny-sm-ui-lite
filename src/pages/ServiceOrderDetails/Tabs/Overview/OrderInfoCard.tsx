@@ -4,7 +4,6 @@ import Typography from '@mui/material/Typography';
 import {BasicDetailsCard} from 'components/BasicDetailsCard';
 import EditIcon from '@mui/icons-material/Edit';
 import useTheme from '@mui/material/styles/useTheme';
-import Button from '@mui/material/Button';
 import {convertToText} from 'utils/utils';
 import {CardProps} from 'components/CardProps';
 import {Confirm} from 'components/Confirm';
@@ -22,6 +21,7 @@ import {
 import {useTranslation} from 'react-i18next';
 import {formatDate, setDateTime} from 'utils/datetime';
 import {ScheduleForm} from 'pages/ServiceOrderDetails/models';
+import {Button} from 'components/Button';
 import {FormikErrors} from 'formik';
 import {orderInfo as orderInfoSchema} from './schema';
 import {ScheduleDialog} from './ScheduleDialog';
@@ -130,19 +130,22 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
     ) ? (
       <>
         <Button
-          variant="contained"
-          onClick={() => setOpenDialog(true)}
-          size="small"
-          sx={{px: '2.5em', mt: '1em', mr: '1em'}}>
-          {t('Reschedule')}
-        </Button>
+          label={t('Reschedule')}
+          buttonProps={{
+            variant: 'contained',
+            onClick: () => setOpenDialog(true),
+
+            sx: {px: '2.5em', mt: '1em', mr: '1em'},
+          }}
+        />
         <Button
-          variant="outlined"
-          size="small"
-          sx={{px: '2.5em', mt: '1em'}}
-          onClick={() => setOpenUnscheduleConfirm(true)}>
-          {t('Unschedule')}
-        </Button>
+          label={t('Unschedule')}
+          buttonProps={{
+            variant: 'contained',
+            onClick: () => setOpenUnscheduleConfirm(true),
+            sx: {px: '2.5em', mt: '1em'},
+          }}
+        />
       </>
     ) : null;
 
@@ -154,19 +157,20 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
     ].includes(serviceOrderDetails.status) ? (
       <>
         <Button
-          variant="text"
-          size="small"
-          sx={{px: '2.5em', mt: '1em'}}
-          onClick={() => setOpenCancelConfirm(true)}>
-          {t('Cancel')}
-        </Button>
+          label={t('Cancel')}
+          buttonProps={{
+            onClick: () => setOpenCancelConfirm(true),
+            sx: {px: '2.5em', mt: '1em'},
+          }}
+        />
         <Button
-          variant="contained"
-          size="small"
-          sx={{px: '2.5em', mt: '1em'}}
-          onClick={() => setOpenDialog(true)}>
-          {t('Schedule')}
-        </Button>
+          label={t('Schedule')}
+          buttonProps={{
+            onClick: () => setOpenDialog(true),
+            sx: {px: '2.5em', mt: '1em'},
+            variant: 'contained',
+          }}
+        />
       </>
     ) : null;
 

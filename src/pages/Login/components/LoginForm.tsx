@@ -4,10 +4,10 @@ import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
-import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import EmailSharp from '@mui/icons-material/EmailSharp';
 import CircularProgress from '@mui/material/CircularProgress';
+import {Button} from 'components/Button';
 
 interface Props {
   handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -83,32 +83,37 @@ export const LoginForm = ({
           <Box display="flex" justifyContent="flex-end" mt={1}>
             <Link to="/recover" style={{textDecoration: 'none'}}>
               <Button
-                variant="text"
-                color="info"
-                sx={{textTransform: 'capitalize'}}>
-                Forgot Password?
-              </Button>
+                label="Forgot Password?"
+                buttonProps={{
+                  sx: {color: 'text.secondary', textTransform: 'capitalize'},
+                  color: 'info',
+                }}
+              />
             </Link>
           </Box>
         </Box>
 
         <Button
-          type="submit"
-          disabled={
-            !!(!password || !email || emailError || passwordError || loading)
-          }
-          sx={{marginTop: 5, width: '100%'}}
-          variant="contained"
-          size="large"
-          endIcon={
-            loading ? (
+          label="Login"
+          buttonProps={{
+            sx: {marginTop: 5, width: '100%'},
+            size: 'large',
+            type: 'submit',
+            variant: 'contained',
+            disabled: !!(
+              !password ||
+              !email ||
+              emailError ||
+              passwordError ||
+              loading
+            ),
+            endIcon: loading ? (
               <CircularProgress size={20} sx={{color: 'gray'}} />
             ) : (
               <ArrowForward />
-            )
-          }>
-          Login
-        </Button>
+            ),
+          }}
+        />
       </form>
     </Box>
   );

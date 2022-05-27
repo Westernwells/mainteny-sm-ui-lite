@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import {Button, Grid, InputLabel, TextField} from '@mui/material';
+import {Grid, InputLabel, TextField} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import {BackAction} from 'components/BackAction';
 import {A4Layout} from 'components/A4Layout';
@@ -15,7 +15,7 @@ import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {StatusChip} from 'components/StatusChip';
 import {PageCard} from 'components/PageCard';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import CopyAllIcon from '@mui/icons-material/CopyAll';
@@ -239,16 +239,17 @@ export const QuotationDetails = () => {
               variant="filled"
             />
           </Box>
-          <CustomButtonUnstyled
+          <Button
             label="Download Quotation"
-            size="medium"
-            onClick={() =>
-              window.open(
-                `${process.env.REACT_APP_BASE_URL}/QuotationPDF.pdf`,
-                '_blank',
-              )
-            }
-            startIcon={<FileDownloadIcon color="primary" />}
+            buttonProps={{
+              onClick: () =>
+                window.open(
+                  `${process.env.REACT_APP_BASE_URL}/QuotationPDF.pdf`,
+                  '_blank',
+                ),
+
+              startIcon: <FileDownloadIcon color="primary" />,
+            }}
           />
         </Box>
         <Grid container width="100%" mt="2.5em" mb="2em" gap={2}>
@@ -267,7 +268,12 @@ export const QuotationDetails = () => {
               <Typography variant="subtitle2" textAlign="center">
                 You haven’t created Service Order for this Quotation
               </Typography>
-              <CustomButtonUnstyled label="Create Service Order" size="small" />
+              <Button
+                label="Create Service Order"
+                buttonProps={{
+                  size: 'small',
+                }}
+              />
             </PageCard>
             <PageCard
               headerLabel="Quotation Details"
@@ -507,13 +513,14 @@ export const QuotationDetails = () => {
             {quotationItems.length ? (
               <>
                 <Button
-                  variant="contained"
-                  size="small"
-                  sx={{alignSelf: 'self-start'}}
-                  startIcon={<AddIcon />}
-                  onClick={() => setIsArticleModalOpen(true)}>
-                  Article
-                </Button>
+                  label="Article"
+                  buttonProps={{
+                    variant: 'contained',
+                    sx: {alignSelf: 'self-start'},
+                    startIcon: <AddIcon />,
+                    onClick: () => setIsArticleModalOpen(true),
+                  }}
+                />
                 <Box borderTop="1px solid" borderColor="grey.300">
                   <Box
                     p="1em"

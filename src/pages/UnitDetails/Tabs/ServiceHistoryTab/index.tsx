@@ -1,6 +1,5 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import Grid from '@mui/material/Grid';
-import Button from '@mui/material/Button';
 import {EmptyIllustration} from 'components/EmptyIllustration';
 import HideImageIcon from '@mui/icons-material/HideImage';
 import useTheme from '@mui/material/styles/useTheme';
@@ -19,6 +18,7 @@ import {
 import {formatDate, getDateObject} from 'utils/datetime';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
+import {Button} from 'components/Button';
 import {getYear, eachYearOfInterval, endOfYear, startOfYear} from 'date-fns';
 import {useParams} from 'react-router-dom';
 import {HistoryCard} from './HistoryCard';
@@ -328,9 +328,13 @@ export const ServiceHistoryTab = () => {
                 size="small"
                 containerStyle={{mt: 8, mb: 2}}
               />
-              <Button variant="contained" onClick={resetFilters}>
-                Reset Filters
-              </Button>
+              <Button
+                label="Reset Filters"
+                buttonProps={{
+                  variant: 'contained',
+                  onClick: resetFilters,
+                }}
+              />
             </Box>
           ) : (
             <Box

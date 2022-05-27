@@ -5,9 +5,9 @@ import EmailIcon from '@mui/icons-material/Email';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import {useNavigate} from 'react-router-dom';
+import {Button} from 'components/Button';
 
 interface Props {
   handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -58,22 +58,26 @@ export const PasswordRequestForm = ({
         />
         <Box mt={5}>
           <Button
-            type="submit"
-            disabled={!!(!email || emailError)}
-            sx={{width: '100%'}}
-            variant="contained"
-            size="large"
-            endIcon={<ArrowForward />}>
-            Get Reset Code
-          </Button>
+            label="Get Reset Code"
+            buttonProps={{
+              type: 'submit',
+              disabled: !!(!email || emailError),
+              sx: {width: '100%'},
+              variant: 'contained',
+              size: 'large',
+              endIcon: <ArrowForward />,
+            }}
+          />
+
           <Button
-            sx={{width: '100%', marginTop: 1}}
-            variant="text"
-            onClick={() => navigate('/login')}
-            size="large"
-            startIcon={<ArrowBack />}>
-            Back
-          </Button>
+            label="Back"
+            buttonProps={{
+              sx: {width: '100%'},
+              onClick: () => navigate('/login'),
+              size: 'large',
+              startIcon: <ArrowBack />,
+            }}
+          />
         </Box>
       </form>
     </Box>

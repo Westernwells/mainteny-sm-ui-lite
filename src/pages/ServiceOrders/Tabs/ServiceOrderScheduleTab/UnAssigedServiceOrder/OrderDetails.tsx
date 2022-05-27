@@ -2,7 +2,7 @@ import Box, {BoxProps} from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderType, ServiceOrderView} from 'models/service-order';
-import {CustomButtonUnstyled} from 'components/CustomButtonUnstyled';
+import {Button} from 'components/Button';
 import {formatDistance} from 'date-fns';
 import Divider from '@mui/material/Divider';
 
@@ -44,10 +44,12 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => (
       {serviceOrder.elevator.address.fullName}
     </Typography>
 
-    <CustomButtonUnstyled
+    <Button
       label="Assign technician"
-      size="small"
       style={{px: '0.5em', mt: '0.7em'}}
+      buttonProps={{
+        size: 'small',
+      }}
     />
 
     <Divider sx={{mt: '1.5em'}} />
