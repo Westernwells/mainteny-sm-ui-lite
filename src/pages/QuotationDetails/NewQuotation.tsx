@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-// import {useNavigate} from 'react-router';
+import * as Yup from 'yup';
 import {useSearchParams} from 'react-router-dom';
 import {useFormik} from 'formik';
 import Typography from '@mui/material/Typography';
@@ -75,13 +75,19 @@ export const NewQuotation = () => {
     subject: '',
     description: DEFAULT_DESCRIPTION,
     elevatorId: '',
-    moreInfo: '',
+    moreInfo: ' ',
     items: [],
     serviceCompanyId: '',
   };
 
+  const validationSchema = Yup.object().shape({
+    subject: Yup.string().required('Subject is required'),
+    description: Yup.string().required('Description is required'),
+  });
+
   const formik = useFormik({
     initialValues,
+    validationSchema,
     onSubmit: (values) => {
       createNewQuotation({data: values, publish});
     },
@@ -151,8 +157,6 @@ export const NewQuotation = () => {
       formik.setFieldValue('moreInfo', quotation.moreInfo, true);
     }
   }, [isFetched]);
-
-  console.log(formik.values);
 
   useEffect(() => {
     if (unit) {
@@ -229,7 +233,7 @@ export const NewQuotation = () => {
         <Box display="flex" mt="1em" gap="2em">
           <Box flexGrow={1} display="flex" flexDirection="column" gap="2em">
             <Box>
-              <Label text="Customer Details" />
+              <Label text="Customer Details" required />
               {customer ? (
                 <SelectCard
                   header={
@@ -258,7 +262,7 @@ export const NewQuotation = () => {
               )}
             </Box>
             <Box>
-              <Label text="Unit Details" />
+              <Label text="Unit Details" required />
 
               {unit ? (
                 <SelectCard
@@ -296,13 +300,16 @@ export const NewQuotation = () => {
         </Box>
         <Box mt="1em">
           <InputLabel>
-            <Label text="Subject" />
+            <Label text="Subject" required />
           </InputLabel>
           <TextField
             size="small"
             id="subject"
             value={formik.values.subject}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={!!(formik.touched.subject && formik.errors.subject)}
+            helperText={formik.touched.subject && formik.errors.subject}
             minRows={1}
             maxRows={3}
             multiline
@@ -311,13 +318,16 @@ export const NewQuotation = () => {
         </Box>
         <Box mt="1em">
           <InputLabel>
-            <Label text="Description" />
+            <Label text="Description" required />
           </InputLabel>
           <TextField
             size="small"
             id="description"
             value={formik.values.description}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={!!(formik.touched.description && formik.errors.description)}
+            helperText={formik.touched.description && formik.errors.description}
             minRows={2}
             maxRows={6}
             multiline
