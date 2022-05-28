@@ -34,7 +34,7 @@ export const UnitContracts = ({containerStyles, contracts}: Props) => {
       }}>
       <DataGridLayout
         fullHeight={false}
-        height={230}
+        height={200}
         hideFooter
         rows={rows}
         columns={columns}

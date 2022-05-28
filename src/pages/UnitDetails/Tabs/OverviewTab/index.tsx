@@ -18,6 +18,7 @@ import {AppointmentPreference} from './AppointmentPreference';
 import {useUseQueryElevatorsContracts} from 'hooks/reactQuery/useContract';
 import {ContractStatus} from 'models/contract';
 import {UnitContracts} from './UnitContracts';
+import {PriorityTechnician} from './PriorityTechnician';
 
 interface Props {
   getServiceHistoryTabIndex?: (value: number) => void;
@@ -124,6 +125,8 @@ export const OverviewTab = ({
         contracts={elevatorId ? contracts[elevatorId] || [] : []}
         containerStyles={{mt: '1.2em'}}
       />
+
+      <PriorityTechnician containerStyles={{mt: '1.2em'}} />
     </>
   );
 };

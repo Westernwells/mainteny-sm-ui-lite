@@ -40,8 +40,7 @@ export const columns: GridColDef[] = [
     field: 'number',
     headerName: 'NUMBER',
     type: 'string',
-    flex: 2,
-    headerAlign: 'left',
+    ...defaultAlignment,
     ...defaultProps,
   },
   {
