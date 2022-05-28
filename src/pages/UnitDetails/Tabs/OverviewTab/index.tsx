@@ -123,7 +123,7 @@ export const OverviewTab = ({
       </Grid>
 
       <UnitContracts
-        contracts={elevatorId ? contracts[elevatorId] : []}
+        contracts={elevatorId ? contracts[elevatorId] || [] : []}
         containerStyles={{mt: '1.2em'}}
       />
     </>
