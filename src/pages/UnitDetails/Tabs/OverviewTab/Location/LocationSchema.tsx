@@ -21,7 +21,7 @@ export const LocationSchema = ({label, elevator}: Props) => {
           <CardProps
             icon={<HomeIcon sx={{color: theme.palette.info.dark}} />}
             label="ADDRESS"
-            bodyText={elevator.address.fullName}
+            bodyText={elevator.address.fullName || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
@@ -32,7 +32,7 @@ export const LocationSchema = ({label, elevator}: Props) => {
           <CardProps
             icon={<LocationCityIcon sx={{color: theme.palette.info.dark}} />}
             label="BUILDING"
-            bodyText="Block 5"
+            bodyText={elevator.additionalInfo.buildingLocation || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
@@ -43,7 +43,7 @@ export const LocationSchema = ({label, elevator}: Props) => {
           <CardProps
             icon={<MapsHomeWorkIcon sx={{color: theme.palette.info.dark}} />}
             label="PROPERTY SEGMENT"
-            bodyText="Commercial"
+            bodyText={elevator.additionalInfo.propertySegment || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
@@ -54,7 +54,7 @@ export const LocationSchema = ({label, elevator}: Props) => {
           <CardProps
             icon={<LocationOnIcon sx={{color: theme.palette.info.dark}} />}
             label="KEY LOCATION"
-            bodyText="At reception"
+            bodyText={elevator.additionalInfo.keyLocation || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
@@ -65,7 +65,7 @@ export const LocationSchema = ({label, elevator}: Props) => {
           <CardProps
             icon={<LocalParkingIcon sx={{color: theme.palette.info.dark}} />}
             label="PARKING"
-            bodyText="Basement, B14"
+            bodyText={elevator.additionalInfo.parking || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"

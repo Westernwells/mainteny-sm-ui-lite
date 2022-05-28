@@ -35,6 +35,21 @@ export interface ElevatorAdditionalInfo {
   deviceIds: string[];
   dueDate: string;
   serviceOrderGenerationEnabled: boolean;
+  buildingLocation: string;
+  builtYear: number;
+  cabinType: string;
+  controllerManufacturer: string;
+  controllerModel: string;
+  documents: any;
+  emergencyContractNumber: string;
+  emergencyPhoneProvider: string;
+  keyLocation: string;
+  lastInspectionDate: string;
+  manufacturer: string;
+  numberOfStops: 5;
+  parking: string;
+  pictures: any;
+  propertySegment: string;
 }
 
 export interface ElevatorMaintainerRecord {

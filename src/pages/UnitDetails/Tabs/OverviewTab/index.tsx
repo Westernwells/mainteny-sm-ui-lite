@@ -44,8 +44,6 @@ export const OverviewTab = ({
     ],
   });
 
-  console.log(contracts, '<<<<<<>>>>%%%^^^##');
-
   // const {data: maintainers = []} = useElevatorMaintainers(elevatorId);
 
   const {

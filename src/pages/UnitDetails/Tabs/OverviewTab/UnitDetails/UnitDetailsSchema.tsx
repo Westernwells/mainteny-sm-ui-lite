@@ -27,7 +27,7 @@ export const UnitDetailsSchema = ({label, elevator}: Props) => {
           <CardProps
             icon={<EscalatorIcon sx={{color: theme.palette.info.dark}} />}
             label="UNIT CATEGORY"
-            bodyText={elevator.category}
+            bodyText={elevator.category || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}
@@ -38,7 +38,7 @@ export const UnitDetailsSchema = ({label, elevator}: Props) => {
           <CardProps
             icon={<ElevatorIcon sx={{color: theme.palette.info.dark}} />}
             label="MANUFACTURER"
-            bodyText="KONE"
+            bodyText={elevator.additionalInfo.manufacturer || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}
@@ -51,7 +51,7 @@ export const UnitDetailsSchema = ({label, elevator}: Props) => {
               <FeaturedPlayListIcon sx={{color: theme.palette.info.dark}} />
             }
             label="UNIT NUMBER"
-            bodyText={elevator.number}
+            bodyText={elevator.number || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}
@@ -62,7 +62,7 @@ export const UnitDetailsSchema = ({label, elevator}: Props) => {
           <CardProps
             icon={<SplitscreenIcon sx={{color: theme.palette.info.dark}} />}
             label="NUMBER OF STOPS"
-            bodyText="6"
+            bodyText={elevator.additionalInfo.numberOfStops || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}
@@ -73,7 +73,7 @@ export const UnitDetailsSchema = ({label, elevator}: Props) => {
           <CardProps
             icon={<BedroomChildIcon sx={{color: theme.palette.info.dark}} />}
             label="CABIN TYPE"
-            bodyText="Single Door"
+            bodyText={elevator.additionalInfo.cabinType || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}
@@ -84,7 +84,7 @@ export const UnitDetailsSchema = ({label, elevator}: Props) => {
           <CardProps
             icon={<CallIcon sx={{color: theme.palette.info.dark}} />}
             label="EMERGENCY PHONE PROVIDER"
-            bodyText="SafeLine"
+            bodyText={elevator.additionalInfo.emergencyContractNumber || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}
