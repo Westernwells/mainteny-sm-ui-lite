@@ -14,45 +14,43 @@ import {serviceOrderStatusToString} from 'utils/service-order-utils';
 import {convertMinsToHM, formatDate} from 'utils/datetime';
 import {theme} from 'theme';
 
-export const orderInfo = (serviceOrderDetails: ServiceOrder) =>
-  // const theme = useTheme();
-  ({
-    type: {
-      label: 'ORDER TYPE',
-      value: serviceOrderDetails.type,
-      icon: <ConstructionIcon sx={{color: theme.palette.info.dark}} />,
-    },
-    people: {
-      label: 'CUSTOMER',
-      value: serviceOrderDetails.elevator.propertyOwner.name,
-      icon: <PeopleIcon sx={{color: theme.palette.info.dark}} />,
-    },
-    status: {
-      label: 'STATUS',
-      value: serviceOrderStatusToString(serviceOrderDetails.status),
-      icon: <InfoIcon sx={{color: theme.palette.info.dark}} />,
-    },
-    createdOn: {
-      label: 'CREATED ON',
-      value: formatDate(serviceOrderDetails.meta.createdAt, 'dd.MM.yyyy'),
-      icon: <CalendarTodayIcon sx={{color: theme.palette.info.dark}} />,
-    },
-    dueDate: {
-      label: 'DUE DATE',
-      value: formatDate(new Date(serviceOrderDetails.dueDate), 'dd.MM.yyyy'),
-      icon: <FlagIcon sx={{color: theme.palette.info.dark}} />,
-    },
-    technician: {
-      label: 'TECHNICIAN',
-      value: serviceOrderDetails.schedules
-        .map(
-          (schedule) =>
-            `${schedule.technician.userAccount.firstName} ${schedule.technician.userAccount.firstName}`,
-        )
-        .join(','),
-      icon: <PersonIcon sx={{color: theme.palette.info.dark}} />,
-    },
-  });
+export const orderInfo = (serviceOrderDetails: ServiceOrder) => ({
+  type: {
+    label: 'ORDER TYPE',
+    value: serviceOrderDetails.type,
+    icon: <ConstructionIcon sx={{color: theme.palette.info.dark}} />,
+  },
+  people: {
+    label: 'CUSTOMER',
+    value: serviceOrderDetails.elevator.propertyOwner.name,
+    icon: <PeopleIcon sx={{color: theme.palette.info.dark}} />,
+  },
+  status: {
+    label: 'STATUS',
+    value: serviceOrderStatusToString(serviceOrderDetails.status),
+    icon: <InfoIcon sx={{color: theme.palette.info.dark}} />,
+  },
+  createdOn: {
+    label: 'CREATED ON',
+    value: formatDate(serviceOrderDetails.meta.createdAt, 'dd.MM.yyyy'),
+    icon: <CalendarTodayIcon sx={{color: theme.palette.info.dark}} />,
+  },
+  dueDate: {
+    label: 'DUE DATE',
+    value: formatDate(new Date(serviceOrderDetails.dueDate), 'dd.MM.yyyy'),
+    icon: <FlagIcon sx={{color: theme.palette.info.dark}} />,
+  },
+  technician: {
+    label: 'TECHNICIAN',
+    value: serviceOrderDetails.schedules
+      .map(
+        (schedule) =>
+          `${schedule.technician.userAccount.firstName} ${schedule.technician.userAccount.firstName}`,
+      )
+      .join(','),
+    icon: <PersonIcon sx={{color: theme.palette.info.dark}} />,
+  },
+});
 
 export const unitInfo = (serviceOrderDetails: ServiceOrder) => ({
   address: {

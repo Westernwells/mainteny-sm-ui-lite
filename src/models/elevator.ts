@@ -61,12 +61,15 @@ export interface Elevator {
   address: Address;
   propertyOwner: Client;
   lastVisitDate: string;
+  nextVisitDate: string;
   serviceTime: number;
   status: ElevatorStatus;
+  serialNumber: string;
   properties: ElevatorProperty[];
   additionalInfo: ElevatorAdditionalInfo;
   labels: string[];
   requiredSkills: string[];
+  assignments: ElevatorMaintainerRecord[];
   search: string;
   meta: Meta;
 }

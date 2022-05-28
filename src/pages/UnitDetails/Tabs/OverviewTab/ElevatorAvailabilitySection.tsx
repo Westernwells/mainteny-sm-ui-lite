@@ -21,8 +21,8 @@ import {
 } from 'chart.js';
 import {Bar} from 'react-chartjs-2';
 
-import {SplitButton} from '../../components/SplitButton';
-import {formatDate} from '../../utils/datetime';
+import {SplitButton} from '../../../../components/SplitButton';
+import {formatDate} from '../../../../utils/datetime';
 
 ChartJS.register(
   CategoryScale,
