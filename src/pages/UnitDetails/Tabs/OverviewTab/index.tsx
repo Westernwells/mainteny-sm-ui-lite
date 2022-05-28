@@ -13,6 +13,11 @@ import {
 } from 'hooks/reactQuery/useElevator';
 import {Location} from './Location';
 import {UnitDetails} from './UnitDetails';
+import {Service} from './Service';
+import {AppointmentPreference} from './AppointmentPreference';
+import {useUseQueryElevatorsContracts} from 'hooks/reactQuery/useContract';
+import {ContractStatus} from 'models/contract';
+import {UnitContracts} from './UnitContracts';
 
 interface Props {
   getServiceHistoryTabIndex?: (value: number) => void;
@@ -30,8 +35,18 @@ export const OverviewTab = ({
 
   const {data: elevator, isLoading: isLoadingElevator} =
     useElevatorById(elevatorId);
+  const {data: contracts = {}} = useUseQueryElevatorsContracts({
+    elevatorIds: elevatorId ? [elevatorId] : [],
+    status: [
+      ContractStatus.VALID,
+      ContractStatus.PENDING,
+      ContractStatus.EXPIRED,
+    ],
+  });
 
-  const {data: maintainers = []} = useElevatorMaintainers(elevatorId);
+  console.log(contracts, '<<<<<<>>>>%%%^^^##');
+
+  // const {data: maintainers = []} = useElevatorMaintainers(elevatorId);
 
   const {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(pageSize),
@@ -83,6 +98,34 @@ export const OverviewTab = ({
           />
         </Grid>
       </Grid>
+
+      <Grid container spacing={2} sx={{mt: '0.3em'}}>
+        <Grid item md={5} sm={12}>
+          <Service
+            containerStyles={{
+              [theme.breakpoints.up('md')]: {
+                minHeight: '23rem',
+              },
+            }}
+            elevator={elevator!}
+          />
+        </Grid>
+        <Grid item md={7} sm={12}>
+          <AppointmentPreference
+            containerStyles={{
+              [theme.breakpoints.up('md')]: {
+                minHeight: '23rem',
+              },
+            }}
+            elevator={elevator!}
+          />
+        </Grid>
+      </Grid>
+
+      <UnitContracts
+        contracts={elevatorId ? contracts[elevatorId] : []}
+        containerStyles={{mt: '1.2em'}}
+      />
     </>
   );
 };

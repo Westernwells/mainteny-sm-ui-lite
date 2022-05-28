@@ -37,4 +37,5 @@ export const queryKeys = {
   fetchRecommendedTechnicians: 'fetchRecommendedTechnicians',
   fetchDispatchRecommendedTechnicians: 'fetchDispatchRecommendedTechnicians',
   querySeviceOrders: 'querySeviceOrders',
+  queryElevatorContracts: 'queryElevatorContracts',
 };

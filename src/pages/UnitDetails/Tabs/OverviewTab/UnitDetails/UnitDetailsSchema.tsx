@@ -50,7 +50,7 @@ export const UnitDetailsSchema = ({label, elevator}: Props) => {
             icon={
               <FeaturedPlayListIcon sx={{color: theme.palette.info.dark}} />
             }
-            label="UNIT ID"
+            label="UNIT NUMBER"
             bodyText={elevator.number}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"

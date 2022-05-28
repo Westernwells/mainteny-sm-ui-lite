@@ -33,6 +33,7 @@ export const getItemPosition = ({
     if (scheduleItemGroup[rowKey]) {
       const group = scheduleItemGroup[rowKey];
       const itemNestLevel = group[orderId];
+
       return {x: `${x}px`, y: `${itemNestLevel}`};
     }
   }

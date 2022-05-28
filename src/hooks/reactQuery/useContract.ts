@@ -9,6 +9,7 @@ import {
   ContractFilters,
   ContractView,
   CustomerContractParams,
+  ElevatorContractParams,
   QueryContractParams,
 } from 'models/contract';
 import {Resource, RestError, WithOptional} from 'models/misc';
@@ -273,3 +274,26 @@ export const useUseQueryCustomerContracts = (
     },
   );
 };
+
+export const queryElevatorsContracts = async (
+  params: ElevatorContractParams,
+) => {
+  const response = await axiosClient.get<{[key: string]: ContractView[]}>(
+    '/api/elevators/contracts',
+    {params, paramsSerializer},
+  );
+  return response.data;
+};
+
+export const useUseQueryElevatorsContracts = (
+  params: ElevatorContractParams,
+  options?: UseQueryOptions<any, any, any>,
+) =>
+  useQuery<{[key: string]: ContractView[]}>(
+    [queryKeys.queryElevatorContracts, params],
+    () => queryElevatorsContracts(params),
+    {
+      enabled: !!params.elevatorIds.length,
+      ...options,
+    },
+  );

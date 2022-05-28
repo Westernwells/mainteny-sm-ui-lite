@@ -16,7 +16,7 @@ interface Props {
 
 export const Location = ({containerStyles, elevator}: Props) => {
   const theme = useTheme();
-  const locationLabels = useRef([
+  const labels = useRef([
     'address',
     'building',
     'propertySegment',
@@ -52,8 +52,8 @@ export const Location = ({containerStyles, elevator}: Props) => {
         </Box>
       </Box>
       <Grid container spacing={2}>
-        {locationLabels.map((label) => (
-          <Grid item xs={12} sm={4} md={12}>
+        {labels.map((label) => (
+          <Grid key={label} item xs={12} sm={4} md={12}>
             <LocationSchema label={label} elevator={elevator} />
           </Grid>
         ))}

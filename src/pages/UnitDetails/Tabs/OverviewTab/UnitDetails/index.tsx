@@ -13,18 +13,18 @@ interface Props {
 
 export const UnitDetails = ({containerStyles, elevator}: Props) => {
   const theme = useTheme();
-  const unitDetailsLabels = [
+  const labels = [
     'category',
-    'manufacturer',
-    'unitId',
-    'stops',
-    'cabinType',
-    'phone',
     'unitType',
+    'manufacturer',
     'model',
+    'unitId',
     'serialNumber',
+    'stops',
     'unitCapacity',
+    'cabinType',
     'spendingLimit',
+    'phone',
   ];
 
   return (
@@ -37,8 +37,8 @@ export const UnitDetails = ({containerStyles, elevator}: Props) => {
         background: theme.palette.inputBackground.main,
       }}>
       <Grid container spacing={2}>
-        {unitDetailsLabels.map((label) => (
-          <Grid item xs={12} sm={4} md={6}>
+        {labels.map((label) => (
+          <Grid key={label} item xs={12} sm={4} md={6}>
             <UnitDetailsSchema label={label} elevator={elevator} />
           </Grid>
         ))}

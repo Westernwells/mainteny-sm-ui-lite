@@ -45,7 +45,7 @@ export const CardProps = ({
         component="div"
         variant={titleTextVariant || 'caption'}
         color="textSecondary"
-        sx={{...labelStyle}}>
+        sx={{textTransform: 'capitalize', ...labelStyle}}>
         {label}
       </Typography>
 
