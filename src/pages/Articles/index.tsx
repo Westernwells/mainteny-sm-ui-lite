@@ -6,19 +6,17 @@ import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 
 const tabItems = [
   {
-    label: 'Articles',
-    icon: <HomeRepairServiceIcon />,
-  },
-  {
     label: 'Packages',
     icon: <AutoAwesomeMosaicIcon />,
+  },
+  {
+    label: 'Articles',
+    icon: <HomeRepairServiceIcon />,
   },
 ];
 
 export const Articles = () => {
   const [tabValue, setTabValue] = useState(0);
-  const [showPackageFilter, setShowPackageListFilter] = useState(false);
-  const [packageListSearch, setPackageListSearch] = useState('');
 
   return (
     <Tabs
@@ -33,7 +31,7 @@ export const Articles = () => {
         {null}
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
-        <PackageList searchQuery={packageListSearch} />
+        {null}
       </TabsBody>
     </Tabs>
   );

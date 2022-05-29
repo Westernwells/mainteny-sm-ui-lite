@@ -97,8 +97,15 @@ export const OverviewTab = ({
               },
             }}
             elevator={elevator!}
-            currency={contracts[elevatorId!][0].currency}
-            spendingLimit={contracts[elevatorId!][0].spendingLimit} // TODO: we need to which contracvt to use for this
+            currency={
+              Object.keys(contracts).length
+                ? contracts[elevatorId!][0].currency
+                : ''
+            }
+            spendingLimit={
+              0
+              // contracts && elevatorId ? contracts[elevatorId!][0].spendingLimit : undefined
+            } // TODO: we need to which contracvt to use for this
           />
         </Grid>
       </Grid>
