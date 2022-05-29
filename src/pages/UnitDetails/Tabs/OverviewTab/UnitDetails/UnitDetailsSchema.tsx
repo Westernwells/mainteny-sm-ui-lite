@@ -16,9 +16,16 @@ import {Elevator} from 'models/elevator';
 interface Props {
   label: string;
   elevator: Elevator;
+  spendingLimit?: number;
+  currency?: string;
 }
 
-export const UnitDetailsSchema = ({label, elevator}: Props) => {
+export const UnitDetailsSchema = ({
+  label,
+  elevator,
+  spendingLimit,
+  currency,
+}: Props) => {
   const theme = useTheme();
   const renderSection = () => {
     switch (label) {
@@ -144,7 +151,7 @@ export const UnitDetailsSchema = ({label, elevator}: Props) => {
           <CardProps
             icon={<MonetizationOnIcon sx={{color: theme.palette.info.dark}} />}
             label="SPENDING LIMIT"
-            bodyText="1,000€"
+            bodyText={spendingLimit ? `${spendingLimit} ${currency}` : '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}

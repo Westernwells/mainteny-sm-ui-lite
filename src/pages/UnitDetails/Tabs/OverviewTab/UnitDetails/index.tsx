@@ -9,9 +9,16 @@ import {UnitDetailsSchema} from './UnitDetailsSchema';
 interface Props {
   containerStyles?: {[key: string]: any};
   elevator: Elevator;
+  spendingLimit?: number;
+  currency?: string;
 }
 
-export const UnitDetails = ({containerStyles, elevator}: Props) => {
+export const UnitDetails = ({
+  containerStyles,
+  elevator,
+  spendingLimit,
+  currency,
+}: Props) => {
   const theme = useTheme();
   const labels = [
     'category',
@@ -39,7 +46,12 @@ export const UnitDetails = ({containerStyles, elevator}: Props) => {
       <Grid container spacing={2}>
         {labels.map((label) => (
           <Grid key={label} item xs={12} sm={4} md={6}>
-            <UnitDetailsSchema label={label} elevator={elevator} />
+            <UnitDetailsSchema
+              label={label}
+              elevator={elevator}
+              spendingLimit={spendingLimit}
+              currency={currency}
+            />
           </Grid>
         ))}
       </Grid>

@@ -67,10 +67,10 @@ export const columns: GridColDef[] = [
     renderCell: (params) => (
       <Box sx={{display: 'flex'}}>
         <Box onClick={() => console.log(params.value)}>
-          <EditIcon />
+          <EditIcon sx={{color: 'text.secondary'}} />
         </Box>
         <Box onClick={() => console.log(params.value)}>
-          <DeleteIcon />
+          <DeleteIcon sx={{color: 'text.secondary'}} />
         </Box>
       </Box>
     ),

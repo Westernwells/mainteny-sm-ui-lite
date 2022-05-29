@@ -17,6 +17,8 @@ const tabItems = [
 
 export const Articles = () => {
   const [tabValue, setTabValue] = useState(0);
+  const [showPackageFilter, setShowPackageListFilter] = useState(false);
+  const [packageListSearch, setPackageListSearch] = useState('');
 
   return (
     <Tabs
@@ -31,7 +33,7 @@ export const Articles = () => {
         {null}
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
-        {null}
+        <PackageList searchQuery={packageListSearch} />
       </TabsBody>
     </Tabs>
   );

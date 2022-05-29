@@ -19,6 +19,9 @@ import {useUseQueryElevatorsContracts} from 'hooks/reactQuery/useContract';
 import {ContractStatus} from 'models/contract';
 import {UnitContracts} from './UnitContracts';
 import {PriorityTechnician} from './PriorityTechnician';
+import {Notes} from './Notes';
+import {Pictures} from './Pictures';
+import {Documents} from './Documents';
 
 interface Props {
   getServiceHistoryTabIndex?: (value: number) => void;
@@ -94,6 +97,8 @@ export const OverviewTab = ({
               },
             }}
             elevator={elevator!}
+            currency={contracts[elevatorId!][0].currency}
+            spendingLimit={contracts[elevatorId!][0].spendingLimit} // TODO: we need to which contracvt to use for this
           />
         </Grid>
       </Grid>
@@ -127,6 +132,20 @@ export const OverviewTab = ({
       />
 
       <PriorityTechnician containerStyles={{mt: '1.2em'}} />
+
+      <Grid container spacing={2} sx={{mt: '0.3em'}}>
+        <Grid item md={4}>
+          <Notes />
+        </Grid>
+
+        <Grid item md={4}>
+          <Pictures />
+        </Grid>
+
+        <Grid item md={4}>
+          <Documents />
+        </Grid>
+      </Grid>
     </>
   );
 };

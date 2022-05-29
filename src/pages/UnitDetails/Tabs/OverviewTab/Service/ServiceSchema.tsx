@@ -35,7 +35,7 @@ export const ServiceSchema = ({label, elevator}: Props) => {
           <CardProps
             icon={<CachedIcon sx={{color: theme.palette.info.dark}} />}
             label="LAST INSPECTION"
-            bodyText="Block 5"
+            bodyText={elevator.additionalInfo.lastInspectionDate}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
