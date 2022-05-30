@@ -55,29 +55,9 @@ export const Widget = ({
   const [view, setView] = useState('list');
 
   return (
-    <Box display="flex" sx={{height: '2.5rem', ...containerStyles}}>
-      {/* {!hideFilter ? (
-        <Button
-          buttonProps={{
-            onClick: () => setShowFilter(!showFilter),
-            sx: {
-              backgroundColor: showFilter
-                ? theme.palette.action.selected
-                : theme.palette.primary.outlinedHoverBg,
-              border: 'none',
-              ':hover': {
-                border: 'none',
-              },
-            },
-            variant: 'outlined',
-            startIcon: <FilterListIcon />,
-          }}>
-          <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
-            Filter
-          </Typography>
-        </Button>
-      ) : null} */}
-
+    <Box
+      display="flex"
+      sx={{height: '2.5rem', flexGrow: 1, ...containerStyles}}>
       {!hideSearchInput ? (
         <Box sx={{mr: '1em'}}>
           <SearchInput
@@ -90,74 +70,51 @@ export const Widget = ({
         </Box>
       ) : null}
       {filterItems || null}
-      {/* {!hideViewOption ? (
-        <ToggleButtonGroup
-          color="secondary"
-          value={view}
-          exclusive
-          sx={{ml: '0.8em'}}>
-          <ToggleButton
-            value="list"
-            aria-label="list"
-            onClick={() => {
-              setView('list');
-              if (closeMapView) {
-                closeMapView();
-              }
-            }}>
-            <ViewListIcon />
-          </ToggleButton>
-          <ToggleButton
-            value="module"
-            aria-label="module"
-            onClick={() => {
-              setView('module');
-              if (openMapView) {
-                openMapView();
-              }
-            }}>
-            <GridViewIcon />
-          </ToggleButton>
-        </ToggleButtonGroup>
-      ) : null} */}
 
-      {showActionBtn ? (
-        <Button
-          // label="Filter"
-          buttonProps={{
-            onClick: () => (btnOnClick ? btnOnClick() : () => {}),
-            sx: {
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          flexGrow: 1,
+        }}>
+        {showActionBtn ? (
+          <Button
+            // label="Filter"
+            buttonProps={{
+              onClick: () => (btnOnClick ? btnOnClick() : () => {}),
+              sx: {
+                textTransform: 'capitalize',
+                ml: '0.8em',
+              },
+              variant: 'contained',
+              color: 'primary',
+              size: 'small',
+              startIcon: <AddIcon />,
+            }}>
+            <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
+              {btnLabel}
+            </Typography>
+          </Button>
+        ) : null}
+
+        {showMenuActionBtn && menu ? (
+          <MenuBtn
+            startIcon={<AddIcon />}
+            label={btnLabel}
+            menu={menu}
+            size="large"
+            color="primary"
+            sx={{
               textTransform: 'capitalize',
               ml: '0.8em',
-            },
-            variant: 'contained',
-            color: 'primary',
-            size: 'small',
-            startIcon: <AddIcon />,
-          }}>
-          <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
-            {btnLabel}
-          </Typography>
-        </Button>
-      ) : null}
-
-      {showMenuActionBtn && menu ? (
-        <MenuBtn
-          startIcon={<AddIcon />}
-          label={btnLabel}
-          menu={menu}
-          size="large"
-          color="primary"
-          sx={{
-            textTransform: 'capitalize',
-            ml: '0.8em',
-            py: '0.7em',
-          }}
-          variant="contained"
-          disableRipple
-          disableFocusRipple
-        />
-      ) : null}
+              py: '0.7em',
+            }}
+            variant="contained"
+            disableRipple
+            disableFocusRipple
+          />
+        ) : null}
+      </Box>
     </Box>
   );
 };
