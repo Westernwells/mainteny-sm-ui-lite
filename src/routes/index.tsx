@@ -235,7 +235,10 @@ export const Router = () => {
               <Helmet>
                 <title>{`New Quotation - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout pageScrollable>
+              <PageLayout
+                pageScrollable
+                backBtnLabel="New quotation"
+                showBackAction>
                 <NewQuotation />
               </PageLayout>
             </>

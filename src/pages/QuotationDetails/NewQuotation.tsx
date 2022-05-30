@@ -7,7 +7,6 @@ import Box from '@mui/material/Box';
 import {InputLabel, TextField} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DraftsIcon from '@mui/icons-material/Drafts';
-import {BackAction} from 'components/BackAction';
 import {Progress} from 'components/Progress';
 import {A4Layout} from 'components/A4Layout';
 import {SelectModal} from 'components/SelectModal';
@@ -213,12 +212,6 @@ export const NewQuotation = () => {
 
   return (
     <Box>
-      <BackAction
-        label="New Quotation"
-        containerStyle={{my: 'auto'}}
-        path="/quotations?pageIndex=1&pageSize=25"
-      />
-
       <A4Layout>
         <Box mt="1em">
           <Typography variant="subtitle1">
