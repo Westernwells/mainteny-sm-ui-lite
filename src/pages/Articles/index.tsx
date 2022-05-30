@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
-import {Tabs} from 'components/Tab';
+import {Tabs} from 'components/Tab-old';
 import AutoAwesomeMosaicIcon from '@mui/icons-material/AutoAwesomeMosaic';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import {Widget} from 'components/Widget';

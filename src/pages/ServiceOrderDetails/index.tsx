@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
-import {Tabs} from 'components/Tab';
+import {Tabs} from 'components/Tab-old';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import {Overview} from './Tabs/Overview';

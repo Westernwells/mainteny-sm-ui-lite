@@ -4,7 +4,7 @@ import EngineeringOutlinedIcon from '@mui/icons-material/EngineeringOutlined';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 
 import {TabsBody} from 'components/TabsBody';
-import {Tabs} from 'components/Tab';
+import {Tabs} from 'components/Tab-old';
 import {EmptySection} from 'components/EmptySection';
 import {OverviewTab} from './Tabs/OverviewTab';
 import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';

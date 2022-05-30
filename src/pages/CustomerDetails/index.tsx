@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
 import {useSearchParams} from 'react-router-dom';
-import {Tabs} from 'components/Tab';
+import {Tabs} from 'components/Tab-old';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';

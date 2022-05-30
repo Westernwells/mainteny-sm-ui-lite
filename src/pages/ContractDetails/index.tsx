@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
-import {Tabs} from 'components/Tab';
+import {Tabs} from 'components/Tab-old';
 import {Button} from 'components/Button';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';

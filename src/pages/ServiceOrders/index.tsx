@@ -59,9 +59,6 @@ export const ServiceOrders = () => {
       getSearchValue={(search) => setListSearch(search)}
       setShowFilter={setShowListFilter}
       showFilter={showListFilter}
-      menu={menu}
-      btnLabel="New Order"
-      showMenuActionBtn
       hideViewOption
     />
   );
@@ -81,6 +78,9 @@ export const ServiceOrders = () => {
     <Tabs
       hideBackIcon
       tabItems={tabItems}
+      showMenuActionBtn
+      menu={menu}
+      btnLabel="New Order"
       currentIndex={tabValue}
       pageTitle="Service Orders"
       renderWidget={renderWidget(tabValue)}
