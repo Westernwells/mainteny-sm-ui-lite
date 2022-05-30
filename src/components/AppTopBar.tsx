@@ -18,12 +18,19 @@ import {useQueryClient} from 'react-query';
 import {languageMap} from 'utils/utils';
 import {useUserSession} from '../hooks/reactQuery/useUserSession';
 import {MenuBtn} from './MenuBtn';
+import {BackAction} from './BackAction';
 
 interface Props {
   pageTitle?: string;
+  showBackAction?: boolean;
+  backBtnLabel?: string;
 }
 
-export const AppTopBar = ({pageTitle}: Props) => {
+export const AppTopBar = ({
+  pageTitle,
+  showBackAction,
+  backBtnLabel = '',
+}: Props) => {
   const theme = useTheme();
   const [selectedLng, setSelectedLng] = useState('');
   const {signout} = useAuth();
@@ -80,6 +87,7 @@ export const AppTopBar = ({pageTitle}: Props) => {
       }}>
       <Box width="4.5rem" />
       <Box sx={{display: 'flex', justifyContent: 'space-between', flexGrow: 1}}>
+        {showBackAction ? <BackAction label={backBtnLabel} /> : null}
         <Typography
           variant="h3"
           component="div"

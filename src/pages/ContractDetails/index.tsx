@@ -28,7 +28,7 @@ export const ContractDetails = () => {
       onChange={(index) => setTabValue(index)}
       showActionBtn
       btnLabel="Download contract"
-      backBtnLabel="Contract Details"
+      // backBtnLabel="Contract Details"
       actionBtnVariant="outlined"
       actionButtonIcon={<FileDownloadIcon color="primary" sx={{}} />}>
       <TabsBody value={tabValue} index={0}>

@@ -9,6 +9,8 @@ interface Props {
   excludeDefaultSpacing?: boolean;
   pageScrollable?: boolean;
   pageTitle?: string;
+  showBackAction?: boolean;
+  backBtnLabel?: string;
 }
 
 export const PageLayout = ({
@@ -17,6 +19,8 @@ export const PageLayout = ({
   excludeDefaultSpacing,
   pageScrollable,
   pageTitle,
+  showBackAction,
+  backBtnLabel,
 }: Props) => (
   <Box
     sx={{
@@ -28,7 +32,11 @@ export const PageLayout = ({
         : {height: '98vh', overflowY: 'hidden'}),
     }}>
     <Box sx={{mx: '2.2em', my: '0.5em'}}>
-      <AppTopBar pageTitle={pageTitle} />
+      <AppTopBar
+        pageTitle={pageTitle}
+        showBackAction={showBackAction}
+        backBtnLabel={backBtnLabel}
+      />
     </Box>
     <Box sx={{display: 'flex', flexGrow: 1, width: '100%'}}>
       {!excludeSidebar ? <AppDrawer /> : null}

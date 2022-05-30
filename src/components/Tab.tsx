@@ -20,12 +20,9 @@ interface TabItems {
 interface Props {
   children: ReactNode;
   tabItems: TabItems[];
-  backBtnLabel?: string;
   onChange?: (tabIndex: number) => void;
   currentIndex?: number;
-  hideBackIcon?: boolean;
   renderWidget?: JSX.Element | null;
-  pageTitle?: string;
   tabStyle?: {[key: string]: string | number};
   label?: string;
   showActionBtn?: boolean;
@@ -36,6 +33,10 @@ interface Props {
   menu?: MenuBtnProps[];
   actionButtonIcon?: JSX.Element;
   actionBtnVariant?: 'contained' | 'outlined' | 'text';
+  backBtnLabel?: string;
+  hideBackIcon?: boolean;
+  pageTitle?: string;
+  hideDivider?: boolean;
 }
 
 const a11yProps = (index: number) => ({
@@ -46,11 +47,8 @@ const a11yProps = (index: number) => ({
 export const Tabs = ({
   children,
   tabItems,
-  hideBackIcon,
   renderWidget = null,
-  pageTitle,
   onChange = () => {},
-  backBtnLabel = '',
   currentIndex = 0,
   tabStyle,
   showActionBtn = false,
@@ -61,6 +59,10 @@ export const Tabs = ({
   menu,
   actionButtonIcon,
   actionBtnVariant,
+  backBtnLabel,
+  hideBackIcon,
+  pageTitle,
+  hideDivider,
 }: Props) => {
   const theme = useTheme();
 
@@ -74,26 +76,10 @@ export const Tabs = ({
       }}>
       <Box
         sx={{
-          display: 'flex',
+          display: showActionBtn || showMenuActionBtn || menu ? 'flex' : 'none',
           justifyContent: 'space-between',
           height: '2.5rem',
         }}>
-        {!hideBackIcon ? (
-          <BackAction label={backBtnLabel} containerStyle={{mr: '3em'}} />
-        ) : null}
-        {pageTitle ? (
-          <Typography
-            component="div"
-            variant="h5"
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-            }}>
-            {pageTitle}
-          </Typography>
-        ) : null}
-
         {showActionBtn ? (
           <Button
             label="Filter"

@@ -20,7 +20,7 @@ export const Articles = () => {
 
   return (
     <Tabs
-      hideBackIcon
+      // hideBackIcon
       tabItems={tabItems}
       currentIndex={tabValue}
       onChange={(index) => {

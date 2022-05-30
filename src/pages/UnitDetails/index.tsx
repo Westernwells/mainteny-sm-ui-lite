@@ -6,6 +6,7 @@ import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import {EmptySection} from 'components/EmptySection';
+import {PageLayout} from 'components/PageLayout';
 import {OverviewTab} from './Tabs/OverviewTab';
 import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
 
@@ -29,29 +30,30 @@ export const UnitsDetail = () => {
   const [unitName, setUnitName] = useState('');
 
   return (
-    <Tabs
-      tabItems={tabItems}
-      currentIndex={value}
-      onChange={(index) => setValue(index)}
-      backBtnLabel={unitName}>
-      <TabsBody value={value} index={0}>
-        <OverviewTab
-          getServiceHistoryTabIndex={(tabIndex: number) => setValue(tabIndex)}
-          getUnitName={(name) => setUnitName(name)}
-        />
-      </TabsBody>
+    <PageLayout pageScrollable showBackAction backBtnLabel={unitName}>
+      <Tabs
+        tabItems={tabItems}
+        currentIndex={value}
+        onChange={(index) => setValue(index)}>
+        <TabsBody value={value} index={0}>
+          <OverviewTab
+            getServiceHistoryTabIndex={(tabIndex: number) => setValue(tabIndex)}
+            getUnitName={(name) => setUnitName(name)}
+          />
+        </TabsBody>
 
-      <TabsBody value={value} index={1}>
-        <ServiceHistoryTab />
-      </TabsBody>
+        <TabsBody value={value} index={1}>
+          <ServiceHistoryTab />
+        </TabsBody>
 
-      <TabsBody value={value} index={2}>
-        <EmptySection
-          label="Data will be available here only for IoT enabled elevators!"
-          size="large"
-          containerStyle={{mt: 12}}
-        />
-      </TabsBody>
-    </Tabs>
+        <TabsBody value={value} index={2}>
+          <EmptySection
+            label="Data will be available here only for IoT enabled elevators!"
+            size="large"
+            containerStyle={{mt: 12}}
+          />
+        </TabsBody>
+      </Tabs>
+    </PageLayout>
   );
 };
