@@ -33,7 +33,7 @@ export const Notifications = () => {
 
   return (
     <Box>
-      <Box sx={{mb: 2, mt: 12}}>
+      <Box sx={{mb: 2}}>
         <Box pl="20vw">
           <BackAction label="Notifications" />
         </Box>

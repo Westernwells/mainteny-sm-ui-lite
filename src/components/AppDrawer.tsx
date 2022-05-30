@@ -2,9 +2,14 @@ import React, {useEffect, useState} from 'react';
 import {Theme, CSSObject} from '@mui/material/styles';
 import styled from '@mui/material/styles/styled';
 import Box from '@mui/material/Box';
+import MenuIcon from '@mui/icons-material/Menu';
+import useTheme from '@mui/material/styles/useTheme';
 import MuiDrawer from '@mui/material/Drawer';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
 import Elevator from '@mui/icons-material/Elevator';
 import BusinessIcon from '@mui/icons-material/Business';
+import IconButton from '@mui/material/IconButton';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import {useLocation, useNavigate} from 'react-router-dom';
@@ -16,8 +21,11 @@ import Typography from '@mui/material/Typography';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
+import {ReactComponent as MaintenyLogo} from 'assets/icons/Mainteny.svg';
 import Fade from '@mui/material/Fade';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
+// import {ListItem} from '@mui/material';
 
 const drawerWidth = '15rem';
 
@@ -61,8 +69,17 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
+// const DrawerHeader = styled('div')(({theme}) => ({
+//   display: 'flex',
+// justifyContent: 'flex-end',
+// marginLeft: theme.spacing(4),
+//   // necessary for content to be below app bar
+//   ...theme.mixins.toolbar,
+// }));
+
 export const AppDrawer = () => {
   const [open, setOpen] = useState(false);
+  const themeX = useTheme();
   const setSelectedIndex = useState(0)[1];
   const [selectedPath, setSelectedPath] = useState('/units');
   const location = useLocation();
@@ -196,6 +213,50 @@ export const AppDrawer = () => {
     },
   ];
 
+  const drawerHeader = (logo: any, arrowIcon: any) => (
+    <>
+      {logo}
+      <Box
+        sx={{
+          display: 'none',
+          [themeX.breakpoints.down('md')]: {
+            display: 'flex',
+            marginLeft: (theme) => theme.spacing(4),
+            justifyContent: 'flex-end',
+          },
+        }}>
+        <IconButton
+          onClick={open ? handleDrawerClose : handleDrawerOpen}
+          edge="start"
+          sx={{}}>
+          {arrowIcon}
+        </IconButton>
+        <IconButton
+          aria-label="open drawer"
+          onClick={open ? handleDrawerClose : handleDrawerOpen}
+          edge="start"
+          sx={{fontSize: ''}}>
+          <MenuIcon />
+        </IconButton>
+      </Box>
+    </>
+  );
+
+  const renderDrawerHeader = () =>
+    open
+      ? drawerHeader(
+          <IconButton sx={{mr: '1em'}} edge="start">
+            <MaintenyLogo width={155.22} height={32} />
+          </IconButton>,
+          <ArrowBackIosNewIcon />,
+        )
+      : drawerHeader(
+          <IconButton>
+            <Logo width={55.22} height={32} />
+          </IconButton>,
+          <ArrowForwardIos />,
+        );
+
   return (
     <Box sx={{display: 'flex'}}>
       <Drawer
@@ -205,10 +266,12 @@ export const AppDrawer = () => {
         open={open}
         PaperProps={{
           sx: {
-            paddingTop: 10,
+            paddingTop: 2,
             color: '#fff',
           },
         }}>
+        {renderDrawerHeader()}
+
         <List>
           {drawerList.map(({text, icon, onClick, path}, index) => (
             <ListItemButton

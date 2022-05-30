@@ -25,7 +25,7 @@ export const PageLayout = ({
         ? {minHeight: '100vh', overflowY: 'scroll'}
         : {height: '98vh', overflowY: 'hidden'}),
     }}>
-    <Box>
+    <Box sx={{mx: '2.2em', my: '1em'}}>
       <AppTopBar />
     </Box>
     <Box sx={{display: 'flex', flexGrow: 1, width: '100%'}}>
@@ -37,7 +37,7 @@ export const PageLayout = ({
       <Box width="4.5rem" />
       <Box
         sx={{
-          pt: !excludeDefaultSpacing ? 12 : null,
+          pt: '1em',
           mx: !excludeDefaultSpacing ? '2.2em' : null,
         }}
         display="flex"
