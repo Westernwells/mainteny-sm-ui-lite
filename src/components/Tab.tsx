@@ -34,6 +34,8 @@ interface Props {
   btnOnClick?: () => void;
   containerStyles?: {[key: string]: string | number};
   menu?: MenuBtnProps[];
+  actionButtonIcon?: JSX.Element;
+  actionBtnVariant?: 'contained' | 'outlined' | 'text';
 }
 
 const a11yProps = (index: number) => ({
@@ -57,6 +59,8 @@ export const Tabs = ({
   containerStyles,
   showMenuActionBtn,
   menu,
+  actionButtonIcon,
+  actionBtnVariant,
 }: Props) => {
   const theme = useTheme();
 
@@ -100,10 +104,10 @@ export const Tabs = ({
                 ml: '0.8em',
                 height: '100%',
               },
-              variant: 'contained',
+              variant: actionBtnVariant || 'contained',
               color: 'primary',
               size: 'small',
-              startIcon: <AddIcon />,
+              startIcon: actionButtonIcon || <AddIcon />,
             }}>
             <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
               {btnLabel}
@@ -113,7 +117,7 @@ export const Tabs = ({
 
         {showMenuActionBtn && menu ? (
           <MenuBtn
-            startIcon={<AddIcon />}
+            startIcon={actionButtonIcon || <AddIcon />}
             label={btnLabel}
             menu={menu}
             size="medium"
@@ -124,7 +128,7 @@ export const Tabs = ({
               py: '0.7em',
               height: '100%',
             }}
-            variant="contained"
+            variant={actionBtnVariant || 'contained'}
             disableRipple
             disableFocusRipple
           />

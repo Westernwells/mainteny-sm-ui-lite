@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
-import {Tabs} from 'components/Tab-old';
-import {Button} from 'components/Button';
+import {Tabs} from 'components/Tab';
+// import {Button} from 'components/Button';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -26,24 +26,11 @@ export const ContractDetails = () => {
       tabItems={tabItems}
       currentIndex={tabValue}
       onChange={(index) => setTabValue(index)}
+      showActionBtn
+      btnLabel="Download contract"
       backBtnLabel="Contract Details"
-      renderWidget={
-        <Button
-          label="Download Contract"
-          style={{
-            textTransform: 'capitalize',
-            background: 'transparent',
-            border: '1px solid rgba(15, 76, 100, 0.5)',
-            px: '1.5em',
-            '&:hover': {
-              background: 'transparent',
-            },
-          }}
-          buttonProps={{
-            startIcon: <FileDownloadIcon color="primary" sx={{}} />,
-          }}
-        />
-      }>
+      actionBtnVariant="outlined"
+      actionButtonIcon={<FileDownloadIcon color="primary" sx={{}} />}>
       <TabsBody value={tabValue} index={0}>
         <ContractOverview />
       </TabsBody>
