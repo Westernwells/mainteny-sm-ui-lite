@@ -12,7 +12,7 @@ interface Props {
 
 export const PageListingLayout = ({children, renderWidget, label}: Props) => (
   <FlexContainer>
-    <Box display="flex" justifyContent="space-between" mb="1em">
+    <Box display="flex" justifyContent="space-between">
       {/* <Typography variant="h5" mt="0.3em">
         {label}
       </Typography> */}

@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useLayoutEffect, useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
 import {useSearchParams} from 'react-router-dom';
 import {Tabs} from 'components/Tab';
@@ -10,6 +10,10 @@ import {useParams} from 'react-router';
 import {CustomerOverviewTab} from './Tabs/CustomerOverview';
 import {ContractsTab} from './Tabs/ContractsTab';
 import {UnitsTab} from './Tabs/UnitsTab';
+
+interface Props {
+  getCurrentPageTitle?: (title: string) => void;
+}
 
 const tabItems = [
   {
@@ -26,11 +30,17 @@ const tabItems = [
   },
 ];
 
-export const CustomerDetails = () => {
+export const CustomerDetails = ({getCurrentPageTitle}: Props) => {
   const [tabValue, setTabValue] = useState(0);
   const {id: customerId} = useParams();
   const [customerName, setCustomerName] = useState('');
   const [queryParams, setQueryParams] = useSearchParams();
+
+  useLayoutEffect(() => {
+    if (getCurrentPageTitle) {
+      getCurrentPageTitle(customerName);
+    }
+  }, [customerName]);
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);

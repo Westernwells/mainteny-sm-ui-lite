@@ -163,7 +163,9 @@ export const Router = () => {
                 <title>{`Customers - ${titleTail}`}</title>
               </Helmet>
 
-              <Customer />
+              <PageLayout pageTitle="Customers">
+                <Customer />
+              </PageLayout>
             </>
           }
         />
@@ -174,8 +176,10 @@ export const Router = () => {
               <Helmet>
                 <title>{`Customer Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
-                <CustomerDetails />
+              <PageLayout showBackAction backBtnLabel={currentPageTitle}>
+                <CustomerDetails
+                  getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                />
               </PageLayout>
             </>
           }
@@ -187,7 +191,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Employees - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
+              <PageLayout pageTitle="Employees">
                 <Employees />
               </PageLayout>
             </>

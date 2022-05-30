@@ -14,7 +14,6 @@ import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
 } from 'utils/utils';
-import {PageLayout} from 'components/PageLayout';
 import {EmptySection} from 'components/EmptySection';
 import {Widget} from '../../components/Widget';
 import {columns, makeRows} from './CustomerDataGridProps';
@@ -92,34 +91,32 @@ export const Customer = () => {
   }
 
   return (
-    <PageLayout pageTitle="Customers">
-      <PageListingLayout
-        renderWidget={
-          <Widget
-            searchPlaceholder="Try 'Astralift BV'"
-            getSearchValue={(val: string) => setSearch(val)}
-            showFilter
-            hideViewOption
-            hideFilter
-          />
-        }>
-        <DataGridLayout
-          rows={rows}
-          columns={columns}
-          loading={isFetching}
-          hideFooter={pageCount <= 1}
-          pageSize={page.pageSize}
-          pageIndex={page.pageIndex + 1}
-          handlePageSizeChange={(newPageSize: number) =>
-            setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
-          }
-          handlePageChange={(newPage: number) =>
-            setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-          }
-          pageCount={pageCount}
-          totalRows={customerResource.total}
+    <PageListingLayout
+      renderWidget={
+        <Widget
+          searchPlaceholder="Try 'Astralift BV'"
+          getSearchValue={(val: string) => setSearch(val)}
+          showFilter
+          hideViewOption
+          hideFilter
         />
-      </PageListingLayout>
-    </PageLayout>
+      }>
+      <DataGridLayout
+        rows={rows}
+        columns={columns}
+        loading={isFetching}
+        hideFooter={pageCount <= 1}
+        pageSize={page.pageSize}
+        pageIndex={page.pageIndex + 1}
+        handlePageSizeChange={(newPageSize: number) =>
+          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+        }
+        handlePageChange={(newPage: number) =>
+          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+        }
+        pageCount={pageCount}
+        totalRows={customerResource.total}
+      />
+    </PageListingLayout>
   );
 };

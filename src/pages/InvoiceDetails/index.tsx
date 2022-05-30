@@ -41,6 +41,7 @@ export const InvoiceDetails = () => {
           label="Download Invoice"
           buttonProps={{
             disabled: !downloadUrl,
+            variant: 'outlined',
             onClick: () =>
               downloadUrl ? window.open(downloadUrl[0], '_blank') : null,
 

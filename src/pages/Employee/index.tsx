@@ -30,7 +30,6 @@ export const Employees = () => {
   const totalEmployeeRef = useRef(0);
   const [pageCount, setPageCount] = useState(0);
   const [search, setSearch] = useState('');
-  const [showFilter, setShowFilter] = useState(false);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -110,13 +109,9 @@ export const Employees = () => {
         <Widget
           searchPlaceholder="Search name, role, address, phone"
           getSearchValue={(val: string) => setSearch(val)}
-          setShowFilter={setShowFilter}
-          showFilter={showFilter}
-          btnLabel="New Employee"
-          btnOnClick={() => setIsDrawerOpen(true)}
+          showFilter
           showActionBtn
-          hideFilter
-          hideViewOption
+          btnLabel="New employee"
         />
       }>
       <DataGridLayout

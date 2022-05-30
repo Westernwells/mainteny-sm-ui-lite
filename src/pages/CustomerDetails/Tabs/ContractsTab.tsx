@@ -91,7 +91,7 @@ export const ContractsTab = ({customerId}: Props) => {
   };
 
   const renderFilterItems = () => (
-    <FilterFields hideClear>
+    <FilterFields>
       <MultipleSelectCheckmarks
         label="Expiry Date"
         options={[
@@ -129,7 +129,7 @@ export const ContractsTab = ({customerId}: Props) => {
   const renderWidget = () => (
     <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
       <Widget
-        searchPlaceholder=""
+        searchPlaceholder="Try 'Astralift BV'"
         getSearchValue={(search) => setSearchQuery(search)}
         hideViewOption
         filterItems={renderFilterItems()}

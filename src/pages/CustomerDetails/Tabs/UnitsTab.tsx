@@ -79,7 +79,7 @@ export const UnitsTab = ({customerId}: Props) => {
   const renderWidget = () => (
     <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
       <Widget
-        searchPlaceholder=""
+        searchPlaceholder="Search company name, unit model"
         getSearchValue={(search) => setSearchQuery(search)}
         hideViewOption
         filterItems={renderFilterItems()}
