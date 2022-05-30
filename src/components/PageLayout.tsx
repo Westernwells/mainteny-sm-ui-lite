@@ -1,10 +1,10 @@
 import Box from '@mui/material/Box';
-import {ReactElement} from 'react';
+import {ReactNode} from 'react';
 import {AppDrawer} from './AppDrawer';
 import {AppTopBar} from './AppTopBar';
 
 interface Props {
-  children: ReactElement;
+  children: ReactNode;
   excludeSidebar?: boolean;
   excludeDefaultSpacing?: boolean;
   pageScrollable?: boolean;

@@ -24,6 +24,7 @@ import {axiosClient} from 'utils/axios-utils';
 import {languageMap} from 'utils/utils';
 import {NewUnit} from 'pages/NewServiceOrder/NewUnit';
 import i18n from 'i18next';
+import {useEffect, useState} from 'react';
 
 import {NewServiceOrder} from 'pages/NewServiceOrder';
 import {Articles} from 'pages/Articles';
@@ -37,6 +38,10 @@ export const Router = () => {
   if (language) {
     axiosClient.defaults.headers.common.language = languageMap[language];
   }
+
+  const [currentPageTitle, setCurrentPageTitle] = useState('');
+
+  useEffect(() => {}, []);
 
   return (
     <Routes>
@@ -65,7 +70,9 @@ export const Router = () => {
               <Helmet>
                 <title>{`Units - ${titleTail}`}</title>
               </Helmet>
-              <MyUnits />
+              <PageLayout pageTitle="Units">
+                <MyUnits />
+              </PageLayout>
             </>
           }
         />
@@ -76,7 +83,14 @@ export const Router = () => {
               <Helmet>
                 <title>{`Unit Details - ${titleTail}`}</title>
               </Helmet>
-              <UnitsDetail />
+              <PageLayout
+                backBtnLabel={currentPageTitle}
+                pageScrollable
+                showBackAction>
+                <UnitsDetail
+                  getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                />
+              </PageLayout>
             </>
           }
         />
@@ -88,7 +102,9 @@ export const Router = () => {
               <Helmet>
                 <title>{`Contracts - ${titleTail}`}</title>
               </Helmet>
-              <Contracts />
+              <PageLayout pageTitle="Contracts">
+                <Contracts />
+              </PageLayout>
             </>
           }
         />
@@ -99,7 +115,10 @@ export const Router = () => {
               <Helmet>
                 <title>{`Contract Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout pageScrollable>
+              <PageLayout
+                pageScrollable
+                backBtnLabel="Contract details"
+                showBackAction>
                 <ContractDetails />
               </PageLayout>
             </>
@@ -113,7 +132,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Invoices - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
+              <PageLayout pageTitle="Invoices">
                 <Invoices />
               </PageLayout>
             </>

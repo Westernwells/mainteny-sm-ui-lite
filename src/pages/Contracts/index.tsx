@@ -14,7 +14,6 @@ import {
   formatSearchParamsPageSize,
 } from 'utils/utils';
 import {useSearchParams} from 'react-router-dom';
-import {PageLayout} from 'components/PageLayout';
 import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
 import {costRangeConvertor as crConverter} from 'utils/contract-utils';
@@ -145,33 +144,31 @@ export const Contracts = () => {
   }
 
   return (
-    <PageLayout pageTitle="Contracts">
-      <PageListingLayout
-        renderWidget={
-          <Widget
-            searchPlaceholder="Try 'Astralift BV'"
-            getSearchValue={(val: string) => setSearch(val)}
-            showFilter
-            filterItems={renderFilterItems()}
-          />
-        }>
-        <DataGridLayout
-          hideFooter={pageCount <= 1}
-          rows={rows}
-          columns={columns}
-          loading={isFetching}
-          pageSize={page.pageSize}
-          pageIndex={page.pageIndex + 1}
-          handlePageSizeChange={(newPageSize: number) =>
-            setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
-          }
-          handlePageChange={(newPage: number) =>
-            setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-          }
-          pageCount={pageCount}
-          totalRows={contractResource.total}
+    <PageListingLayout
+      renderWidget={
+        <Widget
+          searchPlaceholder="Try 'Astralift BV'"
+          getSearchValue={(val: string) => setSearch(val)}
+          showFilter
+          filterItems={renderFilterItems()}
         />
-      </PageListingLayout>
-    </PageLayout>
+      }>
+      <DataGridLayout
+        hideFooter={pageCount <= 1}
+        rows={rows}
+        columns={columns}
+        loading={isFetching}
+        pageSize={page.pageSize}
+        pageIndex={page.pageIndex + 1}
+        handlePageSizeChange={(newPageSize: number) =>
+          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+        }
+        handlePageChange={(newPage: number) =>
+          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+        }
+        pageCount={pageCount}
+        totalRows={contractResource.total}
+      />
+    </PageListingLayout>
   );
 };

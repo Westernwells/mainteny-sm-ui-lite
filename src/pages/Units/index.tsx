@@ -21,7 +21,6 @@ import {
 } from 'utils/utils';
 import {getCenter} from 'geolib';
 import {Location, Resource} from 'models/misc';
-import {PageLayout} from 'components/PageLayout';
 import {useSearchParams} from 'react-router-dom';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Box from '@mui/material/Box';
@@ -135,12 +134,6 @@ export const MyUnits = () => {
     }
   }, [elevatorResponse, page]);
 
-  // useEffect(() => {
-  //   if (!showFilter) {
-  //     setStatus([]);
-  //   }
-  // }, [showFilter]);
-
   if (isFetched && !totalUnitsRef.current) {
     return (
       <EmptySection
@@ -221,54 +214,50 @@ export const MyUnits = () => {
   }
 
   return (
-    <PageLayout pageTitle="Unit">
-      <PageListingLayout
-        label=""
-        renderWidget={
-          <Box
-            sx={{
-              display: 'flex',
-              flexGrow: 1,
-            }}>
-            <Widget
-              searchPlaceholder="Search company name, unit model"
-              getSearchValue={(val: string) => {
-                setSearch(val);
-              }}
-              showFilter
-              filterItems={renderFilterItems()}
-            />
+    <PageListingLayout
+      label=""
+      renderWidget={
+        <Box
+          sx={{
+            display: 'flex',
+            flexGrow: 1,
+          }}>
+          <Widget
+            searchPlaceholder="Search company name, unit model"
+            getSearchValue={(val: string) => {
+              setSearch(val);
+            }}
+            showFilter
+            filterItems={renderFilterItems()}
+          />
 
-            {renderToggleButton()}
-          </Box>
-        }>
-        {!showMapview ? (
-          <DataGridLayout
-            hideFooter={pageCount <= 1}
-            rows={rows}
-            columns={columns}
-            loading={isFetching}
-            pageSize={page.pageSize}
-            pageIndex={page.pageIndex + 1}
-            handlePageSizeChange={(newPageSize: number) =>
-              setQueryParams(
-                formatSearchParamsPageSize(newPageSize, queryParams),
-              )
-            }
-            handlePageChange={(newPage: number) =>
-              setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-            }
-            pageCount={pageCount}
-            totalRows={elevatorResponse.total}
-          />
-        ) : (
-          <UnitsMapsView
-            defaultCenterCoord={elevatorView?.centerCoord}
-            search={search}
-            status={status}
-          />
-        )}
-      </PageListingLayout>
-    </PageLayout>
+          {renderToggleButton()}
+        </Box>
+      }>
+      {!showMapview ? (
+        <DataGridLayout
+          hideFooter={pageCount <= 1}
+          rows={rows}
+          columns={columns}
+          loading={isFetching}
+          pageSize={page.pageSize}
+          pageIndex={page.pageIndex + 1}
+          handlePageSizeChange={(newPageSize: number) =>
+            setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+          }
+          handlePageChange={(newPage: number) =>
+            setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+          }
+          pageCount={pageCount}
+          totalRows={elevatorResponse.total}
+        />
+      ) : (
+        <UnitsMapsView
+          defaultCenterCoord={elevatorView?.centerCoord}
+          search={search}
+          status={status}
+        />
+      )}
+    </PageListingLayout>
   );
 };
