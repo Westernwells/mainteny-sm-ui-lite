@@ -79,7 +79,7 @@ export const Widget = ({
       ) : null} */}
 
       {!hideSearchInput ? (
-        <Box>
+        <Box sx={{mr: '1em'}}>
           <SearchInput
             containerStyle={{height: '100%'}}
             placeholder={searchPlaceholder}

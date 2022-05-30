@@ -200,7 +200,7 @@ export const MyUnits = () => {
   );
 
   const renderFilterItems = () => (
-    <FilterFields containerStyle={{ml: '1em'}}>
+    <FilterFields>
       <MultipleSelectCheckmarks
         label="Status"
         options={['RUNNING', 'STOPPED']}

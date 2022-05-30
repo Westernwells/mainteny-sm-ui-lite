@@ -88,7 +88,6 @@ export const Router = () => {
               <Helmet>
                 <title>{`Contracts - ${titleTail}`}</title>
               </Helmet>
-
               <Contracts />
             </>
           }

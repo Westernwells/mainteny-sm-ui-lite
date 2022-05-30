@@ -14,6 +14,7 @@ import {
   formatSearchParamsPageSize,
 } from 'utils/utils';
 import {useSearchParams} from 'react-router-dom';
+import {PageLayout} from 'components/PageLayout';
 import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
 import {costRangeConvertor as crConverter} from 'utils/contract-utils';
@@ -26,7 +27,6 @@ export const Contracts = () => {
   const [queryParams, setQueryParams] = useSearchParams();
   const [page, setPage] = useState(makePage(0, pageSize));
   const totalContractRef = useRef(0);
-  const [showFilter, setShowFilter] = useState(false);
   const [expiryDate, setExpiryDate] = useState<string[]>([]);
   const [contractor, setContractor] = useState<string[]>([]);
   const [cost, setCost] = useState<number[][]>([]);
@@ -86,7 +86,7 @@ export const Contracts = () => {
     setRows(makeRows(contractResource.data));
 
     setContractorFilterItems([...contractorFilterItems, ...options]);
-  }, [contractResource, showFilter]);
+  }, [contractResource]);
 
   useEffect(() => {
     setPageCount(Math.ceil(contractResource.total / page.pageSize));
@@ -106,70 +106,72 @@ export const Contracts = () => {
     );
   }
 
+  const renderFilterItems = () => (
+    <FilterFields>
+      <MultipleSelectCheckmarks
+        label="Expiry Date"
+        options={[
+          'Last 14 days', // TODO: Create an enum to handle this
+          'Today',
+          'Next 7 days',
+          'Next 14 days',
+        ]}
+        getSelectedValue={(item) => setExpiryDate(item)}
+        multiple={false}
+      />
+
+      <MultipleSelectCheckmarks
+        label="Contractor"
+        options={contractorFilterItems}
+        getSelectedValue={(item) => setContractor(item)}
+      />
+
+      <MultipleSelectCheckmarks
+        label="Cost/year"
+        options={[
+          'Below 1000 €',
+          '1000 - 3000 €',
+          '3000 - 5000 €',
+          'Above 5000 €',
+        ]}
+        getSelectedValue={(item) => costRangeConvertor(item)}
+        multiple={false}
+      />
+    </FilterFields>
+  );
+
   if (isIdle || isLoading) {
     return <Progress />;
   }
 
   return (
-    <PageListingLayout
-      label="Contracts"
-      renderWidget={
-        <Widget
-          searchPlaceholder="Try 'Astralift BV'"
-          getSearchValue={(val: string) => setSearch(val)}
-          setShowFilter={setShowFilter}
-          showFilter={showFilter}
-          hideViewOption
+    <PageLayout pageTitle="Contracts">
+      <PageListingLayout
+        renderWidget={
+          <Widget
+            searchPlaceholder="Try 'Astralift BV'"
+            getSearchValue={(val: string) => setSearch(val)}
+            showFilter
+            filterItems={renderFilterItems()}
+          />
+        }>
+        <DataGridLayout
+          hideFooter={pageCount <= 1}
+          rows={rows}
+          columns={columns}
+          loading={isFetching}
+          pageSize={page.pageSize}
+          pageIndex={page.pageIndex + 1}
+          handlePageSizeChange={(newPageSize: number) =>
+            setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+          }
+          handlePageChange={(newPage: number) =>
+            setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+          }
+          pageCount={pageCount}
+          totalRows={contractResource.total}
         />
-      }>
-      <FilterFields showFilter={showFilter} setShowFilter={setShowFilter}>
-        <MultipleSelectCheckmarks
-          label="Expiry Date"
-          options={[
-            'Last 14 days', // TODO: Create an enum to handle this
-            'Today',
-            'Next 7 days',
-            'Next 14 days',
-          ]}
-          getSelectedValue={(item) => setExpiryDate(item)}
-          multiple={false}
-        />
-
-        <MultipleSelectCheckmarks
-          label="Contractor"
-          options={contractorFilterItems}
-          getSelectedValue={(item) => setContractor(item)}
-        />
-
-        <MultipleSelectCheckmarks
-          label="Cost/year"
-          options={[
-            'Below 1000 €',
-            '1000 - 3000 €',
-            '3000 - 5000 €',
-            'Above 5000 €',
-          ]}
-          getSelectedValue={(item) => costRangeConvertor(item)}
-          multiple={false}
-        />
-      </FilterFields>
-
-      <DataGridLayout
-        hideFooter={pageCount <= 1}
-        rows={rows}
-        columns={columns}
-        loading={isFetching}
-        pageSize={page.pageSize}
-        pageIndex={page.pageIndex + 1}
-        handlePageSizeChange={(newPageSize: number) =>
-          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
-        }
-        handlePageChange={(newPage: number) =>
-          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-        }
-        pageCount={pageCount}
-        totalRows={contractResource.total}
-      />
-    </PageListingLayout>
+      </PageListingLayout>
+    </PageLayout>
   );
 };

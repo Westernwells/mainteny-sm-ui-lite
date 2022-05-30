@@ -23,7 +23,6 @@ const pageSize = 25;
 
 export const Customer = () => {
   const [search, setSearch] = useState('');
-  const [showFilter, setShowFilter] = useState(false);
   const [queryParams, setQueryParams] = useSearchParams();
   const totalCustomerRef = useRef(0);
   const [page, setPage] = useState(makePage(0, pageSize));
@@ -99,8 +98,7 @@ export const Customer = () => {
           <Widget
             searchPlaceholder="Try 'Astralift BV'"
             getSearchValue={(val: string) => setSearch(val)}
-            setShowFilter={setShowFilter}
-            showFilter={showFilter}
+            showFilter
             hideViewOption
             hideFilter
           />
