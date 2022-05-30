@@ -7,7 +7,6 @@ import {StatusChip} from 'components/StatusChip';
 import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
 import {CardProps} from 'components/CardProps';
 import {useParams} from 'react-router-dom';
-import {BackAction} from 'components/BackAction';
 import {Button} from 'components/Button';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {convertToText} from 'utils/utils';
@@ -37,8 +36,7 @@ export const InvoiceDetails = () => {
 
   return (
     <Box>
-      <Box display="flex" justifyContent="space-between" mb="0.5em">
-        <BackAction label="Invoice Details" />
+      <Box display="flex" justifyContent="flex-end" mb="0.5em">
         <Button
           label="Download Invoice"
           buttonProps={{
