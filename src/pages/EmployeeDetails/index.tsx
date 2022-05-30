@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
-import {Tabs} from 'components/Tab-old';
+import {Tabs} from 'components/Tab';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import {useParams} from 'react-router';

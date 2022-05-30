@@ -72,15 +72,20 @@ export const Tabs = ({
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
+          height: '2.5rem',
         }}>
         {!hideBackIcon ? (
-          <BackAction
-            label={backBtnLabel}
-            containerStyle={{mt: '0.5em', mr: '3em'}}
-          />
+          <BackAction label={backBtnLabel} containerStyle={{mr: '3em'}} />
         ) : null}
         {pageTitle ? (
-          <Typography component="div" variant="h5">
+          <Typography
+            component="div"
+            variant="h5"
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}>
             {pageTitle}
           </Typography>
         ) : null}
@@ -93,6 +98,7 @@ export const Tabs = ({
               sx: {
                 textTransform: 'capitalize',
                 ml: '0.8em',
+                height: '100%',
               },
               variant: 'contained',
               color: 'primary',
@@ -116,6 +122,7 @@ export const Tabs = ({
               textTransform: 'capitalize',
               ml: '0.8em',
               py: '0.7em',
+              height: '100%',
             }}
             variant="contained"
             disableRipple
@@ -193,7 +200,7 @@ export const Tabs = ({
           />
         ))}
       </MuiTabs>
-      <Divider sx={{mt: '-0.5em', mb: '0.5em'}} />
+      <Divider light sx={{mt: '-0.5em', mb: '1em'}} />
       {renderWidget}
 
       <Box
