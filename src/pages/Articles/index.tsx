@@ -1,9 +1,8 @@
 import {useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
-import {Tabs} from 'components/Tab-old';
+import {Tabs} from 'components/Tab';
 import AutoAwesomeMosaicIcon from '@mui/icons-material/AutoAwesomeMosaic';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
-import {Widget} from 'components/Widget';
 
 const tabItems = [
   {
@@ -19,39 +18,6 @@ const tabItems = [
 export const Articles = () => {
   const [tabValue, setTabValue] = useState(0);
 
-  const renderArticleListWidget = () => (
-    <Widget
-      searchPlaceholder=""
-      setShowFilter={() => {}}
-      showFilter={false}
-      btnLabel="New Article"
-      showActionBtn
-      hideViewOption
-    />
-  );
-
-  const renderPackageListWidget = () => (
-    <Widget
-      searchPlaceholder=""
-      setShowFilter={() => {}}
-      showFilter={false}
-      btnLabel="New Package"
-      showActionBtn
-      hideViewOption
-    />
-  );
-
-  const renderWidget = (tabIndex: number) => {
-    switch (tabIndex) {
-      case 0:
-        return renderPackageListWidget();
-      case 1:
-        return renderArticleListWidget();
-      default:
-        return renderPackageListWidget();
-    }
-  };
-
   return (
     <Tabs
       hideBackIcon
@@ -60,8 +26,7 @@ export const Articles = () => {
       onChange={(index) => {
         setTabValue(index);
       }}
-      pageTitle="Articles & Packages"
-      renderWidget={renderWidget(tabValue)}>
+      pageTitle="Articles & Packages">
       <TabsBody value={tabValue} index={0}>
         {null}
       </TabsBody>
