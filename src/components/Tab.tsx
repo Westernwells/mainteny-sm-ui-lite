@@ -194,13 +194,7 @@ export const Tabs = ({
         ))}
       </MuiTabs>
       <Divider sx={{mt: '-0.5em', mb: '0.5em'}} />
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-        }}>
-        {renderWidget}
-      </Box>
+      {renderWidget}
 
       <Box
         sx={{

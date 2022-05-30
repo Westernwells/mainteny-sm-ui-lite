@@ -56,7 +56,7 @@ export const MultipleSelectCheckmarks = ({
     }
   }, [selectedItems]);
   return (
-    <Box mb={3}>
+    <Box>
       <FormControl size="small" sx={{mr: '0.5em', width: '13.75rem'}}>
         <InputLabel id={label}>{label}</InputLabel>
         <Select

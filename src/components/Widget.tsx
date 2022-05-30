@@ -1,4 +1,5 @@
-import {useState} from 'react';
+/* eslint-disable */
+import {ReactNode, useState} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -29,6 +30,7 @@ interface Props {
   btnOnClick?: () => void;
   containerStyles?: {[key: string]: string | number};
   menu?: MenuBtnProps[];
+  filterItems?: ReactNode;
 }
 
 export const Widget = ({
@@ -47,13 +49,14 @@ export const Widget = ({
   containerStyles,
   showMenuActionBtn,
   menu,
+  filterItems,
 }: Props) => {
   const theme = useTheme();
   const [view, setView] = useState('list');
 
   return (
     <Box display="flex" sx={{...containerStyles}}>
-      {!hideFilter ? (
+      {/* {!hideFilter ? (
         <Button
           buttonProps={{
             onClick: () => setShowFilter(!showFilter),
@@ -73,7 +76,8 @@ export const Widget = ({
             Filter
           </Typography>
         </Button>
-      ) : null}
+      ) : null} */}
+      {filterItems || null}
 
       {!hideSearchInput ? (
         <Box ml="0.8em">
@@ -119,7 +123,7 @@ export const Widget = ({
 
       {showActionBtn ? (
         <Button
-          label="Filter"
+          // label="Filter"
           buttonProps={{
             onClick: () => (btnOnClick ? btnOnClick() : () => {}),
             sx: {
