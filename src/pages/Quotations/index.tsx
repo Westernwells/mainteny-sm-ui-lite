@@ -9,7 +9,7 @@ import {FilterFields} from 'components/FilterFields';
 import {useQuotations} from 'hooks/reactQuery/useQuotation';
 import {QuotationView} from 'models/quotation';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {PageOverviewLayout} from 'components/PageOverviewLayout';
+import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
@@ -80,7 +80,7 @@ export const Quotations = () => {
   }
 
   return (
-    <PageOverviewLayout
+    <PageListingLayout
       label="Quotations"
       renderWidget={
         <Widget
@@ -122,6 +122,6 @@ export const Quotations = () => {
         pageCount={pageCount}
         totalRows={quotationsResource.total}
       />
-    </PageOverviewLayout>
+    </PageListingLayout>
   );
 };

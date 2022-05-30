@@ -7,7 +7,7 @@ import {useQueryContract} from 'hooks/reactQuery/useContract';
 import {ContractOrderField, ContractView} from 'models/contract';
 import {Order} from 'models/misc';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {PageOverviewLayout} from 'components/PageOverviewLayout';
+import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {
   formatSearchParamsPageIndex,
@@ -111,7 +111,7 @@ export const Contracts = () => {
   }
 
   return (
-    <PageOverviewLayout
+    <PageListingLayout
       label="Contracts"
       renderWidget={
         <Widget
@@ -170,6 +170,6 @@ export const Contracts = () => {
         pageCount={pageCount}
         totalRows={contractResource.total}
       />
-    </PageOverviewLayout>
+    </PageListingLayout>
   );
 };

@@ -9,7 +9,7 @@ interface Props {
   label: string;
 }
 
-export const PageOverviewLayout = ({children, renderWidget, label}: Props) => (
+export const PageListingLayout = ({children, renderWidget, label}: Props) => (
   <FlexContainer>
     <Box display="flex" justifyContent="space-between" mb="1em">
       <Typography variant="h5" mt="0.3em">

@@ -9,7 +9,7 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {ServiceOrderType} from 'models/service-order';
 import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
 import {useInvoices} from 'hooks/reactQuery/useInvoice';
-import {PageOverviewLayout} from 'components/PageOverviewLayout';
+import {PageListingLayout} from 'components/PageListingLayout';
 import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
@@ -129,7 +129,7 @@ export const Invoices = () => {
   }
 
   return (
-    <PageOverviewLayout
+    <PageListingLayout
       label="Invoices"
       renderWidget={
         <Widget
@@ -221,6 +221,6 @@ export const Invoices = () => {
         pageCount={pageCount}
         totalRows={invoiceResource?.total}
       />
-    </PageOverviewLayout>
+    </PageListingLayout>
   );
 };

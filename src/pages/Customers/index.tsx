@@ -1,4 +1,4 @@
-import {PageOverviewLayout} from 'components/PageOverviewLayout';
+import {PageListingLayout} from 'components/PageListingLayout';
 import {useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
@@ -94,7 +94,7 @@ export const Customer = () => {
   }
 
   return (
-    <PageOverviewLayout
+    <PageListingLayout
       label="Customers"
       renderWidget={
         <Widget
@@ -122,6 +122,6 @@ export const Customer = () => {
         pageCount={pageCount}
         totalRows={customerResource.total}
       />
-    </PageOverviewLayout>
+    </PageListingLayout>
   );
 };

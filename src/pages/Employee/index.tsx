@@ -1,5 +1,5 @@
 import {DataGridLayout} from 'components/DataGridLayout';
-import {PageOverviewLayout} from 'components/PageOverviewLayout';
+import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {useQueryTechnicianEvents} from 'hooks/reactQuery/useTechnician';
 import {useQueryUserAccounts} from 'hooks/reactQuery/useUserAccount';
@@ -104,7 +104,7 @@ export const Employees = () => {
   }
 
   return (
-    <PageOverviewLayout
+    <PageListingLayout
       label="Employees"
       renderWidget={
         <Widget
@@ -137,6 +137,6 @@ export const Employees = () => {
       />
 
       <AddEmployee open={isDrawerOpen} setOpen={setIsDrawerOpen} />
-    </PageOverviewLayout>
+    </PageListingLayout>
   );
 };

@@ -9,7 +9,7 @@ import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {FilterFields} from 'components/FilterFields';
-import {PageOverviewLayout} from 'components/PageOverviewLayout';
+import {PageListingLayout} from 'components/PageListingLayout';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {
@@ -161,7 +161,7 @@ export const MyUnits = () => {
   }
 
   return (
-    <PageOverviewLayout
+    <PageListingLayout
       label="Units"
       renderWidget={
         <Widget
@@ -214,6 +214,6 @@ export const MyUnits = () => {
           status={status}
         />
       )}
-    </PageOverviewLayout>
+    </PageListingLayout>
   );
 };
