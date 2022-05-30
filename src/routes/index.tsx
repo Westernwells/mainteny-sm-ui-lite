@@ -205,8 +205,10 @@ export const Router = () => {
               <Helmet>
                 <title>{`Employee Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
-                <EmployeeDetails />
+              <PageLayout showBackAction backBtnLabel={currentPageTitle}>
+                <EmployeeDetails
+                  getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                />
               </PageLayout>
             </>
           }
