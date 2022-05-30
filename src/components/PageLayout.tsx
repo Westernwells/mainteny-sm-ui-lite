@@ -8,6 +8,7 @@ interface Props {
   excludeSidebar?: boolean;
   excludeDefaultSpacing?: boolean;
   pageScrollable?: boolean;
+  pageTitle?: string;
 }
 
 export const PageLayout = ({
@@ -15,6 +16,7 @@ export const PageLayout = ({
   excludeSidebar,
   excludeDefaultSpacing,
   pageScrollable,
+  pageTitle,
 }: Props) => (
   <Box
     sx={{
@@ -25,15 +27,11 @@ export const PageLayout = ({
         ? {minHeight: '100vh', overflowY: 'scroll'}
         : {height: '98vh', overflowY: 'hidden'}),
     }}>
-    <Box sx={{mx: '2.2em', my: '1em'}}>
-      <AppTopBar />
+    <Box sx={{mx: '2.2em', my: '0.5em'}}>
+      <AppTopBar pageTitle={pageTitle} />
     </Box>
     <Box sx={{display: 'flex', flexGrow: 1, width: '100%'}}>
-      {!excludeSidebar ? (
-        <Box>
-          <AppDrawer />
-        </Box>
-      ) : null}
+      {!excludeSidebar ? <AppDrawer /> : null}
       <Box width="4.5rem" />
       <Box
         sx={{

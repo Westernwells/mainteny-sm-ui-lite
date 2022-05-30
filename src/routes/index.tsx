@@ -65,9 +65,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Units - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
-                <MyUnits />
-              </PageLayout>
+              <MyUnits />
             </>
           }
         />
@@ -92,9 +90,8 @@ export const Router = () => {
               <Helmet>
                 <title>{`Contracts - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
-                <Contracts />
-              </PageLayout>
+
+              <Contracts />
             </>
           }
         />
@@ -146,9 +143,8 @@ export const Router = () => {
               <Helmet>
                 <title>{`Customers - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
-                <Customer />
-              </PageLayout>
+
+              <Customer />
             </>
           }
         />

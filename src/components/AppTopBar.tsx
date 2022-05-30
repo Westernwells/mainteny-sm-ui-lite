@@ -6,6 +6,7 @@ import Badge from '@mui/material/Badge';
 // import AppBar from '@mui/material/AppBar';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import useTheme from '@mui/material/styles/useTheme';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import i18n from 'i18n';
 import {ReactComponent as LogoutIcon} from 'assets/icons/Logout.svg';
 // import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
@@ -18,7 +19,11 @@ import {languageMap} from 'utils/utils';
 import {useUserSession} from '../hooks/reactQuery/useUserSession';
 import {MenuBtn} from './MenuBtn';
 
-export const AppTopBar = () => {
+interface Props {
+  pageTitle?: string;
+}
+
+export const AppTopBar = ({pageTitle}: Props) => {
   const theme = useTheme();
   const [selectedLng, setSelectedLng] = useState('');
   const {signout} = useAuth();
@@ -38,6 +43,28 @@ export const AppTopBar = () => {
     queryClient.resetQueries();
   };
 
+  const profileBtnLabel = () => (
+    <Box ml={2}>
+      <Typography
+        color="#222B45"
+        variant="subtitle1"
+        gutterBottom={false}
+        sx={{textTransform: 'capitalize'}}>
+        {fullName}
+      </Typography>
+      <Typography
+        variant="subtitle2"
+        sx={{
+          textTransform: 'capitalize',
+          fontSize: '0.875rem',
+          padding: 0,
+          color: theme.palette.text.secondary,
+        }}>
+        {user?.userAccount.roles[0].split('_').join(' ').toLowerCase()}
+      </Typography>
+    </Box>
+  );
+
   return (
     // <Box
     //   sx={{
@@ -50,11 +77,15 @@ export const AppTopBar = () => {
     <Box
       sx={{
         display: 'flex',
-        justifyContent: 'flex-end',
       }}>
-      {/* <Logo width={155.22} height={32} /> */}
-
-      <Box justifyContent="flex-end">
+      <Box width="4.5rem" />
+      <Box sx={{display: 'flex', justifyContent: 'space-between', flexGrow: 1}}>
+        <Typography
+          variant="h3"
+          component="div"
+          sx={{display: 'flex', alignItems: 'center', mt: '0.2em'}}>
+          {pageTitle || null}
+        </Typography>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" mt={1} alignItems="center">
             <MenuBtn
@@ -89,25 +120,22 @@ export const AppTopBar = () => {
 
           <Box ml={8} display="flex" alignItems="center">
             <Avatar alt={fullName} src={user?.userAccount.photoUrl} />
-            <Box ml={2}>
-              <Typography
-                color="#222B45"
-                variant="subtitle1"
-                gutterBottom={false}
-                sx={{textTransform: 'capitalize'}}>
-                {fullName}
-              </Typography>
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  textTransform: 'capitalize',
-                  fontSize: '0.875rem',
-                  padding: 0,
-                  color: theme.palette.text.secondary,
-                }}>
-                {user?.userAccount.roles[0].split('_').join(' ').toLowerCase()}
-              </Typography>
-            </Box>
+            <MenuBtn
+              endIcon={
+                <ArrowDropDownIcon sx={{color: theme.palette.action.active}} />
+              }
+              label={profileBtnLabel()}
+              menu={[
+                {
+                  label: 'English',
+                  action: () => changeLanguage('en-US', 'EN'),
+                },
+                {
+                  label: 'Deutsch',
+                  action: () => changeLanguage('de-DE', 'DE'),
+                },
+              ]}
+            />
           </Box>
           {/* </Link> */}
 

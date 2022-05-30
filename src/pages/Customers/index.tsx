@@ -64,10 +64,8 @@ export const Customer = () => {
   }, [queryParams]);
 
   useEffect(() => {
-    if (customersWithUnits) {
+    if (customersWithUnits.length) {
       setRows(makeRows(customersWithUnits));
-    } else {
-      setRows([]);
     }
   }, [customersWithUnits]);
 

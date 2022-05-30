@@ -6,12 +6,13 @@ import {MenuBtnProps} from 'models/misc';
 import {MouseEvent, useState} from 'react';
 
 interface Props extends ButtonProps {
-  label: string;
+  label: string | JSX.Element;
   menu: MenuBtnProps[];
-  startIcon: JSX.Element;
+  startIcon?: JSX.Element;
+  endIcon?: JSX.Element;
 }
 
-export const MenuBtn = ({label, menu, startIcon, ...rest}: Props) => {
+export const MenuBtn = ({label, menu, startIcon, endIcon, ...rest}: Props) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -23,7 +24,11 @@ export const MenuBtn = ({label, menu, startIcon, ...rest}: Props) => {
 
   return (
     <Box>
-      <Button startIcon={startIcon} onClick={handleClick} {...rest}>
+      <Button
+        startIcon={startIcon}
+        endIcon={endIcon}
+        onClick={handleClick}
+        {...rest}>
         {label}
       </Button>
       <Menu

@@ -16,8 +16,8 @@ import {Button} from './Button';
 
 interface Props {
   searchPlaceholder?: string;
-  openMapView?: () => void;
-  closeMapView?: () => void;
+  // openMapView?: () => void;
+  // closeMapView?: () => void;
   showFilter?: boolean;
   setShowFilter?: (state: boolean) => void;
   hideViewOption?: boolean;
@@ -35,8 +35,8 @@ interface Props {
 
 export const Widget = ({
   searchPlaceholder,
-  openMapView,
-  closeMapView,
+  // openMapView,
+  // closeMapView,
   showFilter,
   setShowFilter = () => {},
   hideViewOption = false,
@@ -55,7 +55,7 @@ export const Widget = ({
   const [view, setView] = useState('list');
 
   return (
-    <Box display="flex" sx={{...containerStyles}}>
+    <Box display="flex" sx={{height: '2.5rem', ...containerStyles}}>
       {/* {!hideFilter ? (
         <Button
           buttonProps={{
@@ -77,10 +77,9 @@ export const Widget = ({
           </Typography>
         </Button>
       ) : null} */}
-      {filterItems || null}
 
       {!hideSearchInput ? (
-        <Box ml="0.8em">
+        <Box>
           <SearchInput
             containerStyle={{height: '100%'}}
             placeholder={searchPlaceholder}
@@ -90,7 +89,8 @@ export const Widget = ({
           />
         </Box>
       ) : null}
-      {!hideViewOption ? (
+      {filterItems || null}
+      {/* {!hideViewOption ? (
         <ToggleButtonGroup
           color="secondary"
           value={view}
@@ -119,7 +119,7 @@ export const Widget = ({
             <GridViewIcon />
           </ToggleButton>
         </ToggleButtonGroup>
-      ) : null}
+      ) : null} */}
 
       {showActionBtn ? (
         <Button
