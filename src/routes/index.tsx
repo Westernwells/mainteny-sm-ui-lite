@@ -10,6 +10,7 @@ import {Customer} from 'pages/Customers';
 import {ContractDetails} from 'pages/ContractDetails';
 import {CustomerDetails} from 'pages/CustomerDetails';
 import {Invoices} from 'pages/Invoices';
+import {NewInvoice} from 'pages/InvoiceDetails/NewInvoice';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
 import {Employees} from 'pages/Employee';
 import {EmployeeDetails} from 'pages/EmployeeDetails';
@@ -138,6 +139,21 @@ export const Router = () => {
             </>
           }
         />
+
+        <Route
+          path="/invoices/new"
+          element={
+            <>
+              <Helmet>
+                <title>{`New Invoice - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout>
+                <NewInvoice />
+              </PageLayout>
+            </>
+          }
+        />
+
         <Route
           path="/invoices/details/:id"
           element={

@@ -11,7 +11,7 @@ import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
 } from 'utils/utils';
-import {useSearchParams} from 'react-router-dom';
+import {useSearchParams, useNavigate} from 'react-router-dom';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {columns, makeRows} from './InvoicesDataGridProps';
@@ -21,6 +21,7 @@ import {Widget} from '../../components/Widget';
 const pageSize = 25;
 
 export const Invoices = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [queryParams, setQueryParams] = useSearchParams();
@@ -42,7 +43,7 @@ export const Invoices = () => {
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: search,
-      status: [InvoiceStatus.PAID, InvoiceStatus.NOT_PAID],
+      status: [],
     },
     {amount: amount[0], status, serviceType},
     {keepPreviousData: true},
@@ -171,6 +172,7 @@ export const Invoices = () => {
           height: '100%',
           mb: '10em',
         }}
+        btnAction={() => navigate('/invoices/new')}
       />
     );
   }

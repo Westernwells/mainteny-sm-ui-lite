@@ -198,6 +198,18 @@ export interface Amount {
   vat: number;
 }
 
+export interface AmountRecord {
+  currency: string;
+  netAmount: number;
+  percentageVat: number;
+}
+
+export interface PaymentInfo {
+  accountNumber: string;
+  bic: string;
+  iban: string;
+}
+
 export enum PdfGenerationStatus {
   DONE = 'DONE',
   ERROR = 'ERROR',
