@@ -6,12 +6,12 @@ import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 
 const tabItems = [
   {
-    label: 'Packages',
-    icon: <AutoAwesomeMosaicIcon />,
-  },
-  {
     label: 'Articles',
     icon: <HomeRepairServiceIcon />,
+  },
+  {
+    label: 'Packages',
+    icon: <AutoAwesomeMosaicIcon />,
   },
 ];
 
@@ -20,13 +20,13 @@ export const Articles = () => {
 
   return (
     <Tabs
-      // hideBackIcon
+      showActionBtn
+      btnLabel={tabValue === 0 ? 'New article' : 'New package'}
       tabItems={tabItems}
       currentIndex={tabValue}
       onChange={(index) => {
         setTabValue(index);
-      }}
-      pageTitle="Articles & Packages">
+      }}>
       <TabsBody value={tabValue} index={0}>
         {null}
       </TabsBody>
