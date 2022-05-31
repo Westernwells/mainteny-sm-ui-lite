@@ -95,7 +95,6 @@ export const Quotations = () => {
         <Widget
           searchPlaceholder="Try 'QT100100'"
           getSearchValue={(val: string) => setSearch(val)}
-          showFilter
           showActionBtn
           btnLabel="New Quotation"
           btnOnClick={() => navigate('new')}

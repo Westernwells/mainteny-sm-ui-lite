@@ -69,14 +69,6 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-// const DrawerHeader = styled('div')(({theme}) => ({
-//   display: 'flex',
-// justifyContent: 'flex-end',
-// marginLeft: theme.spacing(4),
-//   // necessary for content to be below app bar
-//   ...theme.mixins.toolbar,
-// }));
-
 export const AppDrawer = () => {
   const [open, setOpen] = useState(false);
   const themeX = useTheme();

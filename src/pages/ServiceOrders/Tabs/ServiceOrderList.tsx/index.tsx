@@ -143,7 +143,6 @@ export const ServiceOrderList = () => {
       <Widget
         searchPlaceholder="Search order type, customer, address"
         getSearchValue={(search) => setSearchQuery(search)}
-        hideViewOption
         filterItems={renderFilterItems()}
       />
     </Box>

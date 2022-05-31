@@ -131,7 +131,6 @@ export const ContractsTab = ({customerId}: Props) => {
       <Widget
         searchPlaceholder="Try 'Astralift BV'"
         getSearchValue={(search) => setSearchQuery(search)}
-        hideViewOption
         filterItems={renderFilterItems()}
       />
     </Box>

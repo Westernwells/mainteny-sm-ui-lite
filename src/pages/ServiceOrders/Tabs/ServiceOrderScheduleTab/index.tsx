@@ -97,7 +97,6 @@ export const ServiceOrderScheduleTab = () => {
     <Widget
       filterItems={renderFilterItems()}
       btnLabel="New Order"
-      hideViewOption
       hideSearchInput
     />
   );

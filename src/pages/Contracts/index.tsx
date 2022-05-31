@@ -149,7 +149,6 @@ export const Contracts = () => {
         <Widget
           searchPlaceholder="Try 'Astralift BV'"
           getSearchValue={(val: string) => setSearch(val)}
-          showFilter
           filterItems={renderFilterItems()}
         />
       }>

@@ -1,11 +1,9 @@
-/* eslint-disable */
 import {ReactNode} from 'react';
 import Box from '@mui/material/Box';
 import MuiTabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
-import {BackAction} from './BackAction';
 import {MenuBtnProps} from 'models/misc';
 import AddIcon from '@mui/icons-material/Add';
 import Divider from '@mui/material/Divider';
@@ -47,22 +45,16 @@ const a11yProps = (index: number) => ({
 export const Tabs = ({
   children,
   tabItems,
-  renderWidget = null,
   onChange = () => {},
   currentIndex = 0,
   tabStyle,
   showActionBtn = false,
   btnLabel = '',
   btnOnClick,
-  containerStyles,
   showMenuActionBtn,
   menu,
   actionButtonIcon,
   actionBtnVariant,
-  backBtnLabel,
-  hideBackIcon,
-  pageTitle,
-  hideDivider,
 }: Props) => {
   const theme = useTheme();
 
@@ -203,7 +195,6 @@ export const Tabs = ({
         {renderActionButtons()}
       </Box>
       <Divider light sx={{mt: '-0.5em', mb: '1em'}} />
-      {renderWidget}
 
       <Box
         sx={{

@@ -81,7 +81,6 @@ export const UnitsTab = ({customerId}: Props) => {
       <Widget
         searchPlaceholder="Search company name, unit model"
         getSearchValue={(search) => setSearchQuery(search)}
-        hideViewOption
         filterItems={renderFilterItems()}
       />
     </Box>

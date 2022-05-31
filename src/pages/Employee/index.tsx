@@ -109,7 +109,6 @@ export const Employees = () => {
         <Widget
           searchPlaceholder="Search name, role, address, phone"
           getSearchValue={(val: string) => setSearch(val)}
-          showFilter
           showActionBtn
           btnLabel="New employee"
         />

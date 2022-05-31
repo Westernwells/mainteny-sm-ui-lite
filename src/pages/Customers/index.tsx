@@ -96,9 +96,6 @@ export const Customer = () => {
         <Widget
           searchPlaceholder="Try 'Astralift BV'"
           getSearchValue={(val: string) => setSearch(val)}
-          showFilter
-          hideViewOption
-          hideFilter
         />
       }>
       <DataGridLayout

@@ -189,7 +189,6 @@ export const Invoices = () => {
         <Widget
           searchPlaceholder="Try 'INV000001'"
           getSearchValue={(val: string) => setSearch(val)}
-          showFilter
           showActionBtn
           btnLabel="New invoice"
           filterItems={renderFilterItems()}

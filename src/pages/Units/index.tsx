@@ -227,7 +227,6 @@ export const MyUnits = () => {
             getSearchValue={(val: string) => {
               setSearch(val);
             }}
-            showFilter
             filterItems={renderFilterItems()}
           />
 

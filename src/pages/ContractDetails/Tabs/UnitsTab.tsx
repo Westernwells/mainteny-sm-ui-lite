@@ -36,7 +36,6 @@ export const UnitsTab = () => {
             searchPlaceholder="Search order type, customer, address"
             getSearchValue={(val: string) => setSearch(val)}
             filterItems={null}
-            hideViewOption
           />
         </Box>
       </Box>
