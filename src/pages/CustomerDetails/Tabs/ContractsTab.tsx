@@ -16,25 +16,19 @@ import Box from '@mui/material/Box';
 import {costRangeConvertor as crConverter} from 'utils/contract-utils';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {EmptySection} from 'components/EmptySection';
+import {Widget} from 'components/Widget';
 import {columns, makeRows} from './CustomerContractDataGrid';
 
 interface Props {
   customerId?: string;
-  searchQuery: string;
-  showFilter?: boolean;
-  setShowFilter?: (val: boolean) => void;
 }
 
-export const ContractsTab = ({
-  customerId,
-  searchQuery,
-  showFilter,
-  setShowFilter = () => {},
-}: Props) => {
+export const ContractsTab = ({customerId}: Props) => {
   const [page, setPage] = useState(makePage(0, 10));
   const totalContractsRef = useRef(0);
   const [expiryDate, setExpiryDate] = useState<string[]>([]);
   const [contractor, setContractor] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [cost, setCost] = useState<number[][]>([]);
   const [pageCount, setPageCount] = useState(0);
   const [contractorFilterItems, setContractorFilterItems] = useState<string[]>(
@@ -61,10 +55,11 @@ export const ContractsTab = ({
 
   const {data: contractWithUnits} = useContractElevatorCount(
     contractResource.data,
-    {keepPreviousData: true},
+    // {keepPreviousData: true},
   );
 
-  totalContractsRef.current = contractResource.total;
+  totalContractsRef.current =
+    totalContractsRef.current || contractResource.total;
 
   useEffect(() => {
     const options: string[] = [];
@@ -84,12 +79,7 @@ export const ContractsTab = ({
       setRows([]);
     }
     setContractorFilterItems([...contractorFilterItems, ...options]);
-    if (!showFilter) {
-      setExpiryDate([]);
-      setContractor([]);
-      setCost([]);
-    }
-  }, [contractWithUnits, showFilter]);
+  }, [contractWithUnits]);
 
   useEffect(() => {
     setPageCount(Math.ceil(contractResource.total / page.pageSize));
@@ -100,22 +90,8 @@ export const ContractsTab = ({
     setCost(range);
   };
 
-  if (isFetched && !totalContractsRef.current) {
-    return (
-      <EmptySection
-        label="No contracts yet. Create a new one to view here"
-        showActionBtn
-        btnLabel="Add Contract"
-        containerStyle={{
-          height: '100%',
-          mb: '10em',
-        }}
-      />
-    );
-  }
-
   const renderFilterItems = () => (
-    <FilterFields showFilter={showFilter} setShowFilter={setShowFilter}>
+    <FilterFields>
       <MultipleSelectCheckmarks
         label="Expiry Date"
         options={[
@@ -142,18 +118,41 @@ export const ContractsTab = ({
           '3000 - 5000 €',
           'Above 5000 €',
         ]}
-        getSelectedValue={(item) => costRangeConvertor(item)}
+        getSelectedValue={(item) => {
+          costRangeConvertor(item);
+        }}
         multiple={false}
       />
     </FilterFields>
   );
 
+  const renderWidget = () => (
+    <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+      <Widget
+        searchPlaceholder="Try 'Astralift BV'"
+        getSearchValue={(search) => setSearchQuery(search)}
+        filterItems={renderFilterItems()}
+      />
+    </Box>
+  );
+
+  if (isFetched && !totalContractsRef.current) {
+    return (
+      <EmptySection
+        label="No contracts yet. Create a new one to view here"
+        showActionBtn
+        btnLabel="Add Contract"
+        containerStyle={{
+          height: '100%',
+          mb: '10em',
+        }}
+      />
+    );
+  }
+
   return (
     <TabContentContainer>
-      <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-        {renderFilterItems()}
-      </Box>
-
+      {renderWidget()}
       {isLoading ? (
         <Progress />
       ) : (

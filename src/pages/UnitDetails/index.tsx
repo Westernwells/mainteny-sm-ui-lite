@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useLayoutEffect, useState} from 'react';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import EngineeringOutlinedIcon from '@mui/icons-material/EngineeringOutlined';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
@@ -8,6 +8,10 @@ import {Tabs} from 'components/Tab';
 import {EmptySection} from 'components/EmptySection';
 import {OverviewTab} from './Tabs/OverviewTab';
 import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
+
+interface Props {
+  getCurrentPageTitle?: (title: string) => void;
+}
 
 const tabItems = [
   {
@@ -24,16 +28,21 @@ const tabItems = [
   },
 ];
 
-export const UnitsDetail = () => {
+export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
   const [value, setValue] = useState(0);
   const [unitName, setUnitName] = useState('');
+
+  useLayoutEffect(() => {
+    if (getCurrentPageTitle) {
+      getCurrentPageTitle(unitName);
+    }
+  }, [unitName]);
 
   return (
     <Tabs
       tabItems={tabItems}
       currentIndex={value}
-      onChange={(index) => setValue(index)}
-      backBtnLabel={unitName}>
+      onChange={(index) => setValue(index)}>
       <TabsBody value={value} index={0}>
         <OverviewTab
           getServiceHistoryTabIndex={(tabIndex: number) => setValue(tabIndex)}

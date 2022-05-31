@@ -42,12 +42,7 @@ export const CustomerDetailsWidgets = ({containerStyle}: Props) => {
         </Box>
       </Box>
       <Box mt={3}>
-        <Widget
-          hideViewOption
-          searchPlaceholder="Try 'Astralift BV'"
-          setShowFilter={() => {}}
-          showFilter={false}
-        />
+        <Widget searchPlaceholder="Try 'Astralift BV'" />
       </Box>
     </Box>
   );

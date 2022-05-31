@@ -14,7 +14,6 @@ import {createEmptyResource, makePage} from 'utils/paging-utils';
 export const UnitsTab = () => {
   const [search, setSearch] = useState('');
   const [page] = useState(makePage(0, 25)); // TODO: implement paging
-  const [showFilter, setShowFilter] = useState(false);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const {data: elevator = createEmptyResource<ElevatorView>(10)} =
     useAllElevators(search, page, {
@@ -31,14 +30,12 @@ export const UnitsTab = () => {
 
   return (
     <>
-      <Box display="flex" justifyContent="end" maxWidth="100%" sx={{mt: '1em'}}>
-        <Box>
+      <Box display="flex" justifyContent="end" maxWidth="100%">
+        <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
           <Widget
-            searchPlaceholder="Try ‘Schindler’ or ‘Mitsubishi’"
+            searchPlaceholder="Search order type, customer, address"
             getSearchValue={(val: string) => setSearch(val)}
-            setShowFilter={setShowFilter}
-            showFilter={showFilter}
-            hideViewOption
+            filterItems={null}
           />
         </Box>
       </Box>

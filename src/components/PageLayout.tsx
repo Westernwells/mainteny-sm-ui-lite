@@ -1,13 +1,16 @@
 import Box from '@mui/material/Box';
-import {ReactElement} from 'react';
+import {ReactNode} from 'react';
 import {AppDrawer} from './AppDrawer';
 import {AppTopBar} from './AppTopBar';
 
 interface Props {
-  children: ReactElement;
+  children: ReactNode;
   excludeSidebar?: boolean;
   excludeDefaultSpacing?: boolean;
   pageScrollable?: boolean;
+  pageTitle?: string;
+  showBackAction?: boolean;
+  backBtnLabel?: string;
 }
 
 export const PageLayout = ({
@@ -15,6 +18,9 @@ export const PageLayout = ({
   excludeSidebar,
   excludeDefaultSpacing,
   pageScrollable,
+  pageTitle,
+  showBackAction,
+  backBtnLabel,
 }: Props) => (
   <Box
     sx={{
@@ -25,19 +31,19 @@ export const PageLayout = ({
         ? {minHeight: '100vh', overflowY: 'scroll'}
         : {height: '98vh', overflowY: 'hidden'}),
     }}>
-    <Box>
-      <AppTopBar />
+    <Box sx={{mx: '2.2em', my: '0.5em'}}>
+      <AppTopBar
+        pageTitle={pageTitle}
+        showBackAction={showBackAction}
+        backBtnLabel={backBtnLabel}
+      />
     </Box>
     <Box sx={{display: 'flex', flexGrow: 1, width: '100%'}}>
-      {!excludeSidebar ? (
-        <Box>
-          <AppDrawer />
-        </Box>
-      ) : null}
+      {!excludeSidebar ? <AppDrawer /> : null}
       <Box width="4.5rem" />
       <Box
         sx={{
-          pt: !excludeDefaultSpacing ? 12 : null,
+          pt: '1em',
           mx: !excludeDefaultSpacing ? '2.2em' : null,
         }}
         display="flex"

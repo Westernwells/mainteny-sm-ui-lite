@@ -23,24 +23,15 @@ import {
   serviceOrderStatusToEnum,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
+import {Widget} from 'components/Widget';
 import {columns, makeRows} from './ServiceOrderDataGridProps';
 
-interface Props {
-  showFilter?: boolean;
-  setShowFilter?: (val: boolean) => void;
-  searchQuery: string;
-}
-
-export const ServiceOrderList = ({
-  showFilter = false,
-  setShowFilter = () => {},
-  searchQuery,
-}: Props) => {
+export const ServiceOrderList = () => {
   const [page, setPage] = useState(makePage(0, 25));
-  // const [search, setSearch] = useState('');
   const [queryParams, setQueryParams] = useSearchParams();
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrderStatus, setSelectedOrderStatus] = useState<
     ServiceOrderStatus[]
   >([]);
@@ -120,7 +111,7 @@ export const ServiceOrderList = ({
   };
 
   const renderFilterItems = () => (
-    <FilterFields showFilter={showFilter} setShowFilter={setShowFilter}>
+    <FilterFields hideClear showFilter>
       <MultipleSelectCheckmarks
         label="Status"
         options={renderServiceOrderStatusList()}
@@ -145,15 +136,23 @@ export const ServiceOrderList = ({
     </FilterFields>
   );
 
+  const renderWidget = () => (
+    <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+      <Widget
+        searchPlaceholder="Search order type, customer, address"
+        getSearchValue={(search) => setSearchQuery(search)}
+        filterItems={renderFilterItems()}
+      />
+    </Box>
+  );
+
   if (isIdle || isLoading) {
     return <Progress />;
   }
 
   return (
     <Box sx={{flexGrow: 1, display: 'flex', flexDirection: 'column'}}>
-      <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-        {renderFilterItems()}
-      </Box>
+      {renderWidget()}
 
       <DataGridLayout
         hideFooter={pageCount <= 1}

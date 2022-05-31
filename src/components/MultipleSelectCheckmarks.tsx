@@ -25,6 +25,8 @@ interface Props {
   getSelectedValue?: (item: string[]) => void;
   label: string;
   multiple?: boolean;
+  containerStyles?: {[key: string]: any};
+  formControlStyles?: {[key: string]: any};
 }
 
 export const MultipleSelectCheckmarks = ({
@@ -32,6 +34,8 @@ export const MultipleSelectCheckmarks = ({
   getSelectedValue,
   label,
   multiple = true,
+  containerStyles,
+  formControlStyles,
 }: Props) => {
   const theme = useTheme();
   const [selectedItems, setSelectedItems] = React.useState<string[]>([]);
@@ -56,8 +60,10 @@ export const MultipleSelectCheckmarks = ({
     }
   }, [selectedItems]);
   return (
-    <Box mb={3}>
-      <FormControl size="small" sx={{mr: '0.5em', width: '13.75rem'}}>
+    <Box sx={{...containerStyles}}>
+      <FormControl
+        size="small"
+        sx={{mr: '0.5em', width: '8.5rem', ...formControlStyles}}>
         <InputLabel id={label}>{label}</InputLabel>
         <Select
           id={label}

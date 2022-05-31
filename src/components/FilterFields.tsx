@@ -6,7 +6,7 @@ import useTheme from '@mui/material/styles/useTheme';
 interface Props {
   children: ReactNode;
   containerStyle?: {[key: string]: string | number};
-  setShowFilter: (val: boolean) => void;
+  setShowFilter?: (val: boolean) => void;
   showFilter?: boolean;
   hideClear?: boolean;
 }
@@ -14,7 +14,7 @@ interface Props {
 export const FilterFields = ({
   children,
   containerStyle,
-  setShowFilter,
+  setShowFilter = () => {},
   hideClear,
   showFilter = true,
 }: Props) => {

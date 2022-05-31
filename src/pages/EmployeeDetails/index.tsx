@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useLayoutEffect, useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
@@ -11,6 +11,10 @@ import {Role} from 'models/user';
 import {EmployeesView} from 'models/employee';
 import {EmployeeOverview} from './Tabs/EmployeeOverview';
 import {ScheduleTab} from './Tabs/ScheduleTab';
+
+interface Props {
+  getCurrentPageTitle?: (title: string) => void;
+}
 
 const tabItems = [
   {
@@ -27,7 +31,7 @@ const tabItems = [
   },
 ];
 
-export const EmployeeDetails = () => {
+export const EmployeeDetails = ({getCurrentPageTitle}: Props) => {
   const [tabValue, setTabValue] = useState(0);
   const {id: username} = useParams();
   const {data: userAccount, isLoading} = useGetUserAccount(username);
@@ -37,6 +41,14 @@ export const EmployeeDetails = () => {
       ? userAccount.username
       : null,
   );
+
+  useLayoutEffect(() => {
+    if (getCurrentPageTitle && employee) {
+      getCurrentPageTitle(
+        `${employee?.userAccount.firstName} ${employee?.userAccount.lastName}`,
+      );
+    }
+  }, [employee]);
 
   useEffect(() => {
     let userData: EmployeesView | undefined;
@@ -57,14 +69,7 @@ export const EmployeeDetails = () => {
     <Tabs
       tabItems={tabItems}
       currentIndex={tabValue}
-      onChange={(index) => setTabValue(index)}
-      backBtnLabel={
-        employee
-          ? `${employee?.userAccount.firstName} 
-              
-              ${employee?.userAccount.lastName}`
-          : ''
-      }>
+      onChange={(index) => setTabValue(index)}>
       <TabsBody value={tabValue} index={0}>
         <EmployeeOverview employee={employee} isLoading={isLoading} />
       </TabsBody>

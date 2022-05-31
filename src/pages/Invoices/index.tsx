@@ -1,7 +1,4 @@
 import {useEffect, useRef, useState} from 'react';
-import {useNavigate} from 'react-router';
-import Box from '@mui/material/Box';
-import Fade from '@mui/material/Fade';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
@@ -9,7 +6,7 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {ServiceOrderType} from 'models/service-order';
 import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
 import {useInvoices} from 'hooks/reactQuery/useInvoice';
-import {PageOverviewLayout} from 'components/PageOverviewLayout';
+import {PageListingLayout} from 'components/PageListingLayout';
 import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
@@ -24,12 +21,10 @@ import {Widget} from '../../components/Widget';
 const pageSize = 25;
 
 export const Invoices = () => {
-  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [queryParams, setQueryParams] = useSearchParams();
   const totalInvoiceRef = useRef(0);
-  const [showFilter, setShowFilter] = useState(false);
   const [amount, setAmount] = useState<number[][]>([]);
   const [status, setStatus] = useState<InvoiceStatus>();
   const [serviceType, setServiceType] = useState<ServiceOrderType[]>([]);
@@ -72,14 +67,6 @@ export const Invoices = () => {
   }, [invoiceResource]);
 
   useEffect(() => {
-    if (!showFilter) {
-      setAmount([]);
-      setStatus(undefined);
-      setServiceType([]);
-    }
-  }, [showFilter]);
-
-  useEffect(() => {
     setPageCount(Math.ceil(invoiceResource.total / page.pageSize));
   }, [invoiceResource, pageSize]);
 
@@ -114,6 +101,66 @@ export const Invoices = () => {
     return <Progress />;
   }
 
+  const renderFilterItems = () => (
+    <FilterFields>
+      <MultipleSelectCheckmarks
+        label="Invoice Date"
+        options={['This Week', 'Last Week', 'Last Month']}
+        getSelectedValue={(item) => console.log(item)}
+        multiple={false}
+      />
+      <MultipleSelectCheckmarks
+        label="Total Amount"
+        options={[
+          'Below 1000 EUR',
+          '1000 - 3000 EUR',
+          '3000 - 5000 EUR',
+          'Above 5000 EUR',
+        ]}
+        getSelectedValue={(item) => amountRangeConvertor(item)}
+        multiple={false}
+      />
+      <MultipleSelectCheckmarks
+        label="Status"
+        options={Object.values(InvoiceStatusView).map((value) => value)}
+        getSelectedValue={(items: string[]) =>
+          items.length
+            ? items[0] === 'Paid'
+              ? setStatus(InvoiceStatus.PAID)
+              : setStatus(InvoiceStatus.NOT_PAID)
+            : setStatus(undefined)
+        }
+        multiple={false}
+      />
+      <MultipleSelectCheckmarks
+        label="Service Type"
+        options={['Maintenance', 'Repair', 'Callout', 'Emergency']}
+        getSelectedValue={(items) => {
+          const value: ServiceOrderType[] = [];
+          items.forEach((item) => {
+            switch (item) {
+              case 'Maintenance':
+                value.push(ServiceOrderType.REGULAR);
+                break;
+              case 'Repair':
+                value.push(ServiceOrderType.REPAIR);
+                break;
+              case 'Callout':
+                value.push(ServiceOrderType.CALLOUT);
+                break;
+              case 'Emergency':
+                value.push(ServiceOrderType.EMERGENCY);
+                break;
+              default:
+                break;
+            }
+          });
+          setServiceType(value);
+        }}
+      />
+    </FilterFields>
+  );
+
   if (isFetched && !totalInvoiceRef.current) {
     return (
       <EmptySection
@@ -129,82 +176,16 @@ export const Invoices = () => {
   }
 
   return (
-    <PageOverviewLayout
-      label="Invoices"
+    <PageListingLayout
       renderWidget={
         <Widget
           searchPlaceholder="Try 'INV000001'"
           getSearchValue={(val: string) => setSearch(val)}
-          setShowFilter={setShowFilter}
-          showFilter={showFilter}
           showActionBtn
-          btnLabel="New Invoice"
-          btnOnClick={() => navigate('new')}
-          hideViewOption
+          btnLabel="New invoice"
+          filterItems={renderFilterItems()}
         />
       }>
-      <Fade in={showFilter} unmountOnExit>
-        <Box>
-          <FilterFields setShowFilter={setShowFilter}>
-            <MultipleSelectCheckmarks
-              label="Invoice Date"
-              options={['This Week', 'Last Week', 'Last Month']}
-              getSelectedValue={(item) => console.log(item)}
-              multiple={false}
-            />
-            <MultipleSelectCheckmarks
-              label="Total Amount"
-              options={[
-                'Below 1000 EUR',
-                '1000 - 3000 EUR',
-                '3000 - 5000 EUR',
-                'Above 5000 EUR',
-              ]}
-              getSelectedValue={(item) => amountRangeConvertor(item)}
-              multiple={false}
-            />
-            <MultipleSelectCheckmarks
-              label="Status"
-              options={Object.values(InvoiceStatusView).map((value) => value)}
-              getSelectedValue={(items: string[]) =>
-                items.length
-                  ? items[0] === 'Paid'
-                    ? setStatus(InvoiceStatus.PAID)
-                    : setStatus(InvoiceStatus.NOT_PAID)
-                  : setStatus(undefined)
-              }
-              multiple={false}
-            />
-            <MultipleSelectCheckmarks
-              label="Service Type"
-              options={['Maintenance', 'Repair', 'Callout', 'Emergency']}
-              getSelectedValue={(items) => {
-                const value: ServiceOrderType[] = [];
-                items.forEach((item) => {
-                  switch (item) {
-                    case 'Maintenance':
-                      value.push(ServiceOrderType.REGULAR);
-                      break;
-                    case 'Repair':
-                      value.push(ServiceOrderType.REPAIR);
-                      break;
-                    case 'Callout':
-                      value.push(ServiceOrderType.CALLOUT);
-                      break;
-                    case 'Emergency':
-                      value.push(ServiceOrderType.EMERGENCY);
-                      break;
-                    default:
-                      break;
-                  }
-                });
-                setServiceType(value);
-              }}
-            />
-          </FilterFields>
-        </Box>
-      </Fade>
-
       <DataGridLayout
         rows={rows}
         columns={columns}
@@ -221,6 +202,6 @@ export const Invoices = () => {
         pageCount={pageCount}
         totalRows={invoiceResource?.total}
       />
-    </PageOverviewLayout>
+    </PageListingLayout>
   );
 };

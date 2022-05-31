@@ -21,19 +21,12 @@ import {Switch} from 'components/Switch';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicator';
+import {Widget} from 'components/Widget';
 import {sortOrderByTime} from 'utils/service-order-utils';
 import Typography from '@mui/material/Typography';
 import {UnAssignedServiceOrders} from './UnAssigedServiceOrder';
 
-interface Props {
-  showFilter?: boolean;
-  setShowFilter?: (val: boolean) => void;
-}
-
-export const ServiceOrderScheduleTab = ({
-  showFilter = false,
-  setShowFilter = () => {},
-}: Props) => {
+export const ServiceOrderScheduleTab = () => {
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();
   const [technicianSearch, setTechnicianSearch] = useState('');
   const [orders, setOrders] = useState<{[key: string]: ServiceOrderView[]}>({});
@@ -80,10 +73,7 @@ export const ServiceOrderScheduleTab = ({
   };
 
   const renderFilterItems = () => (
-    <FilterFields
-      showFilter={showFilter}
-      setShowFilter={setShowFilter}
-      hideClear>
+    <FilterFields hideClear>
       <MultipleSelectCheckmarks
         label="Status"
         options={Object.values(ServiceOrderStatus).map((option) =>
@@ -101,6 +91,14 @@ export const ServiceOrderScheduleTab = ({
         multiple
       />
     </FilterFields>
+  );
+
+  const renderWidget = () => (
+    <Widget
+      filterItems={renderFilterItems()}
+      btnLabel="New Order"
+      hideSearchInput
+    />
   );
 
   const renderControls = () => (
@@ -128,9 +126,9 @@ export const ServiceOrderScheduleTab = ({
   return (
     <Box sx={{flexGrow: 1, display: 'flex', flexDirection: 'column'}}>
       <Box sx={{display: 'flex', justifyContent: 'space-between', mb: '0.5em'}}>
-        <Box>{renderControls()}</Box>
+        <Box sx={{mr: '0.8em'}}>{renderControls()}</Box>
+        {renderWidget()}
         <Box sx={{display: 'flex', justifyContent: 'flex-end', flexGrow: 1}}>
-          {renderFilterItems()}
           <Switch
             getValue={(value) => setSwitchActive(value)}
             label="Show Unassigned Orders"

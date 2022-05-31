@@ -11,26 +11,20 @@ import {GridRowsProp} from '@mui/x-data-grid';
 import {TabContentContainer} from 'components/TabContentContainer';
 import {EmptySection} from 'components/EmptySection';
 import {ElevatorView} from 'models/elevator';
+import {Widget} from 'components/Widget';
 import {useQueryCustomerElevator} from 'hooks/reactQuery/useElevator';
 import {columns, makeRows} from './CustomerUnitDataGrid';
 
 interface Props {
   customerId?: string;
-  searchQuery: string;
-  showFilter?: boolean;
-  setShowFilter?: (val: boolean) => void;
 }
 
-export const UnitsTab = ({
-  customerId,
-  searchQuery,
-  showFilter,
-  setShowFilter = () => {},
-}: Props) => {
+export const UnitsTab = ({customerId}: Props) => {
   const [page, setPage] = useState(makePage(0, 25));
   // const [search, setSearch] = useState('');
   const totalUnitsRef = useRef(0);
   const [status, setStatus] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const {
@@ -56,10 +50,7 @@ export const UnitsTab = ({
 
   useEffect(() => {
     setRows(makeRows(elevatorResource));
-    if (!showFilter) {
-      setStatus([]);
-    }
-  }, [elevatorResource, showFilter]);
+  }, [elevatorResource]);
 
   if (isFetched && !totalUnitsRef.current) {
     return (
@@ -76,7 +67,7 @@ export const UnitsTab = ({
   }
 
   const renderFilterItems = () => (
-    <FilterFields showFilter={showFilter} setShowFilter={setShowFilter}>
+    <FilterFields hideClear showFilter>
       <MultipleSelectCheckmarks
         label="Status"
         options={['RUNNING', 'STOPPED']}
@@ -85,11 +76,19 @@ export const UnitsTab = ({
     </FilterFields>
   );
 
+  const renderWidget = () => (
+    <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+      <Widget
+        searchPlaceholder="Search company name, unit model"
+        getSearchValue={(search) => setSearchQuery(search)}
+        filterItems={renderFilterItems()}
+      />
+    </Box>
+  );
+
   return (
     <TabContentContainer>
-      <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-        {renderFilterItems()}
-      </Box>
+      {renderWidget()}
       {isLoading ? (
         <Progress />
       ) : (

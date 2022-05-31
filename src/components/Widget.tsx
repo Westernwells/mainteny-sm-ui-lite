@@ -1,13 +1,7 @@
-import {useState} from 'react';
+import {ReactNode} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import useTheme from '@mui/material/styles/useTheme';
 import AddIcon from '@mui/icons-material/Add';
-import ToggleButton from '@mui/material/ToggleButton';
-import ViewListIcon from '@mui/icons-material/ViewList';
-import GridViewIcon from '@mui/icons-material/GridView';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import {MenuBtnProps} from 'models/misc';
 import {SearchInput} from './SearchInput';
 import {MenuBtn} from './MenuBtn';
@@ -15,13 +9,7 @@ import {Button} from './Button';
 
 interface Props {
   searchPlaceholder?: string;
-  openMapView?: () => void;
-  closeMapView?: () => void;
-  showFilter?: boolean;
-  setShowFilter?: (state: boolean) => void;
-  hideViewOption?: boolean;
   hideSearchInput?: boolean;
-  hideFilter?: boolean;
   getSearchValue?: (val: string) => void;
   showActionBtn?: boolean;
   showMenuActionBtn?: Boolean;
@@ -29,16 +17,11 @@ interface Props {
   btnOnClick?: () => void;
   containerStyles?: {[key: string]: string | number};
   menu?: MenuBtnProps[];
+  filterItems?: ReactNode;
 }
 
 export const Widget = ({
   searchPlaceholder,
-  openMapView,
-  closeMapView,
-  showFilter,
-  setShowFilter = () => {},
-  hideViewOption = false,
-  hideFilter = false,
   showActionBtn = false,
   hideSearchInput = false,
   btnLabel = '',
@@ -47,79 +30,31 @@ export const Widget = ({
   containerStyles,
   showMenuActionBtn,
   menu,
-}: Props) => {
-  const theme = useTheme();
-  const [view, setView] = useState('list');
+  filterItems,
+}: Props) => (
+  <Box display="flex" sx={{height: '2.5rem', flexGrow: 1, ...containerStyles}}>
+    {!hideSearchInput ? (
+      <Box sx={{mr: '1em'}}>
+        <SearchInput
+          containerStyle={{height: '100%'}}
+          placeholder={searchPlaceholder}
+          onValueChanged={(value: string) =>
+            getSearchValue && getSearchValue(value)
+          }
+        />
+      </Box>
+    ) : null}
+    {filterItems || null}
 
-  return (
-    <Box display="flex" sx={{...containerStyles}}>
-      {!hideFilter ? (
-        <Button
-          buttonProps={{
-            onClick: () => setShowFilter(!showFilter),
-            sx: {
-              backgroundColor: showFilter
-                ? theme.palette.action.selected
-                : theme.palette.primary.outlinedHoverBg,
-              border: 'none',
-              ':hover': {
-                border: 'none',
-              },
-            },
-            variant: 'outlined',
-            startIcon: <FilterListIcon />,
-          }}>
-          <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
-            Filter
-          </Typography>
-        </Button>
-      ) : null}
-
-      {!hideSearchInput ? (
-        <Box ml="0.8em">
-          <SearchInput
-            containerStyle={{height: '100%'}}
-            placeholder={searchPlaceholder}
-            onValueChanged={(value: string) =>
-              getSearchValue && getSearchValue(value)
-            }
-          />
-        </Box>
-      ) : null}
-      {!hideViewOption ? (
-        <ToggleButtonGroup
-          color="secondary"
-          value={view}
-          exclusive
-          sx={{ml: '0.8em'}}>
-          <ToggleButton
-            value="list"
-            aria-label="list"
-            onClick={() => {
-              setView('list');
-              if (closeMapView) {
-                closeMapView();
-              }
-            }}>
-            <ViewListIcon />
-          </ToggleButton>
-          <ToggleButton
-            value="module"
-            aria-label="module"
-            onClick={() => {
-              setView('module');
-              if (openMapView) {
-                openMapView();
-              }
-            }}>
-            <GridViewIcon />
-          </ToggleButton>
-        </ToggleButtonGroup>
-      ) : null}
-
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        flexGrow: 1,
+      }}>
       {showActionBtn ? (
         <Button
-          label="Filter"
+          // label="Filter"
           buttonProps={{
             onClick: () => (btnOnClick ? btnOnClick() : () => {}),
             sx: {
@@ -155,5 +90,5 @@ export const Widget = ({
         />
       ) : null}
     </Box>
-  );
-};
+  </Box>
+);

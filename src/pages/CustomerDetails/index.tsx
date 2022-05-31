@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useLayoutEffect, useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
 import {useSearchParams} from 'react-router-dom';
 import {Tabs} from 'components/Tab';
@@ -6,11 +6,14 @@ import ElevatorIcon from '@mui/icons-material/Elevator';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import {formatSearchParams} from 'utils/utils';
-import {Widget} from 'components/Widget';
 import {useParams} from 'react-router';
 import {CustomerOverviewTab} from './Tabs/CustomerOverview';
 import {ContractsTab} from './Tabs/ContractsTab';
 import {UnitsTab} from './Tabs/UnitsTab';
+
+interface Props {
+  getCurrentPageTitle?: (title: string) => void;
+}
 
 const tabItems = [
   {
@@ -27,51 +30,22 @@ const tabItems = [
   },
 ];
 
-export const CustomerDetails = () => {
+export const CustomerDetails = ({getCurrentPageTitle}: Props) => {
   const [tabValue, setTabValue] = useState(0);
   const {id: customerId} = useParams();
   const [customerName, setCustomerName] = useState('');
-  const [unitSearch, setUnitSearch] = useState('');
-  const [showUnitFilter, setShowUnitFiler] = useState(false);
-  const [contractSearch, setContractSearch] = useState('');
-  const [showContractFilter, setShowContractFiler] = useState(false);
   const [queryParams, setQueryParams] = useSearchParams();
+
+  useLayoutEffect(() => {
+    if (getCurrentPageTitle) {
+      getCurrentPageTitle(customerName);
+    }
+  }, [customerName]);
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
     setTabValue(Number(currentParams.tab));
   }, []);
-
-  const renderUnitWidget = () => (
-    <Widget
-      searchPlaceholder=""
-      getSearchValue={(search) => setUnitSearch(search)}
-      setShowFilter={setShowUnitFiler}
-      showFilter={showUnitFilter}
-      hideViewOption
-    />
-  );
-
-  const renderContractWidget = () => (
-    <Widget
-      searchPlaceholder=""
-      getSearchValue={(search) => setContractSearch(search)}
-      setShowFilter={setShowContractFiler}
-      showFilter={showContractFilter}
-      hideViewOption
-    />
-  );
-
-  const renderWidget = (tabIndex: number) => {
-    switch (tabIndex) {
-      case 1:
-        return renderUnitWidget();
-      case 2:
-        return renderContractWidget();
-      default:
-        return null;
-    }
-  };
 
   return (
     <Tabs
@@ -83,7 +57,6 @@ export const CustomerDetails = () => {
         );
         setTabValue(index);
       }}
-      renderWidget={renderWidget(tabValue)}
       backBtnLabel={customerName}>
       <TabsBody value={tabValue} index={0}>
         <CustomerOverviewTab
@@ -93,20 +66,10 @@ export const CustomerDetails = () => {
         />
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
-        <UnitsTab
-          customerId={customerId}
-          searchQuery={unitSearch}
-          showFilter={showUnitFilter}
-          setShowFilter={setShowUnitFiler}
-        />
+        <UnitsTab customerId={customerId} />
       </TabsBody>
       <TabsBody value={tabValue} index={2}>
-        <ContractsTab
-          customerId={customerId}
-          searchQuery={contractSearch}
-          showFilter={showContractFilter}
-          setShowFilter={setShowContractFiler}
-        />
+        <ContractsTab customerId={customerId} />
       </TabsBody>
     </Tabs>
   );

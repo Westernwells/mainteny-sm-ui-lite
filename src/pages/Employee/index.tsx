@@ -1,5 +1,5 @@
 import {DataGridLayout} from 'components/DataGridLayout';
-import {PageOverviewLayout} from 'components/PageOverviewLayout';
+import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {useQueryTechnicianEvents} from 'hooks/reactQuery/useTechnician';
 import {useQueryUserAccounts} from 'hooks/reactQuery/useUserAccount';
@@ -30,7 +30,6 @@ export const Employees = () => {
   const totalEmployeeRef = useRef(0);
   const [pageCount, setPageCount] = useState(0);
   const [search, setSearch] = useState('');
-  const [showFilter, setShowFilter] = useState(false);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -104,19 +103,13 @@ export const Employees = () => {
   }
 
   return (
-    <PageOverviewLayout
-      label="Employees"
+    <PageListingLayout
       renderWidget={
         <Widget
           searchPlaceholder="Search name, role, address, phone"
           getSearchValue={(val: string) => setSearch(val)}
-          setShowFilter={setShowFilter}
-          showFilter={showFilter}
-          btnLabel="New Employee"
-          btnOnClick={() => setIsDrawerOpen(true)}
           showActionBtn
-          hideFilter
-          hideViewOption
+          btnLabel="New employee"
         />
       }>
       <DataGridLayout
@@ -137,6 +130,6 @@ export const Employees = () => {
       />
 
       <AddEmployee open={isDrawerOpen} setOpen={setIsDrawerOpen} />
-    </PageOverviewLayout>
+    </PageListingLayout>
   );
 };

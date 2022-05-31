@@ -8,8 +8,11 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
+import ToggleButton from '@mui/material/ToggleButton';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import GridViewIcon from '@mui/icons-material/GridView';
 import {FilterFields} from 'components/FilterFields';
-import {PageOverviewLayout} from 'components/PageOverviewLayout';
+import {PageListingLayout} from 'components/PageListingLayout';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {
@@ -19,6 +22,8 @@ import {
 import {getCenter} from 'geolib';
 import {Location, Resource} from 'models/misc';
 import {useSearchParams} from 'react-router-dom';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Box from '@mui/material/Box';
 import {columns, makeRows} from './UnitsDataGridProps';
 import {UnitsMapsView} from './UnitsMapsView';
 import {DataGridElevatorView} from './Models';
@@ -36,8 +41,8 @@ export const MyUnits = () => {
   const totalUnitsRef = useRef(0);
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const [showFilter, setShowFilter] = useState(false);
   const [status, setStatus] = useState<string[]>([]);
+  const [view, setView] = useState('list');
   const [showMapview, setShowMapview] = useState(false);
   const [elevatorView, setElevatorView] = useState<{
     elevatorByAddress: ElevatorByAddr;
@@ -128,12 +133,6 @@ export const MyUnits = () => {
     }
   }, [elevatorResponse, page]);
 
-  useEffect(() => {
-    if (!showFilter) {
-      setStatus([]);
-    }
-  }, [showFilter]);
-
   if (isFetched && !totalUnitsRef.current) {
     return (
       <EmptySection
@@ -156,40 +155,82 @@ export const MyUnits = () => {
     setShowMapview(false);
   };
 
+  const renderToggleButton = () => (
+    <ToggleButtonGroup
+      color="secondary"
+      value={view}
+      exclusive
+      sx={{
+        ml: '0.8em',
+        flexGrow: 1,
+        display: 'flex',
+        justifyContent: 'flex-end',
+      }}>
+      <ToggleButton
+        value="list"
+        aria-label="list"
+        onClick={() => {
+          setView('list');
+          if (closeMapView) {
+            closeMapView();
+          }
+        }}>
+        <ViewListIcon />
+      </ToggleButton>
+      <ToggleButton
+        value="module"
+        aria-label="module"
+        onClick={() => {
+          setView('module');
+          if (openMapView) {
+            openMapView();
+          }
+        }}>
+        <GridViewIcon />
+      </ToggleButton>
+    </ToggleButtonGroup>
+  );
+
+  const renderFilterItems = () => (
+    <FilterFields>
+      <MultipleSelectCheckmarks
+        label="Status"
+        options={['RUNNING', 'STOPPED']}
+        getSelectedValue={(item) => setStatus(item)}
+      />
+
+      <MultipleSelectCheckmarks
+        label="Upcoming visits"
+        options={['This week', 'Next week', 'Next month']}
+        getSelectedValue={() => {}}
+        multiple={false}
+      />
+    </FilterFields>
+  );
+
   if (isLoading) {
     return <Progress />;
   }
 
   return (
-    <PageOverviewLayout
-      label="Units"
+    <PageListingLayout
       renderWidget={
-        <Widget
-          searchPlaceholder="Search company name, unit model"
-          getSearchValue={(val: string) => {
-            setSearch(val);
-          }}
-          openMapView={openMapView}
-          closeMapView={closeMapView}
-          setShowFilter={setShowFilter}
-          showFilter={showFilter}
-        />
+        <Box
+          sx={{
+            display: 'flex',
+            flexGrow: 1,
+          }}>
+          <Widget
+            searchPlaceholder="Search company name, unit model"
+            getSearchValue={(val: string) => {
+              setSearch(val);
+            }}
+            filterItems={renderFilterItems()}
+          />
+
+          {renderToggleButton()}
+        </Box>
       }>
-      <FilterFields showFilter={showFilter} setShowFilter={setShowFilter}>
-        <MultipleSelectCheckmarks
-          label="Status"
-          options={['RUNNING', 'STOPPED']}
-          getSelectedValue={(item) => setStatus(item)}
-        />
-
-        <MultipleSelectCheckmarks
-          label="Upcoming visits"
-          options={['This week', 'Next week', 'Next month']}
-          getSelectedValue={() => {}}
-          multiple={false}
-        />
-      </FilterFields>
-
       {!showMapview ? (
         <DataGridLayout
           hideFooter={pageCount <= 1}
@@ -214,6 +255,6 @@ export const MyUnits = () => {
           status={status}
         />
       )}
-    </PageOverviewLayout>
+    </PageListingLayout>
   );
 };

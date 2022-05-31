@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useLayoutEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
@@ -6,7 +6,6 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import {Grid, InputLabel, TextField} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import {BackAction} from 'components/BackAction';
 import {A4Layout} from 'components/A4Layout';
 import {SelectModal} from 'components/SelectModal';
 import {SelectButton} from 'components/SelectButton';
@@ -47,7 +46,11 @@ import {ArticlesDataGrid} from './DataGrid/ArticlesDataGrid';
 import {QuotationHeader} from './Components/QuotationHeader';
 import {PDFContainer} from './Components/PDFContainer';
 
-export const QuotationDetails = () => {
+interface Props {
+  getCurrentPageTitle?: (title: string) => void;
+}
+
+export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
   const {id: quotationId} = useParams();
 
   const navigate = useNavigate();
@@ -139,6 +142,12 @@ export const QuotationDetails = () => {
     setQuotationItems(newItems);
   };
 
+  useLayoutEffect(() => {
+    if (getCurrentPageTitle && quotation) {
+      getCurrentPageTitle(quotation.number);
+    }
+  }, [quotation]);
+
   useEffect(() => {
     if (quotationItems.length) {
       const sum = 0;
@@ -226,11 +235,6 @@ export const QuotationDetails = () => {
           justifyContent="space-between"
           alignItems="center"
           gap="1em">
-          <BackAction
-            label={quotation.number}
-            containerStyle={{my: 'auto'}}
-            path="/quotations?pageIndex=1&pageSize=25"
-          />
           <Box ml="auto">
             <StatusChip
               label={getQuotationStatusStyles(quotation.status).label}
@@ -242,6 +246,7 @@ export const QuotationDetails = () => {
           <Button
             label="Download Quotation"
             buttonProps={{
+              variant: 'outlined',
               onClick: () =>
                 window.open(
                   `${process.env.REACT_APP_BASE_URL}/QuotationPDF.pdf`,
@@ -334,12 +339,7 @@ export const QuotationDetails = () => {
     <EmptySection label="Quotation not found!" />
   ) : (
     <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <BackAction
-          label={quotation.number}
-          containerStyle={{my: 'auto'}}
-          path="/quotations?pageIndex=1&pageSize=25"
-        />
+      <Box display="flex" justifyContent="flex-end" alignItems="center">
         <StatusChip
           label={getQuotationStatusStyles(quotation.status).label}
           color={getQuotationStatusStyles(quotation.status).color}

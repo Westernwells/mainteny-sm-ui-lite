@@ -24,6 +24,7 @@ import {axiosClient} from 'utils/axios-utils';
 import {languageMap} from 'utils/utils';
 import {NewUnit} from 'pages/NewServiceOrder/NewUnit';
 import i18n from 'i18next';
+import {useEffect, useState} from 'react';
 
 import {NewServiceOrder} from 'pages/NewServiceOrder';
 import {Articles} from 'pages/Articles';
@@ -37,6 +38,10 @@ export const Router = () => {
   if (language) {
     axiosClient.defaults.headers.common.language = languageMap[language];
   }
+
+  const [currentPageTitle, setCurrentPageTitle] = useState('');
+
+  useEffect(() => {}, []);
 
   return (
     <Routes>
@@ -65,7 +70,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Units - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
+              <PageLayout pageTitle="Units">
                 <MyUnits />
               </PageLayout>
             </>
@@ -78,8 +83,13 @@ export const Router = () => {
               <Helmet>
                 <title>{`Unit Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout pageScrollable>
-                <UnitsDetail />
+              <PageLayout
+                backBtnLabel={currentPageTitle}
+                pageScrollable
+                showBackAction>
+                <UnitsDetail
+                  getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                />
               </PageLayout>
             </>
           }
@@ -92,7 +102,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Contracts - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
+              <PageLayout pageTitle="Contracts">
                 <Contracts />
               </PageLayout>
             </>
@@ -105,7 +115,10 @@ export const Router = () => {
               <Helmet>
                 <title>{`Contract Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout pageScrollable>
+              <PageLayout
+                pageScrollable
+                backBtnLabel="Contract details"
+                showBackAction>
                 <ContractDetails />
               </PageLayout>
             </>
@@ -119,7 +132,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Invoices - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
+              <PageLayout pageTitle="Invoices">
                 <Invoices />
               </PageLayout>
             </>
@@ -132,7 +145,10 @@ export const Router = () => {
               <Helmet>
                 <title>{`Invoice Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout pageScrollable>
+              <PageLayout
+                showBackAction
+                pageScrollable
+                backBtnLabel="Invoice details">
                 <InvoiceDetails />
               </PageLayout>
             </>
@@ -146,7 +162,8 @@ export const Router = () => {
               <Helmet>
                 <title>{`Customers - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
+
+              <PageLayout pageTitle="Customers">
                 <Customer />
               </PageLayout>
             </>
@@ -159,8 +176,10 @@ export const Router = () => {
               <Helmet>
                 <title>{`Customer Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
-                <CustomerDetails />
+              <PageLayout showBackAction backBtnLabel={currentPageTitle}>
+                <CustomerDetails
+                  getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                />
               </PageLayout>
             </>
           }
@@ -172,7 +191,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Employees - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
+              <PageLayout pageTitle="Employees">
                 <Employees />
               </PageLayout>
             </>
@@ -186,8 +205,10 @@ export const Router = () => {
               <Helmet>
                 <title>{`Employee Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
-                <EmployeeDetails />
+              <PageLayout showBackAction backBtnLabel={currentPageTitle}>
+                <EmployeeDetails
+                  getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                />
               </PageLayout>
             </>
           }
@@ -200,7 +221,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Quotations - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
+              <PageLayout pageTitle="Quotations">
                 <Quotations />
               </PageLayout>
             </>
@@ -214,7 +235,10 @@ export const Router = () => {
               <Helmet>
                 <title>{`New Quotation - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout pageScrollable>
+              <PageLayout
+                pageScrollable
+                backBtnLabel="New Quotation"
+                showBackAction>
                 <NewQuotation />
               </PageLayout>
             </>
@@ -228,7 +252,10 @@ export const Router = () => {
               <Helmet>
                 <title>{`Quotation Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout pageScrollable>
+              <PageLayout
+                pageScrollable
+                backBtnLabel="Quotation Details"
+                showBackAction>
                 <QuotationDetails />
               </PageLayout>
             </>
@@ -242,7 +269,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Service Orders - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
+              <PageLayout pageTitle="Service Orders">
                 <ServiceOrders />
               </PageLayout>
             </>
@@ -256,7 +283,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Service Orders - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
+              <PageLayout backBtnLabel="Order Details" showBackAction>
                 <ServiceOrderDetails />
               </PageLayout>
             </>
@@ -270,8 +297,10 @@ export const Router = () => {
               <Helmet>
                 <title>{`New service order - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
-                <NewServiceOrder />
+              <PageLayout backBtnLabel={currentPageTitle} showBackAction>
+                <NewServiceOrder
+                  getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                />
               </PageLayout>
             </>
           }
@@ -284,7 +313,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`New service order - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
+              <PageLayout backBtnLabel="New Unit" showBackAction>
                 <NewUnit />
               </PageLayout>
             </>
@@ -298,7 +327,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Quotations - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
+              <PageLayout pageTitle="Articles & Packages">
                 <Articles />
               </PageLayout>
             </>
@@ -312,7 +341,12 @@ export const Router = () => {
               <Helmet>
                 <title>{`Notifications - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout excludeSidebar pageScrollable excludeDefaultSpacing>
+              <PageLayout
+                excludeSidebar
+                pageScrollable
+                excludeDefaultSpacing
+                backBtnLabel="Notifications"
+                showBackAction>
                 <Notifications />
               </PageLayout>
             </>

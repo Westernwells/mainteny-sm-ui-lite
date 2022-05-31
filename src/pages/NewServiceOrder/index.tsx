@@ -1,30 +1,27 @@
-import {BreadCrumbs} from 'components/Breadcrumbs';
 import {FlexContainer} from 'components/FlexContainer';
-import {useRef} from 'react';
-import {useNavigate} from 'react-router';
+import {useLayoutEffect, useRef} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {ServiceOrderType} from 'models/service-order';
 import {convertToText} from 'utils/utils';
 import {NewEmergency} from './NewEmergency';
 import {ScheduleServiceOrder} from './ScheduleServiceOrder';
 
-export const NewServiceOrder = () => {
+interface Props {
+  getCurrentPageTitle?: (title: string) => void;
+}
+
+export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
   const [queryParams] = useSearchParams();
   const currentParams = useRef(Object.fromEntries([...queryParams])).current;
-  const navigate = useNavigate();
+
+  useLayoutEffect(() => {
+    if (getCurrentPageTitle && currentParams) {
+      getCurrentPageTitle(`New ${convertToText(currentParams.type)} Order`);
+    }
+  }, []);
 
   return (
     <FlexContainer>
-      <BreadCrumbs
-        activeIndex={1}
-        links={[
-          {
-            label: 'Service Orders',
-            action: () => navigate('/orders?pageIndex=1&pageSize=25&tab=0'),
-          },
-          {label: `New ${convertToText(currentParams.type)}`, action: () => {}},
-        ]}
-      />
       {currentParams.type === 'emergency' ? <NewEmergency /> : null}
       {currentParams.type === 'callout' ? (
         <ScheduleServiceOrder type={ServiceOrderType.CALLOUT} />

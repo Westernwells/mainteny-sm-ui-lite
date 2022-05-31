@@ -1,7 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
 import {useNavigate} from 'react-router';
-import Box from '@mui/material/Box';
-import Fade from '@mui/material/Fade';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
@@ -9,7 +7,7 @@ import {FilterFields} from 'components/FilterFields';
 import {useQuotations} from 'hooks/reactQuery/useQuotation';
 import {QuotationView} from 'models/quotation';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {PageOverviewLayout} from 'components/PageOverviewLayout';
+import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
@@ -75,38 +73,33 @@ export const Quotations = () => {
     );
   }
 
+  const renderFilterItems = () => (
+    <FilterFields setShowFilter={setShowFilter}>
+      <MultipleSelectCheckmarks
+        label="Status"
+        options={['SENT', 'DRAFT']}
+        getSelectedValue={(item) => console.log(item)}
+        multiple={false}
+      />
+    </FilterFields>
+  );
+
   if (isLoading) {
     return <Progress />;
   }
 
   return (
-    <PageOverviewLayout
-      label="Quotations"
+    <PageListingLayout
       renderWidget={
         <Widget
           searchPlaceholder="Try 'QT100100'"
           getSearchValue={(val: string) => setSearch(val)}
-          setShowFilter={setShowFilter}
-          showFilter={showFilter}
+          showActionBtn
           btnLabel="New Quotation"
           btnOnClick={() => navigate('new')}
-          showActionBtn
-          hideViewOption
+          filterItems={renderFilterItems()}
         />
       }>
-      <Fade in={showFilter} unmountOnExit>
-        <Box>
-          <FilterFields setShowFilter={setShowFilter}>
-            <MultipleSelectCheckmarks
-              label="Status"
-              options={['SENT', 'DRAFT']}
-              getSelectedValue={(item) => console.log(item)}
-              multiple={false}
-            />
-          </FilterFields>
-        </Box>
-      </Fade>
-
       <DataGridLayout
         hideFooter={pageCount <= 1}
         rows={rows}
@@ -122,6 +115,6 @@ export const Quotations = () => {
         pageCount={pageCount}
         totalRows={quotationsResource.total}
       />
-    </PageOverviewLayout>
+    </PageListingLayout>
   );
 };

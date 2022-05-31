@@ -1,4 +1,4 @@
-import {PageOverviewLayout} from 'components/PageOverviewLayout';
+import {PageListingLayout} from 'components/PageListingLayout';
 import {useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
@@ -22,7 +22,6 @@ const pageSize = 25;
 
 export const Customer = () => {
   const [search, setSearch] = useState('');
-  const [showFilter, setShowFilter] = useState(false);
   const [queryParams, setQueryParams] = useSearchParams();
   const totalCustomerRef = useRef(0);
   const [page, setPage] = useState(makePage(0, pageSize));
@@ -64,10 +63,8 @@ export const Customer = () => {
   }, [queryParams]);
 
   useEffect(() => {
-    if (customersWithUnits) {
+    if (customersWithUnits.length) {
       setRows(makeRows(customersWithUnits));
-    } else {
-      setRows([]);
     }
   }, [customersWithUnits]);
 
@@ -94,16 +91,11 @@ export const Customer = () => {
   }
 
   return (
-    <PageOverviewLayout
-      label="Customers"
+    <PageListingLayout
       renderWidget={
         <Widget
           searchPlaceholder="Try 'Astralift BV'"
           getSearchValue={(val: string) => setSearch(val)}
-          setShowFilter={setShowFilter}
-          showFilter={showFilter}
-          hideViewOption
-          hideFilter
         />
       }>
       <DataGridLayout
@@ -122,6 +114,6 @@ export const Customer = () => {
         pageCount={pageCount}
         totalRows={customerResource.total}
       />
-    </PageOverviewLayout>
+    </PageListingLayout>
   );
 };
