@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
-import {Tabs} from 'components/Tab-old';
+import {Tabs} from 'components/Tab';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import {Overview} from './Tabs/Overview';
@@ -27,9 +27,8 @@ export const ServiceOrderDetails = () => {
     <Tabs
       tabItems={tabItems}
       currentIndex={tabValue}
-      tabStyle={{ml: '5em'}}
       // pageTitle="Service Orders"  // TODO Separate label and title
-      backBtnLabel="Service Orders"
+      // backBtnLabel="Service Orders"
       // renderWidget={renderWidget(tabValue)}
       onChange={(index) => {
         setTabValue(index);

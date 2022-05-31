@@ -69,14 +69,7 @@ export const EmployeeDetails = ({getCurrentPageTitle}: Props) => {
     <Tabs
       tabItems={tabItems}
       currentIndex={tabValue}
-      onChange={(index) => setTabValue(index)}
-      backBtnLabel={
-        employee
-          ? `${employee?.userAccount.firstName} 
-              
-              ${employee?.userAccount.lastName}`
-          : ''
-      }>
+      onChange={(index) => setTabValue(index)}>
       <TabsBody value={tabValue} index={0}>
         <EmployeeOverview employee={employee} isLoading={isLoading} />
       </TabsBody>
