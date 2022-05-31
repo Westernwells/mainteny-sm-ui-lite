@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Box from '@mui/material/Box';
+import {MaintainerView} from 'models/technician';
 
 const defaultProps = {
   editable: false,
@@ -77,11 +78,11 @@ export const columns: GridColDef[] = [
   },
 ];
 
-export const makeRows = (technicians: {[key: string]: any}[]): GridRowsProp =>
-  technicians.map((item: {[key: string]: any}, index) => ({
-    id: index,
-    name: item.name,
-    address: item.address,
-    priority: item.priority,
-    actions: item.id,
+export const makeRows = (maintainers: MaintainerView[]): GridRowsProp =>
+  maintainers.map((maintainer) => ({
+    id: maintainer.technician.id,
+    name: `${maintainer.technician.userAccount.firstName} ${maintainer.technician.userAccount.lastName}`,
+    address: maintainer.technician.address.fullName,
+    priority: maintainer.weight,
+    actions: maintainer.technician.id,
   }));

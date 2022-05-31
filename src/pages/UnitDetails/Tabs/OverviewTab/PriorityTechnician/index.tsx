@@ -5,21 +5,22 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {useEffect, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
-import {technicians} from './data';
+import {MaintainerView} from 'models/technician';
 import {columns, makeRows} from './PriorityTechnicianDataGridProps';
 
 interface Props {
   containerStyles?: {[key: string]: any};
+  maintainers: MaintainerView[];
 }
 
-export const PriorityTechnician = ({containerStyles}: Props) => {
+export const PriorityTechnician = ({containerStyles, maintainers}: Props) => {
   const theme = useTheme();
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
-    setRows(makeRows(!showAll ? technicians.slice(0, 3) : technicians));
-  }, [technicians]);
+    setRows(makeRows(!showAll ? maintainers.slice(0, 3) : maintainers));
+  }, [maintainers]);
 
   return (
     <PageCard
@@ -41,7 +42,7 @@ export const PriorityTechnician = ({containerStyles}: Props) => {
           borderBottom: 'none',
         }}
       />
-      {technicians.length > 3 ? (
+      {maintainers.length > 3 ? (
         <Box
           sx={{textAlign: 'center', cursor: 'pointer'}}
           onClick={() => setShowAll(!showAll)}>

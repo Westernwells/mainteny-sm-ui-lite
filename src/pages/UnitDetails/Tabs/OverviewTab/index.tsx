@@ -48,7 +48,8 @@ export const OverviewTab = ({
     ],
   });
 
-  // const {data: maintainers = []} = useElevatorMaintainers(elevatorId);
+  const {data: maintainers = []} = useElevatorMaintainers(elevatorId);
+  console.log(maintainers, '@@@@@DSSLSSSP');
 
   const {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(pageSize),
@@ -138,7 +139,10 @@ export const OverviewTab = ({
         containerStyles={{mt: '1.2em'}}
       />
 
-      <PriorityTechnician containerStyles={{mt: '1.2em'}} />
+      <PriorityTechnician
+        containerStyles={{mt: '1.2em'}}
+        maintainers={maintainers}
+      />
 
       <Grid container spacing={2} sx={{mt: '0.3em'}}>
         <Grid item md={4}>

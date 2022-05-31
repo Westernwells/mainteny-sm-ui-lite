@@ -28,7 +28,7 @@ export const SearchInput = ({
     <TextField
       size="small"
       sx={{
-        width: width || '18rem',
+        width: width || '20rem',
         border: 'none',
         background: '#fff',
         '& .MuiOutlinedInput-root:hover': {
