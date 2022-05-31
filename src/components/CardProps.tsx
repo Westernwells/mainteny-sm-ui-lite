@@ -27,7 +27,7 @@ export const CardProps = ({
     {/* remove width to make this component more generic */}
     <Box
       sx={{
-        background: iconBackground,
+        backgroundColor: iconBackground,
         p: '0.7em',
         display: 'flex',
         justifyContent: 'center',

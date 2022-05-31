@@ -1,8 +1,9 @@
-import {useQuery} from 'react-query';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
 import * as _ from 'lodash';
 import {useCallback} from 'react';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
+import {useSnackbar} from 'notistack';
 import {useNavigate} from 'react-router';
 // FIXME: Dummy Import
 
@@ -12,6 +13,7 @@ import {
   QueryInvoiceParams,
   InvoiceFilters,
   InvoiceStatus,
+  CreateInvoice,
 } from 'models/invoice';
 import {useUserSession} from './useUserSession';
 
@@ -139,3 +141,32 @@ export function useInvoiceDetail(invoiceId?: string) {
     },
   });
 }
+
+export const postInvoice = async (body: CreateInvoice) => {
+  const {data} = await axiosClient.post<{value: string}>('api/invoices', body);
+  return {data};
+};
+
+export const useCreateInvoice = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  const navigate = useNavigate();
+
+  return useMutation((data: CreateInvoice) => postInvoice(data), {
+    onSuccess: () => {
+      queryClient.invalidateQueries([qk.fetchInvoices]);
+      queryClient.invalidateQueries([qk.invoiceById]);
+      enqueueSnackbar(`Invoice created successfully!`, {
+        variant: 'success',
+      });
+
+      navigate('/invoices?pageIndex=1&pageSize=25');
+    },
+    onError: (err) => {
+      console.log(err);
+      enqueueSnackbar('Something went wrong, please try again!', {
+        variant: 'error',
+      });
+    },
+  });
+};

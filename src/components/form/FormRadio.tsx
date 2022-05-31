@@ -7,6 +7,7 @@ interface Props {
   handleChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   label?: string | JSX.Element;
   checked?: boolean;
+  disabled?: boolean;
   name?: string;
   radioProps?: RadioProps;
 }
@@ -16,6 +17,7 @@ export const FormRadio = ({
   handleChange,
   label = '',
   checked,
+  disabled,
   name,
   radioProps,
 }: Props) => (
@@ -25,6 +27,7 @@ export const FormRadio = ({
       <Radio
         value={value}
         checked={checked}
+        disabled={disabled}
         name={name}
         onChange={handleChange}
         {...radioProps}
