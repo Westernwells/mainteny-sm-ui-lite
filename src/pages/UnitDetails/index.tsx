@@ -44,10 +44,7 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
       currentIndex={value}
       onChange={(index) => setValue(index)}>
       <TabsBody value={value} index={0}>
-        <OverviewTab
-          getServiceHistoryTabIndex={(tabIndex: number) => setValue(tabIndex)}
-          getUnitName={(name) => setUnitName(name)}
-        />
+        <OverviewTab getUnitName={(name) => setUnitName(name)} />
       </TabsBody>
 
       <TabsBody value={value} index={1}>

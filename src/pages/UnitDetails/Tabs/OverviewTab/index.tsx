@@ -1,4 +1,3 @@
-/*eslint-disable*/
 import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
 import useTheme from '@mui/material/styles/useTheme';
 import Grid from '@mui/material/Grid';
@@ -7,6 +6,8 @@ import {createEmptyResource} from 'utils/paging-utils';
 import {endOfYear, startOfYear} from 'date-fns';
 import {useParams} from 'react-router-dom';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
+import {useUseQueryElevatorsContracts} from 'hooks/reactQuery/useContract';
+import {ContractStatus} from 'models/contract';
 import {
   useElevatorById,
   useElevatorMaintainers,
@@ -15,8 +16,6 @@ import {Location} from './Location';
 import {UnitDetails} from './UnitDetails';
 import {Service} from './Service';
 import {AppointmentPreference} from './AppointmentPreference';
-import {useUseQueryElevatorsContracts} from 'hooks/reactQuery/useContract';
-import {ContractStatus} from 'models/contract';
 import {UnitContracts} from './UnitContracts';
 import {PriorityTechnician} from './PriorityTechnician';
 import {Notes} from './Notes';
@@ -24,16 +23,12 @@ import {Pictures} from './Pictures';
 import {Documents} from './Documents';
 
 interface Props {
-  getServiceHistoryTabIndex?: (value: number) => void;
   getUnitName?: (value: string) => void;
 }
 
 const pageSize = 10;
 
-export const OverviewTab = ({
-  getServiceHistoryTabIndex,
-  getUnitName,
-}: Props) => {
+export const OverviewTab = ({getUnitName}: Props) => {
   const {id: elevatorId} = useParams();
   const theme = useTheme();
 
@@ -49,7 +44,6 @@ export const OverviewTab = ({
   });
 
   const {data: maintainers = []} = useElevatorMaintainers(elevatorId);
-  console.log(maintainers, '@@@@@DSSLSSSP');
 
   const {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(pageSize),
@@ -66,6 +60,8 @@ export const OverviewTab = ({
       ServiceOrderStatus.IN_PROGRESS,
     ],
   });
+
+  console.log(serviceOrders, '____----');
 
   useEffect(() => {
     if (getUnitName && elevator) {
