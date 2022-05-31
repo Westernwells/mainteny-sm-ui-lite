@@ -87,9 +87,11 @@ export const AppTopBar = ({
       }}>
       <Box width="4.5rem" />
       <Box sx={{display: 'flex', justifyContent: 'space-between', flexGrow: 1}}>
-        {showBackAction ? <BackAction label={backBtnLabel} /> : null}
+        {showBackAction ? (
+          <BackAction label={backBtnLabel} containerStyle={{mt: '1em'}} />
+        ) : null}
         <Typography
-          variant="h3"
+          variant="h4"
           component="div"
           sx={{display: 'flex', alignItems: 'center', mt: '0.2em'}}>
           {pageTitle || null}
@@ -145,7 +147,6 @@ export const AppTopBar = ({
               ]}
             />
           </Box>
-          {/* </Link> */}
 
           <Box sx={{marginLeft: 6}}>
             <LogoutIcon style={{cursor: 'pointer'}} onClick={() => signout()} />
