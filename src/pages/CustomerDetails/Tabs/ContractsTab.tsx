@@ -127,7 +127,7 @@ export const ContractsTab = ({customerId}: Props) => {
   );
 
   const renderWidget = () => (
-    <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+    <Box>
       <Widget
         searchPlaceholder="Try 'Astralift BV'"
         getSearchValue={(search) => setSearchQuery(search)}

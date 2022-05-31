@@ -10,6 +10,7 @@ import {
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {ElevatorView} from 'models/elevator';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {TabContentContainer} from 'components/TabContentContainer';
 
 export const UnitsTab = () => {
   const [search, setSearch] = useState('');
@@ -28,19 +29,20 @@ export const UnitsTab = () => {
     }
   }, [elevator]);
 
-  return (
-    <>
-      <Box display="flex" justifyContent="end" maxWidth="100%">
-        <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-          <Widget
-            searchPlaceholder="Search order type, customer, address"
-            getSearchValue={(val: string) => setSearch(val)}
-            filterItems={null}
-          />
-        </Box>
-      </Box>
+  const renderWidget = () => (
+    <Box>
+      <Widget
+        searchPlaceholder="Search order type, customer, address"
+        getSearchValue={(val: string) => setSearch(val)}
+        filterItems={null}
+      />
+    </Box>
+  );
 
+  return (
+    <TabContentContainer>
+      {renderWidget()}
       <DataGridLayout rows={rows} columns={columns} pageSize={page.pageSize} />
-    </>
+    </TabContentContainer>
   );
 };
