@@ -90,7 +90,6 @@ export const Quotations = () => {
 
   return (
     <PageListingLayout
-      label="Quotations"
       renderWidget={
         <Widget
           searchPlaceholder="Try 'QT100100'"

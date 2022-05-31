@@ -3,13 +3,10 @@ import Language from '@mui/icons-material/Language';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
-// import AppBar from '@mui/material/AppBar';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import useTheme from '@mui/material/styles/useTheme';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import i18n from 'i18n';
-import {ReactComponent as LogoutIcon} from 'assets/icons/Logout.svg';
-// import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
 import {useAuth} from 'hooks/useAuth';
 import {Link} from 'react-router-dom';
 import {useEffect, useState} from 'react';
@@ -137,20 +134,16 @@ export const AppTopBar = ({
               label={profileBtnLabel()}
               menu={[
                 {
-                  label: 'English',
-                  action: () => changeLanguage('en-US', 'EN'),
-                },
-                {
-                  label: 'Deutsch',
-                  action: () => changeLanguage('de-DE', 'DE'),
+                  label: 'Logout',
+                  action: () => signout(),
                 },
               ]}
             />
           </Box>
 
-          <Box sx={{marginLeft: 6}}>
+          {/* <Box sx={{marginLeft: 6}}>
             <LogoutIcon style={{cursor: 'pointer'}} onClick={() => signout()} />
-          </Box>
+          </Box> */}
         </Box>
       </Box>
     </Box>

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import Box from '@mui/material/Box';
 import {FilterFields} from 'components/FilterFields';
 import * as _ from 'lodash';

@@ -104,7 +104,6 @@ export const Employees = () => {
 
   return (
     <PageListingLayout
-      label="Employees"
       renderWidget={
         <Widget
           searchPlaceholder="Search name, role, address, phone"

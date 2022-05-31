@@ -215,7 +215,6 @@ export const MyUnits = () => {
 
   return (
     <PageListingLayout
-      label=""
       renderWidget={
         <Box
           sx={{
