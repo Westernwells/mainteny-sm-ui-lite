@@ -74,7 +74,7 @@ export const Tabs = ({
             sx: {
               textTransform: 'capitalize',
               ml: '0.8em',
-              height: '90%',
+              height: '100%',
             },
             variant: actionBtnVariant || 'contained',
             color: 'primary',
@@ -98,7 +98,7 @@ export const Tabs = ({
             textTransform: 'capitalize',
             ml: '0.8em',
             py: '0.7em',
-            height: '90%',
+            height: '100%',
           }}
           variant={actionBtnVariant || 'contained'}
           disableRipple
