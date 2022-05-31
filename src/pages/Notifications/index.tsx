@@ -4,7 +4,6 @@ import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import Fab from '@mui/material/Fab';
 import NavigationIcon from '@mui/icons-material/Navigation';
-import {BackAction} from 'components/BackAction';
 import Fade from '@mui/material/Fade';
 import {NotificationCard} from './NotificationCard';
 
@@ -34,10 +33,6 @@ export const Notifications = () => {
   return (
     <Box>
       <Box sx={{mb: 2}}>
-        <Box pl="20vw">
-          <BackAction label="Notifications" />
-        </Box>
-
         <Box>
           <Typography
             variant="h6"
