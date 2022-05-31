@@ -313,7 +313,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`New service order - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
+              <PageLayout backBtnLabel="New Unit" showBackAction>
                 <NewUnit />
               </PageLayout>
             </>
