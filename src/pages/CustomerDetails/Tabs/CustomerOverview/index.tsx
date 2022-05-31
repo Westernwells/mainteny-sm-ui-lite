@@ -5,7 +5,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import Grid from '@mui/material/Grid';
 import {CardProps} from 'components/CardProps';
 import HomeWorkIcon from '@mui/icons-material/HomeWork';
-import {BasicDetailsCard} from 'components/BasicDetailsCard';
+import {InfoCard} from 'components/InfoCard';
 import Typography from '@mui/material/Typography';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import useTheme from '@mui/material/styles/useTheme';
@@ -96,9 +96,8 @@ export const CustomerOverviewTab = ({
   }, [customer]);
 
   const renderBasicDetails = () => (
-    <BasicDetailsCard
+    <InfoCard
       minHeight="11rem"
-      headerStyles={{pb: '0'}}
       bodyContainerStyle={{height: '9rem'}}
       header={<Typography variant="subtitle1">Basic Details</Typography>}>
       <Box display="flex" flexWrap="wrap" mt="-1em">
@@ -115,7 +114,7 @@ export const CustomerOverviewTab = ({
             />
           ))}
       </Box>
-    </BasicDetailsCard>
+    </InfoCard>
   );
 
   if (isLoading) {

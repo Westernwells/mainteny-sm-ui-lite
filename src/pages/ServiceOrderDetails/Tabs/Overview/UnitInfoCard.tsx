@@ -1,7 +1,7 @@
 import {useRef} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import {BasicDetailsCard} from 'components/BasicDetailsCard';
+import {InfoCard} from 'components/InfoCard';
 import useTheme from '@mui/material/styles/useTheme';
 import {convertToText} from 'utils/utils';
 import {CardProps} from 'components/CardProps';
@@ -16,7 +16,7 @@ export const UnitInfoCard = ({serviceOrderDetails}: Props) => {
   const theme = useTheme();
   const unitInfo = useRef(unitInfoSchema(serviceOrderDetails)).current;
   return (
-    <BasicDetailsCard
+    <InfoCard
       containerStyles={{height: '100%'}}
       header={
         <Box>
@@ -41,6 +41,6 @@ export const UnitInfoCard = ({serviceOrderDetails}: Props) => {
           />
         ))}
       </Box>
-    </BasicDetailsCard>
+    </InfoCard>
   );
 };

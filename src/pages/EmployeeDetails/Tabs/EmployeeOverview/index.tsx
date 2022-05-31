@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
-import {BasicDetailsCard} from 'components/BasicDetailsCard';
+import {InfoCard} from 'components/InfoCard';
 import {CardProps} from 'components/CardProps';
 import useTheme from '@mui/material/styles/useTheme';
 import {EmployeesView} from 'models/employee';
@@ -37,7 +37,7 @@ export const EmployeeOverview = ({employee, isLoading}: Props) => {
   }
 
   const renderBasicDetails = () => (
-    <BasicDetailsCard>
+    <InfoCard>
       <Grid container>
         <Grid item xs={2}>
           <Box
@@ -123,7 +123,7 @@ export const EmployeeOverview = ({employee, isLoading}: Props) => {
           setOpen={setIsDrawerOpen}
         />
       )}
-    </BasicDetailsCard>
+    </InfoCard>
   );
   return <Box>{renderBasicDetails()}</Box>;
 };
