@@ -177,6 +177,12 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   return (
     <BasicDetailsCard
       containerStyles={{display: 'flex', flexDirection: 'column'}}
+      headerActionIcon={
+        <EditIcon
+          style={{color: theme.palette.text.secondary}}
+          fontSize="small"
+        />
+      }
       header={
         <Box>
           <Typography variant="subtitle1">
@@ -186,10 +192,6 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
             <Typography variant="body2" sx={{mr: '0.2em'}}>
               {serviceOrderDetails.description}
             </Typography>
-            <EditIcon
-              style={{color: theme.palette.text.secondary}}
-              fontSize="small"
-            />
           </Box>
         </Box>
       }>
