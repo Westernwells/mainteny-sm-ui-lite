@@ -238,13 +238,17 @@ export const AppDrawer = () => {
     open
       ? drawerHeader(
           <IconButton sx={{mr: '1em'}} edge="start">
-            <MaintenyLogo width={155.22} height={32} />
+            <MaintenyLogo
+              style={{marginRight: '0.5em'}}
+              width={155.22}
+              height={32}
+            />
           </IconButton>,
           <ArrowBackIosNewIcon />,
         )
       : drawerHeader(
           <IconButton>
-            <Logo width={55.22} height={32} />
+            <Logo style={{marginRight: '0.5em'}} width={55.22} height={32} />
           </IconButton>,
           <ArrowForwardIos />,
         );
