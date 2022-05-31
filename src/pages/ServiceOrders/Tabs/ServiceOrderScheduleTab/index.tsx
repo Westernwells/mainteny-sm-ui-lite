@@ -94,14 +94,12 @@ export const ServiceOrderScheduleTab = () => {
   );
 
   const renderWidget = () => (
-    <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-      <Widget
-        filterItems={renderFilterItems()}
-        btnLabel="New Order"
-        hideViewOption
-        hideSearchInput
-      />
-    </Box>
+    <Widget
+      filterItems={renderFilterItems()}
+      btnLabel="New Order"
+      hideViewOption
+      hideSearchInput
+    />
   );
 
   const renderControls = () => (
@@ -129,9 +127,9 @@ export const ServiceOrderScheduleTab = () => {
   return (
     <Box sx={{flexGrow: 1, display: 'flex', flexDirection: 'column'}}>
       <Box sx={{display: 'flex', justifyContent: 'space-between', mb: '0.5em'}}>
-        <Box>{renderControls()}</Box>
+        <Box sx={{mr: '0.8em'}}>{renderControls()}</Box>
+        {renderWidget()}
         <Box sx={{display: 'flex', justifyContent: 'flex-end', flexGrow: 1}}>
-          {renderWidget()}
           <Switch
             getValue={(value) => setSwitchActive(value)}
             label="Show Unassigned Orders"
