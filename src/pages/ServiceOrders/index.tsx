@@ -45,7 +45,6 @@ export const ServiceOrders = () => {
       btnLabel="New Order"
       currentIndex={tabValue}
       pageTitle="Service Orders"
-      // renderWidget={renderWidget(tabValue)}
       onChange={(index) => {
         setQueryParams(
           formatSearchParams({tab: index.toString()}, queryParams),

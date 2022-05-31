@@ -41,7 +41,6 @@ export const MyUnits = () => {
   const totalUnitsRef = useRef(0);
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
-  // const [showFilter, setShowFilter] = useState(false);
   const [status, setStatus] = useState<string[]>([]);
   const [view, setView] = useState('list');
   const [showMapview, setShowMapview] = useState(false);

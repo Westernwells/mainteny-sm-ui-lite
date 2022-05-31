@@ -27,9 +27,6 @@ export const ServiceOrderDetails = () => {
     <Tabs
       tabItems={tabItems}
       currentIndex={tabValue}
-      // pageTitle="Service Orders"  // TODO Separate label and title
-      // backBtnLabel="Service Orders"
-      // renderWidget={renderWidget(tabValue)}
       onChange={(index) => {
         setTabValue(index);
       }}>

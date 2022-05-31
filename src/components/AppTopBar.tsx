@@ -70,14 +70,6 @@ export const AppTopBar = ({
   );
 
   return (
-    // <Box
-    //   sx={{
-    //     // backgroundColor: '#fff',
-    //     // zIndex: theme.zIndex.drawer + 1,
-    //     // boxShadow: '0px 4px 15px rgba(144, 144, 144, 0.2)',
-    // paddingRight: '2.5rem',
-    //     paddingLeft: '3rem',
-    //   }}>
     <Box
       sx={{
         display: 'flex',
@@ -140,13 +132,8 @@ export const AppTopBar = ({
               ]}
             />
           </Box>
-
-          {/* <Box sx={{marginLeft: 6}}>
-            <LogoutIcon style={{cursor: 'pointer'}} onClick={() => signout()} />
-          </Box> */}
         </Box>
       </Box>
     </Box>
-    // </Box>
   );
 };

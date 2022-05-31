@@ -66,14 +66,6 @@ export const Invoices = () => {
     }
   }, [invoiceResource]);
 
-  // useEffect(() => {
-  //   if (!showFilter) {
-  //     setAmount([]);
-  //     setStatus(undefined);
-  //     setServiceType([]);
-  //   }
-  // }, [showFilter]);
-
   useEffect(() => {
     setPageCount(Math.ceil(invoiceResource.total / page.pageSize));
   }, [invoiceResource, pageSize]);

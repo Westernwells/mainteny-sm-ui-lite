@@ -28,7 +28,6 @@ import {columns, makeRows} from './ServiceOrderDataGridProps';
 
 export const ServiceOrderList = () => {
   const [page, setPage] = useState(makePage(0, 25));
-  // const [search, setSearchQuery] = useState('');
   const [queryParams, setQueryParams] = useSearchParams();
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
