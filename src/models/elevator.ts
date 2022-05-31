@@ -1,7 +1,15 @@
-import {Address, AddressRecord, Fee, Meta, Priority, StringMap} from './misc';
+import {
+  Address,
+  AddressRecord,
+  Fee,
+  Meta,
+  Priority,
+  StringMap,
+  StringValue,
+} from './misc';
 import {Client, ClientSimpleView} from './client';
 import {TechnicianSimpleView, TechnicianView} from './technician';
-import {FileResource} from './media';
+import {FileResource, FileResourceRecord} from './media';
 import {ServiceCompanyTimeUnit} from './service-company';
 import {ServiceOrderView} from './service-order';
 
@@ -226,4 +234,38 @@ export interface ElevatorByAddr {
 
 export interface DataGridElevatorView extends ElevatorView {
   showAddress: boolean;
+}
+
+export interface ElevatorRequestBody {
+  address: AddressRecord;
+  buildingLocation: string;
+  builtYear: number;
+  cabinType: string;
+  capacity: string;
+  category: ElevatorCategory;
+  controllerManufacturer: string;
+  controllerModel: string;
+  documents: FileResourceRecord[];
+  emergencyContractNumber: string;
+  emergencyPhoneProvider: string;
+  keyLocation: string;
+  lastInspectionDate: string;
+  lastVisitDate: string;
+  manufacturer: string;
+  model: string;
+  number: string;
+  numberOfStops: number;
+  parking: string;
+  pictures: FileResourceRecord[];
+  priority: Priority[];
+  properties: StringValue;
+  propertyManagerId: string;
+  propertyOwnerId: string;
+  propertySegment: string;
+  qrCode: FileResourceRecord;
+  serialNumber: string;
+  serviceTime: number;
+  status: ElevatorStatus;
+  technicianNumber: number;
+  type: string;
 }

@@ -9,7 +9,7 @@ import {UnitDetailsSchema} from './UnitDetailsSchema';
 interface Props {
   containerStyles?: {[key: string]: any};
   elevator: Elevator;
-  spendingLimit?: number;
+  spendingLimit?: number | string;
   currency?: string;
 }
 

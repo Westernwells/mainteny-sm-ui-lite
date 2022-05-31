@@ -1,7 +1,7 @@
 import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
 import useTheme from '@mui/material/styles/useTheme';
 import Grid from '@mui/material/Grid';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {createEmptyResource} from 'utils/paging-utils';
 import {endOfYear, startOfYear} from 'date-fns';
 import {useParams} from 'react-router-dom';
@@ -26,11 +26,17 @@ interface Props {
   getUnitName?: (value: string) => void;
 }
 
+interface SpendingLimit {
+  value: number;
+  currency: string;
+}
+
 const pageSize = 10;
 
 export const OverviewTab = ({getUnitName}: Props) => {
   const {id: elevatorId} = useParams();
   const theme = useTheme();
+  const [spendingLimit, setSpendingLimit] = useState<SpendingLimit>();
 
   const {data: elevator, isLoading: isLoadingElevator} =
     useElevatorById(elevatorId);
@@ -69,6 +75,18 @@ export const OverviewTab = ({getUnitName}: Props) => {
     }
   }, [elevator]);
 
+  useEffect(() => {
+    if (Object.keys(contracts).length) {
+      const result = contracts[elevatorId!].filter(
+        (item) => item.status === ContractStatus.VALID,
+      );
+      setSpendingLimit({
+        value: result[0].spendingLimit,
+        currency: result[0].currency,
+      });
+    }
+  }, [elevator]);
+
   if (isLoadingElevator) {
     return null;
   }
@@ -94,15 +112,8 @@ export const OverviewTab = ({getUnitName}: Props) => {
               },
             }}
             elevator={elevator!}
-            currency={
-              Object.keys(contracts).length
-                ? contracts[elevatorId!][0].currency
-                : ''
-            }
-            spendingLimit={
-              0
-              // contracts && elevatorId ? contracts[elevatorId!][0].spendingLimit : undefined
-            } // TODO: we need to which contracvt to use for this
+            currency={spendingLimit?.currency || ''}
+            spendingLimit={spendingLimit?.value || ''}
           />
         </Grid>
       </Grid>

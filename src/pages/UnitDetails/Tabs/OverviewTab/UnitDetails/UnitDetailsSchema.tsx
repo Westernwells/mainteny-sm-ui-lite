@@ -16,7 +16,7 @@ import {Elevator} from 'models/elevator';
 interface Props {
   label: string;
   elevator: Elevator;
-  spendingLimit?: number;
+  spendingLimit?: number | string;
   currency?: string;
 }
 
