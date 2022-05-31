@@ -4,7 +4,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import Box from '@mui/material/Box';
 import {ReactComponent as PolygonTop} from '../assets/icons/polygonTop.svg';
 import {ReactComponent as PolygonBottom} from '../assets/icons/polygonBottom.svg';
-import {ReactComponent as Logo} from '../assets/icons/Logo.svg';
+import {ReactComponent as MaintenyLogo} from '../assets/icons/MaintenyLogo.svg';
 
 interface Props {
   children: React.ReactNode;
@@ -70,7 +70,7 @@ export const AuthLayout = ({children}: Props) => {
         alignItems="center">
         <Box>
           <Box display="flex" justifyContent="center">
-            <Logo />
+            <MaintenyLogo />
           </Box>
           {children}
         </Box>
