@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import {BasicDetailsCard} from 'components/BasicDetailsCard';
+import {InfoCard} from 'components/InfoCard';
 import EditIcon from '@mui/icons-material/Edit';
 import useTheme from '@mui/material/styles/useTheme';
 import {convertToText} from 'utils/utils';
@@ -175,7 +175,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
     ) : null;
 
   return (
-    <BasicDetailsCard
+    <InfoCard
       containerStyles={{display: 'flex', flexDirection: 'column'}}
       headerActionIcon={
         <EditIcon
@@ -272,6 +272,6 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
             : null
         }
       />
-    </BasicDetailsCard>
+    </InfoCard>
   );
 };

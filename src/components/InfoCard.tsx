@@ -16,7 +16,7 @@ interface Props {
   showHeaderBackground?: boolean;
 }
 
-export const BasicDetailsCard = ({
+export const InfoCard = ({
   bodyContainerStyle,
   headerActionIcon,
   minHeight,

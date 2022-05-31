@@ -10,7 +10,7 @@ import {useParams} from 'react-router-dom';
 import {StatusChip} from 'components/StatusChip';
 import {toDate} from 'utils/datetime';
 import {differenceInDays, isBefore} from 'date-fns';
-import {BasicDetailsCard} from 'components/BasicDetailsCard';
+import {InfoCard} from 'components/InfoCard';
 
 import {Progress} from 'components/Progress';
 import {formatCurrency} from 'utils/currency';
@@ -58,7 +58,7 @@ export const ContractOverview = () => {
           pb: '1em',
         }}>
         <Grid xs={8} item>
-          <BasicDetailsCard
+          <InfoCard
             minHeight="12rem"
             containerStyles={{pt: '1em'}}
             bodyContainerStyle={{}}
@@ -81,7 +81,7 @@ export const ContractOverview = () => {
               )}
               type={contractDetails?.type.toLowerCase()}
             />
-          </BasicDetailsCard>
+          </InfoCard>
 
           <ContractCard
             containerStyles={{mt: '1em', pt: '1em'}}
