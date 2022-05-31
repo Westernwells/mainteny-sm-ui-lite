@@ -215,7 +215,6 @@ export const ScheduleServiceOrder = ({type}: Props) => {
       getActiveStep={(val) => setActiveStep(val)}
       steps={steps}
       containerStyles={{
-        mt: '3em',
         flexGrow: 1,
         ml: '0',
         display: 'flex',

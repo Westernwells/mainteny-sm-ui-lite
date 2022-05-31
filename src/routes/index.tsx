@@ -297,8 +297,10 @@ export const Router = () => {
               <Helmet>
                 <title>{`New service order - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout>
-                <NewServiceOrder />
+              <PageLayout backBtnLabel={currentPageTitle} showBackAction>
+                <NewServiceOrder
+                  getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                />
               </PageLayout>
             </>
           }
