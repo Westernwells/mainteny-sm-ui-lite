@@ -244,7 +244,7 @@ export interface ElevatorRequestBody {
   builtYear: number;
   cabinType: string;
   capacity: string;
-  category: ElevatorCategory;
+  category: string;
   controllerManufacturer: string;
   controllerModel: string;
   documents: FileResourceRecord[];

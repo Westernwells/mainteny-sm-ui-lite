@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import {Button} from 'components/Button';
+// import {Button} from 'components/Button';
 import {PageCard} from 'components/PageCard';
 import useTheme from '@mui/material/styles/useTheme';
 
@@ -18,16 +18,7 @@ export const Documents = () => {
           Documents
         </Typography>
       }
-      headerActionIcon={
-        <Button
-          label="+Add"
-          buttonProps={{
-            sx: {
-              color: 'info.main',
-            },
-          }}
-        />
-      }>
+      headerActionIcon={<Typography color="info.main">+Add</Typography>}>
       <Box>kdk</Box>
     </PageCard>
   );

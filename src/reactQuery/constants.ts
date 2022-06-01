@@ -38,4 +38,5 @@ export const queryKeys = {
   fetchDispatchRecommendedTechnicians: 'fetchDispatchRecommendedTechnicians',
   querySeviceOrders: 'querySeviceOrders',
   queryElevatorContracts: 'queryElevatorContracts',
+  queryCacheTypes: 'queryCacheTypes',
 };

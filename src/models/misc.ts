@@ -1,4 +1,5 @@
 import {MouseEvent, ReactNode} from 'react';
+import {number} from 'yup';
 import {GetState, SetState} from 'zustand';
 
 export interface RestError {
@@ -227,4 +228,17 @@ export type StoreSlice<T extends object, E extends object = T> = (
 export interface MenuBtnProps {
   label: string;
   action: (event: MouseEvent<HTMLLIElement>) => void;
+}
+
+export enum CacheTypes {
+  ELEVATOR_CAPACITY = 'ELEVATOR_CAPACITY',
+  ELEVATOR_MODEL = 'ELEVATOR_MODEL',
+  ELEVATOR_SKILL = 'ELEVATOR_SKILL',
+  ELEVATOR_TYPE = 'ELEVATOR_TYPE',
+}
+
+export interface CacheTypesParams {
+  pageSize: number;
+  pageIndex: number;
+  query: string;
 }

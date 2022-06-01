@@ -15,7 +15,14 @@ import {
   ElevatorRequestBody,
   ElevatorView,
 } from '../../models/elevator';
-import {Page, Resource, RestError, StringValue} from '../../models/misc';
+import {
+  CacheTypes,
+  CacheTypesParams,
+  Page,
+  Resource,
+  RestError,
+  StringValue,
+} from '../../models/misc';
 import {MaintainerView} from '../../models/technician';
 import {useUserSession} from './useUserSession';
 
@@ -164,6 +171,34 @@ export const useUpdateElevator = (successMsg: string) => {
         enqueueSnackbar('Some error occurred, please try again.', {
           variant: 'error',
         });
+      },
+    },
+  );
+};
+
+export const fetchCacheValues = async (
+  params: CacheTypesParams,
+  type: CacheTypes,
+) => {
+  const response = await axiosClient.get<Resource<string>>(
+    `/api/values/${type}`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useCacheValues = (params: CacheTypesParams, type: CacheTypes) => {
+  const navigate = useNavigate();
+  return useQuery(
+    [queryKeys.queryCacheTypes, type, params],
+    () => fetchCacheValues(params, type),
+    {
+      enabled: !!type,
+      onError: (e: any) => {
+        if (e.response.status === 500) navigate('/404');
       },
     },
   );

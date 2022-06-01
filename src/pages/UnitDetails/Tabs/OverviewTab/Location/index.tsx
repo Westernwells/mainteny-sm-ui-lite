@@ -13,7 +13,7 @@ import * as Yup from 'yup';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {LocationSchema} from './LocationSchema';
 import {EditLocationForm} from './EditLocationForm';
-import {LocationForm} from './models';
+import {LocationFormModel} from '../models';
 
 interface Props {
   containerStyles?: {[key: string]: any};
@@ -35,7 +35,7 @@ export const Location = ({
   const {mutateAsync: updateElevator} = useUpdateElevator(
     'Location updated successfully',
   );
-  const formik = useFormik<LocationForm>({
+  const formik = useFormik<LocationFormModel>({
     initialValues: {
       address: elevator.address,
       building: elevator.additionalInfo.buildingLocation,
@@ -55,6 +55,7 @@ export const Location = ({
   ]).current;
 
   const onSave = async () => {
+    setOpenDialog(false);
     await updateElevator({
       body: {
         ...elevatorRequestBody,
@@ -67,7 +68,6 @@ export const Location = ({
       },
       elevatorId: elevator.id,
     });
-    setOpenDialog(false);
   };
 
   return (

@@ -2,10 +2,10 @@ import {Box} from '@mui/system';
 import {AddressAutoComplete} from 'components/AddressAutoComplete';
 import {FormInput} from 'components/form/FormInput';
 import {FormikProps} from 'formik';
-import {LocationForm} from './models';
+import {LocationFormModel} from '../models';
 
 interface Props {
-  formik: FormikProps<LocationForm>;
+  formik: FormikProps<LocationFormModel>;
 }
 
 export const EditLocationForm = ({formik}: Props) => (

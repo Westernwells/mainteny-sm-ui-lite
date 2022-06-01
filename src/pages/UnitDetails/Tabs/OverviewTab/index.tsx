@@ -7,7 +7,11 @@ import {endOfYear, startOfYear} from 'date-fns';
 import {useParams} from 'react-router-dom';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {useUseQueryElevatorsContracts} from 'hooks/reactQuery/useContract';
-import {ContractStatus} from 'models/contract';
+import {
+  ContractRequestBody,
+  ContractStatus,
+  ContractView,
+} from 'models/contract';
 import {
   useElevatorById,
   useElevatorMaintainers,
@@ -27,19 +31,17 @@ interface Props {
   getUnitName?: (value: string) => void;
 }
 
-interface SpendingLimit {
-  value: number;
-  currency: string;
-}
-
 const pageSize = 10;
 
 export const OverviewTab = ({getUnitName}: Props) => {
   const {id: elevatorId} = useParams();
   const theme = useTheme();
-  const [spendingLimit, setSpendingLimit] = useState<SpendingLimit>();
+
+  const [validContract, setValidContract] = useState<ContractView>();
   const [elevatorRequestBody, setElevatorRequestBody] =
     useState<Partial<ElevatorRequestBody>>();
+  const [contractRequestBody, setContractRequestBody] =
+    useState<Partial<ContractRequestBody>>();
 
   const {data: elevator, isLoading: isLoadingElevator} =
     useElevatorById(elevatorId);
@@ -83,12 +85,9 @@ export const OverviewTab = ({getUnitName}: Props) => {
       const result = contracts[elevatorId!].filter(
         (item) => item.status === ContractStatus.VALID,
       );
-      setSpendingLimit({
-        value: result[0].spendingLimit,
-        currency: result[0].currency,
-      });
+      setValidContract(result[0]);
     }
-  }, [elevator]);
+  }, [contracts]);
 
   useEffect(() => {
     if (elevator) {
@@ -137,6 +136,29 @@ export const OverviewTab = ({getUnitName}: Props) => {
     }
   }, [elevator]);
 
+  useEffect(() => {
+    const body = {
+      currency: validContract?.currency,
+      endDate: validContract?.endTime,
+      externalId: '',
+      hourlyRate: validContract?.hourlyRate,
+      price: validContract?.price,
+      sla: validContract?.sla,
+      spendingLimit: validContract?.spendingLimit,
+      startDate: validContract?.startTime,
+      timePreference: validContract?.timePreference
+        ? validContract.timePreference.map((item) => ({
+            fromTime: item.fromTime,
+            toTime: item.toTime,
+            type: item.type,
+          }))
+        : [],
+      type: validContract?.type,
+      visitsNumber: validContract?.visitsNumber,
+    };
+    setContractRequestBody(body);
+  }, [validContract]);
+
   if (isLoadingElevator) {
     return null;
   }
@@ -163,8 +185,9 @@ export const OverviewTab = ({getUnitName}: Props) => {
               },
             }}
             elevator={elevator!}
-            currency={spendingLimit?.currency || ''}
-            spendingLimit={spendingLimit?.value || ''}
+            validContract={validContract}
+            contractRequestBody={contractRequestBody}
+            elevatorRequestBody={elevatorRequestBody}
           />
         </Grid>
       </Grid>

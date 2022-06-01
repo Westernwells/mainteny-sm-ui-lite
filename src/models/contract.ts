@@ -80,6 +80,7 @@ export interface ContractView {
   startTime: string;
   endTime: string;
   units?: number;
+  timePreference: ContractTimeWindow[];
 
   status: ContractStatus;
   search: string;
@@ -161,4 +162,24 @@ export interface CustomerContractParams {
 export interface ElevatorContractParams {
   elevatorIds: string[];
   status: ContractStatus[];
+}
+
+export interface ContractTimeWindowRecord {
+  fromTime: string;
+  toTime: string;
+  type: TimeWindowType;
+}
+
+export interface ContractRequestBody {
+  currency: string;
+  endDate: string;
+  externalId: string;
+  hourlyRate: number;
+  price: number;
+  sla: number;
+  spendingLimit: number;
+  startDate: string;
+  timePreference: ContractTimeWindowRecord[];
+  type: string;
+  visitsNumber: number;
 }

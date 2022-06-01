@@ -16,7 +16,7 @@ import {Elevator} from 'models/elevator';
 interface Props {
   label: string;
   elevator: Elevator;
-  spendingLimit?: number | string;
+  spendingLimit?: number;
   currency?: string;
 }
 
@@ -91,7 +91,7 @@ export const UnitDetailsSchema = ({
           <CardProps
             icon={<CallIcon sx={{color: theme.palette.info.dark}} />}
             label="EMERGENCY PHONE PROVIDER"
-            bodyText={elevator.additionalInfo.emergencyContractNumber || '-'}
+            bodyText={elevator.additionalInfo.emergencyPhoneProvider || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}
