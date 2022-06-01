@@ -1,5 +1,6 @@
 import {Address, AddressRecord, Meta, Contact, Priority} from './misc';
 import {ServiceCompany, ServiceCompanySimpleView} from './service-company';
+import {UserAccount} from './user';
 
 export interface ClientAdditionalInfo {
   priority: Priority;
@@ -36,6 +37,13 @@ export interface ClientSimpleView {
   labels: string[];
   additionalInfo: ClientAdditionalInfo;
   meta: Meta;
+}
+
+export interface ClientManager {
+  id: string;
+  meta: Meta;
+  propertyOwner: Client;
+  userAccount: UserAccount;
 }
 
 export interface CreateClientRecord {

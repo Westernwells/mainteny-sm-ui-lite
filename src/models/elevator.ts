@@ -7,7 +7,7 @@ import {
   StringMap,
   StringValue,
 } from './misc';
-import {Client, ClientSimpleView} from './client';
+import {Client, ClientManager, ClientSimpleView} from './client';
 import {TechnicianSimpleView, TechnicianView} from './technician';
 import {FileResource, FileResourceRecord} from './media';
 import {ServiceCompanyTimeUnit} from './service-company';
@@ -58,6 +58,7 @@ export interface ElevatorAdditionalInfo {
   parking: string;
   pictures: any;
   propertySegment: string;
+  qrCode: FileResourceRecord;
 }
 
 export interface ElevatorMaintainerRecord {
@@ -83,6 +84,7 @@ export interface Elevator {
   availability: number;
   address: Address;
   propertyOwner: Client;
+  propertyManager: ClientManager;
   lastVisitDate: string;
   nextVisitDate: string;
   serviceTime: number;
@@ -257,8 +259,8 @@ export interface ElevatorRequestBody {
   numberOfStops: number;
   parking: string;
   pictures: FileResourceRecord[];
-  priority: Priority[];
-  properties: StringValue;
+  priority: Priority;
+  properties: ElevatorAvailabilityAdditionalProps;
   propertyManagerId: string;
   propertyOwnerId: string;
   propertySegment: string;

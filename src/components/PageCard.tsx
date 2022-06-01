@@ -18,6 +18,7 @@ export interface Props {
   customHeader?: JSX.Element;
   containerStyles?: {[key: string]: string | number};
   contentContainerStyles?: {[key: string]: string | number};
+  handleAction?: () => void;
 }
 
 export const PageCard = ({
@@ -31,6 +32,7 @@ export const PageCard = ({
   // contentPadding,
   customHeader,
   contentContainerStyles,
+  handleAction = () => {},
 }: Props) => {
   const theme = useTheme();
   return (
@@ -50,7 +52,9 @@ export const PageCard = ({
           }}
           action={
             headerActionIcon ? (
-              <IconButton aria-label="settings">{headerActionIcon}</IconButton>
+              <IconButton onClick={handleAction} aria-label="settings">
+                {headerActionIcon}
+              </IconButton>
             ) : null
           }
           title={

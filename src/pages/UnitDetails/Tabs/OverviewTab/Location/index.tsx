@@ -1,21 +1,51 @@
-import {PageCard} from 'components/PageCard';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
-import {Elevator} from 'models/elevator';
+import {Elevator, ElevatorRequestBody} from 'models/elevator';
 import Grid from '@mui/material/Grid';
-import {useRef} from 'react';
+import {useRef, useState} from 'react';
+import {InfoCard} from 'components/InfoCard';
+import {useFormik} from 'formik';
+import {Dialog} from 'components/Dialog';
+import * as Yup from 'yup';
+import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {LocationSchema} from './LocationSchema';
+import {EditLocationForm} from './EditLocationForm';
+import {LocationForm} from './models';
 
 interface Props {
   containerStyles?: {[key: string]: any};
   elevator: Elevator;
+  elevatorRequestBody?: Partial<ElevatorRequestBody>;
 }
 
-export const Location = ({containerStyles, elevator}: Props) => {
+const validationSchema = Yup.object().shape({
+  address: Yup.object().nullable().required('Address is required'),
+});
+
+export const Location = ({
+  containerStyles,
+  elevator,
+  elevatorRequestBody,
+}: Props) => {
   const theme = useTheme();
+  const [openDialog, setOpenDialog] = useState(false);
+  const {mutateAsync: updateElevator} = useUpdateElevator(
+    'Location updated successfully',
+  );
+  const formik = useFormik<LocationForm>({
+    initialValues: {
+      address: elevator.address,
+      building: elevator.additionalInfo.buildingLocation,
+      propertySegment: elevator.additionalInfo.propertySegment,
+      keyLocation: elevator.additionalInfo.keyLocation,
+      parking: elevator.additionalInfo.parking,
+    },
+    onSubmit: () => {},
+    validationSchema,
+  });
   const labels = useRef([
     'address',
     'building',
@@ -24,15 +54,29 @@ export const Location = ({containerStyles, elevator}: Props) => {
     'parking',
   ]).current;
 
+  const onSave = async () => {
+    await updateElevator({
+      body: {
+        ...elevatorRequestBody,
+        propertyOwnerId: elevatorRequestBody?.propertyOwnerId,
+        address: formik.values.address,
+        buildingLocation: formik.values.building || '',
+        propertySegment: formik.values.propertySegment!,
+        keyLocation: formik.values.keyLocation!,
+        parking: formik.values.parking!,
+      },
+      elevatorId: elevator.id,
+    });
+    setOpenDialog(false);
+  };
+
   return (
-    <PageCard
+    <InfoCard
       containerStyles={{...containerStyles}}
-      customHeader={<Typography variant="subtitle1">Location</Typography>}
-      headerActionIcon={<EditIcon />}
-      headerContainerOverrideStyles={{
-        py: '0.2em',
-        background: theme.palette.inputBackground.main,
-      }}>
+      handleAction={() => setOpenDialog(true)}
+      header={<Typography variant="subtitle1">Location</Typography>}
+      showHeaderBackground
+      headerActionIcon={<EditIcon />}>
       <Box
         sx={{
           display: 'flex',
@@ -58,6 +102,16 @@ export const Location = ({containerStyles, elevator}: Props) => {
           </Grid>
         ))}
       </Grid>
-    </PageCard>
+      <Dialog
+        title="Edit Location"
+        onCancel={() => setOpenDialog(false)}
+        onSave={() => onSave()}
+        dialogProps={{
+          maxWidth: 'xs',
+          open: openDialog || false,
+        }}>
+        <EditLocationForm formik={formik} />
+      </Dialog>
+    </InfoCard>
   );
 };

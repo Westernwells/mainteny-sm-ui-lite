@@ -12,6 +12,7 @@ import {
   useElevatorById,
   useElevatorMaintainers,
 } from 'hooks/reactQuery/useElevator';
+import {ElevatorRequestBody} from 'models/elevator';
 import {Location} from './Location';
 import {UnitDetails} from './UnitDetails';
 import {Service} from './Service';
@@ -37,6 +38,8 @@ export const OverviewTab = ({getUnitName}: Props) => {
   const {id: elevatorId} = useParams();
   const theme = useTheme();
   const [spendingLimit, setSpendingLimit] = useState<SpendingLimit>();
+  const [elevatorRequestBody, setElevatorRequestBody] =
+    useState<Partial<ElevatorRequestBody>>();
 
   const {data: elevator, isLoading: isLoadingElevator} =
     useElevatorById(elevatorId);
@@ -87,6 +90,53 @@ export const OverviewTab = ({getUnitName}: Props) => {
     }
   }, [elevator]);
 
+  useEffect(() => {
+    if (elevator) {
+      let properties = {};
+      elevator.properties.forEach((item) => {
+        properties = {
+          ...properties,
+          [item.key]: item.value,
+        };
+      });
+      const body = {
+        address: elevator.address,
+        buildingLocation: elevator.additionalInfo.buildingLocation,
+        builtYear: elevator.additionalInfo.builtYear,
+        cabinType: elevator.additionalInfo.cabinType,
+        capacity: elevator.capacity,
+        category: elevator.category,
+        controllerManufacturer: elevator.additionalInfo.controllerManufacturer,
+        controllerModel: elevator.additionalInfo.controllerModel,
+        documents: elevator.additionalInfo.documents,
+        emergencyContractNumber:
+          elevator.additionalInfo.emergencyContractNumber,
+        emergencyPhoneProvider: elevator.additionalInfo.emergencyPhoneProvider,
+        keyLocation: elevator.additionalInfo.keyLocation,
+        lastInspectionDate: elevator.additionalInfo.lastInspectionDate,
+        lastVisitDate: elevator.lastVisitDate,
+        manufacturer: elevator.additionalInfo.manufacturer,
+        model: elevator.model,
+        number: elevator.number,
+        numberOfStops: elevator.additionalInfo.numberOfStops,
+        parking: elevator.additionalInfo.parking,
+        pictures: elevator.additionalInfo.pictures,
+        priority: elevator.additionalInfo.priority,
+        properties,
+        // propertyManagerId: elevator.propertyManager?.id || '',
+        propertyOwnerId: elevator.propertyOwner.id,
+        propertySegment: elevator.additionalInfo.propertySegment,
+        qrCode: elevator.additionalInfo.qrCode,
+        serialNumber: elevator.serialNumber,
+        serviceTime: elevator.serviceTime,
+        status: elevator.status,
+        technicianNumber: elevator.technicianNumber,
+        type: elevator.type,
+      };
+      setElevatorRequestBody(body);
+    }
+  }, [elevator]);
+
   if (isLoadingElevator) {
     return null;
   }
@@ -96,6 +146,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
       <Grid container spacing={2}>
         <Grid item md={5} sm={12}>
           <Location
+            elevatorRequestBody={elevatorRequestBody}
             containerStyles={{
               [theme.breakpoints.up('md')]: {
                 minHeight: '35rem',

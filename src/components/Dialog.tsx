@@ -1,4 +1,4 @@
-import MuiDialog from '@mui/material/Dialog';
+import MuiDialog, {DialogProps} from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
@@ -10,51 +10,52 @@ import {Button} from './Button';
 interface Props {
   title: string | JSX.Element;
   children: ReactNode;
-  open?: boolean;
-  onSave: () => void;
+  onSave?: () => void;
   onCancel: () => void;
   disableSaveBtn?: boolean;
+  dialogProps: DialogProps;
+  saveBtnType?: 'button' | 'submit' | 'reset';
 }
 
 export const Dialog = ({
   title,
   children,
-  open,
-  onSave,
-  onCancel,
+  onSave = () => {},
+  onCancel = () => {},
   disableSaveBtn,
-}: Props) => {
-  console.log('');
-  return (
-    <MuiDialog
-      open={open || false}
-      onClose={onCancel}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description">
-      <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
-      <DialogContent>
-        <DialogContentText id="alert-dialog-description" component="div">
-          {children}
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions sx={{mt: '1.5em'}}>
-        <Button
-          buttonProps={{
-            onClick: onCancel,
-          }}>
-          <Typography variant="subtitle2" color="text.secondary">
-            Cancel
-          </Typography>
-        </Button>
-        <Button
-          buttonProps={{
-            onClick: onSave,
-            autoFocus: true,
-            disabled: disableSaveBtn,
-          }}>
-          <Typography variant="subtitle2">Save</Typography>
-        </Button>
-      </DialogActions>
-    </MuiDialog>
-  );
-};
+  dialogProps,
+  saveBtnType,
+}: Props) => (
+  <MuiDialog
+    fullWidth
+    onClose={onCancel}
+    aria-labelledby="alert-dialog-title"
+    aria-describedby="alert-dialog-description"
+    {...dialogProps}>
+    <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
+    <DialogContent>
+      <DialogContentText id="alert-dialog-description" component="div">
+        {children}
+      </DialogContentText>
+    </DialogContent>
+    <DialogActions sx={{mt: '1.5em'}}>
+      <Button
+        buttonProps={{
+          onClick: onCancel,
+        }}>
+        <Typography variant="subtitle2" color="text.secondary">
+          Cancel
+        </Typography>
+      </Button>
+      <Button
+        buttonProps={{
+          onClick: onSave,
+          autoFocus: true,
+          disabled: disableSaveBtn,
+          type: saveBtnType,
+        }}>
+        <Typography variant="subtitle2">Save</Typography>
+      </Button>
+    </DialogActions>
+  </MuiDialog>
+);
