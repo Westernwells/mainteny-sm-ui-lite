@@ -215,6 +215,20 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
               placeholder: 'Enter Capacity',
             }}
           />
+
+          <FormInput
+            props={{
+              size: 'small',
+              disabled: true,
+              placeholder: 'Enter Spending Limit ',
+              label: 'Spending Limit',
+              name: 'spendingLimit',
+              error: !!formik.errors.spendingLimit,
+              value: formik.values.spendingLimit,
+              onBlur: formik.handleBlur,
+              onChange: formik.handleChange,
+            }}
+          />
         </Grid>
       </Grid>
     </Box>

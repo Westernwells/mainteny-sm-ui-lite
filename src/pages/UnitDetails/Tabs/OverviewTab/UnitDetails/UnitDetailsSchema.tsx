@@ -9,6 +9,7 @@ import LabelIcon from '@mui/icons-material/Label';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import useTheme from '@mui/material/styles/useTheme';
 import {Elevator} from 'models/elevator';
 
@@ -19,7 +20,12 @@ interface Props {
   currency?: string;
 }
 
-export const UnitDetailsSchema = ({label, elevator}: Props) => {
+export const UnitDetailsSchema = ({
+  label,
+  elevator,
+  spendingLimit,
+  currency,
+}: Props) => {
   const theme = useTheme();
   const renderSection = () => {
     switch (label) {
@@ -134,6 +140,18 @@ export const UnitDetailsSchema = ({label, elevator}: Props) => {
             icon={<PeopleAltIcon sx={{color: theme.palette.info.dark}} />}
             label="UNIT CAPACITY"
             bodyText={elevator.capacity || '-'}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3em"
+            containerStyles={{mt: '0.5em'}}
+          />
+        );
+
+      case 'spendingLimit':
+        return (
+          <CardProps
+            icon={<MonetizationOnIcon sx={{color: theme.palette.info.dark}} />}
+            label="SPENDING LIMIT"
+            bodyText={spendingLimit ? `${spendingLimit} ${currency}` : '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}

@@ -1,11 +1,11 @@
-import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
+// import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
 import useTheme from '@mui/material/styles/useTheme';
 import Grid from '@mui/material/Grid';
 import {useEffect, useState} from 'react';
-import {createEmptyResource} from 'utils/paging-utils';
-import {endOfYear, startOfYear} from 'date-fns';
+// import {createEmptyResource} from 'utils/paging-utils';
+// import {endOfYear, startOfYear} from 'date-fns';
 import {useParams} from 'react-router-dom';
-import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
+// import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {useUseQueryElevatorsContracts} from 'hooks/reactQuery/useContract';
 import {ContractStatus, ContractView} from 'models/contract';
 import {
@@ -13,6 +13,7 @@ import {
   useElevatorMaintainers,
 } from 'hooks/reactQuery/useElevator';
 import {ElevatorRequestBody} from 'models/elevator';
+import {Progress} from 'components/Progress';
 import {Location} from './Location';
 import {UnitDetails} from './UnitDetails';
 import {Service} from './Service';
@@ -27,7 +28,7 @@ interface Props {
   getUnitName?: (value: string) => void;
 }
 
-const pageSize = 10;
+// const pageSize = 10;
 
 export const OverviewTab = ({getUnitName}: Props) => {
   const {id: elevatorId} = useParams();
@@ -39,34 +40,35 @@ export const OverviewTab = ({getUnitName}: Props) => {
 
   const {data: elevator, isLoading: isLoadingElevator} =
     useElevatorById(elevatorId);
-  const {data: contracts = {}} = useUseQueryElevatorsContracts({
-    elevatorIds: elevatorId ? [elevatorId] : [],
-    status: [
-      ContractStatus.VALID,
-      ContractStatus.PENDING,
-      ContractStatus.EXPIRED,
-    ],
-  });
+  const {data: contracts = {}, isLoading: isLoadingContract} =
+    useUseQueryElevatorsContracts({
+      elevatorIds: elevatorId ? [elevatorId] : [],
+      status: [
+        ContractStatus.VALID,
+        ContractStatus.PENDING,
+        ContractStatus.EXPIRED,
+      ],
+    });
 
   const {data: maintainers = []} = useElevatorMaintainers(elevatorId);
 
-  const {
-    data: serviceOrders = createEmptyResource<ServiceOrderView>(pageSize),
-  } = useServiceOrders({
-    elevatorIds: elevatorId ? [elevatorId] : undefined,
-    start: startOfYear(new Date()).toISOString(),
-    end: endOfYear(new Date()).toISOString(),
-    pageSize,
-    pageIndex: 0,
-    query: '',
-    status: [
-      ServiceOrderStatus.SCHEDULED,
-      ServiceOrderStatus.COMPLETED,
-      ServiceOrderStatus.IN_PROGRESS,
-    ],
-  });
+  // const {
+  //   data: serviceOrders = createEmptyResource<ServiceOrderView>(pageSize),
+  // } = useServiceOrders({
+  //   elevatorIds: elevatorId ? [elevatorId] : undefined,
+  //   start: startOfYear(new Date()).toISOString(),
+  //   end: endOfYear(new Date()).toISOString(),
+  //   pageSize,
+  //   pageIndex: 0,
+  //   query: '',
+  //   status: [
+  //     ServiceOrderStatus.SCHEDULED,
+  //     ServiceOrderStatus.COMPLETED,
+  //     ServiceOrderStatus.IN_PROGRESS,
+  //   ],
+  // });
 
-  console.log(serviceOrders, '____----');
+  // console.log(serviceOrders, '____----');
 
   useEffect(() => {
     if (getUnitName && elevator) {
@@ -130,8 +132,8 @@ export const OverviewTab = ({getUnitName}: Props) => {
     }
   }, [elevator]);
 
-  if (isLoadingElevator) {
-    return null;
+  if (isLoadingElevator || isLoadingContract) {
+    return <Progress />;
   }
 
   return (

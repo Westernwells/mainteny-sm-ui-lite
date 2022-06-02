@@ -35,7 +35,6 @@ export const UnitDetails = ({
   const {mutateAsync: updateElevator} = useUpdateElevator(
     'Unit details updated successfully',
   );
-
   const formik = useFormik<UnitDetailsFormModel>({
     initialValues: {
       category: elevator.category,
@@ -48,6 +47,7 @@ export const UnitDetails = ({
       model: elevator.model,
       serialNumber: elevator.serialNumber,
       unitCapacity: elevator.capacity,
+      spendingLimit: validContract?.spendingLimit,
     },
     onSubmit: () => {},
     validationSchema,
@@ -63,6 +63,7 @@ export const UnitDetails = ({
     'stops',
     'unitCapacity',
     'cabinType',
+    'spendingLimit',
     'phone',
   ]).current;
 
@@ -88,6 +89,8 @@ export const UnitDetails = ({
     });
   };
 
+  console.log(validContract, '@@@@####))');
+
   return (
     <InfoCard
       containerStyles={{...containerStyles}}
@@ -102,6 +105,7 @@ export const UnitDetails = ({
               label={label}
               elevator={elevator}
               currency={validContract?.currency}
+              spendingLimit={validContract?.spendingLimit}
             />
           </Grid>
         ))}
