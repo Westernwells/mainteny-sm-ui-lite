@@ -181,7 +181,7 @@ export const Invoices = () => {
     <PageListingLayout
       renderWidget={
         <Widget
-          searchPlaceholder="Try 'INV000001'"
+          searchPlaceholder="Search by number, customer, service type etc."
           getSearchValue={(val: string) => setSearch(val)}
           showActionBtn
           btnLabel="New invoice"

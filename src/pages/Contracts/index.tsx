@@ -147,7 +147,7 @@ export const Contracts = () => {
     <PageListingLayout
       renderWidget={
         <Widget
-          searchPlaceholder="Try 'Astralift BV'"
+          searchPlaceholder="Search by number, customer, contract type etc."
           getSearchValue={(val: string) => setSearch(val)}
           filterItems={renderFilterItems()}
         />

@@ -139,7 +139,7 @@ export const ServiceOrderList = () => {
   const renderWidget = () => (
     <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
       <Widget
-        searchPlaceholder="Search order type, customer, address"
+        searchPlaceholder="Search order type, customer, address etc."
         getSearchValue={(search) => setSearchQuery(search)}
         filterItems={renderFilterItems()}
       />

@@ -221,7 +221,7 @@ export const MyUnits = () => {
             flexGrow: 1,
           }}>
           <Widget
-            searchPlaceholder="Search company name, unit model"
+            searchPlaceholder="Search by number, model, customer, address etc."
             getSearchValue={(val: string) => {
               setSearch(val);
             }}

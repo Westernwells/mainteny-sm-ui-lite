@@ -1,115 +1,37 @@
-import {
-  GridAlignment,
-  GridColDef,
-  GridColumnHeaderParams,
-  GridRenderCellParams,
-  GridRowsProp,
-} from '@mui/x-data-grid';
-import Typography from '@mui/material/Typography';
-import SendIcon from '@mui/icons-material/Send';
-import {StatusChip} from 'components/StatusChip';
-import IconButton from '@mui/material/IconButton';
 import React from 'react';
-import {convertToText} from 'utils/utils';
-
-const defaultProps = {
-  editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
-  renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" mx="0.5em">
-      {params.value}
-    </Typography>
-  ),
-};
-const defaultAlignment: {
-  flex: number;
-  headerAlign: GridAlignment;
-  align: GridAlignment;
-} = {
-  flex: 1,
-  headerAlign: 'center',
-  align: 'center',
-};
+import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
+import SendIcon from '@mui/icons-material/Send';
+import {getColumnProps} from 'components/DataGridLayout';
+import IconButton from '@mui/material/IconButton';
 
 export const columns: GridColDef[] = [
-  {
-    field: 'name',
-    headerName: 'Name',
-    type: 'string',
-    flex: 2,
-    headerAlign: 'left',
-    cellClassName: 'truncateText',
-    ...defaultProps,
-  },
-  {
+  getColumnProps({
     field: 'number',
-    headerName: 'NUMBER',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'address',
-    headerName: 'ADDRESS',
-    type: 'number',
-    flex: 3,
-    headerAlign: 'left',
-    align: 'left',
+    headerName: 'number',
+    align: 'center',
+    flex: 0,
+  }),
+  getColumnProps({
+    field: 'name',
+    headerName: 'name',
     cellClassName: 'truncateText',
-    ...defaultProps,
-  },
-  {
+    flex: 1.5,
+  }),
+  getColumnProps({
+    field: 'address',
+    headerName: 'address',
+    cellClassName: 'truncateText',
+    flex: 1.5,
+  }),
+  getColumnProps({field: 'phone', headerName: 'phone', flex: 0.75}),
+  getColumnProps({
     field: 'units',
-    headerName: 'NO. OF UNITS',
-    type: 'number',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'phone',
-    headerName: 'PHONE',
-    type: 'string',
-    flex: 1,
-    headerAlign: 'left',
-    align: 'left',
-    cellClassName: 'nowrap',
-    ...defaultProps,
-  },
-  {
-    field: 'access',
-    headerName: 'DASHBOARD ACCESS',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-    flex: 2,
-
-    renderCell: (params) => (
-      <StatusChip
-        label={convertToText(params.value)}
-        color="success"
-        variant="filled"
-        maxChars={8}
-      />
-    ),
-  },
-  {
-    field: 'email',
-    headerName: 'ACTIONS',
-    editable: false,
-    sortable: false,
-    disableColumnMenu: true,
-    disableExport: true,
-    ...defaultAlignment,
-
-    renderHeader: (params) => (
-      <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName}
-      </Typography>
-    ),
+    headerName: 'no. of units',
+    align: 'right',
+  }),
+  getColumnProps({
+    field: 'actions',
+    headerName: 'actions',
     renderCell: (params) => (
       <IconButton
         component="a"
@@ -117,10 +39,12 @@ export const columns: GridColDef[] = [
           e.stopPropagation();
           window.open(`mailto:${params.value}`, '_blank');
         }}>
-        <SendIcon sx={{color: 'action.active'}} />
+        <SendIcon sx={{color: 'action.active'}} fontSize="small" />
       </IconButton>
     ),
-  },
+    align: 'center',
+    flex: 0,
+  }),
 ];
 
 export const makeRows = (customers: any): GridRowsProp =>
@@ -134,6 +58,6 @@ export const makeRows = (customers: any): GridRowsProp =>
         phone: item.contact.phone,
         access: 'Invite',
         navigateTo: `details/${item.id}?tab=0`,
-        email: item.contact.email,
+        actions: item.contact.email,
       }))
     : console.error('No Data');

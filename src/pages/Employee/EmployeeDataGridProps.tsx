@@ -1,10 +1,4 @@
-import {
-  GridAlignment,
-  GridColDef,
-  GridColumnHeaderParams,
-  GridRenderCellParams,
-  GridRowModel,
-} from '@mui/x-data-grid';
+import {GridColDef, GridRowModel} from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 // import {EmployeesView} from 'models/employee';
 import Box from '@mui/material/Box';
@@ -16,91 +10,50 @@ import SendIcon from '@mui/icons-material/Send';
 import {capitalize} from 'utils/utils';
 import IconButton from '@mui/material/IconButton';
 import React from 'react';
+import {getColumnProps} from 'components/DataGridLayout';
 import {CommonUserView, Role} from 'models/user';
 import {TechnicianEventPair} from 'models/technician';
 
-const defaultProps = {
-  editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
-  renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" mx="0.5em">
-      {params.value}
-    </Typography>
-  ),
-};
-const defaultAlignment: {
-  flex: number;
-  headerAlign: GridAlignment;
-  align: GridAlignment;
-} = {
-  flex: 1,
-  headerAlign: 'left',
-  align: 'left',
-};
-
 export const columns: GridColDef[] = [
-  {
+  getColumnProps({
     field: 'name',
     headerName: 'Name',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-    flex: 2,
-  },
-  {
+    flex: 1.5,
+  }),
+  getColumnProps({
     field: 'role',
-    headerName: 'ROLE',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-    flex: 2,
+    headerName: 'role',
+    cellClassName: 'truncateText',
     renderCell: (params) => {
-      // [0].split('_').join(' ')
       const role = capitalize(params.value);
       return (
-        <Typography
-          variant="body2"
-          mx="0.5em"
-          sx={{textTransform: 'capitalize'}}>
+        <Typography variant="body2" sx={{textTransform: 'capitalize'}}>
           {role}
         </Typography>
       );
     },
-  },
-  {
+    flex: 1.5,
+  }),
+  getColumnProps({
     field: 'address',
-    headerName: 'ADDRESS',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-    flex: 4,
-  },
-  {
+    headerName: 'address',
+    cellClassName: 'truncateText',
+    flex: 1.5,
+  }),
+  getColumnProps({
     field: 'phone',
-    headerName: 'PHONE NUMBER',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-    flex: 2,
-  },
-  {
+    headerName: 'phone',
+    flex: 1.5,
+  }),
+  getColumnProps({
     field: 'shift',
-    headerName: 'SHIFT',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
+    headerName: 'shift',
+    align: 'center',
+    flex: 0,
+  }),
+  getColumnProps({
     field: 'availability',
-    headerName: 'AVAILABILITY',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-
+    headerName: 'availability',
     renderCell: (params) => {
       switch (params.value) {
         case TechnicianEventType.HOLIDAY:
@@ -150,7 +103,6 @@ export const columns: GridColDef[] = [
                 />
               </Box>
               <Box>
-                {' '}
                 <Typography variant="body2" ml="0.5em">
                   Available
                 </Typography>
@@ -159,22 +111,11 @@ export const columns: GridColDef[] = [
           );
       }
     },
-  },
-  {
-    field: 'email',
-    headerName: 'EMAIL',
-    ...defaultAlignment,
-    ...defaultProps,
-    editable: false,
-    sortable: false,
-    disableColumnMenu: true,
-    disableExport: true,
-
-    renderHeader: (params) => (
-      <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName}
-      </Typography>
-    ),
+    align: 'center',
+  }),
+  getColumnProps({
+    field: 'actions',
+    headerName: 'actions',
     renderCell: (params) => (
       <IconButton
         component="a"
@@ -182,10 +123,12 @@ export const columns: GridColDef[] = [
           e.stopPropagation();
           window.open(`mailto:${params.value}`, '_blank');
         }}>
-        <SendIcon sx={{color: 'action.active'}} />
+        <SendIcon fontSize="small" sx={{color: 'action.active'}} />
       </IconButton>
     ),
-  },
+    align: 'center',
+    flex: 0,
+  }),
 ];
 
 export const makeRows = (
@@ -215,7 +158,7 @@ export const makeRows = (
           shift,
           availability: event,
           navigateTo: `details/${item.userAccount.username}`,
-          email: item.userAccount.username,
+          actions: item.userAccount.contact.email,
         };
       })
     : [];

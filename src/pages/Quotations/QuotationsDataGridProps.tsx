@@ -1,40 +1,11 @@
-import {
-  GridAlignment,
-  GridColDef,
-  GridColumnHeaderParams,
-  GridRenderCellParams,
-  GridRowsProp,
-} from '@mui/x-data-grid';
-import Typography from '@mui/material/Typography';
+import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import {StatusChip} from 'components/StatusChip';
+import {getColumnProps} from 'components/DataGridLayout';
 import {formatDate} from 'utils/datetime';
 import {formatCurrency} from 'utils/currency';
 import {QuotationStatus, QuotationView} from 'models/quotation';
 import {Resource} from 'models/misc';
 import {Actions} from './Actions';
-
-const defaultProps = {
-  editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="tableHeaderText" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
-  renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" mx="0.5em">
-      {params.value}
-    </Typography>
-  ),
-};
-const defaultAlignment: {
-  flex: number;
-  headerAlign: GridAlignment;
-  align: GridAlignment;
-} = {
-  flex: 1,
-  headerAlign: 'center',
-  align: 'center',
-};
 
 export const getQuotationStatusStyles = (
   status: string,
@@ -57,57 +28,39 @@ export const getQuotationStatusStyles = (
 };
 
 export const columns: GridColDef[] = [
-  {
+  getColumnProps({
     field: 'number',
-    headerName: 'QUOTATION NO',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
+    headerName: 'number',
+    align: 'center',
+    flex: 0,
+  }),
+  getColumnProps({
     field: 'customer',
-    headerName: 'CUSTOMER NAME',
-    type: 'string',
-    sortable: false,
-    flex: 2,
-    headerAlign: 'left',
-    ...defaultProps,
-  },
-  {
+    headerName: 'customer',
+    cellClassName: 'truncateText',
+    flex: 1.5,
+  }),
+  getColumnProps({
     field: 'address',
-    headerName: 'ADDRESS',
-    type: 'string',
-    sortable: false,
-    flex: 3,
-    headerAlign: 'left',
-    ...defaultProps,
-  },
-  {
-    field: 'createdDate',
-    headerName: 'CREATED DATE',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
+    headerName: 'address',
+    cellClassName: 'truncateText',
+    flex: 1.5,
+  }),
+  getColumnProps({
+    field: 'created',
+    headerName: 'created date',
+    align: 'center',
+    flex: 0.75,
+  }),
+  getColumnProps({
     field: 'amount',
-    headerName: 'TOTAL PRICE',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
+    headerName: 'total amount',
+    align: 'right',
+  }),
+  getColumnProps({
     field: 'status',
-    headerName: 'STATUS',
-    type: 'string',
-    ...defaultAlignment,
-    editable: false,
-    sortable: false,
-    renderHeader: (params: GridColumnHeaderParams) => (
-      <Typography variant="tableHeaderText" color="textSecondary">
-        {params.colDef.headerName}
-      </Typography>
-    ),
+    headerName: 'status',
+    align: 'center',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
         label={getQuotationStatusStyles(params.value).label}
@@ -117,28 +70,20 @@ export const columns: GridColDef[] = [
         maxChars={9}
       />
     ),
-  },
-  {
+    flex: 0.75,
+  }),
+  getColumnProps({
     field: 'actions',
-    headerName: 'ACTIONS',
-    editable: false,
-    sortable: false,
-    disableColumnMenu: true,
-    disableExport: true,
-    ...defaultAlignment,
-
-    renderHeader: (params) => (
-      <Typography variant="tableHeaderText" color="textSecondary">
-        {params.colDef.headerName}
-      </Typography>
-    ),
+    headerName: 'actions',
+    align: 'center',
     renderCell: (params) => (
       <Actions
         status={params.row.status}
         quotationId={params.row.quotationId}
       />
     ),
-  },
+    flex: 0,
+  }),
 ];
 
 export const makeRows = (quotations: Resource<QuotationView>): GridRowsProp =>
@@ -149,7 +94,7 @@ export const makeRows = (quotations: Resource<QuotationView>): GridRowsProp =>
     number: item.number,
     customer: item.elevator.propertyOwner.name,
     address: item.elevator.propertyOwner.address.fullName,
-    createdDate: formatDate(item.meta.createdAt),
+    created: formatDate(item.meta.createdAt),
     amount: `${formatCurrency(
       item
         ? item.totalAmount.netAmount / 10 ** item.totalAmount.fractionDigits!

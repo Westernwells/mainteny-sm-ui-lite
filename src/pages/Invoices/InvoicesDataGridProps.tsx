@@ -1,45 +1,14 @@
-import {
-  GridAlignment,
-  GridCellClassNamePropType,
-  GridColDef,
-  GridColumnHeaderParams,
-  GridRenderCellParams,
-  GridRowsProp,
-} from '@mui/x-data-grid';
-import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import {StatusChip} from 'components/StatusChip';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
+import {getColumnProps} from 'components/DataGridLayout';
 // import {fetchDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {InvoiceStatus} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
 import {formatDate, toDate} from '../../utils/datetime';
-
-const defaultProps = {
-  editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
-  renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" mx="0.5em">
-      {params.value}
-    </Typography>
-  ),
-};
-const defaultAlignment: {
-  flex: number;
-  headerAlign: GridAlignment;
-  align: GridAlignment;
-  cellClassName: GridCellClassNamePropType;
-} = {
-  flex: 1,
-  headerAlign: 'center',
-  align: 'center',
-  cellClassName: 'nowrap',
-};
 
 export const getInvoiceStatusStyles = (
   status: string,
@@ -69,83 +38,54 @@ export const getInvoiceStatusStyles = (
 };
 
 export const columns: GridColDef[] = [
-  {
-    field: 'invoiceNumber',
-    headerName: 'INVOICE NUMBER',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'propertyOwner',
-    headerName: 'CUSTOMER',
-    type: 'string',
-    flex: 1.5,
-    headerAlign: 'left',
+  getColumnProps({
+    field: 'number',
+    headerName: 'number',
+    align: 'center',
+    flex: 0,
+  }),
+  getColumnProps({
+    field: 'customer',
+    headerName: 'customer',
     cellClassName: 'truncateText',
-    ...defaultProps,
-  },
-  {
-    field: 'invoiceDate',
-    headerName: 'INVOICE DATE',
-    type: 'string',
-    flex: 1,
-    headerAlign: 'left',
-    ...defaultProps,
-  },
-
-  {
-    field: 'orderNumber',
-    headerName: 'ORDER NUMBER',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-
-  {
-    field: 'serviceType',
-    headerName: 'SERVICE TYPE',
-    type: 'string',
     flex: 1.5,
-    editable: false,
-    headerAlign: 'left',
-    renderHeader: (params: GridColumnHeaderParams) => (
-      <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName}
-      </Typography>
-    ),
+  }),
+  getColumnProps({
+    field: 'date',
+    headerName: 'invoice date',
+    align: 'center',
+    flex: 0.75,
+  }),
+  getColumnProps({
+    field: 'order',
+    headerName: 'order number',
+    align: 'center',
+    flex: 0.75,
+  }),
+  getColumnProps({
+    field: 'type',
+    headerName: 'service type',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <>
-        <ServiceOrderIcons
-          serviceOrderType={params.row.serviceType}
-          size="small"
-        />
+        <ServiceOrderIcons serviceOrderType={params.row.type} size="small" />
         <ServiceOrderTypeText
-          serviceOrderType={params.row.serviceType}
+          serviceOrderType={params.row.type}
           capitalizeText
           variant="body2"
         />
       </>
     ),
-  },
-  {
+  }),
+  getColumnProps({
     field: 'amount',
-    headerName: 'TOTAL AMOUNT',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
+    headerName: 'total amount',
+    align: 'right',
+    flex: 0.75,
+  }),
+  getColumnProps({
     field: 'status',
-    headerName: 'STATUS',
-    type: 'string',
-    ...defaultAlignment,
-    editable: false,
-    renderHeader: (params: GridColumnHeaderParams) => (
-      <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName}
-      </Typography>
-    ),
+    headerName: 'status',
+    align: 'center',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
         label={getInvoiceStatusStyles(params.value).label}
@@ -153,44 +93,39 @@ export const columns: GridColDef[] = [
         maxChars={8}
       />
     ),
-  },
-  {
+    flex: 0.75,
+  }),
+  getColumnProps({
     field: 'actions',
-    headerName: 'ACTIONS',
-    editable: false,
-    sortable: false,
-    disableColumnMenu: true,
-    disableExport: true,
-    ...defaultAlignment,
-
-    renderHeader: (params) => (
-      <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName}
-      </Typography>
-    ),
+    headerName: 'actions',
+    align: 'center',
     renderCell: () => (
-      <FileDownloadOutlinedIcon
-        sx={{color: 'action.active'}}
+      <IconButton
         onClick={() =>
           window.open(
             `${process.env.REACT_APP_BASE_URL}/INV000128.pdf`,
             '_blank',
           )
-        }
-      />
+        }>
+        <FileDownloadOutlinedIcon
+          fontSize="small"
+          sx={{color: 'action.active'}}
+        />
+      </IconButton>
     ),
-  },
+    flex: 0,
+  }),
 ];
 
 export const makeRows = (invoices: any): GridRowsProp =>
   invoices.data
     ? invoices.data.map((item: any, index: number) => ({
         id: index,
-        invoiceDate: formatDate(toDate(item.issuedDate)),
-        invoiceNumber: item.number,
-        orderNumber: item.serviceOrder.number,
-        propertyOwner: item.propertyOwner.name,
-        serviceType: item.serviceOrder.type,
+        date: formatDate(toDate(item.issuedDate)),
+        number: item.number,
+        order: item.serviceOrder.number,
+        customer: item.propertyOwner.name,
+        type: item.serviceOrder.type,
         amount: `${formatCurrency(
           item
             ? item.totalAmount.netAmount /
