@@ -111,7 +111,7 @@ export const UnitDetails = ({
         ))}
       </Grid>
       <Dialog
-        title="Edit Location"
+        title="Edit Unit Details"
         onCancel={() => setOpenDialog(false)}
         disableSaveBtn={!!Object.keys(formik.errors).length}
         onSave={() => onSave()}

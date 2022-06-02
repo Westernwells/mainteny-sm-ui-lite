@@ -1,4 +1,4 @@
-import {AddressRecord} from 'models/misc';
+import {AddressRecord, Priority} from 'models/misc';
 
 export interface LocationFormModel {
   address?: AddressRecord;
@@ -20,4 +20,13 @@ export interface UnitDetailsFormModel {
   serialNumber?: string;
   unitCapacity?: string;
   spendingLimit?: number;
+}
+
+export interface ServiceFormModel {
+  lastVisitDate?: Date;
+  lastInspectionDate?: Date;
+  visitsPerYear?: number;
+  serviceTime?: Date;
+  technicianNumber?: number;
+  priority: Priority;
 }
