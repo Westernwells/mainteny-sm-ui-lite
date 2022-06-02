@@ -109,6 +109,7 @@ export const UnitDetails = ({
       <Dialog
         title="Edit Location"
         onCancel={() => setOpenDialog(false)}
+        disableSaveBtn={!!Object.keys(formik.errors).length}
         onSave={() => onSave()}
         dialogProps={{
           maxWidth: 'md',

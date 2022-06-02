@@ -74,7 +74,6 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
               onBlur: formik.handleBlur,
             }}
           />
-          {/* {console.log(formik.values, '--------------')} */}
           <FormInput
             props={{
               placeholder: 'Enter Manufacturer',
