@@ -1,6 +1,4 @@
-/* eslint-disable */
 import Typography from '@mui/material/Typography';
-// import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
 import {Elevator, ElevatorRequestBody} from 'models/elevator';
 import Grid from '@mui/material/Grid';
@@ -11,8 +9,7 @@ import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {InfoCard} from 'components/InfoCard';
 import {useFormik} from 'formik';
 import {ContractView} from 'models/contract';
-import {getMinutes, minutesToHours} from 'date-fns';
-import {convertMinsToHM, formatDate, setDateTime} from 'utils/datetime';
+import {formatDate} from 'utils/datetime';
 import {ServiceFormModel} from '../models';
 import {ServiceSchema} from './ServiceSchema';
 import {EditServiceForm} from './EditServiceForm';
