@@ -9,6 +9,7 @@ import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {InfoCard} from 'components/InfoCard';
 import {useFormik} from 'formik';
 import {ContractView} from 'models/contract';
+import {Priority} from 'models/misc';
 import {formatDate} from 'utils/datetime';
 import {ServiceFormModel} from '../models';
 import {ServiceSchema} from './ServiceSchema';
@@ -81,7 +82,7 @@ export const Service = ({
         ),
         serviceTime: formik.values.serviceTime,
         technicianNumber: formik.values.technicianNumber,
-        priority: formik.values.priority,
+        priority: formik.values.priority as Priority,
       },
       elevatorId: elevator.id,
     });

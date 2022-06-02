@@ -23,14 +23,18 @@ export const SelectEmployeeRole = () => {
   return (
     <FormSelect
       labelId="rolesSelect-label"
-      id="rolesSelect"
       label="Roles"
-      value={roles}
       options={Object.keys(Role)
         .filter((role) => role !== 'ADMIN')
         .map((role) => convertToText(role))}
-      onChange={handleRoleChange}
-      disabled
+      selectProps={{
+        id: 'rolesSelect',
+        value: roles,
+        onChange: handleRoleChange,
+        multiple: true,
+        name: 'role',
+        disabled: true,
+      }}
     />
   );
 };

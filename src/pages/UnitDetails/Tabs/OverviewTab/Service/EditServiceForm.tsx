@@ -1,7 +1,7 @@
 import {Box} from '@mui/system';
-import {ComboBox} from 'components/ComboBox';
 import {DatePicker} from 'components/DatePicker';
 import {FormInput} from 'components/form/FormInput';
+import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
 import {Priority} from 'models/misc';
 import {convertToText} from 'utils/utils';
@@ -90,28 +90,15 @@ export const EditServiceForm = ({formik}: Props) => (
       }}
     />
 
-    <ComboBox
-      options={Object.keys(Priority).map((item) => ({
-        label: convertToText(item),
-        value: convertToText(item),
-      }))}
-      initialValue={
-        formik.values.priority
-          ? {
-              label: formik.values.priority,
-              value: formik.values.priority,
-            }
-          : null
-      }
-      initialQuery={formik.values.priority}
-      getValue={(item) => formik.setFieldValue('priority', item?.value)}
-      textFieldProps={{
-        name: 'Priority',
-        label: 'priority',
-        onBlur: formik.handleBlur,
-        error: !!(formik.touched.priority && formik.errors.priority),
-        helperText: formik.errors.priority,
-        placeholder: 'A is the highest, C is the lowest',
+    <FormSelect
+      labelId="prioritySelect-label"
+      label="Priority"
+      options={Object.keys(Priority).map((item) => convertToText(item))}
+      selectProps={{
+        id: 'prioritySelect',
+        value: formik.values.priority ? [formik.values.priority] : undefined,
+        onChange: formik.handleChange,
+        name: 'priority',
       }}
     />
   </Box>
