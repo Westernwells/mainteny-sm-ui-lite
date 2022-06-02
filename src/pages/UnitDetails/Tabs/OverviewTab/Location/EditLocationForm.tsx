@@ -24,7 +24,7 @@ export const EditLocationForm = ({formik}: Props) => (
     <FormInput
       props={{
         size: 'small',
-        placeholder: 'Enter building location',
+        placeholder: 'E.g Block D',
         label: 'Building',
         name: 'building',
         value: formik.values.building,
@@ -34,7 +34,7 @@ export const EditLocationForm = ({formik}: Props) => (
     <FormInput
       props={{
         size: 'small',
-        placeholder: 'Enter Property segment',
+        placeholder: 'E.g Commercial',
         label: 'Property Segment',
         name: 'propertySegment',
         value: formik.values.propertySegment,
@@ -45,7 +45,7 @@ export const EditLocationForm = ({formik}: Props) => (
     <FormInput
       props={{
         size: 'small',
-        placeholder: 'Enter key location ',
+        placeholder: 'E.g Reception',
         label: 'Key Location',
         name: 'keyLocation',
         value: formik.values.keyLocation,
@@ -55,7 +55,7 @@ export const EditLocationForm = ({formik}: Props) => (
     <FormInput
       props={{
         size: 'small',
-        placeholder: 'Enter where to park',
+        placeholder: 'E.g Basement',
         label: 'Parking',
         name: 'parking',
         value: formik.values.parking,
