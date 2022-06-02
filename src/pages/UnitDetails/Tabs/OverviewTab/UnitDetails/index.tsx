@@ -44,7 +44,7 @@ export const UnitDetails = ({
   const {mutateAsync: updateElevator} = useUpdateElevator(
     'Unit details updated successfully',
   );
-  const {mutateAsync: updateContract} = useUpdateContract('contract updated');
+  const {mutateAsync: updateContract} = useUpdateContract();
   const formik = useFormik<UnitDetailsFormModel>({
     initialValues: {
       category: elevator.category,
@@ -116,7 +116,6 @@ export const UnitDetails = ({
       });
     }
   };
-  // console.log(formik.values, '++++++++>>>>');
 
   return (
     <InfoCard

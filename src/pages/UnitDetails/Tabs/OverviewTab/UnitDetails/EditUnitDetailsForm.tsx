@@ -73,9 +73,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
             textFieldProps={{
               name: 'category',
               label: 'Unit Category',
-
               onBlur: formik.handleBlur,
-              onChange: formik.handleChange,
             }}
           />
           <FormInput
@@ -220,6 +218,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
             textFieldProps={{
               name: 'unitCapacity',
               label: 'Unit Capacity',
+              placeholder: 'Enter Capacity',
             }}
           />
           <FormInput

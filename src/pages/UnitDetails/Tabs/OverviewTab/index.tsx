@@ -140,7 +140,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
     const body = {
       currency: validContract?.currency,
       endDate: validContract?.endTime,
-      externalId: '',
+      externalId: ' ',
       hourlyRate: validContract?.hourlyRate,
       price: validContract?.price,
       sla: validContract?.sla,

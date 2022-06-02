@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {TextFieldProps} from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import {useEffect, useState} from 'react';
@@ -48,7 +49,9 @@ export const ComboBox = ({
   }, [query]);
 
   const onInputChange = (e: any) => {
-    setQuery(e.target.value);
+    if (e) {
+      setQuery(e.target.value);
+    }
   };
 
   return (
@@ -56,7 +59,8 @@ export const ComboBox = ({
       disablePortal
       id="combo-box"
       size="small"
-      inputValue={query || undefined}
+      inputValue={query}
+      onInputChange={onInputChange}
       options={options}
       onChange={(event: any, newValue: Option | null) => {
         setItem(newValue);
@@ -66,7 +70,6 @@ export const ComboBox = ({
         <FormInput
           props={{
             ...params,
-            onChange: onInputChange,
             ...textFieldProps,
           }}
         />
