@@ -7,11 +7,11 @@ import {PageCard} from 'components/PageCard';
 import useTheme from '@mui/material/styles/useTheme';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import {convertToText} from 'utils/utils';
-import {Elevator, ElevatorStatus} from '../../models/elevator';
-import {ServiceOrder, ServiceOrderView} from '../../models/service-order';
-import {formatDate} from '../../utils/datetime';
+import {Elevator, ElevatorStatus} from '../../../../models/elevator';
+import {ServiceOrder, ServiceOrderView} from '../../../../models/service-order';
+import {formatDate} from '../../../../utils/datetime';
 
-import {calculateNextVisitDate} from '../Units/Models';
+import {calculateNextVisitDate} from '../../../Units/Models';
 
 export interface ElevatorBasicSectionProp {
   elevator?: Elevator;

@@ -48,7 +48,7 @@ export const PageLayout = ({
         }}
         display="flex"
         flexGrow="1"
-        width="80%"
+        width="0"
         flexDirection="column">
         {children}
       </Box>

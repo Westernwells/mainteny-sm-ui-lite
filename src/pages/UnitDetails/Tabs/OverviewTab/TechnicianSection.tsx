@@ -12,7 +12,7 @@ import {PageCard} from 'components/PageCard';
 
 import technicianImage from 'assets/images/avatar.png';
 import {MaintainerView, TechnicianView} from 'models/technician';
-import {TechnSectionStyles as sx} from './styles';
+import {TechnSectionStyles as sx} from '../../styles';
 
 export interface TechnicianSectionProp {
   maintainers: MaintainerView[];

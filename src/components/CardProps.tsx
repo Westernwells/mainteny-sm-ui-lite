@@ -10,7 +10,9 @@ interface Props {
   iconBackground?: string;
   bodyText: string | JSX.Element | ReactNode;
   iconMaxHeight?: string | number;
-  containerStyles?: {[key: string]: string | number};
+  containerStyles?: {[key: string]: any};
+  bodyStyle?: {[key: string]: any};
+  labelStyle?: {[key: string]: any};
 }
 
 export const CardProps = ({
@@ -22,6 +24,8 @@ export const CardProps = ({
   bodyText,
   iconMaxHeight,
   containerStyles,
+  bodyStyle,
+  labelStyle,
 }: Props) => (
   <Box display="flex" sx={{...containerStyles}}>
     {/* remove width to make this component more generic */}
@@ -37,19 +41,21 @@ export const CardProps = ({
       {icon}
     </Box>
     <Box>
-      <Box>
-        <Typography
-          variant={titleTextVariant || 'caption'}
-          color="textSecondary">
-          {label}
-        </Typography>
-      </Box>
+      <Typography
+        component="div"
+        variant={titleTextVariant || 'caption'}
+        color="textSecondary"
+        sx={{textTransform: 'capitalize', ...labelStyle}}>
+        {label}
+      </Typography>
+
       {typeof bodyText === 'string' ? (
-        <Box>
-          <Typography variant={bodyTextVariant || 'body2'}>
-            {bodyText}
-          </Typography>
-        </Box>
+        <Typography
+          component="div"
+          variant={bodyTextVariant || 'body2'}
+          sx={{...bodyStyle}}>
+          {bodyText}
+        </Typography>
       ) : (
         bodyText
       )}

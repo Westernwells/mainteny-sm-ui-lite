@@ -1,7 +1,15 @@
-import {Address, AddressRecord, Fee, Meta, Priority, StringMap} from './misc';
-import {Client, ClientSimpleView} from './client';
+import {
+  Address,
+  AddressRecord,
+  Fee,
+  Meta,
+  Priority,
+  StringMap,
+  StringValue,
+} from './misc';
+import {Client, ClientManager, ClientSimpleView} from './client';
 import {TechnicianSimpleView, TechnicianView} from './technician';
-import {FileResource} from './media';
+import {FileResource, FileResourceRecord} from './media';
 import {ServiceCompanyTimeUnit} from './service-company';
 import {ServiceOrderView} from './service-order';
 
@@ -35,6 +43,22 @@ export interface ElevatorAdditionalInfo {
   deviceIds: string[];
   dueDate: string;
   serviceOrderGenerationEnabled: boolean;
+  buildingLocation: string;
+  builtYear: number;
+  cabinType: string;
+  controllerManufacturer: string;
+  controllerModel: string;
+  documents: any;
+  emergencyContractNumber: string;
+  emergencyPhoneProvider: string;
+  keyLocation: string;
+  lastInspectionDate: string;
+  manufacturer: string;
+  numberOfStops: 5;
+  parking: string;
+  pictures: any;
+  propertySegment: string;
+  qrCode: FileResourceRecord;
 }
 
 export interface ElevatorMaintainerRecord {
@@ -60,13 +84,17 @@ export interface Elevator {
   availability: number;
   address: Address;
   propertyOwner: Client;
+  propertyManager: ClientManager;
   lastVisitDate: string;
+  nextVisitDate: string;
   serviceTime: number;
   status: ElevatorStatus;
+  serialNumber: string;
   properties: ElevatorProperty[];
   additionalInfo: ElevatorAdditionalInfo;
   labels: string[];
   requiredSkills: string[];
+  assignments: ElevatorMaintainerRecord[];
   search: string;
   meta: Meta;
 }
@@ -208,4 +236,38 @@ export interface ElevatorByAddr {
 
 export interface DataGridElevatorView extends ElevatorView {
   showAddress: boolean;
+}
+
+export interface ElevatorRequestBody {
+  address: AddressRecord;
+  buildingLocation: string;
+  builtYear: number;
+  cabinType: string;
+  capacity: string;
+  category: string;
+  controllerManufacturer: string;
+  controllerModel: string;
+  documents: FileResourceRecord[];
+  emergencyContractNumber: string;
+  emergencyPhoneProvider: string;
+  keyLocation: string;
+  lastInspectionDate: string;
+  lastVisitDate: string;
+  manufacturer: string;
+  model: string;
+  number: string;
+  numberOfStops: number;
+  parking: string;
+  pictures: FileResourceRecord[];
+  priority: Priority;
+  properties: ElevatorAvailabilityAdditionalProps;
+  propertyManagerId: string;
+  propertyOwnerId: string;
+  propertySegment: string;
+  qrCode: FileResourceRecord;
+  serialNumber: string;
+  serviceTime: number;
+  status: ElevatorStatus;
+  technicianNumber: number;
+  type: string;
 }

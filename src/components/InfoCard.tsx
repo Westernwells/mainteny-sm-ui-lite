@@ -14,6 +14,7 @@ interface Props {
   headerActionIcon?: JSX.Element;
   children: ReactNode;
   showHeaderBackground?: boolean;
+  handleAction?: () => void;
 }
 
 export const InfoCard = ({
@@ -25,9 +26,9 @@ export const InfoCard = ({
   children,
   headerStyles,
   showHeaderBackground,
+  handleAction,
 }: Props) => {
   const theme = useTheme();
-  console.log(showHeaderBackground);
   return (
     <Card
       sx={{
@@ -48,7 +49,9 @@ export const InfoCard = ({
           ...headerStyles,
         }}
         action={
-          headerActionIcon ? <IconButton>{headerActionIcon}</IconButton> : null
+          headerActionIcon ? (
+            <IconButton onClick={handleAction}>{headerActionIcon}</IconButton>
+          ) : null
         }
         title={header || undefined}
       />

@@ -6,12 +6,12 @@ import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 
 const tabItems = [
   {
-    label: 'Articles',
-    icon: <HomeRepairServiceIcon />,
-  },
-  {
     label: 'Packages',
     icon: <AutoAwesomeMosaicIcon />,
+  },
+  {
+    label: 'Articles',
+    icon: <HomeRepairServiceIcon />,
   },
 ];
 

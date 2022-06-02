@@ -1,5 +1,10 @@
 import {useCallback} from 'react';
-import {useQuery, UseQueryOptions} from 'react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from 'react-query';
 import * as _ from 'lodash';
 import {queryKeys as qk, queryKeys} from 'reactQuery/constants';
 import {useNavigate} from 'react-router';
@@ -7,11 +12,14 @@ import {useNavigate} from 'react-router';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
   ContractFilters,
+  ContractRequestBody,
   ContractView,
   CustomerContractParams,
+  ElevatorContractParams,
   QueryContractParams,
 } from 'models/contract';
-import {Resource, RestError, WithOptional} from 'models/misc';
+import {Resource, RestError, StringValue, WithOptional} from 'models/misc';
+import {useSnackbar} from 'notistack';
 import {
   addDays,
   endOfDay,
@@ -270,6 +278,68 @@ export const useUseQueryCustomerContracts = (
         },
         [filter],
       ),
+    },
+  );
+};
+
+export const queryElevatorsContracts = async (
+  params: ElevatorContractParams,
+) => {
+  const response = await axiosClient.get<{[key: string]: ContractView[]}>(
+    '/api/elevators/contracts',
+    {params, paramsSerializer},
+  );
+  return response.data;
+};
+
+export const useUseQueryElevatorsContracts = (
+  params: ElevatorContractParams,
+  options?: UseQueryOptions<any, any, any>,
+) =>
+  useQuery<{[key: string]: ContractView[]}>(
+    [queryKeys.queryElevatorContracts, params],
+    () => queryElevatorsContracts(params),
+    {
+      enabled: !!params.elevatorIds.length,
+      ...options,
+    },
+  );
+
+const UpdateContract = async (
+  body: Partial<ContractRequestBody>,
+  contractId: string,
+) => {
+  await axiosClient.put<StringValue>(`/api/contracts/${contractId}`, {
+    ...body,
+  });
+};
+
+export const useUpdateContract = (successMsg?: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({
+      body,
+      contractId,
+    }: {
+      body: Partial<ContractRequestBody>;
+      contractId: string;
+    }) => UpdateContract(body, contractId),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.elevatorById);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
     },
   );
 };

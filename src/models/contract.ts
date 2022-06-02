@@ -1,7 +1,7 @@
 import {Client, ClientView} from './client';
 import {ServiceCompany, ServiceCompanyView} from './service-company';
 import {Meta, Order, OrderBy, TimeWindowRecord, TimeWindowType} from './misc';
-import {Elevator, ElevatorView} from './elevator';
+import {Elevator, ElevatorStatus, ElevatorView} from './elevator';
 
 export enum ContractStatus {
   PENDING = 'PENDING',
@@ -80,6 +80,7 @@ export interface ContractView {
   startTime: string;
   endTime: string;
   units?: number;
+  timePreference: ContractTimeWindow[];
 
   status: ContractStatus;
   search: string;
@@ -156,4 +157,29 @@ export interface CustomerContractParams {
   query: string;
   serviceCompanyId: string;
   status?: ContractStatus;
+}
+
+export interface ElevatorContractParams {
+  elevatorIds: string[];
+  status: ContractStatus[];
+}
+
+export interface ContractTimeWindowRecord {
+  fromTime: string;
+  toTime: string;
+  type: TimeWindowType;
+}
+
+export interface ContractRequestBody {
+  currency: string;
+  endDate: string;
+  externalId: string;
+  hourlyRate: number;
+  price: number;
+  sla: number;
+  spendingLimit: number;
+  startDate: string;
+  timePreference: ContractTimeWindowRecord[];
+  type: string;
+  visitsNumber: number;
 }

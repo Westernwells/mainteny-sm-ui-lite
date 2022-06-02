@@ -1,14 +1,28 @@
-import {useQuery, UseQueryOptions} from 'react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from 'react-query';
 import {AxiosResponse} from 'axios';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {queryKeys} from 'reactQuery/constants';
 import {useNavigate} from 'react-router';
+import {useSnackbar} from 'notistack';
 import {
   CustomerElevatorParams,
   Elevator,
+  ElevatorRequestBody,
   ElevatorView,
 } from '../../models/elevator';
-import {Page, Resource, RestError} from '../../models/misc';
+import {
+  CacheTypes,
+  CacheTypesParams,
+  Page,
+  Resource,
+  RestError,
+  StringValue,
+} from '../../models/misc';
 import {MaintainerView} from '../../models/technician';
 import {useUserSession} from './useUserSession';
 
@@ -124,3 +138,68 @@ export const useQueryCustomerElevator = (
       ...options,
     },
   );
+
+const updateElevator = async (
+  body: Partial<ElevatorRequestBody>,
+  elevatorId: string,
+) => {
+  await axiosClient.put<StringValue>(`/api/elevators/${elevatorId}`, {
+    ...body,
+  });
+};
+
+export const useUpdateElevator = (successMsg: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({
+      body,
+      elevatorId,
+    }: {
+      body: Partial<ElevatorRequestBody>;
+      elevatorId: string;
+    }) => updateElevator(body, elevatorId),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+        queryClient.invalidateQueries(queryKeys.elevatorById);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+export const fetchCacheValues = async (
+  params: CacheTypesParams,
+  type: CacheTypes,
+) => {
+  const response = await axiosClient.get<Resource<string>>(
+    `/api/values/${type}`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useCacheValues = (params: CacheTypesParams, type: CacheTypes) => {
+  const navigate = useNavigate();
+  return useQuery(
+    [queryKeys.queryCacheTypes, type, params],
+    () => fetchCacheValues(params, type),
+    {
+      enabled: !!type,
+      onError: (e: any) => {
+        if (e.response.status === 500) navigate('/404');
+      },
+    },
+  );
+};

@@ -25,7 +25,6 @@ import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
 import {ReactComponent as MaintenyLogo} from 'assets/icons/Mainteny.svg';
 import Fade from '@mui/material/Fade';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
-// import {ListItem} from '@mui/material';
 
 const drawerWidth = '15rem';
 

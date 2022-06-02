@@ -26,6 +26,7 @@ module.exports = {
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['error'],
     'no-shadow': 'off',
+    'consistent-return': 'off',
     'no-param-reassign': 0,
     '@typescript-eslint/no-shadow': ['error'],
     'no-use-before-define': 'off',

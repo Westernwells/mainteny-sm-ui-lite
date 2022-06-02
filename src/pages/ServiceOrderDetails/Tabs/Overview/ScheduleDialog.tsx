@@ -172,31 +172,27 @@ export const ScheduleDialog = ({
                 }}>
                 <DatePicker
                   defaultDate={defaultStartDate}
-                  inputError={
-                    formik.errors.date && formik.touched.date
-                      ? formik.errors.date
-                      : ''
-                  }
                   containerStyles={{mr: '1em'}}
-                  handleBlur={formik.handleBlur}
                   getSelectedDate={(date) => {
                     formik.setValues({
                       ...formik.values,
                       date,
                     });
                   }}
-                  label="Reschedule To"
-                  inputName="date"
+                  textFieldProps={{
+                    label: 'Reschedule To',
+                    name: 'date',
+                    helperText:
+                      formik.errors.date && formik.touched.date
+                        ? formik.errors.date
+                        : '',
+                    error: !!(formik.errors.date && formik.touched.date),
+                    onBlur: formik.handleBlur,
+                  }}
                 />
 
                 <TimePicker
                   defaultTime={defaultStartDate}
-                  inputError={
-                    formik.errors.startTime && formik.touched.startTime
-                      ? formik.errors.startTime
-                      : ''
-                  }
-                  handleBlur={formik.handleBlur}
                   containerStyles={{mr: '1em'}}
                   getSelectedTime={(time) => {
                     formik.setValues({
@@ -204,18 +200,22 @@ export const ScheduleDialog = ({
                       startTime: time,
                     });
                   }}
-                  label="Start Time"
-                  inputName="startTime"
+                  textFieldProps={{
+                    label: 'Start Time',
+                    name: 'startTime',
+                    helperText:
+                      formik.errors.startTime && formik.touched.startTime
+                        ? formik.errors.startTime
+                        : '',
+                    error: !!(
+                      formik.errors.startTime && formik.touched.startTime
+                    ),
+                    onBlur: formik.handleBlur,
+                  }}
                 />
 
                 <TimePicker
                   defaultTime={defaultEndDate}
-                  inputError={
-                    formik.errors.endTime && formik.touched.endTime
-                      ? formik.errors.endTime
-                      : ''
-                  }
-                  handleBlur={formik.handleBlur}
                   getSelectedTime={(time) => {
                     // setSelectedEndTime(time)
                     formik.setValues({
@@ -223,8 +223,16 @@ export const ScheduleDialog = ({
                       endTime: time,
                     });
                   }}
-                  label="End Time"
-                  inputName="endTime"
+                  textFieldProps={{
+                    label: 'End Time',
+                    name: 'endTime',
+                    helperText:
+                      formik.errors.endTime && formik.touched.endTime
+                        ? formik.errors.endTime
+                        : '',
+                    error: !!(formik.errors.endTime && formik.touched.endTime),
+                    onBlur: formik.handleBlur,
+                  }}
                 />
               </Box>
             ) : null}

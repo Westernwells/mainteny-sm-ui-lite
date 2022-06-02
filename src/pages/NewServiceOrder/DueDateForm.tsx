@@ -47,21 +47,23 @@ export const DueDateForm = ({
     <Box sx={{...containerStyles}}>
       <DatePicker
         defaultDate={defaultStartDate}
-        fieldStyles={{width: '100%'}}
-        inputError={
-          formik.errors.date && formik.touched.date ? formik.errors.date : ''
-        }
         containerStyles={{mr: '1em', width: '100%'}}
         minDate={startOfDay(new Date())}
-        handleBlur={formik.handleBlur}
         getSelectedDate={(date) => {
           formik.setValues({
             ...formik.values,
             date,
           });
         }}
-        label="Due date"
-        inputName="date"
+        textFieldProps={{
+          label: 'Due date',
+          name: 'date',
+          helperText:
+            formik.errors.date && formik.touched.date ? formik.errors.date : '',
+          error: !!(formik.touched.date && formik.errors.date),
+          sx: {width: '100%'},
+          onBlur: formik.handleBlur,
+        }}
       />
     </Box>
   );

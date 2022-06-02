@@ -5,3 +5,9 @@ export interface FileResource {
   description: string;
   createdAt: string;
 }
+
+export interface FileResourceRecord {
+  description: string;
+  type: string;
+  uri: string;
+}
