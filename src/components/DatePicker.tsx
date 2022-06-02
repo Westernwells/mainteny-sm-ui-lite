@@ -1,13 +1,14 @@
-import TextField, {TextFieldProps} from '@mui/material/TextField';
+import {TextFieldProps} from '@mui/material/TextField';
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {DatePicker as MuiDatePicker} from '@mui/x-date-pickers/DatePicker';
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
+import {FormInput} from './form/FormInput';
 
 interface Props {
   defaultDate?: Date | null;
-  getSelectedDate: (state: Date | null) => void;
+  getSelectedDate?: (state: Date | null) => void;
   containerStyles?: {[key: string]: any};
   minDate?: Date;
   textFieldProps?: TextFieldProps;
@@ -44,7 +45,13 @@ export const DatePicker = ({
             setValue(newValue);
           }}
           renderInput={(params) => (
-            <TextField size="small" {...params} {...textFieldProps} />
+            <FormInput
+              props={{
+                ...params,
+                size: 'small',
+                ...textFieldProps,
+              }}
+            />
           )}
         />
       </LocalizationProvider>

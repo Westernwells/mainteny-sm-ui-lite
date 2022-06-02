@@ -1,13 +1,14 @@
-import TextField, {TextFieldProps} from '@mui/material/TextField';
+import {TextFieldProps} from '@mui/material/TextField';
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {TimePicker as MuiTimePicker} from '@mui/x-date-pickers/TimePicker';
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
+import {FormInput} from './form/FormInput';
 
 interface Props {
   defaultTime?: Date | null;
-  getSelectedTime: (state: Date | null) => void;
+  getSelectedTime?: (state: Date | null) => void;
   containerStyles?: {[key: string]: any};
   textFieldProps?: TextFieldProps;
 }
@@ -43,7 +44,13 @@ export const TimePicker = ({
             setValue(newValue);
           }}
           renderInput={(params) => (
-            <TextField size="small" {...params} {...textFieldProps} />
+            <FormInput
+              props={{
+                ...params,
+                size: 'small',
+                ...textFieldProps,
+              }}
+            />
           )}
         />
       </LocalizationProvider>

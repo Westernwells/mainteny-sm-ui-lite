@@ -1,4 +1,4 @@
-/* eslitnt-disable */
+/* eslint-disable */
 import Typography from '@mui/material/Typography';
 // import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
@@ -11,7 +11,7 @@ import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {InfoCard} from 'components/InfoCard';
 import {useFormik} from 'formik';
 import {ContractView} from 'models/contract';
-import {getMinutes} from 'date-fns';
+import {getMinutes, minutesToHours} from 'date-fns';
 import {convertMinsToHM, formatDate, setDateTime} from 'utils/datetime';
 import {ServiceFormModel} from '../models';
 import {ServiceSchema} from './ServiceSchema';
@@ -25,7 +25,11 @@ interface Props {
 }
 
 const validationSchema = Yup.object().shape({
-  address: Yup.object().nullable().required('Address is required'),
+  lastVisitDate: Yup.string().nullable().required('Last visit is required'),
+  serviceTime: Yup.string().nullable().required('Service time is required'),
+  technicianNumber: Yup.number()
+    .nullable()
+    .required('No. of technicians is required'),
 });
 
 export const Service = ({
@@ -37,17 +41,22 @@ export const Service = ({
   // const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
   const {mutateAsync: updateElevator} = useUpdateElevator(
-    'Location updated successfully',
+    'Service updated successfully',
   );
+
+  const serviceTime = useRef(new Date()).current;
+  serviceTime.setMinutes(elevator.serviceTime);
+
   const formik = useFormik<ServiceFormModel>({
     initialValues: {
-      lastVisitDate: new Date(elevator.lastVisitDate),
-      lastInspectionDate: new Date(elevator.additionalInfo.lastInspectionDate),
+      lastVisitDate: elevator.lastVisitDate
+        ? new Date(elevator.lastVisitDate)
+        : undefined,
+      lastInspectionDate: elevator.additionalInfo.lastInspectionDate
+        ? new Date(elevator.additionalInfo.lastInspectionDate)
+        : undefined,
       visitsPerYear: validContract?.visitsNumber,
-      serviceTime: setDateTime(
-        new Date(),
-        convertMinsToHM(elevator.serviceTime),
-      ),
+      serviceTime: elevator.serviceTime,
       technicianNumber: elevator.technicianNumber,
       priority: elevator.additionalInfo.priority,
     },
@@ -73,14 +82,15 @@ export const Service = ({
           formik.values.lastInspectionDate,
           'yyyy-MM-dd',
         ),
-        serviceTime:
-          formik.values.serviceTime && getMinutes(formik.values.serviceTime),
+        serviceTime: formik.values.serviceTime,
         technicianNumber: formik.values.technicianNumber,
         priority: formik.values.priority,
       },
       elevatorId: elevator.id,
     });
   };
+
+  console.log(formik.values, '@@@@<<<<::""""""":::::::');
 
   return (
     <InfoCard
@@ -92,13 +102,18 @@ export const Service = ({
       <Grid container spacing={2}>
         {labels.map((label) => (
           <Grid key={label} item xs={12} sm={4} md={6}>
-            <ServiceSchema label={label} elevator={elevator} />
+            <ServiceSchema
+              label={label}
+              elevator={elevator}
+              visitNumber={validContract?.visitsNumber}
+            />
           </Grid>
         ))}
       </Grid>
       <Dialog
         title="Edit Service"
         onCancel={() => setOpenDialog(false)}
+        disableSaveBtn={!!Object.keys(formik.errors).length}
         onSave={() => onSave()}
         dialogProps={{
           maxWidth: 'xs',

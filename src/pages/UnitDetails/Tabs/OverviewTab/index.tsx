@@ -174,6 +174,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
             }}
             elevator={elevator!}
             validContract={validContract}
+            elevatorRequestBody={elevatorRequestBody}
           />
         </Grid>
         <Grid item md={7} sm={12}>

@@ -11,9 +11,10 @@ import {Elevator} from 'models/elevator';
 interface Props {
   label: string;
   elevator: Elevator;
+  visitNumber?: number;
 }
 
-export const ServiceSchema = ({label, elevator}: Props) => {
+export const ServiceSchema = ({label, elevator, visitNumber}: Props) => {
   const theme = useTheme();
   const renderSection = () => {
     switch (label) {
@@ -35,7 +36,7 @@ export const ServiceSchema = ({label, elevator}: Props) => {
           <CardProps
             icon={<CachedIcon sx={{color: theme.palette.info.dark}} />}
             label="LAST INSPECTION"
-            bodyText={elevator.additionalInfo.lastInspectionDate}
+            bodyText={elevator.additionalInfo.lastInspectionDate || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
@@ -46,7 +47,7 @@ export const ServiceSchema = ({label, elevator}: Props) => {
           <CardProps
             icon={<CalendarTodayIcon sx={{color: theme.palette.info.dark}} />}
             label="REQUIRED VISITS/YEAR"
-            bodyText="4"
+            bodyText={visitNumber || ''}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
@@ -59,7 +60,7 @@ export const ServiceSchema = ({label, elevator}: Props) => {
               <AccessTimeFilledIcon sx={{color: theme.palette.info.dark}} />
             }
             label="REQUIRED TIME"
-            bodyText="1h 05m"
+            bodyText={elevator.serviceTime || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
@@ -82,7 +83,7 @@ export const ServiceSchema = ({label, elevator}: Props) => {
           <CardProps
             icon={<FlagIcon sx={{color: theme.palette.info.dark}} />}
             label="UNIT PRIORITY"
-            bodyText={elevator.technicianNumber}
+            bodyText={elevator.additionalInfo.priority}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"

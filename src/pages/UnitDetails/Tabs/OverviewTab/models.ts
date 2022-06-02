@@ -26,7 +26,7 @@ export interface ServiceFormModel {
   lastVisitDate?: Date;
   lastInspectionDate?: Date;
   visitsPerYear?: number;
-  serviceTime?: Date;
+  serviceTime?: number;
   technicianNumber?: number;
   priority: Priority;
 }
