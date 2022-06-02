@@ -9,13 +9,7 @@ import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {convertToMacro} from 'utils/utils';
-import {
-  ContractRequestBody,
-  ContractStatus,
-  ContractView,
-} from 'models/contract';
-import {useUpdateContract} from 'hooks/reactQuery/useContract';
-import {useSnackbar} from 'notistack';
+import {ContractView} from 'models/contract';
 import {UnitDetailsSchema} from './UnitDetailsSchema';
 import {EditUnitDetailsForm} from './EditUnitDetailsForm';
 import {UnitDetailsFormModel} from '../models';
@@ -25,7 +19,6 @@ interface Props {
   elevator: Elevator;
   validContract?: ContractView;
   elevatorRequestBody?: Partial<ElevatorRequestBody>;
-  contractRequestBody?: Partial<ContractRequestBody>;
 }
 
 const validationSchema = Yup.object().shape({
@@ -36,15 +29,13 @@ export const UnitDetails = ({
   containerStyles,
   elevator,
   elevatorRequestBody,
-  contractRequestBody,
   validContract,
 }: Props) => {
-  const {enqueueSnackbar} = useSnackbar();
   const [openDialog, setOpenDialog] = useState(false);
   const {mutateAsync: updateElevator} = useUpdateElevator(
     'Unit details updated successfully',
   );
-  const {mutateAsync: updateContract} = useUpdateContract();
+
   const formik = useFormik<UnitDetailsFormModel>({
     initialValues: {
       category: elevator.category,
@@ -57,7 +48,6 @@ export const UnitDetails = ({
       model: elevator.model,
       serialNumber: elevator.serialNumber,
       unitCapacity: elevator.capacity,
-      spendingLimit: contractRequestBody?.spendingLimit,
     },
     onSubmit: () => {},
     validationSchema,
@@ -73,7 +63,6 @@ export const UnitDetails = ({
     'stops',
     'unitCapacity',
     'cabinType',
-    'spendingLimit',
     'phone',
   ]).current;
 
@@ -97,24 +86,6 @@ export const UnitDetails = ({
       },
       elevatorId: elevator.id,
     });
-
-    if (validContract) {
-      if (validContract.status === ContractStatus.EXPIRED) {
-        return enqueueSnackbar(
-          'Spending limit could not be updated because contract has expired',
-          {
-            variant: 'error',
-          },
-        );
-      }
-      await updateContract({
-        body: {
-          ...contractRequestBody,
-          spendingLimit: formik.values.spendingLimit,
-        },
-        contractId: validContract.id,
-      });
-    }
   };
 
   return (
@@ -130,7 +101,6 @@ export const UnitDetails = ({
             <UnitDetailsSchema
               label={label}
               elevator={elevator}
-              spendingLimit={validContract?.spendingLimit}
               currency={validContract?.currency}
             />
           </Grid>

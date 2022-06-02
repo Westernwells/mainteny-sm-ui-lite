@@ -67,15 +67,14 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
                 : null
             }
             initialQuery={formik.values.category}
-            getValue={(item) =>
-              formik.setValues({...formik.values, category: item?.value})
-            }
+            getValue={(item) => formik.setFieldValue('category', item?.value)}
             textFieldProps={{
               name: 'category',
               label: 'Unit Category',
               onBlur: formik.handleBlur,
             }}
           />
+          {/* {console.log(formik.values, '--------------')} */}
           <FormInput
             props={{
               placeholder: 'Enter Manufacturer',
@@ -142,9 +141,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
               label: item,
               value: item,
             }))}
-            getValue={(item) =>
-              formik.setValues({...formik.values, unitType: item?.value})
-            }
+            getValue={(item) => formik.setFieldValue('unitType', item?.value)}
             initialValue={
               formik.values.unitType
                 ? {
@@ -167,9 +164,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
               label: item,
               value: item,
             }))}
-            getValue={(item) =>
-              formik.setValues({...formik.values, model: item?.value})
-            }
+            getValue={(item) => formik.setFieldValue('model', item?.value)}
             initialValue={
               formik.values.model
                 ? {
@@ -203,7 +198,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
               value: item,
             }))}
             getValue={(item) =>
-              formik.setValues({...formik.values, unitCapacity: item?.value})
+              formik.setFieldValue('unitCapacity', item?.value)
             }
             initialValue={
               formik.values.unitCapacity
@@ -219,18 +214,6 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
               name: 'unitCapacity',
               label: 'Unit Capacity',
               placeholder: 'Enter Capacity',
-            }}
-          />
-          <FormInput
-            props={{
-              size: 'small',
-              placeholder: 'Enter Spending Limit ',
-              label: 'Spending Limit',
-              name: 'spendingLimit',
-              error: !!formik.errors.spendingLimit,
-              value: formik.values.spendingLimit,
-              onBlur: formik.handleBlur,
-              onChange: formik.handleChange,
             }}
           />
         </Grid>

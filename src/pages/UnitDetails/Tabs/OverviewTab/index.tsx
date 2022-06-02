@@ -7,11 +7,7 @@ import {endOfYear, startOfYear} from 'date-fns';
 import {useParams} from 'react-router-dom';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {useUseQueryElevatorsContracts} from 'hooks/reactQuery/useContract';
-import {
-  ContractRequestBody,
-  ContractStatus,
-  ContractView,
-} from 'models/contract';
+import {ContractStatus, ContractView} from 'models/contract';
 import {
   useElevatorById,
   useElevatorMaintainers,
@@ -40,8 +36,6 @@ export const OverviewTab = ({getUnitName}: Props) => {
   const [validContract, setValidContract] = useState<ContractView>();
   const [elevatorRequestBody, setElevatorRequestBody] =
     useState<Partial<ElevatorRequestBody>>();
-  const [contractRequestBody, setContractRequestBody] =
-    useState<Partial<ContractRequestBody>>();
 
   const {data: elevator, isLoading: isLoadingElevator} =
     useElevatorById(elevatorId);
@@ -136,29 +130,6 @@ export const OverviewTab = ({getUnitName}: Props) => {
     }
   }, [elevator]);
 
-  useEffect(() => {
-    const body = {
-      currency: validContract?.currency,
-      endDate: validContract?.endTime,
-      externalId: ' ',
-      hourlyRate: validContract?.hourlyRate,
-      price: validContract?.price,
-      sla: validContract?.sla,
-      spendingLimit: validContract?.spendingLimit,
-      startDate: validContract?.startTime,
-      timePreference: validContract?.timePreference
-        ? validContract.timePreference.map((item) => ({
-            fromTime: item.fromTime,
-            toTime: item.toTime,
-            type: item.type,
-          }))
-        : [],
-      type: validContract?.type,
-      visitsNumber: validContract?.visitsNumber,
-    };
-    setContractRequestBody(body);
-  }, [validContract]);
-
   if (isLoadingElevator) {
     return null;
   }
@@ -186,7 +157,6 @@ export const OverviewTab = ({getUnitName}: Props) => {
             }}
             elevator={elevator!}
             validContract={validContract}
-            contractRequestBody={contractRequestBody}
             elevatorRequestBody={elevatorRequestBody}
           />
         </Grid>

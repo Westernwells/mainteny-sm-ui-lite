@@ -1,7 +1,6 @@
-/* eslint-disable */
 import {TextFieldProps} from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import {useEffect, useState} from 'react';
+import {SyntheticEvent, useEffect, useState} from 'react';
 import {FormInput} from './form/FormInput';
 
 interface Option {
@@ -48,9 +47,17 @@ export const ComboBox = ({
     }
   }, [query]);
 
-  const onInputChange = (e: any) => {
-    if (e) {
-      setQuery(e.target.value);
+  const onInputChange = (
+    event: SyntheticEvent,
+    value: string,
+    reason: string,
+  ) => {
+    if (reason === 'input') {
+      setQuery(value);
+    }
+    if (reason === 'clear') {
+      setQuery('');
+      setItem(null);
     }
   };
 
