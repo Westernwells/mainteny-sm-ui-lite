@@ -8,7 +8,7 @@ import Select, {SelectProps} from '@mui/material/Select';
 interface Props<T> {
   labelId: string;
   label: string;
-  options: string[];
+  options: {label: string; value: string}[];
   selectProps?: SelectProps<T[]>;
 }
 
@@ -30,6 +30,7 @@ export const FormSelect = ({
   selectProps,
 }: Props<string>) => (
   <FormControl sx={{marginBlock: '.75em'}} fullWidth>
+    {console.log(selectProps, '~~~~~~~~!!')}
     <InputLabel
       id={labelId}
       shrink
@@ -48,18 +49,18 @@ export const FormSelect = ({
       MenuProps={MenuProps}
       {...selectProps}>
       {options.map((option) => (
-        <MenuItem key={option} value={option}>
+        <MenuItem key={option.label} value={option.value}>
           {selectProps?.multiple ? (
             <Checkbox
               size="small"
               checked={
                 selectProps && selectProps.value
-                  ? selectProps.value.includes(option)
+                  ? selectProps.value.includes(option.value)
                   : false
               }
             />
           ) : null}
-          {option}
+          {option.label}
         </MenuItem>
       ))}
     </Select>

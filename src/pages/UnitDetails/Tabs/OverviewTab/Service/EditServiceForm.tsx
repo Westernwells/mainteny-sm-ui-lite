@@ -93,7 +93,10 @@ export const EditServiceForm = ({formik}: Props) => (
     <FormSelect
       labelId="prioritySelect-label"
       label="Priority"
-      options={Object.keys(Priority).map((item) => convertToText(item))}
+      options={Object.keys(Priority).map((key) => ({
+        label: convertToText(key),
+        value: convertToText(key),
+      }))}
       selectProps={{
         id: 'prioritySelect',
         value: formik.values.priority ? [formik.values.priority] : undefined,

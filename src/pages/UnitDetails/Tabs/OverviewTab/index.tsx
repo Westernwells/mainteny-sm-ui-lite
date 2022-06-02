@@ -185,6 +185,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
               },
             }}
             elevator={elevator!}
+            elevatorRequestBody={elevatorRequestBody}
           />
         </Grid>
       </Grid>

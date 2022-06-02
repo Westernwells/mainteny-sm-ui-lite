@@ -26,7 +26,10 @@ export const SelectEmployeeRole = () => {
       label="Roles"
       options={Object.keys(Role)
         .filter((role) => role !== 'ADMIN')
-        .map((role) => convertToText(role))}
+        .map((role) => ({
+          label: convertToText(role),
+          value: convertToText(role),
+        }))}
       selectProps={{
         id: 'rolesSelect',
         value: roles,

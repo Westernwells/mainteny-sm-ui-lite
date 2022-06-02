@@ -30,3 +30,11 @@ export interface ServiceFormModel {
   technicianNumber?: number;
   priority?: string;
 }
+
+export interface AppointmentFormModel {
+  appointmentDaysOfWeek: string[];
+  openingHours: string;
+  requiresAppointment: string;
+  requiresAppointmentNotification: string;
+  appointmentNotificationDueInDays: string;
+}

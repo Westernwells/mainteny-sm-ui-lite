@@ -88,8 +88,6 @@ export const Service = ({
     });
   };
 
-  console.log(formik.values, '@@@@<<<<::""""""":::::::');
-
   return (
     <InfoCard
       containerStyles={{...containerStyles}}
