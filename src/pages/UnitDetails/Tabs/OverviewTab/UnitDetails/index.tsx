@@ -23,6 +23,7 @@ interface Props {
 
 const validationSchema = Yup.object().shape({
   unitNumber: Yup.string().nullable().required('Unit number is required'),
+  category: Yup.string().nullable().required('Category is required'),
 });
 
 export const UnitDetails = ({

@@ -72,6 +72,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
               name: 'category',
               label: 'Unit Category',
               onBlur: formik.handleBlur,
+              error: !!(formik.touched.category && formik.errors.category),
+              helperText: formik.errors.category,
             }}
           />
           <FormInput
