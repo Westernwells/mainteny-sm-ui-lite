@@ -9,7 +9,7 @@ interface Props<T> {
   labelId: string;
   label: string;
   options: {label: string; value: string}[];
-  selectProps?: SelectProps<T[]>;
+  selectProps?: SelectProps<T>;
 }
 
 const ITEM_HEIGHT = 48;
@@ -28,7 +28,7 @@ export const FormSelect = ({
   label,
   options,
   selectProps,
-}: Props<string>) => (
+}: Props<string | string[]>) => (
   <FormControl sx={{marginBlock: '.75em'}} fullWidth>
     {console.log(selectProps, '~~~~~~~~!!')}
     <InputLabel
@@ -44,7 +44,9 @@ export const FormSelect = ({
       size="small"
       input={<OutlinedInput id="roles" />}
       renderValue={() =>
-        selectProps && selectProps.value && selectProps.value.join(',')
+        selectProps && selectProps.value && Array.isArray(selectProps.value)
+          ? selectProps.value.join(',')
+          : selectProps?.value || ''
       }
       MenuProps={MenuProps}
       {...selectProps}>

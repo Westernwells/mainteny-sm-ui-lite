@@ -11,7 +11,7 @@ export const SelectEmployeeRole = () => {
 
   const {setFieldValue} = useFormikContext<EmployeeAccountData>();
 
-  const handleRoleChange = (event: SelectChangeEvent<string[]>) => {
+  const handleRoleChange = (event: SelectChangeEvent<string | string[]>) => {
     const {
       target: {value},
     } = event;

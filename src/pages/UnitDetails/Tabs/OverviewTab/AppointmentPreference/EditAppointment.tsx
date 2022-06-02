@@ -43,6 +43,50 @@ export const EditAppointmentForm = ({formik}: Props) => {
         }}
       />
 
+      <FormInput
+        props={{
+          label: 'Opening Hours',
+          name: 'openingHours',
+          placeholder: 'E.g 07:00 - 17:00',
+          value: formik.values.openingHours,
+          onChange: formik.handleChange,
+          onBlur: formik.handleBlur,
+        }}
+      />
+
+      <FormInput
+        props={{
+          label: 'Opening Hours',
+          name: 'openingHours',
+          placeholder: 'E.g 07:00 - 17:00',
+          value: formik.values.openingHours,
+          onChange: formik.handleChange,
+          onBlur: formik.handleBlur,
+        }}
+      />
+
+      <FormInput
+        props={{
+          label: 'Opening Hours',
+          name: 'openingHours',
+          placeholder: 'E.g 07:00 - 17:00',
+          value: formik.values.openingHours,
+          onChange: formik.handleChange,
+          onBlur: formik.handleBlur,
+        }}
+      />
+
+      <FormInput
+        props={{
+          label: 'Opening Hours',
+          name: 'openingHours',
+          placeholder: 'E.g 07:00 - 17:00',
+          value: formik.values.openingHours,
+          onChange: formik.handleChange,
+          onBlur: formik.handleBlur,
+        }}
+      />
+
       {/* {console.log(formik.values, '|||||||')} */}
 
       {/* <FormSelect

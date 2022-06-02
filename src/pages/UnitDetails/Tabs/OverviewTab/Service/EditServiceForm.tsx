@@ -99,7 +99,7 @@ export const EditServiceForm = ({formik}: Props) => (
       }))}
       selectProps={{
         id: 'prioritySelect',
-        value: formik.values.priority ? [formik.values.priority] : undefined,
+        value: formik.values.priority ? formik.values.priority : undefined,
         onChange: formik.handleChange,
         name: 'priority',
       }}

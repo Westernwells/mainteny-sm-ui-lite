@@ -13,7 +13,7 @@ export const SelectEmployeeRole = () => {
     values.roles.map((item) => convertToText(item)),
   );
 
-  const handleRoleChange = (event: SelectChangeEvent<string[]>) => {
+  const handleRoleChange = (event: SelectChangeEvent<string | string[]>) => {
     const {
       target: {value},
     } = event;
