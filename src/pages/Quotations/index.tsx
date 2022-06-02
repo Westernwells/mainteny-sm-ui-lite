@@ -92,7 +92,7 @@ export const Quotations = () => {
     <PageListingLayout
       renderWidget={
         <Widget
-          searchPlaceholder="Try 'QT100100'"
+          searchPlaceholder="Search by number, customer, address etc."
           getSearchValue={(val: string) => setSearch(val)}
           showActionBtn
           btnLabel="New Quotation"

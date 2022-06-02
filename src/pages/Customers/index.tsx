@@ -94,7 +94,7 @@ export const Customer = () => {
     <PageListingLayout
       renderWidget={
         <Widget
-          searchPlaceholder="Try 'Astralift BV'"
+          searchPlaceholder="Search by number, name, address etc."
           getSearchValue={(val: string) => setSearch(val)}
         />
       }>

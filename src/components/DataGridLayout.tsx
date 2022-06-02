@@ -1,10 +1,13 @@
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import {
   DataGrid,
   DataGridProps,
   GridColDef,
+  GridColumnHeaderParams,
   GridEventListener,
   GridEvents,
+  GridRenderCellParams,
   GridRowParams,
   GridRowsProp,
 } from '@mui/x-data-grid';
@@ -31,6 +34,42 @@ interface Props extends DataGridProps {
   noRowsEmptySection?: JSX.Element;
   isRowSelectable?: (params: GridRowParams) => boolean;
 }
+
+interface ColumnProps extends GridColDef {
+  field: string;
+  headerName: string;
+  type?: 'string' | 'number';
+  cellClassName?: 'nowrap' | 'truncateText';
+}
+
+export const getColumnProps = ({
+  field,
+  headerName,
+  type = 'string',
+  cellClassName = 'nowrap',
+  renderHeader = (params: GridColumnHeaderParams) => (
+    <Typography variant="subtitle2" color="textSecondary">
+      {params.colDef.headerName && params.colDef.headerName.toUpperCase()}
+    </Typography>
+  ),
+  renderCell = (params: GridRenderCellParams<any, any, any>) => (
+    <Typography variant="body2">{params.value || '-'}</Typography>
+  ),
+  flex = 1,
+  align = 'left',
+}: ColumnProps): GridColDef => ({
+  field,
+  type,
+  headerName,
+  cellClassName,
+  renderHeader,
+  renderCell,
+  flex,
+  headerAlign: align,
+  align,
+  editable: false,
+  sortable: false,
+});
 
 export const DataGridLayout = ({
   rows,
@@ -104,6 +143,7 @@ export const DataGridLayout = ({
         isRowSelectable={isRowSelectable}
         disableSelectionOnClick
         disableColumnFilter
+        disableColumnMenu
         hideFooter={hideFooter}
         onCellClick={
           onCellClick ||
@@ -135,6 +175,9 @@ export const DataGridLayout = ({
             background: 'white',
             borderBottom: '2px solid',
             borderColor: 'background.default',
+          },
+          '& .MuiDataGrid-columnHeaderTitleContainer': {
+            padding: '0',
           },
           '& .MuiDataGrid-columnSeparator': {
             display: 'none',

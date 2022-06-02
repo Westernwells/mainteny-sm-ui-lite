@@ -106,7 +106,7 @@ export const Employees = () => {
     <PageListingLayout
       renderWidget={
         <Widget
-          searchPlaceholder="Search name, role, address, phone"
+          searchPlaceholder="Search by name, role, address etc."
           getSearchValue={(val: string) => setSearch(val)}
           showActionBtn
           btnLabel="New employee"

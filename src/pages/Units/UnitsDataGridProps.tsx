@@ -1,108 +1,60 @@
-import {
-  GridAlignment,
-  GridColDef,
-  GridColumnHeaderParams,
-  GridRenderCellParams,
-  GridRowsProp,
-} from '@mui/x-data-grid';
+import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
-import Elevator from '@mui/icons-material/Elevator';
+import ElevatorIcon from '@mui/icons-material/Elevator';
+import {getColumnProps} from 'components/DataGridLayout';
 import {formatDate} from 'utils/datetime';
 import {DataGridElevatorView} from './Models';
 
-const defaultProps = {
-  editable: false,
-  sortable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
-  renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" mx="0.5em">
-      {params.value || '-'}
-    </Typography>
-  ),
-};
-
-const defaultAlignment: {
-  flex: number;
-  headerAlign: GridAlignment;
-  align: GridAlignment;
-} = {
-  flex: 1,
-  headerAlign: 'left',
-  align: 'left',
-};
-
 export const columns: GridColDef[] = [
-  {
+  getColumnProps({
+    field: 'number',
+    headerName: 'number',
+    align: 'center',
+    flex: 0,
+  }),
+  getColumnProps({
     field: 'model',
-    headerName: 'MODEL',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-    flex: 2,
+    headerName: 'model',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <>
-        <Elevator style={{marginInline: '.25em'}} />
+        <ElevatorIcon style={{marginInline: '.25em'}} />
         <Typography variant="body2">{params.value || '-'}</Typography>
       </>
     ),
-  },
-  {
-    field: 'number',
-    headerName: 'NUMBER',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'address',
-    headerName: 'ADDRESS',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-    flex: 4,
-  },
-  {
+  }),
+  getColumnProps({
     field: 'customer',
-    headerName: 'CUSTOMER',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-    flex: 3,
-  },
-  {
+    headerName: 'customer',
+    cellClassName: 'truncateText',
+    flex: 1.5,
+  }),
+  getColumnProps({
     field: 'address',
-    headerName: 'ADDRESS',
-    type: 'string',
-    ...defaultProps,
-    ...defaultAlignment,
-    flex: 3,
-  },
-  {
+    headerName: 'address',
+    cellClassName: 'truncateText',
+    flex: 1.5,
+  }),
+  getColumnProps({
     field: 'lastVisit',
-    headerName: 'LAST VISIT',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
+    headerName: 'last visit',
+    align: 'center',
+    flex: 0,
+  }),
+  getColumnProps({
     field: 'nextVisit',
-    headerName: 'NEXT VISIT',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
+    headerName: 'next visit',
+    align: 'center',
+    flex: 0,
+  }),
+  getColumnProps({
     field: 'priorityTechnician',
-    headerName: 'PRIORITY TECHNICIAN',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-    flex: 2,
-  },
+    headerName: 'priority technician',
+  }),
+  getColumnProps({
+    field: 'activeContracts',
+    headerName: 'active contracts',
+    align: 'right',
+  }),
 ];
 
 export const makeRows = ({
@@ -122,6 +74,8 @@ export const makeRows = ({
       address: elevator.address.fullName,
       headerText: elevator.address.fullName,
       priorityTechnician: `${elevator.assignments[0].technician.userAccount.firstName} ${elevator.assignments[0].technician.userAccount.lastName}`,
+      // TODO: Use API data
+      activeContracts: Math.floor(Math.random() * 5) + 1,
       elevator,
       navigateTo: `details/${elevator.id}`,
     }));
