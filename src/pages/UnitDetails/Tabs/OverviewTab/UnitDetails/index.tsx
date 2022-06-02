@@ -90,8 +90,6 @@ export const UnitDetails = ({
     });
   };
 
-  console.log(validContract, '@@@@####))');
-
   return (
     <InfoCard
       containerStyles={{...containerStyles}}
