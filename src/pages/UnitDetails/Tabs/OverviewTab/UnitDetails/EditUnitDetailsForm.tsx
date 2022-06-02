@@ -79,7 +79,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
           />
           <FormInput
             props={{
-              placeholder: 'Enter Manufacturer',
+              placeholder: 'E.g. Thyssenkrupp, schindler',
               label: 'Manufacturer',
               name: 'manufacturer',
               value: formik.values.manufacturer,
@@ -89,7 +89,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
           />
           <FormInput
             props={{
-              placeholder: 'Enter Unit Number',
+              placeholder: 'Model number of the elevator',
               label: 'Unit Number',
               name: 'unitNumber',
               value: formik.values.unitNumber,
@@ -103,7 +103,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
           <FormInput
             props={{
               size: 'small',
-              placeholder: 'Enter Number of Stops',
+              placeholder: 'Can also be number of floors',
               label: 'Number of Stops',
               name: 'numberOfStops',
               value: formik.values.numberOfStops,
@@ -115,7 +115,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
           <FormInput
             props={{
               size: 'small',
-              placeholder: 'Enter Cabin type',
+              placeholder: 'Single door; Double door',
               label: 'Cabin Type',
               name: 'cabinType',
               value: formik.values.cabinType,
@@ -127,7 +127,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
           <FormInput
             props={{
               size: 'small',
-              placeholder: 'Enter Emergency Phone Provider',
+              placeholder: 'e.g SafeLine',
               label: 'Emergency Phone Provider',
               name: 'emergencyPhoneProvider',
               value: formik.values.emergencyPhoneProvider,
@@ -155,7 +155,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
             initialQuery={formik.values.unitType}
             getQuery={(item) => setUnitTypeQuery(item || '')}
             textFieldProps={{
-              placeholder: 'Enter Unit Type',
+              placeholder: 'Automatic, manual, etc',
               name: 'unitType',
               label: 'Unit Type',
             }}
@@ -180,12 +180,12 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
             textFieldProps={{
               name: 'model',
               label: 'Model',
-              placeholder: 'Enter Model',
+              placeholder: 'e.g. S2000',
             }}
           />
           <FormInput
             props={{
-              placeholder: 'EnterSerial Number',
+              placeholder: 'Fabric number',
               label: 'Serial Number',
               name: 'serialNumber',
               value: formik.values.serialNumber,
@@ -215,7 +215,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
             textFieldProps={{
               name: 'unitCapacity',
               label: 'Unit Capacity',
-              placeholder: 'Enter Capacity',
+              placeholder: 'In kg',
             }}
           />
 
