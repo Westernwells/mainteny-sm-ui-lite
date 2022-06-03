@@ -1,24 +1,38 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import {PageCard} from 'components/PageCard';
-import useTheme from '@mui/material/styles/useTheme';
+import {Dialog} from 'components/Dialog';
+import {InfoCard} from 'components/InfoCard';
+import {MyDropZone} from 'components/MyDropzone';
+import {useState} from 'react';
 
 export const Pictures = () => {
-  const theme = useTheme();
-  console.log();
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const onSave = () => {};
   return (
-    <PageCard
-      headerContainerOverrideStyles={{
-        py: '0.2em',
-        background: theme.palette.inputBackground.main,
-      }}
-      customHeader={
-        <Typography component="div" variant="subtitle1">
-          Pictures
-        </Typography>
-      }
-      headerActionIcon={<Typography color="info.main">+Add</Typography>}>
+    <InfoCard
+      headerActionIcon={<Typography color="info.main">+Add</Typography>}
+      handleAction={() => setOpenDialog(true)}
+      header={<Typography variant="subtitle1">Pictures</Typography>}>
       <Box>kdk</Box>
-    </PageCard>
+
+      <Dialog
+        title="Add Pictures"
+        onCancel={() => setOpenDialog(false)}
+        onSave={() => onSave()}
+        dialogProps={{
+          maxWidth: 'md',
+          open: openDialog || false,
+        }}>
+        <MyDropZone
+          getAcceptedFiles={(file) => {
+            console.log(file, '#####@@@@@');
+          }}
+          getRejectedFileWithErrors={(file) => {
+            console.log(file, '||||');
+          }}
+        />
+      </Dialog>
+    </InfoCard>
   );
 };
