@@ -1,4 +1,4 @@
-import {AddressRecord, Priority} from 'models/misc';
+import {AddressRecord} from 'models/misc';
 
 export interface LocationFormModel {
   address?: AddressRecord;
@@ -26,7 +26,15 @@ export interface ServiceFormModel {
   lastVisitDate?: Date;
   lastInspectionDate?: Date;
   visitsPerYear?: number;
-  serviceTime?: Date;
+  serviceTime?: number;
   technicianNumber?: number;
-  priority: Priority;
+  priority?: string;
+}
+
+export interface AppointmentFormModel {
+  appointmentDaysOfWeek: string[];
+  openingHours: string;
+  requiresAppointment: string;
+  requiresAppointmentNotification: string;
+  appointmentNotificationDueInDays: string;
 }

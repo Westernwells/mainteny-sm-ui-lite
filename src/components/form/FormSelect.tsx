@@ -3,16 +3,13 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Checkbox from '@mui/material/Checkbox';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import Select, {SelectChangeEvent} from '@mui/material/Select';
+import Select, {SelectProps} from '@mui/material/Select';
 
 interface Props<T> {
   labelId: string;
   label: string;
-  id: string;
-  value: string[];
-  options: string[];
-  onChange: (event: SelectChangeEvent<T[]>) => void;
-  disabled?: boolean;
+  options: {label: string; value: string}[];
+  selectProps?: SelectProps<T>;
 }
 
 const ITEM_HEIGHT = 48;
@@ -29,13 +26,11 @@ const MenuProps = {
 export const FormSelect = ({
   labelId,
   label,
-  id,
-  value,
   options,
-  onChange,
-  disabled,
-}: Props<string>) => (
+  selectProps,
+}: Props<string | string[]>) => (
   <FormControl sx={{marginBlock: '.75em'}} fullWidth>
+    {console.log(selectProps, '~~~~~~~~!!')}
     <InputLabel
       id={labelId}
       shrink
@@ -47,19 +42,27 @@ export const FormSelect = ({
     </InputLabel>
     <Select
       size="small"
-      multiple
-      labelId={labelId}
-      id={id}
-      value={value}
-      onChange={onChange}
       input={<OutlinedInput id="roles" />}
-      renderValue={() => value.join(',')}
+      renderValue={() =>
+        selectProps && selectProps.value && Array.isArray(selectProps.value)
+          ? selectProps.value.join(',')
+          : selectProps?.value || ''
+      }
       MenuProps={MenuProps}
-      disabled={disabled}>
+      {...selectProps}>
       {options.map((option) => (
-        <MenuItem key={option} value={option}>
-          <Checkbox size="small" checked={value.includes(option)} />
-          {option}
+        <MenuItem key={option.label} value={option.value}>
+          {selectProps?.multiple ? (
+            <Checkbox
+              size="small"
+              checked={
+                selectProps && selectProps.value
+                  ? selectProps.value.includes(option.value)
+                  : false
+              }
+            />
+          ) : null}
+          {option.label}
         </MenuItem>
       ))}
     </Select>

@@ -11,7 +11,7 @@ export const SelectEmployeeRole = () => {
 
   const {setFieldValue} = useFormikContext<EmployeeAccountData>();
 
-  const handleRoleChange = (event: SelectChangeEvent<string[]>) => {
+  const handleRoleChange = (event: SelectChangeEvent<string | string[]>) => {
     const {
       target: {value},
     } = event;
@@ -28,13 +28,20 @@ export const SelectEmployeeRole = () => {
   return (
     <FormSelect
       labelId="rolesSelect-label"
-      id="rolesSelect"
       label="Roles"
-      value={roles}
       options={Object.keys(Role)
         .filter((role) => role !== 'ADMIN')
-        .map((role) => convertToText(role))}
-      onChange={handleRoleChange}
+        .map((role) => ({
+          label: convertToText(role),
+          value: convertToText(role),
+        }))}
+      selectProps={{
+        id: 'rolesSelect',
+        value: roles,
+        onChange: handleRoleChange,
+        multiple: true,
+        name: 'role',
+      }}
     />
   );
 };

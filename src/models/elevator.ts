@@ -260,7 +260,7 @@ export interface ElevatorRequestBody {
   parking: string;
   pictures: FileResourceRecord[];
   priority: Priority;
-  properties: ElevatorAvailabilityAdditionalProps;
+  properties: {[key: string]: string};
   propertyManagerId: string;
   propertyOwnerId: string;
   propertySegment: string;

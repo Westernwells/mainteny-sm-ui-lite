@@ -109,6 +109,7 @@ export const Employees = () => {
           searchPlaceholder="Search by name, role, address etc."
           getSearchValue={(val: string) => setSearch(val)}
           showActionBtn
+          btnOnClick={() => setIsDrawerOpen(true)}
           btnLabel="New employee"
         />
       }>
