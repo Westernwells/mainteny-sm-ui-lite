@@ -29,6 +29,7 @@ import {useEffect, useState} from 'react';
 
 import {NewServiceOrder} from 'pages/NewServiceOrder';
 import {Articles} from 'pages/Articles';
+import {ArticleOverView} from 'pages/ArticleDetails';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -341,10 +342,24 @@ export const Router = () => {
           element={
             <>
               <Helmet>
-                <title>{`Quotations - ${titleTail}`}</title>
+                <title>{`Articles - ${titleTail}`}</title>
               </Helmet>
               <PageLayout pageTitle="Articles & Packages">
                 <Articles />
+              </PageLayout>
+            </>
+          }
+        />
+
+        <Route
+          path="/articles/details/:id"
+          element={
+            <>
+              <Helmet>
+                <title>{`Articles Details - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout pageScrollable>
+                <ArticleOverView />
               </PageLayout>
             </>
           }

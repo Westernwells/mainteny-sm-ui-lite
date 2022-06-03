@@ -3,6 +3,7 @@ import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import AutoAwesomeMosaicIcon from '@mui/icons-material/AutoAwesomeMosaic';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
+import {ArticleListDataGrid} from './Tabs/ArticleListDataGrid';
 
 const tabItems = [
   {
@@ -28,7 +29,7 @@ export const Articles = () => {
         setTabValue(index);
       }}>
       <TabsBody value={tabValue} index={0}>
-        {null}
+        <ArticleListDataGrid />
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
         {null}
