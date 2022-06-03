@@ -200,17 +200,69 @@ export const OverviewTab = ({getUnitName}: Props) => {
         maintainers={maintainers}
       />
 
-      <Grid container spacing={2} sx={{mt: '0.3em'}}>
-        <Grid item md={4}>
-          <Notes />
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          mt: '0.3em',
+          [theme.breakpoints.up('md')]: {
+            maxHeight: 500,
+          },
+        }}>
+        <Grid
+          item
+          sm={12}
+          md={4}
+          sx={{
+            [theme.breakpoints.up('md')]: {
+              height: '100%',
+            },
+          }}>
+          <Notes
+            containerStyles={{
+              [theme.breakpoints.up('md')]: {
+                height: '100%',
+              },
+            }}
+          />
         </Grid>
 
-        <Grid item md={4}>
-          <Pictures />
+        <Grid
+          item
+          sm={12}
+          md={4}
+          sx={{
+            [theme.breakpoints.up('md')]: {
+              height: '100%',
+            },
+          }}>
+          <Pictures
+            containerStyles={{
+              [theme.breakpoints.up('md')]: {
+                height: '100%',
+              },
+            }}
+            elevator={elevator!}
+            elevatorRequestBody={elevatorRequestBody}
+          />
         </Grid>
 
-        <Grid item md={4}>
-          <Documents />
+        <Grid
+          item
+          sm={12}
+          md={4}
+          sx={{
+            [theme.breakpoints.up('md')]: {
+              height: '100%',
+            },
+          }}>
+          <Documents
+            containerStyles={{
+              [theme.breakpoints.up('md')]: {
+                height: '100%',
+              },
+            }}
+          />
         </Grid>
       </Grid>
     </>

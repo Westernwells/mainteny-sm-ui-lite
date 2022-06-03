@@ -1,25 +1,21 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-// import {Button} from 'components/Button';
-import {PageCard} from 'components/PageCard';
-import useTheme from '@mui/material/styles/useTheme';
+import {InfoCard} from 'components/InfoCard';
 
-export const Documents = () => {
-  const theme = useTheme();
-  console.log();
-  return (
-    <PageCard
-      headerContainerOverrideStyles={{
-        py: '0.2em',
-        background: theme.palette.inputBackground.main,
-      }}
-      customHeader={
-        <Typography component="div" variant="subtitle1">
-          Documents
-        </Typography>
-      }
-      headerActionIcon={<Typography color="info.main">+Add</Typography>}>
-      <Box>kdk</Box>
-    </PageCard>
-  );
-};
+interface Props {
+  containerStyles?: {[key: string]: any};
+}
+
+export const Documents = ({containerStyles}: Props) => (
+  <InfoCard
+    containerStyles={containerStyles}
+    showHeaderBackground
+    header={
+      <Typography component="div" variant="subtitle1">
+        Documents
+      </Typography>
+    }
+    headerActionIcon={<Typography color="info.main">+Add</Typography>}>
+    <Box>kdk</Box>
+  </InfoCard>
+);
