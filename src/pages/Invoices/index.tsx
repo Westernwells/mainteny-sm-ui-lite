@@ -63,7 +63,7 @@ export const Invoices = () => {
 
   useEffect(() => {
     if (invoiceResource?.data) {
-      setRows(makeRows(invoiceResource));
+      setRows(makeRows(invoiceResource.data));
     }
   }, [invoiceResource]);
 

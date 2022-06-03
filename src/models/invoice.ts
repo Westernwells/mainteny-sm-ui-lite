@@ -1,3 +1,4 @@
+import {Article} from './article';
 import {
   Amount,
   AmountRecord,
@@ -5,6 +6,7 @@ import {
   Meta,
   PaymentInfo,
   PdfGenerationStatus,
+  WithOptional,
 } from './misc';
 import {PropertyOwner} from './propertyManager';
 import {ServiceCompanySimpleView} from './service-company';
@@ -23,12 +25,14 @@ export enum InvoiceStatusView {
 }
 
 export interface InvoiceItem {
+  article: Article;
+  data: string;
+  description: string;
   id: string;
   invoiceId: string;
   name: string;
   quantity: number;
-  unitPrice: Fee;
-  vat: number;
+  unitAmount: Amount;
 }
 
 export interface InvoiceAdditionalInfo {
@@ -43,6 +47,7 @@ export interface InvoiceView {
   description: string;
   totalAmount: Amount;
   issuedDate: string;
+  dueDate: string;
   status: InvoiceStatus;
   serviceCompany: ServiceCompanySimpleView;
   serviceOrder: ServiceOrderView;
@@ -66,23 +71,34 @@ export interface InvoiceFilters {
   serviceType: ServiceOrderType[];
 }
 
-export interface InvoiceItemRecord {
+export interface InvoiceItemRecord<T> {
   articleId: string;
+  articleUnit: string;
   description: string;
   name: string;
   quantity: number;
-  unitAmount: AmountRecord;
+  unitAmount: T;
 }
 
 export interface CreateInvoice {
   description: string;
   dueDate: string;
   issuedDate: string;
-  items: InvoiceItemRecord[];
+  items: WithOptional<InvoiceItemRecord<AmountRecord>, 'articleUnit'>[];
   paymentInfo: PaymentInfo;
   paymentTerms: string;
   propertyOwnerId: string;
   serviceCompanyId: string;
   serviceOrderId: string;
   shouldSendOut: boolean;
+}
+
+export interface UpdateInvoice {
+  description: string;
+  dueDate: string;
+  issuedDate: string;
+  items: InvoiceItemRecord<Amount>[];
+  paymentInfo?: PaymentInfo;
+  paymentTerms?: string;
+  serviceOrderId: string;
 }

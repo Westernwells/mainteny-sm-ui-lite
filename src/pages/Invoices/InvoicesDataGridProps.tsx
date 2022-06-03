@@ -6,7 +6,7 @@ import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {getColumnProps} from 'components/DataGridLayout';
 // import {fetchDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {InvoiceStatus} from 'models/invoice';
+import {InvoiceStatus, InvoiceView} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
 import {formatDate, toDate} from '../../utils/datetime';
 
@@ -117,9 +117,9 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = (invoices: any): GridRowsProp =>
-  invoices.data
-    ? invoices.data.map((item: any, index: number) => ({
+export const makeRows = (invoices: InvoiceView[]): GridRowsProp =>
+  invoices.length
+    ? invoices.map((item, index: number) => ({
         id: index,
         date: formatDate(toDate(item.issuedDate)),
         number: item.number,
@@ -142,4 +142,4 @@ export const makeRows = (invoices: any): GridRowsProp =>
         },
         navigateTo: `details/${item.id}`,
       }))
-    : console.error('No Data');
+    : [];

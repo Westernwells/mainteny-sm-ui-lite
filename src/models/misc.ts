@@ -1,6 +1,7 @@
 import {MouseEvent, ReactNode} from 'react';
 import {number} from 'yup';
 import {GetState, SetState} from 'zustand';
+import {UserAccountSimpleView} from './user';
 
 export interface RestError {
   errorCode: string;
@@ -18,7 +19,7 @@ export enum DispatchStrategy {
 }
 
 export interface Meta {
-  creator?: string;
+  creator?: UserAccountSimpleView;
   createdAt: string;
   lastUpdatedAt: string;
   state: State;

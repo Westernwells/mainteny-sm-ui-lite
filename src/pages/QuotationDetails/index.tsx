@@ -347,26 +347,7 @@ export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
           variant="filled"
         />
       </Box>
-      <A4Layout>
-        <Box display="flex" justifyContent="space-between" mt="1em">
-          <Box>
-            <Typography variant="subtitle1">
-              {user?.userAccount.serviceCompany.name || ''}
-            </Typography>
-            <Typography component="span" variant="caption">
-              {user &&
-                'businessAddress' in user.userAccount.serviceCompany &&
-                user.userAccount.serviceCompany.businessAddress?.fullName}
-            </Typography>
-          </Box>
-          <Box textAlign="end">
-            <Typography component="span" variant="caption">
-              Quotation Number
-            </Typography>
-            <Typography variant="subtitle1">{quotation.number}</Typography>
-          </Box>
-        </Box>
-
+      <A4Layout placeholder="Quotation" number={quotation.number}>
         <Box display="flex" mt="1em" gap="2em">
           <Box flexGrow={1} display="flex" flexDirection="column" gap="2em">
             <Box>

@@ -14,6 +14,7 @@ import {
   InvoiceFilters,
   InvoiceStatus,
   CreateInvoice,
+  UpdateInvoice,
 } from 'models/invoice';
 import {useUserSession} from './useUserSession';
 
@@ -133,7 +134,7 @@ export const fetchInvoice = async (invoiceId: string) => {
 
 export function useInvoiceDetail(invoiceId?: string) {
   const navigate = useNavigate();
-  console.log(typeof navigate);
+
   return useQuery([qk.invoiceById, invoiceId], () => fetchInvoice(invoiceId!), {
     enabled: !!invoiceId,
     onError: (e: any) => {
@@ -141,6 +142,33 @@ export function useInvoiceDetail(invoiceId?: string) {
     },
   });
 }
+
+export const postPublishInvoice = async (id: string) => {
+  await axiosClient.post(`api/invoices/${id}/publish`);
+};
+
+export const usePublishInvoice = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  const navigate = useNavigate();
+
+  return useMutation((invoiceId: string) => postPublishInvoice(invoiceId), {
+    onSuccess: (__, invoiceId) => {
+      queryClient.invalidateQueries([qk.fetchInvoices]);
+      queryClient.invalidateQueries([qk.invoiceById]);
+      enqueueSnackbar(`Invoice sent!`, {
+        variant: 'success',
+      });
+      navigate(`/invoices/details/${invoiceId}`);
+    },
+    onError: (err) => {
+      console.log(err);
+      enqueueSnackbar('Some error occurred, please try again!', {
+        variant: 'error',
+      });
+    },
+  });
+};
 
 export const postInvoice = async (body: CreateInvoice) => {
   const {data} = await axiosClient.post<{value: string}>('api/invoices', body);
@@ -169,4 +197,49 @@ export const useCreateInvoice = () => {
       });
     },
   });
+};
+
+export const putInvoice = async (
+  body: UpdateInvoice,
+  id: string,
+  publish: boolean,
+) => {
+  await axiosClient.put(`api/invoices/${id}`, body);
+  return publish;
+};
+
+export const useUpdateInvoice = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  const {mutate: publishInvoice} = usePublishInvoice();
+
+  return useMutation(
+    ({
+      data,
+      invoiceId,
+      publish,
+    }: {
+      data: UpdateInvoice;
+      invoiceId: string;
+      publish: boolean;
+    }) => putInvoice(data, invoiceId, publish),
+    {
+      onSuccess: (__, {publish, invoiceId}) => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+        enqueueSnackbar(`Invoice updated successfully!`, {
+          variant: 'success',
+        });
+        if (publish) {
+          publishInvoice(invoiceId);
+        }
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again!', {
+          variant: 'error',
+        });
+      },
+    },
+  );
 };
