@@ -1,5 +1,4 @@
 import Typography from '@mui/material/Typography';
-// import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
 import {Elevator, ElevatorProperty, ElevatorRequestBody} from 'models/elevator';
 import Grid from '@mui/material/Grid';
@@ -11,7 +10,7 @@ import {Dialog} from 'components/Dialog';
 import * as Yup from 'yup';
 import {AppointmentFormModel} from '../models';
 import {AppointmentPreferenceSchema} from './AppointmentPreferenceSchema';
-import {EditAppointmentForm} from './EditAppointment';
+import {EditAppointmentForm} from './EditAppointmentForm';
 
 interface Props {
   containerStyles?: {[key: string]: any};
@@ -27,20 +26,13 @@ const makeKeyValueFromArrayOfObjects = (arr: ElevatorProperty[]) => {
   return result;
 };
 
-const validationSchema = Yup.object().shape({
-  lastVisitDate: Yup.string().nullable().required('Last visit is required'),
-  serviceTime: Yup.string().nullable().required('Service time is required'),
-  technicianNumber: Yup.number()
-    .nullable()
-    .required('No. of technicians is required'),
-});
+const validationSchema = Yup.object().shape({});
 
 export const AppointmentPreference = ({
   containerStyles,
   elevator,
   elevatorRequestBody,
 }: Props) => {
-  // const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
   const {mutateAsync: updateElevator} = useUpdateElevator(
     'Appointment preference updated successfully',
@@ -55,8 +47,9 @@ export const AppointmentPreference = ({
         ? propertyRef.appointmentDaysOfWeek.split(',')
         : [],
       openingHours: propertyRef.openingHours,
-      requiresAppointment: propertyRef.openingHours,
-      requiresAppointmentNotification: propertyRef.openingHours,
+      requiresAppointment: propertyRef.requiresAppointment || '',
+      requiresAppointmentNotification:
+        propertyRef.requiresAppointmentNotification || '',
       appointmentNotificationDueInDays:
         propertyRef.appointmentNotificationDueInDays,
     },
@@ -73,8 +66,9 @@ export const AppointmentPreference = ({
           ...elevatorRequestBody?.properties,
           appointmentDaysOfWeek: formik.values.appointmentDaysOfWeek.join(','),
           openingHours: formik.values.openingHours,
-          requiresAppointment: formik.values.openingHours,
-          requiresAppointmentNotification: formik.values.openingHours,
+          requiresAppointment: formik.values.requiresAppointment,
+          requiresAppointmentNotification:
+            formik.values.requiresAppointmentNotification,
           appointmentNotificationDueInDays:
             formik.values.appointmentNotificationDueInDays,
         },
@@ -92,7 +86,7 @@ export const AppointmentPreference = ({
       }
       headerActionIcon={<EditIcon />}
       showHeaderBackground>
-      <Grid container spacing={2}>
+      <Grid container spacing={1}>
         {elevator.properties.map((property) => (
           <Grid key={property.key} item xs={12} sm={4} md={6}>
             <AppointmentPreferenceSchema
