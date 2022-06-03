@@ -20,6 +20,17 @@ module.exports = {
     '{{name}} does not exists': '{{name}} existiert nicht',
     'the emergency at {{address}} is assigned to {{name}} at {{time}}':
       'der Notfall unter {{address}} wird {{name}} um {{time}} zugewiesen',
+
+    // LOGIN
+    'Service Manager Portal': 'Service Manager Portal',
+    'The unified Application made for Service Managers with smart job assignments, real-time overview of Units under Maintenance (UuM) and out-of-the-box ERP Integrations!':
+      'Das Dashboard für Service Manager mit intelligenter Ressourcenzuteilung, Echtzeit-Übersicht des Anlagenportfolios und sofort einsatzbereite ERP-Integrationen!',
+    Login: 'Anmelden',
+    'Email address': 'E-Mail Adresse',
+    Password: 'Passwort',
+    'Forgot Password?': 'Passwort vergessen?',
+    'Enter a valid email': 'Geben Sie eine gültige E-Mail ein',
+    'Email is required': 'E-Mail ist erforderlich',
   },
 };
 

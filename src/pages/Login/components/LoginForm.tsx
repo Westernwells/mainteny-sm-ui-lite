@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
+import {useTranslation} from 'react-i18next';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import TextField from '@mui/material/TextField';
@@ -33,6 +34,7 @@ export const LoginForm = ({
   loading,
 }: Props) => {
   const [showPassword, setShowPassword] = useState(false);
+  const {t} = useTranslation();
   return (
     <Box display="flex" justifyContent="center" width="100%">
       <form style={{width: '18rem'}} onSubmit={handleSubmit}>
@@ -40,7 +42,7 @@ export const LoginForm = ({
           sx={{}}
           id="email"
           name="email"
-          label="Email address"
+          label={t('Email address')}
           size="medium"
           fullWidth
           type="email"
@@ -62,7 +64,7 @@ export const LoginForm = ({
             sx={{marginTop: 4}}
             id="password"
             name="password"
-            label="Password"
+            label={t('Password')}
             size="medium"
             fullWidth
             type={showPassword ? 'text' : 'password'}
@@ -83,7 +85,7 @@ export const LoginForm = ({
           <Box display="flex" justifyContent="flex-end" mt={1}>
             <Link to="/recover" style={{textDecoration: 'none'}}>
               <Button
-                label="Forgot Password?"
+                label={t('Forgot Password?')}
                 buttonProps={{
                   sx: {color: 'text.secondary', textTransform: 'capitalize'},
                   color: 'info',
@@ -94,7 +96,7 @@ export const LoginForm = ({
         </Box>
 
         <Button
-          label="Login"
+          label={t('Login')}
           buttonProps={{
             sx: {marginTop: 5, width: '100%'},
             size: 'large',
