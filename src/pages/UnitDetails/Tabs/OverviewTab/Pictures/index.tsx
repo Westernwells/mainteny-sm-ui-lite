@@ -58,7 +58,6 @@ export const Pictures = ({
     setOpenDialog(false);
   };
 
-  console.log(downloadUrls, '@@@@##$$$^^^');
   return (
     <InfoCard
       containerStyles={containerStyles}

@@ -5,10 +5,6 @@ import {queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useUserSession} from './useUserSession';
 
-// interface SignedUrl {
-//   [key: string]: string;
-// }
-
 const getArrayBuffer = (file: FileWithPreview) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -47,8 +43,6 @@ const uploadAndSave = async (
     },
     body: arrayBuffer,
   });
-
-  // console.log(signedUrl, arrayBuffer, '***********');
 };
 
 export const uploadImages = async (
