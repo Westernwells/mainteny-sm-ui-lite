@@ -178,6 +178,7 @@ export const DataGridLayout = ({
           },
           '& .MuiDataGrid-columnHeaderTitleContainer': {
             padding: '0',
+            whiteSpace: 'pre-wrap',
           },
           '& .MuiDataGrid-columnSeparator': {
             display: 'none',
