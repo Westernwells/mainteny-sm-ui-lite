@@ -1,10 +1,17 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import i18n from 'i18n';
+import {useTranslation} from 'react-i18next';
+import {useQueryClient} from 'react-query';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import Box from '@mui/material/Box';
+import Language from '@mui/icons-material/Language';
+import {axiosClient} from 'utils/axios-utils';
+import {languageMap} from 'utils/utils';
 import {ReactComponent as PolygonTop} from '../assets/icons/polygonTop.svg';
 import {ReactComponent as PolygonBottom} from '../assets/icons/polygonBottom.svg';
 import {ReactComponent as MaintenyLogo} from '../assets/icons/MaintenyLogo.svg';
+import {MenuBtn} from './MenuBtn';
 
 interface Props {
   children: React.ReactNode;
@@ -21,6 +28,20 @@ const useStyles = makeStyles({
 
 export const AuthLayout = ({children}: Props) => {
   const classes = useStyles();
+  const {t} = useTranslation();
+  const queryClient = useQueryClient();
+  const [selectedLng, setSelectedLng] = useState('');
+  useEffect(() => {
+    const {language} = i18n;
+    setSelectedLng(language.split('-')[0].toUpperCase());
+  }, []);
+
+  const changeLanguage = (lang: string, label: string) => {
+    setSelectedLng(label);
+    i18n.changeLanguage(lang);
+    axiosClient.defaults.headers.common.language = languageMap[lang];
+    queryClient.resetQueries();
+  };
 
   return (
     <Box display="flex" minHeight="100vh" sx={{backgroundColor: '#fff'}}>
@@ -39,11 +60,10 @@ export const AuthLayout = ({children}: Props) => {
         <Box>
           <Box marginBottom="5rem">
             <Typography variant="h3" color="#fff" textAlign="center">
-              {' '}
               Mainteny
             </Typography>
             <Typography color="#fff" variant="h5" textAlign="center">
-              Service Manager Portal
+              {t('Service Manager Portal')}
             </Typography>
           </Box>
           <Typography
@@ -53,13 +73,37 @@ export const AuthLayout = ({children}: Props) => {
             textAlign="center"
             paddingLeft={4}
             paddingRight={4}>
-            The unified Application made for Service Managers with smart job
-            assignments, real-time overview of Units under Maintenance (UuM) and
-            out-of-the-box ERP Integrations!
+            {t(
+              `The unified Application made for Service Managers with smart job assignments, real-time overview of Units under Maintenance (UuM) and out-of-the-box ERP Integrations!`,
+            )}
           </Typography>
         </Box>
         <Box style={{position: 'absolute', bottom: 0, left: 0, right: 0}}>
           <PolygonBottom width="100%" />
+        </Box>
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            '& .MuiButton-root': {
+              color: 'text.secondary',
+            },
+          }}>
+          <MenuBtn
+            startIcon={<Language />}
+            label={selectedLng}
+            menu={[
+              {
+                label: 'English',
+                action: () => changeLanguage('en-US', 'EN'),
+              },
+              {
+                label: 'Deutsch',
+                action: () => changeLanguage('de-DE', 'DE'),
+              },
+            ]}
+          />
         </Box>
       </Box>
 

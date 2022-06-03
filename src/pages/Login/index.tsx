@@ -2,6 +2,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import {useFormik} from 'formik';
 import {useLocation} from 'react-router-dom';
+import {useTranslation} from 'react-i18next';
 import queryString from 'query-string';
 import * as Yup from 'yup';
 
@@ -10,17 +11,18 @@ import {useAuth} from 'hooks/useAuth';
 import {AuthLayout} from 'components/AuthLayout';
 import {LoginForm} from './components/LoginForm';
 
-const validationSchema = Yup.object().shape({
-  email: Yup.string()
-    .email('Enter a valid email')
-    .required('Email is required'),
-  password: Yup.string().required('field is required'),
-});
-
 export const Login = () => {
   const {search} = useLocation();
   const {authType} = queryString.parse(search);
   const {signin, loading} = useAuth();
+  const {t} = useTranslation();
+
+  const validationSchema = Yup.object().shape({
+    email: Yup.string()
+      .email(t('Enter a valid email'))
+      .required(t('Email is required')),
+    password: Yup.string().required(t('field is required')),
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -45,13 +47,13 @@ export const Login = () => {
             <CheckMark />
           </Box>
           <Typography variant="h4" mt={7}>
-            Password created successfully
+            {t('Password created successfully')}
           </Typography>
         </Box>
       ) : null}
 
       <Typography variant="h6" mt={5} mb="2.5rem" textAlign="center">
-        Login
+        {t('Login')}
       </Typography>
 
       <LoginForm
