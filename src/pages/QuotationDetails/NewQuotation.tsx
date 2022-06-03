@@ -212,18 +212,7 @@ export const NewQuotation = () => {
 
   return (
     <Box>
-      <A4Layout>
-        <Box mt="1em">
-          <Typography variant="subtitle1">
-            {user?.userAccount.serviceCompany.name || ''}
-          </Typography>
-          <Typography component="span" variant="caption">
-            {user &&
-              'businessAddress' in user.userAccount.serviceCompany &&
-              user.userAccount.serviceCompany.businessAddress?.fullName}
-          </Typography>
-        </Box>
-
+      <A4Layout placeholder="Quotation">
         <Box display="flex" mt="1em" gap="2em">
           <Box flexGrow={1} display="flex" flexDirection="column" gap="2em">
             <Box>

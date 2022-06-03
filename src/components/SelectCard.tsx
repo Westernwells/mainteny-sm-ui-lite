@@ -6,7 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 interface Props {
   header: ReactNode;
   body: ReactNode;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 export const SelectCard = ({header, body, onClose}: Props) => (
@@ -25,8 +25,10 @@ export const SelectCard = ({header, body, onClose}: Props) => (
       {header}
       <Box color="text.secondary">{body}</Box>
     </Box>
-    <IconButton onClick={onClose}>
-      <CloseIcon />
-    </IconButton>
+    {onClose && (
+      <IconButton onClick={onClose}>
+        <CloseIcon />
+      </IconButton>
+    )}
   </Box>
 );

@@ -20,6 +20,7 @@ import {PdfGenerationStatus} from 'models/misc';
 import {InvoiceCard} from './InvoiceCard';
 import {Invoice} from './Invoice';
 import {RelatedTo} from './RelatedTo';
+import {EditInvoice} from './EditInvoice';
 
 export const InvoiceDetails = () => {
   const {id: invoiceId} = useParams();
@@ -32,6 +33,10 @@ export const InvoiceDetails = () => {
 
   if (isLoading) {
     return <Progress />;
+  }
+
+  if (isFetched && invoice && invoice.status === InvoiceStatus.DRAFT) {
+    return <EditInvoice invoice={invoice} />;
   }
 
   return (

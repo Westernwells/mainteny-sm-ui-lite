@@ -100,7 +100,7 @@ export const usePublishQuotation = () => {
       onSuccess: (_, quotationId) => {
         queryClient.invalidateQueries([qk.fetchQuotations]);
         queryClient.invalidateQueries([qk.quotationById]);
-        enqueueSnackbar(`Quotation sent client!`, {
+        enqueueSnackbar(`Quotation sent!`, {
           variant: 'success',
         });
         navigate(`/quotations/details/${quotationId}`);
