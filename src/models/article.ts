@@ -29,6 +29,9 @@ export interface ArticleView {
   number: string;
   search: string;
   serviceCompanyId: string;
+  stock: Stock;
+  storageLocation: string;
+  subCategory: string;
   supplier: string;
   type: ArticleType;
   unit: string;
@@ -64,5 +67,15 @@ export interface Article {
 export interface QueryArticleParams {
   pageIndex: number;
   pageSize: number;
-  query: string;
+  query?: string;
+  type?: string;
+  manufacturer?: string;
+  supplier?: string;
+}
+
+export interface Stock {
+  currentStock: number;
+  maxStock: number;
+  minOrderQuantity: number;
+  minStock: number;
 }
