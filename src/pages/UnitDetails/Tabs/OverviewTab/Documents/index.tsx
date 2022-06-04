@@ -1,4 +1,3 @@
-/* eslint-disable */
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -85,7 +84,9 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
                 display: 'flex',
                 flexDirection: 'column',
               }}>
-              <Box sx={{flexGrow: 1, height: 0}}>
+              <Box
+                sx={{flexGrow: 1, height: 0, cursor: 'pointer'}}
+                onClick={() => window.open(downloadUrls[item.uri], '_blank')}>
                 <FileCopyIcon
                   sx={{fontSize: '4rem', color: theme.palette.text.secondary}}
                 />
