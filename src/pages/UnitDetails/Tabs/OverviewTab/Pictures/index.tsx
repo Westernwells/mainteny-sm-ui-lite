@@ -15,14 +15,9 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 interface Props {
   elevator: Elevator;
   elevatorRequestBody?: Partial<ElevatorRequestBody>;
-  containerStyles?: {[key: string]: any};
 }
 
-export const Pictures = ({
-  elevator,
-  elevatorRequestBody,
-  containerStyles,
-}: Props) => {
+export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
   const [openDialog, setOpenDialog] = useState(false);
   const theme = useTheme();
   const {user} = useUserSession();
@@ -63,10 +58,14 @@ export const Pictures = ({
 
   return (
     <InfoCard
-      containerStyles={containerStyles}
+      containerStyles={{
+        [theme.breakpoints.up('md')]: {
+          height: '100%',
+          overflowY: 'scroll',
+        },
+      }}
       headerActionIcon={<Typography color="info.main">+Add</Typography>}
       handleAction={() => setOpenDialog(true)}
-      bodyContainerStyle={{overflowX: 'scroll'}}
       showHeaderBackground
       header={<Typography variant="subtitle1">Pictures</Typography>}>
       <Grid container spacing={2} sx={{}}>

@@ -7,7 +7,7 @@ import useTheme from '@mui/material/styles/useTheme';
 
 interface Props {
   bodyContainerStyle?: {[key: string]: string | number};
-  containerStyles?: {[key: string]: string | number};
+  containerStyles?: {[key: string]: any};
   headerStyles?: {[key: string]: string | number};
   minHeight?: string | number;
   header?: string | ReactNode;

@@ -218,13 +218,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
               height: '100%',
             },
           }}>
-          <Notes
-            containerStyles={{
-              [theme.breakpoints.up('md')]: {
-                height: '100%',
-              },
-            }}
-          />
+          <Notes />
         </Grid>
 
         <Grid
@@ -237,11 +231,6 @@ export const OverviewTab = ({getUnitName}: Props) => {
             },
           }}>
           <Pictures
-            containerStyles={{
-              [theme.breakpoints.up('md')]: {
-                height: '100%',
-              },
-            }}
             elevator={elevator!}
             elevatorRequestBody={elevatorRequestBody}
           />
@@ -256,13 +245,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
               height: '100%',
             },
           }}>
-          <Documents
-            containerStyles={{
-              [theme.breakpoints.up('md')]: {
-                height: '100%',
-              },
-            }}
-          />
+          <Documents />
         </Grid>
       </Grid>
     </>
