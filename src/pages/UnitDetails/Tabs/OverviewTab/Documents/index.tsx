@@ -1,25 +1,143 @@
-import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
 import useTheme from '@mui/material/styles/useTheme';
+import {FileWithPreview, MyDropZone} from 'components/MyDropzone';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
+import {Elevator, ElevatorRequestBody} from 'models/elevator';
+import {useState} from 'react';
+import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
+import {FileResourceRecord} from 'models/media';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 
-export const Documents = () => {
+interface Props {
+  elevator: Elevator;
+  elevatorRequestBody?: Partial<ElevatorRequestBody>;
+}
+
+export const Documents = ({elevator, elevatorRequestBody}: Props) => {
+  const [openDialog, setOpenDialog] = useState(false);
   const theme = useTheme();
+  const {user} = useUserSession();
+  const [acceptedFiles, setAcceptedFiles] = useState<FileWithPreview[]>([]);
+  const {mutateAsync: uploadFiles, isLoading} = useUploadFiles(
+    'Documents uploaded successfully',
+  );
+  const {mutateAsync: updateElevator} = useUpdateElevator(
+    'Elevator updated successfully',
+  );
+  const {data: downloadUrls = {}} = useDownloadUrl(
+    elevator.additionalInfo.documents.map((item) => item.uri),
+  );
+
+  const onSave = async () => {
+    const serviceCompanyId = user?.userAccount.serviceCompany.id;
+    const uploadPath = `${serviceCompanyId}/elevators/${elevator.id}/documents`;
+    await uploadFiles({files: acceptedFiles, uploadPath});
+    if (elevatorRequestBody) {
+      await updateElevator({
+        body: {
+          ...elevatorRequestBody,
+          documents: [
+            ...(elevatorRequestBody.documents as FileResourceRecord[]),
+            ...acceptedFiles.map((item) => ({
+              description: '',
+              type: item.type,
+              uri: `${uploadPath}/${item.name}`,
+            })),
+          ],
+        },
+        elevatorId: elevator.id,
+      });
+    }
+
+    setOpenDialog(false);
+  };
+
   return (
     <InfoCard
       containerStyles={{
         [theme.breakpoints.up('md')]: {
           height: '100%',
+          overflowY: 'scroll',
         },
       }}
+      headerActionIcon={<Typography color="info.main">+ Add</Typography>}
+      handleAction={() => setOpenDialog(true)}
       showHeaderBackground
-      header={
-        <Typography component="div" variant="subtitle1">
-          Documents
-        </Typography>
-      }
-      headerActionIcon={<Typography color="info.main">+Add</Typography>}>
-      <Box>kdk</Box>
+      header={<Typography variant="subtitle1">Documents</Typography>}>
+      <Grid container spacing={2} sx={{mt: '0.5em'}}>
+        {elevator.additionalInfo.documents.map((item) => (
+          <Grid item sm={4}>
+            <Box
+              sx={{
+                border: `1px solid ${theme.palette.text.disabled}`,
+                padding: '0.5em',
+                height: 120,
+                [theme.breakpoints.down('md')]: {
+                  height: 170,
+                },
+                display: 'flex',
+                flexDirection: 'column',
+              }}>
+              <Box
+                sx={{flexGrow: 1, height: 0, cursor: 'pointer'}}
+                onClick={() => window.open(downloadUrls[item.uri], '_blank')}>
+                <FileCopyIcon
+                  sx={{
+                    fontSize: '4rem',
+                    [theme.breakpoints.down('md')]: {
+                      fontSize: '9rem',
+                    },
+                    color: theme.palette.text.secondary,
+                  }}
+                />
+              </Box>
+
+              {item.description ? (
+                <Typography
+                  component="div"
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    maxWidth: '100%',
+                    WebkitLineClamp: '1',
+                    WebkitBoxOrient: 'vertical',
+                    height: '20%',
+                  }}>
+                  {item.description}
+                </Typography>
+              ) : null}
+            </Box>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Dialog
+        title="Add Documents"
+        isSaving={isLoading}
+        onCancel={() => setOpenDialog(false)}
+        onSave={() => onSave()}
+        dialogProps={{
+          maxWidth: 'md',
+          open: openDialog || false,
+        }}>
+        <MyDropZone
+          getAcceptedFiles={(files) => {
+            setAcceptedFiles(files);
+          }}
+          acceptedFileTypes="application/pdf"
+          getRejectedFileWithErrors={(file) => {
+            console.log(file);
+          }}
+        />
+      </Dialog>
     </InfoCard>
   );
 };
