@@ -41,7 +41,7 @@ export const InfoCard = ({
       <CardHeader
         sx={{
           py: header ? '0.5em' : '0',
-          my: '0.5em',
+          my: '1em',
           px: !showHeaderBackground ? '0' : 'default',
           background: showHeaderBackground
             ? theme.palette.inputBackground.main
