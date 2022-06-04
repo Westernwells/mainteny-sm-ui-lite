@@ -83,7 +83,9 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
                 display: 'flex',
                 flexDirection: 'column',
               }}>
-              <Box sx={{flexGrow: 1, height: 0}}>
+              <Box
+                sx={{flexGrow: 1, height: 0, cursor: 'pointer'}}
+                onClick={() => window.open(downloadUrls[item.uri], '_blank')}>
                 <img
                   alt=""
                   src={downloadUrls[item.uri]}

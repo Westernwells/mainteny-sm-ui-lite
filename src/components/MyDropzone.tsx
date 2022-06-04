@@ -63,8 +63,6 @@ export const MyDropZone = ({
     setFiles(newFiles);
   };
 
-  console.log(files, '#####');
-
   useEffect(
     () =>
       // revoke the data uris to avoid memory leaks
