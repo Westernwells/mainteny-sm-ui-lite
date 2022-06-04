@@ -1,15 +1,15 @@
-import LoadingButton, {LoadingButtonProps} from '@mui/lab/LoadingButton';
+import MuiButton, {ButtonProps} from '@mui/material/Button';
 import {ReactNode} from 'react';
 
 interface Props {
   label?: string;
   children?: ReactNode;
   style?: {[key: string]: any};
-  buttonProps: LoadingButtonProps;
+  buttonProps: ButtonProps;
 }
 
 export const Button = ({label, children, style, buttonProps}: Props) => (
-  <LoadingButton
+  <MuiButton
     disableRipple
     disableFocusRipple
     disableElevation
@@ -20,5 +20,5 @@ export const Button = ({label, children, style, buttonProps}: Props) => (
     }}
     {...buttonProps}>
     {children || label}
-  </LoadingButton>
+  </MuiButton>
 );

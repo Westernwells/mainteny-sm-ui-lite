@@ -48,7 +48,7 @@ export interface ElevatorAdditionalInfo {
   cabinType: string;
   controllerManufacturer: string;
   controllerModel: string;
-  documents: FileResource[];
+  documents: any;
   emergencyContractNumber: string;
   emergencyPhoneProvider: string;
   keyLocation: string;
@@ -56,7 +56,7 @@ export interface ElevatorAdditionalInfo {
   manufacturer: string;
   numberOfStops: 5;
   parking: string;
-  pictures: FileResource[];
+  pictures: any;
   propertySegment: string;
   qrCode: FileResourceRecord;
 }

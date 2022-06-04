@@ -1,22 +1,20 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {useEffect, useRef, useState} from 'react';
-import {FileWithPath, useDropzone} from 'react-dropzone';
+import {useDropzone} from 'react-dropzone';
 import useTheme from '@mui/material/styles/useTheme';
 import IconButton from '@mui/material/IconButton';
 import CancelIcon from '@mui/icons-material/Cancel';
 import {Button} from './Button';
 
-export interface FileWithPreview extends FileWithPath {
-  preview: string;
+interface Props {
+  getAcceptedFiles?: (val: any) => void;
+  getRejectedFileWithErrors?: (val: FilesWithError[]) => void;
 }
 
-export interface FilesWithError extends FileWithPath {
-  error: string;
-}
-interface Props {
-  getAcceptedFiles?: (val: FileWithPreview[]) => void;
-  getRejectedFileWithErrors?: (val: FilesWithError[]) => void;
+interface FilesWithError {
+  file: any;
+  reason: string;
 }
 
 export const MyDropZone = ({
@@ -24,7 +22,7 @@ export const MyDropZone = ({
   getRejectedFileWithErrors,
 }: Props) => {
   const theme = useTheme();
-  const [files, setFiles] = useState<FileWithPreview[]>([]);
+  const [files, setFiles] = useState<any[]>([]);
   const [filesWithError, setFilesWithError] = useState<FilesWithError[]>([]);
   const onKbinBytes = useRef(1000).current;
   const oneMbInByes = useRef(onKbinBytes * onKbinBytes).current;
@@ -40,7 +38,7 @@ export const MyDropZone = ({
         }
         filesError = [
           ...filesWithError,
-          {...item, error: 'Maximum file size exceeded'},
+          {file: item, reason: 'Maximum file size exceeded'},
         ];
         return false;
       });
@@ -82,8 +80,8 @@ export const MyDropZone = ({
     [],
   );
 
-  const thumbs = files.map((file: FileWithPreview, index) => (
-    <Box key={index} sx={{mr: '1em', display: 'flex', mt: '0.3em'}}>
+  const thumbs = files.map((file: any, index) => (
+    <Box sx={{mr: '1em', display: 'flex', mt: '0.3em'}}>
       <img alt="" width={80} height={80} src={file.preview} />
       <Box
         sx={{

@@ -1,16 +1,18 @@
 import {useQuery} from 'react-query';
+// import * as _ from 'lodash';
+import {useCallback} from 'react';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useUserSession} from './useUserSession';
 
 export const fetchDownloadUrl = async (
-  filePath: string[],
+  pdfPath: string[],
   serviceCompanyId: string,
 ) => {
   const response = await axiosClient.get<{[key: string]: string}>(
     `/api/media/signedUrl/download`,
     {
-      params: {file: filePath, serviceCompanyId},
+      params: {file: pdfPath, serviceCompanyId},
       paramsSerializer,
     },
   );
@@ -19,19 +21,23 @@ export const fetchDownloadUrl = async (
 };
 
 export const useDownloadUrl = (
-  filePath: string[],
+  pdfPath: string[],
   options?: {[key: string]: any},
 ) => {
   const {user} = useUserSession();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
   return useQuery(
-    [qk.invoiceDownloadUrl, filePath, serviceCompanyId],
-    () => fetchDownloadUrl(filePath, serviceCompanyId!),
+    [qk.invoiceDownloadUrl, pdfPath, serviceCompanyId],
+    () => fetchDownloadUrl(pdfPath, serviceCompanyId!),
     {
-      enabled: !!filePath.length && !!serviceCompanyId,
+      enabled: !!pdfPath.length && !!serviceCompanyId,
       refetchOnWindowFocus: false,
       cacheTime: 0,
       ...options,
+      select: useCallback(
+        (data) => pdfPath?.map((item) => data[item]),
+        [pdfPath],
+      ),
     },
   );
 };
