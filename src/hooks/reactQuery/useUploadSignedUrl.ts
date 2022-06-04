@@ -55,7 +55,7 @@ export const uploadImages = async (
     files.map((item) => uploadAndSave(item, serviceCompanyId!, uploadPath)),
   );
 
-export const useUploadImages = (successMsg: string) => {
+export const useUploadFiles = (successMsg: string) => {
   const {enqueueSnackbar} = useSnackbar();
   const {user} = useUserSession();
   const queryClient = useQueryClient();

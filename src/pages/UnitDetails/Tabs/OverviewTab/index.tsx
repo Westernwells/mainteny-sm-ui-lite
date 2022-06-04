@@ -245,7 +245,10 @@ export const OverviewTab = ({getUnitName}: Props) => {
               height: '100%',
             },
           }}>
-          <Documents />
+          <Documents
+            elevator={elevator!}
+            elevatorRequestBody={elevatorRequestBody}
+          />
         </Grid>
       </Grid>
     </>

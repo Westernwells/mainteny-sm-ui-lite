@@ -5,7 +5,7 @@ import {InfoCard} from 'components/InfoCard';
 import useTheme from '@mui/material/styles/useTheme';
 import {FileWithPreview, MyDropZone} from 'components/MyDropzone';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {useUploadImages} from 'hooks/reactQuery/useUploadSignedUrl';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {Elevator, ElevatorRequestBody} from 'models/elevator';
 import {useState} from 'react';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
@@ -22,7 +22,7 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
   const theme = useTheme();
   const {user} = useUserSession();
   const [acceptedFiles, setAcceptedFiles] = useState<FileWithPreview[]>([]);
-  const {mutateAsync: uploadImages, isLoading} = useUploadImages(
+  const {mutateAsync: uploadImages, isLoading} = useUploadFiles(
     'Image uploaded successfully',
   );
   const {mutateAsync: updateElevator} = useUpdateElevator(
@@ -64,7 +64,7 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
           overflowY: 'scroll',
         },
       }}
-      headerActionIcon={<Typography color="info.main">+Add</Typography>}
+      headerActionIcon={<Typography color="info.main">+ Add</Typography>}
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
       header={<Typography variant="subtitle1">Pictures</Typography>}>
