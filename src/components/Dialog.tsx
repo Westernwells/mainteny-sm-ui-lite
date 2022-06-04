@@ -14,6 +14,7 @@ interface Props {
   onCancel: () => void;
   disableSaveBtn?: boolean;
   dialogProps: DialogProps;
+  isSaving?: boolean;
   saveBtnType?: 'button' | 'submit' | 'reset';
 }
 
@@ -25,6 +26,7 @@ export const Dialog = ({
   disableSaveBtn,
   dialogProps,
   saveBtnType,
+  isSaving = false,
 }: Props) => (
   <MuiDialog
     fullWidth
@@ -51,10 +53,12 @@ export const Dialog = ({
         buttonProps={{
           onClick: onSave,
           autoFocus: true,
-          disabled: disableSaveBtn,
+          disabled: disableSaveBtn || isSaving,
           type: saveBtnType,
         }}>
-        <Typography variant="subtitle2">Save</Typography>
+        <Typography variant="subtitle2">
+          {isSaving ? 'Saving...' : 'Save'}
+        </Typography>
       </Button>
     </DialogActions>
   </MuiDialog>

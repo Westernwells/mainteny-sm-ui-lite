@@ -200,16 +200,51 @@ export const OverviewTab = ({getUnitName}: Props) => {
         maintainers={maintainers}
       />
 
-      <Grid container spacing={2} sx={{mt: '0.3em'}}>
-        <Grid item md={4}>
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          mt: '0.3em',
+          [theme.breakpoints.up('md')]: {
+            maxHeight: 500,
+          },
+        }}>
+        <Grid
+          item
+          sm={12}
+          md={4}
+          sx={{
+            [theme.breakpoints.up('md')]: {
+              height: '100%',
+            },
+          }}>
           <Notes />
         </Grid>
 
-        <Grid item md={4}>
-          <Pictures />
+        <Grid
+          item
+          sm={12}
+          md={4}
+          sx={{
+            [theme.breakpoints.up('md')]: {
+              height: '100%',
+            },
+          }}>
+          <Pictures
+            elevator={elevator!}
+            elevatorRequestBody={elevatorRequestBody}
+          />
         </Grid>
 
-        <Grid item md={4}>
+        <Grid
+          item
+          sm={12}
+          md={4}
+          sx={{
+            [theme.breakpoints.up('md')]: {
+              height: '100%',
+            },
+          }}>
           <Documents />
         </Grid>
       </Grid>
