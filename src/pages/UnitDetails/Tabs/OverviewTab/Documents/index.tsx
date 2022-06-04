@@ -1,5 +1,6 @@
 /* eslint-disable */
 import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
@@ -12,6 +13,7 @@ import {useState} from 'react';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {FileResourceRecord} from 'models/media';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 
 interface Props {
   elevator: Elevator;
@@ -38,20 +40,20 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
     const uploadPath = `${serviceCompanyId}/elevators/${elevator.id}/documents`;
     await uploadFiles({files: acceptedFiles, uploadPath});
     if (elevatorRequestBody) {
-      // await updateElevator({
-      //   body: {
-      //     ...elevatorRequestBody,
-      //     pictures: [
-      //       ...(elevatorRequestBody.pictures as FileResourceRecord[]),
-      //       ...acceptedFiles.map((item) => ({
-      //         description: '',
-      //         type: item.type,
-      //         uri: `${uploadPath}/${item.name}`,
-      //       })),
-      //     ],
-      //   },
-      //   elevatorId: elevator.id,
-      // });
+      await updateElevator({
+        body: {
+          ...elevatorRequestBody,
+          documents: [
+            ...(elevatorRequestBody.documents as FileResourceRecord[]),
+            ...acceptedFiles.map((item) => ({
+              description: '',
+              type: item.type,
+              uri: `${uploadPath}/${item.name}`,
+            })),
+          ],
+        },
+        elevatorId: elevator.id,
+      });
     }
 
     setOpenDialog(false);
@@ -69,26 +71,43 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
       header={<Typography variant="subtitle1">Documents</Typography>}>
-      <Grid container spacing={2} sx={{}}>
+      <Grid container spacing={2} sx={{mt: '0.5em'}}>
         {elevator.additionalInfo.documents.map((item) => (
-          <Grid
-            item
-            sm={4}
-            sx={{
-              border: `1px solid ${theme.palette.text.disabled}`,
-              padding: '0.5em',
-              height: '100%',
-            }}>
-            <img
-              alt=""
-              width="100%"
-              height={120}
-              src={downloadUrls[item.uri]}
-              style={{
-                objectFit: 'cover',
-              }}
-            />
-            <Typography component="div">{item.description}</Typography>
+          <Grid item sm={4}>
+            <Box
+              sx={{
+                border: `1px solid ${theme.palette.text.disabled}`,
+                padding: '0.5em',
+                height: 120,
+                [theme.breakpoints.down('md')]: {
+                  height: 170,
+                },
+                display: 'flex',
+                flexDirection: 'column',
+              }}>
+              <Box sx={{flexGrow: 1, height: 0}}>
+                <FileCopyIcon
+                  sx={{fontSize: '4rem', color: theme.palette.text.secondary}}
+                />
+              </Box>
+
+              {item.description ? (
+                <Typography
+                  component="div"
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    maxWidth: '100%',
+                    WebkitLineClamp: '1',
+                    WebkitBoxOrient: 'vertical',
+                    height: '20%',
+                  }}>
+                  {item.description}
+                </Typography>
+              ) : null}
+            </Box>
           </Grid>
         ))}
       </Grid>

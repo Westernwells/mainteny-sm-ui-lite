@@ -63,6 +63,8 @@ export const MyDropZone = ({
     setFiles(newFiles);
   };
 
+  console.log(files, '#####');
+
   useEffect(
     () =>
       // revoke the data uris to avoid memory leaks
@@ -80,7 +82,9 @@ export const MyDropZone = ({
       {file.type.split('/')[0] === 'image' ? (
         <img alt="" width={80} height={80} src={file.preview} />
       ) : (
-        <FileCopyIcon sx={{fontSize: '4rem'}} />
+        <FileCopyIcon
+          sx={{fontSize: '4rem', color: theme.palette.text.secondary}}
+        />
       )}
 
       <Box
