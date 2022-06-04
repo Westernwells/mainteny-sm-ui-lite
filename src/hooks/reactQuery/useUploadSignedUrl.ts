@@ -30,13 +30,14 @@ export const getUploadSignedUrl = async (
 const uploadAndSave = async (
   file: FileWithPreview,
   serviceCompanyId: string,
+  uploadPath: string,
 ) => {
   const [signedUrl, arrayBuffer] = await Promise.all([
-    getUploadSignedUrl([file.name], serviceCompanyId),
+    getUploadSignedUrl([`${uploadPath}/${file.name}`], serviceCompanyId),
     getArrayBuffer(file) as unknown as ArrayBuffer,
   ]);
 
-  await fetch(signedUrl[file.name], {
+  await fetch(signedUrl[`${uploadPath}/${file.name}`], {
     method: 'PUT',
     headers: {
       'Content-Type': file.type,
@@ -48,15 +49,19 @@ const uploadAndSave = async (
 export const uploadImages = async (
   files: FileWithPreview[],
   serviceCompanyId: string,
-) => Promise.all(files.map((item) => uploadAndSave(item, serviceCompanyId!)));
+  uploadPath: string,
+) =>
+  Promise.all(
+    files.map((item) => uploadAndSave(item, serviceCompanyId!, uploadPath)),
+  );
 
 export const useUploadImages = (successMsg: string) => {
   const {enqueueSnackbar} = useSnackbar();
   const {user} = useUserSession();
   const queryClient = useQueryClient();
   return useMutation(
-    (files: FileWithPreview[]) =>
-      uploadImages(files, user?.userAccount.serviceCompany.id!),
+    ({files, uploadPath}: {files: FileWithPreview[]; uploadPath: string}) =>
+      uploadImages(files, user?.userAccount.serviceCompany.id!, uploadPath),
     {
       onSuccess: () => {
         if (successMsg) {

@@ -10,6 +10,7 @@ import {Elevator, ElevatorRequestBody} from 'models/elevator';
 import {useState} from 'react';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {FileResourceRecord} from 'models/media';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 interface Props {
   elevator: Elevator;
@@ -24,6 +25,7 @@ export const Pictures = ({
 }: Props) => {
   const [openDialog, setOpenDialog] = useState(false);
   const theme = useTheme();
+  const {user} = useUserSession();
   const [acceptedFiles, setAcceptedFiles] = useState<FileWithPreview[]>([]);
   const {mutateAsync: uploadImages, isLoading} = useUploadImages(
     'Image uploaded successfully',
@@ -34,10 +36,11 @@ export const Pictures = ({
   const {data: downloadUrls = {}} = useDownloadUrl(
     elevator.additionalInfo.pictures.map((item) => item.uri),
   );
-  console.log(downloadUrls, '::');
 
   const onSave = async () => {
-    await uploadImages(acceptedFiles);
+    const serviceCompanyId = user?.userAccount.serviceCompany.id;
+    const uploadPath = `${serviceCompanyId}/elevators/${elevator.id}/images`;
+    await uploadImages({files: acceptedFiles, uploadPath});
     if (elevatorRequestBody) {
       await updateElevator({
         body: {
@@ -47,7 +50,7 @@ export const Pictures = ({
             ...acceptedFiles.map((item) => ({
               description: '',
               type: item.type,
-              uri: item.name,
+              uri: `${uploadPath}/${item.name}`,
             })),
           ],
         },

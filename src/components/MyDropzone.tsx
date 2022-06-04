@@ -83,7 +83,7 @@ export const MyDropZone = ({
   );
 
   const thumbs = files.map((file: FileWithPreview, index) => (
-    <Box sx={{mr: '1em', display: 'flex', mt: '0.3em'}}>
+    <Box key={index} sx={{mr: '1em', display: 'flex', mt: '0.3em'}}>
       <img alt="" width={80} height={80} src={file.preview} />
       <Box
         sx={{
