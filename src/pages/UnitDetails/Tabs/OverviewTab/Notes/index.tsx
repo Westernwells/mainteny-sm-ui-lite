@@ -1,24 +1,25 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import {PageCard} from 'components/PageCard';
+import {InfoCard} from 'components/InfoCard';
 import useTheme from '@mui/material/styles/useTheme';
 
 export const Notes = () => {
   const theme = useTheme();
-  console.log();
   return (
-    <PageCard
-      headerContainerOverrideStyles={{
-        py: '0.2em',
-        background: theme.palette.inputBackground.main,
+    <InfoCard
+      containerStyles={{
+        [theme.breakpoints.up('md')]: {
+          height: '100%',
+        },
       }}
-      customHeader={
+      showHeaderBackground
+      header={
         <Typography component="div" variant="subtitle1">
           Notes
         </Typography>
       }
       headerActionIcon={<Typography color="info.main">+Add</Typography>}>
       <Box>kdk</Box>
-    </PageCard>
+    </InfoCard>
   );
 };
