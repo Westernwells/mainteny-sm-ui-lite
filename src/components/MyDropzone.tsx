@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {useEffect, useRef, useState} from 'react';
@@ -27,8 +28,8 @@ export const MyDropZone = ({
   const [filesWithError, setFilesWithError] = useState<FileRejection[]>([]);
   const onKbinBytes = useRef(1000).current;
   const oneMbInByes = useRef(onKbinBytes * onKbinBytes).current;
-  const {getRootProps, getInputProps, open} = useDropzone({
-    // maxSize: oneMbInByes * 5 ,
+  const {getRootProps, getInputProps, open, fileRejections} = useDropzone({
+    maxSize: oneMbInByes * 5,
     accept: {
       [acceptedFileTypes]: [],
     },
@@ -41,9 +42,6 @@ export const MyDropZone = ({
           }),
         ),
       ]);
-    },
-    onDropRejected: (rejectedFiles) => {
-      setFilesWithError(rejectedFiles);
     },
   });
 
@@ -73,7 +71,9 @@ export const MyDropZone = ({
     [],
   );
 
-  console.log(files, '#####');
+  useEffect(() => {}, []);
+
+  // console.log(files, '#####');
 
   const thumbs = files.map((file: FileWithPreview, index) => (
     <Box key={index} sx={{mr: '1em', display: 'flex', mt: '0.3em'}}>
@@ -106,6 +106,25 @@ export const MyDropZone = ({
     </Box>
   ));
 
+  const renderErrors = () => {
+    return fileRejections.map((item, index) => (
+      <Box mb="0.5em">
+        <Typography component="div" variant="body1" color="error">
+          {`${index + 1}. ${item.file.name}`}:{' '}
+        </Typography>
+        <Box sx={{ml: '1em'}}>
+          {item.errors.map((error) => (
+            <Typography component="div" variant="body2" color="error">
+              {error.code === 'file-too-large'
+                ? 'File is larger than 5mb'
+                : error.message}
+            </Typography>
+          ))}
+        </Box>
+      </Box>
+    ));
+  };
+
   return (
     <Box>
       <Box
@@ -134,7 +153,7 @@ export const MyDropZone = ({
 
       <Box sx={{mt: '1.5em'}}>
         <Box sx={{display: 'flex', flexWrap: 'wrap'}}>{thumbs}</Box>
-        {/* <Box></Box> */}
+        <Box>{renderErrors()}</Box>
       </Box>
     </Box>
   );
