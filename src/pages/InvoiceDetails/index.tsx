@@ -48,12 +48,7 @@ export const InvoiceDetails = () => {
             disabled: !downloadUrl,
             variant: 'outlined',
             onClick: () =>
-              downloadUrl
-                ? window.open(
-                    downloadUrl[invoice!.additionalInfo.pdfPath][0],
-                    '_blank',
-                  )
-                : null,
+              downloadUrl ? window.open(downloadUrl[0], '_blank') : null,
 
             startIcon: (
               <FileDownloadIcon
