@@ -248,8 +248,12 @@ export const ServiceHistoryTab = () => {
                 handleExpandClick={handleExpandClick}
                 expanded={expanded}
                 collapsedChildren={
-                  downloadUrl?.length ? (
-                    <HistoryAttachments downloadUrl={downloadUrl} />
+                  downloadUrl && Object.keys(downloadUrl).length ? (
+                    <HistoryAttachments
+                      downloadUrl={Object.keys(downloadUrl).map(
+                        (key) => downloadUrl[key],
+                      )}
+                    />
                   ) : (
                     <EmptyIllustration
                       label="No image attachments are added to the work report!"

@@ -161,9 +161,11 @@ export const useUpdateElevator = (successMsg: string) => {
     }) => updateElevator(body, elevatorId),
     {
       onSuccess: () => {
-        enqueueSnackbar(successMsg, {
-          variant: 'success',
-        });
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
         queryClient.invalidateQueries(queryKeys.elevatorById);
       },
       onError: (err: any) => {

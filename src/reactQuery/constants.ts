@@ -40,4 +40,5 @@ export const queryKeys = {
   querySeviceOrders: 'querySeviceOrders',
   queryElevatorContracts: 'queryElevatorContracts',
   queryCacheTypes: 'queryCacheTypes',
+  downloadUrl: 'downloadUrl',
 };
