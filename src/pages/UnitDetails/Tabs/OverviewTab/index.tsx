@@ -211,7 +211,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
         }}>
         <Grid
           item
-          sm={12}
+          xs={12}
           md={4}
           sx={{
             [theme.breakpoints.up('md')]: {
@@ -223,7 +223,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
 
         <Grid
           item
-          sm={12}
+          xs={12}
           md={4}
           sx={{
             [theme.breakpoints.up('md')]: {
@@ -238,7 +238,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
 
         <Grid
           item
-          sm={12}
+          xs={12}
           md={4}
           sx={{
             [theme.breakpoints.up('md')]: {

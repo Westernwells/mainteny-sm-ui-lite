@@ -88,7 +88,13 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
                 sx={{flexGrow: 1, height: 0, cursor: 'pointer'}}
                 onClick={() => window.open(downloadUrls[item.uri], '_blank')}>
                 <FileCopyIcon
-                  sx={{fontSize: '4rem', color: theme.palette.text.secondary}}
+                  sx={{
+                    fontSize: '4rem',
+                    [theme.breakpoints.down('md')]: {
+                      fontSize: '9rem',
+                    },
+                    color: theme.palette.text.secondary,
+                  }}
                 />
               </Box>
 
