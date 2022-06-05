@@ -19,6 +19,7 @@ export const NotesForm = ({formik}: Props) => (
         value: formik.values.note,
         onChange: formik.handleChange,
         multiline: true,
+        minRows: 3,
       }}
     />
   </Box>
