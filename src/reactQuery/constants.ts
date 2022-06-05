@@ -41,5 +41,5 @@ export const queryKeys = {
   queryElevatorContracts: 'queryElevatorContracts',
   queryCacheTypes: 'queryCacheTypes',
   downloadUrl: 'downloadUrl',
-  fetchElevatorComment: 'fetchElevatorComment',
+  queryElevatorComment: 'queryElevatorComment',
 };

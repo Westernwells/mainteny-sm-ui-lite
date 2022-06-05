@@ -285,3 +285,8 @@ export interface ElevatorComment {
   subject: string;
   type: ElevatorCommentType;
 }
+
+export interface ElevatorCommentRecord {
+  content: string;
+  subject: string;
+}

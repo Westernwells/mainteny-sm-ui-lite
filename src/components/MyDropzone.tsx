@@ -1,4 +1,3 @@
-/* eslint-disable */
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {useEffect, useRef, useState} from 'react';
@@ -25,7 +24,6 @@ export const MyDropZone = ({
 }: Props) => {
   const theme = useTheme();
   const [files, setFiles] = useState<FileWithPreview[]>([]);
-  const [filesWithError, setFilesWithError] = useState<FileRejection[]>([]);
   const onKbinBytes = useRef(1000).current;
   const oneMbInByes = useRef(onKbinBytes * onKbinBytes).current;
   const {getRootProps, getInputProps, open, fileRejections} = useDropzone({
@@ -51,9 +49,9 @@ export const MyDropZone = ({
     }
 
     if (getRejectedFileWithErrors) {
-      getRejectedFileWithErrors(filesWithError);
+      getRejectedFileWithErrors(fileRejections);
     }
-  }, [files, filesWithError]);
+  }, [files, fileRejections]);
 
   const removeFile = (fileKey: string) => {
     const newFiles = files.filter(
@@ -108,8 +106,8 @@ export const MyDropZone = ({
     </Box>
   ));
 
-  const renderErrors = () => {
-    return fileRejections.map((item, index) => (
+  const renderErrors = () =>
+    fileRejections.map((item, index) => (
       <Box mb="0.5em">
         <Typography component="div" variant="body1" color="error">
           {`${index + 1}. ${item.file.name}`}:{' '}
@@ -125,7 +123,6 @@ export const MyDropZone = ({
         </Box>
       </Box>
     ));
-  };
 
   return (
     <Box>

@@ -1,29 +1,77 @@
-import {useRef} from 'react';
+import {useRef, useState} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {InfoCard} from 'components/InfoCard';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {useFetchElevatorComments} from 'hooks/reactQuery/useElevator';
+import {
+  useQueryElevatorComments,
+  useUpdateElevatorComment,
+} from 'hooks/reactQuery/useElevator';
 import {EmptySection} from 'components/EmptySection';
 import {createEmptyResource} from 'utils/paging-utils';
 import {ElevatorComment} from 'models/elevator';
 import {formatDate} from 'utils/datetime';
+import {Dialog} from 'components/Dialog';
+import {useFormik} from 'formik';
+import * as Yup from 'yup';
+import {NotesForm} from './NotesForm';
+import {NotesFormModel} from '../models';
 
 interface Props {
   elevatorId?: string;
 }
 
+const validationSchema = Yup.object().shape({
+  address: Yup.object().nullable().required('Address is required'),
+});
+
 export const Notes = ({elevatorId}: Props) => {
   const theme = useTheme();
+  const formik = useFormik<NotesFormModel>({
+    initialValues: {
+      note: '',
+    },
+    onSubmit: () => {},
+    validationSchema,
+  });
+  const [openDialog, setOpenDialog] = useState(false);
   const totalNotesRef = useRef(0);
+  const [dialogTitle, setDialogTitle] = useState('');
+  const [currentEditNoteId, setCurrentEditNoteId] = useState('');
   const {
     data: elevatorNotesResource = createEmptyResource<ElevatorComment>(10),
     isFetched,
-  } = useFetchElevatorComments({pageIndex: 0, pageSize: 50}, elevatorId || '');
+  } = useQueryElevatorComments({pageIndex: 0, pageSize: 50}, elevatorId || '');
+
+  const {mutateAsync: updateNote, isLoading} = useUpdateElevatorComment(
+    'Notes updated successfully',
+  );
 
   totalNotesRef.current = totalNotesRef.current || elevatorNotesResource.total;
+
+  const onEditButtonClicked = (noteId: string) => {
+    setDialogTitle('Edit Note');
+    setCurrentEditNoteId(noteId);
+    const result = elevatorNotesResource.data.filter(
+      (item) => item.id === noteId,
+    );
+    if (result.length) {
+      formik.setFieldValue('note', result[0].content);
+    }
+    setOpenDialog(true);
+  };
+
+  const onSave = async () => {
+    await updateNote({
+      body: {subject: '', content: formik.values.note},
+      elevatorId: elevatorId!,
+      noteId: currentEditNoteId,
+    });
+    setOpenDialog(false);
+  };
+
   const renderNote = (elevatorNote: ElevatorComment) => (
     <Box
       sx={{
@@ -38,7 +86,10 @@ export const Notes = ({elevatorId}: Props) => {
           {formatDate(elevatorNote.meta.createdAt, 'HH:mm')}){' '}
         </Typography>
         <Box sx={{display: 'flex'}}>
-          <EditIcon sx={{color: theme.palette.action.active}} />
+          <EditIcon
+            sx={{color: theme.palette.action.active, cursor: 'pointer'}}
+            onClick={() => onEditButtonClicked(elevatorNote.id)}
+          />
           <DeleteIcon sx={{color: theme.palette.action.active}} />
         </Box>
       </Box>
@@ -90,6 +141,17 @@ export const Notes = ({elevatorId}: Props) => {
           {elevatorNotesResource.data.map((elevator) => renderNote(elevator))}
         </Box>
       )}
+      <Dialog
+        title={dialogTitle}
+        isSaving={isLoading}
+        onCancel={() => setOpenDialog(false)}
+        onSave={onSave}
+        dialogProps={{
+          maxWidth: 'sm',
+          open: openDialog || false,
+        }}>
+        <NotesForm formik={formik} />
+      </Dialog>
     </InfoCard>
   );
 };
