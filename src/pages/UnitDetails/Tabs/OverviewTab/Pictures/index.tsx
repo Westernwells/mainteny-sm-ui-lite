@@ -62,9 +62,11 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
       containerStyles={{
         [theme.breakpoints.up('md')]: {
           height: '100%',
-          overflowY: 'scroll',
+          display: 'flex',
+          flexDirection: 'column',
         },
       }}
+      bodyContainerStyle={{overflowY: 'scroll'}}
       headerActionIcon={<Typography color="info.main">+ Add</Typography>}
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
