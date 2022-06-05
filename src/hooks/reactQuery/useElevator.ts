@@ -13,6 +13,7 @@ import {
   CustomerElevatorParams,
   Elevator,
   ElevatorComment,
+  ElevatorCommentRecord,
   ElevatorRequestBody,
   ElevatorView,
 } from '../../models/elevator';
@@ -200,7 +201,7 @@ export const useCacheValues = (params: CacheTypesParams, type: CacheTypes) =>
     },
   );
 
-export const fetchElevatorComment = async (
+export const queryElevatorComment = async (
   params: Page,
   elevatorId: string,
 ) => {
@@ -214,11 +215,56 @@ export const fetchElevatorComment = async (
   return response.data;
 };
 
-export const useFetchElevatorComments = (params: Page, elevatorId: string) =>
+export const useQueryElevatorComments = (params: Page, elevatorId: string) =>
   useQuery(
-    [queryKeys.fetchElevatorComment, params, elevatorId],
-    () => fetchElevatorComment(params, elevatorId),
+    [queryKeys.queryElevatorComment, params, elevatorId],
+    () => queryElevatorComment(params, elevatorId),
     {
       enabled: !!elevatorId,
     },
   );
+
+const updateElevatorComments = async (
+  body: Partial<ElevatorCommentRecord>,
+  elevatorId: string,
+  noteId: string,
+) => {
+  await axiosClient.put<StringValue>(
+    `/api/elevators/${elevatorId}/notes/${noteId}`,
+    {
+      ...body,
+    },
+  );
+};
+
+export const useUpdateElevatorComment = (successMsg?: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({
+      body,
+      elevatorId,
+      noteId,
+    }: {
+      body: Partial<ElevatorCommentRecord>;
+      elevatorId: string;
+      noteId: string;
+    }) => updateElevatorComments(body, elevatorId, noteId),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.queryElevatorComment);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};

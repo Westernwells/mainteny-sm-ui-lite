@@ -38,3 +38,7 @@ export interface AppointmentFormModel {
   requiresAppointmentNotification: string;
   appointmentNotificationDueInDays: string;
 }
+
+export interface NotesFormModel {
+  note: string;
+}
