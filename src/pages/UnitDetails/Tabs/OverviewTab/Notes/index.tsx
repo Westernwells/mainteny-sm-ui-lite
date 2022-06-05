@@ -6,6 +6,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
+  useAddElevatorComment,
   useQueryElevatorComments,
   useUpdateElevatorComment,
 } from 'hooks/reactQuery/useElevator';
@@ -21,6 +22,11 @@ import {NotesFormModel} from '../models';
 
 interface Props {
   elevatorId?: string;
+}
+
+enum DialogTitle {
+  ADD_NOTE = 'Add Note',
+  EDIT_NOTE = 'Edit Note',
 }
 
 const validationSchema = Yup.object().shape({
@@ -45,14 +51,16 @@ export const Notes = ({elevatorId}: Props) => {
     isFetched,
   } = useQueryElevatorComments({pageIndex: 0, pageSize: 50}, elevatorId || '');
 
-  const {mutateAsync: updateNote, isLoading} = useUpdateElevatorComment(
-    'Notes updated successfully',
-  );
+  const {mutateAsync: updateNote, isLoading: editElevatorLoading} =
+    useUpdateElevatorComment('Notes updated successfully');
+
+  const {mutateAsync: addNote, isLoading: addElevatorLoading} =
+    useAddElevatorComment('Notes updated successfully');
 
   totalNotesRef.current = totalNotesRef.current || elevatorNotesResource.total;
 
   const onEditButtonClicked = (noteId: string) => {
-    setDialogTitle('Edit Note');
+    setDialogTitle(DialogTitle.EDIT_NOTE);
     setCurrentEditNoteId(noteId);
     const result = elevatorNotesResource.data.filter(
       (item) => item.id === noteId,
@@ -64,11 +72,18 @@ export const Notes = ({elevatorId}: Props) => {
   };
 
   const onSave = async () => {
-    await updateNote({
-      body: {subject: '', content: formik.values.note},
-      elevatorId: elevatorId!,
-      noteId: currentEditNoteId,
-    });
+    if (dialogTitle === DialogTitle.EDIT_NOTE) {
+      await updateNote({
+        body: {subject: '', content: formik.values.note},
+        elevatorId: elevatorId!,
+        noteId: currentEditNoteId,
+      });
+    } else {
+      await addNote({
+        body: {subject: '', content: formik.values.note},
+        elevatorId: elevatorId!,
+      });
+    }
     setOpenDialog(false);
   };
 
@@ -115,6 +130,10 @@ export const Notes = ({elevatorId}: Props) => {
           Notes
         </Typography>
       }
+      handleAction={() => {
+        formik.setFieldValue('note', '');
+        setOpenDialog(true);
+      }}
       headerActionIcon={<Typography color="info.main">+ Add</Typography>}
       bodyContainerStyle={{flexGrow: 1, overflowY: 'scroll'}}>
       {isFetched && !totalNotesRef.current ? (
@@ -143,7 +162,7 @@ export const Notes = ({elevatorId}: Props) => {
       )}
       <Dialog
         title={dialogTitle}
-        isSaving={isLoading}
+        isSaving={editElevatorLoading || addElevatorLoading}
         onCancel={() => setOpenDialog(false)}
         onSave={onSave}
         dialogProps={{

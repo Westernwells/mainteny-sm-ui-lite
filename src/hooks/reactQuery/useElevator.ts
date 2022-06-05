@@ -224,7 +224,7 @@ export const useQueryElevatorComments = (params: Page, elevatorId: string) =>
     },
   );
 
-const updateElevatorComments = async (
+const updateElevatorComment = async (
   body: Partial<ElevatorCommentRecord>,
   elevatorId: string,
   noteId: string,
@@ -249,7 +249,46 @@ export const useUpdateElevatorComment = (successMsg?: string) => {
       body: Partial<ElevatorCommentRecord>;
       elevatorId: string;
       noteId: string;
-    }) => updateElevatorComments(body, elevatorId, noteId),
+    }) => updateElevatorComment(body, elevatorId, noteId),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.queryElevatorComment);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+const addElevatorComment = async (
+  body: Partial<ElevatorCommentRecord>,
+  elevatorId: string,
+) => {
+  await axiosClient.post<StringValue>(`/api/elevators/${elevatorId}/notes`, {
+    ...body,
+  });
+};
+
+export const useAddElevatorComment = (successMsg?: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({
+      body,
+      elevatorId,
+    }: {
+      body: Partial<ElevatorCommentRecord>;
+      elevatorId: string;
+    }) => addElevatorComment(body, elevatorId),
     {
       onSuccess: () => {
         if (successMsg) {
