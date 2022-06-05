@@ -13,6 +13,11 @@ import {FileResource, FileResourceRecord} from './media';
 import {ServiceCompanyTimeUnit} from './service-company';
 import {ServiceOrderView} from './service-order';
 
+export enum ElevatorCommentType {
+  TODO = 'TODO',
+  NOTE = 'NOTE',
+}
+
 export enum ElevatorStatus {
   RUNNING = 'RUNNING',
   BROKEN = 'BROKEN',
@@ -270,4 +275,13 @@ export interface ElevatorRequestBody {
   status: ElevatorStatus;
   technicianNumber: number;
   type: string;
+}
+
+export interface ElevatorComment {
+  content: string;
+  elevatorId: string;
+  id: string;
+  meta: Meta;
+  subject: string;
+  type: ElevatorCommentType;
 }

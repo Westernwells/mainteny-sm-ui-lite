@@ -12,6 +12,7 @@ import {useSnackbar} from 'notistack';
 import {
   CustomerElevatorParams,
   Elevator,
+  ElevatorComment,
   ElevatorRequestBody,
   ElevatorView,
 } from '../../models/elevator';
@@ -190,16 +191,34 @@ export const fetchCacheValues = async (
   return response.data;
 };
 
-export const useCacheValues = (params: CacheTypesParams, type: CacheTypes) => {
-  const navigate = useNavigate();
-  return useQuery(
+export const useCacheValues = (params: CacheTypesParams, type: CacheTypes) =>
+  useQuery(
     [queryKeys.queryCacheTypes, type, params],
     () => fetchCacheValues(params, type),
     {
       enabled: !!type,
-      onError: (e: any) => {
-        if (e.response.status === 500) navigate('/404');
-      },
     },
   );
+
+export const fetchElevatorComment = async (
+  params: Page,
+  elevatorId: string,
+) => {
+  const response = await axiosClient.get<Resource<ElevatorComment>>(
+    `/api/elevators/${elevatorId}/notes`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
 };
+
+export const useFetchElevatorComments = (params: Page, elevatorId: string) =>
+  useQuery(
+    [queryKeys.fetchElevatorComment, params, elevatorId],
+    () => fetchElevatorComment(params, elevatorId),
+    {
+      enabled: !!elevatorId,
+    },
+  );

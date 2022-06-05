@@ -218,7 +218,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
               height: '100%',
             },
           }}>
-          <Notes />
+          <Notes elevatorId={elevator?.id} />
         </Grid>
 
         <Grid
