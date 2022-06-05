@@ -49,8 +49,6 @@ export const Notes = ({elevatorId}: Props) => {
     'Notes updated successfully',
   );
 
-  // const [currentEditModeContent, setCurrentEditModecontent]
-
   totalNotesRef.current = totalNotesRef.current || elevatorNotesResource.total;
 
   const onEditButtonClicked = (noteId: string) => {
