@@ -39,6 +39,7 @@ declare module '@mui/material/styles' {
     inputBackground: SimplePaletteColorOptions;
     amber: SimplePaletteColorOptions;
     eden: SimplePaletteColorOptions;
+    suvaGrey: SimplePaletteColorOptions;
   }
   interface Palette extends CustomPalette {}
   interface PaletteOptions extends CustomPalette {}
