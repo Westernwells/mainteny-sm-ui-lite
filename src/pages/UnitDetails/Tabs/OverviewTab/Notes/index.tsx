@@ -7,6 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
   useAddElevatorComment,
+  useDeleteElevatorComment,
   useQueryElevatorComments,
   useUpdateElevatorComment,
 } from 'hooks/reactQuery/useElevator';
@@ -17,6 +18,7 @@ import {formatDate} from 'utils/datetime';
 import {Dialog} from 'components/Dialog';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
+import {Confirm} from 'components/Confirm';
 import {NotesForm} from './NotesForm';
 import {NotesFormModel} from '../models';
 
@@ -45,7 +47,8 @@ export const Notes = ({elevatorId}: Props) => {
   const [openDialog, setOpenDialog] = useState(false);
   const totalNotesRef = useRef(0);
   const [dialogTitle, setDialogTitle] = useState('');
-  const [currentEditNoteId, setCurrentEditNoteId] = useState('');
+  const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
+  const [activeNoteId, setActiveNoteId] = useState('');
   const {
     data: elevatorNotesResource = createEmptyResource<ElevatorComment>(10),
     isFetched,
@@ -57,11 +60,15 @@ export const Notes = ({elevatorId}: Props) => {
   const {mutateAsync: addNote, isLoading: addElevatorLoading} =
     useAddElevatorComment('Notes updated successfully');
 
+  const {mutateAsync: deleteNote} = useDeleteElevatorComment(
+    'Notes deleted successfully',
+  );
+
   totalNotesRef.current = totalNotesRef.current || elevatorNotesResource.total;
 
   const onEditButtonClicked = (noteId: string) => {
     setDialogTitle(DialogTitle.EDIT_NOTE);
-    setCurrentEditNoteId(noteId);
+    setActiveNoteId(noteId);
     const result = elevatorNotesResource.data.filter(
       (item) => item.id === noteId,
     );
@@ -76,7 +83,7 @@ export const Notes = ({elevatorId}: Props) => {
       await updateNote({
         body: {subject: '', content: formik.values.note},
         elevatorId: elevatorId!,
-        noteId: currentEditNoteId,
+        noteId: activeNoteId,
       });
     } else {
       await addNote({
@@ -85,6 +92,11 @@ export const Notes = ({elevatorId}: Props) => {
       });
     }
     setOpenDialog(false);
+  };
+
+  const onDelete = async (noteId: string) => {
+    await deleteNote({elevatorId: elevatorId!, noteId});
+    setOpenCancelConfirm(false);
   };
 
   const renderNote = (elevatorNote: ElevatorComment) => (
@@ -105,7 +117,13 @@ export const Notes = ({elevatorId}: Props) => {
             sx={{color: theme.palette.action.active, cursor: 'pointer'}}
             onClick={() => onEditButtonClicked(elevatorNote.id)}
           />
-          <DeleteIcon sx={{color: theme.palette.action.active}} />
+          <DeleteIcon
+            onClick={() => {
+              setOpenCancelConfirm(true);
+              setActiveNoteId(elevatorNote.id);
+            }}
+            sx={{color: theme.palette.action.active, cursor: 'pointer'}}
+          />
         </Box>
       </Box>
       <Typography variant="subtitle2">
@@ -171,6 +189,14 @@ export const Notes = ({elevatorId}: Props) => {
         }}>
         <NotesForm formik={formik} />
       </Dialog>
+
+      <Confirm
+        open={openCancelConfirm}
+        onConfirm={() => onDelete(activeNoteId)}
+        onClose={() => setOpenCancelConfirm(false)}
+        title="Confirm"
+        content="Do you want to delete this note?"
+      />
     </InfoCard>
   );
 };
