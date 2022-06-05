@@ -307,3 +307,34 @@ export const useAddElevatorComment = (successMsg?: string) => {
     },
   );
 };
+
+const deleteElevatorComment = async (elevatorId: string, noteId: string) => {
+  await axiosClient.delete<StringValue>(
+    `/api/elevators/${elevatorId}/notes/${noteId}`,
+  );
+};
+
+export const useDeleteElevatorComment = (successMsg?: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({elevatorId, noteId}: {elevatorId: string; noteId: string}) =>
+      deleteElevatorComment(elevatorId, noteId),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.queryElevatorComment);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
