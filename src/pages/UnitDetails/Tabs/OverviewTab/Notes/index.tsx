@@ -65,7 +65,7 @@ export const Notes = ({elevatorId}: Props) => {
         </Typography>
       }
       headerActionIcon={<Typography color="info.main">+ Add</Typography>}
-      bodyContainerStyle={{flexGrow: 1}}>
+      bodyContainerStyle={{flexGrow: 1, overflowY: 'scroll'}}>
       {isFetched && !totalNotesRef.current ? (
         <Box
           sx={{
