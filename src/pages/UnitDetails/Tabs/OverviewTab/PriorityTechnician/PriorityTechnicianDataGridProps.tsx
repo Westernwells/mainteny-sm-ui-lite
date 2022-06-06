@@ -36,7 +36,8 @@ const defaultAlignment: {
 };
 
 export const columns = (
-  getClickedTechnician: (item: MaintainerView) => void,
+  getEditableTechnician: (item: MaintainerView) => void,
+  getDeletableTechnician: (item: MaintainerView) => void,
 ): GridColDef[] => [
   {
     field: 'name',
@@ -69,10 +70,10 @@ export const columns = (
     ...defaultProps,
     renderCell: (params) => (
       <Box sx={{display: 'flex'}}>
-        <Box onClick={() => getClickedTechnician(params.value)}>
+        <Box onClick={() => getEditableTechnician(params.value)}>
           <EditIcon sx={{color: 'text.secondary'}} />
         </Box>
-        <Box onClick={() => getClickedTechnician(params.value)}>
+        <Box onClick={() => getDeletableTechnician(params.value)}>
           <DeleteIcon sx={{color: 'text.secondary'}} />
         </Box>
       </Box>

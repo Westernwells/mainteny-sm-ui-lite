@@ -86,13 +86,35 @@ export const PriorityTechnician = ({containerStyles, elevatorId}: Props) => {
     setOpenDialog(false);
   };
 
-  const onDelete = async (technicianId: string) => {
-    // await deleteNote({elevatorId: elevatorId!, noteId});
+  const onDelete = async () => {
+    let body = {};
+    maintainers
+      .filter(
+        (maintainer) =>
+          maintainer.technician.id !== activeTechnician?.technician.id,
+      )
+      .forEach((item) => {
+        body = {
+          ...body,
+          [item.technician.id]: item.weight,
+        };
+      });
+
+    await updateTechnician({
+      body,
+      elevatorId: elevatorId!,
+    });
+
     setOpenCancelConfirm(false);
   };
 
-  const getClickedTechnician = (item: MaintainerView) => {
+  const getEditableTechnician = (item: MaintainerView) => {
     onEditButtonClicked(item);
+  };
+
+  const getDeletableTechnician = (item: MaintainerView) => {
+    setActiveTechnician(item);
+    setOpenCancelConfirm(true);
   };
 
   return (
@@ -112,7 +134,10 @@ export const PriorityTechnician = ({containerStyles, elevatorId}: Props) => {
         height={200}
         hideFooter
         rows={rows}
-        columns={useCallback(() => columns(getClickedTechnician), [])()}
+        columns={useCallback(
+          () => columns(getEditableTechnician, getDeletableTechnician),
+          [],
+        )()}
         containerStyle={{
           borderBottom: 'none',
         }}
@@ -146,7 +171,7 @@ export const PriorityTechnician = ({containerStyles, elevatorId}: Props) => {
 
       <Confirm
         open={openCancelConfirm}
-        onConfirm={() => onDelete(activeTechnician?.technician.id!)}
+        onConfirm={() => onDelete()}
         onClose={() => setOpenCancelConfirm(false)}
         title="Confirm"
         content="Do you want to delete this note?"
