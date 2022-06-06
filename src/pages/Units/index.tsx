@@ -26,11 +26,11 @@ import {useNavigate, useSearchParams} from 'react-router-dom';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Box from '@mui/material/Box';
 import {columns, makeRows} from './UnitsDataGridProps';
-import {UnitsMapsView} from './UnitsMapsView';
 import {DataGridElevatorView} from './Models';
 import {Tabs} from 'components/Tab';
 import {TabsBody} from 'components/TabsBody';
 import {UnitListingView} from './Tabs/UnitListingView';
+import {UnitMapsView} from './Tabs/UnitMapView';
 
 const tabItems = [
   {
@@ -71,7 +71,7 @@ export const MyUnits = () => {
         {<UnitListingView />}
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
-        {<UnitsMapsView />}
+        {<UnitMapsView />}
       </TabsBody>
     </Tabs>
   );

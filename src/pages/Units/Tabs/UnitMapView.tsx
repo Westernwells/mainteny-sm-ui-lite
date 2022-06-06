@@ -10,26 +10,22 @@ import Supercluster from 'supercluster';
 import {Typography} from '@mui/material';
 import {LocationPin} from 'components/LocationPin';
 import {Location, Resource} from 'models/misc';
+import {FilterFields} from 'components/FilterFields';
+import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
+import {Widget} from 'components/Widget';
+import {FlexContainer} from 'components/FlexContainer';
 // import {LocationPin} from '../../components/LocationPin';
 // import {Location, Resource} from '../../models/misc';
 
-interface Props {
-  search?: string;
-  status?: string[];
-  defaultCenterCoord?: Location;
-}
-
-export const UnitsMapsView = ({
-  search = '',
-  status = [],
-  defaultCenterCoord,
-}: Props) => {
+export const UnitMapsView = () => {
   const fallback = useRef({
     elevator: createEmptyResource<ElevatorView>(10),
-    centerCoord: defaultCenterCoord || {longitude: 0, latitude: 0},
+    centerCoord: {longitude: 0, latitude: 0},
   }).current;
   const mapRef = useRef<any>();
   const [zoom, setZoom] = useState(20);
+  const [status, setStatus] = useState<string[]>([]);
+  const [search, setSearch] = useState('');
   const [points, setPoints] = useState<any>([]);
   const [bounds, setBounds] = useState<any>([]);
   const [page, setPage] = useState(makePage(0, 100));
@@ -147,25 +143,36 @@ export const UnitsMapsView = ({
     mapRef.current.panTo({lat, lng});
   };
 
-  const mapEmptyState = () => (
-    <GoogleMapReact
-      bootstrapURLKeys={{key: process.env.REACT_APP_GOOGLE_MAPS_KEY!}}
-      defaultCenter={defaultProps.center}
-      defaultZoom={defaultProps.zoom}
-      zoom={10}
-    />
+  const renderFilterItems = () => (
+    <FilterFields>
+      <MultipleSelectCheckmarks
+        label="Status"
+        options={['RUNNING', 'STOPPED']}
+        getSelectedValue={(item) => setStatus(item)}
+      />
+
+      <MultipleSelectCheckmarks
+        label="Upcoming visits"
+        options={['This week', 'Next week', 'Next month']}
+        getSelectedValue={() => {}}
+        multiple={false}
+      />
+    </FilterFields>
   );
 
-  if (!isLoading && !elevatorResponse.total) {
-    return (
-      <Box height="100vh" width="99%">
-        {mapEmptyState()}
-      </Box>
-    );
-  }
+  const renderWidget = () => (
+    <Box sx={{display: 'flex', justifyContent: 'flex-end', mb: '0.5em'}}>
+      <Widget
+        searchPlaceholder="Search order type, customer, address etc."
+        getSearchValue={(val) => setSearch(val)}
+        filterItems={renderFilterItems()}
+      />
+    </Box>
+  );
 
   return (
-    <Box height="100vh" width="99%">
+    <FlexContainer>
+      {renderWidget()}
       <GoogleMapReact
         bootstrapURLKeys={{key: process.env.REACT_APP_GOOGLE_MAPS_KEY!}}
         yesIWantToUseGoogleMapApiInternals
@@ -242,6 +249,6 @@ export const UnitsMapsView = ({
           );
         })}
       </GoogleMapReact>
-    </Box>
+    </FlexContainer>
   );
 };

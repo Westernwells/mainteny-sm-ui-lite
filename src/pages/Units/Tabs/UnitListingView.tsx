@@ -150,14 +150,6 @@ export const UnitListingView = () => {
     );
   }
 
-  const openMapView = () => {
-    setShowMapview(true);
-  };
-
-  const closeMapView = () => {
-    setShowMapview(false);
-  };
-
   const renderFilterItems = () => (
     <FilterFields>
       <MultipleSelectCheckmarks
@@ -175,12 +167,23 @@ export const UnitListingView = () => {
     </FilterFields>
   );
 
+  const renderWidget = () => (
+    <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+      <Widget
+        searchPlaceholder="Search order type, customer, address etc."
+        getSearchValue={(search) => setSearch(search)}
+        filterItems={renderFilterItems()}
+      />
+    </Box>
+  );
+
   if (isLoading) {
     return <Progress />;
   }
 
   return (
     <FlexContainer>
+      {renderWidget()}
       <DataGridLayout
         hideFooter={pageCount <= 1}
         rows={rows}
