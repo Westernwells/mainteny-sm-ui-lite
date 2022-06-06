@@ -67,7 +67,7 @@ export const AddTechnicianDialog = ({
         <DialogActions sx={{mt: '1.5em'}}>
           <Button
             buttonProps={{
-              onClick: onSave,
+              onClick: onCancel,
               autoFocus: true,
               disabled: !queryView,
             }}>
@@ -77,7 +77,7 @@ export const AddTechnicianDialog = ({
           </Button>
           <Button
             buttonProps={{
-              onClick: onCancel,
+              onClick: onSave,
             }}>
             <Typography variant="subtitle2">Add</Typography>
           </Button>
