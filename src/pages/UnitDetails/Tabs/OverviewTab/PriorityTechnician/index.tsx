@@ -1,6 +1,4 @@
-/* eslint-disable */
 import Typography from '@mui/material/Typography';
-import {PageCard} from 'components/PageCard';
 import useTheme from '@mui/material/styles/useTheme';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {useCallback, useEffect, useState} from 'react';
@@ -15,10 +13,10 @@ import {
   useUpdateElevatorTechnician,
 } from 'hooks/reactQuery/useElevator';
 import {Dialog} from 'components/Dialog';
+import {InfoCard} from 'components/InfoCard';
 import {PriorityTechnicianFormModel} from '../models';
 import {columns, makeRows} from './PriorityTechnicianDataGridProps';
 import {PriorityTechnicianForm} from './PriorityTechnicianForm';
-import {InfoCard} from 'components/InfoCard';
 
 interface Props {
   containerStyles?: {[key: string]: any};
