@@ -99,6 +99,7 @@ export const TechnicianAutoComplete = ({
             name: 'technicianId',
             ...params,
             ...textFieldProps,
+            required: true,
           }}
         />
       )}

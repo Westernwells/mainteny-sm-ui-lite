@@ -18,6 +18,7 @@ import {Dialog} from 'components/Dialog';
 import {PriorityTechnicianFormModel} from '../models';
 import {columns, makeRows} from './PriorityTechnicianDataGridProps';
 import {PriorityTechnicianForm} from './PriorityTechnicianForm';
+import {InfoCard} from 'components/InfoCard';
 
 interface Props {
   containerStyles?: {[key: string]: any};
@@ -67,26 +68,21 @@ export const PriorityTechnician = ({containerStyles, elevatorId}: Props) => {
 
   const onSave = async () => {
     let body = {};
-    if (dialogTitle === DialogTitle.EDIT_TECHNICIAN) {
-      maintainers.forEach((item) => {
-        body = {
-          ...body,
-          [item.technician.id]: item.weight,
-        };
-      });
-      await updateTechnician({
-        body: {
-          ...body,
-          [formik.values.technicianId!]: formik.values.priority,
-        },
-        elevatorId: elevatorId!,
-      });
-    } else {
-      // await addNote({
-      //   body: {subject: '', content: formik.values.note},
-      //   elevatorId: elevatorId!,
-      // });
-    }
+
+    maintainers.forEach((item) => {
+      body = {
+        ...body,
+        [item.technician.id]: item.weight,
+      };
+    });
+    await updateTechnician({
+      body: {
+        ...body,
+        [formik.values.technicianId!]: formik.values.priority,
+      },
+      elevatorId: elevatorId!,
+    });
+
     setOpenDialog(false);
   };
 
@@ -100,15 +96,17 @@ export const PriorityTechnician = ({containerStyles, elevatorId}: Props) => {
   };
 
   return (
-    <PageCard
+    <InfoCard
       containerStyles={{...containerStyles}}
-      customHeader={
-        <Typography variant="subtitle1">Priority Technicians</Typography>
-      }
-      headerContainerOverrideStyles={{
-        py: '0.2em',
-        background: theme.palette.inputBackground.main,
-      }}>
+      showHeaderBackground
+      header={<Typography variant="subtitle1">Priority Technicians</Typography>}
+      handleAction={() => {
+        setActiveTechnician(undefined);
+        setDialogTitle(DialogTitle.ADD_TECHNICIAN);
+        formik.setValues({technicianId: '', priority: 0});
+        setOpenDialog(true);
+      }}
+      headerActionIcon={<Typography color="info.main">+ Add</Typography>}>
       <DataGridLayout
         fullHeight={false}
         height={200}
@@ -153,6 +151,6 @@ export const PriorityTechnician = ({containerStyles, elevatorId}: Props) => {
         title="Confirm"
         content="Do you want to delete this note?"
       />
-    </PageCard>
+    </InfoCard>
   );
 };

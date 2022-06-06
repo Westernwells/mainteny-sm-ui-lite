@@ -48,6 +48,7 @@ export const PriorityTechnicianForm = ({
         helperText: formik.errors.priority,
         error: !!formik.errors.priority,
         onBlur: formik.handleBlur,
+        required: true,
         sx: {
           mt: '0.5em',
         },
