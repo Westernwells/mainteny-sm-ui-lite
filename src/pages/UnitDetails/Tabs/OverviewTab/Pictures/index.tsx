@@ -72,8 +72,8 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
       showHeaderBackground
       header={<Typography variant="subtitle1">Pictures</Typography>}>
       <Grid container spacing={1} sx={{mt: '0.5em'}}>
-        {elevator.additionalInfo.pictures.map((item) => (
-          <Grid item xs={6} sm={4}>
+        {elevator.additionalInfo.pictures.map((item, index) => (
+          <Grid item xs={6} sm={4} key={index}>
             <Box
               sx={{
                 border: `1px solid ${theme.palette.text.disabled}`,

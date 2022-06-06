@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 import {TechnicianView} from 'models/technician';
 import {Button} from 'components/Button';
 import Box from '@mui/material/Box';
-import {TechnicianAutoComplete} from './TechnicianAutoComplete';
+import {TechnicianAutoComplete} from '../../components/TechnicianAutoComplete';
 
 interface Props {
   open?: boolean;
@@ -57,10 +57,14 @@ export const AddTechnicianDialog = ({
         <DialogContent>
           <DialogContentText id="alert-dialog-description" component="div">
             <TechnicianAutoComplete
-              fieldStyles={{minWidth: 500}}
               getTechnician={(value) => setTechnician(value)}
-              label="Assign To"
               getQuery={(val) => setQueryView(val)}
+              textFieldProps={{
+                sx: {
+                  minWidth: 500,
+                  label: 'Assign To',
+                },
+              }}
             />
           </DialogContentText>
         </DialogContent>

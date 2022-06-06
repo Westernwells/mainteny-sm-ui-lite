@@ -42,3 +42,8 @@ export interface AppointmentFormModel {
 export interface NotesFormModel {
   note: string;
 }
+
+export interface PriorityTechnicianFormModel {
+  technicianId: string | null;
+  priority: number;
+}

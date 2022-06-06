@@ -35,7 +35,9 @@ const defaultAlignment: {
   align: 'left',
 };
 
-export const columns: GridColDef[] = [
+export const columns = (
+  getClickedTechnician: (item: MaintainerView) => void,
+): GridColDef[] => [
   {
     field: 'name',
     headerName: 'NAME',
@@ -67,10 +69,10 @@ export const columns: GridColDef[] = [
     ...defaultProps,
     renderCell: (params) => (
       <Box sx={{display: 'flex'}}>
-        <Box onClick={() => console.log(params.value)}>
+        <Box onClick={() => getClickedTechnician(params.value)}>
           <EditIcon sx={{color: 'text.secondary'}} />
         </Box>
-        <Box onClick={() => console.log(params.value)}>
+        <Box onClick={() => getClickedTechnician(params.value)}>
           <DeleteIcon sx={{color: 'text.secondary'}} />
         </Box>
       </Box>
@@ -84,5 +86,5 @@ export const makeRows = (maintainers: MaintainerView[]): GridRowsProp =>
     name: `${maintainer.technician.userAccount.firstName} ${maintainer.technician.userAccount.lastName}`,
     address: maintainer.technician.address.fullName,
     priority: maintainer.weight,
-    actions: maintainer.technician.id,
+    actions: maintainer,
   }));

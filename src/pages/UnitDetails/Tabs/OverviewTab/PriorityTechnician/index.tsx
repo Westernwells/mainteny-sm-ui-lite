@@ -1,26 +1,103 @@
+/* eslint-disable */
 import Typography from '@mui/material/Typography';
 import {PageCard} from 'components/PageCard';
 import useTheme from '@mui/material/styles/useTheme';
 import {DataGridLayout} from 'components/DataGridLayout';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
+import {useFormik} from 'formik';
 import {MaintainerView} from 'models/technician';
+import {Confirm} from 'components/Confirm';
+import * as Yup from 'yup';
+import {
+  useElevatorMaintainers,
+  useUpdateElevatorTechnician,
+} from 'hooks/reactQuery/useElevator';
+import {Dialog} from 'components/Dialog';
+import {PriorityTechnicianFormModel} from '../models';
 import {columns, makeRows} from './PriorityTechnicianDataGridProps';
+import {PriorityTechnicianForm} from './PriorityTechnicianForm';
 
 interface Props {
   containerStyles?: {[key: string]: any};
-  maintainers: MaintainerView[];
+  elevatorId?: string;
 }
 
-export const PriorityTechnician = ({containerStyles, maintainers}: Props) => {
+enum DialogTitle {
+  ADD_TECHNICIAN = 'Add Technician',
+  EDIT_TECHNICIAN = 'Edit Technician',
+}
+
+const validationSchema = Yup.object().shape({
+  technicianId: Yup.string().nullable().required('Technician is required'),
+  priority: Yup.string().nullable().required('Priority is required'),
+});
+
+export const PriorityTechnician = ({containerStyles, elevatorId}: Props) => {
   const theme = useTheme();
+  const formik = useFormik<PriorityTechnicianFormModel>({
+    initialValues: {
+      technicianId: '',
+      priority: 1,
+    },
+    onSubmit: () => {},
+    validationSchema,
+  });
   const [rows, setRows] = useState<GridRowsProp>([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [activeTechnician, setActiveTechnician] = useState<MaintainerView>();
+  const [dialogTitle, setDialogTitle] = useState('');
+  const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  const {data: maintainers = []} = useElevatorMaintainers(elevatorId!);
+  const {mutateAsync: updateTechnician, isLoading: isEditing} =
+    useUpdateElevatorTechnician('Technicians updated successfully');
 
   useEffect(() => {
     setRows(makeRows(!showAll ? maintainers.slice(0, 3) : maintainers));
   }, [maintainers]);
+
+  const onEditButtonClicked = (item: MaintainerView) => {
+    setDialogTitle(DialogTitle.EDIT_TECHNICIAN);
+    formik.setFieldValue('technicianId', item.technician.id);
+    setActiveTechnician(item);
+    setOpenDialog(true);
+  };
+
+  const onSave = async () => {
+    let body = {};
+    if (dialogTitle === DialogTitle.EDIT_TECHNICIAN) {
+      maintainers.forEach((item) => {
+        body = {
+          ...body,
+          [item.technician.id]: item.weight,
+        };
+      });
+      await updateTechnician({
+        body: {
+          ...body,
+          [formik.values.technicianId!]: formik.values.priority,
+        },
+        elevatorId: elevatorId!,
+      });
+    } else {
+      // await addNote({
+      //   body: {subject: '', content: formik.values.note},
+      //   elevatorId: elevatorId!,
+      // });
+    }
+    setOpenDialog(false);
+  };
+
+  const onDelete = async (technicianId: string) => {
+    // await deleteNote({elevatorId: elevatorId!, noteId});
+    setOpenCancelConfirm(false);
+  };
+
+  const getClickedTechnician = (item: MaintainerView) => {
+    onEditButtonClicked(item);
+  };
 
   return (
     <PageCard
@@ -37,7 +114,7 @@ export const PriorityTechnician = ({containerStyles, maintainers}: Props) => {
         height={200}
         hideFooter
         rows={rows}
-        columns={columns}
+        columns={useCallback(() => columns(getClickedTechnician), [])()}
         containerStyle={{
           borderBottom: 'none',
         }}
@@ -51,6 +128,31 @@ export const PriorityTechnician = ({containerStyles, maintainers}: Props) => {
           </Typography>
         </Box>
       ) : null}
+
+      <Dialog
+        title={dialogTitle}
+        isSaving={isEditing}
+        disableSaveBtn={!!Object.keys(formik.errors).length}
+        onCancel={() => setOpenDialog(false)}
+        onSave={onSave}
+        dialogProps={{
+          maxWidth: 'sm',
+          open: openDialog || false,
+        }}>
+        <PriorityTechnicianForm
+          disableAutoComplete={dialogTitle === DialogTitle.EDIT_TECHNICIAN}
+          formik={formik}
+          activeTechnician={activeTechnician}
+        />
+      </Dialog>
+
+      <Confirm
+        open={openCancelConfirm}
+        onConfirm={() => onDelete(activeTechnician?.technician.id!)}
+        onClose={() => setOpenCancelConfirm(false)}
+        title="Confirm"
+        content="Do you want to delete this note?"
+      />
     </PageCard>
   );
 };

@@ -8,10 +8,7 @@ import {useParams} from 'react-router-dom';
 // import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {useUseQueryElevatorsContracts} from 'hooks/reactQuery/useContract';
 import {ContractStatus, ContractView} from 'models/contract';
-import {
-  useElevatorById,
-  useElevatorMaintainers,
-} from 'hooks/reactQuery/useElevator';
+import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import {ElevatorRequestBody} from 'models/elevator';
 import {Progress} from 'components/Progress';
 import {Location} from './Location';
@@ -49,8 +46,6 @@ export const OverviewTab = ({getUnitName}: Props) => {
         ContractStatus.EXPIRED,
       ],
     });
-
-  const {data: maintainers = []} = useElevatorMaintainers(elevatorId);
 
   // const {
   //   data: serviceOrders = createEmptyResource<ServiceOrderView>(pageSize),
@@ -197,7 +192,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
 
       <PriorityTechnician
         containerStyles={{mt: '1.2em'}}
-        maintainers={maintainers}
+        elevatorId={elevator?.id}
       />
 
       <Grid
