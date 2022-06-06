@@ -30,7 +30,7 @@ import {UnitsMapsView} from './UnitsMapsView';
 import {DataGridElevatorView} from './Models';
 import {Tabs} from 'components/Tab';
 import {TabsBody} from 'components/TabsBody';
-import {UnitListing} from './Tabs/UnitListing';
+import {UnitListingView} from './Tabs/UnitListingView';
 
 const tabItems = [
   {
@@ -68,10 +68,10 @@ export const MyUnits = () => {
         setTabValue(index);
       }}>
       <TabsBody value={tabValue} index={0}>
-        {<UnitListing />}
+        {<UnitListingView />}
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
-        {null}
+        {<UnitsMapsView />}
       </TabsBody>
     </Tabs>
   );

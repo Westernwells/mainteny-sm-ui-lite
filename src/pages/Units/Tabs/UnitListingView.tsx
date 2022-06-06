@@ -30,13 +30,10 @@ import {UnitsMapsView} from '../UnitsMapsView';
 import {DataGridElevatorView} from '../Models';
 import {TabContentContainer} from 'components/TabContentContainer';
 import {FlexContainer} from 'components/FlexContainer';
-// import {columns, makeRows} from './UnitsDataGridProps';
-// import {UnitsMapsView} from './UnitsMapsView';
-// import {DataGridElevatorView} from './Models';
 
 const pageInfo = makePage(0, 50);
 
-export const UnitListing = () => {
+export const UnitListingView = () => {
   const fallback = useRef({
     elevatorByAddress: {} as ElevatorByAddr,
     centerCoord: {longitude: 0, latitude: 0},
