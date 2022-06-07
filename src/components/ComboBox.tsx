@@ -72,7 +72,12 @@ export const ComboBox = ({
       onChange={(event: any, newValue: Option | null) => {
         setItem(newValue);
       }}
-      sx={{width: '100%'}}
+      sx={{
+        width: '100%',
+        '& .MuiAutocomplete-popupIndicator': {
+          display: 'none',
+        },
+      }}
       renderInput={(params) => (
         <FormInput
           props={{
