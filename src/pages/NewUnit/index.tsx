@@ -1,7 +1,8 @@
-import Box from '@mui/material/Box';
+// import Box from '@mui/material/Box';
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import React from 'react';
+import {Location} from './Location';
 
 const steps = [
   'Add location',
@@ -29,7 +30,7 @@ export const NewUnit = () => {
         flexDirection: 'column',
       }}>
       <FlexContainer>
-        <Box />
+        <Location />
       </FlexContainer>
     </Stepper>
   );
