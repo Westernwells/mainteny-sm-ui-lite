@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
 import {formatSearchParams} from 'utils/utils';
-import {useSearchParams} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {Tabs} from 'components/Tab';
 import {TabsBody} from 'components/TabsBody';
 import {UnitListingView} from './Tabs/UnitListingView';
@@ -20,6 +20,7 @@ const tabItems = [
 ];
 
 export const MyUnits = () => {
+  const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
   const [queryParams, setQueryParams] = useSearchParams();
 
@@ -34,6 +35,7 @@ export const MyUnits = () => {
       tabItems={tabItems}
       showActionBtn
       btnLabel="New Unit"
+      btnOnClick={() => navigate('new')}
       currentIndex={tabValue}
       pageTitle="Service Orders"
       onChange={(index) => {

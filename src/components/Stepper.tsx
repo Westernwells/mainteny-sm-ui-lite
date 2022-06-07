@@ -8,6 +8,7 @@ import useTheme from '@mui/material/styles/useTheme';
 
 interface Props {
   steps: string[];
+  stepperWidth?: string;
   children: ReactNode;
   containerStyles?: {[key: string]: any};
   handleCancel?: () => void;
@@ -24,6 +25,7 @@ export const Stepper = ({
   handleSubmit = () => {},
   getActiveStep,
   disableNextBtn,
+  stepperWidth,
 }: Props) => {
   const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
@@ -44,7 +46,7 @@ export const Stepper = ({
 
   return (
     <Box sx={{...containerStyles}}>
-      <Box sx={{width: '50%'}}>
+      <Box sx={{width: stepperWidth || '50%'}}>
         <MuiStepper activeStep={activeStep}>
           {steps.map((label) => {
             const stepProps: {completed?: boolean} = {};

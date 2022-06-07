@@ -23,11 +23,11 @@ import {ServiceOrders} from 'pages/ServiceOrders';
 import {ServiceOrderDetails} from 'pages/ServiceOrderDetails';
 import {axiosClient} from 'utils/axios-utils';
 import {languageMap} from 'utils/utils';
-import {NewUnit} from 'pages/NewServiceOrder/NewUnit';
 import i18n from 'i18next';
 import {useEffect, useState} from 'react';
 
 import {NewServiceOrder} from 'pages/NewServiceOrder';
+import {NewUnit} from 'pages/NewUnit';
 import {Articles} from 'pages/Articles';
 import {ArticleOverView} from 'pages/ArticleDetails';
 import {ProtectedRoutes} from './ProtectedRoutes';
@@ -92,6 +92,20 @@ export const Router = () => {
                 <UnitsDetail
                   getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
                 />
+              </PageLayout>
+            </>
+          }
+        />
+
+        <Route
+          path="/units/new"
+          element={
+            <>
+              <Helmet>
+                <title>{`New service order - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout backBtnLabel="New Unit" showBackAction>
+                <NewUnit />
               </PageLayout>
             </>
           }
@@ -318,20 +332,6 @@ export const Router = () => {
                 <NewServiceOrder
                   getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
                 />
-              </PageLayout>
-            </>
-          }
-        />
-
-        <Route
-          path="/units/new"
-          element={
-            <>
-              <Helmet>
-                <title>{`New service order - ${titleTail}`}</title>
-              </Helmet>
-              <PageLayout backBtnLabel="New Unit" showBackAction>
-                <NewUnit />
               </PageLayout>
             </>
           }
