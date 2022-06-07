@@ -58,7 +58,7 @@ export const MyUnits = () => {
       hideBackIcon
       tabItems={tabItems}
       showActionBtn
-      btnLabel="New Order"
+      btnLabel="New Unit"
       currentIndex={tabValue}
       pageTitle="Service Orders"
       onChange={(index) => {

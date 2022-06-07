@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import {getColumnProps} from 'components/DataGridLayout';
 import {formatDate} from 'utils/datetime';
+import {StatusChip} from 'components/StatusChip';
 import {DataGridElevatorView} from './Models';
 
 export const columns: GridColDef[] = [
@@ -43,7 +44,6 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'nextVisit',
     headerName: 'next visit',
-    align: 'center',
     flex: 0,
   }),
   getColumnProps({
@@ -53,7 +53,17 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'activeContracts',
     headerName: 'active contracts',
-    align: 'right',
+    align: 'center',
+    headerAlign: 'center',
+    renderCell: () => (
+      <StatusChip
+        label="Yes"
+        color="success"
+        variant="filled"
+        size="small"
+        maxChars={3}
+      />
+    ),
   }),
 ];
 
