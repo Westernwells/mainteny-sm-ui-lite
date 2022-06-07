@@ -14,8 +14,6 @@ import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {Widget} from 'components/Widget';
 import {FlexContainer} from 'components/FlexContainer';
-// import {LocationPin} from '../../components/LocationPin';
-// import {Location, Resource} from '../../models/misc';
 
 export const UnitMapsView = () => {
   const fallback = useRef({

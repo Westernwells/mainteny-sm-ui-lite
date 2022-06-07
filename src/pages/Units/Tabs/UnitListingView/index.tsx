@@ -1,4 +1,3 @@
-// TODO: @suraj we don't need to group elevator by address here because there is no grouping on the UI
 import {useEffect, useRef, useState} from 'react';
 import {ElevatorByAddr, ElevatorView} from 'models/elevator';
 import {Widget} from 'components/Widget';
@@ -8,11 +7,7 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
-import ToggleButton from '@mui/material/ToggleButton';
-import ViewListIcon from '@mui/icons-material/ViewList';
-import GridViewIcon from '@mui/icons-material/GridView';
 import {FilterFields} from 'components/FilterFields';
-import {PageListingLayout} from 'components/PageListingLayout';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {
@@ -22,15 +17,14 @@ import {
 import {getCenter} from 'geolib';
 import {Location, Resource} from 'models/misc';
 import {useSearchParams} from 'react-router-dom';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import {FlexContainer} from 'components/FlexContainer';
 import Box from '@mui/material/Box';
 import {columns, makeRows} from './UnitsDataGridProps';
-import {UnitsMapsView} from './UnitsMapsView';
-import {DataGridElevatorView} from './Models';
+import {DataGridElevatorView} from '../../Models';
 
 const pageInfo = makePage(0, 50);
 
-export const MyUnits = () => {
+export const UnitListingView = () => {
   const fallback = useRef({
     elevatorByAddress: {} as ElevatorByAddr,
     centerCoord: {longitude: 0, latitude: 0},
@@ -42,8 +36,6 @@ export const MyUnits = () => {
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [status, setStatus] = useState<string[]>([]);
-  const [view, setView] = useState('list');
-  const [showMapview, setShowMapview] = useState(false);
   const [elevatorView, setElevatorView] = useState<{
     elevatorByAddress: ElevatorByAddr;
     centerCoord: Location;
@@ -147,50 +139,6 @@ export const MyUnits = () => {
     );
   }
 
-  const openMapView = () => {
-    setShowMapview(true);
-  };
-
-  const closeMapView = () => {
-    setShowMapview(false);
-  };
-
-  const renderToggleButton = () => (
-    <ToggleButtonGroup
-      color="secondary"
-      value={view}
-      exclusive
-      sx={{
-        ml: '0.8em',
-        flexGrow: 1,
-        display: 'flex',
-        justifyContent: 'flex-end',
-      }}>
-      <ToggleButton
-        value="list"
-        aria-label="list"
-        onClick={() => {
-          setView('list');
-          if (closeMapView) {
-            closeMapView();
-          }
-        }}>
-        <ViewListIcon />
-      </ToggleButton>
-      <ToggleButton
-        value="module"
-        aria-label="module"
-        onClick={() => {
-          setView('module');
-          if (openMapView) {
-            openMapView();
-          }
-        }}>
-        <GridViewIcon />
-      </ToggleButton>
-    </ToggleButtonGroup>
-  );
-
   const renderFilterItems = () => (
     <FilterFields>
       <MultipleSelectCheckmarks
@@ -208,53 +156,39 @@ export const MyUnits = () => {
     </FilterFields>
   );
 
+  const renderWidget = () => (
+    <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+      <Widget
+        searchPlaceholder="Search order type, customer, address etc."
+        getSearchValue={(val) => setSearch(val)}
+        filterItems={renderFilterItems()}
+      />
+    </Box>
+  );
+
   if (isLoading) {
     return <Progress />;
   }
 
   return (
-    <PageListingLayout
-      renderWidget={
-        <Box
-          sx={{
-            display: 'flex',
-            flexGrow: 1,
-          }}>
-          <Widget
-            searchPlaceholder="Search by number, model, customer, address etc."
-            getSearchValue={(val: string) => {
-              setSearch(val);
-            }}
-            filterItems={renderFilterItems()}
-          />
-
-          {renderToggleButton()}
-        </Box>
-      }>
-      {!showMapview ? (
-        <DataGridLayout
-          hideFooter={pageCount <= 1}
-          rows={rows}
-          columns={columns}
-          loading={isFetching}
-          pageSize={page.pageSize}
-          pageIndex={page.pageIndex + 1}
-          handlePageSizeChange={(newPageSize: number) =>
-            setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
-          }
-          handlePageChange={(newPage: number) =>
-            setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-          }
-          pageCount={pageCount}
-          totalRows={elevatorResponse.total}
-        />
-      ) : (
-        <UnitsMapsView
-          defaultCenterCoord={elevatorView?.centerCoord}
-          search={search}
-          status={status}
-        />
-      )}
-    </PageListingLayout>
+    <FlexContainer>
+      {renderWidget()}
+      <DataGridLayout
+        hideFooter={pageCount <= 1}
+        rows={rows}
+        columns={columns}
+        loading={isFetching}
+        pageSize={page.pageSize}
+        pageIndex={page.pageIndex + 1}
+        handlePageSizeChange={(newPageSize: number) =>
+          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+        }
+        handlePageChange={(newPage: number) =>
+          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+        }
+        pageCount={pageCount}
+        totalRows={elevatorResponse.total}
+      />
+    </FlexContainer>
   );
 };

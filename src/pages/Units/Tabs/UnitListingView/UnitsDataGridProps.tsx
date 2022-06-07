@@ -4,7 +4,7 @@ import ElevatorIcon from '@mui/icons-material/Elevator';
 import {getColumnProps} from 'components/DataGridLayout';
 import {formatDate} from 'utils/datetime';
 import {StatusChip} from 'components/StatusChip';
-import {DataGridElevatorView} from './Models';
+import {DataGridElevatorView} from '../../Models';
 
 export const columns: GridColDef[] = [
   getColumnProps({
