@@ -3,8 +3,8 @@ import {FormInput} from 'components/form/FormInput';
 import {TechnicianAutoComplete} from 'components/TechnicianAutoComplete';
 import {FormikProps} from 'formik';
 import {MaintainerView} from 'models/technician';
+import {PriorityTechnicianFormModel} from 'models/unitForm';
 import React from 'react';
-import {PriorityTechnicianFormModel} from '../models';
 
 interface Props {
   formik: FormikProps<PriorityTechnicianFormModel>;

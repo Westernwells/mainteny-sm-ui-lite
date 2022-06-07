@@ -2,7 +2,7 @@ import {Box} from '@mui/system';
 import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
-import {AppointmentFormModel} from '../models';
+import {AppointmentFormModel} from 'models/unitForm';
 
 interface Props {
   formik: FormikProps<AppointmentFormModel>;

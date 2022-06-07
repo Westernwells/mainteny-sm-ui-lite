@@ -60,7 +60,7 @@ export const PageCard = ({
           title={
             customHeader || (
               <Typography
-                variant="subtitle2"
+                variant="h6"
                 sx={{
                   color: theme.palette.text.primary,
                   ...headerTextOverrideStyles,

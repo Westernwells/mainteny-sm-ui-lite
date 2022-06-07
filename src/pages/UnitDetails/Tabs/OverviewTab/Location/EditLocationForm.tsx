@@ -2,7 +2,7 @@ import {Box} from '@mui/system';
 import {AddressAutoComplete} from 'components/AddressAutoComplete';
 import {FormInput} from 'components/form/FormInput';
 import {FormikProps} from 'formik';
-import {LocationFormModel} from '../models';
+import {LocationFormModel} from 'models/unitForm';
 
 interface Props {
   formik: FormikProps<LocationFormModel>;

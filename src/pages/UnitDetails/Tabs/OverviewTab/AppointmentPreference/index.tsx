@@ -7,8 +7,8 @@ import {useRef, useState} from 'react';
 import {useFormik} from 'formik';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {Dialog} from 'components/Dialog';
+import {AppointmentFormModel} from 'models/unitForm';
 import * as Yup from 'yup';
-import {AppointmentFormModel} from '../models';
 import {AppointmentPreferenceSchema} from './AppointmentPreferenceSchema';
 import {EditAppointmentForm} from './EditAppointmentForm';
 

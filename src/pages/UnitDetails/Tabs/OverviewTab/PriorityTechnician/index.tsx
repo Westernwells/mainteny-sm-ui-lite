@@ -14,7 +14,7 @@ import {
 } from 'hooks/reactQuery/useElevator';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
-import {PriorityTechnicianFormModel} from '../models';
+import {PriorityTechnicianFormModel} from 'models/unitForm';
 import {columns, makeRows} from './PriorityTechnicianDataGridProps';
 import {PriorityTechnicianForm} from './PriorityTechnicianForm';
 

@@ -6,10 +6,10 @@ import {FormikProps} from 'formik';
 import {useCacheValues} from 'hooks/reactQuery/useElevator';
 import {ElevatorCategory} from 'models/elevator';
 import {CacheTypes} from 'models/misc';
+import {UnitDetailsFormModel} from 'models/unitForm';
 import {useState} from 'react';
 import {createEmptyResource} from 'utils/paging-utils';
 import {convertToText} from 'utils/utils';
-import {UnitDetailsFormModel} from '../models';
 
 interface Props {
   formik: FormikProps<UnitDetailsFormModel>;

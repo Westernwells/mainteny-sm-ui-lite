@@ -11,9 +11,9 @@ import {useFormik} from 'formik';
 import {Dialog} from 'components/Dialog';
 import * as Yup from 'yup';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
+import {LocationFormModel} from 'models/unitForm';
 import {LocationSchema} from './LocationSchema';
 import {EditLocationForm} from './EditLocationForm';
-import {LocationFormModel} from '../models';
 
 interface Props {
   containerStyles?: {[key: string]: any};
