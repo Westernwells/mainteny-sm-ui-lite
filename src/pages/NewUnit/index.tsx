@@ -29,7 +29,7 @@ export const NewUnit = () => {
         display: 'flex',
         flexDirection: 'column',
       }}>
-      <FlexContainer>
+      <FlexContainer containerStyle={{mt: '1em'}}>
         <Location />
       </FlexContainer>
     </Stepper>
