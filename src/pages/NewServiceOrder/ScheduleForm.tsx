@@ -7,7 +7,7 @@ import {TechnicianView} from 'models/technician';
 import {useEffect} from 'react';
 import * as Yup from 'yup';
 import {RadioOptions, ScheduleTechnicianForm} from './models';
-import {TechnicianAutoComplete} from './TechnicianAutoComplete';
+import {TechnicianAutoComplete} from '../../components/TechnicianAutoComplete';
 // import {constant} from './utils';
 
 interface Props {
@@ -131,12 +131,6 @@ export const ScheduleForm = ({
           </Box>
           <Box sx={{mt: '1.4em'}}>
             <TechnicianAutoComplete
-              inputError={
-                formik.errors.technicianId && formik.touched.technicianId
-                  ? formik.errors.technicianId
-                  : ''
-              }
-              handleBlur={formik.handleBlur}
               getTechnician={(value) => {
                 formik.setValues({
                   ...formik.values,
@@ -146,11 +140,21 @@ export const ScheduleForm = ({
                   getTechnician(value);
                 }
               }}
-              label="Assign To"
               getQuery={(val) => {
                 if (getQuery) {
                   getQuery(val);
                 }
+              }}
+              textFieldProps={{
+                error: !!(
+                  formik.errors.technicianId && formik.touched.technicianId
+                ),
+                helperText:
+                  formik.errors.technicianId && formik.touched.technicianId
+                    ? formik.errors.technicianId
+                    : '',
+                label: 'Assign To',
+                onBlur: formik.handleBlur,
               }}
             />
           </Box>

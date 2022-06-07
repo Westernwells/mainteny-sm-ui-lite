@@ -32,7 +32,7 @@ enum DialogTitle {
 }
 
 const validationSchema = Yup.object().shape({
-  address: Yup.object().nullable().required('Address is required'),
+  note: Yup.object().nullable().required('Address is required'),
 });
 
 export const Notes = ({elevatorId}: Props) => {

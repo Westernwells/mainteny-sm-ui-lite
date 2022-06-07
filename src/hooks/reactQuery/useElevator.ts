@@ -338,3 +338,40 @@ export const useDeleteElevatorComment = (successMsg?: string) => {
     },
   );
 };
+
+const updateElevatorTechnician = async (
+  body: {[key: string]: number},
+  elevatorId: string,
+) => {
+  await axiosClient.put<StringValue>(
+    `/api/elevators/${elevatorId}/maintainers`,
+    {
+      ...body,
+    },
+  );
+};
+
+export const useUpdateElevatorTechnician = (successMsg?: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({body, elevatorId}: {body: {[key: string]: number}; elevatorId: string}) =>
+      updateElevatorTechnician(body, elevatorId),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.maintainerByElevatorId);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};

@@ -12,6 +12,7 @@ import {useState} from 'react';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {FileResourceRecord} from 'models/media';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {EmptySection} from 'components/EmptySection';
 
 interface Props {
   elevator: Elevator;
@@ -30,7 +31,9 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
     'Elevator updated successfully',
   );
   const {data: downloadUrls = {}} = useDownloadUrl(
-    elevator.additionalInfo.pictures.map((item) => item.uri),
+    elevator.additionalInfo.pictures
+      ? elevator.additionalInfo.pictures.map((item) => item.uri)
+      : [],
   );
 
   const onSave = async () => {
@@ -57,6 +60,28 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
     setOpenDialog(false);
   };
 
+  const renderEmptySection = () => (
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
+      }}>
+      <EmptySection
+        label="No pictures have been created yet. Please click the button below to create one!"
+        showActionBtn
+        btnLabel="Add Picture"
+        btnAction={() => setOpenDialog(true)}
+        illustration="clipboard"
+        size="tiny"
+        containerStyle={{
+          height: '100%',
+        }}
+      />
+    </Box>
+  );
+
   return (
     <InfoCard
       containerStyles={{
@@ -71,55 +96,63 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
       header={<Typography variant="subtitle1">Pictures</Typography>}>
-      <Grid container spacing={1} sx={{mt: '0.5em'}}>
-        {elevator.additionalInfo.pictures.map((item) => (
-          <Grid item xs={6} sm={4}>
-            <Box
-              sx={{
-                border: `1px solid ${theme.palette.text.disabled}`,
-                padding: '0.5em',
-                height: 120,
-                [theme.breakpoints.down('md')]: {
-                  height: 170,
-                },
-                display: 'flex',
-                flexDirection: 'column',
-              }}>
-              <Box
-                sx={{flexGrow: 1, height: 0, cursor: 'pointer'}}
-                onClick={() => window.open(downloadUrls[item.uri], '_blank')}>
-                <img
-                  alt=""
-                  src={downloadUrls[item.uri]}
-                  style={{
-                    objectFit: 'cover',
-                    objectPosition: 'top',
-                    width: '100%',
-                    height: '100%',
-                  }}
-                />
-              </Box>
-
-              {item.description ? (
-                <Typography
-                  component="div"
-                  variant="caption"
-                  color="text.secondary"
+      {!elevator.additionalInfo.pictures ||
+      elevator.additionalInfo.pictures.length === 0 ? (
+        renderEmptySection()
+      ) : (
+        <Grid container spacing={1} sx={{mt: '0.5em'}}>
+          {elevator.additionalInfo.pictures &&
+            elevator.additionalInfo.pictures.map((item, index) => (
+              <Grid item xs={6} sm={4} key={index}>
+                <Box
                   sx={{
-                    overflow: 'hidden',
-                    display: '-webkit-box',
-                    maxWidth: '100%',
-                    WebkitLineClamp: '1',
-                    WebkitBoxOrient: 'vertical',
-                    height: '20%',
+                    border: `1px solid ${theme.palette.text.disabled}`,
+                    padding: '0.5em',
+                    height: 120,
+                    [theme.breakpoints.down('md')]: {
+                      height: 170,
+                    },
+                    display: 'flex',
+                    flexDirection: 'column',
                   }}>
-                  {item.description}
-                </Typography>
-              ) : null}
-            </Box>
-          </Grid>
-        ))}
-      </Grid>
+                  <Box
+                    sx={{flexGrow: 1, height: 0, cursor: 'pointer'}}
+                    onClick={() =>
+                      window.open(downloadUrls[item.uri], '_blank')
+                    }>
+                    <img
+                      alt=""
+                      src={downloadUrls[item.uri]}
+                      style={{
+                        objectFit: 'cover',
+                        objectPosition: 'top',
+                        width: '100%',
+                        height: '100%',
+                      }}
+                    />
+                  </Box>
+
+                  {item.description ? (
+                    <Typography
+                      component="div"
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{
+                        overflow: 'hidden',
+                        display: '-webkit-box',
+                        maxWidth: '100%',
+                        WebkitLineClamp: '1',
+                        WebkitBoxOrient: 'vertical',
+                        height: '20%',
+                      }}>
+                      {item.description}
+                    </Typography>
+                  ) : null}
+                </Box>
+              </Grid>
+            ))}
+        </Grid>
+      )}
 
       <Dialog
         title="Add Pictures"

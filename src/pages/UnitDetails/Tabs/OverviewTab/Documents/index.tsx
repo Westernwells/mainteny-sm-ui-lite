@@ -13,6 +13,7 @@ import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {FileResourceRecord} from 'models/media';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
+import {EmptySection} from 'components/EmptySection';
 
 interface Props {
   elevator: Elevator;
@@ -31,7 +32,9 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
     'Elevator updated successfully',
   );
   const {data: downloadUrls = {}} = useDownloadUrl(
-    elevator.additionalInfo.documents.map((item) => item.uri),
+    elevator.additionalInfo.documents
+      ? elevator.additionalInfo.documents.map((item) => item.uri)
+      : [],
   );
 
   const onSave = async () => {
@@ -58,6 +61,28 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
     setOpenDialog(false);
   };
 
+  const renderEmptySection = () => (
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
+      }}>
+      <EmptySection
+        label="No documents have been created yet. Please click the button below to create one!"
+        showActionBtn
+        btnLabel="Add Picture"
+        btnAction={() => setOpenDialog(true)}
+        illustration="clipboard"
+        size="tiny"
+        containerStyle={{
+          height: '100%',
+        }}
+      />
+    </Box>
+  );
+
   return (
     <InfoCard
       containerStyles={{
@@ -72,54 +97,62 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
       header={<Typography variant="subtitle1">Documents</Typography>}>
-      <Grid container spacing={2} sx={{mt: '0.5em'}}>
-        {elevator.additionalInfo.documents.map((item) => (
-          <Grid item sm={4}>
-            <Box
-              sx={{
-                border: `1px solid ${theme.palette.text.disabled}`,
-                padding: '0.5em',
-                height: 120,
-                [theme.breakpoints.down('md')]: {
-                  height: 170,
-                },
-                display: 'flex',
-                flexDirection: 'column',
-              }}>
-              <Box
-                sx={{flexGrow: 1, height: 0, cursor: 'pointer'}}
-                onClick={() => window.open(downloadUrls[item.uri], '_blank')}>
-                <FileCopyIcon
+      {!elevator.additionalInfo.documents ||
+      elevator.additionalInfo.documents.length === 0 ? (
+        renderEmptySection()
+      ) : (
+        <Grid container spacing={2} sx={{mt: '0.5em'}}>
+          {elevator.additionalInfo.documents &&
+            elevator.additionalInfo.documents.map((item) => (
+              <Grid item sm={4}>
+                <Box
                   sx={{
-                    fontSize: '4rem',
+                    border: `1px solid ${theme.palette.text.disabled}`,
+                    padding: '0.5em',
+                    height: 120,
                     [theme.breakpoints.down('md')]: {
-                      fontSize: '9rem',
+                      height: 170,
                     },
-                    color: theme.palette.text.secondary,
-                  }}
-                />
-              </Box>
-
-              {item.description ? (
-                <Typography
-                  component="div"
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{
-                    overflow: 'hidden',
-                    display: '-webkit-box',
-                    maxWidth: '100%',
-                    WebkitLineClamp: '1',
-                    WebkitBoxOrient: 'vertical',
-                    height: '20%',
+                    display: 'flex',
+                    flexDirection: 'column',
                   }}>
-                  {item.description}
-                </Typography>
-              ) : null}
-            </Box>
-          </Grid>
-        ))}
-      </Grid>
+                  <Box
+                    sx={{flexGrow: 1, height: 0, cursor: 'pointer'}}
+                    onClick={() =>
+                      window.open(downloadUrls[item.uri], '_blank')
+                    }>
+                    <FileCopyIcon
+                      sx={{
+                        fontSize: '4rem',
+                        [theme.breakpoints.down('md')]: {
+                          fontSize: '9rem',
+                        },
+                        color: theme.palette.text.secondary,
+                      }}
+                    />
+                  </Box>
+
+                  {item.description ? (
+                    <Typography
+                      component="div"
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{
+                        overflow: 'hidden',
+                        display: '-webkit-box',
+                        maxWidth: '100%',
+                        WebkitLineClamp: '1',
+                        WebkitBoxOrient: 'vertical',
+                        height: '20%',
+                      }}>
+                      {item.description}
+                    </Typography>
+                  ) : null}
+                </Box>
+              </Grid>
+            ))}
+        </Grid>
+      )}
 
       <Dialog
         title="Add Documents"

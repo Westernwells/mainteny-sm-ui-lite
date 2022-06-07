@@ -1,37 +1,36 @@
-import {
-  FocusEvent,
-  SyntheticEvent,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
-import TextField from '@mui/material/TextField';
+import {SyntheticEvent, useCallback, useEffect, useState} from 'react';
+import {TextFieldProps} from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import * as _ from 'lodash';
 import {useQueryServiceCompanyTechnicians} from 'hooks/reactQuery/useTechnician';
 import {createEmptyResource} from 'utils/paging-utils';
 import {TechnicianView} from 'models/technician';
+import {FormInput} from './form/FormInput';
 
 interface Props {
   getTechnician?: (val: TechnicianView | null) => void;
   getQuery?: (val: string) => void;
-  label?: string;
-  fieldStyles?: {[key: string]: any};
-  inputError?: string;
-  handleBlur?: (e: FocusEvent<any, Element>) => void;
+  initialValue?: TechnicianView | null;
+  textFieldProps?: TextFieldProps;
+  disabled?: boolean;
 }
 
 export const TechnicianAutoComplete = ({
   getTechnician,
-  label = '',
   getQuery = () => {},
-  fieldStyles,
-  inputError,
-  handleBlur,
+  initialValue = null,
+  textFieldProps,
+  disabled,
 }: Props) => {
   const [query, setQuery] = useState<string>('');
-  const [queryView, setQueryView] = useState('');
-  const [technician, setTechnician] = useState<TechnicianView | null>(null);
+  const [queryView, setQueryView] = useState(
+    initialValue
+      ? `${initialValue.userAccount.firstName} ${initialValue.userAccount.lastName}`
+      : '',
+  );
+  const [technician, setTechnician] = useState<TechnicianView | null>(
+    initialValue,
+  );
 
   const {data: techniciansResource = createEmptyResource(10)} =
     useQueryServiceCompanyTechnicians({
@@ -47,9 +46,17 @@ export const TechnicianAutoComplete = ({
     [],
   );
 
-  const onInputChange = (e: SyntheticEvent, newValue: string) => {
+  const onInputChange = (
+    e: SyntheticEvent,
+    newValue: string,
+    reason: string,
+  ) => {
     setQueryView(newValue);
     debouncedChangeHandler(newValue);
+    if (reason === 'clear') {
+      setQueryView('');
+      setTechnician(null);
+    }
   };
 
   useEffect(() => {
@@ -62,15 +69,21 @@ export const TechnicianAutoComplete = ({
     if (getQuery) {
       getQuery(queryView);
     }
+
+    if (!queryView) {
+      setTechnician(null);
+      if (getQuery) getQuery('');
+    }
   }, [queryView]);
 
   return (
     <Autocomplete
       size="small"
+      disabled={disabled}
       clearOnBlur={false}
       disablePortal
       id="combo-box-demo"
-      sx={{minHeight: 100}}
+      sx={{minHeight: 0}}
       options={techniciansResource.data}
       onChange={(event: any, newValue: TechnicianView | null) => {
         setTechnician(newValue);
@@ -81,14 +94,13 @@ export const TechnicianAutoComplete = ({
       onInputChange={onInputChange}
       inputValue={queryView}
       renderInput={(params) => (
-        <TextField
-          {...params}
-          label={label}
-          name="technicianId"
-          sx={{...fieldStyles}}
-          error={!!inputError}
-          helperText={inputError}
-          onBlur={handleBlur}
+        <FormInput
+          props={{
+            name: 'technicianId',
+            ...params,
+            ...textFieldProps,
+            required: true,
+          }}
         />
       )}
     />
