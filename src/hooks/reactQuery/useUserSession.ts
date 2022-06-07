@@ -32,6 +32,7 @@ export function useUserSession(): UseUserSession {
   function updateUser(newUser: UserSession): void {
     // update user in localstorage
     setStoredUser(newUser);
+    localStorage.removeItem('email');
 
     //  pre-populate user profile in React Query client
     queryClient.setQueryData(queryKeys.userSession, newUser);

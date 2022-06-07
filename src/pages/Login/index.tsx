@@ -27,9 +27,10 @@ export const Login = () => {
   const formik = useFormik({
     initialValues: {
       password: '',
-      email: '',
+      email: localStorage.getItem('email') || '',
     },
     onSubmit: (values) => {
+      localStorage.setItem('email', values.email);
       signin(values.email, values.password);
     },
     validationSchema,

@@ -5,11 +5,12 @@ import EmailIcon from '@mui/icons-material/Email';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import {useNavigate} from 'react-router-dom';
+import {useTranslation} from 'react-i18next';
 import {AuthLayout} from 'components/AuthLayout';
-import {Button} from 'components/Button';
 
 interface Props {
   handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -31,24 +32,25 @@ export const PasswordRequest = ({
   loading,
 }: Props) => {
   const navigate = useNavigate();
+  const {t} = useTranslation();
   return (
     <AuthLayout>
       <Typography variant="h5" mt={7} textAlign="center">
-        Forgot Password
+        {t('Forgot Password')}
       </Typography>
       <Box mt={3} display="flex" justifyContent="center" width="100%">
-        <form style={{width: '18rem'}} onSubmit={handleSubmit}>
+        <form style={{width: 'min(18rem, 100%)'}} onSubmit={handleSubmit}>
           <Typography
             variant="body1"
             color="text.secondary"
             textAlign="center"
             my={4}>
-            We’ll send a password reset code to the below email address
+            {t("We'll send a password reset code to the below email address")}
           </Typography>
           <TextField
             id="email"
             name="email"
-            label="Email address"
+            label={t('Email address')}
             size="medium"
             fullWidth
             type="email"
@@ -66,31 +68,28 @@ export const PasswordRequest = ({
           />
           <Box mt={5}>
             <Button
-              label="Get Reset Code"
-              buttonProps={{
-                type: 'submit',
-                disabled: !!(!email || emailError),
-                sx: {width: '100%'},
-                variant: 'contained',
-                size: 'large',
-                endIcon: loading ? (
+              type="submit"
+              disabled={!!(!email || emailError)}
+              sx={{width: '100%'}}
+              variant="contained"
+              size="large"
+              endIcon={
+                loading ? (
                   <CircularProgress size={20} sx={{color: 'gray'}} />
                 ) : (
                   <ArrowForward />
-                ),
-              }}
-            />
+                )
+              }>
+              {t('Get reset code')}
+            </Button>
             <Button
-              label="Back"
-              buttonProps={{
-                onClick: () => navigate('/login'),
-
-                sx: {width: '100%'},
-                variant: 'contained',
-                size: 'large',
-                startIcon: <ArrowBack />,
-              }}
-            />
+              sx={{width: '100%', marginTop: 1}}
+              variant="text"
+              onClick={() => navigate('/login')}
+              size="large"
+              startIcon={<ArrowBack />}>
+              {t('Back')}
+            </Button>
           </Box>
         </form>
       </Box>
