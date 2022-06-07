@@ -2,7 +2,7 @@ import {Helmet} from 'react-helmet';
 import {Navigate, Route, Routes} from 'react-router-dom';
 import {PageLayout} from 'components/PageLayout';
 import {Login} from 'pages/Login';
-import {Recover} from 'pages/Recover';
+import {ResetPassword} from 'pages/ResetPassword';
 import {MyUnits} from 'pages/Units';
 import {UnitsDetail} from 'pages/UnitDetails';
 import {Contracts} from 'pages/Contracts';
@@ -57,7 +57,7 @@ export const Router = () => {
           </>
         }>
         <Route path="/login" element={<Login />} />
-        <Route path="/recover" element={<Recover />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Route>
       <Route element={<ProtectedRoutes />}>
         <Route

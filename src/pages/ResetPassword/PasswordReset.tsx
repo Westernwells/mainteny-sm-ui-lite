@@ -1,17 +1,18 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {useTranslation} from 'react-i18next';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
 import CircularProgress from '@mui/material/CircularProgress';
-import {useRecoverPassword} from 'hooks/useRecoverPassword';
+import {useResetPassword} from 'hooks/useResetPassword';
 import {AuthLayout} from 'components/AuthLayout';
-import {Button} from 'components/Button';
 
 interface Props {
   handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -46,24 +47,26 @@ export const PasswordReset = ({
   email,
   loading,
 }: Props) => {
+  const navigate = useNavigate();
+  const {t} = useTranslation();
+
   const [reEnterPassword, setReEnterPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [heading, setHeading] = useState('Forgot Password');
+  const [heading, setHeading] = useState(t('Forgot Password'));
   const [swap, setSwap] = useState<Boolean>(false);
-  const {request} = useRecoverPassword();
-  const navigate = useNavigate();
+  const {request} = useResetPassword();
   const handleSwap = (value: Boolean, option: number) => {
     setSwap(value);
     switch (option) {
       case 1:
-        setHeading('Set a new password');
+        setHeading(t('Set a new password'));
         break;
       case 2:
-        setHeading('Confirm new password');
+        setHeading(t('Confirm new password'));
         break;
       default:
-        setHeading('Forgot Password');
+        setHeading(t('Forgot Password'));
     }
   };
   return (
@@ -72,7 +75,7 @@ export const PasswordReset = ({
         {heading}
       </Typography>
       <Box mt={3} display="flex" justifyContent="center" width="100%">
-        <form style={{width: '18rem'}} onSubmit={handleSubmit}>
+        <form style={{width: 'min(18rem, 100%)'}} onSubmit={handleSubmit}>
           {!swap ? (
             <>
               <Typography
@@ -80,7 +83,9 @@ export const PasswordReset = ({
                 color="text.secondary"
                 textAlign="center"
                 my={4}>
-                Please enter the reset code we sent to your email address.
+                {t(
+                  'Please enter the reset code we sent to your email address.',
+                )}
               </Typography>
 
               <TextField
@@ -98,38 +103,36 @@ export const PasswordReset = ({
 
               <Box mt={5}>
                 <Button
-                  label="Reset Password"
-                  buttonProps={{
-                    onClick: () => handleSwap(true, 1),
-                    disabled: !!(!token || tokenError),
-                    sx: {width: '100%'},
-                    variant: 'contained',
-                    size: 'large',
-                    endIcon: loading ? (
+                  onClick={() => handleSwap(true, 1)}
+                  disabled={!!(!token || tokenError)}
+                  sx={{width: '100%'}}
+                  variant="contained"
+                  size="large"
+                  endIcon={
+                    loading ? (
                       <CircularProgress size={20} sx={{color: 'gray'}} />
                     ) : (
                       <ArrowForward />
-                    ),
-                  }}
-                />
+                    )
+                  }>
+                  {t('Reset password')}
+                </Button>
                 <Button
-                  label="Back"
-                  buttonProps={{
-                    sx: {width: '100%', marginTop: 1},
-                    onClick: () => navigate(-1),
-                    size: 'large',
-                    startIcon: <ArrowBack />,
-                  }}
-                />
+                  sx={{width: '100%', marginTop: 1}}
+                  variant="text"
+                  onClick={() => navigate('/reset-password')}
+                  size="large"
+                  startIcon={<ArrowBack />}>
+                  {t('Back')}
+                </Button>
                 <Typography color="text.secondary" textAlign="center" mt={5}>
-                  Did not receive the code?
+                  {`${t("Didn't receive the code?")} `}
                   <Typography
                     color="secondary.dark"
                     component="span"
-                    onClick={() => request(email, true)}
+                    onClick={() => request(email)}
                     sx={{cursor: 'pointer'}}>
-                    {' '}
-                    Resend
+                    {t('Resend')}
                   </Typography>
                 </Typography>
               </Box>
@@ -140,7 +143,7 @@ export const PasswordReset = ({
                 disabled={reEnterPassword}
                 id="password"
                 name="password"
-                label="Password"
+                label={t('Password')}
                 size="medium"
                 fullWidth
                 type={showPassword ? 'text' : 'password'}
@@ -168,12 +171,8 @@ export const PasswordReset = ({
                     <Typography
                       variant="body1"
                       ml={1}
-                      color={
-                        password.length >= 6
-                          ? 'body1'
-                          : 'rgba(143, 155, 179, 0.5)'
-                      }>
-                      Atleast 6 characters
+                      color={password.length >= 6 ? 'body1' : 'text.disabled'}>
+                      {t('Password should contain at least 6 characters')}
                     </Typography>
                   </Box>
 
@@ -184,12 +183,8 @@ export const PasswordReset = ({
                     <Typography
                       variant="body1"
                       ml={1}
-                      color={
-                        password.match(/\d/)
-                          ? 'body1'
-                          : 'rgba(143, 155, 179, 0.5)'
-                      }>
-                      Minimum 1 number
+                      color={password.match(/\d/) ? 'body1' : 'text.disabled'}>
+                      {t('Password should contain at least 1 number')}
                     </Typography>
                   </Box>
                 </>
@@ -198,7 +193,7 @@ export const PasswordReset = ({
                   sx={{marginTop: 4}}
                   id="confirmPassword"
                   name="confirmPassword"
-                  label="Re enter password"
+                  label={t('Re-enter password')}
                   size="medium"
                   fullWidth
                   error={!!(confirmPasswordTouched && confirmPasswordError)}
@@ -223,54 +218,62 @@ export const PasswordReset = ({
               )}
               {!reEnterPassword ? (
                 <Button
-                  label="Next"
-                  buttonProps={{
-                    disabled: !!(!password || passwordError),
-                    sx: {marginTop: 5, width: '100%'},
-                    variant: 'contained',
-                    onClick: () => {
-                      setReEnterPassword(!reEnterPassword);
-                      handleSwap(swap, 2);
-                    },
-                    size: 'large',
-                    endIcon: <ArrowForward />,
+                  disabled={!!(!password || passwordError)}
+                  sx={{marginTop: 5, width: '100%'}}
+                  variant="contained"
+                  onClick={() => {
+                    setReEnterPassword(!reEnterPassword);
+                    handleSwap(swap, 2);
                   }}
-                />
+                  size="large"
+                  endIcon={<ArrowForward />}>
+                  {t('Next')}
+                </Button>
               ) : (
                 <Box mt={5}>
                   <Button
-                    label="Go"
-                    buttonProps={{
-                      type: 'submit',
-                      disabled: !!(
-                        confirmPasswordTouched && confirmPasswordError
-                      ),
-
-                      sx: {width: '100%'},
-                      variant: 'contained',
-                      size: 'large',
-                      endIcon: loading ? (
+                    type="submit"
+                    disabled={
+                      !!(confirmPasswordTouched && confirmPasswordError)
+                    }
+                    sx={{width: '100%'}}
+                    variant="contained"
+                    size="large"
+                    endIcon={
+                      loading ? (
                         <CircularProgress size={20} sx={{color: 'gray'}} />
                       ) : (
                         <ArrowForward />
-                      ),
-                    }}
-                  />
+                      )
+                    }>
+                    {t('Go')}
+                  </Button>
                   <Button
-                    label="Back"
-                    buttonProps={{
-                      sx: {width: '100%', marginTop: 1},
-                      variant: 'outlined',
-                      onClick: () => {
-                        setReEnterPassword(!reEnterPassword);
-                        handleSwap(swap, 1);
-                      },
-                      size: 'large',
-                      startIcon: <ArrowBack />,
+                    sx={{width: '100%', marginTop: 1}}
+                    variant="outlined"
+                    onClick={() => {
+                      setReEnterPassword(!reEnterPassword);
+                      handleSwap(swap, 1);
                     }}
-                  />
+                    size="large"
+                    startIcon={<ArrowBack />}>
+                    {t('Back')}
+                  </Button>
                 </Box>
               )}
+              <Typography color="text.secondary" textAlign="center" mt={5}>
+                {`${t("Didn't receive the code?")} `}
+                <Typography
+                  color="secondary.dark"
+                  component="span"
+                  onClick={() => {
+                    request(email, true);
+                    handleSwap(false, 3);
+                  }}
+                  sx={{cursor: 'pointer'}}>
+                  {t('Resend')}
+                </Typography>
+              </Typography>
             </>
           )}
         </form>

@@ -31,6 +31,40 @@ module.exports = {
     'Forgot Password?': 'Passwort vergessen?',
     'Enter a valid email': 'Geben Sie eine gültige E-Mail ein',
     'Email is required': 'E-Mail ist erforderlich',
+
+    // Reset password
+    'Forgot Password': 'Passwort vergessen',
+    "We'll send a password reset code to the below email address":
+      '	Wir senden Ihnen einen Code zum Zurücksetzen des Passworts an die unten angegebene E-Mail-Adresse.',
+    'Please enter the reset code we sent to your email address.':
+      '	Bitte geben Sie den Code zum Zurücksetzen des Passworts ein, den wir an Ihre E-Mail-Adresse gesendet haben.',
+    'Re-enter password': 'Passwort erneut eingeben',
+    'Get reset code': 'Code zum Zurücksetzen erhalten',
+    Back: 'Zurück',
+    'PIN is required': 'PIN ist erforderlich',
+    "Didn't receive the code?": 'Haben Sie den Code nicht erhalten?',
+    Resend: 'Erneut senden',
+    Next: 'Weiter',
+    Go: 'Weiter',
+    'Reset password': 'Passwort zurücksetzen',
+    'Reset code is required': 'Code zum Zurücksetzen ist erforderlich',
+    'Reset code must be at least 6 characters':
+      'Der Code zum Zurücksetzen muss mindestens 6 Zeichen lang sein.',
+    'Reset code must be at most 6 characters':
+      'Der Code zum Zurücksetzen darf höchstens 6 Zeichen lang sein.',
+    'This field is required': 'Dieses Feld ist erforderlich',
+    'Set a new password': 'Ein neues Passwort festlegen',
+    'Password should contain at least 6 characters':
+      'Das Passwort muss mindestens 6 Zeichen enthalten',
+    'Password should contain at least 1 number':
+      'Das Passwort muss mindestens 1 Zahl enthalten',
+    'Passwords must match': 'Passwörter müssen übereinstimmen',
+    'Code sent successfully': 'Code erfolgreich gesendet',
+    'User account not found': 'Benutzerkonto nicht gefunden',
+    'Sorry, we failed to fulfill the request at this time. Please try again':
+      'Es tut uns leid, wir konnten die Anfrage zu diesem Zeitpunkt nicht erfüllen. Bitte versuchen Sie es erneut.',
+    'Password reset successfully': 'Passwort erfolgreich zurückgesetzt',
+    'Invalid Code': 'Ungültiger Code',
   },
 };
 

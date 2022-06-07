@@ -83,7 +83,7 @@ export const LoginForm = ({
             }}
           />
           <Box display="flex" justifyContent="flex-end" mt={1}>
-            <Link to="/recover" style={{textDecoration: 'none'}}>
+            <Link to="/reset-password" style={{textDecoration: 'none'}}>
               <Button
                 label={t('Forgot Password?')}
                 buttonProps={{
