@@ -78,7 +78,7 @@ export const Overview = () => {
         }}>
         <PageCard
           headerLabel="Timeline"
-          headerContainerOverrideStyles={{pl: '0.3em'}}
+          headerStyles={{pl: '0.3em'}}
           containerStyles={{
             height: '100%',
             overflowY: 'scroll',
