@@ -4,7 +4,7 @@ import {
   useServiceOrderActivities,
   useServiceOrderDetails,
 } from 'hooks/reactQuery/useServiceOrder';
-import {useLocation} from 'react-router';
+import {useParams} from 'react-router';
 import {Progress} from 'components/Progress';
 import {PageCard} from 'components/PageCard';
 
@@ -19,7 +19,7 @@ import {UnitInfoCard} from './UnitInfoCard';
 
 export const Overview = () => {
   const theme = useTheme();
-  const orderId = (useLocation().state as any).id;
+  const {id: orderId} = useParams();
   const {data: serviceOrderDetails, isLoading} =
     useServiceOrderDetails(orderId);
   const {data: serviceOrderActivities = []} =

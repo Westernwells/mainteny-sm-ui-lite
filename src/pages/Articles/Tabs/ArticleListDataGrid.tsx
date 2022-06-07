@@ -160,7 +160,7 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
       },
     )}`,
     stock: item.stock.currentStock,
-    navigationData: {path: 'details', id: item.id},
+    navigateTo: `details/${item.id}`,
     item,
   }));
 

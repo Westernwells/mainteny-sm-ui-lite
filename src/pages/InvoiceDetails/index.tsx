@@ -6,7 +6,7 @@ import {useInvoiceDetail} from 'hooks/reactQuery/useInvoice';
 import {StatusChip} from 'components/StatusChip';
 import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
 import {CardProps} from 'components/CardProps';
-import {useLocation} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import {Button} from 'components/Button';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {convertToText} from 'utils/utils';
@@ -23,7 +23,7 @@ import {RelatedTo} from './RelatedTo';
 import {EditInvoice} from './EditInvoice';
 
 export const InvoiceDetails = () => {
-  const invoiceId = (useLocation().state as any).id;
+  const {id: invoiceId} = useParams();
   const {data: invoice, isLoading, isFetched} = useInvoiceDetail(invoiceId);
 
   const {data: downloadUrl} = useDownloadUrl(

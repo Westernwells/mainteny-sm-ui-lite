@@ -1,5 +1,5 @@
 import {useEffect, useLayoutEffect, useState} from 'react';
-import {useLocation, useNavigate} from 'react-router';
+import {useNavigate, useParams} from 'react-router';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import Typography from '@mui/material/Typography';
@@ -51,7 +51,7 @@ interface Props {
 }
 
 export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
-  const quotationId = (useLocation().state as any).id;
+  const {id: quotationId} = useParams();
 
   const navigate = useNavigate();
 

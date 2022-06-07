@@ -93,5 +93,5 @@ export const makeRows = (serviceOrders: ServiceOrderView[]): GridRowsProp =>
           .join(',')
       : '-',
     status: item.status,
-    navigationData: {path: 'details', id: item.id},
+    navigateTo: `details/${item.id}`,
   }));

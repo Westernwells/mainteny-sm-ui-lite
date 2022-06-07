@@ -104,5 +104,5 @@ export const makeRows = (quotations: Resource<QuotationView>): GridRowsProp =>
       },
     )}`,
     status: item.status,
-    navigationData: {path: 'details', id: item.id},
+    navigateTo: `details/${item.id}`,
   }));

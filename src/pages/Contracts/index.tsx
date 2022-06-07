@@ -72,22 +72,20 @@ export const Contracts = () => {
   };
 
   useEffect(() => {
-    if (!isLoading) {
-      const options: string[] = [];
-      // TODO: Resolve 'any' here
-      contractResource.data.forEach((item: any) => {
-        if (
-          !options.includes(item.serviceCompany.name) &&
-          !contractorFilterItems.includes(item.serviceCompany.name)
-        ) {
-          options.push(item.serviceCompany.name);
-        }
-      });
-      setRows(makeRows(contractResource.data));
+    const options: string[] = [];
+    // TODO: Resolve 'any' here
+    contractResource.data.forEach((item: any) => {
+      if (
+        !options.includes(item.serviceCompany.name) &&
+        !contractorFilterItems.includes(item.serviceCompany.name)
+      ) {
+        options.push(item.serviceCompany.name);
+      }
+    });
+    setRows(makeRows(contractResource.data));
 
-      setContractorFilterItems([...contractorFilterItems, ...options]);
-    }
-  }, [contractResource, isLoading]);
+    setContractorFilterItems([...contractorFilterItems, ...options]);
+  }, [contractResource]);
 
   useEffect(() => {
     setPageCount(Math.ceil(contractResource.total / page.pageSize));

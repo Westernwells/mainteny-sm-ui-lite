@@ -6,7 +6,7 @@ import {useContractDetails} from 'hooks/reactQuery/useContract';
 import Tooltip from '@mui/material/Tooltip';
 import useTheme from '@mui/material/styles/useTheme';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import {useLocation} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import {StatusChip} from 'components/StatusChip';
 import {toDate} from 'utils/datetime';
 import {differenceInDays, isBefore} from 'date-fns';
@@ -21,7 +21,7 @@ import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
 
 export const ContractOverview = () => {
-  const contractId = (useLocation().state as any).id;
+  const {id: contractId} = useParams();
   const theme = useTheme();
   const {data: contractDetails, isLoading} = useContractDetails(contractId!);
 
