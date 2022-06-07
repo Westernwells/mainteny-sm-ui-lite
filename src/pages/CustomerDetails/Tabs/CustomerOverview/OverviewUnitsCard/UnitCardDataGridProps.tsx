@@ -86,6 +86,6 @@ export const makeRows = (
         model: item.model,
         unitNo: item.number,
         status: item.status,
-        navigateTo: `/units/details/${item.id}`,
+        navigationData: {path: 'details', id: item.id},
       }))
     : [];

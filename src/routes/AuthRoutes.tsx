@@ -27,7 +27,7 @@ export const AuthRoutes = () => {
                 location.state.from.search ? location.state.from.search : ''
               }`
         }
-        state={{from: location}}
+        state={{...location.state, from: location}}
         replace
       />
     );

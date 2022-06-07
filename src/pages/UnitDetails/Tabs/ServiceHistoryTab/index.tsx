@@ -20,7 +20,7 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import {Button} from 'components/Button';
 import {getYear, eachYearOfInterval, endOfYear, startOfYear} from 'date-fns';
-import {useParams} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import {HistoryCard} from './HistoryCard';
 import {HistoryReport} from './HistoryReport';
 import {HistoryBasicDetails} from './HistoryBasicDetails';
@@ -30,7 +30,7 @@ const pageSize = 10;
 
 export const ServiceHistoryTab = () => {
   const theme = useTheme();
-  const {id: elevatorId} = useParams();
+  const elevatorId = (useLocation().state as any).id;
   const [selectedYear, setSelectedYear] = useState(
     getYear(new Date()).toString(),
   );

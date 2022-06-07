@@ -3,7 +3,7 @@ import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
-import {useParams} from 'react-router';
+import {useLocation} from 'react-router';
 import {useGetUserAccount} from 'hooks/reactQuery/useUserAccount';
 import {useGetTechnician} from 'hooks/reactQuery/useTechnician';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
@@ -33,7 +33,7 @@ const tabItems = [
 
 export const EmployeeDetails = ({getCurrentPageTitle}: Props) => {
   const [tabValue, setTabValue] = useState(0);
-  const {id: username} = useParams();
+  const username = (useLocation().state as any).id;
   const {data: userAccount, isLoading} = useGetUserAccount(username);
   const [employee, setEmployee] = useState<EmployeesView>();
   const {data: technician} = useGetTechnician(

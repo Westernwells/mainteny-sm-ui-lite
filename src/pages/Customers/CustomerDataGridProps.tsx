@@ -57,7 +57,7 @@ export const makeRows = (customers: any): GridRowsProp =>
         units: item.units,
         phone: item.contact.phone,
         access: 'Invite',
-        navigateTo: `details/${item.id}?tab=0`,
+        navigationData: {path: 'details?tab=0', id: item.id},
         actions: item.contact.email,
       }))
     : console.error('No Data');

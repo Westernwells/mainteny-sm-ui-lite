@@ -140,6 +140,6 @@ export const makeRows = (invoices: InvoiceView[]): GridRowsProp =>
           pdfPath: item.additionalInfo.pdfPath,
           serviceCompanyId: item.serviceCompany.id,
         },
-        navigateTo: `details/${item.id}`,
+        navigationData: {path: 'details', id: item.id},
       }))
     : [];
