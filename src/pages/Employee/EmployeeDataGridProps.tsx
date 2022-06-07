@@ -157,10 +157,7 @@ export const makeRows = (
           phone: item.userAccount.contact.phone,
           shift,
           availability: event,
-          navigationData: {
-            path: 'details?tab=0',
-            id: item.userAccount.username,
-          },
+          navigateTo: `details/${item.userAccount.username}`,
           actions: item.userAccount.contact.email,
         };
       })

@@ -76,6 +76,6 @@ export const makeRows = (contracts: ContractView[]) =>
         cost: `${formatCurrency(item ? item.price! : 0, {
           currency: item.currency,
         })}`,
-        navigationData: {path: 'details', id: item.id},
+        navigateTo: `details/${item.id}`,
       }))
     : [];

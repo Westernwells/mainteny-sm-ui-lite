@@ -62,10 +62,10 @@ export const Invoices = () => {
   }, [queryParams]);
 
   useEffect(() => {
-    if (invoiceResource?.data && !isLoading) {
+    if (invoiceResource?.data) {
       setRows(makeRows(invoiceResource.data));
     }
-  }, [invoiceResource, isLoading]);
+  }, [invoiceResource]);
 
   useEffect(() => {
     setPageCount(Math.ceil(invoiceResource.total / page.pageSize));

@@ -69,6 +69,6 @@ export const makeRows = (contracts: any): GridRowsProp =>
           currency: item.currency,
         })}`,
         expiryDate: formatDate(item.endTime),
-        navigationData: {path: 'details', id: item.id},
+        navigateTo: `/contracts/details/${item.id}`,
       }))
     : console.error('No Data');

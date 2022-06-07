@@ -87,7 +87,7 @@ export const makeRows = ({
       // TODO: Use API data
       activeContracts: Math.floor(Math.random() * 5) + 1,
       elevator,
-      navigationData: {path: 'details', id: elevator.id},
+      navigateTo: `details/${elevator.id}`,
     }));
   return result || [];
 };

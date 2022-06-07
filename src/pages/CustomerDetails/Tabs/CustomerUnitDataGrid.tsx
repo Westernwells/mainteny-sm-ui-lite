@@ -96,6 +96,6 @@ export const makeRows = (
         address: item.address.fullName,
         lastVisit: item.lastVisitDate,
         status: item.status,
-        navigationData: {path: 'details', id: item.id},
+        navigateTo: `/units/details/${item.id}`,
       }))
     : [];
