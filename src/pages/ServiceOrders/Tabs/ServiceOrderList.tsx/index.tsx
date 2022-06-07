@@ -19,6 +19,7 @@ import {
   formatSearchParamsPageSize,
 } from 'utils/utils';
 import {Progress} from 'components/Progress';
+import {FlexContainer} from 'components/FlexContainer';
 import {
   serviceOrderStatusToEnum,
   serviceOrderStatusToString,
@@ -151,7 +152,7 @@ export const ServiceOrderList = () => {
   }
 
   return (
-    <Box sx={{flexGrow: 1, display: 'flex', flexDirection: 'column'}}>
+    <FlexContainer>
       {renderWidget()}
 
       <DataGridLayout
@@ -170,6 +171,6 @@ export const ServiceOrderList = () => {
         pageCount={pageCount}
         totalRows={serviceOrdersResource.total}
       />
-    </Box>
+    </FlexContainer>
   );
 };

@@ -100,7 +100,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/units');
-        navigate('/units?pageIndex=1&pageSize=25');
+        navigate('/units?pageIndex=1&pageSize=25&tab=0');
       },
     },
     {
