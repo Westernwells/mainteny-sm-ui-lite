@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CreateIcon from '@mui/icons-material/Create';
 import Typography from '@mui/material/Typography';
-import {useParams} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import {useArticleDetails} from '../../hooks/reactQuery/useArticle';
 import {Progress} from '../../components/Progress';
 import {BackAction} from '../../components/BackAction';
@@ -14,7 +14,7 @@ import {InfoCard} from '../../components/InfoCard';
 
 // TODO Continue Article Details
 export const ArticleOverView = () => {
-  const {id: articleId} = useParams();
+  const articleId = (useLocation().state as any).id;
   const {data: articleDetail, isLoading} = useArticleDetails(articleId!);
 
   const editArticle = (article?: ArticleView) => {

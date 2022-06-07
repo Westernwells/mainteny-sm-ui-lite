@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {useParams} from 'react-router';
+import {useLocation} from 'react-router';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import Typography from '@mui/material/Typography';
@@ -32,16 +32,11 @@ interface Props {
 }
 
 export const EditInvoice = ({invoice}: Props) => {
-  const {id: invoiceId} = useParams();
-
+  const invoiceId = (useLocation().state as any).id;
   const {mutate: updateQuotation} = useUpdateInvoice();
-
   const [isDrawerOpen] = useState(true);
-
   const [publish, setPublish] = useState(false);
-
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
-
   const [dueDate, setDueDate] = useState<Date | null>(
     invoice && new Date(invoice.dueDate),
   );

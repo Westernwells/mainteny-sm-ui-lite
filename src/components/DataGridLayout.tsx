@@ -150,7 +150,9 @@ export const DataGridLayout = ({
           ((params, e) => {
             e.preventDefault();
             if (params.field !== 'actions') {
-              navigate(params.row.navigateTo);
+              const {navigationData} = params.row;
+              // navigationData: {path: 'details', id: item.id},
+              navigate(navigationData.path, {state: {id: navigationData.id}});
             }
           })
         }

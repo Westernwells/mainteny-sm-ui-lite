@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid';
 import {useEffect, useState} from 'react';
 // import {createEmptyResource} from 'utils/paging-utils';
 // import {endOfYear, startOfYear} from 'date-fns';
-import {useParams} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 // import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {useUseQueryElevatorsContracts} from 'hooks/reactQuery/useContract';
 import {ContractStatus, ContractView} from 'models/contract';
@@ -28,7 +28,7 @@ interface Props {
 // const pageSize = 10;
 
 export const OverviewTab = ({getUnitName}: Props) => {
-  const {id: elevatorId} = useParams();
+  const elevatorId = (useLocation().state as any).id;
   const theme = useTheme();
 
   const [validContract, setValidContract] = useState<ContractView>();

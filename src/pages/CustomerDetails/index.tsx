@@ -6,7 +6,7 @@ import ElevatorIcon from '@mui/icons-material/Elevator';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import {formatSearchParams} from 'utils/utils';
-import {useParams} from 'react-router';
+import {useLocation} from 'react-router';
 import {CustomerOverviewTab} from './Tabs/CustomerOverview';
 import {ContractsTab} from './Tabs/ContractsTab';
 import {UnitsTab} from './Tabs/UnitsTab';
@@ -32,7 +32,7 @@ const tabItems = [
 
 export const CustomerDetails = ({getCurrentPageTitle}: Props) => {
   const [tabValue, setTabValue] = useState(0);
-  const {id: customerId} = useParams();
+  const customerId = (useLocation().state as any).id;
   const [customerName, setCustomerName] = useState('');
   const [queryParams, setQueryParams] = useSearchParams();
 

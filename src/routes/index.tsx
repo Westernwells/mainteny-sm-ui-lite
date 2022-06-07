@@ -62,7 +62,7 @@ export const Router = () => {
       <Route element={<ProtectedRoutes />}>
         <Route
           path="/"
-          element={<Navigate to="/units?pageIndex=1&pageSize=25" />}
+          element={<Navigate to="/units?pageIndex=1&pageSize=25&tab=0" />}
         />
 
         <Route
@@ -79,7 +79,7 @@ export const Router = () => {
           }
         />
         <Route
-          path="/units/details/:id"
+          path="/units/details"
           element={
             <>
               <Helmet>
@@ -111,7 +111,7 @@ export const Router = () => {
           }
         />
         <Route
-          path="/contracts/details/:id"
+          path="/contracts/details"
           element={
             <>
               <Helmet>
@@ -156,7 +156,7 @@ export const Router = () => {
         />
 
         <Route
-          path="/invoices/details/:id"
+          path="/invoices/details"
           element={
             <>
               <Helmet>
@@ -187,7 +187,7 @@ export const Router = () => {
           }
         />
         <Route
-          path="/customers/details/:id"
+          path="/customers/details"
           element={
             <>
               <Helmet>
@@ -216,7 +216,7 @@ export const Router = () => {
         />
 
         <Route
-          path="/employees/details/:id"
+          path="/employees/details"
           element={
             <>
               <Helmet>
@@ -263,7 +263,7 @@ export const Router = () => {
         />
 
         <Route
-          path="/quotations/details/:id"
+          path="/quotations/details"
           element={
             <>
               <Helmet>
@@ -294,7 +294,7 @@ export const Router = () => {
         />
 
         <Route
-          path="/orders/details/:id"
+          path="/orders/details"
           element={
             <>
               <Helmet>
@@ -352,7 +352,7 @@ export const Router = () => {
         />
 
         <Route
-          path="/articles/details/:id"
+          path="/articles/details"
           element={
             <>
               <Helmet>
