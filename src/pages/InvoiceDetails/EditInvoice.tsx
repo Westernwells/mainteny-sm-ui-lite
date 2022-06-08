@@ -55,6 +55,7 @@ export const EditInvoice = ({invoice}: Props) => {
 
   const initialValues: UpdateInvoice = {
     description: '',
+    subject: '',
     dueDate: '',
     issuedDate: '',
     serviceOrderId: '',
@@ -63,6 +64,7 @@ export const EditInvoice = ({invoice}: Props) => {
 
   const validationSchema = Yup.object().shape({
     description: Yup.string().required('Description is required'),
+    subject: Yup.string().required('Subject is required'),
   });
 
   const formik = useFormik({
@@ -101,7 +103,6 @@ export const EditInvoice = ({invoice}: Props) => {
     if (invoiceItems.length) {
       const sum = 0;
       const vat = 0;
-      // TODO: Use factionDigits in calculation
       setTotalPrice(
         invoiceItems
           .map(
@@ -153,6 +154,7 @@ export const EditInvoice = ({invoice}: Props) => {
         ),
       );
       formik.setFieldValue('description', invoice.description, true);
+      formik.setFieldValue('subject', invoice.subject, true);
       formik.setFieldValue('issuedDate', invoice.issuedDate, true);
       formik.setFieldValue('dueDate', invoice.dueDate, true);
       formik.setFieldValue('serviceOrderId', invoice.serviceOrder.id, true);
@@ -256,6 +258,25 @@ export const EditInvoice = ({invoice}: Props) => {
               textFieldProps={{
                 label: 'Due Date',
               }}
+            />
+          </Box>
+
+          <Box mt="1em">
+            <InputLabel>
+              <FormLabel text="Subject" required />
+            </InputLabel>
+            <TextField
+              size="small"
+              id="subject"
+              value={formik.values.subject}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={!!(formik.touched.subject && formik.errors.subject)}
+              helperText={formik.touched.subject && formik.errors.subject}
+              minRows={1}
+              maxRows={2}
+              multiline
+              fullWidth
             />
           </Box>
 
@@ -425,6 +446,7 @@ export const EditInvoice = ({invoice}: Props) => {
         isValid={
           !!(
             formik.values.description &&
+            formik.values.subject &&
             formik.values.items.length &&
             dueDate !== null
           )
