@@ -62,7 +62,7 @@ export const Router = () => {
       <Route element={<ProtectedRoutes />}>
         <Route
           path="/"
-          element={<Navigate to="/units?pageIndex=1&pageSize=25" />}
+          element={<Navigate to="/units?pageIndex=1&pageSize=25&tab=0" />}
         />
 
         <Route
