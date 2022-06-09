@@ -45,6 +45,7 @@ export interface InvoiceView {
   id: string;
   number: string;
   description: string;
+  subject: string;
   totalAmount: Amount;
   issuedDate: string;
   dueDate: string;
@@ -95,6 +96,7 @@ export interface CreateInvoice {
 
 export interface UpdateInvoice {
   description: string;
+  subject: string;
   dueDate: string;
   issuedDate: string;
   items: InvoiceItemRecord<Amount>[];
