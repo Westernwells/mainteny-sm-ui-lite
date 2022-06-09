@@ -12,6 +12,7 @@ import {PageCard} from 'components/PageCard';
 interface Props {
   getLocationFormErrors?: (val: FormikErrors<LocationFormModel>) => void;
   getLocationFormValues?: (val: FormikValues) => void;
+  initialValues?: LocationFormModel;
 }
 
 const validationSchema = Yup.object().shape({
@@ -21,14 +22,15 @@ const validationSchema = Yup.object().shape({
 export const LocationForm = ({
   getLocationFormErrors,
   getLocationFormValues,
+  initialValues,
 }: Props) => {
   const formik = useFormik<LocationFormModel>({
     initialValues: {
-      address: undefined,
-      building: '',
-      propertySegment: '',
-      keyLocation: '',
-      parking: '',
+      address: initialValues?.address,
+      building: initialValues?.building,
+      propertySegment: initialValues?.propertySegment,
+      keyLocation: initialValues?.keyLocation,
+      parking: initialValues?.parking,
     },
     onSubmit: () => {},
     validationSchema,

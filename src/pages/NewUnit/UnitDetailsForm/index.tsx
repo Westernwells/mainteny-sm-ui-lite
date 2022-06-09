@@ -16,8 +16,9 @@ import {CacheTypes} from 'models/misc';
 import {ElevatorCategory} from 'models/elevator';
 
 interface Props {
-  getLocationFormErrors?: (val: FormikErrors<UnitDetailsFormModel>) => void;
-  getLocationFormValues?: (val: FormikValues) => void;
+  getUnitDetailsFormErrors?: (val: FormikErrors<UnitDetailsFormModel>) => void;
+  getUnitDetailsFormValues?: (val: FormikValues) => void;
+  initialValues?: UnitDetailsFormModel;
 }
 
 const validationSchema = Yup.object().shape({
@@ -25,26 +26,27 @@ const validationSchema = Yup.object().shape({
   category: Yup.string().nullable().required('Category is required'),
 });
 
-export const LocationForm = ({
-  getLocationFormErrors,
-  getLocationFormValues,
+export const UnitDetailsForm = ({
+  getUnitDetailsFormErrors,
+  getUnitDetailsFormValues,
+  initialValues,
 }: Props) => {
   const [unitTypeQuery, setUnitTypeQuery] = useState('');
   const [modelQuery, setModelQuery] = useState('');
   const [capacityQuery, setCapacityQuery] = useState('');
   const formik = useFormik<UnitDetailsFormModel>({
     initialValues: {
-      category: '',
-      manufacturer: '',
-      unitNumber: '',
-      numberOfStops: undefined,
-      cabinType: '',
-      emergencyPhoneProvider: '',
-      unitType: '',
-      model: '',
-      serialNumber: '',
-      unitCapacity: '',
-      spendingLimit: undefined,
+      category: initialValues?.category,
+      manufacturer: initialValues?.manufacturer,
+      unitNumber: initialValues?.unitNumber,
+      numberOfStops: initialValues?.numberOfStops,
+      cabinType: initialValues?.cabinType,
+      emergencyPhoneProvider: initialValues?.emergencyPhoneProvider,
+      unitType: initialValues?.unitType,
+      model: initialValues?.model,
+      serialNumber: initialValues?.serialNumber,
+      unitCapacity: initialValues?.unitCapacity,
+      spendingLimit: initialValues?.spendingLimit,
     },
     onSubmit: () => {},
     validationSchema,
@@ -81,12 +83,12 @@ export const LocationForm = ({
     );
 
   useEffect(() => {
-    if (getLocationFormErrors) {
-      getLocationFormErrors(formik.errors);
+    if (getUnitDetailsFormErrors) {
+      getUnitDetailsFormErrors(formik.errors);
     }
 
-    if (getLocationFormValues) {
-      getLocationFormValues(formik.values);
+    if (getUnitDetailsFormValues) {
+      getUnitDetailsFormValues(formik.values);
     }
   }, [formik]);
 
@@ -118,7 +120,10 @@ export const LocationForm = ({
                 label: 'Unit Category',
                 onBlur: formik.handleBlur,
                 error: !!(formik.touched.category && formik.errors.category),
-                helperText: formik.errors.category,
+                helperText:
+                  formik.touched.category && formik.errors.category
+                    ? formik.errors.category
+                    : '',
                 placeholder: 'e.g Escalator',
               }}
             />
@@ -141,7 +146,10 @@ export const LocationForm = ({
                 error: !!(
                   formik.touched.unitNumber && formik.errors.unitNumber
                 ),
-                helperText: formik.errors.unitNumber,
+                helperText:
+                  formik.touched.unitNumber && formik.errors.unitNumber
+                    ? formik.errors.unitNumber
+                    : '',
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
               }}
