@@ -64,6 +64,7 @@ export const LocationForm = ({
               handleBlur={formik.handleBlur}
               textFieldProps={{
                 placeholder: 'e.g. 34-36 Exmouth Market, London EC1R 4QE',
+                required: true,
               }}
               getAddress={(address) =>
                 formik.setValues({

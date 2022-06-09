@@ -33,7 +33,6 @@ export const UnitDetailsForm = ({
 }: Props) => {
   const [unitTypeQuery, setUnitTypeQuery] = useState('');
   const [modelQuery, setModelQuery] = useState('');
-  const [capacityQuery, setCapacityQuery] = useState('');
   const formik = useFormik<UnitDetailsFormModel>({
     initialValues: {
       category: initialValues?.category,
@@ -72,16 +71,6 @@ export const UnitDetailsForm = ({
       CacheTypes.ELEVATOR_MODEL,
     );
 
-  const {data: elevatorCapacityResource = createEmptyResource<string>()} =
-    useCacheValues(
-      {
-        pageIndex: 0,
-        pageSize: 10,
-        query: capacityQuery,
-      },
-      CacheTypes.ELEVATOR_CAPACITY,
-    );
-
   useEffect(() => {
     if (getUnitDetailsFormErrors) {
       getUnitDetailsFormErrors(formik.errors);
@@ -99,7 +88,8 @@ export const UnitDetailsForm = ({
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
         <Grid container spacing={2}>
-          <Grid item md={6}>
+          {/* <Grid item md={4}></Grid> */}
+          <Grid item md={4}>
             <ComboBox
               options={Object.keys(ElevatorCategory).map((item) => ({
                 label: convertToText(item),
@@ -124,12 +114,16 @@ export const UnitDetailsForm = ({
                   formik.touched.category && formik.errors.category
                     ? formik.errors.category
                     : '',
-                placeholder: 'e.g Escalator',
+                placeholder: 'e.g Elevator',
+                required: true,
               }}
             />
+          </Grid>
+
+          <Grid item md={4}>
             <FormInput
               props={{
-                placeholder: 'E.g. Thyssenkrupp, schindler',
+                placeholder: 'e.g. Elevator Installation Meier',
                 label: 'Manufacturer',
                 name: 'manufacturer',
                 value: formik.values.manufacturer,
@@ -137,6 +131,9 @@ export const UnitDetailsForm = ({
                 onChange: formik.handleChange,
               }}
             />
+          </Grid>
+
+          <Grid item md={4}>
             <FormInput
               props={{
                 placeholder: 'Model number of the elevator',
@@ -152,9 +149,12 @@ export const UnitDetailsForm = ({
                     : '',
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
+                required: true,
               }}
             />
+          </Grid>
 
+          <Grid item md={4}>
             <FormInput
               props={{
                 size: 'small',
@@ -166,7 +166,9 @@ export const UnitDetailsForm = ({
                 onChange: formik.handleChange,
               }}
             />
+          </Grid>
 
+          <Grid item md={4}>
             <FormInput
               props={{
                 size: 'small',
@@ -178,7 +180,9 @@ export const UnitDetailsForm = ({
                 onChange: formik.handleChange,
               }}
             />
+          </Grid>
 
+          <Grid item md={4}>
             <FormInput
               props={{
                 size: 'small',
@@ -192,7 +196,7 @@ export const UnitDetailsForm = ({
             />
           </Grid>
 
-          <Grid item md={6}>
+          <Grid item md={4}>
             <ComboBox
               options={elevatorTypeResource.data.map((item) => ({
                 label: item,
@@ -215,7 +219,9 @@ export const UnitDetailsForm = ({
                 label: 'Unit Type',
               }}
             />
+          </Grid>
 
+          <Grid item md={4}>
             <ComboBox
               options={elevatorModelsResource.data.map((item) => ({
                 label: item,
@@ -238,6 +244,8 @@ export const UnitDetailsForm = ({
                 placeholder: 'e.g. S2000',
               }}
             />
+          </Grid>
+          <Grid item md={4}>
             <FormInput
               props={{
                 placeholder: 'Fabric number',
@@ -248,32 +256,22 @@ export const UnitDetailsForm = ({
                 onChange: formik.handleChange,
               }}
             />
+          </Grid>
 
-            <ComboBox
-              options={elevatorCapacityResource.data.map((item) => ({
-                label: item,
-                value: item,
-              }))}
-              getValue={(item) =>
-                formik.setFieldValue('unitCapacity', item?.value)
-              }
-              initialValue={
-                formik.values.unitCapacity
-                  ? {
-                      label: formik.values.unitCapacity,
-                      value: formik.values.unitCapacity,
-                    }
-                  : null
-              }
-              initialQuery={formik.values.unitCapacity}
-              getQuery={(item) => setCapacityQuery(item || '')}
-              textFieldProps={{
+          <Grid item md={4}>
+            <FormInput
+              props={{
                 name: 'unitCapacity',
                 label: 'Unit Capacity',
-                placeholder: 'In kg',
+                placeholder: '1000 kg',
+                value: formik.values.unitCapacity,
+                onBlur: formik.handleBlur,
+                onChange: formik.handleChange,
               }}
             />
+          </Grid>
 
+          <Grid item md={4}>
             <FormInput
               props={{
                 size: 'small',
