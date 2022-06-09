@@ -1,8 +1,10 @@
 import {Box} from '@mui/system';
 import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
+import {TimePicker} from 'components/TimePicker';
 import {FormikProps} from 'formik';
 import {AppointmentFormModel} from 'models/unitForm';
+import {formatDate, setDateTime} from 'utils/datetime';
 
 interface Props {
   formik: FormikProps<AppointmentFormModel>;
@@ -36,13 +38,42 @@ export const EditAppointmentForm = ({formik}: Props) => (
       }}
     />
 
-    <FormInput
-      props={{
-        label: 'Opening Hours',
-        name: 'openingHours',
-        placeholder: 'E.g 07:00 - 17:00',
-        value: formik.values.openingHours,
-        onChange: formik.handleChange,
+    <TimePicker
+      defaultTime={
+        formik.values.openingHour
+          ? setDateTime(new Date(), formik.values.openingHour)
+          : undefined
+      }
+      getSelectedTime={(time) => {
+        formik.setFieldValue(
+          'openingHour',
+          time ? formatDate(time, 'HH:mm') : '',
+        );
+      }}
+      textFieldProps={{
+        label: 'Opening Hour',
+        name: 'openingHour',
+
+        onBlur: formik.handleBlur,
+      }}
+    />
+
+    <TimePicker
+      defaultTime={
+        formik.values.closingHour
+          ? setDateTime(new Date(), formik.values.closingHour)
+          : undefined
+      }
+      getSelectedTime={(time) => {
+        formik.setFieldValue(
+          'closingHour',
+          time ? formatDate(time, 'HH:mm') : '',
+        );
+      }}
+      textFieldProps={{
+        label: 'Closing Hour',
+        name: 'closingHour',
+
         onBlur: formik.handleBlur,
       }}
     />

@@ -33,7 +33,8 @@ export interface ServiceFormModel {
 
 export interface AppointmentFormModel {
   appointmentDaysOfWeek: string[];
-  openingHours: string;
+  openingHour: string;
+  closingHour: string;
   requiresAppointment: string;
   requiresAppointmentNotification: string;
   appointmentNotificationDueInDays: string;

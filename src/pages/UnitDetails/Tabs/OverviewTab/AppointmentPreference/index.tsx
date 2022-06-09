@@ -46,7 +46,12 @@ export const AppointmentPreference = ({
       appointmentDaysOfWeek: propertyRef.appointmentDaysOfWeek
         ? propertyRef.appointmentDaysOfWeek.split(',')
         : [],
-      openingHours: propertyRef.openingHours,
+      openingHour: propertyRef.openingHour
+        ? propertyRef.openingHour.split('-')[0]
+        : '',
+      closingHour: propertyRef.openingHour
+        ? propertyRef.openingHour.split('-')[1]
+        : '',
       requiresAppointment: propertyRef.requiresAppointment || '',
       requiresAppointmentNotification:
         propertyRef.requiresAppointmentNotification || '',
@@ -57,6 +62,8 @@ export const AppointmentPreference = ({
     validationSchema,
   });
 
+  // console.log(propertyRef.openingHour.split('-'), '######');
+
   const onSave = async () => {
     setOpenDialog(false);
     await updateElevator({
@@ -65,7 +72,9 @@ export const AppointmentPreference = ({
         properties: {
           ...elevatorRequestBody?.properties,
           appointmentDaysOfWeek: formik.values.appointmentDaysOfWeek.join(','),
-          openingHours: formik.values.openingHours,
+          openingHours: `${formik.values.openingHour}-${
+            formik.values.closingHour || '17:00'
+          }`,
           requiresAppointment: formik.values.requiresAppointment,
           requiresAppointmentNotification:
             formik.values.requiresAppointmentNotification,

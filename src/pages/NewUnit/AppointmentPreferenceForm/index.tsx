@@ -9,6 +9,8 @@ import * as Yup from 'yup';
 import {useEffect} from 'react';
 import {PageCard} from 'components/PageCard';
 import {FormSelect} from 'components/form/FormSelect';
+import {TimePicker} from 'components/TimePicker';
+import {formatDate, setDateTime} from 'utils/datetime';
 
 interface Props {
   getAppointmentFormErrors?: (val: FormikErrors<AppointmentFormModel>) => void;
@@ -34,7 +36,8 @@ export const AppointmentPreferenceForm = ({
   const formik = useFormik<AppointmentFormModel>({
     initialValues: {
       appointmentDaysOfWeek: initialValues?.appointmentDaysOfWeek || [],
-      openingHours: initialValues?.openingHours || '',
+      openingHour: initialValues?.openingHour || '',
+      closingHour: initialValues?.closingHour || '',
       requiresAppointment: initialValues?.requiresAppointment || '',
       requiresAppointmentNotification:
         initialValues?.requiresAppointmentNotification || '',
@@ -80,13 +83,44 @@ export const AppointmentPreferenceForm = ({
           </Grid>
 
           <Grid item md={4}>
-            <FormInput
-              props={{
-                label: 'Opening Hours',
-                name: 'openingHours',
-                placeholder: 'E.g 07:00 - 17:00',
-                value: formik.values.openingHours,
-                onChange: formik.handleChange,
+            <TimePicker
+              defaultTime={
+                formik.values.openingHour
+                  ? setDateTime(new Date(), formik.values.openingHour)
+                  : undefined
+              }
+              getSelectedTime={(time) => {
+                formik.setFieldValue(
+                  'openingHour',
+                  time ? formatDate(time, 'HH:mm') : '',
+                );
+              }}
+              textFieldProps={{
+                label: 'Opening Hour',
+                name: 'openingHour',
+
+                onBlur: formik.handleBlur,
+              }}
+            />
+          </Grid>
+
+          <Grid item md={4}>
+            <TimePicker
+              defaultTime={
+                formik.values.closingHour
+                  ? setDateTime(new Date(), formik.values.closingHour)
+                  : undefined
+              }
+              getSelectedTime={(time) => {
+                formik.setFieldValue(
+                  'closingHour',
+                  time ? formatDate(time, 'HH:mm') : '',
+                );
+              }}
+              textFieldProps={{
+                label: 'Closing Hour',
+                name: 'closingHour',
+
                 onBlur: formik.handleBlur,
               }}
             />
