@@ -30,7 +30,6 @@ export const FormSelect = ({
   selectProps,
 }: Props<string | string[]>) => (
   <FormControl sx={{marginBlock: '.75em'}} fullWidth>
-    {console.log(selectProps, '~~~~~~~~!!')}
     <InputLabel
       id={labelId}
       shrink

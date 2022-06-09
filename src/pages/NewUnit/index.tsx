@@ -2,9 +2,16 @@
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {FormikErrors, FormikValues} from 'formik';
-import {LocationFormModel, UnitDetailsFormModel} from 'models/unitForm';
+import {
+  AppointmentFormModel,
+  LocationFormModel,
+  ServiceFormModel,
+  UnitDetailsFormModel,
+} from 'models/unitForm';
 import React, {useEffect, useState} from 'react';
+import {AppointmentPreferenceForm} from './AppointmentPreferenceForm';
 import {LocationForm} from './LocationForm/index';
+import {ServiceForm} from './ServiceForm';
 import {UnitDetailsForm} from './UnitDetailsForm';
 
 const steps = [
@@ -13,7 +20,7 @@ const steps = [
   'Add service info',
   'Add appointment preferences',
   'Add priority technicians',
-  'Add Attachments',
+  'Add attachments',
 ];
 
 export const NewUnit = () => {
@@ -46,6 +53,30 @@ export const NewUnit = () => {
       unitCapacity: '',
       spendingLimit: undefined,
     });
+
+  const [serviceFormError, setServicesFormError] = useState<
+    FormikErrors<ServiceFormModel>
+  >({});
+  const [serviceFormValues, setServiceFormValues] = useState<FormikValues>({
+    lastVisitDate: '',
+    lastInspectionDate: '',
+    visitsPerYear: '',
+    serviceTime: '',
+    technicianNumber: '',
+    priority: '',
+  });
+
+  const [appointmentPreferenceFormError, setAppointmentPreferenceFormError] =
+    useState<FormikErrors<AppointmentFormModel>>({});
+  const [appointmentPreferenceFormValues, setAppointmentPreferenceFormValues] =
+    useState<FormikValues>({
+      appointmentDaysOfWeek: [],
+      openingHours: '',
+      requiresAppointment: '',
+      requiresAppointmentNotification: '',
+      appointmentNotificationDueInDays: '',
+    });
+
   const [disableNextBtn, setDisableNextBtn] = useState(false);
   useEffect(() => {
     if (activeStep === 0 && Object.keys(locationFormError).length) {
@@ -53,12 +84,30 @@ export const NewUnit = () => {
     }
 
     if (activeStep === 1 && Object.keys(unitDetailsFormError).length) {
-      console.log(unitDetailsFormError, '|||||>>>>>??');
+      return setDisableNextBtn(true);
+    }
+
+    if (activeStep === 2 && Object.keys(serviceFormError).length) {
+      return setDisableNextBtn(true);
+    }
+
+    if (
+      activeStep === 3 &&
+      Object.keys(appointmentPreferenceFormError).length
+    ) {
       return setDisableNextBtn(true);
     }
 
     return setDisableNextBtn(false);
-  }, [activeStep, locationFormError, unitDetailsFormError]);
+  }, [
+    activeStep,
+    locationFormError,
+    unitDetailsFormError,
+    serviceFormError,
+    appointmentPreferenceFormError,
+  ]);
+
+  console.log(serviceFormError, '>>>>><<<<...');
 
   return (
     <Stepper
@@ -92,6 +141,28 @@ export const NewUnit = () => {
               setUnitDetailsFormValues(values)
             }
             initialValues={unitDetailsFormValues}
+          />
+        ) : null}
+
+        {activeStep === 2 ? (
+          <ServiceForm
+            getServiceFormErrors={(errors) => setServicesFormError(errors)}
+            getServiceFormValues={(values) => setServiceFormValues(values)}
+            initialValues={serviceFormValues}
+          />
+        ) : null}
+
+        {activeStep === 3 ? (
+          <AppointmentPreferenceForm
+            getAppointmentFormErrors={(errors) =>
+              setAppointmentPreferenceFormError(errors)
+            }
+            getAppointmentFormValues={(values) =>
+              setAppointmentPreferenceFormValues(values)
+            }
+            initialValues={
+              appointmentPreferenceFormValues as AppointmentFormModel
+            }
           />
         ) : null}
       </FlexContainer>
