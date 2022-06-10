@@ -1,6 +1,5 @@
-import IconButton from '@mui/material/IconButton';
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
-import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+
 import {StatusChip} from 'components/StatusChip';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
@@ -9,6 +8,7 @@ import {getColumnProps} from 'components/DataGridLayout';
 import {InvoiceStatus, InvoiceView} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
 import {formatDate, toDate} from '../../utils/datetime';
+import {Actions} from './Actions';
 
 export const getInvoiceStatusStyles = (
   status: string,
@@ -99,20 +99,7 @@ export const columns: GridColDef[] = [
     field: 'actions',
     headerName: 'actions',
     align: 'center',
-    renderCell: () => (
-      <IconButton
-        onClick={() =>
-          window.open(
-            `${process.env.REACT_APP_BASE_URL}/INV000128.pdf`,
-            '_blank',
-          )
-        }>
-        <FileDownloadOutlinedIcon
-          fontSize="small"
-          sx={{color: 'action.active'}}
-        />
-      </IconButton>
-    ),
+    renderCell: (params) => <Actions invoice={params.row.invoice} />,
     flex: 0,
   }),
 ];
@@ -140,6 +127,7 @@ export const makeRows = (invoices: InvoiceView[]): GridRowsProp =>
           pdfPath: item.additionalInfo.pdfPath,
           serviceCompanyId: item.serviceCompany.id,
         },
+        invoice: item,
         navigateTo: `details/${item.id}`,
       }))
     : [];

@@ -185,6 +185,7 @@ export const Invoices = () => {
           getSearchValue={(val: string) => setSearch(val)}
           showActionBtn
           btnLabel="New invoice"
+          btnOnClick={() => navigate('/invoices/new')}
           filterItems={renderFilterItems()}
         />
       }>
