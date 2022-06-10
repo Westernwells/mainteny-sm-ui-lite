@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import {Grid, InputLabel, TextField} from '@mui/material';
+import {InputLabel, TextField} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import {A4Layout} from 'components/A4Layout';
 import {SelectModal} from 'components/SelectModal';
@@ -13,9 +13,7 @@ import {SelectCard} from 'components/SelectCard';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {StatusChip} from 'components/StatusChip';
-import {PageCard} from 'components/PageCard';
 import {Button} from 'components/Button';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import CopyAllIcon from '@mui/icons-material/CopyAll';
 
@@ -29,13 +27,14 @@ import {
   UpdateQuotation,
 } from 'models/quotation';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {
   useQuotationDetails,
   useUpdateQuotation,
 } from 'hooks/reactQuery/useQuotation';
 import {formatCurrency} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
-import {WithOptional} from 'models/misc';
+import {PdfGenerationStatus, WithOptional} from 'models/misc';
 import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps';
 import {Label} from './Components/Label';
 import {BottomDrawer} from './Components/BottomDrawer';
@@ -44,7 +43,7 @@ import {CustomersDataGrid} from './DataGrid/CustomersDataGrid';
 import {UnitsDataGrid} from './DataGrid/UnitsDataGrid';
 import {ArticlesDataGrid} from './DataGrid/ArticlesDataGrid';
 import {QuotationHeader} from './Components/QuotationHeader';
-import {PDFContainer} from './Components/PDFContainer';
+import {Quotation} from './Quotation';
 
 interface Props {
   getCurrentPageTitle?: (title: string) => void;
@@ -61,6 +60,13 @@ export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
     isLoading,
     isFetched,
   } = useQuotationDetails(quotationId);
+
+  const {data: downloadUrl} = useDownloadUrl(
+    isFetched &&
+      quotation!.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE
+      ? ([quotation!.additionalInfo.pdfPath] as string[])
+      : [],
+  );
 
   const {mutate: updateQuotation} = useUpdateQuotation();
 
@@ -229,109 +235,10 @@ export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
     quotation.status === QuotationStatus.SENT_TO_CLIENT
   ) {
     return (
-      <Box>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          gap="1em">
-          <Box ml="auto">
-            <StatusChip
-              label={getQuotationStatusStyles(quotation.status).label}
-              color={getQuotationStatusStyles(quotation.status).color}
-              size="small"
-              variant="filled"
-            />
-          </Box>
-          <Button
-            label="Download Quotation"
-            buttonProps={{
-              variant: 'outlined',
-              onClick: () =>
-                window.open(
-                  `${process.env.REACT_APP_BASE_URL}/QuotationPDF.pdf`,
-                  '_blank',
-                ),
-
-              startIcon: <FileDownloadIcon color="primary" />,
-            }}
-          />
-        </Box>
-        <Grid container width="100%" mt="2.5em" mb="2em" gap={2}>
-          <Grid item xs={8}>
-            <PDFContainer />
-          </Grid>
-          <Grid item xs sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
-            <PageCard
-              headerLabel="Service Order"
-              contentContainerStyles={{
-                display: 'flex',
-                gap: '1em',
-                alignItems: 'center',
-                flexDirection: 'column',
-              }}>
-              <Typography variant="subtitle2" textAlign="center">
-                You haven’t created Service Order for this Quotation
-              </Typography>
-              <Button
-                label="Create Service Order"
-                buttonProps={{
-                  size: 'small',
-                }}
-              />
-            </PageCard>
-            <PageCard
-              headerLabel="Quotation Details"
-              contentContainerStyles={{
-                display: 'flex',
-                justifyContent: 'space-between',
-              }}>
-              <Box>
-                <Label text="Quotation Number" sx={{color: 'text.main'}} />
-                <Typography variant="subtitle1" color="primary.main">
-                  {quotation.number}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Created on {formatDate(quotation.meta.createdAt)}
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  component="p">
-                  By
-                  {` ${user?.userAccount.firstName} ${user?.userAccount.lastName}`}
-                </Typography>
-                <Label
-                  text="Total Amount (incl VAT)"
-                  sx={{color: 'text.main'}}
-                />
-                <Typography variant="subtitle1" color="primary.main">
-                  {formatCurrency(
-                    quotation.totalAmount.grossAmount /
-                      10 ** quotation.totalAmount.fractionDigits!,
-                    {currency: quotation.totalAmount.currency},
-                  )}
-                </Typography>
-              </Box>
-              <StatusChip
-                label={getQuotationStatusStyles(quotation.status).label}
-                color={getQuotationStatusStyles(quotation.status).color}
-                size="small"
-                variant="filled"
-              />
-            </PageCard>
-          </Grid>
-        </Grid>
-        <BottomDrawer
-          isOpen={isDrawerOpen}
-          primaryButtonLabel="Duplicate"
-          primaryButtonAction={() => {
-            if (quotationId) navigate(`/quotations/new?id=${quotationId}`);
-          }}
-          listItems={[]}
-          isValid
-        />
-      </Box>
+      <Quotation
+        downloadUrl={downloadUrl ? Object.values(downloadUrl)[0] : ''}
+        quotation={quotation}
+      />
     );
   }
 
@@ -630,16 +537,6 @@ export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
             icon: <CopyAllIcon />,
             onClick: () => {
               navigate(`/quotations/new?id=${quotationId}`);
-            },
-          },
-          {
-            label: 'Download',
-            icon: <FileDownloadIcon />,
-            onClick: () => {
-              window.open(
-                `${process.env.REACT_APP_BASE_URL}/QuotationPDF.pdf`,
-                '_blank',
-              );
             },
           },
         ]}
