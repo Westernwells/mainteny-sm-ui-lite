@@ -12,12 +12,25 @@ import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {NotesForm} from './NotesForm';
 
+interface Props {
+  getAcceptedPictureFiles?: (val: FileWithPreview[]) => void;
+  getAcceptedDocumentFiles?: (val: FileWithPreview[]) => void;
+}
+
 const validationSchema = Yup.object().shape({
   note: Yup.object().nullable().required('Address is required'),
 });
 
-export const Attachments = () => {
-  const [acceptedFiles, setAcceptedFiles] = useState<FileWithPreview[]>([]);
+export const Attachments = ({
+  getAcceptedPictureFiles,
+  getAcceptedDocumentFiles,
+}: Props) => {
+  const [acceptedPictureFiles, setAcceptedPictureFiles] = useState<
+    FileWithPreview[]
+  >([]);
+  const [acceptedDocumentFiles, setAcceptedDocumentFiles] = useState<
+    FileWithPreview[]
+  >([]);
   const {user} = useUserSession();
   const {mutateAsync: uploadImages} = useUploadFiles(
     'Image uploaded successfully',
@@ -78,10 +91,10 @@ export const Attachments = () => {
           </Typography>
           <MyDropZone
             getAcceptedFiles={(files) => {
-              setAcceptedFiles(files);
-            }}
-            getRejectedFileWithErrors={(file) => {
-              console.log(file);
+              if (getAcceptedPictureFiles) {
+                getAcceptedPictureFiles(files);
+              }
+              // setAcceptedFiles(files);
             }}
           />
         </Box>
@@ -94,13 +107,12 @@ export const Attachments = () => {
           </Typography>
           <MyDropZone
             getAcceptedFiles={(files) => {
-              setAcceptedFiles(files);
+              if (getAcceptedDocumentFiles) {
+                getAcceptedDocumentFiles(files);
+              }
             }}
             // acceptedFileTypes='text/*'
             // mimeTypes="application/pdf"
-            getRejectedFileWithErrors={(file) => {
-              console.log(file);
-            }}
           />
         </Box>
       </Box>

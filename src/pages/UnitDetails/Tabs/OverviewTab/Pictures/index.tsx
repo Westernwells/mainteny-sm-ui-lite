@@ -167,9 +167,6 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
           getAcceptedFiles={(files) => {
             setAcceptedFiles(files);
           }}
-          getRejectedFileWithErrors={(file) => {
-            console.log(file);
-          }}
         />
       </Dialog>
     </InfoCard>

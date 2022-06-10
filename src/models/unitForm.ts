@@ -15,6 +15,10 @@ export interface UnitDetailsFormModel {
   numberOfStops?: number;
   cabinType?: string;
   emergencyPhoneProvider?: string;
+  emergencyContractNumber?: string;
+  yearBuilt?: string;
+  modelOfController?: string;
+  manufacturerOfController?: string;
   unitType?: string;
   model?: string;
   serialNumber?: string;

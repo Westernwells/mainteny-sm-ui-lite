@@ -128,7 +128,7 @@ export const ServiceForm = ({
               props={{
                 label: 'Required time',
                 name: 'serviceTime',
-                placeholder: 'In minutes',
+                placeholder: 'e.g. 45 min',
                 value: formik.values.serviceTime,
                 helperText:
                   formik.errors.serviceTime && formik.touched.serviceTime

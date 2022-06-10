@@ -46,6 +46,10 @@ export const UnitDetailsForm = ({
       serialNumber: initialValues?.serialNumber,
       unitCapacity: initialValues?.unitCapacity,
       spendingLimit: initialValues?.spendingLimit,
+      emergencyContractNumber: initialValues?.emergencyContractNumber,
+      yearBuilt: initialValues?.yearBuilt,
+      modelOfController: initialValues?.modelOfController,
+      manufacturerOfController: initialValues?.manufacturerOfController,
     },
     onSubmit: () => {},
     validationSchema,
@@ -263,7 +267,7 @@ export const UnitDetailsForm = ({
               props={{
                 name: 'unitCapacity',
                 label: 'Unit Capacity',
-                placeholder: '1000 kg',
+                placeholder: 'e.g 1000 kg',
                 value: formik.values.unitCapacity,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
@@ -281,6 +285,58 @@ export const UnitDetailsForm = ({
                 name: 'spendingLimit',
                 error: !!formik.errors.spendingLimit,
                 value: formik.values.spendingLimit,
+                onBlur: formik.handleBlur,
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+
+          <Grid item md={4}>
+            <FormInput
+              props={{
+                name: 'emergencyContactNumber',
+                label: 'Emergency Contact Number',
+                placeholder: 'e.g. +49 1000 00000000',
+                value: formik.values.emergencyContractNumber,
+                onBlur: formik.handleBlur,
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+
+          <Grid item md={4}>
+            <FormInput
+              props={{
+                name: 'yearBuilt',
+                label: 'Year Built',
+                placeholder: 'e.g. 2000',
+                value: formik.values.yearBuilt,
+                onBlur: formik.handleBlur,
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+
+          <Grid item md={4}>
+            <FormInput
+              props={{
+                name: 'modelOfController',
+                label: 'Model of Controller',
+                placeholder: 'e.g. TX2000',
+                value: formik.values.modelOfController,
+                onBlur: formik.handleBlur,
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+
+          <Grid item md={4}>
+            <FormInput
+              props={{
+                name: 'manufacturerOfController',
+                label: 'Manufacturer of Controller',
+                placeholder: 'e.g. Schneider',
+                value: formik.values.manufacturerOfController,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
               }}

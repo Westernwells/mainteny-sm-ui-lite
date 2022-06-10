@@ -14,7 +14,7 @@ import {formatDate, setDateTime} from 'utils/datetime';
 
 interface Props {
   getAppointmentFormErrors?: (val: FormikErrors<AppointmentFormModel>) => void;
-  getAppointmentFormValues?: (val: FormikValues) => void;
+  getAppointmentFormValues?: (val: AppointmentFormModel) => void;
   initialValues?: AppointmentFormModel;
 }
 
