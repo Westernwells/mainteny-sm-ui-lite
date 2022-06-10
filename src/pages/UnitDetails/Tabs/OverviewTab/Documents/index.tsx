@@ -167,7 +167,6 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
           getAcceptedFiles={(files) => {
             setAcceptedFiles(files);
           }}
-          acceptedFileTypes="application/pdf"
           getRejectedFileWithErrors={(file) => {
             console.log(file);
           }}

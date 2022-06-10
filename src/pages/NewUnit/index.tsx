@@ -12,6 +12,7 @@ import {
 } from 'models/unitForm';
 import React, {useEffect, useState} from 'react';
 import {AppointmentPreferenceForm} from './AppointmentPreferenceForm';
+import {Attachments} from './Attachments';
 import {LocationForm} from './LocationForm/index';
 import {
   AddPriorityTechnicianFormModel,
@@ -199,6 +200,8 @@ export const NewUnit = () => {
             initialTechniciansValueMap={techniciansValueMap}
           />
         ) : null}
+
+        {activeStep === 5 ? <Attachments /> : null}
       </FlexContainer>
     </Stepper>
   );
