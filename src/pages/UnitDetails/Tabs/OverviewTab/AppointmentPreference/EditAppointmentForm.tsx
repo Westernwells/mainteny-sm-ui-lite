@@ -47,7 +47,9 @@ export const EditAppointmentForm = ({formik}: Props) => (
       getSelectedTime={(time) => {
         formik.setFieldValue(
           'openingHour',
-          time ? formatDate(time, 'HH:mm') : '',
+          time instanceof Date && !Number.isNaN(time.valueOf())
+            ? formatDate(time, 'HH:mm')
+            : '',
         );
       }}
       textFieldProps={{
@@ -67,7 +69,9 @@ export const EditAppointmentForm = ({formik}: Props) => (
       getSelectedTime={(time) => {
         formik.setFieldValue(
           'closingHour',
-          time ? formatDate(time, 'HH:mm') : '',
+          time instanceof Date && !Number.isNaN(time.valueOf())
+            ? formatDate(time, 'HH:mm')
+            : '',
         );
       }}
       textFieldProps={{

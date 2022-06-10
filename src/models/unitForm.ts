@@ -46,5 +46,5 @@ export interface NotesFormModel {
 
 export interface PriorityTechnicianFormModel {
   technicianId: string | null;
-  priority: number;
+  priority?: number;
 }

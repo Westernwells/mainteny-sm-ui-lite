@@ -59,7 +59,7 @@ export const AppointmentPreferenceForm = ({
 
   return (
     <PageCard
-      headerLabel="Location Information"
+      headerLabel="Appointment Preferences"
       containerStyles={{flexGrow: 1}}
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
@@ -92,7 +92,9 @@ export const AppointmentPreferenceForm = ({
               getSelectedTime={(time) => {
                 formik.setFieldValue(
                   'openingHour',
-                  time ? formatDate(time, 'HH:mm') : '',
+                  time instanceof Date && !Number.isNaN(time.valueOf())
+                    ? formatDate(time, 'HH:mm')
+                    : '',
                 );
               }}
               textFieldProps={{
@@ -114,7 +116,9 @@ export const AppointmentPreferenceForm = ({
               getSelectedTime={(time) => {
                 formik.setFieldValue(
                   'closingHour',
-                  time ? formatDate(time, 'HH:mm') : '',
+                  time instanceof Date && !Number.isNaN(time.valueOf())
+                    ? formatDate(time, 'HH:mm')
+                    : '',
                 );
               }}
               textFieldProps={{

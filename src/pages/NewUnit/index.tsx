@@ -2,15 +2,21 @@
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {FormikErrors, FormikValues} from 'formik';
+import {TechnicianView} from 'models/technician';
 import {
   AppointmentFormModel,
   LocationFormModel,
+  PriorityTechnicianFormModel,
   ServiceFormModel,
   UnitDetailsFormModel,
 } from 'models/unitForm';
 import React, {useEffect, useState} from 'react';
 import {AppointmentPreferenceForm} from './AppointmentPreferenceForm';
 import {LocationForm} from './LocationForm/index';
+import {
+  AddPriorityTechnicianFormModel,
+  PriorityTechnicianForm,
+} from './PriorityTechnicianForm';
 import {ServiceForm} from './ServiceForm';
 import {UnitDetailsForm} from './UnitDetailsForm';
 
@@ -25,6 +31,8 @@ const steps = [
 
 export const NewUnit = () => {
   const [activeStep, setActiveStep] = useState(0);
+  const [techniciansValueMap, setTechnicianValueMap] =
+    useState<{[key: string]: TechnicianView | null}>();
   const [locationFormError, setLocationFormError] = useState<
     FormikErrors<LocationFormModel>
   >({});
@@ -77,6 +85,14 @@ export const NewUnit = () => {
       appointmentNotificationDueInDays: '',
     });
 
+  const [priorityTechnicianFormError, setPriorityTechnicianFormError] =
+    useState<FormikErrors<PriorityTechnicianFormModel>>({});
+  const [priorityTechnicianFormValues, setPriorityTechnicianFormValues] =
+    useState<FormikValues>({
+      technicianId_1: '',
+      priority_1: '',
+    });
+
   const [disableNextBtn, setDisableNextBtn] = useState(false);
   useEffect(() => {
     if (activeStep === 0 && Object.keys(locationFormError).length) {
@@ -98,6 +114,10 @@ export const NewUnit = () => {
       return setDisableNextBtn(true);
     }
 
+    if (activeStep === 4 && Object.keys(priorityTechnicianFormError).length) {
+      return setDisableNextBtn(true);
+    }
+
     return setDisableNextBtn(false);
   }, [
     activeStep,
@@ -106,8 +126,6 @@ export const NewUnit = () => {
     serviceFormError,
     appointmentPreferenceFormError,
   ]);
-
-  console.log(serviceFormError, '>>>>><<<<...');
 
   return (
     <Stepper
@@ -163,6 +181,22 @@ export const NewUnit = () => {
             initialValues={
               appointmentPreferenceFormValues as AppointmentFormModel
             }
+          />
+        ) : null}
+
+        {activeStep === 4 ? (
+          <PriorityTechnicianForm
+            getPriorityTechnicianFormErrors={(errors) =>
+              setPriorityTechnicianFormError(errors)
+            }
+            getPriorityTechnicianFormValues={(values) =>
+              setPriorityTechnicianFormValues(values)
+            }
+            initialValues={
+              priorityTechnicianFormValues as AddPriorityTechnicianFormModel
+            }
+            getTechnicianMapValue={(item) => setTechnicianValueMap(item)}
+            initialTechniciansValueMap={techniciansValueMap}
           />
         ) : null}
       </FlexContainer>
