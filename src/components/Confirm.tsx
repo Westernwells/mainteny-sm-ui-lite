@@ -12,9 +12,17 @@ interface Props {
   onClose: () => void;
   title?: string;
   content?: string;
+  helperText?: string;
 }
 
-export const Confirm = ({open, onConfirm, onClose, title, content}: Props) => (
+export const Confirm = ({
+  open,
+  onConfirm,
+  onClose,
+  title,
+  content,
+  helperText,
+}: Props) => (
   <Dialog
     open={open || false}
     onClose={onClose}
@@ -22,8 +30,13 @@ export const Confirm = ({open, onConfirm, onClose, title, content}: Props) => (
     aria-describedby="alert-dialog-description">
     <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
     <DialogContent>
-      <DialogContentText id="alert-dialog-description">
-        {content}
+      <DialogContentText
+        id="alert-dialog-description"
+        sx={{color: 'text.primary'}}>
+        <Typography>{content}</Typography>
+        {helperText && (
+          <Typography variant="subtitle2">{helperText}</Typography>
+        )}
       </DialogContentText>
     </DialogContent>
     <DialogActions>

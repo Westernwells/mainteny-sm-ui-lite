@@ -170,6 +170,36 @@ export const usePublishInvoice = () => {
   });
 };
 
+export const putInvoicePaymentStatus = async (id: string) => {
+  await axiosClient.put(`api/invoices/${id}/payment`);
+};
+
+export const useInvoicePaymentStatus = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  const navigate = useNavigate();
+
+  return useMutation(
+    (invoiceId: string) => putInvoicePaymentStatus(invoiceId),
+    {
+      onSuccess: (__, invoiceId) => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+        enqueueSnackbar(`Invoice marked as paid!`, {
+          variant: 'success',
+        });
+        navigate(`/invoices/details/${invoiceId}`);
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again!', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
 export const postInvoice = async (body: CreateInvoice) => {
   const {data} = await axiosClient.post<{value: string}>('api/invoices', body);
   return {data};

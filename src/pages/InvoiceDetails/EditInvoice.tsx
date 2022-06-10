@@ -34,7 +34,7 @@ interface Props {
 export const EditInvoice = ({invoice}: Props) => {
   const {id: invoiceId} = useParams();
 
-  const {mutate: updateQuotation} = useUpdateInvoice();
+  const {mutate: updateInvoice} = useUpdateInvoice();
 
   const [isDrawerOpen] = useState(true);
 
@@ -72,7 +72,7 @@ export const EditInvoice = ({invoice}: Props) => {
     validationSchema,
     onSubmit: (values) => {
       if (invoiceId) {
-        updateQuotation({data: values, invoiceId, publish});
+        updateInvoice({data: values, invoiceId, publish});
       }
     },
   });
