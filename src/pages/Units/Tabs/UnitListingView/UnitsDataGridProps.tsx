@@ -49,6 +49,7 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'priorityTechnician',
     headerName: 'priority technician',
+    cellClassName: 'truncateText',
   }),
   getColumnProps({
     field: 'activeContracts',
@@ -84,7 +85,12 @@ export const makeRows = ({
       address: elevator.address.fullName,
       headerText: elevator.address.fullName,
       priorityTechnician: elevator.assignments.length
-        ? `${elevator.assignments[0].technician.userAccount.firstName} ${elevator.assignments[0].technician.userAccount.lastName}`
+        ? elevator.assignments
+            .map(
+              (item) =>
+                `${item.technician.userAccount.firstName} ${item.technician.userAccount.lastName}`,
+            )
+            .join(', ')
         : '-',
       activeContracts: !!elevator.contracts.length,
       elevator,
