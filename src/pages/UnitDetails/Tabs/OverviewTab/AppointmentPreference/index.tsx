@@ -38,7 +38,7 @@ export const AppointmentPreference = ({
     'Appointment preference updated successfully',
   );
   const propertyRef = useRef(
-    makeKeyValueFromArrayOfObjects(elevator.properties),
+    makeKeyValueFromArrayOfObjects(elevator.properties || []),
   ).current;
 
   const formik = useFormik<AppointmentFormModel>({
@@ -96,14 +96,15 @@ export const AppointmentPreference = ({
       headerActionIcon={<EditIcon />}
       showHeaderBackground>
       <Grid container spacing={1}>
-        {elevator.properties.map((property) => (
-          <Grid key={property.key} item xs={12} sm={4} md={6}>
-            <AppointmentPreferenceSchema
-              label={property.key}
-              property={property}
-            />
-          </Grid>
-        ))}
+        {elevator.properties &&
+          elevator.properties.map((property) => (
+            <Grid key={property.key} item xs={12} sm={4} md={6}>
+              <AppointmentPreferenceSchema
+                label={property.key}
+                property={property}
+              />
+            </Grid>
+          ))}
       </Grid>
       <Dialog
         title="Edit Appointment Preferences"

@@ -15,13 +15,13 @@ import {
   useFetchCustomerElevatorNumbers,
   useQueryCustomers,
 } from 'hooks/reactQuery/useCustomers';
-import {PropertyOwner} from 'models/propertyManager';
+import {PropertyOwnerView} from 'models/propertyManager';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {NoRowsEmptySection} from './NoRowsEmptySection';
 import {styles} from './style';
 
 interface Props {
-  setRowItem: (row: PropertyOwner) => void;
+  setRowItem: (row: PropertyOwnerView) => void;
 }
 
 const defaultProps = {
@@ -90,7 +90,7 @@ export const columns: GridColDef[] = [
   },
 ];
 
-export const makeRows = (customers: PropertyOwner[]): GridRowsProp =>
+export const makeRows = (customers: PropertyOwnerView[]): GridRowsProp =>
   customers
     ? customers.map((item, index) => ({
         id: index,
@@ -113,7 +113,7 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
   const [pageCount, setPageCount] = useState(0);
 
   const {
-    data: customerResource = createEmptyResource<PropertyOwner>(pageSize),
+    data: customerResource = createEmptyResource<PropertyOwnerView>(pageSize),
   } = useQueryCustomers(
     {
       pageIndex: page.pageIndex,

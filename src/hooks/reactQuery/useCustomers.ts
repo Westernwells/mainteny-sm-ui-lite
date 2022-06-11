@@ -1,5 +1,9 @@
 import {Resource, RestError, WithOptional} from 'models/misc';
-import {PropertyOwner, QueryPropertyOwnersParams} from 'models/propertyManager';
+import {
+  PropertyOwner,
+  PropertyOwnerView,
+  QueryPropertyOwnersParams,
+} from 'models/propertyManager';
 import {useCallback} from 'react';
 import {useQuery, UseQueryOptions} from 'react-query';
 import {queryKeys as qks, queryKeys} from 'reactQuery/constants';
@@ -20,18 +24,18 @@ export const fetchCustomerElevatorNumbers = async (
 };
 
 export const useFetchCustomerElevatorNumbers = (
-  customers: PropertyOwner[],
+  customers: PropertyOwnerView[],
   options?: UseQueryOptions<
     {
       [key: string]: number;
     },
     RestError,
-    PropertyOwner[]
+    PropertyOwnerView[]
   >,
 ) => {
   const propertyOwnerIds = customers.map((customer) => customer.id);
 
-  return useQuery<{[key: string]: number}, RestError, PropertyOwner[]>(
+  return useQuery<{[key: string]: number}, RestError, PropertyOwnerView[]>(
     [qks.fetchCustomerElevatorNumbers, propertyOwnerIds],
     () => fetchCustomerElevatorNumbers(propertyOwnerIds),
     {
@@ -51,7 +55,7 @@ export const useFetchCustomerElevatorNumbers = (
 };
 
 export const queryCustomers = async (params: QueryPropertyOwnersParams) => {
-  const response = await axiosClient.get<Resource<PropertyOwner>>(
+  const response = await axiosClient.get<Resource<PropertyOwnerView>>(
     '/api/propertyOwners',
     {
       params,

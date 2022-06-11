@@ -3,21 +3,29 @@
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {FormikErrors, FormikValues} from 'formik';
+import {
+  useAddElevator,
+  useUpdateElevatorTechnician,
+} from 'hooks/reactQuery/useElevator';
+import {ElevatorStatus} from 'models/elevator';
+import {Priority} from 'models/misc';
+import {PropertyOwnerView} from 'models/propertyManager';
 import {TechnicianView} from 'models/technician';
 import {
   AppointmentFormModel,
+  CustomerFormModel,
   LocationFormModel,
   PriorityTechnicianFormModel,
   ServiceFormModel,
   UnitDetailsFormModel,
 } from 'models/unitForm';
 import {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router';
+import {formatDate} from 'utils/datetime';
+import {convertToMacro} from 'utils/utils';
 import {AppointmentPreferenceForm} from './AppointmentPreferenceForm';
+import {CustomerForm} from './CustomerForm';
 import {LocationForm} from './LocationForm/index';
-import {
-  AddPriorityTechnicianFormModel,
-  PriorityTechnicianForm,
-} from './PriorityTechnicianForm';
 import {ServiceForm} from './ServiceForm';
 import {UnitDetailsForm} from './UnitDetailsForm';
 
@@ -27,13 +35,25 @@ const steps = [
   'Add unit details',
   'Add service info',
   'Add appointment preferences',
-  'Add priority technicians',
 ];
 
 export const NewUnit = () => {
+  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
-  const [techniciansValueMap, setTechnicianValueMap] =
-    useState<{[key: string]: TechnicianView | null}>();
+
+  const [customerFormError, setCustomerFormError] = useState<
+    FormikErrors<CustomerFormModel>
+  >({});
+  const [customerFormValues, setCustomerFormValues] =
+    useState<CustomerFormModel>({
+      propertyOwnerId: '',
+    });
+  const [customer, setCustomer] = useState<PropertyOwnerView>();
+
+  const {mutateAsync: addNewUnit, isLoading: isSubmitting} = useAddElevator(
+    'Unit created successfully',
+  );
+
   const [locationFormError, setLocationFormError] = useState<
     FormikErrors<LocationFormModel>
   >({});
@@ -63,7 +83,7 @@ export const NewUnit = () => {
       unitCapacity: '',
       spendingLimit: undefined,
       emergencyContractNumber: '',
-      yearBuilt: '',
+      yearBuilt: undefined,
       modelOfController: '',
       manufacturerOfController: '',
     });
@@ -77,7 +97,7 @@ export const NewUnit = () => {
     visitsPerYear: undefined,
     serviceTime: undefined,
     technicianNumber: undefined,
-    priority: '',
+    priority: Priority.NONE,
   });
 
   const [appointmentPreferenceFormError, setAppointmentPreferenceFormError] =
@@ -92,16 +112,12 @@ export const NewUnit = () => {
       appointmentNotificationDueInDays: '',
     });
 
-  const [priorityTechnicianFormError, setPriorityTechnicianFormError] =
-    useState<FormikErrors<PriorityTechnicianFormModel>>({});
-  const [priorityTechnicianFormValues, setPriorityTechnicianFormValues] =
-    useState<FormikValues>({
-      technicianId_1: '',
-      priority_1: '',
-    });
-
   const [disableNextBtn, setDisableNextBtn] = useState(false);
   useEffect(() => {
+    if (activeStep === 0 && Object.keys(customerFormError).length) {
+      return setDisableNextBtn(true);
+    }
+
     if (activeStep === 1 && Object.keys(locationFormError).length) {
       return setDisableNextBtn(true);
     }
@@ -121,10 +137,6 @@ export const NewUnit = () => {
       return setDisableNextBtn(true);
     }
 
-    if (activeStep === 5 && Object.keys(priorityTechnicianFormError).length) {
-      return setDisableNextBtn(true);
-    }
-
     return setDisableNextBtn(false);
   }, [
     activeStep,
@@ -132,12 +144,39 @@ export const NewUnit = () => {
     unitDetailsFormError,
     serviceFormError,
     appointmentPreferenceFormError,
+    customerFormError,
   ]);
 
-  const createNewUnit = () => {
+  const getOpeningHours = () => {
+    if (
+      appointmentPreferenceFormValues.openingHour &&
+      appointmentPreferenceFormValues.closingHour
+    ) {
+      return `${appointmentPreferenceFormValues.openingHour}-${appointmentPreferenceFormValues.closingHour}`;
+    }
+
+    if (
+      appointmentPreferenceFormValues.openingHour &&
+      !appointmentPreferenceFormValues.closingHour
+    ) {
+      return appointmentPreferenceFormValues.openingHour;
+    }
+  };
+
+  console.log(
+    appointmentPreferenceFormValues,
+    appointmentPreferenceFormError,
+    '---------><<<<<------',
+  );
+
+  const createNewUnit = async () => {
     // save images and documents
     // save notes
     // create body
+
+    const openingHours = getOpeningHours();
+    // delete appointmentPreferenceFormValues?.openingHour;
+    // delete appointmentPreferenceFormValues?.closingHour;
 
     const body = {
       address: locationFormValues.address,
@@ -145,76 +184,65 @@ export const NewUnit = () => {
       builtYear: unitDetailsFormValues.yearBuilt,
       cabinType: unitDetailsFormValues.cabinType,
       capacity: unitDetailsFormValues.unitCapacity,
-      category: unitDetailsFormValues.category,
+      category: convertToMacro(unitDetailsFormValues.category!),
       controllerManufacturer: unitDetailsFormValues.manufacturerOfController,
       controllerModel: unitDetailsFormValues.modelOfController,
       documents: [],
       emergencyContractNumber: unitDetailsFormError.emergencyContractNumber,
       emergencyPhoneProvider: unitDetailsFormError.emergencyPhoneProvider,
       keyLocation: locationFormValues.keyLocation,
-      lastInspectionDate: serviceFormValues.lastInspectionDate,
-      lastVisitDate: serviceFormValues.lastVisitDate,
+      lastInspectionDate: formatDate(
+        serviceFormValues.lastInspectionDate,
+        'yyyy-MM-dd',
+      ),
+      lastVisitDate: formatDate(serviceFormValues.lastVisitDate, 'yyyy-MM-dd'),
       manufacturer: unitDetailsFormValues.manufacturer,
       model: unitDetailsFormValues.model,
       number: unitDetailsFormValues.unitNumber,
       numberOfStops: unitDetailsFormValues.numberOfStops,
       parking: locationFormValues.parking,
       pictures: [],
-      priority: serviceFormValues.priority,
+      priority: serviceFormValues.priority as Priority,
       properties: {
-        ...appointmentPreferenceFormValues,
-        appointmentDaysOfWeek:
-          appointmentPreferenceFormValues.appointmentDaysOfWeek.join(','),
+        appointmentDaysOfWeek: appointmentPreferenceFormValues
+          ? appointmentPreferenceFormValues.appointmentDaysOfWeek.join(',')
+          : undefined,
+        appointmentNotificationDueInDays:
+          appointmentPreferenceFormValues?.appointmentNotificationDueInDays ||
+          undefined,
+        openingHours: getOpeningHours(),
+        requiresAppointment:
+          appointmentPreferenceFormValues?.requiresAppointment || undefined,
+        requiresAppointmentNotification:
+          appointmentPreferenceFormValues?.requiresAppointmentNotification ||
+          undefined,
       },
       // propertyManagerId: elevator.propertyManager?.id || '',
-      // propertyOwnerId: elevator.propertyOwner.id,
+      propertyOwnerId: customerFormValues.propertyOwnerId,
       propertySegment: locationFormValues.propertySegment,
       // qrCode: elevator.additionalInfo.qrCode,
       serialNumber: unitDetailsFormValues.serialNumber,
       serviceTime: serviceFormValues.serviceTime,
-      // status: elevator.status,
+      status: ElevatorStatus.RUNNING,
       technicianNumber: serviceFormValues.technicianNumber,
-      type: serviceFormValues,
-
-      // buildingLocation: elevator.additionalInfo.buildingLocation,
-      // builtYear: elevator.additionalInfo.builtYear,
-      // cabinType: elevator.additionalInfo.cabinType,
-      // capacity: elevator.capacity,
-      // category: elevator.category,
-      // controllerManufacturer: elevator.additionalInfo.controllerManufacturer,
-      // controllerModel: elevator.additionalInfo.controllerModel,
-      // documents: elevator.additionalInfo.documents,
-      // emergencyContractNumber: elevator.additionalInfo.emergencyContractNumber,
-      // emergencyPhoneProvider: elevator.additionalInfo.emergencyPhoneProvider,
-      // keyLocation: elevator.additionalInfo.keyLocation,
-      // lastInspectionDate: elevator.additionalInfo.lastInspectionDate,
-      // lastVisitDate: elevator.lastVisitDate,
-      // manufacturer: elevator.additionalInfo.manufacturer,
-      // model: elevator.model,
-      // number: elevator.number,
-      // numberOfStops: elevator.additionalInfo.numberOfStops,
-      // parking: elevator.additionalInfo.parking,
-      // pictures: elevator.additionalInfo.pictures,
-      // priority: elevator.additionalInfo.priority,
-      // properties,
-      // // propertyManagerId: elevator.propertyManager?.id || '',
-      // propertyOwnerId: elevator.propertyOwner.id,
-      // propertySegment: elevator.additionalInfo.propertySegment,
-      // qrCode: elevator.additionalInfo.qrCode,
-      // serialNumber: elevator.serialNumber,
-      // serviceTime: elevator.serviceTime,
-      // status: elevator.status,
-      // technicianNumber: elevator.technicianNumber,
-      // type: elevator.type,
+      type: unitDetailsFormValues.unitType,
     };
+
+    const response = await addNewUnit(body);
+    if (response) {
+      navigate(`/units/details/${response.value}`, {replace: true});
+    }
+
+    // console.log(body, '@@@@@@');
   };
 
   return (
     <Stepper
       handleCancel={() => {}}
-      handleSubmit={() => {}}
+      handleSubmit={() => createNewUnit()}
       stepperWidth="100%"
-      disableNextBtn={disableNextBtn}
+      disableNextBtn={disableNextBtn || isSubmitting}
+      submitting={isSubmitting}
       getActiveStep={(val) => setActiveStep(val)}
       steps={steps}
       containerStyles={{
@@ -224,6 +252,15 @@ export const NewUnit = () => {
         flexDirection: 'column',
       }}>
       <FlexContainer containerStyle={{mt: '1em'}}>
+        {activeStep === 0 ? (
+          <CustomerForm
+            getCustomerFormErrors={(errors) => setCustomerFormError(errors)}
+            getCustomerFormValues={(values) => setCustomerFormValues(values)}
+            initialValues={customerFormValues}
+            getCustomer={(item) => setCustomer(item)}
+            initialCustomer={customer}
+          />
+        ) : null}
         {activeStep === 1 ? (
           <LocationForm
             getLocationFormErrors={(errors) => setLocationFormError(errors)}
@@ -263,22 +300,6 @@ export const NewUnit = () => {
             initialValues={
               appointmentPreferenceFormValues as AppointmentFormModel
             }
-          />
-        ) : null}
-
-        {activeStep === 5 ? (
-          <PriorityTechnicianForm
-            getPriorityTechnicianFormErrors={(errors) =>
-              setPriorityTechnicianFormError(errors)
-            }
-            getPriorityTechnicianFormValues={(values) =>
-              setPriorityTechnicianFormValues(values)
-            }
-            initialValues={
-              priorityTechnicianFormValues as AddPriorityTechnicianFormModel
-            }
-            getTechnicianMapValue={(item) => setTechnicianValueMap(item)}
-            initialTechniciansValueMap={techniciansValueMap}
           />
         ) : null}
       </FlexContainer>

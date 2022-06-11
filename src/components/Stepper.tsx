@@ -15,6 +15,7 @@ interface Props {
   handleSubmit?: () => void;
   getActiveStep?: (val: number) => void;
   disableNextBtn?: boolean;
+  submitting?: boolean;
 }
 
 export const Stepper = ({
@@ -26,6 +27,7 @@ export const Stepper = ({
   getActiveStep,
   disableNextBtn,
   stepperWidth,
+  submitting,
 }: Props) => {
   const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
@@ -100,7 +102,11 @@ export const Stepper = ({
               onClick={
                 activeStep === steps.length - 1 ? handleSubmit : handleNext
               }>
-              {activeStep === steps.length - 1 ? 'Submit' : 'Next'}
+              {activeStep === steps.length - 1
+                ? submitting
+                  ? 'Submitting...'
+                  : 'Submit'
+                : 'Next'}
             </Button>
           </Box>
         </Box>

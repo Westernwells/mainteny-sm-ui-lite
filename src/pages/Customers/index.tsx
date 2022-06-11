@@ -3,7 +3,7 @@ import {useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {PropertyOwner} from 'models/propertyManager';
+import {PropertyOwnerView} from 'models/propertyManager';
 import {Progress} from 'components/Progress';
 import {
   useFetchCustomerElevatorNumbers,
@@ -29,7 +29,7 @@ export const Customer = () => {
   const [pageCount, setPageCount] = useState(0);
 
   const {
-    data: customerResource = createEmptyResource<PropertyOwner>(pageSize),
+    data: customerResource = createEmptyResource<PropertyOwnerView>(pageSize),
     isFetched: customerResourceFetched,
   } = useQueryCustomers(
     {

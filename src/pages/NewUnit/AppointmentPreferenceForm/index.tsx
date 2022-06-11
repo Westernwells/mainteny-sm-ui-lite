@@ -102,6 +102,10 @@ export const AppointmentPreferenceForm = ({
                 name: 'openingHour',
 
                 onBlur: formik.handleBlur,
+                helperText:
+                  formik.errors.openingHour && formik.touched.openingHour
+                    ? formik.errors.openingHour
+                    : '',
               }}
             />
           </Grid>

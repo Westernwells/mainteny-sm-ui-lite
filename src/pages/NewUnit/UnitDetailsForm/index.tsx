@@ -24,6 +24,9 @@ interface Props {
 const validationSchema = Yup.object().shape({
   unitNumber: Yup.string().nullable().required('Unit number is required'),
   category: Yup.string().nullable().required('Category is required'),
+  model: Yup.string().nullable().required('Model is required'),
+  unitCapacity: Yup.string().nullable().required('Unit capacity is required'),
+  unitType: Yup.string().nullable().required('Unit type is required'),
 });
 
 export const UnitDetailsForm = ({
@@ -87,7 +90,7 @@ export const UnitDetailsForm = ({
 
   return (
     <PageCard
-      headerLabel="Location Information"
+      headerLabel="Unit Details"
       containerStyles={{flexGrow: 1}}
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
@@ -140,7 +143,7 @@ export const UnitDetailsForm = ({
           <Grid item md={4}>
             <FormInput
               props={{
-                placeholder: 'Model number of the elevator',
+                placeholder: 'e.g. 000001',
                 label: 'Unit Number',
                 name: 'unitNumber',
                 value: formik.values.unitNumber,
@@ -162,7 +165,7 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'Can also be number of floors',
+                placeholder: 'e.g. 10',
                 label: 'Number of Stops',
                 name: 'numberOfStops',
                 value: formik.values.numberOfStops,
@@ -176,7 +179,7 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'Single door; Double door',
+                placeholder: 'e.g. 2 doors',
                 label: 'Cabin Type',
                 name: 'cabinType',
                 value: formik.values.cabinType,
@@ -218,9 +221,16 @@ export const UnitDetailsForm = ({
               initialQuery={formik.values.unitType}
               getQuery={(item) => setUnitTypeQuery(item || '')}
               textFieldProps={{
-                placeholder: 'Automatic, manual, etc',
+                placeholder: 'e.g. Hydraulic',
                 name: 'unitType',
                 label: 'Unit Type',
+                required: true,
+                onBlur: formik.handleBlur,
+                error: !!(formik.touched.unitType && formik.errors.unitType),
+                helperText:
+                  formik.touched.unitType && formik.errors.unitType
+                    ? formik.errors.unitType
+                    : '',
               }}
             />
           </Grid>
@@ -246,13 +256,20 @@ export const UnitDetailsForm = ({
                 name: 'model',
                 label: 'Model',
                 placeholder: 'e.g. S2000',
+                onBlur: formik.handleBlur,
+                error: !!(formik.touched.model && formik.errors.model),
+                helperText:
+                  formik.touched.model && formik.errors.model
+                    ? formik.errors.model
+                    : '',
+                required: true,
               }}
             />
           </Grid>
           <Grid item md={4}>
             <FormInput
               props={{
-                placeholder: 'Fabric number',
+                placeholder: 'e.g. SHX00000000001',
                 label: 'Serial Number',
                 name: 'serialNumber',
                 value: formik.values.serialNumber,
@@ -271,6 +288,14 @@ export const UnitDetailsForm = ({
                 value: formik.values.unitCapacity,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
+                error: !!(
+                  formik.touched.unitCapacity && formik.errors.unitCapacity
+                ),
+                helperText:
+                  formik.touched.unitCapacity && formik.errors.unitCapacity
+                    ? formik.errors.unitCapacity
+                    : '',
+                required: true,
               }}
             />
           </Grid>

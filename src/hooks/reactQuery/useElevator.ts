@@ -375,3 +375,34 @@ export const useUpdateElevatorTechnician = (successMsg?: string) => {
     },
   );
 };
+
+const addElevator = async (body: Partial<ElevatorRequestBody>) => {
+  const response = await axiosClient.post<StringValue>('/api/elevators', {
+    ...body,
+  });
+  return response.data;
+};
+
+export const useAddElevator = (successMsg?: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    (body: Partial<ElevatorRequestBody>) => addElevator(body),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.elevatorById);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
