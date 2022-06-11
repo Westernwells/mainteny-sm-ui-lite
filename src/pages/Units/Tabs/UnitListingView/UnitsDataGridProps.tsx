@@ -55,10 +55,10 @@ export const columns: GridColDef[] = [
     headerName: 'active contracts',
     align: 'center',
     headerAlign: 'center',
-    renderCell: () => (
+    renderCell: (params) => (
       <StatusChip
-        label="Yes"
-        color="success"
+        label={params.value ? 'Yes' : 'No'}
+        color={params.value ? 'success' : 'error'}
         variant="filled"
         size="small"
         maxChars={3}
@@ -87,7 +87,7 @@ export const makeRows = ({
         ? `${elevator.assignments[0].technician.userAccount.firstName} ${elevator.assignments[0].technician.userAccount.lastName}`
         : '-',
       // TODO: Use API data
-      activeContracts: Math.floor(Math.random() * 5) + 1,
+      activeContracts: !!elevator.contracts.length,
       elevator,
       navigateTo: `details/${elevator.id}`,
     }));
