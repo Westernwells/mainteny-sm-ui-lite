@@ -1,17 +1,10 @@
-/* eslint-disable */
 import {Box} from '@mui/system';
-import {AddressAutoComplete} from 'components/AddressAutoComplete';
-import {FormInput} from 'components/form/FormInput';
 import Grid from '@mui/material/Grid';
-import {FormikErrors, FormikProps, FormikValues, useFormik} from 'formik';
-import {CustomerFormModel, PriorityTechnicianFormModel} from 'models/unitForm';
+import {FormikErrors, useFormik} from 'formik';
+import {CustomerFormModel} from 'models/unitForm';
 import * as Yup from 'yup';
 import {useEffect, useState} from 'react';
 import {PageCard} from 'components/PageCard';
-import useTheme from '@mui/material/styles/useTheme';
-import {TechnicianAutoComplete} from 'components/TechnicianAutoComplete';
-import {Button} from 'components/Button';
-import {TechnicianView} from 'models/technician';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {CustomerAutoComplete} from 'components/CustomerAutocomplete';
 
@@ -34,7 +27,6 @@ export const CustomerForm = ({
   initialCustomer,
   getCustomer,
 }: Props) => {
-  const theme = useTheme();
   const [customer, setCustomer] = useState(initialCustomer);
 
   const formik = useFormik<CustomerFormModel>({

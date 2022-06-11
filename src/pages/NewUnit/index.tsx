@@ -1,21 +1,14 @@
-// import Box from '@mui/material/Box';
-/* eslint-disable */
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
-import {FormikErrors, FormikValues} from 'formik';
-import {
-  useAddElevator,
-  useUpdateElevatorTechnician,
-} from 'hooks/reactQuery/useElevator';
+import {FormikErrors} from 'formik';
+import {useAddElevator} from 'hooks/reactQuery/useElevator';
 import {ElevatorStatus} from 'models/elevator';
 import {Priority} from 'models/misc';
 import {PropertyOwnerView} from 'models/propertyManager';
-import {TechnicianView} from 'models/technician';
 import {
   AppointmentFormModel,
   CustomerFormModel,
   LocationFormModel,
-  PriorityTechnicianFormModel,
   ServiceFormModel,
   UnitDetailsFormModel,
 } from 'models/unitForm';
@@ -163,21 +156,7 @@ export const NewUnit = () => {
     }
   };
 
-  console.log(
-    appointmentPreferenceFormValues,
-    appointmentPreferenceFormError,
-    '---------><<<<<------',
-  );
-
   const createNewUnit = async () => {
-    // save images and documents
-    // save notes
-    // create body
-
-    const openingHours = getOpeningHours();
-    // delete appointmentPreferenceFormValues?.openingHour;
-    // delete appointmentPreferenceFormValues?.closingHour;
-
     const body = {
       address: locationFormValues.address,
       buildingLocation: locationFormValues.building,
@@ -217,10 +196,8 @@ export const NewUnit = () => {
           appointmentPreferenceFormValues?.requiresAppointmentNotification ||
           undefined,
       },
-      // propertyManagerId: elevator.propertyManager?.id || '',
       propertyOwnerId: customerFormValues.propertyOwnerId,
       propertySegment: locationFormValues.propertySegment,
-      // qrCode: elevator.additionalInfo.qrCode,
       serialNumber: unitDetailsFormValues.serialNumber,
       serviceTime: serviceFormValues.serviceTime,
       status: ElevatorStatus.RUNNING,
@@ -232,8 +209,6 @@ export const NewUnit = () => {
     if (response) {
       navigate(`/units/details/${response.value}`, {replace: true});
     }
-
-    // console.log(body, '@@@@@@');
   };
 
   return (

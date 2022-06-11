@@ -1,9 +1,7 @@
-/* eslint-disable */
 import {Box} from '@mui/system';
-import {AddressAutoComplete} from 'components/AddressAutoComplete';
 import {FormInput} from 'components/form/FormInput';
 import Grid from '@mui/material/Grid';
-import {FormikErrors, FormikProps, FormikValues, useFormik} from 'formik';
+import {FormikErrors, FormikValues, useFormik} from 'formik';
 import {ServiceFormModel} from 'models/unitForm';
 import * as Yup from 'yup';
 import {useEffect} from 'react';

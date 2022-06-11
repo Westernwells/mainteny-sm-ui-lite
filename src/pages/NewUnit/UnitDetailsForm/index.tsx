@@ -1,10 +1,8 @@
-/* eslint-disable */
 import {Box} from '@mui/system';
-import {AddressAutoComplete} from 'components/AddressAutoComplete';
 import {FormInput} from 'components/form/FormInput';
 import Grid from '@mui/material/Grid';
-import {FormikErrors, FormikProps, FormikValues, useFormik} from 'formik';
-import {LocationFormModel, UnitDetailsFormModel} from 'models/unitForm';
+import {FormikErrors, FormikValues, useFormik} from 'formik';
+import {UnitDetailsFormModel} from 'models/unitForm';
 import * as Yup from 'yup';
 import {useEffect, useState} from 'react';
 import {PageCard} from 'components/PageCard';
