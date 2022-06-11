@@ -83,7 +83,9 @@ export const makeRows = ({
       nextVisit: formatDate(elevator.nextVisitDate),
       address: elevator.address.fullName,
       headerText: elevator.address.fullName,
-      priorityTechnician: `${elevator.assignments[0].technician.userAccount.firstName} ${elevator.assignments[0].technician.userAccount.lastName}`,
+      priorityTechnician: elevator.assignments.length
+        ? `${elevator.assignments[0].technician.userAccount.firstName} ${elevator.assignments[0].technician.userAccount.lastName}`
+        : '-',
       // TODO: Use API data
       activeContracts: Math.floor(Math.random() * 5) + 1,
       elevator,
