@@ -17,10 +17,10 @@ import {ElevatorComment} from 'models/elevator';
 import {formatDate} from 'utils/datetime';
 import {Dialog} from 'components/Dialog';
 import {useFormik} from 'formik';
+import {NotesFormModel} from 'models/unitForm';
 import * as Yup from 'yup';
 import {Confirm} from 'components/Confirm';
 import {NotesForm} from './NotesForm';
-import {NotesFormModel} from '../models';
 
 interface Props {
   elevatorId?: string;

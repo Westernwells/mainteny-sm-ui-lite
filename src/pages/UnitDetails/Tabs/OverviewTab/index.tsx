@@ -1,11 +1,7 @@
-// import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
 import useTheme from '@mui/material/styles/useTheme';
 import Grid from '@mui/material/Grid';
 import {useEffect, useState} from 'react';
-// import {createEmptyResource} from 'utils/paging-utils';
-// import {endOfYear, startOfYear} from 'date-fns';
 import {useParams} from 'react-router-dom';
-// import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {useUseQueryElevatorsContracts} from 'hooks/reactQuery/useContract';
 import {ContractStatus, ContractView} from 'models/contract';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
@@ -24,8 +20,6 @@ import {Documents} from './Documents';
 interface Props {
   getUnitName?: (value: string) => void;
 }
-
-// const pageSize = 10;
 
 export const OverviewTab = ({getUnitName}: Props) => {
   const {id: elevatorId} = useParams();
@@ -47,24 +41,6 @@ export const OverviewTab = ({getUnitName}: Props) => {
       ],
     });
 
-  // const {
-  //   data: serviceOrders = createEmptyResource<ServiceOrderView>(pageSize),
-  // } = useServiceOrders({
-  //   elevatorIds: elevatorId ? [elevatorId] : undefined,
-  //   start: startOfYear(new Date()).toISOString(),
-  //   end: endOfYear(new Date()).toISOString(),
-  //   pageSize,
-  //   pageIndex: 0,
-  //   query: '',
-  //   status: [
-  //     ServiceOrderStatus.SCHEDULED,
-  //     ServiceOrderStatus.COMPLETED,
-  //     ServiceOrderStatus.IN_PROGRESS,
-  //   ],
-  // });
-
-  // console.log(serviceOrders, '____----');
-
   useEffect(() => {
     if (getUnitName && elevator) {
       getUnitName(elevator.model);
@@ -83,12 +59,15 @@ export const OverviewTab = ({getUnitName}: Props) => {
   useEffect(() => {
     if (elevator) {
       let properties = {};
-      elevator.properties.forEach((item) => {
-        properties = {
-          ...properties,
-          [item.key]: item.value,
-        };
-      });
+      if (elevator.properties) {
+        elevator.properties.forEach((item) => {
+          properties = {
+            ...properties,
+            [item.key]: item.value,
+          };
+        });
+      }
+
       const body = {
         address: elevator.address,
         buildingLocation: elevator.additionalInfo.buildingLocation,

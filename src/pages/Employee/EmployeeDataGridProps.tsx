@@ -134,9 +134,8 @@ export const columns: GridColDef[] = [
 export const makeRows = (
   employees: CommonUserView[],
   techniciansEvents: {[key: string]: TechnicianEventPair[]},
-): GridRowModel<{[key: string]: any}[]> => {
-  console.log('');
-  return employees
+): GridRowModel<{[key: string]: any}[]> =>
+  employees
     ? employees.map((item: CommonUserView, index: number) => {
         let shift = '-';
         let event = 'Available';
@@ -162,4 +161,3 @@ export const makeRows = (
         };
       })
     : [];
-};

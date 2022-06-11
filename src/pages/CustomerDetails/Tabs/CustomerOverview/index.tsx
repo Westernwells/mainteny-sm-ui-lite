@@ -128,7 +128,7 @@ export const CustomerOverviewTab = ({
         <Grid item xs={6}>
           <PageCard
             minHeight="5vh"
-            headerContainerOverrideStyles={{backgroundColor: '#fff'}}
+            headerStyles={{backgroundColor: '#fff'}}
             customHeader={
               <Box display="flex" justifyContent="space-between">
                 <Box display="flex">

@@ -14,13 +14,13 @@ export interface FileWithPreview extends FileWithPath {
 interface Props {
   getAcceptedFiles?: (val: FileWithPreview[]) => void;
   getRejectedFileWithErrors?: (val: FileRejection[]) => void;
-  acceptedFileTypes?: 'image/*' | 'application/pdf';
+  acceptedFileTypes?: 'image/*' | 'application/pdf' | '*';
 }
 
 export const MyDropZone = ({
   getAcceptedFiles,
   getRejectedFileWithErrors,
-  acceptedFileTypes = 'image/*',
+  acceptedFileTypes = '*',
 }: Props) => {
   const theme = useTheme();
   const [files, setFiles] = useState<FileWithPreview[]>([]);

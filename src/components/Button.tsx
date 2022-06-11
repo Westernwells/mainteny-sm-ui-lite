@@ -5,7 +5,7 @@ interface Props {
   label?: string;
   children?: ReactNode;
   style?: {[key: string]: any};
-  buttonProps: ButtonProps;
+  buttonProps?: ButtonProps;
 }
 
 export const Button = ({label, children, style, buttonProps}: Props) => (

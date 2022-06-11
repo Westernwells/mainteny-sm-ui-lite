@@ -11,7 +11,7 @@ import {useFormik} from 'formik';
 import {ContractView} from 'models/contract';
 import {Priority} from 'models/misc';
 import {formatDate} from 'utils/datetime';
-import {ServiceFormModel} from '../models';
+import {ServiceFormModel} from '../../../../../models/unitForm';
 import {ServiceSchema} from './ServiceSchema';
 import {EditServiceForm} from './EditServiceForm';
 

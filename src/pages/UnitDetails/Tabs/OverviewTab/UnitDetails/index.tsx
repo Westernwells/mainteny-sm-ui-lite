@@ -9,10 +9,10 @@ import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {convertToMacro} from 'utils/utils';
+import {UnitDetailsFormModel} from 'models/unitForm';
 import {ContractView} from 'models/contract';
 import {UnitDetailsSchema} from './UnitDetailsSchema';
 import {EditUnitDetailsForm} from './EditUnitDetailsForm';
-import {UnitDetailsFormModel} from '../models';
 
 interface Props {
   containerStyles?: {[key: string]: any};

@@ -265,7 +265,7 @@ export interface ElevatorRequestBody {
   parking: string;
   pictures: FileResourceRecord[];
   priority: Priority;
-  properties: {[key: string]: string};
+  properties: {[key: string]: string | undefined};
   propertyManagerId: string;
   propertyOwnerId: string;
   propertySegment: string;

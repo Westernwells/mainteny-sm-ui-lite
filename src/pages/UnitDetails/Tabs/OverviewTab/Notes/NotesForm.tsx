@@ -1,8 +1,8 @@
+import React from 'react';
 import Box from '@mui/material/Box';
 import {FormInput} from 'components/form/FormInput';
 import {FormikProps} from 'formik';
-import React from 'react';
-import {NotesFormModel} from '../models';
+import {NotesFormModel} from 'models/unitForm';
 
 interface Props {
   formik: FormikProps<NotesFormModel>;

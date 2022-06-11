@@ -5,12 +5,14 @@ import LocationIcon from '@mui/icons-material/LocationOn';
 import Typography from '@mui/material/Typography';
 import {AddressRecord} from 'models/misc';
 import {FormInput} from 'components/form/FormInput';
+import {TextFieldProps} from '@mui/material/TextField';
 
 interface Props {
   getAddress?: (val?: AddressRecord) => void;
   initialValue: string;
   inputError?: string;
   handleBlur?: (e: FocusEvent<any, Element>) => void;
+  textFieldProps?: TextFieldProps;
 }
 
 export const AddressAutoComplete = ({
@@ -18,6 +20,7 @@ export const AddressAutoComplete = ({
   initialValue,
   inputError,
   handleBlur,
+  textFieldProps,
 }: Props) => {
   const [address, setAddress] = useState<any>(null);
   const [queryView, setQueryView] = useState(initialValue);
@@ -83,7 +86,9 @@ export const AddressAutoComplete = ({
             error: !!inputError,
             helperText: inputError,
             onBlur: handleBlur,
+
             ...params,
+            ...textFieldProps,
           }}
         />
       )}

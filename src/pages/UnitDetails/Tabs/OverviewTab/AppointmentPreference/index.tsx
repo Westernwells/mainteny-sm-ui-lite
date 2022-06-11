@@ -7,8 +7,8 @@ import {useRef, useState} from 'react';
 import {useFormik} from 'formik';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {Dialog} from 'components/Dialog';
+import {AppointmentFormModel} from 'models/unitForm';
 import * as Yup from 'yup';
-import {AppointmentFormModel} from '../models';
 import {AppointmentPreferenceSchema} from './AppointmentPreferenceSchema';
 import {EditAppointmentForm} from './EditAppointmentForm';
 
@@ -38,7 +38,7 @@ export const AppointmentPreference = ({
     'Appointment preference updated successfully',
   );
   const propertyRef = useRef(
-    makeKeyValueFromArrayOfObjects(elevator.properties),
+    makeKeyValueFromArrayOfObjects(elevator.properties || []),
   ).current;
 
   const formik = useFormik<AppointmentFormModel>({
@@ -46,7 +46,12 @@ export const AppointmentPreference = ({
       appointmentDaysOfWeek: propertyRef.appointmentDaysOfWeek
         ? propertyRef.appointmentDaysOfWeek.split(',')
         : [],
-      openingHours: propertyRef.openingHours,
+      openingHour: propertyRef.openingHour
+        ? propertyRef.openingHour.split('-')[0]
+        : '',
+      closingHour: propertyRef.openingHour
+        ? propertyRef.openingHour.split('-')[1]
+        : '',
       requiresAppointment: propertyRef.requiresAppointment || '',
       requiresAppointmentNotification:
         propertyRef.requiresAppointmentNotification || '',
@@ -57,6 +62,8 @@ export const AppointmentPreference = ({
     validationSchema,
   });
 
+  // console.log(propertyRef.openingHour.split('-'), '######');
+
   const onSave = async () => {
     setOpenDialog(false);
     await updateElevator({
@@ -65,7 +72,9 @@ export const AppointmentPreference = ({
         properties: {
           ...elevatorRequestBody?.properties,
           appointmentDaysOfWeek: formik.values.appointmentDaysOfWeek.join(','),
-          openingHours: formik.values.openingHours,
+          openingHours: `${formik.values.openingHour}-${
+            formik.values.closingHour || '17:00'
+          }`,
           requiresAppointment: formik.values.requiresAppointment,
           requiresAppointmentNotification:
             formik.values.requiresAppointmentNotification,
@@ -87,14 +96,15 @@ export const AppointmentPreference = ({
       headerActionIcon={<EditIcon />}
       showHeaderBackground>
       <Grid container spacing={1}>
-        {elevator.properties.map((property) => (
-          <Grid key={property.key} item xs={12} sm={4} md={6}>
-            <AppointmentPreferenceSchema
-              label={property.key}
-              property={property}
-            />
-          </Grid>
-        ))}
+        {elevator.properties &&
+          elevator.properties.map((property) => (
+            <Grid key={property.key} item xs={12} sm={4} md={6}>
+              <AppointmentPreferenceSchema
+                label={property.key}
+                property={property}
+              />
+            </Grid>
+          ))}
       </Grid>
       <Dialog
         title="Edit Appointment Preferences"

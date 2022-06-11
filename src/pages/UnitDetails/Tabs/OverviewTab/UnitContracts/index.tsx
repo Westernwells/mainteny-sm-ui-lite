@@ -28,7 +28,7 @@ export const UnitContracts = ({containerStyles, contracts}: Props) => {
       customHeader={
         <Typography variant="subtitle1">Related Contracts</Typography>
       }
-      headerContainerOverrideStyles={{
+      headerStyles={{
         py: '0.2em',
         background: theme.palette.inputBackground.main,
       }}>

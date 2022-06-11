@@ -6,10 +6,10 @@ import {FormikProps} from 'formik';
 import {useCacheValues} from 'hooks/reactQuery/useElevator';
 import {ElevatorCategory} from 'models/elevator';
 import {CacheTypes} from 'models/misc';
+import {UnitDetailsFormModel} from 'models/unitForm';
 import {useState} from 'react';
 import {createEmptyResource} from 'utils/paging-utils';
 import {convertToText} from 'utils/utils';
-import {UnitDetailsFormModel} from '../models';
 
 interface Props {
   formik: FormikProps<UnitDetailsFormModel>;
@@ -18,7 +18,6 @@ interface Props {
 export const EditUnitDetailsForm = ({formik}: Props) => {
   const [unitTypeQuery, setUnitTypeQuery] = useState('');
   const [modelQuery, setModelQuery] = useState('');
-  const [capacityQuery, setCapacityQuery] = useState('');
   const {data: elevatorTypeResource = createEmptyResource<string>()} =
     useCacheValues(
       {
@@ -37,16 +36,6 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
         query: modelQuery,
       },
       CacheTypes.ELEVATOR_MODEL,
-    );
-
-  const {data: elevatorCapacityResource = createEmptyResource<string>()} =
-    useCacheValues(
-      {
-        pageIndex: 0,
-        pageSize: 10,
-        query: capacityQuery,
-      },
-      CacheTypes.ELEVATOR_CAPACITY,
     );
 
   return (
@@ -194,28 +183,14 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
             }}
           />
 
-          <ComboBox
-            options={elevatorCapacityResource.data.map((item) => ({
-              label: item,
-              value: item,
-            }))}
-            getValue={(item) =>
-              formik.setFieldValue('unitCapacity', item?.value)
-            }
-            initialValue={
-              formik.values.unitCapacity
-                ? {
-                    label: formik.values.unitCapacity,
-                    value: formik.values.unitCapacity,
-                  }
-                : null
-            }
-            initialQuery={formik.values.unitCapacity}
-            getQuery={(item) => setCapacityQuery(item || '')}
-            textFieldProps={{
+          <FormInput
+            props={{
               name: 'unitCapacity',
               label: 'Unit Capacity',
-              placeholder: 'In kg',
+              placeholder: '1000 kg',
+              value: formik.values.unitCapacity,
+              onBlur: formik.handleBlur,
+              onChange: formik.handleChange,
             }}
           />
 

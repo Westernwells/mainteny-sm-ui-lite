@@ -4,8 +4,8 @@ import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
 import {Priority} from 'models/misc';
+import {ServiceFormModel} from 'models/unitForm';
 import {convertToText} from 'utils/utils';
-import {ServiceFormModel} from '../models';
 
 interface Props {
   formik: FormikProps<ServiceFormModel>;

@@ -15,6 +15,10 @@ export interface UnitDetailsFormModel {
   numberOfStops?: number;
   cabinType?: string;
   emergencyPhoneProvider?: string;
+  emergencyContractNumber?: string;
+  yearBuilt?: number;
+  modelOfController?: string;
+  manufacturerOfController?: string;
   unitType?: string;
   model?: string;
   serialNumber?: string;
@@ -33,7 +37,8 @@ export interface ServiceFormModel {
 
 export interface AppointmentFormModel {
   appointmentDaysOfWeek: string[];
-  openingHours: string;
+  openingHour?: string;
+  closingHour?: string;
   requiresAppointment: string;
   requiresAppointmentNotification: string;
   appointmentNotificationDueInDays: string;
@@ -45,5 +50,9 @@ export interface NotesFormModel {
 
 export interface PriorityTechnicianFormModel {
   technicianId: string | null;
-  priority: number;
+  priority?: number;
+}
+
+export interface CustomerFormModel {
+  propertyOwnerId?: string;
 }

@@ -291,7 +291,7 @@ export const ServiceHistoryTab = () => {
           headerLabel="All Services"
           contentContainerStyles={{p: 0, mx: 0}}
           containerStyles={{height: '100%'}}
-          headerContainerOverrideStyles={{
+          headerStyles={{
             background: 'none',
             mt: 'default',
             mx: 'default',
