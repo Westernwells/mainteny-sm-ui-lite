@@ -86,7 +86,6 @@ export const makeRows = ({
       priorityTechnician: elevator.assignments.length
         ? `${elevator.assignments[0].technician.userAccount.firstName} ${elevator.assignments[0].technician.userAccount.lastName}`
         : '-',
-      // TODO: Use API data
       activeContracts: !!elevator.contracts.length,
       elevator,
       navigateTo: `details/${elevator.id}`,
