@@ -12,6 +12,7 @@ import {TechnicianSimpleView, TechnicianView} from './technician';
 import {FileResource, FileResourceRecord} from './media';
 import {ServiceCompanyTimeUnit} from './service-company';
 import {ServiceOrderView} from './service-order';
+import {ContractSimpleView} from './contract';
 
 export enum ElevatorCommentType {
   TODO = 'TODO',
@@ -112,6 +113,7 @@ export interface ElevatorView {
   capacity: string;
   category: ElevatorCategory;
   technicianNumber: number;
+  contracts: ContractSimpleView[];
   availability: number;
   address: Address;
   propertyOwner: ClientSimpleView;

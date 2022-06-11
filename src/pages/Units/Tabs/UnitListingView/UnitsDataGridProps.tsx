@@ -49,16 +49,17 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'priorityTechnician',
     headerName: 'priority technician',
+    cellClassName: 'truncateText',
   }),
   getColumnProps({
     field: 'activeContracts',
     headerName: 'active contracts',
     align: 'center',
     headerAlign: 'center',
-    renderCell: () => (
+    renderCell: (params) => (
       <StatusChip
-        label="Yes"
-        color="success"
+        label={params.value ? 'Yes' : 'No'}
+        color={params.value ? 'success' : 'error'}
         variant="filled"
         size="small"
         maxChars={3}
@@ -83,9 +84,15 @@ export const makeRows = ({
       nextVisit: formatDate(elevator.nextVisitDate),
       address: elevator.address.fullName,
       headerText: elevator.address.fullName,
-      priorityTechnician: `${elevator.assignments[0].technician.userAccount.firstName} ${elevator.assignments[0].technician.userAccount.lastName}`,
-      // TODO: Use API data
-      activeContracts: Math.floor(Math.random() * 5) + 1,
+      priorityTechnician: elevator.assignments.length
+        ? elevator.assignments
+            .map(
+              (item) =>
+                `${item.technician.userAccount.firstName} ${item.technician.userAccount.lastName}`,
+            )
+            .join(', ')
+        : '-',
+      activeContracts: !!elevator.contracts.length,
       elevator,
       navigateTo: `details/${elevator.id}`,
     }));
