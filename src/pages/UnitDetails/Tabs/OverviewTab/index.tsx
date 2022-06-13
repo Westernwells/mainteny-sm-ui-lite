@@ -2,8 +2,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import Grid from '@mui/material/Grid';
 import {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
-import {useUseQueryElevatorsContracts} from 'hooks/reactQuery/useContract';
-import {ContractStatus, ContractView} from 'models/contract';
+import {ContractStatus, ContractSimpleView} from 'models/contract';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import {ElevatorRequestBody} from 'models/elevator';
 import {Progress} from 'components/Progress';
@@ -25,21 +24,12 @@ export const OverviewTab = ({getUnitName}: Props) => {
   const {id: elevatorId} = useParams();
   const theme = useTheme();
 
-  const [validContract, setValidContract] = useState<ContractView>();
+  const [validContract, setValidContract] = useState<ContractSimpleView>();
   const [elevatorRequestBody, setElevatorRequestBody] =
     useState<Partial<ElevatorRequestBody>>();
 
   const {data: elevator, isLoading: isLoadingElevator} =
     useElevatorById(elevatorId);
-  const {data: contracts = {}, isLoading: isLoadingContract} =
-    useUseQueryElevatorsContracts({
-      elevatorIds: elevatorId ? [elevatorId] : [],
-      status: [
-        ContractStatus.VALID,
-        ContractStatus.PENDING,
-        ContractStatus.EXPIRED,
-      ],
-    });
 
   useEffect(() => {
     if (getUnitName && elevator) {
@@ -48,13 +38,13 @@ export const OverviewTab = ({getUnitName}: Props) => {
   }, [elevator]);
 
   useEffect(() => {
-    if (Object.keys(contracts).length) {
-      const result = contracts[elevatorId!].filter(
+    if (elevator) {
+      const result = elevator.contracts.filter(
         (item) => item.status === ContractStatus.VALID,
       );
       setValidContract(result[0]);
     }
-  }, [contracts]);
+  }, [elevator]);
 
   useEffect(() => {
     if (elevator) {
@@ -106,7 +96,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
     }
   }, [elevator]);
 
-  if (isLoadingElevator || isLoadingContract) {
+  if (isLoadingElevator) {
     return <Progress />;
   }
 
@@ -165,13 +155,14 @@ export const OverviewTab = ({getUnitName}: Props) => {
       </Grid>
 
       <UnitContracts
-        contracts={elevatorId ? contracts[elevatorId] || [] : []}
+        contracts={elevatorId ? elevator!.contracts : []}
         containerStyles={{mt: '1.2em'}}
       />
 
       <PriorityTechnician
         containerStyles={{mt: '1.2em'}}
         elevatorId={elevator?.id}
+        maintainers={elevator?.assignments}
       />
 
       <Grid

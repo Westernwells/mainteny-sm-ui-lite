@@ -2,13 +2,13 @@ import Box from '@mui/material/Box';
 import {FormInput} from 'components/form/FormInput';
 import {TechnicianAutoComplete} from 'components/TechnicianAutoComplete';
 import {FormikProps} from 'formik';
-import {MaintainerView} from 'models/technician';
+import {ElevatorAssignmentSimpleView} from 'models/elevator';
 import {PriorityTechnicianFormModel} from 'models/unitForm';
 import React from 'react';
 
 interface Props {
   formik: FormikProps<PriorityTechnicianFormModel>;
-  activeTechnician?: MaintainerView;
+  activeTechnician?: ElevatorAssignmentSimpleView;
   disableAutoComplete?: boolean;
 }
 
@@ -23,7 +23,7 @@ export const PriorityTechnicianForm = ({
       getTechnician={(value) => {
         formik.setValues({
           ...formik.values,
-          technicianId: value ? value.id : null,
+          technicianId: value ? value.id! : null,
         });
       }}
       initialValue={activeTechnician?.technician}

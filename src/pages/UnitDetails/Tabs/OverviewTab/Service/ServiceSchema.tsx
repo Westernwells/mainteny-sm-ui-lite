@@ -6,11 +6,11 @@ import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import PeopleIcon from '@mui/icons-material/People';
 import FlagIcon from '@mui/icons-material/Flag';
 import useTheme from '@mui/material/styles/useTheme';
-import {Elevator} from 'models/elevator';
+import {ElevatorView} from 'models/elevator';
 
 interface Props {
   label: string;
-  elevator: Elevator;
+  elevator: ElevatorView;
   visitNumber?: number;
 }
 

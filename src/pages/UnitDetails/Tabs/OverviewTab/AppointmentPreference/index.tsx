@@ -1,6 +1,10 @@
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
-import {Elevator, ElevatorProperty, ElevatorRequestBody} from 'models/elevator';
+import {
+  ElevatorView,
+  ElevatorProperty,
+  ElevatorRequestBody,
+} from 'models/elevator';
 import Grid from '@mui/material/Grid';
 import {InfoCard} from 'components/InfoCard';
 import {useRef, useState} from 'react';
@@ -14,7 +18,7 @@ import {EditAppointmentForm} from './EditAppointmentForm';
 
 interface Props {
   containerStyles?: {[key: string]: any};
-  elevator: Elevator;
+  elevator: ElevatorView;
   elevatorRequestBody?: Partial<ElevatorRequestBody>;
 }
 

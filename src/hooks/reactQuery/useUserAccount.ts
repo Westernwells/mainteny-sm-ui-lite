@@ -1,6 +1,6 @@
 import {UserQueryParams} from 'models/employee';
 import {Resource} from 'models/misc';
-import {CommonUserView, Role, UserAccountView} from 'models/user';
+import {UserView, Role} from 'models/user';
 import {EmployeeAccountData} from 'pages/Employee/AddEmployeeForm/model';
 import {EmployeeAccountData as EditEmployeeAccountData} from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/model';
 import {useQuery} from 'react-query';
@@ -17,7 +17,7 @@ export const queryUserAccounts = async (
   params: UserQueryParams,
   serviceCompanyId: string,
 ) => {
-  const response = await axiosClient.get<Resource<CommonUserView>>(
+  const response = await axiosClient.get<Resource<UserView>>(
     `/api/serviceCompanies/${serviceCompanyId}/users`,
     {
       params,
@@ -44,16 +44,14 @@ export const useQueryUserAccounts = (
   );
 };
 
-export const getUserAccount = async (username: string) => {
-  const response = await axiosClient.get<UserAccountView>(
-    `/api/users/${username}`,
-  );
+export const getUserAccount = async (id: string) => {
+  const response = await axiosClient.get<UserView>(`/api/users/${id}`);
   return response.data;
 };
 
-export const useGetUserAccount = (username?: string) =>
-  useQuery([qks.getUserAccount, username], () => getUserAccount(username!), {
-    enabled: !!username,
+export const useGetUserAccount = (id?: string) =>
+  useQuery([qks.getUserAccount, id], () => getUserAccount(id!), {
+    enabled: !!id,
   });
 
 export const useEmployeeAccount = () => {

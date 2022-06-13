@@ -30,7 +30,7 @@ import {WeekPair} from 'models/misc';
 import {ServiceOrderView} from 'models/service-order';
 import CardHeader from '@mui/material/CardHeader';
 import {useTheme} from '@mui/material/styles';
-import {TechnicianView} from 'models/technician';
+import {EmployeesView} from 'models/employee';
 import {styles as sx} from './styles';
 import {ScheduleControls} from './ScheduleControls';
 import {ScheduleLabel} from './ScheduleLabel';
@@ -38,7 +38,7 @@ import {ScheduledItemGroup} from './model';
 import {getItemPosition, getItemWidth} from './utils';
 
 interface Props {
-  technicians?: TechnicianView[];
+  technicians?: EmployeesView[];
   scheduleItems: {[key: string]: ServiceOrderView[]};
   renderCellItem: (
     cellItem: any,
@@ -111,7 +111,7 @@ export const Schedule = ({
   );
 
   const [lookupTechnician, setLookupTechnician] = useState<{
-    [key: string]: TechnicianView[];
+    [key: string]: EmployeesView[];
   }>({});
 
   useEffect(() => {
@@ -120,7 +120,6 @@ export const Schedule = ({
       const items = scheduleItems[key];
       result[key] = {};
       let previousOrder: ServiceOrderView | null = null;
-      console.log(scheduleItems, '>>>>>>>>>>>>');
 
       items.forEach((item) => {
         if (previousOrder) {

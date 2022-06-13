@@ -3,7 +3,7 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
-import {Elevator, ElevatorRequestBody} from 'models/elevator';
+import {ElevatorView, ElevatorRequestBody} from 'models/elevator';
 import Grid from '@mui/material/Grid';
 import {useRef, useState} from 'react';
 import {InfoCard} from 'components/InfoCard';
@@ -17,7 +17,7 @@ import {EditLocationForm} from './EditLocationForm';
 
 interface Props {
   containerStyles?: {[key: string]: any};
-  elevator: Elevator;
+  elevator: ElevatorView;
   elevatorRequestBody?: Partial<ElevatorRequestBody>;
 }
 

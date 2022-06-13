@@ -4,13 +4,13 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import EmailIcon from '@mui/icons-material/Email';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
-import {EmployeesView} from 'models/employee';
 import {convertToText} from 'utils/utils';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {theme} from 'theme';
+import {UserView} from 'models/user';
 
-export const employeeDetailSchema = (employee: EmployeesView) => ({
+export const employeeDetailSchema = (employee: UserView) => ({
   phone: {
     label: 'PHONE NUMBER',
     value: employee.userAccount.contact.phone,
@@ -18,17 +18,17 @@ export const employeeDetailSchema = (employee: EmployeesView) => ({
   },
   address: {
     label: 'ADDRESS',
-    value: employee.address?.fullName || '-',
+    value: employee.userData.address?.fullName || '-',
     icon: <HomeIcon sx={{color: theme.palette.info.dark}} />,
   },
   shiftTime: {
     // TODO: display order shift time in a tooltip
     label: 'SHIFT TIME',
     value:
-      employee && employee.workingHours?.length
-        ? `${convertToText(employee.workingHours[0].type)} ${
-            employee.workingHours[0].fromTime
-          } - ${employee.workingHours[0].toTime}`
+      employee && employee.userData.workingHours?.length
+        ? `${convertToText(employee.userData.workingHours[0].type)} ${
+            employee.userData.workingHours[0].fromTime
+          } - ${employee.userData.workingHours[0].toTime}`
         : '-',
     icon: <TimerOutlinedIcon sx={{color: theme.palette.info.dark}} />,
   },
@@ -41,10 +41,10 @@ export const employeeDetailSchema = (employee: EmployeesView) => ({
     label: 'ASSIGNED ORDER TYPES',
     value:
       employee &&
-      employee.additionalInfo &&
-      employee.additionalInfo.assignedServiceOrderTypes?.length ? (
+      employee.userData.additionalInfo &&
+      employee.userData.additionalInfo.assignedServiceOrderTypes?.length ? (
         <Box display="flex">
-          {employee.additionalInfo?.assignedServiceOrderTypes?.map(
+          {employee.userData.additionalInfo?.assignedServiceOrderTypes?.map(
             (orderType, index) => (
               <Box display="flex" mr="0.4em" key={index}>
                 <Box mr="0.4em">

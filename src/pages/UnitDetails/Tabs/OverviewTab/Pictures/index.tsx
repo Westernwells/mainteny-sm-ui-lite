@@ -7,7 +7,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import {FileWithPreview, MyDropZone} from 'components/MyDropzone';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {Elevator, ElevatorRequestBody} from 'models/elevator';
+import {ElevatorView, ElevatorRequestBody} from 'models/elevator';
 import {useState} from 'react';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {FileResourceRecord} from 'models/media';
@@ -15,7 +15,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmptySection} from 'components/EmptySection';
 
 interface Props {
-  elevator: Elevator;
+  elevator: ElevatorView;
   elevatorRequestBody?: Partial<ElevatorRequestBody>;
 }
 

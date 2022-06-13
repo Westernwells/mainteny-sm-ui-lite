@@ -11,7 +11,6 @@ import {useNavigate} from 'react-router';
 import {useSnackbar} from 'notistack';
 import {
   CustomerElevatorParams,
-  Elevator,
   ElevatorComment,
   ElevatorCommentRecord,
   ElevatorRequestBody,
@@ -40,7 +39,7 @@ export const fetchElevators = async (query: string, page: Page, id: string) => {
 };
 
 export const fetchElevator = async (elevatorId: string) => {
-  const response = await axiosClient.get<Elevator>(
+  const response = await axiosClient.get<ElevatorView>(
     `/api/elevators/${elevatorId}`,
   );
   return response.data;
@@ -364,7 +363,7 @@ export const useUpdateElevatorTechnician = (successMsg?: string) => {
             variant: 'success',
           });
         }
-        queryClient.invalidateQueries(queryKeys.maintainerByElevatorId);
+        queryClient.invalidateQueries(queryKeys.elevatorById);
       },
       onError: (err: any) => {
         console.log(err);

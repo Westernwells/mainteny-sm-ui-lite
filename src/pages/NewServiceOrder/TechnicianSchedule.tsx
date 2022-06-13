@@ -10,15 +10,15 @@ import {ScheduleBody} from 'components/Schedules/ScheduleBody';
 import {ScheduleBodyCell} from 'components/Schedules/ScheduleBodyCell';
 import {ScheduleItemContainer} from 'components/Schedules/ScheduleItemContainer';
 import {ServiceOrderView} from 'models/service-order';
-import {TechnicianView} from 'models/technician';
 import {ScheduleControls} from 'components/Schedules/ScheduleControls';
 import {ScheduleLabel} from 'components/Schedules/ScheduleLabel';
 import {ScheduledItemGroup} from 'components/Schedules/model';
 import {getItemPosition, getItemWidth} from 'components/Schedules/utils';
 import {isBefore} from 'date-fns';
+import {EmployeesView} from 'models/employee';
 
 interface Props {
-  technicians?: TechnicianView[];
+  technicians?: EmployeesView[];
   scheduleItems: {[key: string]: ServiceOrderView[]};
   renderCellItem: (
     cellItem: any,
@@ -52,7 +52,7 @@ export const TechnicianSchedule = ({
   const [bodyRow, setBodyRow] = useState<{[key: string]: string[]}[]>([]);
 
   const [lookupTechnician, setLookupTechnician] = useState<{
-    [key: string]: TechnicianView[];
+    [key: string]: EmployeesView[];
   }>({});
 
   useEffect(() => {

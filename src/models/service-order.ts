@@ -8,6 +8,7 @@ import {Contract, ContractSimpleView} from './contract';
 import {Fee, JobStatus, Meta, Order} from './misc';
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
+import {EmployeesView} from './employee';
 
 export enum Priority {
   A = 'A',
@@ -155,7 +156,7 @@ export interface TechnicianDispatchJobView {
 export interface ServiceOrderSchedule {
   id: string;
   serviceOrderId: string;
-  technician: Technician;
+  technician: EmployeesView;
   startTime: string;
   endTime: string;
 }

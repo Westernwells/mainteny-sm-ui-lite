@@ -13,13 +13,13 @@ import {useServiceOrderStatusColor} from 'hooks/useServiceOrderStatusColor';
 
 import {OrderDetails} from 'components/OrderDetails';
 import {addDays, endOfDay, startOfDay, subDays} from 'date-fns';
-import {TechnicianView} from 'models/technician';
 import {useQueryServiceCompanyTechnicians} from 'hooks/reactQuery/useTechnician';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {Switch} from 'components/Switch';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import {EmployeesView} from 'models/employee';
 import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicator';
 import {Widget} from 'components/Widget';
 import {sortOrderByTime} from 'utils/service-order-utils';
@@ -36,7 +36,7 @@ export const ServiceOrderScheduleTab = () => {
     ServiceOrderStatus[] | []
   >([]);
   const [page] = useState(makePage(0, 500));
-  const {data: technicianResource = createEmptyResource<TechnicianView>(10)} =
+  const {data: technicianResource = createEmptyResource<EmployeesView>(10)} =
     useQueryServiceCompanyTechnicians({
       pageIndex: 0,
       pageSize: 500,

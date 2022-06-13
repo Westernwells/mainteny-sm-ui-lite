@@ -10,7 +10,6 @@ import Autocomplete from '@mui/material/Autocomplete';
 import * as _ from 'lodash';
 import {useQueryServiceCompanyTechnicians} from 'hooks/reactQuery/useTechnician';
 import {createEmptyResource} from 'utils/paging-utils';
-import {Technician} from 'models/technician';
 import {Switch} from 'components/Switch';
 import Box from '@mui/material/Box';
 import {DatePicker} from 'components/DatePicker';
@@ -19,13 +18,14 @@ import {FormikErrors, useFormik} from 'formik';
 import {ScheduleForm} from 'pages/ServiceOrderDetails/models';
 import * as Yup from 'yup';
 import {Button} from 'components/Button';
+import {EmployeesView} from 'models/employee';
 
 interface Props {
   open?: boolean;
   onSave: () => void;
   onCancel: () => void;
   title: string;
-  defaultTechnician?: Technician | null;
+  defaultTechnician?: EmployeesView | null;
   defaultStartDate?: Date | null;
   defaultEndDate?: Date | null;
   getFormValues?: (values: ScheduleForm) => void;
@@ -132,7 +132,7 @@ export const ScheduleDialog = ({
               id="combo-box-demo"
               sx={{minWidth: 500}}
               options={techniciansResource.data}
-              onChange={(event: any, newValue: Technician | null) =>
+              onChange={(event: any, newValue: EmployeesView | null) =>
                 formik.setValues({
                   ...formik.values,
                   technicianId: newValue?.id || null,

@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import {formatDate} from 'utils/datetime';
 import {StatusChip} from 'components/StatusChip';
 import {convertToText} from 'utils/utils';
-import {ContractStatus, ContractView} from 'models/contract';
+import {ContractStatus, ContractSimpleView} from 'models/contract';
 
 const defaultProps = {
   editable: false,
@@ -88,8 +88,8 @@ export const columns: GridColDef[] = [
   },
 ];
 
-export const makeRows = (contracts: ContractView[]): GridRowsProp =>
-  contracts.map((item: ContractView) => ({
+export const makeRows = (contracts: ContractSimpleView[]): GridRowsProp =>
+  contracts.map((item: ContractSimpleView) => ({
     id: item.id,
     number: item.number,
     contractType: item.type,

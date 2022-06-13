@@ -13,6 +13,7 @@ import {FileResource, FileResourceRecord} from './media';
 import {ServiceCompanyTimeUnit} from './service-company';
 import {ServiceOrderView} from './service-order';
 import {ContractSimpleView} from './contract';
+import {EmployeesSimpleView} from './employee';
 
 export enum ElevatorCommentType {
   TODO = 'TODO',
@@ -117,13 +118,15 @@ export interface ElevatorView {
   availability: number;
   address: Address;
   propertyOwner: ClientSimpleView;
+  properties: ElevatorProperty[];
   lastVisitDate: string;
   nextVisitDate: string;
+  serialNumber: string;
   serviceTime: number;
   status: ElevatorStatus;
   labels: [];
   additionalInfo: ElevatorAdditionalInfo;
-  assignments: ElevatorMaintainerRecord[];
+  assignments: ElevatorAssignmentSimpleView[];
   search: string;
   meta: Meta;
 }
@@ -144,6 +147,13 @@ export interface ElevatorSimpleView {
   labels: string[];
   additionalInfo: ElevatorAdditionalInfo;
   meta: Meta;
+}
+
+export interface ElevatorAssignmentSimpleView {
+  elevatorId: string;
+  id: string;
+  technician: EmployeesSimpleView;
+  weight: number;
 }
 
 export interface CreateElevatorRecord {

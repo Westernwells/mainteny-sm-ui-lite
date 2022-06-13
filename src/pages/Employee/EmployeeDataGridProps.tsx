@@ -11,7 +11,7 @@ import {capitalize} from 'utils/utils';
 import IconButton from '@mui/material/IconButton';
 import React from 'react';
 import {getColumnProps} from 'components/DataGridLayout';
-import {CommonUserView, Role} from 'models/user';
+import {UserView, Role} from 'models/user';
 import {TechnicianEventPair} from 'models/technician';
 
 export const columns: GridColDef[] = [
@@ -132,19 +132,19 @@ export const columns: GridColDef[] = [
 ];
 
 export const makeRows = (
-  employees: CommonUserView[],
+  employees: UserView[],
   techniciansEvents: {[key: string]: TechnicianEventPair[]},
 ): GridRowModel<{[key: string]: any}[]> =>
   employees
-    ? employees.map((item: CommonUserView, index: number) => {
+    ? employees.map((item: UserView, index: number) => {
         let shift = '-';
         let event = 'Available';
         if (item.userAccount.roles.includes(Role.TECHNICIAN)) {
           shift = item.userData.workingHours.length
             ? `${item.userData.workingHours[0].fromTime} - ${item.userData.workingHours[0].toTime}`
             : '-';
-          event = techniciansEvents[item.userData.technicianId]
-            ? techniciansEvents[item.userData.technicianId][0].eventViews[0]
+          event = techniciansEvents[item.userData.employeeId]
+            ? techniciansEvents[item.userData.employeeId][0].eventViews[0]
                 .eventType
             : 'Available';
         }
@@ -156,7 +156,7 @@ export const makeRows = (
           phone: item.userAccount.contact.phone,
           shift,
           availability: event,
-          navigateTo: `details/${item.userAccount.username}`,
+          navigateTo: `details/${item.id}`,
           actions: item.userAccount.contact.email,
         };
       })

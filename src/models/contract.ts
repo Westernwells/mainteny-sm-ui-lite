@@ -100,6 +100,7 @@ export interface ContractSimpleView {
   spendingLimit: number;
   price: number;
   hourlyRate: number;
+  number: number;
   currency: string;
   startTime: string;
   endTime: string;

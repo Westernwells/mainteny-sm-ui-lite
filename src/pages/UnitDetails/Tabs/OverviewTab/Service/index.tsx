@@ -1,6 +1,6 @@
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
-import {Elevator, ElevatorRequestBody} from 'models/elevator';
+import {ElevatorView, ElevatorRequestBody} from 'models/elevator';
 import Grid from '@mui/material/Grid';
 import {useRef, useState} from 'react';
 import {Dialog} from 'components/Dialog';
@@ -8,7 +8,7 @@ import * as Yup from 'yup';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {InfoCard} from 'components/InfoCard';
 import {useFormik} from 'formik';
-import {ContractView} from 'models/contract';
+import {ContractSimpleView} from 'models/contract';
 import {Priority} from 'models/misc';
 import {formatDate} from 'utils/datetime';
 import {ServiceFormModel} from '../../../../../models/unitForm';
@@ -17,9 +17,9 @@ import {EditServiceForm} from './EditServiceForm';
 
 interface Props {
   containerStyles?: {[key: string]: any};
-  elevator: Elevator;
+  elevator: ElevatorView;
   elevatorRequestBody?: Partial<ElevatorRequestBody>;
-  validContract?: ContractView;
+  validContract?: ContractSimpleView;
 }
 
 const validationSchema = Yup.object().shape({

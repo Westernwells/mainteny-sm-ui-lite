@@ -1,6 +1,7 @@
 import {ServiceCompany, ServiceCompanyView} from './service-company';
 import {AddressRecord, Meta, Contact, TimeWindowRecord} from './misc';
 import {TechnicianUserData} from './technician';
+import {ServiceOrderType} from './service-order';
 
 export enum UserAccountStatus {
   NORMAL = 'NORMAL',
@@ -95,11 +96,24 @@ export interface UpdateServiceManagerRecord {
   technician?: TechnicianData;
 }
 
-export interface UserView<T> {
+export interface UserView {
   userAccount: UserAccountView;
-  userData: T;
-}
-
-export interface CommonUserView extends UserView<TechnicianUserData> {
+  userData: UserData;
   id: string;
 }
+
+export interface UserAdditionalInfo {
+  leftVacationDays: number;
+  assignedServiceOrderTypes?: ServiceOrderType[];
+}
+
+export interface UserData {
+  employeeId: string;
+  address: AddressRecord;
+  workingHours: TimeWindowRecord[];
+  isOnline: Boolean;
+  additionalInfo: UserAdditionalInfo;
+  meta: Meta;
+}
+
+export interface ServiceManagerData {}

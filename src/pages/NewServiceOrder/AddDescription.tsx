@@ -3,7 +3,7 @@ import Typography from '@mui/material/Typography';
 import {FormInput} from 'components/form/FormInput';
 import {PageCard} from 'components/PageCard';
 import {ElevatorView} from 'models/elevator';
-import {TechnicianView} from 'models/technician';
+import {EmployeesView} from 'models/employee';
 import {useEffect, useState} from 'react';
 import {Summary, SummaryItem} from './Summary';
 
@@ -11,7 +11,7 @@ interface Props {
   getDescription?: (val: string) => void;
   initialDescription?: string;
   selectedUnit?: ElevatorView;
-  selectedTechnicians?: TechnicianView[];
+  selectedTechnicians?: EmployeesView[];
   selectedDateString?: string;
   selectedTimeString?: string;
 }

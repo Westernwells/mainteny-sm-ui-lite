@@ -6,10 +6,10 @@ import {
   useCreateScheduledServiceOrder,
 } from 'hooks/reactQuery/useServiceOrder';
 import {ElevatorView} from 'models/elevator';
-import {TechnicianView} from 'models/technician';
 import {useEffect, useState} from 'react';
 import {Priority, ServiceOrderType} from 'models/service-order';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {EmployeesView} from 'models/employee';
 import {formatDate, setDateTime, toRestDateTime} from 'utils/datetime';
 import {useNavigate} from 'react-router';
 import {AddDescription} from '../AddDescription';
@@ -59,10 +59,10 @@ export const ScheduleServiceOrder = ({type}: Props) => {
     useCreateNonScheduledServiceOrder('Order created successfully');
 
   const [recommendedTechnicians, setRecommendedTechnicians] = useState<
-    TechnicianView[]
+    EmployeesView[]
   >([]);
   const [selectedTechnicians, setSelectedTechnicians] = useState<
-    TechnicianView[]
+    EmployeesView[]
   >([]);
 
   useEffect(() => {
