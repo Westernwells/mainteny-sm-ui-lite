@@ -3,7 +3,6 @@ import Box from '@mui/material/Box';
 import {InfoCard} from 'components/InfoCard';
 import {CardProps} from 'components/CardProps';
 import useTheme from '@mui/material/styles/useTheme';
-import {EmployeesView} from 'models/employee';
 import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import Divider from '@mui/material/Divider';
@@ -12,11 +11,12 @@ import {capitalize} from 'utils/utils';
 import {Progress} from 'components/Progress';
 import {BasicDetailsValue} from 'models/misc';
 import {Button} from 'components/Button';
+import {UserView} from 'models/user';
 import {EditEmployee} from './EditEmployee';
 import {employeeDetailSchema} from './schema';
 
 interface Props {
-  employee?: EmployeesView;
+  employee?: UserView;
   isLoading: boolean;
 }
 

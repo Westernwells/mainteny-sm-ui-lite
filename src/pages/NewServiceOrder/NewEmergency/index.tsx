@@ -2,10 +2,10 @@ import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {useAssignmentBasedOrder} from 'hooks/reactQuery/useServiceOrder';
 import {ElevatorView} from 'models/elevator';
-import {TechnicianView} from 'models/technician';
 import {useEffect, useState} from 'react';
 import {Priority, ServiceOrderType} from 'models/service-order';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {EmployeesView} from 'models/employee';
 import {toRestDateTime} from 'utils/datetime';
 import {useNavigate} from 'react-router';
 import {AddDescription} from '../AddDescription';
@@ -26,10 +26,10 @@ export const NewEmergency = () => {
     'Emergency order created',
   );
   const [recommendedTechnicians, setRecommendedTechnicians] = useState<
-    TechnicianView[]
+    EmployeesView[]
   >([]);
   const [selectedTechnicians, setSelectedTechnicians] = useState<
-    TechnicianView[]
+    EmployeesView[]
   >([]);
 
   useEffect(() => {

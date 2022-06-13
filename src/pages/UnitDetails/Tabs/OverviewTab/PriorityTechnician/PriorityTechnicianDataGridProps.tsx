@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Box from '@mui/material/Box';
-import {MaintainerView} from 'models/technician';
+import {ElevatorAssignmentSimpleView} from 'models/elevator';
 
 const defaultProps = {
   editable: false,
@@ -36,8 +36,8 @@ const defaultAlignment: {
 };
 
 export const columns = (
-  getEditableTechnician: (item: MaintainerView) => void,
-  getDeletableTechnician: (item: MaintainerView) => void,
+  getEditableTechnician: (item: ElevatorAssignmentSimpleView) => void,
+  getDeletableTechnician: (item: ElevatorAssignmentSimpleView) => void,
 ): GridColDef[] => [
   {
     field: 'name',
@@ -81,7 +81,9 @@ export const columns = (
   },
 ];
 
-export const makeRows = (maintainers: MaintainerView[]): GridRowsProp =>
+export const makeRows = (
+  maintainers: ElevatorAssignmentSimpleView[],
+): GridRowsProp =>
   maintainers.map((maintainer) => ({
     id: maintainer.technician.id,
     name: `${maintainer.technician.userAccount.firstName} ${maintainer.technician.userAccount.lastName}`,

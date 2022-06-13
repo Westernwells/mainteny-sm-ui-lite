@@ -363,7 +363,7 @@ export const useUpdateElevatorTechnician = (successMsg?: string) => {
             variant: 'success',
           });
         }
-        queryClient.invalidateQueries(queryKeys.maintainerByElevatorId);
+        queryClient.invalidateQueries(queryKeys.elevatorById);
       },
       onError: (err: any) => {
         console.log(err);

@@ -19,5 +19,3 @@ export interface ServiceManager {
   userAccount: UserAccount;
   meta: Meta;
 }
-
-export interface ServiceManagerUserView extends UserView<any> {}

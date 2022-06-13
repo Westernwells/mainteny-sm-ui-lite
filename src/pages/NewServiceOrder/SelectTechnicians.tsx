@@ -3,7 +3,6 @@ import Typography from '@mui/material/Typography';
 import * as _ from 'lodash';
 import {ServiceOrderType, ServiceOrderView} from 'models/service-order';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {TechnicianView} from 'models/technician';
 import {useFetchRecommendedTechnician} from 'hooks/reactQuery/useTechnician';
 import {useQueryServiceOrderScheduled} from 'hooks/reactQuery/useServiceOrder';
 import {endOfDay, startOfDay} from 'date-fns';
@@ -18,6 +17,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import useTheme from '@mui/material/styles/useTheme';
 import Divider from '@mui/material/Divider';
 import {Button} from 'components/Button';
+import {EmployeesView} from 'models/employee';
 import {sortOrderByTime} from 'utils/service-order-utils';
 import {AddTechnicianDialog} from './AddTechnicianDialog';
 import {TechnicianSchedule} from './TechnicianSchedule';
@@ -28,10 +28,10 @@ import {DueDateForm} from './DueDateForm';
 
 interface Props {
   elevatorId?: string;
-  initialSelectedTechnicians?: TechnicianView[];
-  getSelectedTechnicians?: (val: TechnicianView[]) => void;
-  getRecommendedTechnicianView?: (val: TechnicianView[]) => void;
-  initialRecommendedTechnicians?: TechnicianView[];
+  initialSelectedTechnicians?: EmployeesView[];
+  getSelectedTechnicians?: (val: EmployeesView[]) => void;
+  getRecommendedTechnicianView?: (val: EmployeesView[]) => void;
+  initialRecommendedTechnicians?: EmployeesView[];
   showOptions?: boolean;
   defaultOption?: RadioOptions;
   getScheduleFormValue?: (form: ScheduleTechnicianForm) => void;
@@ -97,7 +97,7 @@ export const SelectTechnicians = ({
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();
   const [openDialog, setOpenDialog] = useState(false);
 
-  const [newTechnician, setNewTechnician] = useState<TechnicianView | null>(
+  const [newTechnician, setNewTechnician] = useState<EmployeesView | null>(
     null,
   );
   const [checkboxState, setCheckboxState] = useState<CheckBoxState>(
@@ -110,7 +110,7 @@ export const SelectTechnicians = ({
   const [orders, setOrders] = useState<{[key: string]: ServiceOrderView[]}>({});
   const [page] = useState(makePage(0, 500));
   const [recommendedTechniciansView, setRecommendedTechniciansView] = useState<
-    TechnicianView[]
+    EmployeesView[]
   >(initialRecommendedTechnicians || []);
   const {data: recommendedTechnicians = []} = useFetchRecommendedTechnician(
     {

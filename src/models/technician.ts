@@ -36,7 +36,7 @@ export interface TechnicianUserData {
   meta: Meta;
 }
 // use related view example api api/users
-export interface TechnicianUserView extends UserView<TechnicianUserData> {}
+export interface TechnicianUserView extends UserView {}
 
 export interface TechEventAdditionalInfo {
   leftVacationDays: number;

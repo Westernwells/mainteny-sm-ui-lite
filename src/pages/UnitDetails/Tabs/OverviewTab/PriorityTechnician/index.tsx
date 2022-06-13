@@ -5,16 +5,13 @@ import {useCallback, useEffect, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import {useFormik} from 'formik';
-import {MaintainerView} from 'models/technician';
 import {Confirm} from 'components/Confirm';
 import * as Yup from 'yup';
-import {
-  useElevatorMaintainers,
-  useUpdateElevatorTechnician,
-} from 'hooks/reactQuery/useElevator';
+import {useUpdateElevatorTechnician} from 'hooks/reactQuery/useElevator';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
 import {getDataGridHeight} from 'utils/utils';
+import {ElevatorAssignmentSimpleView} from 'models/elevator';
 import {PriorityTechnicianFormModel} from 'models/unitForm';
 import {columns, makeRows} from './PriorityTechnicianDataGridProps';
 import {PriorityTechnicianForm} from './PriorityTechnicianForm';
@@ -22,6 +19,7 @@ import {PriorityTechnicianForm} from './PriorityTechnicianForm';
 interface Props {
   containerStyles?: {[key: string]: any};
   elevatorId?: string;
+  maintainers?: ElevatorAssignmentSimpleView[];
 }
 
 enum DialogTitle {
@@ -34,7 +32,11 @@ const validationSchema = Yup.object().shape({
   priority: Yup.string().nullable().required('Priority is required'),
 });
 
-export const PriorityTechnician = ({containerStyles, elevatorId}: Props) => {
+export const PriorityTechnician = ({
+  containerStyles,
+  elevatorId,
+  maintainers = [],
+}: Props) => {
   const theme = useTheme();
   const formik = useFormik<PriorityTechnicianFormModel>({
     initialValues: {
@@ -46,11 +48,11 @@ export const PriorityTechnician = ({containerStyles, elevatorId}: Props) => {
   });
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [openDialog, setOpenDialog] = useState(false);
-  const [activeTechnician, setActiveTechnician] = useState<MaintainerView>();
+  const [activeTechnician, setActiveTechnician] =
+    useState<ElevatorAssignmentSimpleView>();
   const [dialogTitle, setDialogTitle] = useState('');
   const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
   const [showAll, setShowAll] = useState(false);
-  const {data: maintainers = []} = useElevatorMaintainers(elevatorId!);
   const {mutateAsync: updateTechnician, isLoading: isEditing} =
     useUpdateElevatorTechnician('Technicians updated successfully');
 
@@ -58,7 +60,7 @@ export const PriorityTechnician = ({containerStyles, elevatorId}: Props) => {
     setRows(makeRows(!showAll ? maintainers.slice(0, 3) : maintainers));
   }, [maintainers, showAll]);
 
-  const onEditButtonClicked = (item: MaintainerView) => {
+  const onEditButtonClicked = (item: ElevatorAssignmentSimpleView) => {
     setDialogTitle(DialogTitle.EDIT_TECHNICIAN);
     formik.setFieldValue('technicianId', item.technician.id);
     setActiveTechnician(item);
@@ -107,11 +109,11 @@ export const PriorityTechnician = ({containerStyles, elevatorId}: Props) => {
     setOpenCancelConfirm(false);
   };
 
-  const getEditableTechnician = (item: MaintainerView) => {
+  const getEditableTechnician = (item: ElevatorAssignmentSimpleView) => {
     onEditButtonClicked(item);
   };
 
-  const getDeletableTechnician = (item: MaintainerView) => {
+  const getDeletableTechnician = (item: ElevatorAssignmentSimpleView) => {
     setActiveTechnician(item);
     setOpenCancelConfirm(true);
   };

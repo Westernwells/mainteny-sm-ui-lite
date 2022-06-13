@@ -1,6 +1,6 @@
 import {Address, Meta} from './misc';
+import {ServiceOrderType} from './service-order';
 import {
-  TechEventAdditionalInfo,
   TechnicianEventView,
   TechnicianView,
   TechnicianWorkingHours,
@@ -14,13 +14,27 @@ export interface UserQueryParams {
   roles: Role[];
 }
 
+export interface EmployeeAdditionalInfo {
+  leftVacationDays: number;
+  assignedServiceOrderTypes?: ServiceOrderType[];
+}
+
 export interface EmployeesView {
-  address?: Address;
-  workingHours?: TechnicianWorkingHours[];
-  additionalInfo?: TechEventAdditionalInfo;
-  id?: string;
-  isOnline?: boolean;
-  meta?: Meta;
+  address: Address;
+  additionalInfo: EmployeeAdditionalInfo;
+  id: string;
+  isOnline: boolean;
+  online: boolean;
+  meta: Meta;
   userAccount: UserAccountView;
-  events?: TechnicianEventView[];
+}
+
+export interface EmployeesSimpleView {
+  additionalInfo: EmployeeAdditionalInfo;
+  address: Address;
+  id: string;
+  isOnline: boolean;
+  meta: Meta;
+  userAccount: UserAccountView;
+  online: boolean;
 }

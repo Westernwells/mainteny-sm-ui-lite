@@ -4,7 +4,7 @@ import {Widget} from 'components/Widget';
 import {useQueryTechnicianEvents} from 'hooks/reactQuery/useTechnician';
 import {useQueryUserAccounts} from 'hooks/reactQuery/useUserAccount';
 import {TechnicianEventType} from 'models/misc';
-import {CommonUserView, Role} from 'models/user';
+import {UserView, Role} from 'models/user';
 import {useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import * as _ from 'lodash';
@@ -34,7 +34,7 @@ export const Employees = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const {
-    data: userAccountResource = createEmptyResource<CommonUserView>(pageSize),
+    data: userAccountResource = createEmptyResource<UserView>(pageSize),
     isFetched,
     isIdle,
     isLoading,

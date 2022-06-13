@@ -4,13 +4,13 @@ import Autocomplete from '@mui/material/Autocomplete';
 import * as _ from 'lodash';
 import {useQueryServiceCompanyTechnicians} from 'hooks/reactQuery/useTechnician';
 import {createEmptyResource} from 'utils/paging-utils';
-import {TechnicianView} from 'models/technician';
+import {EmployeesSimpleView, EmployeesView} from 'models/employee';
 import {FormInput} from './form/FormInput';
 
 interface Props {
-  getTechnician?: (val: TechnicianView | null) => void;
+  getTechnician?: (val: EmployeesView | EmployeesSimpleView | null) => void;
   getQuery?: (val: string) => void;
-  initialValue?: TechnicianView | null;
+  initialValue?: EmployeesView | EmployeesSimpleView | null;
   textFieldProps?: TextFieldProps;
   disabled?: boolean;
 }
@@ -28,9 +28,9 @@ export const TechnicianAutoComplete = ({
       ? `${initialValue.userAccount.firstName} ${initialValue.userAccount.lastName}`
       : '',
   );
-  const [technician, setTechnician] = useState<TechnicianView | null>(
-    initialValue,
-  );
+  const [technician, setTechnician] = useState<
+    EmployeesView | EmployeesSimpleView | null
+  >(initialValue);
 
   const {data: techniciansResource = createEmptyResource(10)} =
     useQueryServiceCompanyTechnicians({
@@ -85,7 +85,10 @@ export const TechnicianAutoComplete = ({
       id="combo-box-demo"
       sx={{minHeight: 0}}
       options={techniciansResource.data}
-      onChange={(event: any, newValue: TechnicianView | null) => {
+      onChange={(
+        event: any,
+        newValue: EmployeesView | EmployeesSimpleView | null,
+      ) => {
         setTechnician(newValue);
       }}
       getOptionLabel={(option) =>

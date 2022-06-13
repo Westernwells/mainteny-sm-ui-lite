@@ -5,15 +5,15 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
-import {TechnicianView} from 'models/technician';
 import {Button} from 'components/Button';
+import {EmployeesView} from 'models/employee';
 import Box from '@mui/material/Box';
 import {TechnicianAutoComplete} from '../../components/TechnicianAutoComplete';
 
 interface Props {
   open?: boolean;
   getDialogState?: (val: boolean) => void;
-  getTechnician?: (val: TechnicianView | null) => void;
+  getTechnician?: (val: EmployeesView | null) => void;
 }
 
 export const AddTechnicianDialog = ({
@@ -23,7 +23,7 @@ export const AddTechnicianDialog = ({
 }: Props) => {
   const [showModal, setShowModal] = useState(false);
   const [queryView, setQueryView] = useState('');
-  const [technician, setTechnician] = useState<TechnicianView | null>(null);
+  const [technician, setTechnician] = useState<EmployeesView | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -57,7 +57,7 @@ export const AddTechnicianDialog = ({
         <DialogContent>
           <DialogContentText id="alert-dialog-description" component="div">
             <TechnicianAutoComplete
-              getTechnician={(value) => setTechnician(value)}
+              getTechnician={(value) => setTechnician(value as EmployeesView)}
               getQuery={(val) => setQueryView(val)}
               textFieldProps={{
                 sx: {

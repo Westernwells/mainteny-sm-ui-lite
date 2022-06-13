@@ -5,15 +5,14 @@ import {useNavigate} from 'react-router';
 import {SideDrawer} from 'components/SideDrawer';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useEmployeeAccount} from 'hooks/reactQuery/useUserAccount';
-import {EmployeesView} from 'models/employee';
-import {Role} from 'models/user';
+import {UserView, Role} from 'models/user';
 import {EditEmployeeForm} from './EditEmployeeForm';
 import {EmployeeAccountData} from './EditEmployeeForm/model';
 
 // TODO: Use common components for both Add Employee and Edit Employee
 
 interface Props {
-  employee: EmployeesView;
+  employee: UserView;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -32,29 +31,30 @@ export const EditEmployee = ({employee, open, setOpen}: Props) => {
     email: employee.userAccount.contact.email,
     roles: employee.userAccount.roles,
     address:
-      employee.userAccount.roles.includes(Role.TECHNICIAN) && employee.address
+      employee.userAccount.roles.includes(Role.TECHNICIAN) &&
+      employee.userData.address
         ? {
-            fullName: employee.address.fullName,
-            countryCode: employee.address.countryCode,
+            fullName: employee.userData.address.fullName,
+            countryCode: employee.userData.address.countryCode,
             location: {
-              longitude: employee.address.location.longitude,
-              latitude: employee.address.location.latitude,
+              longitude: employee.userData.address.location.longitude,
+              latitude: employee.userData.address.location.latitude,
             },
           }
         : null,
     addressFullName:
       employee.userAccount.roles.includes(Role.TECHNICIAN) &&
-      employee.address &&
-      employee.address.fullName,
+      employee.userData.address &&
+      employee.userData.address.fullName,
     serviceOrderTypes:
       employee.userAccount.roles.includes(Role.TECHNICIAN) &&
-      employee.additionalInfo
-        ? employee.additionalInfo.assignedServiceOrderTypes || []
+      employee.userData.additionalInfo
+        ? employee.userData.additionalInfo.assignedServiceOrderTypes || []
         : [],
     shifts:
       employee.userAccount.roles.includes(Role.TECHNICIAN) &&
-      employee.workingHours
-        ? employee.workingHours.map((item) => ({
+      employee.userData.workingHours
+        ? employee.userData.workingHours.map((item) => ({
             fromTime: item.fromTime,
             toTime: item.toTime,
             type: item.type,
