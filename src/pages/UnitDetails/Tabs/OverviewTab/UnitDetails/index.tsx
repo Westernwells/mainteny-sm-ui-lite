@@ -1,7 +1,7 @@
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
-import {Elevator, ElevatorRequestBody} from 'models/elevator';
+import {ElevatorRequestBody, ElevatorView} from 'models/elevator';
 import {InfoCard} from 'components/InfoCard';
 import {useRef, useState} from 'react';
 import {Dialog} from 'components/Dialog';
@@ -16,7 +16,7 @@ import {EditUnitDetailsForm} from './EditUnitDetailsForm';
 
 interface Props {
   containerStyles?: {[key: string]: any};
-  elevator: Elevator;
+  elevator: ElevatorView;
   validContract?: ContractView;
   elevatorRequestBody?: Partial<ElevatorRequestBody>;
 }

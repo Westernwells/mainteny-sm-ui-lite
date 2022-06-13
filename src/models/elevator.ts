@@ -117,6 +117,7 @@ export interface ElevatorView {
   availability: number;
   address: Address;
   propertyOwner: ClientSimpleView;
+  properties: ElevatorProperty[];
   lastVisitDate: string;
   nextVisitDate: string;
   serviceTime: number;

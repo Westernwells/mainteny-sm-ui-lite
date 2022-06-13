@@ -14,6 +14,7 @@ import {
 } from 'hooks/reactQuery/useElevator';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
+import {getDataGridHeight} from 'utils/utils';
 import {PriorityTechnicianFormModel} from 'models/unitForm';
 import {columns, makeRows} from './PriorityTechnicianDataGridProps';
 import {PriorityTechnicianForm} from './PriorityTechnicianForm';
@@ -55,7 +56,7 @@ export const PriorityTechnician = ({containerStyles, elevatorId}: Props) => {
 
   useEffect(() => {
     setRows(makeRows(!showAll ? maintainers.slice(0, 3) : maintainers));
-  }, [maintainers]);
+  }, [maintainers, showAll]);
 
   const onEditButtonClicked = (item: MaintainerView) => {
     setDialogTitle(DialogTitle.EDIT_TECHNICIAN);
@@ -129,7 +130,7 @@ export const PriorityTechnician = ({containerStyles, elevatorId}: Props) => {
       headerActionIcon={<Typography color="info.main">+ Add</Typography>}>
       <DataGridLayout
         fullHeight={false}
-        height={200}
+        height={getDataGridHeight(rows.length, showAll ? rows.length : 3)}
         hideFooter
         rows={rows}
         columns={useCallback(

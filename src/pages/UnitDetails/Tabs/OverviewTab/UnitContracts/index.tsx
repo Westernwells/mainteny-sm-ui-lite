@@ -4,6 +4,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {useEffect, useState} from 'react';
 import {ContractView} from 'models/contract';
+import {getDataGridHeight} from 'utils/utils';
 import {GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import {columns, makeRows} from './UnitsContractDataGridProps';
@@ -34,7 +35,7 @@ export const UnitContracts = ({containerStyles, contracts}: Props) => {
       }}>
       <DataGridLayout
         fullHeight={false}
-        height={200}
+        height={getDataGridHeight(rows.length, 3)}
         hideFooter
         rows={rows}
         columns={columns}
