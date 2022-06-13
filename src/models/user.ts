@@ -117,7 +117,3 @@ export interface UserData {
 }
 
 export interface ServiceManagerData {}
-
-// export interface UserView extends UserView<TechnicianUserData | ServiceManagerData> {
-//   id: string;
-// }

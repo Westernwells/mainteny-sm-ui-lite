@@ -51,7 +51,6 @@ export const EmployeeDetails = ({getCurrentPageTitle}: Props) => {
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
         <ScheduleTab technicianId={user?.userData.employeeId} />
-        {/* <Schedule technicianId={technician && technician[0].id} /> */}
       </TabsBody>
       <TabsBody value={tabValue} index={2}>
         {null}

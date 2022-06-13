@@ -8,7 +8,6 @@ import * as Yup from 'yup';
 import {EmployeesView} from 'models/employee';
 import {RadioOptions, ScheduleTechnicianForm} from './models';
 import {TechnicianAutoComplete} from '../../components/TechnicianAutoComplete';
-// import {constant} from './utils';
 
 interface Props {
   defaultStartDate: Date | null;

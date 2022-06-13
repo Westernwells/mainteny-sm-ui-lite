@@ -30,15 +30,6 @@ export const OverviewTab = ({getUnitName}: Props) => {
 
   const {data: elevator, isLoading: isLoadingElevator} =
     useElevatorById(elevatorId);
-  // const {data: contracts = {}, isLoading: isLoadingContract} =
-  //   useUseQueryElevatorsContracts({
-  //     elevatorIds: elevatorId ? [elevatorId] : [],
-  //     status: [
-  //       ContractStatus.VALID,
-  //       ContractStatus.PENDING,
-  //       ContractStatus.EXPIRED,
-  //     ],
-  //   });
 
   useEffect(() => {
     if (getUnitName && elevator) {
