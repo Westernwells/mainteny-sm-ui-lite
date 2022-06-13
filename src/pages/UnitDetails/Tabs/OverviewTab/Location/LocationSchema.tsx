@@ -5,11 +5,11 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import LocalParkingIcon from '@mui/icons-material/LocalParking';
 import HomeIcon from '@mui/icons-material/Home';
 import useTheme from '@mui/material/styles/useTheme';
-import {Elevator} from 'models/elevator';
+import {ElevatorView} from 'models/elevator';
 
 interface Props {
   label: string;
-  elevator: Elevator;
+  elevator: ElevatorView;
 }
 
 export const LocationSchema = ({label, elevator}: Props) => {

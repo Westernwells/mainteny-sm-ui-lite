@@ -120,6 +120,7 @@ export interface ElevatorView {
   properties: ElevatorProperty[];
   lastVisitDate: string;
   nextVisitDate: string;
+  serialNumber: string;
   serviceTime: number;
   status: ElevatorStatus;
   labels: [];

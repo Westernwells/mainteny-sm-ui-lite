@@ -10,14 +10,14 @@ import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {convertToMacro} from 'utils/utils';
 import {UnitDetailsFormModel} from 'models/unitForm';
-import {ContractView} from 'models/contract';
+import {ContractSimpleView} from 'models/contract';
 import {UnitDetailsSchema} from './UnitDetailsSchema';
 import {EditUnitDetailsForm} from './EditUnitDetailsForm';
 
 interface Props {
   containerStyles?: {[key: string]: any};
   elevator: ElevatorView;
-  validContract?: ContractView;
+  validContract?: ContractSimpleView;
   elevatorRequestBody?: Partial<ElevatorRequestBody>;
 }
 

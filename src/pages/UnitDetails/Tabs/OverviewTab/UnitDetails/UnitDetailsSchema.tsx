@@ -11,11 +11,11 @@ import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import useTheme from '@mui/material/styles/useTheme';
-import {Elevator} from 'models/elevator';
+import {ElevatorView} from 'models/elevator';
 
 interface Props {
   label: string;
-  elevator: Elevator;
+  elevator: ElevatorView;
   spendingLimit?: number;
   currency?: string;
 }
