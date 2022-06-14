@@ -70,10 +70,6 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const [formValid, setFormValid] = useState(false);
   const {t} = useTranslation();
 
-  // useEffect(() => {
-  //   setOrderInfo(orderInfoSchema(serviceOrderDetails));
-  // }, [serviceOrderDetails]);
-
   useEffect(() => {
     if (
       switchActive &&
