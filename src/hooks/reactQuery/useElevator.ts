@@ -7,7 +7,7 @@ import {
 import {AxiosResponse} from 'axios';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {queryKeys} from 'reactQuery/constants';
-import {useNavigate} from 'react-router';
+import {useNavigate, useParams} from 'react-router';
 import {useSnackbar} from 'notistack';
 import {
   CustomerElevatorParams,
@@ -15,6 +15,7 @@ import {
   ElevatorCommentRecord,
   ElevatorRequestBody,
   ElevatorView,
+  QueryTodoParams,
 } from '../../models/elevator';
 import {
   CacheTypes,
@@ -401,6 +402,132 @@ export const useAddElevator = (successMsg?: string) => {
         enqueueSnackbar('Some error occurred, please try again.', {
           variant: 'error',
         });
+      },
+    },
+  );
+};
+
+export const getTodos = async (id: string, params: QueryTodoParams) => {
+  const response = await axiosClient.get<Resource<ElevatorComment>>(
+    `/api/elevators/${id}/todos`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useTodos = (params: QueryTodoParams, options?: any) => {
+  const {id: elevatorId} = useParams();
+  return useQuery<Resource<ElevatorComment>, RestError>(
+    [queryKeys.queryTodos, params],
+    () => getTodos(elevatorId || '', params),
+    {
+      enabled: !!elevatorId,
+      ...options,
+    },
+  );
+};
+export const postTodo = async (id: string, body: ElevatorCommentRecord) => {
+  await axiosClient.post(`/api/elevators/${id}/todos`, body);
+};
+
+export const useCreateTodo = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({elevatorId, data}: {elevatorId: string; data: ElevatorCommentRecord}) =>
+      postTodo(elevatorId, data),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.queryTodos]);
+        enqueueSnackbar(`Todo created successfully!`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar(
+          'Sorry, there was an error while creating the todo. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
+      },
+    },
+  );
+};
+
+export const putTodo = async (
+  elevatorId: string,
+  todoId: string,
+  body: ElevatorCommentRecord,
+) => {
+  await axiosClient.put(`/api/elevators/${elevatorId}/todos/${todoId}`, body);
+};
+
+export const useUpdateTodo = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({
+      elevatorId,
+      todoId,
+      data,
+    }: {
+      elevatorId: string;
+      todoId: string;
+      data: ElevatorCommentRecord;
+    }) => putTodo(elevatorId, todoId, data),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.queryTodos]);
+        enqueueSnackbar(`Todo updated successfully!`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar(
+          'Sorry, there was an error while updating the todo. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
+      },
+    },
+  );
+};
+
+export const deleteTodo = async (elevatorId: string, todoId: string) => {
+  await axiosClient.delete(`/api/elevators/${elevatorId}/todos/${todoId}`);
+};
+
+export const useDeleteTodo = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({elevatorId, todoId}: {elevatorId: string; todoId: string}) =>
+      deleteTodo(elevatorId, todoId),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.queryTodos]);
+        enqueueSnackbar(`Todo deleted successfully!`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar(
+          'Sorry, there was an error while deleting the todo. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
       },
     },
   );
