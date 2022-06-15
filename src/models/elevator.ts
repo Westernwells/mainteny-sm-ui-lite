@@ -302,3 +302,8 @@ export interface ElevatorCommentRecord {
   content: string;
   subject: string;
 }
+
+export interface QueryTodoParams {
+  pageIndex: number;
+  pageSize: number;
+}
