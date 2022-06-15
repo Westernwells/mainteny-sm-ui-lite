@@ -17,8 +17,8 @@ import {
 } from 'hooks/reactQuery/useServiceOrder';
 import {
   JobScheduleType,
-  ServiceOrder,
   ServiceOrderStatus,
+  ServiceOrderView,
 } from 'models/service-order';
 import {useTranslation} from 'react-i18next';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
@@ -36,7 +36,7 @@ import {ScheduleDialog} from './ScheduleDialog';
 import {OrderInfo} from './schema';
 
 interface Props {
-  serviceOrderDetails: ServiceOrder;
+  serviceOrderDetails: ServiceOrderView;
 }
 
 const orderInfo = [

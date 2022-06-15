@@ -16,6 +16,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import {formatDate} from 'utils/datetime';
 import {OrderInfoCard} from './OrderInfoCard';
 import {DescriptionCard} from './DescriptionCard';
+import {Quotation} from './Quotations';
 
 export const Overview = () => {
   const theme = useTheme();
@@ -62,6 +63,10 @@ export const Overview = () => {
           </Box>
           <Box mt="1em" flexGrow={1}>
             <DescriptionCard content={serviceOrderDetails?.description} />
+          </Box>
+
+          <Box mt="1em" flexGrow={1}>
+            <Quotation serviceOrder={serviceOrderDetails} />
           </Box>
         </Box>
       </Grid>

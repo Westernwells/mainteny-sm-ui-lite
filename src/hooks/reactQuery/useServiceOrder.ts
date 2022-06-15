@@ -25,7 +25,6 @@ import {
   AssignmentBasedOrderBody,
   UpdateServiceOrderBody,
   RedispatchParams,
-  ServiceOrder,
   ServiceOrderActivityView,
   ServiceOrderOrderField,
   ServiceOrderQueryParams,
@@ -352,8 +351,8 @@ export const useQueryServiceOrderScheduled = (
 
 export const getServiceOrderDetails = async (
   serviceOrderId: string,
-): Promise<ServiceOrder> => {
-  const response: AxiosResponse<ServiceOrder> = await axiosClient.get(
+): Promise<ServiceOrderView> => {
+  const response: AxiosResponse<ServiceOrderView> = await axiosClient.get(
     `/api/serviceOrders/${serviceOrderId}`,
   );
   return response.data;
@@ -364,7 +363,7 @@ export function useServiceOrderDetails(
   serviceOrderId?: string,
   options?: UseQueryOptions<any, any, any>,
 ) {
-  return useQuery<ServiceOrder, RestError, ServiceOrder>(
+  return useQuery<ServiceOrderView, RestError, ServiceOrderView>(
     [queryKeys.getServiceOrderDetails, serviceOrderId],
     () => getServiceOrderDetails(serviceOrderId!),
     {enabled: !!serviceOrderId, ...options},

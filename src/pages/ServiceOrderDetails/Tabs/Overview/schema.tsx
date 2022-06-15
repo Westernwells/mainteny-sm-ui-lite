@@ -13,92 +13,18 @@ import PermContactCalendarIcon from '@mui/icons-material/PermContactCalendar';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import TimerIcon from '@mui/icons-material/Timer';
 import TimelapseIcon from '@mui/icons-material/Timelapse';
-import {ServiceOrder, ServiceOrderStatus} from 'models/service-order';
+import {
+  ServiceOrder,
+  ServiceOrderStatus,
+  ServiceOrderView,
+} from 'models/service-order';
 import {serviceOrderStatusToString} from 'utils/service-order-utils';
 import {convertMinsToHM, formatDate, toDate} from 'utils/datetime';
 // import useTheme from '@mui/material/styles/useTheme';
 import {theme} from 'theme';
 import {CardProps} from 'components/CardProps';
-
-// export const orderInfo = (serviceOrderDetails: ServiceOrder) => ({
-//   type: {
-//     label: 'ORDER TYPE',
-//     value: serviceOrderDetails.type,
-//     icon: <ConstructionIcon sx={{color: theme.palette.info.dark}} />,
-//   },
-//   people: {
-//     label: 'CUSTOMER',
-//     value: serviceOrderDetails.elevator.propertyOwner.name,
-//     icon: <PeopleIcon sx={{color: theme.palette.info.dark}} />,
-//   },
-//   status: {
-//     label: 'STATUS',
-//     value: serviceOrderStatusToString(serviceOrderDetails.status),
-//     icon: <InfoIcon sx={{color: theme.palette.info.dark}} />,
-//   },
-//   createdOn: {
-//     label: 'CREATED ON',
-//     value: formatDate(serviceOrderDetails.meta.createdAt, 'dd.MM.yyyy'),
-//     icon: <CalendarTodayIcon sx={{color: theme.palette.info.dark}} />,
-//   },
-//   dueDate: {
-//     label: 'DUE DATE',
-//     value: formatDate(new Date(serviceOrderDetails.dueDate), 'dd.MM.yyyy'),
-//     icon: <FlagIcon sx={{color: theme.palette.info.dark}} />,
-//   },
-//   technician: {
-//     label: 'TECHNICIAN',
-//     value: serviceOrderDetails.schedules
-//       .map(
-//         (schedule) =>
-//           `${schedule.technician.userAccount.firstName} ${schedule.technician.userAccount.firstName}`,
-//       )
-//       .join(','),
-//     icon: <PersonIcon sx={{color: theme.palette.info.dark}} />,
-//   },
-// });
-
-export const unitInfo = (serviceOrderDetails: ServiceOrder) => ({
-  address: {
-    label: 'ADDRESS',
-    value: serviceOrderDetails.elevator.address.fullName,
-    icon: <HomeIcon sx={{color: theme.palette.info.dark}} />,
-  },
-  type: {
-    label: 'TYPE',
-    value: serviceOrderDetails.elevator.type,
-    icon: <PeopleIcon sx={{color: theme.palette.info.dark}} />,
-  },
-  status: {
-    label: 'CAPACITY',
-    value: serviceOrderDetails.elevator.capacity,
-    icon: <PeopleAltIcon sx={{color: theme.palette.info.dark}} />,
-  },
-  createdOn: {
-    label: 'MODEL',
-    value: serviceOrderDetails.elevator.model,
-    icon: <ElevatorIcon sx={{color: theme.palette.info.dark}} />,
-  },
-  dueDate: {
-    label: 'LAST VISIT',
-    value: formatDate(
-      new Date(serviceOrderDetails.lastVisitDate),
-      'dd.MM.yyyy',
-    ),
-    icon: <PermContactCalendarIcon sx={{color: theme.palette.info.dark}} />,
-  },
-  technician: {
-    label: 'SERVICE TIME',
-    value:
-      serviceOrderDetails.status === ServiceOrderStatus.COMPLETED
-        ? convertMinsToHM(serviceOrderDetails.serviceTime)
-        : '-',
-    icon: <TimerIcon sx={{color: theme.palette.info.dark}} />,
-  },
-});
-
 interface OrderInfoProps {
-  serviceOrderDetails: ServiceOrder;
+  serviceOrderDetails: ServiceOrderView;
   label: string;
 }
 

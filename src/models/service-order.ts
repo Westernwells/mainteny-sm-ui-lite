@@ -8,7 +8,8 @@ import {Contract, ContractSimpleView} from './contract';
 import {Fee, JobStatus, Meta, Order} from './misc';
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
-import {EmployeesView} from './employee';
+import {EmployeesSimpleView, EmployeesView} from './employee';
+import {Checklist} from './checklist';
 
 export enum Priority {
   A = 'A',
@@ -89,6 +90,9 @@ export interface ServiceOrderAdditionalInfo {
   appointmentNotificationRequired: boolean;
   appointmentNotificationSent: boolean;
   priority: Priority;
+  checklist: Checklist;
+  moreInformation: string;
+  quotationId: string;
 }
 
 export interface ServiceOrderView {
@@ -164,7 +168,7 @@ export interface ServiceOrderSchedule {
 export interface ServiceOrderScheduleSimpleView {
   id: string;
   serviceOrderId: string;
-  technician: TechnicianSimpleView;
+  technician: EmployeesSimpleView;
   startTime: string;
   endTime: string;
   type: JobScheduleType;
