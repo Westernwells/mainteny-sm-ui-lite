@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import useTheme from '@mui/material/styles/useTheme';
 import {
   DataGrid,
   DataGridProps,
@@ -37,6 +38,7 @@ interface Props extends DataGridProps {
   isRowSelectable?: (params: GridRowParams) => boolean;
   isCellClickable?: boolean;
   isWidget?: boolean;
+  headerHeight?: number;
 }
 
 interface ColumnProps extends GridColDef {
@@ -96,9 +98,11 @@ export const DataGridLayout = ({
   noResultsCondition = false,
   isCellClickable = true,
   isWidget = false,
+  headerHeight,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const rowClassNames: any[string] = [];
   rows.forEach((item) => {
@@ -160,7 +164,7 @@ export const DataGridLayout = ({
           NoRowsOverlay: noRowsOverlay,
         }}
         loading={loading}
-        headerHeight={50}
+        headerHeight={headerHeight || 50}
         rows={rows}
         columns={columns}
         isRowSelectable={isRowSelectable}
@@ -199,7 +203,7 @@ export const DataGridLayout = ({
             borderBottom: '2px solid',
             borderColor: 'background.default',
             ...(isWidget && {
-              border: '1px solid #8F9BB380',
+              border: `1px solid ${theme.palette.text.disabled}`,
               borderRadius: '4px',
             }),
           },
