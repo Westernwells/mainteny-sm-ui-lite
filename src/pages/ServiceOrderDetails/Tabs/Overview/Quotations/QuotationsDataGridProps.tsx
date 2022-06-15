@@ -70,5 +70,5 @@ export const makeRows = (quotations: QuotationView[]): GridRowsProp =>
       },
     )}`,
     status: item.status,
-    navigateTo: `details/${item.id}`,
+    navigateTo: `/quotations/details/${item.id}`,
   }));
