@@ -96,13 +96,18 @@ export const languageMap: {[key: string]: string} = {
   'de-DE': 'de-de',
 };
 
-export const getDataGridHeight = (currentTotal: number, maxItems: number) => {
+export const getDataGridHeight = (
+  currentTotal: number,
+  maxItems: number,
+  headerHeight?: number,
+) => {
+  const height = headerHeight || 30;
   if (currentTotal === 0) {
-    return 70 * 3 + 50;
+    return 70 * 3 + height;
   }
   if (currentTotal >= maxItems) {
-    return 52 * maxItems + 50;
+    return 52 * maxItems + height;
   }
 
-  return 52 * currentTotal + 50;
+  return 52 * currentTotal + height;
 };
