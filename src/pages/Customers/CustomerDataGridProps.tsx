@@ -1,8 +1,9 @@
 import React from 'react';
-import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
+import {GridColDef, GridRowModel} from '@mui/x-data-grid';
 import SendIcon from '@mui/icons-material/Send';
 import {getColumnProps} from 'components/DataGridLayout';
 import IconButton from '@mui/material/IconButton';
+import {PropertyOwnerView} from 'models/propertyManager';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -47,17 +48,17 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = (customers: any): GridRowsProp =>
-  customers
-    ? customers.map((item: any, index: number) => ({
-        id: index,
-        name: item.name,
-        number: 234,
-        address: item.address.fullName,
-        units: item.units,
-        phone: item.contact.phone,
-        access: 'Invite',
-        navigateTo: `details/${item.id}?tab=0`,
-        actions: item.contact.email,
-      }))
-    : console.error('No Data');
+export const makeRows = (
+  customers: PropertyOwnerView[],
+): GridRowModel<{[key: string]: any}[]> =>
+  customers.map((item, index: number) => ({
+    id: index,
+    name: item.name,
+    number: 234,
+    address: item.postalAddress.fullName,
+    units: item.units,
+    phone: item.contact.phone,
+    access: 'Invite',
+    navigateTo: `details/${item.id}?tab=0`,
+    actions: item.contact.email,
+  }));

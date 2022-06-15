@@ -97,7 +97,7 @@ export const makeRows = (customers: PropertyOwnerView[]): GridRowsProp =>
         name: item.name,
         // TODO: Use Customer number
         number: 'C-12345',
-        address: item.address.fullName,
+        address: item.postalAddress.fullName,
         units: item.units,
         phone: item.contact.phone,
         propertyOwner: item,
@@ -138,7 +138,7 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
 
   useEffect(() => {
     if (customersWithUnits) {
-      setRows(makeRows(customersWithUnits));
+      setRows(makeRows(customersWithUnits as unknown as PropertyOwnerView[]));
     } else {
       setRows([]);
     }
