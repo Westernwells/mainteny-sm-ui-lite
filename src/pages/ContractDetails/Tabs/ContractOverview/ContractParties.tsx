@@ -3,7 +3,7 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import {ServiceCompanyView} from 'models/service-company';
-import {ClientView} from 'models/client';
+import {PropertyOwnerView} from 'models/propertyManager';
 import {StatusChip} from 'components/StatusChip';
 import {convertToText} from 'utils/utils';
 
@@ -24,7 +24,7 @@ interface Props {
 }
 
 export interface Parties {
-  [key: string]: ServiceCompanyView | ClientView | undefined;
+  [key: string]: ServiceCompanyView | PropertyOwnerView | undefined;
 }
 
 export const ContractParties = ({

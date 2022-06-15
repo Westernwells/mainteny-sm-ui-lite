@@ -20,7 +20,7 @@ export interface PropertyOwnerAdditionalInfo {
 export interface PropertyOwnerView {
   id: string;
   name: string;
-  address: Address;
+  postalAddress: Address;
   serviceCompany: ServiceCompany;
   contact: Contact;
   search: string;
@@ -28,6 +28,18 @@ export interface PropertyOwnerView {
   units?: number;
   additionalInfo: PropertyOwnerAdditionalInfo;
   labels: string[];
+}
+
+export interface PropertyOwnerSimpleView {
+  additionalInfo: PropertyOwnerAdditionalInfo;
+  postalAddress: Address;
+  contact: Contact;
+  id: string;
+  labels: string[];
+  meta: Meta;
+  name: string;
+  serviceCompanyId: string;
+  units?: number;
 }
 
 export interface PropertyManager {

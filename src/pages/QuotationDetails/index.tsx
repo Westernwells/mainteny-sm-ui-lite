@@ -17,9 +17,11 @@ import {Button} from 'components/Button';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import CopyAllIcon from '@mui/icons-material/CopyAll';
 
-import {Elevator, ElevatorView} from 'models/elevator';
-import {PropertyOwner} from 'models/propertyManager';
-import {ClientSimpleView} from 'models/client';
+import {Elevator, ElevatorSimpleView, ElevatorView} from 'models/elevator';
+import {
+  PropertyOwnerSimpleView,
+  PropertyOwnerView,
+} from 'models/propertyManager';
 import {ArticleView} from 'models/article';
 import {
   QuotationItemRecord,
@@ -81,9 +83,9 @@ export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
 
   const [customer, setCustomer] = useState<
-    PropertyOwner | ClientSimpleView | null
+    PropertyOwnerView | PropertyOwnerSimpleView | null
   >(null);
-  const [unit, setUnit] = useState<ElevatorView | Elevator | null>(null);
+  const [unit, setUnit] = useState<ElevatorSimpleView | Elevator | null>(null);
   const [quotationItems, setQuotationItems] = useState<QuotationItemRecord[]>(
     [],
   );
@@ -114,7 +116,7 @@ export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
     },
   });
 
-  const handleSelectCustomer = (row: PropertyOwner) => {
+  const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
     setIsCustomerModalOpen(false);
   };
@@ -220,7 +222,7 @@ export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
 
   useEffect(() => {
     if (unit) {
-      setCustomer(unit.propertyOwner);
+      setCustomer(unit.propertyOwner as PropertyOwnerSimpleView);
       formik.setFieldValue('elevatorId', unit.id, true);
     }
   }, [unit]);
@@ -267,7 +269,7 @@ export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
                   body={
                     <>
                       <Typography variant="caption">
-                        {customer.address.fullName}
+                        {customer.postalAddress.fullName}
                       </Typography>
                       <Typography variant="caption" component="p">
                         {customer.contact.phone}

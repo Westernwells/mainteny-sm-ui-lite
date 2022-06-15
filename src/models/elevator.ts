@@ -7,13 +7,14 @@ import {
   StringMap,
   StringValue,
 } from './misc';
-import {Client, ClientManager, ClientSimpleView} from './client';
+import {Client, ClientManager} from './client';
 import {TechnicianSimpleView, TechnicianView} from './technician';
 import {FileResource, FileResourceRecord} from './media';
 import {ServiceCompanyTimeUnit} from './service-company';
 import {ServiceOrderView} from './service-order';
 import {ContractSimpleView} from './contract';
 import {EmployeesSimpleView} from './employee';
+import {PropertyOwnerSimpleView} from './propertyManager';
 
 export enum ElevatorCommentType {
   TODO = 'TODO',
@@ -117,7 +118,7 @@ export interface ElevatorView {
   contracts: ContractSimpleView[];
   availability: number;
   address: Address;
-  propertyOwner: ClientSimpleView;
+  propertyOwner: PropertyOwnerSimpleView;
   properties: ElevatorProperty[];
   lastVisitDate: string;
   nextVisitDate: string;
@@ -133,7 +134,7 @@ export interface ElevatorView {
 
 export interface ElevatorSimpleView {
   id: string;
-  propertyOwner: ClientSimpleView;
+  propertyOwner: PropertyOwnerSimpleView;
   properties?: ElevatorProperty[];
   number: string;
   model: string;

@@ -1,5 +1,5 @@
 import {Article} from './article';
-import {Elevator} from './elevator';
+import {Elevator, ElevatorSimpleView} from './elevator';
 import {Amount, Meta} from './misc';
 import {ServiceCompanySimpleView} from './service-company';
 
@@ -35,7 +35,7 @@ export interface QuotationItemRecord {
 export interface QuotationView {
   id: string;
   serviceCompany: ServiceCompanySimpleView;
-  elevator: Elevator;
+  elevator: ElevatorSimpleView;
   number: string;
   externalId: string;
   description: string;

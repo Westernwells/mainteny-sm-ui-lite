@@ -93,7 +93,7 @@ export const makeRows = (quotations: Resource<QuotationView>): GridRowsProp =>
     quotationId: item.id,
     number: item.number,
     customer: item.elevator.propertyOwner.name,
-    address: item.elevator.propertyOwner.address.fullName,
+    address: item.elevator.propertyOwner.postalAddress.fullName,
     created: formatDate(item.meta.createdAt),
     amount: `${formatCurrency(
       item

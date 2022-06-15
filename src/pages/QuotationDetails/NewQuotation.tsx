@@ -19,9 +19,11 @@ import {
 } from 'hooks/reactQuery/useQuotation';
 import {formatCurrency} from 'utils/currency';
 import {CreateQuotation, QuotationItemRecord} from 'models/quotation';
-import {Elevator, ElevatorView} from 'models/elevator';
-import {PropertyOwner} from 'models/propertyManager';
-import {ClientSimpleView} from 'models/client';
+import {ElevatorSimpleView, ElevatorView} from 'models/elevator';
+import {
+  PropertyOwnerSimpleView,
+  PropertyOwnerView,
+} from 'models/propertyManager';
 import {ArticleView} from 'models/article';
 import {WithOptional} from 'models/misc';
 import {Button} from 'components/Button';
@@ -61,9 +63,11 @@ export const NewQuotation = () => {
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
 
   const [customer, setCustomer] = useState<
-    PropertyOwner | ClientSimpleView | null
+    PropertyOwnerView | PropertyOwnerSimpleView | null
   >(null);
-  const [unit, setUnit] = useState<ElevatorView | Elevator | null>(null);
+  const [unit, setUnit] = useState<ElevatorSimpleView | ElevatorView | null>(
+    null,
+  );
   const [quotationItems, setQuotationItems] = useState<QuotationItemRecord[]>(
     [],
   );
@@ -93,7 +97,7 @@ export const NewQuotation = () => {
     },
   });
 
-  const handleSelectCustomer = (row: PropertyOwner) => {
+  const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
     setIsCustomerModalOpen(false);
   };
@@ -225,7 +229,7 @@ export const NewQuotation = () => {
                   body={
                     <>
                       <Typography variant="caption">
-                        {customer.address.fullName}
+                        {customer.postalAddress.fullName}
                       </Typography>
                       <Typography variant="caption" component="p">
                         {customer.contact.phone}
