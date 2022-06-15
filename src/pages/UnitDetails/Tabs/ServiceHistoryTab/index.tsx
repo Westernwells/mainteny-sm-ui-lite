@@ -1,381 +1,149 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
-import Grid from '@mui/material/Grid';
-import {EmptyIllustration} from 'components/EmptyIllustration';
-import HideImageIcon from '@mui/icons-material/HideImage';
-import useTheme from '@mui/material/styles/useTheme';
-import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-
-import {EmptySection} from 'components/EmptySection';
-import {SplitButton} from 'components/SplitButton';
-import Box from '@mui/material/Box';
-import {PageCard} from 'components/PageCard';
-import {createEmptyResource} from 'utils/paging-utils';
+import {useEffect, useRef, useState} from 'react';
+import {useNavigate, useParams} from 'react-router';
+import {endOfYear, startOfYear} from 'date-fns';
+import {GridRowsProp} from '@mui/x-data-grid';
+import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {
-  useServiceOrderReport,
-  useServiceOrders,
-} from 'hooks/reactQuery/useServiceOrder';
-import {formatDate, getDateObject} from 'utils/datetime';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {useElevatorById} from 'hooks/reactQuery/useElevator';
-import {Button} from 'components/Button';
-import {getYear, eachYearOfInterval, endOfYear, startOfYear} from 'date-fns';
-import {useParams} from 'react-router-dom';
-import {HistoryCard} from './HistoryCard';
-import {HistoryReport} from './HistoryReport';
-import {HistoryBasicDetails} from './HistoryBasicDetails';
-import {HistoryAttachments} from './HistoryAttachments';
+  ServiceOrderStatus,
+  ServiceOrderType,
+  ServiceOrderView,
+} from 'models/service-order';
+import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {EmptySection} from 'components/EmptySection';
+import {FilterFields} from 'components/FilterFields';
+import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
+import {PageListingLayout} from 'components/PageListingLayout';
+import {Widget} from 'components/Widget';
+import {DataGridLayout} from 'components/DataGridLayout';
+import {convertToMacro, convertToText} from 'utils/utils';
+import {serviceOrderStatusToString} from 'utils/service-order-utils';
+import {columns, makeRows} from './ServiceHistoryDataGridProps';
 
-const pageSize = 10;
+const pageSize = 25;
+
+const serviceOrderStatusMap = {
+  Unscheduled: ServiceOrderStatus.READY_TO_SCHEDULE,
+  Pending: ServiceOrderStatus.SCHEDULED,
+  Ongoing: ServiceOrderStatus.IN_PROGRESS,
+  Completed: ServiceOrderStatus.COMPLETED,
+  Cancelled: ServiceOrderStatus.CANCELLED,
+  Expired: ServiceOrderStatus.EXPIRED,
+};
+type serviceOrderStatusMapKey = keyof typeof serviceOrderStatusMap;
 
 export const ServiceHistoryTab = () => {
-  const theme = useTheme();
   const {id: elevatorId} = useParams();
-  const [selectedYear, setSelectedYear] = useState(
-    getYear(new Date()).toString(),
-  );
-  const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
-  const [selectedStatusView, setSelectedStatusView] = useState('All');
-  const [isEmpty, setIsEmpty] = useState<boolean>(false);
-  const totalServiceOrdersRef = useRef(0);
-  const [expanded, setExpanded] = useState<boolean>();
-  const [selectedOrder, setSelectedOrder] = useState<ServiceOrderView>();
-  const [currentReportDate, setCurrentReportDate] = useState<string>();
-  const [currentScheduleDate, setCurrentScheduleDate] = useState<string | null>(
-    null,
-  );
-  const [currentScheduleTime, setCurrentScheduleTime] = useState<string | null>(
-    null,
-  );
+  const navigate = useNavigate();
+
+  const totalRef = useRef(0);
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(makePage(0, pageSize));
+  const [pageCount, setPageCount] = useState(0);
+  const [status, setStatus] = useState<ServiceOrderStatus[]>([]);
+  const [types, setTypes] = useState<ServiceOrderType[]>([]);
+  const [rows, setRows] = useState<GridRowsProp>([]);
+
   const {
-    data: serviceOrders = createEmptyResource<ServiceOrderView>(pageSize),
+    data: serviceOrdersResource = createEmptyResource<ServiceOrderView>(
+      pageSize,
+    ),
+    isFetching,
+    isFetched,
   } = useServiceOrders({
     elevatorIds: elevatorId ? [elevatorId] : undefined,
-    start: startOfYear(new Date(selectedYear)).toISOString(),
-    end: endOfYear(new Date(selectedYear)).toISOString(),
-    pageSize: 50,
-    pageIndex: 0,
-    query: '',
-    status: selectedStatus.length
-      ? (selectedStatus as ServiceOrderStatus[])
-      : [
-          ServiceOrderStatus.SCHEDULED,
-          ServiceOrderStatus.COMPLETED,
-          ServiceOrderStatus.IN_PROGRESS,
-        ],
+    start: startOfYear(new Date('01-01-2000')).toISOString(),
+    end: endOfYear(new Date()).toISOString(),
+    pageIndex: page.pageIndex,
+    pageSize: page.pageSize,
+    query: search,
+    status,
+    types,
   });
-  const {data: serviceOrderReport = [], isLoading: serviceOrderReportLoading} =
-    useServiceOrderReport({
-      serviceOrderId: selectedOrder?.id || '',
-    });
-
-  const {data: downloadUrl} = useDownloadUrl(
-    serviceOrderReport.length
-      ? serviceOrderReport[0].attachments.map((item) => item.fileResource.uri)
-      : [],
-    {cacheTime: 5000, refetchOnWindowFocus: true},
-  );
-
-  const {data: elevator} = useElevatorById(elevatorId);
-
-  totalServiceOrdersRef.current = serviceOrders.total;
-
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
-
-  const resolveScheduledDate = () =>
-    formatDate(selectedOrder?.schedules[0].startTime, 'dd MMM YYY') || null;
-
-  const resolveScheduledTime = () => {
-    const startTime = formatDate(selectedOrder?.schedules[0].startTime, 'ha');
-    const endTime = formatDate(selectedOrder?.schedules[0].endTime, 'ha');
-
-    return startTime && endTime ? `${startTime} - ${endTime}` : null;
-  };
+  totalRef.current = totalRef.current || serviceOrdersResource.total;
 
   useEffect(() => {
-    const date = formatDate(
-      getDateObject(selectedOrder?.actualEndTime),
-      'dd MMM YYY',
-    );
-    const result = date && `Resolved on ${date}`;
-    setCurrentReportDate(result);
-    setCurrentScheduleDate(resolveScheduledDate());
-    setCurrentScheduleTime(resolveScheduledTime());
-  }, [selectedOrder]);
+    if (serviceOrdersResource.data.length) {
+      setRows(makeRows(serviceOrdersResource.data));
+    } else {
+      setRows([]);
+    }
+  }, [serviceOrdersResource]);
 
   useEffect(() => {
-    if (serviceOrders) {
-      setSelectedOrder(serviceOrders.data[0]);
-    }
-    setIsEmpty(serviceOrders.data.length === 0);
-  }, [serviceOrders]);
+    setPageCount(Math.ceil(serviceOrdersResource.total / page.pageSize));
+  }, [serviceOrdersResource, page.pageSize]);
 
-  const getYears = useCallback(() => {
-    let yrs: string[] = [];
-    if (elevator) {
-      const startDate = getDateObject(elevator.meta.createdAt);
-      const currentDate = new Date();
-      const result = eachYearOfInterval({
-        start: startDate,
-        end: currentDate,
-      });
-      yrs = result.map((date) => getYear(date).toString());
-    }
-
-    return yrs;
-  }, [serviceOrders]);
-
-  const getStatus = useCallback(
-    () =>
-      Object.keys(ServiceOrderStatus)
-        .map((item) => {
-          if (item === ServiceOrderStatus.SCHEDULED) {
-            return 'Pending';
-          }
-
-          if (item === ServiceOrderStatus.ALL) {
-            return 'All';
-          }
-
-          if (
-            item === ServiceOrderStatus.IN_PROGRESS ||
-            item === ServiceOrderStatus.COMPLETED
-          ) {
-            return item.split('_').join(' ').toLowerCase();
-          }
-
-          return null;
-        })
-        .filter((x): x is string => !!x),
-    [],
+  const renderFilterItems = () => (
+    <FilterFields>
+      <MultipleSelectCheckmarks
+        label="Order Type"
+        options={Object.values(ServiceOrderType).map((item) =>
+          convertToText(item),
+        )}
+        getSelectedValue={(item) =>
+          setTypes(item.map((i) => convertToMacro(i) as ServiceOrderType))
+        }
+      />
+      <MultipleSelectCheckmarks
+        label="Status"
+        options={[
+          ServiceOrderStatus.READY_TO_SCHEDULE,
+          ServiceOrderStatus.SCHEDULED,
+          ServiceOrderStatus.IN_PROGRESS,
+          ServiceOrderStatus.COMPLETED,
+          ServiceOrderStatus.CANCELLED,
+          ServiceOrderStatus.EXPIRED,
+        ].map((item) => serviceOrderStatusToString(item))}
+        getSelectedValue={(item) =>
+          setStatus(
+            item.map(
+              (i) => serviceOrderStatusMap[i as serviceOrderStatusMapKey],
+            ),
+          )
+        }
+      />
+    </FilterFields>
   );
 
-  const onStatusSelect = (value: string) => {
-    setSelectedStatusView(value);
-    if (value !== 'All') {
-      if (value === 'Pending') {
-        return setSelectedStatus([ServiceOrderStatus.SCHEDULED]);
-      }
-      return setSelectedStatus([value.split(' ').join('_').toUpperCase()]);
-      // return setSelectedStatus([...selectedStatus, value]);
-    }
-    return setSelectedStatus([]);
-  };
-
-  const resetFilters = () => {
-    setSelectedYear(getYear(new Date()).toString());
-    setSelectedStatus([]);
-    setSelectedStatusView('All');
-  };
-
-  if (!totalServiceOrdersRef.current) {
+  if (isFetched && !totalRef.current) {
     return (
       <EmptySection
-        label="No service history entries made so far!"
-        size="large"
-        containerStyle={{mt: 12}}
+        label="No service orders have been created yet for this elevator. Please click the button below to create one!"
+        showActionBtn
+        btnLabel="Create Service Order"
+        btnAction={() => navigate('/orders?pageIndex=1&pageSize=25&tab=0')}
+        containerStyle={{
+          height: '100%',
+          mb: '10em',
+        }}
       />
     );
   }
 
   return (
-    <Grid container spacing={2}>
-      <Grid
-        item
-        md={8}
-        xs={12}
-        sx={{
-          [theme.breakpoints.up('md')]: {
-            height: '100%',
-          },
-        }}>
-        {isEmpty ? (
-          <PageCard minHeight="100%">
-            <EmptySection
-              label="No service history entries for the applied filters!"
-              containerStyle={{mt: 12}}
-            />
-          </PageCard>
-        ) : (
-          <Box sx={{height: '100%'}}>
-            <HistoryBasicDetails>
-              <HistoryCard
-                showTimeCategory
-                // noContent={!selectedOrder}
-
-                serviceOrder={selectedOrder}
-                headerTitle={currentScheduleDate || null}
-                description={selectedOrder?.description}
-                scheduledTime={
-                  currentScheduleDate && currentScheduleTime
-                    ? `${currentScheduleDate}, ${currentScheduleTime}`
-                    : ''
-                }
-                minHeight="30vh"
-                isDetailCard
-                removeBottomLeftRadius
-                removeBottomRightRadius
-                showAlert
-                headerActionIcon={<MoreVertIcon />}
-                subtitle={currentScheduleTime || null}
-                containerStyles={{
-                  borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-                  pt: '0.5em',
-                  minHeight: 2,
-                }}
-              />
-            </HistoryBasicDetails>
-            <HistoryReport>
-              <HistoryCard
-                serviceOrder={selectedOrder}
-                noContent={!serviceOrderReport.length}
-                serviceOrderReport={serviceOrderReport[0]}
-                reportIsLoading={serviceOrderReportLoading}
-                minHeight="30vh"
-                isDetailCard
-                removeTopLeftRadius
-                removeTopRightRadius
-                removeServiceOrderType
-                removeServiceOrderStatus
-                showMoreReportDetails={!!serviceOrderReport.length}
-                showActionSection
-                containerStyles={{
-                  pt: '0.5em',
-                  minHeight: 2,
-                }}
-                handleExpandClick={handleExpandClick}
-                expanded={expanded}
-                collapsedChildren={
-                  downloadUrl && Object.keys(downloadUrl).length ? (
-                    <HistoryAttachments
-                      downloadUrl={Object.keys(downloadUrl).map(
-                        (key) => downloadUrl[key],
-                      )}
-                    />
-                  ) : (
-                    <EmptyIllustration
-                      label="No image attachments are added to the work report!"
-                      labelStyle={{
-                        mt: '1em',
-                        color: theme.palette.text.secondary,
-                      }}
-                      labelVariant="subtitle2"
-                      icon={
-                        <HideImageIcon
-                          color="primary"
-                          sx={{width: '2.875rem', height: '2.875rem'}}
-                        />
-                      }
-                    />
-                  )
-                }
-                headerTitle="Work Report"
-                subtitle={currentReportDate || 'Awaiting completion of visit'}
-              />
-            </HistoryReport>
-          </Box>
-        )}
-      </Grid>
-      <Grid
-        item
-        md={4}
-        xs={12}
-        sx={{
-          [theme.breakpoints.up('md')]: {
-            height: '100%',
-          },
-        }}>
-        <PageCard
-          headerLabel="All Services"
-          contentContainerStyles={{p: 0, mx: 0}}
-          containerStyles={{height: '100%'}}
-          headerStyles={{
-            background: 'none',
-            mt: 'default',
-            mx: 'default',
-            height: 'default',
-          }}
-          headerActionIcon={<MoreVertIcon />}>
-          <Box display="flex" mb="0.8em" px="1rem">
-            <Box mr="1em">
-              <SplitButton
-                variant="outlined"
-                size="small"
-                disableRipple
-                selectionStyle={{background: '#fff', cursor: 'default'}}
-                selectedOption={`Year: ${selectedYear}`}
-                options={getYears()}
-                onSelectedOptionChanged={(value) => setSelectedYear(value)}
-              />
-            </Box>
-            <SplitButton
-              variant="outlined"
-              size="small"
-              disableRipple
-              selectionStyle={{background: '#fff', cursor: 'default'}}
-              selectedOption={`Status: ${selectedStatusView}`}
-              options={getStatus()}
-              onSelectedOptionChanged={onStatusSelect}
-            />
-          </Box>
-          {isEmpty ? (
-            <Box
-              sx={{height: '55vh'}}
-              display="flex"
-              flexDirection="column"
-              alignItems="center">
-              <EmptySection
-                label="No service history entries for the applied filters!"
-                illustration="clipboard"
-                size="small"
-                containerStyle={{mt: 8, mb: 2}}
-              />
-              <Button
-                label="Reset Filters"
-                buttonProps={{
-                  variant: 'contained',
-                  onClick: resetFilters,
-                }}
-              />
-            </Box>
-          ) : (
-            <Box
-              sx={{
-                overflowY: 'scroll',
-                minHeight: 2,
-                [theme.breakpoints.up('md')]: {
-                  maxHeight: '46vh',
-                },
-              }}>
-              {serviceOrders.data.map((serviceOrder: ServiceOrderView) => (
-                <HistoryCard
-                  serviceOrder={serviceOrder}
-                  headerTitle={formatDate(
-                    serviceOrder.schedules[0].startTime,
-                    'dd MMM YYY',
-                  )}
-                  subtitle={`${formatDate(
-                    serviceOrder?.schedules[0].startTime,
-                    'ha',
-                  )} - ${formatDate(serviceOrder?.schedules[0].endTime, 'ha')}`}
-                  description={serviceOrder.description}
-                  key={serviceOrder.id}
-                  selected={serviceOrder.id === selectedOrder?.id}
-                  onCardSelect={() => setSelectedOrder(serviceOrder)}
-                  containerStyles={{borderRadius: 0}}
-                  showPointer
-                  removeShadows
-                  bodyContainerStyle={{
-                    borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-                  }}
-                />
-              ))}
-            </Box>
-          )}
-        </PageCard>
-      </Grid>
-    </Grid>
+    <PageListingLayout
+      renderWidget={
+        <Widget
+          searchPlaceholder="Search by number, customer, address etc."
+          getSearchValue={(val: string) => setSearch(val)}
+          filterItems={renderFilterItems()}
+        />
+      }>
+      <DataGridLayout
+        hideFooter={pageCount <= 1}
+        rows={rows}
+        columns={columns}
+        loading={isFetching}
+        pageSize={page.pageSize}
+        handlePageSizeChange={(newPageSize: number) =>
+          setPage({...page, pageSize: newPageSize})
+        }
+        handlePageChange={(newPage: number) => {
+          setPage({...page, pageIndex: newPage - 1});
+        }}
+        pageCount={pageCount}
+        totalRows={serviceOrdersResource.total}
+      />
+    </PageListingLayout>
   );
 };
