@@ -1,6 +1,5 @@
 import {Resource, RestError, WithOptional} from 'models/misc';
 import {
-  PropertyOwner,
   PropertyOwnerView,
   QueryPropertyOwnersParams,
 } from 'models/propertyManager';
@@ -86,7 +85,7 @@ export const useQueryCustomers = (
 };
 
 export const getCustomer = async (id: string) => {
-  const response = await axiosClient.get<PropertyOwner>(
+  const response = await axiosClient.get<PropertyOwnerView>(
     `/api/propertyOwners/${id}`,
   );
   return response.data;
