@@ -1,5 +1,4 @@
 import {useEffect, useState} from 'react';
-import {BackAction} from 'components/BackAction';
 import {Stepper} from 'components/Stepper';
 import {FlexContainer} from 'components/FlexContainer';
 import {useCreateInvoice} from 'hooks/reactQuery/useInvoice';
@@ -38,65 +37,61 @@ export const NewInvoice = () => {
   };
 
   return (
-    <>
-      <BackAction label="New Invoice" />
-
-      <Stepper
-        handleCancel={handleCancel}
-        handleSubmit={async () => {
-          if (selectedOrder && articleResource && articleResource.data.length) {
-            createNewInvoice({
-              description: selectedOrder.description,
-              dueDate: selectedOrder.dueDate,
-              issuedDate: new Date().toISOString().split('T')[0],
-              items: [
-                {
-                  articleId: articleResource.data[0].id,
-                  description: articleResource.data[0].description,
-                  name: articleResource.data[0].name,
-                  quantity: 1,
-                  unitAmount: articleResource.data[0].unitSellingAmount,
-                },
-              ],
-              paymentInfo: {
-                accountNumber: ' ',
-                bic: ' ',
-                iban: ' ',
+    <Stepper
+      handleCancel={handleCancel}
+      handleSubmit={async () => {
+        if (selectedOrder && articleResource && articleResource.data.length) {
+          createNewInvoice({
+            description: selectedOrder.description,
+            dueDate: selectedOrder.dueDate,
+            issuedDate: new Date().toISOString().split('T')[0],
+            items: [
+              {
+                articleId: articleResource.data[0].id,
+                description: articleResource.data[0].description,
+                name: articleResource.data[0].name,
+                quantity: 1,
+                unitAmount: articleResource.data[0].unitSellingAmount,
               },
-              paymentTerms: 'FULL',
-              propertyOwnerId: selectedOrder.elevator.propertyOwner.id,
-              serviceCompanyId:
-                selectedOrder.elevator.propertyOwner.serviceCompanyId,
-              serviceOrderId: selectedOrder.id,
-              shouldSendOut: false,
-            });
-          } else {
-            console.error('NO ARTICLES FOUND');
-          }
-        }}
-        disableNextBtn={isDisabled}
-        getActiveStep={(val) => setActiveStep(val)}
-        steps={steps}
-        containerStyles={{
-          mt: '3em',
-          flexGrow: 1,
-          ml: '0',
-          display: 'flex',
-          flexDirection: 'column',
-        }}>
-        <FlexContainer>
-          {activeStep === 0 && (
-            <ServiceOrder
-              selectedOrder={selectedOrder}
-              setSelectedOrder={setSelectedOrder}
-            />
-          )}
+            ],
+            paymentInfo: {
+              accountNumber: ' ',
+              bic: ' ',
+              iban: ' ',
+            },
+            paymentTerms: 'FULL',
+            propertyOwnerId: selectedOrder.elevator.propertyOwner.id,
+            serviceCompanyId:
+              selectedOrder.elevator.propertyOwner.serviceCompanyId,
+            serviceOrderId: selectedOrder.id,
+            shouldSendOut: false,
+          });
+        } else {
+          console.error('NO ARTICLES FOUND');
+        }
+      }}
+      disableNextBtn={isDisabled}
+      getActiveStep={(val) => setActiveStep(val)}
+      steps={steps}
+      containerStyles={{
+        mt: '3em',
+        flexGrow: 1,
+        ml: '0',
+        display: 'flex',
+        flexDirection: 'column',
+      }}>
+      <FlexContainer>
+        {activeStep === 0 && (
+          <ServiceOrder
+            selectedOrder={selectedOrder}
+            setSelectedOrder={setSelectedOrder}
+          />
+        )}
 
-          {activeStep === 1 && selectedOrder && (
-            <InvoiceType serviceOrder={selectedOrder} />
-          )}
-        </FlexContainer>
-      </Stepper>
-    </>
+        {activeStep === 1 && selectedOrder && (
+          <InvoiceType serviceOrder={selectedOrder} />
+        )}
+      </FlexContainer>
+    </Stepper>
   );
 };
