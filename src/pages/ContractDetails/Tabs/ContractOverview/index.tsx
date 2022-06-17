@@ -154,7 +154,7 @@ export const ContractOverview = () => {
             <ContractParties
               companyName={contractDetails?.serviceCompany.name}
               personName={contractDetails?.serviceCompany.name}
-              email={contractDetails?.serviceCompany.contact.email}
+              email="-"
               partyType="Contractor"
               chipColor="info"
             />

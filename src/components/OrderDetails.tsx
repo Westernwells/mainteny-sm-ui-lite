@@ -2,6 +2,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import {useNavigate} from 'react-router';
 import {formatDate} from 'utils/datetime';
 import {ServiceOrderView} from 'models/service-order';
 import useTheme from '@mui/material/styles/useTheme';
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export const OrderDetails = ({order}: Props) => {
+  const navigate = useNavigate();
   const theme = useTheme();
   const startTime = formatDate(order.schedules[0].startTime, 'HH:mm');
   const endTime = formatDate(order.schedules[0].endTime, 'HH:mm');
@@ -96,6 +98,7 @@ export const OrderDetails = ({order}: Props) => {
               textTransform: 'capitalize',
               px: '2em',
             },
+            onClick: () => navigate(`/orders/details/${order.id}`),
           }}
         />
       </Box>

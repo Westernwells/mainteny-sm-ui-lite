@@ -125,9 +125,7 @@ export const Schedule = ({
         if (previousOrder) {
           const previousEndTime = new Date(previousOrder.schedules[0].endTime);
           const currentOrderStartTime = new Date(item.schedules[0].startTime);
-          // console.log(item, '+++++++++________', previousOrder)
           if (isBefore(currentOrderStartTime, previousEndTime)) {
-            // console.log(previousOrder,'=========>', item)
             const previousOrderNextLevel = result[key][previousOrder.id];
             result[key][item.id] = previousOrderNextLevel + 1;
           } else {
@@ -142,8 +140,6 @@ export const Schedule = ({
 
     setScheduleItemGroup(result);
   }, [scheduleItems]);
-
-  console.log(scheduleItems, '&&&&^^^^^$$');
 
   useEffect(() => {
     setLookupTechnician(_.groupBy(technicians, (technician) => technician.id));

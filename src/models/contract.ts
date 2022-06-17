@@ -1,8 +1,12 @@
 import {Client} from './client';
-import {ServiceCompany, ServiceCompanyView} from './service-company';
+import {
+  ServiceCompany,
+  ServiceCompanySimpleView,
+  ServiceCompanyView,
+} from './service-company';
 import {Meta, Order, OrderBy, TimeWindowRecord, TimeWindowType} from './misc';
 import {Elevator, ElevatorStatus, ElevatorView} from './elevator';
-import {PropertyOwnerView} from './propertyManager';
+import {PropertyOwnerSimpleView, PropertyOwnerView} from './propertyManager';
 
 export enum ContractStatus {
   PENDING = 'PENDING',
@@ -66,8 +70,8 @@ export interface QueryContractParams {
 
 export interface ContractView {
   id: string;
-  propertyOwner: PropertyOwnerView;
-  serviceCompany: ServiceCompanyView;
+  propertyOwner: PropertyOwnerSimpleView;
+  serviceCompany: ServiceCompanySimpleView;
   type: ContractType;
   visitsNumber: number;
   number: number;
