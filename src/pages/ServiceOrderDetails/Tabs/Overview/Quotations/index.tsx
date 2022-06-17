@@ -43,9 +43,6 @@ export const Quotation = ({serviceOrder}: Props) => {
         size="tiny"
         containerStyle={{m: 'auto', width: '60%'}}
         label="No quotations yet. It will appear here once added!"
-        showActionBtn
-        btnLabel="+ Add New Article"
-        btnAction={() => {}}
       />
     </Box>
   );

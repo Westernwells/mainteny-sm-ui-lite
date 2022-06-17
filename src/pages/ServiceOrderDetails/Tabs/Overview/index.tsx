@@ -17,6 +17,7 @@ import {formatDate} from 'utils/datetime';
 import {OrderInfoCard} from './OrderInfoCard';
 import {DescriptionCard} from './DescriptionCard';
 import {Quotation} from './Quotations';
+import {Invoices} from './Invoices';
 
 export const Overview = () => {
   const theme = useTheme();
@@ -63,6 +64,10 @@ export const Overview = () => {
           </Box>
           <Box mt="1em" flexGrow={1}>
             <DescriptionCard content={serviceOrderDetails?.description} />
+          </Box>
+
+          <Box mt="1em" flexGrow={1}>
+            <Invoices serviceOrderId={serviceOrderDetails?.id} />
           </Box>
 
           <Box mt="1em" flexGrow={1}>

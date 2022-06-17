@@ -1,7 +1,12 @@
-import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from 'react-query';
 import * as _ from 'lodash';
 import {useCallback} from 'react';
-import {queryKeys as qk} from 'reactQuery/constants';
+import {queryKeys as qk, queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useSnackbar} from 'notistack';
 import {useNavigate} from 'react-router';
@@ -273,3 +278,20 @@ export const useUpdateInvoice = () => {
     },
   );
 };
+
+const fetchServiceOrderInvoices = async (serviceOrderId: string) => {
+  const response = await axiosClient.get<InvoiceView[]>(
+    `/api/serviceOrders/${serviceOrderId}/invoices`,
+  );
+  return response.data;
+};
+
+export const useFetchServiceOrderInvoices = (
+  serviceOrderId?: string,
+  options?: UseQueryOptions<any, any, any>,
+) =>
+  useQuery<InvoiceView[]>(
+    [queryKeys.fetchServiceOrderInvoices, serviceOrderId],
+    () => fetchServiceOrderInvoices(serviceOrderId!),
+    {enabled: !!serviceOrderId, ...options},
+  );

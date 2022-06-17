@@ -5,7 +5,6 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import {useNavigate} from 'react-router';
 import {formatDate} from 'utils/datetime';
 import {ServiceOrderView} from 'models/service-order';
-import {useNavigate} from 'react-router';
 import useTheme from '@mui/material/styles/useTheme';
 import {Button} from './Button';
 
@@ -16,7 +15,6 @@ interface Props {
 export const OrderDetails = ({order}: Props) => {
   const navigate = useNavigate();
   const theme = useTheme();
-  const navigate = useNavigate();
   const startTime = formatDate(order.schedules[0].startTime, 'HH:mm');
   const endTime = formatDate(order.schedules[0].endTime, 'HH:mm');
   const date = formatDate(order.schedules[0].startTime, 'dd MMMM');

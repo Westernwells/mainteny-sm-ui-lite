@@ -36,15 +36,6 @@ export const Articles = () => {
           borderBottom: 'none',
         }}
       />
-      {/* {contracts.length > 3 ? (
-        <Box
-          sx={{textAlign: 'center', cursor: 'pointer'}}
-          onClick={() => setShowAll(!showAll)}>
-          <Typography variant="caption" color={theme.palette.info.main}>
-            {showAll ? 'see less' : 'see more'}
-          </Typography>
-        </Box>
-      ) : null} */}
     </InfoCard>
   );
 };

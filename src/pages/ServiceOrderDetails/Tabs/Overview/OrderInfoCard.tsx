@@ -169,6 +169,10 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
           label: t('Unschedule'),
           action: () => setOpenUnscheduleConfirm(true),
         },
+        {
+          label: t('Cancel'),
+          action: () => setOpenCancelConfirm(true),
+        },
       ];
     }
     return [];
@@ -183,13 +187,13 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         maxChars={9}
       />
 
-      <Box>
+      <Box sx={{mt: -1}}>
         <MenuBtn
           sx={{p: 0, display: 'flex'}}
           disabled={!!(orderAction().length === 0)}
           disableRipple
-          startIcon={<MoreHorizIcon sx={{color: '#231F20'}} />}
-          label=""
+          anchorType="iconButton"
+          anchorIcon={<MoreHorizIcon sx={{color: '#231F20'}} />}
           menu={orderAction()}
         />
       </Box>
