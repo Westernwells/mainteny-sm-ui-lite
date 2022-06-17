@@ -128,3 +128,34 @@ export const getRangeDate = (
   const dateEnd = formatDate(end, formatStr);
   return `${dateStart} - ${dateEnd}`;
 };
+
+export const convert12hTo24h = (time: string, meridian?: string) => {
+  const localMeridian = meridian || time.split(' ')[1];
+  const hr = time.split(':')[0];
+  const min = time.split(':')[1];
+  if (localMeridian) {
+    const newHr =
+      localMeridian.toUpperCase() === 'PM' && Number(hr) !== 12
+        ? Number(hr) + 12
+        : hr;
+    return `${newHr}:${min.split(' ')[0]}`;
+  }
+  return `${hr}:${min}`;
+};
+
+export const convert24hTo12h = (time: string, addMeridian?: boolean) => {
+  const hr = time.split(':')[0];
+  const min = time.split(':')[1];
+
+  const newHr = Number(hr) > 12 ? Number(hr) - 12 : hr;
+
+  return addMeridian
+    ? `${newHr.toLocaleString('en-US', {
+        minimumIntegerDigits: 2,
+        useGrouping: false,
+      })}:${min} ${Number(hr) >= 12 ? 'PM' : 'AM'}`
+    : `${newHr.toLocaleString('en-US', {
+        minimumIntegerDigits: 2,
+        useGrouping: false,
+      })}:${min}`;
+};

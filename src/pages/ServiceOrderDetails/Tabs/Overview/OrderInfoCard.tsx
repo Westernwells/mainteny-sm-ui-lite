@@ -2,8 +2,6 @@ import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {InfoCard} from 'components/InfoCard';
-import EditIcon from '@mui/icons-material/Edit';
-import useTheme from '@mui/material/styles/useTheme';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Grid from '@mui/material/Grid';
 // import {convertToText} from 'utils/utils';
@@ -49,7 +47,6 @@ const orderInfo = [
 ];
 
 export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
-  const theme = useTheme();
   // const [orderInfo, setOrderInfo] = useState(
   //   orderInfoSchema(serviceOrderDetails),
   // );
@@ -185,12 +182,6 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         size="small"
         maxChars={9}
       />
-      <Box sx={{ml: '0.5em', display: 'flex', alignItems: 'center'}}>
-        <EditIcon
-          style={{color: theme.palette.text.secondary}}
-          fontSize="medium"
-        />
-      </Box>
 
       <Box>
         <MenuBtn
