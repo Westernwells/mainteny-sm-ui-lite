@@ -13,6 +13,7 @@ interface Props {
   containerStyles?: {[key: string]: any};
   handleCancel?: () => void;
   handleSubmit?: () => void;
+  initialActiveStep?: number;
   getActiveStep?: (val: number) => void;
   disableNextBtn?: boolean;
   submitting?: boolean;
@@ -24,6 +25,7 @@ export const Stepper = ({
   containerStyles,
   handleCancel = () => {},
   handleSubmit = () => {},
+  initialActiveStep = 0,
   getActiveStep,
   disableNextBtn,
   stepperWidth,
@@ -31,7 +33,7 @@ export const Stepper = ({
 }: Props) => {
   const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
-
+  console.log(initialActiveStep);
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
@@ -45,6 +47,10 @@ export const Stepper = ({
       getActiveStep(activeStep);
     }
   }, [activeStep]);
+
+  useEffect(() => {
+    setActiveStep(initialActiveStep);
+  }, [initialActiveStep]);
 
   return (
     <Box sx={{...containerStyles}}>

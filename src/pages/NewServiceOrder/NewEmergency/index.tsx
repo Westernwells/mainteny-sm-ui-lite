@@ -8,14 +8,19 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmployeesView} from 'models/employee';
 import {toRestDateTime} from 'utils/datetime';
 import {useNavigate} from 'react-router';
+import {QuotationView} from 'models/quotation';
 import {AddDescription} from '../AddDescription';
 import {SelectTechnicians} from '../SelectTechnicians';
 import {SelectUnit} from '../SelectUnit';
 import {RadioOptions} from '../models';
 
+interface Props {
+  quotation?: QuotationView;
+}
+
 const steps = ['Select unit', 'Select technicians', 'Add description'];
 
-export const NewEmergency = () => {
+export const NewEmergency = ({quotation}: Props) => {
   const [activeStep, setActiveStep] = useState(0);
   const [selectedUnit, setSelectedUnit] = useState<ElevatorView>();
   const [disableNextBtn, setDisableNextBtn] = useState(false);
@@ -44,6 +49,13 @@ export const NewEmergency = () => {
     return setDisableNextBtn(false);
   }, [activeStep, selectedUnit, selectedTechnicians]);
 
+  useEffect(() => {
+    if (quotation) {
+      setSelectedUnit(quotation.elevator);
+      setActiveStep(1);
+    }
+  }, [quotation]);
+
   const handleCancel = () => {
     setActiveStep(0);
     setSelectedUnit(undefined);
@@ -63,6 +75,7 @@ export const NewEmergency = () => {
       technicianIds: selectedTechnicians.map((item) => item.id),
       time: toRestDateTime(new Date()),
       type: ServiceOrderType.EMERGENCY,
+      quotationId: quotation ? quotation.id : '',
     };
     await createEmergencyOrder(body);
     navigate('/orders?pageIndex=1&pageSize=25&tab=1');
@@ -75,6 +88,7 @@ export const NewEmergency = () => {
         await createNewEmergencyOrder();
       }}
       disableNextBtn={disableNextBtn}
+      initialActiveStep={quotation ? 1 : 0}
       getActiveStep={(val) => setActiveStep(val)}
       steps={steps}
       containerStyles={{

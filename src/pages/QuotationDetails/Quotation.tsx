@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import {useNavigate} from 'react-router';
+import {useFormik} from 'formik';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -7,6 +8,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {Button} from 'components/Button';
 import {StatusChip} from 'components/StatusChip';
 import {PageCard} from 'components/PageCard';
+import {Dialog} from 'components/Dialog';
 import {QuotationView} from 'models/quotation';
 import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps';
 import {PdfGenerationStatus} from 'models/misc';
@@ -14,6 +16,8 @@ import {formatCurrency} from 'utils/currency';
 import {BottomDrawer} from './Components/BottomDrawer';
 import {PDFContainer} from './Components/PDFContainer';
 import {Label} from './Components/Label';
+import {CreateServiceOrder} from './CreateServiceOrder';
+import {ServiceOrderDetails} from './ServiceOrderDetails';
 
 interface Props {
   downloadUrl: string;
@@ -23,6 +27,21 @@ interface Props {
 export const Quotation = ({downloadUrl, quotation}: Props) => {
   const navigate = useNavigate();
   const [isDrawerOpen] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const formik = useFormik({
+    initialValues: {
+      createServiceOrder: '',
+    },
+    onSubmit: (values) => {
+      if (values.createServiceOrder && quotation)
+        navigate(
+          `/orders/new?type=${values.createServiceOrder.toLowerCase()}&quotationId=${
+            quotation.id
+          }`,
+        );
+    },
+  });
 
   return (
     <Box>
@@ -87,16 +106,28 @@ export const Quotation = ({downloadUrl, quotation}: Props) => {
               alignItems: 'center',
               flexDirection: 'column',
             }}>
-            <Typography variant="subtitle2" textAlign="center">
-              You haven’t created Service Order for this Quotation
-            </Typography>
-            <Button
-              label="Create Service Order"
-              buttonProps={{
-                variant: 'outlined',
-                size: 'small',
-              }}
-            />
+            {quotation.additionalInfo &&
+            'serviceOrderIds' in quotation.additionalInfo ? (
+              <ServiceOrderDetails
+                serviceOrderId={
+                  quotation.additionalInfo.serviceOrderIds[0] as string
+                }
+              />
+            ) : (
+              <>
+                <Typography variant="subtitle2" textAlign="center">
+                  You haven’t created Service Order for this Quotation
+                </Typography>
+                <Button
+                  label="Create Service Order"
+                  buttonProps={{
+                    variant: 'outlined',
+                    size: 'small',
+                    onClick: () => setIsDialogOpen(true),
+                  }}
+                />
+              </>
+            )}
           </PageCard>
         </Grid>
       </Grid>
@@ -109,6 +140,20 @@ export const Quotation = ({downloadUrl, quotation}: Props) => {
         listItems={[]}
         isValid
       />
+      <Dialog
+        title="Create Service Order"
+        onCancel={() => setIsDialogOpen(false)}
+        disableSaveBtn={!formik.values.createServiceOrder}
+        onSave={() => formik.handleSubmit()}
+        dialogProps={{
+          maxWidth: 'xs',
+          open: isDialogOpen || false,
+        }}>
+        <CreateServiceOrder
+          value={formik.values.createServiceOrder}
+          onChange={formik.handleChange}
+        />
+      </Dialog>
     </Box>
   );
 };
