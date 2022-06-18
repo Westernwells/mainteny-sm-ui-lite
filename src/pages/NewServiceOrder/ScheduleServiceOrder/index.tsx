@@ -10,6 +10,7 @@ import {useEffect, useState} from 'react';
 import {Priority, ServiceOrderType} from 'models/service-order';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmployeesView} from 'models/employee';
+import {QuotationView} from 'models/quotation';
 import {formatDate, setDateTime, toRestDateTime} from 'utils/datetime';
 import {useNavigate} from 'react-router';
 import {AddDescription} from '../AddDescription';
@@ -29,9 +30,10 @@ const steps = [
 
 interface Props {
   type: Exclude<ServiceOrderType, ServiceOrderType.EMERGENCY>;
+  quotation?: QuotationView;
 }
 
-export const ScheduleServiceOrder = ({type}: Props) => {
+export const ScheduleServiceOrder = ({type, quotation}: Props) => {
   const [activeStep, setActiveStep] = useState(0);
   const [selectedUnit, setSelectedUnit] = useState<ElevatorView>();
   const [disableNextBtn, setDisableNextBtn] = useState(false);
@@ -108,6 +110,13 @@ export const ScheduleServiceOrder = ({type}: Props) => {
   ]);
 
   useEffect(() => {
+    if (quotation) {
+      setSelectedUnit(quotation.elevator);
+      setActiveStep(1);
+    }
+  }, [quotation]);
+
+  useEffect(() => {
     let dateString;
     let timeString;
     if (selectedRadioOption === RadioOptions.DUE_DATE) {
@@ -143,6 +152,7 @@ export const ScheduleServiceOrder = ({type}: Props) => {
       technicianIds: selectedTechnicians.map((item) => item.id),
       time: toRestDateTime(new Date()),
       type,
+      quotationId: quotation ? quotation.id : '',
     };
     await createImmediateCalloutOrder(body);
     navigate('/orders?pageIndex=1&pageSize=25&tab=1');
@@ -170,6 +180,7 @@ export const ScheduleServiceOrder = ({type}: Props) => {
       requireTechnicianNotification: true,
       startTime,
       endTime,
+      quotationId: quotation ? quotation.id : '',
     };
 
     await createScheduledServiceOrder(body);
@@ -187,6 +198,7 @@ export const ScheduleServiceOrder = ({type}: Props) => {
       serviceCompanyId,
       type,
       dueDate,
+      quotationId: quotation ? quotation.id : '',
     };
 
     await createNonScheduledServiceOrder(body);
@@ -212,6 +224,7 @@ export const ScheduleServiceOrder = ({type}: Props) => {
       handleCancel={handleCancel}
       handleSubmit={() => handleSubmit()}
       disableNextBtn={disableNextBtn}
+      initialActiveStep={quotation ? 1 : 0}
       getActiveStep={(val) => setActiveStep(val)}
       steps={steps}
       containerStyles={{

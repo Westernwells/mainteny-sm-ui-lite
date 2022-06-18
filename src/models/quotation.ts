@@ -1,5 +1,5 @@
 import {Article} from './article';
-import {Elevator, ElevatorSimpleView} from './elevator';
+import {ElevatorView} from './elevator';
 import {Amount, Meta} from './misc';
 import {ServiceCompanySimpleView} from './service-company';
 
@@ -10,7 +10,9 @@ export enum QuotationStatus {
   SENT_TO_CLIENT = 'SENT_TO_CLIENT',
 }
 
-export type QuotationAdditionalInfo = {[key: string]: string | number};
+export type QuotationAdditionalInfo = {
+  [key: string | number]: any;
+};
 
 export interface QuotationItem {
   additionalInfo: QuotationAdditionalInfo;
@@ -35,7 +37,7 @@ export interface QuotationItemRecord {
 export interface QuotationView {
   id: string;
   serviceCompany: ServiceCompanySimpleView;
-  elevator: ElevatorSimpleView;
+  elevator: ElevatorView;
   number: string;
   externalId: string;
   description: string;

@@ -1,7 +1,9 @@
 import {FlexContainer} from 'components/FlexContainer';
+import {Progress} from 'components/Progress';
 import {useLayoutEffect, useRef} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {ServiceOrderType} from 'models/service-order';
+import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
 import {convertToText} from 'utils/utils';
 import {NewEmergency} from './NewEmergency';
 import {ScheduleServiceOrder} from './ScheduleServiceOrder';
@@ -13,6 +15,14 @@ interface Props {
 export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
   const [queryParams] = useSearchParams();
   const currentParams = useRef(Object.fromEntries([...queryParams])).current;
+  const {
+    data: quotation,
+    isLoading,
+    isFetched,
+  } = currentParams.quotationId
+    ? useQuotationDetails(currentParams.quotationId)
+    : {data: undefined, isLoading: false, isFetched: true};
+  console.log(quotation, isLoading, isFetched);
 
   useLayoutEffect(() => {
     if (getCurrentPageTitle && currentParams) {
@@ -20,18 +30,31 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
     }
   }, []);
 
+  if (isLoading || !isFetched) return <Progress />;
+
   return (
     <FlexContainer>
-      {currentParams.type === 'emergency' ? <NewEmergency /> : null}
+      {currentParams.type === 'emergency' ? (
+        <NewEmergency quotation={quotation} />
+      ) : null}
       {currentParams.type === 'callout' ? (
-        <ScheduleServiceOrder type={ServiceOrderType.CALLOUT} />
+        <ScheduleServiceOrder
+          type={ServiceOrderType.CALLOUT}
+          quotation={quotation}
+        />
       ) : null}
       {currentParams.type === 'repair' ? (
-        <ScheduleServiceOrder type={ServiceOrderType.REPAIR} />
+        <ScheduleServiceOrder
+          type={ServiceOrderType.REPAIR}
+          quotation={quotation}
+        />
       ) : null}
 
       {currentParams.type === 'regular' ? (
-        <ScheduleServiceOrder type={ServiceOrderType.REGULAR} />
+        <ScheduleServiceOrder
+          type={ServiceOrderType.REGULAR}
+          quotation={quotation}
+        />
       ) : null}
     </FlexContainer>
   );
