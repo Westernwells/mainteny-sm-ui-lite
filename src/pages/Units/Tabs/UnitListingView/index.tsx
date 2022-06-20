@@ -30,6 +30,7 @@ export const UnitListingView = () => {
     centerCoord: {longitude: 0, latitude: 0},
   }).current;
   const [queryParams, setQueryParams] = useSearchParams();
+  const [upcomingVisitFilter, setUpcomingVisitFilter] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(pageInfo);
   const totalUnitsRef = useRef(0);
@@ -140,17 +141,23 @@ export const UnitListingView = () => {
   }
 
   const renderFilterItems = () => (
-    <FilterFields>
+    <FilterFields
+      onClear={() => {
+        setStatus([]);
+        setUpcomingVisitFilter([]);
+      }}>
       <MultipleSelectCheckmarks
         label="Status"
         options={['RUNNING', 'STOPPED']}
+        initialSelectedItems={status}
         getSelectedValue={(item) => setStatus(item)}
       />
 
       <MultipleSelectCheckmarks
         label="Upcoming visits"
         options={['This week', 'Next week', 'Next month']}
-        getSelectedValue={() => {}}
+        initialSelectedItems={upcomingVisitFilter}
+        getSelectedValue={(val) => setUpcomingVisitFilter(val)}
         multiple={false}
       />
     </FilterFields>
