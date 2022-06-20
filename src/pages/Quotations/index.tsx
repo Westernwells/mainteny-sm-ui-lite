@@ -20,6 +20,7 @@ export const Quotations = () => {
 
   const [search, setSearch] = useState('');
   const totalQuotationsRef = useRef(0);
+  const [status, setStatus] = useState<string[]>([]);
   const [page, setPage] = useState(makePage(0, pageSize));
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -70,11 +71,12 @@ export const Quotations = () => {
   }
 
   const renderFilterItems = () => (
-    <FilterFields>
+    <FilterFields onClear={() => setStatus([])}>
       <MultipleSelectCheckmarks
         label="Status"
         options={['SENT', 'DRAFT']}
-        getSelectedValue={(item) => console.log(item)}
+        initialSelectedItems={status}
+        getSelectedValue={(item) => setStatus(item)}
         multiple={false}
       />
     </FilterFields>

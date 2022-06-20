@@ -112,11 +112,17 @@ export const ServiceOrderList = () => {
   };
 
   const renderFilterItems = () => (
-    <FilterFields hideClear showFilter>
+    <FilterFields
+      onClear={() => {
+        setSelectedOrderStatus([]);
+        setSelectedOrderTypes([]);
+      }}
+      showFilter>
       <MultipleSelectCheckmarks
         label="Status"
         options={renderServiceOrderStatusList()}
         getSelectedValue={getSelectedStatusValues}
+        initialSelectedItems={selectedOrderStatus}
         multiple
       />
 
@@ -125,6 +131,7 @@ export const ServiceOrderList = () => {
         options={Object.values(ServiceOrderType).map((option) =>
           _.capitalize(option).split('_').join(' '),
         )}
+        initialSelectedItems={selectedOrderTypes}
         getSelectedValue={(item) => {
           const orderTypes = item.map((val) =>
             val.split(' ').join('_').toUpperCase(),

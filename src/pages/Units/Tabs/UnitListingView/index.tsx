@@ -147,13 +147,6 @@ export const UnitListingView = () => {
         setUpcomingVisitFilter([]);
       }}>
       <MultipleSelectCheckmarks
-        label="Status"
-        options={['RUNNING', 'STOPPED']}
-        initialSelectedItems={status}
-        getSelectedValue={(item) => setStatus(item)}
-      />
-
-      <MultipleSelectCheckmarks
         label="Upcoming visits"
         options={['This week', 'Next week', 'Next month']}
         initialSelectedItems={upcomingVisitFilter}
