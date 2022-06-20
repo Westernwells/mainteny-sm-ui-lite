@@ -27,13 +27,13 @@ import {
 import {ArticleView} from 'models/article';
 import {WithOptional} from 'models/misc';
 import {Button} from 'components/Button';
+import {ArticlesModalDataGrid} from 'components/ArticleModalDataGrid';
 import {formatDate} from 'utils/datetime';
 import {Label} from './Components/Label';
 import {BottomDrawer} from './Components/BottomDrawer';
 import {QuotationRow} from './Components/QuotationRow';
 import {CustomersDataGrid} from './DataGrid/CustomersDataGrid';
 import {UnitsDataGrid} from './DataGrid/UnitsDataGrid';
-import {ArticlesDataGrid} from './DataGrid/ArticlesDataGrid';
 import {QuotationHeader} from './Components/QuotationHeader';
 
 const DEFAULT_DESCRIPTION = `Dear Customer,
@@ -460,7 +460,7 @@ export const NewQuotation = () => {
         isOpen={isArticleModalOpen}
         onClose={() => setIsArticleModalOpen(false)}
         header="Select Article">
-        <ArticlesDataGrid setRowItem={handleSelectQuotationItem} />
+        <ArticlesModalDataGrid setRowItem={handleSelectQuotationItem} />
       </SelectModal>
 
       <BottomDrawer
