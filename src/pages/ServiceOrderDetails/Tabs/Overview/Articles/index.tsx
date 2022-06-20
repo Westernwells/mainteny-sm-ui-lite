@@ -11,6 +11,9 @@ import {ServiceOrderArticleView} from 'models/service-order';
 import {columns, makeRows} from './ArticleDataGridProps';
 import {EmptySection} from 'components/EmptySection';
 import Box from '@mui/material/Box';
+import {SelectModal} from 'components/SelectModal';
+import {ArticlesModalDataGrid} from 'components/ArticleModalDataGrid';
+import {ArticleView} from 'models/article';
 
 interface Props {
   containerStyles?: {[key: string]: any};
@@ -19,18 +22,18 @@ interface Props {
 
 export const Articles = ({serviceOrderArticles}: Props) => {
   const [rows, setRows] = useState<GridRowsProp>([]);
+  const [openModal, setOpenModal] = useState(false);
   const [articles, setArticles] = useState<ServiceOrderArticleView[]>(
     serviceOrderArticles ? serviceOrderArticles : [],
   );
-  const [showAll, setShowAll] = useState(false);
-
-  // useEffect(() => {
-  //   setArticles(serviceOrderArticles || []);
-  // }, [serviceOrderArticles]);
 
   useEffect(() => {
     setRows(makeRows(articles));
   }, [articles]);
+
+  const handleSelectArticle = (article: ArticleView) => {
+    console.log(article, '.........????????');
+  };
 
   const renderNoRowsSection = () => (
     <Box
@@ -50,25 +53,34 @@ export const Articles = ({serviceOrderArticles}: Props) => {
   );
 
   return (
-    <InfoCard
-      header={<Typography variant="subtitle1">Articles</Typography>}
-      showHeaderBackground
-      handleAction={() => {}}
-      headerActionIcon={<Typography color="info.main">+ Add</Typography>}>
-      {articles.length === 0 ? (
-        renderNoRowsSection()
-      ) : (
-        <DataGridLayout
-          fullHeight={false}
-          height={getDataGridHeight(rows.length, 3)}
-          hideFooter
-          rows={rows}
-          columns={columns}
-          containerStyle={{
-            borderBottom: 'none',
-          }}
-        />
-      )}
-    </InfoCard>
+    <>
+      <InfoCard
+        header={<Typography variant="subtitle1">Articles</Typography>}
+        showHeaderBackground
+        handleAction={() => setOpenModal(true)}
+        headerActionIcon={<Typography color="info.main">+ Add</Typography>}>
+        {articles.length === 0 ? (
+          renderNoRowsSection()
+        ) : (
+          <DataGridLayout
+            fullHeight={false}
+            height={getDataGridHeight(rows.length, 3)}
+            hideFooter
+            rows={rows}
+            columns={columns}
+            containerStyle={{
+              borderBottom: 'none',
+            }}
+          />
+        )}
+      </InfoCard>
+
+      <SelectModal
+        isOpen={openModal}
+        onClose={() => setOpenModal(false)}
+        header="Select Article">
+        <ArticlesModalDataGrid setRowItem={handleSelectArticle} />
+      </SelectModal>
+    </>
   );
 };
