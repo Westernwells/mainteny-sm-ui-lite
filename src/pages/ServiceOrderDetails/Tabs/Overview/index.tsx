@@ -18,6 +18,7 @@ import {OrderInfoCard} from './OrderInfoCard';
 import {DescriptionCard} from './DescriptionCard';
 import {Quotation} from './Quotations';
 import {Invoices} from './Invoices';
+import {Articles} from './Articles';
 
 export const Overview = () => {
   const theme = useTheme();
@@ -64,6 +65,10 @@ export const Overview = () => {
           </Box>
           <Box mt="1em" flexGrow={1}>
             <DescriptionCard content={serviceOrderDetails?.description} />
+          </Box>
+
+          <Box mt="1em" flexGrow={1}>
+            <Articles serviceOrderArticles={serviceOrderDetails?.articles} />
           </Box>
 
           <Box mt="1em" flexGrow={1}>

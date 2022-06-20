@@ -184,7 +184,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         color={getServiceOrderStatusColor(serviceOrderDetails.status)}
         label={serviceOrderStatusToString(serviceOrderDetails.status)}
         size="small"
-        maxChars={9}
+        maxChars={15}
       />
 
       <Box sx={{mt: -1}}>
@@ -232,7 +232,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
       }>
       <Grid container>
         {orderInfo.map((label) => (
-          <Grid item md={4}>
+          <Grid item xs={4}>
             <OrderInfo
               serviceOrderDetails={serviceOrderDetails}
               label={label}

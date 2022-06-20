@@ -6,9 +6,8 @@ import {
   GridRowsProp,
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
-// import Box from '@mui/material/Box';
 import {formatCurrency} from 'utils/currency';
-import {ArticleView} from 'models/article';
+import {ServiceOrderArticleView} from 'models/service-order';
 
 const defaultProps = {
   editable: false,
@@ -94,26 +93,25 @@ export const columns: GridColDef[] = [
   },
 ];
 
-export const makeRows = (articles: ArticleView[]): GridRowsProp =>
+export const makeRows = (articles: ServiceOrderArticleView[]): GridRowsProp =>
   articles.map((item, index) => {
     const unitPrice = item
-      ? item.unitSellingAmount.netAmount /
-        10 ** item.unitSellingAmount.fractionDigits!
+      ? item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!
       : 0;
 
     return {
       id: index,
       po: index + 1,
-      number: item.number,
+      number: item.articles.number,
       name: item.name,
-      unit: item.unit,
-      total: unitPrice * item.stock.currentStock,
-      model: item.model,
-      supplier: item.supplier,
+      unit: item.articles.unit,
+      total: unitPrice * item.articles.stock.currentStock,
+      model: item.articles.model,
+      supplier: item.articles.manufacturer,
       unitPrice: `${formatCurrency(unitPrice, {
-        currency: item.unitSellingAmount.currency,
+        currency: item.unitAmount.currency,
       })}`,
-      quantity: item.stock.currentStock,
+      quantity: item.articles.stock.currentStock,
       navigateTo: `details/${item.id}`,
       item,
     };

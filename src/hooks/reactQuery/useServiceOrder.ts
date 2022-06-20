@@ -28,11 +28,11 @@ import {
   ServiceOrderActivityView,
   ServiceOrderOrderField,
   ServiceOrderQueryParams,
-  ServiceOrderReport,
   ServiceOrderScheduleParams,
   ServiceOrderView,
   CreateScheduledServiceOrderBody,
   CreateNonScheduledServiceOrderBody,
+  ServiceOrderReportView,
 } from '../../models/service-order';
 import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
@@ -192,7 +192,7 @@ export const useFetchElevatorAvailability = (elevatorIds: string[]) => {
 export const fetchServiceOrderReport = async (
   params: ServiceOrderReportPayload,
 ) => {
-  const response = await axiosClient.get<ServiceOrderReport[]>(
+  const response = await axiosClient.get<ServiceOrderReportView[]>(
     `/api/serviceOrders/reports`,
     {
       params,
@@ -202,11 +202,17 @@ export const fetchServiceOrderReport = async (
   return response.data;
 };
 
-export function useServiceOrderReport(params: ServiceOrderReportPayload) {
-  return useQuery<ServiceOrderReport[], RestError>(
+export function useServiceOrderReport(
+  params: ServiceOrderReportPayload,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<ServiceOrderReportView[]>(
     [queryKeys.fetchServiceOrderReport, params],
     () => fetchServiceOrderReport(params as ServiceOrderReportPayload),
-    {enabled: !!params.serviceOrderId || !!params.serviceOrderId.length},
+    {
+      enabled: !!params.serviceOrderId || !!params.serviceOrderId.length,
+      ...options,
+    },
   );
 }
 
