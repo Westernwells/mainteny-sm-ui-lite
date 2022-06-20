@@ -27,7 +27,7 @@ interface Props {
   multiple?: boolean;
   containerStyles?: {[key: string]: any};
   formControlStyles?: {[key: string]: any};
-  initialSelectedItems?: string[];
+  initialSelectedItems?: any[];
 }
 
 export const MultipleSelectCheckmarks = ({
@@ -64,8 +64,10 @@ export const MultipleSelectCheckmarks = ({
   }, [selectedItems]);
 
   React.useEffect(() => {
-    setSelectedItems(initialSelectedItems);
-  }, [initialSelectedItems]);
+    if (initialSelectedItems.length === 0) {
+      setSelectedItems(initialSelectedItems);
+    }
+  }, [initialSelectedItems.length]);
   return (
     <Box sx={{...containerStyles}}>
       <FormControl
