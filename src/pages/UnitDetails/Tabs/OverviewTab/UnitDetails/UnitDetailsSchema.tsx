@@ -139,7 +139,7 @@ export const UnitDetailsSchema = ({
           <CardProps
             icon={<PeopleAltIcon sx={{color: theme.palette.info.dark}} />}
             label="UNIT CAPACITY"
-            bodyText={elevator.capacity || '-'}
+            bodyText={elevator.capacity ? `${elevator.capacity}kg` : '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}

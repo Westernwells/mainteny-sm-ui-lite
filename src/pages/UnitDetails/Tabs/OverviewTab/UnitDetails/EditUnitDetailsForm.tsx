@@ -10,6 +10,7 @@ import {UnitDetailsFormModel} from 'models/unitForm';
 import {useState} from 'react';
 import {createEmptyResource} from 'utils/paging-utils';
 import {convertToText} from 'utils/utils';
+import InputAdornment from '@mui/material/InputAdornment';
 
 interface Props {
   formik: FormikProps<UnitDetailsFormModel>;
@@ -191,6 +192,11 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
               value: formik.values.unitCapacity,
               onBlur: formik.handleBlur,
               onChange: formik.handleChange,
+              InputProps: {
+                endAdornment: (
+                  <InputAdornment position="start">kg</InputAdornment>
+                ),
+              },
             }}
           />
 

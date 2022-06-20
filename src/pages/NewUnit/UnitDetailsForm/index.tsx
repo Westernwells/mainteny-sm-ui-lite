@@ -12,6 +12,7 @@ import {createEmptyResource} from 'utils/paging-utils';
 import {useCacheValues} from 'hooks/reactQuery/useElevator';
 import {CacheTypes} from 'models/misc';
 import {ElevatorCategory} from 'models/elevator';
+import InputAdornment from '@mui/material/InputAdornment';
 
 interface Props {
   getUnitDetailsFormErrors?: (val: FormikErrors<UnitDetailsFormModel>) => void;
@@ -294,6 +295,11 @@ export const UnitDetailsForm = ({
                     ? formik.errors.unitCapacity
                     : '',
                 required: true,
+                InputProps: {
+                  endAdornment: (
+                    <InputAdornment position="start">kg</InputAdornment>
+                  ),
+                },
               }}
             />
           </Grid>
