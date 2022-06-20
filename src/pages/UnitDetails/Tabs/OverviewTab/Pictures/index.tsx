@@ -71,7 +71,7 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
       <EmptySection
         label="No pictures have been created yet. Please click the button below to create one!"
         showActionBtn
-        btnLabel="Add Picture"
+        btnLabel="Add Pictures"
         btnAction={() => setOpenDialog(true)}
         illustration="clipboard"
         size="tiny"
