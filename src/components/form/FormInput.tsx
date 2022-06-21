@@ -6,7 +6,7 @@ interface Props {
 }
 
 export const FormInput = ({props}: Props) => (
-  <FormControl sx={{marginBlock: '.5em'}} fullWidth>
-    <TextField size="small" {...props} id="22" />
+  <FormControl fullWidth>
+    <TextField size="small" {...props} />
   </FormControl>
 );

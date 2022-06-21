@@ -6,7 +6,7 @@ import {ReactNode} from 'react';
 
 interface Props {
   bodyContainerStyle?: {[key: string]: string | number};
-  containerStyles?: {[key: string]: string | number};
+  containerStyles?: {[key: string]: any};
   minHeight?: string | number;
   header: string | JSX.Element;
   headerActionIcon?: JSX.Element;

@@ -1,61 +1,126 @@
-import Box from '@mui/material/Box';
-import {formatDate, toDate} from 'utils/datetime';
 import useTheme from '@mui/material/styles/useTheme';
 import {CardProps} from 'components/CardProps';
 import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
+import CardTravelIcon from '@mui/icons-material/CardTravel';
 import TodayIcon from '@mui/icons-material/Today';
-import TocIcon from '@mui/icons-material/Toc';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek';
+import WysiwygIcon from '@mui/icons-material/Wysiwyg';
+import TopicIcon from '@mui/icons-material/Topic';
+import {Grid} from '@mui/material';
+import {StatusChip} from 'components/StatusChip';
 
 interface Props {
-  startTime?: string;
-  endTime?: string;
-  costPerYear?: string;
   type?: string;
+  numberOfVisits?: number;
+  costPerYear?: string;
+  spendingLimit?: string;
+  renewalPeriod?: number;
+  invoiceDue?: string;
+  numberOfUnits?: number;
 }
 
 export const ContractBasic = ({
-  startTime,
-  endTime,
   costPerYear,
   type,
+  spendingLimit,
+  invoiceDue,
+  numberOfUnits,
+  numberOfVisits,
+  renewalPeriod,
 }: Props) => {
   const theme = useTheme();
   return (
-    <Box display="flex" justifyContent="space-between">
-      <CardProps
-        label="Cost per Year"
-        bodyTextVariant="subtitle1"
-        icon={<MonetizationOnOutlinedIcon color="info" />}
-        containerStyles={{mr: '0.5em'}}
-        iconBackground={theme.palette.info.outlinedHoverBg}
-        iconMaxHeight="3rem"
-        bodyText={costPerYear || ''}
+    <>
+      <StatusChip
+        color="success"
+        label="Active"
+        style={{margin: '0 0 16px 0', float: 'right'}}
       />
-
-      <CardProps
-        label="Effective Dates"
-        bodyTextVariant="subtitle1"
-        icon={<TodayIcon color="info" />}
-        iconBackground={theme.palette.info.outlinedHoverBg}
-        iconMaxHeight="3rem"
-        bodyText={`${startTime && formatDate(toDate(startTime), 'dd MMM YYY')}
-        -
-        ${endTime && formatDate(toDate(endTime), 'dd MMM YYY')}`}
-      />
-
-      <CardProps
-        label="Contract Type"
-        bodyTextVariant="subtitle1"
-        icon={<TocIcon color="info" />}
-        containerStyles={{
-          ml: '0.5em',
-          display: 'flex',
-          justifyContent: 'center',
-        }}
-        iconBackground={theme.palette.info.outlinedHoverBg}
-        iconMaxHeight="3rem"
-        bodyText={type || ''}
-      />
-    </Box>
+      <Grid container rowGap={2}>
+        <Grid item xs={4}>
+          <CardProps
+            label="TYPE"
+            bodyTextVariant="subtitle1"
+            icon={<CardTravelIcon color="info" />}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={type || '-'}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <CardProps
+            label="NUMBER OF VISITS"
+            bodyTextVariant="subtitle1"
+            icon={<TodayIcon color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={numberOfVisits || '-'}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <CardProps
+            label="PRICE/YEAR (excl VAT)"
+            bodyTextVariant="subtitle1"
+            icon={<AttachMoneyIcon color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={costPerYear || '-'}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <CardProps
+            label="SPENDING LIMIT"
+            bodyTextVariant="subtitle1"
+            icon={<MonetizationOnOutlinedIcon color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={spendingLimit || '-'}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <CardProps
+            label="RENEWAL PERIOD"
+            bodyTextVariant="subtitle1"
+            icon={<CalendarViewWeekIcon color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={
+              renewalPeriod
+                ? renewalPeriod > 1
+                  ? `${renewalPeriod} months`
+                  : `${renewalPeriod} month`
+                : '-'
+            }
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <CardProps
+            label="INVOICE DUE"
+            bodyTextVariant="subtitle1"
+            icon={<WysiwygIcon color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={invoiceDue || '-'}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <CardProps
+            label="NUMBER OF UNITS"
+            bodyTextVariant="subtitle1"
+            icon={<TopicIcon color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={numberOfUnits || '-'}
+          />
+        </Grid>
+      </Grid>
+    </>
   );
 };

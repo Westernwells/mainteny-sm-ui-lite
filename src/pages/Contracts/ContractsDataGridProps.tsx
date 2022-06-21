@@ -73,9 +73,12 @@ export const makeRows = (contracts: ContractView[]) =>
         start: formatDate(item.startTime),
         end: formatDate(item.endTime),
         type: item.type,
-        cost: `${formatCurrency(item ? item.price! : 0, {
-          currency: item.currency,
-        })}`,
+        cost: `${formatCurrency(
+          item.additionalInfo?.price ? item.additionalInfo.price.netAmount : 0,
+          {
+            currency: item.currency,
+          },
+        )}`,
         navigateTo: `details/${item.id}`,
       }))
     : [];

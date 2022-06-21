@@ -68,7 +68,33 @@ export interface QueryContractParams {
   status?: string[];
 }
 
+export interface ContractDocuments {
+  createdAt: string;
+  description: string;
+  id: string;
+  type: string;
+  uri: string;
+}
+
+export interface ContractPrice {
+  currency: string;
+  grossAmount: number;
+  netAmount: number;
+  percentageVat: number;
+  vat: number;
+}
+
+export interface ContractAdditionalInfo {
+  annualPriceAdjustmentPercentage: number;
+  documents: ContractDocuments[];
+  invoiceDue: string;
+  price: ContractPrice;
+  renewalTerms: number;
+  scope: string[];
+}
+
 export interface ContractView {
+  additionalInfo: ContractAdditionalInfo;
   id: string;
   propertyOwner: PropertyOwnerSimpleView;
   serviceCompany: ServiceCompanySimpleView;
@@ -90,6 +116,15 @@ export interface ContractView {
   status: ContractStatus;
   search: string;
   meta: Meta;
+}
+
+export interface FormikContractView {
+  type: string;
+  visitsNumber: number;
+  spendingLimit: number;
+  price: number;
+  renewalTerms: number;
+  invoiceDue: string;
 }
 
 export interface ContractViewWithUnits {
@@ -153,6 +188,7 @@ export interface ContractFilters {
   contractor?: string[];
   expiryDate?: string[];
   price?: number[][];
+  status?: string[];
 }
 
 export interface CustomerContractParams {

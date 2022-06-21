@@ -1,13 +1,15 @@
-import {useLayoutEffect, useState} from 'react';
-import {TabsBody} from 'components/TabsBody';
-import {Tabs} from 'components/Tab';
-import WbSunnyIcon from '@mui/icons-material/WbSunny';
-import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import {useParams} from 'react-router';
-import {useGetUserAccount} from 'hooks/reactQuery/useUserAccount';
+import {useLayoutEffect, useState} from 'react';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+
+import {Tabs} from 'components/Tab';
+import {TabsBody} from 'components/TabsBody';
+import {useGetUserAccount} from 'hooks/reactQuery/useUserAccount';
 import {EmployeeOverview} from './Tabs/EmployeeOverview';
 import {ScheduleTab} from './Tabs/ScheduleTab';
+import WorkHoursTab from './Tabs/WorkHours';
 
 interface Props {
   getCurrentPageTitle?: (title: string) => void;
@@ -23,8 +25,8 @@ const tabItems = [
     icon: <CalendarTodayIcon />,
   },
   {
-    label: 'Holiday',
-    icon: <WbSunnyIcon />,
+    label: 'Work Hours',
+    icon: <TimerOutlinedIcon />,
   },
 ];
 
@@ -53,7 +55,7 @@ export const EmployeeDetails = ({getCurrentPageTitle}: Props) => {
         <ScheduleTab technicianId={user?.userData.employeeId} />
       </TabsBody>
       <TabsBody value={tabValue} index={2}>
-        {null}
+        <WorkHoursTab employeeId={employeeId || ''} />
       </TabsBody>
     </Tabs>
   );

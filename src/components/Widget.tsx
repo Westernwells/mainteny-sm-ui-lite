@@ -46,49 +46,52 @@ export const Widget = ({
     ) : null}
     {filterItems || null}
 
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'flex-end',
-        flexGrow: 1,
-      }}>
-      {showActionBtn ? (
-        <Button
-          // label="Filter"
-          buttonProps={{
-            onClick: () => (btnOnClick ? btnOnClick() : () => {}),
-            sx: {
-              textTransform: 'capitalize',
-              ml: '0.8em',
-            },
-            variant: 'contained',
-            color: 'primary',
-            size: 'small',
-            startIcon: <AddIcon />,
-          }}>
-          <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
-            {btnLabel}
-          </Typography>
-        </Button>
-      ) : null}
-
-      {showMenuActionBtn && menu ? (
-        <MenuBtn
-          startIcon={<AddIcon />}
-          label={btnLabel}
-          menu={menu}
-          size="large"
-          color="primary"
+    {showActionBtn ||
+      (showMenuActionBtn && menu && (
+        <Box
           sx={{
-            textTransform: 'capitalize',
-            ml: '0.8em',
-            py: '0.7em',
-          }}
-          variant="contained"
-          disableRipple
-          disableFocusRipple
-        />
-      ) : null}
-    </Box>
+            display: 'flex',
+            justifyContent: 'flex-end',
+            flexGrow: 1,
+          }}>
+          {showActionBtn ? (
+            <Button
+              // label="Filter"
+              buttonProps={{
+                onClick: () => (btnOnClick ? btnOnClick() : () => {}),
+                sx: {
+                  textTransform: 'capitalize',
+                  ml: '0.8em',
+                },
+                variant: 'contained',
+                color: 'primary',
+                size: 'small',
+                startIcon: <AddIcon />,
+              }}>
+              <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
+                {btnLabel}
+              </Typography>
+            </Button>
+          ) : null}
+
+          {showMenuActionBtn && menu ? (
+            <MenuBtn
+              startIcon={<AddIcon />}
+              label={btnLabel}
+              menu={menu}
+              size="large"
+              color="primary"
+              sx={{
+                textTransform: 'capitalize',
+                ml: '0.8em',
+                py: '0.7em',
+              }}
+              variant="contained"
+              disableRipple
+              disableFocusRipple
+            />
+          ) : null}
+        </Box>
+      ))}
   </Box>
 );

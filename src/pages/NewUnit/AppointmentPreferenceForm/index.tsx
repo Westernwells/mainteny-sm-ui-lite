@@ -60,7 +60,7 @@ export const AppointmentPreferenceForm = ({
       containerStyles={{flexGrow: 1}}
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
-        <Grid container columnSpacing={2}>
+        <Grid container spacing={2}>
           <Grid item md={4}>
             <FormSelect
               labelId="daysOfWeek-label"

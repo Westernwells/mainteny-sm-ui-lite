@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {Widget} from 'components/Widget';
@@ -11,6 +11,9 @@ import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {ElevatorView} from 'models/elevator';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {TabContentContainer} from 'components/TabContentContainer';
+import {FilterFields} from 'components/FilterFields';
+import {DatePicker} from 'components/DatePicker';
+import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 
 export const UnitsTab = () => {
   const [search, setSearch] = useState('');
@@ -29,12 +32,66 @@ export const UnitsTab = () => {
     }
   }, [elevator]);
 
+  const renderFilterItems = useCallback(
+    () => (
+      <FilterFields
+        onClear={() => {}}
+        containerStyle={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}>
+        <DatePicker
+          minDate={undefined}
+          maxDate={undefined}
+          getSelectedDate={() => {}}
+          textFieldProps={{
+            label: 'Last Visit',
+          }}
+          containerStyles={{
+            '& .MuiFormControl-root': {
+              backgroundColor: '#fff',
+              marginBlock: 0,
+            },
+          }}
+        />
+        <DatePicker
+          minDate={undefined}
+          maxDate={undefined}
+          getSelectedDate={() => {}}
+          textFieldProps={{
+            label: 'Next Visit',
+          }}
+          containerStyles={{
+            marginX: 2,
+            '& .MuiFormControl-root': {
+              backgroundColor: '#fff',
+              marginBlock: 0,
+            },
+          }}
+        />
+        <MultipleSelectCheckmarks
+          label="Requires Appointment"
+          options={['Yes', 'No']}
+          multiple={false}
+          containerStyles={{
+            minWidth: '263px',
+            '& .MuiFormControl-root': {
+              width: '100%',
+            },
+          }}
+        />
+      </FilterFields>
+    ),
+    [],
+  );
+
   const renderWidget = () => (
     <Box>
       <Widget
         searchPlaceholder="Search order type, customer, address"
         getSearchValue={(val: string) => setSearch(val)}
-        filterItems={null}
+        filterItems={renderFilterItems()}
       />
     </Box>
   );

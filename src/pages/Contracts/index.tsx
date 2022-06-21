@@ -19,6 +19,7 @@ import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
 import {costRangeConvertor as crConverter} from 'utils/contract-utils';
 import {columns, makeRows} from './ContractsDataGridProps';
+import {Button} from '@mui/material';
 
 const pageSize = 25;
 
@@ -27,8 +28,7 @@ export const Contracts = () => {
   const [queryParams, setQueryParams] = useSearchParams();
   const [page, setPage] = useState(makePage(0, pageSize));
   const totalContractRef = useRef(0);
-  const [expiryDate, setExpiryDate] = useState<string[]>([]);
-  const [contractor, setContractor] = useState<string[]>([]);
+  const [status, setStatus] = useState<string[]>([]);
   const [cost, setCost] = useState<number[][]>([]);
   const [pageCount, setPageCount] = useState(0);
   const [contractorFilterItems, setContractorFilterItems] = useState<string[]>(
@@ -51,7 +51,7 @@ export const Contracts = () => {
       query: search,
       status: [],
     },
-    {expiryDate, contractor, price: cost},
+    {price: cost},
     {keepPreviousData: true},
   );
 
@@ -109,41 +109,20 @@ export const Contracts = () => {
   const renderFilterItems = () => (
     <FilterFields
       onClear={() => {
-        setExpiryDate([]);
-        setContractor([]);
+        setStatus([]);
         setCost([]);
       }}>
       <MultipleSelectCheckmarks
-        label="Expiry Date"
-        options={[
-          'Last 14 days', // TODO: Create an enum to handle this
-          'Today',
-          'Next 7 days',
-          'Next 14 days',
-        ]}
-        initialSelectedItems={expiryDate}
-        getSelectedValue={(item) => setExpiryDate(item)}
-        multiple={false}
-      />
-
-      <MultipleSelectCheckmarks
-        label="Contractor"
-        options={contractorFilterItems}
-        initialSelectedItems={contractor}
-        getSelectedValue={(item) => setContractor(item)}
-      />
-
-      <MultipleSelectCheckmarks
-        label="Cost/year"
-        options={[
-          'Below 1000 €',
-          '1000 - 3000 €',
-          '3000 - 5000 €',
-          'Above 5000 €',
-        ]}
+        label="Price Range"
+        options={['0 - €500', '€500 - €1,000', '> €1,000']}
         initialSelectedItems={cost}
         getSelectedValue={(item) => costRangeConvertor(item)}
-        multiple={false}
+      />
+      <MultipleSelectCheckmarks
+        label="Status"
+        options={['Active', 'Expired']}
+        initialSelectedItems={status}
+        getSelectedValue={(item) => setStatus(item)}
       />
     </FilterFields>
   );
@@ -155,11 +134,14 @@ export const Contracts = () => {
   return (
     <PageListingLayout
       renderWidget={
-        <Widget
-          searchPlaceholder="Search by number, customer, contract type etc."
-          getSearchValue={(val: string) => setSearch(val)}
-          filterItems={renderFilterItems()}
-        />
+        <>
+          <Widget
+            searchPlaceholder="Search by number, customer, contract type etc."
+            getSearchValue={(val: string) => setSearch(val)}
+            filterItems={renderFilterItems()}
+          />
+          <Button variant="contained">+ New Contract</Button>
+        </>
       }>
       <DataGridLayout
         hideFooter={pageCount <= 1}

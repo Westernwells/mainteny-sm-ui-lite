@@ -107,3 +107,24 @@ export const convertMinsToHM = (minutes: number) => {
   const hm = date.toTimeString().slice(0, 5).split(':');
   return `${+hm[0]}hrs ${Number(hm[1]) > 0 ? `${+hm[1]}mins` : ''}`;
 };
+
+export const convertDigitalMinsToHM = (minutes: number) => {
+  const m = Math.floor(minutes % 60).toString();
+  const h = Math.floor((minutes / 60) % 60).toString();
+  return `${h.padStart(2, '0')}:${m.padStart(2, '0')} h`;
+};
+
+export const getLastWeek = () => {
+  const date = new Date();
+  return new Date(date.setDate(date.getDate() - 7));
+};
+
+export const getRangeDate = (
+  start: string,
+  end: string,
+  formatStr?: string,
+) => {
+  const dateStart = formatDate(start, formatStr);
+  const dateEnd = formatDate(end, formatStr);
+  return `${dateStart} - ${dateEnd}`;
+};
