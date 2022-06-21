@@ -14,25 +14,47 @@ import Box from '@mui/material/Box';
 import {SelectModal} from 'components/SelectModal';
 import {ArticlesModalDataGrid} from 'components/ArticleModalDataGrid';
 import {ArticleView} from 'models/article';
+import {useUpdateServiceOrderArticles} from 'hooks/reactQuery/useArticle';
+import {Progress} from 'components/Progress';
 
 interface Props {
   containerStyles?: {[key: string]: any};
   serviceOrderArticles?: ServiceOrderArticleView[];
+  serviceOrderId?: string;
 }
 
-export const Articles = ({serviceOrderArticles}: Props) => {
+export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [openModal, setOpenModal] = useState(false);
+  const {mutateAsync: updateServiceOrderArticles, isLoading} =
+    useUpdateServiceOrderArticles('Article added successfully');
   const [articles, setArticles] = useState<ServiceOrderArticleView[]>(
     serviceOrderArticles ? serviceOrderArticles : [],
   );
+
+  const loading = true;
 
   useEffect(() => {
     setRows(makeRows(articles));
   }, [articles]);
 
-  const handleSelectArticle = (article: ArticleView) => {
-    console.log(article, '.........????????');
+  const handleSelectArticle = async (article: ArticleView) => {
+    const body = {
+      articleId: article.id,
+      description: article.description,
+      name: article.name,
+      quantity: 1,
+      unitAmount: {
+        currency: article.unitSellingAmount.currency,
+        netAmount: article.unitSellingAmount.netAmount,
+        percentageVat: article.unitSellingAmount.percentageVat,
+      },
+    };
+    await updateServiceOrderArticles({
+      body,
+      serviceOrderId: serviceOrderId!,
+    });
+    setOpenModal(false);
   };
 
   const renderNoRowsSection = () => (
@@ -79,7 +101,11 @@ export const Articles = ({serviceOrderArticles}: Props) => {
         isOpen={openModal}
         onClose={() => setOpenModal(false)}
         header="Select Article">
-        <ArticlesModalDataGrid setRowItem={handleSelectArticle} />
+        {isLoading ? (
+          <Progress label="Adding article" />
+        ) : (
+          <ArticlesModalDataGrid setRowItem={handleSelectArticle} />
+        )}
       </SelectModal>
     </>
   );

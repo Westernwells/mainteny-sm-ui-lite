@@ -1,5 +1,12 @@
-import {Address, AddressRecord, Amount, AmountRecord, Meta} from './misc';
 import {FileResource, FileResourceRecord} from './media';
+import {
+  Amount,
+  AmountRecord,
+  Meta,
+  Price,
+  Address,
+  AddressRecord,
+} from './misc';
 
 export enum ArticleType {
   PACKAGE = 'PACKAGE',
@@ -141,4 +148,11 @@ export interface SupplierRecord {
   website: string;
   address?: AddressRecord;
   isPreferred: boolean;
+}
+export interface ServiceOrderArticleRecord {
+  articleId: string;
+  description: string;
+  name: string;
+  quantity: number;
+  unitAmount: AmountRecord;
 }

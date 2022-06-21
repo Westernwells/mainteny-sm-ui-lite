@@ -68,7 +68,10 @@ export const Overview = () => {
           </Box>
 
           <Box mt="1em" flexGrow={1}>
-            <Articles serviceOrderArticles={serviceOrderDetails?.articles} />
+            <Articles
+              serviceOrderArticles={serviceOrderDetails?.articles}
+              serviceOrderId={serviceOrderDetails?.id}
+            />
           </Box>
 
           <Box mt="1em" flexGrow={1}>

@@ -4,13 +4,14 @@ import {queryKeys, queryKeys as qk} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useSnackbar} from 'notistack';
 import _ from 'lodash';
-import {Resource, RestError, StringValue} from 'models/misc';
 import {
   ArticleView,
   CreateArticleRecord,
   QueryArticleParams,
   UpdateArticleRecord,
+  ServiceOrderArticleRecord,
 } from 'models/article';
+import {Resource, RestError, StringValue} from 'models/misc';
 import {useUserSession} from './useUserSession';
 
 export const fetchArticles = async (
@@ -142,6 +143,38 @@ export const useUpdateArticle = (successMsg?: string) => {
         enqueueSnackbar('Some error occurred, please try again.', {
           variant: 'error',
         });
+      },
+    },
+  );
+};
+
+export const updateServiceOrderArticle = async (
+  serviceOrderId: string,
+  body: Partial<ServiceOrderArticleRecord>,
+) =>
+  axiosClient.put(`/api/serviceOrders/${serviceOrderId}/articles`, {
+    ...body,
+  });
+
+export const useUpdateServiceOrderArticles = (successMsg?: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({
+      body,
+      serviceOrderId,
+    }: {
+      body: Partial<ServiceOrderArticleRecord>;
+      serviceOrderId: string;
+    }) => updateServiceOrderArticle(serviceOrderId, body),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(qk.getServiceOrderDetails);
       },
     },
   );

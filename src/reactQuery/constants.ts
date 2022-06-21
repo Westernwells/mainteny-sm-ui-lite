@@ -46,4 +46,5 @@ export const queryKeys = {
   fetchWorkHours: 'fetchWorkHours',
   queryTodos: 'queryTodos',
   fetchServiceOrderInvoices: 'fetchServiceOrderInvoices',
+  fetchServiceOrderArticles: 'fetchServiceOrderArticles',
 };
