@@ -8,6 +8,7 @@ import React from 'react';
 import {SelectButton} from 'components/SelectButton';
 import {FlexContainer} from 'components/FlexContainer';
 import {SelectCard} from 'components/SelectCard';
+import Divider from '@mui/material/Divider';
 import {ArticleHeader} from './ArticleHeader';
 import {ArticleRow} from './ArticleRow';
 import {TimeReportRow} from './TimeReportRow';
@@ -132,6 +133,8 @@ export const WorkReport = ({serviceOrderId}: Props) => {
             <ArticleRow />
           </Box>
         </Box>
+
+        <Divider light sx={{mt: '1em', mb: '1em'}} />
       </A4Layout>
     </FlexContainer>
   );
