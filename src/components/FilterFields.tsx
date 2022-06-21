@@ -6,6 +6,7 @@ import useTheme from '@mui/material/styles/useTheme';
 interface Props {
   children: ReactNode;
   containerStyle?: {[key: string]: string | number};
+  wrapperStyle?: {[key: string]: string | number};
   showFilter?: boolean;
   hideClear?: boolean;
   onClear?: () => void;
@@ -14,6 +15,7 @@ interface Props {
 export const FilterFields = ({
   children,
   containerStyle,
+  wrapperStyle,
   hideClear,
   showFilter = true,
   onClear,
@@ -21,7 +23,9 @@ export const FilterFields = ({
   const theme = useTheme();
   return showFilter ? (
     <Box display="flex" sx={{...containerStyle}}>
-      <Box display="flex">{children}</Box>
+      <Box display="flex" sx={{...wrapperStyle}}>
+        {children}
+      </Box>
       {!hideClear ? (
         <Typography
           onClick={() => onClear && onClear()}
