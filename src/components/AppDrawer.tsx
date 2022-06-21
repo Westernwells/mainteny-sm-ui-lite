@@ -90,6 +90,20 @@ export const AppDrawer = () => {
 
   const drawerList = [
     {
+      text: 'Orders',
+      icon: <LocalShippingIcon sx={{color: '#fff'}} />,
+      path: '/orders',
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/orders');
+        navigate('/orders?pageIndex=1&pageSize=25&tab=0');
+      },
+    },
+    {
       text: 'Units',
       icon: <Elevator sx={{color: '#fff'}} />,
       path: '/units',
@@ -131,21 +145,6 @@ export const AppDrawer = () => {
         navigate('/contracts?pageIndex=1&pageSize=25');
       },
     },
-
-    {
-      text: 'Employees',
-      icon: <PeopleAltIcon sx={{color: '#fff'}} />,
-      path: '/employees',
-      onClick: (
-        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-        index: number,
-      ) => {
-        e.preventDefault();
-        setSelectedIndex(index);
-        setSelectedPath('/employees');
-        navigate('/employees?pageIndex=1&pageSize=25');
-      },
-    },
     {
       text: 'Quotations',
       icon: <RequestQuoteIcon sx={{color: '#fff'}} />,
@@ -175,20 +174,6 @@ export const AppDrawer = () => {
       },
     },
     {
-      text: 'Orders',
-      icon: <LocalShippingIcon sx={{color: '#fff'}} />,
-      path: '/orders',
-      onClick: (
-        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-        index: number,
-      ) => {
-        e.preventDefault();
-        setSelectedIndex(index);
-        setSelectedPath('/orders');
-        navigate('/orders?pageIndex=1&pageSize=25&tab=0');
-      },
-    },
-    {
       text: 'Articles & Packages',
       icon: <HomeRepairServiceIcon sx={{color: '#fff'}} />,
       path: '/articles',
@@ -200,6 +185,20 @@ export const AppDrawer = () => {
         setSelectedIndex(index);
         setSelectedPath('/articles');
         navigate('/articles?pageIndex=1&pageSize=25&tab=0');
+      },
+    },
+    {
+      text: 'Employees',
+      icon: <PeopleAltIcon sx={{color: '#fff'}} />,
+      path: '/employees',
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/employees');
+        navigate('/employees?pageIndex=1&pageSize=25');
       },
     },
   ];
@@ -290,7 +289,9 @@ export const AppDrawer = () => {
                   }),
               }}
               key={text}>
-              <ListItemIcon sx={{minWidth: 0, pr: '1em'}}>{icon}</ListItemIcon>
+              <ListItemIcon sx={{minWidth: 0, pr: '1em', pl: '.25em'}}>
+                {icon}
+              </ListItemIcon>
               <ListItemText
                 primary={
                   <Fade in={open}>
