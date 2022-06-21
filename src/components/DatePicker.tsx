@@ -11,6 +11,7 @@ interface Props {
   getSelectedDate?: (state: Date | null) => void;
   containerStyles?: {[key: string]: any};
   minDate?: Date;
+  maxDate?: Date;
   textFieldProps?: TextFieldProps;
 }
 
@@ -19,6 +20,7 @@ export const DatePicker = ({
   getSelectedDate,
   containerStyles,
   minDate,
+  maxDate,
   textFieldProps,
 }: Props) => {
   const [value, setValue] = useState<Date | null>(null);
@@ -39,8 +41,10 @@ export const DatePicker = ({
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <MuiDatePicker
           inputFormat="dd.MM.yyy"
+          mask="__.__.____"
           value={value}
           minDate={minDate}
+          maxDate={maxDate}
           onChange={(newValue) => {
             setValue(newValue);
           }}

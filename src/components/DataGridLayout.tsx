@@ -32,7 +32,10 @@ interface Props extends DataGridProps {
   totalRows?: number;
   fullHeight?: boolean;
   noRowsEmptySection?: JSX.Element;
+  noResultsEmptySection?: JSX.Element;
+  noResultsCondition?: boolean;
   isRowSelectable?: (params: GridRowParams) => boolean;
+  isCellClickable?: boolean;
 }
 
 interface ColumnProps extends GridColDef {
@@ -88,6 +91,9 @@ export const DataGridLayout = ({
   fullHeight = true,
   noRowsEmptySection,
   isRowSelectable,
+  noResultsEmptySection,
+  noResultsCondition = false,
+  isCellClickable = true,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
@@ -114,15 +120,30 @@ export const DataGridLayout = ({
     />
   );
 
-  const noRowsOverlay = () =>
-    noRowsEmptySection || (
-      <EmptySection
-        illustration="clipboard"
-        size="tiny"
-        containerStyle={{my: 'auto'}}
-        label="There are no rows for the applied filters!"
-      />
+  const noRowsOverlay = () => {
+    if (noResultsCondition) {
+      return (
+        noResultsEmptySection || (
+          <EmptySection
+            illustration="clipboard"
+            size="tiny"
+            containerStyle={{my: 'auto'}}
+            label="No data entries yet. They will appear here once added!"
+          />
+        )
+      );
+    }
+    return (
+      noRowsEmptySection || (
+        <EmptySection
+          illustration="clipboard"
+          size="tiny"
+          containerStyle={{my: 'auto'}}
+          label="There are no rows for the applied filters!"
+        />
+      )
     );
+  };
 
   return (
     <Box
@@ -149,7 +170,7 @@ export const DataGridLayout = ({
           onCellClick ||
           ((params, e) => {
             e.preventDefault();
-            if (params.field !== 'actions') {
+            if (params.field !== 'actions' && isCellClickable) {
               navigate(params.row.navigateTo);
             }
           })
