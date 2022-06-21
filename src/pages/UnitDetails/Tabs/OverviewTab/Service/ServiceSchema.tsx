@@ -7,6 +7,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import FlagIcon from '@mui/icons-material/Flag';
 import useTheme from '@mui/material/styles/useTheme';
 import {ElevatorView} from 'models/elevator';
+import {formatDate} from 'utils/datetime';
 
 interface Props {
   label: string;
@@ -25,7 +26,11 @@ export const ServiceSchema = ({label, elevator, visitNumber}: Props) => {
               <PermContactCalendarIcon sx={{color: theme.palette.info.dark}} />
             }
             label="LAST VISIT"
-            bodyText={elevator.lastVisitDate}
+            bodyText={
+              elevator.lastVisitDate
+                ? formatDate(new Date(elevator.lastVisitDate))
+                : '-'
+            }
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
@@ -36,7 +41,13 @@ export const ServiceSchema = ({label, elevator, visitNumber}: Props) => {
           <CardProps
             icon={<CachedIcon sx={{color: theme.palette.info.dark}} />}
             label="LAST INSPECTION"
-            bodyText={elevator.additionalInfo.lastInspectionDate || '-'}
+            bodyText={
+              elevator.additionalInfo.lastInspectionDate
+                ? formatDate(
+                    new Date(elevator.additionalInfo.lastInspectionDate),
+                  )
+                : '-'
+            }
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"

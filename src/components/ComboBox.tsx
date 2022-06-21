@@ -54,6 +54,7 @@ export const ComboBox = ({
   ) => {
     if (reason === 'input') {
       setQuery(value);
+      setItem({label: value, value});
     }
     if (reason === 'clear') {
       setQuery('');

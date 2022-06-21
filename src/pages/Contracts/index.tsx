@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
@@ -106,7 +107,12 @@ export const Contracts = () => {
   }
 
   const renderFilterItems = () => (
-    <FilterFields>
+    <FilterFields
+      onClear={() => {
+        setExpiryDate([]);
+        setContractor([]);
+        setCost([]);
+      }}>
       <MultipleSelectCheckmarks
         label="Expiry Date"
         options={[
@@ -115,6 +121,7 @@ export const Contracts = () => {
           'Next 7 days',
           'Next 14 days',
         ]}
+        initialSelectedItems={expiryDate}
         getSelectedValue={(item) => setExpiryDate(item)}
         multiple={false}
       />
@@ -122,6 +129,7 @@ export const Contracts = () => {
       <MultipleSelectCheckmarks
         label="Contractor"
         options={contractorFilterItems}
+        initialSelectedItems={contractor}
         getSelectedValue={(item) => setContractor(item)}
       />
 
@@ -133,6 +141,7 @@ export const Contracts = () => {
           '3000 - 5000 €',
           'Above 5000 €',
         ]}
+        initialSelectedItems={cost}
         getSelectedValue={(item) => costRangeConvertor(item)}
         multiple={false}
       />

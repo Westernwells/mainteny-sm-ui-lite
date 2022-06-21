@@ -166,6 +166,7 @@ export const Notes = ({elevatorId}: Props) => {
             label="No notes have been created yet. Please click the button below to create one!"
             showActionBtn
             btnLabel="Add Note"
+            btnAction={() => setOpenDialog(true)}
             illustration="clipboard"
             size="tiny"
             containerStyle={{

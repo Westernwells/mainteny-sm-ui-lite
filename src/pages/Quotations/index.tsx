@@ -20,8 +20,8 @@ export const Quotations = () => {
 
   const [search, setSearch] = useState('');
   const totalQuotationsRef = useRef(0);
+  const [status, setStatus] = useState<string[]>([]);
   const [page, setPage] = useState(makePage(0, pageSize));
-  const [showFilter, setShowFilter] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const {
@@ -49,10 +49,7 @@ export const Quotations = () => {
     } else {
       setRows([]);
     }
-    if (!showFilter) {
-      console.log('Filter Enabled:', showFilter);
-    }
-  }, [quotationsResource, showFilter]);
+  }, [quotationsResource]);
 
   useEffect(() => {
     setPageCount(Math.ceil(quotationsResource.total / page.pageSize));
@@ -74,11 +71,12 @@ export const Quotations = () => {
   }
 
   const renderFilterItems = () => (
-    <FilterFields setShowFilter={setShowFilter}>
+    <FilterFields onClear={() => setStatus([])}>
       <MultipleSelectCheckmarks
         label="Status"
         options={['SENT', 'DRAFT']}
-        getSelectedValue={(item) => console.log(item)}
+        initialSelectedItems={status}
+        getSelectedValue={(item) => setStatus(item)}
         multiple={false}
       />
     </FilterFields>

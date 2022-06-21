@@ -27,6 +27,7 @@ export const Invoices = () => {
   const [queryParams, setQueryParams] = useSearchParams();
   const totalInvoiceRef = useRef(0);
   const [amount, setAmount] = useState<number[][]>([]);
+  const [invoiceDate, setInvoiceDate] = useState<string[]>([]);
   const [status, setStatus] = useState<InvoiceStatus>();
   const [serviceType, setServiceType] = useState<ServiceOrderType[]>([]);
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -103,12 +104,19 @@ export const Invoices = () => {
   }
 
   const renderFilterItems = () => (
-    <FilterFields>
+    <FilterFields
+      onClear={() => {
+        setAmount([]);
+        setInvoiceDate([]);
+        setStatus(undefined);
+        setServiceType([]);
+      }}>
       <MultipleSelectCheckmarks
         label="Invoice Date"
         options={['This Week', 'Last Week', 'Last Month']}
-        getSelectedValue={(item) => console.log(item)}
+        getSelectedValue={(item) => setInvoiceDate(item)}
         multiple={false}
+        initialSelectedItems={invoiceDate}
       />
       <MultipleSelectCheckmarks
         label="Total Amount"
@@ -119,6 +127,7 @@ export const Invoices = () => {
           'Above 5000 EUR',
         ]}
         getSelectedValue={(item) => amountRangeConvertor(item)}
+        initialSelectedItems={amount}
         multiple={false}
       />
       <MultipleSelectCheckmarks
@@ -132,10 +141,12 @@ export const Invoices = () => {
             : setStatus(undefined)
         }
         multiple={false}
+        initialSelectedItems={status ? [status] : []}
       />
       <MultipleSelectCheckmarks
         label="Service Type"
         options={['Maintenance', 'Repair', 'Callout', 'Emergency']}
+        initialSelectedItems={serviceType}
         getSelectedValue={(items) => {
           const value: ServiceOrderType[] = [];
           items.forEach((item) => {

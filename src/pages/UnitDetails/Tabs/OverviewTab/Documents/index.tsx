@@ -72,7 +72,7 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
       <EmptySection
         label="No documents have been created yet. Please click the button below to create one!"
         showActionBtn
-        btnLabel="Add Picture"
+        btnLabel="Add Documents"
         btnAction={() => setOpenDialog(true)}
         illustration="clipboard"
         size="tiny"
