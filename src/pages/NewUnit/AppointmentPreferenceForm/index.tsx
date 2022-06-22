@@ -158,7 +158,7 @@ export const AppointmentPreferenceForm = ({
               }))}
               selectProps={{
                 id: 'requirestNotificationSelect',
-                // value: formik.values.requiresAppointmentNotification,
+                value: formik.values.requiresAppointmentNotification,
                 onChange: formik.handleChange,
                 name: 'requiresAppointmentNotification',
               }}
