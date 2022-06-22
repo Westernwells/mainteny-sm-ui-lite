@@ -14,6 +14,7 @@ import {
 } from '@mui/x-data-grid';
 import LinearProgress from '@mui/material/LinearProgress';
 import {useNavigate} from 'react-router-dom';
+import {olStyles} from 'styles';
 import {CustomPagination} from './CustomPagination';
 import {EmptySection} from './EmptySection';
 
@@ -187,6 +188,8 @@ export const DataGridLayout = ({
             : ''
         }
         sx={{
+          ...olStyles.scrollbar,
+
           width: '100%',
           my: '0.5em',
           borderLeft: 'none',
@@ -194,6 +197,11 @@ export const DataGridLayout = ({
           borderTop: 'none',
           borderBottom: '2px solid',
           borderColor: 'background.default',
+          '& .MuiDataGrid-virtualScroller': {
+            '&:hover': {
+              ...olStyles.verticlaScrollBar,
+            },
+          },
           '& .MuiDataGrid-row': {
             background: 'white',
             cursor: 'pointer',
@@ -274,6 +282,7 @@ export const DataGridLayout = ({
           },
           ...rowClassNames,
           ...containerStyle,
+
           ...rest,
         }}
       />
