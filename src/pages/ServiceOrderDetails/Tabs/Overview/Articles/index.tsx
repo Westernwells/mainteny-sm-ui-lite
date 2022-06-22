@@ -8,7 +8,7 @@ import {getDataGridHeight} from 'utils/utils';
 import {InfoCard} from 'components/InfoCard';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {ServiceOrderArticleView} from 'models/service-order';
-import {columns, makeRows} from './ArticleDataGridProps';
+import {ActionTypes, columns, makeRows} from './ArticleDataGridProps';
 import {EmptySection} from 'components/EmptySection';
 import Box from '@mui/material/Box';
 import {SelectModal} from 'components/SelectModal';
@@ -29,6 +29,8 @@ export const Articles = ({
 }: Props) => {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [openModal, setOpenModal] = useState(false);
+  const [currentArticle, setCurrentArticle] =
+    useState<ServiceOrderArticleView>();
   const {mutateAsync: updateServiceOrderArticles, isLoading} =
     useUpdateServiceOrderArticles('Article added successfully');
   // const [articles, setArticles] = useState<ServiceOrderArticleView[]>(
@@ -75,6 +77,37 @@ export const Articles = ({
     setOpenModal(false);
   };
 
+  const deleteArticle = async (articles: ServiceOrderArticleView[]) => {
+    let body = articles?.map((item) => ({
+      articleId: item.article.id,
+      description: item.article.description,
+      name: item.article.name,
+      quantity: item.quantity,
+      unitAmount: {
+        currency: item.unitAmount.currency,
+        netAmount: item.unitAmount.netAmount,
+        percentageVat: item.unitAmount.percentageVat,
+      },
+    }));
+
+    updateServiceOrderArticles({
+      body,
+      serviceOrderId: serviceOrderId!,
+    });
+  };
+
+  const handleAction = async (
+    serviceOrderArticle: ServiceOrderArticleView,
+    action: ActionTypes,
+  ) => {
+    if (action === ActionTypes.DELETE) {
+      const result = serviceOrderArticles.filter(
+        (item) => item.id !== serviceOrderArticle.id,
+      );
+      await deleteArticle(result);
+    }
+  };
+
   const renderNoRowsSection = () => (
     <Box
       sx={{
@@ -107,7 +140,9 @@ export const Articles = ({
             height={getDataGridHeight(rows.length, 3)}
             hideFooter
             rows={rows}
-            columns={columns}
+            columns={columns((item, actionType) =>
+              handleAction(item, actionType),
+            )}
             containerStyle={{
               borderBottom: 'none',
             }}

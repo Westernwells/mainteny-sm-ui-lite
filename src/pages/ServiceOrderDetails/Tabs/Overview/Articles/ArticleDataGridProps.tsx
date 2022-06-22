@@ -7,7 +7,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 
-export const columns = (): GridColDef[] => [
+export enum ActionTypes {
+  EDIT = 'EDIT',
+  DELETE = 'DELETE',
+}
+
+export const columns = (
+  handleAction: (val: ServiceOrderArticleView, actionType: ActionTypes) => void,
+): GridColDef[] => [
   getColumnProps({
     field: 'po',
     headerName: 'PO',
@@ -44,10 +51,12 @@ export const columns = (): GridColDef[] => [
     renderCell(params) {
       return (
         <Box>
-          <IconButton onClick={() => console.log(params.value)}>
+          <IconButton
+            onClick={() => handleAction(params.value, ActionTypes.EDIT)}>
             <EditIcon />
           </IconButton>
-          <IconButton onClick={() => console.log(params.value)}>
+          <IconButton
+            onClick={() => handleAction(params.value, ActionTypes.DELETE)}>
             <DeleteIcon />
           </IconButton>
         </Box>
