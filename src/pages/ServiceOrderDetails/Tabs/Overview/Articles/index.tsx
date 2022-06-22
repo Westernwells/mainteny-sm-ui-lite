@@ -16,6 +16,7 @@ import {ArticlesModalDataGrid} from 'components/ArticleModalDataGrid';
 import {ArticleView} from 'models/article';
 import {useUpdateServiceOrderArticles} from 'hooks/reactQuery/useArticle';
 import {Progress} from 'components/Progress';
+import {Confirm} from 'components/Confirm';
 
 interface Props {
   containerStyles?: {[key: string]: any};
@@ -29,6 +30,7 @@ export const Articles = ({
 }: Props) => {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [openModal, setOpenModal] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState(false);
   const [currentArticle, setCurrentArticle] =
     useState<ServiceOrderArticleView>();
   const {mutateAsync: updateServiceOrderArticles, isLoading} =
@@ -77,8 +79,11 @@ export const Articles = ({
     setOpenModal(false);
   };
 
-  const deleteArticle = async (articles: ServiceOrderArticleView[]) => {
-    let body = articles?.map((item) => ({
+  const deleteArticle = async () => {
+    const result = serviceOrderArticles.filter(
+      (item) => item.id !== currentArticle?.id,
+    );
+    let body = result?.map((item) => ({
       articleId: item.article.id,
       description: item.article.description,
       name: item.article.name,
@@ -90,21 +95,21 @@ export const Articles = ({
       },
     }));
 
-    updateServiceOrderArticles({
+    await updateServiceOrderArticles({
       body,
       serviceOrderId: serviceOrderId!,
     });
+    setOpenConfirm(false);
   };
 
   const handleAction = async (
     serviceOrderArticle: ServiceOrderArticleView,
     action: ActionTypes,
   ) => {
+    setCurrentArticle(serviceOrderArticle);
+
     if (action === ActionTypes.DELETE) {
-      const result = serviceOrderArticles.filter(
-        (item) => item.id !== serviceOrderArticle.id,
-      );
-      await deleteArticle(result);
+      setOpenConfirm(true);
     }
   };
 
@@ -160,6 +165,13 @@ export const Articles = ({
           <ArticlesModalDataGrid setRowItem={handleSelectArticle} />
         )}
       </SelectModal>
+      <Confirm
+        open={openConfirm}
+        onConfirm={() => deleteArticle()}
+        onClose={() => setOpenConfirm(false)}
+        title="Confirm"
+        content="Do you want to delete this note?"
+      />
     </>
   );
 };

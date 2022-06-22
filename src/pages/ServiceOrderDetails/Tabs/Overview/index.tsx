@@ -12,6 +12,7 @@ import {Timeline} from 'components/Timeline';
 import Typography from '@mui/material/Typography';
 import ComputerIcon from '@mui/icons-material/Computer';
 import PersonIcon from '@mui/icons-material/Person';
+import {olStyles} from 'styles';
 import {formatDate} from 'utils/datetime';
 import {OrderInfoCard} from './OrderInfoCard';
 import {DescriptionCard} from './DescriptionCard';
@@ -46,7 +47,12 @@ export const Overview = ({orderId}: Props) => {
   }
 
   return (
-    <Grid container spacing={2} sx={{height: '100%', overflowY: 'scroll'}}>
+    <Grid
+      container
+      spacing={2}
+      sx={{
+        height: '100%',
+      }}>
       <Grid
         item
         sm={12}
@@ -58,6 +64,7 @@ export const Overview = ({orderId}: Props) => {
         }}>
         <Box
           sx={{
+            ...olStyles.scrollbar,
             height: '100%',
             overflowY: 'scroll',
             display: 'flex',
@@ -101,6 +108,7 @@ export const Overview = ({orderId}: Props) => {
           headerLabel="Timeline"
           headerStyles={{pl: '0.3em'}}
           containerStyles={{
+            ...olStyles.scrollbar,
             height: '100%',
             overflowY: 'scroll',
           }}>

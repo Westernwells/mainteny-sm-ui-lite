@@ -13,11 +13,10 @@ export interface Props {
   headerTextOverrideStyles?: {[key: string]: string | number};
   headerActionIcon?: JSX.Element;
   minHeight?: number | string;
-  // contentPadding?: string | number;
   headerLabel?: string;
   customHeader?: JSX.Element;
-  containerStyles?: {[key: string]: string | number};
-  contentContainerStyles?: {[key: string]: string | number};
+  containerStyles?: {[key: string]: any};
+  contentContainerStyles?: {[key: string]: any};
   handleAction?: () => void;
 }
 
@@ -29,7 +28,6 @@ export const PageCard = ({
   headerTextOverrideStyles,
   headerActionIcon,
   minHeight,
-  // contentPadding,
   customHeader,
   contentContainerStyles,
   handleAction = () => {},
