@@ -23,33 +23,51 @@ interface Props {
   serviceOrderId?: string;
 }
 
-export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
+export const Articles = ({
+  serviceOrderArticles = [],
+  serviceOrderId,
+}: Props) => {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [openModal, setOpenModal] = useState(false);
   const {mutateAsync: updateServiceOrderArticles, isLoading} =
     useUpdateServiceOrderArticles('Article added successfully');
-  const [articles, setArticles] = useState<ServiceOrderArticleView[]>(
-    serviceOrderArticles ? serviceOrderArticles : [],
-  );
+  // const [articles, setArticles] = useState<ServiceOrderArticleView[]>(
+  //   serviceOrderArticles ? serviceOrderArticles : [],
+  // );
 
   const loading = true;
 
   useEffect(() => {
-    setRows(makeRows(articles));
-  }, [articles]);
+    setRows(makeRows(serviceOrderArticles));
+  }, [serviceOrderArticles]);
 
   const handleSelectArticle = async (article: ArticleView) => {
-    const body = {
-      articleId: article.id,
-      description: article.description,
-      name: article.name,
-      quantity: 1,
+    let body = serviceOrderArticles?.map((item) => ({
+      articleId: item.article.id,
+      description: item.article.description,
+      name: item.article.name,
+      quantity: item.quantity,
       unitAmount: {
-        currency: article.unitSellingAmount.currency,
-        netAmount: article.unitSellingAmount.netAmount,
-        percentageVat: article.unitSellingAmount.percentageVat,
+        currency: item.unitAmount.currency,
+        netAmount: item.unitAmount.netAmount,
+        percentageVat: item.unitAmount.percentageVat,
       },
-    };
+    }));
+
+    body = [
+      ...body,
+      {
+        articleId: article.id,
+        description: article.description,
+        name: article.name,
+        quantity: 1,
+        unitAmount: {
+          currency: article.unitSellingAmount.currency,
+          netAmount: article.unitSellingAmount.netAmount,
+          percentageVat: article.unitSellingAmount.percentageVat,
+        },
+      },
+    ];
     await updateServiceOrderArticles({
       body,
       serviceOrderId: serviceOrderId!,
@@ -81,7 +99,7 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
         showHeaderBackground
         handleAction={() => setOpenModal(true)}
         headerActionIcon={<Typography color="info.main">+ Add</Typography>}>
-        {articles.length === 0 ? (
+        {serviceOrderArticles.length === 0 ? (
           renderNoRowsSection()
         ) : (
           <DataGridLayout

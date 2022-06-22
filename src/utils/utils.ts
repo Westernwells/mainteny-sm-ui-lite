@@ -101,7 +101,7 @@ export const getDataGridHeight = (
   maxItems: number,
   headerHeight?: number,
 ) => {
-  const height = headerHeight || 30;
+  const height = headerHeight || 50;
   if (currentTotal === 0) {
     return 70 * 3 + height;
   }

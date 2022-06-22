@@ -4,6 +4,7 @@ import GradingIcon from '@mui/icons-material/Grading';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import {useParams} from 'react-router';
 import {Overview} from './Tabs/Overview';
 import {WorkReport} from './Tabs/WorkReport';
 
@@ -24,6 +25,7 @@ const tabItems = [
 
 export const ServiceOrderDetails = () => {
   const [tabValue, setTabValue] = useState(0);
+  const {id: serviceOrderId} = useParams();
 
   return (
     <Tabs
@@ -33,10 +35,10 @@ export const ServiceOrderDetails = () => {
         setTabValue(index);
       }}>
       <TabsBody value={tabValue} index={0} containerStyle={{height: 2}}>
-        <Overview />
+        <Overview orderId={serviceOrderId} />
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
-        <WorkReport />
+        <WorkReport serviceOrderId={serviceOrderId} />
       </TabsBody>
     </Tabs>
   );

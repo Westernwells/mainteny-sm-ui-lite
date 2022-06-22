@@ -29,6 +29,7 @@ import {
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import {MenuBtn} from 'components/MenuBtn';
+import {olStyles} from 'styles';
 // import {orderInfo as orderInfoSchema} from './schema';
 import {ScheduleDialog} from './ScheduleDialog';
 import {OrderInfo} from './schema';
@@ -183,9 +184,16 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
       <StatusChip
         color={getServiceOrderStatusColor(serviceOrderDetails.status)}
         label={serviceOrderStatusToString(serviceOrderDetails.status)}
-        size="small"
-        maxChars={15}
+        style={{...olStyles.orderStatus, letterSpacing: 'normal'}}
+        // maxChars={15}
       />
+
+      {/* <StatusChip
+        color={getServiceOrderStatusColor(params.value)}
+        style={sx.orderStatus}
+        label={serviceOrderStatusToString(params.value)}
+        variant="filled"
+      /> */}
 
       <Box sx={{mt: -1}}>
         <MenuBtn
@@ -231,8 +239,8 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         </Box>
       }>
       <Grid container>
-        {orderInfo.map((label) => (
-          <Grid item xs={4}>
+        {orderInfo.map((label, index) => (
+          <Grid item xs={4} key={`${label}-${index}`}>
             <OrderInfo
               serviceOrderDetails={serviceOrderDetails}
               label={label}

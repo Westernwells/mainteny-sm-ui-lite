@@ -150,11 +150,8 @@ export const useUpdateArticle = (successMsg?: string) => {
 
 export const updateServiceOrderArticle = async (
   serviceOrderId: string,
-  body: Partial<ServiceOrderArticleRecord>,
-) =>
-  axiosClient.put(`/api/serviceOrders/${serviceOrderId}/articles`, {
-    ...body,
-  });
+  body: Partial<ServiceOrderArticleRecord>[],
+) => axiosClient.put(`/api/serviceOrders/${serviceOrderId}/articles`, body);
 
 export const useUpdateServiceOrderArticles = (successMsg?: string) => {
   const {enqueueSnackbar} = useSnackbar();
@@ -164,7 +161,7 @@ export const useUpdateServiceOrderArticles = (successMsg?: string) => {
       body,
       serviceOrderId,
     }: {
-      body: Partial<ServiceOrderArticleRecord>;
+      body: Partial<ServiceOrderArticleRecord>[];
       serviceOrderId: string;
     }) => updateServiceOrderArticle(serviceOrderId, body),
     {

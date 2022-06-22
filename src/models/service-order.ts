@@ -270,14 +270,13 @@ export interface ServiceOrderReportAttachmentView {
 export interface ServiceOrderReportView {
   actualServiceTime: number;
   additionalInfo: ServiceOrderReportAdditionalInfo;
-  articles: ServiceOrderReportArticleView;
   attachments: ServiceOrderReportAttachmentView[];
   description: string;
   elevator: ElevatorSimpleView;
   externalId: string;
   id: string;
   meta: Meta;
-  serviceOrder: ServiceOrderScheduleSimpleView;
+  serviceOrder: ServiceOrderSimpleView;
   totalAmount: Amount;
 }
 
@@ -372,7 +371,7 @@ export interface CreateNonScheduledServiceOrderBody {
 }
 
 export interface ServiceOrderArticleView {
-  articles: ArticleView;
+  article: ArticleView;
   description: string;
   id: string;
   name: string;

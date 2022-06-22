@@ -131,10 +131,70 @@ export const WorkReport = ({serviceOrderId}: Props) => {
 
             <ArticleRow />
             <ArticleRow />
+
+            <Divider light sx={{mt: '1em', mb: '1em'}} />
+
+            <Box
+              sx={{display: 'flex', justifyContent: 'flex-end', pr: '0.5em'}}>
+              <Typography component="div" variant="body1">
+                Total Price
+                <Typography variant="caption" color="text.secondary">
+                  {' (excl VAT)'}
+                </Typography>
+              </Typography>
+
+              <Typography variant="body2" ml="3em">
+                €34,600
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                mt: '0.5em',
+                pr: '0.5em',
+              }}>
+              <Typography component="div" variant="body1">
+                VAT
+              </Typography>
+              <Typography variant="body2" ml="3em">
+                €6,800
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                mt: '0.5em',
+                py: '0.5em',
+                pr: '0.5em',
+              }}
+              bgcolor="grey.700">
+              <Typography component="div" variant="body1" color="white">
+                Total Price
+                <Typography variant="caption">{' (incl VAT)'}</Typography>
+              </Typography>
+
+              <Typography variant="body2" ml="3em" color="white">
+                €34,600
+              </Typography>
+            </Box>
           </Box>
         </Box>
 
-        <Divider light sx={{mt: '1em', mb: '1em'}} />
+        <Box sx={{mt: '2em'}}>
+          <Typography component="div" variant="caption" color="text.secondary">
+            Description Of Service
+          </Typography>
+          <Typography variant="body2" mt="0.3em">
+            During the last fault calls to the above-mentioned elevator system,
+            non-definable and reproducible errors occurred repeatedly. However,
+            since these two positions are very expensive, it may be necessary to
+            renew the entire elevator control system.
+          </Typography>
+        </Box>
       </A4Layout>
     </FlexContainer>
   );

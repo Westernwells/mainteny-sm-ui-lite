@@ -159,3 +159,18 @@ export const convert24hTo12h = (time: string, addMeridian?: boolean) => {
         useGrouping: false,
       })}:${min}`;
 };
+
+export const get24Hour = (startNumber?: number, endNumber?: number) =>
+  [...Array(24).keys()]
+    .map((i) => (i + 1).toString().padStart(2, '0'))
+    .slice(startNumber ? startNumber - 1 : 0, endNumber || 24);
+
+export const get12Hour = (startNumber?: number, endNumber?: number) =>
+  [...Array(12).keys()]
+    .map((i) => (i + 1).toString().padStart(2, '0'))
+    .slice(startNumber ? startNumber - 1 : 0, endNumber || 12);
+
+export const get60Mins = (startNumber?: number, endNumber?: number) =>
+  [...Array(60).keys()]
+    .map((i) => (i + 1).toString().padStart(2, '0'))
+    .slice(startNumber ? startNumber - 1 : 0, endNumber || 60);

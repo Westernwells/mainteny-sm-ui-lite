@@ -1,96 +1,59 @@
-import {
-  GridAlignment,
-  GridColDef,
-  GridColumnHeaderParams,
-  GridRenderCellParams,
-  GridRowsProp,
-} from '@mui/x-data-grid';
-import Typography from '@mui/material/Typography';
+import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import {formatCurrency} from 'utils/currency';
 import {ServiceOrderArticleView} from 'models/service-order';
+import {getColumnProps} from 'components/DataGridLayout';
+import Box from '@mui/material/Box';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
 
-const defaultProps = {
-  editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
-  renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" mx="0.5em">
-      {params.value || '-'}
-    </Typography>
-  ),
-};
-const defaultAlignment: {
-  flex: number;
-  headerAlign: GridAlignment;
-  align: GridAlignment;
-} = {
-  flex: 1,
-  headerAlign: 'left',
-  align: 'left',
-};
-
-export const columns: GridColDef[] = [
-  {
+export const columns = (): GridColDef[] => [
+  getColumnProps({
     field: 'po',
     headerName: 'PO',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
+  }),
+  getColumnProps({
     field: 'name',
     headerName: 'NAME',
-    type: 'string',
     cellClassName: 'truncateText',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
+  }),
+  getColumnProps({
     field: 'number',
     headerName: 'NUMBER',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
+  }),
+  getColumnProps({
     field: 'unitPrice',
-    headerName: 'UN IT PRICE',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
+    headerName: 'UNIT PRICE',
+  }),
+  getColumnProps({
     field: 'quantity',
     headerName: 'QUANTITY',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-
-  {
+  }),
+  getColumnProps({
     field: 'unit',
     headerName: 'UNIT',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
+  }),
+
+  getColumnProps({
     field: 'total',
     headerName: 'Total',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'action',
-    headerName: 'ACTION',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
+  }),
+  getColumnProps({
+    field: 'actions',
+    headerName: 'ACTIONS',
+    renderCell(params) {
+      return (
+        <Box>
+          <IconButton onClick={() => console.log(params.value)}>
+            <EditIcon />
+          </IconButton>
+          <IconButton onClick={() => console.log(params.value)}>
+            <DeleteIcon />
+          </IconButton>
+        </Box>
+      );
+    },
+  }),
 ];
 
 export const makeRows = (articles: ServiceOrderArticleView[]): GridRowsProp =>
@@ -102,17 +65,17 @@ export const makeRows = (articles: ServiceOrderArticleView[]): GridRowsProp =>
     return {
       id: index,
       po: index + 1,
-      number: item.articles.number,
+      number: item.article.number,
       name: item.name,
-      unit: item.articles.unit,
-      total: unitPrice * item.articles.stock.currentStock,
-      model: item.articles.model,
-      supplier: item.articles.manufacturer,
+      unit: item.article.unit,
+      total: unitPrice * item.article.stock.currentStock,
+      model: item.article.model,
+      supplier: item.article.manufacturer,
       unitPrice: `${formatCurrency(unitPrice, {
         currency: item.unitAmount.currency,
       })}`,
-      quantity: item.articles.stock.currentStock,
+      quantity: item.article.stock.currentStock,
+      actions: item,
       navigateTo: `details/${item.id}`,
-      item,
     };
   });

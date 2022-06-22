@@ -4,7 +4,6 @@ import {
   useServiceOrderActivities,
   useServiceOrderDetails,
 } from 'hooks/reactQuery/useServiceOrder';
-import {useParams} from 'react-router';
 import {Progress} from 'components/Progress';
 import {PageCard} from 'components/PageCard';
 
@@ -20,9 +19,12 @@ import {Quotation} from './Quotations';
 import {Invoices} from './Invoices';
 import {Articles} from './Articles';
 
-export const Overview = () => {
+interface Props {
+  orderId?: string;
+}
+
+export const Overview = ({orderId}: Props) => {
   const theme = useTheme();
-  const {id: orderId} = useParams();
   const {data: serviceOrderDetails, isLoading} =
     useServiceOrderDetails(orderId);
   const {data: serviceOrderActivities = []} =
@@ -42,6 +44,7 @@ export const Overview = () => {
   if (isLoading) {
     return <Progress />;
   }
+
   return (
     <Grid container spacing={2} sx={{height: '100%', overflowY: 'scroll'}}>
       <Grid
