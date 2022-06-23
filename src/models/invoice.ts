@@ -19,6 +19,13 @@ export enum InvoiceStatus {
   EXPIRED = 'EXPIRED',
 }
 
+export enum InvoiceDueType {
+  AFTER_EACH_VISIT = 'AFTER_EACH_VISIT',
+  HALF_YEARLY = 'HALF_YEARLY',
+  QUARTERLY = 'QUARTERLY',
+  YEARLY = 'YEARLY',
+}
+
 export enum InvoiceStatusView {
   PAID = 'Paid',
   NOT_PAID = 'Unpaid',

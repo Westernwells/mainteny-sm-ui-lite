@@ -36,6 +36,7 @@ interface Props extends DataGridProps {
   noResultsCondition?: boolean;
   isRowSelectable?: (params: GridRowParams) => boolean;
   isCellClickable?: boolean;
+  checkboxSelection?: boolean;
 }
 
 interface ColumnProps extends GridColDef {
@@ -94,6 +95,10 @@ export const DataGridLayout = ({
   noResultsEmptySection,
   noResultsCondition = false,
   isCellClickable = true,
+  checkboxSelection = false,
+  disableSelectionOnClick = true,
+  onRowClick = () => {},
+  selectionModel,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
@@ -162,13 +167,17 @@ export const DataGridLayout = ({
         rows={rows}
         columns={columns}
         isRowSelectable={isRowSelectable}
-        disableSelectionOnClick
+        disableSelectionOnClick={disableSelectionOnClick}
         disableColumnFilter
         disableColumnMenu
+        selectionModel={selectionModel}
         hideFooter={hideFooter}
         onCellClick={
           onCellClick ||
           ((params, e) => {
+            if (params.field === '__check__') {
+              return;
+            }
             e.preventDefault();
             if (params.field !== 'actions' && isCellClickable) {
               navigate(params.row.navigateTo);
@@ -180,6 +189,8 @@ export const DataGridLayout = ({
             ? `MuiDataGrid-rowHeading-common MuiDataGrid-rowHeading-${params.row.id}`
             : ''
         }
+        onRowClick={onRowClick}
+        checkboxSelection={checkboxSelection}
         sx={{
           width: '100%',
           my: '0.5em',
@@ -195,8 +206,9 @@ export const DataGridLayout = ({
           },
           '& .MuiDataGrid-columnHeaders': {
             background: 'white',
-            borderBottom: '2px solid',
+            border: '2px solid',
             borderColor: 'background.default',
+            borderRadius: '4px',
           },
           '& .MuiDataGrid-columnHeaderTitleContainer': {
             padding: '0',
@@ -260,6 +272,9 @@ export const DataGridLayout = ({
               WebkitLineClamp: '2 ',
               WebkitBoxOrient: 'vertical',
             },
+          },
+          '& .MuiDataGrid-columnHeaderCheckbox': {
+            opacity: 0,
           },
           ...rowClassNames,
           ...containerStyle,

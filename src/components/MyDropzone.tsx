@@ -3,11 +3,9 @@ import Typography from '@mui/material/Typography';
 import {useEffect, useRef, useState} from 'react';
 import {FileWithPath, useDropzone, FileRejection} from 'react-dropzone';
 import useTheme from '@mui/material/styles/useTheme';
-import IconButton from '@mui/material/IconButton';
-import CancelIcon from '@mui/icons-material/Cancel';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
 import {CheckCircleRounded} from '@mui/icons-material';
 import {Button} from './Button';
+import SelectedFile from './SelectedFile';
 
 export interface FileWithPreview extends FileWithPath {
   preview: string;
@@ -43,14 +41,29 @@ export const MyDropZone = ({
     onDropAccepted: (acceptedFiles) => {
       setFiles([
         ...files,
-        ...acceptedFiles.map((file) =>
-          Object.assign(file, {
+        ...acceptedFiles.map((file) => {
+          let newFile = Object.assign(file, {
             preview: URL.createObjectURL(file),
-          }),
-        ),
+          });
+
+          newFile = Object.defineProperties(newFile, {
+            name: {
+              writable: true,
+              value: file.name,
+            },
+          });
+
+          return newFile;
+        }),
       ]);
     },
   });
+
+  const editFile = (file: FileWithPreview) => {
+    setFiles((prev) =>
+      prev.map((f) => (f.preview === file.preview ? file : f)),
+    );
+  };
 
   useEffect(() => {
     if (getAcceptedFiles) {
@@ -93,36 +106,15 @@ export const MyDropZone = ({
   ));
 
   const thumbs = files.map((file: FileWithPreview, index) => (
-    <Box key={index} sx={{mr: '1em', display: 'flex', mt: '0.3em'}}>
-      {file.type.split('/')[0] === 'image' ? (
-        <img alt="" width={80} height={80} src={file.preview} />
-      ) : (
-        <FileCopyIcon
-          sx={{fontSize: '4rem', color: theme.palette.text.secondary}}
-        />
-      )}
-
-      <Box
-        sx={{
-          mx: '1em',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-        }}>
-        <Typography>{file.path}</Typography>
-        <Typography>
-          {file.size >= oneMbInByes
-            ? `${(file.size / oneMbInByes).toFixed(2)} Mb`
-            : `${(file.size / onKbinBytes).toFixed(2)} Kb`}
-        </Typography>
-      </Box>
-
-      <IconButton
-        onClick={() => removeFile(`${file.path}_${index}`)}
-        edge="start">
-        <CancelIcon sx={{mt: '-0.8em'}} />
-      </IconButton>
-    </Box>
+    <SelectedFile
+      file={file}
+      index={index}
+      onKbinBytes={onKbinBytes}
+      oneMbInByes={oneMbInByes}
+      removeFile={removeFile}
+      key={index}
+      editFile={editFile}
+    />
   ));
 
   const renderErrors = () =>

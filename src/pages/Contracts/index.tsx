@@ -14,7 +14,7 @@ import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
 } from 'utils/utils';
-import {useSearchParams} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
 import {costRangeConvertor as crConverter} from 'utils/contract-utils';
@@ -24,6 +24,7 @@ import {Button} from '@mui/material';
 const pageSize = 25;
 
 export const Contracts = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [queryParams, setQueryParams] = useSearchParams();
   const [page, setPage] = useState(makePage(0, pageSize));
@@ -139,8 +140,11 @@ export const Contracts = () => {
             searchPlaceholder="Search by number, customer, contract type etc."
             getSearchValue={(val: string) => setSearch(val)}
             filterItems={renderFilterItems()}
+            btnLabel="New Contract"
+            btnOnClick={() => navigate('/contracts/new')}
+            showActionBtn={true}
           />
-          <Button variant="contained">+ New Contract</Button>
+          {/* <Button variant="contained">+ New Contract</Button> */}
         </>
       }>
       <DataGridLayout

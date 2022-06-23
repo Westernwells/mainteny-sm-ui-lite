@@ -7,6 +7,7 @@ import {
 import {Meta, Order, OrderBy, TimeWindowRecord, TimeWindowType} from './misc';
 import {Elevator, ElevatorStatus, ElevatorView} from './elevator';
 import {PropertyOwnerSimpleView, PropertyOwnerView} from './propertyManager';
+import {FileWithPreview} from 'components/MyDropzone';
 
 export enum ContractStatus {
   PENDING = 'PENDING',
@@ -224,4 +225,23 @@ export interface ContractRequestBody {
   timePreference: ContractTimeWindowRecord[];
   type: string;
   visitsNumber: number;
+}
+
+export interface ContractBasicInfoFormModel {
+  propertyOwnerId: string;
+  startDate: string;
+  endDate: string;
+  contractType: string;
+  contractNumber: number;
+}
+
+export interface ContractTermsFormModal {
+  visitsNumber: number;
+  invoiceDue: string;
+  netAmount: number;
+  renewalTerms: string;
+  spendingLimit: number;
+  hourlyRate: number;
+  annualPriceAdjustmentPercentage: number;
+  serviceLevelAgreement: number;
 }
