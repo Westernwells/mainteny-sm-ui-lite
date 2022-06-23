@@ -15,6 +15,7 @@ interface Props {
   initialValue?: Option | null;
   initialQuery?: string;
   textFieldProps?: TextFieldProps;
+  containerStyles?: {[key: string]: any};
 }
 
 export const ComboBox = ({
@@ -22,6 +23,7 @@ export const ComboBox = ({
   getValue,
   initialValue = null,
   textFieldProps,
+  containerStyles,
   initialQuery = '',
   getQuery,
 }: Props) => {
@@ -78,6 +80,7 @@ export const ComboBox = ({
         '& .MuiAutocomplete-popupIndicator': {
           display: 'none',
         },
+        ...containerStyles,
       }}
       renderInput={(params) => (
         <FormInput

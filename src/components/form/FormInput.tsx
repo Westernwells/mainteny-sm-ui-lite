@@ -2,11 +2,12 @@ import FormControl from '@mui/material/FormControl';
 import TextField, {TextFieldProps} from '@mui/material/TextField';
 
 interface Props {
+  containerStyles?: {[key: string]: any};
   props?: TextFieldProps;
 }
 
-export const FormInput = ({props}: Props) => (
-  <FormControl fullWidth>
+export const FormInput = ({props, containerStyles}: Props) => (
+  <FormControl sx={{...containerStyles}} fullWidth>
     <TextField size="small" {...props} />
   </FormControl>
 );

@@ -24,14 +24,15 @@ import {ServiceOrderDetails} from 'pages/ServiceOrderDetails';
 import {axiosClient} from 'utils/axios-utils';
 import {languageMap} from 'utils/utils';
 import i18n from 'i18next';
-import {useEffect, useState} from 'react';
 
+import {useEffect, useState} from 'react';
 import {NewServiceOrder} from 'pages/NewServiceOrder';
 import {NewUnit} from 'pages/NewUnit';
 import {Articles} from 'pages/Articles';
 import {ArticleOverView} from 'pages/ArticleDetails';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
+import {NewArticle} from '../pages/ArticleDetails/NewArticle';
 
 export const Router = () => {
   const titleTail = 'Service Manager Portal';
@@ -358,8 +359,39 @@ export const Router = () => {
               <Helmet>
                 <title>{`Articles Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout pageScrollable>
+              <PageLayout
+                pageScrollable
+                backBtnLabel="Article Details"
+                showBackAction>
                 <ArticleOverView />
+              </PageLayout>
+            </>
+          }
+        />
+
+        <Route
+          path="/articles/new"
+          element={
+            <>
+              <Helmet>
+                <title>{`New Article - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout backBtnLabel="New Article" showBackAction>
+                <NewArticle />
+              </PageLayout>
+            </>
+          }
+        />
+
+        <Route
+          path="/articles/newPackage"
+          element={
+            <>
+              <Helmet>
+                <title>{`New Package - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout backBtnLabel="New Package" showBackAction>
+                <NewArticle />
               </PageLayout>
             </>
           }

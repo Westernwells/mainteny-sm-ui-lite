@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {useNavigate} from 'react-router';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import AutoAwesomeMosaicIcon from '@mui/icons-material/AutoAwesomeMosaic';
@@ -7,22 +8,26 @@ import {ArticleListDataGrid} from './Tabs/ArticleListDataGrid';
 
 const tabItems = [
   {
-    label: 'Packages',
-    icon: <AutoAwesomeMosaicIcon />,
-  },
-  {
     label: 'Articles',
     icon: <HomeRepairServiceIcon />,
+  },
+  {
+    label: 'Packages',
+    icon: <AutoAwesomeMosaicIcon />,
   },
 ];
 
 export const Articles = () => {
+  const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
 
   return (
     <Tabs
       showActionBtn
       btnLabel={tabValue === 0 ? 'New article' : 'New package'}
+      btnOnClick={() =>
+        tabValue === 0 ? navigate('new') : navigate('newPackage')
+      }
       tabItems={tabItems}
       currentIndex={tabValue}
       onChange={(index) => {
