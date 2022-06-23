@@ -1,30 +1,43 @@
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CreateIcon from '@mui/icons-material/Create';
-import Typography from '@mui/material/Typography';
+import useTheme from '@mui/material/styles/useTheme';
+import {useState} from 'react';
 import {useParams} from 'react-router-dom';
-import {useArticleDetails} from '../../hooks/reactQuery/useArticle';
+import {useNavigate} from 'react-router';
+import {
+  useArticleDetails,
+  useDeleteArticle,
+} from '../../hooks/reactQuery/useArticle';
 import {Progress} from '../../components/Progress';
-import {BackAction} from '../../components/BackAction';
 import {Button} from '../../components/Button';
-import {PageCard} from '../../components/PageCard';
-import {ArticleView} from '../../models/article';
-import {InfoCard} from '../../components/InfoCard';
+import {Confirm} from '../../components/Confirm';
+import {ArticleBasicInfoCard} from './BasicInfo/ArticleBasicInfoCard';
+import {ArticleDescriptionCard} from './BasicInfo/ArticleDescriptionCard';
+import {ArticleStockCard} from './Stock/ArticleStockCard';
+import {ArticleSupplierCard} from './Suppliers/ArticleSupplierCard';
+import {ArticleAttachmentCard} from './Pictures/ArticleAttachmentCard';
+import {ArticleQRCard} from './Pictures/ArticleQRCard';
 
-// TODO Continue Article Details
 export const ArticleOverView = () => {
   const {id: articleId} = useParams();
-  const {data: articleDetail, isLoading} = useArticleDetails(articleId!);
+  const {data: articleDetail, isLoading} = useArticleDetails(articleId);
+  const [deleteArticleConfirm, setDeleteArticleConfirm] = useState(false);
+  const theme = useTheme();
+  const navigate = useNavigate();
 
-  const editArticle = (article?: ArticleView) => {
-    // TODO Edit article
-    console.log(article);
+  const {mutateAsync: deleteArticle} = useDeleteArticle(
+    'Article deleted successfully',
+  );
+
+  const deleteArticleDialog = () => {
+    setDeleteArticleConfirm(true);
   };
 
-  const deleteArticle = (article?: ArticleView) => {
-    // TODO Delete article
-    console.log(article);
+  const onDelete = async () => {
+    await deleteArticle({articleId: articleDetail!.id});
+    setDeleteArticleConfirm(false);
+    navigate('/articles');
   };
 
   if (isLoading) {
@@ -33,14 +46,20 @@ export const ArticleOverView = () => {
 
   return (
     <>
-      <Box display="flex" justifyContent="space-between" mb="0.5em">
-        <BackAction label={'Article #'.concat(articleDetail?.number || '')} />
+      <Box display="flex" justifyContent="flex-end" mb="1.2rem">
         <Button
           label="Delete"
           buttonProps={{
-            onClick: () => deleteArticle(articleDetail),
+            onClick: () => deleteArticleDialog(),
             variant: 'outlined',
-            startIcon: <DeleteIcon sx={{opacity: '1'}} color="primary" />,
+            sx: {
+              bgcolor: 'transparent',
+            },
+            startIcon: (
+              <DeleteIcon
+                sx={{opacity: '1', color: theme.palette.primary.light}}
+              />
+            ),
           }}
         />
       </Box>
@@ -51,33 +70,25 @@ export const ArticleOverView = () => {
           pb: '1em',
         }}>
         <Grid xs={8} item>
-          <InfoCard
-            containerStyles={{mb: '0.5rem'}}
-            headerActionIcon={
-              <CreateIcon onClick={() => editArticle(articleDetail)} />
-            }
-            header={
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                bgcolor="grey.200"
-                sx={{px: '0.5rem'}}>
-                <Typography variant="subtitle1">
-                  {articleDetail?.name}
-                </Typography>
-              </Box>
-            }>
-            <Box>Properties</Box>
-          </InfoCard>
-          <PageCard containerStyles={{mb: '0.5rem'}}>Panel 2</PageCard>
-          <PageCard containerStyles={{mb: '0.5rem'}}>Panel 3</PageCard>
-          <PageCard>Panel 4</PageCard>
+          <ArticleBasicInfoCard article={articleDetail!} />
+          <ArticleDescriptionCard article={articleDetail!} />
+          <ArticleStockCard article={articleDetail!} />
+          <ArticleSupplierCard article={articleDetail!} />
         </Grid>
         <Grid xs={4} item>
-          <PageCard containerStyles={{mb: '0.5rem'}}>Panel 4</PageCard>
-          <PageCard>Panel 5</PageCard>
+          <Box display="flex" flexDirection="column" height="100%">
+            <ArticleAttachmentCard article={articleDetail!} />
+            <ArticleQRCard article={articleDetail!} />
+          </Box>
         </Grid>
       </Grid>
+      <Confirm
+        open={deleteArticleConfirm}
+        onConfirm={() => onDelete()}
+        onClose={() => setDeleteArticleConfirm(false)}
+        title="Delete"
+        content="Do you want to delete this article?"
+      />
     </>
   );
 };

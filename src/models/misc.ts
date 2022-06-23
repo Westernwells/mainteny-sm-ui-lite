@@ -54,10 +54,6 @@ export interface AddressRecord {
   location: Location;
 }
 
-export interface AddressViewRecord {
-  fullName: string;
-}
-
 export interface Address extends AddressRecord {
   id: string;
 }

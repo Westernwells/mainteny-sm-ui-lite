@@ -6,24 +6,31 @@ import useTheme from '@mui/material/styles/useTheme';
 import IconButton from '@mui/material/IconButton';
 import CancelIcon from '@mui/icons-material/Cancel';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
+import {CheckCircleRounded} from '@mui/icons-material';
 import {Button} from './Button';
 
 export interface FileWithPreview extends FileWithPath {
   preview: string;
 }
 interface Props {
+  existingFiles?: FileWithPreview[];
   getAcceptedFiles?: (val: FileWithPreview[]) => void;
   getRejectedFileWithErrors?: (val: FileRejection[]) => void;
+  hints?: string[];
   acceptedFileTypes?: 'image/*' | 'application/pdf' | '*';
+  maxFiles?: number;
 }
 
 export const MyDropZone = ({
+  existingFiles = [],
   getAcceptedFiles,
   getRejectedFileWithErrors,
+  hints = [],
   acceptedFileTypes = '*',
+  maxFiles,
 }: Props) => {
   const theme = useTheme();
-  const [files, setFiles] = useState<FileWithPreview[]>([]);
+  const [files, setFiles] = useState<FileWithPreview[]>(existingFiles);
   const onKbinBytes = useRef(1000).current;
   const oneMbInByes = useRef(onKbinBytes * onKbinBytes).current;
   const {getRootProps, getInputProps, open, fileRejections} = useDropzone({
@@ -31,6 +38,8 @@ export const MyDropZone = ({
     accept: {
       [acceptedFileTypes]: [],
     },
+    maxFiles,
+    disabled: maxFiles ? files.length >= maxFiles : false,
     onDropAccepted: (acceptedFiles) => {
       setFiles([
         ...files,
@@ -72,6 +81,16 @@ export const MyDropZone = ({
   useEffect(() => {}, []);
 
   // console.log(files, '#####');
+  const hintsLabel = hints?.map((hint, key) => (
+    <Box
+      key={key}
+      sx={{mr: '1em', display: 'flex', mt: '0.5em', flexDirection: 'row'}}>
+      <CheckCircleRounded sx={{mr: '0.5em'}} />
+      <Typography component="div" variant="body1">
+        {hint}
+      </Typography>
+    </Box>
+  ));
 
   const thumbs = files.map((file: FileWithPreview, index) => (
     <Box key={index} sx={{mr: '1em', display: 'flex', mt: '0.3em'}}>
@@ -144,6 +163,7 @@ export const MyDropZone = ({
             label="Select file"
             buttonProps={{
               variant: 'outlined',
+              disabled: maxFiles ? files.length >= maxFiles : false,
               onClick: open,
             }}
           />
@@ -151,6 +171,7 @@ export const MyDropZone = ({
       </Box>
 
       <Box sx={{mt: '1.5em'}}>
+        <Box sx={{display: 'flex', flexDirection: 'column'}}>{hintsLabel}</Box>
         <Box sx={{display: 'flex', flexWrap: 'wrap'}}>{thumbs}</Box>
         <Box>{renderErrors()}</Box>
       </Box>
