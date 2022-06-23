@@ -32,6 +32,7 @@ export interface ArticleView {
   category: string;
   description: string;
   id: string;
+  externalId: string;
   manufacturer: string;
   meta: Meta;
   model: string;

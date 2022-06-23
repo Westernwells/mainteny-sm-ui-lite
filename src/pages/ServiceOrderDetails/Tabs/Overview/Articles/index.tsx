@@ -46,6 +46,13 @@ export const Articles = ({
   }, [serviceOrderArticles]);
 
   const handleSelectArticle = async (article: ArticleView) => {
+    const articleExists = serviceOrderArticles.filter(
+      (item) => item.article.id === article.id,
+    );
+    if (articleExists.length > 0) {
+      setOpenModal(false);
+      return;
+    }
     let body = serviceOrderArticles?.map((item) => ({
       articleId: item.article.id,
       description: item.article.description,

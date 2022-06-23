@@ -187,24 +187,17 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         style={{...olStyles.orderStatus, letterSpacing: 'normal'}}
         // maxChars={15}
       />
-
-      {/* <StatusChip
-        color={getServiceOrderStatusColor(params.value)}
-        style={sx.orderStatus}
-        label={serviceOrderStatusToString(params.value)}
-        variant="filled"
-      /> */}
-
-      <Box sx={{mt: -1}}>
-        <MenuBtn
-          sx={{p: 0, display: 'flex'}}
-          disabled={!!(orderAction().length === 0)}
-          disableRipple
-          anchorType="iconButton"
-          anchorIcon={<MoreHorizIcon sx={{color: '#231F20'}} />}
-          menu={orderAction()}
-        />
-      </Box>
+      {serviceOrderDetails.status !== ServiceOrderStatus.COMPLETED ? (
+        <Box sx={{mt: -1}}>
+          <MenuBtn
+            sx={{p: 0, display: 'flex'}}
+            disableRipple
+            anchorType="iconButton"
+            anchorIcon={<MoreHorizIcon sx={{color: '#231F20'}} />}
+            menu={orderAction()}
+          />
+        </Box>
+      ) : null}
     </Box>
   );
 

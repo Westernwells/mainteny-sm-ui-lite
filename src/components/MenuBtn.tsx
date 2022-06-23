@@ -14,6 +14,7 @@ interface Props extends ButtonProps {
   menuProps?: MenuProps;
   anchorType?: 'iconButton' | 'button';
   anchorIcon?: JSX.Element | null;
+  disableIcon?: boolean;
 }
 
 export const MenuBtn = ({
@@ -24,6 +25,7 @@ export const MenuBtn = ({
   menuProps,
   anchorType = 'button',
   anchorIcon = null,
+  disableIcon,
   ...rest
 }: Props) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -51,7 +53,9 @@ export const MenuBtn = ({
           aria-label="more"
           id="long-button"
           aria-haspopup="true"
-          onClick={handleClick}>
+          onClick={handleClick}
+          disabled={disableIcon}
+          sx={{opacity: disableIcon ? 0.2 : 1}}>
           {anchorIcon}
         </IconButton>
       )}
