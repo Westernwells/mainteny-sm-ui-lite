@@ -12,7 +12,7 @@ import Box from '@mui/material/Box';
 import {useNavigate} from 'react-router';
 import _ from 'lodash';
 import {ArticleType, ArticleView} from '../../../models/article';
-import {formatCurrency} from '../../../utils/currency';
+import {netAmount} from '../../../utils/currency';
 import {createEmptyResource, makePage} from '../../../utils/paging-utils';
 import {useArticles} from '../../../hooks/reactQuery/useArticle';
 import {Progress} from '../../../components/Progress';
@@ -151,24 +151,8 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
     category: item.category,
     manufacturer: item.manufacturer,
     model: item.model,
-    purchasePrice: `${formatCurrency(
-      item
-        ? item.unitPurchaseAmount.netAmount /
-            10 ** item.unitPurchaseAmount.fractionDigits!
-        : 0,
-      {
-        currency: item.unitPurchaseAmount.currency,
-      },
-    )}`,
-    sellingPrice: `${formatCurrency(
-      item
-        ? item.unitSellingAmount.netAmount /
-            10 ** item.unitSellingAmount.fractionDigits!
-        : 0,
-      {
-        currency: item.unitSellingAmount.currency,
-      },
-    )}`,
+    purchasePrice: netAmount(item.unitPurchaseAmount),
+    sellingPrice: netAmount(item.unitSellingAmount),
     stock: item.stock.currentStock,
     navigateTo: `details/${item.id}`,
     item,
