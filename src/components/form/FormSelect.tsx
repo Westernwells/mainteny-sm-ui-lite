@@ -51,6 +51,9 @@ export const FormSelect = ({
       size="small"
       labelId={labelId}
       label={label}
+      inputProps={{
+        shrink: true,
+      }}
       renderValue={() => {
         let selectValue;
         if (

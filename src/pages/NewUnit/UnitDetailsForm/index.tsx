@@ -153,7 +153,6 @@ export const UnitDetailsForm = ({
                     : '',
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
-                required: true,
               }}
             />
           </Grid>
