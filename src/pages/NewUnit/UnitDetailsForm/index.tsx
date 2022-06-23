@@ -90,11 +90,10 @@ export const UnitDetailsForm = ({
   return (
     <PageCard
       headerLabel="Unit Details"
-      containerStyles={{flexGrow: 1}}
+      containerStyles={{flexGrow: 1, overflowY: 'scroll', height: 0}}
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
         <Grid container spacing={2}>
-          {/* <Grid item md={4}></Grid> */}
           <Grid item md={4}>
             <ComboBox
               options={Object.keys(ElevatorCategory).map((item) => ({

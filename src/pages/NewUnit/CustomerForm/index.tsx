@@ -67,11 +67,10 @@ export const CustomerForm = ({
                 propertyOwnerId: value ? value.id : '',
               });
               if (value) {
-                setCustomer(customer);
+                setCustomer(value);
               }
             }}
             initialValue={initialCustomer || null}
-            // initialValue={formik.values.technician}
             textFieldProps={{
               error: !!(
                 formik.errors.propertyOwnerId && formik.touched.propertyOwnerId

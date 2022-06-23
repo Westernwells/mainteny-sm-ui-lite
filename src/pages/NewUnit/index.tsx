@@ -226,7 +226,8 @@ export const NewUnit = () => {
         display: 'flex',
         flexDirection: 'column',
       }}>
-      <FlexContainer containerStyle={{mt: '1em'}}>
+      <FlexContainer
+        containerStyle={{mt: '1em', overflowY: 'scroll', height: 0}}>
         {activeStep === 0 ? (
           <CustomerForm
             getCustomerFormErrors={(errors) => setCustomerFormError(errors)}
