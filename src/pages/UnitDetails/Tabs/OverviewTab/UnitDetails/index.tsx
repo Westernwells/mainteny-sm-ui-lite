@@ -22,7 +22,6 @@ interface Props {
 }
 
 const validationSchema = Yup.object().shape({
-  unitNumber: Yup.string().nullable().required('Unit number is required'),
   category: Yup.string().nullable().required('Category is required'),
 });
 
@@ -40,7 +39,7 @@ export const UnitDetails = ({
     initialValues: {
       category: elevator.category,
       manufacturer: elevator.additionalInfo.manufacturer,
-      unitNumber: elevator.number,
+      externalId: elevator.externalId,
       numberOfStops: elevator.additionalInfo.numberOfStops,
       cabinType: elevator.additionalInfo.cabinType,
       emergencyPhoneProvider: elevator.additionalInfo.emergencyPhoneProvider,
@@ -77,7 +76,7 @@ export const UnitDetails = ({
           ? convertToMacro(formik.values.category)
           : '',
         manufacturer: formik.values.manufacturer,
-        number: elevator.number,
+        externalId: formik.values.externalId,
         numberOfStops: formik.values.numberOfStops,
         cabinType: formik.values.cabinType,
         emergencyPhoneProvider: formik.values.emergencyPhoneProvider,

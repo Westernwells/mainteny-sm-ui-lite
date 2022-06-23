@@ -58,7 +58,7 @@ export const UnitDetailsSchema = ({
               <FeaturedPlayListIcon sx={{color: theme.palette.info.dark}} />
             }
             label="UNIT NUMBER"
-            bodyText={elevator.number || '-'}
+            bodyText={elevator.externalId || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}

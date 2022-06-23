@@ -85,10 +85,10 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
           props={{
             placeholder: 'Model number of the elevator',
             label: 'Unit Number',
-            name: 'unitNumber',
-            value: formik.values.unitNumber,
-            error: !!(formik.touched.unitNumber && formik.errors.unitNumber),
-            helperText: formik.errors.unitNumber,
+            name: 'externalId',
+            value: formik.values.externalId,
+            error: !!(formik.touched.externalId && formik.errors.externalId),
+            helperText: formik.errors.externalId,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
           }}
