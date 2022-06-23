@@ -54,7 +54,7 @@ export const makeRows = (
   customers.map((item, index: number) => ({
     id: index,
     name: item.name,
-    number: 234,
+    number: item.number,
     address: item.postalAddress.fullName,
     units: item.units,
     phone: item.contact.phone,

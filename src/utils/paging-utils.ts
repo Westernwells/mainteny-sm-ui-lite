@@ -1,5 +1,8 @@
 import {Page, Resource} from '../models/misc';
 
+const DEFAULT_PAGE_INDEX = 0;
+const DEFAULT_PAGE_SIZE = 25;
+
 export function createResource<T>(
   data: T[],
   page: Page,
@@ -90,8 +93,11 @@ export function isFirstPage<T>(res: Resource<T>): Boolean {
   return res.page.pageIndex === 0;
 }
 
-export function makePage(pageIndex: number, pageSize: number): Page {
-  return {pageIndex, pageSize};
+export function makePage(pageIndex?: number, pageSize?: number): Page {
+  return {
+    pageIndex: pageIndex || DEFAULT_PAGE_INDEX,
+    pageSize: pageSize || DEFAULT_PAGE_SIZE,
+  };
 }
 
 export function mergeResource<T>(
