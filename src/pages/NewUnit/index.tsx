@@ -66,7 +66,7 @@ export const NewUnit = () => {
     useState<UnitDetailsFormModel>({
       category: '',
       manufacturer: '',
-      unitNumber: '',
+      externalId: '',
       numberOfStops: undefined,
       cabinType: '',
       emergencyPhoneProvider: '',
@@ -177,7 +177,7 @@ export const NewUnit = () => {
       lastVisitDate: formatDate(serviceFormValues.lastVisitDate, 'yyyy-MM-dd'),
       manufacturer: unitDetailsFormValues.manufacturer,
       model: unitDetailsFormValues.model,
-      number: unitDetailsFormValues.unitNumber,
+      externalId: unitDetailsFormValues.externalId,
       numberOfStops: unitDetailsFormValues.numberOfStops,
       parking: locationFormValues.parking,
       pictures: [],
@@ -226,7 +226,8 @@ export const NewUnit = () => {
         display: 'flex',
         flexDirection: 'column',
       }}>
-      <FlexContainer containerStyle={{mt: '1em'}}>
+      <FlexContainer
+        containerStyle={{mt: '1em', overflowY: 'scroll', height: 0}}>
         {activeStep === 0 ? (
           <CustomerForm
             getCustomerFormErrors={(errors) => setCustomerFormError(errors)}

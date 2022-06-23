@@ -77,6 +77,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
         manufacturer: elevator.additionalInfo.manufacturer,
         model: elevator.model,
         number: elevator.number,
+        externalId: elevator.externalId,
         numberOfStops: elevator.additionalInfo.numberOfStops,
         parking: elevator.additionalInfo.parking,
         pictures: elevator.additionalInfo.pictures,

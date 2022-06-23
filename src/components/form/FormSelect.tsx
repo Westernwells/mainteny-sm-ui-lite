@@ -40,9 +40,11 @@ export const FormSelect = ({
 }: Props<string | string[]>) => (
   <FormControl sx={{...containerStyles}} fullWidth required={required}>
     <InputLabel
+      shrink
       id={labelId}
       sx={{
-        bgColor: 'white',
+        background: '#fff',
+        px: '0.2em',
         ...labelStyles,
       }}>
       {label}

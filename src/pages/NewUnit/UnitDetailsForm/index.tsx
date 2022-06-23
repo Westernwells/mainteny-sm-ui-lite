@@ -21,7 +21,6 @@ interface Props {
 }
 
 const validationSchema = Yup.object().shape({
-  unitNumber: Yup.string().nullable().required('Unit number is required'),
   category: Yup.string().nullable().required('Category is required'),
   model: Yup.string().nullable().required('Model is required'),
   unitCapacity: Yup.string().nullable().required('Unit capacity is required'),
@@ -39,7 +38,7 @@ export const UnitDetailsForm = ({
     initialValues: {
       category: initialValues?.category,
       manufacturer: initialValues?.manufacturer,
-      unitNumber: initialValues?.unitNumber,
+      externalId: initialValues?.externalId,
       numberOfStops: initialValues?.numberOfStops,
       cabinType: initialValues?.cabinType,
       emergencyPhoneProvider: initialValues?.emergencyPhoneProvider,
@@ -90,11 +89,10 @@ export const UnitDetailsForm = ({
   return (
     <PageCard
       headerLabel="Unit Details"
-      containerStyles={{flexGrow: 1}}
+      containerStyles={{flexGrow: 1, overflowY: 'scroll', height: 0}}
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
         <Grid container spacing={2}>
-          {/* <Grid item md={4}></Grid> */}
           <Grid item md={4}>
             <ComboBox
               options={Object.keys(ElevatorCategory).map((item) => ({
@@ -144,18 +142,17 @@ export const UnitDetailsForm = ({
               props={{
                 placeholder: 'e.g. 000001',
                 label: 'Unit Number',
-                name: 'unitNumber',
-                value: formik.values.unitNumber,
+                name: 'externalId',
+                value: formik.values.externalId,
                 error: !!(
-                  formik.touched.unitNumber && formik.errors.unitNumber
+                  formik.touched.externalId && formik.errors.externalId
                 ),
                 helperText:
-                  formik.touched.unitNumber && formik.errors.unitNumber
-                    ? formik.errors.unitNumber
+                  formik.touched.externalId && formik.errors.externalId
+                    ? formik.errors.externalId
                     : '',
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
-                required: true,
               }}
             />
           </Grid>

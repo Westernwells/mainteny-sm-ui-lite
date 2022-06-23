@@ -8,6 +8,12 @@ interface Props {
 
 export const FormInput = ({props, containerStyles}: Props) => (
   <FormControl sx={{...containerStyles}} fullWidth>
-    <TextField size="small" {...props} />
+    <TextField
+      InputLabelProps={{
+        shrink: true,
+      }}
+      size="small"
+      {...props}
+    />
   </FormControl>
 );
