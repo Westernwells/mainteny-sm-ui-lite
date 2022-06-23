@@ -65,6 +65,20 @@ module.exports = {
       'Es tut uns leid, wir konnten die Anfrage zu diesem Zeitpunkt nicht erfüllen. Bitte versuchen Sie es erneut.',
     'Password reset successfully': 'Passwort erfolgreich zurückgesetzt',
     'Invalid Code': 'Ungültiger Code',
+
+    // Service Orders
+    'Order types': 'Auftragsarten',
+    'Clear all': 'Alle löschen',
+    NUMBER: 'NUMMER',
+    ADDRESS: 'ADRESSE',
+    'UNIT NUMBER': 'ANLAGENNUMMER',
+    Unscheduled: 'Ungeplant',
+    Completed: 'Abgeschlossen',
+    Expired: 'Abgelaufen',
+    Repair: 'Reparatur',
+    Emergency: 'Personeneinschluss',
+    Callout: 'Störung',
+    Pending: 'Ausstehend',
   },
 };
 

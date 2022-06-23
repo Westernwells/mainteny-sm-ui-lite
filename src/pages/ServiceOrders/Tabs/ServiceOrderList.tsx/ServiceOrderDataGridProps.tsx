@@ -7,6 +7,7 @@ import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
+import {useTranslation} from 'react-i18next';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {StatusChip} from 'components/StatusChip';
 import {getColumnProps} from 'components/DataGridLayout';
@@ -50,14 +51,17 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'type',
     headerName: 'order type',
-    renderCell: (params: GridRenderCellParams<any, any, any>) => (
-      <Box sx={{display: 'flex'}}>
-        <ServiceOrderIcons serviceOrderType={params.value} size="small" />
-        <Typography variant="body2" mx="0.5em">
-          {convertToText(params.value)}
-        </Typography>
-      </Box>
-    ),
+    renderCell: (params: GridRenderCellParams<any, any, any>) => {
+      const {t} = useTranslation();
+      return (
+        <Box sx={{display: 'flex'}}>
+          <ServiceOrderIcons serviceOrderType={params.value} size="small" />
+          <Typography variant="body2" mx="0.5em">
+            {t(convertToText(params.value))}
+          </Typography>
+        </Box>
+      );
+    },
   }),
   getColumnProps({
     field: 'status',

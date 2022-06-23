@@ -2,6 +2,7 @@ import React, {ReactNode} from 'react';
 import Box from '@mui/material/Box';
 import {Typography} from '@mui/material';
 import useTheme from '@mui/material/styles/useTheme';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   children: ReactNode;
@@ -21,6 +22,7 @@ export const FilterFields = ({
   onClear,
 }: Props) => {
   const theme = useTheme();
+  const {t} = useTranslation();
   return showFilter ? (
     <Box display="flex" sx={{...containerStyle}}>
       <Box display="flex" sx={{...wrapperStyle}}>
@@ -31,7 +33,7 @@ export const FilterFields = ({
           onClick={() => onClear && onClear()}
           mt="0.5em"
           sx={{cursor: 'pointer', color: theme.palette.info.main}}>
-          Clear all
+          {t('Clear all')}
         </Typography>
       ) : null}
     </Box>

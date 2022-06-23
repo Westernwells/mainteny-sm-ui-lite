@@ -11,6 +11,7 @@ import {
   GridRowParams,
   GridRowsProp,
 } from '@mui/x-data-grid';
+import {useTranslation} from 'react-i18next';
 import LinearProgress from '@mui/material/LinearProgress';
 import {useNavigate} from 'react-router-dom';
 import {CustomPagination} from './CustomPagination';
@@ -50,11 +51,14 @@ export const getColumnProps = ({
   headerName,
   type = 'string',
   cellClassName = 'nowrap',
-  renderHeader = (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName && params.colDef.headerName.toUpperCase()}
-    </Typography>
-  ),
+  renderHeader = (params: GridColumnHeaderParams) => {
+    const {t} = useTranslation();
+    return (
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName && t(params.colDef.headerName.toUpperCase())}
+      </Typography>
+    );
+  },
   renderCell = (params: GridRenderCellParams<any, any, any>) => (
     <Typography variant="body2">{params.value || '-'}</Typography>
   ),

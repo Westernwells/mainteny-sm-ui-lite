@@ -4,6 +4,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import {MenuBtnProps} from 'models/misc';
 import {MouseEvent, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 
 interface Props extends ButtonProps {
   label: string | JSX.Element;
@@ -21,6 +22,7 @@ export const MenuBtn = ({label, menu, startIcon, endIcon, ...rest}: Props) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const {t} = useTranslation();
 
   return (
     <Box>
@@ -29,7 +31,7 @@ export const MenuBtn = ({label, menu, startIcon, endIcon, ...rest}: Props) => {
         endIcon={endIcon}
         onClick={handleClick}
         {...rest}>
-        {label}
+        {t(`${label}`)}
       </Button>
       <Menu
         anchorEl={anchorEl}
@@ -40,7 +42,7 @@ export const MenuBtn = ({label, menu, startIcon, endIcon, ...rest}: Props) => {
         }}>
         {menu.map((item, index) => (
           <MenuItem key={index} onClick={item.action}>
-            {item.label}
+            {t(item.label)}
           </MenuItem>
         ))}
       </Menu>

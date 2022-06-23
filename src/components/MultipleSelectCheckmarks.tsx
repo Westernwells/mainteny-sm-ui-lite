@@ -8,6 +8,7 @@ import FormControl from '@mui/material/FormControl';
 import ListItemText from '@mui/material/ListItemText';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
+import {useTranslation} from 'react-i18next';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -39,6 +40,7 @@ export const MultipleSelectCheckmarks = ({
   formControlStyles,
   initialSelectedItems = [],
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const [selectedItems, setSelectedItems] =
     React.useState<string[]>(initialSelectedItems);
@@ -73,14 +75,14 @@ export const MultipleSelectCheckmarks = ({
       <FormControl
         size="small"
         sx={{mr: '0.5em', width: '8.5rem', ...formControlStyles}}>
-        <InputLabel id={label}>{label}</InputLabel>
+        <InputLabel id={label}>{t(label)}</InputLabel>
         <Select
           id={label}
           multiple={multiple}
           value={selectedItems}
           onChange={handleChange}
           input={<OutlinedInput sx={{background: '#fff'}} label={label} />}
-          renderValue={() => selectedItems.join(',')}
+          renderValue={() => selectedItems.map((i) => t(i)).join(',')}
           MenuProps={MenuProps}>
           {!multiple ? (
             <MenuItem
@@ -106,12 +108,12 @@ export const MultipleSelectCheckmarks = ({
             ? options.map((option) => (
                 <MenuItem key={option} value={option}>
                   <Checkbox checked={selectedItems.includes(option)} />
-                  <ListItemText primary={option} />
+                  <ListItemText primary={t(option)} />
                 </MenuItem>
               ))
             : options.map((option) => (
                 <MenuItem key={option} value={option}>
-                  <ListItemText primary={option} />
+                  <ListItemText primary={t(option)} />
                 </MenuItem>
               ))}
         </Select>
