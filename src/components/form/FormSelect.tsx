@@ -8,8 +8,10 @@ import Select, {SelectProps} from '@mui/material/Select';
 interface Props<T> {
   labelId: string;
   label: string;
+  required?: boolean;
   options: {label: string; value: string}[];
   selectProps?: SelectProps<T>;
+  containerStyles?: {[key: string]: any};
 }
 
 const ITEM_HEIGHT = 48;
@@ -26,10 +28,12 @@ const MenuProps = {
 export const FormSelect = ({
   labelId,
   label,
+  required,
   options,
   selectProps,
+  containerStyles,
 }: Props<string | string[]>) => (
-  <FormControl fullWidth>
+  <FormControl sx={{...containerStyles}} fullWidth required={required}>
     <InputLabel
       id={labelId}
       shrink

@@ -8,8 +8,9 @@ import {
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import {useNavigate} from 'react-router';
 import _ from 'lodash';
-import {ArticleView} from '../../../models/article';
+import {ArticleType, ArticleView} from '../../../models/article';
 import {formatCurrency} from '../../../utils/currency';
 import {createEmptyResource, makePage} from '../../../utils/paging-utils';
 import {useArticles} from '../../../hooks/reactQuery/useArticle';
@@ -21,6 +22,7 @@ import {FilterFields} from '../../../components/FilterFields';
 import {MultipleSelectCheckmarks} from '../../../components/MultipleSelectCheckmarks';
 import {Widget} from '../../../components/Widget';
 import {PageListingLayout} from '../../../components/PageListingLayout';
+import {convertToText} from '../../../utils/utils';
 
 const defaultProps = {
   editable: false,
@@ -47,8 +49,8 @@ const defaultAlignment: {
 
 export const columns: GridColDef[] = [
   {
-    field: 'number',
-    headerName: 'NUMBER',
+    field: 'externalId',
+    headerName: 'EXTERNAL ID',
     type: 'string',
     cellClassName: 'nowrap',
     flex: 1,
@@ -103,7 +105,7 @@ export const columns: GridColDef[] = [
     field: 'sellingPrice',
     headerName: 'SELLING PRICE',
     type: 'string',
-    flex: 1,
+    flex: 2,
     headerAlign: 'right',
     align: 'right',
     ...defaultProps,
@@ -135,12 +137,11 @@ export const columns: GridColDef[] = [
 export const makeRows = (articles: ArticleView[]): GridRowsProp =>
   _.map(articles, (item, index) => ({
     id: index,
-    number: item.number,
+    externalId: item.externalId,
     name: item.name,
     category: item.category,
     manufacturer: item.manufacturer,
     model: item.model,
-    supplier: item.supplier,
     purchasePrice: `${formatCurrency(
       item
         ? item.unitPurchaseAmount.netAmount /
@@ -185,6 +186,7 @@ const NoArticleSection = ({
 );
 
 export const ArticleListDataGrid = () => {
+  const navigate = useNavigate();
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
@@ -207,16 +209,17 @@ export const ArticleListDataGrid = () => {
   );
 
   const addNewArticle = () => {
-    // TODO Navigate to add new article page
-    console.log('add new article');
+    navigate('new');
   };
 
   useEffect(() => {
     setPageCount(Math.ceil(articleResource.total / page.pageSize));
-  }, [articleResource, page.pageSize]);
+  }, [page.pageSize]);
 
   useEffect(() => {
-    setRows(makeRows(articleResource.data));
+    if (!isIdle && !isLoading) {
+      setRows(makeRows(articleResource.data));
+    }
   }, [articleResource]);
 
   if (isIdle || isLoading) {
@@ -241,8 +244,12 @@ export const ArticleListDataGrid = () => {
             <FilterFields>
               <MultipleSelectCheckmarks
                 label="Type"
-                options={['PACKAGE', 'PART', 'PRODUCT', 'SERVICE']}
-                getSelectedValue={(item: string[]) => setType(item[0])}
+                options={Object.keys(ArticleType).map((it) =>
+                  convertToText(it),
+                )}
+                getSelectedValue={(item: string[]) =>
+                  setType(item[0]?.toUpperCase())
+                }
                 multiple={false}
               />
             </FilterFields>

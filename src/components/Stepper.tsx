@@ -11,6 +11,7 @@ interface Props {
   stepperWidth?: string;
   children: ReactNode;
   containerStyles?: {[key: string]: any};
+  stepperStyles?: {[key: string]: any};
   handleCancel?: () => void;
   handleSubmit?: () => void;
   initialActiveStep?: number;
@@ -28,6 +29,7 @@ export const Stepper = ({
   initialActiveStep = 0,
   getActiveStep,
   disableNextBtn,
+  stepperStyles,
   stepperWidth,
   submitting,
 }: Props) => {
@@ -54,7 +56,7 @@ export const Stepper = ({
 
   return (
     <Box sx={{...containerStyles}}>
-      <Box sx={{width: stepperWidth || '50%'}}>
+      <Box sx={{width: stepperWidth || '50%', ...stepperStyles}}>
         <MuiStepper activeStep={activeStep}>
           {steps.map((label) => {
             const stepProps: {completed?: boolean} = {};
