@@ -214,6 +214,8 @@ export const DataGridLayout = ({
             '.MuiLinearProgress-root': {
               top: 50,
               zIndex: 1,
+              position: 'absolute',
+              width: '100%',
             },
             '& *:focus, & *:focus-within': {
               '& *': {
