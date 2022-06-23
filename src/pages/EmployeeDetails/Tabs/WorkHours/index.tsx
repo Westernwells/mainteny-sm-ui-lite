@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Box, Typography} from '@mui/material';
 import {GridRowsProp} from '@mui/x-data-grid';
 
@@ -6,7 +6,6 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {FilterFields} from 'components/FilterFields';
 import {TabContentContainer} from 'components/TabContentContainer';
 import {Widget} from 'components/Widget';
-import {EmptySection} from 'components/EmptySection';
 import {DatePicker} from 'components/DatePicker';
 import TotalTime from 'components/TotalTime';
 import {useWorkHours} from 'hooks/reactQuery/useWorkHours';
@@ -28,10 +27,9 @@ const WorkHoursTab = ({employeeId}: Props) => {
   const [totalTime, setTotalTime] = useState<string>('00:00');
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(makePage(0, 10));
-  const totalUnitsRef = useRef(0);
 
-  const {data: workHours = createEmptyResource<WorkHoursItem>(10), isFetched} =
-    useWorkHours(search, page, startDate, endDate, employeeId);
+  const {data: workHours = createEmptyResource<WorkHoursItem>(10)} =
+    useWorkHours(search, page, startDate, endDate, employeeId || '');
 
   useEffect(() => {
     if (workHours.data) {
@@ -46,8 +44,6 @@ const WorkHoursTab = ({employeeId}: Props) => {
   useEffect(() => {
     setPageCount(Math.ceil(workHours.total / page.pageSize));
   }, [workHours, page.pageSize]);
-
-  totalUnitsRef.current = totalUnitsRef.current || workHours.total;
 
   const renderFilterItems = () => (
     <Box sx={{display: 'flex', justifyContent: 'flex-end', width: '100%'}}>
@@ -112,15 +108,6 @@ const WorkHoursTab = ({employeeId}: Props) => {
         isCellClickable={false}
         pageCount={pageCount}
         totalRows={workHours.total}
-        noResultsCondition={isFetched && !totalUnitsRef.current}
-        noResultsEmptySection={
-          <EmptySection
-            illustration="clipboard"
-            size="tiny"
-            containerStyle={{my: 'auto'}}
-            label="No work hour entries yet. They will appear here once added!"
-          />
-        }
       />
     </TabContentContainer>
   );

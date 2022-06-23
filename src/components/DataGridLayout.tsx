@@ -36,6 +36,7 @@ interface Props extends DataGridProps {
   noResultsCondition?: boolean;
   isRowSelectable?: (params: GridRowParams) => boolean;
   isCellClickable?: boolean;
+  isWidget?: boolean;
 }
 
 interface ColumnProps extends GridColDef {
@@ -94,6 +95,7 @@ export const DataGridLayout = ({
   noResultsEmptySection,
   noResultsCondition = false,
   isCellClickable = true,
+  isWidget = false,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
@@ -196,6 +198,10 @@ export const DataGridLayout = ({
             background: 'white',
             borderBottom: '2px solid',
             borderColor: 'background.default',
+            ...(isWidget && {
+              border: '1px solid #8F9BB380',
+              borderRadius: '4px',
+            }),
           },
           '& .MuiDataGrid-columnHeaderTitleContainer': {
             padding: '0',

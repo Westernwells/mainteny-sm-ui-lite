@@ -2,6 +2,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
+import {SxProps} from '@mui/system';
 
 interface Props {
   handleChange: (event: SelectChangeEvent) => void;
@@ -9,6 +10,7 @@ interface Props {
   label: string;
   defaultOption: any;
   size: 'small' | 'medium';
+  sx?: SxProps;
 }
 
 export const CustomSelect = ({
@@ -17,8 +19,9 @@ export const CustomSelect = ({
   label,
   defaultOption,
   size,
+  sx,
 }: Props) => (
-  <FormControl size={size} sx={{width: '5rem'}}>
+  <FormControl size={size} sx={{width: '5rem', ...sx}}>
     <InputLabel id="demo-simple-select-label">{label}</InputLabel>
     <Select
       labelId="demo-simple-select-label"

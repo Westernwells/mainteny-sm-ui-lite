@@ -216,6 +216,16 @@ export const theme = createTheme({
           fontSize: '0.75rem',
           lineHeight: 2,
           letterSpacing: '0.15px',
+
+          '& .MuiInputLabel-asterisk': {
+            color: 'red',
+          },
+        },
+        shrink: {
+          transform: 'translate(14px, -11px) scale(1) !important',
+        },
+        outlined: {
+          transform: 'translate(14px, 10px) scale(1)',
         },
       },
     },

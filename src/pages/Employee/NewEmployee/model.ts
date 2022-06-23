@@ -19,4 +19,6 @@ export type EmployeeAccountData = Partial<CreateUserAccountData> & {
       longitude: number;
     };
   } | null;
+  employeeId: string;
+  team?: string;
 };

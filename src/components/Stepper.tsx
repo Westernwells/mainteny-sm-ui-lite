@@ -35,7 +35,7 @@ export const Stepper = ({
 }: Props) => {
   const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
-  console.log(initialActiveStep);
+
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };

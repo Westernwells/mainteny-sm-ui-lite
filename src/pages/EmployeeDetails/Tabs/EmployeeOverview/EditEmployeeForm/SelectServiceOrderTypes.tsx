@@ -1,5 +1,4 @@
 import {ChangeEvent, useEffect, useRef, useState} from 'react';
-import {useFormikContext} from 'formik';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
@@ -9,11 +8,13 @@ import {ReactComponent as RegularIcon} from 'assets/icons/Regular.svg';
 import {ReactComponent as CalloutIcon} from 'assets/icons/Callout.svg';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 import {ServiceOrderType} from 'models/service-order';
-import {EmployeeAccountData} from './model';
 
-export const SelectServiceOrderTypes = () => {
-  const {setFieldValue, values} = useFormikContext<EmployeeAccountData>();
+type Props = {
+  values: any;
+  setFieldValue: any;
+};
 
+export const SelectServiceOrderTypes = ({values, setFieldValue}: Props) => {
   const [serviceOrderTypes, setServiceOrderTypes] = useState({
     REGULAR: {
       label: ServiceOrderType.REGULAR,
