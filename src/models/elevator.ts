@@ -112,6 +112,7 @@ export interface ElevatorView {
   number: string;
   model: string;
   type: string;
+  externalId: string;
   capacity: string;
   category: ElevatorCategory;
   technicianNumber: number;
@@ -273,7 +274,7 @@ export interface ElevatorRequestBody {
   lastVisitDate: string;
   manufacturer: string;
   model: string;
-  number: string;
+  externalId: string;
   numberOfStops: number;
   parking: string;
   pictures: FileResourceRecord[];
