@@ -9,6 +9,7 @@ import {
   ServiceOrderStatus,
   ServiceOrderView,
 } from 'models/service-order';
+import {useTranslation} from 'react-i18next';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {useInView} from 'react-intersection-observer';
 import {endOfDay, startOfMonth} from 'date-fns';
@@ -74,6 +75,8 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
     }
   }, [serviceOrders]);
 
+  const {t} = useTranslation();
+
   return (
     <Box sx={{...containerStyles}} {...rest}>
       <PageCard
@@ -81,7 +84,7 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
         contentContainerStyles={{height: '100%', mx: 0, px: 0, pt: '0.4em'}}
         customHeader={
           <Typography sx={{}} variant="subtitle2" color="textSecondary">
-            Unassigned Orders ({serviceOrders.total})
+            {t('Unassigned Orders')} ({serviceOrders.total})
           </Typography>
         }
         headerStyles={{
