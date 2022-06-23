@@ -87,6 +87,9 @@ export const ComboBox = ({
           props={{
             ...params,
             ...textFieldProps,
+            InputLabelProps: {
+              shrink: true,
+            },
           }}
         />
       )}

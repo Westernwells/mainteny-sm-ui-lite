@@ -93,6 +93,9 @@ export const CustomerAutoComplete = ({
             ...params,
             ...textFieldProps,
             required: true,
+            InputLabelProps: {
+              shrink: true,
+            },
           }}
         />
       )}

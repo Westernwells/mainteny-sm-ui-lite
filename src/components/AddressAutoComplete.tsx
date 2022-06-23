@@ -86,9 +86,11 @@ export const AddressAutoComplete = ({
             error: !!inputError,
             helperText: inputError,
             onBlur: handleBlur,
-
             ...params,
             ...textFieldProps,
+            InputLabelProps: {
+              shrink: true,
+            },
           }}
         />
       )}
