@@ -79,6 +79,33 @@ export const columns: GridColDef[] = [
   },
 ];
 
+export const columnsWidget: GridColDef[] = [
+  {
+    field: 'orderType',
+    headerName: 'TYPE',
+    type: 'string',
+    flex: 1,
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+  {
+    field: 'orderNumber',
+    headerName: 'ORDER NUMBER',
+    type: 'string',
+    flex: 1,
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+  {
+    field: 'duration',
+    headerName: 'DURATION',
+    type: 'string',
+    flex: 1,
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+];
+
 const formatTime = (time: number, unit: string) =>
   `${time} ${unit.toLowerCase()}`;
 

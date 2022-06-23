@@ -20,6 +20,7 @@ import {QuotationDetails} from 'pages/QuotationDetails';
 import {Notifications} from 'pages/Notifications';
 import {PageNotFound} from 'pages/PageNotFound';
 import {ServiceOrders} from 'pages/ServiceOrders';
+import {NewEmployee} from 'pages/Employee/NewEmployee';
 import {ServiceOrderDetails} from 'pages/ServiceOrderDetails';
 import {axiosClient} from 'utils/axios-utils';
 import {languageMap} from 'utils/utils';
@@ -237,8 +238,27 @@ export const Router = () => {
               <Helmet>
                 <title>{`Employee Details - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout showBackAction backBtnLabel={currentPageTitle}>
+              <PageLayout
+                pageScrollable
+                showBackAction
+                backBtnLabel={currentPageTitle}>
                 <EmployeeDetails
+                  getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                />
+              </PageLayout>
+            </>
+          }
+        />
+
+        <Route
+          path="/employees/new"
+          element={
+            <>
+              <Helmet>
+                <title>{`New Employee - ${titleTail}`}</title>
+              </Helmet>
+              <PageLayout showBackAction backBtnLabel={currentPageTitle}>
+                <NewEmployee
                   getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
                 />
               </PageLayout>

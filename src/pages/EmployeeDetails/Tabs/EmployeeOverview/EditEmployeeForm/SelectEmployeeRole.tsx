@@ -1,43 +1,91 @@
 import {useState} from 'react';
 import {useFormikContext} from 'formik';
-import {SelectChangeEvent} from '@mui/material';
-import {Role} from 'models/user';
-import {convertToText} from 'utils/utils';
-import {FormSelect} from 'components/form/FormSelect';
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from '@mui/material';
+
 import {EmployeeAccountData} from './model';
 
-export const SelectEmployeeRole = () => {
-  const {values} = useFormikContext<EmployeeAccountData>();
+export type EmployeeRolesType = {
+  id: string;
+  value: string;
+  label: string;
+};
 
-  const [roles, setRoles] = useState<string[]>(
-    values.roles.map((item) => convertToText(item)),
+export const employeeRoles: EmployeeRolesType[] = [
+  {
+    id: '1',
+    value: 'TECHNICIAN',
+    label: 'Technician',
+  },
+  {
+    id: '2',
+    value: 'SERVICE_MANAGER',
+    label: 'Service Manager',
+  },
+  {
+    id: '3',
+    value: 'BOTH',
+    label: 'Both Technician & Service Manager',
+  },
+];
+
+export const getRole = (initialRole: string | string[]) => {
+  if (initialRole.length > 1) {
+    return 'BOTH';
+  }
+  return initialRole[0] || '';
+};
+
+export const SelectEmployeeRole = () => {
+  const {values, setFieldValue} = useFormikContext<EmployeeAccountData>();
+
+  const [role, setRole] = useState<string>(
+    (values.roles && getRole(values.roles)) || '',
   );
 
-  const handleRoleChange = (event: SelectChangeEvent<string | string[]>) => {
+  const handleRoleChange = (event: SelectChangeEvent) => {
     const {
       target: {value},
     } = event;
-    setRoles(typeof value === 'string' ? value.split(',') : value);
+    let selectedRole: string[] = [value];
+    if (value === 'BOTH') {
+      selectedRole = ['TECHNICIAN', 'SERVICE_MANAGER'];
+    }
+    setRole(value);
+    setFieldValue('roles', selectedRole);
   };
 
   return (
-    <FormSelect
-      labelId="rolesSelect-label"
-      label="Roles"
-      options={Object.keys(Role)
-        .filter((role) => role !== 'ADMIN')
-        .map((role) => ({
-          label: convertToText(role),
-          value: convertToText(role),
-        }))}
-      selectProps={{
-        id: 'rolesSelect',
-        value: roles,
-        onChange: handleRoleChange,
-        multiple: true,
-        name: 'role',
-        disabled: true,
-      }}
-    />
+    <FormControl fullWidth sx={{marginBlock: '0.5em'}}>
+      <InputLabel
+        id="roleSelect-label"
+        sx={{
+          bgcolor: 'white',
+          color: 'text.primary',
+          paddingInline: '.5em',
+        }}>
+        Role
+      </InputLabel>
+      <Select
+        labelId="roleSelect-label"
+        id="roleSelect"
+        value={role}
+        label="Role"
+        size="small"
+        onChange={(event: SelectChangeEvent) => {
+          handleRoleChange(event);
+        }}>
+        {employeeRoles.map((item: EmployeeRolesType) => (
+          <MenuItem value={item.value} key={item.id}>
+            {item.label}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   );
 };

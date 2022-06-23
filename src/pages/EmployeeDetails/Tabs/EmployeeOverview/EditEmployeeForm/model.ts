@@ -9,10 +9,12 @@ export interface Shift<T> {
 export type EmployeeAccountData = Partial<CreateUserAccountData> & {
   phone: string;
   roles: string[];
+  employeeId: string;
   email: string;
   serviceOrderTypes: string[];
   shifts: Shift<string>[];
   addressFullName?: string | false;
+  team: string;
   address?: {
     countryCode: string;
     fullName: string;

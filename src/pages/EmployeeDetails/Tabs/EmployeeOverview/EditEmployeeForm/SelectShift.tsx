@@ -1,5 +1,4 @@
 import {useEffect, useState} from 'react';
-import {useFormikContext} from 'formik';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
@@ -12,9 +11,14 @@ import TimePicker from '@mui/lab/TimePicker';
 import {TimeWindowType} from 'models/misc';
 import {Button} from 'components/Button';
 import {convertToMacro, convertToText} from 'utils/utils';
-import {Shift, EmployeeAccountData} from './model';
+import {Shift} from './model';
 
-export const SelectShift = () => {
+type Props = {
+  values: any;
+  setFieldValue: any;
+};
+
+export const SelectShift = ({values, setFieldValue}: Props) => {
   const workDays = Object.values(TimeWindowType).map((item) =>
     convertToText(item),
   );
@@ -30,11 +34,9 @@ export const SelectShift = () => {
       minute: '2-digit',
     });
 
-  const {setFieldValue, values} = useFormikContext<EmployeeAccountData>();
-
   const [shifts, setShifts] = useState<Shift<Date | null>[]>(
     values.shifts && values.shifts.length
-      ? values.shifts.map((item) => ({
+      ? values.shifts.map((item: any) => ({
           fromTime: new Date(
             0,
             0,
@@ -94,19 +96,23 @@ export const SelectShift = () => {
           gap="1em"
           alignItems="flex-end"
           mt="1em">
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <LocalizationProvider
+            dateAdapter={AdapterDateFns}
+            sx={{width: '224px'}}>
             <TimePicker
               label="Start Time"
               ampm={false}
               value={shift.fromTime}
-              disabled={index < shifts.length - 1}
+              disabled={index < shifts.length - 1 && index === 0}
               onChange={(newValue) => {
                 const oldShifts = shifts.filter((item) => item !== shift);
                 const newShift = shift;
                 newShift.fromTime = newValue;
                 setShifts([...oldShifts, newShift]);
               }}
-              renderInput={(params) => <TextField {...params} size="small" />}
+              renderInput={(params) => (
+                <TextField {...params} size="small" sx={{width: '110px'}} />
+              )}
             />
           </LocalizationProvider>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -114,18 +120,20 @@ export const SelectShift = () => {
               label="End Time"
               ampm={false}
               value={shift.toTime}
-              disabled={index < shifts.length - 1}
+              disabled={index < shifts.length - 1 && index === 0}
               onChange={(newValue) => {
                 const oldShifts = shifts.filter((item) => item !== shift);
                 const newShift = shift;
                 newShift.toTime = newValue;
                 setShifts([...oldShifts, newShift]);
               }}
-              renderInput={(params) => <TextField {...params} size="small" />}
+              renderInput={(params) => (
+                <TextField {...params} size="small" sx={{width: '110px'}} />
+              )}
             />
           </LocalizationProvider>
 
-          <FormControl fullWidth>
+          <FormControl sx={{width: '224px'}}>
             <InputLabel
               id="shiftDaySelect-label"
               sx={{
@@ -133,16 +141,16 @@ export const SelectShift = () => {
                 color: 'text.primary',
                 paddingInline: '.5em',
               }}
-              disabled={index < shifts.length - 1}>
-              Day
+              disabled={index < shifts.length - 1 && index === 0}>
+              Type
             </InputLabel>
             <Select
               labelId="shiftDaySelect-label"
               id="shiftDaySelect"
               value={shift.type}
-              label="Day"
+              label="Type"
               size="small"
-              disabled={index < shifts.length - 1}
+              disabled={index < shifts.length - 1 && index === 0}
               onChange={(event: SelectChangeEvent) => {
                 const oldShifts = shifts.filter((item) => item !== shift);
                 const newShift = shift;
@@ -164,7 +172,7 @@ export const SelectShift = () => {
 
       <Box mt="1em">
         <Button
-          label="Add"
+          label="+ Add"
           buttonProps={{
             variant: 'outlined',
             color: 'info',
@@ -178,20 +186,22 @@ export const SelectShift = () => {
             },
           }}
         />
-        <Button
-          label="Remove"
-          buttonProps={{
-            variant: 'outlined',
-            color: 'error',
-            onClick: handleRemoveShift,
-            disabled: shifts.length === 1,
-            sx: {
-              mr: '1em',
-              borderColor: 'error.main',
-              bgcolor: 'transparent',
-            },
-          }}
-        />
+        {shifts.length > 1 && (
+          <Button
+            label="Remove"
+            buttonProps={{
+              variant: 'outlined',
+              color: 'error',
+              onClick: handleRemoveShift,
+              disabled: shifts.length === 1,
+              sx: {
+                mr: '1em',
+                borderColor: 'error.main',
+                bgcolor: 'transparent',
+              },
+            }}
+          />
+        )}
       </Box>
     </>
   );

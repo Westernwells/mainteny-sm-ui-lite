@@ -4,27 +4,34 @@ import {InfoCard} from 'components/InfoCard';
 import {CardProps} from 'components/CardProps';
 import useTheme from '@mui/material/styles/useTheme';
 import Grid from '@mui/material/Grid';
-import Avatar from '@mui/material/Avatar';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
-import {capitalize} from 'utils/utils';
+import EditIcon from '@mui/icons-material/Edit';
+
 import {Progress} from 'components/Progress';
 import {BasicDetailsValue} from 'models/misc';
-import {Button} from 'components/Button';
 import {UserView} from 'models/user';
 import {EditEmployee} from './EditEmployee';
 import {employeeDetailSchema} from './schema';
+import EmployeeAvatar from './EmployeeAvatar';
+import EmployeeAbsence from './EmployeeAbsence';
+import EmployeeWorkHours from './EmployeeWorkHours';
 
 interface Props {
   employee?: UserView;
   isLoading: boolean;
+  openWorkHoursTab: () => void;
 }
 
-export const EmployeeOverview = ({employee, isLoading}: Props) => {
+export const EmployeeOverview = ({
+  employee,
+  isLoading,
+  openWorkHoursTab,
+}: Props) => {
   const theme = useTheme();
   const [basicDetails, setBasicDetails] =
     useState<{[key: string]: BasicDetailsValue}>();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
 
   useEffect(() => {
     if (employee) {
@@ -36,94 +43,73 @@ export const EmployeeOverview = ({employee, isLoading}: Props) => {
     return <Progress />;
   }
 
+  const userData = employee?.userData;
+  const userAccount = employee?.userAccount;
+
   const renderBasicDetails = () => (
-    <InfoCard>
-      <Grid container>
-        <Grid item xs={2}>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              height: '100%',
-              width: '80%',
-            }}>
-            <Box
-              sx={{
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}>
-              <Avatar
-                alt=""
-                src=""
-                variant="circular"
+    <Grid container columnSpacing={2} rowSpacing={2}>
+      <Grid item xs={12}>
+        <InfoCard
+          header={
+            <Typography variant="subtitle1">Basic Information</Typography>
+          }
+          containerStyles={{flexGrow: 1}}
+          headerStyles={{mt: '0.5em'}}
+          handleAction={() => setOpenDialog(true)}
+          headerActionIcon={<EditIcon />}
+          showHeaderBackground>
+          <Grid container>
+            <Grid item xs={2}>
+              <Box
                 sx={{
-                  width: '80px',
-                  height: '80px',
-                  aspectRatio: '1',
-                }}
-              />
-              <Box>
-                <Typography variant="subtitle1" textAlign="center">
-                  {employee
-                    ? `${employee?.userAccount.firstName}  ${employee?.userAccount.lastName}`
-                    : ''}
-                </Typography>
-                <Typography
-                  variant="subtitle2"
-                  color="textSecondary"
-                  textAlign="center">
-                  {employee ? `${capitalize(employee?.userAccount.roles)}` : ''}
-                </Typography>
-              </Box>
-            </Box>
-            <Divider
-              orientation="vertical"
-              sx={{background: '#F3F5F6'}}
-              flexItem
-            />
-          </Box>
-        </Grid>
-        <Grid item xs={10}>
-          <Box display="flex" flexWrap="wrap">
-            {basicDetails &&
-              Object.values(basicDetails).map((item, index) => (
-                <CardProps
-                  key={`${index}`}
-                  label={item.label}
-                  icon={item.icon}
-                  containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
-                  iconBackground={theme.palette.info.outlinedHoverBg}
-                  iconMaxHeight="3rem"
-                  bodyText={item.value}
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  height: '100%',
+                  width: '80%',
+                }}>
+                <EmployeeAvatar
+                  firstName={userAccount?.firstName || ''}
+                  lastName={userAccount?.lastName || ''}
+                  roles={userAccount?.roles || ''}
+                  isOnline={userData?.isOnline || false}
                 />
-              ))}
-          </Box>
-        </Grid>
+                <Divider
+                  orientation="vertical"
+                  sx={{background: '#F3F5F6'}}
+                  flexItem
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={10}>
+              <Box display="flex" flexWrap="wrap">
+                {basicDetails &&
+                  Object.values(basicDetails).map((item, index) => (
+                    <CardProps
+                      key={index}
+                      label={item.label}
+                      icon={item.icon}
+                      containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
+                      iconBackground={theme.palette.info.outlinedHoverBg}
+                      iconMaxHeight="3rem"
+                      bodyText={item.value}
+                    />
+                  ))}
+              </Box>
+            </Grid>
+          </Grid>
+
+          {employee && (
+            <EditEmployee
+              employee={employee}
+              openDialog={openDialog}
+              onClose={() => setOpenDialog(false)}
+            />
+          )}
+        </InfoCard>
       </Grid>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          color: theme.palette.info.dark,
-          cursor: 'pointer',
-        }}>
-        <Button
-          buttonProps={{
-            onClick: () => setIsDrawerOpen(true),
-          }}>
-          <Typography variant="subtitle2">Edit</Typography>
-        </Button>
-      </Box>
-      {employee && (
-        <EditEmployee
-          employee={employee}
-          open={isDrawerOpen}
-          setOpen={setIsDrawerOpen}
-        />
-      )}
-    </InfoCard>
+      <EmployeeWorkHours action={openWorkHoursTab} />
+      <EmployeeAbsence />
+    </Grid>
   );
   return <Box>{renderBasicDetails()}</Box>;
 };

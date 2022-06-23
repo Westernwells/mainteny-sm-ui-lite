@@ -1,11 +1,12 @@
-import {UserQueryParams} from 'models/employee';
-import {Resource} from 'models/misc';
-import {UserView, Role} from 'models/user';
-import {EmployeeAccountData} from 'pages/Employee/AddEmployeeForm/model';
-import {EmployeeAccountData as EditEmployeeAccountData} from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/model';
 import {useQuery} from 'react-query';
 import {queryKeys as qks} from 'reactQuery/constants';
 import {useSnackbar} from 'notistack';
+
+import {UserQueryParams} from 'models/employee';
+import {Resource} from 'models/misc';
+import {UserView} from 'models/user';
+import {EmployeeAccountData} from 'pages/Employee/NewEmployee/model';
+import {EmployeeAccountData as EditEmployeeAccountData} from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/model';
 import {
   formatEmployeeAccountData,
   formatUpdateEmployeeAccountData,
@@ -61,14 +62,13 @@ export const useEmployeeAccount = () => {
     accountData: EmployeeAccountData,
     onSuccess?: () => void,
   ): Promise<void> => {
-    const urlEndpoint = accountData.roles.includes(Role.SERVICE_MANAGER)
-      ? `/api/users/serviceManagers`
-      : `/api/users/technicians`;
-
     const requestBody = formatEmployeeAccountData(accountData);
 
     try {
-      const {status} = await axiosClient.post(urlEndpoint, requestBody);
+      const {status} = await axiosClient.post(
+        'api/users/employees',
+        requestBody,
+      );
 
       if (status === 200) {
         enqueueSnackbar(
@@ -95,15 +95,15 @@ export const useEmployeeAccount = () => {
 
   const updateEmployeeAccount = async (
     accountData: EditEmployeeAccountData,
+    employeeId: string,
     onSuccess?: () => void,
   ): Promise<void> => {
-    const urlEndpoint = accountData.roles.includes(Role.SERVICE_MANAGER)
-      ? `/api/users/serviceManagers`
-      : `/api/users/technicians`;
-
     const requestBody = formatUpdateEmployeeAccountData(accountData);
     try {
-      const {status} = await axiosClient.put(urlEndpoint, requestBody);
+      const {status} = await axiosClient.put(
+        `/api/users/employees/${employeeId}`,
+        requestBody,
+      );
 
       if (status === 200) {
         enqueueSnackbar(

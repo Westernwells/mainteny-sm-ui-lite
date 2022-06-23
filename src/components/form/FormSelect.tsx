@@ -2,8 +2,9 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Checkbox from '@mui/material/Checkbox';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import Select, {SelectProps} from '@mui/material/Select';
+import {SxProps} from '@mui/system';
+import {capitalize} from 'utils/utils';
 
 interface Props<T> {
   labelId: string;
@@ -11,6 +12,8 @@ interface Props<T> {
   required?: boolean;
   options: {label: string; value: string}[];
   selectProps?: SelectProps<T>;
+  labelStyles?: SxProps;
+  selectStyles?: SxProps;
   containerStyles?: {[key: string]: any};
 }
 
@@ -30,27 +33,48 @@ export const FormSelect = ({
   label,
   required,
   options,
+  labelStyles,
+  selectStyles,
   selectProps,
   containerStyles,
 }: Props<string | string[]>) => (
   <FormControl sx={{...containerStyles}} fullWidth required={required}>
     <InputLabel
       id={labelId}
-      shrink
       sx={{
-        bgcolor: 'white',
-        paddingInline: '.5em 2em',
+        bgColor: 'white',
+        ...labelStyles,
       }}>
       {label}
     </InputLabel>
     <Select
       size="small"
-      input={<OutlinedInput id="roles" />}
-      renderValue={() =>
-        selectProps && selectProps.value && Array.isArray(selectProps.value)
-          ? selectProps.value.join(',')
-          : selectProps?.value || ''
-      }
+      labelId={labelId}
+      label={label}
+      renderValue={() => {
+        let selectValue;
+        if (
+          selectProps &&
+          selectProps.value &&
+          Array.isArray(selectProps.value)
+        ) {
+          const editedValues = selectProps?.value.map((item) => {
+            const selectedOption = options.find(
+              (option) => option.value === item,
+            )?.label;
+            return selectedOption;
+          });
+
+          selectValue = capitalize((editedValues as string[]) || []);
+        } else {
+          selectValue = options.find(
+            ({value}) => value === selectProps?.value,
+          )?.label;
+        }
+        return selectValue || '';
+      }}
+      value={selectProps?.value}
+      sx={selectStyles}
       MenuProps={MenuProps}
       {...selectProps}>
       {options.map((option) => (
