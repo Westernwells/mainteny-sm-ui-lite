@@ -79,6 +79,9 @@ module.exports = {
     Emergency: 'Personeneinschluss',
     Callout: 'Störung',
     Pending: 'Ausstehend',
+    'Search order type, customer, address etc.':
+      'Suche nach Auftragsart, Kunde, Adresse usw.',
+    'Unassigned Orders': 'Nicht zugewiesene Aufträge',
   },
 };
 
