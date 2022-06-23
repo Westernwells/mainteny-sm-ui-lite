@@ -63,11 +63,16 @@ export const Employees = () => {
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
 
-    setPage({
-      ...page,
-      pageSize: Number(currentParams.pageSize),
-      pageIndex: Number(currentParams.pageIndex) - 1,
-    });
+    if (currentParams.pageSize)
+      setPage({
+        ...page,
+        pageSize: Number(currentParams.pageSize),
+      });
+    if (currentParams.pageIndex)
+      setPage({
+        ...page,
+        pageIndex: Number(currentParams.pageIndex) - 1,
+      });
   }, [queryParams]);
 
   useEffect(() => {

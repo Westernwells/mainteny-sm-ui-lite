@@ -47,14 +47,7 @@ export const UnitListingView = () => {
     isLoading,
     isFetched,
     isFetching,
-  } = useAllElevators(
-    search,
-    page,
-    {
-      status,
-    },
-    {keepPreviousData: true},
-  );
+  } = useAllElevators(search, page, {status}, {keepPreviousData: true});
   // set this value only once
   totalUnitsRef.current = totalUnitsRef.current || elevatorResponse.total;
 
@@ -112,12 +105,16 @@ export const UnitListingView = () => {
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
-
-    setPage({
-      ...page,
-      pageSize: Number(currentParams.pageSize),
-      pageIndex: Number(currentParams.pageIndex) - 1,
-    });
+    if (currentParams.pageSize)
+      setPage({
+        ...page,
+        pageSize: Number(currentParams.pageSize),
+      });
+    if (currentParams.pageIndex)
+      setPage({
+        ...page,
+        pageIndex: Number(currentParams.pageIndex) - 1,
+      });
   }, [queryParams]);
 
   useEffect(() => {

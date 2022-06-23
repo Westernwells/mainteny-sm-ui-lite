@@ -51,7 +51,7 @@ export const ServiceHistoryTab = () => {
     isFetched,
   } = useServiceOrders({
     elevatorIds: elevatorId ? [elevatorId] : undefined,
-    start: startOfYear(new Date('01-01-2000')).toISOString(),
+    start: startOfYear(new Date()).toISOString(),
     end: endOfYear(new Date()).toISOString(),
     pageIndex: page.pageIndex,
     pageSize: page.pageSize,

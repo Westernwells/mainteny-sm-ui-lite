@@ -95,7 +95,7 @@ export const useElevatorMaintainers = (elevatorId?: string) =>
 export function useAllElevators(
   query: string,
   page: Page,
-  filter: {status: string[]},
+  filter: {},
   options?: UseQueryOptions<any, any, any>,
 ) {
   const {user} = useUserSession();
