@@ -31,10 +31,12 @@ export const columns = (
   getColumnProps({
     field: 'unitPrice',
     headerName: 'UNIT PRICE',
+    align: 'right',
   }),
   getColumnProps({
     field: 'quantity',
     headerName: 'QUANTITY',
+    align: 'right',
   }),
   getColumnProps({
     field: 'unit',
@@ -44,6 +46,7 @@ export const columns = (
   getColumnProps({
     field: 'total',
     headerName: 'Total',
+    align: 'right',
   }),
   getColumnProps({
     field: 'actions',
