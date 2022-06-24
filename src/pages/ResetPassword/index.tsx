@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {t} from 'i18next';
+import {useTranslation} from 'react-i18next';
 import {useLocation} from 'react-router-dom';
 import {useFormik} from 'formik';
 import queryString from 'query-string';
@@ -9,6 +9,7 @@ import {PasswordRequest} from './PasswordRequest';
 import {PasswordReset} from './PasswordReset';
 
 export const ResetPassword = () => {
+  const {t} = useTranslation();
   const {search} = useLocation();
 
   const {type} = queryString.parse(search);

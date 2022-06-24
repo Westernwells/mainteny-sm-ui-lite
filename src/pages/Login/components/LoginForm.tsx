@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {t} from 'i18next';
+import {useTranslation} from 'react-i18next';
 import {Link} from 'react-router-dom';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import ArrowForward from '@mui/icons-material/ArrowForward';
@@ -34,6 +34,8 @@ export const LoginForm = ({
   loading,
 }: Props) => {
   const [showPassword, setShowPassword] = useState(false);
+  const {t} = useTranslation();
+
   return (
     <Box display="flex" justifyContent="center" width="100%">
       <form style={{width: '18rem'}} onSubmit={handleSubmit}>

@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {t} from 'i18next';
+import {useTranslation} from 'react-i18next';
 import {axiosClient} from 'utils/axios-utils';
 import {useSnackbar} from 'notistack';
 import {useNavigate} from 'react-router-dom';
@@ -19,6 +19,7 @@ export const useResetPassword = (): UseRecoverPassword => {
     email: string,
     navigation?: boolean,
   ): Promise<void> => {
+    const {t} = useTranslation();
     setLoading(true);
     try {
       const {status} = await axiosClient({
@@ -59,6 +60,7 @@ export const useResetPassword = (): UseRecoverPassword => {
     password: string,
     email: string,
   ): Promise<void> => {
+    const {t} = useTranslation();
     setLoading(true);
     try {
       const {status} = await axiosClient.post(

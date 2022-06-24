@@ -1,5 +1,5 @@
 import {ReactNode} from 'react';
-import {t} from 'i18next';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/Add';
@@ -32,64 +32,70 @@ export const Widget = ({
   showMenuActionBtn,
   menu,
   filterItems,
-}: Props) => (
-  <Box display="flex" sx={{height: '2.5rem', flexGrow: 1, ...containerStyles}}>
-    {!hideSearchInput ? (
-      <Box sx={{mr: '1em'}}>
-        <SearchInput
-          containerStyle={{height: '100%'}}
-          placeholder={searchPlaceholder && t(searchPlaceholder)}
-          onValueChanged={(value: string) =>
-            getSearchValue && getSearchValue(value)
-          }
-        />
-      </Box>
-    ) : null}
-    {filterItems || null}
+}: Props) => {
+  const {t} = useTranslation();
 
+  return (
     <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'flex-end',
-        flexGrow: 1,
-      }}>
-      {showActionBtn ? (
-        <Button
-          // label="Filter"
-          buttonProps={{
-            onClick: () => (btnOnClick ? btnOnClick() : () => {}),
-            sx: {
+      display="flex"
+      sx={{height: '2.5rem', flexGrow: 1, ...containerStyles}}>
+      {!hideSearchInput ? (
+        <Box sx={{mr: '1em'}}>
+          <SearchInput
+            containerStyle={{height: '100%'}}
+            placeholder={searchPlaceholder && t(searchPlaceholder)}
+            onValueChanged={(value: string) =>
+              getSearchValue && getSearchValue(value)
+            }
+          />
+        </Box>
+      ) : null}
+      {filterItems || null}
+
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          flexGrow: 1,
+        }}>
+        {showActionBtn ? (
+          <Button
+            // label="Filter"
+            buttonProps={{
+              onClick: () => (btnOnClick ? btnOnClick() : () => {}),
+              sx: {
+                textTransform: 'capitalize',
+                ml: '0.8em',
+              },
+              variant: 'contained',
+              color: 'primary',
+              size: 'small',
+              startIcon: <AddIcon />,
+            }}>
+            <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
+              {t(btnLabel)}
+            </Typography>
+          </Button>
+        ) : null}
+
+        {showMenuActionBtn && menu ? (
+          <MenuBtn
+            startIcon={<AddIcon />}
+            label={btnLabel}
+            menu={menu}
+            size="large"
+            color="primary"
+            sx={{
               textTransform: 'capitalize',
               ml: '0.8em',
-            },
-            variant: 'contained',
-            color: 'primary',
-            size: 'small',
-            startIcon: <AddIcon />,
-          }}>
-          <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
-            {t(btnLabel)}
-          </Typography>
-        </Button>
-      ) : null}
-
-      {showMenuActionBtn && menu ? (
-        <MenuBtn
-          startIcon={<AddIcon />}
-          label={btnLabel}
-          menu={menu}
-          size="large"
-          color="primary"
-          sx={{
-            textTransform: 'capitalize',
-            ml: '0.8em',
-            py: '0.7em',
-          }}
-          variant="contained"
-          disableRipple
-          disableFocusRipple
-        />
-      ) : null}
+              py: '0.7em',
+            }}
+            variant="contained"
+            disableRipple
+            disableFocusRipple
+          />
+        ) : null}
+      </Box>
     </Box>
-  </Box>
-);
+  );
+};

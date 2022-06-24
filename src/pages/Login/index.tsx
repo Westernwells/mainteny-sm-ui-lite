@@ -1,4 +1,4 @@
-import {t} from 'i18next';
+import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import {useFormik} from 'formik';
@@ -12,6 +12,7 @@ import {LoginForm} from './components/LoginForm';
 
 export const Login = () => {
   const {search} = useLocation();
+  const {t} = useTranslation();
   const {authType} = queryString.parse(search);
   const {signin, loading} = useAuth();
 

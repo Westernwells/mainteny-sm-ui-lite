@@ -1,4 +1,4 @@
-import {t} from 'i18next';
+import {useTranslation} from 'react-i18next';
 import {GridColDef, GridRowModel} from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -25,6 +25,7 @@ export const columns: GridColDef[] = [
     headerName: 'role',
     cellClassName: 'truncateText',
     renderCell: (params) => {
+      const {t} = useTranslation();
       const role = capitalize(params.value);
       return (
         <Typography variant="body2" sx={{textTransform: 'capitalize'}}>
@@ -55,6 +56,8 @@ export const columns: GridColDef[] = [
     field: 'availability',
     headerName: 'availability',
     renderCell: (params) => {
+      const {t} = useTranslation();
+
       switch (params.value) {
         case TechnicianEventType.HOLIDAY:
           return (

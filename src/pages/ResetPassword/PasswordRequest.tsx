@@ -1,5 +1,5 @@
 import React from 'react';
-import {t} from 'i18next';
+import {useTranslation} from 'react-i18next';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import EmailIcon from '@mui/icons-material/Email';
@@ -31,6 +31,7 @@ export const PasswordRequest = ({
   emailTouched,
   loading,
 }: Props) => {
+  const {t} = useTranslation();
   const navigate = useNavigate();
 
   return (
