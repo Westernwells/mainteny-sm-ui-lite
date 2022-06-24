@@ -4,12 +4,14 @@ import {ServiceOrderView} from 'models/service-order';
 import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
+  serviceOrderTypeToString,
 } from 'utils/service-order-utils';
+import {useTranslation} from 'react-i18next';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {StatusChip} from 'components/StatusChip';
 import {getColumnProps} from 'components/DataGridLayout';
 import {olStyles} from 'styles';
-import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
+import {Typography} from '@mui/material';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -49,16 +51,17 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'type',
     headerName: 'order type',
-    renderCell: (params: GridRenderCellParams<any, any, any>) => (
-      <Box sx={{display: 'flex'}}>
-        <ServiceOrderIcons serviceOrderType={params.value} size="small" />
-        <ServiceOrderTypeText
-          serviceOrderType={params.value}
-          capitalizeText
-          variant="body2"
-        />
-      </Box>
-    ),
+    renderCell: (params: GridRenderCellParams<any, any, any>) => {
+      const {t} = useTranslation();
+      return (
+        <Box sx={{display: 'flex'}}>
+          <ServiceOrderIcons serviceOrderType={params.value} size="small" />
+          <Typography variant="body2">
+            {t(serviceOrderTypeToString(params.value))}
+          </Typography>
+        </Box>
+      );
+    },
   }),
   getColumnProps({
     field: 'status',

@@ -296,7 +296,8 @@ export const Schedule = ({
                         const label =
                           scheduleType === 'date'
                             ? lookupDate[key]
-                            : `${lookupTechnician[key][0].userAccount.firstName} ${lookupTechnician[key][0].userAccount.lastName}`;
+                            : lookupTechnician[key] &&
+                              `${lookupTechnician[key][0].userAccount.firstName} ${lookupTechnician[key][0].userAccount.lastName}`;
                         return (
                           <ScheduleBodyCell
                             cellWidth={gridWidth}

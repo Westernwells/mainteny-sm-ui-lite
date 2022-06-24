@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import {useTranslation} from 'react-i18next';
 import Button, {ButtonProps} from '@mui/material/Button';
 import Menu, {MenuProps} from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -37,6 +38,7 @@ export const MenuBtn = ({
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const {t} = useTranslation();
 
   return (
     <Box>
@@ -46,7 +48,7 @@ export const MenuBtn = ({
           endIcon={endIcon}
           onClick={handleClick}
           {...rest}>
-          {label}
+          {typeof label === 'string' ? t(label) : label}
         </Button>
       ) : (
         <IconButton
@@ -69,7 +71,7 @@ export const MenuBtn = ({
         {...menuProps}>
         {menu.map((item, index) => (
           <MenuItem key={index} onClick={item.action}>
-            {item.label}
+            {t(item.label)}
           </MenuItem>
         ))}
       </Menu>
