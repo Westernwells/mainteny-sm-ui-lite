@@ -147,6 +147,7 @@ export const ServiceOrderScheduleTab = () => {
           searchPlaceholder="Search technician"
           handleSearch={(value) => setTechnicianSearch(value)}
           technicians={technicianResource.data}
+          labelWidth="15rem"
           renderCellItem={(order: ServiceOrderView, width, position) => (
             <ScheduleItem
               key={order.id}
