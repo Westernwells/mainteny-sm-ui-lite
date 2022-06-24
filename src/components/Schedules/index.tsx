@@ -62,7 +62,7 @@ interface Props {
   checkedValues?: string[];
 }
 
-const gridWidth = 120;
+const gridWidth = 200;
 const dateFormat = 'dd MMMM yy';
 
 export const Schedule = ({

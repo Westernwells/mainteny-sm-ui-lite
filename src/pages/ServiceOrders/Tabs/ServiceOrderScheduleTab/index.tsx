@@ -147,6 +147,7 @@ export const ServiceOrderScheduleTab = () => {
           searchPlaceholder="Search technician"
           handleSearch={(value) => setTechnicianSearch(value)}
           technicians={technicianResource.data}
+          labelWidth="14rem"
           renderCellItem={(order: ServiceOrderView, width, position) => (
             <ScheduleItem
               key={order.id}
@@ -167,7 +168,7 @@ export const ServiceOrderScheduleTab = () => {
         />
         {switchActive ? (
           <UnAssignedServiceOrders
-            containerStyles={{width: '55%', ml: '0.5em'}}
+            containerStyles={{width: '100%', ml: '0.5em'}}
           />
         ) : null}
       </Box>
