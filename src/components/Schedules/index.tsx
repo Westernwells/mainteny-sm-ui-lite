@@ -204,10 +204,9 @@ export const Schedule = ({
       if (elementRef.current) {
         elementRef.current.scroll({
           left: scrollWidth,
-          behavior: 'smooth',
         });
       }
-    }, 500);
+    }, 0);
 
     return () => {
       clearTimeout(timeout);
