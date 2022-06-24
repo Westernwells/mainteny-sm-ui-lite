@@ -59,7 +59,7 @@ export const getColumnProps = ({
     const {t} = useTranslation();
     return (
       <Typography variant="subtitle2" color="textSecondary">
-        {t(params.colDef.headerName!.toUpperCase())}
+        {params.colDef.headerName && t(params.colDef.headerName.toUpperCase())}
       </Typography>
     );
   },

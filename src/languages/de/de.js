@@ -200,6 +200,8 @@ module.exports = {
     'UNIT NUMBER': 'ANLAGENNUMMER',
     Unscheduled: 'Ungeplant',
     Completed: 'Abgeschlossen',
+
+    // Service Orders
     Pending: 'Ausstehend',
     'Search order type, customer, address etc.':
       'Suche nach Auftragsart, Kunde, Adresse usw.',
