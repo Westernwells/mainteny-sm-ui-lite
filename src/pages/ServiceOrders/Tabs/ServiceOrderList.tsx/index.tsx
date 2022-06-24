@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import {FilterFields} from 'components/FilterFields';
-import * as _ from 'lodash';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {
   ServiceOrderStatus,
@@ -24,6 +23,8 @@ import {FlexContainer} from 'components/FlexContainer';
 import {
   serviceOrderStatusToEnum,
   serviceOrderStatusToString,
+  serviceOrderTypeToEnum,
+  serviceOrderTypeToString,
 } from 'utils/service-order-utils';
 import {Widget} from 'components/Widget';
 import {columns, makeRows} from './ServiceOrderDataGridProps';
@@ -136,14 +137,12 @@ export const ServiceOrderList = () => {
 
       <MultipleSelectCheckmarks
         label="Order types"
-        options={Object.values(ServiceOrderType).map((option) =>
-          _.capitalize(option).split('_').join(' '),
+        options={Object.keys(ServiceOrderType).map((i) =>
+          serviceOrderTypeToString(i),
         )}
         initialSelectedItems={selectedOrderTypes}
         getSelectedValue={(item) => {
-          const orderTypes = item.map((val) =>
-            val.split(' ').join('_').toUpperCase(),
-          );
+          const orderTypes = item.map((i) => serviceOrderTypeToEnum(i));
 
           setSelectedOrderTypes(orderTypes as ServiceOrderType[]);
         }}

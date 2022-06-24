@@ -28,7 +28,7 @@ export const ServiceOrders = () => {
     {label: 'Emergency', action: () => navigate('/orders/new?type=emergency')},
     {label: 'Callout', action: () => navigate('/orders/new?type=callout')},
     {label: 'Repair', action: () => navigate('/orders/new?type=repair')},
-    {label: 'Regular', action: () => navigate('/orders/new?type=regular')},
+    {label: 'Maintenance', action: () => navigate('/orders/new?type=regular')},
   ]).current;
 
   useEffect(() => {

@@ -4,7 +4,8 @@ import {useLayoutEffect, useRef} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {ServiceOrderType} from 'models/service-order';
 import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
-import {convertToText} from 'utils/utils';
+import {convertToMacro} from 'utils/utils';
+import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {NewEmergency} from './NewEmergency';
 import {ScheduleServiceOrder} from './ScheduleServiceOrder';
 
@@ -26,7 +27,11 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
 
   useLayoutEffect(() => {
     if (getCurrentPageTitle && currentParams) {
-      getCurrentPageTitle(`New ${convertToText(currentParams.type)} Order`);
+      getCurrentPageTitle(
+        `New ${serviceOrderTypeToString(
+          convertToMacro(currentParams.type),
+        )} Order`,
+      );
     }
   }, []);
 
