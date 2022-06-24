@@ -220,6 +220,7 @@ module.exports = {
     'Add Contract': 'Vertrag hinzufügen',
     'Search by number, customer, contract type etc.':
       'Suche nach Nummer, Kunde, Vertragsart usw.',
+    List: 'Aufführen',
   },
 };
 
