@@ -36,6 +36,7 @@ import {
 } from 'hooks/reactQuery/useQuotation';
 import {formatCurrency} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
+import {ArticlesModalDataGrid} from 'components/ArticleModalDataGrid';
 import {PdfGenerationStatus, WithOptional} from 'models/misc';
 import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps';
 import {Label} from './Components/Label';
@@ -43,7 +44,6 @@ import {BottomDrawer} from './Components/BottomDrawer';
 import {QuotationRow} from './Components/QuotationRow';
 import {CustomersDataGrid} from './DataGrid/CustomersDataGrid';
 import {UnitsDataGrid} from './DataGrid/UnitsDataGrid';
-import {ArticlesDataGrid} from './DataGrid/ArticlesDataGrid';
 import {QuotationHeader} from './Components/QuotationHeader';
 import {Quotation} from './Quotation';
 
@@ -515,7 +515,7 @@ export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
         isOpen={isArticleModalOpen}
         onClose={() => setIsArticleModalOpen(false)}
         header="Select Article">
-        <ArticlesDataGrid setRowItem={handleSelectQuotationItem} />
+        <ArticlesModalDataGrid setRowItem={handleSelectQuotationItem} />
       </SelectModal>
       <BottomDrawer
         isOpen={isDrawerOpen}

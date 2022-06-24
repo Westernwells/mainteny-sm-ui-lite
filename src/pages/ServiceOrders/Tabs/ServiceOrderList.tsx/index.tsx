@@ -7,7 +7,7 @@ import {
   ServiceOrderType,
   ServiceOrderView,
 } from 'models/service-order';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {endOfDay, startOfDay, subDays} from 'date-fns';
@@ -19,6 +19,7 @@ import {
   formatSearchParamsPageSize,
 } from 'utils/utils';
 import {Progress} from 'components/Progress';
+import {EmptySection} from 'components/EmptySection';
 import {FlexContainer} from 'components/FlexContainer';
 import {
   serviceOrderStatusToEnum,
@@ -31,6 +32,7 @@ export const ServiceOrderList = () => {
   const [page, setPage] = useState(makePage(0, 25));
   const [queryParams, setQueryParams] = useSearchParams();
   const [pageCount, setPageCount] = useState(0);
+  const totalOrederRef = useRef(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrderStatus, setSelectedOrderStatus] = useState<
@@ -47,6 +49,7 @@ export const ServiceOrderList = () => {
     isFetching,
     isLoading,
     isIdle,
+    isFetched,
   } = useServiceOrders(
     {
       end: endOfDay(currentDate).toISOString(),
@@ -60,6 +63,9 @@ export const ServiceOrderList = () => {
     {keepPreviousData: true},
   );
 
+  totalOrederRef.current =
+    totalOrederRef.current || serviceOrdersResource.total;
+
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
     setPage({
@@ -70,7 +76,9 @@ export const ServiceOrderList = () => {
   }, [queryParams]);
 
   useEffect(() => {
-    setRows(makeRows(serviceOrdersResource.data));
+    if (isFetched) {
+      setRows(makeRows(serviceOrdersResource.data));
+    }
   }, [serviceOrdersResource]);
 
   useEffect(() => {
@@ -153,6 +161,18 @@ export const ServiceOrderList = () => {
       />
     </Box>
   );
+
+  if (isFetched && !totalOrederRef.current) {
+    return (
+      <EmptySection
+        label="No orders have been created yet. Please click the button above to create one!"
+        containerStyle={{
+          height: '100%',
+          mb: '10em',
+        }}
+      />
+    );
+  }
 
   if (isIdle || isLoading) {
     return <Progress />;

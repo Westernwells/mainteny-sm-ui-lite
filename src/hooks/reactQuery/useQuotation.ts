@@ -1,5 +1,10 @@
 import {useCallback} from 'react';
-import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from 'react-query';
 import {useSnackbar} from 'notistack';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {useNavigate} from 'react-router';
@@ -70,10 +75,13 @@ export const fetchQuotation = async (quotationId: string) => {
   return response.data;
 };
 
-export function useQuotationDetails(quotationId?: string) {
+export function useQuotationDetails(
+  quotationId?: string,
+  options?: UseQueryOptions<any, any, any>,
+) {
   const navigate = useNavigate();
 
-  return useQuery(
+  return useQuery<QuotationView, RestError, QuotationView>(
     [qk.quotationById, quotationId],
     () => fetchQuotation(quotationId!),
     {
@@ -81,6 +89,7 @@ export function useQuotationDetails(quotationId?: string) {
       onError: (e: any) => {
         if (e.response.status === 500) navigate('/404');
       },
+      ...options,
     },
   );
 }

@@ -47,7 +47,7 @@ export const Notes = ({elevatorId}: Props) => {
   const [openDialog, setOpenDialog] = useState(false);
   const totalNotesRef = useRef(0);
   const [dialogTitle, setDialogTitle] = useState('');
-  const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState(false);
   const [activeNoteId, setActiveNoteId] = useState('');
   const {
     data: elevatorNotesResource = createEmptyResource<ElevatorComment>(10),
@@ -96,7 +96,7 @@ export const Notes = ({elevatorId}: Props) => {
 
   const onDelete = async (noteId: string) => {
     await deleteNote({elevatorId: elevatorId!, noteId});
-    setOpenCancelConfirm(false);
+    setOpenConfirm(false);
   };
 
   const renderNote = (elevatorNote: ElevatorComment) => (
@@ -119,7 +119,7 @@ export const Notes = ({elevatorId}: Props) => {
           />
           <DeleteIcon
             onClick={() => {
-              setOpenCancelConfirm(true);
+              setOpenConfirm(true);
               setActiveNoteId(elevatorNote.id);
             }}
             sx={{color: theme.palette.action.active, cursor: 'pointer'}}
@@ -192,9 +192,9 @@ export const Notes = ({elevatorId}: Props) => {
       </Dialog>
 
       <Confirm
-        open={openCancelConfirm}
+        open={openConfirm}
         onConfirm={() => onDelete(activeNoteId)}
-        onClose={() => setOpenCancelConfirm(false)}
+        onClose={() => setOpenConfirm(false)}
         title="Confirm"
         content="Do you want to delete this note?"
       />

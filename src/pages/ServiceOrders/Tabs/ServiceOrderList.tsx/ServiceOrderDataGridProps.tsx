@@ -10,7 +10,7 @@ import {
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {StatusChip} from 'components/StatusChip';
 import {getColumnProps} from 'components/DataGridLayout';
-import {olStyles as sx} from './styles';
+import {olStyles} from 'styles';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -66,7 +66,7 @@ export const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
         color={getServiceOrderStatusColor(params.value)}
-        style={sx.orderStatus}
+        style={olStyles.orderStatus}
         label={serviceOrderStatusToString(params.value)}
         variant="filled"
       />

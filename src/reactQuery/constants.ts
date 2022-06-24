@@ -45,4 +45,6 @@ export const queryKeys = {
   queryElevatorComment: 'queryElevatorComment',
   fetchWorkHours: 'fetchWorkHours',
   queryTodos: 'queryTodos',
+  fetchServiceOrderInvoices: 'fetchServiceOrderInvoices',
+  fetchServiceOrderArticles: 'fetchServiceOrderArticles',
 };

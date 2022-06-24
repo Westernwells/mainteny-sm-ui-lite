@@ -2,10 +2,10 @@ import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {InfoCard} from 'components/InfoCard';
-import EditIcon from '@mui/icons-material/Edit';
-import useTheme from '@mui/material/styles/useTheme';
-import {convertToText} from 'utils/utils';
-import {CardProps} from 'components/CardProps';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import Grid from '@mui/material/Grid';
+// import {convertToText} from 'utils/utils';
+// import {CardProps} from 'components/CardProps';
 import {Confirm} from 'components/Confirm';
 import {
   useCancelServiceOrders,
@@ -15,26 +15,42 @@ import {
 } from 'hooks/reactQuery/useServiceOrder';
 import {
   JobScheduleType,
-  ServiceOrder,
   ServiceOrderStatus,
+  ServiceOrderView,
 } from 'models/service-order';
 import {useTranslation} from 'react-i18next';
+import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {formatDate, setDateTime} from 'utils/datetime';
 import {ScheduleForm} from 'pages/ServiceOrderDetails/models';
-import {Button} from 'components/Button';
 import {FormikErrors} from 'formik';
-import {orderInfo as orderInfoSchema} from './schema';
+import {StatusChip} from 'components/StatusChip';
+import {
+  getServiceOrderStatusColor,
+  serviceOrderStatusToString,
+} from 'utils/service-order-utils';
+import {MenuBtn} from 'components/MenuBtn';
+import {olStyles} from 'styles';
+// import {orderInfo as orderInfoSchema} from './schema';
 import {ScheduleDialog} from './ScheduleDialog';
+import {OrderInfo} from './schema';
 
 interface Props {
-  serviceOrderDetails: ServiceOrder;
+  serviceOrderDetails: ServiceOrderView;
 }
 
+const orderInfo = [
+  'customer',
+  'unitNumber',
+  'unitAddress',
+  'dueDate',
+  'schedule',
+  'technicians',
+];
+
 export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
-  const theme = useTheme();
-  const [orderInfo, setOrderInfo] = useState(
-    orderInfoSchema(serviceOrderDetails),
-  );
+  // const [orderInfo, setOrderInfo] = useState(
+  //   orderInfoSchema(serviceOrderDetails),
+  // );
   const {mutate: cancelServiceOrder} = useCancelServiceOrders();
   const {mutate: unscheduleServiceOrder} = useUnscheduleServiceOrders();
   const {mutate: rescheduleServiceOrder} = useRedispatchServiceOrders(
@@ -51,10 +67,6 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const [formError, setFormErrors] = useState<FormikErrors<ScheduleForm>>();
   const [formValid, setFormValid] = useState(false);
   const {t} = useTranslation();
-
-  useEffect(() => {
-    setOrderInfo(orderInfoSchema(serviceOrderDetails));
-  }, [serviceOrderDetails]);
 
   useEffect(() => {
     if (
@@ -124,99 +136,112 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
       ? 'Reschedule Order'
       : 'Schedule Order';
 
-  const renderRescheduleUnassignBtnGroup = () =>
-    [ServiceOrderStatus.SCHEDULED, ServiceOrderStatus.IN_PROGRESS].includes(
-      serviceOrderDetails.status,
-    ) ? (
-      <>
-        <Button
-          label={t('Reschedule')}
-          buttonProps={{
-            variant: 'contained',
-            onClick: () => setOpenDialog(true),
+  const orderAction = () => {
+    if (
+      [
+        ServiceOrderStatus.INIT,
+        ServiceOrderStatus.READY_TO_SCHEDULE,
+        ServiceOrderStatus.SCHEDULING,
+      ].includes(serviceOrderDetails.status)
+    ) {
+      return [
+        {
+          label: t('Cancel'),
+          action: () => setOpenCancelConfirm(true),
+        },
+        {
+          label: t('Schedule'),
+          action: () => setOpenDialog(true),
+        },
+      ];
+    }
 
-            sx: {px: '2.5em', mt: '1em', mr: '1em'},
-          }}
-        />
-        <Button
-          label={t('Unschedule')}
-          buttonProps={{
-            variant: 'contained',
-            onClick: () => setOpenUnscheduleConfirm(true),
-            sx: {px: '2.5em', mt: '1em'},
-          }}
-        />
-      </>
-    ) : null;
+    if (
+      [ServiceOrderStatus.SCHEDULED, ServiceOrderStatus.IN_PROGRESS].includes(
+        serviceOrderDetails.status,
+      )
+    ) {
+      return [
+        {
+          label: t('Reschedule'),
+          action: () => setOpenDialog(true),
+        },
+        {
+          label: t('Unschedule'),
+          action: () => setOpenUnscheduleConfirm(true),
+        },
+        {
+          label: t('Cancel'),
+          action: () => setOpenCancelConfirm(true),
+        },
+      ];
+    }
+    return [];
+  };
 
-  const renderCancelScheduleBtnGroup = () =>
-    [
-      ServiceOrderStatus.INIT,
-      ServiceOrderStatus.READY_TO_SCHEDULE,
-      ServiceOrderStatus.SCHEDULING,
-    ].includes(serviceOrderDetails.status) ? (
-      <>
-        <Button
-          label={t('Cancel')}
-          buttonProps={{
-            onClick: () => setOpenCancelConfirm(true),
-            sx: {px: '2.5em', mt: '1em'},
-          }}
-        />
-        <Button
-          label={t('Schedule')}
-          buttonProps={{
-            onClick: () => setOpenDialog(true),
-            sx: {px: '2.5em', mt: '1em'},
-            variant: 'contained',
-          }}
-        />
-      </>
-    ) : null;
+  const renderHeaderLeftWidget = () => (
+    <Box sx={{display: 'flex'}}>
+      <StatusChip
+        color={getServiceOrderStatusColor(serviceOrderDetails.status)}
+        label={serviceOrderStatusToString(serviceOrderDetails.status)}
+        style={{...olStyles.orderStatus, letterSpacing: 'normal'}}
+        // maxChars={15}
+      />
+      {serviceOrderDetails.status !== ServiceOrderStatus.COMPLETED ? (
+        <Box sx={{mt: -1}}>
+          <MenuBtn
+            sx={{p: 0, display: 'flex'}}
+            disableRipple
+            anchorType="iconButton"
+            anchorIcon={<MoreHorizIcon sx={{color: '#231F20'}} />}
+            menu={orderAction()}
+          />
+        </Box>
+      ) : null}
+    </Box>
+  );
 
   return (
     <InfoCard
+      showHeaderBackground
       containerStyles={{display: 'flex', flexDirection: 'column'}}
-      headerActionIcon={
-        <EditIcon
-          style={{color: theme.palette.text.secondary}}
-          fontSize="small"
-        />
-      }
       header={
-        <Box>
-          <Typography variant="subtitle1">
-            {serviceOrderDetails.number}
-          </Typography>
+        <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
           <Box sx={{display: 'flex'}}>
-            <Typography variant="body2" sx={{mr: '0.2em'}}>
-              {serviceOrderDetails.description}
+            <Box sx={{display: 'flex', alignItems: 'center'}}>
+              <ServiceOrderIcons serviceOrderType={serviceOrderDetails.type} />
+            </Box>
+            <Typography component="div" variant="subtitle1" ml="0.5em">
+              Maintenance
+            </Typography>
+
+            <Typography
+              component="div"
+              variant="caption"
+              sx={{
+                ml: '0.4em',
+                display: 'flex',
+                alignItems: 'center',
+                mt: '0.2em',
+              }}>
+              {`#${serviceOrderDetails.number}`}
             </Typography>
           </Box>
+
+          {renderHeaderLeftWidget()}
         </Box>
       }>
-      <Box
-        sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'space-between',
-        }}>
-        {Object.values(orderInfo).map((item, index) => (
-          <CardProps
-            key={`${index}`}
-            label={t(item.label)}
-            icon={item.icon}
-            bodyText={convertToText(item.value!)}
-            containerStyles={{mb: '0.5em', width: '27%'}}
-            iconMaxHeight="3rem"
-            iconBackground={theme.palette.info.outlinedHoverBg}
-          />
+      <Grid container>
+        {orderInfo.map((label, index) => (
+          <Grid item xs={4} key={`${label}-${index}`}>
+            <OrderInfo
+              serviceOrderDetails={serviceOrderDetails}
+              label={label}
+            />
+          </Grid>
         ))}
-      </Box>
-      <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-        {renderCancelScheduleBtnGroup()}
-        {renderRescheduleUnassignBtnGroup()}
-      </Box>
+      </Grid>
+
       <Confirm
         open={openCancelConfirm}
         onConfirm={() => {

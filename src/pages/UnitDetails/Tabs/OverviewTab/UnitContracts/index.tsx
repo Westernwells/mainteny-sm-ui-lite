@@ -1,10 +1,10 @@
 import Typography from '@mui/material/Typography';
-import {PageCard} from 'components/PageCard';
 import useTheme from '@mui/material/styles/useTheme';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {useEffect, useState} from 'react';
 import {ContractSimpleView} from 'models/contract';
 import {getDataGridHeight} from 'utils/utils';
+import {InfoCard} from 'components/InfoCard';
 import {GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import {columns, makeRows} from './UnitsContractDataGridProps';
@@ -24,15 +24,10 @@ export const UnitContracts = ({containerStyles, contracts}: Props) => {
   }, [contracts]);
 
   return (
-    <PageCard
+    <InfoCard
       containerStyles={{...containerStyles}}
-      customHeader={
-        <Typography variant="subtitle1">Related Contracts</Typography>
-      }
-      headerStyles={{
-        py: '0.2em',
-        background: theme.palette.inputBackground.main,
-      }}>
+      header={<Typography variant="subtitle1">Related Contracts</Typography>}
+      showHeaderBackground>
       <DataGridLayout
         fullHeight={false}
         height={getDataGridHeight(rows.length, 3)}
@@ -52,6 +47,6 @@ export const UnitContracts = ({containerStyles, contracts}: Props) => {
           </Typography>
         </Box>
       ) : null}
-    </PageCard>
+    </InfoCard>
   );
 };

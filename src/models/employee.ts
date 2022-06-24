@@ -1,12 +1,7 @@
 import {Shift} from 'pages/Employee/NewEmployee/model';
 import {Address, Meta} from './misc';
 import {ServiceOrderType} from './service-order';
-import {
-  TechnicianEventView,
-  TechnicianView,
-  TechnicianWorkingHours,
-} from './technician';
-import {Role, UserAccountView, UserView} from './user';
+import {Role, UserAccountView} from './user';
 
 export interface UserQueryParams {
   pageIndex: number;

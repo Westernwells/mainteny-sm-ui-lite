@@ -128,3 +128,49 @@ export const getRangeDate = (
   const dateEnd = formatDate(end, formatStr);
   return `${dateStart} - ${dateEnd}`;
 };
+
+export const convert12hTo24h = (time: string, meridian?: string) => {
+  const localMeridian = meridian || time.split(' ')[1];
+  const hr = time.split(':')[0];
+  const min = time.split(':')[1];
+  if (localMeridian) {
+    const newHr =
+      localMeridian.toUpperCase() === 'PM' && Number(hr) !== 12
+        ? Number(hr) + 12
+        : hr;
+    return `${newHr}:${min.split(' ')[0]}`;
+  }
+  return `${hr}:${min}`;
+};
+
+export const convert24hTo12h = (time: string, addMeridian?: boolean) => {
+  const hr = time.split(':')[0];
+  const min = time.split(':')[1];
+
+  const newHr = Number(hr) > 12 ? Number(hr) - 12 : hr;
+
+  return addMeridian
+    ? `${newHr.toLocaleString('en-US', {
+        minimumIntegerDigits: 2,
+        useGrouping: false,
+      })}:${min} ${Number(hr) >= 12 ? 'PM' : 'AM'}`
+    : `${newHr.toLocaleString('en-US', {
+        minimumIntegerDigits: 2,
+        useGrouping: false,
+      })}:${min}`;
+};
+
+export const get24Hour = (startNumber?: number, endNumber?: number) =>
+  [...Array(24).keys()]
+    .map((i) => (i + 1).toString().padStart(2, '0'))
+    .slice(startNumber ? startNumber - 1 : 0, endNumber || 24);
+
+export const get12Hour = (startNumber?: number, endNumber?: number) =>
+  [...Array(12).keys()]
+    .map((i) => (i + 1).toString().padStart(2, '0'))
+    .slice(startNumber ? startNumber - 1 : 0, endNumber || 12);
+
+export const get60Mins = (startNumber?: number, endNumber?: number) =>
+  [...Array(60).keys()]
+    .map((i) => (i + 1).toString().padStart(2, '0'))
+    .slice(startNumber ? startNumber - 1 : 0, endNumber || 60);

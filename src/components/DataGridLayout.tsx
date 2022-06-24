@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import useTheme from '@mui/material/styles/useTheme';
 import {
   DataGrid,
   DataGridProps,
@@ -13,6 +14,7 @@ import {
 } from '@mui/x-data-grid';
 import LinearProgress from '@mui/material/LinearProgress';
 import {useNavigate} from 'react-router-dom';
+import {olStyles} from 'styles';
 import {CustomPagination} from './CustomPagination';
 import {EmptySection} from './EmptySection';
 
@@ -37,6 +39,7 @@ interface Props extends DataGridProps {
   isRowSelectable?: (params: GridRowParams) => boolean;
   isCellClickable?: boolean;
   isWidget?: boolean;
+  headerHeight?: number;
 }
 
 interface ColumnProps extends GridColDef {
@@ -96,9 +99,11 @@ export const DataGridLayout = ({
   noResultsCondition = false,
   isCellClickable = true,
   isWidget = false,
+  headerHeight,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const rowClassNames: any[string] = [];
   rows.forEach((item) => {
@@ -160,7 +165,7 @@ export const DataGridLayout = ({
           NoRowsOverlay: noRowsOverlay,
         }}
         loading={loading}
-        headerHeight={50}
+        headerHeight={headerHeight || 50}
         rows={rows}
         columns={columns}
         isRowSelectable={isRowSelectable}
@@ -183,6 +188,8 @@ export const DataGridLayout = ({
             : ''
         }
         sx={{
+          ...olStyles.scrollbar,
+
           width: '100%',
           my: '0.5em',
           borderLeft: 'none',
@@ -190,6 +197,11 @@ export const DataGridLayout = ({
           borderTop: 'none',
           borderBottom: '2px solid',
           borderColor: 'background.default',
+          '& .MuiDataGrid-virtualScroller': {
+            '&:hover': {
+              ...olStyles.verticlaScrollBar,
+            },
+          },
           '& .MuiDataGrid-row': {
             background: 'white',
             cursor: 'pointer',
@@ -199,7 +211,7 @@ export const DataGridLayout = ({
             borderBottom: '2px solid',
             borderColor: 'background.default',
             ...(isWidget && {
-              border: '1px solid #8F9BB380',
+              border: `1px solid ${theme.palette.text.disabled}`,
               borderRadius: '4px',
             }),
           },
@@ -270,6 +282,7 @@ export const DataGridLayout = ({
           },
           ...rowClassNames,
           ...containerStyle,
+
           ...rest,
         }}
       />
