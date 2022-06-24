@@ -5,6 +5,7 @@ import {twentyFourHourTime} from 'utils/utils';
 import Box from '@mui/material/Box';
 import * as _ from 'lodash';
 import Typography from '@mui/material/Typography';
+import {Divider} from '@mui/material';
 import {
   addDays,
   eachDayOfInterval,
@@ -255,6 +256,19 @@ export const Schedule = ({
       ) : null}
 
       <Box ref={elementRef} sx={sx.mainContainer}>
+        <Divider
+          absolute
+          sx={[
+            sx.divider,
+            {
+              marginLeft: `${
+                gridWidth *
+                (new Date().getHours() + new Date().getMinutes() / 60)
+              }px`,
+            },
+          ]}
+          orientation="vertical"
+        />
         <CardContent sx={{padding: 0, width: '100%'}}>
           <ScheduleContainer>
             <ScheduleHeader>
