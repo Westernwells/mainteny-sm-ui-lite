@@ -97,7 +97,7 @@ export const makeRows = (elevators: ElevatorView[]): GridRowsProp => {
     elevators.length &&
     elevators.map((elevator: ElevatorView) => ({
       id: elevator.id,
-      number: elevator.number,
+      number: elevator.externalId,
       model: elevator.model,
       customer: elevator.propertyOwner.name,
       lastVisit: formatDate(elevator.lastVisitDate),

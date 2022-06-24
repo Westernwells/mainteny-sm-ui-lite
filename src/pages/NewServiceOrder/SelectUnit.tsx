@@ -47,8 +47,10 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
   totalUnitsRef.current = totalUnitsRef.current || elevatorResponse.total;
 
   useEffect(() => {
-    setRows(makeRows(elevatorResponse.data));
-  }, [elevatorResponse]);
+    if (!isLoading) {
+      setRows(makeRows(elevatorResponse.data));
+    }
+  }, [elevatorResponse, isLoading]);
 
   useEffect(() => {
     setPageCount(Math.ceil(elevatorResponse.total / page.pageSize));
