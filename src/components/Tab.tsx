@@ -58,131 +58,136 @@ export const Tabs = ({
   actionBtnVariant,
 }: Props) => {
   const theme = useTheme();
-  const {t} = useTranslation();
 
-  const renderActionButtons = () => (
-    <Box
-      sx={{
-        display: showActionBtn || showMenuActionBtn || menu ? 'flex' : 'none',
-        justifyContent: 'space-between',
-        height: '2.5rem',
-        // mb: '0.5em'
-      }}>
-      {showActionBtn ? (
-        <Button
-          label="Filter"
-          buttonProps={{
-            onClick: () => (btnOnClick ? btnOnClick() : () => {}),
-            sx: {
+  const renderActionButtons = () => {
+    const {t} = useTranslation();
+    return (
+      <Box
+        sx={{
+          display: showActionBtn || showMenuActionBtn || menu ? 'flex' : 'none',
+          justifyContent: 'space-between',
+          height: '2.5rem',
+          // mb: '0.5em'
+        }}>
+        {showActionBtn ? (
+          <Button
+            label="Filter"
+            buttonProps={{
+              onClick: () => (btnOnClick ? btnOnClick() : () => {}),
+              sx: {
+                textTransform: 'capitalize',
+                ml: '0.8em',
+                height: '100%',
+              },
+              variant: actionBtnVariant || 'contained',
+              color: 'primary',
+              size: 'small',
+              startIcon: actionButtonIcon || <AddIcon />,
+            }}>
+            <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
+              {t(btnLabel)}
+            </Typography>
+          </Button>
+        ) : null}
+
+        {showMenuActionBtn && menu ? (
+          <MenuBtn
+            startIcon={actionButtonIcon || <AddIcon />}
+            label={btnLabel}
+            menu={menu}
+            size="medium"
+            color="primary"
+            sx={{
               textTransform: 'capitalize',
               ml: '0.8em',
+              py: '0.7em',
               height: '100%',
-            },
-            variant: actionBtnVariant || 'contained',
-            color: 'primary',
-            size: 'small',
-            startIcon: actionButtonIcon || <AddIcon />,
-          }}>
-          <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
-            {t(btnLabel)}
-          </Typography>
-        </Button>
-      ) : null}
+            }}
+            variant={actionBtnVariant || 'contained'}
+            disableRipple
+            disableFocusRipple
+          />
+        ) : null}
+      </Box>
+    );
+  };
 
-      {showMenuActionBtn && menu ? (
-        <MenuBtn
-          startIcon={actionButtonIcon || <AddIcon />}
-          label={btnLabel}
-          menu={menu}
-          size="medium"
-          color="primary"
-          sx={{
-            textTransform: 'capitalize',
-            ml: '0.8em',
-            py: '0.7em',
-            height: '100%',
-          }}
-          variant={actionBtnVariant || 'contained'}
-          disableRipple
-          disableFocusRipple
-        />
-      ) : null}
-    </Box>
-  );
-
-  const renderTabItems = () => (
-    <MuiTabs
-      sx={{
-        flexGrow: 1,
-        '& .MuiTabs-indicator': {
-          display: 'flex',
-          justifyContent: 'center',
-          backgroundColor: 'transparent',
-        },
-        ...tabStyle,
-      }}
-      value={currentIndex}
-      onChange={(e: any, newValue: number) => {
-        if (onChange) {
-          onChange(newValue);
-        }
-      }}
-      textColor="secondary">
-      {tabItems.map((item, index) => (
-        <Tab
-          key={`${item.label}`}
-          disableRipple
-          label={
-            <Box
-              display="flex"
-              className="item-label"
-              sx={{
-                position: 'relative',
-                alignItems: 'center',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  backgroundColor: 'transparent',
-                  borderRadius: '3px',
-                  width: '124px',
-                  height: '3px',
-                  bottom: '0',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                },
-              }}>
-              <Box className="item-icon">{item.icon}</Box>
-              <Typography mb={1} sx={{ml: 1}} variant="subtitle1">
-                {t(item.label)}
-              </Typography>
-            </Box>
+  const renderTabItems = () => {
+    const {t} = useTranslation();
+    return (
+      <MuiTabs
+        sx={{
+          flexGrow: 1,
+          '& .MuiTabs-indicator': {
+            display: 'flex',
+            justifyContent: 'center',
+            backgroundColor: 'transparent',
+          },
+          ...tabStyle,
+        }}
+        value={currentIndex}
+        onChange={(e: any, newValue: number) => {
+          if (onChange) {
+            onChange(newValue);
           }
-          sx={{
-            height: 30,
-            textTransform: 'capitalize',
-            '&.MuiTab-root': {
-              pl: 0,
-            },
-            '&.MuiTab-textColorPrimary': {
-              color: theme.palette.primary.main,
-            },
-            '&.Mui-selected': {
-              color: theme.palette.primary.main,
-              '& .item-label': {
-                '&::before': {
-                  backgroundColor: theme.palette.primary.main,
-                },
-                '& .item-icon': {
-                  color: theme.palette.secondary.main,
+        }}
+        textColor="secondary">
+        {tabItems.map((item, index) => (
+          <Tab
+            key={`${item.label}`}
+            disableRipple
+            label={
+              <Box
+                display="flex"
+                className="item-label"
+                sx={{
+                  position: 'relative',
+                  alignItems: 'center',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    backgroundColor: 'transparent',
+                    borderRadius: '3px',
+                    width: '124px',
+                    height: '3px',
+                    bottom: '0',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                  },
+                }}>
+                <Box className="item-icon">{item.icon}</Box>
+                <Typography mb={1} sx={{ml: 1}} variant="subtitle1">
+                  {t(item.label)}
+                </Typography>
+              </Box>
+            }
+            sx={{
+              height: 30,
+              textTransform: 'capitalize',
+              '&.MuiTab-root': {
+                pl: 0,
+              },
+              '&.MuiTab-textColorPrimary': {
+                color: theme.palette.primary.main,
+              },
+              '&.Mui-selected': {
+                color: theme.palette.primary.main,
+                '& .item-label': {
+                  '&::before': {
+                    backgroundColor: theme.palette.primary.main,
+                  },
+                  '& .item-icon': {
+                    color: theme.palette.secondary.main,
+                  },
                 },
               },
-            },
-          }}
-          {...a11yProps(index)}
-        />
-      ))}
-    </MuiTabs>
-  );
+            }}
+            {...a11yProps(index)}
+          />
+        ))}
+      </MuiTabs>
+    );
+  };
 
   return (
     <Box

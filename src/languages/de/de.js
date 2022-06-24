@@ -204,6 +204,20 @@ module.exports = {
     'Search order type, customer, address etc.':
       'Suche nach Auftragsart, Kunde, Adresse usw.',
     'Unassigned Orders': 'Nicht zugewiesene Aufträge',
+
+    // Service Orders
+    // 'Order types': 'Auftragsarten',
+    // 'Clear all': 'Alle löschen',
+    // NUMBER: 'NUMMER',
+    // ADDRESS: 'ADRESSE',
+    // 'UNIT NUMBER': 'ANLAGENNUMMER',
+    // Unscheduled: 'Ungeplant',
+    // Completed: 'Abgeschlossen',
+    // Expired: 'Abgelaufen',
+    // Repair: 'Reparatur',
+    // Emergency: 'Personeneinschluss',
+    // Callout: 'Störung',
+    // Pending: 'Ausstehend',
   },
 };
 

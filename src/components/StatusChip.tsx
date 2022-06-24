@@ -45,7 +45,6 @@ export const StatusChip = ({
   length = 'auto',
 }: Props) => {
   const {t} = useTranslation();
-
   return (
     <Chip
       sx={{

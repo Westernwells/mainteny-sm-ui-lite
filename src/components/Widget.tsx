@@ -34,7 +34,6 @@ export const Widget = ({
   filterItems,
 }: Props) => {
   const {t} = useTranslation();
-
   return (
     <Box
       display="flex"
@@ -73,7 +72,7 @@ export const Widget = ({
               startIcon: <AddIcon />,
             }}>
             <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
-              {t(btnLabel)}
+              {btnLabel}
             </Typography>
           </Button>
         ) : null}
