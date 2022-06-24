@@ -64,8 +64,7 @@ export const columns = (
   },
   {
     field: 'actions',
-    headerName: 'EXPIRY DATE',
-    type: 'number',
+    headerName: 'Actions',
     ...defaultAlignment,
     ...defaultProps,
     renderCell: (params) => (
