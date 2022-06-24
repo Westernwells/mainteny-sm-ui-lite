@@ -1,7 +1,7 @@
 import {ReactNode, useEffect, useRef, useState} from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import {eachHourOfIntervalInRange} from 'utils/utils';
+import {twentyFourHourTime} from 'utils/utils';
 import Box from '@mui/material/Box';
 import * as _ from 'lodash';
 import Typography from '@mui/material/Typography';
@@ -62,7 +62,7 @@ interface Props {
   checkedValues?: string[];
 }
 
-const gridWidth = 207;
+const gridWidth = 200;
 const dateFormat = 'dd MMMM yy';
 
 export const Schedule = ({
@@ -146,16 +146,14 @@ export const Schedule = ({
   }, [technicians]);
 
   useEffect(() => {
-    const now = new Date();
-    const fourHourTime = eachHourOfIntervalInRange({start: now, end: 3});
     if (scheduleType === 'date') {
       const weekBegins = formatDate(weekPair.startOfWeekDay, 'dd MMM');
       const weekEnds = formatDate(weekPair.endOfWeekDay, 'dd MMM');
-      setTableHeader([`${weekBegins} - ${weekEnds}`, ...fourHourTime]);
+      setTableHeader([`${weekBegins} - ${weekEnds}`, ...twentyFourHourTime]);
     } else if (scheduleType === 'people') {
-      setTableHeader([searchPlaceholder, ...fourHourTime]);
+      setTableHeader([searchPlaceholder, ...twentyFourHourTime]);
     } else {
-      setTableHeader([defaultTypeLabel, ...fourHourTime]);
+      setTableHeader([defaultTypeLabel, ...twentyFourHourTime]);
     }
   }, [weekInterval, searchPlaceholder, scheduleType]);
 

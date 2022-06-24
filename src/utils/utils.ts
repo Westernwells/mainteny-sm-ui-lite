@@ -1,5 +1,3 @@
-import {addHours, eachHourOfInterval, format} from 'date-fns';
-
 export const capitalize = (role: any[]) => {
   let roles = '';
   role.forEach((value: string, index: number) => {
@@ -82,20 +80,6 @@ export const twentyFourHourTime = [
   '22:00',
   '23:00',
 ];
-
-export const eachHourOfIntervalInRange = ({
-  start,
-  end,
-}: {
-  start: Date;
-  end: number;
-}): string[] =>
-  eachHourOfInterval(
-    {start, end: addHours(start, end)},
-    {
-      step: 1,
-    },
-  ).map((x) => format(x, 'HH:mm'));
 
 export const daysTime: {[key: number]: string[]}[] = [
   {0: twentyFourHourTime},
