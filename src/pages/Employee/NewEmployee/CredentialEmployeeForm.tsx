@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {t} from 'i18next';
+import {useTranslation} from 'react-i18next';
 import {Box} from '@mui/system';
 import Grid from '@mui/material/Grid';
 import {FormikErrors, useFormik} from 'formik';
@@ -23,6 +23,7 @@ export const CredentialEmployeeForm = ({
   getCredentialEmployeeFormValues,
   initialValues,
 }: Props) => {
+  const {t} = useTranslation();
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 
   const validationSchema = Yup.object().shape({

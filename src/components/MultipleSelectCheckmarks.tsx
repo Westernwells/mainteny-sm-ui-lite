@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {t} from 'i18next';
+import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
@@ -40,7 +40,9 @@ export const MultipleSelectCheckmarks = ({
   formControlStyles,
   initialSelectedItems = [],
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
+
   const [selectedItems, setSelectedItems] =
     React.useState<string[]>(initialSelectedItems);
   const visibility = selectedItems.length

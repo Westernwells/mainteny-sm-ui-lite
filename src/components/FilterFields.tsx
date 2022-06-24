@@ -1,5 +1,5 @@
 import React, {ReactNode} from 'react';
-import {t} from 'i18next';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import {Typography} from '@mui/material';
 import useTheme from '@mui/material/styles/useTheme';
@@ -21,6 +21,7 @@ export const FilterFields = ({
   showFilter = true,
   onClear,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
 
   return showFilter ? (

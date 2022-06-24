@@ -1,4 +1,4 @@
-import {t} from 'i18next';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
@@ -55,11 +55,14 @@ export const getColumnProps = ({
   headerName,
   type = 'string',
   cellClassName = 'nowrap',
-  renderHeader = (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {t(params.colDef.headerName!.toUpperCase())}
-    </Typography>
-  ),
+  renderHeader = (params: GridColumnHeaderParams) => {
+    const {t} = useTranslation();
+    return (
+      <Typography variant="subtitle2" color="textSecondary">
+        {t(params.colDef.headerName!.toUpperCase())}
+      </Typography>
+    );
+  },
   renderCell = (params: GridRenderCellParams<any, any, any>) => (
     <Typography variant="body2">{params.value || '-'}</Typography>
   ),

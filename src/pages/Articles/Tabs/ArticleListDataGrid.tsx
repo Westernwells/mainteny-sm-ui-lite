@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {t} from 'i18next';
+import {useTranslation} from 'react-i18next';
 import {
   GridAlignment,
   GridColDef,
@@ -27,11 +27,15 @@ import {convertToText} from '../../../utils/utils';
 
 const defaultProps = {
   editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName && t(params.colDef.headerName)}
-    </Typography>
-  ),
+  renderHeader: (params: GridColumnHeaderParams) => {
+    const {t} = useTranslation();
+
+    return (
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName && t(params.colDef.headerName)}
+      </Typography>
+    );
+  },
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
     <Typography variant="body2" mx="0.5em">
       {params.value || '-'}
@@ -119,11 +123,15 @@ export const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'center',
     editable: false,
-    renderHeader: (params: GridColumnHeaderParams) => (
-      <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName && t(params.colDef.headerName)}
-      </Typography>
-    ),
+    renderHeader: (params: GridColumnHeaderParams) => {
+      const {t} = useTranslation();
+
+      return (
+        <Typography variant="subtitle2" color="textSecondary">
+          {params.colDef.headerName && t(params.colDef.headerName)}
+        </Typography>
+      );
+    },
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
         label={params.value}

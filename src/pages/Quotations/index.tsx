@@ -1,4 +1,3 @@
-import {t} from 'i18next';
 import {useEffect, useRef, useState} from 'react';
 import {useNavigate} from 'react-router';
 import {useSearchParams} from 'react-router-dom';
@@ -111,7 +110,7 @@ export const Quotations = () => {
     <FilterFields onClear={() => setStatus([])}>
       <MultipleSelectCheckmarks
         label="Status"
-        options={['Sent', 'Draft'].map((i) => t(i))}
+        options={['Sent', 'Draft']}
         initialSelectedItems={status}
         getSelectedValue={(item) => setStatus(item)}
         multiple={false}

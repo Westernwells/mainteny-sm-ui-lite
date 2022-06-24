@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {t} from 'i18next';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {InfoCard} from 'components/InfoCard';
@@ -51,6 +51,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   // const [orderInfo, setOrderInfo] = useState(
   //   orderInfoSchema(serviceOrderDetails),
   // );
+  const {t} = useTranslation();
   const {mutate: cancelServiceOrder} = useCancelServiceOrders();
   const {mutate: unscheduleServiceOrder} = useUnscheduleServiceOrders();
   const {mutate: rescheduleServiceOrder} = useRedispatchServiceOrders(

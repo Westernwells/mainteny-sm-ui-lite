@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {t} from 'i18next';
+import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import ArrowBack from '@mui/icons-material/ArrowBack';
@@ -47,6 +47,7 @@ export const PasswordReset = ({
   email,
   loading,
 }: Props) => {
+  const {t} = useTranslation();
   const navigate = useNavigate();
 
   const [reEnterPassword, setReEnterPassword] = useState(false);

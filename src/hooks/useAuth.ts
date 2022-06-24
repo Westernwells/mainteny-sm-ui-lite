@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {t} from 'i18next';
+import {useTranslation} from 'react-i18next';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {axiosClient} from 'utils/axios-utils';
 import {useSnackbar} from 'notistack';
@@ -23,6 +23,7 @@ interface Location {
 }
 
 export const useAuth = (): UseAuth => {
+  const {t} = useTranslation();
   const {clearUser, updateUser} = useUserSession();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
