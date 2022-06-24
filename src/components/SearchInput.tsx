@@ -3,6 +3,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import * as _ from 'lodash';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   placeholder?: string;
@@ -24,6 +25,7 @@ export const SearchInput = ({
     [],
   );
 
+  const {t} = useTranslation();
   return (
     <TextField
       size="small"
@@ -47,7 +49,7 @@ export const SearchInput = ({
         },
         ...containerStyle,
       }}
-      placeholder={placeholder && placeholder}
+      placeholder={placeholder && t(placeholder)}
       onChange={debouncedChangeHandler}
       InputProps={{
         endAdornment: (
