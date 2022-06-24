@@ -58,7 +58,8 @@ export const Articles = ({
     }
   }, [isLoading]);
 
-  const getArticleUpdateBody = () => serviceOrderArticles?.map((item) => ({
+  const getArticleUpdateBody = () =>
+    serviceOrderArticles?.map((item) => ({
       articleId: item.article.id,
       description: item.article.description,
       name: item.article.name,
