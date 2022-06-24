@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Theme, CSSObject} from '@mui/material/styles';
 import styled from '@mui/material/styles/styled';
 import Box from '@mui/material/Box';
@@ -69,6 +70,7 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 export const AppDrawer = () => {
+  const {t} = useTranslation();
   const [open, setOpen] = useState(false);
   const themeX = useTheme();
   const setSelectedIndex = useState(0)[1];
@@ -295,7 +297,7 @@ export const AppDrawer = () => {
               <ListItemText
                 primary={
                   <Fade in={open}>
-                    <Typography variant="subtitle1">{text}</Typography>
+                    <Typography variant="subtitle1">{t(text)}</Typography>
                   </Fade>
                 }
               />

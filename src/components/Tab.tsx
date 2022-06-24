@@ -1,4 +1,5 @@
 import {ReactNode} from 'react';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import MuiTabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -57,6 +58,7 @@ export const Tabs = ({
   actionBtnVariant,
 }: Props) => {
   const theme = useTheme();
+  const {t} = useTranslation();
 
   const renderActionButtons = () => (
     <Box
@@ -82,7 +84,7 @@ export const Tabs = ({
             startIcon: actionButtonIcon || <AddIcon />,
           }}>
           <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
-            {btnLabel}
+            {t(btnLabel)}
           </Typography>
         </Button>
       ) : null}
@@ -151,7 +153,7 @@ export const Tabs = ({
               }}>
               <Box className="item-icon">{item.icon}</Box>
               <Typography mb={1} sx={{ml: 1}} variant="subtitle1">
-                {item.label}
+                {t(item.label)}
               </Typography>
             </Box>
           }

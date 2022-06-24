@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import i18n from 'i18n';
-import {useTranslation} from 'react-i18next';
 import {useQueryClient} from 'react-query';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
+import {t} from 'i18next';
 import Box from '@mui/material/Box';
 import Language from '@mui/icons-material/Language';
 import {axiosClient} from 'utils/axios-utils';
@@ -28,7 +28,6 @@ const useStyles = makeStyles({
 
 export const AuthLayout = ({children}: Props) => {
   const classes = useStyles();
-  const {t} = useTranslation();
   const queryClient = useQueryClient();
   const [selectedLng, setSelectedLng] = useState('');
   useEffect(() => {

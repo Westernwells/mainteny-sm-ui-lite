@@ -156,7 +156,7 @@ export const UnitListingView = () => {
   const renderWidget = () => (
     <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
       <Widget
-        searchPlaceholder="Search order type, customer, address etc."
+        searchPlaceholder="Search by number, model, customer, address etc."
         getSearchValue={(val) => setSearch(val)}
         filterItems={renderFilterItems()}
       />

@@ -1,4 +1,5 @@
 import {ReactNode} from 'react';
+import {t} from 'i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/Add';
@@ -37,7 +38,7 @@ export const Widget = ({
       <Box sx={{mr: '1em'}}>
         <SearchInput
           containerStyle={{height: '100%'}}
-          placeholder={searchPlaceholder}
+          placeholder={searchPlaceholder && t(searchPlaceholder)}
           onValueChanged={(value: string) =>
             getSearchValue && getSearchValue(value)
           }
@@ -67,7 +68,7 @@ export const Widget = ({
             startIcon: <AddIcon />,
           }}>
           <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
-            {btnLabel}
+            {t(btnLabel)}
           </Typography>
         </Button>
       ) : null}

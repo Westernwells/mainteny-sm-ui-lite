@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {t} from 'i18next';
 import {
   GridAlignment,
   GridColDef,
@@ -28,7 +29,7 @@ const defaultProps = {
   editable: false,
   renderHeader: (params: GridColumnHeaderParams) => (
     <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
+      {params.colDef.headerName && t(params.colDef.headerName)}
     </Typography>
   ),
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
@@ -120,7 +121,7 @@ export const columns: GridColDef[] = [
     editable: false,
     renderHeader: (params: GridColumnHeaderParams) => (
       <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName}
+        {params.colDef.headerName && t(params.colDef.headerName)}
       </Typography>
     ),
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
@@ -238,7 +239,7 @@ export const ArticleListDataGrid = () => {
     <PageListingLayout
       renderWidget={
         <Widget
-          searchPlaceholder="Search by number, name, manufacturer etc."
+          searchPlaceholder="Search by name, category, manufacturer etc."
           getSearchValue={setQuery}
           filterItems={
             <FilterFields>

@@ -120,32 +120,22 @@ export const Contracts = () => {
       }}>
       <MultipleSelectCheckmarks
         label="Expiry Date"
-        options={[
-          'Last 14 days', // TODO: Create an enum to handle this
-          'Today',
-          'Next 7 days',
-          'Next 14 days',
-        ]}
+        options={['Last 14 days', 'Today', 'Next 7 days', 'Next 14 days']}
         initialSelectedItems={expiryDate}
         getSelectedValue={(item) => setExpiryDate(item)}
         multiple={false}
       />
 
       <MultipleSelectCheckmarks
-        label="Contractor"
+        label={'Contractor'}
         options={contractorFilterItems}
         initialSelectedItems={contractor}
         getSelectedValue={(item) => setContractor(item)}
       />
 
       <MultipleSelectCheckmarks
-        label="Cost/year"
-        options={[
-          'Below 1000 €',
-          '1000 - 3000 €',
-          '3000 - 5000 €',
-          'Above 5000 €',
-        ]}
+        label={'Cost/Year'}
+        options={['Below 1000€', '1000 - 3000€', '3000 - 5000€', 'Above 5000€']}
         initialSelectedItems={cost}
         getSelectedValue={(item) => costRangeConvertor(item)}
         multiple={false}

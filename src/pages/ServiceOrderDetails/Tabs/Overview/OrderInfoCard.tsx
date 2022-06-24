@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {t} from 'i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {InfoCard} from 'components/InfoCard';
@@ -18,7 +19,6 @@ import {
   ServiceOrderStatus,
   ServiceOrderView,
 } from 'models/service-order';
-import {useTranslation} from 'react-i18next';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {formatDate, setDateTime} from 'utils/datetime';
 import {ScheduleForm} from 'pages/ServiceOrderDetails/models';
@@ -66,7 +66,6 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const [form, setForm] = useState<ScheduleForm>({} as ScheduleForm);
   const [formError, setFormErrors] = useState<FormikErrors<ScheduleForm>>();
   const [formValid, setFormValid] = useState(false);
-  const {t} = useTranslation();
 
   useEffect(() => {
     if (

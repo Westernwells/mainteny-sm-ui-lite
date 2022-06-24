@@ -1,4 +1,5 @@
 import React from 'react';
+import {t} from 'i18next';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import EmailIcon from '@mui/icons-material/Email';
@@ -9,7 +10,6 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import {useNavigate} from 'react-router-dom';
-import {useTranslation} from 'react-i18next';
 import {AuthLayout} from 'components/AuthLayout';
 
 interface Props {
@@ -32,7 +32,7 @@ export const PasswordRequest = ({
   loading,
 }: Props) => {
   const navigate = useNavigate();
-  const {t} = useTranslation();
+
   return (
     <AuthLayout>
       <Typography variant="h5" mt={7} textAlign="center">
