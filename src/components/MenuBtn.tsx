@@ -1,5 +1,5 @@
-import Box from '@mui/material/Box';
 import {useTranslation} from 'react-i18next';
+import Box from '@mui/material/Box';
 import Button, {ButtonProps} from '@mui/material/Button';
 import Menu, {MenuProps} from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -29,6 +29,7 @@ export const MenuBtn = ({
   disableIcon,
   ...rest
 }: Props) => {
+  const {t} = useTranslation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -38,7 +39,6 @@ export const MenuBtn = ({
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const {t} = useTranslation();
 
   return (
     <Box>
