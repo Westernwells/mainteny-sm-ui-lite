@@ -3,7 +3,6 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import GradingIcon from '@mui/icons-material/Grading';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
-import ListAltIcon from '@mui/icons-material/ListAlt';
 import {useParams} from 'react-router';
 import {Overview} from './Tabs/Overview';
 import {WorkReport} from './Tabs/WorkReport';
@@ -16,10 +15,6 @@ const tabItems = [
   {
     label: 'Work report',
     icon: <GradingIcon />,
-  },
-  {
-    label: 'Invoices',
-    icon: <ListAltIcon />,
   },
 ];
 
@@ -38,7 +33,7 @@ export const ServiceOrderDetails = () => {
         <Overview orderId={serviceOrderId} />
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
-        <WorkReport serviceOrderId={serviceOrderId} />
+        <WorkReport />
       </TabsBody>
     </Tabs>
   );
