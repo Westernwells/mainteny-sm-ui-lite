@@ -13,7 +13,7 @@ import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {ArticleView} from 'models/article';
-import {formatCurrency} from 'utils/currency';
+import {formatCurrency, formatToDp} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {NoRowsEmptySection} from 'pages/QuotationDetails/DataGrid/NoRowsEmptySection';
 
@@ -100,15 +100,19 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
   articles
     ? articles.map((item, index) => ({
         id: index,
-        number: item.number,
+        number: item.externalId,
         type: item.type,
         model: item.model,
         manufacturer: item.manufacturer,
         description: item.description,
         price: `${formatCurrency(
           item
-            ? item.unitSellingAmount.netAmount /
-                10 ** item.unitSellingAmount.fractionDigits!
+            ? Number(
+                formatToDp(
+                  item?.unitSellingAmount.netAmount!,
+                  item.unitSellingAmount.fractionDigits!,
+                ),
+              )
             : 0,
           {
             currency: item.unitSellingAmount.currency,
