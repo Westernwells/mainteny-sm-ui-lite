@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Button, {ButtonProps} from '@mui/material/Button';
 import Menu, {MenuProps} from '@mui/material/Menu';
@@ -28,6 +29,7 @@ export const MenuBtn = ({
   disableIcon,
   ...rest
 }: Props) => {
+  const {t} = useTranslation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -46,7 +48,7 @@ export const MenuBtn = ({
           endIcon={endIcon}
           onClick={handleClick}
           {...rest}>
-          {label}
+          {typeof label === 'string' ? t(label) : label}
         </Button>
       ) : (
         <IconButton
@@ -69,7 +71,7 @@ export const MenuBtn = ({
         {...menuProps}>
         {menu.map((item, index) => (
           <MenuItem key={index} onClick={item.action}>
-            {item.label}
+            {t(item.label)}
           </MenuItem>
         ))}
       </Menu>

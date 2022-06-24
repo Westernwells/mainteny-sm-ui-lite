@@ -23,7 +23,6 @@ export const FilterFields = ({
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
-
   return showFilter ? (
     <Box display="flex" sx={{...containerStyle}}>
       <Box display="flex" sx={{...wrapperStyle}}>
