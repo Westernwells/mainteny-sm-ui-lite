@@ -1,5 +1,9 @@
 import {differenceInMinutes} from 'date-fns';
-import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
+import {
+  ServiceOrderStatus,
+  ServiceOrderType,
+  ServiceOrderView,
+} from 'models/service-order';
 import {toDate} from './datetime';
 
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
@@ -61,4 +65,34 @@ export const sortOrderByTime = (serviceOrder: ServiceOrderView[]) => {
     ),
   );
   return res;
+};
+
+export const serviceOrderTypeToString = (type: ServiceOrderType | string) => {
+  switch (type) {
+    case ServiceOrderType.REGULAR:
+      return 'Maintenance';
+    case ServiceOrderType.EMERGENCY:
+      return 'Emergency';
+    case ServiceOrderType.CALLOUT:
+      return 'Callout';
+    case ServiceOrderType.REPAIR:
+      return 'Repair';
+    default:
+      return '-';
+  }
+};
+
+export const serviceOrderTypeToEnum = (type: string) => {
+  switch (type) {
+    case 'Maintenance':
+      return ServiceOrderType.REGULAR;
+    case 'Emergency':
+      return ServiceOrderType.EMERGENCY;
+    case 'Callout':
+      return ServiceOrderType.CALLOUT;
+    case 'Repair':
+      return ServiceOrderType.REPAIR;
+    default:
+      return ServiceOrderType.REPAIR;
+  }
 };

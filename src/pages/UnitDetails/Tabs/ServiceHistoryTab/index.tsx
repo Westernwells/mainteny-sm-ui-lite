@@ -15,8 +15,11 @@ import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {DataGridLayout} from 'components/DataGridLayout';
-import {convertToMacro, convertToText} from 'utils/utils';
-import {serviceOrderStatusToString} from 'utils/service-order-utils';
+import {
+  serviceOrderStatusToString,
+  serviceOrderTypeToEnum,
+  serviceOrderTypeToString,
+} from 'utils/service-order-utils';
 import {columns, makeRows} from './ServiceHistoryDataGridProps';
 
 const pageSize = 25;
@@ -77,11 +80,11 @@ export const ServiceHistoryTab = () => {
     <FilterFields>
       <MultipleSelectCheckmarks
         label="Order Type"
-        options={Object.values(ServiceOrderType).map((item) =>
-          convertToText(item),
+        options={Object.keys(ServiceOrderType).map((item) =>
+          serviceOrderTypeToString(item),
         )}
         getSelectedValue={(item) =>
-          setTypes(item.map((i) => convertToMacro(i) as ServiceOrderType))
+          setTypes(item.map((i) => serviceOrderTypeToEnum(i)))
         }
       />
       <MultipleSelectCheckmarks

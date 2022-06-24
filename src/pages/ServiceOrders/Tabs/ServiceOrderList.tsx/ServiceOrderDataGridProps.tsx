@@ -1,8 +1,6 @@
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import {ServiceOrderView} from 'models/service-order';
-import {convertToText} from 'utils/utils';
 import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
@@ -11,6 +9,7 @@ import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {StatusChip} from 'components/StatusChip';
 import {getColumnProps} from 'components/DataGridLayout';
 import {olStyles} from 'styles';
+import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -53,9 +52,11 @@ export const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <Box sx={{display: 'flex'}}>
         <ServiceOrderIcons serviceOrderType={params.value} size="small" />
-        <Typography variant="body2" mx="0.5em">
-          {convertToText(params.value)}
-        </Typography>
+        <ServiceOrderTypeText
+          serviceOrderType={params.value}
+          capitalizeText
+          variant="body2"
+        />
       </Box>
     ),
   }),
