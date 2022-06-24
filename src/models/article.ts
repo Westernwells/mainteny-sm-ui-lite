@@ -38,7 +38,6 @@ export interface ArticleView {
   model: string;
   name: string;
   number: string;
-  externalId: string;
   search: string;
   serviceCompanyId: string;
   stock: Stock;

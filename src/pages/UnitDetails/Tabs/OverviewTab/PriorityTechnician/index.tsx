@@ -164,7 +164,7 @@ export const PriorityTechnician = ({
           height={getDataGridHeight(rows.length, showAll ? rows.length : 3)}
           hideFooter
           rows={rows}
-          showHeaderFullBorder
+          isWidget
           headerHeight={30}
           columns={useCallback(
             () => columns(getEditableTechnician, getDeletableTechnician),
