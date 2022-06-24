@@ -90,12 +90,6 @@ module.exports = {
     'CONTRACT TYPE': 'VERTRAGSTYP',
     'START DATE': 'ANFANGSDATUM',
     'NO. OF UNITS': 'ANZAHL ANLAGEN',
-    NUMBER: 'NUMMER',
-    'No contracts have been created yet. Please click the button below to create one!':
-      'Es sind noch keine Verträge erstellt worden. Bitte klicken Sie auf die folgende Schaltfläche, um einen Vertrag zu erstellen!',
-    'Add Contract': 'Vertrag hinzufügen',
-    'Search by number, customer, contract type etc.':
-      'Suche nach Nummer, Kunde, Vertragsart usw.',
 
     // Units
     Units: 'Anlagen',
@@ -200,12 +194,32 @@ module.exports = {
     'UNIT NUMBER': 'ANLAGENNUMMER',
     Unscheduled: 'Ungeplant',
     Completed: 'Abgeschlossen',
-
-    // Service Orders
     Pending: 'Ausstehend',
     'Search order type, customer, address etc.':
       'Suche nach Auftragsart, Kunde, Adresse usw.',
     'Unassigned Orders': 'Nicht zugewiesene Aufträge',
+    Cancelled: 'Abgesagt',
+    Regular: 'Regulär',
+    Yesterday: 'Gestern',
+    Tomorrow: 'Morgen',
+    'Assign Technician': 'Techniker zuweisen',
+    'Ready to schedule': 'Bereit zur Zuweisung',
+    Scheduling: 'Terminplanung',
+    Init: 'Begonnen',
+    'Search Unassigned Orders': 'Suche nach nicht zugewiesenen Aufträgen',
+    'Due in': 'Fällig in',
+    'Show Unassigned Orders': 'Nicht zugewiesene Aufträge anzeigen',
+    'Search technician': 'Techniker suchen',
+    'Service Orders': 'Aufträge',
+    'New Order': 'Neuer Auftrag',
+    Ongoing: 'Läuft',
+    All: 'Alle',
+    NUMBER: 'NUMMER',
+    'No contracts have been created yet. Please click the button below to create one!':
+      'Es sind noch keine Verträge erstellt worden. Bitte klicken Sie auf die folgende Schaltfläche, um einen Vertrag zu erstellen!',
+    'Add Contract': 'Vertrag hinzufügen',
+    'Search by number, customer, contract type etc.':
+      'Suche nach Nummer, Kunde, Vertragsart usw.',
   },
 };
 

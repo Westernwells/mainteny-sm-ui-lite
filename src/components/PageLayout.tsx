@@ -24,7 +24,6 @@ export const PageLayout = ({
   backBtnLabel,
 }: Props) => {
   const {t} = useTranslation();
-
   return (
     <Box
       sx={{
