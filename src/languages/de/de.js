@@ -200,6 +200,7 @@ module.exports = {
     'Unassigned Orders': 'Nicht zugewiesene Aufträge',
     Cancelled: 'Abgesagt',
     Regular: 'Regulär',
+    REGULAR: 'REGULÄR',
     Yesterday: 'Gestern',
     Tomorrow: 'Morgen',
     'Assign Technician': 'Techniker zuweisen',
@@ -221,6 +222,11 @@ module.exports = {
     'Search by number, customer, contract type etc.':
       'Suche nach Nummer, Kunde, Vertragsart usw.',
     List: 'Aufführen',
+    'about {{hours}} hours': 'ungefähr {{hours}} Stunden',
+    'about {{hours}} month': 'ungefähr {{hours}} monate',
+    '{{time}} days': '{{time}} tage',
+    '{{time}} months': '{{time}} monate',
+    '{{time}} years': '{{time}} jahre',
   },
 };
 

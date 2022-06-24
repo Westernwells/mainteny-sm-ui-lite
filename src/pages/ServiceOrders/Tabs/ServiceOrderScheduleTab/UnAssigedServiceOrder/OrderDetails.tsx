@@ -6,6 +6,7 @@ import {Button} from 'components/Button';
 import {formatDistance} from 'date-fns';
 import Divider from '@mui/material/Divider';
 import {useTranslation} from 'react-i18next';
+import {serviceOrderTypeToString} from 'utils/service-order-utils';
 
 interface Props extends BoxProps {
   serviceOrder: ServiceOrderView;
@@ -13,6 +14,24 @@ interface Props extends BoxProps {
 
 export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
   const {t} = useTranslation();
+  const formatDate = (date: string | number | Date) => {
+    const formattedDate: string = formatDistance(new Date(date), new Date());
+
+    const splitDate: string[] = formattedDate.split(' ');
+
+    if (splitDate[0] === 'about') {
+      const finalDate: string = t(`${splitDate[0]} {{hours}} ${splitDate[2]}`, {
+        hours: splitDate[1],
+      });
+      return finalDate;
+    }
+
+    const finalDate: string = t(`{{time}} ${splitDate[1]}`, {
+      time: splitDate[0],
+    });
+    return finalDate;
+  };
+
   return (
     <Box sx={{mt: '0.5em', px: '0.5em'}} {...rest}>
       <Box
@@ -33,12 +52,12 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
                 : 'primary'
             }
             sx={{textTransform: 'capitalize', ml: '0.5em'}}>
-            {t(serviceOrder.type)}
+            {t(serviceOrderTypeToString(serviceOrder.type))}
           </Typography>
         </Box>
         <Typography variant="caption">
-          {t('Due in')}{' '}
-          {formatDistance(new Date(serviceOrder.dueDate), new Date())}
+          {t('Due in')} {formatDate(serviceOrder.dueDate)}
+          {/* {formatDistance(new Date(serviceOrder.dueDate), new Date()).split(" ")[0]==="about"? t(formatDistance(new Date(serviceOrder.dueDate), new Date()), {hours: formatDistance(new Date(serviceOrder.dueDate), new Date()).split("")[0]}):"hi"} */}
         </Typography>
       </Box>
       <Typography variant="body2" component="div" mt="0.5em">
