@@ -194,6 +194,13 @@ module.exports = {
     'PURCHASE PRICE': 'EINKAUFSPREIS',
     'SELLING PRICE': 'VERKAUFSPREIS',
     STOCK: 'LAGER',
+
+    // Service Orders
+    'Order types': 'Auftragsarten',
+    'UNIT NUMBER': 'ANLAGENNUMMER',
+    Unscheduled: 'Ungeplant',
+    Completed: 'Abgeschlossen',
+    Pending: 'Ausstehend',
   },
 };
 
