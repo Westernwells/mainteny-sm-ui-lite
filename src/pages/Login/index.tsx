@@ -1,11 +1,10 @@
+import {t} from 'i18next';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import {useFormik} from 'formik';
 import {useLocation} from 'react-router-dom';
-import {useTranslation} from 'react-i18next';
 import queryString from 'query-string';
 import * as Yup from 'yup';
-
 import {ReactComponent as CheckMark} from 'assets/icons/CheckMark.svg';
 import {useAuth} from 'hooks/useAuth';
 import {AuthLayout} from 'components/AuthLayout';
@@ -15,7 +14,6 @@ export const Login = () => {
   const {search} = useLocation();
   const {authType} = queryString.parse(search);
   const {signin, loading} = useAuth();
-  const {t} = useTranslation();
 
   const validationSchema = Yup.object().shape({
     email: Yup.string()

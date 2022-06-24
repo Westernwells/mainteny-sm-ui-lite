@@ -1,4 +1,5 @@
 import Typography from '@mui/material/Typography';
+import {t} from 'i18next';
 import {capitalize} from 'utils/utils';
 import {ServiceOrderType} from '../models/service-order';
 
@@ -17,10 +18,10 @@ export const ServiceOrderTypeText = ({
   <Typography variant={variant || 'caption'} sx={{...style}}>
     {serviceOrderType === ServiceOrderType.REGULAR
       ? capitalizeText
-        ? capitalize(['MAINTENANCE'])
-        : 'MAINTENANCE'
+        ? t(capitalize(['MAINTENANCE']))
+        : t('MAINTENANCE')
       : capitalizeText
-      ? capitalize([serviceOrderType])
-      : serviceOrderType}
+      ? t(capitalize([serviceOrderType]))
+      : serviceOrderType && t(serviceOrderType)}
   </Typography>
 );

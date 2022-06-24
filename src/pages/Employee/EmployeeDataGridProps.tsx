@@ -1,6 +1,6 @@
+import {t} from 'i18next';
 import {GridColDef, GridRowModel} from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
-// import {EmployeesView} from 'models/employee';
 import Box from '@mui/material/Box';
 import {TechnicianEventType} from 'models/misc';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
@@ -28,7 +28,7 @@ export const columns: GridColDef[] = [
       const role = capitalize(params.value);
       return (
         <Typography variant="body2" sx={{textTransform: 'capitalize'}}>
-          {role}
+          {t(role)}
         </Typography>
       );
     },
@@ -70,7 +70,7 @@ export const columns: GridColDef[] = [
               </Box>
               <Box>
                 <Typography variant="body2" ml="0.5em">
-                  Holiday
+                  {t('Holiday')}
                 </Typography>
               </Box>
             </Box>
@@ -89,7 +89,7 @@ export const columns: GridColDef[] = [
               </Box>
               <Box>
                 <Typography variant="body2" ml="0.5em">
-                  Sick
+                  {t('Sick')}
                 </Typography>
               </Box>
             </Box>
@@ -104,7 +104,7 @@ export const columns: GridColDef[] = [
               </Box>
               <Box>
                 <Typography variant="body2" ml="0.5em">
-                  Available
+                  {t('Available')}
                 </Typography>
               </Box>
             </Box>

@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {t} from 'i18next';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {axiosClient} from 'utils/axios-utils';
 import {useSnackbar} from 'notistack';
@@ -71,7 +72,7 @@ export const useAuth = (): UseAuth => {
       }
     } catch (errorResponse: any) {
       if (errorResponse?.response.status === 400) {
-        enqueueSnackbar('Incorrect email or password', {
+        enqueueSnackbar(t('Incorrect email or password'), {
           variant: 'error',
         });
       }

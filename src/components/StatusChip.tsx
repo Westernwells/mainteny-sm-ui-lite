@@ -1,4 +1,5 @@
 import Chip from '@mui/material/Chip';
+import {t} from 'i18next';
 import {ReactNode} from 'react';
 
 const statusWidth = {
@@ -55,7 +56,7 @@ export const StatusChip = ({
       ...style,
     }}
     variant={variant}
-    label={label}
+    label={typeof label === 'string' ? t(label) : label}
     size={size}
   />
 );

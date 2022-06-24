@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import {t} from 'i18next';
 import {ReactNode} from 'react';
 import {AppDrawer} from './AppDrawer';
 import {AppTopBar} from './AppTopBar';
@@ -33,7 +34,7 @@ export const PageLayout = ({
     }}>
     <Box sx={{mx: '2.2em', my: '0.5em'}}>
       <AppTopBar
-        pageTitle={pageTitle}
+        pageTitle={pageTitle && t(pageTitle)}
         showBackAction={showBackAction}
         backBtnLabel={backBtnLabel}
       />

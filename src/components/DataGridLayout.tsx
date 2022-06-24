@@ -1,3 +1,4 @@
+import {t} from 'i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
@@ -56,7 +57,7 @@ export const getColumnProps = ({
   cellClassName = 'nowrap',
   renderHeader = (params: GridColumnHeaderParams) => (
     <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName && params.colDef.headerName.toUpperCase()}
+      {t(params.colDef.headerName!.toUpperCase())}
     </Typography>
   ),
   renderCell = (params: GridRenderCellParams<any, any, any>) => (

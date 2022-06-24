@@ -1,12 +1,11 @@
 import {useEffect, useState} from 'react';
+import {t} from 'i18next';
 import {Box} from '@mui/system';
 import Grid from '@mui/material/Grid';
 import {FormikErrors, useFormik} from 'formik';
 import * as Yup from 'yup';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import {InputAdornment} from '@mui/material';
-import {useTranslation} from 'react-i18next';
-
 import {PageCard} from 'components/PageCard';
 import {CredentialEmployeeFormModel} from 'models/employee';
 import {FormInput} from 'components/form/FormInput';
@@ -25,7 +24,6 @@ export const CredentialEmployeeForm = ({
   initialValues,
 }: Props) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-  const {t} = useTranslation();
 
   const validationSchema = Yup.object().shape({
     password: Yup.string()

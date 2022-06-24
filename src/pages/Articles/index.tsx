@@ -24,7 +24,7 @@ export const Articles = () => {
   return (
     <Tabs
       showActionBtn
-      btnLabel={tabValue === 0 ? 'New article' : 'New package'}
+      btnLabel={tabValue === 0 ? 'New Article' : 'New Package'}
       btnOnClick={() =>
         tabValue === 0 ? navigate('new') : navigate('newPackage')
       }

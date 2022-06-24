@@ -183,7 +183,7 @@ export const Employees = () => {
           getSearchValue={(val: string) => setSearch(val)}
           showActionBtn
           btnOnClick={() => navigate('/employees/new')}
-          btnLabel="New employee"
+          btnLabel="New Employee"
           filterItems={renderFilterItems()}
         />
       }>

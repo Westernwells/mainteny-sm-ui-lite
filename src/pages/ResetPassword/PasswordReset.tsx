@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
+import {t} from 'i18next';
 import {useNavigate} from 'react-router-dom';
-import {useTranslation} from 'react-i18next';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
@@ -48,7 +48,6 @@ export const PasswordReset = ({
   loading,
 }: Props) => {
   const navigate = useNavigate();
-  const {t} = useTranslation();
 
   const [reEnterPassword, setReEnterPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);

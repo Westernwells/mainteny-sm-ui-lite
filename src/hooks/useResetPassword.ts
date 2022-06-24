@@ -1,8 +1,8 @@
 import {useState} from 'react';
+import {t} from 'i18next';
 import {axiosClient} from 'utils/axios-utils';
 import {useSnackbar} from 'notistack';
 import {useNavigate} from 'react-router-dom';
-import {useTranslation} from 'react-i18next';
 
 interface UseRecoverPassword {
   request: (email: string, navigation?: boolean) => Promise<void>;
@@ -13,7 +13,6 @@ interface UseRecoverPassword {
 export const useResetPassword = (): UseRecoverPassword => {
   const {enqueueSnackbar} = useSnackbar();
   const navigate = useNavigate();
-  const {t} = useTranslation();
   const [loading, setLoading] = useState<boolean>(false);
 
   const request = async (
