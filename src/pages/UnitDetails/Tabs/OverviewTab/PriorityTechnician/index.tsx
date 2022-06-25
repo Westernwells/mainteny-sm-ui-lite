@@ -67,6 +67,7 @@ export const PriorityTechnician = ({
   const onEditButtonClicked = (item: ElevatorAssignmentSimpleView) => {
     setDialogTitle(DialogTitle.EDIT_TECHNICIAN);
     formik.setFieldValue('technicianId', item.technician.id);
+    formik.setFieldValue('priority', item.weight);
     setActiveTechnician(item);
     setOpenDialog(true);
   };
