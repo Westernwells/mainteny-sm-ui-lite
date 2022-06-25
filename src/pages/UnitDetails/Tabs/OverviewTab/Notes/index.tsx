@@ -101,6 +101,7 @@ export const Notes = ({elevatorId}: Props) => {
 
   const renderNote = (elevatorNote: ElevatorComment) => (
     <Box
+      key={elevatorNote.id}
       sx={{
         border: `1px solid ${theme.palette.suvaGrey.light}`,
         p: '0.5em',
@@ -150,6 +151,7 @@ export const Notes = ({elevatorId}: Props) => {
       }
       handleAction={() => {
         formik.setFieldValue('note', '');
+        setDialogTitle(DialogTitle.ADD_NOTE);
         setOpenDialog(true);
       }}
       headerActionIcon={<Typography color="info.main">+ Add</Typography>}

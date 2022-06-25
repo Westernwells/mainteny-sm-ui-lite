@@ -7,6 +7,14 @@ import FlagIcon from '@mui/icons-material/Flag';
 import useTheme from '@mui/material/styles/useTheme';
 import {ElevatorProperty} from 'models/elevator';
 
+export enum AppointmentPreferenceKey {
+  appointmentDaysOfWeek = 'appointmentDaysOfWeek',
+  openingHours = 'openingHours',
+  requiresAppointment = 'requiresAppointment',
+  requiresAppointmentNotification = 'requiresAppointmentNotification',
+  appointmentNotificationDueInDays = 'appointmentNotificationDueInDays',
+}
+
 interface Props {
   label: string;
   property: ElevatorProperty;
@@ -16,7 +24,7 @@ export const AppointmentPreferenceSchema = ({label, property}: Props) => {
   const theme = useTheme();
   const renderSection = () => {
     switch (label) {
-      case 'appointmentDaysOfWeek':
+      case AppointmentPreferenceKey.appointmentDaysOfWeek:
         return (
           <CardProps
             icon={
@@ -29,7 +37,7 @@ export const AppointmentPreferenceSchema = ({label, property}: Props) => {
             iconMaxHeight="3em"
           />
         );
-      case 'openingHours':
+      case AppointmentPreferenceKey.openingHours:
         return (
           <CardProps
             icon={<CachedIcon sx={{color: theme.palette.info.dark}} />}
@@ -40,7 +48,7 @@ export const AppointmentPreferenceSchema = ({label, property}: Props) => {
             iconMaxHeight="3em"
           />
         );
-      case 'requiresAppointment':
+      case AppointmentPreferenceKey.requiresAppointment:
         return (
           <CardProps
             icon={<CalendarTodayIcon sx={{color: theme.palette.info.dark}} />}
@@ -51,7 +59,7 @@ export const AppointmentPreferenceSchema = ({label, property}: Props) => {
             iconMaxHeight="3em"
           />
         );
-      case 'requiresAppointmentNotification':
+      case AppointmentPreferenceKey.requiresAppointmentNotification:
         return (
           <CardProps
             icon={
@@ -64,7 +72,7 @@ export const AppointmentPreferenceSchema = ({label, property}: Props) => {
             iconMaxHeight="3em"
           />
         );
-      case 'appointmentNotificationDueInDays':
+      case AppointmentPreferenceKey.appointmentNotificationDueInDays:
         return (
           <CardProps
             icon={<FlagIcon sx={{color: theme.palette.info.dark}} />}
