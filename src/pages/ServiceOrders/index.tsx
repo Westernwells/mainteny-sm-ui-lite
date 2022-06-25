@@ -33,7 +33,7 @@ export const ServiceOrders = () => {
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
-    setTabValue(Number(currentParams.tab));
+    if (currentParams.tab) setTabValue(Number(currentParams.tab));
   }, []);
 
   return (

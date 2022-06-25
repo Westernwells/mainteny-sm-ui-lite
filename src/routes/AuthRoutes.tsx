@@ -22,7 +22,7 @@ export const AuthRoutes = () => {
       <Navigate
         to={
           authRouteActive
-            ? '/orders?pageIndex=1&pageSize=25&tab=0'
+            ? '/orders'
             : `${location.state.from.pathname}${
                 location.state.from.search ? location.state.from.search : ''
               }`
