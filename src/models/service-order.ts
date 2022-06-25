@@ -290,6 +290,7 @@ export interface ServiceOrderScheduleParams {
   status?: ServiceOrderStatus[];
   serviceCompanyId?: string;
   technicianIds?: string[];
+  types?: ServiceOrderType;
 }
 
 export interface ServiceOrderQueryParams {

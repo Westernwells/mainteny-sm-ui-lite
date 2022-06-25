@@ -4,7 +4,11 @@ import {useQueryServiceOrderScheduled} from 'hooks/reactQuery/useServiceOrder';
 import * as _ from 'lodash';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {getWhen, toRestDateTime} from 'utils/datetime';
-import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
+import {
+  ServiceOrderStatus,
+  ServiceOrderType,
+  ServiceOrderView,
+} from 'models/service-order';
 
 import {Schedule} from 'components/Schedules';
 import {ScheduleItem} from 'components/Schedules/ScheduleItem';
@@ -26,6 +30,8 @@ import {
   sortOrderByTime,
   getServiceOrderStatusList,
   getSelectedOrderStatuses,
+  serviceOrderTypeToString,
+  serviceOrderTypeToEnum,
 } from 'utils/service-order-utils';
 import Typography from '@mui/material/Typography';
 import {UnAssignedServiceOrders} from './UnAssigedServiceOrder';
@@ -39,6 +45,9 @@ export const ServiceOrderScheduleTab = () => {
   const [selectedOrderStatus, setSelectedOrderStatus] = useState<
     ServiceOrderStatus[] | []
   >([]);
+  const [selectedOrderType, setSelectedOrderType] = useState<
+    ServiceOrderType | undefined
+  >();
   const [page] = useState(makePage(0, 500));
   const {data: technicianResource = createEmptyResource<EmployeesView>(10)} =
     useQueryServiceCompanyTechnicians({
@@ -55,6 +64,7 @@ export const ServiceOrderScheduleTab = () => {
         pageSize: page.pageSize,
         query: '',
         status: selectedOrderStatus,
+        types: selectedOrderType,
       },
       {keepPreviousData: true},
     );
@@ -82,11 +92,31 @@ export const ServiceOrderScheduleTab = () => {
   };
 
   const renderFilterItems = () => (
-    <FilterFields hideClear>
+    <FilterFields
+      onClear={() => {
+        setSelectedOrderStatus([]);
+        setSelectedOrderType(undefined);
+      }}>
+      <MultipleSelectCheckmarks
+        label="Order Type"
+        options={Object.keys(ServiceOrderType).map((i) =>
+          serviceOrderTypeToString(i),
+        )}
+        initialSelectedItems={
+          selectedOrderType ? [selectedOrderType] : undefined
+        }
+        getSelectedValue={(item) =>
+          setSelectedOrderType(
+            serviceOrderTypeToEnum(item[0]) as ServiceOrderType,
+          )
+        }
+        multiple={false}
+      />
       <MultipleSelectCheckmarks
         label="Status"
         options={getServiceOrderStatusList()}
         getSelectedValue={getSelectedStatusValues}
+        initialSelectedItems={selectedOrderStatus}
         multiple
       />
     </FilterFields>
