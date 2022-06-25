@@ -22,7 +22,11 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {EmployeesView} from 'models/employee';
 import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicator';
 import {Widget} from 'components/Widget';
-import {sortOrderByTime} from 'utils/service-order-utils';
+import {
+  sortOrderByTime,
+  getServiceOrderStatusList,
+  getSelectedOrderStatuses,
+} from 'utils/service-order-utils';
 import Typography from '@mui/material/Typography';
 import {UnAssignedServiceOrders} from './UnAssigedServiceOrder';
 
@@ -72,22 +76,17 @@ export const ServiceOrderScheduleTab = () => {
     setCurrentDate(subDays(currentDate, 1));
   };
 
+  const getSelectedStatusValues = (items: string[]) => {
+    const selectedOrderStatuses = getSelectedOrderStatuses(items, false);
+    setSelectedOrderStatus(selectedOrderStatuses as ServiceOrderStatus[]);
+  };
+
   const renderFilterItems = () => (
     <FilterFields hideClear>
       <MultipleSelectCheckmarks
         label="Status"
-        options={Object.values(ServiceOrderStatus).map((option) =>
-          _.capitalize(option).split('_').join(' '),
-        )}
-        getSelectedValue={(item) => {
-          let orderStatus = item.map((val) =>
-            val.split(' ').join('_').toUpperCase(),
-          );
-          if (orderStatus.includes(ServiceOrderStatus.ALL)) {
-            orderStatus = [];
-          }
-          setSelectedOrderStatus(orderStatus as ServiceOrderStatus[]);
-        }}
+        options={getServiceOrderStatusList()}
+        getSelectedValue={getSelectedStatusValues}
         multiple
       />
     </FilterFields>

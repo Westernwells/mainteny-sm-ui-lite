@@ -21,8 +21,8 @@ import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {FlexContainer} from 'components/FlexContainer';
 import {
-  serviceOrderStatusToEnum,
-  serviceOrderStatusToString,
+  getServiceOrderStatusList,
+  getSelectedOrderStatuses,
   serviceOrderTypeToEnum,
   serviceOrderTypeToString,
 } from 'utils/service-order-utils';
@@ -100,38 +100,9 @@ export const ServiceOrderList = () => {
     setPageCount(Math.ceil(serviceOrdersResource.total / page.pageSize));
   }, [serviceOrdersResource, page.pageSize]);
 
-  const renderServiceOrderStatusList = () => {
-    let mappedOptions: string[] = [];
-    Object.values(ServiceOrderStatus).forEach((option) => {
-      const val = serviceOrderStatusToString(option);
-      if (!mappedOptions.includes(val)) {
-        mappedOptions = [...mappedOptions, val];
-      }
-    });
-    return mappedOptions;
-  };
-
   const getSelectedStatusValues = (items: string[]) => {
-    let orderStatus: ServiceOrderStatus[] = [];
-    items.forEach((val) => {
-      if (val === 'Unscheduled') {
-        orderStatus = [
-          ...orderStatus,
-          ServiceOrderStatus.INIT,
-          ServiceOrderStatus.READY_TO_SCHEDULE,
-          ServiceOrderStatus.SCHEDULING,
-        ];
-      } else {
-        orderStatus = [
-          ...orderStatus,
-          serviceOrderStatusToEnum(val) as ServiceOrderStatus,
-        ];
-      }
-    });
-    if (orderStatus.includes(ServiceOrderStatus.ALL)) {
-      orderStatus = [];
-    }
-    setSelectedOrderStatus(orderStatus as ServiceOrderStatus[]);
+    const selectedOrderStatuses = getSelectedOrderStatuses(items);
+    setSelectedOrderStatus(selectedOrderStatuses as ServiceOrderStatus[]);
   };
 
   const renderFilterItems = () => (
@@ -143,7 +114,7 @@ export const ServiceOrderList = () => {
       showFilter>
       <MultipleSelectCheckmarks
         label="Status"
-        options={renderServiceOrderStatusList()}
+        options={getServiceOrderStatusList()}
         getSelectedValue={getSelectedStatusValues}
         initialSelectedItems={selectedOrderStatus}
         multiple
