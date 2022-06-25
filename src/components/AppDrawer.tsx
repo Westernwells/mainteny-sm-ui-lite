@@ -158,7 +158,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/quotations');
-        navigate('/quotations?pageIndex=1&pageSize=25');
+        navigate('/quotations');
       },
     },
     {
