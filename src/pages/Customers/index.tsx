@@ -5,10 +5,7 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {Progress} from 'components/Progress';
-import {
-  useFetchCustomerElevatorNumbers,
-  useQueryCustomers,
-} from 'hooks/reactQuery/useCustomers';
+import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
 import {useSearchParams} from 'react-router-dom';
 import {
   formatSearchParamsPageIndex,
@@ -30,7 +27,10 @@ export const Customer = () => {
 
   const {
     data: customerResource = createEmptyResource<PropertyOwnerView>(pageSize),
-    isFetched: customerResourceFetched,
+    isLoading,
+    isFetching,
+    isFetched,
+    isIdle,
   } = useQueryCustomers(
     {
       pageIndex: page.pageIndex,
@@ -40,17 +40,6 @@ export const Customer = () => {
     {keepPreviousData: true},
   );
   totalCustomerRef.current = totalCustomerRef.current || customerResource.total;
-
-  const {
-    data: customersWithUnits = [],
-    isLoading,
-    isFetching,
-    isIdle,
-    isFetched,
-  } = useFetchCustomerElevatorNumbers(customerResource.data, {
-    enabled: customerResourceFetched,
-    keepPreviousData: true,
-  });
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
@@ -68,10 +57,8 @@ export const Customer = () => {
   }, [queryParams]);
 
   useEffect(() => {
-    if (customersWithUnits.length) {
-      setRows(makeRows(customersWithUnits));
-    }
-  }, [customersWithUnits]);
+    setRows(makeRows(customerResource.data));
+  }, [customerResource]);
 
   useEffect(() => {
     setPageCount(Math.ceil(customerResource.total / page.pageSize));

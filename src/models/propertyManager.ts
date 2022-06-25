@@ -35,7 +35,7 @@ export interface PropertyOwnerView {
   contact: Contact;
   search: string;
   meta: Meta;
-  units?: number;
+  unitNumber?: number;
   additionalInfo: PropertyOwnerAdditionalInfo;
   labels: string[];
 }

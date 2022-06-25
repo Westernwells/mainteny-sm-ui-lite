@@ -30,17 +30,6 @@ import {
 import {toDate} from 'utils/datetime';
 import {useUserSession} from './useUserSession';
 
-export const fetchContractElevatorCount = async (contractId: string[]) => {
-  const response = await axiosClient.get<{[key: string]: number}>(
-    `/api/contracts/elevators/count`,
-    {
-      params: {contractId},
-      paramsSerializer,
-    },
-  );
-  return response.data;
-};
-
 const filterByExpiryData = (
   contractsRes: Resource<ContractView>,
   expiryDate: string[],
@@ -192,30 +181,6 @@ export const useQueryContract = (
           return filterResult;
         },
         [filter],
-      ),
-    },
-  );
-};
-
-export const useContractElevatorCount = (
-  contracts: ContractView[],
-  options?: UseQueryOptions<{[key: string]: number}, RestError, ContractView[]>,
-) => {
-  const contractIds = contracts.map((contract) => contract.id);
-  return useQuery<{[key: string]: number}, RestError, ContractView[]>(
-    [qk.fetchContractElevatorCount, contractIds],
-    () => fetchContractElevatorCount(contractIds),
-    {
-      ...options,
-      enabled: !!contracts.length,
-      select: useCallback(
-        (data) =>
-          contracts.map((contract) => ({
-            ...contract,
-            units: data[contract.id],
-          })),
-
-        [contracts],
       ),
     },
   );

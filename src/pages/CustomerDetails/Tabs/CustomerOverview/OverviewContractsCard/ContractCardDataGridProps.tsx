@@ -6,9 +6,9 @@ import {
   GridRowsProp,
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
-import {formatCurrency} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
 import {ContractView} from 'models/contract';
+import {formatNetAmount} from '../../../../../utils/currency';
 
 const defaultProps = {
   editable: false,
@@ -65,9 +65,7 @@ export const makeRows = (contracts: any): GridRowsProp =>
     ? contracts.data.map((item: ContractView, index: number) => ({
         id: index,
         contractNumber: item.number,
-        cost: `${formatCurrency(item ? item.price! : 0, {
-          currency: item.currency,
-        })}`,
+        cost: formatNetAmount(item.additionalInfo.price) || '-',
         expiryDate: formatDate(item.endTime),
         navigateTo: `/contracts/details/${item.id}`,
       }))
