@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useRef, useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
@@ -30,11 +30,6 @@ export const ServiceOrders = () => {
     {label: 'Repair', action: () => navigate('/orders/new?type=repair')},
     {label: 'Maintenance', action: () => navigate('/orders/new?type=regular')},
   ]).current;
-
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-    if (currentParams.tab) setTabValue(Number(currentParams.tab));
-  }, []);
 
   return (
     <Tabs

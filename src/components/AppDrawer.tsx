@@ -172,7 +172,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/invoices');
-        navigate('/invoices?pageIndex=1&pageSize=25');
+        navigate('/invoices');
       },
     },
     {
@@ -186,7 +186,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/articles');
-        navigate('/articles?pageIndex=1&pageSize=25&tab=0');
+        navigate('/articles');
       },
     },
     {
