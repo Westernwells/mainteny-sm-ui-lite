@@ -68,7 +68,7 @@ export const useAuth = (): UseAuth => {
             {replace: true},
           );
         } else {
-          navigate('/orders?pageIndex=1&pageSize=25&tab=0', {replace: true});
+          navigate('/orders', {replace: true});
         }
       }
     } catch (errorResponse: any) {

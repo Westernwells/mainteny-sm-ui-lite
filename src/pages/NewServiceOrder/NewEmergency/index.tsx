@@ -78,7 +78,7 @@ export const NewEmergency = ({quotation}: Props) => {
       quotationId: quotation ? quotation.id : '',
     };
     await createEmergencyOrder(body);
-    navigate('/orders?pageIndex=1&pageSize=25&tab=1');
+    navigate('/orders?tab=1');
   };
 
   return (

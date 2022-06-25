@@ -114,7 +114,7 @@ export const ServiceHistoryTab = () => {
         label="No service orders have been created yet for this elevator. Please click the button below to create one!"
         showActionBtn
         btnLabel="Create Service Order"
-        btnAction={() => navigate('/orders?pageIndex=1&pageSize=25&tab=0')}
+        btnAction={() => navigate('/orders')}
         containerStyle={{
           height: '100%',
           mb: '10em',

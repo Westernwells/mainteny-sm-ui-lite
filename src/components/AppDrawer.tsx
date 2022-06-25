@@ -102,7 +102,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/orders');
-        navigate('/orders?pageIndex=1&pageSize=25&tab=0');
+        navigate('/orders');
       },
     },
     {
@@ -116,7 +116,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/units');
-        navigate('/units?pageIndex=1&pageSize=25&tab=0');
+        navigate('/units');
       },
     },
     {
@@ -130,7 +130,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/customers');
-        navigate('/customers?pageIndex=1&pageSize=25');
+        navigate('/customers');
       },
     },
     {
@@ -144,7 +144,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/contracts');
-        navigate('/contracts?pageIndex=1&pageSize=25');
+        navigate('/contracts');
       },
     },
     {
@@ -158,7 +158,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/quotations');
-        navigate('/quotations?pageIndex=1&pageSize=25');
+        navigate('/quotations');
       },
     },
     {
@@ -172,7 +172,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/invoices');
-        navigate('/invoices?pageIndex=1&pageSize=25');
+        navigate('/invoices');
       },
     },
     {
@@ -186,7 +186,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/articles');
-        navigate('/articles?pageIndex=1&pageSize=25&tab=0');
+        navigate('/articles');
       },
     },
     {
@@ -200,7 +200,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/employees');
-        navigate('/employees?pageIndex=1&pageSize=25');
+        navigate('/employees');
       },
     },
   ];
