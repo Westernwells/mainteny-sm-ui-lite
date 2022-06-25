@@ -1,4 +1,5 @@
 import Typography from '@mui/material/Typography';
+import {useTranslation} from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import {Dialog} from 'components/Dialog';
@@ -82,6 +83,8 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
     </Box>
   );
 
+  const {t} = useTranslation();
+
   return (
     <InfoCard
       containerStyles={{
@@ -92,10 +95,12 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
         },
       }}
       bodyContainerStyle={{overflowY: 'scroll'}}
-      headerActionIcon={<Typography color="info.main">+ Add</Typography>}
+      headerActionIcon={
+        <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
+      }
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
-      header={<Typography variant="subtitle1">Pictures</Typography>}>
+      header={<Typography variant="subtitle1">{t('Pictures')}</Typography>}>
       {!elevator.additionalInfo.pictures ||
       elevator.additionalInfo.pictures.length === 0 ? (
         renderEmptySection()

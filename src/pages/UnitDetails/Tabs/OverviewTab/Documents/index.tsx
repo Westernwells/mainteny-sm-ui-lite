@@ -14,6 +14,7 @@ import {FileResourceRecord} from 'models/media';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import {EmptySection} from 'components/EmptySection';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   elevator: ElevatorView;
@@ -83,6 +84,8 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
     </Box>
   );
 
+  const {t} = useTranslation();
+
   return (
     <InfoCard
       containerStyles={{
@@ -93,10 +96,12 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
         },
       }}
       bodyContainerStyle={{overflowY: 'scroll'}}
-      headerActionIcon={<Typography color="info.main">+ Add</Typography>}
+      headerActionIcon={
+        <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
+      }
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
-      header={<Typography variant="subtitle1">Documents</Typography>}>
+      header={<Typography variant="subtitle1">{t('Documents')}</Typography>}>
       {!elevator.additionalInfo.documents ||
       elevator.additionalInfo.documents.length === 0 ? (
         renderEmptySection()

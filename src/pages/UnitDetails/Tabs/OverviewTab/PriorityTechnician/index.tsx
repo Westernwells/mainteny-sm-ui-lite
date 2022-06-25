@@ -1,4 +1,5 @@
 import Typography from '@mui/material/Typography';
+import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {useCallback, useEffect, useRef, useState} from 'react';
@@ -149,13 +150,19 @@ export const PriorityTechnician = ({
     </Box>
   );
 
+  const {t} = useTranslation();
+
   return (
     <InfoCard
       containerStyles={{...containerStyles}}
       showHeaderBackground
-      header={<Typography variant="subtitle1">Priority Technicians</Typography>}
+      header={
+        <Typography variant="subtitle1">{t('Priority Technicians')}</Typography>
+      }
       handleAction={() => onAddButtonClicked()}
-      headerActionIcon={<Typography color="info.main">+ Add</Typography>}>
+      headerActionIcon={
+        <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
+      }>
       {!totalTechnicianRef ? (
         renderNoRowsSection()
       ) : (

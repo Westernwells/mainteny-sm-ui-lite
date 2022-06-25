@@ -81,7 +81,7 @@ export const AddressAutoComplete = ({
       renderInput={(params) => (
         <FormInput
           props={{
-            label: 'Address',
+            label: t('Address'),
             placeholder: 'Enter a location',
             name: 'address',
             onChange: onInputChange,

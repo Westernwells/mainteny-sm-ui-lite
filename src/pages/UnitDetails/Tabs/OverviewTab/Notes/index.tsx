@@ -1,5 +1,6 @@
 import {useRef, useState} from 'react';
 import Box from '@mui/material/Box';
+import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import {InfoCard} from 'components/InfoCard';
 import useTheme from '@mui/material/styles/useTheme';
@@ -133,6 +134,8 @@ export const Notes = ({elevatorId}: Props) => {
     </Box>
   );
 
+  const {t} = useTranslation();
+
   return (
     <InfoCard
       containerStyles={{
@@ -145,14 +148,16 @@ export const Notes = ({elevatorId}: Props) => {
       showHeaderBackground
       header={
         <Typography component="div" variant="subtitle1">
-          Notes
+          {t('Notes')}
         </Typography>
       }
       handleAction={() => {
         formik.setFieldValue('note', '');
         setOpenDialog(true);
       }}
-      headerActionIcon={<Typography color="info.main">+ Add</Typography>}
+      headerActionIcon={
+        <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
+      }
       bodyContainerStyle={{flexGrow: 1, overflowY: 'scroll'}}>
       {isFetched && !totalNotesRef.current ? (
         <Box

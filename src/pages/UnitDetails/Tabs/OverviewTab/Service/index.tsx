@@ -1,4 +1,5 @@
 import Typography from '@mui/material/Typography';
+import {useTranslation} from 'react-i18next';
 import EditIcon from '@mui/icons-material/Edit';
 import {ElevatorView, ElevatorRequestBody} from 'models/elevator';
 import Grid from '@mui/material/Grid';
@@ -88,11 +89,13 @@ export const Service = ({
     });
   };
 
+  const {t} = useTranslation();
+
   return (
     <InfoCard
       containerStyles={{...containerStyles}}
       handleAction={() => setOpenDialog(true)}
-      header={<Typography variant="subtitle1">Service</Typography>}
+      header={<Typography variant="subtitle1">{t('Service')}</Typography>}
       headerActionIcon={<EditIcon />}
       showHeaderBackground>
       <Grid container spacing={2}>

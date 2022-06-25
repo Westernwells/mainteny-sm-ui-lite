@@ -5,6 +5,7 @@ import {
   ElevatorProperty,
   ElevatorRequestBody,
 } from 'models/elevator';
+import {useTranslation} from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import {InfoCard} from 'components/InfoCard';
 import {useRef, useState} from 'react';
@@ -90,12 +91,16 @@ export const AppointmentPreference = ({
     });
   };
 
+  const {t} = useTranslation();
+
   return (
     <InfoCard
       containerStyles={{...containerStyles}}
       handleAction={() => setOpenDialog(true)}
       header={
-        <Typography variant="subtitle1">Appointment Preferences</Typography>
+        <Typography variant="subtitle1">
+          {t('Appointment Preferences')}
+        </Typography>
       }
       headerActionIcon={<EditIcon />}
       showHeaderBackground>

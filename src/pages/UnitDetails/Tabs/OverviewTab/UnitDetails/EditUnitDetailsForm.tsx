@@ -10,6 +10,7 @@ import {useState} from 'react';
 import {createEmptyResource} from 'utils/paging-utils';
 import {convertToText} from 'utils/utils';
 import InputAdornment from '@mui/material/InputAdornment';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   formik: FormikProps<UnitDetailsFormModel>;
@@ -38,18 +39,20 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
       CacheTypes.ELEVATOR_MODEL,
     );
 
+  const {t} = useTranslation();
+
   return (
     <Grid container spacing={2} sx={{mt: '0.5em'}} component="form">
       <Grid item md={6}>
         <ComboBox
           options={Object.keys(ElevatorCategory).map((item) => ({
-            label: convertToText(item),
+            label: t(convertToText(item)),
             value: convertToText(item),
           }))}
           initialValue={
             formik.values.category
               ? {
-                  label: formik.values.category,
+                  label: t(formik.values.category),
                   value: formik.values.category,
                 }
               : null
@@ -58,11 +61,11 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
           getValue={(item) => formik.setFieldValue('category', item?.value)}
           textFieldProps={{
             name: 'category',
-            label: 'Unit Category',
+            label: t('Unit Category'),
             onBlur: formik.handleBlur,
             error: !!(formik.touched.category && formik.errors.category),
             helperText: formik.errors.category,
-            placeholder: 'e.g Escalator',
+            placeholder: t('e.g Escalator'),
           }}
         />
       </Grid>
@@ -70,8 +73,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
       <Grid item md={6}>
         <FormInput
           props={{
-            placeholder: 'E.g. Thyssenkrupp, schindler',
-            label: 'Manufacturer',
+            placeholder: t('E.g. Thyssenkrupp, schindler'),
+            label: t('Manufacturer'),
             name: 'manufacturer',
             value: formik.values.manufacturer,
             onBlur: formik.handleBlur,
@@ -83,8 +86,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
       <Grid item md={6}>
         <FormInput
           props={{
-            placeholder: 'Model number of the elevator',
-            label: 'Unit Number',
+            placeholder: t('Model number of the elevator'),
+            label: t('Unit Number'),
             name: 'externalId',
             value: formik.values.externalId,
             error: !!(formik.touched.externalId && formik.errors.externalId),
@@ -99,8 +102,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
         <FormInput
           props={{
             size: 'small',
-            placeholder: 'Can also be number of floors',
-            label: 'Number of Stops',
+            placeholder: t('Can also be number of floors'),
+            label: t('Number of Stops'),
             name: 'numberOfStops',
             value: formik.values.numberOfStops,
             onBlur: formik.handleBlur,
@@ -113,8 +116,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
         <FormInput
           props={{
             size: 'small',
-            placeholder: 'Single door; Double door',
-            label: 'Cabin Type',
+            placeholder: t('Single door; Double door'),
+            label: t('Cabin Type'),
             name: 'cabinType',
             value: formik.values.cabinType,
             onBlur: formik.handleBlur,
@@ -127,8 +130,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
         <FormInput
           props={{
             size: 'small',
-            placeholder: 'e.g SafeLine',
-            label: 'Emergency Phone Provider',
+            placeholder: t('e.g. SafeLine'),
+            label: t('Emergency Phone Provider'),
             name: 'emergencyPhoneProvider',
             value: formik.values.emergencyPhoneProvider,
             onBlur: formik.handleBlur,
@@ -155,9 +158,9 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
           initialQuery={formik.values.unitType}
           getQuery={(item) => setUnitTypeQuery(item || '')}
           textFieldProps={{
-            placeholder: 'Automatic, manual, etc',
+            placeholder: t('Automatic, manual, etc'),
             name: 'unitType',
-            label: 'Unit Type',
+            label: t('Unit Type'),
           }}
         />
       </Grid>
@@ -181,8 +184,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
           getQuery={(item) => setModelQuery(item || '')}
           textFieldProps={{
             name: 'model',
-            label: 'Model',
-            placeholder: 'e.g. S2000',
+            label: t('Model'),
+            placeholder: t('e.g. S2000'),
           }}
         />
       </Grid>
@@ -190,8 +193,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
       <Grid item md={6}>
         <FormInput
           props={{
-            placeholder: 'Fabric number',
-            label: 'Serial Number',
+            placeholder: t('Fabric number'),
+            label: t('Serial Number'),
             name: 'serialNumber',
             value: formik.values.serialNumber,
             onBlur: formik.handleBlur,
@@ -204,8 +207,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
         <FormInput
           props={{
             name: 'unitCapacity',
-            label: 'Unit Capacity',
-            placeholder: '1000 kg',
+            label: t('Unit Capacity'),
+            placeholder: t('1000 kg'),
             value: formik.values.unitCapacity,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
@@ -223,8 +226,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
           props={{
             size: 'small',
             disabled: true,
-            placeholder: 'Enter Spending Limit ',
-            label: 'Spending Limit',
+            placeholder: t('Enter Spending Limit'),
+            label: t('Spending Limit'),
             name: 'spendingLimit',
             error: !!formik.errors.spendingLimit,
             value: formik.values.spendingLimit,
