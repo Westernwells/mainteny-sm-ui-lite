@@ -130,7 +130,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/customers');
-        navigate('/customers?pageIndex=1&pageSize=25');
+        navigate('/customers');
       },
     },
     {
@@ -144,7 +144,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/contracts');
-        navigate('/contracts?pageIndex=1&pageSize=25');
+        navigate('/contracts');
       },
     },
     {

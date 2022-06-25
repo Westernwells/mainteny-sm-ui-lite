@@ -31,6 +31,7 @@ export interface PropertyOwnerView {
   number: string;
   postalAddress: Address;
   serviceCompany: ServiceCompany;
+  externalId: string;
   contact: Contact;
   search: string;
   meta: Meta;
