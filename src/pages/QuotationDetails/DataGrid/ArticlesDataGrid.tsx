@@ -13,7 +13,7 @@ import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {ArticleView} from 'models/article';
-import {netAmount} from 'utils/currency';
+import {formatNetAmount} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {NoRowsEmptySection} from './NoRowsEmptySection';
 import {styles} from './style';
@@ -106,7 +106,7 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
         model: item.model,
         manufacturer: item.manufacturer,
         description: item.description,
-        price: netAmount(item.unitSellingAmount),
+        price: formatNetAmount(item.unitSellingAmount),
         article: item,
       }))
     : [];

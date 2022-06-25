@@ -12,6 +12,7 @@ import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {useServiceOrderStatusColor} from 'hooks/useServiceOrderStatusColor';
 
 import {OrderDetails} from 'components/OrderDetails';
+import {useTranslation} from 'react-i18next';
 import {addDays, endOfDay, startOfDay, subDays} from 'date-fns';
 import {useQueryServiceCompanyTechnicians} from 'hooks/reactQuery/useTechnician';
 import {FilterFields} from 'components/FilterFields';
@@ -101,27 +102,30 @@ export const ServiceOrderScheduleTab = () => {
     />
   );
 
-  const renderControls = () => (
-    <Box
-      sx={{
-        display: 'flex',
-        background: '#fff',
-        py: '0.5em',
-        px: '1em',
-        minWidth: '10rem',
-        justifyContent: 'space-between',
-      }}>
-      <Box onClick={() => prevDay()} sx={{cursor: 'pointer'}}>
-        <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
+  const renderControls = () => {
+    const {t} = useTranslation();
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          background: '#fff',
+          py: '0.5em',
+          px: '1em',
+          minWidth: '10rem',
+          justifyContent: 'space-between',
+        }}>
+        <Box onClick={() => prevDay()} sx={{cursor: 'pointer'}}>
+          <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
+        </Box>
+        <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
+          {t(`${getWhen(currentDate, 'dd.MM.yyyy')}`)}
+        </Typography>
+        <Box onClick={() => nextDay()} sx={{cursor: 'pointer'}}>
+          <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
+        </Box>
       </Box>
-      <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
-        {getWhen(currentDate, 'dd.MM.yyyy')}
-      </Typography>
-      <Box onClick={() => nextDay()} sx={{cursor: 'pointer'}}>
-        <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
-      </Box>
-    </Box>
-  );
+    );
+  };
 
   return (
     <Box sx={{flexGrow: 1, display: 'flex', flexDirection: 'column'}}>

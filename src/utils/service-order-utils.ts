@@ -68,6 +68,7 @@ export const sortOrderByTime = (serviceOrder: ServiceOrderView[]) => {
 };
 
 export const serviceOrderTypeToString = (type: ServiceOrderType | string) => {
+  console.log(type);
   switch (type) {
     case ServiceOrderType.REGULAR:
       return 'Maintenance';
