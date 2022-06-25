@@ -6,7 +6,7 @@ import {useEffect} from 'react';
 import InputAdornment from '@mui/material/InputAdornment';
 import * as Yup from 'yup';
 import {ServiceOrderArticleView} from 'models/service-order';
-import {formatToDp, getCurrencySymbol} from 'utils/currency';
+import {amountForView, getCurrencySymbol} from 'utils/currency';
 import {EditArticleFormModel} from './models';
 
 interface Props {
@@ -30,12 +30,8 @@ export const EditArticleForm = ({
     initialValues: {
       name: serviceOrderArticle.article.name,
       description: serviceOrderArticle.article.description,
-      unitPrice: Number(
-        formatToDp(
-          serviceOrderArticle.article.unitSellingAmount.netAmount,
-          serviceOrderArticle.article.unitSellingAmount.fractionDigits,
-        ),
-      ),
+      unitPrice: amountForView(serviceOrderArticle.article.unitSellingAmount)
+        .netAmount,
       quantity: serviceOrderArticle.quantity,
     },
     onSubmit: () => {},

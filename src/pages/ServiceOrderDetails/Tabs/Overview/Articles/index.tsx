@@ -17,6 +17,10 @@ import {Dialog} from 'components/Dialog';
 import {EditArticleForm} from './EditArticleForm';
 import {ActionTypes, columns, makeRows} from './ArticleDataGridProps';
 import {EditArticleFormModel} from './models';
+import {
+  amountRecordForBackend,
+  makeAmountRecord,
+} from '../../../../../utils/currency';
 
 interface Props {
   serviceOrderArticles?: ServiceOrderArticleView[];
@@ -161,11 +165,13 @@ export const Articles = ({
         description: formikValues!.description,
         name: formikValues!.name,
         quantity: formikValues!.quantity,
-        unitAmount: {
-          currency: currentArticle!.unitAmount.currency,
-          netAmount: formikValues!.unitPrice,
-          percentageVat: currentArticle!.unitAmount.percentageVat,
-        },
+        unitAmount: amountRecordForBackend(
+          makeAmountRecord(
+            formikValues!.unitPrice,
+            currentArticle!.unitAmount.currency,
+            currentArticle!.unitAmount.percentageVat,
+          ),
+        ),
       };
     });
 
