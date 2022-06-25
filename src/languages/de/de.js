@@ -222,8 +222,9 @@ module.exports = {
     'Search by number, customer, contract type etc.':
       'Suche nach Nummer, Kunde, Vertragsart usw.',
     List: 'Aufführen',
-    'about {{hours}} hours': 'ungefähr {{hours}} Stunden',
-    'about {{hours}} month': 'ungefähr {{hours}} monate',
+    '{{hours}} hours': '{{hours}} stunden',
+    '{{hours}} month': '{{hours}} monate',
+    '{{time}} day': '{{time}} tag',
     '{{time}} days': '{{time}} tage',
     '{{time}} months': '{{time}} monate',
     '{{time}} years': '{{time}} jahre',

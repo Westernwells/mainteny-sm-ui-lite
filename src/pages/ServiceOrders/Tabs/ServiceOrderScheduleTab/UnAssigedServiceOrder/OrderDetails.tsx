@@ -20,7 +20,10 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
     const splitDate: string[] = formattedDate.split(' ');
 
     if (splitDate[0] === 'about') {
-      const finalDate: string = t(`${splitDate[0]} {{hours}} ${splitDate[2]}`, {
+      // const finalDate: string = t(`${splitDate[0]} {{hours}} ${splitDate[2]}`, {
+      //   hours: splitDate[1],
+      // });
+      const finalDate: string = t(`{{hours}} ${splitDate[2]}`, {
         hours: splitDate[1],
       });
       return finalDate;
