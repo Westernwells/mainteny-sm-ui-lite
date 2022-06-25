@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import {useTranslation} from 'react-i18next';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {
@@ -134,6 +135,8 @@ export const ServiceOrderList = () => {
     setSelectedOrderStatus(orderStatus as ServiceOrderStatus[]);
   };
 
+  const {t} = useTranslation();
+
   const renderFilterItems = () => (
     <FilterFields
       onClear={() => {
@@ -152,7 +155,7 @@ export const ServiceOrderList = () => {
       <MultipleSelectCheckmarks
         label="Order types"
         options={Object.keys(ServiceOrderType).map((i) =>
-          serviceOrderTypeToString(i),
+          t(serviceOrderTypeToString(i)),
         )}
         initialSelectedItems={selectedOrderTypes}
         getSelectedValue={(item) => {

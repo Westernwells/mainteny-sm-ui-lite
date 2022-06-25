@@ -19,6 +19,7 @@ import {
   getEndOfWeek,
   getStartOfWeek,
 } from 'utils/datetime';
+import {useTranslation} from 'react-i18next';
 import {ScheduleContainer} from 'components/Schedules/ScheduleContainer';
 import {ScheduleHeader} from 'components/Schedules/ScheduleHeader';
 import {ScheduleRow} from 'components/Schedules/ScheduleRow';
@@ -233,6 +234,8 @@ export const Schedule = ({
     });
   };
 
+  const {t} = useTranslation();
+
   return (
     <Card sx={[sx.card, {...containerStyles}]}>
       {customCardHeader || cardHeaderLabel ? (
@@ -270,7 +273,7 @@ export const Schedule = ({
                           getSearchValue={(searchValue) =>
                             handleSearch && handleSearch(searchValue)
                           }
-                          searchPlaceholder={searchPlaceholder}
+                          searchPlaceholder={t(searchPlaceholder)}
                           scheduleType={scheduleType}
                         />
                       </ScheduleHeaderCell>
