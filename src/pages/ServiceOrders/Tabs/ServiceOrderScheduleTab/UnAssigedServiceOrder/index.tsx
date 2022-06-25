@@ -11,7 +11,7 @@ import {
 } from 'models/service-order';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {useInView} from 'react-intersection-observer';
-import {endOfDay, startOfMonth} from 'date-fns';
+import {endOfDay, startOfDay, addDays} from 'date-fns';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {Order, Resource} from 'models/misc';
 import {OrderDetails} from './OrderDetails';
@@ -32,8 +32,8 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
   const {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(page.pageSize),
   } = useServiceOrders({
-    end: endOfDay(new Date()).toISOString(),
-    start: startOfMonth(new Date()).toISOString(), // we should show unsassigned orders for a couople month
+    end: endOfDay(addDays(new Date(), 180)).toISOString(),
+    start: startOfDay(addDays(new Date(), -180)).toISOString(), // we should show unsassigned orders for a couople month
     pageSize: page.pageSize,
     pageIndex: page.pageIndex,
     query: search,
