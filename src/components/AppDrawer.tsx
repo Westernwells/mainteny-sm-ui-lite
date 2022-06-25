@@ -200,7 +200,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/employees');
-        navigate('/employees?pageIndex=1&pageSize=25');
+        navigate('/employees');
       },
     },
   ];
