@@ -324,7 +324,7 @@ module.exports = {
     'Single door; Double door': 'Einzeltür; Doppeltür',
     'Automatic, manual, etc': 'Automatisch, manuell, etc.',
     'Fabric number': 'Nummer des Stoffes',
-    Service: 'Service',
+    Service: 'Dienstleistung',
     'LAST INSPECTION': 'LETZTE INSPEKTION',
     'REQUIRED VISITS/YEAR': 'ERFORDERLICHE BESUCHE/JAHR',
     'REQUIRED TIME': 'WARTUNGSZEIT',
