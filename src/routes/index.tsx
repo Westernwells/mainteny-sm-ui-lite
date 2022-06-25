@@ -439,7 +439,7 @@ export const Router = () => {
               <Helmet>
                 <title>{`Page not found! - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout excludeSidebar pageScrollable excludeDefaultSpacing>
+              <PageLayout pageTitle="Oops!">
                 <PageNotFound />
               </PageLayout>
             </>
