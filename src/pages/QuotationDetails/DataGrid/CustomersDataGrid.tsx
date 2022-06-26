@@ -11,10 +11,7 @@ import {
 import {DataGridLayout} from 'components/DataGridLayout';
 import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
-import {
-  useFetchCustomerElevatorNumbers,
-  useQueryCustomers,
-} from 'hooks/reactQuery/useCustomers';
+import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {NoRowsEmptySection} from './NoRowsEmptySection';
@@ -95,10 +92,9 @@ export const makeRows = (customers: PropertyOwnerView[]): GridRowsProp =>
     ? customers.map((item, index) => ({
         id: index,
         name: item.name,
-        // TODO: Use Customer number
-        number: 'C-12345',
+        number: item.externalId,
         address: item.postalAddress.fullName,
-        units: item.units,
+        units: item.unitNumber,
         phone: item.contact.phone,
         propertyOwner: item,
       }))
@@ -114,6 +110,9 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
 
   const {
     data: customerResource = createEmptyResource<PropertyOwnerView>(pageSize),
+    isLoading,
+    isFetching,
+    isIdle,
   } = useQueryCustomers(
     {
       pageIndex: page.pageIndex,
@@ -123,26 +122,13 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
     {keepPreviousData: true},
   );
 
-  const {
-    data: customersWithUnits,
-    isIdle,
-    isLoading,
-    isFetching,
-  } = useFetchCustomerElevatorNumbers(customerResource.data, {
-    keepPreviousData: true,
-  });
-
   useEffect(() => {
     setPageCount(Math.ceil(customerResource.total / page.pageSize));
   }, [customerResource, page.pageSize]);
 
   useEffect(() => {
-    if (customersWithUnits) {
-      setRows(makeRows(customersWithUnits as unknown as PropertyOwnerView[]));
-    } else {
-      setRows([]);
-    }
-  }, [customersWithUnits]);
+    setRows(makeRows(customerResource.data));
+  }, [customerResource]);
 
   if (isIdle || isLoading) {
     return (
