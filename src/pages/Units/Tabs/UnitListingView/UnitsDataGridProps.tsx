@@ -4,7 +4,7 @@ import ElevatorIcon from '@mui/icons-material/Elevator';
 import {getColumnProps} from 'components/DataGridLayout';
 import {formatDate} from 'utils/datetime';
 import {StatusChip} from 'components/StatusChip';
-import {DataGridElevatorView} from '../../Models';
+import {ElevatorView} from '../../../../models/elevator';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -68,33 +68,25 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = ({
-  elevators,
-}: {
-  elevators: DataGridElevatorView[];
-}): GridRowsProp => {
-  const result =
-    elevators.length &&
-    elevators.map((elevator: DataGridElevatorView, index: number) => ({
-      id: index,
-      number: elevator.externalId,
-      model: elevator.model,
-      customer: elevator.propertyOwner.name,
-      lastVisit: formatDate(elevator.lastVisitDate),
-      nextVisit: formatDate(elevator.nextVisitDate),
-      address: elevator.address.fullName,
-      headerText: elevator.address.fullName,
-      priorityTechnician: elevator.assignments.length
-        ? elevator.assignments
-            .map(
-              (item) =>
-                `${item.technician.userAccount.firstName} ${item.technician.userAccount.lastName}`,
-            )
-            .join(', ')
-        : '-',
-      activeContracts: !!elevator.contracts.length,
-      elevator,
-      navigateTo: `details/${elevator.id}`,
-    }));
-  return result || [];
-};
+export const makeRows = (elevators: ElevatorView[]): GridRowsProp =>
+  elevators.map((elevator: ElevatorView) => ({
+    id: elevator.id,
+    number: elevator.externalId,
+    model: elevator.model,
+    customer: elevator.propertyOwner.name,
+    lastVisit: formatDate(elevator.lastVisitDate),
+    nextVisit: formatDate(elevator.nextVisitDate),
+    address: elevator.address.fullName,
+    headerText: elevator.address.fullName,
+    priorityTechnician: elevator.assignments.length
+      ? elevator.assignments
+          .map(
+            (item) =>
+              `${item.technician.userAccount.firstName} ${item.technician.userAccount.lastName}`,
+          )
+          .join(', ')
+      : '-',
+    activeContracts: !!elevator.contracts.length,
+    elevator,
+    navigateTo: `details/${elevator.id}`,
+  }));
