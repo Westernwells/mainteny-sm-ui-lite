@@ -86,7 +86,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
       <Grid item md={6}>
         <FormInput
           props={{
-            placeholder: t('Model number of the elevator'),
+            placeholder: t('e.g. 100001'),
             label: t('Unit Number'),
             name: 'externalId',
             value: formik.values.externalId,

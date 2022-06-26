@@ -383,6 +383,7 @@ module.exports = {
     '{{time}} days': '{{time}} tage',
     '{{time}} months': '{{time}} monate',
     '{{time}} years': '{{time}} jahre',
+    'e.g. 100001': 'z.B. 100001',
   },
 };
 
