@@ -1,7 +1,8 @@
-import {useEffect, useRef, useState} from 'react';
+/* eslint-disable */
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {ElevatorView} from 'models/elevator';
 import {Widget} from 'components/Widget';
-import {GridRowsProp} from '@mui/x-data-grid';
+import {GridRowsProp, GridSortModel} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
@@ -22,6 +23,8 @@ const pageInfo = makePage(0, 50);
 
 export const UnitListingView = () => {
   const [queryParams, setQueryParams] = useSearchParams();
+  const [orderField, setOrderField] = useState();
+  const [orderBy, setOrderBy] = useState();
   const [upcomingVisitFilter, setUpcomingVisitFilter] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(pageInfo);
@@ -64,6 +67,11 @@ export const UnitListingView = () => {
       setPageCount(Math.ceil(elevatorResponse.total / page.pageSize));
     }
   }, [elevatorResponse, page]);
+
+  const handleSortModelChange = useCallback((sortModel: GridSortModel) => {
+    // Here you save the data you need from the sort model
+    console.log(sortModel, '****^^^^@@@@@@@');
+  }, []);
 
   if (isFetched && !totalUnitsRef.current) {
     return (
@@ -119,6 +127,7 @@ export const UnitListingView = () => {
         loading={isFetching}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
+        onSortModelChange={handleSortModelChange}
         handlePageSizeChange={(newPageSize: number) =>
           setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
         }

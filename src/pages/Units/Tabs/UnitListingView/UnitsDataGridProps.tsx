@@ -40,6 +40,7 @@ export const columns: GridColDef[] = [
     headerName: 'last visit',
     align: 'center',
     flex: 0,
+    sortable: true,
   }),
   getColumnProps({
     field: 'nextVisit',

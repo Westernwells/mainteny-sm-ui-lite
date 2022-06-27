@@ -177,6 +177,7 @@ export const DataGridLayout = ({
         disableColumnFilter
         disableColumnMenu
         hideFooter={hideFooter}
+        sortingMode="server"
         onCellClick={
           onCellClick ||
           ((params, e) => {
@@ -286,9 +287,8 @@ export const DataGridLayout = ({
           },
           ...rowClassNames,
           ...containerStyle,
-
-          ...rest,
         }}
+        {...rest}
       />
     </Box>
   );
