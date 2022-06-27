@@ -12,6 +12,8 @@ import {
   formatSearchParamsPageSize,
 } from 'utils/utils';
 import {useSearchParams, useNavigate} from 'react-router-dom';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {columns, makeRows} from './InvoicesDataGridProps';
@@ -104,6 +106,11 @@ export const Invoices = () => {
     setAmount(range);
   };
 
+  const navigateToNewInvoice = () => {
+    Mixpanel.identifyAndTrack(mixpanelEvents.NEW_UNIT_BUTTON_CLICKED);
+    navigate('/invoices/new');
+  };
+
   if (isIdle || isLoading) {
     return <Progress />;
   }
@@ -183,7 +190,7 @@ export const Invoices = () => {
           height: '100%',
           mb: '10em',
         }}
-        btnAction={() => navigate('/invoices/new')}
+        btnAction={navigateToNewInvoice}
       />
     );
   }
@@ -196,7 +203,7 @@ export const Invoices = () => {
           getSearchValue={(val: string) => setSearch(val)}
           showActionBtn
           btnLabel="New Invoice"
-          btnOnClick={() => navigate('/invoices/new')}
+          btnOnClick={navigateToNewInvoice}
           filterItems={renderFilterItems()}
         />
       }>
