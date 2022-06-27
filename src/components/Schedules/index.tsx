@@ -256,20 +256,20 @@ export const Schedule = ({
       ) : null}
 
       <Box ref={elementRef} sx={sx.mainContainer}>
-        <Divider
-          absolute
-          sx={[
-            sx.divider,
-            {
-              marginLeft: `${
-                gridWidth *
-                (new Date().getHours() + new Date().getMinutes() / 60)
-              }px`,
-            },
-          ]}
-          orientation="vertical"
-        />
-        <CardContent sx={{padding: 0, width: '100%'}}>
+        <CardContent sx={{padding: 0, width: '100%', position: 'relative'}}>
+          <Divider
+            absolute
+            sx={[
+              sx.divider,
+              {
+                marginLeft: `${
+                  gridWidth *
+                  (1 + new Date().getHours() + new Date().getMinutes() / 60)
+                }px`,
+              },
+            ]}
+            orientation="vertical"
+          />
           <ScheduleContainer>
             <ScheduleHeader>
               <ScheduleRow>

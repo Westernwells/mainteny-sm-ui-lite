@@ -8,7 +8,6 @@ export const styles = {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    position: 'relative',
     '&::-webkit-scrollbar': {
       height: '0.2em',
       width: '0.2em',
@@ -26,8 +25,6 @@ export const styles = {
   }),
   divider: sx({
     width: '1px',
-    minHeight: '100vh',
-    top: 60,
     bgcolor: '#BDBDBD',
     opacity: 0.5,
   }),
