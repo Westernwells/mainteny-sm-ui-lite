@@ -5,12 +5,18 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
 import {useQueryContract} from 'hooks/reactQuery/useContract';
-import {ContractOrderField, ContractView} from 'models/contract';
+import {
+  ContractOrderField,
+  ContractStatus,
+  ContractView,
+} from 'models/contract';
 import {Order} from 'models/misc';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {
+  convertToMacro,
+  convertToText,
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
 } from 'utils/utils';
@@ -19,7 +25,6 @@ import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
 import {costRangeConvertor as crConverter} from 'utils/contract-utils';
 import {columns, makeRows} from './ContractsDataGridProps';
-import {Button} from '@mui/material';
 
 const pageSize = 25;
 
@@ -47,10 +52,10 @@ export const Contracts = () => {
     {
       order: Order.DESC,
       orderBy: ContractOrderField.CREATED_TIME,
-      pageIndex: page.pageIndex,
-      pageSize: page.pageSize,
+      pageIndex: page.pageIndex || 0,
+      pageSize: page.pageSize || 25,
       query: search,
-      status: [],
+      status,
     },
     {price: cost},
     {keepPreviousData: true},
@@ -99,6 +104,7 @@ export const Contracts = () => {
         label="No contracts have been created yet. Please click the button below to create one!"
         showActionBtn
         btnLabel="Add Contract"
+        btnAction={() => navigate('/contracts/new')}
         containerStyle={{
           height: '100%',
           mb: '10em',
@@ -121,9 +127,11 @@ export const Contracts = () => {
       />
       <MultipleSelectCheckmarks
         label="Status"
-        options={['Active', 'Expired']}
+        options={Object.keys(ContractStatus).map((item) => convertToText(item))}
         initialSelectedItems={status}
-        getSelectedValue={(item) => setStatus(item)}
+        getSelectedValue={(item) =>
+          setStatus(item.map((val) => convertToMacro(val)))
+        }
       />
     </FilterFields>
   );
@@ -144,7 +152,6 @@ export const Contracts = () => {
             btnOnClick={() => navigate('/contracts/new')}
             showActionBtn={true}
           />
-          {/* <Button variant="contained">+ New Contract</Button> */}
         </>
       }>
       <DataGridLayout

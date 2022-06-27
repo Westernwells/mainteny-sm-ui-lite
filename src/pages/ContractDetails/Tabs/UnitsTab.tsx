@@ -14,9 +14,12 @@ import {TabContentContainer} from 'components/TabContentContainer';
 import {FilterFields} from 'components/FilterFields';
 import {DatePicker} from 'components/DatePicker';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
+import {EmptySection} from 'components/EmptySection';
+import {useNavigate} from 'react-router';
 
 export const UnitsTab = () => {
   const [search, setSearch] = useState('');
+  const navigate = useNavigate();
   const [page] = useState(makePage(0, 25)); // TODO: implement paging
   const [rows, setRows] = useState<GridRowsProp>([]);
   const {data: elevator = createEmptyResource<ElevatorView>(10)} =
@@ -99,7 +102,33 @@ export const UnitsTab = () => {
   return (
     <TabContentContainer>
       {renderWidget()}
-      <DataGridLayout rows={rows} columns={columns} pageSize={page.pageSize} />
+      <DataGridLayout
+        noRowsEmptySection={
+          <EmptySection
+            illustration="clipboard"
+            size="tiny"
+            containerStyle={{my: 'auto'}}
+            btnAction={() => navigate('/units/new')}
+            label="No units yet. They will appear here once added!"
+            btnLabel="+ Add Unit"
+            showActionBtn
+          />
+        }
+        noResultsEmptySection={
+          <EmptySection
+            illustration="clipboard"
+            size="tiny"
+            containerStyle={{my: 'auto'}}
+            btnAction={() => navigate('/units/new')}
+            label="No units yet. They will appear here once added!"
+            btnLabel="+ Add Unit"
+            showActionBtn
+          />
+        }
+        rows={rows}
+        columns={columns}
+        pageSize={page.pageSize}
+      />
     </TabContentContainer>
   );
 };

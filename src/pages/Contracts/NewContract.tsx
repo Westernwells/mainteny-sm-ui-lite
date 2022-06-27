@@ -3,12 +3,16 @@ import {FileWithPreview} from 'components/MyDropzone';
 import {PageCard} from 'components/PageCard';
 import {Stepper} from 'components/Stepper';
 import {useFormik} from 'formik';
+import {useCreateContract} from 'hooks/reactQuery/useContract';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   ContractBasicInfoFormModel,
   ContractTermsFormModal,
 } from 'models/contract';
+import {FileResourceRecord} from 'models/media';
 import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router';
+import {convertToMacro} from 'utils/utils';
 import * as Yup from 'yup';
 import NewContractBasicInfo from './NewContractBasicInfo';
 import NewContractDocuments from './NewContractDocuments';
@@ -23,13 +27,32 @@ const steps = [
 ];
 
 const validationSchemaBasicInfo = Yup.object().shape({
-  propertyOwnerId: Yup.string().nullable().required('Customer is required'),
-  startDate: Yup.string().nullable().required('Start date is required'),
-  endDate: Yup.string().nullable().required('End date is required'),
+  propertyOwner: Yup.object().shape({
+    id: Yup.string().required('Customer is required'),
+  }),
+  startDate: Yup.date()
+    .transform((date) => {
+      console.log(
+        new Date(date).toLocaleString().length,
+        '<<< new Date(date).toLocaleString().length',
+      );
+      if (new Date(date).toLocaleString().length) return date;
+      return date;
+    })
+    .nullable(true)
+    .required('Start date is required'),
+  endDate: Yup.date()
+    .transform((date) => {
+      if (new Date(date).toLocaleString().length) return date;
+      return date;
+    })
+    .nullable(true)
+    .required('End date is required'),
   contractType: Yup.string().nullable().required('Contract Type is required'),
   contractNumber: Yup.number()
     .nullable()
     .min(0, 'Should be higher or equal to 0'),
+  externalId: Yup.string().nullable().required('Contract Number is required'),
 });
 
 const validationSchemaContractTerms = Yup.object().shape({
@@ -56,19 +79,25 @@ const NewContract = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [disableNextBtn, setDisableNextBtn] = useState(false);
 
+  const navigate = useNavigate();
+
   const {user} = useUserSession();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
+  const {mutateAsync: createContract, isLoading} = useCreateContract(
+    'Contract is created',
+  );
+
   const formikBasicInfo = useFormik<ContractBasicInfoFormModel>({
     initialValues: {
-      propertyOwnerId: '',
-      startDate: '',
-      endDate: '',
+      propertyOwner: null,
+      startDate: null,
+      endDate: null,
       contractType: '',
-      contractNumber: 0,
+      externalId: '',
     },
     onSubmit: () => {},
-    validateOnChange: true,
+    enableReinitialize: true,
     validationSchema: validationSchemaBasicInfo,
   });
 
@@ -104,13 +133,6 @@ const NewContract = () => {
   });
 
   useEffect(() => {
-    console.log(
-      activeStep,
-      formikBasicInfo.errors,
-      formikUnits.errors,
-      formikContractTerms.errors,
-      formikDocuments.errors,
-    );
     if (
       (activeStep === 0 && Object.keys(formikBasicInfo.errors).length) ||
       (activeStep === 1 && Object.keys(formikUnits.errors).length) ||
@@ -137,11 +159,17 @@ const NewContract = () => {
       annualPriceAdjustmentPercentage:
         formikContractTerms.values.annualPriceAdjustmentPercentage,
       currency: 'EUR',
-      documents: formikDocuments.values.documents,
+      documents: formikDocuments.values.documents.reduce<FileResourceRecord[]>(
+        (newArr, obj) => [
+            ...newArr,
+            {type: obj.type, uri: obj.preview, description: ''},
+          ],
+        [],
+      ),
       elevators: formikUnits.values.elevators,
       endDate: formikBasicInfo.values.endDate,
       hourlyRate: formikContractTerms.values.hourlyRate,
-      invoiceDue: formikContractTerms.values.invoiceDue,
+      invoiceDue: convertToMacro(formikContractTerms.values.invoiceDue),
       price: {
         currency: 'EUR',
         netAmount: formikContractTerms.values.netAmount,
@@ -149,15 +177,19 @@ const NewContract = () => {
           formikContractTerms.values.annualPriceAdjustmentPercentage,
       },
       sla: formikContractTerms.values.serviceLevelAgreement,
-      propertyOwnerId: formikBasicInfo.values.propertyOwnerId,
+      propertyOwnerId: formikBasicInfo.values.propertyOwner?.id,
       renewalTerms: formikContractTerms.values.renewalTerms,
       serviceCompanyId,
       spendingLimit: formikContractTerms.values.spendingLimit,
       startDate: formikBasicInfo.values.startDate,
-      type: formikBasicInfo.values.contractType,
+      type: convertToMacro(formikBasicInfo.values.contractType),
       visitsNumber: formikContractTerms.values.visitsNumber,
+      timePreference: [],
+      externalId: formikBasicInfo.values.externalId,
     };
-    console.log(newContract, '<<< newContract');
+
+    await createContract(newContract);
+    navigate('/contracts');
   };
 
   return (
@@ -168,6 +200,7 @@ const NewContract = () => {
       disableNextBtn={disableNextBtn}
       steps={steps}
       stepperStyles={{width: '100%'}}
+      submitting={isLoading}
       containerStyles={{
         flexGrow: 1,
         ml: '0',
@@ -188,7 +221,10 @@ const NewContract = () => {
               headerLabel="Units"
               minHeight="100%"
               contentContainerStyles={{height: '100%'}}>
-              <NewContractSelectUnits formik={formikUnits} />
+              <NewContractSelectUnits
+                formik={formikUnits}
+                customerId={formikBasicInfo.values.propertyOwner!.id}
+              />
             </PageCard>
           </FlexContainer>
         )}

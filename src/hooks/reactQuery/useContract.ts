@@ -333,6 +333,7 @@ export const useUpdateContract = (successMsg?: string) => {
           });
         }
         queryClient.invalidateQueries(queryKeys.elevatorById);
+        queryClient.invalidateQueries(queryKeys.contractDetails);
       },
       onError: (err: any) => {
         console.log(err);
@@ -342,4 +343,28 @@ export const useUpdateContract = (successMsg?: string) => {
       },
     },
   );
+};
+
+const createContract = async (body: any): Promise<StringValue> => {
+  const response = await axiosClient.post<StringValue>('/api/contracts', {
+    ...body,
+  });
+  return response.data;
+};
+
+export const useCreateContract = (successMsg: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation((body: any) => createContract(body), {
+    onSuccess: () => {
+      enqueueSnackbar(successMsg, {
+        variant: 'success',
+      });
+    },
+    onError: (err) => {
+      console.log(err);
+      enqueueSnackbar('Some error occurred, please try again.', {
+        variant: 'error',
+      });
+    },
+  });
 };

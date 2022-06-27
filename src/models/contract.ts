@@ -8,6 +8,7 @@ import {Meta, Order, OrderBy, TimeWindowRecord, TimeWindowType} from './misc';
 import {Elevator, ElevatorStatus, ElevatorView} from './elevator';
 import {PropertyOwnerSimpleView, PropertyOwnerView} from './propertyManager';
 import {FileWithPreview} from 'components/MyDropzone';
+import {FileResourceRecord} from './media';
 
 export enum ContractStatus {
   PENDING = 'PENDING',
@@ -117,15 +118,8 @@ export interface ContractView {
   status: ContractStatus;
   search: string;
   meta: Meta;
-}
 
-export interface FormikContractView {
-  type: string;
-  visitsNumber: number;
-  spendingLimit: number;
-  price: number;
-  renewalTerms: number;
-  invoiceDue: string;
+  elevators: ElevatorView[];
 }
 
 export interface ContractViewWithUnits {
@@ -214,25 +208,27 @@ export interface ContractTimeWindowRecord {
 }
 
 export interface ContractRequestBody {
-  currency: string;
-  endDate: string;
-  externalId: string;
-  hourlyRate: number;
-  price: number;
-  sla: number;
-  spendingLimit: number;
-  startDate: string;
-  timePreference: ContractTimeWindowRecord[];
-  type: string;
-  visitsNumber: number;
+  currency?: string;
+  endDate?: string;
+  externalId?: string;
+  hourlyRate?: number;
+  price?: number;
+  sla?: number;
+  spendingLimit?: number;
+  startDate?: string;
+  timePreference?: ContractTimeWindowRecord[];
+  type?: string;
+  visitsNumber?: number;
+  invoiceDue?: string;
+  renewalTerms: number;
 }
 
 export interface ContractBasicInfoFormModel {
-  propertyOwnerId: string;
-  startDate: string;
-  endDate: string;
+  propertyOwner: PropertyOwnerView | null;
+  startDate: Date | null;
+  endDate: Date | null;
   contractType: string;
-  contractNumber: number;
+  externalId: string;
 }
 
 export interface ContractTermsFormModal {

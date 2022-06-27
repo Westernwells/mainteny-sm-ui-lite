@@ -17,11 +17,12 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => (
     <Grid item xs={4}>
       <CustomerAutoComplete
         getCustomer={(customer) =>
-          formik.setFieldValue('propertyOwnerId', customer?.id)
+          formik.setFieldValue('propertyOwner', customer)
         }
         textFieldProps={{
           label: 'Customer',
         }}
+        initialValue={formik.values.propertyOwner}
       />
     </Grid>
     <Grid item xs={4}>
@@ -38,6 +39,7 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => (
               : '',
           error: !!(formik.touched.startDate && formik.errors.startDate),
         }}
+        defaultDate={new Date(formik.values.startDate || Date.now())}
       />
     </Grid>
     <Grid item xs={4}>
@@ -49,11 +51,12 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => (
           onChange: formik.handleChange,
           required: true,
           helperText:
-            formik.errors.startDate && formik.touched.endDate
+            formik.errors.endDate && formik.touched.endDate
               ? formik.errors.endDate
               : '',
           error: !!(formik.touched.endDate && formik.errors.endDate),
         }}
+        defaultDate={new Date(formik.values.endDate || Date.now())}
       />
     </Grid>
     <Grid item xs={4}>
@@ -77,13 +80,12 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => (
       <FormInput
         props={{
           label: 'Contract Number',
-          name: 'contractNumber',
+          name: 'externalId',
           placeholder: '454846',
-          type: 'number',
-          value: formik.values.contractNumber,
-          error: !!(
-            formik.touched.contractNumber && formik.errors.contractNumber
-          ),
+          type: 'text',
+          required: true,
+          value: formik.values.externalId,
+          error: !!(formik.touched.externalId && formik.errors.externalId),
           onBlur: formik.handleBlur,
           onChange: formik.handleChange,
         }}

@@ -29,6 +29,8 @@ export const DatePicker = ({
     if (defaultDate) {
       setValue(defaultDate);
     }
+    console.log('MOUNTED', typeof defaultDate);
+    return () => console.log('UNMOUNTED');
   }, []);
 
   useEffect(() => {

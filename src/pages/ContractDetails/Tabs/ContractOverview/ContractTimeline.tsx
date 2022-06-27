@@ -6,15 +6,11 @@ import {ContractView} from 'models/contract';
 
 interface Props {
   contractDetails?: ContractView;
-  usedContractDays: number | false;
   unUsedContractDays: number | false;
-  totalContractDays: number | false;
 }
 
 export const ContractTimeline = ({
   contractDetails,
-  totalContractDays,
-  usedContractDays,
   unUsedContractDays,
 }: Props) => {
   const theme = useTheme();
@@ -24,7 +20,43 @@ export const ContractTimeline = ({
       <Box display="flex" alignItems="center">
         <Box
           sx={{
-            backgroundColor: `#00D68F`,
+            mr: 2,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '.75rem',
+            height: '.75rem',
+            borderRadius: '50%',
+            backgroundColor: unUsedContractDays
+              ? theme.palette.text.secondary
+              : '#00D68F',
+          }}
+        />
+        <Box>
+          <Typography variant="subtitle1">Contract ends</Typography>
+          <Typography variant="body1">
+            {formatDate(contractDetails?.endTime, 'dd MMM YYY')}
+          </Typography>
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          height: '2.25rem',
+          display: 'flex',
+          flexDirection: 'column',
+          maxWidth: '2px',
+          marginLeft: '.375rem',
+          transform: 'translateX(-50%)',
+          position: 'relative',
+          backgroundColor: theme.palette.text.secondary,
+        }}
+      />
+      <Box display="flex" alignItems="center">
+        <Box
+          sx={{
+            backgroundColor: unUsedContractDays
+              ? `#00D68F`
+              : theme.palette.text.secondary,
             mr: '1em',
             display: 'flex',
             justifyContent: 'center',
@@ -38,64 +70,6 @@ export const ContractTimeline = ({
           <Typography variant="subtitle1">Contract signed</Typography>
           <Typography variant="body1">
             {formatDate(contractDetails?.startTime, 'dd MMM YYY')}
-          </Typography>
-        </Box>
-      </Box>
-
-      <Box
-        sx={{
-          height: '2.25rem',
-          display: 'flex',
-          flexDirection: 'column',
-          maxWidth: '2px',
-          marginLeft: '.375rem',
-          transform: 'translateX(-50%)',
-          position: 'relative',
-          backgroundColor: theme.palette.text.secondary,
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '2px',
-            backgroundColor: theme.palette.primary.main,
-            height:
-              usedContractDays && totalContractDays
-                ? `${(usedContractDays / totalContractDays) * 100}%`
-                : null,
-          },
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '2px',
-            backgroundColor: 'green',
-            height:
-              unUsedContractDays && totalContractDays
-                ? `${(unUsedContractDays / totalContractDays) * 100}%`
-                : null,
-          },
-        }}
-      />
-
-      <Box display="flex" alignItems="center">
-        <Box
-          sx={{
-            mr: 2,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '.75rem',
-            height: '.75rem',
-            borderRadius: '50%',
-            backgroundColor: theme.palette.text.secondary,
-          }}
-        />
-        <Box>
-          <Typography variant="subtitle1">Contract ends</Typography>
-          <Typography variant="body1">
-            {formatDate(contractDetails?.endTime, 'dd MMM YYY')}
           </Typography>
         </Box>
       </Box>
