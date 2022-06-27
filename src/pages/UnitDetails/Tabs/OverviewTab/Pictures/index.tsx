@@ -47,7 +47,7 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
           pictures: [
             ...(elevatorRequestBody.pictures as FileResourceRecord[]),
             ...acceptedFiles.map((item) => ({
-              description: '',
+              description: item.name.split('.')[0],
               type: item.type,
               uri: `${uploadPath}/${item.name}`,
             })),
@@ -103,15 +103,22 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
         <Grid container spacing={1} sx={{mt: '0.5em'}}>
           {elevator.additionalInfo.pictures &&
             elevator.additionalInfo.pictures.map((item, index) => (
-              <Grid item xs={6} sm={4} key={index}>
+              <Grid
+                item
+                xs={6}
+                sm={4}
+                key={index}
+                sx={{
+                  height: 120,
+                  [theme.breakpoints.down('md')]: {
+                    height: 170,
+                  },
+                }}>
                 <Box
                   sx={{
                     border: `1px solid ${theme.palette.text.disabled}`,
                     padding: '0.5em',
-                    height: 120,
-                    [theme.breakpoints.down('md')]: {
-                      height: 170,
-                    },
+                    height: '70%',
                     display: 'flex',
                     flexDirection: 'column',
                   }}>
@@ -131,24 +138,23 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
                       }}
                     />
                   </Box>
-
-                  {item.description ? (
-                    <Typography
-                      component="div"
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{
-                        overflow: 'hidden',
-                        display: '-webkit-box',
-                        maxWidth: '100%',
-                        WebkitLineClamp: '1',
-                        WebkitBoxOrient: 'vertical',
-                        height: '20%',
-                      }}>
-                      {item.description}
-                    </Typography>
-                  ) : null}
                 </Box>
+                {item.description ? (
+                  <Typography
+                    component="div"
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{
+                      overflow: 'hidden',
+                      display: '-webkit-box',
+                      maxWidth: '100%',
+                      WebkitLineClamp: '2',
+                      WebkitBoxOrient: 'vertical',
+                      height: '20%',
+                    }}>
+                    {item.description}
+                  </Typography>
+                ) : null}
               </Grid>
             ))}
         </Grid>
