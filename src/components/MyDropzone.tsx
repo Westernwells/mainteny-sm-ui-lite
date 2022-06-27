@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import {useEffect, useRef, useState} from 'react';
 import {FileWithPath, useDropzone, FileRejection} from 'react-dropzone';
@@ -142,6 +143,7 @@ export const MyDropZone = ({
         </Box>
       </Box>
     ));
+  const {t} = useTranslation();
 
   return (
     <Box>
@@ -157,7 +159,7 @@ export const MyDropZone = ({
         <div {...getRootProps({className: 'dropzone'})}>
           <input {...getInputProps()} />
           <Typography variant="body2" component="div" sx={{mb: '1em'}}>
-            Drag &apos;n&apos; drop or
+            {t('Drag &apos;n&apos; drop or')}
           </Typography>
           <Button
             label="Select file"

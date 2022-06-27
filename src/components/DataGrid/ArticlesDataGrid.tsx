@@ -1,19 +1,12 @@
 import {useEffect, useState} from 'react';
-import {
-  GridAlignment,
-  GridColDef,
-  GridColumnHeaderParams,
-  GridRenderCellParams,
-  GridRowsProp,
-} from '@mui/x-data-grid';
-import Typography from '@mui/material/Typography';
+import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
-import {DataGridLayout} from 'components/DataGridLayout';
+import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {ArticleView} from 'models/article';
-import {netAmount} from 'utils/currency';
+import {formatCurrency} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {NoRowsEmptySection} from './NoRowsEmptySection';
 import {styles} from './style';
@@ -22,79 +15,40 @@ interface Props {
   setRowItem: (row: ArticleView) => void;
 }
 
-const defaultProps = {
-  editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
-  renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" mx="0.5em">
-      {params.value || '-'}
-    </Typography>
-  ),
-};
-const defaultAlignment: {
-  flex: number;
-  headerAlign: GridAlignment;
-  align: GridAlignment;
-} = {
-  flex: 1,
-  headerAlign: 'center',
-  align: 'center',
-};
-
 export const columns: GridColDef[] = [
-  {
+  getColumnProps({
     field: 'number',
-    headerName: 'ARTICLE NO',
-    type: 'string',
-    cellClassName: 'nowrap',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
+    headerName: 'number',
+    align: 'center',
+    flex: 0,
+  }),
+  getColumnProps({
     field: 'type',
-    headerName: 'TYPE',
-    type: 'string',
-    flex: 2,
-    headerAlign: 'left',
-    ...defaultProps,
-  },
-  {
+    headerName: 'type',
+  }),
+  getColumnProps({
     field: 'model',
-    headerName: 'MODEL',
-    type: 'string',
-    flex: 2,
-    headerAlign: 'left',
-    ...defaultProps,
-  },
-  {
+    headerName: 'model',
+    align: 'right',
+    flex: 0,
+  }),
+  getColumnProps({
     field: 'manufacturer',
-    headerName: 'MANUFACTURER',
-    type: 'string',
-    flex: 2,
-    headerAlign: 'left',
+    headerName: 'manufacturer',
     cellClassName: 'truncateText',
-    ...defaultProps,
-  },
-  {
+    flex: 1.5,
+  }),
+  getColumnProps({
     field: 'description',
-    headerName: 'DESCRIPTION',
-    type: 'string',
-    flex: 2,
-    headerAlign: 'left',
+    headerName: 'description',
     cellClassName: 'truncateText',
-    ...defaultProps,
-  },
-  {
+    flex: 1.5,
+  }),
+  getColumnProps({
     field: 'price',
-    headerName: 'UNIT PRICE',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
+    headerName: 'price',
+    align: 'right',
+  }),
 ];
 
 export const makeRows = (articles: ArticleView[]): GridRowsProp =>
@@ -106,7 +60,15 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
         model: item.model,
         manufacturer: item.manufacturer,
         description: item.description,
-        price: netAmount(item.unitSellingAmount),
+        price: `${formatCurrency(
+          item
+            ? item.unitSellingAmount.netAmount /
+                10 ** item.unitSellingAmount.fractionDigits!
+            : 0,
+          {
+            currency: item.unitSellingAmount.currency,
+          },
+        )}`,
         article: item,
       }))
     : [];

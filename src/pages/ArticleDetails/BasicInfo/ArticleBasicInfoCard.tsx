@@ -20,7 +20,7 @@ import {convertToText} from '../../../utils/utils';
 import {useUpdateArticle} from '../../../hooks/reactQuery/useArticle';
 import {CardProps} from '../../../components/CardProps';
 import {InfoCard} from '../../../components/InfoCard';
-import {netAmount} from '../../../utils/currency';
+import {formatNetAmount} from '../../../utils/currency';
 
 const validationSchema = Yup.object().shape({
   category: Yup.string().nullable().required('Category is required'),
@@ -124,12 +124,12 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
     {
       label: 'Selling Price',
       icon: <LocalOfferRoundedIcon sx={{color: theme.palette.info.dark}} />,
-      body: netAmount(article.unitSellingAmount),
+      body: formatNetAmount(article.unitSellingAmount),
     },
     {
       label: 'Purchase Price',
       icon: <LocalOfferRoundedIcon sx={{color: theme.palette.info.dark}} />,
-      body: netAmount(article.unitPurchaseAmount),
+      body: formatNetAmount(article.unitPurchaseAmount),
     },
     {
       label: 'Storage Location',

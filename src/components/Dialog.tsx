@@ -5,6 +5,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import React, {ReactNode} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Button} from './Button';
 
 interface Props {
@@ -27,39 +28,44 @@ export const Dialog = ({
   dialogProps,
   saveBtnType,
   isSaving = false,
-}: Props) => (
-  <MuiDialog
-    fullWidth
-    onClose={onCancel}
-    aria-labelledby="alert-dialog-title"
-    aria-describedby="alert-dialog-description"
-    {...dialogProps}>
-    <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
-    <DialogContent>
-      <DialogContentText id="alert-dialog-description" component="div">
-        {children}
-      </DialogContentText>
-    </DialogContent>
-    <DialogActions sx={{mt: '1.5em'}}>
-      <Button
-        buttonProps={{
-          onClick: onCancel,
-        }}>
-        <Typography variant="subtitle2" color="text.secondary">
-          Cancel
-        </Typography>
-      </Button>
-      <Button
-        buttonProps={{
-          onClick: onSave,
-          autoFocus: true,
-          disabled: disableSaveBtn || isSaving,
-          type: saveBtnType,
-        }}>
-        <Typography variant="subtitle2">
-          {isSaving ? 'Saving...' : 'Save'}
-        </Typography>
-      </Button>
-    </DialogActions>
-  </MuiDialog>
-);
+}: Props) => {
+  const {t} = useTranslation();
+  return (
+    <MuiDialog
+      fullWidth
+      onClose={onCancel}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+      {...dialogProps}>
+      <DialogTitle id="alert-dialog-title">
+        {typeof title === 'string' ? t(title) : title}
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText id="alert-dialog-description" component="div">
+          {children}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions sx={{mt: '1.5em'}}>
+        <Button
+          buttonProps={{
+            onClick: onCancel,
+          }}>
+          <Typography variant="subtitle2" color="text.secondary">
+            {t('Cancel')}
+          </Typography>
+        </Button>
+        <Button
+          buttonProps={{
+            onClick: onSave,
+            autoFocus: true,
+            disabled: disableSaveBtn || isSaving,
+            type: saveBtnType,
+          }}>
+          <Typography variant="subtitle2">
+            {isSaving ? `${t('Saving')}...` : t('Save')}
+          </Typography>
+        </Button>
+      </DialogActions>
+    </MuiDialog>
+  );
+};

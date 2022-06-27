@@ -13,7 +13,7 @@ import {differenceInDays, isBefore} from 'date-fns';
 import {InfoCard} from 'components/InfoCard';
 
 import {Progress} from 'components/Progress';
-import {formatCurrency} from 'utils/currency';
+import {formatNetAmount} from 'utils/currency';
 import {ContractBasic} from './ContractBasic';
 import {ContractParties} from './ContractParties';
 import {ContractScope} from './ContractScope';
@@ -73,12 +73,9 @@ export const ContractOverview = () => {
             <ContractBasic
               startTime={contractDetails?.startTime}
               endTime={contractDetails?.endTime}
-              costPerYear={formatCurrency(
-                contractDetails ? contractDetails.price! : 0,
-                {
-                  currency: contractDetails?.currency || 'EUR',
-                },
-              )}
+              costPerYear={
+                formatNetAmount(contractDetails?.additionalInfo?.price) || '-'
+              }
               type={contractDetails?.type.toLowerCase()}
             />
           </InfoCard>

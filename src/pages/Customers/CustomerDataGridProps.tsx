@@ -56,7 +56,7 @@ export const makeRows = (
     name: item.name,
     number: item.externalId,
     address: item.postalAddress.fullName,
-    units: item.units,
+    units: item.unitNumber,
     phone: item.contact.phone,
     access: 'Invite',
     navigateTo: `details/${item.id}?tab=0`,

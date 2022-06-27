@@ -25,16 +25,27 @@ function formatAmount(amount?: Amount, value?: number): string {
   }).toFormat();
 }
 // display the amount from backend
-export function netAmount(amount?: Amount): string {
+export function formatNetAmount(amount?: Amount): string {
   return formatAmount(amount, amount?.netAmount);
 }
 
-export function grossAmount(amount?: Amount): string {
+export function formatGrossAmount(amount?: Amount): string {
   return formatAmount(amount, amount?.grossAmount);
 }
 
-export function vatAmount(amount?: Amount): string {
+export function formatVatAmount(amount?: Amount): string {
   return formatAmount(amount, amount?.vat);
+}
+
+export function multipleAmount(amount: Amount, quantity: number): Amount {
+  return {
+    currency: amount.currency,
+    fractionDigits: amount.fractionDigits,
+    grossAmount: amount.grossAmount * quantity,
+    netAmount: amount.netAmount * quantity,
+    percentageVat: amount.percentageVat,
+    vat: amount.vat * quantity,
+  };
 }
 
 // define all the supported currencies, { currencyCode: fractionDigits}
@@ -75,6 +86,17 @@ export function amountRecordForBackend(amount: AmountRecord): AmountRecord {
   };
 }
 
+export function makeAmountRecord(
+  netAmount: number,
+  currency: string,
+  percentageVat: number,
+): AmountRecord {
+  return {
+    netAmount,
+    currency,
+    percentageVat,
+  };
+}
 // transform the amount from backend to frontend for calculation (e.g. amount value in editing form)
 export function amountForView(amount: Amount): Amount {
   const factor = currencyFactor(amount);
@@ -87,10 +109,6 @@ export function amountForView(amount: Amount): Amount {
     fractionDigits: amount.fractionDigits,
   };
 }
-
-// TODO:  use the  implementation from Dapeng when it is merged
-export const formatToDp = (num: number, precision: number) =>
-  num.toFixed(precision);
 
 export const getCurrencySymbol: {[key: string]: string} = {
   USD: '$',

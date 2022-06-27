@@ -9,13 +9,13 @@ import {Button} from 'components/Button';
 import {StatusChip} from 'components/StatusChip';
 import {PageCard} from 'components/PageCard';
 import {Dialog} from 'components/Dialog';
+import {FormLabel} from 'components/form/FormLabel';
+import {PDFContainer} from 'components/PDFContainer';
+import {BottomDrawer} from 'components/BottomDrawer';
 import {QuotationView} from 'models/quotation';
 import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps';
 import {PdfGenerationStatus} from 'models/misc';
 import {formatCurrency} from 'utils/currency';
-import {BottomDrawer} from './Components/BottomDrawer';
-import {PDFContainer} from './Components/PDFContainer';
-import {Label} from './Components/Label';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 
@@ -24,7 +24,7 @@ interface Props {
   quotation: QuotationView;
 }
 
-export const Quotation = ({downloadUrl, quotation}: Props) => {
+export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
   const navigate = useNavigate();
   const [isDrawerOpen] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -77,12 +77,12 @@ export const Quotation = ({downloadUrl, quotation}: Props) => {
             containerStyles={{mb: '1.5em'}}
             contentContainerStyles={{display: 'flex', gap: '1.5em'}}>
             <Box>
-              <Label text="Quotation Number" sx={{color: 'text.main'}} />
+              <FormLabel text="Quotation Number" sx={{color: 'text.main'}} />
               <Typography variant="subtitle1">{quotation.number}</Typography>
             </Box>
 
             <Box>
-              <Label text="Total" sx={{color: 'text.main'}} />
+              <FormLabel text="Total" sx={{color: 'text.main'}} />
               <Typography variant="subtitle1">
                 {formatCurrency(
                   quotation.totalAmount.grossAmount /

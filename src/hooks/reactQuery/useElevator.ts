@@ -7,7 +7,7 @@ import {
 import {AxiosResponse} from 'axios';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {queryKeys} from 'reactQuery/constants';
-import {useNavigate, useParams} from 'react-router';
+import {useParams} from 'react-router';
 import {useSnackbar} from 'notistack';
 import {
   CustomerElevatorParams,
@@ -69,19 +69,14 @@ export const fetchElevatorBreakdownHistory = async (elevatorId: string) => {
   return response.data;
 };
 
-export const useElevatorById = (elevatorId?: string) => {
-  const navigate = useNavigate();
-  return useQuery(
+export const useElevatorById = (elevatorId?: string) =>
+  useQuery(
     [queryKeys.elevatorById, elevatorId],
     () => fetchElevator(elevatorId!),
     {
       enabled: !!elevatorId,
-      onError: (e: any) => {
-        if (e.response.status === 500) navigate('/404');
-      },
     },
   );
-};
 
 export const useElevatorMaintainers = (elevatorId?: string) =>
   useQuery(
