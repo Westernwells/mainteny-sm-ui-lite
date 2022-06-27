@@ -13,7 +13,9 @@ import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
 } from 'utils/utils';
-import {useSearchParams} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {FlexContainer} from 'components/FlexContainer';
 import Box from '@mui/material/Box';
 import {columns, makeRows} from './UnitsDataGridProps';
@@ -21,6 +23,7 @@ import {columns, makeRows} from './UnitsDataGridProps';
 const pageInfo = makePage(0, 50);
 
 export const UnitListingView = () => {
+  const navigate = useNavigate();
   const [queryParams, setQueryParams] = useSearchParams();
   const [upcomingVisitFilter, setUpcomingVisitFilter] = useState<string[]>([]);
   const [search, setSearch] = useState('');
@@ -71,6 +74,10 @@ export const UnitListingView = () => {
         label="No elevators have been created yet. Please click the button below to create one!"
         showActionBtn
         btnLabel="Add Elevator"
+        btnAction={() => {
+          Mixpanel.identifyAndTrack(mixpanelEvents.NEW_UNIT_BUTTON_CLICKED);
+          navigate('new');
+        }}
         containerStyle={{
           height: '100%',
           mb: '10em',
