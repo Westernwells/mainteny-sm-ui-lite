@@ -86,7 +86,7 @@ const WorkHoursTab = ({employeeId}: Props) => {
   const renderWidget = () => (
     <Box sx={{display: 'flex', justifyContent: 'flex-end', mb: '0.5em'}}>
       <Widget
-        searchPlaceholder={t('Search by order type, order number etc.')}
+        searchPlaceholder="Search by order type, order number etc."
         getSearchValue={(val) => setSearch(val)}
         filterItems={renderFilterItems()}
       />
