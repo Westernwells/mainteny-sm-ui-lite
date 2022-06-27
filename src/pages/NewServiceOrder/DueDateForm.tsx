@@ -3,6 +3,7 @@ import {DatePicker} from 'components/DatePicker';
 import {startOfDay} from 'date-fns';
 import {useFormik} from 'formik';
 import {useEffect} from 'react';
+import {useTranslation} from 'react-i18next';
 import * as Yup from 'yup';
 import {DueDateFormProps} from './models';
 
@@ -43,6 +44,8 @@ export const DueDateForm = ({
     }
   }, [formik.errors]);
 
+  const {t} = useTranslation();
+
   return (
     <Box sx={{...containerStyles}}>
       <DatePicker
@@ -56,7 +59,7 @@ export const DueDateForm = ({
           });
         }}
         textFieldProps={{
-          label: 'Due date',
+          label: t('Due date'),
           name: 'date',
           helperText:
             formik.errors.date && formik.touched.date ? formik.errors.date : '',

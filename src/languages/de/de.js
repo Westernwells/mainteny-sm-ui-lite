@@ -384,6 +384,33 @@ module.exports = {
     '{{time}} months': '{{time}} monate',
     '{{time}} years': '{{time}} jahre',
     'e.g. 100001': 'z.B. 100001',
+    'Select unit': 'Einheit wählen',
+    'Select technicians': 'Techniker auswählen',
+    'Add description': 'Beschreibung hinzufügen',
+    'Choose Technicians': 'Techniker auswählen',
+    'Selected technicians below will be contacted by phone automatically':
+      'Die ausgewählten Techniker werden automatisch per Telefon kontaktiert.',
+    'Recommended Technician': 'Empfohlener Techniker',
+    'Add More': 'Mehr hinzufügen',
+    'Selected unit': 'Ausgewählte Anlage',
+    'Selected technician': 'Ausgewählter Techniker',
+    'Description (Optional)': 'Beschreibung (fakultativ)',
+    'Select, date, time & technician': 'Datum, Uhrzeit und Techniker auswählen',
+    Immediate: 'Unmittelbar',
+    'Select a due date': 'Wählen Sie ein Fälligkeitsdatum',
+    'Choose a Date, Time & Technician':
+      'Wählen Sie ein Datum, eine Uhrzeit und einen Techniker',
+    'Select a technician for attending this service order immediately':
+      'Wählen Sie einen Techniker für die sofortige Bearbeitung dieses Serviceauftrags',
+    'Select a date before which this service order has to be completed':
+      'Wählen Sie ein Datum, bis zu dem dieser Serviceauftrag abgeschlossen sein muss',
+    'Select a specific date, time and technician and update the technicians schedule for that day':
+      'Wählen Sie ein bestimmtes Datum, eine Uhrzeit und einen Techniker aus und aktualisieren Sie den Zeitplan der Techniker für diesen Tag.',
+    'Due date': 'Fälligkeitsdatum',
+    'Start Time': 'Startzeit',
+    'End Time': 'Endzeit',
+    'Assign To': 'Zuweisen an',
+    'Selected date and time': 'Ausgewähltes Datum und Uhrzeit',
   },
 };
 
