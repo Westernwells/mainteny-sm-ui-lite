@@ -15,7 +15,7 @@ import {useArticles} from 'hooks/reactQuery/useArticle';
 import {ArticleView} from 'models/article';
 import {formatNetAmount} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {NoRowsEmptySection} from 'pages/QuotationDetails/DataGrid/NoRowsEmptySection';
+import {NoRowsEmptySection} from './DataGrid/NoRowsEmptySection';
 
 interface Props {
   setRowItem: (row: ArticleView) => void;
@@ -137,12 +137,10 @@ export const ArticlesModalDataGrid = ({setRowItem}: Props) => {
   }, [articleResource, page.pageSize]);
 
   useEffect(() => {
-    if (articleResource.data.length) {
+    if (!isLoading) {
       setRows(makeRows(articleResource.data));
-    } else {
-      setRows([]);
     }
-  }, [articleResource]);
+  }, [articleResource, isLoading]);
 
   if (isIdle || isLoading) {
     return (

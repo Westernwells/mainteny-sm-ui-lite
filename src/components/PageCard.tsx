@@ -6,6 +6,7 @@ import CardHeader from '@mui/material/CardHeader';
 
 import IconButton from '@mui/material/IconButton';
 import useTheme from '@mui/material/styles/useTheme';
+import {useTranslation} from 'react-i18next';
 
 export interface Props {
   children: ReactNode;
@@ -33,6 +34,7 @@ export const PageCard = ({
   handleAction = () => {},
 }: Props) => {
   const theme = useTheme();
+  const {t} = useTranslation();
   return (
     <Card
       sx={{
@@ -63,7 +65,7 @@ export const PageCard = ({
                   color: theme.palette.text.primary,
                   ...headerTextOverrideStyles,
                 }}>
-                {headerLabel}
+                {t(headerLabel)}
               </Typography>
             )
           }

@@ -57,8 +57,10 @@ export const Customer = () => {
   }, [queryParams]);
 
   useEffect(() => {
-    setRows(makeRows(customerResource.data));
-  }, [customerResource]);
+    if (!isLoading) {
+      setRows(makeRows(customerResource.data));
+    }
+  }, [customerResource, isLoading]);
 
   useEffect(() => {
     setPageCount(Math.ceil(customerResource.total / page.pageSize));

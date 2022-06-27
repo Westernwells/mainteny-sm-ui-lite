@@ -1,4 +1,5 @@
 import Typography from '@mui/material/Typography';
+import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {useEffect, useState} from 'react';
@@ -23,10 +24,13 @@ export const UnitContracts = ({containerStyles, contracts}: Props) => {
     setRows(makeRows(!showAll ? contracts.slice(0, 3) : contracts));
   }, [contracts]);
 
+  const {t} = useTranslation();
   return (
     <InfoCard
       containerStyles={{...containerStyles}}
-      header={<Typography variant="subtitle1">Related Contracts</Typography>}
+      header={
+        <Typography variant="subtitle1">{t('Related Contracts')}</Typography>
+      }
       showHeaderBackground>
       <DataGridLayout
         fullHeight={false}

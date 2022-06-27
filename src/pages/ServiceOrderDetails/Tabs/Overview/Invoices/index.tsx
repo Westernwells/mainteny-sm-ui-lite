@@ -29,8 +29,10 @@ export const Invoices = ({serviceOrderId}: Props) => {
   totalInvoiceRef = totalInvoiceRef || InvoiceList.length;
 
   useEffect(() => {
-    setRows(makeRows(InvoiceList || []));
-  }, [InvoiceList]);
+    if (!isLoading) {
+      setRows(makeRows(InvoiceList || []));
+    }
+  }, [InvoiceList, isLoading]);
 
   const renderNoRowsSection = () => (
     <Box

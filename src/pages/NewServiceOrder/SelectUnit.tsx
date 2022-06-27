@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
 import {GridCellParams, GridRowsProp} from '@mui/x-data-grid';
@@ -112,12 +113,12 @@ please click the button below'
       </PageCard>
     );
   }
-
+  const {t} = useTranslation();
   return (
     <>
       <Box display="flex" justifyContent="space-between">
         <Typography variant="h6" component="div">
-          Select unit
+          {t('Select unit')}
         </Typography>
         <SearchInput
           placeholder="Search"

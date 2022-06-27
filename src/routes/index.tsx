@@ -10,12 +10,12 @@ import {Customer} from 'pages/Customers';
 import {ContractDetails} from 'pages/ContractDetails';
 import {CustomerDetails} from 'pages/CustomerDetails';
 import {Invoices} from 'pages/Invoices';
-import {NewInvoice} from 'pages/NewInvoice';
+import {DraftInvoice} from 'pages/InvoiceDetails/DraftInvoice';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
 import {Employees} from 'pages/Employee';
 import {EmployeeDetails} from 'pages/EmployeeDetails';
 import {Quotations} from 'pages/Quotations';
-import {NewQuotation} from 'pages/QuotationDetails/NewQuotation';
+import {DraftQuotation} from 'pages/QuotationDetails/DraftQuotation';
 import {QuotationDetails} from 'pages/QuotationDetails';
 import {Notifications} from 'pages/Notifications';
 import {PageNotFound} from 'pages/PageNotFound';
@@ -160,8 +160,11 @@ export const Router = () => {
               <Helmet>
                 <title>{`New Invoice - ${titleTail}`}</title>
               </Helmet>
-              <PageLayout backBtnLabel="New Invoice" showBackAction>
-                <NewInvoice />
+              <PageLayout
+                pageScrollable
+                backBtnLabel="New Invoice"
+                showBackAction>
+                <DraftInvoice />
               </PageLayout>
             </>
           }
@@ -287,7 +290,7 @@ export const Router = () => {
                 pageScrollable
                 backBtnLabel="New Quotation"
                 showBackAction>
-                <NewQuotation />
+                <DraftQuotation />
               </PageLayout>
             </>
           }

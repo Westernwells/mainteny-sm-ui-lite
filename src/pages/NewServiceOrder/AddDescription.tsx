@@ -5,6 +5,7 @@ import {PageCard} from 'components/PageCard';
 import {ElevatorView} from 'models/elevator';
 import {EmployeesView} from 'models/employee';
 import {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Summary, SummaryItem} from './Summary';
 
 interface Props {
@@ -32,10 +33,12 @@ export const AddDescription = ({
     }
   }, [description]);
 
+  const {t} = useTranslation();
+
   return (
     <>
       {selectedUnit ? (
-        <Summary label=" Selected unit">
+        <Summary label="Selected unit">
           <SummaryItem value={selectedUnit.model} />
         </Summary>
       ) : null}
@@ -67,7 +70,7 @@ export const AddDescription = ({
       <PageCard
         customHeader={
           <Typography variant="subtitle2" color="grey.700">
-            Description (Optional)
+            {t('Description (Optional)')}
           </Typography>
         }
         containerStyles={{mt: '2em'}}>

@@ -1,14 +1,7 @@
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import {
-  GridAlignment,
-  GridColDef,
-  GridColumnHeaderParams,
-  GridRenderCellParams,
-  GridRowsProp,
-} from '@mui/x-data-grid';
-import {DataGridLayout} from 'components/DataGridLayout';
+import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
+import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
@@ -21,70 +14,35 @@ interface Props {
   setRowItem: (row: PropertyOwnerView) => void;
 }
 
-const defaultProps = {
-  editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
-  renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" mx="0.5em">
-      {params.value || '-'}
-    </Typography>
-  ),
-};
-const defaultAlignment: {
-  flex: number;
-  headerAlign: GridAlignment;
-  align: GridAlignment;
-} = {
-  flex: 1,
-  headerAlign: 'center',
-  align: 'center',
-};
-
 export const columns: GridColDef[] = [
-  {
-    field: 'name',
-    headerName: 'NAME',
-    type: 'string',
-    flex: 2,
-    headerAlign: 'left',
-    cellClassName: 'truncateText',
-    ...defaultProps,
-  },
-  {
+  getColumnProps({
     field: 'number',
-    headerName: 'CUSTOMER NO.',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'address',
-    headerName: 'ADDRESS',
-    type: 'string',
-    flex: 2,
-    headerAlign: 'left',
+    headerName: 'number',
+    align: 'center',
+    flex: 0,
+  }),
+  getColumnProps({
+    field: 'name',
+    headerName: 'name',
     cellClassName: 'truncateText',
-    ...defaultProps,
-  },
-  {
+    flex: 1.5,
+  }),
+  getColumnProps({
+    field: 'address',
+    headerName: 'address',
+    cellClassName: 'truncateText',
+    flex: 1.5,
+  }),
+  getColumnProps({
     field: 'units',
-    headerName: 'NO OF UNITS',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
+    headerName: 'no. of units',
+    align: 'right',
+    flex: 0,
+  }),
+  getColumnProps({
     field: 'phone',
-    headerName: 'PHONE NO.',
-    type: 'string',
-    cellClassName: 'nowrap',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
+    headerName: 'phone',
+  }),
 ];
 
 export const makeRows = (customers: PropertyOwnerView[]): GridRowsProp =>
@@ -92,7 +50,8 @@ export const makeRows = (customers: PropertyOwnerView[]): GridRowsProp =>
     ? customers.map((item, index) => ({
         id: index,
         name: item.name,
-        number: item.externalId,
+        // TODO: Use Customer number
+        number: 'C-12345',
         address: item.postalAddress.fullName,
         units: item.unitNumber,
         phone: item.contact.phone,

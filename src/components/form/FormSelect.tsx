@@ -94,7 +94,7 @@ export const FormSelect = ({
                 }
               />
             ) : null}
-            {option.label}
+            {t(option.label)}
           </MenuItem>
         ))}
       </Select>

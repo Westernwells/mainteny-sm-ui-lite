@@ -70,7 +70,7 @@ export const EmptySection = ({
             variant: 'contained',
             size: 'medium',
           }}>
-          {btnLabel}
+          {t(btnLabel)}
         </Button>
       ) : null}
     </Box>

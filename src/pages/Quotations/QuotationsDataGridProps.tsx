@@ -76,12 +76,7 @@ export const columns: GridColDef[] = [
     field: 'actions',
     headerName: 'actions',
     align: 'center',
-    renderCell: (params) => (
-      <Actions
-        status={params.row.status}
-        quotationId={params.row.quotationId}
-      />
-    ),
+    renderCell: (params) => <Actions quotation={params.row.quotation} />,
     flex: 0,
   }),
 ];
@@ -104,5 +99,6 @@ export const makeRows = (quotations: Resource<QuotationView>): GridRowsProp =>
       },
     )}`,
     status: item.status,
+    quotation: item,
     navigateTo: `details/${item.id}`,
   }));

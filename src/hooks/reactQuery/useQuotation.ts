@@ -79,16 +79,11 @@ export function useQuotationDetails(
   quotationId?: string,
   options?: UseQueryOptions<any, any, any>,
 ) {
-  const navigate = useNavigate();
-
   return useQuery<QuotationView, RestError, QuotationView>(
     [qk.quotationById, quotationId],
     () => fetchQuotation(quotationId!),
     {
       enabled: !!quotationId,
-      onError: (e: any) => {
-        if (e.response.status === 500) navigate('/404');
-      },
       ...options,
     },
   );

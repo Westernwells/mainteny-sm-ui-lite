@@ -40,8 +40,10 @@ export const UnitListingView = () => {
   totalUnitsRef.current = totalUnitsRef.current || elevatorResponse.total;
 
   useEffect(() => {
-    setRows(makeRows(elevatorResponse.data));
-  }, [elevatorResponse]);
+    if (!isLoading) {
+      setRows(makeRows(elevatorResponse.data));
+    }
+  }, [elevatorResponse, isLoading]);
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
