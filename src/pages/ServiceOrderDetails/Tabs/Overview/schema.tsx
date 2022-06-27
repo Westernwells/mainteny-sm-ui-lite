@@ -1,28 +1,14 @@
-/* eslint-disable */
-import ConstructionIcon from '@mui/icons-material/Construction';
 import PeopleIcon from '@mui/icons-material/People';
-import InfoIcon from '@mui/icons-material/Info';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import FlagIcon from '@mui/icons-material/Flag';
-import PersonIcon from '@mui/icons-material/Person';
 import HomeIcon from '@mui/icons-material/Home';
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import Grid3x3Icon from '@mui/icons-material/Grid3x3';
-import ElevatorIcon from '@mui/icons-material/Elevator';
-import PermContactCalendarIcon from '@mui/icons-material/PermContactCalendar';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
-import TimerIcon from '@mui/icons-material/Timer';
 import TimelapseIcon from '@mui/icons-material/Timelapse';
-import {
-  ServiceOrder,
-  ServiceOrderStatus,
-  ServiceOrderView,
-} from 'models/service-order';
-import {serviceOrderStatusToString} from 'utils/service-order-utils';
-import {convertMinsToHM, formatDate, toDate} from 'utils/datetime';
-// import useTheme from '@mui/material/styles/useTheme';
+import {ServiceOrderView} from 'models/service-order';
+import {formatDate, toDate} from 'utils/datetime';
 import {theme} from 'theme';
 import {CardProps} from 'components/CardProps';
+
 interface OrderInfoProps {
   serviceOrderDetails: ServiceOrderView;
   label: string;

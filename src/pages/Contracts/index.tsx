@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
@@ -129,14 +128,14 @@ export const Contracts = () => {
       />
 
       <MultipleSelectCheckmarks
-        label={'Contractor'}
+        label="Contractor"
         options={contractorFilterItems}
         initialSelectedItems={contractor}
         getSelectedValue={(item) => setContractor(item)}
       />
 
       <MultipleSelectCheckmarks
-        label={'Cost/Year'}
+        label="Cost/Year"
         options={['Below 1000€', '1000 - 3000€', '3000 - 5000€', 'Above 5000€']}
         initialSelectedItems={cost}
         getSelectedValue={(item) => costRangeConvertor(item)}
