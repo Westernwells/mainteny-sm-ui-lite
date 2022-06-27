@@ -205,33 +205,41 @@ export const useInvoicePaymentStatus = () => {
   );
 };
 
-export const postInvoice = async (body: CreateInvoice) => {
+export const postInvoice = async (body: CreateInvoice, publish: boolean) => {
   const {data} = await axiosClient.post<{value: string}>('api/invoices', body);
-  return {data};
+  return {data, publish};
 };
 
 export const useCreateInvoice = () => {
   const queryClient = useQueryClient();
   const {enqueueSnackbar} = useSnackbar();
   const navigate = useNavigate();
+  const {mutate: publishInvoice} = usePublishInvoice();
 
-  return useMutation((data: CreateInvoice) => postInvoice(data), {
-    onSuccess: () => {
-      queryClient.invalidateQueries([qk.fetchInvoices]);
-      queryClient.invalidateQueries([qk.invoiceById]);
-      enqueueSnackbar(`Invoice created successfully!`, {
-        variant: 'success',
-      });
-
-      navigate('/invoices?pageIndex=1&pageSize=25');
+  return useMutation(
+    ({data, publish}: {data: CreateInvoice; publish: boolean}) =>
+      postInvoice(data, publish),
+    {
+      onSuccess: ({data, publish}) => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+        enqueueSnackbar(`Invoice created successfully!`, {
+          variant: 'success',
+        });
+        if (publish) {
+          publishInvoice(data.value);
+        } else {
+          navigate('/invoices?pageIndex=1&pageSize=25');
+        }
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Something went wrong, please try again!', {
+          variant: 'error',
+        });
+      },
     },
-    onError: (err) => {
-      console.log(err);
-      enqueueSnackbar('Something went wrong, please try again!', {
-        variant: 'error',
-      });
-    },
-  });
+  );
 };
 
 export const putInvoice = async (

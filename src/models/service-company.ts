@@ -30,6 +30,7 @@ export interface ServiceCompany {
   id: string;
   name: string;
   contact: CompanyContact;
+  postalAddress?: Address;
   businessAddress?: Address;
   language: Language;
   meta: Meta;

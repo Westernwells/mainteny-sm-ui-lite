@@ -4,8 +4,8 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {InvoiceStatus} from 'models/invoice';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
-import {Invoice} from './Invoice';
-import {EditInvoice} from './EditInvoice';
+import {ViewInvoice} from './ViewInvoice';
+import {DraftInvoice} from './DraftInvoice';
 
 export const InvoiceDetails = () => {
   const {id: invoiceId} = useParams();
@@ -20,11 +20,11 @@ export const InvoiceDetails = () => {
   }
 
   if (isFetched && invoice && invoice.status === InvoiceStatus.DRAFT) {
-    return <EditInvoice invoice={invoice} />;
+    return <DraftInvoice invoice={invoice} />;
   }
 
   return isFetched && invoice && invoice.status !== InvoiceStatus.DRAFT ? (
-    <Invoice
+    <ViewInvoice
       downloadUrl={downloadUrl ? Object.values(downloadUrl)[0] : ''}
       invoice={invoice}
     />

@@ -1,3 +1,4 @@
+import {useCallback} from 'react';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {useNavigate} from 'react-router';
 import {queryKeys, queryKeys as qk} from 'reactQuery/constants';
@@ -12,6 +13,7 @@ import {
   ServiceOrderArticleRecord,
 } from 'models/article';
 import {Resource, RestError, StringValue} from 'models/misc';
+import {data} from 'utils/partial-article-data';
 import {useUserSession} from './useUserSession';
 
 export const fetchArticles = async (
@@ -29,13 +31,36 @@ export const fetchArticles = async (
   return response.data;
 };
 
-export function useArticles(params: QueryArticleParams, options?: any) {
+export function useArticles(
+  params: QueryArticleParams,
+  options?: any,
+  showPartial?: boolean,
+) {
   const {user} = useUserSession();
   return useQuery<Resource<ArticleView>, RestError>(
     [qk.fetchArticles, params, user?.userAccount.id],
     () => fetchArticles(params, user!.userAccount.serviceCompany.id),
     {
       enabled: !!user,
+      select: useCallback(
+        (articlesRes: Resource<ArticleView>) => {
+          const filteredRes = articlesRes.data.filter(
+            (i) => i.unit !== 'PARTIAL',
+          );
+
+          return showPartial
+            ? articlesRes
+            : {
+                data: filteredRes,
+                page: {
+                  pageIndex: articlesRes.page.pageIndex,
+                  pageSize: filteredRes.length,
+                },
+                total: articlesRes.total,
+              };
+        },
+        [showPartial],
+      ),
       ...options,
     },
   );
@@ -172,6 +197,37 @@ export const useUpdateServiceOrderArticles = (successMsg?: string) => {
           });
         }
         queryClient.invalidateQueries(qk.getServiceOrderDetails);
+      },
+    },
+  );
+};
+
+export const postPartialArticle = async (serviceCompanyId?: string) => {
+  if (serviceCompanyId)
+    await axiosClient.post('api/articles', {
+      ...data,
+      serviceCompanyId,
+    });
+};
+
+export const useCreatePartialArticle = () => {
+  const queryClient = useQueryClient();
+  const {user} = useUserSession();
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    () => postPartialArticle(user!.userAccount.serviceCompany.id),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([qk.fetchArticles]);
+        enqueueSnackbar(`Partial Invoice Supported`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again!', {
+          variant: 'error',
+        });
       },
     },
   );
