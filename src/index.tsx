@@ -11,7 +11,7 @@ import {theme} from './theme';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      useErrorBoundary: (error?: any) => error?.response?.status >= 500,
+      useErrorBoundary: true,
     },
   },
 });
