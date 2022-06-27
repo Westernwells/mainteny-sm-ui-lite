@@ -37,7 +37,10 @@ export const Dialog = ({
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       {...dialogProps}>
-      <DialogTitle id="alert-dialog-title">{t(`${title}`)}</DialogTitle>
+      <DialogTitle id="alert-dialog-title">
+        {typeof title === 'string' ? t(title) : title}
+      </DialogTitle>
+
       <DialogContent>
         <DialogContentText id="alert-dialog-description" component="div">
           {children}
