@@ -1,47 +1,47 @@
 import React, {FC} from 'react';
 import {Box, InputAdornment} from '@mui/material';
 import {FormInput} from 'components/form/FormInput';
-import {FormikContractView, ContractType} from 'models/contract';
+import {ContractType, ContractUpdateRequest} from 'models/contract';
 import {FormikProps} from 'formik';
-import {ComboBox} from 'components/ComboBox';
 import {convertToText} from 'utils/utils';
+import {InvoiceDueType} from 'models/invoice';
+import {FormSelect} from 'components/form/FormSelect';
 
 interface Props {
-  formik: FormikProps<FormikContractView>;
+  formik: FormikProps<ContractUpdateRequest>;
 }
 
 const EditContractForm: FC<Props> = ({formik}) => (
-  <Box>
-    <ComboBox
+  <Box
+    sx={{
+      '& > div': {
+        marginY: '10px',
+      },
+    }}>
+    <FormSelect
+      labelId="typeSelect-label"
+      label="Contract Type"
       options={Object.keys(ContractType).map((item) => ({
         label: convertToText(item),
         value: convertToText(item),
       }))}
-      initialValue={
-        formik.values.type
-          ? {
-              label: convertToText(formik.values.type),
-              value: convertToText(formik.values.type),
-            }
-          : null
-      }
-      initialQuery={formik.values.type}
-      getValue={(item) => formik.setFieldValue('type', item?.value)}
-      textFieldProps={{
-        name: 'type',
-        label: 'Contract Type',
-        onBlur: formik.handleBlur,
+      selectProps={{
+        id: 'typeSelect',
+        value: convertToText(formik.values.type || ''),
+        onChange: formik.handleChange,
         error: !!(formik.touched.type && formik.errors.type),
-        helperText: formik.errors.type,
         placeholder: 'Select Contract type',
+        name: 'type',
       }}
+      required
     />
     <FormInput
       props={{
         placeholder: 'Enter number of visits',
         label: 'Number of Visits',
-        name: 'numberOfVisits',
-        value: formik.values.visitsNumber,
+        name: 'visitsNumber',
+        type: 'number',
+        value: Number(formik.values.visitsNumber).toString(),
         onBlur: formik.handleBlur,
         onChange: formik.handleChange,
       }}
@@ -51,7 +51,8 @@ const EditContractForm: FC<Props> = ({formik}) => (
         placeholder: 'Enter price/year',
         label: 'Price/Year (excl. VAT, in €)*',
         name: 'price',
-        value: formik.values.price,
+        type: 'number',
+        value: Number(formik.values.price).toString(),
         onBlur: formik.handleBlur,
         onChange: formik.handleChange,
         InputProps: {
@@ -68,7 +69,7 @@ const EditContractForm: FC<Props> = ({formik}) => (
         placeholder: 'Enter spending limit (in €)',
         label: 'Spending Limit (in €)',
         name: 'spendingLimit',
-        value: formik.values.spendingLimit,
+        value: Number(formik.values.spendingLimit).toString(),
         onBlur: formik.handleBlur,
         onChange: formik.handleChange,
         InputProps: {
@@ -85,31 +86,32 @@ const EditContractForm: FC<Props> = ({formik}) => (
         placeholder: 'Enter renewal period (in months)',
         label: 'Renewal Period (in months)',
         name: 'renewalTerms',
-        value: formik.values.renewalTerms,
+        type: 'number',
+        value: Number(formik.values.renewalTerms).toString(),
         onBlur: formik.handleBlur,
         onChange: formik.handleChange,
+        error: !!(formik.touched.renewalTerms && formik.errors.renewalTerms),
+        inputProps: {
+          min: 0,
+          max: 12,
+        },
       }}
     />
-    <ComboBox
-      options={[]}
-      initialValue={
-        formik.values.invoiceDue
-          ? {
-              label: convertToText(formik.values.invoiceDue),
-              value: convertToText(formik.values.invoiceDue),
-            }
-          : null
-      }
-      initialQuery={formik.values.invoiceDue}
-      getValue={(item) => formik.setFieldValue('invoiceDue', item?.value)}
-      textFieldProps={{
-        name: 'invoiceDue',
-        label: 'Invoice Due',
-        onBlur: formik.handleBlur,
+    <FormSelect
+      labelId="invoiceDueSelect-label"
+      label="Invoice Due"
+      options={Object.keys(InvoiceDueType).map((item) => ({
+        label: convertToText(item),
+        value: convertToText(item),
+      }))}
+      selectProps={{
+        id: 'invoiceDueSelect',
+        value: convertToText(formik.values.invoiceDue || ''),
+        onChange: formik.handleChange,
         error: !!(formik.touched.invoiceDue && formik.errors.invoiceDue),
-        helperText: formik.errors.invoiceDue,
-        placeholder: 'Select Invoice due',
+        name: 'invoiceDue',
       }}
+      required
     />
   </Box>
 );

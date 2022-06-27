@@ -74,7 +74,9 @@ export const makeRows = (contracts: ContractView[]) =>
         end: formatDate(item.endTime),
         type: item.type,
         cost: `${formatCurrency(
-          item.additionalInfo?.price ? item.additionalInfo.price.netAmount : 0,
+          item.additionalInfo?.price?.netAmount
+            ? item.additionalInfo.price.netAmount
+            : 0,
           {
             currency: item.currency,
           },

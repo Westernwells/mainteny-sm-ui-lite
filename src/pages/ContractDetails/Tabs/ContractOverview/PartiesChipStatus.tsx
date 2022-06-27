@@ -17,18 +17,15 @@ const statusColor: Record<string, {[key: string]: string}> = {
   },
 };
 
-const PartiesChipStatus: FC<Props> = ({color, partyType}) => {
-  console.log(color, partyType, '<<< color, partyType');
-  return (
-    <Chip
-      label={partyType}
-      sx={{
-        backgroundColor: statusColor[color].bg,
-        color: statusColor[color].color,
-      }}
-      variant="filled"
-    />
-  );
-};
+const PartiesChipStatus: FC<Props> = ({color, partyType}) => (
+  <Chip
+    label={partyType}
+    sx={{
+      backgroundColor: statusColor[color].bg,
+      color: statusColor[color].color,
+    }}
+    variant="filled"
+  />
+);
 
 export default PartiesChipStatus;

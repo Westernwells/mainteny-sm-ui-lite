@@ -8,6 +8,7 @@ import {Meta, Order, OrderBy, TimeWindowRecord, TimeWindowType} from './misc';
 import {Elevator, ElevatorStatus, ElevatorView} from './elevator';
 import {PropertyOwnerSimpleView, PropertyOwnerView} from './propertyManager';
 import {FileWithPreview} from 'components/MyDropzone';
+import {FileResourceRecord} from './media';
 
 export enum ContractStatus {
   PENDING = 'PENDING',
@@ -77,14 +78,6 @@ export interface ContractDocuments {
   uri: string;
 }
 
-export interface ContractPrice {
-  currency: string;
-  grossAmount: number;
-  netAmount: number;
-  percentageVat: number;
-  vat: number;
-}
-
 export interface ContractAdditionalInfo {
   annualPriceAdjustmentPercentage: number;
   documents: ContractDocuments[];
@@ -117,15 +110,8 @@ export interface ContractView {
   status: ContractStatus;
   search: string;
   meta: Meta;
-}
 
-export interface FormikContractView {
-  type: string;
-  visitsNumber: number;
-  spendingLimit: number;
-  price: number;
-  renewalTerms: number;
-  invoiceDue: string;
+  elevators: ElevatorView[];
 }
 
 export interface ContractViewWithUnits {
@@ -213,35 +199,52 @@ export interface ContractTimeWindowRecord {
   type: TimeWindowType;
 }
 
+export interface ContractPrice {
+  currency?: string;
+  netAmount?: number;
+  percentageVat?: number;
+}
+
 export interface ContractRequestBody {
-  currency: string;
-  endDate: string;
-  externalId: string;
-  hourlyRate: number;
-  price: number;
-  sla: number;
-  spendingLimit: number;
-  startDate: string;
-  timePreference: ContractTimeWindowRecord[];
-  type: string;
-  visitsNumber: number;
+  currency?: string;
+  endDate?: string;
+  externalId?: string;
+  hourlyRate?: number;
+  price?: ContractPrice;
+  sla?: number;
+  spendingLimit?: number;
+  startDate?: string;
+  timePreference?: ContractTimeWindowRecord[];
+  type?: string;
+  visitsNumber?: number;
+  invoiceDue?: string;
+  renewalTerms: number;
 }
 
 export interface ContractBasicInfoFormModel {
-  propertyOwnerId: string;
+  propertyOwner: PropertyOwnerView | null;
   startDate: string;
   endDate: string;
   contractType: string;
-  contractNumber: number;
+  externalId: string;
 }
 
 export interface ContractTermsFormModal {
   visitsNumber: number;
   invoiceDue: string;
   netAmount: number;
-  renewalTerms: string;
+  renewalTerms: number;
   spendingLimit: number;
   hourlyRate: number;
   annualPriceAdjustmentPercentage: number;
   serviceLevelAgreement: number;
+}
+
+export interface ContractUpdateRequest {
+  type: string;
+  price: number;
+  invoiceDue: string;
+  renewalTerms: number;
+  visitsNumber: number;
+  spendingLimit: number;
 }

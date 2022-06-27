@@ -30,6 +30,7 @@ export interface Settings {
   companyDispatchStrategy: DispatchStrategy;
   totalYearlyVacationDaysAllowed: number;
   dateFormat: string;
+  percentageVat: number;
 }
 
 export interface Page {

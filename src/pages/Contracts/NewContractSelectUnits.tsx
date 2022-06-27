@@ -1,7 +1,7 @@
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {getCenter} from 'geolib';
-import {useAllElevators} from 'hooks/reactQuery/useElevator';
+import {useQueryCustomerElevator} from 'hooks/reactQuery/useElevator';
 import {ElevatorByAddr, ElevatorView} from 'models/elevator';
 import {Resource} from 'models/misc';
 import {DataGridElevatorView} from 'pages/Units/Models';
@@ -18,11 +18,12 @@ import {columns, makeRows} from './NewContractUnitsGridProps';
 
 interface Props {
   formik: FormikProps<{elevators: string[]}>;
+  customerId: string;
 }
 
 const pageInfo = makePage(0, 25);
 
-const NewContractSelectUnits: FC<Props> = ({formik}) => {
+const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
   const fallback = useRef({
     elevatorByAddress: {} as ElevatorByAddr,
     centerCoord: {longitude: 0, latitude: 0},
@@ -41,12 +42,14 @@ const NewContractSelectUnits: FC<Props> = ({formik}) => {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
     isFetching,
     isLoading,
-  } = useAllElevators(
-    '',
-    page,
+  } = useQueryCustomerElevator(
     {
-      status: [],
+      query: '',
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
     },
+    {status: []},
+    customerId,
     {keepPreviousData: true},
   );
 
