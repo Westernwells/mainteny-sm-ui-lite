@@ -88,10 +88,12 @@ export const Contracts = () => {
         options.push(item.serviceCompany.name);
       }
     });
-    setRows(makeRows(contractResource.data));
+    if (!isLoading) {
+      setRows(makeRows(contractResource.data));
+    }
 
     setContractorFilterItems([...contractorFilterItems, ...options]);
-  }, [contractResource]);
+  }, [contractResource, isLoading]);
 
   useEffect(() => {
     setPageCount(Math.ceil(contractResource.total / page.pageSize));

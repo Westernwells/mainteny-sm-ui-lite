@@ -137,12 +137,10 @@ export const ArticlesModalDataGrid = ({setRowItem}: Props) => {
   }, [articleResource, page.pageSize]);
 
   useEffect(() => {
-    if (articleResource.data.length) {
+    if (!isLoading) {
       setRows(makeRows(articleResource.data));
-    } else {
-      setRows([]);
     }
-  }, [articleResource]);
+  }, [articleResource, isLoading]);
 
   if (isIdle || isLoading) {
     return (
