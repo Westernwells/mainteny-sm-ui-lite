@@ -27,6 +27,7 @@ export const styles = {
     width: '1px',
     bgcolor: '#BDBDBD',
     opacity: 0.5,
+    zIndex: 2,
   }),
   footerContainer: sx({
     position: 'sticky',
