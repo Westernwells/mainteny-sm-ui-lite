@@ -1,5 +1,4 @@
 import {useMutation, useQuery, useQueryClient} from 'react-query';
-import {useNavigate} from 'react-router';
 import {queryKeys, queryKeys as qk} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useSnackbar} from 'notistack';
@@ -47,18 +46,10 @@ const fetchArticleDetails = async (articleId: string) => {
   );
   return response.data;
 };
-export const useArticleDetails = (articleId?: string) => {
-  const navigate = useNavigate();
-  return useQuery(
-    [qk.fetchArticleDetail, articleId],
-    () => fetchArticleDetails(articleId!),
-    {
-      onError: (e: any) => {
-        if (e.response.status === 500) navigate('/404');
-      },
-    },
+export const useArticleDetails = (articleId?: string) =>
+  useQuery([qk.fetchArticleDetail, articleId], () =>
+    fetchArticleDetails(articleId!),
   );
-};
 
 const createArticle = async (
   body: CreateArticleRecord,
