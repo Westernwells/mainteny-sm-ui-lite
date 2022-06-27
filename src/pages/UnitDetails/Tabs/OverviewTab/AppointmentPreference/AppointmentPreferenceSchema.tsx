@@ -30,7 +30,7 @@ export const AppointmentPreferenceSchema = ({label, property}: Props) => {
             icon={
               <PermContactCalendarIcon sx={{color: theme.palette.info.dark}} />
             }
-            label="DAYS OF THE WEEK'"
+            label="DAYS OF THE WEEK"
             bodyText={property.value}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
