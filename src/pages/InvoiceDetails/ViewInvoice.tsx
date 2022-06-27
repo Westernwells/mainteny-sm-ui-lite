@@ -1,12 +1,9 @@
 import {useState} from 'react';
-import {useNavigate} from 'react-router';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-// import DraftsIcon from '@mui/icons-material/Drafts';
 import ReplayIcon from '@mui/icons-material/Replay';
-import CopyAllIcon from '@mui/icons-material/CopyAll';
 import {Button} from 'components/Button';
 import {StatusChip} from 'components/StatusChip';
 import {PageCard} from 'components/PageCard';
@@ -32,8 +29,7 @@ interface Props {
   invoice: InvoiceView;
 }
 
-export const Invoice = ({downloadUrl, invoice}: Props) => {
-  const navigate = useNavigate();
+export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
   const [isDrawerOpen] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {mutate: markAsPaid} = useInvoicePaymentStatus();
@@ -176,11 +172,11 @@ export const Invoice = ({downloadUrl, invoice}: Props) => {
       <BottomDrawer
         isOpen={isDrawerOpen}
         primaryButtonLabel={
-          invoice.status === InvoiceStatus.PAID ? 'Duplicate' : 'Mark as paid'
+          invoice.status === InvoiceStatus.PAID ? 'Download' : 'Mark as paid'
         }
         primaryButtonAction={() => {
           if (invoice.status === InvoiceStatus.PAID && invoice.id) {
-            navigate(`/invoices/new?id=${invoice.id}`);
+            console.log('DOWNLOAD INVOICE');
           } else {
             setIsDialogOpen(true);
           }
@@ -192,13 +188,6 @@ export const Invoice = ({downloadUrl, invoice}: Props) => {
                   label: 'Resend',
                   icon: <ReplayIcon />,
                   onClick: () => {},
-                },
-                {
-                  label: 'Duplicate',
-                  icon: <CopyAllIcon />,
-                  onClick: () => {
-                    navigate(`/invoices/new?id=${invoice.id}`);
-                  },
                 },
               ]
             : []

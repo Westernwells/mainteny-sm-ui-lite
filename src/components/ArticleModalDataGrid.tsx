@@ -15,7 +15,7 @@ import {useArticles} from 'hooks/reactQuery/useArticle';
 import {ArticleView} from 'models/article';
 import {formatNetAmount} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {NoRowsEmptySection} from 'pages/QuotationDetails/DataGrid/NoRowsEmptySection';
+import {NoRowsEmptySection} from './DataGrid/NoRowsEmptySection';
 
 interface Props {
   setRowItem: (row: ArticleView) => void;

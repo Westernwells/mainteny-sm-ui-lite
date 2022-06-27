@@ -67,6 +67,7 @@ export interface ServiceOrder {
   id: string;
   number: string;
   externalID: string;
+  articles: ServiceOrderArticleView[];
   serviceCompany: ServiceCompany;
   elevator: Elevator;
   contract: Contract;
