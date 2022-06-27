@@ -61,6 +61,7 @@ export const ScheduleItem = ({
           borderTopRightRadius: '6px',
           borderBottomRightRadius: '6px',
           backgroundColor: cardStatusAccent,
+          flex: 'none',
         },
         cursor: 'pointer',
         overflowY: 'hidden',
