@@ -385,10 +385,10 @@ module.exports = {
     '{{time}} years': '{{time}} jahre',
     'Customer is required': 'Kundenname benötigt',
     'e.g. 34-36 Exmouth Market, London EC1R 4QE':
-      'z.B. 34-36 Exmouth Market, London EC1R 4QE',
-    'e.g. A1 first floor': 'z.B. A1 first floor',
-    'e.g. Outside key box, pin: 0000': 'z.B. Outside key box, pin: 0000',
-    'e.g. central parking lot': 'z.B. central parking lot',
+      'z.B. Brunnenstr. 5, 10117 Berlin',
+    'e.g. A1 first floor': 'z.B. Haus B',
+    'e.g. Outside key box, pin: 0000': 'z.B. Tresor 1111',
+    'e.g. central parking lot': 'z.B. zentraler Parkplatz',
 
     // Employee details
     'Work Hours': 'Arbeitszeiten',
