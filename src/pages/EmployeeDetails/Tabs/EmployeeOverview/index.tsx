@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import {InfoCard} from 'components/InfoCard';
 import {CardProps} from 'components/CardProps';
@@ -45,13 +46,16 @@ export const EmployeeOverview = ({
 
   const userData = employee?.userData;
   const userAccount = employee?.userAccount;
+  const {t} = useTranslation();
 
   const renderBasicDetails = () => (
     <Grid container columnSpacing={2} rowSpacing={2}>
       <Grid item xs={12}>
         <InfoCard
           header={
-            <Typography variant="subtitle1">Basic Information</Typography>
+            <Typography variant="subtitle1">
+              {t('Basic Information')}
+            </Typography>
           }
           containerStyles={{flexGrow: 1}}
           headerStyles={{mt: '0.5em'}}

@@ -8,6 +8,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 import {DataGridLayout} from 'components/DataGridLayout';
 import {TabContentContainer} from 'components/TabContentContainer';
+import {useTranslation} from 'react-i18next';
 import TotalTime from 'components/TotalTime';
 import {useWorkHours} from 'hooks/reactQuery/useWorkHours';
 import {WorkHoursItem} from 'models/workHours';
@@ -56,6 +57,8 @@ const WorkHourWidget = () => {
     setCurrentDate(subDays(currentDate, 1));
   };
 
+  const {t} = useTranslation();
+
   const renderWidget = () => (
     <Box
       sx={{
@@ -76,7 +79,7 @@ const WorkHourWidget = () => {
           <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
         </Box>
         <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
-          {getWhen(currentDate, 'dd.MM.yyyy')}
+          {t(`${getWhen(currentDate, 'dd.MM.yyyy')}`)}
         </Typography>
         <Box onClick={() => nextDay()} sx={{cursor: 'pointer'}}>
           <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />

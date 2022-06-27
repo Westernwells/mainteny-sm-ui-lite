@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {Box, Typography} from '@mui/material';
 import {GridRowsProp} from '@mui/x-data-grid';
-
+import {useTranslation} from 'react-i18next';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {FilterFields} from 'components/FilterFields';
 import {TabContentContainer} from 'components/TabContentContainer';
@@ -45,6 +45,8 @@ const WorkHoursTab = ({employeeId}: Props) => {
     setPageCount(Math.ceil(workHours.total / page.pageSize));
   }, [workHours, page.pageSize]);
 
+  const {t} = useTranslation();
+
   const renderFilterItems = () => (
     <Box sx={{display: 'flex', justifyContent: 'flex-end', width: '100%'}}>
       <FilterFields
@@ -59,11 +61,11 @@ const WorkHoursTab = ({employeeId}: Props) => {
             if (newValue) setStartDate(newValue);
           }}
           textFieldProps={{
-            label: 'Start Date',
+            label: t('Start Date'),
           }}
         />
         <Typography sx={{margin: '0 16px', color: '#8F9BB3', fontSize: '14px'}}>
-          to
+          {t('to')}
         </Typography>
         <DatePicker
           defaultDate={endDate}
@@ -73,7 +75,7 @@ const WorkHoursTab = ({employeeId}: Props) => {
             if (newValue) setEndDate(newValue);
           }}
           textFieldProps={{
-            label: 'End Date',
+            label: t('End Date'),
           }}
         />
       </FilterFields>
@@ -84,7 +86,7 @@ const WorkHoursTab = ({employeeId}: Props) => {
   const renderWidget = () => (
     <Box sx={{display: 'flex', justifyContent: 'flex-end', mb: '0.5em'}}>
       <Widget
-        searchPlaceholder="Search by order type, order number etc."
+        searchPlaceholder={t('Search by order type, order number etc.')}
         getSearchValue={(val) => setSearch(val)}
         filterItems={renderFilterItems()}
       />

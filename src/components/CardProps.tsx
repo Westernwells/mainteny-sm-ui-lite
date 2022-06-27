@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {ReactNode} from 'react';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   icon: JSX.Element;
@@ -26,39 +27,42 @@ export const CardProps = ({
   containerStyles,
   bodyStyle,
   labelStyle,
-}: Props) => (
-  <Box display="flex" sx={{...containerStyles}}>
-    {/* remove width to make this component more generic */}
-    <Box
-      sx={{
-        backgroundColor: iconBackground,
-        p: '0.7em',
-        display: 'flex',
-        justifyContent: 'center',
-        mr: '1em',
-        maxHeight: iconMaxHeight || 'default',
-      }}>
-      {icon}
-    </Box>
-    <Box>
-      <Typography
-        component="div"
-        variant={titleTextVariant || 'caption'}
-        color="textSecondary"
-        sx={{textTransform: 'capitalize', ...labelStyle}}>
-        {label}
-      </Typography>
-
-      {typeof bodyText === 'string' ? (
+}: Props) => {
+  const {t} = useTranslation();
+  return (
+    <Box display="flex" sx={{...containerStyles}}>
+      {/* remove width to make this component more generic */}
+      <Box
+        sx={{
+          backgroundColor: iconBackground,
+          p: '0.7em',
+          display: 'flex',
+          justifyContent: 'center',
+          mr: '1em',
+          maxHeight: iconMaxHeight || 'default',
+        }}>
+        {icon}
+      </Box>
+      <Box>
         <Typography
           component="div"
-          variant={bodyTextVariant || 'body2'}
-          sx={{...bodyStyle}}>
-          {bodyText}
+          variant={titleTextVariant || 'caption'}
+          color="textSecondary"
+          sx={{textTransform: 'capitalize', ...labelStyle}}>
+          {t(label)}
         </Typography>
-      ) : (
-        bodyText
-      )}
+
+        {typeof bodyText === 'string' ? (
+          <Typography
+            component="div"
+            variant={bodyTextVariant || 'body2'}
+            sx={{...bodyStyle}}>
+            {bodyText}
+          </Typography>
+        ) : (
+          bodyText
+        )}
+      </Box>
     </Box>
-  </Box>
-);
+  );
+};

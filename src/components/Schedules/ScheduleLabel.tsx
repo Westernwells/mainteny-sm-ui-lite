@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import {ServiceOrderView} from 'models/service-order';
 import {formatDate} from 'utils/datetime';
 import {FormCheckbox} from 'components/form/FormCheckbox';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   scheduleType?: 'date' | 'people' | 'default';
@@ -32,10 +33,12 @@ export const ScheduleLabel = ({
     }
   }, []);
 
+  const {t} = useTranslation();
+
   const renderSubLabel = () => (
     <Typography variant="caption" sx={{color: grey[600]}}>
       {scheduleType === 'date'
-        ? formatDate(new Date(item), 'EEEE')
+        ? t(`${formatDate(new Date(item), 'EEEE')}`)
         : scheduleItems[id]
         ? `${scheduleItems[id].length} ${
             scheduleItems[id].length < 2 ? ' Order' : ' Orders'

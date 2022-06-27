@@ -1,6 +1,7 @@
 import {Typography} from '@mui/material';
 import Box from '@mui/material/Box';
 import useTheme from '@mui/material/styles/useTheme';
+import {useTranslation} from 'react-i18next';
 
 type TotalTimeProps = {
   time: string;
@@ -8,7 +9,7 @@ type TotalTimeProps = {
 
 const TotalTime = ({time}: TotalTimeProps) => {
   const theme = useTheme();
-
+  const {t} = useTranslation();
   return (
     <Box
       display="flex"
@@ -34,7 +35,7 @@ const TotalTime = ({time}: TotalTimeProps) => {
           lineHeight: '20px',
           fontWeight: '600',
         }}>
-        Total time
+        {t('Total time')}
       </Typography>
       <Typography
         component="span"
