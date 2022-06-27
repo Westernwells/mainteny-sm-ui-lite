@@ -206,7 +206,7 @@ module.exports = {
 
     // Add new unit
     Customer: 'Kunden',
-    'Customer Name': 'Name Des Kunden',
+    'Customer Name': 'Kundenname',
     'Location Information': 'Informationen zum Standort',
     Address: 'Adresse',
     Building: 'Gebäude',
@@ -271,7 +271,7 @@ module.exports = {
     'Closing Hour': 'Sperrstunde',
     'Requires Notification': 'Benachrichtigung Erforderlich',
     'Notification Due': 'Benachrichtigung Fällig',
-    'E.g. 5 days': 'z.B. 5 tage',
+    'E.g. 5 days': 'z.B. 5 Tage',
     Monday: 'Montag',
     Tuesday: 'Dienstag',
     Wednesday: 'Mittwoch',
@@ -281,8 +281,8 @@ module.exports = {
     Sunday: 'Sonntag',
     YES: 'JA',
     NO: 'NEIN',
-    Submit: 'Einreichen',
-    Submitting: 'Einreichen',
+    Submit: 'Anlegen',
+    Submitting: 'Anlegen',
 
     // Unit Details
 
@@ -316,7 +316,7 @@ module.exports = {
     'Single door; Double door': 'Einzeltür; Durchlader',
     'Automatic, manual, etc': 'Automatisch, manuell, etc.',
     'Fabric number': 'Seriennummer',
-    Service: 'Dienstleistung',
+    Service: 'Wartung',
     'LAST INSPECTION': 'LETZTE INSPEKTION',
     'REQUIRED VISITS/YEAR': 'ERFORDERLICHE BESUCHE/JAHR',
     'REQUIRED TIME': 'WARTUNGSZEIT',
@@ -383,6 +383,12 @@ module.exports = {
     '{{time}} days': '{{time}} tage',
     '{{time}} months': '{{time}} monate',
     '{{time}} years': '{{time}} jahre',
+    'Customer is required': 'Kundenname benötigt',
+    'e.g. 34-36 Exmouth Market, London EC1R 4QE':
+      'z.B. 34-36 Exmouth Market, London EC1R 4QE',
+    'e.g. A1 first floor': 'z.B. A1 first floor',
+    'e.g. Outside key box, pin: 0000': 'z.B. Outside key box, pin: 0000',
+    'e.g. central parking lot': 'z.B. central parking lot',
 
     // Employee details
     'Work Hours': 'Arbeitszeiten',
@@ -409,8 +415,8 @@ module.exports = {
     'Total time': 'Gesamtzeit',
     TYPE: 'TYP',
     DURATION: 'DAUER',
-    'There are no rows for the applied filters!':
-      'Es gibt keine Zeilen für die angewandten Filter!',
+    'There are no results for the applied filters!':
+      'Es gibt keine Ergebnisse für die angewandten Filter!',
     Absence: 'Abwesenheit',
     'Search by order type, order number etc.':
       'Suche nach Auftragsart, Auftragsnummer usw.',
@@ -431,17 +437,17 @@ module.exports = {
     'Selected unit': 'Ausgewählte Anlage',
     'Selected technician': 'Ausgewählter Techniker',
     'Description (Optional)': 'Beschreibung (fakultativ)',
-    'Select, date, time & technician': 'Datum, Uhrzeit und Techniker auswählen',
-    Immediate: 'Unmittelbar',
+    'Select, date, time & technician': 'Wähle: Datum, Uhrzeit und Techniker',
+    Immediate: 'Sofort',
     'Select a due date': 'Wählen Sie ein Fälligkeitsdatum',
     'Choose a Date, Time & Technician':
       'Wählen Sie ein Datum, eine Uhrzeit und einen Techniker',
     'Select a technician for attending this service order immediately':
-      'Wählen Sie einen Techniker für die sofortige Bearbeitung dieses Serviceauftrags',
+      'Wählen Sie einen Techniker diesen Auftrag',
     'Select a date before which this service order has to be completed':
       'Wählen Sie ein Datum, bis zu dem dieser Serviceauftrag abgeschlossen sein muss',
     'Select a specific date, time and technician and update the technicians schedule for that day':
-      'Wählen Sie ein bestimmtes Datum, eine Uhrzeit und einen Techniker aus und aktualisieren Sie den Zeitplan der Techniker für diesen Tag.',
+      'Wählen Sie ein Datum, eine Uhrzeit und einen Techniker und aktualisieren Sie den Zeitplan des Technikers',
     'Due date': 'Fälligkeitsdatum',
     'Assign To': 'Zuweisen an',
     'Selected date and time': 'Ausgewähltes Datum und Uhrzeit',

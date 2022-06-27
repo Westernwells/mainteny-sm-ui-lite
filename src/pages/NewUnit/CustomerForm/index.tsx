@@ -80,7 +80,7 @@ export const CustomerForm = ({
               ),
               helperText:
                 formik.errors.propertyOwnerId && formik.touched.propertyOwnerId
-                  ? formik.errors.propertyOwnerId
+                  ? t(formik.errors.propertyOwnerId)
                   : '',
               label: t('Customer Name'),
               name: 'propertyOwnerId',

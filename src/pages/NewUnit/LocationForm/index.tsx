@@ -65,7 +65,7 @@ export const LocationForm = ({
               }
               handleBlur={formik.handleBlur}
               textFieldProps={{
-                placeholder: 'e.g. 34-36 Exmouth Market, London EC1R 4QE',
+                placeholder: t('e.g. 34-36 Exmouth Market, London EC1R 4QE'),
                 required: true,
               }}
               getAddress={(address) =>
@@ -81,7 +81,7 @@ export const LocationForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'e.g. A1 first floor',
+                placeholder: t('e.g. A1 first floor'),
                 label: t('Building'),
                 name: 'building',
                 value: formik.values.building,
@@ -94,7 +94,7 @@ export const LocationForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'e.g. Residential',
+                placeholder: t('e.g. Residential'),
                 label: t('Property Segment'),
                 name: 'propertySegment',
                 value: formik.values.propertySegment,
@@ -107,7 +107,7 @@ export const LocationForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'e.g. Outside key box, pin: 0000',
+                placeholder: t('e.g. Outside key box, pin: 0000'),
                 label: t('Key Location'),
                 name: 'keyLocation',
                 value: formik.values.keyLocation,
@@ -120,7 +120,7 @@ export const LocationForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'e.g. central parking lot',
+                placeholder: t('e.g. central parking lot'),
                 label: t('Parking'),
                 name: 'parking',
                 value: formik.values.parking,
