@@ -13,6 +13,8 @@ import {useEffect, useState} from 'react';
 import {axiosClient} from 'utils/axios-utils';
 import {useQueryClient} from 'react-query';
 import {languageMap} from 'utils/utils';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {useUserSession} from '../hooks/reactQuery/useUserSession';
 import {MenuBtn} from './MenuBtn';
 import {BackAction} from './BackAction';
@@ -127,7 +129,10 @@ export const AppTopBar = ({
               menu={[
                 {
                   label: 'Logout',
-                  action: () => signout(),
+                  action: () => {
+                    Mixpanel.identifyAndTrack(mixpanelEvents.LOGOUT);
+                    signout();
+                  },
                 },
               ]}
             />
