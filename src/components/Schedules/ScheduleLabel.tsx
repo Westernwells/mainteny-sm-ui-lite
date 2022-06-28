@@ -27,13 +27,12 @@ export const ScheduleLabel = ({
   id,
   checkedValues = [],
 }: Props) => {
+  const {t} = useTranslation();
   const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     if (getCheckedValue) {
       getCheckedValue(event.target.checked, event.target.value);
     }
   }, []);
-
-  const {t} = useTranslation();
 
   const renderSubLabel = () => (
     <Typography variant="caption" sx={{color: grey[600]}}>

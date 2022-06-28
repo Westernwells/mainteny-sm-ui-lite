@@ -20,6 +20,7 @@ type Props = {
 };
 
 export const SelectShift = ({values, setFieldValue}: Props) => {
+  const {t} = useTranslation();
   const workDays = Object.values(TimeWindowType).map((item) =>
     convertToText(item),
   );
@@ -87,8 +88,6 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
       })),
     );
   }, [shifts]);
-
-  const {t} = useTranslation();
 
   return (
     <>

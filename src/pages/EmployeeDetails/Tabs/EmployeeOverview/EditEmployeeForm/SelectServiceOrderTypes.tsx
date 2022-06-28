@@ -16,6 +16,7 @@ type Props = {
 };
 
 export const SelectServiceOrderTypes = ({values, setFieldValue}: Props) => {
+  const {t} = useTranslation();
   const [serviceOrderTypes, setServiceOrderTypes] = useState({
     REGULAR: {
       label: ServiceOrderType.REGULAR,
@@ -34,8 +35,6 @@ export const SelectServiceOrderTypes = ({values, setFieldValue}: Props) => {
       checked: values.serviceOrderTypes.includes(ServiceOrderType.CALLOUT),
     },
   });
-
-  const {t} = useTranslation();
 
   const optionsRef = useRef([
     {

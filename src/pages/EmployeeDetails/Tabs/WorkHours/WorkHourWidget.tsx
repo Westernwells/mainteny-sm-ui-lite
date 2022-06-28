@@ -18,6 +18,7 @@ import {getWhen} from 'utils/datetime';
 import {columnsWidget, makeRows} from './WorkHoursDataGrid';
 
 const WorkHourWidget = () => {
+  const {t} = useTranslation();
   const {id: employeeId} = useParams();
 
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -56,8 +57,6 @@ const WorkHourWidget = () => {
   const prevDay = () => {
     setCurrentDate(subDays(currentDate, 1));
   };
-
-  const {t} = useTranslation();
 
   const renderWidget = () => (
     <Box

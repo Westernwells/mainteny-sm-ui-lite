@@ -29,6 +29,7 @@ export const EmployeeOverview = ({
   isLoading,
   openWorkHoursTab,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const [basicDetails, setBasicDetails] =
     useState<{[key: string]: BasicDetailsValue}>();
@@ -46,7 +47,6 @@ export const EmployeeOverview = ({
 
   const userData = employee?.userData;
   const userAccount = employee?.userAccount;
-  const {t} = useTranslation();
 
   const renderBasicDetails = () => (
     <Grid container columnSpacing={2} rowSpacing={2}>

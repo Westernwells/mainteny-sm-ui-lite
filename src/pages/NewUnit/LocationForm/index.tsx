@@ -24,6 +24,7 @@ export const LocationForm = ({
   getLocationFormValues,
   initialValues,
 }: Props) => {
+  const {t} = useTranslation();
   const formik = useFormik<LocationFormModel>({
     initialValues: {
       address: initialValues?.address,
@@ -45,8 +46,6 @@ export const LocationForm = ({
       getLocationFormValues(formik.values);
     }
   }, [formik]);
-
-  const {t} = useTranslation();
 
   return (
     <PageCard
@@ -81,8 +80,8 @@ export const LocationForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: t('e.g. A1 first floor'),
-                label: t('Building'),
+                placeholder: 'e.g. A1 first floor',
+                label: 'Building',
                 name: 'building',
                 value: formik.values.building,
                 onChange: formik.handleChange,
@@ -94,8 +93,8 @@ export const LocationForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: t('e.g. Residential'),
-                label: t('Property Segment'),
+                placeholder: 'e.g. Residential',
+                label: 'Property Segment',
                 name: 'propertySegment',
                 value: formik.values.propertySegment,
                 onChange: formik.handleChange,
@@ -107,8 +106,8 @@ export const LocationForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: t('e.g. Outside key box, pin: 0000'),
-                label: t('Key Location'),
+                placeholder: 'e.g. Outside key box, pin: 0000',
+                label: 'Key Location',
                 name: 'keyLocation',
                 value: formik.values.keyLocation,
                 onChange: formik.handleChange,
@@ -120,8 +119,8 @@ export const LocationForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: t('e.g. central parking lot'),
-                label: t('Parking'),
+                placeholder: 'e.g. central parking lot',
+                label: 'Parking',
                 name: 'parking',
                 value: formik.values.parking,
                 onChange: formik.handleChange,

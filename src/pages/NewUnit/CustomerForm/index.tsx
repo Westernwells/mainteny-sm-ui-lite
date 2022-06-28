@@ -28,6 +28,7 @@ export const CustomerForm = ({
   initialCustomer,
   getCustomer,
 }: Props) => {
+  const {t} = useTranslation();
   const [customer, setCustomer] = useState(initialCustomer);
 
   const formik = useFormik<CustomerFormModel>({
@@ -53,8 +54,6 @@ export const CustomerForm = ({
       getCustomer(customer);
     }
   }, [customer]);
-
-  const {t} = useTranslation();
 
   return (
     <PageCard

@@ -28,6 +28,7 @@ export const EmptySection = ({
   showActionBtn = false,
   btnAction,
 }: Props) => {
+  const {t} = useTranslation();
   const Width = {
     tiny: '56px',
     small: '128px',
@@ -45,7 +46,6 @@ export const EmptySection = ({
     }
   };
 
-  const {t} = useTranslation();
   return (
     <Box
       display="flex"

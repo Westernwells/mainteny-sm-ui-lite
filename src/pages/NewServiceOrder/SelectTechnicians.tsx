@@ -85,6 +85,7 @@ export const SelectTechnicians = ({
   dueDateFormIsErrored,
   getSelectedRadioOption,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const options = useRef(
     type === ServiceOrderType.CALLOUT ? calloutOptions : otherOptions,
@@ -207,8 +208,6 @@ export const SelectTechnicians = ({
     (checked, value) => setCheckboxState({checked, value}),
     [],
   );
-
-  const {t} = useTranslation();
 
   const cardHeader = () => (
     <Box sx={{}}>

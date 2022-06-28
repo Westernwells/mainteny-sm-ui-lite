@@ -23,6 +23,7 @@ interface Props {
 }
 
 export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
 
   const {
@@ -40,8 +41,6 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
     onChange: handleChange,
     onBlur: handleBlur,
   };
-
-  const {t} = useTranslation();
 
   return (
     <Dialog

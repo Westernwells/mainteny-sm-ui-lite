@@ -20,6 +20,7 @@ interface Props {
 }
 
 const WorkHoursTab = ({employeeId}: Props) => {
+  const {t} = useTranslation();
   const [startDate, setStartDate] = useState<Date>(getLastWeek());
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [search, setSearch] = useState('');
@@ -44,8 +45,6 @@ const WorkHoursTab = ({employeeId}: Props) => {
   useEffect(() => {
     setPageCount(Math.ceil(workHours.total / page.pageSize));
   }, [workHours, page.pageSize]);
-
-  const {t} = useTranslation();
 
   const renderFilterItems = () => (
     <Box sx={{display: 'flex', justifyContent: 'flex-end', width: '100%'}}>

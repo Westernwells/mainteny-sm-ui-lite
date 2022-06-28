@@ -43,6 +43,7 @@ export const getRole = (initialRole: string | string[]) => {
 };
 
 export const SelectEmployeeRole = () => {
+  const {t} = useTranslation();
   const {values, setFieldValue} = useFormikContext<EmployeeAccountData>();
 
   const [role, setRole] = useState<string>(
@@ -60,8 +61,6 @@ export const SelectEmployeeRole = () => {
     setRole(value);
     setFieldValue('roles', selectedRole);
   };
-
-  const {t} = useTranslation();
 
   return (
     <FormControl fullWidth sx={{marginBlock: '0.5em'}}>

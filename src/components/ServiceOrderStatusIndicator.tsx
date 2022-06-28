@@ -27,8 +27,8 @@ export const ServiceOrderStatusIndicator = ({containerStyles}: Props) => {
       justifyContent="flex-end"
       sx={{...containerStyles}}>
       {statuses.map((status: ServiceOrderStatus, index: number) => {
-        const statusColor = status ? serviceOrderStatusColor[status] : null;
         const {t} = useTranslation();
+        const statusColor = status ? serviceOrderStatusColor[status] : null;
         return (
           <Box display="flex" key={index} mr="1em">
             <Box

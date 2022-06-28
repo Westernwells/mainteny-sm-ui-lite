@@ -25,6 +25,7 @@ export const AddDescription = ({
   selectedDateString,
   selectedTimeString,
 }: Props) => {
+  const {t} = useTranslation();
   const [description, setDescription] = useState(initialDescription);
 
   useEffect(() => {
@@ -32,8 +33,6 @@ export const AddDescription = ({
       getDescription(description);
     }
   }, [description]);
-
-  const {t} = useTranslation();
 
   return (
     <>
