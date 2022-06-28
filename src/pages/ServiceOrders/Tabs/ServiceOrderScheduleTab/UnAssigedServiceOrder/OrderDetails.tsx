@@ -36,11 +36,12 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
   };
 
   return (
-    <Box sx={{mt: '0.5em', px: '0.5em'}} {...rest}>
+    <Box sx={{mt: '0.625em', px: '0.5em'}} {...rest}>
       <Box
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
+          flexWrap: 'wrap',
         }}>
         <Box sx={{display: 'flex'}}>
           <ServiceOrderIcons
@@ -66,15 +67,21 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
       <Typography variant="body2" component="div" mt="0.5em">
         {serviceOrder.elevator.propertyOwner.name}
       </Typography>
-      <Typography component="div" variant="caption" color="textSecondary">
+      <Typography
+        component="div"
+        variant="caption"
+        color="textSecondary"
+        mb="0.7em">
         {serviceOrder.elevator.address.fullName}
       </Typography>
 
       <Button
         label="Assign Technician"
-        style={{px: '0.5em', mt: '0.7em'}}
+        style={{px: '0.5em'}}
         buttonProps={{
           size: 'small',
+          variant: 'outlined',
+          sx: {bgcolor: 'white'},
         }}
       />
 

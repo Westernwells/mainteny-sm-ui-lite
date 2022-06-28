@@ -1,18 +1,22 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import Close from '@mui/icons-material/Close';
+import AccessTimeFilled from '@mui/icons-material/AccessTimeFilled';
+import LocationOn from '@mui/icons-material/LocationOn';
 import {useNavigate} from 'react-router';
 import {formatDate} from 'utils/datetime';
 import {ServiceOrderView} from 'models/service-order';
 import useTheme from '@mui/material/styles/useTheme';
 import {Button} from './Button';
 
-interface Props {
+export interface Props {
   order: ServiceOrderView;
+  close: () => void;
 }
 
-export const OrderDetails = ({order}: Props) => {
+export const OrderDetails = ({order, close}: Props) => {
   const navigate = useNavigate();
   const theme = useTheme();
   const startTime = formatDate(order.schedules[0].startTime, 'HH:mm');
@@ -26,57 +30,61 @@ export const OrderDetails = ({order}: Props) => {
     subtitle?: string,
     containerStyles?: {[key: string]: string | number},
   ) => (
-    <Box sx={{display: 'flex', mt: '2em', ...containerStyles}}>
+    <Box sx={{display: 'flex', pt: '1.28em', ...containerStyles}}>
       <Box>{icon}</Box>
-      <Box sx={{mt: '0.2em'}}>
-        <Typography
-          variant="chip"
-          component="div"
-          color={theme.palette.text.primary}>
+      <Box>
+        <Typography variant="chip" color={theme.palette.text.primary}>
           {title || null}
         </Typography>
 
         <Typography
           variant="chip"
           component="div"
-          color="textSecondary"
-          mt="0.8em">
+          color={theme.palette.text.secondary}
+          mt="0.6em">
           {subtitle || null}
         </Typography>
       </Box>
     </Box>
   );
   return (
-    <Box
-      sx={{
-        background: '#fff',
-        boxShadow: '0px 4px 9px rgba(0, 0, 0, 0.09)',
-        p: '1em',
-      }}>
-      <Typography
-        variant="subtitle1"
-        color="primary"
-        textTransform="capitalize">
-        {order.elevator.propertyOwner.name}
-      </Typography>
+    <Box sx={{background: '#fff'}}>
+      <Grid container justifyContent="space-between">
+        <Typography
+          variant="subtitle2"
+          color="primary"
+          textTransform="capitalize">
+          {order.elevator.propertyOwner.name}
+        </Typography>
+
+        <IconButton aria-label="close" sx={{padding: 0}} onClick={close}>
+          <Close
+            sx={{
+              fontSize: '0.875em',
+              color: theme.palette.text.secondary,
+            }}
+          />
+        </IconButton>
+      </Grid>
 
       {basic(
-        <AccessTimeIcon
+        <AccessTimeFilled
           sx={{
-            fontSize: '0.9rem',
-            mr: '0.3em',
+            fontSize: '1.64em',
+            mr: '0.594em',
+            mt: '0.25em',
             color: theme.palette.text.secondary,
           }}
         />,
         `${startTime} to ${endTime}`,
         `${date} ${day}`,
-        {mt: '1em'},
       )}
       {basic(
-        <LocationOnOutlinedIcon
+        <LocationOn
           sx={{
-            fontSize: '0.9rem',
-            mr: '0.3em',
+            fontSize: '1.64em',
+            mr: '0.594em',
+            mt: '0.25em',
             color: theme.palette.text.secondary,
           }}
         />,
@@ -97,6 +105,7 @@ export const OrderDetails = ({order}: Props) => {
             sx: {
               textTransform: 'capitalize',
               px: '2em',
+              width: '85%',
             },
             onClick: () => navigate(`/orders/details/${order.id}`),
           }}

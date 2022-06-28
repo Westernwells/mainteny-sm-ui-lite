@@ -29,7 +29,6 @@ export const getItemPosition = ({
     const orderStartTime = getDateObject(startDateTime);
     const x =
       gridWidth * (differenceInMinutes(orderStartTime, morningTime) / 60);
-    // console.log(rowKey, '<<<<<<<!!!!!!!!<>>>>>>')
     if (scheduleItemGroup[rowKey]) {
       const group = scheduleItemGroup[rowKey];
       const itemNestLevel = group[orderId];

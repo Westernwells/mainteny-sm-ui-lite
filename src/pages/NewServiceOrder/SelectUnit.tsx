@@ -23,6 +23,7 @@ const pageInfo = makePage(0, 10);
 
 export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
   const theme = useTheme();
+  const {t} = useTranslation();
   const [search, setSearch] = useState('');
   const totalUnitsRef = useRef(0);
   const [page, setPage] = useState(pageInfo);
@@ -58,8 +59,6 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
       getSelectedUnit(selectedUnit);
     }
   }, [selectedUnit]);
-
-  const {t} = useTranslation();
 
   if (isIdle || isLoading) {
     return <Progress />;
@@ -111,6 +110,7 @@ please click the button below'
       </PageCard>
     );
   }
+
   return (
     <>
       <Box display="flex" justifyContent="space-between">

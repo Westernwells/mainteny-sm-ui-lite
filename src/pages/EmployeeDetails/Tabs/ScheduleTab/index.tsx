@@ -80,7 +80,8 @@ export const ScheduleTab = ({technicianId}: Props) => {
             title={order.elevator.propertyOwner.name}
             subtitle={order.elevator.address.fullName}
             width={width}
-            tooltip={<OrderDetails order={order} />}
+            tooltip={OrderDetails}
+            order={order}
             cardStatusAccent={serviceOrderStatusColor[order.status]}
             position={position}
           />
