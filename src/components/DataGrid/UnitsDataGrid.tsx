@@ -1,23 +1,13 @@
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Chip from '@mui/material/Chip';
-import {
-  GridAlignment,
-  GridColDef,
-  GridColumnHeaderParams,
-  GridRenderCellParams,
-  GridRowsProp,
-} from '@mui/x-data-grid';
-import {DataGridLayout} from 'components/DataGridLayout';
+import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
+import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {ElevatorView} from 'models/elevator';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {formatDate} from 'utils/datetime';
-import {convertToText} from 'utils/utils';
-import {getElevatorStatusChipColor} from 'utils/elevator-utils';
 import {NoRowsEmptySection} from './NoRowsEmptySection';
 import {styles} from './style';
 
@@ -26,91 +16,49 @@ interface Props {
   searchCustomer?: string;
 }
 
-const defaultProps = {
-  editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
-  renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" mx="0.5em">
-      {params.value || '-'}
-    </Typography>
-  ),
-};
-const defaultAlignment: {
-  flex: number;
-  headerAlign: GridAlignment;
-  align: GridAlignment;
-} = {
-  flex: 1,
-  headerAlign: 'center',
-  align: 'center',
-};
-
 export const columns: GridColDef[] = [
-  {
-    field: 'name',
-    headerName: 'UNIT NAME',
-    type: 'string',
-    flex: 2,
-    headerAlign: 'left',
-    ...defaultProps,
-  },
-  {
+  getColumnProps({
+    field: 'number',
+    headerName: 'number',
+    align: 'center',
+    flex: 0,
+  }),
+  getColumnProps({
+    field: 'model',
+    headerName: 'model',
+  }),
+  getColumnProps({
+    field: 'customer',
+    headerName: 'customer',
+    cellClassName: 'truncateText',
+    flex: 1.5,
+  }),
+  getColumnProps({
+    field: 'address',
+    headerName: 'address',
+    cellClassName: 'truncateText',
+    flex: 1.5,
+  }),
+  getColumnProps({
     field: 'lastVisit',
-    headerName: 'LAST VISIT',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
+    headerName: 'last visit',
+  }),
+  getColumnProps({
     field: 'nextVisit',
-    headerName: 'NEXT VISIT',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'availability',
-    headerName: 'AVAILABILITY',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'status',
-    headerName: 'STATUS',
-    type: 'string',
-    ...defaultAlignment,
-    editable: false,
-    sortable: false,
-    disableColumnMenu: true,
-    renderHeader: (params: GridColumnHeaderParams) => (
-      <Typography variant="tableHeaderText" color="textSecondary">
-        {params.colDef.headerName}
-      </Typography>
-    ),
-    renderCell: (params: GridRenderCellParams<any, any, any>) => (
-      <Chip
-        variant="outlined"
-        label={convertToText(params.value)}
-        color={getElevatorStatusChipColor(params.value)}
-      />
-    ),
-  },
+    headerName: 'next visit',
+  }),
 ];
 
 export const makeRows = (elevators: ElevatorView[]): GridRowsProp =>
   elevators
     ? elevators.map((item, index) => ({
         id: index,
-        name: item.model,
+        number: item.number,
+        model: item.model,
+        customer: item.propertyOwner.name,
+        address: item.address.fullName,
         lastVisit: formatDate(item.lastVisitDate),
         nextVisit: formatDate(item.nextVisitDate),
-        availability: item.availability,
-        status: item.status,
         elevator: item,
       }))
     : [];
@@ -129,11 +77,7 @@ export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
     isLoading,
     isFetching,
   } = useAllElevators(
-    search,
-    page,
-    {
-      status: [],
-    },
+    {query: search, pageIndex: page.pageIndex, pageSize: page.pageSize},
     {keepPreviousData: true},
   );
 

@@ -92,7 +92,7 @@ export const makeRows = (
     ? units.data.map((item: ElevatorView, index: number) => ({
         id: index,
         model: item.model,
-        unitNumber: item.number,
+        unitNumber: item.externalId,
         address: item.address.fullName,
         lastVisit: item.lastVisitDate,
         status: item.status,

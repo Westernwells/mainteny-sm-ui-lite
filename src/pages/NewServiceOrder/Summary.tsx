@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {ReactNode} from 'react';
+import {useTranslation} from 'react-i18next';
 
 interface SummaryItemProps {
   value: string;
@@ -23,11 +24,14 @@ export const SummaryItem = ({value, containerStyle}: SummaryItemProps) => (
   </Typography>
 );
 
-export const Summary = ({label, children, containerStyle}: SummaryProps) => (
-  <Box sx={{...containerStyle}}>
-    <Typography variant="subtitle2" color="grey.700">
-      {label}
-    </Typography>
-    {children}
-  </Box>
-);
+export const Summary = ({label, children, containerStyle}: SummaryProps) => {
+  const {t} = useTranslation();
+  return (
+    <Box sx={{...containerStyle}}>
+      <Typography variant="subtitle2" color="grey.700">
+        {t(label)}
+      </Typography>
+      {children}
+    </Box>
+  );
+};
