@@ -8,7 +8,13 @@ import {SnackbarProvider} from 'notistack';
 import {App} from './App';
 import {theme} from './theme';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      useErrorBoundary: true,
+    },
+  },
+});
 
 ReactDOM.render(
   <ThemeProvider theme={theme}>

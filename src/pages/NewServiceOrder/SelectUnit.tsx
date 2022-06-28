@@ -37,11 +37,7 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
     isLoading,
     isIdle,
   } = useAllElevators(
-    search,
-    page,
-    {
-      status: [],
-    },
+    {query: search, pageIndex: page.pageIndex, pageSize: page.pageSize},
     {keepPreviousData: true},
   );
   // sets this value only once

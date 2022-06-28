@@ -15,6 +15,7 @@ import {
   CustomerElevatorParams,
   ElevatorComment,
   ElevatorCommentRecord,
+  ElevatorQueryParams,
   ElevatorRequestBody,
   ElevatorView,
   QueryTodoParams,
@@ -30,11 +31,14 @@ import {
 import {MaintainerView} from '../../models/technician';
 import {useUserSession} from './useUserSession';
 
-export const fetchElevators = async (query: string, page: Page, id: string) => {
+export const fetchElevators = async (
+  params: Partial<ElevatorQueryParams>,
+  id: string,
+) => {
   const response = await axiosClient.get<Resource<ElevatorView>>(
     `/api/serviceCompanies/${id}/elevators`,
     {
-      params: {query, ...page},
+      params,
       paramsSerializer,
     },
   );
@@ -90,20 +94,13 @@ export const useElevatorMaintainers = (elevatorId?: string) =>
   );
 
 export function useAllElevators(
-  query: string,
-  page: Page,
-  filter: {},
+  params: Partial<ElevatorQueryParams>,
   options?: UseQueryOptions<any, any, any>,
 ) {
   const {user} = useUserSession();
   return useQuery<Resource<ElevatorView>, RestError>(
-    [
-      queryKeys.fetchAllElevators,
-      query,
-      page,
-      user?.userAccount.serviceCompany.id,
-    ],
-    () => fetchElevators(query, page, user!.userAccount.serviceCompany.id),
+    [queryKeys.fetchAllElevators, params, user?.userAccount.serviceCompany.id],
+    () => fetchElevators(params, user!.userAccount.serviceCompany.id),
     {
       ...options,
       enabled: !!user,

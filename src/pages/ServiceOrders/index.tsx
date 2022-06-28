@@ -36,6 +36,11 @@ export const ServiceOrders = () => {
     {label: 'Maintenance', action: () => navigate('/orders/new?type=regular')},
   ]).current;
 
+  useEffect(() => {
+    const currentParams = Object.fromEntries([...queryParams]);
+    if (currentParams.tab) setTabValue(Number(currentParams.tab));
+  }, []);
+
   return (
     <Tabs
       hideBackIcon
