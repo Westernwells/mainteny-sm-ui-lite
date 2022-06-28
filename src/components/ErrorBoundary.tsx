@@ -25,10 +25,6 @@ class ErrorBoundary extends React.Component<Props, State> {
     this.state = {hasError: false};
   }
 
-  componentDidMount() {
-    Mixpanel.identifyAndTrack(mixpanelEvents.CATCH_ALL_ERROR_PAGE_SHOWN);
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   static getDerivedStateFromError(_: Error): State {
     // Update state so the next render will show the fallback UI.
@@ -45,6 +41,7 @@ class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    Mixpanel.identifyAndTrack(mixpanelEvents.CATCH_ALL_ERROR_PAGE_SHOWN);
     console.error('Uncaught error:', error, errorInfo);
   }
 
