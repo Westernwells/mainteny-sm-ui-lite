@@ -57,6 +57,43 @@ export const serviceOrderStatusToEnum = (status: string) => {
   }
 };
 
+export const getServiceOrderStatusList = () => {
+  let mappedOptions: string[] = [];
+  Object.values(ServiceOrderStatus).forEach((option) => {
+    const val = serviceOrderStatusToString(option);
+    if (!mappedOptions.includes(val)) {
+      mappedOptions = [...mappedOptions, val];
+    }
+  });
+  return mappedOptions;
+};
+
+export const getSelectedOrderStatuses = (
+  items: string[],
+  includeScheduling: Boolean = true,
+) => {
+  let selectedOrderStatuses: ServiceOrderStatus[] = [];
+  items.forEach((val) => {
+    if (val === 'Unscheduled') {
+      selectedOrderStatuses = [
+        ...selectedOrderStatuses,
+        ServiceOrderStatus.INIT,
+        ServiceOrderStatus.READY_TO_SCHEDULE,
+        ...(includeScheduling ? [ServiceOrderStatus.SCHEDULING] : []),
+      ];
+    } else {
+      selectedOrderStatuses = [
+        ...selectedOrderStatuses,
+        serviceOrderStatusToEnum(val) as ServiceOrderStatus,
+      ];
+    }
+  });
+  if (selectedOrderStatuses.includes(ServiceOrderStatus.ALL)) {
+    selectedOrderStatuses = [];
+  }
+  return selectedOrderStatuses;
+};
+
 export const sortOrderByTime = (serviceOrder: ServiceOrderView[]) => {
   const res = serviceOrder.sort((a, b) =>
     differenceInMinutes(

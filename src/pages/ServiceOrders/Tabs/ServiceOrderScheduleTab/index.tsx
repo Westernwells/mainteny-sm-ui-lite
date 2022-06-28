@@ -4,7 +4,11 @@ import {useQueryServiceOrderScheduled} from 'hooks/reactQuery/useServiceOrder';
 import * as _ from 'lodash';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {getWhen, toRestDateTime} from 'utils/datetime';
-import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
+import {
+  ServiceOrderStatus,
+  ServiceOrderType,
+  ServiceOrderView,
+} from 'models/service-order';
 
 import {Schedule} from 'components/Schedules';
 import {ScheduleItem} from 'components/Schedules/ScheduleItem';
@@ -23,7 +27,13 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {EmployeesView} from 'models/employee';
 import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicator';
 import {Widget} from 'components/Widget';
-import {sortOrderByTime} from 'utils/service-order-utils';
+import {
+  sortOrderByTime,
+  getServiceOrderStatusList,
+  getSelectedOrderStatuses,
+  serviceOrderTypeToString,
+  serviceOrderTypeToEnum,
+} from 'utils/service-order-utils';
 import Typography from '@mui/material/Typography';
 import {UnAssignedServiceOrders} from './UnAssigedServiceOrder';
 
@@ -36,6 +46,9 @@ export const ServiceOrderScheduleTab = () => {
   const [selectedOrderStatus, setSelectedOrderStatus] = useState<
     ServiceOrderStatus[] | []
   >([]);
+  const [selectedOrderTypes, setSelectedOrderTypes] = useState<
+    ServiceOrderType[]
+  >([]);
   const [page] = useState(makePage(0, 500));
   const {data: technicianResource = createEmptyResource<EmployeesView>(10)} =
     useQueryServiceCompanyTechnicians({
@@ -43,6 +56,7 @@ export const ServiceOrderScheduleTab = () => {
       pageSize: 500,
       query: technicianSearch,
     });
+
   const {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(10),
     isLoading,
@@ -54,6 +68,7 @@ export const ServiceOrderScheduleTab = () => {
       pageSize: page.pageSize,
       query: '',
       status: selectedOrderStatus,
+      types: selectedOrderTypes,
     },
     {keepPreviousData: true},
   );
@@ -77,22 +92,34 @@ export const ServiceOrderScheduleTab = () => {
     setCurrentDate(subDays(currentDate, 1));
   };
 
+  const getSelectedStatusValues = (items: string[]) => {
+    const selectedOrderStatuses = getSelectedOrderStatuses(items, false);
+    setSelectedOrderStatus(selectedOrderStatuses as ServiceOrderStatus[]);
+  };
+
   const renderFilterItems = () => (
-    <FilterFields hideClear>
+    <FilterFields
+      onClear={() => {
+        setSelectedOrderStatus([]);
+        setSelectedOrderTypes([]);
+      }}>
+      <MultipleSelectCheckmarks
+        label="Order Types"
+        options={Object.keys(ServiceOrderType).map((i) =>
+          serviceOrderTypeToString(i),
+        )}
+        initialSelectedItems={selectedOrderTypes}
+        getSelectedValue={(item) => {
+          const orderTypes = item.map((i) => serviceOrderTypeToEnum(i));
+          setSelectedOrderTypes(orderTypes as ServiceOrderType[]);
+        }}
+        multiple
+      />
       <MultipleSelectCheckmarks
         label="Status"
-        options={Object.values(ServiceOrderStatus).map((option) =>
-          _.capitalize(option).split('_').join(' '),
-        )}
-        getSelectedValue={(item) => {
-          let orderStatus = item.map((val) =>
-            val.split(' ').join('_').toUpperCase(),
-          );
-          if (orderStatus.includes(ServiceOrderStatus.ALL)) {
-            orderStatus = [];
-          }
-          setSelectedOrderStatus(orderStatus as ServiceOrderStatus[]);
-        }}
+        options={getServiceOrderStatusList()}
+        getSelectedValue={getSelectedStatusValues}
+        initialSelectedItems={selectedOrderStatus}
         multiple
       />
     </FilterFields>
