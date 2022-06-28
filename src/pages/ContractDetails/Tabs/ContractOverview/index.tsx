@@ -1,19 +1,20 @@
-import {useMemo, useState} from 'react';
+import {FC, useMemo, useState} from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
-import {
-  useContractDetails,
-  useUpdateContract,
-} from 'hooks/reactQuery/useContract';
+import {useUpdateContract} from 'hooks/reactQuery/useContract';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
 import {useParams} from 'react-router-dom';
 import {formatDate, toDate} from 'utils/datetime';
 import {differenceInDays, isBefore} from 'date-fns';
 import {useFormik} from 'formik';
-import {ContractRequestBody, ContractUpdateRequest} from 'models/contract';
+import {
+  ContractRequestBody,
+  ContractUpdateRequest,
+  ContractView,
+} from 'models/contract';
 import {InfoCard} from 'components/InfoCard';
 import {Dialog} from 'components/Dialog';
 
@@ -25,11 +26,18 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
 import {formatCurrency} from 'utils/currency';
 import {convertToMacro, convertToText} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
 import EditContractForm from './EditContractForm';
 import {ContractParties} from './ContractParties';
+
+interface Props {
+  contractDetails: ContractView;
+  isLoading: boolean;
+}
 
 const validationSchema = Yup.object().shape({
   renewalTerms: Yup.number()
@@ -37,10 +45,9 @@ const validationSchema = Yup.object().shape({
     .max(12, '12 is maximum value'),
 });
 
-export const ContractOverview = () => {
+export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const {id: contractId} = useParams();
   const theme = useTheme();
-  const {data: contractDetails, isLoading} = useContractDetails(contractId!);
   const {mutateAsync: updateContract} = useUpdateContract('Contract updated');
   const {user} = useUserSession();
 
@@ -48,6 +55,16 @@ export const ContractOverview = () => {
   const [openDocumentDialog, setOpenDocumentDialog] = useState(false);
 
   const [documents, setDocuments] = useState<FileWithPreview[]>([]);
+
+  const {mutateAsync: uploadFiles} = useUploadFiles(
+    'Documents uploaded successfully',
+  );
+
+  const {data: downloadUrls = {}} = useDownloadUrl(
+    contractDetails?.additionalInfo?.documents
+      ? contractDetails.additionalInfo.documents.map((item) => item.uri)
+      : [],
+  );
 
   const formik = useFormik<ContractUpdateRequest>({
     initialValues: {
@@ -90,7 +107,9 @@ export const ContractOverview = () => {
   };
 
   const onDocsPreview = async () => {
-    const uploadPath = `${contractDetails?.id}/documents`;
+    const serviceCompanyId = user?.userAccount.serviceCompany.id;
+    const uploadPath = `${serviceCompanyId}/contracts/${contractId}/documents`;
+    await uploadFiles({files: documents, uploadPath});
     const updatedContract = {
       ...contractDetails,
       ...contractDetails?.additionalInfo,
@@ -106,6 +125,7 @@ export const ContractOverview = () => {
       endDate: contractDetails?.endTime,
       timePreference: contractDetails?.timePreference || [],
     };
+
     await updateContract({
       body: updatedContract as Partial<ContractRequestBody>,
       contractId: contractId!,
@@ -251,7 +271,7 @@ export const ContractOverview = () => {
                 }
                 headerAction={() => setOpenDocumentDialog(true)}>
                 {contractDetails?.additionalInfo?.documents?.length ? (
-                  <Box sx={{height: '140px', overflowY: 'auto'}}>
+                  <Box sx={{height: '155px', overflowY: 'auto'}}>
                     {contractDetails?.additionalInfo?.documents.map(
                       (documnet) => (
                         <Box
@@ -270,7 +290,10 @@ export const ContractOverview = () => {
                               flexDirection: 'column',
                               alignItems: 'center',
                               borderRadius: '4px',
-                            }}>
+                            }}
+                            onClick={() =>
+                              window.open(downloadUrls[documnet.uri], '_blank')
+                            }>
                             <FileCopyIcon
                               fontSize="large"
                               htmlColor="rgba(15, 76, 100, 0.5)"
@@ -304,6 +327,7 @@ export const ContractOverview = () => {
                   isSaving={false}
                   onCancel={() => setOpenDocumentDialog(false)}
                   onSave={() => onDocsPreview()}
+                  disableSaveBtn={!documents.length}
                   dialogProps={{
                     maxWidth: 'md',
                     open: openDocumentDialog || false,

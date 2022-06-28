@@ -8,12 +8,8 @@ interface Props {
 
 const NewContractDocuments: FC<Props> = ({formik}) => (
   <MyDropZone
-    hints={[
-      'JPEG, PNG, BMP, GIF, WEBP, SVG only',
-      'File size less than 5MB only',
-      'Max 5 files',
-    ]}
-    acceptedFileTypes="image/*"
+    hints={['PDF, DOCX, XLSX, XLS, CSV, TSV only', 'Max 5 files']}
+    acceptedFileTypes="application/pdf"
     getAcceptedFiles={(files) => formik.setFieldValue('documents', files)}
   />
 );

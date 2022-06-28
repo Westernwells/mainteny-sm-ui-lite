@@ -21,7 +21,7 @@ const NewContractTerms: FC<Props> = ({formik}) => (
           placeholder: '4',
           type: 'number',
           required: true,
-          value: Number(formik.values.visitsNumber).toString(),
+          value: Number(formik.values.visitsNumber || 0).toString(),
           error: !!(formik.touched.visitsNumber && formik.errors.visitsNumber),
           onBlur: formik.handleBlur,
           onChange: formik.handleChange,

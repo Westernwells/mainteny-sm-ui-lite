@@ -5,6 +5,9 @@ import {Tabs} from 'components/Tab';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {useContractDetails} from 'hooks/reactQuery/useContract';
+import {useParams} from 'react-router';
 import {UnitsTab} from './Tabs/UnitsTab';
 import {ContractOverview} from './Tabs/ContractOverview';
 
@@ -21,6 +24,15 @@ const tabItems = [
 
 export const ContractDetails = () => {
   const [tabValue, setTabValue] = useState(0);
+  const {id: contractId} = useParams();
+  const {data: contractDetails, isLoading} = useContractDetails(contractId!);
+
+  const {data: downloadUrl} = useDownloadUrl(
+    contractDetails?.additionalInfo?.documents
+      ? [contractDetails?.additionalInfo?.documents[0]?.uri || '']
+      : [],
+  );
+  /*eslint-disable*/
   return (
     <Tabs
       tabItems={tabItems}
@@ -29,9 +41,15 @@ export const ContractDetails = () => {
       showActionBtn
       btnLabel="Download contract"
       actionBtnVariant="outlined"
-      actionButtonIcon={<FileDownloadIcon color="primary" sx={{}} />}>
+      actionButtonIcon={<FileDownloadIcon color="primary" sx={{}} />}
+      btnOnClick={() => {
+        window.open(Object.values(downloadUrl!)[0], '_blank');
+      }}>
       <TabsBody value={tabValue} index={0}>
-        <ContractOverview />
+        <ContractOverview
+          contractDetails={contractDetails!}
+          isLoading={isLoading}
+        />
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
         <UnitsTab />

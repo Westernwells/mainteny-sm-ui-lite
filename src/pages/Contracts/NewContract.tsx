@@ -4,12 +4,13 @@ import {PageCard} from 'components/PageCard';
 import {Stepper} from 'components/Stepper';
 import {useFormik} from 'formik';
 import {useCreateContract} from 'hooks/reactQuery/useContract';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useUuid} from 'hooks/reactQuery/useUuid';
 import {
   ContractBasicInfoFormModel,
   ContractTermsFormModal,
 } from 'models/contract';
-import {FileResourceRecord} from 'models/media';
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router';
 import {convertToMacro} from 'utils/utils';
@@ -30,8 +31,6 @@ const validationSchemaBasicInfo = Yup.object().shape({
   propertyOwner: Yup.object().shape({
     id: Yup.string().required('Customer is required'),
   }),
-  startDate: Yup.date().nullable(true).required('Start date is required'),
-  endDate: Yup.date().nullable(true).required('End date is required'),
   contractType: Yup.string().nullable().required('Contract Type is required'),
   contractNumber: Yup.number()
     .nullable()
@@ -52,11 +51,14 @@ const validationSchemaContractTerms = Yup.object().shape({
     .nullable()
     .required('Customer is required')
     .min(1, 'Should be higher than 0'),
-  renewalTerms: Yup.string(),
-  spendingLimit: Yup.number(),
-  hourlyRate: Yup.number(),
-  annualPriceAdjustmentPercentage: Yup.number(),
-  serviceLevelAgreement: Yup.number(),
+  renewalTerms: Yup.number().min(0, 'Should be higher than 0'),
+  spendingLimit: Yup.number().min(0, 'Should be higher or equals to 0'),
+  hourlyRate: Yup.number().min(0, 'Should be higher or equals to 0'),
+  annualPriceAdjustmentPercentage: Yup.number().min(
+    0,
+    'Should be higher or equals to 0',
+  ),
+  serviceLevelAgreement: Yup.number().min(0, 'Should be higher or equals to 0'),
 });
 
 const NewContract = () => {
@@ -68,9 +70,15 @@ const NewContract = () => {
   const {user} = useUserSession();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
+  const {mutateAsync: uploadFiles} = useUploadFiles(
+    'Documents uploaded successfully',
+  );
+
   const {mutateAsync: createContract, isLoading} = useCreateContract(
     'Contract is created',
   );
+
+  const {data: uuid} = useUuid();
 
   const formikBasicInfo = useFormik<ContractBasicInfoFormModel>({
     initialValues: {
@@ -81,7 +89,7 @@ const NewContract = () => {
       externalId: '',
     },
     onSubmit: () => {},
-    enableReinitialize: true,
+    validateOnMount: true,
     validationSchema: validationSchemaBasicInfo,
   });
 
@@ -139,14 +147,23 @@ const NewContract = () => {
   };
 
   const handleSubmit = async () => {
+    const contractId = uuid;
+
+    const uploadPath = `${serviceCompanyId}/contracts/${contractId}/documents`;
     const newContract = {
+      id: contractId,
       annualPriceAdjustmentPercentage:
         formikContractTerms.values.annualPriceAdjustmentPercentage,
       currency: 'EUR',
-      documents: formikDocuments.values.documents.reduce<FileResourceRecord[]>(
-        (newArr, obj) => [
+      documents: formikDocuments.values.documents.reduce<FileWithPreview[]>(
+        (newArr: FileWithPreview[], obj) => [
           ...newArr,
-          {type: obj.type, uri: obj.preview, description: ''},
+          {
+            ...obj,
+            type: obj.type,
+            uri: `${uploadPath}/${obj.name}`,
+            description: '',
+          },
         ],
         [],
       ),
@@ -173,6 +190,8 @@ const NewContract = () => {
     };
 
     await createContract(newContract);
+    await uploadFiles({files: formikDocuments.values.documents, uploadPath});
+
     navigate('/contracts');
   };
 
