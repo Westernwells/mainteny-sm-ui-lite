@@ -1,7 +1,4 @@
-import {
-  useContractElevatorCount,
-  useUseQueryCustomerContracts,
-} from 'hooks/reactQuery/useContract';
+import {useUseQueryCustomerContracts} from 'hooks/reactQuery/useContract';
 import {ContractOrderField, ContractView} from 'models/contract';
 import {Order} from 'models/misc';
 import {useEffect, useRef, useState} from 'react';
@@ -53,20 +50,14 @@ export const ContractsTab = ({customerId}: Props) => {
     {keepPreviousData: true},
   );
 
-  const {data: contractWithUnits} = useContractElevatorCount(
-    contractResource.data,
-    // {keepPreviousData: true},
-  );
-
   totalContractsRef.current =
     totalContractsRef.current || contractResource.total;
 
   useEffect(() => {
     const options: string[] = [];
 
-    if (contractWithUnits) {
-      // TODO: Resolve 'any' here
-      contractWithUnits?.forEach((item: any) => {
+    if (contractResource) {
+      contractResource.data.forEach((item: any) => {
         if (
           !options.includes(item.serviceCompany.name) &&
           !contractorFilterItems.includes(item.serviceCompany.name)
@@ -74,12 +65,12 @@ export const ContractsTab = ({customerId}: Props) => {
           options.push(item.serviceCompany.name);
         }
       });
-      setRows(makeRows(contractWithUnits));
+      setRows(makeRows(contractResource.data));
     } else {
       setRows([]);
     }
     setContractorFilterItems([...contractorFilterItems, ...options]);
-  }, [contractWithUnits]);
+  }, [contractResource]);
 
   useEffect(() => {
     setPageCount(Math.ceil(contractResource.total / page.pageSize));

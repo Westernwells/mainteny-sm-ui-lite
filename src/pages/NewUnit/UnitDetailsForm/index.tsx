@@ -13,6 +13,7 @@ import {useCacheValues} from 'hooks/reactQuery/useElevator';
 import {CacheTypes} from 'models/misc';
 import {ElevatorCategory} from 'models/elevator';
 import InputAdornment from '@mui/material/InputAdornment';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   getUnitDetailsFormErrors?: (val: FormikErrors<UnitDetailsFormModel>) => void;
@@ -85,6 +86,7 @@ export const UnitDetailsForm = ({
       getUnitDetailsFormValues(formik.values);
     }
   }, [formik]);
+  const {t} = useTranslation();
 
   return (
     <PageCard
@@ -96,7 +98,7 @@ export const UnitDetailsForm = ({
           <Grid item md={4}>
             <ComboBox
               options={Object.keys(ElevatorCategory).map((item) => ({
-                label: convertToText(item),
+                label: t(convertToText(item)),
                 value: convertToText(item),
               }))}
               initialValue={
@@ -111,14 +113,14 @@ export const UnitDetailsForm = ({
               getValue={(item) => formik.setFieldValue('category', item?.value)}
               textFieldProps={{
                 name: 'category',
-                label: 'Unit Category',
+                label: t('Unit Category'),
                 onBlur: formik.handleBlur,
                 error: !!(formik.touched.category && formik.errors.category),
                 helperText:
                   formik.touched.category && formik.errors.category
                     ? formik.errors.category
                     : '',
-                placeholder: 'e.g Elevator',
+                placeholder: t('e.g. Elevator'),
                 required: true,
               }}
             />
@@ -127,8 +129,8 @@ export const UnitDetailsForm = ({
           <Grid item md={4}>
             <FormInput
               props={{
-                placeholder: 'e.g. Elevator Installation Meier',
-                label: 'Manufacturer',
+                placeholder: t('e.g. Elevator Installation Meier'),
+                label: t('Manufacturer'),
                 name: 'manufacturer',
                 value: formik.values.manufacturer,
                 onBlur: formik.handleBlur,
@@ -140,8 +142,8 @@ export const UnitDetailsForm = ({
           <Grid item md={4}>
             <FormInput
               props={{
-                placeholder: 'e.g. 000001',
-                label: 'Unit Number',
+                placeholder: t('e.g. 000001'),
+                label: t('Unit Number'),
                 name: 'externalId',
                 value: formik.values.externalId,
                 error: !!(
@@ -161,8 +163,8 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'e.g. 10',
-                label: 'Number of Stops',
+                placeholder: t('e.g. 10'),
+                label: t('Number of Stops'),
                 name: 'numberOfStops',
                 value: formik.values.numberOfStops,
                 onBlur: formik.handleBlur,
@@ -175,8 +177,8 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'e.g. 2 doors',
-                label: 'Cabin Type',
+                placeholder: t('e.g. 2 doors'),
+                label: t('Cabin Type'),
                 name: 'cabinType',
                 value: formik.values.cabinType,
                 onBlur: formik.handleBlur,
@@ -189,8 +191,8 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'e.g SafeLine',
-                label: 'Emergency Phone Provider',
+                placeholder: t('e.g. SafeLine'),
+                label: t('Emergency Phone Provider'),
                 name: 'emergencyPhoneProvider',
                 value: formik.values.emergencyPhoneProvider,
                 onBlur: formik.handleBlur,
@@ -217,9 +219,9 @@ export const UnitDetailsForm = ({
               initialQuery={formik.values.unitType}
               getQuery={(item) => setUnitTypeQuery(item || '')}
               textFieldProps={{
-                placeholder: 'e.g. Hydraulic',
+                placeholder: t('e.g. Hydraulic'),
                 name: 'unitType',
-                label: 'Unit Type',
+                label: t('Unit Type'),
                 required: true,
                 onBlur: formik.handleBlur,
                 error: !!(formik.touched.unitType && formik.errors.unitType),
@@ -250,8 +252,8 @@ export const UnitDetailsForm = ({
               getQuery={(item) => setModelQuery(item || '')}
               textFieldProps={{
                 name: 'model',
-                label: 'Model',
-                placeholder: 'e.g. S2000',
+                label: t('Model'),
+                placeholder: t('e.g. S2000'),
                 onBlur: formik.handleBlur,
                 error: !!(formik.touched.model && formik.errors.model),
                 helperText:
@@ -265,8 +267,8 @@ export const UnitDetailsForm = ({
           <Grid item md={4}>
             <FormInput
               props={{
-                placeholder: 'e.g. SHX00000000001',
-                label: 'Serial Number',
+                placeholder: t('e.g. SHX00000000001'),
+                label: t('Serial Number'),
                 name: 'serialNumber',
                 value: formik.values.serialNumber,
                 onBlur: formik.handleBlur,
@@ -279,8 +281,8 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 name: 'unitCapacity',
-                label: 'Unit Capacity',
-                placeholder: 'e.g 1000 kg',
+                label: t('Unit Capacity'),
+                placeholder: t('e.g. 1000 kg'),
                 value: formik.values.unitCapacity,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
@@ -306,8 +308,8 @@ export const UnitDetailsForm = ({
               props={{
                 size: 'small',
                 disabled: true,
-                placeholder: 'Enter Spending Limit ',
-                label: 'Spending Limit',
+                placeholder: t('Enter Spending Limit'),
+                label: t('Spending Limit'),
                 name: 'spendingLimit',
                 error: !!formik.errors.spendingLimit,
                 value: formik.values.spendingLimit,
@@ -321,8 +323,8 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 name: 'emergencyContactNumber',
-                label: 'Emergency Contact Number',
-                placeholder: 'e.g. +49 1000 00000000',
+                label: t('Emergency Contact Number'),
+                placeholder: t('e.g. +49 1000 00000000'),
                 value: formik.values.emergencyContractNumber,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
@@ -334,8 +336,8 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 name: 'yearBuilt',
-                label: 'Year Built',
-                placeholder: 'e.g. 2000',
+                label: t('Year Built'),
+                placeholder: t('e.g. 2000'),
                 value: formik.values.yearBuilt,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
@@ -347,8 +349,8 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 name: 'modelOfController',
-                label: 'Model of Controller',
-                placeholder: 'e.g. TX2000',
+                label: t('Model of Controller'),
+                placeholder: t('e.g. TX2000'),
                 value: formik.values.modelOfController,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
@@ -360,8 +362,8 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 name: 'manufacturerOfController',
-                label: 'Manufacturer of Controller',
-                placeholder: 'e.g. Schneider',
+                label: t('Manufacturer of Controller'),
+                placeholder: t('e.g. Schneider'),
                 value: formik.values.manufacturerOfController,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,

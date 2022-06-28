@@ -8,7 +8,11 @@ interface Props {
 }
 
 export const FormLabel = ({text, required, sx}: Props) => (
-  <Typography variant="caption" color="grey.700" sx={sx}>
+  <Typography
+    variant="caption"
+    color="grey.700"
+    textTransform="capitalize"
+    sx={sx}>
     {text}
     {required && (
       <Typography component="span" variant="caption" color="error.light">

@@ -1,5 +1,5 @@
 import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
-import {formatCurrency, formatToDp} from 'utils/currency';
+import {multipleAmount, formatNetAmount} from 'utils/currency';
 import {ServiceOrderArticleView} from 'models/service-order';
 import {getColumnProps} from 'components/DataGridLayout';
 import Box from '@mui/material/Box';
@@ -16,8 +16,8 @@ export const columns = (
   handleAction: (val: ServiceOrderArticleView, actionType: ActionTypes) => void,
 ): GridColDef[] => [
   getColumnProps({
-    field: 'po',
-    headerName: 'PO',
+    field: 'no',
+    headerName: 'No.',
   }),
   getColumnProps({
     field: 'name',
@@ -69,30 +69,19 @@ export const columns = (
 ];
 
 export const makeRows = (articles: ServiceOrderArticleView[]): GridRowsProp =>
-  articles.map((item, index) => {
-    const unitPrice = item
-      ? Number(
-          formatToDp(
-            item.unitAmount.netAmount,
-            item.unitAmount.fractionDigits!,
-          ),
-        )
-      : 0;
-
-    return {
+  articles
+    .sort((a, b) => a.article.name.localeCompare(b.article.name))
+    .map((item, index) => ({
       id: index,
-      po: index + 1,
+      no: index + 1,
       number: item.article.externalId,
       name: item.name,
       unit: item.article.unit,
-      total: unitPrice * item.quantity,
+      total: formatNetAmount(multipleAmount(item.unitAmount, item.quantity)),
       model: item.article.model,
       supplier: item.article.manufacturer,
-      unitPrice: `${formatCurrency(unitPrice, {
-        currency: item.unitAmount.currency,
-      })}`,
+      unitPrice: formatNetAmount(item.unitAmount),
       quantity: item.quantity,
       actions: item,
-      navigateTo: `details/${item.id}`,
-    };
-  });
+      navigateTo: `/articles/details/${item.article.id}`,
+    }));

@@ -50,12 +50,10 @@ export const Quotations = () => {
     totalQuotationsRef.current || quotationsResource.total;
 
   useEffect(() => {
-    if (quotationsResource) {
+    if (!isLoading) {
       setRows(makeRows(quotationsResource));
-    } else {
-      setRows([]);
     }
-  }, [quotationsResource]);
+  }, [quotationsResource, isLoading]);
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);

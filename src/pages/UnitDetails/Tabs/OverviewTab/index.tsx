@@ -67,7 +67,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
         category: elevator.category,
         controllerManufacturer: elevator.additionalInfo.controllerManufacturer,
         controllerModel: elevator.additionalInfo.controllerModel,
-        documents: elevator.additionalInfo.documents,
+        documents: elevator.additionalInfo.documents || [],
         emergencyContractNumber:
           elevator.additionalInfo.emergencyContractNumber,
         emergencyPhoneProvider: elevator.additionalInfo.emergencyPhoneProvider,
@@ -80,7 +80,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
         externalId: elevator.externalId,
         numberOfStops: elevator.additionalInfo.numberOfStops,
         parking: elevator.additionalInfo.parking,
-        pictures: elevator.additionalInfo.pictures,
+        pictures: elevator.additionalInfo.pictures || [],
         priority: elevator.additionalInfo.priority,
         properties,
         // propertyManagerId: elevator.propertyManager?.id || '',

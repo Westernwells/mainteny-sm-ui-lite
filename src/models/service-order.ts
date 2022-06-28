@@ -41,7 +41,8 @@ export enum ServiceOrderType {
 
 export enum ServiceOrderOrderField {
   CREATED_TIME = 'CREATED_TIME',
-  DUE_DATE = 'DUE_DATE',
+  LAST_VISIT_DATE = 'LAST_VISIT_DATE',
+  NEXT_VISIT_DATE = 'NEXT_VISIT_DATE',
 }
 
 export const ServiceOrderTypeValue = {
@@ -67,6 +68,7 @@ export interface ServiceOrder {
   id: string;
   number: string;
   externalID: string;
+  articles: ServiceOrderArticleView[];
   serviceCompany: ServiceCompany;
   elevator: Elevator;
   contract: Contract;

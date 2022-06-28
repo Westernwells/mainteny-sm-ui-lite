@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
 import {GridCellParams, GridRowsProp} from '@mui/x-data-grid';
@@ -22,6 +23,7 @@ const pageInfo = makePage(0, 10);
 
 export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
   const theme = useTheme();
+  const {t} = useTranslation();
   const [search, setSearch] = useState('');
   const totalUnitsRef = useRef(0);
   const [page, setPage] = useState(pageInfo);
@@ -36,11 +38,7 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
     isLoading,
     isIdle,
   } = useAllElevators(
-    search,
-    page,
-    {
-      status: [],
-    },
+    {query: search, pageIndex: page.pageIndex, pageSize: page.pageSize},
     {keepPreviousData: true},
   );
   // sets this value only once
@@ -117,7 +115,7 @@ please click the button below'
     <>
       <Box display="flex" justifyContent="space-between">
         <Typography variant="h6" component="div">
-          Select unit
+          {t('Select unit')}
         </Typography>
         <SearchInput
           placeholder="Search"

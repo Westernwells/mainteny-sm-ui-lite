@@ -2,7 +2,6 @@ import {Article} from './article';
 import {
   Amount,
   AmountRecord,
-  Fee,
   Meta,
   PaymentInfo,
   PdfGenerationStatus,
@@ -46,6 +45,7 @@ export interface InvoiceView {
   number: string;
   description: string;
   subject: string;
+  type: InvoiceType;
   totalAmount: Amount;
   issuedDate: string;
   dueDate: string;
@@ -57,6 +57,7 @@ export interface InvoiceView {
   search: string;
   meta: Meta;
   additionalInfo: InvoiceAdditionalInfo;
+  paymentTerms: string;
 }
 
 export interface QueryInvoiceParams {
@@ -81,7 +82,13 @@ export interface InvoiceItemRecord<T> {
   unitAmount: T;
 }
 
+export enum InvoiceType {
+  FULL = 'FULL',
+  PARTIAL = 'PARTIAL',
+}
+
 export interface CreateInvoice {
+  subject: string;
   description: string;
   dueDate: string;
   issuedDate: string;
@@ -92,6 +99,7 @@ export interface CreateInvoice {
   serviceCompanyId: string;
   serviceOrderId: string;
   shouldSendOut: boolean;
+  type: InvoiceType | '';
 }
 
 export interface UpdateInvoice {
@@ -99,8 +107,9 @@ export interface UpdateInvoice {
   subject: string;
   dueDate: string;
   issuedDate: string;
-  items: InvoiceItemRecord<Amount>[];
+  items: WithOptional<InvoiceItemRecord<AmountRecord>, 'articleUnit'>[];
   paymentInfo?: PaymentInfo;
   paymentTerms?: string;
   serviceOrderId: string;
+  type: InvoiceType | '';
 }

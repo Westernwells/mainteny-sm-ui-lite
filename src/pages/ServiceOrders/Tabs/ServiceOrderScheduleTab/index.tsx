@@ -16,6 +16,7 @@ import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {useServiceOrderStatusColor} from 'hooks/useServiceOrderStatusColor';
 
 import {OrderDetails} from 'components/OrderDetails';
+import {useTranslation} from 'react-i18next';
 import {addDays, endOfDay, startOfDay, subDays} from 'date-fns';
 import {useQueryServiceCompanyTechnicians} from 'hooks/reactQuery/useTechnician';
 import {FilterFields} from 'components/FilterFields';
@@ -55,28 +56,33 @@ export const ServiceOrderScheduleTab = () => {
       pageSize: 500,
       query: technicianSearch,
     });
-  const {data: serviceOrders = createEmptyResource<ServiceOrderView>(10)} =
-    useQueryServiceOrderScheduled(
-      {
-        end: toRestDateTime(endOfDay(currentDate)),
-        start: toRestDateTime(startOfDay(currentDate)),
-        pageIndex: page.pageIndex,
-        pageSize: page.pageSize,
-        query: '',
-        status: selectedOrderStatus,
-        types: selectedOrderTypes,
-      },
-      {keepPreviousData: true},
-    );
+
+  const {
+    data: serviceOrders = createEmptyResource<ServiceOrderView>(10),
+    isLoading,
+  } = useQueryServiceOrderScheduled(
+    {
+      end: toRestDateTime(endOfDay(currentDate)),
+      start: toRestDateTime(startOfDay(currentDate)),
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+      query: '',
+      status: selectedOrderStatus,
+      types: selectedOrderTypes,
+    },
+    {keepPreviousData: true},
+  );
 
   useEffect(() => {
-    const sortedOrder = sortOrderByTime(serviceOrders.data);
-    const groupByTechnicianId = _.groupBy(
-      sortedOrder,
-      (serviceOrder) => serviceOrder.schedules[0].technician.id,
-    );
-    setOrders(groupByTechnicianId);
-  }, [serviceOrders]);
+    if (!isLoading) {
+      const sortedOrder = sortOrderByTime(serviceOrders.data);
+      const groupByTechnicianId = _.groupBy(
+        sortedOrder,
+        (serviceOrder) => serviceOrder.schedules[0].technician.id,
+      );
+      setOrders(groupByTechnicianId);
+    }
+  }, [serviceOrders, isLoading]);
 
   const nextDay = () => {
     setCurrentDate(addDays(currentDate, 1));
@@ -127,27 +133,30 @@ export const ServiceOrderScheduleTab = () => {
     />
   );
 
-  const renderControls = () => (
-    <Box
-      sx={{
-        display: 'flex',
-        background: '#fff',
-        py: '0.5em',
-        px: '1em',
-        minWidth: '10rem',
-        justifyContent: 'space-between',
-      }}>
-      <Box onClick={() => prevDay()} sx={{cursor: 'pointer'}}>
-        <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
+  const renderControls = () => {
+    const {t} = useTranslation();
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          background: '#fff',
+          py: '0.5em',
+          px: '1em',
+          minWidth: '10rem',
+          justifyContent: 'space-between',
+        }}>
+        <Box onClick={() => prevDay()} sx={{cursor: 'pointer'}}>
+          <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
+        </Box>
+        <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
+          {t(`${getWhen(currentDate, 'dd.MM.yyyy')}`)}
+        </Typography>
+        <Box onClick={() => nextDay()} sx={{cursor: 'pointer'}}>
+          <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
+        </Box>
       </Box>
-      <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
-        {getWhen(currentDate, 'dd.MM.yyyy')}
-      </Typography>
-      <Box onClick={() => nextDay()} sx={{cursor: 'pointer'}}>
-        <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
-      </Box>
-    </Box>
-  );
+    );
+  };
 
   return (
     <Box sx={{flexGrow: 1, display: 'flex', flexDirection: 'column'}}>
@@ -186,7 +195,8 @@ export const ServiceOrderScheduleTab = () => {
               title={order.elevator.propertyOwner.name}
               subtitle={order.elevator.address.fullName}
               width={width}
-              tooltip={<OrderDetails order={order} />}
+              tooltip={OrderDetails}
+              order={order}
               cardStatusAccent={serviceOrderStatusColor[order.status]}
               position={position}
             />

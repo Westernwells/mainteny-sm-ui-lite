@@ -7,6 +7,7 @@ import {useEffect, useState} from 'react';
 import {PageCard} from 'components/PageCard';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {CustomerAutoComplete} from 'components/CustomerAutocomplete';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   getCustomerFormErrors?: (val: FormikErrors<CustomerFormModel>) => void;
@@ -53,6 +54,8 @@ export const CustomerForm = ({
     }
   }, [customer]);
 
+  const {t} = useTranslation();
+
   return (
     <PageCard
       headerLabel="Customer"
@@ -79,7 +82,7 @@ export const CustomerForm = ({
                 formik.errors.propertyOwnerId && formik.touched.propertyOwnerId
                   ? formik.errors.propertyOwnerId
                   : '',
-              label: 'Customer Name',
+              label: t('Customer Name'),
               name: 'propertyOwnerId',
               onBlur: formik.handleBlur,
             }}

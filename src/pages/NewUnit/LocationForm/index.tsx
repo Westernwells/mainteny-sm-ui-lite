@@ -7,6 +7,7 @@ import {LocationFormModel} from 'models/unitForm';
 import * as Yup from 'yup';
 import {useEffect} from 'react';
 import {PageCard} from 'components/PageCard';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   getLocationFormErrors?: (val: FormikErrors<LocationFormModel>) => void;
@@ -45,6 +46,8 @@ export const LocationForm = ({
     }
   }, [formik]);
 
+  const {t} = useTranslation();
+
   return (
     <PageCard
       headerLabel="Location Information"
@@ -79,7 +82,7 @@ export const LocationForm = ({
               props={{
                 size: 'small',
                 placeholder: 'e.g. A1 first floor',
-                label: 'Building',
+                label: t('Building'),
                 name: 'building',
                 value: formik.values.building,
                 onChange: formik.handleChange,
@@ -92,7 +95,7 @@ export const LocationForm = ({
               props={{
                 size: 'small',
                 placeholder: 'e.g. Residential',
-                label: 'Property Segment',
+                label: t('Property Segment'),
                 name: 'propertySegment',
                 value: formik.values.propertySegment,
                 onChange: formik.handleChange,
@@ -105,7 +108,7 @@ export const LocationForm = ({
               props={{
                 size: 'small',
                 placeholder: 'e.g. Outside key box, pin: 0000',
-                label: 'Key Location',
+                label: t('Key Location'),
                 name: 'keyLocation',
                 value: formik.values.keyLocation,
                 onChange: formik.handleChange,
@@ -118,7 +121,7 @@ export const LocationForm = ({
               props={{
                 size: 'small',
                 placeholder: 'e.g. central parking lot',
-                label: 'Parking',
+                label: t('Parking'),
                 name: 'parking',
                 value: formik.values.parking,
                 onChange: formik.handleChange,

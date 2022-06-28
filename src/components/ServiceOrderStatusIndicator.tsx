@@ -5,6 +5,7 @@ import {ServiceOrderStatus} from 'models/service-order';
 import {useRef} from 'react';
 import {removeFromList} from 'utils/utils';
 import {serviceOrderStatusToString} from 'utils/service-order-utils';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   containerStyles?: {[key: string]: string | number};
@@ -27,6 +28,7 @@ export const ServiceOrderStatusIndicator = ({containerStyles}: Props) => {
       sx={{...containerStyles}}>
       {statuses.map((status: ServiceOrderStatus, index: number) => {
         const statusColor = status ? serviceOrderStatusColor[status] : null;
+        const {t} = useTranslation();
         return (
           <Box display="flex" key={index} mr="1em">
             <Box
@@ -41,7 +43,7 @@ export const ServiceOrderStatusIndicator = ({containerStyles}: Props) => {
             />
 
             <Typography variant="chip">
-              {serviceOrderStatusToString(status)}
+              {t(serviceOrderStatusToString(status))}
             </Typography>
           </Box>
         );

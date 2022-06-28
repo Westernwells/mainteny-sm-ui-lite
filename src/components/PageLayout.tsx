@@ -24,7 +24,6 @@ export const PageLayout = ({
   backBtnLabel,
 }: Props) => {
   const {t} = useTranslation();
-
   return (
     <Box
       sx={{
@@ -39,7 +38,7 @@ export const PageLayout = ({
         <AppTopBar
           pageTitle={pageTitle && t(pageTitle)}
           showBackAction={showBackAction}
-          backBtnLabel={backBtnLabel}
+          backBtnLabel={backBtnLabel && t(backBtnLabel)}
         />
       </Box>
       <Box sx={{display: 'flex', flexGrow: 1, width: '100%'}}>

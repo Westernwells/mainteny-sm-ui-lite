@@ -2,7 +2,7 @@ import IconButton from '@mui/material/IconButton';
 import {GridColDef} from '@mui/x-data-grid';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import {getColumnProps} from 'components/DataGridLayout';
-import {formatCurrency} from 'utils/currency';
+import {formatNetAmount} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
 import {ContractView} from 'models/contract';
 
@@ -69,13 +69,11 @@ export const makeRows = (contracts: ContractView[]) =>
         id: index,
         number: item.number,
         customer: item.propertyOwner.name,
-        units: item.units,
+        units: item.elevators.length,
         start: formatDate(item.startTime),
         end: formatDate(item.endTime),
         type: item.type,
-        cost: `${formatCurrency(item ? item.price! : 0, {
-          currency: item.currency,
-        })}`,
+        cost: formatNetAmount(item.additionalInfo.price) || '-',
         navigateTo: `details/${item.id}`,
       }))
     : [];
