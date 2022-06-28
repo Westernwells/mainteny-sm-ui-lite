@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import {SearchInput} from 'components/SearchInput';
 import {PageCard} from 'components/PageCard';
 import Divider from '@mui/material/Divider';
+import useTheme from '@mui/material/styles/useTheme';
 import {
   ServiceOrderOrderField,
   ServiceOrderStatus,
@@ -79,21 +80,27 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
   }, [serviceOrders, isLoading]);
 
   const {t} = useTranslation();
+  const theme = useTheme();
 
   return (
     <Box sx={{...containerStyles}} {...rest}>
       <PageCard
         containerStyles={{height: '100%'}}
-        contentContainerStyles={{height: '100%', mx: 0, px: 0, pt: '0.4em'}}
+        contentContainerStyles={{height: '100%', mx: 0, px: 0, pt: '0.79em'}}
         customHeader={
-          <Typography sx={{}} variant="subtitle2" color="textSecondary">
-            {t('Unassigned Orders')} ({serviceOrders.total})
+          <Typography variant="subtitle2" color="textSecondary">
+            {t('Unassigned Orders')}{' '}
+            <Box display="inline" color={theme.palette.primary.main}>
+              ({serviceOrders.total})
+            </Box>
           </Typography>
         }
         headerStyles={{
           background: 'none',
+          pt: '0.84em',
           pb: 0,
           mx: '0',
+          mt: 0,
           height: 'default',
         }}>
         <Box sx={{px: '0.5em'}}>
