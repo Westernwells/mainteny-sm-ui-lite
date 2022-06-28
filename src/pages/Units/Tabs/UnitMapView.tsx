@@ -11,7 +11,6 @@ import {Typography} from '@mui/material';
 import {LocationPin} from 'components/LocationPin';
 import {Location, Resource} from 'models/misc';
 import {FilterFields} from 'components/FilterFields';
-import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {Widget} from 'components/Widget';
 import {FlexContainer} from 'components/FlexContainer';
 
@@ -22,7 +21,6 @@ export const UnitMapsView = () => {
   }).current;
   const mapRef = useRef<any>();
   const [zoom, setZoom] = useState(20);
-  const [status, setStatus] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [points, setPoints] = useState<any>([]);
   const [bounds, setBounds] = useState<any>([]);
@@ -34,10 +32,11 @@ export const UnitMapsView = () => {
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
     isLoading,
-  } = useAllElevators(
-    {query: search, pageIndex: page.pageIndex, pageSize: page.pageSize},
-    {status},
-  );
+  } = useAllElevators({
+    query: search,
+    pageIndex: page.pageIndex,
+    pageSize: page.pageSize,
+  });
 
   useEffect(() => {
     if (page.pageIndex) {
@@ -142,22 +141,7 @@ export const UnitMapsView = () => {
     mapRef.current.panTo({lat, lng});
   };
 
-  const renderFilterItems = () => (
-    <FilterFields>
-      <MultipleSelectCheckmarks
-        label="Status"
-        options={['RUNNING', 'STOPPED']}
-        getSelectedValue={(item) => setStatus(item)}
-      />
-
-      <MultipleSelectCheckmarks
-        label="Upcoming visits"
-        options={['This week', 'Next week', 'Next month']}
-        getSelectedValue={() => {}}
-        multiple={false}
-      />
-    </FilterFields>
-  );
+  const renderFilterItems = () => <FilterFields>{null}</FilterFields>;
 
   const renderWidget = () => (
     <Box sx={{display: 'flex', justifyContent: 'flex-end', mb: '0.5em'}}>

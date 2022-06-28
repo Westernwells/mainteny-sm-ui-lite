@@ -4,7 +4,6 @@ import {Widget} from 'components/Widget';
 import {GridRowsProp, GridSortModel} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {FilterFields} from 'components/FilterFields';
 import {Progress} from 'components/Progress';
@@ -26,13 +25,11 @@ export const UnitListingView = () => {
   const [queryParams, setQueryParams] = useSearchParams();
   const [sortOrder, setSortOrder] = useState<Order | undefined>();
   const [orderBy, setOrderBy] = useState<ServiceOrderOrderField | undefined>();
-  const [upcomingVisitFilter, setUpcomingVisitFilter] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(pageInfo);
   const totalUnitsRef = useRef(0);
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const [status, setStatus] = useState<string[]>([]);
 
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
@@ -47,7 +44,6 @@ export const UnitListingView = () => {
       ...(sortOrder && {order: sortOrder}),
       ...(orderBy && {orderBy}),
     },
-    {status},
     {keepPreviousData: true},
   );
   // set this value only once
@@ -100,19 +96,7 @@ export const UnitListingView = () => {
   }
 
   const renderFilterItems = () => (
-    <FilterFields
-      onClear={() => {
-        setStatus([]);
-        setUpcomingVisitFilter([]);
-      }}>
-      <MultipleSelectCheckmarks
-        label="Upcoming visits"
-        options={['This week', 'Next week', 'Next month']}
-        initialSelectedItems={upcomingVisitFilter}
-        getSelectedValue={(val) => setUpcomingVisitFilter(val)}
-        multiple={false}
-      />
-    </FilterFields>
+    <FilterFields onClear={() => {}}>{null}</FilterFields>
   );
 
   const renderWidget = () => (

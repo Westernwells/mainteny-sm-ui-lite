@@ -78,7 +78,6 @@ export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
     isFetching,
   } = useAllElevators(
     {query: search, pageIndex: page.pageIndex, pageSize: page.pageSize},
-    {status: []},
     {keepPreviousData: true},
   );
 

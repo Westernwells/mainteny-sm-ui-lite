@@ -93,7 +93,6 @@ export const useElevatorMaintainers = (elevatorId?: string) =>
 
 export function useAllElevators(
   params: Partial<ElevatorQueryParams>,
-  filter: {},
   options?: UseQueryOptions<any, any, any>,
 ) {
   const {user} = useUserSession();

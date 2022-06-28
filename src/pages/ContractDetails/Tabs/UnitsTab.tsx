@@ -17,10 +17,11 @@ export const UnitsTab = () => {
   const [page] = useState(makePage(0, 25)); // TODO: implement paging
   const [rows, setRows] = useState<GridRowsProp>([]);
   const {data: elevator = createEmptyResource<ElevatorView>(10)} =
-    useAllElevators(
-      {query: search, pageIndex: page.pageIndex, pageSize: page.pageSize},
-      {status: []},
-    );
+    useAllElevators({
+      query: search,
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+    });
 
   useEffect(() => {
     if (elevator.data) {
