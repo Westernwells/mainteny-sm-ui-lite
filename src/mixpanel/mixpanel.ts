@@ -33,6 +33,9 @@ const actions = {
     actions.identify(user?.userAccount.id);
     actions.track(name, props);
   },
+  timeEvent: (name: string) => {
+    if (isProduction) mixpanel.time_event(name);
+  },
 };
 
 export const Mixpanel = actions;
