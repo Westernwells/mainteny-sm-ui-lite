@@ -1,13 +1,13 @@
 import Box from '@mui/material/Box';
+import {useTranslation} from 'react-i18next';
 import {FilterFields} from 'components/FilterFields';
-import * as _ from 'lodash';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {
   ServiceOrderStatus,
   ServiceOrderType,
   ServiceOrderView,
 } from 'models/service-order';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {endOfDay, startOfDay, subDays} from 'date-fns';
@@ -19,10 +19,13 @@ import {
   formatSearchParamsPageSize,
 } from 'utils/utils';
 import {Progress} from 'components/Progress';
+import {EmptySection} from 'components/EmptySection';
 import {FlexContainer} from 'components/FlexContainer';
 import {
   serviceOrderStatusToEnum,
   serviceOrderStatusToString,
+  serviceOrderTypeToEnum,
+  serviceOrderTypeToString,
 } from 'utils/service-order-utils';
 import {Widget} from 'components/Widget';
 import {columns, makeRows} from './ServiceOrderDataGridProps';
@@ -31,6 +34,7 @@ export const ServiceOrderList = () => {
   const [page, setPage] = useState(makePage(0, 25));
   const [queryParams, setQueryParams] = useSearchParams();
   const [pageCount, setPageCount] = useState(0);
+  const totalOrederRef = useRef(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrderStatus, setSelectedOrderStatus] = useState<
@@ -47,6 +51,7 @@ export const ServiceOrderList = () => {
     isFetching,
     isLoading,
     isIdle,
+    isFetched,
   } = useServiceOrders(
     {
       end: endOfDay(currentDate).toISOString(),
@@ -60,17 +65,36 @@ export const ServiceOrderList = () => {
     {keepPreviousData: true},
   );
 
+  totalOrederRef.current =
+    totalOrederRef.current || serviceOrdersResource.total;
+
+  // useEffect(() => {
+  //   const currentParams = Object.fromEntries([...queryParams]);
+  //   setPage({
+  //     ...page,
+  //     pageSize: Number(currentParams.pageSize),
+  //     pageIndex: Number(currentParams.pageIndex) - 1,
+  //   });
+  // }, [queryParams]);
+
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
-    setPage({
-      ...page,
-      pageSize: Number(currentParams.pageSize),
-      pageIndex: Number(currentParams.pageIndex) - 1,
-    });
+    if (currentParams.pageSize)
+      setPage({
+        ...page,
+        pageSize: Number(currentParams.pageSize),
+      });
+    if (currentParams.pageIndex)
+      setPage({
+        ...page,
+        pageIndex: Number(currentParams.pageIndex) - 1,
+      });
   }, [queryParams]);
 
   useEffect(() => {
-    setRows(makeRows(serviceOrdersResource.data));
+    if (!isLoading) {
+      setRows(makeRows(serviceOrdersResource.data));
+    }
   }, [serviceOrdersResource]);
 
   useEffect(() => {
@@ -111,6 +135,8 @@ export const ServiceOrderList = () => {
     setSelectedOrderStatus(orderStatus as ServiceOrderStatus[]);
   };
 
+  const {t} = useTranslation();
+
   const renderFilterItems = () => (
     <FilterFields
       onClear={() => {
@@ -128,14 +154,12 @@ export const ServiceOrderList = () => {
 
       <MultipleSelectCheckmarks
         label="Order types"
-        options={Object.values(ServiceOrderType).map((option) =>
-          _.capitalize(option).split('_').join(' '),
+        options={Object.keys(ServiceOrderType).map((i) =>
+          t(serviceOrderTypeToString(i)),
         )}
         initialSelectedItems={selectedOrderTypes}
         getSelectedValue={(item) => {
-          const orderTypes = item.map((val) =>
-            val.split(' ').join('_').toUpperCase(),
-          );
+          const orderTypes = item.map((i) => serviceOrderTypeToEnum(i));
 
           setSelectedOrderTypes(orderTypes as ServiceOrderType[]);
         }}
@@ -153,6 +177,18 @@ export const ServiceOrderList = () => {
       />
     </Box>
   );
+
+  if (isFetched && !totalOrederRef.current) {
+    return (
+      <EmptySection
+        label="No orders have been created yet. Please click the button above to create one!"
+        containerStyle={{
+          height: '100%',
+          mb: '10em',
+        }}
+      />
+    );
+  }
 
   if (isIdle || isLoading) {
     return <Progress />;

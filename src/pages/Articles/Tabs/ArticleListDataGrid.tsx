@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   GridAlignment,
   GridColDef,
@@ -11,7 +12,7 @@ import Box from '@mui/material/Box';
 import {useNavigate} from 'react-router';
 import _ from 'lodash';
 import {ArticleType, ArticleView} from '../../../models/article';
-import {formatCurrency} from '../../../utils/currency';
+import {formatNetAmount} from '../../../utils/currency';
 import {createEmptyResource, makePage} from '../../../utils/paging-utils';
 import {useArticles} from '../../../hooks/reactQuery/useArticle';
 import {Progress} from '../../../components/Progress';
@@ -26,11 +27,15 @@ import {convertToText} from '../../../utils/utils';
 
 const defaultProps = {
   editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
+  renderHeader: (params: GridColumnHeaderParams) => {
+    const {t} = useTranslation();
+
+    return (
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName && t(params.colDef.headerName)}
+      </Typography>
+    );
+  },
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
     <Typography variant="body2" mx="0.5em">
       {params.value || '-'}
@@ -118,11 +123,15 @@ export const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'center',
     editable: false,
-    renderHeader: (params: GridColumnHeaderParams) => (
-      <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName}
-      </Typography>
-    ),
+    renderHeader: (params: GridColumnHeaderParams) => {
+      const {t} = useTranslation();
+
+      return (
+        <Typography variant="subtitle2" color="textSecondary">
+          {params.colDef.headerName && t(params.colDef.headerName)}
+        </Typography>
+      );
+    },
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
         label={params.value}
@@ -142,24 +151,8 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
     category: item.category,
     manufacturer: item.manufacturer,
     model: item.model,
-    purchasePrice: `${formatCurrency(
-      item
-        ? item.unitPurchaseAmount.netAmount /
-            10 ** item.unitPurchaseAmount.fractionDigits!
-        : 0,
-      {
-        currency: item.unitPurchaseAmount.currency,
-      },
-    )}`,
-    sellingPrice: `${formatCurrency(
-      item
-        ? item.unitSellingAmount.netAmount /
-            10 ** item.unitSellingAmount.fractionDigits!
-        : 0,
-      {
-        currency: item.unitSellingAmount.currency,
-      },
-    )}`,
+    purchasePrice: formatNetAmount(item.unitPurchaseAmount),
+    sellingPrice: formatNetAmount(item.unitSellingAmount),
     stock: item.stock.currentStock,
     navigateTo: `details/${item.id}`,
     item,
@@ -238,7 +231,7 @@ export const ArticleListDataGrid = () => {
     <PageListingLayout
       renderWidget={
         <Widget
-          searchPlaceholder="Search by number, name, manufacturer etc."
+          searchPlaceholder="Search by name, category, manufacturer etc."
           getSearchValue={setQuery}
           filterItems={
             <FilterFields>

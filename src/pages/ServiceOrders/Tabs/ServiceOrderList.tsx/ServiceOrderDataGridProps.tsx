@@ -1,23 +1,22 @@
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import {ServiceOrderView} from 'models/service-order';
-import {convertToText} from 'utils/utils';
 import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
+  serviceOrderTypeToString,
 } from 'utils/service-order-utils';
+import {useTranslation} from 'react-i18next';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {StatusChip} from 'components/StatusChip';
 import {getColumnProps} from 'components/DataGridLayout';
-import {olStyles as sx} from './styles';
+import {olStyles} from 'styles';
+import {Typography} from '@mui/material';
 
 export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
     headerName: 'number',
-    align: 'center',
-    flex: 0,
   }),
   getColumnProps({
     field: 'customer',
@@ -50,14 +49,17 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'type',
     headerName: 'order type',
-    renderCell: (params: GridRenderCellParams<any, any, any>) => (
-      <Box sx={{display: 'flex'}}>
-        <ServiceOrderIcons serviceOrderType={params.value} size="small" />
-        <Typography variant="body2" mx="0.5em">
-          {convertToText(params.value)}
-        </Typography>
-      </Box>
-    ),
+    renderCell: (params: GridRenderCellParams<any, any, any>) => {
+      const {t} = useTranslation();
+      return (
+        <Box sx={{display: 'flex'}}>
+          <ServiceOrderIcons serviceOrderType={params.value} size="small" />
+          <Typography variant="body2">
+            {t(serviceOrderTypeToString(params.value))}
+          </Typography>
+        </Box>
+      );
+    },
   }),
   getColumnProps({
     field: 'status',
@@ -66,7 +68,7 @@ export const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
         color={getServiceOrderStatusColor(params.value)}
-        style={sx.orderStatus}
+        style={olStyles.orderStatus}
         label={serviceOrderStatusToString(params.value)}
         variant="filled"
       />

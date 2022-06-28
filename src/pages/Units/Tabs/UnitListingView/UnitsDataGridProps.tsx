@@ -4,7 +4,7 @@ import ElevatorIcon from '@mui/icons-material/Elevator';
 import {getColumnProps} from 'components/DataGridLayout';
 import {formatDate} from 'utils/datetime';
 import {StatusChip} from 'components/StatusChip';
-import {DataGridElevatorView} from '../../Models';
+import {ElevatorView} from '../../../../models/elevator';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -36,15 +36,17 @@ export const columns: GridColDef[] = [
     flex: 1.5,
   }),
   getColumnProps({
-    field: 'lastVisit',
+    field: 'LAST_VISIT_DATE',
     headerName: 'last visit',
     align: 'center',
     flex: 0,
+    sortable: true,
   }),
   getColumnProps({
-    field: 'nextVisit',
+    field: 'NEXT_VISIT_DATE',
     headerName: 'next visit',
     flex: 0,
+    sortable: true,
   }),
   getColumnProps({
     field: 'priorityTechnician',
@@ -68,33 +70,27 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = ({
-  elevators,
-}: {
-  elevators: DataGridElevatorView[];
-}): GridRowsProp => {
-  const result =
-    elevators.length &&
-    elevators.map((elevator: DataGridElevatorView, index: number) => ({
-      id: index,
-      number: elevator.number,
-      model: elevator.model,
-      customer: elevator.propertyOwner.name,
-      lastVisit: formatDate(elevator.lastVisitDate),
-      nextVisit: formatDate(elevator.nextVisitDate),
-      address: elevator.address.fullName,
-      headerText: elevator.address.fullName,
-      priorityTechnician: elevator.assignments.length
-        ? elevator.assignments
-            .map(
-              (item) =>
-                `${item.technician.userAccount.firstName} ${item.technician.userAccount.lastName}`,
-            )
-            .join(', ')
-        : '-',
-      activeContracts: !!elevator.contracts.length,
-      elevator,
-      navigateTo: `details/${elevator.id}`,
-    }));
-  return result || [];
-};
+console.log(columns, '#######');
+
+export const makeRows = (elevators: ElevatorView[]): GridRowsProp =>
+  elevators.map((elevator: ElevatorView) => ({
+    id: elevator.id,
+    number: elevator.externalId,
+    model: elevator.model,
+    customer: elevator.propertyOwner.name,
+    LAST_VISIT_DATE: formatDate(elevator.lastVisitDate),
+    NEXT_VISIT_DATE: formatDate(elevator.nextVisitDate),
+    address: elevator.address.fullName,
+    headerText: elevator.address.fullName,
+    priorityTechnician: elevator.assignments.length
+      ? elevator.assignments
+          .map(
+            (item) =>
+              `${item.technician.userAccount.firstName} ${item.technician.userAccount.lastName}`,
+          )
+          .join(', ')
+      : '-',
+    activeContracts: !!elevator.contracts.length,
+    elevator,
+    navigateTo: `details/${elevator.id}`,
+  }));

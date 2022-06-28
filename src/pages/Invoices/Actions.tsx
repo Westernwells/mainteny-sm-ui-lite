@@ -6,7 +6,6 @@ import FileDownloadOffOutlinedIcon from '@mui/icons-material/FileDownloadOffOutl
 import CheckIcon from '@mui/icons-material/Check';
 import SendIcon from '@mui/icons-material/Send';
 import ReplayIcon from '@mui/icons-material/Replay';
-import CopyAllIcon from '@mui/icons-material/CopyAll';
 import {Confirm} from 'components/Confirm';
 import {
   useInvoicePaymentStatus,
@@ -47,11 +46,6 @@ export const Actions = ({invoice}: Props) => {
             fontSize="small"
             sx={{color: 'action.active', cursor: 'not-allowed'}}
           />
-        </IconButton>
-      )}
-      {invoice.status === InvoiceStatus.PAID && (
-        <IconButton onClick={() => {}}>
-          <CopyAllIcon fontSize="small" sx={{color: 'action.active'}} />
         </IconButton>
       )}
       {invoice.status === InvoiceStatus.NOT_PAID && (

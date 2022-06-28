@@ -11,7 +11,7 @@ export interface LocationFormModel {
 export interface UnitDetailsFormModel {
   category?: string;
   manufacturer?: string;
-  unitNumber?: string;
+  externalId?: string;
   numberOfStops?: number;
   cabinType?: string;
   emergencyPhoneProvider?: string;

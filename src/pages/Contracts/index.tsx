@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
@@ -66,11 +65,16 @@ export const Contracts = () => {
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
 
-    setPage({
-      ...page,
-      pageSize: Number(currentParams.pageSize),
-      pageIndex: Number(currentParams.pageIndex) - 1,
-    });
+    if (currentParams.pageSize)
+      setPage({
+        ...page,
+        pageSize: Number(currentParams.pageSize),
+      });
+    if (currentParams.pageIndex)
+      setPage({
+        ...page,
+        pageIndex: Number(currentParams.pageIndex) - 1,
+      });
   }, [queryParams]);
 
   const costRangeConvertor = (selectedItems: string[]) => {
@@ -144,16 +148,14 @@ export const Contracts = () => {
   return (
     <PageListingLayout
       renderWidget={
-        <>
-          <Widget
-            searchPlaceholder="Search by number, customer, contract type etc."
-            getSearchValue={(val: string) => setSearch(val)}
-            filterItems={renderFilterItems()}
-            btnLabel="New Contract"
-            btnOnClick={() => navigate('/contracts/new')}
-            showActionBtn={true}
-          />
-        </>
+        <Widget
+          searchPlaceholder="Search by number, customer, contract type etc."
+          getSearchValue={(val: string) => setSearch(val)}
+          filterItems={renderFilterItems()}
+          btnLabel="New Contract"
+          btnOnClick={() => navigate('/contracts/new')}
+          showActionBtn
+        />
       }>
       <DataGridLayout
         hideFooter={pageCount <= 1}

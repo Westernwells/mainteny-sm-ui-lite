@@ -64,8 +64,7 @@ export const columns = (
   },
   {
     field: 'actions',
-    headerName: 'EXPIRY DATE',
-    type: 'number',
+    headerName: 'Actions',
     ...defaultAlignment,
     ...defaultProps,
     renderCell: (params) => (
@@ -84,10 +83,16 @@ export const columns = (
 export const makeRows = (
   maintainers: ElevatorAssignmentSimpleView[],
 ): GridRowsProp =>
-  maintainers.map((maintainer) => ({
-    id: maintainer.technician.id,
-    name: `${maintainer.technician.userAccount.firstName} ${maintainer.technician.userAccount.lastName}`,
-    address: maintainer.technician.address.fullName,
-    priority: maintainer.weight,
-    actions: maintainer,
-  }));
+  maintainers
+    .sort((a, b) =>
+      a.technician.userAccount.firstName.localeCompare(
+        b.technician.userAccount.firstName,
+      ),
+    )
+    .map((maintainer) => ({
+      id: maintainer.technician.id,
+      name: `${maintainer.technician.userAccount.firstName} ${maintainer.technician.userAccount.lastName}`,
+      address: maintainer.technician.address.fullName,
+      priority: maintainer.weight,
+      actions: maintainer,
+    }));

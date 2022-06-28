@@ -1,4 +1,5 @@
 import {ReactNode} from 'react';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/Add';
@@ -31,22 +32,25 @@ export const Widget = ({
   showMenuActionBtn,
   menu,
   filterItems,
-}: Props) => (
-  <Box display="flex" sx={{height: '2.5rem', flexGrow: 1, ...containerStyles}}>
-    {!hideSearchInput ? (
-      <Box sx={{mr: '1em'}}>
-        <SearchInput
-          containerStyle={{height: '100%'}}
-          placeholder={searchPlaceholder}
-          onValueChanged={(value: string) =>
-            getSearchValue && getSearchValue(value)
-          }
-        />
-      </Box>
-    ) : null}
-    {filterItems || null}
+}: Props) => {
+  const {t} = useTranslation();
+  return (
+    <Box
+      display="flex"
+      sx={{height: '2.5rem', flexGrow: 1, ...containerStyles}}>
+      {!hideSearchInput ? (
+        <Box sx={{mr: '1em'}}>
+          <SearchInput
+            containerStyle={{height: '100%'}}
+            placeholder={searchPlaceholder && t(searchPlaceholder)}
+            onValueChanged={(value: string) =>
+              getSearchValue && getSearchValue(value)
+            }
+          />
+        </Box>
+      ) : null}
+      {filterItems || null}
 
-    {(showActionBtn || (showMenuActionBtn && menu)) && (
       <Box
         sx={{
           display: 'flex',
@@ -91,6 +95,6 @@ export const Widget = ({
           />
         ) : null}
       </Box>
-    )}
-  </Box>
-);
+    </Box>
+  );
+};

@@ -1,7 +1,8 @@
 import Typography from '@mui/material/Typography';
+import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
 import {DataGridLayout} from 'components/DataGridLayout';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import {useFormik} from 'formik';
@@ -10,6 +11,7 @@ import * as Yup from 'yup';
 import {useUpdateElevatorTechnician} from 'hooks/reactQuery/useElevator';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
+import {EmptySection} from 'components/EmptySection';
 import {getDataGridHeight} from 'utils/utils';
 import {ElevatorAssignmentSimpleView} from 'models/elevator';
 import {PriorityTechnicianFormModel} from 'models/unitForm';
@@ -46,6 +48,7 @@ export const PriorityTechnician = ({
     onSubmit: () => {},
     validationSchema,
   });
+  let totalTechnicianRef = useRef(0).current;
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [activeTechnician, setActiveTechnician] =
@@ -56,6 +59,8 @@ export const PriorityTechnician = ({
   const {mutateAsync: updateTechnician, isLoading: isEditing} =
     useUpdateElevatorTechnician('Technicians updated successfully');
 
+  totalTechnicianRef = totalTechnicianRef || maintainers.length;
+
   useEffect(() => {
     setRows(makeRows(!showAll ? maintainers.slice(0, 3) : maintainers));
   }, [maintainers, showAll]);
@@ -63,6 +68,7 @@ export const PriorityTechnician = ({
   const onEditButtonClicked = (item: ElevatorAssignmentSimpleView) => {
     setDialogTitle(DialogTitle.EDIT_TECHNICIAN);
     formik.setFieldValue('technicianId', item.technician.id);
+    formik.setFieldValue('priority', item.weight);
     setActiveTechnician(item);
     setOpenDialog(true);
   };
@@ -118,31 +124,65 @@ export const PriorityTechnician = ({
     setOpenCancelConfirm(true);
   };
 
+  const onAddButtonClicked = () => {
+    setActiveTechnician(undefined);
+    setDialogTitle(DialogTitle.ADD_TECHNICIAN);
+    formik.setValues({technicianId: '', priority: 0});
+    setOpenDialog(true);
+  };
+
+  const renderNoRowsSection = () => (
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
+      }}>
+      <EmptySection
+        illustration="clipboard"
+        size="tiny"
+        containerStyle={{m: 'auto', width: '60%'}}
+        label="No quotations yet. It will appear here once added!"
+        showActionBtn
+        btnLabel="+ Add New Article"
+        btnAction={() => {}}
+      />
+    </Box>
+  );
+
+  const {t} = useTranslation();
+
   return (
     <InfoCard
       containerStyles={{...containerStyles}}
       showHeaderBackground
-      header={<Typography variant="subtitle1">Priority Technicians</Typography>}
-      handleAction={() => {
-        setActiveTechnician(undefined);
-        setDialogTitle(DialogTitle.ADD_TECHNICIAN);
-        formik.setValues({technicianId: '', priority: 0});
-        setOpenDialog(true);
-      }}
-      headerActionIcon={<Typography color="info.main">+ Add</Typography>}>
-      <DataGridLayout
-        fullHeight={false}
-        height={getDataGridHeight(rows.length, showAll ? rows.length : 3)}
-        hideFooter
-        rows={rows}
-        columns={useCallback(
-          () => columns(getEditableTechnician, getDeletableTechnician),
-          [],
-        )()}
-        containerStyle={{
-          borderBottom: 'none',
-        }}
-      />
+      header={
+        <Typography variant="subtitle1">{t('Priority Technicians')}</Typography>
+      }
+      handleAction={() => onAddButtonClicked()}
+      headerActionIcon={
+        <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
+      }>
+      {!totalTechnicianRef ? (
+        renderNoRowsSection()
+      ) : (
+        <DataGridLayout
+          fullHeight={false}
+          height={getDataGridHeight(rows.length, showAll ? rows.length : 3)}
+          hideFooter
+          rows={rows}
+          isWidget
+          headerHeight={30}
+          columns={useCallback(
+            () => columns(getEditableTechnician, getDeletableTechnician),
+            [],
+          )()}
+          containerStyle={{
+            borderBottom: 'none',
+          }}
+        />
+      )}
       {maintainers.length > 3 ? (
         <Box
           sx={{textAlign: 'center', cursor: 'pointer'}}

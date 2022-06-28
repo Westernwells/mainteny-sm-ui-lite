@@ -5,10 +5,7 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {Progress} from 'components/Progress';
-import {
-  useFetchCustomerElevatorNumbers,
-  useQueryCustomers,
-} from 'hooks/reactQuery/useCustomers';
+import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
 import {useSearchParams} from 'react-router-dom';
 import {
   formatSearchParamsPageIndex,
@@ -30,7 +27,10 @@ export const Customer = () => {
 
   const {
     data: customerResource = createEmptyResource<PropertyOwnerView>(pageSize),
-    isFetched: customerResourceFetched,
+    isLoading,
+    isFetching,
+    isFetched,
+    isIdle,
   } = useQueryCustomers(
     {
       pageIndex: page.pageIndex,
@@ -41,32 +41,26 @@ export const Customer = () => {
   );
   totalCustomerRef.current = totalCustomerRef.current || customerResource.total;
 
-  const {
-    data: customersWithUnits = [],
-    isLoading,
-    isFetching,
-    isIdle,
-    isFetched,
-  } = useFetchCustomerElevatorNumbers(customerResource.data, {
-    enabled: customerResourceFetched,
-    keepPreviousData: true,
-  });
-
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
 
-    setPage({
-      ...page,
-      pageSize: Number(currentParams.pageSize),
-      pageIndex: Number(currentParams.pageIndex) - 1,
-    });
+    if (currentParams.pageSize)
+      setPage({
+        ...page,
+        pageSize: Number(currentParams.pageSize),
+      });
+    if (currentParams.pageIndex)
+      setPage({
+        ...page,
+        pageIndex: Number(currentParams.pageIndex) - 1,
+      });
   }, [queryParams]);
 
   useEffect(() => {
-    if (customersWithUnits.length) {
-      setRows(makeRows(customersWithUnits));
+    if (!isLoading) {
+      setRows(makeRows(customerResource.data));
     }
-  }, [customersWithUnits]);
+  }, [customerResource, isLoading]);
 
   useEffect(() => {
     setPageCount(Math.ceil(customerResource.total / page.pageSize));

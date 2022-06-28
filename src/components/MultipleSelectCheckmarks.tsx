@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
@@ -39,7 +40,9 @@ export const MultipleSelectCheckmarks = ({
   formControlStyles,
   initialSelectedItems = [],
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
+
   const [selectedItems, setSelectedItems] =
     React.useState<string[]>(initialSelectedItems);
   const visibility = selectedItems.length
@@ -73,14 +76,14 @@ export const MultipleSelectCheckmarks = ({
       <FormControl
         size="small"
         sx={{mr: '0.5em', width: '8.5rem', ...formControlStyles}}>
-        <InputLabel id={label}>{label}</InputLabel>
+        <InputLabel id={label}>{t(label)}</InputLabel>
         <Select
           id={label}
           multiple={multiple}
           value={selectedItems}
           onChange={handleChange}
-          input={<OutlinedInput sx={{background: '#fff'}} label={label} />}
-          renderValue={() => selectedItems.join(',')}
+          input={<OutlinedInput sx={{background: '#fff'}} label={t(label)} />}
+          renderValue={() => selectedItems.map((i) => t(i)).join(',')}
           MenuProps={MenuProps}>
           {!multiple ? (
             <MenuItem
@@ -97,7 +100,7 @@ export const MultipleSelectCheckmarks = ({
                   color: theme.palette.info.main,
                   ...visibility,
                 }}
-                primary="Clear"
+                primary={t('Clear')}
               />
             </MenuItem>
           ) : null}
@@ -106,12 +109,12 @@ export const MultipleSelectCheckmarks = ({
             ? options.map((option) => (
                 <MenuItem key={option} value={option}>
                   <Checkbox checked={selectedItems.includes(option)} />
-                  <ListItemText primary={option} />
+                  <ListItemText primary={t(option)} />
                 </MenuItem>
               ))
             : options.map((option) => (
                 <MenuItem key={option} value={option}>
-                  <ListItemText primary={option} />
+                  <ListItemText primary={t(option)} />
                 </MenuItem>
               ))}
         </Select>

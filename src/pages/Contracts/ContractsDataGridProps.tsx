@@ -69,7 +69,7 @@ export const makeRows = (contracts: ContractView[]) =>
         id: index,
         number: item.number,
         customer: item.propertyOwner.name,
-        units: item.units,
+        units: item.elevators.length,
         start: formatDate(item.startTime),
         end: formatDate(item.endTime),
         type: item.type,

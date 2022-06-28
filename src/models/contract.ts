@@ -4,11 +4,25 @@ import {
   ServiceCompanySimpleView,
   ServiceCompanyView,
 } from './service-company';
-import {Meta, Order, OrderBy, TimeWindowRecord, TimeWindowType} from './misc';
-import {Elevator, ElevatorStatus, ElevatorView} from './elevator';
+import {
+  Amount,
+  Meta,
+  Order,
+  OrderBy,
+  TimeWindowRecord,
+  TimeWindowType,
+} from './misc';
+import {
+  Elevator,
+  ElevatorSimpleView,
+  ElevatorStatus,
+  ElevatorView,
+} from './elevator';
 import {PropertyOwnerSimpleView, PropertyOwnerView} from './propertyManager';
 import {FileWithPreview} from 'components/MyDropzone';
 import {FileResourceRecord} from './media';
+import {List} from '@mui/material';
+import {FileResource} from './media';
 
 export enum ContractStatus {
   PENDING = 'PENDING',
@@ -70,21 +84,26 @@ export interface QueryContractParams {
   status?: string[];
 }
 
-export interface ContractDocuments {
-  createdAt: string;
-  description: string;
-  id: string;
-  type: string;
-  uri: string;
+export enum InvoiceDueType {
+  YEARLY = 'YEARLY',
+  HALF_YEARLY = 'HALF_YEARLY',
+  QUARTERLY = 'QUARTERLY',
+  AFTER_EACH_VISIT = 'AFTER_EACH_VISIT',
 }
 
 export interface ContractAdditionalInfo {
-  annualPriceAdjustmentPercentage: number;
-  documents: ContractDocuments[];
-  invoiceDue: string;
-  price: ContractPrice;
-  renewalTerms: number;
-  scope: string[];
+  renewalTerms?: number;
+  price?: Amount;
+  annualPriceAdjustmentPercentage?: number;
+  invoiceDue?: InvoiceDueType;
+  documents?: FileResource[];
+  scope?: string[];
+}
+
+export interface ContractElevatorSimpleView {
+  id: string;
+  contractId: string;
+  elevator: ElevatorSimpleView;
 }
 
 export interface ContractView {
@@ -104,19 +123,11 @@ export interface ContractView {
   currency: string;
   startTime: string;
   endTime: string;
-  units?: number;
+  elevators: ContractElevatorSimpleView[];
   timePreference: ContractTimeWindow[];
-
   status: ContractStatus;
   search: string;
   meta: Meta;
-
-  elevators: ElevatorView[];
-}
-
-export interface ContractViewWithUnits {
-  contractView: ContractView;
-  units: number;
 }
 
 export interface ContractSimpleView {

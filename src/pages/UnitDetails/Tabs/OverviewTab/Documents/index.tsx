@@ -14,6 +14,7 @@ import {FileResourceRecord} from 'models/media';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import {EmptySection} from 'components/EmptySection';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   elevator: ElevatorView;
@@ -48,7 +49,7 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
           documents: [
             ...(elevatorRequestBody.documents as FileResourceRecord[]),
             ...acceptedFiles.map((item) => ({
-              description: '',
+              description: item.name.split('.')[0],
               type: item.type,
               uri: `${uploadPath}/${item.name}`,
             })),
@@ -83,6 +84,8 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
     </Box>
   );
 
+  const {t} = useTranslation();
+
   return (
     <InfoCard
       containerStyles={{
@@ -93,37 +96,56 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
         },
       }}
       bodyContainerStyle={{overflowY: 'scroll'}}
-      headerActionIcon={<Typography color="info.main">+ Add</Typography>}
+      headerActionIcon={
+        <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
+      }
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
-      header={<Typography variant="subtitle1">Documents</Typography>}>
+      header={<Typography variant="subtitle1">{t('Documents')}</Typography>}>
       {!elevator.additionalInfo.documents ||
       elevator.additionalInfo.documents.length === 0 ? (
         renderEmptySection()
       ) : (
-        <Grid container spacing={2} sx={{mt: '0.5em'}}>
+        <Grid
+          container
+          spacing={2}
+          sx={{
+            mt: '0.5em',
+          }}>
           {elevator.additionalInfo.documents &&
             elevator.additionalInfo.documents.map((item) => (
-              <Grid item sm={4}>
+              <Grid
+                item
+                sm={4}
+                sx={{
+                  height: 120,
+                  [theme.breakpoints.down('md')]: {
+                    height: 170,
+                  },
+                }}>
                 <Box
                   sx={{
                     border: `1px solid ${theme.palette.text.disabled}`,
                     padding: '0.5em',
-                    height: 120,
-                    [theme.breakpoints.down('md')]: {
-                      height: 170,
-                    },
+                    height: '70%',
                     display: 'flex',
                     flexDirection: 'column',
                   }}>
                   <Box
-                    sx={{flexGrow: 1, height: 0, cursor: 'pointer'}}
+                    sx={{
+                      flexGrow: 1,
+                      height: 0,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
                     onClick={() =>
                       window.open(downloadUrls[item.uri], '_blank')
                     }>
                     <FileCopyIcon
                       sx={{
-                        fontSize: '4rem',
+                        fontSize: '3rem',
                         [theme.breakpoints.down('md')]: {
                           fontSize: '9rem',
                         },
@@ -131,24 +153,22 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
                       }}
                     />
                   </Box>
-
-                  {item.description ? (
-                    <Typography
-                      component="div"
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{
-                        overflow: 'hidden',
-                        display: '-webkit-box',
-                        maxWidth: '100%',
-                        WebkitLineClamp: '1',
-                        WebkitBoxOrient: 'vertical',
-                        height: '20%',
-                      }}>
-                      {item.description}
-                    </Typography>
-                  ) : null}
                 </Box>
+                {item.description ? (
+                  <Typography
+                    component="div"
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{
+                      overflow: 'hidden',
+                      display: '-webkit-box',
+                      maxWidth: '100%',
+                      WebkitLineClamp: '2',
+                      WebkitBoxOrient: 'vertical',
+                    }}>
+                    {item.description}
+                  </Typography>
+                ) : null}
               </Grid>
             ))}
         </Grid>

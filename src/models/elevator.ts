@@ -3,18 +3,22 @@ import {
   AddressRecord,
   Fee,
   Meta,
+  Order,
   Priority,
   StringMap,
   StringValue,
 } from './misc';
-import {Client, ClientManager} from './client';
+import {Client} from './client';
 import {TechnicianSimpleView, TechnicianView} from './technician';
 import {FileResource, FileResourceRecord} from './media';
 import {ServiceCompanyTimeUnit} from './service-company';
-import {ServiceOrderView} from './service-order';
+import {ServiceOrderOrderField, ServiceOrderView} from './service-order';
 import {ContractSimpleView} from './contract';
 import {EmployeesSimpleView} from './employee';
-import {PropertyOwnerSimpleView} from './propertyManager';
+import {
+  PropertyContactPersonSimpleView,
+  PropertyOwnerSimpleView,
+} from './propertyManager';
 
 export enum ElevatorCommentType {
   TODO = 'TODO',
@@ -43,6 +47,24 @@ export enum ElevatorCategory {
   BOARDING_BRIDGE = 'BOARDING_BRIDGE',
   FACADE_ACCESS_SYSTEM = 'FACADE_ACCESS_SYSTEM',
   OTHERS = '',
+}
+
+export interface ElevatorQueryParams {
+  id: string;
+  lastVisitDateEnd: string;
+  lastVisitDateStart: string;
+  neLat: number;
+  neLng: number;
+  nextVisitDateEnd: string;
+  nextVisitDateStart: string;
+  order: Order;
+  orderBy: ServiceOrderOrderField;
+  LAST_VISIT_DATE: string;
+  pageIndex: number;
+  pageSize: number;
+  query: string;
+  swLat: number;
+  swLng: number;
 }
 
 export interface ElevatorAdditionalInfo {
@@ -92,7 +114,7 @@ export interface Elevator {
   availability: number;
   address: Address;
   propertyOwner: Client;
-  propertyManager: ClientManager;
+  propertyManager: PropertyContactPersonSimpleView;
   lastVisitDate: string;
   nextVisitDate: string;
   serviceTime: number;
@@ -112,6 +134,7 @@ export interface ElevatorView {
   number: string;
   model: string;
   type: string;
+  externalId: string;
   capacity: string;
   category: ElevatorCategory;
   technicianNumber: number;
@@ -119,6 +142,7 @@ export interface ElevatorView {
   availability: number;
   address: Address;
   propertyOwner: PropertyOwnerSimpleView;
+  propertyManager: PropertyContactPersonSimpleView;
   properties: ElevatorProperty[];
   lastVisitDate: string;
   nextVisitDate: string;
@@ -273,7 +297,7 @@ export interface ElevatorRequestBody {
   lastVisitDate: string;
   manufacturer: string;
   model: string;
-  number: string;
+  externalId: string;
   numberOfStops: number;
   parking: string;
   pictures: FileResourceRecord[];

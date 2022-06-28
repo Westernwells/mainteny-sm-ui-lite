@@ -5,6 +5,7 @@ import {twentyFourHourTime} from 'utils/utils';
 import Box from '@mui/material/Box';
 import * as _ from 'lodash';
 import Typography from '@mui/material/Typography';
+import {Divider} from '@mui/material';
 import {
   addDays,
   eachDayOfInterval,
@@ -19,6 +20,7 @@ import {
   getEndOfWeek,
   getStartOfWeek,
 } from 'utils/datetime';
+import {useTranslation} from 'react-i18next';
 import {ScheduleContainer} from 'components/Schedules/ScheduleContainer';
 import {ScheduleHeader} from 'components/Schedules/ScheduleHeader';
 import {ScheduleRow} from 'components/Schedules/ScheduleRow';
@@ -62,7 +64,7 @@ interface Props {
   checkedValues?: string[];
 }
 
-const gridWidth = 120;
+const gridWidth = 200;
 const dateFormat = 'dd MMMM yy';
 
 export const Schedule = ({
@@ -204,10 +206,9 @@ export const Schedule = ({
       if (elementRef.current) {
         elementRef.current.scroll({
           left: scrollWidth,
-          behavior: 'smooth',
         });
       }
-    }, 500);
+    }, 0);
 
     return () => {
       clearTimeout(timeout);
@@ -233,6 +234,8 @@ export const Schedule = ({
       endOfWeekDay: endOfPrevWeek,
     });
   };
+
+  const {t} = useTranslation();
 
   return (
     <Card sx={[sx.card, {...containerStyles}]}>
@@ -271,7 +274,7 @@ export const Schedule = ({
                           getSearchValue={(searchValue) =>
                             handleSearch && handleSearch(searchValue)
                           }
-                          searchPlaceholder={searchPlaceholder}
+                          searchPlaceholder={t(searchPlaceholder)}
                           scheduleType={scheduleType}
                         />
                       </ScheduleHeaderCell>
@@ -288,6 +291,21 @@ export const Schedule = ({
               </ScheduleRow>
             </ScheduleHeader>
 
+            <Divider
+              absolute
+              sx={[
+                sx.divider,
+                {
+                  marginLeft: `${
+                    gridWidth *
+                    (1 + new Date().getHours() + new Date().getMinutes() / 60)
+                  }px`,
+                },
+              ]}
+              component="colgroup"
+              orientation="vertical"
+            />
+
             <ScheduleBody>
               {bodyRow.map((dayRow, rowIndex) => (
                 <ScheduleRow key={rowIndex}>
@@ -297,7 +315,8 @@ export const Schedule = ({
                         const label =
                           scheduleType === 'date'
                             ? lookupDate[key]
-                            : `${lookupTechnician[key][0].userAccount.firstName} ${lookupTechnician[key][0].userAccount.lastName}`;
+                            : lookupTechnician[key] &&
+                              `${lookupTechnician[key][0].userAccount.firstName} ${lookupTechnician[key][0].userAccount.lastName}`;
                         return (
                           <ScheduleBodyCell
                             cellWidth={gridWidth}

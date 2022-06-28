@@ -158,7 +158,6 @@ export const ContractOverview = () => {
             }
             headerActionIcon={<EditIcon />}>
             <ContractBasic
-              type={contractDetails?.type}
               numberOfVisits={contractDetails?.visitsNumber}
               costPerYear={formatCurrency(
                 contractDetails &&
@@ -180,6 +179,7 @@ export const ContractOverview = () => {
                 contractDetails?.additionalInfo?.invoiceDue || '',
               )}
               numberOfUnits={contractDetails?.elevators?.length}
+              type={contractDetails?.type.toLowerCase()}
             />
             <Dialog
               title="Edit Contract"

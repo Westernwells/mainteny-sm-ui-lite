@@ -23,6 +23,12 @@ export const styles = {
       height: '1em',
     },
   }),
+  divider: sx({
+    width: '1px',
+    bgcolor: '#BDBDBD',
+    opacity: 0.5,
+    zIndex: 2,
+  }),
   footerContainer: sx({
     position: 'sticky',
     left: 0,

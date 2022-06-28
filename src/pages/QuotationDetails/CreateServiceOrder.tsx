@@ -1,5 +1,6 @@
 import {FormSelect} from 'components/form/FormSelect';
 import {ServiceOrderType} from 'models/service-order';
+import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {convertToText} from 'utils/utils';
 
 interface Props {
@@ -12,7 +13,7 @@ export const CreateServiceOrder = ({value, onChange}: Props) => (
     labelId="createServiceOrder-label"
     label="Service Order Type"
     options={Object.keys(ServiceOrderType).map((i) => ({
-      label: convertToText(i),
+      label: serviceOrderTypeToString(i as ServiceOrderType),
       value: convertToText(i),
     }))}
     selectProps={{

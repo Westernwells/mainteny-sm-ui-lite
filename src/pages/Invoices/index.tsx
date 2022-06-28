@@ -55,18 +55,23 @@ export const Invoices = () => {
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
 
-    setPage({
-      ...page,
-      pageSize: Number(currentParams.pageSize),
-      pageIndex: Number(currentParams.pageIndex) - 1,
-    });
+    if (currentParams.pageSize)
+      setPage({
+        ...page,
+        pageSize: Number(currentParams.pageSize),
+      });
+    if (currentParams.pageIndex)
+      setPage({
+        ...page,
+        pageIndex: Number(currentParams.pageIndex) - 1,
+      });
   }, [queryParams]);
 
   useEffect(() => {
-    if (invoiceResource?.data) {
+    if (!isLoading) {
       setRows(makeRows(invoiceResource.data));
     }
-  }, [invoiceResource]);
+  }, [invoiceResource, isLoading]);
 
   useEffect(() => {
     setPageCount(Math.ceil(invoiceResource.total / page.pageSize));
@@ -76,19 +81,19 @@ export const Invoices = () => {
     const range: number[][] = [];
     selectedItems.forEach((item) => {
       switch (item) {
-        case 'Below 1000 EUR':
+        case 'Below 1000€':
           range.push([0, 1000]);
           break;
 
-        case '1000 - 3000 EUR':
+        case '1000 - 3000€':
           range.push([1000, 3000]);
           break;
 
-        case '3000 - 5000 EUR':
+        case '3000 - 5000€':
           range.push([3000, 5000]);
           break;
 
-        case 'Above 5000 EUR':
+        case 'Above 5000€':
           range.push([5000, 99999]);
           break;
 
@@ -120,12 +125,7 @@ export const Invoices = () => {
       />
       <MultipleSelectCheckmarks
         label="Total Amount"
-        options={[
-          'Below 1000 EUR',
-          '1000 - 3000 EUR',
-          '3000 - 5000 EUR',
-          'Above 5000 EUR',
-        ]}
+        options={['Below 1000€', '1000 - 3000€', '3000 - 5000€', 'Above 5000€']}
         getSelectedValue={(item) => amountRangeConvertor(item)}
         initialSelectedItems={amount}
         multiple={false}
@@ -195,7 +195,7 @@ export const Invoices = () => {
           searchPlaceholder="Search by number, customer, service type etc."
           getSearchValue={(val: string) => setSearch(val)}
           showActionBtn
-          btnLabel="New invoice"
+          btnLabel="New Invoice"
           btnOnClick={() => navigate('/invoices/new')}
           filterItems={renderFilterItems()}
         />

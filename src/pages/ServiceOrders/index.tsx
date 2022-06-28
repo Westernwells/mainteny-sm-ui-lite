@@ -24,16 +24,21 @@ export const ServiceOrders = () => {
   const [queryParams, setQueryParams] = useSearchParams();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const currentParams = Object.fromEntries([...queryParams]);
+    if (currentParams.tab) setTabValue(Number(currentParams.tab));
+  }, []);
+
   const menu = useRef([
     {label: 'Emergency', action: () => navigate('/orders/new?type=emergency')},
     {label: 'Callout', action: () => navigate('/orders/new?type=callout')},
     {label: 'Repair', action: () => navigate('/orders/new?type=repair')},
-    {label: 'Regular', action: () => navigate('/orders/new?type=regular')},
+    {label: 'Maintenance', action: () => navigate('/orders/new?type=regular')},
   ]).current;
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
-    setTabValue(Number(currentParams.tab));
+    if (currentParams.tab) setTabValue(Number(currentParams.tab));
   }, []);
 
   return (

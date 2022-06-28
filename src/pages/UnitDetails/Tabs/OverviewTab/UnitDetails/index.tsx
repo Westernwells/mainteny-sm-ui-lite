@@ -1,4 +1,5 @@
 import Grid from '@mui/material/Grid';
+import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import {ElevatorRequestBody, ElevatorView} from 'models/elevator';
@@ -22,7 +23,6 @@ interface Props {
 }
 
 const validationSchema = Yup.object().shape({
-  unitNumber: Yup.string().nullable().required('Unit number is required'),
   category: Yup.string().nullable().required('Category is required'),
 });
 
@@ -40,7 +40,7 @@ export const UnitDetails = ({
     initialValues: {
       category: elevator.category,
       manufacturer: elevator.additionalInfo.manufacturer,
-      unitNumber: elevator.number,
+      externalId: elevator.externalId,
       numberOfStops: elevator.additionalInfo.numberOfStops,
       cabinType: elevator.additionalInfo.cabinType,
       emergencyPhoneProvider: elevator.additionalInfo.emergencyPhoneProvider,
@@ -77,7 +77,7 @@ export const UnitDetails = ({
           ? convertToMacro(formik.values.category)
           : '',
         manufacturer: formik.values.manufacturer,
-        number: elevator.number,
+        externalId: formik.values.externalId,
         numberOfStops: formik.values.numberOfStops,
         cabinType: formik.values.cabinType,
         emergencyPhoneProvider: formik.values.emergencyPhoneProvider,
@@ -90,11 +90,13 @@ export const UnitDetails = ({
     });
   };
 
+  const {t} = useTranslation();
+
   return (
     <InfoCard
       containerStyles={{...containerStyles}}
       handleAction={() => setOpenDialog(true)}
-      header={<Typography variant="subtitle1">Unit Details</Typography>}
+      header={<Typography variant="subtitle1">{t('Unit Details')}</Typography>}
       showHeaderBackground
       headerActionIcon={<EditIcon />}>
       <Grid container spacing={2}>

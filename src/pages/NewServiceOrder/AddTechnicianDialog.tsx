@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -45,7 +46,7 @@ export const AddTechnicianDialog = ({
   };
 
   const onCancel = () => setShowModal(false);
-
+  const {t} = useTranslation();
   return (
     <Box>
       <Dialog
@@ -53,7 +54,7 @@ export const AddTechnicianDialog = ({
         onClose={onCancel}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description">
-        <DialogTitle id="alert-dialog-title">Add Technician</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{t('Add Technician')}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description" component="div">
             <TechnicianAutoComplete
@@ -76,14 +77,14 @@ export const AddTechnicianDialog = ({
               disabled: !queryView,
             }}>
             <Typography variant="subtitle2" color="text.secondary">
-              Cancel
+              {t('Cancel')}
             </Typography>
           </Button>
           <Button
             buttonProps={{
               onClick: onSave,
             }}>
-            <Typography variant="subtitle2">Add</Typography>
+            <Typography variant="subtitle2">{t('Add')}</Typography>
           </Button>
         </DialogActions>
       </Dialog>

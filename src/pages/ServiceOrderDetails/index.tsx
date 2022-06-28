@@ -1,27 +1,26 @@
 import {useState} from 'react';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import GradingIcon from '@mui/icons-material/Grading';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import ListAltIcon from '@mui/icons-material/ListAlt';
+import {useParams} from 'react-router';
 import {Overview} from './Tabs/Overview';
+import {WorkReport} from './Tabs/WorkReport';
 
 const tabItems = [
   {
     label: 'Overview',
-    icon: <CalendarTodayIcon />,
+    icon: <ManageSearchIcon />,
   },
   {
-    label: 'Spare Parts',
-    icon: <ListAltIcon />,
-  },
-  {
-    label: 'Invoices',
-    icon: <ListAltIcon />,
+    label: 'Work report',
+    icon: <GradingIcon />,
   },
 ];
 
 export const ServiceOrderDetails = () => {
   const [tabValue, setTabValue] = useState(0);
+  const {id: serviceOrderId} = useParams();
 
   return (
     <Tabs
@@ -31,10 +30,10 @@ export const ServiceOrderDetails = () => {
         setTabValue(index);
       }}>
       <TabsBody value={tabValue} index={0} containerStyle={{height: 2}}>
-        <Overview />
+        <Overview orderId={serviceOrderId} />
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
-        null
+        <WorkReport />
       </TabsBody>
     </Tabs>
   );

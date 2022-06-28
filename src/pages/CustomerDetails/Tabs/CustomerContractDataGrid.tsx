@@ -8,11 +8,11 @@ import {
 import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import {formatCurrency} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
 import {ContractStatus, ContractView} from 'models/contract';
 import {StatusChip} from 'components/StatusChip';
 import {convertToText} from 'utils/utils';
+import {formatNetAmount} from '../../../utils/currency';
 
 const defaultProps = {
   editable: false,
@@ -162,19 +162,15 @@ export const columns: GridColDef[] = [
   },
 ];
 
-export const makeRows = (contracts: any): GridRowsProp =>
-  contracts
-    ? contracts.map((item: ContractView, index: number) => ({
-        id: index,
-        contractNumber: item.number,
-        units: item.units || '-',
-        cost: `${formatCurrency(item ? item.price! : 0, {
-          currency: item.currency,
-        })}`,
-        status: item.status,
-        contractType: item.type[0] + item.type.slice(1).toLowerCase(),
-        startDate: formatDate(item.startTime),
-        expiryDate: formatDate(item.endTime),
-        navigateTo: `/contracts/details/${item.id}`,
-      }))
-    : [];
+export const makeRows = (contracts: ContractView[]): GridRowsProp =>
+  contracts.map((item: ContractView, index: number) => ({
+    id: index,
+    contractNumber: item.number,
+    units: item.elevators.length,
+    cost: formatNetAmount(item.additionalInfo.price) || '-',
+    status: item.status,
+    contractType: item.type[0] + item.type.slice(1).toLowerCase(),
+    startDate: formatDate(item.startTime),
+    expiryDate: formatDate(item.endTime),
+    navigateTo: `/contracts/details/${item.id}`,
+  }));

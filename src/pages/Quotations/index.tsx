@@ -1,5 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {useNavigate} from 'react-router';
+import {useSearchParams} from 'react-router-dom';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
@@ -11,6 +12,10 @@ import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
+import {
+  formatSearchParamsPageIndex,
+  formatSearchParamsPageSize,
+} from 'utils/utils';
 import {columns, makeRows} from './QuotationsDataGridProps';
 
 const pageSize = 25;
@@ -22,6 +27,7 @@ export const Quotations = () => {
   const totalQuotationsRef = useRef(0);
   const [status, setStatus] = useState<string[]>([]);
   const [page, setPage] = useState(makePage(0, pageSize));
+  const [queryParams, setQueryParams] = useSearchParams();
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const {
@@ -44,12 +50,40 @@ export const Quotations = () => {
     totalQuotationsRef.current || quotationsResource.total;
 
   useEffect(() => {
-    if (quotationsResource) {
+    if (!isLoading) {
       setRows(makeRows(quotationsResource));
-    } else {
-      setRows([]);
     }
-  }, [quotationsResource]);
+  }, [quotationsResource, isLoading]);
+
+  useEffect(() => {
+    const currentParams = Object.fromEntries([...queryParams]);
+
+    if (currentParams.pageSize)
+      setPage({
+        ...page,
+        pageSize: Number(currentParams.pageSize),
+      });
+    if (currentParams.pageIndex)
+      setPage({
+        ...page,
+        pageIndex: Number(currentParams.pageIndex) - 1,
+      });
+  }, [queryParams]);
+
+  useEffect(() => {
+    const currentParams = Object.fromEntries([...queryParams]);
+
+    if (currentParams.pageSize)
+      setPage({
+        ...page,
+        pageSize: Number(currentParams.pageSize),
+      });
+    if (currentParams.pageIndex)
+      setPage({
+        ...page,
+        pageIndex: Number(currentParams.pageIndex) - 1,
+      });
+  }, [queryParams]);
 
   useEffect(() => {
     setPageCount(Math.ceil(quotationsResource.total / page.pageSize));
@@ -74,7 +108,7 @@ export const Quotations = () => {
     <FilterFields onClear={() => setStatus([])}>
       <MultipleSelectCheckmarks
         label="Status"
-        options={['SENT', 'DRAFT']}
+        options={['Sent', 'Draft']}
         initialSelectedItems={status}
         getSelectedValue={(item) => setStatus(item)}
         multiple={false}
@@ -104,12 +138,13 @@ export const Quotations = () => {
         columns={columns}
         loading={isFetching}
         pageSize={page.pageSize}
+        pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
-          setPage({...page, pageSize: newPageSize})
+          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
         }
-        handlePageChange={(newPage: number) => {
-          setPage({...page, pageIndex: newPage - 1});
-        }}
+        handlePageChange={(newPage: number) =>
+          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+        }
         pageCount={pageCount}
         totalRows={quotationsResource.total}
       />

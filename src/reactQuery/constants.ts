@@ -12,7 +12,6 @@ export const queryKeys = {
   elevatorById: 'elevatorById',
   maintainerByElevatorId: 'maintainerByElevatorId',
   fetchServiceOrderReport: 'fetchServiceOrderReport',
-  fetchContractElevatorCount: 'fetchContractElevatorCount',
   fetchId: 'fetchId',
   fetchInvoices: 'fetchInvoices',
   fetchQuotations: 'fetchQuotations',
@@ -24,7 +23,6 @@ export const queryKeys = {
   invoiceDownloadUrl: 'invoiceDownloadUrl',
   queryServiceManager: 'queryServiceManager',
   queryCustomers: 'queryCustomers',
-  fetchCustomerElevatorNumbers: 'fetchCustomerElevatorNumbers',
   queryUserAccounts: 'queryUserAccounts',
   fetchTechnicians: 'fetchTechnicians',
   queryTechniciansEvents: 'queryTechniciansEvents',
@@ -45,4 +43,6 @@ export const queryKeys = {
   queryElevatorComment: 'queryElevatorComment',
   fetchWorkHours: 'fetchWorkHours',
   queryTodos: 'queryTodos',
+  fetchServiceOrderInvoices: 'fetchServiceOrderInvoices',
+  fetchServiceOrderArticles: 'fetchServiceOrderArticles',
 };

@@ -96,5 +96,5 @@ export const makeRows = (contracts: ContractSimpleView[]): GridRowsProp =>
     startDate: formatDate(new Date(item.startTime), 'dd.MM.yyy') || '-',
     expiryDate: formatDate(new Date(item.endTime), 'dd.MM.yyy') || '-',
     status: item.status,
-    navigateTo: `details/${item.id}`,
+    navigateTo: `/contracts/details/${item.id}`,
   }));

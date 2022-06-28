@@ -1,39 +1,33 @@
-import {Role} from 'models/user';
-import {EmployeeAccountData} from 'pages/Employee/AddEmployeeForm/model';
+import {EmployeeAccountData} from 'pages/Employee/NewEmployee/model';
+
 import {EmployeeAccountData as EditEmployeeAccountData} from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/model';
 
 export const formatEmployeeAccountData = (data: EmployeeAccountData) => {
   const userAccount = {
     contact: {
-      email: data.username,
+      email: data.contact?.email,
       phone: `+${data.phone}`,
     },
     firstName: data.firstName,
     lastName: data.lastName,
     password: data.password,
-    serviceCompanyId: data.serviceCompanyId,
-    username: data.username,
+    serviceCompanyId: data?.serviceCompanyId || '',
+    username: data.contact?.email || '',
     photoUrl: '',
   };
-  const technician = {
+  const employee = {
     address: data.address,
     serviceOrderTypes: data.serviceOrderTypes,
     workingHours: data.shifts,
+    team: data.team,
+    roles: data?.roles || [],
   };
 
-  let body = {};
-
-  if (data.roles.includes(Role.SERVICE_MANAGER)) {
-    body = {userAccount};
-    if (data.roles.includes(Role.TECHNICIAN)) {
-      body = {...body, technician};
-    }
-  } else if (data.roles.includes(Role.TECHNICIAN)) {
-    body = {userAccount, technician};
-  } else {
-    console.error('Invalid Account Details');
+  if (employee.team === '') {
+    delete employee.team;
   }
-  return body;
+
+  return {userAccount, employee};
 };
 
 export const formatUpdateEmployeeAccountData = (
@@ -51,23 +45,14 @@ export const formatUpdateEmployeeAccountData = (
     username: data.username,
     photoUrl: '',
   };
-  const technician = {
+
+  const employee = {
     address: data.address,
-    serviceOrderTypes: data.serviceOrderTypes,
+    serviceOrderTypes: data?.serviceOrderTypes || [],
     workingHours: data.shifts,
+    roles: data.roles,
+    team: data?.team || '',
   };
 
-  let body = {};
-
-  if (data.roles.includes(Role.SERVICE_MANAGER)) {
-    body = {userAccount};
-    if (data.roles.includes(Role.TECHNICIAN)) {
-      body = {...body, technician};
-    }
-  } else if (data.roles.includes(Role.TECHNICIAN)) {
-    body = {userAccount, technician};
-  } else {
-    console.error('Invalid Account Details');
-  }
-  return body;
+  return {userAccount, employee};
 };

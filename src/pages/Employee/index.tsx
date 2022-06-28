@@ -1,37 +1,53 @@
+import {useEffect, useRef, useState} from 'react';
+import {useNavigate, useSearchParams} from 'react-router-dom';
+import {addDays, endOfDay, startOfDay} from 'date-fns';
+import {Box, SelectChangeEvent} from '@mui/material';
+import {GridRowsProp} from '@mui/x-data-grid';
+import * as _ from 'lodash';
+
 import {DataGridLayout} from 'components/DataGridLayout';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
+import {EmptySection} from 'components/EmptySection';
+import {FilterFields} from 'components/FilterFields';
+import {Progress} from 'components/Progress';
+import {FormSelect} from 'components/form/FormSelect';
 import {useQueryTechnicianEvents} from 'hooks/reactQuery/useTechnician';
 import {useQueryUserAccounts} from 'hooks/reactQuery/useUserAccount';
 import {TechnicianEventType} from 'models/misc';
 import {UserView, Role} from 'models/user';
-import {useEffect, useRef, useState} from 'react';
+import {TechnicianEventPair} from 'models/technician';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import * as _ from 'lodash';
 import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
 } from 'utils/utils';
-import {useSearchParams} from 'react-router-dom';
-import {Progress} from 'components/Progress';
-import {TechnicianEventPair} from 'models/technician';
 import {toRestDateTime} from 'utils/datetime';
-import {addDays, endOfDay, startOfDay} from 'date-fns';
-import {GridRowsProp} from '@mui/x-data-grid';
-import {EmptySection} from 'components/EmptySection';
 import {columns, makeRows} from './EmployeeDataGridProps';
-import {AddEmployee} from './AddEmployee';
 
 const pageSize = 25;
 
 export const Employees = () => {
+  const navigate = useNavigate();
+
   const [page, setPage] = useState(makePage(0, pageSize));
   const [queryParams, setQueryParams] = useSearchParams();
   const totalEmployeeRef = useRef(0);
   const [pageCount, setPageCount] = useState(0);
   const [search, setSearch] = useState('');
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [role, setRole] = useState<Role | string>('');
+
+  const getRoles = () => {
+    let roles: Role[] = [Role.SERVICE_MANAGER, Role.TECHNICIAN];
+    if (role === 'SERVICE_MANAGER') {
+      roles = [Role.SERVICE_MANAGER];
+    } else if (role === 'TECHNICIAN') {
+      roles = [Role.TECHNICIAN];
+    }
+
+    return roles;
+  };
 
   const {
     data: userAccountResource = createEmptyResource<UserView>(pageSize),
@@ -44,7 +60,7 @@ export const Employees = () => {
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: search,
-      roles: [Role.SERVICE_MANAGER, Role.TECHNICIAN],
+      roles: getRoles(),
     },
     {keepPreviousData: true},
   );
@@ -63,11 +79,16 @@ export const Employees = () => {
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
 
-    setPage({
-      ...page,
-      pageSize: Number(currentParams.pageSize),
-      pageIndex: Number(currentParams.pageIndex) - 1,
-    });
+    if (currentParams.pageSize)
+      setPage({
+        ...page,
+        pageSize: Number(currentParams.pageSize),
+      });
+    if (currentParams.pageIndex)
+      setPage({
+        ...page,
+        pageIndex: Number(currentParams.pageIndex) - 1,
+      });
   }, [queryParams]);
 
   useEffect(() => {
@@ -102,6 +123,58 @@ export const Employees = () => {
     return <Progress />;
   }
 
+  const handleRoleChange = (event: SelectChangeEvent<string | string[]>) => {
+    const {
+      target: {value},
+    } = event;
+    setRole(value as Role);
+  };
+
+  const handleClearFilters = () => {
+    setSearch('');
+    setRole('');
+  };
+
+  const renderFilterItems = () => (
+    <FilterFields
+      containerStyle={{alignSelf: 'center', height: '100%'}}
+      wrapperStyle={{alignItems: 'center'}}
+      onClear={handleClearFilters}>
+      <Box
+        sx={{
+          minWidth: '350px',
+          marginRight: '7px',
+          alignItems: 'center',
+        }}>
+        <FormSelect
+          labelId="roleFilter-label"
+          label="Role"
+          options={[
+            {
+              label: 'Technician',
+              value: 'TECHNICIAN',
+            },
+            {
+              label: 'Service Manager',
+              value: 'SERVICE_MANAGER',
+            },
+          ]}
+          labelStyles={{backgroundColor: 'transparent'}}
+          selectStyles={{
+            backgroundColor: 'white',
+          }}
+          selectProps={{
+            labelId: 'roleFilter-label',
+            value: role,
+            onChange: handleRoleChange,
+            name: 'roleFilter',
+            multiple: false,
+          }}
+        />
+      </Box>
+    </FilterFields>
+  );
+
   return (
     <PageListingLayout
       renderWidget={
@@ -109,8 +182,9 @@ export const Employees = () => {
           searchPlaceholder="Search by name, role, address etc."
           getSearchValue={(val: string) => setSearch(val)}
           showActionBtn
-          btnOnClick={() => setIsDrawerOpen(true)}
-          btnLabel="New employee"
+          btnOnClick={() => navigate('/employees/new')}
+          btnLabel="New Employee"
+          filterItems={renderFilterItems()}
         />
       }>
       <DataGridLayout
@@ -129,8 +203,6 @@ export const Employees = () => {
         pageCount={pageCount}
         totalRows={userAccountResource.total}
       />
-
-      <AddEmployee open={isDrawerOpen} setOpen={setIsDrawerOpen} />
     </PageListingLayout>
   );
 };

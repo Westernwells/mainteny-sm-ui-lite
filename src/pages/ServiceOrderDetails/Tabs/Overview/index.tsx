@@ -4,7 +4,6 @@ import {
   useServiceOrderActivities,
   useServiceOrderDetails,
 } from 'hooks/reactQuery/useServiceOrder';
-import {useParams} from 'react-router';
 import {Progress} from 'components/Progress';
 import {PageCard} from 'components/PageCard';
 
@@ -13,13 +12,20 @@ import {Timeline} from 'components/Timeline';
 import Typography from '@mui/material/Typography';
 import ComputerIcon from '@mui/icons-material/Computer';
 import PersonIcon from '@mui/icons-material/Person';
+import {olStyles} from 'styles';
 import {formatDate} from 'utils/datetime';
 import {OrderInfoCard} from './OrderInfoCard';
-import {UnitInfoCard} from './UnitInfoCard';
+import {DescriptionCard} from './DescriptionCard';
+import {Quotation} from './Quotations';
+import {Invoices} from './Invoices';
+import {Articles} from './Articles';
 
-export const Overview = () => {
+interface Props {
+  orderId?: string;
+}
+
+export const Overview = ({orderId}: Props) => {
   const theme = useTheme();
-  const {id: orderId} = useParams();
   const {data: serviceOrderDetails, isLoading} =
     useServiceOrderDetails(orderId);
   const {data: serviceOrderActivities = []} =
@@ -39,8 +45,14 @@ export const Overview = () => {
   if (isLoading) {
     return <Progress />;
   }
+
   return (
-    <Grid container spacing={2} sx={{height: '100%', overflowY: 'scroll'}}>
+    <Grid
+      container
+      spacing={2}
+      sx={{
+        height: '100%',
+      }}>
       <Grid
         item
         sm={12}
@@ -52,6 +64,7 @@ export const Overview = () => {
         }}>
         <Box
           sx={{
+            ...olStyles.scrollbar,
             height: '100%',
             overflowY: 'scroll',
             display: 'flex',
@@ -61,7 +74,22 @@ export const Overview = () => {
             <OrderInfoCard serviceOrderDetails={serviceOrderDetails!} />
           </Box>
           <Box mt="1em" flexGrow={1}>
-            <UnitInfoCard serviceOrderDetails={serviceOrderDetails!} />
+            <DescriptionCard content={serviceOrderDetails?.description} />
+          </Box>
+
+          <Box mt="1em" flexGrow={1}>
+            <Articles
+              serviceOrderArticles={serviceOrderDetails?.articles}
+              serviceOrderId={serviceOrderDetails?.id}
+            />
+          </Box>
+
+          <Box mt="1em" flexGrow={1}>
+            <Invoices serviceOrderId={serviceOrderDetails?.id} />
+          </Box>
+
+          <Box mt="1em" flexGrow={1}>
+            <Quotation serviceOrder={serviceOrderDetails} />
           </Box>
         </Box>
       </Grid>
@@ -80,6 +108,7 @@ export const Overview = () => {
           headerLabel="Timeline"
           headerStyles={{pl: '0.3em'}}
           containerStyles={{
+            ...olStyles.scrollbar,
             height: '100%',
             overflowY: 'scroll',
           }}>

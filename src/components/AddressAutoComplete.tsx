@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import {AddressRecord} from 'models/misc';
 import {FormInput} from 'components/form/FormInput';
 import {TextFieldProps} from '@mui/material/TextField';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   getAddress?: (val?: AddressRecord) => void;
@@ -50,13 +51,14 @@ export const AddressAutoComplete = ({
   const onInputChange = (e: any) => {
     setQueryView(e.target.value);
   };
+  const {t} = useTranslation();
   return (
     <AddressAutocomplete
       id="addressAutoComplete"
       inputValue={queryView}
       value={address}
       apiKey={process.env.REACT_APP_GOOGLE_MAPS_KEY!}
-      label="Address"
+      label={t('Address')}
       fields={[
         'address_components',
         'formatted_address',
@@ -79,16 +81,18 @@ export const AddressAutoComplete = ({
       renderInput={(params) => (
         <FormInput
           props={{
-            label: 'Address',
+            label: t('Address'),
             placeholder: 'Enter a location',
             name: 'address',
             onChange: onInputChange,
             error: !!inputError,
             helperText: inputError,
             onBlur: handleBlur,
-
             ...params,
             ...textFieldProps,
+            InputLabelProps: {
+              shrink: true,
+            },
           }}
         />
       )}

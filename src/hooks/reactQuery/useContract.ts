@@ -7,7 +7,6 @@ import {
 } from 'react-query';
 import * as _ from 'lodash';
 import {queryKeys as qk, queryKeys} from 'reactQuery/constants';
-import {useNavigate} from 'react-router';
 
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
@@ -29,17 +28,6 @@ import {
 } from 'date-fns';
 import {toDate} from 'utils/datetime';
 import {useUserSession} from './useUserSession';
-
-export const fetchContractElevatorCount = async (contractId: string[]) => {
-  const response = await axiosClient.get<{[key: string]: number}>(
-    `/api/contracts/elevators/count`,
-    {
-      params: {contractId},
-      paramsSerializer,
-    },
-  );
-  return response.data;
-};
 
 const filterByExpiryData = (
   contractsRes: Resource<ContractView>,
@@ -197,48 +185,16 @@ export const useQueryContract = (
   );
 };
 
-export const useContractElevatorCount = (
-  contracts: ContractView[],
-  options?: UseQueryOptions<{[key: string]: number}, RestError, ContractView[]>,
-) => {
-  const contractIds = contracts.map((contract) => contract.id);
-  return useQuery<{[key: string]: number}, RestError, ContractView[]>(
-    [qk.fetchContractElevatorCount, contractIds],
-    () => fetchContractElevatorCount(contractIds),
-    {
-      ...options,
-      enabled: !!contracts.length,
-      select: useCallback(
-        (data) =>
-          contracts.map((contract) => ({
-            ...contract,
-            units: data[contract.id],
-          })),
-
-        [contracts],
-      ),
-    },
-  );
-};
-
 const fetchContractDetails = async (contractId: string) => {
   const response = await axiosClient.get<ContractView>(
     `/api/contracts/${contractId}`,
   );
   return response.data;
 };
-export const useContractDetails = (contractId: string) => {
-  const navigate = useNavigate();
-  return useQuery(
-    [qk.contractDetails, contractId],
-    () => fetchContractDetails(contractId),
-    {
-      onError: (e: any) => {
-        if (e.response.status === 500) navigate('/404');
-      },
-    },
+export const useContractDetails = (contractId: string) =>
+  useQuery([qk.contractDetails, contractId], () =>
+    fetchContractDetails(contractId),
   );
-};
 
 export const queryCustomerContract = async (
   params: WithOptional<CustomerContractParams, 'serviceCompanyId'>,

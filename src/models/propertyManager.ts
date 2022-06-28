@@ -1,6 +1,6 @@
 import {Address, AddressRecord, Contact, Meta, Priority} from './misc';
 import {ServiceCompany} from './service-company';
-import {UserAccount} from './user';
+import {UserAccount, UserAccountSimpleView} from './user';
 
 export interface PropertyOwner {
   id: string;
@@ -13,6 +13,14 @@ export interface PropertyOwner {
   units?: number;
 }
 
+export interface PropertyContactPersonSimpleView {
+  customerId: string;
+  id: string;
+  meta: Meta;
+  propertyOwnerId: string;
+  userAccount: UserAccountSimpleView;
+}
+
 export interface PropertyOwnerAdditionalInfo {
   priority: Priority;
 }
@@ -20,12 +28,14 @@ export interface PropertyOwnerAdditionalInfo {
 export interface PropertyOwnerView {
   id: string;
   name: string;
+  number: string;
   postalAddress: Address;
   serviceCompany: ServiceCompany;
+  externalId: string;
   contact: Contact;
   search: string;
   meta: Meta;
-  units?: number;
+  unitNumber?: number;
   additionalInfo: PropertyOwnerAdditionalInfo;
   labels: string[];
 }

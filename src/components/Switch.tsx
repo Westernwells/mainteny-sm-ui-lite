@@ -2,6 +2,7 @@ import {ChangeEvent, useEffect, useState} from 'react';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import MuiSwitch from '@mui/material/Switch';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   label?: string | JSX.Element;
@@ -21,11 +22,12 @@ export const Switch = ({label = '', getValue}: Props) => {
     }
   }, [checked]);
 
+  const {t} = useTranslation();
   return (
     <FormGroup>
       <FormControlLabel
         control={<MuiSwitch checked={checked} onChange={handleChange} />}
-        label={label}
+        label={t(`${label}`)}
       />
     </FormGroup>
   );
