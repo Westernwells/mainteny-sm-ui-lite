@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {ElevatorView} from 'models/elevator';
 import {Widget} from 'components/Widget';
@@ -10,6 +9,8 @@ import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {FilterFields} from 'components/FilterFields';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
+import {ServiceOrderOrderField} from 'models/service-order';
+import {Order} from 'models/misc';
 import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
@@ -23,8 +24,8 @@ const pageInfo = makePage(0, 50);
 
 export const UnitListingView = () => {
   const [queryParams, setQueryParams] = useSearchParams();
-  const [orderField, setOrderField] = useState();
-  const [orderBy, setOrderBy] = useState();
+  const [sortOrder, setSortOrder] = useState<Order | undefined>();
+  const [orderBy, setOrderBy] = useState<ServiceOrderOrderField | undefined>();
   const [upcomingVisitFilter, setUpcomingVisitFilter] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(pageInfo);
@@ -38,7 +39,17 @@ export const UnitListingView = () => {
     isLoading,
     isFetched,
     isFetching,
-  } = useAllElevators(search, page, {status}, {keepPreviousData: true});
+  } = useAllElevators(
+    {
+      query: search,
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+      ...(sortOrder && {order: sortOrder}),
+      ...(orderBy && {orderBy}),
+    },
+    {status},
+    {keepPreviousData: true},
+  );
   // set this value only once
   totalUnitsRef.current = totalUnitsRef.current || elevatorResponse.total;
 
@@ -70,7 +81,8 @@ export const UnitListingView = () => {
 
   const handleSortModelChange = useCallback((sortModel: GridSortModel) => {
     // Here you save the data you need from the sort model
-    console.log(sortModel, '****^^^^@@@@@@@');
+    setSortOrder(sortModel[0].sort?.toUpperCase() as Order);
+    setOrderBy(sortModel[0].field as ServiceOrderOrderField);
   }, []);
 
   if (isFetched && !totalUnitsRef.current) {

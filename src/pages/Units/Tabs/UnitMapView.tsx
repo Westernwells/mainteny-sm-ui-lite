@@ -34,9 +34,10 @@ export const UnitMapsView = () => {
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
     isLoading,
-  } = useAllElevators(search, page, {
-    status,
-  });
+  } = useAllElevators(
+    {query: search, pageIndex: page.pageIndex, pageSize: page.pageSize},
+    {status},
+  );
 
   useEffect(() => {
     if (page.pageIndex) {

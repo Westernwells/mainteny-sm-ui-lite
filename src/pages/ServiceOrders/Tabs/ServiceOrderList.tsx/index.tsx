@@ -92,7 +92,7 @@ export const ServiceOrderList = () => {
   }, [queryParams]);
 
   useEffect(() => {
-    if (isFetched) {
+    if (!isLoading) {
       setRows(makeRows(serviceOrdersResource.data));
     }
   }, [serviceOrdersResource]);

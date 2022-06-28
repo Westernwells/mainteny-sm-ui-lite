@@ -68,6 +68,8 @@ export const getColumnProps = ({
   ),
   flex = 1,
   align = 'left',
+  editable = false,
+  sortable = false,
 }: ColumnProps): GridColDef => ({
   field,
   type,
@@ -78,8 +80,8 @@ export const getColumnProps = ({
   flex,
   headerAlign: align,
   align,
-  editable: false,
-  sortable: false,
+  editable,
+  sortable,
 });
 
 export const DataGridLayout = ({

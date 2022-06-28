@@ -36,16 +36,17 @@ export const columns: GridColDef[] = [
     flex: 1.5,
   }),
   getColumnProps({
-    field: 'lastVisit',
+    field: 'LAST_VISIT_DATE',
     headerName: 'last visit',
     align: 'center',
     flex: 0,
     sortable: true,
   }),
   getColumnProps({
-    field: 'nextVisit',
+    field: 'NEXT_VISIT_DATE',
     headerName: 'next visit',
     flex: 0,
+    sortable: true,
   }),
   getColumnProps({
     field: 'priorityTechnician',
@@ -69,14 +70,16 @@ export const columns: GridColDef[] = [
   }),
 ];
 
+console.log(columns, '#######');
+
 export const makeRows = (elevators: ElevatorView[]): GridRowsProp =>
   elevators.map((elevator: ElevatorView) => ({
     id: elevator.id,
     number: elevator.externalId,
     model: elevator.model,
     customer: elevator.propertyOwner.name,
-    lastVisit: formatDate(elevator.lastVisitDate),
-    nextVisit: formatDate(elevator.nextVisitDate),
+    LAST_VISIT_DATE: formatDate(elevator.lastVisitDate),
+    NEXT_VISIT_DATE: formatDate(elevator.nextVisitDate),
     address: elevator.address.fullName,
     headerText: elevator.address.fullName,
     priorityTechnician: elevator.assignments.length

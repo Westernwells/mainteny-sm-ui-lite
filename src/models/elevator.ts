@@ -3,6 +3,7 @@ import {
   AddressRecord,
   Fee,
   Meta,
+  Order,
   Priority,
   StringMap,
   StringValue,
@@ -11,7 +12,7 @@ import {Client} from './client';
 import {TechnicianSimpleView, TechnicianView} from './technician';
 import {FileResource, FileResourceRecord} from './media';
 import {ServiceCompanyTimeUnit} from './service-company';
-import {ServiceOrderView} from './service-order';
+import {ServiceOrderOrderField, ServiceOrderView} from './service-order';
 import {ContractSimpleView} from './contract';
 import {EmployeesSimpleView} from './employee';
 import {
@@ -46,6 +47,24 @@ export enum ElevatorCategory {
   BOARDING_BRIDGE = 'BOARDING_BRIDGE',
   FACADE_ACCESS_SYSTEM = 'FACADE_ACCESS_SYSTEM',
   OTHERS = '',
+}
+
+export interface ElevatorQueryParams {
+  id: string;
+  lastVisitDateEnd: string;
+  lastVisitDateStart: string;
+  neLat: number;
+  neLng: number;
+  nextVisitDateEnd: string;
+  nextVisitDateStart: string;
+  order: Order;
+  orderBy: ServiceOrderOrderField;
+  LAST_VISIT_DATE: string;
+  pageIndex: number;
+  pageSize: number;
+  query: string;
+  swLat: number;
+  swLng: number;
 }
 
 export interface ElevatorAdditionalInfo {
