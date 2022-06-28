@@ -70,8 +70,6 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-console.log(columns, '#######');
-
 export const makeRows = (elevators: ElevatorView[]): GridRowsProp =>
   elevators.map((elevator: ElevatorView) => ({
     id: elevator.id,

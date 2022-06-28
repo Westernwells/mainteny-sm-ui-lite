@@ -82,7 +82,6 @@ export const MyDropZone = ({
 
   useEffect(() => {}, []);
 
-  // console.log(files, '#####');
   const hintsLabel = hints?.map((hint, key) => (
     <Box
       key={key}

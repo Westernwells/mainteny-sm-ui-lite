@@ -43,27 +43,31 @@ export const ServiceOrderScheduleTab = () => {
       pageSize: 500,
       query: technicianSearch,
     });
-  const {data: serviceOrders = createEmptyResource<ServiceOrderView>(10)} =
-    useQueryServiceOrderScheduled(
-      {
-        end: toRestDateTime(endOfDay(currentDate)),
-        start: toRestDateTime(startOfDay(currentDate)),
-        pageIndex: page.pageIndex,
-        pageSize: page.pageSize,
-        query: '',
-        status: selectedOrderStatus,
-      },
-      {keepPreviousData: true},
-    );
+  const {
+    data: serviceOrders = createEmptyResource<ServiceOrderView>(10),
+    isLoading,
+  } = useQueryServiceOrderScheduled(
+    {
+      end: toRestDateTime(endOfDay(currentDate)),
+      start: toRestDateTime(startOfDay(currentDate)),
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+      query: '',
+      status: selectedOrderStatus,
+    },
+    {keepPreviousData: true},
+  );
 
   useEffect(() => {
-    const sortedOrder = sortOrderByTime(serviceOrders.data);
-    const groupByTechnicianId = _.groupBy(
-      sortedOrder,
-      (serviceOrder) => serviceOrder.schedules[0].technician.id,
-    );
-    setOrders(groupByTechnicianId);
-  }, [serviceOrders]);
+    if (!isLoading) {
+      const sortedOrder = sortOrderByTime(serviceOrders.data);
+      const groupByTechnicianId = _.groupBy(
+        sortedOrder,
+        (serviceOrder) => serviceOrder.schedules[0].technician.id,
+      );
+      setOrders(groupByTechnicianId);
+    }
+  }, [serviceOrders, isLoading]);
 
   const nextDay = () => {
     setCurrentDate(addDays(currentDate, 1));
@@ -164,7 +168,8 @@ export const ServiceOrderScheduleTab = () => {
               title={order.elevator.propertyOwner.name}
               subtitle={order.elevator.address.fullName}
               width={width}
-              tooltip={<OrderDetails order={order} />}
+              tooltip={OrderDetails}
+              order={order}
               cardStatusAccent={serviceOrderStatusColor[order.status]}
               position={position}
             />
