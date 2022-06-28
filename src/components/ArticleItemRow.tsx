@@ -229,7 +229,7 @@ export const ArticleItemRow = ({
         )}
         {!isPartial && (
           <Button
-            label=" Delete Article"
+            label="Delete Article"
             buttonProps={{
               color: 'error',
               endIcon: <DeleteIcon />,

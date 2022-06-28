@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
 // import {useNavigate} from 'react-router';
+import {useTranslation} from 'react-i18next';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import Typography from '@mui/material/Typography';
@@ -48,6 +49,7 @@ const dateToString = (date: Date) => date.toISOString().split('T')[0];
 
 export const DraftInvoice = ({invoice}: Props) => {
   //   const navigate = useNavigate();
+  const {t} = useTranslation();
 
   const {user} = useUserSession();
 
@@ -315,7 +317,8 @@ export const DraftInvoice = ({invoice}: Props) => {
         <Box mt="2em" width="32ch">
           <FormSelect
             labelId="invoiceType-label"
-            label="Invoice Type *"
+            label="Invoice Type"
+            required
             options={Object.keys(InvoiceType).map((i) => ({
               label: convertToText(i),
               value: i,
@@ -406,7 +409,7 @@ export const DraftInvoice = ({invoice}: Props) => {
 
       <BottomDrawer
         isOpen={isDrawerOpen}
-        primaryButtonLabel={invoice ? 'send' : 'save'}
+        primaryButtonLabel={invoice ? t('Send') : t('Save')}
         primaryButtonAction={() => {
           setPublish(!!invoice);
           formik.handleSubmit();
@@ -415,7 +418,7 @@ export const DraftInvoice = ({invoice}: Props) => {
           invoice
             ? [
                 {
-                  label: 'Save Draft',
+                  label: t('Save Draft'),
                   icon: <DraftsIcon />,
                   onClick: () => {
                     setPublish(false);
@@ -425,7 +428,7 @@ export const DraftInvoice = ({invoice}: Props) => {
               ]
             : [
                 {
-                  label: 'Save & Send',
+                  label: t('Save & Send'),
                   icon: <DraftsIcon />,
                   onClick: () => {
                     setPublish(true);
