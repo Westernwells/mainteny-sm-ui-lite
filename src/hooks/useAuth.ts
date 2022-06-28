@@ -37,15 +37,10 @@ export const useAuth = (): UseAuth => {
   ): Promise<void> => {
     try {
       setLoading(true);
-      const {data: user, status} = await axiosClient.post<UserSession>(
-        urlEndpoint,
-        {
-          username: email,
-          password,
-        },
-      );
-
-      console.log(status, '######');
+      const {data: user} = await axiosClient.post<UserSession>(urlEndpoint, {
+        username: email,
+        password,
+      });
 
       if (user?.token) {
         if (!user.userAccount.roles.includes(Role.SERVICE_MANAGER)) {

@@ -32,6 +32,7 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
 
   const {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(page.pageSize),
+    isLoading,
   } = useServiceOrders({
     end: endOfDay(new Date()).toISOString(),
     start: startOfMonth(new Date()).toISOString(), // we should show unsassigned orders for a couople month
@@ -65,15 +66,17 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
   }, [search]);
 
   useEffect(() => {
-    if (page.pageIndex === 0) {
-      setServiceOrdersView(serviceOrders);
-    } else {
-      setServiceOrdersView({
-        ...serviceOrders,
-        data: [...serviceOrdersView.data, ...serviceOrders.data],
-      });
+    if (!isLoading) {
+      if (page.pageIndex === 0) {
+        setServiceOrdersView(serviceOrders);
+      } else {
+        setServiceOrdersView({
+          ...serviceOrders,
+          data: [...serviceOrdersView.data, ...serviceOrders.data],
+        });
+      }
     }
-  }, [serviceOrders]);
+  }, [serviceOrders, isLoading]);
 
   const {t} = useTranslation();
 
