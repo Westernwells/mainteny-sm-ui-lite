@@ -237,7 +237,7 @@ export function useServiceOrders(
     RestError,
     Resource<ServiceOrderView>
   >(
-    [queryKeys.queryServiceOrders, params, user!.userAccount.serviceCompany.id],
+    [queryKeys.queryServiceOrders, params, user?.userAccount.serviceCompany.id],
     () =>
       queryServiceOrders({
         ...params,

@@ -5,6 +5,7 @@ import {twentyFourHourTime} from 'utils/utils';
 import Box from '@mui/material/Box';
 import * as _ from 'lodash';
 import Typography from '@mui/material/Typography';
+import {Divider} from '@mui/material';
 import {
   addDays,
   eachDayOfInterval,
@@ -289,6 +290,21 @@ export const Schedule = ({
                 })}
               </ScheduleRow>
             </ScheduleHeader>
+
+            <Divider
+              absolute
+              sx={[
+                sx.divider,
+                {
+                  marginLeft: `${
+                    gridWidth *
+                    (1 + new Date().getHours() + new Date().getMinutes() / 60)
+                  }px`,
+                },
+              ]}
+              component="colgroup"
+              orientation="vertical"
+            />
 
             <ScheduleBody>
               {bodyRow.map((dayRow, rowIndex) => (
