@@ -59,6 +59,8 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
     }
   }, [selectedUnit]);
 
+  const {t} = useTranslation();
+
   if (isIdle || isLoading) {
     return <Progress />;
   }
@@ -109,7 +111,6 @@ please click the button below'
       </PageCard>
     );
   }
-  const {t} = useTranslation();
   return (
     <>
       <Box display="flex" justifyContent="space-between">
