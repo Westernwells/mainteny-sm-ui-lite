@@ -1,14 +1,15 @@
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {ElevatorView} from 'models/elevator';
 import {Widget} from 'components/Widget';
-import {GridRowsProp} from '@mui/x-data-grid';
+import {GridRowsProp, GridSortModel} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {FilterFields} from 'components/FilterFields';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
+import {ServiceOrderOrderField} from 'models/service-order';
+import {Order} from 'models/misc';
 import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
@@ -22,20 +23,29 @@ const pageInfo = makePage(0, 50);
 
 export const UnitListingView = () => {
   const [queryParams, setQueryParams] = useSearchParams();
-  const [upcomingVisitFilter, setUpcomingVisitFilter] = useState<string[]>([]);
+  const [sortOrder, setSortOrder] = useState<Order | undefined>();
+  const [orderBy, setOrderBy] = useState<ServiceOrderOrderField | undefined>();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(pageInfo);
   const totalUnitsRef = useRef(0);
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const [status, setStatus] = useState<string[]>([]);
 
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
     isLoading,
     isFetched,
     isFetching,
-  } = useAllElevators(search, page, {status}, {keepPreviousData: true});
+  } = useAllElevators(
+    {
+      query: search,
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+      ...(sortOrder && {order: sortOrder}),
+      ...(orderBy && {orderBy}),
+    },
+    {keepPreviousData: true},
+  );
   // set this value only once
   totalUnitsRef.current = totalUnitsRef.current || elevatorResponse.total;
 
@@ -65,6 +75,12 @@ export const UnitListingView = () => {
     }
   }, [elevatorResponse, page]);
 
+  const handleSortModelChange = useCallback((sortModel: GridSortModel) => {
+    // Here you save the data you need from the sort model
+    setSortOrder(sortModel[0].sort?.toUpperCase() as Order);
+    setOrderBy(sortModel[0].field as ServiceOrderOrderField);
+  }, []);
+
   if (isFetched && !totalUnitsRef.current) {
     return (
       <EmptySection
@@ -80,19 +96,7 @@ export const UnitListingView = () => {
   }
 
   const renderFilterItems = () => (
-    <FilterFields
-      onClear={() => {
-        setStatus([]);
-        setUpcomingVisitFilter([]);
-      }}>
-      <MultipleSelectCheckmarks
-        label="Upcoming visits"
-        options={['This week', 'Next week', 'Next month']}
-        initialSelectedItems={upcomingVisitFilter}
-        getSelectedValue={(val) => setUpcomingVisitFilter(val)}
-        multiple={false}
-      />
-    </FilterFields>
+    <FilterFields onClear={() => {}}>{null}</FilterFields>
   );
 
   const renderWidget = () => (
@@ -119,6 +123,7 @@ export const UnitListingView = () => {
         loading={isFetching}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
+        onSortModelChange={handleSortModelChange}
         handlePageSizeChange={(newPageSize: number) =>
           setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
         }
