@@ -16,20 +16,18 @@ interface Props {
 }
 
 export const DatePicker = ({
-  defaultDate,
+  defaultDate = null,
   getSelectedDate,
   containerStyles,
   minDate,
   maxDate,
   textFieldProps,
 }: Props) => {
-  const [value, setValue] = useState<Date | null>(null);
+  const [value, setValue] = useState<Date | null>(defaultDate);
 
   useEffect(() => {
-    if (defaultDate) {
-      setValue(defaultDate);
-    }
-  }, []);
+    setValue(defaultDate);
+  }, [defaultDate]);
 
   useEffect(() => {
     if (getSelectedDate) {
