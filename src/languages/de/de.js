@@ -135,6 +135,11 @@ module.exports = {
     Technician: 'Techniker',
     'Service Manager': 'Service Manager',
     'Service Manager, Technician': 'Service Manager, Techniker',
+    'Add basic info': 'Grundlegende Informationen',
+    'Select role': 'Rolle auswählen',
+    'Add password': 'Passwort hinzufügen',
+    'Add work preferences': 'Arbeitspräferenzen hinzufügen',
+    'Work Preferences': 'Arbeitspräferenzen',
 
     // Quotations
     Quotations: 'Angebote',
@@ -188,6 +193,9 @@ module.exports = {
     'PURCHASE PRICE': 'EINKAUFSPREIS',
     'SELLING PRICE': 'VERKAUFSPREIS',
     STOCK: 'LAGER',
+    Package: 'Paket',
+    Part: 'Teil',
+    Product: 'Produkt',
 
     // Service Orders
     'Order types': 'Auftragsarten',
@@ -203,6 +211,10 @@ module.exports = {
     'Add unit details': 'Anlagendetails hinzufügen',
     'Add service info': 'Servicedetails hinzufügen',
     'Add appointment preferences': 'Terminpräferenzen hinzufügen',
+    'New Emergency Order': 'Neuer Personeneinschluss',
+    'New Callout Order': 'Neue Störung',
+    'New Repair Order': 'Neue Reparatur',
+    'New Maintenance Order': 'Neue Wartung',
 
     // Add new unit
     Customer: 'Kunden',
@@ -511,6 +523,8 @@ module.exports = {
     'Select Unit': 'Einheit wählen',
     Duplicate: 'Duplizieren',
     'Quotation Details': 'Details zum Angebot',
+    Orders: 'Aufträge',
+    Customers: 'Kunden',
   },
 };
 
