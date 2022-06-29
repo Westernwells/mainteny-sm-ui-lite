@@ -1,5 +1,4 @@
 import {useEffect, useState} from 'react';
-// import {useNavigate} from 'react-router';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router';
 import * as Yup from 'yup';
@@ -55,7 +54,6 @@ const payment = {
 const dateToString = (date: Date) => date.toISOString().split('T')[0];
 
 export const DraftInvoice = ({invoice}: Props) => {
-  //   const navigate = useNavigate();
   const {t} = useTranslation();
   const navigate = useNavigate();
 
