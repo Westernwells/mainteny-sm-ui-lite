@@ -37,6 +37,7 @@ export const Service = ({
   elevatorRequestBody,
   validContract,
 }: Props) => {
+  const {t} = useTranslation();
   // const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
   const {mutateAsync: updateElevator} = useUpdateElevator(
@@ -88,8 +89,6 @@ export const Service = ({
       elevatorId: elevator.id,
     });
   };
-
-  const {t} = useTranslation();
 
   return (
     <InfoCard

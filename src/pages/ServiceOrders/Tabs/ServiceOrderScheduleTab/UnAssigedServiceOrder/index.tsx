@@ -23,6 +23,8 @@ interface Props extends BoxProps {
 }
 
 export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
+  const {t} = useTranslation();
+  const theme = useTheme();
   const [search, setSearch] = useState('');
   const {ref, inView} = useInView();
   const [page, setPage] = useState(makePage(0, 50));
@@ -78,9 +80,6 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
       }
     }
   }, [serviceOrders, isLoading]);
-
-  const {t} = useTranslation();
-  const theme = useTheme();
 
   return (
     <Box sx={{...containerStyles}} {...rest}>

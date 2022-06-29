@@ -87,6 +87,7 @@ export const Schedule = ({
   technicians,
   checkedValues = [],
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const [tableHeader, setTableHeader] = useState<string[]>([]);
   const elementRef = useRef<HTMLInputElement | undefined>();
@@ -234,8 +235,6 @@ export const Schedule = ({
       endOfWeekDay: endOfPrevWeek,
     });
   };
-
-  const {t} = useTranslation();
 
   return (
     <Card sx={[sx.card, {...containerStyles}]}>

@@ -22,6 +22,7 @@ interface Props {
 }
 
 export const Documents = ({elevator, elevatorRequestBody}: Props) => {
+  const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
   const theme = useTheme();
   const {user} = useUserSession();
@@ -83,8 +84,6 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
       />
     </Box>
   );
-
-  const {t} = useTranslation();
 
   return (
     <InfoCard

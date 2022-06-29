@@ -31,6 +31,7 @@ import {Widget} from 'components/Widget';
 import {columns, makeRows} from './ServiceOrderDataGridProps';
 
 export const ServiceOrderList = () => {
+  const {t} = useTranslation();
   const [page, setPage] = useState(makePage(0, 25));
   const [queryParams, setQueryParams] = useSearchParams();
   const [pageCount, setPageCount] = useState(0);
@@ -105,8 +106,6 @@ export const ServiceOrderList = () => {
     const selectedOrderStatuses = getSelectedOrderStatuses(items);
     setSelectedOrderStatus(selectedOrderStatuses as ServiceOrderStatus[]);
   };
-
-  const {t} = useTranslation();
 
   const renderFilterItems = () => (
     <FilterFields

@@ -32,6 +32,7 @@ export const UnitDetails = ({
   elevatorRequestBody,
   validContract,
 }: Props) => {
+  const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
   const {mutateAsync: updateElevator} = useUpdateElevator(
     'Unit details updated successfully',
@@ -89,8 +90,6 @@ export const UnitDetails = ({
       elevatorId: elevator.id,
     });
   };
-
-  const {t} = useTranslation();
 
   return (
     <InfoCard

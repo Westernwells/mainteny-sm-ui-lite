@@ -39,6 +39,7 @@ export const PriorityTechnician = ({
   elevatorId,
   maintainers = [],
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const formik = useFormik<PriorityTechnicianFormModel>({
     initialValues: {
@@ -150,8 +151,6 @@ export const PriorityTechnician = ({
       />
     </Box>
   );
-
-  const {t} = useTranslation();
 
   return (
     <InfoCard
