@@ -282,6 +282,43 @@ export const useUpdateInvoice = () => {
   );
 };
 
+export const deleteInvoice = async (id: string, navigate: boolean) => {
+  await axiosClient.delete(`api/invoices/${id}`);
+  return navigate;
+};
+
+export const useDeleteInvoice = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  const navigate = useNavigate();
+
+  return useMutation(
+    ({
+      invoiceId,
+      shouldNavigate,
+    }: {
+      invoiceId: string;
+      shouldNavigate: boolean;
+    }) => deleteInvoice(invoiceId, shouldNavigate),
+    {
+      onSuccess: (__, {shouldNavigate}) => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+        enqueueSnackbar(`Invoice deleted successfully`, {
+          variant: 'success',
+        });
+        if (shouldNavigate) navigate(`/invoices?pageIndex=1&pageSize=25`);
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again!', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
 const fetchServiceOrderInvoices = async (serviceOrderId: string) => {
   const response = await axiosClient.get<InvoiceView[]>(
     `/api/serviceOrders/${serviceOrderId}/invoices`,

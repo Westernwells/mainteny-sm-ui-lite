@@ -206,3 +206,40 @@ export const useUpdateQuotation = () => {
     },
   );
 };
+
+export const deleteQuotation = async (id: string, navigate: boolean) => {
+  await axiosClient.delete(`api/quotations/${id}`);
+  return navigate;
+};
+
+export const useDeleteQuotation = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  const navigate = useNavigate();
+
+  return useMutation(
+    ({
+      quotationId,
+      shouldNavigate,
+    }: {
+      quotationId: string;
+      shouldNavigate: boolean;
+    }) => deleteQuotation(quotationId, shouldNavigate),
+    {
+      onSuccess: (__, {shouldNavigate}) => {
+        queryClient.invalidateQueries([qk.fetchQuotations]);
+        queryClient.invalidateQueries([qk.quotationById]);
+        enqueueSnackbar(`Quotation deleted successfully`, {
+          variant: 'success',
+        });
+        if (shouldNavigate) navigate(`/quotations?pageIndex=1&pageSize=25`);
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again!', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
