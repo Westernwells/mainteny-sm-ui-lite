@@ -6,13 +6,19 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
 import {useQuotations} from 'hooks/reactQuery/useQuotation';
-import {QuotationView} from 'models/quotation';
+import {
+  QuotationStatus,
+  QuotationStatusView,
+  QuotationView,
+} from 'models/quotation';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {
+  convertToMacro,
+  convertToText,
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
 } from 'utils/utils';
@@ -27,7 +33,7 @@ export const Quotations = () => {
 
   const [search, setSearch] = useState('');
   const totalQuotationsRef = useRef(0);
-  const [status, setStatus] = useState<string[]>([]);
+  const [status, setStatus] = useState<QuotationStatus[]>([]);
   const [page, setPage] = useState(makePage(0, pageSize));
   const [queryParams, setQueryParams] = useSearchParams();
   const [pageCount, setPageCount] = useState(0);
@@ -42,7 +48,7 @@ export const Quotations = () => {
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: search,
-      status: [],
+      status,
     },
     {},
     {keepPreviousData: true},
@@ -110,15 +116,24 @@ export const Quotations = () => {
       />
     );
   }
-
   const renderFilterItems = () => (
     <FilterFields onClear={() => setStatus([])}>
       <MultipleSelectCheckmarks
         label="Status"
-        options={['Sent', 'Draft']}
+        options={Object.keys(QuotationStatusView).map((i) => convertToText(i))}
         initialSelectedItems={status}
-        getSelectedValue={(item) => setStatus(item)}
-        multiple={false}
+        getSelectedValue={(item) =>
+          setStatus(
+            item
+              .map(
+                (i) =>
+                  QuotationStatusView[
+                    convertToMacro(i) as keyof typeof QuotationStatusView
+                  ],
+              )
+              .map((j) => QuotationStatus[j as keyof typeof QuotationStatus]),
+          )
+        }
       />
     </FilterFields>
   );

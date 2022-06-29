@@ -30,6 +30,7 @@ export const MyDropZone = ({
   acceptedFileTypes = '*',
   maxFiles,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const [files, setFiles] = useState<FileWithPreview[]>(existingFiles);
   const onKbinBytes = useRef(1000).current;
@@ -142,7 +143,6 @@ export const MyDropZone = ({
         </Box>
       </Box>
     ));
-  const {t} = useTranslation();
 
   return (
     <Box>

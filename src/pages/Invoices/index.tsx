@@ -79,33 +79,6 @@ export const Invoices = () => {
     setPageCount(Math.ceil(invoiceResource.total / page.pageSize));
   }, [invoiceResource, pageSize]);
 
-  const amountRangeConvertor = (selectedItems: string[]) => {
-    const range: number[][] = [];
-    selectedItems.forEach((item) => {
-      switch (item) {
-        case 'Below 1000€':
-          range.push([0, 1000]);
-          break;
-
-        case '1000 - 3000€':
-          range.push([1000, 3000]);
-          break;
-
-        case '3000 - 5000€':
-          range.push([3000, 5000]);
-          break;
-
-        case 'Above 5000€':
-          range.push([5000, 99999]);
-          break;
-
-        default:
-          break;
-      }
-    });
-    setAmount(range);
-  };
-
   const navigateToNewInvoice = () => {
     Mixpanel.identifyAndTrack(mixpanelEvents.NEW_UNIT_BUTTON_CLICKED);
     navigate('/invoices/new');
@@ -131,11 +104,11 @@ export const Invoices = () => {
         initialSelectedItems={invoiceDate}
       />
       <MultipleSelectCheckmarks
-        label="Total Amount"
-        options={['Below 1000€', '1000 - 3000€', '3000 - 5000€', 'Above 5000€']}
-        getSelectedValue={(item) => amountRangeConvertor(item)}
-        initialSelectedItems={amount}
+        label="Due Date"
+        options={['This Week', 'Next Week', 'Next Month']}
+        getSelectedValue={(item) => setInvoiceDate(item)}
         multiple={false}
+        initialSelectedItems={invoiceDate}
       />
       <MultipleSelectCheckmarks
         label="Status"
@@ -149,33 +122,6 @@ export const Invoices = () => {
         }
         multiple={false}
         initialSelectedItems={status ? [status] : []}
-      />
-      <MultipleSelectCheckmarks
-        label="Service Type"
-        options={['Maintenance', 'Repair', 'Callout', 'Emergency']}
-        initialSelectedItems={serviceType}
-        getSelectedValue={(items) => {
-          const value: ServiceOrderType[] = [];
-          items.forEach((item) => {
-            switch (item) {
-              case 'Maintenance':
-                value.push(ServiceOrderType.REGULAR);
-                break;
-              case 'Repair':
-                value.push(ServiceOrderType.REPAIR);
-                break;
-              case 'Callout':
-                value.push(ServiceOrderType.CALLOUT);
-                break;
-              case 'Emergency':
-                value.push(ServiceOrderType.EMERGENCY);
-                break;
-              default:
-                break;
-            }
-          });
-          setServiceType(value);
-        }}
       />
     </FilterFields>
   );

@@ -85,6 +85,7 @@ export const SelectTechnicians = ({
   dueDateFormIsErrored,
   getSelectedRadioOption,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const options = useRef(
     type === ServiceOrderType.CALLOUT ? calloutOptions : otherOptions,
@@ -208,8 +209,6 @@ export const SelectTechnicians = ({
     [],
   );
 
-  const {t} = useTranslation();
-
   const cardHeader = () => (
     <Box sx={{}}>
       {showOptions ? (
@@ -282,7 +281,6 @@ export const SelectTechnicians = ({
         />
       }
       title={order.elevator.propertyOwner.name}
-      subtitle={order.elevator.address.fullName}
       width={width}
       tooltip={OrderDetails}
       order={order}

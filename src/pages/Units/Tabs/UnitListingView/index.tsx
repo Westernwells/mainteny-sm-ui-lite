@@ -9,7 +9,9 @@ import {FilterFields} from 'components/FilterFields';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {ServiceOrderOrderField} from 'models/service-order';
+import {DatePicker} from 'components/DatePicker';
 import {Order} from 'models/misc';
+import {formatDate} from 'utils/datetime';
 import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
@@ -26,6 +28,10 @@ const pageInfo = makePage(0, 50);
 export const UnitListingView = () => {
   const navigate = useNavigate();
   const [queryParams, setQueryParams] = useSearchParams();
+  const [lastVisitStart, setLastVisitStart] = useState<Date | null>(null);
+  const [lastVisitEnd, setLastVisitEnd] = useState<Date | null>(null);
+  const [nextVisitStart, setNextVisitStart] = useState<Date | null>(null);
+  const [nextVisitEnd, setNextVisitEnd] = useState<Date | null>(null);
   const [sortOrder, setSortOrder] = useState<Order | undefined>();
   const [orderBy, setOrderBy] = useState<ServiceOrderOrderField | undefined>();
   const [search, setSearch] = useState('');
@@ -44,6 +50,18 @@ export const UnitListingView = () => {
       query: search,
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
+      ...(lastVisitStart && {
+        lastVisitDateStart: formatDate(lastVisitStart, 'yyyy-MM-dd'),
+      }),
+      ...(lastVisitEnd && {
+        lastVisitDateEnd: formatDate(lastVisitEnd, 'yyyy-MM-dd'),
+      }),
+      ...(nextVisitStart && {
+        nextVisitDateStart: formatDate(nextVisitStart, 'yyyy-MM-dd'),
+      }),
+      ...(nextVisitEnd && {
+        nextVisitDateEnd: formatDate(nextVisitEnd, 'yyyy-MM-dd'),
+      }),
       ...(sortOrder && {order: sortOrder}),
       ...(orderBy && {orderBy}),
     },
@@ -84,6 +102,13 @@ export const UnitListingView = () => {
     setOrderBy(sortModel[0].field as ServiceOrderOrderField);
   }, []);
 
+  const clearFilters = () => {
+    setLastVisitStart(null);
+    setLastVisitEnd(null);
+    setNextVisitStart(null);
+    setNextVisitEnd(null);
+  };
+
   if (isFetched && !totalUnitsRef.current) {
     return (
       <EmptySection
@@ -103,7 +128,51 @@ export const UnitListingView = () => {
   }
 
   const renderFilterItems = () => (
-    <FilterFields onClear={() => {}}>{null}</FilterFields>
+    <FilterFields onClear={() => clearFilters()} wrapperStyle={{width: '90%'}}>
+      <DatePicker
+        defaultDate={lastVisitStart}
+        containerStyles={{mr: '1em'}}
+        maxDate={lastVisitEnd || new Date()}
+        getSelectedDate={(date) => setLastVisitStart(date)}
+        inputLabelProps={{shrink: undefined}}
+        textFieldProps={{
+          label: 'Last Visit Start',
+        }}
+      />
+      <DatePicker
+        defaultDate={lastVisitEnd}
+        maxDate={new Date()}
+        minDate={lastVisitStart || undefined}
+        containerStyles={{mr: '1em'}}
+        getSelectedDate={(date) => setLastVisitEnd(date)}
+        inputLabelProps={{shrink: undefined}}
+        textFieldProps={{
+          label: 'Last Visit End',
+        }}
+      />
+
+      <DatePicker
+        defaultDate={nextVisitStart}
+        minDate={new Date()}
+        maxDate={nextVisitEnd || undefined}
+        containerStyles={{mr: '1em'}}
+        getSelectedDate={(date) => setNextVisitStart(date)}
+        inputLabelProps={{shrink: undefined}}
+        textFieldProps={{
+          label: 'Next Visit Start',
+        }}
+      />
+      <DatePicker
+        defaultDate={nextVisitEnd}
+        minDate={nextVisitStart || new Date()}
+        containerStyles={{mr: '1em'}}
+        getSelectedDate={(date) => setNextVisitEnd(date)}
+        inputLabelProps={{shrink: undefined}}
+        textFieldProps={{
+          label: 'Next Visit End',
+        }}
+      />
+    </FilterFields>
   );
 
   const renderWidget = () => (

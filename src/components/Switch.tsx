@@ -10,6 +10,7 @@ interface Props {
 }
 
 export const Switch = ({label = '', getValue}: Props) => {
+  const {t} = useTranslation();
   const [checked, setChecked] = useState(true);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -22,7 +23,6 @@ export const Switch = ({label = '', getValue}: Props) => {
     }
   }, [checked]);
 
-  const {t} = useTranslation();
   return (
     <FormGroup>
       <FormControlLabel

@@ -13,7 +13,7 @@ import {
 import {useTranslation} from 'react-i18next';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {useInView} from 'react-intersection-observer';
-import {endOfDay, startOfMonth} from 'date-fns';
+import {endOfDay, startOfDay, addDays} from 'date-fns';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {Order, Resource} from 'models/misc';
 import {OrderDetails} from './OrderDetails';
@@ -23,6 +23,8 @@ interface Props extends BoxProps {
 }
 
 export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
+  const {t} = useTranslation();
+  const theme = useTheme();
   const [search, setSearch] = useState('');
   const {ref, inView} = useInView();
   const [page, setPage] = useState(makePage(0, 50));
@@ -35,8 +37,8 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(page.pageSize),
     isLoading,
   } = useServiceOrders({
-    end: endOfDay(new Date()).toISOString(),
-    start: startOfMonth(new Date()).toISOString(), // we should show unsassigned orders for a couople month
+    end: endOfDay(addDays(new Date(), 180)).toISOString(),
+    start: startOfDay(addDays(new Date(), -180)).toISOString(), // we should show unsassigned orders for a couople month
     pageSize: page.pageSize,
     pageIndex: page.pageIndex,
     query: search,
@@ -78,9 +80,6 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
       }
     }
   }, [serviceOrders, isLoading]);
-
-  const {t} = useTranslation();
-  const theme = useTheme();
 
   return (
     <Box sx={{...containerStyles}} {...rest}>

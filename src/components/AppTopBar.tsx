@@ -2,13 +2,10 @@ import Box from '@mui/material/Box';
 import Language from '@mui/icons-material/Language';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
-import Badge from '@mui/material/Badge';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import useTheme from '@mui/material/styles/useTheme';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import i18n from 'i18n';
 import {useAuth} from 'hooks/useAuth';
-import {Link} from 'react-router-dom';
 import {useEffect, useState} from 'react';
 import {axiosClient} from 'utils/axios-utils';
 import {useQueryClient} from 'react-query';
@@ -104,6 +101,8 @@ export const AppTopBar = ({
               ]}
             />
           </Box>
+          {/* 
+          TODO: Implement notifications
           <Link to="/notifications">
             <Badge
               badgeContent={1}
@@ -117,9 +116,8 @@ export const AppTopBar = ({
               }}>
               <NotificationsNoneIcon color="primary" />
             </Badge>
-          </Link>
-
-          <Box ml={8} display="flex" alignItems="center">
+          </Link> */}
+          <Box ml={2} display="flex" alignItems="center">
             <Avatar alt={fullName} src={user?.userAccount.photoUrl} />
             <MenuBtn
               endIcon={

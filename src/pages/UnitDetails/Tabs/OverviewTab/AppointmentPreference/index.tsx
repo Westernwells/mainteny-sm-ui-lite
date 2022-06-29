@@ -42,6 +42,7 @@ export const AppointmentPreference = ({
   elevator,
   elevatorRequestBody,
 }: Props) => {
+  const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
   const {mutateAsync: updateElevator} = useUpdateElevator(
     'Appointment preference updated successfully',
@@ -92,8 +93,6 @@ export const AppointmentPreference = ({
       elevatorId: elevator.id,
     });
   };
-
-  const {t} = useTranslation();
 
   return (
     <InfoCard
