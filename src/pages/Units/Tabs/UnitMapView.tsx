@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import GoogleMapReact from 'google-map-react';
 import Box from '@mui/system/Box';
+import {DatePicker} from 'components/DatePicker';
 import useSupercluster from 'use-supercluster';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
@@ -13,6 +14,7 @@ import {Location, Resource} from 'models/misc';
 import {FilterFields} from 'components/FilterFields';
 import {Widget} from 'components/Widget';
 import {FlexContainer} from 'components/FlexContainer';
+import {formatDate} from 'utils/datetime';
 
 export const UnitMapsView = () => {
   const fallback = useRef({
@@ -20,6 +22,10 @@ export const UnitMapsView = () => {
     centerCoord: {longitude: 13.390206, latitude: 52.535152},
   }).current;
   const mapRef = useRef<any>();
+  const [lastVisitStart, setLastVisitStart] = useState<Date | null>(null);
+  const [lastVisitEnd, setLastVisitEnd] = useState<Date | null>(null);
+  const [nextVisitStart, setNextVisitStart] = useState<Date | null>(null);
+  const [nextVisitEnd, setNextVisitEnd] = useState<Date | null>(null);
   const [zoom, setZoom] = useState(20);
   const [search, setSearch] = useState('');
   const [points, setPoints] = useState<any>([]);
@@ -37,16 +43,32 @@ export const UnitMapsView = () => {
     query: search,
     pageIndex: page.pageIndex,
     pageSize: page.pageSize,
+    ...(lastVisitStart && {
+      lastVisitDateStart: formatDate(lastVisitStart, 'yyyy-MM-dd'),
+    }),
+    ...(lastVisitEnd && {
+      lastVisitDateEnd: formatDate(lastVisitEnd, 'yyyy-MM-dd'),
+    }),
+    ...(nextVisitStart && {
+      nextVisitDateStart: formatDate(nextVisitStart, 'yyyy-MM-dd'),
+    }),
+    ...(nextVisitEnd && {
+      nextVisitDateEnd: formatDate(nextVisitEnd, 'yyyy-MM-dd'),
+    }),
   });
 
   useEffect(() => {
     if (page.pageIndex) {
       setPage({...page, pageIndex: 0});
     }
-  }, [search]);
+  }, [search, lastVisitStart, lastVisitEnd, nextVisitStart, nextVisitEnd]);
 
   const newElevatorView = () =>
-    !search
+    !search &&
+    !lastVisitStart &&
+    !lastVisitEnd &&
+    !nextVisitStart &&
+    !nextVisitEnd
       ? {
           ...elevatorView,
           elevator: {
@@ -66,7 +88,9 @@ export const UnitMapsView = () => {
         setPage({...page, pageIndex: page.pageIndex + 1});
       }
     }
-  }, [elevatorResponse]);
+  }, [elevatorResponse, isLoading]);
+
+  console.log(elevatorView, '!!!!@@##');
 
   useEffect(() => {
     if (!isLoading && !isFetching) {
@@ -142,7 +166,56 @@ export const UnitMapsView = () => {
     mapRef.current.panTo({lat, lng});
   };
 
-  const renderFilterItems = () => <FilterFields>{null}</FilterFields>;
+  const clearFilters = () => {
+    setLastVisitStart(null);
+    setLastVisitEnd(null);
+    setNextVisitStart(null);
+    setNextVisitEnd(null);
+  };
+
+  const renderFilterItems = () => (
+    <FilterFields onClear={() => clearFilters()} wrapperStyle={{width: '90%'}}>
+      <DatePicker
+        defaultDate={lastVisitStart}
+        containerStyles={{mr: '1em'}}
+        maxDate={lastVisitEnd || new Date()}
+        getSelectedDate={(date) => setLastVisitStart(date)}
+        textFieldProps={{
+          label: 'Last Visit Start',
+        }}
+      />
+      <DatePicker
+        defaultDate={lastVisitEnd}
+        maxDate={new Date()}
+        minDate={lastVisitStart || undefined}
+        containerStyles={{mr: '1em'}}
+        getSelectedDate={(date) => setLastVisitEnd(date)}
+        textFieldProps={{
+          label: 'Last Visit End',
+        }}
+      />
+
+      <DatePicker
+        defaultDate={nextVisitStart}
+        minDate={new Date()}
+        maxDate={nextVisitEnd || undefined}
+        containerStyles={{mr: '1em'}}
+        getSelectedDate={(date) => setNextVisitStart(date)}
+        textFieldProps={{
+          label: 'Next Visit Start',
+        }}
+      />
+      <DatePicker
+        defaultDate={nextVisitEnd}
+        minDate={nextVisitStart || new Date()}
+        containerStyles={{mr: '1em'}}
+        getSelectedDate={(date) => setNextVisitEnd(date)}
+        textFieldProps={{
+          label: 'Next Visit End',
+        }}
+      />
+    </FilterFields>
+  );
 
   const renderWidget = () => (
     <Box sx={{display: 'flex', justifyContent: 'flex-end', mb: '0.5em'}}>
