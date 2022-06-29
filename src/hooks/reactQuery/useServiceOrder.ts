@@ -479,6 +479,7 @@ export const useRedispatchServiceOrders = (successMsg: string) => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
         enqueueSnackbar(successMsg, {
           variant: 'success',
         });
@@ -518,6 +519,7 @@ export const useUpdateServiceOrder = (successMsg: string) => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
         enqueueSnackbar(successMsg, {
           variant: 'success',
         });
