@@ -463,6 +463,7 @@ module.exports = {
     'This action is irreversible.': ' Dieser Vorgang ist unumkehrbar.',
     'Download Invoice': 'Rechnung herunterladen',
     Download: 'Herunterladen',
+    'Work Report': 'Arbeitsbericht',
 
     // Quotations
     'No quotations have been created yet. Please click the button below to create one!':
