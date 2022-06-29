@@ -17,7 +17,7 @@ import {FlexContainer} from 'components/FlexContainer';
 export const UnitMapsView = () => {
   const fallback = useRef({
     elevator: createEmptyResource<ElevatorView>(10),
-    centerCoord: {longitude: 0, latitude: 0},
+    centerCoord: {longitude: 13.390206, latitude: 52.535152},
   }).current;
   const mapRef = useRef<any>();
   const [zoom, setZoom] = useState(20);
@@ -32,6 +32,7 @@ export const UnitMapsView = () => {
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
     isLoading,
+    isFetching,
   } = useAllElevators({
     query: search,
     pageIndex: page.pageIndex,
@@ -68,7 +69,7 @@ export const UnitMapsView = () => {
   }, [elevatorResponse]);
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && !isFetching) {
       const currentTotal = (page.pageIndex + 1) * page.pageSize;
       if (currentTotal >= elevatorResponse.total) {
         const latLng = elevatorView.elevator.data.map(
