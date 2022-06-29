@@ -463,6 +463,14 @@ module.exports = {
     'This action is irreversible.': ' Dieser Vorgang ist unumkehrbar.',
     'Download Invoice': 'Rechnung herunterladen',
     Download: 'Herunterladen',
+
+    // Quotations
+    'No quotations have been created yet. Please click the button below to create one!':
+      'Es sind noch keine Angebote erstellt worden. Bitte klicken Sie auf die Schaltfläche unten, um ein Angebot zu erstellen!',
+    'Add Quotation': 'Angebot hinzufügen',
+    'Select Unit': 'Einheit wählen',
+    Duplicate: 'Duplizieren',
+    'Quotation Details': 'Details zum Angebot',
   },
 };
 
