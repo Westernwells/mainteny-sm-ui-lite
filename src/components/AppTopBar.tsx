@@ -115,8 +115,7 @@ export const AppTopBar = ({
               <NotificationsNoneIcon color="primary" />
             </Badge>
           </Link> */}
-
-          <Box ml={8} display="flex" alignItems="center">
+          <Box ml={2} display="flex" alignItems="center">
             <Avatar alt={fullName} src={user?.userAccount.photoUrl} />
             <MenuBtn
               endIcon={
