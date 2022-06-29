@@ -51,12 +51,12 @@ export enum ElevatorCategory {
 
 export interface ElevatorQueryParams {
   id: string;
-  lastVisitDateEnd: string;
-  lastVisitDateStart: string;
+  lastVisitDateEnd: any;
+  lastVisitDateStart: any;
   neLat: number;
   neLng: number;
-  nextVisitDateEnd: string;
-  nextVisitDateStart: string;
+  nextVisitDateEnd: any;
+  nextVisitDateStart: any;
   order: Order;
   orderBy: ServiceOrderOrderField;
   LAST_VISIT_DATE: string;

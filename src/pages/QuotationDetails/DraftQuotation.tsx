@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import CopyAllIcon from '@mui/icons-material/CopyAll';
+import DeleteIcon from '@mui/icons-material/Delete';
 import {A4Layout} from 'components/A4Layout';
 import {SelectCombined} from 'components/SelectCombined';
 import {ArticleItemsTable} from 'components/ArticleItemsTable';
@@ -15,9 +16,11 @@ import {UnitsDataGrid} from 'components/DataGrid/UnitsDataGrid';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {FormLabel} from 'components/form/FormLabel';
 import {FormInput} from 'components/form/FormInput';
+import {Confirm} from 'components/Confirm';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateQuotation,
+  useDeleteQuotation,
   useUpdateQuotation,
 } from 'hooks/reactQuery/useQuotation';
 import {
@@ -46,8 +49,10 @@ export const DraftQuotation = ({quotation}: Props) => {
 
   const {mutate: createNewQuotation} = useCreateQuotation();
   const {mutate: updateQuotation} = useUpdateQuotation();
+  const {mutate: deleteQuotation} = useDeleteQuotation();
 
   const [isDrawerOpen] = useState<boolean>(true);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const [publish, setPublish] = useState(false);
 
@@ -65,20 +70,22 @@ export const DraftQuotation = ({quotation}: Props) => {
     subject: '',
     description: '',
     elevatorId: '',
-    moreInfo: ' ',
+    moreInfo: '',
     items: [],
     serviceCompanyId: '',
   };
 
   const validationSchema = Yup.object().shape({
     subject: Yup.string().required('Subject is required'),
-    description: Yup.string().required('Description is required'),
   });
 
   const formik = useFormik({
     initialValues,
     validationSchema,
     onSubmit: (values) => {
+      if (!values.description.length) values.description = ' ';
+      if (!values.moreInfo.length) values.moreInfo = ' ';
+
       if (quotation)
         updateQuotation({
           data: values as UpdateQuotation,
@@ -252,18 +259,20 @@ export const DraftQuotation = ({quotation}: Props) => {
             helperText: formik.touched.subject && formik.errors.subject,
             minRows: 1,
             maxRows: 3,
+            required: true,
           },
           {
             id: 'description',
             value: formik.values.description,
-            error: !!(formik.touched.description && formik.errors.description),
-            helperText: formik.touched.description && formik.errors.description,
+            error: false,
+            helperText: undefined,
             minRows: 2,
             maxRows: 6,
+            required: false,
           },
         ].map((i) => (
           <Box mt="1em" key={i.id}>
-            <FormLabel text={i.id} required />
+            <FormLabel text={i.id} required={i.required} />
             <FormInput
               props={{
                 id: i.id,
@@ -328,6 +337,13 @@ export const DraftQuotation = ({quotation}: Props) => {
                     navigate(`/quotations/new?id=${quotation.id}`);
                   },
                 },
+                {
+                  label: 'Delete Quotation',
+                  icon: <DeleteIcon />,
+                  onClick: () => {
+                    setIsDeleteDialogOpen(true);
+                  },
+                },
               ]
             : [
                 {
@@ -338,18 +354,38 @@ export const DraftQuotation = ({quotation}: Props) => {
                     formik.handleSubmit();
                   },
                 },
+                {
+                  label: 'Discard',
+                  icon: <DeleteIcon />,
+                  onClick: () => {
+                    navigate(-1);
+                  },
+                },
               ]
         }
         isValid={
           !!(
-            formik.values.description &&
             formik.values.subject &&
-            formik.values.moreInfo &&
             formik.values.elevatorId &&
             formik.values.items.length &&
             unit !== null
           )
         }
+      />
+      <Confirm
+        open={isDeleteDialogOpen}
+        onConfirm={() => {
+          if (quotation && quotation.id)
+            deleteQuotation({
+              quotationId: quotation.id,
+              shouldNavigate: true,
+            });
+          setIsDeleteDialogOpen(false);
+        }}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        title="Delete Quotation"
+        content="Do you want to delete this Quotation?"
+        helperText="This action is irreversible."
       />
     </Box>
   );

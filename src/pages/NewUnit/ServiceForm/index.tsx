@@ -114,7 +114,7 @@ export const ServiceForm = ({
             <FormInput
               props={{
                 disabled: true,
-                label: t('Visits per Year'),
+                label: 'Visits per Year',
                 name: 'VisitsPerYear',
                 value: formik.values.visitsPerYear,
                 onChange: formik.handleChange,
@@ -126,7 +126,7 @@ export const ServiceForm = ({
           <Grid item md={4}>
             <FormInput
               props={{
-                label: t('Required time'),
+                label: 'Required time',
                 name: 'serviceTime',
                 placeholder: t('e.g. 45 min'),
                 value: formik.values.serviceTime,
@@ -147,7 +147,7 @@ export const ServiceForm = ({
           <Grid item md={4}>
             <FormInput
               props={{
-                label: t('No. of Technicians'),
+                label: 'No. of Technicians',
                 name: 'technicianNumber',
                 value: formik.values.technicianNumber,
                 helperText:

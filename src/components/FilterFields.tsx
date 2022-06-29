@@ -30,6 +30,7 @@ export const FilterFields = ({
       </Box>
       {!hideClear ? (
         <Typography
+          component="div"
           onClick={() => onClear && onClear()}
           mt="0.5em"
           sx={{cursor: 'pointer', color: theme.palette.info.main}}>

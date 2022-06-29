@@ -18,6 +18,7 @@ export const SearchInput = ({
   width,
   containerStyle,
 }: Props) => {
+  const {t} = useTranslation();
   const debouncedChangeHandler = useCallback(
     _.debounce((e) => {
       onValueChanged?.(e.nativeEvent.target.value);
@@ -25,7 +26,6 @@ export const SearchInput = ({
     [],
   );
 
-  const {t} = useTranslation();
   return (
     <TextField
       size="small"

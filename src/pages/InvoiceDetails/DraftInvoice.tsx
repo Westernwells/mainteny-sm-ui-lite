@@ -1,11 +1,13 @@
 import {useEffect, useState} from 'react';
 // import {useNavigate} from 'react-router';
 import {useTranslation} from 'react-i18next';
+import {useNavigate} from 'react-router';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import DraftsIcon from '@mui/icons-material/Drafts';
+import DeleteIcon from '@mui/icons-material/Delete';
 import {A4Layout} from 'components/A4Layout';
 import {SelectCombined} from 'components/SelectCombined';
 import {ArticleItemsTable} from 'components/ArticleItemsTable';
@@ -17,8 +19,13 @@ import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {DatePicker} from 'components/DatePicker';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
+import {Confirm} from 'components/Confirm';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {useCreateInvoice, useUpdateInvoice} from 'hooks/reactQuery/useInvoice';
+import {
+  useCreateInvoice,
+  useDeleteInvoice,
+  useUpdateInvoice,
+} from 'hooks/reactQuery/useInvoice';
 import {
   CreateInvoice,
   UpdateInvoice,
@@ -50,13 +57,16 @@ const dateToString = (date: Date) => date.toISOString().split('T')[0];
 export const DraftInvoice = ({invoice}: Props) => {
   //   const navigate = useNavigate();
   const {t} = useTranslation();
+  const navigate = useNavigate();
 
   const {user} = useUserSession();
 
   const {mutate: createNewInvoice} = useCreateInvoice();
   const {mutate: updateInvoice} = useUpdateInvoice();
+  const {mutate: deleteInvoice} = useDeleteInvoice();
 
   const [isDrawerOpen] = useState<boolean>(true);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const [publish, setPublish] = useState(false);
 
@@ -80,7 +90,7 @@ export const DraftInvoice = ({invoice}: Props) => {
     description: '',
     dueDate: '',
     issuedDate: dateToString(new Date()),
-    type: '',
+    type: InvoiceType.FULL,
     items: [],
     paymentTerms: '',
     propertyOwnerId: '',
@@ -92,13 +102,14 @@ export const DraftInvoice = ({invoice}: Props) => {
 
   const validationSchema = Yup.object().shape({
     subject: Yup.string().required('Subject is required'),
-    description: Yup.string().required('Description is required'),
   });
 
   const formik = useFormik({
     initialValues,
     validationSchema,
     onSubmit: (values) => {
+      if (!values.description.length) values.description = ' ';
+
       if (invoice)
         updateInvoice({
           data: values as UpdateInvoice,
@@ -175,7 +186,7 @@ export const DraftInvoice = ({invoice}: Props) => {
       );
       formik.setFieldValue('serviceOrderId', serviceOrder.id, true);
 
-      if ('articles' in serviceOrder) {
+      if ('articles' in serviceOrder && serviceOrder.articles.length) {
         const items = serviceOrder.articles.map(
           (i): InvoiceItemRecord<Amount> => ({
             articleId: i.article.id,
@@ -291,7 +302,7 @@ export const DraftInvoice = ({invoice}: Props) => {
             {[
               {
                 label: 'Unit Number',
-                value: serviceOrder?.elevator.number || '-',
+                value: serviceOrder?.elevator.externalId || '-',
               },
               {
                 label: 'Date Created',
@@ -356,18 +367,20 @@ export const DraftInvoice = ({invoice}: Props) => {
             helperText: formik.touched.subject && formik.errors.subject,
             minRows: 1,
             maxRows: 3,
+            required: true,
           },
           {
             id: 'description',
             value: formik.values.description,
-            error: !!(formik.touched.description && formik.errors.description),
-            helperText: formik.touched.description && formik.errors.description,
+            error: false,
+            helperText: undefined,
             minRows: 2,
             maxRows: 6,
+            required: false,
           },
         ].map((i) => (
           <Box mt="1em" key={i.id}>
-            <FormLabel text={i.id} required />
+            <FormLabel text={i.id} required={i.required} />
             <FormInput
               props={{
                 id: i.id,
@@ -425,6 +438,13 @@ export const DraftInvoice = ({invoice}: Props) => {
                     formik.handleSubmit();
                   },
                 },
+                {
+                  label: 'Delete Invoice',
+                  icon: <DeleteIcon />,
+                  onClick: () => {
+                    setIsDeleteDialogOpen(true);
+                  },
+                },
               ]
             : [
                 {
@@ -435,11 +455,17 @@ export const DraftInvoice = ({invoice}: Props) => {
                     formik.handleSubmit();
                   },
                 },
+                {
+                  label: 'Discard',
+                  icon: <DeleteIcon />,
+                  onClick: () => {
+                    navigate(-1);
+                  },
+                },
               ]
         }
         isValid={
           !!(
-            formik.values.description &&
             formik.values.subject &&
             dueDate !== null &&
             formik.values.type.length &&
@@ -447,6 +473,18 @@ export const DraftInvoice = ({invoice}: Props) => {
             serviceOrder !== null
           )
         }
+      />
+      <Confirm
+        open={isDeleteDialogOpen}
+        onConfirm={() => {
+          if (invoice && invoice.id)
+            deleteInvoice({invoiceId: invoice.id, shouldNavigate: true});
+          setIsDeleteDialogOpen(false);
+        }}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        title="Delete Invoice"
+        content="Do you want to delete this Invoice?"
+        helperText="This action is irreversible."
       />
     </Box>
   );

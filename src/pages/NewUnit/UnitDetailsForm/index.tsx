@@ -33,6 +33,7 @@ export const UnitDetailsForm = ({
   getUnitDetailsFormValues,
   initialValues,
 }: Props) => {
+  const {t} = useTranslation();
   const [unitTypeQuery, setUnitTypeQuery] = useState('');
   const [modelQuery, setModelQuery] = useState('');
   const formik = useFormik<UnitDetailsFormModel>({
@@ -86,7 +87,6 @@ export const UnitDetailsForm = ({
       getUnitDetailsFormValues(formik.values);
     }
   }, [formik]);
-  const {t} = useTranslation();
 
   return (
     <PageCard
@@ -129,8 +129,8 @@ export const UnitDetailsForm = ({
           <Grid item md={4}>
             <FormInput
               props={{
-                placeholder: t('e.g. Elevator Installation Meier'),
-                label: t('Manufacturer'),
+                placeholder: 'e.g. Elevator Installation Meier',
+                label: 'Manufacturer',
                 name: 'manufacturer',
                 value: formik.values.manufacturer,
                 onBlur: formik.handleBlur,
@@ -142,8 +142,8 @@ export const UnitDetailsForm = ({
           <Grid item md={4}>
             <FormInput
               props={{
-                placeholder: t('e.g. 000001'),
-                label: t('Unit Number'),
+                placeholder: 'e.g. 000001',
+                label: 'Unit Number',
                 name: 'externalId',
                 value: formik.values.externalId,
                 error: !!(
@@ -163,8 +163,8 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: t('e.g. 10'),
-                label: t('Number of Stops'),
+                placeholder: 'e.g. 10',
+                label: 'Number of Stops',
                 name: 'numberOfStops',
                 value: formik.values.numberOfStops,
                 onBlur: formik.handleBlur,
@@ -177,8 +177,8 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: t('e.g. 2 doors'),
-                label: t('Cabin Type'),
+                placeholder: 'e.g. 2 doors',
+                label: 'Cabin Type',
                 name: 'cabinType',
                 value: formik.values.cabinType,
                 onBlur: formik.handleBlur,
@@ -191,8 +191,8 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: t('e.g. SafeLine'),
-                label: t('Emergency Phone Provider'),
+                placeholder: 'e.g. SafeLine',
+                label: 'Emergency Phone Provider',
                 name: 'emergencyPhoneProvider',
                 value: formik.values.emergencyPhoneProvider,
                 onBlur: formik.handleBlur,
@@ -219,9 +219,9 @@ export const UnitDetailsForm = ({
               initialQuery={formik.values.unitType}
               getQuery={(item) => setUnitTypeQuery(item || '')}
               textFieldProps={{
-                placeholder: t('e.g. Hydraulic'),
+                placeholder: 'e.g. Hydraulic',
                 name: 'unitType',
-                label: t('Unit Type'),
+                label: 'Unit Type',
                 required: true,
                 onBlur: formik.handleBlur,
                 error: !!(formik.touched.unitType && formik.errors.unitType),
@@ -252,8 +252,8 @@ export const UnitDetailsForm = ({
               getQuery={(item) => setModelQuery(item || '')}
               textFieldProps={{
                 name: 'model',
-                label: t('Model'),
-                placeholder: t('e.g. S2000'),
+                label: 'Model',
+                placeholder: 'e.g. S2000',
                 onBlur: formik.handleBlur,
                 error: !!(formik.touched.model && formik.errors.model),
                 helperText:
@@ -267,8 +267,8 @@ export const UnitDetailsForm = ({
           <Grid item md={4}>
             <FormInput
               props={{
-                placeholder: t('e.g. SHX00000000001'),
-                label: t('Serial Number'),
+                placeholder: 'e.g. SHX00000000001',
+                label: 'Serial Number',
                 name: 'serialNumber',
                 value: formik.values.serialNumber,
                 onBlur: formik.handleBlur,
@@ -281,8 +281,8 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 name: 'unitCapacity',
-                label: t('Unit Capacity'),
-                placeholder: t('e.g. 1000 kg'),
+                label: 'Unit Capacity',
+                placeholder: 'e.g. 1000 kg',
                 value: formik.values.unitCapacity,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
@@ -308,8 +308,8 @@ export const UnitDetailsForm = ({
               props={{
                 size: 'small',
                 disabled: true,
-                placeholder: t('Enter Spending Limit'),
-                label: t('Spending Limit'),
+                placeholder: 'Enter Spending Limit',
+                label: 'Spending Limit',
                 name: 'spendingLimit',
                 error: !!formik.errors.spendingLimit,
                 value: formik.values.spendingLimit,
@@ -323,8 +323,8 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 name: 'emergencyContactNumber',
-                label: t('Emergency Contact Number'),
-                placeholder: t('e.g. +49 1000 00000000'),
+                label: 'Emergency Contact Number',
+                placeholder: 'e.g. +49 1000 00000000',
                 value: formik.values.emergencyContractNumber,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
@@ -336,8 +336,8 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 name: 'yearBuilt',
-                label: t('Year Built'),
-                placeholder: t('e.g. 2000'),
+                label: 'Year Built',
+                placeholder: 'e.g. 2000',
                 value: formik.values.yearBuilt,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
@@ -349,8 +349,8 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 name: 'modelOfController',
-                label: t('Model of Controller'),
-                placeholder: t('e.g. TX2000'),
+                label: 'Model of Controller',
+                placeholder: 'e.g. TX2000',
                 value: formik.values.modelOfController,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
@@ -362,8 +362,8 @@ export const UnitDetailsForm = ({
             <FormInput
               props={{
                 name: 'manufacturerOfController',
-                label: t('Manufacturer of Controller'),
-                placeholder: t('e.g. Schneider'),
+                label: 'Manufacturer of Controller',
+                placeholder: 'e.g. Schneider',
                 value: formik.values.manufacturerOfController,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,

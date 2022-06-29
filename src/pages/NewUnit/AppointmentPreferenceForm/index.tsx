@@ -31,6 +31,7 @@ export const AppointmentPreferenceForm = ({
   getAppointmentFormValues,
   initialValues,
 }: Props) => {
+  const {t} = useTranslation();
   const formik = useFormik<AppointmentFormModel>({
     initialValues: {
       appointmentDaysOfWeek: initialValues?.appointmentDaysOfWeek || [],
@@ -54,8 +55,6 @@ export const AppointmentPreferenceForm = ({
       getAppointmentFormValues(formik.values);
     }
   }, [formik]);
-
-  const {t} = useTranslation();
 
   return (
     <PageCard
@@ -154,7 +153,7 @@ export const AppointmentPreferenceForm = ({
           <Grid item md={4}>
             <FormSelect
               labelId="requirestNotification-label"
-              label={t('Requires Notification')}
+              label="Requires Notification"
               options={['YES', 'NO'].map((key) => ({
                 label: key,
                 value: key,
@@ -171,9 +170,9 @@ export const AppointmentPreferenceForm = ({
           <Grid item md={4}>
             <FormInput
               props={{
-                label: t('Notification Due'),
+                label: 'Notification Due',
                 name: 'appointmentNotificationDueInDays',
-                placeholder: t('E.g. 5 days'),
+                placeholder: 'E.g. 5 days',
                 value: formik.values.appointmentNotificationDueInDays,
                 onChange: formik.handleChange,
                 onBlur: formik.handleBlur,

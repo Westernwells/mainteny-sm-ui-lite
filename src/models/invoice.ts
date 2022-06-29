@@ -21,6 +21,8 @@ export enum InvoiceStatus {
 export enum InvoiceStatusView {
   PAID = 'Paid',
   NOT_PAID = 'Unpaid',
+  DRAFT = 'Draft',
+  EXPIRED = 'Overdue',
 }
 
 export interface InvoiceItem {
@@ -99,7 +101,7 @@ export interface CreateInvoice {
   serviceCompanyId: string;
   serviceOrderId: string;
   shouldSendOut: boolean;
-  type: InvoiceType | '';
+  type: InvoiceType;
 }
 
 export interface UpdateInvoice {
@@ -111,5 +113,5 @@ export interface UpdateInvoice {
   paymentInfo?: PaymentInfo;
   paymentTerms?: string;
   serviceOrderId: string;
-  type: InvoiceType | '';
+  type: InvoiceType;
 }
