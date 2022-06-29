@@ -29,12 +29,10 @@ interface Props extends BoxProps {
 export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
   const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
-  const {mutate: rescheduleServiceOrder} = useRedispatchServiceOrders(
-    'Service order rescheduled successfully',
-  );
-  const {mutate: scheduleServiceOrder} = useUpdateServiceOrder(
-    'Service order scheduled successfully',
-  );
+  const successMessage = 'Service order scheduled successfully';
+  const {mutate: rescheduleServiceOrder} =
+    useRedispatchServiceOrders(successMessage);
+  const {mutate: scheduleServiceOrder} = useUpdateServiceOrder(successMessage);
   const [switchActive, setSwitchActive] = useState(true);
   const [form, setForm] = useState<ScheduleForm>({} as ScheduleForm);
   const [formError, setFormErrors] = useState<FormikErrors<ScheduleForm>>();
@@ -174,6 +172,7 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
           setSwitchActive(value)
         }
         title={t('Assign Technician')}
+        datePickerLabel="Schedule To"
         getFormValues={(value: SetStateAction<ScheduleForm>) => setForm(value)}
         getFormErrors={(
           errors: SetStateAction<FormikErrors<ScheduleForm> | undefined>,

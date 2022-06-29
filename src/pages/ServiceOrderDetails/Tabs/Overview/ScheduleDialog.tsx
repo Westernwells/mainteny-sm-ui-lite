@@ -25,6 +25,7 @@ interface Props {
   onSave: () => void;
   onCancel: () => void;
   title: string;
+  datePickerLabel?: string;
   defaultTechnician?: EmployeesView | null;
   defaultStartDate?: Date | null;
   defaultEndDate?: Date | null;
@@ -46,6 +47,7 @@ export const ScheduleDialog = ({
   onSave,
   onCancel,
   title,
+  datePickerLabel = 'Reschedule To',
   defaultTechnician,
   defaultStartDate,
   defaultEndDate,
@@ -180,7 +182,7 @@ export const ScheduleDialog = ({
                     });
                   }}
                   textFieldProps={{
-                    label: 'Reschedule To',
+                    label: datePickerLabel,
                     name: 'date',
                     helperText:
                       formik.errors.date && formik.touched.date
