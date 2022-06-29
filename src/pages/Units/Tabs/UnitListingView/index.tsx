@@ -125,7 +125,7 @@ export const UnitListingView = () => {
       <DatePicker
         defaultDate={lastVisitStart}
         containerStyles={{mr: '1em'}}
-        maxDate={new Date()}
+        maxDate={lastVisitEnd || new Date()}
         getSelectedDate={(date) => setLastVisitStart(date)}
         textFieldProps={{
           label: 'Last Visit Start',
@@ -134,6 +134,7 @@ export const UnitListingView = () => {
       <DatePicker
         defaultDate={lastVisitEnd}
         maxDate={new Date()}
+        minDate={lastVisitStart || undefined}
         containerStyles={{mr: '1em'}}
         getSelectedDate={(date) => setLastVisitEnd(date)}
         textFieldProps={{
@@ -144,6 +145,7 @@ export const UnitListingView = () => {
       <DatePicker
         defaultDate={nextVisitStart}
         minDate={new Date()}
+        maxDate={nextVisitEnd || undefined}
         containerStyles={{mr: '1em'}}
         getSelectedDate={(date) => setNextVisitStart(date)}
         textFieldProps={{
@@ -152,7 +154,7 @@ export const UnitListingView = () => {
       />
       <DatePicker
         defaultDate={nextVisitEnd}
-        minDate={new Date()}
+        minDate={nextVisitStart || new Date()}
         containerStyles={{mr: '1em'}}
         getSelectedDate={(date) => setNextVisitEnd(date)}
         textFieldProps={{
