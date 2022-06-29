@@ -12,7 +12,8 @@ import {Dialog} from 'components/Dialog';
 import {FormLabel} from 'components/form/FormLabel';
 import {PDFContainer} from 'components/PDFContainer';
 import {BottomDrawer} from 'components/BottomDrawer';
-import {QuotationView} from 'models/quotation';
+import {EmptySection} from 'components/EmptySection';
+import {QuotationStatus, QuotationView} from 'models/quotation';
 import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps';
 import {PdfGenerationStatus} from 'models/misc';
 import {formatCurrency} from 'utils/currency';
@@ -26,7 +27,6 @@ interface Props {
 
 export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
   const navigate = useNavigate();
-  const [isDrawerOpen] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const formik = useFormik({
@@ -63,9 +63,10 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
             label="Download Quotation"
             buttonProps={{
               variant: 'outlined',
-              onClick: () =>
-                window.open(`${Object.values(downloadUrl)[0]}`, '_blank'),
-
+              onClick: () => window.open(`${downloadUrl}`, '_blank'),
+              disabled:
+                quotation!.additionalInfo.pdfGenerationStatus !==
+                PdfGenerationStatus.DONE,
               startIcon: <FileDownloadIcon color="primary" />,
             }}
           />
@@ -82,10 +83,10 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
             </Box>
 
             <Box>
-              <FormLabel text="Total" sx={{color: 'text.main'}} />
+              <FormLabel text="Total (excl VAT)" sx={{color: 'text.main'}} />
               <Typography variant="subtitle1">
                 {formatCurrency(
-                  quotation.totalAmount.grossAmount /
+                  quotation.totalAmount.netAmount /
                     10 ** quotation.totalAmount.fractionDigits!,
                   {currency: quotation.totalAmount.currency},
                 )}
@@ -95,7 +96,14 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
           {quotation!.additionalInfo.pdfGenerationStatus ===
             PdfGenerationStatus.DONE && downloadUrl.length ? (
             <PDFContainer url={downloadUrl} />
-          ) : null}
+          ) : (
+            <PageCard>
+              <EmptySection
+                label="The PDF generation is in progress, please try again after sometime. We apologize for the inconvenience."
+                size="small"
+              />
+            </PageCard>
+          )}
         </Grid>
         <Grid item xs sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
           <PageCard
@@ -132,7 +140,7 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
         </Grid>
       </Grid>
       <BottomDrawer
-        isOpen={isDrawerOpen}
+        isOpen={quotation.status !== QuotationStatus.SENT_TO_CLIENT}
         primaryButtonLabel="Duplicate"
         primaryButtonAction={() => {
           if (quotation.id) navigate(`/quotations/new?id=${quotation.id}`);
