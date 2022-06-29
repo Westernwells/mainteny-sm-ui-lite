@@ -127,6 +127,7 @@ export const UnitListingView = () => {
         containerStyles={{mr: '1em'}}
         maxDate={lastVisitEnd || new Date()}
         getSelectedDate={(date) => setLastVisitStart(date)}
+        inputLabelProps={{shrink: undefined}}
         textFieldProps={{
           label: 'Last Visit Start',
         }}
@@ -137,6 +138,7 @@ export const UnitListingView = () => {
         minDate={lastVisitStart || undefined}
         containerStyles={{mr: '1em'}}
         getSelectedDate={(date) => setLastVisitEnd(date)}
+        inputLabelProps={{shrink: undefined}}
         textFieldProps={{
           label: 'Last Visit End',
         }}
@@ -148,6 +150,7 @@ export const UnitListingView = () => {
         maxDate={nextVisitEnd || undefined}
         containerStyles={{mr: '1em'}}
         getSelectedDate={(date) => setNextVisitStart(date)}
+        inputLabelProps={{shrink: undefined}}
         textFieldProps={{
           label: 'Next Visit Start',
         }}
@@ -157,6 +160,7 @@ export const UnitListingView = () => {
         minDate={nextVisitStart || new Date()}
         containerStyles={{mr: '1em'}}
         getSelectedDate={(date) => setNextVisitEnd(date)}
+        inputLabelProps={{shrink: undefined}}
         textFieldProps={{
           label: 'Next Visit End',
         }}
