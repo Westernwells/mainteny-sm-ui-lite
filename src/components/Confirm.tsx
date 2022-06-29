@@ -1,4 +1,5 @@
 import Dialog from '@mui/material/Dialog';
+import {useTranslation} from 'react-i18next';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
@@ -22,42 +23,49 @@ export const Confirm = ({
   title,
   content,
   helperText,
-}: Props) => (
-  <Dialog
-    open={open || false}
-    onClose={onClose}
-    aria-labelledby="alert-dialog-title"
-    aria-describedby="alert-dialog-description">
-    <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
-    <DialogContent>
-      <DialogContentText
-        id="alert-dialog-description"
-        sx={{color: 'text.primary'}}>
-        <Typography>{content}</Typography>
-        {helperText && (
-          <Typography variant="subtitle2">{helperText}</Typography>
-        )}
-      </DialogContentText>
-    </DialogContent>
-    <DialogActions>
-      <Button
-        label="Create Service Order"
-        buttonProps={{
-          onClick: onClose,
-        }}>
-        <Typography variant="subtitle2" color="text.secondary">
-          No
-        </Typography>
-      </Button>
+}: Props) => {
+  const {t} = useTranslation();
+  return (
+    <Dialog
+      open={open || false}
+      onClose={onClose}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description">
+      <DialogTitle id="alert-dialog-title">
+        {typeof title === 'string' ? t(title) : title}
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText
+          id="alert-dialog-description"
+          sx={{color: 'text.primary'}}>
+          <Typography>
+            {typeof content === 'string' ? t(content) : content}
+          </Typography>
+          {helperText && (
+            <Typography variant="subtitle2">{t(helperText)}</Typography>
+          )}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          label="Create Service Order"
+          buttonProps={{
+            onClick: onClose,
+          }}>
+          <Typography variant="subtitle2" color="text.secondary">
+            {t('No')}
+          </Typography>
+        </Button>
 
-      <Button
-        label="Create Service Order"
-        buttonProps={{
-          onClick: onConfirm,
-          autoFocus: true,
-        }}>
-        <Typography variant="subtitle2">Yes</Typography>
-      </Button>
-    </DialogActions>
-  </Dialog>
-);
+        <Button
+          label="Create Service Order"
+          buttonProps={{
+            onClick: onConfirm,
+            autoFocus: true,
+          }}>
+          <Typography variant="subtitle2">{t('Yes')}</Typography>
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};

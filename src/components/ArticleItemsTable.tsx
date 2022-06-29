@@ -1,4 +1,5 @@
 import {Dispatch, SetStateAction, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/Add';
@@ -30,6 +31,7 @@ export const ArticleItemsTable = ({
   setItems,
   isPartial,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
+  const {t} = useTranslation();
   const {
     data: partialArticleResource = createEmptyResource<ArticleView>(1),
     isFetched,
@@ -223,13 +225,13 @@ export const ArticleItemsTable = ({
                 {isPartial && (
                   <>
                     <Typography mb=".5em">
-                      Total Amount
+                      {t('Total Amount')}
                       <Typography
                         variant="caption"
                         component="span"
                         ml="1ch"
                         sx={{color: 'text.secondary'}}>
-                        (excl VAT)
+                        {t('(excl VAT)')}
                       </Typography>
                     </Typography>
 
@@ -240,13 +242,13 @@ export const ArticleItemsTable = ({
                 )}
 
                 <Typography>
-                  {isPartial ? 'Partial Payment' : 'Total Price'}
+                  {isPartial ? t('Partial Payment') : t('Total Price')}
                   <Typography
                     variant="caption"
                     component="span"
                     ml="1ch"
                     sx={{color: 'text.secondary'}}>
-                    (excl VAT)
+                    {t('(excl VAT)')}
                   </Typography>
                 </Typography>
 
@@ -256,7 +258,7 @@ export const ArticleItemsTable = ({
                 <Typography
                   variant="caption"
                   sx={{color: 'text.secondary', alignSelf: 'end'}}>
-                  VAT
+                  {t('VAT')}
                   {totalVat
                     ? ` ${((totalVat * 100) / totalPrice).toFixed(2)}%`
                     : null}
@@ -276,9 +278,9 @@ export const ArticleItemsTable = ({
                   justifyItems: 'end',
                 }}>
                 <Typography sx={{color: 'primary.contrastText'}}>
-                  {isPartial ? 'Invoice Amount' : 'Total Price'}
+                  {isPartial ? t('Invoice Amount') : t('Total Price')}
                   <Typography variant="caption" component="span" ml="1ch">
-                    (incl VAT)
+                    {t('(incl VAT)')}
                   </Typography>
                 </Typography>
                 <Typography sx={{color: 'primary.contrastText'}}>

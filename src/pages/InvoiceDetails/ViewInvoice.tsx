@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -31,6 +32,7 @@ interface Props {
 }
 
 export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
+  const {t} = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {mutate: markAsPaid} = useInvoicePaymentStatus();
 
@@ -117,7 +119,7 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
                 {invoice.serviceOrder.number}
               </Typography>
               <Typography variant="caption" sx={{color: 'text.secondary'}}>
-                {`Created on ${formatDate(
+                {`${t('Created on')} ${formatDate(
                   invoice.serviceOrder.meta.createdAt,
                 )}`}
               </Typography>
@@ -193,7 +195,7 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
           invoice.status !== InvoiceStatus.PAID
             ? [
                 {
-                  label: 'Resend',
+                  label: t('Resend'),
                   icon: <ReplayIcon />,
                   onClick: () => {},
                 },

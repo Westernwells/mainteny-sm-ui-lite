@@ -55,7 +55,7 @@ export const FormSelect = ({
       <Select
         size="small"
         labelId={labelId}
-        label={label}
+        label={t(label)}
         renderValue={() => {
           let selectValue;
           if (
