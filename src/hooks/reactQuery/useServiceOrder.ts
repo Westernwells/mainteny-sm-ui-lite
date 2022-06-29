@@ -269,7 +269,7 @@ export function useFetchServiceOrdersByElevators(
     [
       queryKeys.queryServiceOrders,
       elevatorIds,
-      user!.userAccount.serviceCompany.id,
+      user?.userAccount.serviceCompany.id,
     ],
     () =>
       queryServiceOrders({
@@ -345,7 +345,7 @@ export const useQueryServiceOrderScheduled = (
   const {user} = useUserSession();
 
   return useQuery<Resource<ServiceOrderView>>(
-    [queryKeys.querySeviceOrders, params, user!.userAccount.serviceCompany.id],
+    [queryKeys.querySeviceOrders, params, user?.userAccount.serviceCompany.id],
     () =>
       queryServiceOrderSchedules({
         ...params,
