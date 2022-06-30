@@ -1,4 +1,4 @@
-import {useRef} from 'react';
+import {useEffect, useRef} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -42,6 +42,7 @@ interface Props extends DataGridProps {
   isCellClickable?: boolean;
   isWidget?: boolean;
   headerHeight?: number;
+  scrollToTop?: any;
 }
 
 interface ColumnProps extends GridColDef {
@@ -107,6 +108,7 @@ export const DataGridLayout = ({
   isCellClickable = true,
   isWidget = false,
   headerHeight,
+  scrollToTop,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
@@ -124,18 +126,19 @@ export const DataGridLayout = ({
     }
   });
 
+  useEffect(() => {
+    if (gridRef.current) {
+      const ele = gridRef.current.querySelector('.MuiDataGrid-virtualScroller');
+      ele.scrollTop = 0;
+    }
+  }, [scrollToTop]);
+
   const renderFooter = () => (
     <CustomPagination
       pageSize={pageSize}
       pageIndex={pageIndex}
       handlePageSizeChange={handlePageSizeChange}
-      handlePageChange={(n) => {
-        handlePageChange(n);
-        const ele = gridRef.current.querySelector(
-          '.MuiDataGrid-virtualScroller',
-        );
-        ele.scrollTop = 0;
-      }}
+      handlePageChange={handlePageChange}
       pageCount={pageCount}
       totalRows={totalRows}
     />
