@@ -167,7 +167,7 @@ export const MyDropZone = ({
         <div {...getRootProps({className: 'dropzone'})}>
           <input {...getInputProps()} />
           <Typography variant="body2" component="div" sx={{mb: '1em'}}>
-            {t("Drag 'n' drop or")}
+            {t('Drag')} &apos;n&apos; {t('drop or')}
           </Typography>
           <Button
             label={t('Select file')}
