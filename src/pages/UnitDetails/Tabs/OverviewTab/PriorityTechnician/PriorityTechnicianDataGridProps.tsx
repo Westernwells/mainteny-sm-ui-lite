@@ -69,7 +69,9 @@ export const columns = (
     ...defaultProps,
     renderCell: (params) => (
       <Box sx={{display: 'flex'}}>
-        <Box onClick={() => getEditableTechnician(params.value)}>
+        <Box
+          onClick={() => getEditableTechnician(params.value)}
+          sx={{mr: '1em'}}>
           <EditIcon sx={{color: 'text.secondary'}} />
         </Box>
         <Box onClick={() => getDeletableTechnician(params.value)}>
