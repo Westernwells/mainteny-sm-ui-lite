@@ -1,14 +1,12 @@
 import Box from '@mui/material/Box';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
+import {CheckCircleRounded} from '@mui/icons-material';
 import {useEffect, useRef, useState} from 'react';
 import {FileWithPath, useDropzone, FileRejection} from 'react-dropzone';
 import useTheme from '@mui/material/styles/useTheme';
-import IconButton from '@mui/material/IconButton';
-import CancelIcon from '@mui/icons-material/Cancel';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
-import {CheckCircleRounded} from '@mui/icons-material';
-import {Button} from './Button';
+import {Button} from '../Button';
+import {Thumb} from './Thumb';
 
 export interface FileWithPreview extends FileWithPath {
   preview: string;
@@ -33,6 +31,9 @@ export const MyDropZone = ({
   const {t} = useTranslation();
   const theme = useTheme();
   const [files, setFiles] = useState<FileWithPreview[]>(existingFiles);
+  const [isEditingFileName, setIsEditingFileName] = useState(false);
+  const [currentEditingFileName, setCurrentEditingFileName] = useState('');
+  const [newFileName, setNewFileName] = useState('');
   const onKbinBytes = useRef(1000).current;
   const oneMbInByes = useRef(onKbinBytes * onKbinBytes).current;
   const {getRootProps, getInputProps, open, fileRejections} = useDropzone({
@@ -66,7 +67,7 @@ export const MyDropZone = ({
 
   const removeFile = (fileKey: string) => {
     const newFiles = files.filter(
-      (item, index) => `${item.path}_${index}` !== fileKey,
+      (item, index) => `${item.name}_${index}` !== fileKey,
     );
 
     setFiles(newFiles);
@@ -80,7 +81,26 @@ export const MyDropZone = ({
     [],
   );
 
-  useEffect(() => {}, []);
+  const onSaveFileName = (fileKey: string) => {
+    const result = files.map((item, index) => {
+      if (`${item.name}_${index}` === fileKey) {
+        const newFile = new File([item], newFileName, {
+          type: item.type,
+        });
+        return Object.assign(newFile, {
+          preview: URL.createObjectURL(newFile),
+        });
+      }
+      return item;
+    });
+
+    setFiles(result);
+  };
+
+  const OnCancelEdit = () => {
+    setIsEditingFileName(false);
+    setNewFileName('');
+  };
 
   const hintsLabel = hints?.map((hint, key) => (
     <Box
@@ -94,36 +114,28 @@ export const MyDropZone = ({
   ));
 
   const thumbs = files.map((file: FileWithPreview, index) => (
-    <Box key={index} sx={{mr: '1em', display: 'flex', mt: '0.3em'}}>
-      {file.type.split('/')[0] === 'image' ? (
-        <img alt="" width={80} height={80} src={file.preview} />
-      ) : (
-        <FileCopyIcon
-          sx={{fontSize: '4rem', color: theme.palette.text.secondary}}
-        />
-      )}
-
-      <Box
-        sx={{
-          mx: '1em',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-        }}>
-        <Typography>{file.path}</Typography>
-        <Typography>
-          {file.size >= oneMbInByes
-            ? `${(file.size / oneMbInByes).toFixed(2)} Mb`
-            : `${(file.size / onKbinBytes).toFixed(2)} Kb`}
-        </Typography>
-      </Box>
-
-      <IconButton
-        onClick={() => removeFile(`${file.path}_${index}`)}
-        edge="start">
-        <CancelIcon sx={{mt: '-0.8em'}} />
-      </IconButton>
-    </Box>
+    <Thumb
+      oneMbInByes={oneMbInByes}
+      onKbinBytes={onKbinBytes}
+      file={file}
+      onNameChange={(e) => {
+        setNewFileName(e.target.value);
+      }}
+      isEditingFileName={isEditingFileName}
+      currentEditingFileName={currentEditingFileName}
+      newFileName={newFileName}
+      onDeleteFile={() => removeFile(`${file.name}_${index}`)}
+      onCancelEdit={OnCancelEdit}
+      onSaveFileName={() => {
+        onSaveFileName(`${file.name}_${index}`);
+        setIsEditingFileName(false);
+      }}
+      onEditClick={() => {
+        setNewFileName(file.name);
+        setIsEditingFileName(true);
+        setCurrentEditingFileName(file.name);
+      }}
+    />
   ));
 
   const renderErrors = () =>

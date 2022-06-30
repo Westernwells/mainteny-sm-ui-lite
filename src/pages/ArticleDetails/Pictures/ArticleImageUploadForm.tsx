@@ -1,6 +1,9 @@
 import {useState} from 'react';
 import _ from 'lodash';
-import {FileWithPreview, MyDropZone} from '../../../components/MyDropzone';
+import {
+  FileWithPreview,
+  MyDropZone,
+} from '../../../components/MyDropZone/MyDropzone';
 import {Dialog} from '../../../components/Dialog';
 import {useUploadFiles} from '../../../hooks/reactQuery/useUploadSignedUrl';
 import {FileResourceRecord} from '../../../models/media';
