@@ -32,8 +32,8 @@ const MenuProps = {
 export const FormSelect = ({
   labelId,
   label,
-  required,
   options,
+  required = false,
   labelStyles,
   selectStyles,
   selectProps,

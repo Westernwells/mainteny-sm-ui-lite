@@ -111,3 +111,5 @@ export const getDataGridHeight = (
 
   return 52 * currentTotal + height;
 };
+
+export const padNumber = (num: number) => (num < 10 ? `0${num}` : num);

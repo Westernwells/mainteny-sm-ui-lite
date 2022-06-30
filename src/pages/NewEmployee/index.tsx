@@ -103,7 +103,26 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
     }
 
     if (
+      activeStep === 2 &&
+      (Object.keys(credentialEmployeeFormError).length ||
+        credentialEmployeeFormValues.password === '' ||
+        credentialEmployeeFormValues.confirmPassword === '')
+    ) {
+      return setDisableNextBtn(true);
+    }
+
+    if (
       activeStep === 3 &&
+      (additionalInformationEmployeeFormValues.shifts.length === 0 ||
+        (roleEmployeeFormValues.roles.includes(Role.TECHNICIAN) &&
+          additionalInformationEmployeeFormValues.serviceOrderTypes.length ===
+            0))
+    ) {
+      return setDisableNextBtn(true);
+    }
+
+    if (
+      activeStep === 2 &&
       (additionalInformationEmployeeFormValues.shifts.length === 0 ||
         (roleEmployeeFormValues.roles.includes(Role.TECHNICIAN) &&
           additionalInformationEmployeeFormValues.serviceOrderTypes.length ===

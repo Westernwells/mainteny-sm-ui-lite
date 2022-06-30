@@ -1,4 +1,4 @@
-import {EmployeeAccountData} from 'pages/Employee/NewEmployee/model';
+import {EmployeeAccountData} from 'pages/NewEmployee/model';
 
 import {EmployeeAccountData as EditEmployeeAccountData} from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/model';
 

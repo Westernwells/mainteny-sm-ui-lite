@@ -16,7 +16,7 @@ export const UnitsTab = () => {
   const [search, setSearch] = useState('');
   const [page] = useState(makePage(0, 25)); // TODO: implement paging
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const {data: elevator = createEmptyResource<ElevatorView>(10)} =
+  const {data: elevator = createEmptyResource<ElevatorView>(10), isLoading} =
     useAllElevators({
       query: search,
       pageIndex: page.pageIndex,
@@ -24,8 +24,12 @@ export const UnitsTab = () => {
     });
 
   useEffect(() => {
-    if (elevator.data) {
-      setRows(makeRows(elevator));
+    if (!isLoading) {
+      setRows(
+        makeRows({
+          elevators: elevator.data,
+        }),
+      );
     } else {
       setRows([]);
     }

@@ -28,7 +28,7 @@ import {QuotationDetails} from 'pages/QuotationDetails';
 import {Notifications} from 'pages/Notifications';
 import {PageNotFound} from 'pages/PageNotFound';
 import {ServiceOrders} from 'pages/ServiceOrders';
-import {NewEmployee} from 'pages/Employee/NewEmployee';
+import {NewEmployee} from 'pages/NewEmployee';
 import {ServiceOrderDetails} from 'pages/ServiceOrderDetails';
 import {axiosClient} from 'utils/axios-utils';
 import {languageMap} from 'utils/utils';
@@ -36,6 +36,7 @@ import i18n from 'i18next';
 import {useEffect, useState} from 'react';
 import {NewServiceOrder} from 'pages/NewServiceOrder';
 import {NewUnit} from 'pages/NewUnit';
+import {NewCustomer} from 'pages/NewCustomer';
 import {Articles} from 'pages/Articles';
 import {ArticleOverView} from 'pages/ArticleDetails';
 import {ProtectedRoutes} from './ProtectedRoutes';
@@ -198,7 +199,6 @@ export const Router = () => {
               </>
             }
           />
-
           <Route
             path="/customers"
             element={
@@ -206,7 +206,6 @@ export const Router = () => {
                 <Helmet>
                   <title>{`Customers - ${titleTail}`}</title>
                 </Helmet>
-
                 <PageLayout pageTitle="Customers">
                   <Customer />
                 </PageLayout>
@@ -220,7 +219,10 @@ export const Router = () => {
                 <Helmet>
                   <title>{`Customer Details - ${titleTail}`}</title>
                 </Helmet>
-                <PageLayout showBackAction backBtnLabel={currentPageTitle}>
+                <PageLayout
+                  showBackAction
+                  pageScrollable
+                  backBtnLabel={currentPageTitle}>
                   <CustomerDetails
                     getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
                   />
@@ -241,7 +243,21 @@ export const Router = () => {
               </>
             }
           />
-
+          <Route
+            path="/customers/new"
+            element={
+              <>
+                <Helmet>
+                  <title>New Customer</title>
+                </Helmet>
+                <PageLayout showBackAction backBtnLabel={currentPageTitle}>
+                  <NewCustomer
+                    getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                  />
+                </PageLayout>
+              </>
+            }
+          />
           <Route
             path="/employees/details/:id"
             element={
@@ -260,7 +276,6 @@ export const Router = () => {
               </>
             }
           />
-
           <Route
             path="/employees/new"
             element={
@@ -276,7 +291,6 @@ export const Router = () => {
               </>
             }
           />
-
           <Route
             path="/quotations"
             element={
