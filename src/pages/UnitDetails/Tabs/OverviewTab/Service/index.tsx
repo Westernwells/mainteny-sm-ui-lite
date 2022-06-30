@@ -25,7 +25,7 @@ interface Props {
 
 const validationSchema = Yup.object().shape({
   lastVisitDate: Yup.string().nullable().required('Last visit is required'),
-  serviceTime: Yup.string().nullable().required('Service time is required'),
+  serviceTime: Yup.number().nullable().required('Service time is required'),
   technicianNumber: Yup.number()
     .nullable()
     .required('No. of technicians is required'),

@@ -87,6 +87,8 @@ export const EditServiceForm = ({formik}: Props) => {
             error: !!(formik.errors.serviceTime && formik.touched.serviceTime),
             onChange: formik.handleChange,
             onBlur: formik.handleBlur,
+            type: 'number',
+            inputProps: {min: 0},
           }}
         />
       </Grid>
@@ -106,6 +108,8 @@ export const EditServiceForm = ({formik}: Props) => {
             ),
             onChange: formik.handleChange,
             onBlur: formik.handleBlur,
+            type: 'number',
+            inputProps: {min: 0},
           }}
         />
       </Grid>
