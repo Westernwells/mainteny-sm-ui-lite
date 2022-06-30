@@ -1,3 +1,4 @@
+import {useRef} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -110,6 +111,7 @@ export const DataGridLayout = ({
 }: Props) => {
   const navigate = useNavigate();
   const theme = useTheme();
+  const gridRef = useRef<any>();
 
   const rowClassNames: any[string] = [];
   rows.forEach((item) => {
@@ -127,7 +129,13 @@ export const DataGridLayout = ({
       pageSize={pageSize}
       pageIndex={pageIndex}
       handlePageSizeChange={handlePageSizeChange}
-      handlePageChange={handlePageChange}
+      handlePageChange={(n) => {
+        handlePageChange(n);
+        const ele = gridRef.current.querySelector(
+          '.MuiDataGrid-virtualScroller',
+        );
+        ele.scrollTop = 0;
+      }}
       pageCount={pageCount}
       totalRows={totalRows}
     />
@@ -165,6 +173,7 @@ export const DataGridLayout = ({
         ...(!fullHeight && {height}),
       }}>
       <DataGrid
+        ref={gridRef}
         components={{
           LoadingOverlay: LinearProgress,
           Footer: renderFooter,
