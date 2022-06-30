@@ -115,6 +115,7 @@ export const MyDropZone = ({
 
   const thumbs = files.map((file: FileWithPreview, index) => (
     <Thumb
+      key={`${file.name}-${index}`}
       oneMbInByes={oneMbInByes}
       onKbinBytes={onKbinBytes}
       file={file}
