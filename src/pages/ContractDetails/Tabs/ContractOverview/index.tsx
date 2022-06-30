@@ -7,7 +7,7 @@ import {useUpdateContract} from 'hooks/reactQuery/useContract';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
 import {useParams} from 'react-router-dom';
-import {formatDate, toDate} from 'utils/datetime';
+import {toDate} from 'utils/datetime';
 import {differenceInDays, isBefore} from 'date-fns';
 import {useFormik} from 'formik';
 import {
@@ -116,7 +116,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       documents: [
         ...(contractDetails?.additionalInfo?.documents || []),
         ...documents.map((item) => ({
-          description: '',
+          description: item.name.split('.')[0],
           type: item.type,
           uri: `${uploadPath}/${item.name}`,
         })),
@@ -292,15 +292,11 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                               fontSize="large"
                               htmlColor="rgba(15, 76, 100, 0.5)"
                             />
-                            <Typography
-                              sx={{marginTop: '10px', color: '#8F9BB3'}}>
-                              {documnet.type}
-                            </Typography>
                           </Box>
                           <Typography
                             align="center"
                             sx={{color: '#8F9BB3', marginTop: '10px'}}>
-                            Signed Contract {formatDate(documnet.createdAt)}
+                            {documnet.description}
                           </Typography>
                         </Box>
                       ),

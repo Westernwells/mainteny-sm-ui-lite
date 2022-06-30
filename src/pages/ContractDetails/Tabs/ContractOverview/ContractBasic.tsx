@@ -9,6 +9,7 @@ import WysiwygIcon from '@mui/icons-material/Wysiwyg';
 import TopicIcon from '@mui/icons-material/Topic';
 import {Grid} from '@mui/material';
 import {StatusChip} from 'components/StatusChip';
+import {convertToText} from 'utils/utils';
 
 interface Props {
   type?: string;
@@ -45,7 +46,7 @@ export const ContractBasic = ({
             icon={<CardTravelIcon color="info" />}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3rem"
-            bodyText={type || '-'}
+            bodyText={convertToText(type || '-')}
           />
         </Grid>
         <Grid item xs={4}>
@@ -56,7 +57,7 @@ export const ContractBasic = ({
             containerStyles={{mr: '0.5em'}}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3rem"
-            bodyText={numberOfVisits || '-'}
+            bodyText={`${numberOfVisits}` || '-'}
           />
         </Grid>
         <Grid item xs={4}>
@@ -117,7 +118,7 @@ export const ContractBasic = ({
             containerStyles={{mr: '0.5em'}}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3rem"
-            bodyText={numberOfUnits || '-'}
+            bodyText={`${numberOfUnits}` || '-'}
           />
         </Grid>
       </Grid>

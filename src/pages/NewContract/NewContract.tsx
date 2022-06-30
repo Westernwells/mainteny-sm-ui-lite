@@ -163,7 +163,7 @@ const NewContract = () => {
             ...obj,
             type: obj.type,
             uri: `${uploadPath}/${obj.name}`,
-            description: '',
+            description: obj.name.split('.')[0],
           },
         ],
         [],

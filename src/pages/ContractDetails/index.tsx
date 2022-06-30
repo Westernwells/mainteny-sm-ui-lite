@@ -8,6 +8,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useContractDetails} from 'hooks/reactQuery/useContract';
 import {useParams} from 'react-router';
+import {useSnackbar} from 'notistack';
 import {UnitsTab} from './Tabs/UnitsTab';
 import {ContractOverview} from './Tabs/ContractOverview';
 
@@ -26,6 +27,7 @@ export const ContractDetails = () => {
   const [tabValue, setTabValue] = useState(0);
   const {id: contractId} = useParams();
   const {data: contractDetails, isLoading} = useContractDetails(contractId!);
+  const {enqueueSnackbar} = useSnackbar();
 
   const {data: downloadUrl} = useDownloadUrl(
     contractDetails?.additionalInfo?.documents?.length
@@ -44,8 +46,14 @@ export const ContractDetails = () => {
       actionButtonIcon={<FileDownloadIcon color="primary" sx={{}} />}
       btnOnClick={() => {
         if (downloadUrl && Object.values(downloadUrl).length) {
-          window.open(Object.values(downloadUrl!)[0], '_blank');
+          return window.open(Object.values(downloadUrl!)[0], '_blank');
         }
+        enqueueSnackbar(
+          'Sorry, no document has been attached to this contract yet!',
+          {
+            variant: 'error',
+          },
+        );
       }}>
       <TabsBody value={tabValue} index={0}>
         <ContractOverview

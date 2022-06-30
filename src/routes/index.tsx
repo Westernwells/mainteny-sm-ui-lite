@@ -128,7 +128,7 @@ export const Router = () => {
                 </Helmet>
                 <PageLayout
                   pageScrollable
-                  backBtnLabel="Contract details"
+                  backBtnLabel="Contract Details"
                   showBackAction>
                   <ContractDetails />
                 </PageLayout>
