@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import EditIcon from '@mui/icons-material/Create';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -14,15 +15,17 @@ import {useUpdateArticle} from '../../../hooks/reactQuery/useArticle';
 import {CardProps} from '../../../components/CardProps';
 import {NoItemSection} from '../NoItemSection';
 import {InfoCard} from '../../../components/InfoCard';
-import {ArticleStockForm} from './ArticleStockForm';
+import {EditStockForm} from './EditStockForm';
 import {Dialog} from '../../../components/Dialog';
 import {ArticleStockFormModel} from '../../../models/articleForm';
+import {makeAmountRecord} from '../../../utils/currency';
 
 export const ArticleStockCard = ({article}: {article: ArticleView}) => {
   const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
+  const {t} = useTranslation();
   const {mutateAsync: updateArticle, isLoading} = useUpdateArticle(
-    'Article is updated successfully',
+    t('Article is updated successfully'),
   );
 
   const formik = useFormik<ArticleStockFormModel>({
@@ -57,16 +60,16 @@ export const ArticleStockCard = ({article}: {article: ArticleView}) => {
       suppliers: article.additionalInfo.suppliers || [],
       type: article.type.toUpperCase(),
       unit: article.unit,
-      unitPurchaseAmount: {
-        currency: article.unitPurchaseAmount.currency,
-        netAmount: article.unitPurchaseAmount.netAmount,
-        percentageVat: article.unitPurchaseAmount.percentageVat,
-      },
-      unitSellingAmount: {
-        currency: article.unitSellingAmount.currency,
-        netAmount: article.unitSellingAmount.netAmount,
-        percentageVat: article.unitSellingAmount.percentageVat,
-      },
+      unitPurchaseAmount: makeAmountRecord(
+        article.unitPurchaseAmount.netAmount,
+        article.unitPurchaseAmount.currency,
+        article.unitPurchaseAmount.percentageVat,
+      ),
+      unitSellingAmount: makeAmountRecord(
+        article.unitSellingAmount.netAmount,
+        article.unitSellingAmount.currency,
+        article.unitSellingAmount.percentageVat,
+      ),
     };
     await updateArticle({articleId: article!.id, article: temp});
     setOpenDialog(false);
@@ -74,22 +77,22 @@ export const ArticleStockCard = ({article}: {article: ArticleView}) => {
 
   const stockItems = [
     {
-      label: 'Minimum Stock',
+      label: t('Minimum Stock'),
       icon: <ViewAgendaIcon sx={{color: theme.palette.info.dark}} />,
       body: article.stock.minStock,
     },
     {
-      label: 'Current Stock',
+      label: t('Current Stock'),
       icon: <ViewWeekIcon sx={{color: theme.palette.info.dark}} />,
       body: article.stock.currentStock,
     },
     {
-      label: 'Maximum Stock',
+      label: t('Maximum Stock'),
       icon: <ViewComfyIcon sx={{color: theme.palette.info.dark}} />,
       body: article.stock.maxStock,
     },
     {
-      label: 'Minimum Order Quantity',
+      label: t('Minimum Order Quantity'),
       icon: <Filter1Icon sx={{color: theme.palette.info.dark}} />,
       body: article.stock.minOrderQuantity,
     },
@@ -101,7 +104,7 @@ export const ArticleStockCard = ({article}: {article: ArticleView}) => {
       headerActionIcon={<EditIcon />}
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
-      header={<Typography variant="subtitle1">Stock Info</Typography>}>
+      header={<Typography variant="subtitle1">{t('Stock Info')}</Typography>}>
       <Box display="flex" flexWrap="wrap">
         {article.stock &&
           _.map(stockItems, (item, key) => (
@@ -117,20 +120,23 @@ export const ArticleStockCard = ({article}: {article: ArticleView}) => {
           ))}
         {!article.stock && (
           <NoItemSection
-            placeholder="stock info"
+            label={t(
+              'No stock info yet. Please click the button below to add!',
+            )}
+            buttonLabel={t('+ Add stock info')}
             action={() => setOpenDialog(true)}
           />
         )}
       </Box>
       <Dialog
-        title="Edit Stock Information"
+        title={t('Edit Stock Information')}
         isSaving={isLoading}
         onCancel={() => setOpenDialog(false)}
         onSave={saveArticle}
         dialogProps={{
           open: openDialog || false,
         }}>
-        <ArticleStockForm
+        <EditStockForm
           formik={formik}
           containerStyles={{display: 'flex', flexWrap: 'wrap'}}
         />

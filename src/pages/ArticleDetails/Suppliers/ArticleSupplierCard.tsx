@@ -1,26 +1,26 @@
 import {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import EditIcon from '@mui/icons-material/Create';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import _ from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import {StatusChip} from '../../../components/StatusChip';
 import {NoItemSection} from '../NoItemSection';
 import {InfoCard} from '../../../components/InfoCard';
 import {ArticleView, SupplierRecord} from '../../../models/article';
 import {ArticleSuppliersForm} from './ArticleSuppliersForm';
-import {Dialog} from '../../../components/Dialog';
 import {useUpdateArticle} from '../../../hooks/reactQuery/useArticle';
+import {makeAmountRecord} from '../../../utils/currency';
 
 export const ArticleSupplierCard = ({article}: {article: ArticleView}) => {
-  const [suppliers, setSuppliers] = useState<SupplierRecord[]>(
-    article.additionalInfo.suppliers,
-  );
   const [openDialog, setOpenDialog] = useState(false);
   const {mutateAsync: updateArticle, isLoading} = useUpdateArticle(
     'Article is updated successfully',
   );
+  const {t} = useTranslation();
 
-  const saveArticle = async () => {
+  const saveArticle = async (suppliers: SupplierRecord[]) => {
     const temp = {
       category: article.category,
       description: article.description,
@@ -37,23 +37,19 @@ export const ArticleSupplierCard = ({article}: {article: ArticleView}) => {
       suppliers,
       type: article.type.toUpperCase(),
       unit: article.unit,
-      unitPurchaseAmount: {
-        currency: article.unitPurchaseAmount.currency,
-        netAmount: article.unitPurchaseAmount.netAmount,
-        percentageVat: article.unitPurchaseAmount.percentageVat,
-      },
-      unitSellingAmount: {
-        currency: article.unitSellingAmount.currency,
-        netAmount: article.unitSellingAmount.netAmount,
-        percentageVat: article.unitSellingAmount.percentageVat,
-      },
+      unitPurchaseAmount: makeAmountRecord(
+        article.unitPurchaseAmount.netAmount,
+        article.unitPurchaseAmount.currency,
+        article.unitPurchaseAmount.percentageVat,
+      ),
+      unitSellingAmount: makeAmountRecord(
+        article.unitSellingAmount.netAmount,
+        article.unitSellingAmount.currency,
+        article.unitSellingAmount.percentageVat,
+      ),
     };
     await updateArticle({articleId: article!.id, article: temp});
     setOpenDialog(false);
-  };
-
-  const updateSuppliers = (result: SupplierRecord[]) => {
-    setSuppliers(result);
   };
 
   return (
@@ -62,38 +58,43 @@ export const ArticleSupplierCard = ({article}: {article: ArticleView}) => {
       headerActionIcon={<EditIcon />}
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
-      header={<Typography variant="subtitle1">Suppliers</Typography>}>
+      header={<Typography variant="subtitle1">{t('Suppliers')}</Typography>}>
       <Box display="flex" justifyContent="space-between">
         {!_.isEmpty(article.additionalInfo.suppliers) &&
           _.map(article.additionalInfo.suppliers, (supplier, key) => (
             <Box
               key={key}
               display="flex"
-              bgcolor="grey.200"
+              bgcolor="grey.50"
               minHeight="5em"
               width="50%"
               alignItems="center"
               justifyContent="space-between"
               px="1em"
               py=".5em"
-              mr="1.2rem"
-              border="1px solid"
+              mr="1rem"
               borderColor="inputBackground.main"
               borderRadius="4px">
-              <Box color="text.secondary">
-                <Typography variant="caption">
+              <Box sx={{width: '60%'}}>
+                <Typography variant="subtitle2">
                   {supplier.name || '-'}
                 </Typography>
-                <Typography variant="body2" component="p">
-                  {supplier.address.fullName || '-'}
+                <Typography
+                  color="text.secondary"
+                  variant="body2"
+                  component="p">
+                  {supplier.address?.fullName || '-'}
                 </Typography>
-                <Typography variant="body2" component="p">
+                <Typography
+                  color="text.secondary"
+                  variant="body2"
+                  component="p">
                   {supplier.phone}
                 </Typography>
               </Box>
               {supplier.isPreferred && (
                 <StatusChip
-                  label="Preferred"
+                  label={t('Preferred')}
                   color="success"
                   variant="filled"
                 />
@@ -102,26 +103,19 @@ export const ArticleSupplierCard = ({article}: {article: ArticleView}) => {
           ))}
         {_.isEmpty(article.additionalInfo.suppliers) && (
           <NoItemSection
-            placeholder="suppliers"
+            label={t('No suppliers yet. Please click the button below to add!')}
+            buttonLabel={t('+ Add suppliers')}
             action={() => setOpenDialog(true)}
           />
         )}
-        <Dialog
-          title="Edit Suppliers Information"
-          isSaving={isLoading}
-          onCancel={() => {
-            setOpenDialog(false);
-            setSuppliers(article.additionalInfo.suppliers);
-          }}
-          onSave={saveArticle}
-          dialogProps={{
-            open: openDialog || false,
-          }}>
+        {openDialog && (
           <ArticleSuppliersForm
-            suppliers={suppliers}
-            updateSuppliers={updateSuppliers}
+            isLoading={isLoading}
+            originSuppliers={cloneDeep(article.additionalInfo.suppliers)}
+            onCancel={() => setOpenDialog(false)}
+            onSubmit={saveArticle}
           />
-        </Dialog>
+        )}
       </Box>
     </InfoCard>
   );

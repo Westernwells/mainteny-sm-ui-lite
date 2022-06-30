@@ -10,25 +10,23 @@ import {FileResourceRecord} from '../../../models/media';
 
 export interface Props {
   title: string;
+  successMessage: string;
   hints?: string[];
   uploadPath: string;
   onClose: (files: FileResourceRecord[]) => void;
   onCancel: () => void;
-  maxFiles?: number;
 }
 
 export const ArticleImageUploadForm = ({
   title,
+  successMessage,
   hints,
   uploadPath,
   onClose,
   onCancel,
-  maxFiles,
 }: Props) => {
   const [acceptedFiles, setAcceptedFiles] = useState<FileWithPreview[]>([]);
-  const {mutateAsync: uploadImages, isLoading} = useUploadFiles(
-    'Image uploaded successfully',
-  );
+  const {mutateAsync: uploadImages, isLoading} = useUploadFiles(successMessage);
 
   const updateImages = async (files: FileWithPreview[]) => {
     if (files.length) {
@@ -54,6 +52,7 @@ export const ArticleImageUploadForm = ({
     <Dialog
       title={title}
       isSaving={isLoading}
+      disableSaveBtn={!acceptedFiles.length}
       onCancel={() => cancel()}
       onSave={() => save()}
       dialogProps={{
@@ -69,7 +68,6 @@ export const ArticleImageUploadForm = ({
         getRejectedFileWithErrors={(file) => {
           console.log(file);
         }}
-        maxFiles={maxFiles}
       />
     </Dialog>
   );

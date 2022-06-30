@@ -1,7 +1,9 @@
 import {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import EditIcon from '@mui/icons-material/Create';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import useTheme from '@mui/material/styles/useTheme';
 import _ from 'lodash';
 import {ArticleView} from '../../../models/article';
 import {useDownloadUrl} from '../../../hooks/reactQuery/useDownloadUrl';
@@ -10,13 +12,16 @@ import {InfoCard} from '../../../components/InfoCard';
 import {useUpdateArticle} from '../../../hooks/reactQuery/useArticle';
 import {ArticleImageUploadForm} from './ArticleImageUploadForm';
 import {FileResourceRecord} from '../../../models/media';
+import {makeAmountRecord} from '../../../utils/currency';
 
 export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
+  const theme = useTheme();
   const [currentUrl, setCurrentUrl] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
+  const {t} = useTranslation();
 
   const {mutateAsync: updateArticle} = useUpdateArticle(
-    'Article is updated successfully',
+    t('Article is updated successfully'),
   );
   const {data: pictureUrls = {}} = useDownloadUrl(
     _.map(article.additionalInfo.pictureUrls, (item) => item),
@@ -29,11 +34,6 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
   }, [pictureUrls]);
 
   const saveArticle = async (files: FileResourceRecord[]) => {
-    if (!_.isEmpty(files)) {
-      setCurrentUrl(files[0].uri);
-    } else {
-      setCurrentUrl('');
-    }
     const temp = {
       category: article.category,
       description: article.description,
@@ -41,7 +41,10 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
       model: article.model,
       name: article.name,
       externalId: article.externalId,
-      pictureUrls: files.map((it) => it.uri),
+      pictureUrls: [
+        ...article.additionalInfo.pictureUrls,
+        ...files.map((it) => it.uri),
+      ],
       qrCode: article.additionalInfo.qrCode,
       serviceCompanyId: article.serviceCompanyId!,
       stock: article.stock,
@@ -50,16 +53,16 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
       suppliers: article.additionalInfo.suppliers || [],
       type: article.type.toUpperCase(),
       unit: article.unit,
-      unitPurchaseAmount: {
-        currency: article.unitPurchaseAmount.currency,
-        netAmount: article.unitPurchaseAmount.netAmount,
-        percentageVat: article.unitPurchaseAmount.percentageVat,
-      },
-      unitSellingAmount: {
-        currency: article.unitSellingAmount.currency,
-        netAmount: article.unitSellingAmount.netAmount,
-        percentageVat: article.unitSellingAmount.percentageVat,
-      },
+      unitPurchaseAmount: makeAmountRecord(
+        article.unitPurchaseAmount.netAmount,
+        article.unitPurchaseAmount.currency,
+        article.unitPurchaseAmount.percentageVat,
+      ),
+      unitSellingAmount: makeAmountRecord(
+        article.unitSellingAmount.netAmount,
+        article.unitSellingAmount.currency,
+        article.unitSellingAmount.percentageVat,
+      ),
     };
     await updateArticle({articleId: article!.id, article: temp});
     setOpenDialog(false);
@@ -70,8 +73,18 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
   };
 
   const thumbs = _.map(pictureUrls, (url, key) => (
-    <Box onClick={() => setCurrentAttachment(url)} key={key}>
-      <img alt="" src={url} width={80} height={80} />
+    <Box
+      onClick={() => setCurrentAttachment(url)}
+      key={key}
+      sx={{
+        mx: '0.1rem',
+        border: `2px solid ${
+          url === currentUrl
+            ? theme.palette.text.secondary
+            : theme.palette.text.disabled
+        }`,
+      }}>
+      <img alt="" src={url} width={70} height={70} />
     </Box>
   ));
 
@@ -87,26 +100,31 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
       headerActionIcon={<EditIcon />}
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
-      bodyContainerStyle={{height: '100%'}}
-      header={<Typography variant="subtitle1">Attachments</Typography>}>
+      bodyContainerStyle={{
+        display: 'flex',
+        justifyContent: 'center',
+        height: '100%',
+      }}
+      header={<Typography variant="subtitle1">{t('Attachments')}</Typography>}>
       <Box
         display="flex"
         flexDirection="column"
         alignItems="center"
-        justifyContent="center"
-        sx={{height: '100%'}}>
+        justifyContent="center">
         {currentUrl && (
           <Box
             display="flex"
             alignItems="center"
             justifyContent="center"
-            sx={{height: '100%'}}>
+            sx={{height: '100%', mx: '0.5rem', my: '0.5rem'}}>
             <img
               src={currentUrl}
               alt=""
               style={{
                 objectFit: 'cover',
                 objectPosition: 'center',
+                height: '260px',
+                width: '100%',
               }}
             />
           </Box>
@@ -116,32 +134,34 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
             display="flex"
             flexWrap="wrap"
             alignItems="start"
-            justifyContent="start"
+            justifyContent="flex-start"
             sx={{width: '100%'}}>
             {thumbs}
           </Box>
         )}
         {_.isEmpty(pictureUrls) && (
           <NoItemSection
-            placeholder="attachments"
+            label={t(
+              'No attachments yet. Please click the button below to add!',
+            )}
+            buttonLabel={t('+ Add Attachments')}
             action={() => setOpenDialog(true)}
           />
         )}
       </Box>
       {openDialog && (
         <ArticleImageUploadForm
-          title="Edit Attachments"
+          title={t('Edit Attachments')}
           uploadPath={`${article!.serviceCompanyId}/articles/${
             article!.id
           }/images`}
           onClose={saveArticle}
           onCancel={() => setOpenDialog(false)}
+          successMessage={t('Image uploaded successfully')}
           hints={[
-            'JPEG, PNG, BMP, GIF, WEBP, SVG only',
-            'File size less than 5MB only',
-            'Max 5 files',
+            t('JPEG, PNG, BMP, GIF, WEBP, SVG only'),
+            t('File size less than 5MB only'),
           ]}
-          maxFiles={5}
         />
       )}
     </InfoCard>
