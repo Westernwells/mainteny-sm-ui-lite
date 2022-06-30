@@ -55,6 +55,8 @@ export const PriorityTechnicianForm = ({
           sx: {
             mt: '0.5em',
           },
+          type: 'number',
+          inputProps: {min: 0},
         }}
       />
     </Box>
