@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Box from '@mui/material/Box';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
@@ -7,8 +8,11 @@ import useTheme from '@mui/material/styles/useTheme';
 import IconButton from '@mui/material/IconButton';
 import CancelIcon from '@mui/icons-material/Cancel';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
+import DeleteIcon from '@mui/icons-material/Delete';
 import {CheckCircleRounded} from '@mui/icons-material';
-import {Button} from './Button';
+import EditIcon from '@mui/icons-material/Edit';
+import {Button} from '../Button';
+import {FormInput} from '../form/FormInput';
 
 export interface FileWithPreview extends FileWithPath {
   preview: string;
@@ -33,6 +37,9 @@ export const MyDropZone = ({
   const {t} = useTranslation();
   const theme = useTheme();
   const [files, setFiles] = useState<FileWithPreview[]>(existingFiles);
+  const [isEditingFileName, setIsEditingFileName] = useState(false);
+  const [currentEditingFileName, setCurrentEditingFileName] = useState('');
+  const [newFileName, setNewFileName] = useState('');
   const onKbinBytes = useRef(1000).current;
   const oneMbInByes = useRef(onKbinBytes * onKbinBytes).current;
   const {getRootProps, getInputProps, open, fileRejections} = useDropzone({
@@ -56,6 +63,7 @@ export const MyDropZone = ({
 
   useEffect(() => {
     if (getAcceptedFiles) {
+      console.log(files, '@@@!!!!!++++===>');
       getAcceptedFiles(files);
     }
 
@@ -66,7 +74,7 @@ export const MyDropZone = ({
 
   const removeFile = (fileKey: string) => {
     const newFiles = files.filter(
-      (item, index) => `${item.path}_${index}` !== fileKey,
+      (item, index) => `${item.name}_${index}` !== fileKey,
     );
 
     setFiles(newFiles);
@@ -80,7 +88,29 @@ export const MyDropZone = ({
     [],
   );
 
-  useEffect(() => {}, []);
+  const onSaveFileName = (fileKey: string) => {
+    const result = files.map((item, index) => {
+      console.log(item, '.,,.,,,,,,,,,');
+      if (`${item.name}_${index}` === fileKey) {
+        const newFile = new File([item], newFileName, {
+          type: item.type,
+        });
+        return Object.assign(newFile, {
+          preview: URL.createObjectURL(newFile),
+        });
+      }
+      return item;
+    });
+
+    console.log(result, '~~~~~~~~~');
+
+    setFiles(result);
+  };
+
+  const OnCancelEdit = () => {
+    setIsEditingFileName(false);
+    setNewFileName('');
+  };
 
   const hintsLabel = hints?.map((hint, key) => (
     <Box
@@ -110,7 +140,7 @@ export const MyDropZone = ({
           flexDirection: 'column',
           justifyContent: 'center',
         }}>
-        <Typography>{file.path}</Typography>
+        <Typography>{file.name}</Typography>
         <Typography>
           {file.size >= oneMbInByes
             ? `${(file.size / oneMbInByes).toFixed(2)} Mb`
@@ -118,11 +148,51 @@ export const MyDropZone = ({
         </Typography>
       </Box>
 
-      <IconButton
-        onClick={() => removeFile(`${file.path}_${index}`)}
-        edge="start">
-        <CancelIcon sx={{mt: '-0.8em'}} />
-      </IconButton>
+      {isEditingFileName && file.name === currentEditingFileName ? (
+        <>
+          <FormInput
+            props={{
+              sx: {},
+              value: newFileName,
+              size: 'small',
+              fullWidth: true,
+              type: 'text',
+              onChange: (e) => {
+                setNewFileName(e.target.value);
+              },
+            }}
+          />
+          <IconButton
+            onClick={() => {
+              onSaveFileName(`${file.name}_${index}`),
+                setIsEditingFileName(false);
+            }}
+            edge="start">
+            <CheckCircleRounded sx={{mt: '-0.8em'}} />
+          </IconButton>
+
+          <IconButton onClick={OnCancelEdit} edge="start">
+            <CancelIcon sx={{mt: '-0.8em'}} />
+          </IconButton>
+        </>
+      ) : (
+        <>
+          <IconButton
+            onClick={() => {
+              setNewFileName(file.name);
+              setIsEditingFileName(true);
+              setCurrentEditingFileName(file.name);
+            }}
+            edge="start">
+            <EditIcon sx={{mt: '-0.8em'}} />
+          </IconButton>
+          <IconButton
+            onClick={() => removeFile(`${file.name}_${index}`)}
+            edge="start">
+            <DeleteIcon sx={{mt: '-0.8em'}} />
+          </IconButton>
+        </>
+      )}
     </Box>
   ));
 
