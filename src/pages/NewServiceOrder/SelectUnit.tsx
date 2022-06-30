@@ -22,6 +22,7 @@ interface Props {
 const pageInfo = makePage(0, 10);
 
 export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const [search, setSearch] = useState('');
   const totalUnitsRef = useRef(0);
@@ -109,7 +110,7 @@ please click the button below'
       </PageCard>
     );
   }
-  const {t} = useTranslation();
+
   return (
     <>
       <Box display="flex" justifyContent="space-between">

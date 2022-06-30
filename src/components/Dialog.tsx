@@ -40,6 +40,7 @@ export const Dialog = ({
       <DialogTitle id="alert-dialog-title">
         {typeof title === 'string' ? t(title) : title}
       </DialogTitle>
+
       <DialogContent>
         <DialogContentText id="alert-dialog-description" component="div">
           {children}

@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
 import useTheme from '@mui/material/styles/useTheme';
-import {FileWithPreview, MyDropZone} from 'components/MyDropzone';
+import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {ElevatorView, ElevatorRequestBody} from 'models/elevator';
@@ -21,6 +21,7 @@ interface Props {
 }
 
 export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
+  const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
   const theme = useTheme();
   const {user} = useUserSession();
@@ -82,8 +83,6 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
       />
     </Box>
   );
-
-  const {t} = useTranslation();
 
   return (
     <InfoCard

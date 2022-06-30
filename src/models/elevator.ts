@@ -18,6 +18,7 @@ import {EmployeesSimpleView} from './employee';
 import {
   PropertyContactPersonSimpleView,
   PropertyOwnerSimpleView,
+  PropertyOwnerView,
 } from './propertyManager';
 
 export enum ElevatorCommentType {
@@ -51,12 +52,12 @@ export enum ElevatorCategory {
 
 export interface ElevatorQueryParams {
   id: string;
-  lastVisitDateEnd: string;
-  lastVisitDateStart: string;
+  lastVisitDateEnd: any;
+  lastVisitDateStart: any;
   neLat: number;
   neLng: number;
-  nextVisitDateEnd: string;
-  nextVisitDateStart: string;
+  nextVisitDateEnd: any;
+  nextVisitDateStart: any;
   order: Order;
   orderBy: ServiceOrderOrderField;
   LAST_VISIT_DATE: string;
@@ -141,7 +142,7 @@ export interface ElevatorView {
   contracts: ContractSimpleView[];
   availability: number;
   address: Address;
-  propertyOwner: PropertyOwnerSimpleView;
+  propertyOwner: PropertyOwnerView;
   propertyManager: PropertyContactPersonSimpleView;
   properties: ElevatorProperty[];
   lastVisitDate: string;
@@ -158,7 +159,7 @@ export interface ElevatorView {
 
 export interface ElevatorSimpleView {
   id: string;
-  propertyOwner: PropertyOwnerSimpleView;
+  propertyOwner: PropertyOwnerView;
   properties?: ElevatorProperty[];
   number: string;
   model: string;

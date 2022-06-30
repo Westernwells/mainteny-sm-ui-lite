@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {FC, useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {Widget} from 'components/Widget';
@@ -7,42 +7,42 @@ import {
   columns,
   makeRows,
 } from 'pages/CustomerDetails/Tabs/CustomerUnitDataGrid';
-import {useAllElevators} from 'hooks/reactQuery/useElevator';
-import {ElevatorView} from 'models/elevator';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {makePage} from 'utils/paging-utils';
 import {TabContentContainer} from 'components/TabContentContainer';
 import {EmptySection} from 'components/EmptySection';
 import {useNavigate} from 'react-router';
+import {ContractElevatorSimpleView} from 'models/contract';
+import {ElevatorView} from 'models/elevator';
+import {Resource} from 'models/misc';
 
-export const UnitsTab = () => {
+interface Props {
+  elevators: ContractElevatorSimpleView[];
+}
+/*eslint-disable*/
+export const UnitsTab: FC<Props> = ({elevators}) => {
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
   const [page, setPage] = useState(makePage(0, 25)); // TODO: implement paging
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
-  const {
-    data: elevator = createEmptyResource<ElevatorView>(10),
-    isFetching,
-    isLoading,
-  } = useAllElevators({
-    query: search,
-    pageIndex: page.pageIndex,
-    pageSize: page.pageSize,
-  });
 
   useEffect(() => {
-    if (elevator.data) {
-      setRows(makeRows(elevator));
+    if (elevators.length) {
+      setRows(
+        makeRows({
+          data: elevators.map((elevator) => ({...elevator.elevator})),
+        } as Resource<ElevatorView>),
+      );
     } else {
       setRows([]);
     }
-  }, [elevator]);
+  }, [elevators]);
 
   useEffect(() => {
-    if (elevator) {
-      setPageCount(Math.ceil(elevator.total / page.pageSize));
+    if (elevators) {
+      setPageCount(Math.ceil(elevators.length / page.pageSize));
     }
-  }, [elevator, page]);
+  }, [elevators, page]);
 
   const renderWidget = () => (
     <Box>
@@ -57,7 +57,7 @@ export const UnitsTab = () => {
     <TabContentContainer>
       {renderWidget()}
       <DataGridLayout
-        hideFooter={!isFetching && !isLoading && pageCount <= 1}
+        hideFooter={pageCount <= 1}
         noRowsEmptySection={
           <EmptySection
             illustration="clipboard"
@@ -80,7 +80,6 @@ export const UnitsTab = () => {
             showActionBtn
           />
         }
-        loading={isFetching || isLoading}
         rows={rows}
         columns={columns}
         pageSize={page.pageSize}

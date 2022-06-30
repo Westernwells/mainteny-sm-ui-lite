@@ -21,7 +21,7 @@ const NewContractTerms: FC<Props> = ({formik}) => (
           placeholder: '4',
           type: 'number',
           required: true,
-          value: Number(formik.values.visitsNumber || 0).toString(),
+          value: formik.values.visitsNumber,
           error: !!(formik.touched.visitsNumber && formik.errors.visitsNumber),
           onBlur: formik.handleBlur,
           onChange: formik.handleChange,
@@ -42,6 +42,7 @@ const NewContractTerms: FC<Props> = ({formik}) => (
           onChange: formik.handleChange,
           error: !!(formik.touched.invoiceDue && formik.errors.invoiceDue),
           name: 'invoiceDue',
+          placeholder: 'Yearly',
         }}
         required
       />
@@ -49,12 +50,12 @@ const NewContractTerms: FC<Props> = ({formik}) => (
     <Grid item xs={4}>
       <FormInput
         props={{
-          label: 'Yearly Contract Price (excl. VAT, in €)*',
+          label: 'Yearly Contract Price (excl. VAT, in €)',
           name: 'netAmount',
           placeholder: '1500',
           type: 'number',
           required: true,
-          value: Number(formik.values.netAmount).toString(),
+          value: formik.values.netAmount,
           error: !!(formik.touched.netAmount && formik.errors.netAmount),
           onBlur: formik.handleBlur,
           onChange: formik.handleChange,
@@ -71,7 +72,7 @@ const NewContractTerms: FC<Props> = ({formik}) => (
           name: 'renewalTerms',
           placeholder: '12',
           type: 'number',
-          value: Number(formik.values.renewalTerms).toString(),
+          value: formik.values.renewalTerms,
           error: !!(formik.touched.renewalTerms && formik.errors.renewalTerms),
           onBlur: formik.handleBlur,
           onChange: formik.handleChange,
@@ -85,7 +86,7 @@ const NewContractTerms: FC<Props> = ({formik}) => (
           name: 'spendingLimit',
           placeholder: '1500',
           type: 'number',
-          value: Number(formik.values.spendingLimit).toString(),
+          value: formik.values.spendingLimit,
           error: !!(
             formik.touched.spendingLimit && formik.errors.spendingLimit
           ),
@@ -104,7 +105,7 @@ const NewContractTerms: FC<Props> = ({formik}) => (
           name: 'hourlyRate',
           placeholder: '60',
           type: 'number',
-          value: Number(formik.values.hourlyRate).toString(),
+          value: formik.values.hourlyRate,
           error: !!(formik.touched.hourlyRate && formik.errors.hourlyRate),
           onBlur: formik.handleBlur,
           onChange: formik.handleChange,
@@ -121,9 +122,7 @@ const NewContractTerms: FC<Props> = ({formik}) => (
           name: 'annualPriceAdjustmentPercentage',
           placeholder: '2.5',
           type: 'number',
-          value: Number(
-            formik.values.annualPriceAdjustmentPercentage,
-          ).toString(),
+          value: formik.values.annualPriceAdjustmentPercentage,
           error: !!(
             formik.touched.annualPriceAdjustmentPercentage &&
             formik.errors.annualPriceAdjustmentPercentage
@@ -140,7 +139,7 @@ const NewContractTerms: FC<Props> = ({formik}) => (
           name: 'serviceLevelAgreement',
           placeholder: '120',
           type: 'number',
-          value: Number(formik.values.serviceLevelAgreement).toString(),
+          value: formik.values.serviceLevelAgreement,
           error: !!(
             formik.touched.serviceLevelAgreement &&
             formik.errors.serviceLevelAgreement

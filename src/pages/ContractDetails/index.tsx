@@ -34,7 +34,6 @@ export const ContractDetails = () => {
       ? [contractDetails?.additionalInfo?.documents[0]?.uri]
       : [],
   );
-  /*eslint-disable*/
   return (
     <Tabs
       tabItems={tabItems}
@@ -62,7 +61,7 @@ export const ContractDetails = () => {
         />
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
-        <UnitsTab />
+        <UnitsTab elevators={contractDetails?.elevators || []} />
       </TabsBody>
     </Tabs>
   );

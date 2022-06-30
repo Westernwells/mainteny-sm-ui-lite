@@ -1,7 +1,6 @@
 import {Grid} from '@mui/material';
 import {CustomerAutoComplete} from 'components/CustomerAutocomplete';
 import {DatePicker} from 'components/DatePicker';
-import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
 import {ContractBasicInfoFormModel, ContractType} from 'models/contract';
@@ -70,7 +69,7 @@ const NewContractBasicInfo: FC<Props> = ({
                 : '',
             error: !!(formik.touched.startDate && formik.errors.startDate),
           }}
-          defaultDate={new Date(formik.values.startDate || Date.now())}
+          defaultDate={formik.values.startDate}
         />
       </Grid>
       <Grid item xs={4}>
@@ -87,7 +86,7 @@ const NewContractBasicInfo: FC<Props> = ({
                 : '',
             error: !!(formik.touched.endDate && formik.errors.endDate),
           }}
-          defaultDate={new Date(formik.values.endDate || Date.now())}
+          defaultDate={formik.values.endDate}
         />
       </Grid>
       <Grid item xs={4}>
@@ -105,21 +104,6 @@ const NewContractBasicInfo: FC<Props> = ({
             name: 'contractType',
           }}
           required
-        />
-      </Grid>
-      <Grid item xs={4}>
-        <FormInput
-          props={{
-            label: 'Contract Number',
-            name: 'externalId',
-            placeholder: '454846',
-            type: 'text',
-            required: true,
-            value: formik.values.externalId,
-            error: !!(formik.touched.externalId && formik.errors.externalId),
-            onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
-          }}
         />
       </Grid>
     </Grid>

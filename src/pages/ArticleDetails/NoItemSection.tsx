@@ -1,19 +1,21 @@
 import {EmptySection} from '../../components/EmptySection';
 
 export const NoItemSection = ({
-  placeholder,
+  label,
+  buttonLabel,
   action,
 }: {
-  placeholder: string;
+  label: string;
+  buttonLabel: string;
   action?: () => void;
 }) => (
   <EmptySection
     illustration="clipboard"
     size="tiny"
     containerStyle={{m: 'auto', width: '60%'}}
-    label={`No ${placeholder} yet. Please click the button below to add!`}
+    label={label}
     showActionBtn
-    btnLabel={`+ Add ${placeholder}`}
+    btnLabel={buttonLabel}
     btnAction={action}
   />
 );

@@ -21,7 +21,6 @@ interface Props {
 
 export const UnitsTab = ({customerId}: Props) => {
   const [page, setPage] = useState(makePage(0, 25));
-  // const [search, setSearch] = useState('');
   const totalUnitsRef = useRef(0);
   const [status, setStatus] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');

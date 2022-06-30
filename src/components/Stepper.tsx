@@ -34,6 +34,7 @@ export const Stepper = ({
   stepperWidth,
   submitting,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
   const handleNext = () => {
@@ -53,8 +54,6 @@ export const Stepper = ({
   useEffect(() => {
     setActiveStep(initialActiveStep);
   }, [initialActiveStep]);
-
-  const {t} = useTranslation();
 
   return (
     <Box sx={{...containerStyles}}>

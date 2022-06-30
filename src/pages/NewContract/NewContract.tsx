@@ -1,5 +1,5 @@
 import {FlexContainer} from 'components/FlexContainer';
-import {FileWithPreview} from 'components/MyDropzone';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {PageCard} from 'components/PageCard';
 import {Stepper} from 'components/Stepper';
 import {useFormik} from 'formik';
@@ -14,6 +14,7 @@ import {
 import {PropertyOwnerView} from 'models/propertyManager';
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router';
+import {toRestDate} from 'utils/datetime';
 import {convertToMacro} from 'utils/utils';
 import * as Yup from 'yup';
 import NewContractBasicInfo from './NewContractBasicInfo';
@@ -29,27 +30,39 @@ const steps = [
 ];
 
 const validationSchemaBasicInfo = Yup.object().shape({
-  propertyOwnerId: Yup.string().nullable().required('Customer is required'),
-  contractType: Yup.string().nullable().required('Contract Type is required'),
-  contractNumber: Yup.number()
+  propertyOwnerId: Yup.string()
+    .transform((id) => (id.length > 0 ? id : null))
+    .required('Customer is required'),
+  contractType: Yup.string().required('Contract Type is required'),
+  startDate: Yup.date().nullable().required('Start Date is required'),
+  endDate: Yup.date()
+    .default(null)
+    .when('startDate', (startDate, schema) => {
+      if (startDate) {
+        const dayAfter = new Date(startDate.getTime() + 86400000);
+
+        return schema.min(dayAfter, 'End date has to be after than start date');
+      }
+
+      return schema;
+    })
     .nullable()
-    .min(0, 'Should be higher or equal to 0'),
-  externalId: Yup.string().nullable().required('Contract Number is required'),
+    .required('End Date is required'),
 });
 
 const validationSchemaContractTerms = Yup.object().shape({
   visitsNumber: Yup.number()
     .nullable()
-    .required('Customer is required')
-    .min(1, 'Should be higher than 0'),
+    .min(1, 'Should be higher than 0')
+    .required('Customer is required'),
   invoiceDue: Yup.string()
     .nullable()
-    .required('Customer is required')
-    .min(1, 'Input should be filled out'),
+    .min(1, 'Input should be filled out')
+    .required('Customer is required'),
   netAmount: Yup.number()
     .nullable()
-    .required('Customer is required')
-    .min(1, 'Should be higher than 0'),
+    .min(1, 'Should be higher than 0')
+    .required('Customer is required'),
   renewalTerms: Yup.number().min(0, 'Should be higher than 0'),
   spendingLimit: Yup.number().min(0, 'Should be higher or equals to 0'),
   hourlyRate: Yup.number().min(0, 'Should be higher or equals to 0'),
@@ -84,13 +97,13 @@ const NewContract = () => {
   const formikBasicInfo = useFormik<ContractBasicInfoFormModel>({
     initialValues: {
       propertyOwnerId: '',
-      startDate: '',
-      endDate: '',
+      startDate: null,
+      endDate: null,
       contractType: '',
-      externalId: '',
     },
-    onSubmit: () => {},
     validateOnMount: true,
+
+    onSubmit: () => {},
     validationSchema: validationSchemaBasicInfo,
   });
 
@@ -103,19 +116,18 @@ const NewContract = () => {
 
   const formikContractTerms = useFormik<ContractTermsFormModal>({
     initialValues: {
-      visitsNumber: 0,
+      visitsNumber: '',
       invoiceDue: '',
-      netAmount: 0,
-      renewalTerms: 0,
-      spendingLimit: 0,
-      hourlyRate: 0,
-      annualPriceAdjustmentPercentage: 0,
-      serviceLevelAgreement: 0,
+      netAmount: '',
+      renewalTerms: '',
+      spendingLimit: '',
+      hourlyRate: '',
+      annualPriceAdjustmentPercentage: '',
+      serviceLevelAgreement: '',
     },
     onSubmit: () => {},
-    validateOnChange: true,
-    validateOnMount: true,
     validationSchema: validationSchemaContractTerms,
+    validateOnMount: true,
   });
 
   const formikDocuments = useFormik<{documents: FileWithPreview[]}>({
@@ -169,25 +181,24 @@ const NewContract = () => {
         [],
       ),
       elevators: formikUnits.values.elevators,
-      endDate: formikBasicInfo.values.endDate,
-      hourlyRate: formikContractTerms.values.hourlyRate,
+      endDate: toRestDate(formikBasicInfo.values.endDate!),
+      hourlyRate: +formikContractTerms.values.hourlyRate,
       invoiceDue: convertToMacro(formikContractTerms.values.invoiceDue),
       price: {
         currency: 'EUR',
-        netAmount: formikContractTerms.values.netAmount,
+        netAmount: +formikContractTerms.values.netAmount,
         percentageVat:
-          formikContractTerms.values.annualPriceAdjustmentPercentage,
+          +formikContractTerms.values.annualPriceAdjustmentPercentage,
       },
-      sla: formikContractTerms.values.serviceLevelAgreement,
+      sla: +formikContractTerms.values.serviceLevelAgreement,
       propertyOwnerId: formikBasicInfo.values.propertyOwnerId,
-      renewalTerms: formikContractTerms.values.renewalTerms,
+      renewalTerms: +formikContractTerms.values.renewalTerms,
       serviceCompanyId,
-      spendingLimit: formikContractTerms.values.spendingLimit,
-      startDate: formikBasicInfo.values.startDate,
+      spendingLimit: +formikContractTerms.values.spendingLimit,
+      startDate: toRestDate(formikBasicInfo.values.startDate!),
       type: convertToMacro(formikBasicInfo.values.contractType),
-      visitsNumber: formikContractTerms.values.visitsNumber,
+      visitsNumber: +formikContractTerms.values.visitsNumber,
       timePreference: [],
-      externalId: formikBasicInfo.values.externalId,
     };
 
     await createContract(newContract);

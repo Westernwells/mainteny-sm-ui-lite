@@ -46,7 +46,7 @@ export const employeeDetailSchema = (employee: UserView) => {
     },
     employeeId: {
       label: 'Employee ID',
-      value: employee.userAccount.id,
+      value: employee.userData.externalId || '-',
       icon: <Grid3x3Icon sx={{color: theme.palette.info.dark}} />,
     },
     assignedOrderTypes: {

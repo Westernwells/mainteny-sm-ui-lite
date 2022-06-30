@@ -44,7 +44,7 @@ export const PriorityTechnicianForm = ({
         props={{
           size: 'small',
           placeholder: 'Enter priority number',
-          label: t('Priority'),
+          label: 'Priority',
           name: 'priority',
           value: formik.values.priority,
           onChange: formik.handleChange,
@@ -55,6 +55,8 @@ export const PriorityTechnicianForm = ({
           sx: {
             mt: '0.5em',
           },
+          type: 'number',
+          inputProps: {min: 0},
         }}
       />
     </Box>

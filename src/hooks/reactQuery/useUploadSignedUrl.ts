@@ -1,4 +1,4 @@
-import {FileWithPreview} from 'components/MyDropzone';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useSnackbar} from 'notistack';
 import {useMutation, useQueryClient} from 'react-query';
 import {queryKeys} from 'reactQuery/constants';

@@ -157,7 +157,7 @@ export const DataGridLayout = ({
           illustration="clipboard"
           size="tiny"
           containerStyle={{my: 'auto'}}
-          label="There are no rows for the applied filters!"
+          label="There are no entires for the applied filters!"
         />
       )
     );

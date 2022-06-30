@@ -4,7 +4,16 @@ import {Chip} from '@mui/material';
 interface Props {
   partyType: string;
   color: string;
+  maxChars?: number;
+  length?: 'short' | 'medium' | 'long' | 'auto';
 }
+
+const statusWidth = {
+  auto: 'auto',
+  short: '6rem',
+  medium: '8rem',
+  long: '10rem',
+};
 
 const statusColor: Record<string, {[key: string]: string}> = {
   primary: {
@@ -17,14 +26,22 @@ const statusColor: Record<string, {[key: string]: string}> = {
   },
 };
 
-const PartiesChipStatus: FC<Props> = ({color, partyType}) => (
+const PartiesChipStatus: FC<Props> = ({
+  color,
+  partyType,
+  maxChars,
+  length = 'auto',
+}) => (
   <Chip
     label={partyType}
     sx={{
       backgroundColor: statusColor[color].bg,
       color: statusColor[color].color,
+      maxWidth: maxChars ? `calc(${maxChars}ch + .5em)` : statusWidth[length],
+      width: maxChars ? '100%' : 'auto',
     }}
     variant="filled"
+    size="medium"
   />
 );
 

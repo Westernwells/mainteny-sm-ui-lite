@@ -10,6 +10,13 @@ export enum QuotationStatus {
   SENT_TO_CLIENT = 'SENT_TO_CLIENT',
 }
 
+export enum QuotationStatusView {
+  ACCEPTED = 'ACCEPTED',
+  DRAFT = 'DRAFT',
+  REJECTED = 'REJECTED',
+  SENT = 'SENT_TO_CLIENT',
+}
+
 export type QuotationAdditionalInfo = {
   [key: string | number]: any;
 };
@@ -56,6 +63,8 @@ export interface QueryQuotationParams {
   pageSize: number;
   query: string;
   status: QuotationStatus[];
+  createdDateStart?: string;
+  createdDateEnd?: string;
 }
 
 export interface QuotationFilters {}

@@ -56,7 +56,7 @@ export const EditEmployee = ({employee, openDialog, onClose}: Props) => {
           }))
         : [],
     serviceCompanyId: user?.userAccount.serviceCompany.id,
-    employeeId: employee.userData.employeeId,
+    employeeId: employee.userData.externalId,
     team: employee.userData.team,
   };
 

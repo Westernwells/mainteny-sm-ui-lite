@@ -5,6 +5,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import {useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {useNavigate} from 'react-router';
+import {useTranslation} from 'react-i18next';
 import {
   useArticleDetails,
   useDeleteArticle,
@@ -25,9 +26,10 @@ export const ArticleOverView = () => {
   const [deleteArticleConfirm, setDeleteArticleConfirm] = useState(false);
   const theme = useTheme();
   const navigate = useNavigate();
+  const {t} = useTranslation();
 
   const {mutateAsync: deleteArticle} = useDeleteArticle(
-    'Article deleted successfully',
+    t('Article is deleted successfully'),
   );
 
   const deleteArticleDialog = () => {
@@ -48,7 +50,7 @@ export const ArticleOverView = () => {
     <>
       <Box display="flex" justifyContent="flex-end" mb="1.2rem">
         <Button
-          label="Delete"
+          label={t('Delete')}
           buttonProps={{
             onClick: () => deleteArticleDialog(),
             variant: 'outlined',
@@ -86,8 +88,8 @@ export const ArticleOverView = () => {
         open={deleteArticleConfirm}
         onConfirm={() => onDelete()}
         onClose={() => setDeleteArticleConfirm(false)}
-        title="Delete"
-        content="Do you want to delete this article?"
+        title={t('Delete')}
+        content={t('Do you want to delete this article?')}
       />
     </>
   );

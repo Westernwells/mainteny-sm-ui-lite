@@ -6,6 +6,7 @@ import {
   useLocation,
   useNavigate,
 } from 'react-router-dom';
+import {useTranslation} from 'react-i18next';
 import {PageLayout} from 'components/PageLayout';
 import ErrorBoundary from 'components/ErrorBoundary';
 import {Login} from 'pages/Login';
@@ -45,6 +46,7 @@ import {NewArticle} from '../pages/ArticleDetails/NewArticle';
 export const Router = () => {
   const titleTail = 'Service Manager Portal';
   const {language} = i18n;
+  const {t} = useTranslation();
 
   if (language) {
     axiosClient.defaults.headers.common.language = languageMap[language];
@@ -233,7 +235,7 @@ export const Router = () => {
                 <PageLayout
                   showBackAction
                   pageScrollable
-                  backBtnLabel="Invoice details">
+                  backBtnLabel="Invoice Details">
                   <InvoiceDetails />
                 </PageLayout>
               </>
@@ -387,7 +389,10 @@ export const Router = () => {
                 <Helmet>
                   <title>{`Service Orders - ${titleTail}`}</title>
                 </Helmet>
-                <PageLayout backBtnLabel="Order Details" showBackAction>
+                <PageLayout
+                  pageScrollable
+                  backBtnLabel="Order Details"
+                  showBackAction>
                   <ServiceOrderDetails />
                 </PageLayout>
               </>
@@ -433,7 +438,7 @@ export const Router = () => {
                 </Helmet>
                 <PageLayout
                   pageScrollable
-                  backBtnLabel="Article Details"
+                  backBtnLabel={t('Article Details')}
                   showBackAction>
                   <ArticleOverView />
                 </PageLayout>
@@ -448,7 +453,7 @@ export const Router = () => {
                 <Helmet>
                   <title>{`New Article - ${titleTail}`}</title>
                 </Helmet>
-                <PageLayout backBtnLabel="New Article" showBackAction>
+                <PageLayout backBtnLabel={t('New Article')} showBackAction>
                   <NewArticle />
                 </PageLayout>
               </>

@@ -48,6 +48,7 @@ declare module '@mui/material/styles' {
     state: {
       hover: string;
       ratingActive: string;
+      scheduleWarningColor: string;
       aubergine: string;
     };
   }

@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -10,10 +11,11 @@ import {PageCard} from 'components/PageCard';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {PDFContainer} from 'components/PDFContainer';
 import {FormLabel} from 'components/form/FormLabel';
+import {EmptySection} from 'components/EmptySection';
 import {InvoiceStatus, InvoiceView} from 'models/invoice';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {PdfGenerationStatus} from 'models/misc';
-import {formatCurrency} from 'utils/currency';
+import {formatNetAmount} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
@@ -30,7 +32,7 @@ interface Props {
 }
 
 export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
-  const [isDrawerOpen] = useState(true);
+  const {t} = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {mutate: markAsPaid} = useInvoicePaymentStatus();
 
@@ -54,9 +56,10 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
             label="Download Invoice"
             buttonProps={{
               variant: 'outlined',
-              onClick: () =>
-                window.open(`${Object.values(downloadUrl)[0]}`, '_blank'),
-
+              onClick: () => window.open(`${downloadUrl}`, '_blank'),
+              disabled:
+                invoice!.additionalInfo.pdfGenerationStatus !==
+                PdfGenerationStatus.DONE,
               startIcon: <FileDownloadIcon color="primary" />,
             }}
           />
@@ -68,25 +71,28 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
             containerStyles={{mb: '1.5em'}}
             contentContainerStyles={{display: 'flex', gap: '1.5em'}}>
             <Box>
-              <FormLabel text="Quotation Number" sx={{color: 'text.main'}} />
+              <FormLabel text="Invoice Number" sx={{color: 'text.main'}} />
               <Typography variant="subtitle1">{invoice.number}</Typography>
             </Box>
 
             <Box>
-              <FormLabel text="Total" sx={{color: 'text.main'}} />
+              <FormLabel text="Total (excl VAT)" sx={{color: 'text.main'}} />
               <Typography variant="subtitle1">
-                {formatCurrency(
-                  invoice.totalAmount.grossAmount /
-                    10 ** invoice.totalAmount.fractionDigits!,
-                  {currency: invoice.totalAmount.currency},
-                )}
+                {formatNetAmount(invoice.totalAmount)}
               </Typography>
             </Box>
           </PageCard>
           {invoice!.additionalInfo.pdfGenerationStatus ===
             PdfGenerationStatus.DONE && downloadUrl.length ? (
             <PDFContainer url={downloadUrl} />
-          ) : null}
+          ) : (
+            <PageCard>
+              <EmptySection
+                label="The PDF generation is in progress, please try again after sometime. We apologize for the inconvenience."
+                size="small"
+              />
+            </PageCard>
+          )}
         </Grid>
         <Grid item xs sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
           <PageCard
@@ -113,7 +119,7 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
                 {invoice.serviceOrder.number}
               </Typography>
               <Typography variant="caption" sx={{color: 'text.secondary'}}>
-                {`Created on ${formatDate(
+                {`${t('Created on')} ${formatDate(
                   invoice.serviceOrder.meta.createdAt,
                 )}`}
               </Typography>
@@ -129,28 +135,6 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
               </Box>
               <Typography variant="caption">
                 {invoice.serviceOrder.description}
-              </Typography>
-            </Box>
-          </PageCard>
-
-          <PageCard
-            headerLabel="Work Report"
-            contentContainerStyles={{
-              display: 'flex',
-              gap: '1em',
-              flexDirection: 'column',
-            }}>
-            <Box>
-              <Typography>
-                10.06.2020: Secured lift and counterweight for disconnection of
-                engine and brake. Disassembled engine with brake and delivered
-                it to a workshop in Råde.
-              </Typography>
-              <Typography mt="1em">
-                22.06.2020: Picked up engine at workshop. Mounted motor with
-                brake and removed securing of lift and counterweight. Refilled
-                oil on the gear unit between the hoist and the shaft for
-                chains....
               </Typography>
             </Box>
           </PageCard>
@@ -170,13 +154,17 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
       />
 
       <BottomDrawer
-        isOpen={isDrawerOpen}
+        isOpen={invoice.status !== InvoiceStatus.PAID}
         primaryButtonLabel={
-          invoice.status === InvoiceStatus.PAID ? 'Download' : 'Mark as paid'
+          invoice.status === InvoiceStatus.PAID ? 'Download' : `Mark Paid`
         }
         primaryButtonAction={() => {
-          if (invoice.status === InvoiceStatus.PAID && invoice.id) {
-            console.log('DOWNLOAD INVOICE');
+          if (
+            invoice.status === InvoiceStatus.PAID &&
+            invoice.id &&
+            downloadUrl
+          ) {
+            window.open(`${downloadUrl}`, '_blank');
           } else {
             setIsDialogOpen(true);
           }
@@ -185,14 +173,14 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
           invoice.status !== InvoiceStatus.PAID
             ? [
                 {
-                  label: 'Resend',
+                  label: t('Resend'),
                   icon: <ReplayIcon />,
                   onClick: () => {},
                 },
               ]
             : []
         }
-        isValid
+        isValid={!!downloadUrl.length}
       />
     </Box>
   );

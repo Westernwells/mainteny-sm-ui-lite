@@ -1,4 +1,5 @@
 import {useEffect} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Box} from '@mui/system';
 import Grid from '@mui/material/Grid';
 import {useFormik} from 'formik';
@@ -24,6 +25,7 @@ export const AdditionalInformationEmployeeForm = ({
   initialValues,
   roles,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
 
   const formik = useFormik<AdditionalInformationEmployeeFormModel>({
@@ -49,10 +51,13 @@ export const AdditionalInformationEmployeeForm = ({
         <Grid container spacing={2}>
           <Grid item md={12}>
             {roles.includes(Role.TECHNICIAN) && (
-              <Box sx={{marginBottom: '20px'}}>
+              <Box sx={{marginBottom: '1.250em'}}>
                 <Typography
-                  sx={{color: theme.palette.text.primary, marginBottom: '5px'}}>
-                  Order Types
+                  sx={{
+                    color: theme.palette.text.primary,
+                    marginBottom: '0.313em',
+                  }}>
+                  {t('Order Types')}
                 </Typography>
                 <SelectServiceOrderTypes
                   values={formik.values}
@@ -61,8 +66,8 @@ export const AdditionalInformationEmployeeForm = ({
               </Box>
             )}
             <Typography
-              sx={{color: theme.palette.text.primary, marginBottom: '5px'}}>
-              Shift Time
+              sx={{color: theme.palette.text.primary, marginBottom: '0.313em'}}>
+              {t('Shift Time')}
               <Typography component="span" sx={{color: 'red'}}>
                 *
               </Typography>

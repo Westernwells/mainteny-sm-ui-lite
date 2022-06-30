@@ -26,6 +26,8 @@ export const AddressAutoComplete = ({
   const [address, setAddress] = useState<any>(null);
   const [queryView, setQueryView] = useState(initialValue);
 
+  const {t} = useTranslation();
+
   useEffect(() => {
     if (address !== null) {
       setQueryView(address.formatted_address);
@@ -51,7 +53,6 @@ export const AddressAutoComplete = ({
   const onInputChange = (e: any) => {
     setQueryView(e.target.value);
   };
-  const {t} = useTranslation();
   return (
     <AddressAutocomplete
       id="addressAutoComplete"
@@ -81,7 +82,7 @@ export const AddressAutoComplete = ({
       renderInput={(params) => (
         <FormInput
           props={{
-            label: t('Address'),
+            label: 'Address',
             placeholder: 'Enter a location',
             name: 'address',
             onChange: onInputChange,

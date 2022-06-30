@@ -39,6 +39,7 @@ export const PriorityTechnician = ({
   elevatorId,
   maintainers = [],
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const formik = useFormik<PriorityTechnicianFormModel>({
     initialValues: {
@@ -143,15 +144,13 @@ export const PriorityTechnician = ({
         illustration="clipboard"
         size="tiny"
         containerStyle={{m: 'auto', width: '60%'}}
-        label="No quotations yet. It will appear here once added!"
+        label="No technicians yet. It will appear here once added!"
         showActionBtn
-        btnLabel="+ Add New Article"
+        btnLabel="+ Add New Technician"
         btnAction={() => {}}
       />
     </Box>
   );
-
-  const {t} = useTranslation();
 
   return (
     <InfoCard

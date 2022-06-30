@@ -1,27 +1,8 @@
 import {Client} from './client';
-import {
-  ServiceCompany,
-  ServiceCompanySimpleView,
-  ServiceCompanyView,
-} from './service-company';
-import {
-  Amount,
-  Meta,
-  Order,
-  OrderBy,
-  TimeWindowRecord,
-  TimeWindowType,
-} from './misc';
-import {
-  Elevator,
-  ElevatorSimpleView,
-  ElevatorStatus,
-  ElevatorView,
-} from './elevator';
-import {PropertyOwnerSimpleView, PropertyOwnerView} from './propertyManager';
-import {FileWithPreview} from 'components/MyDropzone';
-import {FileResourceRecord} from './media';
-import {List} from '@mui/material';
+import {ServiceCompany, ServiceCompanySimpleView} from './service-company';
+import {Amount, Meta, Order, TimeWindowRecord, TimeWindowType} from './misc';
+import {Elevator, ElevatorSimpleView, ElevatorView} from './elevator';
+import {PropertyOwnerSimpleView} from './propertyManager';
 import {FileResource} from './media';
 
 export enum ContractStatus {
@@ -234,21 +215,20 @@ export interface ContractRequestBody {
 
 export interface ContractBasicInfoFormModel {
   propertyOwnerId: string;
-  startDate: string;
-  endDate: string;
+  startDate: Date | null;
+  endDate: Date | null;
   contractType: string;
-  externalId: string;
 }
 
 export interface ContractTermsFormModal {
-  visitsNumber: number;
+  visitsNumber: number | string;
   invoiceDue: string;
-  netAmount: number;
-  renewalTerms: number;
-  spendingLimit: number;
-  hourlyRate: number;
-  annualPriceAdjustmentPercentage: number;
-  serviceLevelAgreement: number;
+  netAmount: number | string;
+  renewalTerms: number | string;
+  spendingLimit: number | string;
+  hourlyRate: number | string;
+  annualPriceAdjustmentPercentage: number | string;
+  serviceLevelAgreement: number | string;
 }
 
 export interface ContractUpdateRequest {

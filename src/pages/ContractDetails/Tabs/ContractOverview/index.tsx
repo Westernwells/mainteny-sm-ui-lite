@@ -20,7 +20,7 @@ import {Dialog} from 'components/Dialog';
 
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
-import {FileWithPreview, MyDropZone} from 'components/MyDropzone';
+import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import * as Yup from 'yup';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import {formatCurrency, formatNetAmount} from 'utils/currency';
@@ -213,6 +213,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   '& .MuiCardHeader-root': {
                     pb: 0,
                   },
+                  height: 'calc(100% - 1em)',
                 }}
                 header={
                   <Box sx={headerStyles}>
@@ -228,16 +229,21 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                     contractDetails?.propertyOwner.postalAddress.fullName
                   }
                   phoneNumber={contractDetails?.propertyOwner.contact.phone}
-                  partyType="Contractor"
-                  chipColor="warning"
+                  partyType="CONTRACTOR"
+                  chipStyles={{
+                    chipMaxChars: 15,
+                    chipColor: 'warning',
+                  }}
                 />
                 <ContractParties
                   name={contractDetails?.serviceCompany.name}
-                  occupation="Property manager"
+                  occupation="Property Manager"
                   address=""
                   phoneNumber=""
-                  partyType="Customer"
-                  chipColor="primary"
+                  partyType="CUSTOMER"
+                  chipStyles={{
+                    chipColor: 'primary',
+                  }}
                 />
               </ContractCard>
             </Grid>
@@ -265,7 +271,14 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 }
                 headerAction={() => setOpenDocumentDialog(true)}>
                 {contractDetails?.additionalInfo?.documents?.length ? (
-                  <Box sx={{height: '155px', overflowY: 'auto'}}>
+                  <Box
+                    sx={{
+                      height: '155px',
+                      overflowY: 'auto',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      flexDirection: 'column',
+                    }}>
                     {contractDetails?.additionalInfo?.documents.map(
                       (documnet) => (
                         <Box
@@ -274,7 +287,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                             flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            mb: 2,
+                            mt: 2,
                           }}>
                           <Box
                             sx={{

@@ -12,6 +12,7 @@ import {
   CredentialEmployeeFormModel,
   RoleEmployeeFormModel,
 } from 'models/employee';
+import {getRoles} from 'utils/work-hours-utils';
 import {Role} from 'models/user';
 import {EmployeeAccountData} from './model';
 import {AdditionalInformationEmployeeForm} from './AdditionalInformationEmployeeForm';
@@ -131,7 +132,7 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
   const addNewEmployee = async () => {
     const body: EmployeeAccountData = {
       phone: basicEmployeeFormValues.phone,
-      roles: roleEmployeeFormValues.roles,
+      roles: getRoles(roleEmployeeFormValues.roles[0]),
       serviceOrderTypes:
         additionalInformationEmployeeFormValues.serviceOrderTypes,
       shifts: additionalInformationEmployeeFormValues.shifts,
@@ -159,6 +160,7 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
       disableNextBtn={disableNextBtn}
       initialActiveStep={0}
       getActiveStep={(val) => setActiveStep(val)}
+      stepperWidth="70%"
       steps={steps}
       containerStyles={{
         flexGrow: 1,

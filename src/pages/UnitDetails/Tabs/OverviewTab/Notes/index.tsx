@@ -37,6 +37,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export const Notes = ({elevatorId}: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const formik = useFormik<NotesFormModel>({
     initialValues: {
@@ -134,8 +135,6 @@ export const Notes = ({elevatorId}: Props) => {
       <Typography variant="caption">{elevatorNote.content}</Typography>
     </Box>
   );
-
-  const {t} = useTranslation();
 
   return (
     <InfoCard
