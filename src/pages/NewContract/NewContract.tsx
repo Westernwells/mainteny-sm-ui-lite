@@ -11,6 +11,7 @@ import {
   ContractBasicInfoFormModel,
   ContractTermsFormModal,
 } from 'models/contract';
+import {PropertyOwnerView} from 'models/propertyManager';
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router';
 import {convertToMacro} from 'utils/utils';
@@ -28,9 +29,7 @@ const steps = [
 ];
 
 const validationSchemaBasicInfo = Yup.object().shape({
-  propertyOwner: Yup.object().shape({
-    id: Yup.string().required('Customer is required'),
-  }),
+  propertyOwnerId: Yup.string().nullable().required('Customer is required'),
   contractType: Yup.string().nullable().required('Contract Type is required'),
   contractNumber: Yup.number()
     .nullable()
@@ -65,6 +64,8 @@ const NewContract = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [disableNextBtn, setDisableNextBtn] = useState(false);
 
+  const [customer, setCustomer] = useState<PropertyOwnerView>();
+
   const navigate = useNavigate();
 
   const {user} = useUserSession();
@@ -82,7 +83,7 @@ const NewContract = () => {
 
   const formikBasicInfo = useFormik<ContractBasicInfoFormModel>({
     initialValues: {
-      propertyOwner: null,
+      propertyOwnerId: '',
       startDate: '',
       endDate: '',
       contractType: '',
@@ -178,7 +179,7 @@ const NewContract = () => {
           formikContractTerms.values.annualPriceAdjustmentPercentage,
       },
       sla: formikContractTerms.values.serviceLevelAgreement,
-      propertyOwnerId: formikBasicInfo.values.propertyOwner?.id,
+      propertyOwnerId: formikBasicInfo.values.propertyOwnerId,
       renewalTerms: formikContractTerms.values.renewalTerms,
       serviceCompanyId,
       spendingLimit: formikContractTerms.values.spendingLimit,
@@ -192,7 +193,7 @@ const NewContract = () => {
     await createContract(newContract);
     await uploadFiles({files: formikDocuments.values.documents, uploadPath});
 
-    navigate('/contracts');
+    navigate(`/contracts/details/${contractId}`);
   };
 
   return (
@@ -214,7 +215,11 @@ const NewContract = () => {
         {activeStep === 0 && (
           <FlexContainer containerStyle={{mt: '2em'}}>
             <PageCard headerLabel="Basic Information" minHeight="100%">
-              <NewContractBasicInfo formik={formikBasicInfo} />
+              <NewContractBasicInfo
+                formik={formikBasicInfo}
+                getCustomer={(item) => setCustomer(item)}
+                initialCustomer={customer}
+              />
             </PageCard>
           </FlexContainer>
         )}
@@ -226,7 +231,7 @@ const NewContract = () => {
               contentContainerStyles={{height: '100%'}}>
               <NewContractSelectUnits
                 formik={formikUnits}
-                customerId={formikBasicInfo.values.propertyOwner!.id}
+                customerId={formikBasicInfo.values.propertyOwnerId}
               />
             </PageCard>
           </FlexContainer>

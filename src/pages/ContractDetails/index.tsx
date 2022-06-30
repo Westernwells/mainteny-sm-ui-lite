@@ -28,8 +28,8 @@ export const ContractDetails = () => {
   const {data: contractDetails, isLoading} = useContractDetails(contractId!);
 
   const {data: downloadUrl} = useDownloadUrl(
-    contractDetails?.additionalInfo?.documents
-      ? [contractDetails?.additionalInfo?.documents[0]?.uri || '']
+    contractDetails?.additionalInfo?.documents?.length
+      ? [contractDetails?.additionalInfo?.documents[0]?.uri]
       : [],
   );
   /*eslint-disable*/
@@ -43,7 +43,9 @@ export const ContractDetails = () => {
       actionBtnVariant="outlined"
       actionButtonIcon={<FileDownloadIcon color="primary" sx={{}} />}
       btnOnClick={() => {
-        window.open(Object.values(downloadUrl!)[0], '_blank');
+        if (downloadUrl && Object.values(downloadUrl).length) {
+          window.open(Object.values(downloadUrl!)[0], '_blank');
+        }
       }}>
       <TabsBody value={tabValue} index={0}>
         <ContractOverview

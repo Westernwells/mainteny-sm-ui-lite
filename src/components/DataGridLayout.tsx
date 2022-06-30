@@ -223,7 +223,6 @@ export const DataGridLayout = ({
           '& .MuiDataGrid-row': {
             background: 'white',
             cursor: 'pointer',
-            marginY: 2,
           },
           '& .MuiDataGrid-columnHeaders': {
             background: 'white',

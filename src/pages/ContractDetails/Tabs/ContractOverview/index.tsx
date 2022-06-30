@@ -23,7 +23,7 @@ import {EmptySection} from 'components/EmptySection';
 import {FileWithPreview, MyDropZone} from 'components/MyDropzone';
 import * as Yup from 'yup';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
-import {formatCurrency} from 'utils/currency';
+import {formatCurrency, formatNetAmount} from 'utils/currency';
 import {convertToMacro, convertToText} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
@@ -179,15 +179,9 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             headerActionIcon={<EditIcon />}>
             <ContractBasic
               numberOfVisits={contractDetails?.visitsNumber}
-              costPerYear={formatCurrency(
-                contractDetails &&
-                  contractDetails.additionalInfo?.price?.netAmount
-                  ? contractDetails.additionalInfo.price.netAmount
-                  : 0,
-                {
-                  currency: contractDetails?.currency || 'EUR',
-                },
-              )}
+              costPerYear={
+                formatNetAmount(contractDetails.additionalInfo?.price) || '-'
+              }
               spendingLimit={formatCurrency(
                 contractDetails ? contractDetails.spendingLimit : 0,
                 {

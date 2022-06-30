@@ -233,7 +233,7 @@ export interface ContractRequestBody {
 }
 
 export interface ContractBasicInfoFormModel {
-  propertyOwner: PropertyOwnerView | null;
+  propertyOwnerId: string;
   startDate: string;
   endDate: string;
   contractType: string;

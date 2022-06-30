@@ -13,7 +13,7 @@ import {ResetPassword} from 'pages/ResetPassword';
 import {MyUnits} from 'pages/Units';
 import {UnitsDetail} from 'pages/UnitDetails';
 import {Contracts} from 'pages/Contracts';
-import NewContract from 'pages/Contracts/NewContract';
+import NewContract from 'pages/NewContract/NewContract';
 import {Customer} from 'pages/Customers';
 import {ContractDetails} from 'pages/ContractDetails';
 import {CustomerDetails} from 'pages/CustomerDetails';
@@ -142,10 +142,7 @@ export const Router = () => {
                 <Helmet>
                   <title>{`New Contract - ${titleTail}`}</title>
                 </Helmet>
-                <PageLayout
-                  pageScrollable
-                  backBtnLabel="New Contract"
-                  showBackAction>
+                <PageLayout backBtnLabel="New Contract" showBackAction>
                   <NewContract />
                 </PageLayout>
               </>
