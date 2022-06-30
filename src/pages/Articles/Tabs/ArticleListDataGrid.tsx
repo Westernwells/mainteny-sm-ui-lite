@@ -272,6 +272,7 @@ export const ArticleListDataGrid = () => {
         rows={rows}
         columns={columns}
         loading={isFetching}
+        scrollToTop={query}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
         pageCount={pageCount}

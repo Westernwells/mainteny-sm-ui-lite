@@ -159,6 +159,7 @@ export const Employees = () => {
         rows={rows}
         columns={columns}
         loading={isFetching}
+        scrollToTop={search}
         hideFooter={pageCount <= 1}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}

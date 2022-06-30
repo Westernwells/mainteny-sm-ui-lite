@@ -120,6 +120,7 @@ export const ContractsWidget = ({
             height={320}
             rows={rows}
             loading={isFetching}
+            scrollToTop={contractQuery}
             columns={columns}
             isWidget
             containerStyle={{
