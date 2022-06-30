@@ -138,28 +138,6 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
               </Typography>
             </Box>
           </PageCard>
-
-          <PageCard
-            headerLabel="Work Report"
-            contentContainerStyles={{
-              display: 'flex',
-              gap: '1em',
-              flexDirection: 'column',
-            }}>
-            <Box>
-              <Typography>
-                10.06.2020: Secured lift and counterweight for disconnection of
-                engine and brake. Disassembled engine with brake and delivered
-                it to a workshop in Råde.
-              </Typography>
-              <Typography mt="1em">
-                22.06.2020: Picked up engine at workshop. Mounted motor with
-                brake and removed securing of lift and counterweight. Refilled
-                oil on the gear unit between the hoist and the shaft for
-                chains....
-              </Typography>
-            </Box>
-          </PageCard>
         </Grid>
       </Grid>
 
@@ -178,7 +156,7 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
       <BottomDrawer
         isOpen={invoice.status !== InvoiceStatus.PAID}
         primaryButtonLabel={
-          invoice.status === InvoiceStatus.PAID ? 'Download' : 'Mark as paid'
+          invoice.status === InvoiceStatus.PAID ? 'Download' : `Mark Paid`
         }
         primaryButtonAction={() => {
           if (
