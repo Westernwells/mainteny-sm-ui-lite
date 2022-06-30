@@ -19,7 +19,10 @@ import {formatNetAmount} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
-import {useInvoicePaymentStatus} from 'hooks/reactQuery/useInvoice';
+import {
+  useInvoicePaymentStatus,
+  usePublishInvoice,
+} from 'hooks/reactQuery/useInvoice';
 import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
@@ -34,6 +37,7 @@ interface Props {
 export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
   const {t} = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const {mutate: publishInvoice} = usePublishInvoice();
   const {mutate: markAsPaid} = useInvoicePaymentStatus();
 
   return (
@@ -175,7 +179,9 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
                 {
                   label: t('Resend'),
                   icon: <ReplayIcon />,
-                  onClick: () => {},
+                  onClick: () => {
+                    if (invoice.id) publishInvoice(invoice.id);
+                  },
                 },
               ]
             : []
