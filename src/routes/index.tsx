@@ -192,7 +192,7 @@ export const Router = () => {
                 <PageLayout
                   showBackAction
                   pageScrollable
-                  backBtnLabel="Invoice details">
+                  backBtnLabel="Invoice Details">
                   <InvoiceDetails />
                 </PageLayout>
               </>
