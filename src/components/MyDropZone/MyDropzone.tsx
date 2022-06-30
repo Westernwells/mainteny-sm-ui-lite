@@ -1,18 +1,12 @@
-/* eslint-disable */
 import Box from '@mui/material/Box';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
+import {CheckCircleRounded} from '@mui/icons-material';
 import {useEffect, useRef, useState} from 'react';
 import {FileWithPath, useDropzone, FileRejection} from 'react-dropzone';
 import useTheme from '@mui/material/styles/useTheme';
-import IconButton from '@mui/material/IconButton';
-import CancelIcon from '@mui/icons-material/Cancel';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
-import DeleteIcon from '@mui/icons-material/Delete';
-import {CheckCircleRounded} from '@mui/icons-material';
-import EditIcon from '@mui/icons-material/Edit';
 import {Button} from '../Button';
-import {FormInput} from '../form/FormInput';
+import {Thumb} from './Thumb';
 
 export interface FileWithPreview extends FileWithPath {
   preview: string;
@@ -63,7 +57,6 @@ export const MyDropZone = ({
 
   useEffect(() => {
     if (getAcceptedFiles) {
-      console.log(files, '@@@!!!!!++++===>');
       getAcceptedFiles(files);
     }
 
@@ -90,7 +83,6 @@ export const MyDropZone = ({
 
   const onSaveFileName = (fileKey: string) => {
     const result = files.map((item, index) => {
-      console.log(item, '.,,.,,,,,,,,,');
       if (`${item.name}_${index}` === fileKey) {
         const newFile = new File([item], newFileName, {
           type: item.type,
@@ -101,8 +93,6 @@ export const MyDropZone = ({
       }
       return item;
     });
-
-    console.log(result, '~~~~~~~~~');
 
     setFiles(result);
   };
@@ -124,76 +114,28 @@ export const MyDropZone = ({
   ));
 
   const thumbs = files.map((file: FileWithPreview, index) => (
-    <Box key={index} sx={{mr: '1em', display: 'flex', mt: '0.3em'}}>
-      {file.type.split('/')[0] === 'image' ? (
-        <img alt="" width={80} height={80} src={file.preview} />
-      ) : (
-        <FileCopyIcon
-          sx={{fontSize: '4rem', color: theme.palette.text.secondary}}
-        />
-      )}
-
-      <Box
-        sx={{
-          mx: '1em',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-        }}>
-        <Typography>{file.name}</Typography>
-        <Typography>
-          {file.size >= oneMbInByes
-            ? `${(file.size / oneMbInByes).toFixed(2)} Mb`
-            : `${(file.size / onKbinBytes).toFixed(2)} Kb`}
-        </Typography>
-      </Box>
-
-      {isEditingFileName && file.name === currentEditingFileName ? (
-        <>
-          <FormInput
-            props={{
-              sx: {},
-              value: newFileName,
-              size: 'small',
-              fullWidth: true,
-              type: 'text',
-              onChange: (e) => {
-                setNewFileName(e.target.value);
-              },
-            }}
-          />
-          <IconButton
-            onClick={() => {
-              onSaveFileName(`${file.name}_${index}`),
-                setIsEditingFileName(false);
-            }}
-            edge="start">
-            <CheckCircleRounded sx={{mt: '-0.8em'}} />
-          </IconButton>
-
-          <IconButton onClick={OnCancelEdit} edge="start">
-            <CancelIcon sx={{mt: '-0.8em'}} />
-          </IconButton>
-        </>
-      ) : (
-        <>
-          <IconButton
-            onClick={() => {
-              setNewFileName(file.name);
-              setIsEditingFileName(true);
-              setCurrentEditingFileName(file.name);
-            }}
-            edge="start">
-            <EditIcon sx={{mt: '-0.8em'}} />
-          </IconButton>
-          <IconButton
-            onClick={() => removeFile(`${file.name}_${index}`)}
-            edge="start">
-            <DeleteIcon sx={{mt: '-0.8em'}} />
-          </IconButton>
-        </>
-      )}
-    </Box>
+    <Thumb
+      oneMbInByes={oneMbInByes}
+      onKbinBytes={onKbinBytes}
+      file={file}
+      onNameChange={(e) => {
+        setNewFileName(e.target.value);
+      }}
+      isEditingFileName={isEditingFileName}
+      currentEditingFileName={currentEditingFileName}
+      newFileName={newFileName}
+      onDeleteFile={() => removeFile(`${file.name}_${index}`)}
+      onCancelEdit={OnCancelEdit}
+      onSaveFileName={() => {
+        onSaveFileName(`${file.name}_${index}`);
+        setIsEditingFileName(false);
+      }}
+      onEditClick={() => {
+        setNewFileName(file.name);
+        setIsEditingFileName(true);
+        setCurrentEditingFileName(file.name);
+      }}
+    />
   ));
 
   const renderErrors = () =>
