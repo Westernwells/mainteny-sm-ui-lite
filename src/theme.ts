@@ -31,7 +31,6 @@ export const theme = createTheme({
       disabledBackground: 'rgba(34, 43, 69, 0.12)',
       focus: 'rgba(34, 43, 69, 0.12)',
     },
-
     error: {
       light: '#FF605A',
       main: '#FF182F',
@@ -65,6 +64,7 @@ export const theme = createTheme({
       default: '#F2F6F8',
     },
     inputBackground: {main: '#F7F9FC'},
+    divider: '#F3F5F6',
     amber: {main: '#FF8F00', light: '#FFF8E1'},
     eden: {main: 'rgba(15, 76, 100)', light: 'rgba(15, 76, 100, 0.5)'},
     suvaGrey: {main: 'rgba(144, 144, 144))', light: 'rgba(144, 144, 144, 0.2)'},

@@ -41,7 +41,6 @@ export const AdditionalInformationEmployeeForm = ({
       getAdditionalInformationEmployeeFormValues(formik.values);
     }
   }, [formik]);
-
   return (
     <PageCard
       headerLabel="Work Preferences"

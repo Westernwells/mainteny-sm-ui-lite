@@ -7,7 +7,7 @@ export interface PropertyOwner {
   name: string;
   address: AddressRecord;
   serviceCompany: ServiceCompany;
-  contact: Contact;
+  contact: ContactPropertyOwner;
   search: string;
   meta: Meta;
   units?: number;
@@ -30,20 +30,22 @@ export interface PropertyOwnerView {
   name: string;
   number: string;
   postalAddress: Address;
+  billingAddress: Address;
+  businessAddress: Address;
   serviceCompany: ServiceCompany;
-  externalId: string;
-  contact: Contact;
+  contact: ContactPropertyOwner;
   search: string;
   meta: Meta;
   unitNumber?: number;
   additionalInfo: PropertyOwnerAdditionalInfo;
   labels: string[];
+  externalId: string;
 }
 
 export interface PropertyOwnerSimpleView {
   additionalInfo: PropertyOwnerAdditionalInfo;
   postalAddress: Address;
-  contact: Contact;
+  contact: ContactPropertyOwner;
   id: string;
   labels: string[];
   meta: Meta;
@@ -64,4 +66,10 @@ export interface QueryPropertyOwnersParams {
   pageSize: number;
   query: string;
   serviceCompanyId: string;
+  unitNumberStart?: number;
+  unitNumberEnd?: number;
+}
+
+export interface ContactPropertyOwner extends Contact {
+  url: string;
 }

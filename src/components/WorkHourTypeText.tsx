@@ -2,6 +2,7 @@ import Typography from '@mui/material/Typography';
 
 import {capitalize} from 'utils/utils';
 import {WorkHoursType} from 'models/workHours';
+import {formatServiceName} from 'utils/work-hours-utils';
 
 interface Props {
   workHourType?: WorkHoursType | null;
@@ -15,21 +16,10 @@ export const WorkHourTypeText = ({
   style,
   variant,
   capitalizeText,
-}: Props) => {
-  const formatName = (name: WorkHoursType | null | undefined) => {
-    if (name === null) return '-';
-    if (name === WorkHoursType.REGULAR) return 'Maintenance';
-    if (name === WorkHoursType.EMERGENCY) return 'Emergency';
-    if (name === WorkHoursType.CALLOUT) return 'Callout';
-    if (name === WorkHoursType.REPAIR) return 'Repair';
-    return name;
-  };
-
-  return (
-    <Typography component="span" variant={variant || 'caption'} sx={{...style}}>
-      {capitalizeText
-        ? capitalize([formatName(workHourType)])
-        : formatName(workHourType)}
-    </Typography>
-  );
-};
+}: Props) => (
+  <Typography component="span" variant={variant || 'caption'} sx={{...style}}>
+    {capitalizeText
+      ? capitalize([formatServiceName(workHourType)])
+      : formatServiceName(workHourType)}
+  </Typography>
+);

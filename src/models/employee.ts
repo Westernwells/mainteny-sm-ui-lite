@@ -1,4 +1,4 @@
-import {Shift} from 'pages/Employee/NewEmployee/model';
+import {Shift} from 'pages/NewEmployee/model';
 import {Address, Meta} from './misc';
 import {ServiceOrderType} from './service-order';
 import {Role, UserAccountView} from './user';

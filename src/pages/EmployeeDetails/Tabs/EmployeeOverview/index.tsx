@@ -72,14 +72,15 @@ export const EmployeeOverview = ({
                   width: '80%',
                 }}>
                 <EmployeeAvatar
-                  firstName={userAccount?.firstName || ''}
-                  lastName={userAccount?.lastName || ''}
-                  roles={userAccount?.roles || ''}
+                  name={`${userAccount?.firstName || ''}  ${
+                    userAccount?.lastName || ''
+                  }`}
+                  subTitle={userAccount?.roles || ''}
                   isOnline={userData?.isOnline || false}
                 />
                 <Divider
                   orientation="vertical"
-                  sx={{background: '#F3F5F6'}}
+                  sx={{background: theme.palette.divider}}
                   flexItem
                 />
               </Box>

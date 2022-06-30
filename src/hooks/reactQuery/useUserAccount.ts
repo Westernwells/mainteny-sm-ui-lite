@@ -5,7 +5,7 @@ import {useSnackbar} from 'notistack';
 import {UserQueryParams} from 'models/employee';
 import {Resource} from 'models/misc';
 import {UserView} from 'models/user';
-import {EmployeeAccountData} from 'pages/Employee/NewEmployee/model';
+import {EmployeeAccountData} from 'pages/NewEmployee/model';
 import {EmployeeAccountData as EditEmployeeAccountData} from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/model';
 import {
   formatEmployeeAccountData,
