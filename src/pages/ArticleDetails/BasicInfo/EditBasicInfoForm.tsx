@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box';
 import {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {FormikProps} from 'formik';
 import {ArticleType} from '../../../models/article';
 import {FormInput} from '../../../components/form/FormInput';
@@ -10,7 +11,7 @@ import {createEmptyResource} from '../../../utils/paging-utils';
 import {useCacheValues} from '../../../hooks/reactQuery/useElevator';
 import {CacheTypes} from '../../../models/misc';
 
-export const ArticleBasicInfoForm = ({
+export const EditBasicInfoForm = ({
   containerStyles,
   formik,
 }: {
@@ -18,6 +19,7 @@ export const ArticleBasicInfoForm = ({
   formik: FormikProps<ArticleBasicFormModel>;
 }) => {
   const [modelQuery, setModelQuery] = useState('');
+  const {t} = useTranslation();
   const {data: elevatorModelsResource = createEmptyResource<string>()} =
     useCacheValues(
       {
@@ -32,9 +34,9 @@ export const ArticleBasicInfoForm = ({
       <FormInput
         containerStyles={{...containerStyles}}
         props={{
-          label: 'Name',
+          label: t('Name'),
           name: 'name',
-          placeholder: 'e.g. Flat cable, 16G0.75+2x(2x0.5)',
+          placeholder: t('e.g. Flat cable, 16G0.75+2x(2x0.5)'),
           type: 'text',
           required: true,
           value: formik.values.name,
@@ -47,9 +49,9 @@ export const ArticleBasicInfoForm = ({
       <FormInput
         containerStyles={{...containerStyles}}
         props={{
-          label: 'External Id',
+          label: t('Number'),
           name: 'externalId',
-          placeholder: 'e.g. 000001',
+          placeholder: t('e.g. 000001'),
           type: 'text',
           required: true,
           value: formik.values.externalId,
@@ -61,23 +63,9 @@ export const ArticleBasicInfoForm = ({
       <FormInput
         containerStyles={{...containerStyles}}
         props={{
-          label: 'Category',
-          name: 'category',
-          placeholder: 'e.g. Cable',
-          type: 'text',
-          required: true,
-          value: formik.values.category,
-          error: !!(formik.touched.category && formik.errors.category),
-          onBlur: formik.handleBlur,
-          onChange: formik.handleChange,
-        }}
-      />
-      <FormInput
-        containerStyles={{...containerStyles}}
-        props={{
           name: 'manufacturer',
-          label: 'Manufacturer',
-          placeholder: 'e.g. Meier',
+          label: t('Manufacturer'),
+          placeholder: t('e.g. Meier'),
           variant: 'outlined',
           type: 'text',
           value: formik.values.manufacturer,
@@ -90,8 +78,8 @@ export const ArticleBasicInfoForm = ({
         containerStyles={{...containerStyles}}
         props={{
           name: 'model',
-          label: 'Model',
-          placeholder: 'e.g. 16G0.75+2x(2x0.5)',
+          label: t('Model'),
+          placeholder: t('e.g. 16G0.75+2x(2x0.5)'),
           variant: 'outlined',
           type: 'text',
           value: formik.values.model,
@@ -100,7 +88,20 @@ export const ArticleBasicInfoForm = ({
           onChange: formik.handleChange,
         }}
       />
-
+      <FormInput
+        containerStyles={{...containerStyles}}
+        props={{
+          label: t('Category'),
+          name: 'category',
+          placeholder: t('e.g. Cable'),
+          type: 'text',
+          required: true,
+          value: formik.values.category,
+          error: !!(formik.touched.category && formik.errors.category),
+          onBlur: formik.handleBlur,
+          onChange: formik.handleChange,
+        }}
+      />
       <Box
         display="flex"
         justifyContent="space-between"
@@ -109,8 +110,8 @@ export const ArticleBasicInfoForm = ({
           containerStyles={{pr: '1rem'}}
           props={{
             name: 'unitPurchaseVat',
-            label: 'Purchase VAT',
-            placeholder: '19%',
+            label: t('Purchase VAT'),
+            placeholder: t('19%'),
             inputProps: {min: 0, max: 100},
             type: 'number',
             value: formik.values.unitPurchaseVat,
@@ -121,11 +122,10 @@ export const ArticleBasicInfoForm = ({
         />
 
         <FormInput
-          containerStyles={{pr: '1rem'}}
           props={{
             name: 'unitSellingVat',
-            label: 'Selling VAT',
-            placeholder: '19%',
+            label: t('Selling VAT'),
+            placeholder: t('19%'),
             variant: 'outlined',
             inputProps: {min: 0, max: 100},
             type: 'number',
@@ -160,25 +160,10 @@ export const ArticleBasicInfoForm = ({
         getQuery={(item) => setModelQuery(item || '')}
         textFieldProps={{
           name: 'unit',
-          label: 'Unit',
+          label: t('Unit'),
           required: true,
-          placeholder: 'Select Unit',
+          placeholder: t('Select Unit'),
           error: !!(formik.touched.unit && formik.errors.unit),
-        }}
-      />
-
-      <FormInput
-        containerStyles={{...containerStyles}}
-        props={{
-          name: 'storageLocation',
-          label: 'Storage Location',
-          placeholder: 'e.g. Rack 20, Box 4',
-          variant: 'outlined',
-          type: 'text',
-          value: formik.values.storageLocation,
-          helperText: formik.errors.storageLocation,
-          onBlur: formik.handleBlur,
-          onChange: formik.handleChange,
         }}
       />
 
@@ -190,8 +175,8 @@ export const ArticleBasicInfoForm = ({
           containerStyles={{pr: '1rem'}}
           props={{
             name: 'unitPurchaseAmount',
-            label: 'Purchase Price',
-            placeholder: 'e.g. 150€',
+            label: t('Purchase Price'),
+            placeholder: t('e.g. 150€'),
             inputProps: {min: 0},
             type: 'number',
             value: formik.values.unitPurchaseAmount,
@@ -202,11 +187,10 @@ export const ArticleBasicInfoForm = ({
         />
 
         <FormInput
-          containerStyles={{pr: '1rem'}}
           props={{
             name: 'unitSellingAmount',
-            label: 'Selling Price',
-            placeholder: 'e.g. 200€',
+            label: t('Selling Price'),
+            placeholder: t('e.g. 200€'),
             inputProps: {min: 0},
             type: 'number',
             required: true,
@@ -222,12 +206,29 @@ export const ArticleBasicInfoForm = ({
         />
       </Box>
 
+      <FormInput
+        containerStyles={{...containerStyles}}
+        props={{
+          name: 'storageLocation',
+          label: t('Storage Location'),
+          placeholder: t('e.g. Rack 20, Box 4'),
+          variant: 'outlined',
+          type: 'text',
+          value: formik.values.storageLocation,
+          helperText: formik.errors.storageLocation,
+          onBlur: formik.handleBlur,
+          onChange: formik.handleChange,
+        }}
+      />
+
       <ComboBox
         containerStyles={{...containerStyles}}
-        options={Object.keys(ArticleType).map((key) => ({
-          label: convertToText(key),
-          value: convertToText(key),
-        }))}
+        options={Object.keys(ArticleType)
+          .filter((key) => key !== ArticleType.PACKAGE)
+          .map((key) => ({
+            label: convertToText(key),
+            value: convertToText(key),
+          }))}
         initialValue={
           formik.values.type
             ? {
@@ -240,9 +241,9 @@ export const ArticleBasicInfoForm = ({
         getValue={(item) => formik.setFieldValue('type', item?.value)}
         textFieldProps={{
           name: 'type',
-          label: 'Type',
+          label: t('Type'),
           required: true,
-          placeholder: 'e.g. Select type',
+          placeholder: t('e.g. Select type'),
           error: !!(formik.touched.type && formik.errors.type),
         }}
       />
