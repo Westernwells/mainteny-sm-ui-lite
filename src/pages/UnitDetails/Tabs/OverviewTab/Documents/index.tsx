@@ -117,6 +117,7 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
               <Grid
                 item
                 sm={4}
+                key={item.id}
                 sx={{
                   height: 120,
                   [theme.breakpoints.down('md')]: {
@@ -185,7 +186,6 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
         }}>
         <MyDropZone
           getAcceptedFiles={(files) => {
-            console.log(files, '%%%%%%%%');
             setAcceptedFiles(files);
           }}
           getRejectedFileWithErrors={(file) => {
