@@ -21,6 +21,7 @@ export const formatEmployeeAccountData = (data: EmployeeAccountData) => {
     workingHours: data.shifts,
     team: data.team,
     roles: data?.roles || [],
+    externalId: data.employeeId || '',
   };
 
   if (employee.team === '') {
@@ -52,6 +53,7 @@ export const formatUpdateEmployeeAccountData = (
     workingHours: data.shifts,
     roles: data.roles,
     team: data?.team || '',
+    externalId: data.employeeId || '',
   };
 
   return {userAccount, employee};

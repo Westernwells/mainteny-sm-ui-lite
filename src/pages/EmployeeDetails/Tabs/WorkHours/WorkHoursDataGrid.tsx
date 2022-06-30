@@ -69,7 +69,7 @@ export const columns: GridColDef[] = [
     field: 'time',
     headerName: 'TIME',
     type: 'string',
-    flex: 1,
+    flex: 2,
     ...defaultAlignment,
     ...defaultProps,
   },

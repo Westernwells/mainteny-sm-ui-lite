@@ -51,9 +51,12 @@ export const AdditionalInformationEmployeeForm = ({
         <Grid container spacing={2}>
           <Grid item md={12}>
             {roles.includes(Role.TECHNICIAN) && (
-              <Box sx={{marginBottom: '20px'}}>
+              <Box sx={{marginBottom: '1.250em'}}>
                 <Typography
-                  sx={{color: theme.palette.text.primary, marginBottom: '5px'}}>
+                  sx={{
+                    color: theme.palette.text.primary,
+                    marginBottom: '0.313em',
+                  }}>
                   {t('Order Types')}
                 </Typography>
                 <SelectServiceOrderTypes
@@ -63,7 +66,7 @@ export const AdditionalInformationEmployeeForm = ({
               </Box>
             )}
             <Typography
-              sx={{color: theme.palette.text.primary, marginBottom: '5px'}}>
+              sx={{color: theme.palette.text.primary, marginBottom: '0.313em'}}>
               {t('Shift Time')}
               <Typography component="span" sx={{color: 'red'}}>
                 *

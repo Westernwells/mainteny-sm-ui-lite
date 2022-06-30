@@ -106,7 +106,7 @@ const WorkHourWidget = () => {
         pageCount={pageCount}
         totalRows={workHours.total}
         isWidget
-        containerStyle={{minHeight: '350px'}}
+        containerStyle={{minHeight: '21.875em'}}
       />
     </TabContentContainer>
   );
