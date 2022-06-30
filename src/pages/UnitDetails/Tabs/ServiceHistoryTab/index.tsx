@@ -137,6 +137,7 @@ export const ServiceHistoryTab = () => {
         rows={rows}
         columns={columns}
         loading={isFetching}
+        scrollToTop={search}
         pageSize={page.pageSize}
         handlePageSizeChange={(newPageSize: number) =>
           setPage({...page, pageSize: newPageSize})

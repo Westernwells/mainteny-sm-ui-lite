@@ -141,6 +141,7 @@ export const ContractsTab = ({customerId}: Props) => {
           rows={rows}
           columns={columns}
           loading={isFetching}
+          scrollToTop={searchQuery}
           pageSize={page.pageSize}
           handlePageSizeChange={(newPageSize: number) =>
             setPage({...page, pageSize: newPageSize})

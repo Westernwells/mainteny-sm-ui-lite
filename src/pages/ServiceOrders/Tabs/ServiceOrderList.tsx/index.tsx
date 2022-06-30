@@ -174,6 +174,7 @@ export const ServiceOrderList = () => {
         columns={columns}
         loading={isFetching}
         pageSize={page.pageSize}
+        scrollToTop={searchQuery}
         pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
           setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))

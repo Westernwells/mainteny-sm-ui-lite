@@ -115,6 +115,7 @@ export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
         <DataGridLayout
           rows={rows}
           columns={columns}
+          scrollToTop={search}
           onCellClick={(params) => setRowItem(params.row.elevator)}
           loading={isFetching}
           pageSize={page.pageSize}

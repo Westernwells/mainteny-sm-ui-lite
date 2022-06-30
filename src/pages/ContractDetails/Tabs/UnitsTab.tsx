@@ -48,7 +48,12 @@ export const UnitsTab = () => {
   return (
     <TabContentContainer>
       {renderWidget()}
-      <DataGridLayout rows={rows} columns={columns} pageSize={page.pageSize} />
+      <DataGridLayout
+        scrollToTop={search}
+        rows={rows}
+        columns={columns}
+        pageSize={page.pageSize}
+      />
     </TabContentContainer>
   );
 };

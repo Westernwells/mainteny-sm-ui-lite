@@ -115,6 +115,7 @@ export const UnitsWidget = ({customerId, getTotalUnits, openTab}: Props) => {
             fullHeight={false}
             height={320}
             rows={rows}
+            scrollToTop={unitQuery}
             columns={columns}
             loading={isFetching}
             containerStyle={{

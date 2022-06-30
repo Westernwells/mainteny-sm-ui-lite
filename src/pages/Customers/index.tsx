@@ -152,6 +152,7 @@ export const Customer = () => {
       <DataGridLayout
         rows={rows || []}
         columns={columns}
+        scrollToTop={search}
         loading={isFetching}
         hideFooter={pageCount <= 1}
         pageSize={page.pageSize}
