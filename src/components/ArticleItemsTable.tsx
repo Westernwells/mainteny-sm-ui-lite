@@ -173,139 +173,141 @@ export const ArticleItemsTable = ({
   }, [totalPrice]);
 
   return (
-    <Box
-      bgcolor="grey.50"
-      border="1px solid"
-      borderColor="grey.300"
-      mt="1em"
-      borderRadius="4px"
-      p=".5em">
-      {isPartial ? renderPartialHeader() : renderHeader()}
+    <Box mt="1em">
+      <FormLabel text="Articles" />
       <Box
         bgcolor="grey.50"
+        border="1px solid"
+        borderColor="grey.300"
         borderRadius="4px"
-        display="flex"
-        flexDirection="column"
-        my="1em"
-        gap="1em">
-        {items.map((item, index) => (
-          <ArticleItemRow
-            key={item.articleId}
-            articleItem={item}
-            index={index + 1}
-            deleteItem={deleteItem}
-            setItems={setItems}
-            isPartial={isPartial}
-            total={total}
-            setTotal={setTotal}
-          />
-        ))}
-        {items.length ? (
-          <>
-            {!isPartial && (
-              <Button
-                label="Article"
-                buttonProps={{
-                  variant: 'contained',
-                  sx: {alignSelf: 'self-start'},
-                  startIcon: <AddIcon />,
-                  onClick: () => setIsArticleModalOpen(true),
-                }}
-              />
-            )}
-            <Box borderTop="1px solid" borderColor="grey.300">
-              <Box
-                p="1em"
-                pl="50%"
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  justifyItems: 'end',
-                }}>
-                {isPartial && (
-                  <>
-                    <Typography mb=".5em">
-                      {t('Total Amount')}
-                      <Typography
-                        variant="caption"
-                        component="span"
-                        ml="1ch"
-                        sx={{color: 'text.secondary'}}>
-                        {t('(excl VAT)')}
+        p=".5em">
+        {isPartial ? renderPartialHeader() : renderHeader()}
+        <Box
+          bgcolor="grey.50"
+          borderRadius="4px"
+          display="flex"
+          flexDirection="column"
+          my="1em"
+          gap="1em">
+          {items.map((item, index) => (
+            <ArticleItemRow
+              key={item.articleId}
+              articleItem={item}
+              index={index + 1}
+              deleteItem={deleteItem}
+              setItems={setItems}
+              isPartial={isPartial}
+              total={total}
+              setTotal={setTotal}
+            />
+          ))}
+          {items.length ? (
+            <>
+              {!isPartial && (
+                <Button
+                  label="Article"
+                  buttonProps={{
+                    variant: 'contained',
+                    sx: {alignSelf: 'self-start'},
+                    startIcon: <AddIcon />,
+                    onClick: () => setIsArticleModalOpen(true),
+                  }}
+                />
+              )}
+              <Box borderTop="1px solid" borderColor="grey.300">
+                <Box
+                  p="1em"
+                  pl="50%"
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    justifyItems: 'end',
+                  }}>
+                  {isPartial && (
+                    <>
+                      <Typography mb=".5em">
+                        {t('Total Amount')}
+                        <Typography
+                          variant="caption"
+                          component="span"
+                          ml="1ch"
+                          sx={{color: 'text.secondary'}}>
+                          {t('(excl VAT)')}
+                        </Typography>
                       </Typography>
-                    </Typography>
 
-                    <Typography>
-                      {formatCurrency(total, {currency: 'EUR'})}
-                    </Typography>
-                  </>
-                )}
+                      <Typography>
+                        {formatCurrency(total, {currency: 'EUR'})}
+                      </Typography>
+                    </>
+                  )}
 
-                <Typography>
-                  {isPartial ? t('Partial Payment') : t('Total Price')}
+                  <Typography>
+                    {isPartial ? t('Partial Payment') : t('Total Price')}
+                    <Typography
+                      variant="caption"
+                      component="span"
+                      ml="1ch"
+                      sx={{color: 'text.secondary'}}>
+                      {t('(excl VAT)')}
+                    </Typography>
+                  </Typography>
+
+                  <Typography>
+                    {formatCurrency(totalPrice, {currency: 'EUR'})}
+                  </Typography>
                   <Typography
                     variant="caption"
-                    component="span"
-                    ml="1ch"
-                    sx={{color: 'text.secondary'}}>
-                    {t('(excl VAT)')}
+                    sx={{color: 'text.secondary', alignSelf: 'end'}}>
+                    {t('VAT')}
+                    {totalVat
+                      ? ` ${((totalVat * 100) / totalPrice).toFixed(2)}%`
+                      : null}
                   </Typography>
-                </Typography>
-
-                <Typography>
-                  {formatCurrency(totalPrice, {currency: 'EUR'})}
-                </Typography>
-                <Typography
-                  variant="caption"
-                  sx={{color: 'text.secondary', alignSelf: 'end'}}>
-                  {t('VAT')}
-                  {totalVat
-                    ? ` ${((totalVat * 100) / totalPrice).toFixed(2)}%`
-                    : null}
-                </Typography>
-                <Typography>
-                  {formatCurrency(totalVat, {currency: 'EUR'})}
-                </Typography>
-              </Box>
-              <Box
-                bgcolor="grey.700"
-                borderRadius="4px"
-                p="1em"
-                pl="50%"
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  justifyItems: 'end',
-                }}>
-                <Typography sx={{color: 'primary.contrastText'}}>
-                  {isPartial ? t('Invoice Amount') : t('Total Price')}
-                  <Typography variant="caption" component="span" ml="1ch">
-                    {t('(incl VAT)')}
+                  <Typography>
+                    {formatCurrency(totalVat, {currency: 'EUR'})}
                   </Typography>
-                </Typography>
-                <Typography sx={{color: 'primary.contrastText'}}>
-                  {formatCurrency(totalPrice + totalVat, {currency: 'EUR'})}
-                </Typography>
+                </Box>
+                <Box
+                  bgcolor="grey.700"
+                  borderRadius="4px"
+                  p="1em"
+                  pl="50%"
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    justifyItems: 'end',
+                  }}>
+                  <Typography sx={{color: 'primary.contrastText'}}>
+                    {isPartial ? t('Invoice Amount') : t('Total Price')}
+                    <Typography variant="caption" component="span" ml="1ch">
+                      {t('(incl VAT)')}
+                    </Typography>
+                  </Typography>
+                  <Typography sx={{color: 'primary.contrastText'}}>
+                    {formatCurrency(totalPrice + totalVat, {currency: 'EUR'})}
+                  </Typography>
+                </Box>
               </Box>
+            </>
+          ) : (
+            <Box display="flex" alignItems="center" my="1em" gap="1em">
+              <Typography variant="body2">1</Typography>
+              <SelectButton
+                text="Select Article"
+                onClick={() => setIsArticleModalOpen(true)}
+                sxContainer={{flexGrow: 1}}
+              />
             </Box>
-          </>
-        ) : (
-          <Box display="flex" alignItems="center" my="1em" gap="1em">
-            <Typography variant="body2">1</Typography>
-            <SelectButton
-              text="Select Article"
-              onClick={() => setIsArticleModalOpen(true)}
-              sxContainer={{flexGrow: 1}}
-            />
-          </Box>
-        )}
+          )}
+        </Box>
+        <SelectModal
+          isOpen={isArticleModalOpen}
+          onClose={() => setIsArticleModalOpen(false)}
+          header="Select Article">
+          <ArticlesDataGrid setRowItem={handleSelectItem} />
+        </SelectModal>
       </Box>
-      <SelectModal
-        isOpen={isArticleModalOpen}
-        onClose={() => setIsArticleModalOpen(false)}
-        header="Select Article">
-        <ArticlesDataGrid setRowItem={handleSelectItem} />
-      </SelectModal>
     </Box>
   );
 };

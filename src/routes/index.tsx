@@ -346,7 +346,10 @@ export const Router = () => {
                 <Helmet>
                   <title>{`Service Orders - ${titleTail}`}</title>
                 </Helmet>
-                <PageLayout backBtnLabel="Order Details" showBackAction>
+                <PageLayout
+                  pageScrollable
+                  backBtnLabel="Order Details"
+                  showBackAction>
                   <ServiceOrderDetails />
                 </PageLayout>
               </>
