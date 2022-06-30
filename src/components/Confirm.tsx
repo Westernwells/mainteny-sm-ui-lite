@@ -48,7 +48,7 @@ export const Confirm = ({
       </DialogContent>
       <DialogActions>
         <Button
-          label="Create Service Order"
+          label={t('Create Service Order')}
           buttonProps={{
             onClick: onClose,
           }}>
@@ -58,7 +58,7 @@ export const Confirm = ({
         </Button>
 
         <Button
-          label="Create Service Order"
+          label={t('Create Service Order')}
           buttonProps={{
             onClick: onConfirm,
             autoFocus: true,

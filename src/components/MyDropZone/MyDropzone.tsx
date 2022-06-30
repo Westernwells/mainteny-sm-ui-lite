@@ -17,7 +17,6 @@ interface Props {
   getRejectedFileWithErrors?: (val: FileRejection[]) => void;
   hints?: string[];
   acceptedFileTypes?: 'image/*' | 'application/pdf' | '*';
-  maxFiles?: number;
 }
 
 export const MyDropZone = ({
@@ -26,7 +25,6 @@ export const MyDropZone = ({
   getRejectedFileWithErrors,
   hints = [],
   acceptedFileTypes = '*',
-  maxFiles,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -41,8 +39,6 @@ export const MyDropZone = ({
     accept: {
       [acceptedFileTypes]: [],
     },
-    maxFiles,
-    disabled: maxFiles ? files.length >= maxFiles : false,
     onDropAccepted: (acceptedFiles) => {
       setFiles([
         ...files,
@@ -149,8 +145,8 @@ export const MyDropZone = ({
           {item.errors.map((error) => (
             <Typography component="div" variant="body2" color="error">
               {error.code === 'file-too-large'
-                ? 'File is larger than 5mb'
-                : error.message}
+                ? t('File is larger than 5mb')
+                : t(error.message)}
             </Typography>
           ))}
         </Box>
@@ -174,10 +170,9 @@ export const MyDropZone = ({
             {t('Drag')} &apos;n&apos; {t('drop or')}
           </Typography>
           <Button
-            label="Select file"
+            label={t('Select file')}
             buttonProps={{
               variant: 'outlined',
-              disabled: maxFiles ? files.length >= maxFiles : false,
               onClick: open,
             }}
           />

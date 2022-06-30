@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import EditIcon from '@mui/icons-material/Create';
 import Typography from '@mui/material/Typography';
+import {useTranslation} from 'react-i18next';
 import {useFormik} from 'formik';
 import {FormInput} from '../../../components/form/FormInput';
 import {ArticleView} from '../../../models/article';
@@ -9,11 +10,13 @@ import {InfoCard} from '../../../components/InfoCard';
 import {useUpdateArticle} from '../../../hooks/reactQuery/useArticle';
 import {NoItemSection} from '../NoItemSection';
 import {ArticleDescriptionFormModel} from '../../../models/articleForm';
+import {makeAmountRecord} from '../../../utils/currency';
 
 export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
   const [openDialog, setOpenDialog] = useState(false);
+  const {t} = useTranslation();
   const {mutateAsync: updateArticle, isLoading} = useUpdateArticle(
-    'Article is updated successfully',
+    t('Article is updated successfully'),
   );
 
   const formik = useFormik<ArticleDescriptionFormModel>({
@@ -40,16 +43,16 @@ export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
       suppliers: article.additionalInfo.suppliers || [],
       type: article.type.toUpperCase(),
       unit: article.unit,
-      unitPurchaseAmount: {
-        currency: article.unitPurchaseAmount.currency,
-        netAmount: article.unitPurchaseAmount.netAmount,
-        percentageVat: article.unitPurchaseAmount.percentageVat,
-      },
-      unitSellingAmount: {
-        currency: article.unitSellingAmount.currency,
-        netAmount: article.unitSellingAmount.netAmount,
-        percentageVat: article.unitSellingAmount.percentageVat,
-      },
+      unitPurchaseAmount: makeAmountRecord(
+        article.unitPurchaseAmount.netAmount,
+        article.unitPurchaseAmount.currency,
+        article.unitPurchaseAmount.percentageVat,
+      ),
+      unitSellingAmount: makeAmountRecord(
+        article.unitSellingAmount.netAmount,
+        article.unitSellingAmount.currency,
+        article.unitSellingAmount.percentageVat,
+      ),
     };
     await updateArticle({articleId: article!.id, article: temp});
     setOpenDialog(false);
@@ -61,18 +64,19 @@ export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
       headerActionIcon={<EditIcon />}
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
-      header={<Typography variant="subtitle1">Description</Typography>}>
+      header={<Typography variant="subtitle1">{t('Description')}</Typography>}>
       {article.description && (
         <Typography variant="inherit">{article.description}</Typography>
       )}
       {!article.description && (
         <NoItemSection
-          placeholder="description"
+          label={t('No description yet. Please click the button below to add!')}
+          buttonLabel={t('+ Add Description')}
           action={() => setOpenDialog(true)}
         />
       )}
       <Dialog
-        title="Edit Description"
+        title={t('Edit Description')}
         isSaving={isLoading}
         onCancel={() => setOpenDialog(false)}
         onSave={saveArticle}
@@ -80,12 +84,13 @@ export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
           open: openDialog || false,
         }}>
         <FormInput
-          containerStyles={{width: '100%'}}
+          containerStyles={{width: '100%', py: '1rem'}}
           props={{
             name: 'description',
-            label: 'description',
-            placeholder:
+            label: t('Description'),
+            placeholder: t(
               'e.g. Flat cable used for door engines from the following suppliers.....',
+            ),
             multiline: true,
             rows: 10,
             minRows: 5,
