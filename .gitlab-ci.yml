@@ -58,7 +58,7 @@ variables:
     - pulumi login s3://mainteny-pulumi-state
   variables:
     ENV: stage
-    CACHE_PATH: /sm-lite*
+    CACHE_PATH: /*
   script:
     - echo "Deploying ${IMAGE_SUFFIX} on environment $STACK"
     - pulumi stack select sm-lite.$STACK
@@ -66,8 +66,6 @@ variables:
     - pulumi config set mainteny:version ${CI_COMMIT_SHORT_SHA}_$(date '+%Y%m%d')
     - pulumi config set mainteny:deploymentTimeStamp "$(date)"
     - pulumi up -y
-    - pulumi stack select cdn.$ENV
-    - aws cloudfront create-invalidation --distribution-id $(pulumi stack output distributionId) --paths "$CACHE_PATH"
     - echo "Deploying ${IMAGE_SUFFIX} on environment $STACK (old SM UI)"
     - pulumi stack select frontend.$STACK
     - pulumi config set --path "mainteny:k8sConfig.services[0].image" ${DOCKER_REGISTRY}/sm-lite:${IMAGE_SUFFIX}-${IMAGE_ENV}
@@ -109,7 +107,6 @@ build-stage:
   <<: *build-template
   variables:
     ENV: stage
-    PUBLIC_URL: /sm-lite
   rules:
     - if: $CI_MERGE_REQUEST_ID
       when: never
@@ -123,7 +120,6 @@ build-prod:
     - when: never
   variables:
     ENV: prod
-    PUBLIC_URL: /sm-lite
 
 build-stage-image:
   <<: *build-image-template
@@ -157,7 +153,7 @@ deploy-stage:
         ENV: stage
         STACK: stage
         IMAGE_ENV: stage
-        CACHE_PATH: /sm-lite*
+        CACHE_PATH: /*
       when: on_success
     - when: never
 
@@ -171,6 +167,6 @@ deploy-production:
         ENV: prod
         STACK: prod
         IMAGE_ENV: prod
-        CACHE_PATH: /sm-lite*
+        CACHE_PATH: /*
       when: manual
     - when: never
