@@ -68,6 +68,14 @@ variables:
     - pulumi up -y
     - pulumi stack select cdn.$ENV
     - aws cloudfront create-invalidation --distribution-id $(pulumi stack output distributionId) --paths "$CACHE_PATH"
+    - echo "Deploying ${IMAGE_SUFFIX} on environment $STACK (old SM UI)"
+    - pulumi stack select frontend.$STACK
+    - pulumi config set --path "mainteny:k8sConfig.services[0].image" ${DOCKER_REGISTRY}/sm-lite:${IMAGE_SUFFIX}-${IMAGE_ENV}
+    - pulumi config set mainteny:version ${CI_COMMIT_SHORT_SHA}_$(date '+%Y%m%d')
+    - pulumi config set mainteny:deploymentTimeStamp "$(date)"
+    - pulumi up -y
+    - pulumi stack select cdn.$ENV
+    - aws cloudfront create-invalidation --distribution-id $(pulumi stack output distributionId) --paths "$CACHE_PATH"
     - >-
       curl -X POST
       --data-urlencode
