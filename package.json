@@ -1,8 +1,8 @@
 {
-  "name": "create-react-app-with-typescript",
+  "name": "Service Manager UI",
   "version": "5.0.0",
   "private": true,
-  "homepage": "/sm-lite",
+  "homepage": ".",
   "dependencies": {
     "@emotion/react": "latest",
     "@emotion/styled": "latest",
