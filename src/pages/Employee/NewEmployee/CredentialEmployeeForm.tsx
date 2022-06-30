@@ -71,7 +71,9 @@ export const CredentialEmployeeForm = ({
         <Grid container spacing={2}>
           <Grid item md={6}>
             <Box display="flex">
-              <Box display="flex" sx={{maxWidth: '350px', marginRight: '25px'}}>
+              <Box
+                display="flex"
+                sx={{maxWidth: '21.875em', marginRight: '1.563em'}}>
                 {[
                   {
                     id: 'password',
@@ -106,7 +108,7 @@ export const CredentialEmployeeForm = ({
                   />
                 ))}
               </Box>
-              <Box display="flex" sx={{maxWidth: '350px'}}>
+              <Box display="flex" sx={{maxWidth: '21.875em'}}>
                 {[
                   {
                     id: 'confirmPassword',

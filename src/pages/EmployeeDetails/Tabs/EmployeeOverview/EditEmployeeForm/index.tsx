@@ -65,7 +65,10 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
               <Box
                 display="flex"
                 gap="1em"
-                sx={{marginBlock: '0.5em', marginBottom: '24px'}}>
+                sx={{
+                  marginBlock: '0.5em',
+                  marginBottom: '1.5em',
+                }}>
                 {[
                   {
                     id: 'firstName',
@@ -149,7 +152,7 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
             <Box
               display="flex"
               flexDirection="column"
-              sx={{minWidth: '450px'}}
+              sx={{minWidth: '28.125em'}}
               gap="1em">
               <SelectEmployeeRole />
               {[

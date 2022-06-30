@@ -1,13 +1,12 @@
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 import {Box} from '@mui/system';
 import Grid from '@mui/material/Grid';
-import {FormControl, SelectChangeEvent} from '@mui/material';
+import {FormControl} from '@mui/material';
 import {useFormik} from 'formik';
 
 import {PageCard} from 'components/PageCard';
 import {RoleEmployeeFormModel} from 'models/employee';
-import {getRole} from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/SelectEmployeeRole';
-import {FormSelect} from 'components/form/FormSelect';
+import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 
 interface Props {
   getRoleEmployeeFormValues?: (val: RoleEmployeeFormModel) => void;
@@ -25,24 +24,14 @@ export const SelectRoleEmployeeForm = ({
     onSubmit: () => {},
   });
 
-  const [role, setRole] = useState<string>(getRole(formik.values.roles) || '');
-
   useEffect(() => {
     if (getRoleEmployeeFormValues) {
       getRoleEmployeeFormValues(formik.values);
     }
   }, [formik]);
 
-  const handleRoleChange = (event: SelectChangeEvent<string | string[]>) => {
-    const {
-      target: {value},
-    } = event;
-    let selectedRole: string[] = [value as string];
-    if (value === 'BOTH') {
-      selectedRole = ['TECHNICIAN', 'SERVICE_MANAGER'];
-    }
-    setRole(value as string);
-    formik.setFieldValue('roles', selectedRole);
+  const handleRoleChange = (value: string[]) => {
+    formik.setFieldValue('roles', value);
   };
 
   return (
@@ -55,34 +44,24 @@ export const SelectRoleEmployeeForm = ({
           <Grid item md={4}>
             <Box display="flex" gap="1em">
               <FormControl fullWidth>
-                <FormSelect
-                  labelId="roleFilter-label"
+                <MultipleSelectCheckmarks
                   label="Role"
                   options={[
-                    {
-                      label: 'Technician',
-                      value: 'TECHNICIAN',
-                    },
-                    {
-                      label: 'Service Manager',
-                      value: 'SERVICE_MANAGER',
-                    },
-                    {
-                      label: 'Both Technician & Service Manager',
-                      value: 'BOTH',
-                    },
+                    'Technician',
+                    'Service Manager',
+                    'Both Technician & Service Manager',
                   ]}
-                  labelStyles={{backgroundColor: 'transparent'}}
-                  selectStyles={{
-                    backgroundColor: 'white',
+                  containerStyles={{
+                    minWidth: '21.875em',
+                    marginRight: '0.438em',
+                    alignItems: 'center',
                   }}
-                  selectProps={{
-                    labelId: 'roleFilter-label',
-                    value: role,
-                    onChange: handleRoleChange,
-                    name: 'roleFilter',
-                    multiple: false,
+                  formControlStyles={{
+                    width: '100%',
                   }}
+                  initialSelectedItems={formik.values.roles}
+                  getSelectedValue={(item) => handleRoleChange(item)}
+                  multiple={false}
                 />
               </FormControl>
             </Box>
