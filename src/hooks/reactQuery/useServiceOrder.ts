@@ -33,6 +33,7 @@ import {
   CreateScheduledServiceOrderBody,
   CreateNonScheduledServiceOrderBody,
   ServiceOrderReportView,
+  ServiceOrderItemRecord,
 } from '../../models/service-order';
 import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
@@ -611,6 +612,39 @@ export const useCreateNonScheduledServiceOrder = (successMsg: string) => {
       onError: (err) => {
         console.log(err);
         enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+export const putServiceOrderArticles = async (
+  body: ServiceOrderItemRecord[],
+  id: string,
+) => {
+  await axiosClient.put(`api/serviceOrders/${id}/articles`, body);
+};
+
+export const useUpdateServiceOrderArticles = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({data, orderId}: {data: ServiceOrderItemRecord[]; orderId: string}) =>
+      putServiceOrderArticles(data, orderId),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.fetchServiceOrderReport]);
+        queryClient.invalidateQueries([queryKeys.fetchServiceOrderArticles]);
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        enqueueSnackbar(`Work report updated successfully!`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again!', {
           variant: 'error',
         });
       },
