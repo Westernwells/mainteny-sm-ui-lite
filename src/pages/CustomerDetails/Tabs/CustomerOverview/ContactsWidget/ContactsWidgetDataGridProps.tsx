@@ -5,6 +5,7 @@ import {
   GridRenderCellParams,
   GridRowsProp,
 } from '@mui/x-data-grid';
+import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import {Avatar, Box} from '@mui/material';
 import useTheme from '@mui/material/styles/useTheme';
@@ -17,11 +18,14 @@ import {Actions} from './Actions';
 
 const defaultProps = {
   editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
+  renderHeader: (params: GridColumnHeaderParams) => {
+    const {t} = useTranslation();
+    return (
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName && t(params.colDef.headerName)}
+      </Typography>
+    );
+  },
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
     <Typography variant="body2" mx="0.5em">
       {params.value}
@@ -95,11 +99,14 @@ export const columns = (
     type: 'string',
     ...defaultAlignment,
     editable: false,
-    renderHeader: (params: GridColumnHeaderParams) => (
-      <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName}
-      </Typography>
-    ),
+    renderHeader: (params: GridColumnHeaderParams) => {
+      const {t} = useTranslation();
+      return (
+        <Typography variant="subtitle2" color="textSecondary">
+          {params.colDef.headerName && t(params.colDef.headerName)}
+        </Typography>
+      );
+    },
     renderCell: (params: GridRenderCellParams<any, any, any>) => {
       const theme = useTheme();
       switch (params.value) {
@@ -131,11 +138,14 @@ export const columns = (
     field: 'actions',
     headerName: 'Actions',
     type: 'actions',
-    renderHeader: (params: GridColumnHeaderParams) => (
-      <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName}
-      </Typography>
-    ),
+    renderHeader: (params: GridColumnHeaderParams) => {
+      const {t} = useTranslation();
+      return (
+        <Typography variant="subtitle2" color="textSecondary">
+          {params.colDef.headerName && t(params.colDef.headerName)}
+        </Typography>
+      );
+    },
     renderCell: (params) => (
       <Actions
         onEdit={() => getEditableContacts(params.value)}

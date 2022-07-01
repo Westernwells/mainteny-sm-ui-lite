@@ -605,6 +605,40 @@ module.exports = {
     'Quotation Details': 'Details zum Angebot',
     Orders: 'Aufträge',
     Customers: 'Kunden',
+
+    // Customer
+
+    'Search by number, name, address etc.':
+      'Suche nach Nummer, Name, Adresse usw.',
+    'No. of Units': 'Anzahl Anlagen',
+    'New Customer': 'Neuer Kunde',
+    'JOINED DATE': 'ANGESTELLUNGSDATUM',
+    PRIORITY: 'PRIORITÄT',
+    'NO. OF CONTRACTS': 'NO. VERTRÄGE',
+    'Basic Details': 'Allgemeine Angaben',
+    'Billing Address': 'Rechnungsadresse',
+    'Customer Number': 'Kundennummer',
+    'Search by unit, category': 'Suche nach Einheit, Kategorie',
+    'Search by id, revenue, date': 'Suche nach ID, Umsatz, Datum',
+    'Contract ID': 'Vertragsnr.',
+    'Revenue/Year': 'Einnahmen/Jahr',
+    'Contact Persons': 'Kontaktpersonen',
+    'Dashboard Access': 'Zugang Zum Dashboard',
+    Actions: 'Aktionen',
+    'No contact persons yet. They will appear here once added!':
+      'Noch keine Kontaktpersonen. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!',
+    'Last Visit Start': 'Letzter Besuch Beginn',
+    'Last Visit End': 'Letzter Besuch Ende',
+    'Next Visit Start': 'Nächster Besuch Beginn',
+    'Next Visit End': 'Nächster Besuch Ende',
+    'Search by no, customer, type...': 'Suche nach Nr., Kunde, Typ...',
+    'Price Range': 'Preisspanne',
+    Status: 'Status',
+    'CONTRACT ID': 'VERTRAGSNR.',
+    'NUMBER OF UNITS': 'ANZAHL DER ANLAGEN',
+    Valid: 'Gültig',
+    'Edit Contact Person': 'Kontaktperson bearbeiten',
+    'Add Contact Person': 'Kontaktperson hinzufügen',
   },
 };
 

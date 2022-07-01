@@ -1,4 +1,5 @@
 import {useCallback, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Box, Typography} from '@mui/material';
 import {GridRowsProp} from '@mui/x-data-grid';
 import * as Yup from 'yup';
@@ -38,6 +39,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export const ContactsWidget = ({customerId}: Props) => {
+  const {t} = useTranslation();
   const {user} = useUserSession();
   const [page, setPage] = useState(makePage(0, 5));
   const [pageCount, setPageCount] = useState(0);
@@ -184,11 +186,15 @@ export const ContactsWidget = ({customerId}: Props) => {
   return (
     <Box>
       <InfoCard
-        header={<Typography variant="subtitle1">Contact Persons</Typography>}
+        header={
+          <Typography variant="subtitle1">{t('Contact Persons')}</Typography>
+        }
         containerStyles={{flexGrow: 1}}
         headerStyles={{mt: '0.5em'}}
         handleAction={onCreateContact}
-        headerActionIcon={<Typography color="info.main">+ Add</Typography>}
+        headerActionIcon={
+          <Typography color="info.main">{t('+ Add')}</Typography>
+        }
         showHeaderBackground>
         <DataGridLayout
           fullHeight={false}

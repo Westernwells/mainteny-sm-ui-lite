@@ -5,6 +5,7 @@ import {
   GridRenderCellParams,
   GridRowsProp,
 } from '@mui/x-data-grid';
+import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import {formatDate} from 'utils/datetime';
 import {ContractView} from 'models/contract';
@@ -12,11 +13,14 @@ import {formatNetAmount} from '../../../../../utils/currency';
 
 const defaultProps = {
   editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
+  renderHeader: (params: GridColumnHeaderParams) => {
+    const {t} = useTranslation();
+    return (
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName && t(params.colDef.headerName)}
+      </Typography>
+    );
+  },
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
     <Typography variant="body2" mx="0.5em">
       {params.value}

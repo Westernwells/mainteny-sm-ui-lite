@@ -1,4 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+
 import {useNavigate} from 'react-router';
 import {Typography} from '@mui/material';
 import Box from '@mui/material/Box';
@@ -22,6 +24,7 @@ interface Props {
 }
 
 export const UnitsWidget = ({customerId, getTotalUnits, openTab}: Props) => {
+  const {t} = useTranslation();
   const navigate = useNavigate();
 
   const [page, setPage] = useState(makePage(0, 500));
@@ -62,7 +65,7 @@ export const UnitsWidget = ({customerId, getTotalUnits, openTab}: Props) => {
     <InfoCard
       header={
         <Box display="flex">
-          <Typography variant="subtitle1">Units</Typography>
+          <Typography variant="subtitle1">{t('Units')}</Typography>
           {rows.length > 0 && (
             <Box
               sx={{
