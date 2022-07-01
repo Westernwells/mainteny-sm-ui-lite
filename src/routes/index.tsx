@@ -18,7 +18,7 @@ import {Customer} from 'pages/Customers';
 import {ContractDetails} from 'pages/ContractDetails';
 import {CustomerDetails} from 'pages/CustomerDetails';
 import {Invoices} from 'pages/Invoices';
-import {DraftInvoice} from 'pages/InvoiceDetails/DraftInvoice';
+import {NewInvoice} from 'pages/InvoiceDetails/NewInvoice';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
 import {Employees} from 'pages/Employee';
 import {EmployeeDetails} from 'pages/EmployeeDetails';
@@ -177,7 +177,7 @@ export const Router = () => {
                   pageScrollable
                   backBtnLabel="New Invoice"
                   showBackAction>
-                  <DraftInvoice />
+                  <NewInvoice />
                 </PageLayout>
               </>
             }

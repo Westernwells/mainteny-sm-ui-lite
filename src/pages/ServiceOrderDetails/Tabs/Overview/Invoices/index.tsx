@@ -58,7 +58,7 @@ export const Invoices = ({serviceOrderId}: Props) => {
   return (
     <InfoCard
       header={<Typography variant="subtitle1">Invoices</Typography>}
-      handleAction={() => navigate('/invoices/new')}
+      handleAction={() => navigate(`/invoices/new?orderId=${serviceOrderId}`)}
       headerActionIcon={<Typography color="info.main">+ Add</Typography>}
       showHeaderBackground>
       {!totalInvoiceRef ? (
