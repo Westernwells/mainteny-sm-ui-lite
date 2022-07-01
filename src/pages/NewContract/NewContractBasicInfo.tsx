@@ -72,6 +72,8 @@ const NewContractBasicInfo: FC<Props> = ({
             onBlur: formik.handleBlur,
           }}
           defaultDate={formik.values.startDate}
+          maxDate={formik.values.endDate!}
+          minDate={new Date(Date.now())}
         />
       </Grid>
       <Grid item xs={4}>
@@ -91,7 +93,12 @@ const NewContractBasicInfo: FC<Props> = ({
             onBlur: formik.handleBlur,
           }}
           defaultDate={formik.values.endDate}
-          minDate={formik.values.startDate!}
+          minDate={
+            new Date(
+              new Date(formik.values.startDate! || Date.now()).getTime() +
+                86400000,
+            )
+          }
         />
       </Grid>
       <Grid item xs={4}>

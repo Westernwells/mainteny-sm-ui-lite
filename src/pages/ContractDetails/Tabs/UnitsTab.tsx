@@ -1,7 +1,5 @@
 import {FC, useEffect, useState} from 'react';
-import Box from '@mui/material/Box';
 import {GridRowsProp} from '@mui/x-data-grid';
-import {Widget} from 'components/Widget';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {
   columns,
@@ -48,18 +46,8 @@ export const UnitsTab: FC<Props> = ({elevators}) => {
     }
   }, [elevators, page]);
 
-  const renderWidget = () => (
-    <Box>
-      <Widget
-        searchPlaceholder="Search order type, customer, address"
-        getSearchValue={(val: string) => setSearch(val)}
-      />
-    </Box>
-  );
-
   return (
     <TabContentContainer>
-      {renderWidget()}
       <DataGridLayout
         hideFooter={pageCount <= 1}
         noRowsEmptySection={

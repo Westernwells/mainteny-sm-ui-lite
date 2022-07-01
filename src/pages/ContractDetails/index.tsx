@@ -1,14 +1,12 @@
 import {useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
-// import {Button} from 'components/Button';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useContractDetails} from 'hooks/reactQuery/useContract';
 import {useParams} from 'react-router';
-import {useSnackbar} from 'notistack';
 import {UnitsTab} from './Tabs/UnitsTab';
 import {ContractOverview} from './Tabs/ContractOverview';
 
@@ -27,13 +25,13 @@ export const ContractDetails = () => {
   const [tabValue, setTabValue] = useState(0);
   const {id: contractId} = useParams();
   const {data: contractDetails, isLoading} = useContractDetails(contractId!);
-  const {enqueueSnackbar} = useSnackbar();
 
   const {data: downloadUrl} = useDownloadUrl(
     contractDetails?.additionalInfo?.documents?.length
       ? [contractDetails?.additionalInfo?.documents[0]?.uri]
       : [],
   );
+
   return (
     <Tabs
       tabItems={tabItems}
@@ -42,17 +40,20 @@ export const ContractDetails = () => {
       showActionBtn
       btnLabel="Download contract"
       actionBtnVariant="outlined"
+      disableBtnAction={!Object.values(downloadUrl || {}).length}
       actionButtonIcon={<FileDownloadIcon color="primary" sx={{}} />}
       btnOnClick={() => {
         if (downloadUrl && Object.values(downloadUrl).length) {
-          return window.open(Object.values(downloadUrl!)[0], '_blank');
+          const url = Object.values(downloadUrl)[0];
+          fetch(url).then((t) =>
+            t.blob().then((b) => {
+              const a = document.createElement('a');
+              a.href = URL.createObjectURL(b);
+              a.setAttribute('download', 'contract');
+              a.click();
+            }),
+          );
         }
-        enqueueSnackbar(
-          'Sorry, no document has been attached to this contract yet!',
-          {
-            variant: 'error',
-          },
-        );
       }}>
       <TabsBody value={tabValue} index={0}>
         <ContractOverview

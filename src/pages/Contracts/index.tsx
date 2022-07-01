@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
@@ -22,7 +22,10 @@ import {
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
-import {costRangeConvertor as crConverter} from 'utils/contract-utils';
+import {
+  costRangeConvertor as crConverter,
+  getStartEndPrice,
+} from 'utils/contract-utils';
 import {columns, makeRows} from './ContractsDataGridProps';
 
 const pageSize = 25;
@@ -41,6 +44,8 @@ export const Contracts = () => {
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
 
+  const [priceStart, priceEnd] = useMemo(() => getStartEndPrice(cost), [cost]);
+
   const {
     data: contractResource = createEmptyResource<ContractView>(10),
     isLoading,
@@ -55,8 +60,10 @@ export const Contracts = () => {
       pageSize: page.pageSize || 25,
       query: search,
       status,
+      priceStart,
+      priceEnd,
     },
-    {price: cost},
+    {},
     {keepPreviousData: true},
   );
 
@@ -127,7 +134,7 @@ export const Contracts = () => {
       <MultipleSelectCheckmarks
         label="Price Range"
         options={['0 - €500', '€500 - €1,000', '> €1,000']}
-        initialSelectedItems={cost}
+        initialSelectedItems={[]}
         getSelectedValue={(item) => costRangeConvertor(item)}
       />
       <MultipleSelectCheckmarks

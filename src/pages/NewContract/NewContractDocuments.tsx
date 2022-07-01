@@ -14,6 +14,7 @@ const NewContractDocuments: FC<Props> = ({formik}) => (
     ]}
     acceptedFileTypes="application/pdf"
     getAcceptedFiles={(files) => formik.setFieldValue('documents', files)}
+    maxFiles={1}
   />
 );
 

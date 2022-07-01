@@ -95,7 +95,7 @@ export const ContractBasic = ({
                 ? renewalPeriod > 1
                   ? `${renewalPeriod} months`
                   : `${renewalPeriod} month`
-                : '-'
+                : '0'
             }
           />
         </Grid>

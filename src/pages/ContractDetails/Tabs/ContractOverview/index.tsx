@@ -6,6 +6,7 @@ import Alert from '@mui/material/Alert';
 import {useUpdateContract} from 'hooks/reactQuery/useContract';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
+import {useMediaQuery} from '@mui/material';
 import {useParams} from 'react-router-dom';
 import {toDate} from 'utils/datetime';
 import {differenceInDays, isBefore} from 'date-fns';
@@ -50,6 +51,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const theme = useTheme();
   const {mutateAsync: updateContract} = useUpdateContract('Contract updated');
   const {user} = useUserSession();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [openContractDialog, setOpenContractDialog] = useState(false);
   const [openDocumentDialog, setOpenDocumentDialog] = useState(false);
@@ -69,11 +71,11 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const formik = useFormik<ContractUpdateRequest>({
     initialValues: {
       type: contractDetails?.type!,
-      price: contractDetails?.additionalInfo?.price?.netAmount || 0,
+      price: contractDetails?.additionalInfo?.price?.netAmount || '',
       invoiceDue: contractDetails?.additionalInfo?.invoiceDue!,
-      renewalTerms: contractDetails?.additionalInfo?.renewalTerms || 0,
-      visitsNumber: contractDetails?.visitsNumber || 0,
-      spendingLimit: contractDetails?.spendingLimit || 0,
+      renewalTerms: contractDetails?.additionalInfo?.renewalTerms || '',
+      visitsNumber: contractDetails?.visitsNumber || '',
+      spendingLimit: contractDetails?.spendingLimit || '',
     },
     onSubmit: () => {},
     enableReinitialize: true,
@@ -85,16 +87,16 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       ...contractDetails,
       type: convertToMacro(formik.values.type || ''),
       ...contractDetails?.additionalInfo,
-      renewalTerms: Number(formik.values.renewalTerms),
+      renewalTerms: +formik.values.renewalTerms,
       price: {
         ...contractDetails?.additionalInfo.price,
-        netAmount: Number(formik.values.price),
+        netAmount: +formik.values.price,
         currency: 'EUR',
         percentageVat: user?.userAccount.serviceCompany.settings.percentageVat,
       },
       invoiceDue: convertToMacro(formik.values.invoiceDue || ''),
-      visitsNumber: formik.values.visitsNumber,
-      spendingLimit: formik.values.spendingLimit,
+      visitsNumber: +formik.values.visitsNumber,
+      spendingLimit: +formik.values.spendingLimit,
       startDate: contractDetails?.startTime,
       endDate: contractDetails?.endTime,
       timePreference: contractDetails?.timePreference || [],
@@ -114,7 +116,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       ...contractDetails,
       ...contractDetails?.additionalInfo,
       documents: [
-        ...(contractDetails?.additionalInfo?.documents || []),
         ...documents.map((item) => ({
           description: item.name.split('.')[0],
           type: item.type,
@@ -206,7 +207,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
           </InfoCard>
 
           <Grid container spacing={2}>
-            <Grid item xs={8}>
+            <Grid item xs={12} md={8}>
               <ContractCard
                 containerStyles={{
                   mt: '1em',
@@ -223,12 +224,12 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   </Box>
                 }>
                 <ContractParties
-                  name={contractDetails?.propertyOwner.name}
+                  name={user?.userAccount.serviceCompany.name}
                   occupation="Service Company"
                   address={
-                    contractDetails?.propertyOwner.postalAddress.fullName
+                    user?.userAccount.serviceCompany.postalAddress?.fullName
                   }
-                  phoneNumber={contractDetails?.propertyOwner.contact.phone}
+                  phoneNumber={user?.userAccount.serviceCompany.contact.phone}
                   partyType="CONTRACTOR"
                   chipStyles={{
                     chipMaxChars: 15,
@@ -236,10 +237,12 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   }}
                 />
                 <ContractParties
-                  name={contractDetails?.serviceCompany.name}
-                  occupation="Property Manager"
-                  address=""
-                  phoneNumber=""
+                  name={contractDetails?.propertyOwner.name}
+                  occupation="Property Owner"
+                  address={
+                    contractDetails?.propertyOwner.postalAddress.fullName
+                  }
+                  phoneNumber={contractDetails?.propertyOwner.contact.phone}
                   partyType="CUSTOMER"
                   chipStyles={{
                     chipColor: 'primary',
@@ -247,10 +250,10 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 />
               </ContractCard>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <ContractCard
                 containerStyles={{
-                  mt: '1em',
+                  mt: !isMobile ? '1em' : 0,
                   pt: 2,
                   px: 2,
                   height: 'calc(100% - 1em)',
@@ -270,7 +273,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   <Typography color="#2196F3">+ Add</Typography>
                 }
                 headerAction={() => setOpenDocumentDialog(true)}>
-                {contractDetails?.additionalInfo?.documents?.length ? (
+                {contractDetails?.additionalInfo?.documents![0] ? (
                   <Box
                     sx={{
                       height: '155px',
@@ -279,45 +282,51 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                       justifyContent: 'center',
                       flexDirection: 'column',
                     }}>
-                    {contractDetails?.additionalInfo?.documents.map(
-                      (documnet) => (
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            mt: 2,
-                          }}>
-                          <Box
-                            sx={{
-                              border: '1px solid #8F9BB380',
-                              padding: '1em',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              alignItems: 'center',
-                              borderRadius: '4px',
-                            }}
-                            onClick={() =>
-                              window.open(downloadUrls[documnet.uri], '_blank')
-                            }>
-                            <FileCopyIcon
-                              fontSize="large"
-                              htmlColor="rgba(15, 76, 100, 0.5)"
-                            />
-                          </Box>
-                          <Typography
-                            align="center"
-                            sx={{color: '#8F9BB3', marginTop: '10px'}}>
-                            {documnet.description}
-                          </Typography>
-                        </Box>
-                      ),
-                    )}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mt: 2,
+                        cursor: 'pointer',
+                      }}>
+                      <Box
+                        sx={{
+                          border: '1px solid #8F9BB380',
+                          padding: '1em',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          borderRadius: '4px',
+                        }}
+                        onClick={() =>
+                          window.open(
+                            downloadUrls[
+                              contractDetails?.additionalInfo?.documents![0]
+                                ?.uri
+                            ],
+                            '_blank',
+                          )
+                        }>
+                        <FileCopyIcon
+                          fontSize="large"
+                          htmlColor="rgba(15, 76, 100, 0.5)"
+                        />
+                      </Box>
+                      <Typography
+                        align="center"
+                        sx={{color: '#8F9BB3', marginTop: '10px'}}>
+                        {
+                          contractDetails?.additionalInfo?.documents[0]
+                            .description
+                        }
+                      </Typography>
+                    </Box>
                   </Box>
                 ) : (
                   <EmptySection
-                    label="No documents attached. They will appear here once added!"
+                    label="No document yet. It will be appear here once added."
                     illustration="clipboard"
                     size="tiny"
                     containerStyle={{
@@ -340,6 +349,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                       setDocuments(dropedFiles);
                     }}
                     acceptedFileTypes="application/pdf"
+                    maxFiles={1}
                   />
                 </Dialog>
               </ContractCard>

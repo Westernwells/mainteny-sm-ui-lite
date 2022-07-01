@@ -5,7 +5,7 @@ import {
   ContractView,
 } from 'models/contract';
 import {Order} from 'models/misc';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {Progress} from 'components/Progress';
@@ -14,7 +14,10 @@ import {FilterFields} from 'components/FilterFields';
 import {TabContentContainer} from 'components/TabContentContainer';
 import Box from '@mui/material/Box';
 
-import {costRangeConvertor as crConverter} from 'utils/contract-utils';
+import {
+  costRangeConvertor as crConverter,
+  getStartEndPrice,
+} from 'utils/contract-utils';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {EmptySection} from 'components/EmptySection';
 import {convertToMacro, convertToText} from 'utils/utils';
@@ -37,6 +40,8 @@ export const ContractsTab = ({customerId}: Props) => {
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
 
+  const [priceStart, priceEnd] = useMemo(() => getStartEndPrice(cost), [cost]);
+
   const {
     data: contractResource = createEmptyResource<ContractView>(10),
     isLoading,
@@ -49,9 +54,11 @@ export const ContractsTab = ({customerId}: Props) => {
       order: Order.ASC,
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
+      priceStart,
+      priceEnd,
     },
     customerId,
-    {price: cost},
+    {},
     {keepPreviousData: true},
   );
 

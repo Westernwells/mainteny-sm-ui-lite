@@ -63,6 +63,8 @@ export interface QueryContractParams {
   query: string;
   serviceCompanyId: string;
   status?: string[];
+  priceStart: number;
+  priceEnd: number;
 }
 
 export enum InvoiceDueType {
@@ -165,7 +167,6 @@ export interface ContractRecord {
 export interface ContractFilters {
   contractor?: string[];
   expiryDate?: string[];
-  price?: number[][];
   status?: string[];
 }
 
@@ -177,6 +178,8 @@ export interface CustomerContractParams {
   query: string;
   serviceCompanyId: string;
   status?: ContractStatus;
+  priceStart: number;
+  priceEnd: number;
 }
 
 export interface ElevatorContractParams {
@@ -232,9 +235,9 @@ export interface ContractTermsFormModal {
 
 export interface ContractUpdateRequest {
   type: string;
-  price: number;
+  price: number | string;
   invoiceDue: string;
-  renewalTerms: number;
-  visitsNumber: number;
-  spendingLimit: number;
+  renewalTerms: number | string;
+  visitsNumber: number | string;
+  spendingLimit: number | string;
 }

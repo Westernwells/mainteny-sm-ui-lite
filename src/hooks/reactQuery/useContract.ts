@@ -136,10 +136,6 @@ const filterContracts = (
     result = {...result, data: expiryDates, total: expiryDates.length};
   }
 
-  if (filter.price?.length) {
-    const prices = filterByPrice(result, filter.price);
-    result = {...result, data: prices, total: prices.length};
-  }
   return result;
 };
 

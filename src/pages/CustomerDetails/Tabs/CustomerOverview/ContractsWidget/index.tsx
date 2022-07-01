@@ -42,6 +42,8 @@ export const ContractsWidget = ({
       order: Order.ASC,
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
+      priceStart: 0,
+      priceEnd: 99999,
     },
     customerId,
   );

@@ -20,3 +20,16 @@ export const costRangeConvertor = (selectedItems: string[]) => {
   });
   return range;
 };
+
+export const getStartEndPrice = (price: number[][]) => {
+  const numbers =
+    price.length &&
+    price?.reduce<number[]>((acc, item) => [...acc, ...item], []);
+
+  const newPrice = numbers && numbers.length ? numbers : [0, 99999];
+
+  return [
+    Math.min(...(newPrice as number[])),
+    Math.max(...(newPrice as number[])),
+  ];
+};
