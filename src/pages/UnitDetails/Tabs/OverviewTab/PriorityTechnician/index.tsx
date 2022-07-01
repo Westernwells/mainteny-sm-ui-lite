@@ -143,11 +143,8 @@ export const PriorityTechnician = ({
       <EmptySection
         illustration="clipboard"
         size="tiny"
-        containerStyle={{m: 'auto', width: '60%'}}
-        label="No technicians yet. It will appear here once added!"
-        showActionBtn
-        btnLabel="+ Add New Technician"
-        btnAction={() => {}}
+        containerStyle={{m: '1em 0', width: '60%'}}
+        label="No priority technicians have been added yet!"
       />
     </Box>
   );
@@ -172,7 +169,6 @@ export const PriorityTechnician = ({
           hideFooter
           rows={rows}
           isWidget
-          headerHeight={30}
           columns={useCallback(
             () => columns(getEditableTechnician, getDeletableTechnician),
             [],
@@ -214,7 +210,7 @@ export const PriorityTechnician = ({
         onConfirm={() => onDelete()}
         onClose={() => setOpenCancelConfirm(false)}
         title="Confirm"
-        content="Do you want to delete this note?"
+        content="Do you want to delete this technician?"
       />
     </InfoCard>
   );

@@ -14,6 +14,7 @@ import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {FileResourceRecord} from 'models/media';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmptySection} from 'components/EmptySection';
+import {olStyles} from 'styles';
 
 interface Props {
   elevator: ElevatorView;
@@ -37,6 +38,10 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
       ? elevator.additionalInfo.pictures.map((item) => item.uri)
       : [],
   );
+
+  const isEmpty =
+    !elevator.additionalInfo.pictures ||
+    elevator.additionalInfo.pictures.length === 0;
 
   const onSave = async () => {
     const serviceCompanyId = user?.userAccount.serviceCompany.id;
@@ -71,10 +76,7 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
         height: '100%',
       }}>
       <EmptySection
-        label="No pictures have been created yet. Please click the button below to create one!"
-        showActionBtn
-        btnLabel="Add Pictures"
-        btnAction={() => setOpenDialog(true)}
+        label="No picture has been added yet!"
         illustration="clipboard"
         size="tiny"
         containerStyle={{
@@ -93,15 +95,28 @@ export const Pictures = ({elevator, elevatorRequestBody}: Props) => {
           flexDirection: 'column',
         },
       }}
-      bodyContainerStyle={{overflowY: 'scroll'}}
+      bodyContainerStyle={{
+        [theme.breakpoints.up('md')]: {
+          height: '12em',
+          overflowY: 'hidden',
+
+          '&:hover': {
+            overflowY: 'auto',
+            ...olStyles.verticlaScrollBar,
+          },
+        },
+        [theme.breakpoints.down('md')]: {
+          height: '100%',
+          overflowY: 'auto',
+        },
+      }}
       headerActionIcon={
         <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
       }
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
       header={<Typography variant="subtitle1">{t('Pictures')}</Typography>}>
-      {!elevator.additionalInfo.pictures ||
-      elevator.additionalInfo.pictures.length === 0 ? (
+      {isEmpty ? (
         renderEmptySection()
       ) : (
         <Grid container spacing={1} sx={{mt: '0.5em'}}>

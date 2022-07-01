@@ -7,7 +7,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import FlagIcon from '@mui/icons-material/Flag';
 import useTheme from '@mui/material/styles/useTheme';
 import {ElevatorView} from 'models/elevator';
-import {formatDate} from 'utils/datetime';
+import {convertMinsToHM, formatDate} from 'utils/datetime';
 
 interface Props {
   label: string;
@@ -71,7 +71,11 @@ export const ServiceSchema = ({label, elevator, visitNumber}: Props) => {
               <AccessTimeFilledIcon sx={{color: theme.palette.info.dark}} />
             }
             label="REQUIRED TIME"
-            bodyText={elevator.serviceTime || '-'}
+            bodyText={
+              elevator.serviceTime > 60
+                ? convertMinsToHM(elevator.serviceTime)
+                : elevator.serviceTime || '-'
+            }
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"

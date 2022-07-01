@@ -1,4 +1,5 @@
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
+import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import {getColumnProps} from 'components/DataGridLayout';
@@ -10,18 +11,31 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
     headerName: 'number',
-    align: 'center',
-    flex: 0,
+    align: 'left',
+    renderCell: (params: GridRenderCellParams<any, any, any>) => {
+      const theme = useTheme();
+      return (
+        <>
+          <ElevatorIcon
+            style={{marginInline: '.25em', color: theme.palette.action.active}}
+          />
+          <Typography
+            variant="body2"
+            sx={{
+              whiteSpace: 'pre-wrap',
+              overflowWrap: 'anywhere',
+            }}>
+            {params.value || '-'}
+          </Typography>
+        </>
+      );
+    },
+    flex: 0.75,
   }),
   getColumnProps({
     field: 'model',
     headerName: 'model',
-    renderCell: (params: GridRenderCellParams<any, any, any>) => (
-      <>
-        <ElevatorIcon style={{marginInline: '.25em'}} />
-        <Typography variant="body2">{params.value || '-'}</Typography>
-      </>
-    ),
+    flex: 1.5,
   }),
   getColumnProps({
     field: 'customer',
@@ -60,8 +74,8 @@ export const columns: GridColDef[] = [
     headerAlign: 'center',
     renderCell: (params) => (
       <StatusChip
-        label={params.value ? 'Yes' : 'No'}
-        color={params.value ? 'success' : 'error'}
+        label={params.value ? 'YES' : 'NO'}
+        color={params.value ? 'success' : 'info'}
         variant="filled"
         size="small"
         maxChars={3}

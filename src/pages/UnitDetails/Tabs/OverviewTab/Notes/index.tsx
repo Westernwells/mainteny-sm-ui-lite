@@ -19,6 +19,7 @@ import {formatDate} from 'utils/datetime';
 import {Dialog} from 'components/Dialog';
 import {useFormik} from 'formik';
 import {NotesFormModel} from 'models/unitForm';
+import {olStyles} from 'styles';
 import * as Yup from 'yup';
 import {Confirm} from 'components/Confirm';
 import {NotesForm} from './NotesForm';
@@ -33,7 +34,7 @@ enum DialogTitle {
 }
 
 const validationSchema = Yup.object().shape({
-  note: Yup.object().nullable().required('Address is required'),
+  note: Yup.string().required('Note is required'),
 });
 
 export const Notes = ({elevatorId}: Props) => {
@@ -136,6 +137,8 @@ export const Notes = ({elevatorId}: Props) => {
     </Box>
   );
 
+  const isEmpty = isFetched && !totalNotesRef.current;
+
   return (
     <InfoCard
       containerStyles={{
@@ -159,8 +162,22 @@ export const Notes = ({elevatorId}: Props) => {
       headerActionIcon={
         <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
       }
-      bodyContainerStyle={{flexGrow: 1, overflowY: 'scroll'}}>
-      {isFetched && !totalNotesRef.current ? (
+      bodyContainerStyle={{
+        [theme.breakpoints.up('md')]: {
+          height: '12em',
+          overflowY: 'hidden',
+
+          '&:hover': {
+            overflowY: 'auto',
+            ...olStyles.verticlaScrollBar,
+          },
+        },
+        [theme.breakpoints.down('md')]: {
+          height: '100%',
+          overflowY: 'auto',
+        },
+      }}>
+      {isEmpty ? (
         <Box
           sx={{
             display: 'flex',
@@ -169,10 +186,7 @@ export const Notes = ({elevatorId}: Props) => {
             height: '100%',
           }}>
           <EmptySection
-            label="No notes have been created yet. Please click the button below to create one!"
-            showActionBtn
-            btnLabel="Add Note"
-            btnAction={() => setOpenDialog(true)}
+            label="No note as been added yet!"
             illustration="clipboard"
             size="tiny"
             containerStyle={{
@@ -189,6 +203,7 @@ export const Notes = ({elevatorId}: Props) => {
         title={dialogTitle}
         isSaving={editElevatorLoading || addElevatorLoading}
         onCancel={() => setOpenDialog(false)}
+        disableSaveBtn={!!Object.keys(formik.errors).length}
         onSave={onSave}
         dialogProps={{
           maxWidth: 'sm',
