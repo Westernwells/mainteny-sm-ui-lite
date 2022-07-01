@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -18,7 +19,10 @@ import {formatNetAmount} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
-import {useInvoicePaymentStatus} from 'hooks/reactQuery/useInvoice';
+import {
+  useInvoicePaymentStatus,
+  usePublishInvoice,
+} from 'hooks/reactQuery/useInvoice';
 import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
@@ -31,7 +35,9 @@ interface Props {
 }
 
 export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
+  const {t} = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const {mutate: publishInvoice} = usePublishInvoice();
   const {mutate: markAsPaid} = useInvoicePaymentStatus();
 
   return (
@@ -117,7 +123,7 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
                 {invoice.serviceOrder.number}
               </Typography>
               <Typography variant="caption" sx={{color: 'text.secondary'}}>
-                {`Created on ${formatDate(
+                {`${t('Created on')} ${formatDate(
                   invoice.serviceOrder.meta.createdAt,
                 )}`}
               </Typography>
@@ -133,28 +139,6 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
               </Box>
               <Typography variant="caption">
                 {invoice.serviceOrder.description}
-              </Typography>
-            </Box>
-          </PageCard>
-
-          <PageCard
-            headerLabel="Work Report"
-            contentContainerStyles={{
-              display: 'flex',
-              gap: '1em',
-              flexDirection: 'column',
-            }}>
-            <Box>
-              <Typography>
-                10.06.2020: Secured lift and counterweight for disconnection of
-                engine and brake. Disassembled engine with brake and delivered
-                it to a workshop in Råde.
-              </Typography>
-              <Typography mt="1em">
-                22.06.2020: Picked up engine at workshop. Mounted motor with
-                brake and removed securing of lift and counterweight. Refilled
-                oil on the gear unit between the hoist and the shaft for
-                chains....
               </Typography>
             </Box>
           </PageCard>
@@ -176,7 +160,7 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
       <BottomDrawer
         isOpen={invoice.status !== InvoiceStatus.PAID}
         primaryButtonLabel={
-          invoice.status === InvoiceStatus.PAID ? 'Download' : 'Mark as paid'
+          invoice.status === InvoiceStatus.PAID ? 'Download' : `Mark Paid`
         }
         primaryButtonAction={() => {
           if (
@@ -193,9 +177,11 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
           invoice.status !== InvoiceStatus.PAID
             ? [
                 {
-                  label: 'Resend',
+                  label: t('Resend'),
                   icon: <ReplayIcon />,
-                  onClick: () => {},
+                  onClick: () => {
+                    if (invoice.id) publishInvoice(invoice.id);
+                  },
                 },
               ]
             : []

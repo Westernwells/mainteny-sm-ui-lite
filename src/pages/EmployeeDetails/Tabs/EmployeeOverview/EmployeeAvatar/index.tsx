@@ -2,21 +2,14 @@ import {Avatar, Box, Typography} from '@mui/material';
 import {styled} from '@mui/material/styles';
 import Badge from '@mui/material/Badge';
 
-import {Role} from 'models/user';
 import {capitalize} from 'utils/utils';
 
 type EmployeeAvatarProps = {
-  firstName: string;
-  lastName: string;
-  roles: string | Role[];
-  isOnline: Boolean;
+  name?: string;
+  subTitle?: string | string[];
+  isOnline?: Boolean;
 };
-const EmployeeAvatar = ({
-  firstName,
-  lastName,
-  roles,
-  isOnline,
-}: EmployeeAvatarProps) => {
+const EmployeeAvatar = ({name, subTitle, isOnline}: EmployeeAvatarProps) => {
   const StyledBadge = styled(Badge)(({theme}) => ({
     '& .MuiBadge-badge': {
       backgroundColor: '#00D68F',
@@ -75,15 +68,24 @@ const EmployeeAvatar = ({
         </>
       </Box>
       <Box>
-        <Typography variant="subtitle1" textAlign="center">
-          {`${firstName}  ${lastName}`}
-        </Typography>
-        <Typography
-          variant="subtitle2"
-          color="textSecondary"
-          textAlign="center">
-          {roles ? `${capitalize(roles as string[])}` : ''}
-        </Typography>
+        {name && (
+          <Typography variant="subtitle1" textAlign="center">
+            {name}
+          </Typography>
+        )}
+
+        {subTitle && (
+          <Typography
+            variant="subtitle2"
+            color="textSecondary"
+            textAlign="center">
+            {subTitle
+              ? Array.isArray(subTitle)
+                ? `${capitalize(subTitle as string[])}`
+                : subTitle
+              : '-'}
+          </Typography>
+        )}
       </Box>
     </Box>
   );

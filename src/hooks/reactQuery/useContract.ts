@@ -120,7 +120,9 @@ export const filterByPrice = (
     });
     return result;
   };
-  mergedResult = contractsRes.data.filter((item) => inRange(item.price, price));
+  mergedResult = contractsRes.data.filter((item) =>
+    inRange(item.additionalInfo.price?.netAmount || 0, price),
+  );
   return mergedResult;
 };
 
@@ -218,8 +220,9 @@ export const useUseQueryCustomerContracts = (
     ...params,
     serviceCompanyId: user?.userAccount.serviceCompany.id,
   };
+
   return useQuery(
-    [queryKeys.queryCustomerContract, params, id],
+    [queryKeys.queryCustomerContract, params, id, filter],
     () => queryCustomerContract(params, id!),
     {
       enabled: !!id && !!user,

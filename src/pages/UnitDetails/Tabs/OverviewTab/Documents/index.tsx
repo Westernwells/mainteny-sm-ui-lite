@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
 import useTheme from '@mui/material/styles/useTheme';
-import {FileWithPreview, MyDropZone} from 'components/MyDropzone';
+import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {ElevatorView, ElevatorRequestBody} from 'models/elevator';
@@ -43,6 +43,7 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
     const serviceCompanyId = user?.userAccount.serviceCompany.id;
     const uploadPath = `${serviceCompanyId}/elevators/${elevator.id}/documents`;
     await uploadFiles({files: acceptedFiles, uploadPath});
+    console.log(acceptedFiles, 'QQQQQQ!!!');
     if (elevatorRequestBody) {
       await updateElevator({
         body: {
@@ -116,6 +117,7 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
               <Grid
                 item
                 sm={4}
+                key={item.id}
                 sx={{
                   height: 120,
                   [theme.breakpoints.down('md')]: {

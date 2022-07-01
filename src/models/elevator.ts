@@ -18,6 +18,7 @@ import {EmployeesSimpleView} from './employee';
 import {
   PropertyContactPersonSimpleView,
   PropertyOwnerSimpleView,
+  PropertyOwnerView,
 } from './propertyManager';
 
 export enum ElevatorCommentType {
@@ -141,7 +142,7 @@ export interface ElevatorView {
   contracts: ContractSimpleView[];
   availability: number;
   address: Address;
-  propertyOwner: PropertyOwnerSimpleView;
+  propertyOwner: PropertyOwnerView;
   propertyManager: PropertyContactPersonSimpleView;
   properties: ElevatorProperty[];
   lastVisitDate: string;
@@ -158,7 +159,7 @@ export interface ElevatorView {
 
 export interface ElevatorSimpleView {
   id: string;
-  propertyOwner: PropertyOwnerSimpleView;
+  propertyOwner: PropertyOwnerView;
   properties?: ElevatorProperty[];
   number: string;
   model: string;

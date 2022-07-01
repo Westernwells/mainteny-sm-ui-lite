@@ -1,4 +1,4 @@
-import {EmployeeAccountData} from 'pages/Employee/NewEmployee/model';
+import {EmployeeAccountData} from 'pages/NewEmployee/model';
 
 import {EmployeeAccountData as EditEmployeeAccountData} from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/model';
 
@@ -21,6 +21,7 @@ export const formatEmployeeAccountData = (data: EmployeeAccountData) => {
     workingHours: data.shifts,
     team: data.team,
     roles: data?.roles || [],
+    externalId: data.employeeId || '',
   };
 
   if (employee.team === '') {
@@ -52,6 +53,7 @@ export const formatUpdateEmployeeAccountData = (
     workingHours: data.shifts,
     roles: data.roles,
     team: data?.team || '',
+    externalId: data.employeeId || '',
   };
 
   return {userAccount, employee};

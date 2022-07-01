@@ -21,6 +21,7 @@ export const FormInput = ({props, containerStyles, inputLabelProps}: Props) => {
         size="small"
         {...props}
         label={t(props!.label as string)}
+        helperText={t(props!.helperText as string)}
         placeholder={t(props!.placeholder as string)}
       />
     </FormControl>

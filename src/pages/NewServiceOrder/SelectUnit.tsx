@@ -125,6 +125,7 @@ please click the button below'
       <DataGridLayout
         hideFooter={pageCount <= 1}
         rows={rows}
+        scrollToTop={search}
         columns={columns(selectedUnit?.id || '')}
         onCellClick={(params: GridCellParams) => {
           setSelectedUnit(params.row.elevator);

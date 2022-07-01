@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
 import useTheme from '@mui/material/styles/useTheme';
-import {FileWithPreview, MyDropZone} from 'components/MyDropzone';
+import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {ElevatorView, ElevatorRequestBody} from 'models/elevator';

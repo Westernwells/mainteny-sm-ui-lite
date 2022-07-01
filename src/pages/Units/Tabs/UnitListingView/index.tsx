@@ -137,6 +137,7 @@ export const UnitListingView = () => {
         inputLabelProps={{shrink: undefined}}
         textFieldProps={{
           label: 'Last Visit Start',
+          sx: {background: '#fff'},
         }}
       />
       <DatePicker
@@ -148,6 +149,7 @@ export const UnitListingView = () => {
         inputLabelProps={{shrink: undefined}}
         textFieldProps={{
           label: 'Last Visit End',
+          sx: {background: '#fff'},
         }}
       />
 
@@ -160,6 +162,7 @@ export const UnitListingView = () => {
         inputLabelProps={{shrink: undefined}}
         textFieldProps={{
           label: 'Next Visit Start',
+          sx: {background: '#fff'},
         }}
       />
       <DatePicker
@@ -170,6 +173,7 @@ export const UnitListingView = () => {
         inputLabelProps={{shrink: undefined}}
         textFieldProps={{
           label: 'Next Visit End',
+          sx: {background: '#fff'},
         }}
       />
     </FilterFields>
@@ -196,6 +200,7 @@ export const UnitListingView = () => {
         hideFooter={pageCount <= 1}
         rows={rows}
         columns={columns}
+        scrollToTop={search}
         loading={isFetching}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}

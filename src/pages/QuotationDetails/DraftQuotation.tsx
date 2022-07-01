@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
@@ -41,6 +42,7 @@ interface Props {
 }
 
 export const DraftQuotation = ({quotation}: Props) => {
+  const {t} = useTranslation();
   const navigate = useNavigate();
 
   const {user} = useUserSession();
@@ -311,7 +313,7 @@ export const DraftQuotation = ({quotation}: Props) => {
 
       <BottomDrawer
         isOpen={isDrawerOpen}
-        primaryButtonLabel={quotation ? 'send' : 'save'}
+        primaryButtonLabel={quotation ? 'Send' : 'Save'}
         primaryButtonAction={() => {
           setPublish(!!quotation);
           formik.handleSubmit();
@@ -320,7 +322,7 @@ export const DraftQuotation = ({quotation}: Props) => {
           quotation
             ? [
                 {
-                  label: 'Save Draft',
+                  label: t('Save Draft'),
                   icon: <DraftsIcon />,
                   onClick: () => {
                     setPublish(false);
@@ -329,7 +331,7 @@ export const DraftQuotation = ({quotation}: Props) => {
                   showBorder: true,
                 },
                 {
-                  label: 'Duplicate',
+                  label: t('Duplicate'),
                   icon: <CopyAllIcon />,
                   onClick: () => {
                     navigate(`/quotations/new?id=${quotation.id}`);
@@ -345,7 +347,7 @@ export const DraftQuotation = ({quotation}: Props) => {
               ]
             : [
                 {
-                  label: 'Save & Send',
+                  label: t('Save & Send'),
                   icon: <DraftsIcon />,
                   onClick: () => {
                     setPublish(true);

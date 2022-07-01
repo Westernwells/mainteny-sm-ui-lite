@@ -131,6 +131,7 @@ export const ArticlesDataGrid = ({setRowItem}: Props) => {
           columns={columns}
           onCellClick={(params) => setRowItem(params.row.article)}
           loading={isFetching}
+          scrollToTop={search}
           pageSize={page.pageSize}
           pageIndex={page.pageIndex}
           pageCount={pageCount}

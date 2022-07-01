@@ -12,6 +12,7 @@ export const queryKeys = {
   elevatorById: 'elevatorById',
   maintainerByElevatorId: 'maintainerByElevatorId',
   fetchServiceOrderReport: 'fetchServiceOrderReport',
+  fetchServiceOrderReportDetails: 'fetchServiceOrderReportDetails',
   fetchId: 'fetchId',
   fetchInvoices: 'fetchInvoices',
   fetchQuotations: 'fetchQuotations',
@@ -45,4 +46,5 @@ export const queryKeys = {
   queryTodos: 'queryTodos',
   fetchServiceOrderInvoices: 'fetchServiceOrderInvoices',
   fetchServiceOrderArticles: 'fetchServiceOrderArticles',
+  queryContacts: 'queryContacts',
 };

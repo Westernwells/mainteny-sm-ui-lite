@@ -159,6 +159,7 @@ export const Quotations = () => {
         rows={rows}
         columns={columns}
         loading={isFetching}
+        scrollToTop={search}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>

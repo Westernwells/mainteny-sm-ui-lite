@@ -1,7 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {addDays, endOfDay, startOfDay} from 'date-fns';
-import {Box, SelectChangeEvent} from '@mui/material';
 import {GridRowsProp} from '@mui/x-data-grid';
 import * as _ from 'lodash';
 
@@ -11,7 +10,7 @@ import {Widget} from 'components/Widget';
 import {EmptySection} from 'components/EmptySection';
 import {FilterFields} from 'components/FilterFields';
 import {Progress} from 'components/Progress';
-import {FormSelect} from 'components/form/FormSelect';
+import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useQueryTechnicianEvents} from 'hooks/reactQuery/useTechnician';
 import {useQueryUserAccounts} from 'hooks/reactQuery/useUserAccount';
 import {TechnicianEventType} from 'models/misc';
@@ -23,6 +22,7 @@ import {
   formatSearchParamsPageSize,
 } from 'utils/utils';
 import {toRestDateTime} from 'utils/datetime';
+import {getRoles} from 'utils/work-hours-utils';
 import {columns, makeRows} from './EmployeeDataGridProps';
 
 const pageSize = 25;
@@ -38,17 +38,6 @@ export const Employees = () => {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [role, setRole] = useState<Role | string>('');
 
-  const getRoles = () => {
-    let roles: Role[] = [Role.SERVICE_MANAGER, Role.TECHNICIAN];
-    if (role === 'SERVICE_MANAGER') {
-      roles = [Role.SERVICE_MANAGER];
-    } else if (role === 'TECHNICIAN') {
-      roles = [Role.TECHNICIAN];
-    }
-
-    return roles;
-  };
-
   const {
     data: userAccountResource = createEmptyResource<UserView>(pageSize),
     isFetched,
@@ -60,7 +49,7 @@ export const Employees = () => {
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: search,
-      roles: getRoles(),
+      roles: getRoles(role),
     },
     {keepPreviousData: true},
   );
@@ -123,11 +112,8 @@ export const Employees = () => {
     return <Progress />;
   }
 
-  const handleRoleChange = (event: SelectChangeEvent<string | string[]>) => {
-    const {
-      target: {value},
-    } = event;
-    setRole(value as Role);
+  const handleRoleChange = (value: string[]) => {
+    setRole(value[0] as Role);
   };
 
   const handleClearFilters = () => {
@@ -140,38 +126,20 @@ export const Employees = () => {
       containerStyle={{alignSelf: 'center', height: '100%'}}
       wrapperStyle={{alignItems: 'center'}}
       onClear={handleClearFilters}>
-      <Box
-        sx={{
-          minWidth: '350px',
-          marginRight: '7px',
+      <MultipleSelectCheckmarks
+        label="Role"
+        options={['Technician', 'Service Manager']}
+        containerStyles={{
+          minWidth: '21.875em',
+          marginRight: '0.438em',
           alignItems: 'center',
-        }}>
-        <FormSelect
-          labelId="roleFilter-label"
-          label="Role"
-          options={[
-            {
-              label: 'Technician',
-              value: 'TECHNICIAN',
-            },
-            {
-              label: 'Service Manager',
-              value: 'SERVICE_MANAGER',
-            },
-          ]}
-          labelStyles={{backgroundColor: 'transparent'}}
-          selectStyles={{
-            backgroundColor: 'white',
-          }}
-          selectProps={{
-            labelId: 'roleFilter-label',
-            value: role,
-            onChange: handleRoleChange,
-            name: 'roleFilter',
-            multiple: false,
-          }}
-        />
-      </Box>
+        }}
+        formControlStyles={{
+          width: '100%',
+        }}
+        getSelectedValue={(item) => handleRoleChange(item)}
+        multiple={false}
+      />
     </FilterFields>
   );
 
@@ -191,6 +159,7 @@ export const Employees = () => {
         rows={rows}
         columns={columns}
         loading={isFetching}
+        scrollToTop={search}
         hideFooter={pageCount <= 1}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}

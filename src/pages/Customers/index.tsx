@@ -1,24 +1,32 @@
-import {PageListingLayout} from 'components/PageListingLayout';
 import {useEffect, useRef, useState} from 'react';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {GridRowsProp} from '@mui/x-data-grid';
+import {Box} from '@mui/material';
+
+import {PageListingLayout} from 'components/PageListingLayout';
 import {DataGridLayout} from 'components/DataGridLayout';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {PropertyOwnerView} from 'models/propertyManager';
+import {EmptySection} from 'components/EmptySection';
+import {FilterFields} from 'components/FilterFields';
 import {Progress} from 'components/Progress';
+import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
-import {useSearchParams} from 'react-router-dom';
 import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
 } from 'utils/utils';
-import {EmptySection} from 'components/EmptySection';
+import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {PropertyOwnerView} from 'models/propertyManager';
+import {getFilterUnitNumber} from 'utils/customer-utils';
 import {Widget} from '../../components/Widget';
 import {columns, makeRows} from './CustomerDataGridProps';
 
 const pageSize = 25;
 
 export const Customer = () => {
+  const navigate = useNavigate();
+
   const [search, setSearch] = useState('');
+  const [numberOfUnits, setNumberOfUnits] = useState<string[]>([]);
   const [queryParams, setQueryParams] = useSearchParams();
   const totalCustomerRef = useRef(0);
   const [page, setPage] = useState(makePage(0, pageSize));
@@ -36,6 +44,12 @@ export const Customer = () => {
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: search,
+      ...(numberOfUnits[0] && {
+        unitNumberStart: getFilterUnitNumber(numberOfUnits[0], 'start'),
+      }),
+      ...(numberOfUnits[0] && {
+        unitNumberEnd: getFilterUnitNumber(numberOfUnits[0], 'end'),
+      }),
     },
     {keepPreviousData: true},
   );
@@ -84,17 +98,61 @@ export const Customer = () => {
     );
   }
 
+  const handleNumberOfUnitsChange = (value: string[]) => {
+    setNumberOfUnits(value);
+  };
+
+  const handleClearFilters = () => {
+    setSearch('');
+    setNumberOfUnits([]);
+  };
+
+  const renderFilterItems = () => (
+    <FilterFields
+      containerStyle={{alignSelf: 'center', height: '100%'}}
+      wrapperStyle={{alignItems: 'center'}}
+      onClear={handleClearFilters}>
+      <Box
+        sx={{
+          minWidth: '21.875em',
+          marginRight: '0.438em',
+          alignItems: 'center',
+        }}>
+        <MultipleSelectCheckmarks
+          label="No. of Units"
+          options={['0 - 500', '500 - 1000', '1000 - 5000', '> 5000']}
+          containerStyles={{
+            minWidth: '21.875em',
+            marginRight: '0.438em',
+            alignItems: 'center',
+          }}
+          formControlStyles={{
+            width: '100%',
+          }}
+          initialSelectedItems={numberOfUnits}
+          getSelectedValue={(item) => handleNumberOfUnitsChange(item)}
+          multiple={false}
+        />
+      </Box>
+    </FilterFields>
+  );
+
   return (
     <PageListingLayout
       renderWidget={
         <Widget
           searchPlaceholder="Search by number, name, address etc."
           getSearchValue={(val: string) => setSearch(val)}
+          showActionBtn
+          btnOnClick={() => navigate('/customers/new')}
+          btnLabel="New Customer"
+          filterItems={renderFilterItems()}
         />
       }>
       <DataGridLayout
-        rows={rows}
+        rows={rows || []}
         columns={columns}
+        scrollToTop={search}
         loading={isFetching}
         hideFooter={pageCount <= 1}
         pageSize={page.pageSize}
