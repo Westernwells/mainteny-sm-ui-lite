@@ -17,6 +17,7 @@ interface Props {
   getRejectedFileWithErrors?: (val: FileRejection[]) => void;
   hints?: string[];
   acceptedFileTypes?: 'image/*' | 'application/pdf' | '*';
+  maxFiles?: number;
 }
 
 export const MyDropZone = ({
@@ -25,6 +26,7 @@ export const MyDropZone = ({
   getRejectedFileWithErrors,
   hints = [],
   acceptedFileTypes = '*',
+  maxFiles,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -36,18 +38,29 @@ export const MyDropZone = ({
   const oneMbInByes = useRef(onKbinBytes * onKbinBytes).current;
   const {getRootProps, getInputProps, open, fileRejections} = useDropzone({
     maxSize: oneMbInByes * 5,
+    maxFiles,
     accept: {
       [acceptedFileTypes]: [],
     },
     onDropAccepted: (acceptedFiles) => {
-      setFiles([
-        ...files,
-        ...acceptedFiles.map((file) =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file),
-          }),
-        ),
-      ]);
+      if (maxFiles === 1) {
+        setFiles([
+          ...acceptedFiles.map((file) =>
+            Object.assign(file, {
+              preview: URL.createObjectURL(file),
+            }),
+          ),
+        ]);
+      } else {
+        setFiles([
+          ...files,
+          ...acceptedFiles.map((file) =>
+            Object.assign(file, {
+              preview: URL.createObjectURL(file),
+            }),
+          ),
+        ]);
+      }
     },
   });
 

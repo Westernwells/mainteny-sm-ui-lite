@@ -185,6 +185,7 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
           open: openDialog || false,
         }}>
         <MyDropZone
+          maxFiles={1}
           getAcceptedFiles={(files) => {
             setAcceptedFiles(files);
           }}
