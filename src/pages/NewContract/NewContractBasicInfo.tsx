@@ -60,6 +60,7 @@ const NewContractBasicInfo: FC<Props> = ({
           getSelectedDate={(val) => formik.setFieldValue('startDate', val)}
           textFieldProps={{
             name: 'startDate',
+            id: 'startDate',
             label: 'Start Date',
             onChange: formik.handleChange,
             required: true,
@@ -68,6 +69,7 @@ const NewContractBasicInfo: FC<Props> = ({
                 ? formik.errors.startDate
                 : '',
             error: !!(formik.touched.startDate && formik.errors.startDate),
+            onBlur: formik.handleBlur,
           }}
           defaultDate={formik.values.startDate}
         />
@@ -77,6 +79,7 @@ const NewContractBasicInfo: FC<Props> = ({
           getSelectedDate={(val) => formik.setFieldValue('endDate', val)}
           textFieldProps={{
             name: 'endDate',
+            id: 'endDate',
             label: 'End Date',
             onChange: formik.handleChange,
             required: true,
@@ -85,8 +88,10 @@ const NewContractBasicInfo: FC<Props> = ({
                 ? formik.errors.endDate
                 : '',
             error: !!(formik.touched.endDate && formik.errors.endDate),
+            onBlur: formik.handleBlur,
           }}
           defaultDate={formik.values.endDate}
+          minDate={formik.values.startDate!}
         />
       </Grid>
       <Grid item xs={4}>
@@ -102,6 +107,7 @@ const NewContractBasicInfo: FC<Props> = ({
             value: formik.values.contractType,
             onChange: formik.handleChange,
             name: 'contractType',
+            onBlur: formik.handleBlur,
           }}
           required
         />

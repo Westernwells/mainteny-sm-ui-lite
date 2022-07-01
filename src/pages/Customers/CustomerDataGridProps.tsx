@@ -4,13 +4,25 @@ import SendIcon from '@mui/icons-material/Send';
 import {getColumnProps} from 'components/DataGridLayout';
 import IconButton from '@mui/material/IconButton';
 import {PropertyOwnerView} from 'models/propertyManager';
+import {formatDate, getDateObject} from 'utils/datetime';
+import {Typography} from '@mui/material';
 
 export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
     headerName: 'number',
     align: 'center',
-    flex: 0,
+    flex: 0.75,
+    renderCell: (params) => (
+      <Typography
+        sx={{
+          fontSize: '0.875rem',
+          overflowWrap: 'anywhere',
+          whiteSpace: 'pre-wrap',
+        }}>
+        {params.value}
+      </Typography>
+    ),
   }),
   getColumnProps({
     field: 'name',
@@ -28,7 +40,13 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'units',
     headerName: 'no. of units',
-    align: 'right',
+    align: 'center',
+    flex: 0.5,
+  }),
+  getColumnProps({
+    field: 'createdAt',
+    headerName: 'JOINED DATE',
+    align: 'center',
   }),
   getColumnProps({
     field: 'actions',
@@ -61,4 +79,8 @@ export const makeRows = (
     access: 'Invite',
     navigateTo: `details/${item.id}?tab=0`,
     actions: item.contact.email,
+    createdAt: formatDate(
+      getDateObject(item.meta.createdAt),
+      'dd.MM.yyyy',
+    ) as string,
   }));

@@ -193,6 +193,7 @@ export const UnitListingView = () => {
         hideFooter={pageCount <= 1}
         rows={rows}
         columns={columns}
+        scrollToTop={search}
         loading={isFetching}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}

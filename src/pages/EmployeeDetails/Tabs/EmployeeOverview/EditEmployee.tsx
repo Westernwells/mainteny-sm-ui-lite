@@ -1,7 +1,6 @@
 import React from 'react';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import {useNavigate} from 'react-router';
 
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useEmployeeAccount} from 'hooks/reactQuery/useUserAccount';
@@ -18,7 +17,6 @@ interface Props {
 }
 
 export const EditEmployee = ({employee, openDialog, onClose}: Props) => {
-  const navigate = useNavigate();
   const {user} = useUserSession();
   const {updateEmployeeAccount} = useEmployeeAccount();
 
@@ -84,7 +82,6 @@ export const EditEmployee = ({employee, openDialog, onClose}: Props) => {
         updateEmployeeAccount(values, employee.userData.employeeId, () => {
           resetForm();
           onClose();
-          navigate(0);
         });
       }}>
       <EditEmployeeForm openDialog={openDialog} onClose={onClose} />

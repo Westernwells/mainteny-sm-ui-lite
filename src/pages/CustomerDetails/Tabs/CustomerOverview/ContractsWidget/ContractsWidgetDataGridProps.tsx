@@ -36,7 +36,7 @@ const defaultAlignment: {
 export const columns: GridColDef[] = [
   {
     field: 'contractNumber',
-    headerName: 'CONTRACT ID',
+    headerName: 'Contract ID',
     type: 'string',
     flex: 1,
     headerAlign: 'left',
@@ -45,7 +45,7 @@ export const columns: GridColDef[] = [
 
   {
     field: 'cost',
-    headerName: 'COST/YEAR',
+    headerName: 'Revenue/Year',
     type: 'number',
     ...defaultAlignment,
     ...defaultProps,

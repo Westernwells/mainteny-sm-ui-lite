@@ -346,6 +346,7 @@ const updateElevatorTechnician = async (
 export const useUpdateElevatorTechnician = (successMsg?: string) => {
   const {enqueueSnackbar} = useSnackbar();
   const queryClient = useQueryClient();
+
   return useMutation(
     ({body, elevatorId}: {body: {[key: string]: number}; elevatorId: string}) =>
       updateElevatorTechnician(body, elevatorId),

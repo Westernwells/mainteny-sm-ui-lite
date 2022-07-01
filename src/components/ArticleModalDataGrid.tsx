@@ -178,6 +178,7 @@ export const ArticlesModalDataGrid = ({setRowItem}: Props) => {
         <DataGridLayout
           rows={rows}
           columns={columns}
+          scrollToTop={search}
           onCellClick={(params) => setRowItem(params.row.article)}
           loading={isFetching}
           pageSize={page.pageSize}

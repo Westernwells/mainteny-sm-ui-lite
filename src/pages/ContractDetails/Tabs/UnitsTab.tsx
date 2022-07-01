@@ -12,8 +12,7 @@ import {TabContentContainer} from 'components/TabContentContainer';
 import {EmptySection} from 'components/EmptySection';
 import {useNavigate} from 'react-router';
 import {ContractElevatorSimpleView} from 'models/contract';
-import {ElevatorView} from 'models/elevator';
-import {Resource} from 'models/misc';
+// import {ElevatorView} from 'models/elevator';
 
 interface Props {
   elevators: ContractElevatorSimpleView[];
@@ -30,8 +29,13 @@ export const UnitsTab: FC<Props> = ({elevators}) => {
     if (elevators.length) {
       setRows(
         makeRows({
-          data: elevators.map((elevator) => ({...elevator.elevator})),
-        } as Resource<ElevatorView>),
+          elevators: elevators.map(
+            (elevator) =>
+              ({
+                ...elevator.elevator,
+              } as any),
+          ),
+        }),
       );
     } else {
       setRows([]);
@@ -88,6 +92,7 @@ export const UnitsTab: FC<Props> = ({elevators}) => {
           setPage({...page, pageSize: newPageSize})
         }
         handlePageChange={(newPage) => setPage({...page, pageIndex: newPage})}
+        scrollToTop={search}
       />
     </TabContentContainer>
   );

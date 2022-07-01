@@ -61,31 +61,35 @@ export const CustomerForm = ({
       containerStyles={{flexGrow: 1}}
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
-        <Grid item md={4}>
-          <CustomerAutoComplete
-            getCustomer={(value) => {
-              formik.setValues({
-                ...formik.values,
-                propertyOwnerId: value ? value.id : '',
-              });
-              if (value) {
-                setCustomer(value);
-              }
-            }}
-            initialValue={initialCustomer || null}
-            textFieldProps={{
-              error: !!(
-                formik.errors.propertyOwnerId && formik.touched.propertyOwnerId
-              ),
-              helperText:
-                formik.errors.propertyOwnerId && formik.touched.propertyOwnerId
-                  ? t(formik.errors.propertyOwnerId)
-                  : '',
-              label: t('Customer Name'),
-              name: 'propertyOwnerId',
-              onBlur: formik.handleBlur,
-            }}
-          />
+        <Grid container>
+          <Grid item md={4}>
+            <CustomerAutoComplete
+              getCustomer={(value) => {
+                formik.setValues({
+                  ...formik.values,
+                  propertyOwnerId: value ? value.id : '',
+                });
+                if (value) {
+                  setCustomer(value);
+                }
+              }}
+              initialValue={initialCustomer || null}
+              textFieldProps={{
+                error: !!(
+                  formik.errors.propertyOwnerId &&
+                  formik.touched.propertyOwnerId
+                ),
+                helperText:
+                  formik.errors.propertyOwnerId &&
+                  formik.touched.propertyOwnerId
+                    ? t(formik.errors.propertyOwnerId)
+                    : '',
+                label: t('Customer Name'),
+                name: 'propertyOwnerId',
+                onBlur: formik.handleBlur,
+              }}
+            />
+          </Grid>
         </Grid>
       </Box>
     </PageCard>

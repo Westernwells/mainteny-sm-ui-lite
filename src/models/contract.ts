@@ -98,7 +98,6 @@ export interface ContractView {
 
   sla: number;
   spendingLimit: number;
-  price: number;
 
   hourlyRate: number;
   currency: string;

@@ -99,6 +99,7 @@ const WorkHoursTab = ({employeeId}: Props) => {
         rows={rows}
         columns={columns}
         hideFooter={pageCount <= 1}
+        scrollToTop={search}
         pageSize={page.pageSize}
         handlePageSizeChange={(newPageSize: number) =>
           setPage({...page, pageSize: newPageSize})

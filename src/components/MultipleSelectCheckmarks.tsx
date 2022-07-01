@@ -29,6 +29,8 @@ interface Props {
   containerStyles?: {[key: string]: any};
   formControlStyles?: {[key: string]: any};
   initialSelectedItems?: any[];
+  required?: boolean;
+  disableClearBtn?: boolean;
 }
 
 export const MultipleSelectCheckmarks = ({
@@ -37,12 +39,13 @@ export const MultipleSelectCheckmarks = ({
   label,
   multiple = true,
   containerStyles,
+  required = false,
   formControlStyles,
   initialSelectedItems = [],
+  disableClearBtn = false,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
-
   const [selectedItems, setSelectedItems] =
     React.useState<string[]>(initialSelectedItems);
   const visibility = selectedItems.length
@@ -71,10 +74,12 @@ export const MultipleSelectCheckmarks = ({
       setSelectedItems(initialSelectedItems);
     }
   }, [initialSelectedItems.length]);
+
   return (
     <Box sx={{...containerStyles}}>
       <FormControl
         size="small"
+        required={required}
         sx={{mr: '0.5em', width: '8.5rem', ...formControlStyles}}>
         <InputLabel id={label}>{t(label)}</InputLabel>
         <Select
@@ -85,7 +90,7 @@ export const MultipleSelectCheckmarks = ({
           input={<OutlinedInput sx={{background: '#fff'}} label={t(label)} />}
           renderValue={() => selectedItems.map((i) => t(i)).join(',')}
           MenuProps={MenuProps}>
-          {!multiple ? (
+          {!multiple && !disableClearBtn ? (
             <MenuItem
               disableTouchRipple
               sx={{

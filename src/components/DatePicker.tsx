@@ -55,6 +55,9 @@ export const DatePicker = ({
                 ...params,
                 size: 'small',
                 ...textFieldProps,
+                onKeyDown: (e) => {
+                  e.preventDefault();
+                },
               }}
               inputLabelProps={inputLabelProps}
             />
