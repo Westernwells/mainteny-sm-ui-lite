@@ -8,6 +8,7 @@ import {
   WithOptional,
 } from './misc';
 import {PropertyOwner} from './propertyManager';
+import {QuotationItemRecord} from './quotation';
 import {ServiceCompanySimpleView} from './service-company';
 import {ServiceOrderView, ServiceOrderType} from './service-order';
 
@@ -94,7 +95,7 @@ export interface CreateInvoice {
   description: string;
   dueDate: string;
   issuedDate: string;
-  items: WithOptional<InvoiceItemRecord<AmountRecord>, 'articleUnit'>[];
+  items: QuotationItemRecord[] | InvoiceItemRecord<Amount>[];
   paymentInfo: PaymentInfo;
   paymentTerms: string;
   propertyOwnerId: string;

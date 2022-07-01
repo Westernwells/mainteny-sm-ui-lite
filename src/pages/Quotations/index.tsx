@@ -22,6 +22,8 @@ import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
 } from 'utils/utils';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {columns, makeRows} from './QuotationsDataGridProps';
 
 const pageSize = 25;
@@ -95,13 +97,18 @@ export const Quotations = () => {
     setPageCount(Math.ceil(quotationsResource.total / page.pageSize));
   }, [quotationsResource, page.pageSize]);
 
+  const navigateToNewQuotation = () => {
+    Mixpanel.identifyAndTrack(mixpanelEvents.NEW_QUOTATION_BUTTON_CLICKED);
+    navigate('new');
+  };
+
   if (isFetched && !totalQuotationsRef.current) {
     return (
       <EmptySection
         label="No quotations have been created yet. Please click the button below to create one!"
         showActionBtn
         btnLabel="Add Quotation"
-        btnAction={() => navigate('new')}
+        btnAction={navigateToNewQuotation}
         containerStyle={{
           height: '100%',
           mb: '10em',
@@ -143,7 +150,7 @@ export const Quotations = () => {
           getSearchValue={(val: string) => setSearch(val)}
           showActionBtn
           btnLabel="New Quotation"
-          btnOnClick={() => navigate('new')}
+          btnOnClick={navigateToNewQuotation}
           filterItems={renderFilterItems()}
         />
       }>

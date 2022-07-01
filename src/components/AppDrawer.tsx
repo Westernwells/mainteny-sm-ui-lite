@@ -26,6 +26,8 @@ import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
 import {ReactComponent as MaintenyLogo} from 'assets/icons/Mainteny.svg';
 import Fade from '@mui/material/Fade';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 
 const drawerWidth = '15rem';
 
@@ -102,6 +104,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/orders');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_ORDERS_CLICKED);
         navigate('/orders');
       },
     },
@@ -116,6 +119,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/units');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_UNITS_CLICKED);
         navigate('/units');
       },
     },
@@ -130,6 +134,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/customers');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_CUSTOMERS_CLICKED);
         navigate('/customers');
       },
     },
@@ -144,6 +149,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/contracts');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_CONTRACTS_CLICKED);
         navigate('/contracts');
       },
     },
@@ -158,6 +164,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/quotations');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_QUOTATIONS_CLICKED);
         navigate('/quotations');
       },
     },
@@ -172,6 +179,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/invoices');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_INVOICES_CLICKED);
         navigate('/invoices');
       },
     },
@@ -186,6 +194,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/articles');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_ARTICLES_CLICKED);
         navigate('/articles');
       },
     },
@@ -200,6 +209,7 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/employees');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_EMPLOYEES_CLICKED);
         navigate('/employees');
       },
     },

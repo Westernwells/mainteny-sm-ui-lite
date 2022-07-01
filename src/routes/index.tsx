@@ -31,9 +31,11 @@ import {ServiceOrders} from 'pages/ServiceOrders';
 import {NewEmployee} from 'pages/NewEmployee';
 import {ServiceOrderDetails} from 'pages/ServiceOrderDetails';
 import {axiosClient} from 'utils/axios-utils';
-import {languageMap} from 'utils/utils';
+import {languageMap, onVisibilityChange} from 'utils/utils';
 import i18n from 'i18next';
 import {useEffect, useState} from 'react';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {NewServiceOrder} from 'pages/NewServiceOrder';
 import {NewUnit} from 'pages/NewUnit';
 import {NewCustomer} from 'pages/NewCustomer';
@@ -56,7 +58,15 @@ export const Router = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    onVisibilityChange((visible) => {
+      if (visible) {
+        Mixpanel.timeEvent(mixpanelEvents.ACTIVE_SESSION);
+      } else {
+        Mixpanel.identifyAndTrack(mixpanelEvents.ACTIVE_SESSION);
+      }
+    });
+  }, []);
 
   return (
     <ErrorBoundary navigate={navigate} location={location}>

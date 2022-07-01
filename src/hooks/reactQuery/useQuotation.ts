@@ -17,6 +17,9 @@ import {
   QuotationView,
   UpdateQuotation,
 } from 'models/quotation';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
+import {getTotalFromArticles, getTotalWithVatFromArticles} from 'utils/invoice';
 import {useUserSession} from './useUserSession';
 
 export const fetchQuotations = async (
@@ -140,11 +143,17 @@ export const useCreateQuotation = () => {
     ({data, publish}: {data: CreateQuotation; publish: boolean}) =>
       postQuotation(data, publish),
     {
-      onSuccess: ({data, publish}) => {
+      onSuccess: ({data, publish}, variables) => {
         queryClient.invalidateQueries([qk.fetchQuotations]);
         queryClient.invalidateQueries([qk.quotationById]);
         enqueueSnackbar(`Quotation created successfully!`, {
           variant: 'success',
+        });
+        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_QUOTATION_CREATED, {
+          quotationId: data.value,
+          elevatorId: variables.data.elevatorId,
+          amountWithoutVat: getTotalFromArticles(variables.data.items),
+          amountWithVat: getTotalWithVatFromArticles(variables.data.items),
         });
         if (publish) {
           publishQuotation(data.value);

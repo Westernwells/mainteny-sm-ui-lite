@@ -5,6 +5,8 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {formatSearchParams} from 'utils/utils';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {ServiceOrderScheduleTab} from './Tabs/ServiceOrderScheduleTab';
 import {ServiceOrderList} from './Tabs/ServiceOrderList.tsx';
 
@@ -29,11 +31,28 @@ export const ServiceOrders = () => {
     if (currentParams.tab) setTabValue(Number(currentParams.tab));
   }, []);
 
+  const track = (cb: () => void) => {
+    Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ORDER_BUTTON_CLICKED);
+    cb();
+  };
+
   const menu = useRef([
-    {label: 'Emergency', action: () => navigate('/orders/new?type=emergency')},
-    {label: 'Callout', action: () => navigate('/orders/new?type=callout')},
-    {label: 'Repair', action: () => navigate('/orders/new?type=repair')},
-    {label: 'Maintenance', action: () => navigate('/orders/new?type=regular')},
+    {
+      label: 'Emergency',
+      action: () => track(() => navigate('/orders/new?type=emergency')),
+    },
+    {
+      label: 'Callout',
+      action: () => track(() => navigate('/orders/new?type=callout')),
+    },
+    {
+      label: 'Repair',
+      action: () => track(() => navigate('/orders/new?type=repair')),
+    },
+    {
+      label: 'Maintenance',
+      action: () => track(() => navigate('/orders/new?type=regular')),
+    },
   ]).current;
 
   useEffect(() => {
