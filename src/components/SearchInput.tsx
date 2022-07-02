@@ -79,7 +79,7 @@ export const SearchInput = ({
       variant={variant}
       label={label && t(label)}
       onChange={debouncedChangeHandler}
-      InputLabelProps={{shrink: true}}
+      InputLabelProps={{shrink: variant === 'outlined'}}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
