@@ -1,6 +1,9 @@
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
-import {useQueryServiceOrderScheduled} from 'hooks/reactQuery/useServiceOrder';
+import {
+  useQueryServiceOrderScheduled,
+  useServiceOrders,
+} from 'hooks/reactQuery/useServiceOrder';
 import * as _ from 'lodash';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {getWhen, toRestDateTime} from 'utils/datetime';
@@ -8,8 +11,9 @@ import {
   ServiceOrderStatus,
   ServiceOrderType,
   ServiceOrderView,
+  ServiceOrderOrderField,
 } from 'models/service-order';
-
+import {Order} from 'models/misc';
 import {Schedule} from 'components/Schedules';
 import {ScheduleItem} from 'components/Schedules/ScheduleItem';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
@@ -72,6 +76,21 @@ export const ServiceOrderScheduleTab = () => {
     },
     {keepPreviousData: true},
   );
+
+  const {
+    data: unassignedServiceOrders = createEmptyResource<ServiceOrderView>(
+      page.pageSize,
+    ),
+  } = useServiceOrders({
+    end: endOfDay(addDays(new Date(), 180)).toISOString(),
+    start: startOfDay(addDays(new Date(), -180)).toISOString(), // we should show unsassigned orders for a couople month
+    pageSize: page.pageSize,
+    pageIndex: page.pageIndex,
+    query: '',
+    status: [ServiceOrderStatus.READY_TO_SCHEDULE, ServiceOrderStatus.INIT],
+    order: Order.ASC,
+    orderBy: ServiceOrderOrderField.CREATED_TIME,
+  });
 
   useEffect(() => {
     if (!isLoading) {
@@ -166,7 +185,7 @@ export const ServiceOrderScheduleTab = () => {
         <Box sx={{display: 'flex', justifyContent: 'flex-end', flexGrow: 1}}>
           <Switch
             getValue={(value) => setSwitchActive(value)}
-            label="Show Unassigned Orders"
+            label={`Show Unassigned Orders (${unassignedServiceOrders.total})`}
           />
         </Box>
       </Box>

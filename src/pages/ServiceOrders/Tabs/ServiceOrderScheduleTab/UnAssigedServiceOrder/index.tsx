@@ -4,13 +4,13 @@ import Typography from '@mui/material/Typography';
 import {SearchInput} from 'components/SearchInput';
 import {PageCard} from 'components/PageCard';
 import Divider from '@mui/material/Divider';
-import useTheme from '@mui/material/styles/useTheme';
+// import useTheme from '@mui/material/styles/useTheme';
 import {
   ServiceOrderOrderField,
   ServiceOrderStatus,
   ServiceOrderView,
 } from 'models/service-order';
-import {useTranslation} from 'react-i18next';
+// import {useTranslation} from 'react-i18next';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {useInView} from 'react-intersection-observer';
 import {endOfDay, startOfDay, addDays} from 'date-fns';
@@ -23,8 +23,8 @@ interface Props extends BoxProps {
 }
 
 export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
-  const {t} = useTranslation();
-  const theme = useTheme();
+  // const {t} = useTranslation();
+  // const theme = useTheme();
   const [search, setSearch] = useState('');
   const {ref, inView} = useInView();
   const [page, setPage] = useState(makePage(0, 50));
@@ -86,14 +86,14 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
       <PageCard
         containerStyles={{height: '100%'}}
         contentContainerStyles={{height: '100%', mx: 0, px: 0, pt: '0.79em'}}
-        customHeader={
-          <Typography variant="subtitle2" color="textSecondary">
-            {t('Unassigned Orders')}{' '}
-            <Box display="inline" color={theme.palette.primary.main}>
-              ({serviceOrders.total})
-            </Box>
-          </Typography>
-        }
+        // customHeader={
+        //   <Typography variant="subtitle2" color="textSecondary">
+        //     {t('Unassigned Orders')}{' '}
+        //     <Box display="inline" color={theme.palette.primary.main}>
+        //       ({serviceOrders.total})
+        //     </Box>
+        //   </Typography>
+        // }
         headerStyles={{
           background: 'none',
           pt: '0.84em',
@@ -105,6 +105,8 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
         <Box sx={{px: '0.5em'}}>
           <SearchInput
             placeholder="Search Unassigned Orders"
+            variant="outlined"
+            label="Search"
             onValueChanged={(searchValue) => setSearch(searchValue)}
             containerStyle={{
               background: '#fff',
