@@ -106,7 +106,7 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
         <Box
           sx={{
             overflowY: 'scroll',
-            height: '85%',
+            height: '92%',
             '&::-webkit-scrollbar': {
               width: '0.2em',
             },
