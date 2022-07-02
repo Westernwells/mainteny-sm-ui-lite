@@ -16,6 +16,8 @@ variables:
     - yarn prepare_env
     - yarn install --frozen-lockfile
     - yarn build:${ENV}
+    - ls -l
+    - cat .env.${ENV}
   artifacts:
     paths:
       - build/
