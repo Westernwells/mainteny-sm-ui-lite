@@ -48,6 +48,9 @@ export const SearchInput = ({
                   borderColor: '#c4c4c4',
                 },
               },
+              '& .MuiInputAdornment-root': {
+                marginRight: '-7px',
+              },
 
               ...containerStyle,
             }
