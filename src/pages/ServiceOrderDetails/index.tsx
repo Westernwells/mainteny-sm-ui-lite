@@ -41,8 +41,11 @@ export const ServiceOrderDetails = () => {
       <TabsBody value={tabValue} index={1}>
         <WorkReport />
       </TabsBody>
-      <TabsBody value={tabValue} index={2}>
-        <Checklist />
+      <TabsBody
+        value={tabValue}
+        index={2}
+        containerStyle={{height: '1px', overflow: 'auto'}}>
+        <Checklist orderId={serviceOrderId} />
       </TabsBody>
     </Tabs>
   );

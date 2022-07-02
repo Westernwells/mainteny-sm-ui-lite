@@ -94,7 +94,7 @@ export interface ServiceOrderAdditionalInfo {
   appointmentNotificationRequired: boolean;
   appointmentNotificationSent: boolean;
   priority: Priority;
-  checklist: Checklist;
+  checkList: Checklist;
   moreInformation: string;
   quotationId: string;
 }
