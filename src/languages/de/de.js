@@ -458,6 +458,8 @@ module.exports = {
     'Search Unassigned Orders': 'Suche nach nicht zugewiesenen Aufträgen',
     'Due in': 'Fällig in',
     'Show Unassigned Orders': 'Nicht zugewiesene Aufträge anzeigen',
+    'Show Unassigned Orders ({{count}})':
+      'Nicht zugewiesene Aufträge anzeigen ({{count}})',
     'Search technician': 'Techniker suchen',
     'New Order': 'Neuer Auftrag',
     Ongoing: 'Läuft',

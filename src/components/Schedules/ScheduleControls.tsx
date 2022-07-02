@@ -41,6 +41,8 @@ export const ScheduleControls = ({
   const renderSearch = () => (
     <SearchInput
       placeholder={searchPlaceholder}
+      variant="outlined"
+      label="Search"
       onValueChanged={(searchValue) =>
         getSearchValue && getSearchValue(searchValue)
       }

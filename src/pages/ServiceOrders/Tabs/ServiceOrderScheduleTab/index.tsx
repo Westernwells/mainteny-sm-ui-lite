@@ -42,6 +42,7 @@ import Typography from '@mui/material/Typography';
 import {UnAssignedServiceOrders} from './UnAssigedServiceOrder';
 
 export const ServiceOrderScheduleTab = () => {
+  const {t} = useTranslation();
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();
   const [technicianSearch, setTechnicianSearch] = useState('');
   const [orders, setOrders] = useState<{[key: string]: ServiceOrderView[]}>({});
@@ -152,30 +153,27 @@ export const ServiceOrderScheduleTab = () => {
     />
   );
 
-  const renderControls = () => {
-    const {t} = useTranslation();
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          background: '#fff',
-          py: '0.5em',
-          px: '1em',
-          minWidth: '10rem',
-          justifyContent: 'space-between',
-        }}>
-        <Box onClick={() => prevDay()} sx={{cursor: 'pointer'}}>
-          <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
-        </Box>
-        <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
-          {t(`${getWhen(currentDate, 'dd.MM.yyyy')}`)}
-        </Typography>
-        <Box onClick={() => nextDay()} sx={{cursor: 'pointer'}}>
-          <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
-        </Box>
+  const renderControls = () => (
+    <Box
+      sx={{
+        display: 'flex',
+        background: '#fff',
+        py: '0.5em',
+        px: '1em',
+        minWidth: '10rem',
+        justifyContent: 'space-between',
+      }}>
+      <Box onClick={() => prevDay()} sx={{cursor: 'pointer'}}>
+        <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
       </Box>
-    );
-  };
+      <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
+        {t(`${getWhen(currentDate, 'dd.MM.yyyy')}`)}
+      </Typography>
+      <Box onClick={() => nextDay()} sx={{cursor: 'pointer'}}>
+        <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />
+      </Box>
+    </Box>
+  );
 
   return (
     <Box sx={{flexGrow: 1, display: 'flex', flexDirection: 'column'}}>
@@ -185,7 +183,9 @@ export const ServiceOrderScheduleTab = () => {
         <Box sx={{display: 'flex', justifyContent: 'flex-end', flexGrow: 1}}>
           <Switch
             getValue={(value) => setSwitchActive(value)}
-            label={`Show Unassigned Orders (${unassignedServiceOrders.total})`}
+            label={t(`Show Unassigned Orders ({{count}})`, {
+              count: unassignedServiceOrders.total,
+            })}
           />
         </Box>
       </Box>

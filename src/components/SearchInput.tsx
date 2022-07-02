@@ -37,7 +37,6 @@ export const SearchInput = ({
         variant === 'outlined'
           ? {
               width: width || '20rem',
-              // border: 'none',
               background: '#fff',
               '& .MuiOutlinedInput-root:hover': {
                 '& > fieldset': {
@@ -49,10 +48,6 @@ export const SearchInput = ({
                   borderColor: '#c4c4c4',
                 },
               },
-
-              // '& .MuiOutlinedInput-notchedOutline': {
-              //   border: '1px solid #fff',
-              // },
               ...containerStyle,
             }
           : {
@@ -78,7 +73,7 @@ export const SearchInput = ({
       }
       placeholder={placeholder && t(placeholder)}
       variant={variant}
-      label={label}
+      label={label && t(label)}
       onChange={debouncedChangeHandler}
       InputLabelProps={{shrink: true}}
       InputProps={{
