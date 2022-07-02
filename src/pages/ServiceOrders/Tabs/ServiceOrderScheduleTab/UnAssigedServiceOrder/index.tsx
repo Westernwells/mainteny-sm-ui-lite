@@ -104,7 +104,7 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
         }}>
         <Box sx={{px: '0.5em'}}>
           <SearchInput
-            placeholder="Search Unassigned Orders"
+            placeholder="e.g. REWE AG"
             variant="outlined"
             label="Search"
             onValueChanged={(searchValue) => setSearch(searchValue)}

@@ -48,6 +48,7 @@ export const SearchInput = ({
                   borderColor: '#c4c4c4',
                 },
               },
+
               ...containerStyle,
             }
           : {
@@ -78,7 +79,7 @@ export const SearchInput = ({
       InputLabelProps={{shrink: true}}
       InputProps={{
         endAdornment: (
-          <InputAdornment position="start">
+          <InputAdornment position="end">
             <SearchIcon />
           </InputAdornment>
         ),

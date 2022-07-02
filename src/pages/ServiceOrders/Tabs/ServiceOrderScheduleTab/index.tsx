@@ -198,7 +198,7 @@ export const ServiceOrderScheduleTab = () => {
           }
           scheduleItems={orders}
           scheduleType="people"
-          searchPlaceholder="Search technician"
+          searchPlaceholder="e.g. Tobias"
           handleSearch={(value) => setTechnicianSearch(value)}
           technicians={technicianResource.data}
           labelWidth="14rem"

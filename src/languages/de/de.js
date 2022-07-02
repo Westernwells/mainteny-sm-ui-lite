@@ -483,6 +483,8 @@ module.exports = {
     'e.g. A1 first floor': 'z.B. Haus B',
     'e.g. Outside key box, pin: 0000': 'z.B. Tresor 1111',
     'e.g. central parking lot': 'z.B. zentraler Parkplatz',
+    'e.g. Tobias': 'z.B. Tobias',
+    'e.g. REWE AG': 'z.B. REWE AG',
 
     // Employee details
     'Work Hours': 'Arbeitszeiten',
