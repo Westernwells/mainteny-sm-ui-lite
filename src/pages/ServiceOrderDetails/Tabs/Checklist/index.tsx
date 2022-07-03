@@ -1,12 +1,18 @@
+import React, {useEffect, useMemo} from 'react';
 import {Avatar, Grid, Typography} from '@mui/material';
 import {Box} from '@mui/system';
 import useTheme from '@mui/material/styles/useTheme';
+import {FormikProps, useFormik} from 'formik';
+import {groupBy, sortBy} from 'lodash';
 import {EmptySection} from 'components/EmptySection';
 import {FormLabel} from 'components/form/FormLabel';
 import {InfoCard} from 'components/InfoCard';
 import {PageCard} from 'components/PageCard';
 import {Progress} from 'components/Progress';
-import {useServiceOrderDetails} from 'hooks/reactQuery/useServiceOrder';
+import {
+  useServiceOrderReport,
+  useUpdateServiceOrderCheckListAnswers,
+} from 'hooks/reactQuery/useServiceOrder';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {StatusChip} from 'components/StatusChip';
@@ -16,10 +22,10 @@ import {
 } from 'utils/service-order-utils';
 import {grey} from '@mui/material/colors';
 import {FormCheckbox} from 'components/form/FormCheckbox';
-import signatureImage from 'assets/images/signature.png';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {ServiceOrderStatus} from 'models/service-order';
 import {useTranslation} from 'react-i18next';
+import {ChecklistQuestion} from 'models/checklist';
 
 const EmptyChecklist = () => (
   <EmptySection
@@ -34,21 +40,118 @@ interface Props {
   orderId?: string;
 }
 
+interface FormikValues {
+  checkListAnswers: ChecklistQuestion[];
+}
+
 export const Checklist = ({orderId}: Props) => {
-  const {data: serviceOrderDetails, isLoading} =
-    useServiceOrderDetails(orderId);
-  console.log(
-    '🚀 ~ file: index.tsx ~ line 21 ~ Checklist',
-    serviceOrderDetails,
-  );
   const theme = useTheme();
   const {t} = useTranslation();
+  const {data: serviceOrderReport, isLoading: isLoadingServiceOrderReport} =
+    useServiceOrderReport({serviceOrderId: orderId || ''});
+  const {mutate: updateServiceOrderCheckListAnswers} =
+    useUpdateServiceOrderCheckListAnswers();
+  const serviceOrderDetails = useMemo(
+    () => serviceOrderReport?.[0]?.serviceOrder,
+    [serviceOrderReport?.[0]?.additionalInfo.checkListAnswers.length],
+  );
 
-  if (isLoading) {
+  const formik: FormikProps<FormikValues> = useFormik<FormikValues>({
+    initialValues: {
+      checkListAnswers: [],
+    },
+    onSubmit: async (values: FormikValues) => {
+      await updateServiceOrderCheckListAnswers({
+        serviceOrderId: orderId || '',
+        body: values.checkListAnswers.map((q) => ({
+          questionId: q.id,
+          answer: q.question,
+        })),
+      });
+      formik.resetForm({
+        values: {
+          ...formik.values,
+          checkListAnswers: [...values.checkListAnswers],
+        },
+      });
+    },
+  });
+
+  const questions = useMemo(() => {
+    const questionsWithStatus = sortBy(
+      serviceOrderDetails?.additionalInfo.checkList.questions.map(
+        (question) => {
+          if (
+            !serviceOrderReport?.[0]?.additionalInfo.checkListAnswers?.length
+          ) {
+            return {...question, checked: false};
+          }
+          const isChecked =
+            !!serviceOrderReport?.[0]?.additionalInfo.checkListAnswers?.find(
+              (answer) => answer.questionId === question.id,
+            );
+          return {
+            ...question,
+            checked: isChecked,
+          };
+        },
+      ),
+      'question',
+    );
+
+    const groupedByCategories = groupBy(questionsWithStatus, 'category');
+
+    return {
+      withStatus: questionsWithStatus,
+      byCategories: sortBy(Object.keys(groupedByCategories)).map(
+        (category) => ({
+          category,
+          questions: groupedByCategories[category],
+        }),
+      ),
+    };
+  }, [serviceOrderDetails, serviceOrderReport]);
+
+  useEffect(() => {
+    formik.resetForm({
+      values: {
+        ...formik.values,
+        checkListAnswers: questions.withStatus?.filter((q) => q.checked) ?? [],
+      },
+    });
+  }, [questions.withStatus?.length]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const {checked, value} = e.target;
+    if (checked) {
+      formik.setFieldValue('checkListAnswers', [
+        ...formik.values.checkListAnswers,
+        serviceOrderDetails?.additionalInfo.checkList.questions.find(
+          (question) => question.id === value,
+        ),
+      ]);
+    } else {
+      formik.setFieldValue(
+        'checkListAnswers',
+        formik.values.checkListAnswers.filter((v) => v.id !== value),
+      );
+    }
+  };
+
+  const technicianUserAccount =
+    serviceOrderDetails?.schedules?.[0]?.technician?.userAccount;
+  const technicianName = technicianUserAccount
+    ? `${technicianUserAccount.firstName} ${technicianUserAccount.lastName}`
+    : '';
+
+  if (isLoadingServiceOrderReport) {
     return <Progress />;
   }
 
-  if (!serviceOrderDetails?.additionalInfo.checkList) {
+  if (
+    !serviceOrderDetails?.additionalInfo.checkList ||
+    serviceOrderDetails.status !== ServiceOrderStatus.COMPLETED
+  ) {
     return (
       <InfoCard
         disabledHeader
@@ -144,7 +247,7 @@ export const Checklist = ({orderId}: Props) => {
             sx={{px: '1.25rem', py: '1.5rem'}}>
             <Box bgcolor="white" px="1rem" py="0.625rem">
               <Typography variant="subtitle1" sx={{color: grey[700]}}>
-                KONE TravelMaster’s check list
+                {serviceOrderDetails.additionalInfo.checkList.name}
               </Typography>
               <Box
                 bgcolor="grey.50"
@@ -158,48 +261,41 @@ export const Checklist = ({orderId}: Props) => {
                 display="flex"
                 flexDirection="column"
                 gap="1rem">
-                <Box
-                  boxShadow="0px 4px 15px 0px #90909033"
-                  p="1rem"
-                  bgcolor="grey.50">
-                  <Typography
-                    variant="subtitle2"
-                    color={theme.palette.text.primary}>
-                    Category 1:
-                  </Typography>
-                  <Grid container pt="0.25rem">
-                    <Grid item xs={12}>
-                      <FormCheckbox
-                        checked
-                        value="something"
-                        handleChange={() => {}}
-                        label="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been theindustry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book?"
-                        typographyProps={{fontSize: '0.875rem', py: '0.5rem'}}
-                        sx={{alignItems: 'flex-start'}}
-                      />
+                {questions.byCategories.map((category) => (
+                  <Box
+                    boxShadow="0px 4px 15px 0px #90909033"
+                    p="1rem"
+                    bgcolor="grey.50"
+                    key={category.category}>
+                    <Typography
+                      variant="subtitle2"
+                      color={theme.palette.text.primary}>
+                      {category.category}:
+                    </Typography>
+                    <Grid container pt="0.25rem">
+                      {category.questions.map((question) => (
+                        <Grid item xs={12} key={question.id}>
+                          <FormCheckbox
+                            checked={
+                              !!formik.values?.checkListAnswers?.find(
+                                (a) => a.id === question.id,
+                              )
+                            }
+                            value={question.id}
+                            id={question.id}
+                            handleChange={handleChange}
+                            label={question.question}
+                            typographyProps={{
+                              fontSize: '0.875rem',
+                              py: '0.5rem',
+                            }}
+                            sx={{alignItems: 'flex-start'}}
+                          />
+                        </Grid>
+                      ))}
                     </Grid>
-                    <Grid item xs={12}>
-                      <FormCheckbox
-                        checked={false}
-                        value="something2"
-                        handleChange={() => {}}
-                        label="Question 2"
-                        typographyProps={{fontSize: '0.875rem', py: '0.5rem'}}
-                        sx={{alignItems: 'flex-start'}}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <FormCheckbox
-                        checked={false}
-                        value="something3"
-                        handleChange={() => {}}
-                        label="Question 3"
-                        typographyProps={{fontSize: '0.875rem', py: '0.5rem'}}
-                        sx={{alignItems: 'flex-start'}}
-                      />
-                    </Grid>
-                  </Grid>
-                </Box>
+                  </Box>
+                ))}
               </Box>
               <Typography
                 variant="caption"
@@ -219,7 +315,9 @@ export const Checklist = ({orderId}: Props) => {
                 position="relative"
                 maxWidth="17.5rem">
                 <Avatar
-                  src={signatureImage}
+                  src={
+                    serviceOrderReport?.[0]?.attachments?.[0]?.fileResource.uri
+                  }
                   variant="square"
                   sx={{height: 'auto', my: '1.5rem'}}
                   style={{
@@ -227,41 +325,44 @@ export const Checklist = ({orderId}: Props) => {
                     width: 'auto',
                   }}
                 />
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="center"
-                  justifyContent="center"
-                  mt="-2rem"
-                  bgcolor="white"
-                  px="0.625rem"
-                  position="absolute"
-                  bottom="-2.2rem"
-                  maxWidth="17.5rem">
-                  <Typography
-                    variant="subtitle1"
-                    color={theme.palette.text.primary}>
-                    Noman Gul
-                  </Typography>
-                  <Typography
-                    variant="subtitle2"
-                    color={theme.palette.text.secondary}>
-                    Technician
-                  </Typography>
-                </Box>
+                {technicianName && (
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    justifyContent="center"
+                    mt="-2rem"
+                    bgcolor="white"
+                    px="0.625rem"
+                    position="absolute"
+                    bottom="-2.2rem"
+                    maxWidth="17.5rem">
+                    <Typography
+                      variant="subtitle1"
+                      color={theme.palette.text.primary}>
+                      {technicianName}
+                    </Typography>
+                    <Typography
+                      variant="subtitle2"
+                      color={theme.palette.text.secondary}>
+                      Technician
+                    </Typography>
+                  </Box>
+                )}
               </Box>
             </Box>
           </Box>
         </Grid>
       </Grid>
       <BottomDrawer
-        isOpen={serviceOrderDetails.status !== ServiceOrderStatus.COMPLETED}
+        isOpen={
+          serviceOrderDetails.status === ServiceOrderStatus.COMPLETED &&
+          formik.dirty
+        }
         primaryButtonLabel={t('Save')}
-        primaryButtonAction={() => {
-          //
-        }}
+        primaryButtonAction={formik.handleSubmit}
         listItems={[]}
-        isValid
+        isValid={!formik.isSubmitting}
       />
     </>
   );

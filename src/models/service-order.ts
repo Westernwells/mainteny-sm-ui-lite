@@ -216,8 +216,10 @@ export interface UpdateJobSchedule {
 }
 
 export interface CompleteServiceOrder {
+  answers: CheckListAnswerRecord[];
   attachments: string[];
   description: string;
+  externalId: string;
   serviceTime: number;
 }
 
@@ -240,7 +242,7 @@ export interface ServiceOrderSummary {
 }
 
 export interface ServiceOrderReportAdditionalInfo {
-  checklistAnswers: CheckListAnswerRecord[];
+  checkListAnswers: CheckListAnswerRecord[];
 }
 
 export interface ServiceOrderReportArticleView {

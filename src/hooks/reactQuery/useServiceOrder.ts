@@ -33,6 +33,7 @@ import {
   CreateScheduledServiceOrderBody,
   CreateNonScheduledServiceOrderBody,
   ServiceOrderReportView,
+  CheckListAnswerRecord,
 } from '../../models/service-order';
 import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
@@ -413,6 +414,45 @@ export const useCancelServiceOrders = () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
         enqueueSnackbar('Service order cancelled', {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+const updateServiceOrderCheckListAnswers = async (
+  serviceOrderId: string,
+  body: CheckListAnswerRecord[],
+) => {
+  await axiosClient.put<StringValue>(
+    `/api/serviceOrders/${serviceOrderId}/checkListAnswers`,
+    [...body],
+  );
+};
+
+export const useUpdateServiceOrderCheckListAnswers = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    ({
+      serviceOrderId,
+      body,
+    }: {
+      serviceOrderId: string;
+      body: CheckListAnswerRecord[];
+    }) => updateServiceOrderCheckListAnswers(serviceOrderId, body),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        enqueueSnackbar('Service order check list updated', {
           variant: 'success',
         });
       },
