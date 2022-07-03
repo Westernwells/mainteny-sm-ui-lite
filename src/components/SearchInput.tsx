@@ -38,16 +38,6 @@ export const SearchInput = ({
           ? {
               width: width || '20rem',
               background: '#fff',
-              '& .MuiOutlinedInput-root:hover': {
-                '& > fieldset': {
-                  borderColor: '#c4c4c4',
-                },
-              },
-              '& .MuiOutlinedInput-root.Mui-focused': {
-                '& > fieldset': {
-                  borderColor: '#c4c4c4',
-                },
-              },
               '& .MuiInputAdornment-root': {
                 marginRight: '-7px',
               },
