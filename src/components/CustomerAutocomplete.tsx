@@ -30,7 +30,7 @@ export const CustomerAutoComplete = ({
 
   const {data: customerResource = createEmptyResource(10)} = useQueryCustomers({
     pageIndex: 0,
-    pageSize: 3,
+    pageSize: 6,
     query,
   });
 

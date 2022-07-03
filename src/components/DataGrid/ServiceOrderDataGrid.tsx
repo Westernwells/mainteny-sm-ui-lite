@@ -126,6 +126,7 @@ export const ServiceOrdersDataGrid = ({
         <DataGridLayout
           rows={rows}
           columns={columns}
+          scrollToTop={search}
           onCellClick={(params) => setRowItem(params.row.serviceOrder)}
           loading={isFetching || isLoading}
           pageSize={page.pageSize}

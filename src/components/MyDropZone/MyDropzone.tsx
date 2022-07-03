@@ -1,14 +1,12 @@
 import Box from '@mui/material/Box';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
+import {CheckCircleRounded} from '@mui/icons-material';
 import {useEffect, useRef, useState} from 'react';
 import {FileWithPath, useDropzone, FileRejection} from 'react-dropzone';
 import useTheme from '@mui/material/styles/useTheme';
-import IconButton from '@mui/material/IconButton';
-import CancelIcon from '@mui/icons-material/Cancel';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
-import {CheckCircleRounded} from '@mui/icons-material';
-import {Button} from './Button';
+import {Button} from '../Button';
+import {Thumb} from './Thumb';
 
 export interface FileWithPreview extends FileWithPath {
   preview: string;
@@ -30,26 +28,39 @@ export const MyDropZone = ({
   acceptedFileTypes = '*',
   maxFiles,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const [files, setFiles] = useState<FileWithPreview[]>(existingFiles);
+  const [isEditingFileName, setIsEditingFileName] = useState(false);
+  const [currentEditingFileName, setCurrentEditingFileName] = useState('');
+  const [newFileName, setNewFileName] = useState('');
   const onKbinBytes = useRef(1000).current;
   const oneMbInByes = useRef(onKbinBytes * onKbinBytes).current;
   const {getRootProps, getInputProps, open, fileRejections} = useDropzone({
     maxSize: oneMbInByes * 5,
+    maxFiles,
     accept: {
       [acceptedFileTypes]: [],
     },
-    maxFiles,
-    disabled: maxFiles ? files.length >= maxFiles : false,
     onDropAccepted: (acceptedFiles) => {
-      setFiles([
-        ...files,
-        ...acceptedFiles.map((file) =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file),
-          }),
-        ),
-      ]);
+      if (maxFiles === 1) {
+        setFiles([
+          ...acceptedFiles.map((file) =>
+            Object.assign(file, {
+              preview: URL.createObjectURL(file),
+            }),
+          ),
+        ]);
+      } else {
+        setFiles([
+          ...files,
+          ...acceptedFiles.map((file) =>
+            Object.assign(file, {
+              preview: URL.createObjectURL(file),
+            }),
+          ),
+        ]);
+      }
     },
   });
 
@@ -65,7 +76,7 @@ export const MyDropZone = ({
 
   const removeFile = (fileKey: string) => {
     const newFiles = files.filter(
-      (item, index) => `${item.path}_${index}` !== fileKey,
+      (item, index) => `${item.name}_${index}` !== fileKey,
     );
 
     setFiles(newFiles);
@@ -79,7 +90,26 @@ export const MyDropZone = ({
     [],
   );
 
-  useEffect(() => {}, []);
+  const onSaveFileName = (fileKey: string) => {
+    const result = files.map((item, index) => {
+      if (`${item.name}_${index}` === fileKey) {
+        const newFile = new File([item], newFileName, {
+          type: item.type,
+        });
+        return Object.assign(newFile, {
+          preview: URL.createObjectURL(newFile),
+        });
+      }
+      return item;
+    });
+
+    setFiles(result);
+  };
+
+  const OnCancelEdit = () => {
+    setIsEditingFileName(false);
+    setNewFileName('');
+  };
 
   const hintsLabel = hints?.map((hint, key) => (
     <Box
@@ -93,36 +123,29 @@ export const MyDropZone = ({
   ));
 
   const thumbs = files.map((file: FileWithPreview, index) => (
-    <Box key={index} sx={{mr: '1em', display: 'flex', mt: '0.3em'}}>
-      {file.type.split('/')[0] === 'image' ? (
-        <img alt="" width={80} height={80} src={file.preview} />
-      ) : (
-        <FileCopyIcon
-          sx={{fontSize: '4rem', color: theme.palette.text.secondary}}
-        />
-      )}
-
-      <Box
-        sx={{
-          mx: '1em',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-        }}>
-        <Typography>{file.path}</Typography>
-        <Typography>
-          {file.size >= oneMbInByes
-            ? `${(file.size / oneMbInByes).toFixed(2)} Mb`
-            : `${(file.size / onKbinBytes).toFixed(2)} Kb`}
-        </Typography>
-      </Box>
-
-      <IconButton
-        onClick={() => removeFile(`${file.path}_${index}`)}
-        edge="start">
-        <CancelIcon sx={{mt: '-0.8em'}} />
-      </IconButton>
-    </Box>
+    <Thumb
+      key={`${file.name}-${index}`}
+      oneMbInByes={oneMbInByes}
+      onKbinBytes={onKbinBytes}
+      file={file}
+      onNameChange={(e) => {
+        setNewFileName(e.target.value);
+      }}
+      isEditingFileName={isEditingFileName}
+      currentEditingFileName={currentEditingFileName}
+      newFileName={newFileName}
+      onDeleteFile={() => removeFile(`${file.name}_${index}`)}
+      onCancelEdit={OnCancelEdit}
+      onSaveFileName={() => {
+        onSaveFileName(`${file.name}_${index}`);
+        setIsEditingFileName(false);
+      }}
+      onEditClick={() => {
+        setNewFileName(file.name);
+        setIsEditingFileName(true);
+        setCurrentEditingFileName(file.name);
+      }}
+    />
   ));
 
   const renderErrors = () =>
@@ -135,14 +158,13 @@ export const MyDropZone = ({
           {item.errors.map((error) => (
             <Typography component="div" variant="body2" color="error">
               {error.code === 'file-too-large'
-                ? 'File is larger than 5mb'
-                : error.message}
+                ? t('File is larger than 5mb')
+                : t(error.message)}
             </Typography>
           ))}
         </Box>
       </Box>
     ));
-  const {t} = useTranslation();
 
   return (
     <Box>
@@ -158,13 +180,12 @@ export const MyDropZone = ({
         <div {...getRootProps({className: 'dropzone'})}>
           <input {...getInputProps()} />
           <Typography variant="body2" component="div" sx={{mb: '1em'}}>
-            {t('Drag &apos;n&apos; drop or')}
+            {t('Drag')} &apos;n&apos; {t('drop or')}
           </Typography>
           <Button
-            label="Select file"
+            label={t('Select file')}
             buttonProps={{
               variant: 'outlined',
-              disabled: maxFiles ? files.length >= maxFiles : false,
               onClick: open,
             }}
           />

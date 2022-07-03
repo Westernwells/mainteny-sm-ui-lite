@@ -22,8 +22,8 @@ interface Props {
 const pageInfo = makePage(0, 10);
 
 export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
-  const theme = useTheme();
   const {t} = useTranslation();
+  const theme = useTheme();
   const [search, setSearch] = useState('');
   const totalUnitsRef = useRef(0);
   const [page, setPage] = useState(pageInfo);
@@ -125,6 +125,7 @@ please click the button below'
       <DataGridLayout
         hideFooter={pageCount <= 1}
         rows={rows}
+        scrollToTop={search}
         columns={columns(selectedUnit?.id || '')}
         onCellClick={(params: GridCellParams) => {
           setSelectedUnit(params.row.elevator);

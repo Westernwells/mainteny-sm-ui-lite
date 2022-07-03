@@ -9,7 +9,6 @@ import {UnitDetailsFormModel} from 'models/unitForm';
 import {useState} from 'react';
 import {createEmptyResource} from 'utils/paging-utils';
 import {convertToText} from 'utils/utils';
-import InputAdornment from '@mui/material/InputAdornment';
 import {useTranslation} from 'react-i18next';
 
 interface Props {
@@ -17,6 +16,7 @@ interface Props {
 }
 
 export const EditUnitDetailsForm = ({formik}: Props) => {
+  const {t} = useTranslation();
   const [unitTypeQuery, setUnitTypeQuery] = useState('');
   const [modelQuery, setModelQuery] = useState('');
   const {data: elevatorTypeResource = createEmptyResource<string>()} =
@@ -39,8 +39,6 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
       CacheTypes.ELEVATOR_MODEL,
     );
 
-  const {t} = useTranslation();
-
   return (
     <Grid container spacing={2} sx={{mt: '0.5em'}} component="form">
       <Grid item md={6}>
@@ -61,7 +59,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
           getValue={(item) => formik.setFieldValue('category', item?.value)}
           textFieldProps={{
             name: 'category',
-            label: t('Unit Category'),
+            label: 'Unit Category',
             onBlur: formik.handleBlur,
             error: !!(formik.touched.category && formik.errors.category),
             helperText: formik.errors.category,
@@ -73,8 +71,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
       <Grid item md={6}>
         <FormInput
           props={{
-            placeholder: t('E.g. Thyssenkrupp, schindler'),
-            label: t('Manufacturer'),
+            placeholder: 'E.g. Thyssenkrupp, schindler',
+            label: 'Manufacturer',
             name: 'manufacturer',
             value: formik.values.manufacturer,
             onBlur: formik.handleBlur,
@@ -86,8 +84,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
       <Grid item md={6}>
         <FormInput
           props={{
-            placeholder: t('e.g. 100001'),
-            label: t('Unit Number'),
+            placeholder: 'e.g. 100001',
+            label: 'Unit Number',
             name: 'externalId',
             value: formik.values.externalId,
             error: !!(formik.touched.externalId && formik.errors.externalId),
@@ -102,8 +100,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
         <FormInput
           props={{
             size: 'small',
-            placeholder: t('Can also be number of floors'),
-            label: t('Number of Stops'),
+            placeholder: 'Can also be number of floors',
+            label: 'Number of Stops',
             name: 'numberOfStops',
             value: formik.values.numberOfStops,
             onBlur: formik.handleBlur,
@@ -116,8 +114,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
         <FormInput
           props={{
             size: 'small',
-            placeholder: t('Single door; Double door'),
-            label: t('Cabin Type'),
+            placeholder: 'Single door; Double door',
+            label: 'Cabin Type',
             name: 'cabinType',
             value: formik.values.cabinType,
             onBlur: formik.handleBlur,
@@ -130,8 +128,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
         <FormInput
           props={{
             size: 'small',
-            placeholder: t('e.g. SafeLine'),
-            label: t('Emergency Phone Provider'),
+            placeholder: 'e.g. SafeLine',
+            label: 'Emergency Phone Provider',
             name: 'emergencyPhoneProvider',
             value: formik.values.emergencyPhoneProvider,
             onBlur: formik.handleBlur,
@@ -193,8 +191,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
       <Grid item md={6}>
         <FormInput
           props={{
-            placeholder: t('Fabric number'),
-            label: t('Serial Number'),
+            placeholder: 'Fabric number',
+            label: 'Serial Number',
             name: 'serialNumber',
             value: formik.values.serialNumber,
             onBlur: formik.handleBlur,
@@ -207,16 +205,11 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
         <FormInput
           props={{
             name: 'unitCapacity',
-            label: t('Unit Capacity'),
-            placeholder: t('1000 kg'),
+            label: 'Unit Capacity',
+            placeholder: '1000 kg',
             value: formik.values.unitCapacity,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
-            InputProps: {
-              endAdornment: (
-                <InputAdornment position="start">kg</InputAdornment>
-              ),
-            },
           }}
         />
       </Grid>
@@ -226,8 +219,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
           props={{
             size: 'small',
             disabled: true,
-            placeholder: t('Enter Spending Limit'),
-            label: t('Spending Limit'),
+            placeholder: 'Enter Spending Limit',
+            label: 'Spending Limit',
             name: 'spendingLimit',
             error: !!formik.errors.spendingLimit,
             value: formik.values.spendingLimit,

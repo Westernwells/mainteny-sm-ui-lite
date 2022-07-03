@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
 import useTheme from '@mui/material/styles/useTheme';
-import {FileWithPreview, MyDropZone} from 'components/MyDropzone';
+import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {ElevatorView, ElevatorRequestBody} from 'models/elevator';
@@ -15,6 +15,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import {EmptySection} from 'components/EmptySection';
 import {useTranslation} from 'react-i18next';
+import {olStyles} from 'styles';
 
 interface Props {
   elevator: ElevatorView;
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export const Documents = ({elevator, elevatorRequestBody}: Props) => {
+  const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
   const theme = useTheme();
   const {user} = useUserSession();
@@ -42,6 +44,7 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
     const serviceCompanyId = user?.userAccount.serviceCompany.id;
     const uploadPath = `${serviceCompanyId}/elevators/${elevator.id}/documents`;
     await uploadFiles({files: acceptedFiles, uploadPath});
+
     if (elevatorRequestBody) {
       await updateElevator({
         body: {
@@ -71,10 +74,7 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
         height: '100%',
       }}>
       <EmptySection
-        label="No documents have been created yet. Please click the button below to create one!"
-        showActionBtn
-        btnLabel="Add Documents"
-        btnAction={() => setOpenDialog(true)}
+        label="No document has been attached yet!"
         illustration="clipboard"
         size="tiny"
         containerStyle={{
@@ -84,7 +84,9 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
     </Box>
   );
 
-  const {t} = useTranslation();
+  const isEmpty =
+    !elevator.additionalInfo.documents ||
+    elevator.additionalInfo.documents.length === 0;
 
   return (
     <InfoCard
@@ -95,15 +97,28 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
           flexDirection: 'column',
         },
       }}
-      bodyContainerStyle={{overflowY: 'scroll'}}
+      bodyContainerStyle={{
+        [theme.breakpoints.up('md')]: {
+          height: '12em',
+          overflowY: 'hidden',
+
+          '&:hover': {
+            overflowY: 'auto',
+            ...olStyles.verticlaScrollBar,
+          },
+        },
+        [theme.breakpoints.down('md')]: {
+          height: '100%',
+          overflowY: 'auto',
+        },
+      }}
       headerActionIcon={
         <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
       }
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
       header={<Typography variant="subtitle1">{t('Documents')}</Typography>}>
-      {!elevator.additionalInfo.documents ||
-      elevator.additionalInfo.documents.length === 0 ? (
+      {isEmpty ? (
         renderEmptySection()
       ) : (
         <Grid
@@ -117,6 +132,7 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
               <Grid
                 item
                 sm={4}
+                key={item.id}
                 sx={{
                   height: 120,
                   [theme.breakpoints.down('md')]: {

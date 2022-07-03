@@ -111,6 +111,7 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
         <DataGridLayout
           rows={rows}
           columns={columns}
+          scrollToTop={search}
           onCellClick={(params) => setRowItem(params.row.propertyOwner)}
           loading={isFetching}
           pageSize={page.pageSize}

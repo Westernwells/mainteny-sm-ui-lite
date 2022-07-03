@@ -5,8 +5,9 @@ import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {getColumnProps} from 'components/DataGridLayout';
 // import {fetchDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {InvoiceStatus, InvoiceView} from 'models/invoice';
+import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
+import {convertToText} from 'utils/utils';
 import {formatDate, toDate} from '../../utils/datetime';
 import {Actions} from './Actions';
 
@@ -25,13 +26,13 @@ export const getInvoiceStatusStyles = (
 } => {
   switch (status) {
     case InvoiceStatus.PAID:
-      return {label: 'Paid', color: 'success'};
+      return {label: InvoiceStatusView.PAID, color: 'success'};
     case InvoiceStatus.DRAFT:
-      return {label: 'Draft', color: 'default'};
+      return {label: InvoiceStatusView.DRAFT, color: 'default'};
     case InvoiceStatus.EXPIRED:
-      return {label: 'Expired', color: 'error'};
+      return {label: InvoiceStatusView.EXPIRED, color: 'error'};
     case InvoiceStatus.NOT_PAID:
-      return {label: 'Unpaid', color: 'primary'};
+      return {label: InvoiceStatusView.NOT_PAID, color: 'primary'};
     default:
       return {label: '-', color: 'default'};
   }
@@ -75,6 +76,10 @@ export const columns: GridColDef[] = [
         />
       </>
     ),
+  }),
+  getColumnProps({
+    field: 'invoiceType',
+    headerName: 'invoice type',
   }),
   getColumnProps({
     field: 'amount',
@@ -127,6 +132,7 @@ export const makeRows = (invoices: InvoiceView[]): GridRowsProp =>
           pdfPath: item.additionalInfo.pdfPath,
           serviceCompanyId: item.serviceCompany.id,
         },
+        invoiceType: convertToText(item.type),
         invoice: item,
         navigateTo: `details/${item.id}`,
       }))

@@ -1,8 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
+import Divider from '@mui/material/Divider';
 import _ from 'lodash';
 import cloneDeep from 'lodash/cloneDeep';
 import {useFormik} from 'formik';
@@ -11,19 +13,18 @@ import {FlexContainer} from '../../components/FlexContainer';
 import {useCreateArticle} from '../../hooks/reactQuery/useArticle';
 import {Stepper} from '../../components/Stepper';
 import {useUserSession} from '../../hooks/reactQuery/useUserSession';
-import {ArticleType, SupplierRecord} from '../../models/article';
+import {SupplierRecord} from '../../models/article';
 import {PageCard} from '../../components/PageCard';
 import {FormInput} from '../../components/form/FormInput';
 import {Button} from '../../components/Button';
-import {ArticleSupplierItemForm} from './Suppliers/ArticleSupplierItemForm';
+import {SupplierItem} from './Suppliers/SupplierItem';
 import {
   ArticleBasicFormModel,
   ArticleStockFormModel,
 } from '../../models/articleForm';
-import {ArticleBasicInfoForm} from './BasicInfo/ArticleBasicInfoForm';
-import {ArticleStockForm} from './Stock/ArticleStockForm';
-
-const steps = ['Add basic info', 'Add description', 'Add stock & suppliers'];
+import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';
+import {AddStockForm} from './Stock/AddStockForm';
+import {amountRecordForBackend, makeAmountRecord} from '../../utils/currency';
 
 const validationSchema = Yup.object().shape({
   category: Yup.string().nullable().required('Category is required'),
@@ -42,10 +43,36 @@ export const NewArticle = () => {
   const {user} = useUserSession();
   const navigate = useNavigate();
   const theme = useTheme();
-  const {mutateAsync: createArticle} = useCreateArticle('Article is created');
+  const {t} = useTranslation();
+  const {mutateAsync: createArticle} = useCreateArticle(
+    t('Article is created'),
+  );
   const [description, setDescription] = useState('');
-  const [suppliers, setSuppliers] = useState<SupplierRecord[]>([]);
+  const [suppliers, setSuppliers] = useState<SupplierRecord[]>([
+    {
+      name: '',
+      number: '',
+      email: '',
+      phone: '',
+      website: '',
+      address: {
+        fullName: '',
+        countryCode: 'DE',
+        location: {
+          longitude: -1,
+          latitude: -1,
+        },
+      },
+      isPreferred: true,
+    },
+  ]);
   const [disableNextBtn, setDisableNextBtn] = useState(false);
+
+  const steps = [
+    t('Add basic info'),
+    t('Add description'),
+    t('Add stock & suppliers'),
+  ];
 
   const formik = useFormik<ArticleBasicFormModel>({
     initialValues: {
@@ -80,12 +107,17 @@ export const NewArticle = () => {
     if (activeStep === 0) {
       return setDisableNextBtn(
         !!Object.keys(formik.errors).length ||
-          (!!formik.values.type &&
-            formik.values.type.toUpperCase() === ArticleType.PACKAGE),
+          !formik.values.type ||
+          formik.values.unitSellingVat > 100 ||
+          formik.values.unitPurchaseVat > 100,
       );
     }
+    if (activeStep === 2) {
+      const invalidSupplier = suppliers.some((it) => !it.name);
+      return setDisableNextBtn(invalidSupplier);
+    }
     return setDisableNextBtn(false);
-  }, [activeStep, formik]);
+  }, [activeStep, formik, suppliers]);
 
   const handleCancel = () => {
     setActiveStep(0);
@@ -112,16 +144,20 @@ export const NewArticle = () => {
       suppliers,
       type: formik.values.type.toUpperCase(),
       unit: formik.values.unit,
-      unitPurchaseAmount: {
-        currency: 'EUR',
-        netAmount: formik.values.unitPurchaseAmount,
-        percentageVat: formik.values.unitPurchaseVat,
-      },
-      unitSellingAmount: {
-        currency: 'EUR',
-        netAmount: formik.values.unitSellingAmount,
-        percentageVat: formik.values.unitSellingVat,
-      },
+      unitPurchaseAmount: amountRecordForBackend(
+        makeAmountRecord(
+          formik.values.unitPurchaseAmount,
+          'EUR',
+          formik.values.unitPurchaseVat,
+        ),
+      ),
+      unitSellingAmount: amountRecordForBackend(
+        makeAmountRecord(
+          formik.values.unitSellingAmount,
+          'EUR',
+          formik.values.unitSellingVat,
+        ),
+      ),
     };
     const result = await createArticle(article);
     navigate(`/articles/details/${result.value}`);
@@ -130,7 +166,6 @@ export const NewArticle = () => {
   const addSupplier = () => {
     const origin = cloneDeep(suppliers);
     const supplier = {
-      id: (origin.length + 1).toString(),
       name: '',
       number: '',
       email: '',
@@ -164,11 +199,17 @@ export const NewArticle = () => {
   };
 
   const supplierItem = _.map(suppliers, (supplier, key) => (
-    <ArticleSupplierItemForm
-      key={key}
-      supplier={supplier}
-      updateSupplier={updateSupplier}
-    />
+    <Box key={key}>
+      <SupplierItem
+        supplier={supplier}
+        updateSupplier={updateSupplier}
+        containerStyles={{width: '33%', pr: '1rem', my: '1rem'}}
+        useCheckBox={suppliers.length === 1}
+      />
+      {suppliers.length > 1 && key !== suppliers.length - 1 && (
+        <Divider sx={{my: '1rem'}} />
+      )}
+    </Box>
   ));
 
   return (
@@ -188,24 +229,30 @@ export const NewArticle = () => {
       <FlexContainer>
         {activeStep === 0 && (
           <FlexContainer containerStyle={{mt: '2em'}}>
-            <PageCard headerLabel="Basic Information" minHeight="100%">
-              <ArticleBasicInfoForm
+            <PageCard headerLabel={t('Basic Information')} minHeight="100%">
+              <AddBasicInfoForm
                 formik={formik}
-                containerStyles={{width: '33%', pr: '1rem'}}
+                containerStyles={{
+                  width: '33%',
+                  pr: '1rem',
+                  mr: '0.25rem',
+                  my: '1rem',
+                }}
               />
             </PageCard>
           </FlexContainer>
         )}
         {activeStep === 1 && (
           <FlexContainer containerStyle={{mt: '2em'}}>
-            <PageCard headerLabel="Description" minHeight="100%">
+            <PageCard headerLabel={t('Description')} minHeight="100%">
               <FormInput
                 containerStyles={{width: '60%'}}
                 props={{
                   id: 'description',
-                  label: 'description',
-                  placeholder:
+                  label: t('Description'),
+                  placeholder: t(
                     'e.g. Flat cable used for door engines from the following suppliers.....',
+                  ),
                   value: description,
                   variant: 'outlined',
                   multiline: true,
@@ -220,8 +267,8 @@ export const NewArticle = () => {
         )}
         {activeStep === 2 && (
           <FlexContainer containerStyle={{mt: '2em'}}>
-            <PageCard headerLabel="Stock Information" minHeight="100%">
-              <ArticleStockForm
+            <PageCard headerLabel={t('Stock Information')} minHeight="100%">
+              <AddStockForm
                 formik={formikStock}
                 containerStyles={{display: 'flex', flexDirection: 'row'}}
               />
@@ -231,17 +278,17 @@ export const NewArticle = () => {
                   sx={{
                     color: theme.palette.text.primary,
                     minHeight: '2rem',
-                    my: '2em',
+                    mt: '2em',
                   }}>
-                  Suppliers Information
+                  {t('Suppliers Information')}
                 </Typography>
-                <Box sx={{height: '160px', overflowY: 'auto'}} component="form">
+                <Box sx={{height: '210px', overflowY: 'auto'}} component="form">
                   {supplierItem}
                 </Box>
               </Box>
               <Box display="flex">
                 <Button
-                  label="+ Add Supplier"
+                  label={t('+ Add Supplier')}
                   style={{mt: '0.5rem'}}
                   buttonProps={{
                     onClick: () => addSupplier(),

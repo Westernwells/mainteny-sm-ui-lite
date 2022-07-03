@@ -21,6 +21,9 @@ import {
   CreateInvoice,
   UpdateInvoice,
 } from 'models/invoice';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
+import {getTotalFromArticles, getTotalWithVatFromArticles} from 'utils/invoice';
 import {useUserSession} from './useUserSession';
 
 // TODO: make API call to fetch Invoices
@@ -215,11 +218,19 @@ export const useCreateInvoice = () => {
     ({data, publish}: {data: CreateInvoice; publish: boolean}) =>
       postInvoice(data, publish),
     {
-      onSuccess: ({data, publish}) => {
+      onSuccess: ({data, publish}, variables) => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
         enqueueSnackbar(`Invoice created successfully!`, {
           variant: 'success',
+        });
+        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_INVOICE_CREATED, {
+          invoiceId: data.value,
+          propertyOwnerId: variables.data.propertyOwnerId,
+          serviceOrderId: variables.data.serviceOrderId,
+          amountWithoutVat: getTotalFromArticles(variables.data.items),
+          amountWithVat: getTotalWithVatFromArticles(variables.data.items),
+          isPartialInvoice: variables.data.type === 'PARTIAL',
         });
         if (publish) {
           publishInvoice(data.value);
@@ -271,6 +282,43 @@ export const useUpdateInvoice = () => {
         if (publish) {
           publishInvoice(invoiceId);
         }
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again!', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+export const deleteInvoice = async (id: string, navigate: boolean) => {
+  await axiosClient.delete(`api/invoices/${id}`);
+  return navigate;
+};
+
+export const useDeleteInvoice = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  const navigate = useNavigate();
+
+  return useMutation(
+    ({
+      invoiceId,
+      shouldNavigate,
+    }: {
+      invoiceId: string;
+      shouldNavigate: boolean;
+    }) => deleteInvoice(invoiceId, shouldNavigate),
+    {
+      onSuccess: (__, {shouldNavigate}) => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+        enqueueSnackbar(`Invoice deleted successfully`, {
+          variant: 'success',
+        });
+        if (shouldNavigate) navigate(`/invoices?pageIndex=1&pageSize=25`);
       },
       onError: (err) => {
         console.log(err);

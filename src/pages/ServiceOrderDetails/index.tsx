@@ -39,7 +39,7 @@ export const ServiceOrderDetails = () => {
         <Overview orderId={serviceOrderId} />
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
-        <WorkReport />
+        <WorkReport orderId={serviceOrderId} />
       </TabsBody>
       <TabsBody
         value={tabValue}

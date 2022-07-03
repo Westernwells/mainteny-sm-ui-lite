@@ -1,5 +1,5 @@
 {
-  "name": "create-react-app-with-typescript",
+  "name": "sm-ui",
   "version": "5.0.0",
   "private": true,
   "homepage": "/sm-lite",
@@ -30,6 +30,7 @@
     "i18next-browser-languagedetector": "^6.1.4",
     "i18next-http-backend": "^1.4.0",
     "lodash": "^4.17.21",
+    "mixpanel-browser": "^2.45.0",
     "mui-address-autocomplete": "^2.0.4",
     "notistack": "^2.0.3",
     "query-string": "^7.1.1",
@@ -82,6 +83,7 @@
   },
   "devDependencies": {
     "@types/google-map-react": "^2.1.5",
+    "@types/mixpanel-browser": "^2.38.0",
     "@types/react-helmet": "^6.1.5",
     "@types/react-pdf": "^5.0.9",
     "@types/supercluster": "^7.1.0",

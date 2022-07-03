@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
@@ -19,6 +20,7 @@ type Props = {
 };
 
 export const SelectShift = ({values, setFieldValue}: Props) => {
+  const {t} = useTranslation();
   const workDays = Object.values(TimeWindowType).map((item) =>
     convertToText(item),
   );
@@ -98,9 +100,9 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
           mt="1em">
           <LocalizationProvider
             dateAdapter={AdapterDateFns}
-            sx={{width: '224px'}}>
+            sx={{width: '14em'}}>
             <TimePicker
-              label="Start Time"
+              label={t('Start Time')}
               ampm={false}
               value={shift.fromTime}
               disabled={index < shifts.length - 1 && index === 0}
@@ -111,13 +113,13 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
                 setShifts([...oldShifts, newShift]);
               }}
               renderInput={(params) => (
-                <TextField {...params} size="small" sx={{width: '110px'}} />
+                <TextField {...params} size="small" sx={{width: '6.875em'}} />
               )}
             />
           </LocalizationProvider>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <TimePicker
-              label="End Time"
+              label={t('End Time')}
               ampm={false}
               value={shift.toTime}
               disabled={index < shifts.length - 1 && index === 0}
@@ -128,12 +130,12 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
                 setShifts([...oldShifts, newShift]);
               }}
               renderInput={(params) => (
-                <TextField {...params} size="small" sx={{width: '110px'}} />
+                <TextField {...params} size="small" sx={{width: '6.875em'}} />
               )}
             />
           </LocalizationProvider>
 
-          <FormControl sx={{width: '224px'}}>
+          <FormControl sx={{width: '14em'}}>
             <InputLabel
               id="shiftDaySelect-label"
               sx={{
@@ -142,7 +144,7 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
                 paddingInline: '.5em',
               }}
               disabled={index < shifts.length - 1 && index === 0}>
-              Type
+              {t('Type')}
             </InputLabel>
             <Select
               labelId="shiftDaySelect-label"
@@ -162,7 +164,7 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
                   value={item}
                   key={item}
                   disabled={shifts.map((s) => s.type).includes(item)}>
-                  {item}
+                  {t(item)}
                 </MenuItem>
               ))}
             </Select>

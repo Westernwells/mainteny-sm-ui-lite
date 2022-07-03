@@ -1,5 +1,6 @@
 import React from 'react';
 import {useFormikContext} from 'formik';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import useTheme from '@mui/material/styles/useTheme';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
 
   const {
@@ -63,11 +65,14 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
               <Box
                 display="flex"
                 gap="1em"
-                sx={{marginBlock: '0.5em', marginBottom: '24px'}}>
+                sx={{
+                  marginBlock: '0.5em',
+                  marginBottom: '1.5em',
+                }}>
                 {[
                   {
                     id: 'firstName',
-                    label: 'First Name',
+                    label: t('First Name'),
                     placeholder: 'Blake',
                     value: values.firstName,
                     helperText: touched.firstName && errors.firstName,
@@ -76,7 +81,7 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                   },
                   {
                     id: 'lastName',
-                    label: 'Last Name',
+                    label: t('Last Name'),
                     placeholder: 'Norton',
                     value: values.lastName,
                     helperText: touched.lastName && errors.lastName,
@@ -97,7 +102,7 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                 {[
                   {
                     id: 'phone',
-                    label: 'Phone',
+                    label: t('Phone'),
                     placeholder: '49 17163 995801',
                     value: values.phone,
                     InputProps: {
@@ -127,7 +132,7 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                 {[
                   {
                     id: 'team',
-                    label: 'Team',
+                    label: t('Team'),
                     placeholder: '100',
                     value: values.team,
                     helperText: touched.team && errors.team,
@@ -147,13 +152,13 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
             <Box
               display="flex"
               flexDirection="column"
-              sx={{minWidth: '450px'}}
+              sx={{minWidth: '28.125em'}}
               gap="1em">
               <SelectEmployeeRole />
               {[
                 {
                   id: 'email',
-                  label: 'Email',
+                  label: t('Email'),
                   placeholder: 'john@astralift.com',
                   InputProps: {
                     endAdornment: (
@@ -169,7 +174,7 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                 },
                 {
                   id: 'employeeId',
-                  label: 'Employee ID',
+                  label: t('Employee ID'),
                   placeholder: '12345678',
                   value: values.employeeId,
                   helperText: touched.employeeId && errors.employeeId,
@@ -192,7 +197,7 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                 variant="h6"
                 my=".75em"
                 sx={{color: theme.palette.text.primary}}>
-                Order Types
+                {t('Order Types')}
               </Typography>
               <SelectServiceOrderTypes
                 values={values}
@@ -204,7 +209,7 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
             variant="h6"
             my=".75em"
             sx={{color: theme.palette.text.primary}}>
-            Shift Time
+            {t('Shift Time')}
             <Typography component="span" sx={{color: 'red'}}>
               *
             </Typography>

@@ -3,7 +3,12 @@ import {
   ServiceCompanySimpleView,
   ServiceCompanyView,
 } from './service-company';
-import {AttachmentResource, Elevator, ElevatorSimpleView} from './elevator';
+import {
+  AttachmentResource,
+  Elevator,
+  ElevatorSimpleView,
+  ElevatorView,
+} from './elevator';
 import {Contract, ContractSimpleView} from './contract';
 import {Amount, Fee, JobStatus, Meta, Order} from './misc';
 import {Technician, TechnicianSimpleView} from './technician';
@@ -105,7 +110,7 @@ export interface ServiceOrderView {
   externalID: string;
   articles: ServiceOrderArticleView[];
   serviceCompany: ServiceCompanySimpleView;
-  elevator: ElevatorSimpleView;
+  elevator: ElevatorView;
   contract?: ContractSimpleView;
   description: string;
   type: ServiceOrderType;
@@ -276,11 +281,11 @@ export interface ServiceOrderReportView {
   additionalInfo: ServiceOrderReportAdditionalInfo;
   attachments: ServiceOrderReportAttachmentView[];
   description: string;
-  elevator: ElevatorSimpleView;
+  elevator: ElevatorView;
   externalId: string;
   id: string;
   meta: Meta;
-  serviceOrder: ServiceOrderSimpleView;
+  serviceOrder: ServiceOrderView;
   totalAmount: Amount;
 }
 
@@ -294,6 +299,7 @@ export interface ServiceOrderScheduleParams {
   status?: ServiceOrderStatus[];
   serviceCompanyId?: string;
   technicianIds?: string[];
+  types?: ServiceOrderType[];
 }
 
 export interface ServiceOrderQueryParams {
@@ -381,5 +387,13 @@ export interface ServiceOrderArticleView {
   name: string;
   quantity: number;
   serviceOrderId: string;
+  unitAmount: Amount;
+}
+export interface ServiceOrderItemRecord {
+  articleId: string;
+  articleUnit: string;
+  description: string;
+  name: string;
+  quantity: number;
   unitAmount: Amount;
 }

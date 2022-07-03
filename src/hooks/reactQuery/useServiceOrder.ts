@@ -21,6 +21,8 @@ import {queryKeys} from 'reactQuery/constants';
 import {ServiceCompanyTimeUnit} from 'models/service-company';
 import {toDate, toRestDate} from 'utils/datetime';
 import {useSnackbar} from 'notistack';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {
   AssignmentBasedOrderBody,
   UpdateServiceOrderBody,
@@ -34,6 +36,7 @@ import {
   CreateNonScheduledServiceOrderBody,
   ServiceOrderReportView,
   CheckListAnswerRecord,
+  ServiceOrderItemRecord,
 } from '../../models/service-order';
 import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
@@ -270,7 +273,7 @@ export function useFetchServiceOrdersByElevators(
     [
       queryKeys.queryServiceOrders,
       elevatorIds,
-      user!.userAccount.serviceCompany.id,
+      user?.userAccount.serviceCompany.id,
     ],
     () =>
       queryServiceOrders({
@@ -346,7 +349,7 @@ export const useQueryServiceOrderScheduled = (
   const {user} = useUserSession();
 
   return useQuery<Resource<ServiceOrderView>>(
-    [queryKeys.querySeviceOrders, params, user!.userAccount.serviceCompany.id],
+    [queryKeys.querySeviceOrders, params, user?.userAccount.serviceCompany.id],
     () =>
       queryServiceOrderSchedules({
         ...params,
@@ -519,6 +522,7 @@ export const useRedispatchServiceOrders = (successMsg: string) => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
         enqueueSnackbar(successMsg, {
           variant: 'success',
         });
@@ -558,6 +562,7 @@ export const useUpdateServiceOrder = (successMsg: string) => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
         enqueueSnackbar(successMsg, {
           variant: 'success',
         });
@@ -572,20 +577,23 @@ export const useUpdateServiceOrder = (successMsg: string) => {
   );
 };
 
-const createAssignmentBasedOrder = async (body: AssignmentBasedOrderBody) => {
-  await axiosClient.post<StringValue>('/api/serviceOrders/assignmentBased', {
+const createAssignmentBasedOrder = async (body: AssignmentBasedOrderBody) =>
+  axiosClient.post<StringValue>('/api/serviceOrders/assignmentBased', {
     ...body,
   });
-};
 
 export const useAssignmentBasedOrder = (successMsg: string) => {
   const {enqueueSnackbar} = useSnackbar();
   return useMutation(
     (body: AssignmentBasedOrderBody) => createAssignmentBasedOrder(body),
     {
-      onSuccess: () => {
+      onSuccess: (data, variables) => {
         enqueueSnackbar(successMsg, {
           variant: 'success',
+        });
+        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ORDER_CREATED, {
+          elevatorId: variables.elevatorId,
+          serviceOrderId: data.data.value,
         });
       },
       onError: (err) => {
@@ -600,11 +608,10 @@ export const useAssignmentBasedOrder = (successMsg: string) => {
 
 const createScheduledServiceOrder = async (
   body: CreateScheduledServiceOrderBody,
-) => {
-  await axiosClient.post<StringValue>('/api/serviceOrders/scheduled', {
+) =>
+  axiosClient.post<StringValue>('/api/serviceOrders/scheduled', {
     ...body,
   });
-};
 
 export const useCreateScheduledServiceOrder = (successMsg: string) => {
   const {enqueueSnackbar} = useSnackbar();
@@ -612,9 +619,13 @@ export const useCreateScheduledServiceOrder = (successMsg: string) => {
     (body: CreateScheduledServiceOrderBody) =>
       createScheduledServiceOrder(body),
     {
-      onSuccess: () => {
+      onSuccess: (data, variables) => {
         enqueueSnackbar(successMsg, {
           variant: 'success',
+        });
+        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ORDER_CREATED, {
+          elevatorId: variables.elevatorId,
+          serviceOrderId: data.data.value,
         });
       },
       onError: (err) => {
@@ -629,11 +640,10 @@ export const useCreateScheduledServiceOrder = (successMsg: string) => {
 
 const createNonScheduledServiceOrder = async (
   body: CreateNonScheduledServiceOrderBody,
-) => {
-  await axiosClient.post<StringValue>('/api/serviceOrders/nonscheduled', {
+) =>
+  axiosClient.post<StringValue>('/api/serviceOrders/nonscheduled', {
     ...body,
   });
-};
 
 export const useCreateNonScheduledServiceOrder = (successMsg: string) => {
   const {enqueueSnackbar} = useSnackbar();
@@ -641,14 +651,51 @@ export const useCreateNonScheduledServiceOrder = (successMsg: string) => {
     (body: CreateNonScheduledServiceOrderBody) =>
       createNonScheduledServiceOrder(body),
     {
-      onSuccess: () => {
+      onSuccess: (data, variables) => {
         enqueueSnackbar(successMsg, {
           variant: 'success',
+        });
+        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ORDER_CREATED, {
+          elevatorId: variables.elevatorId,
+          serviceOrderId: data.data.value,
         });
       },
       onError: (err) => {
         console.log(err);
         enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+export const putServiceOrderArticles = async (
+  body: ServiceOrderItemRecord[],
+  id: string,
+) => {
+  await axiosClient.put(`api/serviceOrders/${id}/articles`, body);
+};
+
+export const useUpdateServiceOrderArticles = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({data, orderId}: {data: ServiceOrderItemRecord[]; orderId: string}) =>
+      putServiceOrderArticles(data, orderId),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.fetchServiceOrderReport]);
+        queryClient.invalidateQueries([queryKeys.fetchServiceOrderArticles]);
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        enqueueSnackbar(`Work report updated successfully!`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again!', {
           variant: 'error',
         });
       },

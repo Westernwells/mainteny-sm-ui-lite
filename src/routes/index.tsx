@@ -6,6 +6,7 @@ import {
   useLocation,
   useNavigate,
 } from 'react-router-dom';
+import {useTranslation} from 'react-i18next';
 import {PageLayout} from 'components/PageLayout';
 import ErrorBoundary from 'components/ErrorBoundary';
 import {Login} from 'pages/Login';
@@ -17,7 +18,7 @@ import {Customer} from 'pages/Customers';
 import {ContractDetails} from 'pages/ContractDetails';
 import {CustomerDetails} from 'pages/CustomerDetails';
 import {Invoices} from 'pages/Invoices';
-import {DraftInvoice} from 'pages/InvoiceDetails/DraftInvoice';
+import {NewInvoice} from 'pages/InvoiceDetails/NewInvoice';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
 import {Employees} from 'pages/Employee';
 import {EmployeeDetails} from 'pages/EmployeeDetails';
@@ -27,14 +28,17 @@ import {QuotationDetails} from 'pages/QuotationDetails';
 import {Notifications} from 'pages/Notifications';
 import {PageNotFound} from 'pages/PageNotFound';
 import {ServiceOrders} from 'pages/ServiceOrders';
-import {NewEmployee} from 'pages/Employee/NewEmployee';
+import {NewEmployee} from 'pages/NewEmployee';
 import {ServiceOrderDetails} from 'pages/ServiceOrderDetails';
 import {axiosClient} from 'utils/axios-utils';
-import {languageMap} from 'utils/utils';
+import {languageMap, onVisibilityChange} from 'utils/utils';
 import i18n from 'i18next';
 import {useEffect, useState} from 'react';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {NewServiceOrder} from 'pages/NewServiceOrder';
 import {NewUnit} from 'pages/NewUnit';
+import {NewCustomer} from 'pages/NewCustomer';
 import {Articles} from 'pages/Articles';
 import {ArticleOverView} from 'pages/ArticleDetails';
 import {ProtectedRoutes} from './ProtectedRoutes';
@@ -44,6 +48,7 @@ import {NewArticle} from '../pages/ArticleDetails/NewArticle';
 export const Router = () => {
   const titleTail = 'Service Manager Portal';
   const {language} = i18n;
+  const {t} = useTranslation();
 
   if (language) {
     axiosClient.defaults.headers.common.language = languageMap[language];
@@ -53,7 +58,15 @@ export const Router = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    onVisibilityChange((visible) => {
+      if (visible) {
+        Mixpanel.timeEvent(mixpanelEvents.ACTIVE_SESSION);
+      } else {
+        Mixpanel.identifyAndTrack(mixpanelEvents.ACTIVE_SESSION);
+      }
+    });
+  }, []);
 
   return (
     <ErrorBoundary navigate={navigate} location={location}>
@@ -174,7 +187,7 @@ export const Router = () => {
                   pageScrollable
                   backBtnLabel="New Invoice"
                   showBackAction>
-                  <DraftInvoice />
+                  <NewInvoice />
                 </PageLayout>
               </>
             }
@@ -190,13 +203,12 @@ export const Router = () => {
                 <PageLayout
                   showBackAction
                   pageScrollable
-                  backBtnLabel="Invoice details">
+                  backBtnLabel="Invoice Details">
                   <InvoiceDetails />
                 </PageLayout>
               </>
             }
           />
-
           <Route
             path="/customers"
             element={
@@ -204,7 +216,6 @@ export const Router = () => {
                 <Helmet>
                   <title>{`Customers - ${titleTail}`}</title>
                 </Helmet>
-
                 <PageLayout pageTitle="Customers">
                   <Customer />
                 </PageLayout>
@@ -218,7 +229,10 @@ export const Router = () => {
                 <Helmet>
                   <title>{`Customer Details - ${titleTail}`}</title>
                 </Helmet>
-                <PageLayout showBackAction backBtnLabel={currentPageTitle}>
+                <PageLayout
+                  showBackAction
+                  pageScrollable
+                  backBtnLabel={currentPageTitle}>
                   <CustomerDetails
                     getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
                   />
@@ -239,7 +253,21 @@ export const Router = () => {
               </>
             }
           />
-
+          <Route
+            path="/customers/new"
+            element={
+              <>
+                <Helmet>
+                  <title>New Customer</title>
+                </Helmet>
+                <PageLayout showBackAction backBtnLabel={currentPageTitle}>
+                  <NewCustomer
+                    getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                  />
+                </PageLayout>
+              </>
+            }
+          />
           <Route
             path="/employees/details/:id"
             element={
@@ -258,7 +286,6 @@ export const Router = () => {
               </>
             }
           />
-
           <Route
             path="/employees/new"
             element={
@@ -274,7 +301,6 @@ export const Router = () => {
               </>
             }
           />
-
           <Route
             path="/quotations"
             element={
@@ -344,7 +370,10 @@ export const Router = () => {
                 <Helmet>
                   <title>{`Service Orders - ${titleTail}`}</title>
                 </Helmet>
-                <PageLayout backBtnLabel="Order Details" showBackAction>
+                <PageLayout
+                  pageScrollable
+                  backBtnLabel="Order Details"
+                  showBackAction>
                   <ServiceOrderDetails />
                 </PageLayout>
               </>
@@ -390,7 +419,7 @@ export const Router = () => {
                 </Helmet>
                 <PageLayout
                   pageScrollable
-                  backBtnLabel="Article Details"
+                  backBtnLabel={t('Article Details')}
                   showBackAction>
                   <ArticleOverView />
                 </PageLayout>
@@ -405,7 +434,7 @@ export const Router = () => {
                 <Helmet>
                   <title>{`New Article - ${titleTail}`}</title>
                 </Helmet>
-                <PageLayout backBtnLabel="New Article" showBackAction>
+                <PageLayout backBtnLabel={t('New Article')} showBackAction>
                   <NewArticle />
                 </PageLayout>
               </>

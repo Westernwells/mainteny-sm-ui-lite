@@ -1,24 +1,30 @@
 import {useEffect, useState} from 'react';
-import WorkIcon from '@mui/icons-material/Work';
-import HomeIcon from '@mui/icons-material/Home';
-import EmailIcon from '@mui/icons-material/Email';
 import Grid from '@mui/material/Grid';
-import {CardProps} from 'components/CardProps';
-import HomeWorkIcon from '@mui/icons-material/HomeWork';
-import {InfoCard} from 'components/InfoCard';
+import {
+  Elevator,
+  LowPriority,
+  FileCopy,
+  Email,
+  Home,
+  LocalPhone,
+  Edit,
+} from '@mui/icons-material';
+import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
-import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
-import {formatDate, getDateObject} from 'utils/datetime';
-import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
+import {Divider} from '@mui/material';
+
+import {CardProps} from 'components/CardProps';
+import {InfoCard} from 'components/InfoCard';
 import {Progress} from 'components/Progress';
 import {TabContentContainer} from 'components/TabContentContainer';
-
-import {PageCard} from 'components/PageCard';
-import {SearchInput} from 'components/SearchInput';
-import {OverviewUnitsCard} from './OverviewUnitsCard';
-import {OverviewContractsCard} from './OverviewContractsCard';
+import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
+import EmployeeAvatar from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EmployeeAvatar';
+import {UnitsWidget} from './UnitsWidget';
+import {ContractsWidget} from './ContractsWidget';
+import {ContactsWidget} from './ContactsWidget';
+import {EditCustomer} from './EditCustomer';
 
 interface Props {
   customerId?: string;
@@ -33,11 +39,7 @@ interface BasicDetailsValue {
 }
 
 interface BasicDetails {
-  name: BasicDetailsValue;
-  phone: BasicDetailsValue;
-  startDate: BasicDetailsValue;
-  address: BasicDetailsValue;
-  email: BasicDetailsValue;
+  [key: string]: BasicDetailsValue;
 }
 
 export const CustomerOverviewTab = ({
@@ -45,49 +47,51 @@ export const CustomerOverviewTab = ({
   getCustomerName,
   getCurrentTabIndex,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const {data: customer, isLoading} = useGetCustomer(customerId);
   const [basicDetails, setBasicDetails] = useState<BasicDetails>();
-  const [unitQuery, setUnitQuery] = useState('');
-  const [contractQuery, setContractQuery] = useState('');
   const [totalUnits, setTotalUnits] = useState(0);
   const [totalContracts, setTotalContracts] = useState(0);
+  const [openDialog, setOpenDialog] = useState(false);
 
   useEffect(() => {
     if (customer) {
       setBasicDetails({
         ...basicDetails,
-        name: {
-          label: 'CUSTOMER NAME',
-          value: customer.name,
-          icon: <HomeWorkIcon sx={{color: theme.palette.info.dark}} />,
-        },
-        phone: {
-          label: 'PHONE NUMBER',
-          value: customer.contact.phone,
-          icon: <LocalPhoneIcon sx={{color: theme.palette.info.dark}} />,
-        },
         address: {
           label: 'ADDRESS',
           value: customer.postalAddress.fullName,
-          icon: <HomeIcon sx={{color: theme.palette.info.dark}} />,
+          icon: <Home sx={{color: theme.palette.info.dark}} />,
+        },
+        phone: {
+          label: 'PHONE',
+          value: customer.contact.phone || '-',
+          icon: <LocalPhone sx={{color: theme.palette.info.dark}} />,
         },
         email: {
           label: 'EMAIL ID',
           value: customer.contact.email,
-          icon: <EmailIcon sx={{color: theme.palette.info.dark}} />,
+          icon: <Email sx={{color: theme.palette.info.dark}} />,
         },
-        startDate: {
-          label: 'CUSTOMER SINCE',
-          value: formatDate(
-            getDateObject(customer.meta.createdAt),
-            'dd MMMM yyy',
-          ) as string,
-          icon: <WorkIcon sx={{color: theme.palette.info.dark}} />,
+        priority: {
+          label: 'PRIORITY',
+          value: customer.additionalInfo.priority,
+          icon: <LowPriority sx={{color: theme.palette.info.dark}} />,
+        },
+        numberOfUnits: {
+          label: 'NO. OF UNITS',
+          value: totalUnits.toString() || '-',
+          icon: <Elevator sx={{color: theme.palette.info.dark}} />,
+        },
+        numberOfContracts: {
+          label: 'NO. OF CONTRACTS',
+          value: totalContracts.toString() || '-',
+          icon: <FileCopy sx={{color: theme.palette.info.dark}} />,
         },
       });
     }
-  }, [customer]);
+  }, [customer, totalContracts, totalUnits]);
 
   useEffect(() => {
     if (getCustomerName && customer) {
@@ -97,23 +101,60 @@ export const CustomerOverviewTab = ({
 
   const renderBasicDetails = () => (
     <InfoCard
-      minHeight="11rem"
-      bodyContainerStyle={{height: '9rem'}}
-      header={<Typography variant="subtitle1">Basic Details</Typography>}>
-      <Box display="flex" flexWrap="wrap" mt="-1em">
-        {basicDetails &&
-          Object.keys(basicDetails).map((item, index) => (
-            <CardProps
-              key={index}
-              label={basicDetails[item as keyof BasicDetails].label}
-              icon={basicDetails[item as keyof BasicDetails].icon}
-              containerStyles={{mr: '2em', mt: '1em', width: '30%'}}
-              iconBackground={theme.palette.info.outlinedHoverBg}
-              iconMaxHeight="3rem"
-              bodyText={basicDetails[item as keyof BasicDetails].value}
+      header={<Typography variant="subtitle1">{t('Basic Details')}</Typography>}
+      containerStyles={{flexGrow: 1}}
+      headerStyles={{mt: '0.5em'}}
+      handleAction={() => setOpenDialog(true)}
+      headerActionIcon={<Edit />}
+      showHeaderBackground>
+      <Grid container alignItems="center">
+        <Grid item xs={2}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              height: '100%',
+              width: '80%',
+            }}>
+            <EmployeeAvatar
+              name={customer?.name || ''}
+              subTitle={customer?.number || ''}
             />
-          ))}
-      </Box>
+            <Divider
+              orientation="vertical"
+              sx={{background: theme.palette.divider}}
+              flexItem
+            />
+          </Box>
+        </Grid>
+        <Grid item xs={10}>
+          <Box display="flex" flexWrap="wrap" mt="-1em">
+            {basicDetails &&
+              Object.keys(basicDetails).map((item, index) => (
+                <CardProps
+                  key={index}
+                  label={basicDetails[item as keyof BasicDetails].label}
+                  icon={basicDetails[item as keyof BasicDetails].icon}
+                  containerStyles={{
+                    mr: '2em',
+                    mt: '1em',
+                    width: '30%',
+                  }}
+                  iconBackground={theme.palette.info.outlinedHoverBg}
+                  iconMaxHeight="3rem"
+                  bodyText={basicDetails[item as keyof BasicDetails].value}
+                />
+              ))}
+          </Box>
+        </Grid>
+      </Grid>
+      {customer && (
+        <EditCustomer
+          customer={customer}
+          openDialog={openDialog}
+          onClose={() => setOpenDialog(false)}
+        />
+      )}
     </InfoCard>
   );
 
@@ -123,98 +164,28 @@ export const CustomerOverviewTab = ({
 
   return (
     <TabContentContainer>
-      {renderBasicDetails()}
-      <Grid container spacing={2} sx={{mt: '1em'}}>
-        <Grid item xs={6}>
-          <PageCard
-            minHeight="5vh"
-            headerStyles={{backgroundColor: '#fff'}}
-            customHeader={
-              <Box display="flex" justifyContent="space-between">
-                <Box display="flex">
-                  <Typography
-                    variant="subtitle1"
-                    sx={{
-                      color: theme.palette.text.primary,
-                    }}>
-                    Units
-                  </Typography>
-                  <Typography
-                    variant="subtitle1"
-                    color="textSecondary"
-                    ml="0.3em">
-                    ({totalUnits})
-                  </Typography>
-                </Box>
-                <SearchInput
-                  placeholder="Search"
-                  onValueChanged={(value) => setUnitQuery(value)}
-                  containerStyle={{
-                    background: theme.palette.inputBackground.main,
-                    width: '12rem',
-                  }}
-                />
-              </Box>
-            }>
-            <OverviewUnitsCard
-              getTotalUnits={(val) => setTotalUnits(val)}
-              customerId={customerId}
-              query={unitQuery}
-            />
-            {totalUnits > 3 ? (
-              <Box
-                sx={{textAlign: 'center', cursor: 'pointer'}}
-                onClick={() => getCurrentTabIndex && getCurrentTabIndex(1)}>
-                <Typography variant="caption" color={theme.palette.info.main}>
-                  see more
-                </Typography>
-              </Box>
-            ) : null}
-          </PageCard>
+      <Grid container columnSpacing={2} rowSpacing={2}>
+        <Grid item xs={12}>
+          {renderBasicDetails()}
         </Grid>
 
         <Grid item xs={6}>
-          <PageCard
-            minHeight="5vh"
-            customHeader={
-              <Box display="flex" justifyContent="space-between">
-                <Box display="flex">
-                  <Typography
-                    variant="subtitle1"
-                    sx={{
-                      color: theme.palette.text.primary,
-                    }}>
-                    Contracts
-                  </Typography>
-                  <Typography variant="subtitle1" color="textSecondary">
-                    ({totalContracts})
-                  </Typography>
-                </Box>
-                <SearchInput
-                  onValueChanged={(value) => setContractQuery(value)}
-                  placeholder="Search"
-                  containerStyle={{
-                    background: theme.palette.inputBackground.main,
-                    width: '12rem',
-                  }}
-                />
-              </Box>
-            }>
-            <OverviewContractsCard
-              getTotalContracts={(val) => setTotalContracts(val)}
-              customerId={customerId}
-              query={contractQuery}
-            />
-            {totalUnits > 3 ? (
-              <Box
-                sx={{textAlign: 'center', cursor: 'pointer'}}
-                onClick={() => getCurrentTabIndex && getCurrentTabIndex(2)}>
-                <Typography variant="caption" color={theme.palette.info.main}>
-                  see more
-                </Typography>
-              </Box>
-            ) : null}
-          </PageCard>
+          <UnitsWidget
+            getTotalUnits={(val) => setTotalUnits(val)}
+            customerId={customerId}
+            openTab={() => getCurrentTabIndex && getCurrentTabIndex(1)}
+          />
+        </Grid>
+
+        <Grid item xs={6}>
+          <ContractsWidget
+            getTotalContracts={(val) => setTotalContracts(val)}
+            customerId={customerId}
+            openTab={() => getCurrentTabIndex && getCurrentTabIndex(2)}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <ContactsWidget customerId={customerId || ''} />
         </Grid>
       </Grid>
     </TabContentContainer>

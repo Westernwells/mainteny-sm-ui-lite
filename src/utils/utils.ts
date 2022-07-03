@@ -111,3 +111,45 @@ export const getDataGridHeight = (
 
   return 52 * currentTotal + height;
 };
+
+export const padNumber = (num: number) => (num < 10 ? `0${num}` : num);
+
+export const onVisibilityChange = (callback: (visible: boolean) => void) => {
+  let visible: boolean = true;
+  let prefix: string = '';
+
+  const focused = () => {
+    if (!visible) {
+      callback((visible = true));
+    }
+  };
+
+  const unfocused = () => {
+    if (visible) {
+      callback((visible = false));
+    }
+  };
+
+  if ('hidden' in document) {
+    prefix = 'h';
+  } else if ('webkitHidden' in document) {
+    prefix = 'webkitH';
+  } else if ('mozHidden' in document) {
+    prefix = 'mozH';
+  } else if ('msHidden' in document) {
+    prefix = 'msH';
+  }
+  window.onpageshow = focused;
+  window.onfocus = focused;
+  window.onpagehide = unfocused;
+  window.onblur = unfocused;
+  if (prefix) {
+    visible = !document[`${prefix}idden` as keyof Document];
+    document.addEventListener(
+      `${prefix.substring(0, prefix.length - 1)}visibilitychange`,
+      () => {
+        (document[`${prefix}idden` as keyof Document] ? unfocused : focused)();
+      },
+    );
+  }
+};

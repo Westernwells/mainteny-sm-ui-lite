@@ -27,6 +27,7 @@ import {convertToText} from '../../../utils/utils';
 
 const defaultProps = {
   editable: false,
+  sortable: false,
   renderHeader: (params: GridColumnHeaderParams) => {
     const {t} = useTranslation();
 
@@ -37,7 +38,7 @@ const defaultProps = {
     );
   },
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" mx="0.5em">
+    <Typography variant="body2" mx="0.5em" style={{overflowWrap: 'anywhere'}}>
       {params.value || '-'}
     </Typography>
   ),
@@ -52,10 +53,35 @@ const defaultAlignment: {
   align: 'left',
 };
 
+const NoArticleSection = ({
+  placeholder,
+  action,
+  onSearch,
+}: {
+  placeholder: string;
+  action?: () => void;
+  onSearch: boolean;
+}) => (
+  <>
+    {!onSearch && (
+      <EmptySection
+        illustration="clipboard"
+        size="tiny"
+        containerStyle={{m: 'auto', width: '60%'}}
+        label={`No ${placeholder} yet. Please click the button below to add a new ${placeholder}`}
+        showActionBtn
+        btnLabel="+ Add New Article"
+        btnAction={action}
+      />
+    )}
+    {onSearch && <Box />}
+  </>
+);
+
 export const columns: GridColDef[] = [
   {
     field: 'externalId',
-    headerName: 'EXTERNAL ID',
+    headerName: 'NUMBER',
     type: 'string',
     cellClassName: 'nowrap',
     flex: 1,
@@ -77,6 +103,7 @@ export const columns: GridColDef[] = [
     field: 'category',
     headerName: 'CATEGORY',
     type: 'string',
+    cellClassName: 'truncateText',
     ...defaultAlignment,
     ...defaultProps,
   },
@@ -94,6 +121,7 @@ export const columns: GridColDef[] = [
     field: 'model',
     headerName: 'MODEL',
     type: 'string',
+    cellClassName: 'truncateText',
     ...defaultAlignment,
     ...defaultProps,
   },
@@ -102,6 +130,7 @@ export const columns: GridColDef[] = [
     headerName: 'PURCHASE PRICE',
     type: 'string',
     flex: 2,
+    cellClassName: 'truncateText',
     headerAlign: 'right',
     align: 'right',
     ...defaultProps,
@@ -111,6 +140,7 @@ export const columns: GridColDef[] = [
     headerName: 'SELLING PRICE',
     type: 'string',
     flex: 2,
+    cellClassName: 'truncateText',
     headerAlign: 'right',
     align: 'right',
     ...defaultProps,
@@ -123,6 +153,7 @@ export const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'center',
     editable: false,
+    sortable: false,
     renderHeader: (params: GridColumnHeaderParams) => {
       const {t} = useTranslation();
 
@@ -160,24 +191,6 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
 
 const pageSize = 25;
 
-const NoArticleSection = ({
-  placeholder,
-  action,
-}: {
-  placeholder: string;
-  action?: () => void;
-}) => (
-  <EmptySection
-    illustration="clipboard"
-    size="tiny"
-    containerStyle={{m: 'auto', width: '60%'}}
-    label={`No ${placeholder} yet. Please click the button below to add a new ${placeholder}`}
-    showActionBtn
-    btnLabel="+ Add New Article"
-    btnAction={action}
-  />
-);
-
 export const ArticleListDataGrid = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(makePage(0, pageSize));
@@ -203,6 +216,11 @@ export const ArticleListDataGrid = () => {
 
   const addNewArticle = () => {
     navigate('new');
+  };
+
+  const clearAllFilters = () => {
+    setQuery('');
+    setType('');
   };
 
   useEffect(() => {
@@ -234,7 +252,7 @@ export const ArticleListDataGrid = () => {
           searchPlaceholder="Search by name, category, manufacturer etc."
           getSearchValue={setQuery}
           filterItems={
-            <FilterFields>
+            <FilterFields onClear={() => clearAllFilters()}>
               <MultipleSelectCheckmarks
                 label="Type"
                 options={Object.keys(ArticleType).map((it) =>
@@ -244,6 +262,7 @@ export const ArticleListDataGrid = () => {
                   setType(item[0]?.toUpperCase())
                 }
                 multiple={false}
+                initialSelectedItems={[type]}
               />
             </FilterFields>
           }
@@ -253,6 +272,7 @@ export const ArticleListDataGrid = () => {
         rows={rows}
         columns={columns}
         loading={isFetching}
+        scrollToTop={query}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
         pageCount={pageCount}
@@ -264,7 +284,11 @@ export const ArticleListDataGrid = () => {
           }))
         }
         noRowsEmptySection={
-          <NoArticleSection placeholder="article" action={addNewArticle} />
+          <NoArticleSection
+            placeholder="article"
+            action={addNewArticle}
+            onSearch={!!type || !!query}
+          />
         }
       />
     </PageListingLayout>

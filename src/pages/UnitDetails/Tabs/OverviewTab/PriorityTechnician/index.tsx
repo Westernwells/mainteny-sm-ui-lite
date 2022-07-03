@@ -39,6 +39,7 @@ export const PriorityTechnician = ({
   elevatorId,
   maintainers = [],
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const formik = useFormik<PriorityTechnicianFormModel>({
     initialValues: {
@@ -142,16 +143,11 @@ export const PriorityTechnician = ({
       <EmptySection
         illustration="clipboard"
         size="tiny"
-        containerStyle={{m: 'auto', width: '60%'}}
-        label="No quotations yet. It will appear here once added!"
-        showActionBtn
-        btnLabel="+ Add New Article"
-        btnAction={() => {}}
+        containerStyle={{m: '1em 0', width: '60%'}}
+        label="No priority technicians have been added yet!"
       />
     </Box>
   );
-
-  const {t} = useTranslation();
 
   return (
     <InfoCard
@@ -173,7 +169,6 @@ export const PriorityTechnician = ({
           hideFooter
           rows={rows}
           isWidget
-          headerHeight={30}
           columns={useCallback(
             () => columns(getEditableTechnician, getDeletableTechnician),
             [],
@@ -215,7 +210,7 @@ export const PriorityTechnician = ({
         onConfirm={() => onDelete()}
         onClose={() => setOpenCancelConfirm(false)}
         title="Confirm"
-        content="Do you want to delete this note?"
+        content="Do you want to delete this technician?"
       />
     </InfoCard>
   );

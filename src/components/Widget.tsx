@@ -72,7 +72,7 @@ export const Widget = ({
               startIcon: <AddIcon />,
             }}>
             <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
-              {btnLabel}
+              {t(btnLabel)}
             </Typography>
           </Button>
         ) : null}
@@ -80,7 +80,7 @@ export const Widget = ({
         {showMenuActionBtn && menu ? (
           <MenuBtn
             startIcon={<AddIcon />}
-            label={btnLabel}
+            label={t(btnLabel)}
             menu={menu}
             size="large"
             color="primary"

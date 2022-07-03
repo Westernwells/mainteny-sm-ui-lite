@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import useTheme from '@mui/material/styles/useTheme';
 
 interface Props {
-  bodyContainerStyle?: {[key: string]: string | number};
+  bodyContainerStyle?: {[key: string]: any};
   containerStyles?: {[key: string]: any};
   headerStyles?: {[key: string]: string | number};
   minHeight?: string | number;

@@ -1,3 +1,4 @@
+import {useEffect, useRef} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -41,6 +42,7 @@ interface Props extends DataGridProps {
   isCellClickable?: boolean;
   isWidget?: boolean;
   headerHeight?: number;
+  scrollToTop?: any;
 }
 
 interface ColumnProps extends GridColDef {
@@ -106,10 +108,12 @@ export const DataGridLayout = ({
   isCellClickable = true,
   isWidget = false,
   headerHeight,
+  scrollToTop,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
   const theme = useTheme();
+  const gridRef = useRef<any>();
 
   const rowClassNames: any[string] = [];
   rows.forEach((item) => {
@@ -121,6 +125,13 @@ export const DataGridLayout = ({
       };
     }
   });
+
+  useEffect(() => {
+    if (gridRef.current) {
+      const ele = gridRef.current.querySelector('.MuiDataGrid-virtualScroller');
+      ele.scrollTop = 0;
+    }
+  }, [scrollToTop]);
 
   const renderFooter = () => (
     <CustomPagination
@@ -152,7 +163,7 @@ export const DataGridLayout = ({
           illustration="clipboard"
           size="tiny"
           containerStyle={{my: 'auto'}}
-          label="There are no rows for the applied filters!"
+          label="There are no entires for the applied filters!"
         />
       )
     );
@@ -165,6 +176,7 @@ export const DataGridLayout = ({
         ...(!fullHeight && {height}),
       }}>
       <DataGrid
+        ref={gridRef}
         components={{
           LoadingOverlay: LinearProgress,
           Footer: renderFooter,

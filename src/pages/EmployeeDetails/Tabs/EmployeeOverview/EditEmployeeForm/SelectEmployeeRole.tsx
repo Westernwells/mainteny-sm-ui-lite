@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import {useFormikContext} from 'formik';
+import {useTranslation} from 'react-i18next';
 import {
   FormControl,
   InputLabel,
@@ -42,6 +43,7 @@ export const getRole = (initialRole: string | string[]) => {
 };
 
 export const SelectEmployeeRole = () => {
+  const {t} = useTranslation();
   const {values, setFieldValue} = useFormikContext<EmployeeAccountData>();
 
   const [role, setRole] = useState<string>(
@@ -69,7 +71,7 @@ export const SelectEmployeeRole = () => {
           color: 'text.primary',
           paddingInline: '.5em',
         }}>
-        Role
+        {t('Role')}
       </InputLabel>
       <Select
         labelId="roleSelect-label"
@@ -82,7 +84,7 @@ export const SelectEmployeeRole = () => {
         }}>
         {employeeRoles.map((item: EmployeeRolesType) => (
           <MenuItem value={item.value} key={item.id}>
-            {item.label}
+            {t(item.label)}
           </MenuItem>
         ))}
       </Select>

@@ -115,6 +115,7 @@ export interface UserData {
   additionalInfo: UserAdditionalInfo;
   meta: Meta;
   team: string;
+  externalId: string;
 }
 
 export interface ServiceManagerData {}

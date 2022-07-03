@@ -32,8 +32,8 @@ const MenuProps = {
 export const FormSelect = ({
   labelId,
   label,
-  required,
   options,
+  required = false,
   labelStyles,
   selectStyles,
   selectProps,
@@ -55,7 +55,7 @@ export const FormSelect = ({
       <Select
         size="small"
         labelId={labelId}
-        label={label}
+        label={t(label)}
         renderValue={() => {
           let selectValue;
           if (

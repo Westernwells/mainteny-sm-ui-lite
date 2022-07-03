@@ -33,8 +33,8 @@ export const PageCard = ({
   contentContainerStyles,
   handleAction = () => {},
 }: Props) => {
-  const theme = useTheme();
   const {t} = useTranslation();
+  const theme = useTheme();
   return (
     <Card
       sx={{

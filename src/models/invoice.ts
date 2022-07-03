@@ -8,6 +8,7 @@ import {
   WithOptional,
 } from './misc';
 import {PropertyOwner} from './propertyManager';
+import {QuotationItemRecord} from './quotation';
 import {ServiceCompanySimpleView} from './service-company';
 import {ServiceOrderView, ServiceOrderType} from './service-order';
 
@@ -21,6 +22,8 @@ export enum InvoiceStatus {
 export enum InvoiceStatusView {
   PAID = 'Paid',
   NOT_PAID = 'Unpaid',
+  DRAFT = 'Draft',
+  EXPIRED = 'Overdue',
 }
 
 export interface InvoiceItem {
@@ -92,14 +95,14 @@ export interface CreateInvoice {
   description: string;
   dueDate: string;
   issuedDate: string;
-  items: WithOptional<InvoiceItemRecord<AmountRecord>, 'articleUnit'>[];
+  items: QuotationItemRecord[] | InvoiceItemRecord<Amount>[];
   paymentInfo: PaymentInfo;
   paymentTerms: string;
   propertyOwnerId: string;
   serviceCompanyId: string;
   serviceOrderId: string;
   shouldSendOut: boolean;
-  type: InvoiceType | '';
+  type: InvoiceType;
 }
 
 export interface UpdateInvoice {
@@ -111,5 +114,5 @@ export interface UpdateInvoice {
   paymentInfo?: PaymentInfo;
   paymentTerms?: string;
   serviceOrderId: string;
-  type: InvoiceType | '';
+  type: InvoiceType;
 }

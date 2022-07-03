@@ -14,6 +14,7 @@ interface Props {
   inputError?: string;
   handleBlur?: (e: FocusEvent<any, Element>) => void;
   textFieldProps?: TextFieldProps;
+  label?: string;
 }
 
 export const AddressAutoComplete = ({
@@ -22,9 +23,12 @@ export const AddressAutoComplete = ({
   inputError,
   handleBlur,
   textFieldProps,
+  label,
 }: Props) => {
   const [address, setAddress] = useState<any>(null);
   const [queryView, setQueryView] = useState(initialValue);
+
+  const {t} = useTranslation();
 
   useEffect(() => {
     if (address !== null) {
@@ -51,14 +55,12 @@ export const AddressAutoComplete = ({
   const onInputChange = (e: any) => {
     setQueryView(e.target.value);
   };
-  const {t} = useTranslation();
   return (
     <AddressAutocomplete
-      id="addressAutoComplete"
       inputValue={queryView}
       value={address}
       apiKey={process.env.REACT_APP_GOOGLE_MAPS_KEY!}
-      label={t('Address')}
+      label={label || t('Address')}
       fields={[
         'address_components',
         'formatted_address',
@@ -81,7 +83,7 @@ export const AddressAutoComplete = ({
       renderInput={(params) => (
         <FormInput
           props={{
-            label: t('Address'),
+            label: label || t('Address'),
             placeholder: 'Enter a location',
             name: 'address',
             onChange: onInputChange,

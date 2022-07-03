@@ -40,6 +40,7 @@ export const ScheduleForm = ({
   scheduleFormIsErrored,
   currentRadioOption,
 }: Props) => {
+  const {t} = useTranslation();
   const formik = useFormik<ScheduleTechnicianForm>({
     initialValues: {
       date: defaultStartDate || null,
@@ -62,8 +63,6 @@ export const ScheduleForm = ({
       scheduleFormIsErrored(!!Object.keys(formik.errors).length);
     }
   }, [formik.errors]);
-
-  const {t} = useTranslation();
 
   return (
     <Box sx={{...containerStyles}}>

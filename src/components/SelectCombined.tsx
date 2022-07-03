@@ -1,4 +1,5 @@
 import {ReactNode, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import {FormLabel} from './form/FormLabel';
 import {SelectCard} from './SelectCard';
@@ -28,6 +29,7 @@ export const SelectCombined = ({
   modalHeader,
   modalBody,
 }: Props) => {
+  const {t} = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -36,17 +38,20 @@ export const SelectCombined = ({
 
   return (
     <Box>
-      <FormLabel text={label} required={labelRequired} />
+      <FormLabel text={t(label)} required={labelRequired} />
 
       {selected ? (
         <SelectCard header={cardHeader} body={cardBody} onClose={cardOnClose} />
       ) : (
-        <SelectButton text={buttonText} onClick={() => setIsModalOpen(true)} />
+        <SelectButton
+          text={t(buttonText)}
+          onClick={() => setIsModalOpen(true)}
+        />
       )}
       <SelectModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        header={modalHeader}>
+        header={t(modalHeader)}>
         {modalBody}
       </SelectModal>
     </Box>
