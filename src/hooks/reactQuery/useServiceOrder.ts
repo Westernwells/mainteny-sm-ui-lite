@@ -20,7 +20,9 @@ import {
 import {queryKeys} from 'reactQuery/constants';
 import {ServiceCompanyTimeUnit} from 'models/service-company';
 import {toDate, toRestDate} from 'utils/datetime';
-import {useSnackbar} from 'notistack';
+import {useSnackbar} from 'hooks/useSnackbar';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {
   AssignmentBasedOrderBody,
   UpdateServiceOrderBody,
@@ -535,20 +537,23 @@ export const useUpdateServiceOrder = (successMsg: string) => {
   );
 };
 
-const createAssignmentBasedOrder = async (body: AssignmentBasedOrderBody) => {
-  await axiosClient.post<StringValue>('/api/serviceOrders/assignmentBased', {
+const createAssignmentBasedOrder = async (body: AssignmentBasedOrderBody) =>
+  axiosClient.post<StringValue>('/api/serviceOrders/assignmentBased', {
     ...body,
   });
-};
 
 export const useAssignmentBasedOrder = (successMsg: string) => {
   const {enqueueSnackbar} = useSnackbar();
   return useMutation(
     (body: AssignmentBasedOrderBody) => createAssignmentBasedOrder(body),
     {
-      onSuccess: () => {
+      onSuccess: (data, variables) => {
         enqueueSnackbar(successMsg, {
           variant: 'success',
+        });
+        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ORDER_CREATED, {
+          elevatorId: variables.elevatorId,
+          serviceOrderId: data.data.value,
         });
       },
       onError: (err) => {
@@ -563,11 +568,10 @@ export const useAssignmentBasedOrder = (successMsg: string) => {
 
 const createScheduledServiceOrder = async (
   body: CreateScheduledServiceOrderBody,
-) => {
-  await axiosClient.post<StringValue>('/api/serviceOrders/scheduled', {
+) =>
+  axiosClient.post<StringValue>('/api/serviceOrders/scheduled', {
     ...body,
   });
-};
 
 export const useCreateScheduledServiceOrder = (successMsg: string) => {
   const {enqueueSnackbar} = useSnackbar();
@@ -575,9 +579,13 @@ export const useCreateScheduledServiceOrder = (successMsg: string) => {
     (body: CreateScheduledServiceOrderBody) =>
       createScheduledServiceOrder(body),
     {
-      onSuccess: () => {
+      onSuccess: (data, variables) => {
         enqueueSnackbar(successMsg, {
           variant: 'success',
+        });
+        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ORDER_CREATED, {
+          elevatorId: variables.elevatorId,
+          serviceOrderId: data.data.value,
         });
       },
       onError: (err) => {
@@ -592,11 +600,10 @@ export const useCreateScheduledServiceOrder = (successMsg: string) => {
 
 const createNonScheduledServiceOrder = async (
   body: CreateNonScheduledServiceOrderBody,
-) => {
-  await axiosClient.post<StringValue>('/api/serviceOrders/nonscheduled', {
+) =>
+  axiosClient.post<StringValue>('/api/serviceOrders/nonscheduled', {
     ...body,
   });
-};
 
 export const useCreateNonScheduledServiceOrder = (successMsg: string) => {
   const {enqueueSnackbar} = useSnackbar();
@@ -604,9 +611,13 @@ export const useCreateNonScheduledServiceOrder = (successMsg: string) => {
     (body: CreateNonScheduledServiceOrderBody) =>
       createNonScheduledServiceOrder(body),
     {
-      onSuccess: () => {
+      onSuccess: (data, variables) => {
         enqueueSnackbar(successMsg, {
           variant: 'success',
+        });
+        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ORDER_CREATED, {
+          elevatorId: variables.elevatorId,
+          serviceOrderId: data.data.value,
         });
       },
       onError: (err) => {

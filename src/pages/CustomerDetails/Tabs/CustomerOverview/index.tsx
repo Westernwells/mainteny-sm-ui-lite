@@ -9,6 +9,7 @@ import {
   LocalPhone,
   Edit,
 } from '@mui/icons-material';
+import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
@@ -46,6 +47,7 @@ export const CustomerOverviewTab = ({
   getCustomerName,
   getCurrentTabIndex,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const {data: customer, isLoading} = useGetCustomer(customerId);
   const [basicDetails, setBasicDetails] = useState<BasicDetails>();
@@ -99,7 +101,7 @@ export const CustomerOverviewTab = ({
 
   const renderBasicDetails = () => (
     <InfoCard
-      header={<Typography variant="subtitle1">Basic Details</Typography>}
+      header={<Typography variant="subtitle1">{t('Basic Details')}</Typography>}
       containerStyles={{flexGrow: 1}}
       headerStyles={{mt: '0.5em'}}
       handleAction={() => setOpenDialog(true)}

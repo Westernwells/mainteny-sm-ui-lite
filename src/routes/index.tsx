@@ -19,7 +19,7 @@ import {Customer} from 'pages/Customers';
 import {ContractDetails} from 'pages/ContractDetails';
 import {CustomerDetails} from 'pages/CustomerDetails';
 import {Invoices} from 'pages/Invoices';
-import {DraftInvoice} from 'pages/InvoiceDetails/DraftInvoice';
+import {NewInvoice} from 'pages/InvoiceDetails/NewInvoice';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
 import {Employees} from 'pages/Employee';
 import {EmployeeDetails} from 'pages/EmployeeDetails';
@@ -32,9 +32,11 @@ import {ServiceOrders} from 'pages/ServiceOrders';
 import {NewEmployee} from 'pages/NewEmployee';
 import {ServiceOrderDetails} from 'pages/ServiceOrderDetails';
 import {axiosClient} from 'utils/axios-utils';
-import {languageMap} from 'utils/utils';
+import {languageMap, onVisibilityChange} from 'utils/utils';
 import i18n from 'i18next';
 import {useEffect, useState} from 'react';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {NewServiceOrder} from 'pages/NewServiceOrder';
 import {NewUnit} from 'pages/NewUnit';
 import {NewCustomer} from 'pages/NewCustomer';
@@ -57,7 +59,15 @@ export const Router = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    onVisibilityChange((visible) => {
+      if (visible) {
+        Mixpanel.timeEvent(mixpanelEvents.ACTIVE_SESSION);
+      } else {
+        Mixpanel.identifyAndTrack(mixpanelEvents.ACTIVE_SESSION);
+      }
+    });
+  }, []);
 
   return (
     <ErrorBoundary navigate={navigate} location={location}>
@@ -220,7 +230,7 @@ export const Router = () => {
                   pageScrollable
                   backBtnLabel="New Invoice"
                   showBackAction>
-                  <DraftInvoice />
+                  <NewInvoice />
                 </PageLayout>
               </>
             }

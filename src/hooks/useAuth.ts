@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {axiosClient} from 'utils/axios-utils';
-import {useSnackbar} from 'notistack';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {useUserSession} from './reactQuery/useUserSession';
 import {UserSession} from '../models/session';
 import {Role} from '../models/user';

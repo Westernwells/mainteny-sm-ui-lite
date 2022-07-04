@@ -7,6 +7,8 @@ import queryString from 'query-string';
 import * as Yup from 'yup';
 import {ReactComponent as CheckMark} from 'assets/icons/CheckMark.svg';
 import {useAuth} from 'hooks/useAuth';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {AuthLayout} from 'components/AuthLayout';
 import {LoginForm} from './components/LoginForm';
 
@@ -30,6 +32,7 @@ export const Login = () => {
     },
     onSubmit: (values) => {
       localStorage.setItem('email', values.email);
+      Mixpanel.identifyAndTrack(mixpanelEvents.LOGIN);
       signin(values.email, values.password);
     },
     validationSchema,

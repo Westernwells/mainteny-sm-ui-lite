@@ -43,6 +43,7 @@ import {convertToText} from 'utils/utils';
 
 interface Props {
   invoice?: InvoiceView;
+  serviceOrderResource?: ServiceOrderView;
 }
 
 const payment = {
@@ -53,7 +54,7 @@ const payment = {
 
 const dateToString = (date: Date) => date.toISOString().split('T')[0];
 
-export const DraftInvoice = ({invoice}: Props) => {
+export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
 
@@ -72,7 +73,7 @@ export const DraftInvoice = ({invoice}: Props) => {
     PropertyOwnerView | PropertyOwnerSimpleView | null
   >(null);
   const [serviceOrder, setServiceOrder] = useState<ServiceOrderView | null>(
-    null,
+    serviceOrderResource ?? null,
   );
 
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItemRecord<Amount>[]>(

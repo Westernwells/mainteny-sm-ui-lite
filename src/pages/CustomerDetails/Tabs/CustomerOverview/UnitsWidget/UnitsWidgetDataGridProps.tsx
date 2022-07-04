@@ -4,6 +4,7 @@ import {
   GridRenderCellParams,
   GridRowModel,
 } from '@mui/x-data-grid';
+import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 
 import {ElevatorView} from 'models/elevator';
@@ -12,11 +13,14 @@ import {convertToText} from 'utils/utils';
 
 const defaultProps = {
   editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
+  renderHeader: (params: GridColumnHeaderParams) => {
+    const {t} = useTranslation();
+    return (
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName && t(params.colDef.headerName)}
+      </Typography>
+    );
+  },
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
     <Typography variant="body2" mx="0.5em">
       {params.value}

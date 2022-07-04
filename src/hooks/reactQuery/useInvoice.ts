@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 import {useCallback} from 'react';
 import {queryKeys as qk, queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
-import {useSnackbar} from 'notistack';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {useNavigate} from 'react-router';
 // FIXME: Dummy Import
 
@@ -21,6 +21,9 @@ import {
   CreateInvoice,
   UpdateInvoice,
 } from 'models/invoice';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
+import {getTotalFromArticles, getTotalWithVatFromArticles} from 'utils/invoice';
 import {useUserSession} from './useUserSession';
 
 // TODO: make API call to fetch Invoices
@@ -215,11 +218,19 @@ export const useCreateInvoice = () => {
     ({data, publish}: {data: CreateInvoice; publish: boolean}) =>
       postInvoice(data, publish),
     {
-      onSuccess: ({data, publish}) => {
+      onSuccess: ({data, publish}, variables) => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
         enqueueSnackbar(`Invoice created successfully!`, {
           variant: 'success',
+        });
+        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_INVOICE_CREATED, {
+          invoiceId: data.value,
+          propertyOwnerId: variables.data.propertyOwnerId,
+          serviceOrderId: variables.data.serviceOrderId,
+          amountWithoutVat: getTotalFromArticles(variables.data.items),
+          amountWithVat: getTotalWithVatFromArticles(variables.data.items),
+          isPartialInvoice: variables.data.type === 'PARTIAL',
         });
         if (publish) {
           publishInvoice(data.value);

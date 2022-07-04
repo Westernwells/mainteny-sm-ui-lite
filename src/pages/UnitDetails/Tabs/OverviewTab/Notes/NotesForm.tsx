@@ -11,14 +11,19 @@ interface Props {
 export const NotesForm = ({formik}: Props) => (
   <Box>
     <FormInput
+      containerStyles={{mt: '0.5em'}}
       props={{
         size: 'small',
         placeholder: 'Enter Note',
         label: 'Note',
         name: 'note',
         value: formik.values.note,
+        onBlur: formik.handleBlur,
         onChange: formik.handleChange,
         multiline: true,
+        required: true,
+        error: !!(formik.touched.note && formik.errors.note),
+        helperText: formik.touched.note && formik.errors.note,
         minRows: 3,
       }}
     />

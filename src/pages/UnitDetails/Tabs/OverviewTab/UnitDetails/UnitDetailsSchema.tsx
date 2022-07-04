@@ -12,6 +12,7 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import useTheme from '@mui/material/styles/useTheme';
 import {ElevatorView} from 'models/elevator';
+import {convertToText} from 'utils/utils';
 
 interface Props {
   label: string;
@@ -34,7 +35,7 @@ export const UnitDetailsSchema = ({
           <CardProps
             icon={<EscalatorIcon sx={{color: theme.palette.info.dark}} />}
             label="UNIT CATEGORY"
-            bodyText={elevator.category || '-'}
+            bodyText={convertToText(elevator.category) || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}
@@ -139,7 +140,7 @@ export const UnitDetailsSchema = ({
           <CardProps
             icon={<PeopleAltIcon sx={{color: theme.palette.info.dark}} />}
             label="UNIT CAPACITY"
-            bodyText={elevator.capacity ? `${elevator.capacity}kg` : '-'}
+            bodyText={elevator.capacity ? elevator.capacity : '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}

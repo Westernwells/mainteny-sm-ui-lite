@@ -1,4 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {OpenInNew} from '@mui/icons-material';
 import {Box, Typography} from '@mui/material';
 import {GridRowsProp} from '@mui/x-data-grid';
@@ -25,6 +26,7 @@ export const ContractsWidget = ({
   getTotalContracts,
   openTab,
 }: Props) => {
+  const {t} = useTranslation();
   const [contractQuery, setContractQuery] = useState('');
   const [page, setPage] = useState(makePage(0, 500));
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -67,7 +69,7 @@ export const ContractsWidget = ({
     <InfoCard
       header={
         <Box display="flex">
-          <Typography variant="subtitle1">Contracts</Typography>
+          <Typography variant="subtitle1">{t('Contracts')}</Typography>
           {rows.length > 0 && (
             <Box
               sx={{
