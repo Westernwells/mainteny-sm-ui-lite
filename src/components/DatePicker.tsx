@@ -15,6 +15,8 @@ interface Props {
   maxDate?: Date;
   textFieldProps?: TextFieldProps;
   inputLabelProps?: InputLabelProps;
+  reset?: boolean;
+  getReset?: (reset: boolean) => void;
 }
 
 export const DatePicker = ({
@@ -25,12 +27,21 @@ export const DatePicker = ({
   maxDate,
   textFieldProps,
   inputLabelProps,
+  reset = false,
+  getReset = () => {},
 }: Props) => {
   const [value, setValue] = useState<Date | null>(defaultDate);
 
   useEffect(() => {
     setValue(defaultDate);
-  }, [defaultDate]);
+  }, []);
+
+  useEffect(() => {
+    if (reset) {
+      setValue(defaultDate);
+      if (getReset) getReset(reset);
+    }
+  }, [reset]);
 
   useEffect(() => {
     if (getSelectedDate) {
