@@ -5,7 +5,7 @@ import {
   useQueryClient,
   UseQueryOptions,
 } from 'react-query';
-import {useSnackbar} from 'notistack';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {useNavigate} from 'react-router';
 import {Resource, RestError} from 'models/misc';

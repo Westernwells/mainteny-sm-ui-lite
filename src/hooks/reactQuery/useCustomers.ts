@@ -3,7 +3,7 @@ import {
   PropertyOwnerView,
   QueryPropertyOwnersParams,
 } from 'models/propertyManager';
-import {useSnackbar} from 'notistack';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {CustomerEditForm} from 'pages/CustomerDetails/Tabs/CustomerOverview/EditCustomerForm/model';
 import {NewCustomerBody} from 'pages/NewCustomer/model';
 import {useMutation, useQuery, useQueryClient} from 'react-query';

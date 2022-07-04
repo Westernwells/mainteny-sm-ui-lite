@@ -1,6 +1,6 @@
 import {useQuery} from 'react-query';
 import {queryKeys as qks} from 'reactQuery/constants';
-import {useSnackbar} from 'notistack';
+import {useSnackbar} from 'hooks/useSnackbar';
 
 import {UserQueryParams} from 'models/employee';
 import {Resource} from 'models/misc';

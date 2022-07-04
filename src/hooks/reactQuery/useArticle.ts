@@ -2,7 +2,7 @@ import {useCallback} from 'react';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {queryKeys, queryKeys as qk} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
-import {useSnackbar} from 'notistack';
+import {useSnackbar} from 'hooks/useSnackbar';
 import _ from 'lodash';
 import {
   ArticleView,

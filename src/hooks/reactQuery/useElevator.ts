@@ -8,7 +8,7 @@ import {AxiosResponse} from 'axios';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {queryKeys} from 'reactQuery/constants';
 import {useParams} from 'react-router';
-import {useSnackbar} from 'notistack';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {

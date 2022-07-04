@@ -6,7 +6,7 @@ import {
   UseQueryOptions,
 } from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
-import {useSnackbar} from 'notistack';
+import {useSnackbar} from 'hooks/useSnackbar';
 
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {Page, Resource, RestError, StringValue} from '../../models/misc';
