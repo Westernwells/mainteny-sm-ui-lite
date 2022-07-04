@@ -24,7 +24,12 @@ import {EmptySection} from 'components/EmptySection';
 import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import * as Yup from 'yup';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
-import {formatCurrency, formatNetAmount} from 'utils/currency';
+import {
+  amountForView,
+  amountRecordForBackend,
+  formatCurrency,
+  formatNetAmount,
+} from 'utils/currency';
 import {convertToMacro, convertToText} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
@@ -71,7 +76,9 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const formik = useFormik<ContractUpdateRequest>({
     initialValues: {
       type: contractDetails?.type!,
-      price: contractDetails?.additionalInfo?.price?.netAmount || '',
+      price: contractDetails?.additionalInfo?.price
+        ? amountForView(contractDetails?.additionalInfo?.price).netAmount
+        : '',
       invoiceDue: contractDetails?.additionalInfo?.invoiceDue!,
       renewalTerms: contractDetails?.additionalInfo?.renewalTerms || '',
       visitsNumber: contractDetails?.visitsNumber || '',
@@ -89,10 +96,12 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       ...contractDetails?.additionalInfo,
       renewalTerms: +formik.values.renewalTerms,
       price: {
-        ...contractDetails?.additionalInfo.price,
-        netAmount: +formik.values.price,
-        currency: 'EUR',
-        percentageVat: user?.userAccount.serviceCompany.settings.percentageVat,
+        ...amountRecordForBackend({
+          netAmount: +formik.values.price,
+          currency: 'EUR',
+          percentageVat:
+            user?.userAccount.serviceCompany.settings.percentageVat || 0,
+        }),
       },
       invoiceDue: convertToMacro(formik.values.invoiceDue || ''),
       visitsNumber: +formik.values.visitsNumber,

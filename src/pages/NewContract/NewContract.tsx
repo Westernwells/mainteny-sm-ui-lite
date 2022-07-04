@@ -14,6 +14,7 @@ import {
 import {PropertyOwnerView} from 'models/propertyManager';
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router';
+import {amountRecordForBackend} from 'utils/currency';
 import {toRestDate} from 'utils/datetime';
 import {convertToMacro} from 'utils/utils';
 import * as Yup from 'yup';
@@ -184,12 +185,12 @@ const NewContract = () => {
       endDate: toRestDate(formikBasicInfo.values.endDate!),
       hourlyRate: +formikContractTerms.values.hourlyRate,
       invoiceDue: convertToMacro(formikContractTerms.values.invoiceDue),
-      price: {
+      price: amountRecordForBackend({
         currency: 'EUR',
         netAmount: +formikContractTerms.values.netAmount,
         percentageVat:
           +formikContractTerms.values.annualPriceAdjustmentPercentage,
-      },
+      }),
       sla: +formikContractTerms.values.serviceLevelAgreement,
       propertyOwnerId: formikBasicInfo.values.propertyOwnerId,
       renewalTerms: +formikContractTerms.values.renewalTerms,
@@ -204,7 +205,7 @@ const NewContract = () => {
     await createContract(newContract);
     await uploadFiles({files: formikDocuments.values.documents, uploadPath});
 
-    navigate(`/contracts/details/${contractId}`);
+    navigate(`/contracts/details/${contractId}`, {replace: true});
   };
 
   return (

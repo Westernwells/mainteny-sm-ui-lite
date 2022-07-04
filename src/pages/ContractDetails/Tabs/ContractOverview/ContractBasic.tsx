@@ -14,7 +14,7 @@ import {convertToText} from 'utils/utils';
 interface Props {
   type?: string;
   numberOfVisits?: number;
-  costPerYear?: string;
+  costPerYear?: string | number;
   spendingLimit?: string;
   renewalPeriod?: number;
   invoiceDue?: string;
@@ -68,7 +68,7 @@ export const ContractBasic = ({
             containerStyles={{mr: '0.5em'}}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3rem"
-            bodyText={costPerYear || '-'}
+            bodyText={`${costPerYear}` || '-'}
           />
         </Grid>
         <Grid item xs={4}>
