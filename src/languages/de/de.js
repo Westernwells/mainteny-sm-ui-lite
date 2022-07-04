@@ -458,6 +458,8 @@ module.exports = {
     'Search Unassigned Orders': 'Suche nach nicht zugewiesenen Aufträgen',
     'Due in': 'Fällig in',
     'Show Unassigned Orders': 'Nicht zugewiesene Aufträge anzeigen',
+    'Show Unassigned Orders ({{count}})':
+      'Nicht zugewiesene Aufträge anzeigen ({{count}})',
     'Search technician': 'Techniker suchen',
     'New Order': 'Neuer Auftrag',
     Ongoing: 'Läuft',
@@ -481,6 +483,8 @@ module.exports = {
     'e.g. A1 first floor': 'z.B. Haus B',
     'e.g. Outside key box, pin: 0000': 'z.B. Tresor 1111',
     'e.g. central parking lot': 'z.B. zentraler Parkplatz',
+    'e.g. Tobias': 'z.B. Tobias',
+    'e.g. REWE AG': 'z.B. REWE AG',
 
     // Employee details
     'Work Hours': 'Arbeitszeiten',

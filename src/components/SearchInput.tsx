@@ -10,6 +10,8 @@ interface Props {
   onValueChanged?: (value: string) => void;
   width?: string;
   containerStyle?: {[key: string]: string | number};
+  variant?: 'standard' | 'filled' | 'outlined' | undefined;
+  label?: string;
 }
 
 export const SearchInput = ({
@@ -17,6 +19,8 @@ export const SearchInput = ({
   onValueChanged,
   width,
   containerStyle,
+  variant,
+  label,
 }: Props) => {
   const {t} = useTranslation();
   const debouncedChangeHandler = useCallback(
@@ -29,31 +33,46 @@ export const SearchInput = ({
   return (
     <TextField
       size="small"
-      sx={{
-        width: width || '20rem',
-        border: 'none',
-        background: '#fff',
-        '& .MuiOutlinedInput-root:hover': {
-          '& > fieldset': {
-            borderColor: '#fff',
-          },
-        },
-        '& .MuiOutlinedInput-root.Mui-focused': {
-          '& > fieldset': {
-            borderColor: '#fff',
-          },
-        },
+      sx={
+        variant === 'outlined'
+          ? {
+              width: width || '20rem',
+              background: '#fff',
+              '& .MuiInputAdornment-root': {
+                marginRight: '-7px',
+              },
 
-        '& .MuiOutlinedInput-notchedOutline': {
-          border: '1px solid #fff',
-        },
-        ...containerStyle,
-      }}
+              ...containerStyle,
+            }
+          : {
+              width: width || '20rem',
+              border: 'none',
+              background: '#fff',
+              '& .MuiOutlinedInput-root:hover': {
+                '& > fieldset': {
+                  borderColor: '#fff',
+                },
+              },
+              '& .MuiOutlinedInput-root.Mui-focused': {
+                '& > fieldset': {
+                  borderColor: '#fff',
+                },
+              },
+
+              '& .MuiOutlinedInput-notchedOutline': {
+                border: '1px solid #fff',
+              },
+              ...containerStyle,
+            }
+      }
       placeholder={placeholder && t(placeholder)}
+      variant={variant}
+      label={label && t(label)}
       onChange={debouncedChangeHandler}
+      InputLabelProps={{shrink: variant === 'outlined'}}
       InputProps={{
         endAdornment: (
-          <InputAdornment position="start">
+          <InputAdornment position="end">
             <SearchIcon />
           </InputAdornment>
         ),
