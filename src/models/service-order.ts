@@ -107,7 +107,7 @@ export interface ServiceOrderAdditionalInfo {
 export interface ServiceOrderView {
   id: string;
   number: string;
-  externalID: string;
+  externalId: string;
   articles: ServiceOrderArticleView[];
   serviceCompany: ServiceCompanySimpleView;
   elevator: ElevatorView;
@@ -222,7 +222,6 @@ export interface UpdateJobSchedule {
 
 export interface CompleteServiceOrder {
   answers: CheckListAnswerRecord[];
-  attachments: string[];
   description: string;
   externalId: string;
   serviceTime: number;
