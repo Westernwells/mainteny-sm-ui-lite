@@ -18,7 +18,7 @@ import {
   QueryContractParams,
 } from 'models/contract';
 import {Resource, RestError, StringValue, WithOptional} from 'models/misc';
-import {useSnackbar} from 'notistack';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {
   addDays,
   endOfDay,
