@@ -714,6 +714,10 @@ module.exports = {
     'Order scheduled successfully': 'Die Bestellung wurde erfolgreich geplant',
     'QR code image uploaded successfully':
       'QR-Code wurde erfolgreich hochgeladen',
+    'EMAIL ID': 'EMAIL-ADRESSE',
+    'Postal Address': 'Postanschrift',
+    Active: 'Aktiv',
+    Inactive: 'Inaktiv',
   },
 };
 
