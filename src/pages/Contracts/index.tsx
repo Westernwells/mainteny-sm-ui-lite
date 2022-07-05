@@ -134,7 +134,7 @@ export const Contracts = () => {
       <MultipleSelectCheckmarks
         label="Price Range"
         options={['0 - €500', '€500 - €1,000', '> €1,000']}
-        initialSelectedItems={[]}
+        initialSelectedItems={cost}
         getSelectedValue={(item) => costRangeConvertor(item)}
       />
       <MultipleSelectCheckmarks

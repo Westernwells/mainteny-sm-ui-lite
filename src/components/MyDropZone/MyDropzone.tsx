@@ -3,6 +3,7 @@ import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import {CheckCircleRounded} from '@mui/icons-material';
 import {useEffect, useRef, useState} from 'react';
+import {useUuid} from 'hooks/reactQuery/useUuid';
 import {FileWithPath, useDropzone, FileRejection} from 'react-dropzone';
 import useTheme from '@mui/material/styles/useTheme';
 import {Button} from '../Button';
@@ -29,6 +30,7 @@ export const MyDropZone = ({
   maxFiles,
 }: Props) => {
   const {t} = useTranslation();
+  const {data: uuid} = useUuid();
   const theme = useTheme();
   const [files, setFiles] = useState<FileWithPreview[]>(existingFiles);
   const [isEditingFileName, setIsEditingFileName] = useState(false);
@@ -111,9 +113,9 @@ export const MyDropZone = ({
     setNewFileName('');
   };
 
-  const hintsLabel = hints?.map((hint, key) => (
+  const hintsLabel = hints?.map((hint) => (
     <Box
-      key={key}
+      key={uuid}
       sx={{mr: '1em', display: 'flex', mt: '0.5em', flexDirection: 'row'}}>
       <CheckCircleRounded sx={{mr: '0.5em'}} />
       <Typography component="div" variant="body1">
@@ -150,13 +152,17 @@ export const MyDropZone = ({
 
   const renderErrors = () =>
     fileRejections.map((item, index) => (
-      <Box mb="0.5em">
+      <Box mb="0.5em" key={uuid}>
         <Typography component="div" variant="body1" color="error">
           {`${index + 1}. ${item.file.name}`}:{' '}
         </Typography>
         <Box sx={{ml: '1em'}}>
           {item.errors.map((error) => (
-            <Typography component="div" variant="body2" color="error">
+            <Typography
+              component="div"
+              variant="body2"
+              color="error"
+              key={uuid}>
               {error.code === 'file-too-large'
                 ? t('File is larger than 5mb')
                 : t(error.message)}
