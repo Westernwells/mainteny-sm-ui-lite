@@ -1,5 +1,5 @@
 import {FormikProps} from 'formik';
-import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import {FormInput} from 'components/form/FormInput';
 import {ElevatorCommentRecord} from 'models/elevator';
 
@@ -8,10 +8,10 @@ interface Props {
 }
 
 export const EditTodoForm = ({formik}: Props) => (
-  <Box>
+  <Stack gap="2em" py="1em">
     <FormInput
       props={{
-        label: 'Subject *',
+        label: 'Subject',
         id: 'subject',
         name: 'subject',
         value: formik.values.subject,
@@ -37,5 +37,5 @@ export const EditTodoForm = ({formik}: Props) => (
         maxRows: 6,
       }}
     />
-  </Box>
+  </Stack>
 );
