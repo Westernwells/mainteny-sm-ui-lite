@@ -1,4 +1,5 @@
 import {GridRowsProp} from '@mui/x-data-grid';
+import {Box} from '@mui/material';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {getCenter} from 'geolib';
 import {useQueryCustomerElevator} from 'hooks/reactQuery/useElevator';
@@ -8,12 +9,8 @@ import {DataGridElevatorView} from 'pages/Units/Models';
 import React, {FC, useCallback, useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import * as _ from 'lodash';
-import {useSearchParams} from 'react-router-dom';
-import {
-  formatSearchParamsPageIndex,
-  formatSearchParamsPageSize,
-} from 'utils/utils';
 import {FormikProps} from 'formik';
+import {SearchInput} from 'components/SearchInput';
 import {columns, makeRows} from './NewContractUnitsGridProps';
 
 interface Props {
@@ -21,7 +18,7 @@ interface Props {
   customerId: string;
 }
 
-const pageInfo = makePage(0, 25);
+const pageInfo = makePage(0, 8);
 
 const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
   const fallback = useRef({
@@ -29,7 +26,7 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
     centerCoord: {longitude: 0, latitude: 0},
   }).current;
 
-  const [queryParams, setQueryParams] = useSearchParams();
+  const [search, setSearch] = useState('');
   const [page, setPage] = useState(pageInfo);
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -44,7 +41,7 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
     isLoading,
   } = useQueryCustomerElevator(
     {
-      query: '',
+      query: search,
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
     },
@@ -108,19 +105,6 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
     }
   }, [isLoading, elevatorResponse]);
 
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-
-    setPage({
-      ...page,
-      pageSize: Number(currentParams.pageSize) || page.pageSize,
-      pageIndex:
-        Number(currentParams.pageIndex) - 1 >= 0
-          ? Number(currentParams.pageIndex) - 1
-          : page.pageIndex,
-    });
-  }, [queryParams]);
-
   const setElevators = useCallback(
     (elevatorId: string) => {
       const isExists = formik.values.elevators.find((id) => id === elevatorId);
@@ -139,32 +123,48 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
     [formik.values.elevators],
   );
 
+  const handleChangeSearch = (val: string) => {
+    setPage({
+      ...page,
+      pageIndex: 0,
+    });
+    setSearch(val);
+  };
+
   return (
-    <DataGridLayout
-      hideFooter={pageCount <= 1}
-      onRowClick={(row) => setElevators(row.id as string)}
-      selectionModel={formik.values.elevators}
-      disableSelectionOnClick={false}
-      isCellClickable={false}
-      rows={rows}
-      columns={columns}
-      loading={isFetching}
-      pageSize={page.pageSize}
-      pageIndex={page.pageIndex + 1}
-      height="90%"
-      fullHeight={false}
-      checkboxSelection
-      isRowSelectable={() => true}
-      handlePageSizeChange={(newPageSize: number) => {
-        setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams));
-      }}
-      handlePageChange={(newPage: number) =>
-        setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-      }
-      pageCount={pageCount}
-      totalRows={elevatorResponse.total}
-      containerStyle={{height: '100%'}}
-    />
+    <>
+      <Box display="flex" justifyContent="right">
+        <SearchInput
+          placeholder="Search"
+          onValueChanged={(val) => handleChangeSearch(val)}
+          containerStyle={{
+            border: '2px solid #F2F6F8',
+            borderRadius: '4px',
+          }}
+        />
+      </Box>
+      <DataGridLayout
+        hideFooter={pageCount <= 1 || elevatorResponse.total === 0}
+        onRowClick={(row) => setElevators(row.id as string)}
+        selectionModel={formik.values.elevators}
+        disableSelectionOnClick={false}
+        isCellClickable={false}
+        rows={rows}
+        columns={columns}
+        loading={isFetching}
+        pageSize={page.pageSize}
+        pageIndex={page.pageIndex + 1}
+        height="80%"
+        fullHeight={false}
+        checkboxSelection
+        isRowSelectable={() => true}
+        handlePageChange={(newPage: number) => {
+          setPage({...page, pageIndex: newPage - 1});
+        }}
+        pageCount={pageCount}
+        totalRows={elevatorResponse.total}
+      />
+    </>
   );
 };
 
