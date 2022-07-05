@@ -397,11 +397,6 @@ export const theme = createTheme({
         },
       },
     },
-    // TextField label gets cut off when placed within a DialogContent component
-    // https://github.com/mui/material-ui/issues/31185
-    MuiDialogContent: {
-      styleOverrides: {root: {paddingTop: '1.5rem !important'}},
-    },
   },
 });
 

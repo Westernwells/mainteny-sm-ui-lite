@@ -130,6 +130,7 @@ export const MarkCompletedDialog = ({
                         : '',
                     onChange: formik.handleChange,
                     required: true,
+                    margin: 'dense',
                   }}
                 />
               </Grid>
