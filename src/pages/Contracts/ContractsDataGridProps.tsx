@@ -1,10 +1,9 @@
-import IconButton from '@mui/material/IconButton';
 import {GridColDef} from '@mui/x-data-grid';
-import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import {getColumnProps} from 'components/DataGridLayout';
 import {formatNetAmount} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
 import {ContractView} from 'models/contract';
+import {Actions} from './Actions';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -51,14 +50,7 @@ export const columns: GridColDef[] = [
     field: 'actions',
     headerName: 'actions',
     align: 'center',
-    renderCell: () => (
-      <IconButton onClick={() => console.log('ACTION: Download')}>
-        <FileDownloadOutlinedIcon
-          fontSize="small"
-          sx={{color: 'action.active'}}
-        />
-      </IconButton>
-    ),
+    renderCell: (params) => <Actions url={params.value} />,
     flex: 0,
   }),
 ];
@@ -74,6 +66,11 @@ export const makeRows = (contracts: ContractView[]) =>
         end: formatDate(item.endTime),
         type: item.type,
         cost: formatNetAmount(item.additionalInfo?.price) || '-',
+        actions:
+          item?.additionalInfo?.documents &&
+          item?.additionalInfo?.documents.length > 0
+            ? item?.additionalInfo?.documents[0].uri
+            : '',
         navigateTo: `details/${item.id}`,
       }))
     : [];

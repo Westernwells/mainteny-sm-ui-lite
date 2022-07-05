@@ -41,16 +41,16 @@ export const ContractDetails = () => {
       btnLabel="Download contract"
       actionBtnVariant="outlined"
       disableBtnAction={!Object.values(downloadUrl || {}).length}
-      actionButtonIcon={<FileDownloadIcon color="primary" sx={{}} />}
+      actionButtonIcon={<FileDownloadIcon color="primary" />}
       btnOnClick={() => {
         if (downloadUrl && Object.values(downloadUrl).length) {
-          const url = Object.values(downloadUrl)[0];
-          fetch(url).then((t) =>
-            t.blob().then((b) => {
-              const a = document.createElement('a');
-              a.href = URL.createObjectURL(b);
-              a.setAttribute('download', 'contract');
-              a.click();
+          const uploadUrl = Object.values(downloadUrl)[0];
+          fetch(uploadUrl).then((response) =>
+            response.blob().then((file) => {
+              const link = document.createElement('a');
+              link.href = URL.createObjectURL(file);
+              link.setAttribute('download', 'contract');
+              link.click();
             }),
           );
         }
