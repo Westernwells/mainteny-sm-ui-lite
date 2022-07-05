@@ -4,7 +4,7 @@ import './styles.css';
 import './i18n';
 
 export const App = () => (
-  <BrowserRouter basename={process.env.REACT_APP_BASE_URL}>
+  <BrowserRouter>
     <Router />
   </BrowserRouter>
 );

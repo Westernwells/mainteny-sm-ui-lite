@@ -2,7 +2,6 @@
   "name": "sm-ui",
   "version": "5.0.0",
   "private": true,
-  "homepage": "/sm-lite",
   "dependencies": {
     "@emotion/react": "latest",
     "@emotion/styled": "latest",
