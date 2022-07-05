@@ -45,7 +45,7 @@ export const NewArticle = () => {
   const theme = useTheme();
   const {t} = useTranslation();
   const {mutateAsync: createArticle} = useCreateArticle(
-    t('Article is created'),
+    t('Article created successfully'),
   );
   const [description, setDescription] = useState('');
   const [suppliers, setSuppliers] = useState<SupplierRecord[]>([

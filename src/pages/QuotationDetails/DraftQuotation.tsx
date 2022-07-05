@@ -6,7 +6,6 @@ import {useFormik} from 'formik';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import DraftsIcon from '@mui/icons-material/Drafts';
-import CopyAllIcon from '@mui/icons-material/CopyAll';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {A4Layout} from 'components/A4Layout';
 import {SelectCombined} from 'components/SelectCombined';
@@ -329,13 +328,6 @@ export const DraftQuotation = ({quotation}: Props) => {
                     formik.handleSubmit();
                   },
                   showBorder: true,
-                },
-                {
-                  label: t('Duplicate'),
-                  icon: <CopyAllIcon />,
-                  onClick: () => {
-                    navigate(`/quotations/new?id=${quotation.id}`);
-                  },
                 },
                 {
                   label: 'Delete Quotation',

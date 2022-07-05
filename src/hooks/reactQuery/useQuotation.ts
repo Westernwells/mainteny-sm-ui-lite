@@ -107,14 +107,14 @@ export const usePublishQuotation = () => {
       onSuccess: (_, quotationId) => {
         queryClient.invalidateQueries([qk.fetchQuotations]);
         queryClient.invalidateQueries([qk.quotationById]);
-        enqueueSnackbar(`Quotation sent!`, {
+        enqueueSnackbar(`Quotation sent successfully`, {
           variant: 'success',
         });
         navigate(`/quotations/details/${quotationId}`);
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again!', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },
@@ -146,7 +146,7 @@ export const useCreateQuotation = () => {
       onSuccess: ({data, publish}, variables) => {
         queryClient.invalidateQueries([qk.fetchQuotations]);
         queryClient.invalidateQueries([qk.quotationById]);
-        enqueueSnackbar(`Quotation created successfully!`, {
+        enqueueSnackbar(`Quotation created successfully`, {
           variant: 'success',
         });
         Mixpanel.identifyAndTrack(mixpanelEvents.NEW_QUOTATION_CREATED, {
@@ -163,7 +163,7 @@ export const useCreateQuotation = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again!', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },
@@ -199,7 +199,7 @@ export const useUpdateQuotation = () => {
       onSuccess: (_, {publish, quotationId}) => {
         queryClient.invalidateQueries([qk.fetchQuotations]);
         queryClient.invalidateQueries([qk.quotationById]);
-        enqueueSnackbar(`Quotation updated successfully!`, {
+        enqueueSnackbar(`Quotation updated successfully`, {
           variant: 'success',
         });
         if (publish) {
@@ -208,9 +208,12 @@ export const useUpdateQuotation = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again!', {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          'Sorry! Unable to save changes right now. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
       },
     },
   );
@@ -245,7 +248,7 @@ export const useDeleteQuotation = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again!', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },

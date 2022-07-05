@@ -16,7 +16,7 @@ import {makeAmountRecord} from '../../../utils/currency';
 export const ArticleSupplierCard = ({article}: {article: ArticleView}) => {
   const [openDialog, setOpenDialog] = useState(false);
   const {mutateAsync: updateArticle, isLoading} = useUpdateArticle(
-    'Article is updated successfully',
+    'Article updated successfully',
   );
   const {t} = useTranslation();
 

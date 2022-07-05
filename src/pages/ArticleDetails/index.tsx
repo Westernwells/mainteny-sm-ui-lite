@@ -29,7 +29,7 @@ export const ArticleOverView = () => {
   const {t} = useTranslation();
 
   const {mutateAsync: deleteArticle} = useDeleteArticle(
-    t('Article is deleted successfully'),
+    t('Article deleted successfully'),
   );
 
   const deleteArticleDialog = () => {

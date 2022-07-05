@@ -159,14 +159,14 @@ export const usePublishInvoice = () => {
     onSuccess: (__, invoiceId) => {
       queryClient.invalidateQueries([qk.fetchInvoices]);
       queryClient.invalidateQueries([qk.invoiceById]);
-      enqueueSnackbar(`Invoice sent!`, {
+      enqueueSnackbar(`Invoice sent successfully`, {
         variant: 'success',
       });
       navigate(`/invoices/details/${invoiceId}`);
     },
     onError: (err) => {
       console.log(err);
-      enqueueSnackbar('Some error occurred, please try again!', {
+      enqueueSnackbar('An unexpected error occurred, please try again.', {
         variant: 'error',
       });
     },
@@ -188,14 +188,14 @@ export const useInvoicePaymentStatus = () => {
       onSuccess: (__, invoiceId) => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
-        enqueueSnackbar(`Invoice marked as paid!`, {
+        enqueueSnackbar(`Invoice marked as paid`, {
           variant: 'success',
         });
         navigate(`/invoices/details/${invoiceId}`);
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again!', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },
@@ -221,7 +221,7 @@ export const useCreateInvoice = () => {
       onSuccess: ({data, publish}, variables) => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
-        enqueueSnackbar(`Invoice created successfully!`, {
+        enqueueSnackbar(`Invoice created successfully`, {
           variant: 'success',
         });
         Mixpanel.identifyAndTrack(mixpanelEvents.NEW_INVOICE_CREATED, {
@@ -240,9 +240,12 @@ export const useCreateInvoice = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Something went wrong, please try again!', {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          'Sorry! Unable to save changes right now. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
       },
     },
   );
@@ -276,7 +279,7 @@ export const useUpdateInvoice = () => {
       onSuccess: (__, {publish, invoiceId}) => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
-        enqueueSnackbar(`Invoice updated successfully!`, {
+        enqueueSnackbar(`Invoice updated successfully`, {
           variant: 'success',
         });
         if (publish) {
@@ -285,9 +288,12 @@ export const useUpdateInvoice = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again!', {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          'Sorry! Unable to save changes right now. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
       },
     },
   );
@@ -322,7 +328,7 @@ export const useDeleteInvoice = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again!', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },

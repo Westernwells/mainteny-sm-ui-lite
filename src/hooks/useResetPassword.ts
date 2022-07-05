@@ -28,7 +28,7 @@ export const useResetPassword = (): UseRecoverPassword => {
       });
       setLoading(false);
 
-      enqueueSnackbar(t('Code sent successfully'), {
+      enqueueSnackbar(t('Code sent successfully to your email'), {
         variant: 'success',
       });
 
@@ -37,7 +37,7 @@ export const useResetPassword = (): UseRecoverPassword => {
       }
     } catch (error: any) {
       if (error?.response.status === 400) {
-        enqueueSnackbar(t('User account not found'), {
+        enqueueSnackbar(t("Sorry, user account wasn't found"), {
           variant: 'error',
         });
       } else {

@@ -18,7 +18,7 @@ export const ArticleQRCard = ({article}: {article: ArticleView}) => {
   const {t} = useTranslation();
 
   const {mutateAsync: updateArticle} = useUpdateArticle(
-    t('Article is updated successfully'),
+    t('Article updated successfully'),
   );
   const {data: qrUrls = {}} = useDownloadUrl(
     article.additionalInfo.qrCode ? [article.additionalInfo.qrCode.uri] : [],
@@ -102,7 +102,7 @@ export const ArticleQRCard = ({article}: {article: ArticleView}) => {
           title={t('Edit QR Code')}
           uploadPath={`${article!.serviceCompanyId}/articles/${article!.id}/qr`}
           onClose={saveArticle}
-          successMessage={t('QR code image uploaded successfully!')}
+          successMessage={t('QR code image uploaded successfully')}
           onCancel={() => setOpenDialog(false)}
           hints={[t('File size less than 5MB only')]}
         />

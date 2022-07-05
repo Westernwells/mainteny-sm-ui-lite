@@ -164,9 +164,12 @@ export const useUpdateElevator = (successMsg: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          'Sorry! Unable to save changes right now. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
       },
     },
   );
@@ -255,9 +258,12 @@ export const useUpdateElevatorComment = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          'Sorry! Unable to save changes right now. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
       },
     },
   );
@@ -294,7 +300,7 @@ export const useAddElevatorComment = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },
@@ -325,7 +331,7 @@ export const useDeleteElevatorComment = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },
@@ -363,9 +369,12 @@ export const useUpdateElevatorTechnician = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          'Sorry! Unable to save changes right now. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
       },
     },
   );
@@ -398,7 +407,7 @@ export const useAddElevator = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },
@@ -442,7 +451,7 @@ export const useCreateTodo = () => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.queryTodos]);
-        enqueueSnackbar(`Todo created successfully!`, {
+        enqueueSnackbar(`Todo created successfully`, {
           variant: 'success',
         });
       },
@@ -484,7 +493,7 @@ export const useUpdateTodo = () => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.queryTodos]);
-        enqueueSnackbar(`Todo updated successfully!`, {
+        enqueueSnackbar(`Todo updated successfully`, {
           variant: 'success',
         });
       },
@@ -515,7 +524,7 @@ export const useDeleteTodo = () => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.queryTodos]);
-        enqueueSnackbar(`Todo deleted successfully!`, {
+        enqueueSnackbar(`Todo deleted successfully`, {
           variant: 'success',
         });
       },
