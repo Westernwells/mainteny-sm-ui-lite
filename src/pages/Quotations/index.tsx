@@ -58,6 +58,12 @@ export const Quotations = () => {
     totalQuotationsRef.current || quotationsResource.total;
 
   useEffect(() => {
+    if (page.pageIndex) {
+      setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    }
+  }, [search, status]);
+
+  useEffect(() => {
     if (!isLoading) {
       setRows(makeRows(quotationsResource));
     }
