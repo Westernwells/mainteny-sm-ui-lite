@@ -237,15 +237,10 @@ const NewContract = () => {
         )}
         {activeStep === 1 && (
           <FlexContainer containerStyle={{mt: '2em'}}>
-            <PageCard
-              headerLabel="Units"
-              minHeight="100%"
-              contentContainerStyles={{height: '100%'}}>
-              <NewContractSelectUnits
-                formik={formikUnits}
-                customerId={formikBasicInfo.values.propertyOwnerId}
-              />
-            </PageCard>
+            <NewContractSelectUnits
+              formik={formikUnits}
+              customerId={formikBasicInfo.values.propertyOwnerId}
+            />
           </FlexContainer>
         )}
         {activeStep === 2 && (

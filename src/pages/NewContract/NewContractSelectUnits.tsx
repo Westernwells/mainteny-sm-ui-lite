@@ -1,5 +1,5 @@
 import {GridRowsProp} from '@mui/x-data-grid';
-import {Box} from '@mui/material';
+import {Box, Typography} from '@mui/material';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {getCenter} from 'geolib';
 import {useQueryCustomerElevator} from 'hooks/reactQuery/useElevator';
@@ -133,14 +133,13 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
 
   return (
     <>
-      <Box display="flex" justifyContent="right">
+      <Box display="flex" justifyContent="space-between">
+        <Typography variant="h6" component="div">
+          Select units
+        </Typography>
         <SearchInput
           placeholder="Search"
           onValueChanged={(val) => handleChangeSearch(val)}
-          containerStyle={{
-            border: '2px solid #F2F6F8',
-            borderRadius: '4px',
-          }}
         />
       </Box>
       <DataGridLayout
