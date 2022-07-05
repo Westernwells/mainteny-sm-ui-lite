@@ -41,7 +41,7 @@ export const DatePicker = ({
     <Box sx={{...containerStyles}}>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <MuiDatePicker
-          inputFormat="dd.MM.yyy"
+          inputFormat="dd.MM.yyyy"
           mask="__.__.____"
           value={value}
           minDate={minDate}

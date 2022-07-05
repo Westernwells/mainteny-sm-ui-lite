@@ -145,6 +145,7 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
       onRowClick={(row) => setElevators(row.id as string)}
       selectionModel={formik.values.elevators}
       disableSelectionOnClick={false}
+      isCellClickable={false}
       rows={rows}
       columns={columns}
       loading={isFetching}

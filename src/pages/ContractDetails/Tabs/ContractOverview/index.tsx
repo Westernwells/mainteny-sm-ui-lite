@@ -164,6 +164,8 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     return <Progress />;
   }
 
+  const uploadedDocument = contractDetails?.additionalInfo?.documents;
+
   return (
     <Box>
       <Grid
@@ -281,7 +283,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   <Typography color="#2196F3">+ Add</Typography>
                 }
                 headerAction={() => setOpenDocumentDialog(true)}>
-                {contractDetails?.additionalInfo?.documents![0] ? (
+                {uploadedDocument && uploadedDocument[0] ? (
                   <Box
                     sx={{
                       height: '155px',
@@ -325,10 +327,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                       <Typography
                         align="center"
                         sx={{color: '#8F9BB3', marginTop: '10px'}}>
-                        {
-                          contractDetails?.additionalInfo?.documents[0]
-                            .description
-                        }
+                        {uploadedDocument && uploadedDocument[0].description}
                       </Typography>
                     </Box>
                   </Box>

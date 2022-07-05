@@ -3,7 +3,6 @@ import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import {CheckCircleRounded} from '@mui/icons-material';
 import {useEffect, useRef, useState} from 'react';
-import {useUuid} from 'hooks/reactQuery/useUuid';
 import {FileWithPath, useDropzone, FileRejection} from 'react-dropzone';
 import useTheme from '@mui/material/styles/useTheme';
 import {Button} from '../Button';
@@ -30,7 +29,6 @@ export const MyDropZone = ({
   maxFiles,
 }: Props) => {
   const {t} = useTranslation();
-  const {data: uuid} = useUuid();
   const theme = useTheme();
   const [files, setFiles] = useState<FileWithPreview[]>(existingFiles);
   const [isEditingFileName, setIsEditingFileName] = useState(false);
@@ -113,9 +111,9 @@ export const MyDropZone = ({
     setNewFileName('');
   };
 
-  const hintsLabel = hints?.map((hint) => (
+  const hintsLabel = hints?.map((hint, index) => (
     <Box
-      key={uuid}
+      key={index}
       sx={{mr: '1em', display: 'flex', mt: '0.5em', flexDirection: 'row'}}>
       <CheckCircleRounded sx={{mr: '0.5em'}} />
       <Typography component="div" variant="body1">
@@ -152,7 +150,7 @@ export const MyDropZone = ({
 
   const renderErrors = () =>
     fileRejections.map((item, index) => (
-      <Box mb="0.5em" key={uuid}>
+      <Box mb="0.5em" key={index}>
         <Typography component="div" variant="body1" color="error">
           {`${index + 1}. ${item.file.name}`}:{' '}
         </Typography>
@@ -162,7 +160,7 @@ export const MyDropZone = ({
               component="div"
               variant="body2"
               color="error"
-              key={uuid}>
+              key={index}>
               {error.code === 'file-too-large'
                 ? t('File is larger than 5mb')
                 : t(error.message)}
@@ -200,7 +198,9 @@ export const MyDropZone = ({
 
       <Box sx={{mt: '1.5em'}}>
         <Box sx={{display: 'flex', flexDirection: 'column'}}>{hintsLabel}</Box>
-        <Box sx={{display: 'flex', flexWrap: 'wrap'}}>{thumbs}</Box>
+        <Box sx={{display: 'flex', flexWrap: 'wrap', margin: '0.625em 0'}}>
+          {thumbs}
+        </Box>
         <Box>{renderErrors()}</Box>
       </Box>
     </Box>
