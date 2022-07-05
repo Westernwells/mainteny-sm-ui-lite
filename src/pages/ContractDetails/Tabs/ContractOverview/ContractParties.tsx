@@ -4,23 +4,27 @@ import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import {ServiceCompanyView} from 'models/service-company';
 import {PropertyOwnerView} from 'models/propertyManager';
-import {StatusChip} from 'components/StatusChip';
-import {convertToText} from 'utils/utils';
+import PartiesChipStatus from './PartiesChipStatus';
 
 interface Props {
-  personName?: string;
-  companyName?: string;
-  email?: string;
+  name?: string;
+  address?: string;
+  phoneNumber?: string;
   partyType?: string;
+  occupation?: string;
   containerStyle?: {[key: string]: string | number};
-  chipColor?:
-    | 'default'
-    | 'primary'
-    | 'secondary'
-    | 'error'
-    | 'info'
-    | 'success'
-    | 'warning';
+  chipStyles?: {
+    chipMaxChars?: number;
+    chipLength?: 'short' | 'medium' | 'long' | 'auto';
+    chipColor?:
+      | 'default'
+      | 'primary'
+      | 'secondary'
+      | 'error'
+      | 'info'
+      | 'success'
+      | 'warning';
+  };
 }
 
 export interface Parties {
@@ -28,53 +32,46 @@ export interface Parties {
 }
 
 export const ContractParties = ({
-  personName,
-  companyName,
-  email,
+  name,
+  occupation,
+  address,
+  phoneNumber,
   partyType,
   containerStyle,
-  chipColor,
+  chipStyles,
 }: Props) => (
-  <Grid container sx={{...containerStyle}}>
-    <Grid item xs={4}>
-      <Box display="flex">
+  <Grid container sx={{...containerStyle, marginBottom: 2}}>
+    <Grid item xs={5}>
+      <Box display="flex" alignItems="center">
         <Avatar sx={{width: '3rem', height: '3rem', mr: '1em'}}>H</Avatar>
 
         <Box display="flex" flexDirection="column">
           <Typography variant="subtitle1" sx={{display: 'block'}}>
-            {personName || ''}
+            {name || ''}
+          </Typography>
+          <Typography variant="body2" sx={{display: 'block'}}>
+            {occupation || ''}
           </Typography>
         </Box>
       </Box>
     </Grid>
 
-    <Grid item xs={5}>
-      <Box display="flex">
-        <Box>
-          <Box>
-            <Typography
-              variant="body2"
-              sx={{display: 'block'}}
-              color="textSecondary">
-              {companyName || ''}
-            </Typography>
-          </Box>
-
-          <Box>
-            <Typography variant="body2" color="textSecondary">
-              {email || ''}
-            </Typography>
-          </Box>
-        </Box>
+    <Grid item xs={5} alignSelf="center">
+      <Box>
+        <Typography variant="body2" color="textSecondary">
+          {address || ''}
+        </Typography>
+        <Typography variant="body2" color="textSecondary">
+          {phoneNumber ? `(${phoneNumber})` : ''}
+        </Typography>
       </Box>
     </Grid>
-
-    <Grid item xs={3}>
-      <StatusChip
-        color={chipColor}
-        length="long"
-        label={partyType ? convertToText(partyType) : ''}
-        style={{px: '1em'}}
+    <Grid item xs={2} alignSelf="center">
+      <PartiesChipStatus
+        color={chipStyles?.chipColor! || 'primary'}
+        length={chipStyles?.chipLength || 'auto'}
+        maxChars={chipStyles?.chipMaxChars || undefined}
+        partyType={partyType!}
       />
     </Grid>
   </Grid>

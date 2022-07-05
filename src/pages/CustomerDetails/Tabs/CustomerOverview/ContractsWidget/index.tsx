@@ -1,4 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
+import {useNavigate} from 'react-router';
 import {useTranslation} from 'react-i18next';
 import {OpenInNew} from '@mui/icons-material';
 import {Box, Typography} from '@mui/material';
@@ -27,6 +28,7 @@ export const ContractsWidget = ({
   openTab,
 }: Props) => {
   const {t} = useTranslation();
+  const navigate = useNavigate();
   const [contractQuery, setContractQuery] = useState('');
   const [page, setPage] = useState(makePage(0, 500));
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -44,6 +46,8 @@ export const ContractsWidget = ({
       order: Order.ASC,
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
+      priceStart: 0,
+      priceEnd: 9999999,
     },
     customerId,
   );
@@ -56,8 +60,7 @@ export const ContractsWidget = ({
   }, [contractResource]);
 
   const addNewContract = () => {
-    // TODO Navigate to add new Contract page
-    console.log('add new Contract');
+    navigate('/contracts/new');
   };
 
   totalContractsRef.current =

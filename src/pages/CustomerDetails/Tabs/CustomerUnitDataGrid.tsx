@@ -85,7 +85,7 @@ export const makeRows = ({
       nextVisit: formatDate(elevator.nextVisitDate),
       address: elevator.address.fullName,
       headerText: elevator.address.fullName,
-      priorityTechnician: elevator.assignments.length
+      priorityTechnician: elevator.assignments?.length
         ? elevator.assignments
             .map(
               (item) =>
@@ -93,7 +93,7 @@ export const makeRows = ({
             )
             .join(', ')
         : '-',
-      activeContracts: !!elevator.contracts.length,
+      activeContracts: !!elevator.contracts?.length,
       elevator,
       navigateTo: `/units/details/${elevator.id}`,
     }));

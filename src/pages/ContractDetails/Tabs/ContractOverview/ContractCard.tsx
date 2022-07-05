@@ -6,11 +6,12 @@ import {ReactNode} from 'react';
 
 interface Props {
   bodyContainerStyle?: {[key: string]: string | number};
-  containerStyles?: {[key: string]: string | number};
+  containerStyles?: {[key: string]: any};
   minHeight?: string | number;
   header: string | JSX.Element;
   headerActionIcon?: JSX.Element;
   children: ReactNode;
+  headerAction?: () => void;
 }
 
 export const ContractCard = ({
@@ -19,6 +20,7 @@ export const ContractCard = ({
   minHeight,
   containerStyles,
   header,
+  headerAction = () => {},
   children,
 }: Props) => (
   <Card
@@ -30,7 +32,9 @@ export const ContractCard = ({
     <CardHeader
       sx={{pb: '1.5em'}}
       action={
-        headerActionIcon ? <IconButton>{headerActionIcon}</IconButton> : null
+        headerActionIcon ? (
+          <IconButton onClick={headerAction}>{headerActionIcon}</IconButton>
+        ) : null
       }
       title={header}
     />

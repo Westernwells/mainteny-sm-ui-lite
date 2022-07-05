@@ -7,12 +7,20 @@ interface Props {
   children?: ReactNode;
   style?: {[key: string]: any};
   buttonProps?: ButtonProps;
+  disabled?: boolean;
 }
 
-export const Button = ({label, children, style, buttonProps}: Props) => {
+export const Button = ({
+  label,
+  children,
+  style,
+  buttonProps,
+  disabled,
+}: Props) => {
   const {t} = useTranslation();
   return (
     <MuiButton
+      disabled={disabled}
       disableRipple
       disableFocusRipple
       disableElevation

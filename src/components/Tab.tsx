@@ -36,6 +36,7 @@ interface Props {
   hideBackIcon?: boolean;
   pageTitle?: string;
   hideDivider?: boolean;
+  disableBtnAction?: boolean;
 }
 
 const a11yProps = (index: number) => ({
@@ -56,6 +57,7 @@ export const Tabs = ({
   menu,
   actionButtonIcon,
   actionBtnVariant,
+  disableBtnAction,
 }: Props) => {
   const theme = useTheme();
 
@@ -72,6 +74,7 @@ export const Tabs = ({
         {showActionBtn ? (
           <Button
             label="Filter"
+            disabled={disableBtnAction}
             buttonProps={{
               onClick: () => (btnOnClick ? btnOnClick() : () => {}),
               sx: {

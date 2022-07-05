@@ -1,58 +1,84 @@
-import {useEffect, useState} from 'react';
-import Box from '@mui/material/Box';
+import {FC, useEffect, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
-import {Widget} from 'components/Widget';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {
   columns,
   makeRows,
 } from 'pages/CustomerDetails/Tabs/CustomerUnitDataGrid';
-import {useAllElevators} from 'hooks/reactQuery/useElevator';
-import {ElevatorView} from 'models/elevator';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {makePage} from 'utils/paging-utils';
 import {TabContentContainer} from 'components/TabContentContainer';
+import {EmptySection} from 'components/EmptySection';
+import {useNavigate} from 'react-router';
+import {ContractElevatorSimpleView} from 'models/contract';
+import {ElevatorView} from 'models/elevator';
 
-export const UnitsTab = () => {
-  const [search, setSearch] = useState('');
-  const [page] = useState(makePage(0, 25)); // TODO: implement paging
+interface Props {
+  elevators: ContractElevatorSimpleView[];
+}
+
+export const UnitsTab: FC<Props> = ({elevators}) => {
+  const navigate = useNavigate();
+  const [page, setPage] = useState(makePage(0, 25)); // TODO: implement paging
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const {data: elevator = createEmptyResource<ElevatorView>(10), isLoading} =
-    useAllElevators({
-      query: search,
-      pageIndex: page.pageIndex,
-      pageSize: page.pageSize,
-    });
+  const [pageCount, setPageCount] = useState(0);
 
   useEffect(() => {
-    if (!isLoading) {
+    if (elevators.length) {
       setRows(
         makeRows({
-          elevators: elevator.data,
+          elevators: elevators.map(
+            (elevator) =>
+              ({
+                ...elevator.elevator,
+              } as ElevatorView),
+          ),
         }),
       );
     } else {
       setRows([]);
     }
-  }, [elevator]);
+  }, [elevators]);
 
-  const renderWidget = () => (
-    <Box>
-      <Widget
-        searchPlaceholder="Search order type, customer, address"
-        getSearchValue={(val: string) => setSearch(val)}
-        filterItems={null}
-      />
-    </Box>
-  );
+  useEffect(() => {
+    if (elevators) {
+      setPageCount(Math.ceil(elevators.length / page.pageSize));
+    }
+  }, [elevators, page]);
 
   return (
     <TabContentContainer>
-      {renderWidget()}
       <DataGridLayout
-        scrollToTop={search}
+        hideFooter={pageCount <= 1}
+        noRowsEmptySection={
+          <EmptySection
+            illustration="clipboard"
+            size="tiny"
+            containerStyle={{my: 'auto'}}
+            btnAction={() => navigate('/units/new')}
+            label="No units yet. They will appear here once added!"
+            btnLabel="+ Add Unit"
+            showActionBtn
+          />
+        }
+        noResultsEmptySection={
+          <EmptySection
+            illustration="clipboard"
+            size="tiny"
+            containerStyle={{my: 'auto'}}
+            btnAction={() => navigate('/units/new')}
+            label="No units yet. They will appear here once added!"
+            btnLabel="+ Add Unit"
+            showActionBtn
+          />
+        }
         rows={rows}
         columns={columns}
         pageSize={page.pageSize}
+        pageIndex={page.pageIndex}
+        handlePageSizeChange={(newPageSize) =>
+          setPage({...page, pageSize: newPageSize})
+        }
+        handlePageChange={(newPage) => setPage({...page, pageIndex: newPage})}
       />
     </TabContentContainer>
   );

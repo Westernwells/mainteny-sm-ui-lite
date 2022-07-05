@@ -111,9 +111,9 @@ export const MyDropZone = ({
     setNewFileName('');
   };
 
-  const hintsLabel = hints?.map((hint, key) => (
+  const hintsLabel = hints?.map((hint, index) => (
     <Box
-      key={key}
+      key={index}
       sx={{mr: '1em', display: 'flex', mt: '0.5em', flexDirection: 'row'}}>
       <CheckCircleRounded sx={{mr: '0.5em'}} />
       <Typography component="div" variant="body1">
@@ -150,13 +150,17 @@ export const MyDropZone = ({
 
   const renderErrors = () =>
     fileRejections.map((item, index) => (
-      <Box mb="0.5em">
+      <Box mb="0.5em" key={index}>
         <Typography component="div" variant="body1" color="error">
           {`${index + 1}. ${item.file.name}`}:{' '}
         </Typography>
         <Box sx={{ml: '1em'}}>
           {item.errors.map((error) => (
-            <Typography component="div" variant="body2" color="error">
+            <Typography
+              component="div"
+              variant="body2"
+              color="error"
+              key={index}>
               {error.code === 'file-too-large'
                 ? t('File is larger than 5mb')
                 : t(error.message)}
@@ -194,7 +198,9 @@ export const MyDropZone = ({
 
       <Box sx={{mt: '1.5em'}}>
         <Box sx={{display: 'flex', flexDirection: 'column'}}>{hintsLabel}</Box>
-        <Box sx={{display: 'flex', flexWrap: 'wrap'}}>{thumbs}</Box>
+        <Box sx={{display: 'flex', flexWrap: 'wrap', margin: '0.625em 0'}}>
+          {thumbs}
+        </Box>
         <Box>{renderErrors()}</Box>
       </Box>
     </Box>

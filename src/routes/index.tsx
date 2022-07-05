@@ -14,6 +14,7 @@ import {ResetPassword} from 'pages/ResetPassword';
 import {MyUnits} from 'pages/Units';
 import {UnitsDetail} from 'pages/UnitDetails';
 import {Contracts} from 'pages/Contracts';
+import NewContract from 'pages/NewContract/NewContract';
 import {Customer} from 'pages/Customers';
 import {ContractDetails} from 'pages/ContractDetails';
 import {CustomerDetails} from 'pages/CustomerDetails';
@@ -118,6 +119,48 @@ export const Router = () => {
             }
           />
 
+          <Route
+            path="/contracts"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Contracts - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout pageTitle="Contracts">
+                  <Contracts />
+                </PageLayout>
+              </>
+            }
+          />
+          <Route
+            path="/contracts/details/:id"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Contract Details - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout
+                  pageScrollable
+                  backBtnLabel="Contract Details"
+                  showBackAction>
+                  <ContractDetails />
+                </PageLayout>
+              </>
+            }
+          />
+          <Route
+            path="/contracts/new"
+            element={
+              <>
+                <Helmet>
+                  <title>{`New Contract - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout backBtnLabel="New Contract" showBackAction>
+                  <NewContract />
+                </PageLayout>
+              </>
+            }
+          />
           <Route
             path="/units/new"
             element={
