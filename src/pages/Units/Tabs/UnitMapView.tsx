@@ -31,6 +31,7 @@ export const UnitMapsView = () => {
   const [points, setPoints] = useState<any>([]);
   const [bounds, setBounds] = useState<any>([]);
   const [page, setPage] = useState(makePage(0, 100));
+  const [resetDatePicker, setResetDatePicker] = useState(false);
   const [elevatorView, setElevatorView] = useState<{
     elevator: Resource<ElevatorView>;
     centerCoord: Location;
@@ -89,8 +90,6 @@ export const UnitMapsView = () => {
       }
     }
   }, [elevatorResponse, isLoading]);
-
-  console.log(elevatorView, '!!!!@@##');
 
   useEffect(() => {
     if (!isLoading && !isFetching) {
@@ -171,6 +170,7 @@ export const UnitMapsView = () => {
     setLastVisitEnd(null);
     setNextVisitStart(null);
     setNextVisitEnd(null);
+    setResetDatePicker(true);
   };
 
   const renderFilterItems = () => (
@@ -178,40 +178,68 @@ export const UnitMapsView = () => {
       <DatePicker
         defaultDate={lastVisitStart}
         containerStyles={{mr: '1em'}}
+        reset={resetDatePicker}
+        getReset={(val) => {
+          if (val) {
+            setResetDatePicker(false);
+          }
+        }}
         maxDate={lastVisitEnd || new Date()}
         getSelectedDate={(date) => setLastVisitStart(date)}
         textFieldProps={{
           label: 'Last Visit Start',
+          sx: {background: '#fff'},
         }}
       />
       <DatePicker
         defaultDate={lastVisitEnd}
         maxDate={new Date()}
+        reset={resetDatePicker}
+        getReset={(val) => {
+          if (val) {
+            setResetDatePicker(false);
+          }
+        }}
         minDate={lastVisitStart || undefined}
         containerStyles={{mr: '1em'}}
         getSelectedDate={(date) => setLastVisitEnd(date)}
         textFieldProps={{
           label: 'Last Visit End',
+          sx: {background: '#fff'},
         }}
       />
 
       <DatePicker
         defaultDate={nextVisitStart}
         minDate={new Date()}
+        reset={resetDatePicker}
+        getReset={(val) => {
+          if (val) {
+            setResetDatePicker(false);
+          }
+        }}
         maxDate={nextVisitEnd || undefined}
         containerStyles={{mr: '1em'}}
         getSelectedDate={(date) => setNextVisitStart(date)}
         textFieldProps={{
           label: 'Next Visit Start',
+          sx: {background: '#fff'},
         }}
       />
       <DatePicker
         defaultDate={nextVisitEnd}
+        reset={resetDatePicker}
+        getReset={(val) => {
+          if (val) {
+            setResetDatePicker(false);
+          }
+        }}
         minDate={nextVisitStart || new Date()}
         containerStyles={{mr: '1em'}}
         getSelectedDate={(date) => setNextVisitEnd(date)}
         textFieldProps={{
           label: 'Next Visit End',
+          sx: {background: '#fff'},
         }}
       />
     </FilterFields>
