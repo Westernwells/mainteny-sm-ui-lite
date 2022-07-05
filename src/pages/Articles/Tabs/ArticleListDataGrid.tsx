@@ -224,6 +224,12 @@ export const ArticleListDataGrid = () => {
   };
 
   useEffect(() => {
+    if (page.pageIndex) {
+      setPage({...page, pageIndex: 0});
+    }
+  }, [query, type]);
+
+  useEffect(() => {
     setPageCount(Math.ceil(articleResource.total / page.pageSize));
   }, [page.pageSize]);
 
