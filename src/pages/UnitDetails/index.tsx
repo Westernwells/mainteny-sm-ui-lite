@@ -6,10 +6,10 @@ import ListIcon from '@mui/icons-material/ListAlt';
 
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
-import {EmptySection} from 'components/EmptySection';
 import {OverviewTab} from './Tabs/OverviewTab';
 import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
 import {TodosTab} from './Tabs/TodosTab';
+import {PerformanceTab} from './Tabs/PerformanceTab';
 
 interface Props {
   getCurrentPageTitle?: (title: string) => void;
@@ -58,11 +58,7 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
       </TabsBody>
 
       <TabsBody value={value} index={2}>
-        <EmptySection
-          label="Data will be available here only for IoT enabled elevators!"
-          size="large"
-          containerStyle={{mt: 12}}
-        />
+        <PerformanceTab />
       </TabsBody>
 
       <TabsBody value={value} index={3}>
