@@ -2,6 +2,7 @@ module.exports = {
   de: {
     Reschedule: 'Umplanen',
     Cancel: 'Abbrechen',
+    'Mark Completed': 'Abgeschlossen markieren',
     Schedule: 'Zeitplan',
     'ORDER TYPE': 'AUFTRAGSART',
     CUSTOMER: 'KUNDE',
