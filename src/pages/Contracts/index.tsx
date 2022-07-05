@@ -91,9 +91,9 @@ export const Contracts = () => {
 
   useEffect(() => {
     const options: string[] = [];
-    // TODO: Resolve 'any' here
+
     if (!isLoading && !isFetching && !isIdle) {
-      contractResource.data.forEach((item: any) => {
+      contractResource.data.forEach((item: ContractView) => {
         if (
           !options.includes(item.serviceCompany.name) &&
           !contractorFilterItems.includes(item.serviceCompany.name)
