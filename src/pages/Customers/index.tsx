@@ -56,6 +56,12 @@ export const Customer = () => {
   totalCustomerRef.current = totalCustomerRef.current || customerResource.total;
 
   useEffect(() => {
+    if (page.pageIndex) {
+      setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    }
+  }, [search, numberOfUnits]);
+
+  useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
 
     if (currentParams.pageSize)
