@@ -614,7 +614,7 @@ module.exports = {
     'New Customer': 'Neuer Kunde',
     'JOINED DATE': 'ANGESTELLUNGSDATUM',
     PRIORITY: 'PRIORITÄT',
-    'NO. OF CONTRACTS': 'NO. VERTRÄGE',
+    'NO. OF CONTRACTS': 'Anzahl Verträge',
     'Basic Details': 'Allgemeine Angaben',
     'Billing Address': 'Rechnungsadresse',
     'Customer Number': 'Kundennummer',
@@ -714,6 +714,10 @@ module.exports = {
     'Order scheduled successfully': 'Die Bestellung wurde erfolgreich geplant',
     'QR code image uploaded successfully':
       'QR-Code wurde erfolgreich hochgeladen',
+    'EMAIL ID': 'EMAIL-ADRESSE',
+    'Postal Address': 'Postanschrift',
+    Active: 'Aktiv',
+    Inactive: 'Inaktiv',
   },
 };
 
