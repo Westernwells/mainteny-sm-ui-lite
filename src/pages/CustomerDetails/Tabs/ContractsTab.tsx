@@ -1,10 +1,11 @@
+import {useUseQueryCustomerContracts} from 'hooks/reactQuery/useContract';
 import {
-  useContractElevatorCount,
-  useUseQueryCustomerContracts,
-} from 'hooks/reactQuery/useContract';
-import {ContractOrderField, ContractView} from 'models/contract';
+  ContractOrderField,
+  ContractStatus,
+  ContractView,
+} from 'models/contract';
 import {Order} from 'models/misc';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {Progress} from 'components/Progress';
@@ -13,9 +14,13 @@ import {FilterFields} from 'components/FilterFields';
 import {TabContentContainer} from 'components/TabContentContainer';
 import Box from '@mui/material/Box';
 
-import {costRangeConvertor as crConverter} from 'utils/contract-utils';
+import {
+  costRangeConvertor as crConverter,
+  getStartEndPrice,
+} from 'utils/contract-utils';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {EmptySection} from 'components/EmptySection';
+import {convertToMacro, convertToText} from 'utils/utils';
 import {Widget} from 'components/Widget';
 import {columns, makeRows} from './CustomerContractDataGrid';
 
@@ -26,19 +31,21 @@ interface Props {
 export const ContractsTab = ({customerId}: Props) => {
   const [page, setPage] = useState(makePage(0, 10));
   const totalContractsRef = useRef(0);
-  const [expiryDate, setExpiryDate] = useState<string[]>([]);
-  const [contractor, setContractor] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [cost, setCost] = useState<number[][]>([]);
+  const [status, setStatus] = useState<string[]>([]);
   const [pageCount, setPageCount] = useState(0);
   const [contractorFilterItems, setContractorFilterItems] = useState<string[]>(
     [],
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
 
+  const [priceStart, priceEnd] = useMemo(() => getStartEndPrice(cost), [cost]);
+
   const {
     data: contractResource = createEmptyResource<ContractView>(10),
     isLoading,
+    isFetching,
     isFetched,
   } = useUseQueryCustomerContracts(
     {
@@ -47,15 +54,12 @@ export const ContractsTab = ({customerId}: Props) => {
       order: Order.ASC,
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
+      priceStart,
+      priceEnd,
     },
     customerId,
-    {expiryDate, contractor, price: cost},
+    {},
     {keepPreviousData: true},
-  );
-
-  const {data: contractWithUnits} = useContractElevatorCount(
-    contractResource.data,
-    // {keepPreviousData: true},
   );
 
   totalContractsRef.current =
@@ -63,10 +67,8 @@ export const ContractsTab = ({customerId}: Props) => {
 
   useEffect(() => {
     const options: string[] = [];
-
-    if (contractWithUnits) {
-      // TODO: Resolve 'any' here
-      contractWithUnits?.forEach((item: any) => {
+    if (!isLoading) {
+      contractResource.data.forEach((item: any) => {
         if (
           !options.includes(item.serviceCompany.name) &&
           !contractorFilterItems.includes(item.serviceCompany.name)
@@ -74,12 +76,10 @@ export const ContractsTab = ({customerId}: Props) => {
           options.push(item.serviceCompany.name);
         }
       });
-      setRows(makeRows(contractWithUnits));
-    } else {
-      setRows([]);
+      setRows(makeRows(contractResource.data));
     }
     setContractorFilterItems([...contractorFilterItems, ...options]);
-  }, [contractWithUnits]);
+  }, [contractResource, isLoading]);
 
   useEffect(() => {
     setPageCount(Math.ceil(contractResource.total / page.pageSize));
@@ -91,37 +91,24 @@ export const ContractsTab = ({customerId}: Props) => {
   };
 
   const renderFilterItems = () => (
-    <FilterFields>
+    <FilterFields
+      onClear={() => {
+        setStatus([]);
+        setCost([]);
+      }}>
       <MultipleSelectCheckmarks
-        label="Expiry Date"
-        options={[
-          'Last 14 days', // TODO: Create an enum to handle this
-          'Today',
-          'Next 7 days',
-          'Next 14 days',
-        ]}
-        getSelectedValue={(item) => setExpiryDate(item)}
-        multiple={false}
+        label="Price Range"
+        options={['0 - €500', '€500 - €1,000', '> €1,000']}
+        initialSelectedItems={cost}
+        getSelectedValue={(item) => costRangeConvertor(item)}
       />
-
       <MultipleSelectCheckmarks
-        label="Contractor"
-        options={contractorFilterItems}
-        getSelectedValue={(item) => setContractor(item)}
-      />
-
-      <MultipleSelectCheckmarks
-        label="Cost/year"
-        options={[
-          'Below 1000 €',
-          '1000 - 3000 €',
-          '3000 - 5000 €',
-          'Above 5000 €',
-        ]}
-        getSelectedValue={(item) => {
-          costRangeConvertor(item);
-        }}
-        multiple={false}
+        label="Status"
+        options={Object.keys(ContractStatus).map((item) => convertToText(item))}
+        initialSelectedItems={status}
+        getSelectedValue={(item) =>
+          setStatus(item.map((val) => convertToMacro(val)))
+        }
       />
     </FilterFields>
   );
@@ -129,7 +116,7 @@ export const ContractsTab = ({customerId}: Props) => {
   const renderWidget = () => (
     <Box>
       <Widget
-        searchPlaceholder="Try 'Astralift BV'"
+        searchPlaceholder="Search by number, customer, contract type etc."
         getSearchValue={(search) => setSearchQuery(search)}
         filterItems={renderFilterItems()}
       />
@@ -160,6 +147,8 @@ export const ContractsTab = ({customerId}: Props) => {
           hideFooter={pageCount <= 1}
           rows={rows}
           columns={columns}
+          loading={isFetching}
+          scrollToTop={searchQuery}
           pageSize={page.pageSize}
           handlePageSizeChange={(newPageSize: number) =>
             setPage({...page, pageSize: newPageSize})

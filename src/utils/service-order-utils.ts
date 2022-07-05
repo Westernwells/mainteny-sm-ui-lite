@@ -1,5 +1,9 @@
 import {differenceInMinutes} from 'date-fns';
-import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
+import {
+  ServiceOrderStatus,
+  ServiceOrderType,
+  ServiceOrderView,
+} from 'models/service-order';
 import {toDate} from './datetime';
 
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
@@ -53,6 +57,43 @@ export const serviceOrderStatusToEnum = (status: string) => {
   }
 };
 
+export const getServiceOrderStatusList = () => {
+  let mappedOptions: string[] = [];
+  Object.values(ServiceOrderStatus).forEach((option) => {
+    const val = serviceOrderStatusToString(option);
+    if (!mappedOptions.includes(val)) {
+      mappedOptions = [...mappedOptions, val];
+    }
+  });
+  return mappedOptions;
+};
+
+export const getSelectedOrderStatuses = (
+  items: string[],
+  includeScheduling: Boolean = true,
+) => {
+  let selectedOrderStatuses: ServiceOrderStatus[] = [];
+  items.forEach((val) => {
+    if (val === 'Unscheduled') {
+      selectedOrderStatuses = [
+        ...selectedOrderStatuses,
+        ServiceOrderStatus.INIT,
+        ServiceOrderStatus.READY_TO_SCHEDULE,
+        ...(includeScheduling ? [ServiceOrderStatus.SCHEDULING] : []),
+      ];
+    } else {
+      selectedOrderStatuses = [
+        ...selectedOrderStatuses,
+        serviceOrderStatusToEnum(val) as ServiceOrderStatus,
+      ];
+    }
+  });
+  if (selectedOrderStatuses.includes(ServiceOrderStatus.ALL)) {
+    selectedOrderStatuses = [];
+  }
+  return selectedOrderStatuses;
+};
+
 export const sortOrderByTime = (serviceOrder: ServiceOrderView[]) => {
   const res = serviceOrder.sort((a, b) =>
     differenceInMinutes(
@@ -61,4 +102,34 @@ export const sortOrderByTime = (serviceOrder: ServiceOrderView[]) => {
     ),
   );
   return res;
+};
+
+export const serviceOrderTypeToString = (type: ServiceOrderType | string) => {
+  switch (type) {
+    case ServiceOrderType.REGULAR:
+      return 'Maintenance';
+    case ServiceOrderType.EMERGENCY:
+      return 'Emergency';
+    case ServiceOrderType.CALLOUT:
+      return 'Callout';
+    case ServiceOrderType.REPAIR:
+      return 'Repair';
+    default:
+      return '-';
+  }
+};
+
+export const serviceOrderTypeToEnum = (type: string) => {
+  switch (type) {
+    case 'Maintenance':
+      return ServiceOrderType.REGULAR;
+    case 'Emergency':
+      return ServiceOrderType.EMERGENCY;
+    case 'Callout':
+      return ServiceOrderType.CALLOUT;
+    case 'Repair':
+      return ServiceOrderType.REPAIR;
+    default:
+      return ServiceOrderType.REPAIR;
+  }
 };

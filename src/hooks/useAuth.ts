@@ -1,7 +1,8 @@
 import {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {axiosClient} from 'utils/axios-utils';
-import {useSnackbar} from 'notistack';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {useUserSession} from './reactQuery/useUserSession';
 import {UserSession} from '../models/session';
 import {Role} from '../models/user';
@@ -22,6 +23,7 @@ interface Location {
 }
 
 export const useAuth = (): UseAuth => {
+  const {t} = useTranslation();
   const {clearUser, updateUser} = useUserSession();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -35,15 +37,10 @@ export const useAuth = (): UseAuth => {
   ): Promise<void> => {
     try {
       setLoading(true);
-      const {data: user, status} = await axiosClient.post<UserSession>(
-        urlEndpoint,
-        {
-          username: email,
-          password,
-        },
-      );
-
-      console.log(status, '######');
+      const {data: user} = await axiosClient.post<UserSession>(urlEndpoint, {
+        username: email,
+        password,
+      });
 
       if (user?.token) {
         if (!user.userAccount.roles.includes(Role.SERVICE_MANAGER)) {
@@ -66,12 +63,12 @@ export const useAuth = (): UseAuth => {
             {replace: true},
           );
         } else {
-          navigate('/orders?pageIndex=1&pageSize=25&tab=0', {replace: true});
+          navigate('/orders', {replace: true});
         }
       }
     } catch (errorResponse: any) {
       if (errorResponse?.response.status === 400) {
-        enqueueSnackbar('Incorrect email or password', {
+        enqueueSnackbar(t('Incorrect email or password'), {
           variant: 'error',
         });
       }

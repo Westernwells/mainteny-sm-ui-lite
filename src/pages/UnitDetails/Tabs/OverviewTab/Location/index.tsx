@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import {useTranslation} from 'react-i18next';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
@@ -30,6 +31,7 @@ export const Location = ({
   elevator,
   elevatorRequestBody,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
   const {mutateAsync: updateElevator} = useUpdateElevator(
@@ -74,7 +76,7 @@ export const Location = ({
     <InfoCard
       containerStyles={{...containerStyles}}
       handleAction={() => setOpenDialog(true)}
-      header={<Typography variant="subtitle1">Location</Typography>}
+      header={<Typography variant="subtitle1">{t('Location')}</Typography>}
       showHeaderBackground
       headerActionIcon={<EditIcon />}>
       <Box
@@ -91,7 +93,7 @@ export const Location = ({
             {elevator.propertyOwner.name}
           </Typography>
           <Typography variant="caption" component="div">
-            Property Manager
+            {t('Property Manager')}
           </Typography>
         </Box>
       </Box>

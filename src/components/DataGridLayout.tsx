@@ -1,5 +1,8 @@
+import {useEffect, useRef} from 'react';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import useTheme from '@mui/material/styles/useTheme';
 import {
   DataGrid,
   DataGridProps,
@@ -13,6 +16,7 @@ import {
 } from '@mui/x-data-grid';
 import LinearProgress from '@mui/material/LinearProgress';
 import {useNavigate} from 'react-router-dom';
+import {olStyles} from 'styles';
 import {CustomPagination} from './CustomPagination';
 import {EmptySection} from './EmptySection';
 
@@ -37,6 +41,9 @@ interface Props extends DataGridProps {
   isRowSelectable?: (params: GridRowParams) => boolean;
   isCellClickable?: boolean;
   checkboxSelection?: boolean;
+  isWidget?: boolean;
+  headerHeight?: number;
+  scrollToTop?: any;
 }
 
 interface ColumnProps extends GridColDef {
@@ -51,16 +58,21 @@ export const getColumnProps = ({
   headerName,
   type = 'string',
   cellClassName = 'nowrap',
-  renderHeader = (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName && params.colDef.headerName.toUpperCase()}
-    </Typography>
-  ),
+  renderHeader = (params: GridColumnHeaderParams) => {
+    const {t} = useTranslation();
+    return (
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName && t(params.colDef.headerName.toUpperCase())}
+      </Typography>
+    );
+  },
   renderCell = (params: GridRenderCellParams<any, any, any>) => (
     <Typography variant="body2">{params.value || '-'}</Typography>
   ),
   flex = 1,
   align = 'left',
+  editable = false,
+  sortable = false,
 }: ColumnProps): GridColDef => ({
   field,
   type,
@@ -71,8 +83,8 @@ export const getColumnProps = ({
   flex,
   headerAlign: align,
   align,
-  editable: false,
-  sortable: false,
+  editable,
+  sortable,
 });
 
 export const DataGridLayout = ({
@@ -99,9 +111,14 @@ export const DataGridLayout = ({
   disableSelectionOnClick = true,
   onRowClick = () => {},
   selectionModel,
+  isWidget = false,
+  headerHeight,
+  scrollToTop,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const gridRef = useRef<any>();
 
   const rowClassNames: any[string] = [];
   rows.forEach((item) => {
@@ -113,6 +130,13 @@ export const DataGridLayout = ({
       };
     }
   });
+
+  useEffect(() => {
+    if (gridRef.current) {
+      const ele = gridRef.current.querySelector('.MuiDataGrid-virtualScroller');
+      ele.scrollTop = 0;
+    }
+  }, [scrollToTop]);
 
   const renderFooter = () => (
     <CustomPagination
@@ -144,7 +168,7 @@ export const DataGridLayout = ({
           illustration="clipboard"
           size="tiny"
           containerStyle={{my: 'auto'}}
-          label="There are no rows for the applied filters!"
+          label="There are no entires for the applied filters!"
         />
       )
     );
@@ -157,13 +181,14 @@ export const DataGridLayout = ({
         ...(!fullHeight && {height}),
       }}>
       <DataGrid
+        ref={gridRef}
         components={{
           LoadingOverlay: LinearProgress,
           Footer: renderFooter,
           NoRowsOverlay: noRowsOverlay,
         }}
         loading={loading}
-        headerHeight={50}
+        headerHeight={headerHeight || 50}
         rows={rows}
         columns={columns}
         isRowSelectable={isRowSelectable}
@@ -172,6 +197,7 @@ export const DataGridLayout = ({
         disableColumnMenu
         selectionModel={selectionModel}
         hideFooter={hideFooter}
+        sortingMode="server"
         onCellClick={
           onCellClick ||
           ((params, e) => {
@@ -192,6 +218,8 @@ export const DataGridLayout = ({
         onRowClick={onRowClick}
         checkboxSelection={checkboxSelection}
         sx={{
+          ...olStyles.scrollbar,
+
           width: '100%',
           my: '0.5em',
           borderLeft: 'none',
@@ -199,16 +227,24 @@ export const DataGridLayout = ({
           borderTop: 'none',
           borderBottom: '2px solid',
           borderColor: 'background.default',
+          '& .MuiDataGrid-virtualScroller': {
+            '&:hover': {
+              ...olStyles.verticlaScrollBar,
+            },
+          },
           '& .MuiDataGrid-row': {
             background: 'white',
             cursor: 'pointer',
-            marginY: 2,
           },
           '& .MuiDataGrid-columnHeaders': {
             background: 'white',
             border: '2px solid',
             borderColor: 'background.default',
             borderRadius: '4px',
+            ...(isWidget && {
+              border: `1px solid ${theme.palette.text.disabled}`,
+              borderRadius: '4px',
+            }),
           },
           '& .MuiDataGrid-columnHeaderTitleContainer': {
             padding: '0',
@@ -221,6 +257,8 @@ export const DataGridLayout = ({
             '.MuiLinearProgress-root': {
               top: 50,
               zIndex: 1,
+              position: 'absolute',
+              width: '100%',
             },
             '& *:focus, & *:focus-within': {
               '& *': {
@@ -278,8 +316,8 @@ export const DataGridLayout = ({
           },
           ...rowClassNames,
           ...containerStyle,
-          ...rest,
         }}
+        {...rest}
       />
     </Box>
   );

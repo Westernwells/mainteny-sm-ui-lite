@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Create';
 import Typography from '@mui/material/Typography';
@@ -15,12 +16,17 @@ import {useFormik} from 'formik';
 import {ArticleType, ArticleView} from '../../../models/article';
 import {ArticleBasicFormModel} from '../../../models/articleForm';
 import {Dialog} from '../../../components/Dialog';
-import {ArticleBasicInfoForm} from './ArticleBasicInfoForm';
 import {convertToText} from '../../../utils/utils';
 import {useUpdateArticle} from '../../../hooks/reactQuery/useArticle';
 import {CardProps} from '../../../components/CardProps';
 import {InfoCard} from '../../../components/InfoCard';
-import {formatCurrency} from '../../../utils/currency';
+import {
+  amountRecordForBackend,
+  currencyFactor,
+  formatNetAmount,
+  makeAmountRecord,
+} from '../../../utils/currency';
+import {EditBasicInfoForm} from './EditBasicInfoForm';
 
 const validationSchema = Yup.object().shape({
   category: Yup.string().nullable().required('Category is required'),
@@ -39,8 +45,9 @@ const validationSchema = Yup.object().shape({
 export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
   const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
+  const {t} = useTranslation();
   const {mutateAsync: updateArticle, isLoading} = useUpdateArticle(
-    'Article is updated successfully',
+    t('Article is updated successfully'),
   );
 
   const formik = useFormik<ArticleBasicFormModel>({
@@ -54,9 +61,15 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       type: article.type,
       unit: article.unit,
       unitPurchaseVat: article.unitPurchaseAmount.percentageVat,
-      unitPurchaseAmount: article.unitPurchaseAmount.netAmount,
+      unitPurchaseAmount: Math.round(
+        article.unitPurchaseAmount.netAmount /
+          currencyFactor(article.unitPurchaseAmount),
+      ),
       unitSellingVat: article.unitSellingAmount.percentageVat,
-      unitSellingAmount: article.unitSellingAmount.netAmount,
+      unitSellingAmount: Math.round(
+        article.unitSellingAmount.netAmount /
+          currencyFactor(article.unitSellingAmount),
+      ),
     },
     onSubmit: () => {},
     validationSchema,
@@ -79,16 +92,20 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       suppliers: article.additionalInfo.suppliers || [],
       type: formik.values.type.toUpperCase(),
       unit: formik.values.unit,
-      unitPurchaseAmount: {
-        currency: article.unitPurchaseAmount.currency,
-        netAmount: formik.values.unitPurchaseAmount,
-        percentageVat: formik.values.unitPurchaseVat,
-      },
-      unitSellingAmount: {
-        currency: article.unitSellingAmount.currency,
-        netAmount: formik.values.unitSellingAmount,
-        percentageVat: formik.values.unitSellingVat,
-      },
+      unitPurchaseAmount: amountRecordForBackend(
+        makeAmountRecord(
+          formik.values.unitPurchaseAmount,
+          article.unitPurchaseAmount.currency,
+          formik.values.unitPurchaseVat,
+        ),
+      ),
+      unitSellingAmount: amountRecordForBackend(
+        makeAmountRecord(
+          formik.values.unitSellingAmount,
+          article.unitSellingAmount.currency,
+          formik.values.unitSellingVat,
+        ),
+      ),
     };
     await updateArticle({articleId: article!.id, article: temp});
     setOpenDialog(false);
@@ -96,7 +113,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
 
   const basicInfoItems = [
     {
-      label: 'Category',
+      label: t('Category'),
       icon: (
         <RadioButtonUncheckedRoundedIcon
           sx={{color: theme.palette.info.dark}}
@@ -105,54 +122,44 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       body: article?.category,
     },
     {
-      label: 'Model',
+      label: t('Model'),
       icon: (
         <DocumentScannerRoundedIcon sx={{color: theme.palette.info.dark}} />
       ),
       body: article?.model,
     },
     {
-      label: 'Manufacturer',
+      label: t('Manufacturer'),
       icon: <AssignmentIndRoundedIcon sx={{color: theme.palette.info.dark}} />,
       body: article?.manufacturer,
     },
     {
-      label: 'Unit',
+      label: t('Unit'),
       icon: <ExpandRoundedIcon sx={{color: theme.palette.info.dark}} />,
       body: article?.unit,
     },
     {
-      label: 'Selling Price',
+      label: t('Selling Price'),
       icon: <LocalOfferRoundedIcon sx={{color: theme.palette.info.dark}} />,
-      body: `${formatCurrency(
-        article
-          ? article.unitSellingAmount.netAmount /
-              10 ** article.unitSellingAmount.fractionDigits!
-          : 0,
-      )}`,
+      body: formatNetAmount(article.unitSellingAmount),
     },
     {
-      label: 'Purchase Price',
+      label: t('Purchase Price'),
       icon: <LocalOfferRoundedIcon sx={{color: theme.palette.info.dark}} />,
-      body: `${formatCurrency(
-        article
-          ? article.unitPurchaseAmount.netAmount /
-              10 ** article.unitPurchaseAmount.fractionDigits!
-          : 0,
-      )}`,
+      body: formatNetAmount(article.unitPurchaseAmount),
     },
     {
-      label: 'Storage Location',
+      label: t('Storage Location'),
       icon: <FmdGoodRoundedIcon sx={{color: theme.palette.info.dark}} />,
       body: article?.storageLocation || '-',
     },
     {
-      label: 'Selling VAT',
+      label: t('Selling VAT'),
       icon: <LocalOfferRoundedIcon sx={{color: theme.palette.info.dark}} />,
       body: article?.unitSellingAmount.percentageVat,
     },
     {
-      label: 'Purchase VAT',
+      label: t('Purchase VAT'),
       icon: <LocalOfferRoundedIcon sx={{color: theme.palette.info.dark}} />,
       body: article?.unitPurchaseAmount.percentageVat,
     },
@@ -174,21 +181,29 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
             icon={item.icon}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '1em', width: '33%'}}
+            bodyStyle={{overflowWrap: 'anywhere'}}
             bodyText={item.body}
           />
         ))}
       </Box>
       <Dialog
-        title="Edit Basic Information"
+        title={t('Edit Basic Information')}
         isSaving={isLoading}
         onCancel={() => setOpenDialog(false)}
-        disableSaveBtn={!!Object.keys(formik.errors).length}
+        disableSaveBtn={
+          !!Object.keys(formik.errors).length || !formik.values.type
+        }
         onSave={saveArticle}
         dialogProps={{
           open: openDialog || false,
         }}>
-        <ArticleBasicInfoForm
-          containerStyles={{width: '50%', pr: '1rem'}}
+        <EditBasicInfoForm
+          containerStyles={{
+            width: '49%',
+            pr: '1rem',
+            mr: '0.25rem',
+            my: '0.5rem',
+          }}
           formik={formik}
         />
       </Dialog>

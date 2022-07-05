@@ -1,4 +1,5 @@
 import React, {ReactNode} from 'react';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import {Typography} from '@mui/material';
 import useTheme from '@mui/material/styles/useTheme';
@@ -20,6 +21,7 @@ export const FilterFields = ({
   showFilter = true,
   onClear,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   return showFilter ? (
     <Box display="flex" sx={{...containerStyle}}>
@@ -28,10 +30,11 @@ export const FilterFields = ({
       </Box>
       {!hideClear ? (
         <Typography
+          component="div"
           onClick={() => onClear && onClear()}
           mt="0.5em"
           sx={{cursor: 'pointer', color: theme.palette.info.main}}>
-          Clear all
+          {t('Clear all')}
         </Typography>
       ) : null}
     </Box>

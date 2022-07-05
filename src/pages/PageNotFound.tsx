@@ -1,21 +1,29 @@
+import {useEffect} from 'react';
 import {Typography} from '@mui/material';
 import Box from '@mui/material/Box';
-import {ReactComponent as TechnicianIllustration} from 'assets/illustrations/technician.svg';
+import {ReactComponent as NotFoundIllustration} from 'assets/illustrations/404.svg';
 import {Button} from 'components/Button';
 import {useNavigate} from 'react-router';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 
 export const PageNotFound = () => {
-  const message1 = `Sorry, this page doesn't exist 😟`;
+  const message1 = `Sorry, the page you are looking for doesn't exist!`;
   const navigate = useNavigate();
+
+  useEffect(() => {
+    Mixpanel.identifyAndTrack(mixpanelEvents['404_PAGE_SHOWN']);
+  }, []);
+
   return (
     <Box
-      height="100vh"
+      height="80vh"
       display="flex"
       alignItems="center"
       justifyContent="center"
       flexDirection="column"
       px="10%">
-      <TechnicianIllustration />
+      <NotFoundIllustration />
       <Typography variant="h4" textAlign="center" mt={6}>
         {message1}
       </Typography>
@@ -27,6 +35,7 @@ export const PageNotFound = () => {
             size: 'large',
             onClick: () => navigate('/', {replace: true}),
           }}
+          style={{width: '150px', height: '50px'}}
         />
       </Box>
     </Box>

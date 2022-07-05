@@ -13,14 +13,18 @@ interface Props {
   partyType?: string;
   occupation?: string;
   containerStyle?: {[key: string]: string | number};
-  chipColor?:
-    | 'default'
-    | 'primary'
-    | 'secondary'
-    | 'error'
-    | 'info'
-    | 'success'
-    | 'warning';
+  chipStyles?: {
+    chipMaxChars?: number;
+    chipLength?: 'short' | 'medium' | 'long' | 'auto';
+    chipColor?:
+      | 'default'
+      | 'primary'
+      | 'secondary'
+      | 'error'
+      | 'info'
+      | 'success'
+      | 'warning';
+  };
 }
 
 export interface Parties {
@@ -34,7 +38,7 @@ export const ContractParties = ({
   phoneNumber,
   partyType,
   containerStyle,
-  chipColor,
+  chipStyles,
 }: Props) => (
   <Grid container sx={{...containerStyle, marginBottom: 2}}>
     <Grid item xs={5}>
@@ -63,7 +67,12 @@ export const ContractParties = ({
       </Box>
     </Grid>
     <Grid item xs={2} alignSelf="center">
-      <PartiesChipStatus color={chipColor!} partyType={partyType!} />
+      <PartiesChipStatus
+        color={chipStyles?.chipColor! || 'primary'}
+        length={chipStyles?.chipLength || 'auto'}
+        maxChars={chipStyles?.chipMaxChars || undefined}
+        partyType={partyType!}
+      />
     </Grid>
   </Grid>
 );

@@ -155,7 +155,7 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
       quotationId: quotation ? quotation.id : '',
     };
     await createImmediateCalloutOrder(body);
-    navigate('/orders?pageIndex=1&pageSize=25&tab=1');
+    navigate('/orders?tab=1');
   };
 
   const createScheduledOrder = async () => {
@@ -184,7 +184,7 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
     };
 
     await createScheduledServiceOrder(body);
-    navigate('/orders?pageIndex=1&pageSize=25&tab=1');
+    navigate('/orders?tab=1');
   };
 
   const createNonScheduledOrder = async () => {
@@ -202,7 +202,7 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
     };
 
     await createNonScheduledServiceOrder(body);
-    navigate('/orders?pageIndex=1&pageSize=25&tab=1');
+    navigate('/orders?tab=1');
   };
 
   const handleSubmit = async () => {

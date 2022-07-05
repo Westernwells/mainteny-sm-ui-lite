@@ -1,4 +1,5 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import * as _ from 'lodash';
 import {ServiceOrderType, ServiceOrderView} from 'models/service-order';
@@ -56,8 +57,7 @@ const otherOptions = [
   {
     value: RadioOptions.SCHEDULE_TECHNICIAN,
     label: 'Choose a Date, Time & Technician',
-    subText: `Select a specific date, time and technician and update the
-    technician&apos;s schedule for that day`,
+    subText: `Select a specific date, time and technician and update the technicians schedule for that day`,
   },
 ];
 
@@ -65,8 +65,7 @@ const calloutOptions = [
   {
     value: RadioOptions.IMMEDIATE,
     label: 'Immediate',
-    subText:
-      ' Select a technician for attending this service order immediately',
+    subText: 'Select a technician for attending this service order immediately',
   },
   ...otherOptions,
 ];
@@ -86,6 +85,7 @@ export const SelectTechnicians = ({
   dueDateFormIsErrored,
   getSelectedRadioOption,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const options = useRef(
     type === ServiceOrderType.CALLOUT ? calloutOptions : otherOptions,
@@ -235,13 +235,13 @@ export const SelectTechnicians = ({
                         getSelectedTechnicians([]);
                       }
                     }}
-                    label={option.label}
+                    label={t(option.label)}
                     radioProps={{
                       sx: {color: theme.palette.text.secondary},
                     }}
                   />
                   <Typography variant="body1" color="text.secondary">
-                    {option.subText}
+                    {t(option.subText)}
                   </Typography>
                 </Box>
               ))}
@@ -254,10 +254,12 @@ export const SelectTechnicians = ({
       {selectedOption === RadioOptions.IMMEDIATE ? (
         <>
           <Typography variant="h6" sx={{mt: showOptions ? '2em' : undefined}}>
-            Choose Technicians
+            {t('Choose Technicians')}
           </Typography>
           <Typography variant="body1" component="div" color="text.secondary">
-            Selected technicians below will be contacted by phone automatically
+            {t(
+              'Selected technicians below will be contacted by phone automatically',
+            )}
           </Typography>
         </>
       ) : null}
@@ -279,9 +281,9 @@ export const SelectTechnicians = ({
         />
       }
       title={order.elevator.propertyOwner.name}
-      subtitle={order.elevator.address.fullName}
       width={width}
-      tooltip={<OrderDetails order={order} />}
+      tooltip={OrderDetails}
+      order={order}
       cardStatusAccent={serviceOrderStatusColor[order.status]}
       position={position}
     />

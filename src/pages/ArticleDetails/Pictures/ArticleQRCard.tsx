@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import EditIcon from '@mui/icons-material/Create';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -10,12 +11,14 @@ import {InfoCard} from '../../../components/InfoCard';
 import {ArticleImageUploadForm} from './ArticleImageUploadForm';
 import {NoItemSection} from '../NoItemSection';
 import {FileResourceRecord} from '../../../models/media';
+import {makeAmountRecord} from '../../../utils/currency';
 
 export const ArticleQRCard = ({article}: {article: ArticleView}) => {
   const [openDialog, setOpenDialog] = useState(false);
+  const {t} = useTranslation();
 
   const {mutateAsync: updateArticle} = useUpdateArticle(
-    'Article is updated successfully',
+    t('Article is updated successfully'),
   );
   const {data: qrUrls = {}} = useDownloadUrl(
     article.additionalInfo.qrCode ? [article.additionalInfo.qrCode.uri] : [],
@@ -38,16 +41,16 @@ export const ArticleQRCard = ({article}: {article: ArticleView}) => {
       suppliers: article.additionalInfo.suppliers || [],
       type: article.type.toUpperCase(),
       unit: article.unit,
-      unitPurchaseAmount: {
-        currency: article.unitPurchaseAmount.currency,
-        netAmount: article.unitPurchaseAmount.netAmount,
-        percentageVat: article.unitPurchaseAmount.percentageVat,
-      },
-      unitSellingAmount: {
-        currency: article.unitSellingAmount.currency,
-        netAmount: article.unitSellingAmount.netAmount,
-        percentageVat: article.unitSellingAmount.percentageVat,
-      },
+      unitPurchaseAmount: makeAmountRecord(
+        article.unitPurchaseAmount.netAmount,
+        article.unitPurchaseAmount.currency,
+        article.unitPurchaseAmount.percentageVat,
+      ),
+      unitSellingAmount: makeAmountRecord(
+        article.unitSellingAmount.netAmount,
+        article.unitSellingAmount.currency,
+        article.unitSellingAmount.percentageVat,
+      ),
     };
     await updateArticle({articleId: article!.id, article: temp});
     setOpenDialog(false);
@@ -66,7 +69,7 @@ export const ArticleQRCard = ({article}: {article: ArticleView}) => {
       handleAction={() => setOpenDialog(true)}
       bodyContainerStyle={{height: '100%'}}
       showHeaderBackground
-      header={<Typography variant="subtitle1">QR Code</Typography>}>
+      header={<Typography variant="subtitle1">{t('QR Code')}</Typography>}>
       <Box
         display="flex"
         flexWrap="wrap"
@@ -77,29 +80,31 @@ export const ArticleQRCard = ({article}: {article: ArticleView}) => {
           _.map(qrUrls, (url, key) => (
             <img
               key={key}
-              alt="QR Code"
+              alt={t('QR Code')}
               src={url}
               style={{
                 objectFit: 'cover',
                 objectPosition: 'center',
+                width: '100%',
               }}
             />
           ))}
         {_.isEmpty(qrUrls) && (
           <NoItemSection
-            placeholder="QR code"
+            label={t('No QR code yet. Please click the button below to add!')}
+            buttonLabel={t('+ Add QR Code')}
             action={() => setOpenDialog(true)}
           />
         )}
       </Box>
       {openDialog && (
         <ArticleImageUploadForm
-          title="Edit QR Code"
+          title={t('Edit QR Code')}
           uploadPath={`${article!.serviceCompanyId}/articles/${article!.id}/qr`}
           onClose={saveArticle}
+          successMessage={t('QR code image uploaded successfully!')}
           onCancel={() => setOpenDialog(false)}
-          hints={['File size less than 5MB only', 'Max 1 file']}
-          maxFiles={1}
+          hints={[t('File size less than 5MB only')]}
         />
       )}
     </InfoCard>

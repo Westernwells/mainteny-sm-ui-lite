@@ -1,5 +1,5 @@
 import Axios from 'axios';
-import {getStoredUser} from 'userStorage';
+import {clearStoredUser, getStoredUser} from 'userStorage';
 
 const user = getStoredUser();
 
@@ -11,6 +11,17 @@ export const axiosClient = Axios.create({
     source: 'WEB',
   },
 });
+
+axiosClient.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    if (error.response.status === 401) {
+      clearStoredUser();
+      window.location.replace('/sm-lite/login');
+    }
+  },
+);
+
 if (user) {
   axiosClient.defaults.headers.common.Authorization = `Bearer ${user.token}`;
 }

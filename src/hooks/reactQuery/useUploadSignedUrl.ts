@@ -1,5 +1,5 @@
-import {FileWithPreview} from 'components/MyDropzone';
-import {useSnackbar} from 'notistack';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {useMutation, useQueryClient} from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';

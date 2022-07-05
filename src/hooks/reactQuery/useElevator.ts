@@ -7,12 +7,15 @@ import {
 import {AxiosResponse} from 'axios';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {queryKeys} from 'reactQuery/constants';
-import {useNavigate, useParams} from 'react-router';
-import {useSnackbar} from 'notistack';
+import {useParams} from 'react-router';
+import {useSnackbar} from 'hooks/useSnackbar';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {
   CustomerElevatorParams,
   ElevatorComment,
   ElevatorCommentRecord,
+  ElevatorQueryParams,
   ElevatorRequestBody,
   ElevatorView,
   QueryTodoParams,
@@ -28,11 +31,14 @@ import {
 import {MaintainerView} from '../../models/technician';
 import {useUserSession} from './useUserSession';
 
-export const fetchElevators = async (query: string, page: Page, id: string) => {
+export const fetchElevators = async (
+  params: Partial<ElevatorQueryParams>,
+  id: string,
+) => {
   const response = await axiosClient.get<Resource<ElevatorView>>(
     `/api/serviceCompanies/${id}/elevators`,
     {
-      params: {query, ...page},
+      params,
       paramsSerializer,
     },
   );
@@ -69,19 +75,14 @@ export const fetchElevatorBreakdownHistory = async (elevatorId: string) => {
   return response.data;
 };
 
-export const useElevatorById = (elevatorId?: string) => {
-  const navigate = useNavigate();
-  return useQuery(
+export const useElevatorById = (elevatorId?: string) =>
+  useQuery(
     [queryKeys.elevatorById, elevatorId],
     () => fetchElevator(elevatorId!),
     {
       enabled: !!elevatorId,
-      onError: (e: any) => {
-        if (e.response.status === 500) navigate('/404');
-      },
     },
   );
-};
 
 export const useElevatorMaintainers = (elevatorId?: string) =>
   useQuery(
@@ -93,20 +94,13 @@ export const useElevatorMaintainers = (elevatorId?: string) =>
   );
 
 export function useAllElevators(
-  query: string,
-  page: Page,
-  filter: {status: string[]},
+  params: Partial<ElevatorQueryParams>,
   options?: UseQueryOptions<any, any, any>,
 ) {
   const {user} = useUserSession();
   return useQuery<Resource<ElevatorView>, RestError>(
-    [
-      queryKeys.fetchAllElevators,
-      query,
-      page,
-      user?.userAccount.serviceCompany.id,
-    ],
-    () => fetchElevators(query, page, user!.userAccount.serviceCompany.id),
+    [queryKeys.fetchAllElevators, params, user?.userAccount.serviceCompany.id],
+    () => fetchElevators(params, user!.userAccount.serviceCompany.id),
     {
       ...options,
       enabled: !!user,
@@ -354,6 +348,7 @@ const updateElevatorTechnician = async (
 export const useUpdateElevatorTechnician = (successMsg?: string) => {
   const {enqueueSnackbar} = useSnackbar();
   const queryClient = useQueryClient();
+
   return useMutation(
     ({body, elevatorId}: {body: {[key: string]: number}; elevatorId: string}) =>
       updateElevatorTechnician(body, elevatorId),
@@ -389,13 +384,17 @@ export const useAddElevator = (successMsg?: string) => {
   return useMutation(
     (body: Partial<ElevatorRequestBody>) => addElevator(body),
     {
-      onSuccess: () => {
+      onSuccess: (data, variables) => {
         if (successMsg) {
           enqueueSnackbar(successMsg, {
             variant: 'success',
           });
         }
         queryClient.invalidateQueries(queryKeys.elevatorById);
+        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_UNIT_CREATED, {
+          elevatorId: data.value,
+          propertyOwnerId: variables.propertyOwnerId,
+        });
       },
       onError: (err: any) => {
         console.log(err);

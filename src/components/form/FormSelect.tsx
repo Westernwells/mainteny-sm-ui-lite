@@ -2,8 +2,10 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Checkbox from '@mui/material/Checkbox';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import Select, {SelectProps} from '@mui/material/Select';
+import {SxProps} from '@mui/system';
+import {capitalize} from 'utils/utils';
+import {useTranslation} from 'react-i18next';
 
 interface Props<T> {
   labelId: string;
@@ -11,6 +13,8 @@ interface Props<T> {
   required?: boolean;
   options: {label: string; value: string}[];
   selectProps?: SelectProps<T>;
+  labelStyles?: SxProps;
+  selectStyles?: SxProps;
   containerStyles?: {[key: string]: any};
 }
 
@@ -28,46 +32,72 @@ const MenuProps = {
 export const FormSelect = ({
   labelId,
   label,
-  required,
   options,
+  required = false,
+  labelStyles,
+  selectStyles,
   selectProps,
   containerStyles,
-}: Props<string | string[]>) => (
-  <FormControl sx={{...containerStyles}} fullWidth required={required}>
-    <InputLabel
-      id={labelId}
-      shrink
-      sx={{
-        bgcolor: 'white',
-        paddingInline: '.5em 2em',
-      }}>
-      {label}
-    </InputLabel>
-    <Select
-      size="small"
-      input={<OutlinedInput id="roles" />}
-      renderValue={() =>
-        selectProps && selectProps.value && Array.isArray(selectProps.value)
-          ? selectProps.value.join(',')
-          : selectProps?.value || ''
-      }
-      MenuProps={MenuProps}
-      {...selectProps}>
-      {options.map((option) => (
-        <MenuItem key={option.label} value={option.value}>
-          {selectProps?.multiple ? (
-            <Checkbox
-              size="small"
-              checked={
-                selectProps && selectProps.value
-                  ? selectProps.value.includes(option.value)
-                  : false
-              }
-            />
-          ) : null}
-          {option.label}
-        </MenuItem>
-      ))}
-    </Select>
-  </FormControl>
-);
+}: Props<string | string[]>) => {
+  const {t} = useTranslation();
+  return (
+    <FormControl sx={{...containerStyles}} fullWidth required={required}>
+      <InputLabel
+        shrink
+        id={labelId}
+        sx={{
+          background: '#fff',
+          px: '0.2em',
+          ...labelStyles,
+        }}>
+        {t(label)}
+      </InputLabel>
+      <Select
+        size="small"
+        labelId={labelId}
+        label={t(label)}
+        renderValue={() => {
+          let selectValue;
+          if (
+            selectProps &&
+            selectProps.value &&
+            Array.isArray(selectProps.value)
+          ) {
+            const editedValues = selectProps?.value.map((item) => {
+              const selectedOption = options.find(
+                (option) => option.value === item,
+              )?.label;
+              return selectedOption;
+            });
+
+            selectValue = capitalize((editedValues as string[]) || []);
+          } else {
+            selectValue = options.find(
+              ({value}) => value === selectProps?.value,
+            )?.label;
+          }
+          return selectValue || '';
+        }}
+        value={selectProps?.value}
+        sx={selectStyles}
+        MenuProps={MenuProps}
+        {...selectProps}>
+        {options.map((option) => (
+          <MenuItem key={option.label} value={option.value}>
+            {selectProps?.multiple ? (
+              <Checkbox
+                size="small"
+                checked={
+                  selectProps && selectProps.value
+                    ? selectProps.value.includes(option.value)
+                    : false
+                }
+              />
+            ) : null}
+            {t(option.label)}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
+};

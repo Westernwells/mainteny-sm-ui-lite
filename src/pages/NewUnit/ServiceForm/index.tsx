@@ -10,6 +10,7 @@ import {DatePicker} from 'components/DatePicker';
 import {FormSelect} from 'components/form/FormSelect';
 import {convertToText} from 'utils/utils';
 import {Priority} from 'models/misc';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   getServiceFormErrors?: (val: FormikErrors<ServiceFormModel>) => void;
@@ -56,6 +57,7 @@ export const ServiceForm = ({
     }
   }, [formik]);
 
+  const {t} = useTranslation();
   return (
     <PageCard
       headerLabel="Service Information"
@@ -70,7 +72,7 @@ export const ServiceForm = ({
                 formik.setFieldValue('lastVisitDate', date)
               }
               textFieldProps={{
-                label: 'Last Visit',
+                label: t('Last Visit'),
                 name: 'lastVisitDate',
                 helperText:
                   formik.errors.lastVisitDate && formik.touched.lastVisitDate
@@ -92,7 +94,7 @@ export const ServiceForm = ({
                 formik.setFieldValue('lastInspectionDate', date)
               }
               textFieldProps={{
-                label: 'Last Inspection',
+                label: t('Last Inspection'),
                 name: 'lastInspectionDate',
                 helperText:
                   formik.errors.lastInspectionDate &&
@@ -126,7 +128,7 @@ export const ServiceForm = ({
               props={{
                 label: 'Required time',
                 name: 'serviceTime',
-                placeholder: 'e.g. 45 min',
+                placeholder: t('e.g. 45 min'),
                 value: formik.values.serviceTime,
                 helperText:
                   formik.errors.serviceTime && formik.touched.serviceTime

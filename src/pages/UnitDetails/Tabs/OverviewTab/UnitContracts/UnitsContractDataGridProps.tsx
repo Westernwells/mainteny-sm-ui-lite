@@ -92,9 +92,9 @@ export const makeRows = (contracts: ContractSimpleView[]): GridRowsProp =>
   contracts.map((item: ContractSimpleView) => ({
     id: item.id,
     number: item.number,
-    contractType: item.type,
+    contractType: convertToText(item.type),
     startDate: formatDate(new Date(item.startTime), 'dd.MM.yyy') || '-',
     expiryDate: formatDate(new Date(item.endTime), 'dd.MM.yyy') || '-',
     status: item.status,
-    navigateTo: `details/${item.id}`,
+    navigateTo: `/contracts/details/${item.id}`,
   }));

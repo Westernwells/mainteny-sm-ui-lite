@@ -1,27 +1,41 @@
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
+import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import {getColumnProps} from 'components/DataGridLayout';
 import {formatDate} from 'utils/datetime';
 import {StatusChip} from 'components/StatusChip';
-import {DataGridElevatorView} from '../../Models';
+import {ElevatorView} from '../../../../models/elevator';
 
 export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
     headerName: 'number',
-    align: 'center',
-    flex: 0,
+    align: 'left',
+    renderCell: (params: GridRenderCellParams<any, any, any>) => {
+      const theme = useTheme();
+      return (
+        <>
+          <ElevatorIcon
+            style={{marginInline: '.25em', color: theme.palette.action.active}}
+          />
+          <Typography
+            variant="body2"
+            sx={{
+              whiteSpace: 'pre-wrap',
+              overflowWrap: 'anywhere',
+            }}>
+            {params.value || '-'}
+          </Typography>
+        </>
+      );
+    },
+    flex: 0.75,
   }),
   getColumnProps({
     field: 'model',
     headerName: 'model',
-    renderCell: (params: GridRenderCellParams<any, any, any>) => (
-      <>
-        <ElevatorIcon style={{marginInline: '.25em'}} />
-        <Typography variant="body2">{params.value || '-'}</Typography>
-      </>
-    ),
+    flex: 1.5,
   }),
   getColumnProps({
     field: 'customer',
@@ -36,15 +50,17 @@ export const columns: GridColDef[] = [
     flex: 1.5,
   }),
   getColumnProps({
-    field: 'lastVisit',
+    field: 'LAST_VISIT_DATE',
     headerName: 'last visit',
     align: 'center',
     flex: 0,
+    sortable: true,
   }),
   getColumnProps({
-    field: 'nextVisit',
+    field: 'NEXT_VISIT_DATE',
     headerName: 'next visit',
     flex: 0,
+    sortable: true,
   }),
   getColumnProps({
     field: 'priorityTechnician',
@@ -58,8 +74,8 @@ export const columns: GridColDef[] = [
     headerAlign: 'center',
     renderCell: (params) => (
       <StatusChip
-        label={params.value ? 'Yes' : 'No'}
-        color={params.value ? 'success' : 'error'}
+        label={params.value ? 'YES' : 'NO'}
+        color={params.value ? 'success' : 'info'}
         variant="filled"
         size="small"
         maxChars={3}
@@ -68,33 +84,25 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = ({
-  elevators,
-}: {
-  elevators: DataGridElevatorView[];
-}): GridRowsProp => {
-  const result =
-    elevators.length &&
-    elevators.map((elevator: DataGridElevatorView, index: number) => ({
-      id: index,
-      number: elevator.number,
-      model: elevator.model,
-      customer: elevator.propertyOwner.name,
-      lastVisit: formatDate(elevator.lastVisitDate),
-      nextVisit: formatDate(elevator.nextVisitDate),
-      address: elevator.address.fullName,
-      headerText: elevator.address.fullName,
-      priorityTechnician: elevator.assignments.length
-        ? elevator.assignments
-            .map(
-              (item) =>
-                `${item.technician.userAccount.firstName} ${item.technician.userAccount.lastName}`,
-            )
-            .join(', ')
-        : '-',
-      activeContracts: !!elevator.contracts.length,
-      elevator,
-      navigateTo: `details/${elevator.id}`,
-    }));
-  return result || [];
-};
+export const makeRows = (elevators: ElevatorView[]): GridRowsProp =>
+  elevators.map((elevator: ElevatorView) => ({
+    id: elevator.id,
+    number: elevator.externalId,
+    model: elevator.model,
+    customer: elevator.propertyOwner.name,
+    LAST_VISIT_DATE: formatDate(elevator.lastVisitDate),
+    NEXT_VISIT_DATE: formatDate(elevator.nextVisitDate),
+    address: elevator.address.fullName,
+    headerText: elevator.address.fullName,
+    priorityTechnician: elevator.assignments.length
+      ? elevator.assignments
+          .map(
+            (item) =>
+              `${item.technician.userAccount.firstName} ${item.technician.userAccount.lastName}`,
+          )
+          .join(', ')
+      : '-',
+    activeContracts: !!elevator.contracts.length,
+    elevator,
+    navigateTo: `details/${elevator.id}`,
+  }));

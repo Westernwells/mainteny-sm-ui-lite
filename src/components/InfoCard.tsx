@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import useTheme from '@mui/material/styles/useTheme';
 
 interface Props {
-  bodyContainerStyle?: {[key: string]: string | number};
+  bodyContainerStyle?: {[key: string]: any};
   containerStyles?: {[key: string]: any};
   headerStyles?: {[key: string]: string | number};
   minHeight?: string | number;
@@ -14,6 +14,7 @@ interface Props {
   headerActionIcon?: JSX.Element;
   children: ReactNode;
   showHeaderBackground?: boolean;
+  disabledHeader?: boolean;
   handleAction?: () => void;
 }
 
@@ -26,6 +27,7 @@ export const InfoCard = ({
   children,
   headerStyles,
   showHeaderBackground,
+  disabledHeader = false,
   handleAction,
 }: Props) => {
   const theme = useTheme();
@@ -38,23 +40,25 @@ export const InfoCard = ({
         px: '1em',
         ...containerStyles,
       }}>
-      <CardHeader
-        sx={{
-          py: header ? '0.5em' : '0',
-          my: '1em',
-          px: !showHeaderBackground ? '0' : 'default',
-          background: showHeaderBackground
-            ? theme.palette.inputBackground.main
-            : null,
-          ...headerStyles,
-        }}
-        action={
-          headerActionIcon ? (
-            <IconButton onClick={handleAction}>{headerActionIcon}</IconButton>
-          ) : null
-        }
-        title={header || undefined}
-      />
+      {!disabledHeader && (
+        <CardHeader
+          sx={{
+            py: header ? '0.5em' : '0',
+            my: '1em',
+            px: !showHeaderBackground ? '0' : 'default',
+            background: showHeaderBackground
+              ? theme.palette.inputBackground.main
+              : null,
+            ...headerStyles,
+          }}
+          action={
+            headerActionIcon ? (
+              <IconButton onClick={handleAction}>{headerActionIcon}</IconButton>
+            ) : null
+          }
+          title={header || undefined}
+        />
+      )}
       <CardContent
         sx={{py: '0', minHeight: '5rem', px: '0', ...bodyContainerStyle}}>
         {children}

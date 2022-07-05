@@ -1,4 +1,5 @@
 import Chip from '@mui/material/Chip';
+import {useTranslation} from 'react-i18next';
 import {ReactNode} from 'react';
 
 const statusWidth = {
@@ -42,20 +43,23 @@ export const StatusChip = ({
   color = 'default',
   variant = 'filled',
   length = 'auto',
-}: Props) => (
-  <Chip
-    sx={{
-      bgcolor: variant === 'filled' ? statusColor[color] : undefined,
-      borderColor: variant === 'outlined' ? statusColor[color] : undefined,
-      color:
-        variant === 'outlined' ? statusColor[color] : 'primary.contrastText',
-      minWidth: maxChars ? `calc(${maxChars}ch + .5em)` : statusWidth[length],
-      boxShadow: 0,
-      px: '0.25em',
-      ...style,
-    }}
-    variant={variant}
-    label={label}
-    size={size}
-  />
-);
+}: Props) => {
+  const {t} = useTranslation();
+  return (
+    <Chip
+      sx={{
+        bgcolor: variant === 'filled' ? statusColor[color] : undefined,
+        borderColor: variant === 'outlined' ? statusColor[color] : undefined,
+        color:
+          variant === 'outlined' ? statusColor[color] : 'primary.contrastText',
+        minWidth: maxChars ? `calc(${maxChars}ch + .5em)` : statusWidth[length],
+        boxShadow: 0,
+        px: '0.25em',
+        ...style,
+      }}
+      variant={variant}
+      label={typeof label === 'string' ? t(label) : label}
+      size={size}
+    />
+  );
+};

@@ -2,6 +2,7 @@ import {TextFieldProps} from '@mui/material/TextField';
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {DatePicker as MuiDatePicker} from '@mui/x-date-pickers/DatePicker';
+import {InputLabelProps} from '@mui/material/InputLabel';
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import {FormInput} from './form/FormInput';
@@ -13,25 +14,23 @@ interface Props {
   minDate?: Date;
   maxDate?: Date;
   textFieldProps?: TextFieldProps;
+  inputLabelProps?: InputLabelProps;
 }
 
 export const DatePicker = ({
-  defaultDate,
+  defaultDate = null,
   getSelectedDate,
   containerStyles,
   minDate,
   maxDate,
   textFieldProps,
+  inputLabelProps,
 }: Props) => {
-  const [value, setValue] = useState<Date | null>(null);
+  const [value, setValue] = useState<Date | null>(defaultDate);
 
   useEffect(() => {
-    if (defaultDate) {
-      setValue(defaultDate);
-    }
-    console.log('MOUNTED', typeof defaultDate);
-    return () => console.log('UNMOUNTED');
-  }, []);
+    setValue(defaultDate);
+  }, [defaultDate]);
 
   useEffect(() => {
     if (getSelectedDate) {
@@ -56,7 +55,11 @@ export const DatePicker = ({
                 ...params,
                 size: 'small',
                 ...textFieldProps,
+                onKeyDown: (e) => {
+                  e.preventDefault();
+                },
               }}
+              inputLabelProps={inputLabelProps}
             />
           )}
         />

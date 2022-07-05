@@ -7,6 +7,7 @@ import {LocationFormModel} from 'models/unitForm';
 import * as Yup from 'yup';
 import {useEffect} from 'react';
 import {PageCard} from 'components/PageCard';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   getLocationFormErrors?: (val: FormikErrors<LocationFormModel>) => void;
@@ -23,6 +24,7 @@ export const LocationForm = ({
   getLocationFormValues,
   initialValues,
 }: Props) => {
+  const {t} = useTranslation();
   const formik = useFormik<LocationFormModel>({
     initialValues: {
       address: initialValues?.address,
@@ -62,7 +64,7 @@ export const LocationForm = ({
               }
               handleBlur={formik.handleBlur}
               textFieldProps={{
-                placeholder: 'e.g. 34-36 Exmouth Market, London EC1R 4QE',
+                placeholder: t('e.g. 34-36 Exmouth Market, London EC1R 4QE'),
                 required: true,
               }}
               getAddress={(address) =>

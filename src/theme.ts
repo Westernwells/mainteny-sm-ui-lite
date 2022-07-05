@@ -31,7 +31,6 @@ export const theme = createTheme({
       disabledBackground: 'rgba(34, 43, 69, 0.12)',
       focus: 'rgba(34, 43, 69, 0.12)',
     },
-
     error: {
       light: '#FF605A',
       main: '#FF182F',
@@ -65,6 +64,7 @@ export const theme = createTheme({
       default: '#F2F6F8',
     },
     inputBackground: {main: '#F7F9FC'},
+    divider: '#F3F5F6',
     amber: {main: '#FF8F00', light: '#FFF8E1'},
     eden: {main: 'rgba(15, 76, 100)', light: 'rgba(15, 76, 100, 0.5)'},
     suvaGrey: {main: 'rgba(144, 144, 144))', light: 'rgba(144, 144, 144, 0.2)'},
@@ -155,6 +155,7 @@ export const theme = createTheme({
   state: {
     hover: 'rgba(15, 76, 100, 0.08)',
     ratingActive: '#FFB400',
+    scheduleWarningColor: '#FFB547',
     aubergine: '#231F20',
   },
   components: {
@@ -216,6 +217,16 @@ export const theme = createTheme({
           fontSize: '0.75rem',
           lineHeight: 2,
           letterSpacing: '0.15px',
+
+          '& .MuiInputLabel-asterisk': {
+            color: 'red',
+          },
+        },
+        shrink: {
+          transform: 'translate(14px, -11px) scale(1) !important',
+        },
+        outlined: {
+          transform: 'translate(14px, 10px) scale(1)',
         },
       },
     },

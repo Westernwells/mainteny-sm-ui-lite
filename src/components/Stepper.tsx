@@ -5,6 +5,7 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import useTheme from '@mui/material/styles/useTheme';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   steps: string[];
@@ -33,9 +34,9 @@ export const Stepper = ({
   stepperWidth,
   submitting,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
-  console.log(initialActiveStep);
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
@@ -72,7 +73,7 @@ export const Stepper = ({
                     pl: 0,
                   },
                 }}>
-                <StepLabel {...labelProps}>{label}</StepLabel>
+                <StepLabel {...labelProps}>{t(label)}</StepLabel>
               </Step>
             );
           })}
@@ -91,7 +92,7 @@ export const Stepper = ({
                   }}
                   sx={{mr: '1.5em', color: theme.palette.text.secondary}}
                   variant="text">
-                  Cancel
+                  {t('Cancel')}
                 </Button>
                 <Button
                   color="inherit"
@@ -99,7 +100,7 @@ export const Stepper = ({
                   disabled={activeStep === 0}
                   onClick={handleBack}
                   sx={{mr: '1.5em'}}>
-                  Back
+                  {t('Back')}
                 </Button>
               </>
             ) : null}
@@ -112,9 +113,9 @@ export const Stepper = ({
               }>
               {activeStep === steps.length - 1
                 ? submitting
-                  ? 'Submitting...'
-                  : 'Submit'
-                : 'Next'}
+                  ? `${t('Submitting')}...`
+                  : t('Submit')
+                : t('Next')}
             </Button>
           </Box>
         </Box>

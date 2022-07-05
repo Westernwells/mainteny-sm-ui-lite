@@ -8,6 +8,7 @@ import {PageCard} from 'components/PageCard';
 import {FormSelect} from 'components/form/FormSelect';
 import {TimePicker} from 'components/TimePicker';
 import {formatDate, setDateTime} from 'utils/datetime';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   getAppointmentFormErrors?: (val: FormikErrors<AppointmentFormModel>) => void;
@@ -30,6 +31,7 @@ export const AppointmentPreferenceForm = ({
   getAppointmentFormValues,
   initialValues,
 }: Props) => {
+  const {t} = useTranslation();
   const formik = useFormik<AppointmentFormModel>({
     initialValues: {
       appointmentDaysOfWeek: initialValues?.appointmentDaysOfWeek || [],
@@ -64,7 +66,7 @@ export const AppointmentPreferenceForm = ({
           <Grid item md={4}>
             <FormSelect
               labelId="daysOfWeek-label"
-              label="Days of the week"
+              label={t('Days of the week')}
               options={Object.keys(daysOfWeekOptions).map((key) => ({
                 label: key,
                 value: daysOfWeekOptions[key as keyof typeof daysOfWeekOptions],
@@ -95,7 +97,7 @@ export const AppointmentPreferenceForm = ({
                 );
               }}
               textFieldProps={{
-                label: 'Opening Hour',
+                label: t('Opening Hour'),
                 name: 'openingHour',
 
                 onBlur: formik.handleBlur,
@@ -123,7 +125,7 @@ export const AppointmentPreferenceForm = ({
                 );
               }}
               textFieldProps={{
-                label: 'Closing Hour',
+                label: t('Closing Hour'),
                 name: 'closingHour',
 
                 onBlur: formik.handleBlur,
@@ -134,7 +136,7 @@ export const AppointmentPreferenceForm = ({
           <Grid item md={4}>
             <FormSelect
               labelId="requiresAppointment-label"
-              label="Requires Appointment"
+              label={t('Requires Appointment')}
               options={['YES', 'NO'].map((key) => ({
                 label: key,
                 value: key,
@@ -170,7 +172,7 @@ export const AppointmentPreferenceForm = ({
               props={{
                 label: 'Notification Due',
                 name: 'appointmentNotificationDueInDays',
-                placeholder: 'E.g 5 days',
+                placeholder: 'E.g. 5 days',
                 value: formik.values.appointmentNotificationDueInDays,
                 onChange: formik.handleChange,
                 onBlur: formik.handleBlur,

@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   GridAlignment,
   GridColDef,
@@ -11,7 +12,7 @@ import Box from '@mui/material/Box';
 import {useNavigate} from 'react-router';
 import _ from 'lodash';
 import {ArticleType, ArticleView} from '../../../models/article';
-import {formatCurrency} from '../../../utils/currency';
+import {formatNetAmount} from '../../../utils/currency';
 import {createEmptyResource, makePage} from '../../../utils/paging-utils';
 import {useArticles} from '../../../hooks/reactQuery/useArticle';
 import {Progress} from '../../../components/Progress';
@@ -26,13 +27,18 @@ import {convertToText} from '../../../utils/utils';
 
 const defaultProps = {
   editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
+  sortable: false,
+  renderHeader: (params: GridColumnHeaderParams) => {
+    const {t} = useTranslation();
+
+    return (
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName && t(params.colDef.headerName)}
+      </Typography>
+    );
+  },
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" mx="0.5em">
+    <Typography variant="body2" mx="0.5em" style={{overflowWrap: 'anywhere'}}>
       {params.value || '-'}
     </Typography>
   ),
@@ -47,10 +53,35 @@ const defaultAlignment: {
   align: 'left',
 };
 
+const NoArticleSection = ({
+  placeholder,
+  action,
+  onSearch,
+}: {
+  placeholder: string;
+  action?: () => void;
+  onSearch: boolean;
+}) => (
+  <>
+    {!onSearch && (
+      <EmptySection
+        illustration="clipboard"
+        size="tiny"
+        containerStyle={{m: 'auto', width: '60%'}}
+        label={`No ${placeholder} yet. Please click the button below to add a new ${placeholder}`}
+        showActionBtn
+        btnLabel="+ Add New Article"
+        btnAction={action}
+      />
+    )}
+    {onSearch && <Box />}
+  </>
+);
+
 export const columns: GridColDef[] = [
   {
     field: 'externalId',
-    headerName: 'EXTERNAL ID',
+    headerName: 'NUMBER',
     type: 'string',
     cellClassName: 'nowrap',
     flex: 1,
@@ -72,6 +103,7 @@ export const columns: GridColDef[] = [
     field: 'category',
     headerName: 'CATEGORY',
     type: 'string',
+    cellClassName: 'truncateText',
     ...defaultAlignment,
     ...defaultProps,
   },
@@ -89,6 +121,7 @@ export const columns: GridColDef[] = [
     field: 'model',
     headerName: 'MODEL',
     type: 'string',
+    cellClassName: 'truncateText',
     ...defaultAlignment,
     ...defaultProps,
   },
@@ -97,6 +130,7 @@ export const columns: GridColDef[] = [
     headerName: 'PURCHASE PRICE',
     type: 'string',
     flex: 2,
+    cellClassName: 'truncateText',
     headerAlign: 'right',
     align: 'right',
     ...defaultProps,
@@ -106,6 +140,7 @@ export const columns: GridColDef[] = [
     headerName: 'SELLING PRICE',
     type: 'string',
     flex: 2,
+    cellClassName: 'truncateText',
     headerAlign: 'right',
     align: 'right',
     ...defaultProps,
@@ -118,11 +153,16 @@ export const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'center',
     editable: false,
-    renderHeader: (params: GridColumnHeaderParams) => (
-      <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName}
-      </Typography>
-    ),
+    sortable: false,
+    renderHeader: (params: GridColumnHeaderParams) => {
+      const {t} = useTranslation();
+
+      return (
+        <Typography variant="subtitle2" color="textSecondary">
+          {params.colDef.headerName && t(params.colDef.headerName)}
+        </Typography>
+      );
+    },
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
         label={params.value}
@@ -142,48 +182,14 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
     category: item.category,
     manufacturer: item.manufacturer,
     model: item.model,
-    purchasePrice: `${formatCurrency(
-      item
-        ? item.unitPurchaseAmount.netAmount /
-            10 ** item.unitPurchaseAmount.fractionDigits!
-        : 0,
-      {
-        currency: item.unitPurchaseAmount.currency,
-      },
-    )}`,
-    sellingPrice: `${formatCurrency(
-      item
-        ? item.unitSellingAmount.netAmount /
-            10 ** item.unitSellingAmount.fractionDigits!
-        : 0,
-      {
-        currency: item.unitSellingAmount.currency,
-      },
-    )}`,
+    purchasePrice: formatNetAmount(item.unitPurchaseAmount),
+    sellingPrice: formatNetAmount(item.unitSellingAmount),
     stock: item.stock.currentStock,
     navigateTo: `details/${item.id}`,
     item,
   }));
 
 const pageSize = 25;
-
-const NoArticleSection = ({
-  placeholder,
-  action,
-}: {
-  placeholder: string;
-  action?: () => void;
-}) => (
-  <EmptySection
-    illustration="clipboard"
-    size="tiny"
-    containerStyle={{m: 'auto', width: '60%'}}
-    label={`No ${placeholder} yet. Please click the button below to add a new ${placeholder}`}
-    showActionBtn
-    btnLabel="+ Add New Article"
-    btnAction={action}
-  />
-);
 
 export const ArticleListDataGrid = () => {
   const navigate = useNavigate();
@@ -212,6 +218,11 @@ export const ArticleListDataGrid = () => {
     navigate('new');
   };
 
+  const clearAllFilters = () => {
+    setQuery('');
+    setType('');
+  };
+
   useEffect(() => {
     setPageCount(Math.ceil(articleResource.total / page.pageSize));
   }, [page.pageSize]);
@@ -238,10 +249,10 @@ export const ArticleListDataGrid = () => {
     <PageListingLayout
       renderWidget={
         <Widget
-          searchPlaceholder="Search by number, name, manufacturer etc."
+          searchPlaceholder="Search by name, category, manufacturer etc."
           getSearchValue={setQuery}
           filterItems={
-            <FilterFields>
+            <FilterFields onClear={() => clearAllFilters()}>
               <MultipleSelectCheckmarks
                 label="Type"
                 options={Object.keys(ArticleType).map((it) =>
@@ -251,6 +262,7 @@ export const ArticleListDataGrid = () => {
                   setType(item[0]?.toUpperCase())
                 }
                 multiple={false}
+                initialSelectedItems={[type]}
               />
             </FilterFields>
           }
@@ -260,6 +272,7 @@ export const ArticleListDataGrid = () => {
         rows={rows}
         columns={columns}
         loading={isFetching}
+        scrollToTop={query}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
         pageCount={pageCount}
@@ -271,7 +284,11 @@ export const ArticleListDataGrid = () => {
           }))
         }
         noRowsEmptySection={
-          <NoArticleSection placeholder="article" action={addNewArticle} />
+          <NoArticleSection
+            placeholder="article"
+            action={addNewArticle}
+            onSearch={!!type || !!query}
+          />
         }
       />
     </PageListingLayout>

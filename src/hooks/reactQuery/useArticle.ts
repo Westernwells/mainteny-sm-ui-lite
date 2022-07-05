@@ -1,16 +1,18 @@
+import {useCallback} from 'react';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
-import {useNavigate} from 'react-router';
 import {queryKeys, queryKeys as qk} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
-import {useSnackbar} from 'notistack';
+import {useSnackbar} from 'hooks/useSnackbar';
 import _ from 'lodash';
-import {Resource, RestError, StringValue} from 'models/misc';
 import {
   ArticleView,
   CreateArticleRecord,
   QueryArticleParams,
   UpdateArticleRecord,
+  ServiceOrderArticleRecord,
 } from 'models/article';
+import {Resource, RestError, StringValue} from 'models/misc';
+import {data} from 'utils/partial-article-data';
 import {useUserSession} from './useUserSession';
 
 export const fetchArticles = async (
@@ -28,13 +30,36 @@ export const fetchArticles = async (
   return response.data;
 };
 
-export function useArticles(params: QueryArticleParams, options?: any) {
+export function useArticles(
+  params: QueryArticleParams,
+  options?: any,
+  showPartial?: boolean,
+) {
   const {user} = useUserSession();
   return useQuery<Resource<ArticleView>, RestError>(
     [qk.fetchArticles, params, user?.userAccount.id],
     () => fetchArticles(params, user!.userAccount.serviceCompany.id),
     {
       enabled: !!user,
+      select: useCallback(
+        (articlesRes: Resource<ArticleView>) => {
+          const filteredRes = articlesRes.data.filter(
+            (i) => i.unit !== 'PARTIAL',
+          );
+
+          return showPartial
+            ? articlesRes
+            : {
+                data: filteredRes,
+                page: {
+                  pageIndex: articlesRes.page.pageIndex,
+                  pageSize: filteredRes.length,
+                },
+                total: articlesRes.total,
+              };
+        },
+        [showPartial],
+      ),
       ...options,
     },
   );
@@ -46,18 +71,10 @@ const fetchArticleDetails = async (articleId: string) => {
   );
   return response.data;
 };
-export const useArticleDetails = (articleId?: string) => {
-  const navigate = useNavigate();
-  return useQuery(
-    [qk.fetchArticleDetail, articleId],
-    () => fetchArticleDetails(articleId!),
-    {
-      onError: (e: any) => {
-        if (e.response.status === 500) navigate('/404');
-      },
-    },
+export const useArticleDetails = (articleId?: string) =>
+  useQuery([qk.fetchArticleDetail, articleId], () =>
+    fetchArticleDetails(articleId!),
   );
-};
 
 const createArticle = async (
   body: CreateArticleRecord,
@@ -140,6 +157,66 @@ export const useUpdateArticle = (successMsg?: string) => {
       onError: (err: any) => {
         console.log(err);
         enqueueSnackbar('Some error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+export const updateServiceOrderArticle = async (
+  serviceOrderId: string,
+  body: Partial<ServiceOrderArticleRecord>[],
+) => axiosClient.put(`/api/serviceOrders/${serviceOrderId}/articles`, body);
+
+export const useUpdateServiceOrderArticles = (successMsg?: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({
+      body,
+      serviceOrderId,
+    }: {
+      body: Partial<ServiceOrderArticleRecord>[];
+      serviceOrderId: string;
+    }) => updateServiceOrderArticle(serviceOrderId, body),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(qk.getServiceOrderDetails);
+      },
+    },
+  );
+};
+
+export const postPartialArticle = async (serviceCompanyId?: string) => {
+  if (serviceCompanyId)
+    await axiosClient.post('api/articles', {
+      ...data,
+      serviceCompanyId,
+    });
+};
+
+export const useCreatePartialArticle = () => {
+  const queryClient = useQueryClient();
+  const {user} = useUserSession();
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    () => postPartialArticle(user!.userAccount.serviceCompany.id),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([qk.fetchArticles]);
+        enqueueSnackbar(`Partial Invoice Supported`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again!', {
           variant: 'error',
         });
       },

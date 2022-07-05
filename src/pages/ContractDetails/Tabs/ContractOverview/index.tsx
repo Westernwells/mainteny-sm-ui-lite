@@ -1,35 +1,49 @@
-import {useMemo, useState} from 'react';
+import {FC, useMemo, useState} from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
-import {
-  useContractDetails,
-  useUpdateContract,
-} from 'hooks/reactQuery/useContract';
+import {useUpdateContract} from 'hooks/reactQuery/useContract';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
+import {useMediaQuery} from '@mui/material';
 import {useParams} from 'react-router-dom';
-import {formatDate, toDate} from 'utils/datetime';
+import {toDate} from 'utils/datetime';
 import {differenceInDays, isBefore} from 'date-fns';
 import {useFormik} from 'formik';
-import {ContractRequestBody} from 'models/contract';
+import {
+  ContractRequestBody,
+  ContractUpdateRequest,
+  ContractView,
+} from 'models/contract';
 import {InfoCard} from 'components/InfoCard';
 import {Dialog} from 'components/Dialog';
 
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
-import {FileWithPreview, MyDropZone} from 'components/MyDropzone';
+import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import * as Yup from 'yup';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
-import {formatCurrency} from 'utils/currency';
+import {
+  amountForView,
+  amountRecordForBackend,
+  formatCurrency,
+  formatNetAmount,
+} from 'utils/currency';
 import {convertToMacro, convertToText} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
 import EditContractForm from './EditContractForm';
 import {ContractParties} from './ContractParties';
+
+interface Props {
+  contractDetails: ContractView;
+  isLoading: boolean;
+}
 
 const validationSchema = Yup.object().shape({
   renewalTerms: Yup.number()
@@ -37,49 +51,61 @@ const validationSchema = Yup.object().shape({
     .max(12, '12 is maximum value'),
 });
 
-export const ContractOverview = () => {
+export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const {id: contractId} = useParams();
   const theme = useTheme();
-  const {data: contractDetails, isLoading} = useContractDetails(contractId!);
   const {mutateAsync: updateContract} = useUpdateContract('Contract updated');
   const {user} = useUserSession();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [openContractDialog, setOpenContractDialog] = useState(false);
   const [openDocumentDialog, setOpenDocumentDialog] = useState(false);
 
   const [documents, setDocuments] = useState<FileWithPreview[]>([]);
 
-  const formik = useFormik<ContractRequestBody>({
+  const {mutateAsync: uploadFiles} = useUploadFiles(
+    'Documents uploaded successfully',
+  );
+
+  const {data: downloadUrls = {}} = useDownloadUrl(
+    contractDetails?.additionalInfo?.documents
+      ? contractDetails.additionalInfo.documents.map((item) => item.uri)
+      : [],
+  );
+
+  const formik = useFormik<ContractUpdateRequest>({
     initialValues: {
       type: contractDetails?.type!,
-      price: contractDetails?.additionalInfo?.price?.netAmount || 0,
+      price: contractDetails?.additionalInfo?.price
+        ? amountForView(contractDetails?.additionalInfo?.price).netAmount
+        : '',
       invoiceDue: contractDetails?.additionalInfo?.invoiceDue!,
-      renewalTerms: contractDetails?.additionalInfo?.renewalTerms || 0,
-      visitsNumber: contractDetails?.visitsNumber || 0,
-      spendingLimit: contractDetails?.spendingLimit || 0,
+      renewalTerms: contractDetails?.additionalInfo?.renewalTerms || '',
+      visitsNumber: contractDetails?.visitsNumber || '',
+      spendingLimit: contractDetails?.spendingLimit || '',
     },
     onSubmit: () => {},
     enableReinitialize: true,
     validationSchema,
   });
 
-  console.log(contractDetails, '<<< contractDetails', user);
-
   const onContractSave = async () => {
     const updatedContract = {
       ...contractDetails,
       type: convertToMacro(formik.values.type || ''),
       ...contractDetails?.additionalInfo,
-      renewalTerms: Number(formik.values.renewalTerms),
+      renewalTerms: +formik.values.renewalTerms,
       price: {
-        ...contractDetails?.additionalInfo.price,
-        netAmount: Number(formik.values.price),
-        currency: 'EUR',
-        percentageVat: user?.userAccount.serviceCompany.settings.percentageVat,
+        ...amountRecordForBackend({
+          netAmount: +formik.values.price,
+          currency: 'EUR',
+          percentageVat:
+            user?.userAccount.serviceCompany.settings.percentageVat || 0,
+        }),
       },
       invoiceDue: convertToMacro(formik.values.invoiceDue || ''),
-      visitsNumber: formik.values.visitsNumber,
-      spendingLimit: formik.values.spendingLimit,
+      visitsNumber: +formik.values.visitsNumber,
+      spendingLimit: +formik.values.spendingLimit,
       startDate: contractDetails?.startTime,
       endDate: contractDetails?.endTime,
       timePreference: contractDetails?.timePreference || [],
@@ -92,14 +118,15 @@ export const ContractOverview = () => {
   };
 
   const onDocsPreview = async () => {
-    const uploadPath = `${contractDetails?.id}/documents`;
+    const serviceCompanyId = user?.userAccount.serviceCompany.id;
+    const uploadPath = `${serviceCompanyId}/contracts/${contractId}/documents`;
+    await uploadFiles({files: documents, uploadPath});
     const updatedContract = {
       ...contractDetails,
       ...contractDetails?.additionalInfo,
       documents: [
-        ...(contractDetails?.additionalInfo?.documents || []),
         ...documents.map((item) => ({
-          description: '',
+          description: item.name.split('.')[0],
           type: item.type,
           uri: `${uploadPath}/${item.name}`,
         })),
@@ -160,16 +187,10 @@ export const ContractOverview = () => {
             }
             headerActionIcon={<EditIcon />}>
             <ContractBasic
-              type={contractDetails?.type}
               numberOfVisits={contractDetails?.visitsNumber}
-              costPerYear={formatCurrency(
-                contractDetails && contractDetails.additionalInfo?.price
-                  ? contractDetails.additionalInfo.price.netAmount
-                  : 0,
-                {
-                  currency: contractDetails?.currency || 'EUR',
-                },
-              )}
+              costPerYear={
+                formatNetAmount(contractDetails.additionalInfo?.price) || '-'
+              }
               spendingLimit={formatCurrency(
                 contractDetails ? contractDetails.spendingLimit : 0,
                 {
@@ -181,6 +202,7 @@ export const ContractOverview = () => {
                 contractDetails?.additionalInfo?.invoiceDue || '',
               )}
               numberOfUnits={contractDetails?.elevators?.length}
+              type={contractDetails?.type.toLowerCase()}
             />
             <Dialog
               title="Edit Contract"
@@ -193,13 +215,14 @@ export const ContractOverview = () => {
           </InfoCard>
 
           <Grid container spacing={2}>
-            <Grid item xs={8}>
+            <Grid item xs={12} md={8}>
               <ContractCard
                 containerStyles={{
                   mt: '1em',
                   '& .MuiCardHeader-root': {
                     pb: 0,
                   },
+                  height: 'calc(100% - 1em)',
                 }}
                 header={
                   <Box sx={headerStyles}>
@@ -209,29 +232,36 @@ export const ContractOverview = () => {
                   </Box>
                 }>
                 <ContractParties
-                  name={contractDetails?.propertyOwner.name}
+                  name={user?.userAccount.serviceCompany.name}
                   occupation="Service Company"
+                  address={
+                    user?.userAccount.serviceCompany.postalAddress?.fullName
+                  }
+                  phoneNumber={user?.userAccount.serviceCompany.contact.phone}
+                  partyType="CONTRACTOR"
+                  chipStyles={{
+                    chipMaxChars: 15,
+                    chipColor: 'warning',
+                  }}
+                />
+                <ContractParties
+                  name={contractDetails?.propertyOwner.name}
+                  occupation="Property Owner"
                   address={
                     contractDetails?.propertyOwner.postalAddress.fullName
                   }
                   phoneNumber={contractDetails?.propertyOwner.contact.phone}
-                  partyType="Contractor"
-                  chipColor="warning"
-                />
-                <ContractParties
-                  name={contractDetails?.serviceCompany.name}
-                  occupation="Property manager"
-                  address=""
-                  phoneNumber=""
-                  partyType="Customer"
-                  chipColor="primary"
+                  partyType="CUSTOMER"
+                  chipStyles={{
+                    chipColor: 'primary',
+                  }}
                 />
               </ContractCard>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <ContractCard
                 containerStyles={{
-                  mt: '1em',
+                  mt: !isMobile ? '1em' : 0,
                   pt: 2,
                   px: 2,
                   height: 'calc(100% - 1em)',
@@ -251,48 +281,60 @@ export const ContractOverview = () => {
                   <Typography color="#2196F3">+ Add</Typography>
                 }
                 headerAction={() => setOpenDocumentDialog(true)}>
-                {contractDetails?.additionalInfo?.documents?.length ? (
-                  <Box sx={{height: '140px', overflowY: 'auto'}}>
-                    {contractDetails?.additionalInfo?.documents.map(
-                      (documnet) => (
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            mb: 2,
-                          }}>
-                          <Box
-                            sx={{
-                              border: '1px solid #8F9BB380',
-                              padding: '1em',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              alignItems: 'center',
-                              borderRadius: '4px',
-                            }}>
-                            <FileCopyIcon
-                              fontSize="large"
-                              htmlColor="rgba(15, 76, 100, 0.5)"
-                            />
-                            <Typography
-                              sx={{marginTop: '10px', color: '#8F9BB3'}}>
-                              {documnet.type}
-                            </Typography>
-                          </Box>
-                          <Typography
-                            align="center"
-                            sx={{color: '#8F9BB3', marginTop: '10px'}}>
-                            Signed Contract {formatDate(documnet.createdAt)}
-                          </Typography>
-                        </Box>
-                      ),
-                    )}
+                {contractDetails?.additionalInfo?.documents![0] ? (
+                  <Box
+                    sx={{
+                      height: '155px',
+                      overflowY: 'auto',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      flexDirection: 'column',
+                    }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mt: 2,
+                        cursor: 'pointer',
+                      }}>
+                      <Box
+                        sx={{
+                          border: '1px solid #8F9BB380',
+                          padding: '1em',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          borderRadius: '4px',
+                        }}
+                        onClick={() =>
+                          window.open(
+                            downloadUrls[
+                              contractDetails?.additionalInfo?.documents![0]
+                                ?.uri
+                            ],
+                            '_blank',
+                          )
+                        }>
+                        <FileCopyIcon
+                          fontSize="large"
+                          htmlColor="rgba(15, 76, 100, 0.5)"
+                        />
+                      </Box>
+                      <Typography
+                        align="center"
+                        sx={{color: '#8F9BB3', marginTop: '10px'}}>
+                        {
+                          contractDetails?.additionalInfo?.documents[0]
+                            .description
+                        }
+                      </Typography>
+                    </Box>
                   </Box>
                 ) : (
                   <EmptySection
-                    label="No documents attached. They will appear here once added!"
+                    label="No document yet. It will be appear here once added."
                     illustration="clipboard"
                     size="tiny"
                     containerStyle={{
@@ -305,6 +347,7 @@ export const ContractOverview = () => {
                   isSaving={false}
                   onCancel={() => setOpenDocumentDialog(false)}
                   onSave={() => onDocsPreview()}
+                  disableSaveBtn={!documents.length}
                   dialogProps={{
                     maxWidth: 'md',
                     open: openDocumentDialog || false,
@@ -314,6 +357,7 @@ export const ContractOverview = () => {
                       setDocuments(dropedFiles);
                     }}
                     acceptedFileTypes="application/pdf"
+                    maxFiles={1}
                   />
                 </Dialog>
               </ContractCard>

@@ -9,13 +9,14 @@ import {UnitDetailsFormModel} from 'models/unitForm';
 import {useState} from 'react';
 import {createEmptyResource} from 'utils/paging-utils';
 import {convertToText} from 'utils/utils';
-import InputAdornment from '@mui/material/InputAdornment';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   formik: FormikProps<UnitDetailsFormModel>;
 }
 
 export const EditUnitDetailsForm = ({formik}: Props) => {
+  const {t} = useTranslation();
   const [unitTypeQuery, setUnitTypeQuery] = useState('');
   const [modelQuery, setModelQuery] = useState('');
   const {data: elevatorTypeResource = createEmptyResource<string>()} =
@@ -43,13 +44,13 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
       <Grid item md={6}>
         <ComboBox
           options={Object.keys(ElevatorCategory).map((item) => ({
-            label: convertToText(item),
+            label: t(convertToText(item)),
             value: convertToText(item),
           }))}
           initialValue={
             formik.values.category
               ? {
-                  label: formik.values.category,
+                  label: t(formik.values.category),
                   value: formik.values.category,
                 }
               : null
@@ -62,7 +63,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
             onBlur: formik.handleBlur,
             error: !!(formik.touched.category && formik.errors.category),
             helperText: formik.errors.category,
-            placeholder: 'e.g Escalator',
+            placeholder: t('e.g Escalator'),
           }}
         />
       </Grid>
@@ -83,12 +84,12 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
       <Grid item md={6}>
         <FormInput
           props={{
-            placeholder: 'Model number of the elevator',
+            placeholder: 'e.g. 100001',
             label: 'Unit Number',
-            name: 'unitNumber',
-            value: formik.values.unitNumber,
-            error: !!(formik.touched.unitNumber && formik.errors.unitNumber),
-            helperText: formik.errors.unitNumber,
+            name: 'externalId',
+            value: formik.values.externalId,
+            error: !!(formik.touched.externalId && formik.errors.externalId),
+            helperText: formik.errors.externalId,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
           }}
@@ -127,7 +128,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
         <FormInput
           props={{
             size: 'small',
-            placeholder: 'e.g SafeLine',
+            placeholder: 'e.g. SafeLine',
             label: 'Emergency Phone Provider',
             name: 'emergencyPhoneProvider',
             value: formik.values.emergencyPhoneProvider,
@@ -155,9 +156,9 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
           initialQuery={formik.values.unitType}
           getQuery={(item) => setUnitTypeQuery(item || '')}
           textFieldProps={{
-            placeholder: 'Automatic, manual, etc',
+            placeholder: t('Automatic, manual, etc'),
             name: 'unitType',
-            label: 'Unit Type',
+            label: t('Unit Type'),
           }}
         />
       </Grid>
@@ -181,8 +182,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
           getQuery={(item) => setModelQuery(item || '')}
           textFieldProps={{
             name: 'model',
-            label: 'Model',
-            placeholder: 'e.g. S2000',
+            label: t('Model'),
+            placeholder: t('e.g. S2000'),
           }}
         />
       </Grid>
@@ -209,11 +210,6 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
             value: formik.values.unitCapacity,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
-            InputProps: {
-              endAdornment: (
-                <InputAdornment position="start">kg</InputAdornment>
-              ),
-            },
           }}
         />
       </Grid>
@@ -223,7 +219,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
           props={{
             size: 'small',
             disabled: true,
-            placeholder: 'Enter Spending Limit ',
+            placeholder: 'Enter Spending Limit',
             label: 'Spending Limit',
             name: 'spendingLimit',
             error: !!formik.errors.spendingLimit,

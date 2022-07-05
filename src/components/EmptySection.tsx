@@ -1,4 +1,5 @@
 import Typography from '@mui/material/Typography';
+import {useTranslation} from 'react-i18next';
 import Box, {BoxProps} from '@mui/material/Box';
 import {ReactComponent as LaptopIllustration} from 'assets/illustrations/Laptop.svg';
 import {ReactComponent as ClipboardIllustration} from 'assets/illustrations/Clipboard.svg';
@@ -27,6 +28,7 @@ export const EmptySection = ({
   showActionBtn = false,
   btnAction,
 }: Props) => {
+  const {t} = useTranslation();
   const Width = {
     tiny: '56px',
     small: '128px',
@@ -43,6 +45,7 @@ export const EmptySection = ({
         return <LaptopIllustration style={{width: '100%', height: '100%'}} />;
     }
   };
+
   return (
     <Box
       display="flex"
@@ -57,7 +60,7 @@ export const EmptySection = ({
         variant={labelVariant || 'subtitle2'}
         textAlign="center"
         sx={{...labelStyle}}>
-        {label}
+        {t(label)}
       </Typography>
       {showActionBtn ? (
         <Button
@@ -67,7 +70,7 @@ export const EmptySection = ({
             variant: 'contained',
             size: 'medium',
           }}>
-          {btnLabel}
+          {t(btnLabel)}
         </Button>
       ) : null}
     </Box>

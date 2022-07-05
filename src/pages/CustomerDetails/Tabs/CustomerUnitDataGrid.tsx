@@ -1,101 +1,101 @@
-import {
-  GridAlignment,
-  GridColDef,
-  GridColumnHeaderParams,
-  GridRenderCellParams,
-  GridRowModel,
-} from '@mui/x-data-grid';
+import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
-import {StatusChip} from 'components/StatusChip';
-import {ElevatorStatus, ElevatorView} from 'models/elevator';
-import {Resource} from 'models/misc';
-import {convertToText} from 'utils/utils';
+import {Elevator} from '@mui/icons-material';
 
-const defaultProps = {
-  editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
-  renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" mx="0.5em">
-      {params.value}
-    </Typography>
-  ),
-};
-const defaultAlignment: {
-  flex: number;
-  headerAlign: GridAlignment;
-  align: GridAlignment;
-} = {
-  flex: 1,
-  headerAlign: 'center',
-  align: 'center',
-};
+import {StatusChip} from 'components/StatusChip';
+import {formatDate} from 'utils/datetime';
+import {getColumnProps} from 'components/DataGridLayout';
+import {ElevatorView} from 'models/elevator';
 
 export const columns: GridColDef[] = [
-  {
+  getColumnProps({
+    field: 'number',
+    headerName: 'number',
+    align: 'center',
+    flex: 0,
+  }),
+  getColumnProps({
     field: 'model',
-    headerName: 'MODEL',
-    type: 'string',
-    flex: 2,
-    headerAlign: 'left',
-    ...defaultProps,
-  },
-  {
-    field: 'unitNumber',
-    headerName: 'UNIT NUMBER',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'address',
-    headerName: 'ADDRESS',
-    type: 'string',
-    flex: 1.5,
-    ...defaultProps,
-  },
-  {
-    field: 'lastVisit',
-    headerName: 'LAST VISIT',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'status',
-    headerName: 'STATUS',
-    type: 'string',
-    ...defaultAlignment,
-    editable: false,
-    renderHeader: (params: GridColumnHeaderParams) => (
-      <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName}
-      </Typography>
-    ),
+    headerName: 'model',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
+      <>
+        <Elevator style={{marginInline: '.25em'}} />
+        <Typography variant="body2">{params.value || '-'}</Typography>
+      </>
+    ),
+  }),
+  getColumnProps({
+    field: 'customer',
+    headerName: 'customer',
+    cellClassName: 'truncateText',
+    flex: 1.5,
+  }),
+  getColumnProps({
+    field: 'address',
+    headerName: 'address',
+    cellClassName: 'truncateText',
+    flex: 1.5,
+  }),
+  getColumnProps({
+    field: 'lastVisit',
+    headerName: 'last visit',
+    align: 'center',
+    flex: 0,
+  }),
+  getColumnProps({
+    field: 'nextVisit',
+    headerName: 'next visit',
+    flex: 0,
+  }),
+  getColumnProps({
+    field: 'priorityTechnician',
+    headerName: 'priority technician',
+    cellClassName: 'truncateText',
+  }),
+  getColumnProps({
+    field: 'activeContracts',
+    headerName: 'active contracts',
+    align: 'center',
+    headerAlign: 'center',
+    renderCell: (params) => (
       <StatusChip
-        label={convertToText(params.value)}
-        color={params.value === ElevatorStatus.RUNNING ? 'success' : 'error'}
+        label={params.value ? 'Yes' : 'No'}
+        color={params.value ? 'success' : 'error'}
         variant="filled"
+        size="small"
+        maxChars={3}
       />
     ),
-  },
+  }),
 ];
 
-export const makeRows = (
-  units: Resource<ElevatorView>,
-): GridRowModel<{[key: string]: any}[]> =>
-  units.data.length
-    ? units.data.map((item: ElevatorView, index: number) => ({
-        id: index,
-        model: item.model,
-        unitNumber: item.number,
-        address: item.address.fullName,
-        lastVisit: item.lastVisitDate,
-        status: item.status,
-        navigateTo: `/units/details/${item.id}`,
-      }))
-    : [];
+export const makeRows = ({
+  elevators,
+}: {
+  elevators: ElevatorView[];
+}): GridRowsProp => {
+  const result =
+    elevators.length &&
+    elevators.map((elevator: ElevatorView, index: number) => ({
+      id: index,
+      number: elevator.number,
+      model: elevator.model,
+      customer: elevator.propertyOwner.name,
+      lastVisit: formatDate(elevator.lastVisitDate),
+      nextVisit: formatDate(elevator.nextVisitDate),
+      address: elevator.address.fullName,
+      headerText: elevator.address.fullName,
+      priorityTechnician: elevator.assignments?.length
+        ? elevator.assignments
+            .map(
+              (item) =>
+                `${item.technician.userAccount.firstName} ${item.technician.userAccount.lastName}`,
+            )
+            .join(', ')
+        : '-',
+      activeContracts: !!elevator.contracts?.length,
+      elevator,
+      navigateTo: `/units/details/${elevator.id}`,
+    }));
+  return result || [];
+};

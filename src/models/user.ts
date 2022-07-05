@@ -114,6 +114,8 @@ export interface UserData {
   isOnline: Boolean;
   additionalInfo: UserAdditionalInfo;
   meta: Meta;
+  team: string;
+  externalId: string;
 }
 
 export interface ServiceManagerData {}

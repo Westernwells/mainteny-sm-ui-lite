@@ -1,5 +1,4 @@
-/* eslint-disable */
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
@@ -23,7 +22,10 @@ import {
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
-import {costRangeConvertor as crConverter} from 'utils/contract-utils';
+import {
+  costRangeConvertor as crConverter,
+  getStartEndPrice,
+} from 'utils/contract-utils';
 import {columns, makeRows} from './ContractsDataGridProps';
 
 const pageSize = 25;
@@ -42,6 +44,8 @@ export const Contracts = () => {
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
 
+  const [priceStart, priceEnd] = useMemo(() => getStartEndPrice(cost), [cost]);
+
   const {
     data: contractResource = createEmptyResource<ContractView>(10),
     isLoading,
@@ -56,8 +60,10 @@ export const Contracts = () => {
       pageSize: page.pageSize || 25,
       query: search,
       status,
+      priceStart,
+      priceEnd,
     },
-    {price: cost},
+    {},
     {keepPreviousData: true},
   );
 
@@ -66,11 +72,16 @@ export const Contracts = () => {
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
 
-    setPage({
-      ...page,
-      pageSize: Number(currentParams.pageSize),
-      pageIndex: Number(currentParams.pageIndex) - 1,
-    });
+    if (currentParams.pageSize)
+      setPage({
+        ...page,
+        pageSize: Number(currentParams.pageSize),
+      });
+    if (currentParams.pageIndex)
+      setPage({
+        ...page,
+        pageIndex: Number(currentParams.pageIndex) - 1,
+      });
   }, [queryParams]);
 
   const costRangeConvertor = (selectedItems: string[]) => {
@@ -81,18 +92,19 @@ export const Contracts = () => {
   useEffect(() => {
     const options: string[] = [];
     // TODO: Resolve 'any' here
-    contractResource.data.forEach((item: any) => {
-      if (
-        !options.includes(item.serviceCompany.name) &&
-        !contractorFilterItems.includes(item.serviceCompany.name)
-      ) {
-        options.push(item.serviceCompany.name);
-      }
-    });
-    setRows(makeRows(contractResource.data));
-
-    setContractorFilterItems([...contractorFilterItems, ...options]);
-  }, [contractResource]);
+    if (!isLoading && !isFetching && !isIdle) {
+      contractResource.data.forEach((item: any) => {
+        if (
+          !options.includes(item.serviceCompany.name) &&
+          !contractorFilterItems.includes(item.serviceCompany.name)
+        ) {
+          options.push(item.serviceCompany.name);
+        }
+      });
+      setRows(makeRows(contractResource.data));
+      setContractorFilterItems([...contractorFilterItems, ...options]);
+    }
+  }, [contractResource, isLoading, isFetching, isIdle]);
 
   useEffect(() => {
     setPageCount(Math.ceil(contractResource.total / page.pageSize));
@@ -122,7 +134,7 @@ export const Contracts = () => {
       <MultipleSelectCheckmarks
         label="Price Range"
         options={['0 - €500', '€500 - €1,000', '> €1,000']}
-        initialSelectedItems={cost}
+        initialSelectedItems={[]}
         getSelectedValue={(item) => costRangeConvertor(item)}
       />
       <MultipleSelectCheckmarks
@@ -143,21 +155,20 @@ export const Contracts = () => {
   return (
     <PageListingLayout
       renderWidget={
-        <>
-          <Widget
-            searchPlaceholder="Search by number, customer, contract type etc."
-            getSearchValue={(val: string) => setSearch(val)}
-            filterItems={renderFilterItems()}
-            btnLabel="New Contract"
-            btnOnClick={() => navigate('/contracts/new')}
-            showActionBtn={true}
-          />
-        </>
+        <Widget
+          searchPlaceholder="Search by number, customer, contract type etc."
+          getSearchValue={(val: string) => setSearch(val)}
+          filterItems={renderFilterItems()}
+          btnLabel="New Contract"
+          btnOnClick={() => navigate('/contracts/new')}
+          showActionBtn
+        />
       }>
       <DataGridLayout
         hideFooter={pageCount <= 1}
         rows={rows}
         columns={columns}
+        scrollToTop={search}
         loading={isFetching}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}

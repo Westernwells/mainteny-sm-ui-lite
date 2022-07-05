@@ -14,6 +14,7 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import PreviewIcon from '@mui/icons-material/Preview';
 import {useTheme} from '@mui/material';
 import {Button} from 'components/Button';
+import {useTranslation} from 'react-i18next';
 
 interface ListMenu {
   label: string;
@@ -39,6 +40,7 @@ export const BottomDrawer = ({
   listItems,
   showSecondaryButton,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -87,7 +89,7 @@ export const BottomDrawer = ({
             type="submit"
             disabled={!isValid}
             onClick={primaryButtonAction}>
-            {primaryButtonLabel}
+            {t(primaryButtonLabel)}
           </MuiButton>
 
           {listItems.length > 0 && (

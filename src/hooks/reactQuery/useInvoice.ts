@@ -1,9 +1,14 @@
-import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from 'react-query';
 import * as _ from 'lodash';
 import {useCallback} from 'react';
-import {queryKeys as qk} from 'reactQuery/constants';
+import {queryKeys as qk, queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
-import {useSnackbar} from 'notistack';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {useNavigate} from 'react-router';
 // FIXME: Dummy Import
 
@@ -16,6 +21,9 @@ import {
   CreateInvoice,
   UpdateInvoice,
 } from 'models/invoice';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
+import {getTotalFromArticles, getTotalWithVatFromArticles} from 'utils/invoice';
 import {useUserSession} from './useUserSession';
 
 // TODO: make API call to fetch Invoices
@@ -133,13 +141,8 @@ export const fetchInvoice = async (invoiceId: string) => {
 };
 
 export function useInvoiceDetail(invoiceId?: string) {
-  const navigate = useNavigate();
-
   return useQuery([qk.invoiceById, invoiceId], () => fetchInvoice(invoiceId!), {
     enabled: !!invoiceId,
-    onError: (e: any) => {
-      if (e.response.status === 500) navigate('/404');
-    },
   });
 }
 
@@ -200,33 +203,49 @@ export const useInvoicePaymentStatus = () => {
   );
 };
 
-export const postInvoice = async (body: CreateInvoice) => {
+export const postInvoice = async (body: CreateInvoice, publish: boolean) => {
   const {data} = await axiosClient.post<{value: string}>('api/invoices', body);
-  return {data};
+  return {data, publish};
 };
 
 export const useCreateInvoice = () => {
   const queryClient = useQueryClient();
   const {enqueueSnackbar} = useSnackbar();
   const navigate = useNavigate();
+  const {mutate: publishInvoice} = usePublishInvoice();
 
-  return useMutation((data: CreateInvoice) => postInvoice(data), {
-    onSuccess: () => {
-      queryClient.invalidateQueries([qk.fetchInvoices]);
-      queryClient.invalidateQueries([qk.invoiceById]);
-      enqueueSnackbar(`Invoice created successfully!`, {
-        variant: 'success',
-      });
-
-      navigate('/invoices?pageIndex=1&pageSize=25');
+  return useMutation(
+    ({data, publish}: {data: CreateInvoice; publish: boolean}) =>
+      postInvoice(data, publish),
+    {
+      onSuccess: ({data, publish}, variables) => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+        enqueueSnackbar(`Invoice created successfully!`, {
+          variant: 'success',
+        });
+        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_INVOICE_CREATED, {
+          invoiceId: data.value,
+          propertyOwnerId: variables.data.propertyOwnerId,
+          serviceOrderId: variables.data.serviceOrderId,
+          amountWithoutVat: getTotalFromArticles(variables.data.items),
+          amountWithVat: getTotalWithVatFromArticles(variables.data.items),
+          isPartialInvoice: variables.data.type === 'PARTIAL',
+        });
+        if (publish) {
+          publishInvoice(data.value);
+        } else {
+          navigate('/invoices?pageIndex=1&pageSize=25');
+        }
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Something went wrong, please try again!', {
+          variant: 'error',
+        });
+      },
     },
-    onError: (err) => {
-      console.log(err);
-      enqueueSnackbar('Something went wrong, please try again!', {
-        variant: 'error',
-      });
-    },
-  });
+  );
 };
 
 export const putInvoice = async (
@@ -273,3 +292,57 @@ export const useUpdateInvoice = () => {
     },
   );
 };
+
+export const deleteInvoice = async (id: string, navigate: boolean) => {
+  await axiosClient.delete(`api/invoices/${id}`);
+  return navigate;
+};
+
+export const useDeleteInvoice = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  const navigate = useNavigate();
+
+  return useMutation(
+    ({
+      invoiceId,
+      shouldNavigate,
+    }: {
+      invoiceId: string;
+      shouldNavigate: boolean;
+    }) => deleteInvoice(invoiceId, shouldNavigate),
+    {
+      onSuccess: (__, {shouldNavigate}) => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+        enqueueSnackbar(`Invoice deleted successfully`, {
+          variant: 'success',
+        });
+        if (shouldNavigate) navigate(`/invoices?pageIndex=1&pageSize=25`);
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again!', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+const fetchServiceOrderInvoices = async (serviceOrderId: string) => {
+  const response = await axiosClient.get<InvoiceView[]>(
+    `/api/serviceOrders/${serviceOrderId}/invoices`,
+  );
+  return response.data;
+};
+
+export const useFetchServiceOrderInvoices = (
+  serviceOrderId?: string,
+  options?: UseQueryOptions<any, any, any>,
+) =>
+  useQuery<InvoiceView[]>(
+    [queryKeys.fetchServiceOrderInvoices, serviceOrderId],
+    () => fetchServiceOrderInvoices(serviceOrderId!),
+    {enabled: !!serviceOrderId, ...options},
+  );

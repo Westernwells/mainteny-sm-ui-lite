@@ -49,7 +49,11 @@ export const EmployeeDetails = ({getCurrentPageTitle}: Props) => {
       currentIndex={tabValue}
       onChange={(index) => setTabValue(index)}>
       <TabsBody value={tabValue} index={0}>
-        <EmployeeOverview employee={user} isLoading={isLoading} />
+        <EmployeeOverview
+          employee={user}
+          isLoading={isLoading}
+          openWorkHoursTab={() => setTabValue(2)}
+        />
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
         <ScheduleTab technicianId={user?.userData.employeeId} />

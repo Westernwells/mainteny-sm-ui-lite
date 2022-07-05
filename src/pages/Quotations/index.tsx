@@ -1,16 +1,29 @@
 import {useEffect, useRef, useState} from 'react';
 import {useNavigate} from 'react-router';
+import {useSearchParams} from 'react-router-dom';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
 import {useQuotations} from 'hooks/reactQuery/useQuotation';
-import {QuotationView} from 'models/quotation';
+import {
+  QuotationStatus,
+  QuotationStatusView,
+  QuotationView,
+} from 'models/quotation';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
+import {
+  convertToMacro,
+  convertToText,
+  formatSearchParamsPageIndex,
+  formatSearchParamsPageSize,
+} from 'utils/utils';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {columns, makeRows} from './QuotationsDataGridProps';
 
 const pageSize = 25;
@@ -20,8 +33,9 @@ export const Quotations = () => {
 
   const [search, setSearch] = useState('');
   const totalQuotationsRef = useRef(0);
-  const [status, setStatus] = useState<string[]>([]);
+  const [status, setStatus] = useState<QuotationStatus[]>([]);
   const [page, setPage] = useState(makePage(0, pageSize));
+  const [queryParams, setQueryParams] = useSearchParams();
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const {
@@ -34,7 +48,7 @@ export const Quotations = () => {
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: search,
-      status: [],
+      status,
     },
     {},
     {keepPreviousData: true},
@@ -44,16 +58,49 @@ export const Quotations = () => {
     totalQuotationsRef.current || quotationsResource.total;
 
   useEffect(() => {
-    if (quotationsResource) {
+    if (!isLoading) {
       setRows(makeRows(quotationsResource));
-    } else {
-      setRows([]);
     }
-  }, [quotationsResource]);
+  }, [quotationsResource, isLoading]);
+
+  useEffect(() => {
+    const currentParams = Object.fromEntries([...queryParams]);
+
+    if (currentParams.pageSize)
+      setPage({
+        ...page,
+        pageSize: Number(currentParams.pageSize),
+      });
+    if (currentParams.pageIndex)
+      setPage({
+        ...page,
+        pageIndex: Number(currentParams.pageIndex) - 1,
+      });
+  }, [queryParams]);
+
+  useEffect(() => {
+    const currentParams = Object.fromEntries([...queryParams]);
+
+    if (currentParams.pageSize)
+      setPage({
+        ...page,
+        pageSize: Number(currentParams.pageSize),
+      });
+    if (currentParams.pageIndex)
+      setPage({
+        ...page,
+        pageIndex: Number(currentParams.pageIndex) - 1,
+      });
+  }, [queryParams]);
 
   useEffect(() => {
     setPageCount(Math.ceil(quotationsResource.total / page.pageSize));
   }, [quotationsResource, page.pageSize]);
+
+  const navigateToNewQuotation = () => {
+    Mixpanel.identifyAndTrack(mixpanelEvents.NEW_QUOTATION_BUTTON_CLICKED);
+    navigate('new');
+  };
 
   if (isFetched && !totalQuotationsRef.current) {
     return (
@@ -61,7 +108,7 @@ export const Quotations = () => {
         label="No quotations have been created yet. Please click the button below to create one!"
         showActionBtn
         btnLabel="Add Quotation"
-        btnAction={() => navigate('new')}
+        btnAction={navigateToNewQuotation}
         containerStyle={{
           height: '100%',
           mb: '10em',
@@ -69,15 +116,24 @@ export const Quotations = () => {
       />
     );
   }
-
   const renderFilterItems = () => (
     <FilterFields onClear={() => setStatus([])}>
       <MultipleSelectCheckmarks
         label="Status"
-        options={['SENT', 'DRAFT']}
+        options={Object.keys(QuotationStatusView).map((i) => convertToText(i))}
         initialSelectedItems={status}
-        getSelectedValue={(item) => setStatus(item)}
-        multiple={false}
+        getSelectedValue={(item) =>
+          setStatus(
+            item
+              .map(
+                (i) =>
+                  QuotationStatusView[
+                    convertToMacro(i) as keyof typeof QuotationStatusView
+                  ],
+              )
+              .map((j) => QuotationStatus[j as keyof typeof QuotationStatus]),
+          )
+        }
       />
     </FilterFields>
   );
@@ -94,7 +150,7 @@ export const Quotations = () => {
           getSearchValue={(val: string) => setSearch(val)}
           showActionBtn
           btnLabel="New Quotation"
-          btnOnClick={() => navigate('new')}
+          btnOnClick={navigateToNewQuotation}
           filterItems={renderFilterItems()}
         />
       }>
@@ -103,13 +159,15 @@ export const Quotations = () => {
         rows={rows}
         columns={columns}
         loading={isFetching}
+        scrollToTop={search}
         pageSize={page.pageSize}
+        pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
-          setPage({...page, pageSize: newPageSize})
+          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
         }
-        handlePageChange={(newPage: number) => {
-          setPage({...page, pageIndex: newPage - 1});
-        }}
+        handlePageChange={(newPage: number) =>
+          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+        }
         pageCount={pageCount}
         totalRows={quotationsResource.total}
       />

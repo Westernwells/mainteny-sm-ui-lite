@@ -6,6 +6,7 @@ import CardHeader from '@mui/material/CardHeader';
 
 import IconButton from '@mui/material/IconButton';
 import useTheme from '@mui/material/styles/useTheme';
+import {useTranslation} from 'react-i18next';
 
 export interface Props {
   children: ReactNode;
@@ -13,11 +14,10 @@ export interface Props {
   headerTextOverrideStyles?: {[key: string]: string | number};
   headerActionIcon?: JSX.Element;
   minHeight?: number | string;
-  // contentPadding?: string | number;
   headerLabel?: string;
   customHeader?: JSX.Element;
-  containerStyles?: {[key: string]: string | number};
-  contentContainerStyles?: {[key: string]: string | number};
+  containerStyles?: {[key: string]: any};
+  contentContainerStyles?: {[key: string]: any};
   handleAction?: () => void;
 }
 
@@ -29,11 +29,11 @@ export const PageCard = ({
   headerTextOverrideStyles,
   headerActionIcon,
   minHeight,
-  // contentPadding,
   customHeader,
   contentContainerStyles,
   handleAction = () => {},
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   return (
     <Card
@@ -65,7 +65,7 @@ export const PageCard = ({
                   color: theme.palette.text.primary,
                   ...headerTextOverrideStyles,
                 }}>
-                {headerLabel}
+                {t(headerLabel)}
               </Typography>
             )
           }

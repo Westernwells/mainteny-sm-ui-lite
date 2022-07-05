@@ -1,5 +1,4 @@
 import {ChangeEvent, useEffect, useRef, useState} from 'react';
-import {useFormikContext} from 'formik';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
@@ -9,11 +8,15 @@ import {ReactComponent as RegularIcon} from 'assets/icons/Regular.svg';
 import {ReactComponent as CalloutIcon} from 'assets/icons/Callout.svg';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 import {ServiceOrderType} from 'models/service-order';
-import {EmployeeAccountData} from './model';
+import {useTranslation} from 'react-i18next';
 
-export const SelectServiceOrderTypes = () => {
-  const {setFieldValue, values} = useFormikContext<EmployeeAccountData>();
+type Props = {
+  values: any;
+  setFieldValue: any;
+};
 
+export const SelectServiceOrderTypes = ({values, setFieldValue}: Props) => {
+  const {t} = useTranslation();
   const [serviceOrderTypes, setServiceOrderTypes] = useState({
     REGULAR: {
       label: ServiceOrderType.REGULAR,
@@ -41,7 +44,7 @@ export const SelectServiceOrderTypes = () => {
         <Box display="flex" alignItems="center">
           <RegularIcon style={{height: '1.25em'}} />
           <Typography variant="body2" ml=".25em">
-            Maintenance
+            {t('Maintenance')}
           </Typography>
         </Box>
       ),
@@ -52,7 +55,7 @@ export const SelectServiceOrderTypes = () => {
       label: (
         <Box display="flex" alignItems="center">
           <RepairIcon sx={{color: 'amber.main', height: '.75em'}} />
-          <Typography variant="body2">Repair</Typography>
+          <Typography variant="body2">{t('Repair')}</Typography>
         </Box>
       ),
     },
@@ -62,7 +65,7 @@ export const SelectServiceOrderTypes = () => {
       label: (
         <Box display="flex" alignItems="center">
           <EmergencyIcon style={{height: '.8em', marginLeft: '-.2em'}} />
-          <Typography variant="body2">Emergency</Typography>
+          <Typography variant="body2">{t('Emergency')}</Typography>
         </Box>
       ),
     },
@@ -72,7 +75,7 @@ export const SelectServiceOrderTypes = () => {
       label: (
         <Box display="flex" alignItems="center">
           <CalloutIcon style={{height: '1em'}} />
-          <Typography variant="body2">Callout</Typography>
+          <Typography variant="body2">{t('Callout')}</Typography>
         </Box>
       ),
     },

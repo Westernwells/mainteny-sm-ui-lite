@@ -15,8 +15,11 @@ import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {DataGridLayout} from 'components/DataGridLayout';
-import {convertToMacro, convertToText} from 'utils/utils';
-import {serviceOrderStatusToString} from 'utils/service-order-utils';
+import {
+  serviceOrderStatusToString,
+  serviceOrderTypeToEnum,
+  serviceOrderTypeToString,
+} from 'utils/service-order-utils';
 import {columns, makeRows} from './ServiceHistoryDataGridProps';
 
 const pageSize = 25;
@@ -51,7 +54,7 @@ export const ServiceHistoryTab = () => {
     isFetched,
   } = useServiceOrders({
     elevatorIds: elevatorId ? [elevatorId] : undefined,
-    start: startOfYear(new Date('01-01-2000')).toISOString(),
+    start: startOfYear(new Date()).toISOString(),
     end: endOfYear(new Date()).toISOString(),
     pageIndex: page.pageIndex,
     pageSize: page.pageSize,
@@ -77,11 +80,11 @@ export const ServiceHistoryTab = () => {
     <FilterFields>
       <MultipleSelectCheckmarks
         label="Order Type"
-        options={Object.values(ServiceOrderType).map((item) =>
-          convertToText(item),
+        options={Object.keys(ServiceOrderType).map((item) =>
+          serviceOrderTypeToString(item),
         )}
         getSelectedValue={(item) =>
-          setTypes(item.map((i) => convertToMacro(i) as ServiceOrderType))
+          setTypes(item.map((i) => serviceOrderTypeToEnum(i)))
         }
       />
       <MultipleSelectCheckmarks
@@ -111,7 +114,7 @@ export const ServiceHistoryTab = () => {
         label="No service orders have been created yet for this elevator. Please click the button below to create one!"
         showActionBtn
         btnLabel="Create Service Order"
-        btnAction={() => navigate('/orders?pageIndex=1&pageSize=25&tab=0')}
+        btnAction={() => navigate('/orders')}
         containerStyle={{
           height: '100%',
           mb: '10em',
@@ -134,6 +137,7 @@ export const ServiceHistoryTab = () => {
         rows={rows}
         columns={columns}
         loading={isFetching}
+        scrollToTop={search}
         pageSize={page.pageSize}
         handlePageSizeChange={(newPageSize: number) =>
           setPage({...page, pageSize: newPageSize})

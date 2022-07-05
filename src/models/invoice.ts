@@ -2,13 +2,13 @@ import {Article} from './article';
 import {
   Amount,
   AmountRecord,
-  Fee,
   Meta,
   PaymentInfo,
   PdfGenerationStatus,
   WithOptional,
 } from './misc';
 import {PropertyOwner} from './propertyManager';
+import {QuotationItemRecord} from './quotation';
 import {ServiceCompanySimpleView} from './service-company';
 import {ServiceOrderView, ServiceOrderType} from './service-order';
 
@@ -29,6 +29,8 @@ export enum InvoiceDueType {
 export enum InvoiceStatusView {
   PAID = 'Paid',
   NOT_PAID = 'Unpaid',
+  DRAFT = 'Draft',
+  EXPIRED = 'Overdue',
 }
 
 export interface InvoiceItem {
@@ -53,6 +55,7 @@ export interface InvoiceView {
   number: string;
   description: string;
   subject: string;
+  type: InvoiceType;
   totalAmount: Amount;
   issuedDate: string;
   dueDate: string;
@@ -64,6 +67,7 @@ export interface InvoiceView {
   search: string;
   meta: Meta;
   additionalInfo: InvoiceAdditionalInfo;
+  paymentTerms: string;
 }
 
 export interface QueryInvoiceParams {
@@ -88,17 +92,24 @@ export interface InvoiceItemRecord<T> {
   unitAmount: T;
 }
 
+export enum InvoiceType {
+  FULL = 'FULL',
+  PARTIAL = 'PARTIAL',
+}
+
 export interface CreateInvoice {
+  subject: string;
   description: string;
   dueDate: string;
   issuedDate: string;
-  items: WithOptional<InvoiceItemRecord<AmountRecord>, 'articleUnit'>[];
+  items: QuotationItemRecord[] | InvoiceItemRecord<Amount>[];
   paymentInfo: PaymentInfo;
   paymentTerms: string;
   propertyOwnerId: string;
   serviceCompanyId: string;
   serviceOrderId: string;
   shouldSendOut: boolean;
+  type: InvoiceType;
 }
 
 export interface UpdateInvoice {
@@ -106,8 +117,9 @@ export interface UpdateInvoice {
   subject: string;
   dueDate: string;
   issuedDate: string;
-  items: InvoiceItemRecord<Amount>[];
+  items: WithOptional<InvoiceItemRecord<AmountRecord>, 'articleUnit'>[];
   paymentInfo?: PaymentInfo;
   paymentTerms?: string;
   serviceOrderId: string;
+  type: InvoiceType;
 }

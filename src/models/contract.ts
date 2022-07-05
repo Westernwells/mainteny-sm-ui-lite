@@ -1,14 +1,9 @@
 import {Client} from './client';
-import {
-  ServiceCompany,
-  ServiceCompanySimpleView,
-  ServiceCompanyView,
-} from './service-company';
-import {Meta, Order, OrderBy, TimeWindowRecord, TimeWindowType} from './misc';
-import {Elevator, ElevatorStatus, ElevatorView} from './elevator';
-import {PropertyOwnerSimpleView, PropertyOwnerView} from './propertyManager';
-import {FileWithPreview} from 'components/MyDropzone';
-import {FileResourceRecord} from './media';
+import {ServiceCompany, ServiceCompanySimpleView} from './service-company';
+import {Amount, Meta, Order, TimeWindowRecord, TimeWindowType} from './misc';
+import {Elevator, ElevatorSimpleView, ElevatorView} from './elevator';
+import {PropertyOwnerSimpleView} from './propertyManager';
+import {FileResource} from './media';
 
 export enum ContractStatus {
   PENDING = 'PENDING',
@@ -68,31 +63,30 @@ export interface QueryContractParams {
   query: string;
   serviceCompanyId: string;
   status?: string[];
+  priceStart: number;
+  priceEnd: number;
 }
 
-export interface ContractDocuments {
-  createdAt: string;
-  description: string;
-  id: string;
-  type: string;
-  uri: string;
-}
-
-export interface ContractPrice {
-  currency: string;
-  grossAmount: number;
-  netAmount: number;
-  percentageVat: number;
-  vat: number;
+export enum InvoiceDueType {
+  YEARLY = 'YEARLY',
+  HALF_YEARLY = 'HALF_YEARLY',
+  QUARTERLY = 'QUARTERLY',
+  AFTER_EACH_VISIT = 'AFTER_EACH_VISIT',
 }
 
 export interface ContractAdditionalInfo {
-  annualPriceAdjustmentPercentage: number;
-  documents: ContractDocuments[];
-  invoiceDue: string;
-  price: ContractPrice;
-  renewalTerms: number;
-  scope: string[];
+  renewalTerms?: number;
+  price?: Amount;
+  annualPriceAdjustmentPercentage?: number;
+  invoiceDue?: InvoiceDueType;
+  documents?: FileResource[];
+  scope?: string[];
+}
+
+export interface ContractElevatorSimpleView {
+  id: string;
+  contractId: string;
+  elevator: ElevatorSimpleView;
 }
 
 export interface ContractView {
@@ -106,27 +100,17 @@ export interface ContractView {
 
   sla: number;
   spendingLimit: number;
-  price: number;
 
   hourlyRate: number;
   currency: string;
   startTime: string;
   endTime: string;
-  units?: number;
+  elevators: ContractElevatorSimpleView[];
   timePreference: ContractTimeWindow[];
-
   status: ContractStatus;
   search: string;
   meta: Meta;
-
-  elevators: ElevatorView[];
 }
-
-export interface ContractViewWithUnits {
-  contractView: ContractView;
-  units: number;
-}
-
 export interface ContractSimpleView {
   id: string;
   type: ContractType;
@@ -182,7 +166,6 @@ export interface ContractRecord {
 export interface ContractFilters {
   contractor?: string[];
   expiryDate?: string[];
-  price?: number[][];
   status?: string[];
 }
 
@@ -194,6 +177,8 @@ export interface CustomerContractParams {
   query: string;
   serviceCompanyId: string;
   status?: ContractStatus;
+  priceStart: number;
+  priceEnd: number;
 }
 
 export interface ElevatorContractParams {
@@ -207,12 +192,18 @@ export interface ContractTimeWindowRecord {
   type: TimeWindowType;
 }
 
+export interface ContractPrice {
+  currency?: string;
+  netAmount?: number;
+  percentageVat?: number;
+}
+
 export interface ContractRequestBody {
   currency?: string;
   endDate?: string;
   externalId?: string;
   hourlyRate?: number;
-  price?: number;
+  price?: ContractPrice;
   sla?: number;
   spendingLimit?: number;
   startDate?: string;
@@ -224,20 +215,28 @@ export interface ContractRequestBody {
 }
 
 export interface ContractBasicInfoFormModel {
-  propertyOwner: PropertyOwnerView | null;
+  propertyOwnerId: string;
   startDate: Date | null;
   endDate: Date | null;
   contractType: string;
-  externalId: string;
 }
 
 export interface ContractTermsFormModal {
-  visitsNumber: number;
+  visitsNumber: number | string;
   invoiceDue: string;
-  netAmount: number;
-  renewalTerms: string;
-  spendingLimit: number;
-  hourlyRate: number;
-  annualPriceAdjustmentPercentage: number;
-  serviceLevelAgreement: number;
+  netAmount: number | string;
+  renewalTerms: number | string;
+  spendingLimit: number | string;
+  hourlyRate: number | string;
+  annualPriceAdjustmentPercentage: number | string;
+  serviceLevelAgreement: number | string;
+}
+
+export interface ContractUpdateRequest {
+  type: string;
+  price: number | string;
+  invoiceDue: string;
+  renewalTerms: number | string;
+  visitsNumber: number | string;
+  spendingLimit: number | string;
 }

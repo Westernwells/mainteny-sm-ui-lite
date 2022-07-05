@@ -4,69 +4,88 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import EmailIcon from '@mui/icons-material/Email';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
-import {convertToText} from 'utils/utils';
-import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
-import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
+import Grid3x3Icon from '@mui/icons-material/Grid3x3';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import {Typography} from '@mui/material';
+
+import {capitalize, convertToText} from 'utils/utils';
 import {theme} from 'theme';
 import {UserView} from 'models/user';
+import {formatServiceName} from 'utils/work-hours-utils';
+import {TimeWindowRecord} from 'models/misc';
 
-export const employeeDetailSchema = (employee: UserView) => ({
-  phone: {
-    label: 'PHONE NUMBER',
-    value: employee.userAccount.contact.phone,
-    icon: <LocalPhoneIcon sx={{color: theme.palette.info.dark}} />,
-  },
-  address: {
-    label: 'ADDRESS',
-    value: employee.userData.address?.fullName || '-',
-    icon: <HomeIcon sx={{color: theme.palette.info.dark}} />,
-  },
-  shiftTime: {
-    // TODO: display order shift time in a tooltip
-    label: 'SHIFT TIME',
-    value:
-      employee && employee.userData.workingHours?.length
-        ? `${convertToText(employee.userData.workingHours[0].type)} ${
-            employee.userData.workingHours[0].fromTime
-          } - ${employee.userData.workingHours[0].toTime}`
-        : '-',
-    icon: <TimerOutlinedIcon sx={{color: theme.palette.info.dark}} />,
-  },
-  email: {
-    label: 'EMAIL',
-    value: employee.userAccount.contact.email,
-    icon: <EmailIcon sx={{color: theme.palette.info.dark}} />,
-  },
-  assignedOrderTypes: {
-    label: 'ASSIGNED ORDER TYPES',
-    value:
-      employee &&
-      employee.userData.additionalInfo &&
-      employee.userData.additionalInfo.assignedServiceOrderTypes?.length ? (
-        <Box display="flex">
-          {employee.userData.additionalInfo?.assignedServiceOrderTypes?.map(
-            (orderType, index) => (
-              <Box display="flex" mr="0.4em" key={index}>
-                <Box mr="0.4em">
-                  <ServiceOrderIcons
-                    serviceOrderType={orderType}
-                    size="small"
-                  />
-                </Box>
-                <Box mt="0.05em">
-                  <ServiceOrderTypeText
-                    variant="body2"
-                    serviceOrderType={orderType}
-                    capitalizeText
-                  />
-                </Box>
-              </Box>
-            ),
-          )}
-        </Box>
-      ) : (
-        '-'
-      ),
-    icon: <CalendarTodayIcon sx={{color: theme.palette.info.dark}} />,
-  },
-});
+export const employeeDetailSchema = (employee: UserView) => {
+  const orderTypes =
+    employee.userData.additionalInfo?.assignedServiceOrderTypes;
+
+  const formatOrderNames = () => {
+    const formatOrderText =
+      orderTypes &&
+      orderTypes.length > 0 &&
+      orderTypes.map((item) => formatServiceName(item));
+    if (formatOrderText) {
+      return capitalize(formatOrderText);
+    }
+    return '-';
+  };
+
+  const renderShiftTime = (time: TimeWindowRecord[]) => {
+    const formatShiftTime = time.map(
+      (item: TimeWindowRecord) =>
+        `${convertToText(item.type)} ${item.fromTime} - ${item.toTime}`,
+    );
+    return capitalize(formatShiftTime);
+  };
+
+  formatOrderNames();
+  return {
+    phone: {
+      label: 'PHONE',
+      value: employee.userAccount.contact.phone,
+      icon: <LocalPhoneIcon sx={{color: theme.palette.info.dark}} />,
+    },
+    employeeId: {
+      label: 'Employee ID',
+      value: employee.userData.externalId || '-',
+      icon: <Grid3x3Icon sx={{color: theme.palette.info.dark}} />,
+    },
+    assignedOrderTypes: {
+      label: 'ASSIGNED ORDER TYPES',
+      value:
+        employee && employee.userData.additionalInfo && orderTypes?.length ? (
+          <Box display="flex">
+            <Typography sx={{fontSize: '14px', lineHeight: '20px'}}>
+              {formatOrderNames()}
+            </Typography>
+          </Box>
+        ) : (
+          '-'
+        ),
+      icon: <CalendarTodayIcon sx={{color: theme.palette.info.dark}} />,
+    },
+    email: {
+      label: 'EMAIL',
+      value: employee.userAccount.contact.email,
+      icon: <EmailIcon sx={{color: theme.palette.info.dark}} />,
+    },
+
+    team: {
+      label: 'Team',
+      value: employee.userData.team || '-',
+      icon: <ManageAccountsIcon sx={{color: theme.palette.info.dark}} />,
+    },
+    address: {
+      label: 'ADDRESS',
+      value: employee.userData.address?.fullName || '-',
+      icon: <HomeIcon sx={{color: theme.palette.info.dark}} />,
+    },
+    shiftTime: {
+      label: 'SHIFT TIME',
+      value:
+        employee && employee.userData.workingHours?.length
+          ? renderShiftTime(employee.userData.workingHours)
+          : '-',
+      icon: <TimerOutlinedIcon sx={{color: theme.palette.info.dark}} />,
+    },
+  };
+};

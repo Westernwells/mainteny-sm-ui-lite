@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
 import {GridCellParams, GridRowsProp} from '@mui/x-data-grid';
@@ -21,6 +22,7 @@ interface Props {
 const pageInfo = makePage(0, 10);
 
 export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const [search, setSearch] = useState('');
   const totalUnitsRef = useRef(0);
@@ -36,19 +38,17 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
     isLoading,
     isIdle,
   } = useAllElevators(
-    search,
-    page,
-    {
-      status: [],
-    },
+    {query: search, pageIndex: page.pageIndex, pageSize: page.pageSize},
     {keepPreviousData: true},
   );
   // sets this value only once
   totalUnitsRef.current = totalUnitsRef.current || elevatorResponse.total;
 
   useEffect(() => {
-    setRows(makeRows(elevatorResponse.data));
-  }, [elevatorResponse]);
+    if (!isLoading) {
+      setRows(makeRows(elevatorResponse.data));
+    }
+  }, [elevatorResponse, isLoading]);
 
   useEffect(() => {
     setPageCount(Math.ceil(elevatorResponse.total / page.pageSize));
@@ -115,7 +115,7 @@ please click the button below'
     <>
       <Box display="flex" justifyContent="space-between">
         <Typography variant="h6" component="div">
-          Select unit
+          {t('Select unit')}
         </Typography>
         <SearchInput
           placeholder="Search"
@@ -125,6 +125,7 @@ please click the button below'
       <DataGridLayout
         hideFooter={pageCount <= 1}
         rows={rows}
+        scrollToTop={search}
         columns={columns(selectedUnit?.id || '')}
         onCellClick={(params: GridCellParams) => {
           setSelectedUnit(params.row.elevator);

@@ -1,4 +1,5 @@
 import Typography from '@mui/material/Typography';
+import {useTranslation} from 'react-i18next';
 import EditIcon from '@mui/icons-material/Edit';
 import {ElevatorView, ElevatorRequestBody} from 'models/elevator';
 import Grid from '@mui/material/Grid';
@@ -24,7 +25,7 @@ interface Props {
 
 const validationSchema = Yup.object().shape({
   lastVisitDate: Yup.string().nullable().required('Last visit is required'),
-  serviceTime: Yup.string().nullable().required('Service time is required'),
+  serviceTime: Yup.number().nullable().required('Service time is required'),
   technicianNumber: Yup.number()
     .nullable()
     .required('No. of technicians is required'),
@@ -36,6 +37,7 @@ export const Service = ({
   elevatorRequestBody,
   validContract,
 }: Props) => {
+  const {t} = useTranslation();
   // const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
   const {mutateAsync: updateElevator} = useUpdateElevator(
@@ -92,7 +94,7 @@ export const Service = ({
     <InfoCard
       containerStyles={{...containerStyles}}
       handleAction={() => setOpenDialog(true)}
-      header={<Typography variant="subtitle1">Service</Typography>}
+      header={<Typography variant="subtitle1">{t('Service')}</Typography>}
       headerActionIcon={<EditIcon />}
       showHeaderBackground>
       <Grid container spacing={2}>

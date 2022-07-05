@@ -1,6 +1,11 @@
 import {useCallback} from 'react';
-import {useMutation, useQuery, useQueryClient} from 'react-query';
-import {useSnackbar} from 'notistack';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from 'react-query';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {useNavigate} from 'react-router';
 import {Resource, RestError} from 'models/misc';
@@ -12,6 +17,9 @@ import {
   QuotationView,
   UpdateQuotation,
 } from 'models/quotation';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
+import {getTotalFromArticles, getTotalWithVatFromArticles} from 'utils/invoice';
 import {useUserSession} from './useUserSession';
 
 export const fetchQuotations = async (
@@ -70,17 +78,16 @@ export const fetchQuotation = async (quotationId: string) => {
   return response.data;
 };
 
-export function useQuotationDetails(quotationId?: string) {
-  const navigate = useNavigate();
-
-  return useQuery(
+export function useQuotationDetails(
+  quotationId?: string,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<QuotationView, RestError, QuotationView>(
     [qk.quotationById, quotationId],
     () => fetchQuotation(quotationId!),
     {
       enabled: !!quotationId,
-      onError: (e: any) => {
-        if (e.response.status === 500) navigate('/404');
-      },
+      ...options,
     },
   );
 }
@@ -136,11 +143,17 @@ export const useCreateQuotation = () => {
     ({data, publish}: {data: CreateQuotation; publish: boolean}) =>
       postQuotation(data, publish),
     {
-      onSuccess: ({data, publish}) => {
+      onSuccess: ({data, publish}, variables) => {
         queryClient.invalidateQueries([qk.fetchQuotations]);
         queryClient.invalidateQueries([qk.quotationById]);
         enqueueSnackbar(`Quotation created successfully!`, {
           variant: 'success',
+        });
+        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_QUOTATION_CREATED, {
+          quotationId: data.value,
+          elevatorId: variables.data.elevatorId,
+          amountWithoutVat: getTotalFromArticles(variables.data.items),
+          amountWithVat: getTotalWithVatFromArticles(variables.data.items),
         });
         if (publish) {
           publishQuotation(data.value);
@@ -192,6 +205,43 @@ export const useUpdateQuotation = () => {
         if (publish) {
           publishQuotation(quotationId);
         }
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('Some error occurred, please try again!', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+export const deleteQuotation = async (id: string, navigate: boolean) => {
+  await axiosClient.delete(`api/quotations/${id}`);
+  return navigate;
+};
+
+export const useDeleteQuotation = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  const navigate = useNavigate();
+
+  return useMutation(
+    ({
+      quotationId,
+      shouldNavigate,
+    }: {
+      quotationId: string;
+      shouldNavigate: boolean;
+    }) => deleteQuotation(quotationId, shouldNavigate),
+    {
+      onSuccess: (__, {shouldNavigate}) => {
+        queryClient.invalidateQueries([qk.fetchQuotations]);
+        queryClient.invalidateQueries([qk.quotationById]);
+        enqueueSnackbar(`Quotation deleted successfully`, {
+          variant: 'success',
+        });
+        if (shouldNavigate) navigate(`/quotations?pageIndex=1&pageSize=25`);
       },
       onError: (err) => {
         console.log(err);

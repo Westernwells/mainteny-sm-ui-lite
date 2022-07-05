@@ -3,6 +3,7 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Typography from '@mui/material/Typography';
 import {SearchInput} from 'components/SearchInput';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   scheduleType?: 'date' | 'people' | 'default';
@@ -50,9 +51,10 @@ export const ScheduleControls = ({
     />
   );
 
-  const renderDefault = () => (
-    <Typography variant="subtitle2">{item}</Typography>
-  );
+  const renderDefault = () => {
+    const {t} = useTranslation();
+    return <Typography variant="subtitle2">{t(item)}</Typography>;
+  };
 
   if (scheduleType === 'date') {
     return renderDateContols();

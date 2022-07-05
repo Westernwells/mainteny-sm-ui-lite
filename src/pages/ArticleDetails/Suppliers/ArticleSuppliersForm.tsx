@@ -1,18 +1,30 @@
-import React from 'react';
+import React, {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
-import {RadioGroup} from '@mui/material';
+import Divider from '@mui/material/Divider';
 import _ from 'lodash';
 import cloneDeep from 'lodash/cloneDeep';
 import {SupplierRecord} from '../../../models/article';
-import {ArticleSupplierItemForm} from './ArticleSupplierItemForm';
+import {SupplierItem} from './SupplierItem';
 import {Button} from '../../../components/Button';
+import {Dialog} from '../../../components/Dialog';
 
 export interface Props {
-  suppliers: SupplierRecord[];
-  updateSuppliers: (suppliers: SupplierRecord[]) => void;
+  isLoading: boolean;
+  originSuppliers: SupplierRecord[];
+  onSubmit: (suppliers: SupplierRecord[]) => void;
+  onCancel: () => void;
 }
 
-export const ArticleSuppliersForm = ({suppliers, updateSuppliers}: Props) => {
+export const ArticleSuppliersForm = ({
+  isLoading,
+  originSuppliers,
+  onSubmit,
+  onCancel,
+}: Props) => {
+  const [suppliers, setSuppliers] = useState<SupplierRecord[]>(originSuppliers);
+  const {t} = useTranslation();
+
   const addSupplier = () => {
     const origin = cloneDeep(suppliers);
     const supplier = {
@@ -32,7 +44,7 @@ export const ArticleSuppliersForm = ({suppliers, updateSuppliers}: Props) => {
       isPreferred: false,
     };
     origin.push(supplier);
-    updateSuppliers(origin);
+    setSuppliers(origin);
   };
 
   const updateSupplier = (item: SupplierRecord) => {
@@ -45,29 +57,49 @@ export const ArticleSuppliersForm = ({suppliers, updateSuppliers}: Props) => {
         .value();
     }
     const modified = cloneDeep(suppliers);
-    updateSuppliers(modified);
+    setSuppliers(modified);
   };
 
+  const submit = () => {
+    onSubmit(suppliers);
+  };
+
+  if (_.isEmpty(suppliers)) {
+    addSupplier();
+  }
+
   const supplierItem = _.map(suppliers, (supplier, key) => (
-    <ArticleSupplierItemForm
-      key={key}
-      supplier={supplier}
-      updateSupplier={updateSupplier}
-    />
+    <Box key={key}>
+      <SupplierItem
+        supplier={supplier}
+        updateSupplier={updateSupplier}
+        containerStyles={{width: '50%', pr: '1rem', my: '1rem'}}
+        useCheckBox={suppliers.length === 1}
+      />
+      {suppliers.length > 1 && key !== suppliers.length - 1 && (
+        <Divider sx={{my: '1rem'}} />
+      )}
+    </Box>
   ));
 
   return (
-    <>
-      <Box display="flex" flexDirection="column">
-        <RadioGroup name="radio-buttons-group">
-          <Box sx={{height: '100%', overflowY: 'auto'}} component="form">
-            {supplierItem}
-          </Box>
-        </RadioGroup>
+    <Dialog
+      title={t('Edit Suppliers Information')}
+      isSaving={isLoading}
+      disableSaveBtn={suppliers.some((it) => !it.name)}
+      onCancel={() => onCancel()}
+      onSave={submit}
+      dialogProps={{open: true}}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        sx={{height: '100%', overflowY: 'auto'}}
+        component="form">
+        {supplierItem}
       </Box>
       <Box display="flex">
         <Button
-          label="+ Add Supplier"
+          label={t('+ Add Supplier')}
           style={{mt: '0.5rem'}}
           buttonProps={{
             onClick: () => addSupplier(),
@@ -75,6 +107,6 @@ export const ArticleSuppliersForm = ({suppliers, updateSuppliers}: Props) => {
           }}
         />
       </Box>
-    </>
+    </Dialog>
   );
 };

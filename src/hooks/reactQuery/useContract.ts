@@ -7,7 +7,6 @@ import {
 } from 'react-query';
 import * as _ from 'lodash';
 import {queryKeys as qk, queryKeys} from 'reactQuery/constants';
-import {useNavigate} from 'react-router';
 
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
@@ -19,7 +18,7 @@ import {
   QueryContractParams,
 } from 'models/contract';
 import {Resource, RestError, StringValue, WithOptional} from 'models/misc';
-import {useSnackbar} from 'notistack';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {
   addDays,
   endOfDay,
@@ -29,17 +28,6 @@ import {
 } from 'date-fns';
 import {toDate} from 'utils/datetime';
 import {useUserSession} from './useUserSession';
-
-export const fetchContractElevatorCount = async (contractId: string[]) => {
-  const response = await axiosClient.get<{[key: string]: number}>(
-    `/api/contracts/elevators/count`,
-    {
-      params: {contractId},
-      paramsSerializer,
-    },
-  );
-  return response.data;
-};
 
 const filterByExpiryData = (
   contractsRes: Resource<ContractView>,
@@ -132,7 +120,9 @@ export const filterByPrice = (
     });
     return result;
   };
-  mergedResult = contractsRes.data.filter((item) => inRange(item.price, price));
+  mergedResult = contractsRes.data.filter((item) =>
+    inRange(item.additionalInfo.price?.netAmount || 0, price),
+  );
   return mergedResult;
 };
 
@@ -146,10 +136,6 @@ const filterContracts = (
     result = {...result, data: expiryDates, total: expiryDates.length};
   }
 
-  if (filter.price?.length) {
-    const prices = filterByPrice(result, filter.price);
-    result = {...result, data: prices, total: prices.length};
-  }
   return result;
 };
 
@@ -197,48 +183,16 @@ export const useQueryContract = (
   );
 };
 
-export const useContractElevatorCount = (
-  contracts: ContractView[],
-  options?: UseQueryOptions<{[key: string]: number}, RestError, ContractView[]>,
-) => {
-  const contractIds = contracts.map((contract) => contract.id);
-  return useQuery<{[key: string]: number}, RestError, ContractView[]>(
-    [qk.fetchContractElevatorCount, contractIds],
-    () => fetchContractElevatorCount(contractIds),
-    {
-      ...options,
-      enabled: !!contracts.length,
-      select: useCallback(
-        (data) =>
-          contracts.map((contract) => ({
-            ...contract,
-            units: data[contract.id],
-          })),
-
-        [contracts],
-      ),
-    },
-  );
-};
-
 const fetchContractDetails = async (contractId: string) => {
   const response = await axiosClient.get<ContractView>(
     `/api/contracts/${contractId}`,
   );
   return response.data;
 };
-export const useContractDetails = (contractId: string) => {
-  const navigate = useNavigate();
-  return useQuery(
-    [qk.contractDetails, contractId],
-    () => fetchContractDetails(contractId),
-    {
-      onError: (e: any) => {
-        if (e.response.status === 500) navigate('/404');
-      },
-    },
+export const useContractDetails = (contractId: string) =>
+  useQuery([qk.contractDetails, contractId], () =>
+    fetchContractDetails(contractId),
   );
-};
 
 export const queryCustomerContract = async (
   params: WithOptional<CustomerContractParams, 'serviceCompanyId'>,
@@ -262,8 +216,9 @@ export const useUseQueryCustomerContracts = (
     ...params,
     serviceCompanyId: user?.userAccount.serviceCompany.id,
   };
+
   return useQuery(
-    [queryKeys.queryCustomerContract, params, id],
+    [queryKeys.queryCustomerContract, params, id, filter],
     () => queryCustomerContract(params, id!),
     {
       enabled: !!id && !!user,
@@ -354,7 +309,7 @@ const createContract = async (body: any): Promise<StringValue> => {
 
 export const useCreateContract = (successMsg: string) => {
   const {enqueueSnackbar} = useSnackbar();
-  return useMutation((body: any) => createContract(body), {
+  return useMutation((body: ContractRequestBody) => createContract(body), {
     onSuccess: () => {
       enqueueSnackbar(successMsg, {
         variant: 'success',

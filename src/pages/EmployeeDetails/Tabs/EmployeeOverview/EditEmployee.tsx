@@ -1,8 +1,7 @@
 import React from 'react';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import {useNavigate} from 'react-router';
-import {SideDrawer} from 'components/SideDrawer';
+
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useEmployeeAccount} from 'hooks/reactQuery/useUserAccount';
 import {UserView, Role} from 'models/user';
@@ -13,14 +12,14 @@ import {EmployeeAccountData} from './EditEmployeeForm/model';
 
 interface Props {
   employee: UserView;
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  openDialog: boolean;
+  onClose: () => void;
 }
 
-export const EditEmployee = ({employee, open, setOpen}: Props) => {
-  const navigate = useNavigate();
+export const EditEmployee = ({employee, openDialog, onClose}: Props) => {
   const {user} = useUserSession();
   const {updateEmployeeAccount} = useEmployeeAccount();
+
   const initialValues: EmployeeAccountData = {
     username: employee.userAccount.username,
     firstName: employee.userAccount.firstName,
@@ -30,22 +29,16 @@ export const EditEmployee = ({employee, open, setOpen}: Props) => {
       employee.userAccount.contact.phone,
     email: employee.userAccount.contact.email,
     roles: employee.userAccount.roles,
-    address:
-      employee.userAccount.roles.includes(Role.TECHNICIAN) &&
-      employee.userData.address
-        ? {
-            fullName: employee.userData.address.fullName,
-            countryCode: employee.userData.address.countryCode,
-            location: {
-              longitude: employee.userData.address.location.longitude,
-              latitude: employee.userData.address.location.latitude,
-            },
-          }
-        : null,
-    addressFullName:
-      employee.userAccount.roles.includes(Role.TECHNICIAN) &&
-      employee.userData.address &&
-      employee.userData.address.fullName,
+    address: employee.userData.address
+      ? {
+          fullName: employee.userData.address.fullName,
+          countryCode: employee.userData.address.countryCode,
+          location: {
+            longitude: employee.userData.address.location.longitude,
+            latitude: employee.userData.address.location.latitude,
+          },
+        }
+      : null,
     serviceOrderTypes:
       employee.userAccount.roles.includes(Role.TECHNICIAN) &&
       employee.userData.additionalInfo
@@ -61,6 +54,8 @@ export const EditEmployee = ({employee, open, setOpen}: Props) => {
           }))
         : [],
     serviceCompanyId: user?.userAccount.serviceCompany.id,
+    employeeId: employee.userData.externalId,
+    team: employee.userData.team,
   };
 
   const phoneValidationRE =
@@ -72,30 +67,24 @@ export const EditEmployee = ({employee, open, setOpen}: Props) => {
     email: Yup.string()
       .email('Enter a valid email')
       .required('Email is required'),
+    team: Yup.string().matches(/^[0-9]+$/, 'Team is not valid'),
+    address: Yup.object().nullable().required('Address is required'),
     phone: Yup.string()
       .required('Phone number is required')
       .matches(phoneValidationRE, 'Phone number is not valid'),
   });
 
   return (
-    <SideDrawer
-      open={open}
-      setOpen={setOpen}
-      header="Edit Employee"
-      body={
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={async (values, {resetForm}) => {
-            updateEmployeeAccount(values, () => {
-              resetForm();
-              setOpen(false);
-              navigate(0);
-            });
-          }}>
-          <EditEmployeeForm />
-        </Formik>
-      }
-    />
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={async (values, {resetForm}) => {
+        updateEmployeeAccount(values, employee.userData.employeeId, () => {
+          resetForm();
+          onClose();
+        });
+      }}>
+      <EditEmployeeForm openDialog={openDialog} onClose={onClose} />
+    </Formik>
   );
 };

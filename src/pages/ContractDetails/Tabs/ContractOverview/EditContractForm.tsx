@@ -1,14 +1,14 @@
 import React, {FC} from 'react';
 import {Box, InputAdornment} from '@mui/material';
 import {FormInput} from 'components/form/FormInput';
-import {ContractRequestBody, ContractType} from 'models/contract';
+import {ContractType, ContractUpdateRequest} from 'models/contract';
 import {FormikProps} from 'formik';
 import {convertToText} from 'utils/utils';
 import {InvoiceDueType} from 'models/invoice';
 import {FormSelect} from 'components/form/FormSelect';
 
 interface Props {
-  formik: FormikProps<ContractRequestBody>;
+  formik: FormikProps<ContractUpdateRequest>;
 }
 
 const EditContractForm: FC<Props> = ({formik}) => (
@@ -18,7 +18,6 @@ const EditContractForm: FC<Props> = ({formik}) => (
         marginY: '10px',
       },
     }}>
-    {console.log(formik.values, '<<< formik')}
     <FormSelect
       labelId="typeSelect-label"
       label="Contract Type"

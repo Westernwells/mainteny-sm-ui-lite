@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Theme, CSSObject} from '@mui/material/styles';
 import styled from '@mui/material/styles/styled';
 import Box from '@mui/material/Box';
@@ -25,6 +26,8 @@ import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
 import {ReactComponent as MaintenyLogo} from 'assets/icons/Mainteny.svg';
 import Fade from '@mui/material/Fade';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 
 const drawerWidth = '15rem';
 
@@ -69,6 +72,7 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 export const AppDrawer = () => {
+  const {t} = useTranslation();
   const [open, setOpen] = useState(false);
   const themeX = useTheme();
   const setSelectedIndex = useState(0)[1];
@@ -100,7 +104,8 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/orders');
-        navigate('/orders?pageIndex=1&pageSize=25&tab=0');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_ORDERS_CLICKED);
+        navigate('/orders');
       },
     },
     {
@@ -114,7 +119,8 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/units');
-        navigate('/units?pageIndex=1&pageSize=25&tab=0');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_UNITS_CLICKED);
+        navigate('/units');
       },
     },
     {
@@ -128,7 +134,8 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/customers');
-        navigate('/customers?pageIndex=1&pageSize=25');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_CUSTOMERS_CLICKED);
+        navigate('/customers');
       },
     },
     {
@@ -142,7 +149,8 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/contracts');
-        navigate('/contracts?pageIndex=1&pageSize=25');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_CONTRACTS_CLICKED);
+        navigate('/contracts');
       },
     },
     {
@@ -156,7 +164,8 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/quotations');
-        navigate('/quotations?pageIndex=1&pageSize=25');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_QUOTATIONS_CLICKED);
+        navigate('/quotations');
       },
     },
     {
@@ -170,7 +179,8 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/invoices');
-        navigate('/invoices?pageIndex=1&pageSize=25');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_INVOICES_CLICKED);
+        navigate('/invoices');
       },
     },
     {
@@ -184,7 +194,8 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/articles');
-        navigate('/articles?pageIndex=1&pageSize=25&tab=0');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_ARTICLES_CLICKED);
+        navigate('/articles');
       },
     },
     {
@@ -198,7 +209,8 @@ export const AppDrawer = () => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/employees');
-        navigate('/employees?pageIndex=1&pageSize=25');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_EMPLOYEES_CLICKED);
+        navigate('/employees');
       },
     },
   ];
@@ -295,7 +307,7 @@ export const AppDrawer = () => {
               <ListItemText
                 primary={
                   <Fade in={open}>
-                    <Typography variant="subtitle1">{text}</Typography>
+                    <Typography variant="subtitle1">{t(text)}</Typography>
                   </Fade>
                 }
               />

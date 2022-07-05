@@ -5,6 +5,7 @@ import {
   ElevatorProperty,
   ElevatorRequestBody,
 } from 'models/elevator';
+import {useTranslation} from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import {InfoCard} from 'components/InfoCard';
 import {useRef, useState} from 'react';
@@ -13,8 +14,12 @@ import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {Dialog} from 'components/Dialog';
 import {AppointmentFormModel} from 'models/unitForm';
 import * as Yup from 'yup';
-import {AppointmentPreferenceSchema} from './AppointmentPreferenceSchema';
+import {
+  AppointmentPreferenceKey,
+  AppointmentPreferenceSchema,
+} from './AppointmentPreferenceSchema';
 import {EditAppointmentForm} from './EditAppointmentForm';
+import {StringMap} from '../../../../../models/misc';
 
 interface Props {
   containerStyles?: {[key: string]: any};
@@ -37,6 +42,7 @@ export const AppointmentPreference = ({
   elevator,
   elevatorRequestBody,
 }: Props) => {
+  const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
   const {mutateAsync: updateElevator} = useUpdateElevator(
     'Appointment preference updated successfully',
@@ -50,11 +56,11 @@ export const AppointmentPreference = ({
       appointmentDaysOfWeek: propertyRef.appointmentDaysOfWeek
         ? propertyRef.appointmentDaysOfWeek.split(',')
         : [],
-      openingHour: propertyRef.openingHour
-        ? propertyRef.openingHour.split('-')[0]
+      openingHour: propertyRef.openingHours
+        ? propertyRef.openingHours.split('-')[0]
         : '',
-      closingHour: propertyRef.openingHour
-        ? propertyRef.openingHour.split('-')[1]
+      closingHour: propertyRef.openingHours
+        ? propertyRef.openingHours.split('-')[1]
         : '',
       requiresAppointment: propertyRef.requiresAppointment || '',
       requiresAppointmentNotification:
@@ -65,8 +71,6 @@ export const AppointmentPreference = ({
     onSubmit: () => {},
     validationSchema,
   });
-
-  // console.log(propertyRef.openingHour.split('-'), '######');
 
   const onSave = async () => {
     setOpenDialog(false);
@@ -95,20 +99,28 @@ export const AppointmentPreference = ({
       containerStyles={{...containerStyles}}
       handleAction={() => setOpenDialog(true)}
       header={
-        <Typography variant="subtitle1">Appointment Preferences</Typography>
+        <Typography variant="subtitle1">
+          {t('Appointment Preferences')}
+        </Typography>
       }
       headerActionIcon={<EditIcon />}
       showHeaderBackground>
       <Grid container spacing={1}>
         {elevator.properties &&
-          elevator.properties.map((property) => (
-            <Grid key={property.key} item xs={12} sm={4} md={6}>
-              <AppointmentPreferenceSchema
-                label={property.key}
-                property={property}
-              />
-            </Grid>
-          ))}
+          elevator.properties
+            .filter(
+              (property) =>
+                (AppointmentPreferenceKey as StringMap<string>)[property.key],
+            )
+            .sort((a, b) => a.key.localeCompare(b.key))
+            .map((property) => (
+              <Grid key={property.key} item xs={12} sm={4} md={6}>
+                <AppointmentPreferenceSchema
+                  label={property.key}
+                  property={property}
+                />
+              </Grid>
+            ))}
       </Grid>
       <Dialog
         title="Edit Appointment Preferences"

@@ -3,12 +3,20 @@ import {
   ServiceCompanySimpleView,
   ServiceCompanyView,
 } from './service-company';
-import {AttachmentResource, Elevator, ElevatorSimpleView} from './elevator';
+import {
+  AttachmentResource,
+  Elevator,
+  ElevatorSimpleView,
+  ElevatorView,
+} from './elevator';
 import {Contract, ContractSimpleView} from './contract';
-import {Fee, JobStatus, Meta, Order} from './misc';
+import {Amount, Fee, JobStatus, Meta, Order} from './misc';
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
-import {EmployeesView} from './employee';
+import {EmployeesSimpleView, EmployeesView} from './employee';
+import {Checklist} from './checklist';
+import {ArticleView} from './article';
+import {FileResource} from './media';
 
 export enum Priority {
   A = 'A',
@@ -38,7 +46,8 @@ export enum ServiceOrderType {
 
 export enum ServiceOrderOrderField {
   CREATED_TIME = 'CREATED_TIME',
-  DUE_DATE = 'DUE_DATE',
+  LAST_VISIT_DATE = 'LAST_VISIT_DATE',
+  NEXT_VISIT_DATE = 'NEXT_VISIT_DATE',
 }
 
 export const ServiceOrderTypeValue = {
@@ -64,6 +73,7 @@ export interface ServiceOrder {
   id: string;
   number: string;
   externalID: string;
+  articles: ServiceOrderArticleView[];
   serviceCompany: ServiceCompany;
   elevator: Elevator;
   contract: Contract;
@@ -89,14 +99,18 @@ export interface ServiceOrderAdditionalInfo {
   appointmentNotificationRequired: boolean;
   appointmentNotificationSent: boolean;
   priority: Priority;
+  checklist: Checklist;
+  moreInformation: string;
+  quotationId: string;
 }
 
 export interface ServiceOrderView {
   id: string;
   number: string;
   externalID: string;
+  articles: ServiceOrderArticleView[];
   serviceCompany: ServiceCompanySimpleView;
-  elevator: ElevatorSimpleView;
+  elevator: ElevatorView;
   contract?: ContractSimpleView;
   description: string;
   type: ServiceOrderType;
@@ -112,6 +126,26 @@ export interface ServiceOrderView {
   search: string;
   meta: Meta;
   additionalInfo: ServiceOrderAdditionalInfo;
+}
+
+export interface ServiceOrderSimpleView {
+  actualStartTime?: string;
+  actualEndTime?: string;
+  additionalInfo: ServiceOrderAdditionalInfo;
+  description: string;
+  dueDate: string;
+  expectedVisitDate: string;
+  id: string;
+  labels: string[];
+  lastVisitDate: string;
+  meta: Meta;
+  number: string;
+  schedules: ServiceOrderScheduleSimpleView[];
+  search: string;
+  serviceCompanyId: string;
+  serviceTime?: number;
+  status: ServiceOrderStatus;
+  type: ServiceOrderType;
 }
 
 export interface AppointmentRes {
@@ -164,7 +198,7 @@ export interface ServiceOrderSchedule {
 export interface ServiceOrderScheduleSimpleView {
   id: string;
   serviceOrderId: string;
-  technician: TechnicianSimpleView;
+  technician: EmployeesSimpleView;
   startTime: string;
   endTime: string;
   type: JobScheduleType;
@@ -192,6 +226,11 @@ export interface CompleteServiceOrder {
   serviceTime: number;
 }
 
+export interface CheckListAnswerRecord {
+  answer: string;
+  questionId: string;
+}
+
 export interface ServiceOrderSummary {
   avgCalloutServiceTime: number;
   avgEmergencyServiceTime: number;
@@ -203,6 +242,18 @@ export interface ServiceOrderSummary {
   numberOfUpcomingOrders: string;
   overDueOrderStartDate?: string;
   upcomingOrderEndDate?: string;
+}
+
+export interface ServiceOrderReportAdditionalInfo {
+  checklistAnswers: CheckListAnswerRecord[];
+}
+
+export interface ServiceOrderReportArticleView {
+  article: ArticleView;
+  id: string;
+  quantity: number;
+  serviceOrderReportId: string;
+  unitAmount: Amount[];
 }
 
 export interface ServiceOrderReport {
@@ -217,6 +268,25 @@ export interface ServiceOrderReport {
   fee: Fee;
 }
 
+export interface ServiceOrderReportAttachmentView {
+  fileResource: FileResource;
+  id: string;
+  serviceOrderReportId: string;
+}
+
+export interface ServiceOrderReportView {
+  actualServiceTime: number;
+  additionalInfo: ServiceOrderReportAdditionalInfo;
+  attachments: ServiceOrderReportAttachmentView[];
+  description: string;
+  elevator: ElevatorView;
+  externalId: string;
+  id: string;
+  meta: Meta;
+  serviceOrder: ServiceOrderView;
+  totalAmount: Amount;
+}
+
 export interface ServiceOrderScheduleParams {
   elevatorIds?: string[];
   end: string;
@@ -227,6 +297,7 @@ export interface ServiceOrderScheduleParams {
   status?: ServiceOrderStatus[];
   serviceCompanyId?: string;
   technicianIds?: string[];
+  types?: ServiceOrderType[];
 }
 
 export interface ServiceOrderQueryParams {
@@ -305,4 +376,22 @@ export interface CreateNonScheduledServiceOrderBody {
   priority: Priority;
   serviceCompanyId: string;
   type: ServiceOrderType;
+}
+
+export interface ServiceOrderArticleView {
+  article: ArticleView;
+  description: string;
+  id: string;
+  name: string;
+  quantity: number;
+  serviceOrderId: string;
+  unitAmount: Amount;
+}
+export interface ServiceOrderItemRecord {
+  articleId: string;
+  articleUnit: string;
+  description: string;
+  name: string;
+  quantity: number;
+  unitAmount: Amount;
 }

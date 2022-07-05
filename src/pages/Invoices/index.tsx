@@ -12,6 +12,8 @@ import {
   formatSearchParamsPageSize,
 } from 'utils/utils';
 import {useSearchParams, useNavigate} from 'react-router-dom';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {columns, makeRows} from './InvoicesDataGridProps';
@@ -55,48 +57,31 @@ export const Invoices = () => {
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
 
-    setPage({
-      ...page,
-      pageSize: Number(currentParams.pageSize),
-      pageIndex: Number(currentParams.pageIndex) - 1,
-    });
+    if (currentParams.pageSize)
+      setPage({
+        ...page,
+        pageSize: Number(currentParams.pageSize),
+      });
+    if (currentParams.pageIndex)
+      setPage({
+        ...page,
+        pageIndex: Number(currentParams.pageIndex) - 1,
+      });
   }, [queryParams]);
 
   useEffect(() => {
-    if (invoiceResource?.data) {
+    if (!isLoading) {
       setRows(makeRows(invoiceResource.data));
     }
-  }, [invoiceResource]);
+  }, [invoiceResource, isLoading]);
 
   useEffect(() => {
     setPageCount(Math.ceil(invoiceResource.total / page.pageSize));
   }, [invoiceResource, pageSize]);
 
-  const amountRangeConvertor = (selectedItems: string[]) => {
-    const range: number[][] = [];
-    selectedItems.forEach((item) => {
-      switch (item) {
-        case 'Below 1000 EUR':
-          range.push([0, 1000]);
-          break;
-
-        case '1000 - 3000 EUR':
-          range.push([1000, 3000]);
-          break;
-
-        case '3000 - 5000 EUR':
-          range.push([3000, 5000]);
-          break;
-
-        case 'Above 5000 EUR':
-          range.push([5000, 99999]);
-          break;
-
-        default:
-          break;
-      }
-    });
-    setAmount(range);
+  const navigateToNewInvoice = () => {
+    Mixpanel.identifyAndTrack(mixpanelEvents.NEW_UNIT_BUTTON_CLICKED);
+    navigate('/invoices/new');
   };
 
   if (isIdle || isLoading) {
@@ -119,16 +104,11 @@ export const Invoices = () => {
         initialSelectedItems={invoiceDate}
       />
       <MultipleSelectCheckmarks
-        label="Total Amount"
-        options={[
-          'Below 1000 EUR',
-          '1000 - 3000 EUR',
-          '3000 - 5000 EUR',
-          'Above 5000 EUR',
-        ]}
-        getSelectedValue={(item) => amountRangeConvertor(item)}
-        initialSelectedItems={amount}
+        label="Due Date"
+        options={['This Week', 'Next Week', 'Next Month']}
+        getSelectedValue={(item) => setInvoiceDate(item)}
         multiple={false}
+        initialSelectedItems={invoiceDate}
       />
       <MultipleSelectCheckmarks
         label="Status"
@@ -143,33 +123,6 @@ export const Invoices = () => {
         multiple={false}
         initialSelectedItems={status ? [status] : []}
       />
-      <MultipleSelectCheckmarks
-        label="Service Type"
-        options={['Maintenance', 'Repair', 'Callout', 'Emergency']}
-        initialSelectedItems={serviceType}
-        getSelectedValue={(items) => {
-          const value: ServiceOrderType[] = [];
-          items.forEach((item) => {
-            switch (item) {
-              case 'Maintenance':
-                value.push(ServiceOrderType.REGULAR);
-                break;
-              case 'Repair':
-                value.push(ServiceOrderType.REPAIR);
-                break;
-              case 'Callout':
-                value.push(ServiceOrderType.CALLOUT);
-                break;
-              case 'Emergency':
-                value.push(ServiceOrderType.EMERGENCY);
-                break;
-              default:
-                break;
-            }
-          });
-          setServiceType(value);
-        }}
-      />
     </FilterFields>
   );
 
@@ -183,7 +136,7 @@ export const Invoices = () => {
           height: '100%',
           mb: '10em',
         }}
-        btnAction={() => navigate('/invoices/new')}
+        btnAction={navigateToNewInvoice}
       />
     );
   }
@@ -195,8 +148,8 @@ export const Invoices = () => {
           searchPlaceholder="Search by number, customer, service type etc."
           getSearchValue={(val: string) => setSearch(val)}
           showActionBtn
-          btnLabel="New invoice"
-          btnOnClick={() => navigate('/invoices/new')}
+          btnLabel="New Invoice"
+          btnOnClick={navigateToNewInvoice}
           filterItems={renderFilterItems()}
         />
       }>
@@ -204,6 +157,7 @@ export const Invoices = () => {
         rows={rows}
         columns={columns}
         loading={isFetching}
+        scrollToTop={search}
         hideFooter={pageCount <= 1}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}

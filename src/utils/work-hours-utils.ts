@@ -1,6 +1,8 @@
 import {hoursToMinutes, secondsToMinutes} from 'date-fns';
 
-import {WorkHoursItem} from 'models/workHours';
+import {ServiceOrderType} from 'models/service-order';
+import {Role} from 'models/user';
+import {WorkHoursItem, WorkHoursType} from 'models/workHours';
 import {convertDigitalMinsToHM} from './datetime';
 
 export const calculateTotalTime = (workHours: WorkHoursItem[]) => {
@@ -36,4 +38,30 @@ export const calculateTotalTime = (workHours: WorkHoursItem[]) => {
   );
 
   return convertDigitalMinsToHM(total);
+};
+
+export const formatServiceName = (
+  name: WorkHoursType | ServiceOrderType | null | undefined,
+) => {
+  if (name === null) return '-';
+  if (name === WorkHoursType.REGULAR || name === ServiceOrderType.REGULAR)
+    return 'Maintenance';
+  if (name === WorkHoursType.EMERGENCY || name === ServiceOrderType.EMERGENCY)
+    return 'Emergency';
+  if (name === WorkHoursType.CALLOUT || name === ServiceOrderType.CALLOUT)
+    return 'Callout';
+  if (name === WorkHoursType.REPAIR || name === ServiceOrderType.REPAIR)
+    return 'Repair';
+  return name;
+};
+
+export const getRoles = (selectedRole: string) => {
+  let roles: Role[] = [Role.SERVICE_MANAGER, Role.TECHNICIAN];
+  if (selectedRole === 'Service Manager') {
+    roles = [Role.SERVICE_MANAGER];
+  } else if (selectedRole === 'Technician') {
+    roles = [Role.TECHNICIAN];
+  }
+
+  return roles;
 };

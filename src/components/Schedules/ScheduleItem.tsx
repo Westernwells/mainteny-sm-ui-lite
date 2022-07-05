@@ -1,8 +1,10 @@
 import Box from '@mui/material/Box';
-import {ReactElement} from 'react';
+import {ComponentType, ReactElement, useState} from 'react';
 import useTheme from '@mui/material/styles/useTheme';
 import {Typography} from '@mui/material';
 import {Tooltip} from 'components/Tooltip';
+import {Props as OrderDetailsProps} from 'components/OrderDetails';
+import {ServiceOrderView} from 'models/service-order';
 
 interface Props {
   children?: ReactElement;
@@ -13,7 +15,8 @@ interface Props {
   height?: string;
   titleLeftAdornment?: JSX.Element;
   cardStatusAccent?: string;
-  tooltip: ReactElement;
+  tooltip: ComponentType<OrderDetailsProps>;
+  order: ServiceOrderView;
   containerStyle?: {[key: string]: string | number};
 }
 
@@ -26,32 +29,71 @@ export const ScheduleItem = ({
   subtitle,
   height = '50px',
   cardStatusAccent,
-  tooltip,
+  tooltip: TooltipComponent,
+  order,
   containerStyle,
   ...rest
 }: Props) => {
+  const [show, setShow] = useState(false);
   const theme = useTheme();
+  const close = () => setShow(false);
   return (
     <Box
       {...rest}
       component="div"
       sx={{
+        display: 'flex',
+        alignItems: 'center',
         gridColumn: 1,
         gridRow: Number(position?.y),
         height,
-        background: theme.palette.secondary.outlinedHoverBg,
+        background: theme.palette.info.infoAlert,
         overflowX: 'hidden',
         width,
         transform: `translateX(${position?.x})`,
         marginTop: '0.5em',
-        borderLeft: `2px solid ${cardStatusAccent}`,
+        border: `1px solid ${theme.palette.info.light}`,
+        borderLeft: 'none',
+        '&::before': {
+          content: '""',
+          width: '6px',
+          height: '48px',
+          borderTopRightRadius: '6px',
+          borderBottomRightRadius: '6px',
+          backgroundColor: cardStatusAccent,
+          flex: 'none',
+        },
         cursor: 'pointer',
         overflowY: 'hidden',
         ...containerStyle,
       }}>
-      <Tooltip title={tooltip} placement="top">
+      <Tooltip
+        open={show}
+        onOpen={() => setShow(true)}
+        onClose={close}
+        title={<TooltipComponent order={order} close={close} />}
+        placement="top"
+        componentsProps={{
+          tooltip: {
+            sx: {
+              bgcolor: 'common.white',
+              '& .MuiTooltip-arrow': {
+                color: 'common.black',
+              },
+              padding: '1rem',
+              boxShadow: '0px 4px 9px rgba(0, 0, 0, 0.09)',
+              maxWidth: '14.25rem',
+            },
+          },
+        }}>
         {children || (
-          <Box sx={{display: 'flex', flexDirection: 'column', my: '0.5em'}}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
+              my: '0.3em',
+            }}>
             <Box sx={{px: '0.5em', display: 'flex'}}>
               <Box> {titleLeftAdornment}</Box>
               <Typography
@@ -70,6 +112,7 @@ export const ScheduleItem = ({
             <Typography
               component="div"
               variant="caption"
+              color={theme.palette.primary.light}
               sx={{
                 px: '0.5em',
                 whiteSpace: 'nowrap',

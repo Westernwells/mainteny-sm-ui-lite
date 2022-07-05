@@ -10,15 +10,20 @@ import {ElevatorView} from 'models/elevator';
 import {formatDate} from 'utils/datetime';
 import Box from '@mui/material/Box';
 import {FormRadio} from 'components/form/FormRadio';
+import {useTranslation} from 'react-i18next';
 
 const defaultProps = {
   editable: false,
   sortable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
+  renderHeader: (params: GridColumnHeaderParams) => {
+    const {t} = useTranslation();
+    return (
+      <Typography variant="subtitle2" color="textSecondary">
+        {typeof params.colDef.headerName === 'string' &&
+          t(params.colDef.headerName)}
+      </Typography>
+    );
+  },
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
     <Typography variant="body2">{params.value || '-'}</Typography>
   ),
@@ -40,11 +45,15 @@ export const columns = (activeId: string): GridColDef[] => [
     type: 'string',
     ...defaultAlignment,
     ...defaultProps,
-    renderHeader: (params: GridColumnHeaderParams) => (
-      <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName}
-      </Typography>
-    ),
+    renderHeader: (params: GridColumnHeaderParams) => {
+      const {t} = useTranslation();
+      return (
+        <Typography variant="subtitle2" color="textSecondary">
+          {typeof params.colDef.headerName === 'string' &&
+            t(params.colDef.headerName)}
+        </Typography>
+      );
+    },
     renderCell: (params: GridRenderCellParams<any, ElevatorView, any>) => (
       <Box sx={{display: 'flex'}}>
         <FormRadio
@@ -97,7 +106,7 @@ export const makeRows = (elevators: ElevatorView[]): GridRowsProp => {
     elevators.length &&
     elevators.map((elevator: ElevatorView) => ({
       id: elevator.id,
-      number: elevator.number,
+      number: elevator.externalId,
       model: elevator.model,
       customer: elevator.propertyOwner.name,
       lastVisit: formatDate(elevator.lastVisitDate),

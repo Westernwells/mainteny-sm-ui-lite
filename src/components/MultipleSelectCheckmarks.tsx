@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
@@ -28,6 +29,8 @@ interface Props {
   containerStyles?: {[key: string]: any};
   formControlStyles?: {[key: string]: any};
   initialSelectedItems?: any[];
+  required?: boolean;
+  disableClearBtn?: boolean;
 }
 
 export const MultipleSelectCheckmarks = ({
@@ -36,9 +39,12 @@ export const MultipleSelectCheckmarks = ({
   label,
   multiple = true,
   containerStyles,
+  required = false,
   formControlStyles,
   initialSelectedItems = [],
+  disableClearBtn = false,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const [selectedItems, setSelectedItems] =
     React.useState<string[]>(initialSelectedItems);
@@ -68,21 +74,23 @@ export const MultipleSelectCheckmarks = ({
       setSelectedItems(initialSelectedItems);
     }
   }, [initialSelectedItems.length]);
+
   return (
     <Box sx={{...containerStyles}}>
       <FormControl
         size="small"
+        required={required}
         sx={{mr: '0.5em', width: '8.5rem', ...formControlStyles}}>
-        <InputLabel id={label}>{label}</InputLabel>
+        <InputLabel id={label}>{t(label)}</InputLabel>
         <Select
           id={label}
           multiple={multiple}
           value={selectedItems}
           onChange={handleChange}
-          input={<OutlinedInput sx={{background: '#fff'}} label={label} />}
-          renderValue={() => selectedItems.join(',')}
+          input={<OutlinedInput sx={{background: '#fff'}} label={t(label)} />}
+          renderValue={() => selectedItems.map((i) => t(i)).join(',')}
           MenuProps={MenuProps}>
-          {!multiple ? (
+          {!multiple && !disableClearBtn ? (
             <MenuItem
               disableTouchRipple
               sx={{
@@ -97,7 +105,7 @@ export const MultipleSelectCheckmarks = ({
                   color: theme.palette.info.main,
                   ...visibility,
                 }}
-                primary="Clear"
+                primary={t('Clear')}
               />
             </MenuItem>
           ) : null}
@@ -106,12 +114,12 @@ export const MultipleSelectCheckmarks = ({
             ? options.map((option) => (
                 <MenuItem key={option} value={option}>
                   <Checkbox checked={selectedItems.includes(option)} />
-                  <ListItemText primary={option} />
+                  <ListItemText primary={t(option)} />
                 </MenuItem>
               ))
             : options.map((option) => (
                 <MenuItem key={option} value={option}>
-                  <ListItemText primary={option} />
+                  <ListItemText primary={t(option)} />
                 </MenuItem>
               ))}
         </Select>

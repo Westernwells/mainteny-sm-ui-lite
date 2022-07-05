@@ -13,14 +13,18 @@ import {WorkHourTypeText} from 'components/WorkHourTypeText';
 import {getRangeDate} from 'utils/datetime';
 import {WorkHoursItem} from 'models/workHours';
 import {Resource} from 'models/misc';
+import {useTranslation} from 'react-i18next';
 
 const defaultProps = {
   editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary" component="span">
-      {params.colDef.headerName}
-    </Typography>
-  ),
+  renderHeader: (params: GridColumnHeaderParams) => {
+    const {t} = useTranslation();
+    return (
+      <Typography variant="subtitle2" color="textSecondary" component="span">
+        {params.colDef.headerName && t(params.colDef.headerName)}
+      </Typography>
+    );
+  },
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
     <Typography variant="body2" mx="0.5em" component="span">
       {params.value}
@@ -64,6 +68,33 @@ export const columns: GridColDef[] = [
   {
     field: 'time',
     headerName: 'TIME',
+    type: 'string',
+    flex: 2,
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+  {
+    field: 'duration',
+    headerName: 'DURATION',
+    type: 'string',
+    flex: 1,
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+];
+
+export const columnsWidget: GridColDef[] = [
+  {
+    field: 'orderType',
+    headerName: 'TYPE',
+    type: 'string',
+    flex: 1,
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+  {
+    field: 'orderNumber',
+    headerName: 'ORDER NUMBER',
     type: 'string',
     flex: 1,
     ...defaultAlignment,

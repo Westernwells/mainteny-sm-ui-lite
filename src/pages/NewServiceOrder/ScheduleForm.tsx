@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import {useTranslation} from 'react-i18next';
 import {DatePicker} from 'components/DatePicker';
 import {TimePicker} from 'components/TimePicker';
 import {startOfDay} from 'date-fns';
@@ -39,6 +40,7 @@ export const ScheduleForm = ({
   scheduleFormIsErrored,
   currentRadioOption,
 }: Props) => {
+  const {t} = useTranslation();
   const formik = useFormik<ScheduleTechnicianForm>({
     initialValues: {
       date: defaultStartDate || null,
@@ -75,7 +77,7 @@ export const ScheduleForm = ({
           });
         }}
         textFieldProps={{
-          label: 'Due date',
+          label: t('Due date'),
           name: 'date',
           helperText:
             formik.errors.date && formik.touched.date ? formik.errors.date : '',
@@ -97,7 +99,7 @@ export const ScheduleForm = ({
                 });
               }}
               textFieldProps={{
-                label: 'Start Time',
+                label: t('Start Time'),
                 name: 'startTime',
                 helperText:
                   formik.errors.startTime && formik.touched.startTime
@@ -117,7 +119,7 @@ export const ScheduleForm = ({
                 });
               }}
               textFieldProps={{
-                label: 'End Time',
+                label: t('End Time'),
                 name: 'endTime',
                 helperText:
                   formik.errors.endTime && formik.touched.endTime
@@ -152,7 +154,7 @@ export const ScheduleForm = ({
                   formik.errors.technicianId && formik.touched.technicianId
                     ? formik.errors.technicianId
                     : '',
-                label: 'Assign To',
+                label: t('Assign To'),
                 onBlur: formik.handleBlur,
               }}
             />

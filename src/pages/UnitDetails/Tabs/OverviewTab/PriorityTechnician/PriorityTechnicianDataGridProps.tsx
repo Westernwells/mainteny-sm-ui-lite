@@ -10,6 +10,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Box from '@mui/material/Box';
 import {ElevatorAssignmentSimpleView} from 'models/elevator';
+import {Tooltip} from 'components/Tooltip';
+import {Info} from '@mui/icons-material';
 
 const defaultProps = {
   editable: false,
@@ -61,16 +63,61 @@ export const columns = (
     type: 'number',
     ...defaultAlignment,
     ...defaultProps,
+    renderHeader: (params: GridColumnHeaderParams) => (
+      <Box display="flex" alignItems="center">
+        <Typography variant="subtitle2" color="textSecondary">
+          {params.colDef.headerName}
+        </Typography>
+        <Tooltip
+          title={
+            <Box>
+              <Typography
+                sx={{color: 'primary.main', fontSize: '14px', mb: '0.5em'}}>
+                Priority
+              </Typography>
+              <Typography
+                sx={{
+                  color: 'text.primary',
+                  fontSize: '12px',
+                  lineHeight: '166%',
+                }}>
+                Lower the number here, higher is the priority
+              </Typography>
+            </Box>
+          }
+          placement="bottom-end"
+          componentsProps={{
+            tooltip: {
+              sx: {
+                bgcolor: 'white',
+                color: 'black',
+                boxShadow: '0px 3.59389px 8.08625px rgba(0, 0, 0, 0.1);',
+              },
+            },
+          }}
+          arrow={false}>
+          <Info
+            sx={{
+              ml: '0.1em',
+              width: '1.04rem',
+              height: '1.04rem',
+              color: 'action.active',
+            }}
+          />
+        </Tooltip>
+      </Box>
+    ),
   },
   {
     field: 'actions',
-    headerName: 'EXPIRY DATE',
-    type: 'number',
+    headerName: 'Actions',
     ...defaultAlignment,
     ...defaultProps,
     renderCell: (params) => (
       <Box sx={{display: 'flex'}}>
-        <Box onClick={() => getEditableTechnician(params.value)}>
+        <Box
+          onClick={() => getEditableTechnician(params.value)}
+          sx={{mr: '1em'}}>
           <EditIcon sx={{color: 'text.secondary'}} />
         </Box>
         <Box onClick={() => getDeletableTechnician(params.value)}>
@@ -84,10 +131,16 @@ export const columns = (
 export const makeRows = (
   maintainers: ElevatorAssignmentSimpleView[],
 ): GridRowsProp =>
-  maintainers.map((maintainer) => ({
-    id: maintainer.technician.id,
-    name: `${maintainer.technician.userAccount.firstName} ${maintainer.technician.userAccount.lastName}`,
-    address: maintainer.technician.address.fullName,
-    priority: maintainer.weight,
-    actions: maintainer,
-  }));
+  maintainers
+    .sort((a, b) =>
+      a.technician.userAccount.firstName.localeCompare(
+        b.technician.userAccount.firstName,
+      ),
+    )
+    .map((maintainer) => ({
+      id: maintainer.technician.id,
+      name: `${maintainer.technician.userAccount.firstName} ${maintainer.technician.userAccount.lastName}`,
+      address: maintainer.technician.address.fullName,
+      priority: maintainer.weight,
+      actions: maintainer,
+    }));
