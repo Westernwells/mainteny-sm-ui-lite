@@ -1,3 +1,8 @@
+import {useEffect, useMemo, useRef, useState} from 'react';
+import {useNavigate} from 'react-router';
+import Box from '@mui/material/Box';
+import {GridRowsProp} from '@mui/x-data-grid';
+
 import {useUseQueryCustomerContracts} from 'hooks/reactQuery/useContract';
 import {
   ContractOrderField,
@@ -5,20 +10,16 @@ import {
   ContractView,
 } from 'models/contract';
 import {Order} from 'models/misc';
-import {useEffect, useMemo, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {Progress} from 'components/Progress';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
 import {TabContentContainer} from 'components/TabContentContainer';
-import Box from '@mui/material/Box';
-
 import {
   costRangeConvertor as crConverter,
   getStartEndPrice,
 } from 'utils/contract-utils';
-import {GridRowsProp} from '@mui/x-data-grid';
 import {EmptySection} from 'components/EmptySection';
 import {convertToMacro, convertToText} from 'utils/utils';
 import {Widget} from 'components/Widget';
@@ -29,6 +30,8 @@ interface Props {
 }
 
 export const ContractsTab = ({customerId}: Props) => {
+  const navigate = useNavigate();
+
   const [page, setPage] = useState(makePage(0, 10));
   const totalContractsRef = useRef(0);
   const [searchQuery, setSearchQuery] = useState('');
@@ -129,6 +132,7 @@ export const ContractsTab = ({customerId}: Props) => {
         label="No contracts yet. Create a new one to view here"
         showActionBtn
         btnLabel="Add Contract"
+        btnAction={() => navigate('/contracts/new')}
         containerStyle={{
           height: '100%',
           mb: '10em',
