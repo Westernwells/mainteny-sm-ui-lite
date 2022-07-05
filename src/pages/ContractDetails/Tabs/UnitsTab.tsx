@@ -10,6 +10,7 @@ import {TabContentContainer} from 'components/TabContentContainer';
 import {EmptySection} from 'components/EmptySection';
 import {useNavigate} from 'react-router';
 import {ContractElevatorSimpleView} from 'models/contract';
+import {ElevatorView} from 'models/elevator';
 
 interface Props {
   elevators: ContractElevatorSimpleView[];
@@ -29,7 +30,7 @@ export const UnitsTab: FC<Props> = ({elevators}) => {
             (elevator) =>
               ({
                 ...elevator.elevator,
-              } as any),
+              } as ElevatorView),
           ),
         }),
       );
