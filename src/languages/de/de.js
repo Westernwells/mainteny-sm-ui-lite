@@ -614,7 +614,7 @@ module.exports = {
     'New Customer': 'Neuer Kunde',
     'JOINED DATE': 'ANGESTELLUNGSDATUM',
     PRIORITY: 'PRIORITÄT',
-    'NO. OF CONTRACTS': 'NO. VERTRÄGE',
+    'NO. OF CONTRACTS': 'Anzahl Verträge',
     'Basic Details': 'Allgemeine Angaben',
     'Billing Address': 'Rechnungsadresse',
     'Customer Number': 'Kundennummer',
