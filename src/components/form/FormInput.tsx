@@ -23,16 +23,6 @@ export const FormInput = ({props, containerStyles, inputLabelProps}: Props) => {
         label={t(props!.label as string)}
         helperText={t(props!.helperText as string)}
         placeholder={t(props!.placeholder as string)}
-        sx={{
-          '& input[type=number]::-webkit-outer-spin-button': {
-            '-webkit-appearance': 'none',
-            margin: 0,
-          },
-          '& input[type=number]::-webkit-inner-spin-button': {
-            '-webkit-appearance': 'none',
-            margin: 0,
-          },
-        }}
       />
     </FormControl>
   );
