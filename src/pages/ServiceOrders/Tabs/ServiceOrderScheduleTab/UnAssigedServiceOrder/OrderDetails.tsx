@@ -159,7 +159,8 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
         style={{px: '0.5em'}}
         buttonProps={{
           onClick: () => setOpenDialog(true),
-          size: 'small',
+          size: 'medium',
+          fullWidth: true,
           variant: 'outlined',
           sx: {bgcolor: 'white'},
         }}

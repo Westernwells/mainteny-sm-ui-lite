@@ -39,6 +39,7 @@ export const UnitListingView = () => {
   const totalUnitsRef = useRef(0);
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
+  const [resetDatePicker, setResetDatePicker] = useState(false);
 
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
@@ -107,6 +108,7 @@ export const UnitListingView = () => {
     setLastVisitEnd(null);
     setNextVisitStart(null);
     setNextVisitEnd(null);
+    setResetDatePicker(true);
   };
 
   if (isFetched && !totalUnitsRef.current) {
@@ -132,6 +134,12 @@ export const UnitListingView = () => {
       <DatePicker
         defaultDate={lastVisitStart}
         containerStyles={{mr: '1em'}}
+        reset={resetDatePicker}
+        getReset={(val) => {
+          if (val) {
+            setResetDatePicker(false);
+          }
+        }}
         maxDate={lastVisitEnd || new Date()}
         getSelectedDate={(date) => setLastVisitStart(date)}
         inputLabelProps={{shrink: undefined}}
@@ -144,6 +152,12 @@ export const UnitListingView = () => {
         defaultDate={lastVisitEnd}
         maxDate={new Date()}
         minDate={lastVisitStart || undefined}
+        reset={resetDatePicker}
+        getReset={(val) => {
+          if (val) {
+            setResetDatePicker(false);
+          }
+        }}
         containerStyles={{mr: '1em'}}
         getSelectedDate={(date) => setLastVisitEnd(date)}
         inputLabelProps={{shrink: undefined}}
@@ -157,6 +171,12 @@ export const UnitListingView = () => {
         defaultDate={nextVisitStart}
         minDate={new Date()}
         maxDate={nextVisitEnd || undefined}
+        reset={resetDatePicker}
+        getReset={(val) => {
+          if (val) {
+            setResetDatePicker(false);
+          }
+        }}
         containerStyles={{mr: '1em'}}
         getSelectedDate={(date) => setNextVisitStart(date)}
         inputLabelProps={{shrink: undefined}}
@@ -168,6 +188,12 @@ export const UnitListingView = () => {
       <DatePicker
         defaultDate={nextVisitEnd}
         minDate={nextVisitStart || new Date()}
+        reset={resetDatePicker}
+        getReset={(val) => {
+          if (val) {
+            setResetDatePicker(false);
+          }
+        }}
         containerStyles={{mr: '1em'}}
         getSelectedDate={(date) => setNextVisitEnd(date)}
         inputLabelProps={{shrink: undefined}}
