@@ -31,6 +31,7 @@ export const UnitsTab = ({customerId}: Props) => {
   const [nextVisitStart, setNextVisitStart] = useState<Date | null>(null);
   const [nextVisitEnd, setNextVisitEnd] = useState<Date | null>(null);
   const [pageCount, setPageCount] = useState(0);
+  const [resetDatePicker, setResetDatePicker] = useState(false);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const {
     data: elevatorResource = createEmptyResource<ElevatorView>(25),
@@ -99,6 +100,7 @@ export const UnitsTab = ({customerId}: Props) => {
     setLastVisitEnd(null);
     setNextVisitStart(null);
     setNextVisitEnd(null);
+    setResetDatePicker(true);
   };
 
   const renderFilterItems = () => (
@@ -108,6 +110,12 @@ export const UnitsTab = ({customerId}: Props) => {
       showFilter>
       <DatePicker
         defaultDate={lastVisitStart}
+        reset={resetDatePicker}
+        getReset={(val) => {
+          if (val) {
+            setResetDatePicker(false);
+          }
+        }}
         containerStyles={{mr: '1em'}}
         maxDate={lastVisitEnd || new Date()}
         getSelectedDate={(date) => setLastVisitStart(date)}
@@ -121,6 +129,12 @@ export const UnitsTab = ({customerId}: Props) => {
         defaultDate={lastVisitEnd}
         maxDate={new Date()}
         minDate={lastVisitStart || undefined}
+        reset={resetDatePicker}
+        getReset={(val) => {
+          if (val) {
+            setResetDatePicker(false);
+          }
+        }}
         containerStyles={{mr: '1em'}}
         getSelectedDate={(date) => setLastVisitEnd(date)}
         inputLabelProps={{shrink: undefined}}
@@ -135,6 +149,12 @@ export const UnitsTab = ({customerId}: Props) => {
         minDate={new Date()}
         maxDate={nextVisitEnd || undefined}
         containerStyles={{mr: '1em'}}
+        reset={resetDatePicker}
+        getReset={(val) => {
+          if (val) {
+            setResetDatePicker(false);
+          }
+        }}
         getSelectedDate={(date) => setNextVisitStart(date)}
         inputLabelProps={{shrink: undefined}}
         textFieldProps={{
@@ -146,6 +166,12 @@ export const UnitsTab = ({customerId}: Props) => {
         defaultDate={nextVisitEnd}
         minDate={nextVisitStart || new Date()}
         containerStyles={{mr: '1em'}}
+        reset={resetDatePicker}
+        getReset={(val) => {
+          if (val) {
+            setResetDatePicker(false);
+          }
+        }}
         getSelectedDate={(date) => setNextVisitEnd(date)}
         inputLabelProps={{shrink: undefined}}
         textFieldProps={{
