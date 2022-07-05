@@ -18,7 +18,7 @@ interface Props {
   customerId: string;
 }
 
-const pageInfo = makePage(0, 8);
+const pageInfo = makePage(0, 10);
 
 const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
   const fallback = useRef({
@@ -153,8 +153,6 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
         loading={isFetching}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
-        height="80%"
-        fullHeight={false}
         checkboxSelection
         isRowSelectable={() => true}
         handlePageChange={(newPage: number) => {

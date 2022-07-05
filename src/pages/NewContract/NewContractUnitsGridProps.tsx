@@ -52,9 +52,10 @@ export const makeRows = ({
     elevators.length &&
     elevators.map((elevator: DataGridElevatorView) => ({
       id: elevator.id,
-      number: elevator.number,
-      model: elevator.model,
-      customer: elevator.propertyOwner.name,
+      number: elevator.externalId || '-',
+      address: elevator?.address?.fullName || '-',
+      model: elevator.model || '-',
+      customer: elevator.propertyOwner.name || '-',
       lastVisit: formatDate(elevator.lastVisitDate),
     }));
   return result || [];
