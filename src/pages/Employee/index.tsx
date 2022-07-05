@@ -66,6 +66,12 @@ export const Employees = () => {
     totalEmployeeRef.current || userAccountResource.total;
 
   useEffect(() => {
+    if (page.pageIndex) {
+      setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    }
+  }, [search, role]);
+
+  useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
 
     if (currentParams.pageSize)

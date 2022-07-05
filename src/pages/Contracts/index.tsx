@@ -70,6 +70,12 @@ export const Contracts = () => {
   totalContractRef.current = totalContractRef.current || contractResource.total;
 
   useEffect(() => {
+    if (page.pageIndex) {
+      setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    }
+  }, [search, cost, status]);
+
+  useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
 
     if (currentParams.pageSize)

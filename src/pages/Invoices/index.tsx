@@ -55,6 +55,12 @@ export const Invoices = () => {
   totalInvoiceRef.current = totalInvoiceRef.current || invoiceResource.total;
 
   useEffect(() => {
+    if (page.pageIndex) {
+      setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    }
+  }, [search, status, invoiceDate]);
+
+  useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
 
     if (currentParams.pageSize)

@@ -69,14 +69,11 @@ export const ServiceOrderList = () => {
   totalOrederRef.current =
     totalOrederRef.current || serviceOrdersResource.total;
 
-  // useEffect(() => {
-  //   const currentParams = Object.fromEntries([...queryParams]);
-  //   setPage({
-  //     ...page,
-  //     pageSize: Number(currentParams.pageSize),
-  //     pageIndex: Number(currentParams.pageIndex) - 1,
-  //   });
-  // }, [queryParams]);
+  useEffect(() => {
+    if (page.pageIndex) {
+      setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    }
+  }, [searchQuery, selectedOrderTypes, selectedOrderStatus]);
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
