@@ -53,7 +53,7 @@ export const Checklist = ({orderId}: Props) => {
     useUpdateServiceOrderCheckListAnswers();
   const serviceOrderDetails = useMemo(
     () => serviceOrderReport?.[0]?.serviceOrder,
-    [serviceOrderReport?.[0]?.additionalInfo.checkListAnswers.length],
+    [serviceOrderReport?.[0]?.additionalInfo?.checkListAnswers?.length],
   );
 
   const formik: FormikProps<FormikValues> = useFormik<FormikValues>({
@@ -79,7 +79,7 @@ export const Checklist = ({orderId}: Props) => {
 
   const questions = useMemo(() => {
     const questionsWithStatus = sortBy(
-      serviceOrderDetails?.additionalInfo.checkList.questions.map(
+      serviceOrderDetails?.additionalInfo?.checkList?.questions?.map(
         (question) => {
           if (
             !serviceOrderReport?.[0]?.additionalInfo.checkListAnswers?.length
