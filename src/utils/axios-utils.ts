@@ -17,7 +17,7 @@ axiosClient.interceptors.response.use(
   (error) => {
     if (error.response.status === 401) {
       clearStoredUser();
-      window.location.replace('/sm-lite/login');
+      window.location.replace('/login');
     }
   },
 );

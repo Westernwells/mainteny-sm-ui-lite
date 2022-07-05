@@ -13,11 +13,9 @@ Service Manager also known as Mainteny Manager is the unified application made f
 
 ## Continuous Delivery
 
-Developer Testing: [staging.mainteny.com/sm-lite-test](https://staging.mainteny.com/sm-lite-test)
+Staging: [staging.mainteny.com](https://staging.mainteny.com/)
 
-Staging: [staging.mainteny.com/sm-lite](https://staging.mainteny.com/sm-lite/)
-
-Production: [app.mainteny.com/sm-lite](https://app.mainteny.com/sm/)
+Production: [app.mainteny.com](https://app.mainteny.com/)
 
 ## Installation
 
@@ -77,11 +75,7 @@ If you aren't satisfied with the build tool and configuration choices, you can `
 
 ## Roadmap
 
-- Employees Management - Allowing service managers to have an overview of technicians, their availability, holidays, working hours etc.
-- Invoice Creation workflow - Allowing service managers to verify details and create invoices out of a completed order.
-- Service Orders & Scheduling - Allowing service managers to schedule incoming orders and have an overview of the automated schedule provided by Mainteny's algorithm. The service orders will also be presented in a swimlane view for better UX.
 - KPI Dashboard - A home/dashboard page for service managers to be informed about their key KPIs and action items. They include order completion metrics, to-dos etc.
-- Proposals and Proposal Creation workflow - Proposals are an important way for service managers to convice customers and get revenue. These proposals could ideally be for a repair work.
 
 
 ## Contributing
@@ -94,4 +88,4 @@ This project is currently active and owned by [Mainteny AS](https://mainteny.com
 
 ---
 
-©2022 Mainteny. All rights reserved.
+©2022 Mainteny AS. All rights reserved.
