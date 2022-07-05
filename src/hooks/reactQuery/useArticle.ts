@@ -95,7 +95,7 @@ export const useCreateArticle = (successMsg: string) => {
     },
     onError: (err) => {
       console.log(err);
-      enqueueSnackbar('Some error occurred, please try again.', {
+      enqueueSnackbar('An unexpected error occurred, please try again.', {
         variant: 'error',
       });
     },
@@ -122,7 +122,7 @@ export const useDeleteArticle = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },
@@ -156,9 +156,12 @@ export const useUpdateArticle = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          'Sorry! Unable to save changes right now. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
       },
     },
   );
@@ -210,13 +213,13 @@ export const useCreatePartialArticle = () => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries([qk.fetchArticles]);
-        enqueueSnackbar(`Partial Invoice Supported`, {
+        enqueueSnackbar(`Partial invoicing is supported`, {
           variant: 'success',
         });
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again!', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },

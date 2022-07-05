@@ -1,4 +1,5 @@
 import {useQuery} from 'react-query';
+import {useTranslation} from 'react-i18next';
 import {queryKeys as qks} from 'reactQuery/constants';
 import {useSnackbar} from 'hooks/useSnackbar';
 
@@ -57,6 +58,7 @@ export const useGetUserAccount = (id?: string) =>
 
 export const useEmployeeAccount = () => {
   const {enqueueSnackbar} = useSnackbar();
+  const {t} = useTranslation();
 
   const addEmployeeAccount = async (
     accountData: EmployeeAccountData,
@@ -72,7 +74,9 @@ export const useEmployeeAccount = () => {
 
       if (status === 200) {
         enqueueSnackbar(
-          `User account for ${accountData.firstName} created successfully!`,
+          `${t('User account for')} ${accountData.firstName} ${t(
+            'created successfully.',
+          )}`,
           {
             variant: 'success',
           },
@@ -107,7 +111,9 @@ export const useEmployeeAccount = () => {
 
       if (status === 200) {
         enqueueSnackbar(
-          `User account for ${accountData.firstName} updated successfully!`,
+          `${t('User account for')} ${accountData.firstName} ${t(
+            'updated successfully.',
+          )}`,
           {
             variant: 'success',
           },

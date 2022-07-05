@@ -64,7 +64,6 @@ module.exports = {
     'User account not found': 'Benutzerkonto nicht gefunden',
     'Sorry, we failed to fulfill the request at this time. Please try again':
       'Es tut uns leid, wir konnten die Anfrage zu diesem Zeitpunkt nicht erfüllen. Bitte versuchen Sie es erneut.',
-    'Password reset successfully': 'Passwort erfolgreich zurückgesetzt',
     'Invalid Code': 'Ungültiger Code',
     'Confirm new password': 'Passwort bestätigen',
 
@@ -227,8 +226,6 @@ module.exports = {
     'Article Details': 'Artikel Detail',
     'Do you want to delete this article?': 'Wollen Sie diesen Artikel löschen?',
     'Article is created': 'Artikel wird erstellt',
-    'Article is updated successfully': 'Artikel wurde erfolgreich aktualisiert',
-    'Article is deleted successfully': 'Artikel wurde erfolgreich gelöscht',
     '+ Add Description': '+ Beschreibung hinzufügen',
     'Edit Description': 'Beschreibung bearbeiten',
     'No description yet. Please click the button below to add!':
@@ -243,7 +240,6 @@ module.exports = {
       'Noch keine Lieferanten vorhanden. Bitte klicken Sie zum Hinzufügen auf die Schaltfläche unten!',
     '+ Add suppliers': '+ Lieferanten hinzufügen',
     Preferred: 'Bevorzug',
-    'Image uploaded successfully': 'Bild erfolgreich hochgeladen',
     'QR code image uploaded successfully!':
       'QR-Code-Bild erfolgreich hochgeladen!',
     Attachments: 'Anhänge',
@@ -643,6 +639,81 @@ module.exports = {
     Valid: 'Gültig',
     'Edit Contact Person': 'Kontaktperson bearbeiten',
     'Add Contact Person': 'Kontaktperson hinzufügen',
+
+    // Toast
+    'Uh oh! As a Property Manager, please login at':
+      'Oh oh! Als Property Manager melden Sie sich bitte unter',
+    'Email or password entered is incorrect':
+      'Die eingegebene E-Mail oder das eingegebene Passwort ist falsch',
+    'Code sent successfully to your email':
+      'Der Code wurde erfolgreich an Ihre E-Mail gesendet',
+    "Sorry, user account wasn't found":
+      'Entschuldigung, das Benutzerkonto wurde nicht gefunden',
+    'Password reset successfully':
+      'Das Passwort wurde erfolgreich zurückgesetzt',
+    'Sorry, we failed to fulfill the request at this time. Please try again.':
+      'Entschuldigung, wir konnten die Anfrage zu diesem Zeitpunkt nicht erfüllen. Bitte versuche es erneut.',
+    'An unexpected error occurred, please try again.':
+      'Ein unerwarteter Fehler ist aufgetreten, bitte versuchen Sie es erneut.',
+    'Partial invoicing is supported': 'Teilrechnungen werden unterstützt',
+    'Todo created successfully': 'Die Aufgabe wurde erfolgreich erstellt',
+    'Sorry, there was an error while creating the todo. Please try again.':
+      'Entschuldigung, beim Erstellen der Aufgabe ist ein Fehler aufgetreten. Bitte versuche es erneut.',
+    'Todo updated successfully': 'Die Aufgabe wurde erfolgreich aktualisiert',
+    'Sorry, there was an error while updating the todo. Please try again.':
+      'Entschuldigung, beim Aktualisieren der Aufgabe ist ein Fehler aufgetreten. Bitte versuche es erneut.',
+    'Todo deleted successfully': 'Die Aufgabe wurde erfolgreich gelöscht',
+    'Sorry, there was an error while deleting the todo. Please try again.':
+      'Entschuldigung, beim Löschen der Aufgabe ist ein Fehler aufgetreten. Bitte versuche es erneut.',
+    'Invoice sent successfully': 'Rechnung erfolgreich versandt',
+    'Invoice marked as paid': 'Rechnung als bezahlt markiert',
+    'Invoice created successfully': 'Rechnung wurde erfolgreich erstellt',
+    'Invoice updated successfully': 'Rechnung wurde erfolgreich aktualisiert',
+    'Invoice deleted successfully': 'Rechnung wurde erfolgreich gelöscht',
+    'Quotation sent successfully': 'Angebot erfolgreich versandt',
+    'Quotation created successfully': 'Angebot wurde erfolgreich erstellt',
+    'Quotation updated successfully': 'Angebot wurde erfolgreich aktualisiert',
+    'Quotation deleted successfully': 'Angebot wurde erfolgreich gelöscht',
+    'Service order has been cancelled': 'Auftrag wurde storniert',
+    'Service order has been unscheduled': 'Auftrag wurde storniert',
+    'User account for': 'Das Benutzerkonto für',
+    'created successfully.': 'wurde erfolgreich erstellt.',
+    'Sorry! User account creation failed. Please try again.':
+      'Es tut uns leid! Die Erstellung des Benutzerkontos ist fehlgeschlagen. Bitte versuchen Sie erneut.',
+    'updated successfully.': 'wurde erfolgreich aktualisiert.',
+    'Sorry! Unable to save changes right now. Please try again.':
+      'Es tut uns leid! Änderungen können derzeit nicht gespeichert werden. Bitte versuchen Sie es erneut.',
+    'Article created successfully': 'Der Artikel wurde erfolgreich erstellt',
+    'Article deleted successfully': 'Der Artikel wurde erfolgreich gelöscht',
+    'Article updated successfully':
+      'Der Artikel wurde erfolgreich aktualisiert',
+    'Appointment preference updated successfully':
+      'Die Terminpräferenz erfolgreich aktualisiert',
+    'Elevator updated successfully':
+      'Der Aufzug wurde erfolgreich aktualisiert',
+    'Documents uploaded successfully':
+      'Die Dokumente wurden erfolgreich hochgeladen',
+    'Location updated successfully':
+      'Der Standort wurde erfolgreich aktualisiert',
+    'Notes updated successfully': 'Die Notizen wurden erfolgreich aktualisiert',
+    'Notes deleted successfully': 'Die Notizen wurden erfolgreich gelöscht',
+    'Image uploaded successfully': 'Das Bild  wurde erfolgreich hochgeladen',
+    'Service updated successfully': 'Der Dienst wurde erfolgreich aktualisiert',
+    'Unit details updated successfully':
+      'Die Einheitendetails wurden erfolgreich aktualisiert',
+    'Technicians updated successfully':
+      'Die Techniker wurden erfolgreich aktualisiert',
+    'Unit created successfully': 'Die Einheit wurde erfolgreich erstellt',
+    'Service order rescheduled successfully':
+      'Der Serviceauftrag wurde erfolgreich umgeplant',
+    'Service order scheduled successfully':
+      'Der Serviceauftrag wurde erfolgreich geplant',
+    'Emergency order created successfully':
+      'Der Notfallauftrag wurde erfolgreich erstellt',
+    'Order created successfully': 'Die Bestellung wurde erfolgreich erstellt',
+    'Order scheduled successfully': 'Die Bestellung wurde erfolgreich geplant',
+    'QR code image uploaded successfully':
+      'QR-Code wurde erfolgreich hochgeladen',
   },
 };
 

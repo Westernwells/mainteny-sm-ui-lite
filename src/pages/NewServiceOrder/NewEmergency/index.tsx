@@ -28,7 +28,7 @@ export const NewEmergency = ({quotation}: Props) => {
   const navigate = useNavigate();
   const [description, setDescription] = useState('');
   const {mutateAsync: createEmergencyOrder} = useAssignmentBasedOrder(
-    'Emergency order created',
+    'Emergency order created successfully',
   );
   const [recommendedTechnicians, setRecommendedTechnicians] = useState<
     EmployeesView[]

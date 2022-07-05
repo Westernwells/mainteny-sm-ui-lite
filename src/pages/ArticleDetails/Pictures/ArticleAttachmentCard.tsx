@@ -21,7 +21,7 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
   const {t} = useTranslation();
 
   const {mutateAsync: updateArticle} = useUpdateArticle(
-    t('Article is updated successfully'),
+    t('Article updated successfully'),
   );
   const {data: pictureUrls = {}} = useDownloadUrl(
     _.map(article.additionalInfo.pictureUrls, (item) => item),

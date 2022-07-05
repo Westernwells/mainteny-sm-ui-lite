@@ -415,13 +415,13 @@ export const useCancelServiceOrders = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        enqueueSnackbar('Service order cancelled', {
+        enqueueSnackbar('Service order has been cancelled', {
           variant: 'success',
         });
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },
@@ -444,13 +444,13 @@ export const useUnscheduleServiceOrders = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        enqueueSnackbar('Service order unscheduled', {
+        enqueueSnackbar('Service order has been unscheduled', {
           variant: 'success',
         });
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },
@@ -489,7 +489,7 @@ export const useRedispatchServiceOrders = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },
@@ -529,9 +529,12 @@ export const useUpdateServiceOrder = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          'Sorry! Unable to save changes right now. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
       },
     },
   );
@@ -558,7 +561,7 @@ export const useAssignmentBasedOrder = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },
@@ -590,7 +593,7 @@ export const useCreateScheduledServiceOrder = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },
@@ -622,7 +625,7 @@ export const useCreateNonScheduledServiceOrder = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },
@@ -655,9 +658,12 @@ export const useUpdateServiceOrderArticles = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again!', {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          'Sorry! Unable to save changes right now. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
       },
     },
   );

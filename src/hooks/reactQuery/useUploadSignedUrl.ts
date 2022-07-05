@@ -73,7 +73,7 @@ export const useUploadFiles = (successMsg: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },

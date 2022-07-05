@@ -66,9 +66,12 @@ export const useUpdateContact = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          'Sorry! Unable to save changes right now. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
       },
     },
   );
@@ -95,7 +98,7 @@ export const useCreateContact = (successMsg?: string) => {
     },
     onError: (err: any) => {
       console.log(err);
-      enqueueSnackbar('Some error occurred, please try again.', {
+      enqueueSnackbar('An unexpected error occurred, please try again.', {
         variant: 'error',
       });
     },
@@ -124,7 +127,7 @@ export const useDeleteContact = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },
@@ -155,7 +158,7 @@ export const useInviteContact = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
       },

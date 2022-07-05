@@ -295,9 +295,12 @@ export const useUpdateContract = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          'Sorry! Unable to save changes right now. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
       },
     },
   );

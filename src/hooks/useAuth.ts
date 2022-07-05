@@ -45,7 +45,9 @@ export const useAuth = (): UseAuth => {
       if (user?.token) {
         if (!user.userAccount.roles.includes(Role.SERVICE_MANAGER)) {
           enqueueSnackbar(
-            `Uh oh! As a Property Manager, please login at ${process.env.REACT_APP_PMUI_URL}`,
+            `${t('Uh oh! As a Property Manager, please login at')} ${
+              process.env.REACT_APP_PMUI_URL
+            }`,
             {
               variant: 'warning',
             },
@@ -68,7 +70,7 @@ export const useAuth = (): UseAuth => {
       }
     } catch (errorResponse: any) {
       if (errorResponse?.response.status === 400) {
-        enqueueSnackbar(t('Incorrect email or password'), {
+        enqueueSnackbar('Email or password entered is incorrect', {
           variant: 'error',
         });
       }

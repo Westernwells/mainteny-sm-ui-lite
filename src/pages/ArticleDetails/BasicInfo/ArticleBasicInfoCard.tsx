@@ -47,7 +47,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
   const [openDialog, setOpenDialog] = useState(false);
   const {t} = useTranslation();
   const {mutateAsync: updateArticle, isLoading} = useUpdateArticle(
-    t('Article is updated successfully'),
+    t('Article updated successfully'),
   );
 
   const formik = useFormik<ArticleBasicFormModel>({
