@@ -72,6 +72,12 @@ export const UnitListingView = () => {
   totalUnitsRef.current = totalUnitsRef.current || elevatorResponse.total;
 
   useEffect(() => {
+    if (page.pageIndex) {
+      setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    }
+  }, [search, lastVisitStart, lastVisitEnd, nextVisitStart, nextVisitEnd]);
+
+  useEffect(() => {
     if (!isLoading) {
       setRows(makeRows(elevatorResponse.data));
     }
