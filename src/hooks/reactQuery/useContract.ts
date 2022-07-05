@@ -300,7 +300,9 @@ export const useUpdateContract = (successMsg?: string) => {
   );
 };
 
-const createContract = async (body: any): Promise<StringValue> => {
+const createContract = async (
+  body: ContractRequestBody,
+): Promise<StringValue> => {
   const response = await axiosClient.post<StringValue>('/api/contracts', {
     ...body,
   });

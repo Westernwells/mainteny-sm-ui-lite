@@ -36,7 +36,7 @@ export const ContractBasic = ({
       <StatusChip
         color="success"
         label="Active"
-        style={{margin: '0 0 16px 0', float: 'right'}}
+        style={{mb: '1em', float: 'right'}}
       />
       <Grid container rowGap={2}>
         <Grid item xs={4}>

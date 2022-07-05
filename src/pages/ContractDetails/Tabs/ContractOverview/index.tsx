@@ -286,7 +286,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 {uploadedDocument && uploadedDocument[0] ? (
                   <Box
                     sx={{
-                      height: '155px',
+                      height: '9.688em',
                       overflowY: 'auto',
                       display: 'flex',
                       justifyContent: 'center',
@@ -326,7 +326,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                       </Box>
                       <Typography
                         align="center"
-                        sx={{color: '#8F9BB3', marginTop: '10px'}}>
+                        sx={{color: 'text.secondary', marginTop: '0.625em'}}>
                         {uploadedDocument && uploadedDocument[0].description}
                       </Typography>
                     </Box>

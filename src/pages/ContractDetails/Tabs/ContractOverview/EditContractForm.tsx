@@ -15,7 +15,7 @@ const EditContractForm: FC<Props> = ({formik}) => (
   <Box
     sx={{
       '& > div': {
-        marginY: '10px',
+        marginY: '0.625em',
       },
     }}>
     <FormSelect
@@ -57,7 +57,7 @@ const EditContractForm: FC<Props> = ({formik}) => (
         onChange: formik.handleChange,
         InputProps: {
           startAdornment: (
-            <InputAdornment position="start" color="#222B45">
+            <InputAdornment position="start" color="text.primary">
               €
             </InputAdornment>
           ),
@@ -74,7 +74,7 @@ const EditContractForm: FC<Props> = ({formik}) => (
         onChange: formik.handleChange,
         InputProps: {
           startAdornment: (
-            <InputAdornment position="start" color="#222B45">
+            <InputAdornment position="start" color="text.primary">
               €
             </InputAdornment>
           ),

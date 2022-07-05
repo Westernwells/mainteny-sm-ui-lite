@@ -10,14 +10,12 @@ import {TabContentContainer} from 'components/TabContentContainer';
 import {EmptySection} from 'components/EmptySection';
 import {useNavigate} from 'react-router';
 import {ContractElevatorSimpleView} from 'models/contract';
-// import {ElevatorView} from 'models/elevator';
 
 interface Props {
   elevators: ContractElevatorSimpleView[];
 }
-/*eslint-disable*/
+
 export const UnitsTab: FC<Props> = ({elevators}) => {
-  const [search, setSearch] = useState('');
   const navigate = useNavigate();
   const [page, setPage] = useState(makePage(0, 25)); // TODO: implement paging
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -80,7 +78,6 @@ export const UnitsTab: FC<Props> = ({elevators}) => {
           setPage({...page, pageSize: newPageSize})
         }
         handlePageChange={(newPage) => setPage({...page, pageIndex: newPage})}
-        scrollToTop={search}
       />
     </TabContentContainer>
   );

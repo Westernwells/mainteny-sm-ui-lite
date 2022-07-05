@@ -29,7 +29,7 @@ export const ContractTimeline = ({
             borderRadius: '50%',
             backgroundColor: unUsedContractDays
               ? theme.palette.text.secondary
-              : '#00D68F',
+              : theme.palette.success.main,
           }}
         />
         <Box>
@@ -44,7 +44,7 @@ export const ContractTimeline = ({
           height: '2.25rem',
           display: 'flex',
           flexDirection: 'column',
-          maxWidth: '2px',
+          maxWidth: '0.125em',
           marginLeft: '.375rem',
           transform: 'translateX(-50%)',
           position: 'relative',
@@ -55,7 +55,7 @@ export const ContractTimeline = ({
         <Box
           sx={{
             backgroundColor: unUsedContractDays
-              ? `#00D68F`
+              ? theme.palette.success.main
               : theme.palette.text.secondary,
             mr: '1em',
             display: 'flex',
