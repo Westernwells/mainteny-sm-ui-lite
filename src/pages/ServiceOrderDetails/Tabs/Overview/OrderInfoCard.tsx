@@ -29,8 +29,8 @@ import {
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import {MenuBtn} from 'components/MenuBtn';
+import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {olStyles} from 'styles';
-// import {orderInfo as orderInfoSchema} from './schema';
 import {ScheduleDialog} from './ScheduleDialog';
 import {MarkCompletedDialog} from './MarkCompletedDialog';
 import {OrderInfo} from './schema';
@@ -216,9 +216,12 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
             <Box sx={{display: 'flex', alignItems: 'center'}}>
               <ServiceOrderIcons serviceOrderType={serviceOrderDetails.type} />
             </Box>
-            <Typography component="div" variant="subtitle1" ml="0.5em">
-              Maintenance
-            </Typography>
+            <ServiceOrderTypeText
+              variant="subtitle1"
+              style={{ml: '0.5em', mt: '0.1em'}}
+              capitalizeText
+              serviceOrderType={serviceOrderDetails.type}
+            />
 
             <Typography
               component="div"
