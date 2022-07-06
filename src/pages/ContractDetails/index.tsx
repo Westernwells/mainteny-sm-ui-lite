@@ -32,6 +32,12 @@ export const ContractDetails = () => {
       : [],
   );
 
+  const fileName =
+    contractDetails?.additionalInfo?.documents &&
+    contractDetails?.additionalInfo?.documents?.length > 0
+      ? contractDetails?.additionalInfo?.documents[0]?.description
+      : 'contract';
+
   return (
     <Tabs
       tabItems={tabItems}
@@ -49,7 +55,7 @@ export const ContractDetails = () => {
             response.blob().then((file) => {
               const link = document.createElement('a');
               link.href = URL.createObjectURL(file);
-              link.setAttribute('download', 'contract');
+              link.setAttribute('download', fileName);
               link.click();
             }),
           );

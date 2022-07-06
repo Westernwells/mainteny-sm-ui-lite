@@ -85,7 +85,7 @@ const NewContract = () => {
   const {user} = useUserSession();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
-  const {mutateAsync: uploadFiles} = useUploadFiles(
+  const {mutateAsync: uploadFiles, isLoading: isUploading} = useUploadFiles(
     'Documents uploaded successfully',
   );
 
@@ -213,10 +213,10 @@ const NewContract = () => {
       handleCancel={handleCancel}
       handleSubmit={handleSubmit}
       getActiveStep={(val) => setActiveStep(val)}
-      disableNextBtn={disableNextBtn}
+      disableNextBtn={disableNextBtn || isLoading || isUploading}
       steps={steps}
       stepperStyles={{width: '100%'}}
-      submitting={isLoading}
+      submitting={isLoading || isUploading}
       containerStyles={{
         flexGrow: 1,
         ml: '0',

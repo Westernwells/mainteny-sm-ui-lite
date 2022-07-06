@@ -1,16 +1,14 @@
 import {FC, useEffect, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
+
 import {DataGridLayout} from 'components/DataGridLayout';
-import {
-  columns,
-  makeRows,
-} from 'pages/CustomerDetails/Tabs/CustomerUnitDataGrid';
 import {makePage} from 'utils/paging-utils';
 import {TabContentContainer} from 'components/TabContentContainer';
 import {EmptySection} from 'components/EmptySection';
 import {useNavigate} from 'react-router';
 import {ContractElevatorSimpleView} from 'models/contract';
 import {ElevatorView} from 'models/elevator';
+import {columns, makeRows} from './UnitsDataGridProps';
 
 interface Props {
   elevators: ContractElevatorSimpleView[];
