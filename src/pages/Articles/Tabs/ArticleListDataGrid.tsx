@@ -268,7 +268,7 @@ export const ArticleListDataGrid = () => {
                   setType(item[0]?.toUpperCase())
                 }
                 multiple={false}
-                initialSelectedItems={[type]}
+                initialSelectedItems={type ? [type] : []}
               />
             </FilterFields>
           }
