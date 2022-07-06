@@ -127,7 +127,7 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
       timeString = `${formatDate(
         scheduleFormValue?.startTime!,
         'HH:mm',
-      )}-${formatDate(scheduleFormValue?.startTime!, 'HH:mm')}`;
+      )}-${formatDate(scheduleFormValue?.endTime!, 'HH:mm')}`;
     }
     setSelectedDateString(dateString);
     setSelectedTimeString(timeString);
