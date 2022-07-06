@@ -104,6 +104,7 @@ export const ArticleSupplierCard = ({article}: {article: ArticleView}) => {
         {_.isEmpty(article.additionalInfo.suppliers) && (
           <NoItemSection
             label={t('No suppliers yet. Please click the button below to add!')}
+            illustration="supplier"
             buttonLabel={t('+ Add suppliers')}
             action={() => setOpenDialog(true)}
           />

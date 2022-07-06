@@ -3,6 +3,10 @@ import {useTranslation} from 'react-i18next';
 import Box, {BoxProps} from '@mui/material/Box';
 import {ReactComponent as LaptopIllustration} from 'assets/illustrations/Laptop.svg';
 import {ReactComponent as ClipboardIllustration} from 'assets/illustrations/Clipboard.svg';
+import {ReactComponent as AttachmentIllustration} from 'assets/illustrations/Attachment.svg';
+import {ReactComponent as QRCodeIllustration} from 'assets/illustrations/QR.svg';
+import {ReactComponent as StockIllustration} from 'assets/illustrations/Stock.svg';
+import {ReactComponent as SupplierIllustration} from 'assets/illustrations/Supplier.svg';
 import {Button} from './Button';
 
 interface Props extends BoxProps {
@@ -11,7 +15,13 @@ interface Props extends BoxProps {
   containerStyle?: {[key: string]: string | number};
   labelStyle?: {[key: string]: string | number};
   labelVariant?: any;
-  illustration?: 'clipboard' | 'laptop';
+  illustration?:
+    | 'attachment'
+    | 'clipboard'
+    | 'laptop'
+    | 'qrcode'
+    | 'stock'
+    | 'supplier';
   showActionBtn?: boolean;
   btnLabel?: string;
   btnAction?: () => void;
@@ -37,10 +47,20 @@ export const EmptySection = ({
   };
   const getIllustration = (variant: string) => {
     switch (variant) {
+      case 'attachment':
+        return (
+          <AttachmentIllustration style={{width: '100%', height: '100%'}} />
+        );
       case 'clipboard':
         return (
           <ClipboardIllustration style={{width: '100%', height: '100%'}} />
         );
+      case 'qrcode':
+        return <QRCodeIllustration style={{width: '100%', height: '100%'}} />;
+      case 'stock':
+        return <StockIllustration style={{width: '100%', height: '100%'}} />;
+      case 'supplier':
+        return <SupplierIllustration style={{width: '100%', height: '100%'}} />;
       default:
         return <LaptopIllustration style={{width: '100%', height: '100%'}} />;
     }

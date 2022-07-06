@@ -123,6 +123,7 @@ export const ArticleStockCard = ({article}: {article: ArticleView}) => {
             label={t(
               'No stock info yet. Please click the button below to add!',
             )}
+            illustration="stock"
             buttonLabel={t('+ Add stock info')}
             action={() => setOpenDialog(true)}
           />

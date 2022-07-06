@@ -219,7 +219,6 @@ export const ArticleListDataGrid = () => {
   };
 
   const clearAllFilters = () => {
-    setQuery('');
     setType('');
   };
 

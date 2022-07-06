@@ -1,6 +1,7 @@
-import Box from '@mui/material/Box';
-import {useState} from 'react';
+import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import Box from '@mui/material/Box';
+import InputAdornment from '@mui/material/InputAdornment';
 import {FormikProps} from 'formik';
 import {ArticleType} from '../../../models/article';
 import {FormInput} from '../../../components/form/FormInput';
@@ -10,6 +11,7 @@ import {ArticleBasicFormModel} from '../../../models/articleForm';
 import {createEmptyResource} from '../../../utils/paging-utils';
 import {useCacheValues} from '../../../hooks/reactQuery/useElevator';
 import {CacheTypes} from '../../../models/misc';
+import {getCurrencySymbol} from '../../../utils/currency';
 
 export const EditBasicInfoForm = ({
   containerStyles,
@@ -45,7 +47,20 @@ export const EditBasicInfoForm = ({
           onChange: formik.handleChange,
         }}
       />
-
+      <FormInput
+        containerStyles={{...containerStyles}}
+        props={{
+          label: t('Category'),
+          name: 'category',
+          placeholder: t('e.g. Cable'),
+          type: 'text',
+          required: true,
+          value: formik.values.category,
+          error: !!(formik.touched.category && formik.errors.category),
+          onBlur: formik.handleBlur,
+          onChange: formik.handleChange,
+        }}
+      />
       <FormInput
         containerStyles={{...containerStyles}}
         props={{
@@ -88,20 +103,6 @@ export const EditBasicInfoForm = ({
           onChange: formik.handleChange,
         }}
       />
-      <FormInput
-        containerStyles={{...containerStyles}}
-        props={{
-          label: t('Category'),
-          name: 'category',
-          placeholder: t('e.g. Cable'),
-          type: 'text',
-          required: true,
-          value: formik.values.category,
-          error: !!(formik.touched.category && formik.errors.category),
-          onBlur: formik.handleBlur,
-          onChange: formik.handleChange,
-        }}
-      />
       <Box
         display="flex"
         justifyContent="space-between"
@@ -118,6 +119,11 @@ export const EditBasicInfoForm = ({
             helperText: formik.errors.unitPurchaseVat,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
+            InputProps: {
+              startAdornment: (
+                <InputAdornment position="start">%</InputAdornment>
+              ),
+            },
           }}
         />
 
@@ -137,6 +143,11 @@ export const EditBasicInfoForm = ({
             helperText: formik.errors.unitSellingVat,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
+            InputProps: {
+              startAdornment: (
+                <InputAdornment position="start">%</InputAdornment>
+              ),
+            },
           }}
         />
       </Box>
@@ -183,6 +194,13 @@ export const EditBasicInfoForm = ({
             helperText: formik.errors.unitPurchaseAmount,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
+            InputProps: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  {getCurrencySymbol[formik.values.unitPurchaseAmountCurrency]}
+                </InputAdornment>
+              ),
+            },
           }}
         />
 
@@ -202,6 +220,13 @@ export const EditBasicInfoForm = ({
             helperText: formik.errors.unitSellingAmount,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
+            InputProps: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  {getCurrencySymbol[formik.values.unitPurchaseAmountCurrency]}
+                </InputAdornment>
+              ),
+            },
           }}
         />
       </Box>

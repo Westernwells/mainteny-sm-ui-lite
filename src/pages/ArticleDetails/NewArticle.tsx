@@ -86,8 +86,10 @@ export const NewArticle = () => {
       unit: '',
       unitPurchaseVat: 0,
       unitPurchaseAmount: 0,
+      unitPurchaseAmountCurrency: 'EUR',
       unitSellingVat: 0,
       unitSellingAmount: 0,
+      unitSellingAmountCurrency: 'EUR',
     },
     onSubmit: () => {},
     validationSchema,
@@ -147,14 +149,14 @@ export const NewArticle = () => {
       unitPurchaseAmount: amountRecordForBackend(
         makeAmountRecord(
           formik.values.unitPurchaseAmount,
-          'EUR',
+          formik.values.unitPurchaseAmountCurrency,
           formik.values.unitPurchaseVat,
         ),
       ),
       unitSellingAmount: amountRecordForBackend(
         makeAmountRecord(
           formik.values.unitSellingAmount,
-          'EUR',
+          formik.values.unitSellingAmountCurrency,
           formik.values.unitSellingVat,
         ),
       ),
