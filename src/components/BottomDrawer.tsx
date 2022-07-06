@@ -76,11 +76,7 @@ export const BottomDrawer = ({
               variant: 'outlined',
               disabled: !isValid,
               startIcon: <PreviewIcon />,
-              onClick: () =>
-                window.open(
-                  `${process.env.REACT_APP_BASE_URL}/QuotationPDF.pdf`,
-                  '_blank',
-                ),
+              onClick: () => window.open(`/QuotationPDF.pdf`, '_blank'),
             }}
           />
         )}
