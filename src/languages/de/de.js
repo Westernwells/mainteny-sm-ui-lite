@@ -441,7 +441,7 @@ module.exports = {
     'Enter Note': 'Notiz eingeben',
     Note: 'Notiz',
     Drag: 'Drag',
-    'drop or': 'drop oder',
+    'Drop OR': 'Drop Oder',
     'Select file': 'Datei auswählen',
     Cancelled: 'Abgesagt',
     Regular: 'Regulär',
