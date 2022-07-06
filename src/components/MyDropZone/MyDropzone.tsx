@@ -183,16 +183,21 @@ export const MyDropZone = ({
         }}>
         <div {...getRootProps({className: 'dropzone'})}>
           <input {...getInputProps()} />
-          <Typography variant="body2" component="div" sx={{mb: '1em'}}>
-            {t('Drag')} &apos;n&apos; {t('drop or')}
-          </Typography>
-          <Button
-            label={t('Select file')}
-            buttonProps={{
-              variant: 'outlined',
-              onClick: open,
-            }}
-          />
+          <Box sx={{display: 'flex'}}>
+            <Typography
+              variant="body2"
+              component="div"
+              sx={{mt: '0.5em', mr: '1em'}}>
+              {t('Drag')} & {t('Drop OR')}
+            </Typography>
+            <Button
+              label={t('Select file')}
+              buttonProps={{
+                variant: 'outlined',
+                onClick: open,
+              }}
+            />
+          </Box>
         </div>
       </Box>
 
