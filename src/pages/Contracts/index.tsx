@@ -4,11 +4,7 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
 import {useQueryContract} from 'hooks/reactQuery/useContract';
-import {
-  ContractOrderField,
-  ContractStatus,
-  ContractView,
-} from 'models/contract';
+import {ContractOrderField, ContractView} from 'models/contract';
 import {Order} from 'models/misc';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {PageListingLayout} from 'components/PageListingLayout';
@@ -145,7 +141,7 @@ export const Contracts = () => {
       />
       <MultipleSelectCheckmarks
         label="Status"
-        options={Object.keys(ContractStatus).map((item) => convertToText(item))}
+        options={['VALID', 'EXPIRED'].map((item) => convertToText(item))}
         initialSelectedItems={status}
         getSelectedValue={(item) =>
           setStatus(item.map((val) => convertToMacro(val)))

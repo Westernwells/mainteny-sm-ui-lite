@@ -176,7 +176,7 @@ export interface CustomerContractParams {
   pageSize: number;
   query: string;
   serviceCompanyId: string;
-  status?: ContractStatus;
+  status?: string[];
   priceStart: number;
   priceEnd: number;
 }

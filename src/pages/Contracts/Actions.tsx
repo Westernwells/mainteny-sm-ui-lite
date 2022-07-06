@@ -7,9 +7,10 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 
 interface Props {
   url: string;
+  fileName: string;
 }
 
-export const Actions = ({url}: Props) => {
+export const Actions = ({url, fileName}: Props) => {
   const {data: downloadUrl} = useDownloadUrl(url ? [url] : []);
 
   return (
@@ -23,7 +24,7 @@ export const Actions = ({url}: Props) => {
                 response.blob().then((file) => {
                   const link = document.createElement('a');
                   link.href = URL.createObjectURL(file);
-                  link.setAttribute('download', 'contract');
+                  link.setAttribute('download', fileName);
                   link.click();
                 }),
               );

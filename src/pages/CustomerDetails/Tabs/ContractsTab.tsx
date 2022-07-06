@@ -4,11 +4,7 @@ import Box from '@mui/material/Box';
 import {GridRowsProp} from '@mui/x-data-grid';
 
 import {useUseQueryCustomerContracts} from 'hooks/reactQuery/useContract';
-import {
-  ContractOrderField,
-  ContractStatus,
-  ContractView,
-} from 'models/contract';
+import {ContractOrderField, ContractView} from 'models/contract';
 import {Order} from 'models/misc';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {DataGridLayout} from 'components/DataGridLayout';
@@ -59,6 +55,9 @@ export const ContractsTab = ({customerId}: Props) => {
       pageSize: page.pageSize,
       priceStart,
       priceEnd,
+      ...(status && {
+        status,
+      }),
     },
     customerId,
     {},
@@ -107,7 +106,7 @@ export const ContractsTab = ({customerId}: Props) => {
       />
       <MultipleSelectCheckmarks
         label="Status"
-        options={Object.keys(ContractStatus).map((item) => convertToText(item))}
+        options={['VALID', 'EXPIRED'].map((item) => convertToText(item))}
         initialSelectedItems={status}
         getSelectedValue={(item) =>
           setStatus(item.map((val) => convertToMacro(val)))

@@ -50,7 +50,9 @@ export const columns: GridColDef[] = [
     field: 'actions',
     headerName: 'actions',
     align: 'center',
-    renderCell: (params) => <Actions url={params.value} />,
+    renderCell: (params) => (
+      <Actions url={params.value.url} fileName={params.value.fileName} />
+    ),
     flex: 0,
   }),
 ];
@@ -66,11 +68,18 @@ export const makeRows = (contracts: ContractView[]) =>
         end: formatDate(item.endTime),
         type: item.type,
         cost: formatNetAmount(item.additionalInfo?.price) || '-',
-        actions:
-          item?.additionalInfo?.documents &&
-          item?.additionalInfo?.documents.length > 0
-            ? item?.additionalInfo?.documents[0].uri
-            : '',
+        actions: {
+          url:
+            item?.additionalInfo?.documents &&
+            item?.additionalInfo?.documents.length > 0
+              ? item?.additionalInfo?.documents[0].uri
+              : '',
+          fileName:
+            item?.additionalInfo?.documents &&
+            item?.additionalInfo?.documents?.length > 0
+              ? item?.additionalInfo?.documents[0]?.description
+              : 'contract',
+        },
         navigateTo: `details/${item.id}`,
       }))
     : [];

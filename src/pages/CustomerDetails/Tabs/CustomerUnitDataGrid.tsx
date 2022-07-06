@@ -1,6 +1,7 @@
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 import {Elevator} from '@mui/icons-material';
+import useTheme from '@mui/material/styles/useTheme';
 
 import {StatusChip} from 'components/StatusChip';
 import {formatDate} from 'utils/datetime';
@@ -11,18 +12,25 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
     headerName: 'number',
-    align: 'center',
-    flex: 0,
+    align: 'left',
+    flex: 1,
+    renderCell: (params: GridRenderCellParams<any, any, any>) => {
+      const theme = useTheme();
+      return (
+        <>
+          <Elevator
+            style={{marginInline: '.25em', color: theme.palette.action.active}}
+          />
+          <Typography variant="body2">{params.value || '-'}</Typography>
+        </>
+      );
+    },
   }),
   getColumnProps({
     field: 'model',
     headerName: 'model',
-    renderCell: (params: GridRenderCellParams<any, any, any>) => (
-      <>
-        <Elevator style={{marginInline: '.25em'}} />
-        <Typography variant="body2">{params.value || '-'}</Typography>
-      </>
-    ),
+    align: 'left',
+    flex: 1,
   }),
   getColumnProps({
     field: 'customer',

@@ -1,6 +1,8 @@
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
-import ElevatorIcon from '@mui/icons-material/Elevator';
+import {Elevator} from '@mui/icons-material';
+import useTheme from '@mui/material/styles/useTheme';
+
 import {getColumnProps} from 'components/DataGridLayout';
 import {formatDate} from 'utils/datetime';
 import {DataGridElevatorView} from 'pages/Units/Models';
@@ -9,36 +11,44 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
     headerName: 'unit number',
-    align: 'center',
+    align: 'left',
     flex: 1.25,
+    renderCell: (params: GridRenderCellParams<any, any, any>) => {
+      const theme = useTheme();
+      return (
+        <>
+          <Elevator
+            style={{marginInline: '.25em', color: theme.palette.action.active}}
+          />
+          <Typography variant="body2">{params.value || '-'}</Typography>
+        </>
+      );
+    },
   }),
   getColumnProps({
     field: 'model',
     headerName: 'model',
+    align: 'left',
     flex: 2,
-    renderCell: (params: GridRenderCellParams<any, any, any>) => (
-      <>
-        <ElevatorIcon style={{marginInline: '.25em'}} />
-        <Typography variant="body2">{params.value || '-'}</Typography>
-      </>
-    ),
   }),
   getColumnProps({
     field: 'customer',
     headerName: 'customer',
     cellClassName: 'truncateText',
+    align: 'left',
     flex: 1,
   }),
   getColumnProps({
     field: 'address',
     headerName: 'address',
     cellClassName: 'truncateText',
+    align: 'left',
     flex: 2,
   }),
   getColumnProps({
     field: 'lastVisit',
     headerName: 'last visit',
-    align: 'center',
+    align: 'left',
     flex: 2,
   }),
 ];
