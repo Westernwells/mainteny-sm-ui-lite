@@ -99,7 +99,7 @@ export interface ServiceOrderAdditionalInfo {
   appointmentNotificationRequired: boolean;
   appointmentNotificationSent: boolean;
   priority: Priority;
-  checklist: Checklist;
+  checkList: Checklist;
   moreInformation: string;
   quotationId: string;
 }
@@ -107,7 +107,7 @@ export interface ServiceOrderAdditionalInfo {
 export interface ServiceOrderView {
   id: string;
   number: string;
-  externalID: string;
+  externalId: string;
   articles: ServiceOrderArticleView[];
   serviceCompany: ServiceCompanySimpleView;
   elevator: ElevatorView;
@@ -221,8 +221,9 @@ export interface UpdateJobSchedule {
 }
 
 export interface CompleteServiceOrder {
-  attachments: string[];
+  answers: CheckListAnswerRecord[];
   description: string;
+  externalId: string;
   serviceTime: number;
 }
 
@@ -245,7 +246,7 @@ export interface ServiceOrderSummary {
 }
 
 export interface ServiceOrderReportAdditionalInfo {
-  checklistAnswers: CheckListAnswerRecord[];
+  checkListAnswers: CheckListAnswerRecord[];
 }
 
 export interface ServiceOrderReportArticleView {

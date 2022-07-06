@@ -32,6 +32,7 @@ import {MenuBtn} from 'components/MenuBtn';
 import {olStyles} from 'styles';
 // import {orderInfo as orderInfoSchema} from './schema';
 import {ScheduleDialog} from './ScheduleDialog';
+import {MarkCompletedDialog} from './MarkCompletedDialog';
 import {OrderInfo} from './schema';
 
 interface Props {
@@ -63,6 +64,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
   const [openUnscheduleConfirm, setOpenUnscheduleConfirm] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openMarkCompletedDialog, setOpenMarkCompletedDialog] = useState(false);
   const [switchActive, setSwitchActive] = useState(true);
   const [form, setForm] = useState<ScheduleForm>({} as ScheduleForm);
   const [formError, setFormErrors] = useState<FormikErrors<ScheduleForm>>();
@@ -169,6 +171,10 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         {
           label: t('Unschedule'),
           action: () => setOpenUnscheduleConfirm(true),
+        },
+        {
+          label: t('Mark Completed'),
+          action: () => setOpenMarkCompletedDialog(true),
         },
         {
           label: t('Cancel'),
@@ -296,6 +302,13 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
             ? new Date(serviceOrderDetails.schedules[0].endTime)
             : null
         }
+      />
+
+      <MarkCompletedDialog
+        serviceOrderDetails={serviceOrderDetails}
+        title={t('Mark Completed')}
+        open={openMarkCompletedDialog}
+        onClose={() => setOpenMarkCompletedDialog(false)}
       />
     </InfoCard>
   );
