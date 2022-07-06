@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Box from '@mui/material/Box';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
@@ -171,8 +172,10 @@ export const MyDropZone = ({
     ));
 
   return (
-    <Box>
+    <Box className="container" component="section">
       <Box
+        component="div"
+        {...getRootProps({className: 'dropzone'})}
         sx={{
           display: 'flex',
           flexDirection: 'column',
@@ -181,24 +184,22 @@ export const MyDropZone = ({
           border: `2px dashed rgba(143, 155, 179, 0.5)`,
           py: '2em',
         }}>
-        <div {...getRootProps({className: 'dropzone'})}>
-          <input {...getInputProps()} />
-          <Box sx={{display: 'flex'}}>
-            <Typography
-              variant="body2"
-              component="div"
-              sx={{mt: '0.3em', mr: '1em'}}>
-              {t('Drag')} & {t('Drop OR')}
-            </Typography>
-            <Button
-              label={t('Select file')}
-              buttonProps={{
-                variant: 'outlined',
-                onClick: open,
-              }}
-            />
-          </Box>
-        </div>
+        <input {...getInputProps()} />
+        <Box sx={{display: 'flex'}}>
+          <Typography
+            variant="body2"
+            component="div"
+            sx={{mt: '0.3em', mr: '1em'}}>
+            {t('Drag')} & {t('Drop OR')}
+          </Typography>
+          <Button
+            label={t('Select file')}
+            buttonProps={{
+              variant: 'outlined',
+              onClick: open,
+            }}
+          />
+        </Box>
       </Box>
 
       <Box sx={{mt: '1.5em'}}>
