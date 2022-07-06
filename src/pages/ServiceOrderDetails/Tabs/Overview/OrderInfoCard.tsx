@@ -49,9 +49,6 @@ const orderInfo = [
 ];
 
 export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
-  // const [orderInfo, setOrderInfo] = useState(
-  //   orderInfoSchema(serviceOrderDetails),
-  // );
   const {t} = useTranslation();
   const {mutate: cancelServiceOrder} = useCancelServiceOrders();
   const {mutate: unscheduleServiceOrder} = useUnscheduleServiceOrders();
@@ -67,7 +64,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const [openMarkCompletedDialog, setOpenMarkCompletedDialog] = useState(false);
   const [switchActive, setSwitchActive] = useState(true);
   const [form, setForm] = useState<ScheduleForm>({} as ScheduleForm);
-  const [formError, setFormErrors] = useState<FormikErrors<ScheduleForm>>();
+  const [formError, setFormErrors] = useState<FormikErrors<ScheduleForm>>({});
   const [formValid, setFormValid] = useState(false);
 
   useEffect(() => {
@@ -127,7 +124,9 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
       serviceOrderDetails.status === ServiceOrderStatus.SCHEDULED ||
       serviceOrderDetails.status === ServiceOrderStatus.IN_PROGRESS
     ) {
-      return switchActive && !formError ? schedule() : reschedule();
+      return switchActive && !Object.keys(formError).length
+        ? schedule()
+        : reschedule();
     }
     return schedule();
   };
