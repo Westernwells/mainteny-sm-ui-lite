@@ -2,7 +2,7 @@ import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
 import {DataGridLayout} from 'components/DataGridLayout';
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import {useFormik} from 'formik';
@@ -169,10 +169,7 @@ export const PriorityTechnician = ({
           hideFooter
           rows={rows}
           isWidget
-          columns={useCallback(
-            () => columns(getEditableTechnician, getDeletableTechnician),
-            [],
-          )()}
+          columns={columns(getEditableTechnician, getDeletableTechnician)}
           containerStyle={{
             borderBottom: 'none',
           }}
