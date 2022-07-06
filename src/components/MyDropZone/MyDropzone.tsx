@@ -187,7 +187,7 @@ export const MyDropZone = ({
             <Typography
               variant="body2"
               component="div"
-              sx={{mt: '0.5em', mr: '1em'}}>
+              sx={{mt: '0.3em', mr: '1em'}}>
               {t('Drag')} & {t('Drop OR')}
             </Typography>
             <Button
