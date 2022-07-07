@@ -29,7 +29,7 @@ export const TodosTab = () => {
         <InfoCard header="To-Do List" minHeight="100%" showHeaderBackground>
           {isFetched && todosResource.data.length === 0 ? (
             <EmptySection
-              label="No To-Do added yet."
+              label="No to-do added yet."
               illustration="clipboard"
               size="small"
               containerStyle={{mt: '8em'}}

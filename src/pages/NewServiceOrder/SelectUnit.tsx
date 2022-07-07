@@ -104,8 +104,7 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
             height: '100%',
             width: '50%',
           }}
-          label='Sorry, we couldn"t find any unit that matches the search text. If you like to add a new unit, 
-please click the button below'
+          label="Sorry, we couldn't find any unit that matches the search text. For adding one, please click the button below"
         />
       </PageCard>
     );

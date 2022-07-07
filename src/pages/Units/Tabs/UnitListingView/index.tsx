@@ -120,7 +120,7 @@ export const UnitListingView = () => {
   if (isFetched && !totalUnitsRef.current) {
     return (
       <EmptySection
-        label="No elevators have been created yet. Please click the button below to create one!"
+        label="No units yet. Please click the button below add."
         showActionBtn
         btnLabel="Add Elevator"
         btnAction={() => {

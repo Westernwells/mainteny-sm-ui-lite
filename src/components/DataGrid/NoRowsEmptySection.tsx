@@ -10,8 +10,7 @@ export const NoRowsEmptySection = ({placeholder, action}: Props) => (
     illustration="clipboard"
     size="tiny"
     containerStyle={{m: 'auto', width: '60%'}}
-    label={`Sorry, we couldn't find any ${placeholder} that matches the search text. 
-    If you like to add a new ${placeholder}, please click the button below`}
+    label={`Sorry, we couldn't find any ${placeholder} that matches the search text. For adding one, please click the button below`}
     showActionBtn
     btnLabel="Add New"
     btnAction={action}

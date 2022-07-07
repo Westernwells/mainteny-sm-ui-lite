@@ -93,7 +93,7 @@ export const Customer = () => {
   if (isFetched && !totalCustomerRef.current) {
     return (
       <EmptySection
-        label="No customers have been created yet. Please click the button below to create one!"
+        label="No customers yet. Please click the button below to add."
         showActionBtn
         btnLabel="Add Customer"
         containerStyle={{

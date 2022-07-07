@@ -29,6 +29,6 @@ export const InvoiceDetails = () => {
       invoice={invoice}
     />
   ) : (
-    <EmptySection label="Invoice not found!" />
+    <EmptySection label="Sorry, we couldn't find the invoice." />
   );
 };

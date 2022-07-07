@@ -103,7 +103,7 @@ export const Employees = () => {
   if (isFetched && !totalEmployeeRef.current) {
     return (
       <EmptySection
-        label="No employees have been created yet. Please click the button below to create one!"
+        label="No employees yet. Please click the button below to add."
         showActionBtn
         btnLabel="Add Employee"
         containerStyle={{
