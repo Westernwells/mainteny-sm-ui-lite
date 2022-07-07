@@ -16,6 +16,7 @@ interface Props extends ButtonProps {
   anchorType?: 'iconButton' | 'button';
   anchorIcon?: JSX.Element | null;
   disableIcon?: boolean;
+  persistList?: boolean;
 }
 
 export const MenuBtn = ({
@@ -27,6 +28,7 @@ export const MenuBtn = ({
   anchorType = 'button',
   anchorIcon = null,
   disableIcon,
+  persistList = false,
   ...rest
 }: Props) => {
   const {t} = useTranslation();
@@ -70,7 +72,14 @@ export const MenuBtn = ({
         }}
         {...menuProps}>
         {menu.map((item, index) => (
-          <MenuItem key={index} onClick={item.action}>
+          <MenuItem
+            key={index}
+            onClick={(e) => {
+              if (!persistList) {
+                handleClose();
+              }
+              item.action(e);
+            }}>
             {t(item.label)}
           </MenuItem>
         ))}
