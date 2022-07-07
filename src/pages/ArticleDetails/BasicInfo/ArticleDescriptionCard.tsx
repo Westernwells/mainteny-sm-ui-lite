@@ -71,6 +71,7 @@ export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
       {!article.description && (
         <NoItemSection
           label={t('No description yet. Please click the button below to add!')}
+          illustration="clipboard"
           buttonLabel={t('+ Add Description')}
           action={() => setOpenDialog(true)}
         />

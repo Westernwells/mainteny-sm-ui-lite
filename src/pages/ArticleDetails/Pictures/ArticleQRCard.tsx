@@ -92,6 +92,7 @@ export const ArticleQRCard = ({article}: {article: ArticleView}) => {
         {_.isEmpty(qrUrls) && (
           <NoItemSection
             label={t('No QR code yet. Please click the button below to add!')}
+            illustration="qrcode"
             buttonLabel={t('+ Add QR Code')}
             action={() => setOpenDialog(true)}
           />

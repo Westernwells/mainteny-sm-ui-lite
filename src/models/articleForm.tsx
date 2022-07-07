@@ -9,8 +9,10 @@ export interface ArticleBasicFormModel {
   unit: string;
   unitPurchaseVat: number;
   unitPurchaseAmount: number;
+  unitPurchaseAmountCurrency: string;
   unitSellingVat: number;
   unitSellingAmount: number;
+  unitSellingAmountCurrency: string;
 }
 
 export interface ArticleDescriptionFormModel {

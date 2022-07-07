@@ -65,11 +65,13 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
         article.unitPurchaseAmount.netAmount /
           currencyFactor(article.unitPurchaseAmount),
       ),
+      unitPurchaseAmountCurrency: article.unitPurchaseAmount.currency,
       unitSellingVat: article.unitSellingAmount.percentageVat,
       unitSellingAmount: Math.round(
         article.unitSellingAmount.netAmount /
           currencyFactor(article.unitSellingAmount),
       ),
+      unitSellingAmountCurrency: article.unitSellingAmount.currency,
     },
     onSubmit: () => {},
     validationSchema,
@@ -156,12 +158,12 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
     {
       label: t('Selling VAT'),
       icon: <LocalOfferRoundedIcon sx={{color: theme.palette.info.dark}} />,
-      body: article?.unitSellingAmount.percentageVat,
+      body: article?.unitSellingAmount.percentageVat.toString().concat('%'),
     },
     {
       label: t('Purchase VAT'),
       icon: <LocalOfferRoundedIcon sx={{color: theme.palette.info.dark}} />,
-      body: article?.unitPurchaseAmount.percentageVat,
+      body: article?.unitPurchaseAmount.percentageVat.toString().concat('%'),
     },
   ];
 
