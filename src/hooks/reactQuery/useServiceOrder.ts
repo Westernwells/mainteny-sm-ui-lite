@@ -25,7 +25,7 @@ import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {
   AssignmentBasedOrderBody,
-  UpdateServiceOrderBody,
+  UpdateServiceOrderScheduleBody,
   RedispatchParams,
   ServiceOrderActivityView,
   ServiceOrderOrderField,
@@ -38,6 +38,7 @@ import {
   CheckListAnswerRecord,
   ServiceOrderItemRecord,
   CompleteServiceOrder,
+  UpdateServiceOrderBody,
 } from '../../models/service-order';
 import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
@@ -577,14 +578,54 @@ export const useRedispatchServiceOrders = (successMsg: string) => {
   );
 };
 
-const updateServiceOrder = async (
-  body: UpdateServiceOrderBody,
+const updateServiceOrderSchedule = async (
+  body: UpdateServiceOrderScheduleBody,
   serviceOrderId: string,
 ) => {
   await axiosClient.put<StringValue>(
     `/api/serviceOrders/${serviceOrderId}/jobSchedule`,
     {...body},
   );
+};
+
+export const useUpdateServiceOrderSchedule = (successMsg: string) => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    ({
+      body,
+      serviceOrderId,
+    }: {
+      body: UpdateServiceOrderScheduleBody;
+      serviceOrderId: string;
+    }) => updateServiceOrderSchedule(body, serviceOrderId),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar(
+          'Sorry! Unable to save changes right now. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
+      },
+    },
+  );
+};
+
+const updateServiceOrder = async (
+  body: Partial<UpdateServiceOrderBody>,
+  serviceOrderId: string,
+) => {
+  await axiosClient.put<StringValue>(`/api/serviceOrders/${serviceOrderId}`, {
+    ...body,
+  });
 };
 
 export const useUpdateServiceOrder = (successMsg: string) => {
@@ -595,17 +636,15 @@ export const useUpdateServiceOrder = (successMsg: string) => {
       body,
       serviceOrderId,
     }: {
-      body: UpdateServiceOrderBody;
+      body: Partial<UpdateServiceOrderBody>;
       serviceOrderId: string;
     }) => updateServiceOrder(body, serviceOrderId),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
-        queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
         enqueueSnackbar(successMsg, {
           variant: 'success',
         });
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
       },
       onError: (err) => {
         console.log(err);

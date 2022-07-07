@@ -18,7 +18,7 @@ import {ScheduleDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/ScheduleDi
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {
   useRedispatchServiceOrders,
-  useUpdateServiceOrder,
+  useUpdateServiceOrderSchedule,
 } from 'hooks/reactQuery/useServiceOrder';
 import {setDateTime, formatDate as formatDateUtil} from 'utils/datetime';
 
@@ -32,7 +32,8 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
   const successMessage = 'Service order scheduled successfully';
   const {mutate: rescheduleServiceOrder} =
     useRedispatchServiceOrders(successMessage);
-  const {mutate: scheduleServiceOrder} = useUpdateServiceOrder(successMessage);
+  const {mutate: scheduleServiceOrder} =
+    useUpdateServiceOrderSchedule(successMessage);
   const [switchActive, setSwitchActive] = useState(true);
   const [form, setForm] = useState<ScheduleForm>({} as ScheduleForm);
   const [formError, setFormErrors] = useState<FormikErrors<ScheduleForm>>();

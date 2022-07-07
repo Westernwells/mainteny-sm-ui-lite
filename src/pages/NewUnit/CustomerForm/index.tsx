@@ -62,7 +62,7 @@ export const CustomerForm = ({
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
         <Grid container>
-          <Grid item md={4}>
+          <Grid item sm={4} md={4}>
             <CustomerAutoComplete
               getCustomer={(value) => {
                 formik.setValues({
