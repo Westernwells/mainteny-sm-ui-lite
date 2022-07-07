@@ -38,7 +38,7 @@ import {
   CheckListAnswerRecord,
   ServiceOrderItemRecord,
   CompleteServiceOrder,
-  UpdateServiceOrder,
+  UpdateServiceOrderBody,
 } from '../../models/service-order';
 import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
@@ -620,7 +620,7 @@ export const useUpdateServiceOrderSchedule = (successMsg: string) => {
 };
 
 const updateServiceOrder = async (
-  body: Partial<UpdateServiceOrder>,
+  body: Partial<UpdateServiceOrderBody>,
   serviceOrderId: string,
 ) => {
   await axiosClient.put<StringValue>(`/api/serviceOrders/${serviceOrderId}`, {
@@ -636,7 +636,7 @@ export const useUpdateServiceOrder = (successMsg: string) => {
       body,
       serviceOrderId,
     }: {
-      body: Partial<UpdateServiceOrder>;
+      body: Partial<UpdateServiceOrderBody>;
       serviceOrderId: string;
     }) => updateServiceOrder(body, serviceOrderId),
     {

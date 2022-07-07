@@ -206,7 +206,7 @@ export interface ServiceOrderScheduleSimpleView {
   createdAt: string;
 }
 
-export interface UpdateServiceOrder {
+export interface UpdateServiceOrderBody {
   externalId: string;
   description: string;
   priority: Priority;
