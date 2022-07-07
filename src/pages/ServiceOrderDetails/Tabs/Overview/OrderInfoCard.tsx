@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
@@ -190,7 +191,6 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         color={getServiceOrderStatusColor(serviceOrderDetails.status)}
         label={serviceOrderStatusToString(serviceOrderDetails.status)}
         style={{...olStyles.orderStatus, letterSpacing: 'normal'}}
-        // maxChars={15}
       />
       {serviceOrderDetails.status !== ServiceOrderStatus.COMPLETED ? (
         <Box sx={{mt: -1}}>
@@ -211,26 +211,32 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
       showHeaderBackground
       containerStyles={{display: 'flex', flexDirection: 'column'}}
       header={
-        <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
-          <Box sx={{display: 'flex'}}>
-            <Box sx={{display: 'flex', alignItems: 'center'}}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}>
+          <Box sx={{display: 'flex', height: '100%'}}>
+            <Box sx={{alignSelf: 'center'}}>
               <ServiceOrderIcons serviceOrderType={serviceOrderDetails.type} />
             </Box>
-            <ServiceOrderTypeText
-              variant="subtitle1"
-              style={{ml: '0.5em', mt: '0.1em'}}
-              capitalizeText
-              serviceOrderType={serviceOrderDetails.type}
-            />
+
+            <Box sx={{}}>
+              <ServiceOrderTypeText
+                variant="subtitle1"
+                style={{ml: '0.5em'}}
+                capitalizeText
+                serviceOrderType={serviceOrderDetails.type}
+              />
+            </Box>
 
             <Typography
               component="div"
               variant="caption"
               sx={{
                 ml: '0.4em',
-                display: 'flex',
-                alignItems: 'center',
-                mt: '0.2em',
+                alignSelf: 'center',
+                // mt: '0.2em',
               }}>
               {`#${serviceOrderDetails.number}`}
             </Typography>

@@ -34,7 +34,7 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
           <CardProps
             icon={<Grid3x3Icon sx={{color: theme.palette.info.dark}} />}
             label="UNIT NUMBER"
-            bodyText={serviceOrderDetails.elevator.number || '-'}
+            bodyText={serviceOrderDetails.elevator.externalId || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
