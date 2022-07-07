@@ -10,7 +10,7 @@ import Grid from '@mui/material/Grid';
 import {Confirm} from 'components/Confirm';
 import {
   useCancelServiceOrders,
-  useUpdateServiceOrder,
+  useUpdateServiceOrderSchedule,
   useRedispatchServiceOrders,
   useUnscheduleServiceOrders,
 } from 'hooks/reactQuery/useServiceOrder';
@@ -55,7 +55,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const {mutate: rescheduleServiceOrder} = useRedispatchServiceOrders(
     'Service order rescheduled successfully',
   );
-  const {mutate: scheduleServiceOrder} = useUpdateServiceOrder(
+  const {mutate: scheduleServiceOrder} = useUpdateServiceOrderSchedule(
     'Service order scheduled successfully',
   );
   const [openCancelConfirm, setOpenCancelConfirm] = useState(false);

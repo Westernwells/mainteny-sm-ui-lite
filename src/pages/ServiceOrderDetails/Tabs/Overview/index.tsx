@@ -15,10 +15,10 @@ import PersonIcon from '@mui/icons-material/Person';
 import {olStyles} from 'styles';
 import {formatDate} from 'utils/datetime';
 import {OrderInfoCard} from './OrderInfoCard';
-import {DescriptionCard} from './DescriptionCard';
 import {Quotation} from './Quotations';
 import {Invoices} from './Invoices';
 import {Articles} from './Articles';
+import {Description} from './Description';
 
 interface Props {
   orderId?: string;
@@ -74,7 +74,10 @@ export const Overview = ({orderId}: Props) => {
             <OrderInfoCard serviceOrderDetails={serviceOrderDetails!} />
           </Box>
           <Box mt="1em" flexGrow={1}>
-            <DescriptionCard content={serviceOrderDetails?.description} />
+            <Description
+              content={serviceOrderDetails?.description}
+              serviceOrderId={serviceOrderDetails?.id}
+            />
           </Box>
 
           <Box mt="1em" flexGrow={1}>

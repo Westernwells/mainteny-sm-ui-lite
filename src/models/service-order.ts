@@ -207,10 +207,11 @@ export interface ServiceOrderScheduleSimpleView {
 }
 
 export interface UpdateServiceOrder {
-  id: string;
   externalId: string;
   description: string;
   priority: Priority;
+  quotationId: string;
+  checkListId: string;
 }
 
 export interface UpdateJobSchedule {
@@ -331,7 +332,7 @@ export interface RedispatchParams {
   serviceOrderId: string;
 }
 
-export interface UpdateServiceOrderBody {
+export interface UpdateServiceOrderScheduleBody {
   endTime: string;
   startTime: string;
   technicianIds: string[];
