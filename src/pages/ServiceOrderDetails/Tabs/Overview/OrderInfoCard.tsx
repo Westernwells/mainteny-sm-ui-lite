@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
@@ -6,8 +5,6 @@ import Typography from '@mui/material/Typography';
 import {InfoCard} from 'components/InfoCard';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Grid from '@mui/material/Grid';
-// import {convertToText} from 'utils/utils';
-// import {CardProps} from 'components/CardProps';
 import {Confirm} from 'components/Confirm';
 import {
   useCancelServiceOrders,
