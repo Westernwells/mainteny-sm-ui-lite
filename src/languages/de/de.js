@@ -719,6 +719,61 @@ module.exports = {
     'Postal Address': 'Postanschrift',
     Active: 'Aktiv',
     Inactive: 'Inaktiv',
+
+    // Empty state
+    'No data entries yet. They will appear here once added.':
+      'Es wurden noch keine Informationen eingetragen. Diese werden hier angezeigt, sobald sie hinzugefügt wurden.',
+    'There are no entires for the applied filters.':
+      'Für die angewendeten Filter sind keine Einträge vorhanden.',
+    // "Sorry, we couldn't find any ${placeholder} that matches the search text. If you like to add a new ${placeholder}, please click the button below.":
+    //   'Entschuldigung, wir konnten für Ihre Suche keine Informationen finden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
+    // 'No ${placeholder} yet. Please click the button below to add.':
+    //   'Keine Informationen vorhanden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
+    'Please click the button below to add.':
+      'Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
+    'No contracts yet. Please click the button below to add.':
+      'Es sind noch keine Verträge vorhanden. Bitte klicken Sie zum Hinzufügen auf die Schaltfläche unten.',
+    'No units yet. Please click the button below add.':
+      'Es sind noch keine Anlagen vorhanden. Bitte klicken Sie zum Hinzufügen  auf die Schaltfläche unten.',
+    'No customers yet. Please click the button below to add.':
+      'Es sind noch keine Kunden vorhanden. Bitte klicken Sie zum Hinzufügen auf die Schaltfläche unten.',
+    'No employees yet. Please click the button below to add.':
+      'Es sind noch keine Mitarbeiter vorhanden. Bitte klicken Sie zum Hinzufügen auf die Schaltfläche unten.',
+    "Sorry, we couldn't find the invoice.":
+      'Entschuldigung, wir konnten die Rechnung nicht finden.',
+    'The PDF generation is in progress, please try again after sometime. We apologize for the inconvenience.':
+      'Die PDF-Generierung läuft, bitte versuchen Sie es nach einiger Zeit erneut. Wir entschuldigen uns für die Unannehmlichkeiten.',
+    'No invoices yet. Please click the button below to add.':
+      'Es wurden noch keine Rechnungen erstellt. Bitte klicken Sie auf die Schaltfläche unten, um eine zu erstellen!',
+    "Sorry, we couldn't find any unit that matches the search text. For adding one, please click the button below":
+      'Wir konnten leider keine Anlage finden, die dem Suchtext entspricht. Um eine hinzuzufügen, klicken Sie bitte auf die Schaltfläche unten.',
+    "Sorry, we couldn't find the quotation.":
+      'Das Angebot wurde nicht gefunden.',
+    'No quotations yet. Please click the button below to add.':
+      'Es wurden noch keine Angebote erstellt. Bitte klicken Sie auf die Schaltfläche unten, um eins zu erstellen!',
+    'No articles yet. Please click the button above to add.':
+      'Es wurden noch keine Artikel erstellt. Bitte klicken Sie auf die Schaltfläche oben, um neue anzulegen.',
+    'No invoices yet. They will appear here once added.':
+      'Es wurden noch keine Rechnungen erstellt. Sie werden hier angezeigt, sobald sie hinzugefügt wurden!',
+    'No quotations yet. They will appear here once added.':
+      'Es wurden noch keine Angebote erstellt. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!',
+    'No work report yet. It will appear here once the order is completed.':
+      'Es wurde noch kein Arbeitsbericht erstellt. Er erscheint hier, sobald der Auftrag abgeschlossen ist!',
+    'No orders yet. Please click the button above to add.':
+      'Es wurden noch kein Auftrag erstellt. Bitte klicken Sie auf die Schaltfläche oben, um eine zu erstellen!',
+    'Data will be available here only for IoT enabled units.':
+      'Es können nur Daten für IoT-fähige Anlagen dargestellt werden.',
+    'Stats will appear here if the unit is IoT enabled.':
+      'Statistiken werden hier angezeigt, wenn die Anlage IoT-fähig ist.',
+    'No documents yet. Please click the button below to add.':
+      'Es wurden noch keine Dokumente hinzugefügt. Bitte klicken Sie auf die Schaltfläche unten, um ein Dokument hinzuzufügen!',
+    'No notes yet. Please click the button below to add.':
+      'Es wurden noch keine Notizen erstellt. Bitte klicken Sie auf die Schaltfläche unten, um eine Notiz zu erstellen!',
+    'No pictures yet. Please click the button below to add.':
+      'Es wurden noch keine Bilder hinzugefügt. Bitte klicken Sie auf die Schaltfläche unten, um ein Bild hinzuzufügen!',
+    'No service orders have been created for this elevator yet. Please click the button below to add.':
+      'Für dies Anlage wurden noch kein Auftrag erstellt. Bitte klicken Sie auf die Schaltfläche unten, um einen Serviceauftrag zu erstellen!',
+    'No to-do added yet.': 'Es wurden noch keine To-Dos hinzugefügt.',
   },
 };
 

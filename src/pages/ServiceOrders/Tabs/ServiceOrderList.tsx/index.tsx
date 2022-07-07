@@ -148,7 +148,7 @@ export const ServiceOrderList = () => {
   if (isFetched && !totalOrederRef.current) {
     return (
       <EmptySection
-        label="No orders have been created yet. Please click the button above to create one!"
+        label="No orders yet. Please click the button above to add."
         containerStyle={{
           height: '100%',
           mb: '10em',

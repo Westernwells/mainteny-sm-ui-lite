@@ -157,7 +157,7 @@ export const DataGridLayout = ({
             illustration="clipboard"
             size="tiny"
             containerStyle={{my: 'auto'}}
-            label="No data entries yet. They will appear here once added!"
+            label="No data entries yet. They will appear here once added."
           />
         )
       );
@@ -168,7 +168,7 @@ export const DataGridLayout = ({
           illustration="clipboard"
           size="tiny"
           containerStyle={{my: 'auto'}}
-          label="There are no entires for the applied filters!"
+          label="There are no entires for the applied filters."
         />
       )
     );

@@ -111,7 +111,7 @@ export const Quotations = () => {
   if (isFetched && !totalQuotationsRef.current) {
     return (
       <EmptySection
-        label="No quotations have been created yet. Please click the button below to create one!"
+        label="No quotations yet. Please click the button below to add."
         showActionBtn
         btnLabel="Add Quotation"
         btnAction={navigateToNewQuotation}

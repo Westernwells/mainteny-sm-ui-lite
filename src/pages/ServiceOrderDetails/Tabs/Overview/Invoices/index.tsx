@@ -46,7 +46,7 @@ export const Invoices = ({serviceOrderId}: Props) => {
         illustration="clipboard"
         size="tiny"
         containerStyle={{m: 'auto', width: '60%'}}
-        label="No invoices yet. They will appear here once added!"
+        label="No invoices yet. They will appear here once added."
       />
     </Box>
   );

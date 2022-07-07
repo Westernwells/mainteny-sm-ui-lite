@@ -120,7 +120,7 @@ export const ElevatorAvailabilitySection = ({noStats}: Props) => {
   return (
     <PageCard headerLabel="Stats" minHeight="30rem">
       {!noStats ? (
-        <EmptySection label="Stats will appear here if the unit is IoT enabled!" />
+        <EmptySection label="Stats will appear here if the unit is IoT enabled." />
       ) : (
         <Box
           sx={{

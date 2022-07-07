@@ -111,7 +111,7 @@ export const ServiceHistoryTab = () => {
   if (isFetched && !totalRef.current) {
     return (
       <EmptySection
-        label="No service orders have been created yet for this elevator. Please click the button below to create one!"
+        label="No orders yet. Please click the button above to add."
         showActionBtn
         btnLabel="Create Service Order"
         btnAction={() => navigate('/orders')}

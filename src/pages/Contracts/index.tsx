@@ -115,7 +115,7 @@ export const Contracts = () => {
   if (isFetched && !totalContractRef.current) {
     return (
       <EmptySection
-        label="No contracts have been created yet. Please click the button below to create one!"
+        label="No contracts yet. Please click the button below to add."
         showActionBtn
         btnLabel="Add Contract"
         btnAction={() => navigate('/contracts/new')}

@@ -37,6 +37,6 @@ export const QuotationDetails = () => {
       quotation={quotation}
     />
   ) : (
-    <EmptySection label="Quotation not found!" />
+    <EmptySection label="Sorry, we couldn't find the quotation." />
   );
 };

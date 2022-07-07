@@ -135,7 +135,7 @@ export const Invoices = () => {
   if (isFetched && !totalInvoiceRef.current) {
     return (
       <EmptySection
-        label="No invoices have been created yet. Please click the button below to create one!"
+        label="No invoices yet. Please click the button below to add."
         showActionBtn
         btnLabel="Add Invoice"
         containerStyle={{
