@@ -112,22 +112,27 @@ export const SelectTechnicians = ({
   const [recommendedTechniciansView, setRecommendedTechniciansView] = useState<
     EmployeesView[]
   >(initialRecommendedTechnicians || []);
-  const {data: recommendedTechnicians = []} = useFetchRecommendedTechnician(
+  const {
+    data: recommendedTechnicians = [],
+    isLoading: isLoadingRecommendedTechnicians,
+  } = useFetchRecommendedTechnician(
     {
       time,
       count: 4,
     },
     elevatorId,
   );
-  const {data: serviceOrders = createEmptyResource<ServiceOrderView>(5)} =
-    useQueryServiceOrderScheduled({
-      end: toRestDateTime(endOfDay(new Date())),
-      start: toRestDateTime(startOfDay(new Date())),
-      pageIndex: page.pageIndex,
-      pageSize: page.pageSize,
-      query: '',
-      status: [],
-    });
+  const {
+    data: serviceOrders = createEmptyResource<ServiceOrderView>(5),
+    isLoading: isLoadingOrderSchedules,
+  } = useQueryServiceOrderScheduled({
+    end: toRestDateTime(endOfDay(new Date())),
+    start: toRestDateTime(startOfDay(new Date())),
+    pageIndex: page.pageIndex,
+    pageSize: page.pageSize,
+    query: '',
+    status: [],
+  });
 
   useEffect(() => {
     if (getRecommendedTechnicianView) {
@@ -156,24 +161,28 @@ export const SelectTechnicians = ({
   }, [selectedTechnicianIds]);
 
   useEffect(() => {
-    const sortedOrder = sortOrderByTime(serviceOrders.data);
-    const groupByTechnicianId = _.groupBy(
-      sortedOrder,
-      (serviceOrder) => serviceOrder.schedules[0].technician.id,
-    );
-    setOrders(groupByTechnicianId);
-  }, [serviceOrders]);
+    if (!isLoadingOrderSchedules) {
+      const sortedOrder = sortOrderByTime(serviceOrders.data);
+      const groupByTechnicianId = _.groupBy(
+        sortedOrder,
+        (serviceOrder) => serviceOrder.schedules[0].technician.id,
+      );
+      setOrders(groupByTechnicianId);
+    }
+  }, [serviceOrders, isLoadingOrderSchedules]);
 
   useEffect(() => {
-    const ids = recommendedTechnicians.map((item) => item.id);
-    const result = recommendedTechniciansView.filter(
-      (item) => !ids.includes(item.id),
-    );
-
-    setRecommendedTechniciansView([...recommendedTechnicians, ...result]);
-  }, [recommendedTechnicians]);
+    if (!isLoadingRecommendedTechnicians) {
+      const ids = recommendedTechnicians.map((item) => item.id);
+      const result = recommendedTechniciansView.filter(
+        (item) => !ids.includes(item.id),
+      );
+      setRecommendedTechniciansView([...recommendedTechnicians, ...result]);
+    }
+  }, [recommendedTechnicians, isLoadingRecommendedTechnicians]);
 
   useEffect(() => {
+    if (isLoadingRecommendedTechnicians) return;
     if (newTechnician) {
       const technicianExist = recommendedTechniciansView.filter(
         (item) => item.id === newTechnician.id,

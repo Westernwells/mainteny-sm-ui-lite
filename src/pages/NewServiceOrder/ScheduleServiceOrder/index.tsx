@@ -51,14 +51,19 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
   const [scheduleFormErrored, setScheduleFormErrored] =
     useState<boolean>(false);
   const [dueDateFormErrored, setdueDateFormErrored] = useState<boolean>(false);
-  const {mutateAsync: createImmediateCalloutOrder} = useAssignmentBasedOrder(
-    'Order created successfully',
-  );
+  const {
+    mutateAsync: createImmediateCalloutOrder,
+    isLoading: isCreatingImmediateCalloutOrder,
+  } = useAssignmentBasedOrder('Order created successfully');
 
-  const {mutateAsync: createScheduledServiceOrder} =
-    useCreateScheduledServiceOrder('Order scheduled successfully');
-  const {mutateAsync: createNonScheduledServiceOrder} =
-    useCreateNonScheduledServiceOrder('Order created successfully');
+  const {
+    mutateAsync: createScheduledServiceOrder,
+    isLoading: isSchedulingOrder,
+  } = useCreateScheduledServiceOrder('Order scheduled successfully');
+  const {
+    mutateAsync: createNonScheduledServiceOrder,
+    isLoading: isCreatingNonScheduledOrder,
+  } = useCreateNonScheduledServiceOrder('Order created successfully');
 
   const [recommendedTechnicians, setRecommendedTechnicians] = useState<
     EmployeesView[]
@@ -160,14 +165,18 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
 
   const createScheduledOrder = async () => {
     const serviceCompanyId = user?.userAccount.serviceCompany.id!;
-    const startTime = setDateTime(
-      scheduleFormValue!.date!,
-      formatDate(scheduleFormValue!.startTime!, 'HH:mm')!,
-    ).toISOString();
-    const endTime = setDateTime(
-      scheduleFormValue!.date!,
-      formatDate(scheduleFormValue!.endTime!, 'HH:mm')!,
-    ).toISOString();
+    const startTime = toRestDateTime(
+      setDateTime(
+        scheduleFormValue!.date!,
+        formatDate(scheduleFormValue!.startTime!, 'HH:mm')!,
+      ),
+    );
+    const endTime = toRestDateTime(
+      setDateTime(
+        scheduleFormValue!.date!,
+        formatDate(scheduleFormValue!.endTime!, 'HH:mm')!,
+      ),
+    );
     const body = {
       description,
       elevatorId: selectedUnit!.id,
@@ -223,7 +232,17 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
     <Stepper
       handleCancel={handleCancel}
       handleSubmit={() => handleSubmit()}
-      disableNextBtn={disableNextBtn}
+      submitting={
+        isCreatingImmediateCalloutOrder ||
+        isCreatingNonScheduledOrder ||
+        isSchedulingOrder
+      }
+      disableNextBtn={
+        disableNextBtn ||
+        isCreatingImmediateCalloutOrder ||
+        isCreatingNonScheduledOrder ||
+        isSchedulingOrder
+      }
       initialActiveStep={quotation ? 1 : 0}
       getActiveStep={(val) => setActiveStep(val)}
       steps={steps}
