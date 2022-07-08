@@ -95,7 +95,8 @@ export const ArticleItemsTable = ({
       px=".5em"
       sx={{
         display: 'grid',
-        gridTemplateColumns: '3ch 2fr repeat(4, 10ch)',
+        gridTemplateColumns:
+          '3ch minmax(24ch, 2fr) minmax(10ch, 16ch) repeat(2, minmax(6ch, 10ch)) minmax(12ch, 18ch)',
         placeItems: 'center start',
         gap: '.5em',
       }}>
@@ -115,7 +116,8 @@ export const ArticleItemsTable = ({
       px=".5em"
       sx={{
         display: 'grid',
-        gridTemplateColumns: '3ch 2fr repeat(4, 12ch)',
+        gridTemplateColumns:
+          '3ch minmax(24ch, 2fr) repeat(4, minmax(10ch, 16ch))',
         placeItems: 'center start',
         gap: '.5em',
       }}>
