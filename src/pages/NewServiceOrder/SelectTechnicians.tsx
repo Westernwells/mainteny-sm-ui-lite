@@ -263,7 +263,7 @@ export const SelectTechnicians = ({
       {selectedOption === RadioOptions.IMMEDIATE ? (
         <>
           <Typography variant="h6" sx={{mt: showOptions ? '2em' : undefined}}>
-            {t('Choose Technicians')}
+            {t('Technicians')}
           </Typography>
           <Typography variant="body1" component="div" color="text.secondary">
             {t(
