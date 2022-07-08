@@ -1,4 +1,5 @@
 import {useNavigate} from 'react-router';
+import {useTranslation} from 'react-i18next';
 import {useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export const Invoices = ({serviceOrderId}: Props) => {
+  const {t} = useTranslation();
   const navigate = useNavigate();
   const [rows, setRows] = useState<GridRowsProp>([]);
   let totalInvoiceRef = useRef(0).current;
@@ -57,9 +59,9 @@ export const Invoices = ({serviceOrderId}: Props) => {
 
   return (
     <InfoCard
-      header={<Typography variant="subtitle1">Invoices</Typography>}
+      header={<Typography variant="subtitle1">{t('Invoices')}</Typography>}
       handleAction={() => navigate(`/invoices/new?orderId=${serviceOrderId}`)}
-      headerActionIcon={<Typography color="info.main">+ Add</Typography>}
+      headerActionIcon={<Typography color="info.main">{t('+ Add')}</Typography>}
       showHeaderBackground>
       {!totalInvoiceRef ? (
         renderNoRowsSection()

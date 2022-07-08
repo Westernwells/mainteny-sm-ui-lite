@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
 import {formatDate} from 'utils/datetime';
 import {ContractView} from 'models/contract';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   contractDetails?: ContractView;
@@ -13,6 +14,7 @@ export const ContractTimeline = ({
   contractDetails,
   unUsedContractDays,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
 
   return (
@@ -33,7 +35,7 @@ export const ContractTimeline = ({
           }}
         />
         <Box>
-          <Typography variant="subtitle1">Contract ends</Typography>
+          <Typography variant="subtitle1">{t('Contract ends')}</Typography>
           <Typography variant="body1">
             {formatDate(contractDetails?.endTime, 'dd MMM YYY')}
           </Typography>
@@ -67,7 +69,7 @@ export const ContractTimeline = ({
           }}
         />
         <Box>
-          <Typography variant="subtitle1">Contract signed</Typography>
+          <Typography variant="subtitle1">{t('Contract signed')}</Typography>
           <Typography variant="body1">
             {formatDate(contractDetails?.startTime, 'dd MMM YYY')}
           </Typography>

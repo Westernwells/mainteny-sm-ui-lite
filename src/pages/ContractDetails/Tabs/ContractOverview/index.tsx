@@ -1,4 +1,5 @@
 import {FC, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -52,6 +53,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
+  const {t} = useTranslation();
   const {id: contractId} = useParams();
   const theme = useTheme();
   const {mutateAsync: updateContract} = useUpdateContract('Contract updated');
@@ -229,7 +231,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 header={
                   <Box sx={headerStyles}>
                     <Typography variant="subtitle1" mr="0.5em">
-                      Parties
+                      {t('Parties')}
                     </Typography>
                   </Box>
                 }>
@@ -275,12 +277,12 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 header={
                   <Box sx={headerStyles}>
                     <Typography variant="subtitle1" mr="0.5em">
-                      Document
+                      {t('Document')}
                     </Typography>
                   </Box>
                 }
                 headerActionIcon={
-                  <Typography color="#2196F3">+ Add</Typography>
+                  <Typography color="#2196F3">{t('+ Add')}</Typography>
                 }
                 headerAction={() => setOpenDocumentDialog(true)}>
                 {uploadedDocument && uploadedDocument[0] ? (
@@ -382,7 +384,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   paddingX: 1,
                   borderRadius: '4px',
                 }}>
-                Contract Timeline
+                {t('Contract Timeline')}
               </Typography>
             }>
             {unUsedContractDays > 0 && unUsedContractDays <= 30 ? (
@@ -394,7 +396,9 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   background: theme.palette.warning.outlinedHoverBg,
                   color: theme.palette.warning.main,
                 }}>
-                Contract expires in {unUsedContractDays} days!
+                {t('Contract expires in {{unUsedContractDays}} days!', {
+                  unUsedContractDays,
+                })}
               </Alert>
             ) : null}
 

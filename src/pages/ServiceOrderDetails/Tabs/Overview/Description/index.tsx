@@ -1,4 +1,5 @@
 import Typography from '@mui/material/Typography';
+import {useTranslation} from 'react-i18next';
 import {InfoCard} from 'components/InfoCard';
 import EditIcon from '@mui/icons-material/Edit';
 import {Dialog} from 'components/Dialog';
@@ -21,6 +22,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export const Description = ({content = '', serviceOrderId = ''}: Props) => {
+  const {t} = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const formik = useFormik<DescriptionFormModel>({
@@ -46,7 +48,7 @@ export const Description = ({content = '', serviceOrderId = ''}: Props) => {
   return (
     <>
       <InfoCard
-        header={<Typography variant="subtitle1">Description</Typography>}
+        header={<Typography variant="subtitle1">{t('Description')}</Typography>}
         showHeaderBackground
         headerActionIcon={<EditIcon />}
         handleAction={() => {

@@ -7,8 +7,10 @@ import Stack from '@mui/material/Stack';
 import {FormInput} from 'components/form/FormInput';
 import {useCreateTodo} from 'hooks/reactQuery/useElevator';
 import {ElevatorCommentRecord} from 'models/elevator';
+import {useTranslation} from 'react-i18next';
 
 export const NewTodoForm = () => {
+  const {t} = useTranslation();
   const {id: elevatorId} = useParams();
 
   const {mutate: createTodo} = useCreateTodo();
@@ -65,7 +67,7 @@ export const NewTodoForm = () => {
           type="submit"
           disabled={!formik.values.subject.length || !formik.isValid}
           fullWidth>
-          Save
+          {t('Save')}
         </Button>
       </Stack>
     </Box>

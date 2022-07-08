@@ -1,5 +1,6 @@
 /* eslinst-disable */
 import Typography from '@mui/material/Typography';
+import {useTranslation} from 'react-i18next';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {useEffect, useRef, useState} from 'react';
 import {getDataGridHeight} from 'utils/utils';
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export const Quotation = ({serviceOrder}: Props) => {
+  const {t} = useTranslation();
   const [rows, setRows] = useState<GridRowsProp>([]);
   let totalQuotationRef = useRef(0).current;
   const {data: quotation} = useQuotationDetails(
@@ -49,7 +51,7 @@ export const Quotation = ({serviceOrder}: Props) => {
 
   return (
     <InfoCard
-      header={<Typography variant="subtitle1">Quotations</Typography>}
+      header={<Typography variant="subtitle1">{t('Quotations')}</Typography>}
       showHeaderBackground>
       {!totalQuotationRef ? (
         renderNoRowsSection()
