@@ -6,6 +6,7 @@ import {
   isYesterday,
   parseISO,
   startOfWeek,
+  intervalToDuration,
 } from 'date-fns';
 
 export const DEFAULT_DATE_FORMAT = 'dd.MM.yyyy';
@@ -174,3 +175,6 @@ export const get60Mins = (startNumber?: number, endNumber?: number) =>
   [...Array(60).keys()]
     .map((i) => (i + 1).toString().padStart(2, '0'))
     .slice(startNumber ? startNumber - 1 : 0, endNumber || 60);
+
+export const getDifferenceInInterval = (start: Date, end: Date) =>
+  intervalToDuration({start: new Date(start), end: new Date(end)});

@@ -27,9 +27,7 @@ const TotalTime = ({time}: TotalTimeProps) => {
         component="span"
         variant="caption"
         sx={{
-          [theme.breakpoints.up('md')]: {
-            marginRight: '0.625em',
-          },
+          marginRight: '0.625em',
           color: ' #8F9BB3',
           fontSize: '14px',
           lineHeight: '20px',
@@ -46,7 +44,7 @@ const TotalTime = ({time}: TotalTimeProps) => {
           color: '#0F4C6480',
           border: '1px solid #0F4C6480',
           borderRadius: '16px',
-          padding: '0.18em 0.25em',
+          padding: '0.18em 0.5em',
         }}>
         {time}
       </Typography>

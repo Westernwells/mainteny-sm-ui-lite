@@ -10,12 +10,12 @@ import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 
 import {Progress} from 'components/Progress';
+import EmployeeAbsence from 'pages/EmployeeDetails/Absence';
 import {BasicDetailsValue} from 'models/misc';
 import {UserView} from 'models/user';
 import {EditEmployee} from './EditEmployee';
 import {employeeDetailSchema} from './schema';
 import EmployeeAvatar from './EmployeeAvatar';
-import EmployeeAbsence from './EmployeeAbsence';
 import EmployeeWorkHours from './EmployeeWorkHours';
 
 interface Props {
@@ -113,7 +113,7 @@ export const EmployeeOverview = ({
         </InfoCard>
       </Grid>
       <EmployeeWorkHours action={openWorkHoursTab} />
-      <EmployeeAbsence />
+      <EmployeeAbsence employee={employee} />
     </Grid>
   );
   return <Box>{renderBasicDetails()}</Box>;

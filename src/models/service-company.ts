@@ -24,6 +24,7 @@ export interface ServiceCompanyView {
   language: Language;
   contact: CompanyContact;
   meta: Meta;
+  settings: Settings;
 }
 
 export interface ServiceCompany {
