@@ -76,7 +76,7 @@ export const AppDrawer = () => {
   const [open, setOpen] = useState(false);
   const themeX = useTheme();
   const setSelectedIndex = useState(0)[1];
-  const [selectedPath, setSelectedPath] = useState('/units');
+  const [selectedPath, setSelectedPath] = useState('/orders');
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -247,11 +247,16 @@ export const AppDrawer = () => {
   const renderDrawerHeader = () =>
     open
       ? drawerHeader(
-          <IconButton sx={{mr: '1em'}} edge="start">
+          <IconButton sx={{mr: '1em'}} edge="start" disableRipple>
             <MaintenyLogo
               style={{marginRight: '0.5em'}}
               width={155.22}
               height={32}
+              onClick={() => {
+                setSelectedPath('/orders');
+                Mixpanel.identifyAndTrack(mixpanelEvents.MENU_ORDERS_CLICKED);
+                navigate('/orders');
+              }}
             />
           </IconButton>,
           <ArrowBackIosNewIcon />,

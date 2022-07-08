@@ -11,11 +11,11 @@ export const getQuotationStatusStyles = (
   status: string,
 ): {
   label: string;
-  color: 'success' | 'warning' | 'error' | 'info' | 'default';
+  color: 'success' | 'warning' | 'error' | 'info' | 'default' | 'primary';
 } => {
   switch (status) {
     case QuotationStatus.ACCEPTED:
-      return {label: 'Accepted', color: 'warning'};
+      return {label: 'Accepted', color: 'primary'};
     case QuotationStatus.DRAFT:
       return {label: 'Draft', color: 'default'};
     case QuotationStatus.REJECTED:
