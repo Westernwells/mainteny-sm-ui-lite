@@ -13,7 +13,7 @@ export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
     case ServiceOrderStatus.IN_PROGRESS:
       return 'warning';
     case ServiceOrderStatus.CANCELLED:
-      return 'error';
+      return 'action.active';
     case ServiceOrderStatus.EXPIRED:
       return 'error';
     case ServiceOrderStatus.COMPLETED:

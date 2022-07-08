@@ -10,13 +10,14 @@ const statusWidth = {
 };
 
 const statusColor = {
-  default: 'grey.400',
+  default: 'warning.main',
   primary: 'primary.main',
   secondary: 'secondary.main',
   error: 'error.light',
   info: 'text.secondary',
   success: 'success.main',
   warning: 'warning.light',
+  'action.active': 'action.active',
 };
 interface Props {
   label: string | ReactNode;
@@ -24,14 +25,7 @@ interface Props {
   length?: 'short' | 'medium' | 'long' | 'auto';
   size?: 'small' | 'medium';
   variant?: 'outlined' | 'filled';
-  color?:
-    | 'default'
-    | 'primary'
-    | 'secondary'
-    | 'error'
-    | 'info'
-    | 'success'
-    | 'warning';
+  color?: keyof typeof statusColor;
   maxChars?: number;
 }
 

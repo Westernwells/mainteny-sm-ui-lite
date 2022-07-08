@@ -114,7 +114,7 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
     <>
       <Box display="flex" justifyContent="space-between">
         <Typography variant="h6" component="div">
-          {t('Select unit')}
+          {t('Unit')}
         </Typography>
         <SearchInput
           placeholder="Search"
