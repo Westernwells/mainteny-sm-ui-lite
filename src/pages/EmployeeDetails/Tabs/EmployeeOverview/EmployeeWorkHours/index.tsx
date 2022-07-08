@@ -11,7 +11,7 @@ type EmployeeWorkHoursProps = {
 const EmployeeWorkHours = ({action}: EmployeeWorkHoursProps) => {
   const {t} = useTranslation();
   return (
-    <Grid item xs={8}>
+    <Grid item sm={12} md={6} lg={9}>
       <InfoCard
         header={<Typography variant="subtitle1">{t('Work Hours')}</Typography>}
         containerStyles={{flexGrow: 1}}
