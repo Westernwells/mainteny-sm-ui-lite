@@ -84,7 +84,9 @@ export const TodoCard = ({todo}: Props) => {
           minute: '2-digit',
         })})`}</Typography>
       </Box>
-      <Typography variant="caption">{todo.content}</Typography>
+      <Typography variant="caption" whiteSpace="pre-wrap" component="p">
+        {todo.content}
+      </Typography>
       <Confirm
         open={isDeleteDialogOpen}
         onConfirm={() => {
