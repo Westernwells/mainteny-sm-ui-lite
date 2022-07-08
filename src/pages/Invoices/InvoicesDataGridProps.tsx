@@ -32,7 +32,7 @@ export const getInvoiceStatusStyles = (
     case InvoiceStatus.EXPIRED:
       return {label: InvoiceStatusView.EXPIRED, color: 'error'};
     case InvoiceStatus.NOT_PAID:
-      return {label: InvoiceStatusView.NOT_PAID, color: 'primary'};
+      return {label: InvoiceStatusView.NOT_PAID, color: 'warning'};
     default:
       return {label: '-', color: 'default'};
   }
