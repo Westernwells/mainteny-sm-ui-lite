@@ -117,7 +117,7 @@ export const MyDropZone = ({
       sx={{mr: '1em', display: 'flex', mt: '0.5em', flexDirection: 'row'}}>
       <CheckCircleRounded sx={{mr: '0.5em'}} />
       <Typography component="div" variant="body1">
-        {hint}
+        {t(hint)}
       </Typography>
     </Box>
   ));

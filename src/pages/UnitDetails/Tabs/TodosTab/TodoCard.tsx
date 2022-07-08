@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import Typography from '@mui/material/Typography';
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export const TodoCard = ({todo}: Props) => {
+  const {t} = useTranslation();
   const {mutate: deleteTodo} = useDeleteTodo();
   const {mutate: updateTodo} = useUpdateTodo();
 
@@ -67,7 +69,7 @@ export const TodoCard = ({todo}: Props) => {
       </Box>
       <Box display="flex" gap=".25em" my=".25em">
         <Typography variant="subtitle2" color="textSecondary">
-          Created By:
+          {`${t('Created By')}:`}
         </Typography>
         <Typography variant="subtitle2">
           {todo.meta.creator
@@ -75,7 +77,7 @@ export const TodoCard = ({todo}: Props) => {
             : ''}
         </Typography>
         <Typography variant="subtitle2" color="textSecondary" ml="1em">
-          Date and Time:
+          {`${t('Date and Time')}:`}
         </Typography>
         <Typography variant="subtitle2">{`${formatDate(
           todo.meta.createdAt,

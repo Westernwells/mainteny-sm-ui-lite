@@ -1,4 +1,5 @@
 import Typography from '@mui/material/Typography';
+import {useTranslation} from 'react-i18next';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {useEffect, useState} from 'react';
 import {getDataGridHeight} from 'utils/utils';
@@ -31,6 +32,7 @@ export const Articles = ({
   serviceOrderArticles = [],
   serviceOrderId,
 }: Props) => {
+  const {t} = useTranslation();
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [formikErrors, setFormikErrors] = useState({});
@@ -198,10 +200,12 @@ export const Articles = ({
   return (
     <>
       <InfoCard
-        header={<Typography variant="subtitle1">Articles</Typography>}
+        header={<Typography variant="subtitle1">{t('Articles')}</Typography>}
         showHeaderBackground
         handleAction={() => setOpenSelectModal(true)}
-        headerActionIcon={<Typography color="info.main">+ Add</Typography>}>
+        headerActionIcon={
+          <Typography color="info.main">{t('+ Add')}</Typography>
+        }>
         {serviceOrderArticles.length === 0 ? (
           renderNoRowsSection()
         ) : (

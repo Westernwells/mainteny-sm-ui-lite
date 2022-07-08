@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import {useTranslation} from 'react-i18next';
 import Language from '@mui/icons-material/Language';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
@@ -27,6 +28,7 @@ export const AppTopBar = ({
   showBackAction,
   backBtnLabel = '',
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const [selectedLng, setSelectedLng] = useState('');
   const {signout} = useAuth();
@@ -126,7 +128,7 @@ export const AppTopBar = ({
               label={profileBtnLabel()}
               menu={[
                 {
-                  label: 'Logout',
+                  label: t('Logout'),
                   action: () => {
                     Mixpanel.identifyAndTrack(mixpanelEvents.LOGOUT);
                     signout();

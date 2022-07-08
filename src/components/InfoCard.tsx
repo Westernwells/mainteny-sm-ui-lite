@@ -4,6 +4,7 @@ import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';
 import useTheme from '@mui/material/styles/useTheme';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   bodyContainerStyle?: {[key: string]: any};
@@ -31,6 +32,7 @@ export const InfoCard = ({
   handleAction,
 }: Props) => {
   const theme = useTheme();
+  const {t} = useTranslation();
   return (
     <Card
       sx={{
@@ -56,7 +58,7 @@ export const InfoCard = ({
               <IconButton onClick={handleAction}>{headerActionIcon}</IconButton>
             ) : null
           }
-          title={header || undefined}
+          title={typeof header === 'string' ? t(header) : header || undefined}
         />
       )}
       <CardContent

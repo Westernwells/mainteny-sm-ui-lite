@@ -67,7 +67,9 @@ export const FormSelect = ({
               const selectedOption = options.find(
                 (option) => option.value === item,
               )?.label;
-              return selectedOption;
+              return typeof selectedOption === 'string'
+                ? t(selectedOption)
+                : selectedOption;
             });
 
             selectValue = capitalize((editedValues as string[]) || []);
@@ -76,7 +78,7 @@ export const FormSelect = ({
               ({value}) => value === selectProps?.value,
             )?.label;
           }
-          return selectValue || '';
+          return typeof selectValue === 'string' ? t(selectValue) : '';
         }}
         value={selectProps?.value}
         sx={selectStyles}

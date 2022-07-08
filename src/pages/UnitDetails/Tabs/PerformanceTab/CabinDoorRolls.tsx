@@ -1,9 +1,11 @@
 import {Grid, Typography} from '@mui/material';
 import useTheme from '@mui/material/styles/useTheme';
 import {InfoCard} from 'components/InfoCard';
+import {useTranslation} from 'react-i18next';
 import {CircularProgressWithLabel} from './CircularProgressWithLabel';
 
 export const CabinDoorRolls = () => {
+  const {t} = useTranslation();
   const theme = useTheme();
   return (
     <InfoCard
@@ -15,7 +17,7 @@ export const CabinDoorRolls = () => {
       }}
       header={
         <Typography variant="subtitle2" color={theme.palette.action.active}>
-          Cabin Door Rolls (EOL)
+          {t('Cabin Door Rolls (EOL)')}
         </Typography>
       }
       showHeaderBackground>

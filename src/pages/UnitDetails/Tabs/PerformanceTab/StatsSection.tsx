@@ -116,7 +116,7 @@ export const StatsSection = () => {
     datasets: [
       {
         id: 1,
-        label: 'Runs',
+        label: t('Runs'),
         data: generateData(timeFrame),
         backgroundColor: theme.palette.primary.main,
         borderRadius: 4,
@@ -173,7 +173,7 @@ export const StatsSection = () => {
                     ? primaryStyle
                     : secondaryStyle
                 }>
-                Week
+                {t('Week')}
               </Button>
               <Button
                 onClick={() => setTimeFrame(TimeFrame.LAST_30_DAYS)}
@@ -182,7 +182,7 @@ export const StatsSection = () => {
                     ? primaryStyle
                     : secondaryStyle
                 }>
-                Month
+                {t('Month')}
               </Button>
               <Button
                 onClick={() => setTimeFrame(TimeFrame.LAST_365_DAYS)}
@@ -191,7 +191,7 @@ export const StatsSection = () => {
                     ? primaryStyle
                     : secondaryStyle
                 }>
-                Year
+                {t('Year')}
               </Button>
             </ButtonGroup>
           </Grid>
@@ -205,7 +205,7 @@ export const StatsSection = () => {
             alignItems="center"
             gap={1}>
             <Typography variant="h5">17:21</Typography>
-            <Typography variant="caption">Hours of Runtime</Typography>
+            <Typography variant="caption">{t('Hours of Runtime')}</Typography>
           </Grid>
           <Grid
             item
@@ -217,7 +217,7 @@ export const StatsSection = () => {
             <Typography variant="h5" color={theme.palette.success.main}>
               98%
             </Typography>
-            <Typography variant="caption">Availability</Typography>
+            <Typography variant="caption">{t('Availability')}</Typography>
           </Grid>
         </Grid>
         <Grid container justifyContent="center">

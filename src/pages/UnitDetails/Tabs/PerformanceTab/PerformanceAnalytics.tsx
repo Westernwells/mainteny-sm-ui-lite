@@ -5,6 +5,7 @@ import {Line} from 'react-chartjs-2';
 import {addDays, format} from 'date-fns';
 import {random} from 'lodash';
 import {InfoCard} from 'components/InfoCard';
+import {useTranslation} from 'react-i18next';
 
 Chart.register(...registerables);
 
@@ -18,6 +19,7 @@ const getDays = (number: number) => {
 };
 
 export const PerformanceAnalytics = () => {
+  const {t} = useTranslation();
   const theme = useTheme();
 
   const lineChartData = {
@@ -88,7 +90,7 @@ export const PerformanceAnalytics = () => {
       }}
       header={
         <Typography variant="subtitle2" color={theme.palette.action.active}>
-          Performance Analytics
+          {t('Performance Analytics')}
         </Typography>
       }
       showHeaderBackground>

@@ -62,7 +62,7 @@ export const ContractBasic = ({
         </Grid>
         <Grid item xs={4}>
           <CardProps
-            label="PRICE/YEAR (excl VAT)"
+            label="PRICE/YEAR (Excl VAT)"
             bodyTextVariant="subtitle1"
             icon={<AttachMoneyIcon color="info" />}
             containerStyles={{mr: '0.5em'}}

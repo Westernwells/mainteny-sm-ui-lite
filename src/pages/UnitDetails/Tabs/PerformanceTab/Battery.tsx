@@ -1,9 +1,11 @@
 import {Grid, Typography} from '@mui/material';
 import useTheme from '@mui/material/styles/useTheme';
 import {InfoCard} from 'components/InfoCard';
+import {useTranslation} from 'react-i18next';
 import {LinearProgressWithLabel} from './LinearProgressWithLabel';
 
 export const Battery = () => {
+  const {t} = useTranslation();
   const theme = useTheme();
   return (
     <InfoCard
@@ -15,7 +17,7 @@ export const Battery = () => {
       }}
       header={
         <Typography variant="subtitle2" color={theme.palette.action.active}>
-          Battery
+          {t('Battery')}
         </Typography>
       }
       showHeaderBackground>
@@ -25,7 +27,7 @@ export const Battery = () => {
             variant="body1"
             color={theme.palette.text.primary}
             pb="1.5rem">
-            Cell Health
+            {t('Cell Health')}
           </Typography>
           <LinearProgressWithLabel value={20} />
         </Grid>
@@ -34,7 +36,7 @@ export const Battery = () => {
             variant="body1"
             color={theme.palette.text.primary}
             pb="1.5rem">
-            Emergency Battery Level
+            {t('Emergency Battery Level')}
           </Typography>
           <LinearProgressWithLabel value={70} />
         </Grid>

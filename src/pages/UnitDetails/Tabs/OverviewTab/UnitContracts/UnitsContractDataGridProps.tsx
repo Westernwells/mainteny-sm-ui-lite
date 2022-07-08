@@ -10,15 +10,21 @@ import {formatDate} from 'utils/datetime';
 import {StatusChip} from 'components/StatusChip';
 import {convertToText} from 'utils/utils';
 import {ContractStatus, ContractSimpleView} from 'models/contract';
+import {useTranslation} from 'react-i18next';
 
 const defaultProps = {
   editable: false,
   sortable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
+  renderHeader: (params: GridColumnHeaderParams) => {
+    const {t} = useTranslation();
+    return (
+      <Typography variant="subtitle2" color="textSecondary">
+        {typeof params.colDef.headerName === 'string'
+          ? t(params.colDef.headerName)
+          : params.colDef.headerName}
+      </Typography>
+    );
+  },
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
     <Typography variant="body2" mx="0.5em">
       {params.value}

@@ -90,6 +90,53 @@ module.exports = {
     'CONTRACT TYPE': 'VERTRAGSTYP',
     'START DATE': 'ANFANGSDATUM',
     'NO. OF UNITS': 'ANZAHL ANLAGEN',
+    'CONTACT TYPE': 'KONTAKT',
+    'New Contract': 'Neuer Vertrag',
+    'Select units': 'Wähle Aufzug',
+    'Add contract terms': 'Vertragsbedingungen hinzufügen',
+    'Attach documents': 'Dokumente hinzufügen',
+    'Contract Type': 'Vertragsart',
+    Basic: 'Basis',
+    Medium: 'Medium',
+    Premium: 'Premium',
+    'Contract Terms': 'Vertragsbedingungen',
+    'Invoice Due': 'Rechnung fällig',
+    'Yearly Contract Price (excl. VAT, in €)':
+      'Jährlicher Vertragspreis (ohne MwSt., in €)*',
+    'Contract Renewal Period (in months)':
+      'Vertragsverlängerungszeitraum (in Monaten)',
+    'Spending Allowance (in €)': 'Ausgabenlimit (in €)',
+    'Defined Hourly Rate (in €)': 'Vereinbarter Stundensatz (in €)',
+    'Yearly Price Adjustment (in %)': 'Jährliche Preisanpassung (in %)',
+    'Service Level Agreement (in min)': 'Service Level Vereinbarung (in min)',
+    'After Each Visit': 'Nach jedem Besuch',
+    'Half Yearly': 'Halbjährlich',
+    Quarterly: 'Vierteljährlich',
+    Yearly: 'Jährlich',
+    'PDF, DOCX, XLSX, XLS, CSV, TSV only': 'Nur PDF, DOCX, XLSX, XLS, CSV, TSV',
+    'NUMBER OF VISITS': 'ANZAHL DER WARTUNGEN',
+    'PRICE/YEAR (Excl VAT)': 'PREIS/JAHR (ohne MwSt.)',
+    'RENEWAL PERIOD': 'VERLÄNGERUNGSZEITRAUM',
+    'INVOICE DUE': 'RECHNUNG FÄLLIG',
+    Parties: 'Vertragsparteien',
+    Document: 'Dokumente',
+    'Contract Timeline': 'Zeitrahmen',
+    'Contract expires in {{unUsedContractDays}} days!':
+      'Vertrag läuft in {{unUsedContractDays}} Tagen aus!',
+    'Contract ends': 'Vertrag endet am',
+    'Contract signed': 'Vertrag unterzeichnet am',
+    'Edit Contract': 'Vertrag bearbeiten',
+    'Number of Visits': 'Anzahl der Wartungen',
+    'Enter number of visits': 'Eingeben Anzahl der Wartungen',
+    'Price/Year (excl. VAT, in €)': 'Preis/Jahr (ohne MwSt., in €)',
+    'Enter price/year': 'Eingeben Preis/Jahr (ohne MwSt., in €)',
+    'Spending Limit (in €)': 'Ausgabenpauschale (in €)',
+    'Enter spending limit (in €)': 'Eingeben Ausgabenpauschale (in €)',
+    'Renewal Period (in months)': 'Verlängerungszeitraum (in Monaten)',
+    'Enter renewal Period (in months)':
+      'Eingeben Verlängerungszeitraum (in Monaten)',
+    'Download contract': 'Vertrag herunterladen',
+    'Contract Details': 'Vertragsdetails',
 
     // Units
     Units: 'Anlagen',
@@ -116,6 +163,35 @@ module.exports = {
     'Upcoming visits': 'Termine',
     Clear: 'Löschen',
     Delete: 'Löschen',
+    'Lower the number here, higher is the priority':
+      '1 is die höchste Priorität',
+    'Order Type': 'Auftragsart',
+    'Ø AVAILABILITY': 'Ø VERFÜGBARKEIT',
+    'Ø RUNTIME/DAY': 'Ø LAUFZEIT/TAG',
+    'Ø RUNS/DAY': 'Ø FAHRTEN/TAG',
+    'Ø DOOR OPENS/DAY': 'Ø TÜRÖFFNUNGEN/TAG',
+    'CURRENT FLOOR': 'AKTUELLE ETAGE',
+    'Ø AIR QUALITY': 'Ø LUFTQUALITÄT',
+    Running: 'Laufend',
+    Stats: 'Statistik',
+    Week: 'Woche',
+    Month: 'Monat',
+    Year: 'Jahr',
+    'Hours of Runtime': 'Laufzeit in Stunden',
+    Runs: 'Fahrten',
+    Battery: 'Batterie',
+    'Cell Health': 'Gesundheit der Zellen',
+    'Emergency Battery Level': 'Status der Notstrombatterie',
+    'Cabin Door Rolls (EOL)': 'Rolle Kabinentür (EOL)',
+    'Rolls Shaft Door': 'Rolle Schachttür',
+    Clockwise: 'Im Uhrzeigersinn',
+    'Anti-clockwise': 'Gegen den Uhrzeigersinn',
+    'Performance Analytics': 'Leistungsanalyse',
+    'To-Do List': 'To-Do-Liste',
+    'New To-Do': 'Neue To-Do',
+    Subject: 'Betreff',
+    'Date and Time': 'Datum und Uhrzeit',
+    'Edit To-Do': 'To-Do editieren',
 
     // Employees
     Employees: 'Mitarbeiter',
@@ -596,6 +672,8 @@ module.exports = {
     'Download Invoice': 'Rechnung herunterladen',
     Download: 'Herunterladen',
     'Work Report': 'Arbeitsbericht',
+    'Invoice Number': 'Rechnungsnummer',
+    'Total (excl VAT)': 'Gesamt (ohne MwSt.)',
 
     // Quotations
     'No quotations have been created yet. Please click the button below to create one!':
@@ -606,6 +684,15 @@ module.exports = {
     'Quotation Details': 'Details zum Angebot',
     Orders: 'Aufträge',
     Customers: 'Kunden',
+    'EMAIL ID': 'EMAIL-ADRESSE',
+    'Postal Address': 'Postanschrift',
+    Active: 'Aktiv',
+    Inactive: 'Inaktiv',
+    Accepted: 'Akzeptiert',
+    Rejected: 'Abgelehnt',
+    'Do you want to delete this Quotation?':
+      'Möchten Sie das Angebot wirklich löschen?',
+    'INVOICE TYPE': 'RECHNUNGSART',
 
     // Customer
 
@@ -613,7 +700,7 @@ module.exports = {
       'Suche nach Nummer, Name, Adresse usw.',
     'No. of Units': 'Anzahl Anlagen',
     'New Customer': 'Neuer Kunde',
-    'JOINED DATE': 'ANGESTELLUNGSDATUM',
+    'JOINED DATE': 'Erstellungsdatum',
     PRIORITY: 'PRIORITÄT',
     'NO. OF CONTRACTS': 'Anzahl Verträge',
     'Basic Details': 'Allgemeine Angaben',
@@ -624,7 +711,7 @@ module.exports = {
     'Contract ID': 'Vertragsnr.',
     'Revenue/Year': 'Einnahmen/Jahr',
     'Contact Persons': 'Kontaktpersonen',
-    'Dashboard Access': 'Zugang Zum Dashboard',
+    'Dashboard Access': 'Zugang zum Dashboard',
     Actions: 'Aktionen',
     'No contact persons yet. They will appear here once added!':
       'Noch keine Kontaktpersonen. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!',
@@ -715,10 +802,6 @@ module.exports = {
     'Order scheduled successfully': 'Die Bestellung wurde erfolgreich geplant',
     'QR code image uploaded successfully':
       'QR-Code wurde erfolgreich hochgeladen',
-    'EMAIL ID': 'EMAIL-ADRESSE',
-    'Postal Address': 'Postanschrift',
-    Active: 'Aktiv',
-    Inactive: 'Inaktiv',
 
     // Empty state
     'No data entries yet. They will appear here once added.':
@@ -774,6 +857,19 @@ module.exports = {
     'No service orders have been created for this elevator yet. Please click the button below to add.':
       'Für dies Anlage wurden noch kein Auftrag erstellt. Bitte klicken Sie auf die Schaltfläche unten, um einen Serviceauftrag zu erstellen!',
     'No to-do added yet.': 'Es wurden noch keine To-Dos hinzugefügt.',
+
+    Logout: 'Ausloggen',
+    'View Details': 'Details anzeigen',
+    SCHEDULE: 'ZEITPLAN',
+    'UNIT ADDRESS': 'ANLAGEADRESSE',
+    Timeline: 'Zeitplan',
+    'Order ID': 'Auftragsnummer',
+    'Report ID': 'Arbeitsberichtsnummer',
+    'Description Of Service': 'Leistungsbeschreibung',
+    Signature: 'Unterschrift',
+    Date: 'Datum',
+    Start: 'Start',
+    End: 'Ende',
   },
 };
 

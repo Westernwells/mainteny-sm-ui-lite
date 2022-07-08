@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {A4Layout} from 'components/A4Layout';
@@ -26,6 +27,7 @@ interface Props {
   orderId?: string;
 }
 export const WorkReport = ({orderId}: Props) => {
+  const {t} = useTranslation();
   const {
     data: serviceOrderReportSource,
     isFetched,
@@ -113,7 +115,7 @@ export const WorkReport = ({orderId}: Props) => {
                       {report.elevator.propertyOwner.contact.phone}
                     </Typography>
                     <Typography variant="subtitle2" component="p">
-                      Customer Number
+                      {t('Customer Number')}
                     </Typography>
                     <Typography variant="caption" component="p">
                       {report.elevator.propertyOwner.externalId || '-'}
@@ -142,7 +144,7 @@ export const WorkReport = ({orderId}: Props) => {
                       {report.elevator.address.fullName}
                     </Typography>
                     <Typography variant="subtitle2" component="p">
-                      Unit Number
+                      {t('Unit Number')}
                     </Typography>
                     <Typography variant="caption" component="p">
                       {report.elevator.externalId || '-'}

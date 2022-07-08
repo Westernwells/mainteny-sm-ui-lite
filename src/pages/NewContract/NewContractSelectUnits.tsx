@@ -1,4 +1,5 @@
 import {GridRowsProp} from '@mui/x-data-grid';
+import {useTranslation} from 'react-i18next';
 import {Box, Typography} from '@mui/material';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {getCenter} from 'geolib';
@@ -21,6 +22,7 @@ interface Props {
 const pageInfo = makePage(0, 10);
 
 const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
+  const {t} = useTranslation();
   const fallback = useRef({
     elevatorByAddress: {} as ElevatorByAddr,
     centerCoord: {longitude: 0, latitude: 0},
@@ -135,7 +137,7 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
     <>
       <Box display="flex" justifyContent="space-between">
         <Typography variant="h6" component="div">
-          Select units
+          {t('Select units')}
         </Typography>
         <SearchInput
           placeholder="Search"

@@ -12,15 +12,21 @@ import Box from '@mui/material/Box';
 import {ElevatorAssignmentSimpleView} from 'models/elevator';
 import {Tooltip} from 'components/Tooltip';
 import {Info} from '@mui/icons-material';
+import {useTranslation} from 'react-i18next';
 
 const defaultProps = {
   editable: false,
   sortable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
+  renderHeader: (params: GridColumnHeaderParams) => {
+    const {t} = useTranslation();
+    return (
+      <Typography variant="subtitle2" color="textSecondary">
+        {typeof params.colDef.headerName === 'string'
+          ? t(params.colDef.headerName)
+          : params.colDef.headerName}
+      </Typography>
+    );
+  },
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
     <Typography variant="body2" mx="0.5em">
       {params.value}
@@ -63,50 +69,55 @@ export const columns = (
     type: 'number',
     ...defaultAlignment,
     ...defaultProps,
-    renderHeader: (params: GridColumnHeaderParams) => (
-      <Box display="flex" alignItems="center">
-        <Typography variant="subtitle2" color="textSecondary">
-          {params.colDef.headerName}
-        </Typography>
-        <Tooltip
-          title={
-            <Box>
-              <Typography
-                sx={{color: 'primary.main', fontSize: '14px', mb: '0.5em'}}>
-                Priority
-              </Typography>
-              <Typography
-                sx={{
-                  color: 'text.primary',
-                  fontSize: '12px',
-                  lineHeight: '166%',
-                }}>
-                Lower the number here, higher is the priority
-              </Typography>
-            </Box>
-          }
-          placement="bottom-end"
-          componentsProps={{
-            tooltip: {
-              sx: {
-                bgcolor: 'white',
-                color: 'black',
-                boxShadow: '0px 3.59389px 8.08625px rgba(0, 0, 0, 0.1);',
+    renderHeader: (params: GridColumnHeaderParams) => {
+      const {t} = useTranslation();
+      return (
+        <Box display="flex" alignItems="center">
+          <Typography variant="subtitle2" color="textSecondary">
+            {typeof params.colDef.headerName === 'string'
+              ? t(params.colDef.headerName)
+              : params.colDef.headerName}
+          </Typography>
+          <Tooltip
+            title={
+              <Box>
+                <Typography
+                  sx={{color: 'primary.main', fontSize: '14px', mb: '0.5em'}}>
+                  {t('Priority')}
+                </Typography>
+                <Typography
+                  sx={{
+                    color: 'text.primary',
+                    fontSize: '12px',
+                    lineHeight: '166%',
+                  }}>
+                  {t('Lower the number here, higher is the priority')}
+                </Typography>
+              </Box>
+            }
+            placement="bottom-end"
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  bgcolor: 'white',
+                  color: 'black',
+                  boxShadow: '0px 3.59389px 8.08625px rgba(0, 0, 0, 0.1);',
+                },
               },
-            },
-          }}
-          arrow={false}>
-          <Info
-            sx={{
-              ml: '0.1em',
-              width: '1.04rem',
-              height: '1.04rem',
-              color: 'action.active',
             }}
-          />
-        </Tooltip>
-      </Box>
-    ),
+            arrow={false}>
+            <Info
+              sx={{
+                ml: '0.1em',
+                width: '1.04rem',
+                height: '1.04rem',
+                color: 'action.active',
+              }}
+            />
+          </Tooltip>
+        </Box>
+      );
+    },
   },
   {
     field: 'actions',

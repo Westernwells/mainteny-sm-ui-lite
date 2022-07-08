@@ -49,12 +49,13 @@ const EditContractForm: FC<Props> = ({formik}) => (
     <FormInput
       props={{
         placeholder: 'Enter price/year',
-        label: 'Price/Year (excl. VAT, in €)*',
+        label: 'Price/Year (excl. VAT, in €)',
         name: 'price',
         type: 'number',
         value: Number(formik.values.price).toString(),
         onBlur: formik.handleBlur,
         onChange: formik.handleChange,
+        required: true,
         InputProps: {
           startAdornment: (
             <InputAdornment position="start" color="text.primary">
