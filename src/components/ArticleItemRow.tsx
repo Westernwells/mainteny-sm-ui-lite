@@ -107,8 +107,8 @@ export const ArticleItemRow = ({
         sx={{
           display: 'grid',
           gridTemplateColumns: isPartial
-            ? '3ch 2fr repeat(4, 12ch)'
-            : '3ch 2fr repeat(4, 10ch)',
+            ? '3ch minmax(24ch, 2fr) repeat(4, minmax(10ch, 16ch))'
+            : '3ch minmax(24ch, 2fr) minmax(10ch, 16ch) repeat(2, minmax(6ch, 10ch)) minmax(12ch, 18ch)',
           placeItems: 'start',
           gap: '.5em',
         }}>
@@ -140,7 +140,6 @@ export const ArticleItemRow = ({
               value={total * 1.19}
               size="small"
               disabled
-              sx={{maxWidth: '12ch', justifySelf: 'end'}}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">€</InputAdornment>
@@ -151,7 +150,6 @@ export const ArticleItemRow = ({
               value={total}
               onChange={handleTotalChange}
               size="small"
-              sx={{maxWidth: '12ch'}}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">€</InputAdornment>
@@ -162,7 +160,6 @@ export const ArticleItemRow = ({
               value={total - price}
               size="small"
               disabled
-              sx={{maxWidth: '12ch', justifySelf: 'end'}}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">€</InputAdornment>
@@ -175,7 +172,6 @@ export const ArticleItemRow = ({
           value={price}
           onChange={handlePriceChange}
           size="small"
-          sx={{maxWidth: isPartial ? '12ch' : '10ch'}}
           InputProps={{
             startAdornment: <InputAdornment position="start">€</InputAdornment>,
           }}
@@ -184,26 +180,20 @@ export const ArticleItemRow = ({
           <>
             <TextField
               value={quantity}
-              onChange={(e) =>
-                parseInt(e.target.value, 10) >= 0 &&
-                setQuantity(parseInt(e.target.value, 10))
-              }
+              onChange={(e) => setQuantity(parseInt(e.target.value, 10))}
               type="number"
               inputProps={{inputMode: 'numeric', pattern: '[0-9]*'}}
               size="small"
-              sx={{maxWidth: '10ch'}}
             />
             <TextField
               defaultValue={articleItem.articleUnit}
               size="small"
-              sx={{maxWidth: '10ch'}}
               disabled
             />
             <TextField
               value={price * quantity}
               size="small"
               disabled
-              sx={{maxWidth: '10ch', justifySelf: 'end'}}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">€</InputAdornment>

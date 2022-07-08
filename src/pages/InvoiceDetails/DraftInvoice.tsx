@@ -198,6 +198,8 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
         );
         setInvoiceItems(items);
       }
+    } else if (formik.values.type !== InvoiceType.PARTIAL) {
+      setInvoiceItems([]);
     }
   }, [serviceOrder, formik.values.type]);
 
