@@ -155,6 +155,7 @@ export const NewUnit = () => {
       return appointmentPreferenceFormValues.openingHour;
     }
   };
+  console.log(unitDetailsFormValues.model, '@@###');
 
   const createNewUnit = async () => {
     const body = {

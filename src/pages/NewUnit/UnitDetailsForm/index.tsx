@@ -23,7 +23,6 @@ interface Props {
 
 const validationSchema = Yup.object().shape({
   category: Yup.string().nullable().required('Category is required'),
-  model: Yup.string().nullable().required('Model is required'),
   unitType: Yup.string().nullable().required('Unit type is required'),
 });
 
@@ -238,7 +237,9 @@ export const UnitDetailsForm = ({
                 label: item,
                 value: item,
               }))}
-              getValue={(item) => formik.setFieldValue('model', item?.value)}
+              getValue={(item) =>
+                formik.setFieldValue('model', item?.value || '')
+              }
               initialValue={
                 formik.values.model
                   ? {
@@ -259,7 +260,6 @@ export const UnitDetailsForm = ({
                   formik.touched.model && formik.errors.model
                     ? formik.errors.model
                     : '',
-                required: true,
               }}
             />
           </Grid>
