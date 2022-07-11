@@ -18,7 +18,7 @@ import {
   ServiceOrderView,
 } from 'models/service-order';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
-import {formatDate, setDateTime} from 'utils/datetime';
+import {formatDate, setDateTime, toRestDateTime} from 'utils/datetime';
 import {ScheduleForm} from 'pages/ServiceOrderDetails/models';
 import {FormikErrors} from 'formik';
 import {StatusChip} from 'components/StatusChip';
@@ -94,14 +94,12 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   };
 
   const schedule = () => {
-    const orderStartTime = setDateTime(
-      form?.date!,
-      formatDate(form.startTime as Date, 'HH:mm')!,
-    ).toISOString();
-    const orderEndTime = setDateTime(
-      form?.date!,
-      formatDate(form.endTime as Date, 'HH:mm')!,
-    ).toISOString();
+    const orderStartTime = toRestDateTime(
+      setDateTime(form?.date!, formatDate(form.startTime as Date, 'HH:mm')!),
+    );
+    const orderEndTime = toRestDateTime(
+      setDateTime(form?.date!, formatDate(form.endTime as Date, 'HH:mm')!),
+    );
 
     if (form.technicianId) {
       scheduleServiceOrder({
