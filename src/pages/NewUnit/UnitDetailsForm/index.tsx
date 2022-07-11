@@ -93,7 +93,7 @@ export const UnitDetailsForm = ({
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
         <Grid container spacing={2}>
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <ComboBox
               options={Object.keys(ElevatorCategory).map((item) => ({
                 label: t(convertToText(item)),
@@ -124,82 +124,7 @@ export const UnitDetailsForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
-            <FormInput
-              props={{
-                placeholder: 'e.g. Elevator Installation Meier',
-                label: 'Manufacturer',
-                name: 'manufacturer',
-                value: formik.values.manufacturer,
-                onBlur: formik.handleBlur,
-                onChange: formik.handleChange,
-              }}
-            />
-          </Grid>
-
-          <Grid item md={4}>
-            <FormInput
-              props={{
-                placeholder: 'e.g. 000001',
-                label: 'Unit Number',
-                name: 'externalId',
-                value: formik.values.externalId,
-                error: !!(
-                  formik.touched.externalId && formik.errors.externalId
-                ),
-                helperText:
-                  formik.touched.externalId && formik.errors.externalId
-                    ? formik.errors.externalId
-                    : '',
-                onBlur: formik.handleBlur,
-                onChange: formik.handleChange,
-              }}
-            />
-          </Grid>
-
-          <Grid item md={4}>
-            <FormInput
-              props={{
-                size: 'small',
-                placeholder: 'e.g. 10',
-                label: 'Number of Stops',
-                name: 'numberOfStops',
-                value: formik.values.numberOfStops,
-                onBlur: formik.handleBlur,
-                onChange: formik.handleChange,
-              }}
-            />
-          </Grid>
-
-          <Grid item md={4}>
-            <FormInput
-              props={{
-                size: 'small',
-                placeholder: 'e.g. 2 doors',
-                label: 'Cabin Type',
-                name: 'cabinType',
-                value: formik.values.cabinType,
-                onBlur: formik.handleBlur,
-                onChange: formik.handleChange,
-              }}
-            />
-          </Grid>
-
-          <Grid item md={4}>
-            <FormInput
-              props={{
-                size: 'small',
-                placeholder: 'e.g. SafeLine',
-                label: 'Emergency Phone Provider',
-                name: 'emergencyPhoneProvider',
-                value: formik.values.emergencyPhoneProvider,
-                onBlur: formik.handleBlur,
-                onChange: formik.handleChange,
-              }}
-            />
-          </Grid>
-
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <ComboBox
               options={elevatorTypeResource.data.map((item) => ({
                 label: item,
@@ -231,7 +156,40 @@ export const UnitDetailsForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
+            <FormInput
+              props={{
+                placeholder: 'e.g. Elevator Installation Meier',
+                label: 'Manufacturer',
+                name: 'manufacturer',
+                value: formik.values.manufacturer,
+                onBlur: formik.handleBlur,
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4} md={4}>
+            <FormInput
+              props={{
+                placeholder: 'e.g. 000001',
+                label: 'Unit Number',
+                name: 'externalId',
+                value: formik.values.externalId,
+                error: !!(
+                  formik.touched.externalId && formik.errors.externalId
+                ),
+                helperText:
+                  formik.touched.externalId && formik.errors.externalId
+                    ? formik.errors.externalId
+                    : '',
+                onBlur: formik.handleBlur,
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4} md={4}>
             <ComboBox
               options={elevatorModelsResource.data.map((item) => ({
                 label: item,
@@ -263,7 +221,8 @@ export const UnitDetailsForm = ({
               }}
             />
           </Grid>
-          <Grid item md={4}>
+
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 placeholder: 'e.g. SHX00000000001',
@@ -276,7 +235,21 @@ export const UnitDetailsForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
+            <FormInput
+              props={{
+                size: 'small',
+                placeholder: 'e.g. 10',
+                label: 'Number of Stops',
+                name: 'numberOfStops',
+                value: formik.values.numberOfStops,
+                onBlur: formik.handleBlur,
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 name: 'unitCapacity',
@@ -301,7 +274,21 @@ export const UnitDetailsForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
+            <FormInput
+              props={{
+                size: 'small',
+                placeholder: 'e.g. 2 doors',
+                label: 'Cabin Type',
+                name: 'cabinType',
+                value: formik.values.cabinType,
+                onBlur: formik.handleBlur,
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 size: 'small',
@@ -317,7 +304,21 @@ export const UnitDetailsForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
+            <FormInput
+              props={{
+                size: 'small',
+                placeholder: 'e.g. SafeLine',
+                label: 'Emergency Phone Provider',
+                name: 'emergencyPhoneProvider',
+                value: formik.values.emergencyPhoneProvider,
+                onBlur: formik.handleBlur,
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 name: 'emergencyContactNumber',
@@ -330,7 +331,7 @@ export const UnitDetailsForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 name: 'yearBuilt',
@@ -343,7 +344,7 @@ export const UnitDetailsForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 name: 'modelOfController',
@@ -356,7 +357,7 @@ export const UnitDetailsForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 name: 'manufacturerOfController',

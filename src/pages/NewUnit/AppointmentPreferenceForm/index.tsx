@@ -63,7 +63,7 @@ export const AppointmentPreferenceForm = ({
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
         <Grid container spacing={2}>
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormSelect
               labelId="daysOfWeek-label"
               label={t('Days of the week')}
@@ -81,7 +81,7 @@ export const AppointmentPreferenceForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <TimePicker
               defaultTime={
                 formik.values.openingHour
@@ -109,7 +109,7 @@ export const AppointmentPreferenceForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <TimePicker
               defaultTime={
                 formik.values.closingHour
@@ -133,7 +133,7 @@ export const AppointmentPreferenceForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormSelect
               labelId="requiresAppointment-label"
               label={t('Requires Appointment')}
@@ -150,7 +150,7 @@ export const AppointmentPreferenceForm = ({
             />{' '}
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormSelect
               labelId="requirestNotification-label"
               label="Requires Notification"
@@ -167,7 +167,7 @@ export const AppointmentPreferenceForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 label: 'Notification Due',
