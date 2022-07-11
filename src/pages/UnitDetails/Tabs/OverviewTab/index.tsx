@@ -4,7 +4,6 @@ import {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {ContractStatus, ContractSimpleView} from 'models/contract';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
-import {ElevatorRequestBody} from 'models/elevator';
 import {Progress} from 'components/Progress';
 import {Location} from './Location';
 import {UnitDetails} from './UnitDetails';
@@ -25,8 +24,6 @@ export const OverviewTab = ({getUnitName}: Props) => {
   const theme = useTheme();
 
   const [validContract, setValidContract] = useState<ContractSimpleView>();
-  const [elevatorRequestBody, setElevatorRequestBody] =
-    useState<Partial<ElevatorRequestBody>>();
 
   const {data: elevator, isLoading: isLoadingElevator} =
     useElevatorById(elevatorId);
@@ -46,57 +43,6 @@ export const OverviewTab = ({getUnitName}: Props) => {
     }
   }, [elevator]);
 
-  useEffect(() => {
-    if (elevator) {
-      let properties = {};
-      if (elevator.properties) {
-        elevator.properties.forEach((item) => {
-          properties = {
-            ...properties,
-            [item.key]: item.value,
-          };
-        });
-      }
-
-      const body = {
-        address: elevator.address,
-        buildingLocation: elevator.additionalInfo.buildingLocation,
-        builtYear: elevator.additionalInfo.builtYear,
-        cabinType: elevator.additionalInfo.cabinType,
-        capacity: elevator.capacity,
-        category: elevator.category,
-        controllerManufacturer: elevator.additionalInfo.controllerManufacturer,
-        controllerModel: elevator.additionalInfo.controllerModel,
-        documents: elevator.additionalInfo.documents || [],
-        emergencyContractNumber:
-          elevator.additionalInfo.emergencyContractNumber,
-        emergencyPhoneProvider: elevator.additionalInfo.emergencyPhoneProvider,
-        keyLocation: elevator.additionalInfo.keyLocation,
-        lastInspectionDate: elevator.additionalInfo.lastInspectionDate,
-        lastVisitDate: elevator.lastVisitDate,
-        manufacturer: elevator.additionalInfo.manufacturer,
-        model: elevator.model,
-        number: elevator.number,
-        externalId: elevator.externalId,
-        numberOfStops: elevator.additionalInfo.numberOfStops,
-        parking: elevator.additionalInfo.parking,
-        pictures: elevator.additionalInfo.pictures || [],
-        priority: elevator.additionalInfo.priority,
-        properties,
-        // propertyManagerId: elevator.propertyManager?.id || '',
-        propertyOwnerId: elevator.propertyOwner.id,
-        propertySegment: elevator.additionalInfo.propertySegment,
-        qrCode: elevator.additionalInfo.qrCode,
-        serialNumber: elevator.serialNumber,
-        serviceTime: elevator.serviceTime,
-        status: elevator.status,
-        technicianNumber: elevator.technicianNumber,
-        type: elevator.type,
-      };
-      setElevatorRequestBody(body);
-    }
-  }, [elevator]);
-
   if (isLoadingElevator) {
     return <Progress />;
   }
@@ -106,7 +52,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
       <Grid container spacing={2}>
         <Grid item md={5} sm={12}>
           <Location
-            elevatorRequestBody={elevatorRequestBody}
+            propertyOwnerId={elevator?.propertyOwner.id}
             containerStyles={{
               [theme.breakpoints.up('md')]: {
                 minHeight: '35rem',
@@ -124,7 +70,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
             }}
             elevator={elevator!}
             validContract={validContract}
-            elevatorRequestBody={elevatorRequestBody}
+            propertyOwnerId={elevator?.propertyOwner.id}
           />
         </Grid>
       </Grid>
@@ -139,7 +85,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
             }}
             elevator={elevator!}
             validContract={validContract}
-            elevatorRequestBody={elevatorRequestBody}
+            propertyOwnerId={elevator?.propertyOwner.id}
           />
         </Grid>
         <Grid item md={7} sm={12}>
@@ -150,7 +96,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
               },
             }}
             elevator={elevator!}
-            elevatorRequestBody={elevatorRequestBody}
+            propertyOwnerId={elevator?.propertyOwner.id}
           />
         </Grid>
       </Grid>
@@ -198,7 +144,8 @@ export const OverviewTab = ({getUnitName}: Props) => {
           }}>
           <Pictures
             elevator={elevator!}
-            elevatorRequestBody={elevatorRequestBody}
+            propertyOwnerId={elevator?.propertyOwner.id}
+            elevatorPictures={elevator?.additionalInfo.pictures}
           />
         </Grid>
 
@@ -213,7 +160,8 @@ export const OverviewTab = ({getUnitName}: Props) => {
           }}>
           <Documents
             elevator={elevator!}
-            elevatorRequestBody={elevatorRequestBody}
+            propertyOwnerId={elevator?.propertyOwner.id}
+            elevatorDocuments={elevator?.additionalInfo.documents}
           />
         </Grid>
       </Grid>

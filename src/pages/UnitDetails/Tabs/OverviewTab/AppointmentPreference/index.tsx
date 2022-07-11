@@ -1,10 +1,6 @@
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
-import {
-  ElevatorView,
-  ElevatorProperty,
-  ElevatorRequestBody,
-} from 'models/elevator';
+import {ElevatorView, ElevatorProperty} from 'models/elevator';
 import {useTranslation} from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import {InfoCard} from 'components/InfoCard';
@@ -24,7 +20,7 @@ import {StringMap} from '../../../../../models/misc';
 interface Props {
   containerStyles?: {[key: string]: any};
   elevator: ElevatorView;
-  elevatorRequestBody?: Partial<ElevatorRequestBody>;
+  propertyOwnerId?: string;
 }
 
 const makeKeyValueFromArrayOfObjects = (arr: ElevatorProperty[]) => {
@@ -40,7 +36,7 @@ const validationSchema = Yup.object().shape({});
 export const AppointmentPreference = ({
   containerStyles,
   elevator,
-  elevatorRequestBody,
+  propertyOwnerId,
 }: Props) => {
   const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
@@ -76,9 +72,8 @@ export const AppointmentPreference = ({
     setOpenDialog(false);
     await updateElevator({
       body: {
-        ...elevatorRequestBody,
+        propertyOwnerId,
         properties: {
-          ...elevatorRequestBody?.properties,
           appointmentDaysOfWeek: formik.values.appointmentDaysOfWeek.join(','),
           openingHours: `${formik.values.openingHour}-${
             formik.values.closingHour || '17:00'

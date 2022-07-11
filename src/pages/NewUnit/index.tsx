@@ -75,7 +75,7 @@ export const NewUnit = () => {
       serialNumber: '',
       unitCapacity: '',
       spendingLimit: undefined,
-      emergencyContractNumber: '',
+      emergencyContactNumber: '',
       yearBuilt: undefined,
       modelOfController: '',
       manufacturerOfController: '',
@@ -167,7 +167,7 @@ export const NewUnit = () => {
       controllerManufacturer: unitDetailsFormValues.manufacturerOfController,
       controllerModel: unitDetailsFormValues.modelOfController,
       documents: [],
-      emergencyContractNumber: unitDetailsFormError.emergencyContractNumber,
+      emergencyContactNumber: unitDetailsFormError.emergencyContactNumber,
       emergencyPhoneProvider: unitDetailsFormError.emergencyPhoneProvider,
       keyLocation: locationFormValues.keyLocation,
       lastInspectionDate: formatDate(

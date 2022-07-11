@@ -116,7 +116,7 @@ export const UnitDetailsSchema = ({
           <CardProps
             icon={<LocalMallIcon sx={{color: theme.palette.info.dark}} />}
             label="MODEL"
-            bodyText={elevator.model}
+            bodyText={elevator.model || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}

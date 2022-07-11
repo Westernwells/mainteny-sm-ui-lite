@@ -24,7 +24,6 @@ interface Props {
 const validationSchema = Yup.object().shape({
   category: Yup.string().nullable().required('Category is required'),
   model: Yup.string().nullable().required('Model is required'),
-  unitCapacity: Yup.string().nullable().required('Unit capacity is required'),
   unitType: Yup.string().nullable().required('Unit type is required'),
 });
 
@@ -49,7 +48,7 @@ export const UnitDetailsForm = ({
       serialNumber: initialValues?.serialNumber,
       unitCapacity: initialValues?.unitCapacity,
       spendingLimit: initialValues?.spendingLimit,
-      emergencyContractNumber: initialValues?.emergencyContractNumber,
+      emergencyContactNumber: initialValues?.emergencyContactNumber,
       yearBuilt: initialValues?.yearBuilt,
       modelOfController: initialValues?.modelOfController,
       manufacturerOfController: initialValues?.manufacturerOfController,
@@ -293,7 +292,6 @@ export const UnitDetailsForm = ({
                   formik.touched.unitCapacity && formik.errors.unitCapacity
                     ? formik.errors.unitCapacity
                     : '',
-                required: true,
                 InputProps: {
                   endAdornment: (
                     <InputAdornment position="start">kg</InputAdornment>
@@ -325,7 +323,7 @@ export const UnitDetailsForm = ({
                 name: 'emergencyContactNumber',
                 label: 'Emergency Contact Number',
                 placeholder: 'e.g. +49 1000 00000000',
-                value: formik.values.emergencyContractNumber,
+                value: formik.values.emergencyContactNumber,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
               }}

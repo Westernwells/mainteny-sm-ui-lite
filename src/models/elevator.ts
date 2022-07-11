@@ -80,7 +80,7 @@ export interface ElevatorAdditionalInfo {
   controllerManufacturer: string;
   controllerModel: string;
   documents: FileResource[];
-  emergencyContractNumber: string;
+  emergencyContactNumber: string;
   emergencyPhoneProvider: string;
   keyLocation: string;
   lastInspectionDate: string;
@@ -291,7 +291,7 @@ export interface ElevatorRequestBody {
   controllerManufacturer: string;
   controllerModel: string;
   documents: FileResourceRecord[];
-  emergencyContractNumber: string;
+  emergencyContactNumber: string;
   emergencyPhoneProvider: string;
   keyLocation: string;
   lastInspectionDate: string;

@@ -169,7 +169,9 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
             label: item,
             value: item,
           }))}
-          getValue={(item) => formik.setFieldValue('model', item?.value)}
+          getValue={(item) => {
+            formik.setFieldValue('model', item?.value);
+          }}
           initialValue={
             formik.values.model
               ? {
