@@ -157,7 +157,7 @@ export const ScheduleDialog = ({
             />
 
             {showSwitch ? (
-              <Box sx={{mt: '1.5em'}}>
+              <Box sx={{mt: '1.5em', width: '55%'}}>
                 <Switch
                   getValue={(value) => setSwitchActive(value)}
                   label="Choose a fixed date and time"
