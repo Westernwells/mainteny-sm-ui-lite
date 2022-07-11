@@ -4,7 +4,7 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
-import {ElevatorView, ElevatorRequestBody} from 'models/elevator';
+import {ElevatorView} from 'models/elevator';
 import Grid from '@mui/material/Grid';
 import {useRef, useState} from 'react';
 import {InfoCard} from 'components/InfoCard';
@@ -19,7 +19,7 @@ import {EditLocationForm} from './EditLocationForm';
 interface Props {
   containerStyles?: {[key: string]: any};
   elevator: ElevatorView;
-  elevatorRequestBody?: Partial<ElevatorRequestBody>;
+  propertyOwnerId?: string;
 }
 
 const validationSchema = Yup.object().shape({
@@ -29,7 +29,7 @@ const validationSchema = Yup.object().shape({
 export const Location = ({
   containerStyles,
   elevator,
-  elevatorRequestBody,
+  propertyOwnerId = '',
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -60,8 +60,7 @@ export const Location = ({
     setOpenDialog(false);
     await updateElevator({
       body: {
-        ...elevatorRequestBody,
-        propertyOwnerId: elevatorRequestBody?.propertyOwnerId,
+        propertyOwnerId,
         address: formik.values.address,
         buildingLocation: formik.values.building || '',
         propertySegment: formik.values.propertySegment!,
@@ -106,7 +105,10 @@ export const Location = ({
       </Grid>
       <Dialog
         title="Edit Location"
-        onCancel={() => setOpenDialog(false)}
+        onCancel={() => {
+          setOpenDialog(false);
+        }}
+        disableSaveBtn={!!Object.keys(formik.errors).length}
         onSave={() => onSave()}
         dialogProps={{
           maxWidth: 'xs',

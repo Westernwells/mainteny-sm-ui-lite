@@ -23,8 +23,6 @@ interface Props {
 
 const validationSchema = Yup.object().shape({
   category: Yup.string().nullable().required('Category is required'),
-  model: Yup.string().nullable().required('Model is required'),
-  unitCapacity: Yup.string().nullable().required('Unit capacity is required'),
   unitType: Yup.string().nullable().required('Unit type is required'),
 });
 
@@ -49,7 +47,7 @@ export const UnitDetailsForm = ({
       serialNumber: initialValues?.serialNumber,
       unitCapacity: initialValues?.unitCapacity,
       spendingLimit: initialValues?.spendingLimit,
-      emergencyContractNumber: initialValues?.emergencyContractNumber,
+      emergencyContactNumber: initialValues?.emergencyContactNumber,
       yearBuilt: initialValues?.yearBuilt,
       modelOfController: initialValues?.modelOfController,
       manufacturerOfController: initialValues?.manufacturerOfController,
@@ -95,7 +93,7 @@ export const UnitDetailsForm = ({
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
         <Grid container spacing={2}>
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <ComboBox
               options={Object.keys(ElevatorCategory).map((item) => ({
                 label: t(convertToText(item)),
@@ -126,82 +124,7 @@ export const UnitDetailsForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
-            <FormInput
-              props={{
-                placeholder: 'e.g. Elevator Installation Meier',
-                label: 'Manufacturer',
-                name: 'manufacturer',
-                value: formik.values.manufacturer,
-                onBlur: formik.handleBlur,
-                onChange: formik.handleChange,
-              }}
-            />
-          </Grid>
-
-          <Grid item md={4}>
-            <FormInput
-              props={{
-                placeholder: 'e.g. 000001',
-                label: 'Unit Number',
-                name: 'externalId',
-                value: formik.values.externalId,
-                error: !!(
-                  formik.touched.externalId && formik.errors.externalId
-                ),
-                helperText:
-                  formik.touched.externalId && formik.errors.externalId
-                    ? formik.errors.externalId
-                    : '',
-                onBlur: formik.handleBlur,
-                onChange: formik.handleChange,
-              }}
-            />
-          </Grid>
-
-          <Grid item md={4}>
-            <FormInput
-              props={{
-                size: 'small',
-                placeholder: 'e.g. 10',
-                label: 'Number of Stops',
-                name: 'numberOfStops',
-                value: formik.values.numberOfStops,
-                onBlur: formik.handleBlur,
-                onChange: formik.handleChange,
-              }}
-            />
-          </Grid>
-
-          <Grid item md={4}>
-            <FormInput
-              props={{
-                size: 'small',
-                placeholder: 'e.g. 2 doors',
-                label: 'Cabin Type',
-                name: 'cabinType',
-                value: formik.values.cabinType,
-                onBlur: formik.handleBlur,
-                onChange: formik.handleChange,
-              }}
-            />
-          </Grid>
-
-          <Grid item md={4}>
-            <FormInput
-              props={{
-                size: 'small',
-                placeholder: 'e.g. SafeLine',
-                label: 'Emergency Phone Provider',
-                name: 'emergencyPhoneProvider',
-                value: formik.values.emergencyPhoneProvider,
-                onBlur: formik.handleBlur,
-                onChange: formik.handleChange,
-              }}
-            />
-          </Grid>
-
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <ComboBox
               options={elevatorTypeResource.data.map((item) => ({
                 label: item,
@@ -233,13 +156,48 @@ export const UnitDetailsForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
+            <FormInput
+              props={{
+                placeholder: 'e.g. Elevator Installation Meier',
+                label: 'Manufacturer',
+                name: 'manufacturer',
+                value: formik.values.manufacturer,
+                onBlur: formik.handleBlur,
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4} md={4}>
+            <FormInput
+              props={{
+                placeholder: 'e.g. 000001',
+                label: 'Unit Number',
+                name: 'externalId',
+                value: formik.values.externalId,
+                error: !!(
+                  formik.touched.externalId && formik.errors.externalId
+                ),
+                helperText:
+                  formik.touched.externalId && formik.errors.externalId
+                    ? formik.errors.externalId
+                    : '',
+                onBlur: formik.handleBlur,
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4} md={4}>
             <ComboBox
               options={elevatorModelsResource.data.map((item) => ({
                 label: item,
                 value: item,
               }))}
-              getValue={(item) => formik.setFieldValue('model', item?.value)}
+              getValue={(item) =>
+                formik.setFieldValue('model', item?.value || '')
+              }
               initialValue={
                 formik.values.model
                   ? {
@@ -260,11 +218,11 @@ export const UnitDetailsForm = ({
                   formik.touched.model && formik.errors.model
                     ? formik.errors.model
                     : '',
-                required: true,
               }}
             />
           </Grid>
-          <Grid item md={4}>
+
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 placeholder: 'e.g. SHX00000000001',
@@ -277,7 +235,21 @@ export const UnitDetailsForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
+            <FormInput
+              props={{
+                size: 'small',
+                placeholder: 'e.g. 10',
+                label: 'Number of Stops',
+                name: 'numberOfStops',
+                value: formik.values.numberOfStops,
+                onBlur: formik.handleBlur,
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 name: 'unitCapacity',
@@ -293,7 +265,6 @@ export const UnitDetailsForm = ({
                   formik.touched.unitCapacity && formik.errors.unitCapacity
                     ? formik.errors.unitCapacity
                     : '',
-                required: true,
                 InputProps: {
                   endAdornment: (
                     <InputAdornment position="start">kg</InputAdornment>
@@ -303,7 +274,21 @@ export const UnitDetailsForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
+            <FormInput
+              props={{
+                size: 'small',
+                placeholder: 'e.g. 2 doors',
+                label: 'Cabin Type',
+                name: 'cabinType',
+                value: formik.values.cabinType,
+                onBlur: formik.handleBlur,
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 size: 'small',
@@ -319,20 +304,34 @@ export const UnitDetailsForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
-                name: 'emergencyContactNumber',
-                label: 'Emergency Contact Number',
-                placeholder: 'e.g. +49 1000 00000000',
-                value: formik.values.emergencyContractNumber,
+                size: 'small',
+                placeholder: 'e.g. SafeLine',
+                label: 'Emergency Phone Provider',
+                name: 'emergencyPhoneProvider',
+                value: formik.values.emergencyPhoneProvider,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
               }}
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
+            <FormInput
+              props={{
+                name: 'emergencyContactNumber',
+                label: 'Emergency Contact Number',
+                placeholder: 'e.g. +49 1000 00000000',
+                value: formik.values.emergencyContactNumber,
+                onBlur: formik.handleBlur,
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 name: 'yearBuilt',
@@ -345,7 +344,7 @@ export const UnitDetailsForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 name: 'modelOfController',
@@ -358,7 +357,7 @@ export const UnitDetailsForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 name: 'manufacturerOfController',

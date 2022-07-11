@@ -1,7 +1,7 @@
 import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
 import EditIcon from '@mui/icons-material/Edit';
-import {ElevatorView, ElevatorRequestBody} from 'models/elevator';
+import {ElevatorView} from 'models/elevator';
 import Grid from '@mui/material/Grid';
 import {useRef, useState} from 'react';
 import {Dialog} from 'components/Dialog';
@@ -19,7 +19,7 @@ import {EditServiceForm} from './EditServiceForm';
 interface Props {
   containerStyles?: {[key: string]: any};
   elevator: ElevatorView;
-  elevatorRequestBody?: Partial<ElevatorRequestBody>;
+  propertyOwnerId?: string;
   validContract?: ContractSimpleView;
 }
 
@@ -34,7 +34,7 @@ const validationSchema = Yup.object().shape({
 export const Service = ({
   containerStyles,
   elevator,
-  elevatorRequestBody,
+  propertyOwnerId,
   validContract,
 }: Props) => {
   const {t} = useTranslation();
@@ -76,7 +76,7 @@ export const Service = ({
     setOpenDialog(false);
     await updateElevator({
       body: {
-        ...elevatorRequestBody,
+        propertyOwnerId,
         lastVisitDate: formatDate(formik.values.lastVisitDate, 'yyyy-MM-dd'),
         lastInspectionDate: formatDate(
           formik.values.lastInspectionDate,

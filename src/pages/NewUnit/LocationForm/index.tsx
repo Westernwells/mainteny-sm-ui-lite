@@ -54,7 +54,7 @@ export const LocationForm = ({
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
         <Grid container spacing={2}>
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <AddressAutoComplete
               initialValue={formik.values.address?.fullName || ''}
               inputError={
@@ -76,7 +76,7 @@ export const LocationForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 size: 'small',
@@ -89,7 +89,7 @@ export const LocationForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 size: 'small',
@@ -102,7 +102,7 @@ export const LocationForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 size: 'small',
@@ -115,7 +115,7 @@ export const LocationForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 size: 'small',

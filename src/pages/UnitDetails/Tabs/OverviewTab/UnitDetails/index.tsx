@@ -2,7 +2,7 @@ import Grid from '@mui/material/Grid';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
-import {ElevatorRequestBody, ElevatorView} from 'models/elevator';
+import {ElevatorView} from 'models/elevator';
 import {InfoCard} from 'components/InfoCard';
 import {useRef, useState} from 'react';
 import {Dialog} from 'components/Dialog';
@@ -19,7 +19,7 @@ interface Props {
   containerStyles?: {[key: string]: any};
   elevator: ElevatorView;
   validContract?: ContractSimpleView;
-  elevatorRequestBody?: Partial<ElevatorRequestBody>;
+  propertyOwnerId?: string;
 }
 
 const validationSchema = Yup.object().shape({
@@ -29,7 +29,7 @@ const validationSchema = Yup.object().shape({
 export const UnitDetails = ({
   containerStyles,
   elevator,
-  elevatorRequestBody,
+  propertyOwnerId,
   validContract,
 }: Props) => {
   const {t} = useTranslation();
@@ -73,19 +73,19 @@ export const UnitDetails = ({
     setOpenDialog(false);
     await updateElevator({
       body: {
-        ...elevatorRequestBody,
+        propertyOwnerId,
         category: formik.values.category
           ? convertToMacro(formik.values.category)
           : '',
         manufacturer: formik.values.manufacturer,
-        externalId: formik.values.externalId,
+        externalId: formik.values.externalId || '',
         numberOfStops: formik.values.numberOfStops,
         cabinType: formik.values.cabinType,
         emergencyPhoneProvider: formik.values.emergencyPhoneProvider,
         type: formik.values.unitType,
-        model: formik.values.model,
+        model: formik.values.model || '',
         serialNumber: formik.values.serialNumber,
-        capacity: formik.values.unitCapacity,
+        capacity: formik.values.unitCapacity || '',
       },
       elevatorId: elevator.id,
     });

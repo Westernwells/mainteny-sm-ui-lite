@@ -65,7 +65,7 @@ export const ServiceForm = ({
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
         <Grid container spacing={2}>
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <DatePicker
               defaultDate={formik.values.lastVisitDate}
               getSelectedDate={(date) =>
@@ -87,7 +87,7 @@ export const ServiceForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <DatePicker
               defaultDate={formik.values.lastInspectionDate}
               getSelectedDate={(date) =>
@@ -110,7 +110,7 @@ export const ServiceForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 disabled: true,
@@ -123,7 +123,7 @@ export const ServiceForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 label: 'Required time',
@@ -144,7 +144,7 @@ export const ServiceForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
                 label: 'No. of Technicians',
@@ -166,7 +166,7 @@ export const ServiceForm = ({
             />
           </Grid>
 
-          <Grid item md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             <FormSelect
               labelId="prioritySelect-label"
               label="Priority"

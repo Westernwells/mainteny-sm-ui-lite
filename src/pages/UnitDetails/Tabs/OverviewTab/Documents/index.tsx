@@ -7,10 +7,10 @@ import useTheme from '@mui/material/styles/useTheme';
 import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {ElevatorView, ElevatorRequestBody} from 'models/elevator';
+import {ElevatorView} from 'models/elevator';
 import {useState} from 'react';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
-import {FileResourceRecord} from 'models/media';
+import {FileResource, FileResourceRecord} from 'models/media';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import {EmptySection} from 'components/EmptySection';
@@ -19,10 +19,15 @@ import {olStyles} from 'styles';
 
 interface Props {
   elevator: ElevatorView;
-  elevatorRequestBody?: Partial<ElevatorRequestBody>;
+  propertyOwnerId?: string;
+  elevatorDocuments?: FileResource[];
 }
 
-export const Documents = ({elevator, elevatorRequestBody}: Props) => {
+export const Documents = ({
+  elevator,
+  propertyOwnerId,
+  elevatorDocuments,
+}: Props) => {
   const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
   const theme = useTheme();
@@ -45,22 +50,20 @@ export const Documents = ({elevator, elevatorRequestBody}: Props) => {
     const uploadPath = `${serviceCompanyId}/elevators/${elevator.id}/documents`;
     await uploadFiles({files: acceptedFiles, uploadPath});
 
-    if (elevatorRequestBody) {
-      await updateElevator({
-        body: {
-          ...elevatorRequestBody,
-          documents: [
-            ...(elevatorRequestBody.documents as FileResourceRecord[]),
-            ...acceptedFiles.map((item) => ({
-              description: item.name.split('.')[0],
-              type: item.type,
-              uri: `${uploadPath}/${item.name}`,
-            })),
-          ],
-        },
-        elevatorId: elevator.id,
-      });
-    }
+    await updateElevator({
+      body: {
+        propertyOwnerId,
+        documents: [
+          ...(elevatorDocuments as FileResourceRecord[]),
+          ...acceptedFiles.map((item) => ({
+            description: item.name.split('.')[0],
+            type: item.type,
+            uri: `${uploadPath}/${item.name}`,
+          })),
+        ],
+      },
+      elevatorId: elevator.id,
+    });
 
     setOpenDialog(false);
   };
