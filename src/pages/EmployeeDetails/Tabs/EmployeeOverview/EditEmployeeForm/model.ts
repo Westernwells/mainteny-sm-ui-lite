@@ -11,10 +11,10 @@ export type EmployeeAccountData = Partial<CreateUserAccountData> & {
   roles: string[];
   employeeId: string;
   email: string;
-  serviceOrderTypes: string[];
+  serviceOrderTypes?: string[];
   shifts: Shift<string>[];
   addressFullName?: string | false;
-  team: string;
+  team?: string;
   address?: {
     countryCode: string;
     fullName: string;
@@ -23,4 +23,6 @@ export type EmployeeAccountData = Partial<CreateUserAccountData> & {
       longitude: number;
     };
   } | null;
+  firstName?: string;
+  lastName?: string;
 };

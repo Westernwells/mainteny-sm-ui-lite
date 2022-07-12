@@ -30,6 +30,8 @@ import {Notifications} from 'pages/Notifications';
 import {PageNotFound} from 'pages/PageNotFound';
 import {ServiceOrders} from 'pages/ServiceOrders';
 import {NewEmployee} from 'pages/NewEmployee';
+import {Companies} from 'pages/Companies';
+import {CompanyDetails} from 'pages/CompanyDetails';
 import {ServiceOrderDetails} from 'pages/ServiceOrderDetails';
 import {axiosClient} from 'utils/axios-utils';
 import {languageMap, onVisibilityChange} from 'utils/utils';
@@ -517,6 +519,37 @@ export const Router = () => {
             }
           />
 
+          <Route
+            path="/companies"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Companies - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout pageTitle="Companies">
+                  <Companies />
+                </PageLayout>
+              </>
+            }
+          />
+          <Route
+            path="/companies/details/:id"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Companies Details - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout
+                  backBtnLabel={currentPageTitle}
+                  pageScrollable
+                  showBackAction>
+                  <CompanyDetails
+                    getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                  />
+                </PageLayout>
+              </>
+            }
+          />
           <Route
             path="*"
             element={

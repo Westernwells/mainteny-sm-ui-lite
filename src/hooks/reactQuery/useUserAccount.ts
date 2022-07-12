@@ -1,4 +1,4 @@
-import {useQuery} from 'react-query';
+import {useQuery, useQueryClient} from 'react-query';
 import {useTranslation} from 'react-i18next';
 import {queryKeys as qks} from 'reactQuery/constants';
 import {useSnackbar} from 'hooks/useSnackbar';
@@ -33,12 +33,13 @@ export const queryUserAccounts = async (
 export const useQueryUserAccounts = (
   params: UserQueryParams,
   options?: any,
+  companyId?: string,
 ) => {
   const {user} = useUserSession();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
   return useQuery(
     [qks.queryUserAccounts, params],
-    () => queryUserAccounts(params, serviceCompanyId!),
+    () => queryUserAccounts(params, companyId || serviceCompanyId!),
     {
       ...options,
       enabled: !!serviceCompanyId,
@@ -58,6 +59,7 @@ export const useGetUserAccount = (id?: string) =>
 
 export const useEmployeeAccount = () => {
   const {enqueueSnackbar} = useSnackbar();
+  const queryClient = useQueryClient();
   const {t} = useTranslation();
 
   const addEmployeeAccount = async (
@@ -82,6 +84,7 @@ export const useEmployeeAccount = () => {
           },
         );
         if (onSuccess) {
+          queryClient.invalidateQueries(qks.queryUserAccounts);
           onSuccess();
         }
       }
@@ -119,6 +122,8 @@ export const useEmployeeAccount = () => {
           },
         );
         if (onSuccess) {
+          queryClient.invalidateQueries(qks.getUserAccount);
+          queryClient.invalidateQueries(qks.queryUserAccounts);
           onSuccess();
         }
       }
@@ -134,8 +139,34 @@ export const useEmployeeAccount = () => {
     }
   };
 
+  const updateUserPassword = async (
+    password: string,
+    username: string,
+    onSuccess?: () => void,
+  ): Promise<void> => {
+    try {
+      const {status} = await axiosClient.put(
+        `/api/users/${username}/newPassword`,
+        {
+          password,
+        },
+      );
+
+      if (status === 200) {
+        if (onSuccess) {
+          queryClient.invalidateQueries(qks.getUserAccount);
+          queryClient.invalidateQueries(qks.queryUserAccounts);
+          onSuccess();
+        }
+      }
+    } catch (error: any) {
+      console.error(error);
+    }
+  };
+
   return {
     addEmployeeAccount,
     updateEmployeeAccount,
+    updateUserPassword,
   };
 };

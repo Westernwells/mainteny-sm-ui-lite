@@ -6,15 +6,29 @@ import {useTranslation} from 'react-i18next';
 
 interface Props {
   label?: string | JSX.Element;
+  value?: boolean;
   getValue?: (val: boolean) => void;
+  onChanged?: (val: boolean) => void;
 }
 
-export const Switch = ({label = '', getValue}: Props) => {
+export const Switch = ({label = '', value, getValue, onChanged}: Props) => {
   const {t} = useTranslation();
-  const [checked, setChecked] = useState(true);
+
+  const getInitialValue = () => {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+    return true;
+  };
+
+  const [checked, setChecked] = useState<boolean>(getInitialValue());
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked);
+
+    if (onChanged) {
+      onChanged(event.target.checked);
+    }
   };
 
   useEffect(() => {

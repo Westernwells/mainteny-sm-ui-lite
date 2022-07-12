@@ -21,6 +21,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import PaymentsIcon from '@mui/icons-material/Payments';
+import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
 import {ReactComponent as MaintenyLogo} from 'assets/icons/Mainteny.svg';
@@ -28,6 +29,8 @@ import Fade from '@mui/material/Fade';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {Role} from 'models/user';
 
 const drawerWidth = '15rem';
 
@@ -79,6 +82,7 @@ export const AppDrawer = () => {
   const [selectedPath, setSelectedPath] = useState('/orders');
   const location = useLocation();
   const navigate = useNavigate();
+  const {user} = useUserSession();
 
   useEffect(() => {
     setSelectedPath(location.pathname);
@@ -92,11 +96,14 @@ export const AppDrawer = () => {
     setOpen(false);
   };
 
+  const isAdmin = user?.userAccount.roles.includes(Role.ADMIN);
+
   const drawerList = [
     {
       text: 'Orders',
       icon: <LocalShippingIcon sx={{color: '#fff'}} />,
       path: '/orders',
+      access: !isAdmin,
       onClick: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
         index: number,
@@ -112,6 +119,7 @@ export const AppDrawer = () => {
       text: 'Units',
       icon: <Elevator sx={{color: '#fff'}} />,
       path: '/units',
+      access: !isAdmin,
       onClick: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
         index: number,
@@ -127,6 +135,7 @@ export const AppDrawer = () => {
       text: 'Customers',
       icon: <BusinessIcon sx={{color: '#fff'}} />,
       path: '/customers',
+      access: !isAdmin,
       onClick: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
         index: number,
@@ -142,6 +151,7 @@ export const AppDrawer = () => {
       text: 'Contracts',
       icon: <FileCopyIcon sx={{color: '#fff'}} />,
       path: '/contracts',
+      access: !isAdmin,
       onClick: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
         index: number,
@@ -157,6 +167,7 @@ export const AppDrawer = () => {
       text: 'Quotations',
       icon: <RequestQuoteIcon sx={{color: '#fff'}} />,
       path: '/quotations',
+      access: !isAdmin,
       onClick: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
         index: number,
@@ -172,6 +183,7 @@ export const AppDrawer = () => {
       text: 'Invoices',
       icon: <PaymentsIcon sx={{color: '#fff'}} />,
       path: '/invoices',
+      access: !isAdmin,
       onClick: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
         index: number,
@@ -187,6 +199,7 @@ export const AppDrawer = () => {
       text: 'Articles & Packages',
       icon: <HomeRepairServiceIcon sx={{color: '#fff'}} />,
       path: '/articles',
+      access: !isAdmin,
       onClick: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
         index: number,
@@ -202,6 +215,7 @@ export const AppDrawer = () => {
       text: 'Employees',
       icon: <PeopleAltIcon sx={{color: '#fff'}} />,
       path: '/employees',
+      access: !isAdmin,
       onClick: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
         index: number,
@@ -211,6 +225,22 @@ export const AppDrawer = () => {
         setSelectedPath('/employees');
         Mixpanel.identifyAndTrack(mixpanelEvents.MENU_EMPLOYEES_CLICKED);
         navigate('/employees');
+      },
+    },
+    {
+      text: 'Companies',
+      icon: <CorporateFareIcon sx={{color: '#fff'}} />,
+      path: '/companies',
+      access: isAdmin,
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/companies');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_COMPANIES_CLICKED);
+        navigate('/companies');
       },
     },
   ];
@@ -247,16 +277,19 @@ export const AppDrawer = () => {
   const renderDrawerHeader = () =>
     open
       ? drawerHeader(
-          <IconButton sx={{mr: '1em'}} edge="start" disableRipple>
+          <IconButton
+            sx={{mr: '1em'}}
+            onClick={() => {
+              setSelectedPath('/orders');
+              Mixpanel.identifyAndTrack(mixpanelEvents.MENU_ORDERS_CLICKED);
+              navigate('/orders');
+            }}
+            edge="start"
+            disableRipple>
             <MaintenyLogo
               style={{marginRight: '0.5em'}}
               width={155.22}
               height={32}
-              onClick={() => {
-                setSelectedPath('/orders');
-                Mixpanel.identifyAndTrack(mixpanelEvents.MENU_ORDERS_CLICKED);
-                navigate('/orders');
-              }}
             />
           </IconButton>,
           <ArrowBackIosNewIcon />,
@@ -284,40 +317,43 @@ export const AppDrawer = () => {
         {renderDrawerHeader()}
 
         <List>
-          {drawerList.map(({text, icon, onClick, path}, index) => (
-            <ListItemButton
-              onClick={(e) => onClick(e, index)}
-              selected={!!selectedPath.includes(path)}
-              style={{
-                paddingTop: 15,
-                paddingBottom: 15,
-                ...(open
-                  ? {
-                      marginLeft: '5px',
-                      marginRight: '5px',
-                    }
-                  : null),
-              }}
-              sx={{
-                transition: (theme) =>
-                  theme.transitions.create('margin', {
-                    easing: theme.transitions.easing.sharp,
-                    duration: theme.transitions.duration.leavingScreen,
-                  }),
-              }}
-              key={text}>
-              <ListItemIcon sx={{minWidth: 0, pr: '1em', pl: '.25em'}}>
-                {icon}
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <Fade in={open}>
-                    <Typography variant="subtitle1">{t(text)}</Typography>
-                  </Fade>
-                }
-              />
-            </ListItemButton>
-          ))}
+          {drawerList.map(({text, icon, onClick, path, access}, index) => {
+            if (!access) return null;
+            return (
+              <ListItemButton
+                onClick={(e) => onClick(e, index)}
+                selected={!!selectedPath.includes(path)}
+                style={{
+                  paddingTop: 15,
+                  paddingBottom: 15,
+                  ...(open
+                    ? {
+                        marginLeft: '5px',
+                        marginRight: '5px',
+                      }
+                    : null),
+                }}
+                sx={{
+                  transition: (theme) =>
+                    theme.transitions.create('margin', {
+                      easing: theme.transitions.easing.sharp,
+                      duration: theme.transitions.duration.leavingScreen,
+                    }),
+                }}
+                key={text}>
+                <ListItemIcon sx={{minWidth: 0, pr: '1em', pl: '.25em'}}>
+                  {icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Fade in={open}>
+                      <Typography variant="subtitle1">{t(text)}</Typography>
+                    </Fade>
+                  }
+                />
+              </ListItemButton>
+            );
+          })}
         </List>
       </Drawer>
     </Box>
