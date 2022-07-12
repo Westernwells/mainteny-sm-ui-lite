@@ -166,13 +166,13 @@ export const PasswordReset = ({
                 <>
                   <Box mt={1} display="flex">
                     <CheckCircleRounded
-                      color={password.length >= 6 ? 'success' : 'disabled'}
+                      color={password.length >= 8 ? 'success' : 'disabled'}
                     />
                     <Typography
                       variant="body1"
                       ml={1}
-                      color={password.length >= 6 ? 'body1' : 'text.disabled'}>
-                      {t('Password should contain at least 6 characters')}
+                      color={password.length >= 8 ? 'body1' : 'text.disabled'}>
+                      {t('Password should contain at least 8 characters')}
                     </Typography>
                   </Box>
 
@@ -185,6 +185,26 @@ export const PasswordReset = ({
                       ml={1}
                       color={password.match(/\d/) ? 'body1' : 'text.disabled'}>
                       {t('Password should contain at least 1 number')}
+                    </Typography>
+                  </Box>
+
+                  <Box mt={1} display="flex">
+                    <CheckCircleRounded
+                      color={
+                        password.match(/[!@#$%^&*(),.?":{}|<>_]/g)
+                          ? 'success'
+                          : 'disabled'
+                      }
+                    />
+                    <Typography
+                      variant="body1"
+                      ml={1}
+                      color={
+                        password.match(/[!@#$%^&*(),.?":{}|<>_]/g)
+                          ? 'body1'
+                          : 'text.disabled'
+                      }>
+                      {t('Password should contain at least 1 symbol')}
                     </Typography>
                   </Box>
                 </>

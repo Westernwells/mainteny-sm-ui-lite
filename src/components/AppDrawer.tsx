@@ -279,13 +279,13 @@ export const AppDrawer = () => {
       ? drawerHeader(
           <IconButton
             sx={{mr: '1em'}}
+            edge="start"
+            disableRipple
             onClick={() => {
               setSelectedPath('/orders');
               Mixpanel.identifyAndTrack(mixpanelEvents.MENU_ORDERS_CLICKED);
               navigate('/orders');
-            }}
-            edge="start"
-            disableRipple>
+            }}>
             <MaintenyLogo
               style={{marginRight: '0.5em'}}
               width={155.22}

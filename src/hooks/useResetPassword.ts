@@ -1,5 +1,4 @@
 import {useState} from 'react';
-import {useTranslation} from 'react-i18next';
 import {axiosClient} from 'utils/axios-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {useNavigate} from 'react-router-dom';
@@ -19,7 +18,6 @@ export const useResetPassword = (): UseRecoverPassword => {
     email: string,
     navigation?: boolean,
   ): Promise<void> => {
-    const {t} = useTranslation();
     setLoading(true);
     try {
       const {status} = await axiosClient({
@@ -28,7 +26,7 @@ export const useResetPassword = (): UseRecoverPassword => {
       });
       setLoading(false);
 
-      enqueueSnackbar(t('Code sent successfully to your email'), {
+      enqueueSnackbar('Code sent successfully to your email', {
         variant: 'success',
       });
 
@@ -36,15 +34,13 @@ export const useResetPassword = (): UseRecoverPassword => {
         navigate('/reset-password?type=reset');
       }
     } catch (error: any) {
-      if (error?.response.status === 400) {
-        enqueueSnackbar(t("Sorry, user account wasn't found"), {
+      if ('response' in error && error.response!.status === 400) {
+        enqueueSnackbar("Sorry, user account wasn't found", {
           variant: 'error',
         });
       } else {
         enqueueSnackbar(
-          t(
-            'Sorry, we failed to fulfill the request at this time. Please try again.',
-          ),
+          'Sorry, we failed to fulfill the request at this time. Please try again.',
           {
             variant: 'error',
           },
@@ -60,7 +56,6 @@ export const useResetPassword = (): UseRecoverPassword => {
     password: string,
     email: string,
   ): Promise<void> => {
-    const {t} = useTranslation();
     setLoading(true);
     try {
       const {status} = await axiosClient.post(
@@ -70,22 +65,21 @@ export const useResetPassword = (): UseRecoverPassword => {
       setLoading(false);
 
       if (status === 200) {
-        enqueueSnackbar(t('Password reset successfully'), {
+        enqueueSnackbar('Password reset successfully', {
           variant: 'success',
         });
         localStorage.setItem('email', email);
         navigate('/login?authType=reset');
       }
     } catch (error: any) {
-      if (error?.response.status === 400) {
-        enqueueSnackbar(t('Invalid Code'), {
+      if ('response' in error && error.response!.status === 400) {
+        enqueueSnackbar('Invalid Code', {
           variant: 'error',
         });
       } else {
         enqueueSnackbar(
-          t(
-            'Sorry, we failed to fulfill the request at this time. Please try again.',
-          ),
+          'Sorry, we failed to fulfill the request at this time. Please try again.',
+
           {
             variant: 'error',
           },
