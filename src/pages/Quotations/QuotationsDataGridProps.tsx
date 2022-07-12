@@ -31,8 +31,14 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
     headerName: 'number',
-    align: 'center',
-    flex: 0,
+    align: 'left',
+    flex: 0.75,
+  }),
+  getColumnProps({
+    field: 'subject',
+    headerName: 'subject',
+    cellClassName: 'truncateText',
+    flex: 1.5,
   }),
   getColumnProps({
     field: 'customer',
@@ -85,6 +91,7 @@ export const makeRows = (quotations: Resource<QuotationView>): GridRowsProp =>
   quotations &&
   quotations.data.map((item: QuotationView, index: number) => ({
     id: index,
+    subject: item.subject,
     quotationId: item.id,
     number: item.number,
     customer: item.elevator.propertyOwner.name,
