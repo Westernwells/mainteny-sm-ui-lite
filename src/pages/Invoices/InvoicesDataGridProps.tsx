@@ -22,13 +22,14 @@ export const getInvoiceStatusStyles = (
     | 'error'
     | 'info'
     | 'success'
-    | 'warning';
+    | 'warning'
+    | 'action.active';
 } => {
   switch (status) {
     case InvoiceStatus.PAID:
       return {label: InvoiceStatusView.PAID, color: 'success'};
     case InvoiceStatus.DRAFT:
-      return {label: InvoiceStatusView.DRAFT, color: 'default'};
+      return {label: InvoiceStatusView.DRAFT, color: 'action.active'};
     case InvoiceStatus.EXPIRED:
       return {label: InvoiceStatusView.EXPIRED, color: 'error'};
     case InvoiceStatus.NOT_PAID:
