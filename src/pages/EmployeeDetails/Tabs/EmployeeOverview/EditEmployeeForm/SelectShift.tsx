@@ -105,7 +105,7 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
               label={t('Start Time')}
               ampm={false}
               value={shift.fromTime}
-              disabled={index < shifts.length - 1 && index === 0}
+              disabled={index < shifts.length - 1}
               onChange={(newValue) => {
                 const oldShifts = shifts.filter((item) => item !== shift);
                 const newShift = shift;
@@ -122,7 +122,7 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
               label={t('End Time')}
               ampm={false}
               value={shift.toTime}
-              disabled={index < shifts.length - 1 && index === 0}
+              disabled={index < shifts.length - 1}
               onChange={(newValue) => {
                 const oldShifts = shifts.filter((item) => item !== shift);
                 const newShift = shift;
@@ -143,7 +143,7 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
                 color: 'text.primary',
                 paddingInline: '.5em',
               }}
-              disabled={index < shifts.length - 1 && index === 0}>
+              disabled={index < shifts.length - 1}>
               {t('Type')}
             </InputLabel>
             <Select
@@ -152,7 +152,7 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
               value={shift.type}
               label="Type"
               size="small"
-              disabled={index < shifts.length - 1 && index === 0}
+              disabled={index < shifts.length - 1}
               onChange={(event: SelectChangeEvent) => {
                 const oldShifts = shifts.filter((item) => item !== shift);
                 const newShift = shift;
