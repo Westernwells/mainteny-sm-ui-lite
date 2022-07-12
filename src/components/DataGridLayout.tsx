@@ -17,6 +17,7 @@ import {
 import LinearProgress from '@mui/material/LinearProgress';
 import {useNavigate} from 'react-router-dom';
 import {olStyles} from 'styles';
+import {convertToText} from 'utils/utils';
 import {CustomPagination} from './CustomPagination';
 import {EmptySection} from './EmptySection';
 
@@ -62,7 +63,8 @@ export const getColumnProps = ({
     const {t} = useTranslation();
     return (
       <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName && t(params.colDef.headerName.toUpperCase())}
+        {params.colDef.headerName &&
+          convertToText(t(params.colDef.headerName.toUpperCase()))}
       </Typography>
     );
   },
