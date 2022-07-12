@@ -40,7 +40,10 @@ export const PasswordRequest = ({
         {t('Forgot Password')}
       </Typography>
       <Box mt={3} display="flex" justifyContent="center" width="100%">
-        <form style={{width: 'min(18rem, 100%)'}} onSubmit={handleSubmit}>
+        <Box
+          component="form"
+          style={{width: 'min(18rem, 100%)'}}
+          onSubmit={handleSubmit}>
           <Typography
             variant="body1"
             color="text.secondary"
@@ -92,7 +95,7 @@ export const PasswordRequest = ({
               {t('Back')}
             </Button>
           </Box>
-        </form>
+        </Box>
       </Box>
     </AuthLayout>
   );

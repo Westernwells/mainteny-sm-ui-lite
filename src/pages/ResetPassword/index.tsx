@@ -43,7 +43,8 @@ export const ResetPassword = () => {
     password: Yup.string()
       .required(t('This field is required'))
       .min(6, t('Must be at least 6 characters'))
-      .matches(/\d/, t('Must contain 1 digit')),
+      .matches(/\d/, t('Must contain 1 digit'))
+      .matches(/[!@#$%^&*(),.?":{}|<>_]/g, t('Must contain 1 symbol')),
     confirmPassword: Yup.string()
       .required(t('This field is required'))
       .oneOf([Yup.ref('password'), null], t('Passwords must match')),
