@@ -3,7 +3,6 @@ import Box, {BoxProps} from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {useNavigate} from 'react-router-dom';
 import Tooltip from '@mui/material/Tooltip';
-import useTheme from '@mui/material/styles/useTheme';
 import {ReactComponent as Pin} from '../assets/icons/Pin.svg';
 import {ElevatorStatus, ElevatorView} from '../models/elevator';
 import {formatDate} from '../utils/datetime';
@@ -23,7 +22,6 @@ export const LocationPin = ({
   lng /* eslint-disable-line */, //we had to disable this rule, we do not need this props but react google maps require us to pass it
   children,
 }: Props) => {
-  const theme = useTheme();
   const navigate = useNavigate();
   const renderTooltipDetail = (elevator: ElevatorView) => (
     <Box
@@ -111,12 +109,7 @@ export const LocationPin = ({
     </Box>
   );
   return (
-    <Box
-      sx={{
-        fill: () => theme.palette.common.white,
-        stroke: () => theme.palette.divider,
-        strokeWidth: 1,
-      }}>
+    <Box>
       {children || (
         <Box>
           <Tooltip
