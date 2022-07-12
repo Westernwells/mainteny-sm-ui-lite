@@ -2,6 +2,8 @@ import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {axiosClient} from 'utils/axios-utils';
+
+import {clearStoredAdmin, getStoredAdmin} from 'userStorage';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {useUserSession} from './reactQuery/useUserSession';
 import {UserSession} from '../models/session';
@@ -30,6 +32,8 @@ export const useAuth = (): UseAuth => {
   const location: Location = useLocation();
   const {enqueueSnackbar} = useSnackbar();
 
+  const adminUser = getStoredAdmin();
+
   const authRequest = async (
     urlEndpoint: string,
     email: string,
@@ -43,7 +47,12 @@ export const useAuth = (): UseAuth => {
       });
 
       if (user?.token) {
-        if (!user.userAccount.roles.includes(Role.SERVICE_MANAGER)) {
+        if (
+          !(
+            user.userAccount.roles.includes(Role.SERVICE_MANAGER) ||
+            user.userAccount.roles.includes(Role.ADMIN)
+          )
+        ) {
           enqueueSnackbar(
             `${t('Uh oh! As a Property Manager, please login at')} ${
               process.env.REACT_APP_PMUI_URL
@@ -89,6 +98,13 @@ export const useAuth = (): UseAuth => {
 
   const signout = (): void => {
     clearUser();
+    if (adminUser) {
+      axiosClient.defaults.headers.common.Authorization = `Bearer ${adminUser.token}`;
+      updateUser(adminUser);
+      clearStoredAdmin();
+      navigate('/orders', {replace: true});
+      return;
+    }
     navigate('/login', {replace: true}); // This resets the location state
   };
 

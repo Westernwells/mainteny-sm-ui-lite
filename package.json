@@ -50,7 +50,8 @@
     "typescript": "latest",
     "use-supercluster": "^0.4.0",
     "yup": "^0.32.11",
-    "zustand": "^4.0.0-rc.1"
+    "zustand": "^4.0.0-rc.1",
+    "react-cropper": "^2.1.8"
   },
   "scripts": {
     "prepare_env": "node create_env.mjs",

@@ -6,6 +6,7 @@ import Select, {SelectProps} from '@mui/material/Select';
 import {SxProps} from '@mui/system';
 import {capitalize} from 'utils/utils';
 import {useTranslation} from 'react-i18next';
+import {FormHelperText} from '@mui/material';
 
 interface Props<T> {
   labelId: string;
@@ -16,6 +17,7 @@ interface Props<T> {
   labelStyles?: SxProps;
   selectStyles?: SxProps;
   containerStyles?: {[key: string]: any};
+  errorText?: string | false;
 }
 
 const ITEM_HEIGHT = 48;
@@ -37,6 +39,7 @@ export const FormSelect = ({
   labelStyles,
   selectStyles,
   selectProps,
+  errorText = '',
   containerStyles,
 }: Props<string | string[]>) => {
   const {t} = useTranslation();
@@ -100,6 +103,7 @@ export const FormSelect = ({
           </MenuItem>
         ))}
       </Select>
+      <FormHelperText sx={{color: 'error.main'}}>{errorText}</FormHelperText>
     </FormControl>
   );
 };

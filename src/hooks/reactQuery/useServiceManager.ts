@@ -1,25 +1,50 @@
-import {AxiosResponse} from 'axios';
-import {ServiceManager} from 'models/serviceManager';
-import {useQuery} from 'react-query';
-import {queryKeys} from 'reactQuery/constants';
+import {useSnackbar} from 'notistack';
+import {useNavigate} from 'react-router';
+import {setStoredAdmin} from 'userStorage';
 import {axiosClient} from 'utils/axios-utils';
 import {useUserSession} from './useUserSession';
 
-const fetchServiceManager = async (username: string) => {
-  // TODO: This is a temporary solution,
-  const response: AxiosResponse<ServiceManager> = await axiosClient({
-    method: 'GET',
-    url: `/api/sessions/runAs/${username}`,
-  });
-  return response.data;
-};
 export const useServiceManager = () => {
-  const {user} = useUserSession();
-  return useQuery(
-    [queryKeys.serviceManager, user?.userAccount.username],
-    () => fetchServiceManager(user!.userAccount.username),
-    {
-      enabled: !!user,
-    },
-  );
+  const navigate = useNavigate();
+  const {enqueueSnackbar} = useSnackbar();
+  const {user, updateUser} = useUserSession();
+
+  const getImpersonateUser = async (username: string): Promise<void> => {
+    try {
+      const {data: impersonateUser} = await axiosClient.post(
+        `/api/sessions/runAs`,
+        null,
+        {
+          params: {
+            username,
+          },
+        },
+      );
+
+      if (impersonateUser?.token) {
+        if (user) {
+          enqueueSnackbar(
+            `You are logged as ${impersonateUser?.userAccount?.username}`,
+            {
+              variant: 'success',
+            },
+          );
+          setStoredAdmin(user);
+        }
+
+        axiosClient.defaults.headers.common.Authorization = `Bearer ${impersonateUser.token}`;
+        updateUser(impersonateUser);
+        navigate('/orders', {replace: true});
+      }
+    } catch (error: any) {
+      console.error(error);
+      enqueueSnackbar('Sorry! Something went wrong. Please try again.', {
+        variant: 'error',
+      });
+    }
+  };
+
+  return {
+    getImpersonateUser,
+  };
 };

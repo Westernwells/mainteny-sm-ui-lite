@@ -1,4 +1,13 @@
-import {Address, CompanyContact, Language, Meta, Settings} from './misc';
+import {
+  Address,
+  AddressRecord,
+  CompanyContact,
+  DispatchStrategy,
+  Language,
+  Meta,
+  PaymentInfo,
+  Settings,
+} from './misc';
 import {ServiceOrderSummary} from './service-order';
 import {TechnicianEventView} from './technician';
 
@@ -85,4 +94,39 @@ export interface UpdateServiceCompanyRecord {
 export interface ServiceCompanyTechEvent {
   eventViews: TechnicianEventView[];
   technicianId: string;
+}
+
+export interface ServiceCompanyItem extends ServiceCompany {
+  billingAddress?: Address;
+  search?: string;
+}
+
+export interface ServiceCompanyUpdateBody {
+  name?: string;
+  phone?: string;
+  email?: string;
+  url?: string;
+  language?: string;
+  totalYearlyVacationDaysAllowed?: number;
+  dateFormat?: string;
+  timeFormat?: string;
+  businessAddress?: AddressRecord;
+  postalAddress?: AddressRecord;
+  billingAddress?: AddressRecord;
+  paymentInfo?: PaymentInfo;
+  managingDirector?: string;
+  arbitrationCourt?: string;
+  tradeRegisterNumber?: string;
+  vatId?: string;
+  percentageVat?: number;
+  timezone?: string;
+  currencies?: string[];
+  whiteLabel?: {
+    logoPath?: string;
+  };
+}
+
+export interface SystemSettingsUpdateBody {
+  nightlyShuffleEnabled?: boolean;
+  companyDispatchStrategy?: DispatchStrategy;
 }

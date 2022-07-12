@@ -48,5 +48,7 @@ export const queryKeys = {
   fetchServiceOrderArticles: 'fetchServiceOrderArticles',
   fetchUuid: 'fetchUuid',
   queryContacts: 'queryContacts',
+  fetchCompanies: 'fetchCompanies',
+  fetchCompany: 'fetchCompany',
   fetchAbsence: 'fetchAbsence',
 };

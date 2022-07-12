@@ -5,6 +5,10 @@ import {CheckCircleRounded} from '@mui/icons-material';
 import {useEffect, useRef, useState} from 'react';
 import {FileWithPath, useDropzone, FileRejection} from 'react-dropzone';
 import useTheme from '@mui/material/styles/useTheme';
+import {Cropper} from 'react-cropper';
+import 'styles/cropper.css';
+
+import {Dialog} from 'components/Dialog';
 import {Button} from '../Button';
 import {Thumb} from './Thumb';
 
@@ -18,7 +22,14 @@ interface Props {
   hints?: string[];
   acceptedFileTypes?: 'image/*' | 'application/pdf' | '*';
   maxFiles?: number;
+  cropperTitle?: string;
+  isCropped?: boolean;
 }
+
+type FileErrors = {
+  type: boolean;
+  size: boolean;
+};
 
 export const MyDropZone = ({
   existingFiles = [],
@@ -27,20 +38,40 @@ export const MyDropZone = ({
   hints = [],
   acceptedFileTypes = '*',
   maxFiles,
+  isCropped = false,
+  cropperTitle,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
+  const [openDialog, setOpenDialog] = useState(false);
   const [files, setFiles] = useState<FileWithPreview[]>(existingFiles);
+  const [errors, setErrors] = useState<FileErrors>({type: false, size: true});
   const [isEditingFileName, setIsEditingFileName] = useState(false);
   const [currentEditingFileName, setCurrentEditingFileName] = useState('');
   const [newFileName, setNewFileName] = useState('');
   const onKbinBytes = useRef(1000).current;
   const oneMbInByes = useRef(onKbinBytes * onKbinBytes).current;
+
+  const [cropper, setCropper] = useState<any>();
+
   const {getRootProps, getInputProps, open, fileRejections} = useDropzone({
     maxSize: oneMbInByes * 5,
     maxFiles,
     accept: {
       [acceptedFileTypes]: [],
+    },
+    onDrop: () => {
+      setErrors({type: false, size: false});
+      fileRejections.forEach((file) => {
+        file.errors.forEach((err) => {
+          if (err.code === 'file-too-large') {
+            setErrors({...errors, size: true});
+          }
+          if (err.code === 'file-invalid-type') {
+            setErrors({...errors, type: true});
+          }
+        });
+      });
     },
     onDropAccepted: (acceptedFiles) => {
       if (maxFiles === 1) {
@@ -64,13 +95,28 @@ export const MyDropZone = ({
     },
   });
 
-  useEffect(() => {
+  const handleCropped = (croppFile?: null | File) => {
     if (getAcceptedFiles) {
+      if (croppFile && croppFile !== null) {
+        const result = [
+          Object.assign(croppFile, {preview: URL.createObjectURL(croppFile!)}),
+        ];
+        getAcceptedFiles(result);
+        return;
+      }
       getAcceptedFiles(files);
     }
-
     if (getRejectedFileWithErrors) {
       getRejectedFileWithErrors(fileRejections);
+    }
+  };
+
+  useEffect(() => {
+    if (isCropped && files.length > 0) {
+      setOpenDialog(true);
+    }
+    if (files.length > 0 && !isCropped) {
+      handleCropped();
     }
   }, [files, fileRejections]);
 
@@ -170,6 +216,31 @@ export const MyDropZone = ({
       </Box>
     ));
 
+  function urlToFile(url: string, filename: string, mimeType: string) {
+    return fetch(url)
+      .then((res) => res.arrayBuffer())
+      .then((buf) => new File([buf], filename, {type: mimeType}));
+  }
+  const getCropData = async () => {
+    let resultFile = null;
+    if (typeof cropper !== 'undefined') {
+      await urlToFile(
+        cropper.getCroppedCanvas().toDataURL(),
+        files[0].name,
+        files[0].type,
+      ).then((file) => {
+        resultFile = file;
+      });
+    }
+    return resultFile;
+  };
+
+  const saveCroppedFile = async () => {
+    const croppedFile = await getCropData();
+    handleCropped(croppedFile);
+    setOpenDialog(false);
+  };
+
   return (
     <Box className="container" component="section">
       <Box
@@ -201,13 +272,120 @@ export const MyDropZone = ({
         </Box>
       </Box>
 
-      <Box sx={{mt: '1.5em'}}>
-        <Box sx={{display: 'flex', flexDirection: 'column'}}>{hintsLabel}</Box>
-        <Box sx={{display: 'flex', flexWrap: 'wrap', margin: '0.625em 0'}}>
-          {thumbs}
+      {!isCropped && (
+        <Box sx={{mt: '1.5em'}}>
+          <Box sx={{display: 'flex', flexDirection: 'column'}}>
+            {hintsLabel}
+          </Box>
+          <>
+            <Box sx={{display: 'flex', flexWrap: 'wrap', margin: '0.625em 0'}}>
+              {thumbs}
+            </Box>
+            <Box>{renderErrors()}</Box>
+          </>
         </Box>
-        <Box>{renderErrors()}</Box>
-      </Box>
+      )}
+
+      <Dialog
+        title={cropperTitle || 'Upload image'}
+        onCancel={() => setOpenDialog(false)}
+        onSave={saveCroppedFile}
+        dialogProps={{
+          maxWidth: 'md',
+          open: openDialog || false,
+        }}>
+        <Box>
+          {files.length > 0 && (
+            <>
+              <Box
+                sx={{
+                  height: '2.5em',
+                  width: '100%',
+                  background: '#404040',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0 0.625em',
+                  color: 'white',
+                  borderRadius: '4px 4px 0 0',
+                }}>
+                Drag to reposition picture
+              </Box>
+              <Cropper
+                style={{
+                  height: 400,
+                  width: '100%',
+                }}
+                zoomTo={1}
+                initialAspectRatio={1}
+                preview=".img-preview"
+                src={files[0].preview}
+                viewMode={1}
+                minCropBoxHeight={10}
+                minCropBoxWidth={10}
+                background={false}
+                responsive
+                autoCropArea={1}
+                checkOrientation={false}
+                onInitialized={(instance) => {
+                  setCropper(instance);
+                }}
+                guides
+              />
+            </>
+          )}
+          <Box
+            sx={{mt: '1.5em'}}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="self-start">
+            <Box sx={{display: 'flex', flexDirection: 'column'}}>
+              <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                <Box
+                  sx={{
+                    mr: '1em',
+                    display: 'flex',
+                    mt: '0.5em',
+                    flexDirection: 'row',
+                  }}>
+                  <CheckCircleRounded
+                    sx={{
+                      mr: '0.5em',
+                      color: errors.type ? 'error.main' : 'success.main',
+                    }}
+                  />
+                  <Typography component="div" variant="body1">
+                    PDF, DOCX, XLSX, XLS, CSV, TSV only
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    mr: '1em',
+                    display: 'flex',
+                    mt: '0.5em',
+                    flexDirection: 'row',
+                  }}>
+                  <CheckCircleRounded
+                    sx={{
+                      mr: '0.5em',
+                      color: errors.size ? 'error.main' : 'success.main',
+                    }}
+                  />
+                  <Typography component="div" variant="body1">
+                    File size less than 5MB only
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+            <Button
+              label="Replace Picture"
+              buttonProps={{
+                variant: 'text',
+                onClick: open,
+              }}
+            />
+          </Box>
+        </Box>
+      </Dialog>
     </Box>
   );
 };

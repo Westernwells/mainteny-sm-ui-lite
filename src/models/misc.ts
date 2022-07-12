@@ -27,10 +27,23 @@ export interface Meta {
 
 export interface Settings {
   nightlyShuffleEnabled: boolean;
+  isNightlyShuffleEnabled: boolean;
   companyDispatchStrategy: DispatchStrategy;
   totalYearlyVacationDaysAllowed: number;
   dateFormat: string;
   percentageVat: number;
+  vatId: string;
+  emailAddresses: string[];
+  emailBasedServiceOrderProvider: string;
+  timezone: string;
+  managingDirector: string;
+  arbitrationCourt: string;
+  tradeRegisterNumber: string;
+  paymentInfo: PaymentInfo;
+  timeFormat: string;
+  whiteLabel: {
+    logoPath: string;
+  };
 }
 
 export interface Page {
