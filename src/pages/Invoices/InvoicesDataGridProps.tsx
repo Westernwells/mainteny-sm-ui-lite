@@ -43,8 +43,14 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
     headerName: 'number',
-    align: 'center',
-    flex: 0,
+    align: 'left',
+    flex: 0.75,
+  }),
+  getColumnProps({
+    field: 'subject',
+    headerName: 'subject',
+    cellClassName: 'truncateText',
+    flex: 1.5,
   }),
   getColumnProps({
     field: 'customer',
@@ -114,6 +120,7 @@ export const makeRows = (invoices: InvoiceView[]): GridRowsProp =>
   invoices.length
     ? invoices.map((item, index: number) => ({
         id: index,
+        subject: item.subject,
         date: formatDate(toDate(item.issuedDate)),
         number: item.number,
         order: item.serviceOrder.number,
