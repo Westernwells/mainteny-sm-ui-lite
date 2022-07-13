@@ -52,7 +52,7 @@ interface ColumnProps extends GridColDef {
   headerName: string;
   type?: 'string' | 'number';
   cellClassName?: 'nowrap' | 'truncateText';
-  variant?: string;
+  variant?: 'uppercase' | 'titleCase';
 }
 
 export const getColumnProps = ({
@@ -60,14 +60,14 @@ export const getColumnProps = ({
   headerName,
   type = 'string',
   cellClassName = 'nowrap',
-  variant,
+  variant = 'uppercase',
   renderHeader = (params: GridColumnHeaderParams) => {
     const {t} = useTranslation();
     return (
       <Typography variant="subtitle2" color="textSecondary">
         {(params.colDef.headerName &&
-          variant &&
-          convertToText(t(params.colDef.headerName.toUpperCase()))) ||
+          variant === 'titleCase' &&
+          convertToText(t(params.colDef.headerName))) ||
           (params.colDef.headerName &&
             t(params.colDef.headerName.toUpperCase()))}
       </Typography>
