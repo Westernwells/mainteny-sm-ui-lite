@@ -29,19 +29,23 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'quotationDate',
     headerName: 'QUOTATION DATE',
+    variant: 'titleCase',
   }),
   getColumnProps({
     field: 'number',
     headerName: 'NUMBER',
+    variant: 'titleCase',
   }),
   getColumnProps({
     field: 'totalAmount',
     headerName: 'TOTAL AMOUNT',
+    variant: 'titleCase',
   }),
   getColumnProps({
     field: 'status',
     headerName: 'STATUS',
     align: 'center',
+    variant: 'titleCase',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
         label={getQuotationStatusStyles(params.value).label}

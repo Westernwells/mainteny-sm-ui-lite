@@ -40,23 +40,27 @@ export const columns: GridColDef[] = [
     headerName: 'invoice date',
     align: 'center',
     flex: 0.75,
+    variant: 'titleCase',
   }),
   getColumnProps({
     field: 'number',
     headerName: 'quotation number',
     align: 'center',
     flex: 0,
+    variant: 'titleCase',
   }),
   getColumnProps({
     field: 'amount',
     headerName: 'total amount',
     align: 'right',
     flex: 0.75,
+    variant: 'titleCase',
   }),
   getColumnProps({
     field: 'status',
     headerName: 'status',
     align: 'center',
+    variant: 'titleCase',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
         label={getInvoiceStatusStyles(params.value).label}

@@ -13,6 +13,7 @@ import {ElevatorAssignmentSimpleView} from 'models/elevator';
 import {Tooltip} from 'components/Tooltip';
 import {Info} from '@mui/icons-material';
 import {useTranslation} from 'react-i18next';
+import {convertToText} from 'utils/utils';
 
 const defaultProps = {
   editable: false,
@@ -22,7 +23,7 @@ const defaultProps = {
     return (
       <Typography variant="subtitle2" color="textSecondary">
         {typeof params.colDef.headerName === 'string'
-          ? t(params.colDef.headerName)
+          ? convertToText(t(params.colDef.headerName))
           : params.colDef.headerName}
       </Typography>
     );
@@ -75,7 +76,7 @@ export const columns = (
         <Box display="flex" alignItems="center">
           <Typography variant="subtitle2" color="textSecondary">
             {typeof params.colDef.headerName === 'string'
-              ? t(params.colDef.headerName)
+              ? convertToText(t(params.colDef.headerName))
               : params.colDef.headerName}
           </Typography>
           <Tooltip
