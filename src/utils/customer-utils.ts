@@ -15,30 +15,30 @@ export const formatUpdateCustomer = (data: CustomerEditForm) => ({
 });
 
 export const getFilterUnitNumber = (value: string, type: 'start' | 'end') => {
-  if (value === '0 - 500') {
+  if (value === '0 - 5') {
     if (type === 'start') {
       return 0;
     }
     if (type === 'end') {
-      return 500;
+      return 5;
     }
-  } else if (value === '500 - 1000') {
+  } else if (value === '5 - 20') {
     if (type === 'start') {
-      return 500;
+      return 5;
     }
     if (type === 'end') {
-      return 1000;
+      return 20;
     }
-  } else if (value === '1000 - 5000') {
+  } else if (value === '20 - 100') {
     if (type === 'start') {
-      return 1000;
+      return 20;
     }
     if (type === 'end') {
-      return 5000;
+      return 100;
     }
-  } else if (value === '> 5000') {
+  } else if (value === '100+') {
     if (type === 'start') {
-      return 5000;
+      return 100;
     }
     if (type === 'end') {
       return 1000000;

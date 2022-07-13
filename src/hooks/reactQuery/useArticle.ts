@@ -30,6 +30,11 @@ export const fetchArticles = async (
   return response.data;
 };
 
+// To support the "Partial Invoicing" we use a unique Article which is of category PARTIAL.
+// This "Partial Invoice" article is created automatically and is limited to 1 per service company.
+// "Partial Invoice" article should not be displayed in the article listing.
+// Due to this reason we filter out the "PARTIAL" category by default.
+
 export function useArticles(
   params: QueryArticleParams,
   options?: any,
@@ -55,7 +60,9 @@ export function useArticles(
                   pageIndex: articlesRes.page.pageIndex,
                   pageSize: filteredRes.length,
                 },
-                total: articlesRes.total,
+                total:
+                  articlesRes.total -
+                  (articlesRes.data.length - filteredRes.length),
               };
         },
         [showPartial],

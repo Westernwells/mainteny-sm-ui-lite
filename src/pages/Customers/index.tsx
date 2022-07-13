@@ -2,7 +2,8 @@ import {useEffect, useRef, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {Box} from '@mui/material';
-
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {EmptySection} from 'components/EmptySection';
@@ -95,8 +96,11 @@ export const Customer = () => {
       <EmptySection
         label="No customers yet. Please click the button below to add."
         showActionBtn
-        btnAction={() => navigate('/customers/new')}
         btnLabel="Add Customer"
+        btnAction={() => {
+          Mixpanel.identifyAndTrack(mixpanelEvents.NEW_CUSTOMER_BUTTON_CLICKED);
+          navigate('/customers/new');
+        }}
         containerStyle={{
           height: '100%',
           mb: '10em',
@@ -127,7 +131,7 @@ export const Customer = () => {
         }}>
         <MultipleSelectCheckmarks
           label="No. of Units"
-          options={['0 - 500', '500 - 1000', '1000 - 5000', '> 5000']}
+          options={['0 - 5', '5 - 20', '20 - 100', '100+']}
           containerStyles={{
             minWidth: '21.875em',
             marginRight: '0.438em',
