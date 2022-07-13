@@ -73,7 +73,6 @@ const NewContractBasicInfo: FC<Props> = ({
           }}
           defaultDate={formik.values.startDate}
           maxDate={formik.values.endDate!}
-          minDate={new Date(Date.now())}
         />
       </Grid>
       <Grid item xs={4}>
