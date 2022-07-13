@@ -163,7 +163,14 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
                 <MenuItem
                   value={item}
                   key={item}
-                  disabled={shifts.map((s) => s.type).includes(item)}>
+                  disabled={shifts
+                    .map((s, i) => {
+                      if (i === shifts.length - 1) {
+                        return false;
+                      }
+                      return s.type;
+                    })
+                    .includes(item)}>
                   {t(item)}
                 </MenuItem>
               ))}
