@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
   GridAlignment,
@@ -11,6 +11,8 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import {useNavigate} from 'react-router';
 import _ from 'lodash';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {ArticleType, ArticleView} from '../../../models/article';
 import {formatNetAmount} from '../../../utils/currency';
 import {createEmptyResource, makePage} from '../../../utils/paging-utils';
@@ -52,31 +54,6 @@ const defaultAlignment: {
   headerAlign: 'left',
   align: 'left',
 };
-
-const NoArticleSection = ({
-  placeholder,
-  action,
-  onSearch,
-}: {
-  placeholder: string;
-  action?: () => void;
-  onSearch: boolean;
-}) => (
-  <>
-    {!onSearch && (
-      <EmptySection
-        illustration="clipboard"
-        size="tiny"
-        containerStyle={{m: 'auto', width: '60%'}}
-        label={`No ${placeholder} yet. Please click the button below to add a new ${placeholder}`}
-        showActionBtn
-        btnLabel="+ Add New Article"
-        btnAction={action}
-      />
-    )}
-    {onSearch && <Box />}
-  </>
-);
 
 export const columns: GridColDef[] = [
   {
@@ -198,12 +175,13 @@ export const ArticleListDataGrid = () => {
   const [pageCount, setPageCount] = useState(0);
   const [type, setType] = useState('');
   const [query, setQuery] = useState('');
-
+  const totalArticlesRef = useRef(0);
   const {
     data: articleResource = createEmptyResource<ArticleView>(pageSize),
     isIdle,
     isLoading,
     isFetching,
+    isFetched,
   } = useArticles(
     {
       pageIndex: page.pageIndex,
@@ -214,12 +192,15 @@ export const ArticleListDataGrid = () => {
     {keepPreviousData: true},
   );
 
-  const addNewArticle = () => {
-    navigate('new');
-  };
+  totalArticlesRef.current = totalArticlesRef.current || articleResource.total;
 
   const clearAllFilters = () => {
     setType('');
+  };
+
+  const navigateToNewArticle = () => {
+    Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ARTICLE_BUTTON_CLICKED);
+    navigate('/articles/new');
   };
 
   useEffect(() => {
@@ -247,6 +228,21 @@ export const ArticleListDataGrid = () => {
         flexGrow={1}>
         <Progress height="100%" />
       </Box>
+    );
+  }
+
+  if (isFetched && !totalArticlesRef.current) {
+    return (
+      <EmptySection
+        label="No articles yet. Please click the button below to add."
+        showActionBtn
+        btnLabel="Add Article"
+        containerStyle={{
+          height: '100%',
+          mb: '10em',
+        }}
+        btnAction={navigateToNewArticle}
+      />
     );
   }
 
@@ -287,13 +283,6 @@ export const ArticleListDataGrid = () => {
             ...prev,
             pageIndex: value - 1,
           }))
-        }
-        noRowsEmptySection={
-          <NoArticleSection
-            placeholder="article"
-            action={addNewArticle}
-            onSearch={!!type || !!query}
-          />
         }
       />
     </PageListingLayout>

@@ -1,5 +1,7 @@
 import Box from '@mui/material/Box';
 import {useTranslation} from 'react-i18next';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {
@@ -11,7 +13,7 @@ import {useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {endOfDay, startOfDay, subDays} from 'date-fns';
-import {useSearchParams} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {
@@ -31,6 +33,7 @@ import {Widget} from 'components/Widget';
 import {columns, makeRows} from './ServiceOrderDataGridProps';
 
 export const ServiceOrderList = () => {
+  const navigate = useNavigate();
   const {t} = useTranslation();
   const [page, setPage] = useState(makePage(0, 25));
   const [queryParams, setQueryParams] = useSearchParams();
@@ -149,6 +152,12 @@ export const ServiceOrderList = () => {
     return (
       <EmptySection
         label="No orders yet. Please click the button above to add."
+        showActionBtn
+        btnLabel="Add Service Order"
+        btnAction={() => {
+          Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ORDER_BUTTON_CLICKED);
+          navigate('/orders/new?type=regular');
+        }}
         containerStyle={{
           height: '100%',
           mb: '10em',

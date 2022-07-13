@@ -86,7 +86,7 @@ export const Invoices = () => {
   }, [invoiceResource, pageSize]);
 
   const navigateToNewInvoice = () => {
-    Mixpanel.identifyAndTrack(mixpanelEvents.NEW_UNIT_BUTTON_CLICKED);
+    Mixpanel.identifyAndTrack(mixpanelEvents.NEW_INVOICE_BUTTON_CLICKED);
     navigate('/invoices/new');
   };
 
@@ -102,20 +102,6 @@ export const Invoices = () => {
         setStatus(undefined);
         setServiceType([]);
       }}>
-      <MultipleSelectCheckmarks
-        label="Invoice Date"
-        options={['This Week', 'Last Week', 'Last Month']}
-        getSelectedValue={(item) => setInvoiceDate(item)}
-        multiple={false}
-        initialSelectedItems={invoiceDate}
-      />
-      <MultipleSelectCheckmarks
-        label="Due Date"
-        options={['This Week', 'Next Week', 'Next Month']}
-        getSelectedValue={(item) => setInvoiceDate(item)}
-        multiple={false}
-        initialSelectedItems={invoiceDate}
-      />
       <MultipleSelectCheckmarks
         label="Status"
         options={Object.values(InvoiceStatusView).map((value) => value)}

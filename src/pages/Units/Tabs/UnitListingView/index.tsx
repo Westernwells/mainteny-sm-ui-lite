@@ -122,10 +122,10 @@ export const UnitListingView = () => {
       <EmptySection
         label="No units yet. Please click the button below add."
         showActionBtn
-        btnLabel="Add Elevator"
+        btnLabel="Add Unit"
         btnAction={() => {
           Mixpanel.identifyAndTrack(mixpanelEvents.NEW_UNIT_BUTTON_CLICKED);
-          navigate('new');
+          navigate('/units/new');
         }}
         containerStyle={{
           height: '100%',
