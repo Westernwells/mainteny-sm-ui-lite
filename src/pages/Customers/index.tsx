@@ -95,6 +95,7 @@ export const Customer = () => {
       <EmptySection
         label="No customers yet. Please click the button below to add."
         showActionBtn
+        btnAction={() => navigate('/customers/new')}
         btnLabel="Add Customer"
         containerStyle={{
           height: '100%',

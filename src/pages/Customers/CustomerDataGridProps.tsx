@@ -45,7 +45,7 @@ export const columns: GridColDef[] = [
   }),
   getColumnProps({
     field: 'createdAt',
-    headerName: 'JOINED DATE',
+    headerName: 'CUSTOMER SINCE',
     align: 'center',
   }),
   getColumnProps({

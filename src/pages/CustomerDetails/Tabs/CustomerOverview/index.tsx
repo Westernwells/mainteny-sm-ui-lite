@@ -8,6 +8,7 @@ import {
   Home,
   LocalPhone,
   Edit,
+  Numbers,
 } from '@mui/icons-material';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
@@ -88,6 +89,11 @@ export const CustomerOverviewTab = ({
           label: 'NO. OF CONTRACTS',
           value: totalContracts.toString() || '-',
           icon: <FileCopy sx={{color: theme.palette.info.dark}} />,
+        },
+        customerNumber: {
+          label: 'CUSTOMER NUMBER',
+          value: customer.externalId || '-',
+          icon: <Numbers sx={{color: theme.palette.info.dark}} />,
         },
       });
     }

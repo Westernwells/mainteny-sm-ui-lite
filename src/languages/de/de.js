@@ -727,6 +727,7 @@ module.exports = {
     Valid: 'Gültig',
     'Edit Contact Person': 'Kontaktperson bearbeiten',
     'Add Contact Person': 'Kontaktperson hinzufügen',
+    'CUSTOMER NUMBER': 'Kundennummer',
 
     // Toast
     'Uh oh! As a Property Manager, please login at':
