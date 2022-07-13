@@ -187,7 +187,9 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         label={serviceOrderStatusToString(serviceOrderDetails.status)}
         style={{...olStyles.orderStatus, letterSpacing: 'normal'}}
       />
-      {serviceOrderDetails.status !== ServiceOrderStatus.COMPLETED ? (
+      {![ServiceOrderStatus.COMPLETED, ServiceOrderStatus.CANCELLED].includes(
+        serviceOrderDetails.status,
+      ) ? (
         <Box sx={{mt: -1}}>
           <MenuBtn
             sx={{p: 0, display: 'flex'}}
