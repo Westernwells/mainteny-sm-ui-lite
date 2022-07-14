@@ -1,4 +1,4 @@
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import Grid from '@mui/material/Grid';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
@@ -63,6 +63,10 @@ export const BasicInformation = ({containerStyles, company}: Props) => {
 
   const labels = useRef(['name', 'email', 'phone', 'website']).current;
 
+  useEffect(() => {
+    formik.validateForm();
+  }, []);
+
   return (
     <>
       <InfoCard
@@ -75,7 +79,7 @@ export const BasicInformation = ({containerStyles, company}: Props) => {
         headerActionIcon={<EditIcon />}>
         <Grid container spacing={2}>
           {labels.map((label) => (
-            <Grid key={label} item md={12}>
+            <Grid key={label} item xs={6} md={12}>
               <BasicInformationSchema label={label} company={company} />
             </Grid>
           ))}

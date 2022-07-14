@@ -1,4 +1,4 @@
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import Grid from '@mui/material/Grid';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
@@ -67,6 +67,10 @@ export const LegalInformation = ({containerStyles, company}: Props) => {
     'arbitrationCourt',
     'tradeRegisterNumber',
   ]).current;
+
+  useEffect(() => {
+    formik.validateForm();
+  }, []);
 
   return (
     <>

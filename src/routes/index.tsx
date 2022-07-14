@@ -35,6 +35,7 @@ import {CompanyDetails} from 'pages/CompanyDetails';
 import {ServiceOrderDetails} from 'pages/ServiceOrderDetails';
 import {SystemSettings} from 'pages/SystemSettings';
 import {NewCompany} from 'pages/NewCompany';
+import {SettingsPage} from 'pages/Settings';
 import {axiosClient} from 'utils/axios-utils';
 import {languageMap, onVisibilityChange} from 'utils/utils';
 import i18n from 'i18next';
@@ -522,7 +523,20 @@ export const Router = () => {
           />
 
           <Route
-            path="/admin/companies"
+            path="/settings"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Settings - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout pageScrollable pageTitle="Settings">
+                  <SettingsPage />
+                </PageLayout>
+              </>
+            }
+          />
+          <Route
+            path="admin/companies"
             element={
               <>
                 <Helmet>

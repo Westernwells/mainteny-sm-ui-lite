@@ -98,6 +98,7 @@ export const AppDrawer = () => {
   };
 
   const isAdmin = user?.userAccount.roles.includes(Role.ADMIN);
+  const isManager = user?.userAccount.roles.includes(Role.SERVICE_MANAGER);
 
   const drawerList = [
     {
@@ -226,6 +227,22 @@ export const AppDrawer = () => {
         setSelectedPath('/employees');
         Mixpanel.identifyAndTrack(mixpanelEvents.MENU_EMPLOYEES_CLICKED);
         navigate('/employees');
+      },
+    },
+    {
+      text: 'Settings',
+      icon: <Settings sx={{color: '#fff'}} />,
+      path: '/settings',
+      access: !isAdmin && isManager,
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/settings');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_SETTINGS_CLICKED);
+        navigate('/settings');
       },
     },
     {

@@ -30,11 +30,16 @@ export const WhiteLabel = ({containerStyles, company}: Props) => {
 
   const {mutateAsync: uploadImages, isLoading} = useUploadFiles(
     'Image uploaded successfully',
+    company?.id,
   );
 
   const logoCompany = company?.settings?.whiteLabel?.logoPath;
 
-  const {data: logoUrl = {}} = useDownloadUrl(logoCompany ? [logoCompany] : []);
+  const {data: logoUrl = {}} = useDownloadUrl(
+    logoCompany ? [logoCompany] : [],
+    undefined,
+    company.id,
+  );
 
   const {data: uuid} = useUuid();
 
