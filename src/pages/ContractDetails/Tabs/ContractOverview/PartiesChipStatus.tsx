@@ -1,5 +1,6 @@
 import React, {FC} from 'react';
 import {Chip} from '@mui/material';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   partyType: string;
@@ -31,18 +32,21 @@ const PartiesChipStatus: FC<Props> = ({
   partyType,
   maxChars,
   length = 'auto',
-}) => (
-  <Chip
-    label={partyType}
-    sx={{
-      backgroundColor: statusColor[color].bg,
-      color: statusColor[color].color,
-      maxWidth: maxChars ? `calc(${maxChars}ch + .5em)` : statusWidth[length],
-      width: maxChars ? '100%' : 'auto',
-    }}
-    variant="filled"
-    size="medium"
-  />
-);
+}) => {
+  const {t} = useTranslation();
+  return (
+    <Chip
+      label={t(partyType)}
+      sx={{
+        backgroundColor: statusColor[color].bg,
+        color: statusColor[color].color,
+        maxWidth: maxChars ? `calc(${maxChars}ch + .5em)` : statusWidth[length],
+        width: maxChars ? '100%' : 'auto',
+      }}
+      variant="filled"
+      size="medium"
+    />
+  );
+};
 
 export default PartiesChipStatus;
