@@ -890,6 +890,8 @@ module.exports = {
     Date: 'Datum',
     Start: 'Start',
     End: 'Ende',
+    'The displayed information is based on dummy data. In order to show real-time unit information, the unit has to be connected to an IoT device. Do you need help with finding a provider? We are happy to support, just reach out to us!':
+      'Die angezeigten Informationen beruhen auf Dummy-Daten. Um Echtzeit-Informationen zur Anlage zu erhalten, muss die Anlage mit einem IoT-Gerät verbunden sein. Brauchen Sie Hilfe bei der Suche nach einem Anbieter? Wir unterstützen Sie gerne, sprechen Sie uns einfach an!',
   },
 };
 

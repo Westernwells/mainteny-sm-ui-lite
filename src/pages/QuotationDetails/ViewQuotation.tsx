@@ -13,9 +13,12 @@ import {FormLabel} from 'components/form/FormLabel';
 import {PDFContainer} from 'components/PDFContainer';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {EmptySection} from 'components/EmptySection';
-import {QuotationStatus, QuotationView} from 'models/quotation';
+import {Confirm} from 'components/Confirm';
 import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps';
+import {useReplyQuotation} from 'hooks/reactQuery/useQuotation';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {PdfGenerationStatus} from 'models/misc';
+import {QuotationStatus, QuotationView} from 'models/quotation';
 import {formatCurrency} from 'utils/currency';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
@@ -26,8 +29,12 @@ interface Props {
 }
 
 export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
+  const {user} = useUserSession();
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
+
+  const {mutate: markAsAccepted} = useReplyQuotation();
 
   const formik = useFormik({
     initialValues: {
@@ -134,7 +141,7 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
                   buttonProps={{
                     variant: 'outlined',
                     size: 'small',
-                    onClick: () => setIsDialogOpen(true),
+                    onClick: () => setIsOrderDialogOpen(true),
                   }}
                 />
               </>
@@ -143,22 +150,42 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
         </Grid>
       </Grid>
       <BottomDrawer
-        isOpen={quotation.status !== QuotationStatus.SENT_TO_CLIENT}
-        primaryButtonLabel="Duplicate"
+        isOpen={quotation.status !== QuotationStatus.ACCEPTED}
+        primaryButtonLabel="Mark Accepted"
         primaryButtonAction={() => {
-          if (quotation.id) navigate(`/quotations/new?id=${quotation.id}`);
+          setIsDialogOpen(true);
         }}
         listItems={[]}
         isValid
       />
+      <Confirm
+        open={isDialogOpen}
+        onConfirm={() => {
+          if (quotation.id && user)
+            markAsAccepted({
+              quotationId: quotation.id,
+              reply: {
+                actorId: user.userAccount.id,
+                accepted: true,
+                isAccepted: true,
+                comments: ' ',
+              },
+            });
+          setIsDialogOpen(false);
+        }}
+        onClose={() => setIsDialogOpen(false)}
+        title="Mark as accepted"
+        content="Do you want to mark this quotation as accepted?"
+        helperText="This action is irreversible."
+      />
       <Dialog
         title="Create Service Order"
-        onCancel={() => setIsDialogOpen(false)}
+        onCancel={() => setIsOrderDialogOpen(false)}
         disableSaveBtn={!formik.values.createServiceOrder}
         onSave={() => formik.handleSubmit()}
         dialogProps={{
           maxWidth: 'xs',
-          open: isDialogOpen || false,
+          open: isOrderDialogOpen || false,
         }}>
         <CreateServiceOrder
           value={formik.values.createServiceOrder}

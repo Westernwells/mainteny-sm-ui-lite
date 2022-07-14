@@ -85,3 +85,10 @@ export interface UpdateQuotation {
   elevatorId: string;
   items: QuotationItemRecord[];
 }
+
+export interface ReplyQuotation {
+  actorId?: string;
+  comments: string;
+  isAccepted: boolean;
+  accepted: boolean;
+}
