@@ -48,6 +48,7 @@ export const FormSelect = ({
       <InputLabel
         shrink
         id={labelId}
+        error={!!errorText}
         sx={{
           background: '#fff',
           px: '0.2em',

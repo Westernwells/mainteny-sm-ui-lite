@@ -308,7 +308,7 @@ export const MyDropZone = ({
                   color: 'white',
                   borderRadius: '4px 4px 0 0',
                 }}>
-                Drag to reposition picture
+                {t('Drag to reposition picture')}
               </Box>
               <Cropper
                 style={{
@@ -354,7 +354,7 @@ export const MyDropZone = ({
                     }}
                   />
                   <Typography component="div" variant="body1">
-                    PDF, DOCX, XLSX, XLS, CSV, TSV only
+                    {t('JPG, PNG or BMP only')}
                   </Typography>
                 </Box>
                 <Box
@@ -371,7 +371,7 @@ export const MyDropZone = ({
                     }}
                   />
                   <Typography component="div" variant="body1">
-                    File size less than 5MB only
+                    {t('File size less than 5MB only')}
                   </Typography>
                 </Box>
               </Box>

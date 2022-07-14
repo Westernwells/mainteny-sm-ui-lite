@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {useSearchParams} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {GridRowsProp} from '@mui/x-data-grid';
 
 import {PageListingLayout} from 'components/PageListingLayout';
@@ -16,9 +16,10 @@ import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {Widget} from '../../components/Widget';
 import {columns, makeRows} from './CompaniesDataGridProps';
 
-const pageSize = 25;
+const pageSize = 13;
 
 export const Companies = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [queryParams, setQueryParams] = useSearchParams();
   const totalCompaniesRef = useRef(0);
@@ -90,7 +91,8 @@ export const Companies = () => {
         <Widget
           searchPlaceholder="Search by number, customer, contract type etc."
           getSearchValue={(val: string) => setSearch(val)}
-          showActionBtn={false}
+          btnOnClick={() => navigate('/admin/companies/new')}
+          showActionBtn
           btnLabel="New Company"
         />
       }>

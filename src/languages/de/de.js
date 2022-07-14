@@ -331,6 +331,8 @@ module.exports = {
       'Noch keine Anhänge. Bitte klicken Sie auf die Schaltfläche unten, um sie hinzuzufügen!',
     'Edit Attachments': 'Anhänge bearbeiten',
     'JPEG, PNG, BMP, GIF, WEBP, SVG only': 'Nur JPEG, PNG, BMP, GIF, WEBP, SVG',
+    'JPG, PNG or BMP only': 'Nur JPG, PNG oder BMP',
+    'Drag to reposition picture': 'Ziehen, um das Bild neu zu positionieren',
     'File size less than 5MB only':
       'Nur Dateien mit einer Größe von maximal 5 MB',
     'QR Code': 'QR-Code',

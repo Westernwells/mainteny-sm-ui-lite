@@ -128,5 +128,5 @@ export interface ServiceCompanyUpdateBody {
 
 export interface SystemSettingsUpdateBody {
   nightlyShuffleEnabled?: boolean;
-  companyDispatchStrategy?: DispatchStrategy;
+  companyDispatchStrategy?: DispatchStrategy | string;
 }

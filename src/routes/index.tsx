@@ -33,6 +33,8 @@ import {NewEmployee} from 'pages/NewEmployee';
 import {Companies} from 'pages/Companies';
 import {CompanyDetails} from 'pages/CompanyDetails';
 import {ServiceOrderDetails} from 'pages/ServiceOrderDetails';
+import {SystemSettings} from 'pages/SystemSettings';
+import {NewCompany} from 'pages/NewCompany';
 import {axiosClient} from 'utils/axios-utils';
 import {languageMap, onVisibilityChange} from 'utils/utils';
 import i18n from 'i18next';
@@ -520,7 +522,7 @@ export const Router = () => {
           />
 
           <Route
-            path="/companies"
+            path="/admin/companies"
             element={
               <>
                 <Helmet>
@@ -533,7 +535,7 @@ export const Router = () => {
             }
           />
           <Route
-            path="/companies/details/:id"
+            path="/admin/companies/details/:id"
             element={
               <>
                 <Helmet>
@@ -546,6 +548,34 @@ export const Router = () => {
                   <CompanyDetails
                     getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
                   />
+                </PageLayout>
+              </>
+            }
+          />
+          <Route
+            path="/admin/companies/new"
+            element={
+              <>
+                <Helmet>
+                  <title>New Service Company</title>
+                </Helmet>
+                <PageLayout showBackAction backBtnLabel={currentPageTitle}>
+                  <NewCompany
+                    getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                  />
+                </PageLayout>
+              </>
+            }
+          />
+          <Route
+            path="/admin/system-settings"
+            element={
+              <>
+                <Helmet>
+                  <title>{`System Settings - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout pageTitle="System Settings">
+                  <SystemSettings />
                 </PageLayout>
               </>
             }

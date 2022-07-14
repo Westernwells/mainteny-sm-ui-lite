@@ -21,6 +21,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import PaymentsIcon from '@mui/icons-material/Payments';
+import {Settings} from '@mui/icons-material';
 import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
@@ -230,7 +231,7 @@ export const AppDrawer = () => {
     {
       text: 'Companies',
       icon: <CorporateFareIcon sx={{color: '#fff'}} />,
-      path: '/companies',
+      path: '/admin/companies',
       access: isAdmin,
       onClick: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -238,9 +239,25 @@ export const AppDrawer = () => {
       ) => {
         e.preventDefault();
         setSelectedIndex(index);
-        setSelectedPath('/companies');
+        setSelectedPath('/admin/companies');
         Mixpanel.identifyAndTrack(mixpanelEvents.MENU_COMPANIES_CLICKED);
-        navigate('/companies');
+        navigate('/admin/companies');
+      },
+    },
+    {
+      text: 'Settings',
+      icon: <Settings sx={{color: '#fff'}} />,
+      path: '/admin/system-settings',
+      access: isAdmin,
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/admin/system-settings');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_SYSTEM_SETTINGS_CLICKED);
+        navigate('/admin/system-settings');
       },
     },
   ];
