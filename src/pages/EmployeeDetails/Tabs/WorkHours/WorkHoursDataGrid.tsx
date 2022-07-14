@@ -10,7 +10,7 @@ import {Box} from '@mui/material';
 
 import {WorkHourIcons} from 'components/WorkHourIcons';
 import {WorkHourTypeText} from 'components/WorkHourTypeText';
-import {getRangeDate} from 'utils/datetime';
+import {formatDate} from 'utils/datetime';
 import {WorkHoursItem} from 'models/workHours';
 import {Resource} from 'models/misc';
 import {useTranslation} from 'react-i18next';
@@ -66,10 +66,18 @@ export const columns: GridColDef[] = [
     ...defaultProps,
   },
   {
-    field: 'time',
-    headerName: 'TIME',
+    field: 'startDate',
+    headerName: 'START DATE',
     type: 'string',
-    flex: 2,
+    flex: 1,
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+  {
+    field: 'endDate',
+    headerName: 'END DATE',
+    type: 'string',
+    flex: 1,
     ...defaultAlignment,
     ...defaultProps,
   },
@@ -131,7 +139,8 @@ export const makeRows = (
     ? workHours.data.map((item: WorkHoursItem) => ({
         id: item.id,
         duration: formatTime(item.duration, item.durationUnit),
-        time: getRangeDate(item.startTime, item.endTime, 'dd.MM.yyyy HH:MM'),
+        startDate: formatDate(item.startTime, 'dd.MM.yyyy HH:MM'),
+        endDate: formatDate(item.endTime, 'dd.MM.yyyy HH:MM'),
         address: getAddress(item.data),
         orderNumber: getOrderNumber(item.data),
         orderType: (

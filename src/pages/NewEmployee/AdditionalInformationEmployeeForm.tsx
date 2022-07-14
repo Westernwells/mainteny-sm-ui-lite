@@ -11,6 +11,7 @@ import {SelectServiceOrderTypes} from 'pages/EmployeeDetails/Tabs/EmployeeOvervi
 import {Typography} from '@mui/material';
 import {Role} from 'models/user';
 import {SelectShift} from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/SelectShift';
+import {convertToMacro} from 'utils/utils';
 
 interface Props {
   getAdditionalInformationEmployeeFormValues?: (
@@ -41,6 +42,7 @@ export const AdditionalInformationEmployeeForm = ({
       getAdditionalInformationEmployeeFormValues(formik.values);
     }
   }, [formik]);
+
   return (
     <PageCard
       headerLabel="Work Preferences"
@@ -49,7 +51,7 @@ export const AdditionalInformationEmployeeForm = ({
       <Box sx={{mt: '0.5em'}} component="form">
         <Grid container spacing={2}>
           <Grid item md={12}>
-            {roles.includes(Role.TECHNICIAN) && (
+            {convertToMacro(roles[0]).includes(Role.TECHNICIAN) && (
               <Box sx={{marginBottom: '1.250em'}}>
                 <Typography
                   sx={{

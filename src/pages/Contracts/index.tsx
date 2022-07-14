@@ -39,6 +39,7 @@ export const Contracts = () => {
     [],
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
+  const textInput = useRef<HTMLInputElement>(null);
 
   const [priceStart, priceEnd] = useMemo(() => getStartEndPrice(cost), [cost]);
 
@@ -132,6 +133,10 @@ export const Contracts = () => {
       onClear={() => {
         setStatus([]);
         setCost([]);
+        setSearch('');
+        if (textInput.current) {
+          textInput.current.value = '';
+        }
       }}>
       <MultipleSelectCheckmarks
         label="Price Range"
@@ -161,6 +166,7 @@ export const Contracts = () => {
           searchPlaceholder="Search by number, customer, contract type etc."
           getSearchValue={(val: string) => setSearch(val)}
           filterItems={renderFilterItems()}
+          refInput={textInput}
           btnLabel="New Contract"
           btnOnClick={() => navigate('/contracts/new')}
           showActionBtn

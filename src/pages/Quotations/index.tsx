@@ -38,6 +38,8 @@ export const Quotations = () => {
   const [queryParams, setQueryParams] = useSearchParams();
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
+  const textInput = useRef<HTMLInputElement>(null);
+
   const {
     data: quotationsResource = createEmptyResource<QuotationView>(pageSize),
     isLoading,
@@ -123,7 +125,14 @@ export const Quotations = () => {
     );
   }
   const renderFilterItems = () => (
-    <FilterFields onClear={() => setStatus([])}>
+    <FilterFields
+      onClear={() => {
+        setSearch('');
+        setStatus([]);
+        if (textInput.current) {
+          textInput.current.value = '';
+        }
+      }}>
       <MultipleSelectCheckmarks
         label="Status"
         options={Object.keys(QuotationStatusView).map((i) => convertToText(i))}
@@ -155,6 +164,7 @@ export const Quotations = () => {
           searchPlaceholder="Search by number, customer, address etc."
           getSearchValue={(val: string) => setSearch(val)}
           showActionBtn
+          refInput={textInput}
           btnLabel="New Quotation"
           btnOnClick={navigateToNewQuotation}
           filterItems={renderFilterItems()}

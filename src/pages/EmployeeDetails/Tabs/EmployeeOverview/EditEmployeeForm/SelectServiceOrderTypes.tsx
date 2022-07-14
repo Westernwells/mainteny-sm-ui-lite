@@ -1,8 +1,8 @@
 import {ChangeEvent, useEffect, useRef, useState} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import {Settings} from '@mui/icons-material';
 
-import RepairIcon from '@mui/icons-material/SettingsOutlined';
 import {ReactComponent as EmergencyIcon} from 'assets/icons/Emergency.svg';
 import {ReactComponent as RegularIcon} from 'assets/icons/Regular.svg';
 import {ReactComponent as CalloutIcon} from 'assets/icons/Callout.svg';
@@ -54,7 +54,14 @@ export const SelectServiceOrderTypes = ({values, setFieldValue}: Props) => {
       name: serviceOrderTypes.REPAIR.label,
       label: (
         <Box display="flex" alignItems="center">
-          <RepairIcon sx={{color: 'amber.main', height: '.75em'}} />
+          <Settings
+            sx={{
+              color: 'amber.main',
+              height: '.75em',
+              width: '.75em',
+              marginRight: '0.25em',
+            }}
+          />
           <Typography variant="body2">{t('Repair')}</Typography>
         </Box>
       ),
@@ -64,7 +71,14 @@ export const SelectServiceOrderTypes = ({values, setFieldValue}: Props) => {
       name: serviceOrderTypes.EMERGENCY.label,
       label: (
         <Box display="flex" alignItems="center">
-          <EmergencyIcon style={{height: '.8em', marginLeft: '-.2em'}} />
+          <EmergencyIcon
+            style={{
+              height: '.8em',
+              width: '100%',
+              marginLeft: '-.2em',
+              marginRight: '0.25em',
+            }}
+          />
           <Typography variant="body2">{t('Emergency')}</Typography>
         </Box>
       ),
@@ -74,7 +88,7 @@ export const SelectServiceOrderTypes = ({values, setFieldValue}: Props) => {
       name: serviceOrderTypes.CALLOUT.label,
       label: (
         <Box display="flex" alignItems="center">
-          <CalloutIcon style={{height: '1em'}} />
+          <CalloutIcon style={{height: '1em', marginRight: '0.25em'}} />
           <Typography variant="body2">{t('Callout')}</Typography>
         </Box>
       ),

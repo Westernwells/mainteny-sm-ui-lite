@@ -33,6 +33,7 @@ export const Customer = () => {
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
+  const textInput = useRef<HTMLInputElement>(null);
 
   const {
     data: customerResource = createEmptyResource<PropertyOwnerView>(pageSize),
@@ -116,6 +117,9 @@ export const Customer = () => {
   const handleClearFilters = () => {
     setSearch('');
     setNumberOfUnits([]);
+    if (textInput.current) {
+      textInput.current.value = '';
+    }
   };
 
   const renderFilterItems = () => (
@@ -155,6 +159,7 @@ export const Customer = () => {
           searchPlaceholder="Search by number, name, address etc."
           getSearchValue={(val: string) => setSearch(val)}
           showActionBtn
+          refInput={textInput}
           btnOnClick={() => navigate('/customers/new')}
           btnLabel="New Customer"
           filterItems={renderFilterItems()}

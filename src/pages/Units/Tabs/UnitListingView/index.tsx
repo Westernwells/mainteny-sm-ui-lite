@@ -40,6 +40,7 @@ export const UnitListingView = () => {
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [resetDatePicker, setResetDatePicker] = useState(false);
+  const textInput = useRef<HTMLInputElement>(null);
 
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
@@ -115,6 +116,10 @@ export const UnitListingView = () => {
     setNextVisitStart(null);
     setNextVisitEnd(null);
     setResetDatePicker(true);
+    setSearch('');
+    if (textInput.current) {
+      textInput.current.value = '';
+    }
   };
 
   if (isFetched && !totalUnitsRef.current) {
@@ -216,6 +221,7 @@ export const UnitListingView = () => {
       <Widget
         searchPlaceholder="Search by number, model, customer, address etc."
         getSearchValue={(val) => setSearch(val)}
+        refInput={textInput}
         filterItems={renderFilterItems()}
       />
     </Box>

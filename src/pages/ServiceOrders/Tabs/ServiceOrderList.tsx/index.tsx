@@ -47,7 +47,7 @@ export const ServiceOrderList = () => {
   const [selectedOrderTypes, setSelectedOrderTypes] = useState<
     ServiceOrderType[]
   >([]);
-
+  const textInput = useRef<HTMLInputElement>(null);
   const [currentDate] = useState(new Date());
 
   const {
@@ -112,6 +112,10 @@ export const ServiceOrderList = () => {
       onClear={() => {
         setSelectedOrderStatus([]);
         setSelectedOrderTypes([]);
+        setSearchQuery('');
+        if (textInput.current) {
+          textInput.current.value = '';
+        }
       }}
       showFilter>
       <MultipleSelectCheckmarks
@@ -144,6 +148,7 @@ export const ServiceOrderList = () => {
         searchPlaceholder="Search order type, customer, address etc."
         getSearchValue={(search) => setSearchQuery(search)}
         filterItems={renderFilterItems()}
+        refInput={textInput}
       />
     </Box>
   );

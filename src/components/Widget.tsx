@@ -1,4 +1,4 @@
-import {ReactNode} from 'react';
+import {ReactNode, RefObject} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -19,6 +19,7 @@ interface Props {
   containerStyles?: {[key: string]: string | number};
   menu?: MenuBtnProps[];
   filterItems?: ReactNode;
+  refInput?: RefObject<HTMLInputElement>;
 }
 
 export const Widget = ({
@@ -32,6 +33,7 @@ export const Widget = ({
   showMenuActionBtn,
   menu,
   filterItems,
+  refInput,
 }: Props) => {
   const {t} = useTranslation();
   return (
@@ -46,6 +48,7 @@ export const Widget = ({
             onValueChanged={(value: string) =>
               getSearchValue && getSearchValue(value)
             }
+            refInput={refInput}
           />
         </Box>
       ) : null}

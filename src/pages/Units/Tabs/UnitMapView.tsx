@@ -36,6 +36,8 @@ export const UnitMapsView = () => {
     elevator: Resource<ElevatorView>;
     centerCoord: Location;
   }>(fallback);
+  const textInput = useRef<HTMLInputElement>(null);
+
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
     isLoading,
@@ -171,6 +173,10 @@ export const UnitMapsView = () => {
     setNextVisitStart(null);
     setNextVisitEnd(null);
     setResetDatePicker(true);
+    setSearch('');
+    if (textInput.current) {
+      textInput.current.value = '';
+    }
   };
 
   const renderFilterItems = () => (
@@ -251,6 +257,7 @@ export const UnitMapsView = () => {
         searchPlaceholder="Search by number, model, customer, address etc."
         getSearchValue={(val) => setSearch(val)}
         filterItems={renderFilterItems()}
+        refInput={textInput}
       />
     </Box>
   );
