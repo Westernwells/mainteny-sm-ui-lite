@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {RefObject, useCallback} from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import * as _ from 'lodash';
 import TextField from '@mui/material/TextField';
@@ -12,6 +12,7 @@ interface Props {
   containerStyle?: {[key: string]: string | number};
   variant?: 'standard' | 'filled' | 'outlined' | undefined;
   label?: string;
+  refInput?: RefObject<HTMLInputElement>;
 }
 
 export const SearchInput = ({
@@ -21,8 +22,10 @@ export const SearchInput = ({
   containerStyle,
   variant,
   label,
+  refInput,
 }: Props) => {
   const {t} = useTranslation();
+
   const debouncedChangeHandler = useCallback(
     _.debounce((e) => {
       onValueChanged?.(e.nativeEvent.target.value);
@@ -68,6 +71,7 @@ export const SearchInput = ({
       placeholder={placeholder && t(placeholder)}
       variant={variant}
       label={label && t(label)}
+      inputRef={refInput}
       onChange={debouncedChangeHandler}
       InputLabelProps={{shrink: variant === 'outlined'}}
       InputProps={{

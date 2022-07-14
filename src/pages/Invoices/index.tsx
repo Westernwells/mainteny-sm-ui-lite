@@ -34,6 +34,7 @@ export const Invoices = () => {
   const [serviceType, setServiceType] = useState<ServiceOrderType[]>([]);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
+  const textInput = useRef<HTMLInputElement>(null);
 
   const {
     data: invoiceResource = createEmptyResource<InvoiceView>(10),
@@ -101,6 +102,10 @@ export const Invoices = () => {
         setInvoiceDate([]);
         setStatus(undefined);
         setServiceType([]);
+        setSearch('');
+        if (textInput.current) {
+          textInput.current.value = '';
+        }
       }}>
       <MultipleSelectCheckmarks
         label="Status"
@@ -140,6 +145,7 @@ export const Invoices = () => {
           searchPlaceholder="Search by number, customer, service type etc."
           getSearchValue={(val: string) => setSearch(val)}
           showActionBtn
+          refInput={textInput}
           btnLabel="New Invoice"
           btnOnClick={navigateToNewInvoice}
           filterItems={renderFilterItems()}

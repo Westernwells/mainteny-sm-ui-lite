@@ -37,6 +37,7 @@ export const Employees = () => {
   const [search, setSearch] = useState('');
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [role, setRole] = useState<Role | string>('');
+  const textInput = useRef<HTMLInputElement>(null);
 
   const {
     data: userAccountResource = createEmptyResource<UserView>(pageSize),
@@ -125,6 +126,9 @@ export const Employees = () => {
   const handleClearFilters = () => {
     setSearch('');
     setRole('');
+    if (textInput.current) {
+      textInput.current.value = '';
+    }
   };
 
   const renderFilterItems = () => (
@@ -134,6 +138,7 @@ export const Employees = () => {
       onClear={handleClearFilters}>
       <MultipleSelectCheckmarks
         label="Role"
+        initialSelectedItems={role ? [role] : []}
         options={['Technician', 'Service Manager']}
         containerStyles={{
           minWidth: '21.875em',
@@ -158,6 +163,7 @@ export const Employees = () => {
           showActionBtn
           btnOnClick={() => navigate('/employees/new')}
           btnLabel="New Employee"
+          refInput={textInput}
           filterItems={renderFilterItems()}
         />
       }>

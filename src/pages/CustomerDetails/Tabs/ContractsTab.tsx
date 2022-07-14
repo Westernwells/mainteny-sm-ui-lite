@@ -38,6 +38,7 @@ export const ContractsTab = ({customerId}: Props) => {
     [],
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
+  const textInput = useRef<HTMLInputElement>(null);
 
   const [priceStart, priceEnd] = useMemo(() => getStartEndPrice(cost), [cost]);
 
@@ -97,6 +98,10 @@ export const ContractsTab = ({customerId}: Props) => {
       onClear={() => {
         setStatus([]);
         setCost([]);
+        setSearchQuery('');
+        if (textInput.current) {
+          textInput.current.value = '';
+        }
       }}>
       <MultipleSelectCheckmarks
         label="Price Range"
@@ -121,6 +126,7 @@ export const ContractsTab = ({customerId}: Props) => {
         searchPlaceholder="Search by number, customer, contract type etc."
         getSearchValue={(search) => setSearchQuery(search)}
         filterItems={renderFilterItems()}
+        refInput={textInput}
       />
     </Box>
   );

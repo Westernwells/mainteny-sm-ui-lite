@@ -33,6 +33,8 @@ export const UnitsTab = ({customerId}: Props) => {
   const [pageCount, setPageCount] = useState(0);
   const [resetDatePicker, setResetDatePicker] = useState(false);
   const [rows, setRows] = useState<GridRowsProp>([]);
+  const textInput = useRef<HTMLInputElement>(null);
+
   const {
     data: elevatorResource = createEmptyResource<ElevatorView>(25),
     isLoading,
@@ -101,6 +103,10 @@ export const UnitsTab = ({customerId}: Props) => {
     setNextVisitStart(null);
     setNextVisitEnd(null);
     setResetDatePicker(true);
+    setSearchQuery('');
+    if (textInput.current) {
+      textInput.current.value = '';
+    }
   };
 
   const renderFilterItems = () => (
@@ -188,6 +194,7 @@ export const UnitsTab = ({customerId}: Props) => {
         searchPlaceholder="Search by no, customer, type..."
         getSearchValue={(search) => setSearchQuery(search)}
         filterItems={renderFilterItems()}
+        refInput={textInput}
       />
     </Box>
   );

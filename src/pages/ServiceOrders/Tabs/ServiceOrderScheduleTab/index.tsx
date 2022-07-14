@@ -55,6 +55,7 @@ export const ServiceOrderScheduleTab = () => {
     ServiceOrderType[]
   >([]);
   const [page] = useState(makePage(0, 500));
+
   const {data: technicianResource = createEmptyResource<EmployeesView>(10)} =
     useQueryServiceCompanyTechnicians({
       pageIndex: 0,

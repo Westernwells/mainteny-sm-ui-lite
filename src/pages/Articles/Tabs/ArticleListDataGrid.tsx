@@ -175,6 +175,8 @@ export const ArticleListDataGrid = () => {
   const [pageCount, setPageCount] = useState(0);
   const [type, setType] = useState('');
   const [query, setQuery] = useState('');
+  const textInput = useRef<HTMLInputElement>(null);
+
   const totalArticlesRef = useRef(0);
   const {
     data: articleResource = createEmptyResource<ArticleView>(pageSize),
@@ -195,7 +197,11 @@ export const ArticleListDataGrid = () => {
   totalArticlesRef.current = totalArticlesRef.current || articleResource.total;
 
   const clearAllFilters = () => {
+    setQuery('');
     setType('');
+    if (textInput.current) {
+      textInput.current.value = '';
+    }
   };
 
   const navigateToNewArticle = () => {
@@ -252,6 +258,7 @@ export const ArticleListDataGrid = () => {
         <Widget
           searchPlaceholder="Search by name, category, manufacturer etc."
           getSearchValue={setQuery}
+          refInput={textInput}
           filterItems={
             <FilterFields onClear={() => clearAllFilters()}>
               <MultipleSelectCheckmarks
