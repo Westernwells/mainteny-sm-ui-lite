@@ -137,6 +137,8 @@ module.exports = {
       'Eingeben Verlängerungszeitraum (in Monaten)',
     'Download contract': 'Vertrag herunterladen',
     'Contract Details': 'Vertragsdetails',
+    'Service Company': 'Serviceunternehmen',
+    'Property Owner': 'Eigentümer der Immobilie',
 
     // Units
     Units: 'Anlagen',
@@ -188,10 +190,10 @@ module.exports = {
     'Anti-clockwise': 'Gegen den Uhrzeigersinn',
     'Performance Analytics': 'Leistungsanalyse',
     'To-Do List': 'To-Do-Liste',
-    'New To-Do': 'Neue To-Do',
+    'New To-Do': 'Neues To-Do',
     Subject: 'Betreff',
     'Date and Time': 'Datum und Uhrzeit',
-    'Edit To-Do': 'To-Do editieren',
+    'Edit To-Do': 'To-Do bearbeiten',
 
     // Employees
     Employees: 'Mitarbeiter',
@@ -217,6 +219,7 @@ module.exports = {
     'Add password': 'Passwort hinzufügen',
     'Add work preferences': 'Arbeitspräferenzen hinzufügen',
     'Work Preferences': 'Arbeitspräferenzen',
+    Overdue: 'Überfällig',
 
     // Quotations
     Quotations: 'Angebote',
@@ -250,6 +253,9 @@ module.exports = {
     EMERGENCY: 'Personeneinschluss'.toLocaleUpperCase(),
     'Search by number, customer, service type etc.':
       'Suche nach Nummer, Kunde, Auftragsart usw.',
+    'Delete Invoice': 'Rechnung löschen',
+    'Do you want to delete this Invoice?':
+      'Möchten Sie diese Rechnung löschen?',
 
     // Articles
     'Articles & Packages': 'Artikel & Pakete',
@@ -630,16 +636,16 @@ module.exports = {
     'Service Order': 'Auftrag',
     'Select Order': 'Auftrag auswählen',
     search: 'suche',
-    'Date Created': 'Datum der Erstellung',
+    'Date Created': 'Erstellungsdatum',
     'Created By': 'Erstellt von',
     'Invoice Type': 'Rechnungsart',
     'Due Date *': 'Fälligkeitsdatum *',
     Full: 'Vollständig',
-    Partial: 'Teilweise',
+    Partial: 'Teilrechnung',
     subject: 'Betreff',
     description: 'Beschreibung',
-    'Subject is required': 'Thema ist erforderlich',
-    'Description is required': 'Beschreibung ist erforderlich',
+    'Subject is required': 'Betreff erforderlich',
+    'Description is required': 'Beschreibung erforderlich',
     Description: 'Beschreibung',
     'Unit Price': 'Preis je Einheit',
     Quantity: 'Anzahl',
@@ -660,7 +666,7 @@ module.exports = {
     'Save Draft': 'Entwurf speichern',
     'Save & Send': 'Speichern & Senden',
     Send: 'Senden',
-    'Invoice details': 'Details der Rechnung',
+    'Invoice details': 'Rechnungsdetails',
     'Quotation Number': 'Angebotsnummer',
     Total: 'Gesamt',
     'Order Number': 'Auftragsnummer',
@@ -702,23 +708,23 @@ module.exports = {
     'New Customer': 'Neuer Kunde',
     'JOINED DATE': 'Erstellungsdatum',
     PRIORITY: 'PRIORITÄT',
-    'NO. OF CONTRACTS': 'Anzahl Verträge',
+    'NO. OF CONTRACTS': 'ANZAHL VERTRÄGE',
     'Basic Details': 'Allgemeine Angaben',
     'Billing Address': 'Rechnungsadresse',
     'Customer Number': 'Kundennummer',
     'Search by unit, category': 'Suche nach Einheit, Kategorie',
     'Search by id, revenue, date': 'Suche nach ID, Umsatz, Datum',
     'Contract ID': 'Vertragsnr.',
-    'Revenue/Year': 'Einnahmen/Jahr',
+    'Revenue/Year': 'Umsatz/Jahr',
     'Contact Persons': 'Kontaktpersonen',
     'Dashboard Access': 'Zugang zum Dashboard',
     Actions: 'Aktionen',
     'No contact persons yet. They will appear here once added!':
       'Noch keine Kontaktpersonen. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!',
-    'Last Visit Start': 'Letzter Besuch Beginn',
-    'Last Visit End': 'Letzter Besuch Ende',
-    'Next Visit Start': 'Nächster Besuch Beginn',
-    'Next Visit End': 'Nächster Besuch Ende',
+    'Last Visit Start': 'Beginn letzter Besuch',
+    'Last Visit End': 'Ende letzter Besuch',
+    'Next Visit Start': 'Beginn nächster Besuch',
+    'Next Visit End': 'Ende nächster Besuch',
     'Search by no, customer, type...': 'Suche nach Nr., Kunde, Typ...',
     'Price Range': 'Preisspanne',
     Status: 'Status',
@@ -858,6 +864,17 @@ module.exports = {
     'No service orders have been created for this elevator yet. Please click the button below to add.':
       'Für dies Anlage wurden noch kein Auftrag erstellt. Bitte klicken Sie auf die Schaltfläche unten, um einen Serviceauftrag zu erstellen!',
     'No to-do added yet.': 'Es wurden noch keine To-Dos hinzugefügt.',
+    'No document yet. It will be appear here once added.':
+      'Noch kein Dokument. Es wird hier erscheinen, sobald es hinzugefügt wurde.',
+    'No articles yet. Please click the button above to add new':
+      'Noch keine Artikel vorhanden. Bitte klicken Sie auf die Schaltfläche oben, um neue Artikel hinzuzufügen',
+    'No priority technicians have been added yet!':
+      'Es wurden noch keine vorrangigen Techniker hinzugefügt!',
+    'No note as been added yet!': 'Es wurde noch keine Notiz hinzugefügt!',
+    'No picture has been added yet!': 'Es wurde noch kein Bild hinzugefügt!',
+    'No document has been attached yet!':
+      'Es wurde noch kein Dokument beigefügt!',
+    'Add Invoice': 'Rechnung hinzufügen',
 
     Logout: 'Ausloggen',
     'View Details': 'Details anzeigen',

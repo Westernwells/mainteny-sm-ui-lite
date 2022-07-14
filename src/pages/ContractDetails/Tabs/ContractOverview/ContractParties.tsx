@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import {ServiceCompanyView} from 'models/service-company';
 import {PropertyOwnerView} from 'models/propertyManager';
+import {useTranslation} from 'react-i18next';
 import PartiesChipStatus from './PartiesChipStatus';
 
 interface Props {
@@ -39,40 +40,43 @@ export const ContractParties = ({
   partyType,
   containerStyle,
   chipStyles,
-}: Props) => (
-  <Grid container sx={{...containerStyle, marginBottom: 2}}>
-    <Grid item xs={5}>
-      <Box display="flex" alignItems="center">
-        <Avatar sx={{width: '3rem', height: '3rem', mr: '1em'}}>H</Avatar>
+}: Props) => {
+  const {t} = useTranslation();
+  return (
+    <Grid container sx={{...containerStyle, marginBottom: 2}}>
+      <Grid item xs={5}>
+        <Box display="flex" alignItems="center">
+          <Avatar sx={{width: '3rem', height: '3rem', mr: '1em'}}>H</Avatar>
 
-        <Box display="flex" flexDirection="column">
-          <Typography variant="subtitle1" sx={{display: 'block'}}>
-            {name || ''}
+          <Box display="flex" flexDirection="column">
+            <Typography variant="subtitle1" sx={{display: 'block'}}>
+              {name || ''}
+            </Typography>
+            <Typography variant="body2" sx={{display: 'block'}}>
+              {typeof occupation === 'string' ? t(occupation) : ''}
+            </Typography>
+          </Box>
+        </Box>
+      </Grid>
+
+      <Grid item xs={5} alignSelf="center">
+        <Box>
+          <Typography variant="body2" color="textSecondary">
+            {address || ''}
           </Typography>
-          <Typography variant="body2" sx={{display: 'block'}}>
-            {occupation || ''}
+          <Typography variant="body2" color="textSecondary">
+            {phoneNumber ? `(${phoneNumber})` : ''}
           </Typography>
         </Box>
-      </Box>
+      </Grid>
+      <Grid item xs={2} alignSelf="center">
+        <PartiesChipStatus
+          color={chipStyles?.chipColor! || 'primary'}
+          length={chipStyles?.chipLength || 'auto'}
+          maxChars={chipStyles?.chipMaxChars || undefined}
+          partyType={partyType!}
+        />
+      </Grid>
     </Grid>
-
-    <Grid item xs={5} alignSelf="center">
-      <Box>
-        <Typography variant="body2" color="textSecondary">
-          {address || ''}
-        </Typography>
-        <Typography variant="body2" color="textSecondary">
-          {phoneNumber ? `(${phoneNumber})` : ''}
-        </Typography>
-      </Box>
-    </Grid>
-    <Grid item xs={2} alignSelf="center">
-      <PartiesChipStatus
-        color={chipStyles?.chipColor! || 'primary'}
-        length={chipStyles?.chipLength || 'auto'}
-        maxChars={chipStyles?.chipMaxChars || undefined}
-        partyType={partyType!}
-      />
-    </Grid>
-  </Grid>
-);
+  );
+};

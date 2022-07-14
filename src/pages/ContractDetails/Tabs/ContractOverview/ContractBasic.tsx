@@ -10,6 +10,7 @@ import TopicIcon from '@mui/icons-material/Topic';
 import {Grid} from '@mui/material';
 import {StatusChip} from 'components/StatusChip';
 import {convertToText} from 'utils/utils';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   type?: string;
@@ -30,6 +31,7 @@ export const ContractBasic = ({
   numberOfVisits,
   renewalPeriod,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   return (
     <>
@@ -107,7 +109,7 @@ export const ContractBasic = ({
             containerStyles={{mr: '0.5em'}}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3rem"
-            bodyText={invoiceDue || '-'}
+            bodyText={typeof invoiceDue === 'string' ? t(invoiceDue) : '-'}
           />
         </Grid>
         <Grid item xs={4}>

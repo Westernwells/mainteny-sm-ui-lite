@@ -3,6 +3,7 @@ import {styled} from '@mui/material/styles';
 import Badge from '@mui/material/Badge';
 
 import {capitalize} from 'utils/utils';
+import {useTranslation} from 'react-i18next';
 
 type EmployeeAvatarProps = {
   name?: string;
@@ -10,6 +11,7 @@ type EmployeeAvatarProps = {
   isOnline?: Boolean;
 };
 const EmployeeAvatar = ({name, subTitle, isOnline}: EmployeeAvatarProps) => {
+  const {t} = useTranslation();
   const StyledBadge = styled(Badge)(({theme}) => ({
     '& .MuiBadge-badge': {
       backgroundColor: '#00D68F',
@@ -81,8 +83,8 @@ const EmployeeAvatar = ({name, subTitle, isOnline}: EmployeeAvatarProps) => {
             textAlign="center">
             {subTitle
               ? Array.isArray(subTitle)
-                ? `${capitalize(subTitle as string[])}`
-                : subTitle
+                ? `${t(capitalize(subTitle as string[]))}`
+                : t(subTitle)
               : '-'}
           </Typography>
         )}
