@@ -79,8 +79,8 @@ export const WhiteLabel = ({containerStyles, company}: Props) => {
           <Box>
             <MyDropZone
               hints={[
-                'PDF, DOCX, XLSX, XLS, CSV, TSV only',
-                'File size less than 5MB only',
+                t('JPG, PNG or BMP only'),
+                t('File size less than 5MB only'),
               ]}
               getAcceptedFiles={(files) => {
                 saveImage(files);

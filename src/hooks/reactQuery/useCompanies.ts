@@ -1,3 +1,4 @@
+import {NewServiceCompanyBody} from 'pages/NewCompany/model';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {Page, Resource, RestError, StringValue} from 'models/misc';
 import {
@@ -128,6 +129,35 @@ export const useUpdateSystemSettings = (successMsg?: string) => {
             variant: 'error',
           },
         );
+      },
+    },
+  );
+};
+
+const createServiceCompany = async (
+  body: NewServiceCompanyBody,
+): Promise<StringValue> => {
+  const response = await axiosClient.post<StringValue>('api/serviceCompanies', {
+    ...body,
+  });
+  return response.data;
+};
+
+export const useCreateServiceCompany = (successMsg: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    (body: NewServiceCompanyBody) => createServiceCompany(body),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
       },
     },
   );

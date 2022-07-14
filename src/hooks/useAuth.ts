@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {axiosClient} from 'utils/axios-utils';
@@ -33,6 +33,8 @@ export const useAuth = (): UseAuth => {
   const {enqueueSnackbar} = useSnackbar();
 
   const adminUser = getStoredAdmin();
+
+  useEffect(() => () => setLoading(false), []);
 
   const authRequest = async (
     urlEndpoint: string,
@@ -74,6 +76,10 @@ export const useAuth = (): UseAuth => {
             {replace: true},
           );
         } else {
+          if (user.userAccount.roles.includes(Role.ADMIN)) {
+            navigate('/admin/companies', {replace: true});
+            return;
+          }
           navigate('/orders', {replace: true});
         }
       }
@@ -84,8 +90,6 @@ export const useAuth = (): UseAuth => {
         });
       }
       console.log(errorResponse);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -102,7 +106,7 @@ export const useAuth = (): UseAuth => {
       axiosClient.defaults.headers.common.Authorization = `Bearer ${adminUser.token}`;
       updateUser(adminUser);
       clearStoredAdmin();
-      navigate('/orders', {replace: true});
+      navigate('/admin/companies', {replace: true});
       return;
     }
     navigate('/login', {replace: true}); // This resets the location state
