@@ -19,7 +19,6 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
     headerName: 'number',
-    align: 'center',
     flex: 0,
   }),
   getColumnProps({
@@ -29,8 +28,7 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'model',
     headerName: 'model',
-    align: 'right',
-    flex: 0,
+    cellClassName: 'truncateText',
   }),
   getColumnProps({
     field: 'manufacturer',
@@ -55,7 +53,7 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
   articles
     ? articles.map((item, index) => ({
         id: index,
-        number: item.number,
+        number: item.externalId,
         type: item.type,
         model: item.model,
         manufacturer: item.manufacturer,

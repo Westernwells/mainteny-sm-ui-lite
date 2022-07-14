@@ -10,7 +10,8 @@ import {useAuth} from 'hooks/useAuth';
 import {useEffect, useState} from 'react';
 import {axiosClient} from 'utils/axios-utils';
 import {useQueryClient} from 'react-query';
-import {languageMap} from 'utils/utils';
+import {Role} from 'models/user';
+import {convertToText, languageMap} from 'utils/utils';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {useUserSession} from '../hooks/reactQuery/useUserSession';
@@ -65,7 +66,13 @@ export const AppTopBar = ({
           padding: 0,
           color: theme.palette.text.secondary,
         }}>
-        {user?.userAccount.roles[0].split('_').join(' ').toLowerCase()}
+        {user
+          ? convertToText(
+              user.userAccount.roles.includes(Role.SERVICE_MANAGER)
+                ? Role.SERVICE_MANAGER
+                : user.userAccount.roles[0],
+            )
+          : '-'}
       </Typography>
     </Box>
   );

@@ -83,7 +83,10 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
             </Box>
 
             <Box>
-              <FormLabel text="Total (excl VAT)" sx={{color: 'text.main'}} />
+              <FormLabel
+                text="Total (excl. VAT)"
+                sx={{color: 'text.main', textTransform: 'initial'}}
+              />
               <Typography variant="subtitle1">
                 {formatCurrency(
                   quotation.totalAmount.netAmount /

@@ -20,7 +20,6 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
     headerName: 'number',
-    align: 'center',
     flex: 0,
   }),
   getColumnProps({
@@ -53,7 +52,7 @@ export const makeRows = (elevators: ElevatorView[]): GridRowsProp =>
   elevators
     ? elevators.map((item, index) => ({
         id: index,
-        number: item.number,
+        number: item.externalId,
         model: item.model,
         customer: item.propertyOwner.name,
         address: item.address.fullName,
