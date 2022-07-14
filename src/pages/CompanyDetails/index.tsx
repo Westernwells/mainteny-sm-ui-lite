@@ -45,22 +45,31 @@ export const CompanyDetails = ({getCurrentPageTitle}: Props) => {
     <>
       <Grid container spacing={2}>
         <Grid item md={3} sm={12}>
-          <BasicInformation company={company!} />
+          <BasicInformation
+            company={company!}
+            containerStyles={{height: '100%'}}
+          />
         </Grid>
         <Grid item md={6} sm={12}>
           <Addresses company={company!} containerStyles={{height: '100%'}} />
         </Grid>
         <Grid item md={3} sm={12}>
-          <Settings company={company!} />
+          <Settings company={company!} containerStyles={{height: '100%'}} />
         </Grid>
       </Grid>
 
       <Grid container spacing={2} sx={{mt: '0.3em'}}>
         <Grid item md={3} sm={12}>
-          <LegalInformation company={company!} />
+          <LegalInformation
+            company={company!}
+            containerStyles={{height: '100%'}}
+          />
         </Grid>
         <Grid item md={6} sm={12}>
-          <PaymentInformation company={company!} />
+          <PaymentInformation
+            company={company!}
+            containerStyles={{height: '100%'}}
+          />
         </Grid>
         <Grid item md={3} sm={12}>
           <BillingInformation

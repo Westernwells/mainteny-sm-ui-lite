@@ -21,14 +21,22 @@ export const fetchDownloadUrl = async (
 export const useDownloadUrl = (
   filePath: string[],
   options?: {[key: string]: any},
+  companyId?: string,
 ) => {
   const {user} = useUserSession();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
+
+  let fetchId = serviceCompanyId;
+
+  if (companyId) {
+    fetchId = companyId;
+  }
+
   return useQuery(
-    [qk.invoiceDownloadUrl, filePath, serviceCompanyId],
-    () => fetchDownloadUrl(filePath, serviceCompanyId!),
+    [qk.invoiceDownloadUrl, filePath, fetchId],
+    () => fetchDownloadUrl(filePath, fetchId!),
     {
-      enabled: !!filePath.length && !!serviceCompanyId,
+      enabled: !!filePath.length && !!fetchId,
       refetchOnWindowFocus: false,
       cacheTime: 0,
       ...options,

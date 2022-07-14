@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import Grid from '@mui/material/Grid';
 import {useFormik} from 'formik';
 import useTheme from '@mui/material/styles/useTheme';
@@ -58,6 +58,10 @@ export const Policies = ({containerStyles, company}: Props) => {
 
     setOpenDialog(false);
   };
+
+  useEffect(() => {
+    formik.validateForm();
+  }, []);
 
   return (
     <>

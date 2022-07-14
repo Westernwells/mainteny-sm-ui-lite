@@ -1,4 +1,4 @@
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import Grid from '@mui/material/Grid';
 import {useFormik} from 'formik';
 import {useTranslation} from 'react-i18next';
@@ -50,6 +50,10 @@ export const Dispatching = ({containerStyles, company}: Props) => {
     'companyDispatchStrategy',
     'isNightlyShuffleEnabled',
   ]).current;
+
+  useEffect(() => {
+    formik.validateForm();
+  }, []);
 
   return (
     <>

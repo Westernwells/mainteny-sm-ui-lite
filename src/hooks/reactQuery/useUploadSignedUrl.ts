@@ -55,13 +55,18 @@ export const uploadImages = async (
     files.map((item) => uploadAndSave(item, serviceCompanyId!, uploadPath)),
   );
 
-export const useUploadFiles = (successMsg: string) => {
+export const useUploadFiles = (successMsg: string, companyId?: string) => {
   const {enqueueSnackbar} = useSnackbar();
   const {user} = useUserSession();
   const queryClient = useQueryClient();
+  let fetchId = user?.userAccount.serviceCompany.id;
+  if (companyId) {
+    fetchId = companyId;
+  }
+
   return useMutation(
     ({files, uploadPath}: {files: FileWithPreview[]; uploadPath: string}) =>
-      uploadImages(files, user?.userAccount.serviceCompany.id!, uploadPath),
+      uploadImages(files, fetchId!, uploadPath),
     {
       onSuccess: () => {
         if (successMsg) {
