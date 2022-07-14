@@ -15,6 +15,7 @@ import {
   QueryQuotationParams,
   QuotationFilters,
   QuotationView,
+  ReplyQuotation,
   UpdateQuotation,
 } from 'models/quotation';
 import {Mixpanel} from 'mixpanel/mixpanel';
@@ -108,6 +109,37 @@ export const usePublishQuotation = () => {
         queryClient.invalidateQueries([qk.fetchQuotations]);
         queryClient.invalidateQueries([qk.quotationById]);
         enqueueSnackbar(`Quotation sent successfully`, {
+          variant: 'success',
+        });
+        navigate(`/quotations/details/${quotationId}`);
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+export const putReplyQuotation = async (id: string, body: ReplyQuotation) => {
+  await axiosClient.put(`api/quotations/${id}/reply`, body);
+};
+
+export const useReplyQuotation = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  const navigate = useNavigate();
+
+  return useMutation(
+    ({quotationId, reply}: {quotationId: string; reply: ReplyQuotation}) =>
+      putReplyQuotation(quotationId, reply),
+    {
+      onSuccess: (_, {quotationId}) => {
+        queryClient.invalidateQueries([qk.fetchQuotations]);
+        queryClient.invalidateQueries([qk.quotationById]);
+        enqueueSnackbar(`Quotation marked as accepted`, {
           variant: 'success',
         });
         navigate(`/quotations/details/${quotationId}`);

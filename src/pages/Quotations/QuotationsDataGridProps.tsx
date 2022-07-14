@@ -90,7 +90,7 @@ export const columns: GridColDef[] = [
     headerName: 'actions',
     align: 'center',
     renderCell: (params) => <Actions quotation={params.row.quotation} />,
-    flex: 0,
+    flex: 1,
   }),
 ];
 
