@@ -46,7 +46,7 @@ export const A4Layout = ({
     <Box width="min(calc(1240px + 1.25em), 100%)" mx="auto" mb="8em" mt="1.5em">
       {status && (
         <Box m=".75em" display="flex" justifyContent="end">
-          <StatusChip label={convertToText(status)} />
+          <StatusChip label={convertToText(status)} color="action.active" />
         </Box>
       )}
       <Box
