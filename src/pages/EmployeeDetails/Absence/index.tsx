@@ -32,7 +32,7 @@ type Props = {
 };
 
 const initialValues: AbsenceForm = {
-  duration: ['1 day'],
+  duration: '1 day',
   typeAbsence: 'sick',
   date: new Date(),
   dateStart: undefined,
@@ -41,13 +41,13 @@ const initialValues: AbsenceForm = {
 };
 
 const validationSchema = Yup.object().shape({
-  duration: Yup.array().nullable(),
+  duration: Yup.string().nullable(),
   dateStart: Yup.string().when('duration', {
-    is: (duration: string[]) => duration[0] === 'Multiple days',
+    is: (duration: string) => duration === 'Multiple days',
     then: Yup.string().required('Date start is required'),
   }),
   dateEnd: Yup.string().when('duration', {
-    is: (duration: string[]) => duration[0] === 'Multiple days',
+    is: (duration: string) => duration === 'Multiple days',
     then: Yup.string().required('Date end is required'),
   }),
 });
@@ -78,6 +78,14 @@ const EmployeeAbsence = ({employee}: Props) => {
       .totalYearlyVacationDaysAllowed || 0;
   const leftVacationDays =
     employee?.userData.additionalInfo.leftVacationDays || 0;
+
+  const getTakenDays = () => {
+    let takenDays = totalHolidays - leftVacationDays;
+    if (takenDays < 0) {
+      takenDays = 0;
+    }
+    return takenDays;
+  };
 
   const {
     data: absencesResource = createEmptyResource<AbsenceItem>(pageSize),
@@ -111,7 +119,7 @@ const EmployeeAbsence = ({employee}: Props) => {
     setActiveAbsence(undefined);
 
     formik.setValues({
-      duration: ['1 day'],
+      duration: '1 day',
       typeAbsence: 'sick',
       date: new Date(),
       dateStart: undefined,
@@ -132,7 +140,7 @@ const EmployeeAbsence = ({employee}: Props) => {
     );
 
     formik.setValues({
-      duration: numberOfDays.days === 0 ? ['1 day'] : ['Multiple days'],
+      duration: numberOfDays.days === 0 ? '1 day' : 'Multiple days',
       typeAbsence: convertAbsenceToNormal(absence.eventType),
       date: absence.startTime || new Date(),
       dateStart: absence.startTime || undefined,
@@ -173,7 +181,7 @@ const EmployeeAbsence = ({employee}: Props) => {
           illustration="clipboard"
           size="tiny"
           containerStyle={{mt: '4.5em'}}
-          label="No holiday entries yet. They will appear here once added!"
+          label={t('No holiday entries yet. They will appear here once added!')}
         />
       );
     }
@@ -226,10 +234,12 @@ const EmployeeAbsence = ({employee}: Props) => {
         headerActionIcon={<AddIcon />}
         showHeaderBackground>
         <Box sx={{marginTop: '0.5em'}}>
-          <Typography sx={{fontSize: '14px'}}>Yearly Holidays</Typography>
+          <Typography sx={{fontSize: '14px'}}>
+            {t('Yearly Holidays')}
+          </Typography>
           <AbsenceStatistic
             total={totalHolidays}
-            taken={totalHolidays - leftVacationDays}
+            taken={getTakenDays()}
             left={leftVacationDays >= 0 ? leftVacationDays : 0}
           />
           <Box sx={{height: '100%'}}>
@@ -244,7 +254,7 @@ const EmployeeAbsence = ({employee}: Props) => {
         </Box>
       </InfoCard>
       <Dialog
-        title={typeAction === 'edit' ? 'Edit Absence' : 'Add Absence'}
+        title={typeAction === 'edit' ? t('Edit Absence') : t('Add Absence')}
         disableSaveBtn={!!Object.keys(formik.errors).length}
         onCancel={() => setOpenDialog(false)}
         onSave={typeAction === 'edit' ? editAbsence : saveNewAbsence}

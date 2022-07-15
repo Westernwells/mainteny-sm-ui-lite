@@ -219,6 +219,24 @@ module.exports = {
     'Add password': 'Passwort hinzufügen',
     'Add work preferences': 'Arbeitspräferenzen hinzufügen',
     'Work Preferences': 'Arbeitspräferenzen',
+    Left: 'Übrig',
+    Used: 'Genutzt',
+    'Yearly Holidays': 'Jahresurlaub',
+    'Add Absence': 'Abwesenheit hinzufügen',
+    'Select type of absence': 'Art der Abwesenheit auswählen',
+    Reason: 'Grund',
+    'Enter reason': 'Grund eingeben',
+    Duration: 'Dauer',
+    days: 'tage',
+    'Multipe days': 'Mehrere Tage',
+    '1 Day': '1 Tag',
+    'Select duration': 'Dauer auswählen',
+    'Multiple days': 'Mehrere Tage',
+    'No holiday entries yet. They will appear here once added!':
+      'Noch keine Urlaubseinträge. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!',
+    'Do you want to delete the event from the absence list?':
+      'Möchten Sie das Ereignis aus der Abwesenheitsliste löschen?',
+    'Edit Absence': 'Abwesenheit bearbeiten',
     Overdue: 'Überfällig',
 
     // Quotations
