@@ -2,10 +2,9 @@ import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 import {Elevator} from '@mui/icons-material';
 import useTheme from '@mui/material/styles/useTheme';
-
 import {getColumnProps} from 'components/DataGridLayout';
-import {formatDate} from 'utils/datetime';
 import {DataGridElevatorView} from 'pages/Units/Models';
+import {FormatDate} from 'models/misc';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -53,11 +52,14 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = ({
-  elevators,
-}: {
-  elevators: DataGridElevatorView[];
-}): GridRowsProp => {
+export const makeRows = (
+  {
+    elevators,
+  }: {
+    elevators: DataGridElevatorView[];
+  },
+  formatDate: FormatDate = () => '',
+): GridRowsProp => {
   const result =
     elevators.length &&
     elevators.map((elevator: DataGridElevatorView) => ({
