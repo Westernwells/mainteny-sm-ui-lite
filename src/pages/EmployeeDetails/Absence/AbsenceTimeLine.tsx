@@ -6,6 +6,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import {Confirm} from 'components/Confirm';
 import {useDeleteAbsence} from 'hooks/reactQuery/useAbsence';
 import {convertAbsenceToNormal, getAbsenceDate} from 'utils/absence-utils';
+import {useTranslation} from 'react-i18next';
 
 type Props = {
   id: string;
@@ -26,6 +27,7 @@ const AbsenceTimeLine = ({
   isLast,
   onEdit,
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -41,6 +43,8 @@ const AbsenceTimeLine = ({
 
     setOpenDeleteDialog(false);
   };
+
+  const absenceName = convertAbsenceToNormal(type);
 
   return (
     <>
@@ -62,7 +66,7 @@ const AbsenceTimeLine = ({
             <Typography
               variant="subtitle1"
               sx={{fontSize: '16px', mr: '0.625em'}}>
-              {convertAbsenceToNormal(type)}
+              {t(absenceName)}
             </Typography>
           </Grid>
           <Grid item sm={2} md={5} lg={4} sx={{justifyContent: 'left'}}>
@@ -90,7 +94,7 @@ const AbsenceTimeLine = ({
                   borderRadius: '16px',
                   padding: '0.18em 0.5em',
                 }}>
-                {duration} days
+                {duration} {t('days')}
               </Typography>
             </Box>
           </Grid>
@@ -134,7 +138,7 @@ const AbsenceTimeLine = ({
         onConfirm={() => onDelete()}
         onClose={() => setOpenDeleteDialog(false)}
         title="Delete"
-        content="Do you want to delete the event from the absence list?"
+        content={t('Do you want to delete the event from the absence list?')}
       />
     </>
   );
