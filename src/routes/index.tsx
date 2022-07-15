@@ -1,11 +1,5 @@
 import {Helmet} from 'react-helmet';
-import {
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-  useNavigate,
-} from 'react-router-dom';
+import {Route, Routes, useLocation, useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {PageLayout} from 'components/PageLayout';
 import ErrorBoundary from 'components/ErrorBoundary';
@@ -28,6 +22,7 @@ import {DraftQuotation} from 'pages/QuotationDetails/DraftQuotation';
 import {QuotationDetails} from 'pages/QuotationDetails';
 import {Notifications} from 'pages/Notifications';
 import {PageNotFound} from 'pages/PageNotFound';
+import {Dashboard} from 'pages/Dashboard';
 import {ServiceOrders} from 'pages/ServiceOrders';
 import {NewEmployee} from 'pages/NewEmployee';
 import {Companies} from 'pages/Companies';
@@ -90,7 +85,19 @@ export const Router = () => {
           <Route path="/reset-password" element={<ResetPassword />} />
         </Route>
         <Route element={<ProtectedRoutes />}>
-          <Route path="/" element={<Navigate to="/orders" />} />
+          <Route
+            path="/"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Dashboard - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout pageTitle="Dashboard">
+                  <Dashboard />
+                </PageLayout>
+              </>
+            }
+          />
 
           <Route
             path="/units"
