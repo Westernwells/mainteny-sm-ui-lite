@@ -11,7 +11,7 @@ import {InfoCard} from 'components/InfoCard';
 import {useFormik} from 'formik';
 import {ContractSimpleView} from 'models/contract';
 import {Priority} from 'models/misc';
-import {formatDate} from 'utils/datetime';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {ServiceFormModel} from '../../../../../models/unitForm';
 import {ServiceSchema} from './ServiceSchema';
 import {EditServiceForm} from './EditServiceForm';
@@ -38,7 +38,7 @@ export const Service = ({
   validContract,
 }: Props) => {
   const {t} = useTranslation();
-  // const theme = useTheme();
+  const formatDate = useFormatDate();
   const [openDialog, setOpenDialog] = useState(false);
   const {mutateAsync: updateElevator} = useUpdateElevator(
     'Service updated successfully',

@@ -21,8 +21,8 @@ import {
 } from 'chart.js';
 import {Bar} from 'react-chartjs-2';
 
-import {formatDate} from 'utils/datetime';
 import {Button, ButtonGroup} from '@mui/material';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 ChartJS.register(
   CategoryScale,
@@ -108,6 +108,7 @@ function generateData(timeFrame: TimeFrame) {
 }
 
 export const StatsSection = () => {
+  const formatDate = useFormatDate();
   const theme = useTheme();
   const {t} = useTranslation();
   const [timeFrame, setTimeFrame] = useState(TimeFrame.LAST_7_DAYS);

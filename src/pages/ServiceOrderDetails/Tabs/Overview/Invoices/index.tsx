@@ -10,6 +10,7 @@ import Box from '@mui/material/Box';
 import {getDataGridHeight} from 'utils/utils';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {columns, makeRows} from './InvoicesDataGridProps';
 
 interface Props {
@@ -19,6 +20,7 @@ interface Props {
 export const Invoices = ({serviceOrderId}: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
+  const formatDate = useFormatDate();
   const [rows, setRows] = useState<GridRowsProp>([]);
   let totalInvoiceRef = useRef(0).current;
 
@@ -32,7 +34,7 @@ export const Invoices = ({serviceOrderId}: Props) => {
 
   useEffect(() => {
     if (!isLoading) {
-      setRows(makeRows(InvoiceList || []));
+      setRows(makeRows(InvoiceList || [], formatDate));
     }
   }, [InvoiceList, isLoading]);
 

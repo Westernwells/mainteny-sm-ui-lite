@@ -1,9 +1,9 @@
 import {Typography} from '@mui/material';
 import Box from '@mui/material/Box';
 import {FormLabel} from 'components/form/FormLabel';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {ServiceOrderSchedule} from 'models/service-order';
 import {useTranslation} from 'react-i18next';
-import {formatDate} from 'utils/datetime';
 
 interface Props {
   schedule?: ServiceOrderSchedule;
@@ -13,6 +13,7 @@ const dateToString = (date: Date) =>
   date.toISOString().split('T')[1].split('.')[0];
 
 export const Maintenance = ({schedule}: Props) => {
+  const formatDate = useFormatDate();
   const {t} = useTranslation();
   return (
     <Box mt="1em">

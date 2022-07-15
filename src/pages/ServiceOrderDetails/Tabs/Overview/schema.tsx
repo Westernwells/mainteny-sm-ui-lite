@@ -5,9 +5,10 @@ import Grid3x3Icon from '@mui/icons-material/Grid3x3';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import TimelapseIcon from '@mui/icons-material/Timelapse';
 import {ServiceOrderView} from 'models/service-order';
-import {formatDate, toDate} from 'utils/datetime';
+import {toDate} from 'utils/datetime';
 import {theme} from 'theme';
 import {CardProps} from 'components/CardProps';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface OrderInfoProps {
   serviceOrderDetails: ServiceOrderView;
@@ -15,6 +16,7 @@ interface OrderInfoProps {
 }
 
 export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
+  const formatDate = useFormatDate();
   // const theme = useTheme();
   const renderSection = () => {
     switch (label) {
@@ -56,10 +58,7 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
           <CardProps
             icon={<FlagIcon sx={{color: theme.palette.info.dark}} />}
             label="DUE DATE"
-            bodyText={
-              formatDate(new Date(serviceOrderDetails.dueDate), 'dd.MM.yyyy') ||
-              '-'
-            }
+            bodyText={formatDate(new Date(serviceOrderDetails.dueDate)) || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
@@ -75,7 +74,6 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
               serviceOrderDetails.schedules.length
                 ? `${formatDate(
                     toDate(serviceOrderDetails.schedules[0].startTime),
-                    'dd.MM.yyyy',
                   )},${formatDate(
                     toDate(serviceOrderDetails.schedules[0].startTime),
                     'HH:mm',

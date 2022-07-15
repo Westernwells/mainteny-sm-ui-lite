@@ -14,9 +14,10 @@ import {Location, Resource} from 'models/misc';
 import {FilterFields} from 'components/FilterFields';
 import {Widget} from 'components/Widget';
 import {FlexContainer} from 'components/FlexContainer';
-import {formatDate} from 'utils/datetime';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 export const UnitMapsView = () => {
+  const formatDate = useFormatDate();
   const fallback = useRef({
     elevator: createEmptyResource<ElevatorView>(10),
     centerCoord: {longitude: 13.390206, latitude: 52.535152},
