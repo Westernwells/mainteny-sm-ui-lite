@@ -18,6 +18,7 @@ import {
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {
   costRangeConvertor as crConverter,
   getStartEndPrice,
@@ -28,6 +29,7 @@ const pageSize = 25;
 
 export const Contracts = () => {
   const navigate = useNavigate();
+  const formatDate = useFormatDate();
   const [search, setSearch] = useState('');
   const [queryParams, setQueryParams] = useSearchParams();
   const [page, setPage] = useState(makePage(0, pageSize));
@@ -104,7 +106,7 @@ export const Contracts = () => {
           options.push(item.serviceCompany.name);
         }
       });
-      setRows(makeRows(contractResource.data));
+      setRows(makeRows(contractResource.data, formatDate));
       setContractorFilterItems([...contractorFilterItems, ...options]);
     }
   }, [contractResource, isLoading, isFetching, isIdle]);

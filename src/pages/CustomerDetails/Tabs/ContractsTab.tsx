@@ -18,6 +18,7 @@ import {
 } from 'utils/contract-utils';
 import {EmptySection} from 'components/EmptySection';
 import {convertToMacro, convertToText} from 'utils/utils';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {Widget} from 'components/Widget';
 import {columns, makeRows} from './CustomerContractDataGrid';
 
@@ -27,6 +28,7 @@ interface Props {
 
 export const ContractsTab = ({customerId}: Props) => {
   const navigate = useNavigate();
+  const formatDate = useFormatDate();
 
   const [page, setPage] = useState(makePage(0, 10));
   const totalContractsRef = useRef(0);
@@ -79,7 +81,7 @@ export const ContractsTab = ({customerId}: Props) => {
           options.push(item.serviceCompany.name);
         }
       });
-      setRows(makeRows(contractResource.data));
+      setRows(makeRows(contractResource.data, formatDate));
     }
     setContractorFilterItems([...contractorFilterItems, ...options]);
   }, [contractResource, isLoading]);

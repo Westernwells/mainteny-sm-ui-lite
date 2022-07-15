@@ -4,7 +4,7 @@ import {Elevator} from '@mui/icons-material';
 import useTheme from '@mui/material/styles/useTheme';
 
 import {StatusChip} from 'components/StatusChip';
-import {formatDate} from 'utils/datetime';
+import {FormatDate} from 'models/misc';
 import {getColumnProps} from 'components/DataGridLayout';
 import {ElevatorView} from 'models/elevator';
 
@@ -77,11 +77,14 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = ({
-  elevators,
-}: {
-  elevators: ElevatorView[];
-}): GridRowsProp => {
+export const makeRows = (
+  {
+    elevators,
+  }: {
+    elevators: ElevatorView[];
+  },
+  formatDate: FormatDate = () => '',
+): GridRowsProp => {
   const result =
     elevators.length &&
     elevators.map((elevator: ElevatorView, index: number) => ({

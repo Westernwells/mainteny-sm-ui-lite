@@ -18,6 +18,7 @@ import {
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {getFilterUnitNumber} from 'utils/customer-utils';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {Widget} from '../../components/Widget';
 import {columns, makeRows} from './CustomerDataGridProps';
 
@@ -25,6 +26,7 @@ const pageSize = 25;
 
 export const Customer = () => {
   const navigate = useNavigate();
+  const formatDate = useFormatDate();
 
   const [search, setSearch] = useState('');
   const [numberOfUnits, setNumberOfUnits] = useState<string[]>([]);
@@ -80,7 +82,7 @@ export const Customer = () => {
 
   useEffect(() => {
     if (!isLoading) {
-      setRows(makeRows(customerResource.data));
+      setRows(makeRows(customerResource.data, formatDate));
     }
   }, [customerResource, isLoading]);
 

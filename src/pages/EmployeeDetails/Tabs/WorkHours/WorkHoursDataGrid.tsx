@@ -10,9 +10,8 @@ import {Box} from '@mui/material';
 
 import {WorkHourIcons} from 'components/WorkHourIcons';
 import {WorkHourTypeText} from 'components/WorkHourTypeText';
-import {formatDate} from 'utils/datetime';
 import {WorkHoursItem} from 'models/workHours';
-import {Resource} from 'models/misc';
+import {FormatDate, Resource} from 'models/misc';
 import {useTranslation} from 'react-i18next';
 
 const defaultProps = {
@@ -134,13 +133,20 @@ const getOrderNumber = (data: any) => {
 
 export const makeRows = (
   workHours: Resource<WorkHoursItem>,
+  formatDate: FormatDate = () => '',
 ): GridRowModel<{[key: string]: any}[]> =>
   workHours.data.length
     ? workHours.data.map((item: WorkHoursItem) => ({
         id: item.id,
         duration: formatTime(item.duration, item.durationUnit),
-        startDate: formatDate(item.startTime, 'dd.MM.yyyy HH:MM'),
-        endDate: formatDate(item.endTime, 'dd.MM.yyyy HH:MM'),
+        startDate: `${formatDate(item.startTime)} ${formatDate(
+          item.startTime,
+          'HH:MM',
+        )}`,
+        endDate: `${formatDate(item.endTime)} ${formatDate(
+          item.endTime,
+          'HH:MM',
+        )}`,
         address: getAddress(item.data),
         orderNumber: getOrderNumber(item.data),
         orderType: (
