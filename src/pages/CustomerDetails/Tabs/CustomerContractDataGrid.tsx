@@ -86,7 +86,7 @@ export const columns: GridColDef[] = [
     field: 'cost',
     headerName: 'COST/YEAR',
     type: 'number',
-    flex: 0,
+    flex: 0.5,
     headerAlign: 'right',
     align: 'right',
     ...defaultProps,

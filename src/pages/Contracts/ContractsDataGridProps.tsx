@@ -44,7 +44,7 @@ export const columns: GridColDef[] = [
     field: 'cost',
     headerName: 'cost/year',
     align: 'right',
-    flex: 0,
+    flex: 0.5,
   }),
   getColumnProps({
     field: 'actions',
