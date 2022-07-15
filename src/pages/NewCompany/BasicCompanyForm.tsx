@@ -81,7 +81,7 @@ export const BasicCompanyForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: '1&1 Drillisch AG',
+                placeholder: 'e.g. 1&1 Drillisch AG',
                 label: 'Name',
                 name: 'name',
                 value: formik.values.name,
@@ -99,7 +99,7 @@ export const BasicCompanyForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'e.g brucewayne@gmail.com',
+                placeholder: 'e.g. brucewayne@gmail.com',
                 label: 'Email',
                 name: 'email',
                 value: formik.values.email,
@@ -124,7 +124,7 @@ export const BasicCompanyForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: '1234567890',
+                placeholder: 'e.g. +1234567890',
                 label: 'Phone',
                 name: 'phone',
                 value: formik.values.phone,
@@ -151,7 +151,7 @@ export const BasicCompanyForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'Enter url',
+                placeholder: 'e.g. www.yourcompany.com',
                 label: 'Website / URL',
                 name: 'url',
                 value: formik.values.url,

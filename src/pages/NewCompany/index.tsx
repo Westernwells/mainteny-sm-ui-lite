@@ -189,6 +189,7 @@ export const NewCompany = ({getCurrentPageTitle}: Props) => {
       disableNextBtn={disableNextBtn || isSubmitting || isSavingSettings}
       submitting={isSubmitting}
       initialActiveStep={0}
+      stepperStyles={{width: '80%'}}
       getActiveStep={(val) => setActiveStep(val)}
       steps={steps}
       containerStyles={{

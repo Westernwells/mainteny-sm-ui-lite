@@ -377,7 +377,7 @@ export const MyDropZone = ({
               </Box>
             </Box>
             <Button
-              label="Replace Picture"
+              label={t('Replace Image')}
               buttonProps={{
                 variant: 'text',
                 onClick: open,

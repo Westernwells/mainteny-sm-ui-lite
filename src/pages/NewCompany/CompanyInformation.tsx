@@ -74,7 +74,7 @@ export const CompanyInformation = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'Wolfgang Lutz',
+                placeholder: 'e.g. Wolfgang Lutz',
                 label: 'Managing Director',
                 name: 'managingDirector',
                 helperText:
@@ -94,7 +94,7 @@ export const CompanyInformation = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'Berlin',
+                placeholder: 'e.g. Berlin',
                 label: 'Arbitration Court',
                 name: 'arbitrationCourt',
                 required: true,
@@ -114,7 +114,7 @@ export const CompanyInformation = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'HRB 151080 B, Charlottenburg',
+                placeholder: 'e.g. HRB 151080 B, Charlottenburg',
                 label: 'Trade Register Number',
                 name: 'tradeRegisterNumber',
                 required: true,

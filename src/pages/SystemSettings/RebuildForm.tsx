@@ -17,16 +17,20 @@ export const types = [
     value: 'SERVICE_COMPANY',
   },
   {
+    label: 'SERVICE_COMPANY_ACTIVITY',
+    value: 'SERVICE_COMPANY_ACTIVITY',
+  },
+  {
     label: 'PROPERTY_OWNER',
     value: 'PROPERTY_OWNER',
   },
   {
-    label: 'USER',
-    value: 'USER',
-  },
-  {
     label: 'ELEVATOR',
     value: 'ELEVATOR',
+  },
+  {
+    label: 'EMPLOYEE',
+    value: 'EMPLOYEE',
   },
   {
     label: 'ELEVATOR_COMMENT',
@@ -39,6 +43,10 @@ export const types = [
   {
     label: 'CONTRACT',
     value: 'CONTRACT',
+  },
+  {
+    label: 'PROPERTY_CONTACT_PERSON',
+    value: 'PROPERTY_CONTACT_PERSON',
   },
   {
     label: 'SERVICE_ORDER',
