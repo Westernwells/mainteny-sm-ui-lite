@@ -689,7 +689,7 @@ module.exports = {
     'Add Quotation': 'Angebot hinzufügen',
     'Select Unit': 'Einheit wählen',
     Duplicate: 'Duplizieren',
-    'Quotation Details': 'Details zum Angebot',
+    'Quotation Details': 'Angebotsdetails',
     Orders: 'Aufträge',
     Customers: 'Kunden',
     'EMAIL ID': 'EMAIL-ADRESSE',
@@ -872,11 +872,11 @@ module.exports = {
     'No articles yet. Please click the button above to add new':
       'Noch keine Artikel vorhanden. Bitte klicken Sie auf die Schaltfläche oben, um neue Artikel hinzuzufügen',
     'No priority technicians have been added yet!':
-      'Es wurden noch keine vorrangigen Techniker hinzugefügt!',
+      'Es sind noch keine prioritäts Techniker hinzugefügt worden!',
     'No note as been added yet!': 'Es wurde noch keine Notiz hinzugefügt!',
     'No picture has been added yet!': 'Es wurde noch kein Bild hinzugefügt!',
     'No document has been attached yet!':
-      'Es wurde noch kein Dokument beigefügt!',
+      'Es wurde noch kein Dokument hinzugefügt!',
     'Add Invoice': 'Rechnung hinzufügen',
 
     Logout: 'Ausloggen',
