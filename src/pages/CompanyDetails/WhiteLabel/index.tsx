@@ -73,11 +73,7 @@ export const WhiteLabel = ({containerStyles, company}: Props) => {
   return (
     <InfoCard
       containerStyles={{...containerStyles}}
-      header={
-        <Typography variant="subtitle1">
-          {t('Whitelabel Information')}
-        </Typography>
-      }
+      header={<Typography variant="subtitle1">{t('Company Logo')}</Typography>}
       showHeaderBackground>
       <>
         {(!logoCompany || showUploadForm) && (
@@ -96,12 +92,12 @@ export const WhiteLabel = ({containerStyles, company}: Props) => {
               acceptedFileTypes="image/*"
               maxFiles={1}
               isCropped
-              cropperTitle="Upload Whitelabel Information"
+              cropperTitle={t('Upload Company Logo')}
             />
             {logoCompany && (
               <Box display="flex" alignItems="center" flexDirection="column">
                 <Button
-                  label="Cancel upload image"
+                  label={t('Cancel')}
                   buttonProps={{
                     variant: 'outlined',
                     onClick: () => setShowUploadForm(false),
@@ -150,7 +146,7 @@ export const WhiteLabel = ({containerStyles, company}: Props) => {
               </Box>
             </Box>
             <Button
-              label="Replace Image"
+              label={t('Replace Image')}
               buttonProps={{
                 variant: 'outlined',
                 onClick: () => setShowUploadForm(true),

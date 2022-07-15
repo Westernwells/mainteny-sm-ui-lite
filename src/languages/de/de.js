@@ -332,6 +332,9 @@ module.exports = {
     'Edit Attachments': 'Anhänge bearbeiten',
     'JPEG, PNG, BMP, GIF, WEBP, SVG only': 'Nur JPEG, PNG, BMP, GIF, WEBP, SVG',
     'JPG, PNG or BMP only': 'Nur JPG, PNG oder BMP',
+    'Company Logo': 'Firmenlogo',
+    'Upload Company Logo': 'Firmenlogo hochladen',
+    'Replace Image': 'Bild ersetzen',
     'Drag to reposition picture': 'Ziehen, um das Bild neu zu positionieren',
     'File size less than 5MB only':
       'Nur Dateien mit einer Größe von maximal 5 MB',
