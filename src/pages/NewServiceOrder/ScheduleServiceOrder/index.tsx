@@ -11,7 +11,8 @@ import {Priority, ServiceOrderType} from 'models/service-order';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmployeesView} from 'models/employee';
 import {QuotationView} from 'models/quotation';
-import {formatDate, setDateTime, toRestDateTime} from 'utils/datetime';
+import {useFormatDate} from 'hooks/useFormatDate';
+import {setDateTime, toRestDateTime} from 'utils/datetime';
 import {useNavigate} from 'react-router';
 import {AddDescription} from '../AddDescription';
 import {SelectTechnicians} from '../SelectTechnicians';
@@ -34,6 +35,7 @@ interface Props {
 }
 
 export const ScheduleServiceOrder = ({type, quotation}: Props) => {
+  const formatDate = useFormatDate();
   const [activeStep, setActiveStep] = useState(0);
   const [selectedUnit, setSelectedUnit] = useState<ElevatorView>();
   const [disableNextBtn, setDisableNextBtn] = useState(false);
@@ -125,10 +127,10 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
     let dateString;
     let timeString;
     if (selectedRadioOption === RadioOptions.DUE_DATE) {
-      dateString = formatDate(dueDateFormValue?.date!, 'dd.MM.yyy');
+      dateString = formatDate(dueDateFormValue?.date!);
     }
     if (selectedRadioOption === RadioOptions.SCHEDULE_TECHNICIAN) {
-      dateString = formatDate(scheduleFormValue?.date!, 'dd.MM.yyy');
+      dateString = formatDate(scheduleFormValue?.date!);
       timeString = `${formatDate(
         scheduleFormValue?.startTime!,
         'HH:mm',

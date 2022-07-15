@@ -4,7 +4,7 @@ import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {StatusChip} from 'components/StatusChip';
 import {useServiceOrderDetails} from 'hooks/reactQuery/useServiceOrder';
-import {formatDate} from 'utils/datetime';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
@@ -15,6 +15,7 @@ interface Props {
 }
 
 export const ServiceOrderDetails = ({serviceOrderId}: Props) => {
+  const formatDate = useFormatDate();
   const {data: serviceOrder, isLoading} =
     useServiceOrderDetails(serviceOrderId);
 
