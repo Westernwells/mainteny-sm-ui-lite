@@ -158,7 +158,7 @@ module.exports = {
     'New Unit': 'Neue Anlage',
     'Clear all': 'Alle löschen',
     'Customer ': 'Kunde',
-    No: 'Nein',
+    No: 'Po',
     'This week': 'Diese Woche',
     'Next week': 'Nächste Woche',
     'Next month': 'Nächster Monat',
@@ -656,7 +656,7 @@ module.exports = {
     'Service Order': 'Auftrag',
     'Select Order': 'Auftrag auswählen',
     search: 'suche',
-    'Date Created': 'Erstellungsdatum',
+    'Date Created': 'Datum der Erstellung',
     'Created By': 'Erstellt von',
     'Invoice Type': 'Rechnungsart',
     'Due Date *': 'Fälligkeitsdatum *',
@@ -707,7 +707,7 @@ module.exports = {
     'Add Quotation': 'Angebot hinzufügen',
     'Select Unit': 'Einheit wählen',
     Duplicate: 'Duplizieren',
-    'Quotation Details': 'Details zum Angebot',
+    'Quotation Details': 'Angebotsdetails',
     Orders: 'Aufträge',
     Customers: 'Kunden',
     'EMAIL ID': 'EMAIL-ADRESSE',
@@ -719,6 +719,7 @@ module.exports = {
     'Do you want to delete this Quotation?':
       'Möchten Sie das Angebot wirklich löschen?',
     'INVOICE TYPE': 'RECHNUNGSART',
+    SUBJECT: 'BETREFF',
 
     // Customer
 
@@ -889,11 +890,11 @@ module.exports = {
     'No articles yet. Please click the button above to add new':
       'Noch keine Artikel vorhanden. Bitte klicken Sie auf die Schaltfläche oben, um neue Artikel hinzuzufügen',
     'No priority technicians have been added yet!':
-      'Es wurden noch keine vorrangigen Techniker hinzugefügt!',
+      'Es sind noch keine prioritäts Techniker hinzugefügt worden!',
     'No note as been added yet!': 'Es wurde noch keine Notiz hinzugefügt!',
     'No picture has been added yet!': 'Es wurde noch kein Bild hinzugefügt!',
     'No document has been attached yet!':
-      'Es wurde noch kein Dokument beigefügt!',
+      'Es wurde noch kein Dokument hinzugefügt!',
     'Add Invoice': 'Rechnung hinzufügen',
 
     Logout: 'Ausloggen',
