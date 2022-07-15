@@ -17,6 +17,7 @@ interface Props {
   inputLabelProps?: InputLabelProps;
   reset?: boolean;
   getReset?: (reset: boolean) => void;
+  required?: boolean;
 }
 
 export const DatePicker = ({
@@ -29,6 +30,7 @@ export const DatePicker = ({
   inputLabelProps,
   reset = false,
   getReset = () => {},
+  required,
 }: Props) => {
   const [value, setValue] = useState<Date | null>(defaultDate);
 
@@ -65,6 +67,7 @@ export const DatePicker = ({
               props={{
                 ...params,
                 size: 'small',
+                required,
                 ...textFieldProps,
                 onKeyDown: (e) => {
                   e.preventDefault();

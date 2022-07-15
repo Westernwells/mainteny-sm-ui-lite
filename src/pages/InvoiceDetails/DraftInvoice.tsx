@@ -170,7 +170,11 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
   }, [invoice]);
 
   useEffect(() => {
-    if (serviceOrder && formik.values.type !== InvoiceType.PARTIAL) {
+    if (
+      !invoice &&
+      serviceOrder &&
+      formik.values.type !== InvoiceType.PARTIAL
+    ) {
       setCustomer(serviceOrder.elevator.propertyOwner);
 
       formik.setFieldValue(
@@ -198,7 +202,7 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
         );
         setInvoiceItems(items);
       }
-    } else if (formik.values.type !== InvoiceType.PARTIAL) {
+    } else if (!invoice && formik.values.type !== InvoiceType.PARTIAL) {
       setInvoiceItems([]);
     }
   }, [serviceOrder, formik.values.type]);
@@ -354,9 +358,10 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
               if (newValue) setDueDate(newValue);
             }}
             textFieldProps={{
-              label: 'Due Date *',
+              label: 'Due Date',
               InputLabelProps: {shrink: true},
             }}
+            required
           />
         </Box>
 

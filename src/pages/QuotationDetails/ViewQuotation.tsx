@@ -187,10 +187,12 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
           maxWidth: 'xs',
           open: isOrderDialogOpen || false,
         }}>
-        <CreateServiceOrder
-          value={formik.values.createServiceOrder}
-          onChange={formik.handleChange}
-        />
+        <Box mt=".5em" mb="5em">
+          <CreateServiceOrder
+            value={formik.values.createServiceOrder}
+            onChange={formik.handleChange}
+          />
+        </Box>
       </Dialog>
     </Box>
   );
