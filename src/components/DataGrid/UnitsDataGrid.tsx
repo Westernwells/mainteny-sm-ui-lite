@@ -6,8 +6,9 @@ import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {ElevatorView} from 'models/elevator';
+import {FormatDate} from 'models/misc';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {formatDate} from 'utils/datetime';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {NoRowsEmptySection} from './NoRowsEmptySection';
 import {styles} from './style';
 
@@ -48,7 +49,10 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = (elevators: ElevatorView[]): GridRowsProp =>
+export const makeRows = (
+  elevators: ElevatorView[],
+  formatDate: FormatDate = () => '',
+): GridRowsProp =>
   elevators
     ? elevators.map((item, index) => ({
         id: index,
@@ -65,6 +69,7 @@ export const makeRows = (elevators: ElevatorView[]): GridRowsProp =>
 const pageSize = 25;
 
 export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
+  const formatDate = useFormatDate();
   const [search, setSearch] = useState(searchCustomer || '');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -86,7 +91,7 @@ export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
 
   useEffect(() => {
     if (elevatorResource.data.length) {
-      setRows(makeRows(elevatorResource.data));
+      setRows(makeRows(elevatorResource.data, formatDate));
     } else {
       setRows([]);
     }

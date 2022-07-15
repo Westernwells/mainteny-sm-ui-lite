@@ -6,6 +6,7 @@ import {PageListingLayout} from 'components/PageListingLayout';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
@@ -20,6 +21,7 @@ const pageSize = 13;
 
 export const Companies = () => {
   const navigate = useNavigate();
+  const formatDate = useFormatDate();
   const [search, setSearch] = useState('');
   const [queryParams, setQueryParams] = useSearchParams();
   const totalCompaniesRef = useRef(0);
@@ -61,7 +63,7 @@ export const Companies = () => {
 
   useEffect(() => {
     if (!isLoading) {
-      setRows(makeRows(companiesResource.data));
+      setRows(makeRows(companiesResource.data, formatDate));
     }
   }, [companiesResource, isLoading]);
 

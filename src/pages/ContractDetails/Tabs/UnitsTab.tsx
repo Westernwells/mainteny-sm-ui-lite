@@ -6,6 +6,7 @@ import {makePage} from 'utils/paging-utils';
 import {TabContentContainer} from 'components/TabContentContainer';
 import {EmptySection} from 'components/EmptySection';
 import {useNavigate} from 'react-router';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {ContractElevatorSimpleView} from 'models/contract';
 import {ElevatorView} from 'models/elevator';
 import {columns, makeRows} from './UnitsDataGridProps';
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export const UnitsTab: FC<Props> = ({elevators}) => {
+  const formatDate = useFormatDate();
   const navigate = useNavigate();
   const [page, setPage] = useState(makePage(0, 25)); // TODO: implement paging
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -23,17 +25,18 @@ export const UnitsTab: FC<Props> = ({elevators}) => {
   useEffect(() => {
     if (elevators.length) {
       setRows(
-        makeRows({
-          elevators: elevators.map(
-            (elevator) =>
-              ({
-                ...elevator.elevator,
-              } as ElevatorView),
-          ),
-        }),
+        makeRows(
+          {
+            elevators: elevators.map(
+              (elevator) =>
+                ({
+                  ...elevator.elevator,
+                } as ElevatorView),
+            ),
+          },
+          formatDate,
+        ),
       );
-    } else {
-      setRows([]);
     }
   }, [elevators]);
 

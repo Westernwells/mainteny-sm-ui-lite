@@ -14,12 +14,8 @@ import {
   startOfDay,
   subDays,
 } from 'date-fns';
-import {
-  formatDate,
-  getDateObject,
-  getEndOfWeek,
-  getStartOfWeek,
-} from 'utils/datetime';
+import {getDateObject, getEndOfWeek, getStartOfWeek} from 'utils/datetime';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {useTranslation} from 'react-i18next';
 import {ScheduleContainer} from 'components/Schedules/ScheduleContainer';
 import {ScheduleHeader} from 'components/Schedules/ScheduleHeader';
@@ -87,6 +83,7 @@ export const Schedule = ({
   technicians,
   checkedValues = [],
 }: Props) => {
+  const formatDate = useFormatDate();
   const {t} = useTranslation();
   const theme = useTheme();
   const [tableHeader, setTableHeader] = useState<string[]>([]);

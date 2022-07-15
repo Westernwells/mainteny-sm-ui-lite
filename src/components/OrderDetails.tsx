@@ -6,7 +6,7 @@ import Close from '@mui/icons-material/Close';
 import AccessTimeFilled from '@mui/icons-material/AccessTimeFilled';
 import LocationOn from '@mui/icons-material/LocationOn';
 import {useNavigate} from 'react-router';
-import {formatDate} from 'utils/datetime';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {ServiceOrderView} from 'models/service-order';
 import useTheme from '@mui/material/styles/useTheme';
 import {Button} from './Button';
@@ -18,10 +18,11 @@ export interface Props {
 
 export const OrderDetails = ({order, close}: Props) => {
   const navigate = useNavigate();
+  const formatDate = useFormatDate();
   const theme = useTheme();
   const startTime = formatDate(order.schedules[0].startTime, 'HH:mm');
   const endTime = formatDate(order.schedules[0].endTime, 'HH:mm');
-  const date = formatDate(order.schedules[0].startTime, 'dd MMMM');
+  const date = formatDate(order.schedules[0].startTime);
   const day = formatDate(order.schedules[0].startTime, 'cccc');
 
   const basic = (

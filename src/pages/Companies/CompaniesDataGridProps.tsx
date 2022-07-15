@@ -1,7 +1,7 @@
 import {GridColDef} from '@mui/x-data-grid';
 import {getColumnProps} from 'components/DataGridLayout';
+import {FormatDate} from 'models/misc';
 import {ServiceCompanyItem} from 'models/service-company';
-import {formatDate} from 'utils/datetime';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -42,7 +42,10 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = (companies: ServiceCompanyItem[]) =>
+export const makeRows = (
+  companies: ServiceCompanyItem[],
+  formatDate: FormatDate = () => '',
+) =>
   companies
     ? companies.map((item, index) => ({
         id: index,

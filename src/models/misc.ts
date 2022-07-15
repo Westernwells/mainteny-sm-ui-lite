@@ -265,3 +265,8 @@ export interface CacheTypesParams {
   pageIndex: number;
   query: string;
 }
+
+export type FormatDate = (
+  input?: string | Date | undefined,
+  dateFormat?: string | undefined,
+) => string | undefined;
