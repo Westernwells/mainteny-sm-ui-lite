@@ -61,7 +61,6 @@ interface Props {
 }
 
 const gridWidth = 200;
-const dateFormat = 'dd MMMM yy';
 
 export const Schedule = ({
   getWeekPair,
@@ -101,11 +100,11 @@ export const Schedule = ({
       end: weekPair.endOfWeekDay,
     }),
   );
-  weekInterval.map((item) => formatDate(item, dateFormat));
+  weekInterval.map((item) => formatDate(item));
 
   const [lookupDate, setLookupDate] = useState<any>(
     _.groupBy(
-      weekInterval.map((item) => formatDate(item, dateFormat)),
+      weekInterval.map((item) => formatDate(item)),
       (item) => item,
     ),
   );
@@ -161,7 +160,7 @@ export const Schedule = ({
     if (tableHeader.length) {
       if (scheduleType === 'date') {
         const result = weekInterval.map((item) => {
-          const key = formatDate(item, dateFormat);
+          const key = formatDate(item);
           return {[key!]: tableHeader};
         });
         setBodyRow(result);
@@ -188,7 +187,7 @@ export const Schedule = ({
   useEffect(() => {
     setLookupDate(
       _.groupBy(
-        weekInterval.map((item) => formatDate(item, dateFormat)),
+        weekInterval.map((item) => formatDate(item)),
         (item) => item,
       ),
     );

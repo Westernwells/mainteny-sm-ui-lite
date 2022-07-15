@@ -3,7 +3,6 @@ import {useQueryServiceOrderScheduled} from 'hooks/reactQuery/useServiceOrder';
 import * as _ from 'lodash';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {
-  formatDate,
   getDateObject,
   getEndOfWeek,
   getStartOfWeek,
@@ -20,14 +19,14 @@ import {WeekPair} from 'models/misc';
 import {OrderDetails} from 'components/OrderDetails';
 import {FlexContainer} from 'components/FlexContainer';
 import {sortOrderByTime} from 'utils/service-order-utils';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   technicianId?: string;
 }
 
-const dateFormat = 'dd MMMM yy';
-
 export const ScheduleTab = ({technicianId}: Props) => {
+  const formatDate = useFormatDate();
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();
   const [weekPair, setWeekPair] = useState<WeekPair>({
     startOfWeekDay: getStartOfWeek(new Date(), 1),
@@ -52,10 +51,7 @@ export const ScheduleTab = ({technicianId}: Props) => {
   useEffect(() => {
     const sortedOrder = sortOrderByTime(serviceOrders.data);
     const ordersByDate = _.groupBy(sortedOrder, (serviceOrder) =>
-      formatDate(
-        getDateObject(serviceOrder.schedules[0].startTime),
-        dateFormat,
-      ),
+      formatDate(getDateObject(serviceOrder.schedules[0].startTime)),
     );
 
     setOrders(ordersByDate);
