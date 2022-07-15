@@ -1,9 +1,9 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
-import {formatDate} from 'utils/datetime';
 import {ContractView} from 'models/contract';
 import {useTranslation} from 'react-i18next';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   contractDetails?: ContractView;
@@ -15,6 +15,7 @@ export const ContractTimeline = ({
   unUsedContractDays,
 }: Props) => {
   const {t} = useTranslation();
+  const formatDate = useFormatDate();
   const theme = useTheme();
 
   return (
@@ -37,7 +38,7 @@ export const ContractTimeline = ({
         <Box>
           <Typography variant="subtitle1">{t('Contract ends')}</Typography>
           <Typography variant="body1">
-            {formatDate(contractDetails?.endTime, 'dd MMM YYY')}
+            {formatDate(contractDetails?.endTime)}
           </Typography>
         </Box>
       </Box>

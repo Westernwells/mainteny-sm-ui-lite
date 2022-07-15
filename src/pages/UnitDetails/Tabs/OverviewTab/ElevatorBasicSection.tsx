@@ -2,15 +2,14 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {StatusChip} from 'components/StatusChip';
 import {CardAlert} from 'components/CardAlert';
-import {formatDistance} from 'date-fns';
 import {PageCard} from 'components/PageCard';
 import useTheme from '@mui/material/styles/useTheme';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import {convertToText} from 'utils/utils';
+import {useFormatDate} from 'hooks/useFormatDate';
+import {useFormatDateDistance} from 'hooks/useFormatDateDistance';
 import {Elevator, ElevatorStatus} from '../../../../models/elevator';
 import {ServiceOrder, ServiceOrderView} from '../../../../models/service-order';
-import {formatDate} from '../../../../utils/datetime';
-
 import {calculateNextVisitDate} from '../../../Units/Models';
 
 export interface ElevatorBasicSectionProp {
@@ -24,6 +23,8 @@ export const ElevatorBasicSection = ({
   serviceOrder,
   rows,
 }: ElevatorBasicSectionProp) => {
+  const formatDate = useFormatDate();
+  const formatDistance = useFormatDateDistance();
   const theme = useTheme();
   return (
     <PageCard headerLabel="Unit Details" minHeight="30rem">
@@ -108,11 +109,9 @@ export const ElevatorBasicSection = ({
           message={`Upcoming visit in 
         ${formatDistance(
           calculateNextVisitDate(serviceOrder.schedules[0].startTime),
-          new Date(),
         )}
         (${formatDate(
           calculateNextVisitDate(serviceOrder.schedules[0].startTime),
-          'dd MMM YYY',
         )})`}
         />
       )}

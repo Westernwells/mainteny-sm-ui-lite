@@ -3,10 +3,11 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import {formatDate, getDateObject} from 'utils/datetime';
+import {getDateObject} from 'utils/datetime';
 import CardHeader from '@mui/material/CardHeader';
 import {useTheme} from '@mui/material/styles';
 import {styles as sx} from 'components/Schedules/styles';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   containerStyles?: {[key: string]: any};
@@ -30,6 +31,7 @@ export const ContainerCard = ({
   children,
 }: Props) => {
   const theme = useTheme();
+  const formatDate = useFormatDate();
   const elementRef = useRef<HTMLInputElement | undefined>();
 
   useEffect(() => {

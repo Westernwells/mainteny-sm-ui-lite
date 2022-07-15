@@ -7,6 +7,7 @@ import {getDataGridHeight} from 'utils/utils';
 import {InfoCard} from 'components/InfoCard';
 import {GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {EmptySection} from 'components/EmptySection';
 import {ServiceOrderView} from 'models/service-order';
 import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export const Quotation = ({serviceOrder}: Props) => {
+  const formatDate = useFormatDate();
   const {t} = useTranslation();
   const [rows, setRows] = useState<GridRowsProp>([]);
   let totalQuotationRef = useRef(0).current;
@@ -29,7 +31,7 @@ export const Quotation = ({serviceOrder}: Props) => {
   totalQuotationRef = totalQuotationRef || quotation ? 1 : 0;
 
   useEffect(() => {
-    if (quotation) setRows(makeRows([quotation]));
+    if (quotation) setRows(makeRows([quotation], formatDate));
   }, [quotation]);
 
   const renderNoRowsSection = () => (

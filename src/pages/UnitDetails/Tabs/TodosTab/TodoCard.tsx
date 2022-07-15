@@ -11,7 +11,7 @@ import {Dialog} from 'components/Dialog';
 import {Confirm} from 'components/Confirm';
 import {useDeleteTodo, useUpdateTodo} from 'hooks/reactQuery/useElevator';
 import {ElevatorComment, ElevatorCommentRecord} from 'models/elevator';
-import {formatDate} from 'utils/datetime';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {EditTodoForm} from './EditTodoForm';
 
 interface Props {
@@ -19,6 +19,7 @@ interface Props {
 }
 
 export const TodoCard = ({todo}: Props) => {
+  const formatDate = useFormatDate();
   const {t} = useTranslation();
   const {mutate: deleteTodo} = useDeleteTodo();
   const {mutate: updateTodo} = useUpdateTodo();

@@ -1,5 +1,5 @@
-import Box from '@mui/material/Box';
 import {useTranslation} from 'react-i18next';
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
 import {GridCellParams, GridRowsProp} from '@mui/x-data-grid';
@@ -12,6 +12,7 @@ import {ElevatorView} from 'models/elevator';
 import {useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {Progress} from 'components/Progress';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {columns, makeRows} from './UnitDataGridProps';
 
 interface Props {
@@ -23,6 +24,7 @@ const pageInfo = makePage(0, 10);
 
 export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
   const {t} = useTranslation();
+  const formatDate = useFormatDate();
   const theme = useTheme();
   const [search, setSearch] = useState('');
   const totalUnitsRef = useRef(0);
@@ -46,7 +48,7 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
 
   useEffect(() => {
     if (!isLoading) {
-      setRows(makeRows(elevatorResponse.data));
+      setRows(makeRows(elevatorResponse.data, formatDate));
     }
   }, [elevatorResponse, isLoading]);
 

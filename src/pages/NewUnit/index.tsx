@@ -2,6 +2,7 @@ import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {FormikErrors} from 'formik';
 import {useAddElevator} from 'hooks/reactQuery/useElevator';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {ElevatorStatus} from 'models/elevator';
 import {Priority} from 'models/misc';
 import {PropertyOwnerView} from 'models/propertyManager';
@@ -14,7 +15,6 @@ import {
 } from 'models/unitForm';
 import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router';
-import {formatDate} from 'utils/datetime';
 import {convertToMacro} from 'utils/utils';
 import {AppointmentPreferenceForm} from './AppointmentPreferenceForm';
 import {CustomerForm} from './CustomerForm';
@@ -31,6 +31,7 @@ const steps = [
 ];
 
 export const NewUnit = () => {
+  const formatDate = useFormatDate();
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
 

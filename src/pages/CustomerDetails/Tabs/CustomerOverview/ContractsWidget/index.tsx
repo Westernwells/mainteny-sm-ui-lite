@@ -14,6 +14,7 @@ import {ContractOrderField, ContractView} from 'models/contract';
 import {Order} from 'models/misc';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {padNumber} from 'utils/utils';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {columns, makeRows} from './ContractsWidgetDataGridProps';
 
 interface Props {
@@ -28,6 +29,7 @@ export const ContractsWidget = ({
   openTab,
 }: Props) => {
   const {t} = useTranslation();
+  const formatDate = useFormatDate();
   const navigate = useNavigate();
   const [contractQuery, setContractQuery] = useState('');
   const [page, setPage] = useState(makePage(0, 500));
@@ -52,7 +54,7 @@ export const ContractsWidget = ({
     customerId,
   );
   useEffect(() => {
-    setRows(makeRows(contractResource));
+    setRows(makeRows(contractResource, formatDate));
     setPageCount(Math.ceil(contractResource.total / page.pageSize));
     if (getTotalContracts) {
       getTotalContracts(contractResource.total);

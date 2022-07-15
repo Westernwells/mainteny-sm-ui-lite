@@ -24,12 +24,14 @@ import {
 } from 'utils/utils';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {columns, makeRows} from './QuotationsDataGridProps';
 
 const pageSize = 25;
 
 export const Quotations = () => {
   const navigate = useNavigate();
+  const formatDate = useFormatDate();
 
   const [search, setSearch] = useState('');
   const totalQuotationsRef = useRef(0);
@@ -67,7 +69,7 @@ export const Quotations = () => {
 
   useEffect(() => {
     if (!isLoading) {
-      setRows(makeRows(quotationsResource));
+      setRows(makeRows(quotationsResource, formatDate));
     }
   }, [quotationsResource, isLoading]);
 

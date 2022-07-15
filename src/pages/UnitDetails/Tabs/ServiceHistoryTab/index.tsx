@@ -15,6 +15,7 @@ import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {DataGridLayout} from 'components/DataGridLayout';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {
   serviceOrderStatusToString,
   serviceOrderTypeToEnum,
@@ -35,6 +36,7 @@ const serviceOrderStatusMap = {
 type serviceOrderStatusMapKey = keyof typeof serviceOrderStatusMap;
 
 export const ServiceHistoryTab = () => {
+  const formatDate = useFormatDate();
   const {id: elevatorId} = useParams();
   const navigate = useNavigate();
 
@@ -66,7 +68,7 @@ export const ServiceHistoryTab = () => {
 
   useEffect(() => {
     if (serviceOrdersResource.data.length) {
-      setRows(makeRows(serviceOrdersResource.data));
+      setRows(makeRows(serviceOrdersResource.data, formatDate));
     } else {
       setRows([]);
     }

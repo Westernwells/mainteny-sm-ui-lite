@@ -14,10 +14,11 @@ import {CardProps} from 'components/CardProps';
 import {InfoCard} from 'components/InfoCard';
 import {StatusChip} from 'components/StatusChip';
 import {addDays} from 'date-fns';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {useTranslation} from 'react-i18next';
-import {formatDate} from 'utils/datetime';
 
 export const UnitDetails = () => {
+  const formatDate = useFormatDate();
   const theme = useTheme();
   const {t} = useTranslation();
 

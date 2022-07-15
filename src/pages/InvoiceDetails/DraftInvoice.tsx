@@ -38,8 +38,8 @@ import {
   PropertyOwnerView,
 } from 'models/propertyManager';
 import {Amount, WithOptional} from 'models/misc';
-import {formatDate} from 'utils/datetime';
 import {convertToText} from 'utils/utils';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   invoice?: InvoiceView;
@@ -56,6 +56,7 @@ const dateToString = (date: Date) => date.toISOString().split('T')[0];
 
 export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
   const {t} = useTranslation();
+  const formatDate = useFormatDate();
   const navigate = useNavigate();
 
   const {user} = useUserSession();

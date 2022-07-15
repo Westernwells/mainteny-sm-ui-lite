@@ -6,7 +6,7 @@ import {
 } from 'hooks/reactQuery/useServiceOrder';
 import * as _ from 'lodash';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {getWhen, toRestDateTime} from 'utils/datetime';
+import {toRestDateTime} from 'utils/datetime';
 import {
   ServiceOrderStatus,
   ServiceOrderType,
@@ -39,10 +39,12 @@ import {
   serviceOrderTypeToEnum,
 } from 'utils/service-order-utils';
 import Typography from '@mui/material/Typography';
+import {useWhen} from 'hooks/useWhen';
 import {UnAssignedServiceOrders} from './UnAssigedServiceOrder';
 
 export const ServiceOrderScheduleTab = () => {
   const {t} = useTranslation();
+  const getWhen = useWhen();
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();
   const [technicianSearch, setTechnicianSearch] = useState('');
   const [orders, setOrders] = useState<{[key: string]: ServiceOrderView[]}>({});
@@ -168,7 +170,7 @@ export const ServiceOrderScheduleTab = () => {
         <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
       </Box>
       <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
-        {t(`${getWhen(currentDate, 'dd.MM.yyyy')}`)}
+        {t(`${getWhen(currentDate)}`)}
       </Typography>
       <Box onClick={() => nextDay()} sx={{cursor: 'pointer'}}>
         <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />

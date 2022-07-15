@@ -3,9 +3,10 @@ import {FormSelect} from 'components/form/FormSelect';
 import {TimePicker} from 'components/TimePicker';
 import {FormikProps} from 'formik';
 import {AppointmentFormModel} from 'models/unitForm';
-import {formatDate, setDateTime} from 'utils/datetime';
+import {setDateTime} from 'utils/datetime';
 import Grid from '@mui/material/Grid';
 import {useTranslation} from 'react-i18next';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   formik: FormikProps<AppointmentFormModel>;
@@ -22,6 +23,7 @@ const daysOfWeekOptions = {
 };
 
 export const EditAppointmentForm = ({formik}: Props) => {
+  const formatDate = useFormatDate();
   const {t} = useTranslation();
   return (
     <Grid container spacing={2} sx={{mt: '0.5em'}} component="form">

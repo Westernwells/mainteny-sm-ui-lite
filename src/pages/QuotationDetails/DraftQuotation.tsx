@@ -34,13 +34,14 @@ import {
   PropertyOwnerView,
 } from 'models/propertyManager';
 import {WithOptional} from 'models/misc';
-import {formatDate} from 'utils/datetime';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   quotation?: QuotationView;
 }
 
 export const DraftQuotation = ({quotation}: Props) => {
+  const formatDate = useFormatDate();
   const {t} = useTranslation();
   const navigate = useNavigate();
 

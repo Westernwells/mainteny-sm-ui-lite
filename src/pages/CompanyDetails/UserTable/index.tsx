@@ -9,6 +9,7 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {EmptySection} from 'components/EmptySection';
 import {InfoCard} from 'components/InfoCard';
 import {Dialog} from 'components/Dialog';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {
   useEmployeeAccount,
   useQueryUserAccounts,
@@ -28,6 +29,7 @@ interface Props {
 const pageSize = 5;
 
 export const UserTable = ({companyId}: Props) => {
+  const formatDate = useFormatDate();
   const {t} = useTranslation();
   const [page, setPage] = useState(makePage(0, pageSize));
   const [pageCount, setPageCount] = useState(0);
@@ -95,7 +97,7 @@ export const UserTable = ({companyId}: Props) => {
     );
 
   useEffect(() => {
-    setRows(makeRows(userAccountResource.data));
+    setRows(makeRows(userAccountResource.data, formatDate));
     setPageCount(Math.ceil(userAccountResource.total / page.pageSize));
   }, [userAccountResource, page.pageSize]);
 

@@ -14,6 +14,7 @@ import {
 } from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
 import {useSnackbar} from 'notistack';
+// import { useUserSession } from './useUserSession';
 
 export const getCompanies = async (page: Page, query: string) => {
   const response = await axiosClient.get<Resource<ServiceCompanyItem>>(
@@ -66,6 +67,7 @@ const updateCompany = async (
 
 export const useUpdateCompany = (successMsg?: string) => {
   const {enqueueSnackbar} = useSnackbar();
+  // const {updateUser} = useUserSession();
   const queryClient = useQueryClient();
 
   return useMutation(

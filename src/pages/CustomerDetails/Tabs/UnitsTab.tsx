@@ -13,7 +13,7 @@ import {DatePicker} from 'components/DatePicker';
 import {ElevatorView} from 'models/elevator';
 import {Widget} from 'components/Widget';
 import {useQueryCustomerElevator} from 'hooks/reactQuery/useElevator';
-import {formatDate} from 'utils/datetime';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {columns, makeRows} from './CustomerUnitDataGrid';
 
 interface Props {
@@ -22,6 +22,7 @@ interface Props {
 
 export const UnitsTab = ({customerId}: Props) => {
   const navigate = useNavigate();
+  const formatDate = useFormatDate();
 
   const [page, setPage] = useState(makePage(0, 25));
   const totalUnitsRef = useRef(0);
@@ -72,9 +73,12 @@ export const UnitsTab = ({customerId}: Props) => {
   useEffect(() => {
     if (isFetched)
       setRows(
-        makeRows({
-          elevators: elevatorResource.data,
-        }),
+        makeRows(
+          {
+            elevators: elevatorResource.data,
+          },
+          formatDate,
+        ),
       );
   }, [elevatorResource]);
 

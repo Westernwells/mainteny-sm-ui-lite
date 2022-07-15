@@ -7,10 +7,10 @@ import {
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 import {ElevatorView} from 'models/elevator';
-import {formatDate} from 'utils/datetime';
 import Box from '@mui/material/Box';
 import {FormRadio} from 'components/form/FormRadio';
 import {useTranslation} from 'react-i18next';
+import {FormatDate} from 'models/misc';
 
 const defaultProps = {
   editable: false,
@@ -101,7 +101,10 @@ export const columns = (activeId: string): GridColDef[] => [
   },
 ];
 
-export const makeRows = (elevators: ElevatorView[]): GridRowsProp => {
+export const makeRows = (
+  elevators: ElevatorView[],
+  formatDate: FormatDate = () => '',
+): GridRowsProp => {
   const result =
     elevators.length &&
     elevators.map((elevator: ElevatorView) => ({

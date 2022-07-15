@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import ComputerIcon from '@mui/icons-material/Computer';
 import PersonIcon from '@mui/icons-material/Person';
 import {olStyles} from 'styles';
-import {formatDate} from 'utils/datetime';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {OrderInfoCard} from './OrderInfoCard';
 import {Quotation} from './Quotations';
 import {Invoices} from './Invoices';
@@ -26,6 +26,7 @@ interface Props {
 
 export const Overview = ({orderId}: Props) => {
   const theme = useTheme();
+  const formatDate = useFormatDate();
   const {data: serviceOrderDetails, isLoading} =
     useServiceOrderDetails(orderId);
   const {data: serviceOrderActivities = []} =
@@ -118,7 +119,7 @@ export const Overview = ({orderId}: Props) => {
           <Box sx={{height: '100%'}}>
             {serviceOrderActivities.map((activity, index) => {
               const dateString = new Date(activity.actionTime);
-              const date = formatDate(dateString, 'dd.MM.yyyy');
+              const date = formatDate(dateString);
               const time = formatDate(dateString, 'HH:mm');
               return (
                 <Timeline

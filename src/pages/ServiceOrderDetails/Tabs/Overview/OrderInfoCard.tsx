@@ -18,7 +18,7 @@ import {
   ServiceOrderView,
 } from 'models/service-order';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
-import {formatDate, setDateTime, toRestDateTime} from 'utils/datetime';
+import {setDateTime, toRestDateTime} from 'utils/datetime';
 import {ScheduleForm} from 'pages/ServiceOrderDetails/models';
 import {FormikErrors} from 'formik';
 import {StatusChip} from 'components/StatusChip';
@@ -29,6 +29,7 @@ import {
 import {MenuBtn} from 'components/MenuBtn';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {olStyles} from 'styles';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {ScheduleDialog} from './ScheduleDialog';
 import {MarkCompletedDialog} from './MarkCompletedDialog';
 import {OrderInfo} from './schema';
@@ -48,6 +49,7 @@ const orderInfo = [
 
 export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const {t} = useTranslation();
+  const formatDate = useFormatDate();
   const {mutate: cancelServiceOrder} = useCancelServiceOrders();
   const {mutate: unscheduleServiceOrder} = useUnscheduleServiceOrders();
   const {mutate: rescheduleServiceOrder} = useRedispatchServiceOrders(

@@ -8,7 +8,8 @@ import {getColumnProps} from 'components/DataGridLayout';
 import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
 import {convertToText} from 'utils/utils';
-import {formatDate, toDate} from '../../utils/datetime';
+import {FormatDate} from 'models/misc';
+import {toDate} from '../../utils/datetime';
 import {Actions} from './Actions';
 
 export const getInvoiceStatusStyles = (
@@ -116,7 +117,10 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = (invoices: InvoiceView[]): GridRowsProp =>
+export const makeRows = (
+  invoices: InvoiceView[],
+  formatDate: FormatDate = () => '',
+): GridRowsProp =>
   invoices.length
     ? invoices.map((item, index: number) => ({
         id: index,

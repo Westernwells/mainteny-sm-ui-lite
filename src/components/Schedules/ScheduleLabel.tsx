@@ -2,9 +2,9 @@ import {ChangeEvent, useCallback} from 'react';
 import {grey} from '@mui/material/colors';
 import Typography from '@mui/material/Typography';
 import {ServiceOrderView} from 'models/service-order';
-import {formatDate} from 'utils/datetime';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 import {useTranslation} from 'react-i18next';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   scheduleType?: 'date' | 'people' | 'default';
@@ -27,6 +27,7 @@ export const ScheduleLabel = ({
   id,
   checkedValues = [],
 }: Props) => {
+  const formatDate = useFormatDate();
   const {t} = useTranslation();
   const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     if (getCheckedValue) {

@@ -5,7 +5,8 @@ import useTheme from '@mui/material/styles/useTheme';
 
 import {Confirm} from 'components/Confirm';
 import {useDeleteAbsence} from 'hooks/reactQuery/useAbsence';
-import {convertAbsenceToNormal, getAbsenceDate} from 'utils/absence-utils';
+import {convertAbsenceToNormal} from 'utils/absence-utils';
+import {useAbsencedate} from 'hooks/useAbsenceDate';
 import {useTranslation} from 'react-i18next';
 
 type Props = {
@@ -29,6 +30,7 @@ const AbsenceTimeLine = ({
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
+  const getAbsenceDate = useAbsencedate();
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 

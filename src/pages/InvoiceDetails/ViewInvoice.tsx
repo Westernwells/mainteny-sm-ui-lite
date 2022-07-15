@@ -16,7 +16,6 @@ import {InvoiceStatus, InvoiceView} from 'models/invoice';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {PdfGenerationStatus} from 'models/misc';
 import {formatNetAmount} from 'utils/currency';
-import {formatDate} from 'utils/datetime';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {
@@ -28,6 +27,7 @@ import {
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import {Confirm} from 'components/Confirm';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   downloadUrl: string;
@@ -36,6 +36,7 @@ interface Props {
 
 export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
   const {t} = useTranslation();
+  const formatDate = useFormatDate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {mutate: publishInvoice} = usePublishInvoice();
   const {mutate: markAsPaid} = useInvoicePaymentStatus();

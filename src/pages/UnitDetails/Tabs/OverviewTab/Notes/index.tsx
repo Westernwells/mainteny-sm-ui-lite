@@ -15,12 +15,12 @@ import {
 import {EmptySection} from 'components/EmptySection';
 import {createEmptyResource} from 'utils/paging-utils';
 import {ElevatorComment} from 'models/elevator';
-import {formatDate} from 'utils/datetime';
 import {Dialog} from 'components/Dialog';
 import {useFormik} from 'formik';
 import {NotesFormModel} from 'models/unitForm';
 import {olStyles} from 'styles';
 import * as Yup from 'yup';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {Confirm} from 'components/Confirm';
 import {NotesForm} from './NotesForm';
 
@@ -38,6 +38,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export const Notes = ({elevatorId}: Props) => {
+  const formatDate = useFormatDate();
   const {t} = useTranslation();
   const theme = useTheme();
   const formik = useFormik<NotesFormModel>({

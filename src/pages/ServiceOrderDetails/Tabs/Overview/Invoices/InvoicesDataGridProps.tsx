@@ -2,10 +2,10 @@ import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 
 import {StatusChip} from 'components/StatusChip';
 import {getColumnProps} from 'components/DataGridLayout';
-// import {fetchDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {InvoiceStatus, InvoiceView} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
-import {formatDate, toDate} from 'utils/datetime';
+import {toDate} from 'utils/datetime';
+import {FormatDate} from 'models/misc';
 
 export const getInvoiceStatusStyles = (
   status: string,
@@ -72,7 +72,10 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = (invoices: InvoiceView[]): GridRowsProp =>
+export const makeRows = (
+  invoices: InvoiceView[],
+  formatDate: FormatDate = () => '',
+): GridRowsProp =>
   invoices.length
     ? invoices.map((item, index: number) => ({
         id: index,
