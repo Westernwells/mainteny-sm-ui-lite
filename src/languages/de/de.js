@@ -158,7 +158,7 @@ module.exports = {
     'New Unit': 'Neue Anlage',
     'Clear all': 'Alle löschen',
     'Customer ': 'Kunde',
-    No: 'Nein',
+    No: 'Po',
     'This week': 'Diese Woche',
     'Next week': 'Nächste Woche',
     'Next month': 'Nächster Monat',
@@ -638,7 +638,7 @@ module.exports = {
     'Service Order': 'Auftrag',
     'Select Order': 'Auftrag auswählen',
     search: 'suche',
-    'Date Created': 'Erstellungsdatum',
+    'Date Created': 'Datum der Erstellung',
     'Created By': 'Erstellt von',
     'Invoice Type': 'Rechnungsart',
     'Due Date *': 'Fälligkeitsdatum *',
@@ -701,6 +701,7 @@ module.exports = {
     'Do you want to delete this Quotation?':
       'Möchten Sie das Angebot wirklich löschen?',
     'INVOICE TYPE': 'RECHNUNGSART',
+    SUBJECT: 'BETREFF',
 
     // Customer
 

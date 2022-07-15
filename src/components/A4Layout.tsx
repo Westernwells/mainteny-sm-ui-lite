@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {SxProps, Theme} from '@mui/system';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useTranslation} from 'react-i18next';
 import {convertToText} from 'utils/utils';
 import {StatusChip} from './StatusChip';
 
@@ -41,6 +42,7 @@ export const A4Layout = ({
   status,
   containerStyle,
 }: Props) => {
+  const {t} = useTranslation();
   const {user} = useUserSession();
   return (
     <Box width="min(calc(1240px + 1.25em), 100%)" mx="auto" mb="8em" mt="1.5em">
@@ -71,7 +73,7 @@ export const A4Layout = ({
             {number && (
               <Box textAlign="end">
                 <Typography component="span" variant="caption">
-                  {placeholder} Number
+                  {t(`${placeholder} Number`)}
                 </Typography>
                 <Typography variant="subtitle1">{number}</Typography>
               </Box>
