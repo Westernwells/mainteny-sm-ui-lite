@@ -7,7 +7,6 @@ import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {Tabs} from 'components/Tab';
 import {TabsBody} from 'components/TabsBody';
-import {useFormatDate} from 'hooks/useFormatDate';
 import {UnitListingView} from './Tabs/UnitListingView';
 import {UnitMapsView} from './Tabs/UnitMapView';
 
@@ -26,8 +25,6 @@ export const MyUnits = () => {
   const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
   const [queryParams, setQueryParams] = useSearchParams();
-  const f = useFormatDate();
-  console.log(f);
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
