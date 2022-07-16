@@ -28,7 +28,6 @@ export const TopCard = ({
     <Grid
       container
       alignItems="center"
-      columnSpacing={1.5}
       padding="1.5rem"
       flexWrap="nowrap"
       bgcolor="#fff"
@@ -44,7 +43,7 @@ export const TopCard = ({
           <Icon sx={{color: iconColor}} fontSize="small" />
         </IconButton>
       </Grid>
-      <Grid item justifyContent="space-between">
+      <Grid item justifyContent="space-between" paddingLeft="0.75rem">
         <Typography
           variant="subtitle2"
           color={theme.palette.text.secondary}
