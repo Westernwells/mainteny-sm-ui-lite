@@ -96,6 +96,11 @@ export const languageMap: {[key: string]: string} = {
   'de-DE': 'de-de',
 };
 
+export const mapLanguageToLocale: {[key: string]: string} = {
+  'en-us': 'enUS',
+  'de-de': 'de',
+};
+
 export const getDataGridHeight = (
   currentTotal: number,
   maxItems: number,

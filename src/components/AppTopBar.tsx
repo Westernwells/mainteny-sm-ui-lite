@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import {useTranslation} from 'react-i18next';
-import Language from '@mui/icons-material/Language';
+import LanguageIcon from '@mui/icons-material/Language';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
 import useTheme from '@mui/material/styles/useTheme';
@@ -9,11 +9,13 @@ import i18n from 'i18n';
 import {useAuth} from 'hooks/useAuth';
 import {useEffect, useState} from 'react';
 import {axiosClient} from 'utils/axios-utils';
-import {useQueryClient} from 'react-query';
 import {Role} from 'models/user';
 import {convertToText, languageMap} from 'utils/utils';
 import {Mixpanel} from 'mixpanel/mixpanel';
+import {useQueryClient} from 'react-query';
 import {mixpanelEvents} from 'mixpanel/constants';
+import {Language} from 'models/misc';
+import {queryKeys} from 'reactQuery/constants';
 import {useUserSession} from '../hooks/reactQuery/useUserSession';
 import {MenuBtn} from './MenuBtn';
 import {BackAction} from './BackAction';
@@ -33,20 +35,31 @@ export const AppTopBar = ({
   const theme = useTheme();
   const [selectedLng, setSelectedLng] = useState('');
   const {signout} = useAuth();
-  const {user} = useUserSession();
-  const fullName = `${user?.userAccount.firstName} ${user?.userAccount.lastName}`;
+  const {user, updateUser} = useUserSession();
   const queryClient = useQueryClient();
+  const fullName = `${user?.userAccount.firstName} ${user?.userAccount.lastName}`;
 
   useEffect(() => {
-    const {language} = i18n;
-    setSelectedLng(language.split('-')[0].toUpperCase());
-  }, []);
+    if (user) {
+      const {language} = user.userAccount.serviceCompany;
+      axiosClient.defaults.headers.common.language = language;
+      i18n.changeLanguage(language);
+      setSelectedLng(language.split('-')[0].toUpperCase());
+      queryClient.invalidateQueries(queryKeys.serviceOrderActivity);
+    }
+  }, [user]);
 
-  const changeLanguage = (lang: string, label: string) => {
-    setSelectedLng(label);
-    i18n.changeLanguage(lang);
-    axiosClient.defaults.headers.common.language = languageMap[lang];
-    queryClient.resetQueries();
+  const changeLanguage = (lang: string) => {
+    updateUser({
+      ...user!,
+      userAccount: {
+        ...user!.userAccount,
+        serviceCompany: {
+          ...user!.userAccount.serviceCompany,
+          language: languageMap[lang] as Language,
+        },
+      },
+    });
   };
 
   const profileBtnLabel = () => (
@@ -96,16 +109,16 @@ export const AppTopBar = ({
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" mt={1} alignItems="center">
             <MenuBtn
-              startIcon={<Language sx={{color: '#231F20'}} />}
+              startIcon={<LanguageIcon sx={{color: '#231F20'}} />}
               label={selectedLng}
               menu={[
                 {
                   label: 'English',
-                  action: () => changeLanguage('en-US', 'EN'),
+                  action: () => changeLanguage('en-US'),
                 },
                 {
                   label: 'Deutsch',
-                  action: () => changeLanguage('de-DE', 'DE'),
+                  action: () => changeLanguage('de-DE'),
                 },
               ]}
             />
