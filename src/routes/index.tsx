@@ -92,7 +92,7 @@ export const Router = () => {
                 <Helmet>
                   <title>{`Dashboard - ${titleTail}`}</title>
                 </Helmet>
-                <PageLayout pageTitle="Dashboard">
+                <PageLayout pageTitle="Dashboard" pageScrollable>
                   <Dashboard />
                 </PageLayout>
               </>
