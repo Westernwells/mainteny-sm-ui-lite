@@ -20,6 +20,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {PdfGenerationStatus} from 'models/misc';
 import {QuotationStatus, QuotationView} from 'models/quotation';
 import {formatCurrency} from 'utils/currency';
+import {useTranslation} from 'react-i18next';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 
@@ -29,6 +30,7 @@ interface Props {
 }
 
 export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
+  const {t} = useTranslation();
   const {user} = useUserSession();
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -134,7 +136,9 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
             ) : (
               <>
                 <Typography variant="subtitle2" textAlign="center">
-                  You haven’t created Service Order for this Quotation
+                  {t(
+                    'No service order has been created for this quotation yet!',
+                  )}
                 </Typography>
                 <Button
                   label="Create Service Order"
