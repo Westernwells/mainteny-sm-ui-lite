@@ -872,7 +872,7 @@ module.exports = {
     'No quotations yet. They will appear here once added.':
       'Es wurden noch keine Angebote erstellt. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!',
     'No work report yet. It will appear here once the order is completed.':
-      'Es wurde noch kein Arbeitsbericht erstellt. Er erscheint hier, sobald der Auftrag abgeschlossen ist!',
+      'Es wurde noch kein Arbeitsbericht erstellt. Er erscheint hier, sobald der Auftrag abgeschlossen ist.',
     'No orders yet. Please click the button above to add.':
       'Es wurden noch kein Auftrag erstellt. Bitte klicken Sie auf die Schaltfläche oben, um eine zu erstellen!',
     'Data will be available here only for IoT enabled units.':
@@ -960,6 +960,9 @@ module.exports = {
     'Edit Company Policies': 'Unternehmensrichtlinien bearbeiten',
     'Edit Payment Information': 'Zahlungsinformationen bearbeiten',
     'Edit Addresses': 'Adressen bearbeiten',
+    Checklist: 'Checkliste',
+    'No checklist yet.': 'Keine Checkliste vorhanden.',
+    'Order Details': 'Auftragsdetails',
   },
 };
 

@@ -78,7 +78,7 @@ export const WorkReport = ({orderId}: Props) => {
   if (!report) {
     return (
       <PageCard containerStyles={{py: '3em'}}>
-        <EmptySection label="No work report yet. It will appear here once the order is completed!" />
+        <EmptySection label="No work report yet. It will appear here once the order is completed." />
       </PageCard>
     );
   }
