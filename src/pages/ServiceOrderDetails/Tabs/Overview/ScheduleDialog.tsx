@@ -19,6 +19,7 @@ import {ScheduleForm} from 'pages/ServiceOrderDetails/models';
 import * as Yup from 'yup';
 import {Button} from 'components/Button';
 import {EmployeesView} from 'models/employee';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   open?: boolean;
@@ -57,6 +58,7 @@ export const ScheduleDialog = ({
   getFormErrors,
   showSwitch,
 }: Props) => {
+  const {t} = useTranslation();
   const [query, setQuery] = useState<string>('');
   const [queryView, setQueryView] = useState('');
   const [switchActive, setSwitchActive] = useState(true);
@@ -148,7 +150,7 @@ export const ScheduleDialog = ({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Assign To"
+                  label={t('Assign To')}
                   name="technicianId"
                   error={!!formik.errors.technicianId}
                   helperText={formik.errors.technicianId}
@@ -182,7 +184,7 @@ export const ScheduleDialog = ({
                     });
                   }}
                   textFieldProps={{
-                    label: datePickerLabel,
+                    label: t(datePickerLabel),
                     name: 'date',
                     helperText:
                       formik.errors.date && formik.touched.date
@@ -246,7 +248,7 @@ export const ScheduleDialog = ({
               onClick: onCancel,
             }}>
             <Typography variant="subtitle2" color="text.secondary">
-              Cancel
+              {t('Cancel')}
             </Typography>
           </Button>
           <Button
@@ -255,7 +257,7 @@ export const ScheduleDialog = ({
               autoFocus: true,
               disabled: disableSaveBtn,
             }}>
-            <Typography variant="subtitle2">Save</Typography>
+            <Typography variant="subtitle2">{t('Save')}</Typography>
           </Button>
         </DialogActions>
       </Dialog>

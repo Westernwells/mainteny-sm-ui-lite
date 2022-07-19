@@ -331,6 +331,8 @@ module.exports = {
     'Edit Description': 'Beschreibung bearbeiten',
     'No description yet. Please click the button below to add!':
       'Noch keine Beschreibung. Bitte klicken Sie zum Hinzufügen auf die Schaltfläche unten!',
+    'No description yet. It will appear here once added!':
+      'Noch keine Beschreibung. Sie wird hier erscheinen, sobald sie hinzugefügt wurde!',
     'Stock Info': 'Informationen zum Bestand',
     'No stock info yet. Please click the button below to add!':
       'Noch keine Lagerinformationen. Bitte klicken Sie auf die Schaltfläche unten, um sie hinzuzufügen!',
@@ -640,6 +642,9 @@ module.exports = {
     'Select a due date': 'Wählen Sie ein Fälligkeitsdatum',
     'Choose a Date, Time & Technician':
       'Wählen Sie ein Datum, eine Uhrzeit und einen Techniker',
+    'Choose a fixed date and time':
+      'Wählen Sie ein festes Datum und eine Uhrzeit',
+    'Schedule To': 'Zeitplan für',
     'Select a technician for attending this service order immediately':
       'Wählen Sie einen Techniker diesen Auftrag',
     'Select a date before which this service order has to be completed':
@@ -649,7 +654,8 @@ module.exports = {
     'Due date': 'Fälligkeitsdatum',
     'Assign To': 'Zuweisen an',
     'Selected date and time': 'Ausgewähltes Datum und Uhrzeit',
-
+    'see more': 'Mehr anzeigen',
+    'see less': 'siehe weniger',
     // Invoices
     'This Week': 'Diese Woche',
     'Last Week': 'Letzte Woche',
