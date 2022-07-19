@@ -8,46 +8,21 @@ import {
   ListItemText,
 } from '@mui/material';
 import {nameToInitials} from 'utils/utils';
+import {formatCurrency} from 'utils/currency';
+import {Resource} from 'models/misc';
+import {QuotationView} from 'models/quotation';
 import {DashboardInfoCard} from './DashboardInfoCard';
 
-export const OpenQuotations = () => {
+export const OpenQuotations = ({
+  quotations,
+}: {
+  quotations: Resource<QuotationView>;
+}) => {
   const theme = useTheme();
-  const quotations = [
-    {
-      id: 'random1',
-      company: 'John Doe',
-      total: '4,700€',
-      status: 'sent',
-    },
-    {
-      id: 'random2',
-      company: 'King Edward',
-      total: '4,700€',
-      status: 'sent',
-    },
-    {
-      id: 'random3',
-      company: 'Noman Gul',
-      total: '4,700€',
-      status: 'sent',
-    },
-    {
-      id: 'random4',
-      company: 'John Doe',
-      total: '4,700€',
-      status: 'sent',
-    },
-    {
-      id: 'random5',
-      company: 'John Doe',
-      total: '4,700€',
-      status: 'sent',
-    },
-  ];
   return (
     <DashboardInfoCard
       title="Open quotations"
-      chipLabel="05"
+      chipLabel={`${quotations.total}`}
       seeMorePath="/quotations">
       <List
         disablePadding
@@ -56,13 +31,13 @@ export const OpenQuotations = () => {
             mask: 'linear-gradient(#FFFFFF, transparent)',
           },
         }}>
-        {quotations.map((quotation) => (
+        {quotations.data.map((quotation) => (
           <ListItem
             key={quotation.id}
             sx={{py: '6px', px: '1.5rem'}}
             secondaryAction={
               <Chip
-                label={quotation.status}
+                label="Sent"
                 size="small"
                 sx={{
                   px: '0.28rem',
@@ -74,13 +49,23 @@ export const OpenQuotations = () => {
             }>
             <ListItemAvatar>
               <Avatar sx={{width: 28, height: 28, fontSize: '1rem'}}>
-                {nameToInitials(quotation.company)}
+                {nameToInitials(quotation.elevator.propertyOwner.name)}
               </Avatar>
             </ListItemAvatar>
             <ListItemText sx={{flexBasis: '25%'}}>
-              {quotation.company}
+              {quotation.elevator.propertyOwner.name}
             </ListItemText>
-            <ListItemText>{quotation.total}</ListItemText>
+            <ListItemText>
+              {formatCurrency(
+                quotation
+                  ? quotation.totalAmount.netAmount /
+                      10 ** quotation.totalAmount.fractionDigits!
+                  : 0,
+                {
+                  currency: quotation.totalAmount.currency,
+                },
+              )}
+            </ListItemText>
           </ListItem>
         ))}
       </List>

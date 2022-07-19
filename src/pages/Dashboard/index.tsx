@@ -10,8 +10,10 @@ import {
   useAppointmentNotification,
   useConfirmAppointment,
 } from 'hooks/reactQuery/useServiceOrder';
+import {useQuotations} from 'hooks/reactQuery/useQuotation';
 import {createEmptyResource} from 'utils/paging-utils';
 import {ServiceOrderView} from 'models/service-order';
+import {QuotationStatus, QuotationView} from 'models/quotation';
 import {AddAnything} from './AddAnything';
 import {TopCard} from './TopCard';
 import {TechniciansWorking} from './TechniciansWorking';
@@ -31,8 +33,20 @@ export const Dashboard = () => {
   });
   const appointmentNotificationMutation = useAppointmentNotification();
   const confirmAppointmentMutation = useConfirmAppointment();
+  const {
+    data: quotations = createEmptyResource<QuotationView>(5),
+    isLoading: isLoadingQuotations,
+  } = useQuotations(
+    {
+      pageIndex: 0,
+      pageSize: 5,
+      query: '',
+      status: [QuotationStatus.SENT_TO_CLIENT],
+    },
+    {},
+  );
 
-  const isLoading = isLoadingAppointments;
+  const isLoading = isLoadingAppointments || isLoadingQuotations;
 
   if (isLoading) {
     return <Progress />;
@@ -93,7 +107,7 @@ export const Dashboard = () => {
               />
             </Grid>
             <Grid item xs={12} lg={6}>
-              <OpenQuotations />
+              <OpenQuotations quotations={quotations} />
             </Grid>
             <Grid item xs={12} lg={6}>
               <InvoiceDrafts />
