@@ -8,7 +8,6 @@ import {
   ServiceOrderView,
 } from 'models/service-order';
 import {Button} from 'components/Button';
-import {formatDistance} from 'date-fns';
 import Divider from '@mui/material/Divider';
 import {useTranslation} from 'react-i18next';
 import {isEmpty} from 'lodash';
@@ -20,7 +19,11 @@ import {
   useRedispatchServiceOrders,
   useUpdateServiceOrderSchedule,
 } from 'hooks/reactQuery/useServiceOrder';
-import {setDateTime, formatDate as formatDateUtil} from 'utils/datetime';
+import {
+  setDateTime,
+  formatDate as formatDateUtil,
+  formatDueDate,
+} from 'utils/datetime';
 
 interface Props extends BoxProps {
   serviceOrder: ServiceOrderView;
@@ -94,27 +97,6 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
   const handleSave = () =>
     switchActive && isEmpty(formError) ? schedule() : reschedule();
 
-  const formatDate = (date: string | number | Date) => {
-    const formattedDate: string = formatDistance(new Date(date), new Date());
-
-    const splitDate: string[] = formattedDate.split(' ');
-
-    if (splitDate[0] === 'about') {
-      // const finalDate: string = t(`${splitDate[0]} {{hours}} ${splitDate[2]}`, {
-      //   hours: splitDate[1],
-      // });
-      const finalDate: string = t(`{{hours}} ${splitDate[2]}`, {
-        hours: splitDate[1],
-      });
-      return finalDate;
-    }
-
-    const finalDate: string = t(`{{time}} ${splitDate[1]}`, {
-      time: splitDate[0],
-    });
-    return finalDate;
-  };
-
   return (
     <Box sx={{mt: '0.625em', px: '0.5em'}} {...rest}>
       <Box
@@ -140,7 +122,7 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
           </Typography>
         </Box>
         <Typography variant="caption">
-          {t('Due in')} {formatDate(serviceOrder.dueDate)}
+          {formatDueDate(serviceOrder.dueDate)}
           {/* {formatDistance(new Date(serviceOrder.dueDate), new Date()).split(" ")[0]==="about"? t(formatDistance(new Date(serviceOrder.dueDate), new Date()), {hours: formatDistance(new Date(serviceOrder.dueDate), new Date()).split("")[0]}):"hi"} */}
         </Typography>
       </Box>

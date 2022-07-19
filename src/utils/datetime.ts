@@ -7,7 +7,9 @@ import {
   parseISO,
   startOfWeek,
   intervalToDuration,
+  formatDistance,
 } from 'date-fns';
+import {useTranslation} from 'react-i18next';
 
 export const DEFAULT_DATE_FORMAT = 'dd.MM.yyyy';
 
@@ -178,3 +180,23 @@ export const get60Mins = (startNumber?: number, endNumber?: number) =>
 
 export const getDifferenceInInterval = (start: Date, end: Date) =>
   intervalToDuration({start: new Date(start), end: new Date(end)});
+
+export const formatDueDate = (date: string | number | Date) => {
+  const {t} = useTranslation();
+
+  const formattedDate: string = formatDistance(new Date(date), new Date());
+
+  const splitDate: string[] = formattedDate.split(' ');
+
+  if (splitDate[0] === 'about') {
+    const finalDate: string = t(`{{hours}} ${splitDate[2]}`, {
+      hours: splitDate[1],
+    });
+    return `${t('Due in')} ${finalDate}`;
+  }
+
+  const finalDate: string = t(`{{time}} ${splitDate[1]}`, {
+    time: splitDate[0],
+  });
+  return `${t('Due in')} ${finalDate}`;
+};
