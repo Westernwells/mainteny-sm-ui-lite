@@ -5,7 +5,10 @@ import Typography from '@mui/material/Typography';
 import ReportProblemOutlined from '@mui/icons-material/ReportProblemOutlined';
 import Refresh from '@mui/icons-material/Refresh';
 import {Progress} from 'components/Progress';
-import {useAppointmentConfirmationRequiredOrders} from 'hooks/reactQuery/useServiceOrder';
+import {
+  useAppointmentConfirmationRequiredOrders,
+  useAppointmentNotification,
+} from 'hooks/reactQuery/useServiceOrder';
 import {createEmptyResource} from 'utils/paging-utils';
 import {ServiceOrderView} from 'models/service-order';
 import {AddAnything} from './AddAnything';
@@ -25,6 +28,7 @@ export const Dashboard = () => {
     pageIndex: 0,
     pageSize: 3,
   });
+  const appointmentNotificationMutation = useAppointmentNotification();
 
   const isLoading = isLoadingAppointments;
 
@@ -78,7 +82,12 @@ export const Dashboard = () => {
               <TechniciansWorking />
             </Grid>
             <Grid item xs={12} lg={6}>
-              <AppointmentsToBeScheduled appointments={appointments} />
+              <AppointmentsToBeScheduled
+                appointments={appointments}
+                appointmentNotificationMutation={
+                  appointmentNotificationMutation
+                }
+              />
             </Grid>
             <Grid item xs={12} lg={6}>
               <OpenQuotations />

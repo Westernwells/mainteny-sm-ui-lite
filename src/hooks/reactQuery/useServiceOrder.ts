@@ -826,3 +826,32 @@ export function useAppointmentConfirmationRequiredOrders(
     {enabled: !!user, ...options},
   );
 }
+
+const appointmentNotification = async (serviceOrderId: string) =>
+  axiosClient.post<StringValue>(
+    `/api/serviceOrders/${serviceOrderId}/appointmentNotification`,
+  );
+
+export const useAppointmentNotification = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    (serviceOrderId: string) => appointmentNotification(serviceOrderId),
+    {
+      onSuccess: () => {
+        enqueueSnackbar('Appointment notification sent successfully', {
+          variant: 'success',
+        });
+        return queryClient.invalidateQueries([
+          queryKeys.queryAppointmentConfirmationRequiredOrders,
+        ]);
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
