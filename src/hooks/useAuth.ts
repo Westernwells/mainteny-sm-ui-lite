@@ -80,7 +80,7 @@ export const useAuth = (): UseAuth => {
             navigate('/admin/companies', {replace: true});
             return;
           }
-          navigate('/orders', {replace: true});
+          navigate('/', {replace: true});
         }
       }
     } catch (errorResponse: any) {
