@@ -855,3 +855,32 @@ export const useAppointmentNotification = () => {
     },
   );
 };
+
+const confirmAppointment = async (serviceOrderId: string) =>
+  axiosClient.put<StringValue>(
+    `/api/serviceOrders/${serviceOrderId}/appointment`,
+  );
+
+export const useConfirmAppointment = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    (serviceOrderId: string) => confirmAppointment(serviceOrderId),
+    {
+      onSuccess: () => {
+        enqueueSnackbar('Appointment confirmed', {
+          variant: 'success',
+        });
+        return queryClient.invalidateQueries([
+          queryKeys.queryAppointmentConfirmationRequiredOrders,
+        ]);
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};

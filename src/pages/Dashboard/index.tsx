@@ -8,6 +8,7 @@ import {Progress} from 'components/Progress';
 import {
   useAppointmentConfirmationRequiredOrders,
   useAppointmentNotification,
+  useConfirmAppointment,
 } from 'hooks/reactQuery/useServiceOrder';
 import {createEmptyResource} from 'utils/paging-utils';
 import {ServiceOrderView} from 'models/service-order';
@@ -29,6 +30,7 @@ export const Dashboard = () => {
     pageSize: 3,
   });
   const appointmentNotificationMutation = useAppointmentNotification();
+  const confirmAppointmentMutation = useConfirmAppointment();
 
   const isLoading = isLoadingAppointments;
 
@@ -87,6 +89,7 @@ export const Dashboard = () => {
                 appointmentNotificationMutation={
                   appointmentNotificationMutation
                 }
+                confirmAppointmentMutation={confirmAppointmentMutation}
               />
             </Grid>
             <Grid item xs={12} lg={6}>

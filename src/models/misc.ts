@@ -1,4 +1,6 @@
+import {AxiosResponse} from 'axios';
 import {MouseEvent, ReactNode} from 'react';
+import {UseMutationResult} from 'react-query';
 import {number} from 'yup';
 import {GetState, SetState} from 'zustand';
 import {UserAccountSimpleView} from './user';
@@ -265,3 +267,10 @@ export interface CacheTypesParams {
   pageIndex: number;
   query: string;
 }
+
+export type Mutation = UseMutationResult<
+  AxiosResponse<StringValue, any>,
+  unknown,
+  string,
+  unknown
+>;

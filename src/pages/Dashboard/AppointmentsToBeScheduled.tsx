@@ -1,5 +1,3 @@
-import {AxiosResponse} from 'axios';
-import {UseMutationResult} from 'react-query';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -14,23 +12,22 @@ import {
 } from '@mui/material';
 import {Message} from '@mui/icons-material';
 import Check from '@mui/icons-material/Check';
-import {Resource, StringValue} from 'models/misc';
+import {Mutation, Resource} from 'models/misc';
 import {ServiceOrderView} from 'models/service-order';
 import {formatDueDate} from 'utils/datetime';
 import {DashboardInfoCard} from './DashboardInfoCard';
 
+interface Props {
+  appointments: Resource<ServiceOrderView>;
+  appointmentNotificationMutation: Mutation;
+  confirmAppointmentMutation: Mutation;
+}
+
 export const AppointmentsToBeScheduled = ({
   appointments,
   appointmentNotificationMutation,
-}: {
-  appointments: Resource<ServiceOrderView>;
-  appointmentNotificationMutation: UseMutationResult<
-    AxiosResponse<StringValue, any>,
-    unknown,
-    string,
-    unknown
-  >;
-}) => {
+  confirmAppointmentMutation,
+}: Props) => {
   const theme = useTheme();
   return (
     <DashboardInfoCard
@@ -104,7 +101,10 @@ export const AppointmentsToBeScheduled = ({
                           sx={{color: 'action.active'}}
                         />
                       </IconButton>
-                      <IconButton>
+                      <IconButton
+                        onClick={() =>
+                          confirmAppointmentMutation.mutate(appointment.id)
+                        }>
                         <Check fontSize="small" sx={{color: 'action.active'}} />
                       </IconButton>
                     </Box>
