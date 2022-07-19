@@ -11,9 +11,11 @@ import {
   useConfirmAppointment,
 } from 'hooks/reactQuery/useServiceOrder';
 import {useQuotations} from 'hooks/reactQuery/useQuotation';
+import {useInvoices} from 'hooks/reactQuery/useInvoice';
 import {createEmptyResource} from 'utils/paging-utils';
 import {ServiceOrderView} from 'models/service-order';
 import {QuotationStatus, QuotationView} from 'models/quotation';
+import {InvoiceStatus, InvoiceView} from 'models/invoice';
 import {AddAnything} from './AddAnything';
 import {TopCard} from './TopCard';
 import {TechniciansWorking} from './TechniciansWorking';
@@ -45,8 +47,18 @@ export const Dashboard = () => {
     },
     {},
   );
+  const {
+    data: invoices = createEmptyResource<InvoiceView>(5),
+    isLoading: isLoadingInvoices,
+  } = useInvoices({
+    pageIndex: 0,
+    pageSize: 5,
+    query: '',
+    status: [InvoiceStatus.DRAFT],
+  });
 
-  const isLoading = isLoadingAppointments || isLoadingQuotations;
+  const isLoading =
+    isLoadingAppointments || isLoadingQuotations || isLoadingInvoices;
 
   if (isLoading) {
     return <Progress />;
@@ -110,7 +122,7 @@ export const Dashboard = () => {
               <OpenQuotations quotations={quotations} />
             </Grid>
             <Grid item xs={12} lg={6}>
-              <InvoiceDrafts />
+              <InvoiceDrafts invoices={invoices} />
             </Grid>
           </Grid>
         </Grid>

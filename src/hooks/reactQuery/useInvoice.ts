@@ -112,7 +112,7 @@ const filterInvoices = (
 export function useInvoices(
   params: QueryInvoiceParams,
   // TODO: Write 'interface' for filter object
-  filters: InvoiceFilters,
+  filters?: InvoiceFilters,
   options?: any,
 ) {
   const {user} = useUserSession();
@@ -122,13 +122,15 @@ export function useInvoices(
     {
       enabled: !!user,
       ...options,
-      select: useCallback(
-        (invoicesRes: Resource<InvoiceView>) => {
-          const filterResult = filterInvoices(invoicesRes, filters);
-          return filterResult;
-        },
-        [filters],
-      ),
+      ...(filters && {
+        select: useCallback(
+          (invoicesRes: Resource<InvoiceView>) => {
+            const filterResult = filterInvoices(invoicesRes, filters);
+            return filterResult;
+          },
+          [filters],
+        ),
+      }),
     },
   );
 }

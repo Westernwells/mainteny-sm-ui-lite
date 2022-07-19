@@ -8,46 +8,21 @@ import {
   ListItemText,
 } from '@mui/material';
 import {nameToInitials} from 'utils/utils';
+import {formatCurrency} from 'utils/currency';
+import {Resource} from 'models/misc';
+import {InvoiceView} from 'models/invoice';
 import {DashboardInfoCard} from './DashboardInfoCard';
 
-export const InvoiceDrafts = () => {
+export const InvoiceDrafts = ({
+  invoices,
+}: {
+  invoices: Resource<InvoiceView>;
+}) => {
   const theme = useTheme();
-  const invoices = [
-    {
-      id: 'random1',
-      company: 'Lanxess AG',
-      total: '4,700€',
-      status: 'draft',
-    },
-    {
-      id: 'random2',
-      company: 'ThyssenKrupp AG',
-      total: '4,700€',
-      status: 'draft',
-    },
-    {
-      id: 'random3',
-      company: 'Lanxess AG',
-      total: '4,700€',
-      status: 'draft',
-    },
-    {
-      id: 'random4',
-      company: 'John Doe',
-      total: '4,700€',
-      status: 'draft',
-    },
-    {
-      id: 'random5',
-      company: 'ThyssenKrupp AG',
-      total: '4,700€',
-      status: 'draft',
-    },
-  ];
   return (
     <DashboardInfoCard
       title="Invoice drafts"
-      chipLabel="14"
+      chipLabel={`${invoices.total}`}
       seeMorePath="/invoices">
       <List
         disablePadding
@@ -56,13 +31,13 @@ export const InvoiceDrafts = () => {
             mask: 'linear-gradient(#FFFFFF, transparent)',
           },
         }}>
-        {invoices.map((invoice) => (
+        {invoices.data.map((invoice) => (
           <ListItem
             key={invoice.id}
             sx={{py: '6px', px: '1.5rem'}}
             secondaryAction={
               <Chip
-                label={invoice.status}
+                label="Draft"
                 size="small"
                 sx={{
                   px: '0.28rem',
@@ -74,13 +49,23 @@ export const InvoiceDrafts = () => {
             }>
             <ListItemAvatar>
               <Avatar sx={{width: 28, height: 28, fontSize: '1rem'}}>
-                {nameToInitials(invoice.company)}
+                {nameToInitials(invoice.propertyOwner.name)}
               </Avatar>
             </ListItemAvatar>
             <ListItemText sx={{flexBasis: '25%'}}>
-              {invoice.company}
+              {invoice.propertyOwner.name}
             </ListItemText>
-            <ListItemText>{invoice.total}</ListItemText>
+            <ListItemText>
+              {formatCurrency(
+                invoice
+                  ? invoice.totalAmount.netAmount /
+                      10 ** invoice.totalAmount.fractionDigits!
+                  : 0,
+                {
+                  currency: invoice.totalAmount.currency,
+                },
+              )}
+            </ListItemText>
           </ListItem>
         ))}
       </List>
