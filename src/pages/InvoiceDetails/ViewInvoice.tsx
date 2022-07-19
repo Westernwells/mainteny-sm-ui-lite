@@ -1,10 +1,12 @@
 import {useState} from 'react';
+import {useNavigate} from 'react-router';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import ReplayIcon from '@mui/icons-material/Replay';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {Button} from 'components/Button';
 import {StatusChip} from 'components/StatusChip';
 import {PageCard} from 'components/PageCard';
@@ -36,6 +38,7 @@ interface Props {
 
 export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
   const {t} = useTranslation();
+  const navigate = useNavigate();
   const formatDate = useFormatDate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {mutate: publishInvoice} = usePublishInvoice();
@@ -109,7 +112,11 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
               display: 'flex',
               gap: '1em',
               flexDirection: 'column',
-            }}>
+            }}
+            headerActionIcon={<OpenInNewIcon />}
+            handleAction={() =>
+              navigate(`/orders/details/${invoice.serviceOrder.id}`)
+            }>
             <Box>
               <Box sx={{float: 'right'}}>
                 <StatusChip

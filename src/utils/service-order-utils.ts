@@ -18,6 +18,8 @@ export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
       return 'error';
     case ServiceOrderStatus.COMPLETED:
       return 'success';
+    case ServiceOrderStatus.DONE:
+      return 'success';
     default:
       return 'default';
   }
@@ -25,6 +27,8 @@ export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
 
 export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
   switch (status) {
+    case ServiceOrderStatus.READY_TO_SCHEDULE:
+      return 'Unscheduled';
     case ServiceOrderStatus.SCHEDULED:
       return 'Pending';
     case ServiceOrderStatus.IN_PROGRESS:
@@ -35,8 +39,10 @@ export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
       return 'Expired';
     case ServiceOrderStatus.COMPLETED:
       return 'Completed';
+    case ServiceOrderStatus.DONE:
+      return 'Done';
     default:
-      return 'Unscheduled';
+      return '-';
   }
 };
 
