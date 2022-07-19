@@ -155,4 +155,5 @@ export const makeRows = (
       address: maintainer.technician.address.fullName,
       priority: maintainer.weight,
       actions: maintainer,
+      navigateTo: `/employees/details/${maintainer.technician.userAccount.id}`,
     }));
