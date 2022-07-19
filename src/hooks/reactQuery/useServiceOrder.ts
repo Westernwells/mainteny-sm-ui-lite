@@ -39,6 +39,7 @@ import {
   ServiceOrderItemRecord,
   CompleteServiceOrder,
   UpdateServiceOrderBody,
+  AppointmentConfirmationRequiredOrdersQueryParams,
 } from '../../models/service-order';
 import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
@@ -787,3 +788,41 @@ export const useUpdateServiceOrderArticles = () => {
     },
   );
 };
+
+export const queryAppointmentConfirmationRequiredOrders = async (
+  params: AppointmentConfirmationRequiredOrdersQueryParams,
+): Promise<Resource<ServiceOrderView>> => {
+  const response: AxiosResponse<Resource<ServiceOrderView>> =
+    await axiosClient.get(
+      `/api/serviceOrders/appointmentConfirmationRequiredOrders`,
+      {
+        params,
+        paramsSerializer,
+      },
+    );
+  return response.data;
+};
+
+export function useAppointmentConfirmationRequiredOrders(
+  params: AppointmentConfirmationRequiredOrdersQueryParams,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  const {user} = useUserSession();
+  return useQuery<
+    Resource<ServiceOrderView>,
+    RestError,
+    Resource<ServiceOrderView>
+  >(
+    [
+      queryKeys.queryAppointmentConfirmationRequiredOrders,
+      params,
+      user?.userAccount.serviceCompany.id,
+    ],
+    () =>
+      queryAppointmentConfirmationRequiredOrders({
+        ...params,
+        serviceCompanyId: user!.userAccount.serviceCompany.id,
+      }),
+    {enabled: !!user, ...options},
+  );
+}

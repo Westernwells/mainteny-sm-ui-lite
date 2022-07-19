@@ -4,6 +4,10 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import ReportProblemOutlined from '@mui/icons-material/ReportProblemOutlined';
 import Refresh from '@mui/icons-material/Refresh';
+import {Progress} from 'components/Progress';
+import {useAppointmentConfirmationRequiredOrders} from 'hooks/reactQuery/useServiceOrder';
+import {createEmptyResource} from 'utils/paging-utils';
+import {ServiceOrderView} from 'models/service-order';
 import {AddAnything} from './AddAnything';
 import {TopCard} from './TopCard';
 import {TechniciansWorking} from './TechniciansWorking';
@@ -14,6 +18,20 @@ import {FieldActivities} from './FieldActivities';
 
 export const Dashboard = () => {
   const theme = useTheme();
+  const {
+    data: appointments = createEmptyResource<ServiceOrderView>(3),
+    isLoading: isLoadingAppointments,
+  } = useAppointmentConfirmationRequiredOrders({
+    pageIndex: 0,
+    pageSize: 3,
+  });
+
+  const isLoading = isLoadingAppointments;
+
+  if (isLoading) {
+    return <Progress />;
+  }
+
   return (
     <>
       <Grid container justifyContent="space-between" alignItems="center">
@@ -60,7 +78,7 @@ export const Dashboard = () => {
               <TechniciansWorking />
             </Grid>
             <Grid item xs={12} lg={6}>
-              <AppointmentsToBeScheduled />
+              <AppointmentsToBeScheduled appointments={appointments} />
             </Grid>
             <Grid item xs={12} lg={6}>
               <OpenQuotations />

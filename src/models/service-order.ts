@@ -397,3 +397,10 @@ export interface ServiceOrderItemRecord {
   quantity: number;
   unitAmount: Amount;
 }
+
+export interface AppointmentConfirmationRequiredOrdersQueryParams {
+  pageIndex: number;
+  pageSize: number;
+  query?: string;
+  serviceCompanyId?: string;
+}
