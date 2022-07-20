@@ -3,6 +3,7 @@ import {hoursToMinutes, secondsToMinutes} from 'date-fns';
 import {ServiceOrderType} from 'models/service-order';
 import {Role} from 'models/user';
 import {WorkHoursItem, WorkHoursType} from 'models/workHours';
+import {EmployeeStatus} from 'models/employee';
 import {convertDigitalMinsToHM} from './datetime';
 
 export const calculateTotalTime = (workHours: WorkHoursItem[]) => {
@@ -64,4 +65,21 @@ export const getRoles = (selectedRole: string) => {
   }
 
   return roles;
+};
+
+export const getEmployeeStatus = (status: EmployeeStatus) => {
+  switch (status) {
+    case EmployeeStatus.HOLIDAY:
+      return 'Holiday';
+    case EmployeeStatus.PUBLIC_HOLIDAY:
+      return 'Public Holiday';
+    case EmployeeStatus.WEEKEND:
+      return 'Weekend';
+    case EmployeeStatus.SICK_LEAVE:
+      return 'Sick';
+    case EmployeeStatus.WORKING:
+      return 'Working';
+    default:
+      return 'Working';
+  }
 };

@@ -12,10 +12,14 @@ import {
 } from 'hooks/reactQuery/useServiceOrder';
 import {useQuotations} from 'hooks/reactQuery/useQuotation';
 import {useInvoices} from 'hooks/reactQuery/useInvoice';
+import {useQueryServiceCompanyEmployeeStatus} from 'hooks/reactQuery/useEmployee';
 import {createEmptyResource} from 'utils/paging-utils';
+import {toRestDate} from 'utils/datetime';
+import {Role} from 'models/user';
 import {ServiceOrderView} from 'models/service-order';
 import {QuotationStatus, QuotationView} from 'models/quotation';
 import {InvoiceStatus, InvoiceView} from 'models/invoice';
+import {EmployeeStatusView} from 'models/employee';
 import {AddAnything} from './AddAnything';
 import {TopCard} from './TopCard';
 import {TechniciansWorking} from './TechniciansWorking';
@@ -56,9 +60,21 @@ export const Dashboard = () => {
     query: '',
     status: [InvoiceStatus.DRAFT],
   });
+  const {
+    data: technicians = createEmptyResource<EmployeeStatusView>(5),
+    isLoading: isLoadingTechnicians,
+  } = useQueryServiceCompanyEmployeeStatus({
+    date: toRestDate(new Date()),
+    pageIndex: 0,
+    pageSize: 5,
+    roles: [Role.TECHNICIAN],
+  });
 
   const isLoading =
-    isLoadingAppointments || isLoadingQuotations || isLoadingInvoices;
+    isLoadingAppointments ||
+    isLoadingQuotations ||
+    isLoadingInvoices ||
+    isLoadingTechnicians;
 
   if (isLoading) {
     return <Progress />;
@@ -107,7 +123,7 @@ export const Dashboard = () => {
               />
             </Grid>
             <Grid item xs={12} lg={6}>
-              <TechniciansWorking />
+              <TechniciansWorking technicians={technicians} />
             </Grid>
             <Grid item xs={12} lg={6}>
               <AppointmentsToBeScheduled

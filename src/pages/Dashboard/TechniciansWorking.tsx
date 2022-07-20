@@ -7,56 +7,21 @@ import {
   ListItemAvatar,
   ListItemText,
 } from '@mui/material';
+import {getEmployeeStatus} from 'utils/work-hours-utils';
+import {Resource} from 'models/misc';
+import {EmployeeStatus, EmployeeStatusView} from 'models/employee';
 import {DashboardInfoCard} from './DashboardInfoCard';
 
-export const TechniciansWorking = () => {
+export const TechniciansWorking = ({
+  technicians,
+}: {
+  technicians: Resource<EmployeeStatusView>;
+}) => {
   const theme = useTheme();
-  const technicians = [
-    {
-      id: 'random1',
-      firstName: 'Andre',
-      lastName: 'Kraus',
-      photoUrl:
-        'https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/137034/43002845-0d4d-40cb-ba98-2759b1bf0a4f.jpg',
-      status: 'working',
-    },
-    {
-      id: 'random2',
-      firstName: 'Andre',
-      lastName: 'Zeller',
-      photoUrl:
-        'https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/137034/43002845-0d4d-40cb-ba98-2759b1bf0a4f.jpg',
-      status: 'working',
-    },
-    {
-      id: 'random3',
-      firstName: 'Tobias',
-      lastName: 'Dietrich',
-      photoUrl:
-        'https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/137034/43002845-0d4d-40cb-ba98-2759b1bf0a4f.jpg',
-      status: 'holiday',
-    },
-    {
-      id: 'random4',
-      firstName: 'Noman',
-      lastName: 'Gul',
-      photoUrl:
-        'https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/137034/43002845-0d4d-40cb-ba98-2759b1bf0a4f.jpg',
-      status: 'sick',
-    },
-    {
-      id: 'random5',
-      firstName: 'Ludger',
-      lastName: 'Bergmann',
-      photoUrl:
-        'https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/137034/43002845-0d4d-40cb-ba98-2759b1bf0a4f.jpg',
-      status: 'sick',
-    },
-  ];
   return (
     <DashboardInfoCard
       title="Technicians working"
-      chipLabel="07"
+      chipLabel={`${technicians.total}`}
       seeMorePath="/employees">
       <List
         disablePadding
@@ -65,22 +30,24 @@ export const TechniciansWorking = () => {
             mask: 'linear-gradient(#FFFFFF, transparent)',
           },
         }}>
-        {technicians.map((technician) => (
+        {technicians.data.map((technician) => (
           <ListItem
-            key={technician.id}
+            key={technician.employee.id}
             sx={{py: '6px', px: '1.5rem'}}
             secondaryAction={
               <Chip
-                label={technician.status}
+                label={getEmployeeStatus(technician.status)}
                 size="small"
                 sx={{
                   px: '0.28rem',
                   textTransform: 'capitalize',
                   color: '#fff',
                   bgcolor:
-                    technician.status === 'holiday'
+                    technician.status === EmployeeStatus.PUBLIC_HOLIDAY ||
+                    technician.status === EmployeeStatus.HOLIDAY ||
+                    technician.status === EmployeeStatus.WEEKEND
                       ? theme.palette.info.main
-                      : technician.status === 'sick'
+                      : technician.status === EmployeeStatus.SICK_LEAVE
                       ? theme.palette.warning.main
                       : theme.palette.primary.main,
                 }}
@@ -88,13 +55,14 @@ export const TechniciansWorking = () => {
             }>
             <ListItemAvatar>
               <Avatar
-                alt={technician.id}
-                src={technician.photoUrl}
+                alt={technician.employee.userAccount.firstName}
+                src={technician.employee.userAccount.photoUrl}
                 sx={{width: 28, height: 28}}
               />
             </ListItemAvatar>
             <ListItemText>
-              {technician.firstName} {technician.lastName}
+              {technician.employee.userAccount.firstName}{' '}
+              {technician.employee.userAccount.lastName}
             </ListItemText>
           </ListItem>
         ))}
