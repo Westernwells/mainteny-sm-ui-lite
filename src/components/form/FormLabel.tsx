@@ -18,7 +18,7 @@ export const FormLabel = ({text, required, sx}: Props) => {
       sx={sx}>
       {t(text)}
       {required && (
-        <Typography component="span" variant="caption" color="error.light">
+        <Typography component="span" variant="caption" color="error.main">
           &nbsp;*
         </Typography>
       )}

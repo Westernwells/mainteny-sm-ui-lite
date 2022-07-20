@@ -32,13 +32,13 @@ import {SystemSettings} from 'pages/SystemSettings';
 import {NewCompany} from 'pages/NewCompany';
 import {SettingsPage} from 'pages/Settings';
 import {axiosClient} from 'utils/axios-utils';
-import {languageMap, onVisibilityChange} from 'utils/utils';
-import i18n from 'i18next';
+import {onVisibilityChange} from 'utils/utils';
 import {useEffect, useState} from 'react';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {NewServiceOrder} from 'pages/NewServiceOrder';
 import {NewUnit} from 'pages/NewUnit';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {NewCustomer} from 'pages/NewCustomer';
 import {Articles} from 'pages/Articles';
 import {ArticleOverView} from 'pages/ArticleDetails';
@@ -48,11 +48,12 @@ import {NewArticle} from '../pages/ArticleDetails/NewArticle';
 
 export const Router = () => {
   const titleTail = 'Service Manager Portal';
-  const {language} = i18n;
+  const {user} = useUserSession();
   const {t} = useTranslation();
 
-  if (language) {
-    axiosClient.defaults.headers.common.language = languageMap[language];
+  if (user) {
+    axiosClient.defaults.headers.common.language =
+      user?.userAccount.serviceCompany.language;
   }
 
   const [currentPageTitle, setCurrentPageTitle] = useState('');

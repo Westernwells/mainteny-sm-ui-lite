@@ -110,7 +110,10 @@ export const CustomPagination = ({
             '& .MuiPaginationItem-previousNext': {},
             '& .MuiPaginationItem-root.Mui-selected': {
               background: theme.palette.primary.main,
-              color: '#fff',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: theme.palette.primary.main,
+              },
             },
             '&.MuiPagination-root': {
               background: '#fff',

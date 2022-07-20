@@ -7,6 +7,7 @@ import {ContractSimpleView} from 'models/contract';
 import {getDataGridHeight} from 'utils/utils';
 import {InfoCard} from 'components/InfoCard';
 import {GridRowsProp} from '@mui/x-data-grid';
+import {useFormatDate} from 'hooks/useFormatDate';
 import Box from '@mui/material/Box';
 import {columns, makeRows} from './UnitsContractDataGridProps';
 
@@ -16,12 +17,13 @@ interface Props {
 }
 
 export const UnitContracts = ({containerStyles, contracts}: Props) => {
+  const formatDate = useFormatDate();
   const theme = useTheme();
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
-    setRows(makeRows(!showAll ? contracts.slice(0, 3) : contracts));
+    setRows(makeRows(!showAll ? contracts.slice(0, 3) : contracts, formatDate));
   }, [contracts]);
 
   const {t} = useTranslation();
@@ -48,7 +50,7 @@ export const UnitContracts = ({containerStyles, contracts}: Props) => {
           sx={{textAlign: 'center', cursor: 'pointer'}}
           onClick={() => setShowAll(!showAll)}>
           <Typography variant="caption" color={theme.palette.info.main}>
-            {showAll ? 'see less' : 'see more'}
+            {showAll ? t('see less') : t('see more')}
           </Typography>
         </Box>
       ) : null}

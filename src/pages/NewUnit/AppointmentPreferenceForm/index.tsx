@@ -7,8 +7,9 @@ import {useEffect} from 'react';
 import {PageCard} from 'components/PageCard';
 import {FormSelect} from 'components/form/FormSelect';
 import {TimePicker} from 'components/TimePicker';
-import {formatDate, setDateTime} from 'utils/datetime';
+import {setDateTime} from 'utils/datetime';
 import {useTranslation} from 'react-i18next';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   getAppointmentFormErrors?: (val: FormikErrors<AppointmentFormModel>) => void;
@@ -32,6 +33,7 @@ export const AppointmentPreferenceForm = ({
   initialValues,
 }: Props) => {
   const {t} = useTranslation();
+  const formatDate = useFormatDate();
   const formik = useFormik<AppointmentFormModel>({
     initialValues: {
       appointmentDaysOfWeek: initialValues?.appointmentDaysOfWeek || [],

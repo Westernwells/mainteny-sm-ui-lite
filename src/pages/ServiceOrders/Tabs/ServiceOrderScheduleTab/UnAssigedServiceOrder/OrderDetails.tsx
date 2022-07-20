@@ -19,11 +19,9 @@ import {
   useRedispatchServiceOrders,
   useUpdateServiceOrderSchedule,
 } from 'hooks/reactQuery/useServiceOrder';
-import {
-  setDateTime,
-  formatDate as formatDateUtil,
-  formatDueDate,
-} from 'utils/datetime';
+import {setDateTime, toRestDateTime} from 'utils/datetime';
+import {useFormatDateDistance} from 'hooks/useFormatDateDistance';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props extends BoxProps {
   serviceOrder: ServiceOrderView;
@@ -31,6 +29,8 @@ interface Props extends BoxProps {
 
 export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
   const {t} = useTranslation();
+  const formatDateDistance = useFormatDateDistance();
+  const formatDate = useFormatDate();
   const [openDialog, setOpenDialog] = useState(false);
   const successMessage = 'Service order scheduled successfully';
   const {mutate: rescheduleServiceOrder} =
@@ -71,14 +71,12 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
   };
 
   const schedule = () => {
-    const orderStartTime = setDateTime(
-      form?.date!,
-      formatDateUtil(form.startTime as Date, 'HH:mm')!,
-    ).toISOString();
-    const orderEndTime = setDateTime(
-      form?.date!,
-      formatDateUtil(form.endTime as Date, 'HH:mm')!,
-    ).toISOString();
+    const orderStartTime = toRestDateTime(
+      setDateTime(form?.date!, formatDate(form.startTime as Date, 'HH:mm')!),
+    );
+    const orderEndTime = toRestDateTime(
+      setDateTime(form?.date!, formatDate(form.endTime as Date, 'HH:mm')!),
+    );
 
     if (form.technicianId) {
       scheduleServiceOrder({
@@ -122,8 +120,7 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
           </Typography>
         </Box>
         <Typography variant="caption">
-          {formatDueDate(serviceOrder.dueDate)}
-          {/* {formatDistance(new Date(serviceOrder.dueDate), new Date()).split(" ")[0]==="about"? t(formatDistance(new Date(serviceOrder.dueDate), new Date()), {hours: formatDistance(new Date(serviceOrder.dueDate), new Date()).split("")[0]}):"hi"} */}
+          {t('Due in')} {formatDateDistance(new Date(serviceOrder.dueDate))}
         </Typography>
       </Box>
       <Typography variant="body2" component="div" mt="0.5em">

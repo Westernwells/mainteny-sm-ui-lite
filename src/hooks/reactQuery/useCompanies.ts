@@ -14,6 +14,7 @@ import {
 } from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
 import {useSnackbar} from 'notistack';
+import {useUserSession} from './useUserSession';
 
 export const getCompanies = async (page: Page, query: string) => {
   const response = await axiosClient.get<Resource<ServiceCompanyItem>>(
@@ -66,18 +67,28 @@ const updateCompany = async (
 
 export const useUpdateCompany = (successMsg?: string) => {
   const {enqueueSnackbar} = useSnackbar();
+  const {user, updateUser} = useUserSession();
   const queryClient = useQueryClient();
 
   return useMutation(
     ({body, companyId}: {body: ServiceCompanyUpdateBody; companyId: string}) =>
       updateCompany(body, companyId),
     {
-      onSuccess: () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onSuccess: async (__, {companyId}) => {
         if (successMsg) {
           enqueueSnackbar(successMsg, {
             variant: 'success',
           });
         }
+        const company = await getCompany(companyId);
+        updateUser({
+          ...user!,
+          userAccount: {
+            ...user!.userAccount,
+            serviceCompany: {...user!.userAccount.serviceCompany, ...company},
+          },
+        });
         queryClient.invalidateQueries(queryKeys.fetchCompany);
       },
       onError: (err: any) => {

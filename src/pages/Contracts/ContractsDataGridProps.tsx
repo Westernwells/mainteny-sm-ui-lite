@@ -1,7 +1,7 @@
 import {GridColDef} from '@mui/x-data-grid';
 import {getColumnProps} from 'components/DataGridLayout';
 import {formatNetAmount} from 'utils/currency';
-import {formatDate} from 'utils/datetime';
+import {FormatDate} from 'models/misc';
 import {ContractView} from 'models/contract';
 import {Actions} from './Actions';
 
@@ -44,7 +44,7 @@ export const columns: GridColDef[] = [
     field: 'cost',
     headerName: 'cost/year',
     align: 'right',
-    flex: 0,
+    flex: 0.5,
   }),
   getColumnProps({
     field: 'actions',
@@ -57,7 +57,10 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = (contracts: ContractView[]) =>
+export const makeRows = (
+  contracts: ContractView[],
+  formatDate: FormatDate = () => '',
+) =>
   contracts
     ? contracts.map((item, index) => ({
         id: index,

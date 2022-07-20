@@ -63,7 +63,7 @@ export const AddTechnicianDialog = ({
               textFieldProps={{
                 sx: {
                   minWidth: 500,
-                  label: 'Assign To',
+                  label: t('Assign To'),
                 },
               }}
             />

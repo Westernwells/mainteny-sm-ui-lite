@@ -121,6 +121,9 @@ export const Tabs = ({
       <MuiTabs
         sx={{
           flexGrow: 1,
+          '& .MuiTabs-flexContainer': {
+            gap: '0.75em',
+          },
           '& .MuiTabs-indicator': {
             display: 'flex',
             justifyContent: 'center',
@@ -145,13 +148,15 @@ export const Tabs = ({
                 className="item-label"
                 sx={{
                   position: 'relative',
+                  gap: '0.5em',
+                  p: '0.25em',
                   alignItems: 'center',
                   '&::before': {
                     content: '""',
                     position: 'absolute',
                     backgroundColor: 'transparent',
                     borderRadius: '3px',
-                    width: '124px',
+                    width: '100%',
                     height: '3px',
                     bottom: '0',
                     left: '50%',
@@ -159,9 +164,7 @@ export const Tabs = ({
                   },
                 }}>
                 <Box className="item-icon">{item.icon}</Box>
-                <Typography mb={1} sx={{ml: 1}} variant="subtitle1">
-                  {t(item.label)}
-                </Typography>
+                <Typography variant="subtitle1">{t(item.label)}</Typography>
               </Box>
             }
             sx={{

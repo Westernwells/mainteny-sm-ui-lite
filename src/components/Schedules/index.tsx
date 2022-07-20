@@ -14,12 +14,8 @@ import {
   startOfDay,
   subDays,
 } from 'date-fns';
-import {
-  formatDate,
-  getDateObject,
-  getEndOfWeek,
-  getStartOfWeek,
-} from 'utils/datetime';
+import {getDateObject, getEndOfWeek, getStartOfWeek} from 'utils/datetime';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {useTranslation} from 'react-i18next';
 import {ScheduleContainer} from 'components/Schedules/ScheduleContainer';
 import {ScheduleHeader} from 'components/Schedules/ScheduleHeader';
@@ -65,7 +61,6 @@ interface Props {
 }
 
 const gridWidth = 200;
-const dateFormat = 'dd MMMM yy';
 
 export const Schedule = ({
   getWeekPair,
@@ -87,6 +82,7 @@ export const Schedule = ({
   technicians,
   checkedValues = [],
 }: Props) => {
+  const formatDate = useFormatDate();
   const {t} = useTranslation();
   const theme = useTheme();
   const [tableHeader, setTableHeader] = useState<string[]>([]);
@@ -104,11 +100,11 @@ export const Schedule = ({
       end: weekPair.endOfWeekDay,
     }),
   );
-  weekInterval.map((item) => formatDate(item, dateFormat));
+  weekInterval.map((item) => formatDate(item));
 
   const [lookupDate, setLookupDate] = useState<any>(
     _.groupBy(
-      weekInterval.map((item) => formatDate(item, dateFormat)),
+      weekInterval.map((item) => formatDate(item)),
       (item) => item,
     ),
   );
@@ -164,7 +160,7 @@ export const Schedule = ({
     if (tableHeader.length) {
       if (scheduleType === 'date') {
         const result = weekInterval.map((item) => {
-          const key = formatDate(item, dateFormat);
+          const key = formatDate(item);
           return {[key!]: tableHeader};
         });
         setBodyRow(result);
@@ -191,7 +187,7 @@ export const Schedule = ({
   useEffect(() => {
     setLookupDate(
       _.groupBy(
-        weekInterval.map((item) => formatDate(item, dateFormat)),
+        weekInterval.map((item) => formatDate(item)),
         (item) => item,
       ),
     );
@@ -316,6 +312,7 @@ export const Schedule = ({
                             ? lookupDate[key]
                             : lookupTechnician[key] &&
                               `${lookupTechnician[key][0].userAccount.firstName} ${lookupTechnician[key][0].userAccount.lastName}`;
+
                         return (
                           <ScheduleBodyCell
                             cellWidth={gridWidth}

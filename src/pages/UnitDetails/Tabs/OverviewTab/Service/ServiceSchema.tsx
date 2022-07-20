@@ -7,7 +7,8 @@ import PeopleIcon from '@mui/icons-material/People';
 import FlagIcon from '@mui/icons-material/Flag';
 import useTheme from '@mui/material/styles/useTheme';
 import {ElevatorView} from 'models/elevator';
-import {convertMinsToHM, formatDate} from 'utils/datetime';
+import {convertMinsToHM} from 'utils/datetime';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   label: string;
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export const ServiceSchema = ({label, elevator, visitNumber}: Props) => {
+  const formatDate = useFormatDate();
   const theme = useTheme();
   const renderSection = () => {
     switch (label) {

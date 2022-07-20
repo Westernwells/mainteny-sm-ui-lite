@@ -6,9 +6,9 @@ import {
   GridRenderCellParams,
   GridRowModel,
 } from '@mui/x-data-grid';
+import {FormatDate} from 'models/misc';
 import {UserView} from 'models/user';
 import {useTranslation} from 'react-i18next';
-import {formatDate} from 'utils/datetime';
 import {Actions} from './Actions';
 
 const defaultProps = {
@@ -96,6 +96,7 @@ export const columns = (
 
 export const makeRows = (
   employees: UserView[],
+  formatDate: FormatDate = () => '',
 ): GridRowModel<{[key: string]: any}[]> =>
   employees
     ? employees.map((item: UserView, index: number) => ({

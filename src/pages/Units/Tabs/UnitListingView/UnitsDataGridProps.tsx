@@ -3,9 +3,12 @@ import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import {getColumnProps} from 'components/DataGridLayout';
-import {formatDate} from 'utils/datetime';
+import {FormatDate} from 'models/misc';
 import {StatusChip} from 'components/StatusChip';
-import {ElevatorView} from '../../../../models/elevator';
+import {
+  ElevatorAssignmentSimpleView,
+  ElevatorView,
+} from '../../../../models/elevator';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -74,7 +77,7 @@ export const columns: GridColDef[] = [
     headerAlign: 'center',
     renderCell: (params) => (
       <StatusChip
-        label={params.value ? 'YES' : 'NO'}
+        label={params.value ? 'Yes' : 'No'}
         color={params.value ? 'success' : 'info'}
         variant="filled"
         size="small"
@@ -84,7 +87,32 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = (elevators: ElevatorView[]): GridRowsProp =>
+const getPriorityTechnician = (assignments: ElevatorAssignmentSimpleView[]) => {
+  let {weight} = assignments[0];
+  const tech: ElevatorAssignmentSimpleView[] = [];
+
+  assignments.forEach((i) => {
+    if (i.weight === weight) {
+      tech.push(i);
+    } else if (i.weight > weight) {
+      weight = i.weight;
+      tech.splice(0, tech.length);
+      tech.push(i);
+    }
+  });
+
+  return tech
+    .map(
+      (item) =>
+        `${item.technician.userAccount.firstName} ${item.technician.userAccount.lastName}`,
+    )
+    .join(', ');
+};
+
+export const makeRows = (
+  elevators: ElevatorView[],
+  formatDate: FormatDate = () => '',
+): GridRowsProp =>
   elevators.map((elevator: ElevatorView) => ({
     id: elevator.id,
     number: elevator.externalId,
@@ -95,12 +123,7 @@ export const makeRows = (elevators: ElevatorView[]): GridRowsProp =>
     address: elevator.address.fullName,
     headerText: elevator.address.fullName,
     priorityTechnician: elevator.assignments.length
-      ? elevator.assignments
-          .map(
-            (item) =>
-              `${item.technician.userAccount.firstName} ${item.technician.userAccount.lastName}`,
-          )
-          .join(', ')
+      ? getPriorityTechnician(elevator.assignments)
       : '-',
     activeContracts: !!elevator.contracts.length,
     elevator,

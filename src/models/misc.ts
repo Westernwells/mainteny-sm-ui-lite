@@ -274,3 +274,8 @@ export type Mutation = UseMutationResult<
   string,
   unknown
 >;
+
+export type FormatDate = (
+  input?: string | Date | undefined,
+  dateFormat?: string | undefined,
+) => string | undefined;

@@ -6,11 +6,11 @@ import {
   GridRowsProp,
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
-import {formatDate} from 'utils/datetime';
 import {StatusChip} from 'components/StatusChip';
 import {convertToText} from 'utils/utils';
 import {ContractStatus, ContractSimpleView} from 'models/contract';
 import {useTranslation} from 'react-i18next';
+import {FormatDate} from 'models/misc';
 
 const defaultProps = {
   editable: false,
@@ -94,13 +94,16 @@ export const columns: GridColDef[] = [
   },
 ];
 
-export const makeRows = (contracts: ContractSimpleView[]): GridRowsProp =>
+export const makeRows = (
+  contracts: ContractSimpleView[],
+  formatDate: FormatDate = () => '',
+): GridRowsProp =>
   contracts.map((item: ContractSimpleView) => ({
     id: item.id,
     number: item.number,
     contractType: convertToText(item.type),
-    startDate: formatDate(new Date(item.startTime), 'dd.MM.yyy') || '-',
-    expiryDate: formatDate(new Date(item.endTime), 'dd.MM.yyy') || '-',
+    startDate: formatDate(new Date(item.startTime)) || '-',
+    expiryDate: formatDate(new Date(item.endTime)) || '-',
     status: item.status,
     navigateTo: `/contracts/details/${item.id}`,
   }));

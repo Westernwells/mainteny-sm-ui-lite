@@ -3,6 +3,7 @@ import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {DatePicker as MuiDatePicker} from '@mui/x-date-pickers/DatePicker';
 import {InputLabelProps} from '@mui/material/InputLabel';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import {FormInput} from './form/FormInput';
@@ -17,6 +18,7 @@ interface Props {
   inputLabelProps?: InputLabelProps;
   reset?: boolean;
   getReset?: (reset: boolean) => void;
+  required?: boolean;
 }
 
 export const DatePicker = ({
@@ -29,8 +31,10 @@ export const DatePicker = ({
   inputLabelProps,
   reset = false,
   getReset = () => {},
+  required,
 }: Props) => {
   const [value, setValue] = useState<Date | null>(defaultDate);
+  const {user} = useUserSession();
 
   useEffect(() => {
     setValue(defaultDate);
@@ -52,7 +56,9 @@ export const DatePicker = ({
     <Box sx={{...containerStyles}}>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <MuiDatePicker
-          inputFormat="dd.MM.yyyy"
+          inputFormat={
+            user?.userAccount.serviceCompany.settings.dateFormat || 'dd.MM.yyyy'
+          }
           mask="__.__.____"
           value={value}
           minDate={minDate}
@@ -65,6 +71,7 @@ export const DatePicker = ({
               props={{
                 ...params,
                 size: 'small',
+                required,
                 ...textFieldProps,
                 onKeyDown: (e) => {
                   e.preventDefault();

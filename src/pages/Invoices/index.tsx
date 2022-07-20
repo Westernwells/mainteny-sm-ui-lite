@@ -16,6 +16,7 @@ import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {columns, makeRows} from './InvoicesDataGridProps';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
 import {Widget} from '../../components/Widget';
@@ -24,6 +25,7 @@ const pageSize = 25;
 
 export const Invoices = () => {
   const navigate = useNavigate();
+  const formatDate = useFormatDate();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [queryParams, setQueryParams] = useSearchParams();
@@ -78,7 +80,7 @@ export const Invoices = () => {
 
   useEffect(() => {
     if (!isLoading) {
-      setRows(makeRows(invoiceResource.data));
+      setRows(makeRows(invoiceResource.data, formatDate));
     }
   }, [invoiceResource, isLoading]);
 

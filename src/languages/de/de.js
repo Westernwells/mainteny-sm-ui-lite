@@ -158,7 +158,7 @@ module.exports = {
     'New Unit': 'Neue Anlage',
     'Clear all': 'Alle löschen',
     'Customer ': 'Kunde',
-    No: 'Nein',
+    No: 'Po',
     'This week': 'Diese Woche',
     'Next week': 'Nächste Woche',
     'Next month': 'Nächster Monat',
@@ -219,6 +219,24 @@ module.exports = {
     'Add password': 'Passwort hinzufügen',
     'Add work preferences': 'Arbeitspräferenzen hinzufügen',
     'Work Preferences': 'Arbeitspräferenzen',
+    Left: 'Übrig',
+    Used: 'Genutzt',
+    'Yearly Holidays': 'Jahresurlaub',
+    'Add Absence': 'Abwesenheit hinzufügen',
+    'Select type of absence': 'Art der Abwesenheit auswählen',
+    Reason: 'Grund',
+    'Enter reason': 'Grund eingeben',
+    Duration: 'Dauer',
+    days: 'tage',
+    'Multipe days': 'Mehrere Tage',
+    '1 Day': '1 Tag',
+    'Select duration': 'Dauer auswählen',
+    'Multiple days': 'Mehrere Tage',
+    'No holiday entries yet. They will appear here once added!':
+      'Noch keine Urlaubseinträge. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!',
+    'Do you want to delete the event from the absence list?':
+      'Möchten Sie das Ereignis aus der Abwesenheitsliste löschen?',
+    'Edit Absence': 'Abwesenheit bearbeiten',
     Overdue: 'Überfällig',
 
     // Quotations
@@ -313,6 +331,8 @@ module.exports = {
     'Edit Description': 'Beschreibung bearbeiten',
     'No description yet. Please click the button below to add!':
       'Noch keine Beschreibung. Bitte klicken Sie zum Hinzufügen auf die Schaltfläche unten!',
+    'No description yet. It will appear here once added!':
+      'Noch keine Beschreibung. Sie wird hier erscheinen, sobald sie hinzugefügt wurde!',
     'Stock Info': 'Informationen zum Bestand',
     'No stock info yet. Please click the button below to add!':
       'Noch keine Lagerinformationen. Bitte klicken Sie auf die Schaltfläche unten, um sie hinzuzufügen!',
@@ -332,6 +352,9 @@ module.exports = {
     'Edit Attachments': 'Anhänge bearbeiten',
     'JPEG, PNG, BMP, GIF, WEBP, SVG only': 'Nur JPEG, PNG, BMP, GIF, WEBP, SVG',
     'JPG, PNG or BMP only': 'Nur JPG, PNG oder BMP',
+    'Company Logo': 'Firmenlogo',
+    'Upload Company Logo': 'Firmenlogo hochladen',
+    'Replace Image': 'Bild ersetzen',
     'Drag to reposition picture': 'Ziehen, um das Bild neu zu positionieren',
     'File size less than 5MB only':
       'Nur Dateien mit einer Größe von maximal 5 MB',
@@ -619,6 +642,9 @@ module.exports = {
     'Select a due date': 'Wählen Sie ein Fälligkeitsdatum',
     'Choose a Date, Time & Technician':
       'Wählen Sie ein Datum, eine Uhrzeit und einen Techniker',
+    'Choose a fixed date and time':
+      'Wählen Sie ein festes Datum und eine Uhrzeit',
+    'Schedule To': 'Zeitplan für',
     'Select a technician for attending this service order immediately':
       'Wählen Sie einen Techniker diesen Auftrag',
     'Select a date before which this service order has to be completed':
@@ -628,7 +654,8 @@ module.exports = {
     'Due date': 'Fälligkeitsdatum',
     'Assign To': 'Zuweisen an',
     'Selected date and time': 'Ausgewähltes Datum und Uhrzeit',
-
+    'see more': 'Mehr anzeigen',
+    'see less': 'siehe weniger',
     // Invoices
     'This Week': 'Diese Woche',
     'Last Week': 'Letzte Woche',
@@ -638,7 +665,7 @@ module.exports = {
     'Service Order': 'Auftrag',
     'Select Order': 'Auftrag auswählen',
     search: 'suche',
-    'Date Created': 'Erstellungsdatum',
+    'Date Created': 'Datum der Erstellung',
     'Created By': 'Erstellt von',
     'Invoice Type': 'Rechnungsart',
     'Due Date *': 'Fälligkeitsdatum *',
@@ -689,7 +716,7 @@ module.exports = {
     'Add Quotation': 'Angebot hinzufügen',
     'Select Unit': 'Einheit wählen',
     Duplicate: 'Duplizieren',
-    'Quotation Details': 'Details zum Angebot',
+    'Quotation Details': 'Angebotsdetails',
     Orders: 'Aufträge',
     Customers: 'Kunden',
     'EMAIL ID': 'EMAIL-ADRESSE',
@@ -701,6 +728,7 @@ module.exports = {
     'Do you want to delete this Quotation?':
       'Möchten Sie das Angebot wirklich löschen?',
     'INVOICE TYPE': 'RECHNUNGSART',
+    SUBJECT: 'BETREFF',
 
     // Customer
 
@@ -850,7 +878,7 @@ module.exports = {
     'No quotations yet. They will appear here once added.':
       'Es wurden noch keine Angebote erstellt. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!',
     'No work report yet. It will appear here once the order is completed.':
-      'Es wurde noch kein Arbeitsbericht erstellt. Er erscheint hier, sobald der Auftrag abgeschlossen ist!',
+      'Es wurde noch kein Arbeitsbericht erstellt. Er erscheint hier, sobald der Auftrag abgeschlossen ist.',
     'No orders yet. Please click the button above to add.':
       'Es wurden noch kein Auftrag erstellt. Bitte klicken Sie auf die Schaltfläche oben, um eine zu erstellen!',
     'Data will be available here only for IoT enabled units.':
@@ -871,11 +899,11 @@ module.exports = {
     'No articles yet. Please click the button above to add new':
       'Noch keine Artikel vorhanden. Bitte klicken Sie auf die Schaltfläche oben, um neue Artikel hinzuzufügen',
     'No priority technicians have been added yet!':
-      'Es wurden noch keine vorrangigen Techniker hinzugefügt!',
+      'Es sind noch keine prioritäts Techniker hinzugefügt worden!',
     'No note as been added yet!': 'Es wurde noch keine Notiz hinzugefügt!',
     'No picture has been added yet!': 'Es wurde noch kein Bild hinzugefügt!',
     'No document has been attached yet!':
-      'Es wurde noch kein Dokument beigefügt!',
+      'Es wurde noch kein Dokument hinzugefügt!',
     'Add Invoice': 'Rechnung hinzufügen',
 
     Logout: 'Ausloggen',
@@ -892,6 +920,55 @@ module.exports = {
     End: 'Ende',
     'The displayed information is based on dummy data. In order to show real-time unit information, the unit has to be connected to an IoT device. Do you need help with finding a provider? We are happy to support, just reach out to us!':
       'Die angezeigten Informationen beruhen auf Dummy-Daten. Um Echtzeit-Informationen zur Anlage zu erhalten, muss die Anlage mit einem IoT-Gerät verbunden sein. Brauchen Sie Hilfe bei der Suche nach einem Anbieter? Wir unterstützen Sie gerne, sprechen Sie uns einfach an!',
+    'Mark as accepted': 'Als angenommen markieren',
+    'Do you want to mark this quotation as accepted?':
+      'Möchten Sie dieses Angebot als angenommen markieren?',
+    'Mark Accepted': 'Markierung Akzeptiert',
+    'Download Quotation': 'Angebot herunterladen',
+    'No service order has been created for this quotation yet!':
+      'Für dieses Angebot wurde noch kein Serviceauftrag erstellt!',
+    Addresses: 'Adressen',
+    Settings: 'Einstellungen',
+    'Legal Information': 'Rechtliche Informationen',
+    'Payment Information': 'Zahlungsinformationen',
+    'Billing Information': 'Informationen zur Rechnungsstellung',
+    'Company Policies': 'Unternehmensrichtlinien',
+    LANGUAGE: 'SPRACHE',
+    'DATE FORMAT': 'DATUMSFORMAT',
+    'TIME FORMAT': 'ZEITFORMAT',
+    'TIME ZONE': 'ZEITZONE',
+    'MANAGING DIRECTOR': 'GESCHÄFTSFÜHRERIN',
+    'ARBITRATION COURT': 'REGISTERGERICHT',
+    'TRADE REGISTER NUMBER': 'HANDELSREGISTERNUMMER',
+    IBAN: 'IBAN',
+    BIC: 'BIC',
+    'ACCOUNT NUMBER': 'KONTONUMMER',
+    'VAT ID': 'UMSATZSTEUER-ID',
+    '% VAT': '% MwSt.',
+    'YEARLY VACATION DAYS': 'URLAUBSTAGE PRO JAHE',
+    WEBSITE: 'WEBSITE',
+    'BUSINESS ADDRESS': 'GESCHÄFTSADRESSE',
+    'BILLING ADDRESS': 'RECHNUNGSADRESSE',
+    'POSTAL ADDRESS': 'POSTANSCHRIFT',
+    'Business Address': 'Geschäftsadresse',
+    Language: 'SPRACHE',
+    'Date Format': 'Datumsformat',
+    'Time Format': 'Zeitformat',
+    'Time Zone': 'Zeitzone',
+    'Edit Settings': 'Einstellungen bearbeiten',
+    'Edit Legal Information': 'Rechtliche Informationen bearbeiten',
+    'Managing Director': 'Geschäftsführerin',
+    'Arbitration Court': 'Registergericht',
+    'Trade Register Number': 'Handelsregisternummer',
+    'Account Number': 'Kontonummer',
+    'Yearly Vacation Days': 'Urlaubstage Pro Jahe',
+    'Edit Billing Information': 'Abrechnungsinformationen bearbeiten',
+    'Edit Company Policies': 'Unternehmensrichtlinien bearbeiten',
+    'Edit Payment Information': 'Zahlungsinformationen bearbeiten',
+    'Edit Addresses': 'Adressen bearbeiten',
+    Checklist: 'Checkliste',
+    'No checklist yet.': 'Keine Checkliste vorhanden.',
+    'Order Details': 'Auftragsdetails',
   },
 };
 

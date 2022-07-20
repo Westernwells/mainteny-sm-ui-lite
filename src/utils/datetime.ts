@@ -8,10 +8,21 @@ import {
   startOfWeek,
   intervalToDuration,
   formatDistance,
+  Locale,
 } from 'date-fns';
 import {useTranslation} from 'react-i18next';
+import {enUS, de} from 'date-fns/locale';
 
 export const DEFAULT_DATE_FORMAT = 'dd.MM.yyyy';
+export const locales: {[key: string]: Locale} = {enUS, de};
+
+interface DateFormatOptions {
+  locale?: globalThis.Locale | undefined;
+  weekStartsOn?: 0 | 1 | 3 | 2 | 4 | 5 | 6 | undefined;
+  firstWeekContainsDate?: number | undefined;
+  useAdditionalWeekYearTokens?: boolean | undefined;
+  useAdditionalDayOfYearTokens?: boolean | undefined;
+}
 
 export function getDateObject(input: any): Date {
   const type = typeof input;
@@ -36,13 +47,18 @@ export const getEndOfWeek = (
   weekStart?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | undefined,
 ) => endOfWeek(date, {weekStartsOn: weekStart});
 
-export function formatDate(input?: string | Date, formatType?: string) {
+export function formatDate(
+  input?: string | Date,
+  formatType?: string,
+  options?: DateFormatOptions,
+) {
   if (!input) {
     return undefined;
   }
+
   return formatType
-    ? format(getDateObject(input), formatType)
-    : format(getDateObject(input), DEFAULT_DATE_FORMAT);
+    ? format(getDateObject(input), formatType, options)
+    : format(getDateObject(input), DEFAULT_DATE_FORMAT, options);
 }
 
 export function setDateTime(date: Date, hourMinute: string): Date {

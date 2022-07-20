@@ -4,10 +4,10 @@ import useTheme from '@mui/material/styles/useTheme';
 import {ServiceOrderView} from 'models/service-order';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import Grid from '@mui/material/Grid';
-import {formatDate} from 'utils/datetime';
 import {ServiceOrderStatusIcons} from 'components/ServiceOrderStatusIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {serviceOrderStatusToString} from 'utils/service-order-utils';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   bodyContainerStyle?: {[key: string]: string | number};
@@ -21,6 +21,7 @@ export const ServiceHistory = ({
   serviceOrder,
 }: Props) => {
   const theme = useTheme();
+  const formatDate = useFormatDate();
   console.log(minHeight);
   return (
     <Grid
@@ -34,7 +35,7 @@ export const ServiceHistory = ({
       <Grid xs={3} item>
         <Box display="flex">
           <Typography variant="subtitle1" sx={{mr: '0.3em'}}>
-            {formatDate(serviceOrder.schedules[0].startTime, 'dd MMM YYY')},
+            {formatDate(serviceOrder.schedules[0].startTime)},
           </Typography>
           <Typography
             variant="body2"

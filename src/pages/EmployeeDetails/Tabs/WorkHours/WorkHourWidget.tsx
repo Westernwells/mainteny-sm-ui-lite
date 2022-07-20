@@ -14,10 +14,11 @@ import {useWorkHours} from 'hooks/reactQuery/useWorkHours';
 import {WorkHoursItem} from 'models/workHours';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {calculateTotalTime} from 'utils/work-hours-utils';
-import {getWhen} from 'utils/datetime';
+import {useWhen} from 'hooks/useWhen';
 import {columnsWidget, makeRows} from './WorkHoursDataGrid';
 
 const WorkHourWidget = () => {
+  const getWhen = useWhen();
   const {t} = useTranslation();
   const {id: employeeId} = useParams();
 
@@ -78,7 +79,7 @@ const WorkHourWidget = () => {
           <ArrowBackIosIcon sx={{fontSize: '0.8rem'}} />
         </Box>
         <Typography variant="tableHeaderText" ml="0.5em" mr="0.9em">
-          {t(`${getWhen(currentDate, 'dd.MM.yyyy')}`)}
+          {t(`${getWhen(currentDate)}`)}
         </Typography>
         <Box onClick={() => nextDay()} sx={{cursor: 'pointer'}}>
           <ArrowForwardIosIcon sx={{fontSize: '0.8rem'}} />

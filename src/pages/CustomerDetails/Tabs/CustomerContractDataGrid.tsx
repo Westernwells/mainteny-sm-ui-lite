@@ -7,7 +7,7 @@ import {
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import {formatDate} from 'utils/datetime';
+import {FormatDate} from 'models/misc';
 import {ContractView} from 'models/contract';
 import {formatNetAmount} from '../../../utils/currency';
 
@@ -86,7 +86,7 @@ export const columns: GridColDef[] = [
     field: 'cost',
     headerName: 'COST/YEAR',
     type: 'number',
-    flex: 0,
+    flex: 0.5,
     headerAlign: 'right',
     align: 'right',
     ...defaultProps,
@@ -120,7 +120,10 @@ export const columns: GridColDef[] = [
   },
 ];
 
-export const makeRows = (contracts: ContractView[]): GridRowsProp =>
+export const makeRows = (
+  contracts: ContractView[],
+  formatDate: FormatDate = () => '',
+): GridRowsProp =>
   contracts.map((item: ContractView, index: number) => ({
     id: index,
     contractNumber: item.number,

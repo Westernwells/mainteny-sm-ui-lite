@@ -159,6 +159,7 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
       handleSubmit={addNewEmployee}
       disableNextBtn={disableNextBtn}
       initialActiveStep={0}
+      stepperStyles={{width: '80%'}}
       getActiveStep={(val) => setActiveStep(val)}
       stepperWidth="70%"
       steps={steps}

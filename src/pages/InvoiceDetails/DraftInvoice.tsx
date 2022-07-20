@@ -38,8 +38,8 @@ import {
   PropertyOwnerView,
 } from 'models/propertyManager';
 import {Amount, WithOptional} from 'models/misc';
-import {formatDate} from 'utils/datetime';
 import {convertToText} from 'utils/utils';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   invoice?: InvoiceView;
@@ -56,6 +56,7 @@ const dateToString = (date: Date) => date.toISOString().split('T')[0];
 
 export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
   const {t} = useTranslation();
+  const formatDate = useFormatDate();
   const navigate = useNavigate();
 
   const {user} = useUserSession();
@@ -170,7 +171,11 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
   }, [invoice]);
 
   useEffect(() => {
-    if (serviceOrder && formik.values.type !== InvoiceType.PARTIAL) {
+    if (
+      !invoice &&
+      serviceOrder &&
+      formik.values.type !== InvoiceType.PARTIAL
+    ) {
       setCustomer(serviceOrder.elevator.propertyOwner);
 
       formik.setFieldValue(
@@ -198,7 +203,7 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
         );
         setInvoiceItems(items);
       }
-    } else if (formik.values.type !== InvoiceType.PARTIAL) {
+    } else if (!invoice && formik.values.type !== InvoiceType.PARTIAL) {
       setInvoiceItems([]);
     }
   }, [serviceOrder, formik.values.type]);
@@ -354,9 +359,10 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
               if (newValue) setDueDate(newValue);
             }}
             textFieldProps={{
-              label: 'Due Date *',
+              label: 'Due Date',
               InputLabelProps: {shrink: true},
             }}
+            required
           />
         </Box>
 

@@ -11,7 +11,7 @@ import {EmptySection} from 'components/EmptySection';
 import {ServiceOrderOrderField} from 'models/service-order';
 import {DatePicker} from 'components/DatePicker';
 import {Order} from 'models/misc';
-import {formatDate} from 'utils/datetime';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
@@ -27,6 +27,7 @@ const pageInfo = makePage(0, 50);
 
 export const UnitListingView = () => {
   const navigate = useNavigate();
+  const formatDate = useFormatDate();
   const [queryParams, setQueryParams] = useSearchParams();
   const [lastVisitStart, setLastVisitStart] = useState<Date | null>(null);
   const [lastVisitEnd, setLastVisitEnd] = useState<Date | null>(null);
@@ -80,7 +81,7 @@ export const UnitListingView = () => {
 
   useEffect(() => {
     if (!isLoading) {
-      setRows(makeRows(elevatorResponse.data));
+      setRows(makeRows(elevatorResponse.data, formatDate));
     }
   }, [elevatorResponse, isLoading]);
 

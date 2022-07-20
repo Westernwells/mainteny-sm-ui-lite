@@ -80,7 +80,7 @@ export const EditBasicInformation = ({formik}: Props) => {
         <FormInput
           props={{
             size: 'small',
-            placeholder: 'Enter url',
+            placeholder: 'e.g. www.yourcompany.com',
             label: 'Website',
             name: 'url',
             value: formik.values.url,

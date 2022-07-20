@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {twentyFourHourTime} from 'utils/utils';
 import * as _ from 'lodash';
-import {formatDate, getDateObject} from 'utils/datetime';
+import {getDateObject} from 'utils/datetime';
 import {ScheduleContainer} from 'components/Schedules/ScheduleContainer';
 import {ScheduleHeader} from 'components/Schedules/ScheduleHeader';
 import {ScheduleRow} from 'components/Schedules/ScheduleRow';
@@ -16,6 +16,7 @@ import {ScheduledItemGroup} from 'components/Schedules/model';
 import {getItemPosition, getItemWidth} from 'components/Schedules/utils';
 import {isBefore} from 'date-fns';
 import {EmployeesView} from 'models/employee';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   technicians?: EmployeesView[];
@@ -45,6 +46,7 @@ export const TechnicianSchedule = ({
   technicians,
   checkedValues = [],
 }: Props) => {
+  const formatDate = useFormatDate();
   const [scheduleItemGroup, setScheduleItemGroup] =
     useState<ScheduledItemGroup>({});
   const [tableHeader, setTableHeader] = useState<string[]>([]);

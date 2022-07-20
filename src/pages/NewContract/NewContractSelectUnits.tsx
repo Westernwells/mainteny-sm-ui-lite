@@ -11,6 +11,7 @@ import React, {FC, useCallback, useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import * as _ from 'lodash';
 import {FormikProps} from 'formik';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {SearchInput} from 'components/SearchInput';
 import {columns, makeRows} from './NewContractUnitsGridProps';
 
@@ -23,6 +24,7 @@ const pageInfo = makePage(0, 10);
 
 const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
   const {t} = useTranslation();
+  const formatDate = useFormatDate();
   const fallback = useRef({
     elevatorByAddress: {} as ElevatorByAddr,
     centerCoord: {longitude: 0, latitude: 0},
@@ -79,9 +81,12 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
     if (elevatorView.elevatorByAddress) {
       const flatArr = flatenn(elevatorView.elevatorByAddress);
       setRows(
-        makeRows({
-          elevators: flatArr,
-        }),
+        makeRows(
+          {
+            elevators: flatArr,
+          },
+          formatDate,
+        ),
       );
     } else {
       setRows([]);

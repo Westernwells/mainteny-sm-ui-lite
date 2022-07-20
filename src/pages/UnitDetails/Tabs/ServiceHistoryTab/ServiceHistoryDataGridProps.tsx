@@ -4,11 +4,12 @@ import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {getColumnProps} from 'components/DataGridLayout';
 import {ServiceOrderView} from 'models/service-order';
-import {formatDate, toDate} from 'utils/datetime';
 import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
+import {FormatDate} from 'models/misc';
+import {toDate} from 'utils/datetime';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -61,7 +62,10 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = (serviceOrders: ServiceOrderView[]): GridRowsProp =>
+export const makeRows = (
+  serviceOrders: ServiceOrderView[],
+  formatDate: FormatDate = () => '',
+): GridRowsProp =>
   serviceOrders.length
     ? serviceOrders.map((item, index: number) => ({
         id: index,

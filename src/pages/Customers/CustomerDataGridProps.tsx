@@ -4,8 +4,9 @@ import SendIcon from '@mui/icons-material/Send';
 import {getColumnProps} from 'components/DataGridLayout';
 import IconButton from '@mui/material/IconButton';
 import {PropertyOwnerView} from 'models/propertyManager';
-import {formatDate, getDateObject} from 'utils/datetime';
+import {getDateObject} from 'utils/datetime';
 import {Typography} from '@mui/material';
+import {FormatDate} from 'models/misc';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -68,6 +69,7 @@ export const columns: GridColDef[] = [
 
 export const makeRows = (
   customers: PropertyOwnerView[],
+  formatDate: FormatDate = () => '',
 ): GridRowModel<{[key: string]: any}[]> =>
   customers.map((item, index: number) => ({
     id: index,
@@ -79,8 +81,5 @@ export const makeRows = (
     access: 'Invite',
     navigateTo: `details/${item.id}?tab=0`,
     actions: item.contact.email,
-    createdAt: formatDate(
-      getDateObject(item.meta.createdAt),
-      'dd.MM.yyyy',
-    ) as string,
+    createdAt: formatDate(getDateObject(item.meta.createdAt)) as string,
   }));

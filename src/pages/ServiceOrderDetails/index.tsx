@@ -15,7 +15,7 @@ const tabItems = [
     icon: <ManageSearchIcon />,
   },
   {
-    label: 'Work report',
+    label: 'Work Report',
     icon: <GradingIcon />,
   },
   {

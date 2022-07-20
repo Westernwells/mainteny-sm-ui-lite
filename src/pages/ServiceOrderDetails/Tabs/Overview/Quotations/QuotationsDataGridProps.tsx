@@ -1,9 +1,9 @@
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import {StatusChip} from 'components/StatusChip';
 import {getColumnProps} from 'components/DataGridLayout';
-import {formatDate} from 'utils/datetime';
 import {formatCurrency} from 'utils/currency';
 import {QuotationStatus, QuotationView} from 'models/quotation';
+import {FormatDate} from 'models/misc';
 
 export const getQuotationStatusStyles = (
   status: string,
@@ -59,7 +59,10 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = (quotations: QuotationView[]): GridRowsProp =>
+export const makeRows = (
+  quotations: QuotationView[],
+  formatDate: FormatDate = () => '',
+): GridRowsProp =>
   quotations &&
   quotations.map((item: QuotationView) => ({
     id: item.id,

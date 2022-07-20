@@ -12,6 +12,7 @@ import {useWorkHours} from 'hooks/reactQuery/useWorkHours';
 import {WorkHoursItem} from 'models/workHours';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {calculateTotalTime} from 'utils/work-hours-utils';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {getLastWeek} from 'utils/datetime';
 import {columns, makeRows} from './WorkHoursDataGrid';
 
@@ -21,6 +22,7 @@ interface Props {
 
 const WorkHoursTab = ({employeeId}: Props) => {
   const {t} = useTranslation();
+  const formatDate = useFormatDate();
   const [startDate, setStartDate] = useState<Date>(getLastWeek());
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [search, setSearch] = useState('');
@@ -34,7 +36,7 @@ const WorkHoursTab = ({employeeId}: Props) => {
 
   useEffect(() => {
     if (workHours.data) {
-      setRows(makeRows(workHours));
+      setRows(makeRows(workHours, formatDate));
       setTotalTime(calculateTotalTime(workHours.data));
     } else {
       setRows([]);

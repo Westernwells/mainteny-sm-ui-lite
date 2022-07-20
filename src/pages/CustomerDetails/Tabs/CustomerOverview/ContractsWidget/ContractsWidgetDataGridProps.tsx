@@ -7,7 +7,7 @@ import {
 } from '@mui/x-data-grid';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
-import {formatDate} from 'utils/datetime';
+import {FormatDate} from 'models/misc';
 import {ContractView} from 'models/contract';
 import {formatNetAmount} from '../../../../../utils/currency';
 
@@ -64,7 +64,10 @@ export const columns: GridColDef[] = [
   },
 ];
 
-export const makeRows = (contracts: any): GridRowsProp =>
+export const makeRows = (
+  contracts: any,
+  formatDate: FormatDate = () => '',
+): GridRowsProp =>
   contracts
     ? contracts.data.map((item: ContractView, index: number) => ({
         id: index,
