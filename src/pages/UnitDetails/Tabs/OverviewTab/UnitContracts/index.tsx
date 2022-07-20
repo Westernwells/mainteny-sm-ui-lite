@@ -50,7 +50,7 @@ export const UnitContracts = ({containerStyles, contracts}: Props) => {
           sx={{textAlign: 'center', cursor: 'pointer'}}
           onClick={() => setShowAll(!showAll)}>
           <Typography variant="caption" color={theme.palette.info.main}>
-            {showAll ? 'see less' : 'see more'}
+            {showAll ? t('see less') : t('see more')}
           </Typography>
         </Box>
       ) : null}
