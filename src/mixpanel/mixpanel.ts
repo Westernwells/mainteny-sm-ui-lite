@@ -7,35 +7,49 @@ mixpanel.init(process.env.REACT_APP_MIXPANEL_TOKEN || '', {
   debug: !isProduction,
 });
 
-const user = getStoredUser();
+const registerMixpanelCustomProperties =
+  (fn: (...args: any) => void) =>
+  (...args: any) => {
+    if (!isProduction) {
+      return;
+    }
 
-if (user) {
-  mixpanel.register({
-    userId: user.userAccount.id,
-    userName: user.userAccount.username,
-    serviceCompanyId: user.userAccount.serviceCompany.id,
-    serviceCompanyName: user.userAccount.serviceCompany.name,
-  });
-}
+    const user = getStoredUser();
+    if (user) {
+      mixpanel.register({
+        userId: user.userAccount.id,
+        userName: user.userAccount.username,
+        serviceCompanyId: user.userAccount.serviceCompany.id,
+        serviceCompanyName: user.userAccount.serviceCompany.name,
+      });
+    }
+
+    return fn(...args);
+  };
 
 interface Dict {
   [key: string]: any;
 }
 
 const actions = {
-  identify: (id?: string | undefined) => {
-    if (isProduction) mixpanel.identify(id);
-  },
-  track: (name: string, props?: Dict | undefined) => {
-    if (isProduction) mixpanel.track(name, props);
-  },
-  identifyAndTrack: (name: string, props?: Dict | undefined) => {
-    actions.identify(user?.userAccount.id);
-    actions.track(name, props);
-  },
-  timeEvent: (name: string) => {
-    if (isProduction) mixpanel.time_event(name);
-  },
+  identify: registerMixpanelCustomProperties((id?: string | undefined) => {
+    mixpanel.identify(id);
+  }),
+  track: registerMixpanelCustomProperties(
+    (name: string, props?: Dict | undefined) => {
+      mixpanel.track(name, props);
+    },
+  ),
+  identifyAndTrack: registerMixpanelCustomProperties(
+    (name: string, props?: Dict | undefined) => {
+      const user = getStoredUser();
+      actions.identify(user?.userAccount.id);
+      actions.track(name, props);
+    },
+  ),
+  timeEvent: registerMixpanelCustomProperties((name: string) => {
+    mixpanel.time_event(name);
+  }),
 };
 
 export const Mixpanel = actions;
