@@ -61,6 +61,16 @@ export interface ServiceCompanyActivity<T> {
   type: ActivityMessageType;
 }
 
+export interface ServiceCompanyActivityParams {
+  serviceCompanyId: string;
+  start: string;
+  end: string;
+  pageIndex: number;
+  pageSize: number;
+  query?: string;
+  type?: ActivityMessageType[];
+}
+
 export interface ServiceCompanySummary {
   id: string;
   serviceCompanyId: string;

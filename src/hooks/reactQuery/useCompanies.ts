@@ -1,7 +1,16 @@
+import {AxiosResponse} from 'axios';
 import {NewServiceCompanyBody} from 'pages/NewCompany/model';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
-import {Page, Resource, RestError, StringValue} from 'models/misc';
 import {
+  Page,
+  Resource,
+  RestError,
+  StringValue,
+  WithOptional,
+} from 'models/misc';
+import {
+  ServiceCompanyActivity,
+  ServiceCompanyActivityParams,
   ServiceCompanyItem,
   ServiceCompanyUpdateBody,
   SystemSettingsUpdateBody,
@@ -14,6 +23,7 @@ import {
 } from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
 import {useSnackbar} from 'notistack';
+import {ServiceOrder} from 'models/service-order';
 import {useUserSession} from './useUserSession';
 
 export const getCompanies = async (page: Page, query: string) => {
@@ -173,3 +183,42 @@ export const useCreateServiceCompany = (successMsg: string) => {
     },
   );
 };
+
+const getCompanyActivities = async (params: ServiceCompanyActivityParams) => {
+  const response: AxiosResponse<Resource<ServiceCompanyActivity<'string'>>> =
+    await axiosClient.get(
+      `/api/serviceCompanies/${params.serviceCompanyId}/activities`,
+      {
+        params,
+        paramsSerializer,
+      },
+    );
+  // json parse is needed because of the way the API returns the data (JSON string)
+  return {
+    ...response.data,
+    data: response.data.data.map((activity) => ({
+      ...activity,
+      data: JSON.parse(activity.data),
+    })),
+  };
+};
+
+export function useServiceCompanyActivities(
+  params: WithOptional<ServiceCompanyActivityParams, 'serviceCompanyId'>,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  const {user} = useUserSession();
+  return useQuery<
+    Resource<ServiceCompanyActivity<ServiceOrder>>,
+    RestError,
+    Resource<ServiceCompanyActivity<ServiceOrder>>
+  >(
+    [queryKeys.serviceCompanyActivity, params],
+    () =>
+      getCompanyActivities({
+        ...params,
+        serviceCompanyId: user!.userAccount.serviceCompany.id,
+      }),
+    {enabled: !!user, ...options},
+  );
+}

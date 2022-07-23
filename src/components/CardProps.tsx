@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import {SxProps} from '@mui/system';
 import {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
 
@@ -14,6 +15,7 @@ interface Props {
   containerStyles?: {[key: string]: any};
   bodyStyle?: {[key: string]: any};
   labelStyle?: {[key: string]: any};
+  iconContainerStyles?: SxProps;
 }
 
 export const CardProps = ({
@@ -27,6 +29,7 @@ export const CardProps = ({
   containerStyles,
   bodyStyle,
   labelStyle,
+  iconContainerStyles = {},
 }: Props) => {
   const {t} = useTranslation();
   return (
@@ -40,6 +43,7 @@ export const CardProps = ({
           justifyContent: 'center',
           mr: '1em',
           maxHeight: iconMaxHeight || 'default',
+          ...iconContainerStyles,
         }}>
         {icon}
       </Box>

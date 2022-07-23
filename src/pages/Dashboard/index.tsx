@@ -1,3 +1,4 @@
+import {addDays, endOfToday, startOfDay} from 'date-fns';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -13,13 +14,18 @@ import {
 import {useQuotations} from 'hooks/reactQuery/useQuotation';
 import {useInvoices} from 'hooks/reactQuery/useInvoice';
 import {useQueryServiceCompanyEmployeeStatus} from 'hooks/reactQuery/useEmployee';
+import {useServiceCompanyActivities} from 'hooks/reactQuery/useCompanies';
 import {createEmptyResource} from 'utils/paging-utils';
 import {toRestDate} from 'utils/datetime';
 import {Role} from 'models/user';
-import {ServiceOrderView} from 'models/service-order';
+import {ServiceOrder, ServiceOrderView} from 'models/service-order';
 import {QuotationStatus, QuotationView} from 'models/quotation';
 import {InvoiceStatus, InvoiceView} from 'models/invoice';
 import {EmployeeStatusView} from 'models/employee';
+import {
+  ActivityMessageType,
+  ServiceCompanyActivity,
+} from 'models/service-company';
 import {AddAnything} from './AddAnything';
 import {TopCard} from './TopCard';
 import {TechniciansWorking} from './TechniciansWorking';
@@ -69,12 +75,34 @@ export const Dashboard = () => {
     pageSize: 5,
     roles: [Role.TECHNICIAN],
   });
+  const {
+    data: activities = createEmptyResource<
+      ServiceCompanyActivity<ServiceOrder>
+    >(10),
+    isLoading: isLoadingActivities,
+  } = useServiceCompanyActivities({
+    start: startOfDay(addDays(new Date(), -180)).toISOString(),
+    end: endOfToday().toISOString(),
+    pageIndex: 0,
+    pageSize: 10,
+    type: [
+      ActivityMessageType.SERVICE_ORDER_COMPLETED,
+      ActivityMessageType.SERVICE_ORDER_SCHEDULED,
+      ActivityMessageType.SERVICE_ORDER_CANCELLED,
+      ActivityMessageType.SERVICE_ORDER_STARTED,
+      ActivityMessageType.SERVICE_ORDER_UNSCHEDULED,
+      ActivityMessageType.SERVICE_ORDER_UPDATED,
+      ActivityMessageType.SERVICE_ORDER_EXPIRED,
+      ActivityMessageType.SERVICE_ORDER_TIME_EDITED,
+    ],
+  });
 
   const isLoading =
     isLoadingAppointments ||
     isLoadingQuotations ||
     isLoadingInvoices ||
-    isLoadingTechnicians;
+    isLoadingTechnicians ||
+    isLoadingActivities;
 
   if (isLoading) {
     return <Progress />;
@@ -143,7 +171,7 @@ export const Dashboard = () => {
           </Grid>
         </Grid>
         <Grid item xs={12} xl={3}>
-          <FieldActivities />
+          <FieldActivities activities={activities} />
         </Grid>
       </Grid>
     </>

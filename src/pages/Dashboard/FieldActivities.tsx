@@ -1,85 +1,40 @@
 import {useTranslation} from 'react-i18next';
+import {format} from 'date-fns';
+import {Link as RouterLink} from 'react-router-dom';
 import useTheme from '@mui/material/styles/useTheme';
+import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
+import Timeline from '@mui/lab/Timeline';
+import TimelineItem from '@mui/lab/TimelineItem';
+import TimelineSeparator from '@mui/lab/TimelineSeparator';
+import TimelineConnector from '@mui/lab/TimelineConnector';
+import TimelineContent from '@mui/lab/TimelineContent';
+import TimelineDot from '@mui/lab/TimelineDot';
+import {Engineering, LocationOn, Tag} from '@mui/icons-material';
+import {Resource} from 'models/misc';
+import {ServiceCompanyActivity} from 'models/service-company';
+import {ServiceOrder} from 'models/service-order';
 import {InfoCard} from 'components/InfoCard';
+import {CardProps} from 'components/CardProps';
+import {getFieldActivityColor, getFieldActivityTitle} from 'utils/dashboard';
 
-export const FieldActivities = () => {
+const iconContainerStyles = {
+  mr: '0.5rem',
+  borderRadius: '0.25rem',
+  width: '2.5rem',
+  height: '2.5rem',
+  alignItems: 'center',
+};
+
+export const FieldActivities = ({
+  activities,
+}: {
+  activities: Resource<ServiceCompanyActivity<ServiceOrder>>;
+}) => {
   const {t} = useTranslation();
   const theme = useTheme();
-  const activities = [
-    {
-      id: 'random1',
-      serviceCompanyId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      description: 'somde desx',
-      type: 'SERVICE_ORDER_COMPLETED',
-      data: 'string',
-      requestId: 'string',
-      createdAt: '2022-07-18T07:19:29.494Z',
-    },
-    {
-      id: 'random2',
-      serviceCompanyId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      description: 'somde desx',
-      type: 'SERVICE_ORDER_SCHEDULED',
-      data: 'string',
-      requestId: 'string',
-      createdAt: '2022-07-18T07:19:29.494Z',
-    },
-    {
-      id: 'random8',
-      serviceCompanyId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      description: 'somde desx',
-      type: 'SERVICE_ORDER_TIME_EDITED',
-      data: 'string',
-      requestId: 'string',
-      createdAt: '2022-07-18T07:19:29.494Z',
-    },
-    {
-      id: 'random4',
-      serviceCompanyId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      description: 'somde desx',
-      type: 'SERVICE_ORDER_STARTED',
-      data: 'string',
-      requestId: 'string',
-      createdAt: '2022-07-18T07:19:29.494Z',
-    },
-    {
-      id: 'random5',
-      serviceCompanyId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      description: 'somde desx',
-      type: 'SERVICE_ORDER_UNSCHEDULED',
-      data: 'string',
-      requestId: 'string',
-      createdAt: '2022-07-18T07:19:29.494Z',
-    },
-    {
-      id: 'random6',
-      serviceCompanyId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      description: 'somde desx',
-      type: 'SERVICE_ORDER_UPDATED',
-      data: 'string',
-      requestId: 'string',
-      createdAt: '2022-07-18T07:19:29.494Z',
-    },
-    {
-      id: 'random3',
-      serviceCompanyId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      description: 'somde desx',
-      type: 'SERVICE_ORDER_CANCELLED',
-      data: 'string',
-      requestId: 'string',
-      createdAt: '2022-07-18T07:19:29.494Z',
-    },
-    {
-      id: 'random7',
-      serviceCompanyId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      description: 'somde desx',
-      type: 'SERVICE_ORDER_EXPIRED',
-      data: 'string',
-      requestId: 'string',
-      createdAt: '2022-07-18T07:19:29.494Z',
-    },
-  ];
+
   return (
     <InfoCard
       containerStyles={{
@@ -101,38 +56,90 @@ export const FieldActivities = () => {
         px: '0.5rem',
       }}
       showHeaderBackground>
-      {activities.map((activity) => (
-        <pre key={activity.id}>{JSON.stringify(activity, null, 2)}</pre>
-      ))}
-      {/* <List disablePadding>
-        {invoices.map((invoice) => (
-          <ListItem
-            key={invoice.id}
-            sx={{py: '6px', px: '1.5rem'}}
-            secondaryAction={
-              <Chip
-                label={invoice.status}
-                size="small"
-                sx={{
-                  px: '0.28rem',
-                  textTransform: 'capitalize',
-                  color: '#fff',
-                  bgcolor: theme.palette.eden.light,
-                }}
-              />
-            }>
-            <ListItemAvatar>
-              <Avatar sx={{width: 28, height: 28, fontSize: '1rem'}}>
-                {nameToInitials(invoice.company)}
-              </Avatar>
-            </ListItemAvatar>
-            <ListItemText sx={{flexBasis: '25%'}}>
-              {invoice.company}
-            </ListItemText>
-            <ListItemText>{invoice.total}</ListItemText>
-          </ListItem>
-        ))}
-      </List> */}
+      <Timeline sx={{padding: 0, margin: 0}}>
+        {activities.data.map((activity) => {
+          const technician = activity.data.schedules[0].technician.userAccount;
+          const technicianName = `${technician?.firstName ?? ''} ${
+            technician.lastName ?? ''
+          }`;
+          return (
+            <TimelineItem
+              key={activity.id}
+              sx={{
+                '::before': {
+                  display: 'none',
+                },
+              }}>
+              <TimelineSeparator>
+                <TimelineDot
+                  sx={{
+                    bgcolor: getFieldActivityColor(activity.type),
+                    boxShadow: 'none',
+                  }}
+                />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>
+                <Typography variant="body1" display="inline">
+                  {getFieldActivityTitle(activity.type)}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  display="inline"
+                  pl="8px"
+                  color="text.secondary">
+                  {format(new Date(activity.createdAt), 'dd.MM.yyyy, HH:mm')}h
+                </Typography>
+                <Grid container spacing={2} pt="0.75rem">
+                  <Grid item xs={6}>
+                    <CardProps
+                      icon={<Tag sx={{color: theme.palette.info.dark}} />}
+                      label={t('ORDER ID')}
+                      bodyText={activity.data.number}
+                      iconBackground={theme.palette.info.outlinedHoverBg}
+                      iconContainerStyles={iconContainerStyles}
+                      iconMaxHeight="3rem"
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <CardProps
+                      icon={
+                        <Engineering sx={{color: theme.palette.info.dark}} />
+                      }
+                      label={t('TECHNICIAN')}
+                      bodyText={technicianName}
+                      iconBackground={theme.palette.info.outlinedHoverBg}
+                      iconContainerStyles={iconContainerStyles}
+                      iconMaxHeight="3rem"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <CardProps
+                      icon={
+                        <LocationOn sx={{color: theme.palette.info.dark}} />
+                      }
+                      label={t('UNIT ADDRESS')}
+                      bodyText={
+                        <Link
+                          component={RouterLink}
+                          to={`/units/details/${activity.data.elevator.id}`}
+                          underline="hover"
+                          variant="body2"
+                          color={theme.palette.info.dark}>
+                          {activity.data.elevator.address.fullName}
+                        </Link>
+                      }
+                      iconBackground={theme.palette.info.outlinedHoverBg}
+                      iconContainerStyles={iconContainerStyles}
+                      iconMaxHeight="3rem"
+                    />
+                  </Grid>
+                </Grid>
+              </TimelineContent>
+            </TimelineItem>
+          );
+        })}
+      </Timeline>
     </InfoCard>
   );
 };
