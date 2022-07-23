@@ -61,8 +61,11 @@ export const AppointmentsToBeScheduled = ({
                       borderRight: '1px solid #eeeeee',
                       padding: '0.5rem',
                     },
+                    'td:last-child': {
+                      paddingRight: '0',
+                    },
                   }}>
-                  <TableCell>
+                  <TableCell width="35%">
                     <Typography variant="caption">
                       {appointment.number}
                     </Typography>
@@ -90,7 +93,7 @@ export const AppointmentsToBeScheduled = ({
                       )}
                     </Typography>
                   </TableCell>
-                  <TableCell>
+                  <TableCell width="15%">
                     <Box display="inline-flex">
                       <IconButton
                         onClick={() =>
