@@ -56,7 +56,7 @@ export const FieldActivities = ({
         px: '0.5rem',
       }}
       showHeaderBackground>
-      <Timeline sx={{padding: 0, margin: 0}}>
+      <Timeline sx={{padding: 0, marginTop: 0}}>
         {activities.data.map((activity) => {
           const technician = activity.data.schedules[0].technician.userAccount;
           const technicianName = `${technician?.firstName ?? ''} ${
