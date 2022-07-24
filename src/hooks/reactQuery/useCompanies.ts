@@ -16,6 +16,8 @@ import {
   SystemSettingsUpdateBody,
 } from 'models/service-company';
 import {
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
   useMutation,
   useQuery,
   useQueryClient,
@@ -203,22 +205,34 @@ const getCompanyActivities = async (params: ServiceCompanyActivityParams) => {
   };
 };
 
-export function useServiceCompanyActivities(
+export const useServiceCompanyActivities = (
   params: WithOptional<ServiceCompanyActivityParams, 'serviceCompanyId'>,
-  options?: UseQueryOptions<any, any, any>,
-) {
+  options?: UseInfiniteQueryOptions<any, any, any>,
+) => {
   const {user} = useUserSession();
-  return useQuery<
+  return useInfiniteQuery<
     Resource<ServiceCompanyActivity<ServiceOrder>>,
     RestError,
     Resource<ServiceCompanyActivity<ServiceOrder>>
   >(
     [queryKeys.serviceCompanyActivity, params],
-    () =>
+    ({pageParam = 0}) =>
       getCompanyActivities({
         ...params,
         serviceCompanyId: user!.userAccount.serviceCompany.id,
+        pageIndex: pageParam,
       }),
-    {enabled: !!user, ...options},
+    {
+      enabled: !!user,
+      getNextPageParam: (lastPage) => {
+        const currentTotal =
+          (lastPage.page.pageIndex + 1) * lastPage.page.pageSize;
+        if (lastPage.total && currentTotal < lastPage.total) {
+          return lastPage.page.pageIndex + 1;
+        }
+        return undefined;
+      },
+      ...options,
+    },
   );
-}
+};

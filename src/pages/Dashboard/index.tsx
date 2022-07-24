@@ -1,3 +1,5 @@
+import {useEffect} from 'react';
+import {useInView} from 'react-intersection-observer';
 import {addDays, endOfToday, startOfDay} from 'date-fns';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
@@ -18,14 +20,11 @@ import {useServiceCompanyActivities} from 'hooks/reactQuery/useCompanies';
 import {createEmptyResource} from 'utils/paging-utils';
 import {toRestDate} from 'utils/datetime';
 import {Role} from 'models/user';
-import {ServiceOrder, ServiceOrderView} from 'models/service-order';
+import {ServiceOrderView} from 'models/service-order';
 import {QuotationStatus, QuotationView} from 'models/quotation';
 import {InvoiceStatus, InvoiceView} from 'models/invoice';
 import {EmployeeStatusView} from 'models/employee';
-import {
-  ActivityMessageType,
-  ServiceCompanyActivity,
-} from 'models/service-company';
+import {ActivityMessageType} from 'models/service-company';
 import {AddAnything} from './AddAnything';
 import {TopCard} from './TopCard';
 import {TechniciansWorking} from './TechniciansWorking';
@@ -36,6 +35,7 @@ import {FieldActivities} from './FieldActivities';
 
 export const Dashboard = () => {
   const theme = useTheme();
+  const {ref, inView} = useInView();
   const {
     data: appointments = createEmptyResource<ServiceOrderView>(3),
     isLoading: isLoadingAppointments,
@@ -76,10 +76,14 @@ export const Dashboard = () => {
     roles: [Role.TECHNICIAN],
   });
   const {
-    data: activities = createEmptyResource<
-      ServiceCompanyActivity<ServiceOrder>
-    >(10),
+    data: activities = {
+      pages: [],
+      pageParams: [],
+    },
     isLoading: isLoadingActivities,
+    isFetchingNextPage: isFetchingNextActivitiesPage,
+    hasNextPage: hasNextActivitiesPage,
+    fetchNextPage: fetchNextActivitiesPage,
   } = useServiceCompanyActivities({
     start: startOfDay(addDays(new Date(), -180)).toISOString(),
     end: endOfToday().toISOString(),
@@ -96,6 +100,12 @@ export const Dashboard = () => {
       ActivityMessageType.SERVICE_ORDER_TIME_EDITED,
     ],
   });
+
+  useEffect(() => {
+    if (inView && hasNextActivitiesPage) {
+      fetchNextActivitiesPage();
+    }
+  }, [inView]);
 
   const isLoading =
     isLoadingAppointments ||
@@ -171,7 +181,11 @@ export const Dashboard = () => {
           </Grid>
         </Grid>
         <Grid item xs={12} xl={3}>
-          <FieldActivities activities={activities} />
+          <FieldActivities
+            activities={activities}
+            inViewRef={ref}
+            isFetchingNextActivitiesPage={isFetchingNextActivitiesPage}
+          />
         </Grid>
       </Grid>
     </>

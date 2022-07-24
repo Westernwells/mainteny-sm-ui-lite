@@ -1,3 +1,4 @@
+import {InfiniteData} from 'react-query';
 import {useTranslation} from 'react-i18next';
 import {format} from 'date-fns';
 import {Link as RouterLink} from 'react-router-dom';
@@ -18,6 +19,7 @@ import {ServiceOrder} from 'models/service-order';
 import {InfoCard} from 'components/InfoCard';
 import {CardProps} from 'components/CardProps';
 import {getFieldActivityColor, getFieldActivityTitle} from 'utils/dashboard';
+import {FieldActivitiesSkeleton} from './FieldActivitiesSkeleton';
 
 const iconContainerStyles = {
   mr: '0.5rem',
@@ -29,8 +31,12 @@ const iconContainerStyles = {
 
 export const FieldActivities = ({
   activities,
+  inViewRef,
+  isFetchingNextActivitiesPage,
 }: {
-  activities: Resource<ServiceCompanyActivity<ServiceOrder>>;
+  activities: InfiniteData<Resource<ServiceCompanyActivity<ServiceOrder>>>;
+  inViewRef: (node?: Element | null | undefined) => void;
+  isFetchingNextActivitiesPage: boolean;
 }) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -57,88 +63,93 @@ export const FieldActivities = ({
       }}
       showHeaderBackground>
       <Timeline sx={{padding: 0, marginTop: 0}}>
-        {activities.data.map((activity) => {
-          const technician = activity.data.schedules[0].technician.userAccount;
-          const technicianName = `${technician?.firstName ?? ''} ${
-            technician.lastName ?? ''
-          }`;
-          return (
-            <TimelineItem
-              key={activity.id}
-              sx={{
-                '::before': {
-                  display: 'none',
-                },
-              }}>
-              <TimelineSeparator>
-                <TimelineDot
-                  sx={{
-                    bgcolor: getFieldActivityColor(activity.type),
-                    boxShadow: 'none',
-                  }}
-                />
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent>
-                <Typography variant="body1" display="inline">
-                  {getFieldActivityTitle(activity.type)}
-                </Typography>
-                <Typography
-                  variant="caption"
-                  display="inline"
-                  pl="8px"
-                  color="text.secondary">
-                  {format(new Date(activity.createdAt), 'dd.MM.yyyy, HH:mm')}h
-                </Typography>
-                <Grid container spacing={2} pt="0.75rem">
-                  <Grid item xs={6}>
-                    <CardProps
-                      icon={<Tag sx={{color: theme.palette.info.dark}} />}
-                      label={t('ORDER ID')}
-                      bodyText={activity.data.number}
-                      iconBackground={theme.palette.info.outlinedHoverBg}
-                      iconContainerStyles={iconContainerStyles}
-                      iconMaxHeight="3rem"
-                    />
+        {activities.pages.map((page) =>
+          page.data.map((activity) => {
+            const technician =
+              activity.data.schedules[0].technician.userAccount;
+            const technicianName = `${technician?.firstName ?? ''} ${
+              technician.lastName ?? ''
+            }`;
+            return (
+              <TimelineItem
+                ref={inViewRef}
+                key={activity.id}
+                sx={{
+                  '::before': {
+                    display: 'none',
+                  },
+                }}>
+                <TimelineSeparator>
+                  <TimelineDot
+                    sx={{
+                      bgcolor: getFieldActivityColor(activity.type),
+                      boxShadow: 'none',
+                    }}
+                  />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <Typography variant="body1" display="inline">
+                    {getFieldActivityTitle(activity.type)}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    display="inline"
+                    pl="8px"
+                    color="text.secondary">
+                    {format(new Date(activity.createdAt), 'dd.MM.yyyy, HH:mm')}h
+                  </Typography>
+                  <Grid container spacing={2} pt="0.75rem">
+                    <Grid item xs={6}>
+                      <CardProps
+                        icon={<Tag sx={{color: theme.palette.info.dark}} />}
+                        label={t('ORDER ID')}
+                        bodyText={activity.data.number}
+                        iconBackground={theme.palette.info.outlinedHoverBg}
+                        iconContainerStyles={iconContainerStyles}
+                        iconMaxHeight="3rem"
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <CardProps
+                        icon={
+                          <Engineering sx={{color: theme.palette.info.dark}} />
+                        }
+                        label={t('TECHNICIAN')}
+                        bodyText={technicianName}
+                        iconBackground={theme.palette.info.outlinedHoverBg}
+                        iconContainerStyles={iconContainerStyles}
+                        iconMaxHeight="3rem"
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <CardProps
+                        icon={
+                          <LocationOn sx={{color: theme.palette.info.dark}} />
+                        }
+                        label={t('UNIT ADDRESS')}
+                        bodyText={
+                          <Link
+                            component={RouterLink}
+                            to={`/units/details/${activity.data.elevator.id}`}
+                            underline="hover"
+                            variant="body2"
+                            color={theme.palette.info.dark}>
+                            {activity.data.elevator.address.fullName}
+                          </Link>
+                        }
+                        iconBackground={theme.palette.info.outlinedHoverBg}
+                        iconContainerStyles={iconContainerStyles}
+                        iconMaxHeight="3rem"
+                      />
+                    </Grid>
                   </Grid>
-                  <Grid item xs={6}>
-                    <CardProps
-                      icon={
-                        <Engineering sx={{color: theme.palette.info.dark}} />
-                      }
-                      label={t('TECHNICIAN')}
-                      bodyText={technicianName}
-                      iconBackground={theme.palette.info.outlinedHoverBg}
-                      iconContainerStyles={iconContainerStyles}
-                      iconMaxHeight="3rem"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <CardProps
-                      icon={
-                        <LocationOn sx={{color: theme.palette.info.dark}} />
-                      }
-                      label={t('UNIT ADDRESS')}
-                      bodyText={
-                        <Link
-                          component={RouterLink}
-                          to={`/units/details/${activity.data.elevator.id}`}
-                          underline="hover"
-                          variant="body2"
-                          color={theme.palette.info.dark}>
-                          {activity.data.elevator.address.fullName}
-                        </Link>
-                      }
-                      iconBackground={theme.palette.info.outlinedHoverBg}
-                      iconContainerStyles={iconContainerStyles}
-                      iconMaxHeight="3rem"
-                    />
-                  </Grid>
-                </Grid>
-              </TimelineContent>
-            </TimelineItem>
-          );
-        })}
+                </TimelineContent>
+              </TimelineItem>
+            );
+          }),
+        )}
+        {isFetchingNextActivitiesPage && <FieldActivitiesSkeleton length={1} />}
       </Timeline>
     </InfoCard>
   );
