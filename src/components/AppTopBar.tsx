@@ -14,6 +14,7 @@ import {convertToText, languageMap} from 'utils/utils';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {useQueryClient} from 'react-query';
 import {mixpanelEvents} from 'mixpanel/constants';
+import {Notifications} from 'pages/Notifications';
 import {Language} from 'models/misc';
 import {queryKeys} from 'reactQuery/constants';
 import {useUserSession} from '../hooks/reactQuery/useUserSession';
@@ -123,22 +124,7 @@ export const AppTopBar = ({
               ]}
             />
           </Box>
-          {/* 
-          TODO: Implement notifications
-          <Link to="/notifications">
-            <Badge
-              badgeContent={1}
-              overlap="circular"
-              color="error"
-              sx={{
-                marginLeft: 4,
-                marginTop: 1,
-                color: '#FF4B55',
-                cursor: 'pointer',
-              }}>
-              <NotificationsNoneIcon color="primary" />
-            </Badge>
-          </Link> */}
+          <Notifications />
           <Box ml={2} display="flex" alignItems="center">
             <Avatar alt={fullName} src={user?.userAccount.photoUrl} />
             <MenuBtn

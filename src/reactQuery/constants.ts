@@ -48,6 +48,7 @@ export const queryKeys = {
   fetchServiceOrderArticles: 'fetchServiceOrderArticles',
   fetchUuid: 'fetchUuid',
   queryContacts: 'queryContacts',
+  queryNotifications: 'queryNotifications',
   fetchCompanies: 'fetchCompanies',
   fetchCompany: 'fetchCompany',
   fetchAbsence: 'fetchAbsence',
