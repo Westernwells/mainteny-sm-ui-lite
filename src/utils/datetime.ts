@@ -1,11 +1,14 @@
 import {
   endOfWeek,
   format,
+  formatDistanceToNowStrict,
+  isAfter,
   isToday,
   isTomorrow,
   isYesterday,
   parseISO,
   startOfWeek,
+  subWeeks,
   intervalToDuration,
   Locale,
 } from 'date-fns';
@@ -191,6 +194,27 @@ export const get60Mins = (startNumber?: number, endNumber?: number) =>
   [...Array(60).keys()]
     .map((i) => (i + 1).toString().padStart(2, '0'))
     .slice(startNumber ? startNumber - 1 : 0, endNumber || 60);
+
+export const timeToNow = (value: string): string =>
+  formatDistanceToNowStrict(toDate(value), {
+    addSuffix: true,
+  });
+
+export const formatNotificationsTimestamp = (date: Date, formatStr: string) => {
+  if (isToday(date)) {
+    return 'Today';
+  }
+
+  if (isYesterday(date)) {
+    return 'Yesterday';
+  }
+
+  if (isAfter(date, subWeeks(new Date(), 1))) {
+    return 'Last Week';
+  }
+
+  return formatDate(date, formatStr);
+};
 
 export const getDifferenceInInterval = (start: Date, end: Date) =>
   intervalToDuration({start: new Date(start), end: new Date(end)});
