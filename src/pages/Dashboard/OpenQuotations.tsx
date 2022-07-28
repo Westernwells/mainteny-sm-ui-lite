@@ -1,3 +1,4 @@
+import {Link as RouterLink} from 'react-router-dom';
 import useTheme from '@mui/material/styles/useTheme';
 import {
   Avatar,
@@ -5,6 +6,7 @@ import {
   List,
   ListItem,
   ListItemAvatar,
+  ListItemButton,
   ListItemText,
 } from '@mui/material';
 import {nameToInitials} from 'utils/utils';
@@ -47,25 +49,30 @@ export const OpenQuotations = ({
                 }}
               />
             }>
-            <ListItemAvatar>
-              <Avatar sx={{width: 28, height: 28, fontSize: '1rem'}}>
-                {nameToInitials(quotation.elevator.propertyOwner.name)}
-              </Avatar>
-            </ListItemAvatar>
-            <ListItemText sx={{flexBasis: '25%'}}>
-              {quotation.elevator.propertyOwner.name}
-            </ListItemText>
-            <ListItemText>
-              {formatCurrency(
-                quotation
-                  ? quotation.totalAmount.netAmount /
-                      10 ** quotation.totalAmount.fractionDigits!
-                  : 0,
-                {
-                  currency: quotation.totalAmount.currency,
-                },
-              )}
-            </ListItemText>
+            <ListItemButton
+              component={RouterLink}
+              to={`/quotations/details/${quotation.id}`}
+              sx={{p: '0px !important'}}>
+              <ListItemAvatar>
+                <Avatar sx={{width: 28, height: 28, fontSize: '1rem'}}>
+                  {nameToInitials(quotation.elevator.propertyOwner.name)}
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText sx={{flexBasis: '25%'}}>
+                {quotation.elevator.propertyOwner.name}
+              </ListItemText>
+              <ListItemText>
+                {formatCurrency(
+                  quotation
+                    ? quotation.totalAmount.netAmount /
+                        10 ** quotation.totalAmount.fractionDigits!
+                    : 0,
+                  {
+                    currency: quotation.totalAmount.currency,
+                  },
+                )}
+              </ListItemText>
+            </ListItemButton>
           </ListItem>
         ))}
       </List>

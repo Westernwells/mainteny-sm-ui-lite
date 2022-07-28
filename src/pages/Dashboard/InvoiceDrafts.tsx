@@ -1,3 +1,4 @@
+import {Link as RouterLink} from 'react-router-dom';
 import useTheme from '@mui/material/styles/useTheme';
 import {
   Avatar,
@@ -5,6 +6,7 @@ import {
   List,
   ListItem,
   ListItemAvatar,
+  ListItemButton,
   ListItemText,
 } from '@mui/material';
 import {nameToInitials} from 'utils/utils';
@@ -47,25 +49,30 @@ export const InvoiceDrafts = ({
                 }}
               />
             }>
-            <ListItemAvatar>
-              <Avatar sx={{width: 28, height: 28, fontSize: '1rem'}}>
-                {nameToInitials(invoice.propertyOwner.name)}
-              </Avatar>
-            </ListItemAvatar>
-            <ListItemText sx={{flexBasis: '25%'}}>
-              {invoice.propertyOwner.name}
-            </ListItemText>
-            <ListItemText>
-              {formatCurrency(
-                invoice
-                  ? invoice.totalAmount.netAmount /
-                      10 ** invoice.totalAmount.fractionDigits!
-                  : 0,
-                {
-                  currency: invoice.totalAmount.currency,
-                },
-              )}
-            </ListItemText>
+            <ListItemButton
+              component={RouterLink}
+              to={`/invoices/details/${invoice.id}`}
+              sx={{p: '0px !important'}}>
+              <ListItemAvatar>
+                <Avatar sx={{width: 28, height: 28, fontSize: '1rem'}}>
+                  {nameToInitials(invoice.propertyOwner.name)}
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText sx={{flexBasis: '25%'}}>
+                {invoice.propertyOwner.name}
+              </ListItemText>
+              <ListItemText>
+                {formatCurrency(
+                  invoice
+                    ? invoice.totalAmount.netAmount /
+                        10 ** invoice.totalAmount.fractionDigits!
+                    : 0,
+                  {
+                    currency: invoice.totalAmount.currency,
+                  },
+                )}
+              </ListItemText>
+            </ListItemButton>
           </ListItem>
         ))}
       </List>

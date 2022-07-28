@@ -1,3 +1,4 @@
+import {useNavigate} from 'react-router';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -29,6 +30,7 @@ export const AppointmentsToBeScheduled = ({
   confirmAppointmentMutation,
 }: Props) => {
   const theme = useTheme();
+  const navigate = useNavigate();
   return (
     <DashboardInfoCard
       title="Appointments to be scheduled"
@@ -56,7 +58,10 @@ export const AppointmentsToBeScheduled = ({
               return (
                 <TableRow
                   key={appointment.id}
+                  hover
+                  onClick={() => navigate(`/orders/details/${appointment.id}`)}
                   sx={{
+                    cursor: 'pointer',
                     'td:not(:last-child)': {
                       borderRight: '1px solid #eeeeee',
                       padding: '0.5rem',
@@ -96,18 +101,22 @@ export const AppointmentsToBeScheduled = ({
                   <TableCell width="15%">
                     <Box display="inline-flex">
                       <IconButton
-                        onClick={() =>
-                          appointmentNotificationMutation.mutate(appointment.id)
-                        }>
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          appointmentNotificationMutation.mutate(
+                            appointment.id,
+                          );
+                        }}>
                         <Message
                           fontSize="small"
                           sx={{color: 'action.active'}}
                         />
                       </IconButton>
                       <IconButton
-                        onClick={() =>
-                          confirmAppointmentMutation.mutate(appointment.id)
-                        }>
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          confirmAppointmentMutation.mutate(appointment.id);
+                        }}>
                         <Check fontSize="small" sx={{color: 'action.active'}} />
                       </IconButton>
                     </Box>

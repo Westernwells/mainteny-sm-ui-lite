@@ -1,3 +1,4 @@
+import {Link as RouterLink} from 'react-router-dom';
 import useTheme from '@mui/material/styles/useTheme';
 import {
   Avatar,
@@ -5,6 +6,7 @@ import {
   List,
   ListItem,
   ListItemAvatar,
+  ListItemButton,
   ListItemText,
 } from '@mui/material';
 import {getEmployeeStatus} from 'utils/work-hours-utils';
@@ -53,17 +55,22 @@ export const TechniciansWorking = ({
                 }}
               />
             }>
-            <ListItemAvatar>
-              <Avatar
-                alt={technician.employee.userAccount.firstName}
-                src={technician.employee.userAccount.photoUrl}
-                sx={{width: 28, height: 28}}
-              />
-            </ListItemAvatar>
-            <ListItemText>
-              {technician.employee.userAccount.firstName}{' '}
-              {technician.employee.userAccount.lastName}
-            </ListItemText>
+            <ListItemButton
+              component={RouterLink}
+              to={`/employees/details/${technician.employee.userAccount.id}`}
+              sx={{p: '0px !important'}}>
+              <ListItemAvatar>
+                <Avatar
+                  alt={technician.employee.userAccount.firstName}
+                  src={technician.employee.userAccount.photoUrl}
+                  sx={{width: 28, height: 28}}
+                />
+              </ListItemAvatar>
+              <ListItemText>
+                {technician.employee.userAccount.firstName}{' '}
+                {technician.employee.userAccount.lastName}
+              </ListItemText>
+            </ListItemButton>
           </ListItem>
         ))}
       </List>
