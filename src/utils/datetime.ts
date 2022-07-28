@@ -120,12 +120,10 @@ export const getWhen = (date: Date, formatStr: string) => {
   return formatDate(date, formatStr);
 };
 
-export const convertMinsToHM = (minutes: number) => {
-  const timeString = minutes / 60;
-  const date = new Date(0, 0);
-  date.setMinutes(+timeString * 60);
-  const hm = date.toTimeString().slice(0, 5).split(':');
-  return `${+hm[0]}hrs ${Number(hm[1]) > 0 ? `${+hm[1]}mins` : ''}`;
+export const convertMinsToHM = (minutes: number, padStart: number = 1) => {
+  const m = Math.floor(minutes % 60).toString();
+  const h = Math.floor((minutes / 60) % 60).toString();
+  return `${h.padStart(padStart)}h ${Number(m) > 0 ? `${m}m` : ''}`;
 };
 
 export const convertDigitalMinsToHM = (minutes: number) => {

@@ -9,7 +9,7 @@ import {
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import {FormatDate} from 'models/misc';
-import {toDate} from 'utils/datetime';
+import {convertMinsToHM, toDate} from 'utils/datetime';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -75,7 +75,7 @@ export const makeRows = (
         technician:
           item.schedules.length &&
           `${item.schedules[0].technician.userAccount.firstName} ${item.schedules[0].technician.userAccount.lastName}`,
-        duration: item.serviceTime && `${item.serviceTime}hrs`,
+        duration: item.serviceTime && convertMinsToHM(item.serviceTime),
         status: item.status,
         navigateTo: `/orders/details/${item.id}`,
       }))
