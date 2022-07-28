@@ -15,6 +15,7 @@ import {useArticles} from 'hooks/reactQuery/useArticle';
 import {ArticleView} from 'models/article';
 import {formatNetAmount} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {useTranslation} from 'react-i18next';
 import {NoRowsEmptySection} from './DataGrid/NoRowsEmptySection';
 
 interface Props {
@@ -23,11 +24,14 @@ interface Props {
 
 const defaultProps = {
   editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => (
-    <Typography variant="subtitle2" color="textSecondary">
-      {params.colDef.headerName}
-    </Typography>
-  ),
+  renderHeader: (params: GridColumnHeaderParams) => {
+    const {t} = useTranslation();
+    return (
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName && t(params.colDef.headerName)}
+      </Typography>
+    );
+  },
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
     <Typography variant="body2" mx="0.5em">
       {params.value || '-'}
