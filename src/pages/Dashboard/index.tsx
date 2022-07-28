@@ -13,6 +13,7 @@ import {
   useAppointmentNotification,
   useConfirmAppointment,
 } from 'hooks/reactQuery/useServiceOrder';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useQuotations} from 'hooks/reactQuery/useQuotation';
 import {useInvoices} from 'hooks/reactQuery/useInvoice';
 import {useQueryServiceCompanyEmployeeStatus} from 'hooks/reactQuery/useEmployee';
@@ -36,6 +37,8 @@ import {FieldActivities} from './FieldActivities';
 export const Dashboard = () => {
   const theme = useTheme();
   const {ref, inView} = useInView();
+  const {user} = useUserSession();
+  const fullName = `${user?.userAccount.firstName} ${user?.userAccount.lastName}`;
   const {
     data: appointments = createEmptyResource<ServiceOrderView>(3),
     isLoading: isLoadingAppointments,
@@ -122,7 +125,7 @@ export const Dashboard = () => {
     <>
       <Grid container justifyContent="space-between" alignItems="center">
         <Box>
-          <Typography variant="h3">Hi Nico Eggert!</Typography>
+          <Typography variant="h3">Hi {fullName}!</Typography>
           <Typography variant="subtitle1" color={theme.palette.text.secondary}>
             There are{' '}
             <Typography variant="subtitle1" color="#01a0cc" component="span">
