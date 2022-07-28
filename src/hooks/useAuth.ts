@@ -89,6 +89,7 @@ export const useAuth = (): UseAuth => {
           variant: 'error',
         });
       }
+      setLoading(false);
       console.log(errorResponse);
     }
   };
