@@ -1,5 +1,4 @@
 import React, {useEffect, useMemo, useState, Fragment} from 'react';
-import {useQueryClient} from 'react-query';
 import {useInView} from 'react-intersection-observer';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
@@ -22,19 +21,16 @@ import {EmptySection} from 'components/EmptySection';
 import {Button} from 'components/Button';
 import {MessageType, Type} from 'models/notification';
 import {formatNotificationsTimestamp} from 'utils/datetime';
-import {queryKeys} from 'reactQuery/constants';
 import {
   useMarkAllAsRead,
   useNotifications,
 } from 'hooks/reactQuery/useNotifications';
-import {usePusher} from 'hooks/usePusher';
 import {NotificationCard} from './NotificationCard';
 import {NotificationCardSkeleton} from './NotificationCardSkeleton';
 
 export const Notifications = () => {
   const theme = useTheme();
   const {t} = useTranslation();
-  const queryClient = useQueryClient();
   const [tabValue, setTabValue] = useState('0');
   const [showSideDrawer, setShowSideDrawer] = useState(false);
   const {ref: unreadNotificationsRef, inView: unreadNotificationsInView} =
@@ -50,7 +46,6 @@ export const Notifications = () => {
       pageParams: [],
     },
     isLoading: isLoadingUnreadNotifications,
-    refetch: refetchUnreadNotifications,
     isFetchingNextPage: isFetchingNextUnreadNotificationsPage,
     hasNextPage: hasNextUnreadNotificationsPage,
     fetchNextPage: fetchNextUnreadNotificationsPage,
@@ -73,7 +68,6 @@ export const Notifications = () => {
       pageParams: [],
     },
     isLoading: isLoadingReadNotifications,
-    refetch: refetchReadNotifications,
     isFetchingNextPage: isFetchingNextReadNotificationsPage,
     hasNextPage: hasNextReadNotificationsPage,
     fetchNextPage: fetchNextReadNotificationsPage,
@@ -89,23 +83,6 @@ export const Notifications = () => {
     read: [true],
     pageSize: 10,
     pageIndex: 0,
-  });
-
-  usePusher({
-    onMessageReceived: (event: MessageType | string) => {
-      if (
-        [
-          MessageType.EMERGENCY_ORDER_ACCEPTED,
-          MessageType.NON_TECHNICIAN_ASSIGNMENT_FOR_SERVICE_ORDER,
-          MessageType.TECHNICIAN_JOB_SCHEDULE_UPDATED,
-        ].includes(event as MessageType)
-      ) {
-        setNewNotifications((prevNewNotifications) => prevNewNotifications + 1);
-      }
-      refetchUnreadNotifications();
-      refetchReadNotifications();
-      queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
-    },
   });
 
   const totalUnreadNotifications = useMemo(() => {
