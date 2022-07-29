@@ -1,6 +1,10 @@
 import Box from '@mui/material/Box';
 import {useTranslation} from 'react-i18next';
 import {ReactNode} from 'react';
+import {usePusher} from 'hooks/usePusher';
+import {queryKeys} from 'reactQuery/constants';
+import {MessageType} from 'models/notification';
+import {useQueryClient} from 'react-query';
 import {AppDrawer} from './AppDrawer';
 import {AppTopBar} from './AppTopBar';
 
@@ -24,6 +28,14 @@ export const PageLayout = ({
   backBtnLabel,
 }: Props) => {
   const {t} = useTranslation();
+  const queryClient = useQueryClient();
+  usePusher({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onMessageReceived: (event: MessageType | string) => {
+      queryClient.invalidateQueries([queryKeys.queryNotifications]);
+      queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
+    },
+  });
   return (
     <Box
       sx={{
