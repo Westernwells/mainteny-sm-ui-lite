@@ -312,6 +312,10 @@ export const Schedule = ({
                             ? lookupDate[key]
                             : lookupTechnician[key] &&
                               `${lookupTechnician[key][0].userAccount.firstName} ${lookupTechnician[key][0].userAccount.lastName}`;
+                        const employeeUrl =
+                          scheduleType === 'people'
+                            ? `/employees/details/${lookupTechnician[key][0].userAccount.id}`
+                            : undefined;
 
                         return (
                           <ScheduleBodyCell
@@ -327,6 +331,7 @@ export const Schedule = ({
                               scheduleItems={scheduleItems}
                               item={label || ''}
                               checkedValues={checkedValues}
+                              navigateTo={employeeUrl}
                             />
                           </ScheduleBodyCell>
                         );
