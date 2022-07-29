@@ -1,4 +1,5 @@
 import {ChangeEvent, useCallback} from 'react';
+import {useNavigate} from 'react-router';
 import {grey} from '@mui/material/colors';
 import Typography from '@mui/material/Typography';
 import {ServiceOrderView} from 'models/service-order';
@@ -14,6 +15,7 @@ interface Props {
   id: string;
   getCheckedValue?: (checked: boolean, value: string) => void;
   checkedValues?: string[];
+  navigateTo?: string;
 }
 
 export const ScheduleLabel = ({
@@ -25,7 +27,9 @@ export const ScheduleLabel = ({
   getCheckedValue = () => {},
   id,
   checkedValues = [],
+  navigateTo,
 }: Props) => {
+  const navigate = useNavigate();
   const formatDate = useFormatDate();
   const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     if (getCheckedValue) {
@@ -66,8 +70,17 @@ export const ScheduleLabel = ({
   }
 
   return (
-    <Typography component="div" variant="subtitle2">
-      {item} <br />
+    <Typography component="div">
+      <Typography
+        component="span"
+        variant="subtitle2"
+        sx={{cursor: navigateTo ? 'pointer' : 'initial'}}
+        onClick={() => {
+          if (navigateTo) navigate(navigateTo);
+        }}>
+        {item}
+      </Typography>
+      <br />
       {renderSubLabel()}
     </Typography>
   );

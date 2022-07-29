@@ -166,7 +166,7 @@ export const WorkReport = ({orderId}: Props) => {
               [
                 {
                   label: 'Report ID',
-                  value: report.externalId,
+                  value: report.number,
                 },
                 {
                   label: 'Order ID',
