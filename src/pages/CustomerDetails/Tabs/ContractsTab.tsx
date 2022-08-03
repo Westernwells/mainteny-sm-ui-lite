@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 import Box from '@mui/material/Box';
 import {GridRowsProp} from '@mui/x-data-grid';
 

@@ -4,7 +4,7 @@ import GradingIcon from '@mui/icons-material/Grading';
 import FactCheck from '@mui/icons-material/FactCheck';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
-import {useParams} from 'react-router';
+import {useParams} from 'react-router-dom';
 import {Overview} from './Tabs/Overview';
 import {WorkReport} from './Tabs/WorkReport';
 import {Checklist} from './Tabs/Checklist';

@@ -1,4 +1,4 @@
-import {useLocation} from 'react-router';
+import {useLocation} from 'react-router-dom';
 import queryString from 'query-string';
 import Box from '@mui/material/Box';
 import {Progress} from 'components/Progress';

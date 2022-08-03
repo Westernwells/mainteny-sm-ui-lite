@@ -9,7 +9,7 @@ import {
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 import _ from 'lodash';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';

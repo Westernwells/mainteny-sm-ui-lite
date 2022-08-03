@@ -1,5 +1,5 @@
 import React from 'react';
-import {Location, NavigateFunction} from 'react-router';
+import {Location, NavigateFunction} from 'react-router-dom';
 import {Helmet} from 'react-helmet';
 import {Typography} from '@mui/material';
 import Box from '@mui/material/Box';

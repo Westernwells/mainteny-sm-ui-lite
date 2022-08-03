@@ -1,4 +1,4 @@
-import {useParams} from 'react-router';
+import {useParams} from 'react-router-dom';
 import {useLayoutEffect, useState} from 'react';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';

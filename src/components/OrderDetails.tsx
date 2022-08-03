@@ -5,7 +5,7 @@ import IconButton from '@mui/material/IconButton';
 import Close from '@mui/icons-material/Close';
 import AccessTimeFilled from '@mui/icons-material/AccessTimeFilled';
 import LocationOn from '@mui/icons-material/LocationOn';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {ServiceOrderView} from 'models/service-order';
 import useTheme from '@mui/material/styles/useTheme';

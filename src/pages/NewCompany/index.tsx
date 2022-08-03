@@ -1,6 +1,6 @@
 import {useEffect, useLayoutEffect, useState} from 'react';
 import {FormikErrors} from 'formik';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';

@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 import {queryKeys as qk, queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 // FIXME: Dummy Import
 
 import {Resource, RestError} from 'models/misc';

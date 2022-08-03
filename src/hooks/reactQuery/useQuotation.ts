@@ -7,7 +7,7 @@ import {
 } from 'react-query';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {queryKeys as qk} from 'reactQuery/constants';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 import {Resource, RestError} from 'models/misc';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {

@@ -5,7 +5,7 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {makePage} from 'utils/paging-utils';
 import {TabContentContainer} from 'components/TabContentContainer';
 import {EmptySection} from 'components/EmptySection';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {ContractElevatorSimpleView} from 'models/contract';
 import {ElevatorView} from 'models/elevator';

@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {useParams} from 'react-router';
+import {useParams} from 'react-router-dom';
 import {addDays, endOfDay, startOfDay, subDays} from 'date-fns';
 import {Box, Typography} from '@mui/material';
 import {GridRowsProp} from '@mui/x-data-grid';
