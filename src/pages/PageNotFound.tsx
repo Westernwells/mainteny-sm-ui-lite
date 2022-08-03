@@ -3,7 +3,7 @@ import {Typography} from '@mui/material';
 import Box from '@mui/material/Box';
 import {ReactComponent as NotFoundIllustration} from 'assets/illustrations/404.svg';
 import {Button} from 'components/Button';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 

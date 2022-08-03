@@ -1,4 +1,4 @@
-import {useParams} from 'react-router';
+import {useParams} from 'react-router-dom';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import Box from '@mui/material/Box';

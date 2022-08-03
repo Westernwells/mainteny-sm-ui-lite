@@ -14,7 +14,7 @@ import {
   UnitDetailsFormModel,
 } from 'models/unitForm';
 import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 import {convertToMacro} from 'utils/utils';
 import {AppointmentPreferenceForm} from './AppointmentPreferenceForm';
 import {CustomerForm} from './CustomerForm';

@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 import {useFormik} from 'formik';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';

@@ -3,7 +3,6 @@ import {GridRowsProp} from '@mui/x-data-grid';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {DataGridLayout} from 'components/DataGridLayout';
-import {ServiceOrderType} from 'models/service-order';
 import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
 import {useInvoices} from 'hooks/reactQuery/useInvoice';
 import {PageListingLayout} from 'components/PageListingLayout';
@@ -30,10 +29,7 @@ export const Invoices = () => {
   const [page, setPage] = useState(makePage(0, pageSize));
   const [queryParams, setQueryParams] = useSearchParams();
   const totalInvoiceRef = useRef(0);
-  const [amount, setAmount] = useState<number[][]>([]);
-  const [invoiceDate, setInvoiceDate] = useState<string[]>([]);
   const [status, setStatus] = useState<InvoiceStatus>();
-  const [serviceType, setServiceType] = useState<ServiceOrderType[]>([]);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
   const textInput = useRef<HTMLInputElement>(null);
@@ -51,7 +47,6 @@ export const Invoices = () => {
       query: search,
       status: [],
     },
-    {amount: amount[0], status, serviceType},
     {keepPreviousData: true},
   );
 
@@ -61,7 +56,7 @@ export const Invoices = () => {
     if (page.pageIndex) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
     }
-  }, [search, status, invoiceDate]);
+  }, [search, status]);
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
@@ -100,10 +95,7 @@ export const Invoices = () => {
   const renderFilterItems = () => (
     <FilterFields
       onClear={() => {
-        setAmount([]);
-        setInvoiceDate([]);
         setStatus(undefined);
-        setServiceType([]);
         setSearch('');
         if (textInput.current) {
           textInput.current.value = '';

@@ -13,7 +13,7 @@ import {
 } from 'models/contract';
 import {PropertyOwnerView} from 'models/propertyManager';
 import React, {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 import {amountRecordForBackend} from 'utils/currency';
 import {toRestDate} from 'utils/datetime';
 import {convertToMacro} from 'utils/utils';

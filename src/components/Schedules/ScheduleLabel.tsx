@@ -1,5 +1,5 @@
 import {ChangeEvent, useCallback} from 'react';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 import {grey} from '@mui/material/colors';
 import Typography from '@mui/material/Typography';
 import {ServiceOrderView} from 'models/service-order';

@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {OpenInNew} from '@mui/icons-material';
 import {Box, Typography} from '@mui/material';

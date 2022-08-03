@@ -1,12 +1,11 @@
 import {useEffect, useLayoutEffect, useState} from 'react';
 import {TabsBody} from 'components/TabsBody';
-import {useSearchParams} from 'react-router-dom';
+import {useSearchParams, useParams} from 'react-router-dom';
 import {Tabs} from 'components/Tab';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import {formatSearchParams} from 'utils/utils';
-import {useParams} from 'react-router';
 import {CustomerOverviewTab} from './Tabs/CustomerOverview';
 import {ContractsTab} from './Tabs/ContractsTab';
 import {UnitsTab} from './Tabs/UnitsTab';

@@ -1,5 +1,5 @@
 import {SetStateAction, useEffect, useMemo, useState} from 'react';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 import Box, {BoxProps} from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';

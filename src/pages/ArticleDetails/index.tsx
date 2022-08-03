@@ -3,8 +3,7 @@ import Grid from '@mui/material/Grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import useTheme from '@mui/material/styles/useTheme';
 import {useState} from 'react';
-import {useParams} from 'react-router-dom';
-import {useNavigate} from 'react-router';
+import {useParams, useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {
   useArticleDetails,
