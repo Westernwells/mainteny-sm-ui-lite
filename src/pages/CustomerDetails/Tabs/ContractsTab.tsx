@@ -63,7 +63,6 @@ export const ContractsTab = ({customerId}: Props) => {
       }),
     },
     customerId,
-    {},
     {keepPreviousData: true},
   );
 

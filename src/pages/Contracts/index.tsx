@@ -62,7 +62,6 @@ export const Contracts = () => {
       priceStart,
       priceEnd,
     },
-    {},
     {keepPreviousData: true},
   );
 
