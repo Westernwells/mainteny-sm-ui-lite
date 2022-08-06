@@ -77,6 +77,13 @@ export interface ServiceCompanySummary {
   serviceOrderSummary: ServiceOrderSummary;
   time: string;
   timeUnit: ServiceCompanyTimeUnit;
+  elevatorSummary: {numberOfActiveContractElevator: number};
+}
+
+export interface ServiceCompanySummaryParams {
+  serviceCompanyId: string;
+  date: string;
+  timeUnit: ServiceCompanyTimeUnit;
 }
 
 export interface ServiceCompanySimpleView {

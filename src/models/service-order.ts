@@ -238,6 +238,7 @@ export interface ServiceOrderSummary {
   avgCalloutServiceTime: number;
   avgEmergencyServiceTime: number;
   avgRepairServiceTime: number;
+  numberOfOrders: number;
   numberOfCancelledOrders: number;
   numberOfCompletedOrders: number;
   numberOfOverDueOrders: number;

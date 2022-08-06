@@ -12,6 +12,8 @@ import {
   ServiceCompanyActivity,
   ServiceCompanyActivityParams,
   ServiceCompanyItem,
+  ServiceCompanySummary,
+  ServiceCompanySummaryParams,
   ServiceCompanyUpdateBody,
   SystemSettingsUpdateBody,
 } from 'models/service-company';
@@ -236,3 +238,29 @@ export const useServiceCompanyActivities = (
     },
   );
 };
+
+export const getCompanySummary = async (
+  params: Partial<ServiceCompanySummaryParams>,
+  companyId: string,
+) => {
+  const response = await axiosClient.get<ServiceCompanySummary>(
+    `/api/serviceCompanies/${companyId}/summary`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useCompanySummary = (
+  params: Partial<ServiceCompanySummaryParams>,
+  companyId?: string,
+) =>
+  useQuery(
+    [queryKeys.fetchCompanySummary, companyId, params.timeUnit],
+    () => getCompanySummary(params, companyId!),
+    {
+      enabled: !!companyId,
+    },
+  );

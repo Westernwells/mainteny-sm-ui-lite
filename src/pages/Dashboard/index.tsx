@@ -17,7 +17,10 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useQuotations} from 'hooks/reactQuery/useQuotation';
 import {useInvoices} from 'hooks/reactQuery/useInvoice';
 import {useQueryServiceCompanyEmployeeStatus} from 'hooks/reactQuery/useEmployee';
-import {useServiceCompanyActivities} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanySummary,
+  useServiceCompanyActivities,
+} from 'hooks/reactQuery/useCompanies';
 import {createEmptyResource} from 'utils/paging-utils';
 import {toRestDate} from 'utils/datetime';
 import {Role} from 'models/user';
@@ -25,7 +28,10 @@ import {ServiceOrderView} from 'models/service-order';
 import {QuotationStatus, QuotationView} from 'models/quotation';
 import {InvoiceStatus, InvoiceView} from 'models/invoice';
 import {EmployeeStatusView} from 'models/employee';
-import {ActivityMessageType} from 'models/service-company';
+import {
+  ActivityMessageType,
+  ServiceCompanyTimeUnit,
+} from 'models/service-company';
 import {AddAnything} from './AddAnything';
 import {TopCard} from './TopCard';
 import {TechniciansWorking} from './TechniciansWorking';
@@ -39,6 +45,22 @@ export const Dashboard = () => {
   const {ref, inView} = useInView();
   const {user} = useUserSession();
   const fullName = `${user?.userAccount.firstName} ${user?.userAccount.lastName}`;
+  const {data: dailySummary, isLoading: isLoadingDailySummary} =
+    useCompanySummary(
+      {
+        date: toRestDate(new Date()),
+        timeUnit: ServiceCompanyTimeUnit.DAILY,
+      },
+      user?.userAccount.serviceCompany.id,
+    );
+  const {data: quarterlySummary, isLoading: isLoadingQuarterlySummary} =
+    useCompanySummary(
+      {
+        date: toRestDate(new Date()),
+        timeUnit: ServiceCompanyTimeUnit.QUARTERLY,
+      },
+      user?.userAccount.serviceCompany.id,
+    );
   const {
     data: appointments = createEmptyResource<ServiceOrderView>(3),
     isLoading: isLoadingAppointments,
@@ -104,6 +126,17 @@ export const Dashboard = () => {
     ],
   });
 
+  const dailyNumberOfCompletedOrders =
+    dailySummary?.serviceOrderSummary.numberOfCompletedOrders ?? 0;
+  const dailyNumberOfOrders =
+    dailySummary?.serviceOrderSummary.numberOfOrders ?? 0;
+  const quarterlyNumberOfCompletedOrders =
+    quarterlySummary?.serviceOrderSummary.numberOfCompletedOrders ?? 0;
+  const quarterlyNumberOfOrders =
+    quarterlySummary?.serviceOrderSummary.numberOfOrders ?? 0;
+  const quarterlyNumberOfActiveUnits =
+    quarterlySummary?.elevatorSummary?.numberOfActiveContractElevator ?? 0;
+
   useEffect(() => {
     if (inView && hasNextActivitiesPage) {
       fetchNextActivitiesPage();
@@ -111,6 +144,8 @@ export const Dashboard = () => {
   }, [inView]);
 
   const isLoading =
+    isLoadingDailySummary ||
+    isLoadingQuarterlySummary ||
     isLoadingAppointments ||
     isLoadingQuotations ||
     isLoadingInvoices ||
@@ -129,7 +164,7 @@ export const Dashboard = () => {
           <Typography variant="subtitle1" color={theme.palette.text.secondary}>
             There are{' '}
             <Typography variant="subtitle1" color="#01a0cc" component="span">
-              72 orders
+              {dailyNumberOfOrders} orders
             </Typography>{' '}
             to be finished today
           </Typography>
@@ -140,15 +175,29 @@ export const Dashboard = () => {
         <Grid item xs={12} xl={9}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6} lg={3}>
-              <TopCard title="Completed Today" value="19/72" subValue="26%" />
+              <TopCard
+                title="Completed Today"
+                value={`${dailyNumberOfCompletedOrders}/${dailyNumberOfOrders}`}
+                subValue={`${
+                  dailyNumberOfOrders > 0
+                    ? (dailyNumberOfCompletedOrders / dailyNumberOfOrders) * 100
+                    : 100
+                }%`}
+              />
             </Grid>
             <Grid item xs={12} sm={6} lg={3}>
-              <TopCard title="Monthly" value="189/1340" />
+              <TopCard
+                title="Quarterly"
+                value={`${quarterlyNumberOfCompletedOrders}/${quarterlyNumberOfOrders}`}
+              />
             </Grid>
             <Grid item xs={12} sm={6} lg={3}>
               <TopCard
                 title="Overdue"
-                value="34"
+                value={`${
+                  quarterlySummary?.serviceOrderSummary.numberOfOverDueOrders ??
+                  '0'
+                }`}
                 icon={ReportProblemOutlined}
                 iconColor={theme.palette.error.main}
                 iconBackgroundColor={theme.palette.error.outlinedHoverBg}
@@ -157,7 +206,7 @@ export const Dashboard = () => {
             <Grid item xs={12} sm={6} lg={3}>
               <TopCard
                 title="Active units"
-                value="2147"
+                value={`${quarterlyNumberOfActiveUnits}`}
                 icon={Refresh}
                 iconColor={theme.palette.secondary.dark}
                 iconBackgroundColor={theme.palette.info.outlinedHoverBg}
