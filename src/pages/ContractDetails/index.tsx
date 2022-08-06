@@ -6,7 +6,7 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useContractDetails} from 'hooks/reactQuery/useContract';
-import {useParams} from 'react-router';
+import {useParams} from 'react-router-dom';
 import {UnitsTab} from './Tabs/UnitsTab';
 import {ContractOverview} from './Tabs/ContractOverview';
 

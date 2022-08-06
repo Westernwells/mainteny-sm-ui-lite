@@ -352,7 +352,7 @@ export const useQueryServiceOrderScheduled = (
   const {user} = useUserSession();
 
   return useQuery<Resource<ServiceOrderView>>(
-    [queryKeys.querySeviceOrders, params, user?.userAccount.serviceCompany.id],
+    [queryKeys.queryServiceOrders, params, user?.userAccount.serviceCompany.id],
     () =>
       queryServiceOrderSchedules({
         ...params,

@@ -7,7 +7,7 @@ import {Priority, ServiceOrderType} from 'models/service-order';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmployeesView} from 'models/employee';
 import {toRestDateTime} from 'utils/datetime';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 import {QuotationView} from 'models/quotation';
 import {AddDescription} from '../AddDescription';
 import {SelectTechnicians} from '../SelectTechnicians';

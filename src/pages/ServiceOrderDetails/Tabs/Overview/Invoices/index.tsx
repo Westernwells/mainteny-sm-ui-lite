@@ -1,4 +1,4 @@
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';

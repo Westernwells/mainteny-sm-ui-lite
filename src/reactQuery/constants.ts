@@ -52,6 +52,7 @@ export const queryKeys = {
     'queryAppointmentConfirmationRequiredOrders',
   fetchUuid: 'fetchUuid',
   queryContacts: 'queryContacts',
+  queryNotifications: 'queryNotifications',
   fetchCompanies: 'fetchCompanies',
   fetchCompany: 'fetchCompany',
   fetchCompanySummary: 'fetchCompanySummary',

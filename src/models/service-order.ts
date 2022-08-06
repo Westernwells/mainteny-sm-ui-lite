@@ -279,6 +279,7 @@ export interface ServiceOrderReportAttachmentView {
 }
 
 export interface ServiceOrderReportView {
+  number: string;
   actualServiceTime: number;
   additionalInfo: ServiceOrderReportAdditionalInfo;
   attachments: ServiceOrderReportAttachmentView[];

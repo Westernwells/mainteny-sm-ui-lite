@@ -1,4 +1,4 @@
-import Typography from '@mui/material/Typography';
+import Typography, {TypographyProps} from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
 import Box, {BoxProps} from '@mui/material/Box';
 import {ReactComponent as LaptopIllustration} from 'assets/illustrations/Laptop.svg';
@@ -25,6 +25,8 @@ interface Props extends BoxProps {
   showActionBtn?: boolean;
   btnLabel?: string;
   btnAction?: () => void;
+  subLabel?: string;
+  subLabelProps?: TypographyProps;
 }
 
 export const EmptySection = ({
@@ -37,6 +39,8 @@ export const EmptySection = ({
   btnLabel = '',
   showActionBtn = false,
   btnAction,
+  subLabel = '',
+  subLabelProps = {},
 }: Props) => {
   const {t} = useTranslation();
   const Width = {
@@ -82,6 +86,11 @@ export const EmptySection = ({
         sx={{...labelStyle}}>
         {t(label)}
       </Typography>
+      {subLabel && (
+        <Typography variant="body2" textAlign="center" {...subLabelProps}>
+          {t(subLabel)}
+        </Typography>
+      )}
       {showActionBtn ? (
         <Button
           label="Create Service Order"

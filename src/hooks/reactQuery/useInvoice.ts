@@ -5,11 +5,10 @@ import {
   UseQueryOptions,
 } from 'react-query';
 import * as _ from 'lodash';
-import {useCallback} from 'react';
 import {queryKeys as qk, queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 // FIXME: Dummy Import
 
 import {Resource, RestError} from 'models/misc';
@@ -88,33 +87,7 @@ export const filterByServiceType = (
   return filterResult;
 };
 
-const filterInvoices = (
-  invoicesRes: Resource<InvoiceView>,
-  filters: InvoiceFilters,
-) => {
-  let result = {...invoicesRes};
-
-  if (filters.amount) {
-    const amounts = filterByAmount(result, filters.amount);
-    result = {...result, data: amounts, total: amounts.length};
-  }
-  if (filters.status) {
-    const status = filterByStatus(result, filters.status);
-    result = {...result, data: status, total: status.length};
-  }
-  if (filters.serviceType.length) {
-    const serviceTypes = filterByServiceType(result, filters.serviceType);
-    result = {...result, data: serviceTypes, total: serviceTypes.length};
-  }
-  return result;
-};
-
-export function useInvoices(
-  params: QueryInvoiceParams,
-  // TODO: Write 'interface' for filter object
-  filters?: InvoiceFilters,
-  options?: any,
-) {
+export function useInvoices(params: QueryInvoiceParams, options?: any) {
   const {user} = useUserSession();
   return useQuery<Resource<InvoiceView>, RestError>(
     [qk.fetchInvoices, params, user?.userAccount.id],
@@ -122,15 +95,6 @@ export function useInvoices(
     {
       enabled: !!user,
       ...options,
-      ...(filters && {
-        select: useCallback(
-          (invoicesRes: Resource<InvoiceView>) => {
-            const filterResult = filterInvoices(invoicesRes, filters);
-            return filterResult;
-          },
-          [filters],
-        ),
-      }),
     },
   );
 }

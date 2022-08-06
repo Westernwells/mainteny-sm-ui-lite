@@ -1,5 +1,5 @@
 import {useSnackbar} from 'notistack';
-import {useNavigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 import {setStoredAdmin} from 'userStorage';
 import {axiosClient} from 'utils/axios-utils';
 import {useUserSession} from './useUserSession';

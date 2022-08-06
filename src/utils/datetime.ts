@@ -1,11 +1,14 @@
 import {
   endOfWeek,
   format,
+  formatDistanceToNowStrict,
+  isAfter,
   isToday,
   isTomorrow,
   isYesterday,
   parseISO,
   startOfWeek,
+  subWeeks,
   intervalToDuration,
   formatDistance,
   Locale,
@@ -119,12 +122,10 @@ export const getWhen = (date: Date, formatStr: string) => {
   return formatDate(date, formatStr);
 };
 
-export const convertMinsToHM = (minutes: number) => {
-  const timeString = minutes / 60;
-  const date = new Date(0, 0);
-  date.setMinutes(+timeString * 60);
-  const hm = date.toTimeString().slice(0, 5).split(':');
-  return `${+hm[0]}hrs ${Number(hm[1]) > 0 ? `${+hm[1]}mins` : ''}`;
+export const convertMinsToHM = (minutes: number, padStart: number = 1) => {
+  const m = Math.floor(minutes % 60).toString();
+  const h = Math.floor((minutes / 60) % 60).toString();
+  return `${h.padStart(padStart)}h ${Number(m) > 0 ? `${m}m` : ''}`;
 };
 
 export const convertDigitalMinsToHM = (minutes: number) => {
@@ -193,6 +194,27 @@ export const get60Mins = (startNumber?: number, endNumber?: number) =>
   [...Array(60).keys()]
     .map((i) => (i + 1).toString().padStart(2, '0'))
     .slice(startNumber ? startNumber - 1 : 0, endNumber || 60);
+
+export const timeToNow = (value: string): string =>
+  formatDistanceToNowStrict(toDate(value), {
+    addSuffix: true,
+  });
+
+export const formatNotificationsTimestamp = (date: Date, formatStr: string) => {
+  if (isToday(date)) {
+    return 'Today';
+  }
+
+  if (isYesterday(date)) {
+    return 'Yesterday';
+  }
+
+  if (isAfter(date, subWeeks(new Date(), 1))) {
+    return 'Last Week';
+  }
+
+  return formatDate(date, formatStr);
+};
 
 export const getDifferenceInInterval = (start: Date, end: Date) =>
   intervalToDuration({start: new Date(start), end: new Date(end)});
