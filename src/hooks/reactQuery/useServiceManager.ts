@@ -34,7 +34,7 @@ export const useServiceManager = () => {
 
         axiosClient.defaults.headers.common.Authorization = `Bearer ${impersonateUser.token}`;
         updateUser(impersonateUser);
-        navigate('/orders', {replace: true});
+        navigate('/', {replace: true});
       }
     } catch (error: any) {
       console.error(error);

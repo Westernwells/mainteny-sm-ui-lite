@@ -39,6 +39,7 @@ import {
   ServiceOrderItemRecord,
   CompleteServiceOrder,
   UpdateServiceOrderBody,
+  AppointmentConfirmationRequiredOrdersQueryParams,
 } from '../../models/service-order';
 import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
@@ -783,6 +784,102 @@ export const useUpdateServiceOrderArticles = () => {
             variant: 'error',
           },
         );
+      },
+    },
+  );
+};
+
+export const queryAppointmentConfirmationRequiredOrders = async (
+  params: AppointmentConfirmationRequiredOrdersQueryParams,
+): Promise<Resource<ServiceOrderView>> => {
+  const response: AxiosResponse<Resource<ServiceOrderView>> =
+    await axiosClient.get(
+      `/api/serviceOrders/appointmentConfirmationRequiredOrders`,
+      {
+        params,
+        paramsSerializer,
+      },
+    );
+  return response.data;
+};
+
+export function useAppointmentConfirmationRequiredOrders(
+  params: AppointmentConfirmationRequiredOrdersQueryParams,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  const {user} = useUserSession();
+  return useQuery<
+    Resource<ServiceOrderView>,
+    RestError,
+    Resource<ServiceOrderView>
+  >(
+    [
+      queryKeys.queryAppointmentConfirmationRequiredOrders,
+      params,
+      user?.userAccount.serviceCompany.id,
+    ],
+    () =>
+      queryAppointmentConfirmationRequiredOrders({
+        ...params,
+        serviceCompanyId: user!.userAccount.serviceCompany.id,
+      }),
+    {enabled: !!user, ...options},
+  );
+}
+
+const appointmentNotification = async (serviceOrderId: string) =>
+  axiosClient.post<StringValue>(
+    `/api/serviceOrders/${serviceOrderId}/appointmentNotification`,
+  );
+
+export const useAppointmentNotification = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    (serviceOrderId: string) => appointmentNotification(serviceOrderId),
+    {
+      onSuccess: () => {
+        enqueueSnackbar('Appointment notification sent successfully', {
+          variant: 'success',
+        });
+        return queryClient.invalidateQueries([
+          queryKeys.queryAppointmentConfirmationRequiredOrders,
+        ]);
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+const confirmAppointment = async (serviceOrderId: string) =>
+  axiosClient.put<StringValue>(
+    `/api/serviceOrders/${serviceOrderId}/appointment`,
+  );
+
+export const useConfirmAppointment = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    (serviceOrderId: string) => confirmAppointment(serviceOrderId),
+    {
+      onSuccess: () => {
+        enqueueSnackbar('Appointment confirmed', {
+          variant: 'success',
+        });
+        return queryClient.invalidateQueries([
+          queryKeys.queryAppointmentConfirmationRequiredOrders,
+        ]);
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
       },
     },
   );

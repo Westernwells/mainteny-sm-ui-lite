@@ -158,3 +158,8 @@ export const onVisibilityChange = (callback: (visible: boolean) => void) => {
     );
   }
 };
+
+export const nameToInitials = (name: string) => {
+  const words = name.split(' ');
+  return `${words?.[0]?.[0] ?? ''}${words?.[1]?.[0] ?? ''}`;
+};

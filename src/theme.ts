@@ -36,6 +36,7 @@ export const theme = createTheme({
       main: '#FF182F',
       dark: '#C30006',
       contrastText: '#FFFFFF',
+      outlinedHoverBg: 'rgba(255, 24, 47, 0.08)',
     },
     info: {
       light: '#64B6F7',

@@ -238,6 +238,7 @@ export interface ServiceOrderSummary {
   avgCalloutServiceTime: number;
   avgEmergencyServiceTime: number;
   avgRepairServiceTime: number;
+  numberOfOrders: number;
   numberOfCancelledOrders: number;
   numberOfCompletedOrders: number;
   numberOfOverDueOrders: number;
@@ -398,4 +399,11 @@ export interface ServiceOrderItemRecord {
   name: string;
   quantity: number;
   unitAmount: Amount;
+}
+
+export interface AppointmentConfirmationRequiredOrdersQueryParams {
+  pageIndex: number;
+  pageSize: number;
+  query?: string;
+  serviceCompanyId?: string;
 }

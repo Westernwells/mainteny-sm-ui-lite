@@ -11,6 +11,7 @@ import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
 import Elevator from '@mui/icons-material/Elevator';
 import BusinessIcon from '@mui/icons-material/Business';
 import IconButton from '@mui/material/IconButton';
+import HomeIcon from '@mui/icons-material/Home';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import {useLocation, useNavigate} from 'react-router-dom';
@@ -80,7 +81,7 @@ export const AppDrawer = () => {
   const [open, setOpen] = useState(false);
   const themeX = useTheme();
   const setSelectedIndex = useState(0)[1];
-  const [selectedPath, setSelectedPath] = useState('/orders');
+  const [selectedPath, setSelectedPath] = useState('/');
   const location = useLocation();
   const navigate = useNavigate();
   const {user} = useUserSession();
@@ -101,6 +102,22 @@ export const AppDrawer = () => {
   const isManager = user?.userAccount.roles.includes(Role.SERVICE_MANAGER);
 
   const drawerList = [
+    {
+      text: 'Home',
+      icon: <HomeIcon sx={{color: '#fff'}} />,
+      path: '/',
+      access: !isAdmin,
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/');
+        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_HOME_CLICKED);
+        navigate('/');
+      },
+    },
     {
       text: 'Orders',
       icon: <LocalShippingIcon sx={{color: '#fff'}} />,
@@ -316,9 +333,9 @@ export const AppDrawer = () => {
             edge="start"
             disableRipple
             onClick={() => {
-              setSelectedPath('/orders');
-              Mixpanel.identifyAndTrack(mixpanelEvents.MENU_ORDERS_CLICKED);
-              navigate('/orders');
+              setSelectedPath('/');
+              Mixpanel.identifyAndTrack(mixpanelEvents.MENU_HOME_CLICKED);
+              navigate('/');
             }}>
             <MaintenyLogo
               style={{marginRight: '0.5em'}}
@@ -356,7 +373,7 @@ export const AppDrawer = () => {
             return (
               <ListItemButton
                 onClick={(e) => onClick(e, index)}
-                selected={!!selectedPath.includes(path)}
+                selected={selectedPath === path}
                 style={{
                   paddingTop: 15,
                   paddingBottom: 15,

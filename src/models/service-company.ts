@@ -25,6 +25,10 @@ export enum ActivityMessageType {
   SERVICE_ORDER_EXPIRED = 'SERVICE_ORDER_EXPIRED',
   SERVICE_ORDER_UNSCHEDULED = 'SERVICE_ORDER_UNSCHEDULED',
   SERVICE_ORDER_NO_ASSIGNMENT = 'SERVICE_ORDER_NO_ASSIGNMENT',
+  SERVICE_ORDER_CREATED = 'SERVICE_ORDER_CREATED',
+  SERVICE_ORDER_CANCELLED = 'SERVICE_ORDER_CANCELLED',
+  SERVICE_ORDER_UPDATED = 'SERVICE_ORDER_UPDATED',
+  SERVICE_ORDER_TIME_EDITED = 'SERVICE_ORDER_TIME_EDITED',
 }
 
 export interface ServiceCompanyView {
@@ -57,11 +61,28 @@ export interface ServiceCompanyActivity<T> {
   type: ActivityMessageType;
 }
 
+export interface ServiceCompanyActivityParams {
+  serviceCompanyId: string;
+  start: string;
+  end: string;
+  pageIndex: number;
+  pageSize: number;
+  query?: string;
+  type?: ActivityMessageType[];
+}
+
 export interface ServiceCompanySummary {
   id: string;
   serviceCompanyId: string;
   serviceOrderSummary: ServiceOrderSummary;
   time: string;
+  timeUnit: ServiceCompanyTimeUnit;
+  elevatorSummary: {numberOfActiveContractElevator: number};
+}
+
+export interface ServiceCompanySummaryParams {
+  serviceCompanyId: string;
+  date: string;
   timeUnit: ServiceCompanyTimeUnit;
 }
 

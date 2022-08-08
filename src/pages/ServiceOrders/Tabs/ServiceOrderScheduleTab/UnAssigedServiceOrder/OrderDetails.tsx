@@ -121,7 +121,6 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
         </Box>
         <Typography variant="caption">
           {t('Due in')} {formatDateDistance(new Date(serviceOrder.dueDate))}
-          {/* {formatDistance(new Date(serviceOrder.dueDate), new Date()).split(" ")[0]==="about"? t(formatDistance(new Date(serviceOrder.dueDate), new Date()), {hours: formatDistance(new Date(serviceOrder.dueDate), new Date()).split("")[0]}):"hi"} */}
         </Typography>
       </Box>
       <Typography variant="body2" component="div" mt="0.5em">

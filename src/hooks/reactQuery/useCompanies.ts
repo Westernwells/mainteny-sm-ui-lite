@@ -1,12 +1,25 @@
+import {AxiosResponse} from 'axios';
 import {NewServiceCompanyBody} from 'pages/NewCompany/model';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
-import {Page, Resource, RestError, StringValue} from 'models/misc';
 import {
+  Page,
+  Resource,
+  RestError,
+  StringValue,
+  WithOptional,
+} from 'models/misc';
+import {
+  ServiceCompanyActivity,
+  ServiceCompanyActivityParams,
   ServiceCompanyItem,
+  ServiceCompanySummary,
+  ServiceCompanySummaryParams,
   ServiceCompanyUpdateBody,
   SystemSettingsUpdateBody,
 } from 'models/service-company';
 import {
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
   useMutation,
   useQuery,
   useQueryClient,
@@ -14,6 +27,7 @@ import {
 } from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
 import {useSnackbar} from 'notistack';
+import {ServiceOrder} from 'models/service-order';
 import {useUserSession} from './useUserSession';
 
 export const getCompanies = async (page: Page, query: string) => {
@@ -173,3 +187,80 @@ export const useCreateServiceCompany = (successMsg: string) => {
     },
   );
 };
+
+const getCompanyActivities = async (params: ServiceCompanyActivityParams) => {
+  const response: AxiosResponse<Resource<ServiceCompanyActivity<'string'>>> =
+    await axiosClient.get(
+      `/api/serviceCompanies/${params.serviceCompanyId}/activities`,
+      {
+        params,
+        paramsSerializer,
+      },
+    );
+  // json parse is needed because of the way the API returns the data (JSON string)
+  return {
+    ...response.data,
+    data: response.data.data.map((activity) => ({
+      ...activity,
+      data: JSON.parse(activity.data),
+    })),
+  };
+};
+
+export const useServiceCompanyActivities = (
+  params: WithOptional<ServiceCompanyActivityParams, 'serviceCompanyId'>,
+  options?: UseInfiniteQueryOptions<any, any, any>,
+) => {
+  const {user} = useUserSession();
+  return useInfiniteQuery<
+    Resource<ServiceCompanyActivity<ServiceOrder>>,
+    RestError,
+    Resource<ServiceCompanyActivity<ServiceOrder>>
+  >(
+    [queryKeys.serviceCompanyActivity, params],
+    ({pageParam = 0}) =>
+      getCompanyActivities({
+        ...params,
+        serviceCompanyId: user!.userAccount.serviceCompany.id,
+        pageIndex: pageParam,
+      }),
+    {
+      enabled: !!user,
+      getNextPageParam: (lastPage) => {
+        const currentTotal =
+          (lastPage.page.pageIndex + 1) * lastPage.page.pageSize;
+        if (lastPage.total && currentTotal < lastPage.total) {
+          return lastPage.page.pageIndex + 1;
+        }
+        return undefined;
+      },
+      ...options,
+    },
+  );
+};
+
+export const getCompanySummary = async (
+  params: Partial<ServiceCompanySummaryParams>,
+  companyId: string,
+) => {
+  const response = await axiosClient.get<ServiceCompanySummary>(
+    `/api/serviceCompanies/${companyId}/summary`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useCompanySummary = (
+  params: Partial<ServiceCompanySummaryParams>,
+  companyId?: string,
+) =>
+  useQuery(
+    [queryKeys.fetchCompanySummary, companyId, params.timeUnit],
+    () => getCompanySummary(params, companyId!),
+    {
+      enabled: !!companyId,
+    },
+  );
