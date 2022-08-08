@@ -331,7 +331,7 @@ export const Notifications = () => {
           pt="1.25rem"
           px="1rem">
           <Typography variant="h5" letterSpacing="normal" py="0.75rem">
-            Notifications
+            {t('Notifications')}
           </Typography>
           {tabValue === '0' &&
             !isLoadingUnreadNotifications &&

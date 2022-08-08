@@ -974,6 +974,23 @@ module.exports = {
     Checklist: 'Checkliste',
     'No checklist yet.': 'Keine Checkliste vorhanden.',
     'Order Details': 'Auftragsdetails',
+
+    //  Notifications
+    Notifications: 'Benachrichtigungen',
+    New: 'Neu',
+    'Schedule Updated': 'Zeitplan aktualisiert',
+    'Read notifications': 'Benachrichtigungen lesen',
+    'You are up to date!': 'Sie sind auf dem Laufenden!',
+    'There are no new notifications waiting for you':
+      'Es gibt keine neuen Benachrichtigungen, die auf Sie warten',
+    'No notification yet!': 'Noch keine Benachrichtigung!',
+    'Service Order Accepted': 'Auftrag angenommen',
+    'Service Order Unassigned': 'Auftrag nicht zugewiesen',
+    'View Order': 'Auftrag anzeigen',
+    'View Schedule': 'Zeitplan anzeigen',
+    'emergency order unassigned': 'Personeneinschluss nicht zugewiesen',
+    'emergency order accepted': 'Eilauftrag angenommen',
+    Done: 'Erledigt',
   },
 };
 
