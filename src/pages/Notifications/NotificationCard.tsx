@@ -16,11 +16,7 @@ import {
   useUpdateServiceOrderSchedule,
 } from 'hooks/reactQuery/useServiceOrder';
 import {useMarkNotificationAsRead} from 'hooks/reactQuery/useNotifications';
-import {
-  setDateTime,
-  formatDate as formatDateUtil,
-  timeToNow,
-} from 'utils/datetime';
+import {setDateTime, formatDate as formatDateUtil} from 'utils/datetime';
 import {
   MessageType,
   NonTechnicianAssignmentData,
@@ -36,6 +32,7 @@ import {
   notificationTypeToString,
 } from 'utils/notification';
 import {NotificationIcon} from 'components/NotificationIcon';
+import {useFormatDateDistance} from 'hooks/useFormatDateDistance';
 
 interface Props extends BoxProps {
   notification: NotificationMessage<string>;
@@ -51,6 +48,7 @@ export const NotificationCard = ({
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
+  const formatDistance = useFormatDateDistance();
   const navigate = useNavigate();
   const [openAssignTechnicianDialog, setOpenAssignTechnicianDialog] =
     useState(false);
@@ -243,7 +241,7 @@ export const NotificationCard = ({
           </Box>
           <Box display="flex" alignItems="center">
             <Typography variant="caption" color={theme.palette.text.secondary}>
-              {timeToNow(notification.timestamp)}
+              {formatDistance(new Date(notification.timestamp))}
             </Typography>
             {!read && (
               <Box

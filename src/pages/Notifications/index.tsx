@@ -20,16 +20,17 @@ import {groupBy} from 'lodash';
 import {EmptySection} from 'components/EmptySection';
 import {Button} from 'components/Button';
 import {MessageType, Type} from 'models/notification';
-import {formatNotificationsTimestamp} from 'utils/datetime';
 import {
   useMarkAllAsRead,
   useNotifications,
 } from 'hooks/reactQuery/useNotifications';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {NotificationCard} from './NotificationCard';
 import {NotificationCardSkeleton} from './NotificationCardSkeleton';
 
 export const Notifications = () => {
   const theme = useTheme();
+  const formatDate = useFormatDate();
   const {t} = useTranslation();
   const [tabValue, setTabValue] = useState('0');
   const [showSideDrawer, setShowSideDrawer] = useState(false);
@@ -99,13 +100,7 @@ export const Notifications = () => {
     () =>
       groupBy(
         unreadNotifications.pages.flatMap((i) => i.data),
-        (notification) =>
-          t(
-            `${formatNotificationsTimestamp(
-              new Date(notification.timestamp),
-              'dd.MM.yyyy',
-            )}`,
-          ),
+        (notification) => `${formatDate(new Date(notification.timestamp))}`,
       ),
     [unreadNotifications.pages],
   );
@@ -114,13 +109,7 @@ export const Notifications = () => {
     () =>
       groupBy(
         readNotifications.pages.flatMap((i) => i.data),
-        (notification) =>
-          t(
-            `${formatNotificationsTimestamp(
-              new Date(notification.timestamp),
-              'dd.MM.yyyy',
-            )}`,
-          ),
+        (notification) => `${formatDate(new Date(notification.timestamp))}`,
       ),
     [readNotifications.pages],
   );
