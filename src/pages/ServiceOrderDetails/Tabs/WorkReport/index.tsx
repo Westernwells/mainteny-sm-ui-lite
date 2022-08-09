@@ -18,6 +18,7 @@ import {
 import {Progress} from 'components/Progress';
 import {PageCard} from 'components/PageCard';
 import {BottomDrawer} from 'components/BottomDrawer';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {serviceOrderStatusToString} from 'utils/service-order-utils';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
@@ -26,6 +27,7 @@ import {ReportCard} from './ReportCard';
 interface Props {
   orderId?: string;
 }
+
 export const WorkReport = ({orderId}: Props) => {
   const {t} = useTranslation();
   const {
@@ -36,9 +38,37 @@ export const WorkReport = ({orderId}: Props) => {
   } = useServiceOrderReport({
     serviceOrderId: typeof orderId === 'string' ? orderId : [],
   });
+
   const [items, setItems] = useState<ServiceOrderItemRecord[]>([]);
   const [report, setReport] = useState<ServiceOrderReportView>();
   const {mutate: updateArticles} = useUpdateServiceOrderArticles();
+  const [keysPrepend, setKeysPrepend] = useState<string>();
+  const [signatureKeys, setSignatureKeys] = useState<{[key: string]: string}>(
+    {},
+  );
+
+  const {data: downloadUrls = {}} = useDownloadUrl(
+    serviceOrderReportSource && serviceOrderReportSource.length
+      ? serviceOrderReportSource[0].attachments.map(
+          (item) => `${keysPrepend}/${item.fileResource.uri}`,
+        )
+      : [],
+    {enabled: !!keysPrepend},
+  );
+
+  useEffect(() => {
+    if (serviceOrderReportSource && serviceOrderReportSource.length) {
+      const serviceCompanyId =
+        serviceOrderReportSource[0].serviceOrder.serviceCompany.id;
+      const elevatorId = serviceOrderReportSource[0].serviceOrder.elevator.id;
+      const keys = {
+        CUSTOMER: `${serviceCompanyId}/elevators/${elevatorId}/images/CUSTOMER.png`,
+        TECHNICIAN: `${serviceCompanyId}/elevators/${elevatorId}/images/TECHNICIAN.png`,
+      };
+      setKeysPrepend(`${serviceCompanyId}/elevators/${elevatorId}/images`);
+      setSignatureKeys(keys);
+    }
+  }, [isFetched]);
 
   useEffect(() => {
     if (isFetched && serviceOrderReportSource?.length)
@@ -190,13 +220,7 @@ export const WorkReport = ({orderId}: Props) => {
               ))}
           </Box>
         </Box>
-        <Maintenance
-          schedule={
-            report.serviceOrder.schedules[
-              report.serviceOrder.schedules.length - 1
-            ]
-          }
-        />
+        <Maintenance serviceReport={report} />
 
         <ArticleItemsTable items={items} setItems={setItems} />
 
@@ -218,7 +242,7 @@ export const WorkReport = ({orderId}: Props) => {
             <Signature
               name={report.elevator.propertyOwner.name}
               designation="customer"
-              url="not available"
+              url={downloadUrls[signatureKeys.CUSTOMER]}
             />
             <Signature
               name={
@@ -227,7 +251,7 @@ export const WorkReport = ({orderId}: Props) => {
                   : '-'
               }
               designation="technician"
-              url="not available"
+              url={downloadUrls[signatureKeys.TECHNICIAN]}
             />
           </Box>
         </Box>

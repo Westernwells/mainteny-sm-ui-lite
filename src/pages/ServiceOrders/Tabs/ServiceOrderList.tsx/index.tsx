@@ -30,10 +30,12 @@ import {
   serviceOrderTypeToString,
 } from 'utils/service-order-utils';
 import {Widget} from 'components/Widget';
+import {useFormatDate} from 'hooks/useFormatDate';
 import {columns, makeRows} from './ServiceOrderDataGridProps';
 
 export const ServiceOrderList = () => {
   const navigate = useNavigate();
+  const formatDate = useFormatDate();
   const {t} = useTranslation();
   const [page, setPage] = useState(makePage(0, 25));
   const [queryParams, setQueryParams] = useSearchParams();
@@ -94,7 +96,7 @@ export const ServiceOrderList = () => {
 
   useEffect(() => {
     if (!isLoading) {
-      setRows(makeRows(serviceOrdersResource.data));
+      setRows(makeRows(serviceOrdersResource.data, formatDate));
     }
   }, [serviceOrdersResource]);
 

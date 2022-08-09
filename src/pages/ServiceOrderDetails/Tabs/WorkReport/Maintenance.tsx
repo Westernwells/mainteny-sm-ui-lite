@@ -1,20 +1,34 @@
 import {Typography} from '@mui/material';
 import Box from '@mui/material/Box';
 import {FormLabel} from 'components/form/FormLabel';
+import {addMinutes} from 'date-fns';
 import {useFormatDate} from 'hooks/useFormatDate';
-import {ServiceOrderSchedule} from 'models/service-order';
+import {ServiceOrderReportView} from 'models/service-order';
+import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 interface Props {
-  schedule?: ServiceOrderSchedule;
+  serviceReport: ServiceOrderReportView;
 }
 
 const dateToString = (date: Date) =>
   date.toISOString().split('T')[1].split('.')[0];
 
-export const Maintenance = ({schedule}: Props) => {
+export const Maintenance = ({serviceReport}: Props) => {
+  const [schedule] = useState(
+    serviceReport.serviceOrder.schedules[
+      serviceReport.serviceOrder.schedules.length - 1
+    ],
+  );
+  const [endTime] = useState(
+    addMinutes(
+      new Date(serviceReport.serviceOrder.actualStartTime!),
+      serviceReport.serviceOrder.serviceTime!,
+    ),
+  );
   const formatDate = useFormatDate();
   const {t} = useTranslation();
+
   return (
     <Box mt="1em">
       <FormLabel text="Maintenance" />
@@ -45,13 +59,15 @@ export const Maintenance = ({schedule}: Props) => {
             {[
               {
                 label: t('Start'),
-                date: formatDate(schedule.startTime),
-                time: dateToString(new Date(schedule.startTime)),
+                date: formatDate(serviceReport.serviceOrder.actualStartTime),
+                time: dateToString(
+                  new Date(serviceReport.serviceOrder.actualStartTime!),
+                ),
               },
               {
                 label: t('End'),
-                date: formatDate(schedule.endTime),
-                time: dateToString(new Date(schedule.endTime)),
+                date: formatDate(serviceReport.serviceOrder.actualEndTime),
+                time: dateToString(new Date(endTime)),
               },
             ].map((i) => (
               <Box
