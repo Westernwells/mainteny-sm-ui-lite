@@ -12,6 +12,7 @@ import {StatusChip} from 'components/StatusChip';
 import {getColumnProps} from 'components/DataGridLayout';
 import {olStyles} from 'styles';
 import {Typography} from '@mui/material';
+import {FormatDate} from 'models/misc';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -77,7 +78,10 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = (serviceOrders: ServiceOrderView[]): GridRowsProp =>
+export const makeRows = (
+  serviceOrders: ServiceOrderView[],
+  formatDate: FormatDate = () => '',
+): GridRowsProp =>
   serviceOrders.map((item: ServiceOrderView, index: number) => ({
     id: index,
     number: item.number,
@@ -85,7 +89,7 @@ export const makeRows = (serviceOrders: ServiceOrderView[]): GridRowsProp =>
     customer: item.elevator.propertyOwner.name,
     address: item.elevator.address.fullName || '-',
     unit: item.elevator.number,
-    date: item.dueDate,
+    date: formatDate(item.dueDate),
     technician: item.schedules.length
       ? item.schedules
           .map(
