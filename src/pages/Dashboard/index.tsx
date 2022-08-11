@@ -32,6 +32,7 @@ import {
   ActivityMessageType,
   ServiceCompanyTimeUnit,
 } from 'models/service-company';
+import {useTranslation} from 'react-i18next';
 import {AddAnything} from './AddAnything';
 import {TopCard} from './TopCard';
 import {TechniciansWorking} from './TechniciansWorking';
@@ -41,6 +42,7 @@ import {InvoiceDrafts} from './InvoiceDrafts';
 import {FieldActivities} from './FieldActivities';
 
 export const Dashboard = () => {
+  const {t} = useTranslation();
   const theme = useTheme();
   const {ref, inView} = useInView();
   const {user} = useUserSession();
@@ -162,11 +164,11 @@ export const Dashboard = () => {
         <Box>
           <Typography variant="h3">Hi {fullName}!</Typography>
           <Typography variant="subtitle1" color={theme.palette.text.secondary}>
-            There are{' '}
+            {t('There are')}{' '}
             <Typography variant="subtitle1" color="#01a0cc" component="span">
-              {dailyNumberOfOrders} orders
+              {dailyNumberOfOrders} {t('orders')}
             </Typography>{' '}
-            to be finished today
+            {t('to be finished today')}
           </Typography>
         </Box>
         <AddAnything />
