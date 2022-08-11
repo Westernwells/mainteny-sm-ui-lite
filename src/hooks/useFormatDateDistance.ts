@@ -8,5 +8,5 @@ export const useFormatDateDistance = () => {
   const language = user?.userAccount.serviceCompany.language;
   const locale = mapLanguageToLocale[language!];
   return (date: Date, baseDate: Date = new Date()) =>
-    formatDistance(date, baseDate, {locale: locales[locale]});
+    formatDistance(date, baseDate, {locale: locales[locale], addSuffix: true});
 };
