@@ -29,9 +29,13 @@ export const InvoiceDrafts = ({
       <List
         disablePadding
         sx={{
-          '& > li:last-child': {
-            mask: 'linear-gradient(#FFFFFF, transparent)',
-          },
+          ...(invoices.data.length >= 5
+            ? {
+                '& > li:last-child': {
+                  mask: 'linear-gradient(#FFFFFF, transparent)',
+                },
+              }
+            : {}),
         }}>
         {invoices.data.map((invoice) => (
           <ListItem

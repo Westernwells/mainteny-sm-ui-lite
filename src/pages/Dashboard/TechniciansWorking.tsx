@@ -28,9 +28,13 @@ export const TechniciansWorking = ({
       <List
         disablePadding
         sx={{
-          '& > li:last-child': {
-            mask: 'linear-gradient(#FFFFFF, transparent)',
-          },
+          ...(technicians.data.length >= 5
+            ? {
+                '& > li:last-child': {
+                  mask: 'linear-gradient(#FFFFFF, transparent)',
+                },
+              }
+            : {}),
         }}>
         {technicians.data.map((technician) => (
           <ListItem
