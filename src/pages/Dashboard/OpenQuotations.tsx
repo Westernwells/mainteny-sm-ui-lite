@@ -29,9 +29,13 @@ export const OpenQuotations = ({
       <List
         disablePadding
         sx={{
-          '& > li:last-child': {
-            mask: 'linear-gradient(#FFFFFF, transparent)',
-          },
+          ...(quotations.data.length >= 5
+            ? {
+                '& > li:last-child': {
+                  mask: 'linear-gradient(#FFFFFF, transparent)',
+                },
+              }
+            : {}),
         }}>
         {quotations.data.map((quotation) => (
           <ListItem
