@@ -5,6 +5,7 @@ import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import Check from '@mui/icons-material/Check';
 import {SvgIconComponent} from '@mui/icons-material';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   icon?: SvgIconComponent;
@@ -23,6 +24,7 @@ export const TopCard = ({
   value,
   subValue = '',
 }: Props) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   return (
     <Grid
@@ -48,7 +50,7 @@ export const TopCard = ({
           variant="subtitle2"
           color={theme.palette.text.secondary}
           pb="0.375rem">
-          {title}
+          {t(title)}
         </Typography>
         <Grid container spacing={1} alignItems="center">
           <Grid item>

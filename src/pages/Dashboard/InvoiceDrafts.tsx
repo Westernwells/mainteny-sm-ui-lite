@@ -13,6 +13,7 @@ import {nameToInitials} from 'utils/utils';
 import {formatCurrency} from 'utils/currency';
 import {Resource} from 'models/misc';
 import {InvoiceView} from 'models/invoice';
+import {useTranslation} from 'react-i18next';
 import {DashboardInfoCard} from './DashboardInfoCard';
 
 export const InvoiceDrafts = ({
@@ -20,6 +21,7 @@ export const InvoiceDrafts = ({
 }: {
   invoices: Resource<InvoiceView>;
 }) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   return (
     <DashboardInfoCard
@@ -43,7 +45,7 @@ export const InvoiceDrafts = ({
             sx={{py: '6px', px: '1.5rem'}}
             secondaryAction={
               <Chip
-                label="Draft"
+                label={t('Draft')}
                 size="small"
                 sx={{
                   px: '0.28rem',

@@ -12,6 +12,7 @@ import {
 import {getEmployeeStatus} from 'utils/work-hours-utils';
 import {Resource} from 'models/misc';
 import {EmployeeStatus, EmployeeStatusView} from 'models/employee';
+import {useTranslation} from 'react-i18next';
 import {DashboardInfoCard} from './DashboardInfoCard';
 
 export const TechniciansWorking = ({
@@ -19,6 +20,7 @@ export const TechniciansWorking = ({
 }: {
   technicians: Resource<EmployeeStatusView>;
 }) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   return (
     <DashboardInfoCard
@@ -42,7 +44,7 @@ export const TechniciansWorking = ({
             sx={{py: '6px', px: '1.5rem'}}
             secondaryAction={
               <Chip
-                label={getEmployeeStatus(technician.status)}
+                label={t(getEmployeeStatus(technician.status))}
                 size="small"
                 sx={{
                   px: '0.28rem',

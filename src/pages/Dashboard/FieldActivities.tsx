@@ -90,7 +90,7 @@ export const FieldActivities = ({
                 </TimelineSeparator>
                 <TimelineContent>
                   <Typography variant="body1" display="inline">
-                    {getFieldActivityTitle(activity.type)}
+                    {t(getFieldActivityTitle(activity.type))}
                   </Typography>
                   <Typography
                     variant="caption"

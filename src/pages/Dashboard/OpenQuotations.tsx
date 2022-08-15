@@ -13,6 +13,7 @@ import {nameToInitials} from 'utils/utils';
 import {formatCurrency} from 'utils/currency';
 import {Resource} from 'models/misc';
 import {QuotationView} from 'models/quotation';
+import {useTranslation} from 'react-i18next';
 import {DashboardInfoCard} from './DashboardInfoCard';
 
 export const OpenQuotations = ({
@@ -20,6 +21,7 @@ export const OpenQuotations = ({
 }: {
   quotations: Resource<QuotationView>;
 }) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   return (
     <DashboardInfoCard
@@ -43,7 +45,7 @@ export const OpenQuotations = ({
             sx={{py: '6px', px: '1.5rem'}}
             secondaryAction={
               <Chip
-                label="Sent"
+                label={t('Sent')}
                 size="small"
                 sx={{
                   px: '0.28rem',
