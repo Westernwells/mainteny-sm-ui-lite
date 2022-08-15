@@ -87,8 +87,8 @@ export const AppDrawer = () => {
   const {user} = useUserSession();
 
   useEffect(() => {
-    setSelectedPath(location.pathname);
-  }, []);
+    setSelectedPath(`/${location.pathname.split('/')[1]}`);
+  }, [location.pathname]);
 
   const handleDrawerOpen = () => {
     setOpen(true);
