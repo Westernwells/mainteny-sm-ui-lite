@@ -66,10 +66,10 @@ export const FieldActivities = ({
         {activities.pages.map((page) =>
           page.data.map((activity) => {
             const technician =
-              activity.data.schedules[0].technician.userAccount;
-            const technicianName = `${technician?.firstName ?? ''} ${
-              technician.lastName ?? ''
-            }`;
+              activity.data.schedules?.[0]?.technician.userAccount;
+            const technicianName = technician
+              ? `${technician.firstName ?? ''} ${technician.lastName ?? ''}`
+              : '-';
             return (
               <TimelineItem
                 ref={inViewRef}
