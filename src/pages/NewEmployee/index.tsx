@@ -14,6 +14,7 @@ import {
 } from 'models/employee';
 import {getRoles} from 'utils/work-hours-utils';
 import {Role} from 'models/user';
+import {ServiceOrderType} from 'models/service-order';
 import {EmployeeAccountData} from './model';
 import {AdditionalInformationEmployeeForm} from './AdditionalInformationEmployeeForm';
 import {BasicEmployeeForm} from './BasicEmployeeForm';
@@ -63,7 +64,7 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
     additionalInformationEmployeeFormValues,
     setAdditionalInformationEmployeeFormValues,
   ] = useState<AdditionalInformationEmployeeFormModel>({
-    serviceOrderTypes: [],
+    serviceOrderTypes: Object.values(ServiceOrderType),
     shifts: [],
   });
 
