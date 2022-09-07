@@ -141,11 +141,11 @@ export const makeRows = (
         duration: formatTime(item.duration, item.durationUnit),
         startDate: `${formatDate(item.startTime)} ${formatDate(
           item.startTime,
-          'HH:MM',
+          'HH:mm',
         )}`,
         endDate: `${formatDate(item.endTime)} ${formatDate(
           item.endTime,
-          'HH:MM',
+          'HH:mm',
         )}`,
         address: getAddress(item.data),
         orderNumber: getOrderNumber(item.data),
