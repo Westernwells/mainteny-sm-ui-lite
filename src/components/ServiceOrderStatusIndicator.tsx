@@ -15,7 +15,7 @@ export const ServiceOrderStatusIndicator = ({containerStyles}: Props) => {
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();
   const statuses = useRef(
     removeFromList(
-      ['ALL', 'INIT', 'READY_TO_SCHEDULE', 'SCHEDULING'],
+      ['ALL', 'INIT', 'READY_TO_SCHEDULE', 'SCHEDULING', 'DONE'],
       Object.values(ServiceOrderStatus),
     ),
   ).current;
