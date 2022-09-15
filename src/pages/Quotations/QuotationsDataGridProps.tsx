@@ -5,6 +5,7 @@ import {formatCurrency} from 'utils/currency';
 import {QuotationStatus, QuotationView} from 'models/quotation';
 import {FormatDate, Resource} from 'models/misc';
 import {Actions} from './Actions';
+import {NotesIndicator} from './NotesIndicator';
 
 export const getQuotationStatusStyles = (
   status: string,
@@ -68,6 +69,13 @@ export const columns: GridColDef[] = [
     field: 'amount',
     headerName: 'total amount',
     align: 'right',
+  }),
+  getColumnProps({
+    field: 'notes',
+    headerName: 'notes',
+    align: 'center',
+    renderCell: (params) => <NotesIndicator quotation={params.row.quotation} />,
+    flex: 1,
   }),
   getColumnProps({
     field: 'status',
