@@ -23,6 +23,7 @@ import {Dialog} from 'components/Dialog';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
+import {Button} from 'components/Button';
 import * as Yup from 'yup';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import {
@@ -142,6 +143,15 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       contractId: contractId!,
     });
     setOpenDocumentDialog(false);
+  };
+
+  const onRemoveDoc = async () => {
+    await updateContract({
+      body: {
+        documents: [],
+      } as Partial<ContractRequestBody>,
+      contractId: contractId!,
+    });
   };
 
   const headerStyles = useMemo(
@@ -331,11 +341,18 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                         sx={{color: 'text.secondary', marginTop: '0.625em'}}>
                         {uploadedDocument && uploadedDocument[0].description}
                       </Typography>
+                      <Button
+                        buttonProps={{
+                          color: 'error',
+                          onClick: onRemoveDoc,
+                        }}>
+                        Remove
+                      </Button>
                     </Box>
                   </Box>
                 ) : (
                   <EmptySection
-                    label="No document yet. It will be appear here once added."
+                    label="No documents attached. They will appear here once added!"
                     illustration="clipboard"
                     size="tiny"
                     containerStyle={{
