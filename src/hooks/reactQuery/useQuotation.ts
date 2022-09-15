@@ -11,7 +11,9 @@ import {useNavigate} from 'react-router-dom';
 import {Resource, RestError} from 'models/misc';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
+  Comment,
   CreateQuotation,
+  QueryQuotationCommentsParams,
   QueryQuotationParams,
   QuotationFilters,
   QuotationView,
@@ -287,3 +289,32 @@ export const useDeleteQuotation = () => {
     },
   );
 };
+
+export const fetchQuotationComments = async (
+  quotationId: string,
+  params: QueryQuotationCommentsParams,
+): Promise<Resource<Comment>> => {
+  const response = await axiosClient.get<Resource<Comment>>(
+    `/api/quotations/${quotationId}/comments`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+
+  return response.data;
+};
+
+export function useQuotationComments(
+  quotationId: string,
+  params: QueryQuotationCommentsParams,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<Resource<Comment>, RestError>(
+    [qk.fetchQuotationComments, params, quotationId],
+    () => fetchQuotationComments(quotationId, params),
+    {
+      ...options,
+    },
+  );
+}
