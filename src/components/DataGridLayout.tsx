@@ -67,7 +67,7 @@ export const getColumnProps = ({
       <Typography variant="subtitle2" color="textSecondary">
         {(params.colDef.headerName &&
           variant === 'titleCase' &&
-          convertToText(t(params.colDef.headerName))) ||
+          t(convertToText(params.colDef.headerName))) ||
           (params.colDef.headerName &&
             t(params.colDef.headerName.toUpperCase()))}
       </Typography>
