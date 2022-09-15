@@ -90,6 +90,7 @@ module.exports = {
     'CONTRACT TYPE': 'VERTRAGSTYP',
     'START DATE': 'ANFANGSDATUM',
     'NO. OF UNITS': 'ANZAHL ANLAGEN',
+    'CUSTOMER SINCE': 'KUNDE SEIT',
     'CONTACT TYPE': 'KONTAKT',
     'New Contract': 'Neuer Vertrag',
     'Select units': 'Wähle Aufzug',
@@ -1014,6 +1015,10 @@ module.exports = {
     Contract: 'Vertrag',
     Quotation: 'Angebot',
     Invoice: 'Rechnung',
+    Invite: 'Einladen',
+    'Resend Invite': 'Einladung erneut senden',
+    'Revoke Access': 'Zugang widerrufen',
+    'Create Service Order': 'Auftrag erstellen',
   },
 };
 

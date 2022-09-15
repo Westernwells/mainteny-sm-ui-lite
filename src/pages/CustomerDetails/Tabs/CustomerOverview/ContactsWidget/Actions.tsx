@@ -9,6 +9,7 @@ import {Box} from '@mui/material';
 
 import {useInviteContact} from 'hooks/reactQuery/useContacts';
 import {ContactsStatus} from 'models/contacts';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   onEdit: () => void;
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export const Actions = ({onEdit, onDelete, contactId, status}: Props) => {
+  const {t} = useTranslation();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const {mutateAsync: inviteContact} = useInviteContact(
@@ -98,7 +100,7 @@ export const Actions = ({onEdit, onDelete, contactId, status}: Props) => {
             getTypeInvite().action();
           }}>
           <ListItemText>
-            <Typography variant="body2">{getTypeInvite().label}</Typography>
+            <Typography variant="body2">{t(getTypeInvite().label)}</Typography>
           </ListItemText>
         </MenuItem>
       </Menu>
