@@ -188,6 +188,7 @@ export const Notes = ({quotation}: Props) => {
           sx={{
             bgcolor: 'white',
             position: 'sticky',
+            mt: 'auto',
             bottom: 0,
             p: '1.5rem',
           }}>
