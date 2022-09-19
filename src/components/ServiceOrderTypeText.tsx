@@ -24,7 +24,7 @@ export const ServiceOrderTypeText = ({
           ? t(capitalize(['MAINTENANCE']))
           : t('MAINTENANCE')
         : capitalizeText
-        ? t(capitalize([serviceOrderType]))
+        ? serviceOrderType && t(capitalize([serviceOrderType]))
         : serviceOrderType && t(serviceOrderType)}
     </Typography>
   );

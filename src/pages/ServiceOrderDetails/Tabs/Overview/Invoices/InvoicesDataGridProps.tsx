@@ -81,9 +81,9 @@ export const makeRows = (
         id: index,
         date: formatDate(toDate(item.issuedDate)),
         number: item.number,
-        order: item.serviceOrder.number,
+        order: item.serviceOrder?.number,
         customer: item.propertyOwner.name,
-        type: item.serviceOrder.type,
+        type: item.serviceOrder?.type,
         amount: `${formatCurrency(
           item
             ? item.totalAmount.netAmount /

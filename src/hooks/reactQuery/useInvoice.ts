@@ -74,7 +74,7 @@ export const filterByServiceType = (
   let filterResult = [] as InvoiceView[];
   const invoiceServiceTypeMap = _.groupBy(
     invoicesRes.data,
-    (item) => item.serviceOrder.type,
+    (item) => item.serviceOrder?.type,
   );
 
   serviceType

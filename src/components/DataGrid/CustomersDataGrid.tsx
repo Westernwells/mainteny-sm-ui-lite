@@ -52,7 +52,7 @@ export const makeRows = (customers: PropertyOwnerView[]): GridRowsProp =>
         name: item.name,
         // TODO: Use Customer number
         number: 'C-12345',
-        address: item.postalAddress.fullName,
+        address: item.postalAddress?.fullName,
         units: item.unitNumber,
         phone: item.contact.phone,
         propertyOwner: item,
