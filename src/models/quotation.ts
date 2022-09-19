@@ -113,3 +113,8 @@ export interface QueryQuotationCommentsParams {
   pageIndex: number;
   pageSize: number;
 }
+
+export interface CreateQuotationComment {
+  content: string;
+  subject: string;
+}

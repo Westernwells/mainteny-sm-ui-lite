@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState, Fragment} from 'react';
+import {useEffect, useMemo, useState, Fragment, useRef} from 'react';
 import {useInView} from 'react-intersection-observer';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
@@ -12,7 +12,10 @@ import {Button} from 'components/Button';
 import {FormInput} from 'components/form/FormInput';
 import {EmptySection} from 'components/EmptySection';
 import {QuotationView} from 'models/quotation';
-import {useInfiniteQuotationComments} from 'hooks/reactQuery/useQuotation';
+import {
+  useCreateQuotationComment,
+  useInfiniteQuotationComments,
+} from 'hooks/reactQuery/useQuotation';
 import {formatTimestamp} from 'utils/datetime';
 import {NoteCard} from './NoteCard';
 import {NoteCardSkeleton} from './NoteCardSkeleton';
@@ -43,12 +46,31 @@ export const Notes = ({quotation}: Props) => {
     pageIndex: 0,
     pageSize: 10,
   });
+  const {mutate: createQuotationComment} = useCreateQuotationComment();
+  const notesTopRef = useRef<HTMLElement>();
   const formik = useFormik<{note: string}>({
     initialValues: {
       note: '',
     },
     onSubmit: (values) => {
-      console.log('🚀 ~ file: index.tsx ~ line 55 ~ Notes ~ values', values);
+      createQuotationComment(
+        {
+          quotationId: quotation.id,
+          body: {
+            content: values.note,
+            subject: '',
+          },
+        },
+        {
+          onSuccess: () => {
+            notesTopRef.current?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+            });
+            formik.resetForm();
+          },
+        },
+      );
     },
     validationSchema,
   });
@@ -99,14 +121,15 @@ export const Notes = ({quotation}: Props) => {
         />
       </Box>
     ) : (
-      Object.entries(groupedNotes).map(([date, data]) => (
+      Object.entries(groupedNotes).map(([date, data], index) => (
         <Fragment key={date}>
           <Box
             display="flex"
             alignItems="center"
             py="10px"
             px="1.5rem"
-            bgcolor={theme.palette.grey[50]}>
+            bgcolor={theme.palette.grey[50]}
+            {...(index === 0 && {ref: notesTopRef})}>
             <Typography variant="overline" textTransform="uppercase">
               {date}
             </Typography>
@@ -222,7 +245,7 @@ export const Notes = ({quotation}: Props) => {
                   type: 'submit',
                   size: 'medium',
                   variant: 'contained',
-                  disabled: !formik.isValid,
+                  disabled: !formik.isValid || formik.isSubmitting,
                 }}>
                 {t('Submit note')}
               </Button>

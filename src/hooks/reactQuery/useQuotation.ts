@@ -15,6 +15,7 @@ import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
   Comment,
   CreateQuotation,
+  CreateQuotationComment,
   QueryQuotationCommentsParams,
   QueryQuotationParams,
   QuotationFilters,
@@ -343,3 +344,39 @@ export function useInfiniteQuotationComments(
     },
   );
 }
+
+export const postQuotationComment = async (
+  quotationId: string,
+  body: CreateQuotationComment,
+) => {
+  const {data} = await axiosClient.post<{value: string}>(
+    `/api/quotations/${quotationId}/comments`,
+    body,
+  );
+  return data;
+};
+
+export const useCreateQuotationComment = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({
+      quotationId,
+      body,
+    }: {
+      quotationId: string;
+      body: CreateQuotationComment;
+    }) => postQuotationComment(quotationId, body),
+    {
+      onSuccess: () =>
+        queryClient.invalidateQueries([qk.fetchQuotationComments]),
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
