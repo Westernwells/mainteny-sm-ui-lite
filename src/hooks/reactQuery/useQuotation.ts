@@ -1,5 +1,7 @@
 import {useCallback} from 'react';
 import {
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
   useMutation,
   useQuery,
   useQueryClient,
@@ -11,7 +13,10 @@ import {useNavigate} from 'react-router-dom';
 import {Resource, RestError} from 'models/misc';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
+  Comment,
   CreateQuotation,
+  CreateQuotationComment,
+  QueryQuotationCommentsParams,
   QueryQuotationParams,
   QuotationFilters,
   QuotationView,
@@ -278,6 +283,163 @@ export const useDeleteQuotation = () => {
         });
         if (shouldNavigate) navigate(`/quotations?pageIndex=1&pageSize=25`);
       },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+export const fetchQuotationComments = async (
+  quotationId: string,
+  params: QueryQuotationCommentsParams,
+): Promise<Resource<Comment>> => {
+  const response = await axiosClient.get<Resource<Comment>>(
+    `/api/quotations/${quotationId}/comments`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+
+  return response.data;
+};
+
+export function useQuotationComments(
+  quotationId: string,
+  params: QueryQuotationCommentsParams,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<Resource<Comment>, RestError>(
+    [qk.fetchQuotationComments, params, quotationId],
+    () => fetchQuotationComments(quotationId, params),
+    {
+      ...options,
+    },
+  );
+}
+
+export function useInfiniteQuotationComments(
+  quotationId: string,
+  params: QueryQuotationCommentsParams,
+  options?: UseInfiniteQueryOptions<any, any, any>,
+) {
+  return useInfiniteQuery<Resource<Comment>, RestError, Resource<Comment>>(
+    [qk.fetchQuotationComments, params, quotationId, {infinite: true}],
+    ({pageParam = 0}) =>
+      fetchQuotationComments(quotationId, {...params, pageIndex: pageParam}),
+    {
+      getNextPageParam: (lastPage) => {
+        const currentTotal =
+          (lastPage.page.pageIndex + 1) * lastPage.page.pageSize;
+        if (lastPage.total && currentTotal < lastPage.total) {
+          return lastPage.page.pageIndex + 1;
+        }
+        return undefined;
+      },
+      ...options,
+    },
+  );
+}
+
+export const postQuotationComment = async (
+  quotationId: string,
+  body: CreateQuotationComment,
+) => {
+  const {data} = await axiosClient.post<{value: string}>(
+    `/api/quotations/${quotationId}/comments`,
+    body,
+  );
+  return data;
+};
+
+export const useCreateQuotationComment = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({
+      quotationId,
+      body,
+    }: {
+      quotationId: string;
+      body: CreateQuotationComment;
+    }) => postQuotationComment(quotationId, body),
+    {
+      onSuccess: () =>
+        queryClient.invalidateQueries([qk.fetchQuotationComments]),
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+export const deleteQuotationComment = async (
+  quotationId: string,
+  commentId: string,
+) => {
+  const {data} = await axiosClient.delete<{value: string}>(
+    `/api/quotations/${quotationId}/comments/${commentId}`,
+  );
+  return data;
+};
+
+export const useDeleteQuotationComment = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({quotationId, commentId}: {quotationId: string; commentId: string}) =>
+      deleteQuotationComment(quotationId, commentId),
+    {
+      onSuccess: () =>
+        queryClient.invalidateQueries([qk.fetchQuotationComments]),
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+export const updateQuotationComment = async (
+  quotationId: string,
+  commentId: string,
+  body: CreateQuotationComment,
+) => {
+  const {data} = await axiosClient.put<{value: string}>(
+    `/api/quotations/${quotationId}/comments/${commentId}`,
+    body,
+  );
+  return data;
+};
+
+export const useUpdateQuotationComment = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({
+      quotationId,
+      commentId,
+      body,
+    }: {
+      quotationId: string;
+      commentId: string;
+      body: CreateQuotationComment;
+    }) => updateQuotationComment(quotationId, commentId, body),
+    {
+      onSuccess: () =>
+        queryClient.invalidateQueries([qk.fetchQuotationComments]),
       onError: (err) => {
         console.log(err);
         enqueueSnackbar('An unexpected error occurred, please try again.', {

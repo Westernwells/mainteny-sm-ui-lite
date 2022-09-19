@@ -92,3 +92,29 @@ export interface ReplyQuotation {
   isAccepted: boolean;
   accepted: boolean;
 }
+
+export enum CommentType {
+  ELEVATOR_NOTE = 'ELEVATOR_NOTE',
+  ELEVATOR_TODO = 'ELEVATOR_TODO',
+  INVOICE_COMMENT = 'INVOICE_COMMENT',
+  QUOTATION_COMMENT = 'QUOTATION_COMMENT',
+}
+
+export interface Comment {
+  id: string;
+  refId: string;
+  type: CommentType;
+  subject: string;
+  content: string;
+  meta: Meta;
+}
+
+export interface QueryQuotationCommentsParams {
+  pageIndex: number;
+  pageSize: number;
+}
+
+export interface CreateQuotationComment {
+  content: string;
+  subject: string;
+}

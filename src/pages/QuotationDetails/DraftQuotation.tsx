@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import DeleteIcon from '@mui/icons-material/Delete';
+import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps';
 import {A4Layout} from 'components/A4Layout';
 import {SelectCombined} from 'components/SelectCombined';
 import {ArticleItemsTable} from 'components/ArticleItemsTable';
@@ -16,6 +17,7 @@ import {BottomDrawer} from 'components/BottomDrawer';
 import {FormLabel} from 'components/form/FormLabel';
 import {FormInput} from 'components/form/FormInput';
 import {Confirm} from 'components/Confirm';
+import {StatusChip} from 'components/StatusChip';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateQuotation,
@@ -35,6 +37,7 @@ import {
 } from 'models/propertyManager';
 import {WithOptional} from 'models/misc';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {Notes} from './Notes';
 
 interface Props {
   quotation?: QuotationView;
@@ -160,10 +163,16 @@ export const DraftQuotation = ({quotation}: Props) => {
 
   return (
     <Box>
-      <A4Layout
-        placeholder="Quotation"
-        number={quotation?.number}
-        status={quotation?.status}>
+      <Box display="flex" alignItems="flex-end" justifyContent="space-between">
+        <StatusChip
+          label={getQuotationStatusStyles(quotation?.status ?? '').label}
+          color={getQuotationStatusStyles(quotation?.status ?? '').color}
+          size="small"
+          variant="filled"
+        />
+        <Notes quotation={quotation!} />
+      </Box>
+      <A4Layout placeholder="Quotation" number={quotation?.number}>
         <Box display="flex" mt="1em" gap="2em">
           <Box flexGrow={1} display="flex" flexDirection="column" gap="2em">
             <SelectCombined

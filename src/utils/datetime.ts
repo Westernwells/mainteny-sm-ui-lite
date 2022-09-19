@@ -200,7 +200,7 @@ export const timeToNow = (value: string): string =>
     addSuffix: true,
   });
 
-export const formatNotificationsTimestamp = (date: Date, formatStr: string) => {
+export const formatTimestamp = (date: Date, formatStr: string) => {
   if (isToday(date)) {
     return 'Today';
   }
