@@ -1,5 +1,7 @@
 import {useCallback} from 'react';
 import {
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
   useMutation,
   useQuery,
   useQueryClient,
@@ -314,6 +316,29 @@ export function useQuotationComments(
     [qk.fetchQuotationComments, params, quotationId],
     () => fetchQuotationComments(quotationId, params),
     {
+      ...options,
+    },
+  );
+}
+
+export function useInfiniteQuotationComments(
+  quotationId: string,
+  params: QueryQuotationCommentsParams,
+  options?: UseInfiniteQueryOptions<any, any, any>,
+) {
+  return useInfiniteQuery<Resource<Comment>, RestError, Resource<Comment>>(
+    [qk.fetchQuotationComments, params, quotationId, {infinite: true}],
+    ({pageParam = 0}) =>
+      fetchQuotationComments(quotationId, {...params, pageIndex: pageParam}),
+    {
+      getNextPageParam: (lastPage) => {
+        const currentTotal =
+          (lastPage.page.pageIndex + 1) * lastPage.page.pageSize;
+        if (lastPage.total && currentTotal < lastPage.total) {
+          return lastPage.page.pageIndex + 1;
+        }
+        return undefined;
+      },
       ...options,
     },
   );

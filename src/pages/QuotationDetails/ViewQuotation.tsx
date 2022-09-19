@@ -23,6 +23,7 @@ import {formatCurrency} from 'utils/currency';
 import {useTranslation} from 'react-i18next';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
+import {Notes} from './Notes';
 
 interface Props {
   downloadUrl: string;
@@ -54,34 +55,45 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
 
   return (
     <Box>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        gap="1em">
-        <Box ml="auto">
-          <StatusChip
-            label={getQuotationStatusStyles(quotation.status).label}
-            color={getQuotationStatusStyles(quotation.status).color}
-            size="small"
-            variant="filled"
-          />
-        </Box>
-        {downloadUrl && (
-          <Button
-            label="Download Quotation"
-            buttonProps={{
-              variant: 'outlined',
-              onClick: () => window.open(`${downloadUrl}`, '_blank'),
-              disabled:
-                quotation!.additionalInfo.pdfGenerationStatus !==
-                PdfGenerationStatus.DONE,
-              startIcon: <FileDownloadIcon color="primary" />,
-            }}
-          />
-        )}
-      </Box>
       <Grid container width="100%" mt="2.5em" mb="2em" gap={2}>
+        <Grid item xs={12}>
+          <Grid container flexDirection="row">
+            <Grid item xs={4}>
+              <StatusChip
+                label={getQuotationStatusStyles(quotation.status).label}
+                color={getQuotationStatusStyles(quotation.status).color}
+                size="small"
+                variant="filled"
+              />
+            </Grid>
+
+            <Grid
+              item
+              xs={4}
+              display="flex"
+              alignItems="center"
+              justifyContent="flex-end"
+              gap={0.5}>
+              <Notes quotation={quotation!} />
+            </Grid>
+
+            <Grid item xs={4} textAlign="end">
+              {downloadUrl && (
+                <Button
+                  label="Download Quotation"
+                  buttonProps={{
+                    variant: 'outlined',
+                    onClick: () => window.open(`${downloadUrl}`, '_blank'),
+                    disabled:
+                      quotation!.additionalInfo.pdfGenerationStatus !==
+                      PdfGenerationStatus.DONE,
+                    startIcon: <FileDownloadIcon color="primary" />,
+                  }}
+                />
+              )}
+            </Grid>
+          </Grid>
+        </Grid>
         <Grid item xs={8}>
           <PageCard
             containerStyles={{mb: '1.5em'}}
