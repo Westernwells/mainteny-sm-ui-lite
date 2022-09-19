@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import NoteAlt from '@mui/icons-material/NoteAlt';
-import {Chip, Divider, Drawer, Typography} from '@mui/material';
+import {Chip, Divider, Drawer, LinearProgress, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {groupBy} from 'lodash';
 import {Button} from 'components/Button';
@@ -14,11 +14,13 @@ import {EmptySection} from 'components/EmptySection';
 import {QuotationView} from 'models/quotation';
 import {
   useCreateQuotationComment,
+  useDeleteQuotationComment,
   useInfiniteQuotationComments,
 } from 'hooks/reactQuery/useQuotation';
 import {formatTimestamp} from 'utils/datetime';
 import {NoteCard} from './NoteCard';
 import {NoteCardSkeleton} from './NoteCardSkeleton';
+import {ConfirmDelete} from './ConfirmDelete';
 
 interface Props {
   quotation: QuotationView;
@@ -32,6 +34,8 @@ export const Notes = ({quotation}: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
   const [showSideDrawer, setShowSideDrawer] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedNoteId, setSelectedNoteId] = useState('');
   const {ref: notesRef, inView: notesInView} = useInView();
   const {
     data: notes = {
@@ -47,6 +51,10 @@ export const Notes = ({quotation}: Props) => {
     pageSize: 10,
   });
   const {mutate: createQuotationComment} = useCreateQuotationComment();
+  const {
+    mutate: deleteQuotationComment,
+    isLoading: isDeletingQuotationComment,
+  } = useDeleteQuotationComment();
   const notesTopRef = useRef<HTMLElement>();
   const formik = useFormik<{note: string}>({
     initialValues: {
@@ -137,10 +145,23 @@ export const Notes = ({quotation}: Props) => {
 
           <Box sx={{width: '100%'}}>
             {data.map((note) => (
-              <Box ref={notesRef} key={note.id}>
-                <NoteCard note={note} />
-                <Divider />
-              </Box>
+              <Fragment key={note.id}>
+                <Box ref={notesRef}>
+                  <NoteCard
+                    note={note}
+                    onDelete={() => {
+                      setSelectedNoteId(note.id);
+                      setIsDeleteDialogOpen(true);
+                    }}
+                  />
+                  {selectedNoteId === note.id && isDeletingQuotationComment && (
+                    <Box height="4px">
+                      <LinearProgress />
+                    </Box>
+                  )}
+                  <Divider />
+                </Box>
+              </Fragment>
             ))}
           </Box>
         </Fragment>
@@ -253,6 +274,17 @@ export const Notes = ({quotation}: Props) => {
           </form>
         </Box>
       </Drawer>
+      <ConfirmDelete
+        open={isDeleteDialogOpen}
+        onConfirm={() => {
+          deleteQuotationComment({
+            quotationId: quotation.id,
+            commentId: selectedNoteId,
+          });
+          setIsDeleteDialogOpen(false);
+        }}
+        onClose={() => setIsDeleteDialogOpen(false)}
+      />
     </>
   );
 };

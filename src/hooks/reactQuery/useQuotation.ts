@@ -380,3 +380,33 @@ export const useCreateQuotationComment = () => {
     },
   );
 };
+
+export const deleteQuotationComment = async (
+  quotationId: string,
+  commentId: string,
+) => {
+  const {data} = await axiosClient.delete<{value: string}>(
+    `/api/quotations/${quotationId}/comments/${commentId}`,
+  );
+  return data;
+};
+
+export const useDeleteQuotationComment = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({quotationId, commentId}: {quotationId: string; commentId: string}) =>
+      deleteQuotationComment(quotationId, commentId),
+    {
+      onSuccess: () =>
+        queryClient.invalidateQueries([qk.fetchQuotationComments]),
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
