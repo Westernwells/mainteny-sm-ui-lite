@@ -10,9 +10,10 @@ import {Comment} from 'models/quotation';
 interface Props extends BoxProps {
   note: Comment;
   onDelete: () => void;
+  onEdit: () => void;
 }
 
-export const NoteCard = ({note, onDelete, ...rest}: Props) => {
+export const NoteCard = ({note, onDelete, onEdit, ...rest}: Props) => {
   const theme = useTheme();
 
   return (
@@ -42,7 +43,7 @@ export const NoteCard = ({note, onDelete, ...rest}: Props) => {
             )}`}
           </Typography>
           <Box display="flex" alignItems="center">
-            <IconButton size="small">
+            <IconButton size="small" onClick={onEdit}>
               <Edit fontSize="small" />
             </IconButton>
             <IconButton size="small" onClick={onDelete}>

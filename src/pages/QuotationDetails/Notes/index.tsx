@@ -16,6 +16,7 @@ import {
   useCreateQuotationComment,
   useDeleteQuotationComment,
   useInfiniteQuotationComments,
+  useUpdateQuotationComment,
 } from 'hooks/reactQuery/useQuotation';
 import {formatTimestamp} from 'utils/datetime';
 import {NoteCard} from './NoteCard';
@@ -55,30 +56,55 @@ export const Notes = ({quotation}: Props) => {
     mutate: deleteQuotationComment,
     isLoading: isDeletingQuotationComment,
   } = useDeleteQuotationComment();
+  const {
+    mutate: updateQuotationComment,
+    isLoading: isUpdatingQuotationComment,
+  } = useUpdateQuotationComment();
   const notesTopRef = useRef<HTMLElement>();
   const formik = useFormik<{note: string}>({
     initialValues: {
       note: '',
     },
-    onSubmit: (values) => {
-      createQuotationComment(
-        {
-          quotationId: quotation.id,
-          body: {
-            content: values.note,
-            subject: '',
+    onSubmit: (values, {setSubmitting}) => {
+      if (selectedNoteId) {
+        updateQuotationComment(
+          {
+            quotationId: quotation.id,
+            commentId: selectedNoteId,
+            body: {
+              content: values.note,
+              subject: '',
+            },
           },
-        },
-        {
-          onSuccess: () => {
-            notesTopRef.current?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'center',
-            });
-            formik.resetForm();
+          {
+            onSuccess: () => {
+              formik.setValues({note: ''});
+              setSelectedNoteId('');
+            },
+            onSettled: () => setSubmitting(false),
           },
-        },
-      );
+        );
+      } else {
+        createQuotationComment(
+          {
+            quotationId: quotation.id,
+            body: {
+              content: values.note,
+              subject: '',
+            },
+          },
+          {
+            onSuccess: () => {
+              notesTopRef.current?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+              });
+              formik.setValues({note: ''});
+            },
+            onSettled: () => setSubmitting(false),
+          },
+        );
+      }
     },
     validationSchema,
   });
@@ -153,12 +179,19 @@ export const Notes = ({quotation}: Props) => {
                       setSelectedNoteId(note.id);
                       setIsDeleteDialogOpen(true);
                     }}
+                    onEdit={() => {
+                      setSelectedNoteId(note.id);
+                      formik.setValues({
+                        note: note.content,
+                      });
+                    }}
                   />
-                  {selectedNoteId === note.id && isDeletingQuotationComment && (
+                  {selectedNoteId === note.id &&
+                  (isDeletingQuotationComment || isUpdatingQuotationComment) ? (
                     <Box height="4px">
                       <LinearProgress />
                     </Box>
-                  )}
+                  ) : null}
                   <Divider />
                 </Box>
               </Fragment>
@@ -266,7 +299,7 @@ export const Notes = ({quotation}: Props) => {
                   type: 'submit',
                   size: 'medium',
                   variant: 'contained',
-                  disabled: !formik.isValid || formik.isSubmitting,
+                  disabled: !formik.values.note || formik.isSubmitting,
                 }}>
                 {t('Submit note')}
               </Button>
@@ -277,10 +310,13 @@ export const Notes = ({quotation}: Props) => {
       <ConfirmDelete
         open={isDeleteDialogOpen}
         onConfirm={() => {
-          deleteQuotationComment({
-            quotationId: quotation.id,
-            commentId: selectedNoteId,
-          });
+          deleteQuotationComment(
+            {
+              quotationId: quotation.id,
+              commentId: selectedNoteId,
+            },
+            {onSettled: () => setSelectedNoteId('')},
+          );
           setIsDeleteDialogOpen(false);
         }}
         onClose={() => setIsDeleteDialogOpen(false)}

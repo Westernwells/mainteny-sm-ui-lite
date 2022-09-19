@@ -410,3 +410,42 @@ export const useDeleteQuotationComment = () => {
     },
   );
 };
+
+export const updateQuotationComment = async (
+  quotationId: string,
+  commentId: string,
+  body: CreateQuotationComment,
+) => {
+  const {data} = await axiosClient.put<{value: string}>(
+    `/api/quotations/${quotationId}/comments/${commentId}`,
+    body,
+  );
+  return data;
+};
+
+export const useUpdateQuotationComment = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({
+      quotationId,
+      commentId,
+      body,
+    }: {
+      quotationId: string;
+      commentId: string;
+      body: CreateQuotationComment;
+    }) => updateQuotationComment(quotationId, commentId, body),
+    {
+      onSuccess: () =>
+        queryClient.invalidateQueries([qk.fetchQuotationComments]),
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
