@@ -9,6 +9,7 @@ import {queryKeys} from 'reactQuery/constants';
 import {useSnackbar} from 'hooks/useSnackbar';
 
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
+import {ErrorCode} from 'models/error';
 import {Page, Resource, RestError, StringValue} from '../../models/misc';
 
 export const getContacts = async (page: Page, customerId: string) => {
@@ -98,9 +99,18 @@ export const useCreateContact = (successMsg?: string) => {
     },
     onError: (err: any) => {
       console.log(err);
-      enqueueSnackbar('An unexpected error occurred, please try again.', {
-        variant: 'error',
-      });
+      if (
+        (err?.response?.data as RestError)?.errorCode ===
+        ErrorCode.USERNAME_EXISTS
+      ) {
+        enqueueSnackbar('A contact person with this email already exists.', {
+          variant: 'error',
+        });
+      } else {
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      }
     },
   });
 };

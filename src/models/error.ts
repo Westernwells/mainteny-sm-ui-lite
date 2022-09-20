@@ -1,3 +1,4 @@
 export enum ErrorCode {
   NOT_DECODABLE_ADDRESS = '10000',
+  USERNAME_EXISTS = 1004,
 }
