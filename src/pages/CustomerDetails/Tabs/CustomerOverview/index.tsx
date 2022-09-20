@@ -62,7 +62,7 @@ export const CustomerOverviewTab = ({
         ...basicDetails,
         address: {
           label: 'ADDRESS',
-          value: customer.postalAddress.fullName,
+          value: customer.postalAddress?.fullName,
           icon: <Home sx={{color: theme.palette.info.dark}} />,
         },
         phone: {
