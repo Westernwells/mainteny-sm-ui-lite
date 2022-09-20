@@ -6,7 +6,7 @@ import {GetState, SetState} from 'zustand';
 import {UserAccountSimpleView} from './user';
 
 export interface RestError {
-  errorCode: string;
+  errorCode: number;
   message: string;
 }
 
