@@ -9,6 +9,7 @@ import {Location} from './Location';
 import {UnitDetails} from './UnitDetails';
 import {Service} from './Service';
 import {AppointmentPreference} from './AppointmentPreference';
+import {EmergencyPhone} from './EmergencyPhone';
 import {UnitContracts} from './UnitContracts';
 import {PriorityTechnician} from './PriorityTechnician';
 import {Notes} from './Notes';
@@ -75,12 +76,30 @@ export const OverviewTab = ({getUnitName}: Props) => {
         </Grid>
       </Grid>
 
-      <Grid container spacing={2} sx={{mt: '0.3em'}}>
-        <Grid item md={5} sm={12}>
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          mt: '0.3em',
+          [theme.breakpoints.up('md')]: {
+            maxHeight: '27.5rem',
+          },
+        }}>
+        <Grid
+          item
+          xs={12}
+          md={4}
+          sx={{
+            [theme.breakpoints.up('md')]: {
+              height: '100%',
+            },
+          }}>
           <Service
             containerStyles={{
               [theme.breakpoints.up('md')]: {
-                minHeight: '23rem',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
               },
             }}
             elevator={elevator!}
@@ -88,11 +107,42 @@ export const OverviewTab = ({getUnitName}: Props) => {
             propertyOwnerId={elevator?.propertyOwner.id}
           />
         </Grid>
-        <Grid item md={7} sm={12}>
+        <Grid
+          item
+          xs={12}
+          md={4}
+          sx={{
+            [theme.breakpoints.up('md')]: {
+              height: '100%',
+            },
+          }}>
           <AppointmentPreference
             containerStyles={{
               [theme.breakpoints.up('md')]: {
-                minHeight: '23rem',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+              },
+            }}
+            elevator={elevator!}
+            propertyOwnerId={elevator?.propertyOwner.id}
+          />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          md={4}
+          sx={{
+            [theme.breakpoints.up('md')]: {
+              height: '100%',
+            },
+          }}>
+          <EmergencyPhone
+            containerStyles={{
+              [theme.breakpoints.up('md')]: {
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
               },
             }}
             elevator={elevator!}

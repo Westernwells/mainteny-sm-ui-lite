@@ -68,6 +68,15 @@ export interface ElevatorQueryParams {
   swLng: number;
 }
 
+export interface ElevatorPhone {
+  phoneNumber: string;
+  connectionType: string;
+  systemId: string;
+  callCenter: string;
+  location: string;
+  simCardNumber: string;
+}
+
 export interface ElevatorAdditionalInfo {
   priority: Priority;
   isServiceOrderGenerationEnabled: boolean;
@@ -90,6 +99,7 @@ export interface ElevatorAdditionalInfo {
   pictures: FileResource[];
   propertySegment: string;
   qrCode: FileResourceRecord;
+  elevatorPhone: ElevatorPhone;
 }
 
 export interface ElevatorMaintainerRecord {
@@ -313,6 +323,7 @@ export interface ElevatorRequestBody {
   status: ElevatorStatus;
   technicianNumber: number;
   type: string;
+  elevatorPhone: Partial<ElevatorPhone>;
 }
 
 export interface ElevatorComment {

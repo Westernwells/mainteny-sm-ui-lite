@@ -44,6 +44,16 @@ export interface AppointmentFormModel {
   appointmentNotificationDueInDays: string;
 }
 
+export interface EmergencyPhoneFormModel {
+  manufacturer?: string;
+  systemId?: string;
+  phoneConnection?: string;
+  phoneNumber?: string;
+  simCardNumber?: string;
+  callCenter?: string;
+  placeOfInstallation?: string;
+}
+
 export interface NotesFormModel {
   note: string;
 }
