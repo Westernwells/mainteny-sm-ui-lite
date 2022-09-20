@@ -1,4 +1,5 @@
-import {Typography} from '@mui/material';
+import useTheme from '@mui/material/styles/useTheme';
+import {Divider, Typography} from '@mui/material';
 import Box from '@mui/material/Box';
 import {FormLabel} from 'components/form/FormLabel';
 import {addMinutes} from 'date-fns';
@@ -6,6 +7,7 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {ServiceOrderReportView} from 'models/service-order';
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import {convertDigitalMinsToHM} from 'utils/datetime';
 
 interface Props {
   serviceReport: ServiceOrderReportView;
@@ -15,6 +17,7 @@ const dateToString = (date: Date) =>
   date.toISOString().split('T')[1].split('.')[0];
 
 export const Maintenance = ({serviceReport}: Props) => {
+  const theme = useTheme();
   const [schedule] = useState(
     serviceReport.serviceOrder.schedules[
       serviceReport.serviceOrder.schedules.length - 1
@@ -85,6 +88,30 @@ export const Maintenance = ({serviceReport}: Props) => {
                 <Typography variant="body2">{i.time}</Typography>
               </Box>
             ))}
+          </Box>
+          <Divider
+            sx={{
+              my: '1rem',
+              border: `1px solid ${theme.palette.action.disabledBackground}`,
+            }}
+          />
+          <Box
+            bgcolor="grey.700"
+            borderRadius="4px"
+            p="1em"
+            mb=".5em"
+            pl="50%"
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              justifyItems: 'end',
+            }}>
+            <Typography sx={{color: 'primary.contrastText'}}>
+              {t('Total Time')}
+            </Typography>
+            <Typography sx={{color: 'primary.contrastText'}}>
+              {convertDigitalMinsToHM(serviceReport.actualServiceTime)}
+            </Typography>
           </Box>
         </Box>
       )}
