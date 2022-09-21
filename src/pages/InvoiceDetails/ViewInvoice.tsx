@@ -115,41 +115,45 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
             }}
             headerActionIcon={<OpenInNewIcon />}
             handleAction={() =>
-              navigate(`/orders/details/${invoice.serviceOrder.id}`)
+              navigate(`/orders/details/${invoice.serviceOrder?.id}`)
             }>
             <Box>
               <Box sx={{float: 'right'}}>
-                <StatusChip
-                  color={getServiceOrderStatusColor(
-                    invoice.serviceOrder.status,
-                  )}
-                  label={serviceOrderStatusToString(
-                    invoice.serviceOrder.status,
-                  )}
-                  size="small"
-                />
+                {invoice.serviceOrder && (
+                  <StatusChip
+                    color={getServiceOrderStatusColor(
+                      invoice.serviceOrder.status,
+                    )}
+                    label={serviceOrderStatusToString(
+                      invoice.serviceOrder.status,
+                    )}
+                    size="small"
+                  />
+                )}
               </Box>
               <FormLabel text="Order Number" sx={{color: 'text.main'}} />
               <Typography variant="subtitle1">
-                {invoice.serviceOrder.number}
+                {invoice.serviceOrder?.number}
               </Typography>
-              <Typography variant="caption" sx={{color: 'text.secondary'}}>
-                {`${t('Created on')} ${formatDate(
-                  invoice.serviceOrder.meta.createdAt,
-                )}`}
-              </Typography>
+              {invoice.serviceOrder && (
+                <Typography variant="caption" sx={{color: 'text.secondary'}}>
+                  {`${t('Created on')} ${formatDate(
+                    invoice.serviceOrder.meta.createdAt,
+                  )}`}
+                </Typography>
+              )}
               <Box display="flex" alignItems="center" gap=".5em" mt="1em">
                 <ServiceOrderIcons
-                  serviceOrderType={invoice.serviceOrder.type}
+                  serviceOrderType={invoice.serviceOrder?.type}
                   size="small"
                 />
                 <ServiceOrderTypeText
-                  serviceOrderType={invoice.serviceOrder.type}
+                  serviceOrderType={invoice.serviceOrder?.type}
                   capitalizeText
                 />
               </Box>
               <Typography variant="caption">
-                {invoice.serviceOrder.description}
+                {invoice.serviceOrder?.description}
               </Typography>
             </Box>
           </PageCard>

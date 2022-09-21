@@ -71,11 +71,11 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
   const [publish, setPublish] = useState(false);
 
   const [customer, setCustomer] = useState<
-    PropertyOwnerView | PropertyOwnerSimpleView | null
-  >(null);
-  const [serviceOrder, setServiceOrder] = useState<ServiceOrderView | null>(
-    serviceOrderResource ?? null,
-  );
+    PropertyOwnerView | PropertyOwnerSimpleView | undefined
+  >(undefined);
+  const [serviceOrder, setServiceOrder] = useState<
+    ServiceOrderView | undefined
+  >(serviceOrderResource ?? undefined);
 
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItemRecord<Amount>[]>(
     [],
@@ -158,7 +158,7 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
       );
 
       setServiceOrder(invoice.serviceOrder);
-      setCustomer(invoice.serviceOrder.elevator.propertyOwner);
+      setCustomer(invoice.serviceOrder?.elevator.propertyOwner);
 
       formik.setFieldValue('subject', invoice.subject, true);
       formik.setFieldValue('description', invoice.description, true);
@@ -166,7 +166,7 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
       formik.setFieldValue('paymentTerms', invoice.paymentTerms, true);
       formik.setFieldValue('issuedDate', invoice.issuedDate, true);
       formik.setFieldValue('dueDate', invoice.dueDate, true);
-      formik.setFieldValue('serviceOrderId', invoice.serviceOrder.id, true);
+      formik.setFieldValue('serviceOrderId', invoice.serviceOrder?.id, true);
     }
   }, [invoice]);
 
@@ -254,8 +254,8 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
                 )
               }
               cardOnClose={() => {
-                setCustomer(null);
-                setServiceOrder(null);
+                setCustomer(undefined);
+                setServiceOrder(undefined);
               }}
               modalHeader="Select Customer"
               modalBody={
@@ -288,7 +288,7 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
                   </>
                 )
               }
-              cardOnClose={() => setServiceOrder(null)}
+              cardOnClose={() => setServiceOrder(undefined)}
               modalHeader="Select Order"
               modalBody={
                 <ServiceOrdersDataGrid
