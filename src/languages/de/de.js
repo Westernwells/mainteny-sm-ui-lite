@@ -410,7 +410,7 @@ module.exports = {
     'Key Location': 'Schlüssel-Standort',
     Parking: 'Parkplatz',
     'Unit Details': 'Anlagendetails',
-    'Unit Category': 'Anlagenkategorie*',
+    'Unit Category': 'Anlagenkategorie',
     'Unit Number': 'Anlagennummer',
     'Number of Stops': 'Haltestellen',
     'Cabin Type': 'Kabinentyp',
