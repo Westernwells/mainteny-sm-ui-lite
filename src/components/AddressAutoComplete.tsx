@@ -57,6 +57,7 @@ export const AddressAutoComplete = ({
   };
   return (
     <AddressAutocomplete
+      noOptionsText={t('No options')}
       inputValue={queryView}
       value={address}
       apiKey={process.env.REACT_APP_GOOGLE_MAPS_KEY!}
@@ -88,7 +89,7 @@ export const AddressAutoComplete = ({
             name: 'address',
             onChange: onInputChange,
             error: !!inputError,
-            helperText: inputError,
+            helperText: inputError && t(inputError),
             onBlur: handleBlur,
             ...params,
             ...textFieldProps,
