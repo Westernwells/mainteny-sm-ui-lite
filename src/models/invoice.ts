@@ -61,7 +61,7 @@ export interface InvoiceView {
   dueDate: string;
   status: InvoiceStatus;
   serviceCompany: ServiceCompanySimpleView;
-  serviceOrder: ServiceOrderView;
+  serviceOrder?: ServiceOrderView;
   propertyOwner: PropertyOwner;
   items: InvoiceItem[];
   search: string;
@@ -107,7 +107,7 @@ export interface CreateInvoice {
   paymentTerms: string;
   propertyOwnerId: string;
   serviceCompanyId: string;
-  serviceOrderId: string;
+  serviceOrderId?: string;
   shouldSendOut: boolean;
   type: InvoiceType;
 }
@@ -120,6 +120,6 @@ export interface UpdateInvoice {
   items: WithOptional<InvoiceItemRecord<AmountRecord>, 'articleUnit'>[];
   paymentInfo?: PaymentInfo;
   paymentTerms?: string;
-  serviceOrderId: string;
+  serviceOrderId?: string;
   type: InvoiceType;
 }
