@@ -114,10 +114,6 @@ export const NewArticle = () => {
           formik.values.unitPurchaseVat > 100,
       );
     }
-    if (activeStep === 2) {
-      const invalidSupplier = suppliers.some((it) => !it.name);
-      return setDisableNextBtn(invalidSupplier);
-    }
     return setDisableNextBtn(false);
   }, [activeStep, formik, suppliers]);
 
