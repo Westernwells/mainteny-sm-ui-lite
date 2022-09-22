@@ -163,15 +163,20 @@ export const DraftQuotation = ({quotation}: Props) => {
 
   return (
     <Box>
-      <Box display="flex" alignItems="flex-end" justifyContent="space-between">
-        <StatusChip
-          label={getQuotationStatusStyles(quotation?.status ?? '').label}
-          color={getQuotationStatusStyles(quotation?.status ?? '').color}
-          size="small"
-          variant="filled"
-        />
-        <Notes quotation={quotation!} />
-      </Box>
+      {quotation && (
+        <Box
+          display="flex"
+          alignItems="flex-end"
+          justifyContent="space-between">
+          <StatusChip
+            label={getQuotationStatusStyles(quotation?.status ?? '').label}
+            color={getQuotationStatusStyles(quotation?.status ?? '').color}
+            size="small"
+            variant="filled"
+          />
+          <Notes quotation={quotation!} />
+        </Box>
+      )}
       <A4Layout placeholder="Quotation" number={quotation?.number}>
         <Box display="flex" mt="1em" gap="2em">
           <Box flexGrow={1} display="flex" flexDirection="column" gap="2em">
