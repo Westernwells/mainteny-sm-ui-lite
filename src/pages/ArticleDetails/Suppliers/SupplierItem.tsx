@@ -32,7 +32,6 @@ export const SupplierItem = ({
           value: supplier.name,
           variant: 'outlined',
           type: 'text',
-          required: true,
           onChange: (e) => {
             supplier.name = e.target.value;
             updateSupplier(supplier);
