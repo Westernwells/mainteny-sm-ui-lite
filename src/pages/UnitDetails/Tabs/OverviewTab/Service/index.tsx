@@ -96,10 +96,13 @@ export const Service = ({
       handleAction={() => setOpenDialog(true)}
       header={<Typography variant="subtitle1">{t('Service')}</Typography>}
       headerActionIcon={<EditIcon />}
-      showHeaderBackground>
+      showHeaderBackground
+      bodyContainerStyle={{
+        overflowY: 'auto',
+      }}>
       <Grid container spacing={2}>
         {labels.map((label) => (
-          <Grid key={label} item xs={12} sm={4} md={6}>
+          <Grid key={label} item xs={12}>
             <ServiceSchema
               label={label}
               elevator={elevator}
