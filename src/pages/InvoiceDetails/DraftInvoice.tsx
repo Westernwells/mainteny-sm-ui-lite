@@ -171,11 +171,7 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
   }, [invoice]);
 
   useEffect(() => {
-    if (
-      !invoice &&
-      serviceOrder &&
-      formik.values.type !== InvoiceType.PARTIAL
-    ) {
+    if (!invoice && serviceOrder) {
       setCustomer(serviceOrder.elevator.propertyOwner);
 
       formik.setFieldValue(
@@ -190,7 +186,11 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
       );
       formik.setFieldValue('serviceOrderId', serviceOrder.id, true);
 
-      if ('articles' in serviceOrder && serviceOrder.articles.length) {
+      if (
+        formik.values.type !== InvoiceType.PARTIAL &&
+        'articles' in serviceOrder &&
+        serviceOrder.articles.length
+      ) {
         const items = serviceOrder.articles.map(
           (i): InvoiceItemRecord<Amount> => ({
             articleId: i.article.id,
@@ -233,7 +233,7 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
         <Box display="flex" mt="1em" gap="2em">
           <Box flexGrow={1} display="flex" flexDirection="column" gap="2em">
             <SelectCombined
-              selected={customer !== null}
+              selected={customer !== undefined}
               label="Customer Details"
               buttonText="Select Customer"
               cardHeader={
@@ -264,7 +264,7 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
               labelRequired
             />
             <SelectCombined
-              selected={serviceOrder !== null}
+              selected={serviceOrder !== undefined}
               label="Service Order"
               buttonText="Select Order"
               cardHeader={
@@ -477,7 +477,7 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
             dueDate !== null &&
             formik.values.type.length &&
             formik.values.items.length &&
-            serviceOrder !== null
+            serviceOrder !== undefined
           )
         }
       />
