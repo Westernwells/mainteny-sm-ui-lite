@@ -41,7 +41,7 @@ export const ArticleItemsTable = ({
     {
       pageIndex: 0,
       pageSize: 1,
-      query: 'PARTIAL',
+      query: '[internalLabel:PARTIAL]',
     },
     {},
     true,
