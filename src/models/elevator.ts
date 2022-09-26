@@ -140,6 +140,21 @@ export interface Elevator {
   meta: Meta;
 }
 
+export enum ElevatorTimeRuleType {
+  TIME_OF_DAY_RANGE = 'TIME_OF_DAY_RANGE',
+  TIME_OF_DAY = 'TIME_OF_DAY',
+  DAY_OF_WEEK = 'DAY_OF_WEEK',
+  DAY_OF_WEEK_AND_TIME_RANGES = 'DAY_OF_WEEK_AND_TIME_RANGES',
+  DAYS_OF_WEEK_AND_TIME_RANGE = 'DAYS_OF_WEEK_AND_TIME_RANGE',
+}
+
+export interface ElevatorTimeRuleView {
+  id: string;
+  elevator_id: string;
+  type: ElevatorTimeRuleType;
+  data: string;
+}
+
 export interface ElevatorView {
   id: string;
   number: string;
@@ -165,6 +180,7 @@ export interface ElevatorView {
   assignments: ElevatorAssignmentSimpleView[];
   search: string;
   meta: Meta;
+  timeRules: ElevatorTimeRuleView[];
 }
 
 export interface ElevatorSimpleView {
@@ -291,6 +307,18 @@ export interface DataGridElevatorView extends ElevatorView {
   showAddress: boolean;
 }
 
+export interface DaysTimeRange {
+  daysOfWeek: string[];
+  timeRange: {
+    start: string;
+    end: string;
+  };
+}
+
+export interface ElevatorTimeRuleRecord {
+  daysTimeRange: Partial<DaysTimeRange>[];
+}
+
 export interface ElevatorRequestBody {
   address: AddressRecord;
   buildingLocation: string;
@@ -324,6 +352,7 @@ export interface ElevatorRequestBody {
   technicianNumber: number;
   type: string;
   elevatorPhone: Partial<ElevatorPhone>;
+  timeRule: Partial<ElevatorTimeRuleRecord>;
 }
 
 export interface ElevatorComment {

@@ -22,6 +22,23 @@ const daysOfWeekOptions = {
   Sunday: 'Su',
 };
 
+export const mapDaysOfWeekOptions = {
+  Monday: 'Monday',
+  Tuesday: 'Tuesday',
+  Wednesday: 'Wednesday',
+  Thursday: 'Thursday',
+  Friday: 'Friday',
+  Saturday: 'Saturday',
+  Sunday: 'Sunday',
+  Mo: 'Monday',
+  Tu: 'Tuesday',
+  We: 'Wednesday',
+  Th: 'Thursday',
+  Fr: 'Friday',
+  Sa: 'Saturday',
+  Su: 'Sunday',
+};
+
 export const EditAppointmentForm = ({formik}: Props) => {
   const formatDate = useFormatDate();
   const {t} = useTranslation();
