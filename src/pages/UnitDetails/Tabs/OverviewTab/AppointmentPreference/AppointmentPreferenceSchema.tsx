@@ -53,7 +53,7 @@ export const AppointmentPreferenceSchema = ({label, property}: Props) => {
           <CardProps
             icon={<CalendarTodayIcon sx={{color: theme.palette.info.dark}} />}
             label="REQUIRES APPOINTMENT"
-            bodyText={property.value}
+            bodyText={property.value || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
@@ -66,7 +66,7 @@ export const AppointmentPreferenceSchema = ({label, property}: Props) => {
               <AccessTimeFilledIcon sx={{color: theme.palette.info.dark}} />
             }
             label="REQUIRES NOTIFICATION"
-            bodyText={property.value}
+            bodyText={property.value || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
@@ -77,7 +77,7 @@ export const AppointmentPreferenceSchema = ({label, property}: Props) => {
           <CardProps
             icon={<FlagIcon sx={{color: theme.palette.info.dark}} />}
             label="NOTIFICATION DUE"
-            bodyText={property.value}
+            bodyText={property.value || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
