@@ -8,6 +8,8 @@ import {getColumnProps} from 'components/DataGridLayout';
 import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
 import {convertToText} from 'utils/utils';
+import {Typography} from '@mui/material';
+import {useTranslation} from 'react-i18next';
 import {FormatDate} from 'models/misc';
 import {toDate} from '../../utils/datetime';
 import {Actions} from './Actions';
@@ -89,6 +91,10 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'invoiceType',
     headerName: 'invoice type',
+    renderCell: (params) => {
+      const {t} = useTranslation();
+      return <Typography variant="body2">{t(params.value) || '-'}</Typography>;
+    },
   }),
   getColumnProps({
     field: 'amount',
