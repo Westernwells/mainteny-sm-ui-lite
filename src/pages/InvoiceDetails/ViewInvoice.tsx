@@ -30,6 +30,7 @@ import {
 } from 'utils/service-order-utils';
 import {Confirm} from 'components/Confirm';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {Notes} from './Notes';
 
 interface Props {
   downloadUrl: string;
@@ -46,34 +47,45 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
 
   return (
     <Box>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        gap="1em">
-        <Box ml="auto">
-          <StatusChip
-            label={getInvoiceStatusStyles(invoice.status).label}
-            color={getInvoiceStatusStyles(invoice.status).color}
-            size="small"
-            variant="filled"
-          />
-        </Box>
-        {downloadUrl && (
-          <Button
-            label="Download Invoice"
-            buttonProps={{
-              variant: 'outlined',
-              onClick: () => window.open(`${downloadUrl}`, '_blank'),
-              disabled:
-                invoice!.additionalInfo.pdfGenerationStatus !==
-                PdfGenerationStatus.DONE,
-              startIcon: <FileDownloadIcon color="primary" />,
-            }}
-          />
-        )}
-      </Box>
       <Grid container width="100%" mt="2.5em" mb="2em" gap={2}>
+        <Grid item xs={12}>
+          <Grid container flexDirection="row">
+            <Grid item xs={4}>
+              <StatusChip
+                label={getInvoiceStatusStyles(invoice.status).label}
+                color={getInvoiceStatusStyles(invoice.status).color}
+                size="small"
+                variant="filled"
+              />
+            </Grid>
+
+            <Grid
+              item
+              xs={4}
+              display="flex"
+              alignItems="center"
+              justifyContent="flex-end"
+              gap={0.5}>
+              <Notes invoice={invoice!} />
+            </Grid>
+
+            <Grid item xs={4} textAlign="end">
+              {downloadUrl && (
+                <Button
+                  label="Download Invoice"
+                  buttonProps={{
+                    variant: 'outlined',
+                    onClick: () => window.open(`${downloadUrl}`, '_blank'),
+                    disabled:
+                      invoice!.additionalInfo.pdfGenerationStatus !==
+                      PdfGenerationStatus.DONE,
+                    startIcon: <FileDownloadIcon color="primary" />,
+                  }}
+                />
+              )}
+            </Grid>
+          </Grid>
+        </Grid>
         <Grid item xs={8}>
           <PageCard
             containerStyles={{mb: '1.5em'}}

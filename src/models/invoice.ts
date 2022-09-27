@@ -123,3 +123,13 @@ export interface UpdateInvoice {
   serviceOrderId?: string;
   type: InvoiceType;
 }
+
+export interface QueryInvoiceCommentsParams {
+  pageIndex: number;
+  pageSize: number;
+}
+
+export interface CreateInvoiceComment {
+  content: string;
+  subject: string;
+}

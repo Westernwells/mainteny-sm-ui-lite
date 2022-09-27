@@ -1,4 +1,6 @@
 import {
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
   useMutation,
   useQuery,
   useQueryClient,
@@ -19,7 +21,10 @@ import {
   InvoiceStatus,
   CreateInvoice,
   UpdateInvoice,
+  QueryInvoiceCommentsParams,
+  CreateInvoiceComment,
 } from 'models/invoice';
+import {Comment} from 'models/comment';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {getTotalFromArticles, getTotalWithVatFromArticles} from 'utils/invoice';
@@ -318,3 +323,152 @@ export const useFetchServiceOrderInvoices = (
     () => fetchServiceOrderInvoices(serviceOrderId!),
     {enabled: !!serviceOrderId, ...options},
   );
+
+export const fetchInvoiceComments = async (
+  invoiceId: string,
+  params: QueryInvoiceCommentsParams,
+): Promise<Resource<Comment>> => {
+  const response = await axiosClient.get<Resource<Comment>>(
+    `/api/invoices/${invoiceId}/comments`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+
+  return response.data;
+};
+
+export function useInvoiceComments(
+  invoiceId: string,
+  params: QueryInvoiceCommentsParams,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<Resource<Comment>, RestError>(
+    [qk.fetchInvoiceComments, params, invoiceId],
+    () => fetchInvoiceComments(invoiceId, params),
+    {
+      ...options,
+    },
+  );
+}
+
+export function useInfiniteInvoiceComments(
+  invoiceid: string,
+  params: QueryInvoiceCommentsParams,
+  options?: UseInfiniteQueryOptions<any, any, any>,
+) {
+  return useInfiniteQuery<Resource<Comment>, RestError, Resource<Comment>>(
+    [qk.fetchInvoiceComments, params, invoiceid, {infinite: true}],
+    ({pageParam = 0}) =>
+      fetchInvoiceComments(invoiceid, {...params, pageIndex: pageParam}),
+    {
+      getNextPageParam: (lastPage) => {
+        const currentTotal =
+          (lastPage.page.pageIndex + 1) * lastPage.page.pageSize;
+        if (lastPage.total && currentTotal < lastPage.total) {
+          return lastPage.page.pageIndex + 1;
+        }
+        return undefined;
+      },
+      ...options,
+    },
+  );
+}
+
+export const postInvoiceComment = async (
+  invoiceId: string,
+  body: CreateInvoiceComment,
+) => {
+  const {data} = await axiosClient.post<{value: string}>(
+    `/api/invoices/${invoiceId}/comments`,
+    body,
+  );
+  return data;
+};
+
+export const useCreateInvoiceComment = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({invoiceId, body}: {invoiceId: string; body: CreateInvoiceComment}) =>
+      postInvoiceComment(invoiceId, body),
+    {
+      onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+export const deleteInvoiceComment = async (
+  invoiceId: string,
+  commentId: string,
+) => {
+  const {data} = await axiosClient.delete<{value: string}>(
+    `/api/invoices/${invoiceId}/comments/${commentId}`,
+  );
+  return data;
+};
+
+export const useDeleteInvoiceComment = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({invoiceId, commentId}: {invoiceId: string; commentId: string}) =>
+      deleteInvoiceComment(invoiceId, commentId),
+    {
+      onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+export const updateInvoiceComment = async (
+  invoiceId: string,
+  commentId: string,
+  body: CreateInvoiceComment,
+) => {
+  const {data} = await axiosClient.put<{value: string}>(
+    `/api/invoices/${invoiceId}/comments/${commentId}`,
+    body,
+  );
+  return data;
+};
+
+export const useUpdateInvoiceComment = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({
+      invoiceId,
+      commentId,
+      body,
+    }: {
+      invoiceId: string;
+      commentId: string;
+      body: CreateInvoiceComment;
+    }) => updateInvoiceComment(invoiceId, commentId, body),
+    {
+      onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
