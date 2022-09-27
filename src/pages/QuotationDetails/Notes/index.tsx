@@ -11,6 +11,9 @@ import {groupBy} from 'lodash';
 import {Button} from 'components/Button';
 import {FormInput} from 'components/form/FormInput';
 import {EmptySection} from 'components/EmptySection';
+import {NoteCardSkeleton} from 'components/NoteCardSkeleton';
+import {NoteCard} from 'components/NoteCard';
+import {ConfirmDelete} from 'components/ConfirmDelete';
 import {QuotationView} from 'models/quotation';
 import {
   useCreateQuotationComment,
@@ -19,9 +22,6 @@ import {
   useUpdateQuotationComment,
 } from 'hooks/reactQuery/useQuotation';
 import {formatTimestamp} from 'utils/datetime';
-import {NoteCard} from './NoteCard';
-import {NoteCardSkeleton} from './NoteCardSkeleton';
-import {ConfirmDelete} from './ConfirmDelete';
 
 interface Props {
   quotation: QuotationView;

@@ -13,7 +13,6 @@ import {useNavigate} from 'react-router-dom';
 import {Resource, RestError} from 'models/misc';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
-  Comment,
   CreateQuotation,
   CreateQuotationComment,
   QueryQuotationCommentsParams,
@@ -23,6 +22,7 @@ import {
   ReplyQuotation,
   UpdateQuotation,
 } from 'models/quotation';
+import {Comment} from 'models/comment';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {getTotalFromArticles, getTotalWithVatFromArticles} from 'utils/invoice';

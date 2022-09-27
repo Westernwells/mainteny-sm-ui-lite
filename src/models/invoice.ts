@@ -124,23 +124,12 @@ export interface UpdateInvoice {
   type: InvoiceType;
 }
 
-export enum CommentType {
-  ELEVATOR_NOTE = 'ELEVATOR_NOTE',
-  ELEVATOR_TODO = 'ELEVATOR_TODO',
-  INVOICE_COMMENT = 'INVOICE_COMMENT',
-  QUOTATION_COMMENT = 'QUOTATION_COMMENT',
-}
-
-export interface Comment {
-  id: string;
-  refId: string;
-  type: CommentType;
-  subject: string;
-  content: string;
-  meta: Meta;
-}
-
 export interface QueryInvoiceCommentsParams {
   pageIndex: number;
   pageSize: number;
+}
+
+export interface CreateInvoiceComment {
+  content: string;
+  subject: string;
 }

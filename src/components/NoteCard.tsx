@@ -5,7 +5,7 @@ import IconButton from '@mui/material/IconButton';
 import Edit from '@mui/icons-material/Edit';
 import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import {format} from 'date-fns';
-import {Comment} from 'models/quotation';
+import {Comment} from 'models/comment';
 
 interface Props extends BoxProps {
   note: Comment;

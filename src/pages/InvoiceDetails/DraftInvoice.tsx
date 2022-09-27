@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import DeleteIcon from '@mui/icons-material/Delete';
+import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {A4Layout} from 'components/A4Layout';
 import {SelectCombined} from 'components/SelectCombined';
 import {ArticleItemsTable} from 'components/ArticleItemsTable';
@@ -19,6 +20,7 @@ import {FormSelect} from 'components/form/FormSelect';
 import {DatePicker} from 'components/DatePicker';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {Confirm} from 'components/Confirm';
+import {StatusChip} from 'components/StatusChip';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateInvoice,
@@ -40,6 +42,7 @@ import {
 import {Amount, WithOptional} from 'models/misc';
 import {convertToText} from 'utils/utils';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {Notes} from './Notes';
 
 interface Props {
   invoice?: InvoiceView;
@@ -226,10 +229,16 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
 
   return (
     <Box>
-      <A4Layout
-        placeholder="Invoice"
-        number={invoice?.number}
-        status={invoice?.status}>
+      <Box display="flex" alignItems="flex-end" justifyContent="space-between">
+        <StatusChip
+          label={getInvoiceStatusStyles(invoice?.status ?? '').label}
+          color={getInvoiceStatusStyles(invoice?.status ?? '').color}
+          size="small"
+          variant="filled"
+        />
+        <Notes invoice={invoice!} />
+      </Box>
+      <A4Layout placeholder="Invoice" number={invoice?.number}>
         <Box display="flex" mt="1em" gap="2em">
           <Box flexGrow={1} display="flex" flexDirection="column" gap="2em">
             <SelectCombined

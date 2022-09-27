@@ -22,8 +22,9 @@ import {
   CreateInvoice,
   UpdateInvoice,
   QueryInvoiceCommentsParams,
-  Comment,
+  CreateInvoiceComment,
 } from 'models/invoice';
+import {Comment} from 'models/comment';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {getTotalFromArticles, getTotalWithVatFromArticles} from 'utils/invoice';
@@ -374,3 +375,100 @@ export function useInfiniteInvoiceComments(
     },
   );
 }
+
+export const postInvoiceComment = async (
+  invoiceId: string,
+  body: CreateInvoiceComment,
+) => {
+  const {data} = await axiosClient.post<{value: string}>(
+    `/api/invoices/${invoiceId}/comments`,
+    body,
+  );
+  return data;
+};
+
+export const useCreateInvoiceComment = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({invoiceId, body}: {invoiceId: string; body: CreateInvoiceComment}) =>
+      postInvoiceComment(invoiceId, body),
+    {
+      onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+export const deleteInvoiceComment = async (
+  invoiceId: string,
+  commentId: string,
+) => {
+  const {data} = await axiosClient.delete<{value: string}>(
+    `/api/invoices/${invoiceId}/comments/${commentId}`,
+  );
+  return data;
+};
+
+export const useDeleteInvoiceComment = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({invoiceId, commentId}: {invoiceId: string; commentId: string}) =>
+      deleteInvoiceComment(invoiceId, commentId),
+    {
+      onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+export const updateInvoiceComment = async (
+  invoiceId: string,
+  commentId: string,
+  body: CreateInvoiceComment,
+) => {
+  const {data} = await axiosClient.put<{value: string}>(
+    `/api/invoices/${invoiceId}/comments/${commentId}`,
+    body,
+  );
+  return data;
+};
+
+export const useUpdateInvoiceComment = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+
+  return useMutation(
+    ({
+      invoiceId,
+      commentId,
+      body,
+    }: {
+      invoiceId: string;
+      commentId: string;
+      body: CreateInvoiceComment;
+    }) => updateInvoiceComment(invoiceId, commentId, body),
+    {
+      onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
