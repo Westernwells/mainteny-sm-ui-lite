@@ -11,6 +11,7 @@ import {convertToText} from 'utils/utils';
 import {FormatDate} from 'models/misc';
 import {toDate} from '../../utils/datetime';
 import {Actions} from './Actions';
+import {NotesIndicator} from './NotesIndicator';
 
 export const getInvoiceStatusStyles = (
   status: string,
@@ -93,6 +94,13 @@ export const columns: GridColDef[] = [
     field: 'amount',
     headerName: 'total amount',
     align: 'right',
+    flex: 0.75,
+  }),
+  getColumnProps({
+    field: 'notes',
+    headerName: 'notes',
+    align: 'center',
+    renderCell: (params) => <NotesIndicator invoice={params.row.invoice} />,
     flex: 0.75,
   }),
   getColumnProps({
