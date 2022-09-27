@@ -1,4 +1,6 @@
 import {
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
   useMutation,
   useQuery,
   useQueryClient,
@@ -345,6 +347,29 @@ export function useInvoiceComments(
     [qk.fetchInvoiceComments, params, invoiceId],
     () => fetchInvoiceComments(invoiceId, params),
     {
+      ...options,
+    },
+  );
+}
+
+export function useInfiniteInvoiceComments(
+  invoiceid: string,
+  params: QueryInvoiceCommentsParams,
+  options?: UseInfiniteQueryOptions<any, any, any>,
+) {
+  return useInfiniteQuery<Resource<Comment>, RestError, Resource<Comment>>(
+    [qk.fetchInvoiceComments, params, invoiceid, {infinite: true}],
+    ({pageParam = 0}) =>
+      fetchInvoiceComments(invoiceid, {...params, pageIndex: pageParam}),
+    {
+      getNextPageParam: (lastPage) => {
+        const currentTotal =
+          (lastPage.page.pageIndex + 1) * lastPage.page.pageSize;
+        if (lastPage.total && currentTotal < lastPage.total) {
+          return lastPage.page.pageIndex + 1;
+        }
+        return undefined;
+      },
       ...options,
     },
   );
