@@ -19,6 +19,8 @@ import {
   InvoiceStatus,
   CreateInvoice,
   UpdateInvoice,
+  QueryInvoiceCommentsParams,
+  Comment,
 } from 'models/invoice';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
@@ -318,3 +320,32 @@ export const useFetchServiceOrderInvoices = (
     () => fetchServiceOrderInvoices(serviceOrderId!),
     {enabled: !!serviceOrderId, ...options},
   );
+
+export const fetchInvoiceComments = async (
+  invoiceId: string,
+  params: QueryInvoiceCommentsParams,
+): Promise<Resource<Comment>> => {
+  const response = await axiosClient.get<Resource<Comment>>(
+    `/api/invoices/${invoiceId}/comments`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+
+  return response.data;
+};
+
+export function useInvoiceComments(
+  invoiceId: string,
+  params: QueryInvoiceCommentsParams,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<Resource<Comment>, RestError>(
+    [qk.fetchInvoiceComments, params, invoiceId],
+    () => fetchInvoiceComments(invoiceId, params),
+    {
+      ...options,
+    },
+  );
+}
