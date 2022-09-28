@@ -1,5 +1,5 @@
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
-
+import Box from '@mui/material/Box';
 import {StatusChip} from 'components/StatusChip';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
@@ -34,7 +34,7 @@ export const getInvoiceStatusStyles = (
     case InvoiceStatus.EXPIRED:
       return {label: InvoiceStatusView.EXPIRED, color: 'error'};
     case InvoiceStatus.NOT_PAID:
-      return {label: InvoiceStatusView.NOT_PAID, color: 'warning'};
+      return {label: InvoiceStatusView.NOT_PAID, color: 'primary'};
     default:
       return {label: '-', color: 'default'};
   }
@@ -69,14 +69,14 @@ export const columns: GridColDef[] = [
     field: 'type',
     headerName: 'service type',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
-      <>
+      <Box display="flex" alignItems="flex-end" gap="0.5rem">
         <ServiceOrderIcons serviceOrderType={params.row.type} size="small" />
         <ServiceOrderTypeText
           serviceOrderType={params.row.type}
           capitalizeText
           variant="body2"
         />
-      </>
+      </Box>
     ),
   }),
   getColumnProps({

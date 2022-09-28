@@ -28,7 +28,7 @@ export enum InvoiceDueType {
 
 export enum InvoiceStatusView {
   PAID = 'Paid',
-  NOT_PAID = 'Unpaid',
+  NOT_PAID = 'Sent',
   DRAFT = 'Draft',
   EXPIRED = 'Overdue',
 }
