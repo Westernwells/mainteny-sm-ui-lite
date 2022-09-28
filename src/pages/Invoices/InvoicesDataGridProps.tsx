@@ -7,9 +7,6 @@ import {getColumnProps} from 'components/DataGridLayout';
 // import {fetchDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
-import {convertToText} from 'utils/utils';
-import {Typography} from '@mui/material';
-import {useTranslation} from 'react-i18next';
 import {FormatDate} from 'models/misc';
 import {toDate} from '../../utils/datetime';
 import {Actions} from './Actions';
@@ -51,12 +48,6 @@ export const columns: GridColDef[] = [
     flex: 0.75,
   }),
   getColumnProps({
-    field: 'subject',
-    headerName: 'subject',
-    cellClassName: 'truncateText',
-    flex: 1.5,
-  }),
-  getColumnProps({
     field: 'customer',
     headerName: 'customer',
     cellClassName: 'truncateText',
@@ -87,14 +78,6 @@ export const columns: GridColDef[] = [
         />
       </>
     ),
-  }),
-  getColumnProps({
-    field: 'invoiceType',
-    headerName: 'invoice type',
-    renderCell: (params) => {
-      const {t} = useTranslation();
-      return <Typography variant="body2">{t(params.value) || '-'}</Typography>;
-    },
   }),
   getColumnProps({
     field: 'amount',
@@ -138,7 +121,6 @@ export const makeRows = (
   invoices.length
     ? invoices.map((item, index: number) => ({
         id: index,
-        subject: item.subject,
         date: formatDate(toDate(item.issuedDate)),
         number: item.number,
         order: item.serviceOrder?.number,
@@ -158,7 +140,6 @@ export const makeRows = (
           pdfPath: item.additionalInfo.pdfPath,
           serviceCompanyId: item.serviceCompany.id,
         },
-        invoiceType: convertToText(item.type),
         invoice: item,
         navigateTo: `details/${item.id}`,
       }))
