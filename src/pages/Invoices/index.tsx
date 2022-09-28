@@ -17,6 +17,7 @@ import {
   costRangeConvertor as crConverter,
   getStartEndPrice,
 } from 'utils/contract-utils';
+import {mapInvoiceStatus} from 'utils/invoice';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {useFormatDate} from 'hooks/useFormatDate';
@@ -133,11 +134,7 @@ export const Invoices = () => {
         label="Status"
         options={Object.values(InvoiceStatusView).map((value) => value)}
         getSelectedValue={(items: string[]) =>
-          items.length
-            ? items[0] === 'Paid'
-              ? setStatus(InvoiceStatus.PAID)
-              : setStatus(InvoiceStatus.NOT_PAID)
-            : setStatus(undefined)
+          setStatus(mapInvoiceStatus((items as InvoiceStatusView[])[0]))
         }
         multiple={false}
         initialSelectedItems={status ? [status] : []}
