@@ -229,15 +229,20 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
 
   return (
     <Box>
-      <Box display="flex" alignItems="flex-end" justifyContent="space-between">
-        <StatusChip
-          label={getInvoiceStatusStyles(invoice?.status ?? '').label}
-          color={getInvoiceStatusStyles(invoice?.status ?? '').color}
-          size="small"
-          variant="filled"
-        />
-        <Notes invoice={invoice!} />
-      </Box>
+      {invoice && (
+        <Box
+          display="flex"
+          alignItems="flex-end"
+          justifyContent="space-between">
+          <StatusChip
+            label={getInvoiceStatusStyles(invoice?.status ?? '').label}
+            color={getInvoiceStatusStyles(invoice?.status ?? '').color}
+            size="small"
+            variant="filled"
+          />
+          <Notes invoice={invoice!} />
+        </Box>
+      )}
       <A4Layout placeholder="Invoice" number={invoice?.number}>
         <Box display="flex" mt="1em" gap="2em">
           <Box flexGrow={1} display="flex" flexDirection="column" gap="2em">
