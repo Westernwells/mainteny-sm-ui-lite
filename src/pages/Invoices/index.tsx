@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
@@ -13,6 +13,10 @@ import {
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
+import {
+  costRangeConvertor as crConverter,
+  getStartEndPrice,
+} from 'utils/contract-utils';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {useFormatDate} from 'hooks/useFormatDate';
@@ -30,9 +34,15 @@ export const Invoices = () => {
   const [queryParams, setQueryParams] = useSearchParams();
   const totalInvoiceRef = useRef(0);
   const [status, setStatus] = useState<InvoiceStatus>();
+  const [cost, setCost] = useState<number[][]>([]);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
   const textInput = useRef<HTMLInputElement>(null);
+
+  const [totalAmountFrom, totalAmountTo] = useMemo(
+    () => getStartEndPrice(cost),
+    [cost],
+  );
 
   const {
     data: invoiceResource = createEmptyResource<InvoiceView>(10),
@@ -45,7 +55,9 @@ export const Invoices = () => {
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: search,
-      status: [],
+      status: status ? [status] : [],
+      totalAmountFrom,
+      totalAmountTo,
     },
     {keepPreviousData: true},
   );
@@ -56,7 +68,7 @@ export const Invoices = () => {
     if (page.pageIndex) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
     }
-  }, [search, status]);
+  }, [search, status, cost]);
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
@@ -88,6 +100,11 @@ export const Invoices = () => {
     navigate('/invoices/new');
   };
 
+  const costRangeConvertor = (selectedItems: string[]) => {
+    const range = crConverter(selectedItems);
+    setCost(range);
+  };
+
   if (isIdle || isLoading) {
     return <Progress />;
   }
@@ -96,11 +113,22 @@ export const Invoices = () => {
     <FilterFields
       onClear={() => {
         setStatus(undefined);
+        setCost([]);
         setSearch('');
         if (textInput.current) {
           textInput.current.value = '';
         }
-      }}>
+      }}
+      wrapperStyle={{flex: 1, gap: 1.5}}
+      containerStyle={{width: '35%', gap: 1.5}}>
+      <MultipleSelectCheckmarks
+        label="Invoice Total Range"
+        options={['0 - €500', '€500 - €1,000', '> €1,000']}
+        initialSelectedItems={cost}
+        getSelectedValue={(item) => costRangeConvertor(item)}
+        formControlStyles={{width: '100%'}}
+        containerStyles={{flex: 1}}
+      />
       <MultipleSelectCheckmarks
         label="Status"
         options={Object.values(InvoiceStatusView).map((value) => value)}
@@ -113,6 +141,8 @@ export const Invoices = () => {
         }
         multiple={false}
         initialSelectedItems={status ? [status] : []}
+        formControlStyles={{width: '100%'}}
+        containerStyles={{flex: 1}}
       />
     </FilterFields>
   );

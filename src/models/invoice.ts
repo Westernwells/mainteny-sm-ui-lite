@@ -75,6 +75,8 @@ export interface QueryInvoiceParams {
   pageSize: number;
   query: string;
   status: InvoiceStatus[];
+  totalAmountFrom?: number;
+  totalAmountTo?: number;
 }
 
 export interface InvoiceFilters {
