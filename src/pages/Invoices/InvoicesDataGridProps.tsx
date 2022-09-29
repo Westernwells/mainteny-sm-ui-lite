@@ -110,7 +110,7 @@ export const columns: GridColDef[] = [
     headerName: 'actions',
     align: 'center',
     renderCell: (params) => <Actions invoice={params.row.invoice} />,
-    flex: 0,
+    flex: 1,
   }),
 ];
 
