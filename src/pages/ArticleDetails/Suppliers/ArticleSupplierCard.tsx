@@ -83,6 +83,13 @@ export const ArticleSupplierCard = ({article}: {article: ArticleView}) => {
                   color="text.secondary"
                   variant="body2"
                   component="p">
+                  Supplier Article{' '}
+                  {supplier.number ? `#${supplier.number}` : ''}
+                </Typography>
+                <Typography
+                  color="text.secondary"
+                  variant="body2"
+                  component="p">
                   {supplier.address?.fullName || '-'}
                 </Typography>
                 <Typography
