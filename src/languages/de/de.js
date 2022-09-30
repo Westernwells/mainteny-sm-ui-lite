@@ -245,6 +245,7 @@ module.exports = {
     'Search by number, customer, address etc.':
       'Suche nach Nummer, Kunde, Adresse usw.',
     'TOTAL AMOUNT': 'GESAMTBETRAG',
+    NOTES: 'NOTIZEN',
     'CREATED DATE': 'ERSTELLUNGSDATUM',
     Draft: 'Entwurf',
     Sent: 'Versand',
@@ -1027,6 +1028,13 @@ module.exports = {
     'Last visit is required': 'Letzter Besuch ist erforderlich',
     'Service time is required': 'Dienstzeit ist erforderlich',
     'No. of technicians is required': 'Anzahl der Techniker ist erforderlich',
+    'No notes yet. They will appear here once added.':
+      'Noch keine Notizen vorhanden.',
+    Close: 'Schließen',
+    'Note message': 'Notiz',
+    'Press Enter to submit note':
+      'Klicken Sie Enter, um die Notiz zu speichern',
+    'Submit note': 'Notiz speichern',
   },
 };
 
