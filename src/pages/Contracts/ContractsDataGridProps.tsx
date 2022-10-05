@@ -64,7 +64,7 @@ export const makeRows = (
   contracts
     ? contracts.map((item, index) => ({
         id: index,
-        number: item.number,
+        number: item.externalId || '-',
         customer: item.propertyOwner.name,
         units: item.elevators.length,
         start: formatDate(item.startTime),
