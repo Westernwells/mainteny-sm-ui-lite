@@ -13,6 +13,7 @@ import {WorkHourTypeText} from 'components/WorkHourTypeText';
 import {WorkHoursItem} from 'models/workHours';
 import {FormatDate, Resource} from 'models/misc';
 import {useTranslation} from 'react-i18next';
+import {DateDuration, DateDurationOptions} from 'hooks/useFormatDuration';
 
 const defaultProps = {
   editable: false,
@@ -117,8 +118,8 @@ export const columnsWidget: GridColDef[] = [
   },
 ];
 
-const formatTime = (time: number, unit: string) =>
-  `${time} ${unit.toLowerCase()}`;
+// const formatTime = (time: number, unit: string) =>
+//   `${time} ${unit.toLowerCase()}`;
 
 const getAddress = (data: any) => {
   const parsedData = JSON.parse(data);
@@ -134,11 +135,16 @@ const getOrderNumber = (data: any) => {
 export const makeRows = (
   workHours: Resource<WorkHoursItem>,
   formatDate: FormatDate = () => '',
+  formatDateDuration: (
+    input: DateDuration,
+    dateFormat?: string,
+    options?: DateDurationOptions,
+  ) => any = () => '',
 ): GridRowModel<{[key: string]: any}[]> =>
   workHours.data.length
     ? workHours.data.map((item: WorkHoursItem) => ({
         id: item.id,
-        duration: formatTime(item.duration, item.durationUnit),
+        duration: formatDateDuration({minutes: item.duration}),
         startDate: `${formatDate(item.startTime)} ${formatDate(
           item.startTime,
           'HH:mm',
