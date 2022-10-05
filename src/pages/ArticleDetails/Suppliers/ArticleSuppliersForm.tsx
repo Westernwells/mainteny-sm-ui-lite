@@ -18,7 +18,7 @@ export interface Props {
 
 export const ArticleSuppliersForm = ({
   isLoading,
-  originSuppliers,
+  originSuppliers = [],
   onSubmit,
   onCancel,
 }: Props) => {

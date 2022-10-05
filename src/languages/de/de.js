@@ -245,7 +245,6 @@ module.exports = {
     'Search by number, customer, address etc.':
       'Suche nach Nummer, Kunde, Adresse usw.',
     'TOTAL AMOUNT': 'GESAMTBETRAG',
-    NOTES: 'NOTIZEN',
     'CREATED DATE': 'ERSTELLUNGSDATUM',
     Draft: 'Entwurf',
     Sent: 'Versand',
@@ -263,7 +262,7 @@ module.exports = {
     Unpaid: 'Offen',
     Paid: 'Beglichen',
     Expired: 'Überfällig',
-    Maintenance: 'Dienstleistung',
+    Maintenance: 'Wartung',
     Repair: 'Reparatur',
     Callout: 'Störung',
     Emergency: 'Personeneinschluss',
@@ -534,6 +533,7 @@ module.exports = {
       'Noch keine Angebote. Diese werden hier erscheinen, sobald sie hinzugefügt wurden!',
     '+ Add New Article': '+ Artikel hinzufügen',
     Notes: 'Notizen',
+    NOTES: 'NOTIZEN',
     'No notes have been created yet. Please click the button below to create one!':
       'Es wurden noch keine Notizen erstellt. Bitte klicken Sie auf die Schaltfläche unten, um eine zu erstellen!',
     'Add Note': '+ Notiz hinzufügen',
