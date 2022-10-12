@@ -231,6 +231,19 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
           }}
         />
       </Grid>
+
+      <Grid item md={6}>
+        <FormInput
+          props={{
+            name: 'yearBuilt',
+            label: 'Year Built',
+            placeholder: 'Enter year build',
+            value: formik.values.yearBuilt,
+            onBlur: formik.handleBlur,
+            onChange: formik.handleChange,
+          }}
+        />
+      </Grid>
     </Grid>
   );
 };
