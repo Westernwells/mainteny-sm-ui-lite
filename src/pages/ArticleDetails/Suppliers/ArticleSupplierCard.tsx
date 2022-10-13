@@ -98,6 +98,12 @@ export const ArticleSupplierCard = ({article}: {article: ArticleView}) => {
                   component="p">
                   {supplier.phone}
                 </Typography>
+                <Typography
+                  color="text.secondary"
+                  variant="body2"
+                  component="p">
+                  {supplier.email}
+                </Typography>
               </Box>
               {supplier.isPreferred && (
                 <StatusChip
