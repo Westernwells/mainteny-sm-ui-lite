@@ -51,13 +51,3 @@ export const useFormatDuration = () => {
     [],
   );
 };
-
-// function formatDuration(
-//   duration: Duration,
-// options?: {
-//   format?: string[]
-//   zero?: boolean
-//   delimiter?: string
-//   locale?: Locale
-// }
-// ): string

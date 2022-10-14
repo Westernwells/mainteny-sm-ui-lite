@@ -144,7 +144,12 @@ export const makeRows = (
   workHours.data.length
     ? workHours.data.map((item: WorkHoursItem) => ({
         id: item.id,
-        duration: formatDateDuration({minutes: item.duration}),
+        duration: formatDateDuration({
+          [item.durationUnit.toLowerCase()]:
+            item.durationUnit === 'DAYS' && item.duration === 0
+              ? 1
+              : item.duration,
+        }),
         startDate: `${formatDate(item.startTime)} ${formatDate(
           item.startTime,
           'HH:mm',
@@ -171,3 +176,15 @@ export const makeRows = (
         ),
       }))
     : [];
+
+// let duration = '-';
+// const startDate =
+// if(item.type === WorkHoursType.HOLIDAY) {
+
+// } else {
+//   `${formatDate(item.startTime)} ${formatDate(
+//     item.startTime,
+//     'HH:mm',
+//   )}`
+
+// }

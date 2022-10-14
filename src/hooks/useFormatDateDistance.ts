@@ -7,6 +7,10 @@ export const useFormatDateDistance = () => {
   const {user} = useUserSession();
   const language = user?.userAccount.serviceCompany.language;
   const locale = mapLanguageToLocale[language!];
-  return (date: Date, baseDate: Date = new Date()) =>
-    formatDistance(date, baseDate, {locale: locales[locale], addSuffix: true});
+  return (date: Date, baseDate: Date = new Date(), options: any = {}) =>
+    formatDistance(date, baseDate, {
+      locale: locales[locale],
+      addSuffix: true,
+      ...options,
+    });
 };
