@@ -12,6 +12,7 @@ import {useWorkHours} from 'hooks/reactQuery/useWorkHours';
 import {WorkHoursItem} from 'models/workHours';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {calculateTotalTime} from 'utils/work-hours-utils';
+import {endOfDay, startOfDay} from 'date-fns';
 import {useFormatDuration} from 'hooks/useFormatDuration';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {getLastWeek} from 'utils/datetime';
@@ -61,7 +62,7 @@ const WorkHoursTab = ({employeeId}: Props) => {
           minDate={undefined}
           maxDate={endDate}
           getSelectedDate={(newValue) => {
-            if (newValue) setStartDate(newValue);
+            if (newValue) setStartDate(startOfDay(newValue));
           }}
           textFieldProps={{
             label: t('Start Date'),
@@ -75,7 +76,7 @@ const WorkHoursTab = ({employeeId}: Props) => {
           minDate={startDate}
           maxDate={new Date()}
           getSelectedDate={(newValue) => {
-            if (newValue) setEndDate(newValue);
+            if (newValue) setEndDate(endOfDay(newValue));
           }}
           textFieldProps={{
             label: t('End Date'),
