@@ -95,7 +95,7 @@ export const Actions = ({invoice}: Props) => {
     }
     return (
       <Tooltip title={t('Preview')} placement="left" arrow>
-        <IconButton onClick={() => setIsDialogOpen(true)}>
+        <IconButton onClick={() => navigate(`/invoices/details/${invoice.id}`)}>
           <RemoveRedEye fontSize="small" sx={{color: 'action.active'}} />
         </IconButton>
       </Tooltip>
@@ -127,7 +127,7 @@ export const Actions = ({invoice}: Props) => {
         label: t('Preview'),
         icon: <RemoveRedEye />,
         onClick: () => {
-          // TODO: handle preview
+          navigate(`/invoices/details/${invoice.id}`);
         },
       });
     }
