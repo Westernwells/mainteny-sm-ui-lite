@@ -19,10 +19,10 @@ import FileDownload from '@mui/icons-material/FileDownload';
 import Edit from '@mui/icons-material/Edit';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import {Confirm} from 'components/Confirm';
+import {SendEmailDialog} from 'components/SendEmailDialog';
 import {
   useDeleteInvoice,
   useInvoicePaymentStatus,
-  usePublishInvoice,
 } from 'hooks/reactQuery/useInvoice';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {InvoiceStatus, InvoiceView} from 'models/invoice';
@@ -52,6 +52,7 @@ export const Actions = ({invoice}: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -60,7 +61,6 @@ export const Actions = ({invoice}: Props) => {
     invoice ? [invoice!.additionalInfo.pdfPath] : [],
   );
   const {mutate: markAsPaid} = useInvoicePaymentStatus();
-  const {mutate: sendInvoice} = usePublishInvoice();
   const {mutate: deleteInvoice} = useDeleteInvoice();
 
   const handleClick = (event: any) => {
@@ -77,7 +77,7 @@ export const Actions = ({invoice}: Props) => {
         <Tooltip title={t('Send')} placement="left" arrow>
           <IconButton
             onClick={() => {
-              if (invoice.id) sendInvoice(invoice.id);
+              setIsSendEmailDialogOpen(true);
             }}>
             <SendIcon fontSize="small" sx={{color: 'action.active'}} />
           </IconButton>
@@ -211,6 +211,13 @@ export const Actions = ({invoice}: Props) => {
         title="Mark as paid"
         content="Do you want to mark this invoice as paid?"
         helperText="This action is irreversible."
+      />
+
+      <SendEmailDialog
+        invoice={invoice}
+        open={isSendEmailDialogOpen}
+        onConfirm={() => setIsSendEmailDialogOpen(false)}
+        onClose={() => setIsSendEmailDialogOpen(false)}
       />
 
       <Confirm

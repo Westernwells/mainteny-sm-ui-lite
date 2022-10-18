@@ -279,3 +279,9 @@ export type FormatDate = (
   input?: string | Date | undefined,
   dateFormat?: string | undefined,
 ) => string | undefined;
+
+export interface SimpleEmailRecord {
+  email: string;
+  subject: string;
+  content: string;
+}

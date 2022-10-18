@@ -71,8 +71,6 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
   const [isDrawerOpen] = useState<boolean>(true);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const [publish, setPublish] = useState(false);
-
   const [customer, setCustomer] = useState<
     PropertyOwnerView | PropertyOwnerSimpleView | undefined
   >(undefined);
@@ -117,9 +115,8 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
         updateInvoice({
           data: values as UpdateInvoice,
           invoiceId: invoice.id,
-          publish,
         });
-      else createNewInvoice({data: values, publish});
+      else createNewInvoice({data: values});
     },
   });
 
@@ -444,20 +441,14 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
       <BottomDrawer
         isOpen={isDrawerOpen}
         primaryButtonLabel={invoice ? t('Send') : t('Save')}
-        primaryButtonAction={() => {
-          setPublish(!!invoice);
-          formik.handleSubmit();
-        }}
+        primaryButtonAction={formik.handleSubmit}
         listItems={
           invoice
             ? [
                 {
                   label: t('Save Draft'),
                   icon: <DraftsIcon />,
-                  onClick: () => {
-                    setPublish(false);
-                    formik.handleSubmit();
-                  },
+                  onClick: () => formik.handleSubmit,
                 },
                 {
                   label: 'Delete Invoice',
@@ -471,10 +462,7 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
                 {
                   label: t('Save & Send'),
                   icon: <DraftsIcon />,
-                  onClick: () => {
-                    setPublish(true);
-                    formik.handleSubmit();
-                  },
+                  onClick: () => formik.handleSubmit,
                 },
                 {
                   label: 'Discard',
