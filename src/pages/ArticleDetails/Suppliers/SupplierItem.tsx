@@ -84,6 +84,21 @@ export const SupplierItem = ({
           },
         }}
       />
+      <FormInput
+        containerStyles={{...containerStyles}}
+        props={{
+          id: 'supplierEmailAddress',
+          label: t('Supplier Email Address'),
+          placeholder: 'supplier.part@mail.com',
+          value: supplier.email,
+          variant: 'outlined',
+          type: 'text',
+          onChange: (e) => {
+            supplier.email = e.target.value;
+            updateSupplier(supplier);
+          },
+        }}
+      />
       {!useCheckBox && (
         <FormRadio
           checked={supplier.isPreferred}

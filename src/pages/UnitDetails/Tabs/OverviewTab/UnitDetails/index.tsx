@@ -50,6 +50,7 @@ export const UnitDetails = ({
       serialNumber: elevator.serialNumber,
       unitCapacity: elevator.capacity,
       spendingLimit: validContract?.spendingLimit,
+      yearBuilt: elevator.additionalInfo.builtYear,
     },
     onSubmit: () => {},
     validationSchema,
@@ -67,6 +68,7 @@ export const UnitDetails = ({
     'cabinType',
     'spendingLimit',
     'phone',
+    'builtYear',
   ]).current;
 
   const onSave = async () => {
@@ -86,10 +88,13 @@ export const UnitDetails = ({
         model: formik.values.model || '',
         serialNumber: formik.values.serialNumber,
         capacity: formik.values.unitCapacity || '',
+        builtYear: formik.values.yearBuilt,
       },
       elevatorId: elevator.id,
     });
   };
+
+  console.log(formik.values.yearBuilt, '#######');
 
   return (
     <InfoCard

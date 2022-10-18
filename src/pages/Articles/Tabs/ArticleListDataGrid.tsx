@@ -103,6 +103,14 @@ export const columns: GridColDef[] = [
     ...defaultProps,
   },
   {
+    field: 'supplier',
+    headerName: 'SUPPLIER',
+    type: 'string',
+    flex: 2,
+    cellClassName: 'truncateText',
+    ...defaultProps,
+  },
+  {
     field: 'purchasePrice',
     headerName: 'PURCHASE PRICE',
     type: 'string',
@@ -162,6 +170,7 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
     purchasePrice: formatNetAmount(item.unitPurchaseAmount),
     sellingPrice: formatNetAmount(item.unitSellingAmount),
     stock: item.stock.currentStock,
+    supplier: item.additionalInfo.suppliers?.map((x) => x.name).join(', '),
     navigateTo: `details/${item.id}`,
     item,
   }));

@@ -12,6 +12,7 @@ import {useTranslation} from 'react-i18next';
 import TotalTime from 'components/TotalTime';
 import {useWorkHours} from 'hooks/reactQuery/useWorkHours';
 import {WorkHoursItem} from 'models/workHours';
+import {useFormatDuration} from 'hooks/useFormatDuration';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {calculateTotalTime} from 'utils/work-hours-utils';
 import {useWhen} from 'hooks/useWhen';
@@ -21,7 +22,7 @@ const WorkHourWidget = () => {
   const getWhen = useWhen();
   const {t} = useTranslation();
   const {id: employeeId} = useParams();
-
+  const formatDuration = useFormatDuration();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [totalTime, setTotalTime] = useState<string>('00:00');
@@ -39,7 +40,7 @@ const WorkHourWidget = () => {
 
   useEffect(() => {
     if (workHours.data) {
-      setRows(makeRows(workHours));
+      setRows(makeRows(workHours, () => '', formatDuration));
       setTotalTime(calculateTotalTime(workHours.data));
     } else {
       setRows([]);

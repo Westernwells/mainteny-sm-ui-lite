@@ -97,6 +97,7 @@ export interface ContractView {
   type: ContractType;
   visitsNumber: number;
   number: number;
+  externalId: string;
 
   sla: number;
   spendingLimit: number;

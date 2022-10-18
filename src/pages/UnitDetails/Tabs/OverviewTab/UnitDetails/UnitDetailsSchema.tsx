@@ -13,6 +13,7 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import useTheme from '@mui/material/styles/useTheme';
 import {ElevatorView} from 'models/elevator';
 import {convertToText} from 'utils/utils';
+import CalendarToday from '@mui/icons-material/CalendarToday';
 
 interface Props {
   label: string;
@@ -153,6 +154,18 @@ export const UnitDetailsSchema = ({
             icon={<MonetizationOnIcon sx={{color: theme.palette.info.dark}} />}
             label="SPENDING LIMIT"
             bodyText={spendingLimit ? `${spendingLimit} ${currency}` : '-'}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3em"
+            containerStyles={{mt: '0.5em'}}
+          />
+        );
+
+      case 'builtYear':
+        return (
+          <CardProps
+            icon={<CalendarToday sx={{color: theme.palette.info.dark}} />}
+            label="YEAR BUILT"
+            bodyText={elevator.additionalInfo.builtYear || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}

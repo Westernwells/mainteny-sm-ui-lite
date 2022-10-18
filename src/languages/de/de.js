@@ -262,7 +262,7 @@ module.exports = {
     Unpaid: 'Offen',
     Paid: 'Beglichen',
     Expired: 'Überfällig',
-    Maintenance: 'Dienstleistung',
+    Maintenance: 'Wartung',
     Repair: 'Reparatur',
     Callout: 'Störung',
     Emergency: 'Personeneinschluss',
@@ -533,6 +533,7 @@ module.exports = {
       'Noch keine Angebote. Diese werden hier erscheinen, sobald sie hinzugefügt wurden!',
     '+ Add New Article': '+ Artikel hinzufügen',
     Notes: 'Notizen',
+    NOTES: 'NOTIZEN',
     'No notes have been created yet. Please click the button below to create one!':
       'Es wurden noch keine Notizen erstellt. Bitte klicken Sie auf die Schaltfläche unten, um eine zu erstellen!',
     'Add Note': '+ Notiz hinzufügen',
@@ -1027,6 +1028,13 @@ module.exports = {
     'Last visit is required': 'Letzter Besuch ist erforderlich',
     'Service time is required': 'Dienstzeit ist erforderlich',
     'No. of technicians is required': 'Anzahl der Techniker ist erforderlich',
+    'No notes yet. They will appear here once added.':
+      'Noch keine Notizen vorhanden.',
+    Close: 'Schließen',
+    'Note message': 'Notiz',
+    'Press Enter to submit note':
+      'Klicken Sie Enter, um die Notiz zu speichern',
+    'Submit note': 'Notiz speichern',
   },
 };
 
