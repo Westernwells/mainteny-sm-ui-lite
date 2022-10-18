@@ -1,6 +1,7 @@
 import {useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router';
+import printJS from 'print-js';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import MUITooltip, {TooltipProps} from '@mui/material/Tooltip';
@@ -108,9 +109,13 @@ export const Actions = ({invoice}: Props) => {
       items.unshift({
         label: t('Print'),
         icon: <Print />,
-        onClick: () => {
-          // TODO: handle print
-        },
+        onClick: () =>
+          downloadUrl &&
+          printJS({
+            printable: Object.values(downloadUrl)[0],
+            type: 'pdf',
+            showModal: true,
+          }),
       });
     } else if (invoice.status === InvoiceStatus.NOT_PAID) {
       items.unshift({
@@ -157,7 +162,7 @@ export const Actions = ({invoice}: Props) => {
       ],
     );
     return items;
-  }, []);
+  }, [downloadUrl]);
 
   return (
     <Box>
