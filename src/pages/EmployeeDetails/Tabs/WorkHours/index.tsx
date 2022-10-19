@@ -40,7 +40,6 @@ const WorkHoursTab = ({employeeId}: Props) => {
   useEffect(() => {
     if (workHours.data) {
       setRows(makeRows(workHours, formatDate, formatDuration));
-      console.log(calculateTotalTime(workHours.data), '||||||');
       setTotalTime(calculateTotalTime(workHours.data));
     } else {
       setRows([]);

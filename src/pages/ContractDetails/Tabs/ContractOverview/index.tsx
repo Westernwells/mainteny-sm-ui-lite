@@ -217,6 +217,17 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               )}
               numberOfUnits={contractDetails?.elevators?.length}
               type={contractDetails?.type.toLowerCase()}
+              paymentDue={contractDetails?.additionalInfo?.invoiceDueDays}
+              yearlyPriceAdjustment={
+                contractDetails.additionalInfo?.annualPriceAdjustmentPercentage
+              }
+              noticePreiod={
+                contractDetails?.additionalInfo?.noticePeriodInMonth
+              }
+              discount={contractDetails?.additionalInfo?.discounts?.map(
+                (item) =>
+                  `${item.discountPercentage} when paid in ${item.days}`,
+              )}
             />
             <Dialog
               title="Edit Contract"

@@ -11,6 +11,10 @@ import {Grid} from '@mui/material';
 import {StatusChip} from 'components/StatusChip';
 import {convertToText} from 'utils/utils';
 import {useTranslation} from 'react-i18next';
+import CalendarToday from '@mui/icons-material/CalendarToday';
+import TrendingUp from '@mui/icons-material/TrendingUp';
+import DateRange from '@mui/icons-material/DateRange';
+import MoneyOff from '@mui/icons-material/MoneyOff';
 
 interface Props {
   type?: string;
@@ -20,6 +24,10 @@ interface Props {
   renewalPeriod?: number;
   invoiceDue?: string;
   numberOfUnits?: number;
+  paymentDue?: number;
+  yearlyPriceAdjustment?: number;
+  noticePreiod?: number;
+  discount?: string[];
 }
 
 export const ContractBasic = ({
@@ -30,6 +38,10 @@ export const ContractBasic = ({
   numberOfUnits,
   numberOfVisits,
   renewalPeriod,
+  paymentDue,
+  yearlyPriceAdjustment,
+  noticePreiod,
+  discount,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -121,6 +133,54 @@ export const ContractBasic = ({
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3rem"
             bodyText={`${numberOfUnits}` || '-'}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <CardProps
+            label="PAYMENT DUE"
+            bodyTextVariant="subtitle1"
+            icon={<CalendarToday color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={paymentDue ? `${paymentDue} days` : '-'}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <CardProps
+            label="YEARLY PRICE ADJUSTMENT"
+            bodyTextVariant="subtitle1"
+            icon={<TrendingUp color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={yearlyPriceAdjustment ? `${yearlyPriceAdjustment}%` : '-'}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <CardProps
+            label="NOTICE PERIOD"
+            bodyTextVariant="subtitle1"
+            icon={<DateRange color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={noticePreiod ? `${noticePreiod} months` : '-'}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <CardProps
+            label="DISCOUNT"
+            bodyTextVariant="subtitle1"
+            icon={<MoneyOff color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={discount ? `${discount}` : '-'}
           />
         </Grid>
       </Grid>

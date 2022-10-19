@@ -74,6 +74,11 @@ export enum InvoiceDueType {
   AFTER_EACH_VISIT = 'AFTER_EACH_VISIT',
 }
 
+export interface ContractDiscount {
+  days: number;
+  discountPercentage: number;
+}
+
 export interface ContractAdditionalInfo {
   renewalTerms?: number;
   price?: Amount;
@@ -81,6 +86,9 @@ export interface ContractAdditionalInfo {
   invoiceDue?: InvoiceDueType;
   documents?: FileResource[];
   scope?: string[];
+  noticePeriodInMonth?: number;
+  invoiceDueDays?: number;
+  discounts?: ContractDiscount[];
 }
 
 export interface ContractElevatorSimpleView {

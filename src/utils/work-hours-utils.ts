@@ -38,8 +38,6 @@ export const calculateTotalTime = (workHours: WorkHoursItem[]) => {
     0,
   );
 
-  console.log(total, '????');
-
   return convertDigitalMinsToHM(total);
 };
 
