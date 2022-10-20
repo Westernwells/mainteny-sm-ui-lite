@@ -94,8 +94,6 @@ export const UnitDetails = ({
     });
   };
 
-  console.log(formik.values.yearBuilt, '#######');
-
   return (
     <InfoCard
       containerStyles={{...containerStyles}}

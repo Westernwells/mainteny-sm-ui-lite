@@ -248,4 +248,8 @@ export interface ContractUpdateRequest {
   renewalTerms: number | string;
   visitsNumber: number | string;
   spendingLimit: number | string;
+  invoiceDueDays?: number;
+  annualPriceAdjustmentPercentage?: number;
+  discounts?: number;
+  noticePeriodInMonth?: number;
 }

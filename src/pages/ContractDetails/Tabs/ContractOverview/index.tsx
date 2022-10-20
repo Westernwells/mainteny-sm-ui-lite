@@ -86,6 +86,14 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       renewalTerms: contractDetails?.additionalInfo?.renewalTerms || '',
       visitsNumber: contractDetails?.visitsNumber || '',
       spendingLimit: contractDetails?.spendingLimit || '',
+      invoiceDueDays: contractDetails?.additionalInfo?.invoiceDueDays,
+      annualPriceAdjustmentPercentage:
+        contractDetails?.additionalInfo?.annualPriceAdjustmentPercentage,
+      discounts:
+        contractDetails?.additionalInfo &&
+        contractDetails?.additionalInfo?.discounts &&
+        contractDetails?.additionalInfo?.discounts[0].days,
+      noticePeriodInMonth: contractDetails?.additionalInfo?.noticePeriodInMonth,
     },
     onSubmit: () => {},
     enableReinitialize: true,
@@ -112,7 +120,15 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       startDate: contractDetails?.startTime,
       endDate: contractDetails?.endTime,
       timePreference: contractDetails?.timePreference || [],
+      invoiceDueDays: formik.values.invoiceDueDays,
+      annualPriceAdjustmentPercentage:
+        formik.values.annualPriceAdjustmentPercentage,
+      discounts: formik.values.discounts && [
+        {days: 14, discountPercentage: formik.values.discounts},
+      ],
+      noticePeriodInMonth: formik.values.noticePeriodInMonth,
     };
+
     await updateContract({
       body: updatedContract as any,
       contractId: contractId!,
@@ -219,14 +235,14 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               type={contractDetails?.type.toLowerCase()}
               paymentDue={contractDetails?.additionalInfo?.invoiceDueDays}
               yearlyPriceAdjustment={
-                contractDetails.additionalInfo?.annualPriceAdjustmentPercentage
+                contractDetails?.additionalInfo?.annualPriceAdjustmentPercentage
               }
               noticePreiod={
                 contractDetails?.additionalInfo?.noticePeriodInMonth
               }
               discount={contractDetails?.additionalInfo?.discounts?.map(
                 (item) =>
-                  `${item.discountPercentage} when paid in ${item.days}`,
+                  `${item.discountPercentage}% when paid in ${item.days} days`,
               )}
             />
             <Dialog

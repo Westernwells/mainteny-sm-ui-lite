@@ -1,6 +1,7 @@
 import React from 'react';
 import {useFormikContext} from 'formik';
-import {Grid, InputAdornment} from '@mui/material';
+import Grid from '@mui/material/Grid';
+import InputAdornment from '@mui/material/InputAdornment';
 import {Email, Phone} from '@mui/icons-material';
 
 import {FormInput} from 'components/form/FormInput';
