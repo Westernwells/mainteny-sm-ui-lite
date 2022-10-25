@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
@@ -20,6 +21,8 @@ import {FormLabel} from './form/FormLabel';
 import {SelectModal} from './SelectModal';
 import {ArticlesDataGrid} from './DataGrid/ArticlesDataGrid';
 import {SelectButton} from './SelectButton';
+import {FormInput} from './form/FormInput';
+import {number} from 'yup/lib/locale';
 
 interface Props<T> {
   items: T[];
@@ -34,6 +37,9 @@ export const ArticleItemsTable = ({
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
+  const [percentageVat, setPercentageVat] = useState(
+    user!.userAccount.serviceCompany.settings.percentageVat || 0,
+  );
   const {
     data: partialArticleResource = createEmptyResource<ArticleView>(1),
     isFetched,
@@ -54,16 +60,37 @@ export const ArticleItemsTable = ({
 
   const [total, setTotal] = useState(0);
 
+  const getItemRecord = (
+    record: QuotationItemRecord | InvoiceItemRecord<Amount>,
+  ) => {
+    const netAmount = record.unitAmount.netAmount;
+    const vat =
+      (percentageVat * netAmount) / 10 ** record.unitAmount.fractionDigits;
+    return {
+      ...record,
+      unitAmount: {
+        ...record.unitAmount,
+        netAmount,
+        percentageVat,
+        vat,
+        grossAmount: netAmount + vat,
+      },
+    };
+  };
+
   const articleViewToItem = (
     article: ArticleView,
-  ): QuotationItemRecord | InvoiceItemRecord<Amount> => ({
-    articleId: article.id,
-    articleUnit: article.unit,
-    description: article.description,
-    name: article.name,
-    quantity: 1,
-    unitAmount: article.unitSellingAmount,
-  });
+  ): QuotationItemRecord | InvoiceItemRecord<Amount> => {
+    const record = {
+      articleId: article.id,
+      articleUnit: article.unit,
+      description: article.description,
+      name: article.name,
+      quantity: 1,
+      unitAmount: article.unitSellingAmount,
+    };
+    return getItemRecord(record);
+  };
 
   const deleteItem = (
     item: QuotationItemRecord | InvoiceItemRecord<Amount>,
@@ -79,6 +106,11 @@ export const ArticleItemsTable = ({
 
     setIsArticleModalOpen(false);
   };
+
+  useEffect(() => {
+    const result = items.map((item) => getItemRecord(item));
+    setItems(result);
+  }, [percentageVat]);
 
   useEffect(() => {
     if (isPartial && isFetched && !partialArticleResource.data.length)
@@ -248,7 +280,17 @@ export const ArticleItemsTable = ({
                   <Typography>
                     {formatCurrency(totalPrice, {currency: 'EUR'})}
                   </Typography>
-                  <Typography
+                  <Box>
+                    <FormInput
+                      props={{
+                        label: 'vat',
+                        value: percentageVat,
+                        sx: {mt: '0.5em'},
+                        onChange: (e) =>
+                          setPercentageVat(Number(e.target.value)),
+                      }}
+                    />
+                    {/* <Typography
                     variant="caption"
                     sx={{color: 'text.secondary', alignSelf: 'end'}}>
                     {t('VAT')}
@@ -258,15 +300,13 @@ export const ArticleItemsTable = ({
                             .percentageVat
                         }%`
                       : null}
-                  </Typography>
+                      {console.log(user!.userAccount.serviceCompany.settings, '||||||')}
+                  </Typography> */}
+                  </Box>
                   <Typography>
-                    {formatCurrency(
-                      totalPrice *
-                        (user!.userAccount.serviceCompany.settings
-                          .percentageVat /
-                          100),
-                      {currency: 'EUR'},
-                    )}
+                    {formatCurrency(totalPrice * (percentageVat / 100), {
+                      currency: 'EUR',
+                    })}
                   </Typography>
                 </Box>
                 <Box
@@ -286,14 +326,9 @@ export const ArticleItemsTable = ({
                     </Typography>
                   </Typography>
                   <Typography sx={{color: 'primary.contrastText'}}>
-                    {formatCurrency(
-                      totalPrice *
-                        (1 +
-                          user!.userAccount.serviceCompany.settings
-                            .percentageVat /
-                            100),
-                      {currency: 'EUR'},
-                    )}
+                    {formatCurrency(totalPrice * (1 + percentageVat / 100), {
+                      currency: 'EUR',
+                    })}
                   </Typography>
                 </Box>
               </Box>
