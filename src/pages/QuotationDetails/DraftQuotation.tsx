@@ -161,6 +161,8 @@ export const DraftQuotation = ({quotation}: Props) => {
     );
   }, [quotationItems]);
 
+  console.log(quotationItems, '****************+++++>>');
+
   return (
     <Box>
       {quotation && (
