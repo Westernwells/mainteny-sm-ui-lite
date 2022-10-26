@@ -37,9 +37,7 @@ export const ArticleItemsTable = ({
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
-  const [percentageVat, setPercentageVat] = useState(
-    user!.userAccount.serviceCompany.settings.percentageVat || 0,
-  );
+  const [percentageVat, setPercentageVat] = useState(0);
   const {
     data: partialArticleResource = createEmptyResource<ArticleView>(1),
     isFetched,
@@ -106,6 +104,21 @@ export const ArticleItemsTable = ({
 
     setIsArticleModalOpen(false);
   };
+
+  useEffect(() => {
+    setPercentageVat(
+      user!.userAccount.serviceCompany.settings.percentageVat || 0,
+    );
+  }, []);
+
+  useEffect(() => {
+    let pVat = 0;
+    if (!!items.length) {
+      pVat = items[0].unitAmount.percentageVat;
+    }
+
+    setPercentageVat(pVat);
+  }, [items]);
 
   useEffect(() => {
     const result = items.map((item) => getItemRecord(item));
@@ -260,7 +273,7 @@ export const ArticleItemsTable = ({
                         </Typography>
                       </Typography>
 
-                      <Typography>
+                      <Typography sx={{justifySelf: 'end'}}>
                         {formatCurrency(total, {currency: 'EUR'})}
                       </Typography>
                     </>
@@ -285,7 +298,7 @@ export const ArticleItemsTable = ({
                       props={{
                         label: 'vat',
                         value: percentageVat,
-                        sx: {mt: '0.5em'},
+                        sx: {mt: '0.5em', width: '5rem'},
                         onChange: (e) =>
                           setPercentageVat(Number(e.target.value)),
                       }}
