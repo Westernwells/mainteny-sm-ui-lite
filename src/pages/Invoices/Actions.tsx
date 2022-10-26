@@ -21,10 +21,8 @@ import Edit from '@mui/icons-material/Edit';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import {Confirm} from 'components/Confirm';
 import {SendEmailDialog} from 'components/SendEmailDialog';
-import {
-  useDeleteInvoice,
-  useInvoicePaymentStatus,
-} from 'hooks/reactQuery/useInvoice';
+import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
+import {useDeleteInvoice} from 'hooks/reactQuery/useInvoice';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {InvoiceStatus, InvoiceView} from 'models/invoice';
 import {PdfGenerationStatus} from 'models/misc';
@@ -62,7 +60,6 @@ export const Actions = ({invoice}: Props) => {
   const {data: downloadUrl} = useDownloadUrl(
     invoice ? [invoice!.additionalInfo.pdfPath] : [],
   );
-  const {mutate: markAsPaid} = useInvoicePaymentStatus();
   const {mutate: deleteInvoice} = useDeleteInvoice();
 
   const isPDFGenerated =
@@ -232,16 +229,11 @@ export const Actions = ({invoice}: Props) => {
         ))}
       </Menu>
 
-      <Confirm
+      <MarkAsPaidDialog
+        invoice={invoice}
         open={isDialogOpen}
-        onConfirm={() => {
-          if (invoice.id) markAsPaid(invoice.id);
-          setIsDialogOpen(false);
-        }}
+        onConfirm={() => setIsDialogOpen(false)}
         onClose={() => setIsDialogOpen(false)}
-        title="Mark as paid"
-        content="Do you want to mark this invoice as paid?"
-        helperText="This action is irreversible."
       />
 
       <SendEmailDialog

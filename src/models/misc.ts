@@ -192,7 +192,7 @@ export interface StringValueResponse {
 }
 
 export interface Money {
-  amount: number;
+  value: number;
   currency: string;
 }
 

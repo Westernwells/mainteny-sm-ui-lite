@@ -23,6 +23,7 @@ import {
   UpdateInvoice,
   QueryInvoiceCommentsParams,
   CreateInvoiceComment,
+  InvoicePaymentRecord,
 } from 'models/invoice';
 import {Comment} from 'models/comment';
 import {Mixpanel} from 'mixpanel/mixpanel';
@@ -167,6 +168,46 @@ export const useInvoicePaymentStatus = () => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
         enqueueSnackbar(`Invoice marked as paid`, {
+          variant: 'success',
+        });
+        navigate(`/invoices/details/${invoiceId}`);
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+export const addInvoicePayment = async ({
+  invoiceId,
+  body,
+}: {
+  invoiceId: string;
+  body: InvoicePaymentRecord;
+}) => {
+  await axiosClient.post<{value: string}>(
+    `api/invoices/${invoiceId}/payments`,
+    body,
+  );
+};
+
+export const useAddInvoicePayment = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  const navigate = useNavigate();
+
+  return useMutation(
+    ({invoiceId, body}: {invoiceId: string; body: InvoicePaymentRecord}) =>
+      addInvoicePayment({invoiceId, body}),
+    {
+      onSuccess: (__, {invoiceId}) => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+        enqueueSnackbar(`Invoice marked as paid!`, {
           variant: 'success',
         });
         navigate(`/invoices/details/${invoiceId}`);

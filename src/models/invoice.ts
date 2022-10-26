@@ -3,6 +3,7 @@ import {
   Amount,
   AmountRecord,
   Meta,
+  Money,
   PaymentInfo,
   PdfGenerationStatus,
   WithOptional,
@@ -134,4 +135,10 @@ export interface QueryInvoiceCommentsParams {
 export interface CreateInvoiceComment {
   content: string;
   subject: string;
+}
+
+export interface InvoicePaymentRecord {
+  amount: Money;
+  paidDate: string;
+  markAsPaid: boolean;
 }
