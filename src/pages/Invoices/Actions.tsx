@@ -27,6 +27,7 @@ import {
 } from 'hooks/reactQuery/useInvoice';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {InvoiceStatus, InvoiceView} from 'models/invoice';
+import {PdfGenerationStatus} from 'models/misc';
 
 interface Props {
   invoice: InvoiceView;
@@ -64,6 +65,10 @@ export const Actions = ({invoice}: Props) => {
   const {mutate: markAsPaid} = useInvoicePaymentStatus();
   const {mutate: deleteInvoice} = useDeleteInvoice();
 
+  const isPDFGenerated =
+    invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
+    downloadUrl;
+
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
@@ -73,15 +78,27 @@ export const Actions = ({invoice}: Props) => {
   };
 
   const action = useMemo(() => {
-    if (invoice.status === InvoiceStatus.DRAFT) {
+    if (
+      invoice.status === InvoiceStatus.DRAFT ||
+      invoice.status === InvoiceStatus.EXPIRED
+    ) {
       return (
-        <Tooltip title={t('Send')} placement="left" arrow>
-          <IconButton
-            onClick={() => {
-              setIsSendEmailDialogOpen(true);
-            }}>
-            <SendIcon fontSize="small" sx={{color: 'action.active'}} />
-          </IconButton>
+        <Tooltip
+          title={
+            isPDFGenerated ? t('Send') : t('The PDF is not generated yet.')
+          }
+          placement="left"
+          arrow>
+          <span>
+            <IconButton
+              onClick={() => {
+                setIsSendEmailDialogOpen(true);
+              }}
+              sx={{color: 'action.active'}}
+              disabled={!isPDFGenerated}>
+              <SendIcon fontSize="small" />
+            </IconButton>
+          </span>
         </Tooltip>
       );
     }
@@ -101,11 +118,15 @@ export const Actions = ({invoice}: Props) => {
         </IconButton>
       </Tooltip>
     );
-  }, [invoice.status]);
+  }, [invoice.status, downloadUrl]);
 
   const actions = useMemo(() => {
     const items = [];
-    if (invoice.status === InvoiceStatus.DRAFT) {
+    if (
+      isPDFGenerated &&
+      (invoice.status === InvoiceStatus.DRAFT ||
+        invoice.status === InvoiceStatus.EXPIRED)
+    ) {
       items.unshift({
         label: t('Print'),
         icon: <Print />,
@@ -126,6 +147,7 @@ export const Actions = ({invoice}: Props) => {
     }
     if (
       invoice.status === InvoiceStatus.DRAFT ||
+      invoice.status === InvoiceStatus.EXPIRED ||
       invoice.status === InvoiceStatus.NOT_PAID
     ) {
       items.push({
@@ -138,13 +160,17 @@ export const Actions = ({invoice}: Props) => {
     }
     items.push(
       ...[
-        {
-          label: t('Download'),
-          icon: <FileDownload />,
-          onClick: () =>
-            downloadUrl &&
-            window.open(`${Object.values(downloadUrl)[0]}`, '_blank'),
-        },
+        ...(isPDFGenerated
+          ? [
+              {
+                label: t('Download'),
+                icon: <FileDownload />,
+                onClick: () =>
+                  downloadUrl &&
+                  window.open(`${Object.values(downloadUrl)[0]}`, '_blank'),
+              },
+            ]
+          : []),
         {
           label: t('Edit'),
           icon: <Edit />,
