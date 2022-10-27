@@ -50,6 +50,7 @@ export interface EmergencyPhoneFormModel {
   phoneConnection?: string;
   phoneNumber?: string;
   simCardNumber?: string;
+  simPin?: string;
   callCenter?: string;
   placeOfInstallation?: string;
 }

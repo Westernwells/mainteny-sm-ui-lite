@@ -112,12 +112,10 @@ export const ArticleItemsTable = ({
   }, []);
 
   useEffect(() => {
-    let pVat = 0;
     if (!!items.length) {
-      pVat = items[0].unitAmount.percentageVat;
+      const pVat = items[0].unitAmount.percentageVat;
+      setPercentageVat(pVat);
     }
-
-    setPercentageVat(pVat);
   }, [items]);
 
   useEffect(() => {
@@ -130,9 +128,11 @@ export const ArticleItemsTable = ({
       createPartial();
     if (isPartial && isFetched && partialArticleResource.data.length) {
       const temp = partialArticleResource.data[0];
-      if (items.length && temp.id !== items[0].articleId)
+      if (items.length && temp.id !== items[0].articleId) {
         setItems([articleViewToItem(temp)]);
-      else setItems([articleViewToItem(temp)]);
+      } else {
+        setItems([articleViewToItem(temp)]);
+      }
     }
   }, [isPartial]);
 
