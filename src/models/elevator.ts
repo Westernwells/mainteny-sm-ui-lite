@@ -75,6 +75,7 @@ export interface ElevatorPhone {
   callCenter: string;
   location: string;
   simCardNumber: string;
+  simPin: string;
 }
 
 export interface ElevatorAdditionalInfo {

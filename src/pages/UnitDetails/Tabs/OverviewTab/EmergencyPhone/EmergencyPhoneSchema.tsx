@@ -80,6 +80,18 @@ export const EmergencyPhoneSchema = ({label, elevator}: Props) => {
           />
         );
 
+      case 'simPin':
+        return (
+          <CardProps
+            icon={<SdCard sx={{color: theme.palette.info.dark}} />}
+            label="SIM PIN"
+            bodyText={elevator.additionalInfo?.elevatorPhone?.simPin || '-'}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            containerStyles={{mt: '0.5em'}}
+            iconMaxHeight="3em"
+          />
+        );
+
       case 'callCenter':
         return (
           <CardProps
