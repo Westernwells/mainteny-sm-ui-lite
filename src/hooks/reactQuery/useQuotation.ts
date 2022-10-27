@@ -43,13 +43,8 @@ export const fetchQuotations = async (
   return response.data;
 };
 
-const filterQuotations = (
-  quotationsRes: Resource<QuotationView>,
-  filters: QuotationFilters,
-) => {
+const filterQuotations = (quotationsRes: Resource<QuotationView>) => {
   const result = {...quotationsRes};
-  console.log(filters);
-  // TODO: Filter code goes here
 
   return result;
 };
@@ -68,7 +63,7 @@ export function useQuotations(
       ...options,
       select: useCallback(
         (quotationsRes: Resource<QuotationView>) => {
-          const filterResult = filterQuotations(quotationsRes, filters);
+          const filterResult = filterQuotations(quotationsRes);
           return filterResult;
         },
         [filters],
