@@ -3,6 +3,7 @@ import {
   Amount,
   AmountRecord,
   Meta,
+  Money,
   PaymentInfo,
   PdfGenerationStatus,
   WithOptional,
@@ -28,7 +29,7 @@ export enum InvoiceDueType {
 
 export enum InvoiceStatusView {
   PAID = 'Paid',
-  NOT_PAID = 'Unpaid',
+  NOT_PAID = 'Sent',
   DRAFT = 'Draft',
   EXPIRED = 'Overdue',
 }
@@ -75,6 +76,8 @@ export interface QueryInvoiceParams {
   pageSize: number;
   query: string;
   status: InvoiceStatus[];
+  totalAmountFrom?: number;
+  totalAmountTo?: number;
 }
 
 export interface InvoiceFilters {
@@ -132,4 +135,10 @@ export interface QueryInvoiceCommentsParams {
 export interface CreateInvoiceComment {
   content: string;
   subject: string;
+}
+
+export interface InvoicePaymentRecord {
+  amount: Money;
+  paidDate: string;
+  markAsPaid: boolean;
 }

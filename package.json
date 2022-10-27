@@ -32,6 +32,7 @@
     "mixpanel-browser": "^2.45.0",
     "mui-address-autocomplete": "^2.0.4",
     "notistack": "^2.0.3",
+    "print-js": "^1.6.0",
     "pusher-js": "^7.2.0",
     "query-string": "^7.1.1",
     "react": "latest",

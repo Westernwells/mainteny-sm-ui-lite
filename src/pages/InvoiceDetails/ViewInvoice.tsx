@@ -20,15 +20,13 @@ import {PdfGenerationStatus} from 'models/misc';
 import {formatNetAmount} from 'utils/currency';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
-import {
-  useInvoicePaymentStatus,
-  usePublishInvoice,
-} from 'hooks/reactQuery/useInvoice';
+import {useInvoicePaymentStatus} from 'hooks/reactQuery/useInvoice';
 import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import {Confirm} from 'components/Confirm';
+import {SendEmailDialog} from 'components/SendEmailDialog';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {Notes} from './Notes';
 
@@ -42,7 +40,7 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const {mutate: publishInvoice} = usePublishInvoice();
+  const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const {mutate: markAsPaid} = useInvoicePaymentStatus();
 
   return (
@@ -207,13 +205,19 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
                   label: t('Resend'),
                   icon: <ReplayIcon />,
                   onClick: () => {
-                    if (invoice.id) publishInvoice(invoice.id);
+                    setIsSendEmailDialogOpen(true);
                   },
                 },
               ]
             : []
         }
         isValid={!!downloadUrl.length}
+      />
+      <SendEmailDialog
+        invoice={invoice}
+        open={isSendEmailDialogOpen}
+        onConfirm={() => setIsSendEmailDialogOpen(false)}
+        onClose={() => setIsSendEmailDialogOpen(false)}
       />
     </Box>
   );
