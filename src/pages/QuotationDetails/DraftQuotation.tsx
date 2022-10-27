@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 import * as Yup from 'yup';
@@ -161,7 +161,7 @@ export const DraftQuotation = ({quotation}: Props) => {
     );
   }, [quotationItems]);
 
-  console.log(quotationItems, '****************+++++>>');
+  // console.log(quotationItems, '****************+++++>>');
 
   return (
     <Box>
@@ -307,7 +307,7 @@ export const DraftQuotation = ({quotation}: Props) => {
         ))}
 
         <ArticleItemsTable
-          items={quotationItems}
+          items={useMemo(() => quotationItems, [quotationItems])}
           setItems={setQuotationItems}
         />
 

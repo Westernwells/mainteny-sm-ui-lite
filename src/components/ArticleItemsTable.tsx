@@ -1,5 +1,10 @@
-/* eslint-disable */
-import {Dispatch, SetStateAction, useEffect, useState} from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -22,7 +27,6 @@ import {SelectModal} from './SelectModal';
 import {ArticlesDataGrid} from './DataGrid/ArticlesDataGrid';
 import {SelectButton} from './SelectButton';
 import {FormInput} from './form/FormInput';
-import {number} from 'yup/lib/locale';
 
 interface Props<T> {
   items: T[];
@@ -58,37 +62,39 @@ export const ArticleItemsTable = ({
 
   const [total, setTotal] = useState(0);
 
-  const getItemRecord = (
-    record: QuotationItemRecord | InvoiceItemRecord<Amount>,
-  ) => {
-    const netAmount = record.unitAmount.netAmount;
-    const vat =
-      (percentageVat * netAmount) / 10 ** record.unitAmount.fractionDigits;
-    return {
-      ...record,
-      unitAmount: {
-        ...record.unitAmount,
-        netAmount,
-        percentageVat,
-        vat,
-        grossAmount: netAmount + vat,
-      },
-    };
-  };
+  const getItemRecord = useCallback(
+    (record: QuotationItemRecord | InvoiceItemRecord<Amount>) => {
+      const {netAmount} = record.unitAmount;
+      const vat =
+        (percentageVat * netAmount) / 10 ** record.unitAmount.fractionDigits;
+      return {
+        ...record,
+        unitAmount: {
+          ...record.unitAmount,
+          netAmount,
+          percentageVat,
+          vat,
+          grossAmount: netAmount + vat,
+        },
+      };
+    },
+    [percentageVat],
+  );
 
-  const articleViewToItem = (
-    article: ArticleView,
-  ): QuotationItemRecord | InvoiceItemRecord<Amount> => {
-    const record = {
-      articleId: article.id,
-      articleUnit: article.unit,
-      description: article.description,
-      name: article.name,
-      quantity: 1,
-      unitAmount: article.unitSellingAmount,
-    };
-    return getItemRecord(record);
-  };
+  const articleViewToItem = useCallback(
+    (article: ArticleView): QuotationItemRecord | InvoiceItemRecord<Amount> => {
+      const record = {
+        articleId: article.id,
+        articleUnit: article.unit,
+        description: article.description,
+        name: article.name,
+        quantity: 1,
+        unitAmount: article.unitSellingAmount,
+      };
+      return getItemRecord(record);
+    },
+    [getItemRecord],
+  );
 
   const deleteItem = (
     item: QuotationItemRecord | InvoiceItemRecord<Amount>,
@@ -106,13 +112,7 @@ export const ArticleItemsTable = ({
   };
 
   useEffect(() => {
-    setPercentageVat(
-      user!.userAccount.serviceCompany.settings.percentageVat || 0,
-    );
-  }, []);
-
-  useEffect(() => {
-    if (!!items.length) {
+    if (items.length > 0) {
       const pVat = items[0].unitAmount.percentageVat;
       setPercentageVat(pVat);
     }
@@ -130,11 +130,17 @@ export const ArticleItemsTable = ({
       const temp = partialArticleResource.data[0];
       if (items.length && temp.id !== items[0].articleId) {
         setItems([articleViewToItem(temp)]);
-      } else {
-        setItems([articleViewToItem(temp)]);
       }
     }
-  }, [isPartial]);
+  }, [
+    isPartial,
+    articleViewToItem,
+    items,
+    createPartial,
+    isFetched,
+    setItems,
+    partialArticleResource.data,
+  ]);
 
   const renderHeader = () => (
     <Box
@@ -207,7 +213,7 @@ export const ArticleItemsTable = ({
 
   useEffect(() => {
     if (total === 0) setTotal(totalPrice);
-  }, [totalPrice]);
+  }, [totalPrice, total]);
 
   return (
     <Box mt="1em">
@@ -303,18 +309,6 @@ export const ArticleItemsTable = ({
                           setPercentageVat(Number(e.target.value)),
                       }}
                     />
-                    {/* <Typography
-                    variant="caption"
-                    sx={{color: 'text.secondary', alignSelf: 'end'}}>
-                    {t('VAT')}
-                    {totalPrice
-                      ? ` ${
-                          user!.userAccount.serviceCompany.settings
-                            .percentageVat
-                        }%`
-                      : null}
-                      {console.log(user!.userAccount.serviceCompany.settings, '||||||')}
-                  </Typography> */}
                   </Box>
                   <Typography>
                     {formatCurrency(totalPrice * (percentageVat / 100), {
