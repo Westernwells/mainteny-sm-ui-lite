@@ -105,7 +105,6 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
   const validationSchema = Yup.object().shape({
     subject: Yup.string().required('Subject is required'),
   });
-
   const formik = useFormik({
     initialValues,
     validationSchema,
@@ -447,9 +446,9 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
           invoice
             ? [
                 {
-                  label: t('Save Draft'),
+                  label: t('Save Drafts'),
                   icon: <DraftsIcon />,
-                  onClick: () => formik.handleSubmit,
+                  onClick: () => formik.handleSubmit(),
                 },
                 {
                   label: 'Delete Invoice',
