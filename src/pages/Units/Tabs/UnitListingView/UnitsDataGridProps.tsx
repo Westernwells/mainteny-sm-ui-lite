@@ -9,6 +9,7 @@ import {
   ElevatorAssignmentSimpleView,
   ElevatorView,
 } from '../../../../models/elevator';
+import {Actions} from './Action';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -38,13 +39,14 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'model',
     headerName: 'model',
-    flex: 1.5,
+    cellClassName: 'truncateText',
+    flex: 1,
   }),
   getColumnProps({
     field: 'customer',
     headerName: 'customer',
     cellClassName: 'truncateText',
-    flex: 1.5,
+    flex: 1,
   }),
   getColumnProps({
     field: 'address',
@@ -85,6 +87,13 @@ export const columns: GridColDef[] = [
       />
     ),
   }),
+  getColumnProps({
+    field: 'actions',
+    headerName: 'actions',
+    align: 'center',
+    renderCell: (params) => <Actions id={params.value} />,
+    flex: 0,
+  }),
 ];
 
 const getPriorityTechnician = (assignments: ElevatorAssignmentSimpleView[]) => {
@@ -116,7 +125,8 @@ export const makeRows = (
   elevators.map((elevator: ElevatorView) => ({
     id: elevator.id,
     number: elevator.externalId,
-    model: elevator.model,
+    model: 'this is a very very long model for the elevqtoir',
+    actions: elevator.id,
     customer: elevator.propertyOwner.name,
     LAST_VISIT_DATE: formatDate(elevator.lastVisitDate),
     NEXT_VISIT_DATE: formatDate(elevator.nextVisitDate),

@@ -550,13 +550,14 @@ const deleteElevator = async (elevatorId: string) => {
 
 export const useDeleteElevator = (successMsg?: string) => {
   const {enqueueSnackbar} = useSnackbar();
-  // const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation((elevatorId: string) => deleteElevator(elevatorId), {
     onSuccess: () => {
       if (successMsg) {
         enqueueSnackbar(successMsg, {
           variant: 'success',
         });
+        queryClient.invalidateQueries(queryKeys.fetchAllElevators);
       }
     },
     onError: (err: any) => {
