@@ -540,3 +540,30 @@ export const useDeleteTodo = () => {
     },
   );
 };
+
+const deleteElevator = async (elevatorId: string) => {
+  const response = await axiosClient.delete<StringValue>(
+    `/api/elevators/${elevatorId}`,
+  );
+  return response.data;
+};
+
+export const useDeleteElevator = (successMsg?: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  // const queryClient = useQueryClient();
+  return useMutation((elevatorId: string) => deleteElevator(elevatorId), {
+    onSuccess: () => {
+      if (successMsg) {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+      }
+    },
+    onError: (err: any) => {
+      console.log(err);
+      enqueueSnackbar('An unexpected error occurred, please try again.', {
+        variant: 'error',
+      });
+    },
+  });
+};
