@@ -125,7 +125,7 @@ export const makeRows = (
   elevators.map((elevator: ElevatorView) => ({
     id: elevator.id,
     number: elevator.externalId,
-    model: 'this is a very very long model for the elevqtoir',
+    model: elevator.model,
     actions: elevator.id,
     customer: elevator.propertyOwner.name,
     LAST_VISIT_DATE: formatDate(elevator.lastVisitDate),
