@@ -1,10 +1,16 @@
+import {useSnackbar} from 'hooks/useSnackbar';
 import {
   EmployeeStatusView,
   EmployeesView,
   QueryServiceCompanyEmployeeStatusParams,
 } from 'models/employee';
-import {Resource} from 'models/misc';
-import {useQuery, UseQueryOptions} from 'react-query';
+import {Resource, StringValue} from 'models/misc';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from 'react-query';
 import {queryKeys as qks} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useUserSession} from './useUserSession';
@@ -53,4 +59,32 @@ export const useQueryServiceCompanyEmployeeStatus = (
       ...options,
     },
   );
+};
+
+const deleteEmployee = async (employeeId: string) => {
+  const response = await axiosClient.delete<StringValue>(
+    `/api/users/employees/${employeeId}`,
+  );
+  return response.data;
+};
+
+export const useDeleteEmployee = (successMsg?: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation((elevatorId: string) => deleteEmployee(elevatorId), {
+    onSuccess: () => {
+      if (successMsg) {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+        queryClient.invalidateQueries(qks.queryUserAccounts);
+      }
+    },
+    onError: (err: any) => {
+      console.log(err);
+      enqueueSnackbar('An unexpected error occurred, please try again.', {
+        variant: 'error',
+      });
+    },
+  });
 };
