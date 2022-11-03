@@ -66,7 +66,6 @@ export const Service = ({
   const labels = useRef([
     'lastVisit',
     'lastInspection',
-    'visitsPerYear',
     'requiredTime',
     'numOfTechnicians',
     'unitPriority',

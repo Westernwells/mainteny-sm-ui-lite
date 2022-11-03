@@ -63,19 +63,6 @@ export const EditServiceForm = ({formik}: Props) => {
       <Grid item sm={12}>
         <FormInput
           props={{
-            disabled: true,
-            label: 'Visits per Year',
-            name: 'VisitsPerYear',
-            value: formik.values.visitsPerYear,
-            onChange: formik.handleChange,
-            onBlur: formik.handleBlur,
-          }}
-        />
-      </Grid>
-
-      <Grid item sm={12}>
-        <FormInput
-          props={{
             label: 'Time',
             name: 'serviceTime',
             placeholder: 'In minutes',
