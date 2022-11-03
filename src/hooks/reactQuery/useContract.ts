@@ -186,3 +186,31 @@ export const useCreateContract = (successMsg: string) => {
     },
   });
 };
+
+const deleteContract = async (contractId: string) => {
+  const response = await axiosClient.delete<StringValue>(
+    `/api/contracts/${contractId}`,
+  );
+  return response.data;
+};
+
+export const useDeleteContract = (successMsg?: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation((contractId: string) => deleteContract(contractId), {
+    onSuccess: () => {
+      if (successMsg) {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+        queryClient.invalidateQueries(qk.contracts);
+      }
+    },
+    onError: (err: any) => {
+      console.log(err);
+      enqueueSnackbar('An unexpected error occurred, please try again.', {
+        variant: 'error',
+      });
+    },
+  });
+};

@@ -51,7 +51,11 @@ export const columns: GridColDef[] = [
     headerName: 'actions',
     align: 'center',
     renderCell: (params) => (
-      <Actions url={params.value.url} fileName={params.value.fileName} />
+      <Actions
+        url={params.value.url}
+        fileName={params.value.fileName}
+        contractId={params.value.contractId}
+      />
     ),
     flex: 0,
   }),
@@ -82,6 +86,7 @@ export const makeRows = (
             item?.additionalInfo?.documents?.length > 0
               ? item?.additionalInfo?.documents[0]?.description
               : 'contract',
+          contractId: item.id,
         },
         navigateTo: `details/${item.id}`,
       }))
