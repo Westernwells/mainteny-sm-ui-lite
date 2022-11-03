@@ -56,13 +56,13 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'date',
     headerName: 'invoice date',
-    align: 'center',
+    align: 'left',
     flex: 0.75,
   }),
   getColumnProps({
     field: 'order',
     headerName: 'order number',
-    align: 'center',
+    align: 'left',
     flex: 0.75,
   }),
   getColumnProps({
