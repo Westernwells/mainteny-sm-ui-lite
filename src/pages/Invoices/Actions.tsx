@@ -172,7 +172,7 @@ export const Actions = ({invoice}: Props) => {
           label: t('Edit'),
           icon: <Edit />,
           onClick: () => {
-            navigate(`/invoices/details/${invoice.id}`);
+            navigate(`/invoices/details/${invoice.id}/edit`);
           },
         },
         {

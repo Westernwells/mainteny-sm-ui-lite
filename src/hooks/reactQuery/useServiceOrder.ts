@@ -40,6 +40,7 @@ import {
   CompleteServiceOrder,
   UpdateServiceOrderBody,
   AppointmentConfirmationRequiredOrdersQueryParams,
+  ServiceOrderReport,
 } from '../../models/service-order';
 import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
@@ -220,6 +221,24 @@ export function useServiceOrderReport(
       enabled: !!params.serviceOrderId || !!params.serviceOrderId.length,
       ...options,
     },
+  );
+}
+
+export const fetchServiceOrderWorkReport = async (serviceOrderId: string) => {
+  const response = await axiosClient.get<ServiceOrderReport>(
+    `/api/serviceOrders/${serviceOrderId}/report`,
+  );
+  return response.data;
+};
+
+export function useServiceOrderWorkReport(
+  serviceOrderId: string,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<ServiceOrderReport, RestError>(
+    [queryKeys.fetchServiceOrderWorkReport, serviceOrderId],
+    () => fetchServiceOrderWorkReport(serviceOrderId),
+    {...options},
   );
 }
 
