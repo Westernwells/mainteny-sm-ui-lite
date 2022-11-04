@@ -1,4 +1,4 @@
-import {ReactNode, useState} from 'react';
+import React, {ReactNode, useState} from 'react';
 import Drawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -11,9 +11,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import MoreIcon from '@mui/icons-material/MoreVert';
-import PreviewIcon from '@mui/icons-material/Preview';
 import {useTheme} from '@mui/material';
-import {Button} from 'components/Button';
 import {useTranslation} from 'react-i18next';
 
 interface ListMenu {
@@ -29,7 +27,7 @@ interface Props {
   primaryButtonLabel: string;
   primaryButtonAction: () => void;
   listItems: ListMenu[];
-  showSecondaryButton?: boolean;
+  secondaryButton?: React.ReactNode;
 }
 
 export const BottomDrawer = ({
@@ -38,7 +36,7 @@ export const BottomDrawer = ({
   primaryButtonLabel,
   primaryButtonAction,
   listItems,
-  showSecondaryButton,
+  secondaryButton,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -69,17 +67,7 @@ export const BottomDrawer = ({
         justifyContent="flex-end"
         gap={2}
         sx={{my: 'auto', px: '4em'}}>
-        {showSecondaryButton && (
-          <Button
-            label="preview"
-            buttonProps={{
-              variant: 'outlined',
-              disabled: !isValid,
-              startIcon: <PreviewIcon />,
-              onClick: () => window.open(`/QuotationPDF.pdf`, '_blank'),
-            }}
-          />
-        )}
+        {secondaryButton}
         <ButtonGroup variant="contained">
           <MuiButton
             type="submit"
