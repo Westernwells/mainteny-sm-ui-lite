@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import {endOfYear, startOfYear} from 'date-fns';
 import Box from '@mui/material/Box';
@@ -26,13 +27,19 @@ interface Props {
 export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
-    headerName: 'number',
+    headerName: 'order number',
     align: 'center',
     flex: 0,
   }),
   getColumnProps({
     field: 'customer',
     headerName: 'customer',
+    cellClassName: 'truncateText',
+    flex: 1.5,
+  }),
+  getColumnProps({
+    field: 'address',
+    headerName: 'address',
     cellClassName: 'truncateText',
     flex: 1.5,
   }),
@@ -84,6 +91,7 @@ export const ServiceOrdersDataGrid = ({
   searchCustomer,
   elevatorId,
 }: Props) => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState(searchCustomer || '');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -119,7 +127,9 @@ export const ServiceOrdersDataGrid = ({
   return (
     <>
       <SearchInput
-        placeholder="search"
+        variant="outlined"
+        label="Search"
+        placeholder="Search by number, customer, status etc."
         onValueChanged={(value) => setSearch(value)}
       />
       <Box display="flex" flexGrow={1} sx={styles.scrollBar}>
@@ -140,7 +150,10 @@ export const ServiceOrdersDataGrid = ({
             }))
           }
           noRowsEmptySection={
-            <NoRowsEmptySection placeholder="service order" />
+            <NoRowsEmptySection
+              placeholder="service order"
+              action={() => navigate('/orders/new?type=regular')}
+            />
           }
         />
       </Box>

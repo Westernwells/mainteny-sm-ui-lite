@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
@@ -18,7 +19,7 @@ interface Props {
 export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
-    headerName: 'number',
+    headerName: 'article no.',
     flex: 0,
   }),
   getColumnProps({
@@ -44,7 +45,7 @@ export const columns: GridColDef[] = [
   }),
   getColumnProps({
     field: 'price',
-    headerName: 'price',
+    headerName: 'unit price',
     align: 'right',
   }),
 ];
@@ -74,6 +75,7 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
 const pageSize = 25;
 
 export const ArticlesDataGrid = ({setRowItem}: Props) => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -120,7 +122,8 @@ export const ArticlesDataGrid = ({setRowItem}: Props) => {
   return (
     <>
       <SearchInput
-        placeholder="search"
+        variant="outlined"
+        label="Search"
         onValueChanged={(value) => setSearch(value)}
       />
       <Box display="flex" flexGrow={1} sx={styles.scrollBar}>
@@ -140,7 +143,12 @@ export const ArticlesDataGrid = ({setRowItem}: Props) => {
               pageIndex: value - 1,
             }))
           }
-          noRowsEmptySection={<NoRowsEmptySection placeholder="article" />}
+          noRowsEmptySection={
+            <NoRowsEmptySection
+              placeholder="article"
+              action={() => navigate('/articles/new')}
+            />
+          }
         />
       </Box>
     </>

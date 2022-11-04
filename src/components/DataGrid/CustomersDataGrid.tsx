@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import Box from '@mui/material/Box';
 import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
@@ -16,16 +17,16 @@ interface Props {
 
 export const columns: GridColDef[] = [
   getColumnProps({
-    field: 'number',
-    headerName: 'number',
-    align: 'center',
-    flex: 0,
-  }),
-  getColumnProps({
     field: 'name',
-    headerName: 'name',
+    headerName: 'customer',
     cellClassName: 'truncateText',
     flex: 1.5,
+  }),
+  getColumnProps({
+    field: 'number',
+    headerName: 'customer no.',
+    align: 'center',
+    flex: 0,
   }),
   getColumnProps({
     field: 'address',
@@ -41,7 +42,7 @@ export const columns: GridColDef[] = [
   }),
   getColumnProps({
     field: 'phone',
-    headerName: 'phone',
+    headerName: 'phone no.',
   }),
 ];
 
@@ -62,6 +63,7 @@ export const makeRows = (customers: PropertyOwnerView[]): GridRowsProp =>
 const pageSize = 25;
 
 export const CustomersDataGrid = ({setRowItem}: Props) => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -104,7 +106,9 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
   return (
     <>
       <SearchInput
-        placeholder="search"
+        variant="outlined"
+        label="Search"
+        placeholder="Search by number, name, address etc."
         onValueChanged={(value) => setSearch(value)}
       />
       <Box display="flex" flexGrow={1} sx={styles.scrollBar}>
@@ -124,7 +128,12 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
               pageIndex: value - 1,
             }))
           }
-          noRowsEmptySection={<NoRowsEmptySection placeholder="customer" />}
+          noRowsEmptySection={
+            <NoRowsEmptySection
+              placeholder="customer"
+              action={() => navigate('/customers/new')}
+            />
+          }
         />
       </Box>
     </>
