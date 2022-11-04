@@ -15,6 +15,7 @@ import {CustomerDetails} from 'pages/CustomerDetails';
 import {Invoices} from 'pages/Invoices';
 import {NewInvoice} from 'pages/InvoiceDetails/NewInvoice';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
+import {EditInvoicePage} from 'pages/EditInvoice';
 import {Employees} from 'pages/Employee';
 import {EmployeeDetails} from 'pages/EmployeeDetails';
 import {Quotations} from 'pages/Quotations';
@@ -261,6 +262,23 @@ export const Router = () => {
                   pageScrollable
                   backBtnLabel="Invoice Details">
                   <InvoiceDetails />
+                </PageLayout>
+              </>
+            }
+          />
+
+          <Route
+            path="/invoices/details/:id/edit"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Edit Invoice - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout
+                  showBackAction
+                  pageScrollable
+                  backBtnLabel="Edit Invoice">
+                  <EditInvoicePage />
                 </PageLayout>
               </>
             }

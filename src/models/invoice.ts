@@ -113,6 +113,7 @@ export interface CreateInvoice {
   serviceOrderId?: string;
   shouldSendOut: boolean;
   type: InvoiceType;
+  includeWorkReport?: boolean;
 }
 
 export interface UpdateInvoice {
@@ -125,6 +126,7 @@ export interface UpdateInvoice {
   paymentTerms?: string;
   serviceOrderId?: string;
   type: InvoiceType;
+  includeWorkReport?: boolean;
 }
 
 export interface QueryInvoiceCommentsParams {
