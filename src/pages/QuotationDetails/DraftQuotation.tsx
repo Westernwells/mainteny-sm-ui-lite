@@ -18,10 +18,12 @@ import {FormLabel} from 'components/form/FormLabel';
 import {FormInput} from 'components/form/FormInput';
 import {Confirm} from 'components/Confirm';
 import {StatusChip} from 'components/StatusChip';
+import {SendEmailDialog} from 'components/SendEmailDialog';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateQuotation,
   useDeleteQuotation,
+  usePublishQuotation,
   useUpdateQuotation,
 } from 'hooks/reactQuery/useQuotation';
 import {
@@ -55,9 +57,8 @@ export const DraftQuotation = ({quotation}: Props) => {
   const {mutate: deleteQuotation} = useDeleteQuotation();
 
   const [isDrawerOpen] = useState<boolean>(true);
+  const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  const [publish, setPublish] = useState(false);
 
   const [customer, setCustomer] = useState<
     PropertyOwnerView | PropertyOwnerSimpleView | null
@@ -93,9 +94,8 @@ export const DraftQuotation = ({quotation}: Props) => {
         updateQuotation({
           data: values as UpdateQuotation,
           quotationId: quotation.id,
-          publish,
         });
-      else createNewQuotation({data: values, publish});
+      else createNewQuotation({data: values});
     },
   });
 
@@ -330,20 +330,16 @@ export const DraftQuotation = ({quotation}: Props) => {
       <BottomDrawer
         isOpen={isDrawerOpen}
         primaryButtonLabel={quotation ? 'Send' : 'Save'}
-        primaryButtonAction={() => {
-          setPublish(!!quotation);
-          formik.handleSubmit();
-        }}
+        primaryButtonAction={
+          quotation ? () => setIsSendEmailDialogOpen(true) : formik.handleSubmit
+        }
         listItems={
           quotation
             ? [
                 {
                   label: t('Save Draft'),
                   icon: <DraftsIcon />,
-                  onClick: () => {
-                    setPublish(false);
-                    formik.handleSubmit();
-                  },
+                  onClick: formik.handleSubmit,
                   showBorder: true,
                 },
                 {
@@ -358,10 +354,7 @@ export const DraftQuotation = ({quotation}: Props) => {
                 {
                   label: t('Save & Send'),
                   icon: <DraftsIcon />,
-                  onClick: () => {
-                    setPublish(true);
-                    formik.handleSubmit();
-                  },
+                  onClick: formik.handleSubmit,
                 },
                 {
                   label: 'Discard',
@@ -380,6 +373,13 @@ export const DraftQuotation = ({quotation}: Props) => {
             unit !== null
           )
         }
+      />
+      <SendEmailDialog
+        open={isSendEmailDialogOpen}
+        onConfirm={() => setIsSendEmailDialogOpen(false)}
+        onClose={() => setIsSendEmailDialogOpen(false)}
+        id={quotation?.id ?? ''}
+        submitHook={usePublishQuotation}
       />
       <Confirm
         open={isDeleteDialogOpen}

@@ -7,17 +7,18 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import {InvoiceView} from 'models/invoice';
 import {SimpleEmailRecord} from 'models/misc';
 import {usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {Button} from 'components/Button';
 import {FormInput} from 'components/form/FormInput';
+import {usePublishQuotation} from 'hooks/reactQuery/useQuotation';
 
 interface Props {
   open: boolean;
   onConfirm: () => void;
   onClose: () => void;
-  invoice: InvoiceView;
+  submitHook: typeof usePublishInvoice | typeof usePublishQuotation;
+  id: string;
 }
 
 const validationSchema = Yup.object().shape({
@@ -28,9 +29,15 @@ const validationSchema = Yup.object().shape({
   content: Yup.string().required('Content is required'),
 });
 
-export const SendEmailDialog = ({open, onConfirm, onClose, invoice}: Props) => {
+export const SendEmailDialog = ({
+  open,
+  onConfirm,
+  onClose,
+  submitHook,
+  id,
+}: Props) => {
   const {t} = useTranslation();
-  const {mutate: publishInvoice} = usePublishInvoice();
+  const {mutate: publish} = submitHook();
   const formik = useFormik<SimpleEmailRecord>({
     initialValues: {
       email: '',
@@ -38,9 +45,9 @@ export const SendEmailDialog = ({open, onConfirm, onClose, invoice}: Props) => {
       content: '',
     },
     onSubmit: (values, {setSubmitting}) => {
-      publishInvoice(
+      publish(
         {
-          invoiceId: invoice.id,
+          id,
           body: {
             email: values.email,
             subject: values.subject,

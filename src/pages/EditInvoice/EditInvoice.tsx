@@ -29,7 +29,11 @@ import {FormCheckbox} from 'components/form/FormCheckbox';
 import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {useDeleteInvoice, useUpdateInvoice} from 'hooks/reactQuery/useInvoice';
+import {
+  useDeleteInvoice,
+  usePublishInvoice,
+  useUpdateInvoice,
+} from 'hooks/reactQuery/useInvoice';
 import {
   CreateInvoice,
   UpdateInvoice,
@@ -604,13 +608,14 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
         }
       />
       <SendEmailDialog
-        invoice={invoice}
         open={isSendEmailDialogOpen}
         onConfirm={() => {
           onSave(formik.values);
           setIsSendEmailDialogOpen(false);
         }}
         onClose={() => setIsSendEmailDialogOpen(false)}
+        id={invoice.id}
+        submitHook={usePublishInvoice}
       />
       <Confirm
         open={isDeleteDialogOpen}
