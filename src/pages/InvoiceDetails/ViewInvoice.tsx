@@ -30,6 +30,7 @@ import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
 import {
   useDeleteInvoice,
   useInvoicePaymentStatus,
+  usePublishInvoice,
 } from 'hooks/reactQuery/useInvoice';
 import {
   getServiceOrderStatusColor,
@@ -304,10 +305,11 @@ export const ViewInvoice = ({downloadUrl, invoice, workReport}: Props) => {
         isValid={!!downloadUrl.length}
       />
       <SendEmailDialog
-        invoice={invoice}
         open={isSendEmailDialogOpen}
         onConfirm={() => setIsSendEmailDialogOpen(false)}
         onClose={() => setIsSendEmailDialogOpen(false)}
+        id={invoice.id}
+        submitHook={usePublishInvoice}
       />
 
       <MarkAsPaidDialog

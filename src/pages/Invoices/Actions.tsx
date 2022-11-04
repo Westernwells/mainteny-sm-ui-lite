@@ -22,7 +22,7 @@ import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import {Confirm} from 'components/Confirm';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
-import {useDeleteInvoice} from 'hooks/reactQuery/useInvoice';
+import {useDeleteInvoice, usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {InvoiceStatus, InvoiceView} from 'models/invoice';
 import {PdfGenerationStatus} from 'models/misc';
@@ -237,10 +237,11 @@ export const Actions = ({invoice}: Props) => {
       />
 
       <SendEmailDialog
-        invoice={invoice}
         open={isSendEmailDialogOpen}
         onConfirm={() => setIsSendEmailDialogOpen(false)}
         onClose={() => setIsSendEmailDialogOpen(false)}
+        id={invoice.id}
+        submitHook={usePublishInvoice}
       />
 
       <Confirm

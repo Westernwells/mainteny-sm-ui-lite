@@ -10,7 +10,7 @@ import {
 import {useSnackbar} from 'hooks/useSnackbar';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {useNavigate} from 'react-router-dom';
-import {Resource, RestError} from 'models/misc';
+import {Resource, RestError, SimpleEmailRecord} from 'models/misc';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
   CreateQuotation,
@@ -93,8 +93,11 @@ export function useQuotationDetails(
   );
 }
 
-export const postPublishQuotation = async (id: string) => {
-  await axiosClient.post(`api/quotations/${id}/publish`);
+export const postPublishQuotation = async (
+  id: string,
+  body: SimpleEmailRecord,
+) => {
+  await axiosClient.post(`api/quotations/${id}/publish`, body);
 };
 
 export const usePublishQuotation = () => {
@@ -103,15 +106,16 @@ export const usePublishQuotation = () => {
   const navigate = useNavigate();
 
   return useMutation(
-    (quotationId: string) => postPublishQuotation(quotationId),
+    ({id, body}: {id: string; body: SimpleEmailRecord}) =>
+      postPublishQuotation(id, body),
     {
-      onSuccess: (_, quotationId) => {
+      onSuccess: (_, {id}) => {
         queryClient.invalidateQueries([qk.fetchQuotations]);
         queryClient.invalidateQueries([qk.quotationById]);
         enqueueSnackbar(`Quotation sent successfully`, {
           variant: 'success',
         });
-        navigate(`/quotations/details/${quotationId}`);
+        navigate(`/quotations/details/${id}`);
       },
       onError: (err) => {
         console.log(err);
@@ -154,89 +158,61 @@ export const useReplyQuotation = () => {
   );
 };
 
-export const postQuotation = async (
-  body: CreateQuotation,
-  publish: boolean,
-) => {
+export const postQuotation = async (body: CreateQuotation) => {
   const {data} = await axiosClient.post<{value: string}>(
     'api/quotations',
     body,
   );
-  return {data, publish};
+  return data;
 };
 
 export const useCreateQuotation = () => {
   const queryClient = useQueryClient();
   const {enqueueSnackbar} = useSnackbar();
   const navigate = useNavigate();
-  const {mutate: publishQuotation} = usePublishQuotation();
 
-  return useMutation(
-    ({data, publish}: {data: CreateQuotation; publish: boolean}) =>
-      postQuotation(data, publish),
-    {
-      onSuccess: ({data, publish}, variables) => {
-        queryClient.invalidateQueries([qk.fetchQuotations]);
-        queryClient.invalidateQueries([qk.quotationById]);
-        enqueueSnackbar(`Quotation created successfully`, {
-          variant: 'success',
-        });
-        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_QUOTATION_CREATED, {
-          quotationId: data.value,
-          elevatorId: variables.data.elevatorId,
-          amountWithoutVat: getTotalFromArticles(variables.data.items),
-          amountWithVat: getTotalWithVatFromArticles(variables.data.items),
-        });
-        if (publish) {
-          publishQuotation(data.value);
-        } else {
-          navigate('/quotations?pageIndex=1&pageSize=25');
-        }
-      },
-      onError: (err) => {
-        console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
-      },
+  return useMutation(({data}: {data: CreateQuotation}) => postQuotation(data), {
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries([qk.fetchQuotations]);
+      queryClient.invalidateQueries([qk.quotationById]);
+      enqueueSnackbar(`Quotation created successfully`, {
+        variant: 'success',
+      });
+      Mixpanel.identifyAndTrack(mixpanelEvents.NEW_QUOTATION_CREATED, {
+        quotationId: data.value,
+        elevatorId: variables.data.elevatorId,
+        amountWithoutVat: getTotalFromArticles(variables.data.items),
+        amountWithVat: getTotalWithVatFromArticles(variables.data.items),
+      });
+      navigate(`/quotations/details/${data.value}`);
     },
-  );
+    onError: (err) => {
+      console.log(err);
+      enqueueSnackbar('An unexpected error occurred, please try again.', {
+        variant: 'error',
+      });
+    },
+  });
 };
 
-export const putQuotation = async (
-  body: UpdateQuotation,
-  id: string,
-  publish: boolean,
-) => {
+export const putQuotation = async (body: UpdateQuotation, id: string) => {
   await axiosClient.put(`api/quotations/${id}`, body);
-  return publish;
 };
 
 export const useUpdateQuotation = () => {
   const queryClient = useQueryClient();
   const {enqueueSnackbar} = useSnackbar();
-  const {mutate: publishQuotation} = usePublishQuotation();
 
   return useMutation(
-    ({
-      data,
-      quotationId,
-      publish,
-    }: {
-      data: UpdateQuotation;
-      quotationId: string;
-      publish: boolean;
-    }) => putQuotation(data, quotationId, publish),
+    ({data, quotationId}: {data: UpdateQuotation; quotationId: string}) =>
+      putQuotation(data, quotationId),
     {
-      onSuccess: (_, {publish, quotationId}) => {
+      onSuccess: () => {
         queryClient.invalidateQueries([qk.fetchQuotations]);
         queryClient.invalidateQueries([qk.quotationById]);
         enqueueSnackbar(`Quotation updated successfully`, {
           variant: 'success',
         });
-        if (publish) {
-          publishQuotation(quotationId);
-        }
       },
       onError: (err) => {
         console.log(err);

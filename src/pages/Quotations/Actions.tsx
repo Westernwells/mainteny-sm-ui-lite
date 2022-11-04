@@ -7,6 +7,7 @@ import SendIcon from '@mui/icons-material/Send';
 import ReplayIcon from '@mui/icons-material/Replay';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {Confirm} from 'components/Confirm';
+import {SendEmailDialog} from 'components/SendEmailDialog';
 import {
   useDeleteQuotation,
   usePublishQuotation,
@@ -25,13 +26,13 @@ interface Props {
 export const Actions = ({quotation}: Props) => {
   const {user} = useUserSession();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const {data: downloadUrl} = useDownloadUrl(
     quotation ? [quotation!.additionalInfo.pdfPath] : [],
   );
   const {mutate: markAsAccepted} = useReplyQuotation();
-  const {mutate: sendQuotation} = usePublishQuotation();
   const {mutate: deleteQuotation} = useDeleteQuotation();
 
   return (
@@ -65,20 +66,14 @@ export const Actions = ({quotation}: Props) => {
             }}>
             <DeleteIcon fontSize="small" sx={{color: 'action.active'}} />
           </IconButton>
-          <IconButton
-            onClick={() => {
-              if (quotation.id) sendQuotation(quotation.id);
-            }}>
+          <IconButton onClick={() => setIsSendEmailDialogOpen(true)}>
             <SendIcon fontSize="small" sx={{color: 'action.active'}} />
           </IconButton>
         </>
       )}
       {quotation.status === QuotationStatus.SENT_TO_CLIENT && (
         <>
-          <IconButton
-            onClick={() => {
-              if (quotation.id) sendQuotation(quotation.id);
-            }}>
+          <IconButton onClick={() => setIsSendEmailDialogOpen(true)}>
             <ReplayIcon fontSize="small" sx={{color: 'action.active'}} />
           </IconButton>
           <IconButton onClick={() => setIsDialogOpen(true)}>
@@ -105,6 +100,13 @@ export const Actions = ({quotation}: Props) => {
         title="Mark as accepted"
         content="Do you want to mark this quotation as accepted?"
         helperText="This action is irreversible."
+      />
+      <SendEmailDialog
+        open={isSendEmailDialogOpen}
+        onConfirm={() => setIsSendEmailDialogOpen(false)}
+        onClose={() => setIsSendEmailDialogOpen(false)}
+        id={quotation.id}
+        submitHook={usePublishQuotation}
       />
       <Confirm
         open={isDeleteDialogOpen}

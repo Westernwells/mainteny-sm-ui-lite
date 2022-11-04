@@ -131,16 +131,16 @@ export const usePublishInvoice = () => {
   const navigate = useNavigate();
 
   return useMutation(
-    ({invoiceId, body}: {invoiceId: string; body: SimpleEmailRecord}) =>
-      postPublishInvoice(invoiceId, body),
+    ({id, body}: {id: string; body: SimpleEmailRecord}) =>
+      postPublishInvoice(id, body),
     {
-      onSuccess: (__, {invoiceId}) => {
+      onSuccess: (__, {id}) => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
         enqueueSnackbar(`Invoice sent successfully`, {
           variant: 'success',
         });
-        navigate(`/invoices/details/${invoiceId}`);
+        navigate(`/invoices/details/${id}`);
       },
       onError: (err) => {
         console.log(err);
