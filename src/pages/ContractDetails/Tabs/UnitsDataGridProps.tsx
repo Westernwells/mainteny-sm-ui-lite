@@ -61,7 +61,7 @@ export const makeRows = (
     elevators.length &&
     elevators.map((elevator: ElevatorView, index: number) => ({
       id: index,
-      number: elevator.number,
+      number: elevator.externalId,
       model: elevator.model,
       lastVisit: formatDate(elevator.lastVisitDate),
       nextVisit: formatDate(elevator.nextVisitDate),

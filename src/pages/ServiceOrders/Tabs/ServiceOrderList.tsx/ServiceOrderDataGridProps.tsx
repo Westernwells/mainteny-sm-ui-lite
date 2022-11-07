@@ -84,7 +84,7 @@ export const makeRows = (
 ): GridRowsProp =>
   serviceOrders.map((item: ServiceOrderView, index: number) => ({
     id: index,
-    number: item.number,
+    number: item.externalId,
     type: item.type,
     customer: item.elevator.propertyOwner.name,
     address: item.elevator.address.fullName || '-',
