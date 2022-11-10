@@ -22,7 +22,7 @@ export const getQuotationStatusStyles = (
 } => {
   switch (status) {
     case QuotationStatus.ACCEPTED:
-      return {label: 'Accepted', color: 'primary'};
+      return {label: 'Accepted', color: 'warning'};
     case QuotationStatus.DRAFT:
       return {label: 'Draft', color: 'action.active'};
     case QuotationStatus.REJECTED:
@@ -40,12 +40,6 @@ export const columns: GridColDef[] = [
     headerName: 'number',
     align: 'left',
     flex: 0.75,
-  }),
-  getColumnProps({
-    field: 'subject',
-    headerName: 'subject',
-    cellClassName: 'truncateText',
-    flex: 1.5,
   }),
   getColumnProps({
     field: 'customer',
@@ -108,7 +102,6 @@ export const makeRows = (
   quotations &&
   quotations.data.map((item: QuotationView, index: number) => ({
     id: index,
-    subject: item.subject,
     quotationId: item.id,
     number: item.number,
     customer: item.elevator.propertyOwner.name,
