@@ -1,11 +1,22 @@
+import {useMemo, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import FileDownloadOffOutlinedIcon from '@mui/icons-material/FileDownloadOffOutlined';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
+import MoreIcon from '@mui/icons-material/MoreVert';
+import Edit from '@mui/icons-material/Edit';
+import CopyAll from '@mui/icons-material/CopyAll';
 import CheckIcon from '@mui/icons-material/Check';
 import SendIcon from '@mui/icons-material/Send';
 import ReplayIcon from '@mui/icons-material/Replay';
 import DeleteIcon from '@mui/icons-material/Delete';
+import FileDownload from '@mui/icons-material/FileDownload';
 import {Confirm} from 'components/Confirm';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {
@@ -17,17 +28,20 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {QuotationStatus, QuotationView} from 'models/quotation';
 import {PdfGenerationStatus} from 'models/misc';
-import {useState} from 'react';
 
 interface Props {
   quotation: QuotationView;
 }
 
 export const Actions = ({quotation}: Props) => {
+  const {t} = useTranslation();
+  const navigate = useNavigate();
   const {user} = useUserSession();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
 
   const {data: downloadUrl} = useDownloadUrl(
     quotation ? [quotation!.additionalInfo.pdfPath] : [],
@@ -35,52 +49,125 @@ export const Actions = ({quotation}: Props) => {
   const {mutate: markAsAccepted} = useReplyQuotation();
   const {mutate: deleteQuotation} = useDeleteQuotation();
 
+  const isPDFGenerated =
+    quotation.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
+    downloadUrl;
+
+  const handleClick = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const actions = useMemo(() => {
+    const items = [];
+
+    if (quotation.status === QuotationStatus.DRAFT) {
+      items.unshift(
+        ...[
+          {
+            label: t('Send'),
+            icon: <SendIcon />,
+            onClick: () => setIsSendEmailDialogOpen(true),
+          },
+          {
+            label: t('Delete'),
+            icon: <DeleteIcon />,
+            onClick: () => setIsDeleteDialogOpen(true),
+          },
+        ],
+      );
+    } else if (quotation.status === QuotationStatus.SENT_TO_CLIENT) {
+      items.unshift({
+        label: t('Resend'),
+        icon: <ReplayIcon />,
+        onClick: () => setIsSendEmailDialogOpen(true),
+      });
+    }
+
+    if (
+      quotation.status === QuotationStatus.DRAFT ||
+      quotation.status === QuotationStatus.SENT_TO_CLIENT
+    ) {
+      items.unshift({
+        label: t('Mark Accepted'),
+        icon: <CheckIcon />,
+        onClick: () => setIsDialogOpen(true),
+      });
+    }
+
+    items.push(
+      ...[
+        {
+          label: t('Duplicate'),
+          icon: <CopyAll />,
+          onClick: () => {
+            // TODO: handle duplicate
+          },
+        },
+        ...(isPDFGenerated
+          ? [
+              {
+                label: t('Download'),
+                icon: <FileDownload />,
+                onClick: () =>
+                  downloadUrl &&
+                  window.open(`${Object.values(downloadUrl)[0]}`, '_blank'),
+              },
+            ]
+          : []),
+      ],
+    );
+    return items;
+  }, [downloadUrl]);
+
   return (
     <Box>
-      {quotation.status !== QuotationStatus.DRAFT &&
-        (quotation!.additionalInfo.pdfGenerationStatus ===
-          PdfGenerationStatus.DONE && downloadUrl ? (
-          <IconButton
-            onClick={() =>
-              window.open(`${Object.values(downloadUrl)[0]}`, '_blank')
-            }>
-            <FileDownloadOutlinedIcon
-              fontSize="small"
-              sx={{color: 'action.active'}}
-            />
-          </IconButton>
-        ) : (
-          <IconButton disabled>
-            <FileDownloadOffOutlinedIcon
-              fontSize="small"
-              sx={{color: 'action.active', cursor: 'not-allowed'}}
-            />
-          </IconButton>
-        ))}
+      <IconButton
+        onClick={() => navigate(`/quotations/details/${quotation.id}/edit`)}
+        disabled={quotation.status === QuotationStatus.SENT_TO_CLIENT}
+        sx={{color: 'action.active'}}>
+        <Edit fontSize="small" />
+      </IconButton>
 
-      {quotation.status === QuotationStatus.DRAFT && (
-        <>
-          <IconButton
-            onClick={() => {
-              setIsDeleteDialogOpen(true);
-            }}>
-            <DeleteIcon fontSize="small" sx={{color: 'action.active'}} />
-          </IconButton>
-          <IconButton onClick={() => setIsSendEmailDialogOpen(true)}>
-            <SendIcon fontSize="small" sx={{color: 'action.active'}} />
-          </IconButton>
-        </>
-      )}
-      {quotation.status === QuotationStatus.SENT_TO_CLIENT && (
-        <>
-          <IconButton onClick={() => setIsSendEmailDialogOpen(true)}>
-            <ReplayIcon fontSize="small" sx={{color: 'action.active'}} />
-          </IconButton>
-          <IconButton onClick={() => setIsDialogOpen(true)}>
-            <CheckIcon fontSize="small" sx={{color: 'action.active'}} />
-          </IconButton>
-        </>
-      )}
+      <IconButton onClick={handleClick}>
+        <MoreIcon fontSize="small" sx={{color: 'action.active'}} />
+      </IconButton>
+      <Menu
+        id="actions-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          'aria-labelledby': 'actions-button',
+        }}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}>
+        {actions.map((item, index) => (
+          <Box key={`${item.label}-${index}`}>
+            <MenuItem
+              onClick={() => {
+                item.onClick();
+                handleClose();
+              }}>
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText>
+                <Typography variant="body2">{item.label}</Typography>
+              </ListItemText>
+            </MenuItem>
+            {actions[actions.length - 1] !== item && <Divider />}
+          </Box>
+        ))}
+      </Menu>
+
       <Confirm
         open={isDialogOpen}
         onConfirm={() => {
