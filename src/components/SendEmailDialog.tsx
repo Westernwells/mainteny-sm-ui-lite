@@ -7,6 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import Tooltip from '@mui/material/Tooltip';
 import {SimpleEmailRecord} from 'models/misc';
 import {usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {Button} from 'components/Button';
@@ -19,6 +20,7 @@ interface Props {
   onClose: () => void;
   submitHook: typeof usePublishInvoice | typeof usePublishQuotation;
   id: string;
+  confirmBtnDisabled: boolean;
 }
 
 const validationSchema = Yup.object().shape({
@@ -35,6 +37,7 @@ export const SendEmailDialog = ({
   onClose,
   submitHook,
   id,
+  confirmBtnDisabled,
 }: Props) => {
   const {t} = useTranslation();
   const {mutate: publish} = submitHook();
@@ -146,16 +149,25 @@ export const SendEmailDialog = ({
           <Typography variant="subtitle2">{t('Cancel')}</Typography>
         </Button>
 
-        <Button
-          buttonProps={{
-            size: 'medium',
-            variant: 'contained',
-            autoFocus: true,
-            disabled: formik.isSubmitting,
-            onClick: () => formik.handleSubmit(),
-          }}>
-          <Typography variant="subtitle2">{t('Send email')}</Typography>
-        </Button>
+        <Tooltip
+          title={
+            confirmBtnDisabled ? t('The PDF is not generated yet.') : t('Send')
+          }
+          placement="left"
+          arrow>
+          <span>
+            <Button
+              buttonProps={{
+                size: 'medium',
+                variant: 'contained',
+                autoFocus: true,
+                disabled: formik.isSubmitting || confirmBtnDisabled,
+                onClick: () => formik.handleSubmit(),
+              }}>
+              <Typography variant="subtitle2">{t('Send email')}</Typography>
+            </Button>
+          </span>
+        </Tooltip>
       </DialogActions>
     </Dialog>
   );

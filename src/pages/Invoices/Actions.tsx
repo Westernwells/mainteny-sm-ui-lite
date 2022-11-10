@@ -242,6 +242,7 @@ export const Actions = ({invoice}: Props) => {
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={invoice.id}
         submitHook={usePublishInvoice}
+        confirmBtnDisabled={!isPDFGenerated}
       />
 
       <Confirm

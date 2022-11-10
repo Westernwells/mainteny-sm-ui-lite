@@ -37,7 +37,7 @@ import {
   PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from 'models/propertyManager';
-import {WithOptional} from 'models/misc';
+import {PdfGenerationStatus, WithOptional} from 'models/misc';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {Notes} from './Notes';
 
@@ -69,6 +69,8 @@ export const DraftQuotation = ({quotation}: Props) => {
   const [quotationItems, setQuotationItems] = useState<QuotationItemRecord[]>(
     [],
   );
+  const isPDFGenerated =
+    quotation?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE;
 
   const initialValues: CreateQuotation = {
     subject: '',
@@ -380,6 +382,7 @@ export const DraftQuotation = ({quotation}: Props) => {
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={quotation?.id ?? ''}
         submitHook={usePublishQuotation}
+        confirmBtnDisabled={!isPDFGenerated}
       />
       <Confirm
         open={isDeleteDialogOpen}

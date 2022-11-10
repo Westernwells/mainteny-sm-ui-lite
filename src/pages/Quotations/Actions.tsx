@@ -194,6 +194,7 @@ export const Actions = ({quotation}: Props) => {
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={quotation.id}
         submitHook={usePublishQuotation}
+        confirmBtnDisabled={!isPDFGenerated}
       />
       <Confirm
         open={isDeleteDialogOpen}
