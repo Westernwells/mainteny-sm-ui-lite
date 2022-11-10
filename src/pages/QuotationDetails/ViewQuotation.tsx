@@ -1,10 +1,12 @@
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useFormik} from 'formik';
+import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {Button} from 'components/Button';
 import {StatusChip} from 'components/StatusChip';
 import {PageCard} from 'components/PageCard';
@@ -32,6 +34,7 @@ interface Props {
 
 export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
   const {t} = useTranslation();
+  const theme = useTheme();
   const {user} = useUserSession();
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -83,6 +86,10 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
                   label="Download Quotation"
                   buttonProps={{
                     variant: 'outlined',
+                    size: 'medium',
+                    sx: {
+                      background: 'transparent',
+                    },
                     onClick: () => window.open(`${downloadUrl}`, '_blank'),
                     disabled:
                       quotation!.additionalInfo.pdfGenerationStatus !==
@@ -137,7 +144,29 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
               gap: '1em',
               alignItems: 'center',
               flexDirection: 'column',
-            }}>
+              mx: 0,
+              pt: '0.5rem',
+            }}
+            headerStyles={{
+              mx: 0,
+              px: '1rem',
+            }}
+            headerActionIcon={
+              quotation.additionalInfo &&
+              'serviceOrderIds' in quotation.additionalInfo ? (
+                <OpenInNewIcon
+                  fontSize="small"
+                  sx={{color: theme.palette.secondary.dark}}
+                />
+              ) : undefined
+            }
+            handleAction={() =>
+              navigate(
+                `/orders/details/${
+                  quotation?.additionalInfo?.serviceOrderIds?.[0] ?? ''
+                }`,
+              )
+            }>
             {quotation.additionalInfo &&
             'serviceOrderIds' in quotation.additionalInfo ? (
               <ServiceOrderDetails
@@ -157,6 +186,9 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
                   buttonProps={{
                     variant: 'outlined',
                     size: 'small',
+                    sx: {
+                      background: 'transparent',
+                    },
                     onClick: () => setIsOrderDialogOpen(true),
                   }}
                 />

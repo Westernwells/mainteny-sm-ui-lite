@@ -21,6 +21,7 @@ import {EmployeeDetails} from 'pages/EmployeeDetails';
 import {Quotations} from 'pages/Quotations';
 import {DraftQuotation} from 'pages/QuotationDetails/DraftQuotation';
 import {QuotationDetails} from 'pages/QuotationDetails';
+import {EditQuotationPage} from 'pages/EditQuotation';
 import {Notifications} from 'pages/Notifications';
 import {PageNotFound} from 'pages/PageNotFound';
 import {Dashboard} from 'pages/Dashboard';
@@ -418,6 +419,23 @@ export const Router = () => {
                   backBtnLabel="Quotation Details"
                   showBackAction>
                   <QuotationDetails />
+                </PageLayout>
+              </>
+            }
+          />
+
+          <Route
+            path="/quotations/details/:id/edit"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Edit Quotation - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout
+                  pageScrollable
+                  backBtnLabel="Edit Quotation"
+                  showBackAction>
+                  <EditQuotationPage />
                 </PageLayout>
               </>
             }

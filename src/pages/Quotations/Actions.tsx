@@ -127,7 +127,7 @@ export const Actions = ({quotation}: Props) => {
     <Box>
       <IconButton
         onClick={() => navigate(`/quotations/details/${quotation.id}/edit`)}
-        disabled={quotation.status === QuotationStatus.SENT_TO_CLIENT}
+        disabled={quotation.status !== QuotationStatus.DRAFT}
         sx={{color: 'action.active'}}>
         <Edit fontSize="small" />
       </IconButton>
