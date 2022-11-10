@@ -104,7 +104,7 @@ export const Actions = ({quotation}: Props) => {
           label: t('Duplicate'),
           icon: <CopyAll />,
           onClick: () => {
-            // TODO: handle duplicate
+            navigate(`/quotations/new?id=${quotation.id}`);
           },
         },
         ...(isPDFGenerated
