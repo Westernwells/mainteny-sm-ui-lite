@@ -53,6 +53,8 @@ export function multipleAmount(amount: Amount, quantity: number): Amount {
 export const Currencies: StringMap<number> = {
   EUR: 2,
   USD: 2,
+  GBP: 2,
+  JPY: 0,
 };
 
 export function getCurrencyFractionDigits(currency: string) {
@@ -113,6 +115,7 @@ export function amountForView(amount: Amount): Amount {
 export const getCurrencySymbol: {[key: string]: string} = {
   USD: '$',
   EUR: '€',
+  GBP: '£',
   CNY: '¥',
   JPY: '¥',
 };
