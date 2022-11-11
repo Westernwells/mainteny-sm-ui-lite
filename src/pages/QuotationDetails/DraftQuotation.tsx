@@ -1,6 +1,6 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import Typography from '@mui/material/Typography';
@@ -19,11 +19,13 @@ import {FormInput} from 'components/form/FormInput';
 import {Confirm} from 'components/Confirm';
 import {StatusChip} from 'components/StatusChip';
 import {SendEmailDialog} from 'components/SendEmailDialog';
+import {Progress} from 'components/Progress';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateQuotation,
   useDeleteQuotation,
   usePublishQuotation,
+  useQuotationDetails,
   useUpdateQuotation,
 } from 'hooks/reactQuery/useQuotation';
 import {
@@ -37,7 +39,7 @@ import {
   PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from 'models/propertyManager';
-import {WithOptional} from 'models/misc';
+import {PdfGenerationStatus, WithOptional} from 'models/misc';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {Notes} from './Notes';
 
@@ -45,13 +47,22 @@ interface Props {
   quotation?: QuotationView;
 }
 
-export const DraftQuotation = ({quotation}: Props) => {
+export const DraftQuotation = ({quotation: quotationFromProps}: Props) => {
+  const [queryParams] = useSearchParams();
+  const currentParams = Object.fromEntries([...queryParams]);
   const formatDate = useFormatDate();
   const {t} = useTranslation();
   const navigate = useNavigate();
 
   const {user} = useUserSession();
 
+  const {data: quotationFromAPI, isLoading} = useQuotationDetails(
+    currentParams?.id,
+    {
+      enabled: !!currentParams?.id,
+    },
+  );
+  const quotation = quotationFromProps || quotationFromAPI;
   const {mutate: createNewQuotation} = useCreateQuotation();
   const {mutate: updateQuotation} = useUpdateQuotation();
   const {mutate: deleteQuotation} = useDeleteQuotation();
@@ -69,6 +80,8 @@ export const DraftQuotation = ({quotation}: Props) => {
   const [quotationItems, setQuotationItems] = useState<QuotationItemRecord[]>(
     [],
   );
+  const isPDFGenerated =
+    quotation?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE;
 
   const initialValues: CreateQuotation = {
     subject: '',
@@ -90,7 +103,7 @@ export const DraftQuotation = ({quotation}: Props) => {
       if (!values.description.length) values.description = ' ';
       if (!values.moreInfo.length) values.moreInfo = ' ';
 
-      if (quotation)
+      if (quotation && !currentParams.id)
         updateQuotation({
           data: values as UpdateQuotation,
           quotationId: quotation.id,
@@ -161,11 +174,13 @@ export const DraftQuotation = ({quotation}: Props) => {
     );
   }, [quotationItems]);
 
-  // console.log(quotationItems, '****************+++++>>');
+  if (isLoading) {
+    return <Progress />;
+  }
 
   return (
     <Box>
-      {quotation && (
+      {quotation && !currentParams.id && (
         <Box
           display="flex"
           alignItems="flex-end"
@@ -307,7 +322,7 @@ export const DraftQuotation = ({quotation}: Props) => {
         ))}
 
         <ArticleItemsTable
-          items={useMemo(() => quotationItems, [quotationItems])}
+          items={quotationItems}
           setItems={setQuotationItems}
         />
 
@@ -329,12 +344,14 @@ export const DraftQuotation = ({quotation}: Props) => {
 
       <BottomDrawer
         isOpen={isDrawerOpen}
-        primaryButtonLabel={quotation ? 'Send' : 'Save'}
+        primaryButtonLabel={quotation && !currentParams.id ? 'Send' : 'Save'}
         primaryButtonAction={
-          quotation ? () => setIsSendEmailDialogOpen(true) : formik.handleSubmit
+          quotation && !currentParams.id
+            ? () => setIsSendEmailDialogOpen(true)
+            : formik.handleSubmit
         }
         listItems={
-          quotation
+          quotation && !currentParams.id
             ? [
                 {
                   label: t('Save Draft'),
@@ -380,6 +397,7 @@ export const DraftQuotation = ({quotation}: Props) => {
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={quotation?.id ?? ''}
         submitHook={usePublishQuotation}
+        confirmBtnDisabled={!isPDFGenerated}
       />
       <Confirm
         open={isDeleteDialogOpen}

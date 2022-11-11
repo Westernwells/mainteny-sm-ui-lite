@@ -616,6 +616,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={invoice.id}
         submitHook={usePublishInvoice}
+        confirmBtnDisabled={!isPDFGenerated}
       />
       <Confirm
         open={isDeleteDialogOpen}
