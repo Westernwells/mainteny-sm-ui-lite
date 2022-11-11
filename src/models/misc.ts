@@ -27,6 +27,12 @@ export interface Meta {
   state: State;
 }
 
+export interface Currency {
+  code: string;
+  fractionDigits: number;
+  symbol: string;
+}
+
 export interface Settings {
   nightlyShuffleEnabled: boolean;
   isNightlyShuffleEnabled: boolean;
@@ -46,6 +52,7 @@ export interface Settings {
   whiteLabel: {
     logoPath: string;
   };
+  currencies: Currency[];
 }
 
 export interface Page {

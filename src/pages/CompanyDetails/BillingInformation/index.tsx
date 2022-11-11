@@ -40,6 +40,7 @@ export const BillingInformation = ({containerStyles, company}: Props) => {
     initialValues: {
       vatId: company?.settings?.vatId || '',
       percentageVat: company?.settings?.percentageVat || 0,
+      currencies: [company?.settings?.currencies?.[0]?.code || ''],
     },
     onSubmit: () => {},
     validationSchema,
@@ -50,6 +51,7 @@ export const BillingInformation = ({containerStyles, company}: Props) => {
       body: {
         vatId: formik.values.vatId,
         percentageVat: formik.values.percentageVat,
+        currencies: formik.values.currencies,
       },
       companyId: company?.id || '',
     });
@@ -57,7 +59,7 @@ export const BillingInformation = ({containerStyles, company}: Props) => {
     setOpenDialog(false);
   };
 
-  const labels = useRef(['vatId', 'percentageVat']).current;
+  const labels = useRef(['vatId', 'percentageVat', 'currencies']).current;
 
   useEffect(() => {
     formik.validateForm();
