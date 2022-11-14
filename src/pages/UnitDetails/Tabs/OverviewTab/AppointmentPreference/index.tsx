@@ -134,7 +134,15 @@ export const AppointmentPreference = ({
           <CardProps
             icon={<PermContactCalendar sx={{color: theme.palette.info.dark}} />}
             label="DAYS OF THE WEEK"
-            bodyText={parsedData.daysOfWeek.join(', ')}
+            bodyText={
+              parsedData.daysOfWeek
+                ? parsedData.daysOfWeek
+                    .map((s) =>
+                      t(`${s[0].toUpperCase()}${s.slice(1).toLowerCase()}`),
+                    )
+                    .join(', ')
+                : '-'
+            }
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
