@@ -32,6 +32,7 @@ interface Props {
   menu?: MenuBtnProps[];
   actionButtonIcon?: JSX.Element;
   actionBtnVariant?: 'contained' | 'outlined' | 'text';
+  secondaryBtn?: ReactNode;
   backBtnLabel?: string;
   hideBackIcon?: boolean;
   pageTitle?: string;
@@ -58,6 +59,7 @@ export const Tabs = ({
   actionButtonIcon,
   actionBtnVariant,
   disableBtnAction,
+  secondaryBtn,
 }: Props) => {
   const theme = useTheme();
 
@@ -92,6 +94,8 @@ export const Tabs = ({
             </Typography>
           </Button>
         ) : null}
+
+        {secondaryBtn}
 
         {showMenuActionBtn && menu ? (
           <MenuBtn
