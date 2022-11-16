@@ -102,6 +102,9 @@ export const ContractDetails = () => {
         header="Select Unit">
         <AddUnitsDataGrid
           propertyOwnerId={contractDetails?.propertyOwner.id ?? ''}
+          selectedElevators={
+            contractDetails?.elevators?.map((i) => i.elevator.id) ?? []
+          }
         />
       </SelectModal>
     </>

@@ -61,8 +61,10 @@ export const makeRows = (
 
 export const AddUnitsDataGrid = ({
   propertyOwnerId,
+  selectedElevators,
 }: {
   propertyOwnerId: string;
+  selectedElevators?: string[];
 }) => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -87,7 +89,7 @@ export const AddUnitsDataGrid = ({
 
   const formik = useFormik<{elevators: string[]}>({
     initialValues: {
-      elevators: [],
+      elevators: selectedElevators ?? [],
     },
     onSubmit: (values) =>
       updateContract({
