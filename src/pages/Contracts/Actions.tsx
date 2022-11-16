@@ -44,11 +44,8 @@ export const Actions = ({url, fileName, contractId}: Props) => {
               sx={{color: 'action.active'}}
             />
           </IconButton>
-          <IconButton>
-            <Delete
-              sx={{ml: '0.5em'}}
-              onClick={() => setOpenDeleteConfirm(true)}
-            />
+          <IconButton onClick={() => setOpenDeleteConfirm(true)}>
+            <Delete sx={{ml: '0.5em'}} />
           </IconButton>
         </>
       ) : (
@@ -59,11 +56,8 @@ export const Actions = ({url, fileName, contractId}: Props) => {
               sx={{color: 'action.active', cursor: 'not-allowed'}}
             />
           </IconButton>
-          <IconButton>
-            <Delete
-              sx={{ml: '0.5em'}}
-              onClick={() => setOpenDeleteConfirm(true)}
-            />
+          <IconButton onClick={() => setOpenDeleteConfirm(true)}>
+            <Delete sx={{ml: '0.5em'}} />
           </IconButton>
         </>
       )}

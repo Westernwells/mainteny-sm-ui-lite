@@ -214,3 +214,41 @@ export const useDeleteContract = (successMsg?: string) => {
     },
   });
 };
+
+const attachElevatorsToContract = async (
+  contractId: string,
+  body: string[],
+) => {
+  await axiosClient.put<StringValue>(
+    `/api/contracts/${contractId}/elevators`,
+    body,
+  );
+};
+
+export const useAttachElevatorsToContract = (successMsg?: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({contractId, body}: {contractId: string; body: string[]}) =>
+      attachElevatorsToContract(contractId, body),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.contractDetails);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        enqueueSnackbar(
+          'Sorry! Unable to save changes right now. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
+      },
+    },
+  );
+};
