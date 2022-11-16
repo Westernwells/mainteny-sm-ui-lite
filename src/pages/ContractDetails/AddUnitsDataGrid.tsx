@@ -61,9 +61,11 @@ export const makeRows = (
 
 export const AddUnitsDataGrid = ({
   propertyOwnerId,
+  onConfirm,
   selectedElevators,
 }: {
   propertyOwnerId: string;
+  onConfirm: () => void;
   selectedElevators?: string[];
 }) => {
   const theme = useTheme();
@@ -92,10 +94,15 @@ export const AddUnitsDataGrid = ({
       elevators: selectedElevators ?? [],
     },
     onSubmit: (values) =>
-      updateContract({
-        contractId,
-        body: values.elevators,
-      }),
+      updateContract(
+        {
+          contractId,
+          body: values.elevators,
+        },
+        {
+          onSuccess: () => onConfirm(),
+        },
+      ),
   });
 
   useEffect(() => {

@@ -105,6 +105,7 @@ export const ContractDetails = () => {
           selectedElevators={
             contractDetails?.elevators?.map((i) => i.elevator.id) ?? []
           }
+          onConfirm={() => setOpenSelectUnitModal(false)}
         />
       </SelectModal>
     </>
