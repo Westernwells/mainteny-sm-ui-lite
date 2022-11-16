@@ -45,7 +45,6 @@ interface Props extends DataGridProps {
   isWidget?: boolean;
   headerHeight?: number;
   scrollToTop?: any;
-  keepNonExistentRowsSelected?: boolean;
 }
 
 interface ColumnProps extends GridColDef {
@@ -122,7 +121,6 @@ export const DataGridLayout = ({
   isWidget = false,
   headerHeight,
   scrollToTop,
-  keepNonExistentRowsSelected = true,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
@@ -226,7 +224,6 @@ export const DataGridLayout = ({
         }
         onRowClick={onRowClick}
         checkboxSelection={checkboxSelection}
-        keepNonExistentRowsSelected={keepNonExistentRowsSelected}
         sx={{
           ...olStyles.scrollbar,
 
