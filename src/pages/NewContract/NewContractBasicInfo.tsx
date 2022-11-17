@@ -3,7 +3,8 @@ import {CustomerAutoComplete} from 'components/CustomerAutocomplete';
 import {DatePicker} from 'components/DatePicker';
 import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
-import {ContractBasicInfoFormModel, ContractType} from 'models/contract';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {ContractBasicInfoFormModel} from 'models/contract';
 import {PropertyOwnerView} from 'models/propertyManager';
 import React, {FC, useEffect, useState} from 'react';
 import {convertToText} from 'utils/utils';
@@ -19,6 +20,7 @@ const NewContractBasicInfo: FC<Props> = ({
   getCustomer,
   initialCustomer,
 }) => {
+  const {user} = useUserSession();
   const [customer, setCustomer] = useState(initialCustomer);
 
   useEffect(() => {
@@ -104,7 +106,9 @@ const NewContractBasicInfo: FC<Props> = ({
         <FormSelect
           labelId="contractTypeSelect-label"
           label="Contract Type"
-          options={Object.keys(ContractType).map((key) => ({
+          options={(
+            user?.userAccount?.serviceCompany?.settings?.contractTypes ?? []
+          ).map((key) => ({
             label: convertToText(key),
             value: convertToText(key),
           }))}

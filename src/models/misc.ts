@@ -53,6 +53,7 @@ export interface Settings {
     logoPath: string;
   };
   currencies: Currency[];
+  contractTypes: string[];
 }
 
 export interface Page {

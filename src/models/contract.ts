@@ -11,12 +11,6 @@ export enum ContractStatus {
   EXPIRED = 'EXPIRED',
 }
 
-export enum ContractType {
-  BASIC = 'BASIC',
-  MEDIUM = 'MEDIUM',
-  PREMIUM = 'PREMIUM',
-}
-
 export enum ContractOrderField {
   EXPIRY_TIME = 'EXPIRY_TIME',
   CREATED_TIME = 'CREATED_TIME',
@@ -40,7 +34,7 @@ export interface Contract {
   id: string;
   propertyOwner: Client;
   serviceCompany: ServiceCompany;
-  type: ContractType;
+  type: string;
   elevators: ContractElevator[];
   visitsNumber: number;
   sla: number;
@@ -102,7 +96,7 @@ export interface ContractView {
   id: string;
   propertyOwner: PropertyOwnerSimpleView;
   serviceCompany: ServiceCompanySimpleView;
-  type: ContractType;
+  type: string;
   visitsNumber: number;
   number: number;
   externalId: string;
@@ -122,7 +116,7 @@ export interface ContractView {
 }
 export interface ContractSimpleView {
   id: string;
-  type: ContractType;
+  type: string;
   visitsNumber: number;
   sla: number;
   spendingLimit: number;
@@ -140,7 +134,7 @@ export interface ContractSimpleView {
 export interface CreateContractRecord {
   propertyOwnerId: string;
   serviceCompanyId: string;
-  type: ContractType;
+  type: string;
   elevators: string[];
   visitsNumber: number;
   sla: number;
@@ -155,7 +149,7 @@ export interface CreateContractRecord {
 
 export interface UpdateContractRecord {
   id: string;
-  type: ContractType;
+  type: string;
   visitsNumber: number;
   sla: number;
   spendingLimit: number;
