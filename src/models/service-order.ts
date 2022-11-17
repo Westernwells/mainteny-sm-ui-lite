@@ -43,6 +43,8 @@ export enum ServiceOrderType {
   EMERGENCY = 'EMERGENCY',
   REPAIR = 'REPAIR',
   CALLOUT = 'CALLOUT',
+  INSPECTION = 'INSPECTION',
+  NEW_INSTALLATION = 'NEW_INSTALLATION',
 }
 
 export enum ServiceOrderOrderField {

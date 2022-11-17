@@ -155,6 +155,7 @@ export const ScheduleForm = ({
                     ? formik.errors.technicianId
                     : '',
                 label: t('Assign To'),
+                placeholder: t('e.g. Paul Schneider'),
                 onBlur: formik.handleBlur,
               }}
             />

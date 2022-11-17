@@ -53,6 +53,13 @@ export const formatServiceName = (
     return 'Callout';
   if (name === WorkHoursType.REPAIR || name === ServiceOrderType.REPAIR)
     return 'Repair';
+  if (name === WorkHoursType.INSPECTION || name === ServiceOrderType.INSPECTION)
+    return 'Inspection';
+  if (
+    name === WorkHoursType.NEW_INSTALLATION ||
+    name === ServiceOrderType.NEW_INSTALLATION
+  )
+    return 'Installation';
   return name;
 };
 

@@ -36,14 +36,18 @@ export const AddDescription = ({
 
   return (
     <>
+      <Typography variant="h6" pb={2}>
+        {t('Description')}
+      </Typography>
+
       {selectedUnit ? (
-        <Summary label="Selected unit">
+        <Summary label="Selected Unit">
           <SummaryItem value={selectedUnit.model} />
         </Summary>
       ) : null}
 
       {selectedTechnicians.length ? (
-        <Summary label="Selected technician" containerStyle={{mt: '1em'}}>
+        <Summary label="Selected Technician" containerStyle={{mt: '1em'}}>
           {selectedTechnicians.map((item) => (
             <SummaryItem
               key={item.id}
@@ -54,7 +58,7 @@ export const AddDescription = ({
       ) : null}
 
       {selectedDateString || selectedTimeString ? (
-        <Summary label="Selected date and time" containerStyle={{mt: '1em'}}>
+        <Summary label="Selected Date & Time" containerStyle={{mt: '1em'}}>
           {selectedDateString ? (
             <SummaryItem
               value={`${selectedDateString} ${
@@ -77,6 +81,7 @@ export const AddDescription = ({
           props={{
             sx: {background: grey[50], border: 'none'},
             value: description,
+            placeholder: t('Please describe what happened'),
             size: 'medium',
             fullWidth: true,
             type: 'text',
