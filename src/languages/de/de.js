@@ -640,7 +640,7 @@ module.exports = {
     'Selected unit': 'Ausgewählte Anlage',
     'Selected technician': 'Ausgewählter Techniker',
     'Description (Optional)': 'Beschreibung (fakultativ)',
-    'Select, date, time & technician': 'Wähle: Datum, Uhrzeit und Techniker',
+    'Select date, time & technicians': 'Wähle: Datum, Uhrzeit und Techniker',
     Immediate: 'Sofort',
     'Select a due date': 'Wählen Sie ein Fälligkeitsdatum',
     'Choose a Date, Time & Technician':

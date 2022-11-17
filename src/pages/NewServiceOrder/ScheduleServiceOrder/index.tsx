@@ -25,7 +25,7 @@ import {
 
 const steps = [
   'Select unit',
-  'Select, date, time & technician',
+  'Select date, time & technicians',
   'Add description',
 ];
 

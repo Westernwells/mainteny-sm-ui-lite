@@ -1,7 +1,10 @@
 import {ChangeEvent, useEffect, useRef, useState} from 'react';
+import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {Settings} from '@mui/icons-material';
+import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
+import BuildCircleIcon from '@mui/icons-material/BuildCircle';
 
 import {ReactComponent as EmergencyIcon} from 'assets/icons/Emergency.svg';
 import {ReactComponent as RegularIcon} from 'assets/icons/Regular.svg';
@@ -16,6 +19,7 @@ type Props = {
 };
 
 export const SelectServiceOrderTypes = ({values, setFieldValue}: Props) => {
+  const theme = useTheme();
   const {t} = useTranslation();
   const [serviceOrderTypes, setServiceOrderTypes] = useState({
     REGULAR: {
@@ -33,6 +37,16 @@ export const SelectServiceOrderTypes = ({values, setFieldValue}: Props) => {
     CALLOUT: {
       label: ServiceOrderType.CALLOUT,
       checked: values.serviceOrderTypes.includes(ServiceOrderType.CALLOUT),
+    },
+    INSPECTION: {
+      label: ServiceOrderType.INSPECTION,
+      checked: values.serviceOrderTypes.includes(ServiceOrderType.INSPECTION),
+    },
+    NEW_INSTALLATION: {
+      label: ServiceOrderType.NEW_INSTALLATION,
+      checked: values.serviceOrderTypes.includes(
+        ServiceOrderType.NEW_INSTALLATION,
+      ),
     },
   });
 
@@ -90,6 +104,38 @@ export const SelectServiceOrderTypes = ({values, setFieldValue}: Props) => {
         <Box display="flex" alignItems="center">
           <CalloutIcon style={{height: '1em', marginRight: '0.25em'}} />
           <Typography variant="body2">{t('Callout')}</Typography>
+        </Box>
+      ),
+    },
+    {
+      checked: serviceOrderTypes.INSPECTION.checked,
+      name: serviceOrderTypes.INSPECTION.label,
+      label: (
+        <Box display="flex" alignItems="center">
+          <YoutubeSearchedForIcon
+            style={{
+              color: theme.palette.primary.main,
+              height: '1em',
+              marginRight: '0.25em',
+            }}
+          />
+          <Typography variant="body2">{t('Inspection')}</Typography>
+        </Box>
+      ),
+    },
+    {
+      checked: serviceOrderTypes.NEW_INSTALLATION.checked,
+      name: serviceOrderTypes.NEW_INSTALLATION.label,
+      label: (
+        <Box display="flex" alignItems="center">
+          <BuildCircleIcon
+            style={{
+              color: theme.palette.secondary.dark,
+              height: '1em',
+              marginRight: '0.25em',
+            }}
+          />
+          <Typography variant="body2">{t('Installation')}</Typography>
         </Box>
       ),
     },
