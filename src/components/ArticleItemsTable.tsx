@@ -19,6 +19,7 @@ import {
 } from 'hooks/reactQuery/useArticle';
 import {formatCurrency} from 'utils/currency';
 import {createEmptyResource} from 'utils/paging-utils';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {ArticleItemRow} from './ArticleItemRow';
 import {Button} from './Button';
 import {FormLabel} from './form/FormLabel';
@@ -39,7 +40,10 @@ export const ArticleItemsTable = ({
   isPartial,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const {t} = useTranslation();
-  const [percentageVat, setPercentageVat] = useState(0);
+  const {user} = useUserSession();
+  const [percentageVat, setPercentageVat] = useState(
+    user?.userAccount?.serviceCompany?.settings?.percentageVat ?? 0,
+  );
   const {
     data: partialArticleResource = createEmptyResource<ArticleView>(1),
     isFetched,
