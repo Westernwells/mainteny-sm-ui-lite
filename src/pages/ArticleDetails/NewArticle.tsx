@@ -224,7 +224,8 @@ export const NewArticle = () => {
         display: 'flex',
         flexDirection: 'column',
       }}>
-      <FlexContainer>
+      <FlexContainer
+        containerStyle={{mt: '1em', overflowY: 'scroll', height: 0}}>
         {activeStep === 0 && (
           <FlexContainer containerStyle={{mt: '2em'}}>
             <PageCard headerLabel={t('Basic Information')} minHeight="100%">
