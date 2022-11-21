@@ -1,5 +1,12 @@
-import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
+import {useTranslation} from 'react-i18next';
+import {
+  GridColDef,
+  GridColumnHeaderParams,
+  GridRenderCellParams,
+  GridRowsProp,
+} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import {StatusChip} from 'components/StatusChip';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
@@ -82,6 +89,14 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'amount',
     headerName: 'total amount',
+    renderHeader: (params: GridColumnHeaderParams) => {
+      const {t} = useTranslation();
+      return (
+        <Typography variant="subtitle2" color="textSecondary" textAlign="right">
+          {t(params?.colDef?.headerName?.toUpperCase?.() ?? '')}
+        </Typography>
+      );
+    },
     align: 'right',
     flex: 0.75,
   }),
