@@ -6,13 +6,12 @@ import {TechnicianEventType} from 'models/misc';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import {ReactComponent as ThermometerIcon} from 'assets/icons/Thermometer.svg';
 import {ReactComponent as SunIcon} from 'assets/icons/Sun.svg';
-import SendIcon from '@mui/icons-material/Send';
 import {capitalize} from 'utils/utils';
-import IconButton from '@mui/material/IconButton';
 import React from 'react';
 import {getColumnProps} from 'components/DataGridLayout';
 import {UserView, Role} from 'models/user';
 import {TechnicianEventPair} from 'models/technician';
+import {Actions} from './Actions';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -120,14 +119,7 @@ export const columns: GridColDef[] = [
     field: 'actions',
     headerName: 'actions',
     renderCell: (params) => (
-      <IconButton
-        component="a"
-        onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
-          e.stopPropagation();
-          window.open(`mailto:${params.value}`, '_blank');
-        }}>
-        <SendIcon fontSize="small" sx={{color: 'action.active'}} />
-      </IconButton>
+      <Actions email={params.value.email} id={params.value.id} />
     ),
     align: 'center',
     flex: 0,
@@ -160,7 +152,10 @@ export const makeRows = (
           shift,
           availability: event,
           navigateTo: `details/${item.id}`,
-          actions: item.userAccount.contact.email,
+          actions: {
+            email: item.userAccount.contact.email,
+            id: item.userData.employeeId,
+          },
         };
       })
     : [];
