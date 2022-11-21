@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import useTheme from '@mui/material/styles/useTheme';
 import {useTranslation} from 'react-i18next';
 
-interface Props {
+export interface Props {
   bodyContainerStyle?: {[key: string]: any};
   containerStyles?: {[key: string]: any};
   headerStyles?: {[key: string]: string | number};

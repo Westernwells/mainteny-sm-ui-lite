@@ -27,7 +27,14 @@ export const InvoiceDrafts = ({
     <DashboardInfoCard
       title="Invoice drafts"
       chipLabel={`${invoices.total}`}
-      seeMorePath="/invoices">
+      seeMorePath="/invoices"
+      emptySection={{
+        show: !invoices.total,
+        label: 'No Invoices.',
+      }}
+      bodyContainerStyle={{
+        height: '100%',
+      }}>
       <List
         disablePadding
         sx={{

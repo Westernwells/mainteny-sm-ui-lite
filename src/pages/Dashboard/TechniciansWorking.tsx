@@ -26,7 +26,14 @@ export const TechniciansWorking = ({
     <DashboardInfoCard
       title="Technicians working"
       chipLabel={`${technicians.total}`}
-      seeMorePath="/employees">
+      seeMorePath="/employees"
+      emptySection={{
+        show: !technicians.total,
+        label: 'No working technicians.',
+      }}
+      bodyContainerStyle={{
+        height: '100%',
+      }}>
       <List
         disablePadding
         sx={{
