@@ -8,6 +8,7 @@ import {
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import InputAdornment from '@mui/material/InputAdornment';
 import AddIcon from '@mui/icons-material/Add';
 import {QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord} from 'models/invoice';
@@ -304,11 +305,16 @@ export const ArticleItemsTable = ({
                   <Box>
                     <FormInput
                       props={{
-                        label: 'vat',
+                        label: 'VAT',
                         value: percentageVat,
                         sx: {mt: '0.5em', width: '5rem'},
                         onChange: (e) =>
                           setPercentageVat(Number(e.target.value)),
+                        InputProps: {
+                          endAdornment: (
+                            <InputAdornment position="end">%</InputAdornment>
+                          ),
+                        },
                       }}
                     />
                   </Box>
