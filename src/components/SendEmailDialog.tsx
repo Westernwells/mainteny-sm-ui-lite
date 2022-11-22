@@ -125,12 +125,6 @@ export const SendEmailDialog = ({
               multiline: true,
               minRows: 5,
               maxRows: 5,
-              onKeyDown: (e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  formik.handleSubmit();
-                }
-              },
             }}
           />
         </Box>
