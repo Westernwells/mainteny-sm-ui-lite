@@ -48,13 +48,14 @@ export const SendEmailDialog = ({
       content: '',
     },
     onSubmit: (values, {setSubmitting}) => {
+      const contentWithLineBreaks = values.content.replace(/\n/g, '<br/>');
       publish(
         {
           id,
           body: {
             email: values.email,
             subject: values.subject,
-            content: values.content,
+            content: contentWithLineBreaks,
           },
         },
         {
@@ -125,12 +126,6 @@ export const SendEmailDialog = ({
               multiline: true,
               minRows: 5,
               maxRows: 5,
-              onKeyDown: (e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  formik.handleSubmit();
-                }
-              },
             }}
           />
         </Box>
