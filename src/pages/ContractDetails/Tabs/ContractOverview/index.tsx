@@ -414,7 +414,14 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                     getAcceptedFiles={(dropedFiles) => {
                       setDocuments(dropedFiles);
                     }}
-                    acceptedFileTypes="application/pdf"
+                    acceptedFileTypes={[
+                      'application/pdf',
+                      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                      'application/vnd.ms-excel',
+                      'text/tab-separated-values',
+                      'text/csv',
+                    ]}
                     maxFiles={1}
                   />
                 </Dialog>

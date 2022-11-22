@@ -27,7 +27,7 @@ export const Stepper = ({
   containerStyles,
   handleCancel = () => {},
   handleSubmit = () => {},
-  initialActiveStep = 0,
+  initialActiveStep = 4,
   getActiveStep,
   disableNextBtn,
   stepperStyles,

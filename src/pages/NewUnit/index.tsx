@@ -98,7 +98,7 @@ export const NewUnit = () => {
     useState<FormikErrors<AppointmentFormModel>>({});
   const [appointmentPreferenceFormValues, setAppointmentPreferenceFormValues] =
     useState<AppointmentFormModel>({
-      appointmentDaysOfWeek: [],
+      appointmentDaysOfWeek: ['Mo', 'Tu', 'We', 'Th', 'Fr'],
       openingHour: '',
       closingHour: '',
       requiresAppointment: '',

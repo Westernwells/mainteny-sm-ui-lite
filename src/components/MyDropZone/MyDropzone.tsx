@@ -20,7 +20,7 @@ interface Props {
   getAcceptedFiles?: (val: FileWithPreview[]) => void;
   getRejectedFileWithErrors?: (val: FileRejection[]) => void;
   hints?: string[];
-  acceptedFileTypes?: 'image/*' | 'application/pdf' | '*';
+  acceptedFileTypes?: string[];
   maxFiles?: number;
   cropperTitle?: string;
   isCropped?: boolean;
@@ -31,12 +31,21 @@ type FileErrors = {
   size: boolean;
 };
 
+function formatAcceptedFileType(items: string[]) {
+  const result: {[key: string]: any} = {};
+  items.forEach((item) => {
+    result[item] = [];
+  });
+
+  return result;
+}
+
 export const MyDropZone = ({
   existingFiles = [],
   getAcceptedFiles,
   getRejectedFileWithErrors,
   hints = [],
-  acceptedFileTypes = '*',
+  acceptedFileTypes,
   maxFiles,
   isCropped = false,
   cropperTitle,
@@ -53,13 +62,12 @@ export const MyDropZone = ({
   const oneMbInByes = useRef(onKbinBytes * onKbinBytes).current;
 
   const [cropper, setCropper] = useState<any>();
-
   const {getRootProps, getInputProps, open, fileRejections} = useDropzone({
     maxSize: oneMbInByes * 5,
     maxFiles,
-    accept: {
-      [acceptedFileTypes]: [],
-    },
+    accept: acceptedFileTypes
+      ? formatAcceptedFileType(acceptedFileTypes)
+      : {'*': []},
     onDrop: () => {
       setErrors({type: false, size: false});
       fileRejections.forEach((file) => {

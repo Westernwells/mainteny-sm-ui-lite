@@ -61,7 +61,14 @@ export const ArticleImageUploadForm = ({
       }}>
       <MyDropZone
         hints={hints}
-        acceptedFileTypes="image/*"
+        acceptedFileTypes={[
+          'image/png',
+          'image/jpeg',
+          'image/bmp',
+          'image/gif',
+          'image/webp',
+          'image/svg+xml',
+        ]}
         getAcceptedFiles={(files) => {
           setAcceptedFiles(files);
         }}
@@ -72,3 +79,4 @@ export const ArticleImageUploadForm = ({
     </Dialog>
   );
 };
+// JPEG, PNG, BMP, GIF, WEBP, SVG only

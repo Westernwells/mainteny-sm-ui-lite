@@ -113,7 +113,12 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
                 setShifts([...oldShifts, newShift]);
               }}
               renderInput={(params) => (
-                <TextField {...params} size="small" sx={{width: '6.875em'}} />
+                <TextField
+                  {...params}
+                  size="small"
+                  sx={{width: '6.875em'}}
+                  onKeyDown={(e) => e.preventDefault()}
+                />
               )}
             />
           </LocalizationProvider>
@@ -130,7 +135,12 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
                 setShifts([...oldShifts, newShift]);
               }}
               renderInput={(params) => (
-                <TextField {...params} size="small" sx={{width: '6.875em'}} />
+                <TextField
+                  {...params}
+                  size="small"
+                  sx={{width: '6.875em'}}
+                  onKeyDown={(e) => e.preventDefault()}
+                />
               )}
             />
           </LocalizationProvider>

@@ -193,6 +193,18 @@ export const Pictures = ({
           open: openDialog || false,
         }}>
         <MyDropZone
+          acceptedFileTypes={[
+            'image/png',
+            'image/jpeg',
+            'image/bmp',
+            'image/gif',
+            'image/webp',
+            'image/svg+xml',
+          ]}
+          hints={[
+            t('JPEG, PNG, BMP, GIF, WEBP, SVG only'),
+            t('File size less than 5MB only'),
+          ]}
           getAcceptedFiles={(files) => {
             setAcceptedFiles(files);
           }}

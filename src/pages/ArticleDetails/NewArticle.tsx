@@ -271,13 +271,21 @@ export const NewArticle = () => {
                 formik={formikStock}
                 containerStyles={{display: 'flex', flexDirection: 'row'}}
               />
-              <Box display="flex" flexDirection="column">
+              <Box
+                display="flex"
+                flexDirection="column"
+                sx={{
+                  boxShadow:
+                    suppliers.length > 1 ? '0 2px 5px -3px gray' : 'none',
+                }}>
                 <Typography
                   variant="subtitle2"
                   sx={{
                     color: theme.palette.text.primary,
                     minHeight: '2rem',
                     mt: '2em',
+                    boxShadow:
+                      suppliers.length > 1 ? '0 2px 5px -3px gray' : 'none',
                   }}>
                   {t('Suppliers Information')}
                 </Typography>

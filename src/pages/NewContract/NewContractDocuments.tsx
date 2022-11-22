@@ -12,7 +12,14 @@ const NewContractDocuments: FC<Props> = ({formik}) => (
       'PDF, DOCX, XLSX, XLS, CSV, TSV only',
       'File size less than 5MB only',
     ]}
-    acceptedFileTypes="application/pdf"
+    acceptedFileTypes={[
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+      'text/tab-separated-values',
+      'text/csv',
+    ]}
     getAcceptedFiles={(files) => formik.setFieldValue('documents', files)}
     maxFiles={1}
   />

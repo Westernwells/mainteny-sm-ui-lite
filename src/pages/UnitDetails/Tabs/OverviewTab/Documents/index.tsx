@@ -203,6 +203,14 @@ export const Documents = ({
           open: openDialog || false,
         }}>
         <MyDropZone
+          acceptedFileTypes={[
+            'application/pdf',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.ms-excel',
+            'text/tab-separated-values',
+            'text/csv',
+          ]}
           getAcceptedFiles={(files) => {
             setAcceptedFiles(files);
           }}
