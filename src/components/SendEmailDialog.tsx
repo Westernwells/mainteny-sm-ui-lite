@@ -48,13 +48,14 @@ export const SendEmailDialog = ({
       content: '',
     },
     onSubmit: (values, {setSubmitting}) => {
+      const contentWithLineBreaks = values.content.replace(/\n/g, '<br/>');
       publish(
         {
           id,
           body: {
             email: values.email,
             subject: values.subject,
-            content: values.content,
+            content: contentWithLineBreaks,
           },
         },
         {
