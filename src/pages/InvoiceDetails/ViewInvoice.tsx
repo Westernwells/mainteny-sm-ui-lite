@@ -148,7 +148,7 @@ export const ViewInvoice = ({downloadUrl, invoice, workReport}: Props) => {
                     disabled:
                       invoice!.additionalInfo.pdfGenerationStatus !==
                       PdfGenerationStatus.DONE,
-                    startIcon: <FileDownloadIcon color="primary" />,
+                    startIcon: <FileDownloadIcon />,
                   }}
                 />
               )}

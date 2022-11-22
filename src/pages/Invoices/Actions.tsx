@@ -214,17 +214,21 @@ export const Actions = ({invoice}: Props) => {
         }}>
         {actions.map((item, index) => (
           <Box key={`${item.label}-${index}`}>
+            {(actions.length > 3 && actions.length - 3 < index) ||
+            (actions.length <= 3 && actions.length - 1 === index) ? (
+              <Divider />
+            ) : null}
             <MenuItem
               onClick={() => {
                 item.onClick();
                 handleClose();
-              }}>
+              }}
+              sx={{py: '0.7rem'}}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText>
                 <Typography variant="body2">{item.label}</Typography>
               </ListItemText>
             </MenuItem>
-            {actions[actions.length - 1] !== item && <Divider />}
           </Box>
         ))}
       </Menu>

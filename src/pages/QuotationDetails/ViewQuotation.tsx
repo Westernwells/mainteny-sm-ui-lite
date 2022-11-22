@@ -94,7 +94,7 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
                     disabled:
                       quotation!.additionalInfo.pdfGenerationStatus !==
                       PdfGenerationStatus.DONE,
-                    startIcon: <FileDownloadIcon color="primary" />,
+                    startIcon: <FileDownloadIcon />,
                   }}
                 />
               )}

@@ -14,11 +14,11 @@ export const BackAction = ({label, containerStyle, path}: Props) => {
   const theme = useTheme();
   const navigate = useNavigate();
   return (
-    <Box display="flex" sx={{...containerStyle}}>
-      <Box
-        mr={2}
-        sx={{cursor: 'pointer', mt: '0.3em'}}
-        onClick={() => (path ? navigate(path) : navigate(-1))}>
+    <Box
+      display="flex"
+      sx={{cursor: 'pointer', ...containerStyle}}
+      onClick={() => (path ? navigate(path) : navigate(-1))}>
+      <Box mr={2} sx={{mt: '0.3em'}}>
         <ArrowBackIosNewIcon sx={{color: theme.palette.action.active}} />
       </Box>
       {label ? (
