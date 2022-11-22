@@ -8,12 +8,14 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {convertToText} from 'utils/utils';
 import {InvoiceDueType} from 'models/invoice';
 import {FormSelect} from 'components/form/FormSelect';
+import {getCurrencySymbol} from 'utils/currency';
 
 interface Props {
   formik: FormikProps<ContractUpdateRequest>;
+  currency: string;
 }
 
-const EditContractForm: FC<Props> = ({formik}) => {
+const EditContractForm: FC<Props> = ({formik, currency}) => {
   const {user} = useUserSession();
   return (
     <Grid container spacing={2} sx={{mt: '0.5em'}}>
@@ -203,6 +205,28 @@ const EditContractForm: FC<Props> = ({formik}) => {
               formik.touched.noticePeriodInMonth &&
               formik.errors.noticePeriodInMonth
             ),
+          }}
+        />
+      </Grid>
+
+      <Grid item md={6}>
+        <FormInput
+          props={{
+            placeholder: 'Enter hourly rates',
+            label: 'Hourly rate',
+            name: 'hourlyRate',
+            type: 'number',
+            value: Number(formik.values.hourlyRate).toString(),
+            onBlur: formik.handleBlur,
+            onChange: formik.handleChange,
+            error: !!(formik.touched.hourlyRate && formik.errors.hourlyRate),
+            InputProps: {
+              startAdornment: (
+                <InputAdornment position="start" color="text.primary">
+                  {getCurrencySymbol[currency]}
+                </InputAdornment>
+              ),
+            },
           }}
         />
       </Grid>

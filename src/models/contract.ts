@@ -246,4 +246,5 @@ export interface ContractUpdateRequest {
   annualPriceAdjustmentPercentage?: number;
   discounts?: number;
   noticePeriodInMonth?: number;
+  hourlyRate?: number;
 }

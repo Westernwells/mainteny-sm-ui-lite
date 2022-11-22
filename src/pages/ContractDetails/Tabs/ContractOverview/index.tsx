@@ -86,6 +86,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       renewalTerms: contractDetails?.additionalInfo?.renewalTerms || '',
       visitsNumber: contractDetails?.visitsNumber || '',
       spendingLimit: contractDetails?.spendingLimit || '',
+      hourlyRate: contractDetails?.hourlyRate,
       invoiceDueDays: contractDetails?.additionalInfo?.invoiceDueDays,
       annualPriceAdjustmentPercentage:
         contractDetails?.additionalInfo?.annualPriceAdjustmentPercentage,
@@ -117,6 +118,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       invoiceDue: convertToMacro(formik.values.invoiceDue || ''),
       visitsNumber: +formik.values.visitsNumber,
       spendingLimit: +formik.values.spendingLimit,
+      hourlyRate: formik.values.hourlyRate || '',
       startDate: contractDetails?.startTime,
       endDate: contractDetails?.endTime,
       timePreference: contractDetails?.timePreference || [],
@@ -244,6 +246,12 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 (item) =>
                   `${item.discountPercentage}% when paid in ${item.days} days`,
               )}
+              hourlyRate={formatCurrency(
+                contractDetails ? contractDetails.hourlyRate : 0,
+                {
+                  currency: contractDetails?.currency || 'EUR',
+                },
+              )}
             />
             <Dialog
               title="Edit Contract"
@@ -251,7 +259,12 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               disableSaveBtn={!!Object.keys(formik.errors).length}
               onSave={() => onContractSave()}
               dialogProps={{open: openContractDialog || false}}>
-              {!isLoading && <EditContractForm formik={formik} />}
+              {!isLoading && (
+                <EditContractForm
+                  formik={formik}
+                  currency={contractDetails.currency || 'EUR'}
+                />
+              )}
             </Dialog>
           </InfoCard>
 
