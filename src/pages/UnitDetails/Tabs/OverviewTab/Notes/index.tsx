@@ -134,7 +134,9 @@ export const Notes = ({elevatorId}: Props) => {
       <Typography variant="subtitle2">
         {`${elevatorNote.meta.creator?.firstName} ${elevatorNote.meta.creator?.lastName}`}
       </Typography>
-      <Typography variant="caption">{elevatorNote.content}</Typography>
+      <Typography variant="caption" whiteSpace="break-spaces">
+        {elevatorNote.content}
+      </Typography>
     </Box>
   );
 
