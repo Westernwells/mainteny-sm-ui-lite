@@ -247,6 +247,8 @@ export const Actions = ({invoice}: Props) => {
         id={invoice.id}
         submitHook={usePublishInvoice}
         confirmBtnDisabled={!isPDFGenerated}
+        subject={invoice.subject}
+        content={invoice.description}
       />
 
       <Confirm

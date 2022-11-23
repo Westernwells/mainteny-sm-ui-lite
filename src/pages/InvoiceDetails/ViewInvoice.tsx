@@ -311,6 +311,8 @@ export const ViewInvoice = ({downloadUrl, invoice, workReport}: Props) => {
         id={invoice.id}
         submitHook={usePublishInvoice}
         confirmBtnDisabled={!isPDFGenerated}
+        subject={invoice.subject}
+        content={invoice.description}
       />
 
       <MarkAsPaidDialog

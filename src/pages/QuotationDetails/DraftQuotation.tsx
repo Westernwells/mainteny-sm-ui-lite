@@ -398,6 +398,8 @@ export const DraftQuotation = ({quotation: quotationFromProps}: Props) => {
         id={quotation?.id ?? ''}
         submitHook={usePublishQuotation}
         confirmBtnDisabled={!isPDFGenerated}
+        subject={quotation?.subject ?? ''}
+        content={quotation?.description ?? ''}
       />
       <Confirm
         open={isDeleteDialogOpen}

@@ -363,6 +363,8 @@ export const EditQuotation = ({quotation}: Props) => {
         id={quotation.id}
         submitHook={usePublishQuotation}
         confirmBtnDisabled={!isPDFGenerated}
+        subject={quotation.subject}
+        content={quotation.description}
       />
       <Confirm
         open={isDeleteDialogOpen}
