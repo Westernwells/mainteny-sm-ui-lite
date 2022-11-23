@@ -37,10 +37,7 @@ export const NoteCard = ({note, onDelete, onEdit, ...rest}: Props) => {
           <Typography variant="body2" color={theme.palette.text.secondary}>
             {`${note.meta.creator?.firstName} ${
               note.meta.creator?.lastName
-            } - ${format(
-              new Date(note.meta.createdAt),
-              'dd.MM.yyyy, hh:mm a',
-            )}`}
+            } - ${format(new Date(note.meta.createdAt), 'dd.MM.yyyy, HH:mm')}`}
           </Typography>
           <Box display="flex" alignItems="center">
             <IconButton size="small" onClick={onEdit}>
