@@ -21,6 +21,8 @@ interface Props {
   submitHook: typeof usePublishInvoice | typeof usePublishQuotation;
   id: string;
   confirmBtnDisabled: boolean;
+  subject: string;
+  content: string;
 }
 
 const validationSchema = Yup.object().shape({
@@ -38,14 +40,16 @@ export const SendEmailDialog = ({
   submitHook,
   id,
   confirmBtnDisabled,
+  subject,
+  content,
 }: Props) => {
   const {t} = useTranslation();
   const {mutate: publish} = submitHook();
   const formik = useFormik<SimpleEmailRecord>({
     initialValues: {
       email: '',
-      subject: '',
-      content: '',
+      subject,
+      content,
     },
     onSubmit: (values, {setSubmitting}) => {
       const contentWithLineBreaks = values.content.replace(/\n/g, '<br/>');
