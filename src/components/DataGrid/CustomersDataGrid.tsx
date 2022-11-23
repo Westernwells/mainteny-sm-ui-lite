@@ -51,8 +51,7 @@ export const makeRows = (customers: PropertyOwnerView[]): GridRowsProp =>
     ? customers.map((item, index) => ({
         id: index,
         name: item.name,
-        // TODO: Use Customer number
-        number: 'C-12345',
+        number: item.externalId,
         address: item.postalAddress?.fullName,
         units: item.unitNumber,
         phone: item.contact.phone,
