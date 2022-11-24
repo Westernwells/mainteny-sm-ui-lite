@@ -358,7 +358,7 @@ export interface ElevatorRequestBody {
 
 export interface ElevatorComment {
   content: string;
-  elevatorId: string;
+  refId: string;
   id: string;
   meta: Meta;
   subject: string;

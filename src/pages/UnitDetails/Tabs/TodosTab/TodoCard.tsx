@@ -36,9 +36,9 @@ export const TodoCard = ({todo}: Props) => {
       content: todo.content,
     },
     onSubmit: (values, {resetForm}) => {
-      if (todo.elevatorId && todo.id) {
+      if (todo.refId && todo.id) {
         updateTodo({
-          elevatorId: todo.elevatorId,
+          elevatorId: todo.refId,
           todoId: todo.id,
           data: values,
         });
@@ -93,8 +93,7 @@ export const TodoCard = ({todo}: Props) => {
       <Confirm
         open={isDeleteDialogOpen}
         onConfirm={() => {
-          if (todo.id)
-            deleteTodo({elevatorId: todo.elevatorId, todoId: todo.id});
+          if (todo.id) deleteTodo({elevatorId: todo.refId, todoId: todo.id});
           setIsDeleteDialogOpen(false);
         }}
         onClose={() => setIsDeleteDialogOpen(false)}
