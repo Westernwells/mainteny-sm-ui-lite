@@ -182,7 +182,10 @@ export const Dashboard = () => {
                 value={`${dailyNumberOfCompletedOrders}/${dailyNumberOfOrders}`}
                 subValue={`${
                   dailyNumberOfOrders > 0
-                    ? (dailyNumberOfCompletedOrders / dailyNumberOfOrders) * 100
+                    ? (
+                        (dailyNumberOfCompletedOrders / dailyNumberOfOrders) *
+                        100
+                      ).toFixed(2)
                     : 100
                 }%`}
               />
