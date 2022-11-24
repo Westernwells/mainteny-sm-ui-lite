@@ -31,7 +31,7 @@ import {
   QuotationItemRecord,
   QuotationView,
 } from 'models/quotation';
-import {ElevatorSimpleView, ElevatorView} from 'models/elevator';
+import {ElevatorView} from 'models/elevator';
 import {
   PropertyOwnerSimpleView,
   PropertyOwnerView,
@@ -58,9 +58,7 @@ export const EditQuotation = ({quotation}: Props) => {
   const [customer, setCustomer] = useState<
     PropertyOwnerView | PropertyOwnerSimpleView | null
   >(null);
-  const [unit, setUnit] = useState<ElevatorView | ElevatorSimpleView | null>(
-    null,
-  );
+  const [unit, setUnit] = useState<ElevatorView | null>(null);
   const [quotationItems, setQuotationItems] = useState<QuotationItemRecord[]>(
     [],
   );
@@ -211,6 +209,12 @@ export const EditQuotation = ({quotation}: Props) => {
                     <Typography variant="caption" component="p">
                       {customer.contact.phone}
                     </Typography>
+                    <Typography variant="subtitle2" component="p">
+                      {t('Customer Number')}
+                    </Typography>
+                    <Typography variant="caption" component="p">
+                      {customer.externalId || '-'}
+                    </Typography>
                   </>
                 )
               }
@@ -233,9 +237,17 @@ export const EditQuotation = ({quotation}: Props) => {
               }
               cardBody={
                 unit && (
-                  <Typography variant="caption">
-                    {unit.address.fullName}
-                  </Typography>
+                  <>
+                    <Typography variant="caption">
+                      {unit.address.fullName}
+                    </Typography>
+                    <Typography variant="subtitle2" component="p">
+                      {t('Unit Number')}
+                    </Typography>
+                    <Typography variant="caption" component="p">
+                      {unit.externalId || '-'}
+                    </Typography>
+                  </>
                 )
               }
               cardOnClose={() => {

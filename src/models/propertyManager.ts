@@ -51,6 +51,7 @@ export interface PropertyOwnerSimpleView {
   meta: Meta;
   name: string;
   serviceCompanyId: string;
+  externalId: string;
   units?: number;
 }
 
