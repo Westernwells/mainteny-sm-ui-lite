@@ -1,4 +1,4 @@
-import {useLayoutEffect, useState} from 'react';
+import {useContext, useLayoutEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import EngineeringOutlinedIcon from '@mui/icons-material/EngineeringOutlined';
@@ -8,6 +8,8 @@ import Delete from '@mui/icons-material/Delete';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import {Confirm} from 'components/Confirm';
+import {LanguageContext} from 'context/LanguageProvider';
+import {useTranslation} from 'react-i18next';
 import {useDeleteElevator} from 'hooks/reactQuery/useElevator';
 import {OverviewTab} from './Tabs/OverviewTab';
 import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
@@ -40,17 +42,18 @@ const tabItems = [
 export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
   const [value, setValue] = useState(0);
   const {id: elevatorId} = useParams();
+  const {t} = useTranslation();
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
   const navigate = useNavigate();
+  const {language} = useContext(LanguageContext);
   const {mutateAsync: deleteElevator, isLoading: isDeleting} =
     useDeleteElevator('Unit deleted successfully');
   const [unitName, setUnitName] = useState('');
-
   useLayoutEffect(() => {
     if (getCurrentPageTitle) {
-      getCurrentPageTitle(unitName);
+      getCurrentPageTitle(`${t('Manufacturer')} - ${unitName}`);
     }
-  }, [unitName]);
+  }, [unitName, language]);
 
   return (
     <>

@@ -7,7 +7,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import i18n from 'i18n';
 import {useAuth} from 'hooks/useAuth';
-import {useEffect, useState} from 'react';
+import {useContext, useEffect} from 'react';
 import {axiosClient} from 'utils/axios-utils';
 import {Role} from 'models/user';
 import {convertToText, languageMap} from 'utils/utils';
@@ -15,8 +15,8 @@ import {Mixpanel} from 'mixpanel/mixpanel';
 import {useQueryClient} from 'react-query';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {Notifications} from 'pages/Notifications';
+import {LanguageContext} from 'context/LanguageProvider';
 import {Language} from 'models/misc';
-import {queryKeys} from 'reactQuery/constants';
 import {useUserSession} from '../hooks/reactQuery/useUserSession';
 import {MenuBtn} from './MenuBtn';
 import {BackAction} from './BackAction';
@@ -34,19 +34,20 @@ export const AppTopBar = ({
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
-  const [selectedLng, setSelectedLng] = useState('');
   const {signout} = useAuth();
   const {user, updateUser} = useUserSession();
   const queryClient = useQueryClient();
+  const {language: selectedLng, setLanguage} = useContext(LanguageContext);
   const fullName = `${user?.userAccount.firstName} ${user?.userAccount.lastName}`;
 
   useEffect(() => {
     if (user) {
-      const {language} = user.userAccount.serviceCompany;
-      axiosClient.defaults.headers.common.language = language;
-      i18n.changeLanguage(language);
-      setSelectedLng(language.split('-')[0].toUpperCase());
-      queryClient.invalidateQueries(queryKeys.serviceOrderActivity);
+      const {language: lang} = user.userAccount.serviceCompany;
+      axiosClient.defaults.headers.common.language = lang;
+      i18n.changeLanguage(lang);
+      const value = lang.split('-')[0].toUpperCase();
+      setLanguage(value);
+      queryClient.invalidateQueries();
     }
   }, [user]);
 
