@@ -1,12 +1,18 @@
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useFormik} from 'formik';
+import printJS from 'print-js';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import ReplayIcon from '@mui/icons-material/Replay';
+import Print from '@mui/icons-material/Print';
+import Edit from '@mui/icons-material/Edit';
+import Check from '@mui/icons-material/Check';
+import Close from '@mui/icons-material/Close';
 import {Button} from 'components/Button';
 import {StatusChip} from 'components/StatusChip';
 import {PageCard} from 'components/PageCard';
@@ -16,8 +22,12 @@ import {PDFContainer} from 'components/PDFContainer';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {EmptySection} from 'components/EmptySection';
 import {Confirm} from 'components/Confirm';
+import {SendEmailDialog} from 'components/SendEmailDialog';
 import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps';
-import {useReplyQuotation} from 'hooks/reactQuery/useQuotation';
+import {
+  usePublishQuotation,
+  useReplyQuotation,
+} from 'hooks/reactQuery/useQuotation';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {PdfGenerationStatus} from 'models/misc';
 import {QuotationStatus, QuotationView} from 'models/quotation';
@@ -38,6 +48,8 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
   const {user} = useUserSession();
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
+  const [isRejectedDialogOpen, setIsRejectedDialogOpen] = useState(false);
   const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
 
   const {mutate: markAsAccepted} = useReplyQuotation();
@@ -55,6 +67,58 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
         );
     },
   });
+
+  const isPDFGenerated =
+    quotation.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
+    downloadUrl;
+
+  const actions = useMemo(() => {
+    const items = [];
+
+    if (quotation.status === QuotationStatus.DRAFT) {
+      items.push({
+        label: t('Mark Accepted'),
+        icon: <Check />,
+        onClick: () => setIsDialogOpen(true),
+      });
+    } else {
+      items.push({
+        label: t('Resend'),
+        icon: <ReplayIcon />,
+        onClick: () => setIsSendEmailDialogOpen(true),
+      });
+    }
+
+    if (isPDFGenerated) {
+      items.push({
+        label: t('Print'),
+        icon: <Print />,
+        onClick: () =>
+          downloadUrl &&
+          printJS({
+            printable: downloadUrl,
+            type: 'pdf',
+            showModal: true,
+          }),
+      });
+    }
+
+    items.push(
+      ...[
+        {
+          label: t('Edit'),
+          icon: <Edit />,
+          onClick: () => navigate(`/quotations/details/${quotation.id}/edit`),
+        },
+        {
+          label: t('Mark Rejected'),
+          icon: <Close />,
+          onClick: () => setIsRejectedDialogOpen(true),
+        },
+      ],
+    );
+    return items;
+  }, [downloadUrl]);
 
   return (
     <Box>
@@ -124,8 +188,7 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
               </Typography>
             </Box>
           </PageCard>
-          {quotation!.additionalInfo.pdfGenerationStatus ===
-            PdfGenerationStatus.DONE && downloadUrl.length ? (
+          {isPDFGenerated ? (
             <PDFContainer url={downloadUrl} />
           ) : (
             <PageCard>
@@ -198,13 +261,35 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
         </Grid>
       </Grid>
       <BottomDrawer
-        isOpen={quotation.status !== QuotationStatus.ACCEPTED}
-        primaryButtonLabel="Mark Accepted"
+        isOpen={
+          quotation.status !== QuotationStatus.ACCEPTED &&
+          quotation.status !== QuotationStatus.REJECTED
+        }
+        primaryButtonLabel={
+          quotation.status === QuotationStatus.DRAFT ? 'Send' : 'Mark Accepted'
+        }
         primaryButtonAction={() => {
-          setIsDialogOpen(true);
+          if (quotation.status === QuotationStatus.DRAFT) {
+            setIsSendEmailDialogOpen(true);
+          } else {
+            setIsDialogOpen(true);
+          }
         }}
-        listItems={[]}
+        listItems={actions.map((item, index) => ({
+          ...item,
+          showBorder: actions.length === index + 2,
+        }))}
         isValid
+      />
+      <SendEmailDialog
+        open={isSendEmailDialogOpen}
+        onConfirm={() => setIsSendEmailDialogOpen(false)}
+        onClose={() => setIsSendEmailDialogOpen(false)}
+        id={quotation.id}
+        submitHook={usePublishQuotation}
+        confirmBtnDisabled={!isPDFGenerated}
+        subject={quotation.subject}
+        content={quotation.description}
       />
       <Confirm
         open={isDialogOpen}
@@ -224,6 +309,26 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
         onClose={() => setIsDialogOpen(false)}
         title="Mark as accepted"
         content="Do you want to mark this quotation as accepted?"
+        helperText="This action is irreversible."
+      />
+      <Confirm
+        open={isRejectedDialogOpen}
+        onConfirm={() => {
+          if (quotation.id && user)
+            markAsAccepted({
+              quotationId: quotation.id,
+              reply: {
+                actorId: user.userAccount.id,
+                accepted: false,
+                isAccepted: false,
+                comments: ' ',
+              },
+            });
+          setIsRejectedDialogOpen(false);
+        }}
+        onClose={() => setIsRejectedDialogOpen(false)}
+        title="Mark as rejected"
+        content="Do you want to mark this quotation as rejected?"
         helperText="This action is irreversible."
       />
       <Dialog
