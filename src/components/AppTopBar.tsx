@@ -65,7 +65,7 @@ export const AppTopBar = ({
   };
 
   const profileBtnLabel = () => (
-    <Box ml={2}>
+    <Box display="flex" flexDirection="column" alignItems="flex-start">
       <Typography
         color="#222B45"
         variant="subtitle1"
