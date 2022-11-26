@@ -112,7 +112,7 @@ export const MarkAsPaidDialog = ({
           <FormInput
             props={{
               placeholder: 'e.g. 200',
-              label: 'Paid amount',
+              label: t('Paid amount'),
               name: 'amount.value',
               id: 'amount.value',
               value: formik.values.amount.value,

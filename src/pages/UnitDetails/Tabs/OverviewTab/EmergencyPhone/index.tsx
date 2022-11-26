@@ -79,9 +79,7 @@ export const EmergencyPhone = ({
     <InfoCard
       containerStyles={{...containerStyles}}
       handleAction={() => setOpenDialog(true)}
-      header={
-        <Typography variant="subtitle1">{t('Emergency Phone')}</Typography>
-      }
+      header={<Typography variant="subtitle1">{t('Auto dialer')}</Typography>}
       headerActionIcon={<EditIcon />}
       showHeaderBackground
       bodyContainerStyle={{
