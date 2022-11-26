@@ -159,7 +159,7 @@ module.exports = {
     'New Unit': 'Neue Anlage',
     'Clear all': 'Alle löschen',
     'Customer ': 'Kunde',
-    No: 'Po',
+    No: 'Nein',
     'This week': 'Diese Woche',
     'Next week': 'Nächste Woche',
     'Next month': 'Nächster Monat',
@@ -167,7 +167,7 @@ module.exports = {
     Clear: 'Löschen',
     Delete: 'Löschen',
     'Lower the number here, higher is the priority':
-      '1 is die höchste Priorität',
+      '1 ist die höchste Priorität',
     'Order Type': 'Auftragsart',
     'Ø AVAILABILITY': 'Ø VERFÜGBARKEIT',
     'Ø RUNTIME/DAY': 'Ø LAUFZEIT/TAG',
@@ -494,7 +494,7 @@ module.exports = {
     PARKING: 'PARKPLATZ',
     'Edit Location': 'Adresse bearbeiten',
     Save: 'Speichern',
-    Saving: 'Sparen',
+    Saving: 'Speichern',
     'e.g. Residential': 'z.B. Gewerbe',
     'UNIT CATEGORY': 'ANLAGENKATEGORIE',
     'UNIT TYPE': 'ANLAGENTYP',
@@ -512,7 +512,7 @@ module.exports = {
     'Single door; Double door': 'Einzeltür; Durchlader',
     'Automatic, manual, etc': 'Automatisch, manuell, etc.',
     'Fabric number': 'Seriennummer',
-    Service: 'Dienstleistung',
+    Service: 'Service',
     'LAST INSPECTION': 'LETZTE INSPEKTION',
     'REQUIRED VISITS/YEAR': 'ERFORDERLICHE BESUCHE/JAHR',
     'REQUIRED TIME': 'WARTUNGSZEIT',
@@ -629,7 +629,7 @@ module.exports = {
     'End Date': 'Enddatum',
     'EXTERNAL ID': 'ARTIKELNUMMER',
     'e.g. 100001': 'z.B. 100001',
-    'Select unit': 'Einheit wählen',
+    'Select unit': 'Anlage wählen',
     'Select technicians': 'Techniker auswählen',
     'Add description': 'Beschreibung hinzufügen',
     'Choose Technicians': 'Techniker auswählen',
@@ -683,7 +683,7 @@ module.exports = {
     'UNIT PRICE': 'PREIS JE EINHEIT',
     Quantity: 'Anzahl',
     QUANTITY: 'ANZAHL',
-    Unit: 'Anlage',
+    Unit: 'Einheit',
     UNIT: 'EINHEIT',
     'Total Price': 'Gesamtpreis',
     '(excl VAT)': '(ohne MwSt.)',
@@ -834,7 +834,7 @@ module.exports = {
     'Unit details updated successfully':
       'Die Einheitendetails wurden erfolgreich aktualisiert',
     'Technicians updated successfully':
-      'Die Techniker wurden erfolgreich aktualisiert',
+      'Der Techniker wurden erfolgreich aktualisiert',
     'Unit created successfully': 'Die Einheit wurde erfolgreich erstellt',
     'Service order rescheduled successfully':
       'Der Serviceauftrag wurde erfolgreich umgeplant',
@@ -858,10 +858,10 @@ module.exports = {
     //   'Keine Informationen vorhanden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
     'Please click the button below to add.':
       'Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
-    'No contracts yet. Please click the button below to add.':
-      'Es sind noch keine Verträge vorhanden. Bitte klicken Sie zum Hinzufügen auf die Schaltfläche unten.',
-    'No units yet. Please click the button below add.':
-      'Es sind noch keine Anlagen vorhanden. Bitte klicken Sie zum Hinzufügen  auf die Schaltfläche unten.',
+    'No contracts yet. Please click the button below to add!':
+      'Keine Verträge vorhanden',
+    'No units yet. Please click the button below to add!':
+      'Keine Anlagen vorhanden',
     'No customers yet. Please click the button below to add.':
       'Es sind noch keine Kunden vorhanden. Bitte klicken Sie zum Hinzufügen auf die Schaltfläche unten.',
     'No employees yet. Please click the button below to add.':
@@ -930,7 +930,7 @@ module.exports = {
     'Mark as accepted': 'Als angenommen markieren',
     'Do you want to mark this quotation as accepted?':
       'Möchten Sie dieses Angebot als angenommen markieren?',
-    'Mark Accepted': 'Markierung Akzeptiert',
+    'Mark Accepted': 'Angebot angenommen',
     'Download Quotation': 'Angebot herunterladen',
     'No service order has been created for this quotation yet!':
       'Für dieses Angebot wurde noch kein Serviceauftrag erstellt!',
@@ -1035,6 +1035,61 @@ module.exports = {
     'Press Enter to submit note':
       'Klicken Sie Enter, um die Notiz zu speichern',
     'Submit note': 'Notiz speichern',
+    'Repeat Password': 'Wiederhole Passwort',
+    '+ Add New Unit': '+ Anlage hinzufügen',
+    '+ Add New Contract': '+ Vertrag hinzufügen',
+    'Add Unit': 'Anlage hinzufügen',
+    'Remove Employee': 'Mitarbeiter entfernen',
+    'YEAR BUILT': 'Baujahr'.toUpperCase(),
+    'Edit Technician': 'Priorität bearbeiten',
+    'Add Customer': 'Kunde hinzufügen',
+    'Do you want to mark this To-Do as completed?':
+      'Möchten Sie diese Aufgabe als erledigt markieren?',
+    More: 'Mehr',
+    'e.g. John': 'z.B. John',
+    Confirm: 'Bestätigung',
+    'Do you want to remove this employee?':
+      'Möchten Sie den Mitarbeiter wirklich entfernen?',
+    'Edit Note': 'Notiz bearbeiten',
+    'Select a date, time & technician':
+      'Wählen Sie Datum, Uhrzeit und Techniker',
+    'Do you want to delete this unit?': 'Möchten Sie diese Einheit löschen?',
+    'Keep as Unpaid': 'Unbezahlt lassen',
+    'Paid in full': 'Vollständig gezahlt',
+    'Paid amount': 'Gezahlter Betrag',
+    Preview: 'Vorschau',
+    Edit: 'Bearbeiten',
+    Payment: 'Zahlung',
+    'Due Date': 'Fälligkeitsdatum',
+    'Selected Unit': 'Gewählte Anlage',
+    'Selected Technician': 'Gewählter Techniker',
+    'Please describe what happened': 'Bitte beschreiben Sie',
+    'Send email': 'Email senden',
+    'Email Address': 'Emailadresse',
+    Technicians: 'Techniker',
+    'Selected Date & Time': 'Gewähltes Datum und Uhrzeit',
+    'Supplier Article': 'Lieferantenartikelnr',
+    'No documents attached. They will appear here once added!':
+      'Keine Dokumente beigefügt. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!',
+    'PAYMENT DUE': 'VERPFLICHTETE ZAHLUNG',
+    DISCOUNT: 'DISCOUNT',
+    'NOTICE PERIOD': 'MELDUNGSFRIST',
+    'YEARLY PRICE ADJUSTMENT': 'JÄHRLICHE PREISANPASSUNG',
+    'HOURLY RATE': 'STUNDENPREIS',
+    'First name is required': 'Vorname ist erforderlich',
+    'Last name is required': 'Nachname ist erforderlich',
+    'Phone number is required': 'Telefonnummer ist erforderlich',
+    'address is a required field': 'Adresse ist ein Pflichtfeld',
+    'e.g. Karl-Liebknecht-Str. 32, 10178 Berlin':
+      'z.B. Karl-Liebknecht-Str. 32, 10178 Berlin',
+    'e.g. +49 173 12345678': 'z.B. +49 173 12345678',
+    'e.g johndoe@example.com': 'z.B. johndoe@example.com',
+    'Company:': 'Unternehmen:',
+    'Elevator Address:': 'Aufzug Adresse:',
+    'Last Visit:': 'Letzter Besuch:',
+    'Capacity:': 'Kapazität:',
+    'Next Visit:': 'Nächster Besuch:',
+    'More details': 'Mehr Details',
   },
 };
 

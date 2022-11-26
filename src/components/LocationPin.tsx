@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import {useNavigate} from 'react-router-dom';
 import Tooltip from '@mui/material/Tooltip';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useTranslation} from 'react-i18next';
 import {ReactComponent as Pin} from '../assets/icons/Pin.svg';
 import {ElevatorStatus, ElevatorView} from '../models/elevator';
 import {StatusIndicator} from './StatusIndicator';
@@ -22,6 +23,7 @@ export const LocationPin = ({
   lng /* eslint-disable-line */, //we had to disable this rule, we do not need this props but react google maps require us to pass it
   children,
 }: Props) => {
+  const {t} = useTranslation();
   const formatDate = useFormatDate();
   const navigate = useNavigate();
   const renderTooltipDetail = (elevator: ElevatorView) => (
@@ -34,7 +36,7 @@ export const LocationPin = ({
       <Box display="flex" justifyContent="space-between">
         <Box sx={{flexGrow: 1}}>
           <Typography variant="caption" mt="1em">
-            Company: <br />{' '}
+            {t('Company:')} <br />
             <Typography
               color="text.secondary"
               sx={{whiteSpace: 'wrap', mr: '0.5em'}}>
@@ -50,9 +52,11 @@ export const LocationPin = ({
             }
             containerStyles={{ml: '5em'}}>
             <Typography variant="caption">
-              {`${elevator.status.charAt(0)}${elevator.status
-                .slice(1)
-                .toLowerCase()}`}
+              {t(
+                `${elevator.status.charAt(0)}${elevator.status
+                  .slice(1)
+                  .toLowerCase()}`,
+              )}
             </Typography>
           </StatusIndicator>
         </Box>
@@ -60,7 +64,7 @@ export const LocationPin = ({
       <Box display="flex" justifyContent="space-between" mt="1em">
         <Box sx={{flexGrow: 1}}>
           <Typography variant="caption">
-            Elevator Address: <br />
+            {t('Elevator Address:')} <br />
             <Typography
               color="text.secondary"
               sx={{whiteSpace: 'wrap', mr: '0.5em'}}>
@@ -70,7 +74,7 @@ export const LocationPin = ({
         </Box>
         <Box>
           <Typography variant="caption" mt="1em">
-            Capacity: <br />{' '}
+            {t('Capacity:')} <br />
             <Typography color="text.secondary">{elevator.capacity}</Typography>
           </Typography>
         </Box>
@@ -78,16 +82,15 @@ export const LocationPin = ({
       <Box display="flex" justifyContent="space-between" mt="1em">
         <Box sx={{flexGrow: 1}}>
           <Typography variant="caption">
-            Last Visit: <br />{' '}
+            {t('Last Visit:')} <br />
             <Typography color="text.secondary">
-              {' '}
               {formatDate(elevator.lastVisitDate)}
             </Typography>
           </Typography>
         </Box>
         <Box>
           <Typography variant="caption">
-            Next Visit: <br />
+            {t('Next Visit:')} <br />
             {elevator.nextVisitDate && (
               <Typography color="text.secondary">
                 {' '}
