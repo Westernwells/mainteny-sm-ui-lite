@@ -8,7 +8,7 @@ import {
   Home,
   LocalPhone,
   Edit,
-  Numbers,
+  HomeWork,
 } from '@mui/icons-material';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
@@ -90,10 +90,15 @@ export const CustomerOverviewTab = ({
           value: totalContracts.toString() || '-',
           icon: <FileCopy sx={{color: theme.palette.info.dark}} />,
         },
-        customerNumber: {
-          label: 'CUSTOMER NUMBER',
-          value: customer.externalId || '-',
-          icon: <Numbers sx={{color: theme.palette.info.dark}} />,
+        billingAddress: {
+          label: 'BILLING ADDRESS',
+          value: customer.billingAddress.fullName || '-',
+          icon: <HomeWork sx={{color: theme.palette.info.dark}} />,
+        },
+        billingEmailAddress: {
+          label: 'BILLING EMAIL ADDRESS',
+          value: customer.additionalInfo.billingEmail || '-',
+          icon: <Email sx={{color: theme.palette.info.dark}} />,
         },
       });
     }
@@ -107,7 +112,9 @@ export const CustomerOverviewTab = ({
 
   const renderBasicDetails = () => (
     <InfoCard
-      header={<Typography variant="subtitle1">{t('Basic Details')}</Typography>}
+      header={
+        <Typography variant="subtitle1">{t('Basic Information')}</Typography>
+      }
       containerStyles={{flexGrow: 1}}
       headerStyles={{mt: '0.5em'}}
       handleAction={() => setOpenDialog(true)}
@@ -124,7 +131,7 @@ export const CustomerOverviewTab = ({
             }}>
             <EmployeeAvatar
               name={customer?.name || ''}
-              subTitle={customer?.number || ''}
+              subTitle={customer?.externalId || ''}
             />
             <Divider
               orientation="vertical"
@@ -133,25 +140,19 @@ export const CustomerOverviewTab = ({
             />
           </Box>
         </Grid>
-        <Grid item xs={10}>
-          <Box display="flex" flexWrap="wrap" mt="-1em">
-            {basicDetails &&
-              Object.keys(basicDetails).map((item, index) => (
+        <Grid container item xs={10} gap={4}>
+          {basicDetails &&
+            Object.keys(basicDetails).map((item, index) => (
+              <Grid key={index} item xs={12} md={3.5}>
                 <CardProps
-                  key={index}
                   label={basicDetails[item as keyof BasicDetails].label}
                   icon={basicDetails[item as keyof BasicDetails].icon}
-                  containerStyles={{
-                    mr: '2em',
-                    mt: '1em',
-                    width: '30%',
-                  }}
                   iconBackground={theme.palette.info.outlinedHoverBg}
                   iconMaxHeight="3rem"
                   bodyText={basicDetails[item as keyof BasicDetails].value}
                 />
-              ))}
-          </Box>
+              </Grid>
+            ))}
         </Grid>
       </Grid>
       {customer && (
