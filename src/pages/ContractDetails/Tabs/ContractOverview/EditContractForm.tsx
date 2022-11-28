@@ -100,12 +100,14 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
             label: 'Renewal Period (in months)',
             name: 'renewalTerms',
             type: 'number',
-            value: Number(formik.values.renewalTerms).toString(),
+            value: formik.values.renewalTerms,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
             error: !!(
               formik.touched.renewalTerms && formik.errors.renewalTerms
             ),
+            helperText:
+              formik.touched.renewalTerms && formik.errors.renewalTerms,
             inputProps: {
               min: 0,
               max: 12,
