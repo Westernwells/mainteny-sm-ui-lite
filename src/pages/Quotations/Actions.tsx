@@ -16,6 +16,7 @@ import CopyAll from '@mui/icons-material/CopyAll';
 import CheckIcon from '@mui/icons-material/Check';
 import SendIcon from '@mui/icons-material/Send';
 import ReplayIcon from '@mui/icons-material/Replay';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Print from '@mui/icons-material/Print';
 import Close from '@mui/icons-material/Close';
 import FileDownload from '@mui/icons-material/FileDownload';
@@ -139,6 +140,14 @@ export const Actions = ({quotation}: Props) => {
       );
     }
 
+    if (quotation.status === QuotationStatus.DRAFT) {
+      items.push({
+        label: t('Delete'),
+        icon: <DeleteIcon />,
+        onClick: () => setIsDeleteDialogOpen(true),
+      });
+    }
+
     return items;
   }, [downloadUrl]);
 
@@ -183,7 +192,7 @@ export const Actions = ({quotation}: Props) => {
                 <Typography variant="body2">{item.label}</Typography>
               </ListItemText>
             </MenuItem>
-            {index === 0 && <Divider />}
+            {index === 0 && actions.length > 1 && <Divider />}
           </Box>
         ))}
       </Menu>
