@@ -92,7 +92,7 @@ export const CustomerOverviewTab = ({
         },
         billingAddress: {
           label: 'BILLING ADDRESS',
-          value: customer.billingAddress.fullName || '-',
+          value: customer.billingAddress?.fullName || '-',
           icon: <HomeWork sx={{color: theme.palette.info.dark}} />,
         },
         billingEmailAddress: {

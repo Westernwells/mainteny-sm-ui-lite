@@ -31,7 +31,7 @@ export interface PropertyOwnerView {
   name: string;
   number: string;
   postalAddress: Address;
-  billingAddress: Address;
+  billingAddress?: Address;
   businessAddress: Address;
   serviceCompany: ServiceCompany;
   contact: ContactPropertyOwner;
