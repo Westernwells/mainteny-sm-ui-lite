@@ -18,17 +18,18 @@ export const getQuotationStatusStyles = (
     | 'info'
     | 'default'
     | 'primary'
+    | 'eden.light'
     | 'action.active';
 } => {
   switch (status) {
     case QuotationStatus.ACCEPTED:
-      return {label: 'Accepted', color: 'warning'};
+      return {label: 'Accepted', color: 'success'};
     case QuotationStatus.DRAFT:
-      return {label: 'Draft', color: 'action.active'};
+      return {label: 'Draft', color: 'eden.light'};
     case QuotationStatus.REJECTED:
       return {label: 'Denied', color: 'error'};
     case QuotationStatus.SENT_TO_CLIENT:
-      return {label: 'Sent', color: 'success'};
+      return {label: 'Sent', color: 'primary'};
     default:
       return {label: '-', color: 'default'};
   }
