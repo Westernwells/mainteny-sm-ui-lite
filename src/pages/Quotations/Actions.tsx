@@ -1,6 +1,7 @@
 import {useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
+import printJS from 'print-js';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
@@ -16,6 +17,8 @@ import CheckIcon from '@mui/icons-material/Check';
 import SendIcon from '@mui/icons-material/Send';
 import ReplayIcon from '@mui/icons-material/Replay';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Print from '@mui/icons-material/Print';
+import Close from '@mui/icons-material/Close';
 import FileDownload from '@mui/icons-material/FileDownload';
 import {Confirm} from 'components/Confirm';
 import {SendEmailDialog} from 'components/SendEmailDialog';
@@ -38,6 +41,7 @@ export const Actions = ({quotation}: Props) => {
   const navigate = useNavigate();
   const {user} = useUserSession();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isRejectedDialogOpen, setIsRejectedDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -65,41 +69,36 @@ export const Actions = ({quotation}: Props) => {
     const items = [];
 
     if (quotation.status === QuotationStatus.DRAFT) {
-      items.unshift(
-        ...[
-          {
-            label: t('Send'),
-            icon: <SendIcon />,
-            onClick: () => setIsSendEmailDialogOpen(true),
-          },
-          {
-            label: t('Delete'),
-            icon: <DeleteIcon />,
-            onClick: () => setIsDeleteDialogOpen(true),
-          },
-        ],
-      );
+      items.push({
+        label: t('Send'),
+        icon: <SendIcon />,
+        onClick: () => setIsSendEmailDialogOpen(true),
+      });
     } else if (quotation.status === QuotationStatus.SENT_TO_CLIENT) {
-      items.unshift({
+      items.push({
         label: t('Resend'),
         icon: <ReplayIcon />,
         onClick: () => setIsSendEmailDialogOpen(true),
       });
     }
 
-    if (
-      quotation.status === QuotationStatus.DRAFT ||
-      quotation.status === QuotationStatus.SENT_TO_CLIENT
-    ) {
-      items.unshift({
-        label: t('Mark Accepted'),
-        icon: <CheckIcon />,
-        onClick: () => setIsDialogOpen(true),
-      });
-    }
-
     items.push(
       ...[
+        ...(isPDFGenerated
+          ? [
+              {
+                label: t('Print'),
+                icon: <Print />,
+                onClick: () =>
+                  downloadUrl &&
+                  printJS({
+                    printable: Object.values(downloadUrl)[0],
+                    type: 'pdf',
+                    showModal: true,
+                  }),
+              },
+            ]
+          : []),
         {
           label: t('Duplicate'),
           icon: <CopyAll />,
@@ -120,6 +119,35 @@ export const Actions = ({quotation}: Props) => {
           : []),
       ],
     );
+
+    if (
+      quotation.status === QuotationStatus.DRAFT ||
+      quotation.status === QuotationStatus.SENT_TO_CLIENT
+    ) {
+      items.push(
+        ...[
+          {
+            label: t('Mark Accepted'),
+            icon: <CheckIcon />,
+            onClick: () => setIsDialogOpen(true),
+          },
+          {
+            label: t('Mark Rejected'),
+            icon: <Close />,
+            onClick: () => setIsRejectedDialogOpen(true),
+          },
+        ],
+      );
+    }
+
+    if (quotation.status === QuotationStatus.DRAFT) {
+      items.push({
+        label: t('Delete'),
+        icon: <DeleteIcon />,
+        onClick: () => setIsDeleteDialogOpen(true),
+      });
+    }
+
     return items;
   }, [downloadUrl]);
 
@@ -157,13 +185,14 @@ export const Actions = ({quotation}: Props) => {
               onClick={() => {
                 item.onClick();
                 handleClose();
-              }}>
+              }}
+              sx={{py: '0.5rem'}}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText>
                 <Typography variant="body2">{item.label}</Typography>
               </ListItemText>
             </MenuItem>
-            {actions[actions.length - 1] !== item && <Divider />}
+            {index === 0 && actions.length > 1 && <Divider />}
           </Box>
         ))}
       </Menu>
@@ -186,6 +215,26 @@ export const Actions = ({quotation}: Props) => {
         onClose={() => setIsDialogOpen(false)}
         title="Mark as accepted"
         content="Do you want to mark this quotation as accepted?"
+        helperText="This action is irreversible."
+      />
+      <Confirm
+        open={isRejectedDialogOpen}
+        onConfirm={() => {
+          if (quotation.id && user)
+            markAsAccepted({
+              quotationId: quotation.id,
+              reply: {
+                actorId: user.userAccount.id,
+                accepted: false,
+                isAccepted: false,
+                comments: ' ',
+              },
+            });
+          setIsRejectedDialogOpen(false);
+        }}
+        onClose={() => setIsRejectedDialogOpen(false)}
+        title="Mark as rejected"
+        content="Do you want to mark this quotation as rejected?"
         helperText="This action is irreversible."
       />
       <SendEmailDialog

@@ -175,15 +175,19 @@ export const Actions = ({invoice}: Props) => {
             navigate(`/invoices/details/${invoice.id}/edit`);
           },
         },
-        {
-          label: t('Delete'),
-          icon: <DeleteIcon />,
-          onClick: () => {
-            setIsDeleteDialogOpen(true);
-          },
-        },
       ],
     );
+    if (
+      ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
+    ) {
+      items.push({
+        label: t('Delete'),
+        icon: <DeleteIcon />,
+        onClick: () => {
+          setIsDeleteDialogOpen(true);
+        },
+      });
+    }
     return items;
   }, [downloadUrl]);
 

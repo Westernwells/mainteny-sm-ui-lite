@@ -258,14 +258,18 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
           setIsSendEmailDialogOpen(true);
         },
       },
-      {
+    ];
+    if (
+      ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
+    ) {
+      items.push({
         label: t('Delete'),
         icon: <DeleteIcon />,
         onClick: () => {
           setIsDeleteDialogOpen(true);
         },
-      },
-    ];
+      });
+    }
     if (
       isPDFGenerated &&
       (invoice.status === InvoiceStatus.DRAFT ||
