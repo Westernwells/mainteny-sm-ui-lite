@@ -89,24 +89,24 @@ export const ViewInvoice = ({downloadUrl, invoice, workReport}: Props) => {
         },
       });
     }
-    items.push(
-      ...[
-        {
-          label: t('Edit'),
-          icon: <Edit />,
-          onClick: () => {
-            navigate(`/invoices/details/${invoice.id}/edit`);
-          },
+    items.push({
+      label: t('Edit'),
+      icon: <Edit />,
+      onClick: () => {
+        navigate(`/invoices/details/${invoice.id}/edit`);
+      },
+    });
+    if (
+      ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
+    ) {
+      items.push({
+        label: t('Delete'),
+        icon: <DeleteIcon />,
+        onClick: () => {
+          setIsDeleteDialogOpen(true);
         },
-        {
-          label: t('Delete'),
-          icon: <DeleteIcon />,
-          onClick: () => {
-            setIsDeleteDialogOpen(true);
-          },
-        },
-      ],
-    );
+      });
+    }
     return items;
   }, [downloadUrl]);
 
