@@ -219,7 +219,7 @@ const attachElevatorsToContract = async (
   contractId: string,
   body: string[],
 ) => {
-  await axiosClient.put<StringValue>(
+  await axiosClient.post<StringValue>(
     `/api/contracts/${contractId}/elevators`,
     body,
   );
