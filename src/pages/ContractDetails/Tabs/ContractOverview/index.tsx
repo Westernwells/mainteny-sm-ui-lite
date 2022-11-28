@@ -49,8 +49,8 @@ interface Props {
 
 const validationSchema = Yup.object().shape({
   renewalTerms: Yup.number()
-    .min(0, '0 is minimal value')
-    .max(12, '12 is maximum value'),
+    .min(0, 'Renewal period must be between 0-12 months')
+    .max(12, 'Renewal period must be between 0-12 months'),
 });
 
 export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
@@ -106,7 +106,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       ...contractDetails,
       type: convertToMacro(formik.values.type || ''),
       ...contractDetails?.additionalInfo,
-      renewalTerms: +formik.values.renewalTerms,
+      renewalTerms: formik.values.renewalTerms,
       price: {
         ...amountRecordForBackend({
           netAmount: +formik.values.price,
