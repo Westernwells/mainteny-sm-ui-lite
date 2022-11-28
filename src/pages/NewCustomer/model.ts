@@ -10,6 +10,7 @@ export type BasicCustomerFormModel = {
   postalAddress: AddressRecord | null;
   priority: Priority | null;
   externalId: string;
+  registrationDate: Date;
 };
 
 export type NewCustomerBody = {
@@ -25,4 +26,5 @@ export type NewCustomerBody = {
   postalAddress: AddressRecord | null;
   priority: Priority | null;
   serviceCompanyId: string;
+  registrationDate: Date;
 };

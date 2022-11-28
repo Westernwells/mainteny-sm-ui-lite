@@ -10,6 +10,7 @@ import {PageCard} from 'components/PageCard';
 import {AddressAutoComplete} from 'components/AddressAutoComplete';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FormInput} from 'components/form/FormInput';
+import {DatePicker} from 'components/DatePicker';
 import {BasicCustomerFormModel} from './model';
 
 interface Props {
@@ -51,6 +52,7 @@ export const BasicCustomerForm = ({
       billingAddress: initialValues?.billingAddress || null,
       priority: initialValues?.priority || null,
       externalId: initialValues?.externalId || '',
+      registrationDate: initialValues?.registrationDate || new Date(),
     },
     onSubmit: () => {},
     validationSchema,
@@ -245,6 +247,23 @@ export const BasicCustomerForm = ({
                   mt: '0.5em',
                 },
                 required: true,
+                ...defaultProps,
+              }}
+            />
+          </Grid>
+          <Grid item md={4}>
+            <DatePicker
+              defaultDate={formik.values.registrationDate}
+              getSelectedDate={(newValue) => {
+                if (newValue)
+                  formik.setFieldValue('registrationDate', newValue);
+              }}
+              textFieldProps={{
+                label: 'Customer Since',
+                placeholder: 'Select date',
+                sx: {
+                  mt: '0.5em',
+                },
                 ...defaultProps,
               }}
             />
