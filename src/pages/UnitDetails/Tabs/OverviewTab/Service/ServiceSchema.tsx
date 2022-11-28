@@ -76,7 +76,9 @@ export const ServiceSchema = ({label, elevator, visitNumber}: Props) => {
             bodyText={
               elevator.serviceTime > 60
                 ? convertMinsToHM(elevator.serviceTime)
-                : elevator.serviceTime || '-'
+                : elevator.serviceTime > 0
+                ? `${elevator.serviceTime}m`
+                : '-'
             }
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
