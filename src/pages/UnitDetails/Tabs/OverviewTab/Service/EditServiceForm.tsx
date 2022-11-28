@@ -3,6 +3,7 @@ import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
 import Grid from '@mui/material/Grid';
+import InputAdornment from '@mui/material/InputAdornment';
 import {Priority} from 'models/misc';
 import {ServiceFormModel} from 'models/unitForm';
 import {convertToText} from 'utils/utils';
@@ -63,9 +64,8 @@ export const EditServiceForm = ({formik}: Props) => {
       <Grid item sm={12}>
         <FormInput
           props={{
-            label: 'Time',
+            label: 'Required Time',
             name: 'serviceTime',
-            placeholder: 'In minutes',
             value: formik.values.serviceTime,
             helperText:
               formik.errors.serviceTime && formik.touched.serviceTime
@@ -76,6 +76,11 @@ export const EditServiceForm = ({formik}: Props) => {
             onBlur: formik.handleBlur,
             type: 'number',
             inputProps: {min: 0},
+            InputProps: {
+              endAdornment: (
+                <InputAdornment position="end">{t('minutes')}</InputAdornment>
+              ),
+            },
           }}
         />
       </Grid>
