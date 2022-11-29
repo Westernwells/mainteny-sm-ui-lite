@@ -99,6 +99,6 @@ export const makeRows = (
           serviceCompanyId: item.serviceCompany.id,
         },
         invoice: item,
-        navigateTo: `details/${item.id}`,
+        navigateTo: `/invoices/details/${item.id}`,
       }))
     : [];
