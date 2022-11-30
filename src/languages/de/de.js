@@ -87,6 +87,7 @@ module.exports = {
     'START DATE': 'ANFANGSDATUM',
     'NO. OF UNITS': 'ANZAHL ANLAGEN',
     'CUSTOMER SINCE': 'KUNDE SEIT',
+    'Customer Since': 'Kunde seit',
     'CONTACT TYPE': 'KONTAKT',
     'New Contract': 'Neuer Vertrag',
     'Select units': 'Wähle Aufzug',
@@ -643,6 +644,15 @@ module.exports = {
     'Selected technician': 'Ausgewählter Techniker',
     'Description (Optional)': 'Beschreibung (fakultativ)',
     'Select date, time & technicians': 'Wähle: Datum, Uhrzeit und Techniker',
+    'Select date': 'Datum auswählen',
+    Print: 'Drucken',
+    'Mark as rejected': 'Als abgelehnt markieren',
+    'Mark Rejected': 'Abgelehnt markieren',
+    'Do you want to mark this quotation as rejected?':
+      'Möchten Sie dieses Angebot als abgelehnt markieren?',
+    'This action is irreversible': 'Diese Aktion ist unwiderruflich',
+    'Renewal period must be between 0-12 months':
+      'Der Verlängerungszeitraum muss zwischen 0-12 Monaten liegen',
     Immediate: 'Sofort',
     'Select a due date': 'Wählen Sie ein Fälligkeitsdatum',
     'Choose a Date, Time & Technician':
@@ -746,6 +756,7 @@ module.exports = {
     'No. of Units': 'Anzahl Anlagen',
     'New Customer': 'Neuer Kunde',
     'JOINED DATE': 'Erstellungsdatum',
+    'Article Name': 'Artikelbezeichnung',
     PRIORITY: 'PRIORITÄT',
     'NO. OF CONTRACTS': 'ANZAHL VERTRÄGE',
     'Basic Details': 'Allgemeine Angaben',
