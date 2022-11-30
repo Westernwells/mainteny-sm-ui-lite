@@ -2,31 +2,11 @@ import {FormikProps} from 'formik';
 import Grid from '@mui/material/Grid';
 
 import {FormInput} from 'components/form/FormInput';
-import {FormSelect} from 'components/form/FormSelect';
 import {BillingInformationCompanyFormModel} from './model';
 
 interface Props {
   formik: FormikProps<BillingInformationCompanyFormModel>;
 }
-
-export const currencies = [
-  {
-    label: 'USD',
-    value: 'USD',
-  },
-  {
-    label: 'Euro',
-    value: 'EUR',
-  },
-  {
-    label: 'Pound',
-    value: 'GBP',
-  },
-  {
-    label: 'Yen',
-    value: 'JPY',
-  },
-];
 
 export const EditBillingInformation = ({formik}: Props) => {
   const defaultProps = {
@@ -70,25 +50,6 @@ export const EditBillingInformation = ({formik}: Props) => {
             sx: {mb: '1em'},
             inputProps: {min: 0},
             ...defaultProps,
-          }}
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <FormSelect
-          labelId="currencySelect-label"
-          label="Currency"
-          options={currencies.map(({label, value}) => ({
-            label,
-            value,
-          }))}
-          selectProps={{
-            id: 'currencySelect',
-            value: formik.values.currencies[0],
-            error: !!(formik.touched.currencies && formik.errors.currencies),
-            name: 'currencies',
-            onChange: (event) =>
-              formik.setFieldValue('currencies', [event.target.value]),
-            onBlur: formik.handleBlur,
           }}
         />
       </Grid>
