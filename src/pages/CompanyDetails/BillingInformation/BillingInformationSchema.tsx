@@ -1,7 +1,7 @@
 import {CardProps} from 'components/CardProps';
 import useTheme from '@mui/material/styles/useTheme';
 import {ServiceCompanyItem} from 'models/service-company';
-import {AttachMoney, PointOfSale, Receipt} from '@mui/icons-material';
+import {PointOfSale, Receipt} from '@mui/icons-material';
 
 interface Props {
   label: string;
@@ -30,17 +30,6 @@ export const BillingInformationSchema = ({label, company}: Props) => {
             icon={<PointOfSale sx={{color: theme.palette.info.dark}} />}
             label="% VAT"
             bodyText={company?.settings?.percentageVat || '-'}
-            iconBackground={theme.palette.info.outlinedHoverBg}
-            iconMaxHeight="3em"
-            containerStyles={{mt: '0.5em'}}
-          />
-        );
-      case 'currencies':
-        return (
-          <CardProps
-            icon={<AttachMoney sx={{color: theme.palette.info.dark}} />}
-            label="Currency"
-            bodyText={company?.settings?.currencies?.[0]?.code || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}

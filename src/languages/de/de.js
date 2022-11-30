@@ -77,10 +77,6 @@ module.exports = {
     'Next 14 days': 'Nächsten 14 Tage',
     Contractor: 'Auftragnehmer',
     'Cost/Year': 'Kosten/Jahr',
-    'Below 1000€': 'Weniger als 1000€',
-    '1000 - 3000€': '1000 - 3000€',
-    '3000 - 5000€': '3000 - 5000€',
-    'Above 5000€': 'Über 5000€',
     CONTRACTOR: 'AUFTRAGNEHMER',
     'CONTRACT NO': 'VERTRAGSNUMMER',
     UNITS: 'EINHEITEN',
@@ -102,12 +98,14 @@ module.exports = {
     Premium: 'Premium',
     'Contract Terms': 'Vertragsbedingungen',
     'Invoice Due': 'Rechnung fällig',
-    'Yearly Contract Price (excl. VAT, in €)':
-      'Jährlicher Vertragspreis (ohne MwSt., in €)*',
+    'Yearly Contract Price (excl. VAT, in {{currencySymbol}})':
+      'Jährlicher Vertragspreis (ohne MwSt., in {{currencySymbol}})*',
     'Contract Renewal Period (in months)':
       'Vertragsverlängerungszeitraum (in Monaten)',
-    'Spending Allowance (in €)': 'Ausgabenlimit (in €)',
-    'Defined Hourly Rate (in €)': 'Vereinbarter Stundensatz (in €)',
+    'Spending Allowance (in {{currencySymbol}})':
+      'Ausgabenlimit (in {{currencySymbol}})',
+    'Defined Hourly Rate (in {{currencySymbol}})':
+      'Vereinbarter Stundensatz (in {{currencySymbol}})',
     'Yearly Price Adjustment (in %)': 'Jährliche Preisanpassung (in %)',
     'Service Level Agreement (in min)': 'Service Level Vereinbarung (in min)',
     'After Each Visit': 'Nach jedem Besuch',
@@ -129,10 +127,14 @@ module.exports = {
     'Edit Contract': 'Vertrag bearbeiten',
     'Number of Visits': 'Anzahl der Wartungen',
     'Enter number of visits': 'Eingeben Anzahl der Wartungen',
-    'Price/Year (excl. VAT, in €)': 'Preis/Jahr (ohne MwSt., in €)',
-    'Enter price/year': 'Eingeben Preis/Jahr (ohne MwSt., in €)',
-    'Spending Limit (in €)': 'Ausgabenpauschale (in €)',
-    'Enter spending limit (in €)': 'Eingeben Ausgabenpauschale (in €)',
+    'Price/Year (excl. VAT, in {{currencySymbol}})':
+      'Preis/Jahr (ohne MwSt., in {{currencySymbol}})',
+    'Enter price/year (in {{currencySymbol}})':
+      'Eingeben Preis/Jahr (ohne MwSt., in {{currencySymbol}})',
+    'Spending Limit (in {{currencySymbol}})':
+      'Ausgabenpauschale (in {{currencySymbol}})',
+    'Enter spending limit (in {{currencySymbol}})':
+      'Eingeben Ausgabenpauschale (in {{currencySymbol}})',
     'Renewal Period (in months)': 'Verlängerungszeitraum (in Monaten)',
     'Enter renewal Period (in months)':
       'Eingeben Verlängerungszeitraum (in Monaten)',
@@ -371,8 +373,8 @@ module.exports = {
     'e.g. Meier': 'z.B. Meier',
     'e.g. 16G0.75+2x(2x0.5)': 'z.B. 16G0.75+2x(2x0.5)',
     'e.g. Rack 20, Box 4': 'z. B. Rack 20, Box 4',
-    'e.g. 150€': 'z.B. 150€',
-    'e.g. 200€': 'z.B. 200€',
+    'e.g. 150{{currencySymbol}}': 'z.B. 150{{currencySymbol}}',
+    'e.g. 200{{currencySymbol}}': 'z.B. 200{{currencySymbol}}',
     'e.g. Flat cable used for door engines from the following suppliers.....':
       'z.B. Flachkabel für Türmotoren von folgenden Anbietern.....',
     'e.g. 50': 'z.B. 50',

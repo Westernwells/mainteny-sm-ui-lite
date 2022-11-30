@@ -31,6 +31,8 @@ export const EditBasicInfoForm = ({
       },
       CacheTypes.ELEVATOR_MODEL,
     );
+  const currencySymbol =
+    getCurrencySymbol[formik.values.unitPurchaseAmountCurrency];
   return (
     <Box display="flex" flexWrap="wrap" component="form">
       <FormInput
@@ -187,7 +189,7 @@ export const EditBasicInfoForm = ({
           props={{
             name: 'unitPurchaseAmount',
             label: t('Purchase Price'),
-            placeholder: t('e.g. 150€'),
+            placeholder: t(`e.g. 150{{currencySymbol}}`, {currencySymbol}),
             inputProps: {min: 0},
             type: 'number',
             value: formik.values.unitPurchaseAmount,
@@ -197,7 +199,7 @@ export const EditBasicInfoForm = ({
             InputProps: {
               startAdornment: (
                 <InputAdornment position="start">
-                  {getCurrencySymbol[formik.values.unitPurchaseAmountCurrency]}
+                  {currencySymbol}
                 </InputAdornment>
               ),
             },
@@ -208,7 +210,7 @@ export const EditBasicInfoForm = ({
           props={{
             name: 'unitSellingAmount',
             label: t('Selling Price'),
-            placeholder: t('e.g. 200€'),
+            placeholder: t(`e.g. 200{{currencySymbol}}`, {currencySymbol}),
             inputProps: {min: 0},
             type: 'number',
             required: true,
@@ -223,7 +225,7 @@ export const EditBasicInfoForm = ({
             InputProps: {
               startAdornment: (
                 <InputAdornment position="start">
-                  {getCurrencySymbol[formik.values.unitPurchaseAmountCurrency]}
+                  {currencySymbol}
                 </InputAdornment>
               ),
             },

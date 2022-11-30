@@ -1,4 +1,5 @@
 import React, {FC} from 'react';
+import {useTranslation} from 'react-i18next';
 import InputAdornment from '@mui/material/InputAdornment';
 import Grid from '@mui/material/Grid';
 import {FormInput} from 'components/form/FormInput';
@@ -16,7 +17,9 @@ interface Props {
 }
 
 const EditContractForm: FC<Props> = ({formik, currency}) => {
+  const {t} = useTranslation();
   const {user} = useUserSession();
+  const currencySymbol = getCurrencySymbol[currency];
   return (
     <Grid container spacing={2} sx={{mt: '0.5em'}}>
       <Grid item md={6}>
@@ -56,8 +59,12 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
       <Grid item md={6}>
         <FormInput
           props={{
-            placeholder: 'Enter price/year',
-            label: 'Price/Year (excl. VAT, in €)',
+            placeholder: t('Enter price/year (in {{currencySymbol}})', {
+              currencySymbol,
+            }),
+            label: t(`Price/Year (excl. VAT, in {{currencySymbol}})`, {
+              currencySymbol,
+            }),
             name: 'price',
             type: 'number',
             value: Number(formik.values.price).toString(),
@@ -67,7 +74,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
             InputProps: {
               startAdornment: (
                 <InputAdornment position="start" color="text.primary">
-                  €
+                  {currencySymbol}
                 </InputAdornment>
               ),
             },
@@ -77,8 +84,12 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
       <Grid item md={6}>
         <FormInput
           props={{
-            placeholder: 'Enter spending limit (in €)',
-            label: 'Spending Limit (in €)',
+            placeholder: t(`Enter spending limit (in {{currencySymbol}})`, {
+              currencySymbol,
+            }),
+            label: t(`Spending Limit (in {{currencySymbol}})`, {
+              currencySymbol,
+            }),
             name: 'spendingLimit',
             value: Number(formik.values.spendingLimit).toString(),
             onBlur: formik.handleBlur,
@@ -86,7 +97,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
             InputProps: {
               startAdornment: (
                 <InputAdornment position="start" color="text.primary">
-                  €
+                  {currencySymbol}
                 </InputAdornment>
               ),
             },
@@ -225,7 +236,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
             InputProps: {
               startAdornment: (
                 <InputAdornment position="start" color="text.primary">
-                  {getCurrencySymbol[currency]}
+                  {currencySymbol}
                 </InputAdornment>
               ),
             },

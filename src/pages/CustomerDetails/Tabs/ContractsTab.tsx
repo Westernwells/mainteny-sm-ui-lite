@@ -18,8 +18,10 @@ import {
 } from 'utils/contract-utils';
 import {EmptySection} from 'components/EmptySection';
 import {convertToMacro, convertToText} from 'utils/utils';
+import {useCurrentCurrency} from 'utils/currency';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {Widget} from 'components/Widget';
+import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
 import {columns, makeRows} from './CustomerContractDataGrid';
 
 interface Props {
@@ -27,6 +29,7 @@ interface Props {
 }
 
 export const ContractsTab = ({customerId}: Props) => {
+  const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
 
@@ -90,7 +93,7 @@ export const ContractsTab = ({customerId}: Props) => {
   }, [contractResource, page.pageSize]);
 
   const costRangeConvertor = (selectedItems: string[]) => {
-    const range = crConverter(selectedItems);
+    const range = crConverter(selectedItems, currentCurrency.symbol);
     setCost(range);
   };
 
@@ -104,12 +107,7 @@ export const ContractsTab = ({customerId}: Props) => {
           textInput.current.value = '';
         }
       }}>
-      <MultipleSelectCheckmarks
-        label="Price Range"
-        options={['0 - €500', '€500 - €1,000', '> €1,000']}
-        initialSelectedItems={cost}
-        getSelectedValue={(item) => costRangeConvertor(item)}
-      />
+      <PriceRangeDropdown cost={cost} costRangeConvertor={costRangeConvertor} />
       <MultipleSelectCheckmarks
         label="Status"
         options={['VALID', 'EXPIRED'].map((item) => convertToText(item))}

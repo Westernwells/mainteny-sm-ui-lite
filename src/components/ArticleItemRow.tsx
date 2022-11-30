@@ -8,6 +8,7 @@ import {QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord} from 'models/invoice';
 import {Amount} from 'models/misc';
 import {Button} from 'components/Button';
+import {useCurrentCurrency} from 'utils/currency';
 
 interface Props<T> {
   articleItem: T;
@@ -28,6 +29,7 @@ export const ArticleItemRow = ({
   setTotal,
   isPartial,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
+  const currentCurrency = useCurrentCurrency();
   const [name, setName] = useState(articleItem.name);
   const [description, setDescription] = useState<string>(
     articleItem.description,
@@ -142,7 +144,9 @@ export const ArticleItemRow = ({
               disabled
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">€</InputAdornment>
+                  <InputAdornment position="start">
+                    {currentCurrency.symbol}
+                  </InputAdornment>
                 ),
               }}
             />
@@ -152,7 +156,9 @@ export const ArticleItemRow = ({
               size="small"
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">€</InputAdornment>
+                  <InputAdornment position="start">
+                    {currentCurrency.symbol}
+                  </InputAdornment>
                 ),
               }}
             />
@@ -162,7 +168,9 @@ export const ArticleItemRow = ({
               disabled
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">€</InputAdornment>
+                  <InputAdornment position="start">
+                    {currentCurrency.symbol}
+                  </InputAdornment>
                 ),
               }}
             />
@@ -173,7 +181,11 @@ export const ArticleItemRow = ({
           onChange={handlePriceChange}
           size="small"
           InputProps={{
-            startAdornment: <InputAdornment position="start">€</InputAdornment>,
+            startAdornment: (
+              <InputAdornment position="start">
+                {currentCurrency.symbol}
+              </InputAdornment>
+            ),
           }}
         />
         {!isPartial && (
@@ -196,7 +208,9 @@ export const ArticleItemRow = ({
               disabled
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">€</InputAdornment>
+                  <InputAdornment position="start">
+                    {currentCurrency.symbol}
+                  </InputAdornment>
                 ),
               }}
             />

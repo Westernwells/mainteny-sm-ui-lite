@@ -20,7 +20,7 @@ const MenuProps = {
   },
 };
 
-interface Props {
+export interface Props {
   options: string[];
   getSelectedValue?: (item: string[]) => void;
   label: string;
