@@ -1,5 +1,11 @@
 import Dinero, {Currency} from 'dinero.js';
-import {Amount, AmountRecord, StringMap} from '../models/misc';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {
+  Amount,
+  AmountRecord,
+  StringMap,
+  Currency as CurrencyModalType,
+} from '../models/misc';
 
 export const formatCurrency = (
   amount: number,
@@ -9,7 +15,7 @@ export const formatCurrency = (
     style: 'currency',
     currencyDisplay: 'narrowSymbol',
     useGrouping: true,
-    currency: 'EUR',
+    currency: options?.currency ?? 'EUR',
     ...options,
   });
 
@@ -118,4 +124,16 @@ export const getCurrencySymbol: {[key: string]: string} = {
   GBP: '£',
   CNY: '¥',
   JPY: '¥',
+};
+
+export const useCurrentCurrency = (): CurrencyModalType => {
+  const {user} = useUserSession();
+
+  return (
+    user?.userAccount?.serviceCompany?.settings?.currencies?.[0] ?? {
+      code: 'EUR',
+      fractionDigits: 2,
+      symbol: '€',
+    }
+  );
 };

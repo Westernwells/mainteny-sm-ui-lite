@@ -31,6 +31,7 @@ import {
   amountRecordForBackend,
   formatCurrency,
   formatNetAmount,
+  useCurrentCurrency,
 } from 'utils/currency';
 import {convertToMacro, convertToText} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -55,6 +56,8 @@ const validationSchema = Yup.object().shape({
 
 export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const {t} = useTranslation();
+  const currentCurrency = useCurrentCurrency();
+  const currency = contractDetails?.currency ?? currentCurrency.code;
   const {id: contractId} = useParams();
   const theme = useTheme();
   const {mutateAsync: updateContract} = useUpdateContract('Contract updated');
@@ -110,7 +113,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       price: {
         ...amountRecordForBackend({
           netAmount: +formik.values.price,
-          currency: 'EUR',
+          currency,
           percentageVat:
             user?.userAccount.serviceCompany.settings.percentageVat || 0,
         }),
@@ -225,9 +228,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               }
               spendingLimit={formatCurrency(
                 contractDetails ? contractDetails.spendingLimit : 0,
-                {
-                  currency: contractDetails?.currency || 'EUR',
-                },
+                {currency},
               )}
               renewalPeriod={contractDetails?.additionalInfo?.renewalTerms}
               invoiceDue={convertToText(
@@ -248,9 +249,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               )}
               hourlyRate={formatCurrency(
                 contractDetails ? contractDetails.hourlyRate : 0,
-                {
-                  currency: contractDetails?.currency || 'EUR',
-                },
+                {currency},
               )}
             />
             <Dialog
@@ -260,10 +259,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               onSave={() => onContractSave()}
               dialogProps={{open: openContractDialog || false}}>
               {!isLoading && (
-                <EditContractForm
-                  formik={formik}
-                  currency={contractDetails.currency || 'EUR'}
-                />
+                <EditContractForm formik={formik} currency={currency} />
               )}
             </Dialog>
           </InfoCard>
