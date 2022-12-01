@@ -163,14 +163,15 @@ module.exports = {
     'Clear all': 'Alle löschen',
     'Customer ': 'Kunde',
     No: 'Nein',
+    No_number: 'No',
     'This week': 'Diese Woche',
     'Next week': 'Nächste Woche',
     'Next month': 'Nächster Monat',
     'Upcoming visits': 'Termine',
     Clear: 'Löschen',
     Delete: 'Löschen',
-    'Lower the number here, higher is the priority':
-      '1 ist die höchste Priorität',
+    'Higher the number here, higher is the priority':
+      'Höher Zahl, bedeutet höhere Priorität',
     'Order Type': 'Auftragsart',
     'Ø AVAILABILITY': 'Ø VERFÜGBARKEIT',
     'Ø RUNTIME/DAY': 'Ø LAUFZEIT/TAG',
@@ -269,6 +270,8 @@ module.exports = {
     Repair: 'Reparatur',
     Callout: 'Störung',
     Emergency: 'Personeneinschluss',
+    Inspection: 'Inspektion',
+    Installation: 'Installation',
     MAINTENANCE: 'Wartung'.toLocaleUpperCase(),
     REPAIR: 'Reparatur'.toLocaleUpperCase(),
     CALLOUT: 'Störung'.toLocaleUpperCase(),
@@ -402,6 +405,7 @@ module.exports = {
     'New Callout Order': 'Neue Störung',
     'New Repair Order': 'Neue Reparatur',
     'New Maintenance Order': 'Neue Wartung',
+    'Technician is required': 'Techniker ist notwendig',
 
     // Add new unit
     Customer: 'Kunden',
@@ -594,6 +598,7 @@ module.exports = {
     'e.g. central parking lot': 'z.B. zentraler Parkplatz',
     'e.g. Tobias': 'z.B. Tobias',
     'e.g. REWE AG': 'z.B. REWE AG',
+    'e.g 2': '',
 
     // Employee details
     'Work Hours': 'Arbeitszeiten',
@@ -873,6 +878,8 @@ module.exports = {
     'Please click the button below to add.':
       'Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
     'No contracts yet. Please click the button below to add!':
+      'Keine Verträge vorhanden',
+    'No contracts yet. Create a new one to view here':
       'Keine Verträge vorhanden',
     'No units yet. Please click the button below to add!':
       'Keine Anlagen vorhanden',

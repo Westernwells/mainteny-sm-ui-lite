@@ -92,7 +92,7 @@ export const columns = (
                     fontSize: '12px',
                     lineHeight: '166%',
                   }}>
-                  {t('Lower the number here, higher is the priority')}
+                  {t('Higher the number here, higher is the priority')}
                 </Typography>
               </Box>
             }

@@ -28,6 +28,7 @@ export const SelectButton = ({text, onClick, sxContainer}: Props) => (
         sx: {
           color: 'primary.main',
           background: 'transparent',
+          textTransform: 'none',
         },
         onClick,
       }}
