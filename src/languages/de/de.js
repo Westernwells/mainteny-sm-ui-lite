@@ -413,6 +413,7 @@ module.exports = {
     'Location Information': 'Informationen zum Standort',
     Address: 'Adresse',
     Building: 'Gebäude',
+    'Mark as complete': 'Als erledigt markieren',
     'Property Segment': 'Kundensegment',
     'Key Location': 'Schlüssel-Standort',
     Parking: 'Parkplatz',
