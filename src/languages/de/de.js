@@ -118,11 +118,13 @@ module.exports = {
     'PRICE/YEAR (Excl VAT)': 'PREIS/JAHR (ohne MwSt.)',
     'RENEWAL PERIOD': 'VERLÄNGERUNGSZEITRAUM',
     'INVOICE DUE': 'RECHNUNG FÄLLIG',
+    MONTHLY: 'MONATLICH',
+    Monthly: 'Monatlich',
     Parties: 'Vertragsparteien',
     Document: 'Dokumente',
     'Contract Timeline': 'Zeitrahmen',
-    'Contract expires in {{unUsedContractDays}} days!':
-      'Vertrag läuft in {{unUsedContractDays}} Tagen aus!',
+    'Contract renews in {{unUsedContractDays}} days!':
+      'Vertrag verlängert sich in {{unUsedContractDays}} Tagen',
     'Contract ends': 'Vertrag endet am',
     'Contract signed': 'Vertrag unterzeichnet am',
     'Edit Contract': 'Vertrag bearbeiten',

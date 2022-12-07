@@ -456,7 +456,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   background: theme.palette.warning.outlinedHoverBg,
                   color: theme.palette.warning.main,
                 }}>
-                {t('Contract expires in {{unUsedContractDays}} days!', {
+                {t('Contract renews in {{unUsedContractDays}} days!', {
                   unUsedContractDays,
                 })}
               </Alert>
