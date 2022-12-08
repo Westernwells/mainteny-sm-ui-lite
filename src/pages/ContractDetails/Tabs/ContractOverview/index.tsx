@@ -222,6 +222,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             }
             headerActionIcon={<EditIcon />}>
             <ContractBasic
+              status={contractDetails?.status}
               numberOfVisits={contractDetails?.visitsNumber}
               costPerYear={
                 formatNetAmount(contractDetails.additionalInfo?.price) || '-'
