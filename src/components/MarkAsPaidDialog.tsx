@@ -169,6 +169,7 @@ export const MarkAsPaidDialog = ({
             variant: 'text',
             sx: {
               mr: '1rem',
+              textTransform: 'capitalize',
             },
             onClick: onClose,
           }}>
@@ -184,6 +185,9 @@ export const MarkAsPaidDialog = ({
             autoFocus: true,
             disabled: formik.isSubmitting,
             onClick: () => formik.handleSubmit(),
+            sx: {
+              textTransform: 'capitalize',
+            },
           }}>
           <Typography variant="subtitle2">{t('Mark as paid')}</Typography>
         </Button>
