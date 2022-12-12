@@ -134,7 +134,7 @@ export const ScheduleDialog = ({
               clearOnBlur={false}
               disablePortal
               id="combo-box-demo"
-              sx={{minWidth: 500}}
+              sx={{minWidth: 500, mt: '0.5em'}}
               options={techniciansResource.data}
               onChange={(event: any, newValue: EmployeesView | null) =>
                 formik.setValues({
