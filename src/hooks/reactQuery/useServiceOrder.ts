@@ -402,14 +402,21 @@ export function useServiceOrderDetails(
   );
 }
 
-const getServiceOrderActivities = async (serviceOrderId: string) => {
+const getServiceOrderActivities = async (
+  serviceOrderId: string,
+  params: any = {},
+) => {
   const response: AxiosResponse<ServiceOrderActivityView[]> =
-    await axiosClient.get(`/api/serviceOrders/${serviceOrderId}/activities`);
+    await axiosClient.get(`/api/serviceOrders/${serviceOrderId}/activities`, {
+      params,
+      paramsSerializer,
+    });
   return response.data;
 };
 
 export function useServiceOrderActivities(
   serviceOrderId?: string,
+  params?: any,
   options?: UseQueryOptions<any, any, any>,
 ) {
   return useQuery<
@@ -417,8 +424,8 @@ export function useServiceOrderActivities(
     RestError,
     ServiceOrderActivityView[]
   >(
-    [queryKeys.serviceOrderActivity, serviceOrderId],
-    () => getServiceOrderActivities(serviceOrderId!),
+    [queryKeys.serviceOrderActivity, serviceOrderId, params],
+    () => getServiceOrderActivities(serviceOrderId!, params),
     {enabled: !!serviceOrderId, ...options},
   );
 }
