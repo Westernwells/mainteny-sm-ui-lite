@@ -1128,6 +1128,14 @@ module.exports = {
     'Capacity:': 'Kapazität:',
     'Next Visit:': 'Nächster Besuch:',
     'More details': 'Mehr Details',
+    'Add work report to invoice': 'Arbeitsbericht zur Rechnung hinzufügen',
+    'Mark all as read': 'Alles als gelesen markieren',
+    Order: 'Auftrag',
+    'Facility Manager': 'Facility Manager',
+    'Contact Person': 'Kontaktperson',
+    'Asset Owner': 'Eigentümer',
+    'Add units': 'Einheiten hinzufügen',
+    'Contact invited successfully': 'Kontakt erfolgreich eingeladen',
   },
 };
 
