@@ -79,6 +79,9 @@ export const NewArticle = () => {
     t('Add stock & suppliers'),
   ];
 
+  const percentageVat =
+    user?.userAccount?.serviceCompany?.settings?.percentageVat ?? 0;
+
   const formik = useFormik<ArticleBasicFormModel>({
     initialValues: {
       category: '',
@@ -89,10 +92,10 @@ export const NewArticle = () => {
       storageLocation: '',
       type: '',
       unit: '',
-      unitPurchaseVat: 0,
+      unitPurchaseVat: percentageVat,
       unitPurchaseAmount: 0,
       unitPurchaseAmountCurrency: currentCurrency.code,
-      unitSellingVat: 0,
+      unitSellingVat: percentageVat,
       unitSellingAmount: 0,
       unitSellingAmountCurrency: currentCurrency.code,
     },
