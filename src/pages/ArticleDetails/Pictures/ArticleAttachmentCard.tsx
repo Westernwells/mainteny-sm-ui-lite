@@ -42,7 +42,7 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
       name: article.name,
       externalId: article.externalId,
       pictureUrls: [
-        ...article.additionalInfo.pictureUrls,
+        ...(article.additionalInfo.pictureUrls || []),
         ...files.map((it) => it.uri),
       ],
       qrCode: article.additionalInfo.qrCode,

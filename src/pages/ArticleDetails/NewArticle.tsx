@@ -24,7 +24,11 @@ import {
 } from '../../models/articleForm';
 import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';
 import {AddStockForm} from './Stock/AddStockForm';
-import {amountRecordForBackend, makeAmountRecord} from '../../utils/currency';
+import {
+  amountRecordForBackend,
+  makeAmountRecord,
+  useCurrentCurrency,
+} from '../../utils/currency';
 
 const validationSchema = Yup.object().shape({
   category: Yup.string().nullable().required('Category is required'),
@@ -44,6 +48,7 @@ export const NewArticle = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const {t} = useTranslation();
+  const currentCurrency = useCurrentCurrency();
   const {mutateAsync: createArticle} = useCreateArticle(
     t('Article created successfully'),
   );
@@ -89,10 +94,10 @@ export const NewArticle = () => {
       unit: '',
       unitPurchaseVat: percentageVat,
       unitPurchaseAmount: 0,
-      unitPurchaseAmountCurrency: 'EUR',
+      unitPurchaseAmountCurrency: currentCurrency.code,
       unitSellingVat: percentageVat,
       unitSellingAmount: 0,
-      unitSellingAmountCurrency: 'EUR',
+      unitSellingAmountCurrency: currentCurrency.code,
     },
     onSubmit: () => {},
     validationSchema,

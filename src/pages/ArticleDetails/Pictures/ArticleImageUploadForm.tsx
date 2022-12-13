@@ -64,6 +64,7 @@ export const ArticleImageUploadForm = ({
         acceptedFileTypes={[
           'image/png',
           'image/jpeg',
+          'image/jpg',
           'image/bmp',
           'image/gif',
           'image/webp',

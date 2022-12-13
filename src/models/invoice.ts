@@ -25,6 +25,7 @@ export enum InvoiceDueType {
   HALF_YEARLY = 'HALF_YEARLY',
   QUARTERLY = 'QUARTERLY',
   YEARLY = 'YEARLY',
+  MONTHLY = 'MONTHLY',
 }
 
 export enum InvoiceStatusView {

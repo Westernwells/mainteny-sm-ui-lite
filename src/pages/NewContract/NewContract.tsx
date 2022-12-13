@@ -14,7 +14,7 @@ import {
 import {PropertyOwnerView} from 'models/propertyManager';
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {amountRecordForBackend} from 'utils/currency';
+import {amountRecordForBackend, useCurrentCurrency} from 'utils/currency';
 import {toRestDate} from 'utils/datetime';
 import {convertToMacro} from 'utils/utils';
 import * as Yup from 'yup';
@@ -75,6 +75,7 @@ const validationSchemaContractTerms = Yup.object().shape({
 });
 
 const NewContract = () => {
+  const currentCurrency = useCurrentCurrency();
   const [activeStep, setActiveStep] = useState(0);
   const [disableNextBtn, setDisableNextBtn] = useState(false);
 
@@ -168,7 +169,7 @@ const NewContract = () => {
       id: contractId,
       annualPriceAdjustmentPercentage:
         formikContractTerms.values.annualPriceAdjustmentPercentage,
-      currency: 'EUR',
+      currency: currentCurrency.code,
       documents: formikDocuments.values.documents.reduce<FileWithPreview[]>(
         (newArr: FileWithPreview[], obj) => [
           ...newArr,
@@ -186,7 +187,7 @@ const NewContract = () => {
       hourlyRate: +formikContractTerms.values.hourlyRate,
       invoiceDue: convertToMacro(formikContractTerms.values.invoiceDue),
       price: amountRecordForBackend({
-        currency: 'EUR',
+        currency: currentCurrency.code,
         netAmount: +formikContractTerms.values.netAmount,
         percentageVat:
           +formikContractTerms.values.annualPriceAdjustmentPercentage,

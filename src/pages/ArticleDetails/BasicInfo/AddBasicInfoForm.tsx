@@ -11,7 +11,7 @@ import {ArticleBasicFormModel} from '../../../models/articleForm';
 import {createEmptyResource} from '../../../utils/paging-utils';
 import {useCacheValues} from '../../../hooks/reactQuery/useElevator';
 import {CacheTypes} from '../../../models/misc';
-import {getCurrencySymbol} from '../../../utils/currency';
+import {getCurrencySymbol, useCurrentCurrency} from '../../../utils/currency';
 
 export const AddBasicInfoForm = ({
   containerStyles,
@@ -22,6 +22,7 @@ export const AddBasicInfoForm = ({
 }) => {
   const [modelQuery, setModelQuery] = useState('');
   const {t} = useTranslation();
+  const currentCurrency = useCurrentCurrency();
   const {data: elevatorModelsResource = createEmptyResource<string>()} =
     useCacheValues(
       {
@@ -198,7 +199,9 @@ export const AddBasicInfoForm = ({
           props={{
             name: 'unitPurchaseAmount',
             label: t('Purchase Price'),
-            placeholder: t('e.g. 150€'),
+            placeholder: t(`e.g. 150{{currencySymbol}}`, {
+              currencySymbol: currentCurrency.symbol,
+            }),
             inputProps: {min: 0},
             type: 'number',
             value: formik.values.unitPurchaseAmount,
@@ -219,7 +222,9 @@ export const AddBasicInfoForm = ({
           props={{
             name: 'unitSellingAmount',
             label: t('Selling Price'),
-            placeholder: t('e.g. 200€'),
+            placeholder: t(`e.g. 200{{currencySymbol}}`, {
+              currencySymbol: currentCurrency.symbol,
+            }),
             inputProps: {min: 0},
             type: 'number',
             required: true,

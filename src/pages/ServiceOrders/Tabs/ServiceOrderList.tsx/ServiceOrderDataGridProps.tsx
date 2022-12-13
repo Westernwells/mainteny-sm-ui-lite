@@ -84,11 +84,11 @@ export const makeRows = (
 ): GridRowsProp =>
   serviceOrders.map((item: ServiceOrderView, index: number) => ({
     id: index,
-    number: item.externalId,
+    number: item.number,
     type: item.type,
     customer: item.elevator.propertyOwner.name,
     address: item.elevator.address.fullName || '-',
-    unit: item.elevator.number,
+    unit: item.elevator.externalId || '-',
     date: formatDate(item.dueDate),
     technician: item.schedules.length
       ? item.schedules

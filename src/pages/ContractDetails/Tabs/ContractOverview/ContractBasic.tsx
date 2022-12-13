@@ -16,6 +16,8 @@ import TrendingUp from '@mui/icons-material/TrendingUp';
 import DateRange from '@mui/icons-material/DateRange';
 import MoneyOff from '@mui/icons-material/MoneyOff';
 import Timer from '@mui/icons-material/Timer';
+import {ContractStatus} from 'models/contract';
+import {capitalize} from 'lodash';
 
 interface Props {
   type?: string;
@@ -30,6 +32,7 @@ interface Props {
   noticePreiod?: number;
   discount?: string[];
   hourlyRate?: string;
+  status?: ContractStatus;
 }
 
 export const ContractBasic = ({
@@ -45,14 +48,21 @@ export const ContractBasic = ({
   noticePreiod,
   discount,
   hourlyRate,
+  status,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   return (
     <>
       <StatusChip
-        color="success"
-        label="Active"
+        color={
+          status === ContractStatus.VALID
+            ? 'success'
+            : status === ContractStatus.PENDING
+            ? 'info'
+            : 'error'
+        }
+        label={capitalize(status!)}
         style={{mb: '1em', float: 'right'}}
       />
       <Grid container rowGap={2}>

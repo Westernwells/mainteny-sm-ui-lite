@@ -18,8 +18,10 @@ import {
   getStartEndPrice,
 } from 'utils/contract-utils';
 import {mapInvoiceStatus} from 'utils/invoice';
+import {useCurrentCurrency} from 'utils/currency';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
+import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {columns, makeRows} from './InvoicesDataGridProps';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
@@ -28,6 +30,7 @@ import {Widget} from '../../components/Widget';
 const pageSize = 25;
 
 export const Invoices = () => {
+  const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
   const [search, setSearch] = useState('');
@@ -102,7 +105,7 @@ export const Invoices = () => {
   };
 
   const costRangeConvertor = (selectedItems: string[]) => {
-    const range = crConverter(selectedItems);
+    const range = crConverter(selectedItems, currentCurrency.symbol);
     setCost(range);
   };
 
@@ -122,11 +125,9 @@ export const Invoices = () => {
       }}
       wrapperStyle={{flex: 1, gap: 1.5}}
       containerStyle={{width: '35%', gap: 1.5}}>
-      <MultipleSelectCheckmarks
-        label="Invoice Total Range"
-        options={['0 - €500', '€500 - €1,000', '> €1,000']}
-        initialSelectedItems={cost}
-        getSelectedValue={(item) => costRangeConvertor(item)}
+      <PriceRangeDropdown
+        cost={cost}
+        costRangeConvertor={costRangeConvertor}
         formControlStyles={{width: '100%'}}
         containerStyles={{flex: 1}}
       />

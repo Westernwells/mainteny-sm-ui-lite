@@ -18,7 +18,7 @@ import {
   useArticles,
   useCreatePartialArticle,
 } from 'hooks/reactQuery/useArticle';
-import {formatCurrency} from 'utils/currency';
+import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {createEmptyResource} from 'utils/paging-utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {ArticleItemRow} from './ArticleItemRow';
@@ -41,6 +41,7 @@ export const ArticleItemsTable = ({
   isPartial,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const {t} = useTranslation();
+  const currentCurrency = useCurrentCurrency();
   const {user} = useUserSession();
   const [percentageVat, setPercentageVat] = useState(
     user?.userAccount?.serviceCompany?.settings?.percentageVat ?? 0,
@@ -155,9 +156,9 @@ export const ArticleItemsTable = ({
         placeItems: 'center start',
         gap: '.5em',
       }}>
-      <FormLabel text="No" />
+      <FormLabel text="No" textTranslationContext="number" />
       <FormLabel text="Article Name" sx={{justifySelf: 'start'}} />
-      <FormLabel text="Unit Price" />
+      <FormLabel text="Unit Price" sx={{textTransform: 'none'}} />
       <FormLabel text="Quantity" />
       <FormLabel text="Unit" />
       <Box>
@@ -283,7 +284,9 @@ export const ArticleItemsTable = ({
                       </Typography>
 
                       <Typography sx={{justifySelf: 'end'}}>
-                        {formatCurrency(total, {currency: 'EUR'})}
+                        {formatCurrency(total, {
+                          currency: currentCurrency.code,
+                        })}
                       </Typography>
                     </>
                   )}
@@ -300,7 +303,9 @@ export const ArticleItemsTable = ({
                   </Typography>
 
                   <Typography>
-                    {formatCurrency(totalPrice, {currency: 'EUR'})}
+                    {formatCurrency(totalPrice, {
+                      currency: currentCurrency.code,
+                    })}
                   </Typography>
                   <Box>
                     <FormInput
@@ -320,7 +325,7 @@ export const ArticleItemsTable = ({
                   </Box>
                   <Typography>
                     {formatCurrency(totalPrice * (percentageVat / 100), {
-                      currency: 'EUR',
+                      currency: currentCurrency.code,
                     })}
                   </Typography>
                 </Box>
@@ -342,7 +347,7 @@ export const ArticleItemsTable = ({
                   </Typography>
                   <Typography sx={{color: 'primary.contrastText'}}>
                     {formatCurrency(totalPrice * (1 + percentageVat / 100), {
-                      currency: 'EUR',
+                      currency: currentCurrency.code,
                     })}
                   </Typography>
                 </Box>

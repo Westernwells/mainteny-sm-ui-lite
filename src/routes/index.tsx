@@ -261,8 +261,10 @@ export const Router = () => {
                 <PageLayout
                   showBackAction
                   pageScrollable
-                  backBtnLabel="Invoice Details">
-                  <InvoiceDetails />
+                  backBtnLabel={currentPageTitle}>
+                  <InvoiceDetails
+                    getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                  />
                 </PageLayout>
               </>
             }
