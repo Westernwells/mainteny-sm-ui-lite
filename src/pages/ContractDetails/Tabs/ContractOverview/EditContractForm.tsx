@@ -30,11 +30,11 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
             user?.userAccount?.serviceCompany?.settings?.contractTypes ?? []
           ).map((item) => ({
             label: convertToText(item),
-            value: convertToText(item),
+            value: item,
           }))}
           selectProps={{
             id: 'typeSelect',
-            value: convertToText(formik.values.type || ''),
+            value: formik.values.type || '',
             onChange: formik.handleChange,
             error: !!(formik.touched.type && formik.errors.type),
             placeholder: 'Select Contract type',

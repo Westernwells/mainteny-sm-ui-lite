@@ -12,6 +12,7 @@ import {PaymentInformation} from 'pages/CompanyDetails/PaymentInformation';
 import {BillingInformation} from 'pages/CompanyDetails/BillingInformation';
 import {WhiteLabel} from 'pages/CompanyDetails/WhiteLabel';
 import {Policies} from 'pages/CompanyDetails/Policies';
+import {DefinedContractNames} from 'pages/CompanyDetails/DefinedContractNames';
 
 interface Props {
   getCurrentPageTitle?: (title: string) => void;
@@ -73,7 +74,13 @@ export const SettingsPage = ({getCurrentPageTitle}: Props) => {
         <Grid item md={3} sm={12}>
           <Policies company={company!} containerStyles={{height: '100%'}} />
         </Grid>
-        <Grid item md={9} sm={12}>
+        <Grid item md={6} sm={12}>
+          <DefinedContractNames
+            company={company!}
+            containerStyles={{height: '100%'}}
+          />
+        </Grid>
+        <Grid item md={3} sm={12}>
           <WhiteLabel company={company!} containerStyles={{height: '100%'}} />
         </Grid>
       </Grid>

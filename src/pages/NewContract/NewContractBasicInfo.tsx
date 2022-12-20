@@ -110,7 +110,7 @@ const NewContractBasicInfo: FC<Props> = ({
             user?.userAccount?.serviceCompany?.settings?.contractTypes ?? []
           ).map((key) => ({
             label: convertToText(key),
-            value: convertToText(key),
+            value: key,
           }))}
           selectProps={{
             id: 'contractTypeSelect',
