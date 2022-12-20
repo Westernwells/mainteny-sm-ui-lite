@@ -145,6 +145,7 @@ export interface ServiceCompanyUpdateBody {
   whiteLabel?: {
     logoPath?: string;
   };
+  contractTypes?: string[];
 }
 
 export interface SystemSettingsUpdateBody {
