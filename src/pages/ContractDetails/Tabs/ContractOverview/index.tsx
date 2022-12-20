@@ -107,7 +107,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const onContractSave = async () => {
     const updatedContract = {
       ...contractDetails,
-      type: convertToMacro(formik.values.type || ''),
+      type: formik.values.type || '',
       ...contractDetails?.additionalInfo,
       renewalTerms: formik.values.renewalTerms,
       price: {

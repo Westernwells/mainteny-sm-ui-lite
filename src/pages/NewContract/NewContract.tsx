@@ -198,7 +198,7 @@ const NewContract = () => {
       serviceCompanyId,
       spendingLimit: +formikContractTerms.values.spendingLimit,
       startDate: toRestDate(formikBasicInfo.values.startDate!),
-      type: convertToMacro(formikBasicInfo.values.contractType),
+      type: formikBasicInfo.values.contractType,
       visitsNumber: +formikContractTerms.values.visitsNumber,
       timePreference: [],
     };
