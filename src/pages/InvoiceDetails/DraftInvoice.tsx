@@ -99,6 +99,10 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
       value: InvoiceType.PARTIAL,
       label: 'Partial',
     },
+    {
+      value: InvoiceType.CREDIT_NOTE,
+      label: 'Credit Note',
+    },
   ]).current;
 
   const initialValues: CreateInvoice = {
@@ -386,10 +390,7 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
                   {
                     label: 'Invoice Type',
                     value: formik.values.type
-                      ? `${
-                          formik.values.type[0].toUpperCase() +
-                          formik.values.type.substring(1).toLowerCase()
-                        } invoice`
+                      ? `${convertToText(formik.values.type)} invoice`
                       : '-',
                   },
                   {
@@ -417,11 +418,13 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
               </Box>
             </Box>
 
-            <Box mt="2em" width="32ch">
+            <Box mt="2em">
               <Typography variant="body1" color={theme.palette.text.secondary}>
                 {t('Invoice Type')}
               </Typography>
-              <RadioGroup name="radio-buttons-group">
+              <RadioGroup
+                name="radio-buttons-group"
+                sx={{flexDirection: 'row'}}>
                 {invoiceTyoeOptions.map((option) => (
                   <FormRadio
                     key={option.value}
