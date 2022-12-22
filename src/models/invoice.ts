@@ -99,6 +99,7 @@ export interface InvoiceItemRecord<T> {
 export enum InvoiceType {
   FULL = 'FULL',
   PARTIAL = 'PARTIAL',
+  CREDIT_NOTE = 'CREDIT_NOTE',
 }
 
 export interface CreateInvoice {
