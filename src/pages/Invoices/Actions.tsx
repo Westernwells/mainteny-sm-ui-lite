@@ -75,10 +75,7 @@ export const Actions = ({invoice}: Props) => {
   };
 
   const action = useMemo(() => {
-    if (
-      invoice.status === InvoiceStatus.DRAFT ||
-      invoice.status === InvoiceStatus.EXPIRED
-    ) {
+    if (invoice.status === InvoiceStatus.DRAFT) {
       return (
         <Tooltip
           title={
@@ -119,11 +116,14 @@ export const Actions = ({invoice}: Props) => {
 
   const actions = useMemo(() => {
     const items = [];
-    if (
-      isPDFGenerated &&
-      (invoice.status === InvoiceStatus.DRAFT ||
-        invoice.status === InvoiceStatus.EXPIRED)
-    ) {
+    if (invoice.status === InvoiceStatus.EXPIRED) {
+      items.unshift({
+        label: t('Send Overdue Notice'),
+        icon: <SendIcon />,
+        onClick: () => navigate('/invoices/overdue-notice'),
+      });
+    }
+    if (isPDFGenerated && invoice.status === InvoiceStatus.DRAFT) {
       items.unshift({
         label: t('Print'),
         icon: <Print />,
@@ -135,18 +135,17 @@ export const Actions = ({invoice}: Props) => {
             showModal: true,
           }),
       });
-    } else if (invoice.status === InvoiceStatus.NOT_PAID) {
-      items.unshift({
+    } else if (
+      invoice.status === InvoiceStatus.NOT_PAID ||
+      invoice.status === InvoiceStatus.EXPIRED
+    ) {
+      items.push({
         label: t('Payment'),
         icon: <Payments />,
         onClick: () => setIsDialogOpen(true),
       });
     }
-    if (
-      invoice.status === InvoiceStatus.DRAFT ||
-      invoice.status === InvoiceStatus.EXPIRED ||
-      invoice.status === InvoiceStatus.NOT_PAID
-    ) {
+    if (invoice.status !== InvoiceStatus.PAID) {
       items.push({
         label: t('Preview'),
         icon: <RemoveRedEye />,
@@ -207,6 +206,7 @@ export const Actions = ({invoice}: Props) => {
         onClose={handleClose}
         MenuListProps={{
           'aria-labelledby': 'actions-button',
+          sx: {width: '210px'},
         }}
         anchorOrigin={{
           vertical: 'top',
