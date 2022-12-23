@@ -1,26 +1,33 @@
-import {useNavigate} from 'react-router-dom';
+import {useMemo} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import Cancel from '@mui/icons-material/Cancel';
+import Print from '@mui/icons-material/Print';
+import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import {PageCard} from 'components/PageCard';
 import {FormLabel} from 'components/form/FormLabel';
 import {FormInput} from 'components/form/FormInput';
-import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {BottomDrawer} from 'components/BottomDrawer';
-import {useMemo} from 'react';
-import Cancel from '@mui/icons-material/Cancel';
-import Print from '@mui/icons-material/Print';
 import {Button} from 'components/Button';
-import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
+import {Progress} from 'components/Progress';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useInvoiceDetail} from 'hooks/reactQuery/useInvoice';
+import {formatCurrency, getCurrencySymbol} from 'utils/currency';
 
 const validationSchema = Yup.object().shape({
   customerAddress: Yup.string().required('Customer Address is required'),
-  invoiceNumber: Yup.number().required('Invoice number is required'),
+  invoiceNumber: Yup.string().required('Invoice number is required'),
   subject: Yup.string().required('Subject is required'),
   description: Yup.string().required('Description is required'),
+  initialAmount: Yup.number().required('Initial amount is required'),
+  handlingFee: Yup.number().required('Handling fee is required'),
 });
 
 export const InvoiceOverdueNotice = () => {
@@ -28,17 +35,25 @@ export const InvoiceOverdueNotice = () => {
   const theme = useTheme();
   const {user} = useUserSession();
   const navigate = useNavigate();
+  const {id: invoiceId} = useParams();
+  const {data: invoice, isLoading} = useInvoiceDetail(invoiceId);
 
   const initialValues = {
-    customerAddress: '',
-    invoiceNumber: 0,
-    subject: '',
-    description: '',
+    customerAddress: invoice?.serviceOrder?.elevator.address.fullName ?? '',
+    invoiceNumber: invoice?.externalId ?? '',
+    subject: invoice?.subject ?? 0,
+    description: invoice?.description ?? '',
+    initialAmount:
+      (invoice?.totalAmount.netAmount ?? 0) /
+      10 ** (invoice?.totalAmount.fractionDigits ?? 0),
+    handlingFee: 0,
   };
 
   const formik = useFormik({
     initialValues,
     validationSchema,
+    validateOnMount: false,
+    enableReinitialize: true,
     // TODO: handle onSubmit
     onSubmit: (values) =>
       console.log(
@@ -63,6 +78,10 @@ export const InvoiceOverdueNotice = () => {
     });
     return items;
   }, []);
+
+  if (isLoading) {
+    return <Progress />;
+  }
 
   return (
     <>
@@ -132,7 +151,6 @@ export const InvoiceOverdueNotice = () => {
           props={{
             name: 'invoiceNumber',
             label: t('Invoice number'),
-            type: 'number',
             variant: 'outlined',
             value: formik.values.invoiceNumber,
             error: !!(
@@ -176,39 +194,53 @@ export const InvoiceOverdueNotice = () => {
 
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body2">{t('Initial amount')}</Typography>
-          <FormInput
-            containerStyles={{width: '120px'}}
-            props={{
-              name: 'initialAmount',
-              variant: 'outlined',
-              value: '€38,900',
-              disabled: true,
-              sx: {
-                '& .MuiInputBase-input.Mui-disabled': {
-                  WebkitTextFillColor: theme.palette.text.primary,
-                  textAlign: 'end',
-                },
+          <TextField
+            name="initialAmount"
+            size="small"
+            value={formik.values.initialAmount}
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+            error={
+              !!(formik.touched.initialAmount && formik.errors.initialAmount)
+            }
+            sx={{width: '120px'}}
+            InputProps={{
+              inputProps: {
+                type: 'number',
+                min: 0,
               },
+              startAdornment: (
+                <InputAdornment position="start">
+                  {getCurrencySymbol[invoice?.totalAmount.currency ?? 'EUR']}
+                </InputAdornment>
+              ),
             }}
+            required
           />
         </Box>
 
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body2">{t('Handling fee')}</Typography>
-          <FormInput
-            containerStyles={{width: '120px'}}
-            props={{
-              name: 'handlingFee',
-              variant: 'outlined',
-              value: '€20,00',
-              disabled: true,
-              sx: {
-                '& .MuiInputBase-input.Mui-disabled': {
-                  WebkitTextFillColor: theme.palette.text.primary,
-                  textAlign: 'end',
-                },
+          <TextField
+            name="handlingFee"
+            size="small"
+            value={formik.values.handlingFee}
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+            error={!!(formik.touched.handlingFee && formik.errors.handlingFee)}
+            sx={{width: '120px'}}
+            InputProps={{
+              inputProps: {
+                type: 'number',
+                min: 0,
               },
+              startAdornment: (
+                <InputAdornment position="start">
+                  {getCurrencySymbol[invoice?.totalAmount.currency ?? 'EUR']}
+                </InputAdornment>
+              ),
             }}
+            required
           />
         </Box>
 
@@ -224,7 +256,12 @@ export const InvoiceOverdueNotice = () => {
               {t('(incl VAT)')}
             </Typography>
           </Typography>
-          <Typography sx={{color: 'primary.contrastText'}}>€38,920</Typography>
+          <Typography sx={{color: 'primary.contrastText'}}>
+            {formatCurrency(
+              formik.values.initialAmount + formik.values.handlingFee,
+              {currency: invoice?.totalAmount.currency ?? 'EUR'},
+            )}
+          </Typography>
         </Box>
       </PageCard>
 

@@ -55,6 +55,7 @@ export interface InvoiceAdditionalInfo {
 export interface InvoiceView {
   id: string;
   number: string;
+  externalId: string;
   description: string;
   subject: string;
   type: InvoiceType;

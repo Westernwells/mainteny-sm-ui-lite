@@ -289,7 +289,7 @@ export const Router = () => {
           />
 
           <Route
-            path="/invoices/overdue-notice"
+            path="/invoices/overdue-notice/:id"
             element={
               <>
                 <Helmet>

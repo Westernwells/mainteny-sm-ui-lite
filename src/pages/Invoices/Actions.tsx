@@ -120,7 +120,7 @@ export const Actions = ({invoice}: Props) => {
       items.unshift({
         label: t('Send Overdue Notice'),
         icon: <SendIcon />,
-        onClick: () => navigate('/invoices/overdue-notice'),
+        onClick: () => navigate(`/invoices/overdue-notice/${invoice.id}`),
       });
     }
     if (isPDFGenerated && invoice.status === InvoiceStatus.DRAFT) {
