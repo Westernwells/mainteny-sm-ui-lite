@@ -44,6 +44,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {NewCustomer} from 'pages/NewCustomer';
 import {Articles} from 'pages/Articles';
 import {ArticleOverView} from 'pages/ArticleDetails';
+import {OrderArticle} from 'pages/OrderArticle';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 import {NewArticle} from '../pages/ArticleDetails/NewArticle';
@@ -544,6 +545,23 @@ export const Router = () => {
                 </Helmet>
                 <PageLayout backBtnLabel="New Package" showBackAction>
                   <NewArticle />
+                </PageLayout>
+              </>
+            }
+          />
+
+          <Route
+            path="/articles/order"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Order Article - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout
+                  backBtnLabel="Order Article"
+                  showBackAction
+                  pageScrollable>
+                  <OrderArticle />
                 </PageLayout>
               </>
             }
