@@ -10,6 +10,7 @@ import {
   QueryArticleParams,
   UpdateArticleRecord,
   ServiceOrderArticleRecord,
+  CreateArticleOrderRecord,
 } from 'models/article';
 import {Resource, RestError, StringValue} from 'models/misc';
 import {data} from 'utils/partial-article-data';
@@ -221,6 +222,35 @@ export const useCreatePartialArticle = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([qk.fetchArticles]);
         enqueueSnackbar(`Partial invoicing is supported`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+const createArticleOrder = async (
+  body: CreateArticleOrderRecord,
+): Promise<StringValue> => {
+  const response = await axiosClient.post<StringValue>('/api/articleOrders', {
+    ...body,
+  });
+  return response.data;
+};
+
+export const useCreateArticleOrder = (successMsg: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    (body: CreateArticleOrderRecord) => createArticleOrder(body),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(successMsg, {
           variant: 'success',
         });
       },

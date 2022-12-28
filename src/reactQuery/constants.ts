@@ -59,5 +59,6 @@ export const queryKeys = {
   fetchCompanies: 'fetchCompanies',
   fetchCompany: 'fetchCompany',
   fetchCompanySummary: 'fetchCompanySummary',
+  queryArticleSuppliers: 'queryArticleSuppliers',
   fetchAbsence: 'fetchAbsence',
 };

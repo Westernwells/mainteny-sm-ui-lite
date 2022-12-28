@@ -6,6 +6,7 @@ import {
   Price,
   Address,
   AddressRecord,
+  CompanyContact,
 } from './misc';
 
 export enum ArticleType {
@@ -155,4 +156,33 @@ export interface ServiceOrderArticleRecord {
   name: string;
   quantity: number;
   unitAmount: AmountRecord;
+}
+
+export interface ArticleOrderItemRecord {
+  articleId: string;
+  articleName: string;
+  supplierArticleNumber: string;
+  quantity: number;
+  unit: string;
+  description: string;
+}
+
+export interface CreateArticleOrderRecord {
+  serviceCompanyId: string;
+  externalId: string;
+  articleSupplierId: string;
+  description: string;
+  items: ArticleOrderItemRecord[];
+}
+
+export interface ArticleSupplierView {
+  id: string;
+  serviceCompanyId: string;
+  externalId: string;
+  name: string;
+  address: Address;
+  contact: CompanyContact;
+  additionalInfo: string;
+  search: string;
+  meta: Meta;
 }
