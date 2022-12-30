@@ -24,7 +24,9 @@ import {
   QueryInvoiceCommentsParams,
   CreateInvoiceComment,
   InvoicePaymentRecord,
+  CreateInvoiceOverdueNoticeRecord,
 } from 'models/invoice';
+import {ErrorCode} from 'models/error';
 import {Comment} from 'models/comment';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
@@ -491,6 +493,95 @@ export const useUpdateInvoiceComment = () => {
         enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
+      },
+    },
+  );
+};
+
+export const createInvoiceOverdueNotice = async (
+  invoiceId: string,
+  body: CreateInvoiceOverdueNoticeRecord,
+) => {
+  const {data} = await axiosClient.post<{value: string}>(
+    `/api/invoices/${invoiceId}/overdueNotices`,
+    body,
+  );
+  return data;
+};
+
+export const useCreateInvoiceOverdueNotice = () => {
+  const {enqueueSnackbar} = useSnackbar();
+  return useMutation(
+    ({
+      invoiceId,
+      body,
+    }: {
+      invoiceId: string;
+      body: CreateInvoiceOverdueNoticeRecord;
+    }) => createInvoiceOverdueNotice(invoiceId, body),
+    {
+      onError: (err) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
+
+export const publishInvoiceOverdueNotice = async (
+  invoiceId: string,
+  noticeId: string,
+  body: SimpleEmailRecord,
+) => {
+  await axiosClient.post<{value: string}>(
+    `api/invoices/${invoiceId}/overdueNotices/${noticeId}/publish`,
+    body,
+  );
+};
+
+export const usePublishInvoiceOverdueNotice = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar} = useSnackbar();
+  const navigate = useNavigate();
+  return useMutation(
+    ({
+      invoiceId,
+      noticeId,
+      body,
+    }: {
+      invoiceId: string;
+      noticeId: string;
+      body: SimpleEmailRecord;
+    }) => publishInvoiceOverdueNotice(invoiceId, noticeId, body),
+    {
+      onSuccess: (__, {invoiceId}) => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+        enqueueSnackbar(`Overdue notice sent successfully!`, {
+          variant: 'success',
+        });
+        navigate(`/invoices/details/${invoiceId}`);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+      retryDelay: 3000,
+      retry: (_failureCount, err: any) => {
+        const isGeneratingPDF =
+          (err?.response?.data as RestError)?.errorCode ===
+          ErrorCode.DOCUMENT_NOT_READY;
+        if (isGeneratingPDF) {
+          enqueueSnackbar('The PDF generation is in progress. Please wait...', {
+            variant: 'info',
+            autoHideDuration: 3000,
+          });
+        }
+        return isGeneratingPDF;
       },
     },
   );

@@ -16,6 +16,7 @@ import {Invoices} from 'pages/Invoices';
 import {NewInvoice} from 'pages/InvoiceDetails/NewInvoice';
 import {InvoiceDetails} from 'pages/InvoiceDetails';
 import {EditInvoicePage} from 'pages/EditInvoice';
+import {InvoiceOverdueNotice} from 'pages/InvoiceOverdueNotice';
 import {Employees} from 'pages/Employee';
 import {EmployeeDetails} from 'pages/EmployeeDetails';
 import {Quotations} from 'pages/Quotations';
@@ -287,6 +288,24 @@ export const Router = () => {
               </>
             }
           />
+
+          <Route
+            path="/invoices/overdue-notice/:id"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Overdue Notice - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout
+                  pageScrollable
+                  backBtnLabel="Overdue notice"
+                  showBackAction>
+                  <InvoiceOverdueNotice />
+                </PageLayout>
+              </>
+            }
+          />
+
           <Route
             path="/customers"
             element={

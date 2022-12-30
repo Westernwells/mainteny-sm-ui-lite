@@ -18,11 +18,20 @@ interface Props {
   open: boolean;
   onConfirm: () => void;
   onClose: () => void;
-  submitHook: typeof usePublishInvoice | typeof usePublishQuotation;
+  submitHook?: typeof usePublishInvoice | typeof usePublishQuotation;
   id: string;
   confirmBtnDisabled: boolean;
   subject: string;
   content: string;
+  callback?: ({
+    email,
+    subject,
+    content,
+  }: {
+    email: string;
+    subject: string;
+    content: string;
+  }) => void;
 }
 
 const validationSchema = Yup.object().shape({
@@ -42,9 +51,10 @@ export const SendEmailDialog = ({
   confirmBtnDisabled,
   subject,
   content,
+  callback,
 }: Props) => {
   const {t} = useTranslation();
-  const {mutate: publish} = submitHook();
+  const publish = submitHook?.();
   const formik = useFormik<SimpleEmailRecord>({
     initialValues: {
       email: '',
@@ -53,23 +63,27 @@ export const SendEmailDialog = ({
     },
     onSubmit: (values, {setSubmitting}) => {
       const contentWithLineBreaks = values.content.replace(/\n/g, '<br/>');
-      publish(
-        {
-          id,
-          body: {
-            email: values.email,
-            subject: values.subject,
-            content: contentWithLineBreaks,
+      if (submitHook && publish) {
+        publish.mutate(
+          {
+            id,
+            body: {
+              email: values.email,
+              subject: values.subject,
+              content: contentWithLineBreaks,
+            },
           },
-        },
-        {
-          onSuccess: () => {
-            formik.resetForm();
-            onConfirm();
+          {
+            onSuccess: () => {
+              formik.resetForm();
+              onConfirm();
+            },
+            onSettled: () => setSubmitting(false),
           },
-          onSettled: () => setSubmitting(false),
-        },
-      );
+        );
+      } else if (callback) {
+        callback(values);
+      }
     },
     validationSchema,
   });

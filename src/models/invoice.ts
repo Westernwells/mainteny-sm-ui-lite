@@ -55,6 +55,7 @@ export interface InvoiceAdditionalInfo {
 export interface InvoiceView {
   id: string;
   number: string;
+  externalId: string;
   description: string;
   subject: string;
   type: InvoiceType;
@@ -145,4 +146,13 @@ export interface InvoicePaymentRecord {
   amount: Money;
   paidDate: string;
   markAsPaid: boolean;
+}
+
+export interface CreateInvoiceOverdueNoticeRecord {
+  externalId: string;
+  subject: string;
+  description: string;
+  dueDate: string;
+  initialAmount: Money;
+  handlingFee: Money;
 }
