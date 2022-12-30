@@ -146,3 +146,12 @@ export interface InvoicePaymentRecord {
   paidDate: string;
   markAsPaid: boolean;
 }
+
+export interface CreateInvoiceOverdueNoticeRecord {
+  externalId: string;
+  subject: string;
+  description: string;
+  dueDate: string;
+  initialAmount: Money;
+  handlingFee: Money;
+}

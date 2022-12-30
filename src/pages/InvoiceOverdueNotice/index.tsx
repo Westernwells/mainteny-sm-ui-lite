@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import {useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import * as Yup from 'yup';
@@ -17,9 +17,15 @@ import {FormInput} from 'components/form/FormInput';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {Button} from 'components/Button';
 import {Progress} from 'components/Progress';
+import {SendEmailDialog} from 'components/SendEmailDialog';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {useInvoiceDetail} from 'hooks/reactQuery/useInvoice';
+import {
+  useCreateInvoiceOverdueNotice,
+  useInvoiceDetail,
+  usePublishInvoiceOverdueNotice,
+} from 'hooks/reactQuery/useInvoice';
 import {formatCurrency, getCurrencySymbol} from 'utils/currency';
+import {SimpleEmailRecord} from 'models/misc';
 
 const validationSchema = Yup.object().shape({
   customerAddress: Yup.string().required('Customer Address is required'),
@@ -36,12 +42,15 @@ export const InvoiceOverdueNotice = () => {
   const {user} = useUserSession();
   const navigate = useNavigate();
   const {id: invoiceId} = useParams();
+  const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const {data: invoice, isLoading} = useInvoiceDetail(invoiceId);
+  const createInvoiceOverdueNotice = useCreateInvoiceOverdueNotice();
+  const publishInvoiceOverdueNotice = usePublishInvoiceOverdueNotice();
 
   const initialValues = {
     customerAddress: invoice?.serviceOrder?.elevator.address.fullName ?? '',
     invoiceNumber: invoice?.externalId ?? '',
-    subject: invoice?.subject ?? 0,
+    subject: invoice?.subject ?? '',
     description: invoice?.description ?? '',
     initialAmount:
       (invoice?.totalAmount.netAmount ?? 0) /
@@ -54,13 +63,41 @@ export const InvoiceOverdueNotice = () => {
     validationSchema,
     validateOnMount: false,
     enableReinitialize: true,
-    // TODO: handle onSubmit
-    onSubmit: (values) =>
-      console.log(
-        '🚀 ~ file: index.tsx:56 ~ InvoiceOverdueNotice ~ values',
-        values,
-      ),
+    onSubmit: () => {},
   });
+
+  const onSubmitHandler = (sendEmailBody: SimpleEmailRecord) => {
+    formik.setSubmitting(true);
+    createInvoiceOverdueNotice.mutate(
+      {
+        invoiceId: invoice?.id ?? '',
+        body: {
+          externalId: formik.values.invoiceNumber,
+          subject: formik.values.subject,
+          description: formik.values.description,
+          dueDate: invoice?.dueDate ?? '',
+          initialAmount: {
+            value: formik.values.initialAmount,
+            currency: invoice?.totalAmount.currency ?? '',
+          },
+          handlingFee: {
+            value: formik.values.handlingFee,
+            currency: invoice?.totalAmount.currency ?? '',
+          },
+        },
+      },
+      {
+        onSuccess: ({value}) => {
+          publishInvoiceOverdueNotice.mutate({
+            invoiceId: invoice?.id ?? '',
+            noticeId: value,
+            body: sendEmailBody,
+          });
+        },
+        onSettled: () => formik.setSubmitting(false),
+      },
+    );
+  };
 
   const actions = useMemo(() => {
     const items = [
@@ -268,12 +305,12 @@ export const InvoiceOverdueNotice = () => {
       <BottomDrawer
         isOpen
         primaryButtonLabel={t('Send')}
-        primaryButtonAction={formik.handleSubmit}
+        primaryButtonAction={() => setIsSendEmailDialogOpen(true)}
         listItems={actions.map((item) => ({
           ...item,
           showBorder: actions[actions.length - 1] !== item,
         }))}
-        isValid={formik.isValid}
+        isValid={formik.isValid || formik.isSubmitting}
         secondaryButton={
           <Button
             label="Preview"
@@ -287,6 +324,17 @@ export const InvoiceOverdueNotice = () => {
             }}
           />
         }
+      />
+
+      <SendEmailDialog
+        open={isSendEmailDialogOpen}
+        onConfirm={() => setIsSendEmailDialogOpen(false)}
+        onClose={() => setIsSendEmailDialogOpen(false)}
+        id={invoice?.id ?? ''}
+        confirmBtnDisabled={false}
+        subject={invoice?.subject ?? ''}
+        content={invoice?.description ?? ''}
+        callback={(values) => onSubmitHandler(values)}
       />
     </>
   );
