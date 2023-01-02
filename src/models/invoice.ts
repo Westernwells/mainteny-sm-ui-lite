@@ -52,6 +52,32 @@ export interface InvoiceAdditionalInfo {
   pdfPath: string;
 }
 
+export enum InvoiceOverdueNoticeStatus {
+  DRAFT = 'DRAFT',
+  SENT = 'SENT',
+}
+
+export interface InvoiceOverdueNoticeAdditionalInfo {
+  pdfPath: string;
+  pdfGenerationStatus: PdfGenerationStatus;
+}
+
+export interface InvoiceOverdueNoticeSimpleView {
+  id: string;
+  number: string;
+  externalId: string;
+  subject: string;
+  description: string;
+  sentDate: string;
+  dueDate: string;
+  initialAmount: Money;
+  handlingFee: Money;
+  totalAmount: Money;
+  status: InvoiceOverdueNoticeStatus;
+  additionalInfo: InvoiceOverdueNoticeAdditionalInfo;
+  meta: Meta;
+}
+
 export interface InvoiceView {
   id: string;
   number: string;
@@ -71,6 +97,7 @@ export interface InvoiceView {
   meta: Meta;
   additionalInfo: InvoiceAdditionalInfo;
   paymentTerms: string;
+  overdueNotices: InvoiceOverdueNoticeSimpleView[];
 }
 
 export interface QueryInvoiceParams {

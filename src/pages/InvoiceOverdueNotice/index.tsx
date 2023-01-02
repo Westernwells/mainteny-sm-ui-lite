@@ -66,8 +66,7 @@ export const InvoiceOverdueNotice = () => {
     onSubmit: () => {},
   });
 
-  const onSubmitHandler = (sendEmailBody: SimpleEmailRecord) => {
-    formik.setSubmitting(true);
+  const handleCreateInvoiceOverdueNotice = () => {
     createInvoiceOverdueNotice.mutate(
       {
         invoiceId: invoice?.id ?? '',
@@ -87,13 +86,24 @@ export const InvoiceOverdueNotice = () => {
         },
       },
       {
-        onSuccess: ({value}) => {
-          publishInvoiceOverdueNotice.mutate({
-            invoiceId: invoice?.id ?? '',
-            noticeId: value,
-            body: sendEmailBody,
-          });
+        onSuccess: () => {
+          setIsSendEmailDialogOpen(true);
         },
+      },
+    );
+  };
+
+  const handlePublishInvoiceOverdueNotice = (
+    sendEmailBody: SimpleEmailRecord,
+  ) => {
+    formik.setSubmitting(true);
+    publishInvoiceOverdueNotice.mutate(
+      {
+        invoiceId: invoice?.id ?? '',
+        noticeId: createInvoiceOverdueNotice.data?.value ?? '',
+        body: sendEmailBody,
+      },
+      {
         onSettled: () => formik.setSubmitting(false),
       },
     );
@@ -305,12 +315,12 @@ export const InvoiceOverdueNotice = () => {
       <BottomDrawer
         isOpen
         primaryButtonLabel={t('Send')}
-        primaryButtonAction={() => setIsSendEmailDialogOpen(true)}
+        primaryButtonAction={() => handleCreateInvoiceOverdueNotice()}
         listItems={actions.map((item) => ({
           ...item,
           showBorder: actions[actions.length - 1] !== item,
         }))}
-        isValid={formik.isValid || formik.isSubmitting}
+        isValid={formik.isValid || createInvoiceOverdueNotice.isLoading}
         secondaryButton={
           <Button
             label="Preview"
@@ -331,10 +341,10 @@ export const InvoiceOverdueNotice = () => {
         onConfirm={() => setIsSendEmailDialogOpen(false)}
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={invoice?.id ?? ''}
-        confirmBtnDisabled={false}
+        confirmBtnDisabled={formik.isSubmitting}
         subject={invoice?.subject ?? ''}
         content={invoice?.description ?? ''}
-        callback={(values) => onSubmitHandler(values)}
+        callback={(values) => handlePublishInvoiceOverdueNotice(values)}
       />
     </>
   );
