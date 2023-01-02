@@ -26,7 +26,6 @@ import {
   InvoicePaymentRecord,
   CreateInvoiceOverdueNoticeRecord,
 } from 'models/invoice';
-import {ErrorCode} from 'models/error';
 import {Comment} from 'models/comment';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
@@ -510,6 +509,7 @@ export const createInvoiceOverdueNotice = async (
 };
 
 export const useCreateInvoiceOverdueNotice = () => {
+  const queryClient = useQueryClient();
   const {enqueueSnackbar} = useSnackbar();
   return useMutation(
     ({
@@ -520,6 +520,10 @@ export const useCreateInvoiceOverdueNotice = () => {
       body: CreateInvoiceOverdueNoticeRecord;
     }) => createInvoiceOverdueNotice(invoiceId, body),
     {
+      onSuccess: () => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+      },
       onError: (err) => {
         console.log(err);
         enqueueSnackbar('An unexpected error occurred, please try again.', {
@@ -569,19 +573,6 @@ export const usePublishInvoiceOverdueNotice = () => {
         enqueueSnackbar('An unexpected error occurred, please try again.', {
           variant: 'error',
         });
-      },
-      retryDelay: 3000,
-      retry: (_failureCount, err: any) => {
-        const isGeneratingPDF =
-          (err?.response?.data as RestError)?.errorCode ===
-          ErrorCode.DOCUMENT_NOT_READY;
-        if (isGeneratingPDF) {
-          enqueueSnackbar('The PDF generation is in progress. Please wait...', {
-            variant: 'info',
-            autoHideDuration: 3000,
-          });
-        }
-        return isGeneratingPDF;
       },
     },
   );
