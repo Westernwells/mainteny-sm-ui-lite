@@ -1,5 +1,10 @@
 import {useCallback} from 'react';
-import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from 'react-query';
 import {queryKeys, queryKeys as qk} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
@@ -11,6 +16,7 @@ import {
   UpdateArticleRecord,
   ServiceOrderArticleRecord,
   CreateArticleOrderRecord,
+  ArticleOrderView,
 } from 'models/article';
 import {Resource, RestError, StringValue} from 'models/misc';
 import {data} from 'utils/partial-article-data';
@@ -235,6 +241,23 @@ export const useCreatePartialArticle = () => {
   );
 };
 
+const getArticleOrder = async (orderId: string) => {
+  const response = await axiosClient.get<ArticleOrderView>(
+    `/api/articleOrders/${orderId}`,
+  );
+  return response.data;
+};
+
+export const useArticleOrder = (
+  orderId?: string,
+  options?: UseQueryOptions<any, any, any>,
+) =>
+  useQuery<ArticleOrderView, RestError>(
+    [qk.fetchArticleOrder, orderId],
+    () => getArticleOrder(orderId!),
+    {enabled: !!orderId, ...options},
+  );
+
 const createArticleOrder = async (
   body: CreateArticleOrderRecord,
 ): Promise<StringValue> => {
@@ -245,6 +268,7 @@ const createArticleOrder = async (
 };
 
 export const useCreateArticleOrder = (successMsg: string) => {
+  const queryClient = useQueryClient();
   const {enqueueSnackbar} = useSnackbar();
   return useMutation(
     (body: CreateArticleOrderRecord) => createArticleOrder(body),
@@ -253,6 +277,7 @@ export const useCreateArticleOrder = (successMsg: string) => {
         enqueueSnackbar(successMsg, {
           variant: 'success',
         });
+        queryClient.invalidateQueries([queryKeys.fetchArticleOrder]);
       },
       onError: (err) => {
         console.log(err);

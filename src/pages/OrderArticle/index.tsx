@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
+import printJS from 'print-js';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import {SelectCombined} from 'components/SelectCombined';
@@ -11,18 +12,19 @@ import {FormInput} from 'components/form/FormInput';
 import {SuppliersDataGrid} from 'components/DataGrid/SuppliersDataGrid';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useFormatDate} from 'hooks/useFormatDate';
-import {useCreateArticleOrder} from 'hooks/reactQuery/useArticle';
-import {InvoiceView} from 'models/invoice';
+import {
+  useArticleOrder,
+  useCreateArticleOrder,
+} from 'hooks/reactQuery/useArticle';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {
   ArticleOrderItemRecord,
   ArticleSupplierView,
   CreateArticleOrderRecord,
 } from 'models/article';
+import {PdfGenerationStatus} from 'models/misc';
+import {waitForSeconds} from 'utils/utils';
 import {ArticleItemsTable} from './ArticleItemsTable';
-
-interface Props {
-  invoice?: InvoiceView;
-}
 
 const validationSchema = Yup.object().shape({
   serviceCompanyId: Yup.string().required('Service company ID is required'),
@@ -46,17 +48,29 @@ const validationSchema = Yup.object().shape({
     .required('Articles are required'),
 });
 
-export const OrderArticle = ({invoice}: Props) => {
+export const OrderArticle = () => {
   const {t} = useTranslation();
   const formatDate = useFormatDate();
   const {user} = useUserSession();
+  const [orderId, setOrderId] = useState('');
+  const [isPrinted, setIsPrinted] = useState(false);
+  const {data: articleOrder, refetch} = useArticleOrder(orderId);
   const {mutate: createArticleOrder} = useCreateArticleOrder(
-    'You have successfully printed an order!',
+    'The PDF generation is in progress. Please wait...',
   );
   const [supplier, setSupplier] = useState<ArticleSupplierView | undefined>(
     undefined,
   );
   const [items, setItems] = useState<ArticleOrderItemRecord[]>([]);
+  const {data: downloadUrl} = useDownloadUrl([
+    articleOrder?.additionalInfo?.pdfGenerationStatus ===
+    PdfGenerationStatus.DONE
+      ? articleOrder?.additionalInfo?.pdfPath
+      : '',
+  ]);
+  const isPDFGenerated =
+    articleOrder?.additionalInfo?.pdfGenerationStatus ===
+      PdfGenerationStatus.DONE && downloadUrl;
 
   const initialValues: CreateArticleOrderRecord = {
     serviceCompanyId: user?.userAccount.serviceCompany.id ?? '',
@@ -70,7 +84,14 @@ export const OrderArticle = ({invoice}: Props) => {
     initialValues,
     validationSchema,
     onSubmit: (values) => {
-      createArticleOrder(values);
+      formik.setSubmitting(true);
+      createArticleOrder(values, {
+        onSuccess: async ({value}) => {
+          setOrderId(value);
+          await waitForSeconds(10);
+          refetch();
+        },
+      });
     },
   });
 
@@ -82,6 +103,18 @@ export const OrderArticle = ({invoice}: Props) => {
   useEffect(() => {
     formik.setFieldValue('items', items);
   }, [items]);
+
+  useEffect(() => {
+    if (isPDFGenerated && downloadUrl && !isPrinted) {
+      printJS({
+        printable: Object.values(downloadUrl)[0],
+        type: 'pdf',
+        showModal: true,
+      });
+      formik.setSubmitting(false);
+      setIsPrinted(true);
+    }
+  }, [downloadUrl, isPDFGenerated, isPrinted]);
 
   return (
     <Box>
@@ -167,9 +200,7 @@ export const OrderArticle = ({invoice}: Props) => {
               mt="1.5em">
               <Box>
                 <FormLabel text="Date" />
-                <Typography>
-                  {formatDate(invoice ? invoice.meta.createdAt : new Date())}
-                </Typography>
+                <Typography>{formatDate(new Date())}</Typography>
               </Box>
             </Box>
           </Box>
@@ -215,7 +246,7 @@ export const OrderArticle = ({invoice}: Props) => {
         primaryButtonLabel={t('Print order')}
         primaryButtonAction={formik.handleSubmit}
         listItems={[]}
-        isValid={formik.isValid}
+        isValid={formik.isValid && !formik.isSubmitting}
       />
     </Box>
   );

@@ -163,3 +163,10 @@ export const nameToInitials = (name: string) => {
   const words = name.split(' ');
   return `${words?.[0]?.[0] ?? ''}${words?.[1]?.[0] ?? ''}`;
 };
+
+export const waitForSeconds = (seconds: number) =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('done');
+    }, seconds * 1000);
+  });

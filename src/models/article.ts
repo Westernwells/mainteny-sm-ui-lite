@@ -7,7 +7,9 @@ import {
   Address,
   AddressRecord,
   CompanyContact,
+  PdfGenerationStatus,
 } from './misc';
+import {ServiceCompanySimpleView} from './service-company';
 
 export enum ArticleType {
   PACKAGE = 'PACKAGE',
@@ -183,6 +185,65 @@ export interface ArticleSupplierView {
   address: Address;
   contact: CompanyContact;
   additionalInfo: string;
+  search: string;
+  meta: Meta;
+}
+
+export interface ArticleSupplierSimpleView {
+  id: string;
+  serviceCompanyId: string;
+  externalId: string;
+  name: string;
+  address: Address;
+  contact: CompanyContact;
+  additionalInfo: string;
+}
+
+export enum ArticleOrderStatus {
+  DRAFT = 'DRAFT',
+}
+
+export interface ArticleSimpleView {
+  id: string;
+  serviceCompanyId: string;
+  name: string;
+  description: string;
+  number: string;
+  externalId: string;
+  model: string;
+  type: ArticleType;
+  category: string;
+  subCategory: string;
+  manufacturer: string;
+  meta: Meta;
+}
+
+export interface ArticleOrderItemView {
+  id: string;
+  article: ArticleSimpleView;
+  articleName: string;
+  supplierArticleNumber: string;
+  quantity: number;
+  unit: string;
+  description: string;
+  data: string;
+}
+
+export interface ArticleOrderAdditionalInfo {
+  pdfPath: string;
+  pdfGenerationStatus: PdfGenerationStatus;
+}
+
+export interface ArticleOrderView {
+  id: string;
+  serviceCompany: ServiceCompanySimpleView;
+  number: string;
+  externalId: string;
+  articleSupplier: ArticleSupplierSimpleView;
+  description: string;
+  status: ArticleOrderStatus;
+  items: ArticleOrderItemView;
+  additionalInfo: ArticleOrderAdditionalInfo;
   search: string;
   meta: Meta;
 }
