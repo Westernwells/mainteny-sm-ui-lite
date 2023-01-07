@@ -37,7 +37,7 @@ export const useDownloadUrl = (
     () => fetchDownloadUrl(filePath, fetchId!),
     {
       enabled: !!filePath.length && !!fetchId,
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: true,
       cacheTime: 0,
       ...options,
     },
