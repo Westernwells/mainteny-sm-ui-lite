@@ -115,7 +115,9 @@ export const ServiceForm = ({
               props={{
                 label: 'Required time',
                 name: 'serviceTime',
-                placeholder: t('e.g. 45 min'),
+                placeholder: t('e.g. 45 (in minutes)'),
+                type: 'number',
+                inputProps: {min: 0},
                 value: formik.values.serviceTime,
                 helperText:
                   formik.errors.serviceTime && formik.touched.serviceTime
@@ -136,6 +138,8 @@ export const ServiceForm = ({
               props={{
                 label: 'No. of Technicians',
                 name: 'technicianNumber',
+                type: 'number',
+                inputProps: {min: 0},
                 value: formik.values.technicianNumber,
                 helperText:
                   formik.errors.technicianNumber &&
