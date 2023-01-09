@@ -254,6 +254,7 @@ module.exports = {
     'CREATED DATE': 'ERSTELLUNGSDATUM',
     Draft: 'Entwurf',
     Sent: 'Versand',
+    Denied: 'Bestritten',
     'New Quotation': 'Neues Angebot',
 
     // Invoices
@@ -278,6 +279,8 @@ module.exports = {
     REPAIR: 'Reparatur'.toLocaleUpperCase(),
     CALLOUT: 'Störung'.toLocaleUpperCase(),
     EMERGENCY: 'Personeneinschluss'.toLocaleUpperCase(),
+    INSPECTION: 'Inspektion'.toLocaleUpperCase(),
+    INSTALLATION: 'Installation'.toLocaleUpperCase(),
     'Search by number, customer, service type etc.':
       'Suche nach Nummer, Kunde, Auftragsart usw.',
     'Delete Invoice': 'Rechnung löschen',
@@ -407,6 +410,8 @@ module.exports = {
     'New Callout Order': 'Neue Störung',
     'New Repair Order': 'Neue Reparatur',
     'New Maintenance Order': 'Neue Wartung',
+    'New Inspection Order': 'Neue Inspektion',
+    'New Installation Order': 'Neue Installation',
     'Technician is required': 'Techniker ist notwendig',
 
     // Add new unit
@@ -616,6 +621,8 @@ module.exports = {
     'e.g. central parking lot': 'z.B. zentraler Parkplatz',
     'e.g. Tobias': 'z.B. Tobias',
     'e.g. REWE AG': 'z.B. REWE AG',
+    'Auto dialer': 'Notrufsystem',
+    'Delete Unit': 'Anlagen löschen',
 
     // Employee details
     'Work Hours': 'Arbeitszeiten',
@@ -771,6 +778,7 @@ module.exports = {
       'Möchten Sie das Angebot wirklich löschen?',
     'INVOICE TYPE': 'RECHNUNGSART',
     SUBJECT: 'BETREFF',
+    'Delete Quotation': 'Angebot löschen',
 
     // Customer
 
@@ -961,6 +969,7 @@ module.exports = {
     'Description Of Service': 'Leistungsbeschreibung',
     Signature: 'Unterschrift',
     Date: 'Datum',
+    DATE: 'DATUM',
     Start: 'Start',
     End: 'Ende',
     'The displayed information is based on dummy data. In order to show real-time unit information, the unit has to be connected to an IoT device. Do you need help with finding a provider? We are happy to support, just reach out to us!':

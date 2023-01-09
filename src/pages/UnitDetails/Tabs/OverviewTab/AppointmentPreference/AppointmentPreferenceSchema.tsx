@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {CardProps} from 'components/CardProps';
 import PermContactCalendarIcon from '@mui/icons-material/PermContactCalendar';
 import CachedIcon from '@mui/icons-material/Cached';
@@ -22,6 +23,7 @@ interface Props {
 
 export const AppointmentPreferenceSchema = ({label, property}: Props) => {
   const theme = useTheme();
+  const {t} = useTranslation();
   const renderSection = () => {
     switch (label) {
       case AppointmentPreferenceKey.appointmentDaysOfWeek:
@@ -53,7 +55,7 @@ export const AppointmentPreferenceSchema = ({label, property}: Props) => {
           <CardProps
             icon={<CalendarTodayIcon sx={{color: theme.palette.info.dark}} />}
             label="REQUIRES APPOINTMENT"
-            bodyText={property.value || '-'}
+            bodyText={property.value ? t(property.value) : '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
@@ -66,7 +68,7 @@ export const AppointmentPreferenceSchema = ({label, property}: Props) => {
               <AccessTimeFilledIcon sx={{color: theme.palette.info.dark}} />
             }
             label="REQUIRES NOTIFICATION"
-            bodyText={property.value || '-'}
+            bodyText={property.value ? t(property.value) : '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
