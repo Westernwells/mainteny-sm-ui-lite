@@ -183,3 +183,25 @@ export interface CreateInvoiceOverdueNoticeRecord {
   initialAmount: Money;
   handlingFee: Money;
 }
+
+export enum InvoiceActivityType {
+  CREATED = 'CREATED',
+  UPDATED = 'UPDATED',
+  SENT = 'SENT',
+  PRINTED = 'PRINTED',
+  OVERDUE_NOTICE_SENT = 'OVERDUE_NOTICE_SENT',
+  PAID = 'PAID',
+  EXPIRED = 'EXPIRED',
+  PAYMENT_RECEIVED = 'PAYMENT_RECEIVED',
+  PAYMENT_UPDATED = 'PAYMENT_UPDATED',
+  PAYMENT_DELETED = 'PAYMENT_DELETED',
+}
+
+export interface InvoiceActivityView {
+  id: string;
+  type: InvoiceActivityType;
+  data: string;
+  text: string;
+  additionalInfo: string;
+  meta: Meta;
+}
