@@ -1,3 +1,4 @@
+import {useContext} from 'react';
 import {
   useInfiniteQuery,
   UseInfiniteQueryOptions,
@@ -13,7 +14,7 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import {useNavigate} from 'react-router-dom';
 // FIXME: Dummy Import
 
-import {Resource, RestError, SimpleEmailRecord} from 'models/misc';
+import {Language, Resource, RestError, SimpleEmailRecord} from 'models/misc';
 import {
   InvoiceView,
   QueryInvoiceParams,
@@ -25,11 +26,14 @@ import {
   CreateInvoiceComment,
   InvoicePaymentRecord,
   CreateInvoiceOverdueNoticeRecord,
+  InvoiceActivityView,
 } from 'models/invoice';
 import {Comment} from 'models/comment';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
+import {languageContextMap} from 'utils/utils';
 import {getTotalFromArticles, getTotalWithVatFromArticles} from 'utils/invoice';
+import {LanguageContext} from 'context/LanguageProvider';
 import {useUserSession} from './useUserSession';
 
 // TODO: make API call to fetch Invoices
@@ -138,6 +142,7 @@ export const usePublishInvoice = () => {
       onSuccess: (__, {id}) => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
+        queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
         enqueueSnackbar(`Invoice sent successfully`, {
           variant: 'success',
         });
@@ -168,6 +173,7 @@ export const useInvoicePaymentStatus = () => {
       onSuccess: (__, invoiceId) => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
+        queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
         enqueueSnackbar(`Invoice marked as paid`, {
           variant: 'success',
         });
@@ -208,6 +214,7 @@ export const useAddInvoicePayment = () => {
       onSuccess: (__, {invoiceId}) => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
+        queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
         enqueueSnackbar(`Invoice marked as paid!`, {
           variant: 'success',
         });
@@ -237,6 +244,7 @@ export const useCreateInvoice = () => {
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries([qk.fetchInvoices]);
       queryClient.invalidateQueries([qk.invoiceById]);
+      queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
       enqueueSnackbar(`Invoice created successfully`, {
         variant: 'success',
       });
@@ -277,6 +285,7 @@ export const useUpdateInvoice = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
+        queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
         enqueueSnackbar(`Invoice updated successfully`, {
           variant: 'success',
         });
@@ -523,6 +532,7 @@ export const useCreateInvoiceOverdueNotice = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
+        queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
       },
       onError: (err) => {
         console.log(err);
@@ -563,6 +573,7 @@ export const usePublishInvoiceOverdueNotice = () => {
       onSuccess: (__, {invoiceId}) => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
+        queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
         enqueueSnackbar(`Overdue notice sent successfully!`, {
           variant: 'success',
         });
@@ -574,6 +585,39 @@ export const usePublishInvoiceOverdueNotice = () => {
           variant: 'error',
         });
       },
+    },
+  );
+};
+
+export const fetchInvoiceActivities = async (params: {
+  invoiceId: string;
+  language: Language;
+}) => {
+  const response = await axiosClient.get<InvoiceActivityView[]>(
+    `/api/invoices/${params.invoiceId}/activities`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useInvoiceActivities = (
+  {invoiceId}: {invoiceId: string},
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {language} = useContext(LanguageContext);
+  return useQuery<InvoiceActivityView[], RestError>(
+    [qk.fetchInvoiceActivities, invoiceId, language],
+    () =>
+      fetchInvoiceActivities({
+        invoiceId,
+        language: languageContextMap[language],
+      }),
+    {
+      enabled: !!invoiceId,
+      ...options,
     },
   );
 };

@@ -19,7 +19,7 @@ import {BottomDrawer} from 'components/BottomDrawer';
 import {PDFContainer} from 'components/PDFContainer';
 import {FormLabel} from 'components/form/FormLabel';
 import {EmptySection} from 'components/EmptySection';
-import {InvoiceStatus, InvoiceView} from 'models/invoice';
+import {InvoiceActivityView, InvoiceStatus, InvoiceView} from 'models/invoice';
 import {ServiceOrderReport} from 'models/service-order';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {PdfGenerationStatus} from 'models/misc';
@@ -40,14 +40,21 @@ import {Confirm} from 'components/Confirm';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {Notes} from './Notes';
+import {InvoiceActivities} from './InvoiceActivities';
 
 interface Props {
   downloadUrl: string;
   invoice: InvoiceView;
   workReport: ServiceOrderReport;
+  invoiceActivities: InvoiceActivityView[];
 }
 
-export const ViewInvoice = ({downloadUrl, invoice, workReport}: Props) => {
+export const ViewInvoice = ({
+  downloadUrl,
+  invoice,
+  workReport,
+  invoiceActivities,
+}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const navigate = useNavigate();
@@ -265,6 +272,9 @@ export const ViewInvoice = ({downloadUrl, invoice, workReport}: Props) => {
               </Typography>
             </PageCard>
           )}
+          {invoiceActivities?.length ? (
+            <InvoiceActivities activities={invoiceActivities} />
+          ) : null}
         </Grid>
       </Grid>
 

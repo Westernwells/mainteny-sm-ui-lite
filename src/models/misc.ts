@@ -293,3 +293,8 @@ export interface SimpleEmailRecord {
   subject: string;
   content: string;
 }
+
+export enum Language {
+  EN_US = 'EN_US',
+  DE_DE = 'DE_DE',
+}

@@ -1,3 +1,5 @@
+import {Language} from 'models/misc';
+
 export const capitalize = (role: any[]) => {
   let roles = '';
   role.forEach((value: string, index: number) => {
@@ -170,3 +172,8 @@ export const waitForSeconds = (seconds: number) =>
       resolve('done');
     }, seconds * 1000);
   });
+
+export const languageContextMap: {[key: string]: Language} = {
+  EN: Language.EN_US,
+  DE: Language.DE_DE,
+};
