@@ -20,6 +20,7 @@ export const queryKeys = {
   fetchInvoiceActivities: 'fetchInvoiceActivities',
   fetchQuotations: 'fetchQuotations',
   fetchQuotationComments: 'fetchQuotationComments',
+  fetchQuotationActivities: 'fetchQuotationActivities',
   fetchArticles: 'fetchArticles',
   fetchArticleDetail: 'fetchArticleDetail',
   fetchArticleOrder: 'fetchArticleOrder',

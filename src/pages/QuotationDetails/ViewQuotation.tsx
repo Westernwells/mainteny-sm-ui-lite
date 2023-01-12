@@ -30,19 +30,29 @@ import {
 } from 'hooks/reactQuery/useQuotation';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {PdfGenerationStatus} from 'models/misc';
-import {QuotationStatus, QuotationView} from 'models/quotation';
+import {
+  QuotationActivityView,
+  QuotationStatus,
+  QuotationView,
+} from 'models/quotation';
 import {formatCurrency} from 'utils/currency';
 import {useTranslation} from 'react-i18next';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
+import {QuotationActivities} from './QuotationActivities';
 
 interface Props {
   downloadUrl: string;
   quotation: QuotationView;
+  quotationActivities: QuotationActivityView[];
 }
 
-export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
+export const ViewQuotation = ({
+  downloadUrl,
+  quotation,
+  quotationActivities,
+}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const {user} = useUserSession();
@@ -258,6 +268,9 @@ export const ViewQuotation = ({downloadUrl, quotation}: Props) => {
               </>
             )}
           </PageCard>
+          {quotationActivities?.length ? (
+            <QuotationActivities activities={quotationActivities} />
+          ) : null}
         </Grid>
       </Grid>
       <BottomDrawer
