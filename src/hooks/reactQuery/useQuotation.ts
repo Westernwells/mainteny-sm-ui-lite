@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {useCallback, useContext} from 'react';
 import {
   useInfiniteQuery,
   UseInfiniteQueryOptions,
@@ -10,13 +10,14 @@ import {
 import {useSnackbar} from 'hooks/useSnackbar';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {useNavigate} from 'react-router-dom';
-import {Resource, RestError, SimpleEmailRecord} from 'models/misc';
+import {Language, Resource, RestError, SimpleEmailRecord} from 'models/misc';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
   CreateQuotation,
   CreateQuotationComment,
   QueryQuotationCommentsParams,
   QueryQuotationParams,
+  QuotationActivityView,
   QuotationFilters,
   QuotationView,
   ReplyQuotation,
@@ -25,7 +26,9 @@ import {
 import {Comment} from 'models/comment';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
+import {languageContextMap} from 'utils/utils';
 import {getTotalFromArticles, getTotalWithVatFromArticles} from 'utils/invoice';
+import {LanguageContext} from 'context/LanguageProvider';
 import {useUserSession} from './useUserSession';
 
 export const fetchQuotations = async (
@@ -417,6 +420,39 @@ export const useUpdateQuotationComment = () => {
           variant: 'error',
         });
       },
+    },
+  );
+};
+
+export const fetchQuotationActivities = async (params: {
+  quotationId: string;
+  language: Language;
+}) => {
+  const response = await axiosClient.get<QuotationActivityView[]>(
+    `/api/quotations/${params.quotationId}/activities`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useQuotationActivities = (
+  {quotationId}: {quotationId: string},
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {language} = useContext(LanguageContext);
+  return useQuery<QuotationActivityView[], RestError>(
+    [qk.fetchQuotationActivities, quotationId, language],
+    () =>
+      fetchQuotationActivities({
+        quotationId,
+        language: languageContextMap[language],
+      }),
+    {
+      enabled: !!quotationId,
+      ...options,
     },
   );
 };
