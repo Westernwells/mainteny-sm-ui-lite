@@ -50,6 +50,8 @@ export interface InvoiceAdditionalInfo {
   dueDate: string;
   pdfGenerationStatus: PdfGenerationStatus;
   pdfPath: string;
+  includeWorkReport: Boolean;
+  paymentInfo: PaymentInfo;
 }
 
 export enum InvoiceOverdueNoticeStatus {

@@ -20,7 +20,7 @@ import {PDFContainer} from 'components/PDFContainer';
 import {FormLabel} from 'components/form/FormLabel';
 import {EmptySection} from 'components/EmptySection';
 import {InvoiceActivityView, InvoiceStatus, InvoiceView} from 'models/invoice';
-import {ServiceOrderReport} from 'models/service-order';
+import {ServiceOrderReportView} from 'models/service-order';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {PdfGenerationStatus} from 'models/misc';
 import {formatNetAmount} from 'utils/currency';
@@ -45,7 +45,7 @@ import {InvoiceActivities} from './InvoiceActivities';
 interface Props {
   downloadUrl: string;
   invoice: InvoiceView;
-  workReport: ServiceOrderReport;
+  workReport: ServiceOrderReportView;
   invoiceActivities: InvoiceActivityView[];
 }
 
@@ -65,14 +65,19 @@ export const ViewInvoice = ({
   const {mutate: markAsPaid} = useInvoicePaymentStatus();
   const {mutate: deleteInvoice} = useDeleteInvoice();
 
-  const isPDFGenerated =
+  const isInvoicePDFGenerated =
     invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
     downloadUrl;
+  const isWorkReportPDFGenerated = invoice?.additionalInfo?.includeWorkReport
+    ? workReport?.additionalInfo?.pdfGenerationStatus ===
+      PdfGenerationStatus.DONE
+    : true;
+  const isPDFsGenerated = !!isWorkReportPDFGenerated && isInvoicePDFGenerated;
 
   const actions = useMemo(() => {
     const items = [];
     if (
-      isPDFGenerated &&
+      isInvoicePDFGenerated &&
       (invoice.status === InvoiceStatus.DRAFT ||
         invoice.status === InvoiceStatus.EXPIRED)
     ) {
@@ -320,7 +325,7 @@ export const ViewInvoice = ({
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={invoice.id}
         submitHook={usePublishInvoice}
-        confirmBtnDisabled={!isPDFGenerated}
+        confirmBtnDisabled={!isPDFsGenerated}
         subject={invoice.subject}
         content={invoice.description}
       />

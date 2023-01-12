@@ -164,7 +164,9 @@ export const SendEmailDialog = ({
 
         <Tooltip
           title={
-            confirmBtnDisabled ? t('The PDF is not generated yet.') : t('Send')
+            confirmBtnDisabled
+              ? t('The PDFs are not generated yet.')
+              : t('Send')
           }
           placement="left"
           arrow>

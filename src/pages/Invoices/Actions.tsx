@@ -24,6 +24,7 @@ import {SendEmailDialog} from 'components/SendEmailDialog';
 import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
 import {useDeleteInvoice, usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {useServiceOrderWorkReport} from 'hooks/reactQuery/useServiceOrder';
 import {InvoiceStatus, InvoiceView} from 'models/invoice';
 import {PdfGenerationStatus} from 'models/misc';
 
@@ -56,15 +57,30 @@ export const Actions = ({invoice}: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const {data: workReport} = useServiceOrderWorkReport(
+    invoice?.serviceOrder?.id ?? '',
+    {
+      useErrorBoundary: false,
+      retry: false,
+      enabled: !!(
+        invoice?.serviceOrder?.id && invoice?.additionalInfo?.includeWorkReport
+      ),
+    },
+  );
 
   const {data: downloadUrl} = useDownloadUrl(
     invoice ? [invoice!.additionalInfo.pdfPath] : [],
   );
   const {mutate: deleteInvoice} = useDeleteInvoice();
 
-  const isPDFGenerated =
+  const isInvoicePDFGenerated =
     invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
     downloadUrl;
+  const isWorkReportPDFGenerated = invoice?.additionalInfo?.includeWorkReport
+    ? workReport?.additionalInfo?.pdfGenerationStatus ===
+      PdfGenerationStatus.DONE
+    : true;
+  const isPDFsGenerated = !!isWorkReportPDFGenerated && isInvoicePDFGenerated;
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -79,7 +95,7 @@ export const Actions = ({invoice}: Props) => {
       return (
         <Tooltip
           title={
-            isPDFGenerated ? t('Send') : t('The PDF is not generated yet.')
+            isPDFsGenerated ? t('Send') : t('The PDFs are not generated yet.')
           }
           placement="left"
           arrow>
@@ -89,7 +105,7 @@ export const Actions = ({invoice}: Props) => {
                 setIsSendEmailDialogOpen(true);
               }}
               sx={{color: 'action.active'}}
-              disabled={!isPDFGenerated}>
+              disabled={!isPDFsGenerated}>
               <SendIcon fontSize="small" />
             </IconButton>
           </span>
@@ -123,7 +139,7 @@ export const Actions = ({invoice}: Props) => {
         onClick: () => navigate(`/invoices/overdue-notice/${invoice.id}`),
       });
     }
-    if (isPDFGenerated && invoice.status === InvoiceStatus.DRAFT) {
+    if (isInvoicePDFGenerated && invoice.status === InvoiceStatus.DRAFT) {
       items.unshift({
         label: t('Print'),
         icon: <Print />,
@@ -156,7 +172,7 @@ export const Actions = ({invoice}: Props) => {
     }
     items.push(
       ...[
-        ...(isPDFGenerated
+        ...(isInvoicePDFGenerated
           ? [
               {
                 label: t('Download'),
@@ -250,7 +266,7 @@ export const Actions = ({invoice}: Props) => {
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={invoice.id}
         submitHook={usePublishInvoice}
-        confirmBtnDisabled={!isPDFGenerated}
+        confirmBtnDisabled={!isPDFsGenerated}
         subject={invoice.subject}
         content={invoice.description}
       />
