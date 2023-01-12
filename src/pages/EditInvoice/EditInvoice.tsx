@@ -51,6 +51,7 @@ import {Amount, PdfGenerationStatus, WithOptional} from 'models/misc';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {Notes} from 'pages/InvoiceDetails/Notes';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {useServiceOrderWorkReport} from 'hooks/reactQuery/useServiceOrder';
 import {convertToText} from 'utils/utils';
 
 interface Props {
@@ -76,6 +77,16 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
 
   const {mutate: updateInvoice} = useUpdateInvoice();
   const {mutate: deleteInvoice} = useDeleteInvoice();
+  const {data: workReport} = useServiceOrderWorkReport(
+    invoice?.serviceOrder?.id ?? '',
+    {
+      useErrorBoundary: false,
+      retry: false,
+      enabled: !!(
+        invoice?.serviceOrder?.id && invoice?.additionalInfo?.includeWorkReport
+      ),
+    },
+  );
 
   const [isDrawerOpen] = useState<boolean>(true);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
@@ -250,9 +261,14 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
 
   const {data: downloadUrl} = useDownloadUrl([invoice.additionalInfo.pdfPath]);
 
-  const isPDFGenerated =
+  const isInvoicePDFGenerated =
     invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
     downloadUrl;
+  const isWorkReportPDFGenerated = invoice?.additionalInfo?.includeWorkReport
+    ? workReport?.additionalInfo?.pdfGenerationStatus ===
+      PdfGenerationStatus.DONE
+    : true;
+  const isPDFsGenerated = !!isWorkReportPDFGenerated && isInvoicePDFGenerated;
 
   const actions = useMemo(() => {
     const items = [
@@ -276,7 +292,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
       });
     }
     if (
-      isPDFGenerated &&
+      isInvoicePDFGenerated &&
       (invoice.status === InvoiceStatus.DRAFT ||
         invoice.status === InvoiceStatus.EXPIRED)
     ) {
@@ -624,7 +640,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={invoice.id}
         submitHook={usePublishInvoice}
-        confirmBtnDisabled={!isPDFGenerated}
+        confirmBtnDisabled={!isPDFsGenerated}
         subject={invoice.subject}
         content={invoice.description}
       />

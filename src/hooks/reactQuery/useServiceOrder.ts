@@ -40,7 +40,6 @@ import {
   CompleteServiceOrder,
   UpdateServiceOrderBody,
   AppointmentConfirmationRequiredOrdersQueryParams,
-  ServiceOrderReport,
 } from '../../models/service-order';
 import {Order, Resource, RestError, StringValue} from '../../models/misc';
 import {
@@ -225,7 +224,7 @@ export function useServiceOrderReport(
 }
 
 export const fetchServiceOrderWorkReport = async (serviceOrderId: string) => {
-  const response = await axiosClient.get<ServiceOrderReport>(
+  const response = await axiosClient.get<ServiceOrderReportView>(
     `/api/serviceOrders/${serviceOrderId}/report`,
   );
   return response.data;
@@ -235,7 +234,7 @@ export function useServiceOrderWorkReport(
   serviceOrderId: string,
   options?: UseQueryOptions<any, any, any>,
 ) {
-  return useQuery<ServiceOrderReport, RestError>(
+  return useQuery<ServiceOrderReportView, RestError>(
     [queryKeys.fetchServiceOrderWorkReport, serviceOrderId],
     () => fetchServiceOrderWorkReport(serviceOrderId),
     {...options},

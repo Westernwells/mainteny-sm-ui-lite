@@ -10,7 +10,7 @@ import {
   ElevatorView,
 } from './elevator';
 import {Contract, ContractSimpleView} from './contract';
-import {Amount, Fee, JobStatus, Meta, Order} from './misc';
+import {Amount, Fee, JobStatus, Meta, Order, PdfGenerationStatus} from './misc';
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
@@ -252,6 +252,8 @@ export interface ServiceOrderSummary {
 
 export interface ServiceOrderReportAdditionalInfo {
   checkListAnswers: CheckListAnswerRecord[];
+  pdfPath: string;
+  pdfGenerationStatus: PdfGenerationStatus;
 }
 
 export interface ServiceOrderReportArticleView {
