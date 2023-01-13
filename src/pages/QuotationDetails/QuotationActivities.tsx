@@ -54,7 +54,7 @@ export const QuotationActivities = ({
             </TimelineSeparator>
             <TimelineContent>
               <Typography variant="subtitle1">
-                {getQuotationActivityTitle(activity.type)}
+                {t(getQuotationActivityTitle(activity.type))}
               </Typography>
               <Typography variant="subtitle2">
                 {format(

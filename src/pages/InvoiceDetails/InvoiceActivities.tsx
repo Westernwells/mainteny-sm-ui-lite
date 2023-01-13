@@ -52,7 +52,7 @@ export const InvoiceActivities = ({
             </TimelineSeparator>
             <TimelineContent>
               <Typography variant="subtitle1">
-                {getInvoiceActivityTitle(activity.type)}
+                {t(getInvoiceActivityTitle(activity.type))}
               </Typography>
               <Typography variant="subtitle2">
                 {format(
