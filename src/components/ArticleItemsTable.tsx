@@ -53,7 +53,7 @@ export const ArticleItemsTable = ({
     {
       pageIndex: 0,
       pageSize: 1,
-      query: '[internalLabel:PARTIAL]',
+      query: '[internallabel:partial]',
     },
     {},
     true,
@@ -132,8 +132,8 @@ export const ArticleItemsTable = ({
       createPartial();
     if (isPartial && isFetched && partialArticleResource.data.length) {
       const temp = partialArticleResource.data[0];
-      if (items.length && temp.id !== items[0].articleId) {
-        setItems([articleViewToItem(temp)]);
+      if ((items.length && temp.id !== items[0].articleId) || !items.length) {
+        setItems([articleViewToItem(partialArticleResource.data[0])]);
       }
     }
   }, [
