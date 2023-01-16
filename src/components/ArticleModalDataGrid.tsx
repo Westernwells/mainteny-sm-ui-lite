@@ -1,12 +1,5 @@
 import {useEffect, useState} from 'react';
-import {
-  GridAlignment,
-  GridColDef,
-  GridColumnHeaderParams,
-  GridRenderCellParams,
-  GridRowsProp,
-} from '@mui/x-data-grid';
-import Typography from '@mui/material/Typography';
+import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {SearchInput} from 'components/SearchInput';
@@ -15,29 +8,11 @@ import {useArticles} from 'hooks/reactQuery/useArticle';
 import {ArticleView} from 'models/article';
 import {formatNetAmount} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {useTranslation} from 'react-i18next';
 import {NoRowsEmptySection} from './DataGrid/NoRowsEmptySection';
 
 interface Props {
   setRowItem: (row: ArticleView) => void;
 }
-
-const defaultProps = {
-  editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => {
-    const {t} = useTranslation();
-    return (
-      <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName && t(params.colDef.headerName)}
-      </Typography>
-    );
-  },
-  renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" mx="0.5em">
-      {params.value || '-'}
-    </Typography>
-  ),
-};
 
 export const columns: GridColDef[] = [
   getColumnProps({
