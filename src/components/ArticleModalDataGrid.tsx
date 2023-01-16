@@ -22,6 +22,23 @@ interface Props {
   setRowItem: (row: ArticleView) => void;
 }
 
+const defaultProps = {
+  editable: false,
+  renderHeader: (params: GridColumnHeaderParams) => {
+    const {t} = useTranslation();
+    return (
+      <Typography variant="subtitle2" color="textSecondary">
+        {params.colDef.headerName && t(params.colDef.headerName)}
+      </Typography>
+    );
+  },
+  renderCell: (params: GridRenderCellParams<any, any, any>) => (
+    <Typography variant="body2" mx="0.5em">
+      {params.value || '-'}
+    </Typography>
+  ),
+};
+
 export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
