@@ -18,6 +18,7 @@ interface Props<T> {
   total: number;
   setTotal: Dispatch<SetStateAction<number>>;
   isPartial?: boolean;
+  isCreditNote?: boolean;
 }
 
 export const ArticleItemRow = ({
@@ -28,6 +29,7 @@ export const ArticleItemRow = ({
   total,
   setTotal,
   isPartial,
+  isCreditNote,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const currentCurrency = useCurrentCurrency();
   const [name, setName] = useState(articleItem.name);
@@ -110,6 +112,8 @@ export const ArticleItemRow = ({
           display: 'grid',
           gridTemplateColumns: isPartial
             ? '3ch minmax(24ch, 2fr) repeat(4, minmax(10ch, 16ch))'
+            : isCreditNote
+            ? '3ch minmax(24ch, 2fr) minmax(16ch, 0.5fr)'
             : '3ch minmax(24ch, 2fr) minmax(10ch, 16ch) repeat(2, minmax(6ch, 10ch)) minmax(12ch, 18ch)',
           placeItems: 'start',
           gap: '.5em',
@@ -188,7 +192,7 @@ export const ArticleItemRow = ({
             ),
           }}
         />
-        {!isPartial && (
+        {!isPartial && !isCreditNote && (
           <>
             <TextField
               value={quantity}
@@ -218,7 +222,7 @@ export const ArticleItemRow = ({
         )}
       </Box>
       <Box sx={{float: 'right', mt: '1em'}}>
-        {!description.trim() && (
+        {!description.trim() && !isCreditNote && (
           <Button
             label="Add Description"
             buttonProps={{
@@ -231,7 +235,7 @@ export const ArticleItemRow = ({
             }}
           />
         )}
-        {!isPartial && (
+        {!isPartial && !isCreditNote && (
           <Button
             label="Delete Article"
             buttonProps={{

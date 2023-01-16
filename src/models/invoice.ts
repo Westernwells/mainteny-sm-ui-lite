@@ -52,6 +52,8 @@ export interface InvoiceAdditionalInfo {
   pdfPath: string;
   includeWorkReport: Boolean;
   paymentInfo: PaymentInfo;
+  costCenter?: string;
+  customerSpecificOrderNumber?: string;
 }
 
 export enum InvoiceOverdueNoticeStatus {
@@ -146,6 +148,8 @@ export interface CreateInvoice {
   shouldSendOut: boolean;
   type: InvoiceType;
   includeWorkReport?: boolean;
+  costCenter?: string;
+  customerSpecificOrderNumber?: string;
 }
 
 export interface UpdateInvoice {

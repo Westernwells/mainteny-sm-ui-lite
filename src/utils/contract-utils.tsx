@@ -29,7 +29,7 @@ export const getStartEndPrice = (price: number[][]) => {
     price.length &&
     price?.reduce<number[]>((acc, item) => [...acc, ...item], []);
 
-  const newPrice = numbers && numbers.length ? numbers : [0, 9999999];
+  const newPrice = numbers && numbers.length ? numbers : [-9999999, 9999999];
 
   return [
     Math.min(...(newPrice as number[])),
