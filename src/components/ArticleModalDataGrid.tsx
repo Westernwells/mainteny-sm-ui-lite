@@ -8,7 +8,7 @@ import {
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import {DataGridLayout} from 'components/DataGridLayout';
+import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
 import {useArticles} from 'hooks/reactQuery/useArticle';
@@ -22,82 +22,39 @@ interface Props {
   setRowItem: (row: ArticleView) => void;
 }
 
-const defaultProps = {
-  editable: false,
-  renderHeader: (params: GridColumnHeaderParams) => {
-    const {t} = useTranslation();
-    return (
-      <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName && t(params.colDef.headerName)}
-      </Typography>
-    );
-  },
-  renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" mx="0.5em">
-      {params.value || '-'}
-    </Typography>
-  ),
-};
-const defaultAlignment: {
-  flex: number;
-  headerAlign: GridAlignment;
-  align: GridAlignment;
-} = {
-  flex: 1,
-  headerAlign: 'center',
-  align: 'center',
-};
-
 export const columns: GridColDef[] = [
-  {
+  getColumnProps({
     field: 'number',
     headerName: 'ARTICLE NO',
-    type: 'string',
-    cellClassName: 'nowrap',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'type',
-    headerName: 'TYPE',
-    type: 'string',
-    flex: 2,
-    headerAlign: 'left',
-    ...defaultProps,
-  },
-  {
+    align: 'left',
+    flex: 1,
+  }),
+  getColumnProps({
+    field: 'name',
+    headerName: 'ARTICLE NAME',
+    align: 'left',
+    flex: 1,
+  }),
+  getColumnProps({
     field: 'model',
     headerName: 'MODEL',
-    type: 'string',
-    flex: 2,
-    headerAlign: 'left',
-    ...defaultProps,
-  },
-  {
+    align: 'left',
+    flex: 1,
+  }),
+  getColumnProps({
     field: 'manufacturer',
     headerName: 'MANUFACTURER',
-    type: 'string',
-    flex: 2,
-    headerAlign: 'left',
+    align: 'left',
+    flex: 1,
     cellClassName: 'truncateText',
-    ...defaultProps,
-  },
-  {
-    field: 'description',
-    headerName: 'DESCRIPTION',
-    type: 'string',
-    flex: 2,
-    headerAlign: 'left',
-    cellClassName: 'truncateText',
-    ...defaultProps,
-  },
-  {
+  }),
+  getColumnProps({
     field: 'price',
     headerName: 'UNIT PRICE',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
+    align: 'right',
+    flex: 1,
+    cellClassName: 'truncateText',
+  }),
 ];
 
 export const makeRows = (articles: ArticleView[]): GridRowsProp =>
@@ -105,10 +62,9 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
     ? articles.map((item, index) => ({
         id: index,
         number: item.externalId,
-        type: item.type,
+        name: item.name,
         model: item.model,
         manufacturer: item.manufacturer,
-        description: item.description,
         price: formatNetAmount(item.unitSellingAmount),
         article: item,
       }))

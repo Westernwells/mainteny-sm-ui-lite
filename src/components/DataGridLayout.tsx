@@ -245,7 +245,10 @@ export const DataGridLayout = ({
           },
           '& .MuiDataGrid-columnHeaders': {
             background: 'white',
-            border: '2px solid',
+            borderLeft: 'none',
+            borderRight: 'none',
+            borderTop: 'none',
+            borderBottom: '2px solid',
             borderColor: 'background.default',
             borderRadius: '4px',
             ...(isWidget && {
