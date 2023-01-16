@@ -33,12 +33,14 @@ interface Props<T> {
   items: T[];
   setItems: Dispatch<SetStateAction<T[]>>;
   isPartial?: boolean;
+  isCreditNote?: boolean;
 }
 
 export const ArticleItemsTable = ({
   items,
   setItems,
   isPartial,
+  isCreditNote,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -58,6 +60,19 @@ export const ArticleItemsTable = ({
     {},
     true,
   );
+  const {
+    data: creditNoteArticleResource = createEmptyResource<ArticleView>(1),
+    isFetched: isFetchedCreditNoteArticle,
+  } = useArticles(
+    {
+      pageIndex: 0,
+      pageSize: 1,
+      query: '[internallabel:credit_note]',
+    },
+    {},
+    true,
+  );
+
   const {mutate: createPartial} = useCreatePartialArticle();
 
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
@@ -128,22 +143,38 @@ export const ArticleItemsTable = ({
   }, [percentageVat]);
 
   useEffect(() => {
-    if (isPartial && isFetched && !partialArticleResource.data.length)
-      createPartial();
-    if (isPartial && isFetched && partialArticleResource.data.length) {
-      const temp = partialArticleResource.data[0];
-      if ((items.length && temp.id !== items[0].articleId) || !items.length) {
-        setItems([articleViewToItem(partialArticleResource.data[0])]);
+    if (isPartial && isFetched) {
+      if (!partialArticleResource.data.length) {
+        createPartial();
+      } else {
+        const article = partialArticleResource.data[0];
+        if (
+          (items.length && article.id !== items[0].articleId) ||
+          !items.length
+        ) {
+          setItems([articleViewToItem(article)]);
+        }
+      }
+    } else if (isCreditNote && isFetchedCreditNoteArticle) {
+      const article = creditNoteArticleResource.data[0];
+      if (
+        (items.length && article && article.id !== items[0].articleId) ||
+        !items.length
+      ) {
+        setItems([articleViewToItem(article)]);
       }
     }
   }, [
     isPartial,
+    isCreditNote,
     articleViewToItem,
     items,
     createPartial,
     isFetched,
+    isFetchedCreditNoteArticle,
     setItems,
     partialArticleResource.data,
+    creditNoteArticleResource.data,
   ]);
 
   const renderHeader = () => (
@@ -197,6 +228,20 @@ export const ArticleItemsTable = ({
       </Box>
     </Box>
   );
+  const renderCreditNoteHeader = () => (
+    <Box
+      px=".5em"
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: '3ch minmax(24ch, 2fr) minmax(16ch, 0.5fr)',
+        placeItems: 'center start',
+        gap: '.5em',
+      }}>
+      <FormLabel text="No" />
+      <FormLabel text="Note name" sx={{justifySelf: 'start'}} />
+      <FormLabel text="Total amount (excl VAT)" />
+    </Box>
+  );
 
   useEffect(() => {
     if (items.length) {
@@ -228,7 +273,11 @@ export const ArticleItemsTable = ({
         borderColor="grey.300"
         borderRadius="4px"
         p=".5em">
-        {isPartial ? renderPartialHeader() : renderHeader()}
+        {isPartial
+          ? renderPartialHeader()
+          : isCreditNote
+          ? renderCreditNoteHeader()
+          : renderHeader()}
         <Box
           bgcolor="grey.50"
           borderRadius="4px"
@@ -244,13 +293,14 @@ export const ArticleItemsTable = ({
               deleteItem={deleteItem}
               setItems={setItems}
               isPartial={isPartial}
+              isCreditNote={isCreditNote}
               total={total}
               setTotal={setTotal}
             />
           ))}
           {items.length ? (
             <>
-              {!isPartial && (
+              {!isPartial && !isCreditNote && (
                 <Button
                   label="Article"
                   buttonProps={{

@@ -136,6 +136,9 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
     paymentInfo: payment,
     shouldSendOut: false,
     includeWorkReport: true,
+    costCenter: invoice.additionalInfo?.costCenter ?? '',
+    customerSpecificOrderNumber:
+      invoice.additionalInfo?.customerSpecificOrderNumber ?? '',
   };
 
   const validationSchema = Yup.object().shape({
@@ -344,7 +347,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
                 flexGrow={1}
                 display="flex"
                 flexDirection="column"
-                gap="1rem">
+                gap="1.5rem">
                 <Box>
                   <FormLabel text={t('From')} />
                   <Box
@@ -449,11 +452,11 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
                 />
               </Box>
               <Box
-                width="40%"
+                width="35%"
                 display="flex"
                 flexDirection="column"
-                gap="1rem"
-                mt="1.5em">
+                gap="1.5rem"
+                px="2rem">
                 {[
                   {
                     label: 'Invoice Type',
@@ -483,6 +486,38 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
                     <Typography>{i.value}</Typography>
                   </Box>
                 ))}
+                <FormInput
+                  props={{
+                    id: 'customerSpecificOrderNumber',
+                    placeholder: 'e.g 000 000 000',
+                    label: 'Customer specific order number',
+                    value: formik.values.customerSpecificOrderNumber,
+                    onChange: formik.handleChange,
+                    onBlur: formik.handleBlur,
+                    error: !!(
+                      formik.touched.customerSpecificOrderNumber &&
+                      formik.errors.customerSpecificOrderNumber
+                    ),
+                    helperText:
+                      formik.touched.customerSpecificOrderNumber &&
+                      formik.errors.customerSpecificOrderNumber,
+                  }}
+                />
+                <FormInput
+                  props={{
+                    id: 'costCenter',
+                    placeholder: 'e.g 000 000 000',
+                    label: 'Cost Center',
+                    value: formik.values.costCenter,
+                    onChange: formik.handleChange,
+                    onBlur: formik.handleBlur,
+                    error: !!(
+                      formik.touched.costCenter && formik.errors.costCenter
+                    ),
+                    helperText:
+                      formik.touched.costCenter && formik.errors.costCenter,
+                  }}
+                />
               </Box>
             </Box>
 
@@ -509,17 +544,21 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
               </RadioGroup>
             </Box>
 
-            <Box mt="2em" width="32ch">
-              <Typography variant="body1" color={theme.palette.text.secondary}>
-                {t('Work Report')}
-              </Typography>
-              <FormCheckbox
-                checked={formik.values.includeWorkReport}
-                name="includeWorkReport"
-                handleChange={formik.handleChange}
-                label={t('Add work report to invoice')}
-              />
-            </Box>
+            {formik.values.type !== InvoiceType.CREDIT_NOTE && (
+              <Box mt="2em" width="32ch">
+                <Typography
+                  variant="body1"
+                  color={theme.palette.text.secondary}>
+                  {t('Work Report')}
+                </Typography>
+                <FormCheckbox
+                  checked={formik.values.includeWorkReport}
+                  name="includeWorkReport"
+                  handleChange={formik.handleChange}
+                  label={t('Add work report to invoice')}
+                />
+              </Box>
+            )}
 
             <Box mt="2em" width="32ch">
               <DatePicker
@@ -579,6 +618,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
               items={invoiceItems}
               setItems={setInvoiceItems}
               isPartial={!(formik.values.type !== InvoiceType.PARTIAL)}
+              isCreditNote={formik.values.type === InvoiceType.CREDIT_NOTE}
             />
 
             <Box my="1.5em">
