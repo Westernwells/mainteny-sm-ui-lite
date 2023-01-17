@@ -42,30 +42,28 @@ export const WorkReport = ({orderId}: Props) => {
   const [items, setItems] = useState<ServiceOrderItemRecord[]>([]);
   const [report, setReport] = useState<ServiceOrderReportView>();
   const {mutate: updateArticles} = useUpdateServiceOrderArticles();
-  const [keysPrepend, setKeysPrepend] = useState<string>();
   const [signatureKeys, setSignatureKeys] = useState<{[key: string]: string}>(
     {},
   );
 
   const {data: downloadUrls = {}} = useDownloadUrl(
     serviceOrderReportSource && serviceOrderReportSource.length
-      ? serviceOrderReportSource[0].attachments.map(
-          (item) => `${keysPrepend}/${item.fileResource.uri}`,
+      ? serviceOrderReportSource[0].signatures.map(
+          (item) => item.fileResource.uri,
         )
       : [],
-    {enabled: !!keysPrepend},
+    {enabled: !!(serviceOrderReportSource && serviceOrderReportSource.length)},
   );
 
   useEffect(() => {
     if (serviceOrderReportSource && serviceOrderReportSource.length) {
       const serviceCompanyId =
         serviceOrderReportSource[0].serviceOrder.serviceCompany.id;
-      const elevatorId = serviceOrderReportSource[0].serviceOrder.elevator.id;
+      const serviceOrderId = serviceOrderReportSource[0].serviceOrder.id;
       const keys = {
-        CUSTOMER: `${serviceCompanyId}/elevators/${elevatorId}/images/CUSTOMER.png`,
-        TECHNICIAN: `${serviceCompanyId}/elevators/${elevatorId}/images/TECHNICIAN.png`,
+        CUSTOMER: `${serviceCompanyId}/serviceOrders/${serviceOrderId}/report/CUSTOMER.png`,
+        TECHNICIAN: `${serviceCompanyId}/serviceOrders/${serviceOrderId}/report/TECHNICIAN.png`,
       };
-      setKeysPrepend(`${serviceCompanyId}/elevators/${elevatorId}/images`);
       setSignatureKeys(keys);
     }
   }, [isFetched]);
