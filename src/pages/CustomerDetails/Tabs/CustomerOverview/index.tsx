@@ -9,6 +9,7 @@ import {
   LocalPhone,
   Edit,
   HomeWork,
+  AttachMoney,
 } from '@mui/icons-material';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
@@ -90,11 +91,17 @@ export const CustomerOverviewTab = ({
           value: totalContracts.toString() || '-',
           icon: <FileCopy sx={{color: theme.palette.info.dark}} />,
         },
+        costCenter: {
+          label: 'COST CENTER',
+          value: customer.additionalInfo.costCenter || '-',
+          icon: <AttachMoney sx={{color: theme.palette.info.dark}} />,
+        },
         billingAddress: {
           label: 'BILLING ADDRESS',
           value: customer.billingAddress?.fullName || '-',
           icon: <HomeWork sx={{color: theme.palette.info.dark}} />,
         },
+
         billingEmailAddress: {
           label: 'BILLING EMAIL ADDRESS',
           value: customer.additionalInfo.billingEmail || '-',

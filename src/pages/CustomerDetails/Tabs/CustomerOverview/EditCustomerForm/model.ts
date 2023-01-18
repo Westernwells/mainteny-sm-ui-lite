@@ -10,4 +10,5 @@ export type CustomerEditForm = {
   priority: Priority;
   externalId: string;
   businessAddress?: AddressRecord | null;
+  costCenter?: string;
 };

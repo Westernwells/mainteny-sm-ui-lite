@@ -12,6 +12,7 @@ export const formatUpdateCustomer = (data: CustomerEditForm) => ({
   name: data.name,
   postalAddress: data.postalAddress,
   priority: data.priority || 'NONE',
+  costCenter: data.costCenter,
 });
 
 export const getFilterUnitNumber = (value: string, type: 'start' | 'end') => {

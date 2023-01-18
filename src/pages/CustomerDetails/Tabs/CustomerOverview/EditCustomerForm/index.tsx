@@ -136,6 +136,24 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
           <FormInput
             props={{
               size: 'small',
+              placeholder: 'e.g 000 000 000',
+              label: 'Cost center',
+              name: 'costCenter',
+              value: values.costCenter,
+              helperText: touched.costCenter && errors.costCenter,
+              error: !!errors.costCenter && touched.costCenter,
+              required: true,
+              sx: {
+                mt: '0.5em',
+              },
+              ...defaultProps,
+            }}
+          />
+        </Grid>
+        <Grid item md={6}>
+          <FormInput
+            props={{
+              size: 'small',
               placeholder: 'e.g 1234',
               label: 'Customer Number',
               name: 'externalId',
