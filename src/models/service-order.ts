@@ -283,6 +283,12 @@ export interface ServiceOrderReportAttachmentView {
   serviceOrderReportId: string;
 }
 
+export interface ServiceOrderReportSignatureView {
+  id: string;
+  serviceOrderReportId: string;
+  fileResource: FileResource;
+}
+
 export interface ServiceOrderReportView {
   number: string;
   actualServiceTime: number;
@@ -295,6 +301,7 @@ export interface ServiceOrderReportView {
   meta: Meta;
   serviceOrder: ServiceOrderView;
   totalAmount: Amount;
+  signatures: ServiceOrderReportSignatureView[];
 }
 
 export interface ServiceOrderScheduleParams {

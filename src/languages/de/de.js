@@ -145,6 +145,8 @@ module.exports = {
     'Contract Details': 'Vertragsdetails',
     'Service Company': 'Serviceunternehmen',
     'Property Owner': 'Eigentümer der Immobilie',
+    'Do you want to delete this contract?':
+      'Möchten Sie diesen Vertrag löschen?',
 
     // Units
     Units: 'Anlagen',
@@ -815,6 +817,7 @@ module.exports = {
     'Edit Contact Person': 'Kontaktperson bearbeiten',
     'Add Contact Person': 'Kontaktperson hinzufügen',
     'CUSTOMER NUMBER': 'Kundennummer',
+    'BILLING EMAIL ADDRESS': 'RECHNUNGS-EMAIL-ADRESSE',
 
     // Toast
     'Uh oh! As a Property Manager, please login at':
@@ -1158,6 +1161,10 @@ module.exports = {
     'Payment deleted': 'Zahlung gelöscht',
     'Quotation history': 'Geschichte des Angebots',
     'Quotation sent': 'Angebot gesendet',
+    'No appointments.': 'Keine Termine.',
+    'No Invoices.': 'Keine Rechnungen.',
+    'No quotations.': 'Keine Angebote.',
+    'No working technicians.': 'Keine arbeitenden Techniker.',
   },
 };
 
