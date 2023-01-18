@@ -11,6 +11,7 @@ export type BasicCustomerFormModel = {
   priority: Priority | null;
   externalId: string;
   registrationDate: Date;
+  costCenter: string;
 };
 
 export type NewCustomerBody = {
@@ -27,4 +28,5 @@ export type NewCustomerBody = {
   priority: Priority | null;
   serviceCompanyId: string;
   registrationDate: Date;
+  costCenter: string;
 };

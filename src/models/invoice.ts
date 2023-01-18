@@ -163,6 +163,8 @@ export interface UpdateInvoice {
   serviceOrderId?: string;
   type: InvoiceType;
   includeWorkReport?: boolean;
+  costCenter?: string;
+  customerSpecificOrderNumber?: string;
 }
 
 export interface QueryInvoiceCommentsParams {

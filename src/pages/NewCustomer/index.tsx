@@ -42,6 +42,7 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       priority: Priority.NONE,
       externalId: '',
       registrationDate: new Date(),
+      costCenter: '',
     });
 
   useLayoutEffect(() => {
@@ -81,6 +82,7 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       priority: basicCustomerFormValues.priority,
       serviceCompanyId: user!.userAccount.serviceCompany.id,
       registrationDate: basicCustomerFormValues.registrationDate,
+      costCenter: basicCustomerFormValues.costCenter,
     };
 
     const response = await createCustomer(body);

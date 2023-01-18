@@ -53,6 +53,7 @@ export const BasicCustomerForm = ({
       priority: initialValues?.priority || null,
       externalId: initialValues?.externalId || '',
       registrationDate: initialValues?.registrationDate || new Date(),
+      costCenter: initialValues.costCenter,
     },
     onSubmit: () => {},
     validationSchema,
@@ -144,6 +145,23 @@ export const BasicCustomerForm = ({
                     </InputAdornment>
                   ),
                 },
+                sx: {
+                  mt: '0.5em',
+                },
+                ...defaultProps,
+              }}
+            />
+          </Grid>
+          <Grid item md={4}>
+            <FormInput
+              props={{
+                size: 'small',
+                placeholder: '49 17163 995801',
+                label: 'Cost Center',
+                name: 'costCenter',
+                value: formik.values.costCenter,
+                helperText: formik.errors.costCenter,
+                error: !!formik.errors.costCenter,
                 sx: {
                   mt: '0.5em',
                 },

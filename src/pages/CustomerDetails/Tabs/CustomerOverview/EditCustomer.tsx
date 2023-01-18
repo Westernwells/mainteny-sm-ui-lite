@@ -21,6 +21,7 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
     phone: customer.contact.phone.split('+')[1] || customer.contact.phone,
     url: customer.contact.url,
     email: customer.contact.email,
+    costCenter: customer.additionalInfo.costCenter,
     postalAddress: customer.postalAddress
       ? {
           fullName: customer.postalAddress.fullName,

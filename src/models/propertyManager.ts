@@ -24,6 +24,7 @@ export interface PropertyContactPersonSimpleView {
 export interface PropertyOwnerAdditionalInfo {
   priority: Priority;
   billingEmail: string;
+  costCenter: string;
 }
 
 export interface PropertyOwnerView {
