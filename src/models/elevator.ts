@@ -101,6 +101,7 @@ export interface ElevatorAdditionalInfo {
   propertySegment: string;
   qrCode: FileResourceRecord;
   elevatorPhone: ElevatorPhone;
+  customerAppointment: CustomerAppointment;
 }
 
 export interface ElevatorMaintainerRecord {
@@ -320,6 +321,11 @@ export interface ElevatorTimeRuleRecord {
   daysTimeRange: Partial<DaysTimeRange>[];
 }
 
+export interface CustomerAppointment {
+  shouldNotifyCustomer: boolean;
+  appointmentNotificationDue: number;
+}
+
 export interface ElevatorRequestBody {
   address: AddressRecord;
   buildingLocation: string;
@@ -354,6 +360,7 @@ export interface ElevatorRequestBody {
   type: string;
   elevatorPhone: Partial<ElevatorPhone>;
   timeRule: Partial<ElevatorTimeRuleRecord>;
+  customerAppointment: CustomerAppointment;
 }
 
 export interface ElevatorComment {

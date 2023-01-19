@@ -13,6 +13,7 @@ import {
   ServiceFormModel,
   UnitDetailsFormModel,
 } from 'models/unitForm';
+import {mapDaysOfWeekOptions} from 'pages/UnitDetails/Tabs/OverviewTab/AppointmentPreference/EditAppointmentForm';
 import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {convertToMacro} from 'utils/utils';
@@ -101,9 +102,8 @@ export const NewUnit = () => {
       appointmentDaysOfWeek: ['Mo', 'Tu', 'We', 'Th', 'Fr'],
       openingHour: '',
       closingHour: '',
-      requiresAppointment: '',
-      requiresAppointmentNotification: '',
-      appointmentNotificationDueInDays: '',
+      shouldNotifyCustomer: true,
+      appointmentNotificationDue: 0,
     });
 
   const [disableNextBtn, setDisableNextBtn] = useState(false);
@@ -141,22 +141,6 @@ export const NewUnit = () => {
     customerFormError,
   ]);
 
-  const getOpeningHours = () => {
-    if (
-      appointmentPreferenceFormValues.openingHour &&
-      appointmentPreferenceFormValues.closingHour
-    ) {
-      return `${appointmentPreferenceFormValues.openingHour}-${appointmentPreferenceFormValues.closingHour}`;
-    }
-
-    if (
-      appointmentPreferenceFormValues.openingHour &&
-      !appointmentPreferenceFormValues.closingHour
-    ) {
-      return appointmentPreferenceFormValues.openingHour;
-    }
-  };
-
   const createNewUnit = async () => {
     const body = {
       address: locationFormValues.address,
@@ -183,20 +167,7 @@ export const NewUnit = () => {
       parking: locationFormValues.parking,
       pictures: [],
       priority: serviceFormValues.priority as Priority,
-      properties: {
-        appointmentDaysOfWeek: appointmentPreferenceFormValues
-          ? appointmentPreferenceFormValues.appointmentDaysOfWeek.join(',')
-          : undefined,
-        appointmentNotificationDueInDays:
-          appointmentPreferenceFormValues?.appointmentNotificationDueInDays ||
-          undefined,
-        openingHours: getOpeningHours(),
-        requiresAppointment:
-          appointmentPreferenceFormValues?.requiresAppointment || undefined,
-        requiresAppointmentNotification:
-          appointmentPreferenceFormValues?.requiresAppointmentNotification ||
-          undefined,
-      },
+      properties: {},
       propertyOwnerId: customerFormValues.propertyOwnerId,
       propertySegment: locationFormValues.propertySegment,
       serialNumber: unitDetailsFormValues.serialNumber,
@@ -204,6 +175,32 @@ export const NewUnit = () => {
       status: ElevatorStatus.RUNNING,
       technicianNumber: serviceFormValues.technicianNumber,
       type: unitDetailsFormValues.unitType,
+      ...(appointmentPreferenceFormValues.openingHour &&
+        appointmentPreferenceFormValues.closingHour && {
+          timeRule: {
+            daysTimeRange: [
+              {
+                daysOfWeek:
+                  appointmentPreferenceFormValues.appointmentDaysOfWeek.map(
+                    (val) =>
+                      mapDaysOfWeekOptions[
+                        val as keyof typeof mapDaysOfWeekOptions
+                      ].toUpperCase(),
+                  ),
+                timeRange: {
+                  start: appointmentPreferenceFormValues.openingHour || '',
+                  end: appointmentPreferenceFormValues.closingHour || '',
+                },
+              },
+            ],
+          },
+        }),
+      customerAppointment: {
+        shouldNotifyCustomer:
+          appointmentPreferenceFormValues.shouldNotifyCustomer,
+        appointmentNotificationDue:
+          appointmentPreferenceFormValues.appointmentNotificationDue,
+      },
     };
 
     const response = await addNewUnit(body);

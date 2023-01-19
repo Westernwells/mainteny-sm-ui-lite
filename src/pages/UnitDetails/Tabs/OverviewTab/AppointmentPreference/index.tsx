@@ -2,10 +2,11 @@ import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import PermContactCalendar from '@mui/icons-material/PermContactCalendar';
+import FlagIcon from '@mui/icons-material/Flag';
+import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import Cached from '@mui/icons-material/Cached';
 import {
   ElevatorView,
-  ElevatorProperty,
   ElevatorTimeRuleView,
   ElevatorTimeRuleType,
   DaysTimeRange,
@@ -13,19 +14,15 @@ import {
 import {useTranslation} from 'react-i18next';
 import Grid from '@mui/material/Grid';
 import {InfoCard} from 'components/InfoCard';
-import {useRef, useState} from 'react';
+import {useState} from 'react';
 import {useFormik} from 'formik';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
+import {titleCase} from 'utils/utils';
 import {Dialog} from 'components/Dialog';
 import {CardProps} from 'components/CardProps';
 import {AppointmentFormModel} from 'models/unitForm';
 import * as Yup from 'yup';
-import {
-  AppointmentPreferenceKey,
-  AppointmentPreferenceSchema,
-} from './AppointmentPreferenceSchema';
 import {EditAppointmentForm, mapDaysOfWeekOptions} from './EditAppointmentForm';
-import {StringMap} from '../../../../../models/misc';
 
 interface Props {
   containerStyles?: {[key: string]: any};
@@ -33,15 +30,21 @@ interface Props {
   propertyOwnerId?: string;
 }
 
-const makeKeyValueFromArrayOfObjects = (arr: ElevatorProperty[]) => {
-  const result: {[key: string]: string} = {};
-  arr.forEach((item) => {
-    result[item.key] = item.value;
-  });
-  return result;
-};
-
 const validationSchema = Yup.object().shape({});
+
+const parseTimeRulesData = (timeRules: ElevatorTimeRuleView[]) => {
+  const daysOfWeekAndTimeRangeTimeRule = timeRules.find(
+    (timeRule) =>
+      timeRule.type === ElevatorTimeRuleType.DAYS_OF_WEEK_AND_TIME_RANGE,
+  );
+  if (!daysOfWeekAndTimeRangeTimeRule) return null;
+
+  const parsedData = (
+    JSON.parse(daysOfWeekAndTimeRangeTimeRule.data) as DaysTimeRange[]
+  )[0];
+
+  return parsedData;
+};
 
 export const AppointmentPreference = ({
   containerStyles,
@@ -54,26 +57,20 @@ export const AppointmentPreference = ({
   const {mutateAsync: updateElevator} = useUpdateElevator(
     'Appointment preference updated successfully',
   );
-  const propertyRef = useRef(
-    makeKeyValueFromArrayOfObjects(elevator.properties || []),
-  ).current;
+  const parsedTimeRulesData = parseTimeRulesData(elevator.timeRules);
 
   const formik = useFormik<AppointmentFormModel>({
     initialValues: {
-      appointmentDaysOfWeek: propertyRef.appointmentDaysOfWeek
-        ? propertyRef.appointmentDaysOfWeek.split(',')
-        : [],
-      openingHour: propertyRef.openingHours
-        ? propertyRef.openingHours.split('-')[0]
-        : '',
-      closingHour: propertyRef.openingHours
-        ? propertyRef.openingHours.split('-')[1]
-        : '',
-      requiresAppointment: propertyRef.requiresAppointment || '',
-      requiresAppointmentNotification:
-        propertyRef.requiresAppointmentNotification || '',
-      appointmentNotificationDueInDays:
-        propertyRef.appointmentNotificationDueInDays,
+      appointmentDaysOfWeek:
+        parsedTimeRulesData?.daysOfWeek.map((val) => titleCase(val)) ?? [],
+      openingHour: parsedTimeRulesData?.timeRange.start ?? '',
+      closingHour: parsedTimeRulesData?.timeRange.end ?? '',
+      shouldNotifyCustomer:
+        elevator.additionalInfo?.customerAppointment?.shouldNotifyCustomer ??
+        true,
+      appointmentNotificationDue:
+        elevator.additionalInfo?.customerAppointment
+          ?.appointmentNotificationDue ?? 0,
     },
     onSubmit: () => {},
     validationSchema,
@@ -84,13 +81,6 @@ export const AppointmentPreference = ({
     await updateElevator({
       body: {
         propertyOwnerId,
-        properties: {
-          requiresAppointment: formik.values.requiresAppointment,
-          requiresAppointmentNotification:
-            formik.values.requiresAppointmentNotification,
-          appointmentNotificationDueInDays:
-            formik.values.appointmentNotificationDueInDays,
-        },
         ...(formik.values.openingHour &&
           formik.values.closingHour && {
             timeRule: {
@@ -109,21 +99,17 @@ export const AppointmentPreference = ({
               ],
             },
           }),
+        customerAppointment: {
+          shouldNotifyCustomer: formik.values.shouldNotifyCustomer,
+          appointmentNotificationDue: formik.values.appointmentNotificationDue,
+        },
       },
       elevatorId: elevator.id,
     });
   };
 
-  const renderTimeRules = (timeRules: ElevatorTimeRuleView[]) => {
-    const daysOfWeekAndTimeRangeTimeRule = timeRules.find(
-      (timeRule) =>
-        timeRule.type === ElevatorTimeRuleType.DAYS_OF_WEEK_AND_TIME_RANGE,
-    );
-    if (!daysOfWeekAndTimeRangeTimeRule) return null;
-
-    const parsedData = (
-      JSON.parse(daysOfWeekAndTimeRangeTimeRule.data) as DaysTimeRange[]
-    )[0];
+  const renderTimeRules = () => {
+    if (!parsedTimeRulesData) return null;
 
     const removeSecondsFromTimeString = (time: string) =>
       time.slice(0, time.lastIndexOf(':'));
@@ -135,8 +121,8 @@ export const AppointmentPreference = ({
             icon={<PermContactCalendar sx={{color: theme.palette.info.dark}} />}
             label="DAYS OF THE WEEK"
             bodyText={
-              parsedData.daysOfWeek
-                ? parsedData.daysOfWeek
+              parsedTimeRulesData.daysOfWeek
+                ? parsedTimeRulesData.daysOfWeek
                     .map((s) =>
                       t(`${s[0].toUpperCase()}${s.slice(1).toLowerCase()}`),
                     )
@@ -153,8 +139,10 @@ export const AppointmentPreference = ({
             icon={<Cached sx={{color: theme.palette.info.dark}} />}
             label="OPENING HOURS"
             bodyText={`${removeSecondsFromTimeString(
-              parsedData.timeRange.start,
-            )}-${removeSecondsFromTimeString(parsedData.timeRange.end)}`}
+              parsedTimeRulesData.timeRange.start,
+            )}-${removeSecondsFromTimeString(
+              parsedTimeRulesData.timeRange.end,
+            )}`}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
@@ -178,26 +166,39 @@ export const AppointmentPreference = ({
       bodyContainerStyle={{
         overflowY: 'auto',
       }}>
-      <Grid container spacing={1}>
-        {elevator?.timeRules.length
-          ? renderTimeRules(elevator.timeRules)
-          : null}
+      <Grid container spacing={2}>
+        {elevator?.timeRules.length ? renderTimeRules() : null}
 
-        {elevator.properties &&
-          elevator.properties
-            .filter(
-              (property) =>
-                (AppointmentPreferenceKey as StringMap<string>)[property.key],
-            )
-            .sort((a, b) => a.key.localeCompare(b.key))
-            .map((property) => (
-              <Grid key={property.key} item xs={12}>
-                <AppointmentPreferenceSchema
-                  label={property.key}
-                  property={property}
-                />
-              </Grid>
-            ))}
+        <Grid item xs={12}>
+          <CardProps
+            icon={<FlagIcon sx={{color: theme.palette.info.dark}} />}
+            label="NOTIFICATION DUE"
+            bodyText={
+              elevator?.additionalInfo?.customerAppointment
+                ?.appointmentNotificationDue ?? '-'
+            }
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            containerStyles={{mt: '0.5em'}}
+            iconMaxHeight="3em"
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <CardProps
+            icon={
+              <AccessTimeFilledIcon sx={{color: theme.palette.info.dark}} />
+            }
+            label="REQUIRES NOTIFICATION"
+            bodyText={
+              elevator?.additionalInfo?.customerAppointment
+                ?.shouldNotifyCustomer
+                ? t('YES')
+                : t('NO')
+            }
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            containerStyles={{mt: '0.5em'}}
+            iconMaxHeight="3em"
+          />
+        </Grid>
       </Grid>
       <Dialog
         title="Edit Appointment Preferences"

@@ -7,6 +7,7 @@ import {useEffect} from 'react';
 import {PageCard} from 'components/PageCard';
 import {FormSelect} from 'components/form/FormSelect';
 import {TimePicker} from 'components/TimePicker';
+import {FormCheckbox} from 'components/form/FormCheckbox';
 import {setDateTime} from 'utils/datetime';
 import {useTranslation} from 'react-i18next';
 import {useFormatDate} from 'hooks/useFormatDate';
@@ -39,11 +40,9 @@ export const AppointmentPreferenceForm = ({
       appointmentDaysOfWeek: initialValues?.appointmentDaysOfWeek || [],
       openingHour: initialValues?.openingHour || '',
       closingHour: initialValues?.closingHour || '',
-      requiresAppointment: initialValues?.requiresAppointment || '',
-      requiresAppointmentNotification:
-        initialValues?.requiresAppointmentNotification || '',
-      appointmentNotificationDueInDays:
-        initialValues?.appointmentNotificationDueInDays || '',
+      shouldNotifyCustomer: initialValues?.shouldNotifyCustomer || false,
+      appointmentNotificationDue:
+        initialValues?.appointmentNotificationDue || 1,
     },
     onSubmit: () => {},
   });
@@ -136,49 +135,26 @@ export const AppointmentPreferenceForm = ({
           </Grid>
 
           <Grid item xs={12} sm={4} md={4}>
-            <FormSelect
-              labelId="requiresAppointment-label"
-              label={t('Requires Appointment')}
-              options={['YES', 'NO'].map((key) => ({
-                label: key,
-                value: key,
-              }))}
-              selectProps={{
-                id: 'requiresAppointmentSelect',
-                value: formik.values.requiresAppointment,
+            <FormInput
+              props={{
+                label: 'Notification Due',
+                name: 'appointmentNotificationDue',
+                placeholder: 'E.g. 5 days',
+                type: 'number',
+                inputProps: {min: 0},
+                value: formik.values.appointmentNotificationDue,
                 onChange: formik.handleChange,
-                name: 'requiresAppointment',
-              }}
-            />{' '}
-          </Grid>
-
-          <Grid item xs={12} sm={4} md={4}>
-            <FormSelect
-              labelId="requirestNotification-label"
-              label="Requires Notification"
-              options={['YES', 'NO'].map((key) => ({
-                label: key,
-                value: key,
-              }))}
-              selectProps={{
-                id: 'requirestNotificationSelect',
-                value: formik.values.requiresAppointmentNotification,
-                onChange: formik.handleChange,
-                name: 'requiresAppointmentNotification',
+                onBlur: formik.handleBlur,
               }}
             />
           </Grid>
 
           <Grid item xs={12} sm={4} md={4}>
-            <FormInput
-              props={{
-                label: 'Notification Due',
-                name: 'appointmentNotificationDueInDays',
-                placeholder: 'E.g. 5 days',
-                value: formik.values.appointmentNotificationDueInDays,
-                onChange: formik.handleChange,
-                onBlur: formik.handleBlur,
-              }}
+            <FormCheckbox
+              checked={formik.values.shouldNotifyCustomer}
+              name="shouldNotifyCustomer"
+              handleChange={formik.handleChange}
+              label={t('Requires Notification')}
             />
           </Grid>
         </Grid>

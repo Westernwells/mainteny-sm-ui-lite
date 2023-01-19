@@ -177,3 +177,6 @@ export const languageContextMap: {[key: string]: Language} = {
   EN: Language.EN_US,
   DE: Language.DE_DE,
 };
+
+export const titleCase = (str: string) =>
+  `${str[0].toUpperCase()}${str.slice(1).toLowerCase()}`;
