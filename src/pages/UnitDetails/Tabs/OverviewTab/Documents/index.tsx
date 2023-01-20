@@ -4,8 +4,9 @@ import Grid from '@mui/material/Grid';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
 import useTheme from '@mui/material/styles/useTheme';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
 import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {ElevatorView} from 'models/elevator';
 import {useState} from 'react';
@@ -30,6 +31,7 @@ export const Documents = ({
 }: Props) => {
   const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
+  const [show, setShow] = useState('');
   const theme = useTheme();
   const {user} = useUserSession();
   const [acceptedFiles, setAcceptedFiles] = useState<FileWithPreview[]>([]);
@@ -38,11 +40,6 @@ export const Documents = ({
   );
   const {mutateAsync: updateElevator} = useUpdateElevator(
     'Elevator updated successfully',
-  );
-  const {data: downloadUrls = {}} = useDownloadUrl(
-    elevator.additionalInfo.documents
-      ? elevator.additionalInfo.documents.map((item) => item.uri)
-      : [],
   );
 
   const onSave = async () => {
@@ -66,6 +63,16 @@ export const Documents = ({
     });
 
     setOpenDialog(false);
+  };
+
+  const onDeleteDocument = async (id: string) => {
+    await updateElevator({
+      elevatorId: elevator.id,
+      body: {
+        propertyOwnerId,
+        documents: elevatorDocuments?.filter((doc) => doc.id !== id) ?? [],
+      },
+    });
   };
 
   const renderEmptySection = () => (
@@ -141,11 +148,12 @@ export const Documents = ({
                   [theme.breakpoints.down('md')]: {
                     height: 170,
                   },
-                }}>
+                }}
+                onMouseEnter={() => setShow(item.id)}
+                onMouseLeave={() => setShow('')}>
                 <Box
                   sx={{
                     border: `1px solid ${theme.palette.text.disabled}`,
-                    padding: '0.5em',
                     height: '70%',
                     display: 'flex',
                     flexDirection: 'column',
@@ -158,10 +166,23 @@ export const Documents = ({
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                    }}
-                    onClick={() =>
-                      window.open(downloadUrls[item.uri], '_blank')
-                    }>
+                      position: 'relative',
+                    }}>
+                    {show === item.id && (
+                      <IconButton
+                        onClick={() => onDeleteDocument(item.id)}
+                        sx={{
+                          position: 'absolute',
+                          width: '100%',
+                          height: '100%',
+                          borderRadius: 0,
+                          color: 'white',
+                          backgroundColor: 'rgba(34, 43, 69, 0.42)',
+                        }}
+                        disableRipple>
+                        <DeleteIcon />
+                      </IconButton>
+                    )}
                     <FileCopyIcon
                       sx={{
                         fontSize: '3rem',
@@ -176,7 +197,7 @@ export const Documents = ({
                 {item.description ? (
                   <Typography
                     component="div"
-                    variant="caption"
+                    variant="subtitle2"
                     color="text.secondary"
                     sx={{
                       overflow: 'hidden',

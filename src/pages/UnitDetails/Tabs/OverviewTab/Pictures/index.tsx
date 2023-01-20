@@ -5,6 +5,8 @@ import Box from '@mui/material/Box';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
 import useTheme from '@mui/material/styles/useTheme';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
 import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
@@ -29,6 +31,7 @@ export const Pictures = ({
 }: Props) => {
   const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
+  const [show, setShow] = useState('');
   const theme = useTheme();
   const {user} = useUserSession();
   const [acceptedFiles, setAcceptedFiles] = useState<FileWithPreview[]>([]);
@@ -69,6 +72,16 @@ export const Pictures = ({
     });
 
     setOpenDialog(false);
+  };
+
+  const onDeletePicture = async (id: string) => {
+    await updateElevator({
+      elevatorId: elevator.id,
+      body: {
+        propertyOwnerId,
+        pictures: elevatorPictures.filter((pic) => pic.id !== id),
+      },
+    });
   };
 
   const renderEmptySection = () => (
@@ -136,20 +149,38 @@ export const Pictures = ({
                   [theme.breakpoints.down('md')]: {
                     height: 170,
                   },
-                }}>
+                }}
+                onMouseEnter={() => setShow(item.id)}
+                onMouseLeave={() => setShow('')}>
                 <Box
                   sx={{
                     border: `1px solid ${theme.palette.text.disabled}`,
-                    padding: '0.5em',
                     height: '70%',
                     display: 'flex',
                     flexDirection: 'column',
                   }}>
                   <Box
-                    sx={{flexGrow: 1, height: 0, cursor: 'pointer'}}
-                    onClick={() =>
-                      window.open(downloadUrls[item.uri], '_blank')
-                    }>
+                    sx={{
+                      flexGrow: 1,
+                      height: 0,
+                      cursor: 'pointer',
+                      position: 'relative',
+                    }}>
+                    {show === item.id && (
+                      <IconButton
+                        onClick={() => onDeletePicture(item.id)}
+                        sx={{
+                          position: 'absolute',
+                          width: '100%',
+                          height: '100%',
+                          borderRadius: 0,
+                          color: 'white',
+                          backgroundColor: 'rgba(34, 43, 69, 0.42)',
+                        }}
+                        disableRipple>
+                        <DeleteIcon />
+                      </IconButton>
+                    )}
                     <img
                       alt=""
                       src={downloadUrls[item.uri]}
@@ -165,7 +196,7 @@ export const Pictures = ({
                 {item.description ? (
                   <Typography
                     component="div"
-                    variant="caption"
+                    variant="subtitle2"
                     color="text.secondary"
                     sx={{
                       overflow: 'hidden',
