@@ -558,6 +558,7 @@ export const useDeleteElevator = (successMsg?: string) => {
           variant: 'success',
         });
         queryClient.invalidateQueries(queryKeys.fetchAllElevators);
+        queryClient.invalidateQueries(queryKeys.queryUnitsByCustomer);
       }
     },
     onError: (err: any) => {

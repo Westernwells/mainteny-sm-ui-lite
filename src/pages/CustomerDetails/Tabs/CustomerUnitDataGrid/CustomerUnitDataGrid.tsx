@@ -7,6 +7,7 @@ import {StatusChip} from 'components/StatusChip';
 import {FormatDate} from 'models/misc';
 import {getColumnProps} from 'components/DataGridLayout';
 import {ElevatorView} from 'models/elevator';
+import {Actions} from './Action';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -74,6 +75,13 @@ export const columns: GridColDef[] = [
         maxChars={3}
       />
     ),
+  }),
+  getColumnProps({
+    field: 'actions',
+    headerName: 'actions',
+    align: 'center',
+    renderCell: (params) => <Actions elevatorId={params.row.elevator.id} />,
+    flex: 0,
   }),
 ];
 
