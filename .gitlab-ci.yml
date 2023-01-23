@@ -54,6 +54,7 @@ variables:
     - ./aws/install
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/mainteny/infra/kubeapps
     - cd kubeapps
+    - git checkout db0a98cb885b6c333ca19277563687c6fca8c57d # the working commit for sm lite, TODO: remove after kubeapps gets fixed
     - npm ci
     - pulumi login s3://mainteny-pulumi-state
   variables:
