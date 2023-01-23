@@ -204,6 +204,7 @@ export const useDeleteContract = (successMsg?: string) => {
           variant: 'success',
         });
         queryClient.invalidateQueries(qk.contracts);
+        queryClient.invalidateQueries(qk.queryCustomerContract);
       }
     },
     onError: (err: any) => {
