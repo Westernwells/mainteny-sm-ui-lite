@@ -818,6 +818,7 @@ module.exports = {
     'Add Contact Person': 'Kontaktperson hinzufügen',
     'CUSTOMER NUMBER': 'Kundennummer',
     'BILLING EMAIL ADDRESS': 'RECHNUNGS-EMAIL-ADRESSE',
+    'Do you want to delete this customer?': 'Möchten Sie diese Kunde löschen?',
 
     // Toast
     'Uh oh! As a Property Manager, please login at':
@@ -893,6 +894,7 @@ module.exports = {
     'Order scheduled successfully': 'Die Bestellung wurde erfolgreich geplant',
     'QR code image uploaded successfully':
       'QR-Code wurde erfolgreich hochgeladen',
+    'Customer deleted successfully': 'Kunde wurden erfolgreich gelöscht',
 
     // Empty state
     'No data entries yet. They will appear here once added.':
