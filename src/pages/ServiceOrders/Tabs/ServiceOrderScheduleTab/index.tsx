@@ -4,7 +4,6 @@ import {
   useQueryServiceOrderScheduled,
   useServiceOrders,
 } from 'hooks/reactQuery/useServiceOrder';
-import * as _ from 'lodash';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {toRestDateTime} from 'utils/datetime';
 import {
