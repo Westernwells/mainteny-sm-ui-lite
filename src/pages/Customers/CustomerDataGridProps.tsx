@@ -1,12 +1,10 @@
-import React from 'react';
 import {GridColDef, GridRowModel} from '@mui/x-data-grid';
-import SendIcon from '@mui/icons-material/Send';
 import {getColumnProps} from 'components/DataGridLayout';
-import IconButton from '@mui/material/IconButton';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {getDateObject} from 'utils/datetime';
 import {Typography} from '@mui/material';
 import {FormatDate} from 'models/misc';
+import {Actions} from './Actions';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -53,14 +51,10 @@ export const columns: GridColDef[] = [
     field: 'actions',
     headerName: 'actions',
     renderCell: (params) => (
-      <IconButton
-        component="a"
-        onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
-          e.stopPropagation();
-          window.open(`mailto:${params.value}`, '_blank');
-        }}>
-        <SendIcon sx={{color: 'action.active'}} fontSize="small" />
-      </IconButton>
+      <Actions
+        propertyOwnerId={params.value.propertyOwnerId}
+        toEmail={params.value.toEmail}
+      />
     ),
     align: 'center',
     flex: 0,
@@ -80,6 +74,9 @@ export const makeRows = (
     phone: item.contact.phone,
     access: 'Invite',
     navigateTo: `details/${item.id}?tab=0`,
-    actions: item.contact.email,
+    actions: {
+      toEmail: item.contact.email,
+      propertyOwnerId: item.id,
+    },
     createdAt: formatDate(getDateObject(item.meta.createdAt)) as string,
   }));

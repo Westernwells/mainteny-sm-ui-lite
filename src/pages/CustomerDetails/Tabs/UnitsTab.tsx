@@ -14,7 +14,7 @@ import {ElevatorView} from 'models/elevator';
 import {Widget} from 'components/Widget';
 import {useQueryCustomerElevator} from 'hooks/reactQuery/useElevator';
 import {useFormatDate} from 'hooks/useFormatDate';
-import {columns, makeRows} from './CustomerUnitDataGrid';
+import {columns, makeRows} from './CustomerUnitDataGrid/CustomerUnitDataGrid';
 
 interface Props {
   customerId?: string;

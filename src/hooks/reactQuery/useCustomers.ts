@@ -119,3 +119,37 @@ export const useCustomer = () => {
     updateCustomer,
   };
 };
+
+const deleteCustomer = async (propertyOwnerId: string) => {
+  const response = await axiosClient.delete<StringValue>(
+    `/api/propertyOwners/${propertyOwnerId}`,
+  );
+  return response.data;
+};
+
+export const useDeleteCustomer = (successMsg?: string) => {
+  const {enqueueSnackbar} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    (propertyOwnerId: string) => deleteCustomer(propertyOwnerId),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.queryCustomers);
+      },
+      onError: (err: any) => {
+        console.log(
+          '🚀 ~ file: useCustomers.ts ~ useDeleteCustomer ~ err',
+          err,
+        );
+        enqueueSnackbar('An unexpected error occurred, please try again.', {
+          variant: 'error',
+        });
+      },
+    },
+  );
+};
