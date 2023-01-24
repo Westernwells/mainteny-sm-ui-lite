@@ -8,6 +8,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
+import CachedIcon from '@mui/icons-material/Cached';
+import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
 import {SimpleEmailRecord} from 'models/misc';
 import {usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {Button} from 'components/Button';
@@ -32,6 +34,7 @@ interface Props {
     subject: string;
     content: string;
   }) => void;
+  loadingProgress?: number;
 }
 
 const validationSchema = Yup.object().shape({
@@ -52,6 +55,7 @@ export const SendEmailDialog = ({
   subject,
   content,
   callback,
+  loadingProgress,
 }: Props) => {
   const {t} = useTranslation();
   const publish = submitHook?.();
@@ -147,6 +151,38 @@ export const SendEmailDialog = ({
             }}
           />
         </Box>
+        {loadingProgress && loadingProgress > 0 ? (
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            pt={2}>
+            <Typography variant="caption">
+              {loadingProgress <= 99
+                ? t('Your PDF is being generated')
+                : t('Your PDF has been generated successfully!')}
+            </Typography>
+            <Typography
+              variant="caption"
+              component="div"
+              display="flex"
+              alignItems="center">
+              {loadingProgress}%
+              {loadingProgress <= 99 ? (
+                <CachedIcon
+                  sx={{color: 'text.secondary', ml: 1}}
+                  fontSize="small"
+                />
+              ) : (
+                <CheckCircleRounded
+                  color="success"
+                  sx={{ml: 1}}
+                  fontSize="small"
+                />
+              )}
+            </Typography>
+          </Box>
+        ) : null}
       </DialogContent>
       <DialogActions sx={{padding: 0, justifyContent: 'space-between'}}>
         <Button

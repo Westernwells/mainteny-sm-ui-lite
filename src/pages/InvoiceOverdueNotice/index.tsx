@@ -24,6 +24,7 @@ import {
   useInvoiceDetail,
   usePublishInvoiceOverdueNotice,
 } from 'hooks/reactQuery/useInvoice';
+import useFakeProgress from 'hooks/useFakeProgress';
 import {formatCurrency, getCurrencySymbol} from 'utils/currency';
 import {SimpleEmailRecord} from 'models/misc';
 
@@ -46,6 +47,7 @@ export const InvoiceOverdueNotice = () => {
   const {data: invoice, isLoading} = useInvoiceDetail(invoiceId);
   const createInvoiceOverdueNotice = useCreateInvoiceOverdueNotice();
   const publishInvoiceOverdueNotice = usePublishInvoiceOverdueNotice();
+  const fakeProgress = useFakeProgress(createInvoiceOverdueNotice.status);
 
   const initialValues = {
     customerAddress: invoice?.serviceOrder?.elevator.address.fullName ?? '',
@@ -66,7 +68,8 @@ export const InvoiceOverdueNotice = () => {
     onSubmit: () => {},
   });
 
-  const handleCreateInvoiceOverdueNotice = () => {
+  const onSubmitHandler = (sendEmailBody: SimpleEmailRecord) => {
+    formik.setSubmitting(true);
     createInvoiceOverdueNotice.mutate(
       {
         invoiceId: invoice?.id ?? '',
@@ -86,24 +89,13 @@ export const InvoiceOverdueNotice = () => {
         },
       },
       {
-        onSuccess: () => {
-          setIsSendEmailDialogOpen(true);
+        onSuccess: ({value}) => {
+          publishInvoiceOverdueNotice.mutate({
+            invoiceId: invoice?.id ?? '',
+            noticeId: value,
+            body: sendEmailBody,
+          });
         },
-      },
-    );
-  };
-
-  const handlePublishInvoiceOverdueNotice = (
-    sendEmailBody: SimpleEmailRecord,
-  ) => {
-    formik.setSubmitting(true);
-    publishInvoiceOverdueNotice.mutate(
-      {
-        invoiceId: invoice?.id ?? '',
-        noticeId: createInvoiceOverdueNotice.data?.value ?? '',
-        body: sendEmailBody,
-      },
-      {
         onSettled: () => formik.setSubmitting(false),
       },
     );
@@ -315,12 +307,12 @@ export const InvoiceOverdueNotice = () => {
       <BottomDrawer
         isOpen
         primaryButtonLabel={t('Send')}
-        primaryButtonAction={() => handleCreateInvoiceOverdueNotice()}
+        primaryButtonAction={() => setIsSendEmailDialogOpen(true)}
         listItems={actions.map((item) => ({
           ...item,
           showBorder: actions[actions.length - 1] !== item,
         }))}
-        isValid={formik.isValid || createInvoiceOverdueNotice.isLoading}
+        isValid={formik.isValid || formik.isSubmitting}
         secondaryButton={
           <Button
             label="Preview"
@@ -344,7 +336,8 @@ export const InvoiceOverdueNotice = () => {
         confirmBtnDisabled={formik.isSubmitting}
         subject={invoice?.subject ?? ''}
         content={invoice?.description ?? ''}
-        callback={(values) => handlePublishInvoiceOverdueNotice(values)}
+        callback={(values) => onSubmitHandler(values)}
+        loadingProgress={fakeProgress}
       />
     </>
   );
