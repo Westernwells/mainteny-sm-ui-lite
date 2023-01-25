@@ -53,9 +53,9 @@ export const usePusher = ({
   const registerPusher = ({user}: {user: UserSession}) => {
     deregisterPusher();
 
-    const pusher = new Pusher(process.env.REACT_APP_PUSHER_KEY || '', {
+    const pusher = new Pusher(import.meta.env.REACT_APP_PUSHER_KEY || '', {
       cluster: 'eu',
-      authEndpoint: `${process.env.REACT_APP_API_URL}/api/auth/pusher`,
+      authEndpoint: `${import.meta.env.REACT_APP_API_URL}/api/auth/pusher`,
       auth: {
         headers: {
           Authorization: `Bearer ${user.token}`,
