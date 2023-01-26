@@ -267,7 +267,7 @@ export const UnitMapsView = () => {
     <FlexContainer>
       {renderWidget()}
       <GoogleMapReact
-        bootstrapURLKeys={{key: process.env.REACT_APP_GOOGLE_MAPS_KEY!}}
+        bootstrapURLKeys={{key: import.meta.env.REACT_APP_GOOGLE_MAPS_KEY!}}
         yesIWantToUseGoogleMapApiInternals
         onGoogleApiLoaded={({map}) => {
           mapRef.current = map;
