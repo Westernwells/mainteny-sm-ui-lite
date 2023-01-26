@@ -57,7 +57,7 @@ export const useAuth = (): UseAuth => {
         ) {
           enqueueSnackbar(
             `${t('Uh oh! As a Property Manager, please login at')} ${
-              import.meta.env.REACT_APP_PMUI_URL
+              process.env.REACT_APP_PMUI_URL
             }`,
             {
               variant: 'warning',

@@ -1,11 +1,11 @@
 import i18n from 'i18next';
 import {initReactI18next} from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import {germany} from './languages/de/de';
+import {de} from './languages/de/de';
 
 export const resources = {
   de: {
-    translation: germany.de,
+    translation: de,
   },
   en: {
     translation: {},

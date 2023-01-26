@@ -60,7 +60,7 @@ export const AddressAutoComplete = ({
       noOptionsText={t('No options')}
       inputValue={queryView}
       value={address}
-      apiKey={import.meta.env.REACT_APP_GOOGLE_MAPS_KEY!}
+      apiKey={process.env.REACT_APP_GOOGLE_MAPS_KEY!}
       label={label || t('Address')}
       fields={[
         'address_components',
