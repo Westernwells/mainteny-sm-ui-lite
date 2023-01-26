@@ -7,9 +7,7 @@
 //   5. Add the name without suffix in the .env.template
 import * as fs from 'fs/promises';
 
-console.log(JSON.stringify(import.meta), '||||')
-
-const ENV = import.meta.env['ENV'];
+const ENV = process.env['ENV'];
 const envFileName = `.env.${ENV}`;
 const envSuffix = ENV === 'prod' ? 'PROD' : 'STAGE';
 
@@ -24,7 +22,7 @@ await fs.writeFile(envFileName, '', {flag: 'w'}); // Create an empty env file
 requiredVariables.forEach(async (variable) => {
   const variableName = `${variable}_${envSuffix}`;
   console.log(`Processing ${variableName}`);
-  const value = import.meta.env[variableName];
+  const value = process.env[variableName];
   if (!value) {
     console.error(
       `${variableName} not found. Maybe you forgot to add it in GitLab CI settings?`,
