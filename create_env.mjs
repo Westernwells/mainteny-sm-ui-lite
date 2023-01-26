@@ -7,6 +7,8 @@
 //   5. Add the name without suffix in the .env.template
 import * as fs from 'fs/promises';
 
+console.log(JSON.stringify(import.meta), '||||')
+
 const ENV = import.meta.env['ENV'];
 const envFileName = `.env.${ENV}`;
 const envSuffix = ENV === 'prod' ? 'PROD' : 'STAGE';
