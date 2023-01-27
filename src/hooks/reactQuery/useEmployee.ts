@@ -69,7 +69,7 @@ const deleteEmployee = async (employeeId: string) => {
 };
 
 export const useDeleteEmployee = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation((elevatorId: string) => deleteEmployee(elevatorId), {
     onSuccess: () => {
@@ -82,9 +82,7 @@ export const useDeleteEmployee = (successMsg?: string) => {
     },
     onError: (err: any) => {
       console.log(err);
-      enqueueSnackbar('An unexpected error occurred, please try again.', {
-        variant: 'error',
-      });
+      showError(err);
     },
   });
 };

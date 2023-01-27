@@ -62,7 +62,7 @@ const createCustomer = async (body: NewCustomerBody): Promise<StringValue> => {
 };
 
 export const useCreateCustomer = (successMsg: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation((body: NewCustomerBody) => createCustomer(body), {
     onSuccess: () => {
       enqueueSnackbar(successMsg, {
@@ -71,15 +71,13 @@ export const useCreateCustomer = (successMsg: string) => {
     },
     onError: (err) => {
       console.log(err);
-      enqueueSnackbar('An unexpected error occurred, please try again.', {
-        variant: 'error',
-      });
+      showError(err);
     },
   });
 };
 
 export const useCustomer = () => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
 
   const updateCustomer = async (
@@ -105,13 +103,7 @@ export const useCustomer = () => {
       }
     } catch (error: any) {
       console.error(error);
-      enqueueSnackbar(
-        error.response?.message ||
-          'Sorry! Unable to save changes right now. Please try again.',
-        {
-          variant: 'error',
-        },
-      );
+      showError(error);
     }
   };
 
@@ -128,7 +120,7 @@ const deleteCustomer = async (propertyOwnerId: string) => {
 };
 
 export const useDeleteCustomer = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation(
     (propertyOwnerId: string) => deleteCustomer(propertyOwnerId),
@@ -146,9 +138,7 @@ export const useDeleteCustomer = (successMsg?: string) => {
           '🚀 ~ file: useCustomers.ts ~ useDeleteCustomer ~ err',
           err,
         );
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );

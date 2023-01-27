@@ -100,7 +100,7 @@ const createArticle = async (
 };
 
 export const useCreateArticle = (successMsg: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation((body: CreateArticleRecord) => createArticle(body), {
     onSuccess: () => {
       enqueueSnackbar(successMsg, {
@@ -109,9 +109,7 @@ export const useCreateArticle = (successMsg: string) => {
     },
     onError: (err) => {
       console.log(err);
-      enqueueSnackbar('An unexpected error occurred, please try again.', {
-        variant: 'error',
-      });
+      showError(err);
     },
   });
 };
@@ -121,7 +119,7 @@ const deleteArticle = async (articleId: string) => {
 };
 
 export const useDeleteArticle = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation(
     ({articleId}: {articleId: string}) => deleteArticle(articleId),
@@ -136,9 +134,7 @@ export const useDeleteArticle = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -154,7 +150,7 @@ const updateArticle = async (
 };
 
 export const useUpdateArticle = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation(
     ({articleId, article}: {articleId: string; article: UpdateArticleRecord}) =>
@@ -170,12 +166,7 @@ export const useUpdateArticle = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -221,7 +212,7 @@ export const postPartialArticle = async (serviceCompanyId?: string) => {
 export const useCreatePartialArticle = () => {
   const queryClient = useQueryClient();
   const {user} = useUserSession();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     () => postPartialArticle(user!.userAccount.serviceCompany.id),
     {
@@ -233,9 +224,7 @@ export const useCreatePartialArticle = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -269,7 +258,7 @@ const createArticleOrder = async (
 
 export const useCreateArticleOrder = (successMsg: string) => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (body: CreateArticleOrderRecord) => createArticleOrder(body),
     {
@@ -281,9 +270,7 @@ export const useCreateArticleOrder = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );

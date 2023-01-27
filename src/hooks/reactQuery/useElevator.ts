@@ -75,14 +75,20 @@ export const fetchElevatorBreakdownHistory = async (elevatorId: string) => {
   return response.data;
 };
 
-export const useElevatorById = (elevatorId?: string) =>
-  useQuery(
+export const useElevatorById = (elevatorId?: string) => {
+  const {showError} = useSnackbar();
+  return useQuery(
     [queryKeys.elevatorById, elevatorId],
     () => fetchElevator(elevatorId!),
     {
       enabled: !!elevatorId,
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
     },
   );
+};
 
 export const useElevatorMaintainers = (elevatorId?: string) =>
   useQuery(
@@ -98,12 +104,17 @@ export function useAllElevators(
   options?: UseQueryOptions<any, any, any>,
 ) {
   const {user} = useUserSession();
+  const {showError} = useSnackbar();
   return useQuery<Resource<ElevatorView>, RestError>(
     [queryKeys.fetchAllElevators, params, user?.userAccount.serviceCompany.id],
     () => fetchElevators(params, user!.userAccount.serviceCompany.id),
     {
       ...options,
       enabled: !!user,
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
     },
   );
 }
@@ -145,7 +156,7 @@ const updateElevator = async (
 };
 
 export const useUpdateElevator = (successMsg: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation(
     ({
@@ -164,12 +175,7 @@ export const useUpdateElevator = (successMsg: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -235,7 +241,7 @@ const updateElevatorComment = async (
 };
 
 export const useUpdateElevatorComment = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation(
     ({
@@ -258,12 +264,7 @@ export const useUpdateElevatorComment = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -279,7 +280,7 @@ const addElevatorComment = async (
 };
 
 export const useAddElevatorComment = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation(
     ({
@@ -300,9 +301,7 @@ export const useAddElevatorComment = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -315,7 +314,7 @@ const deleteElevatorComment = async (elevatorId: string, noteId: string) => {
 };
 
 export const useDeleteElevatorComment = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation(
     ({elevatorId, noteId}: {elevatorId: string; noteId: string}) =>
@@ -331,9 +330,7 @@ export const useDeleteElevatorComment = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -352,7 +349,7 @@ const updateElevatorTechnician = async (
 };
 
 export const useUpdateElevatorTechnician = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
 
   return useMutation(
@@ -369,12 +366,7 @@ export const useUpdateElevatorTechnician = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -388,7 +380,7 @@ const addElevator = async (body: Partial<ElevatorRequestBody>) => {
 };
 
 export const useAddElevator = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation(
     (body: Partial<ElevatorRequestBody>) => addElevator(body),
@@ -407,9 +399,7 @@ export const useAddElevator = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -443,7 +433,7 @@ export const postTodo = async (id: string, body: ElevatorCommentRecord) => {
 
 export const useCreateTodo = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(
     ({elevatorId, data}: {elevatorId: string; data: ElevatorCommentRecord}) =>
@@ -457,12 +447,7 @@ export const useCreateTodo = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry, there was an error while creating the todo. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -478,7 +463,7 @@ export const putTodo = async (
 
 export const useUpdateTodo = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(
     ({
@@ -499,12 +484,7 @@ export const useUpdateTodo = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry, there was an error while updating the todo. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -516,7 +496,7 @@ export const deleteTodo = async (elevatorId: string, todoId: string) => {
 
 export const useDeleteTodo = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(
     ({elevatorId, todoId}: {elevatorId: string; todoId: string}) =>
@@ -530,12 +510,7 @@ export const useDeleteTodo = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry, there was an error while deleting the todo. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -549,7 +524,7 @@ const deleteElevator = async (elevatorId: string) => {
 };
 
 export const useDeleteElevator = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation((elevatorId: string) => deleteElevator(elevatorId), {
     onSuccess: () => {
@@ -563,9 +538,7 @@ export const useDeleteElevator = (successMsg?: string) => {
     },
     onError: (err: any) => {
       console.log(err);
-      enqueueSnackbar('An unexpected error occurred, please try again.', {
-        variant: 'error',
-      });
+      showError(err);
     },
   });
 };

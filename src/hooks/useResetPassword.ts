@@ -10,7 +10,7 @@ interface UseRecoverPassword {
 }
 
 export const useResetPassword = (): UseRecoverPassword => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -34,19 +34,7 @@ export const useResetPassword = (): UseRecoverPassword => {
         navigate('/reset-password?type=reset');
       }
     } catch (error: any) {
-      if ('response' in error && error.response!.status === 400) {
-        enqueueSnackbar("Sorry, user account wasn't found", {
-          variant: 'error',
-        });
-      } else {
-        enqueueSnackbar(
-          'Sorry, we failed to fulfill the request at this time. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
-      }
-
+      showError(error);
       setLoading(false);
       console.error(error);
     }
@@ -72,19 +60,7 @@ export const useResetPassword = (): UseRecoverPassword => {
         navigate('/login?authType=reset');
       }
     } catch (error: any) {
-      if ('response' in error && error.response!.status === 400) {
-        enqueueSnackbar('Invalid Code', {
-          variant: 'error',
-        });
-      } else {
-        enqueueSnackbar(
-          'Sorry, we failed to fulfill the request at this time. Please try again.',
-
-          {
-            variant: 'error',
-          },
-        );
-      }
+      showError(error);
       setLoading(false);
       console.error(error);
     }

@@ -437,7 +437,7 @@ const cancelServiceOrders = async (serviceOrderId: string) => {
 
 export const useCancelServiceOrders = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (serviceOrderId: string) => cancelServiceOrders(serviceOrderId),
     {
@@ -450,9 +450,7 @@ export const useCancelServiceOrders = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -470,7 +468,7 @@ const updateServiceOrderCheckListAnswers = async (
 
 export const useUpdateServiceOrderCheckListAnswers = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     ({
       serviceOrderId,
@@ -489,9 +487,7 @@ export const useUpdateServiceOrderCheckListAnswers = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -509,7 +505,7 @@ const completeServiceOrder = async (
 
 export const useCompleteServiceOrder = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     ({
       serviceOrderId,
@@ -528,9 +524,7 @@ export const useCompleteServiceOrder = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -544,7 +538,7 @@ const unschedulerServiceOrder = async (serviceOrderId: string) => {
 
 export const useUnscheduleServiceOrders = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (serviceOrderId: string) => unschedulerServiceOrder(serviceOrderId),
     {
@@ -557,9 +551,7 @@ export const useUnscheduleServiceOrders = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -581,7 +573,7 @@ const redispatchServiceOrders = async (
 
 export const useRedispatchServiceOrders = (successMsg: string) => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     ({technicianId, serviceOrderId}: RedispatchParams) =>
       redispatchServiceOrders(technicianId, serviceOrderId),
@@ -596,9 +588,7 @@ export const useRedispatchServiceOrders = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -616,7 +606,7 @@ const updateServiceOrderSchedule = async (
 
 export const useUpdateServiceOrderSchedule = (successMsg: string) => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     ({
       body,
@@ -634,12 +624,7 @@ export const useUpdateServiceOrderSchedule = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -656,7 +641,7 @@ const updateServiceOrder = async (
 
 export const useUpdateServiceOrder = (successMsg: string) => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     ({
       body,
@@ -674,12 +659,7 @@ export const useUpdateServiceOrder = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -691,7 +671,7 @@ const createAssignmentBasedOrder = async (body: AssignmentBasedOrderBody) =>
   });
 
 export const useAssignmentBasedOrder = (successMsg: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (body: AssignmentBasedOrderBody) => createAssignmentBasedOrder(body),
     {
@@ -706,9 +686,7 @@ export const useAssignmentBasedOrder = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -722,7 +700,7 @@ const createScheduledServiceOrder = async (
   });
 
 export const useCreateScheduledServiceOrder = (successMsg: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (body: CreateScheduledServiceOrderBody) =>
       createScheduledServiceOrder(body),
@@ -738,9 +716,7 @@ export const useCreateScheduledServiceOrder = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -754,7 +730,7 @@ const createNonScheduledServiceOrder = async (
   });
 
 export const useCreateNonScheduledServiceOrder = (successMsg: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (body: CreateNonScheduledServiceOrderBody) =>
       createNonScheduledServiceOrder(body),
@@ -770,9 +746,7 @@ export const useCreateNonScheduledServiceOrder = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -787,7 +761,7 @@ export const putServiceOrderArticles = async (
 
 export const useUpdateServiceOrderArticles = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(
     ({data, orderId}: {data: ServiceOrderItemRecord[]; orderId: string}) =>
@@ -803,12 +777,7 @@ export const useUpdateServiceOrderArticles = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -859,7 +828,7 @@ const appointmentNotification = async (serviceOrderId: string) =>
 
 export const useAppointmentNotification = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (serviceOrderId: string) => appointmentNotification(serviceOrderId),
     {
@@ -873,9 +842,7 @@ export const useAppointmentNotification = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -888,7 +855,7 @@ const confirmAppointment = async (serviceOrderId: string) =>
 
 export const useConfirmAppointment = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (serviceOrderId: string) => confirmAppointment(serviceOrderId),
     {
@@ -902,9 +869,7 @@ export const useConfirmAppointment = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );

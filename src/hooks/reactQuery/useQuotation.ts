@@ -105,7 +105,7 @@ export const postPublishQuotation = async (
 
 export const usePublishQuotation = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
 
   return useMutation(
@@ -122,9 +122,7 @@ export const usePublishQuotation = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -136,7 +134,7 @@ export const putReplyQuotation = async (id: string, body: ReplyQuotation) => {
 
 export const useReplyQuotation = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
 
   return useMutation(
@@ -153,9 +151,7 @@ export const useReplyQuotation = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -171,7 +167,7 @@ export const postQuotation = async (body: CreateQuotation) => {
 
 export const useCreateQuotation = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
 
   return useMutation(({data}: {data: CreateQuotation}) => postQuotation(data), {
@@ -191,9 +187,7 @@ export const useCreateQuotation = () => {
     },
     onError: (err) => {
       console.log(err);
-      enqueueSnackbar('An unexpected error occurred, please try again.', {
-        variant: 'error',
-      });
+      showError(err);
     },
   });
 };
@@ -204,7 +198,7 @@ export const putQuotation = async (body: UpdateQuotation, id: string) => {
 
 export const useUpdateQuotation = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(
     ({data, quotationId}: {data: UpdateQuotation; quotationId: string}) =>
@@ -219,12 +213,7 @@ export const useUpdateQuotation = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -237,7 +226,7 @@ export const deleteQuotation = async (id: string, navigate: boolean) => {
 
 export const useDeleteQuotation = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
 
   return useMutation(
@@ -259,9 +248,7 @@ export const useDeleteQuotation = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -332,7 +319,7 @@ export const postQuotationComment = async (
 
 export const useCreateQuotationComment = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {showError} = useSnackbar();
 
   return useMutation(
     ({
@@ -347,9 +334,7 @@ export const useCreateQuotationComment = () => {
         queryClient.invalidateQueries([qk.fetchQuotationComments]),
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -367,7 +352,7 @@ export const deleteQuotationComment = async (
 
 export const useDeleteQuotationComment = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {showError} = useSnackbar();
 
   return useMutation(
     ({quotationId, commentId}: {quotationId: string; commentId: string}) =>
@@ -377,9 +362,7 @@ export const useDeleteQuotationComment = () => {
         queryClient.invalidateQueries([qk.fetchQuotationComments]),
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -399,7 +382,7 @@ export const updateQuotationComment = async (
 
 export const useUpdateQuotationComment = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {showError} = useSnackbar();
 
   return useMutation(
     ({
@@ -416,9 +399,7 @@ export const useUpdateQuotationComment = () => {
         queryClient.invalidateQueries([qk.fetchQuotationComments]),
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );

@@ -132,7 +132,7 @@ export const postPublishInvoice = async (
 
 export const usePublishInvoice = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
 
   return useMutation(
@@ -150,9 +150,7 @@ export const usePublishInvoice = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -164,7 +162,7 @@ export const putInvoicePaymentStatus = async (id: string) => {
 
 export const useInvoicePaymentStatus = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
 
   return useMutation(
@@ -181,9 +179,7 @@ export const useInvoicePaymentStatus = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -204,7 +200,7 @@ export const addInvoicePayment = async ({
 
 export const useAddInvoicePayment = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
 
   return useMutation(
@@ -222,9 +218,7 @@ export const useAddInvoicePayment = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -237,7 +231,7 @@ export const postInvoice = async (body: CreateInvoice) => {
 
 export const useCreateInvoice = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
 
   return useMutation(({data}: {data: CreateInvoice}) => postInvoice(data), {
@@ -260,12 +254,7 @@ export const useCreateInvoice = () => {
     },
     onError: (err) => {
       console.log(err);
-      enqueueSnackbar(
-        'Sorry! Unable to save changes right now. Please try again.',
-        {
-          variant: 'error',
-        },
-      );
+      showError(err);
     },
   });
 };
@@ -276,7 +265,7 @@ export const putInvoice = async (body: UpdateInvoice, id: string) => {
 
 export const useUpdateInvoice = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(
     ({data, invoiceId}: {data: UpdateInvoice; invoiceId: string}) =>
@@ -292,12 +281,7 @@ export const useUpdateInvoice = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -310,7 +294,7 @@ export const deleteInvoice = async (id: string, navigate: boolean) => {
 
 export const useDeleteInvoice = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
 
   return useMutation(
@@ -332,9 +316,7 @@ export const useDeleteInvoice = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -422,7 +404,7 @@ export const postInvoiceComment = async (
 
 export const useCreateInvoiceComment = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {showError} = useSnackbar();
 
   return useMutation(
     ({invoiceId, body}: {invoiceId: string; body: CreateInvoiceComment}) =>
@@ -431,9 +413,7 @@ export const useCreateInvoiceComment = () => {
       onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -451,7 +431,7 @@ export const deleteInvoiceComment = async (
 
 export const useDeleteInvoiceComment = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {showError} = useSnackbar();
 
   return useMutation(
     ({invoiceId, commentId}: {invoiceId: string; commentId: string}) =>
@@ -460,9 +440,7 @@ export const useDeleteInvoiceComment = () => {
       onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -482,7 +460,7 @@ export const updateInvoiceComment = async (
 
 export const useUpdateInvoiceComment = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {showError} = useSnackbar();
 
   return useMutation(
     ({
@@ -498,9 +476,7 @@ export const useUpdateInvoiceComment = () => {
       onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -519,7 +495,7 @@ export const createInvoiceOverdueNotice = async (
 
 export const useCreateInvoiceOverdueNotice = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {showError} = useSnackbar();
   return useMutation(
     ({
       invoiceId,
@@ -536,9 +512,7 @@ export const useCreateInvoiceOverdueNotice = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -557,7 +531,7 @@ export const publishInvoiceOverdueNotice = async (
 
 export const usePublishInvoiceOverdueNotice = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
   return useMutation(
     ({
@@ -581,9 +555,7 @@ export const usePublishInvoiceOverdueNotice = () => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );

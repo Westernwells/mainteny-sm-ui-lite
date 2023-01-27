@@ -30,7 +30,7 @@ export const useAuth = (): UseAuth => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location: Location = useLocation();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   const adminUser = getStoredAdmin();
 
@@ -83,14 +83,10 @@ export const useAuth = (): UseAuth => {
           navigate('/', {replace: true});
         }
       }
-    } catch (errorResponse: any) {
-      if (errorResponse?.response.status === 400) {
-        enqueueSnackbar('Email or password entered is incorrect', {
-          variant: 'error',
-        });
-      }
+    } catch (err: any) {
+      showError(err);
       setLoading(false);
-      console.log(errorResponse);
+      console.log(err);
     }
   };
 

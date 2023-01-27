@@ -9,7 +9,6 @@ import {queryKeys} from 'reactQuery/constants';
 import {useSnackbar} from 'hooks/useSnackbar';
 
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
-import {ErrorCode} from 'models/error';
 import {Page, Resource, RestError, StringValue} from '../../models/misc';
 
 export const getContacts = async (page: Page, customerId: string) => {
@@ -50,7 +49,7 @@ const updateContact = async (body: ContactBody, contactId: string) => {
 };
 
 export const useUpdateContact = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
 
   return useMutation(
@@ -67,12 +66,7 @@ export const useUpdateContact = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -85,7 +79,7 @@ const createContact = async (body: ContactBody) => {
 };
 
 export const useCreateContact = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
 
   return useMutation(({body}: {body: ContactBody}) => createContact(body), {
@@ -99,18 +93,7 @@ export const useCreateContact = (successMsg?: string) => {
     },
     onError: (err: any) => {
       console.log(err);
-      if (
-        (err?.response?.data as RestError)?.errorCode ===
-        ErrorCode.USERNAME_EXISTS
-      ) {
-        enqueueSnackbar('A contact person with this email already exists.', {
-          variant: 'error',
-        });
-      } else {
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
-      }
+      showError(err);
     },
   });
 };
@@ -122,7 +105,7 @@ const deleteContact = async (contactId: string) => {
 };
 
 export const useDeleteContact = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation(
     ({contactId}: {contactId: string}) => deleteContact(contactId),
@@ -137,9 +120,7 @@ export const useDeleteContact = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -152,7 +133,7 @@ const inviteContact = async (userName: string) => {
 };
 
 export const useInviteContact = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
 
   return useMutation(
@@ -168,9 +149,7 @@ export const useInviteContact = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );

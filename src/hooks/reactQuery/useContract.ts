@@ -128,7 +128,7 @@ const UpdateContract = async (
 };
 
 export const useUpdateContract = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation(
     ({
@@ -150,12 +150,7 @@ export const useUpdateContract = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -171,7 +166,7 @@ const createContract = async (
 };
 
 export const useCreateContract = (successMsg: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation((body: ContractRequestBody) => createContract(body), {
     onSuccess: () => {
       enqueueSnackbar(successMsg, {
@@ -180,9 +175,7 @@ export const useCreateContract = (successMsg: string) => {
     },
     onError: (err) => {
       console.log(err);
-      enqueueSnackbar('Some error occurred, please try again.', {
-        variant: 'error',
-      });
+      showError(err);
     },
   });
 };
@@ -195,7 +188,7 @@ const deleteContract = async (contractId: string) => {
 };
 
 export const useDeleteContract = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation((contractId: string) => deleteContract(contractId), {
     onSuccess: () => {
@@ -209,9 +202,7 @@ export const useDeleteContract = (successMsg?: string) => {
     },
     onError: (err: any) => {
       console.log(err);
-      enqueueSnackbar('An unexpected error occurred, please try again.', {
-        variant: 'error',
-      });
+      showError(err);
     },
   });
 };
@@ -227,7 +218,7 @@ const attachElevatorsToContract = async (
 };
 
 export const useAttachElevatorsToContract = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation(
     ({contractId, body}: {contractId: string; body: string[]}) =>
@@ -243,12 +234,7 @@ export const useAttachElevatorsToContract = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );

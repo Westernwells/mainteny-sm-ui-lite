@@ -1,8 +1,8 @@
 import {StringValue} from 'models/misc';
-import {useSnackbar} from 'notistack';
 import {RebuildFormModel} from 'pages/SystemSettings/models';
 import {useMutation} from 'react-query';
 import {axiosClient} from 'utils/axios-utils';
+import {useSnackbar} from 'hooks/useSnackbar';
 
 const rebuildIndex = async (data: RebuildFormModel): Promise<StringValue> => {
   const response = await axiosClient.post<StringValue>(
@@ -14,7 +14,7 @@ const rebuildIndex = async (data: RebuildFormModel): Promise<StringValue> => {
 };
 
 export const useRebuildIndex = (successMsg: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation((data: RebuildFormModel) => rebuildIndex(data), {
     onSuccess: () => {
@@ -24,9 +24,7 @@ export const useRebuildIndex = (successMsg: string) => {
     },
     onError: (err) => {
       console.log(err);
-      enqueueSnackbar('An unexpected error occurred, please try again.', {
-        variant: 'error',
-      });
+      showError(err);
     },
   });
 };
@@ -39,7 +37,7 @@ const createIndex = async (type: string): Promise<StringValue> => {
 };
 
 export const useCreateIndex = (successMsg: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation((type: string) => createIndex(type), {
     onSuccess: () => {
@@ -49,9 +47,7 @@ export const useCreateIndex = (successMsg: string) => {
     },
     onError: (err) => {
       console.log(err);
-      enqueueSnackbar('An unexpected error occurred, please try again.', {
-        variant: 'error',
-      });
+      showError(err);
     },
   });
 };

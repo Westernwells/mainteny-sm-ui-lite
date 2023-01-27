@@ -58,7 +58,7 @@ export const useGetUserAccount = (id?: string) =>
   });
 
 export const useEmployeeAccount = () => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   const {t} = useTranslation();
 
@@ -90,13 +90,7 @@ export const useEmployeeAccount = () => {
       }
     } catch (error: any) {
       console.error(error);
-      enqueueSnackbar(
-        error.response?.message ||
-          'Sorry! User account creation failed. Please try again.',
-        {
-          variant: 'error',
-        },
-      );
+      showError(error);
     }
   };
 
@@ -129,13 +123,7 @@ export const useEmployeeAccount = () => {
       }
     } catch (error: any) {
       console.error(error);
-      enqueueSnackbar(
-        error.response?.message ||
-          'Sorry! Unable to save changes right now. Please try again.',
-        {
-          variant: 'error',
-        },
-      );
+      showError(error);
     }
   };
 
