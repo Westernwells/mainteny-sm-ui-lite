@@ -10,6 +10,7 @@ import {
   ElevatorView,
 } from '../../../../models/elevator';
 import {Actions} from './Action';
+import {ContractStatus} from '../../../../models/contract';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -135,7 +136,9 @@ export const makeRows = (
     priorityTechnician: elevator.assignments.length
       ? getPriorityTechnician(elevator.assignments)
       : '-',
-    activeContracts: !!elevator.contracts.length,
+    activeContracts:
+      !!elevator.contracts.length &&
+      elevator.contracts.some((it) => it.status === ContractStatus.VALID),
     elevator,
     navigateTo: `details/${elevator.id}`,
   }));

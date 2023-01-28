@@ -63,6 +63,14 @@ export const Dashboard = () => {
       },
       user?.userAccount.serviceCompany.id,
     );
+  const {data: fullSummary, isLoading: isLoadingFullSummary} =
+    useCompanySummary(
+      {
+        date: toRestDate(new Date()),
+        timeUnit: ServiceCompanyTimeUnit.FULLY,
+      },
+      user?.userAccount.serviceCompany.id,
+    );
   const {
     data: appointments = createEmptyResource<ServiceOrderView>(3),
     isLoading: isLoadingAppointments,
@@ -136,8 +144,8 @@ export const Dashboard = () => {
     quarterlySummary?.serviceOrderSummary.numberOfCompletedOrders ?? 0;
   const quarterlyNumberOfOrders =
     quarterlySummary?.serviceOrderSummary.numberOfOrders ?? 0;
-  const quarterlyNumberOfActiveUnits =
-    quarterlySummary?.elevatorSummary?.numberOfActiveContractElevator ?? 0;
+  const fullNumberOfActiveUnits =
+    fullSummary?.elevatorSummary?.numberOfActiveContractElevator ?? 0;
 
   useEffect(() => {
     if (inView && hasNextActivitiesPage) {
@@ -148,6 +156,7 @@ export const Dashboard = () => {
   const isLoading =
     isLoadingDailySummary ||
     isLoadingQuarterlySummary ||
+    isLoadingFullSummary ||
     isLoadingAppointments ||
     isLoadingQuotations ||
     isLoadingInvoices ||
@@ -211,7 +220,7 @@ export const Dashboard = () => {
             <Grid item xs={12} sm={6} lg={3}>
               <TopCard
                 title="Active units"
-                value={`${quarterlyNumberOfActiveUnits}`}
+                value={`${fullNumberOfActiveUnits}`}
                 icon={Refresh}
                 iconColor={theme.palette.secondary.dark}
                 iconBackgroundColor={theme.palette.info.outlinedHoverBg}
