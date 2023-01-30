@@ -8,6 +8,7 @@ import {FormatDate} from 'models/misc';
 import {getColumnProps} from 'components/DataGridLayout';
 import {ElevatorView} from 'models/elevator';
 import {Actions} from './Action';
+import {ContractStatus} from '../../../../models/contract';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -112,7 +113,9 @@ export const makeRows = (
             )
             .join(', ')
         : '-',
-      activeContracts: !!elevator.contracts?.length,
+      activeContracts:
+        !!elevator.contracts?.length &&
+        elevator.contracts.some((it) => it.status === ContractStatus.VALID),
       elevator,
       navigateTo: `/units/details/${elevator.id}`,
     }));
