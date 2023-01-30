@@ -26,9 +26,9 @@ import {
   UseQueryOptions,
 } from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
-import {useSnackbar} from 'notistack';
 import {ServiceOrder} from 'models/service-order';
 import {ArticleSupplierView} from 'models/article';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {useUserSession} from './useUserSession';
 
 export const getCompanies = async (page: Page, query: string) => {
@@ -101,10 +101,20 @@ export const getCompany = async (companyId: string) => {
   return response.data;
 };
 
-export const useCompanyById = (companyId?: string) =>
-  useQuery([queryKeys.fetchCompany, companyId], () => getCompany(companyId!), {
-    enabled: !!companyId,
-  });
+export const useCompanyById = (companyId?: string) => {
+  const {showError} = useSnackbar();
+  return useQuery(
+    [queryKeys.fetchCompany, companyId],
+    () => getCompany(companyId!),
+    {
+      enabled: !!companyId,
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
 
 const updateCompany = async (
   body: ServiceCompanyUpdateBody,
@@ -116,7 +126,7 @@ const updateCompany = async (
 };
 
 export const useUpdateCompany = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const {user, updateUser} = useUserSession();
   const queryClient = useQueryClient();
 
@@ -143,12 +153,7 @@ export const useUpdateCompany = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -167,7 +172,7 @@ const updateSystemSettings = async (
 };
 
 export const useUpdateSystemSettings = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
 
   return useMutation(
@@ -184,12 +189,7 @@ export const useUpdateSystemSettings = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -205,7 +205,7 @@ const createServiceCompany = async (
 };
 
 export const useCreateServiceCompany = (successMsg: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (body: NewServiceCompanyBody) => createServiceCompany(body),
     {
@@ -216,9 +216,7 @@ export const useCreateServiceCompany = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );

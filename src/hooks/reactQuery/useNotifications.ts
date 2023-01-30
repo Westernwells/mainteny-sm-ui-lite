@@ -60,7 +60,7 @@ const markNotificationAsRead = async (notificationId: string) => {
 
 export const useMarkNotificationAsRead = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {showError} = useSnackbar();
   return useMutation(
     (notificationId: string) => markNotificationAsRead(notificationId),
     {
@@ -68,9 +68,7 @@ export const useMarkNotificationAsRead = () => {
         queryClient.invalidateQueries([queryKeys.queryNotifications]),
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -82,7 +80,7 @@ const markAllAsRead = async (target: string) => {
 
 export const useMarkAllAsRead = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {showError} = useSnackbar();
   const {user} = useUserSession();
   return useMutation(() => markAllAsRead(user!.userAccount.serviceCompany.id), {
     onSuccess: () => {
@@ -90,9 +88,7 @@ export const useMarkAllAsRead = () => {
     },
     onError: (err) => {
       console.log(err);
-      enqueueSnackbar('An unexpected error occurred, please try again.', {
-        variant: 'error',
-      });
+      showError(err);
     },
   });
 };
