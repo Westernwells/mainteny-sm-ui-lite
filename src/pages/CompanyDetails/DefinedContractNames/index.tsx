@@ -58,7 +58,8 @@ export const DefinedContractNames = ({company, containerStyles}: Props) => {
   return (
     <>
       <InfoCard
-        containerStyles={{...containerStyles}}
+        containerStyles={{...containerStyles, pb: '4rem'}}
+        bodyContainerStyle={{height: '100%'}}
         handleAction={() => setOpenDialog(true)}
         header={
           <Typography variant="subtitle1">
@@ -70,7 +71,7 @@ export const DefinedContractNames = ({company, containerStyles}: Props) => {
         <DataGridLayout
           fullHeight={false}
           isCellClickable={false}
-          height={210}
+          height="100%"
           rows={rows}
           columns={columns}
           noRowsEmptySection={

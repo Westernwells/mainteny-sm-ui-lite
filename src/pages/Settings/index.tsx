@@ -70,7 +70,7 @@ export const SettingsPage = ({getCurrentPageTitle}: Props) => {
         </Grid>
       </Grid>
 
-      <Grid container spacing={2} sx={{mt: '0.3em'}}>
+      <Grid container spacing={2} sx={{my: '0.3em'}}>
         <Grid item md={3} sm={12}>
           <Policies company={company!} containerStyles={{height: '100%'}} />
         </Grid>
