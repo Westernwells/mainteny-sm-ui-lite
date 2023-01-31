@@ -1,8 +1,7 @@
 {
-  "extends": "./tsconfig.bases.json",
   "compilerOptions": {
     "baseUrl": "src",
-    "target": "es5",
+    "target": "esnext",
     "downlevelIteration": true, 
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
