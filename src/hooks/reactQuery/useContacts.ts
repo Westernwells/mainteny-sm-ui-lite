@@ -13,7 +13,7 @@ import {Page, Resource, RestError, StringValue} from '../../models/misc';
 
 export const getContacts = async (page: Page, customerId: string) => {
   const response = await axiosClient.get<Resource<ContactsView>>(
-    `api/propertyOwners/${customerId}/contactPersons`,
+    `/api/propertyOwners/${customerId}/contactPersons`,
     {
       params: {
         query: '',
