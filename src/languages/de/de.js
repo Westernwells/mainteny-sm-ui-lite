@@ -1,4 +1,4 @@
-module.exports = {
+export const germany = {
   de: {
     Reschedule: 'Umplanen',
     Cancel: 'Abbrechen',
