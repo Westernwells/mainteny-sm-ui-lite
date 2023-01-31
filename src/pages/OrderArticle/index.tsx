@@ -28,7 +28,7 @@ import {ArticleItemsTable} from './ArticleItemsTable';
 
 const validationSchema = Yup.object().shape({
   serviceCompanyId: Yup.string().required('Service company ID is required'),
-  externalId: Yup.string().required('Internal order number is required'),
+  externalId: Yup.string(),
   articleSupplierId: Yup.string().required('Article supplier ID is required'),
   description: Yup.string().required('Description is required'),
   items: Yup.array()
@@ -209,14 +209,13 @@ export const OrderArticle = () => {
             <FormInput
               props={{
                 name: 'externalId',
-                label: 'Internal order number',
+                label: 'Purchase order number',
                 value: formik.values.externalId,
                 onChange: formik.handleChange,
                 onBlur: formik.handleBlur,
                 error: !!formik.errors.externalId && formik.touched.externalId,
                 helperText:
                   formik.touched.externalId && formik.errors.externalId,
-                required: true,
               }}
             />
             <FormInput
