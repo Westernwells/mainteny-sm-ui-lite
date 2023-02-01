@@ -52,9 +52,8 @@ variables:
     - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" # Install AWS CLI
     - unzip -qq awscliv2.zip
     - ./aws/install
-    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/mainteny/infra/kubeapps
-    - cd kubeapps
-    - git checkout db0a98cb885b6c333ca19277563687c6fca8c57d # the working commit for sm lite, TODO: remove after kubeapps gets fixed
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/mainteny/infra/sm-ui-lite-deployment
+    - cd sm-ui-lite-deployment
     - npm ci
     - pulumi login s3://mainteny-pulumi-state
   variables:
@@ -62,12 +61,11 @@ variables:
     CACHE_PATH: /*
   script:
     - echo "Deploying ${IMAGE_SUFFIX} on environment $STACK"
-    - pulumi stack select sm-lite.$STACK
-    - pulumi config set --path "mainteny:k8sConfig.services[0].image" ${DOCKER_REGISTRY}/sm-lite:${IMAGE_SUFFIX}-${IMAGE_ENV}
+    - pulumi stack select $STACK
+    - pulumi config set --path "mainteny:imageName" ${DOCKER_REGISTRY}/sm-lite:${IMAGE_SUFFIX}-${IMAGE_ENV}
     - pulumi config set mainteny:version ${CI_COMMIT_SHORT_SHA}_$(date '+%Y%m%d')
     - pulumi config set mainteny:deploymentTimeStamp "$(date)"
     - pulumi up -y
-    - pulumi stack select cdn.$ENV
     - aws cloudfront create-invalidation --distribution-id $(pulumi stack output distributionId) --paths "$CACHE_PATH"
     - >-
       curl -X POST
