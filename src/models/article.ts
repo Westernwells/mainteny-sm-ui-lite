@@ -50,6 +50,7 @@ export interface ArticleView {
   unit: string;
   unitPurchaseAmount: Amount;
   unitSellingAmount: Amount;
+  suppliers: ArticleSupplierItemView[];
 }
 
 export interface ArticleViewItem {
@@ -141,6 +142,16 @@ export interface Supplier {
   website: string;
   address: Address;
   isPreferred: boolean;
+}
+
+export interface ArticleSupplierItemView {
+  id: string;
+  articleId: string;
+  supplier: ArticleSupplierView;
+  number: string;
+  isPreferred: boolean;
+  additionalInfo: string;
+  preferred: boolean;
 }
 
 export interface SupplierRecord {

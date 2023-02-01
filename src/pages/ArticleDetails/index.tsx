@@ -49,7 +49,12 @@ export const ArticleOverView = () => {
         <Button
           label={t('Order article')}
           buttonProps={{
-            onClick: () => navigate('/articles/order'),
+            onClick: () =>
+              navigate(`/articles/order`, {
+                state: {
+                  article: articleDetail,
+                },
+              }),
             variant: 'contained',
             size: 'large',
           }}
