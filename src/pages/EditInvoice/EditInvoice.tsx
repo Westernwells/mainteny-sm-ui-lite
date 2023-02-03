@@ -53,6 +53,7 @@ import {Notes} from 'pages/InvoiceDetails/Notes';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useServiceOrderWorkReport} from 'hooks/reactQuery/useServiceOrder';
 import {convertToText} from 'utils/utils';
+import {addYears} from 'date-fns';
 
 interface Props {
   invoice: InvoiceView;
@@ -145,20 +146,29 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
     subject: Yup.string().required('Subject is required'),
   });
 
-  const onSave = (values: CreateInvoice) => {
-    if (!values.description.length) values.description = ' ';
-
-    updateInvoice({
-      data: values as UpdateInvoice,
-      invoiceId: invoice.id,
-    });
-  };
-
   const formik = useFormik({
     initialValues,
     validationSchema,
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     onSubmit: (values) => onSave(values),
   });
+
+  function onSave(values: CreateInvoice) {
+    if (!values.description.length) values.description = ' ';
+
+    const dueDateToString =
+      formik.values.type === InvoiceType.CREDIT_NOTE
+        ? dateToString(addYears(new Date(), 1))
+        : values.dueDate;
+
+    updateInvoice({
+      data: {
+        ...values,
+        dueDate: dueDateToString,
+      } as UpdateInvoice,
+      invoiceId: invoice.id,
+    });
+  }
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
@@ -313,6 +323,18 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
     }
     return items;
   }, [downloadUrl]);
+
+  const isValid = () => {
+    const valid =
+      formik.values.subject &&
+      formik.values.type.length &&
+      formik.values.items.length &&
+      serviceOrder !== undefined;
+    if (formik.values.type !== InvoiceType.CREDIT_NOTE) {
+      return !!(valid && dueDate !== null);
+    }
+    return !!valid;
+  };
 
   return (
     <Box>
@@ -545,35 +567,36 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
             </Box>
 
             {formik.values.type !== InvoiceType.CREDIT_NOTE && (
-              <Box mt="2em" width="32ch">
-                <Typography
-                  variant="body1"
-                  color={theme.palette.text.secondary}>
-                  {t('Work Report')}
-                </Typography>
-                <FormCheckbox
-                  checked={formik.values.includeWorkReport}
-                  name="includeWorkReport"
-                  handleChange={formik.handleChange}
-                  label={t('Add work report to invoice')}
-                />
-              </Box>
+              <>
+                <Box mt="2em" width="32ch">
+                  <Typography
+                    variant="body1"
+                    color={theme.palette.text.secondary}>
+                    {t('Work Report')}
+                  </Typography>
+                  <FormCheckbox
+                    checked={formik.values.includeWorkReport}
+                    name="includeWorkReport"
+                    handleChange={formik.handleChange}
+                    label={t('Add work report to invoice')}
+                  />
+                </Box>
+                <Box mt="2em" width="32ch">
+                  <DatePicker
+                    defaultDate={dueDate}
+                    minDate={new Date()}
+                    getSelectedDate={(newValue) => {
+                      if (newValue) setDueDate(newValue);
+                    }}
+                    textFieldProps={{
+                      label: 'Due Date',
+                      InputLabelProps: {shrink: true},
+                    }}
+                    required
+                  />
+                </Box>
+              </>
             )}
-
-            <Box mt="2em" width="32ch">
-              <DatePicker
-                defaultDate={dueDate}
-                minDate={new Date()}
-                getSelectedDate={(newValue) => {
-                  if (newValue) setDueDate(newValue);
-                }}
-                textFieldProps={{
-                  label: 'Due Date',
-                  InputLabelProps: {shrink: true},
-                }}
-                required
-              />
-            </Box>
 
             {[
               {
@@ -647,15 +670,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
           ...item,
           showBorder: actions[actions.length - 1] !== item,
         }))}
-        isValid={
-          !!(
-            formik.values.subject &&
-            dueDate !== null &&
-            formik.values.type.length &&
-            formik.values.items.length &&
-            serviceOrder !== undefined
-          )
-        }
+        isValid={isValid()}
         secondaryButton={
           invoice?.status === InvoiceStatus.DRAFT ||
           invoice?.status === InvoiceStatus.EXPIRED ? (

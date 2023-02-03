@@ -30,7 +30,7 @@ ReactDOM.render(
     <LanguageProvider>
       <QueryClientProvider client={queryClient}>
         <SnackbarProvider
-          autoHideDuration={2000}
+          autoHideDuration={6000}
           anchorOrigin={{
             vertical: 'top',
             horizontal: 'right',
