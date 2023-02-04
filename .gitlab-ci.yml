@@ -67,6 +67,7 @@ variables:
     - pulumi config set mainteny:deploymentTimeStamp "$(date)"
     - pulumi up -y
 #    - aws cloudfront create-invalidation --distribution-id $(pulumi stack output distributionId) --paths "$CACHE_PATH"
+    - aws cloudfront create-invalidation --distribution-id $CDN_DISTRIBUTION_ID --paths "$CACHE_PATH"
     - >-
       curl -X POST
       --data-urlencode
@@ -147,6 +148,7 @@ deploy-stage:
         STACK: stage
         IMAGE_ENV: stage
         CACHE_PATH: /*
+        CDN_DISTRIBUTION_ID: E24VZD1QKFHU18
       when: on_success
     - when: never
 
@@ -161,5 +163,6 @@ deploy-production:
         STACK: prod
         IMAGE_ENV: prod
         CACHE_PATH: /*
+        CDN_DISTRIBUTION_ID: E25UK9TDV510UC
       when: manual
     - when: never
