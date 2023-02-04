@@ -66,7 +66,21 @@ variables:
     - pulumi config set --path "mainteny:k8sConfig.services[0].image" ${DOCKER_REGISTRY}/sm-lite:${IMAGE_SUFFIX}-${IMAGE_ENV}
     - pulumi config set mainteny:version ${CI_COMMIT_SHORT_SHA}_$(date '+%Y%m%d')
     - pulumi config set mainteny:deploymentTimeStamp "$(date)"
-    - pulumi destroy -y
+    - pulumi up -y
+    - pulumi stack select cdn.$ENV
+    - aws cloudfront create-invalidation --distribution-id $(pulumi stack output distributionId) --paths "$CACHE_PATH"
+    - >-
+      curl -X POST
+      --data-urlencode
+      "payload={
+      \"channel\": \"#release-notifications\",
+      \"username\": \"ReleaseBot\",
+      \"text\": \"*Service Manager UI Lite $STACK Release* :rocket:\n
+      *Git commit Message*: $CI_COMMIT_MESSAGE\n
+      *Git commit ID*: <https://gitlab.com/mainteny/applications/sm-ui-lite/-/commit/$CI_COMMIT_SHA|$CI_COMMIT_SHORT_SHA>
+      \",
+      \"icon_emoji\": \":rocket:\"
+       }" $SLACK_WEBHOOK_URL
   rules:
     - if: '$CI_MERGE_REQUEST_ID'
       when: never
