@@ -28,6 +28,7 @@ interface Props {
   primaryButtonAction: () => void;
   listItems: ListMenu[];
   secondaryButton?: React.ReactNode;
+  isSaving?: boolean;
 }
 
 export const BottomDrawer = ({
@@ -37,6 +38,7 @@ export const BottomDrawer = ({
   primaryButtonAction,
   listItems,
   secondaryButton,
+  isSaving,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -71,18 +73,18 @@ export const BottomDrawer = ({
         <ButtonGroup variant="contained">
           <MuiButton
             type="submit"
-            disabled={!isValid}
+            disabled={!isValid || isSaving}
             onClick={primaryButtonAction}>
             {t(primaryButtonLabel)}
           </MuiButton>
 
           {listItems.length > 0 && (
             <IconButton
-              disabled={!isValid}
+              disabled={!isValid || isSaving}
               onClick={handleClick}
               style={{
                 backgroundColor: `${
-                  isValid
+                  isValid && !isSaving
                     ? theme.palette.primary.main
                     : theme.palette.action.disabledBackground
                 }`,

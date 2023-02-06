@@ -76,7 +76,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
 
   const {user} = useUserSession();
 
-  const {mutate: updateInvoice} = useUpdateInvoice();
+  const {mutate: updateInvoice, isLoading} = useUpdateInvoice();
   const {mutate: deleteInvoice} = useDeleteInvoice();
   const {data: workReport} = useServiceOrderWorkReport(
     invoice?.serviceOrder?.id ?? '',
@@ -282,6 +282,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
       PdfGenerationStatus.DONE
     : true;
   const isPDFsGenerated = !!isWorkReportPDFGenerated && isInvoicePDFGenerated;
+  console.log(invoice, '*******', workReport);
 
   const actions = useMemo(() => {
     const items = [
@@ -664,6 +665,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
 
       <BottomDrawer
         isOpen={isDrawerOpen}
+        isSaving={isLoading}
         primaryButtonLabel={t('Save')}
         primaryButtonAction={formik.handleSubmit}
         listItems={actions.map((item) => ({

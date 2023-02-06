@@ -68,8 +68,8 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
 
   const {user} = useUserSession();
 
-  const {mutate: createNewInvoice} = useCreateInvoice();
-  const {mutate: updateInvoice} = useUpdateInvoice();
+  const {mutate: createNewInvoice, isLoading: isCreating} = useCreateInvoice();
+  const {mutate: updateInvoice, isLoading: isUpdating} = useUpdateInvoice();
   const {mutate: deleteInvoice} = useDeleteInvoice();
 
   const [isDrawerOpen] = useState<boolean>(true);
@@ -593,6 +593,7 @@ export const DraftInvoice = ({invoice, serviceOrderResource}: Props) => {
 
       <BottomDrawer
         isOpen={isDrawerOpen}
+        isSaving={isCreating || isUpdating}
         primaryButtonLabel={invoice ? t('Send') : t('Save')}
         primaryButtonAction={formik.handleSubmit}
         listItems={
