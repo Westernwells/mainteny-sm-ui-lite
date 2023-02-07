@@ -281,6 +281,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
     ? workReport?.additionalInfo?.pdfGenerationStatus ===
       PdfGenerationStatus.DONE
     : true;
+  // TODO: show an error message below button if work report is not generated
   const isPDFsGenerated = !!isWorkReportPDFGenerated && isInvoicePDFGenerated;
 
   const actions = useMemo(() => {
@@ -689,8 +690,8 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
       />
       <SendEmailDialog
         open={isSendEmailDialogOpen}
-        onConfirm={() => {
-          onSave(formik.values);
+        onConfirm={async () => {
+          await onSave(formik.values);
           setIsSendEmailDialogOpen(false);
         }}
         onClose={() => setIsSendEmailDialogOpen(false)}

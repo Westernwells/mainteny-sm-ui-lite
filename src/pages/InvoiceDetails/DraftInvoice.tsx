@@ -57,7 +57,8 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const navigate = useNavigate();
-  const [invoiceId, setInvoiceId] = useState<string | undefined>();
+  const {mutateAsync: publishInvoice, isLoading: publishingInvoice} =
+    usePublishInvoice();
 
   const {user} = useUserSession();
 
@@ -141,7 +142,6 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
 
   const waitForPdfGeneration = async (id: string) => {
     setGeneratingPDF(true);
-    setInvoiceId(id);
     let loop = true;
     let workReport;
     if (!id) {
@@ -190,7 +190,12 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
       invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
       downloadUrl;
 
-    const pdfGenerated = !!isInvoicePDFGenerated;
+    const isWorkReportPDFGenerated = invoice?.additionalInfo?.includeWorkReport
+      ? workReport?.additionalInfo?.pdfGenerationStatus ===
+        PdfGenerationStatus.DONE
+      : true;
+
+    const pdfGenerated = !!isWorkReportPDFGenerated && !!isInvoicePDFGenerated;
     setIsPDFsGenerated(pdfGenerated);
     setGeneratingPDF(false);
     setIsSendEmailDialogOpen(true);
@@ -594,8 +599,6 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
             label: t('Save & Send'),
             icon: <DraftsIcon />,
             onClick: async () => {
-              const response = await save(formik.values);
-              await waitForPdfGeneration(response.value);
               setIsSendEmailDialogOpen(true);
             },
           },
@@ -611,11 +614,20 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
       />
       <SendEmailDialog
         open={isSendEmailDialogOpen}
-        id={invoiceId}
-        onConfirm={async () => {}}
         onClose={() => setIsSendEmailDialogOpen(false)}
-        submitHook={usePublishInvoice}
-        confirmBtnDisabled={!isPDFsGenerated}
+        confirmBtnDisabled={generatingPDF || publishingInvoice}
+        callback={async (emailRecord) => {
+          const response = await save(formik.values);
+          await waitForPdfGeneration(response.value);
+          await publishInvoice({
+            id: response.value,
+            body: {
+              email: emailRecord.email,
+              subject: emailRecord.subject,
+              content: emailRecord.content,
+            },
+          });
+        }}
       />
     </Box>
   );
