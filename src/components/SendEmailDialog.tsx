@@ -193,6 +193,7 @@ export const SendEmailDialog = ({
           <Typography variant="subtitle2">{t('Cancel')}</Typography>
         </Button>
         <Tooltip
+          open={confirmBtnDisabled}
           title={
             confirmBtnDisabled
               ? t('The PDFs are not generated yet.')
