@@ -282,7 +282,6 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
       PdfGenerationStatus.DONE
     : true;
   const isPDFsGenerated = !!isWorkReportPDFGenerated && isInvoicePDFGenerated;
-  console.log(invoice, '*******', workReport);
 
   const actions = useMemo(() => {
     const items = [
