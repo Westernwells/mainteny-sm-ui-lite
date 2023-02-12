@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import {useLocation} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import printJS from 'print-js';
@@ -20,6 +21,7 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {
   ArticleOrderItemRecord,
   ArticleSupplierView,
+  ArticleView,
   CreateArticleOrderRecord,
 } from 'models/article';
 import {PdfGenerationStatus} from 'models/misc';
@@ -50,6 +52,9 @@ const validationSchema = Yup.object().shape({
 
 export const OrderArticle = () => {
   const {t} = useTranslation();
+  const location = useLocation();
+  const articleFromLocation = (location.state as {article: ArticleView})
+    ?.article;
   const formatDate = useFormatDate();
   const {user} = useUserSession();
   const [orderId, setOrderId] = useState('');
@@ -115,6 +120,31 @@ export const OrderArticle = () => {
       setIsPrinted(true);
     }
   }, [downloadUrl, isPDFGenerated, isPrinted]);
+
+  useEffect(() => {
+    if (articleFromLocation) {
+      const preferredSupplier = articleFromLocation?.suppliers.find(
+        (s) => s.isPreferred,
+      )?.supplier;
+
+      if (preferredSupplier) {
+        setSupplier(preferredSupplier);
+      }
+
+      if (!items.length) {
+        setItems([
+          {
+            articleId: articleFromLocation.id,
+            articleName: articleFromLocation.name,
+            supplierArticleNumber: articleFromLocation.externalId,
+            quantity: 1,
+            unit: articleFromLocation.unit,
+            description: articleFromLocation.description,
+          },
+        ]);
+      }
+    }
+  }, [articleFromLocation]);
 
   return (
     <Box>
