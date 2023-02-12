@@ -256,8 +256,9 @@ export const germany = {
     'CREATED DATE': 'ERSTELLUNGSDATUM',
     Draft: 'Entwurf',
     Sent: 'Versand',
-    Denied: 'Bestritten',
+    Denied: 'Abgelehnt',
     'New Quotation': 'Neues Angebot',
+    Discard: 'Verwerfen',
 
     // Invoices
     Invoices: 'Rechnungen',
@@ -393,6 +394,11 @@ export const germany = {
     'e.g. Hydronic': 'z.B. Hydronic',
     'e.g. 00000001': 'z.B. 00000001',
     'e.g. +49 1000 000000': 'z.B. +49 1000 000000',
+    From: 'Von',
+    'Select Supplier': 'Lieferant auswählen',
+    'Purchase order number': 'Bestellnummer',
+    'Print order': 'Bestellung drucken',
+    'The PDFs are not generated yet.': 'Die PDFs sind noch nicht erstellt.',
 
     // Service Orders
     'Order types': 'Auftragsarten',
@@ -415,6 +421,8 @@ export const germany = {
     'New Inspection Order': 'Neue Inspektion',
     'New Installation Order': 'Neue Installation',
     'Technician is required': 'Techniker ist notwendig',
+    'Order Article': 'Artikel bestellen',
+    'SUPPLIER NO.': 'Lieferantnummer',
 
     // Add new unit
     Customer: 'Kunden',
@@ -513,7 +521,6 @@ export const germany = {
     Submitting: 'Anlegen',
 
     // Unit Details
-
     Overview: 'Übersicht',
     'Service Orders': 'Aufträge',
     Performance: 'Performance',
@@ -783,7 +790,6 @@ export const germany = {
     'Delete Quotation': 'Angebot löschen',
 
     // Customer
-
     'Search by number, name, address etc.':
       'Suche nach Nummer, Name, Adresse usw.',
     'No. of Units': 'Anzahl Anlagen',
@@ -819,6 +825,8 @@ export const germany = {
     'CUSTOMER NUMBER': 'Kundennummer',
     'BILLING EMAIL ADDRESS': 'RECHNUNGS-EMAIL-ADRESSE',
     'Do you want to delete this customer?': 'Möchten Sie diese Kunde löschen?',
+    'COST CENTER': 'KOSTENSTELLE',
+    'Cost Center': 'Kostenstelle',
 
     // Toast
     'Uh oh! As a Property Manager, please login at':
@@ -895,6 +903,8 @@ export const germany = {
     'QR code image uploaded successfully':
       'QR-Code wurde erfolgreich hochgeladen',
     'Customer deleted successfully': 'Kunde wurden erfolgreich gelöscht',
+    'Contract types updated successfully':
+      'Vertragsarten erfolgreich aktualisiert',
 
     // Empty state
     'No data entries yet. They will appear here once added.':
@@ -990,6 +1000,7 @@ export const germany = {
     Settings: 'Einstellungen',
     'Legal Information': 'Rechtliche Informationen',
     'Payment Information': 'Zahlungsinformationen',
+    'Defined contract names': 'Defined contract names',
     'Billing Information': 'Informationen zur Rechnungsstellung',
     'Company Policies': 'Unternehmensrichtlinien',
     LANGUAGE: 'SPRACHE',

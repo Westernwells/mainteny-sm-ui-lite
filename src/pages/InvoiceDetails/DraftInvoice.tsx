@@ -594,22 +594,37 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
         isSaving={isCreating || generatingPDF}
         primaryButtonLabel={generatingPDF ? 'Generating pdfs...' : t('Save')}
         primaryButtonAction={formik.handleSubmit}
-        listItems={[
-          {
-            label: t('Save & Send'),
-            icon: <DraftsIcon />,
-            onClick: async () => {
-              setIsSendEmailDialogOpen(true);
-            },
-          },
-          {
-            label: 'Discard',
-            icon: <DeleteIcon />,
-            onClick: () => {
-              navigate(-1);
-            },
-          },
-        ]}
+        listItems={
+          invoice
+            ? [
+                {
+                  label: t('Save Drafts'),
+                  icon: <DraftsIcon />,
+                  onClick: () => formik.handleSubmit(),
+                },
+                {
+                  label: 'Delete Invoice',
+                  icon: <DeleteIcon />,
+                  onClick: () => {
+                    setIsDeleteDialogOpen(true);
+                  },
+                },
+              ]
+            : [
+                {
+                  label: t('Save & Send'),
+                  icon: <DraftsIcon />,
+                  onClick: () => formik.handleSubmit,
+                },
+                {
+                  label: t('Discard'),
+                  icon: <DeleteIcon />,
+                  onClick: () => {
+                    navigate(-1);
+                  },
+                },
+              ]
+        }
         isValid={isValid()}
       />
       <SendEmailDialog
