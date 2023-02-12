@@ -18,22 +18,14 @@ import {usePublishQuotation} from 'hooks/reactQuery/useQuotation';
 
 interface Props {
   open: boolean;
-  onConfirm: () => void;
+  onConfirm?: () => void;
   onClose: () => void;
   submitHook?: typeof usePublishInvoice | typeof usePublishQuotation;
-  id: string;
+  id?: string;
   confirmBtnDisabled: boolean;
-  subject: string;
-  content: string;
-  callback?: ({
-    email,
-    subject,
-    content,
-  }: {
-    email: string;
-    subject: string;
-    content: string;
-  }) => void;
+  subject?: string;
+  content?: string;
+  callback?: ({email, subject, content}: SimpleEmailRecord) => void;
   loadingProgress?: number;
 }
 
@@ -62,12 +54,12 @@ export const SendEmailDialog = ({
   const formik = useFormik<SimpleEmailRecord>({
     initialValues: {
       email: '',
-      subject,
-      content,
+      subject: subject || '',
+      content: content || '',
     },
-    onSubmit: (values, {setSubmitting}) => {
+    onSubmit: async (values, {setSubmitting}) => {
       const contentWithLineBreaks = values.content.replace(/\n/g, '<br/>');
-      if (submitHook && publish) {
+      if (submitHook && publish && id) {
         publish.mutate(
           {
             id,
@@ -80,13 +72,16 @@ export const SendEmailDialog = ({
           {
             onSuccess: () => {
               formik.resetForm();
-              onConfirm();
+              if (onConfirm) {
+                onConfirm();
+              }
             },
             onSettled: () => setSubmitting(false),
           },
         );
       } else if (callback) {
-        callback(values);
+        console.log(formik.isSubmitting, '&&&&&&&');
+        callback({...values, content: contentWithLineBreaks});
       }
     },
     validationSchema,
@@ -197,8 +192,8 @@ export const SendEmailDialog = ({
           }}>
           <Typography variant="subtitle2">{t('Cancel')}</Typography>
         </Button>
-
         <Tooltip
+          open={confirmBtnDisabled}
           title={
             confirmBtnDisabled
               ? t('The PDFs are not generated yet.')

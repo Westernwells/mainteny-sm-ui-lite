@@ -225,7 +225,7 @@ export const useAddInvoicePayment = () => {
 };
 
 export const postInvoice = async (body: CreateInvoice) => {
-  const {data} = await axiosClient.post<{value: string}>('api/invoices', body);
+  const {data} = await axiosClient.post<{value: string}>('/api/invoices', body);
   return data;
 };
 
@@ -250,7 +250,7 @@ export const useCreateInvoice = () => {
         amountWithVat: getTotalWithVatFromArticles(variables.data.items),
         isPartialInvoice: variables.data.type === 'PARTIAL',
       });
-      navigate(`/invoices/details/${data.value}`);
+      // navigate(`/invoices/details/${data.value}`);
     },
     onError: (err) => {
       console.log(err);
