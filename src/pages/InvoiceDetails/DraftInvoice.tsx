@@ -40,6 +40,7 @@ import {convertToText, waitForSeconds} from 'utils/utils';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {fetchServiceOrderWorkReport} from 'hooks/reactQuery/useServiceOrder';
 import {fetchDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {useSnackbar} from 'hooks/useSnackbar';
 
 interface Props {
   serviceOrderResource?: ServiceOrderView;
@@ -57,6 +58,7 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const navigate = useNavigate();
+  const {enqueueSnackbar} = useSnackbar();
   const {mutateAsync: publishInvoice, isLoading: publishingInvoice} =
     usePublishInvoice();
 
@@ -65,7 +67,6 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
   const {mutateAsync: createNewInvoice, isLoading: isCreating} =
     useCreateInvoice();
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
-  const [isPDFsGenerated, setIsPDFsGenerated] = useState(false);
   const [generatingPDF, setGeneratingPDF] = useState(false);
   const [isDrawerOpen] = useState<boolean>(true);
 
@@ -196,9 +197,11 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
       : true;
 
     const pdfGenerated = !!isWorkReportPDFGenerated && !!isInvoicePDFGenerated;
-    setIsPDFsGenerated(pdfGenerated);
     setGeneratingPDF(false);
-    setIsSendEmailDialogOpen(true);
+    if (!pdfGenerated) {
+      return false;
+    }
+    return true;
   };
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
@@ -615,18 +618,28 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
       <SendEmailDialog
         open={isSendEmailDialogOpen}
         onClose={() => setIsSendEmailDialogOpen(false)}
-        confirmBtnDisabled={generatingPDF || publishingInvoice}
+        confirmBtnDisabled={generatingPDF || publishingInvoice || isCreating}
         callback={async (emailRecord) => {
           const response = await save(formik.values);
-          await waitForPdfGeneration(response.value);
-          await publishInvoice({
-            id: response.value,
-            body: {
-              email: emailRecord.email,
-              subject: emailRecord.subject,
-              content: emailRecord.content,
-            },
+          setIsSendEmailDialogOpen(false);
+          enqueueSnackbar('Generating PDFs, please wait...', {
+            variant: 'info',
           });
+          const isPDFsGenerated = await waitForPdfGeneration(response.value);
+          if (isPDFsGenerated) {
+            await publishInvoice({
+              id: response.value,
+              body: {
+                email: emailRecord.email,
+                subject: emailRecord.subject,
+                content: emailRecord.content,
+              },
+            });
+          } else {
+            enqueueSnackbar('PDF generation failed', {
+              variant: 'error',
+            });
+          }
         }}
       />
     </Box>

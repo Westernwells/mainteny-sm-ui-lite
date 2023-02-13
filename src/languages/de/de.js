@@ -1000,7 +1000,7 @@ export const germany = {
     Settings: 'Einstellungen',
     'Legal Information': 'Rechtliche Informationen',
     'Payment Information': 'Zahlungsinformationen',
-    'Defined contract names': 'Defined contract names',
+    'Defined contract names': 'Vertragsnamen',
     'Billing Information': 'Informationen zur Rechnungsstellung',
     'Company Policies': 'Unternehmensrichtlinien',
     LANGUAGE: 'SPRACHE',

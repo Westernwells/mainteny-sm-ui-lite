@@ -80,7 +80,6 @@ export const SendEmailDialog = ({
           },
         );
       } else if (callback) {
-        console.log(formik.isSubmitting, '&&&&&&&');
         callback({...values, content: contentWithLineBreaks});
       }
     },
