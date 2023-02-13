@@ -603,7 +603,7 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
             },
           },
           {
-            label: 'Discard',
+            label: t('Discard'),
             icon: <DeleteIcon />,
             onClick: () => {
               navigate(-1);

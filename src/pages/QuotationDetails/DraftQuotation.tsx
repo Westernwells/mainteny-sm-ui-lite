@@ -386,7 +386,7 @@ export const DraftQuotation = ({quotation: quotationFromProps}: Props) => {
                   onClick: formik.handleSubmit,
                 },
                 {
-                  label: 'Discard',
+                  label: t('Discard'),
                   icon: <DeleteIcon />,
                   onClick: () => {
                     navigate(-1);

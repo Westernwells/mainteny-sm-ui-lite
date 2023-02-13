@@ -577,7 +577,7 @@ export const Router = () => {
                   <title>{`Order Article - ${titleTail}`}</title>
                 </Helmet>
                 <PageLayout
-                  backBtnLabel="Order Article"
+                  backBtnLabel={t('Order Article')}
                   showBackAction
                   pageScrollable>
                   <OrderArticle />

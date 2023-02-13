@@ -61,7 +61,7 @@ export const ArticleItemsTable = ({
         }}>
         <FormLabel text="No" textTranslationContext="number" />
         <FormLabel text="Article" sx={{justifySelf: 'start'}} />
-        <FormLabel text="Supplier article number" />
+        <FormLabel text="Supplier Article Number" />
         <FormLabel text="Quantity" />
         <FormLabel text="Unit" />
       </Box>
