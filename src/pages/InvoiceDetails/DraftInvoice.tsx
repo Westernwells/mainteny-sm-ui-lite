@@ -165,14 +165,15 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
       switch (invoiceCondition) {
         case PdfGenerationStatus.RUNNING:
         case PdfGenerationStatus.INIT:
-          console.log(invoiceCondition, 'invoice initial', workReportCondition);
           invoice = await fetchInvoice(id);
           break;
         case PdfGenerationStatus.DONE:
-          console.log(invoiceCondition, 'invoice final');
           loop = false;
           break;
         default:
+          enqueueSnackbar('PDF generation failed', {
+            variant: 'error',
+          });
           console.log('error occured');
           loop = false;
           break;
@@ -634,10 +635,6 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
                 subject: emailRecord.subject,
                 content: emailRecord.content,
               },
-            });
-          } else {
-            enqueueSnackbar('PDF generation failed', {
-              variant: 'error',
             });
           }
         }}
