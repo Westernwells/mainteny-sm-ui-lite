@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable no-await-in-loop */
 import {useEffect, useState, useRef} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
@@ -35,12 +34,9 @@ import {
   PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from 'models/propertyManager';
-import {Amount, PdfGenerationStatus, WithOptional} from 'models/misc';
-import {convertToText, waitForSeconds} from 'utils/utils';
+import {Amount, WithOptional} from 'models/misc';
+import {convertToText} from 'utils/utils';
 import {SendEmailDialog} from 'components/SendEmailDialog';
-import {fetchServiceOrderWorkReport} from 'hooks/reactQuery/useServiceOrder';
-import {fetchDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {useSnackbar} from 'hooks/useSnackbar';
 
 interface Props {
   serviceOrderResource?: ServiceOrderView;
@@ -58,7 +54,6 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const navigate = useNavigate();
-  const {enqueueSnackbar} = useSnackbar();
   const {mutateAsync: publishInvoice, isLoading: publishingInvoice} =
     usePublishInvoice();
 
@@ -67,7 +62,6 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
   const {mutateAsync: createNewInvoice, isLoading: isCreating} =
     useCreateInvoice();
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
-  const [generatingPDF, setGeneratingPDF] = useState(false);
   const [isDrawerOpen] = useState<boolean>(true);
 
   const [customer, setCustomer] = useState<
@@ -140,70 +134,6 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
       data: {...values, dueDate: dueDateToString},
     });
   }
-
-  const waitForPdfGeneration = async (id: string) => {
-    setGeneratingPDF(true);
-    let loop = true;
-    let workReport;
-    if (!id) {
-      return;
-    }
-    let invoice = await fetchInvoice(id);
-
-    if (!invoice) {
-      return;
-    }
-
-    if (invoice.serviceOrder) {
-      workReport = await fetchServiceOrderWorkReport(invoice.serviceOrder.id);
-    }
-
-    while (loop) {
-      const invoiceCondition = invoice.additionalInfo.pdfGenerationStatus;
-      const workReportCondition =
-        workReport?.additionalInfo.pdfGenerationStatus;
-      switch (invoiceCondition) {
-        case PdfGenerationStatus.RUNNING:
-        case PdfGenerationStatus.INIT:
-          invoice = await fetchInvoice(id);
-          break;
-        case PdfGenerationStatus.DONE:
-          loop = false;
-          break;
-        default:
-          enqueueSnackbar('PDF generation failed', {
-            variant: 'error',
-          });
-          console.log('error occured');
-          loop = false;
-          break;
-      }
-
-      await waitForSeconds(5);
-    }
-
-    const serviceCompanyId = user?.userAccount.serviceCompany.id;
-    const downloadUrl = await fetchDownloadUrl(
-      [invoice.additionalInfo.pdfPath],
-      serviceCompanyId!,
-    );
-
-    const isInvoicePDFGenerated =
-      invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
-      downloadUrl;
-
-    const isWorkReportPDFGenerated = invoice?.additionalInfo?.includeWorkReport
-      ? workReport?.additionalInfo?.pdfGenerationStatus ===
-        PdfGenerationStatus.DONE
-      : true;
-
-    const pdfGenerated = !!isWorkReportPDFGenerated && !!isInvoicePDFGenerated;
-    setGeneratingPDF(false);
-    if (!pdfGenerated) {
-      return false;
-    }
-    return true;
-  };
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
@@ -595,8 +525,8 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
 
       <BottomDrawer
         isOpen={isDrawerOpen}
-        isSaving={isCreating || generatingPDF}
-        primaryButtonLabel={generatingPDF ? 'Generating pdfs...' : t('Save')}
+        isSaving={isCreating}
+        primaryButtonLabel={t('Save')}
         primaryButtonAction={formik.handleSubmit}
         listItems={[
           {
@@ -619,24 +549,18 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
       <SendEmailDialog
         open={isSendEmailDialogOpen}
         onClose={() => setIsSendEmailDialogOpen(false)}
-        confirmBtnDisabled={generatingPDF || publishingInvoice || isCreating}
+        confirmBtnDisabled={publishingInvoice || isCreating}
         callback={async (emailRecord) => {
           const response = await save(formik.values);
           setIsSendEmailDialogOpen(false);
-          enqueueSnackbar('Generating PDFs, please wait...', {
-            variant: 'info',
+          await publishInvoice({
+            id: response.value,
+            body: {
+              email: emailRecord.email,
+              subject: emailRecord.subject,
+              content: emailRecord.content,
+            },
           });
-          const isPDFsGenerated = await waitForPdfGeneration(response.value);
-          if (isPDFsGenerated) {
-            await publishInvoice({
-              id: response.value,
-              body: {
-                email: emailRecord.email,
-                subject: emailRecord.subject,
-                content: emailRecord.content,
-              },
-            });
-          }
         }}
       />
     </Box>
