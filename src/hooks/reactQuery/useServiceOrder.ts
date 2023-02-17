@@ -42,7 +42,13 @@ import {
   UpdateServiceOrderBody,
   AppointmentConfirmationRequiredOrdersQueryParams,
 } from '../../models/service-order';
-import {Order, Resource, RestError, StringValue} from '../../models/misc';
+import {
+  Order,
+  Resource,
+  RestError,
+  SimpleEmailRecord,
+  StringValue,
+} from '../../models/misc';
 import {
   ElevatorAvailability,
   ElevatorAvailabilityParams,
@@ -888,6 +894,35 @@ export const useConfirmAppointment = () => {
         return queryClient.invalidateQueries([
           queryKeys.queryAppointmentConfirmationRequiredOrders,
         ]);
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+export const postPublishChecklist = async (
+  id: string,
+  body: SimpleEmailRecord,
+) => {
+  await axiosClient.post<{value: string}>(
+    `api/serviceOrders/${id}/checkList/publish`,
+    body,
+  );
+};
+
+export const usePublishChecklist = () => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  return useMutation(
+    ({id, body}: {id: string; body: SimpleEmailRecord}) =>
+      postPublishChecklist(id, body),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(`CheckList sent successfully`, {
+          variant: 'success',
+        });
       },
       onError: (err) => {
         console.log(err);
