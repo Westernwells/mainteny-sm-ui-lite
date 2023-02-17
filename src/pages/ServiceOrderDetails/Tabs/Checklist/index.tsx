@@ -1,15 +1,17 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {useMemo} from 'react';
 import {Avatar, Grid, Typography} from '@mui/material';
+import * as _ from 'lodash';
 import {Box} from '@mui/system';
 import useTheme from '@mui/material/styles/useTheme';
 import {FormikProps, useFormik} from 'formik';
-import {groupBy, sortBy} from 'lodash';
 import {EmptySection} from 'components/EmptySection';
 import {FormLabel} from 'components/form/FormLabel';
 import {InfoCard} from 'components/InfoCard';
 import {PageCard} from 'components/PageCard';
 import {Progress} from 'components/Progress';
 import {
+  useServiceOrderCheckList,
+  useServiceOrderDetails,
   useServiceOrderReport,
   useUpdateServiceOrderCheckListAnswers,
 } from 'hooks/reactQuery/useServiceOrder';
@@ -25,9 +27,19 @@ import {FormCheckbox} from 'components/form/FormCheckbox';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {ServiceOrderStatus} from 'models/service-order';
 import {useTranslation} from 'react-i18next';
-import {ChecklistQuestion} from 'models/checklist';
+import {
+  CheckListQuestionType,
+  CheckListQuestion,
+  CheckListOptionColor,
+} from 'models/checklist';
+import {optionStates} from './Checklist.styles';
 
-const EmptyChecklist = () => (
+const YES_NO_ANSWER: {[key: string]: string} = {
+  y: 'Yes',
+  n: 'No',
+};
+
+const EmptyCheckList = () => (
   <EmptySection
     illustration="clipboard"
     size="tiny"
@@ -41,20 +53,24 @@ interface Props {
 }
 
 interface FormikValues {
-  checkListAnswers: ChecklistQuestion[];
+  checkListAnswers: CheckListQuestion[];
 }
 
-export const Checklist = ({orderId}: Props) => {
+export const CheckList = ({orderId}: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
   const {data: serviceOrderReport, isLoading: isLoadingServiceOrderReport} =
     useServiceOrderReport({serviceOrderId: orderId || ''});
   const {mutate: updateServiceOrderCheckListAnswers} =
     useUpdateServiceOrderCheckListAnswers();
-  const serviceOrderDetails = useMemo(
-    () => serviceOrderReport?.[0]?.serviceOrder,
-    [serviceOrderReport?.[0]?.additionalInfo?.checkListAnswers?.length],
-  );
+
+  const {data: serviceOrderDetails, isLoading: isLoadingServiceOrder} =
+    useServiceOrderDetails(orderId);
+
+  const {data: serviceOrderCheckList, isLoading: isLoadingCheckList} =
+    useServiceOrderCheckList(
+      serviceOrderDetails?.additionalInfo.checkListInfo.checkListId && orderId,
+    );
 
   const formik: FormikProps<FormikValues> = useFormik<FormikValues>({
     initialValues: {
@@ -78,65 +94,12 @@ export const Checklist = ({orderId}: Props) => {
   });
 
   const questions = useMemo(() => {
-    const questionsWithStatus = sortBy(
-      serviceOrderDetails?.additionalInfo?.checkList?.questions?.map(
-        (question) => {
-          if (
-            !serviceOrderReport?.[0]?.additionalInfo.checkListAnswers?.length
-          ) {
-            return {...question, checked: false};
-          }
-          const isChecked =
-            !!serviceOrderReport?.[0]?.additionalInfo.checkListAnswers?.find(
-              (answer) => answer.questionId === question.id,
-            );
-          return {
-            ...question,
-            checked: isChecked,
-          };
-        },
-      ),
-      'question',
-    );
-
-    const groupedByCategories = groupBy(questionsWithStatus, 'category');
-
-    return {
-      withStatus: questionsWithStatus,
-      byCategories: sortBy(Object.keys(groupedByCategories)).map(
-        (category) => ({
-          category,
-          questions: groupedByCategories[category],
-        }),
-      ),
-    };
-  }, [serviceOrderDetails, serviceOrderReport]);
-
-  useEffect(() => {
-    formik.resetForm({
-      values: {
-        ...formik.values,
-        checkListAnswers: questions.withStatus?.filter((q) => q.checked) ?? [],
-      },
-    });
-  }, [questions.withStatus?.length]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {checked, value} = e.target;
-    if (checked) {
-      formik.setFieldValue('checkListAnswers', [
-        ...formik.values.checkListAnswers,
-        serviceOrderDetails?.additionalInfo.checkList.questions.find(
-          (question) => question.id === value,
-        ),
-      ]);
-    } else {
-      formik.setFieldValue(
-        'checkListAnswers',
-        formik.values.checkListAnswers.filter((v) => v.id !== value),
-      );
-    }
-  };
+    const sortedQuestions = _.sortBy(serviceOrderCheckList?.questions, [
+      'category',
+      (obj) => obj.additionalInfo.orderNumber,
+    ]);
+    return _.groupBy(sortedQuestions, (question) => question.category);
+  }, [serviceOrderCheckList]);
 
   const technicianUserAccount =
     serviceOrderDetails?.schedules?.[0]?.technician?.userAccount;
@@ -144,12 +107,68 @@ export const Checklist = ({orderId}: Props) => {
     ? `${technicianUserAccount.firstName} ${technicianUserAccount.lastName}`
     : '';
 
-  if (isLoadingServiceOrderReport) {
+  const questionLabel = (question: CheckListQuestion) => {
+    const YES_NO = !(
+      question.type === CheckListQuestionType.SINGLE_CHECK ||
+      question.type === CheckListQuestionType.MULTIPLE_CHECKS
+    );
+    const checked = !!question.additionalInfo.answer;
+    const {options} = question.additionalInfo;
+    const answers = question.additionalInfo.answer;
+    const notes = question.additionalInfo.note;
+
+    return (
+      <Box>
+        <Box sx={{display: 'flex', mt: '0.1em'}}>
+          <Typography
+            variant="body2"
+            color={checked ? 'text.secondary' : 'primary'}
+            sx={{textDecoration: checked ? 'line-through' : 'none'}}>
+            {question.question}
+          </Typography>
+          {answers?.map((answer) => {
+            const color = YES_NO ? 'DEFAULT' : options[Number(answer)].color;
+            return (
+              <StatusChip
+                variant="outlined"
+                label={
+                  YES_NO ? YES_NO_ANSWER[answer] : options[Number(answer)].text
+                }
+                style={{
+                  ml: 0.5,
+                  ...optionStates[color],
+
+                  border: 'none',
+                }}
+                maxChars={10}
+              />
+            );
+          })}
+        </Box>
+        {notes ? (
+          <Box
+            sx={{py: '0.5rem', px: '0.5rem', borderRadius: '4px'}}
+            bgcolor="grey.100">
+            <Typography variant="body2">
+              I’ve noticed a defect in the applicable area approximately 5cm in
+              thickness compromising the area.
+            </Typography>
+          </Box>
+        ) : null}
+      </Box>
+    );
+  };
+
+  if (
+    isLoadingServiceOrderReport ||
+    isLoadingServiceOrder ||
+    isLoadingCheckList
+  ) {
     return <Progress />;
   }
 
   if (
-    !serviceOrderDetails?.additionalInfo.checkList ||
+    !serviceOrderDetails?.additionalInfo.checkListInfo.checkListId ||
     serviceOrderDetails.status !== ServiceOrderStatus.COMPLETED
   ) {
     return (
@@ -164,13 +183,14 @@ export const Checklist = ({orderId}: Props) => {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <EmptyChecklist />
+        <EmptyCheckList />
       </InfoCard>
     );
   }
 
   return (
     <>
+      <div />
       <Grid
         container
         alignItems="center"
@@ -247,7 +267,7 @@ export const Checklist = ({orderId}: Props) => {
             sx={{px: '1.25rem', py: '1.5rem'}}>
             <Box bgcolor="white" px="1rem" py="0.625rem">
               <Typography variant="subtitle1" sx={{color: grey[700]}}>
-                {serviceOrderDetails.additionalInfo.checkList.name}
+                {serviceOrderCheckList?.name}
               </Typography>
               <Box
                 bgcolor="grey.50"
@@ -261,30 +281,26 @@ export const Checklist = ({orderId}: Props) => {
                 display="flex"
                 flexDirection="column"
                 gap="1rem">
-                {questions.byCategories.map((category) => (
+                {Object.keys(questions).map((category) => (
                   <Box
                     boxShadow="0px 4px 15px 0px #90909033"
                     p="1rem"
                     bgcolor="grey.50"
-                    key={category.category}>
+                    key={category}>
                     <Typography
                       variant="subtitle2"
                       color={theme.palette.text.primary}>
-                      {category.category}:
+                      {category}:
                     </Typography>
                     <Grid container pt="0.25rem">
-                      {category.questions.map((question) => (
+                      {questions[category].map((question) => (
                         <Grid item xs={12} key={question.id}>
                           <FormCheckbox
-                            checked={
-                              !!formik.values?.checkListAnswers?.find(
-                                (a) => a.id === question.id,
-                              )
-                            }
+                            checked={!!question.additionalInfo.answer}
                             value={question.id}
                             id={question.id}
-                            handleChange={handleChange}
-                            label={question.question}
+                            // handleChange={handleChange}
+                            label={questionLabel(question)}
                             typographyProps={{
                               fontSize: '0.875rem',
                               py: '0.5rem',
@@ -309,33 +325,28 @@ export const Checklist = ({orderId}: Props) => {
                 justifyContent="center"
                 mt="0.5rem"
                 mb="2.3rem"
+                py="2.5rem"
                 border="1px solid"
                 borderColor="grey.300"
                 borderRadius="0.5rem"
                 position="relative"
                 maxWidth="17.5rem">
-                <Avatar
-                  src={
-                    serviceOrderReport?.[0]?.attachments?.[0]?.fileResource.uri
-                  }
-                  variant="square"
-                  sx={{height: 'auto', my: '1.5rem'}}
-                  style={{
-                    height: 'auto',
-                    width: 'auto',
-                  }}
-                />
+                <Box>
+                  {serviceOrderReport?.[0]?.attachments?.[0]?.fileResource
+                    .uri || 'No Signature'}
+                </Box>
                 {technicianName && (
                   <Box
                     display="flex"
                     flexDirection="column"
                     alignItems="center"
                     justifyContent="center"
-                    mt="-2rem"
+                    top="5.5rem"
+                    // mt="-8rem"
                     bgcolor="white"
                     px="0.625rem"
                     position="absolute"
-                    bottom="-2.2rem"
+                    // bottom="-2.2rem"
                     maxWidth="17.5rem">
                     <Typography
                       variant="subtitle1"
@@ -354,7 +365,7 @@ export const Checklist = ({orderId}: Props) => {
           </Box>
         </Grid>
       </Grid>
-      <BottomDrawer
+      {/* <BottomDrawer
         isOpen={
           serviceOrderDetails.status === ServiceOrderStatus.COMPLETED &&
           formik.dirty
@@ -363,7 +374,7 @@ export const Checklist = ({orderId}: Props) => {
         primaryButtonAction={formik.handleSubmit}
         listItems={[]}
         isValid={!formik.isSubmitting}
-      />
+      /> */}
     </>
   );
 };

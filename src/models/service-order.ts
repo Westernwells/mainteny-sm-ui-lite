@@ -14,7 +14,6 @@ import {Amount, Fee, JobStatus, Meta, Order, PdfGenerationStatus} from './misc';
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
-import {Checklist} from './checklist';
 import {ArticleView} from './article';
 import {FileResource} from './media';
 
@@ -72,6 +71,12 @@ export enum JobScheduleType {
   FIXED = 'FIXED',
 }
 
+export interface ServiceOrderCheckListInfo {
+  checkListId: string;
+  technicianSignature: string;
+  pdfPath: string;
+  pdfGenerationStatus: PdfGenerationStatus;
+}
 export interface ServiceOrder {
   id: string;
   number: string;
@@ -102,7 +107,7 @@ export interface ServiceOrderAdditionalInfo {
   appointmentNotificationRequired: boolean;
   appointmentNotificationSent: boolean;
   priority: Priority;
-  checkList: Checklist;
+  checkListInfo: ServiceOrderCheckListInfo;
   moreInformation: string;
   quotationId: string;
 }
