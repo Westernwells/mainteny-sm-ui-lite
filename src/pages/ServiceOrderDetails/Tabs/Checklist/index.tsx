@@ -1,5 +1,8 @@
-import React, {useMemo} from 'react';
-import {Avatar, Grid, Typography} from '@mui/material';
+import React, {useMemo, useRef} from 'react';
+import {useTranslation} from 'react-i18next';
+import {Grid, Typography} from '@mui/material';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import Send from '@mui/icons-material/Send';
 import * as _ from 'lodash';
 import {Box} from '@mui/system';
 import useTheme from '@mui/material/styles/useTheme';
@@ -9,6 +12,7 @@ import {FormLabel} from 'components/form/FormLabel';
 import {InfoCard} from 'components/InfoCard';
 import {PageCard} from 'components/PageCard';
 import {Progress} from 'components/Progress';
+import {Button} from 'components/Button';
 import {
   useServiceOrderCheckList,
   useServiceOrderDetails,
@@ -26,7 +30,8 @@ import {grey} from '@mui/material/colors';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {ServiceOrderStatus} from 'models/service-order';
-import {useTranslation} from 'react-i18next';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {PdfGenerationStatus} from 'models/misc';
 import {
   CheckListQuestionType,
   CheckListQuestion,
@@ -71,6 +76,16 @@ export const CheckList = ({orderId}: Props) => {
     useServiceOrderCheckList(
       serviceOrderDetails?.additionalInfo.checkListInfo.checkListId && orderId,
     );
+  const isPdfGenerated = useRef(
+    serviceOrderDetails?.additionalInfo.checkListInfo.pdfGenerationStatus ===
+      PdfGenerationStatus.DONE,
+  ).current;
+
+  const {data: downloadUrl = {}} = useDownloadUrl(
+    isPdfGenerated
+      ? [serviceOrderDetails!.additionalInfo.checkListInfo.pdfPath]
+      : [],
+  );
 
   const formik: FormikProps<FormikValues> = useFormik<FormikValues>({
     initialValues: {
@@ -360,6 +375,44 @@ export const CheckList = ({orderId}: Props) => {
                     </Typography>
                   </Box>
                 )}
+              </Box>
+
+              <Box
+                sx={{display: 'flex', justifyContent: 'flex-end', mb: '1em'}}>
+                <Button
+                  label="Download"
+                  buttonProps={{
+                    variant: 'outlined',
+                    size: 'medium',
+                    disabled: !isPdfGenerated,
+                    onClick: () => {
+                      const url = isPdfGenerated
+                        ? serviceOrderDetails!.additionalInfo.checkListInfo
+                            .pdfPath
+                        : '';
+                      window.open(downloadUrl[url], '_blank');
+                    },
+                    sx: {
+                      background: 'transparent',
+                    },
+
+                    startIcon: <FileDownloadIcon />,
+                  }}
+                />
+
+                <Button
+                  label="Send Checklist"
+                  buttonProps={{
+                    variant: 'contained',
+                    size: 'medium',
+
+                    sx: {
+                      ml: '1em',
+                    },
+
+                    startIcon: <Send />,
+                  }}
+                />
               </Box>
             </Box>
           </Box>
