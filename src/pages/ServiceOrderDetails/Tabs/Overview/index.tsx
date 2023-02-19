@@ -45,7 +45,6 @@ export const Overview = ({orderId}: Props) => {
         .replace('-', '_'),
     },
   );
-  console.log(serviceOrderDetails, '&&&&&&&&');
 
   const iconType = (icon: string) => {
     switch (icon) {

@@ -107,7 +107,7 @@ export interface ServiceOrderAdditionalInfo {
   appointmentNotificationRequired: boolean;
   appointmentNotificationSent: boolean;
   priority: Priority;
-  checkListInfo: ServiceOrderCheckListInfo;
+  checkListInfo?: ServiceOrderCheckListInfo;
   moreInformation: string;
   quotationId: string;
 }

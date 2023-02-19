@@ -17,7 +17,6 @@ import {
   usePublishChecklist,
   useServiceOrderCheckList,
   useServiceOrderDetails,
-  useServiceOrderReport,
   useUpdateServiceOrderCheckListAnswers,
 } from 'hooks/reactQuery/useServiceOrder';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
@@ -62,8 +61,6 @@ export const CheckList = ({orderId}: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
-  const {data: serviceOrderReport, isLoading: isLoadingServiceOrderReport} =
-    useServiceOrderReport({serviceOrderId: orderId || ''});
   const {mutate: updateServiceOrderCheckListAnswers} =
     useUpdateServiceOrderCheckListAnswers();
 
@@ -75,16 +72,22 @@ export const CheckList = ({orderId}: Props) => {
 
   const {data: serviceOrderCheckList, isLoading: isLoadingCheckList} =
     useServiceOrderCheckList(
-      serviceOrderDetails?.additionalInfo.checkListInfo.checkListId && orderId,
+      serviceOrderDetails?.additionalInfo.checkListInfo?.checkListId && orderId,
     );
   const isPdfGenerated = useRef(
-    serviceOrderDetails?.additionalInfo.checkListInfo.pdfGenerationStatus ===
+    serviceOrderDetails?.additionalInfo.checkListInfo?.pdfGenerationStatus ===
       PdfGenerationStatus.DONE,
   ).current;
 
-  const {data: downloadUrl = {}} = useDownloadUrl(
-    isPdfGenerated
-      ? [serviceOrderDetails!.additionalInfo.checkListInfo.pdfPath]
+  const {data: pdfDownloadUrl = {}} = useDownloadUrl(
+    isPdfGenerated && serviceOrderDetails!.additionalInfo.checkListInfo
+      ? [serviceOrderDetails!.additionalInfo.checkListInfo?.pdfPath]
+      : [],
+  );
+
+  const {data: signatureDownloadUrls = {}} = useDownloadUrl(
+    serviceOrderDetails?.additionalInfo.checkListInfo?.checkListId
+      ? [serviceOrderDetails.additionalInfo.checkListInfo.technicianSignature]
       : [],
   );
 
@@ -142,10 +145,11 @@ export const CheckList = ({orderId}: Props) => {
             sx={{textDecoration: checked ? 'line-through' : 'none'}}>
             {question.question}
           </Typography>
-          {answers?.map((answer) => {
+          {answers?.map((answer, index) => {
             const color = YES_NO ? 'DEFAULT' : options[Number(answer)].color;
             return (
               <StatusChip
+                key={`${answer}_${index}`}
                 variant="outlined"
                 label={
                   YES_NO ? YES_NO_ANSWER[answer] : options[Number(answer)].text
@@ -175,16 +179,22 @@ export const CheckList = ({orderId}: Props) => {
     );
   };
 
-  if (
-    isLoadingServiceOrderReport ||
-    isLoadingServiceOrder ||
-    isLoadingCheckList
-  ) {
+  const signaturePath = useMemo(
+    () =>
+      serviceOrderDetails &&
+      serviceOrderDetails.additionalInfo.checkListInfo &&
+      signatureDownloadUrls[
+        serviceOrderDetails.additionalInfo.checkListInfo.technicianSignature
+      ],
+    [serviceOrderDetails, signatureDownloadUrls],
+  );
+
+  if (isLoadingServiceOrder || isLoadingCheckList) {
     return <Progress />;
   }
 
   if (
-    !serviceOrderDetails?.additionalInfo.checkListInfo.checkListId ||
+    !serviceOrderDetails?.additionalInfo.checkListInfo?.checkListId ||
     serviceOrderDetails.status !== ServiceOrderStatus.COMPLETED
   ) {
     return (
@@ -325,7 +335,7 @@ export const CheckList = ({orderId}: Props) => {
               ))}
             </Box>
             <Typography variant="caption" color={theme.palette.text.secondary}>
-              Signature
+              {t('Signature')}
             </Typography>
             <Box
               display="flex"
@@ -339,10 +349,23 @@ export const CheckList = ({orderId}: Props) => {
               borderColor="grey.300"
               borderRadius="0.5rem"
               position="relative"
-              maxWidth="17.5rem">
+              maxWidth="15rem"
+              maxHeight="5rem">
               <Box>
-                {serviceOrderReport?.[0]?.attachments?.[0]?.fileResource.uri ||
-                  'No Signature'}
+                {signaturePath ? (
+                  <img
+                    alt=""
+                    src={signaturePath}
+                    style={{
+                      objectFit: 'cover',
+                      objectPosition: 'top',
+                      width: '100%',
+                      height: '100%',
+                    }}
+                  />
+                ) : (
+                  t('No Signature')
+                )}
               </Box>
               {technicianName && (
                 <Box
@@ -350,7 +373,7 @@ export const CheckList = ({orderId}: Props) => {
                   flexDirection="column"
                   alignItems="center"
                   justifyContent="center"
-                  top="5.5rem"
+                  top="4.1rem"
                   bgcolor="white"
                   px="0.625rem"
                   position="absolute"
@@ -363,7 +386,7 @@ export const CheckList = ({orderId}: Props) => {
                   <Typography
                     variant="subtitle2"
                     color={theme.palette.text.secondary}>
-                    Technician
+                    {t('Technician')}
                   </Typography>
                 </Box>
               )}
@@ -378,10 +401,10 @@ export const CheckList = ({orderId}: Props) => {
                   disabled: !isPdfGenerated,
                   onClick: () => {
                     const url = isPdfGenerated
-                      ? serviceOrderDetails!.additionalInfo.checkListInfo
+                      ? serviceOrderDetails!.additionalInfo.checkListInfo!
                           .pdfPath
                       : '';
-                    window.open(downloadUrl[url], '_blank');
+                    window.open(pdfDownloadUrl[url], '_blank');
                   },
                   sx: {
                     background: 'transparent',
@@ -392,7 +415,7 @@ export const CheckList = ({orderId}: Props) => {
               />
 
               <Button
-                label="Send Checklist"
+                label={t('Send Checklist')}
                 buttonProps={{
                   variant: 'contained',
                   size: 'medium',

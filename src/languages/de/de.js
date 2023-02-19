@@ -1000,7 +1000,7 @@ export const germany = {
     Settings: 'Einstellungen',
     'Legal Information': 'Rechtliche Informationen',
     'Payment Information': 'Zahlungsinformationen',
-    'Defined contract names': 'Vertragsnamen',
+    'Defined contract names': 'Definierte Vertragsnamen',
     'Billing Information': 'Informationen zur Rechnungsstellung',
     'Company Policies': 'Unternehmensrichtlinien',
     LANGUAGE: 'SPRACHE',
@@ -1178,6 +1178,11 @@ export const germany = {
     'No Invoices.': 'Keine Rechnungen.',
     'No quotations.': 'Keine Angebote.',
     'No working technicians.': 'Keine arbeitenden Techniker.',
+    'Contract name is required': 'Vertragsname ist erforderlich',
+    'New contract name': 'Neuer Vertragsname',
+    'Contract name': 'Vertragsname',
+    'No Signature': 'Keine Unterschrift',
+    'Send Checklist': 'Checkliste senden',
   },
 };
 
