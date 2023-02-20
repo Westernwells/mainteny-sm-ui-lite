@@ -7,7 +7,7 @@ import {Tabs} from 'components/Tab';
 import {useParams} from 'react-router-dom';
 import {Overview} from './Tabs/Overview';
 import {WorkReport} from './Tabs/WorkReport';
-import {Checklist} from './Tabs/Checklist';
+import {CheckList} from './Tabs/Checklist';
 
 const tabItems = [
   {
@@ -45,7 +45,7 @@ export const ServiceOrderDetails = () => {
         value={tabValue}
         index={2}
         containerStyle={{height: '1px', overflow: 'auto'}}>
-        <Checklist orderId={serviceOrderId} />
+        <CheckList orderId={serviceOrderId} />
       </TabsBody>
     </Tabs>
   );

@@ -11,12 +11,10 @@ import {grey} from '@mui/material/colors';
 import useTheme from '@mui/material/styles/useTheme';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
-import {groupBy, sortBy} from 'lodash';
 import {useTranslation} from 'react-i18next';
 import {Button} from 'components/Button';
 import {CompleteServiceOrder, ServiceOrderView} from 'models/service-order';
 import {FormInput} from 'components/form/FormInput';
-import {FormCheckbox} from 'components/form/FormCheckbox';
 import {useCompleteServiceOrder} from 'hooks/reactQuery/useServiceOrder';
 
 interface Props {
@@ -62,44 +60,6 @@ export const MarkCompletedDialog = ({
     },
     validationSchema,
   });
-
-  const questions = useMemo(() => {
-    const groupedByCategories = groupBy(
-      serviceOrderDetails.additionalInfo.checkList?.questions,
-      'category',
-    );
-
-    return {
-      byCategories: sortBy(Object.keys(groupedByCategories)).map(
-        (category) => ({
-          category,
-          questions: groupedByCategories[category],
-        }),
-      ),
-    };
-  }, [serviceOrderDetails]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {checked, value} = e.target;
-    if (checked) {
-      const checklistQuestion =
-        serviceOrderDetails?.additionalInfo?.checkList?.questions?.find(
-          (question) => question.id === value,
-        )?.question;
-      formik.setFieldValue('answers', [
-        ...formik.values.answers,
-        {
-          questionId: value,
-          answer: checklistQuestion || '',
-        },
-      ]);
-    } else {
-      formik.setFieldValue(
-        'answers',
-        formik.values.answers.filter((v) => v.questionId !== value),
-      );
-    }
-  };
 
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
@@ -155,51 +115,6 @@ export const MarkCompletedDialog = ({
                   }}
                 />
               </Grid>
-
-              {serviceOrderDetails.additionalInfo.checkList?.questions && (
-                <Grid item xs={12}>
-                  <Typography variant="subtitle1" color={grey[700]}>
-                    Routine Maintenance Checklist
-                  </Typography>
-                  <Box pt="0.5rem">
-                    {questions.byCategories.map((category) => (
-                      <Box py="0.5rem" key={category.category}>
-                        <Typography
-                          variant="subtitle2"
-                          color={theme.palette.text.primary}>
-                          {category.category}:
-                        </Typography>
-                        <Grid container pt="0.25rem">
-                          {category.questions.map((question) => (
-                            <Grid item xs={12} key={question.id}>
-                              <FormCheckbox
-                                checked={
-                                  !!formik.values?.answers?.find(
-                                    (a) => a.questionId === question.id,
-                                  )
-                                }
-                                checkboxProps={{
-                                  size: 'small',
-                                }}
-                                value={question.id}
-                                id={question.id}
-                                handleChange={handleChange}
-                                label={question.question}
-                                typographyProps={{
-                                  py: '0.5rem',
-                                  color: theme.palette.text.primary,
-                                  variant: 'body2',
-                                }}
-                                sx={{alignItems: 'flex-start'}}
-                              />
-                            </Grid>
-                          ))}
-                        </Grid>
-                      </Box>
-                    ))}
-                  </Box>
-                </Grid>
-              )}
             </Grid>
           </DialogContentText>
         </DialogContent>

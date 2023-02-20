@@ -36,7 +36,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
             id: 'typeSelect',
             value: formik.values.type || '',
             onChange: formik.handleChange,
-            error: !!(formik.touched.type && formik.errors.type),
+            error: !!formik.errors.type,
             placeholder: 'Select Contract type',
             name: 'type',
           }}
@@ -114,11 +114,8 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
             value: formik.values.renewalTerms,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
-            error: !!(
-              formik.touched.renewalTerms && formik.errors.renewalTerms
-            ),
-            helperText:
-              formik.touched.renewalTerms && formik.errors.renewalTerms,
+            error: !!formik.errors.renewalTerms,
+            helperText: formik.errors.renewalTerms,
             inputProps: {
               min: 0,
               max: 12,
@@ -138,7 +135,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
             id: 'invoiceDueSelect',
             value: convertToText(formik.values.invoiceDue || ''),
             onChange: formik.handleChange,
-            error: !!(formik.touched.invoiceDue && formik.errors.invoiceDue),
+            error: !!formik.errors.invoiceDue,
             name: 'invoiceDue',
           }}
           required
@@ -155,9 +152,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
             value: Number(formik.values.invoiceDueDays).toString(),
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
-            error: !!(
-              formik.touched.invoiceDueDays && formik.errors.invoiceDueDays
-            ),
+            error: !!formik.errors.invoiceDueDays,
           }}
         />
       </Grid>
@@ -174,10 +169,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
             ).toString(),
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
-            error: !!(
-              formik.touched.annualPriceAdjustmentPercentage &&
-              formik.errors.annualPriceAdjustmentPercentage
-            ),
+            error: !!formik.errors.annualPriceAdjustmentPercentage,
           }}
         />
       </Grid>
@@ -192,7 +184,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
             value: Number(formik.values.discounts).toString(),
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
-            error: !!(formik.touched.discounts && formik.errors.discounts),
+            error: !!formik.errors.discounts,
             InputProps: {
               endAdornment: (
                 <InputAdornment position="end" color="text.primary">
@@ -214,10 +206,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
             value: Number(formik.values.noticePeriodInMonth).toString(),
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
-            error: !!(
-              formik.touched.noticePeriodInMonth &&
-              formik.errors.noticePeriodInMonth
-            ),
+            error: !!formik.errors.noticePeriodInMonth,
           }}
         />
       </Grid>
@@ -232,7 +221,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
             value: Number(formik.values.hourlyRate).toString(),
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
-            error: !!(formik.touched.hourlyRate && formik.errors.hourlyRate),
+            error: !!formik.errors.hourlyRate,
             InputProps: {
               startAdornment: (
                 <InputAdornment position="start" color="text.primary">

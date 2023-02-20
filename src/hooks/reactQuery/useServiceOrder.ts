@@ -23,6 +23,7 @@ import {toDate, toRestDate} from 'utils/datetime';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
+import {CheckList} from 'models/checklist';
 import {
   AssignmentBasedOrderBody,
   UpdateServiceOrderScheduleBody,
@@ -41,7 +42,13 @@ import {
   UpdateServiceOrderBody,
   AppointmentConfirmationRequiredOrdersQueryParams,
 } from '../../models/service-order';
-import {Order, Resource, RestError, StringValue} from '../../models/misc';
+import {
+  Order,
+  Resource,
+  RestError,
+  SimpleEmailRecord,
+  StringValue,
+} from '../../models/misc';
 import {
   ElevatorAvailability,
   ElevatorAvailabilityParams,
@@ -397,6 +404,27 @@ export function useServiceOrderDetails(
   return useQuery<ServiceOrderView, RestError, ServiceOrderView>(
     [queryKeys.getServiceOrderDetails, serviceOrderId],
     () => getServiceOrderDetails(serviceOrderId!),
+    {enabled: !!serviceOrderId, ...options},
+  );
+}
+
+export const getServiceOrderChecklist = async (
+  serviceOrderId: string,
+): Promise<CheckList> => {
+  const response = await axiosClient.get<CheckList>(
+    `/api/serviceOrders/${serviceOrderId}/checkList`,
+  );
+  return response.data;
+};
+
+// it is okay to use pass any,information is for react-query & not us.Passing correct types makes simple function gigantic
+export function useServiceOrderCheckList(
+  serviceOrderId?: string,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<CheckList, RestError, CheckList>(
+    [queryKeys.fetchServiceOrderChecklist, serviceOrderId],
+    () => getServiceOrderChecklist(serviceOrderId!),
     {enabled: !!serviceOrderId, ...options},
   );
 }
@@ -866,6 +894,35 @@ export const useConfirmAppointment = () => {
         return queryClient.invalidateQueries([
           queryKeys.queryAppointmentConfirmationRequiredOrders,
         ]);
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+export const postPublishChecklist = async (
+  id: string,
+  body: SimpleEmailRecord,
+) => {
+  await axiosClient.post<{value: string}>(
+    `api/serviceOrders/${id}/checkList/publish`,
+    body,
+  );
+};
+
+export const usePublishChecklist = () => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  return useMutation(
+    ({id, body}: {id: string; body: SimpleEmailRecord}) =>
+      postPublishChecklist(id, body),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(`CheckList sent successfully`, {
+          variant: 'success',
+        });
       },
       onError: (err) => {
         console.log(err);
