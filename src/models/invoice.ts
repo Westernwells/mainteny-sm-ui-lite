@@ -91,6 +91,7 @@ export interface InvoiceView {
   type: InvoiceType;
   totalAmount: Amount;
   issuedDate: string;
+  sentDate: string;
   dueDate: string;
   status: InvoiceStatus;
   serviceCompany: ServiceCompanySimpleView;

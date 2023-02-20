@@ -213,7 +213,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
     formik.setFieldValue('description', invoice.description, true);
     formik.setFieldValue('type', invoice.type, true);
     formik.setFieldValue('paymentTerms', invoice.paymentTerms, true);
-    formik.setFieldValue('issuedDate', invoice.issuedDate, true);
+    formik.setFieldValue('sentDate', invoice.sentDate, true);
     formik.setFieldValue('dueDate', invoice.dueDate, true);
     formik.setFieldValue('serviceOrderId', invoice.serviceOrder?.id, true);
   }, [invoice]);
