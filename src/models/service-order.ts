@@ -110,6 +110,7 @@ export interface ServiceOrderAdditionalInfo {
   checkListInfo?: ServiceOrderCheckListInfo;
   moreInformation: string;
   quotationId: string;
+  workReportGenerated: boolean;
 }
 
 export interface ServiceOrderView {

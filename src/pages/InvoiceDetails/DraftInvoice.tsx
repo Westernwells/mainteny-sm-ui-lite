@@ -37,6 +37,7 @@ import {
 import {Amount, WithOptional} from 'models/misc';
 import {convertToText} from 'utils/utils';
 import {SendEmailDialog} from 'components/SendEmailDialog';
+import Tooltip from '@mui/material/Tooltip';
 
 interface Props {
   serviceOrderResource?: ServiceOrderView;
@@ -76,6 +77,8 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
   );
 
   const [dueDate, setDueDate] = useState<Date | null>(null);
+  const [workReportGenerated, setWorkReportGenerated] = useState(true);
+  const [showWorkReportTooltip, setShowWorlReportTooltip] = useState(false);
 
   const invoiceTyoeOptions = useRef([
     {
@@ -210,6 +213,14 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
       true,
     );
   }, [invoiceItems]);
+
+  useEffect(() => {
+    if (serviceOrder?.additionalInfo.workReportGenerated) {
+      setWorkReportGenerated(true);
+    } else {
+      setWorkReportGenerated(false);
+    }
+  }, [serviceOrder]);
 
   const isValid = () => {
     const valid =
@@ -426,22 +437,45 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
                 ))}
               </RadioGroup>
             </Box>
-
             {formik.values.type !== InvoiceType.CREDIT_NOTE && (
               <>
-                <Box mt="2em" width="32ch">
-                  <Typography
-                    variant="body1"
-                    color={theme.palette.text.secondary}>
-                    {t('Work Report')}
-                  </Typography>
-                  <FormCheckbox
-                    checked={formik.values.includeWorkReport}
-                    name="includeWorkReport"
-                    handleChange={formik.handleChange}
-                    label={t('Add work report to invoice')}
-                  />
-                </Box>
+                <Tooltip
+                  open={showWorkReportTooltip}
+                  onMouseEnter={() => {
+                    if (!workReportGenerated) {
+                      setShowWorlReportTooltip(true);
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    if (showWorkReportTooltip) {
+                      setShowWorlReportTooltip(false);
+                    }
+                  }}
+                  title="No work report for the selected service order"
+                  placement="right"
+                  sx={{
+                    '&:hover': {},
+                  }}
+                  arrow>
+                  <Box
+                    mt="2em"
+                    width="32ch"
+                    sx={{opacity: workReportGenerated ? 1 : 0.3}}>
+                    <Typography
+                      variant="body1"
+                      color={theme.palette.text.secondary}>
+                      {t('Work Report')}
+                    </Typography>
+                    <FormCheckbox
+                      checked={
+                        workReportGenerated && formik.values.includeWorkReport
+                      }
+                      name="includeWorkReport"
+                      handleChange={formik.handleChange}
+                      label={t('Add work report to invoice')}
+                    />
+                  </Box>
+                </Tooltip>
                 <Box mt="2em" width="32ch">
                   <DatePicker
                     defaultDate={dueDate}
