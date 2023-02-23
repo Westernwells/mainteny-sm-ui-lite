@@ -25,7 +25,6 @@ import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {Confirm} from 'components/Confirm';
 import {StatusChip} from 'components/StatusChip';
 import {FormRadio} from 'components/form/FormRadio';
-import {FormCheckbox} from 'components/form/FormCheckbox';
 import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -54,6 +53,8 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useServiceOrderWorkReport} from 'hooks/reactQuery/useServiceOrder';
 import {convertToText} from 'utils/utils';
 import {addYears} from 'date-fns';
+import Tooltip from '@mui/material/Tooltip';
+import {InvoiceCheckbox} from 'pages/InvoiceDetails/InvoiceCheckbox';
 
 interface Props {
   invoice: InvoiceView;
@@ -92,6 +93,8 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
   const [isDrawerOpen] = useState<boolean>(true);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [showCheckListTooltip, setShowCheckListTooltip] = useState(false);
+  const [showWorkReportTooltip, setShowWorlReportTooltip] = useState(false);
 
   const [customer, setCustomer] = useState<
     PropertyOwnerView | PropertyOwnerSimpleView | undefined
@@ -137,6 +140,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
     paymentInfo: payment,
     shouldSendOut: false,
     includeWorkReport: true,
+    includeCheckList: true,
     costCenter: invoice.additionalInfo?.costCenter ?? '',
     customerSpecificOrderNumber:
       invoice.additionalInfo?.customerSpecificOrderNumber ?? '',
@@ -281,8 +285,15 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
     ? workReport?.additionalInfo?.pdfGenerationStatus ===
       PdfGenerationStatus.DONE
     : true;
-  // TODO: show an error message below button if work report is not generated
-  const isPDFsGenerated = !!isWorkReportPDFGenerated && isInvoicePDFGenerated;
+  const isCheckListPDFGenerated = invoice?.additionalInfo.includeCheckList
+    ? workReport?.serviceOrder.additionalInfo.checkListInfo
+        ?.pdfGenerationStatus === PdfGenerationStatus.DONE
+    : true;
+
+  const isPDFsGenerated =
+    !!isWorkReportPDFGenerated &&
+    !!isCheckListPDFGenerated &&
+    isInvoicePDFGenerated;
 
   const actions = useMemo(() => {
     const items = [
@@ -335,6 +346,30 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
       return !!(valid && dueDate !== null);
     }
     return !!valid;
+  };
+
+  const handleCheckListMouseEnter = () => {
+    if (!isCheckListPDFGenerated) {
+      setShowCheckListTooltip(true);
+    }
+  };
+
+  const handleCheckListMouseLeave = () => {
+    if (showCheckListTooltip) {
+      setShowCheckListTooltip(false);
+    }
+  };
+
+  const handleWorkReportMouseEnter = () => {
+    if (!isWorkReportPDFGenerated) {
+      setShowWorlReportTooltip(true);
+    }
+  };
+
+  const handleWorkReportMouseLeave = () => {
+    if (showWorkReportTooltip) {
+      setShowWorlReportTooltip(false);
+    }
   };
 
   return (
@@ -569,19 +604,112 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
 
             {formik.values.type !== InvoiceType.CREDIT_NOTE && (
               <>
-                <Box mt="2em" width="32ch">
-                  <Typography
-                    variant="body1"
-                    color={theme.palette.text.secondary}>
-                    {t('Work Report')}
-                  </Typography>
-                  <FormCheckbox
-                    checked={formik.values.includeWorkReport}
-                    name="includeWorkReport"
-                    handleChange={formik.handleChange}
-                    label={t('Add work report to invoice')}
-                  />
-                </Box>
+                <InvoiceCheckbox
+                  onMouseEnter={handleWorkReportMouseEnter}
+                  onMouseLeave={handleWorkReportMouseLeave}
+                  checkboxName="includeWorkReport"
+                  disabled={!isWorkReportPDFGenerated}
+                  handleChange={formik.handleChange}
+                  showTooltip={showWorkReportTooltip}
+                  tooltipTitle="No work report for the selected service order"
+                  title="Work Report"
+                  checkboxLabel="Add work report to invoice"
+                  checked={
+                    isWorkReportPDFGenerated && formik.values.includeWorkReport
+                  }
+                />
+                {/* <Tooltip
+                  open={showWorkReportTooltip}
+                  onMouseEnter={() => {
+                    if (!isWorkReportPDFGenerated) {
+                      setShowWorlReportTooltip(true);
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    if (showWorkReportTooltip) {
+                      setShowWorlReportTooltip(false);
+                    }
+                  }}
+                  title="No work report for the selected service order"
+                  placement="right"
+                  sx={{
+                    '&:hover': {},
+                  }}
+                  arrow>
+                  <Box
+                    mt="2em"
+                    width="32ch"
+                    sx={{opacity: isWorkReportPDFGenerated ? 1 : 0.3}}>
+                    <Typography
+                      variant="body1"
+                      color={theme.palette.text.secondary}>
+                      {t('Work Report')}
+                    </Typography>
+                    <FormCheckbox
+                      checked={
+                        isWorkReportPDFGenerated &&
+                        formik.values.includeWorkReport
+                      }
+                      name="includeWorkReport"
+                      handleChange={formik.handleChange}
+                      label={t('Add work report to invoice')}
+                    />
+                  </Box>
+                </Tooltip> */}
+
+                <InvoiceCheckbox
+                  onMouseEnter={handleCheckListMouseEnter}
+                  onMouseLeave={handleCheckListMouseLeave}
+                  checkboxName="includeCheckList"
+                  disabled={!isCheckListPDFGenerated}
+                  handleChange={formik.handleChange}
+                  showTooltip={showCheckListTooltip}
+                  tooltipTitle="No checklist for selected service order"
+                  title="Checklist"
+                  checkboxLabel="Add checklist to invoice"
+                  checked={
+                    isCheckListPDFGenerated && formik.values.includeCheckList
+                  }
+                />
+
+                {/* <Tooltip
+                  open={showCheckListTooltip}
+                  onMouseEnter={() => {
+                    if (!isCheckListPDFGenerated) {
+                      setShowCheckListTooltip(true);
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    if (showCheckListTooltip) {
+                      setShowCheckListTooltip(false);
+                    }
+                  }}
+                  title="No checklist for selected service order"
+                  placement="right"
+                  sx={{
+                    '&:hover': {},
+                  }}
+                  arrow>
+                  <Box
+                    mt="2em"
+                    width="32ch"
+                    sx={{opacity: isCheckListPDFGenerated ? 1 : 0.3}}>
+                    <Typography
+                      variant="body1"
+                      color={theme.palette.text.secondary}>
+                      {t('Checklist')}
+                    </Typography>
+                    <FormCheckbox
+                      checked={
+                        isCheckListPDFGenerated &&
+                        formik.values.includeCheckList
+                      }
+                      name="includeCheckList"
+                      handleChange={formik.handleChange}
+                      label={t('Add checklist to invoice')}
+                    />
+                  </Box>
+                </Tooltip> */}
                 <Box mt="2em" width="32ch">
                   <DatePicker
                     defaultDate={dueDate}

@@ -23,7 +23,7 @@ export interface PropertyContactPersonSimpleView {
 
 export interface PropertyOwnerAdditionalInfo {
   priority: Priority;
-  billingEmail: string;
+  billingEmail?: string;
   costCenter: string;
 }
 

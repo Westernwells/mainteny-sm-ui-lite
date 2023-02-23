@@ -141,8 +141,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     setOpenContractDialog(false);
   };
 
-  console.log(formik.values, '^^^^^^^^', formik.errors);
-
   const onDocsPreview = async () => {
     const serviceCompanyId = user?.userAccount.serviceCompany.id;
     const uploadPath = `${serviceCompanyId}/contracts/${contractId}/documents`;

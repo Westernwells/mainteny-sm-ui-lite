@@ -50,7 +50,8 @@ export interface InvoiceAdditionalInfo {
   dueDate: string;
   pdfGenerationStatus: PdfGenerationStatus;
   pdfPath: string;
-  includeWorkReport: Boolean;
+  includeWorkReport: boolean;
+  includeCheckList?: boolean;
   paymentInfo: PaymentInfo;
   costCenter?: string;
   customerSpecificOrderNumber?: string;
@@ -149,6 +150,7 @@ export interface CreateInvoice {
   shouldSendOut: boolean;
   type: InvoiceType;
   includeWorkReport?: boolean;
+  includeCheckList?: boolean;
   costCenter?: string;
   customerSpecificOrderNumber?: string;
 }

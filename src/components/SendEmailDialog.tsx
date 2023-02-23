@@ -22,7 +22,8 @@ interface Props {
   onClose: () => void;
   submitHook?: typeof usePublishInvoice | typeof usePublishQuotation;
   id?: string;
-  confirmBtnDisabled: boolean;
+  confirmBtnDisabled?: boolean;
+  email?: string;
   subject?: string;
   content?: string;
   callback?: ({email, subject, content}: SimpleEmailRecord) => void;
@@ -44,6 +45,7 @@ export const SendEmailDialog = ({
   submitHook,
   id,
   confirmBtnDisabled,
+  email,
   subject,
   content,
   callback,
@@ -53,7 +55,7 @@ export const SendEmailDialog = ({
   const publish = submitHook?.();
   const formik = useFormik<SimpleEmailRecord>({
     initialValues: {
-      email: '',
+      email: email || '',
       subject: subject || '',
       content: content || '',
     },
@@ -206,7 +208,10 @@ export const SendEmailDialog = ({
                 size: 'medium',
                 variant: 'contained',
                 autoFocus: true,
-                disabled: formik.isSubmitting || confirmBtnDisabled,
+                disabled:
+                  formik.isSubmitting ||
+                  confirmBtnDisabled ||
+                  Object.keys(formik.errors).length > 0,
                 onClick: () => formik.handleSubmit(),
               }}>
               <Typography variant="subtitle2">{t('Send email')}</Typography>

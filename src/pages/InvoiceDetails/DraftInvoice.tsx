@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import {useEffect, useState, useRef} from 'react';
+import {useEffect, useState, useRef, ChangeEvent} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 import * as Yup from 'yup';
@@ -18,15 +18,10 @@ import {BottomDrawer} from 'components/BottomDrawer';
 import {FormLabel} from 'components/form/FormLabel';
 import {FormInput} from 'components/form/FormInput';
 import {FormRadio} from 'components/form/FormRadio';
-import {FormCheckbox} from 'components/form/FormCheckbox';
 import {DatePicker} from 'components/DatePicker';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {
-  useCreateInvoice,
-  usePublishInvoice,
-  fetchInvoice,
-} from 'hooks/reactQuery/useInvoice';
+import {useCreateInvoice, usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {CreateInvoice, InvoiceItemRecord, InvoiceType} from 'models/invoice';
 import {ServiceOrderView} from 'models/service-order';
 import {addYears} from 'date-fns';
@@ -34,10 +29,11 @@ import {
   PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from 'models/propertyManager';
-import {Amount, WithOptional} from 'models/misc';
+import {Amount, PdfGenerationStatus, WithOptional} from 'models/misc';
 import {convertToText} from 'utils/utils';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import Tooltip from '@mui/material/Tooltip';
+import {InvoiceCheckbox} from './InvoiceCheckbox';
 
 interface Props {
   serviceOrderResource?: ServiceOrderView;
@@ -79,6 +75,8 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [workReportGenerated, setWorkReportGenerated] = useState(true);
   const [showWorkReportTooltip, setShowWorlReportTooltip] = useState(false);
+  const [checkListGenerated, setCheckListGenerated] = useState(true);
+  const [showCheckListTooltip, setShowCheckListTooltip] = useState(false);
 
   const invoiceTyoeOptions = useRef([
     {
@@ -109,6 +107,7 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
     paymentInfo: payment,
     shouldSendOut: false,
     includeWorkReport: true,
+    includeCheckList: true,
     costCenter: '',
     customerSpecificOrderNumber: '',
   };
@@ -220,6 +219,15 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
     } else {
       setWorkReportGenerated(false);
     }
+
+    if (
+      serviceOrder?.additionalInfo.checkListInfo?.pdfGenerationStatus ===
+      PdfGenerationStatus.DONE
+    ) {
+      setCheckListGenerated(true);
+    } else {
+      setCheckListGenerated(false);
+    }
   }, [serviceOrder]);
 
   const isValid = () => {
@@ -232,6 +240,30 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
       return !!(valid && dueDate !== null);
     }
     return !!valid;
+  };
+
+  const handleCheckListMouseEnter = () => {
+    if (!checkListGenerated) {
+      setShowCheckListTooltip(true);
+    }
+  };
+
+  const handleCheckListMouseLeave = () => {
+    if (showCheckListTooltip) {
+      setShowCheckListTooltip(false);
+    }
+  };
+
+  const handleWorkReportMouseEnter = () => {
+    if (!workReportGenerated) {
+      setShowWorlReportTooltip(true);
+    }
+  };
+
+  const handleWorkReportMouseLeave = () => {
+    if (showWorkReportTooltip) {
+      setShowWorlReportTooltip(false);
+    }
   };
 
   return (
@@ -439,43 +471,33 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
             </Box>
             {formik.values.type !== InvoiceType.CREDIT_NOTE && (
               <>
-                <Tooltip
-                  open={showWorkReportTooltip}
-                  onMouseEnter={() => {
-                    if (!workReportGenerated) {
-                      setShowWorlReportTooltip(true);
-                    }
-                  }}
-                  onMouseLeave={() => {
-                    if (showWorkReportTooltip) {
-                      setShowWorlReportTooltip(false);
-                    }
-                  }}
-                  title="No work report for the selected service order"
-                  placement="right"
-                  sx={{
-                    '&:hover': {},
-                  }}
-                  arrow>
-                  <Box
-                    mt="2em"
-                    width="32ch"
-                    sx={{opacity: workReportGenerated ? 1 : 0.3}}>
-                    <Typography
-                      variant="body1"
-                      color={theme.palette.text.secondary}>
-                      {t('Work Report')}
-                    </Typography>
-                    <FormCheckbox
-                      checked={
-                        workReportGenerated && formik.values.includeWorkReport
-                      }
-                      name="includeWorkReport"
-                      handleChange={formik.handleChange}
-                      label={t('Add work report to invoice')}
-                    />
-                  </Box>
-                </Tooltip>
+                <InvoiceCheckbox
+                  onMouseEnter={handleWorkReportMouseEnter}
+                  onMouseLeave={handleWorkReportMouseLeave}
+                  checkboxName="includeWorkReport"
+                  disabled={!workReportGenerated}
+                  handleChange={formik.handleChange}
+                  showTooltip={showWorkReportTooltip}
+                  tooltipTitle="No work report for the selected service order"
+                  title="Work Report"
+                  checkboxLabel="Add work report to invoice"
+                  checked={
+                    workReportGenerated && formik.values.includeWorkReport
+                  }
+                />
+
+                <InvoiceCheckbox
+                  onMouseEnter={handleCheckListMouseEnter}
+                  onMouseLeave={handleCheckListMouseLeave}
+                  checkboxName="includeCheckList"
+                  disabled={!checkListGenerated}
+                  handleChange={formik.handleChange}
+                  showTooltip={showCheckListTooltip}
+                  tooltipTitle="No checklist for selected service order"
+                  title="Checklist"
+                  checkboxLabel="Add checklist to invoice"
+                  checked={checkListGenerated && formik.values.includeCheckList}
+                />
                 <Box mt="2em" width="32ch">
                   <DatePicker
                     defaultDate={dueDate}
@@ -584,6 +606,7 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
         open={isSendEmailDialogOpen}
         onClose={() => setIsSendEmailDialogOpen(false)}
         confirmBtnDisabled={publishingInvoice || isCreating}
+        email={customer?.additionalInfo.billingEmail}
         callback={async (emailRecord) => {
           const response = await save(formik.values);
           setIsSendEmailDialogOpen(false);
