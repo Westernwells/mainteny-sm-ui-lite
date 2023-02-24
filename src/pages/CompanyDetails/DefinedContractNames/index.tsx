@@ -9,10 +9,12 @@ import {InfoCard} from 'components/InfoCard';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {EmptySection} from 'components/EmptySection';
 import {useUpdateCompany} from 'hooks/reactQuery/useCompanies';
+import {ContractTypes} from 'models/contract';
 import {ServiceCompanyItem} from 'models/service-company';
 import {ContractNameFormModel} from './model';
 import {ContractNameInput} from './ContractNameInput';
 import {columns, makeRows} from './ContractNamesDataGridProps';
+import {ContractTypeRadio} from './ContractTypeRadio';
 
 interface Props {
   company: ServiceCompanyItem;
@@ -35,14 +37,18 @@ export const DefinedContractNames = ({company, containerStyles}: Props) => {
   const formik = useFormik<ContractNameFormModel>({
     initialValues: {
       contractName: '',
+      contractType: '',
     },
     onSubmit: (values) => {
       updateCompany(
         {
           body: {
-            contractTypes: [
-              values.contractName,
-              ...company.settings.contractTypes,
+            contractNameTypes: [
+              ...company.settings.contractNameTypes,
+              {
+                name: values.contractName,
+                type: values.contractType as ContractTypes,
+              },
             ],
           },
           companyId: company.id,
@@ -98,6 +104,21 @@ export const DefinedContractNames = ({company, containerStyles}: Props) => {
           open: openDialog || false,
         }}>
         <ContractNameInput formik={formik} />
+        <ContractTypeRadio
+          label="Maintenance contract"
+          name="contractType"
+          value={ContractTypes.SERVICE}
+          checked={formik.values.contractType === ContractTypes.SERVICE}
+          handleChange={formik.handleChange}
+        />
+
+        <ContractTypeRadio
+          label="Non-maintenance contract"
+          name="contractType"
+          value={ContractTypes.NON_SERVICE}
+          checked={formik.values.contractType === ContractTypes.NON_SERVICE}
+          handleChange={formik.handleChange}
+        />
       </Dialog>
     </>
   );

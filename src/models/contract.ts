@@ -16,6 +16,16 @@ export enum ContractOrderField {
   CREATED_TIME = 'CREATED_TIME',
 }
 
+export enum ContractTypes {
+  SERVICE = 'SERVICE',
+  NON_SERVICE = 'NON_SERVICE',
+}
+
+export interface ContractNameTypes {
+  name: string;
+  type: ContractTypes;
+}
+
 export interface ContractTimeWindow {
   id: string;
   contractId: string;

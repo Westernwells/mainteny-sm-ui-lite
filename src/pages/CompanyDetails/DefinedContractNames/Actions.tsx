@@ -6,20 +6,22 @@ import IconButton from '@mui/material/IconButton';
 import {DeleteOutline, Edit} from '@mui/icons-material';
 import {Dialog} from 'components/Dialog';
 import {useUpdateCompany} from 'hooks/reactQuery/useCompanies';
+import {ContractTypes, ContractNameTypes} from 'models/contract';
 import {ContractNameInput} from './ContractNameInput';
 import {ContractNameFormModel} from './model';
+import {ContractTypeRadio} from './ContractTypeRadio';
 
 interface Props {
   id: string;
-  contractTypes: string[];
-  contractType: string;
+  contractNameTypes: ContractNameTypes[];
+  contractNameType: ContractNameTypes;
 }
 
 const validationSchema = Yup.object().shape({
   contractName: Yup.string().required('Contract name is required'),
 });
 
-export const Actions = ({id, contractTypes, contractType}: Props) => {
+export const Actions = ({id, contractNameTypes, contractNameType}: Props) => {
   const [openDialog, setOpenDialog] = useState(false);
   const {mutateAsync: updateCompany} = useUpdateCompany(
     'Contract types updated successfully',
@@ -27,14 +29,21 @@ export const Actions = ({id, contractTypes, contractType}: Props) => {
 
   const formik = useFormik<ContractNameFormModel>({
     initialValues: {
-      contractName: contractType,
+      contractName: contractNameType.name,
+      contractType: contractNameType.name,
     },
     onSubmit: (values) => {
+      console.log(values, '%%%%%%%%');
       updateCompany(
         {
           body: {
-            contractTypes: contractTypes.map((i) =>
-              i === contractType ? values.contractName : i,
+            contractNameTypes: contractNameTypes.map((i) =>
+              i.name === contractNameType.name
+                ? ({
+                    name: values.contractName,
+                    type: values.contractType,
+                  } as ContractNameTypes)
+                : i,
             ),
           },
           companyId: id,
@@ -50,7 +59,9 @@ export const Actions = ({id, contractTypes, contractType}: Props) => {
   const onDelete = () => {
     updateCompany({
       body: {
-        contractTypes: contractTypes.filter((i) => i !== contractType),
+        contractNameTypes: contractNameTypes.filter(
+          (i) => i.name !== contractNameType.name,
+        ),
       },
       companyId: id,
     });
@@ -79,6 +90,21 @@ export const Actions = ({id, contractTypes, contractType}: Props) => {
           open: openDialog || false,
         }}>
         <ContractNameInput formik={formik} />
+        <ContractTypeRadio
+          label="Maintenance contract"
+          name="contractType"
+          value={ContractTypes.SERVICE}
+          checked={formik.values.contractType === ContractTypes.SERVICE}
+          handleChange={formik.handleChange}
+        />
+
+        <ContractTypeRadio
+          label="Non-maintenance contract"
+          name="contractType"
+          value={ContractTypes.NON_SERVICE}
+          checked={formik.values.contractType === ContractTypes.NON_SERVICE}
+          handleChange={formik.handleChange}
+        />
       </Dialog>
     </>
   );
