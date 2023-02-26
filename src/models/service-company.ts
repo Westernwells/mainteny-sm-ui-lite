@@ -148,7 +148,7 @@ export interface ServiceCompanyUpdateBody {
     logoPath?: string;
   };
   contractTypes?: string[];
-  contractNameTypes: ContractNameTypes[];
+  contractNameTypes?: ContractNameTypes[];
 }
 
 export interface SystemSettingsUpdateBody {

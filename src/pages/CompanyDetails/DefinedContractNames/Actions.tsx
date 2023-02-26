@@ -2,6 +2,8 @@ import {useState} from 'react';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {Box} from '@mui/material';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import {DeleteOutline, Edit} from '@mui/icons-material';
 import {Dialog} from 'components/Dialog';
@@ -30,10 +32,9 @@ export const Actions = ({id, contractNameTypes, contractNameType}: Props) => {
   const formik = useFormik<ContractNameFormModel>({
     initialValues: {
       contractName: contractNameType.name,
-      contractType: contractNameType.name,
+      contractType: contractNameType.type,
     },
     onSubmit: (values) => {
-      console.log(values, '%%%%%%%%');
       updateCompany(
         {
           body: {
@@ -86,25 +87,43 @@ export const Actions = ({id, contractNameTypes, contractNameType}: Props) => {
         onSave={() => formik.handleSubmit()}
         disableSaveBtn={!!Object.keys(formik.errors).length}
         dialogProps={{
-          maxWidth: 'xs',
+          maxWidth: 'md',
           open: openDialog || false,
         }}>
         <ContractNameInput formik={formik} />
-        <ContractTypeRadio
-          label="Maintenance contract"
-          name="contractType"
-          value={ContractTypes.SERVICE}
-          checked={formik.values.contractType === ContractTypes.SERVICE}
-          handleChange={formik.handleChange}
-        />
-
-        <ContractTypeRadio
-          label="Non-maintenance contract"
-          name="contractType"
-          value={ContractTypes.NON_SERVICE}
-          checked={formik.values.contractType === ContractTypes.NON_SERVICE}
-          handleChange={formik.handleChange}
-        />
+        <Grid container sx={{mt: '0.5em'}} component="form" spacing={2}>
+          <Grid item xs={12}>
+            <Typography variant="subtitle2">Contract type</Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <ContractTypeRadio
+              label="Maintenance contract"
+              name="contractType"
+              value={ContractTypes.SERVICE}
+              checked={formik.values.contractType === ContractTypes.SERVICE}
+              handleChange={formik.handleChange}
+              helperTexts={[
+                'All contracts that are related to regular maintenance',
+                'These contracts have a fixed service cycle (e.g. 4 times per year)',
+                'The system will automatically create the related work orders',
+              ]}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <ContractTypeRadio
+              label="Non-maintenance contract"
+              name="contractType"
+              value={ContractTypes.NON_SERVICE}
+              checked={formik.values.contractType === ContractTypes.NON_SERVICE}
+              handleChange={formik.handleChange}
+              helperTexts={[
+                'These contracts are not related to maintenance, e.g. auto dialer systems',
+                'The contracts have specific invoice cycles, e.g. monthly',
+                'The invoices will be created automatically by the system',
+              ]}
+            />
+          </Grid>
+        </Grid>
       </Dialog>
     </>
   );

@@ -3,6 +3,7 @@ import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
 import Add from '@mui/icons-material/Add';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
@@ -23,6 +24,7 @@ interface Props {
 
 const validationSchema = Yup.object().shape({
   contractName: Yup.string().required('Contract name is required'),
+  contractType: Yup.string().required('Contract type is required'),
 });
 
 export const DefinedContractNames = ({company, containerStyles}: Props) => {
@@ -100,25 +102,44 @@ export const DefinedContractNames = ({company, containerStyles}: Props) => {
         onSave={() => formik.handleSubmit()}
         disableSaveBtn={!!Object.keys(formik.errors).length}
         dialogProps={{
-          maxWidth: 'xs',
+          maxWidth: 'md',
           open: openDialog || false,
+          sx: {border: '1px solid green'},
         }}>
         <ContractNameInput formik={formik} />
-        <ContractTypeRadio
-          label="Maintenance contract"
-          name="contractType"
-          value={ContractTypes.SERVICE}
-          checked={formik.values.contractType === ContractTypes.SERVICE}
-          handleChange={formik.handleChange}
-        />
-
-        <ContractTypeRadio
-          label="Non-maintenance contract"
-          name="contractType"
-          value={ContractTypes.NON_SERVICE}
-          checked={formik.values.contractType === ContractTypes.NON_SERVICE}
-          handleChange={formik.handleChange}
-        />
+        <Grid container sx={{mt: '0.5em'}} component="form" spacing={2}>
+          <Grid item xs={12}>
+            <Typography variant="subtitle2">Contract type</Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <ContractTypeRadio
+              label="Maintenance contract"
+              name="contractType"
+              value={ContractTypes.SERVICE}
+              checked={formik.values.contractType === ContractTypes.SERVICE}
+              handleChange={formik.handleChange}
+              helperTexts={[
+                'All contracts that are related to regular maintenance',
+                'These contracts have a fixed service cycle (e.g. 4 times per year)',
+                'The system will automatically create the related work orders',
+              ]}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <ContractTypeRadio
+              label="Non-maintenance contract"
+              name="contractType"
+              value={ContractTypes.NON_SERVICE}
+              checked={formik.values.contractType === ContractTypes.NON_SERVICE}
+              handleChange={formik.handleChange}
+              helperTexts={[
+                'These contracts are not related to maintenance, e.g. auto dialer systems',
+                'The contracts have specific invoice cycles, e.g. monthly',
+                'The invoices will be created automatically by the system',
+              ]}
+            />
+          </Grid>
+        </Grid>
       </Dialog>
     </>
   );
