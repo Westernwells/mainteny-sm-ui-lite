@@ -7,13 +7,9 @@ import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import {getColumnProps} from 'components/DataGridLayout';
 import {ServiceCompanyItem} from 'models/service-company';
-import {ContractTypes, ContractNameTypes} from 'models/contract';
+import {contractTypeMap} from 'utils/contract-utils';
+import {ContractNameTypes} from 'models/contract';
 import {Actions} from './Actions';
-
-const contractTypeMap = {
-  [ContractTypes.SERVICE]: 'Maintenance',
-  [ContractTypes.NON_SERVICE]: 'Non  maintence',
-};
 
 export const columns: GridColDef[] = [
   getColumnProps({

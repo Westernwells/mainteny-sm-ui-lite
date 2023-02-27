@@ -20,6 +20,7 @@ import {ContractStatus} from 'models/contract';
 import {capitalize} from 'lodash';
 
 interface Props {
+  name?: string;
   type?: string;
   numberOfVisits?: number;
   costPerYear?: string | number;
@@ -37,7 +38,7 @@ interface Props {
 
 export const ContractBasic = ({
   costPerYear,
-  type,
+  name,
   spendingLimit,
   invoiceDue,
   numberOfUnits,
@@ -49,6 +50,7 @@ export const ContractBasic = ({
   discount,
   hourlyRate,
   status,
+  type,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -68,7 +70,18 @@ export const ContractBasic = ({
       <Grid container rowGap={2}>
         <Grid item xs={4}>
           <CardProps
-            label="TYPE"
+            label="CONTRACT NAME"
+            bodyTextVariant="subtitle1"
+            icon={<CardTravelIcon color="info" />}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={convertToText(name || '-')}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <CardProps
+            label="CONTRACT TYPE"
             bodyTextVariant="subtitle1"
             icon={<CardTravelIcon color="info" />}
             iconBackground={theme.palette.info.outlinedHoverBg}

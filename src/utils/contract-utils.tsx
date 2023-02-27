@@ -1,3 +1,5 @@
+import {ContractTypes} from 'models/contract';
+
 export const costRangeConvertor = (
   selectedItems: string[],
   currencySymbol: string,
@@ -35,4 +37,9 @@ export const getStartEndPrice = (price: number[][]) => {
     Math.min(...(newPrice as number[])),
     Math.max(...(newPrice as number[])),
   ];
+};
+
+export const contractTypeMap = {
+  [ContractTypes.SERVICE]: 'Maintenance',
+  [ContractTypes.NON_SERVICE]: 'Non  maintence',
 };

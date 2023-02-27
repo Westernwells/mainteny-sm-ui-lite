@@ -25,20 +25,20 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
       <Grid item md={6}>
         <FormSelect
           labelId="typeSelect-label"
-          label="Contract Type"
+          label="Contract Name"
           options={(
-            user?.userAccount?.serviceCompany?.settings?.contractTypes ?? []
+            user?.userAccount?.serviceCompany?.settings?.contractNameTypes ?? []
           ).map((item) => ({
-            label: convertToText(item),
-            value: item,
+            label: item.name,
+            value: item.name,
           }))}
           selectProps={{
             id: 'typeSelect',
-            value: formik.values.type || '',
+            value: formik.values.name,
             onChange: formik.handleChange,
-            error: !!formik.errors.type,
-            placeholder: 'Select Contract type',
-            name: 'type',
+            error: !!formik.errors.name,
+            placeholder: 'Select contract name',
+            name: 'name',
           }}
           required
         />

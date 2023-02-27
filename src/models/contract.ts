@@ -106,7 +106,8 @@ export interface ContractView {
   id: string;
   propertyOwner: PropertyOwnerSimpleView;
   serviceCompany: ServiceCompanySimpleView;
-  type: string;
+  name: string;
+  type: ContractTypes;
   visitsNumber: number;
   number: number;
   externalId: string;
@@ -246,7 +247,8 @@ export interface ContractTermsFormModal {
 }
 
 export interface ContractUpdateRequest {
-  type: string;
+  type: ContractTypes;
+  name: string;
   price: number | string;
   invoiceDue: string;
   renewalTerms: number | string;
