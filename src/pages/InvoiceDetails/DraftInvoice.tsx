@@ -132,8 +132,21 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
         : values.dueDate;
 
     return createNewInvoice({
-      data: {...values, dueDate: dueDateToString},
+      data: {
+        ...values,
+        includeWorkReport: workReportGenerated
+          ? !!values.includeWorkReport
+          : false,
+        includeCheckList: checkListGenerated
+          ? !!values.includeCheckList
+          : false,
+        dueDate: dueDateToString,
+      },
     });
+
+    // return createNewInvoice({
+    //   data: {...values, dueDate: dueDateToString},
+    // });
   }
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
