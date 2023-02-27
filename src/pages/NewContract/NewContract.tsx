@@ -16,7 +16,6 @@ import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {amountRecordForBackend, useCurrentCurrency} from 'utils/currency';
 import {toRestDate} from 'utils/datetime';
-import {convertToMacro} from 'utils/utils';
 import * as Yup from 'yup';
 import NewContractBasicInfo from './NewContractBasicInfo';
 import NewContractDocuments from './NewContractDocuments';
@@ -55,7 +54,7 @@ const validationSchemaContractTerms = Yup.object().shape({
   visitsNumber: Yup.number()
     .nullable()
     .min(1, 'Should be higher than 0')
-    .required('Customer is required'),
+    .required('Visit number is required'),
   invoiceCycle: Yup.string().required('Invoice cycle is required'),
   netAmount: Yup.number()
     .nullable()
