@@ -34,7 +34,7 @@ const validationSchemaBasicInfo = Yup.object().shape({
   propertyOwnerId: Yup.string()
     .transform((id) => (id.length > 0 ? id : null))
     .required('Customer is required'),
-  contractType: Yup.string().required('Contract Type is required'),
+  name: Yup.string().required('Contract name is required'),
   startDate: Yup.date().nullable().required('Start Date is required'),
   endDate: Yup.date()
     .default(null)
@@ -56,10 +56,7 @@ const validationSchemaContractTerms = Yup.object().shape({
     .nullable()
     .min(1, 'Should be higher than 0')
     .required('Customer is required'),
-  invoiceDue: Yup.string()
-    .nullable()
-    .min(1, 'Input should be filled out')
-    .required('Customer is required'),
+  invoiceCycle: Yup.string().required('Invoice cycle is required'),
   netAmount: Yup.number()
     .nullable()
     .min(1, 'Should be higher than 0')
@@ -101,7 +98,7 @@ const NewContract = () => {
       propertyOwnerId: '',
       startDate: null,
       endDate: null,
-      contractType: '',
+      name: '',
     },
     validateOnMount: true,
 
@@ -119,7 +116,7 @@ const NewContract = () => {
   const formikContractTerms = useFormik<ContractTermsFormModal>({
     initialValues: {
       visitsNumber: '',
-      invoiceDue: '',
+      invoiceCycle: '',
       netAmount: '',
       renewalTerms: '',
       spendingLimit: '',
@@ -163,6 +160,10 @@ const NewContract = () => {
 
   const handleSubmit = async () => {
     const contractId = uuid;
+    const contractNameType =
+      user?.userAccount?.serviceCompany?.settings?.contractNameTypes.find(
+        (item) => item.name === formikBasicInfo.values.name,
+      );
 
     const uploadPath = `${serviceCompanyId}/contracts/${contractId}/documents`;
     const newContract = {
@@ -185,7 +186,7 @@ const NewContract = () => {
       elevators: formikUnits.values.elevators,
       endDate: toRestDate(formikBasicInfo.values.endDate!),
       hourlyRate: +formikContractTerms.values.hourlyRate,
-      invoiceDue: convertToMacro(formikContractTerms.values.invoiceDue),
+      invoiceCycle: formikContractTerms.values.invoiceCycle,
       price: amountRecordForBackend({
         currency: currentCurrency.code,
         netAmount: +formikContractTerms.values.netAmount,
@@ -198,7 +199,8 @@ const NewContract = () => {
       serviceCompanyId,
       spendingLimit: +formikContractTerms.values.spendingLimit,
       startDate: toRestDate(formikBasicInfo.values.startDate!),
-      type: formikBasicInfo.values.contractType,
+      name: contractNameType?.name,
+      type: contractNameType?.type,
       visitsNumber: +formikContractTerms.values.visitsNumber,
       timePreference: [],
     };

@@ -4,10 +4,9 @@ import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
 import {ContractTermsFormModal} from 'models/contract';
-import {InvoiceDueType} from 'models/invoice';
-import React, {FC} from 'react';
+import {FC} from 'react';
 import {useCurrentCurrency} from 'utils/currency';
-import {convertToText} from 'utils/utils';
+import {invoiceCycle} from 'utils/contract-utils';
 
 interface Props {
   formik: FormikProps<ContractTermsFormModal>;
@@ -35,20 +34,23 @@ const NewContractTerms: FC<Props> = ({formik}) => {
           }}
         />
       </Grid>
+
       <Grid item xs={4}>
         <FormSelect
           labelId="invoiceDueSelect-label"
-          label="Invoice Due"
-          options={Object.keys(InvoiceDueType).map((item) => ({
-            label: convertToText(item),
-            value: convertToText(item),
+          label="Invoice Cycle"
+          options={Object.keys(invoiceCycle).map((key) => ({
+            label: invoiceCycle[key],
+            value: key,
           }))}
           selectProps={{
             id: 'invoiceDueSelect',
-            value: formik.values.invoiceDue,
+            value: formik.values.invoiceCycle,
             onChange: formik.handleChange,
-            error: !!(formik.touched.invoiceDue && formik.errors.invoiceDue),
-            name: 'invoiceDue',
+            error: !!(
+              formik.touched.invoiceCycle && formik.errors.invoiceCycle
+            ),
+            name: 'invoiceCycle',
             placeholder: 'Yearly',
           }}
           required

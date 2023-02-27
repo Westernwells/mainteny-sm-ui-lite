@@ -26,7 +26,7 @@ interface Props {
   costPerYear?: string | number;
   spendingLimit?: string;
   renewalPeriod?: number;
-  invoiceDue?: string;
+  invoiceCycle?: string;
   numberOfUnits?: number;
   paymentDue?: number;
   yearlyPriceAdjustment?: number;
@@ -40,7 +40,7 @@ export const ContractBasic = ({
   costPerYear,
   name,
   spendingLimit,
-  invoiceDue,
+  invoiceCycle,
   numberOfUnits,
   numberOfVisits,
   renewalPeriod,
@@ -141,13 +141,13 @@ export const ContractBasic = ({
         </Grid>
         <Grid item xs={4}>
           <CardProps
-            label="INVOICE DUE"
+            label="INVOICE CYCLE"
             bodyTextVariant="subtitle1"
             icon={<WysiwygIcon color="info" />}
             containerStyles={{mr: '0.5em'}}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3rem"
-            bodyText={typeof invoiceDue === 'string' ? t(invoiceDue) : '-'}
+            bodyText={typeof invoiceCycle === 'string' ? t(invoiceCycle) : '-'}
           />
         </Grid>
         <Grid item xs={4}>

@@ -6,10 +6,9 @@ import {FormInput} from 'components/form/FormInput';
 import {ContractUpdateRequest} from 'models/contract';
 import {FormikProps} from 'formik';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {convertToText} from 'utils/utils';
-import {InvoiceDueType} from 'models/invoice';
 import {FormSelect} from 'components/form/FormSelect';
 import {getCurrencySymbol} from 'utils/currency';
+import {invoiceCycle} from 'utils/contract-utils';
 
 interface Props {
   formik: FormikProps<ContractUpdateRequest>;
@@ -126,17 +125,19 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
       <Grid item md={6}>
         <FormSelect
           labelId="invoiceDueSelect-label"
-          label="Invoice Due"
-          options={Object.keys(InvoiceDueType).map((item) => ({
-            label: convertToText(item),
-            value: convertToText(item),
+          label="Invoice Cycle"
+          options={Object.keys(invoiceCycle).map((key) => ({
+            label: invoiceCycle[key],
+            value: key,
           }))}
           selectProps={{
-            id: 'invoiceDueSelect',
-            value: convertToText(formik.values.invoiceDue || ''),
+            id: 'invoiceCycleSelect',
+            value: formik.values.invoiceCycle
+              ? formik.values.invoiceCycle.toString()
+              : '',
             onChange: formik.handleChange,
-            error: !!formik.errors.invoiceDue,
-            name: 'invoiceDue',
+            error: !!formik.errors.invoiceCycle,
+            name: 'invoiceCycle',
           }}
           required
         />

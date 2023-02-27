@@ -37,7 +37,7 @@ import {convertToMacro, convertToText} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {contractTypeMap} from 'utils/contract-utils';
+import {contractTypeMap, invoiceCycle} from 'utils/contract-utils';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
@@ -87,7 +87,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       price: contractDetails?.additionalInfo?.price
         ? amountForView(contractDetails?.additionalInfo?.price).netAmount
         : '',
-      invoiceDue: contractDetails?.additionalInfo?.invoiceDue!,
+      invoiceCycle: contractDetails?.additionalInfo?.invoiceCycle!,
       renewalTerms: contractDetails?.additionalInfo?.renewalTerms || '',
       visitsNumber: contractDetails?.visitsNumber || '',
       spendingLimit: contractDetails?.spendingLimit || '',
@@ -125,7 +125,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             user?.userAccount.serviceCompany.settings.percentageVat || 0,
         }),
       },
-      invoiceDue: convertToMacro(formik.values.invoiceDue || ''),
+      invoiceCycle: formik.values.invoiceCycle || '',
       visitsNumber: +formik.values.visitsNumber,
       spendingLimit: +formik.values.spendingLimit,
       hourlyRate: formik.values.hourlyRate || '',
@@ -239,8 +239,10 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 {currency},
               )}
               renewalPeriod={contractDetails?.additionalInfo?.renewalTerms}
-              invoiceDue={convertToText(
-                contractDetails?.additionalInfo?.invoiceDue || '',
+              invoiceCycle={convertToText(
+                contractDetails?.additionalInfo?.invoiceCycle
+                  ? invoiceCycle[contractDetails?.additionalInfo?.invoiceCycle]
+                  : '',
               )}
               numberOfUnits={contractDetails?.elevators?.length}
               type={contractTypeMap[contractDetails?.type]}

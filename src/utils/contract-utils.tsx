@@ -43,3 +43,13 @@ export const contractTypeMap = {
   [ContractTypes.SERVICE]: 'Maintenance',
   [ContractTypes.NON_SERVICE]: 'Non  maintence',
 };
+
+export const invoiceCycle: {[key: string]: string} = {
+  '0': 'Afer each visit',
+  '1': '1 month',
+  '2': '2 months',
+  '3': '3 months',
+  '4': '4 months',
+  '6': '6 months',
+  '12': '12 months',
+};
