@@ -53,6 +53,7 @@ export const queryKeys = {
   fetchWorkHours: 'fetchWorkHours',
   queryTodos: 'queryTodos',
   fetchServiceOrderInvoices: 'fetchServiceOrderInvoices',
+  fetchElevatorInvoices: 'fetchElevatorInvoices',
   fetchServiceOrderArticles: 'fetchServiceOrderArticles',
   queryAppointmentConfirmationRequiredOrders:
     'queryAppointmentConfirmationRequiredOrders',
