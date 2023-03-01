@@ -20,12 +20,13 @@ import {ContractStatus} from 'models/contract';
 import {capitalize} from 'lodash';
 
 interface Props {
+  name?: string;
   type?: string;
   numberOfVisits?: number;
   costPerYear?: string | number;
   spendingLimit?: string;
   renewalPeriod?: number;
-  invoiceDue?: string;
+  invoiceCycle?: string;
   numberOfUnits?: number;
   paymentDue?: number;
   yearlyPriceAdjustment?: number;
@@ -37,9 +38,9 @@ interface Props {
 
 export const ContractBasic = ({
   costPerYear,
-  type,
+  name,
   spendingLimit,
-  invoiceDue,
+  invoiceCycle,
   numberOfUnits,
   numberOfVisits,
   renewalPeriod,
@@ -49,6 +50,7 @@ export const ContractBasic = ({
   discount,
   hourlyRate,
   status,
+  type,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -68,7 +70,18 @@ export const ContractBasic = ({
       <Grid container rowGap={2}>
         <Grid item xs={4}>
           <CardProps
-            label="TYPE"
+            label="CONTRACT NAME"
+            bodyTextVariant="subtitle1"
+            icon={<CardTravelIcon color="info" />}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={convertToText(name || '-')}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <CardProps
+            label="CONTRACT TYPE"
             bodyTextVariant="subtitle1"
             icon={<CardTravelIcon color="info" />}
             iconBackground={theme.palette.info.outlinedHoverBg}
@@ -128,13 +141,13 @@ export const ContractBasic = ({
         </Grid>
         <Grid item xs={4}>
           <CardProps
-            label="INVOICE DUE"
+            label="INVOICE CYCLE"
             bodyTextVariant="subtitle1"
             icon={<WysiwygIcon color="info" />}
             containerStyles={{mr: '0.5em'}}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3rem"
-            bodyText={typeof invoiceDue === 'string' ? t(invoiceDue) : '-'}
+            bodyText={typeof invoiceCycle === 'string' ? t(invoiceCycle) : '-'}
           />
         </Grid>
         <Grid item xs={4}>

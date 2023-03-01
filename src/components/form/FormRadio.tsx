@@ -12,6 +12,7 @@ interface Props {
   name?: string;
   radioProps?: RadioProps;
   labelProps?: SxProps;
+  formControlLabelStyles?: {[key: string]: any};
 }
 
 export const FormRadio = ({
@@ -23,9 +24,11 @@ export const FormRadio = ({
   name,
   radioProps,
   labelProps,
+  formControlLabelStyles,
 }: Props) => (
   <FormControlLabel
     value={value}
+    sx={formControlLabelStyles}
     control={
       <Radio
         value={value}

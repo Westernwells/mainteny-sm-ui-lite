@@ -1183,6 +1183,15 @@ export const germany = {
     'Contract name': 'Vertragsname',
     'No Signature': 'Keine Unterschrift',
     'Send Checklist': 'Checkliste senden',
+    'Maintenance contract': 'Maintenance contract',
+    'Contract type': 'Contract type',
+    'Non-maintenance contract': 'Non-maintenance contract',
+    'All contracts that are related to regular maintenance':
+      'All contracts that are related to regular maintenance',
+    'These contracts have a fixed service cycle (e.g. 4 times per year)':
+      'These contracts have a fixed service cycle (e.g. 4 times per year)',
+    'The system will automatically create the related work orders':
+      'The system will automatically create the related work orders',
   },
 };
 

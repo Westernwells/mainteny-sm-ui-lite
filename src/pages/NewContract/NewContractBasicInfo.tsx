@@ -6,8 +6,7 @@ import {FormikProps} from 'formik';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {ContractBasicInfoFormModel} from 'models/contract';
 import {PropertyOwnerView} from 'models/propertyManager';
-import React, {FC, useEffect, useState} from 'react';
-import {convertToText} from 'utils/utils';
+import {FC, useEffect, useState} from 'react';
 
 interface Props {
   formik: FormikProps<ContractBasicInfoFormModel>;
@@ -105,18 +104,18 @@ const NewContractBasicInfo: FC<Props> = ({
       <Grid item xs={4}>
         <FormSelect
           labelId="contractTypeSelect-label"
-          label="Contract Type"
+          label="Contract Name"
           options={(
-            user?.userAccount?.serviceCompany?.settings?.contractTypes ?? []
-          ).map((key) => ({
-            label: convertToText(key),
-            value: key,
+            user?.userAccount?.serviceCompany?.settings?.contractNameTypes ?? []
+          ).map((item) => ({
+            label: item.name,
+            value: item.name,
           }))}
           selectProps={{
             id: 'contractTypeSelect',
-            value: formik.values.contractType,
+            value: formik.values.name,
             onChange: formik.handleChange,
-            name: 'contractType',
+            name: 'name',
             onBlur: formik.handleBlur,
           }}
           required

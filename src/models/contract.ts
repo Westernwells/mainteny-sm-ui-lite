@@ -16,6 +16,16 @@ export enum ContractOrderField {
   CREATED_TIME = 'CREATED_TIME',
 }
 
+export enum ContractTypes {
+  SERVICE = 'SERVICE',
+  NON_SERVICE = 'NON_SERVICE',
+}
+
+export interface ContractNameTypes {
+  name: string;
+  type: ContractTypes;
+}
+
 export interface ContractTimeWindow {
   id: string;
   contractId: string;
@@ -61,7 +71,7 @@ export interface QueryContractParams {
   priceEnd: number;
 }
 
-export enum InvoiceDueType {
+export enum InvoiceCyle {
   YEARLY = 'YEARLY',
   HALF_YEARLY = 'HALF_YEARLY',
   QUARTERLY = 'QUARTERLY',
@@ -77,7 +87,7 @@ export interface ContractAdditionalInfo {
   renewalTerms?: number;
   price?: Amount;
   annualPriceAdjustmentPercentage?: number;
-  invoiceDue?: InvoiceDueType;
+  invoiceCycle?: number;
   documents?: FileResource[];
   scope?: string[];
   noticePeriodInMonth?: number;
@@ -96,7 +106,8 @@ export interface ContractView {
   id: string;
   propertyOwner: PropertyOwnerSimpleView;
   serviceCompany: ServiceCompanySimpleView;
-  type: string;
+  name: string;
+  type: ContractTypes;
   visitsNumber: number;
   number: number;
   externalId: string;
@@ -221,12 +232,12 @@ export interface ContractBasicInfoFormModel {
   propertyOwnerId: string;
   startDate: Date | null;
   endDate: Date | null;
-  contractType: string;
+  name: string;
 }
 
 export interface ContractTermsFormModal {
   visitsNumber: number | string;
-  invoiceDue: string;
+  invoiceCycle: string;
   netAmount: number | string;
   renewalTerms: number | string;
   spendingLimit: number | string;
@@ -236,9 +247,10 @@ export interface ContractTermsFormModal {
 }
 
 export interface ContractUpdateRequest {
-  type: string;
+  type: ContractTypes;
+  name: string;
   price: number | string;
-  invoiceDue: string;
+  invoiceCycle: number;
   renewalTerms: number | string;
   visitsNumber: number | string;
   spendingLimit: number | string;

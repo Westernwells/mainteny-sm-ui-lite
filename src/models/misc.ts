@@ -4,6 +4,7 @@ import {UseMutationResult} from 'react-query';
 import {number} from 'yup';
 import {GetState, SetState} from 'zustand';
 import {UserAccountSimpleView} from './user';
+import {ContractTypes, ContractNameTypes} from './contract';
 
 export interface RestError {
   errorCode: number;
@@ -53,7 +54,8 @@ export interface Settings {
     logoPath: string;
   };
   currencies: Currency[];
-  contractTypes: string[];
+  contractTypes: ContractTypes;
+  contractNameTypes: ContractNameTypes[];
 }
 
 export interface Page {

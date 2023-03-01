@@ -1,3 +1,4 @@
+import {ContractTypes, ContractNameTypes} from 'models/contract';
 import {
   Address,
   AddressRecord,
@@ -147,6 +148,7 @@ export interface ServiceCompanyUpdateBody {
     logoPath?: string;
   };
   contractTypes?: string[];
+  contractNameTypes?: ContractNameTypes[];
 }
 
 export interface SystemSettingsUpdateBody {
