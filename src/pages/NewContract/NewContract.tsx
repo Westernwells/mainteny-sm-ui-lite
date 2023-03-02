@@ -202,6 +202,8 @@ const NewContract = () => {
       type: contractNameType?.type,
       visitsNumber: +formikContractTerms.values.visitsNumber,
       timePreference: [],
+      firstMaintenance: formikContractTerms.values.firstMaintenance,
+      firstInvoiceDate: formikContractTerms.values.firstInvoiceDate,
     };
 
     await createContract(newContract);

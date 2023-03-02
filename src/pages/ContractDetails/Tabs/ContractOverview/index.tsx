@@ -33,7 +33,7 @@ import {
   formatNetAmount,
   useCurrentCurrency,
 } from 'utils/currency';
-import {convertToMacro, convertToText} from 'utils/utils';
+import {convertToText} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';

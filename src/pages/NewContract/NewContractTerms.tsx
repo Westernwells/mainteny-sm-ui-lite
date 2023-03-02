@@ -7,6 +7,8 @@ import {ContractTermsFormModal} from 'models/contract';
 import {FC} from 'react';
 import {useCurrentCurrency} from 'utils/currency';
 import {invoiceCycle} from 'utils/contract-utils';
+import {DatePicker} from 'components/DatePicker';
+import {format, getMonth, getYear, toDate} from 'date-fns';
 
 interface Props {
   formik: FormikProps<ContractTermsFormModal>;
@@ -180,6 +182,66 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             ),
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
+          }}
+        />
+      </Grid>
+
+      <Grid item md={4}>
+        <DatePicker
+          dateFormat="MMM yyyy"
+          disableMask
+          containerStyles={{mr: '1em', width: '100%'}}
+          getSelectedDate={(date) => {
+            if (date) {
+              formik.setValues({
+                ...formik.values,
+                firstMaintenance: {
+                  year: getYear(date),
+                  month: getMonth(date),
+                },
+              });
+            }
+          }}
+          textFieldProps={{
+            label: t('First maintenance visit'),
+            name: 'firstMaintenance',
+            helperText:
+              formik.errors.firstMaintenance && formik.touched.firstMaintenance
+                ? formik.errors.firstMaintenance
+                : '',
+            error: !!(
+              formik.touched.firstMaintenance && formik.errors.firstMaintenance
+            ),
+            sx: {width: '100%'},
+            onBlur: formik.handleBlur,
+          }}
+        />
+      </Grid>
+
+      <Grid item md={4}>
+        <DatePicker
+          containerStyles={{mr: '1em', width: '100%'}}
+          getSelectedDate={(date) => {
+            if (date) {
+              formik.setValues({
+                ...formik.values,
+                firstInvoiceDate: format(date, 'yyyy-MM-dd'),
+              });
+            }
+          }}
+          disableMask
+          textFieldProps={{
+            label: t('First invoice'),
+            name: 'firstInvoiceDate',
+            helperText:
+              formik.errors.firstInvoiceDate && formik.touched.firstInvoiceDate
+                ? formik.errors.firstInvoiceDate
+                : '',
+            error: !!(
+              formik.touched.firstInvoiceDate && formik.errors.firstInvoiceDate
+            ),
+            sx: {width: '100%'},
+            onBlur: formik.handleBlur,
           }}
         />
       </Grid>

@@ -250,13 +250,15 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
           disableMask
           containerStyles={{mr: '1em', width: '100%'}}
           getSelectedDate={(date) => {
-            formik.setValues({
-              ...formik.values,
-              firstMaintenance: {
-                year: getYear(date!),
-                month: getMonth(date!),
-              },
-            });
+            if (date) {
+              formik.setValues({
+                ...formik.values,
+                firstMaintenance: {
+                  year: getYear(date),
+                  month: getMonth(date),
+                },
+              });
+            }
           }}
           textFieldProps={{
             label: t('First maintenance visit'),
@@ -282,10 +284,12 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
           }
           containerStyles={{mr: '1em', width: '100%'}}
           getSelectedDate={(date) => {
-            formik.setValues({
-              ...formik.values,
-              firstInvoiceDate: format(date!, 'yyyy-MM-dd'),
-            });
+            if (date) {
+              formik.setValues({
+                ...formik.values,
+                firstInvoiceDate: format(date, 'yyyy-MM-dd'),
+              });
+            }
           }}
           disableMask
           textFieldProps={{

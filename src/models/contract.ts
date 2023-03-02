@@ -250,6 +250,8 @@ export interface ContractTermsFormModal {
   hourlyRate: number | string;
   annualPriceAdjustmentPercentage: number | string;
   serviceLevelAgreement: number | string;
+  firstMaintenance?: FirstMaintenance;
+  firstInvoiceDate?: string;
 }
 
 export interface ContractUpdateRequest {

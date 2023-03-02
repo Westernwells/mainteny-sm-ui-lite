@@ -242,6 +242,7 @@ export const ContractBasic = ({
               firstMaintenance
                 ? `${formatDate(
                     new Date(firstMaintenance.year, firstMaintenance.month),
+                    'MMM yyyy',
                   )}`
                 : '-'
             }
