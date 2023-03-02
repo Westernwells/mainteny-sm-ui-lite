@@ -130,7 +130,11 @@ export const postPublishInvoice = async (
   await axiosClient.post<{value: string}>(`api/invoices/${id}/publish`, body);
 };
 
-export const usePublishInvoice = () => {
+export const usePublishInvoice = ({
+  shouldNavigate = true,
+}: {
+  shouldNavigate?: boolean;
+} = {}) => {
   const queryClient = useQueryClient();
   const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
@@ -146,7 +150,9 @@ export const usePublishInvoice = () => {
         enqueueSnackbar(`Invoice sent successfully`, {
           variant: 'success',
         });
-        navigate(`/invoices/details/${id}`);
+        if (shouldNavigate) {
+          navigate(`/invoices/details/${id}`);
+        }
       },
       onError: (err) => {
         console.log(err);

@@ -38,6 +38,7 @@ import {
 } from 'utils/service-order-utils';
 import {Confirm} from 'components/Confirm';
 import {SendEmailDialog} from 'components/SendEmailDialog';
+import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {Notes} from './Notes';
 import {InvoiceActivities} from './InvoiceActivities';
@@ -62,8 +63,13 @@ export const ViewInvoice = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
+    useState(false);
   const {mutate: markAsPaid} = useInvoicePaymentStatus();
   const {mutate: deleteInvoice} = useDeleteInvoice();
+  const {mutateAsync: publishInvoice} = usePublishInvoice({
+    shouldNavigate: false,
+  });
 
   const isInvoicePDFGenerated =
     invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
@@ -84,13 +90,7 @@ export const ViewInvoice = ({
       items.unshift({
         label: t('Print'),
         icon: <Print />,
-        onClick: () =>
-          downloadUrl &&
-          printJS({
-            printable: downloadUrl,
-            type: 'pdf',
-            showModal: true,
-          }),
+        onClick: () => setIsConfirmPrintDialogOpen(true),
       });
     } else if (invoice.status === InvoiceStatus.NOT_PAID) {
       items.unshift({
@@ -121,6 +121,31 @@ export const ViewInvoice = ({
     }
     return items;
   }, [downloadUrl]);
+
+  const onPrintInvoice = async () => {
+    await publishInvoice(
+      {
+        id: invoice.id,
+        body: {
+          email: '',
+          subject: '',
+          content: '',
+        },
+      },
+      {
+        onSuccess: () => {
+          setIsConfirmPrintDialogOpen(false);
+          if (downloadUrl) {
+            printJS({
+              printable: downloadUrl,
+              type: 'pdf',
+              showModal: true,
+            });
+          }
+        },
+      },
+    );
+  };
 
   return (
     <Box>
@@ -348,6 +373,11 @@ export const ViewInvoice = ({
         title="Delete Invoice"
         content="Do you want to delete this Invoice?"
         helperText="This action is irreversible."
+      />
+      <ConfirmPrintInvoice
+        open={isConfirmPrintDialogOpen}
+        onConfirm={onPrintInvoice}
+        onClose={() => setIsConfirmPrintDialogOpen(false)}
       />
     </Box>
   );
