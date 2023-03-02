@@ -21,6 +21,9 @@ interface Props {
   reset?: boolean;
   getReset?: (reset: boolean) => void;
   required?: boolean;
+  dateFormat?: string;
+  mask?: string;
+  disableMask?: boolean;
 }
 
 export const DatePicker = ({
@@ -34,11 +37,15 @@ export const DatePicker = ({
   reset = false,
   getReset = () => {},
   required,
+  dateFormat,
+  mask = '__.__.____"',
+  disableMask,
 }: Props) => {
   const {user} = useUserSession();
   const language = user?.userAccount.serviceCompany.language;
   const locale = mapLanguageToLocale[language!];
   const [value, setValue] = useState<Date | null>(defaultDate);
+  // const format = user?.userAccount.serviceCompany.settings.dateFormat || dateFormat
 
   useEffect(() => {
     setValue(defaultDate);
@@ -63,9 +70,10 @@ export const DatePicker = ({
         adapterLocale={locales[locale]}>
         <MuiDatePicker
           inputFormat={
-            user?.userAccount.serviceCompany.settings.dateFormat || 'dd.MM.yyyy'
+            dateFormat || user?.userAccount.serviceCompany.settings.dateFormat
           }
-          mask="__.__.____"
+          mask={mask}
+          disableMaskedInput={disableMask}
           value={value}
           minDate={minDate}
           maxDate={maxDate}

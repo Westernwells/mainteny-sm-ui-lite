@@ -16,8 +16,10 @@ import TrendingUp from '@mui/icons-material/TrendingUp';
 import DateRange from '@mui/icons-material/DateRange';
 import MoneyOff from '@mui/icons-material/MoneyOff';
 import Timer from '@mui/icons-material/Timer';
-import {ContractStatus} from 'models/contract';
+import {ContractStatus, FirstMaintenance} from 'models/contract';
 import {capitalize} from 'lodash';
+import {useFormatDate} from 'hooks/useFormatDate';
+import {toDate} from 'utils/datetime';
 
 interface Props {
   name?: string;
@@ -34,6 +36,8 @@ interface Props {
   discount?: string[];
   hourlyRate?: string;
   status?: ContractStatus;
+  firstMaintenance?: FirstMaintenance;
+  firstInvoiceDate?: string;
 }
 
 export const ContractBasic = ({
@@ -51,9 +55,13 @@ export const ContractBasic = ({
   hourlyRate,
   status,
   type,
+  firstMaintenance,
+  firstInvoiceDate,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
+  const formatDate = useFormatDate();
+
   return (
     <>
       <StatusChip
@@ -219,6 +227,39 @@ export const ContractBasic = ({
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3rem"
             bodyText={hourlyRate ? `${hourlyRate}` : '-'}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <CardProps
+            label="FIRST MAINTENANCE VISIT"
+            bodyTextVariant="subtitle1"
+            icon={<CalendarToday color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={
+              firstMaintenance
+                ? `${formatDate(
+                    new Date(firstMaintenance.year, firstMaintenance.month),
+                  )}`
+                : '-'
+            }
+          />
+        </Grid>
+        {console.log()}
+
+        <Grid item xs={4}>
+          <CardProps
+            label="FIRST INVOICE"
+            bodyTextVariant="subtitle1"
+            icon={<CalendarToday color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={
+              firstInvoiceDate ? `${formatDate(toDate(firstInvoiceDate))}` : '-'
+            }
           />
         </Grid>
       </Grid>
