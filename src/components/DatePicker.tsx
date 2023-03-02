@@ -45,7 +45,6 @@ export const DatePicker = ({
   const language = user?.userAccount.serviceCompany.language;
   const locale = mapLanguageToLocale[language!];
   const [value, setValue] = useState<Date | null>(defaultDate);
-  // const format = user?.userAccount.serviceCompany.settings.dateFormat || dateFormat
 
   useEffect(() => {
     setValue(defaultDate);
