@@ -2,9 +2,11 @@ import {useContext, useLayoutEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import EngineeringOutlinedIcon from '@mui/icons-material/EngineeringOutlined';
+import PaymentsIcon from '@mui/icons-material/Payments';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import ListIcon from '@mui/icons-material/ListAlt';
 import Delete from '@mui/icons-material/Delete';
+import {Invoices} from 'pages/Invoices';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import {Confirm} from 'components/Confirm';
@@ -28,6 +30,10 @@ const tabItems = [
   {
     label: 'Service Orders',
     icon: <EngineeringOutlinedIcon />,
+  },
+  {
+    label: 'Invoice history',
+    icon: <PaymentsIcon />,
   },
   {
     label: 'Performance',
@@ -76,10 +82,14 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
         </TabsBody>
 
         <TabsBody value={value} index={2}>
-          <PerformanceTab />
+          <Invoices elevatorId={elevatorId} />
         </TabsBody>
 
         <TabsBody value={value} index={3}>
+          <PerformanceTab />
+        </TabsBody>
+
+        <TabsBody value={value} index={4}>
           <TodosTab />
         </TabsBody>
       </Tabs>

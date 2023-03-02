@@ -593,3 +593,28 @@ export const useInvoiceActivities = (
     },
   );
 };
+
+const fetchElevatorInvoices = async (
+  elevatorId: string,
+  params: QueryInvoiceParams,
+): Promise<Resource<InvoiceView>> => {
+  const response = await axiosClient.get<Resource<InvoiceView>>(
+    `/api/elevators/${elevatorId}/invoices`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useElevatorInvoices = (
+  elevatorId: string,
+  params: QueryInvoiceParams,
+  options?: UseQueryOptions<any, any, any>,
+) =>
+  useQuery<Resource<InvoiceView>, RestError>(
+    [queryKeys.fetchElevatorInvoices, elevatorId, params],
+    () => fetchElevatorInvoices(elevatorId, params),
+    {enabled: !!elevatorId, ...options},
+  );

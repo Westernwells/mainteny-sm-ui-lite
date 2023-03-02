@@ -4,7 +4,7 @@ import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
-import {useInvoices} from 'hooks/reactQuery/useInvoice';
+import {useElevatorInvoices, useInvoices} from 'hooks/reactQuery/useInvoice';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {
   formatSearchParamsPageIndex,
@@ -29,7 +29,7 @@ import {Widget} from '../../components/Widget';
 
 const pageSize = 25;
 
-export const Invoices = () => {
+export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
@@ -49,11 +49,11 @@ export const Invoices = () => {
   );
 
   const {
-    data: invoiceResource = createEmptyResource<InvoiceView>(10),
-    isLoading,
-    isFetching,
-    isFetched,
-    isIdle,
+    data: allInvoiceResource = createEmptyResource<InvoiceView>(10),
+    isLoading: isLoadingAllInvoiceResource,
+    isFetching: isFetchingAllInvoiceResource,
+    isFetched: isFetchedAllInvoiceResource,
+    isIdle: isIdleAllInvoiceResource,
   } = useInvoices(
     {
       pageIndex: page.pageIndex,
@@ -65,6 +65,41 @@ export const Invoices = () => {
     },
     {keepPreviousData: true},
   );
+
+  const {
+    data: elevatorInvoiceResource = createEmptyResource<InvoiceView>(10),
+    isLoading: isLoadingElevatorInvoiceResource,
+    isFetching: isFetchingElevatorInvoiceResource,
+    isFetched: isFetchedElevatorInvoiceResource,
+    isIdle: isIdleElevatorInvoiceResource,
+  } = useElevatorInvoices(
+    elevatorId ?? '',
+    {
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+      query: search,
+      status: status ? [status] : [],
+      totalAmountFrom,
+      totalAmountTo,
+    },
+    {keepPreviousData: true},
+  );
+
+  const {invoiceResource, isLoading, isFetching, isFetched, isIdle} = elevatorId
+    ? {
+        invoiceResource: elevatorInvoiceResource,
+        isLoading: isLoadingElevatorInvoiceResource,
+        isFetching: isFetchingElevatorInvoiceResource,
+        isFetched: isFetchedElevatorInvoiceResource,
+        isIdle: isIdleElevatorInvoiceResource,
+      }
+    : {
+        invoiceResource: allInvoiceResource,
+        isLoading: isLoadingAllInvoiceResource,
+        isFetching: isFetchingAllInvoiceResource,
+        isFetched: isFetchedAllInvoiceResource,
+        isIdle: isIdleAllInvoiceResource,
+      };
 
   totalInvoiceRef.current = totalInvoiceRef.current || invoiceResource.total;
 
@@ -166,7 +201,7 @@ export const Invoices = () => {
         <Widget
           searchPlaceholder="Search by number, customer, service type etc."
           getSearchValue={(val: string) => setSearch(val)}
-          showActionBtn
+          showActionBtn={!elevatorId}
           refInput={textInput}
           btnLabel="New Invoice"
           btnOnClick={navigateToNewInvoice}
