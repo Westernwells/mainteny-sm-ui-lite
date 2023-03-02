@@ -80,6 +80,7 @@ export enum ErrorCode {
   NOT_COMPLETE_SERVICE_ORDER = 4003,
   MULTIPLE_CURRENCY_FOUND = 4005,
   DOCUMENT_NOT_READY = 4006,
+  INVALID_NON_SERVICE_CONTRACT_INVOICE_CYCLE = 3037,
 }
 
 export enum ErrorMessage {
@@ -161,4 +162,5 @@ export enum ErrorMessage {
   NOT_COMPLETE_SERVICE_ORDER = 'There are some service orders not complete',
   MULTIPLE_CURRENCY_FOUND = 'Multiple currency found',
   DOCUMENT_NOT_READY = 'Document not ready',
+  INVALID_NON_SERVICE_CONTRACT_INVOICE_CYCLE = 'The invoice cycle should not be "After each visit" for Non-maintenance contract',
 }

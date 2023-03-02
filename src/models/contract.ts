@@ -82,6 +82,10 @@ export interface ContractDiscount {
   days: number;
   discountPercentage: number;
 }
+export interface FirstMaintenance {
+  year: number;
+  month: number;
+}
 
 export interface ContractAdditionalInfo {
   renewalTerms?: number;
@@ -93,6 +97,8 @@ export interface ContractAdditionalInfo {
   noticePeriodInMonth?: number;
   invoiceDueDays?: number;
   discounts?: ContractDiscount[];
+  firstMaintenance: FirstMaintenance;
+  firstInvoiceDate: string;
 }
 
 export interface ContractElevatorSimpleView {
@@ -244,6 +250,8 @@ export interface ContractTermsFormModal {
   hourlyRate: number | string;
   annualPriceAdjustmentPercentage: number | string;
   serviceLevelAgreement: number | string;
+  firstMaintenance?: FirstMaintenance;
+  firstInvoiceDate?: string;
 }
 
 export interface ContractUpdateRequest {
@@ -259,4 +267,6 @@ export interface ContractUpdateRequest {
   discounts?: number;
   noticePeriodInMonth?: number;
   hourlyRate?: number;
+  firstMaintenance?: FirstMaintenance;
+  firstInvoiceDate?: string;
 }

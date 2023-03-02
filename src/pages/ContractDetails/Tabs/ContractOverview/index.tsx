@@ -33,7 +33,7 @@ import {
   formatNetAmount,
   useCurrentCurrency,
 } from 'utils/currency';
-import {convertToMacro, convertToText} from 'utils/utils';
+import {convertToText} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
@@ -100,6 +100,8 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
         contractDetails?.additionalInfo?.discounts &&
         contractDetails?.additionalInfo?.discounts[0].days,
       noticePeriodInMonth: contractDetails?.additionalInfo?.noticePeriodInMonth,
+      firstMaintenance: contractDetails?.additionalInfo?.firstMaintenance,
+      firstInvoiceDate: contractDetails?.additionalInfo?.firstInvoiceDate,
     },
     onSubmit: () => {},
     enableReinitialize: true,
@@ -139,6 +141,8 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
         {days: 14, discountPercentage: formik.values.discounts},
       ],
       noticePeriodInMonth: formik.values.noticePeriodInMonth,
+      firstMaintenance: formik.values.firstMaintenance,
+      firstInvoiceDate: formik.values.firstInvoiceDate,
     };
 
     await updateContract({
@@ -228,6 +232,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               </Box>
             }
             headerActionIcon={<EditIcon />}>
+            {/** TODO: Pass down the full contract instead of long props */}
             <ContractBasic
               status={contractDetails?.status}
               numberOfVisits={contractDetails?.visitsNumber}
@@ -262,6 +267,8 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 contractDetails ? contractDetails.hourlyRate : 0,
                 {currency},
               )}
+              firstMaintenance={contractDetails.additionalInfo.firstMaintenance}
+              firstInvoiceDate={contractDetails.additionalInfo.firstInvoiceDate}
             />
             <Dialog
               title="Edit Contract"
