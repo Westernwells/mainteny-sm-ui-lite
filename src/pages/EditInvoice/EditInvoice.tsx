@@ -53,7 +53,6 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useServiceOrderWorkReport} from 'hooks/reactQuery/useServiceOrder';
 import {convertToText} from 'utils/utils';
 import {addYears} from 'date-fns';
-import Tooltip from '@mui/material/Tooltip';
 import {InvoiceCheckbox} from 'pages/InvoiceDetails/InvoiceCheckbox';
 
 interface Props {

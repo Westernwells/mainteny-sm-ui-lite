@@ -21,7 +21,10 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
     phone: customer.contact.phone.split('+')[1] || customer.contact.phone,
     url: customer.contact.url,
     email: customer.contact.email,
+    billingEmail: customer.additionalInfo.billingEmail,
     costCenter: customer.additionalInfo.costCenter,
+    registrationDate: customer.additionalInfo.registrationDate,
+    secondaryPhoneNumber: customer.additionalInfo.secondaryPhoneNumber,
     postalAddress: customer.postalAddress
       ? {
           fullName: customer.postalAddress.fullName,
@@ -77,7 +80,7 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={async (values, {resetForm}) => {
-        updateCustomer(values, customer.id, () => {
+        updateCustomer({...values}, customer.id, () => {
           resetForm();
           onClose();
         });

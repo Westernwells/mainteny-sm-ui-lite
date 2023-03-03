@@ -11,4 +11,7 @@ export type CustomerEditForm = {
   externalId: string;
   businessAddress?: AddressRecord | null;
   costCenter?: string;
+  billingEmail?: string;
+  registrationDate?: string;
+  secondaryPhoneNumber?: string;
 };
