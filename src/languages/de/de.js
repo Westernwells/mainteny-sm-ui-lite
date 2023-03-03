@@ -289,6 +289,10 @@ export const germany = {
     'Delete Invoice': 'Rechnung löschen',
     'Do you want to delete this Invoice?':
       'Möchten Sie diese Rechnung löschen?',
+    'Print invoice': 'Rechnung drucken',
+    'This action will set the status of the invoice to "Sent". The invoice can not be edited or deleted after.':
+      'Mit dieser Aktion wird der Status der Rechnung auf "Gesendet" gesetzt. Die Rechnung kann danach nicht mehr bearbeitet oder gelöscht werden.',
+    'Do you want to proceed?': 'Möchten Sie fortfahren?',
 
     // Articles
     'Articles & Packages': 'Artikel & Pakete',
