@@ -129,19 +129,19 @@ export const BasicCustomerForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: '49 17163 995801',
-                label: 'Phone',
-                name: 'phone',
-                value: formik.values.phone,
-                helperText: formik.errors.phone,
-                error: !!formik.errors.phone,
+                placeholder: 'e.g johndoe@example.com',
+                label: 'Billing email address',
+                name: 'billingEmail',
+                value: formik.values.billingEmail,
+                helperText:
+                  formik.touched.billingEmail && formik.errors.billingEmail,
+                error:
+                  !!formik.errors.billingEmail && formik.touched.billingEmail,
+                required: true,
                 InputProps: {
-                  startAdornment: (
-                    <InputAdornment position="start"> + </InputAdornment>
-                  ),
                   endAdornment: (
                     <InputAdornment position="end">
-                      <Phone />
+                      <Email />
                     </InputAdornment>
                   ),
                 },
@@ -156,12 +156,12 @@ export const BasicCustomerForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: '49 17163 995801',
-                label: 'Cost Center',
-                name: 'costCenter',
-                value: formik.values.costCenter,
-                helperText: formik.errors.costCenter,
-                error: !!formik.errors.costCenter,
+                placeholder: 'Enter url',
+                label: 'Website / URL',
+                name: 'url',
+                value: formik.values.url,
+                helperText: formik.errors.url,
+                error: !!formik.errors.url,
                 sx: {
                   mt: '0.5em',
                 },
@@ -216,33 +216,52 @@ export const BasicCustomerForm = ({
             </Box>
           </Grid>
           <Grid item md={4}>
-            <Box display="flex" gap="1em">
-              <MultipleSelectCheckmarks
-                label="Priority"
-                options={['A', 'B', 'C', 'NONE']}
-                getSelectedValue={(item: string[]) =>
-                  formik.setFieldValue('priority', item[0])
-                }
-                initialSelectedItems={
-                  formik.values.priority ? [formik.values.priority] : ['NONE']
-                }
-                disableClearBtn
-                multiple={false}
-                containerStyles={{marginTop: '0.5em', width: '100%'}}
-                formControlStyles={{width: '100%'}}
-              />
-            </Box>
+            <FormInput
+              props={{
+                size: 'small',
+                placeholder: '49 17163 995801',
+                label: 'Phone',
+                name: 'phone',
+                value: formik.values.phone,
+                helperText: formik.errors.phone,
+                error: !!formik.errors.phone,
+                InputProps: {
+                  startAdornment: (
+                    <InputAdornment position="start"> + </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Phone />
+                    </InputAdornment>
+                  ),
+                },
+                sx: {
+                  mt: '0.5em',
+                },
+                ...defaultProps,
+              }}
+            />
           </Grid>
           <Grid item md={4}>
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'Enter url',
-                label: 'Website / URL',
-                name: 'url',
-                value: formik.values.url,
-                helperText: formik.errors.url,
-                error: !!formik.errors.url,
+                placeholder: '49 17163 995801',
+                label: '2nd Phone',
+                name: 'secondaryPhoneNumber',
+                value: formik.values.secondaryPhoneNumber,
+                helperText: formik.errors.secondaryPhoneNumber,
+                error: !!formik.errors.secondaryPhoneNumber,
+                InputProps: {
+                  startAdornment: (
+                    <InputAdornment position="start"> + </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Phone />
+                    </InputAdornment>
+                  ),
+                },
                 sx: {
                   mt: '0.5em',
                 },
@@ -271,7 +290,6 @@ export const BasicCustomerForm = ({
           </Grid>
           <Grid item md={4}>
             <DatePicker
-              defaultDate={formik.values.registrationDate}
               getSelectedDate={(newValue) => {
                 if (newValue)
                   formik.setFieldValue('registrationDate', newValue);
@@ -285,6 +303,41 @@ export const BasicCustomerForm = ({
                 ...defaultProps,
               }}
             />
+          </Grid>
+          <Grid item md={4}>
+            <FormInput
+              props={{
+                size: 'small',
+                placeholder: '49 17163 995801',
+                label: 'Cost Center',
+                name: 'costCenter',
+                value: formik.values.costCenter,
+                helperText: formik.errors.costCenter,
+                error: !!formik.errors.costCenter,
+                sx: {
+                  mt: '0.5em',
+                },
+                ...defaultProps,
+              }}
+            />
+          </Grid>
+          <Grid item md={4}>
+            <Box display="flex" gap="1em">
+              <MultipleSelectCheckmarks
+                label="Priority"
+                options={['A', 'B', 'C', 'NONE']}
+                getSelectedValue={(item: string[]) =>
+                  formik.setFieldValue('priority', item[0])
+                }
+                initialSelectedItems={
+                  formik.values.priority ? [formik.values.priority] : ['NONE']
+                }
+                disableClearBtn
+                multiple={false}
+                containerStyles={{marginTop: '0.5em', width: '100%'}}
+                formControlStyles={{width: '100%'}}
+              />
+            </Box>
           </Grid>
         </Grid>
       </Box>

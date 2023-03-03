@@ -1,3 +1,5 @@
+import {format} from 'date-fns';
+import {useTranslation} from 'react-i18next';
 import React from 'react';
 import {useFormikContext} from 'formik';
 import Grid from '@mui/material/Grid';
@@ -6,6 +8,7 @@ import {Email, Phone} from '@mui/icons-material';
 
 import {FormInput} from 'components/form/FormInput';
 import {Dialog} from 'components/Dialog';
+import {DatePicker} from 'components/DatePicker';
 import {CustomerEditForm} from './model';
 import {SelectPostalAddress} from './SelectPostalAddress';
 import {SelectBillingAddress} from './SelectBillingAddress';
@@ -17,8 +20,16 @@ interface Props {
 }
 
 export const EditCustomerForm = ({openDialog, onClose}: Props) => {
-  const {values, errors, touched, handleChange, handleBlur, submitForm} =
-    useFormikContext<CustomerEditForm>();
+  const {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleBlur,
+    submitForm,
+    setValues,
+  } = useFormikContext<CustomerEditForm>();
+  const {t} = useTranslation();
 
   const defaultProps = {
     onChange: handleChange,
@@ -83,6 +94,53 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
           <FormInput
             props={{
               size: 'small',
+              placeholder: 'Enter url',
+              label: 'Website / URL',
+              name: 'url',
+              value: values.url,
+              helperText: touched.url && errors.url,
+              error: !!errors.url && touched.url,
+              sx: {
+                mt: '0.5em',
+              },
+              ...defaultProps,
+            }}
+          />
+        </Grid>
+        <Grid item md={6}>
+          <SelectPostalAddress />
+        </Grid>
+        <Grid item md={6}>
+          <SelectBillingAddress />
+        </Grid>
+        <Grid item md={6}>
+          <FormInput
+            props={{
+              size: 'small',
+              placeholder: 'e.g johndoe@example.com',
+              label: 'Billing email address',
+              name: 'billingEmail',
+              value: values.billingEmail,
+              helperText: touched.billingEmail && errors.billingEmail,
+              error: !!errors.billingEmail && touched.billingEmail,
+              InputProps: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Email />
+                  </InputAdornment>
+                ),
+              },
+              sx: {
+                mt: '0.5em',
+              },
+              ...defaultProps,
+            }}
+          />
+        </Grid>
+        <Grid item md={6}>
+          <FormInput
+            props={{
+              size: 'small',
               placeholder: '49 17163 995801',
               label: 'Phone',
               name: 'phone',
@@ -107,24 +165,27 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
           />
         </Grid>
         <Grid item md={6}>
-          <SelectPostalAddress />
-        </Grid>
-        <Grid item md={6}>
-          <SelectBillingAddress />
-        </Grid>
-        <Grid item md={6}>
-          <SelectPriority />
-        </Grid>
-        <Grid item md={6}>
           <FormInput
             props={{
               size: 'small',
-              placeholder: 'Enter url',
-              label: 'Website / URL',
-              name: 'url',
-              value: values.url,
-              helperText: touched.url && errors.url,
-              error: !!errors.url && touched.url,
+              placeholder: '49 17163 995801',
+              label: '2nd Phone',
+              name: 'secondaryPhoneNumber',
+              value: values.secondaryPhoneNumber,
+              helperText:
+                touched.secondaryPhoneNumber && errors.secondaryPhoneNumber,
+              error:
+                !!errors.secondaryPhoneNumber && touched.secondaryPhoneNumber,
+              InputProps: {
+                startAdornment: (
+                  <InputAdornment position="start"> + </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Phone />
+                  </InputAdornment>
+                ),
+              },
               sx: {
                 mt: '0.5em',
               },
@@ -132,6 +193,52 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
             }}
           />
         </Grid>
+
+        <Grid item md={6}>
+          <FormInput
+            props={{
+              size: 'small',
+              placeholder: 'e.g 1234',
+              label: 'Customer Number',
+              name: 'externalId',
+              value: values.externalId,
+              helperText: touched.externalId && errors.externalId,
+              error: !!errors.externalId && touched.externalId,
+              required: true,
+              sx: {
+                mt: '0.5em',
+              },
+              ...defaultProps,
+            }}
+          />
+        </Grid>
+
+        <Grid item md={6}>
+          <DatePicker
+            containerStyles={{mr: '1em', width: '100%'}}
+            getSelectedDate={(date) => {
+              if (date) {
+                setValues({
+                  ...values,
+                  registrationDate: format(date, 'yyyy-MM-dd'),
+                });
+              }
+            }}
+            disableMask
+            textFieldProps={{
+              label: t('Customer Since'),
+              name: 'registrationDate',
+              helperText:
+                errors.registrationDate && touched.registrationDate
+                  ? errors.registrationDate
+                  : '',
+              error: !!(touched.registrationDate && errors.registrationDate),
+              sx: {width: '100%'},
+              onBlur: handleBlur,
+            }}
+          />
+        </Grid>
+
         <Grid item md={6}>
           <FormInput
             props={{
@@ -150,23 +257,9 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
             }}
           />
         </Grid>
+
         <Grid item md={6}>
-          <FormInput
-            props={{
-              size: 'small',
-              placeholder: 'e.g 1234',
-              label: 'Customer Number',
-              name: 'externalId',
-              value: values.externalId,
-              helperText: touched.externalId && errors.externalId,
-              error: !!errors.externalId && touched.externalId,
-              required: true,
-              sx: {
-                mt: '0.5em',
-              },
-              ...defaultProps,
-            }}
-          />
+          <SelectPriority />
         </Grid>
       </Grid>
     </Dialog>

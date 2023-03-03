@@ -10,6 +10,7 @@ import {
   Edit,
   HomeWork,
   AttachMoney,
+  Language,
 } from '@mui/icons-material';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
@@ -76,10 +77,25 @@ export const CustomerOverviewTab = ({
           value: customer.contact.email,
           icon: <Email sx={{color: theme.palette.info.dark}} />,
         },
-        priority: {
-          label: 'PRIORITY',
-          value: customer.additionalInfo.priority,
-          icon: <LowPriority sx={{color: theme.palette.info.dark}} />,
+        billingAddress: {
+          label: 'BILLING ADDRESS',
+          value: customer.billingAddress?.fullName || '-',
+          icon: <HomeWork sx={{color: theme.palette.info.dark}} />,
+        },
+        secondaryPhoneNumber: {
+          label: '2nd PHONE',
+          value: customer.additionalInfo.secondaryPhoneNumber || '-',
+          icon: <LocalPhone sx={{color: theme.palette.info.dark}} />,
+        },
+        billingEmailAddress: {
+          label: 'BILLING EMAIL ADDRESS',
+          value: customer.additionalInfo.billingEmail || '-',
+          icon: <Email sx={{color: theme.palette.info.dark}} />,
+        },
+        costCenter: {
+          label: 'COST CENTER',
+          value: customer.additionalInfo.costCenter || '-',
+          icon: <AttachMoney sx={{color: theme.palette.info.dark}} />,
         },
         numberOfUnits: {
           label: 'NO. OF UNITS',
@@ -91,21 +107,20 @@ export const CustomerOverviewTab = ({
           value: totalContracts.toString() || '-',
           icon: <FileCopy sx={{color: theme.palette.info.dark}} />,
         },
-        costCenter: {
-          label: 'COST CENTER',
-          value: customer.additionalInfo.costCenter || '-',
-          icon: <AttachMoney sx={{color: theme.palette.info.dark}} />,
+        priority: {
+          label: 'PRIORITY',
+          value: customer.additionalInfo.priority,
+          icon: <LowPriority sx={{color: theme.palette.info.dark}} />,
         },
-        billingAddress: {
-          label: 'BILLING ADDRESS',
-          value: customer.billingAddress?.fullName || '-',
-          icon: <HomeWork sx={{color: theme.palette.info.dark}} />,
+        website: {
+          label: 'WEBSITE/URL',
+          value: customer.contact.url || '-',
+          icon: <Language sx={{color: theme.palette.info.dark}} />,
         },
-
-        billingEmailAddress: {
-          label: 'BILLING EMAIL ADDRESS',
-          value: customer.additionalInfo.billingEmail || '-',
-          icon: <Email sx={{color: theme.palette.info.dark}} />,
+        customerSince: {
+          label: 'CUSTOMER SINCE',
+          value: customer.additionalInfo.registrationDate || '-',
+          icon: <Language sx={{color: theme.palette.info.dark}} />,
         },
       });
     }

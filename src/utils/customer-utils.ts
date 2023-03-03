@@ -8,11 +8,14 @@ export const formatUpdateCustomer = (data: CustomerEditForm) => ({
     phone: `+${data.phone.replaceAll('+', '')}`,
     url: data.url,
   },
+  billingEmail: data.billingEmail,
   externalId: data.externalId,
   name: data.name,
   postalAddress: data.postalAddress,
   priority: data.priority || 'NONE',
   costCenter: data.costCenter,
+  registrationDate: data.registrationDate,
+  secondaryPhoneNumber: data.secondaryPhoneNumber,
 });
 
 export const getFilterUnitNumber = (value: string, type: 'start' | 'end') => {

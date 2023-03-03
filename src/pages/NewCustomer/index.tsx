@@ -79,10 +79,12 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       externalId: basicCustomerFormValues.externalId,
       name: basicCustomerFormValues.name,
       postalAddress: basicCustomerFormValues.postalAddress,
+      billingEmail: basicCustomerFormValues.billingEmail,
       priority: basicCustomerFormValues.priority,
       serviceCompanyId: user!.userAccount.serviceCompany.id,
       registrationDate: basicCustomerFormValues.registrationDate,
       costCenter: basicCustomerFormValues.costCenter,
+      secondaryPhoneNumber: basicCustomerFormValues.secondaryPhoneNumber,
     };
 
     const response = await createCustomer(body);

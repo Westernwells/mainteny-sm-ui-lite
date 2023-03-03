@@ -1,4 +1,11 @@
-import {Address, AddressRecord, Contact, Meta, Priority} from './misc';
+import {
+  Address,
+  AddressRecord,
+  Contact,
+  Meta,
+  Priority,
+  WithOptional,
+} from './misc';
 import {ServiceCompany} from './service-company';
 import {UserAccount, UserAccountSimpleView} from './user';
 
@@ -25,6 +32,8 @@ export interface PropertyOwnerAdditionalInfo {
   priority: Priority;
   billingEmail?: string;
   costCenter: string;
+  secondaryPhoneNumber: string;
+  registrationDate: string;
 }
 
 export interface PropertyOwnerView {
