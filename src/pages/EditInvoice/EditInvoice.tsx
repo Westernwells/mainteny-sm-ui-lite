@@ -363,7 +363,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
         ? dateToString(addYears(new Date(), 1))
         : values.dueDate;
 
-    return updateInvoiceAsync({
+    await updateInvoiceAsync({
       data: {
         ...values,
         includeWorkReport: isWorkReportPDFGenerated
