@@ -87,3 +87,5 @@ export const SettingsPage = ({getCurrentPageTitle}: Props) => {
     </>
   );
 };
+
+export default SettingsPage;

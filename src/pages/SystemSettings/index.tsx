@@ -36,3 +36,5 @@ export const SystemSettings = ({getCurrentPageTitle}: Props) => {
     </InfoCard>
   );
 };
+
+export default SystemSettings;

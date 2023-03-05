@@ -127,3 +127,5 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
     </Stepper>
   );
 };
+
+export default NewCustomer;

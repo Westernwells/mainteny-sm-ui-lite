@@ -28,3 +28,5 @@ export const NewInvoice = () => {
   }
   return <DraftInvoice serviceOrderResource={serviceOrderDetails} />;
 };
+
+export default NewInvoice;

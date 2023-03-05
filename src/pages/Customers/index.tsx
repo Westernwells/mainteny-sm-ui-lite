@@ -187,3 +187,5 @@ export const Customer = () => {
     </PageListingLayout>
   );
 };
+
+export default Customer;

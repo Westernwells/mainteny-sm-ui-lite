@@ -18,3 +18,5 @@ export const EditInvoicePage = () => {
     <EmptySection label="Sorry, we couldn't find the invoice." />
   );
 };
+
+export default EditInvoicePage;

@@ -280,3 +280,5 @@ export const OrderArticle = () => {
     </Box>
   );
 };
+
+export default OrderArticle;

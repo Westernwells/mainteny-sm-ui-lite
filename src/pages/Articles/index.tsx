@@ -43,3 +43,5 @@ export const Articles = () => {
     </Tabs>
   );
 };
+
+export default Articles;

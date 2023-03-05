@@ -118,3 +118,5 @@ export const Companies = () => {
     </PageListingLayout>
   );
 };
+
+export default Companies;

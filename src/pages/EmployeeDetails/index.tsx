@@ -92,3 +92,5 @@ export const EmployeeDetails = ({getCurrentPageTitle}: Props) => {
     </>
   );
 };
+
+export default EmployeeDetails;

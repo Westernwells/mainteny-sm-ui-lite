@@ -1,5 +1,7 @@
+import {Suspense} from 'react';
 import {Navigate, Outlet, useLocation} from 'react-router-dom';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {Progress} from 'components/Progress';
 
 interface Location {
   pathname: string;
@@ -32,5 +34,9 @@ export const AuthRoutes = () => {
       />
     );
   }
-  return <Outlet />;
+  return (
+    <Suspense fallback={null}>
+      <Outlet />
+    </Suspense>
+  );
 };

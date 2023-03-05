@@ -50,3 +50,5 @@ export const ServiceOrderDetails = () => {
     </Tabs>
   );
 };
+
+export default ServiceOrderDetails;

@@ -92,3 +92,5 @@ export const ServiceOrders = () => {
     </Tabs>
   );
 };
+
+export default ServiceOrders;

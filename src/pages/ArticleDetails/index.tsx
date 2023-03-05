@@ -101,3 +101,5 @@ export const ArticleOverView = () => {
     </>
   );
 };
+
+export default ArticleOverView;

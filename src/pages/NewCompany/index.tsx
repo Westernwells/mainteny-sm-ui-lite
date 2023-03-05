@@ -255,3 +255,5 @@ export const NewCompany = ({getCurrentPageTitle}: Props) => {
     </Stepper>
   );
 };
+
+export default NewCompany;

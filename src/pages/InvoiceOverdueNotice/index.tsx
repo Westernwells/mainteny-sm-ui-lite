@@ -395,3 +395,5 @@ export const InvoiceOverdueNotice = () => {
     </>
   );
 };
+
+export default InvoiceOverdueNotice;

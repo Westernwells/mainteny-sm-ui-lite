@@ -187,3 +187,5 @@ export const Employees = () => {
     </PageListingLayout>
   );
 };
+
+export default Employees;

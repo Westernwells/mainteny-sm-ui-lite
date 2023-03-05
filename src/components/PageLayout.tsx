@@ -1,12 +1,12 @@
 import Box from '@mui/material/Box';
 import {useTranslation} from 'react-i18next';
-import {ReactNode} from 'react';
+import {ReactNode, Suspense} from 'react';
 import {usePusher} from 'hooks/usePusher';
 import {queryKeys} from 'reactQuery/constants';
 import {MessageType} from 'models/notification';
 import {useQueryClient} from 'react-query';
-import {AppDrawer} from './AppDrawer';
 import {AppTopBar} from './AppTopBar';
+import {Progress} from './Progress';
 
 interface Props {
   children: ReactNode;
@@ -36,6 +36,7 @@ export const PageLayout = ({
       queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
     },
   });
+
   return (
     <Box
       sx={{
@@ -54,7 +55,7 @@ export const PageLayout = ({
         />
       </Box>
       <Box sx={{display: 'flex', flexGrow: 1, width: '100%'}}>
-        {!excludeSidebar ? <AppDrawer /> : null}
+        {/* {!excludeSidebar ? <AppDrawer /> : null} */}
         <Box width="4.5rem" />
         <Box
           sx={{
@@ -65,7 +66,7 @@ export const PageLayout = ({
           flexGrow="1"
           width="0"
           flexDirection="column">
-          {children}
+          <Suspense fallback={<Progress />}>{children}</Suspense>
         </Box>
       </Box>
     </Box>

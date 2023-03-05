@@ -313,3 +313,5 @@ export const DraftQuotation = () => {
     </Box>
   );
 };
+
+export default DraftQuotation;

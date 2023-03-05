@@ -1,3 +1,4 @@
+import {AppDrawer} from 'components/AppDrawer';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {Navigate, Outlet, useLocation} from 'react-router-dom';
 
@@ -8,7 +9,12 @@ export const ProtectedRoutes = () => {
   if (user === undefined) return null;
 
   if (user && user.token) {
-    return <Outlet />;
+    return (
+      <>
+        <AppDrawer />
+        <Outlet />
+      </>
+    );
   }
   return <Navigate to="/login" state={{from: location}} replace />;
 };
