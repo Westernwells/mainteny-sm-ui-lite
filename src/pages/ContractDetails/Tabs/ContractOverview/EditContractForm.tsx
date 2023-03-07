@@ -27,7 +27,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
       <Grid item md={6}>
         <FormSelect
           labelId="typeSelect-label"
-          label="Contract Name"
+          label="Contract name"
           options={(
             user?.userAccount?.serviceCompany?.settings?.contractNameTypes ?? []
           ).map((item) => ({
@@ -136,7 +136,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
           selectProps={{
             id: 'invoiceCycleSelect',
             value: formik.values.invoiceCycle
-              ? formik.values.invoiceCycle.toString()
+              ? t(formik.values.invoiceCycle.toString())
               : '',
             onChange: formik.handleChange,
             error: !!formik.errors.invoiceCycle,
@@ -219,7 +219,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
         <FormInput
           props={{
             placeholder: 'Enter hourly rates',
-            label: 'Hourly rate',
+            label: 'Hourly Rate',
             name: 'hourlyRate',
             type: 'number',
             value: Number(formik.values.hourlyRate).toString(),
@@ -261,7 +261,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
             }
           }}
           textFieldProps={{
-            label: t('First maintenance visit'),
+            label: t('First Maintenance Visit'),
             name: 'firstMaintenance',
             helperText:
               formik.errors.firstMaintenance && formik.touched.firstMaintenance
@@ -293,7 +293,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
           }}
           disableMask
           textFieldProps={{
-            label: t('First invoice'),
+            label: t('First Invoice'),
             name: 'firstInvoiceDate',
             helperText:
               formik.errors.firstInvoiceDate && formik.touched.firstInvoiceDate

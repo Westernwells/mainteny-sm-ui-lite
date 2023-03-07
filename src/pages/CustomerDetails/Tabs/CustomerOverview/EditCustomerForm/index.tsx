@@ -118,7 +118,7 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
             props={{
               size: 'small',
               placeholder: 'e.g johndoe@example.com',
-              label: 'Billing email address',
+              label: 'Billing Email Address',
               name: 'billingEmail',
               value: values.billingEmail,
               helperText: touched.billingEmail && errors.billingEmail,
@@ -244,7 +244,7 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
             props={{
               size: 'small',
               placeholder: 'e.g 000 000 000',
-              label: 'Cost center',
+              label: 'Cost Center',
               name: 'costCenter',
               value: values.costCenter,
               helperText: touched.costCenter && errors.costCenter,

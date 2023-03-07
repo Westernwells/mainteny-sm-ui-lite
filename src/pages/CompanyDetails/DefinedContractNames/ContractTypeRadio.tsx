@@ -67,7 +67,7 @@ export const ContractTypeRadio = ({
 
           {helperTexts
             ? helperTexts.map((text) => (
-                <Typography key={text}>{`- ${text}`}</Typography>
+                <Typography key={text}>{`- ${t(text)}`}</Typography>
               ))
             : null}
         </Box>
