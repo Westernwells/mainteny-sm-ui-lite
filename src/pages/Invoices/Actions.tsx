@@ -22,6 +22,7 @@ import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import {Confirm} from 'components/Confirm';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
+import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useDeleteInvoice, usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useServiceOrderWorkReport} from 'hooks/reactQuery/useServiceOrder';
@@ -55,6 +56,8 @@ export const Actions = ({invoice}: Props) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
+    useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const {data: workReport} = useServiceOrderWorkReport(
@@ -67,6 +70,9 @@ export const Actions = ({invoice}: Props) => {
       ),
     },
   );
+  const {mutateAsync: publishInvoice} = usePublishInvoice({
+    shouldNavigate: false,
+  });
 
   const {data: downloadUrl} = useDownloadUrl(
     invoice ? [invoice!.additionalInfo.pdfPath] : [],
@@ -143,13 +149,7 @@ export const Actions = ({invoice}: Props) => {
       items.unshift({
         label: t('Print'),
         icon: <Print />,
-        onClick: () =>
-          downloadUrl &&
-          printJS({
-            printable: Object.values(downloadUrl)[0],
-            type: 'pdf',
-            showModal: true,
-          }),
+        onClick: () => setIsConfirmPrintDialogOpen(true),
       });
     } else if (
       invoice.status === InvoiceStatus.NOT_PAID ||
@@ -205,6 +205,31 @@ export const Actions = ({invoice}: Props) => {
     }
     return items;
   }, [downloadUrl]);
+
+  const onPrintInvoice = async () => {
+    await publishInvoice(
+      {
+        id: invoice.id,
+        body: {
+          email: '',
+          subject: '',
+          content: '',
+        },
+      },
+      {
+        onSuccess: () => {
+          setIsConfirmPrintDialogOpen(false);
+          if (downloadUrl) {
+            printJS({
+              printable: Object.values(downloadUrl)[0],
+              type: 'pdf',
+              showModal: true,
+            });
+          }
+        },
+      },
+    );
+  };
 
   return (
     <Box>
@@ -282,6 +307,12 @@ export const Actions = ({invoice}: Props) => {
         title="Delete Invoice"
         content="Do you want to delete this Invoice?"
         helperText="This action is irreversible."
+      />
+
+      <ConfirmPrintInvoice
+        open={isConfirmPrintDialogOpen}
+        onConfirm={onPrintInvoice}
+        onClose={() => setIsConfirmPrintDialogOpen(false)}
       />
     </Box>
   );

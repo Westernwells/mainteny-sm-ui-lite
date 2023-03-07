@@ -27,6 +27,7 @@ import {StatusChip} from 'components/StatusChip';
 import {FormRadio} from 'components/form/FormRadio';
 import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
+import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useDeleteInvoice,
@@ -76,7 +77,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
 
   const {user} = useUserSession();
 
-  const {mutate: updateInvoice, isLoading} = useUpdateInvoice();
+  const {mutateAsync: updateInvoiceAsync, isLoading} = useUpdateInvoice();
   const {mutate: deleteInvoice} = useDeleteInvoice();
   const {data: workReport} = useServiceOrderWorkReport(
     invoice?.serviceOrder?.id ?? '',
@@ -88,10 +89,15 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
       ),
     },
   );
+  const {mutateAsync: publishInvoice} = usePublishInvoice({
+    shouldNavigate: false,
+  });
 
   const [isDrawerOpen] = useState<boolean>(true);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
+    useState(false);
   const [showCheckListTooltip, setShowCheckListTooltip] = useState(false);
   const [showWorkReportTooltip, setShowWorlReportTooltip] = useState(false);
 
@@ -306,13 +312,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
       items.splice(1, 0, {
         label: t('Print'),
         icon: <Print />,
-        onClick: () =>
-          downloadUrl &&
-          printJS({
-            printable: downloadUrl,
-            type: 'pdf',
-            showModal: true,
-          }),
+        onClick: () => setIsConfirmPrintDialogOpen(true),
       });
     }
     return items;
@@ -354,7 +354,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
     }
   };
 
-  function onSave(values: CreateInvoice) {
+  async function onSave(values: CreateInvoice) {
     if (!values.description.length) values.description = ' ';
 
     const dueDateToString =
@@ -362,7 +362,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
         ? dateToString(addYears(new Date(), 1))
         : values.dueDate;
 
-    updateInvoice({
+    await updateInvoiceAsync({
       data: {
         ...values,
         includeWorkReport: isWorkReportPDFGenerated
@@ -376,6 +376,32 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
       invoiceId: invoice.id,
     });
   }
+
+  const onPrintInvoice = async () => {
+    await onSave(formik.values);
+    await publishInvoice(
+      {
+        id: invoice.id,
+        body: {
+          email: '',
+          subject: '',
+          content: '',
+        },
+      },
+      {
+        onSuccess: () => {
+          setIsConfirmPrintDialogOpen(false);
+          if (downloadUrl) {
+            printJS({
+              printable: Object.values(downloadUrl)[0],
+              type: 'pdf',
+              showModal: true,
+            });
+          }
+        },
+      },
+    );
+  };
 
   return (
     <Box>
@@ -768,6 +794,11 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
         title="Delete Invoice"
         content="Do you want to delete this Invoice?"
         helperText="This action is irreversible."
+      />
+      <ConfirmPrintInvoice
+        open={isConfirmPrintDialogOpen}
+        onConfirm={onPrintInvoice}
+        onClose={() => setIsConfirmPrintDialogOpen(false)}
       />
     </Box>
   );
