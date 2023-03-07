@@ -212,6 +212,7 @@ export const germany = {
     Role: 'Rolle',
     'New Employee': 'Neuer Mitarbeiter',
     NAME: 'NAME',
+    Name: 'Name',
     ROLE: 'ROLLE',
     PHONE: 'TELEFONNUMMER',
     SHIFT: 'SCHICHT',
@@ -639,6 +640,7 @@ export const germany = {
     'Employee ID': 'Mitarbeiternummer',
     'ASSIGNED ORDER TYPES': 'ZUGEWIESENE AUFTRAGSARTEN',
     EMAIL: 'EMAIL',
+    Email: 'Email',
     Team: 'Mannschaft',
     'SHIFT TIME': 'SCHICHTZEIT',
     'Edit Basic Information': 'Allgemeine Informationen bearbeiten',
@@ -824,6 +826,7 @@ export const germany = {
     'Add Contact Person': 'Kontaktperson hinzufügen',
     'CUSTOMER NUMBER': 'Kundennummer',
     'BILLING EMAIL ADDRESS': 'RECHNUNGS-EMAIL-ADRESSE',
+    'Billing Email Address': 'Rechnungs-E-Mail-Adresse',
     'Do you want to delete this customer?': 'Möchten Sie diese Kunde löschen?',
     'COST CENTER': 'KOSTENSTELLE',
     'Cost Center': 'Kostenstelle',
@@ -1135,6 +1138,7 @@ export const germany = {
     'No documents attached. They will appear here once added!':
       'Keine Dokumente beigefügt. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!',
     'PAYMENT DUE': 'ZAHLUNGSFRIST',
+    'Payment due': 'Zahlungsfrist',
     DISCOUNT: 'SKONTO',
     'NOTICE PERIOD': 'KÜNDIGUNGSFRIST',
     'YEARLY PRICE ADJUSTMENT': 'JÄHRLICHE PREISANPASSUNG',
@@ -1183,27 +1187,61 @@ export const germany = {
     'Contract name': 'Vertragsname',
     'No Signature': 'Keine Unterschrift',
     'Send Checklist': 'Checkliste senden',
-    'Maintenance contract': 'Maintenance contract',
-    'Contract type': 'Contract type',
-    'Non-maintenance contract': 'Non-maintenance contract',
+    'FIRST MAINTENANCE VISIT': 'ERSTE WARTUNG',
+    'FIRST INVOICE': 'ERSTE RECHNUNG',
+    'Invoice cycle is required': 'Rechnungszyklus ist erforderlich',
+    'INVOICE CYCLE': 'RECHNUNHSZYKLUS',
+    'The invoice cycle should not be "After each visit" for Non-maintenance contract':
+      'Der Rechnungszyklus sollte bei Sonstigen Verträgen nicht "nach jedem Besuch" sein.',
+    'Visit number is required': 'Anzahl an Wartungen ist erforderlich',
+    'Credit Note': 'Gutschrift',
+    'No checklist for selected service order':
+      'Keine Checkliste für ausgewählten Serviceauftrag',
+    'Add checklist to invoice': 'Checkliste zur Rechnung hinzufügen',
+    'Billing email address': 'Rechnungs-E-Mail-Adresse',
+    'No report for selected service order':
+      'Kein Wartungsbericht für den ausgewählten Serviceauftrag',
+    'Maintenance contract': 'Wartungsvertrag',
+    'Non-maintenance contract': 'Sonstiger Vertrag',
     'All contracts that are related to regular maintenance':
-      'All contracts that are related to regular maintenance',
+      'Alle Verträge, die sich auf die regelmäßige Wartung beziehen',
     'These contracts have a fixed service cycle (e.g. 4 times per year)':
-      'These contracts have a fixed service cycle (e.g. 4 times per year)',
+      'Diese Verträge haben einen festen Wartungszyklus (z.B. 4 mal pro Jahr)',
     'The system will automatically create the related work orders':
-      'The system will automatically create the related work orders',
+      'Das System erstellt automatisch die entsprechenden Arbeitsaufträge',
+    'These contracts are not related to maintenance, e.g. auto dialer systems':
+      'Diese Verträge stehen nicht im Zusammenhang mit der Wartung, z.B. Notrufanlagen',
+    'The contracts have specific invoice cycles, e.g. monthly':
+      'Die Verträge haben einen bestimmten Rechnungszyklus, z.B. monatlich',
+    'The invoices will be created automatically by the system':
+      'Die Rechnungen werden automatisch vom System erstellt.',
+    'Contract type': 'Vertragsart',
+    'Payment Due (in days)': 'Zahlungsfrist (in Tagen)',
+    'Discount (first 14 days)': 'Skonto (erste 14 Tage)',
+    'Notice Period (in months)': 'Kündigungsfrist (in Monaten)',
+    'Invoice Cycle': 'Rechnungszyklus',
+    'Enter renewal period (in months)':
+      'Verlängerungszeitraum eingeben (in Monaten)',
+    'Enter payment due (in days)': 'Zahlungsfrist eingeben (in Tagen)',
+    'Yearly Price Adjustment (%)': 'Jährliche Preisanpassung (%)',
+    'Enter yearly price adjustment': 'Jährliche Preisanpassung eingeben',
+    'Enter discount': 'Skonto eingeben',
+    'Enter notice period': 'Kündigungsfrist eingeben',
+    'Enter hourly rates': 'Stundensatz eingeben',
+    'Hourly Rate': 'Stundensatz',
+    'Start date is required': 'Startdatum ist erforderlich',
+    'End date is required': 'Erster Wartung',
+    'First Invoice': 'Erste Rechnung',
+    'First Maintenance Visit': 'Erster Wartung',
+    'After each visit': 'Nach jeder Wartung',
+    '1 month': '1 Monat',
+    '2 months': '2 Monate',
+    '3 months': '3 Monate',
+    '4 months': '4 Monate',
+    '6 months': '6 Monate',
+    '12 months': '12 Monate',
+    'No work report for the selected service order':
+      'Kein Arbeitsbericht für den ausgewählten Auftrag',
+    'Website/URL': 'Website/URL',
   },
 };
-
-// Dynamic data example
-// Units: '1 {UnitVariable}',
-// 'elevators': 'Aufzüge',
-// 'meters': 'Zähler',
-// 'there are 3 {{units}}': 'es gibt 3 {{units}}',
-// 'there are 3 elevators': 'es sind 3 Meter',
-// 'there are 3 meters': 'es gibt 3 Aufzüge',
-// '{{name}} does not exists': '{{name}} existiert nicht',
-
-// usage examples
-// {t('{{name}} does not exists', {name: 'Dapeng'})}
-//   {t('there are 3 {{units}}', {units: t('meters', {}) })} *

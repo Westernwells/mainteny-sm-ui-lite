@@ -45,7 +45,7 @@ export const contractTypeMap = {
 };
 
 export const invoiceCycle: {[key: string]: string} = {
-  '0': 'Afer each visit',
+  '0': 'After each visit',
   '1': '1 month',
   '2': '2 months',
   '3': '3 months',

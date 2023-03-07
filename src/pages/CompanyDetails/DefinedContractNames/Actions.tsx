@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 import {Box} from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import {useTranslation} from 'react-i18next';
 import IconButton from '@mui/material/IconButton';
 import {DeleteOutline, Edit} from '@mui/icons-material';
 import {Dialog} from 'components/Dialog';
@@ -25,6 +26,7 @@ const validationSchema = Yup.object().shape({
 
 export const Actions = ({id, contractNameTypes, contractNameType}: Props) => {
   const [openDialog, setOpenDialog] = useState(false);
+  const {t} = useTranslation();
   const {mutateAsync: updateCompany} = useUpdateCompany(
     'Contract types updated successfully',
   );
@@ -93,7 +95,7 @@ export const Actions = ({id, contractNameTypes, contractNameType}: Props) => {
         <ContractNameInput formik={formik} />
         <Grid container sx={{mt: '0.5em'}} component="form" spacing={2}>
           <Grid item xs={12}>
-            <Typography variant="subtitle2">Contract type</Typography>
+            <Typography variant="subtitle2">{t('Contract type')}</Typography>
           </Grid>
           <Grid item xs={6}>
             <ContractTypeRadio

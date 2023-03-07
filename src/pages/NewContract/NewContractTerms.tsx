@@ -203,7 +203,7 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             }
           }}
           textFieldProps={{
-            label: t('First maintenance visit'),
+            label: t('First Maintenance Visit'),
             name: 'firstMaintenance',
             helperText:
               formik.errors.firstMaintenance && formik.touched.firstMaintenance
@@ -231,7 +231,7 @@ const NewContractTerms: FC<Props> = ({formik}) => {
           }}
           disableMask
           textFieldProps={{
-            label: t('First invoice'),
+            label: t('First Invoice'),
             name: 'firstInvoiceDate',
             helperText:
               formik.errors.firstInvoiceDate && formik.touched.firstInvoiceDate

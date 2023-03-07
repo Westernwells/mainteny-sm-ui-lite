@@ -109,7 +109,7 @@ export const DefinedContractNames = ({company, containerStyles}: Props) => {
         <ContractNameInput formik={formik} />
         <Grid container sx={{mt: '0.5em'}} component="form" spacing={2}>
           <Grid item xs={12}>
-            <Typography variant="subtitle2">Contract type</Typography>
+            <Typography variant="subtitle2">{t('Contract type')}</Typography>
           </Grid>
           <Grid item xs={6}>
             <ContractTypeRadio

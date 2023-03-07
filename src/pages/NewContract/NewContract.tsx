@@ -34,7 +34,7 @@ const validationSchemaBasicInfo = Yup.object().shape({
     .transform((id) => (id.length > 0 ? id : null))
     .required('Customer is required'),
   name: Yup.string().required('Contract name is required'),
-  startDate: Yup.date().nullable().required('Start Date is required'),
+  startDate: Yup.date().nullable().required('Start date is required'),
   endDate: Yup.date()
     .default(null)
     .when('startDate', (startDate, schema) => {
@@ -47,7 +47,7 @@ const validationSchemaBasicInfo = Yup.object().shape({
       return schema;
     })
     .nullable()
-    .required('End Date is required'),
+    .required('End date is required'),
 });
 
 const validationSchemaContractTerms = Yup.object().shape({
