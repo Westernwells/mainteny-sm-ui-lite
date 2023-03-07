@@ -26,7 +26,7 @@ import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useDeleteInvoice, usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useServiceOrderWorkReport} from 'hooks/reactQuery/useServiceOrder';
-import {InvoiceStatus, InvoiceView} from 'models/invoice';
+import {InvoiceStatus, InvoiceView, InvoiceType} from 'models/invoice';
 import {PdfGenerationStatus} from 'models/misc';
 
 interface Props {
@@ -57,6 +57,8 @@ export const Actions = ({invoice}: Props) => {
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
+    useState(false);
+  const [isCreateCreditNoteDialogOpen, setIsCreateCreditNoteDialogOpen] =
     useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -159,6 +161,13 @@ export const Actions = ({invoice}: Props) => {
         label: t('Payment'),
         icon: <Payments />,
         onClick: () => setIsDialogOpen(true),
+      });
+    }
+    if (invoice.status !== InvoiceStatus.DRAFT) {
+      items.push({
+        label: t('Create Credit note'),
+        icon: <Payments />,
+        onClick: () => setIsCreateCreditNoteDialogOpen(true),
       });
     }
     if (invoice.status !== InvoiceStatus.PAID) {
@@ -313,6 +322,20 @@ export const Actions = ({invoice}: Props) => {
         open={isConfirmPrintDialogOpen}
         onConfirm={onPrintInvoice}
         onClose={() => setIsConfirmPrintDialogOpen(false)}
+      />
+
+      <Confirm
+        open={isCreateCreditNoteDialogOpen}
+        onConfirm={() => {
+          setIsCreateCreditNoteDialogOpen(false);
+          navigate(
+            `/invoices/new?invoiceId=${invoice.id}&invoiceType=${InvoiceType.CREDIT_NOTE}`,
+          );
+        }}
+        onClose={() => setIsCreateCreditNoteDialogOpen(false)}
+        title="Create Credit note"
+        content="This action will create a credit note from this invoice details."
+        helperText="Do you want to proceed?"
       />
     </Box>
   );
