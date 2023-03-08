@@ -773,6 +773,9 @@ export const germany = {
     'Work Report': 'Arbeitsbericht',
     'Invoice Number': 'Rechnungsnummer',
     'Total (excl VAT)': 'Gesamt (ohne MwSt.)',
+    'Create Credit note': 'Gutschrift erstellen',
+    'This action will create a credit note from this invoice details.':
+      'Mit dieser Aktion wird eine Gutschrift aus den Rechnungsdaten erstellt.',
 
     // Quotations
     'No quotations have been created yet. Please click the button below to create one!':

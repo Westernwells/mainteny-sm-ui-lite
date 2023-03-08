@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import {useEffect, useState, useRef, ChangeEvent} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import {useTranslation} from 'react-i18next';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
+import queryString from 'query-string';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import useTheme from '@mui/material/styles/useTheme';
@@ -21,7 +22,11 @@ import {FormRadio} from 'components/form/FormRadio';
 import {DatePicker} from 'components/DatePicker';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {useCreateInvoice, usePublishInvoice} from 'hooks/reactQuery/useInvoice';
+import {
+  useCreateInvoice,
+  useInvoiceDetail,
+  usePublishInvoice,
+} from 'hooks/reactQuery/useInvoice';
 import {CreateInvoice, InvoiceItemRecord, InvoiceType} from 'models/invoice';
 import {ServiceOrderView} from 'models/service-order';
 import {addYears} from 'date-fns';
@@ -50,6 +55,12 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const navigate = useNavigate();
+  const {search} = useLocation();
+  const {invoiceId = '', invoiceType = ''} = queryString.parse(search);
+  const {data: invoice} =
+    typeof invoiceId === 'string'
+      ? useInvoiceDetail(invoiceId)
+      : {data: undefined};
   const {mutateAsync: publishInvoice, isLoading: publishingInvoice} =
     usePublishInvoice();
 
@@ -93,22 +104,28 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
   ]).current;
 
   const initialValues: CreateInvoice = {
-    subject: '',
-    description: '',
-    dueDate: '',
-    issuedDate: dateToString(new Date()),
-    type: InvoiceType.FULL,
+    subject: invoice?.subject ?? '',
+    description: invoice?.description ?? '',
+    dueDate: invoice?.dueDate ?? '',
+    issuedDate: invoice?.issuedDate ?? dateToString(new Date()),
+    type:
+      typeof invoiceType === 'string' &&
+      invoiceType &&
+      invoiceType in InvoiceType
+        ? InvoiceType[invoiceType as InvoiceType]
+        : InvoiceType.FULL,
     items: [],
-    paymentTerms: '',
-    propertyOwnerId: '',
+    paymentTerms: invoice?.paymentTerms ?? '',
+    propertyOwnerId: invoice?.propertyOwner.id ?? '',
     serviceCompanyId: '',
     serviceOrderId: '',
     paymentInfo: payment,
     shouldSendOut: false,
     includeWorkReport: true,
     includeCheckList: true,
-    costCenter: '',
-    customerSpecificOrderNumber: '',
+    costCenter: invoice?.additionalInfo.costCenter ?? '',
+    customerSpecificOrderNumber:
+      invoice?.additionalInfo.customerSpecificOrderNumber ?? '',
   };
 
   const validationSchema = Yup.object().shape({
@@ -117,6 +134,8 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
   const formik = useFormik({
     initialValues,
     validationSchema,
+    validateOnMount: false,
+    enableReinitialize: true,
     onSubmit: async (values) => {
       const response = await save(values);
       navigate(`/invoices/details/${response.value}`);
@@ -208,6 +227,12 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
       setInvoiceItems([]);
     }
   }, [formik.values.type, serviceOrder]);
+
+  useEffect(() => {
+    if (invoice?.serviceOrder) {
+      setServiceOrder(invoice.serviceOrder);
+    }
+  }, [invoice]);
 
   useEffect(() => {
     formik.setFieldValue(
