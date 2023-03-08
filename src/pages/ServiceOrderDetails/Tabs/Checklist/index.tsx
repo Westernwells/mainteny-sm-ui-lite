@@ -169,10 +169,7 @@ export const CheckList = ({orderId}: Props) => {
           <Box
             sx={{py: '0.5rem', px: '0.5rem', borderRadius: '4px'}}
             bgcolor="grey.100">
-            <Typography variant="body2">
-              I’ve noticed a defect in the applicable area approximately 5cm in
-              thickness compromising the area.
-            </Typography>
+            <Typography variant="body2">{notes}</Typography>
           </Box>
         ) : null}
       </Box>
