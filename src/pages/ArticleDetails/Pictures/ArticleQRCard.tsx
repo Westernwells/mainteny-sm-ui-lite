@@ -105,7 +105,6 @@ export const ArticleQRCard = ({article}: {article: ArticleView}) => {
           onClose={saveArticle}
           successMessage={t('QR code image uploaded successfully')}
           onCancel={() => setOpenDialog(false)}
-          hints={[t('File size less than 5MB only')]}
         />
       )}
     </InfoCard>

@@ -19,7 +19,7 @@ interface Props {
   existingFiles?: FileWithPreview[];
   getAcceptedFiles?: (val: FileWithPreview[]) => void;
   getRejectedFileWithErrors?: (val: FileRejection[]) => void;
-  hints?: string[];
+  hint?: string;
   acceptedFileTypes?: string[];
   maxFiles?: number;
   cropperTitle?: string;
@@ -44,7 +44,7 @@ export const MyDropZone = ({
   existingFiles = [],
   getAcceptedFiles,
   getRejectedFileWithErrors,
-  hints = [],
+  hint = '',
   acceptedFileTypes,
   maxFiles,
   isCropped = false,
@@ -165,17 +165,6 @@ export const MyDropZone = ({
     setNewFileName('');
   };
 
-  const hintsLabel = hints?.map((hint, index) => (
-    <Box
-      key={index}
-      sx={{mr: '1em', display: 'flex', mt: '0.5em', flexDirection: 'row'}}>
-      <CheckCircleRounded sx={{mr: '0.5em'}} />
-      <Typography component="div" variant="body1">
-        {t(hint)}
-      </Typography>
-    </Box>
-  ));
-
   const thumbs = files.map((file: FileWithPreview, index) => (
     <Thumb
       key={`${file.name}-${index}`}
@@ -250,7 +239,11 @@ export const MyDropZone = ({
   };
 
   return (
-    <Box className="container" component="section">
+    <Box
+      className="container"
+      component="section"
+      width="100%"
+      maxWidth="57rem">
       <Box
         component="div"
         {...getRootProps({className: 'dropzone'})}
@@ -258,39 +251,38 @@ export const MyDropZone = ({
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          justifyContent: 'center',
           backgroundColor: theme.palette.inputBackground.main,
           border: `2px dashed rgba(143, 155, 179, 0.5)`,
-          py: '2em',
+          p: '2rem',
+          cursor: 'pointer',
+          height: '10rem',
+          borderRadius: '4px',
         }}>
         <input {...getInputProps()} />
-        <Box sx={{display: 'flex'}}>
-          <Typography
-            variant="body2"
-            component="div"
-            sx={{mt: '0.3em', mr: '1em'}}>
-            {t('Drag')} & {t('Drop OR')}
-          </Typography>
+        <Box sx={{display: 'flex', alignItems: 'center'}}>
           <Button
-            label={t('Select file')}
+            label={t('Select file to upload')}
             buttonProps={{
-              variant: 'outlined',
+              variant: 'text',
+              size: 'medium',
+              color: 'primary',
               onClick: open,
             }}
           />
+          <Typography variant="body2" component="div">
+            {t('or drag and drop')}
+          </Typography>
         </Box>
+        <Typography variant="caption">
+          {t(hint)} {t('(max. 5MB)')}
+        </Typography>
       </Box>
 
       {!isCropped && (
         <Box sx={{mt: '1.5em'}}>
-          <Box sx={{display: 'flex', flexDirection: 'column'}}>
-            {hintsLabel}
-          </Box>
-          <>
-            <Box sx={{display: 'flex', flexWrap: 'wrap', margin: '0.625em 0'}}>
-              {thumbs}
-            </Box>
-            <Box>{renderErrors()}</Box>
-          </>
+          {thumbs}
+          <Box sx={{my: '0.625rem'}}>{renderErrors()}</Box>
         </Box>
       )}
 
