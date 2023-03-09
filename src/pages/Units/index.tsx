@@ -60,3 +60,5 @@ export const MyUnits = () => {
     </Tabs>
   );
 };
+
+export default MyUnits;

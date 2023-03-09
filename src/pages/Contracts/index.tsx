@@ -191,3 +191,5 @@ export const Contracts = () => {
     </PageListingLayout>
   );
 };
+
+export default Contracts;

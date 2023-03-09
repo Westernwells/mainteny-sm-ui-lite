@@ -318,3 +318,5 @@ export const NewArticle = () => {
     </Stepper>
   );
 };
+
+export default NewArticle;

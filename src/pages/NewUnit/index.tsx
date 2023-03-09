@@ -280,3 +280,5 @@ export const NewUnit = () => {
     </Stepper>
   );
 };
+
+export default NewUnit;

@@ -191,3 +191,5 @@ export const Quotations = () => {
     </PageListingLayout>
   );
 };
+
+export default Quotations;

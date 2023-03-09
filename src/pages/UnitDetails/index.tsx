@@ -109,3 +109,5 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
     </>
   );
 };
+
+export default UnitsDetail;

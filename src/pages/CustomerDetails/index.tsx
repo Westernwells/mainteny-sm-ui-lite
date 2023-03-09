@@ -73,3 +73,5 @@ export const CustomerDetails = ({getCurrentPageTitle}: Props) => {
     </Tabs>
   );
 };
+
+export default CustomerDetails;

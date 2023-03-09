@@ -70,3 +70,5 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
     </FlexContainer>
   );
 };
+
+export default NewServiceOrder;

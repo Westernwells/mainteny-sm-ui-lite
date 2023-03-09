@@ -224,3 +224,5 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
     </Stepper>
   );
 };
+
+export default NewEmployee;

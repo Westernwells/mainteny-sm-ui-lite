@@ -41,3 +41,5 @@ export const PageNotFound = () => {
     </Box>
   );
 };
+
+export default PageNotFound;

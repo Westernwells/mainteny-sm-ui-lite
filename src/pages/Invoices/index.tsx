@@ -228,3 +228,5 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
     </PageListingLayout>
   );
 };
+
+export default Invoices;

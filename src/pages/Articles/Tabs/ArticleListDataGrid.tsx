@@ -241,7 +241,7 @@ export const ArticleListDataGrid = () => {
         alignItems="center"
         justifyContent="center"
         flexGrow={1}>
-        <Progress height="100%" />
+        <Progress />
       </Box>
     );
   }

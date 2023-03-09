@@ -38,3 +38,5 @@ export const QuotationDetails = () => {
     <EmptySection label="Sorry, we couldn't find the quotation." />
   );
 };
+
+export default QuotationDetails;

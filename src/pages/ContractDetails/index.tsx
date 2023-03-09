@@ -111,3 +111,5 @@ export const ContractDetails = () => {
     </>
   );
 };
+
+export default ContractDetails;

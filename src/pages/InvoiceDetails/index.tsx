@@ -55,3 +55,5 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
     <EmptySection label="Sorry, we couldn't find the invoice." />
   );
 };
+
+export default InvoiceDetails;

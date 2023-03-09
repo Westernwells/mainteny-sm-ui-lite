@@ -22,3 +22,5 @@ export const EditQuotationPage = () => {
     <EmptySection label="Sorry, we couldn't find the quotation." />
   );
 };
+
+export default EditQuotationPage;
