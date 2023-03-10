@@ -8,6 +8,7 @@ import {useTranslation} from 'react-i18next';
 import IconButton from '@mui/material/IconButton';
 import {DeleteOutline, Edit} from '@mui/icons-material';
 import {Dialog} from 'components/Dialog';
+import {Confirm} from 'components/Confirm';
 import {useUpdateCompany} from 'hooks/reactQuery/useCompanies';
 import {ContractTypes, ContractNameTypes} from 'models/contract';
 import {ContractNameInput} from './ContractNameInput';
@@ -26,8 +27,9 @@ const validationSchema = Yup.object().shape({
 
 export const Actions = ({id, contractNameTypes, contractNameType}: Props) => {
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
   const {t} = useTranslation();
-  const {mutateAsync: updateCompany} = useUpdateCompany(
+  const {mutateAsync: updateCompany, isLoading: isDeleting} = useUpdateCompany(
     'Contract types updated successfully',
   );
 
@@ -78,7 +80,9 @@ export const Actions = ({id, contractNameTypes, contractNameType}: Props) => {
           sx={{color: 'action.active'}}>
           <Edit fontSize="small" />
         </IconButton>
-        <IconButton onClick={onDelete} sx={{color: 'action.active'}}>
+        <IconButton
+          onClick={() => setOpenDeleteConfirm(true)}
+          sx={{color: 'action.active'}}>
           <DeleteOutline fontSize="small" />
         </IconButton>
       </Box>
@@ -127,6 +131,23 @@ export const Actions = ({id, contractNameTypes, contractNameType}: Props) => {
           </Grid>
         </Grid>
       </Dialog>
+
+      <Confirm
+        disableActions={isDeleting}
+        open={openDeleteConfirm}
+        onConfirm={async () => {
+          await onDelete();
+          setOpenDeleteConfirm(false);
+        }}
+        onClose={() => setOpenDeleteConfirm(false)}
+        title="Remove defined contract name"
+        content={[
+          'If you delete this contract name, all existing contracts with the same contract name will lose their properties.',
+          <br />,
+          <br />,
+          'Do you want to delete this defined contract name?',
+        ]}
+      />
     </>
   );
 };
