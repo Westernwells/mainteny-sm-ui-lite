@@ -114,7 +114,6 @@ export const CheckList = ({orderId}: Props) => {
 
   const questions = useMemo(() => {
     const sortedQuestions = _.sortBy(serviceOrderCheckList?.questions, [
-      'category',
       (obj) => obj.additionalInfo.orderNumber,
     ]);
     return _.groupBy(sortedQuestions, (question) => question.category);
