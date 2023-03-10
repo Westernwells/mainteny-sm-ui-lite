@@ -159,10 +159,7 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
           onClose={saveArticle}
           onCancel={() => setOpenDialog(false)}
           successMessage={t('Image uploaded successfully')}
-          hints={[
-            t('JPEG, PNG, BMP, GIF, WEBP, SVG only'),
-            t('File size less than 5MB only'),
-          ]}
+          hint="JPEG, PNG, BMP, GIF, WEBP oder SVG"
         />
       )}
     </InfoCard>

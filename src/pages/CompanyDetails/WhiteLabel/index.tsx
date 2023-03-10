@@ -79,10 +79,7 @@ export const WhiteLabel = ({containerStyles, company}: Props) => {
         {(!logoCompany || showUploadForm) && (
           <Box>
             <MyDropZone
-              hints={[
-                t('JPEG, PNG, BMP, GIF, WEBP, SVG only'),
-                t('File size less than 5MB only'),
-              ]}
+              hint="JPEG, PNG, BMP, GIF, WEBP or SVG"
               getAcceptedFiles={(files) => {
                 saveImage(files);
               }}

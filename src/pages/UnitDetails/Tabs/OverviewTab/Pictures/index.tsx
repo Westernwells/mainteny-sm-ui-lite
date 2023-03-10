@@ -232,10 +232,7 @@ export const Pictures = ({
             'image/webp',
             'image/svg+xml',
           ]}
-          hints={[
-            t('JPEG, PNG, BMP, GIF, WEBP, SVG only'),
-            t('File size less than 5MB only'),
-          ]}
+          hint="JPEG, PNG, BMP, GIF, WEBP or SVG"
           getAcceptedFiles={(files) => {
             setAcceptedFiles(files);
           }}

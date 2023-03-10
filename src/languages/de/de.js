@@ -147,6 +147,10 @@ export const germany = {
     'Property Owner': 'Eigentümer der Immobilie',
     'Do you want to delete this contract?':
       'Möchten Sie diesen Vertrag löschen?',
+    'Select file to upload': 'Datei zum Hochladen auswählen',
+    'or drag and drop': 'oder ziehen und ablegen',
+    'PDF, DOCX, XLSX, XLS, CSV or TSV': 'PDF, DOCX, XLSX, XLS, CSV oder TSV',
+    'JPEG, PNG, BMP, GIF, WEBP or SVG': 'JPEG, PNG, BMP, GIF, WEBP oder SVG',
 
     // Units
     Units: 'Anlagen',

@@ -42,12 +42,12 @@ export const Thumb = ({
 }: Props) => {
   const theme = useTheme();
   return (
-    <Box sx={{mr: '1em', display: 'flex', mt: '0.3em'}}>
+    <Box sx={{display: 'flex', py: '0.5rem'}}>
       {file.type.split('/')[0] === 'image' ? (
-        <img alt="" width={80} height={80} src={file.preview} />
+        <img alt="" width={36} height={46} src={file.preview} />
       ) : (
         <FileCopyIcon
-          sx={{fontSize: '4rem', color: theme.palette.text.secondary}}
+          sx={{fontSize: '3rem', color: theme.palette.text.secondary}}
         />
       )}
 
@@ -88,22 +88,22 @@ export const Thumb = ({
             </IconButton>
           </Box>
         ) : (
-          <Typography>{file.name}</Typography>
+          <Typography variant="body2">{file.name}</Typography>
         )}
 
-        <Typography>
+        <Typography variant="caption" color="text.secondary">
           {file.size >= oneMbInByes
-            ? `${(file.size / oneMbInByes).toFixed(2)} Mb`
-            : `${(file.size / onKbinBytes).toFixed(2)} Kb`}
+            ? `${(file.size / oneMbInByes).toFixed(2)} MB`
+            : `${(file.size / onKbinBytes).toFixed(2)} KB`}
         </Typography>
       </Box>
 
       {!isEditingFileName ? (
         <>
           <IconButton onClick={onEditClick} edge="start">
-            <EditIcon sx={{mt: '-0.8em'}} />
+            <EditIcon sx={{mt: '-1.2rem', fontSize: '1rem'}} />
           </IconButton>
-          <IconButton onClick={onDeleteFile} edge="start">
+          <IconButton onClick={onDeleteFile} edge="start" sx={{ml: 'auto'}}>
             <DeleteIcon sx={{ml: '1em'}} />
           </IconButton>
         </>
