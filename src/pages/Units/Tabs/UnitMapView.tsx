@@ -118,7 +118,7 @@ export const UnitMapsView = () => {
         }
       }
     }
-  }, [elevatorView]);
+  }, [elevatorView, isLoading, isFetching]);
 
   useEffect(() => {
     const result = elevatorView.elevator.data.map((elevator: ElevatorView) => ({
