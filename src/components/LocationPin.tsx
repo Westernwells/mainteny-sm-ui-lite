@@ -33,6 +33,7 @@ export const LocationPin = ({
       flexDirection="column"
       style={{color: 'black'}}
       padding={1}>
+      {console.log('@@@@@')}
       <Box display="flex" justifyContent="space-between">
         <Box sx={{flexGrow: 1}}>
           <Typography variant="caption" mt="1em">
@@ -130,7 +131,9 @@ export const LocationPin = ({
             title={renderTooltipDetail(elevatorItem!)}
             arrow
             placement="top">
-            <Pin />
+            <Box width="2rem" height="2rem">
+              <Pin style={{width: '100%', height: '100%'}} />
+            </Box>
           </Tooltip>
         </Box>
       )}

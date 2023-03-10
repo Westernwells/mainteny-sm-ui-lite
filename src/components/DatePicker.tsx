@@ -71,7 +71,7 @@ export const DatePicker = ({
           inputFormat={
             dateFormat || user?.userAccount.serviceCompany.settings.dateFormat
           }
-          mask={mask}
+          // mask={mask}
           disableMaskedInput={disableMask}
           value={value}
           minDate={minDate}
