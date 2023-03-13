@@ -1254,5 +1254,10 @@ export const germany = {
     'No work report for the selected service order':
       'Kein Arbeitsbericht für den ausgewählten Auftrag',
     'Website/URL': 'Website/URL',
+    'Remove defined contract name': 'Vertragsnamen entfernen',
+    'If you delete this contract name, all existing contracts with the same contract name will lose their properties.':
+      'Wenn Sie diesen Vertragsnamen löschen, verlieren alle bestehenden Verträge mit demselben Vertragsnamen ihre Eigenschaften.',
+    'Do you want to delete this defined contract name?':
+      'Möchten Sie diesen definierten Vertragsnamen löschen?',
   },
 };

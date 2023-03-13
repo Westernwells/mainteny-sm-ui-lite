@@ -6,6 +6,9 @@ import {ContractTypes} from 'models/contract';
 import Typography from '@mui/material/Typography';
 import RadioGroup from '@mui/material/RadioGroup';
 import useTheme from '@mui/material/styles/useTheme';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
 
 interface Props {
   label?: string;
@@ -65,11 +68,15 @@ export const ContractTypeRadio = ({
             handleChange={handleChange}
           />
 
-          {helperTexts
-            ? helperTexts.map((text) => (
-                <Typography key={text}>{`- ${t(text)}`}</Typography>
-              ))
-            : null}
+          <List>
+            {helperTexts
+              ? helperTexts.map((text) => (
+                  <ListItem key={text}>
+                    <ListItemText primary={t(text)} />
+                  </ListItem>
+                ))
+              : null}
+          </List>
         </Box>
       </Box>
     </RadioGroup>

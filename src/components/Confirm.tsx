@@ -12,7 +12,7 @@ interface Props {
   onConfirm: () => void;
   onClose: () => void;
   title?: string;
-  content?: string;
+  content?: string | any[];
   helperText?: string;
   disableActions?: boolean;
 }
