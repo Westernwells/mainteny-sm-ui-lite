@@ -351,6 +351,10 @@ export const ViewInvoice = ({
         id={invoice.id}
         submitHook={usePublishInvoice}
         confirmBtnDisabled={!isPDFsGenerated}
+        email={
+          invoice.propertyOwner?.additionalInfo.billingEmail ||
+          invoice.propertyOwner?.contact.email
+        }
         subject={invoice.subject}
         content={invoice.description}
       />

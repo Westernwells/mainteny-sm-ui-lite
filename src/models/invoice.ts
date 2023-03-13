@@ -8,7 +8,7 @@ import {
   PdfGenerationStatus,
   WithOptional,
 } from './misc';
-import {PropertyOwner} from './propertyManager';
+import {PropertyOwnerSimpleView} from './propertyManager';
 import {QuotationItemRecord} from './quotation';
 import {ServiceCompanySimpleView} from './service-company';
 import {ServiceOrderView, ServiceOrderType} from './service-order';
@@ -97,7 +97,7 @@ export interface InvoiceView {
   status: InvoiceStatus;
   serviceCompany: ServiceCompanySimpleView;
   serviceOrder?: ServiceOrderView;
-  propertyOwner: PropertyOwner;
+  propertyOwner: PropertyOwnerSimpleView;
   items: InvoiceItem[];
   search: string;
   meta: Meta;

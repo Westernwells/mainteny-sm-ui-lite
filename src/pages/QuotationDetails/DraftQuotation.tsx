@@ -297,6 +297,9 @@ export const DraftQuotation = () => {
         open={isSendEmailDialogOpen}
         onClose={() => setIsSendEmailDialogOpen(false)}
         confirmBtnDisabled={publishingQuotation || isCreating}
+        email={customer?.additionalInfo.billingEmail || customer?.contact.email}
+        subject={formik.values.subject}
+        content={formik.values.description}
         callback={async (emailRecord) => {
           const response = await save(formik.values);
           setIsSendEmailDialogOpen(false);

@@ -66,8 +66,8 @@ export const EditQuotation = ({quotation}: Props) => {
     quotation.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE;
 
   const initialValues: CreateQuotation = {
-    subject: '',
-    description: '',
+    subject: quotation.subject,
+    description: quotation.description,
     elevatorId: '',
     moreInfo: '',
     items: [],
@@ -129,8 +129,6 @@ export const EditQuotation = ({quotation}: Props) => {
       ),
     );
     setUnit(quotation.elevator);
-    formik.setFieldValue('subject', quotation.subject, true);
-    formik.setFieldValue('description', quotation.description, true);
     formik.setFieldValue('moreInfo', quotation.moreInfo, true);
   }, [quotation]);
 
@@ -375,8 +373,9 @@ export const EditQuotation = ({quotation}: Props) => {
         id={quotation.id}
         submitHook={usePublishQuotation}
         confirmBtnDisabled={!isPDFGenerated}
-        subject={quotation.subject}
-        content={quotation.description}
+        email={customer?.additionalInfo.billingEmail || customer?.contact.email}
+        subject={formik.values.subject}
+        content={formik.values.description}
       />
       <Confirm
         open={isDeleteDialogOpen}

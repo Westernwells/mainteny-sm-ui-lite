@@ -54,6 +54,8 @@ export const SendEmailDialog = ({
   const {t} = useTranslation();
   const publish = submitHook?.();
   const formik = useFormik<SimpleEmailRecord>({
+    validateOnMount: false,
+    enableReinitialize: true,
     initialValues: {
       email: email || '',
       subject: subject || '',

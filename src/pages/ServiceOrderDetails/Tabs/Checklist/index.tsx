@@ -429,6 +429,12 @@ export const CheckList = ({orderId}: Props) => {
               open={isSendEmailDialogOpen}
               onClose={() => setIsSendEmailDialogOpen(false)}
               confirmBtnDisabled={publishingCheckList}
+              email={
+                serviceOrderDetails.elevator.propertyOwner?.additionalInfo
+                  .billingEmail ||
+                serviceOrderDetails.elevator.propertyOwner?.contact.email
+              }
+              content={serviceOrderDetails.description}
               callback={async (emailRecord) => {
                 setIsSendEmailDialogOpen(false);
                 await publishCheckList({

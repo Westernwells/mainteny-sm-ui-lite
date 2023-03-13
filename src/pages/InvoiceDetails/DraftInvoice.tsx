@@ -647,7 +647,9 @@ export const DraftInvoice = ({serviceOrderResource}: Props) => {
         open={isSendEmailDialogOpen}
         onClose={() => setIsSendEmailDialogOpen(false)}
         confirmBtnDisabled={publishingInvoice || isCreating}
-        email={customer?.additionalInfo.billingEmail}
+        email={customer?.additionalInfo.billingEmail || customer?.contact.email}
+        subject={formik.values.subject}
+        content={formik.values.description}
         callback={async (emailRecord) => {
           const response = await save(formik.values);
           setIsSendEmailDialogOpen(false);
