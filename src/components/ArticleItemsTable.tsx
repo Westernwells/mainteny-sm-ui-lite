@@ -13,7 +13,7 @@ import AddIcon from '@mui/icons-material/Add';
 import {QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord} from 'models/invoice';
 import {Amount} from 'models/misc';
-import {ArticleView, QueryArticleType} from 'models/article';
+import {ArticleType, ArticleView} from 'models/article';
 import {
   useArticles,
   useCreatePartialArticle,
@@ -56,7 +56,7 @@ export const ArticleItemsTable = ({
       pageIndex: 0,
       pageSize: 1,
       query: '[internallabel:partial]',
-      type: [QueryArticleType.SYSTEM],
+      type: [ArticleType.SYSTEM],
     },
     {},
     true,
@@ -69,7 +69,7 @@ export const ArticleItemsTable = ({
       pageIndex: 0,
       pageSize: 1,
       query: '[internallabel:credit_note]',
-      type: [QueryArticleType.SYSTEM],
+      type: [ArticleType.SYSTEM],
     },
     {},
     true,

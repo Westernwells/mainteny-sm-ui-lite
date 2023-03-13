@@ -16,6 +16,7 @@ export enum ArticleType {
   PART = 'PART',
   PRODUCT = 'PRODUCT',
   SERVICE = 'SERVICE',
+  SYSTEM = 'SYSTEM',
 }
 
 export interface ArticleItem {
@@ -46,7 +47,7 @@ export interface ArticleView {
   stock: Stock;
   storageLocation: string;
   subCategory: string;
-  type: ArticleType;
+  type: ArticleType[];
   unit: string;
   unitPurchaseAmount: Amount;
   unitSellingAmount: Amount;
@@ -56,26 +57,6 @@ export interface ArticleView {
 export interface ArticleViewItem {
   article: ArticleView;
   quantity: number;
-}
-
-export interface Article {
-  additionalInfo: ArticleAdditionalInfo;
-  category: string;
-  childArticles?: ArticleViewItem[];
-  description: string;
-  id: string;
-  manufacturer: string;
-  meta: Meta;
-  model: string;
-  name: string;
-  number: string;
-  search: string;
-  serviceCompanyId: string;
-  supplier: Supplier;
-  type: ArticleType;
-  unit: string;
-  unitPurchaseAmount: Amount;
-  unitSellingAmount: Amount;
 }
 
 export interface CreateArticleRecord {
@@ -118,19 +99,11 @@ export interface UpdateArticleRecord {
   unitSellingAmount: AmountRecord;
 }
 
-export enum QueryArticleType {
-  SERVICE = 'SERVICE',
-  PRODUCT = 'PRODUCT',
-  PART = 'PART',
-  PACKAGE = 'PACKAGE',
-  SYSTEM = 'SYSTEM',
-}
-
 export interface QueryArticleParams {
   pageIndex: number;
   pageSize: number;
   query?: string;
-  type?: QueryArticleType[];
+  type?: ArticleType[];
   manufacturer?: string;
   supplier?: string;
 }
@@ -230,7 +203,7 @@ export interface ArticleSimpleView {
   number: string;
   externalId: string;
   model: string;
-  type: ArticleType;
+  type: ArticleType[];
   category: string;
   subCategory: string;
   manufacturer: string;

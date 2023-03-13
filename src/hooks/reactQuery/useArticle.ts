@@ -17,7 +17,7 @@ import {
   ServiceOrderArticleRecord,
   CreateArticleOrderRecord,
   ArticleOrderView,
-  QueryArticleType,
+  ArticleType,
 } from 'models/article';
 import {Resource, RestError, StringValue} from 'models/misc';
 import {data} from 'utils/partial-article-data';
@@ -55,10 +55,10 @@ export function useArticles(
       fetchArticles(
         {
           type: [
-            QueryArticleType.SERVICE,
-            QueryArticleType.PRODUCT,
-            QueryArticleType.PART,
-            QueryArticleType.PACKAGE,
+            ArticleType.SERVICE,
+            ArticleType.PRODUCT,
+            ArticleType.PART,
+            ArticleType.PACKAGE,
           ],
           ...params,
         },
