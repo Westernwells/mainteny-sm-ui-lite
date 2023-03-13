@@ -387,8 +387,12 @@ export const InvoiceOverdueNotice = () => {
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={invoice?.id ?? ''}
         confirmBtnDisabled={formik.isSubmitting}
-        subject={invoice?.subject ?? ''}
-        content={invoice?.description ?? ''}
+        email={
+          invoice?.propertyOwner?.additionalInfo.billingEmail ||
+          invoice?.propertyOwner?.contact.email
+        }
+        subject={formik.values.subject}
+        content={formik.values.description}
         callback={(values) => onSubmitHandler(values)}
         loadingProgress={isEditing ? fakeProgress : 0}
       />

@@ -132,8 +132,8 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
   ]).current;
 
   const initialValues: CreateInvoice = {
-    subject: '',
-    description: '',
+    subject: invoice.subject,
+    description: invoice.description,
     dueDate: '',
     issuedDate: dateToString(new Date()),
     type: InvoiceType.FULL,
@@ -201,8 +201,6 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
     setServiceOrder(invoice.serviceOrder);
     setCustomer(invoice.serviceOrder?.elevator.propertyOwner);
 
-    formik.setFieldValue('subject', invoice.subject, true);
-    formik.setFieldValue('description', invoice.description, true);
     formik.setFieldValue('type', invoice.type, true);
     formik.setFieldValue('paymentTerms', invoice.paymentTerms, true);
     formik.setFieldValue('sentDate', invoice.sentDate, true);
@@ -780,8 +778,9 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
         id={invoice.id}
         submitHook={usePublishInvoice}
         confirmBtnDisabled={!isPDFsGenerated}
-        subject={invoice.subject}
-        content={invoice.description}
+        email={customer?.additionalInfo.billingEmail || customer?.contact.email}
+        subject={formik.values.subject}
+        content={formik.values.description}
       />
       <Confirm
         open={isDeleteDialogOpen}
