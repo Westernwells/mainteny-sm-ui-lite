@@ -70,7 +70,7 @@ export const useAuth = (): UseAuth => {
         updateUser(user);
         if (location.state?.from) {
           navigate(
-            `/${location.state.from.pathname}${
+            `${location.state.from.pathname}${
               location.state.from.search ? location.state.from.search : ''
             }`,
             {replace: true},
