@@ -118,11 +118,19 @@ export interface UpdateArticleRecord {
   unitSellingAmount: AmountRecord;
 }
 
+export enum QueryArticleType {
+  SERVICE = 'SERVICE',
+  PRODUCT = 'PRODUCT',
+  PART = 'PART',
+  PACKAGE = 'PACKAGE',
+  SYSTEM = 'SYSTEM',
+}
+
 export interface QueryArticleParams {
   pageIndex: number;
   pageSize: number;
   query?: string;
-  type?: string;
+  type?: QueryArticleType[];
   manufacturer?: string;
   supplier?: string;
 }

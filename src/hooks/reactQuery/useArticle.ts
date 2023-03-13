@@ -17,6 +17,7 @@ import {
   ServiceOrderArticleRecord,
   CreateArticleOrderRecord,
   ArticleOrderView,
+  QueryArticleType,
 } from 'models/article';
 import {Resource, RestError, StringValue} from 'models/misc';
 import {data} from 'utils/partial-article-data';
@@ -50,7 +51,19 @@ export function useArticles(
   const {user} = useUserSession();
   return useQuery<Resource<ArticleView>, RestError>(
     [qk.fetchArticles, params, user?.userAccount.id],
-    () => fetchArticles(params, user!.userAccount.serviceCompany.id),
+    () =>
+      fetchArticles(
+        {
+          type: [
+            QueryArticleType.SERVICE,
+            QueryArticleType.PRODUCT,
+            QueryArticleType.PART,
+            QueryArticleType.PACKAGE,
+          ],
+          ...params,
+        },
+        user!.userAccount.serviceCompany.id,
+      ),
     {
       enabled: !!user,
       select: useCallback(
