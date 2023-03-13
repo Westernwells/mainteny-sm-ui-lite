@@ -1,4 +1,4 @@
-import {Article} from './article';
+import {ArticleView} from './article';
 import {
   Amount,
   AmountRecord,
@@ -36,7 +36,7 @@ export enum InvoiceStatusView {
 }
 
 export interface InvoiceItem {
-  article: Article;
+  article: ArticleView;
   data: string;
   description: string;
   id: string;

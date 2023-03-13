@@ -1,4 +1,4 @@
-import {Article} from './article';
+import {ArticleView} from './article';
 import {ElevatorView} from './elevator';
 import {Amount, Meta} from './misc';
 import {ServiceCompanySimpleView} from './service-company';
@@ -23,7 +23,7 @@ export type QuotationAdditionalInfo = {
 
 export interface QuotationItem {
   additionalInfo: QuotationAdditionalInfo;
-  article: Article;
+  article: ArticleView;
   id: string;
   description: string;
   name: string;
