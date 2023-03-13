@@ -142,10 +142,12 @@ export const Actions = ({id, contractNameTypes, contractNameType}: Props) => {
         onClose={() => setOpenDeleteConfirm(false)}
         title="Remove defined contract name"
         content={[
-          'If you delete this contract name, all existing contracts with the same contract name will lose their properties.',
+          t(
+            'If you delete this contract name, all existing contracts with the same contract name will lose their properties.',
+          ),
           <br />,
           <br />,
-          'Do you want to delete this defined contract name?',
+          t('Do you want to delete this defined contract name?'),
         ]}
       />
     </>
