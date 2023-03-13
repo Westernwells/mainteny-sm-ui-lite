@@ -47,7 +47,7 @@ export interface ArticleView {
   stock: Stock;
   storageLocation: string;
   subCategory: string;
-  type: ArticleType[];
+  type: ArticleType;
   unit: string;
   unitPurchaseAmount: Amount;
   unitSellingAmount: Amount;
@@ -203,7 +203,7 @@ export interface ArticleSimpleView {
   number: string;
   externalId: string;
   model: string;
-  type: ArticleType[];
+  type: ArticleType;
   category: string;
   subCategory: string;
   manufacturer: string;
