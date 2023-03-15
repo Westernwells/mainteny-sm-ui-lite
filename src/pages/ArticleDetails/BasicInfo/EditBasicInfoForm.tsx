@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
+import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
 import {ArticleType} from '../../../models/article';
 import {FormInput} from '../../../components/form/FormInput';
@@ -248,8 +249,11 @@ export const EditBasicInfoForm = ({
         }}
       />
 
-      <ComboBox
+      <FormSelect
+        required
         containerStyles={{...containerStyles}}
+        labelId="typeSelect-label"
+        label={t('Types')}
         options={Object.keys(ArticleType)
           .filter(
             (key) => key !== ArticleType.PACKAGE && key !== ArticleType.SYSTEM,
@@ -258,20 +262,13 @@ export const EditBasicInfoForm = ({
             label: convertToText(key),
             value: convertToText(key),
           }))}
-        initialValue={
-          formik.values.type
-            ? {
-                label: convertToText(formik.values.type),
-                value: convertToText(formik.values.type),
-              }
-            : null
-        }
-        initialQuery={formik.values.type}
-        getValue={(item) => formik.setFieldValue('type', item?.value)}
-        textFieldProps={{
+        selectProps={{
+          id: 'typeSelect',
+          value: formik.values.type
+            ? convertToText(formik.values.type)
+            : undefined,
+          onChange: formik.handleChange,
           name: 'type',
-          label: t('Type'),
-          required: true,
           placeholder: t('e.g. Select type'),
           error: !!(formik.touched.type && formik.errors.type),
         }}
