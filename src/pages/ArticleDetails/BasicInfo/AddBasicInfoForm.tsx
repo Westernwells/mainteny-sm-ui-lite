@@ -250,7 +250,9 @@ export const AddBasicInfoForm = ({
       <ComboBox
         containerStyles={{...containerStyles}}
         options={Object.keys(ArticleType)
-          .filter((key) => key !== ArticleType.PACKAGE)
+          .filter(
+            (key) => key !== ArticleType.PACKAGE && key !== ArticleType.SYSTEM,
+          )
           .map((key) => ({
             label: t(convertToText(key)),
             value: convertToText(key),

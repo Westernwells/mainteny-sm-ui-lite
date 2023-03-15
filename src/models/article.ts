@@ -16,6 +16,7 @@ export enum ArticleType {
   PART = 'PART',
   PRODUCT = 'PRODUCT',
   SERVICE = 'SERVICE',
+  SYSTEM = 'SYSTEM',
 }
 
 export interface ArticleItem {
