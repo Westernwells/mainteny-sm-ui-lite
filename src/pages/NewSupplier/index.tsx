@@ -31,7 +31,7 @@ const NewSupplier = () => {
   const navigate = useNavigate();
   const {t} = useTranslation();
   const {mutateAsync: createSupplier} = useCreateArticleSupplier(
-    'Supplier created successfully',
+    'New supplier created successfully!',
   );
 
   const formik = useFormik<CreateArticleSupplierRecord>({

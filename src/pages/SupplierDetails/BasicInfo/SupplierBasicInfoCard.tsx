@@ -43,7 +43,7 @@ export const SupplierBasicInfoCard = ({
   const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
   const {mutateAsync: updateArticle, isLoading} = useUpdateSupplier(
-    'Supplier updated successfully',
+    'Supplier details updated successfully!',
   );
 
   const formik = useFormik<UpdateArticleSupplierRecord>({
