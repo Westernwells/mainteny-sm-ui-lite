@@ -15,7 +15,7 @@ const queryClient = new QueryClient({
     queries: {
       useErrorBoundary: true,
       onError: queryErrorHandler,
-      refetchOnWindowFocus: false,
+      // refetchOnWindowFocus: false,
     },
     mutations: {
       onError: MutationErrorHandler,
