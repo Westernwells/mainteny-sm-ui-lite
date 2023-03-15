@@ -166,7 +166,7 @@ export const AddUnitsDataGrid = ({
           noRowsEmptySection={
             <NoRowsEmptySection
               placeholder="unit"
-              action={() => navigate('/units/new')}
+              action={() => window.open('/units/new', '_blank')}
             />
           }
         />

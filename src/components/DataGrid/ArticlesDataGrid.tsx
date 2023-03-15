@@ -146,7 +146,7 @@ export const ArticlesDataGrid = ({setRowItem}: Props) => {
           noRowsEmptySection={
             <NoRowsEmptySection
               placeholder="article"
-              action={() => navigate('/articles/new')}
+              action={() => window.open('/articles/new', '_blank')}
             />
           }
         />

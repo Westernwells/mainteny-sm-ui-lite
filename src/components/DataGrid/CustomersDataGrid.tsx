@@ -130,7 +130,7 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
           noRowsEmptySection={
             <NoRowsEmptySection
               placeholder="customer"
-              action={() => navigate('/customers/new')}
+              action={() => window.open('/customers/new', '_blank')}
             />
           }
         />
