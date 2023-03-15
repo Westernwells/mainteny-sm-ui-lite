@@ -179,6 +179,7 @@ export interface ArticleSupplierView {
   additionalInfo: string;
   search: string;
   meta: Meta;
+  category: string;
 }
 
 export interface ArticleSupplierSimpleView {
@@ -238,4 +239,25 @@ export interface ArticleOrderView {
   additionalInfo: ArticleOrderAdditionalInfo;
   search: string;
   meta: Meta;
+}
+
+export interface CreateArticleSupplierRecord {
+  serviceCompanyId: string;
+  externalId: string;
+  name: string;
+  email: string;
+  phone: string;
+  url: string;
+  address: AddressRecord;
+  category: string;
+}
+
+export interface UpdateArticleSupplierRecord {
+  externalId: string;
+  name: string;
+  email: string;
+  phone: string;
+  url: string;
+  address: AddressRecord;
+  category: string;
 }
