@@ -122,6 +122,10 @@ export const AppTopBar = ({
                   label: 'Deutsch',
                   action: () => changeLanguage('de-DE'),
                 },
+                {
+                  label: 'Serbien',
+                  action: () => changeLanguage('sr-SP'),
+                },
               ]}
             />
           </Box>

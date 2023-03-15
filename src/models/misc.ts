@@ -149,6 +149,7 @@ export enum SaveMode {
 export enum Language {
   'en-US' = 'en-us',
   'de-DE' = 'de-de',
+  'sr-SP' = 'sr-sp',
 }
 
 export enum Order {
