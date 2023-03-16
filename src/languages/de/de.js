@@ -366,6 +366,20 @@ export const germany = {
     'No suppliers yet. Please click the button below to add!':
       'Noch keine Lieferanten vorhanden. Bitte klicken Sie zum Hinzufügen auf die Schaltfläche unten!',
     '+ Add suppliers': '+ Lieferanten hinzufügen',
+    'Add Supplier': 'Lieferant hinzufügen',
+    'Create Supplier': 'Lieferant anlegen',
+    'New Supplier': 'Neuer Lieferant',
+    'Supplier Details': 'Lieferantendetails',
+    'SUPPLIER ID': 'LIEFERANTEN-ID',
+    'EMAIL ADDRESS': 'EMAIL ADRESSE',
+    Website: 'Website',
+    'New supplier created successfully!':
+      'Neuer Lieferant erfolgreich angelegt!',
+    'Supplier details updated successfully!':
+      'Lieferantendaten erfolgreich aktualisiert!',
+    'Supplier deleted successfully': 'Lieferant erfolgreich gelöscht',
+    'Do you want to delete this supplier?':
+      'Möchten Sie diesen Lieferanten löschen?',
     Preferred: 'Bevorzug',
     'QR code image uploaded successfully!':
       'QR-Code-Bild erfolgreich hochgeladen!',
