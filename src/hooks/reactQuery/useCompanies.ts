@@ -27,7 +27,6 @@ import {
 } from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
 import {ServiceOrder} from 'models/service-order';
-import {ArticleSupplierView} from 'models/article';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {useUserSession} from './useUserSession';
 
@@ -58,41 +57,6 @@ export function useCompanies(
     },
   );
 }
-
-export const queryArticleSuppliers = async (
-  serviceCompanyId: string,
-  page: Page,
-  query: string,
-) => {
-  const response = await axiosClient.get<Resource<ArticleSupplierView>>(
-    `/api/serviceCompanies/${serviceCompanyId}/articleSuppliers`,
-    {
-      params: {
-        query,
-        ...page,
-      },
-      paramsSerializer,
-    },
-  );
-  return response.data;
-};
-
-export const useQueryArticleSuppliers = (
-  page: Page,
-  query: string,
-  options?: UseQueryOptions<any, any, any>,
-) => {
-  const {user} = useUserSession();
-  return useQuery<Resource<ArticleSupplierView>, RestError>(
-    [queryKeys.queryArticleSuppliers, page, query],
-    () =>
-      queryArticleSuppliers(user!.userAccount.serviceCompany.id, page, query),
-    {
-      enabled: !!user,
-      ...options,
-    },
-  );
-};
 
 export const getCompany = async (companyId: string) => {
   const response = await axiosClient.get<ServiceCompanyItem>(

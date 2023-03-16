@@ -126,7 +126,8 @@ export const Tabs = ({
         sx={{
           flexGrow: 1,
           '& .MuiTabs-flexContainer': {
-            gap: '0.75em',
+            columnGap: '0.75em',
+            flexWrap: 'wrap',
           },
           '& .MuiTabs-indicator': {
             display: 'flex',
@@ -195,6 +196,14 @@ export const Tabs = ({
             {...a11yProps(index)}
           />
         ))}
+        <Divider
+          sx={{
+            flexBasis: '100%',
+            border: `0.5px solid ${theme.palette.action.disabledBackground}`,
+            mt: '-0.5em',
+            mb: '1em',
+          }}
+        />
       </MuiTabs>
     );
   };
@@ -211,7 +220,6 @@ export const Tabs = ({
         {renderTabItems()}
         {renderActionButtons()}
       </Box>
-      <Divider light sx={{mt: '-0.5em', mb: '1em'}} />
 
       <Box
         sx={{

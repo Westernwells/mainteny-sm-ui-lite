@@ -18,8 +18,11 @@ import {
   CreateArticleOrderRecord,
   ArticleOrderView,
   ArticleType,
+  CreateArticleSupplierRecord,
+  ArticleSupplierView,
+  UpdateArticleSupplierRecord,
 } from 'models/article';
-import {Resource, RestError, StringValue} from 'models/misc';
+import {Page, Resource, RestError, StringValue} from 'models/misc';
 import {data} from 'utils/partial-article-data';
 import {useUserSession} from './useUserSession';
 
@@ -287,4 +290,143 @@ export const useCreateArticleOrder = (successMsg: string) => {
       },
     },
   );
+};
+
+export const queryArticleSuppliers = async (
+  serviceCompanyId: string,
+  page: Page,
+  query: string,
+) => {
+  const response = await axiosClient.get<Resource<ArticleSupplierView>>(
+    `/api/serviceCompanies/${serviceCompanyId}/articleSuppliers`,
+    {
+      params: {
+        query,
+        ...page,
+      },
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useQueryArticleSuppliers = (
+  page: Page,
+  query: string,
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {user} = useUserSession();
+  return useQuery<Resource<ArticleSupplierView>, RestError>(
+    [queryKeys.queryArticleSuppliers, page, query],
+    () =>
+      queryArticleSuppliers(user!.userAccount.serviceCompany.id, page, query),
+    {
+      enabled: !!user,
+      ...options,
+    },
+  );
+};
+
+const createArticleSupplier = async (
+  body: CreateArticleSupplierRecord,
+): Promise<StringValue> => {
+  const response = await axiosClient.post<StringValue>(
+    '/api/articleSuppliers',
+    {
+      ...body,
+    },
+  );
+  return response.data;
+};
+
+export const useCreateArticleSupplier = (successMsg: string) => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+  return useMutation(
+    (body: CreateArticleSupplierRecord) => createArticleSupplier(body),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+        queryClient.invalidateQueries([queryKeys.fetchArticleSuppliers]);
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+const getArticleSupplier = async (id: string) => {
+  const response = await axiosClient.get<ArticleSupplierView>(
+    `/api/articleSuppliers/${id}`,
+  );
+  return response.data;
+};
+
+export const useArticleSupplier = (
+  id?: string,
+  options?: UseQueryOptions<any, any, any>,
+) =>
+  useQuery<ArticleSupplierView, RestError>(
+    [qk.fetchArticleSupplier, id],
+    () => getArticleSupplier(id!),
+    {enabled: !!id, ...options},
+  );
+
+const updateSupplier = async (
+  id: string,
+  supplier: UpdateArticleSupplierRecord,
+) => {
+  await axiosClient.put<StringValue>(`/api/articleSuppliers/${id}`, {
+    ...supplier,
+  });
+};
+
+export const useUpdateSupplier = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({id, supplier}: {id: string; supplier: UpdateArticleSupplierRecord}) =>
+      updateSupplier(id, supplier),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.fetchArticleSupplier);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+const deleteSupplier = async (id: string) => {
+  await axiosClient.delete<StringValue>(`/api/articleSuppliers/${id}`);
+};
+
+export const useDeleteSupplier = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(({id}: {id: string}) => deleteSupplier(id), {
+    onSuccess: () => {
+      if (successMsg) {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+      }
+      queryClient.invalidateQueries(queryKeys.queryArticleSuppliers);
+    },
+    onError: (err: any) => {
+      console.log(err);
+      showError(err);
+    },
+  });
 };

@@ -5,7 +5,7 @@ import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
-import {useQueryArticleSuppliers} from 'hooks/reactQuery/useCompanies';
+import {useQueryArticleSuppliers} from 'hooks/reactQuery/useArticle';
 import {ArticleSupplierView} from 'models/article';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {NoRowsEmptySection} from './NoRowsEmptySection';

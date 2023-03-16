@@ -52,6 +52,8 @@ const Articles = lazy(() => import('pages/Articles'));
 const ArticleOverView = lazy(() => import('pages/ArticleDetails'));
 const OrderArticle = lazy(() => import('pages/OrderArticle'));
 const NewArticle = lazy(() => import('pages/ArticleDetails/NewArticle'));
+const NewSupplier = lazy(() => import('pages/NewSupplier'));
+const SupplierDetails = lazy(() => import('pages/SupplierDetails'));
 
 export const Router = () => {
   const titleTail = 'Service Manager Portal';
@@ -567,6 +569,37 @@ export const Router = () => {
                 </Helmet>
                 <PageLayout backBtnLabel="New Package" showBackAction>
                   <NewArticle />
+                </PageLayout>
+              </>
+            }
+          />
+
+          <Route
+            path="/articles/newSupplier"
+            element={
+              <>
+                <Helmet>
+                  <title>{`New Supplier - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout backBtnLabel="New Supplier" showBackAction>
+                  <NewSupplier />
+                </PageLayout>
+              </>
+            }
+          />
+
+          <Route
+            path="/articles/supplier/:id"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Supplier Details - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout
+                  pageScrollable
+                  backBtnLabel={t('Supplier Details')}
+                  showBackAction>
+                  <SupplierDetails />
                 </PageLayout>
               </>
             }
