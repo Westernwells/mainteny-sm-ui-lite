@@ -147,7 +147,7 @@ export const Reports = () => {
                 <Box sx={{color: iconColor, display: 'flex'}}>
                   {option.icon}
                 </Box>
-                <Typography variant="h5">{option.label}</Typography>
+                <Typography variant="h5">{t(option.label)}</Typography>
               </Grid>
             }
             value={option.value}
