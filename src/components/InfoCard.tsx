@@ -45,9 +45,9 @@ export const InfoCard = ({
       {!disabledHeader && (
         <CardHeader
           sx={{
-            py: header ? '0.5em' : '0',
+            py: header ? '0.25rem' : '0',
             my: '1em',
-            px: !showHeaderBackground ? '0' : 'default',
+            px: !showHeaderBackground ? '0' : '0.5rem',
             background: showHeaderBackground
               ? theme.palette.inputBackground.main
               : null,

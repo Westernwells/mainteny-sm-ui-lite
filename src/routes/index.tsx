@@ -54,6 +54,7 @@ const OrderArticle = lazy(() => import('pages/OrderArticle'));
 const NewArticle = lazy(() => import('pages/ArticleDetails/NewArticle'));
 const NewSupplier = lazy(() => import('pages/NewSupplier'));
 const SupplierDetails = lazy(() => import('pages/SupplierDetails'));
+const Analytics = lazy(() => import('pages/Analytics'));
 
 export const Router = () => {
   const titleTail = 'Service Manager Portal';
@@ -636,6 +637,20 @@ export const Router = () => {
                   backBtnLabel="Notifications"
                   showBackAction>
                   <Notifications />
+                </PageLayout>
+              </>
+            }
+          />
+
+          <Route
+            path="/analytics"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Analytics - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout pageTitle="Analytics">
+                  <Analytics />
                 </PageLayout>
               </>
             }
