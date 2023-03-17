@@ -280,6 +280,8 @@ export const Reports = () => {
                   textFieldProps={{
                     label: 'To',
                     InputLabelProps: {shrink: true},
+                    helperText: formik.errors.endDate,
+                    error: !!formik.errors.endDate,
                   }}
                   required
                 />
