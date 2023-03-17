@@ -1273,5 +1273,20 @@ export const germany = {
       'Wenn Sie diesen Vertragsnamen löschen, verlieren alle bestehenden Verträge mit demselben Vertragsnamen ihre Eigenschaften.',
     'Do you want to delete this defined contract name?':
       'Möchten Sie diesen definierten Vertragsnamen löschen?',
+
+    // Analytics
+    Analytics: 'Analytik',
+    Reports: 'Berichte',
+    'Report config': 'Bericht konfigurieren',
+    'Report types': 'Berichtsarten',
+    Financials: 'Finanzen',
+    'Format type': 'Format',
+    'Choose format': 'Format wählen',
+    Period: 'Zeitraum',
+    To: 'An',
+    Downloading: 'Herunterladen',
+    'Report downloaded successfully!': 'Bericht erfolgreich heruntergeladen!',
+    'Max time range exceeded, the max time range is 90 days':
+      'Maximale Zeitspanne überschritten, die maximale Zeitspanne beträgt 90 Tage',
   },
 };
