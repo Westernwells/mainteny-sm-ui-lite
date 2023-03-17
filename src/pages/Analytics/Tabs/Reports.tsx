@@ -37,6 +37,7 @@ const validationSchema = Yup.object().shape({
     .required('Format type is required'),
   startDate: Yup.date().nullable().required('Start date is required'),
   endDate: Yup.date()
+    .nullable()
     .when('startDate', (startDate, schema) => {
       if (startDate) {
         const dayAfter = new Date(startDate);
@@ -280,8 +281,13 @@ export const Reports = () => {
                   textFieldProps={{
                     label: 'To',
                     InputLabelProps: {shrink: true},
-                    helperText: formik.errors.endDate,
-                    error: !!formik.errors.endDate,
+                    helperText:
+                      formik.initialValues.endDate !== formik.values.endDate
+                        ? formik.errors.endDate
+                        : '',
+                    error:
+                      formik.initialValues.endDate !== formik.values.endDate &&
+                      !!formik.errors.endDate,
                   }}
                   required
                 />
