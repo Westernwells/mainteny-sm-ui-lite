@@ -25,6 +25,7 @@ import PaymentsIcon from '@mui/icons-material/Payments';
 import {Settings} from '@mui/icons-material';
 import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import PieChartIcon from '@mui/icons-material/PieChart';
 import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
 import {ReactComponent as MaintenyLogo} from 'assets/icons/Mainteny.svg';
 import Fade from '@mui/material/Fade';
@@ -244,6 +245,21 @@ export const AppDrawer = () => {
         setSelectedPath('/employees');
         Mixpanel.identifyAndTrack(mixpanelEvents.MENU_EMPLOYEES_CLICKED);
         navigate('/employees');
+      },
+    },
+    {
+      text: 'Analytics',
+      icon: <PieChartIcon sx={{color: '#fff'}} />,
+      path: '/analytics',
+      access: !isAdmin,
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/analytics');
+        navigate('/analytics');
       },
     },
     {
