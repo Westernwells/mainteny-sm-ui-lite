@@ -28,7 +28,7 @@ import {
 } from 'utils/service-order-utils';
 import {grey} from '@mui/material/colors';
 import {FormCheckbox} from 'components/form/FormCheckbox';
-import {ServiceOrderStatus} from 'models/service-order';
+import {ChecklistStatus, ServiceOrderStatus} from 'models/service-order';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {PdfGenerationStatus} from 'models/misc';
 import {SendEmailDialog} from 'components/SendEmailDialog';
@@ -191,7 +191,8 @@ export const CheckList = ({orderId}: Props) => {
 
   if (
     !serviceOrderDetails?.additionalInfo.checkListInfo?.checkListId ||
-    serviceOrderDetails.status !== ServiceOrderStatus.COMPLETED
+    serviceOrderDetails?.additionalInfo.checkListInfo?.status !==
+      ChecklistStatus.COMPLETED
   ) {
     return (
       <InfoCard
