@@ -789,6 +789,7 @@ export const germany = {
     'Download Invoice': 'Rechnung herunterladen',
     Download: 'Herunterladen',
     'Work Report': 'Arbeitsbericht',
+    'Download Work Report': 'Arbeitsbericht herunterladen',
     'Invoice Number': 'Rechnungsnummer',
     'Total (excl VAT)': 'Gesamt (ohne MwSt.)',
     'Create Credit note': 'Gutschrift erstellen',
