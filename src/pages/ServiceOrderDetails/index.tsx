@@ -69,7 +69,12 @@ export const ServiceOrderDetails = () => {
         <Overview orderId={serviceOrderId} />
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
-        <WorkReport orderId={serviceOrderId} />
+        <WorkReport
+          orderId={serviceOrderId}
+          downloadWorkReport={
+            isWorkReportPdfGenerated ? downloadWorkReport : null
+          }
+        />
       </TabsBody>
       <TabsBody
         value={tabValue}

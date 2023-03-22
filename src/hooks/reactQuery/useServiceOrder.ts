@@ -931,3 +931,35 @@ export const usePublishChecklist = () => {
     },
   );
 };
+
+export const publishWorkReport = async (
+  id: string,
+  body: SimpleEmailRecord,
+) => {
+  await axiosClient.post<{value: string}>(
+    `/api/serviceOrders/${id}/report/publish`,
+    body,
+  );
+};
+
+export const usePublishWorkReport = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+
+  return useMutation(
+    ({id, body}: {id: string; body: SimpleEmailRecord}) =>
+      publishWorkReport(id, body),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.fetchServiceOrderWorkReport]);
+        enqueueSnackbar(`Work report sent successfully!`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};

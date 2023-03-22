@@ -23,6 +23,8 @@ interface Props {
   submitHook?: typeof usePublishInvoice | typeof usePublishQuotation;
   id?: string;
   confirmBtnDisabled?: boolean;
+  title?: string;
+  confirmBtnLabel?: string;
   email?: string;
   subject?: string;
   content?: string;
@@ -45,6 +47,8 @@ export const SendEmailDialog = ({
   submitHook,
   id,
   confirmBtnDisabled,
+  title = 'Send email',
+  confirmBtnLabel = 'Send email',
   email,
   subject,
   content,
@@ -104,7 +108,7 @@ export const SendEmailDialog = ({
         },
       }}>
       <DialogTitle id="alert-dialog-title" sx={{padding: 0}}>
-        {t('Send email')}
+        {t(title)}
       </DialogTitle>
       <DialogContent sx={{p: 0, px: 0, pb: '1.5rem'}}>
         <Box display="flex" flexDirection="column" gap={3} pt="2rem">
@@ -216,7 +220,7 @@ export const SendEmailDialog = ({
                   Object.keys(formik.errors).length > 0,
                 onClick: () => formik.handleSubmit(),
               }}>
-              <Typography variant="subtitle2">{t('Send email')}</Typography>
+              <Typography variant="subtitle2">{t(confirmBtnLabel)}</Typography>
             </Button>
           </span>
         </Tooltip>
