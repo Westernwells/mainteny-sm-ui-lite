@@ -96,11 +96,13 @@ export const daysTime: {[key: number]: string[]}[] = [
 export const languageMap: {[key: string]: string} = {
   'en-US': 'en-us',
   'de-DE': 'de-de',
+  'sr-SP': 'sr-sp',
 };
 
 export const mapLanguageToLocale: {[key: string]: string} = {
   'en-us': 'enUS',
   'de-de': 'de',
+  'sr-SP': 'sr',
 };
 
 export const getDataGridHeight = (

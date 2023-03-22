@@ -14,10 +14,10 @@ import {
   Locale,
 } from 'date-fns';
 import {useTranslation} from 'react-i18next';
-import {enUS, de} from 'date-fns/locale';
+import {enUS, de, srLatn} from 'date-fns/locale';
 
 export const DEFAULT_DATE_FORMAT = 'dd.MM.yyyy';
-export const locales: {[key: string]: Locale} = {enUS, de};
+export const locales: {[key: string]: Locale} = {enUS, de, srLatn};
 
 interface DateFormatOptions {
   locale?: globalThis.Locale | undefined;
