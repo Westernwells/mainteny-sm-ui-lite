@@ -146,12 +146,6 @@ export enum SaveMode {
   EDIT,
 }
 
-export enum Language {
-  'en-US' = 'en-us',
-  'de-DE' = 'de-de',
-  'sr-SP' = 'sr-sp',
-}
-
 export enum Order {
   ASC = 'ASC',
   DESC = 'DESC',
@@ -300,4 +294,5 @@ export interface SimpleEmailRecord {
 export enum Language {
   EN_US = 'EN_US',
   DE_DE = 'DE_DE',
+  SR_RS = 'SR_RS',
 }

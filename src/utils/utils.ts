@@ -178,6 +178,7 @@ export const waitForSeconds = (seconds: number) =>
 export const languageContextMap: {[key: string]: Language} = {
   EN: Language.EN_US,
   DE: Language.DE_DE,
+  SR: Language.SR_RS,
 };
 
 export const titleCase = (str: string) =>

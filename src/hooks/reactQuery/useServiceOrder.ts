@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {useCallback, useContext} from 'react';
 import {
   useMutation,
   useQuery,
@@ -24,6 +24,8 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {CheckList} from 'models/checklist';
+import {LanguageContext} from 'context/LanguageProvider';
+import {languageContextMap} from 'utils/utils';
 import {
   AssignmentBasedOrderBody,
   UpdateServiceOrderScheduleBody,
@@ -443,16 +445,23 @@ const getServiceOrderActivities = async (
 
 export function useServiceOrderActivities(
   serviceOrderId?: string,
-  params?: any,
   options?: UseQueryOptions<any, any, any>,
 ) {
+  const {language} = useContext(LanguageContext);
   return useQuery<
     ServiceOrderActivityView[],
     RestError,
     ServiceOrderActivityView[]
   >(
-    [queryKeys.serviceOrderActivity, serviceOrderId, params],
-    () => getServiceOrderActivities(serviceOrderId!, params),
+    [
+      queryKeys.serviceOrderActivity,
+      serviceOrderId,
+      languageContextMap[language],
+    ],
+    () =>
+      getServiceOrderActivities(serviceOrderId!, {
+        language: languageContextMap[language],
+      }),
     {enabled: !!serviceOrderId, ...options},
   );
 }

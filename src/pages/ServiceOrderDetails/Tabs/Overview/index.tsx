@@ -14,7 +14,6 @@ import ComputerIcon from '@mui/icons-material/Computer';
 import PersonIcon from '@mui/icons-material/Person';
 import {olStyles} from 'styles';
 import {useFormatDate} from 'hooks/useFormatDate';
-import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {OrderInfoCard} from './OrderInfoCard';
 import {Quotation} from './Quotations';
 import {Invoices} from './Invoices';
@@ -32,19 +31,12 @@ export const serviceOrderActivitiesLang: {[key: string]: string} = {
 
 export const Overview = ({orderId}: Props) => {
   const theme = useTheme();
-  const {user} = useUserSession();
 
   const formatDate = useFormatDate();
   const {data: serviceOrderDetails, isLoading} =
     useServiceOrderDetails(orderId);
-  const {data: serviceOrderActivities = []} = useServiceOrderActivities(
-    orderId,
-    {
-      language: user?.userAccount.serviceCompany.language
-        .toUpperCase()
-        .replace('-', '_'),
-    },
-  );
+  const {data: serviceOrderActivities = []} =
+    useServiceOrderActivities(orderId);
 
   const iconType = (icon: string) => {
     switch (icon) {
