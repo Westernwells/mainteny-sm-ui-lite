@@ -1,7 +1,7 @@
 import mixpanel from 'mixpanel-browser';
 import {getStoredUser} from '../userStorage/index';
 
-const isProduction = import.meta.env.NODE_ENV === 'production';
+const isProduction = import.meta.env.MODE === 'prod';
 
 mixpanel.init(import.meta.env.REACT_APP_MIXPANEL_TOKEN || '', {
   debug: !isProduction,
