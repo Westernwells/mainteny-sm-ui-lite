@@ -1,5 +1,6 @@
 import {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
+import {SxProps} from '@mui/system';
 import Box from '@mui/material/Box';
 import MuiTabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -32,6 +33,7 @@ interface Props {
   menu?: MenuBtnProps[];
   actionButtonIcon?: JSX.Element;
   actionBtnVariant?: 'contained' | 'outlined' | 'text';
+  actionButtonStyles?: SxProps;
   secondaryBtn?: ReactNode;
   backBtnLabel?: string;
   hideBackIcon?: boolean;
@@ -58,6 +60,7 @@ export const Tabs = ({
   menu,
   actionButtonIcon,
   actionBtnVariant,
+  actionButtonStyles,
   disableBtnAction,
   secondaryBtn,
 }: Props) => {
@@ -83,6 +86,7 @@ export const Tabs = ({
                 textTransform: 'capitalize',
                 ml: '0.8em',
                 height: '100%',
+                ...actionButtonStyles,
               },
               variant: actionBtnVariant || 'contained',
               color: 'primary',
