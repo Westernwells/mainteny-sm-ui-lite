@@ -91,7 +91,6 @@ export const ServiceOrdersDataGrid = ({
   searchCustomer,
   elevatorId,
 }: Props) => {
-  const navigate = useNavigate();
   const [search, setSearch] = useState(searchCustomer || '');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -140,7 +139,7 @@ export const ServiceOrdersDataGrid = ({
           onCellClick={(params) => setRowItem(params.row.serviceOrder)}
           loading={isFetching || isLoading}
           pageSize={page.pageSize}
-          pageIndex={page.pageIndex}
+          pageIndex={page.pageIndex + 1}
           pageCount={pageCount}
           hideFooter={pageCount <= 1}
           handlePageChange={(value) =>

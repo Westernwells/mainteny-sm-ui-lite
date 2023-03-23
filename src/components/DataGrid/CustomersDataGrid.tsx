@@ -62,7 +62,6 @@ export const makeRows = (customers: PropertyOwnerView[]): GridRowsProp =>
 const pageSize = 25;
 
 export const CustomersDataGrid = ({setRowItem}: Props) => {
-  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -118,7 +117,7 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
           onCellClick={(params) => setRowItem(params.row.propertyOwner)}
           loading={isFetching}
           pageSize={page.pageSize}
-          pageIndex={page.pageIndex}
+          pageIndex={page.pageIndex + 1}
           pageCount={pageCount}
           hideFooter={pageCount <= 1}
           handlePageChange={(value) =>
