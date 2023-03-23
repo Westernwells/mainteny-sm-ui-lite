@@ -1,3 +1,5 @@
+// TODO: Delete this file once the new implementation has been confirmed free of bugs
+
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';

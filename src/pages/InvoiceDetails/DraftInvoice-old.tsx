@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
+
+// TODO: Delete this file once the new implementation has been confirmed free of bugs
 import {useEffect, useState, useRef} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useLocation, useNavigate} from 'react-router-dom';
