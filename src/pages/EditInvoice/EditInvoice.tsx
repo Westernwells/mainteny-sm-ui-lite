@@ -77,7 +77,8 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
 
   const {user} = useUserSession();
 
-  const {mutateAsync: updateInvoiceAsync, isLoading} = useUpdateInvoice();
+  const {mutateAsync: updateInvoiceAsync, isLoading: isUpdating} =
+    useUpdateInvoice();
   const {mutate: deleteInvoice} = useDeleteInvoice();
   const {data: workReport} = useServiceOrderWorkReport(
     invoice?.serviceOrder?.id ?? '',
@@ -89,9 +90,10 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
       ),
     },
   );
-  const {mutateAsync: publishInvoice} = usePublishInvoice({
-    shouldNavigate: false,
-  });
+  const {mutateAsync: publishInvoice, isLoading: isPublishing} =
+    usePublishInvoice({
+      shouldNavigate: false,
+    });
 
   const [isDrawerOpen] = useState<boolean>(true);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
@@ -275,11 +277,6 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
     ? workReport?.serviceOrder.additionalInfo.checkListInfo
         ?.pdfGenerationStatus === PdfGenerationStatus.DONE
     : true;
-
-  const isPDFsGenerated =
-    !!isWorkReportPDFGenerated &&
-    !!isCheckListPDFGenerated &&
-    isInvoicePDFGenerated;
 
   const actions = useMemo(() => {
     const items = [
@@ -745,7 +742,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
 
       <BottomDrawer
         isOpen={isDrawerOpen}
-        isSaving={isLoading}
+        isSaving={isUpdating}
         primaryButtonLabel={t('Save')}
         primaryButtonAction={formik.handleSubmit}
         listItems={actions.map((item) => ({
@@ -770,14 +767,20 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
       />
       <SendEmailDialog
         open={isSendEmailDialogOpen}
-        onConfirm={async () => {
+        onClose={() => setIsSendEmailDialogOpen(false)}
+        confirmBtnDisabled={isPublishing || isUpdating}
+        callback={async (emailRecord) => {
           await onSave(formik.values);
           setIsSendEmailDialogOpen(false);
+          await publishInvoice({
+            id: invoice.id,
+            body: {
+              email: emailRecord.email,
+              subject: emailRecord.subject,
+              content: emailRecord.content,
+            },
+          });
         }}
-        onClose={() => setIsSendEmailDialogOpen(false)}
-        id={invoice.id}
-        submitHook={usePublishInvoice}
-        confirmBtnDisabled={!isPDFsGenerated}
         email={customer?.additionalInfo.billingEmail || customer?.contact.email}
         subject={formik.values.subject}
         content={formik.values.description}

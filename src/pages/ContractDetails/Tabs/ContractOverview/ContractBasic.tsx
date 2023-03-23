@@ -248,7 +248,6 @@ export const ContractBasic = ({
             }
           />
         </Grid>
-        {console.log()}
 
         <Grid item xs={4}>
           <CardProps

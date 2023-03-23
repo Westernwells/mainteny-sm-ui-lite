@@ -2,7 +2,7 @@ import {useInvoiceDetail} from 'hooks/reactQuery/useInvoice';
 import {useParams} from 'react-router-dom';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
-import {EditInvoice} from './EditInvoice';
+import {InvoiceForm} from 'pages/InvoiceDetails/InvoiceForm';
 
 export const EditInvoicePage = () => {
   const {id: invoiceId} = useParams();
@@ -13,7 +13,7 @@ export const EditInvoicePage = () => {
   }
 
   return isFetched && invoice ? (
-    <EditInvoice invoice={invoice} />
+    <InvoiceForm formType="edit" invoice={invoice} />
   ) : (
     <EmptySection label="Sorry, we couldn't find the invoice." />
   );

@@ -81,7 +81,6 @@ export const useDeleteEmployee = (successMsg?: string) => {
       }
     },
     onError: (err: any) => {
-      console.log(err);
       showError(err);
     },
   });

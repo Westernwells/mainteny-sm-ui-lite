@@ -14,7 +14,13 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import {useNavigate} from 'react-router-dom';
 // FIXME: Dummy Import
 
-import {Language, Resource, RestError, SimpleEmailRecord} from 'models/misc';
+import {
+  Language,
+  Resource,
+  RestError,
+  SimpleEmailRecord,
+  StringValue,
+} from 'models/misc';
 import {
   InvoiceView,
   QueryInvoiceParams,
@@ -231,7 +237,7 @@ export const useAddInvoicePayment = () => {
 };
 
 export const postInvoice = async (body: CreateInvoice) => {
-  const {data} = await axiosClient.post<{value: string}>('/api/invoices', body);
+  const {data} = await axiosClient.post<StringValue>('/api/invoices', body);
   return data;
 };
 
@@ -266,7 +272,8 @@ export const useCreateInvoice = () => {
 };
 
 export const putInvoice = async (body: UpdateInvoice, id: string) => {
-  await axiosClient.put(`api/invoices/${id}`, body);
+  const {data} = await axiosClient.put<StringValue>(`api/invoices/${id}`, body);
+  return data;
 };
 
 export const useUpdateInvoice = () => {
