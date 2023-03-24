@@ -101,14 +101,17 @@ export const ServiceOrdersDataGrid = ({
     ),
     isLoading,
     isFetching,
-  } = useServiceOrders({
-    elevatorIds: elevatorId ? [elevatorId] : [],
-    start: startOfYear(new Date(2000, 1, 1)).toISOString(),
-    end: endOfYear(new Date()).toISOString(),
-    pageIndex: page.pageIndex,
-    pageSize: page.pageSize,
-    query: search,
-  });
+  } = useServiceOrders(
+    {
+      elevatorIds: elevatorId ? [elevatorId] : [],
+      start: startOfYear(new Date(2000, 1, 1)).toISOString(),
+      end: endOfYear(new Date()).toISOString(),
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+      query: search,
+    },
+    {keepPreviousData: true},
+  );
 
   useEffect(() => {
     setPageCount(Math.ceil(serviceOrdersResource.total / page.pageSize));
