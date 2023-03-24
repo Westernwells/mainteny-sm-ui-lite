@@ -3,7 +3,7 @@ import queryString from 'query-string';
 import Box from '@mui/material/Box';
 import {Progress} from 'components/Progress';
 import {useServiceOrderDetails} from 'hooks/reactQuery/useServiceOrder';
-import {DraftInvoice} from './DraftInvoice';
+import {InvoiceForm} from './InvoiceForm';
 
 export const NewInvoice = () => {
   const {search} = useLocation();
@@ -26,7 +26,7 @@ export const NewInvoice = () => {
       </Box>
     );
   }
-  return <DraftInvoice serviceOrderResource={serviceOrderDetails} />;
+  return <InvoiceForm serviceOrderResource={serviceOrderDetails} />;
 };
 
 export default NewInvoice;

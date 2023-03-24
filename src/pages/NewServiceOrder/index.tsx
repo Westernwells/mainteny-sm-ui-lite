@@ -23,7 +23,6 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
   } = currentParams.quotationId
     ? useQuotationDetails(currentParams.quotationId)
     : {data: undefined, isLoading: false, isFetched: true};
-  console.log(quotation, isLoading, isFetched);
 
   useLayoutEffect(() => {
     if (getCurrentPageTitle && currentParams) {

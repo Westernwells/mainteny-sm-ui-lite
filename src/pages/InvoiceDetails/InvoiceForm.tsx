@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
@@ -30,6 +31,7 @@ import {SendEmailDialog} from 'components/SendEmailDialog';
 import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
+  useCreateInvoice,
   useDeleteInvoice,
   usePublishInvoice,
   useUpdateInvoice,
@@ -51,14 +53,14 @@ import {Amount, PdfGenerationStatus, WithOptional} from 'models/misc';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {Notes} from 'pages/InvoiceDetails/Notes';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {useServiceOrderWorkReport} from 'hooks/reactQuery/useServiceOrder';
 import {convertToText} from 'utils/utils';
 import {addYears} from 'date-fns';
 import {InvoiceCheckbox} from 'pages/InvoiceDetails/InvoiceCheckbox';
 
 interface Props {
-  invoice: InvoiceView;
+  invoice?: InvoiceView;
   serviceOrderResource?: ServiceOrderView;
+  formType?: 'new' | 'edit';
 }
 
 const payment = {
@@ -69,7 +71,11 @@ const payment = {
 
 const dateToString = (date: Date) => date.toISOString().split('T')[0];
 
-export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
+export const InvoiceForm = ({
+  invoice,
+  serviceOrderResource,
+  formType = 'new',
+}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const formatDate = useFormatDate();
@@ -77,21 +83,18 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
 
   const {user} = useUserSession();
 
-  const {mutateAsync: updateInvoiceAsync, isLoading} = useUpdateInvoice();
+  const {mutateAsync: updateInvoiceAsync, isLoading: isUpdating} =
+    useUpdateInvoice();
+  const {mutateAsync: createNewInvoice, isLoading: isCreating} =
+    useCreateInvoice();
   const {mutate: deleteInvoice} = useDeleteInvoice();
-  const {data: workReport} = useServiceOrderWorkReport(
-    invoice?.serviceOrder?.id ?? '',
-    {
-      useErrorBoundary: false,
-      retry: false,
-      enabled: !!(
-        invoice?.serviceOrder?.id && invoice?.additionalInfo?.includeWorkReport
-      ),
-    },
+  const {mutateAsync: publishInvoice, isLoading: isPublishing} =
+    usePublishInvoice({
+      shouldNavigate: false,
+    });
+  const {data: downloadUrl} = useDownloadUrl(
+    invoice ? [invoice.additionalInfo.pdfPath] : [],
   );
-  const {mutateAsync: publishInvoice} = usePublishInvoice({
-    shouldNavigate: false,
-  });
 
   const [isDrawerOpen] = useState<boolean>(true);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
@@ -100,6 +103,9 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
     useState(false);
   const [showCheckListTooltip, setShowCheckListTooltip] = useState(false);
   const [showWorkReportTooltip, setShowWorlReportTooltip] = useState(false);
+  const [isInvoicePDFGenerated] = useState(
+    invoice?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE,
+  );
 
   const [customer, setCustomer] = useState<
     PropertyOwnerView | PropertyOwnerSimpleView | undefined
@@ -107,6 +113,14 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
   const [serviceOrder, setServiceOrder] = useState<
     ServiceOrderView | undefined
   >(serviceOrderResource ?? undefined);
+
+  const [isWorkReportPDFGenerated, setIsWorkReportPDFGenerated] = useState(
+    !!serviceOrder?.additionalInfo.workReportGenerated,
+  );
+  const [isCheckListPDFGenerated, setIsCheckListPDFGenerated] = useState(
+    serviceOrder?.additionalInfo.checkListInfo?.pdfGenerationStatus ===
+      PdfGenerationStatus.DONE,
+  );
 
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItemRecord<Amount>[]>(
     [],
@@ -132,8 +146,8 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
   ]).current;
 
   const initialValues: CreateInvoice = {
-    subject: invoice.subject,
-    description: invoice.description,
+    subject: invoice?.subject || '',
+    description: invoice?.description || '',
     dueDate: '',
     issuedDate: dateToString(new Date()),
     type: InvoiceType.FULL,
@@ -144,11 +158,11 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
     serviceOrderId: '',
     paymentInfo: payment,
     shouldSendOut: false,
-    includeWorkReport: true,
-    includeCheckList: true,
-    costCenter: invoice.additionalInfo?.costCenter ?? '',
+    includeWorkReport: false,
+    includeCheckList: false,
+    costCenter: invoice?.additionalInfo?.costCenter || '',
     customerSpecificOrderNumber:
-      invoice.additionalInfo?.customerSpecificOrderNumber ?? '',
+      invoice?.additionalInfo?.customerSpecificOrderNumber || '',
   };
 
   const validationSchema = Yup.object().shape({
@@ -159,7 +173,11 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
     initialValues,
     validationSchema,
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    onSubmit: (values) => onSave(values),
+    onSubmit: async (values) => {
+      const response = await onSave(values);
+      const invoiceId = formType === 'new' ? response.value : invoice?.id;
+      navigate(`/invoices/details/${invoiceId}`);
+    },
   });
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
@@ -185,27 +203,51 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
   }, [dueDate]);
 
   useEffect(() => {
-    setInvoiceItems(
-      invoice.items.map(
-        (i): InvoiceItemRecord<Amount> => ({
-          articleId: i.article.id,
-          description: i.description || i.article.description,
-          name: i.name || i.article.name,
-          articleUnit: i.article.unit,
-          quantity: i.quantity,
-          unitAmount: i.unitAmount,
-        }),
-      ),
+    const workReportGenerated =
+      !!serviceOrder?.additionalInfo.workReportGenerated;
+    const checkListGenerated =
+      serviceOrder?.additionalInfo.checkListInfo?.pdfGenerationStatus ===
+      PdfGenerationStatus.DONE;
+    setIsWorkReportPDFGenerated(workReportGenerated);
+    setIsCheckListPDFGenerated(checkListGenerated);
+    formik.setFieldValue(
+      'includeWorkReport',
+      workReportGenerated || false,
+      true,
     );
+    formik.setFieldValue('includeCheckList', checkListGenerated || '', true);
+  }, [serviceOrder]);
 
-    setServiceOrder(invoice.serviceOrder);
-    setCustomer(invoice.serviceOrder?.elevator.propertyOwner);
+  console.log(serviceOrder, '******');
 
-    formik.setFieldValue('type', invoice.type, true);
-    formik.setFieldValue('paymentTerms', invoice.paymentTerms, true);
-    formik.setFieldValue('sentDate', invoice.sentDate, true);
-    formik.setFieldValue('dueDate', invoice.dueDate, true);
-    formik.setFieldValue('serviceOrderId', invoice.serviceOrder?.id, true);
+  useEffect(() => {
+    if (invoice) {
+      setInvoiceItems(
+        invoice.items.map(
+          (i): InvoiceItemRecord<Amount> => ({
+            articleId: i.article.id,
+            description: i.description || i.article.description,
+            name: i.name || i.article.name,
+            articleUnit: i.article.unit,
+            quantity: i.quantity,
+            unitAmount: i.unitAmount,
+          }),
+        ),
+      );
+
+      setServiceOrder(invoice.serviceOrder);
+      setCustomer(invoice.serviceOrder?.elevator.propertyOwner);
+    }
+
+    formik.setFieldValue('type', invoice?.type || InvoiceType.FULL, true);
+    formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '', true);
+
+    formik.setFieldValue('dueDate', invoice?.dueDate || '', true);
+    formik.setFieldValue(
+      'serviceOrderId',
+      invoice?.serviceOrder?.id || '',
+      true,
+    );
   }, [invoice]);
 
   useEffect(() => {
@@ -262,25 +304,6 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
     );
   }, [invoiceItems]);
 
-  const {data: downloadUrl} = useDownloadUrl([invoice.additionalInfo.pdfPath]);
-
-  const isInvoicePDFGenerated =
-    invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
-    downloadUrl;
-  const isWorkReportPDFGenerated = invoice?.additionalInfo?.includeWorkReport
-    ? workReport?.additionalInfo?.pdfGenerationStatus ===
-      PdfGenerationStatus.DONE
-    : true;
-  const isCheckListPDFGenerated = invoice?.additionalInfo.includeCheckList
-    ? workReport?.serviceOrder.additionalInfo.checkListInfo
-        ?.pdfGenerationStatus === PdfGenerationStatus.DONE
-    : true;
-
-  const isPDFsGenerated =
-    !!isWorkReportPDFGenerated &&
-    !!isCheckListPDFGenerated &&
-    isInvoicePDFGenerated;
-
   const actions = useMemo(() => {
     const items = [
       {
@@ -292,6 +315,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
       },
     ];
     if (
+      invoice &&
       ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
     ) {
       items.push({
@@ -304,8 +328,8 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
     }
     if (
       isInvoicePDFGenerated &&
-      (invoice.status === InvoiceStatus.DRAFT ||
-        invoice.status === InvoiceStatus.EXPIRED)
+      (invoice?.status === InvoiceStatus.DRAFT ||
+        invoice?.status === InvoiceStatus.EXPIRED)
     ) {
       items.splice(1, 0, {
         label: t('Print'),
@@ -355,50 +379,59 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
   async function onSave(values: CreateInvoice) {
     if (!values.description.length) values.description = ' ';
 
-    const dueDateToString =
+    const dueDateToString: string =
       formik.values.type === InvoiceType.CREDIT_NOTE
         ? dateToString(addYears(new Date(), 1))
         : values.dueDate;
 
-    await updateInvoiceAsync({
+    if (formType === 'edit' && invoice) {
+      return updateInvoiceAsync({
+        data: {
+          ...values,
+          includeWorkReport: values.includeWorkReport,
+          includeCheckList: values.includeCheckList,
+          dueDate: dueDateToString,
+        } as UpdateInvoice,
+        invoiceId: invoice.id,
+      });
+    }
+
+    return createNewInvoice({
       data: {
         ...values,
-        includeWorkReport: isWorkReportPDFGenerated
-          ? !!values.includeWorkReport
-          : false,
-        includeCheckList: isCheckListPDFGenerated
-          ? !!values.includeCheckList
-          : false,
+        includeWorkReport: values.includeWorkReport,
+        includeCheckList: values.includeCheckList,
         dueDate: dueDateToString,
-      } as UpdateInvoice,
-      invoiceId: invoice.id,
+      },
     });
   }
 
   const onPrintInvoice = async () => {
-    await onSave(formik.values);
-    await publishInvoice(
-      {
-        id: invoice.id,
-        body: {
-          email: '',
-          subject: '',
-          content: '',
+    if (invoice) {
+      await onSave(formik.values);
+      await publishInvoice(
+        {
+          id: invoice.id,
+          body: {
+            email: '',
+            subject: '',
+            content: '',
+          },
         },
-      },
-      {
-        onSuccess: () => {
-          setIsConfirmPrintDialogOpen(false);
-          if (downloadUrl) {
-            printJS({
-              printable: Object.values(downloadUrl)[0],
-              type: 'pdf',
-              showModal: true,
-            });
-          }
+        {
+          onSuccess: () => {
+            setIsConfirmPrintDialogOpen(false);
+            if (downloadUrl) {
+              printJS({
+                printable: Object.values(downloadUrl)[0],
+                type: 'pdf',
+                showModal: true,
+              });
+            }
+          },
         },
-      },
-    );
+      );
+    }
   };
 
   return (
@@ -633,35 +666,38 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
 
             {formik.values.type !== InvoiceType.CREDIT_NOTE && (
               <>
-                <InvoiceCheckbox
-                  onMouseEnter={handleWorkReportMouseEnter}
-                  onMouseLeave={handleWorkReportMouseLeave}
-                  checkboxName="includeWorkReport"
-                  disabled={!isWorkReportPDFGenerated}
-                  handleChange={formik.handleChange}
-                  showTooltip={showWorkReportTooltip}
-                  tooltipTitle="No work report for the selected service order"
-                  title="Work Report"
-                  checkboxLabel="Add work report to invoice"
-                  checked={
-                    isWorkReportPDFGenerated && formik.values.includeWorkReport
-                  }
-                />
+                <Box sx={{display: 'flex'}}>
+                  <InvoiceCheckbox
+                    onMouseEnter={handleWorkReportMouseEnter}
+                    onMouseLeave={handleWorkReportMouseLeave}
+                    checkboxName="includeWorkReport"
+                    disabled={!isWorkReportPDFGenerated}
+                    handleChange={formik.handleChange}
+                    showTooltip={showWorkReportTooltip}
+                    tooltipTitle="No work report for the selected service order"
+                    title="Work Report"
+                    checkboxLabel="Add work report to invoice"
+                    checked={
+                      isWorkReportPDFGenerated &&
+                      formik.values.includeWorkReport
+                    }
+                  />
 
-                <InvoiceCheckbox
-                  onMouseEnter={handleCheckListMouseEnter}
-                  onMouseLeave={handleCheckListMouseLeave}
-                  checkboxName="includeCheckList"
-                  disabled={!isCheckListPDFGenerated}
-                  handleChange={formik.handleChange}
-                  showTooltip={showCheckListTooltip}
-                  tooltipTitle="No checklist for selected service order"
-                  title="Checklist"
-                  checkboxLabel="Add checklist to invoice"
-                  checked={
-                    isCheckListPDFGenerated && formik.values.includeCheckList
-                  }
-                />
+                  <InvoiceCheckbox
+                    onMouseEnter={handleCheckListMouseEnter}
+                    onMouseLeave={handleCheckListMouseLeave}
+                    checkboxName="includeCheckList"
+                    disabled={!isCheckListPDFGenerated}
+                    handleChange={formik.handleChange}
+                    showTooltip={showCheckListTooltip}
+                    tooltipTitle="No checklist for selected service order"
+                    title="Checklist"
+                    checkboxLabel="Add checklist to invoice"
+                    checked={
+                      isCheckListPDFGenerated && formik.values.includeCheckList
+                    }
+                  />
+                </Box>
                 <Box mt="2em" width="32ch">
                   <DatePicker
                     defaultDate={dueDate}
@@ -745,7 +781,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
 
       <BottomDrawer
         isOpen={isDrawerOpen}
-        isSaving={isLoading}
+        isSaving={isUpdating || isCreating}
         primaryButtonLabel={t('Save')}
         primaryButtonAction={formik.handleSubmit}
         listItems={actions.map((item) => ({
@@ -770,14 +806,22 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
       />
       <SendEmailDialog
         open={isSendEmailDialogOpen}
-        onConfirm={async () => {
-          await onSave(formik.values);
-          setIsSendEmailDialogOpen(false);
-        }}
         onClose={() => setIsSendEmailDialogOpen(false)}
-        id={invoice.id}
-        submitHook={usePublishInvoice}
-        confirmBtnDisabled={!isPDFsGenerated}
+        confirmBtnDisabled={isPublishing || isUpdating || isCreating}
+        callback={async (emailRecord) => {
+          const response = await onSave(formik.values);
+          setIsSendEmailDialogOpen(false);
+          const invoiceId = formType === 'new' ? response.value : invoice?.id;
+          await publishInvoice({
+            id: invoiceId!,
+            body: {
+              email: emailRecord.email,
+              subject: emailRecord.subject,
+              content: emailRecord.content,
+            },
+          });
+          navigate(`/invoices/details/${invoiceId}`);
+        }}
         email={customer?.additionalInfo.billingEmail || customer?.contact.email}
         subject={formik.values.subject}
         content={formik.values.description}
@@ -785,7 +829,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
       <Confirm
         open={isDeleteDialogOpen}
         onConfirm={() => {
-          if (invoice.id)
+          if (invoice)
             deleteInvoice({invoiceId: invoice.id, shouldNavigate: true});
           setIsDeleteDialogOpen(false);
         }}
