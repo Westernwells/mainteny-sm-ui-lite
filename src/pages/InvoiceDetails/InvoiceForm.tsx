@@ -218,8 +218,6 @@ export const InvoiceForm = ({
     formik.setFieldValue('includeCheckList', checkListGenerated || '', true);
   }, [serviceOrder]);
 
-  console.log(serviceOrder, '******');
-
   useEffect(() => {
     if (invoice) {
       setInvoiceItems(
