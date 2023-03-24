@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -7,8 +7,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import {grey} from '@mui/material/colors';
-import useTheme from '@mui/material/styles/useTheme';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {useTranslation} from 'react-i18next';
@@ -37,7 +35,6 @@ export const MarkCompletedDialog = ({
   title,
   serviceOrderDetails,
 }: Props) => {
-  const theme = useTheme();
   const {t} = useTranslation();
   const {mutate: completeServiceOrder} = useCompleteServiceOrder();
   const formik = useFormik<CompleteServiceOrder>({

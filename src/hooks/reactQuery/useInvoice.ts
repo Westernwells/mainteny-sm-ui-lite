@@ -244,7 +244,6 @@ export const postInvoice = async (body: CreateInvoice) => {
 export const useCreateInvoice = () => {
   const queryClient = useQueryClient();
   const {enqueueSnackbar, showError} = useSnackbar();
-  const navigate = useNavigate();
 
   return useMutation(({data}: {data: CreateInvoice}) => postInvoice(data), {
     onSuccess: (data, variables) => {

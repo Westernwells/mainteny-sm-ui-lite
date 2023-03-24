@@ -8,7 +8,7 @@ import {FC} from 'react';
 import {useCurrentCurrency} from 'utils/currency';
 import {invoiceCycle} from 'utils/contract-utils';
 import {DatePicker} from 'components/DatePicker';
-import {format, getMonth, getYear, toDate} from 'date-fns';
+import {format, getMonth, getYear} from 'date-fns';
 
 interface Props {
   formik: FormikProps<ContractTermsFormModal>;

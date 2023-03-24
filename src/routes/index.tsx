@@ -631,7 +631,6 @@ export const Router = () => {
                   <title>{`Notifications - ${titleTail}`}</title>
                 </Helmet>
                 <PageLayout
-                  excludeSidebar
                   pageScrollable
                   excludeDefaultSpacing
                   backBtnLabel="Notifications"

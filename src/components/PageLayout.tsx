@@ -10,7 +10,6 @@ import {Progress} from './Progress';
 
 interface Props {
   children: ReactNode;
-  excludeSidebar?: boolean;
   excludeDefaultSpacing?: boolean;
   pageScrollable?: boolean;
   pageTitle?: string;
@@ -20,7 +19,6 @@ interface Props {
 
 export const PageLayout = ({
   children,
-  excludeSidebar,
   excludeDefaultSpacing,
   pageScrollable,
   pageTitle,
@@ -55,7 +53,6 @@ export const PageLayout = ({
         />
       </Box>
       <Box sx={{display: 'flex', flexGrow: 1, width: '100%'}}>
-        {/* {!excludeSidebar ? <AppDrawer /> : null} */}
         <Box width="4.5rem" />
         <Box
           sx={{

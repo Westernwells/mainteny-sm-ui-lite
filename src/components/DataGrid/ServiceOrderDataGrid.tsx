@@ -1,5 +1,4 @@
 import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import {endOfYear, startOfYear} from 'date-fns';
 import Box from '@mui/material/Box';

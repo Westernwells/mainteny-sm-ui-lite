@@ -1,5 +1,4 @@
 import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
@@ -75,7 +74,6 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
 const pageSize = 25;
 
 export const ArticlesDataGrid = ({setRowItem}: Props) => {
-  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
