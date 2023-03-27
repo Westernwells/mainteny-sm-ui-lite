@@ -66,6 +66,7 @@ export const queryKeys = {
   fetchCompany: 'fetchCompany',
   fetchCompanySummary: 'fetchCompanySummary',
   queryArticleSuppliers: 'queryArticleSuppliers',
+  queryChecklists: 'queryChecklists',
   fetchAbsence: 'fetchAbsence',
   fetchServiceOrderChecklist: 'fetchServiceOrderChecklist',
 };
