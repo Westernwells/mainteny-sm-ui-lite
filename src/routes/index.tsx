@@ -45,6 +45,8 @@ const ServiceOrderDetails = lazy(() => import('pages/ServiceOrderDetails'));
 const SystemSettings = lazy(() => import('pages/SystemSettings'));
 const NewCompany = lazy(() => import('pages/NewCompany'));
 const SettingsPage = lazy(() => import('pages/Settings'));
+const NewChecklist = lazy(() => import('pages/Settings/NewChecklist'));
+
 const NewServiceOrder = lazy(() => import('pages/NewServiceOrder'));
 const NewUnit = lazy(() => import('pages/NewUnit'));
 const NewCustomer = lazy(() => import('pages/NewCustomer'));
@@ -668,6 +670,24 @@ export const Router = () => {
               </>
             }
           />
+
+          <Route
+            path="/settings/checklist/new"
+            element={
+              <>
+                <Helmet>
+                  <title>{`New Checklist - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout
+                  backBtnLabel="New Checklist"
+                  pageScrollable
+                  showBackAction>
+                  <NewChecklist />
+                </PageLayout>
+              </>
+            }
+          />
+
           <Route
             path="admin/companies"
             element={
