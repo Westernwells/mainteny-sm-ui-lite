@@ -54,6 +54,7 @@ export const makeRows = (checklists: CheckList[]): GridRowsProp =>
     totalTasks: item.questions.length,
     checklist: item,
     navigateTo: `/settings/checklists/${item.id}`,
+    navigateOptions: {state: {checklist: item}},
   }));
 
 const pageSize = 25;

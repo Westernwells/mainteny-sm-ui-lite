@@ -213,7 +213,10 @@ export const DataGridLayout = ({
             }
             e.preventDefault();
             if (params.field !== 'actions' && isCellClickable) {
-              navigate(params.row.navigateTo);
+              navigate(
+                params.row.navigateTo,
+                params.row?.navigateOptions ?? {},
+              );
             }
           })
         }

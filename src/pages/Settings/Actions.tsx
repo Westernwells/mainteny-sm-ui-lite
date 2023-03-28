@@ -46,14 +46,18 @@ export const Actions = ({checklist}: Props) => {
         label: t('Preview'),
         icon: <RemoveRedEye />,
         onClick: () => {
-          navigate(`/settings/checklists/${checklist.id}`);
+          navigate(`/settings/checklists/${checklist.id}`, {
+            state: {checklist},
+          });
         },
       },
       {
         label: t('Edit'),
         icon: <Edit />,
         onClick: () => {
-          navigate(`/settings/checklists/${checklist.id}?edit=1`);
+          navigate(`/settings/checklists/${checklist.id}?edit=1`, {
+            state: {checklist},
+          });
         },
       },
       {
