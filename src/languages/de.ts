@@ -735,7 +735,7 @@ export const de = {
   'Created By': 'Erstellt von',
   'Invoice Type': 'Rechnungsart',
   'Due Date': 'Fälligkeitsdatum',
-  Full: 'gesamt',
+  Full: 'Gesamt',
   Partial: 'Teilrechnung',
   subject: 'Betreff',
   description: 'Beschreibung',
