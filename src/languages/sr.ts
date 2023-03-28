@@ -408,6 +408,8 @@ export const sr = {
   From: 'Od',
   'Select Supplier': 'Odaberi dobavljača',
   'Purchase order number': 'Broj narudžbe',
+  'Full invoice': 'Potpuna faktura',
+  'Customer specific order number': 'Broj narudžbe specifičan za kupca',
   'Print order': 'Ispiši narudžbu',
   'The PDFs are not generated yet.': 'PDF dokumenti još nisu generirani.',
 
