@@ -47,7 +47,7 @@ export const ArticleOverView = () => {
     <>
       <Box display="flex" justifyContent="flex-end" gap={3} mb="1.5rem">
         <Button
-          label={t('Order article')}
+          label={t('Order Article')}
           buttonProps={{
             onClick: () =>
               navigate(`/articles/order`, {

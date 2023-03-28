@@ -39,7 +39,7 @@ export const InvoiceCheckbox = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       title={t(tooltipTitle)}
-      placement="right"
+      placement="bottom"
       sx={{
         '&:hover': {},
       }}

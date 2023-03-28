@@ -19,7 +19,7 @@ export const languages = [
     value: 'de-de',
   },
   {
-    label: 'Serbien',
+    label: 'Serbian',
     value: 'sr-rs',
   },
 ];

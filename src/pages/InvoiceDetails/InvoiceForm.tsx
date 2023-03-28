@@ -37,12 +37,12 @@ import {
   useUpdateInvoice,
 } from 'hooks/reactQuery/useInvoice';
 import {
-  CreateInvoice,
   UpdateInvoice,
   InvoiceItemRecord,
   InvoiceView,
   InvoiceType,
   InvoiceStatus,
+  InvoiceFormData,
 } from 'models/invoice';
 import {ServiceOrderView} from 'models/service-order';
 import {
@@ -56,6 +56,8 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {convertToText} from 'utils/utils';
 import {addYears} from 'date-fns';
 import {InvoiceCheckbox} from 'pages/InvoiceDetails/InvoiceCheckbox';
+import {BeneficiaryDetails} from './BeneficiaryDetails';
+import {formatInvoiceRecord} from './utils';
 
 interface Props {
   invoice?: InvoiceView;
@@ -145,7 +147,7 @@ export const InvoiceForm = ({
     },
   ]).current;
 
-  const initialValues: CreateInvoice = {
+  const initialValues: InvoiceFormData = {
     subject: invoice?.subject || '',
     description: invoice?.description || '',
     dueDate: '',
@@ -160,6 +162,8 @@ export const InvoiceForm = ({
     shouldSendOut: false,
     includeWorkReport: false,
     includeCheckList: false,
+    beneficialName: invoice?.additionalInfo.beneficialDetails?.name || '',
+    beneficialAddress: invoice?.additionalInfo.beneficialDetails?.address,
     costCenter: invoice?.additionalInfo?.costCenter || '',
     customerSpecificOrderNumber:
       invoice?.additionalInfo?.customerSpecificOrderNumber || '',
@@ -374,7 +378,7 @@ export const InvoiceForm = ({
     }
   };
 
-  async function onSave(values: CreateInvoice) {
+  async function onSave(values: InvoiceFormData) {
     if (!values.description.length) values.description = ' ';
 
     const dueDateToString: string =
@@ -384,23 +388,23 @@ export const InvoiceForm = ({
 
     if (formType === 'edit' && invoice) {
       return updateInvoiceAsync({
-        data: {
+        data: formatInvoiceRecord({
           ...values,
           includeWorkReport: values.includeWorkReport,
           includeCheckList: values.includeCheckList,
           dueDate: dueDateToString,
-        } as UpdateInvoice,
+        }),
         invoiceId: invoice.id,
       });
     }
 
     return createNewInvoice({
-      data: {
+      data: formatInvoiceRecord({
         ...values,
         includeWorkReport: values.includeWorkReport,
         includeCheckList: values.includeCheckList,
         dueDate: dueDateToString,
-      },
+      }),
     });
   }
 
@@ -579,7 +583,7 @@ export const InvoiceForm = ({
                   {
                     label: 'Invoice Type',
                     value: formik.values.type
-                      ? `${convertToText(formik.values.type)} invoice`
+                      ? t(`${convertToText(formik.values.type)} invoice`)
                       : '-',
                   },
                   {
@@ -773,6 +777,8 @@ export const InvoiceForm = ({
                 }}
               />
             </Box>
+
+            <BeneficiaryDetails formik={formik} />
           </Box>
         </Box>
       </Box>

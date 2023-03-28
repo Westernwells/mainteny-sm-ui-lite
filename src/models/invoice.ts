@@ -1,5 +1,7 @@
 import {ArticleView} from './article';
 import {
+  Address,
+  AddressRecord,
   Amount,
   AmountRecord,
   Meta,
@@ -46,6 +48,16 @@ export interface InvoiceItem {
   unitAmount: Amount;
 }
 
+export interface BeneficialDetails {
+  name: string;
+  address: Address;
+}
+
+export interface BeneficialDetailsRecord {
+  name: string;
+  address: AddressRecord;
+}
+
 export interface InvoiceAdditionalInfo {
   dueDate: string;
   pdfGenerationStatus: PdfGenerationStatus;
@@ -55,6 +67,7 @@ export interface InvoiceAdditionalInfo {
   paymentInfo: PaymentInfo;
   costCenter?: string;
   customerSpecificOrderNumber?: string;
+  beneficialDetails?: BeneficialDetails;
 }
 
 export enum InvoiceOverdueNoticeStatus {
@@ -136,6 +149,27 @@ export enum InvoiceType {
   CREDIT_NOTE = 'CREDIT_NOTE',
 }
 
+export interface InvoiceFormData {
+  subject: string;
+  description: string;
+  dueDate: string;
+  issuedDate: string;
+  items: QuotationItemRecord[] | InvoiceItemRecord<Amount>[];
+  paymentInfo: PaymentInfo;
+  paymentTerms: string;
+  propertyOwnerId: string;
+  serviceCompanyId: string;
+  serviceOrderId?: string;
+  shouldSendOut: boolean;
+  type: InvoiceType;
+  includeWorkReport?: boolean;
+  includeCheckList?: boolean;
+  costCenter?: string;
+  customerSpecificOrderNumber?: string;
+  beneficialName?: string;
+  beneficialAddress?: AddressRecord;
+}
+
 export interface CreateInvoice {
   subject: string;
   description: string;
@@ -153,6 +187,7 @@ export interface CreateInvoice {
   includeCheckList?: boolean;
   costCenter?: string;
   customerSpecificOrderNumber?: string;
+  beneficialDetails?: BeneficialDetailsRecord;
 }
 
 export interface UpdateInvoice {
@@ -168,6 +203,7 @@ export interface UpdateInvoice {
   includeWorkReport?: boolean;
   costCenter?: string;
   customerSpecificOrderNumber?: string;
+  beneficialDetails?: BeneficialDetailsRecord;
 }
 
 export interface QueryInvoiceCommentsParams {
