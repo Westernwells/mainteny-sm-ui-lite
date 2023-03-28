@@ -412,6 +412,7 @@ export const sr = {
   'Customer specific order number': 'Broj narudžbe specifičan za kupca',
   'Print order': 'Ispiši narudžbu',
   'The PDFs are not generated yet.': 'PDF dokumenti još nisu generirani.',
+  'Beneficiary details': 'Podaci o korisniku',
 
   // Service Orders
   'Order types': 'Vrste naloga',
