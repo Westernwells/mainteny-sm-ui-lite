@@ -409,6 +409,7 @@ export const de = {
   From: 'Von',
   'Select Supplier': 'Lieferant auswählen',
   'Purchase order number': 'Bestellnummer',
+  'Full invoice': 'Gesamtrechnung',
   'Print order': 'Bestellung drucken',
   'The PDFs are not generated yet.': 'Die PDFs sind noch nicht erstellt.',
 

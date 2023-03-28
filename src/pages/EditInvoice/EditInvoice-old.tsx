@@ -547,7 +547,7 @@ export const EditInvoice = ({invoice, serviceOrderResource}: Props) => {
                   {
                     label: 'Invoice Type',
                     value: formik.values.type
-                      ? `${convertToText(formik.values.type)} invoice`
+                      ? t(`${convertToText(formik.values.type)} invoice`)
                       : '-',
                   },
                   {
