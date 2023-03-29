@@ -255,9 +255,7 @@ export const EditBasicInfoForm = ({
         labelId="typeSelect-label"
         label={t('Types')}
         options={Object.keys(ArticleType)
-          .filter(
-            (key) => key !== ArticleType.PACKAGE && key !== ArticleType.SYSTEM,
-          )
+          .filter((key) => key !== ArticleType.SYSTEM)
           .map((key) => ({
             label: convertToText(key),
             value: convertToText(key),

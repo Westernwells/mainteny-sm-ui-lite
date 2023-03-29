@@ -12,7 +12,6 @@ import {
 import {ServiceCompanySimpleView} from './service-company';
 
 export enum ArticleType {
-  PACKAGE = 'PACKAGE',
   PART = 'PART',
   PRODUCT = 'PRODUCT',
   SERVICE = 'SERVICE',
