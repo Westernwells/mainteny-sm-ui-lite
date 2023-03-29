@@ -47,7 +47,7 @@ variables:
   allow_failure: false
   image: node:lts-gallium
   before_script:
-    - curl -fsSL https://get.pulumi.com/ | bash # Install Pulumi
+    - curl -fsSL https://get.pulumi.com | sh -s -- --version 3.57.1 # Install Pulumi
     - export PATH=$PATH:$HOME/.pulumi/bin
     - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" # Install AWS CLI
     - unzip -qq awscliv2.zip
