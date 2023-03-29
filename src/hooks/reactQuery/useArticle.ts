@@ -57,12 +57,7 @@ export function useArticles(
     () =>
       fetchArticles(
         {
-          type: [
-            ArticleType.SERVICE,
-            ArticleType.PRODUCT,
-            ArticleType.PART,
-            ArticleType.PACKAGE,
-          ],
+          type: [ArticleType.SERVICE, ArticleType.PRODUCT, ArticleType.PART],
           ...params,
         },
         user!.userAccount.serviceCompany.id,
