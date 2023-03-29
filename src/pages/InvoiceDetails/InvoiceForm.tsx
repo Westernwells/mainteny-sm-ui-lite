@@ -63,6 +63,7 @@ interface Props {
   invoice?: InvoiceView;
   serviceOrderResource?: ServiceOrderView;
   formType?: 'new' | 'edit';
+  invoiceType?: InvoiceType;
 }
 
 const payment = {
@@ -77,6 +78,7 @@ export const InvoiceForm = ({
   invoice,
   serviceOrderResource,
   formType = 'new',
+  invoiceType,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -152,7 +154,12 @@ export const InvoiceForm = ({
     description: invoice?.description || '',
     dueDate: '',
     issuedDate: dateToString(new Date()),
-    type: InvoiceType.FULL,
+    type:
+      typeof invoiceType === 'string' &&
+      invoiceType &&
+      invoiceType in InvoiceType
+        ? InvoiceType[invoiceType as InvoiceType]
+        : InvoiceType.FULL,
     items: [],
     paymentTerms: '',
     propertyOwnerId: '',
@@ -224,24 +231,30 @@ export const InvoiceForm = ({
 
   useEffect(() => {
     if (invoice) {
-      setInvoiceItems(
-        invoice.items.map(
-          (i): InvoiceItemRecord<Amount> => ({
-            articleId: i.article.id,
-            description: i.description || i.article.description,
-            name: i.name || i.article.name,
-            articleUnit: i.article.unit,
-            quantity: i.quantity,
-            unitAmount: i.unitAmount,
-          }),
-        ),
-      );
+      if (formik.values.type === InvoiceType.FULL) {
+        setInvoiceItems(
+          invoice.items.map(
+            (i): InvoiceItemRecord<Amount> => ({
+              articleId: i.article.id,
+              description: i.description || i.article.description,
+              name: i.name || i.article.name,
+              articleUnit: i.article.unit,
+              quantity: i.quantity,
+              unitAmount: i.unitAmount,
+            }),
+          ),
+        );
+      }
 
       setServiceOrder(invoice.serviceOrder);
       setCustomer(invoice.serviceOrder?.elevator.propertyOwner);
     }
 
-    formik.setFieldValue('type', invoice?.type || InvoiceType.FULL, true);
+    formik.setFieldValue(
+      'type',
+      invoiceType || invoice?.type || InvoiceType.FULL,
+      true,
+    );
     formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '', true);
 
     formik.setFieldValue('dueDate', invoice?.dueDate || '', true);

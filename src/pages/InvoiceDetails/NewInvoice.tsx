@@ -3,17 +3,24 @@ import queryString from 'query-string';
 import Box from '@mui/material/Box';
 import {Progress} from 'components/Progress';
 import {useServiceOrderDetails} from 'hooks/reactQuery/useServiceOrder';
+import {useInvoiceDetail} from 'hooks/reactQuery/useInvoice';
+import {InvoiceType} from 'models/invoice';
 import {InvoiceForm} from './InvoiceForm';
 
 export const NewInvoice = () => {
   const {search} = useLocation();
 
-  const {orderId} = queryString.parse(search);
+  const {orderId, invoiceId = '', invoiceType = ''} = queryString.parse(search);
 
   const {data: serviceOrderDetails, isLoading} =
     typeof orderId === 'string'
       ? useServiceOrderDetails(orderId)
       : {data: undefined, isLoading: false};
+
+  const {data: invoice} =
+    typeof invoiceId === 'string'
+      ? useInvoiceDetail(invoiceId)
+      : {data: undefined};
 
   if (isLoading) {
     return (
@@ -26,7 +33,13 @@ export const NewInvoice = () => {
       </Box>
     );
   }
-  return <InvoiceForm serviceOrderResource={serviceOrderDetails} />;
+  return (
+    <InvoiceForm
+      serviceOrderResource={serviceOrderDetails}
+      invoice={invoice}
+      invoiceType={invoiceType as InvoiceType}
+    />
+  );
 };
 
 export default NewInvoice;
