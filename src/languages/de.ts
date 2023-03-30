@@ -1052,6 +1052,28 @@ export const de = {
   'No checklist yet.': 'Keine Checkliste vorhanden.',
   'Order Details': 'Auftragsdetails',
 
+  // Checklists
+  Checklists: 'Checklisten',
+  'DATE CREATED': 'ERSTELLUNGSDATUM',
+  CATEGORIES: 'KATEGORIEN',
+  'TOTAL TASKS': 'AUFGABEN INSGESAMT',
+  'New Checklist': 'Neue Checkliste',
+  'No checklists yet': 'Noch keine Checklisten',
+  'Create and customize your own list':
+    'Erstellen Sie Ihre eigene Liste und passen Sie sie an',
+  'Remove checklist template': 'Checklistenvorlage entfernen',
+  'Do you want to delete this checklist template?':
+    'Möchten Sie diese Checklistenvorlage löschen?',
+  'Checklist name': 'Name der Checkliste',
+  'New Category': 'Neue Kategorie',
+  'New Task': 'Neue Aufgabe',
+  'Option per task': 'Wahlmöglichkeit je Aufgabe',
+  'New Option': 'Neue Wahlmöglichkeit',
+  'Checklist saved successfully!': 'Checkliste erfolgreich gespeichert!',
+  'Checklist updated successfully!': 'Checkliste erfolgreich aktualisiert!',
+  'Checklist template removed successfully!':
+    'Checklistenvorlage erfolgreich entfernt!',
+
   //  Notifications
   Notifications: 'Benachrichtigungen',
   New: 'Neu',
