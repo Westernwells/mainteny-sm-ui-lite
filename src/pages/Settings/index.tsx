@@ -1,7 +1,13 @@
-import {useLayoutEffect} from 'react';
+import {useLayoutEffect, useEffect, useState} from 'react';
+import {useNavigate, useSearchParams} from 'react-router-dom';
+import {useTranslation} from 'react-i18next';
 import {Grid} from '@mui/material';
-
+import InfoIcon from '@mui/icons-material/Info';
+import FactCheckIcon from '@mui/icons-material/FactCheck';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 import {Progress} from 'components/Progress';
+import {Tabs} from 'components/Tab';
+import {TabsBody} from 'components/TabsBody';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {BasicInformation} from 'pages/CompanyDetails/BasicInformation';
@@ -13,13 +19,35 @@ import {BillingInformation} from 'pages/CompanyDetails/BillingInformation';
 import {WhiteLabel} from 'pages/CompanyDetails/WhiteLabel';
 import {Policies} from 'pages/CompanyDetails/Policies';
 import {DefinedContractNames} from 'pages/CompanyDetails/DefinedContractNames';
+import {formatSearchParams} from 'utils/utils';
+import {ChecklistDataGrid} from './ChecklistDataGrid';
 
 interface Props {
   getCurrentPageTitle?: (title: string) => void;
 }
 
 export const SettingsPage = ({getCurrentPageTitle}: Props) => {
+  const navigate = useNavigate();
+  const [queryParams, setQueryParams] = useSearchParams();
+  const {t} = useTranslation();
+  const [tabValue, setTabValue] = useState(0);
   const {user} = useUserSession();
+
+  useEffect(() => {
+    const currentParams = Object.fromEntries([...queryParams]);
+    if (currentParams.tab) setTabValue(Number(currentParams.tab));
+  }, []);
+
+  const tabItems = [
+    {
+      label: 'Basic Information',
+      icon: <InfoIcon />,
+    },
+    {
+      label: 'Checklists',
+      icon: <FactCheckIcon />,
+    },
+  ];
 
   const {data: company, isLoading} = useCompanyById(
     user?.userAccount.serviceCompany.id,
@@ -36,55 +64,72 @@ export const SettingsPage = ({getCurrentPageTitle}: Props) => {
   }
 
   return (
-    <>
-      <Grid container spacing={2}>
-        <Grid item md={3} sm={12}>
-          <BasicInformation
-            company={company!}
-            containerStyles={{height: '100%'}}
-          />
+    <Tabs
+      showActionBtn={!!tabValue}
+      btnLabel={t('New Checklist')}
+      btnOnClick={() => navigate('/settings/checklist/new')}
+      actionButtonIcon={<ListAltIcon />}
+      tabItems={tabItems}
+      currentIndex={tabValue}
+      onChange={(index) => {
+        setQueryParams(
+          formatSearchParams({tab: index.toString()}, queryParams),
+        );
+        setTabValue(index);
+      }}>
+      <TabsBody value={tabValue} index={0}>
+        <Grid container spacing={2}>
+          <Grid item md={3} sm={12}>
+            <BasicInformation
+              company={company!}
+              containerStyles={{height: '100%'}}
+            />
+          </Grid>
+          <Grid item md={6} sm={12}>
+            <Addresses company={company!} containerStyles={{height: '100%'}} />
+          </Grid>
+          <Grid item md={3} sm={12}>
+            <Settings company={company!} containerStyles={{height: '100%'}} />
+          </Grid>
         </Grid>
-        <Grid item md={6} sm={12}>
-          <Addresses company={company!} containerStyles={{height: '100%'}} />
-        </Grid>
-        <Grid item md={3} sm={12}>
-          <Settings company={company!} containerStyles={{height: '100%'}} />
-        </Grid>
-      </Grid>
 
-      <Grid container spacing={2} sx={{mt: '0.3em'}}>
-        <Grid item md={3} sm={12}>
-          <LegalInformation company={company!} />
+        <Grid container spacing={2} sx={{mt: '0.3em'}}>
+          <Grid item md={3} sm={12}>
+            <LegalInformation company={company!} />
+          </Grid>
+          <Grid item md={6} sm={12}>
+            <PaymentInformation
+              company={company!}
+              containerStyles={{height: '100%'}}
+            />
+          </Grid>
+          <Grid item md={3} sm={12}>
+            <BillingInformation
+              company={company!}
+              containerStyles={{height: '100%'}}
+            />
+          </Grid>
         </Grid>
-        <Grid item md={6} sm={12}>
-          <PaymentInformation
-            company={company!}
-            containerStyles={{height: '100%'}}
-          />
-        </Grid>
-        <Grid item md={3} sm={12}>
-          <BillingInformation
-            company={company!}
-            containerStyles={{height: '100%'}}
-          />
-        </Grid>
-      </Grid>
 
-      <Grid container spacing={2} sx={{my: '0.3em'}}>
-        <Grid item md={3} sm={12}>
-          <Policies company={company!} containerStyles={{height: '100%'}} />
+        <Grid container spacing={2} sx={{my: '0.3em'}}>
+          <Grid item md={3} sm={12}>
+            <Policies company={company!} containerStyles={{height: '100%'}} />
+          </Grid>
+          <Grid item md={6} sm={12}>
+            <DefinedContractNames
+              company={company!}
+              containerStyles={{height: '100%'}}
+            />
+          </Grid>
+          <Grid item md={3} sm={12}>
+            <WhiteLabel company={company!} containerStyles={{height: '100%'}} />
+          </Grid>
         </Grid>
-        <Grid item md={6} sm={12}>
-          <DefinedContractNames
-            company={company!}
-            containerStyles={{height: '100%'}}
-          />
-        </Grid>
-        <Grid item md={3} sm={12}>
-          <WhiteLabel company={company!} containerStyles={{height: '100%'}} />
-        </Grid>
-      </Grid>
-    </>
+      </TabsBody>
+      <TabsBody value={tabValue} index={1}>
+        <ChecklistDataGrid />
+      </TabsBody>
+    </Tabs>
   );
 };
 

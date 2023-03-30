@@ -6,20 +6,21 @@ export enum CheckListQuestionType {
   YES_NO = 'YES_NO',
 }
 
-export enum CheckListOptionColor {
-  DEFAULT = 'gray',
-  RED = '#FFECCF',
-  YELLOW = 'warning.fade',
-  GREEN = 'success.fade',
+export enum CheckListQuestionOptionColor {
+  DEFAULT,
+  RED,
+  YELLOW,
+  GREEN,
 }
 
-export interface CheckListOption {
+export interface CheckListQuestionOption {
   text: string;
-  color: CheckListOptionColor;
+  color: CheckListQuestionOptionColor;
+  isDefault?: Boolean;
 }
 
 export interface CheckListQuestionAdditionalInfo {
-  options: CheckListOption[];
+  options: CheckListQuestionOption[];
   orderNumber: number;
   answer?: string[];
   note: string;
@@ -44,4 +45,27 @@ export interface CheckList {
   questions: CheckListQuestion[];
   search: string;
   meta: Meta;
+}
+
+export interface CheckListQuestionRecord {
+  category: string;
+  question: string;
+  type: CheckListQuestionType;
+  options: CheckListQuestionOption[];
+  orderNumber?: number;
+}
+
+export interface CreateCheckListRecord {
+  serviceCompanyId: string;
+  name: string;
+  externalId?: string;
+  category: string;
+  questions: CheckListQuestionRecord[];
+}
+
+export interface UpdateCheckListRecord {
+  name: string;
+  externalId: string;
+  category: string;
+  questions: CheckListQuestionRecord[];
 }

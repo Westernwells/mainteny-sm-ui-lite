@@ -183,3 +183,5 @@ export const languageContextMap: {[key: string]: Language} = {
 
 export const titleCase = (str: string) =>
   `${str[0].toUpperCase()}${str.slice(1).toLowerCase()}`;
+
+export const getUniqueId = () => Math.random().toString(36).substring(2, 9);
