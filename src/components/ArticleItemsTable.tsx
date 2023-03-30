@@ -18,7 +18,11 @@ import {
   useArticles,
   useCreatePartialArticle,
 } from 'hooks/reactQuery/useArticle';
-import {formatCurrency, useCurrentCurrency} from 'utils/currency';
+import {
+  formatCurrency,
+  useCurrentCurrency,
+  getCurrencySymbol,
+} from 'utils/currency';
 import {createEmptyResource} from 'utils/paging-utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {ArticleItemRow} from './ArticleItemRow';
@@ -34,6 +38,7 @@ interface Props<T> {
   setItems: Dispatch<SetStateAction<T[]>>;
   isPartial?: boolean;
   isCreditNote?: boolean;
+  unitSellingAmount?: Amount;
 }
 
 export const ArticleItemsTable = ({
@@ -41,9 +46,15 @@ export const ArticleItemsTable = ({
   setItems,
   isPartial,
   isCreditNote,
+  unitSellingAmount,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
+  const currencyCode =
+    unitSellingAmount && isCreditNote
+      ? unitSellingAmount.currency
+      : currentCurrency.code;
+
   const {user} = useUserSession();
   const [percentageVat, setPercentageVat] = useState(
     user?.userAccount?.serviceCompany?.settings?.percentageVat ?? 0,
@@ -163,7 +174,18 @@ export const ArticleItemsTable = ({
         (items.length && article && article.id !== items[0].articleId) ||
         !items.length
       ) {
-        setItems([articleViewToItem(article)]);
+        setItems([
+          articleViewToItem({
+            ...article,
+            unitSellingAmount: unitSellingAmount
+              ? {
+                  ...unitSellingAmount,
+                  netAmount: -unitSellingAmount.netAmount,
+                  grossAmount: -unitSellingAmount.grossAmount,
+                }
+              : article.unitSellingAmount,
+          }),
+        ]);
       }
     }
   }, [
@@ -177,6 +199,7 @@ export const ArticleItemsTable = ({
     setItems,
     partialArticleResource.data,
     creditNoteArticleResource.data,
+    unitSellingAmount,
   ]);
 
   const renderHeader = () => (
@@ -298,6 +321,9 @@ export const ArticleItemsTable = ({
               isCreditNote={isCreditNote}
               total={total}
               setTotal={setTotal}
+              currencySymbol={
+                isCreditNote ? getCurrencySymbol[currencyCode] : ''
+              }
             />
           ))}
           {items.length ? (
@@ -337,7 +363,7 @@ export const ArticleItemsTable = ({
 
                       <Typography sx={{justifySelf: 'end'}}>
                         {formatCurrency(total, {
-                          currency: currentCurrency.code,
+                          currency: currencyCode,
                         })}
                       </Typography>
                     </>
@@ -356,7 +382,7 @@ export const ArticleItemsTable = ({
 
                   <Typography>
                     {formatCurrency(totalPrice, {
-                      currency: currentCurrency.code,
+                      currency: currencyCode,
                     })}
                   </Typography>
                   <Box>
@@ -377,7 +403,7 @@ export const ArticleItemsTable = ({
                   </Box>
                   <Typography>
                     {formatCurrency(totalPrice * (percentageVat / 100), {
-                      currency: currentCurrency.code,
+                      currency: currencyCode,
                     })}
                   </Typography>
                 </Box>
@@ -399,7 +425,7 @@ export const ArticleItemsTable = ({
                   </Typography>
                   <Typography sx={{color: 'primary.contrastText'}}>
                     {formatCurrency(totalPrice * (1 + percentageVat / 100), {
-                      currency: currentCurrency.code,
+                      currency: currencyCode,
                     })}
                   </Typography>
                 </Box>

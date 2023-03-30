@@ -266,7 +266,7 @@ export const InvoiceForm = ({
   }, [invoice]);
 
   useEffect(() => {
-    if (!invoice && serviceOrder) {
+    if (serviceOrder) {
       setCustomer(serviceOrder.elevator.propertyOwner);
 
       formik.setFieldValue(
@@ -774,6 +774,7 @@ export const InvoiceForm = ({
               setItems={setInvoiceItems}
               isPartial={!(formik.values.type !== InvoiceType.PARTIAL)}
               isCreditNote={formik.values.type === InvoiceType.CREDIT_NOTE}
+              unitSellingAmount={invoice?.totalAmount}
             />
 
             <Box my="1.5em">

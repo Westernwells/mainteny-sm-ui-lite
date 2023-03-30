@@ -17,12 +17,12 @@ export const NewInvoice = () => {
       ? useServiceOrderDetails(orderId)
       : {data: undefined, isLoading: false};
 
-  const {data: invoice} =
+  const {data: invoice, isLoading: isLoadingInvoice} =
     typeof invoiceId === 'string'
       ? useInvoiceDetail(invoiceId)
-      : {data: undefined};
+      : {data: undefined, isLoading: false};
 
-  if (isLoading) {
+  if (isLoading || isLoadingInvoice) {
     return (
       <Box
         display="flex"
