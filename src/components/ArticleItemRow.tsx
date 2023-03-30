@@ -19,6 +19,7 @@ interface Props<T> {
   setTotal: Dispatch<SetStateAction<number>>;
   isPartial?: boolean;
   isCreditNote?: boolean;
+  currencySymbol?: string;
 }
 
 export const ArticleItemRow = ({
@@ -30,6 +31,7 @@ export const ArticleItemRow = ({
   setTotal,
   isPartial,
   isCreditNote,
+  currencySymbol,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const currentCurrency = useCurrentCurrency();
   const [name, setName] = useState(articleItem.name);
@@ -187,7 +189,7 @@ export const ArticleItemRow = ({
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                {currentCurrency.symbol}
+                {currencySymbol || currentCurrency.symbol}
               </InputAdornment>
             ),
           }}
