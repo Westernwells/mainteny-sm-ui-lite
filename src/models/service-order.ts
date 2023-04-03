@@ -71,11 +71,17 @@ export enum JobScheduleType {
   FIXED = 'FIXED',
 }
 
+export enum ChecklistStatus {
+  INIT = 'INIT',
+  COMPLETED = 'COMPLETED',
+}
+
 export interface ServiceOrderCheckListInfo {
   checkListId: string;
   technicianSignature: string;
   pdfPath: string;
   pdfGenerationStatus: PdfGenerationStatus;
+  status: ChecklistStatus;
 }
 export interface ServiceOrder {
   id: string;
