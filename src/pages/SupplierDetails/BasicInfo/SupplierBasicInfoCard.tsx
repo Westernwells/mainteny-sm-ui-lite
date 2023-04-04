@@ -31,8 +31,8 @@ const validationSchema = Yup.object().shape({
     .required('Phone number is required')
     .matches(phoneValidationRE, 'Phone number is not valid'),
   address: Yup.object().nullable().required('Address is required'),
-  url: Yup.string().nullable().required('Website is required'),
-  category: Yup.string().nullable().required('Category is required'),
+  url: Yup.string().nullable(),
+  category: Yup.string().nullable(),
 });
 
 export const SupplierBasicInfoCard = ({
@@ -97,12 +97,12 @@ export const SupplierBasicInfoCard = ({
     {
       label: 'Website',
       icon: <Language sx={{color: theme.palette.info.main}} />,
-      body: supplier?.contact.url ?? '-',
+      body: supplier?.contact.url || '-',
     },
     {
       label: 'Category',
       icon: <LensOutlined sx={{color: theme.palette.info.main}} />,
-      body: supplier?.category ?? '-',
+      body: supplier?.category || '-',
     },
     {
       label: 'Address',
