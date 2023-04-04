@@ -615,6 +615,7 @@ export const de = {
   Init: 'Begonnen',
   'Search Unassigned Orders': 'Suche nach nicht zugewiesenen Aufträgen',
   'Due in': 'Fällig in',
+  Due: 'Fällig',
   'Show Unassigned Orders': 'Nicht zugewiesene Aufträge anzeigen',
   'Show Unassigned Orders ({{count}})':
     'Nicht zugewiesene Aufträge anzeigen ({{count}})',
