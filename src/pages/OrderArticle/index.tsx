@@ -129,6 +129,7 @@ export const OrderArticle = () => {
 
       if (preferredSupplier) {
         setSupplier(preferredSupplier);
+        formik.setFieldValue('articleSupplierId', preferredSupplier.id);
       }
 
       if (!items.length) {
