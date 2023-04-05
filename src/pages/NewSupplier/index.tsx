@@ -22,8 +22,8 @@ const validationSchema = Yup.object().shape({
     .required('Phone number is required')
     .matches(phoneValidationRE, 'Phone number is not valid'),
   address: Yup.object().nullable().required('Address is required'),
-  url: Yup.string().nullable().required('Website is required'),
-  category: Yup.string().nullable().required('Category is required'),
+  url: Yup.string().nullable(),
+  category: Yup.string().nullable(),
 });
 
 const NewSupplier = () => {
@@ -131,7 +131,7 @@ const NewSupplier = () => {
               props={{
                 label: 'Phone',
                 name: 'phone',
-                placeholder: 'e.g.',
+                placeholder: 'e.g. 49 173 12345678',
                 type: 'text',
                 required: true,
                 value: formik.values.phone,
@@ -167,7 +167,6 @@ const NewSupplier = () => {
                 name: 'url',
                 placeholder: 'e.g. www.web.com',
                 type: 'text',
-                required: true,
                 value: formik.values.url,
                 helperText: formik.touched.url && formik.errors.url,
                 error: !!(formik.touched.url && formik.errors.url),
@@ -183,7 +182,6 @@ const NewSupplier = () => {
                 name: 'category',
                 placeholder: 'e.g. Cable',
                 type: 'text',
-                required: true,
                 value: formik.values.category,
                 helperText: formik.touched.category && formik.errors.category,
                 error: !!(formik.touched.category && formik.errors.category),
