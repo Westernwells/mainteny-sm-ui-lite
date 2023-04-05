@@ -57,7 +57,7 @@ export const ArticleItemRow = ({
   };
 
   const handleTotalChange = (e: any) => {
-    setTotal(e.target.value);
+    setTotal(Number(e.target.value));
   };
 
   useEffect(() => {
@@ -157,6 +157,7 @@ export const ArticleItemRow = ({
               }}
             />
             <TextField
+              type="number"
               value={total}
               onChange={handleTotalChange}
               size="small"
