@@ -32,6 +32,9 @@ export const PageLayout = ({
     onMessageReceived: (event: MessageType | string) => {
       queryClient.invalidateQueries([queryKeys.queryNotifications]);
       queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
+      if (event === MessageType.FILE_UPDATED) {
+        queryClient.invalidateQueries([queryKeys.invoiceById]);
+      }
     },
   });
 
