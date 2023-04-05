@@ -37,7 +37,6 @@ import {
   useUpdateInvoice,
 } from 'hooks/reactQuery/useInvoice';
 import {
-  UpdateInvoice,
   InvoiceItemRecord,
   InvoiceView,
   InvoiceType,
@@ -282,6 +281,7 @@ export const InvoiceForm = ({
       formik.setFieldValue('serviceOrderId', serviceOrder.id, true);
 
       if (
+        !invoice &&
         formik.values.type !== InvoiceType.PARTIAL &&
         'articles' in serviceOrder &&
         serviceOrder.articles.length
