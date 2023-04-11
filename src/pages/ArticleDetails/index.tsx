@@ -57,6 +57,9 @@ export const ArticleOverView = () => {
               }),
             variant: 'contained',
             size: 'large',
+            sx: {
+              textTransform: 'none',
+            },
           }}
         />
         <Button
