@@ -1,8 +1,13 @@
 import Box, {BoxProps} from '@mui/material/Box';
 import {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import Grid from '@mui/material/Grid';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import ArrowDownward from '@mui/icons-material/ArrowDownward';
+import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import {SearchInput} from 'components/SearchInput';
 import {PageCard} from 'components/PageCard';
 import {DatePicker} from 'components/DatePicker';
@@ -12,7 +17,7 @@ import {useInView} from 'react-intersection-observer';
 import {endOfDay, startOfDay, addDays} from 'date-fns';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {toRestDate} from 'utils/datetime';
-import {Resource} from 'models/misc';
+import {Order, Resource} from 'models/misc';
 import {OrderDetails} from './OrderDetails';
 
 interface Props extends BoxProps {
@@ -20,6 +25,7 @@ interface Props extends BoxProps {
 }
 
 export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
+  const {t} = useTranslation();
   const [search, setSearch] = useState('');
   const {ref, inView} = useInView();
   const [page, setPage] = useState(makePage(0, 50));
@@ -31,6 +37,7 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
     startOfDay(addDays(new Date(), -90)),
   );
   const [endDate, setEndDate] = useState(endOfDay(addDays(new Date(), 90)));
+  const [order, setOrder] = useState(Order.DESC);
 
   const {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(page.pageSize),
@@ -41,6 +48,7 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
     pageSize: page.pageSize,
     pageIndex: page.pageIndex,
     query: search,
+    order,
   });
 
   useEffect(() => {
@@ -77,6 +85,14 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
     }
   }, [serviceOrders, isLoading]);
 
+  const handleSort = () => {
+    if (order === Order.ASC) {
+      setOrder(Order.DESC);
+    } else {
+      setOrder(Order.ASC);
+    }
+  };
+
   return (
     <Box sx={{...containerStyles}} {...rest}>
       <PageCard
@@ -91,16 +107,23 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
           height: 'default',
         }}>
         <Box display="flex" flexDirection="column" gap={2} sx={{px: '0.5em'}}>
-          <SearchInput
-            placeholder="e.g. REWE AG"
-            variant="outlined"
-            label="Search"
-            onValueChanged={(searchValue) => setSearch(searchValue)}
-            containerStyle={{
-              background: '#fff',
-              width: '100%',
-            }}
-          />
+          <Box display="flex">
+            <SearchInput
+              placeholder="e.g. REWE AG"
+              variant="outlined"
+              label="Search"
+              onValueChanged={(searchValue) => setSearch(searchValue)}
+              containerStyle={{
+                background: '#fff',
+                width: '100%',
+              }}
+            />
+            <Tooltip title={t('Sort by due date')} placement="left" arrow>
+              <IconButton onClick={handleSort}>
+                {order === Order.ASC ? <ArrowDownward /> : <ArrowUpward />}
+              </IconButton>
+            </Tooltip>
+          </Box>
           <Grid container gap={1} justifyContent="space-between">
             <Grid item xs={12} xl={5.7}>
               <DatePicker
