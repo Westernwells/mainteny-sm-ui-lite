@@ -283,6 +283,42 @@ export function useServiceOrders(
   );
 }
 
+export const queryDueServiceOrders = async (
+  params: ServiceOrderQueryParams,
+): Promise<Resource<ServiceOrderView>> => {
+  const response: AxiosResponse<Resource<ServiceOrderView>> =
+    await axiosClient.get(`/api/serviceOrders/dueOrders`, {
+      params,
+      paramsSerializer,
+    });
+  return response.data;
+};
+
+export function useDueServiceOrders(
+  params: ServiceOrderQueryParams,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  const {user} = useUserSession();
+  return useQuery<
+    Resource<ServiceOrderView>,
+    RestError,
+    Resource<ServiceOrderView>
+  >(
+    [
+      queryKeys.queryDueServiceOrders,
+      params,
+      user?.userAccount.serviceCompany.id,
+    ],
+    () =>
+      queryDueServiceOrders({
+        serviceCompanyId: user!.userAccount.serviceCompany.id,
+        order: Order.DESC,
+        ...params,
+      }),
+    {enabled: !!user, ...options},
+  );
+}
+
 // TODO: currently not in uae, we migght have to remove
 // if we realise we'll never need it again
 export function useFetchServiceOrdersByElevators(

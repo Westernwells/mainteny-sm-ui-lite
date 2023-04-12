@@ -1,19 +1,18 @@
 import Box, {BoxProps} from '@mui/material/Box';
 import {useEffect, useState} from 'react';
+import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
 import {SearchInput} from 'components/SearchInput';
 import {PageCard} from 'components/PageCard';
-import Divider from '@mui/material/Divider';
-import {
-  ServiceOrderOrderField,
-  ServiceOrderStatus,
-  ServiceOrderView,
-} from 'models/service-order';
-import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
+import {DatePicker} from 'components/DatePicker';
+import {ServiceOrderView} from 'models/service-order';
+import {useDueServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {useInView} from 'react-intersection-observer';
 import {endOfDay, startOfDay, addDays} from 'date-fns';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {Order, Resource} from 'models/misc';
+import {toRestDate} from 'utils/datetime';
+import {Resource} from 'models/misc';
 import {OrderDetails} from './OrderDetails';
 
 interface Props extends BoxProps {
@@ -28,19 +27,20 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
   const [serviceOrdersView, setServiceOrdersView] = useState<
     Resource<ServiceOrderView>
   >(createEmptyResource<ServiceOrderView>(page.pageSize));
+  const [startDate, setStartDate] = useState(
+    startOfDay(addDays(new Date(), -90)),
+  );
+  const [endDate, setEndDate] = useState(endOfDay(addDays(new Date(), 90)));
 
   const {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(page.pageSize),
     isLoading,
-  } = useServiceOrders({
-    end: endOfDay(addDays(new Date(), 180)).toISOString(),
-    start: startOfDay(addDays(new Date(), -180)).toISOString(), // we should show unsassigned orders for a couople month
+  } = useDueServiceOrders({
+    end: toRestDate(endDate),
+    start: toRestDate(startDate),
     pageSize: page.pageSize,
     pageIndex: page.pageIndex,
     query: search,
-    status: [ServiceOrderStatus.READY_TO_SCHEDULE, ServiceOrderStatus.INIT],
-    order: Order.ASC,
-    orderBy: ServiceOrderOrderField.CREATED_TIME,
   });
 
   useEffect(() => {
@@ -90,7 +90,7 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
           mt: 0,
           height: 'default',
         }}>
-        <Box sx={{px: '0.5em'}}>
+        <Box display="flex" flexDirection="column" gap={2} sx={{px: '0.5em'}}>
           <SearchInput
             placeholder="e.g. REWE AG"
             variant="outlined"
@@ -101,12 +101,38 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
               width: '100%',
             }}
           />
+          <Grid container gap={1} justifyContent="space-between">
+            <Grid item xs={12} xl={5.7}>
+              <DatePicker
+                defaultDate={startDate}
+                maxDate={endDate}
+                getSelectedDate={(date) => date && setStartDate(date)}
+                inputLabelProps={{shrink: undefined}}
+                textFieldProps={{
+                  label: 'Start Date',
+                  sx: {background: '#fff'},
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} xl={5.7}>
+              <DatePicker
+                defaultDate={endDate}
+                minDate={startDate}
+                getSelectedDate={(date) => date && setEndDate(date)}
+                inputLabelProps={{shrink: undefined}}
+                textFieldProps={{
+                  label: 'End Date',
+                  sx: {background: '#fff'},
+                }}
+              />
+            </Grid>
+          </Grid>
         </Box>
         <Divider sx={{mt: '1em'}} />
         <Box
           sx={{
             overflowY: 'scroll',
-            height: '92%',
+            height: '82%',
             '&::-webkit-scrollbar': {
               width: '0.2em',
             },
