@@ -114,7 +114,7 @@ export const AuthLayout = ({children}: Props) => {
         alignItems="center">
         <Box>
           <Box display="flex" justifyContent="center">
-            <MaintenyLogo />
+            <MaintenyLogo width={236} height={49} />
           </Box>
           {children}
         </Box>
