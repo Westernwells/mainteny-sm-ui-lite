@@ -97,7 +97,7 @@ export const UnitsWidget = ({customerId, getTotalUnits, openTab}: Props) => {
           containerStyle={{m: 'auto', width: '60%', minHeight: '24.375em'}}
           label="No units yet. Please click the button below to add!"
           showActionBtn
-          btnLabel="+ Add New Unit"
+          btnLabel="Add New Unit"
           btnAction={addNewUnit}
         />
       )}

@@ -145,7 +145,7 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
               'No attachments yet. Please click the button below to add!',
             )}
             illustration="attachment"
-            buttonLabel={t('+ Add Attachments')}
+            buttonLabel={t('Add Attachments')}
             action={() => setOpenDialog(true)}
           />
         )}
