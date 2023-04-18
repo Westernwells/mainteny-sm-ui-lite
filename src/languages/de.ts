@@ -619,6 +619,7 @@ export const de = {
   'Show Unassigned Orders': 'Nicht zugewiesene Aufträge anzeigen',
   'Show Unassigned Orders ({{count}})':
     'Nicht zugewiesene Aufträge anzeigen ({{count}})',
+  'Sort by due date': 'Nach Fälligkeitsdatum sortieren',
   'Search technician': 'Techniker suchen',
   'New Order': 'Neuer Auftrag',
   Ongoing: 'Läuft',

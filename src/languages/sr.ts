@@ -620,6 +620,7 @@ export const sr = {
   'Show Unassigned Orders': 'Prikaži nedodjeljene naloge',
   'Show Unassigned Orders ({{count}})':
     'Prikaži nedodjeljene naloge ({{count}})',
+  'Sort by due date': 'Sortiraj po roku',
   'Search technician': 'Serviser za pretragu',
   'New Order': 'Novi nalog',
   Ongoing: 'U toku',
