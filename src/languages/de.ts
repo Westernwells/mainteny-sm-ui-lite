@@ -350,12 +350,12 @@ export const de = {
   'Stock Info': 'Informationen zum Bestand',
   'No stock info yet. Please click the button below to add!':
     'Noch keine Lagerinformationen. Bitte klicken Sie auf die Schaltfläche unten, um sie hinzuzufügen!',
-  '+ Add stock info': '+ Bestandsinfo hinzufügen',
+  'Add stock info': 'Bestandsinfo hinzufügen',
   'Edit Stock Information': 'Bestandsinformationen bearbeiten',
   Suppliers: 'Zulieferer',
   'No suppliers yet. Please click the button below to add!':
     'Noch keine Lieferanten vorhanden. Bitte klicken Sie zum Hinzufügen auf die Schaltfläche unten!',
-  '+ Add suppliers': '+ Lieferanten hinzufügen',
+  'Add suppliers': 'Lieferanten hinzufügen',
   'Add Supplier': 'Lieferant hinzufügen',
   'Create Supplier': 'Lieferant anlegen',
   'New Supplier': 'Neuer Lieferant',
@@ -373,7 +373,7 @@ export const de = {
   'QR code image uploaded successfully!':
     'QR-Code-Bild erfolgreich hochgeladen!',
   Attachments: 'Anhänge',
-  '+ Add Attachments': '+ Anhänge hinzufügen',
+  'Add Attachments': 'Anhänge hinzufügen',
   'No attachments yet. Please click the button below to add!':
     'Noch keine Anhänge. Bitte klicken Sie auf die Schaltfläche unten, um sie hinzuzufügen!',
   'Edit Attachments': 'Anhänge bearbeiten',
@@ -386,7 +386,7 @@ export const de = {
   'File size less than 5MB only':
     'Nur Dateien mit einer Größe von maximal 5 MB',
   'QR Code': 'QR-Code',
-  '+ Add QR Code': '+ QR-Code hinzufügen',
+  'Add QR Code': 'QR-Code hinzufügen',
   'Edit QR Code': 'QR-Code bearbeiten',
   'No QR code yet. Please click the button below to add!':
     'Noch kein QR-Code. Bitte klicken Sie auf die Schaltfläche unten, um ihn hinzuzufügen!',
@@ -1135,8 +1135,8 @@ export const de = {
   'Press Enter to submit note': 'Klicken Sie Enter, um die Notiz zu speichern',
   'Submit note': 'Notiz speichern',
   'Repeat Password': 'Wiederhole Passwort',
-  '+ Add New Unit': '+ Anlage hinzufügen',
-  '+ Add New Contract': '+ Vertrag hinzufügen',
+  'Add New Unit': 'Anlage hinzufügen',
+  'Add New Contract': 'Vertrag hinzufügen',
   'Add Unit': 'Anlage hinzufügen',
   'Remove Employee': 'Mitarbeiter entfernen',
   'YEAR BUILT': 'Baujahr'.toUpperCase(),

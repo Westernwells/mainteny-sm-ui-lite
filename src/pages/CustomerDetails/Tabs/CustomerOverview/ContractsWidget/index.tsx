@@ -104,7 +104,7 @@ export const ContractsWidget = ({
           containerStyle={{m: 'auto', width: '60%', minHeight: '24.375em'}}
           label="No contracts yet. Please click the button below to add!"
           showActionBtn
-          btnLabel="+ Add New Contract"
+          btnLabel="Add New Contract"
           btnAction={addNewContract}
         />
       )}

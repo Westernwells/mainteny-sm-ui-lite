@@ -349,12 +349,12 @@ export const sr = {
   'Stock Info': 'Zaliha',
   'No stock info yet. Please click the button below to add!':
     'Još nema informacija o zalihama. Kliknite na dugme ispod da dodate!',
-  '+ Add stock info': '+ Dodajte informacije o zalihama',
+  'Add stock info': 'Dodajte informacije o zalihama',
   'Edit Stock Information': 'Uredite informacije o akcijama',
   Suppliers: 'Dobavljači',
   'No suppliers yet. Please click the button below to add!':
     'Još nema dobavljača. Kliknite na dugme ispod da dodate!',
-  '+ Add suppliers': '+ Dodajte dobavljače',
+  'Add suppliers': 'Dodajte dobavljače',
 
   'Add Supplier': 'Dodajte dobavljače',
   'Create Supplier': 'Stvori dobavljača',
@@ -372,7 +372,7 @@ export const sr = {
   Preferred: 'Preferirani',
   'QR code image uploaded successfully!': 'QR kod!',
   Attachments: 'Prilozi',
-  '+ Add Attachments': '+ Dodajte priloge',
+  'Add Attachments': 'Dodajte priloge',
   'No attachments yet. Please click the button below to add!':
     'Još nema priloga. Kliknite na dugme ispod da dodate!',
   'Edit Attachments': 'Uredi priloge',
@@ -384,7 +384,7 @@ export const sr = {
   'Drag to reposition picture': 'Prevucite da biste promjenili položaj slike',
   'File size less than 5MB only': 'Samo veličina datoteke manja od 5 MB',
   'QR Code': 'QR kod',
-  '+ Add QR Code': '+ Dodajte QR kod',
+  'Add QR Code': 'Dodajte QR kod',
   'Edit QR Code': 'Uredite QR kod',
   'No QR code yet. Please click the button below to add!':
     'Još nema QR koda. Kliknite na dugme ispod da dodate.',
@@ -1106,8 +1106,8 @@ export const sr = {
   'Press Enter to submit note': 'Pritisnite Enter za slanje bilješke',
   'Submit note': 'Pošaljite bilješku',
   'Repeat Password': 'Ponovite lozinku',
-  '+ Add New Unit': '+ Dodaj novu jedinicu',
-  '+ Add New Contract': '+ Dodaj novi ugovor',
+  'Add New Unit': 'Dodaj novu jedinicu',
+  'Add New Contract': 'Dodaj novi ugovor',
   'Add Unit': 'Dodajte jedinice',
   'Remove Employee': 'Uklonite zaposlenog',
   'YEAR BUILT': 'Godina izgradnje'.toUpperCase(),

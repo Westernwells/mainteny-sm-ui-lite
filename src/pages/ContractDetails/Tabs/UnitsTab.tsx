@@ -61,17 +61,6 @@ export const UnitsTab: FC<Props> = ({elevators}) => {
             showActionBtn
           />
         }
-        noResultsEmptySection={
-          <EmptySection
-            illustration="clipboard"
-            size="tiny"
-            containerStyle={{my: 'auto'}}
-            btnAction={() => navigate('/units/new')}
-            label="No units yet. They will appear here once added!"
-            btnLabel="+ Add Unit"
-            showActionBtn
-          />
-        }
         rows={rows}
         columns={columns}
         pageSize={page.pageSize}
