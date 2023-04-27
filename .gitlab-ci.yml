@@ -58,7 +58,7 @@ variables:
     - pulumi login s3://mainteny-pulumi-state
   variables:
     ENV: stage
-    CACHE_PATH: /*
+    CACHE_PATH: /index.html
   script:
     - echo "Deploying ${IMAGE_SUFFIX} on environment $STACK"
     - pulumi stack select "sm-ui-lite.${STACK}"
@@ -146,7 +146,7 @@ deploy-stage:
         ENV: stage
         STACK: stage
         IMAGE_ENV: stage
-        CACHE_PATH: /*
+        CACHE_PATH: /index.html
       when: on_success
     - when: never
 
@@ -160,6 +160,6 @@ deploy-production:
         ENV: prod
         STACK: prod
         IMAGE_ENV: prod
-        CACHE_PATH: /*
+        CACHE_PATH: /index.html
       when: manual
     - when: never
