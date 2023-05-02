@@ -3,6 +3,7 @@ import {
   SetStateAction,
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 import {useTranslation} from 'react-i18next';
@@ -25,6 +26,7 @@ import {
 } from 'utils/currency';
 import {createEmptyResource} from 'utils/paging-utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useFetchServiceOrderInvoices} from 'hooks/reactQuery/useInvoice';
 import {ArticleItemRow} from './ArticleItemRow';
 import {Button} from './Button';
 import {FormLabel} from './form/FormLabel';
@@ -39,6 +41,7 @@ interface Props<T> {
   isPartial?: boolean;
   isCreditNote?: boolean;
   unitSellingAmount?: Amount;
+  serviceOrderId?: string;
 }
 
 export const ArticleItemsTable = ({
@@ -47,6 +50,7 @@ export const ArticleItemsTable = ({
   isPartial,
   isCreditNote,
   unitSellingAmount,
+  serviceOrderId,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -84,6 +88,20 @@ export const ArticleItemsTable = ({
     },
     {},
     true,
+  );
+  const {data: invoices = []} = useFetchServiceOrderInvoices(serviceOrderId, {
+    enabled: !!serviceOrderId && isPartial,
+  });
+  const previousInvoicedTotal = useMemo(
+    () =>
+      invoices
+        .map(
+          (invoice) =>
+            invoice.totalAmount.netAmount /
+            10 ** invoice.totalAmount.fractionDigits!,
+        )
+        .reduce((acc, curr) => acc + curr, 0),
+    [invoices],
   );
 
   const {mutate: createPartial} = useCreatePartialArticle();
@@ -319,7 +337,7 @@ export const ArticleItemsTable = ({
               setItems={setItems}
               isPartial={isPartial}
               isCreditNote={isCreditNote}
-              total={total}
+              total={total - previousInvoicedTotal}
               setTotal={setTotal}
               currencySymbol={
                 isCreditNote ? getCurrencySymbol[currencyCode] : ''
