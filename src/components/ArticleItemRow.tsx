@@ -145,7 +145,7 @@ export const ArticleItemRow = ({
         {isPartial && (
           <>
             <TextField
-              value={total * 1.19}
+              value={total * (1 + articleItem.unitAmount.percentageVat / 100)}
               size="small"
               disabled
               InputProps={{

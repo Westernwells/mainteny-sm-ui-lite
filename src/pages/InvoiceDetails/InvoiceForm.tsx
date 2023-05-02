@@ -786,6 +786,7 @@ export const InvoiceForm = ({
               isPartial={!(formik.values.type !== InvoiceType.PARTIAL)}
               isCreditNote={formik.values.type === InvoiceType.CREDIT_NOTE}
               unitSellingAmount={invoice?.totalAmount}
+              serviceOrderId={formik.values.serviceOrderId}
             />
 
             <Box my="1.5em">
