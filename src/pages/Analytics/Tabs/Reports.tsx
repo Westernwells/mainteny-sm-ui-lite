@@ -59,7 +59,7 @@ interface Option {
 }
 
 export const Reports = () => {
-  const {t} = useTranslation();
+  const {t, i18n} = useTranslation();
   const theme = useTheme();
   const {user} = useUserSession();
   const serviceCompanyId = user!.userAccount.serviceCompany.id;
@@ -279,7 +279,7 @@ export const Reports = () => {
                     if (newValue) formik.setFieldValue('endDate', newValue);
                   }}
                   textFieldProps={{
-                    label: 'To',
+                    label: i18n.language === 'de-de' ? 'Bis' : 'To',
                     InputLabelProps: {shrink: true},
                     helperText:
                       formik.initialValues.endDate !== formik.values.endDate

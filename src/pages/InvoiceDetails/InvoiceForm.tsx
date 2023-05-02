@@ -636,7 +636,7 @@ export const InvoiceForm = ({
                   props={{
                     id: 'customerSpecificOrderNumber',
                     placeholder: 'e.g 000 000 000',
-                    label: 'Customer specific order number',
+                    label: 'Purchase order number',
                     value: formik.values.customerSpecificOrderNumber,
                     onChange: formik.handleChange,
                     onBlur: formik.handleBlur,
