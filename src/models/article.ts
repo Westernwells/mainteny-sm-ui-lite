@@ -43,6 +43,7 @@ export interface ArticleView {
   number: string;
   search: string;
   serviceCompanyId: string;
+  propertyOwnerId?: string;
   stock: Stock;
   storageLocation: string;
   subCategory: string;
@@ -259,4 +260,15 @@ export interface UpdateArticleSupplierRecord {
   url: string;
   address: AddressRecord;
   category: string;
+}
+
+export interface PropertyOwnerArticleRecord {
+  id?: string;
+  name: string;
+  externalId?: string;
+  type: ArticleType;
+  category: string;
+  unit: string;
+  unitPurchaseAmount: AmountRecord;
+  unitSellingAmount: AmountRecord;
 }
