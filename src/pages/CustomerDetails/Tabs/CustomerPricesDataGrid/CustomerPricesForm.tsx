@@ -1,5 +1,4 @@
 import {useState} from 'react';
-import {useTranslation} from 'react-i18next';
 import {FormikHelpers, useFormik} from 'formik';
 import * as Yup from 'yup';
 import Grid from '@mui/material/Grid';
@@ -63,7 +62,6 @@ export const CustomerPricesForm = ({
   onSubmit,
   article,
 }: Props) => {
-  const {t} = useTranslation();
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
   const [modelQuery, setModelQuery] = useState('');
@@ -225,9 +223,9 @@ export const CustomerPricesForm = ({
             getQuery={(item) => setModelQuery(item || '')}
             textFieldProps={{
               name: 'unit',
-              label: t('Unit'),
+              label: 'Unit',
               required: true,
-              placeholder: t('Select unit'),
+              placeholder: 'Select unit',
               error: !!(touched.unit && errors.unit),
             }}
           />
@@ -236,7 +234,7 @@ export const CustomerPricesForm = ({
         <Grid item xs={12}>
           <FormInput
             props={{
-              label: t('Purchase price (excl. VAT)'),
+              label: 'Purchase price (excl. VAT)',
               name: 'unitPurchaseAmount.netAmount',
               value: values.unitPurchaseAmount?.netAmount ?? 0,
               helperText:
@@ -266,7 +264,7 @@ export const CustomerPricesForm = ({
         <Grid item xs={12}>
           <FormInput
             props={{
-              label: t('Selling price (excl. VAT)'),
+              label: 'Selling price (excl. VAT)',
               name: 'unitSellingAmount.netAmount',
               value: values.unitSellingAmount?.netAmount ?? 0,
               helperText:
