@@ -846,6 +846,20 @@ export const sr = {
   'Do you want to delete this customer?': 'Želite li izbrisati kupca?',
   'COST CENTER': 'MESTO TROŠKOVA',
   'Cost Center': 'Mesto troškova',
+  'Custom prices': 'Prilagođene cene',
+  'Customer specific article': 'Artikl specifičan za kupca',
+  'Add Article & Spare part': 'Dodajte artikl i rezervni deo',
+  'Add Article': 'Dodajte artikl',
+  'No specific prices added, start adding your service prices!':
+    'Nema dodatih posebnih cena, počnite da dodajete cene usluga!',
+  ARTICLE: 'Artikl',
+  'PURCHASE PRICE (EXCL. VAT)': 'NABAVNA CENA (BEZ PDV-a)',
+  'SELLING PRICE (EXCL. VAT)': 'PRODAJNA CENA (BEZ PDV-a)',
+  'Add customer specific article': 'Dodajte artikl specifičan za kupca',
+  'Articles & Spare part Number': 'Artikli i broj rezervnog dela',
+  'Purchase price (excl. VAT)': 'Nabavna cena (bez PDV-a)',
+  'Selling price (excl. VAT)': 'Prodajna cena (bez PDV-a)',
+  'Edit customer specific article': 'Uredite artikl specifičan za kupca',
 
   // Toast
   'Uh oh! As a Property Manager, please login at':
