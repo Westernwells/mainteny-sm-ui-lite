@@ -33,7 +33,6 @@ import {
   formatNetAmount,
   useCurrentCurrency,
 } from 'utils/currency';
-import {convertToText} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
@@ -244,11 +243,12 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 {currency},
               )}
               renewalPeriod={contractDetails?.additionalInfo?.renewalTerms}
-              invoiceCycle={convertToText(
-                contractDetails?.additionalInfo?.invoiceCycle
+              invoiceCycle={
+                contractDetails?.additionalInfo?.invoiceCycle !== undefined &&
+                contractDetails?.additionalInfo?.invoiceCycle >= 0
                   ? invoiceCycle[contractDetails?.additionalInfo?.invoiceCycle]
-                  : '',
-              )}
+                  : ''
+              }
               numberOfUnits={contractDetails?.elevators?.length}
               type={contractTypeMap[contractDetails?.type]}
               name={contractDetails?.name}

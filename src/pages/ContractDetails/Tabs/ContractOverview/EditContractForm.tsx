@@ -135,9 +135,10 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
           }))}
           selectProps={{
             id: 'invoiceCycleSelect',
-            value: formik.values.invoiceCycle
-              ? t(formik.values.invoiceCycle.toString())
-              : '',
+            value:
+              formik.values.invoiceCycle >= 0
+                ? t(formik.values.invoiceCycle.toString())
+                : '',
             onChange: formik.handleChange,
             error: !!formik.errors.invoiceCycle,
             name: 'invoiceCycle',
