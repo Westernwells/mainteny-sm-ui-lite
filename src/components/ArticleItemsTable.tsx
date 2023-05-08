@@ -162,13 +162,6 @@ export const ArticleItemsTable = ({
   };
 
   useEffect(() => {
-    if (items.length > 0) {
-      const pVat = items[0].unitAmount.percentageVat;
-      setPercentageVat(pVat);
-    }
-  }, [items]);
-
-  useEffect(() => {
     const result = items.map((item) => getItemRecord(item));
     setItems(result);
   }, [percentageVat]);
