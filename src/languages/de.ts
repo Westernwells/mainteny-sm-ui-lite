@@ -863,6 +863,10 @@ export const de = {
   'Purchase price (excl. VAT)': 'Einkaufspreis (exkl. MwSt.)',
   'Selling price (excl. VAT)': 'Verkaufspreis (exkl. MwSt.)',
   'Edit customer specific article': 'Kundenspezifische Artikel bearbeiten',
+  'Select Articles & Custom Prices':
+    'Artikel & kundenspezifische Preise auswählen',
+  'Articles & Spare parts': 'Artikel',
+  'Add Articles & Spare part': 'Artikel hinzufügen',
 
   // Toast
   'Uh oh! As a Property Manager, please login at':

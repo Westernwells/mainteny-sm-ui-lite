@@ -165,7 +165,7 @@ export const ArticleItemsTable = ({
     ];
     if (propertyOwnerId) {
       tItems.push({
-        label: 'Custom Prices',
+        label: 'Custom prices',
         icon: <ReceiptLongIcon />,
       });
     }

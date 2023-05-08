@@ -860,6 +860,9 @@ export const sr = {
   'Purchase price (excl. VAT)': 'Nabavna cena (bez PDV-a)',
   'Selling price (excl. VAT)': 'Prodajna cena (bez PDV-a)',
   'Edit customer specific article': 'Uredite artikl specifičan za kupca',
+  'Select Articles & Custom Prices': 'Izaberite Artikli i prilagođene cene',
+  'Articles & Spare parts': 'Artikli i rezervni delovi',
+  'Add Articles & Spare part': 'Dodajte artikle i rezervni deo',
 
   // Toast
   'Uh oh! As a Property Manager, please login at':
