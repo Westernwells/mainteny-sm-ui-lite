@@ -330,6 +330,7 @@ export const EditQuotation = ({quotation}: Props) => {
         <ArticleItemsTable
           items={useMemo(() => quotationItems, [quotationItems])}
           setItems={setQuotationItems}
+          propertyOwnerId={customer?.id ?? ''}
         />
 
         <Box my="1.5em">

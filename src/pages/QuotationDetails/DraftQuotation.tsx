@@ -252,6 +252,7 @@ export const DraftQuotation = () => {
         <ArticleItemsTable
           items={quotationItems}
           setItems={setQuotationItems}
+          propertyOwnerId={customer?.id ?? ''}
         />
 
         <Box my="1.5em">
