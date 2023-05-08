@@ -74,8 +74,10 @@ const EmployeeAbsence = ({employee}: Props) => {
   const employeeRoles = employee?.userAccount.roles;
   const employeeName = `${employee?.userAccount.firstName} ${employee?.userAccount.lastName}`;
   const totalHolidays =
+    employee?.userData.additionalInfo?.totalYearlyVacationDaysAllowed ||
     employee?.userAccount.serviceCompany.settings
-      .totalYearlyVacationDaysAllowed || 0;
+      .totalYearlyVacationDaysAllowed ||
+    0;
   const leftVacationDays =
     employee?.userData.additionalInfo.leftVacationDays || 0;
 

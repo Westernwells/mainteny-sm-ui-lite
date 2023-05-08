@@ -105,6 +105,7 @@ export interface UserView {
 export interface UserAdditionalInfo {
   leftVacationDays: number;
   assignedServiceOrderTypes?: ServiceOrderType[];
+  totalYearlyVacationDaysAllowed?: number;
 }
 
 export interface UserData {
