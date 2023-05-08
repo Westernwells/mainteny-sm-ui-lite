@@ -134,11 +134,12 @@ export const Checklist = () => {
   const handleSubmit = (values: typeof initialValues) => {
     const questions = values.categories
       .map((category) =>
-        category.questions.map((question) => ({
+        category.questions.map((question, index) => ({
           category: category.name,
           question: question.question,
           type: question.type,
           options: values.options,
+          orderNumber: index + 1,
         })),
       )
       .flat();
