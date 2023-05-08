@@ -455,7 +455,7 @@ export function usePropertyOwnerArticles(
         ...params,
       }),
     {
-      enabled: !!user,
+      enabled: !!user && !!propertyOwnerId,
       ...options,
     },
   );

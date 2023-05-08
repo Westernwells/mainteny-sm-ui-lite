@@ -11,6 +11,10 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import InputAdornment from '@mui/material/InputAdornment';
 import AddIcon from '@mui/icons-material/Add';
+import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import {TabItems, Tabs} from 'components/Tab';
+import {TabsBody} from 'components/TabsBody';
 import {QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord} from 'models/invoice';
 import {Amount} from 'models/misc';
@@ -32,12 +36,15 @@ import {Button} from './Button';
 import {FormLabel} from './form/FormLabel';
 import {SelectModal} from './SelectModal';
 import {ArticlesDataGrid} from './DataGrid/ArticlesDataGrid';
+import {CustomPricesDataGrid} from './DataGrid/CustomPricesDataGrid';
 import {SelectButton} from './SelectButton';
 import {FormInput} from './form/FormInput';
+import {SearchInput} from './SearchInput';
 
 interface Props<T> {
   items: T[];
   setItems: Dispatch<SetStateAction<T[]>>;
+  propertyOwnerId: string;
   isPartial?: boolean;
   isCreditNote?: boolean;
   unitSellingAmount?: Amount;
@@ -47,6 +54,7 @@ interface Props<T> {
 export const ArticleItemsTable = ({
   items,
   setItems,
+  propertyOwnerId,
   isPartial,
   isCreditNote,
   unitSellingAmount,
@@ -63,6 +71,8 @@ export const ArticleItemsTable = ({
   const [percentageVat, setPercentageVat] = useState(
     user?.userAccount?.serviceCompany?.settings?.percentageVat ?? 0,
   );
+  const [tabValue, setTabValue] = useState(0);
+  const [search, setSearch] = useState('');
   const {
     data: partialArticleResource = createEmptyResource<ArticleView>(1),
     isFetched,
@@ -145,6 +155,22 @@ export const ArticleItemsTable = ({
     },
     [getItemRecord],
   );
+
+  const tabItems: TabItems[] = useMemo(() => {
+    const tItems = [
+      {
+        label: 'Articles & Spare parts',
+        icon: <HomeRepairServiceIcon />,
+      },
+    ];
+    if (propertyOwnerId) {
+      tItems.push({
+        label: 'Custom Prices',
+        icon: <ReceiptLongIcon />,
+      });
+    }
+    return tItems;
+  }, [propertyOwnerId]);
 
   const deleteItem = (
     item: QuotationItemRecord | InvoiceItemRecord<Amount>,
@@ -453,7 +479,7 @@ export const ArticleItemsTable = ({
             <Box display="flex" alignItems="center" my="1em" gap="1em">
               <Typography variant="body2">1</Typography>
               <SelectButton
-                text="Select Article"
+                text="Select Articles & Custom Prices"
                 onClick={() => setIsArticleModalOpen(true)}
                 sxContainer={{flexGrow: 1}}
               />
@@ -463,8 +489,34 @@ export const ArticleItemsTable = ({
         <SelectModal
           isOpen={isArticleModalOpen}
           onClose={() => setIsArticleModalOpen(false)}
-          header="Select Article">
-          <ArticlesDataGrid setRowItem={handleSelectItem} />
+          header="Select Articles & Custom Prices">
+          <Box
+            sx={{
+              position: 'absolute',
+              right: 10,
+              zIndex: 9999,
+            }}>
+            <SearchInput
+              variant="outlined"
+              label="Search"
+              onValueChanged={(value) => setSearch(value)}
+            />
+          </Box>
+          <Tabs
+            tabItems={tabItems}
+            currentIndex={tabValue}
+            onChange={(index) => setTabValue(index)}>
+            <TabsBody value={tabValue} index={0}>
+              <ArticlesDataGrid search={search} setRowItem={handleSelectItem} />
+            </TabsBody>
+            <TabsBody value={tabValue} index={1}>
+              <CustomPricesDataGrid
+                search={search}
+                setRowItem={handleSelectItem}
+                propertyOwnerId={propertyOwnerId}
+              />
+            </TabsBody>
+          </Tabs>
         </SelectModal>
       </Box>
     </Box>
