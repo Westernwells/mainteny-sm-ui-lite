@@ -8,6 +8,7 @@ import {FormLabel} from 'components/form/FormLabel';
 import {SelectModal} from 'components/SelectModal';
 import {ArticlesDataGrid} from 'components/DataGrid/ArticlesDataGrid';
 import {SelectButton} from 'components/SelectButton';
+import {SearchInput} from 'components/SearchInput';
 import {ArticleItemRow} from './ArticleItemRow';
 
 interface Props<T> {
@@ -20,6 +21,7 @@ export const ArticleItemsTable = ({
   setItems,
 }: Props<ArticleOrderItemRecord>) => {
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
+  const [search, setSearch] = useState('');
 
   const articleViewToItem = (article: ArticleView): ArticleOrderItemRecord => {
     const record: ArticleOrderItemRecord = {
@@ -111,7 +113,14 @@ export const ArticleItemsTable = ({
         isOpen={isArticleModalOpen}
         onClose={() => setIsArticleModalOpen(false)}
         header="Select Article">
-        <ArticlesDataGrid setRowItem={handleSelectItem} />
+        <Box sx={{py: 2}}>
+          <SearchInput
+            variant="outlined"
+            label="Search"
+            onValueChanged={(value) => setSearch(value)}
+          />
+        </Box>
+        <ArticlesDataGrid setRowItem={handleSelectItem} search={search} />
       </SelectModal>
     </Box>
   );
