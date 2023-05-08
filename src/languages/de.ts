@@ -1070,7 +1070,8 @@ export const de = {
   'Do you want to delete this checklist template?':
     'Möchten Sie diese Checklistenvorlage löschen?',
   'Checklist name': 'Name der Checkliste',
-  'New Category': 'Neue Kategorie',
+  'New Service': 'Neue Service',
+  'Delete Service': 'Service löschen',
   'New Task': 'Neue Aufgabe',
   'Option per task': 'Wahlmöglichkeit je Aufgabe',
   'New Option': 'Neue Wahlmöglichkeit',

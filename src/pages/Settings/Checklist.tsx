@@ -393,7 +393,7 @@ export const Checklist = () => {
                 autoFocus: true,
                 startIcon: <Add />,
               }}>
-              <Typography variant="subtitle2">{t('New Category')}</Typography>
+              <Typography variant="subtitle2">{t('New Service')}</Typography>
             </Button>
           </Grid>
 
@@ -478,7 +478,7 @@ export const Checklist = () => {
                         onClick: () => removeCategory(category.id),
                       }}>
                       <Typography variant="subtitle2">
-                        {t('Delete Category')}
+                        {t('Delete Service')}
                       </Typography>
                     </Button>
                   ) : null}
