@@ -849,6 +849,24 @@ export const de = {
   'Do you want to delete this customer?': 'Möchten Sie diese Kunde löschen?',
   'COST CENTER': 'KOSTENSTELLE',
   'Cost Center': 'Kostenstelle',
+  'Custom prices': 'Kundenspezifische Preise',
+  'Customer specific article': 'Kundenspezifische Artikel',
+  'Add Article & Spare part': 'Artikel hinzufügen',
+  'Add Article': 'Artikel hinzufügen',
+  'No specific prices added, start adding your service prices!':
+    'Keine kundenspezifischen Preise hinzugefügt. Legen Sie jetzt Preise an!',
+  ARTICLE: 'ARTIKEL',
+  'PURCHASE PRICE (EXCL. VAT)': 'EINKAUFSPREIS (EXKL. MWST.)',
+  'SELLING PRICE (EXCL. VAT)': 'VERKAUFSPREIS (EXKL. MWST.)',
+  'Add customer specific article': 'Kundenspezifische Artikel hinzufügen',
+  'Articles & Spare part Number': 'Artikelteilnummer',
+  'Purchase price (excl. VAT)': 'Einkaufspreis (exkl. MwSt.)',
+  'Selling price (excl. VAT)': 'Verkaufspreis (exkl. MwSt.)',
+  'Edit customer specific article': 'Kundenspezifische Artikel bearbeiten',
+  'Select Articles & Custom Prices':
+    'Artikel & kundenspezifische Preise auswählen',
+  'Articles & Spare parts': 'Artikel',
+  'Add Articles & Spare part': 'Artikel hinzufügen',
 
   // Toast
   'Uh oh! As a Property Manager, please login at':

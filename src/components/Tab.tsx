@@ -12,7 +12,7 @@ import Divider from '@mui/material/Divider';
 import {Button} from './Button';
 import {MenuBtn} from './MenuBtn';
 
-interface TabItems {
+export interface TabItems {
   label: string;
   icon: JSX.Element;
 }

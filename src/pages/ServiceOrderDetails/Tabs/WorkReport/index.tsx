@@ -229,7 +229,11 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
         </Box>
         <Maintenance serviceReport={report} />
 
-        <ArticleItemsTable items={items} setItems={setItems} />
+        <ArticleItemsTable
+          items={items}
+          setItems={setItems}
+          propertyOwnerId={report?.elevator?.propertyOwner?.id ?? ''}
+        />
 
         <Box mt="1em">
           <FormLabel text="Description Of Service" />

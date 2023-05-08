@@ -21,6 +21,7 @@ import {
   CreateArticleSupplierRecord,
   ArticleSupplierView,
   UpdateArticleSupplierRecord,
+  PropertyOwnerArticleRecord,
 } from 'models/article';
 import {Page, Resource, RestError, StringValue} from 'models/misc';
 import {data} from 'utils/partial-article-data';
@@ -418,6 +419,142 @@ export const useDeleteSupplier = (successMsg?: string) => {
         });
       }
       queryClient.invalidateQueries(queryKeys.queryArticleSuppliers);
+    },
+    onError: (err: any) => {
+      console.log(err);
+      showError(err);
+    },
+  });
+};
+
+export const fetchPropertyOwnerArticles = async (
+  propertyOwnerId: string,
+  params: QueryArticleParams,
+): Promise<Resource<ArticleView>> => {
+  const response = await axiosClient.get<Resource<ArticleView>>(
+    `/api/propertyOwners/${propertyOwnerId}/articles`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export function usePropertyOwnerArticles(
+  propertyOwnerId: string,
+  params: QueryArticleParams,
+  options?: any,
+) {
+  const {user} = useUserSession();
+  return useQuery<Resource<ArticleView>, RestError>(
+    [qk.fetchPropertyOwnerArticles, params, propertyOwnerId],
+    () =>
+      fetchPropertyOwnerArticles(propertyOwnerId, {
+        type: [ArticleType.SERVICE, ArticleType.PRODUCT, ArticleType.PART],
+        ...params,
+      }),
+    {
+      enabled: !!user && !!propertyOwnerId,
+      ...options,
+    },
+  );
+}
+
+const createPropertyOwnerArticle = async ({
+  propertyOwnerId,
+  body,
+}: {
+  propertyOwnerId: string;
+  body: PropertyOwnerArticleRecord;
+}): Promise<StringValue> => {
+  const response = await axiosClient.post<StringValue>(
+    `/api/propertyOwners/${propertyOwnerId}/articles`,
+    {
+      ...body,
+    },
+  );
+  return response.data;
+};
+
+export const useCreatePropertyOwnerArticle = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(createPropertyOwnerArticle, {
+    onSuccess: () => {
+      if (successMsg) {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+      }
+      queryClient.invalidateQueries(queryKeys.fetchPropertyOwnerArticles);
+    },
+    onError: (err) => {
+      console.log(err);
+      showError(err);
+    },
+  });
+};
+
+const updatePropertyOwnerArticle = async ({
+  propertyOwnerId,
+  articleId,
+  article,
+}: {
+  propertyOwnerId: string;
+  articleId: string;
+  article: PropertyOwnerArticleRecord;
+}) => {
+  await axiosClient.put<StringValue>(
+    `/api/propertyOwners/${propertyOwnerId}/articles/${articleId}`,
+    {
+      ...article,
+    },
+  );
+};
+
+export const useUpdatePropertyOwnerArticle = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(updatePropertyOwnerArticle, {
+    onSuccess: () => {
+      if (successMsg) {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+      }
+      queryClient.invalidateQueries(queryKeys.fetchPropertyOwnerArticles);
+    },
+    onError: (err: any) => {
+      console.log(err);
+      showError(err);
+    },
+  });
+};
+
+const deletePropertyOwnerArticle = async ({
+  propertyOwnerId,
+  articleId,
+}: {
+  propertyOwnerId: string;
+  articleId: string;
+}) => {
+  await axiosClient.delete<StringValue>(
+    `/api/propertyOwners/${propertyOwnerId}/articles/${articleId}`,
+  );
+};
+
+export const useDeletePropertyOwnerArticle = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(deletePropertyOwnerArticle, {
+    onSuccess: () => {
+      if (successMsg) {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+      }
+      queryClient.invalidateQueries(queryKeys.fetchPropertyOwnerArticles);
     },
     onError: (err: any) => {
       console.log(err);

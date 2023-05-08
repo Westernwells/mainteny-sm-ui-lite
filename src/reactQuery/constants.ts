@@ -27,6 +27,7 @@ export const queryKeys = {
   fetchArticleOrder: 'fetchArticleOrder',
   fetchArticleSuppliers: 'fetchArticleSuppliers',
   fetchArticleSupplier: 'fetchArticleSupplier',
+  fetchPropertyOwnerArticles: 'fetchPropertyOwnerArticles',
   fetchIssueHistory: 'fetchIssueHistory',
   invoiceById: 'invoiceById',
   quotationById: 'quotationById',

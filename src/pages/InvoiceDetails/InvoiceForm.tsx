@@ -787,6 +787,7 @@ export const InvoiceForm = ({
               isCreditNote={formik.values.type === InvoiceType.CREDIT_NOTE}
               unitSellingAmount={invoice?.totalAmount}
               serviceOrderId={formik.values.serviceOrderId}
+              propertyOwnerId={customer?.id ?? ''}
             />
 
             <Box my="1.5em">

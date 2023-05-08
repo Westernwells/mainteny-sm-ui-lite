@@ -2,7 +2,6 @@ import {useEffect, useState} from 'react';
 import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
-import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {ArticleView} from 'models/article';
@@ -13,6 +12,7 @@ import {styles} from './style';
 
 interface Props {
   setRowItem: (row: ArticleView) => void;
+  search: string;
 }
 
 export const columns: GridColDef[] = [
@@ -73,8 +73,7 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
 
 const pageSize = 25;
 
-export const ArticlesDataGrid = ({setRowItem}: Props) => {
-  const [search, setSearch] = useState('');
+export const ArticlesDataGrid = ({setRowItem, search}: Props) => {
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
@@ -118,37 +117,30 @@ export const ArticlesDataGrid = ({setRowItem}: Props) => {
   }
 
   return (
-    <>
-      <SearchInput
-        variant="outlined"
-        label="Search"
-        onValueChanged={(value) => setSearch(value)}
+    <Box display="flex" flexGrow={1} sx={styles.scrollBar}>
+      <DataGridLayout
+        rows={rows}
+        columns={columns}
+        onCellClick={(params) => setRowItem(params.row.article)}
+        loading={isFetching}
+        scrollToTop={search}
+        pageSize={page.pageSize}
+        pageIndex={page.pageIndex}
+        pageCount={pageCount}
+        hideFooter={pageCount <= 1}
+        handlePageChange={(value) =>
+          setPage((prev) => ({
+            ...prev,
+            pageIndex: value - 1,
+          }))
+        }
+        noRowsEmptySection={
+          <NoRowsEmptySection
+            placeholder="article"
+            action={() => window.open('/articles/new', '_blank')}
+          />
+        }
       />
-      <Box display="flex" flexGrow={1} sx={styles.scrollBar}>
-        <DataGridLayout
-          rows={rows}
-          columns={columns}
-          onCellClick={(params) => setRowItem(params.row.article)}
-          loading={isFetching}
-          scrollToTop={search}
-          pageSize={page.pageSize}
-          pageIndex={page.pageIndex}
-          pageCount={pageCount}
-          hideFooter={pageCount <= 1}
-          handlePageChange={(value) =>
-            setPage((prev) => ({
-              ...prev,
-              pageIndex: value - 1,
-            }))
-          }
-          noRowsEmptySection={
-            <NoRowsEmptySection
-              placeholder="article"
-              action={() => window.open('/articles/new', '_blank')}
-            />
-          }
-        />
-      </Box>
-    </>
+    </Box>
   );
 };
