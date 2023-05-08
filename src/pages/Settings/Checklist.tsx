@@ -134,22 +134,25 @@ export const Checklist = () => {
   const handleSubmit = (values: typeof initialValues) => {
     const questions = values.categories
       .map((category) =>
-        category.questions.map((question, index) => ({
+        category.questions.map((question) => ({
           category: category.name,
           question: question.question,
           type: question.type,
           options: values.options,
-          orderNumber: index + 1,
         })),
       )
       .flat();
+    const questionsWithOrderNumber = questions.map((q, index) => ({
+      ...q,
+      orderNumber: index + 1,
+    }));
 
     if (checklist?.id) {
       const data = {
         name: values.name,
         externalId: checklist.externalId,
         category: values.category,
-        questions,
+        questions: questionsWithOrderNumber,
       };
       updateChecklist(
         {id: checklist.id, checklist: data},
@@ -160,7 +163,7 @@ export const Checklist = () => {
         serviceCompanyId: user!.userAccount.serviceCompany.id,
         name: values.name,
         category: values.category,
-        questions,
+        questions: questionsWithOrderNumber,
       };
       createChecklist(data, {onSuccess: () => navigate(-1)});
     }
