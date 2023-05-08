@@ -10,6 +10,7 @@ import {
   DropResult,
   DraggableProvided,
 } from 'react-beautiful-dnd';
+import _ from 'lodash';
 import useTheme from '@mui/material/styles/useTheme';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -41,6 +42,40 @@ import {getUniqueId} from 'utils/utils';
 import {getQuestionsGroupedByCategory, getOptions} from 'utils/checklist';
 import ChecklistPreview from './ChecklistPreview';
 
+declare module 'Yup' {
+  interface ArraySchema<T> {
+    unique(propertyPath: string, message: string): ArraySchema<T>;
+  }
+}
+
+Yup.addMethod(Yup.array, 'unique', function fn(propertyPath, message) {
+  return this.test('unique', '', function fn2(list) {
+    const errors: string | Yup.ValidationError | Yup.ValidationError[] = [];
+
+    list?.forEach((item, index) => {
+      const propertyValue = _.get(item, propertyPath);
+
+      if (
+        propertyValue &&
+        _.filter(list, [propertyPath, propertyValue]).length > 1
+      ) {
+        errors.push(
+          this.createError({
+            path: `${this.path}[${index}].${propertyPath}`,
+            message,
+          }),
+        );
+      }
+    });
+
+    if (!_.isEmpty(errors)) {
+      throw new Yup.ValidationError(errors);
+    }
+
+    return true;
+  });
+});
+
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
   category: Yup.string().required('Category is required'),
@@ -60,6 +95,7 @@ const validationSchema = Yup.object().shape({
           .min(1),
       }),
     )
+    .unique('name', 'Service name must be unique')
     .min(1),
   options: Yup.array()
     .of(
