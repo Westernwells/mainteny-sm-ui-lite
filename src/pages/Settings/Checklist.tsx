@@ -42,7 +42,7 @@ import {getUniqueId} from 'utils/utils';
 import {getQuestionsGroupedByCategory, getOptions} from 'utils/checklist';
 import ChecklistPreview from './ChecklistPreview';
 
-declare module 'Yup' {
+declare module 'yup' {
   interface ArraySchema<T> {
     unique(propertyPath: string, message: string): ArraySchema<T>;
   }
