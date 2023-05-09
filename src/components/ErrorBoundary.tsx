@@ -41,7 +41,10 @@ class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    Mixpanel.identifyAndTrack(mixpanelEvents.CATCH_ALL_ERROR_PAGE_SHOWN);
+    Mixpanel.identifyAndTrack(mixpanelEvents.CATCH_ALL_ERROR_PAGE_SHOWN, {
+      error,
+      errorInfo,
+    });
     console.error('Uncaught error:', error, errorInfo);
   }
 
