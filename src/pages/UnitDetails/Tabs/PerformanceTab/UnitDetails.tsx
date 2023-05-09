@@ -1,5 +1,7 @@
 import {
+  AvTimer,
   Cached,
+  CallSplit,
   DoorSliding,
   Equalizer,
   EventAvailable,
@@ -127,6 +129,39 @@ export const UnitDetails = () => {
             icon={<Equalizer sx={{color: theme.palette.info.dark}} />}
             label="Ø AIR QUALITY"
             bodyText="92%"
+            bodyTextVariant="body1"
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            containerStyles={{mt: '0.5em'}}
+            iconMaxHeight="3rem"
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <CardProps
+            icon={<CallSplit sx={{color: theme.palette.info.dark}} />}
+            label="EXECUTED VS PLANNED VISITS"
+            bodyText="4 / 78"
+            bodyTextVariant="body1"
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            containerStyles={{mt: '0.5em'}}
+            iconMaxHeight="3rem"
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <CardProps
+            icon={<AvTimer sx={{color: theme.palette.info.dark}} />}
+            label="CONTRACTUAL RESPONSE TIME"
+            bodyText="120 min"
+            bodyTextVariant="body1"
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            containerStyles={{mt: '0.5em'}}
+            iconMaxHeight="3rem"
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <CardProps
+            icon={<AvTimer sx={{color: theme.palette.info.dark}} />}
+            label="RESPONSE TIME"
+            bodyText="97 min"
             bodyTextVariant="body1"
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
