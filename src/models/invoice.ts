@@ -117,6 +117,7 @@ export interface InvoiceView {
   additionalInfo: InvoiceAdditionalInfo;
   paymentTerms: string;
   overdueNotices: InvoiceOverdueNoticeSimpleView[];
+  commentCount?: number;
 }
 
 export interface QueryInvoiceParams {

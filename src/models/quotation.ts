@@ -56,6 +56,7 @@ export interface QuotationView {
   search: string;
   meta: Meta;
   items: QuotationItem[];
+  commentCount?: number;
 }
 
 export interface QueryQuotationParams {
