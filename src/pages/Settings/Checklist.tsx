@@ -119,6 +119,7 @@ const questionMock = {
   id: getUniqueId(),
   question: '',
   type: CheckListQuestionType.SINGLE_CHECK,
+  additionalInfo: {orderNumber: 0},
 };
 
 export const Checklist = () => {
@@ -257,8 +258,9 @@ export const Checklist = () => {
     formik.setFieldValue('categories', [
       ...formik.values.categories,
       {
-        ...initialValues.categories[0],
         id: getUniqueId(),
+        name: 'Service',
+        questions: [{...questionMock, id: getUniqueId()}],
       },
     ]);
   };
@@ -326,7 +328,7 @@ export const Checklist = () => {
             checkListId: '',
             additionalInfo: {
               options: formik.values.options,
-              orderNumber: 0,
+              orderNumber: question.additionalInfo.orderNumber,
               note: '',
             },
           })),

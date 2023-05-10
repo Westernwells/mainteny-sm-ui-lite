@@ -2,12 +2,27 @@ import _ from 'lodash';
 import {CheckListQuestion} from 'models/checklist';
 import {getUniqueId} from './utils';
 
+export const categoriesSortedByOrderNumber = (
+  questions: {
+    id: string;
+    name: string;
+    questions: CheckListQuestion[];
+  }[],
+) =>
+  _.sortBy(questions, (c) =>
+    c.questions.map((q) => q.additionalInfo.orderNumber),
+  );
+
 export const getQuestionsGroupedByCategory = (questions: CheckListQuestion[]) =>
-  Object.entries(_.groupBy(questions, 'category')).map(([category, value]) => ({
-    id: getUniqueId(),
-    name: category,
-    questions: value,
-  }));
+  categoriesSortedByOrderNumber(
+    Object.entries(_.groupBy(questions, 'category')).map(
+      ([category, value]) => ({
+        id: getUniqueId(),
+        name: category,
+        questions: _.sortBy(value, 'additionalInfo.orderNumber'),
+      }),
+    ),
+  );
 
 export const getOptions = (questions: CheckListQuestion[]) =>
   _.uniqBy(
