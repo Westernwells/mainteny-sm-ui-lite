@@ -25,7 +25,6 @@ import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
 import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useDeleteInvoice, usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {useServiceOrderWorkReport} from 'hooks/reactQuery/useServiceOrder';
 import {InvoiceStatus, InvoiceView, InvoiceType} from 'models/invoice';
 import {PdfGenerationStatus} from 'models/misc';
 
@@ -62,16 +61,6 @@ export const Actions = ({invoice}: Props) => {
     useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const {data: workReport} = useServiceOrderWorkReport(
-    invoice?.serviceOrder?.id ?? '',
-    {
-      useErrorBoundary: false,
-      retry: false,
-      enabled: !!(
-        invoice?.serviceOrder?.id && invoice?.additionalInfo?.includeWorkReport
-      ),
-    },
-  );
   const {mutateAsync: publishInvoice} = usePublishInvoice({
     shouldNavigate: false,
   });
@@ -85,8 +74,7 @@ export const Actions = ({invoice}: Props) => {
     invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
     downloadUrl;
   const isWorkReportPDFGenerated = invoice?.additionalInfo?.includeWorkReport
-    ? workReport?.additionalInfo?.pdfGenerationStatus ===
-      PdfGenerationStatus.DONE
+    ? invoice?.serviceOrder?.additionalInfo.workReportGenerated
     : true;
   const isPDFsGenerated = !!isWorkReportPDFGenerated && isInvoicePDFGenerated;
 
