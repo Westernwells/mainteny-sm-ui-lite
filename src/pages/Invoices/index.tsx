@@ -104,10 +104,11 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
 
   totalInvoiceRef.current = totalInvoiceRef.current || invoiceResource.total;
 
+  const pdfPaths = invoiceResource.data
+    .map((i) => i.additionalInfo.pdfPath)
+    .filter((pdfPath) => pdfPath !== undefined);
   const {data: downloadUrls} = useDownloadUrl(
-    invoiceResource.data
-      ? invoiceResource.data.map((i) => i.additionalInfo.pdfPath)
-      : [],
+    invoiceResource.data ? pdfPaths : [],
   );
 
   useEffect(() => {

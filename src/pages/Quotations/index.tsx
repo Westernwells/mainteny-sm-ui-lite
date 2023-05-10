@@ -61,10 +61,11 @@ export const Quotations = () => {
   totalQuotationsRef.current =
     totalQuotationsRef.current || quotationsResource.total;
 
+  const pdfPaths = quotationsResource.data
+    .map((q) => q.additionalInfo.pdfPath)
+    .filter((pdfPath) => pdfPath !== undefined);
   const {data: downloadUrls} = useDownloadUrl(
-    quotationsResource.data
-      ? quotationsResource.data.map((q) => q.additionalInfo.pdfPath)
-      : [],
+    quotationsResource.data ? pdfPaths : [],
   );
 
   useEffect(() => {
