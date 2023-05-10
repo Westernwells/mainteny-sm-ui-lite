@@ -124,13 +124,19 @@ export const columns: GridColDef[] = [
     field: 'actions',
     headerName: 'actions',
     align: 'center',
-    renderCell: (params) => <Actions invoice={params.row.invoice} />,
+    renderCell: (params) => (
+      <Actions
+        invoice={params.row.invoice}
+        downloadUrl={params.row.downloadUrl}
+      />
+    ),
     flex: 1,
   }),
 ];
 
 export const makeRows = (
   invoices: InvoiceView[],
+  downloadUrls: {[key: string]: string} | undefined,
   formatDate: FormatDate = () => '',
 ): GridRowsProp =>
   invoices.length
@@ -155,6 +161,7 @@ export const makeRows = (
           pdfPath: item.additionalInfo.pdfPath,
           serviceCompanyId: item.serviceCompany.id,
         },
+        downloadUrl: downloadUrls?.[item.additionalInfo.pdfPath] ?? '',
         invoice: item,
         navigateTo: `/invoices/details/${item.id}`,
       }))

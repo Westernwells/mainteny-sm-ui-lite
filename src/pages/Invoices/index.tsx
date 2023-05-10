@@ -23,6 +23,7 @@ import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {columns, makeRows} from './InvoicesDataGridProps';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
 import {Widget} from '../../components/Widget';
@@ -103,6 +104,12 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
 
   totalInvoiceRef.current = totalInvoiceRef.current || invoiceResource.total;
 
+  const {data: downloadUrls} = useDownloadUrl(
+    invoiceResource.data
+      ? invoiceResource.data.map((i) => i.additionalInfo.pdfPath)
+      : [],
+  );
+
   useEffect(() => {
     if (page.pageIndex) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
@@ -126,9 +133,9 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
 
   useEffect(() => {
     if (!isLoading) {
-      setRows(makeRows(invoiceResource.data, formatDate));
+      setRows(makeRows(invoiceResource.data, downloadUrls, formatDate));
     }
-  }, [invoiceResource, isLoading]);
+  }, [invoiceResource, isLoading, downloadUrls]);
 
   useEffect(() => {
     setPageCount(Math.ceil(invoiceResource.total / page.pageSize));

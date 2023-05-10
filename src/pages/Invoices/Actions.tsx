@@ -24,12 +24,12 @@ import {SendEmailDialog} from 'components/SendEmailDialog';
 import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
 import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useDeleteInvoice, usePublishInvoice} from 'hooks/reactQuery/useInvoice';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {InvoiceStatus, InvoiceView, InvoiceType} from 'models/invoice';
 import {PdfGenerationStatus} from 'models/misc';
 
 interface Props {
   invoice: InvoiceView;
+  downloadUrl: string;
 }
 
 const Tooltip = ({children, ...props}: TooltipProps) => (
@@ -49,7 +49,7 @@ const Tooltip = ({children, ...props}: TooltipProps) => (
   </MUITooltip>
 );
 
-export const Actions = ({invoice}: Props) => {
+export const Actions = ({invoice, downloadUrl}: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -65,9 +65,6 @@ export const Actions = ({invoice}: Props) => {
     shouldNavigate: false,
   });
 
-  const {data: downloadUrl} = useDownloadUrl(
-    invoice ? [invoice!.additionalInfo.pdfPath] : [],
-  );
   const {mutate: deleteInvoice} = useDeleteInvoice();
 
   const isInvoicePDFGenerated =
@@ -174,9 +171,7 @@ export const Actions = ({invoice}: Props) => {
               {
                 label: t('Download'),
                 icon: <FileDownload />,
-                onClick: () =>
-                  downloadUrl &&
-                  window.open(`${Object.values(downloadUrl)[0]}`, '_blank'),
+                onClick: () => window.open(downloadUrl, '_blank'),
               },
             ]
           : []),
@@ -218,7 +213,7 @@ export const Actions = ({invoice}: Props) => {
           setIsConfirmPrintDialogOpen(false);
           if (downloadUrl) {
             printJS({
-              printable: Object.values(downloadUrl)[0],
+              printable: downloadUrl,
               type: 'pdf',
               showModal: true,
             });

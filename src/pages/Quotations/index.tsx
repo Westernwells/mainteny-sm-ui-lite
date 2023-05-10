@@ -24,6 +24,7 @@ import {
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {columns, makeRows} from './QuotationsDataGridProps';
 
 const pageSize = 25;
@@ -60,6 +61,12 @@ export const Quotations = () => {
   totalQuotationsRef.current =
     totalQuotationsRef.current || quotationsResource.total;
 
+  const {data: downloadUrls} = useDownloadUrl(
+    quotationsResource.data
+      ? quotationsResource.data.map((q) => q.additionalInfo.pdfPath)
+      : [],
+  );
+
   useEffect(() => {
     if (page.pageIndex) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
@@ -68,9 +75,9 @@ export const Quotations = () => {
 
   useEffect(() => {
     if (!isLoading) {
-      setRows(makeRows(quotationsResource, formatDate));
+      setRows(makeRows(quotationsResource, downloadUrls, formatDate));
     }
-  }, [quotationsResource, isLoading]);
+  }, [quotationsResource, isLoading, downloadUrls]);
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);

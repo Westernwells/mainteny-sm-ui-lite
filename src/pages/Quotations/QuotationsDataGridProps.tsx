@@ -91,13 +91,19 @@ export const columns: GridColDef[] = [
     field: 'actions',
     headerName: 'actions',
     align: 'center',
-    renderCell: (params) => <Actions quotation={params.row.quotation} />,
+    renderCell: (params) => (
+      <Actions
+        quotation={params.row.quotation}
+        downloadUrl={params.row.downloadUrl}
+      />
+    ),
     flex: 1,
   }),
 ];
 
 export const makeRows = (
   quotations: Resource<QuotationView>,
+  downloadUrls: {[key: string]: string} | undefined,
   formatDate: FormatDate = () => '',
 ): GridRowsProp =>
   quotations &&
@@ -117,6 +123,7 @@ export const makeRows = (
       },
     )}`,
     status: item.status,
+    downloadUrl: downloadUrls?.[item.additionalInfo.pdfPath] ?? '',
     quotation: item,
     navigateTo: `details/${item.id}`,
   }));

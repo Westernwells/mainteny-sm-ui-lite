@@ -27,16 +27,16 @@ import {
   usePublishQuotation,
   useReplyQuotation,
 } from 'hooks/reactQuery/useQuotation';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {QuotationStatus, QuotationView} from 'models/quotation';
 import {PdfGenerationStatus} from 'models/misc';
 
 interface Props {
   quotation: QuotationView;
+  downloadUrl: string;
 }
 
-export const Actions = ({quotation}: Props) => {
+export const Actions = ({quotation, downloadUrl}: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
   const {user} = useUserSession();
@@ -47,9 +47,6 @@ export const Actions = ({quotation}: Props) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
-  const {data: downloadUrl} = useDownloadUrl(
-    quotation ? [quotation!.additionalInfo.pdfPath] : [],
-  );
   const {mutate: markAsAccepted} = useReplyQuotation();
   const {mutate: deleteQuotation} = useDeleteQuotation();
 
@@ -92,7 +89,7 @@ export const Actions = ({quotation}: Props) => {
                 onClick: () =>
                   downloadUrl &&
                   printJS({
-                    printable: Object.values(downloadUrl)[0],
+                    printable: downloadUrl,
                     type: 'pdf',
                     showModal: true,
                   }),
@@ -111,9 +108,7 @@ export const Actions = ({quotation}: Props) => {
               {
                 label: t('Download'),
                 icon: <FileDownload />,
-                onClick: () =>
-                  downloadUrl &&
-                  window.open(`${Object.values(downloadUrl)[0]}`, '_blank'),
+                onClick: () => window.open(downloadUrl, '_blank'),
               },
             ]
           : []),
