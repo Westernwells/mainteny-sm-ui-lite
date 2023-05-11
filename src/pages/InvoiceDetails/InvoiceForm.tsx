@@ -592,6 +592,7 @@ export const InvoiceForm = ({
                     <ServiceOrdersDataGrid
                       setRowItem={handleSelectServiceOrder}
                       searchCustomer={customer?.name}
+                      propertyOwnerId={customer?.id ?? ''}
                     />
                   }
                   labelRequired

@@ -339,6 +339,7 @@ export interface ServiceOrderQueryParams {
   status?: ServiceOrderStatus[];
   serviceCompanyId?: string;
   technicianIds?: string[];
+  propertyOwnerId?: string;
   order?: Order;
   orderBy?: ServiceOrderOrderField;
   types?: ServiceOrderType[];
