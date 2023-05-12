@@ -1,4 +1,5 @@
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {Elevator} from '@mui/icons-material';
 import useTheme from '@mui/material/styles/useTheme';
@@ -35,6 +36,12 @@ export const columns: GridColDef[] = [
     flex: 1,
   }),
   getColumnProps({
+    field: 'building',
+    headerName: 'building',
+    cellClassName: 'truncateText',
+    flex: 1,
+  }),
+  getColumnProps({
     field: 'customer',
     headerName: 'customer',
     cellClassName: 'truncateText',
@@ -68,21 +75,17 @@ export const columns: GridColDef[] = [
     align: 'center',
     headerAlign: 'center',
     renderCell: (params) => (
-      <StatusChip
-        label={params.value ? 'Yes' : 'No'}
-        color={params.value ? 'success' : 'error'}
-        variant="filled"
-        size="small"
-        maxChars={3}
-      />
+      <Box display="flex" alignItems="center" justifyContent="center" gap={3}>
+        <StatusChip
+          label={params.row.activeContracts ? 'Yes' : 'No'}
+          color={params.row.activeContracts ? 'success' : 'info'}
+          variant="filled"
+          size="small"
+          maxChars={3}
+        />
+        <Actions elevatorId={params.row.elevator.id} />
+      </Box>
     ),
-  }),
-  getColumnProps({
-    field: 'actions',
-    headerName: 'actions',
-    align: 'center',
-    renderCell: (params) => <Actions elevatorId={params.row.elevator.id} />,
-    flex: 0,
   }),
 ];
 
@@ -100,6 +103,7 @@ export const makeRows = (
       id: index,
       number: elevator.externalId,
       model: elevator.model,
+      building: elevator.additionalInfo.buildingLocation,
       customer: elevator.propertyOwner.name,
       lastVisit: formatDate(elevator.lastVisitDate),
       nextVisit: formatDate(elevator.nextVisitDate),

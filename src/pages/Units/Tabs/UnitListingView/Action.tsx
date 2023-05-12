@@ -1,4 +1,5 @@
 import Delete from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
 import {Confirm} from 'components/Confirm';
 import {useDeleteElevator} from 'hooks/reactQuery/useElevator';
 import {useState} from 'react';
@@ -14,10 +15,13 @@ export const Actions = ({id}: Props) => {
 
   return (
     <>
-      <Delete
-        sx={{color: 'action.active'}}
-        onClick={() => setOpenDeleteConfirm(true)}
-      />
+      <IconButton
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpenDeleteConfirm(true);
+        }}>
+        <Delete sx={{color: 'action.active'}} />
+      </IconButton>
       <Confirm
         disableActions={isDeleting}
         open={openDeleteConfirm}
