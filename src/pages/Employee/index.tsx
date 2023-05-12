@@ -13,6 +13,7 @@ import {Progress} from 'components/Progress';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useQueryTechnicianEvents} from 'hooks/reactQuery/useTechnician';
 import {useQueryUserAccounts} from 'hooks/reactQuery/useUserAccount';
+import {useQueryState} from 'hooks/useQueryState';
 import {TechnicianEventType} from 'models/misc';
 import {UserView, Role} from 'models/user';
 import {TechnicianEventPair} from 'models/technician';
@@ -34,7 +35,7 @@ export const Employees = () => {
   const [queryParams, setQueryParams] = useSearchParams();
   const totalEmployeeRef = useRef(0);
   const [pageCount, setPageCount] = useState(0);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useQueryState('searchEmployees');
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [role, setRole] = useState<Role | string>('');
   const textInput = useRef<HTMLInputElement>(null);
@@ -69,6 +70,9 @@ export const Employees = () => {
   useEffect(() => {
     if (page.pageIndex) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    }
+    if (textInput.current) {
+      textInput.current.value = search;
     }
   }, [search, role]);
 

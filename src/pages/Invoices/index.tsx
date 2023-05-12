@@ -24,6 +24,7 @@ import {EmptySection} from 'components/EmptySection';
 import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {useQueryState} from 'hooks/useQueryState';
 import {columns, makeRows} from './InvoicesDataGridProps';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
 import {Widget} from '../../components/Widget';
@@ -34,7 +35,7 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useQueryState('searchInvoices');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [queryParams, setQueryParams] = useSearchParams();
   const totalInvoiceRef = useRef(0);
@@ -114,6 +115,9 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   useEffect(() => {
     if (page.pageIndex) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    }
+    if (textInput.current) {
+      textInput.current.value = search;
     }
   }, [search, status, cost]);
 

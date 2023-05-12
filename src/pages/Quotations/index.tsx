@@ -25,6 +25,7 @@ import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {useQueryState} from 'hooks/useQueryState';
 import {columns, makeRows} from './QuotationsDataGridProps';
 
 const pageSize = 25;
@@ -33,7 +34,7 @@ export const Quotations = () => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
 
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useQueryState('searchQuotations');
   const totalQuotationsRef = useRef(0);
   const [status, setStatus] = useState<QuotationStatus[]>([]);
   const [page, setPage] = useState(makePage(0, pageSize));
@@ -71,6 +72,9 @@ export const Quotations = () => {
   useEffect(() => {
     if (page.pageIndex) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    }
+    if (textInput.current) {
+      textInput.current.value = search;
     }
   }, [search, status]);
 

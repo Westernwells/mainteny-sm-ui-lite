@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {Box, Typography} from '@mui/material';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {useTranslation} from 'react-i18next';
@@ -15,6 +15,7 @@ import {calculateTotalTime} from 'utils/work-hours-utils';
 import {endOfDay, startOfDay} from 'date-fns';
 import {useFormatDuration} from 'hooks/useFormatDuration';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useQueryState} from 'hooks/useQueryState';
 import {getLastWeek} from 'utils/datetime';
 import {columns, makeRows} from './WorkHoursDataGrid';
 
@@ -28,11 +29,12 @@ const WorkHoursTab = ({employeeId}: Props) => {
   const formatDuration = useFormatDuration();
   const [startDate, setStartDate] = useState<Date>(getLastWeek());
   const [endDate, setEndDate] = useState<Date>(new Date());
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useQueryState('searchWorkHours');
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [totalTime, setTotalTime] = useState<string>('00:00');
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(makePage(0, 10));
+  const textInput = useRef<HTMLInputElement>(null);
 
   const {data: workHours = createEmptyResource<WorkHoursItem>(10)} =
     useWorkHours(search, page, startDate, endDate, employeeId || '');
@@ -50,6 +52,12 @@ const WorkHoursTab = ({employeeId}: Props) => {
   useEffect(() => {
     setPageCount(Math.ceil(workHours.total / page.pageSize));
   }, [workHours, page.pageSize]);
+
+  useEffect(() => {
+    if (textInput.current) {
+      textInput.current.value = search;
+    }
+  }, [search]);
 
   const renderFilterItems = () => (
     <Box sx={{display: 'flex', justifyContent: 'flex-end', width: '100%'}}>
@@ -93,6 +101,7 @@ const WorkHoursTab = ({employeeId}: Props) => {
         searchPlaceholder="Search by order type, order number etc."
         getSearchValue={(val) => setSearch(val)}
         filterItems={renderFilterItems()}
+        refInput={textInput}
       />
     </Box>
   );

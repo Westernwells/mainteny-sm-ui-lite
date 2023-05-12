@@ -20,6 +20,7 @@ import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
 import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useQueryState} from 'hooks/useQueryState';
 import {
   costRangeConvertor as crConverter,
   getStartEndPrice,
@@ -33,7 +34,7 @@ export const Contracts = () => {
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useQueryState('searchContracts');
   const [queryParams, setQueryParams] = useSearchParams();
   const [page, setPage] = useState(makePage(0, pageSize));
   const totalContractRef = useRef(0);
@@ -73,6 +74,9 @@ export const Contracts = () => {
   useEffect(() => {
     if (page.pageIndex) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    }
+    if (textInput.current) {
+      textInput.current.value = search;
     }
   }, [search, cost, status]);
 

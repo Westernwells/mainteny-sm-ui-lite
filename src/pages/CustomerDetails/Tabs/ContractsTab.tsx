@@ -20,6 +20,7 @@ import {EmptySection} from 'components/EmptySection';
 import {convertToMacro, convertToText} from 'utils/utils';
 import {useCurrentCurrency} from 'utils/currency';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useQueryState} from 'hooks/useQueryState';
 import {Widget} from 'components/Widget';
 import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
 import {columns, makeRows} from './CustomerContractDataGrid';
@@ -35,7 +36,7 @@ export const ContractsTab = ({customerId}: Props) => {
 
   const [page, setPage] = useState(makePage(0, 10));
   const totalContractsRef = useRef(0);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useQueryState('searchContracts');
   const [cost, setCost] = useState<number[][]>([]);
   const [status, setStatus] = useState<string[]>([]);
   const [pageCount, setPageCount] = useState(0);
@@ -71,6 +72,12 @@ export const ContractsTab = ({customerId}: Props) => {
 
   totalContractsRef.current =
     totalContractsRef.current || contractResource.total;
+
+  useEffect(() => {
+    if (textInput.current) {
+      textInput.current.value = searchQuery;
+    }
+  }, [searchQuery]);
 
   useEffect(() => {
     const options: string[] = [];

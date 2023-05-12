@@ -31,6 +31,7 @@ import {
 } from 'utils/service-order-utils';
 import {Widget} from 'components/Widget';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useQueryState} from 'hooks/useQueryState';
 import {columns, makeRows} from './ServiceOrderDataGridProps';
 
 export const ServiceOrderList = () => {
@@ -42,7 +43,7 @@ export const ServiceOrderList = () => {
   const [pageCount, setPageCount] = useState(0);
   const totalOrederRef = useRef(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useQueryState('searchServiceOrders');
   const [selectedOrderStatus, setSelectedOrderStatus] = useState<
     ServiceOrderStatus[]
   >([]);
@@ -77,6 +78,9 @@ export const ServiceOrderList = () => {
   useEffect(() => {
     if (page.pageIndex) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    }
+    if (textInput.current) {
+      textInput.current.value = searchQuery;
     }
   }, [searchQuery, selectedOrderTypes, selectedOrderStatus]);
 

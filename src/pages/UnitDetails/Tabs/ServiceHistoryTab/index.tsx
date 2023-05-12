@@ -16,6 +16,7 @@ import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useQueryState} from 'hooks/useQueryState';
 import {
   serviceOrderStatusToString,
   serviceOrderTypeToEnum,
@@ -41,12 +42,13 @@ export const ServiceHistoryTab = () => {
   const navigate = useNavigate();
 
   const totalRef = useRef(0);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useQueryState('searchServiceOrders');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [pageCount, setPageCount] = useState(0);
   const [status, setStatus] = useState<ServiceOrderStatus[]>([]);
   const [types, setTypes] = useState<ServiceOrderType[]>([]);
   const [rows, setRows] = useState<GridRowsProp>([]);
+  const textInput = useRef<HTMLInputElement>(null);
 
   const {
     data: serviceOrdersResource = createEmptyResource<ServiceOrderView>(
@@ -65,6 +67,12 @@ export const ServiceHistoryTab = () => {
     types,
   });
   totalRef.current = totalRef.current || serviceOrdersResource.total;
+
+  useEffect(() => {
+    if (textInput.current) {
+      textInput.current.value = search;
+    }
+  }, [search]);
 
   useEffect(() => {
     if (serviceOrdersResource.data.length) {
@@ -132,6 +140,7 @@ export const ServiceHistoryTab = () => {
           searchPlaceholder="Search by number, customer, address etc."
           getSearchValue={(val: string) => setSearch(val)}
           filterItems={renderFilterItems()}
+          refInput={textInput}
         />
       }>
       <DataGridLayout

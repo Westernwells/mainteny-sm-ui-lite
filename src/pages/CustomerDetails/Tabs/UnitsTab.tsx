@@ -14,6 +14,7 @@ import {ElevatorView} from 'models/elevator';
 import {Widget} from 'components/Widget';
 import {useQueryCustomerElevator} from 'hooks/reactQuery/useElevator';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useQueryState} from 'hooks/useQueryState';
 import {columns, makeRows} from './CustomerUnitDataGrid/CustomerUnitDataGrid';
 
 interface Props {
@@ -26,7 +27,7 @@ export const UnitsTab = ({customerId}: Props) => {
 
   const [page, setPage] = useState(makePage(0, 25));
   const totalUnitsRef = useRef(0);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useQueryState('searchUnits');
   const [lastVisitStart, setLastVisitStart] = useState<Date | null>(null);
   const [lastVisitEnd, setLastVisitEnd] = useState<Date | null>(null);
   const [nextVisitStart, setNextVisitStart] = useState<Date | null>(null);
@@ -65,6 +66,12 @@ export const UnitsTab = ({customerId}: Props) => {
   );
 
   totalUnitsRef.current = totalUnitsRef.current || elevatorResource.total;
+
+  useEffect(() => {
+    if (textInput.current) {
+      textInput.current.value = searchQuery;
+    }
+  }, [searchQuery]);
 
   useEffect(() => {
     setPageCount(Math.ceil(elevatorResource.total / page.pageSize));
