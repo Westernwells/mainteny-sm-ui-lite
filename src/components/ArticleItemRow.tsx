@@ -43,6 +43,7 @@ export const ArticleItemRow = ({
     articleItem.unitAmount.netAmount /
       10 ** articleItem.unitAmount.fractionDigits!,
   );
+  const [newTotal, setNewTotal] = useState<number>(total);
 
   const handleDescriptionChange = (e: any) => {
     setDescription(e.target.value);
@@ -57,7 +58,7 @@ export const ArticleItemRow = ({
   };
 
   const handleTotalChange = (e: any) => {
-    setTotal(Number(e.target.value));
+    setNewTotal(Number(e.target.value));
   };
 
   useEffect(() => {
@@ -68,7 +69,8 @@ export const ArticleItemRow = ({
         item.articleId === articleItem.articleId ? articleItem : item,
       ),
     );
-  }, [quantity]);
+    setTotal(newTotal);
+  }, [quantity, newTotal]);
 
   useEffect(() => {
     if (description) articleItem.description = description;
@@ -145,7 +147,9 @@ export const ArticleItemRow = ({
         {isPartial && (
           <>
             <TextField
-              value={total * (1 + articleItem.unitAmount.percentageVat / 100)}
+              value={
+                newTotal * (1 + articleItem.unitAmount.percentageVat / 100)
+              }
               size="small"
               disabled
               InputProps={{
@@ -158,7 +162,7 @@ export const ArticleItemRow = ({
             />
             <TextField
               type="number"
-              value={total}
+              value={newTotal}
               onChange={handleTotalChange}
               size="small"
               InputProps={{
@@ -170,7 +174,7 @@ export const ArticleItemRow = ({
               }}
             />
             <TextField
-              value={total - price}
+              value={newTotal - price}
               size="small"
               disabled
               InputProps={{
