@@ -261,6 +261,7 @@ export const de = {
 
   // Invoices
   Invoices: 'Rechnungen',
+  'Edit Invoice': 'Rechnung bearbeiten',
   'New Invoice': 'Neue Rechnung',
   'INVOICE DATE': 'RECHNUNGSDATUM',
   'ORDER NUMBER': 'AUFTRAGSNUMMER',
@@ -417,6 +418,7 @@ export const de = {
   'Credit Note invoice': 'Gutschrift',
   'Print order': 'Bestellung drucken',
   'The PDFs are not generated yet.': 'Die PDFs sind noch nicht erstellt.',
+  'Beneficiary details': 'Leistungsempfänger',
 
   // Service Orders
   'Order types': 'Auftragsarten',
@@ -443,7 +445,7 @@ export const de = {
   'SUPPLIER NO.': 'Lieferantnummer',
 
   // Add new unit
-  Customer: 'Kunden',
+  Customer: 'Kunde',
   'Customer Name': 'Kundenname',
   'Location Information': 'Informationen zum Standort',
   Address: 'Adresse',
@@ -746,6 +748,8 @@ export const de = {
   Full: 'Gesamt',
   Partial: 'Teilrechnung',
   subject: 'Betreff',
+  'Invoice {{invoiceNumber}} for Order {{orderNumber}}':
+    'Rechnung {{invoiceNumber}} für Auftrag {{orderNumber}}',
   description: 'Beschreibung',
   'Subject is required': 'Betreff erforderlich',
   'Description is required': 'Beschreibung erforderlich',
@@ -756,6 +760,7 @@ export const de = {
   QUANTITY: 'ANZAHL',
   Unit: 'Einheit',
   UNIT: 'EINHEIT',
+  Pcs: 'Stk',
   'Total Price': 'Gesamtpreis',
   '(excl VAT)': '(ohne MwSt.)',
   'Select Article': 'Artikel auswählen',
@@ -821,6 +826,7 @@ export const de = {
   'JOINED DATE': 'Erstellungsdatum',
   'Article Name': 'Artikelbezeichnung',
   PRIORITY: 'PRIORITÄT',
+  NONE: 'KEINE',
   'NO. OF CONTRACTS': 'ANZAHL VERTRÄGE',
   'Basic Details': 'Allgemeine Angaben',
   'Billing Address': 'Rechnungsadresse',
@@ -1091,7 +1097,7 @@ export const de = {
   'Do you want to delete this checklist template?':
     'Möchten Sie diese Checklistenvorlage löschen?',
   'Checklist name': 'Name der Checkliste',
-  'New Service': 'Neue Service',
+  'New Service': 'Neue Kategorie',
   'Delete Service': 'Service löschen',
   'New Task': 'Neue Aufgabe',
   'Option per task': 'Wahlmöglichkeit je Aufgabe',
@@ -1284,6 +1290,8 @@ export const de = {
   'Enter notice period': 'Kündigungsfrist eingeben',
   'Enter hourly rates': 'Stundensatz eingeben',
   'Hourly Rate': 'Stundensatz',
+  'Hourly Travel Rate': 'Stundensatz Anfahrt',
+  'Travel Fee': 'Anfahrtspauschale',
   'Start date is required': 'Startdatum ist erforderlich',
   'End date is required': 'Erster Wartung',
   'First Invoice': 'Erste Rechnung',

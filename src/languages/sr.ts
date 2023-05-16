@@ -259,6 +259,7 @@ export const sr = {
 
   // Invoices
   Invoices: 'fakture',
+  'Edit Invoice': 'Uredi fakturu',
   'New Invoice': 'Nova faktura',
   'INVOICE DATE': 'DATUM FAKTURE',
   'ORDER NUMBER': 'BROJ NALOGA',
@@ -744,6 +745,8 @@ export const sr = {
   Full: 'Pun',
   Partial: 'Djelimično',
   subject: 'Predmet',
+  'Invoice {{invoiceNumber}} for Order {{orderNumber}}':
+    'Faktura {{invoiceNumber}} za porudžbinu {{orderNumber}}',
   description: 'Opis',
   'Subject is required': 'Predmet je obavezan',
   'Description is required': 'Opis je obavezan',
@@ -754,6 +757,7 @@ export const sr = {
   QUANTITY: 'Količina'.toLocaleUpperCase(),
   Unit: 'Jedinica',
   UNIT: 'Jedinica'.toLocaleUpperCase(),
+  Pcs: 'Kom',
   'Total Price': 'Ukupna cijena',
   '(excl VAT)': '( bez PDV-a )',
   'Select Article': 'Izaberite artikal',
@@ -818,6 +822,7 @@ export const sr = {
   'JOINED DATE': 'DATUM PRIDRUŽENJA',
   'Article Name': 'Naziv članka',
   PRIORITY: 'Prioritet',
+  NONE: 'NIJEDAN',
   'NO. OF CONTRACTS': 'BROJ UGOVORA',
   'Basic Details': 'Osnovni detalji',
   'Billing Address': 'Adresa za naplatu',
@@ -1251,6 +1256,8 @@ export const sr = {
   'Enter notice period': 'Unesite otkazni rok',
   'Enter hourly rates': 'Unesite satnice',
   'Hourly Rate': 'Satnica',
+  'Hourly Travel Rate': 'Cena putovanja po satu',
+  'Travel Fee': 'Putna naknada',
   'Start date is required': 'Potreban je datum početka',
   'End date is required': 'Potreban je datum završetka',
   'First Invoice': 'Prva faktura',

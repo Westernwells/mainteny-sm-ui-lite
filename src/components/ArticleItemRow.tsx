@@ -1,4 +1,5 @@
 import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -33,6 +34,7 @@ export const ArticleItemRow = ({
   isCreditNote,
   currencySymbol,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
+  const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const [name, setName] = useState(articleItem.name);
   const [description, setDescription] = useState<string>(
@@ -205,7 +207,7 @@ export const ArticleItemRow = ({
               size="small"
             />
             <TextField
-              defaultValue={articleItem.articleUnit}
+              defaultValue={t(articleItem.articleUnit)}
               size="small"
               disabled
             />

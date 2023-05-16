@@ -104,7 +104,7 @@ const NewContractBasicInfo: FC<Props> = ({
       <Grid item xs={4}>
         <FormSelect
           labelId="contractTypeSelect-label"
-          label="Contract Name"
+          label="Contract name"
           options={(
             user?.userAccount?.serviceCompany?.settings?.contractNameTypes ?? []
           ).map((item) => ({
