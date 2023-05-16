@@ -35,6 +35,27 @@ export const PageLayout = ({
       if (event === MessageType.FILE_UPDATED) {
         queryClient.invalidateQueries([queryKeys.invoiceById]);
       }
+      if (
+        [
+          MessageType.EMERGENCE_ASSIGNMENT_REQUEST,
+          MessageType.NON_TECHNICIAN_ASSIGNMENT_FOR_SERVICE_ORDER,
+          MessageType.EMERGENCY_ORDER_ACCEPTED,
+          MessageType.TECHNICIAN_JOB_SCHEDULE_UPDATED,
+          MessageType.SERVICE_ORDER_SCHEDULE_UPDATED,
+          MessageType.SERVICE_ORDER_STATUS_CHANGED,
+          MessageType.SERVICE_ORDER_SCHEDULE_ALERT,
+        ].includes(event as MessageType)
+      ) {
+        [
+          queryKeys.queryServiceOrders,
+          queryKeys.fetchServiceOrderWorkReport,
+          queryKeys.queryDueServiceOrders,
+          queryKeys.getServiceOrderDetails,
+          queryKeys.fetchServiceOrderChecklist,
+          queryKeys.serviceOrderActivity,
+          queryKeys.queryAppointmentConfirmationRequiredOrders,
+        ].map((q) => queryClient.invalidateQueries(q));
+      }
     },
   });
 
