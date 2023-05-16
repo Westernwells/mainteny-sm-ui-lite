@@ -151,9 +151,10 @@ export const InvoiceForm = ({
   const initialValues: InvoiceFormData = {
     subject:
       invoice?.subject ||
-      `Invoice ${invoice?.number ?? ''} for Order ${
-        serviceOrder?.number ?? ''
-      }`,
+      t('Invoice {{invoiceNumber}} for Order {{orderNumber}}', {
+        invoiceNumber: invoice?.number ?? '',
+        orderNumber: serviceOrder?.number ?? '',
+      }),
     description: invoice?.description || '',
     dueDate: '',
     issuedDate: dateToString(new Date()),
@@ -285,9 +286,10 @@ export const InvoiceForm = ({
       formik.setFieldValue('serviceOrderId', serviceOrder.id, true);
       formik.setFieldValue(
         'subject',
-        `Invoice ${invoice?.number ?? ''} for Order ${
-          serviceOrder?.number ?? ''
-        }`,
+        t('Invoice {{invoiceNumber}} for Order {{orderNumber}}', {
+          invoiceNumber: invoice?.number ?? '',
+          orderNumber: serviceOrder?.number ?? '',
+        }),
         true,
       );
 

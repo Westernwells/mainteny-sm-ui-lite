@@ -1,7 +1,9 @@
 import {useEffect, useState} from 'react';
 import {FormikHelpers} from 'formik';
-import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
+import {useTranslation} from 'react-i18next';
+import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import {CustomerPricesForm} from 'pages/CustomerDetails/Tabs/CustomerPricesDataGrid/CustomerPricesForm';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {Progress} from 'components/Progress';
@@ -31,6 +33,10 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'name',
     headerName: 'article',
+    renderCell: (params: GridRenderCellParams<any, any, any>) => {
+      const {t} = useTranslation();
+      return <Typography variant="body2">{t(params.value) || '-'}</Typography>;
+    },
   }),
   getColumnProps({
     field: 'type',

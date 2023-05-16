@@ -177,7 +177,7 @@ export const DraftQuotation = () => {
             <SelectCombined
               selected={unit !== null}
               label="Unit Details"
-              buttonText="Select Unit"
+              buttonText="Select unit"
               cardHeader={
                 unit && <Typography variant="body2">{unit.model}</Typography>
               }
@@ -199,7 +199,7 @@ export const DraftQuotation = () => {
               cardOnClose={() => {
                 setUnit(null);
               }}
-              modalHeader="Select Unit"
+              modalHeader="Select unit"
               modalBody={
                 <UnitsDataGrid
                   setRowItem={handleSelectUnit}

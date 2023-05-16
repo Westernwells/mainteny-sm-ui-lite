@@ -225,7 +225,7 @@ export const CustomerPricesForm = ({
               name: 'unit',
               label: 'Unit',
               required: true,
-              placeholder: 'Select unit',
+              placeholder: 'Select Unit',
               error: !!(touched.unit && errors.unit),
             }}
           />
