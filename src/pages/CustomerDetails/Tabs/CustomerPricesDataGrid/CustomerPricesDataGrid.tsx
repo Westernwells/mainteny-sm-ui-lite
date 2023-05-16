@@ -1,4 +1,6 @@
-import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
+import {useTranslation} from 'react-i18next';
+import Typography from '@mui/material/Typography';
+import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import {getColumnProps} from 'components/DataGridLayout';
 import {ArticleView} from 'models/article';
 import {formatNetAmount} from 'utils/currency';
@@ -14,6 +16,10 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'name',
     headerName: 'article',
+    renderCell: (params: GridRenderCellParams<any, any, any>) => {
+      const {t} = useTranslation();
+      return <Typography variant="body2">{t(params.value) || '-'}</Typography>;
+    },
   }),
   getColumnProps({
     field: 'type',

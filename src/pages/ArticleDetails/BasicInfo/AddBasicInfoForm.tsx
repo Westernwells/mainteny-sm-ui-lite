@@ -171,7 +171,7 @@ export const AddBasicInfoForm = ({
           name: 'unit',
           label: t('Unit'),
           required: true,
-          placeholder: t('Select unit'),
+          placeholder: t('Select Unit'),
           error: !!(formik.touched.unit && formik.errors.unit),
         }}
       />
