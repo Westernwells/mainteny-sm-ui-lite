@@ -49,7 +49,7 @@ interface Props<T> {
   isCreditNote?: boolean;
   unitSellingAmount?: Amount;
   serviceOrderId?: string;
-  invoiceType: string;
+  invoiceType?: string;
 }
 
 export const ArticleItemsTable = ({
