@@ -47,10 +47,10 @@ export const ArticleItemRow = ({
     articleItem.description,
   );
   const [quantity, setQuantity] = useState(articleItem.quantity);
-
-  const price =
+  const [price, setPrice] = useState(
     articleItem.unitAmount.netAmount /
-    10 ** articleItem.unitAmount.fractionDigits!;
+      10 ** articleItem.unitAmount.fractionDigits!,
+  );
 
   const [newTotal, setNewTotal] = useState<number>(total);
 
@@ -63,6 +63,10 @@ export const ArticleItemRow = ({
   };
 
   const handlePriceChange = (e: any) => {
+    setPrice(e.target.value);
+  };
+
+  const handlePartialPriceChange = (e: any) => {
     setPartialPrice(e.target.value);
   };
 
@@ -199,7 +203,7 @@ export const ArticleItemRow = ({
 
         <TextField
           value={isPartial ? partialPrice : price}
-          onChange={handlePriceChange}
+          onChange={isPartial ? handlePartialPriceChange : handlePriceChange}
           size="small"
           InputProps={{
             startAdornment: (
