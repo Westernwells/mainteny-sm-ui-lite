@@ -21,6 +21,9 @@ interface Props<T> {
   isPartial?: boolean;
   isCreditNote?: boolean;
   currencySymbol?: string;
+  previousInvoicedTotal: number;
+  partialPrice: number;
+  setPartialPrice: Dispatch<SetStateAction<number>>;
 }
 
 export const ArticleItemRow = ({
@@ -33,6 +36,9 @@ export const ArticleItemRow = ({
   isPartial,
   isCreditNote,
   currencySymbol,
+  previousInvoicedTotal,
+  partialPrice,
+  setPartialPrice,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -41,10 +47,11 @@ export const ArticleItemRow = ({
     articleItem.description,
   );
   const [quantity, setQuantity] = useState(articleItem.quantity);
-  const [price, setPrice] = useState(
+
+  const price =
     articleItem.unitAmount.netAmount /
-      10 ** articleItem.unitAmount.fractionDigits!,
-  );
+    10 ** articleItem.unitAmount.fractionDigits!;
+
   const [newTotal, setNewTotal] = useState<number>(total);
 
   const handleDescriptionChange = (e: any) => {
@@ -56,7 +63,7 @@ export const ArticleItemRow = ({
   };
 
   const handlePriceChange = (e: any) => {
-    setPrice(e.target.value);
+    setPartialPrice(e.target.value);
   };
 
   const handleTotalChange = (e: any) => {
@@ -176,7 +183,7 @@ export const ArticleItemRow = ({
               }}
             />
             <TextField
-              value={newTotal - price}
+              value={newTotal - previousInvoicedTotal - partialPrice}
               size="small"
               disabled
               InputProps={{
@@ -189,8 +196,9 @@ export const ArticleItemRow = ({
             />
           </>
         )}
+
         <TextField
-          value={price}
+          value={isPartial ? partialPrice : price}
           onChange={handlePriceChange}
           size="small"
           InputProps={{
