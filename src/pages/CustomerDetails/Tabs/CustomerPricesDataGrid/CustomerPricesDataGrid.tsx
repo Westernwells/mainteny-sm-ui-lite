@@ -31,6 +31,10 @@ export const columns: GridColDef[] = [
     headerName: 'category',
   }),
   getColumnProps({
+    field: 'unit',
+    headerName: 'unit',
+  }),
+  getColumnProps({
     field: 'purchasePrice',
     headerName: 'Purchase price (excl. VAT)',
     align: 'right',
@@ -56,6 +60,7 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
         name: article.name,
         type: convertToText(article.type),
         category: article.category,
+        unit: article.unit,
         purchasePrice: formatNetAmount(article.unitPurchaseAmount),
         sellingPrice: formatNetAmount(article.unitSellingAmount),
         article,
