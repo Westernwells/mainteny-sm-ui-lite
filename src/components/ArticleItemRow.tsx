@@ -6,7 +6,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {QuotationItemRecord} from 'models/quotation';
-import {InvoiceItemRecord} from 'models/invoice';
+import {InvoiceItemRecord, InvoiceType} from 'models/invoice';
 import {Amount} from 'models/misc';
 import {Button} from 'components/Button';
 import {useCurrentCurrency} from 'utils/currency';
@@ -63,11 +63,14 @@ export const ArticleItemRow = ({
   };
 
   const handlePriceChange = (e: any) => {
-    setPrice(e.target.value);
+    setPrice(Number(e.target.value));
   };
 
   const handlePartialPriceChange = (e: any) => {
-    setPartialPrice(e.target.value);
+    setPartialPrice(Number(e.target.value));
+    if (InvoiceType.PARTIAL) {
+      setPrice(Number(e.target.value));
+    }
   };
 
   const handleTotalChange = (e: any) => {
@@ -203,6 +206,7 @@ export const ArticleItemRow = ({
 
         <TextField
           value={isPartial ? partialPrice : price}
+          type="number"
           onChange={isPartial ? handlePartialPriceChange : handlePriceChange}
           size="small"
           InputProps={{
