@@ -18,6 +18,7 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
     headerName: 'number',
+    flex: 0.5,
   }),
   getColumnProps({
     field: 'customer',

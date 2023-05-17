@@ -40,7 +40,7 @@ export const columns: GridColDef[] = [
     field: 'number',
     headerName: 'number',
     align: 'left',
-    flex: 0.75,
+    flex: 0.5,
   }),
   getColumnProps({
     field: 'customer',
@@ -70,7 +70,7 @@ export const columns: GridColDef[] = [
     headerName: 'notes',
     align: 'center',
     renderCell: (params) => <NotesIndicator quotation={params.row.quotation} />,
-    flex: 1,
+    flex: 0.5,
   }),
   getColumnProps({
     field: 'status',
@@ -85,7 +85,7 @@ export const columns: GridColDef[] = [
         maxChars={9}
       />
     ),
-    flex: 0.75,
+    flex: 0.5,
   }),
   getColumnProps({
     field: 'actions',
@@ -97,7 +97,7 @@ export const columns: GridColDef[] = [
         downloadUrl={params.row.downloadUrl}
       />
     ),
-    flex: 1,
+    flex: 0.5,
   }),
 ];
 

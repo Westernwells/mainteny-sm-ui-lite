@@ -262,6 +262,11 @@ export const DataGridLayout = ({
           '& .MuiDataGrid-columnHeaderTitleContainer': {
             padding: '0',
             whiteSpace: 'pre-wrap',
+            '& .MuiTypography-subtitle2': {
+              wordWrap: 'break-word',
+              overflow: 'auto',
+              width: 'fit-content',
+            },
           },
           '& .MuiDataGrid-columnSeparator': {
             display: 'none',
