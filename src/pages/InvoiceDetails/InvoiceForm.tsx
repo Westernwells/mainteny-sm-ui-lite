@@ -791,6 +791,7 @@ export const InvoiceForm = ({
               unitSellingAmount={invoice?.totalAmount}
               serviceOrderId={formik.values.serviceOrderId}
               propertyOwnerId={customer?.id ?? ''}
+              invoiceType={formik.values.type}
             />
 
             <Box my="1.5em">

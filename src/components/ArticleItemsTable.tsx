@@ -49,6 +49,7 @@ interface Props<T> {
   isCreditNote?: boolean;
   unitSellingAmount?: Amount;
   serviceOrderId?: string;
+  invoiceType?: string;
 }
 
 export const ArticleItemsTable = ({
@@ -59,6 +60,7 @@ export const ArticleItemsTable = ({
   isCreditNote,
   unitSellingAmount,
   serviceOrderId,
+  invoiceType,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -102,6 +104,7 @@ export const ArticleItemsTable = ({
   const {data: invoices = []} = useFetchServiceOrderInvoices(serviceOrderId, {
     enabled: !!serviceOrderId && isPartial,
   });
+
   const previousInvoicedTotal = useMemo(
     () =>
       invoices
@@ -121,6 +124,8 @@ export const ArticleItemsTable = ({
   const [totalPrice, setTotalPrice] = useState(0);
 
   const [total, setTotal] = useState(0);
+
+  const [partialPrice, setPartialPrice] = useState<number>(0);
 
   const getItemRecord = useCallback(
     (record: QuotationItemRecord | InvoiceItemRecord<Amount>) => {
@@ -309,22 +314,27 @@ export const ArticleItemsTable = ({
     if (items.length) {
       const sum = 0;
 
-      setTotalPrice(
-        items
-          .map(
-            (item) =>
-              item.quantity *
-              (item.unitAmount.netAmount /
-                10 ** item.unitAmount.fractionDigits!),
-          )
-          .reduce((prevValue, currentValue) => prevValue + currentValue, sum),
-      );
+      if (invoiceType === 'FULL') {
+        setTotalPrice(
+          items
+            .map(
+              (item) =>
+                item.quantity *
+                (item.unitAmount.netAmount /
+                  10 ** item.unitAmount.fractionDigits!),
+            )
+            .reduce((prevValue, currentValue) => prevValue + currentValue, sum),
+        );
+      }
     }
   }, [items]);
 
   useEffect(() => {
     if (total === 0) setTotal(totalPrice);
-  }, [totalPrice, total]);
+    if (invoiceType !== 'PARTIAL') {
+      setPartialPrice(0);
+    }
+  }, [totalPrice, total, invoiceType]);
 
   return (
     <Box mt="1em">
@@ -356,11 +366,14 @@ export const ArticleItemsTable = ({
               setItems={setItems}
               isPartial={isPartial}
               isCreditNote={isCreditNote}
-              total={total - previousInvoicedTotal}
+              total={totalPrice}
               setTotal={setTotal}
               currencySymbol={
                 isCreditNote ? getCurrencySymbol[currencyCode] : ''
               }
+              previousInvoicedTotal={previousInvoicedTotal || 0}
+              partialPrice={partialPrice}
+              setPartialPrice={setPartialPrice}
             />
           ))}
           {items.length ? (
@@ -418,7 +431,7 @@ export const ArticleItemsTable = ({
                   </Typography>
 
                   <Typography>
-                    {formatCurrency(totalPrice, {
+                    {formatCurrency(isPartial ? partialPrice : totalPrice, {
                       currency: currencyCode,
                     })}
                   </Typography>
@@ -439,9 +452,14 @@ export const ArticleItemsTable = ({
                     />
                   </Box>
                   <Typography>
-                    {formatCurrency(totalPrice * (percentageVat / 100), {
-                      currency: currencyCode,
-                    })}
+                    {formatCurrency(
+                      isPartial
+                        ? partialPrice * (percentageVat / 100)
+                        : totalPrice * (percentageVat / 100),
+                      {
+                        currency: currencyCode,
+                      },
+                    )}
                   </Typography>
                 </Box>
                 <Box
@@ -461,9 +479,14 @@ export const ArticleItemsTable = ({
                     </Typography>
                   </Typography>
                   <Typography sx={{color: 'primary.contrastText'}}>
-                    {formatCurrency(totalPrice * (1 + percentageVat / 100), {
-                      currency: currencyCode,
-                    })}
+                    {formatCurrency(
+                      isPartial
+                        ? partialPrice * (1 + percentageVat / 100)
+                        : totalPrice * (1 + percentageVat / 100),
+                      {
+                        currency: currencyCode,
+                      },
+                    )}
                   </Typography>
                 </Box>
               </Box>
