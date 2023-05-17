@@ -788,6 +788,8 @@ export const sr = {
   'Download Invoice': 'Preuzmite fakturu',
   Download: 'Preuzmite',
   'Work Report': 'Izvještaj o radu',
+  'Download Work Report': 'Preuzmite izvješće o radu',
+  'Send Work Report': 'Pošalji izvješće o radu',
   'Invoice Number': 'Broj fakture',
   'Total (excl VAT)': 'Ukupno (bez PDV-a)',
   'Create Credit note': 'Stvori kredit',
@@ -1171,6 +1173,7 @@ export const sr = {
   'YEARLY PRICE ADJUSTMENT':
     'Godišnja prilagodba cijene (%)'.toLocaleUpperCase(),
   'HOURLY RATE': 'Satnica'.toLocaleUpperCase(),
+  'Name is required': 'Ime je obavezno',
   'First name is required': 'Ime je obavezno',
   'Last name is required': 'Prezime je obavezno',
   'Phone number is required': 'Broj telefona je obavezan',

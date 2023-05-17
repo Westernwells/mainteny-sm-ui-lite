@@ -24,6 +24,10 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'type',
     headerName: 'type',
+    renderCell: (params: GridRenderCellParams<any, any, any>) => {
+      const {t} = useTranslation();
+      return <Typography variant="body2">{t(params.value) || '-'}</Typography>;
+    },
     flex: 0.5,
   }),
   getColumnProps({
