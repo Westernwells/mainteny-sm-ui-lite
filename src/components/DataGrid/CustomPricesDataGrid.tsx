@@ -47,6 +47,10 @@ export const columns: GridColDef[] = [
     headerName: 'category',
   }),
   getColumnProps({
+    field: 'unit',
+    headerName: 'unit',
+  }),
+  getColumnProps({
     field: 'purchasePrice',
     headerName: 'Purchase price (excl. VAT)',
     align: 'right',
