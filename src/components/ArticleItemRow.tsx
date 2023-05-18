@@ -218,10 +218,16 @@ export const ArticleItemRow = ({
         {!isPartial && !isCreditNote && (
           <>
             <TextField
-              value={quantity}
-              onChange={(e) => setQuantity(parseInt(e.target.value, 10))}
+              value={quantity.toFixed(2)}
+              onChange={(e) => setQuantity(Number(e.target.value))}
               type="number"
-              inputProps={{inputMode: 'numeric', pattern: '[0-9]*'}}
+              inputProps={{
+                inputMode: 'numeric',
+                pattern: '[0-9]*',
+                min: 0,
+                max: Infinity,
+                step: '0.05',
+              }}
               size="small"
             />
             <TextField
