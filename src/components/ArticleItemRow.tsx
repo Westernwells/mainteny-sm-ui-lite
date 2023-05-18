@@ -46,7 +46,7 @@ export const ArticleItemRow = ({
   const [description, setDescription] = useState<string>(
     articleItem.description,
   );
-  const [quantity, setQuantity] = useState(articleItem.quantity);
+  const [quantity, setQuantity] = useState<number>(articleItem.quantity);
   const [price, setPrice] = useState(
     articleItem.unitAmount.netAmount /
       10 ** articleItem.unitAmount.fractionDigits!,
@@ -83,7 +83,7 @@ export const ArticleItemRow = ({
         item.articleId === articleItem.articleId ? articleItem : item,
       ),
     );
-    setTotal(newTotal);
+    setTotal(Number(newTotal));
   }, [quantity, newTotal]);
 
   useEffect(() => {
@@ -176,7 +176,7 @@ export const ArticleItemRow = ({
             />
             <TextField
               type="number"
-              value={newTotal}
+              value={newTotal.toString()}
               onChange={handleTotalChange}
               size="small"
               InputProps={{
@@ -203,7 +203,7 @@ export const ArticleItemRow = ({
         )}
 
         <TextField
-          value={isPartial ? partialPrice : price}
+          value={isPartial ? partialPrice.toString() : price.toString()}
           type="number"
           onChange={isPartial ? handlePartialPriceChange : handlePriceChange}
           size="small"
@@ -218,8 +218,10 @@ export const ArticleItemRow = ({
         {!isPartial && !isCreditNote && (
           <>
             <TextField
-              value={quantity.toFixed(2)}
-              onChange={(e) => setQuantity(Number(e.target.value))}
+              value={quantity.toString()}
+              onChange={(e: any) =>
+                setQuantity(Number(parseFloat(e.target.value).toFixed(2)))
+              }
               type="number"
               inputProps={{
                 inputMode: 'numeric',
