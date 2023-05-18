@@ -314,7 +314,7 @@ export const ArticleItemsTable = ({
     if (items.length) {
       const sum = 0;
 
-      if (invoiceType === 'FULL') {
+      if (invoiceType === 'FULL' || invoiceType === undefined) {
         setTotalPrice(
           items
             .map(
