@@ -454,6 +454,7 @@ export const sr = {
   Parking: 'Parking',
   'Unit Details': 'Detalji jedinice',
   'Unit Category': 'Kategorija jedinice',
+  'Invalid unit category': 'Nevažeći kategorija jedinice',
   'Unit Number': 'Broj jedinice',
   'Number of Stops': 'Broj stanica',
   'Cabin Type': 'Tip kabine',

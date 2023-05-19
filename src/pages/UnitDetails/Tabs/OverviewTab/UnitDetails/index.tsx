@@ -2,14 +2,14 @@ import Grid from '@mui/material/Grid';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
-import {ElevatorView} from 'models/elevator';
+import {ElevatorCategory, ElevatorView} from 'models/elevator';
 import {InfoCard} from 'components/InfoCard';
 import {useRef, useState} from 'react';
 import {Dialog} from 'components/Dialog';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
-import {convertToMacro} from 'utils/utils';
+import {convertToMacro, convertToText} from 'utils/utils';
 import {UnitDetailsFormModel} from 'models/unitForm';
 import {ContractSimpleView} from 'models/contract';
 import {UnitDetailsSchema} from './UnitDetailsSchema';
@@ -23,7 +23,13 @@ interface Props {
 }
 
 const validationSchema = Yup.object().shape({
-  category: Yup.string().nullable().required('Category is required'),
+  category: Yup.string()
+    .nullable()
+    .oneOf(
+      Object.values(ElevatorCategory).map((c) => convertToText(c)),
+      'Invalid unit category',
+    )
+    .required('Category is required'),
 });
 
 export const UnitDetails = ({
@@ -37,9 +43,10 @@ export const UnitDetails = ({
   const {mutateAsync: updateElevator} = useUpdateElevator(
     'Unit details updated successfully',
   );
+
   const formik = useFormik<UnitDetailsFormModel>({
     initialValues: {
-      category: elevator.category,
+      category: convertToText(elevator.category),
       manufacturer: elevator.additionalInfo.manufacturer,
       externalId: elevator.externalId,
       numberOfStops: elevator.additionalInfo.numberOfStops,

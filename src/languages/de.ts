@@ -456,6 +456,7 @@ export const de = {
   Parking: 'Parkplatz',
   'Unit Details': 'Anlagendetails',
   'Unit Category': 'Anlagenkategorie',
+  'Invalid unit category': 'Ungültiger Anlagenkategorie',
   'Unit Number': 'Anlagennummer',
   'Number of Stops': 'Haltestellen',
   'Cabin Type': 'Kabinentyp',

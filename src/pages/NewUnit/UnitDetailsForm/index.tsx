@@ -22,7 +22,13 @@ interface Props {
 }
 
 const validationSchema = Yup.object().shape({
-  category: Yup.string().nullable().required('Category is required'),
+  category: Yup.string()
+    .nullable()
+    .oneOf(
+      Object.values(ElevatorCategory).map((c) => convertToText(c)),
+      'Invalid unit category',
+    )
+    .required('Category is required'),
   unitType: Yup.string().nullable().required('Unit type is required'),
 });
 
