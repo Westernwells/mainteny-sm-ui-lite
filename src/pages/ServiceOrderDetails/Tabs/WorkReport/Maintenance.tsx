@@ -2,7 +2,6 @@ import useTheme from '@mui/material/styles/useTheme';
 import {Divider, Typography} from '@mui/material';
 import Box from '@mui/material/Box';
 import {FormLabel} from 'components/form/FormLabel';
-import {addMinutes} from 'date-fns';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {ServiceOrderReportView} from 'models/service-order';
 import {useState} from 'react';
@@ -19,12 +18,6 @@ export const Maintenance = ({serviceReport}: Props) => {
     serviceReport.serviceOrder.schedules[
       serviceReport.serviceOrder.schedules.length - 1
     ],
-  );
-  const [endTime] = useState(
-    addMinutes(
-      new Date(serviceReport.serviceOrder.actualStartTime!),
-      serviceReport.serviceOrder.serviceTime!,
-    ),
   );
   const formatDate = useFormatDate();
   const {t} = useTranslation();
@@ -67,7 +60,9 @@ export const Maintenance = ({serviceReport}: Props) => {
               {
                 label: t('End'),
                 date: formatDate(serviceReport.serviceOrder.actualEndTime),
-                time: new Date(endTime).toLocaleTimeString(),
+                time: new Date(
+                  serviceReport.serviceOrder.actualEndTime!,
+                ).toLocaleTimeString(),
               },
             ].map((i) => (
               <Box
