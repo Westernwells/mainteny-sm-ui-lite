@@ -19,6 +19,7 @@ import {useTranslation} from 'react-i18next';
 import {groupBy} from 'lodash';
 import {EmptySection} from 'components/EmptySection';
 import {Button} from 'components/Button';
+import useResizeObserver from 'hooks/useResizeObserver';
 import {MessageType, Type} from 'models/notification';
 import {
   useMarkAllAsRead,
@@ -287,6 +288,24 @@ export const Notifications = () => {
     setTabValue(newValue);
   };
 
+  const [height, setHeight] = React.useState(0);
+
+  const measuredRef = React.useCallback((node) => {
+    if (node !== null) {
+      setHeight(node.getBoundingClientRect().offsetHeight);
+    }
+  }, []);
+
+  const elementRef = useResizeObserver(measuredRef);
+
+  useEffect(() => {
+    window.addEventListener('resize', measuredRef);
+
+    setHeight(elementRef?.current?.offsetHeight);
+
+    return () => window.removeEventListener('resize', measuredRef);
+  }, [height]);
+
   return (
     <>
       <Badge
@@ -318,7 +337,14 @@ export const Notifications = () => {
           justifyContent="space-between"
           alignItems="center"
           pt="1.25rem"
-          px="1rem">
+          px="1rem"
+          sx={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 10,
+            background: 'white',
+          }}
+          ref={elementRef}>
           <Typography variant="h5" letterSpacing="normal" py="0.75rem">
             {t('Notifications')}
           </Typography>
@@ -349,7 +375,15 @@ export const Notifications = () => {
         )}
 
         <TabContext value={tabValue}>
-          <TabList onChange={handleChangeTab} variant="fullWidth">
+          <TabList
+            onChange={handleChangeTab}
+            variant="fullWidth"
+            sx={{
+              position: 'sticky',
+              top: elementRef?.current?.offsetHeight,
+              zIndex: 10,
+              background: 'white',
+            }}>
             {tabItems.map((item) => (
               <Tab
                 label={item.label}
