@@ -238,7 +238,7 @@ export const ArticleItemRow = ({
               disabled
             />
             <TextField
-              value={price * quantity}
+              value={(price * quantity).toFixed(2)}
               size="small"
               disabled
               InputProps={{
