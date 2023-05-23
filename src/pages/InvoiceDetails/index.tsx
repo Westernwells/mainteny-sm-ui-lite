@@ -27,7 +27,7 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
     useServiceOrderWorkReport(invoice?.serviceOrder?.id ?? '', {
       useErrorBoundary: false,
       retry: false,
-      enabled: !!invoice?.serviceOrder?.id,
+      enabled: !!invoice?.serviceOrder?.additionalInfo?.workReportGenerated,
     });
 
   const {data: downloadUrl} = useDownloadUrl(
