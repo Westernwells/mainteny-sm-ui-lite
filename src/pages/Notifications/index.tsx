@@ -12,6 +12,7 @@ import {
   LinearProgress,
   Tab,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
 import {TabContext, TabList, TabPanel} from '@mui/lab';
 import {addDays, endOfDay, startOfDay} from 'date-fns';
@@ -19,7 +20,6 @@ import {useTranslation} from 'react-i18next';
 import {groupBy} from 'lodash';
 import {EmptySection} from 'components/EmptySection';
 import {Button} from 'components/Button';
-import useResizeObserver from 'hooks/useResizeObserver';
 import {MessageType, Type} from 'models/notification';
 import {
   useMarkAllAsRead,
@@ -288,23 +288,9 @@ export const Notifications = () => {
     setTabValue(newValue);
   };
 
-  const [height, setHeight] = React.useState(0);
-
-  const measuredRef = React.useCallback((node) => {
-    if (node !== null) {
-      setHeight(node.getBoundingClientRect().offsetHeight);
-    }
-  }, []);
-
-  const elementRef = useResizeObserver(measuredRef);
-
-  useEffect(() => {
-    window.addEventListener('resize', measuredRef);
-
-    setHeight(elementRef?.current?.offsetHeight);
-
-    return () => window.removeEventListener('resize', measuredRef);
-  }, [height]);
+  const SmallScreens = useMediaQuery('(max-width:601px)');
+  const MediumScreens = useMediaQuery('(max-width:1025px)');
+  const LargerScreens = useMediaQuery('(max-width:2900px)');
 
   return (
     <>
@@ -343,8 +329,7 @@ export const Notifications = () => {
             top: 0,
             zIndex: 10,
             background: 'white',
-          }}
-          ref={elementRef}>
+          }}>
           <Typography variant="h5" letterSpacing="normal" py="0.75rem">
             {t('Notifications')}
           </Typography>
@@ -380,9 +365,15 @@ export const Notifications = () => {
             variant="fullWidth"
             sx={{
               position: 'sticky',
-              top: elementRef?.current?.offsetHeight,
               zIndex: 10,
               background: 'white',
+              top: SmallScreens
+                ? 44.125
+                : MediumScreens
+                ? 52.938
+                : LargerScreens
+                ? 71
+                : 0,
             }}>
             {tabItems.map((item) => (
               <Tab
