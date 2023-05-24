@@ -290,7 +290,8 @@ export const ViewInvoice = ({
               </Typography>
             </Box>
           </PageCard>
-          {!!workReport && (
+
+          {workReport && (
             <PageCard
               headerLabel={t('Work Report')}
               headerStyles={{
@@ -302,6 +303,7 @@ export const ViewInvoice = ({
               </Typography>
             </PageCard>
           )}
+
           {invoiceActivities?.length ? (
             <InvoiceActivities activities={invoiceActivities} />
           ) : null}
