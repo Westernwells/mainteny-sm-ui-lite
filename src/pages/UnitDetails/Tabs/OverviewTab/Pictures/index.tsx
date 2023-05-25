@@ -3,6 +3,7 @@ import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
+import MUIDialog from '@mui/material/Dialog';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
@@ -11,6 +12,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import {FormInput} from 'components/form/FormInput';
+import {Carousel} from 'components/Carousel';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {ElevatorView} from 'models/elevator';
@@ -28,6 +30,7 @@ interface Props {
 export const Pictures = ({elevator, propertyOwnerId}: Props) => {
   const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
+  const [openPreview, setOpenPreview] = useState(false);
   const [editingFileId, setEditingFileId] = useState('');
   const [fileName, setFileName] = useState('');
   const theme = useTheme();
@@ -176,7 +179,9 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
                 alignItems="center"
                 justifyContent="center"
                 border={`1px solid ${theme.palette.text.disabled}`}
-                borderRadius={1}>
+                borderRadius={1}
+                onClick={() => setOpenPreview(true)}
+                sx={{cursor: 'pointer'}}>
                 <img
                   alt=""
                   width={72}
@@ -277,6 +282,18 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
           }}
         />
       </Dialog>
+      <MUIDialog
+        onClose={() => setOpenPreview(false)}
+        open={openPreview}
+        maxWidth="sm">
+        <Carousel
+          images={elevator.additionalInfo.pictures.map((p) => ({
+            label: p.description,
+            imgPath: downloadUrls[p.uri],
+          }))}
+          onClose={() => setOpenPreview(false)}
+        />
+      </MUIDialog>
     </InfoCard>
   );
 };
