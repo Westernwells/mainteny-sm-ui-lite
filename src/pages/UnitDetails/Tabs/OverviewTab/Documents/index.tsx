@@ -19,6 +19,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
 import {EmptySection} from 'components/EmptySection';
 import {useTranslation} from 'react-i18next';
 import {olStyles} from 'styles';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 
 interface Props {
   elevator: ElevatorView;
@@ -38,6 +39,11 @@ export const Documents = ({elevator, propertyOwnerId}: Props) => {
   );
   const {mutateAsync: updateElevator} = useUpdateElevator(
     'Elevator updated successfully',
+  );
+  const {data: downloadUrls = {}} = useDownloadUrl(
+    elevator.additionalInfo.documents
+      ? elevator.additionalInfo.documents.map((d) => d.uri)
+      : [],
   );
 
   const onSave = async () => {
@@ -172,7 +178,11 @@ export const Documents = ({elevator, propertyOwnerId}: Props) => {
                   alignItems="center"
                   justifyContent="center"
                   border={`1px solid ${theme.palette.text.disabled}`}
-                  borderRadius={1}>
+                  borderRadius={1}
+                  sx={{cursor: 'pointer'}}
+                  onClick={() =>
+                    window.open(downloadUrls[document.uri], '_blank')
+                  }>
                   <FileCopyIcon
                     sx={{
                       fontSize: '3.5rem',
