@@ -22,7 +22,7 @@ import {
   getCurrencySymbol,
 } from 'utils/currency';
 import {createEmptyResource} from 'utils/paging-utils';
-import {useFetchServiceOrderInvoices} from 'hooks/reactQuery/useInvoice';
+// import {useFetchServiceOrderInvoices} from 'hooks/reactQuery/useInvoice';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {calculateTotal} from 'utils/calculate-total';
 import {ArticleItemRow} from './ArticleItemRow';
@@ -43,8 +43,8 @@ interface Props<T> {
   isPartial?: boolean;
   isCreditNote?: boolean;
   unitSellingAmount?: Amount;
-  invoiceType?: string;
-  serviceOrderId?: string;
+  // invoiceType?: string;
+  // serviceOrderId?: string;
 }
 
 export const ArticleItemsTable = ({
@@ -55,9 +55,9 @@ export const ArticleItemsTable = ({
   isPartial,
   isCreditNote,
   unitSellingAmount,
-  invoiceType,
-  serviceOrderId,
-}: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
+}: // invoiceType,
+// serviceOrderId,
+Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const currencyCode =
@@ -107,9 +107,9 @@ export const ArticleItemsTable = ({
 
   const [newPartialTotal, setNewPartialTotal] = useState(0);
 
-  const {data: invoices = []} = useFetchServiceOrderInvoices(serviceOrderId, {
-    enabled: !!serviceOrderId && isPartial,
-  });
+  // const {data: invoices = []} = useFetchServiceOrderInvoices(serviceOrderId, {
+  //   enabled: !!serviceOrderId && isPartial,
+  // });
 
   const getItemRecord = (
     record: QuotationItemRecord | InvoiceItemRecord<Amount>,
@@ -169,7 +169,6 @@ export const ArticleItemsTable = ({
     if (items.filter((item) => item.articleId === row.id).length === 0) {
       setItems([...items, articleViewToItem(row)]);
     }
-
     setIsArticleModalOpen(false);
   };
 
@@ -177,30 +176,106 @@ export const ArticleItemsTable = ({
     setTotalPrice(calculateTotal(items));
   }, [items]);
 
+  const setArticleResourceAndPrice = (resourceItem: any) => {
+    const article = resourceItem;
+    setNewPartialTotal(calculateTotal([articleViewToItem(article)]));
+    setItems([articleViewToItem(article)]);
+    setTotalPrice(calculateTotal([articleViewToItem(article)]));
+  };
+
+  const setItemsAndCalculatePrice = (invItems: any) => {
+    setItems(invItems);
+    setTotalPrice(calculateTotal(invItems));
+  };
+
+  const createCreditArticleResource = (invoiceArg: InvoiceView) => {
+    const article = [articleViewToItem(creditNoteArticleResource.data[0])];
+    if (article[0].articleId !== invoiceArg.id) {
+      const newItems = article.map((articleItem) => ({
+        ...articleItem,
+        unitAmount: {
+          ...articleItem.unitAmount,
+          netAmount:
+            invoiceArg.totalAmount.netAmount >= 0
+              ? -1 * invoiceArg.totalAmount.netAmount
+              : invoiceArg.totalAmount.netAmount,
+          grossAmount:
+            invoiceArg.totalAmount.netAmount >= 0
+              ? -1 * invoiceArg.totalAmount.grossAmount
+              : invoiceArg.totalAmount.netAmount,
+        },
+      }));
+      setItemsAndCalculatePrice(newItems);
+    }
+  };
   useEffect(() => {
-    if (invoices) {
-      if (!invoice) {
+    if (!invoice) {
+      if (isPartial && isFetched) {
+        if (!partialArticleResource.data.length) {
+          createPartial();
+        }
+        setArticleResourceAndPrice(partialArticleResource.data[0]);
+      } else if (isCreditNote && isFetchedCreditNoteArticle) {
+        setArticleResourceAndPrice(creditNoteArticleResource.data[0]);
+      } else if (!isPartial && !isCreditNote) {
+        setItems([]);
+      }
+    } else if (invoice) {
+      if (invoice.type === 'FULL') {
+        if (!isPartial && !isCreditNote) {
+          const newItems = invoice.items.map(
+            (i): InvoiceItemRecord<Amount> => ({
+              articleId: i.article.id,
+              description: i.description || i.article.description,
+              name: i.name || i.article.name,
+              articleUnit: i.article.unit,
+              quantity: i.quantity,
+              unitAmount: i.unitAmount,
+            }),
+          );
+          setItemsAndCalculatePrice(newItems);
+        } else if (isPartial && isFetched) {
+          if (!partialArticleResource.data.length || !items.length) {
+            createPartial();
+          } else {
+            const article = [articleViewToItem(partialArticleResource.data[0])];
+            if (article[0].articleId !== invoice.id || !items.length) {
+              const newItems = article.map((articleItem) => ({
+                ...articleItem,
+                unitAmount: {
+                  ...articleItem.unitAmount,
+                  netAmount:
+                    invoice.totalAmount.netAmount >= 0
+                      ? invoice.totalAmount.netAmount
+                      : -1 * invoice.totalAmount.netAmount,
+                  grossAmount:
+                    invoice.totalAmount.netAmount >= 0
+                      ? invoice.totalAmount.grossAmount
+                      : -1 * invoice.totalAmount.netAmount,
+                },
+              }));
+              setItemsAndCalculatePrice(newItems);
+              if (invoice.partialInvoices && invoice.partialInvoices.length) {
+                setNewPartialTotal(
+                  invoice.totalAmount.netAmount /
+                    10 ** invoice.totalAmount.fractionDigits!,
+                );
+              } else {
+                setNewPartialTotal(calculateTotal(newItems));
+              }
+            }
+          }
+        } else if (
+          (isCreditNote && isFetchedCreditNoteArticle) ||
+          !items.length
+        ) {
+          createCreditArticleResource(invoice);
+        }
+      } else if (invoice.type === 'PARTIAL') {
         if (isPartial && isFetched) {
           if (!partialArticleResource.data.length) {
             createPartial();
-          }
-          const article = partialArticleResource.data[0];
-          setNewPartialTotal(calculateTotal([articleViewToItem(article)]));
-          setItems([articleViewToItem(article)]);
-          setTotalPrice(calculateTotal([articleViewToItem(article)]));
-        } else if (isCreditNote && isFetchedCreditNoteArticle) {
-          const article = [
-            articleViewToItem(creditNoteArticleResource.data[0]),
-          ];
-          setNewPartialTotal(calculateTotal(article));
-          setItems(article);
-          setTotalPrice(calculateTotal(article));
-        } else if (!isPartial && !isCreditNote) {
-          setItems([]);
-        }
-      } else if (invoice) {
-        if (invoice.type === 'FULL') {
-          if (!isPartial && !isCreditNote) {
+          } else {
             const newItems = invoice.items.map(
               (i): InvoiceItemRecord<Amount> => ({
                 articleId: i.article.id,
@@ -208,160 +283,57 @@ export const ArticleItemsTable = ({
                 name: i.name || i.article.name,
                 articleUnit: i.article.unit,
                 quantity: i.quantity,
-                unitAmount: i.unitAmount,
+                unitAmount: invoice.totalAmount,
               }),
             );
-            setItems(newItems);
-            setTotalPrice(calculateTotal(newItems));
-          } else if (isPartial && isFetched) {
-            if (!partialArticleResource.data.length || !items.length) {
-              createPartial();
-            } else {
-              const article = [
-                articleViewToItem(partialArticleResource.data[0]),
-              ];
-              if (article[0].articleId !== invoice.id || !items.length) {
-                const newItems = article.map((articleItem) => ({
-                  ...articleItem,
-                  unitAmount: {
-                    ...articleItem.unitAmount,
-                    netAmount:
-                      invoice.totalAmount.netAmount >= 0
-                        ? invoice.totalAmount.netAmount
-                        : -1 * invoice.totalAmount.netAmount,
-                    grossAmount:
-                      invoice.totalAmount.netAmount >= 0
-                        ? invoice.totalAmount.grossAmount
-                        : -1 * invoice.totalAmount.netAmount,
-                  },
-                }));
-                setItems(newItems);
-                setTotalPrice(calculateTotal(newItems));
-                if (invoice.partialInvoices && invoice.partialInvoices.length) {
-                  setNewPartialTotal(
-                    invoice.totalAmount.netAmount /
-                      10 ** invoice.totalAmount.fractionDigits!,
-                  );
-                } else {
-                  setNewPartialTotal(calculateTotal(newItems));
-                }
-              }
-            }
-          } else if (
-            (isCreditNote && isFetchedCreditNoteArticle) ||
-            !items.length
-          ) {
-            const article = [
-              articleViewToItem(creditNoteArticleResource.data[0]),
-            ];
-            if (article[0].articleId !== invoice.id) {
-              const newItems = article.map((articleItem) => ({
-                ...articleItem,
-                unitAmount: {
-                  ...articleItem.unitAmount,
-                  netAmount: -1 * invoice.totalAmount.netAmount,
-                  grossAmount: -1 * invoice.totalAmount.grossAmount,
-                },
-              }));
-              setItems(newItems);
-              setTotalPrice(calculateTotal(newItems));
-            }
+            setNewPartialTotal(calculateTotal(newItems));
+            setItemsAndCalculatePrice(newItems);
           }
-        } else if (invoice.type === 'PARTIAL') {
-          if (isPartial && isFetched) {
-            if (!partialArticleResource.data.length) {
-              createPartial();
-            } else {
-              const newItems = invoice.items.map(
-                (i): InvoiceItemRecord<Amount> => ({
-                  articleId: i.article.id,
-                  description: i.description || i.article.description,
-                  name: i.name || i.article.name,
-                  articleUnit: i.article.unit,
-                  quantity: i.quantity,
-                  unitAmount: invoice.totalAmount,
-                }),
-              );
-              setNewPartialTotal(calculateTotal(newItems));
-              setItems(newItems);
-              setTotalPrice(calculateTotal(newItems));
-            }
-          } else if (isCreditNote && isFetchedCreditNoteArticle) {
-            const article = [
-              articleViewToItem(creditNoteArticleResource.data[0]),
-            ];
-            if (article[0].articleId !== invoice.id || !items.length) {
-              const newItems = article.map((articleItem) => ({
-                ...articleItem,
-                unitAmount: {
-                  ...articleItem.unitAmount,
-                  netAmount: -1 * invoice.totalAmount.netAmount,
-                  grossAmount: -1 * invoice.totalAmount.grossAmount,
-                },
-              }));
-              setItems(newItems);
-              setTotalPrice(calculateTotal(newItems));
-            }
-          } else if (!isPartial && !isCreditNote) {
-            setItems([]);
-          }
-        } else if (invoice.type === 'CREDIT_NOTE') {
-          if ((isCreditNote && isFetchedCreditNoteArticle) || !items.length) {
-            const article = [
-              articleViewToItem(creditNoteArticleResource.data[0]),
-            ];
+        } else if (isCreditNote && isFetchedCreditNoteArticle) {
+          createCreditArticleResource(invoice);
+        } else if (!isPartial && !isCreditNote) {
+          setItems([]);
+        }
+      } else if (invoice.type === 'CREDIT_NOTE') {
+        if (isCreditNote && isFetchedCreditNoteArticle) {
+          createCreditArticleResource(invoice);
+        } else if ((isPartial && isFetched) || !items.length) {
+          if (!partialArticleResource.data.length) {
+            createPartial();
+          } else {
+            const article = [articleViewToItem(partialArticleResource.data[0])];
             if (article[0].articleId !== invoice.id) {
               const newItems = article.map((articleItem) => ({
                 ...articleItem,
                 unitAmount: {
                   ...articleItem.unitAmount,
                   netAmount:
-                    invoice.totalAmount.netAmount > 0
-                      ? -1 * invoice.totalAmount.netAmount
+                    invoice.type === 'CREDIT_NOTE'
+                      ? 0
                       : invoice.totalAmount.netAmount,
                   grossAmount:
-                    invoice.totalAmount.netAmount > 0
-                      ? -1 * invoice.totalAmount.grossAmount
-                      : invoice.totalAmount.grossAmount,
+                    invoice.type === 'CREDIT_NOTE'
+                      ? 0
+                      : invoice.totalAmount.netAmount,
                 },
               }));
-              setItems(newItems);
-              setTotalPrice(calculateTotal(newItems));
+              setNewPartialTotal(calculateTotal(newItems));
+              setItemsAndCalculatePrice(newItems);
             }
-          } else if ((isPartial && isFetched) || !items.length) {
-            if (!partialArticleResource.data.length) {
-              createPartial();
-            } else {
-              const article = [
-                articleViewToItem(partialArticleResource.data[0]),
-              ];
-              if (article[0].articleId !== invoice.id) {
-                const newItems = article.map((articleItem) => ({
-                  ...articleItem,
-                  unitAmount: {
-                    ...articleItem.unitAmount,
-                    netAmount:
-                      invoice.type === 'CREDIT_NOTE'
-                        ? -1 * invoice.totalAmount.netAmount
-                        : invoice.totalAmount.netAmount,
-                    grossAmount:
-                      invoice.type === 'CREDIT_NOTE'
-                        ? -1 * invoice.totalAmount.grossAmount
-                        : invoice.totalAmount.netAmount,
-                  },
-                }));
-                setNewPartialTotal(calculateTotal(newItems));
-                setItems(newItems);
-                setTotalPrice(calculateTotal(newItems));
-              }
-            }
-          } else if (!isPartial && !isCreditNote) {
-            setItems([]);
           }
+        } else if (!isPartial && !isCreditNote) {
+          setItems([]);
         }
       }
     }
-  }, [isPartial, isCreditNote, createPartial, invoiceType]);
+  }, [
+    isPartial,
+    isCreditNote,
+    createPartial,
+    invoice?.type,
+    isFetched,
+    isFetchedCreditNoteArticle,
+  ]);
   const renderHeader = () => (
     <Box
       px=".5em"
