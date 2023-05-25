@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
@@ -16,14 +17,15 @@ interface Props<T> {
   index: number;
   deleteItem: (item: T) => void;
   setItems: React.Dispatch<React.SetStateAction<T[]>>;
-  total: number;
-  setTotal: Dispatch<SetStateAction<number>>;
+  totalPrice: number;
+  setTotalPrice: Dispatch<SetStateAction<number>>;
   isPartial?: boolean;
   isCreditNote?: boolean;
   currencySymbol?: string;
-  previousInvoicedTotal: number;
   partialPrice: number;
   setPartialPrice: Dispatch<SetStateAction<number>>;
+  newPartialTotal: number;
+  setNewPartialTotal: Dispatch<SetStateAction<number>>;
 }
 
 export const ArticleItemRow = ({
@@ -31,14 +33,15 @@ export const ArticleItemRow = ({
   index,
   deleteItem,
   setItems,
-  total,
-  setTotal,
+  totalPrice,
+  setTotalPrice,
   isPartial,
   isCreditNote,
   currencySymbol,
-  previousInvoicedTotal,
   partialPrice,
   setPartialPrice,
+  newPartialTotal,
+  setNewPartialTotal,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -51,8 +54,6 @@ export const ArticleItemRow = ({
     articleItem.unitAmount.netAmount /
       10 ** articleItem.unitAmount.fractionDigits!,
   );
-
-  const [newTotal, setNewTotal] = useState<number>(total);
 
   const handleDescriptionChange = (e: any) => {
     setDescription(e.target.value);
@@ -68,59 +69,82 @@ export const ArticleItemRow = ({
 
   const handlePartialPriceChange = (e: any) => {
     setPartialPrice(Number(e.target.value));
-    setPrice(Number(e.target.value));
   };
 
   const handleTotalChange = (e: any) => {
-    setNewTotal(Number(e.target.value));
+    setTotalPrice(Number(e.target.value));
+  };
+
+  const handleNewPartialTotalChange = (e: any) => {
+    setNewPartialTotal(Number(e.target.value));
   };
 
   useEffect(() => {
     articleItem.quantity = quantity;
 
     setItems((prev) =>
-      prev.map((item) =>
-        item.articleId === articleItem.articleId ? articleItem : item,
-      ),
+      prev.map((item) => {
+        if (item.articleId === articleItem.articleId) {
+          return {
+            ...item,
+            quantity: articleItem.quantity,
+          };
+        }
+        return item;
+      }),
     );
-    setTotal(Number(newTotal));
-  }, [quantity, newTotal]);
-
-  useEffect(() => {
-    if (description) articleItem.description = description;
-    else articleItem.description = ' ';
-
-    setItems((prev) =>
-      prev.map((item) =>
-        item.articleId === articleItem.articleId ? articleItem : item,
-      ),
-    );
-  }, [description]);
+  }, [quantity]);
 
   useEffect(() => {
     articleItem.name = name;
 
     setItems((prev) =>
-      prev.map((item) =>
-        item.articleId === articleItem.articleId ? articleItem : item,
-      ),
+      prev.map((item) => {
+        if (item.articleId === articleItem.articleId) {
+          return {
+            ...item,
+            name: articleItem.name,
+          };
+        }
+        return item;
+      }),
     );
   }, [name]);
 
   useEffect(() => {
-    articleItem.unitAmount.netAmount =
-      price * 10 ** articleItem.unitAmount.fractionDigits!;
-    articleItem.unitAmount.vat =
-      price *
-      (articleItem.unitAmount.percentageVat / 100) *
-      10 ** articleItem.unitAmount.fractionDigits!;
+    articleItem.description = description;
 
     setItems((prev) =>
-      prev.map((item) =>
-        item.articleId === articleItem.articleId ? articleItem : item,
-      ),
+      prev.map((item) => {
+        if (item.articleId === articleItem.articleId) {
+          return {
+            ...item,
+            description: articleItem.description,
+          };
+        }
+        return item;
+      }),
     );
-  }, [price]);
+  }, [description]);
+
+  useEffect(() => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.articleId === articleItem.articleId) {
+          return {
+            ...item,
+            unitAmount: {
+              ...item.unitAmount,
+              netAmount: isPartial
+                ? partialPrice * 10 ** item.unitAmount.fractionDigits!
+                : price * 10 ** item.unitAmount.fractionDigits!,
+            },
+          };
+        }
+        return item;
+      }),
+    );
+  }, [price, partialPrice]);
 
   return (
     <Box boxShadow="0px 4px 15px 0px #90909033" py="1em">
@@ -158,11 +182,13 @@ export const ArticleItemRow = ({
             />
           )}
         </Box>
+
         {isPartial && (
           <>
             <TextField
               value={
-                newTotal * (1 + articleItem.unitAmount.percentageVat / 100)
+                (isPartial ? newPartialTotal : totalPrice) *
+                (1 + articleItem.unitAmount.percentageVat / 100)
               }
               size="small"
               disabled
@@ -176,8 +202,10 @@ export const ArticleItemRow = ({
             />
             <TextField
               type="number"
-              value={newTotal.toString()}
-              onChange={handleTotalChange}
+              value={isPartial ? newPartialTotal : totalPrice}
+              onChange={
+                isPartial ? handleNewPartialTotalChange : handleTotalChange
+              }
               size="small"
               InputProps={{
                 startAdornment: (
@@ -188,7 +216,7 @@ export const ArticleItemRow = ({
               }}
             />
             <TextField
-              value={newTotal - previousInvoicedTotal - partialPrice}
+              value={isPartial ? newPartialTotal - partialPrice : totalPrice}
               size="small"
               disabled
               InputProps={{
@@ -203,7 +231,7 @@ export const ArticleItemRow = ({
         )}
 
         <TextField
-          value={isPartial ? partialPrice.toString() : price.toString()}
+          value={isPartial ? partialPrice : price}
           type="number"
           onChange={isPartial ? handlePartialPriceChange : handlePriceChange}
           size="small"
@@ -215,6 +243,7 @@ export const ArticleItemRow = ({
             ),
           }}
         />
+
         {!isPartial && !isCreditNote && (
           <>
             <TextField
@@ -238,7 +267,7 @@ export const ArticleItemRow = ({
               disabled
             />
             <TextField
-              value={price * quantity}
+              value={(price * quantity).toFixed(2)}
               size="small"
               disabled
               InputProps={{

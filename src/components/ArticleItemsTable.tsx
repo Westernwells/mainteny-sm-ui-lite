@@ -1,11 +1,4 @@
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import {Dispatch, SetStateAction, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -16,7 +9,7 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import {TabItems, Tabs} from 'components/Tab';
 import {TabsBody} from 'components/TabsBody';
 import {QuotationItemRecord} from 'models/quotation';
-import {InvoiceItemRecord} from 'models/invoice';
+import {InvoiceItemRecord, InvoiceView} from 'models/invoice';
 import {Amount} from 'models/misc';
 import {ArticleType, ArticleView} from 'models/article';
 import {
@@ -29,8 +22,9 @@ import {
   getCurrencySymbol,
 } from 'utils/currency';
 import {createEmptyResource} from 'utils/paging-utils';
-import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useFetchServiceOrderInvoices} from 'hooks/reactQuery/useInvoice';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {calculateTotal} from 'utils/calculate-total';
 import {ArticleItemRow} from './ArticleItemRow';
 import {Button} from './Button';
 import {FormLabel} from './form/FormLabel';
@@ -42,25 +36,27 @@ import {FormInput} from './form/FormInput';
 import {SearchInput} from './SearchInput';
 
 interface Props<T> {
+  invoice?: InvoiceView | undefined;
   items: T[];
   setItems: Dispatch<SetStateAction<T[]>>;
   propertyOwnerId: string;
   isPartial?: boolean;
   isCreditNote?: boolean;
   unitSellingAmount?: Amount;
-  serviceOrderId?: string;
   invoiceType?: string;
+  serviceOrderId?: string;
 }
 
 export const ArticleItemsTable = ({
+  invoice,
   items,
   setItems,
   propertyOwnerId,
   isPartial,
   isCreditNote,
   unitSellingAmount,
-  serviceOrderId,
   invoiceType,
+  serviceOrderId,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -101,66 +97,51 @@ export const ArticleItemsTable = ({
     {},
     true,
   );
-  const {data: invoices = []} = useFetchServiceOrderInvoices(serviceOrderId, {
-    enabled: !!serviceOrderId && isPartial,
-  });
-
-  const previousInvoicedTotal = useMemo(
-    () =>
-      invoices
-        .map(
-          (invoice) =>
-            invoice.totalAmount.netAmount /
-            10 ** invoice.totalAmount.fractionDigits!,
-        )
-        .reduce((acc, curr) => acc + curr, 0),
-    [invoices],
-  );
 
   const {mutate: createPartial} = useCreatePartialArticle();
 
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
 
   const [totalPrice, setTotalPrice] = useState(0);
-
-  const [total, setTotal] = useState(0);
-
   const [partialPrice, setPartialPrice] = useState<number>(0);
 
-  const getItemRecord = useCallback(
-    (record: QuotationItemRecord | InvoiceItemRecord<Amount>) => {
-      const {netAmount} = record.unitAmount;
-      const vat =
-        (percentageVat * netAmount) / 10 ** record.unitAmount.fractionDigits;
-      return {
-        ...record,
-        unitAmount: {
-          ...record.unitAmount,
-          netAmount,
-          percentageVat,
-          vat,
-          grossAmount: netAmount + vat,
-        },
-      };
-    },
-    [percentageVat],
-  );
+  const [newPartialTotal, setNewPartialTotal] = useState(0);
 
-  const articleViewToItem = useCallback(
-    (article: ArticleView): QuotationItemRecord | InvoiceItemRecord<Amount> => {
-      const record = {
-        articleId: article.id,
-        articleUnit: article.unit,
-        description: article.description,
-        name: article.name,
-        quantity: 1,
-        unitAmount: article.unitSellingAmount,
-      };
-      return getItemRecord(record);
-    },
-    [getItemRecord],
-  );
+  const {data: invoices = []} = useFetchServiceOrderInvoices(serviceOrderId, {
+    enabled: !!serviceOrderId && isPartial,
+  });
 
+  const getItemRecord = (
+    record: QuotationItemRecord | InvoiceItemRecord<Amount>,
+  ) => {
+    const {netAmount} = record.unitAmount;
+    const vat =
+      (percentageVat * netAmount) / 10 ** record.unitAmount.fractionDigits;
+    return {
+      ...record,
+      unitAmount: {
+        ...record.unitAmount,
+        netAmount,
+        percentageVat,
+        vat,
+        grossAmount: netAmount + vat,
+      },
+    };
+  };
+
+  const articleViewToItem = (
+    article: ArticleView,
+  ): QuotationItemRecord | InvoiceItemRecord<Amount> => {
+    const record = {
+      articleId: article.id,
+      articleUnit: article.unit,
+      description: article.description,
+      name: article.name,
+      quantity: 1,
+      unitAmount: article.unitSellingAmount,
+    };
+    return getItemRecord(record);
+  };
   const tabItems: TabItems[] = useMemo(() => {
     const tItems = [
       {
@@ -193,57 +174,194 @@ export const ArticleItemsTable = ({
   };
 
   useEffect(() => {
-    const result = items.map((item) => getItemRecord(item));
-    setItems(result);
-  }, [percentageVat]);
+    setTotalPrice(calculateTotal(items));
+  }, [items]);
 
   useEffect(() => {
-    if (isPartial && isFetched) {
-      if (!partialArticleResource.data.length) {
-        createPartial();
-      } else {
-        const article = partialArticleResource.data[0];
-        if (
-          (items.length && article.id !== items[0].articleId) ||
-          !items.length
-        ) {
+    if (invoices) {
+      if (!invoice) {
+        if (isPartial && isFetched) {
+          if (!partialArticleResource.data.length) {
+            createPartial();
+          }
+          const article = partialArticleResource.data[0];
+          setNewPartialTotal(calculateTotal([articleViewToItem(article)]));
           setItems([articleViewToItem(article)]);
+          setTotalPrice(calculateTotal([articleViewToItem(article)]));
+        } else if (isCreditNote && isFetchedCreditNoteArticle) {
+          const article = [
+            articleViewToItem(creditNoteArticleResource.data[0]),
+          ];
+          setNewPartialTotal(calculateTotal(article));
+          setItems(article);
+          setTotalPrice(calculateTotal(article));
+        } else if (!isPartial && !isCreditNote) {
+          setItems([]);
+        }
+      } else if (invoice) {
+        if (invoice.type === 'FULL') {
+          if (!isPartial && !isCreditNote) {
+            const newItems = invoice.items.map(
+              (i): InvoiceItemRecord<Amount> => ({
+                articleId: i.article.id,
+                description: i.description || i.article.description,
+                name: i.name || i.article.name,
+                articleUnit: i.article.unit,
+                quantity: i.quantity,
+                unitAmount: i.unitAmount,
+              }),
+            );
+            setItems(newItems);
+            setTotalPrice(calculateTotal(newItems));
+          } else if (isPartial && isFetched) {
+            if (!partialArticleResource.data.length || !items.length) {
+              createPartial();
+            } else {
+              const article = [
+                articleViewToItem(partialArticleResource.data[0]),
+              ];
+              if (article[0].articleId !== invoice.id || !items.length) {
+                const newItems = article.map((articleItem) => ({
+                  ...articleItem,
+                  unitAmount: {
+                    ...articleItem.unitAmount,
+                    netAmount:
+                      invoice.totalAmount.netAmount >= 0
+                        ? invoice.totalAmount.netAmount
+                        : -1 * invoice.totalAmount.netAmount,
+                    grossAmount:
+                      invoice.totalAmount.netAmount >= 0
+                        ? invoice.totalAmount.grossAmount
+                        : -1 * invoice.totalAmount.netAmount,
+                  },
+                }));
+                setItems(newItems);
+                setTotalPrice(calculateTotal(newItems));
+                if (invoice.partialInvoices && invoice.partialInvoices.length) {
+                  setNewPartialTotal(
+                    invoice.totalAmount.netAmount /
+                      10 ** invoice.totalAmount.fractionDigits!,
+                  );
+                } else {
+                  setNewPartialTotal(calculateTotal(newItems));
+                }
+              }
+            }
+          } else if (
+            (isCreditNote && isFetchedCreditNoteArticle) ||
+            !items.length
+          ) {
+            const article = [
+              articleViewToItem(creditNoteArticleResource.data[0]),
+            ];
+            if (article[0].articleId !== invoice.id) {
+              const newItems = article.map((articleItem) => ({
+                ...articleItem,
+                unitAmount: {
+                  ...articleItem.unitAmount,
+                  netAmount: -1 * invoice.totalAmount.netAmount,
+                  grossAmount: -1 * invoice.totalAmount.grossAmount,
+                },
+              }));
+              setItems(newItems);
+              setTotalPrice(calculateTotal(newItems));
+            }
+          }
+        } else if (invoice.type === 'PARTIAL') {
+          if (isPartial && isFetched) {
+            if (!partialArticleResource.data.length) {
+              createPartial();
+            } else {
+              const newItems = invoice.items.map(
+                (i): InvoiceItemRecord<Amount> => ({
+                  articleId: i.article.id,
+                  description: i.description || i.article.description,
+                  name: i.name || i.article.name,
+                  articleUnit: i.article.unit,
+                  quantity: i.quantity,
+                  unitAmount: invoice.totalAmount,
+                }),
+              );
+              setNewPartialTotal(calculateTotal(newItems));
+              setItems(newItems);
+              setTotalPrice(calculateTotal(newItems));
+            }
+          } else if (isCreditNote && isFetchedCreditNoteArticle) {
+            const article = [
+              articleViewToItem(creditNoteArticleResource.data[0]),
+            ];
+            if (article[0].articleId !== invoice.id || !items.length) {
+              const newItems = article.map((articleItem) => ({
+                ...articleItem,
+                unitAmount: {
+                  ...articleItem.unitAmount,
+                  netAmount: -1 * invoice.totalAmount.netAmount,
+                  grossAmount: -1 * invoice.totalAmount.grossAmount,
+                },
+              }));
+              setItems(newItems);
+              setTotalPrice(calculateTotal(newItems));
+            }
+          } else if (!isPartial && !isCreditNote) {
+            setItems([]);
+          }
+        } else if (invoice.type === 'CREDIT_NOTE') {
+          if ((isCreditNote && isFetchedCreditNoteArticle) || !items.length) {
+            const article = [
+              articleViewToItem(creditNoteArticleResource.data[0]),
+            ];
+            if (article[0].articleId !== invoice.id) {
+              const newItems = article.map((articleItem) => ({
+                ...articleItem,
+                unitAmount: {
+                  ...articleItem.unitAmount,
+                  netAmount:
+                    invoice.totalAmount.netAmount > 0
+                      ? -1 * invoice.totalAmount.netAmount
+                      : invoice.totalAmount.netAmount,
+                  grossAmount:
+                    invoice.totalAmount.netAmount > 0
+                      ? -1 * invoice.totalAmount.grossAmount
+                      : invoice.totalAmount.grossAmount,
+                },
+              }));
+              setItems(newItems);
+              setTotalPrice(calculateTotal(newItems));
+            }
+          } else if ((isPartial && isFetched) || !items.length) {
+            if (!partialArticleResource.data.length) {
+              createPartial();
+            } else {
+              const article = [
+                articleViewToItem(partialArticleResource.data[0]),
+              ];
+              if (article[0].articleId !== invoice.id) {
+                const newItems = article.map((articleItem) => ({
+                  ...articleItem,
+                  unitAmount: {
+                    ...articleItem.unitAmount,
+                    netAmount:
+                      invoice.type === 'CREDIT_NOTE'
+                        ? -1 * invoice.totalAmount.netAmount
+                        : invoice.totalAmount.netAmount,
+                    grossAmount:
+                      invoice.type === 'CREDIT_NOTE'
+                        ? -1 * invoice.totalAmount.grossAmount
+                        : invoice.totalAmount.netAmount,
+                  },
+                }));
+                setNewPartialTotal(calculateTotal(newItems));
+                setItems(newItems);
+                setTotalPrice(calculateTotal(newItems));
+              }
+            }
+          } else if (!isPartial && !isCreditNote) {
+            setItems([]);
+          }
         }
       }
-    } else if (isCreditNote && isFetchedCreditNoteArticle) {
-      const article = creditNoteArticleResource.data[0];
-      if (
-        (items.length && article && article.id !== items[0].articleId) ||
-        !items.length
-      ) {
-        setItems([
-          articleViewToItem({
-            ...article,
-            unitSellingAmount: unitSellingAmount
-              ? {
-                  ...unitSellingAmount,
-                  netAmount: -unitSellingAmount.netAmount,
-                  grossAmount: -unitSellingAmount.grossAmount,
-                }
-              : article.unitSellingAmount,
-          }),
-        ]);
-      }
     }
-  }, [
-    isPartial,
-    isCreditNote,
-    articleViewToItem,
-    items,
-    createPartial,
-    isFetched,
-    isFetchedCreditNoteArticle,
-    setItems,
-    partialArticleResource.data,
-    creditNoteArticleResource.data,
-    unitSellingAmount,
-  ]);
-
+  }, [isPartial, isCreditNote, createPartial, invoiceType]);
   const renderHeader = () => (
     <Box
       px=".5em"
@@ -310,32 +428,6 @@ export const ArticleItemsTable = ({
     </Box>
   );
 
-  useEffect(() => {
-    if (items.length) {
-      const sum = 0;
-
-      if (invoiceType === 'FULL' || invoiceType === undefined) {
-        setTotalPrice(
-          items
-            .map(
-              (item) =>
-                item.quantity *
-                (item.unitAmount.netAmount /
-                  10 ** item.unitAmount.fractionDigits!),
-            )
-            .reduce((prevValue, currentValue) => prevValue + currentValue, sum),
-        );
-      }
-    }
-  }, [items]);
-
-  useEffect(() => {
-    if (total === 0) setTotal(totalPrice);
-    if (invoiceType !== 'PARTIAL') {
-      setPartialPrice(0);
-    }
-  }, [totalPrice, total, invoiceType]);
-
   return (
     <Box mt="1em">
       <FormLabel text="Articles" />
@@ -366,14 +458,15 @@ export const ArticleItemsTable = ({
               setItems={setItems}
               isPartial={isPartial}
               isCreditNote={isCreditNote}
-              total={totalPrice}
-              setTotal={setTotal}
+              totalPrice={totalPrice}
+              setTotalPrice={setTotalPrice}
               currencySymbol={
                 isCreditNote ? getCurrencySymbol[currencyCode] : ''
               }
-              previousInvoicedTotal={previousInvoicedTotal || 0}
               partialPrice={partialPrice}
               setPartialPrice={setPartialPrice}
+              newPartialTotal={newPartialTotal}
+              setNewPartialTotal={setNewPartialTotal}
             />
           ))}
           {items.length ? (
@@ -412,9 +505,12 @@ export const ArticleItemsTable = ({
                       </Typography>
 
                       <Typography sx={{justifySelf: 'end'}}>
-                        {formatCurrency(total, {
-                          currency: currencyCode,
-                        })}
+                        {formatCurrency(
+                          isPartial ? newPartialTotal : totalPrice,
+                          {
+                            currency: currencyCode,
+                          },
+                        )}
                       </Typography>
                     </>
                   )}

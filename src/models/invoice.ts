@@ -38,6 +38,7 @@ export enum InvoiceStatusView {
 }
 
 export interface InvoiceItem {
+  totalAmount: Amount;
   article: ArticleView;
   data: string;
   description: string;
@@ -118,6 +119,7 @@ export interface InvoiceView {
   paymentTerms: string;
   overdueNotices: InvoiceOverdueNoticeSimpleView[];
   commentCount?: number;
+  partialInvoices?: InvoiceItem[];
 }
 
 export interface QueryInvoiceParams {
