@@ -1,19 +1,21 @@
 import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
-import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
 import useTheme from '@mui/material/styles/useTheme';
+import EditIcon from '@mui/icons-material/Edit';
+import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
+import CancelIcon from '@mui/icons-material/Cancel';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
+import {FormInput} from 'components/form/FormInput';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {ElevatorView} from 'models/elevator';
 import {useState} from 'react';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
-import {FileResource, FileResourceRecord} from 'models/media';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmptySection} from 'components/EmptySection';
 import {olStyles} from 'styles';
@@ -21,17 +23,13 @@ import {olStyles} from 'styles';
 interface Props {
   elevator: ElevatorView;
   propertyOwnerId?: string;
-  elevatorPictures?: FileResource[];
 }
 
-export const Pictures = ({
-  elevator,
-  propertyOwnerId,
-  elevatorPictures = [],
-}: Props) => {
+export const Pictures = ({elevator, propertyOwnerId}: Props) => {
   const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
-  const [show, setShow] = useState('');
+  const [editingFileId, setEditingFileId] = useState('');
+  const [fileName, setFileName] = useState('');
   const theme = useTheme();
   const {user} = useUserSession();
   const [acceptedFiles, setAcceptedFiles] = useState<FileWithPreview[]>([]);
@@ -60,7 +58,7 @@ export const Pictures = ({
       body: {
         propertyOwnerId,
         pictures: [
-          ...(elevatorPictures as FileResourceRecord[]),
+          ...elevator.additionalInfo.pictures,
           ...acceptedFiles.map((item) => ({
             description: item.name.split('.')[0],
             type: item.type,
@@ -75,13 +73,43 @@ export const Pictures = ({
   };
 
   const onDeletePicture = async (id: string) => {
+    const filteredPictures = elevator.additionalInfo.pictures.filter(
+      (pic) => pic.id !== id,
+    );
     await updateElevator({
       elevatorId: elevator.id,
       body: {
         propertyOwnerId,
-        pictures: elevatorPictures.filter((pic) => pic.id !== id),
+        pictures: filteredPictures,
       },
     });
+  };
+
+  const handleFileNameChange = (fileId?: string) => {
+    if (fileId) {
+      const file = elevator.additionalInfo.pictures.find(
+        (p) => p.id === fileId,
+      );
+      setFileName(file?.description ?? '');
+      setEditingFileId(fileId);
+    } else {
+      setEditingFileId('');
+      setFileName('');
+    }
+  };
+
+  const onSaveFileName = async (fileId: string) => {
+    const updatedPictures = elevator.additionalInfo.pictures.map((p) =>
+      p.id === fileId ? {...p, description: fileName} : p,
+    );
+    await updateElevator({
+      elevatorId: elevator.id,
+      body: {
+        propertyOwnerId,
+        pictures: updatedPictures,
+      },
+    });
+    handleFileNameChange();
   };
 
   const renderEmptySection = () => (
@@ -135,84 +163,95 @@ export const Pictures = ({
       header={<Typography variant="subtitle1">{t('Pictures')}</Typography>}>
       {isEmpty ? (
         renderEmptySection()
-      ) : (
-        <Grid container spacing={1} sx={{mt: '0.5em'}}>
-          {elevator.additionalInfo.pictures &&
-            elevator.additionalInfo.pictures.map((item, index) => (
-              <Grid
-                item
-                xs={6}
-                sm={4}
-                key={index}
-                sx={{
-                  height: 120,
-                  [theme.breakpoints.down('md')]: {
-                    height: 170,
-                  },
-                }}
-                onMouseEnter={() => setShow(item.id)}
-                onMouseLeave={() => setShow('')}>
-                <Box
-                  sx={{
-                    border: `1px solid ${theme.palette.text.disabled}`,
-                    height: '70%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}>
-                  <Box
-                    sx={{
-                      flexGrow: 1,
-                      height: 0,
-                      cursor: 'pointer',
-                      position: 'relative',
-                    }}>
-                    {show === item.id && (
-                      <IconButton
-                        onClick={() => onDeletePicture(item.id)}
-                        sx={{
-                          position: 'absolute',
-                          width: '100%',
-                          height: '100%',
-                          borderRadius: 0,
-                          color: 'white',
-                          backgroundColor: 'rgba(34, 43, 69, 0.42)',
-                        }}
-                        disableRipple>
-                        <DeleteIcon />
-                      </IconButton>
-                    )}
-                    <img
-                      alt=""
-                      src={downloadUrls[item.uri]}
-                      style={{
-                        objectFit: 'cover',
-                        objectPosition: 'top',
-                        width: '100%',
-                        height: '100%',
+      ) : elevator.additionalInfo.pictures.length ? (
+        <Box display="flex" flexDirection="column">
+          {elevator.additionalInfo.pictures.map((picture) => (
+            <Box
+              key={picture.id}
+              display="flex"
+              alignItems="center"
+              py="0.5rem">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                border={`1px solid ${theme.palette.text.disabled}`}
+                borderRadius={1}>
+                <img
+                  alt=""
+                  width={72}
+                  height="100%"
+                  src={downloadUrls[picture.uri]}
+                  style={{objectFit: 'cover'}}
+                />
+              </Box>
+
+              {editingFileId === picture.id ? (
+                <Box sx={{display: 'flex'}}>
+                  <FormInput
+                    props={{
+                      value: fileName,
+                      size: 'small',
+                      sx: {ml: '0.1rem'},
+                      type: 'text',
+                      onChange: (e) => setFileName(e.target.value),
+                    }}
+                  />
+                  <IconButton
+                    onClick={() => onSaveFileName(picture.id)}
+                    edge="start"
+                    sx={{ml: '0.1rem'}}>
+                    <CheckCircleRounded
+                      sx={{
+                        color: theme.palette.primary.main,
+                        fontSize: '1.2rem',
                       }}
                     />
-                  </Box>
+                  </IconButton>
+
+                  <IconButton
+                    onClick={() => handleFileNameChange()}
+                    edge="start">
+                    <CancelIcon
+                      sx={{
+                        color: theme.palette.primary.main,
+                        fontSize: '1.2rem',
+                      }}
+                    />
+                  </IconButton>
                 </Box>
-                {item.description ? (
-                  <Typography
-                    component="div"
-                    variant="subtitle2"
-                    color="text.secondary"
-                    sx={{
-                      overflow: 'hidden',
-                      display: '-webkit-box',
-                      maxWidth: '100%',
-                      WebkitLineClamp: '2',
-                      WebkitBoxOrient: 'vertical',
-                      height: '20%',
-                    }}>
-                    {item.description}
-                  </Typography>
-                ) : null}
-              </Grid>
-            ))}
-        </Grid>
-      )}
+              ) : (
+                <>
+                  <Box display="flex">
+                    <Typography
+                      variant="body1"
+                      pl={2}
+                      pr={1.75}
+                      sx={{
+                        wordBreak: 'break-word',
+                        overflowWrap: 'anywhere',
+                      }}>
+                      {picture.description}
+                    </Typography>
+                    <IconButton
+                      onClick={() => handleFileNameChange(picture.id)}
+                      edge="start">
+                      <EditIcon sx={{mt: '-0.2rem', fontSize: '1rem'}} />
+                    </IconButton>
+                  </Box>
+
+                  <IconButton
+                    size="small"
+                    onClick={() => onDeletePicture(picture.id)}
+                    sx={{ml: 'auto'}}>
+                    <DeleteIcon />
+                  </IconButton>
+                </>
+              )}
+            </Box>
+          ))}
+        </Box>
+      ) : null}
 
       <Dialog
         title="Add Pictures"
