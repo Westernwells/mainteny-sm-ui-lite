@@ -12,6 +12,7 @@ import {
   LinearProgress,
   Tab,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
 import {TabContext, TabList, TabPanel} from '@mui/lab';
 import {addDays, endOfDay, startOfDay} from 'date-fns';
@@ -287,6 +288,10 @@ export const Notifications = () => {
     setTabValue(newValue);
   };
 
+  const SmallScreens = useMediaQuery('(max-width:601px)');
+  const MediumScreens = useMediaQuery('(max-width:1025px)');
+  const LargerScreens = useMediaQuery('(max-width:2900px)');
+
   return (
     <>
       <Badge
@@ -318,7 +323,13 @@ export const Notifications = () => {
           justifyContent="space-between"
           alignItems="center"
           pt="1.25rem"
-          px="1rem">
+          px="1rem"
+          sx={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 10,
+            background: 'white',
+          }}>
           <Typography variant="h5" letterSpacing="normal" py="0.75rem">
             {t('Notifications')}
           </Typography>
@@ -349,7 +360,21 @@ export const Notifications = () => {
         )}
 
         <TabContext value={tabValue}>
-          <TabList onChange={handleChangeTab} variant="fullWidth">
+          <TabList
+            onChange={handleChangeTab}
+            variant="fullWidth"
+            sx={{
+              position: 'sticky',
+              zIndex: 10,
+              background: 'white',
+              top: SmallScreens
+                ? 44.125
+                : MediumScreens
+                ? 52.938
+                : LargerScreens
+                ? 71
+                : 0,
+            }}>
             {tabItems.map((item) => (
               <Tab
                 label={item.label}

@@ -195,7 +195,6 @@ export const OverviewTab = ({getUnitName}: Props) => {
           <Pictures
             elevator={elevator!}
             propertyOwnerId={elevator?.propertyOwner.id}
-            elevatorPictures={elevator?.additionalInfo.pictures}
           />
         </Grid>
 
@@ -211,7 +210,6 @@ export const OverviewTab = ({getUnitName}: Props) => {
           <Documents
             elevator={elevator!}
             propertyOwnerId={elevator?.propertyOwner.id}
-            elevatorDocuments={elevator?.additionalInfo.documents}
           />
         </Grid>
       </Grid>
