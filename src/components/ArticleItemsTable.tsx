@@ -9,7 +9,7 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import {TabItems, Tabs} from 'components/Tab';
 import {TabsBody} from 'components/TabsBody';
 import {QuotationItemRecord} from 'models/quotation';
-import {InvoiceItemRecord, InvoiceView} from 'models/invoice';
+import {InvoiceItemRecord, InvoiceType, InvoiceView} from 'models/invoice';
 import {Amount} from 'models/misc';
 import {ArticleType, ArticleView} from 'models/article';
 import {
@@ -22,7 +22,6 @@ import {
   getCurrencySymbol,
 } from 'utils/currency';
 import {createEmptyResource} from 'utils/paging-utils';
-// import {useFetchServiceOrderInvoices} from 'hooks/reactQuery/useInvoice';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {calculateTotal} from 'utils/calculate-total';
 import {ArticleItemRow} from './ArticleItemRow';
@@ -43,8 +42,6 @@ interface Props<T> {
   isPartial?: boolean;
   isCreditNote?: boolean;
   unitSellingAmount?: Amount;
-  // invoiceType?: string;
-  // serviceOrderId?: string;
 }
 
 export const ArticleItemsTable = ({
@@ -55,9 +52,7 @@ export const ArticleItemsTable = ({
   isPartial,
   isCreditNote,
   unitSellingAmount,
-}: // invoiceType,
-// serviceOrderId,
-Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
+}: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const currencyCode =
@@ -106,10 +101,6 @@ Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const [partialPrice, setPartialPrice] = useState<number>(0);
 
   const [newPartialTotal, setNewPartialTotal] = useState(0);
-
-  // const {data: invoices = []} = useFetchServiceOrderInvoices(serviceOrderId, {
-  //   enabled: !!serviceOrderId && isPartial,
-  // });
 
   const getItemRecord = (
     record: QuotationItemRecord | InvoiceItemRecord<Amount>,
@@ -221,7 +212,7 @@ Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
         setItems([]);
       }
     } else if (invoice) {
-      if (invoice.type === 'FULL') {
+      if (invoice.type === InvoiceType.FULL) {
         if (!isPartial && !isCreditNote) {
           const newItems = invoice.items.map(
             (i): InvoiceItemRecord<Amount> => ({
@@ -271,7 +262,7 @@ Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
         ) {
           createCreditArticleResource(invoice);
         }
-      } else if (invoice.type === 'PARTIAL') {
+      } else if (invoice.type === InvoiceType.PARTIAL) {
         if (isPartial && isFetched) {
           if (!partialArticleResource.data.length) {
             createPartial();
@@ -294,7 +285,7 @@ Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
         } else if (!isPartial && !isCreditNote) {
           setItems([]);
         }
-      } else if (invoice.type === 'CREDIT_NOTE') {
+      } else if (invoice.type === InvoiceType.CREDIT_NOTE) {
         if (isCreditNote && isFetchedCreditNoteArticle) {
           createCreditArticleResource(invoice);
         } else if ((isPartial && isFetched) || !items.length) {
@@ -308,11 +299,11 @@ Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
                 unitAmount: {
                   ...articleItem.unitAmount,
                   netAmount:
-                    invoice.type === 'CREDIT_NOTE'
+                    invoice.type === InvoiceType.CREDIT_NOTE
                       ? 0
                       : invoice.totalAmount.netAmount,
                   grossAmount:
-                    invoice.type === 'CREDIT_NOTE'
+                    invoice.type === InvoiceType.CREDIT_NOTE
                       ? 0
                       : invoice.totalAmount.netAmount,
                 },
