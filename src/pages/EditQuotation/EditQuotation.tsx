@@ -1,5 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import {useNavigate} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import Typography from '@mui/material/Typography';
@@ -47,6 +48,7 @@ export const EditQuotation = ({quotation}: Props) => {
   const formatDate = useFormatDate();
   const {t} = useTranslation();
 
+  const navigate = useNavigate();
   const {user} = useUserSession();
 
   const {mutate: updateQuotation} = useUpdateQuotation();
@@ -91,7 +93,11 @@ export const EditQuotation = ({quotation}: Props) => {
           quotationId: quotation.id,
         },
         {
-          onSuccess: () => setIsSendEmailDialogOpen(false),
+          onSuccess: () => {
+            setIsSendEmailDialogOpen(false);
+            const quotationId = quotation?.id;
+            navigate(`/quotations/details/${quotationId}`);
+          },
         },
       );
     },
