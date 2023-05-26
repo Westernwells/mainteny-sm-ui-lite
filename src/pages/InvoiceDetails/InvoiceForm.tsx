@@ -133,7 +133,7 @@ export const InvoiceForm = ({
     invoice ? new Date(invoice.dueDate) : null,
   );
 
-  const invoiceTyoeOptions = useRef([
+  const invoiceTypeOptions = useRef([
     {
       value: InvoiceType.FULL,
       label: 'Full',
@@ -235,21 +235,6 @@ export const InvoiceForm = ({
 
   useEffect(() => {
     if (invoice) {
-      if (formik.values.type === InvoiceType.FULL) {
-        setInvoiceItems(
-          invoice.items.map(
-            (i): InvoiceItemRecord<Amount> => ({
-              articleId: i.article.id,
-              description: i.description || i.article.description,
-              name: i.name || i.article.name,
-              articleUnit: i.article.unit,
-              quantity: i.quantity,
-              unitAmount: i.unitAmount,
-            }),
-          ),
-        );
-      }
-
       setServiceOrder(invoice.serviceOrder);
       setCustomer(invoice.serviceOrder?.elevator.propertyOwner);
     }
@@ -292,27 +277,6 @@ export const InvoiceForm = ({
         }),
         true,
       );
-
-      if (
-        !invoice &&
-        formik.values.type !== InvoiceType.PARTIAL &&
-        'articles' in serviceOrder &&
-        serviceOrder.articles.length
-      ) {
-        const items = serviceOrder.articles.map(
-          (i): InvoiceItemRecord<Amount> => ({
-            articleId: i.article.id,
-            articleUnit: i.article.unit,
-            description: i.description,
-            name: i.name,
-            quantity: i.quantity,
-            unitAmount: i.unitAmount,
-          }),
-        );
-        setInvoiceItems(items);
-      }
-    } else if (!invoice && formik.values.type !== InvoiceType.PARTIAL) {
-      setInvoiceItems([]);
     }
   }, [serviceOrder, formik.values.type]);
 
@@ -677,7 +641,7 @@ export const InvoiceForm = ({
               <RadioGroup
                 name="radio-buttons-group"
                 sx={{flexDirection: 'row'}}>
-                {invoiceTyoeOptions.map((option) => (
+                {invoiceTypeOptions.map((option) => (
                   <FormRadio
                     key={option.value}
                     name="type"
@@ -784,14 +748,13 @@ export const InvoiceForm = ({
             ))}
 
             <ArticleItemsTable
+              invoice={invoice}
               items={invoiceItems}
               setItems={setInvoiceItems}
               isPartial={!(formik.values.type !== InvoiceType.PARTIAL)}
               isCreditNote={formik.values.type === InvoiceType.CREDIT_NOTE}
               unitSellingAmount={invoice?.totalAmount}
-              serviceOrderId={formik.values.serviceOrderId}
               propertyOwnerId={customer?.id ?? ''}
-              invoiceType={formik.values.type}
             />
 
             <Box my="1.5em">
