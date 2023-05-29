@@ -199,6 +199,21 @@ export const ArticleItemsTable = ({
       setItemsAndCalculatePrice(newItems);
     }
   };
+
+  const setFinalAndFullArticles = (invoiceArg: InvoiceView) => {
+    const newItems = invoiceArg.items.map(
+      (i): InvoiceItemRecord<Amount> => ({
+        articleId: i.article.id,
+        description: i.description || i.article.description,
+        name: i.name || i.article.name,
+        articleUnit: i.article.unit,
+        quantity: i.quantity,
+        unitAmount: i.unitAmount,
+      }),
+    );
+    setItemsAndCalculatePrice(newItems);
+  };
+
   useEffect(() => {
     if (!invoice) {
       if (isPartial && isFetched) {
@@ -208,23 +223,55 @@ export const ArticleItemsTable = ({
         setArticleResourceAndPrice(partialArticleResource.data[0]);
       } else if (isCreditNote && isFetchedCreditNoteArticle) {
         setArticleResourceAndPrice(creditNoteArticleResource.data[0]);
-      } else if (!isPartial && !isCreditNote) {
+      } else if (!isPartial && !isCreditNote && InvoiceType.FULL) {
+        setItems([]);
+      } else if (!isPartial && !isCreditNote && InvoiceType.FINAL) {
         setItems([]);
       }
     } else if (invoice) {
-      if (invoice.type === InvoiceType.FULL) {
+      if (invoice.type === InvoiceType.FINAL) {
         if (!isPartial && !isCreditNote) {
-          const newItems = invoice.items.map(
-            (i): InvoiceItemRecord<Amount> => ({
-              articleId: i.article.id,
-              description: i.description || i.article.description,
-              name: i.name || i.article.name,
-              articleUnit: i.article.unit,
-              quantity: i.quantity,
-              unitAmount: i.unitAmount,
-            }),
-          );
-          setItemsAndCalculatePrice(newItems);
+          setFinalAndFullArticles(invoice);
+        } else if (isPartial && isFetched) {
+          if (!partialArticleResource.data.length || !items.length) {
+            createPartial();
+          } else {
+            const article = [articleViewToItem(partialArticleResource.data[0])];
+            if (article[0].articleId !== invoice.id || !items.length) {
+              const newItems = article.map((articleItem) => ({
+                ...articleItem,
+                unitAmount: {
+                  ...articleItem.unitAmount,
+                  netAmount:
+                    invoice.totalAmount.netAmount >= 0
+                      ? invoice.totalAmount.netAmount
+                      : -1 * invoice.totalAmount.netAmount,
+                  grossAmount:
+                    invoice.totalAmount.netAmount >= 0
+                      ? invoice.totalAmount.grossAmount
+                      : -1 * invoice.totalAmount.netAmount,
+                },
+              }));
+              setItemsAndCalculatePrice(newItems);
+              if (invoice.partialInvoices && invoice.partialInvoices.length) {
+                setNewPartialTotal(
+                  invoice.totalAmount.netAmount /
+                    10 ** invoice.totalAmount.fractionDigits!,
+                );
+              } else {
+                setNewPartialTotal(calculateTotal(newItems));
+              }
+            }
+          }
+        } else if (
+          (isCreditNote && isFetchedCreditNoteArticle) ||
+          !items.length
+        ) {
+          createCreditArticleResource(invoice);
+        }
+      } else if (invoice.type === InvoiceType.FULL) {
+        if (!isPartial && !isCreditNote) {
+          setFinalAndFullArticles(invoice);
         } else if (isPartial && isFetched) {
           if (!partialArticleResource.data.length || !items.length) {
             createPartial();
