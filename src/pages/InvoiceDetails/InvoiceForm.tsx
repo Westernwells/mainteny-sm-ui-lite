@@ -135,6 +135,10 @@ export const InvoiceForm = ({
 
   const invoiceTypeOptions = useRef([
     {
+      value: InvoiceType.FINAL,
+      label: 'Final',
+    },
+    {
       value: InvoiceType.FULL,
       label: 'Full',
     },
@@ -241,7 +245,7 @@ export const InvoiceForm = ({
 
     formik.setFieldValue(
       'type',
-      invoiceType || invoice?.type || InvoiceType.FULL,
+      invoiceType || invoice?.type || InvoiceType.FINAL,
       true,
     );
     formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '', true);

@@ -147,6 +147,7 @@ export interface InvoiceItemRecord<T> {
 }
 
 export enum InvoiceType {
+  FINAL = 'FINAL',
   FULL = 'FULL',
   PARTIAL = 'PARTIAL',
   CREDIT_NOTE = 'CREDIT_NOTE',

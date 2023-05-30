@@ -199,6 +199,21 @@ export const ArticleItemsTable = ({
       setItemsAndCalculatePrice(newItems);
     }
   };
+
+  const setFinalAndFullArticles = (invoiceArg: InvoiceView) => {
+    const newItems = invoiceArg.items.map(
+      (i): InvoiceItemRecord<Amount> => ({
+        articleId: i.article.id,
+        description: i.description || i.article.description,
+        name: i.name || i.article.name,
+        articleUnit: i.article.unit,
+        quantity: i.quantity,
+        unitAmount: i.unitAmount,
+      }),
+    );
+    setItemsAndCalculatePrice(newItems);
+  };
+
   useEffect(() => {
     if (!invoice) {
       if (isPartial && isFetched) {
@@ -212,19 +227,9 @@ export const ArticleItemsTable = ({
         setItems([]);
       }
     } else if (invoice) {
-      if (invoice.type === InvoiceType.FULL) {
+      if (invoice.type === InvoiceType.FINAL || InvoiceType.FULL) {
         if (!isPartial && !isCreditNote) {
-          const newItems = invoice.items.map(
-            (i): InvoiceItemRecord<Amount> => ({
-              articleId: i.article.id,
-              description: i.description || i.article.description,
-              name: i.name || i.article.name,
-              articleUnit: i.article.unit,
-              quantity: i.quantity,
-              unitAmount: i.unitAmount,
-            }),
-          );
-          setItemsAndCalculatePrice(newItems);
+          setFinalAndFullArticles(invoice);
         } else if (isPartial && isFetched) {
           if (!partialArticleResource.data.length || !items.length) {
             createPartial();
