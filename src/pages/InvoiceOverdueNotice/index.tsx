@@ -28,7 +28,11 @@ import {
 } from 'hooks/reactQuery/useInvoice';
 import useFakeProgress from 'hooks/useFakeProgress';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {formatCurrency, getCurrencySymbol} from 'utils/currency';
+import {
+  currencyFactor,
+  formatCurrency,
+  getCurrencySymbol,
+} from 'utils/currency';
 import {SimpleEmailRecord} from 'models/misc';
 import {PDFPreview} from './Preview';
 
@@ -81,6 +85,10 @@ export const InvoiceOverdueNotice = () => {
     onSubmit: () => {},
   });
 
+  const factor = currencyFactor({
+    currency: invoice?.totalAmount.currency ?? '',
+  });
+
   const createInvoiceOverdueNoticeBody = {
     invoiceId: invoice?.id ?? '',
     body: {
@@ -89,11 +97,11 @@ export const InvoiceOverdueNotice = () => {
       description: formik.values.description,
       dueDate: invoice?.dueDate ?? '',
       initialAmount: {
-        value: formik.values.initialAmount,
+        value: Math.round(formik.values.initialAmount * factor),
         currency: invoice?.totalAmount.currency ?? '',
       },
       handlingFee: {
-        value: formik.values.handlingFee,
+        value: Math.round(formik.values.handlingFee * factor),
         currency: invoice?.totalAmount.currency ?? '',
       },
     },
