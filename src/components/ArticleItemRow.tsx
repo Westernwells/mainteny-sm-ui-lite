@@ -202,7 +202,9 @@ export const ArticleItemRow = ({
             />
             <TextField
               type="number"
-              value={isPartial ? newPartialTotal : totalPrice}
+              value={
+                isPartial ? newPartialTotal.toString() : totalPrice.toString()
+              }
               onChange={
                 isPartial ? handleNewPartialTotalChange : handleTotalChange
               }
@@ -231,7 +233,7 @@ export const ArticleItemRow = ({
         )}
 
         <TextField
-          value={isPartial ? partialPrice : price}
+          value={isPartial ? partialPrice.toString() : price.toString()}
           type="number"
           onChange={isPartial ? handlePartialPriceChange : handlePriceChange}
           size="small"
