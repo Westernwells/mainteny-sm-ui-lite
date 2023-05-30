@@ -34,6 +34,7 @@ import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {Role} from 'models/user';
+import {ClickAwayListener} from '@mui/material';
 
 const drawerWidth = '15rem';
 
@@ -370,59 +371,61 @@ export const AppDrawer = () => {
 
   return (
     <Box sx={{display: 'flex'}}>
-      <Drawer
-        onMouseEnter={() => handleDrawerOpen()}
-        onMouseLeave={() => handleDrawerClose()}
-        variant="permanent"
-        open={open}
-        PaperProps={{
-          sx: {
-            paddingTop: 2,
-            color: '#fff',
-          },
-        }}>
-        {renderDrawerHeader()}
+      <ClickAwayListener onClickAway={handleDrawerClose}>
+        <Drawer
+          onMouseEnter={() => handleDrawerOpen()}
+          onMouseLeave={() => handleDrawerClose()}
+          variant="permanent"
+          open={open}
+          PaperProps={{
+            sx: {
+              paddingTop: 2,
+              color: '#fff',
+            },
+          }}>
+          {renderDrawerHeader()}
 
-        <List>
-          {drawerList.map(({text, icon, onClick, path, access}, index) => {
-            if (!access) return null;
-            return (
-              <ListItemButton
-                onClick={(e) => onClick(e, index)}
-                selected={selectedPath === path}
-                style={{
-                  paddingTop: 15,
-                  paddingBottom: 15,
-                  ...(open
-                    ? {
-                        marginLeft: '5px',
-                        marginRight: '5px',
-                      }
-                    : null),
-                }}
-                sx={{
-                  transition: (theme) =>
-                    theme.transitions.create('margin', {
-                      easing: theme.transitions.easing.sharp,
-                      duration: theme.transitions.duration.leavingScreen,
-                    }),
-                }}
-                key={text}>
-                <ListItemIcon sx={{minWidth: 0, pr: '1em', pl: '.25em'}}>
-                  {icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Fade in={open}>
-                      <Typography variant="subtitle1">{t(text)}</Typography>
-                    </Fade>
-                  }
-                />
-              </ListItemButton>
-            );
-          })}
-        </List>
-      </Drawer>
+          <List>
+            {drawerList.map(({text, icon, onClick, path, access}, index) => {
+              if (!access) return null;
+              return (
+                <ListItemButton
+                  onClick={(e) => onClick(e, index)}
+                  selected={selectedPath === path}
+                  style={{
+                    paddingTop: 15,
+                    paddingBottom: 15,
+                    ...(open
+                      ? {
+                          marginLeft: '5px',
+                          marginRight: '5px',
+                        }
+                      : null),
+                  }}
+                  sx={{
+                    transition: (theme) =>
+                      theme.transitions.create('margin', {
+                        easing: theme.transitions.easing.sharp,
+                        duration: theme.transitions.duration.leavingScreen,
+                      }),
+                  }}
+                  key={text}>
+                  <ListItemIcon sx={{minWidth: 0, pr: '1em', pl: '.25em'}}>
+                    {icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Fade in={open}>
+                        <Typography variant="subtitle1">{t(text)}</Typography>
+                      </Fade>
+                    }
+                  />
+                </ListItemButton>
+              );
+            })}
+          </List>
+        </Drawer>
+      </ClickAwayListener>
     </Box>
   );
 };
