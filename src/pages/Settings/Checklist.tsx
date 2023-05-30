@@ -157,8 +157,10 @@ export const Checklist = () => {
         : [
             {
               id: getUniqueId(),
-              name: 'Service',
-              questions: [{...questionMock, id: getUniqueId()}],
+              name: 'Category',
+              questions: [
+                {...questionMock, question: 'Task 1', id: getUniqueId()},
+              ],
             },
           ],
       options: options.length ? options : [{...optionMock, id: getUniqueId()}],
@@ -257,7 +259,7 @@ export const Checklist = () => {
       ...formik.values.categories,
       {
         id: getUniqueId(),
-        name: 'Service',
+        name: 'Category',
         questions: [{...questionMock, id: getUniqueId()}],
       },
     ]);
