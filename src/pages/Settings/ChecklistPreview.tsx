@@ -31,7 +31,7 @@ export const ChecklistPreview = ({checklist}: Props) => {
         alignSelf: 'center',
       }}
       headerStyles={{mt: '1rem'}}>
-      <Grid container>
+      <Grid container pb={6}>
         <Grid item xs={12} md={6}>
           <FormInput
             props={{
@@ -51,10 +51,6 @@ export const ChecklistPreview = ({checklist}: Props) => {
           />
         </Grid>
       </Grid>
-
-      <Box display="flex" alignItems="center" pt={4} pb={2}>
-        <Typography variant="h6">{checklist.category}</Typography>
-      </Box>
 
       {categories.map((category) => (
         <Box

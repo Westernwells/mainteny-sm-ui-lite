@@ -78,7 +78,7 @@ Yup.addMethod(Yup.array, 'unique', function fn(propertyPath, message) {
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
-  category: Yup.string().required('Category is required'),
+  category: Yup.string(),
   categories: Yup.array()
     .of(
       Yup.object().shape({
@@ -95,7 +95,7 @@ const validationSchema = Yup.object().shape({
           .min(1),
       }),
     )
-    .unique('name', 'Service name must be unique')
+    .unique('name', 'Category name must be unique')
     .min(1),
   options: Yup.array()
     .of(
@@ -130,8 +130,6 @@ export const Checklist = () => {
   const checklist = (location.state as {checklist: CheckList})?.checklist;
   const {user} = useUserSession();
   const [isPreviewing, setIsPreviewing] = useState(false);
-  const [isEditingChecklistCategoryName, setIsEditingChecklistCategoryName] =
-    useState(false);
   const [editingQuestionCategory, setEditingQuestionCategory] = useState('');
   const {mutate: createChecklist, isLoading: isCreating} = useCreateChecklist(
     'Checklist saved successfully!',
@@ -153,7 +151,7 @@ export const Checklist = () => {
   const initialValues = useMemo(
     () => ({
       name: checklist?.name ?? '',
-      category: checklist?.category ?? 'Category',
+      category: checklist?.category ?? '',
       categories: categories.length
         ? categories
         : [
@@ -372,60 +370,10 @@ export const Checklist = () => {
 
           <Grid
             container
-            justifyContent="space-between"
+            justifyContent="flex-end"
             alignItems="center"
-            pt={6}
+            pt={2}
             pb={2.75}>
-            <Box sx={{display: 'flex'}}>
-              {isEditingChecklistCategoryName ? (
-                <>
-                  <FormInput
-                    props={{
-                      name: 'category',
-                      value: formik.values.category,
-                      size: 'small',
-                      fullWidth: true,
-                      type: 'text',
-                      onChange: formik.handleChange,
-                    }}
-                  />
-                  <IconButton
-                    onClick={() => {
-                      setIsEditingChecklistCategoryName(false);
-                    }}
-                    edge="start"
-                    sx={{mt: '0.7em', ml: '0.2em'}}>
-                    <CheckCircleRounded
-                      sx={{mt: '-0.8em', color: theme.palette.primary.main}}
-                    />
-                  </IconButton>
-
-                  <IconButton
-                    onClick={() => {
-                      setIsEditingChecklistCategoryName(false);
-                    }}
-                    edge="start"
-                    sx={{mt: '0.7em'}}>
-                    <Cancel
-                      sx={{mt: '-0.8em', color: theme.palette.primary.main}}
-                    />
-                  </IconButton>
-                </>
-              ) : (
-                <>
-                  <Typography variant="h6">{formik.values.category}</Typography>
-                  <IconButton
-                    onClick={() => {
-                      setIsEditingChecklistCategoryName(true);
-                    }}
-                    edge="start"
-                    sx={{mt: '-0.2rem', pl: 2.5}}>
-                    <Edit sx={{fontSize: '1rem'}} />
-                  </IconButton>
-                </>
-              )}
-            </Box>
-
             <Button
               buttonProps={{
                 size: 'large',
@@ -434,7 +382,7 @@ export const Checklist = () => {
                 autoFocus: true,
                 startIcon: <Add />,
               }}>
-              <Typography variant="subtitle2">{t('New Service')}</Typography>
+              <Typography variant="subtitle2">{t('New Category')}</Typography>
             </Button>
           </Grid>
 
@@ -519,7 +467,7 @@ export const Checklist = () => {
                         onClick: () => removeCategory(category.id),
                       }}>
                       <Typography variant="subtitle2">
-                        {t('Delete Service')}
+                        {t('Delete Category')}
                       </Typography>
                     </Button>
                   ) : null}
