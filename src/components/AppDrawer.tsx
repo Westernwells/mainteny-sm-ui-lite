@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Theme, CSSObject} from '@mui/material/styles';
 import styled from '@mui/material/styles/styled';
@@ -78,9 +78,13 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-export const AppDrawer = () => {
+interface Props {
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+}
+
+export const AppDrawer = ({open, setOpen}: Props) => {
   const {t} = useTranslation();
-  const [open, setOpen] = useState(false);
   const themeX = useTheme();
   const setSelectedIndex = useState(0)[1];
   const [selectedPath, setSelectedPath] = useState('/');
@@ -370,7 +374,7 @@ export const AppDrawer = () => {
         );
 
   return (
-    <Box sx={{display: 'flex'}}>
+    <Box sx={{display: 'flex', zIndex: 1000}}>
       <ClickAwayListener onClickAway={handleDrawerClose}>
         <Drawer
           onMouseEnter={() => handleDrawerOpen()}

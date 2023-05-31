@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box';
+import {useOutletContext} from 'react-router';
 import {useTranslation} from 'react-i18next';
-import {ReactNode, Suspense} from 'react';
+import {Dispatch, ReactNode, SetStateAction, Suspense} from 'react';
 import {usePusher} from 'hooks/usePusher';
 import {queryKeys} from 'reactQuery/constants';
 import {MessageType} from 'models/notification';
@@ -15,6 +16,11 @@ interface Props {
   pageTitle?: string;
   showBackAction?: boolean;
   backBtnLabel?: string;
+}
+
+interface OpenContext {
+  open?: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export const PageLayout = ({
@@ -59,6 +65,12 @@ export const PageLayout = ({
     },
   });
 
+  const {setOpen} = useOutletContext<OpenContext>();
+
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
+
   return (
     <Box
       sx={{
@@ -68,7 +80,9 @@ export const PageLayout = ({
         ...(pageScrollable
           ? {minHeight: '100vh', overflowY: 'scroll'}
           : {height: '98vh', overflowY: 'hidden'}),
-      }}>
+      }}
+      onTouchMove={handleDrawerClose}
+      onTouchStart={handleDrawerClose}>
       <Box sx={{mx: '2.2em', my: '0.5em'}}>
         <AppTopBar
           pageTitle={pageTitle && t(pageTitle)}
