@@ -24,7 +24,9 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
     billingEmail: customer.additionalInfo.billingEmail,
     costCenter: customer.additionalInfo.costCenter,
     registrationDate: customer.additionalInfo.registrationDate,
-    secondaryPhoneNumber: customer.additionalInfo.secondaryPhoneNumber,
+    secondaryPhoneNumber:
+      customer.additionalInfo.secondaryPhoneNumber?.split('+')?.[1] ??
+      customer.additionalInfo.secondaryPhoneNumber,
     postalAddress: customer.postalAddress
       ? {
           fullName: customer.postalAddress.fullName,
@@ -79,6 +81,7 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
+      enableReinitialize
       onSubmit={async (values, {resetForm}) => {
         updateCustomer({...values}, customer.id, () => {
           resetForm();

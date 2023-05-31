@@ -21,6 +21,7 @@ import {EmptySection} from 'components/EmptySection';
 import {convertToMacro} from 'utils/utils';
 import {Confirm} from 'components/Confirm';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {formatPhoneNumber} from 'utils/customer-utils';
 import {columns, makeRows} from './ContactsWidgetDataGridProps';
 import {EditContactForm} from './EditContactForm';
 
@@ -70,6 +71,7 @@ export const ContactsWidget = ({customerId}: Props) => {
   const formik = useFormik<ContactFormModel>({
     initialValues: {
       phone: '',
+      secondaryPhone: '',
       firstName: '',
       lastName: '',
       email: '',
@@ -92,6 +94,8 @@ export const ContactsWidget = ({customerId}: Props) => {
   const getEditableContacts = (item: ContactsView) => {
     formik.setValues({
       phone: item?.userAccount.contact.phone.replace(/[^\d]/g, '') || '',
+      secondaryPhone:
+        item?.additionalInfo?.secondaryPhone?.replace(/[^\d]/g, '') ?? '',
       firstName: item?.userAccount.firstName || '',
       lastName: item?.userAccount.lastName || '',
       email: item?.userAccount.contact.email || '',
@@ -106,6 +110,7 @@ export const ContactsWidget = ({customerId}: Props) => {
   const onCreateContact = () => {
     formik.setValues({
       phone: '',
+      secondaryPhone: '',
       firstName: '',
       lastName: '',
       email: '',
@@ -129,12 +134,17 @@ export const ContactsWidget = ({customerId}: Props) => {
         propertyContactPerson: {
           externalId: customerId,
           roles: [convertToMacro(formik.values.roles)],
+          secondaryPhone: formik.values.secondaryPhone
+            ? formatPhoneNumber(formik.values.secondaryPhone)
+            : '',
         },
         userAccount: {
           category: activeContact?.userAccount.category || '',
           contact: {
             email: formik.values.email,
-            phone: formik.values.phone ? `+${formik.values.phone}` : '',
+            phone: formik.values.phone
+              ? formatPhoneNumber(formik.values.phone)
+              : '',
           },
           firstName: formik.values.firstName,
           lastName: formik.values.lastName,

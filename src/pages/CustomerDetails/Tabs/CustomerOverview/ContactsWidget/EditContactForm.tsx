@@ -111,28 +111,49 @@ export const EditContactForm = ({formik}: Props) => {
             />
           ))}
         </Grid>
-        <Grid item md={6}>
-          {[
-            {
-              id: 'phone',
-              label: 'Phone',
-              placeholder: 'e.g. +49 173 12345678',
-              value: formik.values.phone,
-              InputProps: {
-                startAdornment: (
-                  <InputAdornment position="start"> + </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Phone />
-                  </InputAdornment>
-                ),
-              },
-              helperText: formik.touched.phone && formik.errors.phone,
-              error: !!formik.errors.phone && formik.touched.phone,
-              required: false,
+        {[
+          {
+            id: 'phone',
+            label: 'Phone',
+            placeholder: 'e.g. +49 173 12345678',
+            value: formik.values.phone,
+            InputProps: {
+              startAdornment: (
+                <InputAdornment position="start"> + </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Phone />
+                </InputAdornment>
+              ),
             },
-          ].map((item, index) => (
+            helperText: formik.touched.phone && formik.errors.phone,
+            error: !!formik.errors.phone && formik.touched.phone,
+            required: false,
+          },
+          {
+            id: 'secondaryPhone',
+            label: '2nd Phone',
+            placeholder: 'e.g. +49 173 12345678',
+            value: formik.values.secondaryPhone,
+            InputProps: {
+              startAdornment: (
+                <InputAdornment position="start"> + </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Phone />
+                </InputAdornment>
+              ),
+            },
+            helperText:
+              formik.touched.secondaryPhone && formik.errors.secondaryPhone,
+            error:
+              !!formik.errors.secondaryPhone && formik.touched.secondaryPhone,
+            required: false,
+          },
+        ].map((item, index) => (
+          <Grid item md={3}>
             <FormInput
               key={index}
               props={{
@@ -140,8 +161,8 @@ export const EditContactForm = ({formik}: Props) => {
                 ...defaultProps,
               }}
             />
-          ))}
-        </Grid>
+          </Grid>
+        ))}
       </Grid>
     </Box>
   );

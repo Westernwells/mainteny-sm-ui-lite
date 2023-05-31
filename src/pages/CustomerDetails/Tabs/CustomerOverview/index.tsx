@@ -23,6 +23,7 @@ import {InfoCard} from 'components/InfoCard';
 import {Progress} from 'components/Progress';
 import {TabContentContainer} from 'components/TabContentContainer';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
+import {formatPhoneNumber} from 'utils/customer-utils';
 import EmployeeAvatar from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EmployeeAvatar';
 import {UnitsWidget} from './UnitsWidget';
 import {ContractsWidget} from './ContractsWidget';
@@ -84,7 +85,9 @@ export const CustomerOverviewTab = ({
         },
         secondaryPhoneNumber: {
           label: '2nd PHONE',
-          value: customer.additionalInfo.secondaryPhoneNumber || '-',
+          value: customer.additionalInfo.secondaryPhoneNumber
+            ? formatPhoneNumber(customer.additionalInfo.secondaryPhoneNumber)
+            : '-',
           icon: <LocalPhone sx={{color: theme.palette.info.dark}} />,
         },
         billingEmailAddress: {

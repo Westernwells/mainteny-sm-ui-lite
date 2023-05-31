@@ -7,6 +7,7 @@ import {Stepper} from 'components/Stepper';
 import {Priority} from 'models/service-order';
 import {useCreateCustomer} from 'hooks/reactQuery/useCustomers';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {formatPhoneNumber} from 'utils/customer-utils';
 import {BasicCustomerFormModel, NewCustomerBody} from './model';
 import {BasicCustomerForm} from './BasicCustomerForm';
 
@@ -84,7 +85,9 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       serviceCompanyId: user!.userAccount.serviceCompany.id,
       registrationDate: basicCustomerFormValues.registrationDate,
       costCenter: basicCustomerFormValues.costCenter,
-      secondaryPhoneNumber: basicCustomerFormValues.secondaryPhoneNumber,
+      secondaryPhoneNumber: basicCustomerFormValues.secondaryPhoneNumber
+        ? formatPhoneNumber(basicCustomerFormValues.secondaryPhoneNumber)
+        : '',
     };
 
     const response = await createCustomer(body);

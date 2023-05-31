@@ -86,6 +86,14 @@ export const columns = (
     ...defaultProps,
   },
   {
+    field: 'secondaryPhone',
+    headerName: '2nd Phone',
+    type: 'string',
+    flex: 1,
+    headerAlign: 'left',
+    ...defaultProps,
+  },
+  {
     field: 'role',
     headerName: 'Role',
     type: 'string',
@@ -104,7 +112,7 @@ export const columns = (
   },
   {
     field: 'access',
-    headerName: 'Dashboard Access',
+    headerName: 'Access',
     type: 'string',
     ...defaultAlignment,
     editable: false,
@@ -175,6 +183,7 @@ export const makeRows = (contacts: Resource<ContactsView>): GridRowsProp =>
         name: `${item.userAccount.firstName} ${item.userAccount.lastName}`,
         email: item.userAccount.contact.email || '-',
         phone: item.userAccount.contact.phone || '-',
+        secondaryPhone: item.additionalInfo?.secondaryPhone || '-',
         role: item.userAccount.roles.map((role) => convertToText(role)),
         access: item.userAccount.status,
         actions: item,
