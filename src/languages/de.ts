@@ -840,6 +840,9 @@ export const de = {
   'Revenue/Year': 'Umsatz/Jahr',
   'Contact Persons': 'Kontaktpersonen',
   'Dashboard Access': 'Zugang zum Dashboard',
+  '2nd Phone': 'Telefon 2',
+  '2nd PHONE': 'TELEFON 2',
+  Access: 'Zugang',
   Actions: 'Aktionen',
   'No contact persons yet. They will appear here once added!':
     'Noch keine Kontaktpersonen. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!',
