@@ -836,6 +836,9 @@ export const sr = {
   'Revenue/Year': 'Prihod/godina',
   'Contact Persons': 'Kontakt osobe',
   'Dashboard Access': 'Pristup komandnoj tabli', // STOPPED
+  '2nd Phone': 'Drugi telefon',
+  '2nd PHONE': 'DRUGI TELEFON',
+  Access: 'Pristup',
   Actions: 'Akcije',
   'No contact persons yet. They will appear here once added!':
     'Još nema kontakt osoba. Oni će se pojaviti ovde kada se dodaju!',
