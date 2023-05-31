@@ -29,6 +29,7 @@ import {FormRadio} from 'components/form/FormRadio';
 import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
+import {Tooltip} from 'components/Tooltip';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateInvoice,
@@ -55,6 +56,8 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {convertToText} from 'utils/utils';
 import {addYears} from 'date-fns';
 import {InvoiceCheckbox} from 'pages/InvoiceDetails/InvoiceCheckbox';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import {IconButton} from '@mui/material';
 import {BeneficiaryDetails} from './BeneficiaryDetails';
 import {formatInvoiceRecord} from './utils';
 
@@ -72,6 +75,18 @@ const payment = {
 };
 
 const dateToString = (date: Date) => date.toISOString().split('T')[0];
+
+const toolTipText = (
+  <div>
+    Full - Standard invoice for the full amount. <br />
+    Partial - Partial payment when less than the full amount is due.
+    <br />
+    Final - Final invoice after partial invoices have been created before.
+    <br />
+    Credit note - Is issued to indicate a return of funds.
+    <br />
+  </div>
+);
 
 export const InvoiceForm = ({
   invoice,
@@ -640,8 +655,26 @@ export const InvoiceForm = ({
 
             <Box mt="2em">
               <Typography variant="body1" color={theme.palette.text.secondary}>
-                {t('Invoice Type')}
+                {t('Invoice Type')}{' '}
+                <Tooltip
+                  title={toolTipText}
+                  placement="top"
+                  componentsProps={{
+                    tooltip: {
+                      sx: {
+                        bgcolor: 'common.gray',
+                        maxWidth: 500,
+                        padding: '1em',
+                        fontSize: '0.85rem',
+                      },
+                    },
+                  }}>
+                  <IconButton>
+                    <InfoOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
               </Typography>
+
               <RadioGroup
                 name="radio-buttons-group"
                 sx={{flexDirection: 'row'}}>
