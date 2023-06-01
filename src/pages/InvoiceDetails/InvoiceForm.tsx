@@ -150,16 +150,16 @@ export const InvoiceForm = ({
 
   const invoiceTypeOptions = useRef([
     {
-      value: InvoiceType.FINAL,
-      label: 'Final',
-    },
-    {
       value: InvoiceType.FULL,
       label: 'Full',
     },
     {
       value: InvoiceType.PARTIAL,
       label: 'Partial',
+    },
+    {
+      value: InvoiceType.FINAL,
+      label: 'Final',
     },
     {
       value: InvoiceType.CREDIT_NOTE,
@@ -678,19 +678,54 @@ export const InvoiceForm = ({
               <RadioGroup
                 name="radio-buttons-group"
                 sx={{flexDirection: 'row'}}>
-                {invoiceTypeOptions.map((option) => (
-                  <FormRadio
-                    key={option.value}
-                    name="type"
-                    value={option.value}
-                    checked={formik.values.type === option.value}
-                    handleChange={formik.handleChange}
-                    label={t(option.label)}
-                    radioProps={{
-                      sx: {color: theme.palette.text.secondary},
-                    }}
-                  />
-                ))}
+                {(invoice?.type === InvoiceType.FULL ||
+                  invoice?.type === InvoiceType.CREDIT_NOTE) &&
+                !invoice.partialInvoices?.length
+                  ? invoiceTypeOptions
+                      .filter((option) => option.value !== InvoiceType.FINAL)
+                      .map((option) => (
+                        <FormRadio
+                          key={option.value}
+                          name="type"
+                          value={option.value}
+                          checked={formik.values.type === option.value}
+                          handleChange={formik.handleChange}
+                          label={t(option.label)}
+                          radioProps={{
+                            sx: {color: theme.palette.text.secondary},
+                          }}
+                        />
+                      ))
+                  : invoice?.type === InvoiceType.FINAL &&
+                    invoice.partialInvoices?.length
+                  ? invoiceTypeOptions
+                      .filter((option) => option.value !== InvoiceType.FULL)
+                      .map((option) => (
+                        <FormRadio
+                          key={option.value}
+                          name="type"
+                          value={option.value}
+                          checked={formik.values.type === option.value}
+                          handleChange={formik.handleChange}
+                          label={t(option.label)}
+                          radioProps={{
+                            sx: {color: theme.palette.text.secondary},
+                          }}
+                        />
+                      ))
+                  : invoiceTypeOptions.map((option) => (
+                      <FormRadio
+                        key={option.value}
+                        name="type"
+                        value={option.value}
+                        checked={formik.values.type === option.value}
+                        handleChange={formik.handleChange}
+                        label={t(option.label)}
+                        radioProps={{
+                          sx: {color: theme.palette.text.secondary},
+                        }}
+                      />
+                    ))}
               </RadioGroup>
             </Box>
 
