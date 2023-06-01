@@ -227,7 +227,10 @@ export const ArticleItemsTable = ({
         setItems([]);
       }
     } else if (invoice) {
-      if (invoice.type === InvoiceType.FINAL || InvoiceType.FULL) {
+      if (
+        invoice.type === InvoiceType.FINAL ||
+        invoice.type === InvoiceType.FULL
+      ) {
         if (!isPartial && !isCreditNote) {
           setFinalAndFullArticles(invoice);
         } else if (isPartial && isFetched) {
@@ -326,10 +329,10 @@ export const ArticleItemsTable = ({
     isPartial,
     isCreditNote,
     createPartial,
-    invoice?.type,
     isFetched,
     isFetchedCreditNoteArticle,
   ]);
+
   const renderHeader = () => (
     <Box
       px=".5em"
