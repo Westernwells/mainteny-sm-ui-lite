@@ -69,12 +69,10 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
     email: Yup.string()
       .email('Enter a valid email')
       .required('Email is required'),
-    externalId: Yup.string().required('Customer number is required'),
+    externalId: Yup.string(),
     phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),
-    postalAddress: Yup.object().nullable().required('Address is required'),
-    billingAddress: Yup.object()
-      .nullable()
-      .required('Billing Address is required'),
+    postalAddress: Yup.object().nullable(),
+    billingAddress: Yup.object().nullable(),
   });
 
   return (
