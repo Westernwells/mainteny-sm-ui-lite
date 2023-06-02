@@ -159,7 +159,7 @@ export const de = {
   'Requires Appointment': 'Termin erforderlich',
   Yes: 'Ja',
   'New Unit': 'Neue Anlage',
-  'Clear all': 'Alle löschen',
+  'Clear filter': 'Filter löschen',
   'Customer ': 'Kunde',
   No: 'Nein',
   No_number: 'No',

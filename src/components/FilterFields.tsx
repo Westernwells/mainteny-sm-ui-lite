@@ -34,7 +34,7 @@ export const FilterFields = ({
           onClick={() => onClear && onClear()}
           mt="0.5em"
           sx={{cursor: 'pointer', color: theme.palette.info.main}}>
-          {t('Clear all')}
+          {t('Clear filter')}
         </Typography>
       ) : null}
     </Box>
