@@ -158,7 +158,7 @@ export const sr = {
   'Requires Appointment': 'Zakaži termin',
   Yes: 'Da',
   'New Unit': 'Nova jedinica',
-  'Clear all': 'Izbriši sve',
+  'Clear filter': 'Obriši filter',
   'Customer ': 'Kupac',
   No: 'Ne',
   No_number: 'No',
