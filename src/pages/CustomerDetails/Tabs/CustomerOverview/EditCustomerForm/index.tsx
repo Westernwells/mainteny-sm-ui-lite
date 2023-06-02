@@ -204,7 +204,7 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
               value: values.externalId,
               helperText: touched.externalId && errors.externalId,
               error: !!errors.externalId && touched.externalId,
-              required: true,
+              required: false,
               sx: {
                 mt: '0.5em',
               },
@@ -249,7 +249,7 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
               value: values.costCenter,
               helperText: touched.costCenter && errors.costCenter,
               error: !!errors.costCenter && touched.costCenter,
-              required: true,
+              required: false,
               sx: {
                 mt: '0.5em',
               },

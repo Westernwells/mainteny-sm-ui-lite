@@ -22,7 +22,7 @@ export const SelectPostalAddress = () => {
         textFieldProps={{
           name: 'postalAddress',
           placeholder: 'e.g. 34-36 Exmouth Market, London EC1R 4QE',
-          required: true,
+          required: false,
         }}
         label="Postal Address"
         getAddress={(address) => setFieldValue('postalAddress', address)}
