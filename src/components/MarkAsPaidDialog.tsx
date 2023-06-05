@@ -46,7 +46,7 @@ export const MarkAsPaidDialog = ({
     initialValues: {
       amount: {
         value:
-          invoice.totalAmount.netAmount /
+          invoice.totalAmount.grossAmount /
           10 ** invoice.totalAmount.fractionDigits!,
         currency: invoice.totalAmount.currency,
       },
