@@ -372,7 +372,7 @@ export const ViewInvoice = ({
         open={isDeleteDialogOpen}
         onConfirm={() => {
           if (invoice.id)
-            deleteInvoice({invoiceId: invoice.id, shouldNavigate: false});
+            deleteInvoice({invoiceId: invoice.id, shouldNavigate: true});
           setIsDeleteDialogOpen(false);
         }}
         onClose={() => setIsDeleteDialogOpen(false)}
