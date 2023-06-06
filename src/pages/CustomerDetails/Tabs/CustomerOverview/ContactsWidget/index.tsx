@@ -166,12 +166,17 @@ export const ContactsWidget = ({customerId}: Props) => {
           externalId: customerId,
           roles: [convertToMacro(formik.values.roles)],
           propertyOwnerId: customerId,
+          secondaryPhone: formik.values.secondaryPhone
+            ? formatPhoneNumber(formik.values.secondaryPhone)
+            : '',
         },
         userAccount: {
           category: '',
           contact: {
             email: formik.values.email,
-            phone: formik.values.phone ? `+${formik.values.phone}` : '',
+            phone: formik.values.phone
+              ? formatPhoneNumber(formik.values.phone)
+              : '',
           },
           firstName: formik.values.firstName,
           lastName: formik.values.lastName,
