@@ -9,8 +9,8 @@ import {
 
 export const formatCurrency = (
   amount: number,
-  selectedLang?: string,
   options?: Intl.NumberFormatOptions,
+  selectedLang?: string,
 ) =>
   amount.toLocaleString(
     selectedLang === 'DE' || selectedLang === 'SR' ? 'de-DE' : 'en-US',

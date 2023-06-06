@@ -487,8 +487,20 @@ export const ArticleItemsTable = ({
 
                       <Typography sx={{justifySelf: 'end'}}>
                         {isPartial
-                          ? formatCurrency(newPartialTotal, selectedLng)
-                          : formatCurrency(totalPrice, selectedLng)}
+                          ? formatCurrency(
+                              newPartialTotal,
+                              {
+                                currency: currentCurrency.code,
+                              },
+                              selectedLng,
+                            )
+                          : formatCurrency(
+                              totalPrice,
+                              {
+                                currency: currentCurrency.code,
+                              },
+                              selectedLng,
+                            )}
                       </Typography>
                     </>
                   )}
@@ -506,8 +518,20 @@ export const ArticleItemsTable = ({
 
                   <Typography>
                     {isPartial
-                      ? formatCurrency(partialPrice, selectedLng)
-                      : formatCurrency(totalPrice, selectedLng)}
+                      ? formatCurrency(
+                          partialPrice,
+                          {
+                            currency: currentCurrency.code,
+                          },
+                          selectedLng,
+                        )
+                      : formatCurrency(
+                          totalPrice,
+                          {
+                            currency: currentCurrency.code,
+                          },
+                          selectedLng,
+                        )}
                   </Typography>
                   <Box>
                     <FormInput
@@ -529,10 +553,16 @@ export const ArticleItemsTable = ({
                     {isPartial
                       ? formatCurrency(
                           partialPrice * (percentageVat / 100),
+                          {
+                            currency: currentCurrency.code,
+                          },
                           selectedLng,
                         )
                       : formatCurrency(
                           totalPrice * (percentageVat / 100),
+                          {
+                            currency: currentCurrency.code,
+                          },
                           selectedLng,
                         )}
                   </Typography>
@@ -557,10 +587,16 @@ export const ArticleItemsTable = ({
                     {isPartial
                       ? formatCurrency(
                           partialPrice * (1 + percentageVat / 100),
+                          {
+                            currency: currentCurrency.code,
+                          },
                           selectedLng,
                         )
                       : formatCurrency(
                           totalPrice * (1 + percentageVat / 100),
+                          {
+                            currency: currentCurrency.code,
+                          },
                           selectedLng,
                         )}
                   </Typography>
