@@ -83,7 +83,7 @@ export const ArticleSupplierCard = ({article}: {article: ArticleView}) => {
                   color="text.secondary"
                   variant="body2"
                   component="p">
-                  Supplier Article{' '}
+                  {t('Supplier Article')}{' '}
                   {supplier.number ? `#${supplier.number}` : ''}
                 </Typography>
                 <Typography
@@ -97,6 +97,12 @@ export const ArticleSupplierCard = ({article}: {article: ArticleView}) => {
                   variant="body2"
                   component="p">
                   {supplier.phone}
+                </Typography>
+                <Typography
+                  color="text.secondary"
+                  variant="body2"
+                  component="p">
+                  {supplier.email}
                 </Typography>
               </Box>
               {supplier.isPreferred && (
@@ -112,7 +118,7 @@ export const ArticleSupplierCard = ({article}: {article: ArticleView}) => {
           <NoItemSection
             label={t('No suppliers yet. Please click the button below to add!')}
             illustration="supplier"
-            buttonLabel={t('+ Add suppliers')}
+            buttonLabel={t('Add suppliers')}
             action={() => setOpenDialog(true)}
           />
         )}

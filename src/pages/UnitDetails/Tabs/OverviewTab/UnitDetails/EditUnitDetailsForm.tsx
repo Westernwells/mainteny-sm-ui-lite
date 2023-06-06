@@ -103,6 +103,8 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
             placeholder: 'Can also be number of floors',
             label: 'Number of Stops',
             name: 'numberOfStops',
+            type: 'number',
+            inputProps: {min: 0},
             value: formik.values.numberOfStops,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
@@ -226,6 +228,21 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
             name: 'spendingLimit',
             error: !!formik.errors.spendingLimit,
             value: formik.values.spendingLimit,
+            onBlur: formik.handleBlur,
+            onChange: formik.handleChange,
+          }}
+        />
+      </Grid>
+
+      <Grid item md={6}>
+        <FormInput
+          props={{
+            name: 'yearBuilt',
+            label: 'Year Built',
+            placeholder: 'Enter year build',
+            type: 'number',
+            inputProps: {min: 0},
+            value: formik.values.yearBuilt,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
           }}

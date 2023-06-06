@@ -4,11 +4,13 @@ import {useSearchParams, useParams} from 'react-router-dom';
 import {Tabs} from 'components/Tab';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import {formatSearchParams} from 'utils/utils';
 import {CustomerOverviewTab} from './Tabs/CustomerOverview';
 import {ContractsTab} from './Tabs/ContractsTab';
 import {UnitsTab} from './Tabs/UnitsTab';
+import {CustomPricesTab} from './Tabs/CustomPricesTab';
 
 interface Props {
   getCurrentPageTitle?: (title: string) => void;
@@ -27,11 +29,15 @@ const tabItems = [
     label: 'Contracts',
     icon: <FileCopyIcon />,
   },
+  {
+    label: 'Custom prices',
+    icon: <ReceiptLongIcon />,
+  },
 ];
 
 export const CustomerDetails = ({getCurrentPageTitle}: Props) => {
   const [tabValue, setTabValue] = useState(0);
-  const {id: customerId} = useParams();
+  const {id: customerId = ''} = useParams();
   const [customerName, setCustomerName] = useState('');
   const [queryParams, setQueryParams] = useSearchParams();
 
@@ -70,6 +76,11 @@ export const CustomerDetails = ({getCurrentPageTitle}: Props) => {
       <TabsBody value={tabValue} index={2}>
         <ContractsTab customerId={customerId} />
       </TabsBody>
+      <TabsBody value={tabValue} index={3}>
+        <CustomPricesTab propertyOwnerId={customerId} />
+      </TabsBody>
     </Tabs>
   );
 };
+
+export default CustomerDetails;

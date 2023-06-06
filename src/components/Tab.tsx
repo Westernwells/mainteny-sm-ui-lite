@@ -1,5 +1,6 @@
 import {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
+import {SxProps} from '@mui/system';
 import Box from '@mui/material/Box';
 import MuiTabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -11,7 +12,7 @@ import Divider from '@mui/material/Divider';
 import {Button} from './Button';
 import {MenuBtn} from './MenuBtn';
 
-interface TabItems {
+export interface TabItems {
   label: string;
   icon: JSX.Element;
 }
@@ -32,6 +33,8 @@ interface Props {
   menu?: MenuBtnProps[];
   actionButtonIcon?: JSX.Element;
   actionBtnVariant?: 'contained' | 'outlined' | 'text';
+  actionButtonStyles?: SxProps;
+  secondaryBtn?: ReactNode;
   backBtnLabel?: string;
   hideBackIcon?: boolean;
   pageTitle?: string;
@@ -57,7 +60,9 @@ export const Tabs = ({
   menu,
   actionButtonIcon,
   actionBtnVariant,
+  actionButtonStyles,
   disableBtnAction,
+  secondaryBtn,
 }: Props) => {
   const theme = useTheme();
 
@@ -81,6 +86,7 @@ export const Tabs = ({
                 textTransform: 'capitalize',
                 ml: '0.8em',
                 height: '100%',
+                ...actionButtonStyles,
               },
               variant: actionBtnVariant || 'contained',
               color: 'primary',
@@ -92,6 +98,8 @@ export const Tabs = ({
             </Typography>
           </Button>
         ) : null}
+
+        {secondaryBtn}
 
         {showMenuActionBtn && menu ? (
           <MenuBtn
@@ -122,7 +130,8 @@ export const Tabs = ({
         sx={{
           flexGrow: 1,
           '& .MuiTabs-flexContainer': {
-            gap: '0.75em',
+            columnGap: '0.75em',
+            flexWrap: 'wrap',
           },
           '& .MuiTabs-indicator': {
             display: 'flex',
@@ -191,6 +200,14 @@ export const Tabs = ({
             {...a11yProps(index)}
           />
         ))}
+        <Divider
+          sx={{
+            flexBasis: '100%',
+            border: `0.5px solid ${theme.palette.action.disabledBackground}`,
+            mt: '-0.5em',
+            mb: '1em',
+          }}
+        />
       </MuiTabs>
     );
   };
@@ -207,7 +224,6 @@ export const Tabs = ({
         {renderTabItems()}
         {renderActionButtons()}
       </Box>
-      <Divider light sx={{mt: '-0.5em', mb: '1em'}} />
 
       <Box
         sx={{

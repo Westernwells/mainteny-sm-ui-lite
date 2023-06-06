@@ -23,6 +23,7 @@ export function useUserSession(): UseUserSession {
         if (minuteDiff <= 0) {
           clearStoredUser();
           queryClient.setQueryData(queryKeys.userSession, null);
+          window.location.reload();
         }
       }
     },

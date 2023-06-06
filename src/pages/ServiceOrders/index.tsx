@@ -53,6 +53,14 @@ export const ServiceOrders = () => {
       label: 'Maintenance',
       action: () => track(() => navigate('/orders/new?type=regular')),
     },
+    {
+      label: 'Inspection',
+      action: () => track(() => navigate('/orders/new?type=inspection')),
+    },
+    {
+      label: 'Installation',
+      action: () => track(() => navigate('/orders/new?type=new_installation')),
+    },
   ]).current;
 
   useEffect(() => {
@@ -84,3 +92,5 @@ export const ServiceOrders = () => {
     </Tabs>
   );
 };
+
+export default ServiceOrders;

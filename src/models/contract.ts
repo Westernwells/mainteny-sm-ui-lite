@@ -11,15 +11,19 @@ export enum ContractStatus {
   EXPIRED = 'EXPIRED',
 }
 
-export enum ContractType {
-  BASIC = 'BASIC',
-  MEDIUM = 'MEDIUM',
-  PREMIUM = 'PREMIUM',
-}
-
 export enum ContractOrderField {
   EXPIRY_TIME = 'EXPIRY_TIME',
   CREATED_TIME = 'CREATED_TIME',
+}
+
+export enum ContractTypes {
+  SERVICE = 'SERVICE',
+  NON_SERVICE = 'NON_SERVICE',
+}
+
+export interface ContractNameTypes {
+  name: string;
+  type: ContractTypes;
 }
 
 export interface ContractTimeWindow {
@@ -40,7 +44,7 @@ export interface Contract {
   id: string;
   propertyOwner: Client;
   serviceCompany: ServiceCompany;
-  type: ContractType;
+  type: string;
   elevators: ContractElevator[];
   visitsNumber: number;
   sla: number;
@@ -67,20 +71,34 @@ export interface QueryContractParams {
   priceEnd: number;
 }
 
-export enum InvoiceDueType {
+export enum InvoiceCyle {
   YEARLY = 'YEARLY',
   HALF_YEARLY = 'HALF_YEARLY',
   QUARTERLY = 'QUARTERLY',
   AFTER_EACH_VISIT = 'AFTER_EACH_VISIT',
 }
 
+export interface ContractDiscount {
+  days: number;
+  discountPercentage: number;
+}
+export interface FirstMaintenance {
+  year: number;
+  month: number;
+}
+
 export interface ContractAdditionalInfo {
   renewalTerms?: number;
   price?: Amount;
   annualPriceAdjustmentPercentage?: number;
-  invoiceDue?: InvoiceDueType;
+  invoiceCycle?: number;
   documents?: FileResource[];
   scope?: string[];
+  noticePeriodInMonth?: number;
+  invoiceDueDays?: number;
+  discounts?: ContractDiscount[];
+  firstMaintenance: FirstMaintenance;
+  firstInvoiceDate: string;
 }
 
 export interface ContractElevatorSimpleView {
@@ -94,7 +112,8 @@ export interface ContractView {
   id: string;
   propertyOwner: PropertyOwnerSimpleView;
   serviceCompany: ServiceCompanySimpleView;
-  type: ContractType;
+  name: string;
+  type: ContractTypes;
   visitsNumber: number;
   number: number;
   externalId: string;
@@ -114,7 +133,7 @@ export interface ContractView {
 }
 export interface ContractSimpleView {
   id: string;
-  type: ContractType;
+  type: string;
   visitsNumber: number;
   sla: number;
   spendingLimit: number;
@@ -132,7 +151,7 @@ export interface ContractSimpleView {
 export interface CreateContractRecord {
   propertyOwnerId: string;
   serviceCompanyId: string;
-  type: ContractType;
+  type: string;
   elevators: string[];
   visitsNumber: number;
   sla: number;
@@ -147,7 +166,7 @@ export interface CreateContractRecord {
 
 export interface UpdateContractRecord {
   id: string;
-  type: ContractType;
+  type: string;
   visitsNumber: number;
   sla: number;
   spendingLimit: number;
@@ -219,25 +238,35 @@ export interface ContractBasicInfoFormModel {
   propertyOwnerId: string;
   startDate: Date | null;
   endDate: Date | null;
-  contractType: string;
+  name: string;
 }
 
 export interface ContractTermsFormModal {
   visitsNumber: number | string;
-  invoiceDue: string;
+  invoiceCycle: string;
   netAmount: number | string;
   renewalTerms: number | string;
   spendingLimit: number | string;
   hourlyRate: number | string;
   annualPriceAdjustmentPercentage: number | string;
   serviceLevelAgreement: number | string;
+  firstMaintenance?: FirstMaintenance;
+  firstInvoiceDate?: string;
 }
 
 export interface ContractUpdateRequest {
-  type: string;
+  type: ContractTypes;
+  name: string;
   price: number | string;
-  invoiceDue: string;
+  invoiceCycle: number;
   renewalTerms: number | string;
   visitsNumber: number | string;
   spendingLimit: number | string;
+  invoiceDueDays?: number;
+  annualPriceAdjustmentPercentage?: number;
+  discounts?: number;
+  noticePeriodInMonth?: number;
+  hourlyRate?: number;
+  firstMaintenance?: FirstMaintenance;
+  firstInvoiceDate?: string;
 }

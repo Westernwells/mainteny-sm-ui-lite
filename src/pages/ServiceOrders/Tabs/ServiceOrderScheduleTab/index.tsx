@@ -4,7 +4,6 @@ import {
   useQueryServiceOrderScheduled,
   useServiceOrders,
 } from 'hooks/reactQuery/useServiceOrder';
-import * as _ from 'lodash';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {toRestDateTime} from 'utils/datetime';
 import {
@@ -99,10 +98,22 @@ export const ServiceOrderScheduleTab = () => {
   useEffect(() => {
     if (!isLoading) {
       const sortedOrder = sortOrderByTime(serviceOrders.data);
-      const groupByTechnicianId = _.groupBy(
-        sortedOrder,
-        (serviceOrder) => serviceOrder.schedules[0].technician.id,
-      );
+      let groupByTechnicianId: {[key: string]: ServiceOrderView[]} = {};
+
+      sortedOrder.forEach((serviceOrder) => {
+        serviceOrder.schedules.forEach((schedule) => {
+          const technicianId = schedule.technician.id;
+          const group = groupByTechnicianId[technicianId];
+          if (!group) {
+            groupByTechnicianId[technicianId] = [serviceOrder];
+          } else {
+            groupByTechnicianId = {
+              ...groupByTechnicianId,
+              [technicianId]: [...group, serviceOrder],
+            };
+          }
+        });
+      });
       setOrders(groupByTechnicianId);
     }
   }, [serviceOrders, isLoading]);

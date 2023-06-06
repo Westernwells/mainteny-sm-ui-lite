@@ -11,7 +11,7 @@ import {Avatar, Box} from '@mui/material';
 import useTheme from '@mui/material/styles/useTheme';
 
 import {ContactsStatus, ContactsView} from 'models/contacts';
-import {capitalize} from 'utils/utils';
+import {convertToText} from 'utils/utils';
 import {StatusChip} from 'components/StatusChip';
 import {Resource} from 'models/misc';
 import {Actions} from './Actions';
@@ -86,16 +86,33 @@ export const columns = (
     ...defaultProps,
   },
   {
-    field: 'role',
-    headerName: 'Role',
+    field: 'secondaryPhone',
+    headerName: '2nd Phone',
     type: 'string',
     flex: 1,
     headerAlign: 'left',
     ...defaultProps,
   },
   {
+    field: 'role',
+    headerName: 'Role',
+    type: 'string',
+    flex: 1,
+    headerAlign: 'left',
+    ...defaultProps,
+    renderCell: (params: GridRenderCellParams<any, any, any>) => {
+      const {t} = useTranslation();
+      const [value = ''] = params.value;
+      return (
+        <Typography variant="body2" mx="0.5em">
+          {t(value)}
+        </Typography>
+      );
+    },
+  },
+  {
     field: 'access',
-    headerName: 'Dashboard Access',
+    headerName: 'Access',
     type: 'string',
     ...defaultAlignment,
     editable: false,
@@ -166,7 +183,8 @@ export const makeRows = (contacts: Resource<ContactsView>): GridRowsProp =>
         name: `${item.userAccount.firstName} ${item.userAccount.lastName}`,
         email: item.userAccount.contact.email || '-',
         phone: item.userAccount.contact.phone || '-',
-        role: capitalize(item.userAccount.roles),
+        secondaryPhone: item.additionalInfo?.secondaryPhone || '-',
+        role: item.userAccount.roles.map((role) => convertToText(role)),
         access: item.userAccount.status,
         actions: item,
       }))

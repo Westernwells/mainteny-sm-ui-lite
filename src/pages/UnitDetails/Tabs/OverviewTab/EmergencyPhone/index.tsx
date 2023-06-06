@@ -38,6 +38,7 @@ export const EmergencyPhone = ({
       phoneNumber: elevator.additionalInfo?.elevatorPhone?.phoneNumber ?? '',
       simCardNumber:
         elevator.additionalInfo?.elevatorPhone?.simCardNumber ?? '',
+      simPin: elevator.additionalInfo?.elevatorPhone?.simPin ?? '',
       callCenter: elevator.additionalInfo?.elevatorPhone?.callCenter ?? '',
       placeOfInstallation:
         elevator.additionalInfo?.elevatorPhone?.location ?? '',
@@ -53,6 +54,7 @@ export const EmergencyPhone = ({
             connectionType: values.phoneConnection,
             phoneNumber: values.phoneNumber,
             simCardNumber: values.simCardNumber,
+            simPin: values.simPin,
             callCenter: values.callCenter,
             location: values.placeOfInstallation,
           },
@@ -68,6 +70,7 @@ export const EmergencyPhone = ({
     'phoneConnection',
     'phoneNumber',
     'simCardNumber',
+    'simPin',
     'callCenter',
     'placeOfInstallation',
   ]).current;
@@ -76,9 +79,7 @@ export const EmergencyPhone = ({
     <InfoCard
       containerStyles={{...containerStyles}}
       handleAction={() => setOpenDialog(true)}
-      header={
-        <Typography variant="subtitle1">{t('Emergency Phone')}</Typography>
-      }
+      header={<Typography variant="subtitle1">{t('Auto dialer')}</Typography>}
       headerActionIcon={<EditIcon />}
       showHeaderBackground
       bodyContainerStyle={{

@@ -6,6 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import {ThemeProvider} from '@mui/material/styles';
 import {MutationErrorHandler, queryErrorHandler} from 'reactQuery/handlers';
 import {SnackbarProvider} from 'notistack';
+import {LanguageProvider} from 'context/LanguageProvider';
 import {App} from './App';
 import {theme} from './theme';
 
@@ -14,7 +15,7 @@ const queryClient = new QueryClient({
     queries: {
       useErrorBoundary: true,
       onError: queryErrorHandler,
-      refetchOnWindowFocus: false,
+      // refetchOnWindowFocus: false,
     },
     mutations: {
       onError: MutationErrorHandler,
@@ -26,18 +27,20 @@ ReactDOM.render(
   <ThemeProvider theme={theme}>
     {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
     <CssBaseline />
-    <QueryClientProvider client={queryClient}>
-      <SnackbarProvider
-        autoHideDuration={2000}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        maxSnack={3}>
-        <App />
-      </SnackbarProvider>
-      <ReactQueryDevtools />
-    </QueryClientProvider>
+    <LanguageProvider>
+      <QueryClientProvider client={queryClient}>
+        <SnackbarProvider
+          autoHideDuration={6000}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          maxSnack={3}>
+          <App />
+        </SnackbarProvider>
+        <ReactQueryDevtools />
+      </QueryClientProvider>
+    </LanguageProvider>
   </ThemeProvider>,
   document.querySelector('#root'),
 );

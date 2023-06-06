@@ -24,7 +24,11 @@ import {
 } from '../../models/articleForm';
 import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';
 import {AddStockForm} from './Stock/AddStockForm';
-import {amountRecordForBackend, makeAmountRecord} from '../../utils/currency';
+import {
+  amountRecordForBackend,
+  makeAmountRecord,
+  useCurrentCurrency,
+} from '../../utils/currency';
 
 const validationSchema = Yup.object().shape({
   category: Yup.string().nullable().required('Category is required'),
@@ -44,6 +48,7 @@ export const NewArticle = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const {t} = useTranslation();
+  const currentCurrency = useCurrentCurrency();
   const {mutateAsync: createArticle} = useCreateArticle(
     t('Article created successfully'),
   );
@@ -74,6 +79,9 @@ export const NewArticle = () => {
     t('Add stock & suppliers'),
   ];
 
+  const percentageVat =
+    user?.userAccount?.serviceCompany?.settings?.percentageVat ?? 0;
+
   const formik = useFormik<ArticleBasicFormModel>({
     initialValues: {
       category: '',
@@ -84,12 +92,12 @@ export const NewArticle = () => {
       storageLocation: '',
       type: '',
       unit: '',
-      unitPurchaseVat: 0,
+      unitPurchaseVat: percentageVat,
       unitPurchaseAmount: 0,
-      unitPurchaseAmountCurrency: 'EUR',
-      unitSellingVat: 0,
+      unitPurchaseAmountCurrency: currentCurrency.code,
+      unitSellingVat: percentageVat,
       unitSellingAmount: 0,
-      unitSellingAmountCurrency: 'EUR',
+      unitSellingAmountCurrency: currentCurrency.code,
     },
     onSubmit: () => {},
     validationSchema,
@@ -224,7 +232,8 @@ export const NewArticle = () => {
         display: 'flex',
         flexDirection: 'column',
       }}>
-      <FlexContainer>
+      <FlexContainer
+        containerStyle={{mt: '1em', overflowY: 'scroll', height: 0}}>
         {activeStep === 0 && (
           <FlexContainer containerStyle={{mt: '2em'}}>
             <PageCard headerLabel={t('Basic Information')} minHeight="100%">
@@ -270,13 +279,21 @@ export const NewArticle = () => {
                 formik={formikStock}
                 containerStyles={{display: 'flex', flexDirection: 'row'}}
               />
-              <Box display="flex" flexDirection="column">
+              <Box
+                display="flex"
+                flexDirection="column"
+                sx={{
+                  boxShadow:
+                    suppliers.length > 1 ? '0 2px 5px -3px gray' : 'none',
+                }}>
                 <Typography
                   variant="subtitle2"
                   sx={{
                     color: theme.palette.text.primary,
                     minHeight: '2rem',
                     mt: '2em',
+                    boxShadow:
+                      suppliers.length > 1 ? '0 2px 5px -3px gray' : 'none',
                   }}>
                   {t('Suppliers Information')}
                 </Typography>
@@ -301,3 +318,5 @@ export const NewArticle = () => {
     </Stepper>
   );
 };
+
+export default NewArticle;

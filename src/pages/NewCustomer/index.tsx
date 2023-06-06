@@ -7,6 +7,7 @@ import {Stepper} from 'components/Stepper';
 import {Priority} from 'models/service-order';
 import {useCreateCustomer} from 'hooks/reactQuery/useCustomers';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {formatPhoneNumber} from 'utils/customer-utils';
 import {BasicCustomerFormModel, NewCustomerBody} from './model';
 import {BasicCustomerForm} from './BasicCustomerForm';
 
@@ -41,6 +42,8 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       billingAddress: null,
       priority: Priority.NONE,
       externalId: '',
+      registrationDate: new Date(),
+      costCenter: '',
     });
 
   useLayoutEffect(() => {
@@ -77,8 +80,14 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       externalId: basicCustomerFormValues.externalId,
       name: basicCustomerFormValues.name,
       postalAddress: basicCustomerFormValues.postalAddress,
+      billingEmail: basicCustomerFormValues.billingEmail,
       priority: basicCustomerFormValues.priority,
       serviceCompanyId: user!.userAccount.serviceCompany.id,
+      registrationDate: basicCustomerFormValues.registrationDate,
+      costCenter: basicCustomerFormValues.costCenter,
+      secondaryPhoneNumber: basicCustomerFormValues.secondaryPhoneNumber
+        ? formatPhoneNumber(basicCustomerFormValues.secondaryPhoneNumber)
+        : '',
     };
 
     const response = await createCustomer(body);
@@ -121,3 +130,5 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
     </Stepper>
   );
 };
+
+export default NewCustomer;

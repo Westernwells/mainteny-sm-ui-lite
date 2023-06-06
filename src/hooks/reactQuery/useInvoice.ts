@@ -1,3 +1,4 @@
+import {useContext} from 'react';
 import {
   useInfiniteQuery,
   UseInfiniteQueryOptions,
@@ -13,7 +14,13 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import {useNavigate} from 'react-router-dom';
 // FIXME: Dummy Import
 
-import {Resource, RestError} from 'models/misc';
+import {
+  Language,
+  Resource,
+  RestError,
+  SimpleEmailRecord,
+  StringValue,
+} from 'models/misc';
 import {
   InvoiceView,
   QueryInvoiceParams,
@@ -23,11 +30,16 @@ import {
   UpdateInvoice,
   QueryInvoiceCommentsParams,
   CreateInvoiceComment,
+  InvoicePaymentRecord,
+  CreateInvoiceOverdueNoticeRecord,
+  InvoiceActivityView,
 } from 'models/invoice';
 import {Comment} from 'models/comment';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
+import {languageContextMap} from 'utils/utils';
 import {getTotalFromArticles, getTotalWithVatFromArticles} from 'utils/invoice';
+import {LanguageContext} from 'context/LanguageProvider';
 import {useUserSession} from './useUserSession';
 
 // TODO: make API call to fetch Invoices
@@ -117,31 +129,43 @@ export function useInvoiceDetail(invoiceId?: string) {
   });
 }
 
-export const postPublishInvoice = async (id: string) => {
-  await axiosClient.post(`api/invoices/${id}/publish`);
+export const postPublishInvoice = async (
+  id: string,
+  body: SimpleEmailRecord,
+) => {
+  await axiosClient.post<{value: string}>(`api/invoices/${id}/publish`, body);
 };
 
-export const usePublishInvoice = () => {
+export const usePublishInvoice = ({
+  shouldNavigate = true,
+}: {
+  shouldNavigate?: boolean;
+} = {}) => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
 
-  return useMutation((invoiceId: string) => postPublishInvoice(invoiceId), {
-    onSuccess: (__, invoiceId) => {
-      queryClient.invalidateQueries([qk.fetchInvoices]);
-      queryClient.invalidateQueries([qk.invoiceById]);
-      enqueueSnackbar(`Invoice sent successfully`, {
-        variant: 'success',
-      });
-      navigate(`/invoices/details/${invoiceId}`);
+  return useMutation(
+    ({id, body}: {id: string; body: SimpleEmailRecord}) =>
+      postPublishInvoice(id, body),
+    {
+      onSuccess: (__, {id}) => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+        queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
+        enqueueSnackbar(`Invoice sent successfully`, {
+          variant: 'success',
+        });
+        if (shouldNavigate) {
+          navigate(`/invoices/details/${id}`);
+        }
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
     },
-    onError: (err) => {
-      console.log(err);
-      enqueueSnackbar('An unexpected error occurred, please try again.', {
-        variant: 'error',
-      });
-    },
-  });
+  );
 };
 
 export const putInvoicePaymentStatus = async (id: string) => {
@@ -150,7 +174,7 @@ export const putInvoicePaymentStatus = async (id: string) => {
 
 export const useInvoicePaymentStatus = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
 
   return useMutation(
@@ -159,6 +183,7 @@ export const useInvoicePaymentStatus = () => {
       onSuccess: (__, invoiceId) => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
+        queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
         enqueueSnackbar(`Invoice marked as paid`, {
           variant: 'success',
         });
@@ -166,105 +191,109 @@ export const useInvoicePaymentStatus = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
 };
 
-export const postInvoice = async (body: CreateInvoice, publish: boolean) => {
-  const {data} = await axiosClient.post<{value: string}>('api/invoices', body);
-  return {data, publish};
+export const addInvoicePayment = async ({
+  invoiceId,
+  body,
+}: {
+  invoiceId: string;
+  body: InvoicePaymentRecord;
+}) => {
+  await axiosClient.post<{value: string}>(
+    `api/invoices/${invoiceId}/payments`,
+    body,
+  );
+};
+
+export const useAddInvoicePayment = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const navigate = useNavigate();
+
+  return useMutation(
+    ({invoiceId, body}: {invoiceId: string; body: InvoicePaymentRecord}) =>
+      addInvoicePayment({invoiceId, body}),
+    {
+      onSuccess: (__, {invoiceId}) => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+        queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
+        enqueueSnackbar(`Invoice marked as paid!`, {
+          variant: 'success',
+        });
+        navigate(`/invoices/details/${invoiceId}`);
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+export const postInvoice = async (body: CreateInvoice) => {
+  const {data} = await axiosClient.post<StringValue>('/api/invoices', body);
+  return data;
 };
 
 export const useCreateInvoice = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
-  const navigate = useNavigate();
-  const {mutate: publishInvoice} = usePublishInvoice();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
-  return useMutation(
-    ({data, publish}: {data: CreateInvoice; publish: boolean}) =>
-      postInvoice(data, publish),
-    {
-      onSuccess: ({data, publish}, variables) => {
-        queryClient.invalidateQueries([qk.fetchInvoices]);
-        queryClient.invalidateQueries([qk.invoiceById]);
-        enqueueSnackbar(`Invoice created successfully`, {
-          variant: 'success',
-        });
-        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_INVOICE_CREATED, {
-          invoiceId: data.value,
-          propertyOwnerId: variables.data.propertyOwnerId,
-          serviceOrderId: variables.data.serviceOrderId,
-          amountWithoutVat: getTotalFromArticles(variables.data.items),
-          amountWithVat: getTotalWithVatFromArticles(variables.data.items),
-          isPartialInvoice: variables.data.type === 'PARTIAL',
-        });
-        if (publish) {
-          publishInvoice(data.value);
-        } else {
-          navigate('/invoices?pageIndex=1&pageSize=25');
-        }
-      },
-      onError: (err) => {
-        console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
-      },
+  return useMutation(({data}: {data: CreateInvoice}) => postInvoice(data), {
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries([qk.fetchInvoices]);
+      queryClient.invalidateQueries([qk.invoiceById]);
+      queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
+      enqueueSnackbar(`Invoice created successfully`, {
+        variant: 'success',
+      });
+      Mixpanel.identifyAndTrack(mixpanelEvents.NEW_INVOICE_CREATED, {
+        invoiceId: data.value,
+        propertyOwnerId: variables.data.propertyOwnerId,
+        serviceOrderId: variables.data.serviceOrderId,
+        amountWithoutVat: getTotalFromArticles(variables.data.items),
+        amountWithVat: getTotalWithVatFromArticles(variables.data.items),
+        isPartialInvoice: variables.data.type === 'PARTIAL',
+      });
+      // navigate(`/invoices/details/${data.value}`);
     },
-  );
+    onError: (err) => {
+      console.log(err);
+      showError(err);
+    },
+  });
 };
 
-export const putInvoice = async (
-  body: UpdateInvoice,
-  id: string,
-  publish: boolean,
-) => {
-  await axiosClient.put(`api/invoices/${id}`, body);
-  return publish;
+export const putInvoice = async (body: UpdateInvoice, id: string) => {
+  const {data} = await axiosClient.put<StringValue>(`api/invoices/${id}`, body);
+  return data;
 };
 
 export const useUpdateInvoice = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
-  const {mutate: publishInvoice} = usePublishInvoice();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(
-    ({
-      data,
-      invoiceId,
-      publish,
-    }: {
-      data: UpdateInvoice;
-      invoiceId: string;
-      publish: boolean;
-    }) => putInvoice(data, invoiceId, publish),
+    ({data, invoiceId}: {data: UpdateInvoice; invoiceId: string}) =>
+      putInvoice(data, invoiceId),
     {
-      onSuccess: (__, {publish, invoiceId}) => {
+      onSuccess: () => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
+        queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
         enqueueSnackbar(`Invoice updated successfully`, {
           variant: 'success',
         });
-        if (publish) {
-          publishInvoice(invoiceId);
-        }
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -277,7 +306,7 @@ export const deleteInvoice = async (id: string, navigate: boolean) => {
 
 export const useDeleteInvoice = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
 
   return useMutation(
@@ -299,9 +328,7 @@ export const useDeleteInvoice = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -389,7 +416,7 @@ export const postInvoiceComment = async (
 
 export const useCreateInvoiceComment = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {showError} = useSnackbar();
 
   return useMutation(
     ({invoiceId, body}: {invoiceId: string; body: CreateInvoiceComment}) =>
@@ -398,9 +425,7 @@ export const useCreateInvoiceComment = () => {
       onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -418,7 +443,7 @@ export const deleteInvoiceComment = async (
 
 export const useDeleteInvoiceComment = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {showError} = useSnackbar();
 
   return useMutation(
     ({invoiceId, commentId}: {invoiceId: string; commentId: string}) =>
@@ -427,9 +452,7 @@ export const useDeleteInvoiceComment = () => {
       onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -449,7 +472,7 @@ export const updateInvoiceComment = async (
 
 export const useUpdateInvoiceComment = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {showError} = useSnackbar();
 
   return useMutation(
     ({
@@ -465,10 +488,145 @@ export const useUpdateInvoiceComment = () => {
       onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
 };
+
+export const createInvoiceOverdueNotice = async (
+  invoiceId: string,
+  body: CreateInvoiceOverdueNoticeRecord,
+) => {
+  const {data} = await axiosClient.post<{value: string}>(
+    `/api/invoices/${invoiceId}/overdueNotices`,
+    body,
+  );
+  return data;
+};
+
+export const useCreateInvoiceOverdueNotice = () => {
+  const queryClient = useQueryClient();
+  const {showError} = useSnackbar();
+  return useMutation(
+    ({
+      invoiceId,
+      body,
+    }: {
+      invoiceId: string;
+      body: CreateInvoiceOverdueNoticeRecord;
+    }) => createInvoiceOverdueNotice(invoiceId, body),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+        queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+export const publishInvoiceOverdueNotice = async (
+  invoiceId: string,
+  noticeId: string,
+  body: SimpleEmailRecord,
+) => {
+  await axiosClient.post<{value: string}>(
+    `api/invoices/${invoiceId}/overdueNotices/${noticeId}/publish`,
+    body,
+  );
+};
+
+export const usePublishInvoiceOverdueNotice = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const navigate = useNavigate();
+  return useMutation(
+    ({
+      invoiceId,
+      noticeId,
+      body,
+    }: {
+      invoiceId: string;
+      noticeId: string;
+      body: SimpleEmailRecord;
+    }) => publishInvoiceOverdueNotice(invoiceId, noticeId, body),
+    {
+      onSuccess: (__, {invoiceId}) => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+        queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
+        enqueueSnackbar(`Overdue notice sent successfully!`, {
+          variant: 'success',
+        });
+        navigate(`/invoices/details/${invoiceId}`);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+export const fetchInvoiceActivities = async (params: {
+  invoiceId: string;
+  language: Language;
+}) => {
+  const response = await axiosClient.get<InvoiceActivityView[]>(
+    `/api/invoices/${params.invoiceId}/activities`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useInvoiceActivities = (
+  {invoiceId}: {invoiceId: string},
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {language} = useContext(LanguageContext);
+  return useQuery<InvoiceActivityView[], RestError>(
+    [qk.fetchInvoiceActivities, invoiceId, language],
+    () =>
+      fetchInvoiceActivities({
+        invoiceId,
+        language: languageContextMap[language],
+      }),
+    {
+      enabled: !!invoiceId,
+      ...options,
+    },
+  );
+};
+
+const fetchElevatorInvoices = async (
+  elevatorId: string,
+  params: QueryInvoiceParams,
+): Promise<Resource<InvoiceView>> => {
+  const response = await axiosClient.get<Resource<InvoiceView>>(
+    `/api/elevators/${elevatorId}/invoices`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useElevatorInvoices = (
+  elevatorId: string,
+  params: QueryInvoiceParams,
+  options?: UseQueryOptions<any, any, any>,
+) =>
+  useQuery<Resource<InvoiceView>, RestError>(
+    [queryKeys.fetchElevatorInvoices, elevatorId, params],
+    () => fetchElevatorInvoices(elevatorId, params),
+    {enabled: !!elevatorId, ...options},
+  );

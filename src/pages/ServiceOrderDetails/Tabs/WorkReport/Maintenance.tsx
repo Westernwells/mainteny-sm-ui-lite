@@ -2,7 +2,6 @@ import useTheme from '@mui/material/styles/useTheme';
 import {Divider, Typography} from '@mui/material';
 import Box from '@mui/material/Box';
 import {FormLabel} from 'components/form/FormLabel';
-import {addMinutes} from 'date-fns';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {ServiceOrderReportView} from 'models/service-order';
 import {useState} from 'react';
@@ -13,21 +12,12 @@ interface Props {
   serviceReport: ServiceOrderReportView;
 }
 
-const dateToString = (date: Date) =>
-  date.toISOString().split('T')[1].split('.')[0];
-
 export const Maintenance = ({serviceReport}: Props) => {
   const theme = useTheme();
   const [schedule] = useState(
     serviceReport.serviceOrder.schedules[
       serviceReport.serviceOrder.schedules.length - 1
     ],
-  );
-  const [endTime] = useState(
-    addMinutes(
-      new Date(serviceReport.serviceOrder.actualStartTime!),
-      serviceReport.serviceOrder.serviceTime!,
-    ),
   );
   const formatDate = useFormatDate();
   const {t} = useTranslation();
@@ -63,14 +53,16 @@ export const Maintenance = ({serviceReport}: Props) => {
               {
                 label: t('Start'),
                 date: formatDate(serviceReport.serviceOrder.actualStartTime),
-                time: dateToString(
-                  new Date(serviceReport.serviceOrder.actualStartTime!),
-                ),
+                time: new Date(
+                  serviceReport.serviceOrder.actualStartTime!,
+                ).toLocaleTimeString(),
               },
               {
                 label: t('End'),
                 date: formatDate(serviceReport.serviceOrder.actualEndTime),
-                time: dateToString(new Date(endTime)),
+                time: new Date(
+                  serviceReport.serviceOrder.actualEndTime!,
+                ).toLocaleTimeString(),
               },
             ].map((i) => (
               <Box

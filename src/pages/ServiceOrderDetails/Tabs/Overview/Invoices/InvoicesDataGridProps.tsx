@@ -79,7 +79,7 @@ export const makeRows = (
   invoices.length
     ? invoices.map((item, index: number) => ({
         id: index,
-        date: formatDate(toDate(item.issuedDate)),
+        date: item.sentDate ? formatDate(toDate(item.sentDate)) : '-',
         number: item.number,
         order: item.serviceOrder?.number,
         customer: item.propertyOwner.name,
@@ -99,6 +99,6 @@ export const makeRows = (
           serviceCompanyId: item.serviceCompany.id,
         },
         invoice: item,
-        navigateTo: `details/${item.id}`,
+        navigateTo: `/invoices/details/${item.id}`,
       }))
     : [];

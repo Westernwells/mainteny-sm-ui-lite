@@ -118,6 +118,10 @@ export const serviceOrderTypeToString = (type: ServiceOrderType | string) => {
       return 'Callout';
     case ServiceOrderType.REPAIR:
       return 'Repair';
+    case ServiceOrderType.INSPECTION:
+      return 'Inspection';
+    case ServiceOrderType.NEW_INSTALLATION:
+      return 'Installation';
     default:
       return '-';
   }
@@ -133,6 +137,10 @@ export const serviceOrderTypeToEnum = (type: string) => {
       return ServiceOrderType.CALLOUT;
     case 'Repair':
       return ServiceOrderType.REPAIR;
+    case 'Inspection':
+      return ServiceOrderType.INSPECTION;
+    case 'Installation':
+      return ServiceOrderType.NEW_INSTALLATION;
     default:
       return ServiceOrderType.REPAIR;
   }

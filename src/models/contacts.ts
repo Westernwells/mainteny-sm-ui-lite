@@ -8,6 +8,9 @@ export interface ContactsView {
   number: string;
   userAccount: ContactsUserAccount;
   propertyOwner: PropertyOwner;
+  additionalInfo?: {
+    secondaryPhone?: string;
+  };
 }
 
 export interface PropertyOwner {
@@ -18,6 +21,7 @@ export interface PropertyOwner {
   labels: string[];
   postalAddress: Address;
   serviceCompanyId: string;
+  secondaryPhoneNumber?: string;
 }
 
 interface ContactsMeta extends Meta {
@@ -40,6 +44,7 @@ export enum ContactsStatus {
 
 export interface ContactFormModel {
   phone: string;
+  secondaryPhone: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -51,6 +56,7 @@ export interface ContactBody {
     externalId: string;
     roles: string[];
     propertyOwnerId?: string;
+    secondaryPhone?: string;
   };
   userAccount: {
     category: string;

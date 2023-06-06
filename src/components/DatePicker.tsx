@@ -4,7 +4,9 @@ import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {DatePicker as MuiDatePicker} from '@mui/x-date-pickers/DatePicker';
 import {InputLabelProps} from '@mui/material/InputLabel';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {mapLanguageToLocale} from 'utils/utils';
 import {useEffect, useState} from 'react';
+import {locales} from 'utils/datetime';
 import Box from '@mui/material/Box';
 import {FormInput} from './form/FormInput';
 
@@ -19,6 +21,9 @@ interface Props {
   reset?: boolean;
   getReset?: (reset: boolean) => void;
   required?: boolean;
+  dateFormat?: string;
+  mask?: string;
+  disableMask?: boolean;
 }
 
 export const DatePicker = ({
@@ -32,9 +37,14 @@ export const DatePicker = ({
   reset = false,
   getReset = () => {},
   required,
+  dateFormat,
+  mask = '__.__.____"',
+  disableMask,
 }: Props) => {
-  const [value, setValue] = useState<Date | null>(defaultDate);
   const {user} = useUserSession();
+  const language = user?.userAccount.serviceCompany.language;
+  const locale = mapLanguageToLocale[language!];
+  const [value, setValue] = useState<Date | null>(defaultDate);
 
   useEffect(() => {
     setValue(defaultDate);
@@ -54,12 +64,15 @@ export const DatePicker = ({
   }, [value]);
   return (
     <Box sx={{...containerStyles}}>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider
+        dateAdapter={AdapterDateFns}
+        adapterLocale={locales[locale]}>
         <MuiDatePicker
           inputFormat={
-            user?.userAccount.serviceCompany.settings.dateFormat || 'dd.MM.yyyy'
+            dateFormat || user?.userAccount.serviceCompany.settings.dateFormat
           }
-          mask="__.__.____"
+          // mask={mask}
+          disableMaskedInput={disableMask}
           value={value}
           minDate={minDate}
           maxDate={maxDate}

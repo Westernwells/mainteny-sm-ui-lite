@@ -67,6 +67,17 @@ export const EditEmergencyPhoneForm = ({formik}: Props) => (
     <Grid item sm={12}>
       <FormInput
         props={{
+          label: 'Sim Pin ',
+          name: 'simPin',
+          value: formik.values.simPin,
+          onChange: formik.handleChange,
+          onBlur: formik.handleBlur,
+        }}
+      />
+    </Grid>
+    <Grid item sm={12}>
+      <FormInput
+        props={{
           label: 'Call Center',
           name: 'callCenter',
           value: formik.values.callCenter,

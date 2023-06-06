@@ -1,4 +1,5 @@
-import {SetStateAction, useEffect, useState} from 'react';
+import {SetStateAction, useEffect, useMemo, useState} from 'react';
+import {isAfter} from 'date-fns';
 import Box, {BoxProps} from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
@@ -28,7 +29,7 @@ interface Props extends BoxProps {
 }
 
 export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
-  const {t} = useTranslation();
+  const {t, i18n} = useTranslation();
   const formatDateDistance = useFormatDateDistance();
   const formatDate = useFormatDate();
   const [openDialog, setOpenDialog] = useState(false);
@@ -95,6 +96,19 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
   const handleSave = () =>
     switchActive && isEmpty(formError) ? schedule() : reschedule();
 
+  const dueDate = useMemo(() => {
+    const dueDateObj = new Date(serviceOrder.dueDate);
+
+    // check if date is future date
+    if (isAfter(dueDateObj, new Date())) {
+      return `${t('Due in')} ${formatDateDistance(dueDateObj, undefined, {
+        addSuffix: false,
+      })}`;
+    }
+
+    return `${t('Due')} ${formatDateDistance(dueDateObj)}`;
+  }, [serviceOrder.dueDate, i18n.language]);
+
   return (
     <Box sx={{mt: '0.625em', px: '0.5em'}} {...rest}>
       <Box
@@ -119,9 +133,7 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
             {t(serviceOrderTypeToString(serviceOrder.type))}
           </Typography>
         </Box>
-        <Typography variant="caption">
-          {t('Due in')} {formatDateDistance(new Date(serviceOrder.dueDate))}
-        </Typography>
+        <Typography variant="caption">{dueDate}</Typography>
       </Box>
       <Typography variant="body2" component="div" mt="0.5em">
         {serviceOrder.elevator.propertyOwner.name}

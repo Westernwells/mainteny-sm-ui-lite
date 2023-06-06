@@ -18,6 +18,7 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
     headerName: 'number',
+    flex: 0.5,
   }),
   getColumnProps({
     field: 'customer',
@@ -88,7 +89,7 @@ export const makeRows = (
     type: item.type,
     customer: item.elevator.propertyOwner.name,
     address: item.elevator.address.fullName || '-',
-    unit: item.elevator.number,
+    unit: item.elevator.externalId || '-',
     date: formatDate(item.dueDate),
     technician: item.schedules.length
       ? item.schedules

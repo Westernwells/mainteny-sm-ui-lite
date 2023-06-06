@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import useTheme from '@mui/material/styles/useTheme';
 import {useTranslation} from 'react-i18next';
 
-interface Props {
+export interface Props {
   bodyContainerStyle?: {[key: string]: any};
   containerStyles?: {[key: string]: any};
   headerStyles?: {[key: string]: string | number};
@@ -45,9 +45,9 @@ export const InfoCard = ({
       {!disabledHeader && (
         <CardHeader
           sx={{
-            py: header ? '0.5em' : '0',
+            py: header ? '0.25rem' : '0',
             my: '1em',
-            px: !showHeaderBackground ? '0' : 'default',
+            px: !showHeaderBackground ? '0' : '0.5rem',
             background: showHeaderBackground
               ? theme.palette.inputBackground.main
               : null,

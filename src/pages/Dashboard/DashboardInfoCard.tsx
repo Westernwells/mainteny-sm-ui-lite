@@ -1,7 +1,8 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
-import {InfoCard} from 'components/InfoCard';
+import {InfoCard, Props as InfoCardProps} from 'components/InfoCard';
+import {EmptySection} from 'components/EmptySection';
 import {Chip, Typography} from '@mui/material';
 import {SeeMore} from './SeeMore';
 
@@ -26,12 +27,14 @@ export const DashboardInfoCard = ({
   title,
   chipLabel,
   seeMorePath,
+  emptySection,
   children,
   ...props
-}: {
+}: InfoCardProps & {
   title: string;
   chipLabel: string;
   seeMorePath: string;
+  emptySection: {show: boolean; label: string};
   children: React.ReactNode;
 }) => {
   const {t} = useTranslation();
@@ -46,6 +49,7 @@ export const DashboardInfoCard = ({
       }}
       bodyContainerStyle={{
         paddingBottom: '0px !important',
+        ...props.bodyContainerStyle,
       }}
       header={
         <Typography variant="subtitle1">
@@ -59,7 +63,16 @@ export const DashboardInfoCard = ({
       showHeaderBackground
       {...props}>
       {children}
-      <SeeMore path={seeMorePath} />
+      {emptySection.show ? (
+        <EmptySection
+          illustration="clipboard"
+          size="tiny"
+          containerStyle={{height: '75%'}}
+          label={emptySection.label}
+        />
+      ) : (
+        <SeeMore path={seeMorePath} />
+      )}
     </InfoCard>
   );
 };

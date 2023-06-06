@@ -11,7 +11,7 @@ import {FileResourceRecord} from '../../../models/media';
 export interface Props {
   title: string;
   successMessage: string;
-  hints?: string[];
+  hint?: string;
   uploadPath: string;
   onClose: (files: FileResourceRecord[]) => void;
   onCancel: () => void;
@@ -20,7 +20,7 @@ export interface Props {
 export const ArticleImageUploadForm = ({
   title,
   successMessage,
-  hints,
+  hint,
   uploadPath,
   onClose,
   onCancel,
@@ -60,8 +60,16 @@ export const ArticleImageUploadForm = ({
         open: true,
       }}>
       <MyDropZone
-        hints={hints}
-        acceptedFileTypes="image/*"
+        hint={hint}
+        acceptedFileTypes={[
+          'image/png',
+          'image/jpeg',
+          'image/jpg',
+          'image/bmp',
+          'image/gif',
+          'image/webp',
+          'image/svg+xml',
+        ]}
         getAcceptedFiles={(files) => {
           setAcceptedFiles(files);
         }}
@@ -72,3 +80,4 @@ export const ArticleImageUploadForm = ({
     </Dialog>
   );
 };
+// JPEG, PNG, BMP, GIF, WEBP, SVG only

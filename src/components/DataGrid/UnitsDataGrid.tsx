@@ -20,8 +20,8 @@ interface Props {
 export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
-    headerName: 'number',
-    flex: 0,
+    headerName: 'unit number',
+    flex: 1,
   }),
   getColumnProps({
     field: 'model',
@@ -31,21 +31,13 @@ export const columns: GridColDef[] = [
     field: 'customer',
     headerName: 'customer',
     cellClassName: 'truncateText',
-    flex: 1.5,
+    flex: 1,
   }),
   getColumnProps({
     field: 'address',
     headerName: 'address',
     cellClassName: 'truncateText',
     flex: 1.5,
-  }),
-  getColumnProps({
-    field: 'lastVisit',
-    headerName: 'last visit',
-  }),
-  getColumnProps({
-    field: 'nextVisit',
-    headerName: 'next visit',
   }),
 ];
 
@@ -112,7 +104,9 @@ export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
   return (
     <>
       <SearchInput
-        placeholder="search"
+        variant="outlined"
+        label="Search"
+        placeholder="Search by number, model, customer, address etc."
         onValueChanged={(value) => setSearch(value)}
       />
       <Box display="flex" flexGrow={1} sx={styles.scrollBar}>
@@ -132,7 +126,12 @@ export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
               pageIndex: value - 1,
             }))
           }
-          noRowsEmptySection={<NoRowsEmptySection placeholder="unit" />}
+          noRowsEmptySection={
+            <NoRowsEmptySection
+              placeholder="unit"
+              action={() => window.open('/units/new', '_blank')}
+            />
+          }
         />
       </Box>
     </>

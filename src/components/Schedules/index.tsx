@@ -313,7 +313,7 @@ export const Schedule = ({
                             : lookupTechnician[key] &&
                               `${lookupTechnician[key][0].userAccount.firstName} ${lookupTechnician[key][0].userAccount.lastName}`;
                         const employeeUrl =
-                          scheduleType === 'people'
+                          scheduleType === 'people' && lookupTechnician[key]
                             ? `/employees/details/${lookupTechnician[key][0].userAccount.id}`
                             : undefined;
 

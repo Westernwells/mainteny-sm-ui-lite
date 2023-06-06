@@ -18,6 +18,10 @@ export const languages = [
     label: 'German',
     value: 'de-de',
   },
+  {
+    label: 'Serbian',
+    value: 'sr-rs',
+  },
 ];
 
 export const timeFormats = [

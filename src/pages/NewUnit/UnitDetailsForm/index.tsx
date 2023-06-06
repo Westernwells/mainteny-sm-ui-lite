@@ -22,7 +22,13 @@ interface Props {
 }
 
 const validationSchema = Yup.object().shape({
-  category: Yup.string().nullable().required('Category is required'),
+  category: Yup.string()
+    .nullable()
+    .oneOf(
+      Object.values(ElevatorCategory).map((c) => convertToText(c)),
+      'Invalid unit category',
+    )
+    .required('Category is required'),
   unitType: Yup.string().nullable().required('Unit type is required'),
 });
 
@@ -242,6 +248,8 @@ export const UnitDetailsForm = ({
                 placeholder: 'e.g. 10',
                 label: 'Number of Stops',
                 name: 'numberOfStops',
+                type: 'number',
+                inputProps: {min: 0},
                 value: formik.values.numberOfStops,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
@@ -337,6 +345,8 @@ export const UnitDetailsForm = ({
                 name: 'yearBuilt',
                 label: 'Year Built',
                 placeholder: 'e.g. 2000',
+                type: 'number',
+                inputProps: {min: 0},
                 value: formik.values.yearBuilt,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,

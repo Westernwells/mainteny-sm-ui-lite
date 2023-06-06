@@ -1,7 +1,7 @@
 import i18n from 'i18next';
 import {initReactI18next} from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import {de} from './languages/de/de';
+import {de, sr} from './languages';
 
 export const resources = {
   de: {
@@ -9,6 +9,9 @@ export const resources = {
   },
   en: {
     translation: {},
+  },
+  sr: {
+    translation: sr,
   },
 };
 

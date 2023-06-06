@@ -21,6 +21,12 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
     phone: customer.contact.phone.split('+')[1] || customer.contact.phone,
     url: customer.contact.url,
     email: customer.contact.email,
+    billingEmail: customer.additionalInfo.billingEmail,
+    costCenter: customer.additionalInfo.costCenter,
+    registrationDate: customer.additionalInfo.registrationDate,
+    secondaryPhoneNumber:
+      customer.additionalInfo.secondaryPhoneNumber?.split('+')?.[1] ??
+      customer.additionalInfo.secondaryPhoneNumber,
     postalAddress: customer.postalAddress
       ? {
           fullName: customer.postalAddress.fullName,
@@ -63,20 +69,19 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
     email: Yup.string()
       .email('Enter a valid email')
       .required('Email is required'),
-    externalId: Yup.string().required('Customer number is required'),
+    externalId: Yup.string(),
     phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),
-    postalAddress: Yup.object().nullable().required('Address is required'),
-    billingAddress: Yup.object()
-      .nullable()
-      .required('Billing Address is required'),
+    postalAddress: Yup.object().nullable(),
+    billingAddress: Yup.object().nullable(),
   });
 
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
+      enableReinitialize
       onSubmit={async (values, {resetForm}) => {
-        updateCustomer(values, customer.id, () => {
+        updateCustomer({...values}, customer.id, () => {
           resetForm();
           onClose();
         });

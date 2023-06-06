@@ -6,9 +6,10 @@ import {
 } from '@mui/x-data-grid';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
-import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import {FormatDate} from 'models/misc';
 import {ContractView} from 'models/contract';
+import {Actions} from 'pages/Contracts/Actions';
+import {getColumnProps} from 'components/DataGridLayout';
 import {formatNetAmount} from '../../../utils/currency';
 
 const defaultProps = {
@@ -91,33 +92,18 @@ export const columns: GridColDef[] = [
     align: 'right',
     ...defaultProps,
   },
-  {
+  getColumnProps({
     field: 'actions',
-    headerName: 'ACTIONS',
-    // TODO: Actions not working as expected
-    editable: false,
-    sortable: false,
-    disableColumnMenu: true,
-    disableExport: true,
-    flex: 0,
-    headerAlign: 'center',
+    headerName: 'actions',
     align: 'center',
-
-    renderHeader: (params) => {
-      const {t} = useTranslation();
-      return (
-        <Typography variant="subtitle2" color="textSecondary">
-          {params.colDef.headerName && t(params.colDef.headerName)}
-        </Typography>
-      );
-    },
-    renderCell: () => (
-      <FileDownloadOutlinedIcon
-        sx={{color: 'action.active'}}
-        onClick={() => console.log('ACTION: Download')}
+    renderCell: (params) => (
+      <Actions
+        url={params.value.url}
+        fileName={params.value.fileName}
+        contractId={params.value.contractId}
       />
     ),
-  },
+  }),
 ];
 
 export const makeRows = (
@@ -134,5 +120,18 @@ export const makeRows = (
     contractType: item.type[0] + item.type.slice(1).toLowerCase(),
     cost: formatNetAmount(item.additionalInfo.price) || '-',
     status: item.status,
+    actions: {
+      url:
+        item?.additionalInfo?.documents &&
+        item?.additionalInfo?.documents.length > 0
+          ? item?.additionalInfo?.documents[0].uri
+          : '',
+      fileName:
+        item?.additionalInfo?.documents &&
+        item?.additionalInfo?.documents?.length > 0
+          ? item?.additionalInfo?.documents[0]?.description
+          : 'contract',
+      contractId: item.id,
+    },
     navigateTo: `/contracts/details/${item.id}`,
   }));

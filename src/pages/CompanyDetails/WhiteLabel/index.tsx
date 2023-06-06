@@ -79,17 +79,21 @@ export const WhiteLabel = ({containerStyles, company}: Props) => {
         {(!logoCompany || showUploadForm) && (
           <Box>
             <MyDropZone
-              hints={[
-                t('JPG, PNG or BMP only'),
-                t('File size less than 5MB only'),
-              ]}
+              hint="JPEG, PNG, BMP, GIF, WEBP or SVG"
               getAcceptedFiles={(files) => {
                 saveImage(files);
               }}
               getRejectedFileWithErrors={(file) => {
                 console.log(file);
               }}
-              acceptedFileTypes="image/*"
+              acceptedFileTypes={[
+                'image/png',
+                'image/jpeg',
+                'image/bmp',
+                'image/gif',
+                'image/webp',
+                'image/svg+xml',
+              ]}
               maxFiles={1}
               isCropped
               cropperTitle={t('Upload Company Logo')}

@@ -12,6 +12,7 @@ import {
   formatSearchParamsPageSize,
 } from 'utils/utils';
 import {useCompanies} from 'hooks/reactQuery/useCompanies';
+import {useQueryState} from 'hooks/useQueryState';
 import {ServiceCompanyItem} from 'models/service-company';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {Widget} from '../../components/Widget';
@@ -22,12 +23,13 @@ const pageSize = 13;
 export const Companies = () => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useQueryState('searchCompanies');
   const [queryParams, setQueryParams] = useSearchParams();
   const totalCompaniesRef = useRef(0);
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
+  const textInput = useRef<HTMLInputElement>(null);
 
   const {
     data: companiesResource = createEmptyResource<ServiceCompanyItem>(pageSize),
@@ -43,6 +45,9 @@ export const Companies = () => {
   useEffect(() => {
     if (page.pageIndex) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    }
+    if (textInput.current) {
+      textInput.current.value = search;
     }
   }, [search]);
 
@@ -96,6 +101,7 @@ export const Companies = () => {
           btnOnClick={() => navigate('/admin/companies/new')}
           showActionBtn
           btnLabel="New Company"
+          refInput={textInput}
         />
       }>
       <DataGridLayout
@@ -118,3 +124,5 @@ export const Companies = () => {
     </PageListingLayout>
   );
 };
+
+export default Companies;

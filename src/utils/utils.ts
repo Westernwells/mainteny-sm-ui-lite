@@ -1,3 +1,5 @@
+import {Language} from 'models/misc';
+
 export const capitalize = (role: any[]) => {
   let roles = '';
   role.forEach((value: string, index: number) => {
@@ -94,11 +96,13 @@ export const daysTime: {[key: number]: string[]}[] = [
 export const languageMap: {[key: string]: string} = {
   'en-US': 'en-us',
   'de-DE': 'de-de',
+  'sr-SP': 'sr-sp',
 };
 
 export const mapLanguageToLocale: {[key: string]: string} = {
   'en-us': 'enUS',
   'de-de': 'de',
+  'sr-SP': 'sr',
 };
 
 export const getDataGridHeight = (
@@ -163,3 +167,21 @@ export const nameToInitials = (name: string) => {
   const words = name.split(' ');
   return `${words?.[0]?.[0] ?? ''}${words?.[1]?.[0] ?? ''}`;
 };
+
+export const waitForSeconds = (seconds: number) =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('done');
+    }, seconds * 1000);
+  });
+
+export const languageContextMap: {[key: string]: Language} = {
+  EN: Language.EN_US,
+  DE: Language.DE_DE,
+  SR: Language.SR_RS,
+};
+
+export const titleCase = (str: string) =>
+  `${str[0].toUpperCase()}${str.slice(1).toLowerCase()}`;
+
+export const getUniqueId = () => Math.random().toString(36).substring(2, 9);

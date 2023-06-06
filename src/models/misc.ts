@@ -4,6 +4,7 @@ import {UseMutationResult} from 'react-query';
 import {number} from 'yup';
 import {GetState, SetState} from 'zustand';
 import {UserAccountSimpleView} from './user';
+import {ContractTypes, ContractNameTypes} from './contract';
 
 export interface RestError {
   errorCode: number;
@@ -27,6 +28,12 @@ export interface Meta {
   state: State;
 }
 
+export interface Currency {
+  code: string;
+  fractionDigits: number;
+  symbol: string;
+}
+
 export interface Settings {
   nightlyShuffleEnabled: boolean;
   isNightlyShuffleEnabled: boolean;
@@ -46,6 +53,9 @@ export interface Settings {
   whiteLabel: {
     logoPath: string;
   };
+  currencies: Currency[];
+  contractTypes: ContractTypes;
+  contractNameTypes: ContractNameTypes[];
 }
 
 export interface Page {
@@ -136,11 +146,6 @@ export enum SaveMode {
   EDIT,
 }
 
-export enum Language {
-  'en-US' = 'en-us',
-  'de-DE' = 'de-de',
-}
-
 export enum Order {
   ASC = 'ASC',
   DESC = 'DESC',
@@ -192,7 +197,7 @@ export interface StringValueResponse {
 }
 
 export interface Money {
-  amount: number;
+  value: number;
   currency: string;
 }
 
@@ -279,3 +284,15 @@ export type FormatDate = (
   input?: string | Date | undefined,
   dateFormat?: string | undefined,
 ) => string | undefined;
+
+export interface SimpleEmailRecord {
+  email: string;
+  subject: string;
+  content: string;
+}
+
+export enum Language {
+  EN_US = 'EN_US',
+  DE_DE = 'DE_DE',
+  SR_RS = 'SR_RS',
+}

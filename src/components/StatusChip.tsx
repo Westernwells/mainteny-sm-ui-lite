@@ -13,11 +13,12 @@ const statusColor = {
   default: 'warning.main',
   primary: 'primary.main',
   secondary: 'secondary.main',
-  error: 'error.light',
+  error: 'error.main',
   info: 'text.secondary',
   success: 'success.main',
   warning: 'warning.light',
   'action.active': 'action.active',
+  'eden.light': 'eden.light',
 };
 interface Props {
   label: string | ReactNode;

@@ -62,7 +62,7 @@ const createCustomer = async (body: NewCustomerBody): Promise<StringValue> => {
 };
 
 export const useCreateCustomer = (successMsg: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation((body: NewCustomerBody) => createCustomer(body), {
     onSuccess: () => {
       enqueueSnackbar(successMsg, {
@@ -71,15 +71,13 @@ export const useCreateCustomer = (successMsg: string) => {
     },
     onError: (err) => {
       console.log(err);
-      enqueueSnackbar('An unexpected error occurred, please try again.', {
-        variant: 'error',
-      });
+      showError(err);
     },
   });
 };
 
 export const useCustomer = () => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
 
   const updateCustomer = async (
@@ -105,17 +103,43 @@ export const useCustomer = () => {
       }
     } catch (error: any) {
       console.error(error);
-      enqueueSnackbar(
-        error.response?.message ||
-          'Sorry! Unable to save changes right now. Please try again.',
-        {
-          variant: 'error',
-        },
-      );
+      showError(error);
     }
   };
 
   return {
     updateCustomer,
   };
+};
+
+const deleteCustomer = async (propertyOwnerId: string) => {
+  const response = await axiosClient.delete<StringValue>(
+    `/api/propertyOwners/${propertyOwnerId}`,
+  );
+  return response.data;
+};
+
+export const useDeleteCustomer = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    (propertyOwnerId: string) => deleteCustomer(propertyOwnerId),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.queryCustomers);
+      },
+      onError: (err: any) => {
+        console.log(
+          '🚀 ~ file: useCustomers.ts ~ useDeleteCustomer ~ err',
+          err,
+        );
+        showError(err);
+      },
+    },
+  );
 };

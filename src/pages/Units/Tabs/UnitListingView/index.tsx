@@ -12,6 +12,7 @@ import {ServiceOrderOrderField} from 'models/service-order';
 import {DatePicker} from 'components/DatePicker';
 import {Order} from 'models/misc';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useQueryState} from 'hooks/useQueryState';
 import {
   formatSearchParamsPageIndex,
   formatSearchParamsPageSize,
@@ -35,7 +36,7 @@ export const UnitListingView = () => {
   const [nextVisitEnd, setNextVisitEnd] = useState<Date | null>(null);
   const [sortOrder, setSortOrder] = useState<Order | undefined>();
   const [orderBy, setOrderBy] = useState<ServiceOrderOrderField | undefined>();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useQueryState('searchUnits');
   const [page, setPage] = useState(pageInfo);
   const totalUnitsRef = useRef(0);
   const [pageCount, setPageCount] = useState(0);
@@ -76,6 +77,9 @@ export const UnitListingView = () => {
   useEffect(() => {
     if (page.pageIndex) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    }
+    if (textInput.current) {
+      textInput.current.value = search;
     }
   }, [search, lastVisitStart, lastVisitEnd, nextVisitStart, nextVisitEnd]);
 

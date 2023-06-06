@@ -165,7 +165,7 @@ export const Notes = ({quotation}: Props) => {
             bgcolor={theme.palette.grey[50]}
             {...(index === 0 && {ref: notesTopRef})}>
             <Typography variant="overline" textTransform="uppercase">
-              {date}
+              {t(date)}
             </Typography>
           </Box>
 

@@ -41,7 +41,7 @@ const defaultAlignment: {
 export const columns = (activeId: string): GridColDef[] => [
   {
     field: 'number',
-    headerName: 'UNIT NUMBER',
+    headerName: 'Number',
     type: 'string',
     ...defaultAlignment,
     ...defaultProps,
@@ -73,29 +73,29 @@ export const columns = (activeId: string): GridColDef[] => [
   },
   {
     field: 'model',
-    headerName: 'MODEL',
+    headerName: 'Model',
     type: 'string',
     ...defaultAlignment,
     ...defaultProps,
   },
   {
     field: 'customer',
-    headerName: 'CUSTOMER',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'lastVisit',
-    headerName: 'LAST VISIT',
+    headerName: 'Customer',
     type: 'string',
     ...defaultAlignment,
     ...defaultProps,
   },
   {
     field: 'address',
-    headerName: 'ADDRESS',
+    headerName: 'Address',
     type: 'number',
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+  {
+    field: 'lastVisit',
+    headerName: 'Last Visit',
+    type: 'string',
     ...defaultAlignment,
     ...defaultProps,
   },

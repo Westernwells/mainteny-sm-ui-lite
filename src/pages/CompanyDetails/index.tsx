@@ -97,3 +97,5 @@ export const CompanyDetails = ({getCurrentPageTitle}: Props) => {
     </>
   );
 };
+
+export default CompanyDetails;

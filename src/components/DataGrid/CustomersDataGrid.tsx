@@ -16,16 +16,16 @@ interface Props {
 
 export const columns: GridColDef[] = [
   getColumnProps({
-    field: 'number',
-    headerName: 'number',
-    align: 'center',
-    flex: 0,
-  }),
-  getColumnProps({
     field: 'name',
-    headerName: 'name',
+    headerName: 'customer',
     cellClassName: 'truncateText',
     flex: 1.5,
+  }),
+  getColumnProps({
+    field: 'number',
+    headerName: 'customer no.',
+    align: 'center',
+    flex: 0,
   }),
   getColumnProps({
     field: 'address',
@@ -41,7 +41,7 @@ export const columns: GridColDef[] = [
   }),
   getColumnProps({
     field: 'phone',
-    headerName: 'phone',
+    headerName: 'phone no.',
   }),
 ];
 
@@ -50,8 +50,7 @@ export const makeRows = (customers: PropertyOwnerView[]): GridRowsProp =>
     ? customers.map((item, index) => ({
         id: index,
         name: item.name,
-        // TODO: Use Customer number
-        number: 'C-12345',
+        number: item.externalId,
         address: item.postalAddress?.fullName,
         units: item.unitNumber,
         phone: item.contact.phone,
@@ -104,7 +103,9 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
   return (
     <>
       <SearchInput
-        placeholder="search"
+        variant="outlined"
+        label="Search"
+        placeholder="Search by number, name, address etc."
         onValueChanged={(value) => setSearch(value)}
       />
       <Box display="flex" flexGrow={1} sx={styles.scrollBar}>
@@ -115,7 +116,7 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
           onCellClick={(params) => setRowItem(params.row.propertyOwner)}
           loading={isFetching}
           pageSize={page.pageSize}
-          pageIndex={page.pageIndex}
+          pageIndex={page.pageIndex + 1}
           pageCount={pageCount}
           hideFooter={pageCount <= 1}
           handlePageChange={(value) =>
@@ -124,7 +125,12 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
               pageIndex: value - 1,
             }))
           }
-          noRowsEmptySection={<NoRowsEmptySection placeholder="customer" />}
+          noRowsEmptySection={
+            <NoRowsEmptySection
+              placeholder="customer"
+              action={() => window.open('/customers/new', '_blank')}
+            />
+          }
         />
       </Box>
     </>

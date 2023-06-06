@@ -1,4 +1,4 @@
-import {Article} from './article';
+import {ArticleView} from './article';
 import {ElevatorView} from './elevator';
 import {Amount, Meta} from './misc';
 import {ServiceCompanySimpleView} from './service-company';
@@ -23,7 +23,7 @@ export type QuotationAdditionalInfo = {
 
 export interface QuotationItem {
   additionalInfo: QuotationAdditionalInfo;
-  article: Article;
+  article: ArticleView;
   id: string;
   description: string;
   name: string;
@@ -56,6 +56,7 @@ export interface QuotationView {
   search: string;
   meta: Meta;
   items: QuotationItem[];
+  commentCount?: number;
 }
 
 export interface QueryQuotationParams {
@@ -101,4 +102,23 @@ export interface QueryQuotationCommentsParams {
 export interface CreateQuotationComment {
   content: string;
   subject: string;
+}
+
+export enum QuotationActivityType {
+  CREATED = 'CREATED',
+  UPDATED = 'UPDATED',
+  SENT = 'SENT',
+  ACCEPTED = 'ACCEPTED',
+  REJECTED = 'REJECTED',
+  SERVICE_ORDER_ADDED = 'SERVICE_ORDER_ADDED',
+  SERVICE_ORDER_REMOVED = 'SERVICE_ORDER_REMOVED',
+}
+
+export interface QuotationActivityView {
+  id: string;
+  type: QuotationActivityType;
+  data: string;
+  text: string;
+  additionalInfo: string;
+  meta: Meta;
 }

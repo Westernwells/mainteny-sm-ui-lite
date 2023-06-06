@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {useCallback, useContext} from 'react';
 import {
   useInfiniteQuery,
   UseInfiniteQueryOptions,
@@ -10,13 +10,14 @@ import {
 import {useSnackbar} from 'hooks/useSnackbar';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {useNavigate} from 'react-router-dom';
-import {Resource, RestError} from 'models/misc';
+import {Language, Resource, RestError, SimpleEmailRecord} from 'models/misc';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
   CreateQuotation,
   CreateQuotationComment,
   QueryQuotationCommentsParams,
   QueryQuotationParams,
+  QuotationActivityView,
   QuotationFilters,
   QuotationView,
   ReplyQuotation,
@@ -25,7 +26,9 @@ import {
 import {Comment} from 'models/comment';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
+import {languageContextMap} from 'utils/utils';
 import {getTotalFromArticles, getTotalWithVatFromArticles} from 'utils/invoice';
+import {LanguageContext} from 'context/LanguageProvider';
 import {useUserSession} from './useUserSession';
 
 export const fetchQuotations = async (
@@ -43,13 +46,8 @@ export const fetchQuotations = async (
   return response.data;
 };
 
-const filterQuotations = (
-  quotationsRes: Resource<QuotationView>,
-  filters: QuotationFilters,
-) => {
+const filterQuotations = (quotationsRes: Resource<QuotationView>) => {
   const result = {...quotationsRes};
-  console.log(filters);
-  // TODO: Filter code goes here
 
   return result;
 };
@@ -68,7 +66,7 @@ export function useQuotations(
       ...options,
       select: useCallback(
         (quotationsRes: Resource<QuotationView>) => {
-          const filterResult = filterQuotations(quotationsRes, filters);
+          const filterResult = filterQuotations(quotationsRes);
           return filterResult;
         },
         [filters],
@@ -98,31 +96,33 @@ export function useQuotationDetails(
   );
 }
 
-export const postPublishQuotation = async (id: string) => {
-  await axiosClient.post(`api/quotations/${id}/publish`);
+export const postPublishQuotation = async (
+  id: string,
+  body: SimpleEmailRecord,
+) => {
+  await axiosClient.post(`api/quotations/${id}/publish`, body);
 };
 
 export const usePublishQuotation = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
 
   return useMutation(
-    (quotationId: string) => postPublishQuotation(quotationId),
+    ({id, body}: {id: string; body: SimpleEmailRecord}) =>
+      postPublishQuotation(id, body),
     {
-      onSuccess: (_, quotationId) => {
+      onSuccess: (_, {id}) => {
         queryClient.invalidateQueries([qk.fetchQuotations]);
         queryClient.invalidateQueries([qk.quotationById]);
         enqueueSnackbar(`Quotation sent successfully`, {
           variant: 'success',
         });
-        navigate(`/quotations/details/${quotationId}`);
+        navigate(`/quotations/details/${id}`);
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -134,7 +134,7 @@ export const putReplyQuotation = async (id: string, body: ReplyQuotation) => {
 
 export const useReplyQuotation = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
 
   return useMutation(
@@ -151,106 +151,69 @@ export const useReplyQuotation = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
 };
 
-export const postQuotation = async (
-  body: CreateQuotation,
-  publish: boolean,
-) => {
+export const postQuotation = async (body: CreateQuotation) => {
   const {data} = await axiosClient.post<{value: string}>(
     'api/quotations',
     body,
   );
-  return {data, publish};
+  return data;
 };
 
 export const useCreateQuotation = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
-  const {mutate: publishQuotation} = usePublishQuotation();
 
-  return useMutation(
-    ({data, publish}: {data: CreateQuotation; publish: boolean}) =>
-      postQuotation(data, publish),
-    {
-      onSuccess: ({data, publish}, variables) => {
-        queryClient.invalidateQueries([qk.fetchQuotations]);
-        queryClient.invalidateQueries([qk.quotationById]);
-        enqueueSnackbar(`Quotation created successfully`, {
-          variant: 'success',
-        });
-        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_QUOTATION_CREATED, {
-          quotationId: data.value,
-          elevatorId: variables.data.elevatorId,
-          amountWithoutVat: getTotalFromArticles(variables.data.items),
-          amountWithVat: getTotalWithVatFromArticles(variables.data.items),
-        });
-        if (publish) {
-          publishQuotation(data.value);
-        } else {
-          navigate('/quotations?pageIndex=1&pageSize=25');
-        }
-      },
-      onError: (err) => {
-        console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
-      },
+  return useMutation(({data}: {data: CreateQuotation}) => postQuotation(data), {
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries([qk.fetchQuotations]);
+      queryClient.invalidateQueries([qk.quotationById]);
+      enqueueSnackbar(`Quotation created successfully`, {
+        variant: 'success',
+      });
+      Mixpanel.identifyAndTrack(mixpanelEvents.NEW_QUOTATION_CREATED, {
+        quotationId: data.value,
+        elevatorId: variables.data.elevatorId,
+        amountWithoutVat: getTotalFromArticles(variables.data.items),
+        amountWithVat: getTotalWithVatFromArticles(variables.data.items),
+      });
+      navigate(`/quotations/details/${data.value}`);
     },
-  );
+    onError: (err) => {
+      console.log(err);
+      showError(err);
+    },
+  });
 };
 
-export const putQuotation = async (
-  body: UpdateQuotation,
-  id: string,
-  publish: boolean,
-) => {
+export const putQuotation = async (body: UpdateQuotation, id: string) => {
   await axiosClient.put(`api/quotations/${id}`, body);
-  return publish;
 };
 
 export const useUpdateQuotation = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
-  const {mutate: publishQuotation} = usePublishQuotation();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(
-    ({
-      data,
-      quotationId,
-      publish,
-    }: {
-      data: UpdateQuotation;
-      quotationId: string;
-      publish: boolean;
-    }) => putQuotation(data, quotationId, publish),
+    ({data, quotationId}: {data: UpdateQuotation; quotationId: string}) =>
+      putQuotation(data, quotationId),
     {
-      onSuccess: (_, {publish, quotationId}) => {
+      onSuccess: () => {
         queryClient.invalidateQueries([qk.fetchQuotations]);
         queryClient.invalidateQueries([qk.quotationById]);
         enqueueSnackbar(`Quotation updated successfully`, {
           variant: 'success',
         });
-        if (publish) {
-          publishQuotation(quotationId);
-        }
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -263,7 +226,7 @@ export const deleteQuotation = async (id: string, navigate: boolean) => {
 
 export const useDeleteQuotation = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
 
   return useMutation(
@@ -285,9 +248,7 @@ export const useDeleteQuotation = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -358,7 +319,7 @@ export const postQuotationComment = async (
 
 export const useCreateQuotationComment = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {showError} = useSnackbar();
 
   return useMutation(
     ({
@@ -373,9 +334,7 @@ export const useCreateQuotationComment = () => {
         queryClient.invalidateQueries([qk.fetchQuotationComments]),
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -393,7 +352,7 @@ export const deleteQuotationComment = async (
 
 export const useDeleteQuotationComment = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {showError} = useSnackbar();
 
   return useMutation(
     ({quotationId, commentId}: {quotationId: string; commentId: string}) =>
@@ -403,9 +362,7 @@ export const useDeleteQuotationComment = () => {
         queryClient.invalidateQueries([qk.fetchQuotationComments]),
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -425,7 +382,7 @@ export const updateQuotationComment = async (
 
 export const useUpdateQuotationComment = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {showError} = useSnackbar();
 
   return useMutation(
     ({
@@ -442,10 +399,41 @@ export const useUpdateQuotationComment = () => {
         queryClient.invalidateQueries([qk.fetchQuotationComments]),
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
+    },
+  );
+};
+
+export const fetchQuotationActivities = async (params: {
+  quotationId: string;
+  language: Language;
+}) => {
+  const response = await axiosClient.get<QuotationActivityView[]>(
+    `/api/quotations/${params.quotationId}/activities`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useQuotationActivities = (
+  {quotationId}: {quotationId: string},
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {language} = useContext(LanguageContext);
+  return useQuery<QuotationActivityView[], RestError>(
+    [qk.fetchQuotationActivities, quotationId, language],
+    () =>
+      fetchQuotationActivities({
+        quotationId,
+        language: languageContextMap[language],
+      }),
+    {
+      enabled: !!quotationId,
+      ...options,
     },
   );
 };

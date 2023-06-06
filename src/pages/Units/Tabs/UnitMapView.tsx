@@ -15,6 +15,7 @@ import {FilterFields} from 'components/FilterFields';
 import {Widget} from 'components/Widget';
 import {FlexContainer} from 'components/FlexContainer';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useQueryState} from 'hooks/useQueryState';
 
 export const UnitMapsView = () => {
   const formatDate = useFormatDate();
@@ -28,7 +29,7 @@ export const UnitMapsView = () => {
   const [nextVisitStart, setNextVisitStart] = useState<Date | null>(null);
   const [nextVisitEnd, setNextVisitEnd] = useState<Date | null>(null);
   const [zoom, setZoom] = useState(20);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useQueryState('searchUnitsMapView');
   const [points, setPoints] = useState<any>([]);
   const [bounds, setBounds] = useState<any>([]);
   const [page, setPage] = useState(makePage(0, 100));
@@ -64,6 +65,9 @@ export const UnitMapsView = () => {
   useEffect(() => {
     if (page.pageIndex) {
       setPage({...page, pageIndex: 0});
+    }
+    if (textInput.current) {
+      textInput.current.value = search;
     }
   }, [search, lastVisitStart, lastVisitEnd, nextVisitStart, nextVisitEnd]);
 
@@ -118,7 +122,7 @@ export const UnitMapsView = () => {
         }
       }
     }
-  }, [elevatorView]);
+  }, [elevatorView, isLoading, isFetching]);
 
   useEffect(() => {
     const result = elevatorView.elevator.data.map((elevator: ElevatorView) => ({
@@ -267,7 +271,7 @@ export const UnitMapsView = () => {
     <FlexContainer>
       {renderWidget()}
       <GoogleMapReact
-        bootstrapURLKeys={{key: process.env.REACT_APP_GOOGLE_MAPS_KEY!}}
+        bootstrapURLKeys={{key: import.meta.env.REACT_APP_GOOGLE_MAPS_KEY!}}
         yesIWantToUseGoogleMapApiInternals
         onGoogleApiLoaded={({map}) => {
           mapRef.current = map;

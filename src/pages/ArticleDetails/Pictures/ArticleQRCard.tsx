@@ -93,7 +93,7 @@ export const ArticleQRCard = ({article}: {article: ArticleView}) => {
           <NoItemSection
             label={t('No QR code yet. Please click the button below to add!')}
             illustration="qrcode"
-            buttonLabel={t('+ Add QR Code')}
+            buttonLabel={t('Add QR Code')}
             action={() => setOpenDialog(true)}
           />
         )}
@@ -105,7 +105,6 @@ export const ArticleQRCard = ({article}: {article: ArticleView}) => {
           onClose={saveArticle}
           successMessage={t('QR code image uploaded successfully')}
           onCancel={() => setOpenDialog(false)}
-          hints={[t('File size less than 5MB only')]}
         />
       )}
     </InfoCard>

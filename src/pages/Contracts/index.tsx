@@ -18,19 +18,23 @@ import {
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
+import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useQueryState} from 'hooks/useQueryState';
 import {
   costRangeConvertor as crConverter,
   getStartEndPrice,
 } from 'utils/contract-utils';
+import {useCurrentCurrency} from 'utils/currency';
 import {columns, makeRows} from './ContractsDataGridProps';
 
 const pageSize = 25;
 
 export const Contracts = () => {
+  const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useQueryState('searchContracts');
   const [queryParams, setQueryParams] = useSearchParams();
   const [page, setPage] = useState(makePage(0, pageSize));
   const totalContractRef = useRef(0);
@@ -71,6 +75,9 @@ export const Contracts = () => {
     if (page.pageIndex) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
     }
+    if (textInput.current) {
+      textInput.current.value = search;
+    }
   }, [search, cost, status]);
 
   useEffect(() => {
@@ -89,7 +96,7 @@ export const Contracts = () => {
   }, [queryParams]);
 
   const costRangeConvertor = (selectedItems: string[]) => {
-    const range = crConverter(selectedItems);
+    const range = crConverter(selectedItems, currentCurrency.symbol);
     setCost(range);
   };
 
@@ -139,12 +146,7 @@ export const Contracts = () => {
           textInput.current.value = '';
         }
       }}>
-      <MultipleSelectCheckmarks
-        label="Price Range"
-        options={['0 - €500', '€500 - €1,000', '> €1,000']}
-        initialSelectedItems={cost}
-        getSelectedValue={(item) => costRangeConvertor(item)}
-      />
+      <PriceRangeDropdown cost={cost} costRangeConvertor={costRangeConvertor} />
       <MultipleSelectCheckmarks
         label="Status"
         options={['VALID', 'EXPIRED'].map((item) => convertToText(item))}
@@ -193,3 +195,5 @@ export const Contracts = () => {
     </PageListingLayout>
   );
 };
+
+export default Contracts;

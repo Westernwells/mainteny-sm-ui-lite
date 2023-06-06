@@ -141,6 +141,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         ServiceOrderStatus.INIT,
         ServiceOrderStatus.READY_TO_SCHEDULE,
         ServiceOrderStatus.SCHEDULING,
+        ServiceOrderStatus.EXPIRED,
       ].includes(serviceOrderDetails.status)
     ) {
       return [

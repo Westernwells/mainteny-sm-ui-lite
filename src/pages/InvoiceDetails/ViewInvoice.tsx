@@ -1,12 +1,17 @@
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
+import printJS from 'print-js';
+import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import ReplayIcon from '@mui/icons-material/Replay';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import Print from '@mui/icons-material/Print';
+import Edit from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import {Button} from 'components/Button';
 import {StatusChip} from 'components/StatusChip';
 import {PageCard} from 'components/PageCard';
@@ -14,13 +19,16 @@ import {BottomDrawer} from 'components/BottomDrawer';
 import {PDFContainer} from 'components/PDFContainer';
 import {FormLabel} from 'components/form/FormLabel';
 import {EmptySection} from 'components/EmptySection';
-import {InvoiceStatus, InvoiceView} from 'models/invoice';
+import {InvoiceActivityView, InvoiceStatus, InvoiceView} from 'models/invoice';
+import {ServiceOrderReportView} from 'models/service-order';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {PdfGenerationStatus} from 'models/misc';
 import {formatNetAmount} from 'utils/currency';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
+import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
 import {
+  useDeleteInvoice,
   useInvoicePaymentStatus,
   usePublishInvoice,
 } from 'hooks/reactQuery/useInvoice';
@@ -29,21 +37,115 @@ import {
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import {Confirm} from 'components/Confirm';
+import {SendEmailDialog} from 'components/SendEmailDialog';
+import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {Notes} from './Notes';
+import {InvoiceActivities} from './InvoiceActivities';
 
 interface Props {
   downloadUrl: string;
   invoice: InvoiceView;
+  workReport: ServiceOrderReportView;
+  invoiceActivities: InvoiceActivityView[];
 }
 
-export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
+export const ViewInvoice = ({
+  downloadUrl,
+  invoice,
+  workReport,
+  invoiceActivities,
+}: Props) => {
   const {t} = useTranslation();
+  const theme = useTheme();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const {mutate: publishInvoice} = usePublishInvoice();
+  const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
+    useState(false);
   const {mutate: markAsPaid} = useInvoicePaymentStatus();
+  const {mutate: deleteInvoice} = useDeleteInvoice();
+  const {mutateAsync: publishInvoice} = usePublishInvoice({
+    shouldNavigate: false,
+  });
+
+  const isInvoicePDFGenerated =
+    invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
+    downloadUrl;
+  const isWorkReportPDFGenerated = invoice?.additionalInfo?.includeWorkReport
+    ? workReport?.additionalInfo?.pdfGenerationStatus ===
+      PdfGenerationStatus.DONE
+    : true;
+  const isPDFsGenerated = !!isWorkReportPDFGenerated && isInvoicePDFGenerated;
+
+  const actions = useMemo(() => {
+    const items = [];
+    if (
+      isInvoicePDFGenerated &&
+      (invoice.status === InvoiceStatus.DRAFT ||
+        invoice.status === InvoiceStatus.EXPIRED)
+    ) {
+      items.unshift({
+        label: t('Print'),
+        icon: <Print />,
+        onClick: () => setIsConfirmPrintDialogOpen(true),
+      });
+    } else if (invoice.status === InvoiceStatus.NOT_PAID) {
+      items.unshift({
+        label: t('Resend'),
+        icon: <ReplayIcon />,
+        onClick: () => {
+          setIsSendEmailDialogOpen(true);
+        },
+      });
+    }
+    items.push({
+      label: t('Edit'),
+      icon: <Edit />,
+      onClick: () => {
+        navigate(`/invoices/details/${invoice.id}/edit`);
+      },
+    });
+    if (
+      ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
+    ) {
+      items.push({
+        label: t('Delete'),
+        icon: <DeleteIcon />,
+        onClick: () => {
+          setIsDeleteDialogOpen(true);
+        },
+      });
+    }
+    return items;
+  }, [downloadUrl]);
+
+  const onPrintInvoice = async () => {
+    await publishInvoice(
+      {
+        id: invoice.id,
+        body: {
+          email: '',
+          subject: '',
+          content: '',
+        },
+      },
+      {
+        onSuccess: () => {
+          setIsConfirmPrintDialogOpen(false);
+          if (downloadUrl) {
+            printJS({
+              printable: downloadUrl,
+              type: 'pdf',
+              showModal: true,
+            });
+          }
+        },
+      },
+    );
+  };
 
   return (
     <Box>
@@ -75,11 +177,15 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
                   label="Download Invoice"
                   buttonProps={{
                     variant: 'outlined',
+                    size: 'medium',
+                    sx: {
+                      background: 'transparent',
+                    },
                     onClick: () => window.open(`${downloadUrl}`, '_blank'),
                     disabled:
                       invoice!.additionalInfo.pdfGenerationStatus !==
                       PdfGenerationStatus.DONE,
-                    startIcon: <FileDownloadIcon color="primary" />,
+                    startIcon: <FileDownloadIcon />,
                   }}
                 />
               )}
@@ -97,7 +203,7 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
 
             <Box>
               <FormLabel
-                text="Total (excl. VAT)"
+                text="Total"
                 sx={{color: 'text.main', textTransform: 'initial'}}
               />
               <Typography variant="subtitle1">
@@ -124,8 +230,19 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
               display: 'flex',
               gap: '1em',
               flexDirection: 'column',
+              mx: 0,
+              pt: '0.5rem',
             }}
-            headerActionIcon={<OpenInNewIcon />}
+            headerActionIcon={
+              <OpenInNewIcon
+                fontSize="small"
+                sx={{color: theme.palette.secondary.dark}}
+              />
+            }
+            headerStyles={{
+              mx: 0,
+              px: '1rem',
+            }}
             handleAction={() =>
               navigate(`/orders/details/${invoice.serviceOrder?.id}`)
             }>
@@ -144,17 +261,21 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
                 )}
               </Box>
               <FormLabel text="Order Number" sx={{color: 'text.main'}} />
-              <Typography variant="subtitle1">
+              <Typography variant="caption" component="div">
                 {invoice.serviceOrder?.number}
               </Typography>
               {invoice.serviceOrder && (
-                <Typography variant="caption" sx={{color: 'text.secondary'}}>
+                <Typography
+                  variant="caption"
+                  sx={{color: 'text.secondary'}}
+                  display="block"
+                  mt="-0.25rem">
                   {`${t('Created on')} ${formatDate(
                     invoice.serviceOrder.meta.createdAt,
                   )}`}
                 </Typography>
               )}
-              <Box display="flex" alignItems="center" gap=".5em" mt="1em">
+              <Box display="flex" alignItems="center" gap=".2em" mt="1em">
                 <ServiceOrderIcons
                   serviceOrderType={invoice.serviceOrder?.type}
                   size="small"
@@ -169,6 +290,23 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
               </Typography>
             </Box>
           </PageCard>
+
+          {workReport && (
+            <PageCard
+              headerLabel={t('Work Report')}
+              headerStyles={{
+                pt: '11px',
+              }}>
+              <Typography variant="body1">
+                {formatDate(workReport.serviceOrder.actualStartTime)}:{' '}
+                {workReport.description || '-'}
+              </Typography>
+            </PageCard>
+          )}
+
+          {invoiceActivities?.length ? (
+            <InvoiceActivities activities={invoiceActivities} />
+          ) : null}
         </Grid>
       </Grid>
 
@@ -187,33 +325,65 @@ export const ViewInvoice = ({downloadUrl, invoice}: Props) => {
       <BottomDrawer
         isOpen={invoice.status !== InvoiceStatus.PAID}
         primaryButtonLabel={
-          invoice.status === InvoiceStatus.PAID ? 'Download' : `Mark Paid`
+          invoice.status === InvoiceStatus.DRAFT ||
+          invoice.status === InvoiceStatus.EXPIRED
+            ? 'Send'
+            : 'Payment'
         }
         primaryButtonAction={() => {
           if (
-            invoice.status === InvoiceStatus.PAID &&
-            invoice.id &&
-            downloadUrl
+            invoice.status === InvoiceStatus.DRAFT ||
+            invoice.status === InvoiceStatus.EXPIRED
           ) {
-            window.open(`${downloadUrl}`, '_blank');
+            setIsSendEmailDialogOpen(true);
           } else {
             setIsDialogOpen(true);
           }
         }}
-        listItems={
-          invoice.status !== InvoiceStatus.PAID
-            ? [
-                {
-                  label: t('Resend'),
-                  icon: <ReplayIcon />,
-                  onClick: () => {
-                    if (invoice.id) publishInvoice(invoice.id);
-                  },
-                },
-              ]
-            : []
-        }
+        listItems={actions.map((item) => ({
+          ...item,
+          showBorder: actions[actions.length - 1] !== item,
+        }))}
         isValid={!!downloadUrl.length}
+      />
+      <SendEmailDialog
+        open={isSendEmailDialogOpen}
+        onConfirm={() => setIsSendEmailDialogOpen(false)}
+        onClose={() => setIsSendEmailDialogOpen(false)}
+        id={invoice.id}
+        submitHook={usePublishInvoice}
+        confirmBtnDisabled={!isPDFsGenerated}
+        email={
+          invoice.propertyOwner?.additionalInfo.billingEmail ||
+          invoice.propertyOwner?.contact.email
+        }
+        subject={invoice.subject}
+        content={invoice.description}
+      />
+
+      <MarkAsPaidDialog
+        invoice={invoice}
+        open={isDialogOpen}
+        onConfirm={() => setIsDialogOpen(false)}
+        onClose={() => setIsDialogOpen(false)}
+      />
+
+      <Confirm
+        open={isDeleteDialogOpen}
+        onConfirm={() => {
+          if (invoice.id)
+            deleteInvoice({invoiceId: invoice.id, shouldNavigate: true});
+          setIsDeleteDialogOpen(false);
+        }}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        title="Delete Invoice"
+        content="Do you want to delete this Invoice?"
+        helperText="This action is irreversible."
+      />
+      <ConfirmPrintInvoice
+        open={isConfirmPrintDialogOpen}
+        onConfirm={onPrintInvoice}
+        onClose={() => setIsConfirmPrintDialogOpen(false)}
       />
     </Box>
   );

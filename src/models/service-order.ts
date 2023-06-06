@@ -10,11 +10,10 @@ import {
   ElevatorView,
 } from './elevator';
 import {Contract, ContractSimpleView} from './contract';
-import {Amount, Fee, JobStatus, Meta, Order} from './misc';
+import {Amount, Fee, JobStatus, Meta, Order, PdfGenerationStatus} from './misc';
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
-import {Checklist} from './checklist';
 import {ArticleView} from './article';
 import {FileResource} from './media';
 
@@ -43,6 +42,8 @@ export enum ServiceOrderType {
   EMERGENCY = 'EMERGENCY',
   REPAIR = 'REPAIR',
   CALLOUT = 'CALLOUT',
+  INSPECTION = 'INSPECTION',
+  NEW_INSTALLATION = 'NEW_INSTALLATION',
 }
 
 export enum ServiceOrderOrderField {
@@ -70,6 +71,18 @@ export enum JobScheduleType {
   FIXED = 'FIXED',
 }
 
+export enum ChecklistStatus {
+  INIT = 'INIT',
+  COMPLETED = 'COMPLETED',
+}
+
+export interface ServiceOrderCheckListInfo {
+  checkListId: string;
+  technicianSignature: string;
+  pdfPath: string;
+  pdfGenerationStatus: PdfGenerationStatus;
+  status: ChecklistStatus;
+}
 export interface ServiceOrder {
   id: string;
   number: string;
@@ -100,9 +113,10 @@ export interface ServiceOrderAdditionalInfo {
   appointmentNotificationRequired: boolean;
   appointmentNotificationSent: boolean;
   priority: Priority;
-  checkList: Checklist;
+  checkListInfo?: ServiceOrderCheckListInfo;
   moreInformation: string;
   quotationId: string;
+  workReportGenerated: boolean;
 }
 
 export interface ServiceOrderView {
@@ -250,6 +264,8 @@ export interface ServiceOrderSummary {
 
 export interface ServiceOrderReportAdditionalInfo {
   checkListAnswers: CheckListAnswerRecord[];
+  pdfPath: string;
+  pdfGenerationStatus: PdfGenerationStatus;
 }
 
 export interface ServiceOrderReportArticleView {
@@ -269,6 +285,7 @@ export interface ServiceOrderReport {
   createdAt: number;
   actualServiceTime: number;
   serviceOrderId: string;
+  serviceOrder: ServiceOrderView;
   fee: Fee;
 }
 
@@ -276,6 +293,12 @@ export interface ServiceOrderReportAttachmentView {
   fileResource: FileResource;
   id: string;
   serviceOrderReportId: string;
+}
+
+export interface ServiceOrderReportSignatureView {
+  id: string;
+  serviceOrderReportId: string;
+  fileResource: FileResource;
 }
 
 export interface ServiceOrderReportView {
@@ -290,6 +313,7 @@ export interface ServiceOrderReportView {
   meta: Meta;
   serviceOrder: ServiceOrderView;
   totalAmount: Amount;
+  signatures: ServiceOrderReportSignatureView[];
 }
 
 export interface ServiceOrderScheduleParams {
@@ -315,6 +339,7 @@ export interface ServiceOrderQueryParams {
   status?: ServiceOrderStatus[];
   serviceCompanyId?: string;
   technicianIds?: string[];
+  propertyOwnerId?: string;
   order?: Order;
   orderBy?: ServiceOrderOrderField;
   types?: ServiceOrderType[];

@@ -3,6 +3,7 @@ import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
 import {FormikProps} from 'formik';
+import {FormSelect} from 'components/form/FormSelect';
 import {ArticleType} from '../../../models/article';
 import {FormInput} from '../../../components/form/FormInput';
 import {convertToText} from '../../../utils/utils';
@@ -11,7 +12,7 @@ import {ArticleBasicFormModel} from '../../../models/articleForm';
 import {createEmptyResource} from '../../../utils/paging-utils';
 import {useCacheValues} from '../../../hooks/reactQuery/useElevator';
 import {CacheTypes} from '../../../models/misc';
-import {getCurrencySymbol} from '../../../utils/currency';
+import {getCurrencySymbol, useCurrentCurrency} from '../../../utils/currency';
 
 export const AddBasicInfoForm = ({
   containerStyles,
@@ -22,6 +23,7 @@ export const AddBasicInfoForm = ({
 }) => {
   const [modelQuery, setModelQuery] = useState('');
   const {t} = useTranslation();
+  const currentCurrency = useCurrentCurrency();
   const {data: elevatorModelsResource = createEmptyResource<string>()} =
     useCacheValues(
       {
@@ -117,10 +119,9 @@ export const AddBasicInfoForm = ({
             placeholder: '19%',
             inputProps: {min: 0, max: 100},
             type: 'number',
+            required: true,
+            disabled: true,
             value: formik.values.unitPurchaseVat,
-            helperText: formik.errors.unitPurchaseVat,
-            onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
             InputProps: {
               startAdornment: (
                 <InputAdornment position="start">%</InputAdornment>
@@ -138,13 +139,8 @@ export const AddBasicInfoForm = ({
             inputProps: {min: 0, max: 100},
             type: 'number',
             required: true,
+            disabled: true,
             value: formik.values.unitSellingVat,
-            error: !!(
-              formik.touched.unitSellingVat && formik.errors.unitSellingVat
-            ),
-            helperText: formik.errors.unitSellingVat,
-            onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
             InputProps: {
               startAdornment: (
                 <InputAdornment position="start">%</InputAdornment>
@@ -175,7 +171,7 @@ export const AddBasicInfoForm = ({
           name: 'unit',
           label: t('Unit'),
           required: true,
-          placeholder: t('Select unit'),
+          placeholder: t('Select Unit'),
           error: !!(formik.touched.unit && formik.errors.unit),
         }}
       />
@@ -204,7 +200,9 @@ export const AddBasicInfoForm = ({
           props={{
             name: 'unitPurchaseAmount',
             label: t('Purchase Price'),
-            placeholder: t('e.g. 150€'),
+            placeholder: t(`e.g. 150{{currencySymbol}}`, {
+              currencySymbol: currentCurrency.symbol,
+            }),
             inputProps: {min: 0},
             type: 'number',
             value: formik.values.unitPurchaseAmount,
@@ -225,7 +223,9 @@ export const AddBasicInfoForm = ({
           props={{
             name: 'unitSellingAmount',
             label: t('Selling Price'),
-            placeholder: t('e.g. 200€'),
+            placeholder: t(`e.g. 200{{currencySymbol}}`, {
+              currencySymbol: currentCurrency.symbol,
+            }),
             inputProps: {min: 0},
             type: 'number',
             required: true,
@@ -248,28 +248,22 @@ export const AddBasicInfoForm = ({
         />
       </Box>
 
-      <ComboBox
+      <FormSelect
+        required
         containerStyles={{...containerStyles}}
+        labelId="type-label"
+        label={t('Types')}
         options={Object.keys(ArticleType)
-          .filter((key) => key !== ArticleType.PACKAGE)
+          .filter((key) => key !== ArticleType.SYSTEM)
           .map((key) => ({
-            label: t(convertToText(key)),
+            label: convertToText(key),
             value: convertToText(key),
           }))}
-        initialValue={
-          formik.values.type
-            ? {
-                label: t(convertToText(formik.values.type)),
-                value: convertToText(formik.values.type),
-              }
-            : null
-        }
-        initialQuery={formik.values.type}
-        getValue={(item) => formik.setFieldValue('type', item?.value)}
-        textFieldProps={{
+        selectProps={{
+          id: 'type',
+          value: formik.values.type ? formik.values.type : undefined,
+          onChange: formik.handleChange,
           name: 'type',
-          label: t('Type'),
-          required: true,
           placeholder: t('e.g. Select type'),
           error: !!(formik.touched.type && formik.errors.type),
         }}

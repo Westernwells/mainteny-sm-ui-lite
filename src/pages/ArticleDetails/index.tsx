@@ -1,7 +1,6 @@
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import DeleteIcon from '@mui/icons-material/Delete';
-import useTheme from '@mui/material/styles/useTheme';
 import {useState} from 'react';
 import {useParams, useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
@@ -23,7 +22,6 @@ export const ArticleOverView = () => {
   const {id: articleId} = useParams();
   const {data: articleDetail, isLoading} = useArticleDetails(articleId);
   const [deleteArticleConfirm, setDeleteArticleConfirm] = useState(false);
-  const theme = useTheme();
   const navigate = useNavigate();
   const {t} = useTranslation();
 
@@ -47,20 +45,33 @@ export const ArticleOverView = () => {
 
   return (
     <>
-      <Box display="flex" justifyContent="flex-end" mb="1.2rem">
+      <Box display="flex" justifyContent="flex-end" gap={3} mb="1.5rem">
+        <Button
+          label={t('Order Article')}
+          buttonProps={{
+            onClick: () =>
+              navigate(`/articles/order`, {
+                state: {
+                  article: articleDetail,
+                },
+              }),
+            variant: 'contained',
+            size: 'large',
+            sx: {
+              textTransform: 'none',
+            },
+          }}
+        />
         <Button
           label={t('Delete')}
           buttonProps={{
             onClick: () => deleteArticleDialog(),
             variant: 'outlined',
+            size: 'large',
             sx: {
               bgcolor: 'transparent',
             },
-            startIcon: (
-              <DeleteIcon
-                sx={{opacity: '1', color: theme.palette.primary.light}}
-              />
-            ),
+            startIcon: <DeleteIcon />,
           }}
         />
       </Box>
@@ -93,3 +104,5 @@ export const ArticleOverView = () => {
     </>
   );
 };
+
+export default ArticleOverView;

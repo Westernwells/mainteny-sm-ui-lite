@@ -31,11 +31,12 @@ import {
   amountRecordForBackend,
   formatCurrency,
   formatNetAmount,
+  useCurrentCurrency,
 } from 'utils/currency';
-import {convertToMacro, convertToText} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
+import {contractTypeMap, invoiceCycle} from 'utils/contract-utils';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
@@ -49,12 +50,14 @@ interface Props {
 
 const validationSchema = Yup.object().shape({
   renewalTerms: Yup.number()
-    .min(0, '0 is minimal value')
-    .max(12, '12 is maximum value'),
+    .min(0, 'Renewal period must be between 0-12 months')
+    .max(12, 'Renewal period must be between 0-12 months'),
 });
 
 export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const {t} = useTranslation();
+  const currentCurrency = useCurrentCurrency();
+  const currency = contractDetails?.currency ?? currentCurrency.code;
   const {id: contractId} = useParams();
   const theme = useTheme();
   const {mutateAsync: updateContract} = useUpdateContract('Contract updated');
@@ -79,13 +82,25 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const formik = useFormik<ContractUpdateRequest>({
     initialValues: {
       type: contractDetails?.type!,
+      name: contractDetails?.name!,
       price: contractDetails?.additionalInfo?.price
         ? amountForView(contractDetails?.additionalInfo?.price).netAmount
         : '',
-      invoiceDue: contractDetails?.additionalInfo?.invoiceDue!,
+      invoiceCycle: contractDetails?.additionalInfo?.invoiceCycle!,
       renewalTerms: contractDetails?.additionalInfo?.renewalTerms || '',
       visitsNumber: contractDetails?.visitsNumber || '',
       spendingLimit: contractDetails?.spendingLimit || '',
+      hourlyRate: contractDetails?.hourlyRate,
+      invoiceDueDays: contractDetails?.additionalInfo?.invoiceDueDays,
+      annualPriceAdjustmentPercentage:
+        contractDetails?.additionalInfo?.annualPriceAdjustmentPercentage,
+      discounts:
+        contractDetails?.additionalInfo &&
+        contractDetails?.additionalInfo?.discounts &&
+        contractDetails?.additionalInfo?.discounts[0].days,
+      noticePeriodInMonth: contractDetails?.additionalInfo?.noticePeriodInMonth,
+      firstMaintenance: contractDetails?.additionalInfo?.firstMaintenance,
+      firstInvoiceDate: contractDetails?.additionalInfo?.firstInvoiceDate,
     },
     onSubmit: () => {},
     enableReinitialize: true,
@@ -93,26 +108,42 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   });
 
   const onContractSave = async () => {
+    const contractNameType =
+      user?.userAccount?.serviceCompany?.settings?.contractNameTypes.find(
+        (item) => item.name === formik.values.name,
+      );
     const updatedContract = {
       ...contractDetails,
-      type: convertToMacro(formik.values.type || ''),
+      type: contractNameType?.type || '',
+      name: formik.values?.name || '',
       ...contractDetails?.additionalInfo,
-      renewalTerms: +formik.values.renewalTerms,
+      renewalTerms: formik.values.renewalTerms,
       price: {
         ...amountRecordForBackend({
           netAmount: +formik.values.price,
-          currency: 'EUR',
+          currency,
           percentageVat:
             user?.userAccount.serviceCompany.settings.percentageVat || 0,
         }),
       },
-      invoiceDue: convertToMacro(formik.values.invoiceDue || ''),
+      invoiceCycle: formik.values.invoiceCycle || '',
       visitsNumber: +formik.values.visitsNumber,
       spendingLimit: +formik.values.spendingLimit,
+      hourlyRate: formik.values.hourlyRate || '',
       startDate: contractDetails?.startTime,
       endDate: contractDetails?.endTime,
       timePreference: contractDetails?.timePreference || [],
+      invoiceDueDays: formik.values.invoiceDueDays,
+      annualPriceAdjustmentPercentage:
+        formik.values.annualPriceAdjustmentPercentage,
+      discounts: formik.values.discounts && [
+        {days: 14, discountPercentage: formik.values.discounts},
+      ],
+      noticePeriodInMonth: formik.values.noticePeriodInMonth,
+      firstMaintenance: formik.values.firstMaintenance,
+      firstInvoiceDate: formik.values.firstInvoiceDate,
     };
+
     await updateContract({
       body: updatedContract as any,
       contractId: contractId!,
@@ -200,23 +231,44 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               </Box>
             }
             headerActionIcon={<EditIcon />}>
+            {/** TODO: Pass down the full contract instead of long props */}
             <ContractBasic
+              status={contractDetails?.status}
               numberOfVisits={contractDetails?.visitsNumber}
               costPerYear={
                 formatNetAmount(contractDetails.additionalInfo?.price) || '-'
               }
               spendingLimit={formatCurrency(
                 contractDetails ? contractDetails.spendingLimit : 0,
-                {
-                  currency: contractDetails?.currency || 'EUR',
-                },
+                {currency},
               )}
               renewalPeriod={contractDetails?.additionalInfo?.renewalTerms}
-              invoiceDue={convertToText(
-                contractDetails?.additionalInfo?.invoiceDue || '',
-              )}
+              invoiceCycle={
+                contractDetails?.additionalInfo?.invoiceCycle !== undefined &&
+                contractDetails?.additionalInfo?.invoiceCycle >= 0
+                  ? invoiceCycle[contractDetails?.additionalInfo?.invoiceCycle]
+                  : ''
+              }
               numberOfUnits={contractDetails?.elevators?.length}
-              type={contractDetails?.type.toLowerCase()}
+              type={contractTypeMap[contractDetails?.type]}
+              name={contractDetails?.name}
+              paymentDue={contractDetails?.additionalInfo?.invoiceDueDays}
+              yearlyPriceAdjustment={
+                contractDetails?.additionalInfo?.annualPriceAdjustmentPercentage
+              }
+              noticePreiod={
+                contractDetails?.additionalInfo?.noticePeriodInMonth
+              }
+              discount={contractDetails?.additionalInfo?.discounts?.map(
+                (item) =>
+                  `${item.discountPercentage}% when paid in ${item.days} days`,
+              )}
+              hourlyRate={formatCurrency(
+                contractDetails ? contractDetails.hourlyRate : 0,
+                {currency},
+              )}
+              firstMaintenance={contractDetails.additionalInfo.firstMaintenance}
+              firstInvoiceDate={contractDetails.additionalInfo.firstInvoiceDate}
             />
             <Dialog
               title="Edit Contract"
@@ -224,10 +276,11 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               disableSaveBtn={!!Object.keys(formik.errors).length}
               onSave={() => onContractSave()}
               dialogProps={{open: openContractDialog || false}}>
-              {!isLoading && <EditContractForm formik={formik} />}
+              {!isLoading && (
+                <EditContractForm formik={formik} currency={currency} />
+              )}
             </Dialog>
           </InfoCard>
-
           <Grid container spacing={2}>
             <Grid item xs={12} md={8}>
               <ContractCard
@@ -374,7 +427,14 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                     getAcceptedFiles={(dropedFiles) => {
                       setDocuments(dropedFiles);
                     }}
-                    acceptedFileTypes="application/pdf"
+                    acceptedFileTypes={[
+                      'application/pdf',
+                      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                      'application/vnd.ms-excel',
+                      'text/tab-separated-values',
+                      'text/csv',
+                    ]}
                     maxFiles={1}
                   />
                 </Dialog>
@@ -413,7 +473,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   background: theme.palette.warning.outlinedHoverBg,
                   color: theme.palette.warning.main,
                 }}>
-                {t('Contract expires in {{unUsedContractDays}} days!', {
+                {t('Contract renews in {{unUsedContractDays}} days!', {
                   unUsedContractDays,
                 })}
               </Alert>

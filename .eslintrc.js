@@ -15,7 +15,7 @@ module.exports = {
   globals: {
     JSX: 'readonly',
   },
-  plugins: ['react', '@typescript-eslint'],
+  plugins: ['react', '@typescript-eslint', 'react-hooks'],
   ignorePatterns: ['src/models/*.ts'],
   rules: {
     'react/react-in-jsx-scope': 'off',
@@ -24,7 +24,7 @@ module.exports = {
     'react/jsx-fragments': 'off',
     'react/jsx-filename-extension': [1, {extensions: ['.tsx']}],
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error'],
+    '@typescript-eslint/no-unused-vars': ['warn'],
     'no-shadow': 'off',
     'consistent-return': 'off',
     'no-param-reassign': 0,

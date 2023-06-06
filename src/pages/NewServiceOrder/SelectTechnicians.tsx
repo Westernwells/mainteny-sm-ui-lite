@@ -56,7 +56,7 @@ const otherOptions = [
   },
   {
     value: RadioOptions.SCHEDULE_TECHNICIAN,
-    label: 'Choose a Date, Time & Technician',
+    label: 'Select a date, time & technician',
     subText: `Select a specific date, time and technician and update the technicians schedule for that day`,
   },
 ];
@@ -222,16 +222,21 @@ export const SelectTechnicians = ({
     <Box sx={{}}>
       {showOptions ? (
         <>
+          <Typography variant="h6" pb={2}>
+            {t('Date, time & technicians')}
+          </Typography>
+
           <RadioGroup name="radio-buttons-group">
             <Box sx={{display: 'flex'}}>
               {options.map((option) => (
                 <Box
                   key={option.label}
                   sx={{
-                    width: '32%',
+                    width: '35%',
                     mr: '1em',
-                    px: '1em',
-                    border: `1px solid ${theme.palette.primary.outlinedHoverBg}`,
+                    px: '1.2em',
+                    py: '1.125rem',
+                    border: `1px solid ${theme.palette.eden.light}`,
                     borderRadius: 2,
                   }}>
                   <FormRadio
@@ -244,7 +249,19 @@ export const SelectTechnicians = ({
                         getSelectedTechnicians([]);
                       }
                     }}
-                    label={t(option.label)}
+                    label={
+                      <Typography
+                        variant="h6"
+                        component="span"
+                        fontSize="1.125rem"
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          color: theme.palette.text.secondary,
+                        }}>
+                        {t(option.label)}
+                      </Typography>
+                    }
                     radioProps={{
                       sx: {color: theme.palette.text.secondary},
                     }}
@@ -256,7 +273,12 @@ export const SelectTechnicians = ({
               ))}
             </Box>
           </RadioGroup>
-          <Divider sx={{mt: '1.5em'}} />
+          <Divider
+            sx={{
+              mt: '1.5em',
+              border: `1px solid ${theme.palette.grey[200]}`,
+            }}
+          />
         </>
       ) : null}
 

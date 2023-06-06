@@ -3,10 +3,10 @@ import {CustomerAutoComplete} from 'components/CustomerAutocomplete';
 import {DatePicker} from 'components/DatePicker';
 import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
-import {ContractBasicInfoFormModel, ContractType} from 'models/contract';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {ContractBasicInfoFormModel} from 'models/contract';
 import {PropertyOwnerView} from 'models/propertyManager';
-import React, {FC, useEffect, useState} from 'react';
-import {convertToText} from 'utils/utils';
+import {FC, useEffect, useState} from 'react';
 
 interface Props {
   formik: FormikProps<ContractBasicInfoFormModel>;
@@ -19,6 +19,7 @@ const NewContractBasicInfo: FC<Props> = ({
   getCustomer,
   initialCustomer,
 }) => {
+  const {user} = useUserSession();
   const [customer, setCustomer] = useState(initialCustomer);
 
   useEffect(() => {
@@ -103,16 +104,18 @@ const NewContractBasicInfo: FC<Props> = ({
       <Grid item xs={4}>
         <FormSelect
           labelId="contractTypeSelect-label"
-          label="Contract Type"
-          options={Object.keys(ContractType).map((key) => ({
-            label: convertToText(key),
-            value: convertToText(key),
+          label="Contract name"
+          options={(
+            user?.userAccount?.serviceCompany?.settings?.contractNameTypes ?? []
+          ).map((item) => ({
+            label: item.name,
+            value: item.name,
           }))}
           selectProps={{
             id: 'contractTypeSelect',
-            value: formik.values.contractType,
+            value: formik.values.name,
             onChange: formik.handleChange,
-            name: 'contractType',
+            name: 'name',
             onBlur: formik.handleBlur,
           }}
           required

@@ -24,8 +24,14 @@ interface Props {
   orderId?: string;
 }
 
+export const serviceOrderActivitiesLang: {[key: string]: string} = {
+  EN: 'EN_US',
+  DE: 'DE_DE',
+};
+
 export const Overview = ({orderId}: Props) => {
   const theme = useTheme();
+
   const formatDate = useFormatDate();
   const {data: serviceOrderDetails, isLoading} =
     useServiceOrderDetails(orderId);

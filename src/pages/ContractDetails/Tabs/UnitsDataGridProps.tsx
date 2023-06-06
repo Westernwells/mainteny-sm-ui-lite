@@ -31,6 +31,11 @@ export const columns: GridColDef[] = [
     flex: 1,
   }),
   getColumnProps({
+    field: 'customer',
+    headerName: 'customer',
+    flex: 1,
+  }),
+  getColumnProps({
     field: 'address',
     headerName: 'address',
     cellClassName: 'truncateText',
@@ -61,8 +66,9 @@ export const makeRows = (
     elevators.length &&
     elevators.map((elevator: ElevatorView, index: number) => ({
       id: index,
-      number: elevator.number,
+      number: elevator.externalId,
       model: elevator.model,
+      customer: elevator.propertyOwner.name,
       lastVisit: formatDate(elevator.lastVisitDate),
       nextVisit: formatDate(elevator.nextVisitDate),
       address: elevator.address.fullName,

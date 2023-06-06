@@ -19,6 +19,7 @@ import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {getFilterUnitNumber} from 'utils/customer-utils';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useQueryState} from 'hooks/useQueryState';
 import {Widget} from '../../components/Widget';
 import {columns, makeRows} from './CustomerDataGridProps';
 
@@ -28,7 +29,7 @@ export const Customer = () => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
 
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useQueryState('searchCustomers');
   const [numberOfUnits, setNumberOfUnits] = useState<string[]>([]);
   const [queryParams, setQueryParams] = useSearchParams();
   const totalCustomerRef = useRef(0);
@@ -62,6 +63,9 @@ export const Customer = () => {
   useEffect(() => {
     if (page.pageIndex) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    }
+    if (textInput.current) {
+      textInput.current.value = search;
     }
   }, [search, numberOfUnits]);
 
@@ -187,3 +191,5 @@ export const Customer = () => {
     </PageListingLayout>
   );
 };
+
+export default Customer;

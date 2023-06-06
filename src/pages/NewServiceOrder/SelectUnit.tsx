@@ -81,7 +81,9 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
               Choose unit
             </Typography>
             <SearchInput
-              placeholder="search"
+              variant="outlined"
+              label="Search"
+              placeholder="Search by number, model, customer, address etc."
               containerStyle={{
                 background: '#fff',
                 border: `1px solid ${theme.palette.text.secondary}`,
@@ -119,7 +121,9 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
           {t('Unit')}
         </Typography>
         <SearchInput
-          placeholder="Search"
+          variant="outlined"
+          label="Search"
+          placeholder="Search by number, model, customer, address etc."
           onValueChanged={(val) => setSearch(val)}
         />
       </Box>

@@ -1,8 +1,11 @@
+import useTheme from '@mui/material/styles/useTheme';
 import LoopIcon from '@mui/icons-material/Loop';
 import WifiCallingIcon from '@mui/icons-material/WifiCalling';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import {amber, grey} from '@mui/material/colors';
 import SettingsIcon from '@mui/icons-material/Settings';
+import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
+import BuildCircleIcon from '@mui/icons-material/BuildCircle';
 import {ServiceOrderType} from '../models/service-order';
 
 interface Props {
@@ -11,6 +14,7 @@ interface Props {
   size?: 'inherit' | 'large' | 'medium' | 'small';
 }
 export const ServiceOrderIcons = ({serviceOrderType, style, size}: Props) => {
+  const theme = useTheme();
   switch (serviceOrderType) {
     case ServiceOrderType.REPAIR:
       return (
@@ -25,6 +29,20 @@ export const ServiceOrderIcons = ({serviceOrderType, style, size}: Props) => {
     case ServiceOrderType.CALLOUT:
       return (
         <WifiCallingIcon fontSize={size} sx={{color: grey[800], ...style}} />
+      );
+    case ServiceOrderType.INSPECTION:
+      return (
+        <YoutubeSearchedForIcon
+          fontSize={size}
+          sx={{color: theme.palette.primary.main, ...style}}
+        />
+      );
+    case ServiceOrderType.NEW_INSTALLATION:
+      return (
+        <BuildCircleIcon
+          fontSize={size}
+          sx={{color: theme.palette.secondary.dark, ...style}}
+        />
       );
     default:
       return null;

@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {useCallback, useContext} from 'react';
 import {
   useMutation,
   useQuery,
@@ -23,6 +23,9 @@ import {toDate, toRestDate} from 'utils/datetime';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
+import {CheckList} from 'models/checklist';
+import {LanguageContext} from 'context/LanguageProvider';
+import {languageContextMap} from 'utils/utils';
 import {
   AssignmentBasedOrderBody,
   UpdateServiceOrderScheduleBody,
@@ -41,7 +44,13 @@ import {
   UpdateServiceOrderBody,
   AppointmentConfirmationRequiredOrdersQueryParams,
 } from '../../models/service-order';
-import {Order, Resource, RestError, StringValue} from '../../models/misc';
+import {
+  Order,
+  Resource,
+  RestError,
+  SimpleEmailRecord,
+  StringValue,
+} from '../../models/misc';
 import {
   ElevatorAvailability,
   ElevatorAvailabilityParams,
@@ -223,6 +232,24 @@ export function useServiceOrderReport(
   );
 }
 
+export const fetchServiceOrderWorkReport = async (serviceOrderId: string) => {
+  const response = await axiosClient.get<ServiceOrderReportView>(
+    `/api/serviceOrders/${serviceOrderId}/report`,
+  );
+  return response.data;
+};
+
+export function useServiceOrderWorkReport(
+  serviceOrderId: string,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<ServiceOrderReportView, RestError>(
+    [queryKeys.fetchServiceOrderWorkReport, serviceOrderId],
+    () => fetchServiceOrderWorkReport(serviceOrderId),
+    {...options},
+  );
+}
+
 export const queryServiceOrders = async (
   params: ServiceOrderQueryParams,
 ): Promise<Resource<ServiceOrderView>> => {
@@ -251,6 +278,42 @@ export function useServiceOrders(
         serviceCompanyId: user!.userAccount.serviceCompany.id,
         orderBy: ServiceOrderOrderField.CREATED_TIME,
         order: Order.DESC,
+      }),
+    {enabled: !!user, ...options},
+  );
+}
+
+export const queryDueServiceOrders = async (
+  params: ServiceOrderQueryParams,
+): Promise<Resource<ServiceOrderView>> => {
+  const response: AxiosResponse<Resource<ServiceOrderView>> =
+    await axiosClient.get(`/api/serviceOrders/dueOrders`, {
+      params,
+      paramsSerializer,
+    });
+  return response.data;
+};
+
+export function useDueServiceOrders(
+  params: ServiceOrderQueryParams,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  const {user} = useUserSession();
+  return useQuery<
+    Resource<ServiceOrderView>,
+    RestError,
+    Resource<ServiceOrderView>
+  >(
+    [
+      queryKeys.queryDueServiceOrders,
+      params,
+      user?.userAccount.serviceCompany.id,
+    ],
+    () =>
+      queryDueServiceOrders({
+        serviceCompanyId: user!.userAccount.serviceCompany.id,
+        order: Order.DESC,
+        ...params,
       }),
     {enabled: !!user, ...options},
   );
@@ -383,9 +446,36 @@ export function useServiceOrderDetails(
   );
 }
 
-const getServiceOrderActivities = async (serviceOrderId: string) => {
+export const getServiceOrderChecklist = async (
+  serviceOrderId: string,
+): Promise<CheckList> => {
+  const response = await axiosClient.get<CheckList>(
+    `/api/serviceOrders/${serviceOrderId}/checkList`,
+  );
+  return response.data;
+};
+
+// it is okay to use pass any,information is for react-query & not us.Passing correct types makes simple function gigantic
+export function useServiceOrderCheckList(
+  serviceOrderId?: string,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<CheckList, RestError, CheckList>(
+    [queryKeys.fetchServiceOrderChecklist, serviceOrderId],
+    () => getServiceOrderChecklist(serviceOrderId!),
+    {enabled: !!serviceOrderId, ...options},
+  );
+}
+
+const getServiceOrderActivities = async (
+  serviceOrderId: string,
+  params: any = {},
+) => {
   const response: AxiosResponse<ServiceOrderActivityView[]> =
-    await axiosClient.get(`/api/serviceOrders/${serviceOrderId}/activities`);
+    await axiosClient.get(`/api/serviceOrders/${serviceOrderId}/activities`, {
+      params,
+      paramsSerializer,
+    });
   return response.data;
 };
 
@@ -393,13 +483,21 @@ export function useServiceOrderActivities(
   serviceOrderId?: string,
   options?: UseQueryOptions<any, any, any>,
 ) {
+  const {language} = useContext(LanguageContext);
   return useQuery<
     ServiceOrderActivityView[],
     RestError,
     ServiceOrderActivityView[]
   >(
-    [queryKeys.serviceOrderActivity, serviceOrderId],
-    () => getServiceOrderActivities(serviceOrderId!),
+    [
+      queryKeys.serviceOrderActivity,
+      serviceOrderId,
+      languageContextMap[language],
+    ],
+    () =>
+      getServiceOrderActivities(serviceOrderId!, {
+        language: languageContextMap[language],
+      }),
     {enabled: !!serviceOrderId, ...options},
   );
 }
@@ -412,7 +510,7 @@ const cancelServiceOrders = async (serviceOrderId: string) => {
 
 export const useCancelServiceOrders = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (serviceOrderId: string) => cancelServiceOrders(serviceOrderId),
     {
@@ -425,9 +523,7 @@ export const useCancelServiceOrders = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -445,7 +541,7 @@ const updateServiceOrderCheckListAnswers = async (
 
 export const useUpdateServiceOrderCheckListAnswers = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     ({
       serviceOrderId,
@@ -464,9 +560,7 @@ export const useUpdateServiceOrderCheckListAnswers = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -484,7 +578,7 @@ const completeServiceOrder = async (
 
 export const useCompleteServiceOrder = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     ({
       serviceOrderId,
@@ -503,9 +597,7 @@ export const useCompleteServiceOrder = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -519,7 +611,7 @@ const unschedulerServiceOrder = async (serviceOrderId: string) => {
 
 export const useUnscheduleServiceOrders = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (serviceOrderId: string) => unschedulerServiceOrder(serviceOrderId),
     {
@@ -532,9 +624,7 @@ export const useUnscheduleServiceOrders = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -556,7 +646,7 @@ const redispatchServiceOrders = async (
 
 export const useRedispatchServiceOrders = (successMsg: string) => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     ({technicianId, serviceOrderId}: RedispatchParams) =>
       redispatchServiceOrders(technicianId, serviceOrderId),
@@ -571,9 +661,7 @@ export const useRedispatchServiceOrders = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -591,7 +679,7 @@ const updateServiceOrderSchedule = async (
 
 export const useUpdateServiceOrderSchedule = (successMsg: string) => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     ({
       body,
@@ -609,12 +697,7 @@ export const useUpdateServiceOrderSchedule = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -631,7 +714,7 @@ const updateServiceOrder = async (
 
 export const useUpdateServiceOrder = (successMsg: string) => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     ({
       body,
@@ -649,12 +732,7 @@ export const useUpdateServiceOrder = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -666,7 +744,7 @@ const createAssignmentBasedOrder = async (body: AssignmentBasedOrderBody) =>
   });
 
 export const useAssignmentBasedOrder = (successMsg: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (body: AssignmentBasedOrderBody) => createAssignmentBasedOrder(body),
     {
@@ -681,9 +759,7 @@ export const useAssignmentBasedOrder = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -697,7 +773,7 @@ const createScheduledServiceOrder = async (
   });
 
 export const useCreateScheduledServiceOrder = (successMsg: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (body: CreateScheduledServiceOrderBody) =>
       createScheduledServiceOrder(body),
@@ -713,9 +789,7 @@ export const useCreateScheduledServiceOrder = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -729,7 +803,7 @@ const createNonScheduledServiceOrder = async (
   });
 
 export const useCreateNonScheduledServiceOrder = (successMsg: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (body: CreateNonScheduledServiceOrderBody) =>
       createNonScheduledServiceOrder(body),
@@ -745,9 +819,7 @@ export const useCreateNonScheduledServiceOrder = (successMsg: string) => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -762,7 +834,7 @@ export const putServiceOrderArticles = async (
 
 export const useUpdateServiceOrderArticles = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(
     ({data, orderId}: {data: ServiceOrderItemRecord[]; orderId: string}) =>
@@ -778,12 +850,7 @@ export const useUpdateServiceOrderArticles = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -834,7 +901,7 @@ const appointmentNotification = async (serviceOrderId: string) =>
 
 export const useAppointmentNotification = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (serviceOrderId: string) => appointmentNotification(serviceOrderId),
     {
@@ -848,9 +915,7 @@ export const useAppointmentNotification = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );
@@ -863,7 +928,7 @@ const confirmAppointment = async (serviceOrderId: string) =>
 
 export const useConfirmAppointment = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (serviceOrderId: string) => confirmAppointment(serviceOrderId),
     {
@@ -877,9 +942,68 @@ export const useConfirmAppointment = () => {
       },
       onError: (err) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
+        showError(err);
+      },
+    },
+  );
+};
+
+export const postPublishChecklist = async (
+  id: string,
+  body: SimpleEmailRecord,
+) => {
+  await axiosClient.post<{value: string}>(
+    `api/serviceOrders/${id}/checkList/publish`,
+    body,
+  );
+};
+
+export const usePublishChecklist = () => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  return useMutation(
+    ({id, body}: {id: string; body: SimpleEmailRecord}) =>
+      postPublishChecklist(id, body),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(`CheckList sent successfully`, {
+          variant: 'success',
         });
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+export const publishWorkReport = async (
+  id: string,
+  body: SimpleEmailRecord,
+) => {
+  await axiosClient.post<{value: string}>(
+    `/api/serviceOrders/${id}/report/publish`,
+    body,
+  );
+};
+
+export const usePublishWorkReport = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+
+  return useMutation(
+    ({id, body}: {id: string; body: SimpleEmailRecord}) =>
+      publishWorkReport(id, body),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.fetchServiceOrderWorkReport]);
+        enqueueSnackbar(`Work report sent successfully!`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
       },
     },
   );

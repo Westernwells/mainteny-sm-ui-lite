@@ -23,7 +23,6 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
   } = currentParams.quotationId
     ? useQuotationDetails(currentParams.quotationId)
     : {data: undefined, isLoading: false, isFetched: true};
-  console.log(quotation, isLoading, isFetched);
 
   useLayoutEffect(() => {
     if (getCurrentPageTitle && currentParams) {
@@ -41,26 +40,34 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
     <FlexContainer>
       {currentParams.type === 'emergency' ? (
         <NewEmergency quotation={quotation} />
-      ) : null}
-      {currentParams.type === 'callout' ? (
+      ) : currentParams.type === 'callout' ? (
         <ScheduleServiceOrder
           type={ServiceOrderType.CALLOUT}
           quotation={quotation}
         />
-      ) : null}
-      {currentParams.type === 'repair' ? (
+      ) : currentParams.type === 'repair' ? (
         <ScheduleServiceOrder
           type={ServiceOrderType.REPAIR}
           quotation={quotation}
         />
-      ) : null}
-
-      {currentParams.type === 'regular' ? (
+      ) : currentParams.type === 'regular' ? (
         <ScheduleServiceOrder
           type={ServiceOrderType.REGULAR}
+          quotation={quotation}
+        />
+      ) : currentParams.type === 'inspection' ? (
+        <ScheduleServiceOrder
+          type={ServiceOrderType.INSPECTION}
+          quotation={quotation}
+        />
+      ) : currentParams.type === 'new_installation' ? (
+        <ScheduleServiceOrder
+          type={ServiceOrderType.NEW_INSTALLATION}
           quotation={quotation}
         />
       ) : null}
     </FlexContainer>
   );
 };
+
+export default NewServiceOrder;

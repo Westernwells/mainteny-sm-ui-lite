@@ -7,6 +7,8 @@ import ReportProblemIcon from '@mui/icons-material/ReportProblemOutlined';
 import PhoneInTalkIcon from '@mui/icons-material/PhoneInTalk';
 import SettingsIcon from '@mui/icons-material/Settings';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
+import BuildCircleIcon from '@mui/icons-material/BuildCircle';
 import Elevator from '@mui/icons-material/Elevator';
 import People from '@mui/icons-material/People';
 import FileCopy from '@mui/icons-material/FileCopy';
@@ -170,6 +172,17 @@ export const AddAnything = () => {
           label: 'Maintenance',
           action: () => track(() => navigate('/orders/new?type=regular')),
           icon: <RefreshIcon fontSize="small" />,
+        },
+        {
+          label: 'Inspection',
+          action: () => track(() => navigate('/orders/new?type=inspection')),
+          icon: <YoutubeSearchedForIcon fontSize="small" />,
+        },
+        {
+          label: 'Installation',
+          action: () =>
+            track(() => navigate('/orders/new?type=new_installation')),
+          icon: <BuildCircleIcon fontSize="small" />,
         },
       ],
     },

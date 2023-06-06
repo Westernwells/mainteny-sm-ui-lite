@@ -4,11 +4,17 @@ import {useTranslation} from 'react-i18next';
 
 interface Props {
   text: string;
+  textTranslationContext?: string;
   required?: boolean;
   sx?: SxProps<Theme>;
 }
 
-export const FormLabel = ({text, required, sx}: Props) => {
+export const FormLabel = ({
+  text,
+  required,
+  textTranslationContext,
+  sx,
+}: Props) => {
   const {t} = useTranslation();
   return (
     <Typography
@@ -16,7 +22,7 @@ export const FormLabel = ({text, required, sx}: Props) => {
       color="grey.700"
       textTransform="capitalize"
       sx={sx}>
-      {t(text)}
+      {t(text, {context: textTranslationContext})}
       {required && (
         <Typography component="span" variant="caption" color="error.main">
           &nbsp;*

@@ -16,12 +16,11 @@ const MenuProps = {
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
     },
   },
 };
 
-interface Props {
+export interface Props {
   options: string[];
   getSelectedValue?: (item: string[]) => void;
   label: string;

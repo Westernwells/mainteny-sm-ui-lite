@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Theme, CSSObject} from '@mui/material/styles';
 import styled from '@mui/material/styles/styled';
@@ -25,6 +25,7 @@ import PaymentsIcon from '@mui/icons-material/Payments';
 import {Settings} from '@mui/icons-material';
 import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import PieChartIcon from '@mui/icons-material/PieChart';
 import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
 import {ReactComponent as MaintenyLogo} from 'assets/icons/Mainteny.svg';
 import Fade from '@mui/material/Fade';
@@ -33,6 +34,7 @@ import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {Role} from 'models/user';
+import {ClickAwayListener} from '@mui/material';
 
 const drawerWidth = '15rem';
 
@@ -76,9 +78,13 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-export const AppDrawer = () => {
+interface Props {
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+}
+
+export const AppDrawer = ({open, setOpen}: Props) => {
   const {t} = useTranslation();
-  const [open, setOpen] = useState(false);
   const themeX = useTheme();
   const setSelectedIndex = useState(0)[1];
   const [selectedPath, setSelectedPath] = useState('/');
@@ -247,6 +253,21 @@ export const AppDrawer = () => {
       },
     },
     {
+      text: 'Analytics',
+      icon: <PieChartIcon sx={{color: '#fff'}} />,
+      path: '/analytics',
+      access: !isAdmin,
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/analytics');
+        navigate('/analytics');
+      },
+    },
+    {
       text: 'Settings',
       icon: <Settings sx={{color: '#fff'}} />,
       path: '/settings',
@@ -353,60 +374,62 @@ export const AppDrawer = () => {
         );
 
   return (
-    <Box sx={{display: 'flex'}}>
-      <Drawer
-        onMouseEnter={() => handleDrawerOpen()}
-        onMouseLeave={() => handleDrawerClose()}
-        variant="permanent"
-        open={open}
-        PaperProps={{
-          sx: {
-            paddingTop: 2,
-            color: '#fff',
-          },
-        }}>
-        {renderDrawerHeader()}
+    <Box sx={{display: 'flex', zIndex: 1000}}>
+      <ClickAwayListener onClickAway={handleDrawerClose}>
+        <Drawer
+          onMouseEnter={() => handleDrawerOpen()}
+          onMouseLeave={() => handleDrawerClose()}
+          variant="permanent"
+          open={open}
+          PaperProps={{
+            sx: {
+              paddingTop: 2,
+              color: '#fff',
+            },
+          }}>
+          {renderDrawerHeader()}
 
-        <List>
-          {drawerList.map(({text, icon, onClick, path, access}, index) => {
-            if (!access) return null;
-            return (
-              <ListItemButton
-                onClick={(e) => onClick(e, index)}
-                selected={selectedPath === path}
-                style={{
-                  paddingTop: 15,
-                  paddingBottom: 15,
-                  ...(open
-                    ? {
-                        marginLeft: '5px',
-                        marginRight: '5px',
-                      }
-                    : null),
-                }}
-                sx={{
-                  transition: (theme) =>
-                    theme.transitions.create('margin', {
-                      easing: theme.transitions.easing.sharp,
-                      duration: theme.transitions.duration.leavingScreen,
-                    }),
-                }}
-                key={text}>
-                <ListItemIcon sx={{minWidth: 0, pr: '1em', pl: '.25em'}}>
-                  {icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Fade in={open}>
-                      <Typography variant="subtitle1">{t(text)}</Typography>
-                    </Fade>
-                  }
-                />
-              </ListItemButton>
-            );
-          })}
-        </List>
-      </Drawer>
+          <List>
+            {drawerList.map(({text, icon, onClick, path, access}, index) => {
+              if (!access) return null;
+              return (
+                <ListItemButton
+                  onClick={(e) => onClick(e, index)}
+                  selected={selectedPath === path}
+                  style={{
+                    paddingTop: 15,
+                    paddingBottom: 15,
+                    ...(open
+                      ? {
+                          marginLeft: '5px',
+                          marginRight: '5px',
+                        }
+                      : null),
+                  }}
+                  sx={{
+                    transition: (theme) =>
+                      theme.transitions.create('margin', {
+                        easing: theme.transitions.easing.sharp,
+                        duration: theme.transitions.duration.leavingScreen,
+                      }),
+                  }}
+                  key={text}>
+                  <ListItemIcon sx={{minWidth: 0, pr: '1em', pl: '.25em'}}>
+                    {icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Fade in={open}>
+                        <Typography variant="subtitle1">{t(text)}</Typography>
+                      </Fade>
+                    }
+                  />
+                </ListItemButton>
+              );
+            })}
+          </List>
+        </Drawer>
+      </ClickAwayListener>
     </Box>
   );
 };

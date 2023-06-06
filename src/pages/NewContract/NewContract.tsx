@@ -14,9 +14,8 @@ import {
 import {PropertyOwnerView} from 'models/propertyManager';
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {amountRecordForBackend} from 'utils/currency';
+import {amountRecordForBackend, useCurrentCurrency} from 'utils/currency';
 import {toRestDate} from 'utils/datetime';
-import {convertToMacro} from 'utils/utils';
 import * as Yup from 'yup';
 import NewContractBasicInfo from './NewContractBasicInfo';
 import NewContractDocuments from './NewContractDocuments';
@@ -34,8 +33,8 @@ const validationSchemaBasicInfo = Yup.object().shape({
   propertyOwnerId: Yup.string()
     .transform((id) => (id.length > 0 ? id : null))
     .required('Customer is required'),
-  contractType: Yup.string().required('Contract Type is required'),
-  startDate: Yup.date().nullable().required('Start Date is required'),
+  name: Yup.string().required('Contract name is required'),
+  startDate: Yup.date().nullable().required('Start date is required'),
   endDate: Yup.date()
     .default(null)
     .when('startDate', (startDate, schema) => {
@@ -48,18 +47,15 @@ const validationSchemaBasicInfo = Yup.object().shape({
       return schema;
     })
     .nullable()
-    .required('End Date is required'),
+    .required('End date is required'),
 });
 
 const validationSchemaContractTerms = Yup.object().shape({
   visitsNumber: Yup.number()
     .nullable()
     .min(1, 'Should be higher than 0')
-    .required('Customer is required'),
-  invoiceDue: Yup.string()
-    .nullable()
-    .min(1, 'Input should be filled out')
-    .required('Customer is required'),
+    .required('Visit number is required'),
+  invoiceCycle: Yup.string().required('Invoice cycle is required'),
   netAmount: Yup.number()
     .nullable()
     .min(1, 'Should be higher than 0')
@@ -75,6 +71,7 @@ const validationSchemaContractTerms = Yup.object().shape({
 });
 
 const NewContract = () => {
+  const currentCurrency = useCurrentCurrency();
   const [activeStep, setActiveStep] = useState(0);
   const [disableNextBtn, setDisableNextBtn] = useState(false);
 
@@ -100,7 +97,7 @@ const NewContract = () => {
       propertyOwnerId: '',
       startDate: null,
       endDate: null,
-      contractType: '',
+      name: '',
     },
     validateOnMount: true,
 
@@ -118,7 +115,7 @@ const NewContract = () => {
   const formikContractTerms = useFormik<ContractTermsFormModal>({
     initialValues: {
       visitsNumber: '',
-      invoiceDue: '',
+      invoiceCycle: '',
       netAmount: '',
       renewalTerms: '',
       spendingLimit: '',
@@ -162,13 +159,17 @@ const NewContract = () => {
 
   const handleSubmit = async () => {
     const contractId = uuid;
+    const contractNameType =
+      user?.userAccount?.serviceCompany?.settings?.contractNameTypes.find(
+        (item) => item.name === formikBasicInfo.values.name,
+      );
 
     const uploadPath = `${serviceCompanyId}/contracts/${contractId}/documents`;
     const newContract = {
       id: contractId,
       annualPriceAdjustmentPercentage:
         formikContractTerms.values.annualPriceAdjustmentPercentage,
-      currency: 'EUR',
+      currency: currentCurrency.code,
       documents: formikDocuments.values.documents.reduce<FileWithPreview[]>(
         (newArr: FileWithPreview[], obj) => [
           ...newArr,
@@ -184,9 +185,9 @@ const NewContract = () => {
       elevators: formikUnits.values.elevators,
       endDate: toRestDate(formikBasicInfo.values.endDate!),
       hourlyRate: +formikContractTerms.values.hourlyRate,
-      invoiceDue: convertToMacro(formikContractTerms.values.invoiceDue),
+      invoiceCycle: formikContractTerms.values.invoiceCycle,
       price: amountRecordForBackend({
-        currency: 'EUR',
+        currency: currentCurrency.code,
         netAmount: +formikContractTerms.values.netAmount,
         percentageVat:
           +formikContractTerms.values.annualPriceAdjustmentPercentage,
@@ -197,9 +198,12 @@ const NewContract = () => {
       serviceCompanyId,
       spendingLimit: +formikContractTerms.values.spendingLimit,
       startDate: toRestDate(formikBasicInfo.values.startDate!),
-      type: convertToMacro(formikBasicInfo.values.contractType),
+      name: contractNameType?.name,
+      type: contractNameType?.type,
       visitsNumber: +formikContractTerms.values.visitsNumber,
       timePreference: [],
+      firstMaintenance: formikContractTerms.values.firstMaintenance,
+      firstInvoiceDate: formikContractTerms.values.firstInvoiceDate,
     };
 
     await createContract(newContract);

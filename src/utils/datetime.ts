@@ -14,10 +14,10 @@ import {
   Locale,
 } from 'date-fns';
 import {useTranslation} from 'react-i18next';
-import {enUS, de} from 'date-fns/locale';
+import {enUS, de, srLatn} from 'date-fns/locale';
 
 export const DEFAULT_DATE_FORMAT = 'dd.MM.yyyy';
-export const locales: {[key: string]: Locale} = {enUS, de};
+export const locales: {[key: string]: Locale} = {enUS, de, srLatn};
 
 interface DateFormatOptions {
   locale?: globalThis.Locale | undefined;
@@ -124,13 +124,13 @@ export const getWhen = (date: Date, formatStr: string) => {
 
 export const convertMinsToHM = (minutes: number, padStart: number = 1) => {
   const m = Math.floor(minutes % 60).toString();
-  const h = Math.floor((minutes / 60) % 60).toString();
-  return `${h.padStart(padStart)}h ${Number(m) > 0 ? `${m}m` : ''}`;
+  const h = Math.floor(minutes / 60).toString();
+  return `${h.padStart(padStart, '0')}h ${Number(m) > 0 ? `${m}m` : ''}`;
 };
 
 export const convertDigitalMinsToHM = (minutes: number) => {
   const m = Math.floor(minutes % 60).toString();
-  const h = Math.floor((minutes / 60) % 60).toString();
+  const h = Math.floor(minutes / 60).toString();
   return `${h.padStart(2, '0')}:${m.padStart(2, '0')} h`;
 };
 

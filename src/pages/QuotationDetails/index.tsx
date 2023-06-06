@@ -1,10 +1,11 @@
 import {useParams} from 'react-router-dom';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
+import {
+  useQuotationActivities,
+  useQuotationDetails,
+} from 'hooks/reactQuery/useQuotation';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
-import {QuotationStatus} from 'models/quotation';
-import {DraftQuotation} from './DraftQuotation';
 import {ViewQuotation} from './ViewQuotation';
 
 export const QuotationDetails = () => {
@@ -16,27 +17,26 @@ export const QuotationDetails = () => {
     isLoading,
     isFetched,
   } = useQuotationDetails(quotationId);
+  const {data: quotationActivities, isLoading: isLoadingQuotationActivities} =
+    useQuotationActivities({quotationId: quotationId ?? ''});
 
   const {data: downloadUrl} = useDownloadUrl(
     isFetched ? [quotation!.additionalInfo.pdfPath] : [],
   );
 
-  if (isIdle || isLoading) {
+  if (isIdle || isLoading || isLoadingQuotationActivities) {
     return <Progress />;
   }
 
-  if (isFetched && quotation && quotation.status === QuotationStatus.DRAFT) {
-    return <DraftQuotation quotation={quotation} />;
-  }
-
-  return isFetched &&
-    quotation &&
-    quotation.status !== QuotationStatus.DRAFT ? (
+  return isFetched && quotation ? (
     <ViewQuotation
       downloadUrl={downloadUrl ? Object.values(downloadUrl)[0] : ''}
       quotation={quotation}
+      quotationActivities={quotationActivities!}
     />
   ) : (
     <EmptySection label="Sorry, we couldn't find the quotation." />
   );
 };
+
+export default QuotationDetails;

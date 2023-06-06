@@ -35,7 +35,14 @@ export const AppointmentsToBeScheduled = ({
     <DashboardInfoCard
       title="Appointments to be scheduled"
       chipLabel={`${appointments.total}`}
-      seeMorePath="/orders?tab=1">
+      seeMorePath="/orders?tab=1"
+      emptySection={{
+        show: !appointments.total,
+        label: 'No appointments.',
+      }}
+      bodyContainerStyle={{
+        height: '100%',
+      }}>
       <TableContainer
         component={Paper}
         sx={{boxShadow: 'none', overflow: 'visible'}}>

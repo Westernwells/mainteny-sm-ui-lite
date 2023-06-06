@@ -39,9 +39,8 @@ export interface AppointmentFormModel {
   appointmentDaysOfWeek: string[];
   openingHour?: string;
   closingHour?: string;
-  requiresAppointment: string;
-  requiresAppointmentNotification: string;
-  appointmentNotificationDueInDays: string;
+  shouldNotifyCustomer: boolean;
+  appointmentNotificationDue: number;
 }
 
 export interface EmergencyPhoneFormModel {
@@ -50,6 +49,7 @@ export interface EmergencyPhoneFormModel {
   phoneConnection?: string;
   phoneNumber?: string;
   simCardNumber?: string;
+  simPin?: string;
   callCenter?: string;
   placeOfInstallation?: string;
 }

@@ -3,48 +3,56 @@ import {Route, Routes, useLocation, useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {PageLayout} from 'components/PageLayout';
 import ErrorBoundary from 'components/ErrorBoundary';
-import {Login} from 'pages/Login';
-import {ResetPassword} from 'pages/ResetPassword';
-import {MyUnits} from 'pages/Units';
-import {UnitsDetail} from 'pages/UnitDetails';
-import {Contracts} from 'pages/Contracts';
-import NewContract from 'pages/NewContract/NewContract';
-import {Customer} from 'pages/Customers';
-import {ContractDetails} from 'pages/ContractDetails';
-import {CustomerDetails} from 'pages/CustomerDetails';
-import {Invoices} from 'pages/Invoices';
-import {NewInvoice} from 'pages/InvoiceDetails/NewInvoice';
-import {InvoiceDetails} from 'pages/InvoiceDetails';
-import {Employees} from 'pages/Employee';
-import {EmployeeDetails} from 'pages/EmployeeDetails';
-import {Quotations} from 'pages/Quotations';
-import {DraftQuotation} from 'pages/QuotationDetails/DraftQuotation';
-import {QuotationDetails} from 'pages/QuotationDetails';
-import {Notifications} from 'pages/Notifications';
-import {PageNotFound} from 'pages/PageNotFound';
-import {Dashboard} from 'pages/Dashboard';
-import {ServiceOrders} from 'pages/ServiceOrders';
-import {NewEmployee} from 'pages/NewEmployee';
-import {Companies} from 'pages/Companies';
-import {CompanyDetails} from 'pages/CompanyDetails';
-import {ServiceOrderDetails} from 'pages/ServiceOrderDetails';
-import {SystemSettings} from 'pages/SystemSettings';
-import {NewCompany} from 'pages/NewCompany';
-import {SettingsPage} from 'pages/Settings';
 import {axiosClient} from 'utils/axios-utils';
 import {onVisibilityChange} from 'utils/utils';
 import {useEffect, useState} from 'react';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
-import {NewServiceOrder} from 'pages/NewServiceOrder';
-import {NewUnit} from 'pages/NewUnit';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {NewCustomer} from 'pages/NewCustomer';
-import {Articles} from 'pages/Articles';
-import {ArticleOverView} from 'pages/ArticleDetails';
+import Login from 'pages/Login';
+import ResetPassword from 'pages/ResetPassword';
+import MyUnits from 'pages/Units';
+import UnitsDetail from 'pages/UnitDetails';
+import Contracts from 'pages/Contracts';
+import NewContract from 'pages/NewContract/NewContract';
+import Customer from 'pages/Customers';
+import ContractDetails from 'pages/ContractDetails';
+import CustomerDetails from 'pages/CustomerDetails';
+import Invoices from 'pages/Invoices';
+import NewInvoice from 'pages/InvoiceDetails/NewInvoice';
+import InvoiceDetails from 'pages/InvoiceDetails';
+import EditInvoicePage from 'pages/EditInvoice';
+import InvoiceOverdueNotice from 'pages/InvoiceOverdueNotice';
+import Employees from 'pages/Employee';
+import EmployeeDetails from 'pages/EmployeeDetails';
+import Quotations from 'pages/Quotations';
+import DraftQuotation from 'pages/QuotationDetails/DraftQuotation';
+import QuotationDetails from 'pages/QuotationDetails';
+import EditQuotationPage from 'pages/EditQuotation';
+import Notifications from 'pages/Notifications';
+import PageNotFound from 'pages/PageNotFound';
+import Dashboard from 'pages/Dashboard';
+import ServiceOrders from 'pages/ServiceOrders';
+import NewEmployee from 'pages/NewEmployee';
+import Companies from 'pages/Companies';
+import CompanyDetails from 'pages/CompanyDetails';
+import ServiceOrderDetails from 'pages/ServiceOrderDetails';
+import SystemSettings from 'pages/SystemSettings';
+import NewCompany from 'pages/NewCompany';
+import SettingsPage from 'pages/Settings';
+import Checklist from 'pages/Settings/Checklist';
+import NewServiceOrder from 'pages/NewServiceOrder';
+import NewUnit from 'pages/NewUnit';
+import NewCustomer from 'pages/NewCustomer';
+import Articles from 'pages/Articles';
+import ArticleOverView from 'pages/ArticleDetails';
+import OrderArticle from 'pages/OrderArticle';
+import NewArticle from 'pages/ArticleDetails/NewArticle';
+import NewSupplier from 'pages/NewSupplier';
+import SupplierDetails from 'pages/SupplierDetails';
+import Analytics from 'pages/Analytics';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
-import {NewArticle} from '../pages/ArticleDetails/NewArticle';
 
 export const Router = () => {
   const titleTail = 'Service Manager Portal';
@@ -259,12 +267,49 @@ export const Router = () => {
                 <PageLayout
                   showBackAction
                   pageScrollable
-                  backBtnLabel="Invoice Details">
-                  <InvoiceDetails />
+                  backBtnLabel={currentPageTitle}>
+                  <InvoiceDetails
+                    getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                  />
                 </PageLayout>
               </>
             }
           />
+
+          <Route
+            path="/invoices/details/:id/edit"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Edit Invoice - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout
+                  showBackAction
+                  pageScrollable
+                  backBtnLabel="Edit Invoice">
+                  <EditInvoicePage />
+                </PageLayout>
+              </>
+            }
+          />
+
+          <Route
+            path="/invoices/overdue-notice/:id"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Overdue Notice - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout
+                  pageScrollable
+                  backBtnLabel="Overdue notice"
+                  showBackAction>
+                  <InvoiceOverdueNotice />
+                </PageLayout>
+              </>
+            }
+          />
+
           <Route
             path="/customers"
             element={
@@ -406,6 +451,23 @@ export const Router = () => {
           />
 
           <Route
+            path="/quotations/details/:id/edit"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Edit Quotation - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout
+                  pageScrollable
+                  backBtnLabel="Edit Quotation"
+                  showBackAction>
+                  <EditQuotationPage />
+                </PageLayout>
+              </>
+            }
+          />
+
+          <Route
             path="/orders"
             element={
               <>
@@ -512,6 +574,54 @@ export const Router = () => {
           />
 
           <Route
+            path="/articles/newSupplier"
+            element={
+              <>
+                <Helmet>
+                  <title>{`New Supplier - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout backBtnLabel="New Supplier" showBackAction>
+                  <NewSupplier />
+                </PageLayout>
+              </>
+            }
+          />
+
+          <Route
+            path="/articles/supplier/:id"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Supplier Details - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout
+                  pageScrollable
+                  backBtnLabel={t('Supplier Details')}
+                  showBackAction>
+                  <SupplierDetails />
+                </PageLayout>
+              </>
+            }
+          />
+
+          <Route
+            path="/articles/order"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Order Article - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout
+                  backBtnLabel="Order Article"
+                  showBackAction
+                  pageScrollable>
+                  <OrderArticle />
+                </PageLayout>
+              </>
+            }
+          />
+
+          <Route
             path="/notifications"
             element={
               <>
@@ -519,12 +629,25 @@ export const Router = () => {
                   <title>{`Notifications - ${titleTail}`}</title>
                 </Helmet>
                 <PageLayout
-                  excludeSidebar
                   pageScrollable
                   excludeDefaultSpacing
                   backBtnLabel="Notifications"
                   showBackAction>
                   <Notifications />
+                </PageLayout>
+              </>
+            }
+          />
+
+          <Route
+            path="/analytics"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Analytics - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout pageTitle="Analytics">
+                  <Analytics />
                 </PageLayout>
               </>
             }
@@ -543,6 +666,41 @@ export const Router = () => {
               </>
             }
           />
+
+          <Route
+            path="/settings/checklist/new"
+            element={
+              <>
+                <Helmet>
+                  <title>{`New Checklist - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout
+                  backBtnLabel="New Checklist"
+                  pageScrollable
+                  showBackAction>
+                  <Checklist />
+                </PageLayout>
+              </>
+            }
+          />
+
+          <Route
+            path="/settings/checklists/:id"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Checklist - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout
+                  backBtnLabel="Checklist"
+                  pageScrollable
+                  showBackAction>
+                  <Checklist />
+                </PageLayout>
+              </>
+            }
+          />
+
           <Route
             path="admin/companies"
             element={

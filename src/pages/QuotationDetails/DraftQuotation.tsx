@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
@@ -7,7 +8,6 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps';
 import {A4Layout} from 'components/A4Layout';
 import {SelectCombined} from 'components/SelectCombined';
 import {ArticleItemsTable} from 'components/ArticleItemsTable';
@@ -16,55 +16,38 @@ import {UnitsDataGrid} from 'components/DataGrid/UnitsDataGrid';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {FormLabel} from 'components/form/FormLabel';
 import {FormInput} from 'components/form/FormInput';
-import {Confirm} from 'components/Confirm';
-import {StatusChip} from 'components/StatusChip';
+import {SendEmailDialog} from 'components/SendEmailDialog';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateQuotation,
-  useDeleteQuotation,
-  useUpdateQuotation,
+  usePublishQuotation,
 } from 'hooks/reactQuery/useQuotation';
-import {
-  CreateQuotation,
-  UpdateQuotation,
-  QuotationItemRecord,
-  QuotationView,
-} from 'models/quotation';
-import {ElevatorSimpleView, ElevatorView} from 'models/elevator';
+import {CreateQuotation, QuotationItemRecord} from 'models/quotation';
+import {ElevatorView} from 'models/elevator';
 import {
   PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from 'models/propertyManager';
 import {WithOptional} from 'models/misc';
-import {useFormatDate} from 'hooks/useFormatDate';
-import {Notes} from './Notes';
 
-interface Props {
-  quotation?: QuotationView;
-}
-
-export const DraftQuotation = ({quotation}: Props) => {
-  const formatDate = useFormatDate();
+export const DraftQuotation = () => {
   const {t} = useTranslation();
   const navigate = useNavigate();
 
   const {user} = useUserSession();
 
-  const {mutate: createNewQuotation} = useCreateQuotation();
-  const {mutate: updateQuotation} = useUpdateQuotation();
-  const {mutate: deleteQuotation} = useDeleteQuotation();
+  const {mutateAsync: createNewQuotation, isLoading: isCreating} =
+    useCreateQuotation();
+  const {mutateAsync: publishQuotation, isLoading: publishingQuotation} =
+    usePublishQuotation();
 
   const [isDrawerOpen] = useState<boolean>(true);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  const [publish, setPublish] = useState(false);
+  const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
 
   const [customer, setCustomer] = useState<
     PropertyOwnerView | PropertyOwnerSimpleView | null
   >(null);
-  const [unit, setUnit] = useState<ElevatorView | ElevatorSimpleView | null>(
-    null,
-  );
+  const [unit, setUnit] = useState<ElevatorView | null>(null);
   const [quotationItems, setQuotationItems] = useState<QuotationItemRecord[]>(
     [],
   );
@@ -85,19 +68,18 @@ export const DraftQuotation = ({quotation}: Props) => {
   const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: (values) => {
-      if (!values.description.length) values.description = ' ';
-      if (!values.moreInfo.length) values.moreInfo = ' ';
-
-      if (quotation)
-        updateQuotation({
-          data: values as UpdateQuotation,
-          quotationId: quotation.id,
-          publish,
-        });
-      else createNewQuotation({data: values, publish});
+    onSubmit: async (values) => {
+      const response = await save(values);
+      navigate(`/quotations/details/${response.value}`);
     },
   });
+
+  async function save(values: CreateQuotation) {
+    if (!values.description.length) values.description = ' ';
+    if (!values.moreInfo.length) values.moreInfo = ' ';
+
+    return createNewQuotation({data: values});
+  }
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
@@ -116,27 +98,6 @@ export const DraftQuotation = ({quotation}: Props) => {
       );
     }
   }, [user]);
-
-  useEffect(() => {
-    if (quotation) {
-      setQuotationItems(
-        quotation.items.map(
-          (i): QuotationItemRecord => ({
-            articleId: i.article.id,
-            description: i.description || i.article.description,
-            name: i.name || i.article.name,
-            articleUnit: i.article.unit,
-            quantity: i.quantity,
-            unitAmount: i.unitAmount,
-          }),
-        ),
-      );
-      setUnit(quotation.elevator);
-      formik.setFieldValue('subject', quotation.subject, true);
-      formik.setFieldValue('description', quotation.description, true);
-      formik.setFieldValue('moreInfo', quotation.moreInfo, true);
-    }
-  }, [quotation]);
 
   useEffect(() => {
     if (unit) {
@@ -161,23 +122,19 @@ export const DraftQuotation = ({quotation}: Props) => {
     );
   }, [quotationItems]);
 
+  const isValid = () => {
+    const valid =
+      formik.values.subject &&
+      formik.values.elevatorId &&
+      formik.values.items.length &&
+      unit !== null;
+
+    return !!valid;
+  };
+
   return (
     <Box>
-      {quotation && (
-        <Box
-          display="flex"
-          alignItems="flex-end"
-          justifyContent="space-between">
-          <StatusChip
-            label={getQuotationStatusStyles(quotation?.status ?? '').label}
-            color={getQuotationStatusStyles(quotation?.status ?? '').color}
-            size="small"
-            variant="filled"
-          />
-          <Notes quotation={quotation!} />
-        </Box>
-      )}
-      <A4Layout placeholder="Quotation" number={quotation?.number}>
+      <A4Layout placeholder="Quotation">
         <Box display="flex" mt="1em" gap="2em">
           <Box flexGrow={1} display="flex" flexDirection="column" gap="2em">
             <SelectCombined
@@ -198,6 +155,12 @@ export const DraftQuotation = ({quotation}: Props) => {
                     <Typography variant="caption" component="p">
                       {customer.contact.phone}
                     </Typography>
+                    <Typography variant="subtitle2" component="p">
+                      {t('Customer Number')}
+                    </Typography>
+                    <Typography variant="caption" component="p">
+                      {customer.externalId || '-'}
+                    </Typography>
                   </>
                 )
               }
@@ -214,21 +177,29 @@ export const DraftQuotation = ({quotation}: Props) => {
             <SelectCombined
               selected={unit !== null}
               label="Unit Details"
-              buttonText="Select Unit"
+              buttonText="Select unit"
               cardHeader={
                 unit && <Typography variant="body2">{unit.model}</Typography>
               }
               cardBody={
                 unit && (
-                  <Typography variant="caption">
-                    {unit.address.fullName}
-                  </Typography>
+                  <>
+                    <Typography variant="caption">
+                      {unit.address.fullName}
+                    </Typography>
+                    <Typography variant="subtitle2" component="p">
+                      {t('Unit Number')}
+                    </Typography>
+                    <Typography variant="caption" component="p">
+                      {unit.externalId || '-'}
+                    </Typography>
+                  </>
                 )
               }
               cardOnClose={() => {
                 setUnit(null);
               }}
-              modalHeader="Select Unit"
+              modalHeader="Select unit"
               modalBody={
                 <UnitsDataGrid
                   setRowItem={handleSelectUnit}
@@ -237,32 +208,6 @@ export const DraftQuotation = ({quotation}: Props) => {
               }
               labelRequired
             />
-          </Box>
-          <Box
-            width="40%"
-            display="flex"
-            flexDirection="column"
-            gap="2em"
-            mt="1.5em">
-            {[
-              {
-                label: 'Date Created',
-                value: formatDate(
-                  quotation ? quotation.meta.createdAt : new Date(),
-                ),
-              },
-              {
-                label: 'Created By',
-                value: quotation
-                  ? `${quotation.meta.creator?.firstName} ${quotation.meta.creator?.lastName}`
-                  : `${user?.userAccount.firstName} ${user?.userAccount.lastName}`,
-              },
-            ].map((i) => (
-              <Box key={i.label}>
-                <FormLabel text={i.label} />
-                <Typography>{i.value}</Typography>
-              </Box>
-            ))}
           </Box>
         </Box>
         {[
@@ -307,6 +252,7 @@ export const DraftQuotation = ({quotation}: Props) => {
         <ArticleItemsTable
           items={quotationItems}
           setItems={setQuotationItems}
+          propertyOwnerId={customer?.id ?? ''}
         />
 
         <Box my="1.5em">
@@ -327,73 +273,49 @@ export const DraftQuotation = ({quotation}: Props) => {
 
       <BottomDrawer
         isOpen={isDrawerOpen}
-        primaryButtonLabel={quotation ? 'Send' : 'Save'}
-        primaryButtonAction={() => {
-          setPublish(!!quotation);
-          formik.handleSubmit();
-        }}
-        listItems={
-          quotation
-            ? [
-                {
-                  label: t('Save Draft'),
-                  icon: <DraftsIcon />,
-                  onClick: () => {
-                    setPublish(false);
-                    formik.handleSubmit();
-                  },
-                  showBorder: true,
-                },
-                {
-                  label: 'Delete Quotation',
-                  icon: <DeleteIcon />,
-                  onClick: () => {
-                    setIsDeleteDialogOpen(true);
-                  },
-                },
-              ]
-            : [
-                {
-                  label: t('Save & Send'),
-                  icon: <DraftsIcon />,
-                  onClick: () => {
-                    setPublish(true);
-                    formik.handleSubmit();
-                  },
-                },
-                {
-                  label: 'Discard',
-                  icon: <DeleteIcon />,
-                  onClick: () => {
-                    navigate(-1);
-                  },
-                },
-              ]
-        }
-        isValid={
-          !!(
-            formik.values.subject &&
-            formik.values.elevatorId &&
-            formik.values.items.length &&
-            unit !== null
-          )
-        }
+        isSaving={isCreating}
+        primaryButtonLabel={t('Save')}
+        primaryButtonAction={formik.handleSubmit}
+        listItems={[
+          {
+            label: t('Save & Send'),
+            icon: <DraftsIcon />,
+            onClick: async () => {
+              setIsSendEmailDialogOpen(true);
+            },
+          },
+          {
+            label: t('Discard'),
+            icon: <DeleteIcon />,
+            onClick: () => {
+              navigate(-1);
+            },
+          },
+        ]}
+        isValid={isValid()}
       />
-      <Confirm
-        open={isDeleteDialogOpen}
-        onConfirm={() => {
-          if (quotation && quotation.id)
-            deleteQuotation({
-              quotationId: quotation.id,
-              shouldNavigate: true,
-            });
-          setIsDeleteDialogOpen(false);
+      <SendEmailDialog
+        open={isSendEmailDialogOpen}
+        onClose={() => setIsSendEmailDialogOpen(false)}
+        confirmBtnDisabled={publishingQuotation || isCreating}
+        email={customer?.additionalInfo.billingEmail || customer?.contact.email}
+        subject={formik.values.subject}
+        content={formik.values.description}
+        callback={async (emailRecord) => {
+          const response = await save(formik.values);
+          setIsSendEmailDialogOpen(false);
+          await publishQuotation({
+            id: response.value,
+            body: {
+              email: emailRecord.email,
+              subject: emailRecord.subject,
+              content: emailRecord.content,
+            },
+          });
         }}
-        onClose={() => setIsDeleteDialogOpen(false)}
-        title="Delete Quotation"
-        content="Do you want to delete this Quotation?"
-        helperText="This action is irreversible."
       />
     </Box>
   );
 };
+
+export default DraftQuotation;

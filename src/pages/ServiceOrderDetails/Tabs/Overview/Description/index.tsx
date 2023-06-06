@@ -74,7 +74,7 @@ export const Description = ({content = '', serviceOrderId = ''}: Props) => {
                 setOpenDialog(true);
               }}
               showActionBtn
-              btnLabel="+ Add Description"
+              btnLabel="Add Description"
               label="No description yet. It will appear here once added!"
               illustration="clipboard"
               size="tiny"

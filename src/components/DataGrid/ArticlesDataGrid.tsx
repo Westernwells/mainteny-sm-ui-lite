@@ -2,7 +2,6 @@ import {useEffect, useState} from 'react';
 import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
-import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {ArticleView} from 'models/article';
@@ -13,13 +12,20 @@ import {styles} from './style';
 
 interface Props {
   setRowItem: (row: ArticleView) => void;
+  search: string;
 }
 
 export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
-    headerName: 'number',
+    headerName: 'article no.',
     flex: 0,
+  }),
+  getColumnProps({
+    field: 'name',
+    headerName: 'article name',
+    flex: 1.5,
+    cellClassName: 'truncateText',
   }),
   getColumnProps({
     field: 'type',
@@ -44,7 +50,7 @@ export const columns: GridColDef[] = [
   }),
   getColumnProps({
     field: 'price',
-    headerName: 'price',
+    headerName: 'unit price',
     align: 'right',
   }),
 ];
@@ -53,6 +59,7 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
   articles
     ? articles.map((item, index) => ({
         id: index,
+        name: item.name,
         number: item.externalId,
         type: item.type,
         model: item.model,
@@ -73,8 +80,7 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
 
 const pageSize = 25;
 
-export const ArticlesDataGrid = ({setRowItem}: Props) => {
-  const [search, setSearch] = useState('');
+export const ArticlesDataGrid = ({setRowItem, search}: Props) => {
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
@@ -118,31 +124,30 @@ export const ArticlesDataGrid = ({setRowItem}: Props) => {
   }
 
   return (
-    <>
-      <SearchInput
-        placeholder="search"
-        onValueChanged={(value) => setSearch(value)}
+    <Box display="flex" flexGrow={1} sx={styles.scrollBar}>
+      <DataGridLayout
+        rows={rows}
+        columns={columns}
+        onCellClick={(params) => setRowItem(params.row.article)}
+        loading={isFetching}
+        scrollToTop={search}
+        pageSize={page.pageSize}
+        pageIndex={page.pageIndex}
+        pageCount={pageCount}
+        hideFooter={pageCount <= 1}
+        handlePageChange={(value) =>
+          setPage((prev) => ({
+            ...prev,
+            pageIndex: value - 1,
+          }))
+        }
+        noRowsEmptySection={
+          <NoRowsEmptySection
+            placeholder="article"
+            action={() => window.open('/articles/new', '_blank')}
+          />
+        }
       />
-      <Box display="flex" flexGrow={1} sx={styles.scrollBar}>
-        <DataGridLayout
-          rows={rows}
-          columns={columns}
-          onCellClick={(params) => setRowItem(params.row.article)}
-          loading={isFetching}
-          scrollToTop={search}
-          pageSize={page.pageSize}
-          pageIndex={page.pageIndex}
-          pageCount={pageCount}
-          hideFooter={pageCount <= 1}
-          handlePageChange={(value) =>
-            setPage((prev) => ({
-              ...prev,
-              pageIndex: value - 1,
-            }))
-          }
-          noRowsEmptySection={<NoRowsEmptySection placeholder="article" />}
-        />
-      </Box>
-    </>
+    </Box>
   );
 };

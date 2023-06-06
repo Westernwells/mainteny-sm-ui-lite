@@ -1,12 +1,12 @@
-import {useSnackbar} from 'notistack';
 import {useNavigate} from 'react-router-dom';
 import {setStoredAdmin} from 'userStorage';
 import {axiosClient} from 'utils/axios-utils';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {useUserSession} from './useUserSession';
 
 export const useServiceManager = () => {
   const navigate = useNavigate();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const {user, updateUser} = useUserSession();
 
   const getImpersonateUser = async (username: string): Promise<void> => {
@@ -38,9 +38,7 @@ export const useServiceManager = () => {
       }
     } catch (error: any) {
       console.error(error);
-      enqueueSnackbar('Sorry! Something went wrong. Please try again.', {
-        variant: 'error',
-      });
+      showError(error);
     }
   };
 

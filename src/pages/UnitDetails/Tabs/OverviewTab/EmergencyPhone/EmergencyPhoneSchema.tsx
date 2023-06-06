@@ -8,6 +8,7 @@ import Grid3x3 from '@mui/icons-material/Grid3x3';
 import Phone from '@mui/icons-material/Phone';
 import {ElevatorView} from 'models/elevator';
 import {CardProps} from 'components/CardProps';
+import Lock from '@mui/icons-material/Lock';
 
 interface Props {
   label: string;
@@ -74,6 +75,18 @@ export const EmergencyPhoneSchema = ({label, elevator}: Props) => {
             bodyText={
               elevator.additionalInfo?.elevatorPhone?.simCardNumber || '-'
             }
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            containerStyles={{mt: '0.5em'}}
+            iconMaxHeight="3em"
+          />
+        );
+
+      case 'simPin':
+        return (
+          <CardProps
+            icon={<Lock sx={{color: theme.palette.info.dark}} />}
+            label="SIM PIN"
+            bodyText={elevator.additionalInfo?.elevatorPhone?.simPin || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"

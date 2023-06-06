@@ -2,11 +2,14 @@ import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import SendIcon from '@mui/icons-material/Send';
 import {A4Layout} from 'components/A4Layout';
 import {SelectCombined} from 'components/SelectCombined';
 import {EmptySection} from 'components/EmptySection';
 import {FormLabel} from 'components/form/FormLabel';
 import {
+  usePublishWorkReport,
   useServiceOrderReport,
   useUpdateServiceOrderArticles,
 } from 'hooks/reactQuery/useServiceOrder';
@@ -18,6 +21,8 @@ import {
 import {Progress} from 'components/Progress';
 import {PageCard} from 'components/PageCard';
 import {BottomDrawer} from 'components/BottomDrawer';
+import {Button} from 'components/Button';
+import {SendEmailDialog} from 'components/SendEmailDialog';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {serviceOrderStatusToString} from 'utils/service-order-utils';
 import {Maintenance} from './Maintenance';
@@ -26,9 +31,10 @@ import {ReportCard} from './ReportCard';
 
 interface Props {
   orderId?: string;
+  downloadWorkReport: (() => void) | null;
 }
 
-export const WorkReport = ({orderId}: Props) => {
+export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
   const {t} = useTranslation();
   const {
     data: serviceOrderReportSource,
@@ -41,31 +47,32 @@ export const WorkReport = ({orderId}: Props) => {
 
   const [items, setItems] = useState<ServiceOrderItemRecord[]>([]);
   const [report, setReport] = useState<ServiceOrderReportView>();
+  const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
+  const {mutate: publishWorkReport, isLoading: publishingWorkReport} =
+    usePublishWorkReport();
   const {mutate: updateArticles} = useUpdateServiceOrderArticles();
-  const [keysPrepend, setKeysPrepend] = useState<string>();
   const [signatureKeys, setSignatureKeys] = useState<{[key: string]: string}>(
     {},
   );
 
   const {data: downloadUrls = {}} = useDownloadUrl(
     serviceOrderReportSource && serviceOrderReportSource.length
-      ? serviceOrderReportSource[0].attachments.map(
-          (item) => `${keysPrepend}/${item.fileResource.uri}`,
+      ? serviceOrderReportSource[0].signatures.map(
+          (item) => item.fileResource.uri,
         )
       : [],
-    {enabled: !!keysPrepend},
+    {enabled: !!(serviceOrderReportSource && serviceOrderReportSource.length)},
   );
 
   useEffect(() => {
     if (serviceOrderReportSource && serviceOrderReportSource.length) {
       const serviceCompanyId =
         serviceOrderReportSource[0].serviceOrder.serviceCompany.id;
-      const elevatorId = serviceOrderReportSource[0].serviceOrder.elevator.id;
+      const serviceOrderId = serviceOrderReportSource[0].serviceOrder.id;
       const keys = {
-        CUSTOMER: `${serviceCompanyId}/elevators/${elevatorId}/images/CUSTOMER.png`,
-        TECHNICIAN: `${serviceCompanyId}/elevators/${elevatorId}/images/TECHNICIAN.png`,
+        CUSTOMER: `${serviceCompanyId}/serviceOrders/${serviceOrderId}/report/CUSTOMER.png`,
+        TECHNICIAN: `${serviceCompanyId}/serviceOrders/${serviceOrderId}/report/TECHNICIAN.png`,
       };
-      setKeysPrepend(`${serviceCompanyId}/elevators/${elevatorId}/images`);
       setSignatureKeys(keys);
     }
   }, [isFetched]);
@@ -222,7 +229,11 @@ export const WorkReport = ({orderId}: Props) => {
         </Box>
         <Maintenance serviceReport={report} />
 
-        <ArticleItemsTable items={items} setItems={setItems} />
+        <ArticleItemsTable
+          items={items}
+          setItems={setItems}
+          propertyOwnerId={report?.elevator?.propertyOwner?.id ?? ''}
+        />
 
         <Box mt="1em">
           <FormLabel text="Description Of Service" />
@@ -255,6 +266,32 @@ export const WorkReport = ({orderId}: Props) => {
             />
           </Box>
         </Box>
+
+        <Box display="flex" justifyContent="flex-end" gap={2} pt="3rem">
+          <Button
+            buttonProps={{
+              size: 'large',
+              variant: 'outlined',
+              disabled: !downloadWorkReport,
+              sx: {
+                background: 'transparent',
+              },
+              startIcon: <FileDownloadIcon />,
+              onClick: () => downloadWorkReport?.(),
+            }}>
+            <Typography variant="subtitle2">{t('Download')}</Typography>
+          </Button>
+          <Button
+            buttonProps={{
+              size: 'large',
+              variant: 'contained',
+              autoFocus: true,
+              startIcon: <SendIcon />,
+              onClick: () => setIsSendEmailDialogOpen(true),
+            }}>
+            <Typography variant="subtitle2">{t('Send Work Report')}</Typography>
+          </Button>
+        </Box>
       </A4Layout>
       <BottomDrawer
         isOpen
@@ -264,6 +301,32 @@ export const WorkReport = ({orderId}: Props) => {
         }}
         listItems={[]}
         isValid={!!items.length}
+      />
+      <SendEmailDialog
+        open={isSendEmailDialogOpen}
+        onClose={() => setIsSendEmailDialogOpen(false)}
+        confirmBtnDisabled={publishingWorkReport}
+        title="Send work report"
+        confirmBtnLabel="Send Work Report"
+        email={
+          report.elevator.propertyOwner?.additionalInfo.billingEmail ||
+          report.elevator.propertyOwner?.contact.email
+        }
+        subject=""
+        content={report.description}
+        callback={(emailRecord) => {
+          publishWorkReport(
+            {
+              id: orderId!,
+              body: {
+                email: emailRecord.email,
+                subject: emailRecord.subject,
+                content: emailRecord.content,
+              },
+            },
+            {onSuccess: () => setIsSendEmailDialogOpen(false)},
+          );
+        }}
       />
     </Box>
   );

@@ -128,7 +128,7 @@ const UpdateContract = async (
 };
 
 export const useUpdateContract = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation(
     ({
@@ -150,12 +150,7 @@ export const useUpdateContract = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar(
-          'Sorry! Unable to save changes right now. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        showError(err);
       },
     },
   );
@@ -171,7 +166,7 @@ const createContract = async (
 };
 
 export const useCreateContract = (successMsg: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation((body: ContractRequestBody) => createContract(body), {
     onSuccess: () => {
       enqueueSnackbar(successMsg, {
@@ -180,9 +175,67 @@ export const useCreateContract = (successMsg: string) => {
     },
     onError: (err) => {
       console.log(err);
-      enqueueSnackbar('Some error occurred, please try again.', {
-        variant: 'error',
-      });
+      showError(err);
     },
   });
+};
+
+const deleteContract = async (contractId: string) => {
+  const response = await axiosClient.delete<StringValue>(
+    `/api/contracts/${contractId}`,
+  );
+  return response.data;
+};
+
+export const useDeleteContract = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation((contractId: string) => deleteContract(contractId), {
+    onSuccess: () => {
+      if (successMsg) {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+        queryClient.invalidateQueries(qk.contracts);
+        queryClient.invalidateQueries(qk.queryCustomerContract);
+      }
+    },
+    onError: (err: any) => {
+      console.log(err);
+      showError(err);
+    },
+  });
+};
+
+const attachElevatorsToContract = async (
+  contractId: string,
+  body: string[],
+) => {
+  await axiosClient.post<StringValue>(
+    `/api/contracts/${contractId}/elevators`,
+    body,
+  );
+};
+
+export const useAttachElevatorsToContract = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({contractId, body}: {contractId: string; body: string[]}) =>
+      attachElevatorsToContract(contractId, body),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.contractDetails);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
 };

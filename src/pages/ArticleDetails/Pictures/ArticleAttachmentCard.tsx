@@ -42,7 +42,7 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
       name: article.name,
       externalId: article.externalId,
       pictureUrls: [
-        ...article.additionalInfo.pictureUrls,
+        ...(article.additionalInfo.pictureUrls || []),
         ...files.map((it) => it.uri),
       ],
       qrCode: article.additionalInfo.qrCode,
@@ -145,7 +145,7 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
               'No attachments yet. Please click the button below to add!',
             )}
             illustration="attachment"
-            buttonLabel={t('+ Add Attachments')}
+            buttonLabel={t('Add Attachments')}
             action={() => setOpenDialog(true)}
           />
         )}
@@ -159,10 +159,7 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
           onClose={saveArticle}
           onCancel={() => setOpenDialog(false)}
           successMessage={t('Image uploaded successfully')}
-          hints={[
-            t('JPEG, PNG, BMP, GIF, WEBP, SVG only'),
-            t('File size less than 5MB only'),
-          ]}
+          hint="JPEG, PNG, BMP, GIF, WEBP oder SVG"
         />
       )}
     </InfoCard>

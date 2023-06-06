@@ -56,7 +56,7 @@ export const uploadImages = async (
   );
 
 export const useUploadFiles = (successMsg: string, companyId?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const {user} = useUserSession();
   const queryClient = useQueryClient();
   let fetchId = user?.userAccount.serviceCompany.id;
@@ -78,9 +78,7 @@ export const useUploadFiles = (successMsg: string, companyId?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('An unexpected error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );

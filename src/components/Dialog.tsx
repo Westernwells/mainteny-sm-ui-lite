@@ -4,7 +4,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
-import React, {ReactNode} from 'react';
+import {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Button} from './Button';
 
@@ -46,17 +46,14 @@ export const Dialog = ({
           {children}
         </DialogContentText>
       </DialogContent>
-      <DialogActions sx={{mt: '1.5em'}}>
-        <Button
-          buttonProps={{
-            onClick: onCancel,
-          }}>
-          <Typography variant="subtitle2" color="text.secondary">
-            {t('Cancel')}
-          </Typography>
+      <DialogActions sx={{mt: '1.5em', padding: '0px 24px 20px 0px'}}>
+        <Button buttonProps={{onClick: onCancel, size: 'large'}}>
+          <Typography variant="subtitle2">{t('Cancel')}</Typography>
         </Button>
         <Button
           buttonProps={{
+            size: 'large',
+            variant: 'contained',
             onClick: onSave,
             autoFocus: true,
             disabled: disableSaveBtn || isSaving,

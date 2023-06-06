@@ -30,7 +30,7 @@ export const useAuth = (): UseAuth => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location: Location = useLocation();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   const adminUser = getStoredAdmin();
 
@@ -57,7 +57,7 @@ export const useAuth = (): UseAuth => {
         ) {
           enqueueSnackbar(
             `${t('Uh oh! As a Property Manager, please login at')} ${
-              process.env.REACT_APP_PMUI_URL
+              import.meta.env.REACT_APP_PMUI_URL
             }`,
             {
               variant: 'warning',
@@ -70,7 +70,7 @@ export const useAuth = (): UseAuth => {
         updateUser(user);
         if (location.state?.from) {
           navigate(
-            `/${location.state.from.pathname}${
+            `${location.state.from.pathname}${
               location.state.from.search ? location.state.from.search : ''
             }`,
             {replace: true},
@@ -83,14 +83,10 @@ export const useAuth = (): UseAuth => {
           navigate('/', {replace: true});
         }
       }
-    } catch (errorResponse: any) {
-      if (errorResponse?.response.status === 400) {
-        enqueueSnackbar('Email or password entered is incorrect', {
-          variant: 'error',
-        });
-      }
+    } catch (err: any) {
+      showError(err);
       setLoading(false);
-      console.log(errorResponse);
+      console.log(err);
     }
   };
 

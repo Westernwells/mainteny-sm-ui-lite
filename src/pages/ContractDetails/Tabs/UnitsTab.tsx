@@ -57,18 +57,7 @@ export const UnitsTab: FC<Props> = ({elevators}) => {
             containerStyle={{my: 'auto'}}
             btnAction={() => navigate('/units/new')}
             label="No units yet. They will appear here once added!"
-            btnLabel="+ Add Unit"
-            showActionBtn
-          />
-        }
-        noResultsEmptySection={
-          <EmptySection
-            illustration="clipboard"
-            size="tiny"
-            containerStyle={{my: 'auto'}}
-            btnAction={() => navigate('/units/new')}
-            label="No units yet. They will appear here once added!"
-            btnLabel="+ Add Unit"
+            btnLabel="Create New Unit"
             showActionBtn
           />
         }

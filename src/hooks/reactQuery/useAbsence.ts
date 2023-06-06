@@ -1,5 +1,4 @@
 import {useMutation, useQuery, useQueryClient} from 'react-query';
-import {useSnackbar} from 'notistack';
 
 import {AbsenceItem} from 'models/absence';
 import {Resource, RestError, StringValue} from 'models/misc';
@@ -7,6 +6,7 @@ import {AbsenceForm} from 'pages/EmployeeDetails/Absence/model';
 import {queryKeys} from 'reactQuery/constants';
 import {formatCreateAbsence} from 'utils/absence-utils';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {AbsenceUpdate} from '../../pages/EmployeeDetails/Absence/model';
 
 export const getAbsence = async (params: any, employeeId: string) => {
@@ -30,7 +30,7 @@ export const useGetAbsence = (params: any, employeeId: string | null) =>
   );
 
 export const useAbsence = () => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
 
   const createAbsence = async (
@@ -58,13 +58,7 @@ export const useAbsence = () => {
       }
     } catch (error: any) {
       console.error(error);
-      enqueueSnackbar(
-        error.response?.message ||
-          'Sorry! Unable to save changes right now. Please try again.',
-        {
-          variant: 'error',
-        },
-      );
+      showError(error);
     }
   };
 
@@ -78,7 +72,7 @@ const deleteAbsence = async (eventId: string) => {
 };
 
 export const useDeleteAbsence = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation(({eventId}: {eventId: string}) => deleteAbsence(eventId), {
     onSuccess: () => {
@@ -92,9 +86,7 @@ export const useDeleteAbsence = (successMsg?: string) => {
     },
     onError: (err: any) => {
       console.log(err);
-      enqueueSnackbar('Some error occurred, please try again.', {
-        variant: 'error',
-      });
+      showError(err);
     },
   });
 };
@@ -106,7 +98,7 @@ const updateAbsence = async (body: AbsenceUpdate, eventId: string) => {
 };
 
 export const useUpdateAbsence = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
 
   return useMutation(
@@ -124,9 +116,7 @@ export const useUpdateAbsence = (successMsg?: string) => {
       },
       onError: (err: any) => {
         console.log(err);
-        enqueueSnackbar('Some error occurred, please try again.', {
-          variant: 'error',
-        });
+        showError(err);
       },
     },
   );

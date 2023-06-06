@@ -213,7 +213,10 @@ export const DataGridLayout = ({
             }
             e.preventDefault();
             if (params.field !== 'actions' && isCellClickable) {
-              navigate(params.row.navigateTo);
+              navigate(
+                params.row.navigateTo,
+                params.row?.navigateOptions ?? {},
+              );
             }
           })
         }
@@ -245,7 +248,10 @@ export const DataGridLayout = ({
           },
           '& .MuiDataGrid-columnHeaders': {
             background: 'white',
-            border: '2px solid',
+            borderLeft: 'none',
+            borderRight: 'none',
+            borderTop: 'none',
+            borderBottom: '2px solid',
             borderColor: 'background.default',
             borderRadius: '4px',
             ...(isWidget && {
@@ -256,6 +262,11 @@ export const DataGridLayout = ({
           '& .MuiDataGrid-columnHeaderTitleContainer': {
             padding: '0',
             whiteSpace: 'pre-wrap',
+            '& .MuiTypography-subtitle2': {
+              wordWrap: 'break-word',
+              overflow: 'auto',
+              width: 'fit-content',
+            },
           },
           '& .MuiDataGrid-columnSeparator': {
             display: 'none',

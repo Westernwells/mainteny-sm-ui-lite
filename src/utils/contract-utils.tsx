@@ -1,16 +1,21 @@
-export const costRangeConvertor = (selectedItems: string[]) => {
+import {ContractTypes} from 'models/contract';
+
+export const costRangeConvertor = (
+  selectedItems: string[],
+  currencySymbol: string,
+) => {
   const range: number[][] = [];
   selectedItems.forEach((item) => {
     switch (item) {
-      case '0 - €500':
+      case `0 - ${currencySymbol}500`:
         range.push([0, 50000]);
         break;
 
-      case '€500 - €1,000':
+      case `${currencySymbol}500 - ${currencySymbol}1,000`:
         range.push([50000, 100000]);
         break;
 
-      case '> €1,000':
+      case `> ${currencySymbol}1,000`:
         range.push([100000, 9999999]);
         break;
 
@@ -26,10 +31,25 @@ export const getStartEndPrice = (price: number[][]) => {
     price.length &&
     price?.reduce<number[]>((acc, item) => [...acc, ...item], []);
 
-  const newPrice = numbers && numbers.length ? numbers : [0, 9999999];
+  const newPrice = numbers && numbers.length ? numbers : [-9999999, 9999999];
 
   return [
     Math.min(...(newPrice as number[])),
     Math.max(...(newPrice as number[])),
   ];
+};
+
+export const contractTypeMap = {
+  [ContractTypes.SERVICE]: 'Maintenance',
+  [ContractTypes.NON_SERVICE]: 'Non  maintence',
+};
+
+export const invoiceCycle: {[key: string]: string} = {
+  '0': 'After each visit',
+  '1': '1 month',
+  '2': '2 months',
+  '3': '3 months',
+  '4': '4 months',
+  '6': '6 months',
+  '12': '12 months',
 };

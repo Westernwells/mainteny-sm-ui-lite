@@ -1,6 +1,7 @@
 import Typography, {TypographyProps} from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
 import Box, {BoxProps} from '@mui/material/Box';
+import AddIcon from '@mui/icons-material/Add';
 import {ReactComponent as LaptopIllustration} from 'assets/illustrations/Laptop.svg';
 import {ReactComponent as ClipboardIllustration} from 'assets/illustrations/Clipboard.svg';
 import {ReactComponent as AttachmentIllustration} from 'assets/illustrations/Attachment.svg';
@@ -25,6 +26,7 @@ interface Props extends BoxProps {
   showActionBtn?: boolean;
   btnLabel?: string;
   btnAction?: () => void;
+  actionButtonIcon?: JSX.Element;
   subLabel?: string;
   subLabelProps?: TypographyProps;
 }
@@ -39,6 +41,7 @@ export const EmptySection = ({
   btnLabel = '',
   showActionBtn = false,
   btnAction,
+  actionButtonIcon,
   subLabel = '',
   subLabelProps = {},
 }: Props) => {
@@ -98,6 +101,7 @@ export const EmptySection = ({
             onClick: btnAction,
             variant: 'contained',
             size: 'medium',
+            startIcon: actionButtonIcon || <AddIcon />,
           }}>
           {t(btnLabel)}
         </Button>

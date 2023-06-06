@@ -103,6 +103,14 @@ export const columns: GridColDef[] = [
     ...defaultProps,
   },
   {
+    field: 'supplier',
+    headerName: 'SUPPLIER',
+    type: 'string',
+    flex: 2,
+    cellClassName: 'truncateText',
+    ...defaultProps,
+  },
+  {
     field: 'purchasePrice',
     headerName: 'PURCHASE PRICE',
     type: 'string',
@@ -162,6 +170,7 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
     purchasePrice: formatNetAmount(item.unitPurchaseAmount),
     sellingPrice: formatNetAmount(item.unitSellingAmount),
     stock: item.stock.currentStock,
+    supplier: item.additionalInfo.suppliers?.map((x) => x.name).join(', '),
     navigateTo: `details/${item.id}`,
     item,
   }));
@@ -173,7 +182,7 @@ export const ArticleListDataGrid = () => {
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
-  const [type, setType] = useState('');
+  const [type, setType] = useState<ArticleType[]>([]);
   const [query, setQuery] = useState('');
   const textInput = useRef<HTMLInputElement>(null);
 
@@ -198,7 +207,7 @@ export const ArticleListDataGrid = () => {
 
   const clearAllFilters = () => {
     setQuery('');
-    setType('');
+    setType([]);
     if (textInput.current) {
       textInput.current.value = '';
     }
@@ -232,7 +241,7 @@ export const ArticleListDataGrid = () => {
         alignItems="center"
         justifyContent="center"
         flexGrow={1}>
-        <Progress height="100%" />
+        <Progress />
       </Box>
     );
   }
@@ -266,11 +275,11 @@ export const ArticleListDataGrid = () => {
                 options={Object.keys(ArticleType).map((it) =>
                   convertToText(it),
                 )}
-                getSelectedValue={(item: string[]) =>
-                  setType(item[0]?.toUpperCase())
+                getSelectedValue={(items) =>
+                  items[0] && setType([items[0].toUpperCase()] as ArticleType[])
                 }
                 multiple={false}
-                initialSelectedItems={type ? [type] : []}
+                initialSelectedItems={type}
               />
             </FilterFields>
           }

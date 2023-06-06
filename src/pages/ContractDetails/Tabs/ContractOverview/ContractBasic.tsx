@@ -11,39 +11,85 @@ import {Grid} from '@mui/material';
 import {StatusChip} from 'components/StatusChip';
 import {convertToText} from 'utils/utils';
 import {useTranslation} from 'react-i18next';
+import CalendarToday from '@mui/icons-material/CalendarToday';
+import TrendingUp from '@mui/icons-material/TrendingUp';
+import DateRange from '@mui/icons-material/DateRange';
+import MoneyOff from '@mui/icons-material/MoneyOff';
+import Timer from '@mui/icons-material/Timer';
+import {ContractStatus, FirstMaintenance} from 'models/contract';
+import {capitalize} from 'lodash';
+import {useFormatDate} from 'hooks/useFormatDate';
+import {toDate} from 'utils/datetime';
 
 interface Props {
+  name?: string;
   type?: string;
   numberOfVisits?: number;
   costPerYear?: string | number;
   spendingLimit?: string;
   renewalPeriod?: number;
-  invoiceDue?: string;
+  invoiceCycle?: string;
   numberOfUnits?: number;
+  paymentDue?: number;
+  yearlyPriceAdjustment?: number;
+  noticePreiod?: number;
+  discount?: string[];
+  hourlyRate?: string;
+  status?: ContractStatus;
+  firstMaintenance?: FirstMaintenance;
+  firstInvoiceDate?: string;
 }
 
 export const ContractBasic = ({
   costPerYear,
-  type,
+  name,
   spendingLimit,
-  invoiceDue,
+  invoiceCycle,
   numberOfUnits,
   numberOfVisits,
   renewalPeriod,
+  paymentDue,
+  yearlyPriceAdjustment,
+  noticePreiod,
+  discount,
+  hourlyRate,
+  status,
+  type,
+  firstMaintenance,
+  firstInvoiceDate,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
+  const formatDate = useFormatDate();
+
   return (
     <>
       <StatusChip
-        color="success"
-        label="Active"
+        color={
+          status === ContractStatus.VALID
+            ? 'success'
+            : status === ContractStatus.PENDING
+            ? 'info'
+            : 'error'
+        }
+        label={capitalize(status!)}
         style={{mb: '1em', float: 'right'}}
       />
       <Grid container rowGap={2}>
         <Grid item xs={4}>
           <CardProps
-            label="TYPE"
+            label="CONTRACT NAME"
+            bodyTextVariant="subtitle1"
+            icon={<CardTravelIcon color="info" />}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={convertToText(name || '-')}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <CardProps
+            label="CONTRACT TYPE"
             bodyTextVariant="subtitle1"
             icon={<CardTravelIcon color="info" />}
             iconBackground={theme.palette.info.outlinedHoverBg}
@@ -103,13 +149,13 @@ export const ContractBasic = ({
         </Grid>
         <Grid item xs={4}>
           <CardProps
-            label="INVOICE DUE"
+            label="INVOICE CYCLE"
             bodyTextVariant="subtitle1"
             icon={<WysiwygIcon color="info" />}
             containerStyles={{mr: '0.5em'}}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3rem"
-            bodyText={typeof invoiceDue === 'string' ? t(invoiceDue) : '-'}
+            bodyText={typeof invoiceCycle === 'string' ? t(invoiceCycle) : '-'}
           />
         </Grid>
         <Grid item xs={4}>
@@ -121,6 +167,99 @@ export const ContractBasic = ({
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3rem"
             bodyText={`${numberOfUnits}` || '-'}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <CardProps
+            label="PAYMENT DUE"
+            bodyTextVariant="subtitle1"
+            icon={<CalendarToday color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={paymentDue ? `${paymentDue} days` : '-'}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <CardProps
+            label="YEARLY PRICE ADJUSTMENT"
+            bodyTextVariant="subtitle1"
+            icon={<TrendingUp color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={yearlyPriceAdjustment ? `${yearlyPriceAdjustment}%` : '-'}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <CardProps
+            label="NOTICE PERIOD"
+            bodyTextVariant="subtitle1"
+            icon={<DateRange color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={noticePreiod ? `${noticePreiod} months` : '-'}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <CardProps
+            label="DISCOUNT"
+            bodyTextVariant="subtitle1"
+            icon={<MoneyOff color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={discount ? `${discount}` : '-'}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <CardProps
+            label="HOURLY RATE"
+            bodyTextVariant="subtitle1"
+            icon={<Timer color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={hourlyRate ? `${hourlyRate}` : '-'}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <CardProps
+            label="FIRST MAINTENANCE VISIT"
+            bodyTextVariant="subtitle1"
+            icon={<CalendarToday color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={
+              firstMaintenance
+                ? `${formatDate(
+                    new Date(firstMaintenance.year, firstMaintenance.month),
+                    'MMM yyyy',
+                  )}`
+                : '-'
+            }
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <CardProps
+            label="FIRST INVOICE"
+            bodyTextVariant="subtitle1"
+            icon={<CalendarToday color="info" />}
+            containerStyles={{mr: '0.5em'}}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3rem"
+            bodyText={
+              firstInvoiceDate ? `${formatDate(toDate(firstInvoiceDate))}` : '-'
+            }
           />
         </Grid>
       </Grid>

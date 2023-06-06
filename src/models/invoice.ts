@@ -1,13 +1,16 @@
-import {Article} from './article';
+import {ArticleView} from './article';
 import {
+  Address,
+  AddressRecord,
   Amount,
   AmountRecord,
   Meta,
+  Money,
   PaymentInfo,
   PdfGenerationStatus,
   WithOptional,
 } from './misc';
-import {PropertyOwner} from './propertyManager';
+import {PropertyOwnerSimpleView} from './propertyManager';
 import {QuotationItemRecord} from './quotation';
 import {ServiceCompanySimpleView} from './service-company';
 import {ServiceOrderView, ServiceOrderType} from './service-order';
@@ -19,22 +22,24 @@ export enum InvoiceStatus {
   EXPIRED = 'EXPIRED',
 }
 
-export enum InvoiceDueType {
+export enum InvoiceCycle {
   AFTER_EACH_VISIT = 'AFTER_EACH_VISIT',
   HALF_YEARLY = 'HALF_YEARLY',
   QUARTERLY = 'QUARTERLY',
   YEARLY = 'YEARLY',
+  MONTHLY = 'MONTHLY',
 }
 
 export enum InvoiceStatusView {
   PAID = 'Paid',
-  NOT_PAID = 'Unpaid',
+  NOT_PAID = 'Sent',
   DRAFT = 'Draft',
   EXPIRED = 'Overdue',
 }
 
 export interface InvoiceItem {
-  article: Article;
+  totalAmount: Amount;
+  article: ArticleView;
   data: string;
   description: string;
   id: string;
@@ -44,30 +49,77 @@ export interface InvoiceItem {
   unitAmount: Amount;
 }
 
+export interface BeneficialDetails {
+  name: string;
+  address: Address;
+}
+
+export interface BeneficialDetailsRecord {
+  name: string;
+  address: AddressRecord;
+}
+
 export interface InvoiceAdditionalInfo {
   dueDate: string;
   pdfGenerationStatus: PdfGenerationStatus;
   pdfPath: string;
+  includeWorkReport: boolean;
+  includeCheckList?: boolean;
+  paymentInfo: PaymentInfo;
+  costCenter?: string;
+  customerSpecificOrderNumber?: string;
+  beneficialDetails?: BeneficialDetails;
+}
+
+export enum InvoiceOverdueNoticeStatus {
+  DRAFT = 'DRAFT',
+  SENT = 'SENT',
+}
+
+export interface InvoiceOverdueNoticeAdditionalInfo {
+  pdfPath: string;
+  pdfGenerationStatus: PdfGenerationStatus;
+}
+
+export interface InvoiceOverdueNoticeSimpleView {
+  id: string;
+  number: string;
+  externalId: string;
+  subject: string;
+  description: string;
+  sentDate: string;
+  dueDate: string;
+  initialAmount: Money;
+  handlingFee: Money;
+  totalAmount: Money;
+  status: InvoiceOverdueNoticeStatus;
+  additionalInfo: InvoiceOverdueNoticeAdditionalInfo;
+  meta: Meta;
 }
 
 export interface InvoiceView {
   id: string;
   number: string;
+  externalId: string;
   description: string;
   subject: string;
   type: InvoiceType;
   totalAmount: Amount;
   issuedDate: string;
+  sentDate: string;
   dueDate: string;
   status: InvoiceStatus;
   serviceCompany: ServiceCompanySimpleView;
   serviceOrder?: ServiceOrderView;
-  propertyOwner: PropertyOwner;
+  propertyOwner: PropertyOwnerSimpleView;
   items: InvoiceItem[];
   search: string;
   meta: Meta;
   additionalInfo: InvoiceAdditionalInfo;
   paymentTerms: string;
+  overdueNotices: InvoiceOverdueNoticeSimpleView[];
+  commentCount?: number;
+  partialInvoices?: InvoiceItem[];
 }
 
 export interface QueryInvoiceParams {
@@ -75,6 +127,8 @@ export interface QueryInvoiceParams {
   pageSize: number;
   query: string;
   status: InvoiceStatus[];
+  totalAmountFrom?: number;
+  totalAmountTo?: number;
 }
 
 export interface InvoiceFilters {
@@ -93,8 +147,31 @@ export interface InvoiceItemRecord<T> {
 }
 
 export enum InvoiceType {
+  FINAL = 'FINAL',
   FULL = 'FULL',
   PARTIAL = 'PARTIAL',
+  CREDIT_NOTE = 'CREDIT_NOTE',
+}
+
+export interface InvoiceFormData {
+  subject: string;
+  description: string;
+  dueDate: string;
+  issuedDate: string;
+  items: QuotationItemRecord[] | InvoiceItemRecord<Amount>[];
+  paymentInfo: PaymentInfo;
+  paymentTerms: string;
+  propertyOwnerId: string;
+  serviceCompanyId: string;
+  serviceOrderId?: string;
+  shouldSendOut: boolean;
+  type: InvoiceType;
+  includeWorkReport?: boolean;
+  includeCheckList?: boolean;
+  costCenter?: string;
+  customerSpecificOrderNumber?: string;
+  beneficialName?: string;
+  beneficialAddress?: AddressRecord;
 }
 
 export interface CreateInvoice {
@@ -110,6 +187,11 @@ export interface CreateInvoice {
   serviceOrderId?: string;
   shouldSendOut: boolean;
   type: InvoiceType;
+  includeWorkReport?: boolean;
+  includeCheckList?: boolean;
+  costCenter?: string;
+  customerSpecificOrderNumber?: string;
+  beneficialDetails?: BeneficialDetailsRecord;
 }
 
 export interface UpdateInvoice {
@@ -122,6 +204,10 @@ export interface UpdateInvoice {
   paymentTerms?: string;
   serviceOrderId?: string;
   type: InvoiceType;
+  includeWorkReport?: boolean;
+  costCenter?: string;
+  customerSpecificOrderNumber?: string;
+  beneficialDetails?: BeneficialDetailsRecord;
 }
 
 export interface QueryInvoiceCommentsParams {
@@ -132,4 +218,41 @@ export interface QueryInvoiceCommentsParams {
 export interface CreateInvoiceComment {
   content: string;
   subject: string;
+}
+
+export interface InvoicePaymentRecord {
+  amount: Money;
+  paidDate: string;
+  markAsPaid: boolean;
+}
+
+export interface CreateInvoiceOverdueNoticeRecord {
+  externalId: string;
+  subject: string;
+  description: string;
+  dueDate: string;
+  initialAmount: Money;
+  handlingFee: Money;
+}
+
+export enum InvoiceActivityType {
+  CREATED = 'CREATED',
+  UPDATED = 'UPDATED',
+  SENT = 'SENT',
+  PRINTED = 'PRINTED',
+  OVERDUE_NOTICE_SENT = 'OVERDUE_NOTICE_SENT',
+  PAID = 'PAID',
+  EXPIRED = 'EXPIRED',
+  PAYMENT_RECEIVED = 'PAYMENT_RECEIVED',
+  PAYMENT_UPDATED = 'PAYMENT_UPDATED',
+  PAYMENT_DELETED = 'PAYMENT_DELETED',
+}
+
+export interface InvoiceActivityView {
+  id: string;
+  type: InvoiceActivityType;
+  data: string;
+  text: string;
+  additionalInfo: string;
+  meta: Meta;
 }

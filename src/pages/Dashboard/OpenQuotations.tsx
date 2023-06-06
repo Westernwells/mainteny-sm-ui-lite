@@ -27,7 +27,14 @@ export const OpenQuotations = ({
     <DashboardInfoCard
       title="Open quotations"
       chipLabel={`${quotations.total}`}
-      seeMorePath="/quotations">
+      seeMorePath="/quotations"
+      emptySection={{
+        show: !quotations.total,
+        label: 'No quotations.',
+      }}
+      bodyContainerStyle={{
+        height: '100%',
+      }}>
       <List
         disablePadding
         sx={{

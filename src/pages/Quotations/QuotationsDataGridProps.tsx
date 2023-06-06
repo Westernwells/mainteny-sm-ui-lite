@@ -18,17 +18,18 @@ export const getQuotationStatusStyles = (
     | 'info'
     | 'default'
     | 'primary'
+    | 'eden.light'
     | 'action.active';
 } => {
   switch (status) {
     case QuotationStatus.ACCEPTED:
-      return {label: 'Accepted', color: 'primary'};
+      return {label: 'Accepted', color: 'success'};
     case QuotationStatus.DRAFT:
-      return {label: 'Draft', color: 'action.active'};
+      return {label: 'Draft', color: 'eden.light'};
     case QuotationStatus.REJECTED:
       return {label: 'Denied', color: 'error'};
     case QuotationStatus.SENT_TO_CLIENT:
-      return {label: 'Sent', color: 'success'};
+      return {label: 'Sent', color: 'primary'};
     default:
       return {label: '-', color: 'default'};
   }
@@ -39,13 +40,7 @@ export const columns: GridColDef[] = [
     field: 'number',
     headerName: 'number',
     align: 'left',
-    flex: 0.75,
-  }),
-  getColumnProps({
-    field: 'subject',
-    headerName: 'subject',
-    cellClassName: 'truncateText',
-    flex: 1.5,
+    flex: 0.5,
   }),
   getColumnProps({
     field: 'customer',
@@ -75,7 +70,7 @@ export const columns: GridColDef[] = [
     headerName: 'notes',
     align: 'center',
     renderCell: (params) => <NotesIndicator quotation={params.row.quotation} />,
-    flex: 1,
+    flex: 0.5,
   }),
   getColumnProps({
     field: 'status',
@@ -90,25 +85,30 @@ export const columns: GridColDef[] = [
         maxChars={9}
       />
     ),
-    flex: 0.75,
+    flex: 0.5,
   }),
   getColumnProps({
     field: 'actions',
     headerName: 'actions',
     align: 'center',
-    renderCell: (params) => <Actions quotation={params.row.quotation} />,
-    flex: 1,
+    renderCell: (params) => (
+      <Actions
+        quotation={params.row.quotation}
+        downloadUrl={params.row.downloadUrl}
+      />
+    ),
+    flex: 0.5,
   }),
 ];
 
 export const makeRows = (
   quotations: Resource<QuotationView>,
+  downloadUrls: {[key: string]: string} | undefined,
   formatDate: FormatDate = () => '',
 ): GridRowsProp =>
   quotations &&
   quotations.data.map((item: QuotationView, index: number) => ({
     id: index,
-    subject: item.subject,
     quotationId: item.id,
     number: item.number,
     customer: item.elevator.propertyOwner.name,
@@ -123,6 +123,7 @@ export const makeRows = (
       },
     )}`,
     status: item.status,
+    downloadUrl: downloadUrls?.[item.additionalInfo.pdfPath] ?? '',
     quotation: item,
     navigateTo: `details/${item.id}`,
   }));

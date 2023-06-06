@@ -1,3 +1,5 @@
+import {ErrorCode, ErrorMessage} from 'models/error';
+import {RestError} from 'models/misc';
 import {
   OptionsObject,
   ProviderContext,
@@ -6,7 +8,9 @@ import {
 } from 'notistack';
 import {useTranslation} from 'react-i18next';
 
-export const useSnackbar = (): ProviderContext => {
+export const useSnackbar = (): ProviderContext & {
+  showError: (err: any) => void;
+} => {
   const {t} = useTranslation();
   const {enqueueSnackbar: enqueueNotistackSnackbar, closeSnackbar} =
     useNotistackSnackbar();
@@ -17,5 +21,28 @@ export const useSnackbar = (): ProviderContext => {
       options,
     );
 
-  return {enqueueSnackbar, closeSnackbar};
+  const showError = (err: any) => {
+    const responseErrorCode = (err?.response?.data as RestError)?.errorCode;
+
+    const errorCodeEnumArrayOfObject = Object.entries(ErrorCode).map(
+      ([type, code]) => {
+        const errorMessage = ErrorMessage[type as keyof typeof ErrorMessage];
+        return {
+          type,
+          code,
+          message: errorMessage,
+        };
+      },
+    );
+
+    const foundError = errorCodeEnumArrayOfObject.find(
+      (i) => i.code === responseErrorCode,
+    );
+
+    enqueueSnackbar(foundError?.message ?? ErrorMessage.DEFAULT, {
+      variant: 'error',
+    });
+  };
+
+  return {enqueueSnackbar, closeSnackbar, showError};
 };

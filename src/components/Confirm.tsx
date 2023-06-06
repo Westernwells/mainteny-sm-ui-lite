@@ -12,8 +12,9 @@ interface Props {
   onConfirm: () => void;
   onClose: () => void;
   title?: string;
-  content?: string;
+  content?: string | any[];
   helperText?: string;
+  disableActions?: boolean;
 }
 
 export const Confirm = ({
@@ -23,6 +24,7 @@ export const Confirm = ({
   title,
   content,
   helperText,
+  disableActions = false,
 }: Props) => {
   const {t} = useTranslation();
   return (
@@ -48,6 +50,7 @@ export const Confirm = ({
       </DialogContent>
       <DialogActions>
         <Button
+          disabled={disableActions}
           label={t('Create Service Order')}
           buttonProps={{
             onClick: onClose,
@@ -58,6 +61,7 @@ export const Confirm = ({
         </Button>
 
         <Button
+          disabled={disableActions}
           label={t('Create Service Order')}
           buttonProps={{
             onClick: onConfirm,

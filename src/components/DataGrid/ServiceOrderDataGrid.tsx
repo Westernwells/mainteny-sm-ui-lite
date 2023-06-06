@@ -21,18 +21,25 @@ interface Props {
   setRowItem: (row: ServiceOrderView) => void;
   searchCustomer?: string;
   elevatorId?: string;
+  propertyOwnerId?: string;
 }
 
 export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
-    headerName: 'number',
+    headerName: 'order number',
     align: 'center',
     flex: 0,
   }),
   getColumnProps({
     field: 'customer',
     headerName: 'customer',
+    cellClassName: 'truncateText',
+    flex: 1.5,
+  }),
+  getColumnProps({
+    field: 'address',
+    headerName: 'address',
     cellClassName: 'truncateText',
     flex: 1.5,
   }),
@@ -83,6 +90,7 @@ export const ServiceOrdersDataGrid = ({
   setRowItem,
   searchCustomer,
   elevatorId,
+  propertyOwnerId,
 }: Props) => {
   const [search, setSearch] = useState(searchCustomer || '');
   const [page, setPage] = useState(makePage(0, pageSize));
@@ -95,14 +103,18 @@ export const ServiceOrdersDataGrid = ({
     ),
     isLoading,
     isFetching,
-  } = useServiceOrders({
-    elevatorIds: elevatorId ? [elevatorId] : [],
-    start: startOfYear(new Date(2000, 1, 1)).toISOString(),
-    end: endOfYear(new Date()).toISOString(),
-    pageIndex: page.pageIndex,
-    pageSize: page.pageSize,
-    query: search,
-  });
+  } = useServiceOrders(
+    {
+      elevatorIds: elevatorId ? [elevatorId] : [],
+      start: startOfYear(new Date(2000, 1, 1)).toISOString(),
+      end: endOfYear(new Date()).toISOString(),
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+      query: search,
+      ...(propertyOwnerId ? {propertyOwnerId} : {}),
+    },
+    {keepPreviousData: true},
+  );
 
   useEffect(() => {
     setPageCount(Math.ceil(serviceOrdersResource.total / page.pageSize));
@@ -119,7 +131,9 @@ export const ServiceOrdersDataGrid = ({
   return (
     <>
       <SearchInput
-        placeholder="search"
+        variant="outlined"
+        label="Search"
+        placeholder="Search by number, customer, status etc."
         onValueChanged={(value) => setSearch(value)}
       />
       <Box display="flex" flexGrow={1} sx={styles.scrollBar}>
@@ -130,7 +144,7 @@ export const ServiceOrdersDataGrid = ({
           onCellClick={(params) => setRowItem(params.row.serviceOrder)}
           loading={isFetching || isLoading}
           pageSize={page.pageSize}
-          pageIndex={page.pageIndex}
+          pageIndex={page.pageIndex + 1}
           pageCount={pageCount}
           hideFooter={pageCount <= 1}
           handlePageChange={(value) =>
@@ -140,7 +154,10 @@ export const ServiceOrdersDataGrid = ({
             }))
           }
           noRowsEmptySection={
-            <NoRowsEmptySection placeholder="service order" />
+            <NoRowsEmptySection
+              placeholder="service order"
+              action={() => window.open('/orders/new?type=regular', '_blank')}
+            />
           }
         />
       </Box>

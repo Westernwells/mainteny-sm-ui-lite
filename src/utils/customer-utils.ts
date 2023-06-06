@@ -1,17 +1,26 @@
 import {CustomerEditForm} from 'pages/CustomerDetails/Tabs/CustomerOverview/EditCustomerForm/model';
 
+export const formatPhoneNumber = (phoneNumber: string) =>
+  `+${phoneNumber.replaceAll('+', '')}`;
+
 export const formatUpdateCustomer = (data: CustomerEditForm) => ({
   billingAddress: data.billingAddress,
   businessAddress: data.businessAddress,
   contact: {
     email: data.email,
-    phone: `+${data.phone.replaceAll('+', '')}`,
+    phone: formatPhoneNumber(data.phone),
     url: data.url,
   },
+  billingEmail: data.billingEmail,
   externalId: data.externalId,
   name: data.name,
   postalAddress: data.postalAddress,
   priority: data.priority || 'NONE',
+  costCenter: data.costCenter,
+  registrationDate: data.registrationDate,
+  secondaryPhoneNumber: data.secondaryPhoneNumber
+    ? formatPhoneNumber(data.secondaryPhoneNumber)
+    : '',
 });
 
 export const getFilterUnitNumber = (value: string, type: 'start' | 'end') => {

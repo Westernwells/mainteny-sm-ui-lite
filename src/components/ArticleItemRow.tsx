@@ -1,4 +1,6 @@
+/* eslint-disable array-callback-return */
 import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -8,15 +10,22 @@ import {QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord} from 'models/invoice';
 import {Amount} from 'models/misc';
 import {Button} from 'components/Button';
+import {useCurrentCurrency} from 'utils/currency';
 
 interface Props<T> {
   articleItem: T;
   index: number;
   deleteItem: (item: T) => void;
   setItems: React.Dispatch<React.SetStateAction<T[]>>;
-  total: number;
-  setTotal: Dispatch<SetStateAction<number>>;
+  totalPrice: number;
+  setTotalPrice: Dispatch<SetStateAction<number>>;
   isPartial?: boolean;
+  isCreditNote?: boolean;
+  currencySymbol?: string;
+  partialPrice: number;
+  setPartialPrice: Dispatch<SetStateAction<number>>;
+  newPartialTotal: number;
+  setNewPartialTotal: Dispatch<SetStateAction<number>>;
 }
 
 export const ArticleItemRow = ({
@@ -24,15 +33,23 @@ export const ArticleItemRow = ({
   index,
   deleteItem,
   setItems,
-  total,
-  setTotal,
+  totalPrice,
+  setTotalPrice,
   isPartial,
+  isCreditNote,
+  currencySymbol,
+  partialPrice,
+  setPartialPrice,
+  newPartialTotal,
+  setNewPartialTotal,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
+  const {t} = useTranslation();
+  const currentCurrency = useCurrentCurrency();
   const [name, setName] = useState(articleItem.name);
   const [description, setDescription] = useState<string>(
     articleItem.description,
   );
-  const [quantity, setQuantity] = useState(articleItem.quantity);
+  const [quantity, setQuantity] = useState<number>(articleItem.quantity);
   const [price, setPrice] = useState(
     articleItem.unitAmount.netAmount /
       10 ** articleItem.unitAmount.fractionDigits!,
@@ -47,58 +64,87 @@ export const ArticleItemRow = ({
   };
 
   const handlePriceChange = (e: any) => {
-    setPrice(e.target.value);
+    setPrice(Number(e.target.value));
+  };
+
+  const handlePartialPriceChange = (e: any) => {
+    setPartialPrice(Number(e.target.value));
   };
 
   const handleTotalChange = (e: any) => {
-    setTotal(e.target.value);
+    setTotalPrice(Number(e.target.value));
+  };
+
+  const handleNewPartialTotalChange = (e: any) => {
+    setNewPartialTotal(Number(e.target.value));
   };
 
   useEffect(() => {
     articleItem.quantity = quantity;
 
     setItems((prev) =>
-      prev.map((item) =>
-        item.articleId === articleItem.articleId ? articleItem : item,
-      ),
+      prev.map((item) => {
+        if (item.articleId === articleItem.articleId) {
+          return {
+            ...item,
+            quantity: articleItem.quantity,
+          };
+        }
+        return item;
+      }),
     );
   }, [quantity]);
-
-  useEffect(() => {
-    if (description) articleItem.description = description;
-    else articleItem.description = ' ';
-
-    setItems((prev) =>
-      prev.map((item) =>
-        item.articleId === articleItem.articleId ? articleItem : item,
-      ),
-    );
-  }, [description]);
 
   useEffect(() => {
     articleItem.name = name;
 
     setItems((prev) =>
-      prev.map((item) =>
-        item.articleId === articleItem.articleId ? articleItem : item,
-      ),
+      prev.map((item) => {
+        if (item.articleId === articleItem.articleId) {
+          return {
+            ...item,
+            name: articleItem.name,
+          };
+        }
+        return item;
+      }),
     );
   }, [name]);
 
   useEffect(() => {
-    articleItem.unitAmount.netAmount =
-      price * 10 ** articleItem.unitAmount.fractionDigits!;
-    articleItem.unitAmount.vat =
-      price *
-      (articleItem.unitAmount.percentageVat / 100) *
-      10 ** articleItem.unitAmount.fractionDigits!;
+    articleItem.description = description;
 
     setItems((prev) =>
-      prev.map((item) =>
-        item.articleId === articleItem.articleId ? articleItem : item,
-      ),
+      prev.map((item) => {
+        if (item.articleId === articleItem.articleId) {
+          return {
+            ...item,
+            description: articleItem.description,
+          };
+        }
+        return item;
+      }),
     );
-  }, [price]);
+  }, [description]);
+
+  useEffect(() => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.articleId === articleItem.articleId) {
+          return {
+            ...item,
+            unitAmount: {
+              ...item.unitAmount,
+              netAmount: isPartial
+                ? partialPrice * 10 ** item.unitAmount.fractionDigits!
+                : price * 10 ** item.unitAmount.fractionDigits!,
+            },
+          };
+        }
+        return item;
+      }),
+    );
+  }, [price, partialPrice]);
 
   return (
     <Box boxShadow="0px 4px 15px 0px #90909033" py="1em">
@@ -108,6 +154,8 @@ export const ArticleItemRow = ({
           display: 'grid',
           gridTemplateColumns: isPartial
             ? '3ch minmax(24ch, 2fr) repeat(4, minmax(10ch, 16ch))'
+            : isCreditNote
+            ? '3ch minmax(24ch, 2fr) minmax(16ch, 0.5fr)'
             : '3ch minmax(24ch, 2fr) minmax(10ch, 16ch) repeat(2, minmax(6ch, 10ch)) minmax(12ch, 18ch)',
           placeItems: 'start',
           gap: '.5em',
@@ -134,69 +182,101 @@ export const ArticleItemRow = ({
             />
           )}
         </Box>
+
         {isPartial && (
           <>
             <TextField
-              value={total * 1.19}
+              value={
+                (isPartial ? newPartialTotal : totalPrice) *
+                (1 + articleItem.unitAmount.percentageVat / 100)
+              }
               size="small"
               disabled
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">€</InputAdornment>
+                  <InputAdornment position="start">
+                    {currentCurrency.symbol}
+                  </InputAdornment>
                 ),
               }}
             />
             <TextField
-              value={total}
-              onChange={handleTotalChange}
+              type="number"
+              value={
+                isPartial ? newPartialTotal.toString() : totalPrice.toString()
+              }
+              onChange={
+                isPartial ? handleNewPartialTotalChange : handleTotalChange
+              }
               size="small"
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">€</InputAdornment>
+                  <InputAdornment position="start">
+                    {currentCurrency.symbol}
+                  </InputAdornment>
                 ),
               }}
             />
             <TextField
-              value={total - price}
+              value={isPartial ? newPartialTotal - partialPrice : totalPrice}
               size="small"
               disabled
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">€</InputAdornment>
+                  <InputAdornment position="start">
+                    {currentCurrency.symbol}
+                  </InputAdornment>
                 ),
               }}
             />
           </>
         )}
+
         <TextField
-          value={price}
-          onChange={handlePriceChange}
+          value={isPartial ? partialPrice.toString() : price.toString()}
+          type="number"
+          onChange={isPartial ? handlePartialPriceChange : handlePriceChange}
           size="small"
           InputProps={{
-            startAdornment: <InputAdornment position="start">€</InputAdornment>,
+            startAdornment: (
+              <InputAdornment position="start">
+                {currencySymbol || currentCurrency.symbol}
+              </InputAdornment>
+            ),
           }}
         />
-        {!isPartial && (
+
+        {!isPartial && !isCreditNote && (
           <>
             <TextField
-              value={quantity}
-              onChange={(e) => setQuantity(parseInt(e.target.value, 10))}
+              value={quantity.toString()}
+              onChange={(e: any) =>
+                setQuantity(Number(parseFloat(e.target.value).toFixed(2)))
+              }
               type="number"
-              inputProps={{inputMode: 'numeric', pattern: '[0-9]*'}}
+              inputProps={{
+                inputMode: 'numeric',
+                pattern: '[0-9]*',
+                min: 0,
+                max: Infinity,
+                step: '0.05',
+              }}
               size="small"
             />
             <TextField
-              defaultValue={articleItem.articleUnit}
+              defaultValue={t(articleItem.articleUnit)}
               size="small"
               disabled
             />
             <TextField
-              value={price * quantity}
+              value={(price * quantity).toFixed(2)}
               size="small"
               disabled
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">€</InputAdornment>
+                  <InputAdornment position="start">
+                    {currentCurrency.symbol}
+                  </InputAdornment>
                 ),
               }}
             />
@@ -204,7 +284,7 @@ export const ArticleItemRow = ({
         )}
       </Box>
       <Box sx={{float: 'right', mt: '1em'}}>
-        {!description.trim() && (
+        {!description.trim() && !isCreditNote && (
           <Button
             label="Add Description"
             buttonProps={{
@@ -217,7 +297,7 @@ export const ArticleItemRow = ({
             }}
           />
         )}
-        {!isPartial && (
+        {!isPartial && !isCreditNote && (
           <Button
             label="Delete Article"
             buttonProps={{

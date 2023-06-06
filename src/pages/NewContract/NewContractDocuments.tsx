@@ -8,11 +8,15 @@ interface Props {
 
 const NewContractDocuments: FC<Props> = ({formik}) => (
   <MyDropZone
-    hints={[
-      'PDF, DOCX, XLSX, XLS, CSV, TSV only',
-      'File size less than 5MB only',
+    hint="PDF, DOCX, XLSX, XLS, CSV or TSV"
+    acceptedFileTypes={[
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+      'text/tab-separated-values',
+      'text/csv',
     ]}
-    acceptedFileTypes="application/pdf"
     getAcceptedFiles={(files) => formik.setFieldValue('documents', files)}
     maxFiles={1}
   />
