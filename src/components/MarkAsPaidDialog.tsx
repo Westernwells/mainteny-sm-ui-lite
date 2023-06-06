@@ -46,7 +46,7 @@ export const MarkAsPaidDialog = ({
     initialValues: {
       amount: {
         value:
-          invoice.totalAmount.grossAmount /
+          invoice.totalAmount.netAmount /
           10 ** invoice.totalAmount.fractionDigits!,
         currency: invoice.totalAmount.currency,
       },
@@ -55,13 +55,17 @@ export const MarkAsPaidDialog = ({
       paidInFull: true,
     },
     onSubmit: (values, {setSubmitting}) => {
+      const grossTotal =
+        (values.amount.value +
+          invoice.totalAmount.vat / 10 ** invoice.totalAmount.fractionDigits!) *
+        10 ** invoice.totalAmount.fractionDigits!;
+
       addInvoicePayment(
         {
           invoiceId: invoice.id,
           body: {
             amount: {
-              value:
-                values.amount.value * 10 ** invoice.totalAmount.fractionDigits!,
+              value: grossTotal,
               currency: values.amount.currency,
             },
             paidDate: formatDate(values.paidDate, 'yyyy-MM-dd')!,
@@ -112,7 +116,7 @@ export const MarkAsPaidDialog = ({
           <FormInput
             props={{
               placeholder: 'e.g. 200',
-              label: t('Paid amount'),
+              label: t('Paid amount (excl. VAT)'),
               name: 'amount.value',
               id: 'amount.value',
               value: formik.values.amount.value,

@@ -1191,6 +1191,7 @@ export const de = {
   'Keep as Unpaid': 'Unbezahlt lassen',
   'Paid in full': 'Vollständig gezahlt',
   'Paid amount': 'Gezahlter Betrag',
+  'Paid amount (excl. VAT)': 'Gezahlter Betrag (ohne MwSt.)',
   Preview: 'Vorschau',
   Edit: 'Bearbeiten',
   Payment: 'Zahlung',
