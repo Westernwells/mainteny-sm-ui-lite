@@ -1,5 +1,12 @@
 /* eslint-disable array-callback-return */
-import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
+import React, {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import {NumericFormat} from 'react-number-format';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -11,6 +18,7 @@ import {InvoiceItemRecord} from 'models/invoice';
 import {Amount} from 'models/misc';
 import {Button} from 'components/Button';
 import {useCurrentCurrency} from 'utils/currency';
+import {LanguageContext} from 'context/LanguageProvider';
 
 interface Props<T> {
   articleItem: T;
@@ -55,28 +63,14 @@ export const ArticleItemRow = ({
       10 ** articleItem.unitAmount.fractionDigits!,
   );
 
+  const {language: selectedLng} = useContext(LanguageContext);
+
   const handleDescriptionChange = (e: any) => {
     setDescription(e.target.value);
   };
 
   const handleNameChange = (e: any) => {
     setName(e.target.value);
-  };
-
-  const handlePriceChange = (e: any) => {
-    setPrice(Number(e.target.value));
-  };
-
-  const handlePartialPriceChange = (e: any) => {
-    setPartialPrice(Number(e.target.value));
-  };
-
-  const handleTotalChange = (e: any) => {
-    setTotalPrice(Number(e.target.value));
-  };
-
-  const handleNewPartialTotalChange = (e: any) => {
-    setNewPartialTotal(Number(e.target.value));
   };
 
   useEffect(() => {
@@ -185,28 +179,20 @@ export const ArticleItemRow = ({
 
         {isPartial && (
           <>
-            <TextField
+            <NumericFormat
               value={
                 (isPartial ? newPartialTotal : totalPrice) *
                 (1 + articleItem.unitAmount.percentageVat / 100)
               }
-              size="small"
               disabled
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    {currentCurrency.symbol}
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <TextField
-              type="number"
-              value={
-                isPartial ? newPartialTotal.toString() : totalPrice.toString()
+              customInput={TextField}
+              decimalScale={2}
+              fixedDecimalScale
+              decimalSeparator={
+                selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
               }
-              onChange={
-                isPartial ? handleNewPartialTotalChange : handleTotalChange
+              thousandSeparator={
+                selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
               }
               size="small"
               InputProps={{
@@ -217,8 +203,52 @@ export const ArticleItemRow = ({
                 ),
               }}
             />
-            <TextField
+
+            <NumericFormat
+              value={isPartial ? newPartialTotal : totalPrice}
+              customInput={TextField}
+              decimalScale={2}
+              // fixedDecimalScale
+              decimalSeparator={
+                selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
+              }
+              thousandSeparator={
+                selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
+              }
+              size="small"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    {currentCurrency.symbol}
+                  </InputAdornment>
+                ),
+              }}
+              onValueChange={(values) => {
+                const {floatValue} = values;
+                if (floatValue) {
+                  if (isPartial) {
+                    setNewPartialTotal(floatValue);
+                  } else {
+                    setTotalPrice(floatValue);
+                  }
+                } else {
+                  setTotalPrice(0);
+                  setNewPartialTotal(0);
+                }
+              }}
+            />
+
+            <NumericFormat
               value={isPartial ? newPartialTotal - partialPrice : totalPrice}
+              customInput={TextField}
+              decimalScale={2}
+              fixedDecimalScale
+              decimalSeparator={
+                selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
+              }
+              thousandSeparator={
+                selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
+              }
               size="small"
               disabled
               InputProps={{
@@ -232,28 +262,53 @@ export const ArticleItemRow = ({
           </>
         )}
 
-        <TextField
-          value={isPartial ? partialPrice.toString() : price.toString()}
-          type="number"
-          onChange={isPartial ? handlePartialPriceChange : handlePriceChange}
+        <NumericFormat
+          value={isPartial ? partialPrice : price}
+          customInput={TextField}
+          decimalScale={2}
+          // fixedDecimalScale
+          decimalSeparator={
+            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
+          }
+          thousandSeparator={
+            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
+          }
           size="small"
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                {currencySymbol || currentCurrency.symbol}
+                {currentCurrency.symbol}
               </InputAdornment>
             ),
+          }}
+          onValueChange={(values) => {
+            const {floatValue} = values;
+            if (floatValue) {
+              if (isPartial) {
+                setPartialPrice(floatValue);
+              } else {
+                setPrice(floatValue);
+              }
+            } else {
+              setPrice(0);
+              setPartialPrice(0);
+            }
           }}
         />
 
         {!isPartial && !isCreditNote && (
           <>
-            <TextField
-              value={quantity.toString()}
-              onChange={(e: any) =>
-                setQuantity(Number(parseFloat(e.target.value).toFixed(2)))
+            <NumericFormat
+              value={quantity}
+              customInput={TextField}
+              decimalScale={2}
+              // fixedDecimalScale
+              decimalSeparator={
+                selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
               }
-              type="number"
+              thousandSeparator={
+                selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
+              }
               inputProps={{
                 inputMode: 'numeric',
                 pattern: '[0-9]*',
@@ -262,23 +317,35 @@ export const ArticleItemRow = ({
                 step: '0.05',
               }}
               size="small"
+              onValueChange={(values) => {
+                const {floatValue} = values;
+                if (floatValue) {
+                  setQuantity(floatValue);
+                } else {
+                  setQuantity(0);
+                }
+              }}
             />
+
             <TextField
               defaultValue={t(articleItem.articleUnit)}
               size="small"
               disabled
             />
-            <TextField
-              value={(price * quantity).toFixed(2)}
+
+            <NumericFormat
+              value={price * quantity}
+              customInput={TextField}
+              decimalScale={2}
+              fixedDecimalScale
+              decimalSeparator={
+                selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
+              }
+              thousandSeparator={
+                selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
+              }
               size="small"
               disabled
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    {currentCurrency.symbol}
-                  </InputAdornment>
-                ),
-              }}
             />
           </>
         )}

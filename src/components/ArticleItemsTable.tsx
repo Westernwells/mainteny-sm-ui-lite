@@ -1,4 +1,11 @@
-import {Dispatch, SetStateAction, useEffect, useMemo, useState} from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -23,6 +30,7 @@ import {
 } from 'utils/currency';
 import {createEmptyResource} from 'utils/paging-utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {LanguageContext} from 'context/LanguageProvider';
 import {calculateTotal} from 'utils/calculate-total';
 import {ArticleItemRow} from './ArticleItemRow';
 import {Button} from './Button';
@@ -101,6 +109,8 @@ export const ArticleItemsTable = ({
   const [partialPrice, setPartialPrice] = useState<number>(0);
 
   const [newPartialTotal, setNewPartialTotal] = useState(0);
+
+  const {language: selectedLng} = useContext(LanguageContext);
 
   const getItemRecord = (
     record: QuotationItemRecord | InvoiceItemRecord<Amount>,
@@ -476,12 +486,9 @@ export const ArticleItemsTable = ({
                       </Typography>
 
                       <Typography sx={{justifySelf: 'end'}}>
-                        {formatCurrency(
-                          isPartial ? newPartialTotal : totalPrice,
-                          {
-                            currency: currencyCode,
-                          },
-                        )}
+                        {isPartial
+                          ? formatCurrency(newPartialTotal, selectedLng)
+                          : formatCurrency(totalPrice, selectedLng)}
                       </Typography>
                     </>
                   )}
@@ -498,9 +505,9 @@ export const ArticleItemsTable = ({
                   </Typography>
 
                   <Typography>
-                    {formatCurrency(isPartial ? partialPrice : totalPrice, {
-                      currency: currencyCode,
-                    })}
+                    {isPartial
+                      ? formatCurrency(partialPrice, selectedLng)
+                      : formatCurrency(totalPrice, selectedLng)}
                   </Typography>
                   <Box>
                     <FormInput
@@ -519,14 +526,15 @@ export const ArticleItemsTable = ({
                     />
                   </Box>
                   <Typography>
-                    {formatCurrency(
-                      isPartial
-                        ? partialPrice * (percentageVat / 100)
-                        : totalPrice * (percentageVat / 100),
-                      {
-                        currency: currencyCode,
-                      },
-                    )}
+                    {isPartial
+                      ? formatCurrency(
+                          partialPrice * (percentageVat / 100),
+                          selectedLng,
+                        )
+                      : formatCurrency(
+                          totalPrice * (percentageVat / 100),
+                          selectedLng,
+                        )}
                   </Typography>
                 </Box>
                 <Box
@@ -546,14 +554,15 @@ export const ArticleItemsTable = ({
                     </Typography>
                   </Typography>
                   <Typography sx={{color: 'primary.contrastText'}}>
-                    {formatCurrency(
-                      isPartial
-                        ? partialPrice * (1 + percentageVat / 100)
-                        : totalPrice * (1 + percentageVat / 100),
-                      {
-                        currency: currencyCode,
-                      },
-                    )}
+                    {isPartial
+                      ? formatCurrency(
+                          partialPrice * (1 + percentageVat / 100),
+                          selectedLng,
+                        )
+                      : formatCurrency(
+                          totalPrice * (1 + percentageVat / 100),
+                          selectedLng,
+                        )}
                   </Typography>
                 </Box>
               </Box>

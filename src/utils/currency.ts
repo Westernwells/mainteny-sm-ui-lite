@@ -9,15 +9,19 @@ import {
 
 export const formatCurrency = (
   amount: number,
+  selectedLang?: string,
   options?: Intl.NumberFormatOptions,
 ) =>
-  amount.toLocaleString('en-US', {
-    style: 'currency',
-    currencyDisplay: 'narrowSymbol',
-    useGrouping: true,
-    currency: options?.currency ?? 'EUR',
-    ...options,
-  });
+  amount.toLocaleString(
+    selectedLang === 'DE' || selectedLang === 'SR' ? 'de-DE' : 'en-US',
+    {
+      style: 'currency',
+      currencyDisplay: 'narrowSymbol',
+      useGrouping: true,
+      currency: options?.currency ?? 'EUR',
+      ...options,
+    },
+  );
 
 function formatAmount(amount?: Amount, value?: number): string {
   if (!amount) {
