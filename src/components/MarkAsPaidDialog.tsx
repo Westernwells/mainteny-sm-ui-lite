@@ -56,8 +56,9 @@ export const MarkAsPaidDialog = ({
     },
     onSubmit: (values, {setSubmitting}) => {
       const grossTotal =
-        values.amount.value * 10 ** invoice.totalAmount.fractionDigits! +
-        invoice.totalAmount.vat;
+        (values.amount.value +
+          invoice.totalAmount.vat / 10 ** invoice.totalAmount.fractionDigits!) *
+        10 ** invoice.totalAmount.fractionDigits!;
 
       addInvoicePayment(
         {
