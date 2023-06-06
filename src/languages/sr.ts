@@ -1157,6 +1157,7 @@ export const sr = {
   'Keep as Unpaid': 'Zadrži kao Neplaćeno',
   'Paid in full': 'Plaćeno u potpunosti',
   'Paid amount': 'Plaćeni iznos',
+  'Paid amount (excl. VAT)': 'Plaćeni iznos (bez PDV)',
   Preview: 'Pregled',
   Edit: 'Urediti',
   Payment: 'Plaćanje',
