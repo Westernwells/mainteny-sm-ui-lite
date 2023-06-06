@@ -208,7 +208,6 @@ export const ArticleItemRow = ({
               value={isPartial ? newPartialTotal : totalPrice}
               customInput={TextField}
               decimalScale={2}
-              // fixedDecimalScale
               decimalSeparator={
                 selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
               }
@@ -266,7 +265,6 @@ export const ArticleItemRow = ({
           value={isPartial ? partialPrice : price}
           customInput={TextField}
           decimalScale={2}
-          // fixedDecimalScale
           decimalSeparator={
             selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
           }
@@ -277,7 +275,7 @@ export const ArticleItemRow = ({
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                {currentCurrency.symbol}
+                {currencySymbol || currentCurrency.symbol}
               </InputAdornment>
             ),
           }}
@@ -302,7 +300,6 @@ export const ArticleItemRow = ({
               value={quantity}
               customInput={TextField}
               decimalScale={2}
-              // fixedDecimalScale
               decimalSeparator={
                 selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
               }
