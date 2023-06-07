@@ -287,7 +287,7 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
         open={openPreview}
         maxWidth="sm">
         <Carousel
-          images={elevator.additionalInfo.pictures.map((p) => ({
+          images={elevator?.additionalInfo?.pictures?.map((p) => ({
             label: p.description,
             imgPath: downloadUrls[p.uri],
           }))}
