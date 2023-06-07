@@ -316,7 +316,7 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             label: 'Payment terms',
             name: 'paymentTerms',
             placeholder: 'Choose your payment term',
-            value: formik.values.paymentTerms ? 'Choosed' : '',
+            value: formik.values.paymentTerms ? t('Choosed') : '',
             error: !!(
               formik.touched.paymentTerms && formik.errors.paymentTerms
             ),
@@ -344,7 +344,7 @@ const NewContractTerms: FC<Props> = ({formik}) => {
       </Grid>
 
       <ContractPaymentTermsDialog
-        title={t('Choose your payment terms')}
+        title={t('Choose your payment term')}
         open={openContractPaymentTermsDialog}
         onSave={handleContractPaymentTermsModal}
         onCancel={() => handleContractPaymentTermsModal('')}

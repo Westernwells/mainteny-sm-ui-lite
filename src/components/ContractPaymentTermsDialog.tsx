@@ -191,7 +191,7 @@ export const ContractPaymentTermsDialog = ({
 
         <Box pt={3}>
           <Typography variant="overline" textTransform="uppercase">
-            Add other terms
+            {t('Add other terms')}
           </Typography>
         </Box>
 

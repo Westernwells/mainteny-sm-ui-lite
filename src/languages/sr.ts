@@ -141,6 +141,16 @@ export const sr = {
   'or drag and drop': 'ili povuci i ispusti',
   'PDF, DOCX, XLSX, XLS, CSV or TSV': 'PDF, DOCX, XLSX, XLS, CSV ili TSV',
   'JPEG, PNG, BMP, GIF, WEBP or SVG': 'JPEG, PNG, BMP, GIF, WEBP ili SVG',
+  'No description added.': 'Nije dodat opis',
+  'Payment terms': 'Uslovi plaćanja',
+  'No payment terms applied': 'Nisu primenjeni uslovi plaćanja',
+  'Choose your payment term': 'Izaberite svoj uslov plaćanja',
+  Choosed: 'Izabrani',
+  'Add other terms': 'Dodaj druge uslove',
+  'New Term': 'Novi uslov',
+  'No terms found. Add other terms first to be used here.':
+    'Nije pronađen nijedan uslov. Prvo dodajte druge uslove koji će se koristiti ovde.',
+  'Contract updated': 'Ugovor je ažuriran',
 
   // Units
   Units: 'Jedinice',

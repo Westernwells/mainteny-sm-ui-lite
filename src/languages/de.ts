@@ -142,6 +142,16 @@ export const de = {
   'or drag and drop': 'oder ziehen und ablegen',
   'PDF, DOCX, XLSX, XLS, CSV or TSV': 'PDF, DOCX, XLSX, XLS, CSV oder TSV',
   'JPEG, PNG, BMP, GIF, WEBP or SVG': 'JPEG, PNG, BMP, GIF, WEBP oder SVG',
+  'No description added.': 'Keine Beschreibung hinzugefügt',
+  'Payment terms': 'Zahlungskonditionen',
+  'No payment terms applied': 'Keine Zahlungskondition ausgewählt',
+  'Choose your payment term': 'Wählen Sie Ihre Zahlungskondition',
+  Choosed: 'Gewählt',
+  'Add other terms': 'Andere Zahlungskondition hinzufügen',
+  'New Term': 'Neue Zahlungskondition',
+  'No terms found. Add other terms first to be used here.':
+    'Keine Zahlungskondition gefunden. Fügen Sie zunächst andere Konditionen hinzu.',
+  'Contract updated': 'Vertrag aktualisiert',
 
   // Units
   Units: 'Anlagen',

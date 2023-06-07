@@ -596,7 +596,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             )}
 
             <ContractPaymentTermsDialog
-              title={t('Choose your payment terms')}
+              title={t('Choose your payment term')}
               open={openContractPaymentTermsDialog}
               onSave={handleContractPaymentTermsModal}
               onCancel={() => setOpenContractPaymentTermsDialog(false)}
