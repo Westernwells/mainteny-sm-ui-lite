@@ -1,14 +1,16 @@
 import {useTranslation} from 'react-i18next';
 import {Grid, InputAdornment} from '@mui/material';
+import {ArrowDropDown} from '@mui/icons-material';
 import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
 import {ContractTermsFormModal} from 'models/contract';
-import {FC} from 'react';
+import {FC, useState} from 'react';
 import {useCurrentCurrency} from 'utils/currency';
 import {invoiceCycle} from 'utils/contract-utils';
 import {DatePicker} from 'components/DatePicker';
 import {format, getMonth, getYear} from 'date-fns';
+import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
 
 interface Props {
   formik: FormikProps<ContractTermsFormModal>;
@@ -17,6 +19,14 @@ interface Props {
 const NewContractTerms: FC<Props> = ({formik}) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
+  const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
+    useState(false);
+
+  const handleContractPaymentTermsModal = (paymentTerms: string) => {
+    formik.setFieldValue('paymentTerms', paymentTerms);
+    setOpenContractPaymentTermsDialog(false);
+  };
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={4}>
@@ -152,6 +162,60 @@ const NewContractTerms: FC<Props> = ({formik}) => {
       <Grid item xs={4}>
         <FormInput
           props={{
+            label: 'Payment Due (in days)',
+            name: 'invoiceDueDays',
+            placeholder: 'Enter payment due (in days)',
+            type: 'number',
+            value: formik.values.invoiceDueDays,
+            error: !!(
+              formik.touched.invoiceDueDays && formik.errors.invoiceDueDays
+            ),
+            onBlur: formik.handleBlur,
+            onChange: formik.handleChange,
+          }}
+        />
+      </Grid>
+      <Grid item xs={4}>
+        <FormInput
+          props={{
+            label: 'Discount (first 14 days)',
+            name: 'discounts[0].days',
+            placeholder: 'Enter payment due (in days)',
+            type: 'number',
+            value: formik.values.discounts?.[0]?.days ?? 0,
+            error: !!(formik.touched.discounts && formik.errors.discounts),
+            onBlur: formik.handleBlur,
+            onChange: formik.handleChange,
+            InputProps: {
+              endAdornment: (
+                <InputAdornment position="end" color="text.primary">
+                  %
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+      </Grid>
+      <Grid item xs={4}>
+        <FormInput
+          props={{
+            label: 'Notice Period (in months)',
+            name: 'noticePeriodInMonth',
+            placeholder: 'Enter notice period',
+            type: 'number',
+            value: formik.values.noticePeriodInMonth,
+            error: !!(
+              formik.touched.noticePeriodInMonth &&
+              formik.errors.noticePeriodInMonth
+            ),
+            onBlur: formik.handleBlur,
+            onChange: formik.handleChange,
+          }}
+        />
+      </Grid>
+      <Grid item xs={4}>
+        <FormInput
+          props={{
             label: 'Yearly Price Adjustment (in %)',
             name: 'annualPriceAdjustmentPercentage',
             placeholder: '2.5',
@@ -245,6 +309,47 @@ const NewContractTerms: FC<Props> = ({formik}) => {
           }}
         />
       </Grid>
+
+      <Grid item md={4}>
+        <FormInput
+          props={{
+            label: 'Payment terms',
+            name: 'paymentTerms',
+            placeholder: 'Choose your payment term',
+            value: formik.values.paymentTerms ? 'Choosed' : '',
+            error: !!(
+              formik.touched.paymentTerms && formik.errors.paymentTerms
+            ),
+            onBlur: formik.handleBlur,
+            onChange: formik.handleChange,
+            onClick: () => setOpenContractPaymentTermsDialog(true),
+            disabled: true,
+            InputProps: {
+              endAdornment: (
+                <InputAdornment position="end" color="text.primary">
+                  <ArrowDropDown />
+                </InputAdornment>
+              ),
+            },
+            inputProps: {
+              sx: {
+                cursor: 'pointer',
+                '&::placeholder': {
+                  opacity: 1,
+                },
+              },
+            },
+          }}
+        />
+      </Grid>
+
+      <ContractPaymentTermsDialog
+        title={t('Choose your payment terms')}
+        open={openContractPaymentTermsDialog}
+        onSave={handleContractPaymentTermsModal}
+        onCancel={() => handleContractPaymentTermsModal('')}
+        paymentTerms={formik.values.paymentTerms}
+      />
     </Grid>
   );
 };

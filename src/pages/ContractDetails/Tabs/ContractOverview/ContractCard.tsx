@@ -26,6 +26,7 @@ export const ContractCard = ({
   <Card
     sx={{
       border: 'none',
+      boxShadow: '0px 4px 15px rgba(144, 144, 144, 0.2)',
       minHeight,
       ...containerStyles,
     }}>
