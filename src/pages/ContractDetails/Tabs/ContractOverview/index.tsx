@@ -43,6 +43,7 @@ import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
 import EditContractForm from './EditContractForm';
 import {ContractParties} from './ContractParties';
+import {DescriptionForm} from './DescriptionForm';
 
 interface Props {
   contractDetails: ContractView;
@@ -69,6 +70,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const [openDocumentDialog, setOpenDocumentDialog] = useState(false);
 
   const [documents, setDocuments] = useState<FileWithPreview[]>([]);
+  const [openDescriptionDialog, setOpenDescriptionDialog] = useState(false);
   const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
     useState(false);
 
@@ -105,6 +107,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       firstMaintenance: contractDetails?.additionalInfo?.firstMaintenance,
       firstInvoiceDate: contractDetails?.additionalInfo?.firstInvoiceDate,
       paymentTerms: contractDetails?.additionalInfo.paymentTerms,
+      description: contractDetails?.description,
     },
     onSubmit: () => {},
     enableReinitialize: true,
@@ -147,6 +150,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       firstMaintenance: formik.values.firstMaintenance,
       firstInvoiceDate: formik.values.firstInvoiceDate,
       paymentTerms: formik.values.paymentTerms,
+      description: formik.values.description,
     };
 
     await updateContract({
@@ -188,6 +192,18 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       } as Partial<ContractRequestBody>,
       contractId: contractId!,
     });
+  };
+
+  const handleSaveDescription = () => {
+    updateContract(
+      {
+        body: {
+          description: formik.values.description,
+        } as Partial<ContractRequestBody>,
+        contractId: contractId!,
+      },
+      {onSuccess: () => setOpenDescriptionDialog(false)},
+    );
   };
 
   const handleContractPaymentTermsModal = (paymentTerms: string) => {
@@ -487,6 +503,55 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 ]}
                 maxFiles={1}
               />
+            </Dialog>
+          </ContractCard>
+        </Grid>
+
+        <Grid item xs={12} md={8}>
+          <ContractCard
+            containerStyles={{
+              mt: !isMobile ? '1em' : 0,
+              pt: 2,
+              px: 2,
+              height: '100%',
+              '& .MuiCardHeader-root': {
+                ...headerStyles,
+                py: 0,
+              },
+            }}
+            header={
+              <Box sx={headerStyles}>
+                <Typography variant="subtitle1" mr="0.5em">
+                  {t('Description')}
+                </Typography>
+              </Box>
+            }
+            headerActionIcon={<EditIcon />}
+            headerAction={() => setOpenDescriptionDialog(true)}>
+            {contractDetails.description ? (
+              <Typography variant="body2">
+                {contractDetails.description}
+              </Typography>
+            ) : (
+              <EmptySection
+                label="No description added."
+                illustration="clipboard"
+                size="tiny"
+                containerStyle={{
+                  height: '100%',
+                }}
+              />
+            )}
+            <Dialog
+              title="Edit Description"
+              onCancel={() => setOpenDescriptionDialog(false)}
+              disableSaveBtn={!!Object.keys(formik.errors).length}
+              onSave={handleSaveDescription}
+              dialogProps={{
+                maxWidth: 'sm',
+                open: openDescriptionDialog,
+              }}>
+              <DescriptionForm formik={formik} />
             </Dialog>
           </ContractCard>
         </Grid>

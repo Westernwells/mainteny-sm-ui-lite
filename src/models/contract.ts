@@ -128,6 +128,7 @@ export interface ContractView {
   endTime: string;
   elevators: ContractElevatorSimpleView[];
   timePreference: ContractTimeWindow[];
+  description: string;
   status: ContractStatus;
   search: string;
   meta: Meta;
@@ -279,6 +280,7 @@ export interface ContractUpdateRequest {
   firstMaintenance?: FirstMaintenance;
   firstInvoiceDate?: string;
   paymentTerms?: string;
+  description?: string;
 }
 
 export interface ContractPaymentTermView {
