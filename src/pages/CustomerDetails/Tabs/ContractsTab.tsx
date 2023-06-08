@@ -23,6 +23,8 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
 import {Widget} from 'components/Widget';
 import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {columns, makeRows} from './CustomerContractDataGrid';
 
 interface Props {
@@ -98,6 +100,12 @@ export const ContractsTab = ({customerId}: Props) => {
   useEffect(() => {
     setPageCount(Math.ceil(contractResource.total / page.pageSize));
   }, [contractResource, page.pageSize]);
+
+  useEffect(() => {
+    Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMER_UNITDETAILS_UNITS_VIEW, {
+      pageName: 'Customers',
+    });
+  }, []);
 
   const costRangeConvertor = (selectedItems: string[]) => {
     const range = crConverter(selectedItems, currentCurrency.symbol);
