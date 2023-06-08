@@ -15,6 +15,8 @@ import {Widget} from 'components/Widget';
 import {useQueryCustomerElevator} from 'hooks/reactQuery/useElevator';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {columns, makeRows} from './CustomerUnitDataGrid/CustomerUnitDataGrid';
 
 interface Props {
@@ -209,6 +211,12 @@ export const UnitsTab = ({customerId}: Props) => {
       />
     </Box>
   );
+
+  useEffect(() => {
+    Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMER_UNITDETAILS_UNITS_VIEW, {
+      pageName: 'Customers',
+    });
+  }, []);
 
   return (
     <TabContentContainer>
