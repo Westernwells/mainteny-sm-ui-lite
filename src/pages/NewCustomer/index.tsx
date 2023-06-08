@@ -1,13 +1,14 @@
 import {useEffect, useLayoutEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {FormikErrors} from 'formik';
-
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {Priority} from 'models/service-order';
 import {useCreateCustomer} from 'hooks/reactQuery/useCustomers';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {formatPhoneNumber} from 'utils/customer-utils';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {BasicCustomerFormModel, NewCustomerBody} from './model';
 import {BasicCustomerForm} from './BasicCustomerForm';
 
@@ -93,6 +94,12 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
     const response = await createCustomer(body);
 
     if (response) {
+      Mixpanel.identifyAndTrack(mixpanelEvents.NEW_CUSTOMER_BUTTON_CLICKED, {
+        pageName: 'Customers',
+        submit: 1,
+        customerNumber: response.value,
+        creationDate: Date.now(),
+      });
       navigate(`/customers/details/${response.value}?tab=0`, {replace: true});
     }
   };
