@@ -25,6 +25,8 @@ import {TabContentContainer} from 'components/TabContentContainer';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import EmployeeAvatar from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EmployeeAvatar';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {UnitsWidget} from './UnitsWidget';
 import {ContractsWidget} from './ContractsWidget';
 import {ContactsWidget} from './ContactsWidget';
@@ -134,6 +136,15 @@ export const CustomerOverviewTab = ({
       getCustomerName(customer.name);
     }
   }, [customer]);
+
+  useEffect(() => {
+    Mixpanel.identifyAndTrack(
+      mixpanelEvents.CUSTOMER_UNITDETAILS_OVERVIEW_VIEW,
+      {
+        pageName: 'Customer Details',
+      },
+    );
+  }, []);
 
   const renderBasicDetails = () => (
     <InfoCard
