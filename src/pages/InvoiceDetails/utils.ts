@@ -24,4 +24,5 @@ export const formatInvoiceRecord = (value: InvoiceFormData) => ({
       : undefined,
   costCenter: value.costCenter,
   customerSpecificOrderNumber: value.customerSpecificOrderNumber,
+  moreInfo: value.moreInfo,
 });

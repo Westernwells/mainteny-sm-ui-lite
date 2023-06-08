@@ -69,6 +69,7 @@ export interface InvoiceAdditionalInfo {
   costCenter?: string;
   customerSpecificOrderNumber?: string;
   beneficialDetails?: BeneficialDetails;
+  moreInfo?: string;
 }
 
 export enum InvoiceOverdueNoticeStatus {
@@ -172,6 +173,7 @@ export interface InvoiceFormData {
   customerSpecificOrderNumber?: string;
   beneficialName?: string;
   beneficialAddress?: AddressRecord;
+  moreInfo?: string;
 }
 
 export interface CreateInvoice {
@@ -192,6 +194,7 @@ export interface CreateInvoice {
   costCenter?: string;
   customerSpecificOrderNumber?: string;
   beneficialDetails?: BeneficialDetailsRecord;
+  moreInfo?: string;
 }
 
 export interface UpdateInvoice {
@@ -208,6 +211,7 @@ export interface UpdateInvoice {
   costCenter?: string;
   customerSpecificOrderNumber?: string;
   beneficialDetails?: BeneficialDetailsRecord;
+  moreInfo?: string;
 }
 
 export interface QueryInvoiceCommentsParams {

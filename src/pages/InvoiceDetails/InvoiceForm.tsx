@@ -13,6 +13,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import Print from '@mui/icons-material/Print';
 import Send from '@mui/icons-material/Send';
+import EditIcon from '@mui/icons-material/Edit';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {SelectCombined} from 'components/SelectCombined';
 import {ArticleItemsTable} from 'components/ArticleItemsTable';
@@ -30,6 +31,9 @@ import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {Tooltip} from 'components/Tooltip';
+import {InfoCard} from 'components/InfoCard';
+import {EmptySection} from 'components/EmptySection';
+import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateInvoice,
@@ -119,6 +123,8 @@ export const InvoiceForm = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
     useState(false);
+  const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
+    useState(false);
   const [showCheckListTooltip, setShowCheckListTooltip] = useState(false);
   const [showWorkReportTooltip, setShowWorlReportTooltip] = useState(false);
   const [isInvoicePDFGenerated] = useState(
@@ -197,6 +203,7 @@ export const InvoiceForm = ({
     costCenter: invoice?.additionalInfo?.costCenter || '',
     customerSpecificOrderNumber:
       invoice?.additionalInfo?.customerSpecificOrderNumber || '',
+    moreInfo: invoice?.additionalInfo?.moreInfo ?? '',
   };
 
   const validationSchema = Yup.object().shape({
@@ -389,6 +396,7 @@ export const InvoiceForm = ({
 
   async function onSave(values: InvoiceFormData) {
     if (!values.description.length) values.description = ' ';
+    if (!values?.moreInfo?.length) values.moreInfo = ' ';
 
     const dueDateToString: string =
       formik.values.type === InvoiceType.CREDIT_NOTE
@@ -443,6 +451,11 @@ export const InvoiceForm = ({
         },
       );
     }
+  };
+
+  const handleContractPaymentTermsModal = (paymentTerms: string) => {
+    formik.setFieldValue('paymentTerms', paymentTerms);
+    setOpenContractPaymentTermsDialog(false);
   };
 
   return (
@@ -829,12 +842,44 @@ export const InvoiceForm = ({
               propertyOwnerId={customer?.id ?? ''}
             />
 
+            <InfoCard
+              containerStyles={{
+                my: '1rem',
+                boxShadow: 'none',
+                border: '1px solid #E4E9F2',
+              }}
+              headerActionIcon={<EditIcon />}
+              handleAction={() => setOpenContractPaymentTermsDialog(true)}
+              showHeaderBackground
+              header={
+                <Typography variant="subtitle1">
+                  {t('Payment terms')}
+                </Typography>
+              }>
+              {formik.values.paymentTerms ? (
+                <Typography variant="body2">
+                  {formik.values.paymentTerms}
+                </Typography>
+              ) : (
+                <EmptySection
+                  label="No payment terms applied"
+                  illustration="clipboard"
+                  size="tiny"
+                  containerStyle={{
+                    height: '100%',
+                    gap: '0.5rem',
+                  }}
+                />
+              )}
+            </InfoCard>
+
             <Box my="1.5em">
               <FormLabel text="Additional Information" />
               <FormInput
                 props={{
-                  id: 'paymentTerms',
-                  value: formik.values.paymentTerms,
+                  id: 'moreInfo',
+                  name: 'moreInfo',
+                  value: formik.values.moreInfo,
                   onChange: formik.handleChange,
                   minRows: 2,
                   maxRows: 4,
@@ -912,6 +957,13 @@ export const InvoiceForm = ({
         open={isConfirmPrintDialogOpen}
         onConfirm={onPrintInvoice}
         onClose={() => setIsConfirmPrintDialogOpen(false)}
+      />
+      <ContractPaymentTermsDialog
+        title={t('Choose your payment term')}
+        open={openContractPaymentTermsDialog}
+        onSave={handleContractPaymentTermsModal}
+        onCancel={() => setOpenContractPaymentTermsDialog(false)}
+        paymentTerms={formik.values.paymentTerms}
       />
     </Box>
   );
