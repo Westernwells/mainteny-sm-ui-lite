@@ -141,7 +141,7 @@ export const CustomerOverviewTab = ({
     Mixpanel.identifyAndTrack(
       mixpanelEvents.CUSTOMER_UNITDETAILS_OVERVIEW_VIEW,
       {
-        pageName: 'Customer Details',
+        pageName: 'Customers',
       },
     );
   }, []);

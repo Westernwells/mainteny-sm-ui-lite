@@ -13,6 +13,8 @@ import {
   useCreatePropertyOwnerArticle,
   usePropertyOwnerArticles,
 } from 'hooks/reactQuery/useArticle';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {
   columns,
   makeRows,
@@ -61,6 +63,15 @@ export const CustomPricesTab = ({propertyOwnerId}: Props) => {
   useEffect(() => {
     if (isFetched) setRows(makeRows(articleResource.data));
   }, [articleResource]);
+
+  useEffect(() => {
+    Mixpanel.identifyAndTrack(
+      mixpanelEvents.CUSTOMER_UNITDETAILS_CUSTOM_PRICES_VIEW,
+      {
+        pageName: 'Customers',
+      },
+    );
+  }, []);
 
   const onClose = () => setOpenDialog(false);
 
