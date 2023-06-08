@@ -94,6 +94,12 @@ export const Customer = () => {
     setPageCount(Math.ceil(customerResource.total / page.pageSize));
   }, [customerResource, page.pageSize]);
 
+  useEffect(() => {
+    Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_VIEW, {
+      pageName: 'Customer',
+    });
+  }, []);
+
   if (isIdle || isLoading) {
     return <Progress />;
   }
