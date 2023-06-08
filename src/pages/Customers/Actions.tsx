@@ -5,6 +5,8 @@ import Delete from '@mui/icons-material/Delete';
 import SendIcon from '@mui/icons-material/Send';
 import {useDeleteCustomer} from 'hooks/reactQuery/useCustomers';
 import {Confirm} from 'components/Confirm';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 
 interface Props {
   propertyOwnerId: string;
@@ -27,7 +29,14 @@ export const Actions = ({propertyOwnerId, toEmail}: Props) => {
         <SendIcon sx={{color: 'action.active'}} fontSize="small" />
       </IconButton>
 
-      <IconButton onClick={() => setOpenDeleteConfirm(true)}>
+      <IconButton
+        onClick={() => {
+          Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_DELETE_CLICKED, {
+            pageName: 'Customers',
+            source: 'Customer List View',
+          });
+          setOpenDeleteConfirm(true);
+        }}>
         <Delete sx={{color: 'action.active'}} fontSize="small" />
       </IconButton>
 

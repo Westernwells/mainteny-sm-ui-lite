@@ -96,7 +96,7 @@ export const Customer = () => {
 
   useEffect(() => {
     Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_VIEW, {
-      pageName: 'Customer',
+      pageName: 'Customers',
     });
   }, []);
 
