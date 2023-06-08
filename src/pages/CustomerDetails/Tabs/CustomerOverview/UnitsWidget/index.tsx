@@ -15,6 +15,8 @@ import {padNumber} from 'utils/utils';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {EmptySection} from 'components/EmptySection';
 import {SearchInput} from 'components/SearchInput';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {columns, makeRows} from './UnitsWidgetDataGridProps';
 
 interface Props {
@@ -87,7 +89,13 @@ export const UnitsWidget = ({customerId, getTotalUnits, openTab}: Props) => {
       }
       containerStyles={{flexGrow: 1}}
       headerStyles={{mt: '0.5em'}}
-      handleAction={openTab}
+      handleAction={() => {
+        Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_OVERVIEW_OPEN, {
+          pageName: 'Customers',
+          source: 'Units',
+        });
+        openTab();
+      }}
       headerActionIcon={<OpenInNew />}
       showHeaderBackground>
       {isFetched && !totalUnitsRef.current && (
