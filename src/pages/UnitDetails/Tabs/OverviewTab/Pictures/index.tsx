@@ -44,7 +44,7 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
   );
   const {data: downloadUrls = {}} = useDownloadUrl(
     elevator.additionalInfo.pictures
-      ? elevator.additionalInfo.pictures.map((item) => item.uri)
+      ? elevator.additionalInfo?.pictures?.map((item) => item.uri)
       : [],
   );
 
@@ -102,7 +102,7 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
   };
 
   const onSaveFileName = async (fileId: string) => {
-    const updatedPictures = elevator.additionalInfo.pictures.map((p) =>
+    const updatedPictures = elevator.additionalInfo?.pictures?.map((p) =>
       p.id === fileId ? {...p, description: fileName} : p,
     );
     await updateElevator({
@@ -168,7 +168,7 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
         renderEmptySection()
       ) : elevator.additionalInfo.pictures.length ? (
         <Box display="flex" flexDirection="column">
-          {elevator.additionalInfo.pictures.map((picture) => (
+          {elevator.additionalInfo?.pictures?.map((picture) => (
             <Box
               key={picture.id}
               display="flex"
