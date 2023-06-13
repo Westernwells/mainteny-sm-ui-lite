@@ -140,6 +140,12 @@ export const ArticleItemRow = ({
     );
   }, [price, partialPrice]);
 
+  useEffect(() => {
+    if (description.trim()) {
+      setDescription(`${t('Description')}`);
+    }
+  }, [selectedLng]);
+
   return (
     <Box boxShadow="0px 4px 15px 0px #90909033" py="1em">
       <Box
@@ -354,7 +360,7 @@ export const ArticleItemRow = ({
             buttonProps={{
               size: 'small',
               endIcon: <EditIcon />,
-              onClick: () => setDescription('Description:\n'),
+              onClick: () => setDescription(`${t('Description')}`),
               sx: {
                 bgcolor: '#00D1FF14',
               },
