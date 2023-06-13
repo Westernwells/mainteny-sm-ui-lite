@@ -217,7 +217,9 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
                 },
                 {
                   label: 'Status',
-                  value: serviceOrderStatusToString(report.serviceOrder.status),
+                  value: `${t(
+                    serviceOrderStatusToString(report.serviceOrder.status),
+                  )}`,
                 },
               ].map((i) => (
                 <Box key={i.label}>
