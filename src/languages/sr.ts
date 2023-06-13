@@ -313,6 +313,7 @@ export const sr = {
   'New Package': 'Novi paket',
   Type: 'Tip',
   Manufacturer: 'Proizvodjač',
+  'ARTICLE NAME': 'Naziv članka'.toLocaleUpperCase(),
   Supplier: 'Dobavljač',
   'ARTICLE NUMBER': 'Broj artikla'.toLocaleUpperCase(),
   CATEGORY: 'Kategorija'.toLocaleUpperCase(),

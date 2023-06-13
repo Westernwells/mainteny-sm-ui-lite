@@ -18,13 +18,13 @@ interface Props {
 export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
-    headerName: 'article no.',
+    headerName: `article no`,
     flex: 0,
   }),
   getColumnProps({
     field: 'name',
     headerName: 'article name',
-    flex: 1.5,
+    flex: 2,
     cellClassName: 'truncateText',
   }),
   getColumnProps({
