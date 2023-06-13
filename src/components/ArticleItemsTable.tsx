@@ -274,10 +274,7 @@ export const ArticleItemsTable = ({
               }
             }
           }
-        } else if (
-          (isCreditNote && isFetchedCreditNoteArticle) ||
-          !items.length
-        ) {
+        } else if (isCreditNote && isFetchedCreditNoteArticle) {
           createCreditArticleResource(invoice);
         }
       } else if (invoice.type === InvoiceType.PARTIAL) {
@@ -306,8 +303,8 @@ export const ArticleItemsTable = ({
       } else if (invoice.type === InvoiceType.CREDIT_NOTE) {
         if (isCreditNote && isFetchedCreditNoteArticle) {
           createCreditArticleResource(invoice);
-        } else if ((isPartial && isFetched) || !items.length) {
-          if (!partialArticleResource.data.length) {
+        } else if (isPartial && isFetched) {
+          if (!partialArticleResource.data.length || !items.length) {
             createPartial();
           } else {
             const article = [articleViewToItem(partialArticleResource.data[0])];
