@@ -44,7 +44,7 @@ export const columns: GridColDef[] = [
   }),
   getColumnProps({
     field: 'number',
-    headerName: 'quotation number',
+    headerName: 'invoice number',
     align: 'center',
     flex: 0,
     variant: 'titleCase',
