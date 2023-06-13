@@ -13,10 +13,9 @@ import FmdGoodRoundedIcon from '@mui/icons-material/FmdGoodRounded';
 import _ from 'lodash';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
-import {ArticleType, ArticleView} from '../../../models/article';
+import {ArticleView} from '../../../models/article';
 import {ArticleBasicFormModel} from '../../../models/articleForm';
 import {Dialog} from '../../../components/Dialog';
-import {convertToText} from '../../../utils/utils';
 import {useUpdateArticle} from '../../../hooks/reactQuery/useArticle';
 import {CardProps} from '../../../components/CardProps';
 import {InfoCard} from '../../../components/InfoCard';
@@ -33,7 +32,7 @@ const validationSchema = Yup.object().shape({
   name: Yup.string().nullable().required('Name is required'),
   externalId: Yup.string().nullable().required('External Id is required'),
   type: Yup.string().nullable().required('Type is required'),
-  unit: Yup.string().nullable().required('Unit is required'),
+  unit: Yup.string().nullable(),
   unitSellingVat: Yup.number().nullable().required('Selling VAT is required'),
   unitSellingAmount: Yup.number()
     .nullable()
@@ -58,12 +57,18 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       storageLocation: article.storageLocation,
       type: article.type,
       unit: article.unit,
-      unitPurchaseVat: article.unitPurchaseAmount.percentageVat,
-      unitPurchaseAmount: Math.round(
-        article.unitPurchaseAmount.netAmount /
-          currencyFactor(article.unitPurchaseAmount),
-      ),
-      unitPurchaseAmountCurrency: article.unitPurchaseAmount.currency,
+      unitPurchaseVat: article.unitPurchaseAmount
+        ? article.unitPurchaseAmount.percentageVat
+        : 0,
+      unitPurchaseAmount: article.unitPurchaseAmount
+        ? Math.round(
+            article.unitPurchaseAmount.netAmount /
+              currencyFactor(article.unitPurchaseAmount),
+          )
+        : 0,
+      unitPurchaseAmountCurrency: article.unitPurchaseAmount
+        ? article.unitPurchaseAmount.currency
+        : article.unitSellingAmount.currency,
       unitSellingVat: article.unitSellingAmount.percentageVat,
       unitSellingAmount: Math.round(
         article.unitSellingAmount.netAmount /
@@ -95,7 +100,9 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       unitPurchaseAmount: amountRecordForBackend(
         makeAmountRecord(
           formik.values.unitPurchaseAmount,
-          article.unitPurchaseAmount.currency,
+          article.unitPurchaseAmount
+            ? article.unitPurchaseAmount.currency
+            : article.unitSellingAmount.currency,
           formik.values.unitPurchaseVat,
         ),
       ),
@@ -161,7 +168,9 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
     {
       label: t('Purchase VAT'),
       icon: <LocalOfferRoundedIcon sx={{color: theme.palette.info.dark}} />,
-      body: article?.unitPurchaseAmount.percentageVat.toString().concat('%'),
+      body: article.unitPurchaseAmount
+        ? article?.unitPurchaseAmount.percentageVat.toString().concat('%')
+        : 0,
     },
   ];
 
