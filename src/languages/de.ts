@@ -422,7 +422,7 @@ export const de = {
   'e.g. +49 1000 000000': 'z.B. +49 1000 000000',
   From: 'Von',
   'Select Supplier': 'Lieferant auswählen',
-  'Purchase order number': 'Bestellnummer',
+  'Purchase order number': 'Kundenbestellnummer',
   'Full invoice': 'Gesamtrechnung',
   'Partial invoice': 'Teilrechnung',
   'Credit Note invoice': 'Gutschrift',
