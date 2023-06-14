@@ -57,6 +57,9 @@ export const ArticleItemRow = ({
   const [description, setDescription] = useState<string>(
     articleItem.description,
   );
+  const [showDescription, setShowDescription] = useState<boolean>(
+    !!articleItem.description,
+  );
   const [quantity, setQuantity] = useState<number>(articleItem.quantity);
   const [price, setPrice] = useState(
     articleItem.unitAmount.netAmount /
@@ -140,12 +143,6 @@ export const ArticleItemRow = ({
     );
   }, [price, partialPrice]);
 
-  useEffect(() => {
-    if (description.trim()) {
-      setDescription(`${t('Description')}`);
-    }
-  }, [selectedLng]);
-
   return (
     <Box boxShadow="0px 4px 15px 0px #90909033" py="1em">
       <Box
@@ -169,9 +166,10 @@ export const ArticleItemRow = ({
             fullWidth
             sx={{width: '100%'}}
           />
-          {description.trim() && (
+          {showDescription && (
             <TextField
               size="small"
+              placeholder={t('Description')}
               multiline
               fullWidth
               value={description}
@@ -354,13 +352,13 @@ export const ArticleItemRow = ({
         )}
       </Box>
       <Box sx={{float: 'right', mt: '1em'}}>
-        {!description.trim() && !isCreditNote && (
+        {!showDescription && !isCreditNote && (
           <Button
             label="Add Description"
             buttonProps={{
               size: 'small',
               endIcon: <EditIcon />,
-              onClick: () => setDescription(`${t('Description')}`),
+              onClick: () => setShowDescription(true),
               sx: {
                 bgcolor: '#00D1FF14',
               },
