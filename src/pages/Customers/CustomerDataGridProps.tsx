@@ -78,5 +78,7 @@ export const makeRows = (
       toEmail: item.contact.email,
       propertyOwnerId: item.id,
     },
-    createdAt: formatDate(getDateObject(item.meta.createdAt)) as string,
+    createdAt: formatDate(
+      getDateObject(item.additionalInfo.registrationDate),
+    ) as string,
   }));

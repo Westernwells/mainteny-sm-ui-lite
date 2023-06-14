@@ -25,6 +25,7 @@ import {TabContentContainer} from 'components/TabContentContainer';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import EmployeeAvatar from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EmployeeAvatar';
+import {formatDate, getDateObject} from 'utils/datetime';
 import {UnitsWidget} from './UnitsWidget';
 import {ContractsWidget} from './ContractsWidget';
 import {ContactsWidget} from './ContactsWidget';
@@ -122,7 +123,10 @@ export const CustomerOverviewTab = ({
         },
         customerSince: {
           label: 'CUSTOMER SINCE',
-          value: customer.additionalInfo.registrationDate || '-',
+          value:
+            (formatDate(
+              getDateObject(customer.additionalInfo.registrationDate),
+            ) as string) || '-',
           icon: <Language sx={{color: theme.palette.info.dark}} />,
         },
       });
