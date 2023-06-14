@@ -485,6 +485,7 @@ export const de = {
   'Sim Pin': 'Sim-Pin',
   'PLACE OF INSTALLATION': 'ORT DER INSTALLATION',
   'Place Of Installation': 'Ort Dee Installation',
+  'Edit Emergency Phone': 'Notruf bearbeiten',
   'Unit Type': 'Anlagentyp',
   Model: 'Modell',
   'Serial Number': 'Seriennummer',

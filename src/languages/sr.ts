@@ -483,6 +483,7 @@ export const sr = {
   'Sim Pin': 'Sim pin',
   'PLACE OF INSTALLATION': 'Mjesto ugradnje'.toLocaleUpperCase(),
   'Place Of Installation': 'Mjesto ugradnje',
+  'Edit Emergency Phone': 'Uredite telefon za hitne slučajeve',
   'Unit Type': 'Jedinica tip',
   Model: 'Model',
   'Serial Number': 'Serijski broj',
