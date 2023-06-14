@@ -32,6 +32,7 @@ export interface ArticleAdditionalInfo {
 
 export interface ArticleView {
   additionalInfo: ArticleAdditionalInfo;
+  canDelete: boolean;
   category: string;
   description: string;
   id: string;
