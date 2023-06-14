@@ -1312,7 +1312,7 @@ export const de = {
   'Hourly Travel Rate': 'Stundensatz Anfahrt',
   'Travel Fee': 'Anfahrtspauschale',
   'Start date is required': 'Startdatum ist erforderlich',
-  'End date is required': 'Erster Wartung',
+  'End date is required': 'Enddatum ist erforderlich',
   'First Invoice': 'Erste Rechnung',
   'First Maintenance Visit': 'Erste Wartung',
   'After each visit': 'Nach jeder Wartung',
