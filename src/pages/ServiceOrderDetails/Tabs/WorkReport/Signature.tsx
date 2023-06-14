@@ -26,6 +26,7 @@ export const Signature = ({url, name, designation}: Props) => {
         borderRadius=".75em"
         display="flex"
         alignItems="center"
+        overflow="hidden"
         justifyContent="center">
         {url ? (
           <img
@@ -34,15 +35,13 @@ export const Signature = ({url, name, designation}: Props) => {
             style={{
               objectFit: 'cover',
               objectPosition: 'top',
-              width: '100%',
-              height: '100%',
+              maxWidth: '100%',
+              maxHeight: '300%',
             }}
           />
         ) : (
-          'Not Available'
+          t('No Signature')
         )}
-
-        {/* {url} */}
       </Box>
       <Box mt="-.8em" px=".25em" bgcolor="white">
         <Typography variant="h6">{name}</Typography>
