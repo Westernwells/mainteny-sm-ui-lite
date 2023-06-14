@@ -1314,7 +1314,7 @@ export const de = {
   'Start date is required': 'Startdatum ist erforderlich',
   'End date is required': 'Erster Wartung',
   'First Invoice': 'Erste Rechnung',
-  'First Maintenance Visit': 'Erster Wartung',
+  'First Maintenance Visit': 'Erste Wartung',
   'After each visit': 'Nach jeder Wartung',
   '1 month': '1 Monat',
   '2 months': '2 Monate',
