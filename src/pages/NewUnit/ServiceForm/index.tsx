@@ -8,7 +8,6 @@ import {useEffect} from 'react';
 import {PageCard} from 'components/PageCard';
 import {DatePicker} from 'components/DatePicker';
 import {FormSelect} from 'components/form/FormSelect';
-import {convertToText} from 'utils/utils';
 import {Priority} from 'models/misc';
 import {useTranslation} from 'react-i18next';
 
@@ -162,8 +161,8 @@ export const ServiceForm = ({
               labelId="prioritySelect-label"
               label="Priority"
               options={Object.keys(Priority).map((key) => ({
-                label: convertToText(key),
-                value: convertToText(key),
+                label: t(key),
+                value: key,
               }))}
               selectProps={{
                 id: 'prioritySelect',
