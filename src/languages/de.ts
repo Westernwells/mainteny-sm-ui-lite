@@ -893,6 +893,8 @@ export const de = {
     'Artikel & kundenspezifische Preise auswählen',
   'Articles & Spare parts': 'Artikel',
   'Add Articles & Spare part': 'Artikel hinzufügen',
+  'Customer {{customerName}} updated successfully!':
+    'Änderung an Kunde {{customerName}} erfolgreich übernommen',
 
   // Toast
   'Uh oh! As a Property Manager, please login at':
