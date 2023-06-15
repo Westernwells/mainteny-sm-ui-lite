@@ -889,6 +889,8 @@ export const sr = {
   'Select Articles & Custom Prices': 'Izaberite Artikli i prilagođene cene',
   'Articles & Spare parts': 'Artikli i rezervni delovi',
   'Add Articles & Spare part': 'Dodajte artikle i rezervni deo',
+  'Customer {{customerName}} updated successfully!':
+    'Klijent {{customerName}} je uspešno ažuriran!',
 
   // Toast
   'Uh oh! As a Property Manager, please login at':

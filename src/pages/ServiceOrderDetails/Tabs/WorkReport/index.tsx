@@ -254,7 +254,7 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
           <Box display="flex" justifyContent="space-between">
             <Signature
               name={report.elevator.propertyOwner.name}
-              designation="customer"
+              designation="Customer"
               url={downloadUrls[signatureKeys.CUSTOMER]}
             />
             <Signature
@@ -263,7 +263,7 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
                   ? `${report.serviceOrder.schedules[0].technician.userAccount.firstName} ${report.serviceOrder.schedules[0].technician.userAccount.lastName}`
                   : '-'
               }
-              designation="technician"
+              designation="Technician"
               url={downloadUrls[signatureKeys.TECHNICIAN]}
             />
           </Box>

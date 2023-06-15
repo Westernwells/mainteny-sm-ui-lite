@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import Grid from '@mui/material/Grid';
 import {
   Elevator,
@@ -26,6 +26,7 @@ import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import EmployeeAvatar from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EmployeeAvatar';
 import {formatDate, getDateObject} from 'utils/datetime';
+import {LanguageContext} from 'context/LanguageProvider';
 import {UnitsWidget} from './UnitsWidget';
 import {ContractsWidget} from './ContractsWidget';
 import {ContactsWidget} from './ContactsWidget';
@@ -53,6 +54,7 @@ export const CustomerOverviewTab = ({
   getCurrentTabIndex,
 }: Props) => {
   const {t} = useTranslation();
+  const {language: selectedLng} = useContext(LanguageContext);
   const theme = useTheme();
   const {data: customer, isLoading} = useGetCustomer(customerId);
   const [basicDetails, setBasicDetails] = useState<BasicDetails>();
@@ -113,7 +115,7 @@ export const CustomerOverviewTab = ({
         },
         priority: {
           label: 'PRIORITY',
-          value: customer.additionalInfo.priority,
+          value: t(customer.additionalInfo.priority),
           icon: <LowPriority sx={{color: theme.palette.info.dark}} />,
         },
         website: {
@@ -131,7 +133,7 @@ export const CustomerOverviewTab = ({
         },
       });
     }
-  }, [customer, totalContracts, totalUnits]);
+  }, [customer, totalContracts, totalUnits, selectedLng]);
 
   useEffect(() => {
     if (getCustomerName && customer) {
