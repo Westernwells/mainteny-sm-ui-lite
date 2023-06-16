@@ -485,6 +485,7 @@ export const de = {
   'Sim Pin': 'Sim-Pin',
   'PLACE OF INSTALLATION': 'ORT DER INSTALLATION',
   'Place Of Installation': 'Ort Dee Installation',
+  'Edit Emergency Phone': 'Notruf bearbeiten',
   'Unit Type': 'Anlagentyp',
   Model: 'Modell',
   'Serial Number': 'Seriennummer',
@@ -893,6 +894,8 @@ export const de = {
     'Artikel & kundenspezifische Preise auswählen',
   'Articles & Spare parts': 'Artikel',
   'Add Articles & Spare part': 'Artikel hinzufügen',
+  'Customer {{customerName}} updated successfully!':
+    'Änderung an Kunde {{customerName}} erfolgreich übernommen',
 
   // Toast
   'Uh oh! As a Property Manager, please login at':
@@ -1312,9 +1315,9 @@ export const de = {
   'Hourly Travel Rate': 'Stundensatz Anfahrt',
   'Travel Fee': 'Anfahrtspauschale',
   'Start date is required': 'Startdatum ist erforderlich',
-  'End date is required': 'Erster Wartung',
+  'End date is required': 'Enddatum ist erforderlich',
   'First Invoice': 'Erste Rechnung',
-  'First Maintenance Visit': 'Erster Wartung',
+  'First Maintenance Visit': 'Erste Wartung',
   'After each visit': 'Nach jeder Wartung',
   '1 month': '1 Monat',
   '2 months': '2 Monate',

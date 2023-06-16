@@ -62,18 +62,21 @@ export const ArticleOverView = () => {
             },
           }}
         />
-        <Button
-          label={t('Delete')}
-          buttonProps={{
-            onClick: () => deleteArticleDialog(),
-            variant: 'outlined',
-            size: 'large',
-            sx: {
-              bgcolor: 'transparent',
-            },
-            startIcon: <DeleteIcon />,
-          }}
-        />
+
+        {articleDetail && articleDetail.canDelete && (
+          <Button
+            label={t('Delete')}
+            buttonProps={{
+              onClick: () => deleteArticleDialog(),
+              variant: 'outlined',
+              size: 'large',
+              sx: {
+                bgcolor: 'transparent',
+              },
+              startIcon: <DeleteIcon />,
+            }}
+          />
+        )}
       </Box>
       <Grid
         container

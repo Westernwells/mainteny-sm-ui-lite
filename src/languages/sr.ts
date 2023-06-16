@@ -483,6 +483,7 @@ export const sr = {
   'Sim Pin': 'Sim pin',
   'PLACE OF INSTALLATION': 'Mjesto ugradnje'.toLocaleUpperCase(),
   'Place Of Installation': 'Mjesto ugradnje',
+  'Edit Emergency Phone': 'Uredite telefon za hitne slučajeve',
   'Unit Type': 'Jedinica tip',
   Model: 'Model',
   'Serial Number': 'Serijski broj',
@@ -888,6 +889,8 @@ export const sr = {
   'Select Articles & Custom Prices': 'Izaberite Artikli i prilagođene cene',
   'Articles & Spare parts': 'Artikli i rezervni delovi',
   'Add Articles & Spare part': 'Dodajte artikle i rezervni deo',
+  'Customer {{customerName}} updated successfully!':
+    'Klijent {{customerName}} je uspešno ažuriran!',
 
   // Toast
   'Uh oh! As a Property Manager, please login at':

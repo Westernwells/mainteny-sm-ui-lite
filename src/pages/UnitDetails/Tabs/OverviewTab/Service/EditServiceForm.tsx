@@ -6,7 +6,6 @@ import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
 import {Priority} from 'models/misc';
 import {ServiceFormModel} from 'models/unitForm';
-import {convertToText} from 'utils/utils';
 import {useTranslation} from 'react-i18next';
 
 interface Props {
@@ -111,8 +110,8 @@ export const EditServiceForm = ({formik}: Props) => {
           labelId="prioritySelect-label"
           label="Priority"
           options={Object.keys(Priority).map((key) => ({
-            label: convertToText(key),
-            value: convertToText(key),
+            label: t(key),
+            value: key,
           }))}
           selectProps={{
             id: 'prioritySelect',
