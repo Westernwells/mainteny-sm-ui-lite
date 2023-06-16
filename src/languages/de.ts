@@ -1142,6 +1142,7 @@ export const de = {
   'View Schedule': 'Zeitplan anzeigen',
   'emergency order unassigned': 'Personeneinschluss nicht zugewiesen',
   'emergency order accepted': 'Eilauftrag angenommen',
+  'Mark as read': 'Als gelesen markieren',
   Done: 'Erledigt',
 
   // Dashboard

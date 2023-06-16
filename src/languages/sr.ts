@@ -1108,6 +1108,7 @@ export const sr = {
   'View Schedule': 'Zeitplan anzeigen',
   'emergency order unassigned': 'Personeneinschluss nicht zugewiesen',
   'emergency order accepted': 'hitna naredba prihvaćena',
+  'Mark as read': 'Označi kao pročitano',
   Done: 'Done',
 
   // Dashboard
