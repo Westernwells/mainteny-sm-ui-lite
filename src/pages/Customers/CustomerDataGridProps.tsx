@@ -35,7 +35,12 @@ export const columns: GridColDef[] = [
     cellClassName: 'truncateText',
     flex: 1.5,
   }),
-  getColumnProps({field: 'phone', headerName: 'phone', flex: 0.75}),
+  getColumnProps({
+    field: 'phone',
+    headerName: 'phone',
+    flex: 0.75,
+    align: 'center',
+  }),
   getColumnProps({
     field: 'units',
     headerName: 'no. of units',
@@ -71,7 +76,7 @@ export const makeRows = (
     number: item.externalId,
     address: item.postalAddress?.fullName,
     units: item.unitNumber,
-    phone: item.contact.phone,
+    phone: item.contact.phone === '+' ? '-' : item.contact.phone,
     access: 'Invite',
     navigateTo: `details/${item.id}?tab=0`,
     actions: {
