@@ -55,14 +55,20 @@ export const Maintenance = ({serviceReport}: Props) => {
                 date: formatDate(serviceReport.serviceOrder.actualStartTime),
                 time: new Date(
                   serviceReport.serviceOrder.actualStartTime!,
-                ).toLocaleTimeString(),
+                ).toLocaleTimeString(navigator.language, {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                }),
               },
               {
                 label: t('End'),
                 date: formatDate(serviceReport.serviceOrder.actualEndTime),
                 time: new Date(
                   serviceReport.serviceOrder.actualEndTime!,
-                ).toLocaleTimeString(),
+                ).toLocaleTimeString(navigator.language, {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                }),
               },
             ].map((i) => (
               <Box
