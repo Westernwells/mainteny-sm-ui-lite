@@ -36,6 +36,9 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
   const theme = useTheme();
   const {user} = useUserSession();
   const [acceptedFiles, setAcceptedFiles] = useState<FileWithPreview[]>([]);
+
+  const [activeStep, setActiveStep] = useState(0);
+
   const {mutateAsync: uploadImages, isLoading} = useUploadFiles(
     'Image uploaded successfully',
   );
@@ -168,7 +171,7 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
         renderEmptySection()
       ) : elevator.additionalInfo.pictures.length ? (
         <Box display="flex" flexDirection="column">
-          {elevator.additionalInfo?.pictures?.map((picture) => (
+          {elevator.additionalInfo?.pictures?.map((picture, index) => (
             <Box
               key={picture.id}
               display="flex"
@@ -180,7 +183,10 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
                 justifyContent="center"
                 border={`1px solid ${theme.palette.text.disabled}`}
                 borderRadius={1}
-                onClick={() => setOpenPreview(true)}
+                onClick={() => {
+                  setOpenPreview(true);
+                  setActiveStep(index);
+                }}
                 sx={{cursor: 'pointer'}}>
                 <img
                   alt=""
@@ -292,6 +298,8 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
             imgPath: downloadUrls[p.uri],
           }))}
           onClose={() => setOpenPreview(false)}
+          activeStep={activeStep}
+          setActiveStep={setActiveStep}
         />
       </MUIDialog>
     </InfoCard>
