@@ -88,7 +88,6 @@ export const ContactsWidget = ({customerId}: Props) => {
 
   useEffect(() => {
     setRows(makeRows(contactsResource));
-    console.log(contactsResource, 'contactResource');
     setPageCount(Math.ceil(contactsResource.total / page.pageSize));
   }, [contactsResource, page.pageSize]);
 
