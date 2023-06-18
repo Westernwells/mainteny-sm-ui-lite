@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {Dispatch, SetStateAction} from 'react';
 import SwipeableViews from 'react-swipeable-views';
 import {useTheme} from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -13,12 +13,15 @@ import Close from '@mui/icons-material/Close';
 export const Carousel = ({
   images,
   onClose,
+  activeStep,
+  setActiveStep,
 }: {
   images: {label: string; imgPath: string}[];
   onClose: () => void;
+  activeStep: number;
+  setActiveStep: Dispatch<SetStateAction<number>>;
 }) => {
   const theme = useTheme();
-  const [activeStep, setActiveStep] = useState(0);
   const maxSteps = images.length;
 
   const handleNext = () => {

@@ -144,7 +144,7 @@ export const columns = (
         default:
           return (
             <StatusChip
-              label="Inactive"
+              label="Invitation sent"
               style={{background: theme.palette.text.secondary}}
             />
           );
