@@ -3,7 +3,6 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {Elevator} from '@mui/icons-material';
 import useTheme from '@mui/material/styles/useTheme';
-
 import {StatusChip} from 'components/StatusChip';
 import {FormatDate} from 'models/misc';
 import {getColumnProps} from 'components/DataGridLayout';
