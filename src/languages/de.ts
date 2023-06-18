@@ -1143,6 +1143,8 @@ export const de = {
   'emergency order unassigned': 'Personeneinschluss nicht zugewiesen',
   'emergency order accepted': 'Eilauftrag angenommen',
   'Mark as read': 'Als gelesen markieren',
+  "{{firstName}} {{lastName}}'s schedule has been updated.":
+    'Der Zeitplan von {{firstName}} {{lastName}} wurde aktualisiert.',
   Done: 'Erledigt',
 
   // Dashboard

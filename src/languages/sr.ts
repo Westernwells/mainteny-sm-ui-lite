@@ -1109,6 +1109,8 @@ export const sr = {
   'emergency order unassigned': 'Personeneinschluss nicht zugewiesen',
   'emergency order accepted': 'hitna naredba prihvaćena',
   'Mark as read': 'Označi kao pročitano',
+  "{{firstName}} {{lastName}}'s schedule has been updated.":
+    "{{firstName}} {{lastName}}'s raspored je ažuriran.",
   Done: 'Done',
 
   // Dashboard

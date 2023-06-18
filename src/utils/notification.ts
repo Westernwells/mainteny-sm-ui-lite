@@ -4,6 +4,7 @@ import {
   ServiceOrderAssignedData,
   TechnicianJobScheduleUpdatedData,
 } from 'models/notification';
+import {useTranslation} from 'react-i18next';
 
 export const convertEmergencyOrderAccepted = (
   data: string,
@@ -93,6 +94,8 @@ export const notificationSubtitle = (
     | ServiceOrderAssignedData
     | TechnicianJobScheduleUpdatedData,
 ) => {
+  const {t} = useTranslation();
+
   switch (type) {
     case MessageType.EMERGENCY_ORDER_ACCEPTED: {
       const serviceOrder = (
@@ -114,18 +117,21 @@ export const notificationSubtitle = (
         (notificationData as NonTechnicianAssignmentData)?.serviceOrder?.type ??
         ''
       ).toLowerCase();
-      return `No technicians accepted the ${
+      return t(`No technicians accepted the ${
         serviceOrder ? `${serviceOrder} ` : ''
       }service order request at
       ${
         (notificationData as NonTechnicianAssignmentData).serviceOrder.elevator
           .address.fullName
-      }`;
+      }`);
     }
     case MessageType.TECHNICIAN_JOB_SCHEDULE_UPDATED: {
       const technician = (notificationData as TechnicianJobScheduleUpdatedData)
         .technician.userAccount;
-      return `${technician.firstName} ${technician.lastName}'s schedule has been updated.`;
+      return t("{{firstName}} {{lastName}}'s schedule has been updated.", {
+        firstName: technician.firstName,
+        lastName: technician.lastName,
+      });
     }
     default:
       return '-';
