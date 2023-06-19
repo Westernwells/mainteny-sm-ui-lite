@@ -281,6 +281,7 @@ export const Notifications = () => {
       totalReadNotifications,
       groupedReadNotifications,
       isFetchingNextReadNotificationsPage,
+      t,
     ],
   );
 
