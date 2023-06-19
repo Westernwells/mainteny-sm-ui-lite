@@ -1147,7 +1147,7 @@ export const de = {
     'Der Zeitplan von {{firstName}} {{lastName}} wurde aktualisiert.',
   'No technicians accepted the service order request at {{address}}':
     'Kein Techniker hat den Auftrag von in der {{address}} angenommen',
-  '{{firstName}} {{lastName}} accepted the emergency service order request at {{address}}':
+  '{{firstName}} {{lastName}} accepted the service order request at {{address}}':
     '{{firstName}} {{lastName}} hat Auftrag in der {{address}} angenommen.',
   Done: 'Erledigt',
 

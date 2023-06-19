@@ -1113,7 +1113,7 @@ export const sr = {
     "{{firstName}} {{lastName}}'s raspored je ažuriran.",
   'No technicians accepted the service order request at {{address}}':
     'Nijedan tehničar je prihvatio zahtev za narudžbu usluge na {{address}}',
-  '{{firstName}} {{lastName}} accepted the emergency service order request at {{address}}.':
+  '{{firstName}} {{lastName}} accepted the service order request at {{address}}.':
     '{{firstName}} {{lastName}} je prihvatio zahtev za narudžbu usluge na {{address}}.',
   Done: 'Done',
 

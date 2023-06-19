@@ -35,27 +35,12 @@ export const notificationJSONDataToObject = (
   }
 };
 
-export const notificationTypeToString = (
-  type: MessageType | string,
-  notificationData?:
-    | NonTechnicianAssignmentData
-    | ServiceOrderAssignedData
-    | TechnicianJobScheduleUpdatedData,
-) => {
+export const notificationTypeToString = (type: MessageType | string) => {
   switch (type) {
     case MessageType.EMERGENCY_ORDER_ACCEPTED:
-      return (notificationData as ServiceOrderAssignedData)?.serviceOrder?.type
-        ? `${
-            (notificationData as ServiceOrderAssignedData).serviceOrder.type
-          } Order Accepted`.toLowerCase()
-        : 'Service Order Accepted';
+      return 'Service Order Accepted';
     case MessageType.NON_TECHNICIAN_ASSIGNMENT_FOR_SERVICE_ORDER:
-      return (notificationData as NonTechnicianAssignmentData)?.serviceOrder
-        ?.type
-        ? `${
-            (notificationData as NonTechnicianAssignmentData).serviceOrder.type
-          } Order Unassigned`.toLowerCase()
-        : 'Service Order Unassigned';
+      return 'Service Order Unassigned';
     case MessageType.TECHNICIAN_JOB_SCHEDULE_UPDATED:
       return 'Schedule Updated';
     default:
@@ -101,7 +86,7 @@ export const notificationSubtitle = (
       const technician = (notificationData as ServiceOrderAssignedData)
         .serviceOrder.technician.userAccount;
       return t(
-        '{{firstName}} {{lastName}} accepted the emergency service order request at {{address}}',
+        '{{firstName}} {{lastName}} accepted the service order request at {{address}}',
         {
           firstName: technician.firstName,
           lastName: technician.lastName,
