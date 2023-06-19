@@ -4,6 +4,7 @@ import {
   ServiceOrderAssignedData,
   TechnicianJobScheduleUpdatedData,
 } from 'models/notification';
+import {useTranslation} from 'react-i18next';
 
 export const convertEmergencyOrderAccepted = (
   data: string,
@@ -93,39 +94,38 @@ export const notificationSubtitle = (
     | ServiceOrderAssignedData
     | TechnicianJobScheduleUpdatedData,
 ) => {
+  const {t} = useTranslation();
+
   switch (type) {
     case MessageType.EMERGENCY_ORDER_ACCEPTED: {
-      const serviceOrder = (
-        (notificationData as NonTechnicianAssignmentData)?.serviceOrder?.type ??
-        ''
-      ).toLowerCase();
       const technician = (notificationData as ServiceOrderAssignedData)
         .serviceOrder.technician.userAccount;
-      return `${technician.firstName} ${technician.lastName} accepted the ${
-        serviceOrder ? `${serviceOrder} ` : ''
-      }service order request at
-      ${
-        (notificationData as ServiceOrderAssignedData).serviceOrder.elevator
-          .address.fullName
-      }`;
+      return t(
+        '{{firstName}} {{lastName}} accepted the emergency service order request at {{address}}',
+        {
+          firstName: technician.firstName,
+          lastName: technician.lastName,
+          address: (notificationData as ServiceOrderAssignedData).serviceOrder
+            .elevator.address.fullName,
+        },
+      );
     }
     case MessageType.NON_TECHNICIAN_ASSIGNMENT_FOR_SERVICE_ORDER: {
-      const serviceOrder = (
-        (notificationData as NonTechnicianAssignmentData)?.serviceOrder?.type ??
-        ''
-      ).toLowerCase();
-      return `No technicians accepted the ${
-        serviceOrder ? `${serviceOrder} ` : ''
-      }service order request at
-      ${
-        (notificationData as NonTechnicianAssignmentData).serviceOrder.elevator
-          .address.fullName
-      }`;
+      return t(
+        'No technicians accepted the service order request at {{address}}',
+        {
+          address: (notificationData as NonTechnicianAssignmentData)
+            .serviceOrder.elevator.address.fullName,
+        },
+      );
     }
     case MessageType.TECHNICIAN_JOB_SCHEDULE_UPDATED: {
       const technician = (notificationData as TechnicianJobScheduleUpdatedData)
         .technician.userAccount;
-      return `${technician.firstName} ${technician.lastName}'s schedule has been updated.`;
+      return t("{{firstName}} {{lastName}}'s schedule has been updated.", {
+        firstName: technician.firstName,
+        lastName: technician.lastName,
+      });
     }
     default:
       return '-';
