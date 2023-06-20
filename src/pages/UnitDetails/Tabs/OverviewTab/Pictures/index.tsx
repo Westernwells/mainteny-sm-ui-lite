@@ -60,17 +60,27 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
     const uploadPath = `${serviceCompanyId}/elevators/${elevator.id}/images`;
     await uploadImages({files: acceptedFiles, uploadPath});
 
-    await updateElevator({
-      body: {
-        propertyOwnerId,
-        pictures: [
+    const updatedPictures = elevator.additionalInfo.pictures
+      ? [
           ...elevator.additionalInfo.pictures,
           ...acceptedFiles.map((item) => ({
             description: item.name.split('.')[0],
             type: item.type,
             uri: `${uploadPath}/${item.name}`,
           })),
-        ],
+        ]
+      : [
+          ...acceptedFiles.map((item) => ({
+            description: item.name.split('.')[0],
+            type: item.type,
+            uri: `${uploadPath}/${item.name}`,
+          })),
+        ];
+
+    await updateElevator({
+      body: {
+        propertyOwnerId,
+        pictures: updatedPictures,
       },
       elevatorId: elevator.id,
     });
