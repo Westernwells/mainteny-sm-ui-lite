@@ -102,7 +102,7 @@ export const SupplierListDataGrid = () => {
 
   useEffect(() => {
     setPageCount(Math.ceil(articleSupplierResource.total / page.pageSize));
-  }, [page.pageSize]);
+  }, [page.pageSize, articleSupplierResource]);
 
   useEffect(() => {
     if (!isIdle && !isLoading) {
