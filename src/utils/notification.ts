@@ -36,13 +36,15 @@ export const notificationJSONDataToObject = (
 };
 
 export const notificationTypeToString = (type: MessageType | string) => {
+  const {t} = useTranslation();
+
   switch (type) {
     case MessageType.EMERGENCY_ORDER_ACCEPTED:
-      return 'Service Order Accepted';
+      return t('Service Order Accepted');
     case MessageType.NON_TECHNICIAN_ASSIGNMENT_FOR_SERVICE_ORDER:
-      return 'Service Order Unassigned';
+      return t('Service Order Unassigned');
     case MessageType.TECHNICIAN_JOB_SCHEDULE_UPDATED:
-      return 'Schedule Updated';
+      return t('Schedule Updated');
     default:
       return '-';
   }
