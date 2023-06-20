@@ -51,17 +51,27 @@ export const Documents = ({elevator, propertyOwnerId}: Props) => {
     const uploadPath = `${serviceCompanyId}/elevators/${elevator.id}/documents`;
     await uploadFiles({files: acceptedFiles, uploadPath});
 
-    await updateElevator({
-      body: {
-        propertyOwnerId,
-        documents: [
+    const updatedDocuments = elevator.additionalInfo.documents
+      ? [
           ...elevator.additionalInfo.documents,
           ...acceptedFiles.map((item) => ({
             description: item.name.split('.')[0],
             type: item.type,
             uri: `${uploadPath}/${item.name}`,
           })),
-        ],
+        ]
+      : [
+          ...acceptedFiles.map((item) => ({
+            description: item.name.split('.')[0],
+            type: item.type,
+            uri: `${uploadPath}/${item.name}`,
+          })),
+        ];
+
+    await updateElevator({
+      body: {
+        propertyOwnerId,
+        documents: updatedDocuments,
       },
       elevatorId: elevator.id,
     });
