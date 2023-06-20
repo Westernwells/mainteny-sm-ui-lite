@@ -201,6 +201,7 @@ export const ArticleListDataGrid = () => {
       type,
     },
     {keepPreviousData: true},
+    true,
   );
 
   totalArticlesRef.current = totalArticlesRef.current || articleResource.total;
@@ -226,7 +227,7 @@ export const ArticleListDataGrid = () => {
 
   useEffect(() => {
     setPageCount(Math.ceil(articleResource.total / page.pageSize));
-  }, [page.pageSize]);
+  }, [page.pageSize, articleResource]);
 
   useEffect(() => {
     if (!isIdle && !isLoading) {
