@@ -225,14 +225,9 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
 
         <Box mt="1em">
           <FormLabel text="Description Of Service" />
-          <Typography
-            component="p"
-            sx={{
-              p: '.5em',
-              border: '1px solid',
-              borderColor: 'grey.300',
-              borderRadius: '4px',
-            }}>{`${report.description}`}</Typography>
+          <Typography variant="body2" sx={{py: '0.5rem'}}>
+            {report.description || '-'}
+          </Typography>
         </Box>
 
         <Box mt="1em" mb="1.5em">
