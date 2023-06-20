@@ -97,6 +97,7 @@ export const ArticlesDataGrid = ({setRowItem, search}: Props) => {
       query: search,
     },
     {keepPreviousData: true},
+    true,
   );
 
   useEffect(() => {
@@ -132,7 +133,7 @@ export const ArticlesDataGrid = ({setRowItem, search}: Props) => {
         loading={isFetching}
         scrollToTop={search}
         pageSize={page.pageSize}
-        pageIndex={page.pageIndex}
+        pageIndex={page.pageIndex + 1}
         pageCount={pageCount}
         hideFooter={pageCount <= 1}
         handlePageChange={(value) =>
