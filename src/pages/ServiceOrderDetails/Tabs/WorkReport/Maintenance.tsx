@@ -105,7 +105,7 @@ export const Maintenance = ({serviceReport}: Props) => {
               justifyItems: 'end',
             }}>
             <Typography sx={{color: 'primary.contrastText'}}>
-              {t('Total Time')}
+              {t('Total time')}
             </Typography>
             <Typography sx={{color: 'primary.contrastText'}}>
               {convertDigitalMinsToHM(serviceReport.actualServiceTime)}
