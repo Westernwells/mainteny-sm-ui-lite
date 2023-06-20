@@ -1115,6 +1115,8 @@ export const sr = {
     'Nijedan tehničar je prihvatio zahtev za narudžbu usluge na {{address}}',
   '{{firstName}} {{lastName}} accepted the service order request at {{address}}.':
     '{{firstName}} {{lastName}} je prihvatio zahtev za narudžbu usluge na {{address}}.',
+  'Callout Job Unassigned': 'Pozivni posao je nedodeljen',
+  'Callout Job Accepted': 'Pozivni posao je prihvaćen',
   Done: 'Done',
 
   // Dashboard
