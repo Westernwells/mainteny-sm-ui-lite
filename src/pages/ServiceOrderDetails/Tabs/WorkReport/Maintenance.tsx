@@ -98,15 +98,14 @@ export const Maintenance = ({serviceReport}: Props) => {
             borderRadius="4px"
             p="1em"
             mb=".5em"
-            pl="50%"
             sx={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              justifyItems: 'end',
+              gridTemplateColumns: '1fr 8ch 4fr',
             }}>
             <Typography sx={{color: 'primary.contrastText'}}>
-              {t('Total Time')}
+              {t('Total time')}
             </Typography>
+            <Box />
             <Typography sx={{color: 'primary.contrastText'}}>
               {convertDigitalMinsToHM(serviceReport.actualServiceTime)}
             </Typography>
