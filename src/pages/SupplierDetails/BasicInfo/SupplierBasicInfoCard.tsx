@@ -107,7 +107,7 @@ export const SupplierBasicInfoCard = ({
     {
       label: 'Address',
       icon: <LocationOn sx={{color: theme.palette.info.main}} />,
-      body: supplier?.address.fullName ?? '-',
+      body: supplier?.address?.fullName ?? '-',
     },
   ];
 
