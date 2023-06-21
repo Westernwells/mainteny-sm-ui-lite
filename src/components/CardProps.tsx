@@ -61,7 +61,7 @@ export const CardProps = ({
             component="div"
             variant={bodyTextVariant || 'body2'}
             sx={{...bodyStyle}}>
-            {bodyText}
+            {t(bodyText)}
           </Typography>
         ) : (
           bodyText

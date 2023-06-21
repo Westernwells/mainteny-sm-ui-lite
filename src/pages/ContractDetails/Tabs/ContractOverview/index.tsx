@@ -1,4 +1,4 @@
-import {FC, useMemo, useState} from 'react';
+import {FC, useContext, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -31,12 +31,12 @@ import {
   amountForView,
   amountRecordForBackend,
   formatCurrency,
-  formatNetAmount,
   useCurrentCurrency,
 } from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
+import {LanguageContext} from 'context/LanguageProvider';
 import {contractTypeMap, invoiceCycle} from 'utils/contract-utils';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
@@ -60,6 +60,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const currency = contractDetails?.currency ?? currentCurrency.code;
+  const {language: selectedLng} = useContext(LanguageContext);
   const {id: contractId} = useParams();
   const theme = useTheme();
   const {mutateAsync: updateContract} = useUpdateContract('Contract updated');
@@ -269,11 +270,19 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               status={contractDetails?.status}
               numberOfVisits={contractDetails?.visitsNumber}
               costPerYear={
-                formatNetAmount(contractDetails.additionalInfo?.price) || '-'
+                formatCurrency(
+                  (contractDetails?.additionalInfo?.price?.netAmount || 0) /
+                    10 **
+                      (contractDetails?.additionalInfo?.price
+                        ?.fractionDigits! || 0),
+                  {currency},
+                  selectedLng,
+                ) || '-'
               }
               spendingLimit={formatCurrency(
-                contractDetails ? contractDetails.spendingLimit : 0,
+                contractDetails ? contractDetails?.spendingLimit : 0,
                 {currency},
+                selectedLng,
               )}
               renewalPeriod={contractDetails?.additionalInfo?.renewalTerms}
               invoiceCycle={
@@ -299,6 +308,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               hourlyRate={formatCurrency(
                 contractDetails ? contractDetails.hourlyRate : 0,
                 {currency},
+                selectedLng,
               )}
               firstMaintenance={contractDetails.additionalInfo.firstMaintenance}
               firstInvoiceDate={contractDetails.additionalInfo.firstInvoiceDate}

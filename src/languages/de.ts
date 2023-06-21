@@ -75,6 +75,7 @@ export const de = {
   'COST/YEAR': 'KOSTEN/JAHR',
   'EXPIRY DATE': 'ENDDATUM',
   ACTIONS: 'AKTIONEN',
+  'CONTRACT NAME': 'Vertragsname'.toUpperCase(),
   'CONTRACT TYPE': 'VERTRAGSTYP',
   'START DATE': 'ANFANGSDATUM',
   'NO. OF UNITS': 'ANZAHL ANLAGEN',

@@ -74,6 +74,7 @@ export const sr = {
   'COST/YEAR': 'TROŠKOVI/GOD',
   'EXPIRY DATE': 'DATUM ISTEKA',
   ACTIONS: 'AKCIJE',
+  'CONTRACT NAME': 'Naziv ugovora'.toUpperCase(),
   'CONTRACT TYPE': 'TIP UGOVORA',
   'START DATE': 'DATUM POČETKA',
   'NO. OF UNITS': 'BROJ JEDINICA',
