@@ -268,7 +268,6 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
             buttonProps={{
               size: 'large',
               variant: 'contained',
-              autoFocus: true,
               startIcon: <SendIcon />,
               onClick: () => setIsSendEmailDialogOpen(true),
             }}>
