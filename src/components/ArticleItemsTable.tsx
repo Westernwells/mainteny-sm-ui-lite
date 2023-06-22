@@ -632,11 +632,16 @@ export const ArticleItemsTable = ({
             currentIndex={tabValue}
             onChange={(index) => setTabValue(index)}>
             <TabsBody value={tabValue} index={0}>
-              <ArticlesDataGrid search={search} setRowItem={handleSelectItem} />
+              <ArticlesDataGrid
+                search={search}
+                setRowItem={handleSelectItem}
+                setSearch={() => setSearch('')}
+              />
             </TabsBody>
             <TabsBody value={tabValue} index={1}>
               <CustomPricesDataGrid
                 search={search}
+                setSearch={() => setSearch('')}
                 setRowItem={handleSelectItem}
                 propertyOwnerId={propertyOwnerId}
               />
