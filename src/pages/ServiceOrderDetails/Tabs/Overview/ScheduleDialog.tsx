@@ -143,7 +143,6 @@ export const ScheduleDialog = ({
             <Autocomplete
               size="small"
               clearOnBlur={false}
-              disablePortal
               id="combo-box-demo"
               sx={{mt: '0.5em'}}
               options={techniciansResource.data}
