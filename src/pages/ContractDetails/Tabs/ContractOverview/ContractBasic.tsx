@@ -141,8 +141,8 @@ export const ContractBasic = ({
             bodyText={
               renewalPeriod
                 ? renewalPeriod > 1
-                  ? `${renewalPeriod} months`
-                  : `${renewalPeriod} month`
+                  ? t('{{time}} months', {time: renewalPeriod})
+                  : t('{{hours}} month', {hours: renewalPeriod})
                 : '0'
             }
           />
