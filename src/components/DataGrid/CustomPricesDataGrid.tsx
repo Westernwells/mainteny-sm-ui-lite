@@ -21,7 +21,7 @@ import {styles} from './style';
 interface Props {
   setRowItem: (row: ArticleView) => void;
   search: string;
-  setSearch: Dispatch<SetStateAction<''>>;
+  setSearch?: Dispatch<SetStateAction<''>>;
   propertyOwnerId: string;
 }
 
