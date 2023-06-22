@@ -102,7 +102,7 @@ export const ArticlesDataGrid = ({setRowItem, search, setSearch}: Props) => {
   );
 
   useEffect(() => {
-    setSearch('');
+    setSearch?.('');
   }, []);
 
   useEffect(() => {

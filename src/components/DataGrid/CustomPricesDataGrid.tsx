@@ -112,7 +112,7 @@ export const CustomPricesDataGrid = ({
   );
 
   useEffect(() => {
-    setSearch('');
+    setSearch?.('');
   }, []);
 
   useEffect(() => {
