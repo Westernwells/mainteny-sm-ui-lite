@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {FormikHelpers} from 'formik';
 import {useTranslation} from 'react-i18next';
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
@@ -21,6 +21,7 @@ import {styles} from './style';
 interface Props {
   setRowItem: (row: ArticleView) => void;
   search: string;
+  setSearch: Dispatch<SetStateAction<''>>;
   propertyOwnerId: string;
 }
 
@@ -85,6 +86,7 @@ const pageSize = 25;
 export const CustomPricesDataGrid = ({
   setRowItem,
   search,
+  setSearch,
   propertyOwnerId,
 }: Props) => {
   const [page, setPage] = useState(makePage(0, pageSize));
@@ -108,6 +110,10 @@ export const CustomPricesDataGrid = ({
   const {mutateAsync: createArticle} = useCreatePropertyOwnerArticle(
     'Article created successfully',
   );
+
+  useEffect(() => {
+    setSearch('');
+  }, []);
 
   useEffect(() => {
     setPageCount(Math.ceil(articleResource.total / page.pageSize));

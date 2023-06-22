@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
@@ -13,6 +13,7 @@ import {styles} from './style';
 interface Props {
   setRowItem: (row: ArticleView) => void;
   search: string;
+  setSearch: Dispatch<SetStateAction<''>>;
 }
 
 export const columns: GridColDef[] = [
@@ -80,7 +81,7 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
 
 const pageSize = 25;
 
-export const ArticlesDataGrid = ({setRowItem, search}: Props) => {
+export const ArticlesDataGrid = ({setRowItem, search, setSearch}: Props) => {
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
@@ -99,6 +100,10 @@ export const ArticlesDataGrid = ({setRowItem, search}: Props) => {
     {keepPreviousData: true},
     true,
   );
+
+  useEffect(() => {
+    setSearch('');
+  }, []);
 
   useEffect(() => {
     setPageCount(Math.ceil(articleResource.total / page.pageSize));
