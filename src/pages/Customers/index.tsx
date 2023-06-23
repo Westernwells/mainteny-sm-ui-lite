@@ -110,10 +110,7 @@ export const Customer = () => {
         label="No customers yet. Please click the button below to add."
         showActionBtn
         btnLabel="Add Customer"
-        btnAction={() => {
-          Mixpanel.identifyAndTrack(mixpanelEvents.NEW_CUSTOMER_BUTTON_CLICKED);
-          navigate('/customers/new');
-        }}
+        btnAction={() => navigate('/customers/new')}
         containerStyle={{
           height: '100%',
           mb: '10em',

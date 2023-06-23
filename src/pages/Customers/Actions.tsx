@@ -31,10 +31,6 @@ export const Actions = ({propertyOwnerId, toEmail}: Props) => {
 
       <IconButton
         onClick={() => {
-          Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_DELETE_CLICKED, {
-            pageName: 'Customers',
-            source: 'Customer List View',
-          });
           setOpenDeleteConfirm(true);
         }}>
         <Delete sx={{color: 'action.active'}} fontSize="small" />
@@ -45,6 +41,10 @@ export const Actions = ({propertyOwnerId, toEmail}: Props) => {
         open={openDeleteConfirm}
         onConfirm={async () => {
           await deleteCustomer(propertyOwnerId!);
+          Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_DELETE_CLICKED, {
+            pageName: 'Customers',
+            source: 'Customer List View',
+          });
           setOpenDeleteConfirm(false);
         }}
         onClose={() => setOpenDeleteConfirm(false)}
