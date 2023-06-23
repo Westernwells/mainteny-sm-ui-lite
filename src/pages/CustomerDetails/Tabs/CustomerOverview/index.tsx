@@ -201,7 +201,16 @@ export const CustomerOverviewTab = ({
         <EditCustomer
           customer={customer}
           openDialog={openDialog}
-          onClose={() => setOpenDialog(false)}
+          onClose={() => {
+            setOpenDialog(false);
+            Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_EDIT_CLICK, {
+              pageName: 'Customers',
+              creationTime: new Date(),
+              save: 0,
+              cancel: 1,
+              source: 'Basic Information',
+            });
+          }}
         />
       )}
     </InfoCard>
