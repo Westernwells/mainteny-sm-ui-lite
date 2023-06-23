@@ -13,6 +13,8 @@
     "@mui/system": "^5.4.3",
     "@mui/x-data-grid": "^5.5.1",
     "@mui/x-date-pickers": "^5.0.8",
+    "@sentry/browser": "^7.56.0",
+    "@sentry/react": "^7.56.0",
     "@types/autosuggest-highlight": "^3.2.0",
     "@types/dinero.js": "^1.9.0",
     "@types/react": "latest",

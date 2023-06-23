@@ -7,6 +7,7 @@ import {ThemeProvider} from '@mui/material/styles';
 import {MutationErrorHandler, queryErrorHandler} from 'reactQuery/handlers';
 import {SnackbarProvider} from 'notistack';
 import {LanguageProvider} from 'context/LanguageProvider';
+import * as Sentry from '@sentry/react';
 import {App} from './App';
 import {theme} from './theme';
 
@@ -21,6 +22,14 @@ const queryClient = new QueryClient({
       onError: MutationErrorHandler,
     },
   },
+});
+
+const isProduction = import.meta.env.MODE === 'prod';
+
+Sentry.init({
+  dsn: import.meta.env.REACT_APP_SENTRY_DSN,
+  environment: isProduction ? 'production' : import.meta.env.MODE,
+  debug: !isProduction,
 });
 
 ReactDOM.render(
