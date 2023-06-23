@@ -102,9 +102,12 @@ export const ContractsTab = ({customerId}: Props) => {
   }, [contractResource, page.pageSize]);
 
   useEffect(() => {
-    Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMER_UNITDETAILS_UNITS_VIEW, {
-      pageName: 'Customers',
-    });
+    Mixpanel.identifyAndTrack(
+      mixpanelEvents.CUSTOMER_UNITDETAILS_CONTRACTS_VIEW,
+      {
+        pageName: 'Customers',
+      },
+    );
   }, []);
 
   const costRangeConvertor = (selectedItems: string[]) => {
