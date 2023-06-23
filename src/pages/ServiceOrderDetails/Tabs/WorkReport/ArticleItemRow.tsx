@@ -1,0 +1,148 @@
+import React, {useContext, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import {NumericFormat} from 'react-number-format';
+import {ServiceOrderArticleView} from 'models/service-order';
+import {Button} from 'components/Button';
+import {LanguageContext} from 'context/LanguageProvider';
+
+interface Props<T> {
+  articleItem: T;
+  index: number;
+  deleteItem: (item: T) => void;
+  setItems: React.Dispatch<React.SetStateAction<T[]>>;
+}
+
+export const ArticleItemRow = ({
+  articleItem,
+  index,
+  deleteItem,
+  setItems,
+}: Props<ServiceOrderArticleView>) => {
+  const {t} = useTranslation();
+  const {language: selectedLng} = useContext(LanguageContext);
+  const [description, setDescription] = useState<string>(
+    articleItem.description,
+  );
+  const [showDescription, setShowDescription] = useState<boolean>(
+    !!articleItem.description,
+  );
+  const [quantity, setQuantity] = useState(articleItem.quantity);
+
+  useEffect(() => {
+    const updatedArticleItem = {
+      ...articleItem,
+      quantity,
+      description,
+    };
+
+    setItems((prev) =>
+      prev.map((item) =>
+        item.article.id === updatedArticleItem.article.id
+          ? updatedArticleItem
+          : item,
+      ),
+    );
+  }, [quantity, description]);
+
+  return (
+    <Box boxShadow="0px 4px 15px 0px #90909033" bgcolor="grey.50" p="1rem">
+      <Box
+        px=".5em"
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: '3ch 2fr 2fr 1fr 1fr',
+          placeItems: 'start',
+          gap: '1.5rem',
+          alignItems: 'baseline',
+        }}>
+        <Typography variant="body2">{index}</Typography>
+
+        <Box sx={{justifySelf: 'stretch'}}>
+          <Typography variant="body2">{articleItem.name}</Typography>
+          {showDescription && (
+            <TextField
+              size="small"
+              placeholder={t('Description')}
+              multiline
+              fullWidth
+              value={description}
+              minRows={4}
+              maxRows={6}
+              onChange={(e) => setDescription(e.target.value)}
+              sx={{mt: '1.5rem'}}
+            />
+          )}
+        </Box>
+
+        <Typography variant="body2">
+          {articleItem.article.externalId || '-'}
+        </Typography>
+        <NumericFormat
+          value={quantity}
+          customInput={TextField}
+          decimalScale={2}
+          decimalSeparator={
+            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
+          }
+          thousandSeparator={
+            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
+          }
+          inputProps={{
+            inputMode: 'numeric',
+            pattern: '[0-9]*',
+            min: 0,
+            max: Infinity,
+            step: '0.05',
+          }}
+          size="small"
+          onValueChange={(values) => {
+            const {floatValue} = values;
+            if (floatValue) {
+              setQuantity(floatValue);
+            } else {
+              setQuantity(0);
+            }
+          }}
+        />
+        <Typography variant="body2">{articleItem.article.unit}</Typography>
+      </Box>
+      <Box sx={{float: 'right', mt: '2rem'}}>
+        {!showDescription && (
+          <Button
+            buttonProps={{
+              size: 'small',
+              endIcon: <EditIcon />,
+              onClick: () => setShowDescription(true),
+              sx: {
+                bgcolor: '#00D1FF14',
+                px: '7px',
+                py: '6px',
+              },
+            }}>
+            <Typography variant="inputLabel">{t('Add Description')}</Typography>
+          </Button>
+        )}
+        <Button
+          buttonProps={{
+            size: 'small',
+            color: 'error',
+            endIcon: <DeleteIcon />,
+            onClick: () => deleteItem(articleItem),
+            sx: {
+              bgcolor: '#FF182F14',
+              px: '7px',
+              py: '6px',
+              mx: '0.5rem',
+            },
+          }}>
+          <Typography variant="inputLabel">{t('Delete Article')}</Typography>
+        </Button>
+      </Box>
+    </Box>
+  );
+};

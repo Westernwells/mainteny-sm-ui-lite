@@ -59,7 +59,6 @@ export const InvoiceActivities = ({
                   new Date(activity.meta.createdAt),
                   'dd.MM.yyyy - HH:mm',
                 )}
-                h
               </Typography>
               <Typography variant="subtitle2">{activity.text}</Typography>
             </TimelineContent>

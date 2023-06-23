@@ -231,12 +231,7 @@ export const NotificationCard = ({
               />
             </Box>
             <Typography variant="h6" sx={{textTransform: 'capitalize'}}>
-              {t(
-                notificationTypeToString(
-                  notification.messageType,
-                  notificationData,
-                ),
-              )}
+              {t(notificationTypeToString(notification.messageType))}
             </Typography>
           </Box>
           <Box display="flex" alignItems="center">

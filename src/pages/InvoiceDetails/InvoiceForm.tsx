@@ -267,7 +267,7 @@ export const InvoiceForm = ({
 
     formik.setFieldValue(
       'type',
-      invoiceType || invoice?.type || InvoiceType.FINAL,
+      invoiceType || invoice?.type || InvoiceType.FULL,
       true,
     );
     formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '', true);

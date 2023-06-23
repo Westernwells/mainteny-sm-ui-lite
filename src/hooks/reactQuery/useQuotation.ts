@@ -144,6 +144,7 @@ export const useReplyQuotation = () => {
       onSuccess: (_, {quotationId}) => {
         queryClient.invalidateQueries([qk.fetchQuotations]);
         queryClient.invalidateQueries([qk.quotationById]);
+        queryClient.invalidateQueries([qk.fetchQuotationActivities]);
         enqueueSnackbar(`Quotation marked as accepted`, {
           variant: 'success',
         });

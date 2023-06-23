@@ -1,4 +1,11 @@
-import {Dispatch, SetStateAction, useEffect, useMemo, useState} from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -23,6 +30,7 @@ import {
 } from 'utils/currency';
 import {createEmptyResource} from 'utils/paging-utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {LanguageContext} from 'context/LanguageProvider';
 import {calculateTotal} from 'utils/calculate-total';
 import {ArticleItemRow} from './ArticleItemRow';
 import {Button} from './Button';
@@ -101,6 +109,8 @@ export const ArticleItemsTable = ({
   const [partialPrice, setPartialPrice] = useState<number>(0);
 
   const [newPartialTotal, setNewPartialTotal] = useState(0);
+
+  const {language: selectedLng} = useContext(LanguageContext);
 
   const getItemRecord = (
     record: QuotationItemRecord | InvoiceItemRecord<Amount>,
@@ -264,10 +274,7 @@ export const ArticleItemsTable = ({
               }
             }
           }
-        } else if (
-          (isCreditNote && isFetchedCreditNoteArticle) ||
-          !items.length
-        ) {
+        } else if (isCreditNote && isFetchedCreditNoteArticle) {
           createCreditArticleResource(invoice);
         }
       } else if (invoice.type === InvoiceType.PARTIAL) {
@@ -296,8 +303,8 @@ export const ArticleItemsTable = ({
       } else if (invoice.type === InvoiceType.CREDIT_NOTE) {
         if (isCreditNote && isFetchedCreditNoteArticle) {
           createCreditArticleResource(invoice);
-        } else if ((isPartial && isFetched) || !items.length) {
-          if (!partialArticleResource.data.length) {
+        } else if (isPartial && isFetched) {
+          if (!partialArticleResource.data.length || !items.length) {
             createPartial();
           } else {
             const article = [articleViewToItem(partialArticleResource.data[0])];
@@ -476,12 +483,21 @@ export const ArticleItemsTable = ({
                       </Typography>
 
                       <Typography sx={{justifySelf: 'end'}}>
-                        {formatCurrency(
-                          isPartial ? newPartialTotal : totalPrice,
-                          {
-                            currency: currencyCode,
-                          },
-                        )}
+                        {isPartial
+                          ? formatCurrency(
+                              newPartialTotal,
+                              {
+                                currency: currentCurrency.code,
+                              },
+                              selectedLng,
+                            )
+                          : formatCurrency(
+                              totalPrice,
+                              {
+                                currency: currentCurrency.code,
+                              },
+                              selectedLng,
+                            )}
                       </Typography>
                     </>
                   )}
@@ -498,9 +514,21 @@ export const ArticleItemsTable = ({
                   </Typography>
 
                   <Typography>
-                    {formatCurrency(isPartial ? partialPrice : totalPrice, {
-                      currency: currencyCode,
-                    })}
+                    {isPartial
+                      ? formatCurrency(
+                          partialPrice,
+                          {
+                            currency: currentCurrency.code,
+                          },
+                          selectedLng,
+                        )
+                      : formatCurrency(
+                          totalPrice,
+                          {
+                            currency: currentCurrency.code,
+                          },
+                          selectedLng,
+                        )}
                   </Typography>
                   <Box>
                     <FormInput
@@ -519,14 +547,21 @@ export const ArticleItemsTable = ({
                     />
                   </Box>
                   <Typography>
-                    {formatCurrency(
-                      isPartial
-                        ? partialPrice * (percentageVat / 100)
-                        : totalPrice * (percentageVat / 100),
-                      {
-                        currency: currencyCode,
-                      },
-                    )}
+                    {isPartial
+                      ? formatCurrency(
+                          partialPrice * (percentageVat / 100),
+                          {
+                            currency: currentCurrency.code,
+                          },
+                          selectedLng,
+                        )
+                      : formatCurrency(
+                          totalPrice * (percentageVat / 100),
+                          {
+                            currency: currentCurrency.code,
+                          },
+                          selectedLng,
+                        )}
                   </Typography>
                 </Box>
                 <Box
@@ -546,14 +581,21 @@ export const ArticleItemsTable = ({
                     </Typography>
                   </Typography>
                   <Typography sx={{color: 'primary.contrastText'}}>
-                    {formatCurrency(
-                      isPartial
-                        ? partialPrice * (1 + percentageVat / 100)
-                        : totalPrice * (1 + percentageVat / 100),
-                      {
-                        currency: currencyCode,
-                      },
-                    )}
+                    {isPartial
+                      ? formatCurrency(
+                          partialPrice * (1 + percentageVat / 100),
+                          {
+                            currency: currentCurrency.code,
+                          },
+                          selectedLng,
+                        )
+                      : formatCurrency(
+                          totalPrice * (1 + percentageVat / 100),
+                          {
+                            currency: currentCurrency.code,
+                          },
+                          selectedLng,
+                        )}
                   </Typography>
                 </Box>
               </Box>
@@ -590,11 +632,16 @@ export const ArticleItemsTable = ({
             currentIndex={tabValue}
             onChange={(index) => setTabValue(index)}>
             <TabsBody value={tabValue} index={0}>
-              <ArticlesDataGrid search={search} setRowItem={handleSelectItem} />
+              <ArticlesDataGrid
+                search={search}
+                setRowItem={handleSelectItem}
+                setSearch={() => setSearch('')}
+              />
             </TabsBody>
             <TabsBody value={tabValue} index={1}>
               <CustomPricesDataGrid
                 search={search}
+                setSearch={() => setSearch('')}
                 setRowItem={handleSelectItem}
                 propertyOwnerId={propertyOwnerId}
               />

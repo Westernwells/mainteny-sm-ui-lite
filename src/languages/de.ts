@@ -75,6 +75,7 @@ export const de = {
   'COST/YEAR': 'KOSTEN/JAHR',
   'EXPIRY DATE': 'ENDDATUM',
   ACTIONS: 'AKTIONEN',
+  'CONTRACT NAME': 'Vertragsname'.toUpperCase(),
   'CONTRACT TYPE': 'VERTRAGSTYP',
   'START DATE': 'ANFANGSDATUM',
   'NO. OF UNITS': 'ANZAHL ANLAGEN',
@@ -318,6 +319,7 @@ export const de = {
   'ARTICLE NUMBER': 'ARTIKELNUMMER',
   CATEGORY: 'KATEGORIE',
   MANUFACTURER: 'HERSTELLER',
+  'ARTICLE NAME': 'Artikelbezeichnung'.toLocaleUpperCase(),
   SUPPLIER: 'LIEFERANT',
   'PURCHASE PRICE': 'EINKAUFSPREIS',
   'SELLING PRICE': 'VERKAUFSPREIS',
@@ -422,7 +424,7 @@ export const de = {
   'e.g. +49 1000 000000': 'z.B. +49 1000 000000',
   From: 'Von',
   'Select Supplier': 'Lieferant auswählen',
-  'Purchase order number': 'Bestellnummer',
+  'Purchase order number': 'Kundenbestellnummer',
   'Full invoice': 'Gesamtrechnung',
   'Partial invoice': 'Teilrechnung',
   'Credit Note invoice': 'Gutschrift',
@@ -484,6 +486,7 @@ export const de = {
   'Sim Pin': 'Sim-Pin',
   'PLACE OF INSTALLATION': 'ORT DER INSTALLATION',
   'Place Of Installation': 'Ort Dee Installation',
+  'Edit Emergency Phone': 'Notruf bearbeiten',
   'Unit Type': 'Anlagentyp',
   Model: 'Modell',
   'Serial Number': 'Seriennummer',
@@ -892,6 +895,8 @@ export const de = {
     'Artikel & kundenspezifische Preise auswählen',
   'Articles & Spare parts': 'Artikel',
   'Add Articles & Spare part': 'Artikel hinzufügen',
+  'Customer {{customerName}} updated successfully!':
+    'Änderung an Kunde {{customerName}} erfolgreich übernommen',
 
   // Toast
   'Uh oh! As a Property Manager, please login at':
@@ -1138,6 +1143,15 @@ export const de = {
   'View Schedule': 'Zeitplan anzeigen',
   'emergency order unassigned': 'Personeneinschluss nicht zugewiesen',
   'emergency order accepted': 'Eilauftrag angenommen',
+  'Mark as read': 'Als gelesen markieren',
+  "{{firstName}} {{lastName}}'s schedule has been updated.":
+    'Der Zeitplan von {{firstName}} {{lastName}} wurde aktualisiert.',
+  'No technicians accepted the service order request at {{address}}':
+    'Kein Techniker hat den Auftrag von in der {{address}} angenommen',
+  '{{firstName}} {{lastName}} accepted the service order request at {{address}}':
+    '{{firstName}} {{lastName}} hat Auftrag in der {{address}} angenommen.',
+  'Callout Job Unassigned': 'Störung nicht zugewiesen',
+  'Callout Job Accepted': 'Störung angenommen',
   Done: 'Erledigt',
 
   // Dashboard
@@ -1311,9 +1325,9 @@ export const de = {
   'Hourly Travel Rate': 'Stundensatz Anfahrt',
   'Travel Fee': 'Anfahrtspauschale',
   'Start date is required': 'Startdatum ist erforderlich',
-  'End date is required': 'Erster Wartung',
+  'End date is required': 'Enddatum ist erforderlich',
   'First Invoice': 'Erste Rechnung',
-  'First Maintenance Visit': 'Erster Wartung',
+  'First Maintenance Visit': 'Erste Wartung',
   'After each visit': 'Nach jeder Wartung',
   '1 month': '1 Monat',
   '2 months': '2 Monate',

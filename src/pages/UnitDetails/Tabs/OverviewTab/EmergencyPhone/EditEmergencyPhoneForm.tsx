@@ -89,7 +89,7 @@ export const EditEmergencyPhoneForm = ({formik}: Props) => (
     <Grid item sm={12}>
       <FormInput
         props={{
-          label: 'Place of Instalation',
+          label: 'Place Of Installation',
           name: 'placeOfInstallation',
           value: formik.values.placeOfInstallation,
           onChange: formik.handleChange,

@@ -125,16 +125,26 @@ export const ScheduleDialog = ({
         open={open || false}
         onClose={onCancel}
         aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description">
+        aria-describedby="alert-dialog-description"
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{
+          sx: {
+            height: {
+              xs: 280,
+              sm: 300,
+              md: 350,
+            },
+          },
+        }}>
         <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description" component="div">
             <Autocomplete
               size="small"
               clearOnBlur={false}
-              disablePortal
               id="combo-box-demo"
-              sx={{minWidth: 500, mt: '0.5em'}}
+              sx={{mt: '0.5em'}}
               options={techniciansResource.data}
               onChange={(event: any, newValue: EmployeesView | null) =>
                 formik.setValues({
@@ -159,7 +169,7 @@ export const ScheduleDialog = ({
             />
 
             {showSwitch ? (
-              <Box sx={{mt: '1.5em', width: '55%'}}>
+              <Box sx={{mt: '1.5em'}}>
                 <Switch
                   getValue={(value) => setSwitchActive(value)}
                   label="Choose a fixed date and time"

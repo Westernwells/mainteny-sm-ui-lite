@@ -5,7 +5,7 @@ import FileDownloadOffOutlinedIcon from '@mui/icons-material/FileDownloadOffOutl
 
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import Delete from '@mui/icons-material/Delete';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useDeleteContract} from 'hooks/reactQuery/useContract';
 import {Confirm} from 'components/Confirm';
 
@@ -16,29 +16,33 @@ interface Props {
 }
 
 export const Actions = ({url, fileName, contractId}: Props) => {
-  const {data: downloadUrl} = useDownloadUrl(url ? [url] : []);
+  const {data: downloadUrl, refetch: downloadDocument} = useDownloadUrl(
+    url ? [url] : [],
+    {enabled: false},
+  );
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
   const {mutateAsync: deleteContract, isLoading: isDeleting} =
     useDeleteContract('Contract deleted successfully');
+
+  useEffect(() => {
+    if (downloadUrl && Object.values(downloadUrl).length) {
+      const uploadUrl = Object.values(downloadUrl)[0];
+      fetch(uploadUrl).then((response) =>
+        response.blob().then((file) => {
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(file);
+          link.setAttribute('download', fileName);
+          link.click();
+        }),
+      );
+    }
+  }, [downloadUrl]);
 
   return (
     <Box>
       {url ? (
         <>
-          <IconButton
-            onClick={() => {
-              if (downloadUrl && Object.values(downloadUrl).length) {
-                const uploadUrl = Object.values(downloadUrl)[0];
-                fetch(uploadUrl).then((response) =>
-                  response.blob().then((file) => {
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(file);
-                    link.setAttribute('download', fileName);
-                    link.click();
-                  }),
-                );
-              }
-            }}>
+          <IconButton onClick={() => downloadDocument()}>
             <FileDownloadOutlinedIcon
               fontSize="small"
               sx={{color: 'action.active'}}

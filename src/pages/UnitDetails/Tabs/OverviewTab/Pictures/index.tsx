@@ -36,6 +36,9 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
   const theme = useTheme();
   const {user} = useUserSession();
   const [acceptedFiles, setAcceptedFiles] = useState<FileWithPreview[]>([]);
+
+  const [activeStep, setActiveStep] = useState(0);
+
   const {mutateAsync: uploadImages, isLoading} = useUploadFiles(
     'Image uploaded successfully',
   );
@@ -44,7 +47,7 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
   );
   const {data: downloadUrls = {}} = useDownloadUrl(
     elevator.additionalInfo.pictures
-      ? elevator.additionalInfo.pictures.map((item) => item.uri)
+      ? elevator.additionalInfo?.pictures?.map((item) => item.uri)
       : [],
   );
 
@@ -57,17 +60,27 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
     const uploadPath = `${serviceCompanyId}/elevators/${elevator.id}/images`;
     await uploadImages({files: acceptedFiles, uploadPath});
 
-    await updateElevator({
-      body: {
-        propertyOwnerId,
-        pictures: [
+    const updatedPictures = elevator.additionalInfo.pictures
+      ? [
           ...elevator.additionalInfo.pictures,
           ...acceptedFiles.map((item) => ({
             description: item.name.split('.')[0],
             type: item.type,
             uri: `${uploadPath}/${item.name}`,
           })),
-        ],
+        ]
+      : [
+          ...acceptedFiles.map((item) => ({
+            description: item.name.split('.')[0],
+            type: item.type,
+            uri: `${uploadPath}/${item.name}`,
+          })),
+        ];
+
+    await updateElevator({
+      body: {
+        propertyOwnerId,
+        pictures: updatedPictures,
       },
       elevatorId: elevator.id,
     });
@@ -102,7 +115,7 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
   };
 
   const onSaveFileName = async (fileId: string) => {
-    const updatedPictures = elevator.additionalInfo.pictures.map((p) =>
+    const updatedPictures = elevator.additionalInfo?.pictures?.map((p) =>
       p.id === fileId ? {...p, description: fileName} : p,
     );
     await updateElevator({
@@ -168,7 +181,7 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
         renderEmptySection()
       ) : elevator.additionalInfo.pictures.length ? (
         <Box display="flex" flexDirection="column">
-          {elevator.additionalInfo.pictures.map((picture) => (
+          {elevator.additionalInfo?.pictures?.map((picture, index) => (
             <Box
               key={picture.id}
               display="flex"
@@ -180,7 +193,10 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
                 justifyContent="center"
                 border={`1px solid ${theme.palette.text.disabled}`}
                 borderRadius={1}
-                onClick={() => setOpenPreview(true)}
+                onClick={() => {
+                  setOpenPreview(true);
+                  setActiveStep(index);
+                }}
                 sx={{cursor: 'pointer'}}>
                 <img
                   alt=""
@@ -292,6 +308,8 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
             imgPath: downloadUrls[p.uri],
           }))}
           onClose={() => setOpenPreview(false)}
+          activeStep={activeStep}
+          setActiveStep={setActiveStep}
         />
       </MUIDialog>
     </InfoCard>

@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import Grid from '@mui/material/Grid';
 import {
   Elevator,
@@ -25,6 +25,8 @@ import {TabContentContainer} from 'components/TabContentContainer';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import EmployeeAvatar from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EmployeeAvatar';
+import {formatDate, getDateObject} from 'utils/datetime';
+import {LanguageContext} from 'context/LanguageProvider';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {UnitsWidget} from './UnitsWidget';
@@ -54,6 +56,7 @@ export const CustomerOverviewTab = ({
   getCurrentTabIndex,
 }: Props) => {
   const {t} = useTranslation();
+  const {language: selectedLng} = useContext(LanguageContext);
   const theme = useTheme();
   const {data: customer, isLoading} = useGetCustomer(customerId);
   const [basicDetails, setBasicDetails] = useState<BasicDetails>();
@@ -114,7 +117,7 @@ export const CustomerOverviewTab = ({
         },
         priority: {
           label: 'PRIORITY',
-          value: customer.additionalInfo.priority,
+          value: t(customer.additionalInfo.priority),
           icon: <LowPriority sx={{color: theme.palette.info.dark}} />,
         },
         website: {
@@ -124,12 +127,15 @@ export const CustomerOverviewTab = ({
         },
         customerSince: {
           label: 'CUSTOMER SINCE',
-          value: customer.additionalInfo.registrationDate || '-',
+          value:
+            (formatDate(
+              getDateObject(customer.additionalInfo.registrationDate),
+            ) as string) || '-',
           icon: <Language sx={{color: theme.palette.info.dark}} />,
         },
       });
     }
-  }, [customer, totalContracts, totalUnits]);
+  }, [customer, totalContracts, totalUnits, selectedLng]);
 
   useEffect(() => {
     if (getCustomerName && customer) {
