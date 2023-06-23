@@ -157,7 +157,16 @@ export const Customer = () => {
             width: '100%',
           }}
           initialSelectedItems={numberOfUnits}
-          getSelectedValue={(item) => handleNumberOfUnitsChange(item)}
+          getSelectedValue={(item) => {
+            Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_FILTER_CLICK, {
+              pageName: 'Customers',
+              noOfUnits: item,
+              time: 0,
+              searchBar: 0,
+              source: 'List View',
+            });
+            handleNumberOfUnitsChange(item);
+          }}
           multiple={false}
         />
       </Box>
