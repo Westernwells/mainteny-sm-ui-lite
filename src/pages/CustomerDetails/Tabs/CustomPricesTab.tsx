@@ -73,7 +73,16 @@ export const CustomPricesTab = ({propertyOwnerId}: Props) => {
     );
   }, []);
 
-  const onClose = () => setOpenDialog(false);
+  const onClose = () => {
+    Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_ADD_CLICK, {
+      pageName: 'Customers',
+      creationTime: new Date(),
+      save: 0,
+      cancel: 1,
+      source: 'Add article & spare parts',
+    });
+    setOpenDialog(false);
+  };
 
   const onSubmit = async (
     values: PropertyOwnerArticleRecord,
@@ -88,6 +97,14 @@ export const CustomPricesTab = ({propertyOwnerId}: Props) => {
         },
       },
     );
+
+    Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_ADD_CLICK, {
+      pageName: 'Customers',
+      creationTime: new Date(),
+      save: 1,
+      cancel: 0,
+      source: 'Add article & spare parts',
+    });
   };
 
   return (

@@ -191,7 +191,7 @@ export const ContactsWidget = ({customerId}: Props) => {
     });
     Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_ADD_CLICK, {
       pageName: 'Customers',
-      creationTime: new Date(Date.now()),
+      creationTime: new Date(),
       save: 1,
       cancel: 0,
       source: 'Contact Person',
@@ -263,7 +263,7 @@ export const ContactsWidget = ({customerId}: Props) => {
           if (typeAction !== 'edit') {
             Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_ADD_CLICK, {
               pageName: 'Customers',
-              creationTime: new Date(Date.now()),
+              creationTime: new Date(),
               save: 0,
               cancel: 1,
               source: 'Contact Person',
