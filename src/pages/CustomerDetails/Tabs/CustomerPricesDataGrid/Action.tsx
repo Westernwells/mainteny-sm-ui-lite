@@ -9,6 +9,8 @@ import {
 } from 'hooks/reactQuery/useArticle';
 import {Confirm} from 'components/Confirm';
 import {ArticleView, PropertyOwnerArticleRecord} from 'models/article';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {CustomerPricesForm} from './CustomerPricesForm';
 
 interface Props {
@@ -25,7 +27,16 @@ export const Actions = ({article}: Props) => {
     t('Article updated successfully'),
   );
 
-  const onClose = () => setOpenUpdateDialog(false);
+  const onClose = () => {
+    Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_EDIT_CLICK, {
+      pageName: 'Customers',
+      creationTime: new Date(),
+      save: 0,
+      cancel: 1,
+      source: 'Custom Prices',
+    });
+    setOpenUpdateDialog(false);
+  };
 
   const onSubmit = async (
     values: PropertyOwnerArticleRecord,
@@ -44,6 +55,13 @@ export const Actions = ({article}: Props) => {
         },
       },
     );
+    Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_EDIT_CLICK, {
+      pageName: 'Customers',
+      creationTime: new Date(),
+      save: 1,
+      cancel: 0,
+      source: 'Custom Prices',
+    });
   };
 
   return (
