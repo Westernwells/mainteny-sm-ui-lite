@@ -1093,6 +1093,12 @@ export const sr = {
   Checklist: 'Kontrolna lista',
   'No checklist yet.': 'Još nema kontrolne liste.',
   'Order Details': 'Detalji narudžbe',
+  'Task 1': 'Aufgabe 1',
+  'Checklist name': 'Ime kontrolne liste',
+  'New Category': 'Novi Kategorija',
+  'New Task': 'Novi zadatak',
+  'Option per task': 'Opcija po zadatku',
+  'New Option': 'Nova opcija',
 
   //  Notifications
   Notifications: 'Obavještenja',

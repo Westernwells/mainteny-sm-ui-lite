@@ -1109,6 +1109,7 @@ export const de = {
   Checklists: 'Checklisten',
   'DATE CREATED': 'ERSTELLUNGSDATUM',
   CATEGORIES: 'KATEGORIEN',
+  'Task 1': 'Aufgabe 1',
   'TOTAL TASKS': 'AUFGABEN INSGESAMT',
   'New Checklist': 'Neue Checkliste',
   'No checklists yet': 'Noch keine Checklisten',
