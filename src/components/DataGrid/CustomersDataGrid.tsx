@@ -19,13 +19,13 @@ export const columns: GridColDef[] = [
     field: 'name',
     headerName: 'customer',
     cellClassName: 'truncateText',
-    flex: 1.5,
+    flex: 1,
   }),
   getColumnProps({
     field: 'number',
     headerName: 'customer no.',
     align: 'center',
-    flex: 0,
+    flex: 1,
   }),
   getColumnProps({
     field: 'address',
@@ -36,12 +36,13 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'units',
     headerName: 'no. of units',
-    align: 'right',
-    flex: 0,
+    align: 'center',
+    flex: 1,
   }),
   getColumnProps({
     field: 'phone',
     headerName: 'phone no.',
+    align: 'right',
   }),
 ];
 
