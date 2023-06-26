@@ -141,7 +141,9 @@ export const DataGridLayout = ({
   useEffect(() => {
     if (gridRef.current) {
       const ele = gridRef.current.querySelector('.MuiDataGrid-virtualScroller');
-      ele.scrollTop = 0;
+      if (ele) {
+        ele.scrollTop = 0;
+      }
     }
   }, [scrollToTop]);
 

@@ -4,6 +4,8 @@ import * as Yup from 'yup';
 
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useCustomer} from 'hooks/reactQuery/useCustomers';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {CustomerEditForm} from './EditCustomerForm/model';
 import {EditCustomerForm} from './EditCustomerForm';
 
@@ -84,6 +86,13 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
         updateCustomer({...values}, customer.id, () => {
           resetForm();
           onClose();
+        });
+        Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_EDIT_CLICK, {
+          pageName: 'Customers',
+          creationTime: new Date(),
+          save: 1,
+          cancel: 0,
+          source: 'Basic Information',
         });
       }}>
       <EditCustomerForm openDialog={openDialog} onClose={onClose} />

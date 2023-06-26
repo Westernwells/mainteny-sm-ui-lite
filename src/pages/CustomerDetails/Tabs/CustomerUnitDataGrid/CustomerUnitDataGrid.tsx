@@ -3,12 +3,10 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {Elevator} from '@mui/icons-material';
 import useTheme from '@mui/material/styles/useTheme';
-
 import {StatusChip} from 'components/StatusChip';
 import {FormatDate} from 'models/misc';
 import {getColumnProps} from 'components/DataGridLayout';
 import {ElevatorView} from 'models/elevator';
-import {Actions} from './Action';
 import {ContractStatus} from '../../../../models/contract';
 
 export const columns: GridColDef[] = [
@@ -83,7 +81,6 @@ export const columns: GridColDef[] = [
           size="small"
           maxChars={3}
         />
-        <Actions elevatorId={params.row.elevator.id} />
       </Box>
     ),
   }),

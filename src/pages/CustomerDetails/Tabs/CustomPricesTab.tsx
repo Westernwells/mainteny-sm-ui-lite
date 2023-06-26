@@ -13,6 +13,8 @@ import {
   useCreatePropertyOwnerArticle,
   usePropertyOwnerArticles,
 } from 'hooks/reactQuery/useArticle';
+import {Mixpanel} from 'mixpanel/mixpanel';
+import {mixpanelEvents} from 'mixpanel/constants';
 import {
   columns,
   makeRows,
@@ -62,7 +64,25 @@ export const CustomPricesTab = ({propertyOwnerId}: Props) => {
     if (isFetched) setRows(makeRows(articleResource.data));
   }, [articleResource]);
 
-  const onClose = () => setOpenDialog(false);
+  useEffect(() => {
+    Mixpanel.identifyAndTrack(
+      mixpanelEvents.CUSTOMER_UNITDETAILS_CUSTOM_PRICES_VIEW,
+      {
+        pageName: 'Customers',
+      },
+    );
+  }, []);
+
+  const onClose = () => {
+    Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_ADD_CLICK, {
+      pageName: 'Customers',
+      creationTime: new Date(),
+      save: 0,
+      cancel: 1,
+      source: 'Add article & spare parts',
+    });
+    setOpenDialog(false);
+  };
 
   const onSubmit = async (
     values: PropertyOwnerArticleRecord,
@@ -77,6 +97,14 @@ export const CustomPricesTab = ({propertyOwnerId}: Props) => {
         },
       },
     );
+
+    Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_ADD_CLICK, {
+      pageName: 'Customers',
+      creationTime: new Date(),
+      save: 1,
+      cancel: 0,
+      source: 'Add article & spare parts',
+    });
   };
 
   return (

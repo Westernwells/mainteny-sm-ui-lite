@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {Resource, StringValue, WithOptional} from 'models/misc';
 import {
   PropertyOwnerView,
@@ -79,6 +80,7 @@ export const useCreateCustomer = (successMsg: string) => {
 export const useCustomer = () => {
   const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
+  const {t} = useTranslation();
 
   const updateCustomer = async (
     data: CustomerEditForm,
@@ -93,9 +95,14 @@ export const useCustomer = () => {
       );
 
       if (status === 200) {
-        enqueueSnackbar(`Customer for ${data.name} updated successfully!`, {
-          variant: 'success',
-        });
+        enqueueSnackbar(
+          t('Customer {{customerName}} updated successfully!', {
+            customerName: data.name,
+          }),
+          {
+            variant: 'success',
+          },
+        );
         if (onSuccess) {
           queryClient.invalidateQueries(queryKeys.getCustomer);
           onSuccess();

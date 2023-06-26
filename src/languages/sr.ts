@@ -74,6 +74,7 @@ export const sr = {
   'COST/YEAR': 'TROŠKOVI/GOD',
   'EXPIRY DATE': 'DATUM ISTEKA',
   ACTIONS: 'AKCIJE',
+  'CONTRACT NAME': 'Naziv ugovora'.toUpperCase(),
   'CONTRACT TYPE': 'TIP UGOVORA',
   'START DATE': 'DATUM POČETKA',
   'NO. OF UNITS': 'BROJ JEDINICA',
@@ -141,6 +142,16 @@ export const sr = {
   'or drag and drop': 'ili povuci i ispusti',
   'PDF, DOCX, XLSX, XLS, CSV or TSV': 'PDF, DOCX, XLSX, XLS, CSV ili TSV',
   'JPEG, PNG, BMP, GIF, WEBP or SVG': 'JPEG, PNG, BMP, GIF, WEBP ili SVG',
+  'No description added.': 'Nije dodat opis',
+  'Payment terms': 'Uslovi plaćanja',
+  'No payment terms applied': 'Nisu primenjeni uslovi plaćanja',
+  'Choose your payment term': 'Izaberite svoj uslov plaćanja',
+  Choosed: 'Izabrani',
+  'Add other terms': 'Dodaj druge uslove',
+  'New Term': 'Novi uslov',
+  'No terms found. Add other terms first to be used here.':
+    'Nije pronađen nijedan uslov. Prvo dodajte druge uslove koji će se koristiti ovde.',
+  'Contract updated': 'Ugovor je ažuriran',
 
   // Units
   Units: 'Jedinice',
@@ -303,6 +314,7 @@ export const sr = {
   'New Package': 'Novi paket',
   Type: 'Tip',
   Manufacturer: 'Proizvodjač',
+  'ARTICLE NAME': 'Naziv članka'.toLocaleUpperCase(),
   Supplier: 'Dobavljač',
   'ARTICLE NUMBER': 'Broj artikla'.toLocaleUpperCase(),
   CATEGORY: 'Kategorija'.toLocaleUpperCase(),
@@ -472,6 +484,7 @@ export const sr = {
   'Sim Pin': 'Sim pin',
   'PLACE OF INSTALLATION': 'Mjesto ugradnje'.toLocaleUpperCase(),
   'Place Of Installation': 'Mjesto ugradnje',
+  'Edit Emergency Phone': 'Uredite telefon za hitne slučajeve',
   'Unit Type': 'Jedinica tip',
   Model: 'Model',
   'Serial Number': 'Serijski broj',
@@ -877,6 +890,8 @@ export const sr = {
   'Select Articles & Custom Prices': 'Izaberite Artikli i prilagođene cene',
   'Articles & Spare parts': 'Artikli i rezervni delovi',
   'Add Articles & Spare part': 'Dodajte artikle i rezervni deo',
+  'Customer {{customerName}} updated successfully!':
+    'Klijent {{customerName}} je uspešno ažuriran!',
 
   // Toast
   'Uh oh! As a Property Manager, please login at':
@@ -1094,6 +1109,15 @@ export const sr = {
   'View Schedule': 'Zeitplan anzeigen',
   'emergency order unassigned': 'Personeneinschluss nicht zugewiesen',
   'emergency order accepted': 'hitna naredba prihvaćena',
+  'Mark as read': 'Označi kao pročitano',
+  "{{firstName}} {{lastName}}'s schedule has been updated.":
+    "{{firstName}} {{lastName}}'s raspored je ažuriran.",
+  'No technicians accepted the service order request at {{address}}':
+    'Nijedan tehničar je prihvatio zahtev za narudžbu usluge na {{address}}',
+  '{{firstName}} {{lastName}} accepted the service order request at {{address}}.':
+    '{{firstName}} {{lastName}} je prihvatio zahtev za narudžbu usluge na {{address}}.',
+  'Callout Job Unassigned': 'Pozivni posao je nedodeljen',
+  'Callout Job Accepted': 'Pozivni posao je prihvaćen',
   Done: 'Done',
 
   // Dashboard

@@ -122,6 +122,10 @@ const NewContract = () => {
       hourlyRate: '',
       annualPriceAdjustmentPercentage: '',
       serviceLevelAgreement: '',
+      invoiceDueDays: 0,
+      discounts: [{days: 14, discountPercentage: 0}],
+      noticePeriodInMonth: 0,
+      paymentTerms: '',
     },
     onSubmit: () => {},
     validationSchema: validationSchemaContractTerms,
@@ -204,6 +208,10 @@ const NewContract = () => {
       timePreference: [],
       firstMaintenance: formikContractTerms.values.firstMaintenance,
       firstInvoiceDate: formikContractTerms.values.firstInvoiceDate,
+      invoiceDueDays: formikContractTerms.values.invoiceDueDays,
+      discounts: formikContractTerms.values.discounts,
+      noticePeriodInMonth: formikContractTerms.values.noticePeriodInMonth,
+      paymentTerms: formikContractTerms.values.paymentTerms,
     };
 
     await createContract(newContract);

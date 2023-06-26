@@ -15,6 +15,7 @@ interface Props {
   handleBlur?: (e: FocusEvent<any, Element>) => void;
   textFieldProps?: TextFieldProps;
   label?: string;
+  noOptionsText?: string;
 }
 
 export const AddressAutoComplete = ({
@@ -24,6 +25,7 @@ export const AddressAutoComplete = ({
   handleBlur,
   textFieldProps,
   label,
+  noOptionsText = 'No options',
 }: Props) => {
   const [address, setAddress] = useState<any>(null);
   const [queryView, setQueryView] = useState(initialValue);
@@ -57,7 +59,9 @@ export const AddressAutoComplete = ({
   };
   return (
     <AddressAutocomplete
-      noOptionsText={t('No options')}
+      noOptionsText={
+        typeof noOptionsText === 'string' ? t(noOptionsText) : noOptionsText
+      }
       inputValue={queryView}
       value={address}
       apiKey={import.meta.env.REACT_APP_GOOGLE_MAPS_KEY!}

@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {CardProps} from 'components/CardProps';
 import PermContactCalendarIcon from '@mui/icons-material/PermContactCalendar';
 import CachedIcon from '@mui/icons-material/Cached';
@@ -18,6 +19,7 @@ interface Props {
 
 export const ServiceSchema = ({label, elevator, visitNumber}: Props) => {
   const formatDate = useFormatDate();
+  const {t} = useTranslation();
   const theme = useTheme();
   const renderSection = () => {
     switch (label) {
@@ -102,7 +104,7 @@ export const ServiceSchema = ({label, elevator, visitNumber}: Props) => {
           <CardProps
             icon={<FlagIcon sx={{color: theme.palette.info.dark}} />}
             label="UNIT PRIORITY"
-            bodyText={elevator.additionalInfo.priority}
+            bodyText={t(elevator.additionalInfo.priority)}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"

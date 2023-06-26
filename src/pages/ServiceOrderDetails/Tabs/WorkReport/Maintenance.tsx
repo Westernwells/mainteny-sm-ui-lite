@@ -11,7 +11,6 @@ import {convertDigitalMinsToHM} from 'utils/datetime';
 interface Props {
   serviceReport: ServiceOrderReportView;
 }
-
 export const Maintenance = ({serviceReport}: Props) => {
   const theme = useTheme();
   const [schedule] = useState(
@@ -21,7 +20,6 @@ export const Maintenance = ({serviceReport}: Props) => {
   );
   const formatDate = useFormatDate();
   const {t} = useTranslation();
-
   return (
     <Box mt="1em">
       <FormLabel text="Maintenance" />
@@ -52,17 +50,31 @@ export const Maintenance = ({serviceReport}: Props) => {
             {[
               {
                 label: t('Start'),
-                date: formatDate(serviceReport.serviceOrder.actualStartTime),
-                time: new Date(
-                  serviceReport.serviceOrder.actualStartTime!,
-                ).toLocaleTimeString(),
+                date: serviceReport.serviceOrder.actualStartTime
+                  ? formatDate(serviceReport.serviceOrder.actualStartTime)
+                  : '-',
+                time: serviceReport.serviceOrder.actualStartTime
+                  ? new Date(
+                      serviceReport.serviceOrder.actualStartTime!,
+                    ).toLocaleTimeString(navigator.language, {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })
+                  : '-',
               },
               {
                 label: t('End'),
-                date: formatDate(serviceReport.serviceOrder.actualEndTime),
-                time: new Date(
-                  serviceReport.serviceOrder.actualEndTime!,
-                ).toLocaleTimeString(),
+                date: serviceReport.serviceOrder.actualEndTime
+                  ? formatDate(serviceReport.serviceOrder.actualEndTime)
+                  : '-',
+                time: serviceReport.serviceOrder.actualEndTime
+                  ? new Date(
+                      serviceReport.serviceOrder.actualEndTime!,
+                    ).toLocaleTimeString(navigator.language, {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })
+                  : '-',
               },
             ].map((i) => (
               <Box
@@ -92,15 +104,14 @@ export const Maintenance = ({serviceReport}: Props) => {
             borderRadius="4px"
             p="1em"
             mb=".5em"
-            pl="50%"
             sx={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              justifyItems: 'end',
+              gridTemplateColumns: '1fr 8ch 4fr',
             }}>
             <Typography sx={{color: 'primary.contrastText'}}>
-              {t('Total Time')}
+              {t('Total time')}
             </Typography>
+            <Box />
             <Typography sx={{color: 'primary.contrastText'}}>
               {convertDigitalMinsToHM(serviceReport.actualServiceTime)}
             </Typography>

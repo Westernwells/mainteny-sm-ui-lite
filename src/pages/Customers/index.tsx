@@ -94,6 +94,12 @@ export const Customer = () => {
     setPageCount(Math.ceil(customerResource.total / page.pageSize));
   }, [customerResource, page.pageSize]);
 
+  useEffect(() => {
+    Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_VIEW, {
+      pageName: 'Customers',
+    });
+  }, []);
+
   if (isIdle || isLoading) {
     return <Progress />;
   }
@@ -104,10 +110,7 @@ export const Customer = () => {
         label="No customers yet. Please click the button below to add."
         showActionBtn
         btnLabel="Add Customer"
-        btnAction={() => {
-          Mixpanel.identifyAndTrack(mixpanelEvents.NEW_CUSTOMER_BUTTON_CLICKED);
-          navigate('/customers/new');
-        }}
+        btnAction={() => navigate('/customers/new')}
         containerStyle={{
           height: '100%',
           mb: '10em',
@@ -151,7 +154,16 @@ export const Customer = () => {
             width: '100%',
           }}
           initialSelectedItems={numberOfUnits}
-          getSelectedValue={(item) => handleNumberOfUnitsChange(item)}
+          getSelectedValue={(item) => {
+            Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_FILTER_CLICK, {
+              pageName: 'Customers',
+              noOfUnits: item,
+              time: 0,
+              searchBar: 0,
+              source: 'List View',
+            });
+            handleNumberOfUnitsChange(item);
+          }}
           multiple={false}
         />
       </Box>

@@ -1,4 +1,4 @@
-import {FC, useMemo, useState} from 'react';
+import {FC, useContext, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -24,24 +24,26 @@ import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import {Button} from 'components/Button';
+import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
 import * as Yup from 'yup';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import {
   amountForView,
   amountRecordForBackend,
   formatCurrency,
-  formatNetAmount,
   useCurrentCurrency,
 } from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
+import {LanguageContext} from 'context/LanguageProvider';
 import {contractTypeMap, invoiceCycle} from 'utils/contract-utils';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
 import EditContractForm from './EditContractForm';
 import {ContractParties} from './ContractParties';
+import {DescriptionForm} from './DescriptionForm';
 
 interface Props {
   contractDetails: ContractView;
@@ -58,6 +60,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const currency = contractDetails?.currency ?? currentCurrency.code;
+  const {language: selectedLng} = useContext(LanguageContext);
   const {id: contractId} = useParams();
   const theme = useTheme();
   const {mutateAsync: updateContract} = useUpdateContract('Contract updated');
@@ -68,6 +71,9 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const [openDocumentDialog, setOpenDocumentDialog] = useState(false);
 
   const [documents, setDocuments] = useState<FileWithPreview[]>([]);
+  const [openDescriptionDialog, setOpenDescriptionDialog] = useState(false);
+  const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
+    useState(false);
 
   const {mutateAsync: uploadFiles} = useUploadFiles(
     'Documents uploaded successfully',
@@ -101,6 +107,8 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       noticePeriodInMonth: contractDetails?.additionalInfo?.noticePeriodInMonth,
       firstMaintenance: contractDetails?.additionalInfo?.firstMaintenance,
       firstInvoiceDate: contractDetails?.additionalInfo?.firstInvoiceDate,
+      paymentTerms: contractDetails?.additionalInfo.paymentTerms,
+      description: contractDetails?.description,
     },
     onSubmit: () => {},
     enableReinitialize: true,
@@ -142,6 +150,8 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       noticePeriodInMonth: formik.values.noticePeriodInMonth,
       firstMaintenance: formik.values.firstMaintenance,
       firstInvoiceDate: formik.values.firstInvoiceDate,
+      paymentTerms: formik.values.paymentTerms,
+      description: formik.values.description,
     };
 
     await updateContract({
@@ -185,6 +195,30 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     });
   };
 
+  const handleSaveDescription = () => {
+    updateContract(
+      {
+        body: {
+          description: formik.values.description,
+        } as Partial<ContractRequestBody>,
+        contractId: contractId!,
+      },
+      {onSuccess: () => setOpenDescriptionDialog(false)},
+    );
+  };
+
+  const handleContractPaymentTermsModal = (paymentTerms: string) => {
+    updateContract(
+      {
+        body: {
+          paymentTerms,
+        } as Partial<ContractRequestBody>,
+        contractId: contractId!,
+      },
+      {onSuccess: () => setOpenContractPaymentTermsDialog(false)},
+    );
+  };
+
   const headerStyles = useMemo(
     () => ({
       display: 'flex',
@@ -217,7 +251,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
         sx={{
           pb: '1em',
         }}>
-        <Grid xs={8} item>
+        <Grid item xs={12} md={8}>
           <InfoCard
             minHeight="12rem"
             headerStyles={headerStyles}
@@ -236,11 +270,19 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               status={contractDetails?.status}
               numberOfVisits={contractDetails?.visitsNumber}
               costPerYear={
-                formatNetAmount(contractDetails.additionalInfo?.price) || '-'
+                formatCurrency(
+                  (contractDetails?.additionalInfo?.price?.netAmount || 0) /
+                    10 **
+                      (contractDetails?.additionalInfo?.price
+                        ?.fractionDigits! || 0),
+                  {currency},
+                  selectedLng,
+                ) || '-'
               }
               spendingLimit={formatCurrency(
-                contractDetails ? contractDetails.spendingLimit : 0,
+                contractDetails ? contractDetails?.spendingLimit : 0,
                 {currency},
+                selectedLng,
               )}
               renewalPeriod={contractDetails?.additionalInfo?.renewalTerms}
               invoiceCycle={
@@ -266,6 +308,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               hourlyRate={formatCurrency(
                 contractDetails ? contractDetails.hourlyRate : 0,
                 {currency},
+                selectedLng,
               )}
               firstMaintenance={contractDetails.additionalInfo.firstMaintenance}
               firstInvoiceDate={contractDetails.additionalInfo.firstInvoiceDate}
@@ -281,177 +324,10 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               )}
             </Dialog>
           </InfoCard>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={8}>
-              <ContractCard
-                containerStyles={{
-                  mt: '1em',
-                  '& .MuiCardHeader-root': {
-                    pb: 0,
-                  },
-                  height: 'calc(100% - 1em)',
-                }}
-                header={
-                  <Box sx={headerStyles}>
-                    <Typography variant="subtitle1" mr="0.5em">
-                      {t('Parties')}
-                    </Typography>
-                  </Box>
-                }>
-                <ContractParties
-                  name={user?.userAccount.serviceCompany.name}
-                  occupation="Service Company"
-                  address={
-                    user?.userAccount.serviceCompany.postalAddress?.fullName
-                  }
-                  phoneNumber={user?.userAccount.serviceCompany.contact.phone}
-                  partyType="CONTRACTOR"
-                  chipStyles={{
-                    chipMaxChars: 15,
-                    chipColor: 'warning',
-                  }}
-                />
-                <ContractParties
-                  name={contractDetails?.propertyOwner.name}
-                  occupation="Property Owner"
-                  address={
-                    contractDetails?.propertyOwner.postalAddress.fullName
-                  }
-                  phoneNumber={contractDetails?.propertyOwner.contact.phone}
-                  partyType="CUSTOMER"
-                  chipStyles={{
-                    chipColor: 'primary',
-                  }}
-                />
-              </ContractCard>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <ContractCard
-                containerStyles={{
-                  mt: !isMobile ? '1em' : 0,
-                  pt: 2,
-                  px: 2,
-                  height: 'calc(100% - 1em)',
-                  '& .MuiCardHeader-root': {
-                    ...headerStyles,
-                    py: 0,
-                  },
-                }}
-                header={
-                  <Box sx={headerStyles}>
-                    <Typography variant="subtitle1" mr="0.5em">
-                      {t('Document')}
-                    </Typography>
-                  </Box>
-                }
-                headerActionIcon={
-                  <Typography color="#2196F3">{t('+ Add')}</Typography>
-                }
-                headerAction={() => setOpenDocumentDialog(true)}>
-                {uploadedDocument && uploadedDocument[0] ? (
-                  <Box
-                    sx={{
-                      height: '9.688em',
-                      overflowY: 'auto',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      flexDirection: 'column',
-                    }}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mt: 2,
-                        cursor: 'pointer',
-                      }}>
-                      <Box
-                        sx={{
-                          border: '1px solid #8F9BB380',
-                          padding: '1em',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          borderRadius: '4px',
-                        }}
-                        onClick={() =>
-                          window.open(
-                            downloadUrls[
-                              contractDetails?.additionalInfo?.documents![0]
-                                ?.uri
-                            ],
-                            '_blank',
-                          )
-                        }>
-                        <FileCopyIcon
-                          fontSize="large"
-                          htmlColor="rgba(15, 76, 100, 0.5)"
-                        />
-                      </Box>
-                      <Typography
-                        align="center"
-                        sx={{color: 'text.secondary', marginTop: '0.625em'}}>
-                        {uploadedDocument && uploadedDocument[0].description}
-                      </Typography>
-                      <Button
-                        buttonProps={{
-                          color: 'error',
-                          onClick: onRemoveDoc,
-                        }}>
-                        Remove
-                      </Button>
-                    </Box>
-                  </Box>
-                ) : (
-                  <EmptySection
-                    label="No documents attached. They will appear here once added!"
-                    illustration="clipboard"
-                    size="tiny"
-                    containerStyle={{
-                      height: '100%',
-                    }}
-                  />
-                )}
-                <Dialog
-                  title="Add Documents"
-                  isSaving={false}
-                  onCancel={() => setOpenDocumentDialog(false)}
-                  onSave={() => onDocsPreview()}
-                  disableSaveBtn={!documents.length}
-                  dialogProps={{
-                    maxWidth: 'md',
-                    open: openDocumentDialog || false,
-                  }}>
-                  <MyDropZone
-                    getAcceptedFiles={(dropedFiles) => {
-                      setDocuments(dropedFiles);
-                    }}
-                    acceptedFileTypes={[
-                      'application/pdf',
-                      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                      'application/vnd.ms-excel',
-                      'text/tab-separated-values',
-                      'text/csv',
-                    ]}
-                    maxFiles={1}
-                  />
-                </Dialog>
-              </ContractCard>
-            </Grid>
-          </Grid>
         </Grid>
-        <Grid xs={4} item>
+        <Grid item xs={12} md={4}>
           <ContractCard
-            containerStyles={{
-              height: '100%',
-              py: '1em',
-              '& .MuiCardHeader-root': {
-                py: 0,
-              },
-            }}
-            bodyContainerStyle={{height: '100%'}}
+            containerStyles={{height: '100%'}}
             header={
               <Typography
                 variant="subtitle1"
@@ -482,6 +358,259 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             <ContractTimeline
               contractDetails={contractDetails}
               unUsedContractDays={unUsedContractDays}
+            />
+          </ContractCard>
+        </Grid>
+
+        <Grid item xs={12} md={8}>
+          <ContractCard
+            containerStyles={{
+              mt: '1em',
+              '& .MuiCardHeader-root': {
+                pb: 0,
+              },
+              height: 'calc(100% - 1em)',
+            }}
+            header={
+              <Box sx={headerStyles}>
+                <Typography variant="subtitle1" mr="0.5em">
+                  {t('Parties')}
+                </Typography>
+              </Box>
+            }>
+            <ContractParties
+              name={user?.userAccount.serviceCompany.name}
+              occupation="Service Company"
+              address={user?.userAccount.serviceCompany.postalAddress?.fullName}
+              phoneNumber={user?.userAccount.serviceCompany.contact.phone}
+              partyType="CONTRACTOR"
+              chipStyles={{
+                chipMaxChars: 15,
+                chipColor: 'warning',
+              }}
+            />
+            <ContractParties
+              name={contractDetails?.propertyOwner.name}
+              occupation="Property Owner"
+              address={contractDetails?.propertyOwner.postalAddress.fullName}
+              phoneNumber={contractDetails?.propertyOwner.contact.phone}
+              partyType="CUSTOMER"
+              chipStyles={{
+                chipColor: 'primary',
+              }}
+            />
+          </ContractCard>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <ContractCard
+            containerStyles={{
+              mt: !isMobile ? '1em' : 0,
+              pt: 2,
+              px: 2,
+              height: 'calc(100% - 1em)',
+              '& .MuiCardHeader-root': {
+                ...headerStyles,
+                py: 0,
+              },
+            }}
+            header={
+              <Box sx={headerStyles}>
+                <Typography variant="subtitle1" mr="0.5em">
+                  {t('Document')}
+                </Typography>
+              </Box>
+            }
+            headerActionIcon={
+              <Typography color="#2196F3">{t('+ Add')}</Typography>
+            }
+            headerAction={() => setOpenDocumentDialog(true)}>
+            {uploadedDocument && uploadedDocument[0] ? (
+              <Box
+                sx={{
+                  height: '9.688em',
+                  overflowY: 'auto',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  flexDirection: 'column',
+                }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mt: 2,
+                    cursor: 'pointer',
+                  }}>
+                  <Box
+                    sx={{
+                      border: '1px solid #8F9BB380',
+                      padding: '1em',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      borderRadius: '4px',
+                    }}
+                    onClick={() =>
+                      window.open(
+                        downloadUrls[
+                          contractDetails?.additionalInfo?.documents![0]?.uri
+                        ],
+                        '_blank',
+                      )
+                    }>
+                    <FileCopyIcon
+                      fontSize="large"
+                      htmlColor="rgba(15, 76, 100, 0.5)"
+                    />
+                  </Box>
+                  <Typography
+                    align="center"
+                    sx={{color: 'text.secondary', marginTop: '0.625em'}}>
+                    {uploadedDocument && uploadedDocument[0].description}
+                  </Typography>
+                  <Button
+                    buttonProps={{
+                      color: 'error',
+                      onClick: onRemoveDoc,
+                    }}>
+                    Remove
+                  </Button>
+                </Box>
+              </Box>
+            ) : (
+              <EmptySection
+                label="No documents attached. They will appear here once added!"
+                illustration="clipboard"
+                size="tiny"
+                containerStyle={{
+                  height: '100%',
+                }}
+              />
+            )}
+            <Dialog
+              title="Add Documents"
+              isSaving={false}
+              onCancel={() => setOpenDocumentDialog(false)}
+              onSave={() => onDocsPreview()}
+              disableSaveBtn={!documents.length}
+              dialogProps={{
+                maxWidth: 'md',
+                open: openDocumentDialog || false,
+              }}>
+              <MyDropZone
+                getAcceptedFiles={(dropedFiles) => {
+                  setDocuments(dropedFiles);
+                }}
+                acceptedFileTypes={[
+                  'application/pdf',
+                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                  'application/vnd.ms-excel',
+                  'text/tab-separated-values',
+                  'text/csv',
+                ]}
+                maxFiles={1}
+              />
+            </Dialog>
+          </ContractCard>
+        </Grid>
+
+        <Grid item xs={12} md={8}>
+          <ContractCard
+            containerStyles={{
+              mt: !isMobile ? '1em' : 0,
+              pt: 2,
+              px: 2,
+              height: '100%',
+              '& .MuiCardHeader-root': {
+                ...headerStyles,
+                py: 0,
+              },
+            }}
+            header={
+              <Box sx={headerStyles}>
+                <Typography variant="subtitle1" mr="0.5em">
+                  {t('Description')}
+                </Typography>
+              </Box>
+            }
+            headerActionIcon={<EditIcon />}
+            headerAction={() => setOpenDescriptionDialog(true)}>
+            {contractDetails.description ? (
+              <Typography variant="body2">
+                {contractDetails.description}
+              </Typography>
+            ) : (
+              <EmptySection
+                label="No description added."
+                illustration="clipboard"
+                size="tiny"
+                containerStyle={{
+                  height: '100%',
+                }}
+              />
+            )}
+            <Dialog
+              title="Edit Description"
+              onCancel={() => setOpenDescriptionDialog(false)}
+              disableSaveBtn={!!Object.keys(formik.errors).length}
+              onSave={handleSaveDescription}
+              dialogProps={{
+                maxWidth: 'sm',
+                open: openDescriptionDialog,
+              }}>
+              <DescriptionForm formik={formik} />
+            </Dialog>
+          </ContractCard>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <ContractCard
+            containerStyles={{
+              mt: !isMobile ? '1em' : 0,
+              pt: 2,
+              px: 2,
+              height: '100%',
+              [theme.breakpoints.up('md')]: {
+                minHeight: '13rem',
+              },
+              '& .MuiCardHeader-root': {
+                ...headerStyles,
+                py: 0,
+              },
+            }}
+            header={
+              <Box sx={headerStyles}>
+                <Typography variant="subtitle1" mr="0.5em">
+                  {t('Payment terms')}
+                </Typography>
+              </Box>
+            }
+            headerActionIcon={<EditIcon />}
+            headerAction={() => setOpenContractPaymentTermsDialog(true)}>
+            {contractDetails.additionalInfo.paymentTerms ? (
+              <Typography variant="body2">
+                {contractDetails.additionalInfo.paymentTerms}
+              </Typography>
+            ) : (
+              <EmptySection
+                label="No payment terms applied"
+                illustration="clipboard"
+                size="tiny"
+                containerStyle={{
+                  height: '100%',
+                }}
+              />
+            )}
+
+            <ContractPaymentTermsDialog
+              title={t('Choose your payment term')}
+              open={openContractPaymentTermsDialog}
+              onSave={handleContractPaymentTermsModal}
+              onCancel={() => setOpenContractPaymentTermsDialog(false)}
+              paymentTerms={formik.values.paymentTerms}
             />
           </ContractCard>
         </Grid>

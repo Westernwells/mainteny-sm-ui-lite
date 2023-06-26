@@ -99,6 +99,7 @@ export interface ContractAdditionalInfo {
   discounts?: ContractDiscount[];
   firstMaintenance: FirstMaintenance;
   firstInvoiceDate: string;
+  paymentTerms?: string;
 }
 
 export interface ContractElevatorSimpleView {
@@ -127,6 +128,7 @@ export interface ContractView {
   endTime: string;
   elevators: ContractElevatorSimpleView[];
   timePreference: ContractTimeWindow[];
+  description: string;
   status: ContractStatus;
   search: string;
   meta: Meta;
@@ -232,6 +234,10 @@ export interface ContractRequestBody {
   visitsNumber?: number;
   invoiceDue?: string;
   renewalTerms: number;
+  invoiceDueDays?: number;
+  discounts?: ContractDiscount[];
+  noticePeriodInMonth?: number;
+  paymentTerms?: string;
 }
 
 export interface ContractBasicInfoFormModel {
@@ -252,6 +258,10 @@ export interface ContractTermsFormModal {
   serviceLevelAgreement: number | string;
   firstMaintenance?: FirstMaintenance;
   firstInvoiceDate?: string;
+  invoiceDueDays?: number;
+  discounts?: ContractDiscount[];
+  noticePeriodInMonth?: number;
+  paymentTerms?: string;
 }
 
 export interface ContractUpdateRequest {
@@ -269,4 +279,19 @@ export interface ContractUpdateRequest {
   hourlyRate?: number;
   firstMaintenance?: FirstMaintenance;
   firstInvoiceDate?: string;
+  paymentTerms?: string;
+  description?: string;
+}
+
+export interface ContractPaymentTermView {
+  id: string;
+  serviceCompanyId: string;
+  term: string;
+  additionalInfo: string;
+  meta: Meta;
+}
+
+export interface NewContractPaymentTermBody {
+  serviceCompanyId: string;
+  term: string;
 }

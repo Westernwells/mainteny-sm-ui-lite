@@ -13,8 +13,8 @@ import {
   useServiceOrderReport,
   useUpdateServiceOrderArticles,
 } from 'hooks/reactQuery/useServiceOrder';
-import {ArticleItemsTable} from 'components/ArticleItemsTable';
 import {
+  ServiceOrderArticleView,
   ServiceOrderItemRecord,
   ServiceOrderReportView,
 } from 'models/service-order';
@@ -28,6 +28,7 @@ import {serviceOrderStatusToString} from 'utils/service-order-utils';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
+import {ArticleItemsTable} from './ArticleItemsTable';
 
 interface Props {
   orderId?: string;
@@ -45,7 +46,7 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
     serviceOrderId: typeof orderId === 'string' ? orderId : [],
   });
 
-  const [items, setItems] = useState<ServiceOrderItemRecord[]>([]);
+  const [items, setItems] = useState<ServiceOrderArticleView[]>([]);
   const [report, setReport] = useState<ServiceOrderReportView>();
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const {mutate: publishWorkReport, isLoading: publishingWorkReport} =
@@ -84,18 +85,7 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
 
   useEffect(() => {
     if (report && report.serviceOrder && 'articles' in report.serviceOrder) {
-      const temp = report
-        ? report.serviceOrder.articles.map(
-            (i): ServiceOrderItemRecord => ({
-              articleId: i.article.id,
-              articleUnit: i.article.unit,
-              description: i.description,
-              name: i.name,
-              quantity: i.quantity,
-              unitAmount: i.unitAmount,
-            }),
-          )
-        : [];
+      const temp = report ? report.serviceOrder.articles : [];
       setItems(temp);
     }
   }, [report]);
@@ -217,7 +207,9 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
                 },
                 {
                   label: 'Status',
-                  value: serviceOrderStatusToString(report.serviceOrder.status),
+                  value: `${t(
+                    serviceOrderStatusToString(report.serviceOrder.status),
+                  )}`,
                 },
               ].map((i) => (
                 <Box key={i.label}>
@@ -229,22 +221,13 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
         </Box>
         <Maintenance serviceReport={report} />
 
-        <ArticleItemsTable
-          items={items}
-          setItems={setItems}
-          propertyOwnerId={report?.elevator?.propertyOwner?.id ?? ''}
-        />
+        <ArticleItemsTable items={items} setItems={setItems} />
 
         <Box mt="1em">
           <FormLabel text="Description Of Service" />
-          <Typography
-            component="p"
-            sx={{
-              p: '.5em',
-              border: '1px solid',
-              borderColor: 'grey.300',
-              borderRadius: '4px',
-            }}>{`${report.description}`}</Typography>
+          <Typography variant="body2" sx={{py: '0.5rem'}}>
+            {report.description || '-'}
+          </Typography>
         </Box>
 
         <Box mt="1em" mb="1.5em">
@@ -252,7 +235,7 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
           <Box display="flex" justifyContent="space-between">
             <Signature
               name={report.elevator.propertyOwner.name}
-              designation="customer"
+              designation="Customer"
               url={downloadUrls[signatureKeys.CUSTOMER]}
             />
             <Signature
@@ -261,7 +244,7 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
                   ? `${report.serviceOrder.schedules[0].technician.userAccount.firstName} ${report.serviceOrder.schedules[0].technician.userAccount.lastName}`
                   : '-'
               }
-              designation="technician"
+              designation="Technician"
               url={downloadUrls[signatureKeys.TECHNICIAN]}
             />
           </Box>
@@ -285,7 +268,6 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
             buttonProps={{
               size: 'large',
               variant: 'contained',
-              autoFocus: true,
               startIcon: <SendIcon />,
               onClick: () => setIsSendEmailDialogOpen(true),
             }}>
@@ -297,7 +279,20 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
         isOpen
         primaryButtonLabel="Save"
         primaryButtonAction={() => {
-          if (items.length && orderId) updateArticles({data: items, orderId});
+          if (items.length && orderId)
+            updateArticles({
+              data: items.map(
+                (i): ServiceOrderItemRecord => ({
+                  articleId: i.article.id,
+                  articleUnit: i.article.unit,
+                  description: i.description,
+                  name: i.name,
+                  quantity: i.quantity,
+                  unitAmount: i.unitAmount,
+                }),
+              ),
+              orderId,
+            });
         }}
         listItems={[]}
         isValid={!!items.length}
