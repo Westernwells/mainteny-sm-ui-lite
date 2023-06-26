@@ -41,8 +41,8 @@ const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
   externalId: Yup.string(),
   type: Yup.string().required('Type is required'),
-  category: Yup.string().required('Category is required'),
-  unit: Yup.string().required('Unit is required'),
+  category: Yup.string(),
+  unit: Yup.string(),
   unitPurchaseAmount: Yup.object().shape({
     currency: Yup.string().required(),
     netAmount: Yup.number(),
@@ -184,7 +184,6 @@ export const CustomerPricesForm = ({
               value: values.category,
               helperText: touched.category && errors.category,
               error: !!errors.category && touched.category,
-              required: true,
               ...defaultProps,
             }}
           />
@@ -224,7 +223,6 @@ export const CustomerPricesForm = ({
             textFieldProps={{
               name: 'unit',
               label: 'Unit',
-              required: true,
               placeholder: 'Select Unit',
               error: !!(touched.unit && errors.unit),
             }}
