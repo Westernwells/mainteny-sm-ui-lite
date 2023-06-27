@@ -55,7 +55,7 @@ export interface PropertyOwnerView {
 
 export interface PropertyOwnerSimpleView {
   additionalInfo: PropertyOwnerAdditionalInfo;
-  postalAddress: Address;
+  postalAddress?: Address;
   contact: ContactPropertyOwner;
   id: string;
   labels: string[];
