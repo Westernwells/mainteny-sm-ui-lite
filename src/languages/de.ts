@@ -1123,6 +1123,8 @@ export const de = {
   'Delete Category': 'Kategorie löschen',
   'New Task': 'Neue Aufgabe',
   'Option per task': 'Wahlmöglichkeit je Aufgabe',
+  'My Service': 'Mein Service',
+  'My Checklist': 'Meine Checkliste',
   'New Option': 'Neue Wahlmöglichkeit',
   'Checklist saved successfully!': 'Checkliste erfolgreich gespeichert!',
   'Checklist updated successfully!': 'Checkliste erfolgreich aktualisiert!',

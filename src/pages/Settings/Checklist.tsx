@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useContext, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useLocation, useNavigate} from 'react-router-dom';
 import * as Yup from 'yup';
@@ -12,6 +12,7 @@ import {
 } from 'react-beautiful-dnd';
 import _ from 'lodash';
 import useTheme from '@mui/material/styles/useTheme';
+import {LanguageContext} from 'context/LanguageProvider';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -125,6 +126,7 @@ const questionMock = {
 export const Checklist = () => {
   const {t} = useTranslation();
   const theme = useTheme();
+  const {language: selectedLng} = useContext(LanguageContext);
   const navigate = useNavigate();
   const location = useLocation();
   const checklist = (location.state as {checklist: CheckList})?.checklist;
@@ -138,6 +140,7 @@ export const Checklist = () => {
     'Checklist updated successfully!',
   );
 
+  useEffect(() => {}, [selectedLng]);
   useEffect(() => {
     const hasEdit = location.search.includes('edit=1');
     setIsPreviewing(hasEdit ? false : !!checklist);
