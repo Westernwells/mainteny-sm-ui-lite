@@ -1322,4 +1322,11 @@ export const sr = {
   'Report downloaded successfully!': 'Izvješće je uspješno preuzeto!',
   'Max time range exceeded, the max time range is 90 days':
     'Maksimalni vremenski raspon je premašen, maksimalni vremenski raspon je 90 dana',
+  German: 'Nemački',
+  Europe: 'Evropa',
+  'Europe/Berlin': 'Evropa/Berlin',
+  'Europe/Belfast': 'Evropa/Belfast',
+  'Europe/Dublin': 'Evropa/Dublin',
+  'Europe/London': 'Evropa/London',
+  English: 'Engleski jezik',
 };

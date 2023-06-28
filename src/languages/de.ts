@@ -1356,4 +1356,11 @@ export const de = {
   'Report downloaded successfully!': 'Bericht erfolgreich heruntergeladen!',
   'Max time range exceeded, the max time range is 90 days':
     'Maximale Zeitspanne überschritten, die maximale Zeitspanne beträgt 90 Tage',
+  German: 'Deutsch',
+  Europe: 'Europa',
+  'Europe/Berlin': 'Europa/Berlin',
+  'Europe/Belfast': 'Europa/Belfast',
+  'Europe/Dublin': 'Europa/Dublin',
+  'Europe/London': 'Europa/London',
+  English: 'Englisch',
 };

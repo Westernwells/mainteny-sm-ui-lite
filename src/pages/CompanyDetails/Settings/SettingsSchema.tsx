@@ -17,7 +17,6 @@ interface Props {
 
 export const SettingsSchema = ({label, company}: Props) => {
   const theme = useTheme();
-
   const renderSection = () => {
     switch (label) {
       case 'language':
@@ -41,7 +40,7 @@ export const SettingsSchema = ({label, company}: Props) => {
           <CardProps
             icon={<CalendarToday sx={{color: theme.palette.info.dark}} />}
             label="DATE FORMAT"
-            bodyText={company?.settings.dateFormat || '-'}
+            bodyText={company?.settings.dateFormat.toLowerCase() || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}
