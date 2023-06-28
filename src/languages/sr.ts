@@ -1099,8 +1099,8 @@ export const sr = {
   'New Task': 'Novi zadatak',
   'Option per task': 'Opcija po zadatku',
   'New Option': 'Nova opcija',
-  'My Service': 'Mein Service',
-  'My Checklist': 'Meine Checkliste',
+  'My Service': 'Moja služba',
+  'My Checklist': 'Moja kontrolna lista',
 
   //  Notifications
   Notifications: 'Obavještenja',
