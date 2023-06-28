@@ -959,7 +959,7 @@ export const de = {
     'Die Einheitendetails wurden erfolgreich aktualisiert',
   'Technicians updated successfully':
     'Der Techniker wurden erfolgreich aktualisiert',
-  'Unit created successfully': 'Die Einheit wurde erfolgreich erstellt',
+  'Unit created successfully': 'Die Anlage wurde erfolgreich erstellt',
   'Service order rescheduled successfully':
     'Der Serviceauftrag wurde erfolgreich umgeplant',
   'Service order scheduled successfully':
