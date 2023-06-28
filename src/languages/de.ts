@@ -817,7 +817,7 @@ export const de = {
   'No quotations have been created yet. Please click the button below to create one!':
     'Es sind noch keine Angebote erstellt worden. Bitte klicken Sie auf die Schaltfläche unten, um ein Angebot zu erstellen!',
   'Add Quotation': 'Angebot hinzufügen',
-  'Select Unit': 'Einheit wählen',
+  'Select Unit': 'Anlage wählen',
   Duplicate: 'Duplizieren',
   'Quotation Details': 'Angebotsdetails',
   Orders: 'Aufträge',
@@ -1256,7 +1256,7 @@ export const de = {
   'Facility Manager': 'Facility Manager',
   'Contact Person': 'Kontaktperson',
   'Asset Owner': 'Eigentümer',
-  'Add units': 'Einheiten hinzufügen',
+  'Add units': 'Anlage hinzufügen',
   'Contact invited successfully': 'Kontakt erfolgreich eingeladen',
   'Invoice created': 'Rechnung erstellt',
   'Invoice updated': 'Rechnung aktualisiert',
