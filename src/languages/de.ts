@@ -539,7 +539,7 @@ export const de = {
   'Appointment Preferences': 'Terminpräferenz',
   'Days of the week': 'Wochentage',
   'Opening Hour': 'Öffnungszeiten',
-  'Closing Hour': 'Sperrstunde',
+  'Closing Hour': 'Schließzeiten',
   'Requires Notification': 'Benachrichtigung Erforderlich',
   'Notification Due': 'Benachrichtigung Fällig',
   'E.g. 5 days': 'z.B. 5 Tage',
