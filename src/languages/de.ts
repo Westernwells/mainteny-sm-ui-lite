@@ -876,7 +876,7 @@ export const de = {
   'CUSTOMER NUMBER': 'Kundennummer',
   'BILLING EMAIL ADDRESS': 'RECHNUNGS-EMAIL-ADRESSE',
   'Billing Email Address': 'Rechnungs-E-Mail-Adresse',
-  'Do you want to delete this customer?': 'Möchten Sie diese Kunde löschen?',
+  'Do you want to delete this customer?': 'Möchten Sie diesen Kunden löschen?',
   'COST CENTER': 'KOSTENSTELLE',
   'Cost Center': 'Kostenstelle',
   'Custom prices': 'Kundenspezifische Preise',
