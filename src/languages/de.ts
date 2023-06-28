@@ -456,6 +456,8 @@ export const de = {
   'Order Article': 'Artikel bestellen',
   'SUPPLIER NO.': 'Lieferantnummer',
   'Reschedule Order': 'Auftrag umplanen',
+  'Do you want to cancel the order?':
+    'Möchten Sie den Auftrag wirklich abbrechen?',
 
   // Add new unit
   Customer: 'Kunde',
