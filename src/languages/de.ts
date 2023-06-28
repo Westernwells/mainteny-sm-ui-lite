@@ -1184,7 +1184,7 @@ export const de = {
   'No options': 'Keine Vorschläge',
   'Address is required': 'Adresse ist erforderlich',
   'Category is required': 'Kategorie ist erforderlich',
-  'Unit type is required': 'Einheitstyp ist erforderlich',
+  'Unit type is required': 'Anlagentyp ist erforderlich',
   'Last visit is required': 'Letzter Besuch ist erforderlich',
   'Service time is required': 'Dienstzeit ist erforderlich',
   'No. of technicians is required': 'Anzahl der Techniker ist erforderlich',
