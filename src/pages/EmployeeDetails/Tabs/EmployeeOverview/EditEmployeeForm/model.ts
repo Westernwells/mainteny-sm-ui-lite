@@ -1,3 +1,4 @@
+import {AddressRecord} from 'models/misc';
 import {CreateUserAccountData} from 'models/user';
 
 export interface Shift<T> {
@@ -15,14 +16,7 @@ export type EmployeeAccountData = Partial<CreateUserAccountData> & {
   shifts: Shift<string>[];
   addressFullName?: string | false;
   team?: string;
-  address?: {
-    countryCode: string;
-    fullName: string;
-    location: {
-      latitude: number;
-      longitude: number;
-    };
-  } | null;
+  address?: AddressRecord | null;
   firstName?: string;
   lastName?: string;
 };

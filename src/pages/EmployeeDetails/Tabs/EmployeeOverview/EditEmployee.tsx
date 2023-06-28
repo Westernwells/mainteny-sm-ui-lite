@@ -29,16 +29,7 @@ export const EditEmployee = ({employee, openDialog, onClose}: Props) => {
       employee.userAccount.contact.phone,
     email: employee.userAccount.contact.email,
     roles: employee.userAccount.roles,
-    address: employee.userData.address
-      ? {
-          fullName: employee.userData.address.fullName,
-          countryCode: employee.userData.address.countryCode,
-          location: {
-            longitude: employee.userData.address.location.longitude,
-            latitude: employee.userData.address.location.latitude,
-          },
-        }
-      : null,
+    address: employee.userData.address ? employee.userData.address : null,
     serviceOrderTypes:
       employee.userAccount.roles.includes(Role.TECHNICIAN) &&
       employee.userData.additionalInfo

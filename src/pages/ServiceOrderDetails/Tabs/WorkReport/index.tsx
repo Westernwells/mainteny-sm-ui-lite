@@ -136,7 +136,8 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
                 report && (
                   <>
                     <Typography variant="caption">
-                      {report.elevator.propertyOwner.postalAddress.fullName}
+                      {report.elevator.propertyOwner.postalAddress?.fullName ??
+                        '-'}
                     </Typography>
                     <Typography variant="caption" component="p">
                       {report.elevator.propertyOwner.contact.phone}
