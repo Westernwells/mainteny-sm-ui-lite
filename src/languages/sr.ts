@@ -719,6 +719,7 @@ export const sr = {
   'Selected technician': 'Izabrani serviser',
   'Description (Optional)': 'Opis (opciono)',
   'Select date, time & technicians': 'Izaberite , datum, vrijeme i serviser',
+  'Date, time & technicians': 'Datum, vreme i tehničari',
   'Select date': 'Izaberite datum',
   Print: 'Printaj',
   'Mark as rejected': 'Označi kao odbijeno',

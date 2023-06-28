@@ -720,6 +720,7 @@ export const de = {
   'Selected technician': 'Ausgewählter Techniker',
   'Description (Optional)': 'Beschreibung (fakultativ)',
   'Select date, time & technicians': 'Wähle: Datum, Uhrzeit und Techniker',
+  'Date, time & technicians': 'Datum, Uhrzeit und Techniker',
   'Select date': 'Datum auswählen',
   Print: 'Drucken',
   'Mark as rejected': 'Als abgelehnt markieren',
