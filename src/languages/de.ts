@@ -982,8 +982,8 @@ export const de = {
     'Es wurden noch keine Informationen eingetragen. Diese werden hier angezeigt, sobald sie hinzugefügt wurden.',
   'There are no entires for the applied filters.':
     'Für die angewendeten Filter sind keine Einträge vorhanden.',
-  // "Sorry, we couldn't find any ${placeholder} that matches the search text. If you like to add a new ${placeholder}, please click the button below.":
-  //   'Entschuldigung, wir konnten für Ihre Suche keine Informationen finden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
+  "Sorry, we couldn't find any {{placeholderText}} that matches the search text. For adding a new {{placeholderText}}, please click the button below":
+    'Entschuldigung, wir konnten keinen passenden {{placeholderText}} zu Ihrer Suche finden. Um einen neuen {{placeholderText}} hinzuzufügen, klicken Sie bitte auf die nachfolgende Schaltfläche',
   // 'No ${placeholder} yet. Please click the button below to add.':
   //   'Keine Informationen vorhanden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
   'Please click the button below to add.':
@@ -1367,4 +1367,5 @@ export const de = {
   'Europe/Dublin': 'Europa/Dublin',
   'Europe/London': 'Europa/London',
   English: 'Englisch',
+  'Add New': 'Artikel hinzufügen',
 };
