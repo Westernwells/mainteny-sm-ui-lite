@@ -453,6 +453,7 @@ export const sr = {
   'Technician is required': 'Potreban je serviser',
   'Order Article': 'Naručite proizvod',
   'SUPPLIER NO.': 'SUPPLIER NO',
+  'Reschedule Order': 'Ponovo zakažite narudžbu',
 
   // Add new unit
   Customer: 'Kupac',

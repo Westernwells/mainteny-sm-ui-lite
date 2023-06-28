@@ -455,6 +455,7 @@ export const de = {
   'Technician is required': 'Techniker ist notwendig',
   'Order Article': 'Artikel bestellen',
   'SUPPLIER NO.': 'Lieferantnummer',
+  'Reschedule Order': 'Auftrag umplanen',
 
   // Add new unit
   Customer: 'Kunde',

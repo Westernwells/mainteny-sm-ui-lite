@@ -132,8 +132,8 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const renderDialogTitle = () =>
     serviceOrderDetails.status === ServiceOrderStatus.SCHEDULED ||
     serviceOrderDetails.status === ServiceOrderStatus.IN_PROGRESS
-      ? 'Reschedule Order'
-      : 'Schedule Order';
+      ? t('Reschedule Order')
+      : t('Schedule Order');
 
   const orderAction = () => {
     if (
