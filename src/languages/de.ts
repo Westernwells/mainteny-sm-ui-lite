@@ -527,7 +527,7 @@ export const de = {
   'Garage Door': 'Garagentor',
   'Boarding Bridge': 'Fluggastbrücke',
   'Facade Access System': 'Fassadenbefahrsystem',
-  Others: 'Sonstiges',
+  Others: 'Andere',
   'Last Visit': 'Letzter Besuch',
   'Last Inspection': 'Letzte Inspektion',
   'Visits per Year': 'Wartung pro Jahr',
