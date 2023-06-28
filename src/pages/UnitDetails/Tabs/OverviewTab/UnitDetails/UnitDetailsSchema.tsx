@@ -14,6 +14,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import {ElevatorView} from 'models/elevator';
 import {convertToText} from 'utils/utils';
 import CalendarToday from '@mui/icons-material/CalendarToday';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   label: string;
@@ -29,6 +30,8 @@ export const UnitDetailsSchema = ({
   currency,
 }: Props) => {
   const theme = useTheme();
+  const {t} = useTranslation();
+
   const renderSection = () => {
     switch (label) {
       case 'category':
@@ -36,7 +39,7 @@ export const UnitDetailsSchema = ({
           <CardProps
             icon={<EscalatorIcon sx={{color: theme.palette.info.dark}} />}
             label="UNIT CATEGORY"
-            bodyText={convertToText(elevator.category) || '-'}
+            bodyText={t(convertToText(elevator.category) || '-')}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}

@@ -263,6 +263,7 @@ export const MyDropZone = ({
         <Box sx={{display: 'flex', alignItems: 'center'}}>
           <Button
             label={t('Select file to upload')}
+            style={{textTransform: 'inherit'}}
             buttonProps={{
               variant: 'text',
               size: 'medium',

@@ -455,6 +455,7 @@ export const de = {
   'Technician is required': 'Techniker ist notwendig',
   'Order Article': 'Artikel bestellen',
   'SUPPLIER NO.': 'Lieferantnummer',
+  'Reschedule Order': 'Auftrag umplanen',
 
   // Add new unit
   Customer: 'Kunde',
@@ -527,7 +528,7 @@ export const de = {
   'Garage Door': 'Garagentor',
   'Boarding Bridge': 'Fluggastbrücke',
   'Facade Access System': 'Fassadenbefahrsystem',
-  Others: 'Sonstiges',
+  Others: 'Andere',
   'Last Visit': 'Letzter Besuch',
   'Last Inspection': 'Letzte Inspektion',
   'Visits per Year': 'Wartung pro Jahr',
@@ -538,7 +539,7 @@ export const de = {
   'Appointment Preferences': 'Terminpräferenz',
   'Days of the week': 'Wochentage',
   'Opening Hour': 'Öffnungszeiten',
-  'Closing Hour': 'Sperrstunde',
+  'Closing Hour': 'Schließzeiten',
   'Requires Notification': 'Benachrichtigung Erforderlich',
   'Notification Due': 'Benachrichtigung Fällig',
   'E.g. 5 days': 'z.B. 5 Tage',
@@ -817,7 +818,7 @@ export const de = {
   'No quotations have been created yet. Please click the button below to create one!':
     'Es sind noch keine Angebote erstellt worden. Bitte klicken Sie auf die Schaltfläche unten, um ein Angebot zu erstellen!',
   'Add Quotation': 'Angebot hinzufügen',
-  'Select Unit': 'Einheit wählen',
+  'Select Unit': 'Anlage wählen',
   Duplicate: 'Duplizieren',
   'Quotation Details': 'Angebotsdetails',
   Orders: 'Aufträge',
@@ -958,7 +959,7 @@ export const de = {
     'Die Einheitendetails wurden erfolgreich aktualisiert',
   'Technicians updated successfully':
     'Der Techniker wurden erfolgreich aktualisiert',
-  'Unit created successfully': 'Die Einheit wurde erfolgreich erstellt',
+  'Unit created successfully': 'Die Anlage wurde erfolgreich erstellt',
   'Service order rescheduled successfully':
     'Der Serviceauftrag wurde erfolgreich umgeplant',
   'Service order scheduled successfully':
@@ -1184,7 +1185,7 @@ export const de = {
   'No options': 'Keine Vorschläge',
   'Address is required': 'Adresse ist erforderlich',
   'Category is required': 'Kategorie ist erforderlich',
-  'Unit type is required': 'Einheitstyp ist erforderlich',
+  'Unit type is required': 'Anlagentyp ist erforderlich',
   'Last visit is required': 'Letzter Besuch ist erforderlich',
   'Service time is required': 'Dienstzeit ist erforderlich',
   'No. of technicians is required': 'Anzahl der Techniker ist erforderlich',
@@ -1256,7 +1257,7 @@ export const de = {
   'Facility Manager': 'Facility Manager',
   'Contact Person': 'Kontaktperson',
   'Asset Owner': 'Eigentümer',
-  'Add units': 'Einheiten hinzufügen',
+  'Add units': 'Anlage hinzufügen',
   'Contact invited successfully': 'Kontakt erfolgreich eingeladen',
   'Invoice created': 'Rechnung erstellt',
   'Invoice updated': 'Rechnung aktualisiert',
@@ -1283,7 +1284,7 @@ export const de = {
   'FIRST MAINTENANCE VISIT': 'ERSTE WARTUNG',
   'FIRST INVOICE': 'ERSTE RECHNUNG',
   'Invoice cycle is required': 'Rechnungszyklus ist erforderlich',
-  'INVOICE CYCLE': 'RECHNUNHSZYKLUS',
+  'INVOICE CYCLE': 'RechnunGszyklus'.toUpperCase(),
   'The invoice cycle should not be "After each visit" for Non-maintenance contract':
     'Der Rechnungszyklus sollte bei Sonstigen Verträgen nicht "nach jedem Besuch" sein.',
   'Visit number is required': 'Anzahl an Wartungen ist erforderlich',
