@@ -83,29 +83,30 @@ export const Stepper = ({
         {children}
         <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
           <Box sx={{display: 'flex', flexDirection: 'row', pt: 2}}>
+            <Button
+              onClick={() => {
+                setActiveStep(0);
+                handleCancel();
+              }}
+              sx={{mr: '1.5em', color: theme.palette.text.secondary}}
+              size="large"
+              variant="text">
+              {t('Cancel')}
+            </Button>
             {activeStep > 0 ? (
-              <>
-                <Button
-                  onClick={() => {
-                    setActiveStep(0);
-                    handleCancel();
-                  }}
-                  sx={{mr: '1.5em', color: theme.palette.text.secondary}}
-                  variant="text">
-                  {t('Cancel')}
-                </Button>
-                <Button
-                  color="inherit"
-                  variant="outlined"
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                  sx={{mr: '1.5em'}}>
-                  {t('Back')}
-                </Button>
-              </>
+              <Button
+                color="inherit"
+                size="large"
+                variant="outlined"
+                disabled={activeStep === 0}
+                onClick={handleBack}
+                sx={{mr: '1.5em'}}>
+                {t('Back')}
+              </Button>
             ) : null}
             <Box sx={{flex: '1 1 auto'}} />
             <Button
+              size="large"
               variant="contained"
               disabled={disableNextBtn}
               onClick={

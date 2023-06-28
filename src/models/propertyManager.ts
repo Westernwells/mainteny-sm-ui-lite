@@ -34,15 +34,16 @@ export interface PropertyOwnerAdditionalInfo {
   costCenter: string;
   secondaryPhoneNumber: string;
   registrationDate: string;
+  taxNumber?: string;
 }
 
 export interface PropertyOwnerView {
   id: string;
   name: string;
   number: string;
-  postalAddress: Address;
+  postalAddress?: Address;
   billingAddress?: Address;
-  businessAddress: Address;
+  businessAddress?: Address;
   serviceCompany: ServiceCompany;
   contact: ContactPropertyOwner;
   search: string;
@@ -55,7 +56,7 @@ export interface PropertyOwnerView {
 
 export interface PropertyOwnerSimpleView {
   additionalInfo: PropertyOwnerAdditionalInfo;
-  postalAddress: Address;
+  postalAddress?: Address;
   contact: ContactPropertyOwner;
   id: string;
   labels: string[];

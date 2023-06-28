@@ -208,7 +208,7 @@ export const EditQuotation = ({quotation}: Props) => {
                 customer && (
                   <>
                     <Typography variant="caption">
-                      {customer.postalAddress.fullName}
+                      {customer.postalAddress?.fullName ?? '-'}
                     </Typography>
                     <Typography variant="caption" component="p">
                       {customer.contact.phone}
