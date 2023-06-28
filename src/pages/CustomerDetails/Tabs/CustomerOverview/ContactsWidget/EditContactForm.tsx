@@ -1,6 +1,4 @@
-import React from 'react';
 import {FormikProps} from 'formik';
-import {Email, Phone} from '@mui/icons-material';
 import {FormControl, Grid, InputAdornment} from '@mui/material';
 import Box from '@mui/material/Box';
 
@@ -8,6 +6,7 @@ import {FormInput} from 'components/form/FormInput';
 import {ContactFormModel} from 'models/contacts';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {convertToText} from 'utils/utils';
+import {propertyContactPersonRoleOptions} from 'pages/NewCustomer/model';
 
 interface Props {
   formik: FormikProps<ContactFormModel>;
@@ -23,7 +22,7 @@ export const EditContactForm = ({formik}: Props) => {
   return (
     <Box sx={{mt: '0.5em'}}>
       <Grid container spacing={2}>
-        <Grid item md={3}>
+        <Grid item md={6}>
           <FormInput
             props={{
               size: 'small',
@@ -41,7 +40,7 @@ export const EditContactForm = ({formik}: Props) => {
             }}
           />
         </Grid>
-        <Grid item md={3}>
+        <Grid item md={6}>
           <FormInput
             props={{
               size: 'small',
@@ -63,12 +62,7 @@ export const EditContactForm = ({formik}: Props) => {
           <FormControl fullWidth>
             <MultipleSelectCheckmarks
               label="Role"
-              options={[
-                'Facility Manager',
-                'Property Manager',
-                'Contact Person',
-                'Asset Owner',
-              ]}
+              options={propertyContactPersonRoleOptions}
               getSelectedValue={(item: string[]) =>
                 formik.setFieldValue('roles', item[0])
               }
@@ -89,13 +83,6 @@ export const EditContactForm = ({formik}: Props) => {
               id: 'email',
               label: 'Email',
               placeholder: 'e.g johndoe@example.com',
-              InputProps: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Email />
-                  </InputAdornment>
-                ),
-              },
               value: formik.values.email,
               helperText: formik.touched.email && formik.errors.email,
               error: !!formik.errors.email && formik.touched.email,
@@ -121,11 +108,6 @@ export const EditContactForm = ({formik}: Props) => {
               startAdornment: (
                 <InputAdornment position="start"> + </InputAdornment>
               ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Phone />
-                </InputAdornment>
-              ),
             },
             helperText: formik.touched.phone && formik.errors.phone,
             error: !!formik.errors.phone && formik.touched.phone,
@@ -140,11 +122,6 @@ export const EditContactForm = ({formik}: Props) => {
               startAdornment: (
                 <InputAdornment position="start"> + </InputAdornment>
               ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Phone />
-                </InputAdornment>
-              ),
             },
             helperText:
               formik.touched.secondaryPhone && formik.errors.secondaryPhone,
@@ -153,7 +130,7 @@ export const EditContactForm = ({formik}: Props) => {
             required: false,
           },
         ].map((item, index) => (
-          <Grid item md={3}>
+          <Grid item md={6}>
             <FormInput
               key={index}
               props={{

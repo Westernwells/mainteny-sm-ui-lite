@@ -8,7 +8,7 @@ export const formatUpdateCustomer = (data: CustomerEditForm) => ({
   businessAddress: data.businessAddress,
   contact: {
     email: data.email,
-    phone: formatPhoneNumber(data.phone),
+    phone: data.phone ? formatPhoneNumber(data.phone) : '',
     url: data.url,
   },
   billingEmail: data.billingEmail,
@@ -21,6 +21,7 @@ export const formatUpdateCustomer = (data: CustomerEditForm) => ({
   secondaryPhoneNumber: data.secondaryPhoneNumber
     ? formatPhoneNumber(data.secondaryPhoneNumber)
     : '',
+  taxNumber: data.taxNumber,
 });
 
 export const getFilterUnitNumber = (value: string, type: 'start' | 'end') => {
