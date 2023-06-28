@@ -1283,7 +1283,7 @@ export const de = {
   'FIRST MAINTENANCE VISIT': 'ERSTE WARTUNG',
   'FIRST INVOICE': 'ERSTE RECHNUNG',
   'Invoice cycle is required': 'Rechnungszyklus ist erforderlich',
-  'INVOICE CYCLE': 'RECHNUNHSZYKLUS',
+  'INVOICE CYCLE': 'RechnunGszyklus'.toUpperCase(),
   'The invoice cycle should not be "After each visit" for Non-maintenance contract':
     'Der Rechnungszyklus sollte bei Sonstigen Verträgen nicht "nach jedem Besuch" sein.',
   'Visit number is required': 'Anzahl an Wartungen ist erforderlich',
