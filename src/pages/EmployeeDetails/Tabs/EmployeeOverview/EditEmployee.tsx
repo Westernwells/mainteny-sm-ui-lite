@@ -69,9 +69,7 @@ export const EditEmployee = ({employee, openDialog, onClose}: Props) => {
       .required('Email is required'),
     team: Yup.string().matches(/^[0-9]+$/, 'Team is not valid'),
     address: Yup.object().nullable().required('Address is required'),
-    phone: Yup.string()
-      .required('Phone number is required')
-      .matches(phoneValidationRE, 'Phone number is not valid'),
+    phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),
   });
 
   return (
