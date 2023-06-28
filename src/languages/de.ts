@@ -967,8 +967,8 @@ export const de = {
     'Der Serviceauftrag wurde erfolgreich geplant',
   'Emergency order created successfully':
     'Der Notfallauftrag wurde erfolgreich erstellt',
-  'Order created successfully': 'Die Bestellung wurde erfolgreich erstellt',
-  'Order scheduled successfully': 'Die Bestellung wurde erfolgreich geplant',
+  'Order created successfully': 'Der Auftrag wurde erfolgreich erstellt',
+  'Order scheduled successfully': 'Der Auftrag wurde erfolgreich geplant',
   'QR code image uploaded successfully':
     'QR-Code wurde erfolgreich hochgeladen',
   'Customer deleted successfully': 'Kunde wurden erfolgreich gelöscht',
