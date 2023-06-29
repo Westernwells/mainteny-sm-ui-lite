@@ -456,6 +456,8 @@ export const de = {
   'Order Article': 'Artikel bestellen',
   'SUPPLIER NO.': 'Lieferantnummer',
   'Reschedule Order': 'Auftrag umplanen',
+  'Do you want to cancel the order?':
+    'Möchten Sie den Auftrag wirklich abbrechen?',
 
   // Add new unit
   Customer: 'Kunde',
@@ -720,6 +722,7 @@ export const de = {
   'Selected technician': 'Ausgewählter Techniker',
   'Description (Optional)': 'Beschreibung (fakultativ)',
   'Select date, time & technicians': 'Wähle: Datum, Uhrzeit und Techniker',
+  'Date, time & technicians': 'Datum, Uhrzeit und Techniker',
   'Select date': 'Datum auswählen',
   Print: 'Drucken',
   'Mark as rejected': 'Als abgelehnt markieren',
@@ -875,7 +878,7 @@ export const de = {
   'CUSTOMER NUMBER': 'Kundennummer',
   'BILLING EMAIL ADDRESS': 'RECHNUNGS-EMAIL-ADRESSE',
   'Billing Email Address': 'Rechnungs-E-Mail-Adresse',
-  'Do you want to delete this customer?': 'Möchten Sie diese Kunde löschen?',
+  'Do you want to delete this customer?': 'Möchten Sie diesen Kunden löschen?',
   'COST CENTER': 'KOSTENSTELLE',
   'Cost Center': 'Kostenstelle',
   'Custom prices': 'Kundenspezifische Preise',
@@ -966,8 +969,8 @@ export const de = {
     'Der Serviceauftrag wurde erfolgreich geplant',
   'Emergency order created successfully':
     'Der Notfallauftrag wurde erfolgreich erstellt',
-  'Order created successfully': 'Die Bestellung wurde erfolgreich erstellt',
-  'Order scheduled successfully': 'Die Bestellung wurde erfolgreich geplant',
+  'Order created successfully': 'Der Auftrag wurde erfolgreich erstellt',
+  'Order scheduled successfully': 'Der Auftrag wurde erfolgreich geplant',
   'QR code image uploaded successfully':
     'QR-Code wurde erfolgreich hochgeladen',
   'Customer deleted successfully': 'Kunde wurden erfolgreich gelöscht',
@@ -979,8 +982,8 @@ export const de = {
     'Es wurden noch keine Informationen eingetragen. Diese werden hier angezeigt, sobald sie hinzugefügt wurden.',
   'There are no entires for the applied filters.':
     'Für die angewendeten Filter sind keine Einträge vorhanden.',
-  // "Sorry, we couldn't find any ${placeholder} that matches the search text. If you like to add a new ${placeholder}, please click the button below.":
-  //   'Entschuldigung, wir konnten für Ihre Suche keine Informationen finden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
+  "Sorry, we couldn't find any {{placeholderText}} that matches the search text. For adding a new {{placeholderText}}, please click the button below":
+    'Entschuldigung, wir konnten keinen passenden {{placeholderText}} zu Ihrer Suche finden. Um einen neuen {{placeholderText}} hinzuzufügen, klicken Sie bitte auf die nachfolgende Schaltfläche',
   // 'No ${placeholder} yet. Please click the button below to add.':
   //   'Keine Informationen vorhanden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
   'Please click the button below to add.':
@@ -1364,4 +1367,5 @@ export const de = {
   'Europe/Dublin': 'Europa/Dublin',
   'Europe/London': 'Europa/London',
   English: 'Englisch',
+  'Add New': 'Artikel hinzufügen',
 };
