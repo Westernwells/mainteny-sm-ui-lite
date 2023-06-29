@@ -7,7 +7,7 @@ import TimelineSeparator from '@mui/lab/TimelineSeparator';
 import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineDot from '@mui/lab/TimelineDot';
-import {InvoiceActivityView} from 'models/invoice';
+import {InvoiceActivityType, InvoiceActivityView} from 'models/invoice';
 import {InfoCard} from 'components/InfoCard';
 import {getInvoiceActivityColor, getInvoiceActivityTitle} from 'utils/invoice';
 
@@ -17,7 +17,7 @@ export const InvoiceActivities = ({
   activities: InvoiceActivityView[];
 }) => {
   const {t} = useTranslation();
-
+  console.log(activities, 'activieis');
   return (
     <InfoCard
       bodyContainerStyle={{
@@ -60,7 +60,11 @@ export const InvoiceActivities = ({
                   'dd.MM.yyyy - HH:mm',
                 )}
               </Typography>
-              <Typography variant="subtitle2">{activity.text}</Typography>
+              <Typography variant="subtitle2">
+                {activity.type === InvoiceActivityType.EXPIRED
+                  ? 'The invoice was overdue'
+                  : activity.text}
+              </Typography>
             </TimelineContent>
           </TimelineItem>
         ))}
