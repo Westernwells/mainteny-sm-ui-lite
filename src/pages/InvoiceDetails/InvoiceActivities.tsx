@@ -17,7 +17,6 @@ export const InvoiceActivities = ({
   activities: InvoiceActivityView[];
 }) => {
   const {t} = useTranslation();
-  console.log(activities, 'activieis');
   return (
     <InfoCard
       bodyContainerStyle={{
