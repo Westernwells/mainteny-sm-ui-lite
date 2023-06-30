@@ -81,6 +81,8 @@ export const AddDescription = ({
           props={{
             sx: {background: grey[50], border: 'none'},
             value: description,
+            multiline: true,
+            maxRows: 8,
             placeholder: t('Please describe what happened'),
             size: 'medium',
             fullWidth: true,
