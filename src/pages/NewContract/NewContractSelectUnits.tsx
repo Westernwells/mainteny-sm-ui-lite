@@ -96,8 +96,8 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
   useEffect(() => {
     if (!isLoading) {
       const latLng = elevatorResponse?.data.map((elevator: ElevatorView) => ({
-        latitude: elevator.address.location.latitude,
-        longitude: elevator.address.location.longitude,
+        latitude: elevator.address.location?.latitude ?? 0.0,
+        longitude: elevator.address.location?.longitude ?? 0.0,
       }));
       const centerCoord = getCenter(latLng) as unknown as Location;
       const result = groupElevatorByAddressList(elevatorResponse);

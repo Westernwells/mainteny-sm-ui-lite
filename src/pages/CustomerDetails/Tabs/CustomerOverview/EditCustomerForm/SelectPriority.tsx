@@ -19,7 +19,7 @@ export const SelectPriority = () => {
         disableClearBtn
         initialSelectedItems={values.priority ? [values.priority] : ['NONE']}
         multiple={false}
-        containerStyles={{marginTop: '0.5em', width: '100%'}}
+        containerStyles={{width: '100%'}}
         formControlStyles={{width: '100%'}}
       />
     </Box>

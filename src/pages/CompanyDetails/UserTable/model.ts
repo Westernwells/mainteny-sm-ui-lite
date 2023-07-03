@@ -1,3 +1,4 @@
+import {AddressRecord} from 'models/misc';
 import {Shift} from 'pages/NewEmployee/model';
 
 export type UserFormTypes = {
@@ -8,12 +9,5 @@ export type UserFormTypes = {
   employeeId: string;
   shifts: Shift<string>[];
   password?: string;
-  address: {
-    countryCode: string;
-    fullName: string;
-    location: {
-      latitude: number;
-      longitude: number;
-    };
-  } | null;
+  address: AddressRecord | null;
 };

@@ -719,6 +719,7 @@ export const sr = {
   'Selected technician': 'Izabrani serviser',
   'Description (Optional)': 'Opis (opciono)',
   'Select date, time & technicians': 'Izaberite , datum, vrijeme i serviser',
+  'Date, time & technicians': 'Datum, vreme i tehničari',
   'Select date': 'Izaberite datum',
   Print: 'Printaj',
   'Mark as rejected': 'Označi kao odbijeno',
@@ -1234,6 +1235,8 @@ export const sr = {
   'Overdue notice sent': 'Poslato opomena',
   'Invoice paid': 'Faktura plaćena',
   'Invoice expired': 'Faktura je istekla',
+  'Invoice overdue': 'Faktura je dospela',
+  'The invoice was overdue': 'Faktura je kasnila',
   'Payment received': 'Primila uplatu',
   'Payment updated': 'Plaćanje je ažurirano',
   'Payment deleted': 'Uplata je obrisana',
@@ -1323,4 +1326,11 @@ export const sr = {
   'Report downloaded successfully!': 'Izvješće je uspješno preuzeto!',
   'Max time range exceeded, the max time range is 90 days':
     'Maksimalni vremenski raspon je premašen, maksimalni vremenski raspon je 90 dana',
+  German: 'Nemački',
+  Europe: 'Evropa',
+  'Europe/Berlin': 'Evropa/Berlin',
+  'Europe/Belfast': 'Evropa/Belfast',
+  'Europe/Dublin': 'Evropa/Dublin',
+  'Europe/London': 'Evropa/London',
+  English: 'Engleski jezik',
 };

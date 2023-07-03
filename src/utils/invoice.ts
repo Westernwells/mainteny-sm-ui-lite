@@ -60,7 +60,7 @@ export const getInvoiceActivityTitle = (type: InvoiceActivityType): string => {
     case InvoiceActivityType.PAID:
       return 'Invoice paid';
     case InvoiceActivityType.EXPIRED:
-      return 'Invoice expired';
+      return 'Invoice overdue';
     case InvoiceActivityType.PAYMENT_RECEIVED:
       return 'Payment received';
     case InvoiceActivityType.PAYMENT_UPDATED:
