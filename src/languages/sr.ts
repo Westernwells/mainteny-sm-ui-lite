@@ -425,6 +425,7 @@ export const sr = {
   'Select Supplier': 'Odaberi dobavljača',
   'Purchase order number': 'Broj narudžbe',
   'Full invoice': 'Potpuna faktura',
+  'Partial Invoice': 'Djelimična faktura',
   'Customer specific order number': 'Broj narudžbe specifičan za kupca',
   'Print order': 'Ispiši narudžbu',
   'The PDFs are not generated yet.': 'PDF dokumenti još nisu generirani.',
@@ -454,6 +455,7 @@ export const sr = {
   'Order Article': 'Naručite proizvod',
   'SUPPLIER NO.': 'SUPPLIER NO',
   'Reschedule Order': 'Ponovo zakažite narudžbu',
+  'Do you want to cancel the order?': 'Da li želite da otkažete porudžbinu?',
 
   // Add new unit
   Customer: 'Kupac',
@@ -782,7 +784,7 @@ export const sr = {
   VAT: 'PDV.',
   'Invoice Amount': 'Iznos',
   '(incl VAT)': '( sa PDV )',
-  'Partial Payment': 'Partial Payment',
+  'Partial Payment': 'Djelimično plaćanje',
   'Add Description': 'Dodaj opis',
   'Delete Article': 'Izbriši artikal',
   'Additional Information': 'Dodatne Informacije',
@@ -967,8 +969,8 @@ export const sr = {
     'Još nema unosa podataka. Oni će se pojaviti ovde kada se dodaju.',
   'There are no entires for the applied filters.':
     'FNe postoje cjeline za primjenjene filtere.',
-  // "Sorry, we couldn't find any ${placeholder} that matches the search text. If you like to add a new ${placeholder}, please click the button below.":
-  //   'Entschuldigung, wir konnten für Ihre Suche keine Informationen finden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
+  "Sorry, we couldn't find any {{placeholderText}} that matches the search text. For adding a new {{placeholderText}}, please click the button below":
+    'Žao nam je, nismo mogli da pronađemo nijedan {{placeholderText}}  koji odgovara tekstu pretrage. Ako želite da dodate novi  {{placeholderText}} kliknite na dugme ispod',
   // 'No ${placeholder} yet. Please click the button below to add.':
   //   'Keine Informationen vorhanden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
   'Please click the button below to add.':
@@ -1326,6 +1328,7 @@ export const sr = {
   'Report downloaded successfully!': 'Izvješće je uspješno preuzeto!',
   'Max time range exceeded, the max time range is 90 days':
     'Maksimalni vremenski raspon je premašen, maksimalni vremenski raspon je 90 dana',
+  'Total Payable': 'Ukupan iznos za plaćanje',
   German: 'Nemački',
   Europe: 'Evropa',
   'Europe/Berlin': 'Evropa/Berlin',
@@ -1333,4 +1336,5 @@ export const sr = {
   'Europe/Dublin': 'Evropa/Dublin',
   'Europe/London': 'Evropa/London',
   English: 'Engleski jezik',
+  'Add New': 'Dodaj novi',
 };

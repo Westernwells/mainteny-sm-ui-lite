@@ -173,6 +173,7 @@ export const de = {
   'Clear filter': 'Filter löschen',
   'Customer ': 'Kunde',
   No: 'Nein',
+  'No.': 'Pos',
   No_number: 'No',
   'This week': 'Diese Woche',
   'Next week': 'Nächste Woche',
@@ -1362,6 +1363,7 @@ export const de = {
   'Report downloaded successfully!': 'Bericht erfolgreich heruntergeladen!',
   'Max time range exceeded, the max time range is 90 days':
     'Maximale Zeitspanne überschritten, die maximale Zeitspanne beträgt 90 Tage',
+  'Total Payable': 'Gesamtbetrag',
   German: 'Deutsch',
   Europe: 'Europa',
   'Europe/Berlin': 'Europa/Berlin',
