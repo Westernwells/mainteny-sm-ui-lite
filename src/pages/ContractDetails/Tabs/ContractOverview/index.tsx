@@ -24,6 +24,7 @@ import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import {Button} from 'components/Button';
+import {ContractPaymentTermSelectDialog} from 'components/ContractPaymentTermSelectModal';
 import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
 import * as Yup from 'yup';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
@@ -74,6 +75,10 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const [openDescriptionDialog, setOpenDescriptionDialog] = useState(false);
   const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
     useState(false);
+  const [
+    openContractPaymentTermSelectDialog,
+    setOpenContractPaymentTermSelectDialog,
+  ] = useState(false);
 
   const {mutateAsync: uploadFiles} = useUploadFiles(
     'Documents uploaded successfully',
@@ -589,7 +594,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               </Box>
             }
             headerActionIcon={<EditIcon />}
-            headerAction={() => setOpenContractPaymentTermsDialog(true)}>
+            headerAction={() => setOpenContractPaymentTermSelectDialog(true)}>
             {contractDetails.additionalInfo.paymentTerms ? (
               <Typography variant="body2">
                 {contractDetails.additionalInfo.paymentTerms}
@@ -605,12 +610,24 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               />
             )}
 
-            <ContractPaymentTermsDialog
-              title={t('Choose your payment term')}
-              open={openContractPaymentTermsDialog}
+            <ContractPaymentTermSelectDialog
+              title={t('Payment Terms')}
+              alertText={t('Choose a payment term to be used on your invoice')}
+              open={openContractPaymentTermSelectDialog}
               onSave={handleContractPaymentTermsModal}
+              onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
+              onClickPaymentTerms={() =>
+                setOpenContractPaymentTermsDialog(true)
+              }
+            />
+
+            <ContractPaymentTermsDialog
+              title={t('Manage payment terms')}
+              alertText={t(
+                'Add your payment terms that would be used later in invoicing',
+              )}
+              open={openContractPaymentTermsDialog}
               onCancel={() => setOpenContractPaymentTermsDialog(false)}
-              paymentTerms={formik.values.paymentTerms}
             />
           </ContractCard>
         </Grid>
