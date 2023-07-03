@@ -61,7 +61,7 @@ export const InvoiceActivities = ({
               </Typography>
               <Typography variant="subtitle2">
                 {activity.type === InvoiceActivityType.EXPIRED
-                  ? 'The invoice was overdue'
+                  ? t('The invoice was overdue')
                   : activity.text}
               </Typography>
             </TimelineContent>

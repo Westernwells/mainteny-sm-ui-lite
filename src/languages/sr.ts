@@ -1235,6 +1235,8 @@ export const sr = {
   'Overdue notice sent': 'Poslato opomena',
   'Invoice paid': 'Faktura plaćena',
   'Invoice expired': 'Faktura je istekla',
+  'Invoice overdue': 'Faktura je dospela',
+  'The invoice was overdue': 'Faktura je kasnila',
   'Payment received': 'Primila uplatu',
   'Payment updated': 'Plaćanje je ažurirano',
   'Payment deleted': 'Uplata je obrisana',
