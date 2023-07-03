@@ -264,7 +264,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         }}
         onClose={() => setOpenCancelConfirm(false)}
         title="Confirm"
-        content="Do you want to cancel the service order?"
+        content="Do you want to cancel the order?"
       />
       <Confirm
         open={openUnscheduleConfirm}
