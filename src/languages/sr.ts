@@ -454,6 +454,7 @@ export const sr = {
   'Order Article': 'Naručite proizvod',
   'SUPPLIER NO.': 'SUPPLIER NO',
   'Reschedule Order': 'Ponovo zakažite narudžbu',
+  'Do you want to cancel the order?': 'Da li želite da otkažete porudžbinu?',
 
   // Add new unit
   Customer: 'Kupac',
@@ -1326,6 +1327,7 @@ export const sr = {
   'Report downloaded successfully!': 'Izvješće je uspješno preuzeto!',
   'Max time range exceeded, the max time range is 90 days':
     'Maksimalni vremenski raspon je premašen, maksimalni vremenski raspon je 90 dana',
+  'Total Payable': 'Ukupan iznos za plaćanje',
   German: 'Nemački',
   Europe: 'Evropa',
   'Europe/Berlin': 'Evropa/Berlin',
