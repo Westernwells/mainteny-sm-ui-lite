@@ -1270,6 +1270,8 @@ export const de = {
   'Overdue notice sent': 'Mahnung gesendet',
   'Invoice paid': 'Rechnung beglichen',
   'Invoice expired': 'Rechnung abgelaufen',
+  'The invoice was overdue': 'Die Rechnung war überfällig',
+  'Invoice overdue': 'Überfällige Rechnung',
   'Payment received': 'Zahlung erhalten',
   'Payment updated': 'Zahlung aktualisiert',
   'Payment deleted': 'Zahlung gelöscht',
