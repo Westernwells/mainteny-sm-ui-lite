@@ -969,8 +969,8 @@ export const sr = {
     'Još nema unosa podataka. Oni će se pojaviti ovde kada se dodaju.',
   'There are no entires for the applied filters.':
     'FNe postoje cjeline za primjenjene filtere.',
-  // "Sorry, we couldn't find any ${placeholder} that matches the search text. If you like to add a new ${placeholder}, please click the button below.":
-  //   'Entschuldigung, wir konnten für Ihre Suche keine Informationen finden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
+  "Sorry, we couldn't find any {{placeholderText}} that matches the search text. For adding a new {{placeholderText}}, please click the button below":
+    'Žao nam je, nismo mogli da pronađemo nijedan {{placeholderText}}  koji odgovara tekstu pretrage. Ako želite da dodate novi  {{placeholderText}} kliknite na dugme ispod',
   // 'No ${placeholder} yet. Please click the button below to add.':
   //   'Keine Informationen vorhanden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
   'Please click the button below to add.':
@@ -1336,4 +1336,5 @@ export const sr = {
   'Europe/Dublin': 'Evropa/Dublin',
   'Europe/London': 'Evropa/London',
   English: 'Engleski jezik',
+  'Add New': 'Dodaj novi',
 };
