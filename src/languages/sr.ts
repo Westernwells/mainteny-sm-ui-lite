@@ -896,6 +896,35 @@ export const sr = {
   'Add Articles & Spare part': 'Dodajte artikle i rezervni deo',
   'Customer {{customerName}} updated successfully!':
     'Klijent {{customerName}} je uspešno ažuriran!',
+  'Add basic information': 'Dodajte osnovne informacije',
+  'Address information': 'Informacije o adresi',
+  'Add contact persons': 'Dodajte kontakt osobe',
+  'Cancel your progress?': 'Želite li da otkažete svoj napredak?',
+  'Are you sure you want to cancel your progress in creating a new customer?':
+    'Da li ste sigurni da želite da otkažete svoj napredak u stvaranju novog klijenta?',
+  'Cancel creation': 'Otkažite kreiranje',
+  'Customer Name is required': 'Ime klijenta je obavezno',
+  'Phone number is not valid': 'Broj telefona nije važeći',
+  'Postal address': 'Poštanska adresa',
+  'Address line 1': 'Adresna linija 1',
+  'Address line 2': 'Adresna linija 2',
+  City: 'Grad',
+  'ZIP/Postal Code': 'Poštanski broj',
+  Country: 'Država',
+  'State/Province/Region': 'Država/Provincija/Region',
+  'Different billing address': 'Drugačija adresa za obračun',
+  'Billing address': 'Adresa za naplatu',
+  'Send invoice via different address': 'Pošaljite fakturu preko druge adrese',
+  'Send invoice via': 'Pošaljite fakturu preko',
+  'No Contact Persons. Do you want to add someone?':
+    'Nema kontakt osoba. Da li želite da dodate nekoga?',
+  'Contact person': 'Kontakt osoba',
+  'Customer created successfully': 'Klijen je uspješno kreiran',
+  'DIFFERENT BILLING ADDRESS': 'RAZLIČITA ADRESA ZA FAKULTET',
+  'SEND INVOICE VIA ADDRESS': 'POŠALJITE FAKTURU PREKO ADRESE',
+  'VAT/TAX NUMBER': 'PDV/PORESKI BROJ',
+  'Do you want to delete {{customerName}} from the contact persons list?':
+    'Da li želite da izbrišete {{customerName}} sa liste kontakt osoba?',
 
   // Toast
   'Uh oh! As a Property Manager, please login at':

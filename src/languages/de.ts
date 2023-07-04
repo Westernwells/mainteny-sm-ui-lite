@@ -902,6 +902,36 @@ export const de = {
   'Add Articles & Spare part': 'Artikel hinzufügen',
   'Customer {{customerName}} updated successfully!':
     'Änderung an Kunde {{customerName}} erfolgreich übernommen',
+  'Add basic information': 'Allgemeine Informationen hinzufügen',
+  'Address information': 'Adressinformationen',
+  'Add contact persons': 'Kontaktpersonen hinzufügen',
+  'Cancel your progress?': 'Vorgang abbrechen?',
+  'Are you sure you want to cancel your progress in creating a new customer?':
+    'Sind Sie sicher, dass Sie den Vorgang abbrechen möchten?',
+  'Cancel creation': 'Vorgang abbrechen',
+  'Customer Name is required': 'Kundenname ist erforderlich',
+  'Phone number is not valid': 'Telefonnummer ist nicht gültig',
+  'Postal address': 'Postanschrift',
+  'Address line 1': 'Adresszeile 1',
+  'Address line 2': 'Adresszeile 2',
+  City: 'Stadt',
+  'ZIP/Postal Code': 'Postleitzahl',
+  Country: 'Land',
+  'State/Province/Region': 'Bundesland/Provinz/Region',
+  'Different billing address': 'Abweichende Rechnungsadresse',
+  'Billing address': 'Rechnungsadresse',
+  'Send invoice via different address':
+    'Rechnung über eine andere Adresse senden',
+  'Send invoice via': 'Rechnung senden über',
+  'No Contact Persons. Do you want to add someone?':
+    'Keine Kontaktpersonen. Möchten Sie jemanden hinzufügen?',
+  'Contact person': 'Kontaktperson',
+  'Customer created successfully': 'Kunde erfolgreich angelegt',
+  'DIFFERENT BILLING ADDRESS': 'ABWEICHENDE RECHNUNGSADRESSE',
+  'SEND INVOICE VIA ADDRESS': 'RECHNUNG ÜBER ADRESSE SENDEN',
+  'VAT/TAX NUMBER': 'VAT/TAX NUMBER',
+  'Do you want to delete {{customerName}} from the contact persons list?':
+    'Möchten Sie {{customerName}} aus der Liste der Ansprechpartner löschen?',
 
   // Toast
   'Uh oh! As a Property Manager, please login at':

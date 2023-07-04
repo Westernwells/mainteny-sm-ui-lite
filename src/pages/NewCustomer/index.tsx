@@ -29,7 +29,7 @@ const phoneValidationRE =
   /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
 const validationSchemaBasicInfo = Yup.object().shape({
-  name: Yup.string().required('Csutomer Name is required'),
+  name: Yup.string().required('Customer Name is required'),
   email: Yup.string().email('Enter a valid email'),
   billingEmail: Yup.string().email('Enter a valid email'),
   phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),

@@ -296,7 +296,12 @@ export const ContactsWidget = ({customerId}: Props) => {
         onConfirm={() => onDelete()}
         onClose={() => setOpenCancelConfirm(false)}
         title="Delete"
-        content={`Do you want to delete ${activeContact?.userAccount.firstName} ${activeContact?.userAccount.lastName} from the contact persons list?`}
+        content={t(
+          'Do you want to delete {{customerName}} from the contact persons list?',
+          {
+            customerName: `${activeContact?.userAccount.firstName} ${activeContact?.userAccount.lastName}`,
+          },
+        )}
       />
     </Box>
   );
