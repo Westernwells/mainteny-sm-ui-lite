@@ -1077,7 +1077,7 @@ export const de = {
   'DATE FORMAT': 'DATUMSFORMAT',
   'TIME FORMAT': 'ZEITFORMAT',
   'TIME ZONE': 'ZEITZONE',
-  'MANAGING DIRECTOR': 'GESCHÄFTSFÜHRERIN',
+  'MANAGING DIRECTOR': 'Geschäftsfüher:in'.toUpperCase(),
   'ARBITRATION COURT': 'REGISTERGERICHT',
   'TRADE REGISTER NUMBER': 'HANDELSREGISTERNUMMER',
   IBAN: 'IBAN',
@@ -1375,4 +1375,7 @@ export const de = {
   'Europe/London': 'Europa/London',
   English: 'Englisch',
   'Add New': 'Artikel hinzufügen',
+  'Invitation sent': 'Einladung versendet',
+  'Search by number, customer, status etc.':
+    'Suche nach Nummer, Kunde, Status usw.',
 };

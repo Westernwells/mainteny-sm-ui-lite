@@ -1345,4 +1345,7 @@ export const sr = {
   'Europe/London': 'Evropa/London',
   English: 'Engleski jezik',
   'Add New': 'Dodaj novi',
+  'Invitation sent': 'Pozivnica poslana',
+  'Search by number, customer, status etc.':
+    'Pretražujte po broju, kupcu, statusu itd.',
 };
