@@ -37,7 +37,7 @@ export const ChecklistPreview = ({checklist}: Props) => {
             props={{
               label: t('Checklist name'),
               variant: 'outlined',
-              value: t(`${checklist.name}`),
+              value: `${checklist.name}`,
               disabled: true,
               sx: {
                 '& .MuiInputBase-input.Mui-disabled': {
@@ -58,7 +58,7 @@ export const ChecklistPreview = ({checklist}: Props) => {
           p={4}
           mb={2}
           bgcolor={theme.palette.inputBackground.main}>
-          <Typography variant="h6">{t(category.name)}</Typography>
+          <Typography variant="h6">{category.name}</Typography>
           <Box pt={1.8}>
             {category.questions.map((item, questionIndex) => (
               <Typography key={item.id} variant="body1" py={0.5}>
@@ -76,7 +76,7 @@ export const ChecklistPreview = ({checklist}: Props) => {
       <Grid container pt={2}>
         {options.map((option) => (
           <Grid item xs={12} key={option.id}>
-            <FormCheckbox checked={false} label={t(option.text)} />
+            <FormCheckbox checked={false} label={option.text} />
           </Grid>
         ))}
       </Grid>
