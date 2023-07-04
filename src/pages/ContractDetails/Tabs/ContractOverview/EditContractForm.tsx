@@ -280,8 +280,9 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
       <Grid item md={6}>
         <DatePicker
           defaultDate={
-            formik.values.firstMaintenance &&
-            toDate(formik.values.firstInvoiceDate)
+            formik.values.firstInvoiceDate
+              ? toDate(formik.values.firstInvoiceDate)
+              : null
           }
           containerStyles={{mr: '1em', width: '100%'}}
           getSelectedDate={(date) => {
