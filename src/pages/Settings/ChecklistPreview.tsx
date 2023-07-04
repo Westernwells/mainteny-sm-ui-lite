@@ -37,7 +37,7 @@ export const ChecklistPreview = ({checklist}: Props) => {
             props={{
               label: t('Checklist name'),
               variant: 'outlined',
-              value: checklist.name,
+              value: `${checklist.name}`,
               disabled: true,
               sx: {
                 '& .MuiInputBase-input.Mui-disabled': {

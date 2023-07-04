@@ -1097,6 +1097,14 @@ export const sr = {
   Checklist: 'Kontrolna lista',
   'No checklist yet.': 'Još nema kontrolne liste.',
   'Order Details': 'Detalji narudžbe',
+  'Task 1': 'Zadatak 1',
+  'Checklist name': 'Ime kontrolne liste',
+  'New Category': 'Nova Kategorija',
+  'New Task': 'Novi zadatak',
+  'Option per task': 'Opcija po zadatku',
+  'New Option': 'Nova opcija',
+  'My Service': 'Moja služba',
+  'My Checklist': 'Moja kontrolna lista',
 
   //  Notifications
   Notifications: 'Obavještenja',
@@ -1151,7 +1159,7 @@ export const sr = {
   'Revoke Access': 'Opozovi pristup',
   'Create Service Order': 'Stvori servisni nalog',
   'Service Information': 'Servisne informacije',
-  'No options': 'No options',
+  'No options': 'Nema opcija',
   'Address is required': 'Adresa je obavezna',
   'Category is required': 'Kategorija je obavezna',
   'Unit type is required': 'Potrebna je vrsta jedinice',
