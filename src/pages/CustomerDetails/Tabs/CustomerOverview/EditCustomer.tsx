@@ -3,7 +3,7 @@ import * as Yup from 'yup';
 
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useCustomer} from 'hooks/reactQuery/useCustomers';
-import {formatPhoneNumber} from 'utils/customer-utils';
+import {phoneNumberDigitsOnly} from 'utils/customer-utils';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {CustomerEditForm} from './EditCustomerForm/model';
@@ -38,7 +38,7 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
   const initialValues: CustomerEditForm = {
     name: customer.name,
     phone: customer.contact.phone
-      ? formatPhoneNumber(customer.contact.phone)
+      ? phoneNumberDigitsOnly(customer.contact.phone)
       : '',
     url: customer.contact.url,
     email: customer.contact.email,
@@ -46,7 +46,7 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
     costCenter: customer.additionalInfo.costCenter,
     registrationDate: customer.additionalInfo.registrationDate,
     secondaryPhoneNumber: customer.additionalInfo.secondaryPhoneNumber
-      ? formatPhoneNumber(customer.additionalInfo.secondaryPhoneNumber)
+      ? phoneNumberDigitsOnly(customer.additionalInfo.secondaryPhoneNumber)
       : '',
     postalAddress: customer.postalAddress ? customer.postalAddress : null,
     billingAddress: customer.billingAddress ? customer.billingAddress : null,

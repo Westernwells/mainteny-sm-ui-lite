@@ -3,6 +3,9 @@ import {CustomerEditForm} from 'pages/CustomerDetails/Tabs/CustomerOverview/Edit
 export const formatPhoneNumber = (phoneNumber: string) =>
   `+${phoneNumber.replaceAll('+', '')}`;
 
+export const phoneNumberDigitsOnly = (phoneNumber: string) =>
+  phoneNumber.replace(/[^\d]/g, '');
+
 export const formatUpdateCustomer = (data: CustomerEditForm) => ({
   billingAddress: data.billingAddress,
   businessAddress: data.businessAddress,
