@@ -1375,4 +1375,5 @@ export const de = {
   'Europe/London': 'Europa/London',
   English: 'Englisch',
   'Add New': 'Artikel hinzufügen',
+  'Invitation sent': 'Einladung versendet',
 };

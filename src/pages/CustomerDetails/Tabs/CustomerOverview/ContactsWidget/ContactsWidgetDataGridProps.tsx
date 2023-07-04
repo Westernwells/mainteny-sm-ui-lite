@@ -137,14 +137,14 @@ export const columns = (
         case ContactsStatus.PENDING:
           return (
             <StatusChip
-              label="Pending"
+              label="Invitation sent"
               style={{background: theme.palette.primary.main}}
             />
           );
         default:
           return (
             <StatusChip
-              label="Invitation sent"
+              label="Inactive"
               style={{background: theme.palette.text.secondary}}
             />
           );
