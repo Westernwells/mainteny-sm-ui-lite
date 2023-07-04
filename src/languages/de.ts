@@ -1376,4 +1376,6 @@ export const de = {
   English: 'Englisch',
   'Add New': 'Artikel hinzufügen',
   'Invitation sent': 'Einladung versendet',
+  'Search by number, customer, status etc.':
+    'Suche nach Nummer, Kunde, Status usw.',
 };
