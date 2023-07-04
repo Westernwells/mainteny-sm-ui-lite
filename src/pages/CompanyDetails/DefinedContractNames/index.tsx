@@ -29,7 +29,7 @@ const validationSchema = Yup.object().shape({
 
 export const DefinedContractNames = ({company, containerStyles}: Props) => {
   const {t} = useTranslation();
-  const rows = useMemo(() => makeRows(company), [company]);
+  const rows = useMemo(() => makeRows(company), [company, t]);
   const [openDialog, setOpenDialog] = useState(false);
 
   const {mutateAsync: updateCompany} = useUpdateCompany(
