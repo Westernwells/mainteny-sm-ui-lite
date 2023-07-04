@@ -106,6 +106,7 @@ export const CustomerPricesForm = ({
     onSubmit: (formikValues, formikHelpers) => {
       const valuesWithPenniesAmount = {
         ...formikValues,
+        unit: formikValues?.unit ?? '',
         unitPurchaseAmount: amountRecordForBackend(
           formikValues.unitPurchaseAmount,
         ),
@@ -225,6 +226,7 @@ export const CustomerPricesForm = ({
               label: 'Unit',
               placeholder: 'Select Unit',
               error: !!(touched.unit && errors.unit),
+              ...defaultProps,
             }}
           />
         </Grid>
