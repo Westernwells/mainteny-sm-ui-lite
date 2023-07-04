@@ -173,6 +173,7 @@ export const de = {
   'Clear filter': 'Filter löschen',
   'Customer ': 'Kunde',
   No: 'Nein',
+  'No.': 'Pos',
   No_number: 'No',
   'This week': 'Diese Woche',
   'Next week': 'Nächste Woche',
@@ -455,6 +456,9 @@ export const de = {
   'Technician is required': 'Techniker ist notwendig',
   'Order Article': 'Artikel bestellen',
   'SUPPLIER NO.': 'Lieferantnummer',
+  'Reschedule Order': 'Auftrag umplanen',
+  'Do you want to cancel the order?':
+    'Möchten Sie den Auftrag wirklich abbrechen?',
 
   // Add new unit
   Customer: 'Kunde',
@@ -527,7 +531,7 @@ export const de = {
   'Garage Door': 'Garagentor',
   'Boarding Bridge': 'Fluggastbrücke',
   'Facade Access System': 'Fassadenbefahrsystem',
-  Others: 'Sonstiges',
+  Others: 'Andere',
   'Last Visit': 'Letzter Besuch',
   'Last Inspection': 'Letzte Inspektion',
   'Visits per Year': 'Wartung pro Jahr',
@@ -538,7 +542,7 @@ export const de = {
   'Appointment Preferences': 'Terminpräferenz',
   'Days of the week': 'Wochentage',
   'Opening Hour': 'Öffnungszeiten',
-  'Closing Hour': 'Sperrstunde',
+  'Closing Hour': 'Schließzeiten',
   'Requires Notification': 'Benachrichtigung Erforderlich',
   'Notification Due': 'Benachrichtigung Fällig',
   'E.g. 5 days': 'z.B. 5 Tage',
@@ -719,6 +723,7 @@ export const de = {
   'Selected technician': 'Ausgewählter Techniker',
   'Description (Optional)': 'Beschreibung (fakultativ)',
   'Select date, time & technicians': 'Wähle: Datum, Uhrzeit und Techniker',
+  'Date, time & technicians': 'Datum, Uhrzeit und Techniker',
   'Select date': 'Datum auswählen',
   Print: 'Drucken',
   'Mark as rejected': 'Als abgelehnt markieren',
@@ -817,7 +822,7 @@ export const de = {
   'No quotations have been created yet. Please click the button below to create one!':
     'Es sind noch keine Angebote erstellt worden. Bitte klicken Sie auf die Schaltfläche unten, um ein Angebot zu erstellen!',
   'Add Quotation': 'Angebot hinzufügen',
-  'Select Unit': 'Einheit wählen',
+  'Select Unit': 'Anlage wählen',
   Duplicate: 'Duplizieren',
   'Quotation Details': 'Angebotsdetails',
   Orders: 'Aufträge',
@@ -874,7 +879,7 @@ export const de = {
   'CUSTOMER NUMBER': 'Kundennummer',
   'BILLING EMAIL ADDRESS': 'RECHNUNGS-EMAIL-ADRESSE',
   'Billing Email Address': 'Rechnungs-E-Mail-Adresse',
-  'Do you want to delete this customer?': 'Möchten Sie diese Kunde löschen?',
+  'Do you want to delete this customer?': 'Möchten Sie diesen Kunden löschen?',
   'COST CENTER': 'KOSTENSTELLE',
   'Cost Center': 'Kostenstelle',
   'Custom prices': 'Kundenspezifische Preise',
@@ -958,15 +963,15 @@ export const de = {
     'Die Einheitendetails wurden erfolgreich aktualisiert',
   'Technicians updated successfully':
     'Der Techniker wurden erfolgreich aktualisiert',
-  'Unit created successfully': 'Die Einheit wurde erfolgreich erstellt',
+  'Unit created successfully': 'Die Anlage wurde erfolgreich erstellt',
   'Service order rescheduled successfully':
     'Der Serviceauftrag wurde erfolgreich umgeplant',
   'Service order scheduled successfully':
     'Der Serviceauftrag wurde erfolgreich geplant',
   'Emergency order created successfully':
     'Der Notfallauftrag wurde erfolgreich erstellt',
-  'Order created successfully': 'Die Bestellung wurde erfolgreich erstellt',
-  'Order scheduled successfully': 'Die Bestellung wurde erfolgreich geplant',
+  'Order created successfully': 'Der Auftrag wurde erfolgreich erstellt',
+  'Order scheduled successfully': 'Der Auftrag wurde erfolgreich geplant',
   'QR code image uploaded successfully':
     'QR-Code wurde erfolgreich hochgeladen',
   'Customer deleted successfully': 'Kunde wurden erfolgreich gelöscht',
@@ -978,8 +983,8 @@ export const de = {
     'Es wurden noch keine Informationen eingetragen. Diese werden hier angezeigt, sobald sie hinzugefügt wurden.',
   'There are no entires for the applied filters.':
     'Für die angewendeten Filter sind keine Einträge vorhanden.',
-  // "Sorry, we couldn't find any ${placeholder} that matches the search text. If you like to add a new ${placeholder}, please click the button below.":
-  //   'Entschuldigung, wir konnten für Ihre Suche keine Informationen finden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
+  "Sorry, we couldn't find any {{placeholderText}} that matches the search text. For adding a new {{placeholderText}}, please click the button below":
+    'Entschuldigung, wir konnten keinen passenden {{placeholderText}} zu Ihrer Suche finden. Um einen neuen {{placeholderText}} hinzuzufügen, klicken Sie bitte auf die nachfolgende Schaltfläche',
   // 'No ${placeholder} yet. Please click the button below to add.':
   //   'Keine Informationen vorhanden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
   'Please click the button below to add.':
@@ -1187,7 +1192,7 @@ export const de = {
   'No options': 'Keine Vorschläge',
   'Address is required': 'Adresse ist erforderlich',
   'Category is required': 'Kategorie ist erforderlich',
-  'Unit type is required': 'Einheitstyp ist erforderlich',
+  'Unit type is required': 'Anlagentyp ist erforderlich',
   'Last visit is required': 'Letzter Besuch ist erforderlich',
   'Service time is required': 'Dienstzeit ist erforderlich',
   'No. of technicians is required': 'Anzahl der Techniker ist erforderlich',
@@ -1259,7 +1264,7 @@ export const de = {
   'Facility Manager': 'Facility Manager',
   'Contact Person': 'Kontaktperson',
   'Asset Owner': 'Eigentümer',
-  'Add units': 'Einheiten hinzufügen',
+  'Add units': 'Anlage hinzufügen',
   'Contact invited successfully': 'Kontakt erfolgreich eingeladen',
   'Invoice created': 'Rechnung erstellt',
   'Invoice updated': 'Rechnung aktualisiert',
@@ -1269,6 +1274,8 @@ export const de = {
   'Overdue notice sent': 'Mahnung gesendet',
   'Invoice paid': 'Rechnung beglichen',
   'Invoice expired': 'Rechnung abgelaufen',
+  'The invoice was overdue': 'Die Rechnung war überfällig',
+  'Invoice overdue': 'Überfällige Rechnung',
   'Payment received': 'Zahlung erhalten',
   'Payment updated': 'Zahlung aktualisiert',
   'Payment deleted': 'Zahlung gelöscht',
@@ -1286,7 +1293,7 @@ export const de = {
   'FIRST MAINTENANCE VISIT': 'ERSTE WARTUNG',
   'FIRST INVOICE': 'ERSTE RECHNUNG',
   'Invoice cycle is required': 'Rechnungszyklus ist erforderlich',
-  'INVOICE CYCLE': 'RECHNUNHSZYKLUS',
+  'INVOICE CYCLE': 'RechnunGszyklus'.toUpperCase(),
   'The invoice cycle should not be "After each visit" for Non-maintenance contract':
     'Der Rechnungszyklus sollte bei Sonstigen Verträgen nicht "nach jedem Besuch" sein.',
   'Visit number is required': 'Anzahl an Wartungen ist erforderlich',
@@ -1359,4 +1366,13 @@ export const de = {
   'Report downloaded successfully!': 'Bericht erfolgreich heruntergeladen!',
   'Max time range exceeded, the max time range is 90 days':
     'Maximale Zeitspanne überschritten, die maximale Zeitspanne beträgt 90 Tage',
+  'Total Payable': 'Gesamtbetrag',
+  German: 'Deutsch',
+  Europe: 'Europa',
+  'Europe/Berlin': 'Europa/Berlin',
+  'Europe/Belfast': 'Europa/Belfast',
+  'Europe/Dublin': 'Europa/Dublin',
+  'Europe/London': 'Europa/London',
+  English: 'Englisch',
+  'Add New': 'Artikel hinzufügen',
 };

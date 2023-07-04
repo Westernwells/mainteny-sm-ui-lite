@@ -104,8 +104,8 @@ export const UnitMapsView = () => {
       if (currentTotal >= elevatorResponse.total) {
         const latLng = elevatorView.elevator.data.map(
           (elevator: ElevatorView) => ({
-            latitude: elevator.address.location.latitude,
-            longitude: elevator.address.location.longitude,
+            latitude: elevator.address.location?.latitude ?? 0.0,
+            longitude: elevator.address.location?.longitude ?? 0.0,
           }),
         );
 
@@ -135,8 +135,8 @@ export const UnitMapsView = () => {
       geometry: {
         type: 'Point',
         coordinates: [
-          elevator.address.location.longitude,
-          elevator.address.location.latitude,
+          elevator.address.location?.longitude ?? 0.0,
+          elevator.address.location?.latitude ?? 0.0,
         ],
       },
     }));

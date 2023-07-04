@@ -4,6 +4,7 @@ import {
   GridRowsProp,
 } from '@mui/x-data-grid';
 import {useTranslation} from 'react-i18next';
+import i18next from 'i18next';
 import Typography from '@mui/material/Typography';
 import {getColumnProps} from 'components/DataGridLayout';
 import {ServiceCompanyItem} from 'models/service-company';
@@ -54,7 +55,7 @@ export const makeRows = (company: ServiceCompanyItem): GridRowsProp =>
     ? company.settings.contractNameTypes.map((item: ContractNameTypes) => ({
         id: item.name,
         contractName: item.name,
-        contractType: contractTypeMap[item.type],
+        contractType: i18next.t(contractTypeMap[item.type]),
         companyId: company.id,
         contractNameTypes: company.settings.contractNameTypes,
         contractNameType: item,

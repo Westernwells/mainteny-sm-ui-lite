@@ -33,6 +33,7 @@ import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {Tooltip} from 'components/Tooltip';
 import {InfoCard} from 'components/InfoCard';
 import {EmptySection} from 'components/EmptySection';
+import {ContractPaymentTermSelectDialog} from 'components/ContractPaymentTermSelectModal';
 import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
@@ -125,6 +126,10 @@ export const InvoiceForm = ({
     useState(false);
   const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
     useState(false);
+  const [
+    openContractPaymentTermSelectDialog,
+    setOpenContractPaymentTermSelectDialog,
+  ] = useState(false);
   const [showCheckListTooltip, setShowCheckListTooltip] = useState(false);
   const [showWorkReportTooltip, setShowWorlReportTooltip] = useState(false);
   const [isInvoicePDFGenerated] = useState(
@@ -539,7 +544,7 @@ export const InvoiceForm = ({
                     customer && (
                       <>
                         <Typography variant="caption">
-                          {customer.postalAddress.fullName}
+                          {customer.postalAddress?.fullName ?? '-'}
                         </Typography>
                         <Typography variant="caption" component="p">
                           {customer.contact.phone}
@@ -849,7 +854,7 @@ export const InvoiceForm = ({
                 border: '1px solid #E4E9F2',
               }}
               headerActionIcon={<EditIcon />}
-              handleAction={() => setOpenContractPaymentTermsDialog(true)}
+              handleAction={() => setOpenContractPaymentTermSelectDialog(true)}
               showHeaderBackground
               header={
                 <Typography variant="subtitle1">
@@ -958,12 +963,23 @@ export const InvoiceForm = ({
         onConfirm={onPrintInvoice}
         onClose={() => setIsConfirmPrintDialogOpen(false)}
       />
-      <ContractPaymentTermsDialog
-        title={t('Choose your payment term')}
-        open={openContractPaymentTermsDialog}
+
+      <ContractPaymentTermSelectDialog
+        title={t('Payment Terms')}
+        alertText={t('Choose a payment term to be used on your invoice')}
+        open={openContractPaymentTermSelectDialog}
         onSave={handleContractPaymentTermsModal}
+        onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
+        onClickPaymentTerms={() => setOpenContractPaymentTermsDialog(true)}
+      />
+
+      <ContractPaymentTermsDialog
+        title={t('Manage payment terms')}
+        alertText={t(
+          'Add your payment terms that would be used later in invoicing',
+        )}
+        open={openContractPaymentTermsDialog}
         onCancel={() => setOpenContractPaymentTermsDialog(false)}
-        paymentTerms={formik.values.paymentTerms}
       />
     </Box>
   );

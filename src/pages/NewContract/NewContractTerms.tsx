@@ -1,6 +1,5 @@
 import {useTranslation} from 'react-i18next';
 import {Grid, InputAdornment} from '@mui/material';
-import {ArrowDropDown} from '@mui/icons-material';
 import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
@@ -11,10 +10,14 @@ import {invoiceCycle} from 'utils/contract-utils';
 import {DatePicker} from 'components/DatePicker';
 import {format, getMonth, getYear} from 'date-fns';
 import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
+import {useQueryContractPaymentTerms} from 'hooks/reactQuery/useCompanies';
+import {createEmptyResource} from 'utils/paging-utils';
 
 interface Props {
   formik: FormikProps<ContractTermsFormModal>;
 }
+
+const pageSize = 50;
 
 const NewContractTerms: FC<Props> = ({formik}) => {
   const {t} = useTranslation();
@@ -22,10 +25,14 @@ const NewContractTerms: FC<Props> = ({formik}) => {
   const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
     useState(false);
 
-  const handleContractPaymentTermsModal = (paymentTerms: string) => {
-    formik.setFieldValue('paymentTerms', paymentTerms);
-    setOpenContractPaymentTermsDialog(false);
-  };
+  const {data: contractPaymentTerms = createEmptyResource(pageSize)} =
+    useQueryContractPaymentTerms({
+      page: {
+        pageIndex: 0,
+        pageSize,
+      },
+      query: '',
+    });
 
   return (
     <Grid container spacing={2}>
@@ -311,44 +318,38 @@ const NewContractTerms: FC<Props> = ({formik}) => {
       </Grid>
 
       <Grid item md={4}>
-        <FormInput
-          props={{
-            label: 'Payment terms',
-            name: 'paymentTerms',
-            placeholder: 'Choose your payment term',
-            value: formik.values.paymentTerms ? t('Choosed') : '',
-            error: !!(
-              formik.touched.paymentTerms && formik.errors.paymentTerms
-            ),
-            onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
-            onClick: () => setOpenContractPaymentTermsDialog(true),
-            disabled: true,
-            InputProps: {
-              endAdornment: (
-                <InputAdornment position="end" color="text.primary">
-                  <ArrowDropDown />
-                </InputAdornment>
+        {contractPaymentTerms?.data && (
+          <FormSelect
+            labelId="Payment terms"
+            label={t('Payment terms')}
+            options={contractPaymentTerms?.data?.map(({term}) => ({
+              label: term,
+              value: term,
+            }))}
+            selectProps={{
+              id: 'paymentTerms',
+              value: formik.values.paymentTerms
+                ? formik.values.paymentTerms
+                : undefined,
+              onChange: formik.handleChange,
+              name: 'paymentTerms',
+              placeholder: t('Choose your payment term'),
+              error: !!(
+                formik.touched.paymentTerms && formik.errors.paymentTerms
               ),
-            },
-            inputProps: {
-              sx: {
-                cursor: 'pointer',
-                '&::placeholder': {
-                  opacity: 1,
-                },
-              },
-            },
-          }}
-        />
+            }}
+            onClickPaymentTerms={() => setOpenContractPaymentTermsDialog(true)}
+          />
+        )}
       </Grid>
 
       <ContractPaymentTermsDialog
-        title={t('Choose your payment term')}
+        title={t('Manage payment terms')}
+        alertText={t(
+          'Add your payment terms that would be used later in invoicing',
+        )}
         open={openContractPaymentTermsDialog}
-        onSave={handleContractPaymentTermsModal}
-        onCancel={() => handleContractPaymentTermsModal('')}
-        paymentTerms={formik.values.paymentTerms}
+        onCancel={() => setOpenContractPaymentTermsDialog(false)}
       />
     </Grid>
   );

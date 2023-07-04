@@ -115,16 +115,7 @@ export const UserTable = ({companyId}: Props) => {
             type: shift.type,
           }))
         : [],
-      address: item.userData.address
-        ? {
-            fullName: item.userData.address.fullName,
-            countryCode: item.userData.address.countryCode,
-            location: {
-              longitude: item.userData.address.location.longitude,
-              latitude: item.userData.address.location.latitude,
-            },
-          }
-        : null,
+      address: item.userData.address ? item.userData.address : null,
     });
     setTypeAction('edit');
     setActiveUser(item);

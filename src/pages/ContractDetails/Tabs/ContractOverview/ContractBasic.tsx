@@ -139,10 +139,10 @@ export const ContractBasic = ({
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3rem"
             bodyText={
-              renewalPeriod
-                ? renewalPeriod > 1
-                  ? t('{{time}} months', {time: renewalPeriod})
-                  : t('{{hours}} month', {hours: renewalPeriod})
+              renewalPeriod && renewalPeriod > 1
+                ? t('{{time}} months', {time: renewalPeriod})
+                : renewalPeriod && renewalPeriod === 1
+                ? t('{{hours}} month', {hours: renewalPeriod})
                 : '0'
             }
           />
@@ -178,7 +178,13 @@ export const ContractBasic = ({
             containerStyles={{mr: '0.5em'}}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3rem"
-            bodyText={paymentDue ? `${paymentDue} days` : '-'}
+            bodyText={
+              paymentDue && paymentDue > 1
+                ? t('{{time}} days', {time: paymentDue})
+                : paymentDue && paymentDue === 1
+                ? t('{{time}} day', {time: paymentDue})
+                : !paymentDue && '-'
+            }
           />
         </Grid>
 
@@ -202,7 +208,13 @@ export const ContractBasic = ({
             containerStyles={{mr: '0.5em'}}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3rem"
-            bodyText={noticePreiod ? `${noticePreiod} months` : '-'}
+            bodyText={
+              noticePreiod && noticePreiod > 1
+                ? t('{{time}} months', {time: noticePreiod})
+                : noticePreiod && noticePreiod === 1
+                ? t('{{hours}} month', {hours: noticePreiod})
+                : !noticePreiod && '-'
+            }
           />
         </Grid>
 

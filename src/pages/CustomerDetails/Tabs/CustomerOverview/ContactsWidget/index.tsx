@@ -2,6 +2,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Box, Typography} from '@mui/material';
 import {GridRowsProp} from '@mui/x-data-grid';
+import Add from '@mui/icons-material/Add';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 
@@ -217,7 +218,14 @@ export const ContactsWidget = ({customerId}: Props) => {
         headerStyles={{mt: '0.5em'}}
         handleAction={onCreateContact}
         headerActionIcon={
-          <Typography color="info.main">{t('+ Add')}</Typography>
+          <Typography
+            color="primary.main"
+            display="flex"
+            alignItems="center"
+            gap={1}>
+            <Add fontSize="small" />
+            {t('Contact Person')}
+          </Typography>
         }
         showHeaderBackground>
         <DataGridLayout
@@ -233,8 +241,11 @@ export const ContactsWidget = ({customerId}: Props) => {
             <EmptySection
               illustration="clipboard"
               size="tiny"
-              containerStyle={{my: 'auto'}}
-              label="No contact persons yet. They will appear here once added!"
+              containerStyle={{my: '6rem'}}
+              label="No Contact Persons. Do you want to add someone?"
+              showActionBtn
+              btnLabel="Contact person"
+              btnAction={onCreateContact}
             />
           }
           isWidget
@@ -275,7 +286,7 @@ export const ContactsWidget = ({customerId}: Props) => {
         }}
         onSave={typeAction === 'edit' ? updateCurrentContact : saveNewContact}
         dialogProps={{
-          maxWidth: 'md',
+          maxWidth: 'sm',
           open: openDialog || false,
         }}>
         <EditContactForm formik={formik} />

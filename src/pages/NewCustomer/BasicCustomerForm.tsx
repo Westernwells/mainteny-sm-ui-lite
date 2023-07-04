@@ -1,74 +1,19 @@
-import {useEffect} from 'react';
-import {FormikErrors, useFormik} from 'formik';
-import * as Yup from 'yup';
-import {Box} from '@mui/system';
+import {FormikProps} from 'formik';
+import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import {InputAdornment} from '@mui/material';
+import InputAdornment from '@mui/material/InputAdornment';
 import {Email, Phone} from '@mui/icons-material';
-
 import {PageCard} from 'components/PageCard';
-import {AddressAutoComplete} from 'components/AddressAutoComplete';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FormInput} from 'components/form/FormInput';
 import {DatePicker} from 'components/DatePicker';
-import {BasicCustomerFormModel} from './model';
+import {CustomerBasicInfoFormModel} from './model';
 
 interface Props {
-  getBasicCustomerFormErrors?: (
-    val: FormikErrors<BasicCustomerFormModel>,
-  ) => void;
-  getBasicCustomerFormValues?: (val: BasicCustomerFormModel) => void;
-  initialValues: BasicCustomerFormModel;
+  formik: FormikProps<CustomerBasicInfoFormModel>;
 }
 
-const phoneValidationRE =
-  /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
-
-const validationSchema = Yup.object().shape({
-  name: Yup.string().required('Name is required'),
-  email: Yup.string()
-    .email('Enter a valid email')
-    .required('Email is required'),
-  phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),
-  postalAddress: Yup.object().nullable().required('Postal Address is required'),
-  externalId: Yup.string().required('Customer number is required'),
-  billingAddress: Yup.object()
-    .nullable()
-    .required('Billing Address is required'),
-});
-
-export const BasicCustomerForm = ({
-  getBasicCustomerFormErrors,
-  getBasicCustomerFormValues,
-  initialValues,
-}: Props) => {
-  const formik = useFormik<BasicCustomerFormModel>({
-    initialValues: {
-      name: initialValues?.name || '',
-      phone: initialValues?.phone || '',
-      url: initialValues?.url || '',
-      email: initialValues?.email || '',
-      postalAddress: initialValues?.postalAddress || null,
-      billingAddress: initialValues?.billingAddress || null,
-      priority: initialValues?.priority || null,
-      externalId: initialValues?.externalId || '',
-      registrationDate: initialValues?.registrationDate || new Date(),
-      costCenter: initialValues.costCenter,
-    },
-    onSubmit: () => {},
-    validationSchema,
-  });
-
-  useEffect(() => {
-    if (getBasicCustomerFormErrors) {
-      getBasicCustomerFormErrors(formik.errors);
-    }
-
-    if (getBasicCustomerFormValues) {
-      getBasicCustomerFormValues(formik.values);
-    }
-  }, [formik]);
-
+export const BasicCustomerForm = ({formik}: Props) => {
   const defaultProps = {
     InputLabelProps: {shrink: true},
     onChange: formik.handleChange,
@@ -81,21 +26,18 @@ export const BasicCustomerForm = ({
       containerStyles={{flexGrow: 1}}
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
-        <Grid container spacing={2}>
+        <Grid container spacing={3}>
           <Grid item md={4}>
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'Blake',
-                label: 'Name',
+                placeholder: 'e.g Mainteny GmbH',
+                label: 'Customer Name',
                 name: 'name',
                 value: formik.values.name,
                 helperText: formik.touched.name && formik.errors.name,
                 error: !!formik.errors.name && formik.touched.name,
                 required: true,
-                sx: {
-                  mt: '0.5em',
-                },
                 ...defaultProps,
               }}
             />
@@ -110,16 +52,12 @@ export const BasicCustomerForm = ({
                 value: formik.values.email,
                 helperText: formik.touched.email && formik.errors.email,
                 error: !!formik.errors.email && formik.touched.email,
-                required: true,
                 InputProps: {
                   endAdornment: (
                     <InputAdornment position="end">
                       <Email />
                     </InputAdornment>
                   ),
-                },
-                sx: {
-                  mt: '0.5em',
                 },
                 ...defaultProps,
               }}
@@ -130,14 +68,13 @@ export const BasicCustomerForm = ({
               props={{
                 size: 'small',
                 placeholder: 'e.g johndoe@example.com',
-                label: 'Billing Email Address',
+                label: 'Billing email address',
                 name: 'billingEmail',
                 value: formik.values.billingEmail,
                 helperText:
                   formik.touched.billingEmail && formik.errors.billingEmail,
                 error:
                   !!formik.errors.billingEmail && formik.touched.billingEmail,
-                required: true,
                 InputProps: {
                   endAdornment: (
                     <InputAdornment position="end">
@@ -145,9 +82,6 @@ export const BasicCustomerForm = ({
                     </InputAdornment>
                   ),
                 },
-                sx: {
-                  mt: '0.5em',
-                },
                 ...defaultProps,
               }}
             />
@@ -156,70 +90,7 @@ export const BasicCustomerForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: 'Enter url',
-                label: 'Website / URL',
-                name: 'url',
-                value: formik.values.url,
-                helperText: formik.errors.url,
-                error: !!formik.errors.url,
-                sx: {
-                  mt: '0.5em',
-                },
-                ...defaultProps,
-              }}
-            />
-          </Grid>
-          <Grid item md={4}>
-            <Box marginTop="0.5em" width="100%">
-              <AddressAutoComplete
-                initialValue={formik.values.postalAddress?.fullName || ''}
-                inputError={
-                  formik.errors.postalAddress && formik.touched.postalAddress
-                    ? formik.errors.postalAddress
-                    : ''
-                }
-                handleBlur={formik.handleBlur}
-                textFieldProps={{
-                  name: 'postalAddress',
-                  onBlur: formik.handleBlur,
-                  placeholder: 'e.g. 34-36 Exmouth Market, London EC1R 4QE',
-                  required: true,
-                }}
-                label="Postal Address"
-                getAddress={(address) =>
-                  formik.setFieldValue('postalAddress', address)
-                }
-              />
-            </Box>
-          </Grid>
-          <Grid item md={4}>
-            <Box marginTop="0.5em" width="100%">
-              <AddressAutoComplete
-                initialValue={formik.values.billingAddress?.fullName || ''}
-                inputError={
-                  formik.errors.billingAddress && formik.touched.billingAddress
-                    ? formik.errors.billingAddress
-                    : ''
-                }
-                handleBlur={formik.handleBlur}
-                textFieldProps={{
-                  name: 'billingAddress',
-                  onBlur: formik.handleBlur,
-                  placeholder: 'e.g. 34-36 Exmouth Market, London EC1R 4QE',
-                  required: true,
-                }}
-                label="Billing Address"
-                getAddress={(address) =>
-                  formik.setFieldValue('billingAddress', address)
-                }
-              />
-            </Box>
-          </Grid>
-          <Grid item md={4}>
-            <FormInput
-              props={{
-                size: 'small',
-                placeholder: '49 17163 995801',
+                placeholder: 'e.g +34 12345678',
                 label: 'Phone',
                 name: 'phone',
                 value: formik.values.phone,
@@ -235,9 +106,6 @@ export const BasicCustomerForm = ({
                     </InputAdornment>
                   ),
                 },
-                sx: {
-                  mt: '0.5em',
-                },
                 ...defaultProps,
               }}
             />
@@ -246,7 +114,7 @@ export const BasicCustomerForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: '49 17163 995801',
+                placeholder: 'e.g +34 12345678',
                 label: '2nd Phone',
                 name: 'secondaryPhoneNumber',
                 value: formik.values.secondaryPhoneNumber,
@@ -262,9 +130,20 @@ export const BasicCustomerForm = ({
                     </InputAdornment>
                   ),
                 },
-                sx: {
-                  mt: '0.5em',
-                },
+                ...defaultProps,
+              }}
+            />
+          </Grid>
+          <Grid item md={4}>
+            <FormInput
+              props={{
+                size: 'small',
+                placeholder: 'e.g mainteny.com',
+                label: 'Website/URL',
+                name: 'url',
+                value: formik.values.url,
+                helperText: formik.errors.url,
+                error: !!formik.errors.url,
                 ...defaultProps,
               }}
             />
@@ -280,10 +159,6 @@ export const BasicCustomerForm = ({
                 helperText:
                   formik.touched.externalId && formik.errors.externalId,
                 error: !!formik.errors.externalId && formik.touched.externalId,
-                sx: {
-                  mt: '0.5em',
-                },
-                required: true,
                 ...defaultProps,
               }}
             />
@@ -297,9 +172,6 @@ export const BasicCustomerForm = ({
               textFieldProps={{
                 label: 'Customer Since',
                 placeholder: 'Select date',
-                sx: {
-                  mt: '0.5em',
-                },
                 ...defaultProps,
               }}
             />
@@ -308,15 +180,12 @@ export const BasicCustomerForm = ({
             <FormInput
               props={{
                 size: 'small',
-                placeholder: '49 17163 995801',
+                placeholder: 'e.g 000 000 000',
                 label: 'Cost Center',
                 name: 'costCenter',
                 value: formik.values.costCenter,
                 helperText: formik.errors.costCenter,
                 error: !!formik.errors.costCenter,
-                sx: {
-                  mt: '0.5em',
-                },
                 ...defaultProps,
               }}
             />
@@ -334,10 +203,23 @@ export const BasicCustomerForm = ({
                 }
                 disableClearBtn
                 multiple={false}
-                containerStyles={{marginTop: '0.5em', width: '100%'}}
+                containerStyles={{width: '100%'}}
                 formControlStyles={{width: '100%'}}
               />
             </Box>
+          </Grid>
+          <Grid item md={4}>
+            <FormInput
+              props={{
+                size: 'small',
+                label: 'VAT/Tax number',
+                name: 'taxNumber',
+                value: formik.values.taxNumber,
+                helperText: formik.touched.taxNumber && formik.errors.taxNumber,
+                error: !!formik.errors.taxNumber && formik.touched.taxNumber,
+                ...defaultProps,
+              }}
+            />
           </Grid>
         </Grid>
       </Box>

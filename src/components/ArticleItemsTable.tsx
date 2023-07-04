@@ -371,7 +371,7 @@ export const ArticleItemsTable = ({
         placeItems: 'center start',
         gap: '.5em',
       }}>
-      <FormLabel text="No" />
+      <FormLabel text="No." />
       <FormLabel text="Article Name" sx={{justifySelf: 'start'}} />
       <Box>
         <FormLabel text="Total Payable" sx={{display: 'block'}} />

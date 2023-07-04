@@ -10,7 +10,7 @@ export const columns: GridColDef[] = [
     field: 'number',
     headerName: 'number',
     align: 'center',
-    flex: 0,
+    flex: 1.25,
   }),
   getColumnProps({
     field: 'customer',
@@ -21,7 +21,7 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'units',
     headerName: 'no. of units',
-    align: 'right',
+    align: 'center',
   }),
   getColumnProps({
     field: 'start',

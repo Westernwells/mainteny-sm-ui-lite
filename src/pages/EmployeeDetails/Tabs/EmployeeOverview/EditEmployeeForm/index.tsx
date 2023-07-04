@@ -117,7 +117,6 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                     },
                     helperText: touched.phone && errors.phone,
                     error: !!errors.phone && touched.phone,
-                    required: true,
                   },
                 ].map((item, index) => (
                   <FormInput
