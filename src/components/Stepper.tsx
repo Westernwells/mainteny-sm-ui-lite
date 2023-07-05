@@ -84,10 +84,7 @@ export const Stepper = ({
         <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
           <Box sx={{display: 'flex', flexDirection: 'row', pt: 2}}>
             <Button
-              onClick={() => {
-                setActiveStep(0);
-                handleCancel();
-              }}
+              onClick={() => handleCancel()}
               sx={{mr: '1.5em', color: theme.palette.text.secondary}}
               size="large"
               variant="text">
