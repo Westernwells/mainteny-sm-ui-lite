@@ -259,7 +259,7 @@ export const AddBasicInfoForm = ({
         }))}
         selectProps={{
           id: 'type',
-          value: formik.values.type ?? formik.values.type,
+          value: formik.values.type,
           onChange: formik.handleChange,
           name: 'type',
           placeholder: t('e.g. Select type'),
