@@ -30,75 +30,80 @@ export const Maintenance = ({serviceReport}: Props) => {
           borderColor="grey.300"
           borderRadius="4px"
           p=".5em">
-          <Box
-            px="1em"
-            py=".75em"
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: '8ch 1fr 4fr',
-              placeItems: 'start',
-              gap: '.5em',
-            }}>
-            <FormLabel text="" />
-            <FormLabel text="Date" sx={{justifySelf: 'start'}} />
-            <FormLabel text="Time" />
-          </Box>
-          <Box
-            bgcolor="grey.50"
-            boxShadow="0px 4px 15px 0px #90909033"
-            px=".5em">
-            {[
-              {
-                label: t('Start'),
-                date: serviceReport.serviceOrder.actualStartTime
-                  ? formatDate(serviceReport.serviceOrder.actualStartTime)
-                  : '-',
-                time: serviceReport.serviceOrder.actualStartTime
-                  ? new Date(
-                      serviceReport.serviceOrder.actualStartTime!,
-                    ).toLocaleTimeString(navigator.language, {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })
-                  : '-',
-              },
-              {
-                label: t('End'),
-                date: serviceReport.serviceOrder.actualEndTime
-                  ? formatDate(serviceReport.serviceOrder.actualEndTime)
-                  : '-',
-                time: serviceReport.serviceOrder.actualEndTime
-                  ? new Date(
-                      serviceReport.serviceOrder.actualEndTime!,
-                    ).toLocaleTimeString(navigator.language, {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })
-                  : '-',
-              },
-            ].map((i) => (
+          {!serviceReport.additionalInfo.onlyShowTotalTime && (
+            <>
               <Box
-                key={i.label}
-                px=".5em"
-                py="1em"
+                px="1em"
+                py=".75em"
                 sx={{
                   display: 'grid',
                   gridTemplateColumns: '8ch 1fr 4fr',
                   placeItems: 'start',
                   gap: '.5em',
                 }}>
-                <Typography variant="body2">{i.label}</Typography>
-                <Typography variant="body2">{i.date}</Typography>
-                <Typography variant="body2">{i.time}</Typography>
+                <FormLabel text="" />
+                <FormLabel text="Date" sx={{justifySelf: 'start'}} />
+                <FormLabel text="Time" />
               </Box>
-            ))}
-          </Box>
-          <Divider
-            sx={{
-              my: '1rem',
-              border: `1px solid ${theme.palette.action.disabledBackground}`,
-            }}
-          />
+              <Box
+                bgcolor="grey.50"
+                boxShadow="0px 4px 15px 0px #90909033"
+                px=".5em">
+                {[
+                  {
+                    label: t('Start'),
+                    date: serviceReport.serviceOrder.actualStartTime
+                      ? formatDate(serviceReport.serviceOrder.actualStartTime)
+                      : '-',
+                    time: serviceReport.serviceOrder.actualStartTime
+                      ? new Date(
+                          serviceReport.serviceOrder.actualStartTime!,
+                        ).toLocaleTimeString(navigator.language, {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })
+                      : '-',
+                  },
+                  {
+                    label: t('End'),
+                    date: serviceReport.serviceOrder.actualEndTime
+                      ? formatDate(serviceReport.serviceOrder.actualEndTime)
+                      : '-',
+                    time: serviceReport.serviceOrder.actualEndTime
+                      ? new Date(
+                          serviceReport.serviceOrder.actualEndTime!,
+                        ).toLocaleTimeString(navigator.language, {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })
+                      : '-',
+                  },
+                ].map((i) => (
+                  <Box
+                    key={i.label}
+                    px=".5em"
+                    py="1em"
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: '8ch 1fr 4fr',
+                      placeItems: 'start',
+                      gap: '.5em',
+                    }}>
+                    <Typography variant="body2">{i.label}</Typography>
+                    <Typography variant="body2">{i.date}</Typography>
+                    <Typography variant="body2">{i.time}</Typography>
+                  </Box>
+                ))}
+              </Box>
+              <Divider
+                sx={{
+                  my: '1rem',
+                  border: `1px solid ${theme.palette.action.disabledBackground}`,
+                }}
+              />
+            </>
+          )}
+
           <Box
             bgcolor="grey.700"
             borderRadius="4px"
