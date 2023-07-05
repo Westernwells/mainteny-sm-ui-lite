@@ -57,7 +57,6 @@ export const EditBasicInfoForm = ({
           name: 'category',
           placeholder: t('e.g. Cable'),
           type: 'text',
-          required: true,
           value: formik.values.category,
           error: !!(formik.touched.category && formik.errors.category),
           onBlur: formik.handleBlur,
@@ -71,7 +70,6 @@ export const EditBasicInfoForm = ({
           name: 'externalId',
           placeholder: t('e.g. 000001'),
           type: 'text',
-          required: true,
           value: formik.values.externalId,
           error: !!(formik.touched.externalId && formik.errors.externalId),
           onBlur: formik.handleBlur,
@@ -120,6 +118,7 @@ export const EditBasicInfoForm = ({
             type: 'number',
             value: formik.values.unitPurchaseVat,
             helperText: formik.errors.unitPurchaseVat,
+            disabled: true,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
             InputProps: {
@@ -138,12 +137,12 @@ export const EditBasicInfoForm = ({
             variant: 'outlined',
             inputProps: {min: 0, max: 100},
             type: 'number',
-            required: true,
             value: formik.values.unitSellingVat,
             error: !!(
               formik.touched.unitSellingVat && formik.errors.unitSellingVat
             ),
             helperText: formik.errors.unitSellingVat,
+            disabled: true,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
             InputProps: {
@@ -175,7 +174,6 @@ export const EditBasicInfoForm = ({
         textFieldProps={{
           name: 'unit',
           label: t('Unit'),
-          required: true,
           placeholder: t('Select Unit'),
           error: !!(formik.touched.unit && formik.errors.unit),
         }}
@@ -189,7 +187,7 @@ export const EditBasicInfoForm = ({
           containerStyles={{pr: '1rem'}}
           props={{
             name: 'unitPurchaseAmount',
-            label: t('Purchase Price'),
+            label: t('Purchase Price (excl. VAT)'),
             placeholder: t(`e.g. 150{{currencySymbol}}`, {currencySymbol}),
             inputProps: {min: 0},
             type: 'number',
@@ -210,7 +208,7 @@ export const EditBasicInfoForm = ({
         <FormInput
           props={{
             name: 'unitSellingAmount',
-            label: t('Selling Price'),
+            label: t('Selling Price (excl. VAT)'),
             placeholder: t(`e.g. 200{{currencySymbol}}`, {currencySymbol}),
             inputProps: {min: 0},
             type: 'number',
@@ -250,7 +248,6 @@ export const EditBasicInfoForm = ({
       />
 
       <FormSelect
-        required
         containerStyles={{...containerStyles}}
         labelId="typeSelect-label"
         label={t('Types')}

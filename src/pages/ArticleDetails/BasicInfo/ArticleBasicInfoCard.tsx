@@ -28,12 +28,12 @@ import {
 import {EditBasicInfoForm} from './EditBasicInfoForm';
 
 const validationSchema = Yup.object().shape({
-  category: Yup.string().nullable().required('Category is required'),
+  category: Yup.string().nullable(),
   name: Yup.string().nullable().required('Name is required'),
-  externalId: Yup.string().nullable().required('External Id is required'),
+  externalId: Yup.string().nullable(),
   type: Yup.string().nullable().required('Type is required'),
   unit: Yup.string().nullable(),
-  unitSellingVat: Yup.number().nullable().required('Selling VAT is required'),
+  unitSellingVat: Yup.number().nullable(),
   unitSellingAmount: Yup.number()
     .nullable()
     .required('Selling price is required'),
