@@ -2,11 +2,13 @@ import {useEffect, useLayoutEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
+import {isEqual, omit} from 'lodash';
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {Priority} from 'models/service-order';
 import {useCreateCustomer} from 'hooks/reactQuery/useCustomers';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
@@ -20,6 +22,7 @@ import {BasicCustomerForm} from './BasicCustomerForm';
 import {CustomerAddressForm} from './CustomerAddressForm';
 import {CustomerContactPersonsForm} from './CustomerContactPersonsForm';
 import {ConfirmCancel} from './ConfirmCancel';
+import {ResumeProgress} from './ResumeProgress';
 
 interface Props {
   getCurrentPageTitle?: (title: string) => void;
@@ -55,6 +58,10 @@ const steps = [
   'Add contact persons',
 ];
 
+const localStorageFormikBasicInfoKey = 'NEW_CUSTOMER_formikBasicInfo';
+const localStorageFormikAddressKey = 'NEW_CUSTOMER_formikAddress';
+const localStorageFormikContactPersonsKey = 'NEW_CUSTOMER_formikContactPersons';
+
 export const NewCustomer = ({getCurrentPageTitle}: Props) => {
   const navigate = useNavigate();
   const {user} = useUserSession();
@@ -62,6 +69,8 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
   const [activeStep, setActiveStep] = useState(0);
   const [disableNextBtn, setDisableNextBtn] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openResumeProgressDialog, setOpenResumeProgressDialog] =
+    useState(false);
 
   const {mutateAsync: createCustomer} = useCreateCustomer(
     'Customer created successfully',
@@ -104,6 +113,46 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
     validationSchema: validationSchemaContactPersons,
   });
 
+  useEffectAfterMount(() => {
+    localStorage.setItem(
+      localStorageFormikBasicInfoKey,
+      JSON.stringify(formikBasicInfo.values),
+    );
+    localStorage.setItem(
+      localStorageFormikAddressKey,
+      JSON.stringify(formikAddress.values),
+    );
+    localStorage.setItem(
+      localStorageFormikContactPersonsKey,
+      JSON.stringify(formikContactPersons.values),
+    );
+  }, [
+    formikBasicInfo.values,
+    formikAddress.values,
+    formikContactPersons.values,
+  ]);
+
+  // show resume progress modal if there's previous stored state in local storage
+  useEffect(() => {
+    const localStorageFormikBasicInfo = localStorage.getItem(
+      localStorageFormikBasicInfoKey,
+    );
+
+    const localStorageFormikBasicInfoParsed = JSON.parse(
+      localStorageFormikBasicInfo ?? '{}',
+    ) as CustomerBasicInfoFormModel;
+
+    if (
+      localStorageFormikBasicInfo &&
+      !isEqual(
+        omit(localStorageFormikBasicInfoParsed, 'registrationDate'),
+        omit(formikBasicInfo.values, 'registrationDate'),
+      )
+    ) {
+      setOpenResumeProgressDialog(true);
+    }
+  }, []);
+
   useLayoutEffect(() => {
     if (getCurrentPageTitle) {
       getCurrentPageTitle('New Customer');
@@ -121,11 +170,47 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
     return setDisableNextBtn(false);
   }, [activeStep, formikBasicInfo, formikAddress, formikContactPersons]);
 
+  const restoreFormikFromLocalStorage = () => {
+    const localStorageFormikBasicInfo = localStorage.getItem(
+      localStorageFormikBasicInfoKey,
+    );
+    const localStorageFormikAddress = localStorage.getItem(
+      localStorageFormikAddressKey,
+    );
+    const localStorageFormikContactPersons = localStorage.getItem(
+      localStorageFormikContactPersonsKey,
+    );
+    if (localStorageFormikBasicInfo) {
+      formikBasicInfo.setValues(JSON.parse(localStorageFormikBasicInfo!));
+    }
+    if (localStorageFormikAddress) {
+      formikAddress.setValues(JSON.parse(localStorageFormikAddress!));
+    }
+    if (localStorageFormikContactPersons) {
+      formikContactPersons.setValues(
+        JSON.parse(localStorageFormikContactPersons!),
+      );
+    }
+    setOpenResumeProgressDialog(false);
+  };
+
+  const resetLocalStorage = () => {
+    [
+      localStorageFormikBasicInfoKey,
+      localStorageFormikAddressKey,
+      localStorageFormikContactPersonsKey,
+    ].forEach((key) => {
+      localStorage.removeItem(key);
+    });
+    setOpenResumeProgressDialog(false);
+  };
+
   const handleCancel = () => {
     setOpenDialog(true);
   };
 
   const onCancel = () => {
+    resetLocalStorage();
     navigate(-1);
   };
 
@@ -164,6 +249,7 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
         customerNumber: response.value,
         creationDate: Date.now(),
       });
+      resetLocalStorage();
       navigate(`/customers/details/${response.value}?tab=0`, {replace: true});
     }
   };
@@ -202,6 +288,11 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
         open={openDialog}
         onConfirm={onCancel}
         onClose={() => setOpenDialog(false)}
+      />
+      <ResumeProgress
+        open={openResumeProgressDialog}
+        onConfirm={restoreFormikFromLocalStorage}
+        onClose={resetLocalStorage}
       />
     </Stepper>
   );
