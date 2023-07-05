@@ -253,15 +253,13 @@ export const AddBasicInfoForm = ({
         containerStyles={{...containerStyles}}
         labelId="type-label"
         label={t('Types')}
-        options={Object.keys(ArticleType)
-          .filter((key) => key !== ArticleType.SYSTEM)
-          .map((key) => ({
-            label: convertToText(key),
-            value: convertToText(key),
-          }))}
+        options={Object.keys(ArticleType).map((key) => ({
+          label: convertToText(key),
+          value: convertToText(key),
+        }))}
         selectProps={{
           id: 'type',
-          value: formik.values.type ? formik.values.type : undefined,
+          value: formik.values.type ?? formik.values.type,
           onChange: formik.handleChange,
           name: 'type',
           placeholder: t('e.g. Select type'),
