@@ -31,7 +31,8 @@ export const EmergencyPhone = ({
 
   const formik = useFormik<EmergencyPhoneFormModel>({
     initialValues: {
-      manufacturer: elevator.additionalInfo?.manufacturer ?? '',
+      emergencyPhoneProvider:
+        elevator.additionalInfo?.emergencyPhoneProvider ?? '',
       systemId: elevator.additionalInfo?.elevatorPhone?.systemId ?? '',
       phoneConnection:
         elevator.additionalInfo?.elevatorPhone?.connectionType ?? '',
@@ -48,7 +49,7 @@ export const EmergencyPhone = ({
       await updateElevator({
         body: {
           propertyOwnerId,
-          manufacturer: values.manufacturer,
+          emergencyPhoneProvider: values.emergencyPhoneProvider,
           elevatorPhone: {
             systemId: values.systemId,
             connectionType: values.phoneConnection,
@@ -65,7 +66,7 @@ export const EmergencyPhone = ({
   });
 
   const labels = useRef([
-    'manufacturer',
+    'emergencyPhoneProvider',
     'systemId',
     'phoneConnection',
     'phoneNumber',
