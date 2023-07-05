@@ -266,6 +266,7 @@ export interface ServiceOrderReportAdditionalInfo {
   checkListAnswers: CheckListAnswerRecord[];
   pdfPath: string;
   pdfGenerationStatus: PdfGenerationStatus;
+  onlyShowTotalTime: boolean;
 }
 
 export interface ServiceOrderReportArticleView {
