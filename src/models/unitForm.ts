@@ -44,7 +44,7 @@ export interface AppointmentFormModel {
 }
 
 export interface EmergencyPhoneFormModel {
-  manufacturer?: string;
+  emergencyPhoneProvider?: string;
   systemId?: string;
   phoneConnection?: string;
   phoneNumber?: string;
