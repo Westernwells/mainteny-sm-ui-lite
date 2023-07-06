@@ -35,6 +35,7 @@ export const fetchElevators = async (
   params: Partial<ElevatorQueryParams>,
   id: string,
 ) => {
+  console.log(id, 'serviceCO')
   const response = await axiosClient.get<Resource<ElevatorView>>(
     `/api/serviceCompanies/${id}/elevators`,
     {

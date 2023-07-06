@@ -73,7 +73,7 @@ export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
   const {data: elevatorResource = createEmptyResource<ElevatorView>(pageSize)} =
     useAllElevators(
       {
-        query: searchCustomer,
+        query: encodeURIComponent(searchCustomer!!),
         pageIndex: page.pageIndex,
         pageSize: page.pageSize,
       },
@@ -87,7 +87,7 @@ export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
     isFetching,
     isSuccess,
   } = useQueryCustomerElevator(
-    {query: search, pageIndex: 0, pageSize: 500},
+    {query: encodeURIComponent(search), pageIndex: 0, pageSize: 500},
     {},
     elevatorResource.data && elevatorResource.data[0]?.propertyOwner?.id,
     {keepPreviousData: true},
