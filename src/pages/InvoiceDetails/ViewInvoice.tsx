@@ -118,6 +118,8 @@ export const ViewInvoice = ({
           setIsDeleteDialogOpen(true);
         },
       });
+    } else if (invoice.sentDate) {
+      return items.filter((item) => item.label !== t('Edit'));
     }
     return items;
   }, [downloadUrl]);
