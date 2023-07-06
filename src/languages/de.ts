@@ -1408,4 +1408,8 @@ export const de = {
   'Invitation sent': 'Einladung versendet',
   'Search by number, customer, status etc.':
     'Suche nach Nummer, Kunde, Status usw.',
+  'Create new unit': 'Neue Anlage anlegen',
+  'Create New Unit': 'Neue Anlage anlegen',
+  'No units yet. They will appear here once added!':
+    'Noch keine Anlagen. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!',
 };
