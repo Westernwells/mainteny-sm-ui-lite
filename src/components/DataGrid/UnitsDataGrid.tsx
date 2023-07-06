@@ -4,7 +4,10 @@ import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
-import {useAllElevators} from 'hooks/reactQuery/useElevator';
+import {
+  useAllElevators,
+  useQueryCustomerElevator,
+} from 'hooks/reactQuery/useElevator';
 import {ElevatorView} from 'models/elevator';
 import {FormatDate} from 'models/misc';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
@@ -62,34 +65,47 @@ const pageSize = 25;
 
 export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
   const formatDate = useFormatDate();
-  const [search, setSearch] = useState(searchCustomer || '');
+  const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
 
+  const {data: elevatorResource = createEmptyResource<ElevatorView>(pageSize)} =
+    useAllElevators(
+      {
+        query: searchCustomer,
+        pageIndex: page.pageIndex,
+        pageSize: page.pageSize,
+      },
+      {keepPreviousData: true},
+    );
+
   const {
-    data: elevatorResource = createEmptyResource<ElevatorView>(pageSize),
+    data: customerElevatorResource = createEmptyResource<ElevatorView>(500),
     isIdle,
     isLoading,
     isFetching,
-  } = useAllElevators(
-    {query: search, pageIndex: page.pageIndex, pageSize: page.pageSize},
+    isSuccess,
+  } = useQueryCustomerElevator(
+    {query: search, pageIndex: 0, pageSize: 500},
+    {},
+    elevatorResource.data && elevatorResource.data[0]?.propertyOwner?.id,
     {keepPreviousData: true},
   );
 
   useEffect(() => {
-    setPageCount(Math.ceil(elevatorResource.total / page.pageSize));
-  }, [elevatorResource, page.pageSize]);
+    setPageCount(Math.ceil(customerElevatorResource.total / page.pageSize));
+  }, [customerElevatorResource, page.pageSize]);
 
   useEffect(() => {
-    if (elevatorResource.data.length) {
-      setRows(makeRows(elevatorResource.data, formatDate));
+    if (customerElevatorResource.data.length) {
+      setRows(makeRows(customerElevatorResource.data, formatDate));
     } else {
       setRows([]);
     }
-  }, [elevatorResource]);
+  }, [customerElevatorResource]);
 
-  if (isIdle || isLoading) {
+  if ((isIdle || isLoading) && isSuccess) {
     return (
       <Box
         display="flex"
