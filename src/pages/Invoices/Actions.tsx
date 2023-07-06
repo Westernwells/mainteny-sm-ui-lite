@@ -195,6 +195,9 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
         },
       });
     }
+    if (invoice.sentDate) {
+      return items.filter((item) => item.label !== t('Edit'));
+    }
     return items;
   }, [downloadUrl]);
 
