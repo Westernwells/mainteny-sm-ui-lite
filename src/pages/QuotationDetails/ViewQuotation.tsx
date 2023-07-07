@@ -127,6 +127,10 @@ export const ViewQuotation = ({
         },
       ],
     );
+
+    if (quotation.status === QuotationStatus.SENT_TO_CLIENT) {
+      return items.filter((item) => item.label !== t('Edit'));
+    }
     return items;
   }, [downloadUrl]);
 

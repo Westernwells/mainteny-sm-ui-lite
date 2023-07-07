@@ -1377,4 +1377,8 @@ export const sr = {
   'Invitation sent': 'Pozivnica poslana',
   'Search by number, customer, status etc.':
     'Pretražujte po broju, kupcu, statusu itd.',
+  'Create new unit': 'Napravite novu jedinicu',
+  'Create New Unit': 'Napravite Novu Jedinicu',
+  'No units yet. They will appear here once added!':
+    'Još nema jedinica. Pojaviće se ovde kada se unesu!',
 };
