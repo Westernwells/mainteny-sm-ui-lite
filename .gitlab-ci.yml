@@ -147,7 +147,7 @@ deploy-stage:
         STACK: stage
         IMAGE_ENV: stage
         CACHE_PATH: /*
-      when: manual
+      when: on_success
     - when: never
 
 deploy-production:
