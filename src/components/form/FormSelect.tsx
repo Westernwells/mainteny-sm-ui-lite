@@ -140,9 +140,7 @@ export const FormSelect = ({
                 margin: '0.1em 0.3em 0.1em 0em',
               }}
             />{' '}
-            {options.length === 0
-              ? t('Create and Manage Payment Terms')
-              : t('Manage Payment Terms')}
+            {t('Manage Payment Terms')}
           </MenuItem>,
         ]}
         ]

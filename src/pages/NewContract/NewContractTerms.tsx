@@ -344,7 +344,7 @@ const NewContractTerms: FC<Props> = ({formik}) => {
       </Grid>
 
       <ContractPaymentTermsDialog
-        title={t('Manage payment terms')}
+        title={t('Manage Payment Terms')}
         alertText={t(
           'Add your payment terms that would be used later in invoicing',
         )}

@@ -974,7 +974,7 @@ export const InvoiceForm = ({
       />
 
       <ContractPaymentTermsDialog
-        title={t('Manage payment terms')}
+        title={t('Manage Payment Terms')}
         alertText={t(
           'Add your payment terms that would be used later in invoicing',
         )}

@@ -145,6 +145,7 @@ export const de = {
   'JPEG, PNG, BMP, GIF, WEBP or SVG': 'JPEG, PNG, BMP, GIF, WEBP oder SVG',
   'No description added.': 'Keine Beschreibung hinzugefügt',
   'Payment terms': 'Zahlungskonditionen',
+  'Payment Terms': 'Zahlungskonditionen',
   'No payment terms applied': 'Keine Zahlungskondition ausgewählt',
   'Choose your payment term': 'Wählen Sie Ihre Zahlungskondition',
   Choosed: 'Gewählt',
@@ -1408,4 +1409,11 @@ export const de = {
   'Invitation sent': 'Einladung versendet',
   'Search by number, customer, status etc.':
     'Suche nach Nummer, Kunde, Status usw.',
+  'Manage Payment Terms': 'Zahlungsbedingungen verwalten',
+  'Choose a payment term to be used on your invoice':
+    'Wählen Sie eine Zahlungsbedingung für Ihre Rechnung',
+  'Write your term here': 'Schreiben Sie hier Ihre Bedingungen',
+  'Add your payment terms that would be used later in invoicing':
+    'Zahlungsbedingungen hinzufügen, die später bei der Rechnungsstellung verwendet werden sollen',
+  'New Payment Term': 'Neue Zahlungsbedingung',
 };
