@@ -712,6 +712,7 @@ export const InvoiceForm = ({
                           radioProps={{
                             sx: {color: theme.palette.text.secondary},
                           }}
+                          disabled={formType === 'edit'}
                         />
                       ))
                   : invoice?.type === InvoiceType.FINAL &&
@@ -729,6 +730,7 @@ export const InvoiceForm = ({
                           radioProps={{
                             sx: {color: theme.palette.text.secondary},
                           }}
+                          disabled={formType === 'edit'}
                         />
                       ))
                   : invoiceTypeOptions.map((option) => (
@@ -742,6 +744,7 @@ export const InvoiceForm = ({
                         radioProps={{
                           sx: {color: theme.palette.text.secondary},
                         }}
+                        disabled={formType === 'edit'}
                       />
                     ))}
               </RadioGroup>
