@@ -233,8 +233,6 @@ export const ArticleItemsTable = ({
         setArticleResourceAndPrice(partialArticleResource.data[0]);
       } else if (isCreditNote && isFetchedCreditNoteArticle) {
         setArticleResourceAndPrice(creditNoteArticleResource.data[0]);
-      } else if (!isPartial && !isCreditNote) {
-        setItems([]);
       }
     } else if (invoice) {
       if (
