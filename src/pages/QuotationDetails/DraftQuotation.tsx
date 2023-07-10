@@ -204,6 +204,7 @@ export const DraftQuotation = () => {
                 <UnitsDataGrid
                   setRowItem={handleSelectUnit}
                   searchCustomer={customer?.name}
+                  propertyOwnerId={customer?.id}
                 />
               }
               labelRequired

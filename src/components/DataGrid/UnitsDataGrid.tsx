@@ -4,7 +4,10 @@ import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
-import {useAllElevators} from 'hooks/reactQuery/useElevator';
+import {
+  useAllElevators,
+  useQueryCustomerElevator,
+} from 'hooks/reactQuery/useElevator';
 import {ElevatorView} from 'models/elevator';
 import {FormatDate} from 'models/misc';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
@@ -15,6 +18,7 @@ import {styles} from './style';
 interface Props {
   setRowItem: (row: ElevatorView) => void;
   searchCustomer?: string;
+  propertyOwnerId?: string;
 }
 
 export const columns: GridColDef[] = [
@@ -60,7 +64,11 @@ export const makeRows = (
 
 const pageSize = 25;
 
-export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
+export const UnitsDataGrid = ({
+  setRowItem,
+  searchCustomer,
+  propertyOwnerId,
+}: Props) => {
   const formatDate = useFormatDate();
   const [search, setSearch] = useState(searchCustomer || '');
   const [page, setPage] = useState(makePage(0, pageSize));
@@ -69,9 +77,8 @@ export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
 
   const {
     data: elevatorResource = createEmptyResource<ElevatorView>(pageSize),
-    isIdle,
-    isLoading,
-    isFetching,
+    isLoading: isElevatorLoading,
+    isFetching: isElevatorFetching,
   } = useAllElevators(
     {
       query: encodeURIComponent(search!!),
@@ -81,17 +88,39 @@ export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
     {keepPreviousData: true},
   );
 
-  useEffect(() => {
-    setPageCount(Math.ceil(elevatorResource.total / page.pageSize));
-  }, [elevatorResource, page.pageSize]);
+  const {
+    data: customerResource = createEmptyResource<ElevatorView>(500),
+    isFetching: isCustomerFetching,
+    isLoading: isCustomerLoading,
+  } = useQueryCustomerElevator(
+    {query: encodeURIComponent(search!!), pageIndex: 0, pageSize: 500},
+    {},
+    propertyOwnerId,
+    {keepPreviousData: true},
+  );
 
   useEffect(() => {
-    if (elevatorResource.data.length) {
-      setRows(makeRows(elevatorResource.data, formatDate));
+    setPageCount(
+      Math.ceil(
+        propertyOwnerId
+          ? customerResource.total / page.pageSize
+          : elevatorResource.total / page.pageSize,
+      ),
+    );
+  }, [elevatorResource, customerResource, page.pageSize]);
+
+  useEffect(() => {
+    if (elevatorResource.data.length || customerResource.data.length) {
+      setRows(
+        makeRows(
+          propertyOwnerId ? customerResource.data : elevatorResource.data,
+          formatDate,
+        ),
+      );
     } else {
       setRows([]);
     }
-  }, [isFetching]);
+  }, [isElevatorFetching, isCustomerFetching, propertyOwnerId, search]);
 
   useEffect(() => {
     if (search) {
@@ -99,7 +128,7 @@ export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
     }
   }, [search]);
 
-  if (isIdle || isLoading) {
+  if (isCustomerLoading || isElevatorLoading) {
     return (
       <Box
         display="flex"
@@ -125,7 +154,7 @@ export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
           columns={columns}
           scrollToTop={search}
           onCellClick={(params) => setRowItem(params.row.elevator)}
-          loading={isFetching}
+          loading={isCustomerFetching}
           pageSize={page.pageSize}
           pageIndex={page.pageIndex + 1}
           pageCount={pageCount}
