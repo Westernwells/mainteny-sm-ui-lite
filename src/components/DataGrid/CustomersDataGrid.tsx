@@ -87,7 +87,7 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
 
   useEffect(() => {
     setRows(makeRows(customerResource.data));
-  }, [customerResource]);
+  }, [isFetching]);
 
   if (isIdle || isLoading) {
     return (
