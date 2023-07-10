@@ -310,11 +310,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 (item) =>
                   `${item.discountPercentage}% when paid in ${item.days} days`,
               )}
-              hourlyRate={formatCurrency(
-                contractDetails ? contractDetails.hourlyRate : 0,
-                {currency},
-                selectedLng,
-              )}
               firstMaintenance={contractDetails.additionalInfo.firstMaintenance}
               firstInvoiceDate={contractDetails.additionalInfo.firstInvoiceDate}
             />
