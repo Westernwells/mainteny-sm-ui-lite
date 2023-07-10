@@ -74,7 +74,7 @@ export const makeRows = (
     id: index,
     name: item.name,
     number: item.externalId,
-    address: item.postalAddress?.fullName,
+    address: item.billingAddress?.fullName,
     units: item.unitNumber,
     phone: item.contact.phone === '+' ? '-' : item.contact.phone,
     access: 'Invite',

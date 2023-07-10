@@ -17,9 +17,9 @@ export type CustomerBasicInfoFormModel = {
 };
 
 export type CustomerAddressFormModel = {
-  postalAddress: AddressRecord | null;
   billingAddress: AddressRecord | null;
-  businessAddress: AddressRecord | null;
+  beneficiaryAddress: AddressRecord | null;
+  otherAddress: AddressRecord | null;
 };
 
 export enum PropertyContactPersonRole {
@@ -60,7 +60,8 @@ export type CustomerContactPersonsFormModel = {
 
 export type NewCustomerBody = {
   billingAddress: AddressRecord | null;
-  businessAddress: AddressRecord | null;
+  beneficiaryAddress: AddressRecord | null;
+  otherAddress: AddressRecord | null;
   contact: {
     email: string;
     phone: string;
@@ -68,7 +69,6 @@ export type NewCustomerBody = {
   };
   externalId: string;
   name: string;
-  postalAddress: AddressRecord | null;
   priority: Priority | null;
   serviceCompanyId: string;
   registrationDate: Date;

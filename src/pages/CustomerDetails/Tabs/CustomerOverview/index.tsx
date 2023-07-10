@@ -68,19 +68,19 @@ export const CustomerOverviewTab = ({
     if (customer) {
       setBasicDetails({
         ...basicDetails,
-        address: {
-          label: 'ADDRESS',
-          value: customer.postalAddress?.fullName ?? '-',
+        billingAddress: {
+          label: 'BILLING ADDRESS',
+          value: customer.billingAddress?.fullName ?? '-',
           icon: <Home sx={{color: theme.palette.info.dark}} />,
         },
-        differentBillingAddress: {
-          label: 'DIFFERENT BILLING ADDRESS',
-          value: customer.billingAddress?.fullName ?? '-',
+        beneficiaryAddress: {
+          label: 'BENEFICIARY ADDRESS',
+          value: customer.beneficiaryAddress?.fullName ?? '-',
           icon: <HomeWork sx={{color: theme.palette.info.dark}} />,
         },
-        sendInvoiceViaAddress: {
+        otherAddress: {
           label: 'SEND INVOICE VIA ADDRESS',
-          value: customer.businessAddress?.fullName ?? '-',
+          value: customer.otherAddress?.fullName ?? '-',
           icon: <HomeWork sx={{color: theme.palette.info.dark}} />,
         },
         costCenter: {
