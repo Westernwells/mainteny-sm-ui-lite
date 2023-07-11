@@ -99,7 +99,7 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
     if (search === '' || (search !== '' && page.pageIndex === 0)) {
       refetch();
     }
-  }, [page.pageIndex]);
+  }, [search, page.pageIndex]);
 
   useEffect(() => {
     if (page.pageIndex) {
