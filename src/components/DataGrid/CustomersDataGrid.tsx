@@ -72,13 +72,17 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
     isLoading,
     isFetching,
     isIdle,
+    refetch,
   } = useQueryCustomers(
     {
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: search,
     },
-    {keepPreviousData: true},
+    {
+      keepPreviousData: true,
+      enabled: false,
+    },
   );
 
   useEffect(() => {
@@ -86,8 +90,20 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
   }, [customerResource, page.pageSize]);
 
   useEffect(() => {
-    setRows(makeRows(customerResource.data));
+    if (!isIdle && !isLoading) {
+      setRows(makeRows(customerResource.data));
+    }
   }, [isFetching]);
+
+  useEffect(() => {
+    if (page.pageIndex && search !== '') {
+      setPage({...page, pageIndex: 0});
+    }
+
+    if (search === '' || (search !== '' && page.pageIndex === 0)) {
+      refetch();
+    }
+  }, [page.pageIndex, search]);
 
   if (isIdle || isLoading) {
     return (

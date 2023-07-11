@@ -76,27 +76,32 @@ export const UnitsDataGrid = ({
   const [pageCount, setPageCount] = useState(0);
 
   const {
+    data: customerResource = createEmptyResource<ElevatorView>(pageSize),
+    isFetching: isCustomerFetching,
+    isLoading: isCustomerLoading,
+  } = useQueryCustomerElevator(
+    {
+      query: encodeURIComponent(search!!),
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+    },
+    {},
+    propertyOwnerId,
+    {keepPreviousData: true},
+  );
+
+  const {
     data: elevatorResource = createEmptyResource<ElevatorView>(pageSize),
     isLoading: isElevatorLoading,
     isFetching: isElevatorFetching,
+    refetch: refetchElevatorResource,
   } = useAllElevators(
     {
       query: encodeURIComponent(search!!),
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
     },
-    {keepPreviousData: true},
-  );
-
-  const {
-    data: customerResource = createEmptyResource<ElevatorView>(500),
-    isFetching: isCustomerFetching,
-    isLoading: isCustomerLoading,
-  } = useQueryCustomerElevator(
-    {query: encodeURIComponent(search!!), pageIndex: 0, pageSize: 500},
-    {},
-    propertyOwnerId,
-    {keepPreviousData: true},
+    {keepPreviousData: true, enabled: false},
   );
 
   useEffect(() => {
@@ -123,10 +128,14 @@ export const UnitsDataGrid = ({
   }, [isElevatorFetching, isCustomerFetching, propertyOwnerId, search]);
 
   useEffect(() => {
-    if (search) {
+    if (page.pageIndex && search !== '') {
       setPage({...page, pageIndex: 0});
     }
-  }, [search]);
+
+    if (search === '' || (search !== '' && page.pageIndex === 0)) {
+      refetchElevatorResource();
+    }
+  }, [search, page.pageIndex]);
 
   if (isCustomerLoading || isElevatorLoading) {
     return (
