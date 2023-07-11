@@ -41,9 +41,9 @@ export interface PropertyOwnerView {
   id: string;
   name: string;
   number: string;
-  postalAddress?: Address;
   billingAddress?: Address;
-  businessAddress?: Address;
+  beneficiaryAddress?: Address;
+  otherAddress?: Address;
   serviceCompany: ServiceCompany;
   contact: ContactPropertyOwner;
   search: string;
@@ -56,7 +56,9 @@ export interface PropertyOwnerView {
 
 export interface PropertyOwnerSimpleView {
   additionalInfo: PropertyOwnerAdditionalInfo;
-  postalAddress?: Address;
+  billingAddress?: Address;
+  beneficiaryAddress?: Address;
+  otherAddress?: Address;
   contact: ContactPropertyOwner;
   id: string;
   labels: string[];

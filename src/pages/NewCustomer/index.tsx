@@ -43,9 +43,9 @@ const validationSchemaBasicInfo = Yup.object().shape({
 });
 
 const validationSchemaAddress = Yup.object().shape({
-  postalAddress: Yup.object().nullable(),
   billingAddress: Yup.object().nullable(),
-  businessAddress: Yup.object().nullable(),
+  beneficiaryAddress: Yup.object().nullable(),
+  otherAddress: Yup.object().nullable(),
 });
 
 const validationSchemaContactPersons = Yup.object().shape({
@@ -96,9 +96,9 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
 
   const formikAddress = useFormik<CustomerAddressFormModel>({
     initialValues: {
-      postalAddress: null,
       billingAddress: null,
-      businessAddress: null,
+      beneficiaryAddress: null,
+      otherAddress: null,
     },
     onSubmit: () => {},
     validationSchema: validationSchemaAddress,
@@ -235,8 +235,8 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
         ? formatPhoneNumber(formikBasicInfo.values.secondaryPhoneNumber)
         : '',
       billingAddress: formikAddress.values.billingAddress,
-      postalAddress: formikAddress.values.postalAddress,
-      businessAddress: formikAddress.values.businessAddress,
+      beneficiaryAddress: formikAddress.values.beneficiaryAddress,
+      otherAddress: formikAddress.values.otherAddress,
       contactPersons: formikContactPersons.values.contactPersons,
     };
 

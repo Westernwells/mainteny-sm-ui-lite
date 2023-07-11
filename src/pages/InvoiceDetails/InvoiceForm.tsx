@@ -544,7 +544,7 @@ export const InvoiceForm = ({
                     customer && (
                       <>
                         <Typography variant="caption">
-                          {customer.postalAddress?.fullName ?? '-'}
+                          {customer.billingAddress?.fullName ?? '-'}
                         </Typography>
                         <Typography variant="caption" component="p">
                           {customer.contact.phone}

@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-import Add from '@mui/icons-material/Add';
 import Delete from '@mui/icons-material/Delete';
 import {PageCard} from 'components/PageCard';
 import {FormInput} from 'components/form/FormInput';
@@ -20,29 +19,29 @@ interface Props {
 
 export const CustomerAddressForm = ({formik}: Props) => {
   const {t} = useTranslation();
-  const [showBillingAddress, setShowBillingAddress] = useState(
-    !!formik.values.billingAddress || false,
+  const [showBeneficiaryAddress, setShowBeneficiaryAddress] = useState(
+    !!formik.values.beneficiaryAddress || false,
   );
   const [showSendInvoiceViaAddress, setShowSendInvoiceViaAddress] = useState(
-    !!formik.values.businessAddress || false,
+    !!formik.values.otherAddress || false,
   );
 
   const statesByCountry = useCallback(
     (country?: string) => getStatesByCountry(country ?? ''),
     [
-      formik.values.postalAddress?.component?.country,
       formik.values.billingAddress?.component?.country,
-      formik.values.businessAddress?.component?.country,
+      formik.values.beneficiaryAddress?.component?.country,
+      formik.values.otherAddress?.component?.country,
     ],
   );
 
-  const removeBillingAddress = () => {
-    formik.setFieldValue('billingAddress', null);
-    setShowBillingAddress(false);
+  const removeBeneficiaryAddress = () => {
+    formik.setFieldValue('beneficiaryAddress', null);
+    setShowBeneficiaryAddress(false);
   };
 
   const removeSendInvoiceViaAddress = () => {
-    formik.setFieldValue('businessAddress', null);
+    formik.setFieldValue('otherAddress', null);
     setShowSendInvoiceViaAddress(false);
   };
 
@@ -54,7 +53,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
 
   return (
     <PageCard
-      headerLabel="Postal address"
+      headerLabel="Billing Address"
       containerStyles={{flexGrow: 1, p: '0.5rem'}}
       headerStyles={{m: 0, p: '1.5rem', pb: 0}}>
       <Grid container spacing={3}>
@@ -63,8 +62,8 @@ export const CustomerAddressForm = ({formik}: Props) => {
             props={{
               size: 'small',
               label: 'Name',
-              name: 'postalAddress.fullName',
-              value: formik.values.postalAddress?.fullName ?? '',
+              name: 'billingAddress.fullName',
+              value: formik.values.billingAddress?.fullName ?? '',
               ...defaultProps,
             }}
           />
@@ -74,8 +73,8 @@ export const CustomerAddressForm = ({formik}: Props) => {
             props={{
               size: 'small',
               label: 'Address line 1',
-              name: 'postalAddress.component.street',
-              value: formik.values.postalAddress?.component?.street ?? '',
+              name: 'billingAddress.component.street',
+              value: formik.values.billingAddress?.component?.street ?? '',
               ...defaultProps,
             }}
           />
@@ -85,8 +84,8 @@ export const CustomerAddressForm = ({formik}: Props) => {
             props={{
               size: 'small',
               label: 'Address line 2',
-              name: 'postalAddress.component.street2',
-              value: formik.values.postalAddress?.component?.street2 ?? '',
+              name: 'billingAddress.component.street2',
+              value: formik.values.billingAddress?.component?.street2 ?? '',
               ...defaultProps,
             }}
           />
@@ -96,8 +95,8 @@ export const CustomerAddressForm = ({formik}: Props) => {
             props={{
               size: 'small',
               label: 'City',
-              name: 'postalAddress.component.city',
-              value: formik.values.postalAddress?.component?.city ?? '',
+              name: 'billingAddress.component.city',
+              value: formik.values.billingAddress?.component?.city ?? '',
               ...defaultProps,
             }}
           />
@@ -107,21 +106,21 @@ export const CustomerAddressForm = ({formik}: Props) => {
             props={{
               size: 'small',
               label: 'ZIP/Postal Code',
-              name: 'postalAddress.component.postalCode',
-              value: formik.values.postalAddress?.component?.postalCode ?? '',
+              name: 'billingAddress.component.postalCode',
+              value: formik.values.billingAddress?.component?.postalCode ?? '',
               ...defaultProps,
             }}
           />
         </Grid>
         <Grid item md={2.5}>
           <FormSelect
-            labelId="postalAddress.component.country"
+            labelId="billingAddress.component.country"
             label="Country"
             options={countriesOptions}
             selectProps={{
-              id: 'postalAddress.component.country',
-              name: 'postalAddress.component.country',
-              value: formik.values.postalAddress?.component?.country ?? '',
+              id: 'billingAddress.component.country',
+              name: 'billingAddress.component.country',
+              value: formik.values.billingAddress?.component?.country ?? '',
               multiple: false,
               onChange: formik.handleChange,
             }}
@@ -129,15 +128,15 @@ export const CustomerAddressForm = ({formik}: Props) => {
         </Grid>
         <Grid item md={2.5}>
           <FormSelect
-            labelId="postalAddress.component.state"
+            labelId="billingAddress.component.state"
             label="State/Province/Region"
             options={statesByCountry(
-              formik.values.postalAddress?.component?.country,
+              formik.values.billingAddress?.component?.country,
             )}
             selectProps={{
-              id: 'postalAddress.component.state',
-              name: 'postalAddress.component.state',
-              value: formik.values.postalAddress?.component?.state ?? '',
+              id: 'billingAddress.component.state',
+              name: 'billingAddress.component.state',
+              value: formik.values.billingAddress?.component?.state ?? '',
               multiple: false,
               onChange: formik.handleChange,
             }}
@@ -151,22 +150,22 @@ export const CustomerAddressForm = ({formik}: Props) => {
         display="flex"
         alignItems="center"
         justifyContent="space-between">
-        <Typography variant="h6">{t('Different billing address')}</Typography>
-        {showBillingAddress && (
-          <IconButton onClick={removeBillingAddress} size="small">
+        <Typography variant="h6">{t('Beneficiary address')}</Typography>
+        {showBeneficiaryAddress && (
+          <IconButton onClick={removeBeneficiaryAddress} size="small">
             <Delete />
           </IconButton>
         )}
       </Box>
-      {showBillingAddress ? (
+      {showBeneficiaryAddress ? (
         <Grid container spacing={3}>
           <Grid item md={2.5}>
             <FormInput
               props={{
                 size: 'small',
                 label: 'Name',
-                name: 'billingAddress.fullName',
-                value: formik.values.billingAddress?.fullName ?? '',
+                name: 'beneficiaryAddress.fullName',
+                value: formik.values.beneficiaryAddress?.fullName ?? '',
                 ...defaultProps,
               }}
             />
@@ -176,8 +175,9 @@ export const CustomerAddressForm = ({formik}: Props) => {
               props={{
                 size: 'small',
                 label: 'Address line 1',
-                name: 'billingAddress.component.street',
-                value: formik.values.billingAddress?.component?.street ?? '',
+                name: 'beneficiaryAddress.component.street',
+                value:
+                  formik.values.beneficiaryAddress?.component?.street ?? '',
                 ...defaultProps,
               }}
             />
@@ -187,8 +187,9 @@ export const CustomerAddressForm = ({formik}: Props) => {
               props={{
                 size: 'small',
                 label: 'Address line 2',
-                name: 'billingAddress.component.street2',
-                value: formik.values.billingAddress?.component?.street2 ?? '',
+                name: 'beneficiaryAddress.component.street2',
+                value:
+                  formik.values.beneficiaryAddress?.component?.street2 ?? '',
                 ...defaultProps,
               }}
             />
@@ -198,8 +199,8 @@ export const CustomerAddressForm = ({formik}: Props) => {
               props={{
                 size: 'small',
                 label: 'City',
-                name: 'billingAddress.component.city',
-                value: formik.values.billingAddress?.component?.city ?? '',
+                name: 'beneficiaryAddress.component.city',
+                value: formik.values.beneficiaryAddress?.component?.city ?? '',
                 ...defaultProps,
               }}
             />
@@ -209,22 +210,23 @@ export const CustomerAddressForm = ({formik}: Props) => {
               props={{
                 size: 'small',
                 label: 'ZIP/Postal Code',
-                name: 'billingAddress.component.postalCode',
+                name: 'beneficiaryAddress.component.postalCode',
                 value:
-                  formik.values.billingAddress?.component?.postalCode ?? '',
+                  formik.values.beneficiaryAddress?.component?.postalCode ?? '',
                 ...defaultProps,
               }}
             />
           </Grid>
           <Grid item md={2.5}>
             <FormSelect
-              labelId="billingAddress.component.country"
+              labelId="beneficiaryAddress.component.country"
               label="Country"
               options={countriesOptions}
               selectProps={{
-                id: 'billingAddress.component.country',
-                name: 'billingAddress.component.country',
-                value: formik.values.billingAddress?.component?.country ?? '',
+                id: 'beneficiaryAddress.component.country',
+                name: 'beneficiaryAddress.component.country',
+                value:
+                  formik.values.beneficiaryAddress?.component?.country ?? '',
                 multiple: false,
                 onChange: formik.handleChange,
               }}
@@ -232,15 +234,15 @@ export const CustomerAddressForm = ({formik}: Props) => {
           </Grid>
           <Grid item md={2.5}>
             <FormSelect
-              labelId="billingAddress.component.state"
+              labelId="beneficiaryAddress.component.state"
               label="State/Province/Region"
               options={statesByCountry(
-                formik.values.billingAddress?.component?.country,
+                formik.values.beneficiaryAddress?.component?.country,
               )}
               selectProps={{
-                id: 'billingAddress.component.state',
-                name: 'billingAddress.component.state',
-                value: formik.values.billingAddress?.component?.state ?? '',
+                id: 'beneficiaryAddress.component.state',
+                name: 'beneficiaryAddress.component.state',
+                value: formik.values.beneficiaryAddress?.component?.state ?? '',
                 multiple: false,
                 onChange: formik.handleChange,
               }}
@@ -252,11 +254,12 @@ export const CustomerAddressForm = ({formik}: Props) => {
           buttonProps={{
             size: 'medium',
             variant: 'outlined',
-            onClick: () => setShowBillingAddress(true),
-            startIcon: <Add />,
+            onClick: () => setShowBeneficiaryAddress(true),
             sx: {background: 'transparent'},
           }}>
-          <Typography variant="subtitle2">{t('Billing address')}</Typography>
+          <Typography variant="subtitle2">
+            {t('Add Beneficiary Address')}
+          </Typography>
         </Button>
       )}
 
@@ -282,8 +285,8 @@ export const CustomerAddressForm = ({formik}: Props) => {
               props={{
                 size: 'small',
                 label: 'Name',
-                name: 'businessAddress.fullName',
-                value: formik.values.businessAddress?.fullName ?? '',
+                name: 'otherAddress.fullName',
+                value: formik.values.otherAddress?.fullName ?? '',
                 ...defaultProps,
               }}
             />
@@ -293,8 +296,8 @@ export const CustomerAddressForm = ({formik}: Props) => {
               props={{
                 size: 'small',
                 label: 'Address line 1',
-                name: 'businessAddress.component.street',
-                value: formik.values.businessAddress?.component?.street ?? '',
+                name: 'otherAddress.component.street',
+                value: formik.values.otherAddress?.component?.street ?? '',
                 ...defaultProps,
               }}
             />
@@ -304,8 +307,8 @@ export const CustomerAddressForm = ({formik}: Props) => {
               props={{
                 size: 'small',
                 label: 'Address line 2',
-                name: 'businessAddress.component.street2',
-                value: formik.values.businessAddress?.component?.street2 ?? '',
+                name: 'otherAddress.component.street2',
+                value: formik.values.otherAddress?.component?.street2 ?? '',
                 ...defaultProps,
               }}
             />
@@ -315,8 +318,8 @@ export const CustomerAddressForm = ({formik}: Props) => {
               props={{
                 size: 'small',
                 label: 'City',
-                name: 'businessAddress.component.city',
-                value: formik.values.businessAddress?.component?.city ?? '',
+                name: 'otherAddress.component.city',
+                value: formik.values.otherAddress?.component?.city ?? '',
                 ...defaultProps,
               }}
             />
@@ -326,22 +329,21 @@ export const CustomerAddressForm = ({formik}: Props) => {
               props={{
                 size: 'small',
                 label: 'ZIP/Postal Code',
-                name: 'businessAddress.component.postalCode',
-                value:
-                  formik.values.businessAddress?.component?.postalCode ?? '',
+                name: 'otherAddress.component.postalCode',
+                value: formik.values.otherAddress?.component?.postalCode ?? '',
                 ...defaultProps,
               }}
             />
           </Grid>
           <Grid item md={2.5}>
             <FormSelect
-              labelId="businessAddress.component.country"
+              labelId="otherAddress.component.country"
               label="Country"
               options={countriesOptions}
               selectProps={{
-                id: 'businessAddress.component.country',
-                name: 'businessAddress.component.country',
-                value: formik.values.businessAddress?.component?.country ?? '',
+                id: 'otherAddress.component.country',
+                name: 'otherAddress.component.country',
+                value: formik.values.otherAddress?.component?.country ?? '',
                 multiple: false,
                 onChange: formik.handleChange,
               }}
@@ -349,15 +351,15 @@ export const CustomerAddressForm = ({formik}: Props) => {
           </Grid>
           <Grid item md={2.5}>
             <FormSelect
-              labelId="businessAddress.component.state"
+              labelId="otherAddress.component.state"
               label="State/Province/Region"
               options={statesByCountry(
-                formik.values.businessAddress?.component?.country,
+                formik.values.otherAddress?.component?.country,
               )}
               selectProps={{
-                id: 'businessAddress.component.state',
-                name: 'businessAddress.component.state',
-                value: formik.values.businessAddress?.component?.state ?? '',
+                id: 'otherAddress.component.state',
+                name: 'otherAddress.component.state',
+                value: formik.values.otherAddress?.component?.state ?? '',
                 multiple: false,
                 onChange: formik.handleChange,
               }}
@@ -370,12 +372,13 @@ export const CustomerAddressForm = ({formik}: Props) => {
             size: 'medium',
             variant: 'outlined',
             onClick: () => setShowSendInvoiceViaAddress(true),
-            startIcon: <Add />,
             sx: {
               background: 'transparent',
             },
           }}>
-          <Typography variant="subtitle2">{t('Send invoice via')}</Typography>
+          <Typography variant="subtitle2">
+            {t('Add Send invoice via')}
+          </Typography>
         </Button>
       )}
     </PageCard>

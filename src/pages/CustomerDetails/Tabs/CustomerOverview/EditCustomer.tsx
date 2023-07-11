@@ -27,9 +27,9 @@ const validationSchema = Yup.object().shape({
     phoneValidationRE,
     'Phone number is not valid',
   ),
-  postalAddress: Yup.object().nullable(),
   billingAddress: Yup.object().nullable(),
-  businessAddress: Yup.object().nullable(),
+  beneficiaryAddress: Yup.object().nullable(),
+  otherAddress: Yup.object().nullable(),
 });
 
 export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
@@ -48,9 +48,11 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
     secondaryPhoneNumber: customer.additionalInfo.secondaryPhoneNumber
       ? phoneNumberDigitsOnly(customer.additionalInfo.secondaryPhoneNumber)
       : '',
-    postalAddress: customer.postalAddress ? customer.postalAddress : null,
     billingAddress: customer.billingAddress ? customer.billingAddress : null,
-    businessAddress: customer.businessAddress ? customer.businessAddress : null,
+    beneficiaryAddress: customer.beneficiaryAddress
+      ? customer.beneficiaryAddress
+      : null,
+    otherAddress: customer.otherAddress ? customer.otherAddress : null,
     priority: customer.additionalInfo.priority,
     externalId: customer.externalId,
     taxNumber: customer.additionalInfo.taxNumber || '',
