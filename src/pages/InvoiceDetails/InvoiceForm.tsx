@@ -848,6 +848,7 @@ export const InvoiceForm = ({
               isCreditNote={formik.values.type === InvoiceType.CREDIT_NOTE}
               unitSellingAmount={invoice?.totalAmount}
               propertyOwnerId={customer?.id ?? ''}
+              formType={formType}
             />
 
             <InfoCard

@@ -50,6 +50,7 @@ interface Props<T> {
   isPartial?: boolean;
   isCreditNote?: boolean;
   unitSellingAmount?: Amount;
+  formType?: string;
 }
 
 export const ArticleItemsTable = ({
@@ -60,6 +61,7 @@ export const ArticleItemsTable = ({
   isPartial,
   isCreditNote,
   unitSellingAmount,
+  formType,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -233,8 +235,10 @@ export const ArticleItemsTable = ({
         setArticleResourceAndPrice(partialArticleResource.data[0]);
       } else if (isCreditNote && isFetchedCreditNoteArticle) {
         setArticleResourceAndPrice(creditNoteArticleResource.data[0]);
-      } else if (!isPartial && !isCreditNote) {
-        setItems([]);
+      } else if (!isCreditNote && !isPartial) {
+        if (formType === 'new') {
+          setItems([]);
+        }
       }
     } else if (invoice) {
       if (
