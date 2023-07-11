@@ -211,7 +211,8 @@ export const CustomerContactPersonsForm = ({formik}: Props) => {
           containerStyle={{my: '6rem'}}
           label="No Contact Persons. Do you want to add someone?"
           showActionBtn
-          btnLabel="Contact person"
+          actionButtonIcon={<div />}
+          btnLabel="Add Contact person"
           btnAction={() => setOpenDialog(true)}
         />
       )}

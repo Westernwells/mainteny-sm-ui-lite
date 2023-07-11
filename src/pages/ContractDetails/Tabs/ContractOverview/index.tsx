@@ -397,7 +397,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             <ContractParties
               name={contractDetails?.propertyOwner.name}
               occupation="Property Owner"
-              address={contractDetails?.propertyOwner.postalAddress?.fullName}
+              address={contractDetails?.propertyOwner.billingAddress?.fullName}
               phoneNumber={contractDetails?.propertyOwner.contact.phone}
               partyType="CUSTOMER"
               chipStyles={{

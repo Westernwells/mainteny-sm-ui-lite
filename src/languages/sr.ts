@@ -923,8 +923,19 @@ export const sr = {
   'DIFFERENT BILLING ADDRESS': 'RAZLIČITA ADRESA ZA FAKULTET',
   'SEND INVOICE VIA ADDRESS': 'POŠALJITE FAKTURU PREKO ADRESE',
   'VAT/TAX NUMBER': 'PDV/PORESKI BROJ',
+  'VAT/Tax number': 'PDV/Poreski broj',
   'Do you want to delete {{customerName}} from the contact persons list?':
     'Da li želite da izbrišete {{customerName}} sa liste kontakt osoba?',
+  'Resume your progress?': 'Nastavite svoj napredak?',
+  "We've saved your progress from the previous session. Would you like to continue where you left off or start from scratch?":
+    'Sačuvali smo vaš napredak iz prethodne sesije. Da li biste želeli da nastavite tamo gde ste stali ili da počnete od nule?',
+  'Start from scratch': 'Početi od nule',
+  'Resume progress': 'Nastavite napredak',
+  'Beneficiary address': 'Adresa korisnika',
+  'Add Beneficiary Address': 'Dodajte adresu korisnika',
+  'Add Send invoice via': 'Dodaj Pošalji fakturu putem',
+  'Add Contact person': 'Dodaj kontakt osobu',
+  'BENEFICIARY ADDRESS': 'ADRESA KORISNIKA',
 
   // Toast
   'Uh oh! As a Property Manager, please login at':
