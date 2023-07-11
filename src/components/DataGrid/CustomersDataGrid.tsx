@@ -77,7 +77,7 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
     {
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
-      query: search,
+      query: encodeURIComponent(search!!),
     },
     {
       keepPreviousData: true,
