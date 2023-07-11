@@ -146,29 +146,6 @@ const NewContractTerms: FC<Props> = ({formik}) => {
       <Grid item xs={4}>
         <FormInput
           props={{
-            label: t('Defined Hourly Rate (in {{currencySymbol}})', {
-              currencySymbol: currentCurrency.symbol,
-            }),
-            name: 'hourlyRate',
-            placeholder: '60',
-            type: 'number',
-            value: Number(formik.values.hourlyRate).toString(),
-            error: !!(formik.touched.hourlyRate && formik.errors.hourlyRate),
-            onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
-            InputProps: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  {currentCurrency.symbol}
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </Grid>
-      <Grid item xs={4}>
-        <FormInput
-          props={{
             label: 'Payment Due (in days)',
             name: 'invoiceDueDays',
             placeholder: 'Enter payment due (in days)',

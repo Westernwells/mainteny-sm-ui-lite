@@ -119,7 +119,6 @@ const NewContract = () => {
       netAmount: '',
       renewalTerms: '',
       spendingLimit: '',
-      hourlyRate: '',
       annualPriceAdjustmentPercentage: '',
       serviceLevelAgreement: '',
       invoiceDueDays: 0,
@@ -188,7 +187,6 @@ const NewContract = () => {
       ),
       elevators: formikUnits.values.elevators,
       endDate: toRestDate(formikBasicInfo.values.endDate!),
-      hourlyRate: +formikContractTerms.values.hourlyRate,
       invoiceCycle: formikContractTerms.values.invoiceCycle,
       price: amountRecordForBackend({
         currency: currentCurrency.code,
