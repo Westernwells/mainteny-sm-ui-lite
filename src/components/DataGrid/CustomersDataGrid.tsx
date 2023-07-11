@@ -96,14 +96,16 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
   }, [isFetching]);
 
   useEffect(() => {
-    if (page.pageIndex && search !== '') {
-      setPage({...page, pageIndex: 0});
-    }
-
     if (search === '' || (search !== '' && page.pageIndex === 0)) {
       refetch();
     }
-  }, [page.pageIndex, search]);
+  }, [page.pageIndex]);
+
+  useEffect(() => {
+    if (page.pageIndex) {
+      setPage({...page, pageIndex: 0});
+    }
+  }, [search]);
 
   if (isIdle || isLoading) {
     return (

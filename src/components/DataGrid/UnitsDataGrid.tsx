@@ -128,14 +128,16 @@ export const UnitsDataGrid = ({
   }, [isElevatorFetching, isCustomerFetching, propertyOwnerId, search]);
 
   useEffect(() => {
-    if (page.pageIndex && search !== '') {
-      setPage({...page, pageIndex: 0});
-    }
-
-    if (search === '' || (search !== '' && page.pageIndex === 0)) {
+    if (search === '' || (search !== '' && page.pageIndex !== 0)) {
       refetchElevatorResource();
     }
   }, [search, page.pageIndex]);
+
+  useEffect(() => {
+    if (page.pageIndex) {
+      setPage({...page, pageIndex: 0});
+    }
+  }, [search]);
 
   if (isCustomerLoading || isElevatorLoading) {
     return (
