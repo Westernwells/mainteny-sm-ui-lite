@@ -101,7 +101,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       renewalTerms: contractDetails?.additionalInfo?.renewalTerms || '',
       visitsNumber: contractDetails?.visitsNumber || '',
       spendingLimit: contractDetails?.spendingLimit || '',
-      hourlyRate: contractDetails?.hourlyRate,
       invoiceDueDays: contractDetails?.additionalInfo?.invoiceDueDays,
       annualPriceAdjustmentPercentage:
         contractDetails?.additionalInfo?.annualPriceAdjustmentPercentage,
@@ -142,7 +141,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       invoiceCycle: formik.values.invoiceCycle || '',
       visitsNumber: +formik.values.visitsNumber,
       spendingLimit: +formik.values.spendingLimit,
-      hourlyRate: formik.values.hourlyRate || '',
       startDate: contractDetails?.startTime,
       endDate: contractDetails?.endTime,
       timePreference: contractDetails?.timePreference || [],
