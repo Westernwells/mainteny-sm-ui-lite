@@ -930,9 +930,20 @@ export const de = {
   'Customer created successfully': 'Kunde erfolgreich angelegt',
   'DIFFERENT BILLING ADDRESS': 'ABWEICHENDE RECHNUNGSADRESSE',
   'SEND INVOICE VIA ADDRESS': 'RECHNUNG ÜBER ADRESSE SENDEN',
-  'VAT/TAX NUMBER': 'VAT/TAX NUMBER',
+  'VAT/TAX NUMBER': 'USt - IdNr',
+  'VAT/Tax number': 'USt - IdNr',
   'Do you want to delete {{customerName}} from the contact persons list?':
     'Möchten Sie {{customerName}} aus der Liste der Ansprechpartner löschen?',
+  'Resume your progress?': 'Ihren Fortschritt fortsetzen?',
+  "We've saved your progress from the previous session. Would you like to continue where you left off or start from scratch?":
+    'Wir haben Ihre Fortschritte aus der letzten Sitzung gespeichert. Möchten Sie dort weitermachen, wo Sie aufgehört haben, oder von vorne beginnen?',
+  'Start from scratch': 'Von vorne beginnen',
+  'Resume progress': 'Fortschritt fortsetzen',
+  'Beneficiary address': 'Leistungsempfänger',
+  'Add Beneficiary Address': 'Leistungsempfänger hinzufügen',
+  'Add Send invoice via': 'Hinzufügen "Rechnung senden über"',
+  'Add Contact person': 'Kontaktperson hinzufügen',
+  'BENEFICIARY ADDRESS': 'LEISTUNGSEMPFÄNGER ADRESSE',
 
   // Toast
   'Uh oh! As a Property Manager, please login at':
@@ -1378,7 +1389,7 @@ export const de = {
   '12 months': '12 Monate',
   'No work report for the selected service order':
     'Kein Arbeitsbericht für den ausgewählten Auftrag',
-  'Website/URL': 'Website/URL',
+  'Website/URL': 'Webseite/URL',
   'Remove defined contract name': 'Vertragsnamen entfernen',
   'If you delete this contract name, all existing contracts with the same contract name will lose their properties.':
     'Wenn Sie diesen Vertragsnamen löschen, verlieren alle bestehenden Verträge mit demselben Vertragsnamen ihre Eigenschaften.',
@@ -1409,6 +1420,10 @@ export const de = {
   'Invitation sent': 'Einladung versendet',
   'Search by number, customer, status etc.':
     'Suche nach Nummer, Kunde, Status usw.',
+  'Create new unit': 'Neue Anlage anlegen',
+  'Create New Unit': 'Neue Anlage anlegen',
+  'No units yet. They will appear here once added!':
+    'Noch keine Anlagen. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!',
   'Manage Payment Terms': 'Zahlungsbedingungen verwalten',
   'Choose a payment term to be used on your invoice':
     'Wählen Sie eine Zahlungsbedingung für Ihre Rechnung',

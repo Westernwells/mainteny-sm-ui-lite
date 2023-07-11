@@ -544,7 +544,7 @@ export const InvoiceForm = ({
                     customer && (
                       <>
                         <Typography variant="caption">
-                          {customer.postalAddress?.fullName ?? '-'}
+                          {customer.billingAddress?.fullName ?? '-'}
                         </Typography>
                         <Typography variant="caption" component="p">
                           {customer.contact.phone}
@@ -712,6 +712,7 @@ export const InvoiceForm = ({
                           radioProps={{
                             sx: {color: theme.palette.text.secondary},
                           }}
+                          disabled={formType === 'edit'}
                         />
                       ))
                   : invoice?.type === InvoiceType.FINAL &&
@@ -729,6 +730,7 @@ export const InvoiceForm = ({
                           radioProps={{
                             sx: {color: theme.palette.text.secondary},
                           }}
+                          disabled={formType === 'edit'}
                         />
                       ))
                   : invoiceTypeOptions.map((option) => (
@@ -742,6 +744,7 @@ export const InvoiceForm = ({
                         radioProps={{
                           sx: {color: theme.palette.text.secondary},
                         }}
+                        disabled={formType === 'edit'}
                       />
                     ))}
               </RadioGroup>
@@ -845,6 +848,7 @@ export const InvoiceForm = ({
               isCreditNote={formik.values.type === InvoiceType.CREDIT_NOTE}
               unitSellingAmount={invoice?.totalAmount}
               propertyOwnerId={customer?.id ?? ''}
+              formType={formType}
             />
 
             <InfoCard

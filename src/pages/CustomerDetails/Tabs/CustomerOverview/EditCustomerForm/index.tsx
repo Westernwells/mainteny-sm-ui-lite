@@ -7,7 +7,6 @@ import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
-import Add from '@mui/icons-material/Add';
 import Delete from '@mui/icons-material/Delete';
 
 import {countriesOptions, getStatesByCountry} from 'utils/countries';
@@ -36,29 +35,29 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
     setFieldValue,
   } = useFormikContext<CustomerEditForm>();
   const {t} = useTranslation();
-  const [showBillingAddress, setShowBillingAddress] = useState(
-    !!values.billingAddress || false,
+  const [showBeneficiaryAddress, setShowBeneficiaryAddress] = useState(
+    !!values.beneficiaryAddress || false,
   );
   const [showSendInvoiceViaAddress, setShowSendInvoiceViaAddress] = useState(
-    !!values.businessAddress || false,
+    !!values.otherAddress || false,
   );
 
   const statesByCountry = useCallback(
     (country?: string) => getStatesByCountry(country ?? ''),
     [
-      values.postalAddress?.component?.country,
       values.billingAddress?.component?.country,
-      values.businessAddress?.component?.country,
+      values.beneficiaryAddress?.component?.country,
+      values.otherAddress?.component?.country,
     ],
   );
 
-  const removeBillingAddress = () => {
-    setFieldValue('billingAddress.fullName', null);
-    setShowBillingAddress(false);
+  const removeBeneficiaryAddress = () => {
+    setFieldValue('beneficiaryAddress.fullName', null);
+    setShowBeneficiaryAddress(false);
   };
 
   const removeSendInvoiceViaAddress = () => {
-    setFieldValue('businessAddress.fullName', null);
+    setFieldValue('otherAddress.fullName', null);
     setShowSendInvoiceViaAddress(false);
   };
 
@@ -254,7 +253,7 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
       </Grid>
 
       <Typography variant="h6" pt="2rem" pb="1.5rem">
-        {t('Postal address')}
+        {t('Billing Address')}
       </Typography>
       <Grid container spacing={3}>
         <Grid item md={2.5}>
@@ -262,8 +261,8 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
             props={{
               size: 'small',
               label: 'Name',
-              name: 'postalAddress.fullName',
-              value: values.postalAddress?.fullName ?? '',
+              name: 'billingAddress.fullName',
+              value: values.billingAddress?.fullName ?? '',
               ...defaultProps,
             }}
           />
@@ -273,8 +272,8 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
             props={{
               size: 'small',
               label: 'Address line 1',
-              name: 'postalAddress.component.street',
-              value: values.postalAddress?.component?.street ?? '',
+              name: 'billingAddress.component.street',
+              value: values.billingAddress?.component?.street ?? '',
               ...defaultProps,
             }}
           />
@@ -284,8 +283,8 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
             props={{
               size: 'small',
               label: 'Address line 2',
-              name: 'postalAddress.component.street2',
-              value: values.postalAddress?.component?.street2 ?? '',
+              name: 'billingAddress.component.street2',
+              value: values.billingAddress?.component?.street2 ?? '',
               ...defaultProps,
             }}
           />
@@ -295,8 +294,8 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
             props={{
               size: 'small',
               label: 'City',
-              name: 'postalAddress.component.city',
-              value: values.postalAddress?.component?.city ?? '',
+              name: 'billingAddress.component.city',
+              value: values.billingAddress?.component?.city ?? '',
               ...defaultProps,
             }}
           />
@@ -306,21 +305,21 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
             props={{
               size: 'small',
               label: 'ZIP/Postal Code',
-              name: 'postalAddress.component.postalCode',
-              value: values.postalAddress?.component?.postalCode ?? '',
+              name: 'billingAddress.component.postalCode',
+              value: values.billingAddress?.component?.postalCode ?? '',
               ...defaultProps,
             }}
           />
         </Grid>
         <Grid item md={2.5}>
           <FormSelect
-            labelId="postalAddress.component.country"
+            labelId="billingAddress.component.country"
             label="Country"
             options={countriesOptions}
             selectProps={{
-              id: 'postalAddress.component.country',
-              name: 'postalAddress.component.country',
-              value: values.postalAddress?.component?.country ?? '',
+              id: 'billingAddress.component.country',
+              name: 'billingAddress.component.country',
+              value: values.billingAddress?.component?.country ?? '',
               multiple: false,
               onChange: handleChange,
             }}
@@ -328,13 +327,13 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
         </Grid>
         <Grid item md={2.5}>
           <FormSelect
-            labelId="postalAddress.component.state"
+            labelId="billingAddress.component.state"
             label="State/Province/Region"
-            options={statesByCountry(values.postalAddress?.component?.country)}
+            options={statesByCountry(values.billingAddress?.component?.country)}
             selectProps={{
-              id: 'postalAddress.component.state',
-              name: 'postalAddress.component.state',
-              value: values.postalAddress?.component?.state ?? '',
+              id: 'billingAddress.component.state',
+              name: 'billingAddress.component.state',
+              value: values.billingAddress?.component?.state ?? '',
               multiple: false,
               onChange: handleChange,
             }}
@@ -348,22 +347,22 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
         display="flex"
         alignItems="center"
         justifyContent="space-between">
-        <Typography variant="h6">{t('Different billing address')}</Typography>
-        {showBillingAddress && (
-          <IconButton onClick={removeBillingAddress} size="small">
+        <Typography variant="h6">{t('Beneficiary address')}</Typography>
+        {showBeneficiaryAddress && (
+          <IconButton onClick={removeBeneficiaryAddress} size="small">
             <Delete />
           </IconButton>
         )}
       </Box>
-      {showBillingAddress ? (
+      {showBeneficiaryAddress ? (
         <Grid container spacing={3}>
           <Grid item md={2.5}>
             <FormInput
               props={{
                 size: 'small',
                 label: 'Name',
-                name: 'billingAddress.fullName',
-                value: values.billingAddress?.fullName ?? '',
+                name: 'beneficiaryAddress.fullName',
+                value: values.beneficiaryAddress?.fullName ?? '',
                 ...defaultProps,
               }}
             />
@@ -373,8 +372,8 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
               props={{
                 size: 'small',
                 label: 'Address line 1',
-                name: 'billingAddress.component.street',
-                value: values.billingAddress?.component?.street ?? '',
+                name: 'beneficiaryAddress.component.street',
+                value: values.beneficiaryAddress?.component?.street ?? '',
                 ...defaultProps,
               }}
             />
@@ -384,8 +383,8 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
               props={{
                 size: 'small',
                 label: 'Address line 2',
-                name: 'billingAddress.component.street2',
-                value: values.billingAddress?.component?.street2 ?? '',
+                name: 'beneficiaryAddress.component.street2',
+                value: values.beneficiaryAddress?.component?.street2 ?? '',
                 ...defaultProps,
               }}
             />
@@ -395,8 +394,8 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
               props={{
                 size: 'small',
                 label: 'City',
-                name: 'billingAddress.component.city',
-                value: values.billingAddress?.component?.city ?? '',
+                name: 'beneficiaryAddress.component.city',
+                value: values.beneficiaryAddress?.component?.city ?? '',
                 ...defaultProps,
               }}
             />
@@ -406,21 +405,21 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
               props={{
                 size: 'small',
                 label: 'ZIP/Postal Code',
-                name: 'billingAddress.component.postalCode',
-                value: values.billingAddress?.component?.postalCode ?? '',
+                name: 'beneficiaryAddress.component.postalCode',
+                value: values.beneficiaryAddress?.component?.postalCode ?? '',
                 ...defaultProps,
               }}
             />
           </Grid>
           <Grid item md={2.5}>
             <FormSelect
-              labelId="billingAddress.component.country"
+              labelId="beneficiaryAddress.component.country"
               label="Country"
               options={countriesOptions}
               selectProps={{
-                id: 'billingAddress.component.country',
-                name: 'billingAddress.component.country',
-                value: values.billingAddress?.component?.country ?? '',
+                id: 'beneficiaryAddress.component.country',
+                name: 'beneficiaryAddress.component.country',
+                value: values.beneficiaryAddress?.component?.country ?? '',
                 multiple: false,
                 onChange: handleChange,
               }}
@@ -428,15 +427,15 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
           </Grid>
           <Grid item md={2.5}>
             <FormSelect
-              labelId="billingAddress.component.state"
+              labelId="beneficiaryAddress.component.state"
               label="State/Province/Region"
               options={statesByCountry(
-                values.billingAddress?.component?.country,
+                values.beneficiaryAddress?.component?.country,
               )}
               selectProps={{
-                id: 'billingAddress.component.state',
-                name: 'billingAddress.component.state',
-                value: values.billingAddress?.component?.state ?? '',
+                id: 'beneficiaryAddress.component.state',
+                name: 'beneficiaryAddress.component.state',
+                value: values.beneficiaryAddress?.component?.state ?? '',
                 multiple: false,
                 onChange: handleChange,
               }}
@@ -448,11 +447,12 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
           buttonProps={{
             size: 'medium',
             variant: 'outlined',
-            onClick: () => setShowBillingAddress(true),
-            startIcon: <Add />,
+            onClick: () => setShowBeneficiaryAddress(true),
             sx: {background: 'transparent'},
           }}>
-          <Typography variant="subtitle2">{t('Billing address')}</Typography>
+          <Typography variant="subtitle2">
+            {t('Add Beneficiary Address')}
+          </Typography>
         </Button>
       )}
 
@@ -478,8 +478,8 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
               props={{
                 size: 'small',
                 label: 'Name',
-                name: 'businessAddress.fullName',
-                value: values.businessAddress?.fullName ?? '',
+                name: 'otherAddress.fullName',
+                value: values.otherAddress?.fullName ?? '',
                 ...defaultProps,
               }}
             />
@@ -489,8 +489,8 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
               props={{
                 size: 'small',
                 label: 'Address line 1',
-                name: 'businessAddress.component.street',
-                value: values.businessAddress?.component?.street ?? '',
+                name: 'otherAddress.component.street',
+                value: values.otherAddress?.component?.street ?? '',
                 ...defaultProps,
               }}
             />
@@ -500,8 +500,8 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
               props={{
                 size: 'small',
                 label: 'Address line 2',
-                name: 'businessAddress.component.street2',
-                value: values.businessAddress?.component?.street2 ?? '',
+                name: 'otherAddress.component.street2',
+                value: values.otherAddress?.component?.street2 ?? '',
                 ...defaultProps,
               }}
             />
@@ -511,8 +511,8 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
               props={{
                 size: 'small',
                 label: 'City',
-                name: 'businessAddress.component.city',
-                value: values.businessAddress?.component?.city ?? '',
+                name: 'otherAddress.component.city',
+                value: values.otherAddress?.component?.city ?? '',
                 ...defaultProps,
               }}
             />
@@ -522,21 +522,21 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
               props={{
                 size: 'small',
                 label: 'ZIP/Postal Code',
-                name: 'businessAddress.component.postalCode',
-                value: values.businessAddress?.component?.postalCode ?? '',
+                name: 'otherAddress.component.postalCode',
+                value: values.otherAddress?.component?.postalCode ?? '',
                 ...defaultProps,
               }}
             />
           </Grid>
           <Grid item md={2.5}>
             <FormSelect
-              labelId="businessAddress.component.country"
+              labelId="otherAddress.component.country"
               label="Country"
               options={countriesOptions}
               selectProps={{
-                id: 'businessAddress.component.country',
-                name: 'businessAddress.component.country',
-                value: values.businessAddress?.component?.country ?? '',
+                id: 'otherAddress.component.country',
+                name: 'otherAddress.component.country',
+                value: values.otherAddress?.component?.country ?? '',
                 multiple: false,
                 onChange: handleChange,
               }}
@@ -544,15 +544,13 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
           </Grid>
           <Grid item md={2.5}>
             <FormSelect
-              labelId="businessAddress.component.state"
+              labelId="otherAddress.component.state"
               label="State/Province/Region"
-              options={statesByCountry(
-                values.businessAddress?.component?.country,
-              )}
+              options={statesByCountry(values.otherAddress?.component?.country)}
               selectProps={{
-                id: 'businessAddress.component.state',
-                name: 'businessAddress.component.state',
-                value: values.businessAddress?.component?.state ?? '',
+                id: 'otherAddress.component.state',
+                name: 'otherAddress.component.state',
+                value: values.otherAddress?.component?.state ?? '',
                 multiple: false,
                 onChange: handleChange,
               }}
@@ -565,12 +563,13 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
             size: 'medium',
             variant: 'outlined',
             onClick: () => setShowSendInvoiceViaAddress(true),
-            startIcon: <Add />,
             sx: {
               background: 'transparent',
             },
           }}>
-          <Typography variant="subtitle2">{t('Send invoice via')}</Typography>
+          <Typography variant="subtitle2">
+            {t('Add Send invoice via')}
+          </Typography>
         </Button>
       )}
     </Dialog>
