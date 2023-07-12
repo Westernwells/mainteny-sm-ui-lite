@@ -262,6 +262,7 @@ export const EditQuotation = ({quotation}: Props) => {
                 <UnitsDataGrid
                   setRowItem={handleSelectUnit}
                   searchCustomer={customer?.name}
+                  propertyOwnerId={customer?.id}
                 />
               }
               labelRequired
