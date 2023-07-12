@@ -15,7 +15,6 @@ import CalendarToday from '@mui/icons-material/CalendarToday';
 import TrendingUp from '@mui/icons-material/TrendingUp';
 import DateRange from '@mui/icons-material/DateRange';
 import MoneyOff from '@mui/icons-material/MoneyOff';
-import Timer from '@mui/icons-material/Timer';
 import {ContractStatus, FirstMaintenance} from 'models/contract';
 import {capitalize} from 'lodash';
 import {useFormatDate} from 'hooks/useFormatDate';
@@ -34,7 +33,6 @@ interface Props {
   yearlyPriceAdjustment?: number;
   noticePreiod?: number;
   discount?: string[];
-  hourlyRate?: string;
   status?: ContractStatus;
   firstMaintenance?: FirstMaintenance;
   firstInvoiceDate?: string;
@@ -52,7 +50,6 @@ export const ContractBasic = ({
   yearlyPriceAdjustment,
   noticePreiod,
   discount,
-  hourlyRate,
   status,
   type,
   firstMaintenance,
@@ -227,18 +224,6 @@ export const ContractBasic = ({
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3rem"
             bodyText={discount ? `${discount}` : '-'}
-          />
-        </Grid>
-
-        <Grid item xs={4}>
-          <CardProps
-            label="HOURLY RATE"
-            bodyTextVariant="subtitle1"
-            icon={<Timer color="info" />}
-            containerStyles={{mr: '0.5em'}}
-            iconBackground={theme.palette.info.outlinedHoverBg}
-            iconMaxHeight="3rem"
-            bodyText={hourlyRate ? `${hourlyRate}` : '-'}
           />
         </Grid>
 

@@ -217,28 +217,6 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
       </Grid>
 
       <Grid item md={6}>
-        <FormInput
-          props={{
-            placeholder: 'Enter hourly rates',
-            label: 'Hourly Rate',
-            name: 'hourlyRate',
-            type: 'number',
-            value: Number(formik.values.hourlyRate).toString(),
-            onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
-            error: !!formik.errors.hourlyRate,
-            InputProps: {
-              startAdornment: (
-                <InputAdornment position="start" color="text.primary">
-                  {currencySymbol}
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </Grid>
-
-      <Grid item md={6}>
         <DatePicker
           defaultDate={
             formik.values.firstMaintenance &&
