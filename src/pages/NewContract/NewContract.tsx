@@ -62,7 +62,6 @@ const validationSchemaContractTerms = Yup.object().shape({
     .required('Customer is required'),
   renewalTerms: Yup.number().min(0, 'Should be higher than 0'),
   spendingLimit: Yup.number().min(0, 'Should be higher or equals to 0'),
-  hourlyRate: Yup.number().min(0, 'Should be higher or equals to 0'),
   annualPriceAdjustmentPercentage: Yup.number().min(
     0,
     'Should be higher or equals to 0',
@@ -119,7 +118,6 @@ const NewContract = () => {
       netAmount: '',
       renewalTerms: '',
       spendingLimit: '',
-      hourlyRate: '',
       annualPriceAdjustmentPercentage: '',
       serviceLevelAgreement: '',
       invoiceDueDays: 0,
@@ -188,7 +186,6 @@ const NewContract = () => {
       ),
       elevators: formikUnits.values.elevators,
       endDate: toRestDate(formikBasicInfo.values.endDate!),
-      hourlyRate: +formikContractTerms.values.hourlyRate,
       invoiceCycle: formikContractTerms.values.invoiceCycle,
       price: amountRecordForBackend({
         currency: currentCurrency.code,

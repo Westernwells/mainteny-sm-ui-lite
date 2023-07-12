@@ -1344,7 +1344,6 @@ export const de = {
   'No checklist for selected service order':
     'Keine Checkliste für ausgewählten Serviceauftrag',
   'Add checklist to invoice': 'Checkliste zur Rechnung hinzufügen',
-  'Billing email address': 'Rechnungs-E-Mail-Adresse',
   'No report for selected service order':
     'Kein Wartungsbericht für den ausgewählten Serviceauftrag',
   'Maintenance contract': 'Wartungsvertrag',

@@ -4,7 +4,10 @@ import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
-import {useAllElevators} from 'hooks/reactQuery/useElevator';
+import {
+  useAllElevators,
+  useQueryCustomerElevator,
+} from 'hooks/reactQuery/useElevator';
 import {ElevatorView} from 'models/elevator';
 import {FormatDate} from 'models/misc';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
@@ -15,6 +18,7 @@ import {styles} from './style';
 interface Props {
   setRowItem: (row: ElevatorView) => void;
   searchCustomer?: string;
+  propertyOwnerId?: string;
 }
 
 export const columns: GridColDef[] = [
@@ -60,7 +64,11 @@ export const makeRows = (
 
 const pageSize = 25;
 
-export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
+export const UnitsDataGrid = ({
+  setRowItem,
+  searchCustomer,
+  propertyOwnerId,
+}: Props) => {
   const formatDate = useFormatDate();
   const [search, setSearch] = useState(searchCustomer || '');
   const [page, setPage] = useState(makePage(0, pageSize));
@@ -68,28 +76,70 @@ export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
   const [pageCount, setPageCount] = useState(0);
 
   const {
-    data: elevatorResource = createEmptyResource<ElevatorView>(pageSize),
-    isIdle,
-    isLoading,
-    isFetching,
-  } = useAllElevators(
-    {query: search, pageIndex: page.pageIndex, pageSize: page.pageSize},
+    data: customerResource = createEmptyResource<ElevatorView>(pageSize),
+    isFetching: isCustomerFetching,
+    isLoading: isCustomerLoading,
+  } = useQueryCustomerElevator(
+    {
+      query: encodeURIComponent(search!!),
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+    },
+    {},
+    propertyOwnerId,
     {keepPreviousData: true},
   );
 
-  useEffect(() => {
-    setPageCount(Math.ceil(elevatorResource.total / page.pageSize));
-  }, [elevatorResource, page.pageSize]);
+  const {
+    data: elevatorResource = createEmptyResource<ElevatorView>(pageSize),
+    isLoading: isElevatorLoading,
+    isFetching: isElevatorFetching,
+    refetch: refetchElevatorResource,
+  } = useAllElevators(
+    {
+      query: encodeURIComponent(search!!),
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+    },
+    {keepPreviousData: true, enabled: false},
+  );
 
   useEffect(() => {
-    if (elevatorResource.data.length) {
-      setRows(makeRows(elevatorResource.data, formatDate));
+    setPageCount(
+      Math.ceil(
+        propertyOwnerId
+          ? customerResource.total / page.pageSize
+          : elevatorResource.total / page.pageSize,
+      ),
+    );
+  }, [elevatorResource, customerResource, page.pageSize]);
+
+  useEffect(() => {
+    if (elevatorResource.data.length || customerResource.data.length) {
+      setRows(
+        makeRows(
+          propertyOwnerId ? customerResource.data : elevatorResource.data,
+          formatDate,
+        ),
+      );
     } else {
       setRows([]);
     }
-  }, [elevatorResource]);
+  }, [isElevatorFetching, isCustomerFetching, propertyOwnerId, search]);
 
-  if (isIdle || isLoading) {
+  useEffect(() => {
+    if (search === '' || (search !== '' && page.pageIndex !== 0)) {
+      refetchElevatorResource();
+    }
+  }, [search, page.pageIndex]);
+
+  useEffect(() => {
+    if (page.pageIndex) {
+      setPage({...page, pageIndex: 0});
+    }
+  }, [search]);
+
+  if (isCustomerLoading || isElevatorLoading) {
     return (
       <Box
         display="flex"
@@ -115,9 +165,9 @@ export const UnitsDataGrid = ({setRowItem, searchCustomer}: Props) => {
           columns={columns}
           scrollToTop={search}
           onCellClick={(params) => setRowItem(params.row.elevator)}
-          loading={isFetching}
+          loading={isCustomerFetching}
           pageSize={page.pageSize}
-          pageIndex={page.pageIndex}
+          pageIndex={page.pageIndex + 1}
           pageCount={pageCount}
           hideFooter={pageCount <= 1}
           handlePageChange={(value) =>

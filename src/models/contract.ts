@@ -50,7 +50,6 @@ export interface Contract {
   sla: number;
   spendingLimit: number;
   price: number;
-  hourlyRate: number;
   currency: string;
   startTime: string;
   endTime: string;
@@ -118,11 +117,8 @@ export interface ContractView {
   visitsNumber: number;
   number: number;
   externalId: string;
-
   sla: number;
   spendingLimit: number;
-
-  hourlyRate: number;
   currency: string;
   startTime: string;
   endTime: string;
@@ -140,7 +136,6 @@ export interface ContractSimpleView {
   sla: number;
   spendingLimit: number;
   price: number;
-  hourlyRate: number;
   number: number;
   currency: string;
   startTime: string;
@@ -159,7 +154,6 @@ export interface CreateContractRecord {
   sla: number;
   spendingLimit: number;
   price: number;
-  hourlyRate: number;
   currency: string;
   startDate: string;
   endDate: string;
@@ -173,7 +167,6 @@ export interface UpdateContractRecord {
   sla: number;
   spendingLimit: number;
   price: number;
-  hourlyRate: number;
   currency: string;
   startDate: string;
   endDate: string;
@@ -224,7 +217,6 @@ export interface ContractRequestBody {
   currency?: string;
   endDate?: string;
   externalId?: string;
-  hourlyRate?: number;
   price?: ContractPrice;
   sla?: number;
   spendingLimit?: number;
@@ -253,7 +245,6 @@ export interface ContractTermsFormModal {
   netAmount: number | string;
   renewalTerms: number | string;
   spendingLimit: number | string;
-  hourlyRate: number | string;
   annualPriceAdjustmentPercentage: number | string;
   serviceLevelAgreement: number | string;
   firstMaintenance?: FirstMaintenance;
@@ -276,7 +267,6 @@ export interface ContractUpdateRequest {
   annualPriceAdjustmentPercentage?: number;
   discounts?: number;
   noticePeriodInMonth?: number;
-  hourlyRate?: number;
   firstMaintenance?: FirstMaintenance;
   firstInvoiceDate?: string;
   paymentTerms?: string;

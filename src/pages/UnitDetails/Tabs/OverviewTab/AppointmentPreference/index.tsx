@@ -140,7 +140,7 @@ export const AppointmentPreference = ({
             label="OPENING HOURS"
             bodyText={`${removeSecondsFromTimeString(
               parsedTimeRulesData.timeRange.start,
-            )}-${removeSecondsFromTimeString(
+            )} - ${removeSecondsFromTimeString(
               parsedTimeRulesData.timeRange.end,
             )}`}
             iconBackground={theme.palette.info.outlinedHoverBg}
