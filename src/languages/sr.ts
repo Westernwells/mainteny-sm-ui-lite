@@ -1312,7 +1312,6 @@ export const sr = {
   'No checklist for selected service order':
     'Nema kontrolne liste za odabranu narudžbu usluge',
   'Add checklist to invoice': 'Dodajte kontrolni popis na fakturu',
-  'Billing email address': 'Adresa e-pošte za naplatu',
   'No report for selected service order':
     'Nema izvješća za odabrani nalog usluge',
   'Maintenance contract': 'Maintenance contract',

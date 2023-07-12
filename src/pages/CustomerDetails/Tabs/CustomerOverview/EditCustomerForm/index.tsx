@@ -114,7 +114,7 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
             props={{
               size: 'small',
               placeholder: 'e.g johndoe@example.com',
-              label: 'Billing email address',
+              label: 'Billing Email Address',
               name: 'billingEmail',
               value: values.billingEmail,
               helperText: touched.billingEmail && errors.billingEmail,

@@ -68,7 +68,7 @@ export const BasicCustomerForm = ({formik}: Props) => {
               props={{
                 size: 'small',
                 placeholder: 'e.g johndoe@example.com',
-                label: 'Billing email address',
+                label: 'Billing Email Address',
                 name: 'billingEmail',
                 value: formik.values.billingEmail,
                 helperText:
