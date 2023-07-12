@@ -849,6 +849,7 @@ export const de = {
   'Article Name': 'Artikelbezeichnung',
   PRIORITY: 'PRIORITÄT',
   NONE: 'KEINE',
+  None: 'Keine',
   'NO. OF CONTRACTS': 'ANZAHL VERTRÄGE',
   'Basic Details': 'Allgemeine Angaben',
   'Billing Address': 'Rechnungsadresse',

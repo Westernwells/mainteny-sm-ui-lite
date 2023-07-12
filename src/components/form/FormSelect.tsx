@@ -123,8 +123,10 @@ export const FormSelect = ({
               style={{
                 margin: '0.3em 0.5em 0.3em 0em',
                 backgroundColor: 'white',
-              }}>
-              {t('No terms found.')}
+              }}
+              key="none"
+              value="none">
+              {t('None')}
             </MenuItem>
           ),
 
@@ -134,7 +136,8 @@ export const FormSelect = ({
               background: 'none',
               fontWeight: '600',
               color: theme.palette.primary.main,
-            }}>
+            }}
+            key="onClickPaymentTerms">
             <SettingsIcon
               style={{
                 margin: '0.1em 0.3em 0.1em 0em',

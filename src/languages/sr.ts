@@ -844,6 +844,7 @@ export const sr = {
   'Article Name': 'Naziv članka',
   PRIORITY: 'Prioritet',
   NONE: 'NIJEDAN',
+  None: 'Nijedan',
   'NO. OF CONTRACTS': 'BROJ UGOVORA',
   'Basic Details': 'Osnovni detalji',
   'Billing Address': 'Adresa za naplatu',

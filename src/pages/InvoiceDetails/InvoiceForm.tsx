@@ -33,7 +33,7 @@ import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {Tooltip} from 'components/Tooltip';
 import {InfoCard} from 'components/InfoCard';
 import {EmptySection} from 'components/EmptySection';
-import {ContractPaymentTermSelectDialog} from 'components/ContractPaymentTermSelectModal';
+import {ContractPaymentTermSelectDialog} from 'components/ContractPaymentTermSelectDialog';
 import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
@@ -63,6 +63,8 @@ import {addYears} from 'date-fns';
 import {InvoiceCheckbox} from 'pages/InvoiceDetails/InvoiceCheckbox';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {IconButton} from '@mui/material';
+import {useQueryContractPaymentTerms} from 'hooks/reactQuery/useCompanies';
+import {createEmptyResource} from 'utils/paging-utils';
 import {BeneficiaryDetails} from './BeneficiaryDetails';
 import {formatInvoiceRecord} from './utils';
 
@@ -93,6 +95,8 @@ const toolTipText = (
   </div>
 );
 
+const pageSize = 50;
+
 export const InvoiceForm = ({
   invoice,
   serviceOrderResource,
@@ -105,6 +109,15 @@ export const InvoiceForm = ({
   const navigate = useNavigate();
 
   const {user} = useUserSession();
+
+  const {data: contractPaymentTerms = createEmptyResource(pageSize)} =
+    useQueryContractPaymentTerms({
+      page: {
+        pageIndex: 0,
+        pageSize,
+      },
+      query: '',
+    });
 
   const {mutateAsync: updateInvoiceAsync, isLoading: isUpdating} =
     useUpdateInvoice();
@@ -462,6 +475,18 @@ export const InvoiceForm = ({
     formik.setFieldValue('paymentTerms', paymentTerms);
     setOpenContractPaymentTermsDialog(false);
   };
+
+  useEffect(() => {
+    if (
+      !contractPaymentTerms.data.filter(
+        (item) =>
+          item.term === formik.values.paymentTerms ||
+          item.term === invoice?.paymentTerms,
+      ).length
+    ) {
+      formik.setFieldValue('paymentTerms', '');
+    }
+  }, [contractPaymentTerms.data]);
 
   return (
     <Box>
