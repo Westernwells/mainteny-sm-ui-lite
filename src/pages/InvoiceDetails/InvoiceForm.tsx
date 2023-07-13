@@ -288,7 +288,6 @@ export const InvoiceForm = ({
       invoiceType || invoice?.type || InvoiceType.FULL,
       true,
     );
-    formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '', true);
 
     formik.setFieldValue('dueDate', invoice?.dueDate || '', true);
     formik.setFieldValue(
@@ -486,7 +485,8 @@ export const InvoiceForm = ({
     ) {
       formik.setFieldValue('paymentTerms', '');
     }
-  }, [contractPaymentTerms.data]);
+    formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '', true);
+  }, [contractPaymentTerms.data, invoice]);
 
   return (
     <Box>
