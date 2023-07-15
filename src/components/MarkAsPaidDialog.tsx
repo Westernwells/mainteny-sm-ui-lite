@@ -2,7 +2,6 @@ import Dialog from '@mui/material/Dialog';
 import {useTranslation} from 'react-i18next';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
-import useTheme from '@mui/material/styles/useTheme';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
@@ -40,32 +39,24 @@ export const MarkAsPaidDialog = ({
   invoice,
 }: Props) => {
   const {t} = useTranslation();
-  const theme = useTheme();
   const {mutate: addInvoicePayment} = useAddInvoicePayment();
-  const formik = useFormik<InvoicePaymentRecord & {paidInFull: boolean}>({
+  const formik = useFormik<InvoicePaymentRecord>({
     initialValues: {
       amount: {
-        value:
-          invoice.totalAmount.netAmount /
-          10 ** invoice.totalAmount.fractionDigits!,
+        value: invoice.totalAmount.grossAmount,
         currency: invoice.totalAmount.currency,
       },
       paidDate: new Date().toString(),
-      markAsPaid: true,
-      paidInFull: true,
+      markAsPaid: false,
     },
     onSubmit: (values, {setSubmitting}) => {
-      const grossTotal =
-        (values.amount.value +
-          invoice.totalAmount.vat / 10 ** invoice.totalAmount.fractionDigits!) *
-        10 ** invoice.totalAmount.fractionDigits!;
-
+      console.log(values, 'values');
       addInvoicePayment(
         {
           invoiceId: invoice.id,
           body: {
             amount: {
-              value: grossTotal,
+              value: values.amount.value,
               currency: values.amount.currency,
             },
             paidDate: formatDate(values.paidDate, 'yyyy-MM-dd')!,
@@ -131,7 +122,7 @@ export const MarkAsPaidDialog = ({
                   : '',
               required: true,
               type: 'number',
-              disabled: formik.values.paidInFull,
+              disabled: formik.values.markAsPaid,
               InputProps: {
                 endAdornment: (
                   <InputAdornment position="start">
@@ -142,10 +133,10 @@ export const MarkAsPaidDialog = ({
             }}
           />
           <FormCheckbox
-            checked={formik.values.paidInFull}
-            name="paidInFull"
+            checked={formik.values.markAsPaid}
+            name="markAsPaid"
             handleChange={formik.handleChange}
-            label={t('Paid in full')}
+            label={t('Mark as paid')}
           />
           <DatePicker
             defaultDate={new Date()}
@@ -170,21 +161,6 @@ export const MarkAsPaidDialog = ({
         <Button
           buttonProps={{
             size: 'medium',
-            variant: 'text',
-            sx: {
-              mr: '1rem',
-              textTransform: 'capitalize',
-            },
-            onClick: onClose,
-          }}>
-          <Typography variant="subtitle2" color={theme.palette.primary.main}>
-            {t('Keep as Unpaid')}
-          </Typography>
-        </Button>
-
-        <Button
-          buttonProps={{
-            size: 'medium',
             variant: 'contained',
             autoFocus: true,
             disabled: formik.isSubmitting,
@@ -193,7 +169,7 @@ export const MarkAsPaidDialog = ({
               textTransform: 'capitalize',
             },
           }}>
-          <Typography variant="subtitle2">{t('Mark as paid')}</Typography>
+          <Typography variant="subtitle2">{t('Pay')}</Typography>
         </Button>
       </DialogActions>
     </Dialog>
