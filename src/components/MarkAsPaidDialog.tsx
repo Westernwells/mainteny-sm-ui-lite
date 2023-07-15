@@ -17,6 +17,7 @@ import {FormInput} from 'components/form/FormInput';
 import {Button} from 'components/Button';
 import {DatePicker} from 'components/DatePicker';
 import {FormCheckbox} from 'components/form/FormCheckbox';
+import {useEffect} from 'react';
 
 interface Props {
   open?: boolean;
@@ -43,20 +44,22 @@ export const MarkAsPaidDialog = ({
   const formik = useFormik<InvoicePaymentRecord>({
     initialValues: {
       amount: {
-        value: invoice.totalAmount.grossAmount,
+        value:
+          invoice.totalAmount.grossAmount /
+          10 ** invoice.totalAmount.fractionDigits!,
         currency: invoice.totalAmount.currency,
       },
       paidDate: new Date().toString(),
       markAsPaid: false,
     },
     onSubmit: (values, {setSubmitting}) => {
-      console.log(values, 'values');
       addInvoicePayment(
         {
           invoiceId: invoice.id,
           body: {
             amount: {
-              value: values.amount.value,
+              value:
+                values.amount.value * 10 ** invoice.totalAmount.fractionDigits!,
               currency: values.amount.currency,
             },
             paidDate: formatDate(values.paidDate, 'yyyy-MM-dd')!,
@@ -75,6 +78,7 @@ export const MarkAsPaidDialog = ({
     validationSchema,
   });
 
+  useEffect(() => {}, [open]);
   return (
     <Dialog
       open={open || false}
