@@ -1265,6 +1265,7 @@ export const de = {
   'Paid in full': 'Vollständig gezahlt',
   'Paid amount': 'Gezahlter Betrag',
   'Paid amount (excl. VAT)': 'Gezahlter Betrag (ohne MwSt.)',
+  'Paid amount (incl. VAT)': 'Gezahlter Betrag (inkl. MwSt.)',
   Preview: 'Vorschau',
   Edit: 'Bearbeiten',
   Payment: 'Zahlung',
