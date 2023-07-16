@@ -17,7 +17,6 @@ import {FormInput} from 'components/form/FormInput';
 import {Button} from 'components/Button';
 import {DatePicker} from 'components/DatePicker';
 import {FormCheckbox} from 'components/form/FormCheckbox';
-import {useEffect} from 'react';
 
 interface Props {
   open?: boolean;
@@ -41,6 +40,7 @@ export const MarkAsPaidDialog = ({
 }: Props) => {
   const {t} = useTranslation();
   const {mutate: addInvoicePayment} = useAddInvoicePayment();
+
   const formik = useFormik<InvoicePaymentRecord>({
     initialValues: {
       amount: {
@@ -78,7 +78,6 @@ export const MarkAsPaidDialog = ({
     validationSchema,
   });
 
-  useEffect(() => {}, [open]);
   return (
     <Dialog
       open={open || false}
