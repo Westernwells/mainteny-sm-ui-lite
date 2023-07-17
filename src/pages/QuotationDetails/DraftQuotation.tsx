@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import Typography from '@mui/material/Typography';
@@ -17,10 +17,12 @@ import {BottomDrawer} from 'components/BottomDrawer';
 import {FormLabel} from 'components/form/FormLabel';
 import {FormInput} from 'components/form/FormInput';
 import {SendEmailDialog} from 'components/SendEmailDialog';
+import {Progress} from 'components/Progress';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateQuotation,
   usePublishQuotation,
+  useQuotationDetails,
 } from 'hooks/reactQuery/useQuotation';
 import {CreateQuotation, QuotationItemRecord} from 'models/quotation';
 import {ElevatorView} from 'models/elevator';
@@ -31,11 +33,17 @@ import {
 import {WithOptional} from 'models/misc';
 
 export const DraftQuotation = () => {
+  const [queryParams] = useSearchParams();
+  const currentParams = Object.fromEntries([...queryParams]);
+
   const {t} = useTranslation();
   const navigate = useNavigate();
 
   const {user} = useUserSession();
 
+  const {data: quotation, isLoading} = useQuotationDetails(currentParams?.id, {
+    enabled: !!currentParams?.id,
+  });
   const {mutateAsync: createNewQuotation, isLoading: isCreating} =
     useCreateQuotation();
   const {mutateAsync: publishQuotation, isLoading: publishingQuotation} =
@@ -100,6 +108,27 @@ export const DraftQuotation = () => {
   }, [user]);
 
   useEffect(() => {
+    if (quotation) {
+      setQuotationItems(
+        quotation.items.map(
+          (i): QuotationItemRecord => ({
+            articleId: i.article.id,
+            description: i.description || i.article.description,
+            name: i.name || i.article.name,
+            articleUnit: i.article.unit,
+            quantity: i.quantity,
+            unitAmount: i.unitAmount,
+          }),
+        ),
+      );
+      setUnit(quotation.elevator);
+      formik.setFieldValue('subject', quotation.subject, true);
+      formik.setFieldValue('description', quotation.description, true);
+      formik.setFieldValue('moreInfo', quotation.moreInfo, true);
+    }
+  }, [quotation]);
+
+  useEffect(() => {
     if (unit) {
       setCustomer(unit.propertyOwner);
       formik.setFieldValue('elevatorId', unit.id, true);
@@ -131,6 +160,10 @@ export const DraftQuotation = () => {
 
     return !!valid;
   };
+
+  if (isLoading) {
+    return <Progress />;
+  }
 
   return (
     <Box>
