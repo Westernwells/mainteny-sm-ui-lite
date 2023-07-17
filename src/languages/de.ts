@@ -1267,6 +1267,7 @@ export const de = {
   'Paid in full': 'Vollständig gezahlt',
   'Paid amount': 'Gezahlter Betrag',
   'Paid amount (excl. VAT)': 'Gezahlter Betrag (ohne MwSt.)',
+  'Paid amount (incl. VAT)': 'Gezahlter Betrag (inkl. MwSt.)',
   Preview: 'Vorschau',
   Edit: 'Bearbeiten',
   Payment: 'Zahlung',
@@ -1424,6 +1425,7 @@ export const de = {
   'Create New Unit': 'Neue Anlage anlegen',
   'No units yet. They will appear here once added!':
     'Noch keine Anlagen. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!',
+  Pay: 'Zahlen',
   'Manage Payment Terms': 'Zahlungsbedingungen verwalten',
   'Choose a payment term to be used on your invoice':
     'Wählen Sie eine Zahlungsbedingung für Ihre Rechnung',

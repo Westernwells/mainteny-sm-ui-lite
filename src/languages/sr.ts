@@ -1236,6 +1236,7 @@ export const sr = {
   'Paid in full': 'Plaćeno u potpunosti',
   'Paid amount': 'Plaćeni iznos',
   'Paid amount (excl. VAT)': 'Plaćeni iznos (bez PDV)',
+  'Paid amount (incl. VAT)': 'Gezahlter Betrag ( sa PDV )',
   Preview: 'Pregled',
   Edit: 'Urediti',
   Payment: 'Plaćanje',
@@ -1400,4 +1401,5 @@ export const sr = {
   'Add your payment terms that would be used later in invoicing':
     'Dodajte uslove plaćanja koji će se kasnije koristiti u fakturisanju',
   'New Payment Term': 'Novi uslov plaćanja',
+  Pay: 'Plati',
 };
