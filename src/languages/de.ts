@@ -1423,4 +1423,5 @@ export const de = {
   'Create New Unit': 'Neue Anlage anlegen',
   'No units yet. They will appear here once added!':
     'Noch keine Anlagen. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!',
+  Pay: 'Zahlen',
 };
