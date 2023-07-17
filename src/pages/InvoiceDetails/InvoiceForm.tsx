@@ -275,7 +275,7 @@ export const InvoiceForm = ({
       invoiceType || invoice?.type || InvoiceType.FULL,
       true,
     );
-
+    formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '', true);
     formik.setFieldValue('dueDate', invoice?.dueDate || '', true);
     formik.setFieldValue(
       'serviceOrderId',
