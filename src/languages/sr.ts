@@ -1234,6 +1234,7 @@ export const sr = {
   'Paid in full': 'Plaćeno u potpunosti',
   'Paid amount': 'Plaćeni iznos',
   'Paid amount (excl. VAT)': 'Plaćeni iznos (bez PDV)',
+  'Paid amount (incl. VAT)': 'Gezahlter Betrag ( sa PDV )',
   Preview: 'Pregled',
   Edit: 'Urediti',
   Payment: 'Plaćanje',
@@ -1391,4 +1392,5 @@ export const sr = {
   'Create New Unit': 'Napravite Novu Jedinicu',
   'No units yet. They will appear here once added!':
     'Još nema jedinica. Pojaviće se ovde kada se unesu!',
+  Pay: 'Plati',
 };
