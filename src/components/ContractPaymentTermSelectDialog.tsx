@@ -84,14 +84,14 @@ export const ContractPaymentTermSelectDialog = ({
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{pb: 1}}>
+      <DialogContent sx={{pb: 5}}>
         <Alert severity="info" sx={{mb: 3, mt: 3}}>
           {alertText}
         </Alert>
 
         <FormSelect
-          labelId="Payment terms"
-          label={t('Payment terms')}
+          labelId="Payment Terms"
+          label={t('Payment Terms')}
           options={contractPaymentTerms?.data?.map(({term}) => ({
             label: term,
             value: term,

@@ -144,6 +144,7 @@ export const sr = {
   'JPEG, PNG, BMP, GIF, WEBP or SVG': 'JPEG, PNG, BMP, GIF, WEBP ili SVG',
   'No description added.': 'Nije dodat opis',
   'Payment terms': 'Uslovi plaćanja',
+  'Payment Terms': 'Uslovi Plaćanja',
   'No payment terms applied': 'Nisu primenjeni uslovi plaćanja',
   'Choose your payment term': 'Izaberite svoj uslov plaćanja',
   Choosed: 'Izabrani',
@@ -843,6 +844,7 @@ export const sr = {
   'Article Name': 'Naziv članka',
   PRIORITY: 'Prioritet',
   NONE: 'NIJEDAN',
+  None: 'Nijedan',
   'NO. OF CONTRACTS': 'BROJ UGOVORA',
   'Basic Details': 'Osnovni detalji',
   'Billing Address': 'Adresa za naplatu',
@@ -1392,5 +1394,12 @@ export const sr = {
   'Create New Unit': 'Napravite Novu Jedinicu',
   'No units yet. They will appear here once added!':
     'Još nema jedinica. Pojaviće se ovde kada se unesu!',
+  'Manage Payment Terms': 'Upravljajte uslovima plaćanja',
+  'Choose a payment term to be used on your invoice':
+    'Izaberite uslov plaćanja koji će se koristiti na vašoj fakturi',
+  'Write your term here': 'Ovde napišite svoj uslov',
+  'Add your payment terms that would be used later in invoicing':
+    'Dodajte uslove plaćanja koji će se kasnije koristiti u fakturisanju',
+  'New Payment Term': 'Novi uslov plaćanja',
   Pay: 'Plati',
 };

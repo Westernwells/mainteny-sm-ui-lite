@@ -285,3 +285,12 @@ export interface NewContractPaymentTermBody {
   serviceCompanyId: string;
   term: string;
 }
+
+export interface UpdateContractPaymentTermRecord {
+  term: string;
+}
+
+export interface UpdateContractPaymentTermView {
+  term: string;
+  id: string;
+}

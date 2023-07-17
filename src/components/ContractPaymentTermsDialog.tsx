@@ -14,8 +14,15 @@ import Add from '@mui/icons-material/Add';
 import Close from '@mui/icons-material/Close';
 import {getUniqueId} from 'utils/utils';
 import {Button} from 'components/Button';
-import {useCreateContractPaymentTerm} from 'hooks/reactQuery/useContractPaymentTerms';
+import {
+  useCreateContractPaymentTerm,
+  useDeleteContractPaymentTerm,
+  useUpdateContractPaymentTerm,
+} from 'hooks/reactQuery/useContractPaymentTerms';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useQueryContractPaymentTerms} from 'hooks/reactQuery/useCompanies';
+import {createEmptyResource} from 'utils/paging-utils';
+import {compareArrays} from 'utils/contract-terms';
 import {FormInput} from './form/FormInput';
 
 interface Props {
@@ -34,6 +41,8 @@ const validationSchema = Yup.object().shape({
   ),
 });
 
+const pageSize = 50;
+
 export const ContractPaymentTermsDialog = ({
   open,
   onCancel,
@@ -43,6 +52,18 @@ export const ContractPaymentTermsDialog = ({
   const {t} = useTranslation();
   const {user} = useUserSession();
   const {mutate: createContractPaymentTerm} = useCreateContractPaymentTerm();
+  const {mutateAsync: updateContractPaymentTerm} =
+    useUpdateContractPaymentTerm();
+  const {mutate: deleteContractPaymentTerm} = useDeleteContractPaymentTerm();
+
+  const {data: contractPaymentTerms = createEmptyResource(pageSize)} =
+    useQueryContractPaymentTerms({
+      page: {
+        pageIndex: 0,
+        pageSize,
+      },
+      query: '',
+    });
 
   const formik = useFormik<{
     otherPaymentTerms: {id: string; term: string}[];
@@ -52,14 +73,44 @@ export const ContractPaymentTermsDialog = ({
       otherPaymentTerms: [],
     },
     onSubmit: (values, {resetForm}) => {
-      values.otherPaymentTerms.forEach(
-        (pt) =>
-          pt.term &&
-          createContractPaymentTerm({
-            serviceCompanyId: user!.userAccount.serviceCompany.id,
-            term: pt.term,
-          }),
+      const comparisonResult = compareArrays(
+        contractPaymentTerms.data,
+        values.otherPaymentTerms,
       );
+
+      if (comparisonResult.itemsInFirstOnly) {
+        comparisonResult.itemsInFirstOnly.forEach(
+          (pt) =>
+            pt.id &&
+            deleteContractPaymentTerm({
+              paymentTermId: pt.id,
+            }),
+        );
+      }
+
+      if (comparisonResult.modifiedItems) {
+        comparisonResult.modifiedItems.forEach(
+          (pt) =>
+            pt.id &&
+            updateContractPaymentTerm({
+              body: {
+                term: pt.term,
+              },
+              paymentTermId: pt.id,
+            }),
+        );
+      }
+
+      if (comparisonResult.newItems) {
+        comparisonResult.newItems.forEach(
+          (pt) =>
+            pt.term &&
+            createContractPaymentTerm({
+              serviceCompanyId: user!.userAccount.serviceCompany.id,
+              term: pt.term,
+            }),
+        );
+      }
       resetForm();
       onCancel();
     },
@@ -84,14 +135,16 @@ export const ContractPaymentTermsDialog = ({
   };
 
   useEffect(() => {
-    formik.setFieldValue('otherPaymentTerms', [
-      ...formik.values.otherPaymentTerms,
-      {
-        id: getUniqueId(),
-        term: '',
-      },
-    ]);
-  }, []);
+    if (open) {
+      formik.setFieldValue('otherPaymentTerms', [
+        ...contractPaymentTerms.data,
+        {
+          id: getUniqueId(),
+          term: '',
+        },
+      ]);
+    }
+  }, [open]);
 
   return (
     <Dialog
@@ -190,7 +243,8 @@ export const ContractPaymentTermsDialog = ({
           buttonProps={{
             variant: 'contained',
             size: 'medium',
-            disabled: !formik.isValid,
+            disabled:
+              !formik.isValid && !!formik.values.otherPaymentTerms.length,
             onClick: () => formik.handleSubmit(),
           }}>
           <Typography variant="subtitle2">{t('Save')}</Typography>

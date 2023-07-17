@@ -33,7 +33,7 @@ import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {Tooltip} from 'components/Tooltip';
 import {InfoCard} from 'components/InfoCard';
 import {EmptySection} from 'components/EmptySection';
-import {ContractPaymentTermSelectDialog} from 'components/ContractPaymentTermSelectModal';
+import {ContractPaymentTermSelectDialog} from 'components/ContractPaymentTermSelectDialog';
 import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
@@ -276,7 +276,6 @@ export const InvoiceForm = ({
       true,
     );
     formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '', true);
-
     formik.setFieldValue('dueDate', invoice?.dueDate || '', true);
     formik.setFieldValue(
       'serviceOrderId',
@@ -978,7 +977,7 @@ export const InvoiceForm = ({
       />
 
       <ContractPaymentTermsDialog
-        title={t('Manage payment terms')}
+        title={t('Manage Payment Terms')}
         alertText={t(
           'Add your payment terms that would be used later in invoicing',
         )}
