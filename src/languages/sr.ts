@@ -1392,5 +1392,5 @@ export const sr = {
   'Create New Unit': 'Napravite Novu Jedinicu',
   'No units yet. They will appear here once added!':
     'Još nema jedinica. Pojaviće se ovde kada se unesu!',
-  Pay: 'Platiti',
+  Pay: 'Plati',
 };
