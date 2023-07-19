@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import {ElevatorCategory, ElevatorView} from 'models/elevator';
 import {InfoCard} from 'components/InfoCard';
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {Dialog} from 'components/Dialog';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {useFormik} from 'formik';
@@ -100,6 +100,26 @@ export const UnitDetails = ({
       elevatorId: elevator.id,
     });
   };
+
+  useEffect(() => {
+    formik.setFieldValue('category', convertToText(elevator.category));
+    formik.setFieldValue('manufacturer', elevator.additionalInfo.manufacturer);
+    formik.setFieldValue(
+      'numberOfStops',
+      elevator.additionalInfo.numberOfStops,
+    );
+    formik.setFieldValue('cabinType', elevator.additionalInfo.cabinType);
+    formik.setFieldValue(
+      'emergencyPhoneProvider',
+      elevator.additionalInfo.emergencyPhoneProvider,
+    );
+    formik.setFieldValue('unitType', elevator.type);
+    formik.setFieldValue('model', elevator.model);
+    formik.setFieldValue('serialNumber', elevator.serialNumber);
+    formik.setFieldValue('yearBuilt', elevator.additionalInfo.builtYear);
+    formik.setFieldValue('spendingLimit', validContract?.spendingLimit);
+    formik.setFieldValue('unitCapacity', elevator.capacity);
+  }, [openDialog]);
 
   return (
     <InfoCard
