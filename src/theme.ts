@@ -4,15 +4,15 @@ export const theme = createTheme({
   palette: {
     primary: {
       light: '#457892',
-      main: '#0F4C64',
-      dark: '#00243A',
+      main: '#000034',
+      dark: '#000034',
       contrastText: '#FFFFFF',
       outlinedHoverBg: 'rgba(15, 76, 100, 0.08)',
     },
     secondary: {
       light: '#6CFFFF',
       main: '#00D1FF',
-      dark: '#00A0CC',
+      dark: '#00D1FF',
       contrastText: '#FFFFFF',
       outlinedHoverBg: 'rgba(0, 209, 255, 0.08)',
       containedHoverBackground:
@@ -25,8 +25,8 @@ export const theme = createTheme({
     },
     action: {
       active: '#8F9BB3',
-      hover: 'rgba(0, 209, 255, 0.04)',
-      selected: 'rgba(0, 209, 255, 0.08)',
+      hover: '#40748054',
+      selected: '#40748054',
       disabled: 'rgba(143, 155, 179, 0.5)',
       disabledBackground: 'rgba(34, 43, 69, 0.12)',
       focus: 'rgba(34, 43, 69, 0.12)',
@@ -78,7 +78,12 @@ export const theme = createTheme({
     tonalOffset: 0.2,
   },
   typography: {
-    fontFamily: ['"Open Sans"', 'Helvetica', 'Arial', 'sans-serif'].join(','),
+    fontFamily: [
+      '"Aventa","Open Sans"',
+      'Helvetica',
+      'Arial',
+      'sans-serif',
+    ].join(','),
     // htmlFontSize: 10,
     // root: {},
     h1: {
@@ -117,7 +122,7 @@ export const theme = createTheme({
       letterSpacing: '0.15px',
     },
     subtitle1: {
-      fontWeight: 600,
+      fontWeight: 400,
       fontSize: '1rem',
       lineHeight: 1.75,
       letterSpacing: '0.15px',
@@ -264,7 +269,7 @@ export const theme = createTheme({
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          background: 'linear-gradient(180deg, #095369 0%, #043146 100%)',
+          background: '#000034',
           color: '#fff',
         },
       },
@@ -272,9 +277,14 @@ export const theme = createTheme({
     MuiListItemButton: {
       styleOverrides: {
         root: {
+          '&:hover': {
+            background: '#40748054',
+            borderLeft: '0px',
+          },
           '&.Mui-selected': {
-            background: '#457892',
+            background: '#40748054',
             boxSizing: 'border-box',
+            borderLeft: '6px solid #00D1FF',
           },
         },
       },
@@ -334,7 +344,7 @@ export const theme = createTheme({
         {
           props: {variant: 'tableHeaderText'},
           style: {
-            fontFamily: 'Open Sans',
+            fontFamily: 'Aventa',
             fontWeight: 500,
             fontSize: '0.875rem',
             lineHeight: 1.7,
@@ -344,7 +354,7 @@ export const theme = createTheme({
         {
           props: {variant: 'alertTitleText'},
           style: {
-            fontFamily: 'Open Sans',
+            fontFamily: 'Aventa',
             fontWeight: 500,
             fontSize: '1rem',
             lineHeight: 1.5,
@@ -354,7 +364,7 @@ export const theme = createTheme({
         {
           props: {variant: 'helperText'},
           style: {
-            fontFamily: 'Open Sans',
+            fontFamily: 'Aventa',
             fontWeight: 400,
             fontSize: '0.75rem',
             lineHeight: 1.66,

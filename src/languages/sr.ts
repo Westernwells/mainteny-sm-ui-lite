@@ -1402,4 +1402,10 @@ export const sr = {
     'Dodajte uslove plaćanja koji će se kasnije koristiti u fakturisanju',
   'New Payment Term': 'Novi uslov plaćanja',
   Pay: 'Plati',
+  Dashboard: 'Komandna table',
+  'Resend code': 'Pošalji ponovo šifru',
+  'Send reset code': 'Pošalji kod za resetovanje',
+  'Enter your email address': 'Unesite svoju imejl adresu',
+  'Enter your password': 'Enter your password',
+  Jobs: 'Naređenja',
 };

@@ -1433,4 +1433,5 @@ export const de = {
   'Add your payment terms that would be used later in invoicing':
     'Zahlungsbedingungen hinzufügen, die später bei der Rechnungsstellung verwendet werden sollen',
   'New Payment Term': 'Neue Zahlungsbedingung',
+  Jobs: 'Aufträge',
 };

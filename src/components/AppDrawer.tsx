@@ -8,28 +8,28 @@ import useTheme from '@mui/material/styles/useTheme';
 import MuiDrawer from '@mui/material/Drawer';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
-import Elevator from '@mui/icons-material/Elevator';
-import BusinessIcon from '@mui/icons-material/Business';
 import IconButton from '@mui/material/IconButton';
-import HomeIcon from '@mui/icons-material/Home';
-import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import {useLocation, useNavigate} from 'react-router-dom';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
-import PaymentsIcon from '@mui/icons-material/Payments';
-import {Settings} from '@mui/icons-material';
 import CorporateFareIcon from '@mui/icons-material/CorporateFare';
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import PieChartIcon from '@mui/icons-material/PieChart';
 import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
+import {ReactComponent as DashboardIcon} from 'assets/icons/Dashboard.svg';
+import {ReactComponent as JobsIcon} from 'assets/icons/Jobs.svg';
+import {ReactComponent as UnitsIcon} from 'assets/icons/Units.svg';
+import {ReactComponent as CustomersIcon} from 'assets/icons/Customers.svg';
+import {ReactComponent as ContractIcon} from 'assets/icons/Contract.svg';
+import {ReactComponent as QuotationIcon} from 'assets/icons/Quotation.svg';
+import {ReactComponent as InvoicesIcon} from 'assets/icons/Invoices.svg';
+import {ReactComponent as ArticlesIcon} from 'assets/icons/Articles.svg';
+import {ReactComponent as EmployeesIcon} from 'assets/icons/Employees.svg';
+import {ReactComponent as AnalyticsIcon} from 'assets/icons/Analytics.svg';
+import {ReactComponent as SettingsIcon} from 'assets/icons/Settings.svg';
 import {ReactComponent as MaintenyLogo} from 'assets/icons/Mainteny.svg';
 import Fade from '@mui/material/Fade';
-import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -109,8 +109,8 @@ export const AppDrawer = ({open, setOpen}: Props) => {
 
   const drawerList = [
     {
-      text: 'Home',
-      icon: <HomeIcon sx={{color: '#fff'}} />,
+      text: 'Dashboard',
+      icon: <DashboardIcon fontSize="1.5rem" />,
       path: '/',
       access: !isAdmin,
       onClick: (
@@ -125,8 +125,8 @@ export const AppDrawer = ({open, setOpen}: Props) => {
       },
     },
     {
-      text: 'Orders',
-      icon: <LocalShippingIcon sx={{color: '#fff'}} />,
+      text: 'Jobs',
+      icon: <JobsIcon fontSize="1.5rem" />,
       path: '/orders',
       access: !isAdmin,
       onClick: (
@@ -142,7 +142,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     },
     {
       text: 'Units',
-      icon: <Elevator sx={{color: '#fff'}} />,
+      icon: <UnitsIcon fontSize="1.5rem" />,
       path: '/units',
       access: !isAdmin,
       onClick: (
@@ -158,7 +158,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     },
     {
       text: 'Customers',
-      icon: <BusinessIcon sx={{color: '#fff'}} />,
+      icon: <CustomersIcon fontSize="1.5rem" />,
       path: '/customers',
       access: !isAdmin,
       onClick: (
@@ -174,7 +174,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     },
     {
       text: 'Contracts',
-      icon: <FileCopyIcon sx={{color: '#fff'}} />,
+      icon: <ContractIcon fontSize="1.5rem" />,
       path: '/contracts',
       access: !isAdmin,
       onClick: (
@@ -190,7 +190,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     },
     {
       text: 'Quotations',
-      icon: <RequestQuoteIcon sx={{color: '#fff'}} />,
+      icon: <QuotationIcon fontSize="1.5rem" />,
       path: '/quotations',
       access: !isAdmin,
       onClick: (
@@ -206,7 +206,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     },
     {
       text: 'Invoices',
-      icon: <PaymentsIcon sx={{color: '#fff'}} />,
+      icon: <InvoicesIcon fontSize="1.5rem" />,
       path: '/invoices',
       access: !isAdmin,
       onClick: (
@@ -221,8 +221,8 @@ export const AppDrawer = ({open, setOpen}: Props) => {
       },
     },
     {
-      text: 'Articles & Packages',
-      icon: <HomeRepairServiceIcon sx={{color: '#fff'}} />,
+      text: 'Articles',
+      icon: <ArticlesIcon fontSize="1.5rem" />,
       path: '/articles',
       access: !isAdmin,
       onClick: (
@@ -238,7 +238,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     },
     {
       text: 'Employees',
-      icon: <PeopleAltIcon sx={{color: '#fff'}} />,
+      icon: <EmployeesIcon fontSize="1.5rem" />,
       path: '/employees',
       access: !isAdmin,
       onClick: (
@@ -254,7 +254,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     },
     {
       text: 'Analytics',
-      icon: <PieChartIcon sx={{color: '#fff'}} />,
+      icon: <AnalyticsIcon fontSize="1.5rem" />,
       path: '/analytics',
       access: !isAdmin,
       onClick: (
@@ -269,7 +269,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     },
     {
       text: 'Settings',
-      icon: <Settings sx={{color: '#fff'}} />,
+      icon: <SettingsIcon fontSize="1.5rem" />,
       path: '/settings',
       access: !isAdmin && isManager,
       onClick: (
@@ -301,7 +301,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     },
     {
       text: 'Settings',
-      icon: <Settings sx={{color: '#fff'}} />,
+      icon: <SettingsIcon />,
       path: '/admin/system-settings',
       access: isAdmin,
       onClick: (
@@ -350,7 +350,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     open
       ? drawerHeader(
           <IconButton
-            sx={{mr: '1em'}}
+            sx={{mr: '4em', mt: '0.5em', mb: '0.5em'}}
             edge="start"
             disableRipple
             onClick={() => {

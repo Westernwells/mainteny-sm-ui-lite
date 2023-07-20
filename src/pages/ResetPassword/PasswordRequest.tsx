@@ -62,13 +62,7 @@ export const PasswordRequest = ({
             onChange={handleChange}
             onBlur={handleBlur}
             value={email}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <EmailIcon />
-                </InputAdornment>
-              ),
-            }}
+            placeholder={t('Enter your email address')}
           />
           <Box mt={5}>
             <Button
@@ -84,7 +78,7 @@ export const PasswordRequest = ({
                   <ArrowForward />
                 )
               }>
-              {t('Get reset code')}
+              {t('Send reset code')}
             </Button>
             <Button
               sx={{width: '100%', marginTop: 1}}
