@@ -1434,4 +1434,9 @@ export const de = {
     'Zahlungsbedingungen hinzufügen, die später bei der Rechnungsstellung verwendet werden sollen',
   'New Payment Term': 'Neue Zahlungsbedingung',
   Jobs: 'Aufträge',
+  Dashboard: 'Dashboard',
+  'Resend code': 'Code erneut anfordern',
+  'Send reset code': 'Reset Code anfordern',
+  'Enter your email address': 'Geben Sie Ihre E-Mail ein',
+  'Enter your password': 'Geben Sie Ihr Passwort ein',
 };
