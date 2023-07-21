@@ -7,6 +7,12 @@ import {PageCard} from 'components/PageCard';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FormInput} from 'components/form/FormInput';
 import {DatePicker} from 'components/DatePicker';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {
+  useCompanyAutoNumberConfig,
+  useCompanyNextNumber,
+} from 'hooks/reactQuery/useCompanies';
+import {ServiceCompanyNextNumberType} from 'models/service-company';
 import {CustomerBasicInfoFormModel} from './model';
 
 interface Props {
@@ -19,6 +25,24 @@ export const BasicCustomerForm = ({formik}: Props) => {
     onChange: formik.handleChange,
     onBlur: formik.handleBlur,
   };
+
+  const {user} = useUserSession();
+
+  const {data: companyAutoNumberConfig, isLoading} = useCompanyAutoNumberConfig(
+    user?.userAccount.serviceCompany.id,
+  );
+
+  const {data: companyNextNumber, isLoading: isLoadingCompanyNextNumber} =
+    useCompanyNextNumber(
+      {
+        type: ServiceCompanyNextNumberType.PROPERTY_OWNER,
+      },
+      user?.userAccount.serviceCompany.id,
+    );
+
+  console.log(companyAutoNumberConfig, 'companyAutoNumberConfig');
+
+  console.log(companyNextNumber, 'companyNextNumber');
 
   return (
     <PageCard

@@ -11,7 +11,10 @@ import {
 import {
   ServiceCompanyActivity,
   ServiceCompanyActivityParams,
+  ServiceCompanyAutoNumberConfig,
   ServiceCompanyItem,
+  ServiceCompanyNextNumber,
+  ServiceCompanyNextNumberParams,
   ServiceCompanySummary,
   ServiceCompanySummaryParams,
   ServiceCompanyUpdateBody,
@@ -306,3 +309,49 @@ export const useQueryContractPaymentTerms = ({
     },
   );
 };
+
+export const getCompanyAutoNumberConfig = async (companyId: string) => {
+  const response = await axiosClient.get<ServiceCompanyAutoNumberConfig>(
+    `/api/serviceCompanies/${companyId}/settings/autoNumber`,
+  );
+  return response.data;
+};
+
+export const useCompanyAutoNumberConfig = (companyId?: string) => {
+  const {showError} = useSnackbar();
+  return useQuery(
+    [queryKeys.fetchAutoNumberConfig, companyId],
+    () => getCompanyAutoNumberConfig(companyId!),
+    {
+      enabled: !!companyId,
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+const getCompanyNextNumber = async (
+  params: Partial<ServiceCompanyNextNumberParams>,
+  companyId?: string,
+) => {
+  const response: AxiosResponse<ServiceCompanyNextNumber> =
+    await axiosClient.get(`/api/serviceCompanies/${companyId}/nextNumber`, {
+      params,
+      paramsSerializer,
+    });
+  return response.data;
+};
+
+export const useCompanyNextNumber = (
+  params: Partial<ServiceCompanyNextNumberParams>,
+  companyId?: string,
+) =>
+  useQuery(
+    [queryKeys.fetchcompanyNextNumber, companyId, params.type],
+    () => getCompanyNextNumber(params, companyId!),
+    {
+      enabled: !!companyId,
+    },
+  );

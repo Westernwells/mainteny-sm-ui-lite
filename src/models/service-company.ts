@@ -20,6 +20,22 @@ export enum ServiceCompanyTimeUnit {
   MONTHLY = 'MONTHLY',
   FULLY = 'FULLY',
 }
+
+export enum ServiceCompanyNextNumberType {
+  ARTICLE = 'ARTICLE',
+  SERVICE_ORDER = 'SERVICE_ORDER',
+  SERVICE_ORDER_REPORT = 'SERVICE_ORDER_REPORT',
+  CONTRACT = 'CONTRACT',
+  INVOICE = 'INVOICE',
+  QUOTATION = 'QUOTATION',
+  EMPLOYEE = 'EMPLOYEE',
+  PROPERTY_OWNER = 'PROPERTY_OWNER',
+  PROPERTY_CONTACT_PERSON = 'PROPERTY_CONTACT_PERSON',
+  CHECK_LIST = 'CHECK_LIST',
+  ELEVATOR = 'ELEVATOR',
+  ARTICLE_ORDER = 'ARTICLE_ORDER',
+}
+
 export enum ActivityMessageType {
   SERVICE_ORDER_COMPLETED = 'SERVICE_ORDER_COMPLETED',
   SERVICE_ORDER_STARTED = 'SERVICE_ORDER_STARTED',
@@ -154,4 +170,25 @@ export interface ServiceCompanyUpdateBody {
 export interface SystemSettingsUpdateBody {
   nightlyShuffleEnabled?: boolean;
   companyDispatchStrategy?: DispatchStrategy | string;
+}
+
+export interface ServiceCompanyNextNumberParams {
+  serviceCompanyId: string;
+  type: ServiceCompanyNextNumberType;
+}
+
+export interface ServiceCompanyNextNumber {
+  value: string;
+}
+
+export interface ServiceCompanyConfigRecord {
+  type: string;
+  prefix: string;
+  numberOfDigits: number;
+  enabled: boolean;
+  startFrom: number;
+}
+
+export interface ServiceCompanyAutoNumberConfig {
+  configRecords: ServiceCompanyConfigRecord[];
 }
