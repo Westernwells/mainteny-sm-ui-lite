@@ -96,7 +96,12 @@ export const LoginForm = ({
         <Button
           label={t('Login')}
           buttonProps={{
-            sx: {marginTop: 5, width: '100%'},
+            sx: {
+              marginTop: 5,
+              width: '100%',
+              fontWeight: '400',
+              letterSpacing: '0.02em',
+            },
             size: 'large',
             type: 'submit',
             variant: 'contained',
