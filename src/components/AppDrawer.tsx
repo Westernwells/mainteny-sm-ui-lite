@@ -414,13 +414,19 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                       }),
                   }}
                   key={text}>
-                  <ListItemIcon sx={{minWidth: 0, pr: '1em', pl: '.25em'}}>
+                  <ListItemIcon
+                    sx={{minWidth: 0, pr: '1em', pl: '.25em'}}
+                    color={selectedPath === path ? '#FFF' : '#8F9BB3'}>
                     {icon}
                   </ListItemIcon>
                   <ListItemText
                     primary={
                       <Fade in={open}>
-                        <Typography variant="subtitle1">{t(text)}</Typography>
+                        <Typography
+                          variant="subtitle1"
+                          color={selectedPath === path ? '#FFF' : '#8F9BB3'}>
+                          {t(text)}
+                        </Typography>
                       </Fade>
                     }
                   />
