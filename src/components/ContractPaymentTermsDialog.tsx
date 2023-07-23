@@ -136,8 +136,24 @@ export const ContractPaymentTermsDialog = ({
 
   useEffect(() => {
     if (open) {
+      if (contractPaymentTerms.data.length) {
+        formik.setFieldValue('otherPaymentTerms', [
+          ...contractPaymentTerms.data,
+        ]);
+      } else {
+        formik.setFieldValue('otherPaymentTerms', [
+          {
+            id: getUniqueId(),
+            term: '',
+          },
+        ]);
+      }
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!contractPaymentTerms.data.length) {
       formik.setFieldValue('otherPaymentTerms', [
-        ...contractPaymentTerms.data,
         {
           id: getUniqueId(),
           term: '',
