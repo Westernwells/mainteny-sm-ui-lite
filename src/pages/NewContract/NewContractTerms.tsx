@@ -297,8 +297,8 @@ const NewContractTerms: FC<Props> = ({formik}) => {
       <Grid item md={4}>
         {contractPaymentTerms?.data && (
           <FormSelect
-            labelId="Payment terms"
-            label={t('Payment terms')}
+            labelId="Payment Terms"
+            label={t('Payment Terms')}
             options={contractPaymentTerms?.data?.map(({term}) => ({
               label: term,
               value: term,
