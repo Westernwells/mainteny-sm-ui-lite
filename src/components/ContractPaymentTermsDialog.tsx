@@ -151,17 +151,6 @@ export const ContractPaymentTermsDialog = ({
     }
   }, [open]);
 
-  useEffect(() => {
-    if (!contractPaymentTerms.data.length) {
-      formik.setFieldValue('otherPaymentTerms', [
-        {
-          id: getUniqueId(),
-          term: '',
-        },
-      ]);
-    }
-  }, [open]);
-
   return (
     <Dialog
       open={open || false}
