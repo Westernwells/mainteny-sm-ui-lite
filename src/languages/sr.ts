@@ -1402,4 +1402,7 @@ export const sr = {
     'Dodajte uslove plaćanja koji će se kasnije koristiti u fakturisanju',
   'New Payment Term': 'Novi uslov plaćanja',
   Pay: 'Plati',
+  'Select or Add Payment Terms': 'Izaberite ili dodajte uslove plaćanja',
+  'Select Invoice Cycle': 'Izaberite Ciklus fakture',
+  'Select Contract Type': 'Izaberite Tip ugovora',
 };

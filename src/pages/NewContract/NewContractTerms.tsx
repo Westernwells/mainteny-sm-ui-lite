@@ -57,7 +57,7 @@ const NewContractTerms: FC<Props> = ({formik}) => {
       <Grid item xs={4}>
         <FormSelect
           labelId="invoiceDueSelect-label"
-          label="Invoice Cycle"
+          label="Select Invoice Cycle"
           options={Object.keys(invoiceCycle).map((key) => ({
             label: invoiceCycle[key],
             value: key,
@@ -298,7 +298,7 @@ const NewContractTerms: FC<Props> = ({formik}) => {
         {contractPaymentTerms?.data && (
           <FormSelect
             labelId="Payment Terms"
-            label={t('Payment Terms')}
+            label={t('Select or Add Payment Terms')}
             options={contractPaymentTerms?.data?.map(({term}) => ({
               label: term,
               value: term,
@@ -310,7 +310,6 @@ const NewContractTerms: FC<Props> = ({formik}) => {
                 : undefined,
               onChange: formik.handleChange,
               name: 'paymentTerms',
-              placeholder: t('Choose your payment term'),
               error: !!(
                 formik.touched.paymentTerms && formik.errors.paymentTerms
               ),

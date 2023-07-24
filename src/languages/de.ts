@@ -1433,4 +1433,8 @@ export const de = {
   'Add your payment terms that would be used later in invoicing':
     'Zahlungsbedingungen hinzufügen, die später bei der Rechnungsstellung verwendet werden sollen',
   'New Payment Term': 'Neue Zahlungsbedingung',
+  'Select or Add Payment Terms':
+    'Wählen oder fügen Sie eine Zahlungsbedingung hinzu',
+  'Select Invoice Cycle': 'Wählen Sie einen Rechnungszyklus',
+  'Select Contract Type': 'Wählen Sie einen Vertragstypen',
 };
