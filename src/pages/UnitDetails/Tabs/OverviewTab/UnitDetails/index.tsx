@@ -102,23 +102,19 @@ export const UnitDetails = ({
   };
 
   useEffect(() => {
-    formik.setFieldValue('category', convertToText(elevator.category));
-    formik.setFieldValue('manufacturer', elevator.additionalInfo.manufacturer);
-    formik.setFieldValue(
-      'numberOfStops',
-      elevator.additionalInfo.numberOfStops,
-    );
-    formik.setFieldValue('cabinType', elevator.additionalInfo.cabinType);
-    formik.setFieldValue(
-      'emergencyPhoneProvider',
-      elevator.additionalInfo.emergencyPhoneProvider,
-    );
-    formik.setFieldValue('unitType', elevator.type);
-    formik.setFieldValue('model', elevator.model);
-    formik.setFieldValue('serialNumber', elevator.serialNumber);
-    formik.setFieldValue('yearBuilt', elevator.additionalInfo.builtYear);
-    formik.setFieldValue('spendingLimit', validContract?.spendingLimit);
-    formik.setFieldValue('unitCapacity', elevator.capacity);
+    formik.setValues({
+      category: convertToText(elevator.category),
+      manufacturer: elevator.additionalInfo.manufacturer,
+      numberOfStops: elevator.additionalInfo.numberOfStops,
+      cabinType: elevator.additionalInfo.cabinType,
+      emergencyPhoneProvider: elevator.additionalInfo.emergencyPhoneProvider,
+      unitType: elevator.type,
+      model: elevator.model,
+      serialNumber: elevator.serialNumber,
+      unitCapacity: elevator.capacity,
+      spendingLimit: validContract?.spendingLimit,
+      yearBuilt: elevator.additionalInfo.builtYear,
+    });
   }, [openDialog]);
 
   return (
