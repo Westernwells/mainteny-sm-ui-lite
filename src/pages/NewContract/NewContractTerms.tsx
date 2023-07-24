@@ -48,6 +48,10 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             error: !!(
               formik.touched.visitsNumber && formik.errors.visitsNumber
             ),
+            helperText:
+              formik.errors.visitsNumber && formik.touched.visitsNumber
+                ? formik.errors.visitsNumber
+                : '',
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
           }}
@@ -89,6 +93,10 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             type: 'number',
             required: true,
             value: Number(formik.values.netAmount).toString(),
+            helperText:
+              formik.errors.netAmount && formik.touched.netAmount
+                ? formik.errors.netAmount
+                : '',
             error: !!(formik.touched.netAmount && formik.errors.netAmount),
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
@@ -110,6 +118,10 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             placeholder: '12',
             type: 'number',
             value: Number(formik.values.renewalTerms).toString(),
+            helperText:
+              formik.errors.renewalTerms && formik.touched.renewalTerms
+                ? formik.errors.renewalTerms
+                : '',
             error: !!(
               formik.touched.renewalTerms && formik.errors.renewalTerms
             ),
@@ -128,6 +140,10 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             placeholder: '1500',
             type: 'number',
             value: Number(formik.values.spendingLimit).toString(),
+            helperText:
+              formik.errors.spendingLimit && formik.touched.spendingLimit
+                ? formik.errors.spendingLimit
+                : '',
             error: !!(
               formik.touched.spendingLimit && formik.errors.spendingLimit
             ),
@@ -151,6 +167,10 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             placeholder: 'Enter payment due (in days)',
             type: 'number',
             value: formik.values.invoiceDueDays,
+            helperText:
+              formik.errors.invoiceDueDays && formik.touched.invoiceDueDays
+                ? formik.errors.invoiceDueDays
+                : '',
             error: !!(
               formik.touched.invoiceDueDays && formik.errors.invoiceDueDays
             ),
@@ -167,6 +187,10 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             placeholder: 'Enter payment due (in days)',
             type: 'number',
             value: formik.values.discounts?.[0]?.days ?? 0,
+            helperText:
+              formik.errors.discounts && formik.touched.discounts
+                ? formik.errors.discounts
+                : '',
             error: !!(formik.touched.discounts && formik.errors.discounts),
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
@@ -188,6 +212,11 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             placeholder: 'Enter notice period',
             type: 'number',
             value: formik.values.noticePeriodInMonth,
+            helperText:
+              formik.errors.noticePeriodInMonth &&
+              formik.touched.noticePeriodInMonth
+                ? formik.errors.noticePeriodInMonth
+                : '',
             error: !!(
               formik.touched.noticePeriodInMonth &&
               formik.errors.noticePeriodInMonth
@@ -207,6 +236,11 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             value: Number(
               formik.values.annualPriceAdjustmentPercentage,
             ).toString(),
+            helperText:
+              formik.errors.annualPriceAdjustmentPercentage &&
+              formik.touched.annualPriceAdjustmentPercentage
+                ? formik.errors.annualPriceAdjustmentPercentage
+                : '',
             error: !!(
               formik.touched.annualPriceAdjustmentPercentage &&
               formik.errors.annualPriceAdjustmentPercentage
@@ -224,6 +258,11 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             placeholder: '120',
             type: 'number',
             value: Number(formik.values.serviceLevelAgreement).toString(),
+            helperText:
+              formik.errors.serviceLevelAgreement &&
+              formik.touched.serviceLevelAgreement
+                ? formik.errors.serviceLevelAgreement
+                : '',
             error: !!(
               formik.touched.serviceLevelAgreement &&
               formik.errors.serviceLevelAgreement
