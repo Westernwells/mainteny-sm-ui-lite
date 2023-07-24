@@ -25,7 +25,7 @@ export const theme = createTheme({
     },
     action: {
       active: '#8F9BB3',
-      hover: '#40748054',
+      hover: '#F2F6F8',
       selected: '#40748054',
       disabled: 'rgba(143, 155, 179, 0.5)',
       disabledBackground: 'rgba(34, 43, 69, 0.12)',
@@ -278,7 +278,7 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           '&:hover': {
-            background: '#40748054',
+            background: '#F2F6F8',
             borderLeft: '0px',
           },
           '&.Mui-selected': {

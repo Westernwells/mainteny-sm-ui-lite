@@ -350,7 +350,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     open
       ? drawerHeader(
           <IconButton
-            sx={{mr: '4em', mt: '0.5em', mb: '0.5em'}}
+            sx={{mr: '4em'}}
             edge="start"
             disableRipple
             onClick={() => {
@@ -360,7 +360,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             }}>
             <MaintenyLogo
               style={{marginRight: '0.5em'}}
-              width={155.22}
+              width={55.22}
               height={32}
             />
           </IconButton>,
@@ -412,6 +412,9 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                         easing: theme.transitions.easing.sharp,
                         duration: theme.transitions.duration.leavingScreen,
                       }),
+                    '&:hover': {
+                      background: '#40748054',
+                    },
                   }}
                   key={text}>
                   <ListItemIcon
