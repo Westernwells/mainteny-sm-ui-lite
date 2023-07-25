@@ -1411,4 +1411,7 @@ export const sr = {
   'Select or Add Payment Terms': 'Izaberite ili dodajte uslove plaćanja',
   'Select Invoice Cycle': 'Izaberite Ciklus fakture',
   'Select Contract Type': 'Izaberite Tip ugovora',
+  'Should be higher than 0': 'Trebalo bi da bude veće od 0',
+  'Yearly Contract Price is required': 'Godišnja cena ugovora je obavezna',
+  'Should be higher or equals to 0': 'Trebalo bi da bude veće ili jednako 0',
 };

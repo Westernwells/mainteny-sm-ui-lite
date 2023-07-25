@@ -1443,4 +1443,8 @@ export const de = {
   'Send reset code': 'Reset Code anfordern',
   'Enter your email address': 'Geben Sie Ihre E-Mail ein',
   'Enter your password': 'Geben Sie Ihr Passwort ein',
+  'Should be higher than 0': 'Sollte höher als 0 sein',
+  'Yearly Contract Price is required':
+    'Jährlicher Vertragspreis ist erforderlich',
+  'Should be higher or equals to 0': 'Sollte höher oder gleich 0 sein',
 };
