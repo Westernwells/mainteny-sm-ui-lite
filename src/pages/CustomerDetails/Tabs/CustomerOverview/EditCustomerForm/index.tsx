@@ -187,6 +187,7 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
               value: values.externalId,
               helperText: touched.externalId && errors.externalId,
               error: !!errors.externalId && touched.externalId,
+              disabled: true,
               ...defaultProps,
             }}
           />
