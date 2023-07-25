@@ -126,13 +126,12 @@ export const PasswordReset = ({
                   {t('Back')}
                 </Button>
                 <Typography color="text.secondary" textAlign="center" mt={5}>
-                  {`${t("Didn't receive the code?")} `}
                   <Typography
                     color="secondary.dark"
                     component="span"
                     onClick={() => request(email)}
                     sx={{cursor: 'pointer'}}>
-                    {t('Resend')}
+                    {t('Resend code')}
                   </Typography>
                 </Typography>
               </Box>
@@ -152,9 +151,9 @@ export const PasswordReset = ({
                 onBlur={handleBlur}
                 value={password}
                 InputProps={{
-                  startAdornment: (
+                  endAdornment: (
                     <InputAdornment
-                      position="start"
+                      position="end"
                       onClick={() => setShowPassword(!showPassword)}
                       sx={{cursor: 'pointer'}}>
                       <RemoveRedEye />
@@ -223,9 +222,9 @@ export const PasswordReset = ({
                   value={confirmPassword}
                   helperText={confirmPasswordError}
                   InputProps={{
-                    startAdornment: (
+                    endAdornment: (
                       <InputAdornment
-                        position="start"
+                        position="end"
                         onClick={() =>
                           setShowConfirmPassword(!showConfirmPassword)
                         }
@@ -282,7 +281,6 @@ export const PasswordReset = ({
                 </Box>
               )}
               <Typography color="text.secondary" textAlign="center" mt={5}>
-                {`${t("Didn't receive the code?")} `}
                 <Typography
                   color="secondary.dark"
                   component="span"
@@ -291,7 +289,7 @@ export const PasswordReset = ({
                     handleSwap(false, 3);
                   }}
                   sx={{cursor: 'pointer'}}>
-                  {t('Resend')}
+                  {t('Resend code')}
                 </Typography>
               </Typography>
             </>

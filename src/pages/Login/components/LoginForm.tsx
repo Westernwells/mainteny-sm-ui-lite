@@ -6,7 +6,6 @@ import ArrowForward from '@mui/icons-material/ArrowForward';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Box from '@mui/material/Box';
-import EmailSharp from '@mui/icons-material/EmailSharp';
 import CircularProgress from '@mui/material/CircularProgress';
 import {Button} from 'components/Button';
 
@@ -37,7 +36,7 @@ export const LoginForm = ({
   const {t} = useTranslation();
 
   return (
-    <Box display="flex" justifyContent="center" width="100%">
+    <Box display="flex" justifyContent="center" width="100%" mt={10} mb={10}>
       <form style={{width: '18rem'}} onSubmit={handleSubmit}>
         <TextField
           sx={{}}
@@ -53,12 +52,9 @@ export const LoginForm = ({
           onBlur={handleBlur}
           value={email}
           InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <EmailSharp />
-              </InputAdornment>
-            ),
+            startAdornment: <Box />,
           }}
+          placeholder={t('Enter your email address')}
         />
         <Box>
           <TextField
@@ -73,22 +69,23 @@ export const LoginForm = ({
             onBlur={handleBlur}
             value={password}
             InputProps={{
-              startAdornment: (
+              endAdornment: (
                 <InputAdornment
-                  position="start"
+                  position="end"
                   onClick={() => setShowPassword(!showPassword)}
                   sx={{cursor: 'pointer'}}>
-                  <RemoveRedEye />
+                  <RemoveRedEye fill="#8F9BB3" />
                 </InputAdornment>
               ),
             }}
+            placeholder={t('Enter your password')}
           />
           <Box display="flex" justifyContent="flex-end" mt={1}>
             <Link to="/reset-password" style={{textDecoration: 'none'}}>
               <Button
                 label={t('Forgot Password?')}
                 buttonProps={{
-                  sx: {color: 'text.secondary', textTransform: 'capitalize'},
+                  sx: {color: '#00D1FF', textTransform: 'capitalize'},
                   color: 'info',
                 }}
               />
@@ -99,7 +96,12 @@ export const LoginForm = ({
         <Button
           label={t('Login')}
           buttonProps={{
-            sx: {marginTop: 5, width: '100%'},
+            sx: {
+              marginTop: 5,
+              width: '100%',
+              fontWeight: '400',
+              letterSpacing: '0.02em',
+            },
             size: 'large',
             type: 'submit',
             variant: 'contained',
