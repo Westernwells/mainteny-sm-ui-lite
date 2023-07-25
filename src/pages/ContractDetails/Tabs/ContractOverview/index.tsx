@@ -582,7 +582,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             header={
               <Box sx={headerStyles}>
                 <Typography variant="subtitle1" mr="0.5em">
-                  {t('Payment terms')}
+                  {t('Payment Terms')}
                 </Typography>
               </Box>
             }

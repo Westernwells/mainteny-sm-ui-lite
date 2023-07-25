@@ -861,7 +861,7 @@ export const InvoiceForm = ({
               showHeaderBackground
               header={
                 <Typography variant="subtitle1">
-                  {t('Payment terms')}
+                  {t('Payment Terms')}
                 </Typography>
               }>
               {formik.values.paymentTerms ? (
