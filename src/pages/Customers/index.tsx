@@ -20,8 +20,12 @@ import {PropertyOwnerView} from 'models/propertyManager';
 import {getFilterUnitNumber} from 'utils/customer-utils';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
-import {Widget} from '../../components/Widget';
+import {useSyncStatusXero} from 'hooks/reactQuery/useAnalytics';
+import {ServiceCompanyType} from 'models/service-company';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useFormatDateDistance} from 'hooks/useFormatDateDistance';
 import {columns, makeRows} from './CustomerDataGridProps';
+import {Widget} from '../../components/Widget';
 
 const pageSize = 25;
 
@@ -100,25 +104,6 @@ export const Customer = () => {
     });
   }, []);
 
-  if (isIdle || isLoading) {
-    return <Progress />;
-  }
-
-  if (isFetched && !totalCustomerRef.current) {
-    return (
-      <EmptySection
-        label="No customers yet. Please click the button below to add."
-        showActionBtn
-        btnLabel="Add Customer"
-        btnAction={() => navigate('/customers/new')}
-        containerStyle={{
-          height: '100%',
-          mb: '10em',
-        }}
-      />
-    );
-  }
-
   const handleNumberOfUnitsChange = (value: string[]) => {
     setNumberOfUnits(value);
   };
@@ -169,6 +154,49 @@ export const Customer = () => {
       </Box>
     </FilterFields>
   );
+  const {user} = useUserSession();
+
+  const {data: lastSyncInfo} = useSyncStatusXero({
+    serviceCompanyId: user?.userAccount.serviceCompany.id,
+    type: ServiceCompanyType.PROPERTY_OWNER,
+  });
+
+  const formatDistance = useFormatDateDistance();
+
+  const [lastSyncedText, setLastSyncedText] = useState('');
+
+  useEffect(() => {
+    setLastSyncedText(
+      formatDistance(
+        lastSyncInfo ? new Date(lastSyncInfo?.lastSyncedTime!!) : new Date(),
+        new Date(),
+        {
+          addSuffix: true,
+        },
+      ),
+    );
+  }, [lastSyncInfo]);
+
+  console.log(lastSyncedText, 'lastSyncedText');
+
+  if (isIdle || isLoading) {
+    return <Progress />;
+  }
+
+  if (isFetched && !totalCustomerRef.current) {
+    return (
+      <EmptySection
+        label="No customers yet. Please click the button below to add."
+        showActionBtn
+        btnLabel="Add Customer"
+        btnAction={() => navigate('/customers/new')}
+        containerStyle={{
+          height: '100%',
+          mb: '10em',
+        }}
+      />
+    );
+  }
 
   return (
     <PageListingLayout

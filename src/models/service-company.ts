@@ -21,7 +21,7 @@ export enum ServiceCompanyTimeUnit {
   FULLY = 'FULLY',
 }
 
-export enum ServiceCompanyNextNumberType {
+export enum ServiceCompanyType {
   ARTICLE = 'ARTICLE',
   SERVICE_ORDER = 'SERVICE_ORDER',
   SERVICE_ORDER_REPORT = 'SERVICE_ORDER_REPORT',
@@ -174,7 +174,7 @@ export interface SystemSettingsUpdateBody {
 
 export interface ServiceCompanyNextNumberParams {
   serviceCompanyId: string;
-  type: ServiceCompanyNextNumberType;
+  type: ServiceCompanyType;
 }
 
 export interface ServiceCompanyNextNumber {
@@ -191,4 +191,13 @@ export interface ServiceCompanyConfigRecord {
 
 export interface ServiceCompanyAutoNumberConfig {
   configRecords: ServiceCompanyConfigRecord[];
+}
+
+export interface ServiceCompanySyncStatusParams {
+  serviceCompanyId?: string;
+  type: ServiceCompanyType;
+}
+
+export interface ServiceCompanySyncStatus {
+  lastSyncedTime: Date;
 }
