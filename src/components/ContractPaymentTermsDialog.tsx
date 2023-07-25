@@ -136,13 +136,18 @@ export const ContractPaymentTermsDialog = ({
 
   useEffect(() => {
     if (open) {
-      formik.setFieldValue('otherPaymentTerms', [
-        ...contractPaymentTerms.data,
-        {
-          id: getUniqueId(),
-          term: '',
-        },
-      ]);
+      if (contractPaymentTerms.data.length) {
+        formik.setFieldValue('otherPaymentTerms', [
+          ...contractPaymentTerms.data,
+        ]);
+      } else {
+        formik.setFieldValue('otherPaymentTerms', [
+          {
+            id: getUniqueId(),
+            term: '',
+          },
+        ]);
+      }
     }
   }, [open]);
 
@@ -174,7 +179,12 @@ export const ContractPaymentTermsDialog = ({
 
         <Grid container rowSpacing={2} pt={1} pb={2}>
           {formik.values.otherPaymentTerms.map?.((pt, index) => (
-            <Grid container item xs={12} key={pt.id}>
+            <Grid
+              container
+              item
+              xs={12}
+              key={pt.id}
+              sx={{alignItems: 'flex-start'}}>
               <Grid item xs={11}>
                 <FormInput
                   props={{
