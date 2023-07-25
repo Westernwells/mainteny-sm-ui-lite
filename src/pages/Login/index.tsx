@@ -55,10 +55,6 @@ export const Login = () => {
         </Box>
       ) : null}
 
-      <Typography variant="h6" mt={5} mb="2.5rem" textAlign="center">
-        {t('Login')}
-      </Typography>
-
       <LoginForm
         handleChange={formik.handleChange}
         handleSubmit={formik.handleSubmit}

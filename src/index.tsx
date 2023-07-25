@@ -10,6 +10,7 @@ import {LanguageProvider} from 'context/LanguageProvider';
 import * as Sentry from '@sentry/react';
 import {App} from './App';
 import {theme} from './theme';
+import './assets/fonts/Aventa/Aventa-Regular.ttf';
 
 const queryClient = new QueryClient({
   defaultOptions: {

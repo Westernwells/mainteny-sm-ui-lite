@@ -8,6 +8,7 @@ import Box from '@mui/material/Box';
 import Language from '@mui/icons-material/Language';
 import {axiosClient} from 'utils/axios-utils';
 import {languageMap} from 'utils/utils';
+import useTheme from '@mui/material/styles/useTheme';
 import {ReactComponent as PolygonTop} from '../assets/icons/polygonTop.svg';
 import {ReactComponent as PolygonBottom} from '../assets/icons/polygonBottom.svg';
 import {ReactComponent as MaintenyLogo} from '../assets/icons/MaintenyLogo.svg';
@@ -19,7 +20,7 @@ interface Props {
 
 const useStyles = makeStyles({
   leftBackground: {
-    background: 'linear-gradient(180deg, #095369 0%, #043146 100%)',
+    background: '#000034',
   },
   leftContentText: {
     color: '#fff',
@@ -27,6 +28,7 @@ const useStyles = makeStyles({
 });
 
 export const AuthLayout = ({children}: Props) => {
+  const themeX = useTheme();
   const {t} = useTranslation();
   const classes = useStyles();
   const queryClient = useQueryClient();
@@ -62,7 +64,12 @@ export const AuthLayout = ({children}: Props) => {
             <Typography variant="h3" color="#fff" textAlign="center">
               Mainteny
             </Typography>
-            <Typography color="#fff" variant="h5" textAlign="center">
+            <Typography
+              color="#fff"
+              variant="h5"
+              textAlign="center"
+              fontWeight="200"
+              letterSpacing="0.02em">
               {t('Service Manager Portal')}
             </Typography>
           </Box>
@@ -72,7 +79,15 @@ export const AuthLayout = ({children}: Props) => {
             width="100%"
             textAlign="center"
             paddingLeft={4}
-            paddingRight={4}>
+            paddingRight={4}
+            lineHeight={1.8}
+            sx={{
+              [themeX.breakpoints.up('xl')]: {
+                paddingLeft: '8em',
+                paddingRight: '8em',
+              },
+            }}
+            fontWeight="400">
             {t(
               `The unified Application made for Service Managers with smart job assignments, real-time overview of Units under Maintenance (UuM) and out-of-the-box ERP Integrations!`,
             )}
