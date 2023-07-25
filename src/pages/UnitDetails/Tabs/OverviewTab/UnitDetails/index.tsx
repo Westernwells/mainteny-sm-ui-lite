@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import {ElevatorCategory, ElevatorView} from 'models/elevator';
 import {InfoCard} from 'components/InfoCard';
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {Dialog} from 'components/Dialog';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {useFormik} from 'formik';
@@ -100,6 +100,22 @@ export const UnitDetails = ({
       elevatorId: elevator.id,
     });
   };
+
+  useEffect(() => {
+    formik.setValues({
+      category: convertToText(elevator.category),
+      manufacturer: elevator.additionalInfo.manufacturer,
+      numberOfStops: elevator.additionalInfo.numberOfStops,
+      cabinType: elevator.additionalInfo.cabinType,
+      emergencyPhoneProvider: elevator.additionalInfo.emergencyPhoneProvider,
+      unitType: elevator.type,
+      model: elevator.model,
+      serialNumber: elevator.serialNumber,
+      unitCapacity: elevator.capacity,
+      spendingLimit: validContract?.spendingLimit,
+      yearBuilt: elevator.additionalInfo.builtYear,
+    });
+  }, [openDialog]);
 
   return (
     <InfoCard
