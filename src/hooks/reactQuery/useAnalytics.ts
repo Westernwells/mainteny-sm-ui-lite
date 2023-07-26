@@ -8,10 +8,7 @@ import {
   ReportType,
 } from 'models/analytics';
 import {toRestDateTime} from 'utils/datetime';
-import {
-  ServiceCompanySyncStatus,
-  ServiceCompanySyncStatusParams,
-} from 'models/service-company';
+import {DataSyncStatus, DataSyncStatusParams} from 'models/service-company';
 import {AxiosResponse} from 'axios';
 import {queryKeys} from 'reactQuery/constants';
 
@@ -181,16 +178,18 @@ export const useInvoicesXero = (
   );
 };
 
-const fetchSyncStatusXero = async (params: ServiceCompanySyncStatusParams) => {
-  const response: AxiosResponse<ServiceCompanySyncStatus> =
-    await axiosClient.get(`/api/system/xero/synchronization/status`, {
+const fetchSyncStatusXero = async (params: DataSyncStatusParams) => {
+  const response: AxiosResponse<DataSyncStatus> = await axiosClient.get(
+    `/api/system/xero/synchronization/status`,
+    {
       params,
       paramsSerializer,
-    });
+    },
+  );
   return response.data;
 };
 
-export const useSyncStatusXero = (params: ServiceCompanySyncStatusParams) =>
+export const useSyncStatusXero = (params: DataSyncStatusParams) =>
   useQuery(
     [queryKeys.fetchSyncStatusXero, params.serviceCompanyId, params.type],
     () => fetchSyncStatusXero(params),

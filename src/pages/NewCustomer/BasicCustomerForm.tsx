@@ -10,7 +10,7 @@ import {FormInput} from 'components/form/FormInput';
 import {DatePicker} from 'components/DatePicker';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useCompanyNextNumber} from 'hooks/reactQuery/useCompanies';
-import {ServiceCompanyType} from 'models/service-company';
+import {DataSyncType} from 'models/service-company';
 import {CustomerBasicInfoFormModel} from './model';
 
 interface Props {
@@ -29,7 +29,7 @@ export const BasicCustomerForm = ({formik}: Props) => {
   const {data: companyNextNumber, isLoading: isLoadingCompanyNextNumber} =
     useCompanyNextNumber(
       {
-        type: ServiceCompanyType.PROPERTY_OWNER,
+        type: DataSyncType.PROPERTY_OWNER,
       },
       user?.userAccount.serviceCompany.id,
     );

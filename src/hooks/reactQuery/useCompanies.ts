@@ -11,9 +11,9 @@ import {
 import {
   ServiceCompanyActivity,
   ServiceCompanyActivityParams,
-  ServiceCompanyAutoNumberConfig,
+  AutoNumberConfig,
   ServiceCompanyItem,
-  ServiceCompanyNextNumber,
+  StringValueResponse,
   ServiceCompanyNextNumberParams,
   ServiceCompanySummary,
   ServiceCompanySummaryParams,
@@ -311,7 +311,7 @@ export const useQueryContractPaymentTerms = ({
 };
 
 export const getCompanyAutoNumberConfig = async (companyId: string) => {
-  const response = await axiosClient.get<ServiceCompanyAutoNumberConfig>(
+  const response = await axiosClient.get<AutoNumberConfig>(
     `/api/serviceCompanies/${companyId}/settings/autoNumber`,
   );
   return response.data;
@@ -336,11 +336,13 @@ const getCompanyNextNumber = async (
   params: Partial<ServiceCompanyNextNumberParams>,
   companyId?: string,
 ) => {
-  const response: AxiosResponse<ServiceCompanyNextNumber> =
-    await axiosClient.get(`/api/serviceCompanies/${companyId}/nextNumber`, {
+  const response: AxiosResponse<StringValueResponse> = await axiosClient.get(
+    `/api/serviceCompanies/${companyId}/nextNumber`,
+    {
       params,
       paramsSerializer,
-    });
+    },
+  );
   return response.data;
 };
 

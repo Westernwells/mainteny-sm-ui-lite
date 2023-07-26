@@ -21,7 +21,7 @@ import {getFilterUnitNumber} from 'utils/customer-utils';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
 import {useSyncStatusXero} from 'hooks/reactQuery/useAnalytics';
-import {ServiceCompanyType} from 'models/service-company';
+import {DataSyncType} from 'models/service-company';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useFormatDateDistance} from 'hooks/useFormatDateDistance';
 import {columns, makeRows} from './CustomerDataGridProps';
@@ -158,7 +158,7 @@ export const Customer = () => {
 
   const {data: lastSyncInfo} = useSyncStatusXero({
     serviceCompanyId: user?.userAccount.serviceCompany.id,
-    type: ServiceCompanyType.PROPERTY_OWNER,
+    type: DataSyncType.PROPERTY_OWNER,
   });
 
   const formatDistance = useFormatDateDistance();
