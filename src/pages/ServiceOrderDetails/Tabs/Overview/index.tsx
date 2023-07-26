@@ -139,10 +139,10 @@ export const Overview = ({orderId}: Props) => {
                   body={activity.description}
                   footer={
                     <Typography component="div" display="flex">
-                      {iconType(activity.userAccount ? 'people' : 'system')}
+                      {iconType(activity.creator ? 'people' : 'system')}
                       <Typography variant="caption" component="div" ml="0.5em">
-                        {activity.userAccount
-                          ? `${activity.userAccount.firstName} ${activity.userAccount.lastName}`
+                        {activity.creator
+                          ? `${activity.creator.firstName} ${activity.creator.lastName}`
                           : 'System'}
                       </Typography>
                     </Typography>
