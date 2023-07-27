@@ -146,16 +146,23 @@ export const DataGridLayout = ({
       }
     }
   }, [scrollToTop]);
-
   const renderFooter = () => (
-    <CustomPagination
-      pageSize={pageSize}
-      pageIndex={pageIndex}
-      handlePageSizeChange={handlePageSizeChange}
-      handlePageChange={handlePageChange}
-      pageCount={pageCount}
-      totalRows={totalRows}
-    />
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        height: '100%',
+      }}>
+      <CustomPagination
+        pageSize={pageSize}
+        pageIndex={pageIndex}
+        handlePageSizeChange={handlePageSizeChange}
+        handlePageChange={handlePageChange}
+        pageCount={pageCount}
+        totalRows={totalRows}
+      />
+    </Box>
   );
 
   const noRowsOverlay = () => {
@@ -182,11 +189,11 @@ export const DataGridLayout = ({
       )
     );
   };
-
   return (
     <Box
       sx={{
         flexGrow: fullHeight ? 1 : 'unset',
+        display: 'flex',
         ...(!fullHeight && {height}),
       }}>
       <DataGrid
@@ -231,7 +238,7 @@ export const DataGridLayout = ({
         checkboxSelection={checkboxSelection}
         sx={{
           ...olStyles.scrollbar,
-
+          height: '100%',
           width: '100%',
           my: '0.5em',
           borderLeft: 'none',
@@ -239,6 +246,16 @@ export const DataGridLayout = ({
           borderTop: 'none',
           borderBottom: '2px solid',
           borderColor: 'background.default',
+          '& > div:nth-of-type(3)': {
+            display: 'flex',
+            flexDirection: 'column',
+            height:
+              pageSize === 5
+                ? '19.8%'
+                : rows.length >= 11
+                ? '13%'
+                : `${14 + 6.8 * (11 - rows.length)}%`,
+          },
           '& .MuiDataGrid-virtualScroller': {
             '&:hover': {
               ...olStyles.verticlaScrollBar,
