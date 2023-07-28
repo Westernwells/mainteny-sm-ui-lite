@@ -353,7 +353,7 @@ export interface ServiceOrderActivityView {
   description: string;
   id: string;
   serviceOrderId: string;
-  userAccount: UserAccountSimpleView;
+  creator: UserAccountSimpleView;
 }
 
 export interface RedispatchParams {

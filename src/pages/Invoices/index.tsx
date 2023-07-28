@@ -115,7 +115,7 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   );
 
   const {lastSyncedText} = useLastSyncedItem({
-    syncType: DataSyncType.PROPERTY_OWNER,
+    syncType: DataSyncType.INVOICE,
   });
 
   useEffect(() => {

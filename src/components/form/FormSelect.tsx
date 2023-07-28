@@ -55,11 +55,9 @@ export const FormSelect = ({
   return (
     <FormControl sx={{...containerStyles}} fullWidth required={required}>
       <InputLabel
-        shrink
         id={labelId}
         error={!!errorText}
         sx={{
-          background: '#fff',
           px: '0.2em',
           ...labelStyles,
         }}>

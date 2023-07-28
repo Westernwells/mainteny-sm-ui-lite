@@ -59,7 +59,7 @@ const validationSchemaContractTerms = Yup.object().shape({
   netAmount: Yup.number()
     .nullable()
     .min(1, 'Should be higher than 0')
-    .required('Customer is required'),
+    .required('Yearly Contract Price is required'),
   renewalTerms: Yup.number().min(0, 'Should be higher than 0'),
   spendingLimit: Yup.number().min(0, 'Should be higher or equals to 0'),
   annualPriceAdjustmentPercentage: Yup.number().min(

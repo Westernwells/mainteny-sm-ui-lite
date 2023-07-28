@@ -93,6 +93,7 @@ export const CustomerAutoComplete = ({
             ...params,
             ...textFieldProps,
             required: true,
+            placeholder: 'Select Customer',
             InputLabelProps: {
               shrink: true,
             },

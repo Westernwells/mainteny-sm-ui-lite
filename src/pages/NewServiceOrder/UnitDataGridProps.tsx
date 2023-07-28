@@ -79,6 +79,13 @@ export const columns = (activeId: string): GridColDef[] => [
     ...defaultProps,
   },
   {
+    field: 'building',
+    headerName: 'Building',
+    type: 'string',
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+  {
     field: 'customer',
     headerName: 'Customer',
     type: 'string',
@@ -111,6 +118,7 @@ export const makeRows = (
       id: elevator.id,
       number: elevator.externalId,
       model: elevator.model,
+      building: elevator.additionalInfo.buildingLocation,
       customer: elevator.propertyOwner.name,
       lastVisit: formatDate(elevator.lastVisitDate),
       nextVisit: formatDate(elevator.nextVisitDate),

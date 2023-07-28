@@ -17,7 +17,7 @@ const useLastSyncedItem = ({syncType}: Props) => {
   const language = user?.userAccount.serviceCompany.language;
   const locale = mapLanguageToLocale[language!];
 
-  const {data: lastSyncInfo} = useSyncStatusXero({
+  const {data: lastSyncInfo, isLoading} = useSyncStatusXero({
     serviceCompanyId: user?.userAccount.serviceCompany.id,
     type: syncType,
   });
@@ -41,7 +41,7 @@ const useLastSyncedItem = ({syncType}: Props) => {
     );
   }, [lastSyncInfo, locale]);
 
-  return {lastSyncedText};
+  return {lastSyncedText, isLoading};
 };
 
 export default useLastSyncedItem;
