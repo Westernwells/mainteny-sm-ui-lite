@@ -96,11 +96,25 @@ export const AuthLayout = ({children}: Props) => {
         <Box style={{position: 'absolute', bottom: 0, left: 0, right: 0}}>
           <PolygonBottom width="100%" />
         </Box>
+      </Box>
+
+      <Box
+        display="flex"
+        flexGrow={1}
+        justifyContent="center"
+        alignItems="center"
+        position="relative">
+        <Box>
+          <Box display="flex" justifyContent="center">
+            <MaintenyLogo width={236} height={49} />
+          </Box>
+          {children}
+        </Box>
         <Box
           sx={{
             position: 'absolute',
-            bottom: 0,
-            left: 0,
+            bottom: '1%',
+            left: '2%',
             '& .MuiButton-root': {
               color: 'text.secondary',
             },
@@ -119,19 +133,6 @@ export const AuthLayout = ({children}: Props) => {
               },
             ]}
           />
-        </Box>
-      </Box>
-
-      <Box
-        display="flex"
-        flexGrow={1}
-        justifyContent="center"
-        alignItems="center">
-        <Box>
-          <Box display="flex" justifyContent="center">
-            <MaintenyLogo width={236} height={49} />
-          </Box>
-          {children}
         </Box>
       </Box>
     </Box>
