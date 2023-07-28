@@ -60,7 +60,7 @@ export const AuthLayout = ({children}: Props) => {
         </Box>
 
         <Box>
-          <Box marginBottom="5rem">
+          <Box marginBottom="32px">
             <Typography variant="h3" color="#fff" textAlign="center">
               Mainteny
             </Typography>
