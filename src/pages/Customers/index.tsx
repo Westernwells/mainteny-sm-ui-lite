@@ -20,10 +20,8 @@ import {PropertyOwnerView} from 'models/propertyManager';
 import {getFilterUnitNumber} from 'utils/customer-utils';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
-import {useSyncStatusXero} from 'hooks/reactQuery/useAnalytics';
 import {DataSyncType} from 'models/service-company';
-import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {useFormatDateDistance} from 'hooks/useFormatDateDistance';
+import useLastSyncedItem from 'hooks/useLastSyncedItem';
 import {columns, makeRows} from './CustomerDataGridProps';
 import {Widget} from '../../components/Widget';
 
@@ -63,6 +61,10 @@ export const Customer = () => {
     {keepPreviousData: true},
   );
   totalCustomerRef.current = totalCustomerRef.current || customerResource.total;
+
+  const {lastSyncedText} = useLastSyncedItem({
+    syncType: DataSyncType.PROPERTY_OWNER,
+  });
 
   useEffect(() => {
     if (page.pageIndex) {
@@ -154,30 +156,6 @@ export const Customer = () => {
       </Box>
     </FilterFields>
   );
-  const {user} = useUserSession();
-
-  const {data: lastSyncInfo} = useSyncStatusXero({
-    serviceCompanyId: user?.userAccount.serviceCompany.id,
-    type: DataSyncType.PROPERTY_OWNER,
-  });
-
-  const formatDistance = useFormatDateDistance();
-
-  const [lastSyncedText, setLastSyncedText] = useState('');
-
-  useEffect(() => {
-    setLastSyncedText(
-      formatDistance(
-        lastSyncInfo ? new Date(lastSyncInfo?.lastSyncedTime!!) : new Date(),
-        new Date(),
-        {
-          addSuffix: true,
-        },
-      ),
-    );
-  }, [lastSyncInfo]);
-
-  console.log(lastSyncedText, 'lastSyncedText');
 
   if (isIdle || isLoading) {
     return <Progress />;
@@ -216,7 +194,7 @@ export const Customer = () => {
         columns={columns}
         scrollToTop={search}
         loading={isFetching}
-        hideFooter={pageCount <= 1}
+        hideFooter={pageCount < 1}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
@@ -227,6 +205,7 @@ export const Customer = () => {
         }
         pageCount={pageCount}
         totalRows={customerResource.total}
+        lastSyncedText={lastSyncedText}
       />
     </PageListingLayout>
   );

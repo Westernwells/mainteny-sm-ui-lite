@@ -1439,4 +1439,5 @@ export const de = {
   'Send reset code': 'Reset Code anfordern',
   'Enter your email address': 'Geben Sie Ihre E-Mail ein',
   'Enter your password': 'Geben Sie Ihr Passwort ein',
+  'Synced with XERO': 'Mit Xero synchronisiert',
 };

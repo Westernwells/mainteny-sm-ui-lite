@@ -25,9 +25,11 @@ import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryState} from 'hooks/useQueryState';
-import {columns, makeRows} from './InvoicesDataGridProps';
-import {createEmptyResource, makePage} from '../../utils/paging-utils';
+import {DataSyncType} from 'models/service-company';
+import useLastSyncedItem from 'hooks/useLastSyncedItem';
 import {Widget} from '../../components/Widget';
+import {createEmptyResource, makePage} from '../../utils/paging-utils';
+import {columns, makeRows} from './InvoicesDataGridProps';
 
 const pageSize = 25;
 
@@ -112,6 +114,10 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
     invoiceResource.data ? pdfPaths : [],
   );
 
+  const {lastSyncedText} = useLastSyncedItem({
+    syncType: DataSyncType.PROPERTY_OWNER,
+  });
+
   useEffect(() => {
     if (page.pageIndex) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
@@ -156,10 +162,6 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
     setCost(range);
   };
 
-  if (isIdle || isLoading) {
-    return <Progress />;
-  }
-
   const renderFilterItems = () => (
     <FilterFields
       onClear={() => {
@@ -192,6 +194,10 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
     </FilterFields>
   );
 
+  if (isIdle || isLoading) {
+    return <Progress />;
+  }
+
   if (isFetched && !totalInvoiceRef.current) {
     return (
       <EmptySection
@@ -221,11 +227,11 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
         />
       }>
       <DataGridLayout
-        rows={rows}
+        rows={rows || []}
         columns={columns}
         loading={isFetching}
         scrollToTop={search}
-        hideFooter={pageCount <= 1}
+        hideFooter={pageCount < 1}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
@@ -236,6 +242,7 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
         }
         pageCount={pageCount}
         totalRows={invoiceResource?.total}
+        lastSyncedText={lastSyncedText}
       />
     </PageListingLayout>
   );

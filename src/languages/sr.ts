@@ -1408,4 +1408,5 @@ export const sr = {
   'Enter your email address': 'Unesite svoju imejl adresu',
   'Enter your password': 'Enter your password',
   Jobs: 'Naređenja',
+  'Synced with XERO': 'Sinkronizovano sa XERO',
 };

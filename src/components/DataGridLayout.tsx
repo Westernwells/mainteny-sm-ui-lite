@@ -45,6 +45,7 @@ interface Props extends DataGridProps {
   isWidget?: boolean;
   headerHeight?: number;
   scrollToTop?: any;
+  lastSyncedText?: string;
 }
 
 interface ColumnProps extends GridColDef {
@@ -121,6 +122,7 @@ export const DataGridLayout = ({
   isWidget = false,
   headerHeight,
   scrollToTop,
+  lastSyncedText,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
@@ -161,6 +163,7 @@ export const DataGridLayout = ({
         handlePageChange={handlePageChange}
         pageCount={pageCount}
         totalRows={totalRows}
+        lastSyncedText={lastSyncedText}
       />
     </Box>
   );
@@ -254,7 +257,7 @@ export const DataGridLayout = ({
                 ? '19.8%'
                 : rows.length >= 11
                 ? '13%'
-                : `${14 + 6.8 * (11 - rows.length)}%`,
+                : `${16 + 6.9 * (11 - rows.length)}%`,
           },
           '& .MuiDataGrid-virtualScroller': {
             '&:hover': {
