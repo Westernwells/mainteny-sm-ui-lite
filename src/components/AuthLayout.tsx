@@ -134,6 +134,26 @@ export const AuthLayout = ({children}: Props) => {
             ]}
           />
         </Box>
+
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: '1.5%',
+            right: '2%',
+            '& .MuiButton-root': {
+              color: 'text.secondary',
+            },
+          }}>
+          <Typography
+            sx={{
+              color: 'text.secondary',
+              fontSize: '0.8rem',
+              letterSpacing: '0.035em',
+            }}>
+            ©2023 Mainteny. All rights reserved. <br /> Mainteny® is a
+            registered trademark.
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );
