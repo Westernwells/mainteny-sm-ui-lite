@@ -270,7 +270,7 @@ export const sr = {
   Discard: 'Discard',
 
   // Invoices
-  Invoices: 'fakture',
+  Invoices: 'Fakture',
   'Edit Invoice': 'Uredi fakturu',
   'New Invoice': 'Nova faktura',
   'INVOICE DATE': 'DATUM FAKTURE',
@@ -1097,7 +1097,7 @@ export const sr = {
   'No service order has been created for this quotation yet!':
     'Još uvijek nije kreiran nalog za ovu ponudu!',
   Addresses: 'adrese',
-  Settings: 'Informacije o plaćanju',
+  Settings: 'Postavke',
   'Legal Information': 'informacije o naplati',
   'Payment Information': 'Politika kompanije',
   'Defined contract names': 'Definirani nazivi ugovora',
