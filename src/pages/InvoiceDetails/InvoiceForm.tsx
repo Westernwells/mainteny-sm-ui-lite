@@ -338,7 +338,11 @@ export const InvoiceForm = ({
     ];
     if (
       invoice &&
-      ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
+      ![
+        InvoiceStatus.NOT_PAID,
+        InvoiceStatus.EXPIRED,
+        InvoiceStatus.PARTIALLY_PAID,
+      ].includes(invoice.status)
     ) {
       items.push({
         label: t('Delete'),

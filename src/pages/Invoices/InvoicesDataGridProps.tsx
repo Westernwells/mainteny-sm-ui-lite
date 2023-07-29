@@ -42,6 +42,8 @@ export const getInvoiceStatusStyles = (
       return {label: InvoiceStatusView.EXPIRED, color: 'error'};
     case InvoiceStatus.NOT_PAID:
       return {label: InvoiceStatusView.NOT_PAID, color: 'primary'};
+    case InvoiceStatus.PARTIALLY_PAID:
+      return {label: InvoiceStatusView.PARTIALLY_PAID, color: 'warning'};
     default:
       return {label: '-', color: 'default'};
   }
