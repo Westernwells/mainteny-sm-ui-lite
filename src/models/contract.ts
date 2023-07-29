@@ -1,5 +1,5 @@
 import {Client} from './client';
-import {ServiceCompany, ServiceCompanySimpleView} from './service-company';
+import {ServiceCompany} from './service-company';
 import {Amount, Meta, Order, TimeWindowRecord, TimeWindowType} from './misc';
 import {Elevator, ElevatorSimpleView, ElevatorView} from './elevator';
 import {PropertyOwnerSimpleView} from './propertyManager';
@@ -111,7 +111,6 @@ export interface ContractView {
   additionalInfo: ContractAdditionalInfo;
   id: string;
   propertyOwner: PropertyOwnerSimpleView;
-  serviceCompany: ServiceCompanySimpleView;
   name: string;
   type: ContractTypes;
   visitsNumber: number;

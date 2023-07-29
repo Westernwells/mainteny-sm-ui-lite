@@ -9,7 +9,6 @@ import {
   CompanyContact,
   PdfGenerationStatus,
 } from './misc';
-import {ServiceCompanySimpleView} from './service-company';
 
 export enum ArticleType {
   PART = 'PART',
@@ -230,7 +229,6 @@ export interface ArticleOrderAdditionalInfo {
 
 export interface ArticleOrderView {
   id: string;
-  serviceCompany: ServiceCompanySimpleView;
   number: string;
   externalId: string;
   articleSupplier: ArticleSupplierSimpleView;

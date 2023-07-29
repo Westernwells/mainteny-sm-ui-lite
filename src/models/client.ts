@@ -23,7 +23,6 @@ export interface ClientView {
   elevatorCount?: number;
   address: Address;
   contact: Contact;
-  serviceCompany: ServiceCompanySimpleView;
   additionalInfo: ClientAdditionalInfo;
   meta: Meta;
 }

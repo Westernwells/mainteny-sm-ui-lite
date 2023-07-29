@@ -1,8 +1,4 @@
-import {
-  ServiceCompany,
-  ServiceCompanySimpleView,
-  ServiceCompanyView,
-} from './service-company';
+import {ServiceCompany, ServiceCompanyView} from './service-company';
 import {
   AttachmentResource,
   Elevator,
@@ -124,7 +120,6 @@ export interface ServiceOrderView {
   number: string;
   externalId: string;
   articles: ServiceOrderArticleView[];
-  serviceCompany: ServiceCompanySimpleView;
   elevator: ElevatorView;
   contract?: ContractSimpleView;
   description: string;
