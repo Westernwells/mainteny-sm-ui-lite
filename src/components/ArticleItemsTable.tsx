@@ -9,7 +9,6 @@ import {
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import InputAdornment from '@mui/material/InputAdornment';
 import AddIcon from '@mui/icons-material/Add';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
@@ -32,6 +31,8 @@ import {createEmptyResource} from 'utils/paging-utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {LanguageContext} from 'context/LanguageProvider';
 import {calculateTotal} from 'utils/calculate-total';
+import {NumericFormat} from 'react-number-format';
+import {TextField} from '@mui/material';
 import {ArticleItemRow} from './ArticleItemRow';
 import {Button} from './Button';
 import {FormLabel} from './form/FormLabel';
@@ -39,7 +40,6 @@ import {SelectModal} from './SelectModal';
 import {ArticlesDataGrid} from './DataGrid/ArticlesDataGrid';
 import {CustomPricesDataGrid} from './DataGrid/CustomPricesDataGrid';
 import {SelectButton} from './SelectButton';
-import {FormInput} from './form/FormInput';
 import {SearchInput} from './SearchInput';
 
 interface Props<T> {
@@ -534,23 +534,50 @@ export const ArticleItemsTable = ({
                           selectedLng,
                         )}
                   </Typography>
-                  <Box>
-                    <FormInput
-                      props={{
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      paddingTop: '0.75em',
+                    }}>
+                    <FormLabel text="VAT" sx={{paddingRight: '1em'}} />
+                    <NumericFormat
+                      value={percentageVat}
+                      customInput={TextField}
+                      suffix="%"
+                      decimalScale={2}
+                      decimalSeparator={
+                        selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
+                      }
+                      thousandSeparator={
+                        selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
+                      }
+                      inputProps={{
+                        inputMode: 'numeric',
+                        pattern: '[0-9]*',
+                        min: 0,
+                        max: Infinity,
+                        step: '0.05',
                         label: 'VAT',
-                        value: percentageVat,
-                        sx: {mt: '0.5em', width: '5rem'},
-                        onChange: (e) =>
-                          setPercentageVat(Number(e.target.value)),
-                        InputProps: {
-                          endAdornment: (
-                            <InputAdornment position="end">%</InputAdornment>
-                          ),
-                        },
+                      }}
+                      sx={{
+                        width: '120px',
+                        letterSpacing: '0.02em',
+                        maxWidth: '150px',
+                      }}
+                      size="small"
+                      onValueChange={(values) => {
+                        const {floatValue} = values;
+                        if (floatValue) {
+                          setPercentageVat(floatValue);
+                        } else {
+                          setPercentageVat(0);
+                        }
                       }}
                     />
                   </Box>
-                  <Typography>
+                  <Typography sx={{paddingTop: '0.75em'}}>
                     {isPartial
                       ? formatCurrency(
                           partialPrice * (percentageVat / 100),
