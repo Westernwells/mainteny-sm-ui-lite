@@ -43,7 +43,6 @@ export interface ContractElevator {
 export interface Contract {
   id: string;
   propertyOwner: Client;
-  serviceCompany: ServiceCompany;
   type: string;
   elevators: ContractElevator[];
   visitsNumber: number;

@@ -10,7 +10,6 @@ export interface Client {
   id: string;
   name: string;
   address: Address;
-  serviceCompany: ServiceCompany;
   contact: Contact;
   additionalInfo: ClientAdditionalInfo;
   search: string;

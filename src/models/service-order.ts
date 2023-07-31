@@ -84,7 +84,6 @@ export interface ServiceOrder {
   number: string;
   externalID: string;
   articles: ServiceOrderArticleView[];
-  serviceCompany: ServiceCompany;
   elevator: Elevator;
   contract: Contract;
   description: string;
@@ -174,7 +173,6 @@ export interface ServiceOrderActivity {
 
 export interface DispatchPlanView {
   id: string;
-  serviceCompany: ServiceCompanyView;
   planMonth: string;
   status: DispatchPlanStatus;
   notes: string;

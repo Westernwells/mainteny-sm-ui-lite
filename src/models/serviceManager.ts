@@ -7,7 +7,6 @@ export interface Manager {
   id: string;
   name: string;
   address: AddressRecord;
-  serviceCompany: ServiceCompany;
   contact: Contact;
   search: string;
   meta: Meta;
