@@ -27,6 +27,8 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryState} from 'hooks/useQueryState';
 import {DataSyncType} from 'models/service-company';
 import useLastSyncedItem from 'hooks/useLastSyncedItem';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useCompanyXeroInfo} from 'hooks/reactQuery/useCompanies';
 import {Widget} from '../../components/Widget';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
 import {columns, makeRows} from './InvoicesDataGridProps';
@@ -114,8 +116,12 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
     invoiceResource.data ? pdfPaths : [],
   );
 
+  const {user} = useUserSession();
+  const {data: xeroInfoData} = useCompanyXeroInfo(
+    user?.userAccount.serviceCompany.id,
+  );
   const {lastSyncedText} = useLastSyncedItem({
-    syncType: DataSyncType.INVOICE,
+    syncType: DataSyncType.PROPERTY_OWNER,
   });
 
   useEffect(() => {
@@ -242,7 +248,7 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
         }
         pageCount={pageCount}
         totalRows={invoiceResource?.total}
-        lastSyncedText={lastSyncedText}
+        lastSyncedText={xeroInfoData?.enabled ? lastSyncedText : ''}
       />
     </PageListingLayout>
   );

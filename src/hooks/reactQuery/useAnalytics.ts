@@ -13,6 +13,7 @@ import {AxiosResponse} from 'axios';
 import {queryKeys} from 'reactQuery/constants';
 import {RestError} from 'models/misc';
 import {useUserSession} from './useUserSession';
+import {useCompanyXeroInfo} from './useCompanies';
 
 export const download = (blob: Blob, filename: string) => {
   const a = document.createElement('a');
@@ -196,11 +197,14 @@ export const useSyncStatusXero = (
   options?: UseQueryOptions<any, any, any>,
 ) => {
   const {user} = useUserSession();
+  const {data: xeroInfoData} = useCompanyXeroInfo(
+    user?.userAccount.serviceCompany.id,
+  );
   return useQuery<DataSyncStatus, RestError>(
     [queryKeys.fetchSyncStatusXero, params.serviceCompanyId, params.type],
     () => fetchSyncStatusXero(params),
     {
-      enabled: !!user && !!params.serviceCompanyId,
+      enabled: !!user && !!params.serviceCompanyId && !!xeroInfoData?.enabled,
       ...options,
     },
   );

@@ -75,4 +75,5 @@ export const queryKeys = {
   fetchcompanyNextNumber: 'fetchcompanyNextNumber',
   fetchAutoNumberConfig: 'fetchAutoNumberConfig',
   fetchSyncStatusXero: 'fetchSyncStatusXero',
+  fetchXeroIntegration: 'fetchXeroIntegration',
 };

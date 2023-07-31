@@ -22,6 +22,8 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
 import {DataSyncType} from 'models/service-company';
 import useLastSyncedItem from 'hooks/useLastSyncedItem';
+import {useCompanyXeroInfo} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {columns, makeRows} from './CustomerDataGridProps';
 import {Widget} from '../../components/Widget';
 
@@ -62,6 +64,10 @@ export const Customer = () => {
   );
   totalCustomerRef.current = totalCustomerRef.current || customerResource.total;
 
+  const {user} = useUserSession();
+  const {data: xeroInfoData} = useCompanyXeroInfo(
+    user?.userAccount.serviceCompany.id,
+  );
   const {lastSyncedText} = useLastSyncedItem({
     syncType: DataSyncType.PROPERTY_OWNER,
   });
@@ -205,7 +211,7 @@ export const Customer = () => {
         }
         pageCount={pageCount}
         totalRows={customerResource.total}
-        lastSyncedText={lastSyncedText}
+        lastSyncedText={xeroInfoData?.enabled ? lastSyncedText : ''}
       />
     </PageListingLayout>
   );

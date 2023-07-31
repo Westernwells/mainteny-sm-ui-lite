@@ -19,6 +19,7 @@ import {
   ServiceCompanySummaryParams,
   ServiceCompanyUpdateBody,
   SystemSettingsUpdateBody,
+  XeroIntegration,
 } from 'models/service-company';
 import {
   useInfiniteQuery,
@@ -357,3 +358,25 @@ export const useCompanyNextNumber = (
       enabled: !!companyId,
     },
   );
+
+export const getCompanyXeroInfo = async (companyId: string) => {
+  const response = await axiosClient.get<XeroIntegration>(
+    `/api/serviceCompanies/${companyId}/settings/xero`,
+  );
+  return response.data;
+};
+
+export const useCompanyXeroInfo = (companyId?: string) => {
+  const {showError} = useSnackbar();
+  return useQuery(
+    [queryKeys.fetchXeroIntegration, companyId],
+    () => getCompanyXeroInfo(companyId!),
+    {
+      enabled: !!companyId,
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};

@@ -216,3 +216,10 @@ export interface DataSyncStatusParams {
 export interface DataSyncStatus {
   lastSyncedTime: Date;
 }
+
+export interface XeroIntegration {
+  enabled: boolean;
+  clientId: string;
+  secret: string;
+  tenantId: string;
+}
