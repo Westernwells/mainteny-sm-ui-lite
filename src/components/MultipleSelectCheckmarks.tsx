@@ -10,7 +10,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
 
-const ITEM_HEIGHT = 48;
+const ITEM_HEIGHT = 52;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
   PaperProps: {

@@ -29,6 +29,8 @@ export const getInvoiceStatusStyles = (
       return {label: 'Overdue', color: 'error'};
     case InvoiceStatus.NOT_PAID:
       return {label: 'Unpaid', color: 'primary'};
+    case InvoiceStatus.PARTIALLY_PAID:
+      return {label: 'Partially Paid', color: 'warning'};
     default:
       return {label: '-', color: 'default'};
   }
