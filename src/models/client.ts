@@ -10,7 +10,6 @@ export interface Client {
   id: string;
   name: string;
   address: Address;
-  serviceCompany: ServiceCompany;
   contact: Contact;
   additionalInfo: ClientAdditionalInfo;
   search: string;
@@ -23,7 +22,6 @@ export interface ClientView {
   elevatorCount?: number;
   address: Address;
   contact: Contact;
-  serviceCompany: ServiceCompanySimpleView;
   additionalInfo: ClientAdditionalInfo;
   meta: Meta;
 }

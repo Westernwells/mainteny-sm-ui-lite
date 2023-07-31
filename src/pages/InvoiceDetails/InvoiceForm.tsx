@@ -295,7 +295,7 @@ export const InvoiceForm = ({
       );
       formik.setFieldValue(
         'serviceCompanyId',
-        serviceOrder.serviceCompany.id,
+        user?.userAccount.serviceCompany.id,
         true,
       );
       formik.setFieldValue('serviceOrderId', serviceOrder.id, true);

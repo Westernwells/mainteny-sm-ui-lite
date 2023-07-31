@@ -137,6 +137,7 @@ export const columns: GridColDef[] = [
 export const makeRows = (
   invoices: InvoiceView[],
   downloadUrls: {[key: string]: string} | undefined,
+  serviceCompanyId?: string,
   formatDate: FormatDate = () => '',
 ): GridRowsProp =>
   invoices.length
@@ -159,7 +160,7 @@ export const makeRows = (
         status: item.status,
         actions: {
           pdfPath: item.additionalInfo.pdfPath,
-          serviceCompanyId: item.serviceCompany.id,
+          serviceCompanyId,
         },
         downloadUrl: downloadUrls?.[item.additionalInfo.pdfPath] ?? '',
         invoice: item,
