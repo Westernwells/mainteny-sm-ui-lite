@@ -13,7 +13,6 @@ export interface PropertyOwner {
   id: string;
   name: string;
   address: AddressRecord;
-  serviceCompany: ServiceCompany;
   contact: ContactPropertyOwner;
   search: string;
   meta: Meta;
@@ -44,7 +43,6 @@ export interface PropertyOwnerView {
   billingAddress?: Address;
   beneficiaryAddress?: Address;
   otherAddress?: Address;
-  serviceCompany: ServiceCompany;
   contact: ContactPropertyOwner;
   search: string;
   meta: Meta;
