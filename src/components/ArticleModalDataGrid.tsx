@@ -136,7 +136,6 @@ export const ArticlesModalDataGrid = ({setRowItem}: Props) => {
           pageSize={page.pageSize}
           pageIndex={page.pageIndex}
           pageCount={pageCount}
-          hideFooter={pageCount <= 1}
           handlePageChange={(value) =>
             setPage((prev) => ({
               ...prev,

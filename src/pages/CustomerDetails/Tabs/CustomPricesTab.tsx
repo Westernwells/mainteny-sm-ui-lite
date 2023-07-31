@@ -142,7 +142,6 @@ export const CustomPricesTab = ({propertyOwnerId}: Props) => {
             fullHeight={false}
             isCellClickable={false}
             height="100%"
-            hideFooter={pageCount <= 1}
             rows={rows || []}
             columns={columns}
             loading={isFetching}

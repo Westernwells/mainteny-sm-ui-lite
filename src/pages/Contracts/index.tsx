@@ -176,7 +176,6 @@ export const Contracts = () => {
         />
       }>
       <DataGridLayout
-        hideFooter={pageCount <= 1}
         rows={rows}
         columns={columns}
         scrollToTop={search}

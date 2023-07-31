@@ -186,7 +186,6 @@ export const ServiceOrderList = () => {
       {renderWidget()}
 
       <DataGridLayout
-        hideFooter={pageCount <= 1}
         rows={rows}
         columns={columns}
         loading={isFetching}

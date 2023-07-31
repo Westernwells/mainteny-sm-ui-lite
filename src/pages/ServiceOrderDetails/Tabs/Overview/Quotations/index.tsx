@@ -63,7 +63,6 @@ export const Quotation = ({serviceOrder}: Props) => {
           headerHeight={30}
           height={getDataGridHeight(rows.length, 3)}
           isWidget
-          hideFooter
           rows={rows}
           columns={columns}
           containerStyle={{

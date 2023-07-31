@@ -128,7 +128,6 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
         />
       </Box>
       <DataGridLayout
-        hideFooter={pageCount <= 1}
         rows={rows}
         scrollToTop={search}
         columns={columns(selectedUnit?.id || '')}

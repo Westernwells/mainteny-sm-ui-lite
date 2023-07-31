@@ -202,7 +202,6 @@ export const CustomerContactPersonsForm = ({formik}: Props) => {
           containerStyle={{
             borderBottom: 'none',
           }}
-          hideFooter
         />
       ) : (
         <EmptySection

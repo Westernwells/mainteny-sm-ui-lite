@@ -93,7 +93,6 @@ export const DefinedContractNames = ({company, containerStyles}: Props) => {
           containerStyle={{
             borderBottom: 'none',
           }}
-          hideFooter
         />
       </InfoCard>
       <Dialog

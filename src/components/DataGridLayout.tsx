@@ -24,7 +24,6 @@ import {EmptySection} from './EmptySection';
 interface Props extends DataGridProps {
   rows: GridRowsProp;
   columns: GridColDef[];
-  hideFooter?: boolean;
   height?: string | number;
   containerStyle?: {[key: string]: string | number};
   loading?: boolean;
@@ -98,7 +97,6 @@ export const getColumnProps = ({
 export const DataGridLayout = ({
   rows,
   columns,
-  hideFooter = false,
   height,
   containerStyle,
   loading,
@@ -215,7 +213,6 @@ export const DataGridLayout = ({
         disableColumnFilter
         disableColumnMenu
         selectionModel={selectionModel}
-        hideFooter={hideFooter}
         sortingMode="server"
         onCellClick={
           onCellClick ||

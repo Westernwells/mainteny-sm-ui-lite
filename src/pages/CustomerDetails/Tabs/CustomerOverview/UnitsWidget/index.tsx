@@ -133,7 +133,6 @@ export const UnitsWidget = ({customerId, getTotalUnits, openTab}: Props) => {
               borderBottom: 'none',
             }}
             isWidget
-            hideFooter={pageCount <= 1}
             pageIndex={page.pageIndex + 1}
             pageSize={page.pageSize}
             handlePageSizeChange={(newPageSize: number) =>
