@@ -23,7 +23,7 @@ import {InvoiceActivityView, InvoiceStatus, InvoiceView} from 'models/invoice';
 import {ServiceOrderReportView} from 'models/service-order';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {PdfGenerationStatus} from 'models/misc';
-import {formatGrossAmount, formatNetAmount} from 'utils/currency';
+import {formatGrossAmount} from 'utils/currency';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
