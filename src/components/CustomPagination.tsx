@@ -108,37 +108,42 @@ export const CustomPagination = ({
           }}>
           {lastSyncedText && <LastSyncedItem lastSyncedText={lastSyncedText} />}
 
-          <Pagination
-            count={pageCount || 10}
-            page={pageIndex || 1}
-            shape="rounded"
-            variant="outlined"
-            onChange={(event: React.ChangeEvent<unknown>, newPage: number) => {
-              event.preventDefault();
-              if (handlePageChange) {
-                handlePageChange(newPage);
-              }
-              setPage({...page, pageIndex: newPage});
-            }}
-            sx={{
-              m: '0 auto',
-              '& .MuiPaginationItem-previousNext': {},
-              '& .MuiPaginationItem-root.Mui-selected': {
-                background: theme.palette.primary.main,
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: theme.palette.primary.main,
+          {pageCount! > 1 && (
+            <Pagination
+              count={pageCount || 10}
+              page={pageIndex || 1}
+              shape="rounded"
+              variant="outlined"
+              onChange={(
+                event: React.ChangeEvent<unknown>,
+                newPage: number,
+              ) => {
+                event.preventDefault();
+                if (handlePageChange) {
+                  handlePageChange(newPage);
+                }
+                setPage({...page, pageIndex: newPage});
+              }}
+              sx={{
+                m: '0 auto',
+                '& .MuiPaginationItem-previousNext': {},
+                '& .MuiPaginationItem-root.Mui-selected': {
+                  background: theme.palette.primary.main,
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: theme.palette.primary.main,
+                  },
                 },
-              },
-              '&.MuiPagination-root': {
-                background: '#fff',
-                py: '0.2em',
-              },
-              '& .MuiPaginationItem-page': {
-                border: 0,
-              },
-            }}
-          />
+                '&.MuiPagination-root': {
+                  background: '#fff',
+                  py: '0.2em',
+                },
+                '& .MuiPaginationItem-page': {
+                  border: 0,
+                },
+              }}
+            />
+          )}
         </Box>
       </Box>
     </Box>
