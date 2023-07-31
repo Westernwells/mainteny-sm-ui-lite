@@ -26,7 +26,7 @@ export const getInvoiceStatusStyles = (
     case InvoiceStatus.DRAFT:
       return {label: 'Draft', color: 'default'};
     case InvoiceStatus.EXPIRED:
-      return {label: 'Expired', color: 'error'};
+      return {label: 'Overdue', color: 'error'};
     case InvoiceStatus.NOT_PAID:
       return {label: 'Unpaid', color: 'primary'};
     default:
