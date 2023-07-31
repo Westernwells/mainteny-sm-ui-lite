@@ -33,6 +33,7 @@ import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {Tooltip} from 'components/Tooltip';
 import {InfoCard} from 'components/InfoCard';
 import {EmptySection} from 'components/EmptySection';
+import {ContractPaymentTermSelectDialog} from 'components/ContractPaymentTermSelectDialog';
 import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
@@ -125,6 +126,10 @@ export const InvoiceForm = ({
     useState(false);
   const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
     useState(false);
+  const [
+    openContractPaymentTermSelectDialog,
+    setOpenContractPaymentTermSelectDialog,
+  ] = useState(false);
   const [showCheckListTooltip, setShowCheckListTooltip] = useState(false);
   const [showWorkReportTooltip, setShowWorlReportTooltip] = useState(false);
   const [isInvoicePDFGenerated] = useState(
@@ -271,7 +276,6 @@ export const InvoiceForm = ({
       true,
     );
     formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '', true);
-
     formik.setFieldValue('dueDate', invoice?.dueDate || '', true);
     formik.setFieldValue(
       'serviceOrderId',
@@ -291,7 +295,7 @@ export const InvoiceForm = ({
       );
       formik.setFieldValue(
         'serviceCompanyId',
-        serviceOrder.serviceCompany.id,
+        user?.userAccount.serviceCompany.id,
         true,
       );
       formik.setFieldValue('serviceOrderId', serviceOrder.id, true);
@@ -334,7 +338,11 @@ export const InvoiceForm = ({
     ];
     if (
       invoice &&
-      ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
+      ![
+        InvoiceStatus.NOT_PAID,
+        InvoiceStatus.EXPIRED,
+        InvoiceStatus.PARTIALLY_PAID,
+      ].includes(invoice.status)
     ) {
       items.push({
         label: t('Delete'),
@@ -539,7 +547,7 @@ export const InvoiceForm = ({
                     customer && (
                       <>
                         <Typography variant="caption">
-                          {customer.postalAddress.fullName}
+                          {customer.billingAddress?.fullName ?? '-'}
                         </Typography>
                         <Typography variant="caption" component="p">
                           {customer.contact.phone}
@@ -707,6 +715,7 @@ export const InvoiceForm = ({
                           radioProps={{
                             sx: {color: theme.palette.text.secondary},
                           }}
+                          disabled={formType === 'edit'}
                         />
                       ))
                   : invoice?.type === InvoiceType.FINAL &&
@@ -724,6 +733,7 @@ export const InvoiceForm = ({
                           radioProps={{
                             sx: {color: theme.palette.text.secondary},
                           }}
+                          disabled={formType === 'edit'}
                         />
                       ))
                   : invoiceTypeOptions.map((option) => (
@@ -737,6 +747,7 @@ export const InvoiceForm = ({
                         radioProps={{
                           sx: {color: theme.palette.text.secondary},
                         }}
+                        disabled={formType === 'edit'}
                       />
                     ))}
               </RadioGroup>
@@ -840,6 +851,7 @@ export const InvoiceForm = ({
               isCreditNote={formik.values.type === InvoiceType.CREDIT_NOTE}
               unitSellingAmount={invoice?.totalAmount}
               propertyOwnerId={customer?.id ?? ''}
+              formType={formType}
             />
 
             <InfoCard
@@ -849,11 +861,11 @@ export const InvoiceForm = ({
                 border: '1px solid #E4E9F2',
               }}
               headerActionIcon={<EditIcon />}
-              handleAction={() => setOpenContractPaymentTermsDialog(true)}
+              handleAction={() => setOpenContractPaymentTermSelectDialog(true)}
               showHeaderBackground
               header={
                 <Typography variant="subtitle1">
-                  {t('Payment terms')}
+                  {t('Payment Terms')}
                 </Typography>
               }>
               {formik.values.paymentTerms ? (
@@ -958,12 +970,23 @@ export const InvoiceForm = ({
         onConfirm={onPrintInvoice}
         onClose={() => setIsConfirmPrintDialogOpen(false)}
       />
-      <ContractPaymentTermsDialog
-        title={t('Choose your payment term')}
-        open={openContractPaymentTermsDialog}
+
+      <ContractPaymentTermSelectDialog
+        title={t('Payment Terms')}
+        alertText={t('Choose a payment term to be used on your invoice')}
+        open={openContractPaymentTermSelectDialog}
         onSave={handleContractPaymentTermsModal}
+        onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
+        onClickPaymentTerms={() => setOpenContractPaymentTermsDialog(true)}
+      />
+
+      <ContractPaymentTermsDialog
+        title={t('Manage Payment Terms')}
+        alertText={t(
+          'Add your payment terms that would be used later in invoicing',
+        )}
+        open={openContractPaymentTermsDialog}
         onCancel={() => setOpenContractPaymentTermsDialog(false)}
-        paymentTerms={formik.values.paymentTerms}
       />
     </Box>
   );

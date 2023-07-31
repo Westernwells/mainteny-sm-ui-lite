@@ -24,6 +24,7 @@ import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import {Button} from 'components/Button';
+import {ContractPaymentTermSelectDialog} from 'components/ContractPaymentTermSelectDialog';
 import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
 import * as Yup from 'yup';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
@@ -74,6 +75,10 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const [openDescriptionDialog, setOpenDescriptionDialog] = useState(false);
   const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
     useState(false);
+  const [
+    openContractPaymentTermSelectDialog,
+    setOpenContractPaymentTermSelectDialog,
+  ] = useState(false);
 
   const {mutateAsync: uploadFiles} = useUploadFiles(
     'Documents uploaded successfully',
@@ -96,7 +101,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       renewalTerms: contractDetails?.additionalInfo?.renewalTerms || '',
       visitsNumber: contractDetails?.visitsNumber || '',
       spendingLimit: contractDetails?.spendingLimit || '',
-      hourlyRate: contractDetails?.hourlyRate,
       invoiceDueDays: contractDetails?.additionalInfo?.invoiceDueDays,
       annualPriceAdjustmentPercentage:
         contractDetails?.additionalInfo?.annualPriceAdjustmentPercentage,
@@ -137,7 +141,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       invoiceCycle: formik.values.invoiceCycle || '',
       visitsNumber: +formik.values.visitsNumber,
       spendingLimit: +formik.values.spendingLimit,
-      hourlyRate: formik.values.hourlyRate || '',
       startDate: contractDetails?.startTime,
       endDate: contractDetails?.endTime,
       timePreference: contractDetails?.timePreference || [],
@@ -305,11 +308,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 (item) =>
                   `${item.discountPercentage}% when paid in ${item.days} days`,
               )}
-              hourlyRate={formatCurrency(
-                contractDetails ? contractDetails.hourlyRate : 0,
-                {currency},
-                selectedLng,
-              )}
               firstMaintenance={contractDetails.additionalInfo.firstMaintenance}
               firstInvoiceDate={contractDetails.additionalInfo.firstInvoiceDate}
             />
@@ -392,7 +390,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             <ContractParties
               name={contractDetails?.propertyOwner.name}
               occupation="Property Owner"
-              address={contractDetails?.propertyOwner.postalAddress.fullName}
+              address={contractDetails?.propertyOwner.billingAddress?.fullName}
               phoneNumber={contractDetails?.propertyOwner.contact.phone}
               partyType="CUSTOMER"
               chipStyles={{
@@ -584,12 +582,12 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             header={
               <Box sx={headerStyles}>
                 <Typography variant="subtitle1" mr="0.5em">
-                  {t('Payment terms')}
+                  {t('Payment Terms')}
                 </Typography>
               </Box>
             }
             headerActionIcon={<EditIcon />}
-            headerAction={() => setOpenContractPaymentTermsDialog(true)}>
+            headerAction={() => setOpenContractPaymentTermSelectDialog(true)}>
             {contractDetails.additionalInfo.paymentTerms ? (
               <Typography variant="body2">
                 {contractDetails.additionalInfo.paymentTerms}
@@ -605,12 +603,24 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               />
             )}
 
-            <ContractPaymentTermsDialog
-              title={t('Choose your payment term')}
-              open={openContractPaymentTermsDialog}
+            <ContractPaymentTermSelectDialog
+              title={t('Payment Terms')}
+              alertText={t('Choose a payment term to be used on your invoice')}
+              open={openContractPaymentTermSelectDialog}
               onSave={handleContractPaymentTermsModal}
+              onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
+              onClickPaymentTerms={() =>
+                setOpenContractPaymentTermsDialog(true)
+              }
+            />
+
+            <ContractPaymentTermsDialog
+              title={t('Manage Payment Terms')}
+              alertText={t(
+                'Add your payment terms that would be used later in invoicing',
+              )}
+              open={openContractPaymentTermsDialog}
               onCancel={() => setOpenContractPaymentTermsDialog(false)}
-              paymentTerms={formik.values.paymentTerms}
             />
           </ContractCard>
         </Grid>

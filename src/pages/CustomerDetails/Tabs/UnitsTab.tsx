@@ -95,21 +95,6 @@ export const UnitsTab = ({customerId}: Props) => {
     navigate('/units/new');
   };
 
-  if (isFetched && !totalUnitsRef.current) {
-    return (
-      <EmptySection
-        label="No units yet. Please click the button below to add!"
-        showActionBtn
-        btnLabel="Add Unit"
-        btnAction={addNewUnit}
-        containerStyle={{
-          height: '100%',
-          mb: '10em',
-        }}
-      />
-    );
-  }
-
   const clearFilters = () => {
     setLastVisitStart(null);
     setLastVisitEnd(null);
@@ -217,6 +202,21 @@ export const UnitsTab = ({customerId}: Props) => {
       pageName: 'Customers',
     });
   }, []);
+
+  if (isFetched && !totalUnitsRef.current) {
+    return (
+      <EmptySection
+        label="No units yet. Please click the button below to add!"
+        showActionBtn
+        btnLabel="Add Unit"
+        btnAction={addNewUnit}
+        containerStyle={{
+          height: '100%',
+          mb: '10em',
+        }}
+      />
+    );
+  }
 
   return (
     <TabContentContainer>

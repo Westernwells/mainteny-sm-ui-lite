@@ -47,7 +47,7 @@ export enum ElevatorCategory {
   GARAGE_DOOR = 'GARAGE_DOOR',
   BOARDING_BRIDGE = 'BOARDING_BRIDGE',
   FACADE_ACCESS_SYSTEM = 'FACADE_ACCESS_SYSTEM',
-  OTHERS = '',
+  OTHERS = 'OTHERS',
 }
 
 export interface ElevatorQueryParams {

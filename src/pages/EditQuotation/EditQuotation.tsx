@@ -208,7 +208,7 @@ export const EditQuotation = ({quotation}: Props) => {
                 customer && (
                   <>
                     <Typography variant="caption">
-                      {customer.postalAddress.fullName}
+                      {customer.billingAddress?.fullName ?? '-'}
                     </Typography>
                     <Typography variant="caption" component="p">
                       {customer.contact.phone}
@@ -262,6 +262,7 @@ export const EditQuotation = ({quotation}: Props) => {
                 <UnitsDataGrid
                   setRowItem={handleSelectUnit}
                   searchCustomer={customer?.name}
+                  propertyOwnerId={customer?.id}
                 />
               }
               labelRequired

@@ -140,7 +140,8 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
       });
     } else if (
       invoice.status === InvoiceStatus.NOT_PAID ||
-      invoice.status === InvoiceStatus.EXPIRED
+      invoice.status === InvoiceStatus.EXPIRED ||
+      invoice.status === InvoiceStatus.PARTIALLY_PAID
     ) {
       items.push({
         label: t('Payment'),
@@ -185,7 +186,11 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
       ],
     );
     if (
-      ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
+      ![
+        InvoiceStatus.NOT_PAID,
+        InvoiceStatus.EXPIRED,
+        InvoiceStatus.PARTIALLY_PAID,
+      ].includes(invoice.status)
     ) {
       items.push({
         label: t('Delete'),
@@ -194,6 +199,9 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
           setIsDeleteDialogOpen(true);
         },
       });
+    }
+    if (invoice.sentDate) {
+      return items.filter((item) => item.label !== t('Edit'));
     }
     return items;
   }, [downloadUrl]);

@@ -43,7 +43,6 @@ export interface QuotationItemRecord {
 
 export interface QuotationView {
   id: string;
-  serviceCompany: ServiceCompanySimpleView;
   elevator: ElevatorView;
   number: string;
   externalId: string;

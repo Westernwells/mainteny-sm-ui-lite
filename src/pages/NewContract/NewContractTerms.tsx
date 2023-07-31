@@ -1,6 +1,5 @@
 import {useTranslation} from 'react-i18next';
 import {Grid, InputAdornment} from '@mui/material';
-import {ArrowDropDown} from '@mui/icons-material';
 import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
@@ -11,10 +10,14 @@ import {invoiceCycle} from 'utils/contract-utils';
 import {DatePicker} from 'components/DatePicker';
 import {format, getMonth, getYear} from 'date-fns';
 import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
+import {useQueryContractPaymentTerms} from 'hooks/reactQuery/useCompanies';
+import {createEmptyResource} from 'utils/paging-utils';
 
 interface Props {
   formik: FormikProps<ContractTermsFormModal>;
 }
+
+const pageSize = 50;
 
 const NewContractTerms: FC<Props> = ({formik}) => {
   const {t} = useTranslation();
@@ -22,10 +25,14 @@ const NewContractTerms: FC<Props> = ({formik}) => {
   const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
     useState(false);
 
-  const handleContractPaymentTermsModal = (paymentTerms: string) => {
-    formik.setFieldValue('paymentTerms', paymentTerms);
-    setOpenContractPaymentTermsDialog(false);
-  };
+  const {data: contractPaymentTerms = createEmptyResource(pageSize)} =
+    useQueryContractPaymentTerms({
+      page: {
+        pageIndex: 0,
+        pageSize,
+      },
+      query: '',
+    });
 
   return (
     <Grid container spacing={2}>
@@ -41,6 +48,10 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             error: !!(
               formik.touched.visitsNumber && formik.errors.visitsNumber
             ),
+            helperText:
+              formik.errors.visitsNumber && formik.touched.visitsNumber
+                ? formik.errors.visitsNumber
+                : '',
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
           }}
@@ -50,7 +61,7 @@ const NewContractTerms: FC<Props> = ({formik}) => {
       <Grid item xs={4}>
         <FormSelect
           labelId="invoiceDueSelect-label"
-          label="Invoice Cycle"
+          label="Select Invoice Cycle"
           options={Object.keys(invoiceCycle).map((key) => ({
             label: invoiceCycle[key],
             value: key,
@@ -82,6 +93,10 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             type: 'number',
             required: true,
             value: Number(formik.values.netAmount).toString(),
+            helperText:
+              formik.errors.netAmount && formik.touched.netAmount
+                ? formik.errors.netAmount
+                : '',
             error: !!(formik.touched.netAmount && formik.errors.netAmount),
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
@@ -103,6 +118,10 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             placeholder: '12',
             type: 'number',
             value: Number(formik.values.renewalTerms).toString(),
+            helperText:
+              formik.errors.renewalTerms && formik.touched.renewalTerms
+                ? formik.errors.renewalTerms
+                : '',
             error: !!(
               formik.touched.renewalTerms && formik.errors.renewalTerms
             ),
@@ -121,32 +140,13 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             placeholder: '1500',
             type: 'number',
             value: Number(formik.values.spendingLimit).toString(),
+            helperText:
+              formik.errors.spendingLimit && formik.touched.spendingLimit
+                ? formik.errors.spendingLimit
+                : '',
             error: !!(
               formik.touched.spendingLimit && formik.errors.spendingLimit
             ),
-            onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
-            InputProps: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  {currentCurrency.symbol}
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </Grid>
-      <Grid item xs={4}>
-        <FormInput
-          props={{
-            label: t('Defined Hourly Rate (in {{currencySymbol}})', {
-              currencySymbol: currentCurrency.symbol,
-            }),
-            name: 'hourlyRate',
-            placeholder: '60',
-            type: 'number',
-            value: Number(formik.values.hourlyRate).toString(),
-            error: !!(formik.touched.hourlyRate && formik.errors.hourlyRate),
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
             InputProps: {
@@ -167,6 +167,10 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             placeholder: 'Enter payment due (in days)',
             type: 'number',
             value: formik.values.invoiceDueDays,
+            helperText:
+              formik.errors.invoiceDueDays && formik.touched.invoiceDueDays
+                ? formik.errors.invoiceDueDays
+                : '',
             error: !!(
               formik.touched.invoiceDueDays && formik.errors.invoiceDueDays
             ),
@@ -183,6 +187,10 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             placeholder: 'Enter payment due (in days)',
             type: 'number',
             value: formik.values.discounts?.[0]?.days ?? 0,
+            helperText:
+              formik.errors.discounts && formik.touched.discounts
+                ? formik.errors.discounts
+                : '',
             error: !!(formik.touched.discounts && formik.errors.discounts),
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
@@ -204,6 +212,11 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             placeholder: 'Enter notice period',
             type: 'number',
             value: formik.values.noticePeriodInMonth,
+            helperText:
+              formik.errors.noticePeriodInMonth &&
+              formik.touched.noticePeriodInMonth
+                ? formik.errors.noticePeriodInMonth
+                : '',
             error: !!(
               formik.touched.noticePeriodInMonth &&
               formik.errors.noticePeriodInMonth
@@ -223,6 +236,11 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             value: Number(
               formik.values.annualPriceAdjustmentPercentage,
             ).toString(),
+            helperText:
+              formik.errors.annualPriceAdjustmentPercentage &&
+              formik.touched.annualPriceAdjustmentPercentage
+                ? formik.errors.annualPriceAdjustmentPercentage
+                : '',
             error: !!(
               formik.touched.annualPriceAdjustmentPercentage &&
               formik.errors.annualPriceAdjustmentPercentage
@@ -240,6 +258,11 @@ const NewContractTerms: FC<Props> = ({formik}) => {
             placeholder: '120',
             type: 'number',
             value: Number(formik.values.serviceLevelAgreement).toString(),
+            helperText:
+              formik.errors.serviceLevelAgreement &&
+              formik.touched.serviceLevelAgreement
+                ? formik.errors.serviceLevelAgreement
+                : '',
             error: !!(
               formik.touched.serviceLevelAgreement &&
               formik.errors.serviceLevelAgreement
@@ -311,44 +334,37 @@ const NewContractTerms: FC<Props> = ({formik}) => {
       </Grid>
 
       <Grid item md={4}>
-        <FormInput
-          props={{
-            label: 'Payment terms',
-            name: 'paymentTerms',
-            placeholder: 'Choose your payment term',
-            value: formik.values.paymentTerms ? t('Choosed') : '',
-            error: !!(
-              formik.touched.paymentTerms && formik.errors.paymentTerms
-            ),
-            onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
-            onClick: () => setOpenContractPaymentTermsDialog(true),
-            disabled: true,
-            InputProps: {
-              endAdornment: (
-                <InputAdornment position="end" color="text.primary">
-                  <ArrowDropDown />
-                </InputAdornment>
+        {contractPaymentTerms?.data && (
+          <FormSelect
+            labelId="Payment Terms"
+            label={t('Select or Add Payment Terms')}
+            options={contractPaymentTerms?.data?.map(({term}) => ({
+              label: term,
+              value: term,
+            }))}
+            selectProps={{
+              id: 'paymentTerms',
+              value: formik.values.paymentTerms
+                ? formik.values.paymentTerms
+                : undefined,
+              onChange: formik.handleChange,
+              name: 'paymentTerms',
+              error: !!(
+                formik.touched.paymentTerms && formik.errors.paymentTerms
               ),
-            },
-            inputProps: {
-              sx: {
-                cursor: 'pointer',
-                '&::placeholder': {
-                  opacity: 1,
-                },
-              },
-            },
-          }}
-        />
+            }}
+            onClickPaymentTerms={() => setOpenContractPaymentTermsDialog(true)}
+          />
+        )}
       </Grid>
 
       <ContractPaymentTermsDialog
-        title={t('Choose your payment term')}
+        title={t('Manage Payment Terms')}
+        alertText={t(
+          'Add your payment terms that would be used later in invoicing',
+        )}
         open={openContractPaymentTermsDialog}
-        onSave={handleContractPaymentTermsModal}
-        onCancel={() => handleContractPaymentTermsModal('')}
-        paymentTerms={formik.values.paymentTerms}
+        onCancel={() => setOpenContractPaymentTermsDialog(false)}
       />
     </Grid>
   );

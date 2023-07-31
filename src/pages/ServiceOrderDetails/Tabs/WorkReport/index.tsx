@@ -25,6 +25,7 @@ import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {serviceOrderStatusToString} from 'utils/service-order-utils';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -37,6 +38,7 @@ interface Props {
 
 export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
   const {t} = useTranslation();
+  const {user} = useUserSession();
   const {
     data: serviceOrderReportSource,
     isFetched,
@@ -67,8 +69,7 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
 
   useEffect(() => {
     if (serviceOrderReportSource && serviceOrderReportSource.length) {
-      const serviceCompanyId =
-        serviceOrderReportSource[0].serviceOrder.serviceCompany.id;
+      const serviceCompanyId = user?.userAccount.serviceCompany.id;
       const serviceOrderId = serviceOrderReportSource[0].serviceOrder.id;
       const keys = {
         CUSTOMER: `${serviceCompanyId}/serviceOrders/${serviceOrderId}/report/CUSTOMER.png`,
@@ -136,7 +137,8 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
                 report && (
                   <>
                     <Typography variant="caption">
-                      {report.elevator.propertyOwner.postalAddress.fullName}
+                      {report.elevator.propertyOwner.billingAddress?.fullName ??
+                        '-'}
                     </Typography>
                     <Typography variant="caption" component="p">
                       {report.elevator.propertyOwner.contact.phone}

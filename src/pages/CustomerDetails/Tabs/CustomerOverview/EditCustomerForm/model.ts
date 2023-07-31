@@ -4,14 +4,15 @@ export type CustomerEditForm = {
   name: string;
   phone: string;
   billingAddress: AddressRecord | null;
+  beneficiaryAddress: AddressRecord | null;
+  otherAddress: AddressRecord | null;
   url: string;
   email: string;
-  postalAddress: AddressRecord | null;
   priority: Priority;
   externalId: string;
-  businessAddress?: AddressRecord | null;
   costCenter?: string;
   billingEmail?: string;
   registrationDate?: string;
   secondaryPhoneNumber?: string;
+  taxNumber: string;
 };

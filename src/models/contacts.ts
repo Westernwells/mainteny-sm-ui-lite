@@ -19,7 +19,9 @@ export interface PropertyOwner {
   contact: CompanyContact;
   name: string;
   labels: string[];
-  postalAddress: Address;
+  billingAddress?: Address;
+  beneficiaryAddress?: Address;
+  otherAddress?: Address;
   serviceCompanyId: string;
   secondaryPhoneNumber?: string;
 }

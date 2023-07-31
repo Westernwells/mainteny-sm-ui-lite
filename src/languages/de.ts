@@ -145,6 +145,7 @@ export const de = {
   'JPEG, PNG, BMP, GIF, WEBP or SVG': 'JPEG, PNG, BMP, GIF, WEBP oder SVG',
   'No description added.': 'Keine Beschreibung hinzugefügt',
   'Payment terms': 'Zahlungskonditionen',
+  'Payment Terms': 'Zahlungskonditionen',
   'No payment terms applied': 'Keine Zahlungskondition ausgewählt',
   'Choose your payment term': 'Wählen Sie Ihre Zahlungskondition',
   Choosed: 'Gewählt',
@@ -173,6 +174,7 @@ export const de = {
   'Clear filter': 'Filter löschen',
   'Customer ': 'Kunde',
   No: 'Nein',
+  'No.': 'Pos',
   No_number: 'No',
   'This week': 'Diese Woche',
   'Next week': 'Nächste Woche',
@@ -455,6 +457,9 @@ export const de = {
   'Technician is required': 'Techniker ist notwendig',
   'Order Article': 'Artikel bestellen',
   'SUPPLIER NO.': 'Lieferantnummer',
+  'Reschedule Order': 'Auftrag umplanen',
+  'Do you want to cancel the order?':
+    'Möchten Sie den Auftrag wirklich abbrechen?',
 
   // Add new unit
   Customer: 'Kunde',
@@ -527,7 +532,7 @@ export const de = {
   'Garage Door': 'Garagentor',
   'Boarding Bridge': 'Fluggastbrücke',
   'Facade Access System': 'Fassadenbefahrsystem',
-  Others: 'Sonstiges',
+  Others: 'Andere',
   'Last Visit': 'Letzter Besuch',
   'Last Inspection': 'Letzte Inspektion',
   'Visits per Year': 'Wartung pro Jahr',
@@ -538,7 +543,7 @@ export const de = {
   'Appointment Preferences': 'Terminpräferenz',
   'Days of the week': 'Wochentage',
   'Opening Hour': 'Öffnungszeiten',
-  'Closing Hour': 'Sperrstunde',
+  'Closing Hour': 'Schließzeiten',
   'Requires Notification': 'Benachrichtigung Erforderlich',
   'Notification Due': 'Benachrichtigung Fällig',
   'E.g. 5 days': 'z.B. 5 Tage',
@@ -719,6 +724,7 @@ export const de = {
   'Selected technician': 'Ausgewählter Techniker',
   'Description (Optional)': 'Beschreibung (fakultativ)',
   'Select date, time & technicians': 'Wähle: Datum, Uhrzeit und Techniker',
+  'Date, time & technicians': 'Datum, Uhrzeit und Techniker',
   'Select date': 'Datum auswählen',
   Print: 'Drucken',
   'Mark as rejected': 'Als abgelehnt markieren',
@@ -817,7 +823,7 @@ export const de = {
   'No quotations have been created yet. Please click the button below to create one!':
     'Es sind noch keine Angebote erstellt worden. Bitte klicken Sie auf die Schaltfläche unten, um ein Angebot zu erstellen!',
   'Add Quotation': 'Angebot hinzufügen',
-  'Select Unit': 'Einheit wählen',
+  'Select Unit': 'Anlage wählen',
   Duplicate: 'Duplizieren',
   'Quotation Details': 'Angebotsdetails',
   Orders: 'Aufträge',
@@ -843,6 +849,7 @@ export const de = {
   'Article Name': 'Artikelbezeichnung',
   PRIORITY: 'PRIORITÄT',
   NONE: 'KEINE',
+  None: 'Keine',
   'NO. OF CONTRACTS': 'ANZAHL VERTRÄGE',
   'Basic Details': 'Allgemeine Angaben',
   'Billing Address': 'Rechnungsadresse',
@@ -874,7 +881,7 @@ export const de = {
   'CUSTOMER NUMBER': 'Kundennummer',
   'BILLING EMAIL ADDRESS': 'RECHNUNGS-EMAIL-ADRESSE',
   'Billing Email Address': 'Rechnungs-E-Mail-Adresse',
-  'Do you want to delete this customer?': 'Möchten Sie diese Kunde löschen?',
+  'Do you want to delete this customer?': 'Möchten Sie diesen Kunden löschen?',
   'COST CENTER': 'KOSTENSTELLE',
   'Cost Center': 'Kostenstelle',
   'Custom prices': 'Kundenspezifische Preise',
@@ -897,6 +904,47 @@ export const de = {
   'Add Articles & Spare part': 'Artikel hinzufügen',
   'Customer {{customerName}} updated successfully!':
     'Änderung an Kunde {{customerName}} erfolgreich übernommen',
+  'Add basic information': 'Allgemeine Informationen hinzufügen',
+  'Address information': 'Adressinformationen',
+  'Add contact persons': 'Kontaktpersonen hinzufügen',
+  'Cancel your progress?': 'Vorgang abbrechen?',
+  'Are you sure you want to cancel your progress in creating a new customer?':
+    'Sind Sie sicher, dass Sie den Vorgang abbrechen möchten?',
+  'Cancel creation': 'Vorgang abbrechen',
+  'Customer Name is required': 'Kundenname ist erforderlich',
+  'Phone number is not valid': 'Telefonnummer ist nicht gültig',
+  'Postal address': 'Postanschrift',
+  'Address line 1': 'Adresszeile 1',
+  'Address line 2': 'Adresszeile 2',
+  City: 'Stadt',
+  'ZIP/Postal Code': 'Postleitzahl',
+  Country: 'Land',
+  'State/Province/Region': 'Bundesland/Provinz/Region',
+  'Different billing address': 'Abweichende Rechnungsadresse',
+  'Billing address': 'Rechnungsadresse',
+  'Send invoice via different address':
+    'Rechnung über eine andere Adresse senden',
+  'Send invoice via': 'Rechnung senden über',
+  'No Contact Persons. Do you want to add someone?':
+    'Keine Kontaktpersonen. Möchten Sie jemanden hinzufügen?',
+  'Contact person': 'Kontaktperson',
+  'Customer created successfully': 'Kunde erfolgreich angelegt',
+  'DIFFERENT BILLING ADDRESS': 'ABWEICHENDE RECHNUNGSADRESSE',
+  'SEND INVOICE VIA ADDRESS': 'RECHNUNG ÜBER ADRESSE SENDEN',
+  'VAT/TAX NUMBER': 'USt - IdNr',
+  'VAT/Tax number': 'USt - IdNr',
+  'Do you want to delete {{customerName}} from the contact persons list?':
+    'Möchten Sie {{customerName}} aus der Liste der Ansprechpartner löschen?',
+  'Resume your progress?': 'Ihren Fortschritt fortsetzen?',
+  "We've saved your progress from the previous session. Would you like to continue where you left off or start from scratch?":
+    'Wir haben Ihre Fortschritte aus der letzten Sitzung gespeichert. Möchten Sie dort weitermachen, wo Sie aufgehört haben, oder von vorne beginnen?',
+  'Start from scratch': 'Von vorne beginnen',
+  'Resume progress': 'Fortschritt fortsetzen',
+  'Beneficiary address': 'Leistungsempfänger',
+  'Add Beneficiary Address': 'Leistungsempfänger hinzufügen',
+  'Add Send invoice via': 'Hinzufügen "Rechnung senden über"',
+  'Add Contact person': 'Kontaktperson hinzufügen',
+  'BENEFICIARY ADDRESS': 'LEISTUNGSEMPFÄNGER ADRESSE',
 
   // Toast
   'Uh oh! As a Property Manager, please login at':
@@ -958,15 +1006,15 @@ export const de = {
     'Die Einheitendetails wurden erfolgreich aktualisiert',
   'Technicians updated successfully':
     'Der Techniker wurden erfolgreich aktualisiert',
-  'Unit created successfully': 'Die Einheit wurde erfolgreich erstellt',
+  'Unit created successfully': 'Die Anlage wurde erfolgreich erstellt',
   'Service order rescheduled successfully':
     'Der Serviceauftrag wurde erfolgreich umgeplant',
   'Service order scheduled successfully':
     'Der Serviceauftrag wurde erfolgreich geplant',
   'Emergency order created successfully':
     'Der Notfallauftrag wurde erfolgreich erstellt',
-  'Order created successfully': 'Die Bestellung wurde erfolgreich erstellt',
-  'Order scheduled successfully': 'Die Bestellung wurde erfolgreich geplant',
+  'Order created successfully': 'Der Auftrag wurde erfolgreich erstellt',
+  'Order scheduled successfully': 'Der Auftrag wurde erfolgreich geplant',
   'QR code image uploaded successfully':
     'QR-Code wurde erfolgreich hochgeladen',
   'Customer deleted successfully': 'Kunde wurden erfolgreich gelöscht',
@@ -978,8 +1026,8 @@ export const de = {
     'Es wurden noch keine Informationen eingetragen. Diese werden hier angezeigt, sobald sie hinzugefügt wurden.',
   'There are no entires for the applied filters.':
     'Für die angewendeten Filter sind keine Einträge vorhanden.',
-  // "Sorry, we couldn't find any ${placeholder} that matches the search text. If you like to add a new ${placeholder}, please click the button below.":
-  //   'Entschuldigung, wir konnten für Ihre Suche keine Informationen finden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
+  "Sorry, we couldn't find any {{placeholderText}} that matches the search text. For adding a new {{placeholderText}}, please click the button below":
+    'Entschuldigung, wir konnten keinen passenden {{placeholderText}} zu Ihrer Suche finden. Um einen neuen {{placeholderText}} hinzuzufügen, klicken Sie bitte auf die nachfolgende Schaltfläche',
   // 'No ${placeholder} yet. Please click the button below to add.':
   //   'Keine Informationen vorhanden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
   'Please click the button below to add.':
@@ -1072,7 +1120,7 @@ export const de = {
   'DATE FORMAT': 'DATUMSFORMAT',
   'TIME FORMAT': 'ZEITFORMAT',
   'TIME ZONE': 'ZEITZONE',
-  'MANAGING DIRECTOR': 'GESCHÄFTSFÜHRERIN',
+  'MANAGING DIRECTOR': 'Geschäftsfüher:in'.toUpperCase(),
   'ARBITRATION COURT': 'REGISTERGERICHT',
   'TRADE REGISTER NUMBER': 'HANDELSREGISTERNUMMER',
   IBAN: 'IBAN',
@@ -1109,6 +1157,7 @@ export const de = {
   Checklists: 'Checklisten',
   'DATE CREATED': 'ERSTELLUNGSDATUM',
   CATEGORIES: 'KATEGORIEN',
+  'Task 1': 'Aufgabe 1',
   'TOTAL TASKS': 'AUFGABEN INSGESAMT',
   'New Checklist': 'Neue Checkliste',
   'No checklists yet': 'Noch keine Checklisten',
@@ -1122,6 +1171,8 @@ export const de = {
   'Delete Category': 'Kategorie löschen',
   'New Task': 'Neue Aufgabe',
   'Option per task': 'Wahlmöglichkeit je Aufgabe',
+  'My Service': 'Mein Service',
+  'My Checklist': 'Meine Checkliste',
   'New Option': 'Neue Wahlmöglichkeit',
   'Checklist saved successfully!': 'Checkliste erfolgreich gespeichert!',
   'Checklist updated successfully!': 'Checkliste erfolgreich aktualisiert!',
@@ -1184,7 +1235,7 @@ export const de = {
   'No options': 'Keine Vorschläge',
   'Address is required': 'Adresse ist erforderlich',
   'Category is required': 'Kategorie ist erforderlich',
-  'Unit type is required': 'Einheitstyp ist erforderlich',
+  'Unit type is required': 'Anlagentyp ist erforderlich',
   'Last visit is required': 'Letzter Besuch ist erforderlich',
   'Service time is required': 'Dienstzeit ist erforderlich',
   'No. of technicians is required': 'Anzahl der Techniker ist erforderlich',
@@ -1216,6 +1267,7 @@ export const de = {
   'Paid in full': 'Vollständig gezahlt',
   'Paid amount': 'Gezahlter Betrag',
   'Paid amount (excl. VAT)': 'Gezahlter Betrag (ohne MwSt.)',
+  'Paid amount (incl. VAT)': 'Gezahlter Betrag (inkl. MwSt.)',
   Preview: 'Vorschau',
   Edit: 'Bearbeiten',
   Payment: 'Zahlung',
@@ -1256,7 +1308,7 @@ export const de = {
   'Facility Manager': 'Facility Manager',
   'Contact Person': 'Kontaktperson',
   'Asset Owner': 'Eigentümer',
-  'Add units': 'Einheiten hinzufügen',
+  'Add units': 'Anlage hinzufügen',
   'Contact invited successfully': 'Kontakt erfolgreich eingeladen',
   'Invoice created': 'Rechnung erstellt',
   'Invoice updated': 'Rechnung aktualisiert',
@@ -1266,6 +1318,8 @@ export const de = {
   'Overdue notice sent': 'Mahnung gesendet',
   'Invoice paid': 'Rechnung beglichen',
   'Invoice expired': 'Rechnung abgelaufen',
+  'The invoice was overdue': 'Die Rechnung war überfällig',
+  'Invoice overdue': 'Überfällige Rechnung',
   'Payment received': 'Zahlung erhalten',
   'Payment updated': 'Zahlung aktualisiert',
   'Payment deleted': 'Zahlung gelöscht',
@@ -1283,7 +1337,7 @@ export const de = {
   'FIRST MAINTENANCE VISIT': 'ERSTE WARTUNG',
   'FIRST INVOICE': 'ERSTE RECHNUNG',
   'Invoice cycle is required': 'Rechnungszyklus ist erforderlich',
-  'INVOICE CYCLE': 'RECHNUNHSZYKLUS',
+  'INVOICE CYCLE': 'RechnunGszyklus'.toUpperCase(),
   'The invoice cycle should not be "After each visit" for Non-maintenance contract':
     'Der Rechnungszyklus sollte bei Sonstigen Verträgen nicht "nach jedem Besuch" sein.',
   'Visit number is required': 'Anzahl an Wartungen ist erforderlich',
@@ -1291,7 +1345,6 @@ export const de = {
   'No checklist for selected service order':
     'Keine Checkliste für ausgewählten Serviceauftrag',
   'Add checklist to invoice': 'Checkliste zur Rechnung hinzufügen',
-  'Billing email address': 'Rechnungs-E-Mail-Adresse',
   'No report for selected service order':
     'Kein Wartungsbericht für den ausgewählten Serviceauftrag',
   'Maintenance contract': 'Wartungsvertrag',
@@ -1337,7 +1390,7 @@ export const de = {
   '12 months': '12 Monate',
   'No work report for the selected service order':
     'Kein Arbeitsbericht für den ausgewählten Auftrag',
-  'Website/URL': 'Website/URL',
+  'Website/URL': 'Webseite/URL',
   'Remove defined contract name': 'Vertragsnamen entfernen',
   'If you delete this contract name, all existing contracts with the same contract name will lose their properties.':
     'Wenn Sie diesen Vertragsnamen löschen, verlieren alle bestehenden Verträge mit demselben Vertragsnamen ihre Eigenschaften.',
@@ -1356,4 +1409,43 @@ export const de = {
   'Report downloaded successfully!': 'Bericht erfolgreich heruntergeladen!',
   'Max time range exceeded, the max time range is 90 days':
     'Maximale Zeitspanne überschritten, die maximale Zeitspanne beträgt 90 Tage',
+  'Total Payable': 'Gesamtbetrag',
+  German: 'Deutsch',
+  Europe: 'Europa',
+  'Europe/Berlin': 'Europa/Berlin',
+  'Europe/Belfast': 'Europa/Belfast',
+  'Europe/Dublin': 'Europa/Dublin',
+  'Europe/London': 'Europa/London',
+  English: 'Englisch',
+  'Add New': 'Artikel hinzufügen',
+  'Invitation sent': 'Einladung versendet',
+  'Search by number, customer, status etc.':
+    'Suche nach Nummer, Kunde, Status usw.',
+  'Create new unit': 'Neue Anlage anlegen',
+  'Create New Unit': 'Neue Anlage anlegen',
+  'No units yet. They will appear here once added!':
+    'Noch keine Anlagen. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!',
+  Pay: 'Zahlen',
+  'Manage Payment Terms': 'Zahlungsbedingungen verwalten',
+  'Choose a payment term to be used on your invoice':
+    'Wählen Sie eine Zahlungsbedingung für Ihre Rechnung',
+  'Write your term here': 'Schreiben Sie hier Ihre Bedingungen',
+  'Add your payment terms that would be used later in invoicing':
+    'Zahlungsbedingungen hinzufügen, die später bei der Rechnungsstellung verwendet werden sollen',
+  'New Payment Term': 'Neue Zahlungsbedingung',
+  'Select or Add Payment Terms':
+    'Wählen oder fügen Sie eine Zahlungsbedingung hinzu',
+  'Select Invoice Cycle': 'Wählen Sie einen Rechnungszyklus',
+  'Select Contract Type': 'Wählen Sie einen Vertragstypen',
+  Jobs: 'Aufträge',
+  Dashboard: 'Dashboard',
+  'Resend code': 'Code erneut anfordern',
+  'Send reset code': 'Reset Code anfordern',
+  'Enter your email address': 'Geben Sie Ihre E-Mail ein',
+  'Enter your password': 'Geben Sie Ihr Passwort ein',
+  'Should be higher than 0': 'Sollte höher als 0 sein',
+  'Yearly Contract Price is required':
+    'Jährlicher Vertragspreis ist erforderlich',
+  'Should be higher or equals to 0': 'Sollte höher oder gleich 0 sein',
+  'Partially Paid': 'Teilweise bezahlt',
 };

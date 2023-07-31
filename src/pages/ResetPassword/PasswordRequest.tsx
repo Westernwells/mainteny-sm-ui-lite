@@ -2,9 +2,7 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import ArrowBack from '@mui/icons-material/ArrowBack';
-import EmailIcon from '@mui/icons-material/Email';
 import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -36,7 +34,7 @@ export const PasswordRequest = ({
 
   return (
     <AuthLayout>
-      <Typography variant="h5" mt={7} textAlign="center">
+      <Typography variant="h5" mt={7} textAlign="center" letterSpacing="0.04em">
         {t('Forgot Password')}
       </Typography>
       <Box mt={3} display="flex" justifyContent="center" width="100%">
@@ -62,13 +60,7 @@ export const PasswordRequest = ({
             onChange={handleChange}
             onBlur={handleBlur}
             value={email}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <EmailIcon />
-                </InputAdornment>
-              ),
-            }}
+            placeholder={t('Enter your email address')}
           />
           <Box mt={5}>
             <Button
@@ -84,7 +76,7 @@ export const PasswordRequest = ({
                   <ArrowForward />
                 )
               }>
-              {t('Get reset code')}
+              {t('Send reset code')}
             </Button>
             <Button
               sx={{width: '100%', marginTop: 1}}

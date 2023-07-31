@@ -40,6 +40,8 @@ export const mapInvoiceStatus = (invoiceStatus: InvoiceStatusView) => {
       return InvoiceStatus.DRAFT;
     case InvoiceStatusView.EXPIRED:
       return InvoiceStatus.EXPIRED;
+    case InvoiceStatusView.PARTIALLY_PAID:
+      return InvoiceStatus.PARTIALLY_PAID;
     default:
       return undefined;
   }
@@ -60,7 +62,7 @@ export const getInvoiceActivityTitle = (type: InvoiceActivityType): string => {
     case InvoiceActivityType.PAID:
       return 'Invoice paid';
     case InvoiceActivityType.EXPIRED:
-      return 'Invoice expired';
+      return 'Invoice overdue';
     case InvoiceActivityType.PAYMENT_RECEIVED:
       return 'Payment received';
     case InvoiceActivityType.PAYMENT_UPDATED:

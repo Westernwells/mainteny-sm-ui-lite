@@ -157,9 +157,9 @@ export const Checklist = () => {
         : [
             {
               id: getUniqueId(),
-              name: 'Category',
+              name: t('Category'),
               questions: [
-                {...questionMock, question: 'Task 1', id: getUniqueId()},
+                {...questionMock, question: t('Task 1'), id: getUniqueId()},
               ],
             },
           ],
@@ -445,7 +445,7 @@ export const Checklist = () => {
                     ) : (
                       <>
                         <Typography variant="h6">
-                          {formik.values.categories[index].name}
+                          {t(formik.values.categories[index].name)}
                         </Typography>
                         <IconButton
                           onClick={() => {
@@ -512,9 +512,10 @@ export const Checklist = () => {
                                     props={{
                                       name: `categories[${index}].questions[${questionIndex}].question`,
                                       variant: 'outlined',
-                                      value:
+                                      value: t(
                                         formik.values.categories[index]
                                           .questions[questionIndex].question,
+                                      ),
                                       error: !!(
                                         formik.touched.categories?.[index]
                                           ?.questions?.[questionIndex] &&

@@ -74,10 +74,21 @@ export interface Location {
   latitude: number;
 }
 
+export interface AddressComponent {
+  name?: string;
+  street?: string;
+  street2?: string;
+  city?: string;
+  postalCode?: string;
+  state?: string;
+  country?: string;
+}
+
 export interface AddressRecord {
   fullName: string;
-  countryCode: string;
-  location: Location;
+  countryCode?: string;
+  location?: Location | null;
+  component?: AddressComponent | null;
 }
 
 export interface Address extends AddressRecord {

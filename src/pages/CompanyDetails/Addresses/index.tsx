@@ -39,36 +39,9 @@ export const Addresses = ({containerStyles, company}: Props) => {
 
   const formik = useFormik<AddressesCompanyFormModel>({
     initialValues: {
-      postalAddress: company.postalAddress
-        ? {
-            fullName: company.postalAddress.fullName,
-            countryCode: company.postalAddress.countryCode,
-            location: {
-              longitude: company.postalAddress.location.longitude,
-              latitude: company.postalAddress.location.latitude,
-            },
-          }
-        : null,
-      billingAddress: company.billingAddress
-        ? {
-            fullName: company.billingAddress.fullName,
-            countryCode: company.billingAddress.countryCode,
-            location: {
-              longitude: company.billingAddress.location.longitude,
-              latitude: company.billingAddress.location.latitude,
-            },
-          }
-        : null,
-      businessAddress: company.businessAddress
-        ? {
-            fullName: company.businessAddress.fullName,
-            countryCode: company.businessAddress.countryCode,
-            location: {
-              longitude: company.businessAddress.location.longitude,
-              latitude: company.businessAddress.location.latitude,
-            },
-          }
-        : null,
+      postalAddress: company.postalAddress ? company.postalAddress : null,
+      billingAddress: company.billingAddress ? company.billingAddress : null,
+      businessAddress: company.businessAddress ? company.businessAddress : null,
     },
     onSubmit: () => {},
     validationSchema,

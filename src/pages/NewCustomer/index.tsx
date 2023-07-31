@@ -1,22 +1,66 @@
 import {useEffect, useLayoutEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {FormikErrors} from 'formik';
+import {useFormik} from 'formik';
+import * as Yup from 'yup';
+import {isEqual, omit} from 'lodash';
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {Priority} from 'models/service-order';
 import {useCreateCustomer} from 'hooks/reactQuery/useCustomers';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
-import {BasicCustomerFormModel, NewCustomerBody} from './model';
+import {
+  CustomerAddressFormModel,
+  CustomerBasicInfoFormModel,
+  CustomerContactPersonsFormModel,
+  NewCustomerBody,
+} from './model';
 import {BasicCustomerForm} from './BasicCustomerForm';
+import {CustomerAddressForm} from './CustomerAddressForm';
+import {CustomerContactPersonsForm} from './CustomerContactPersonsForm';
+import {ConfirmCancel} from './ConfirmCancel';
+import {ResumeProgress} from './ResumeProgress';
 
 interface Props {
   getCurrentPageTitle?: (title: string) => void;
 }
 
-const steps = ['Add basic info'];
+const phoneValidationRE =
+  /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+
+const validationSchemaBasicInfo = Yup.object().shape({
+  name: Yup.string().required('Customer Name is required'),
+  email: Yup.string().email('Enter a valid email'),
+  billingEmail: Yup.string().email('Enter a valid email'),
+  phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),
+  secondaryPhoneNumber: Yup.string().matches(
+    phoneValidationRE,
+    'Phone number is not valid',
+  ),
+});
+
+const validationSchemaAddress = Yup.object().shape({
+  billingAddress: Yup.object().nullable(),
+  beneficiaryAddress: Yup.object().nullable(),
+  otherAddress: Yup.object().nullable(),
+});
+
+const validationSchemaContactPersons = Yup.object().shape({
+  contactPersons: Yup.object().nullable(),
+});
+
+const steps = [
+  'Add basic information',
+  'Address information',
+  'Add contact persons',
+];
+
+const localStorageFormikBasicInfoKey = 'NEW_CUSTOMER_formikBasicInfo';
+const localStorageFormikAddressKey = 'NEW_CUSTOMER_formikAddress';
+const localStorageFormikContactPersonsKey = 'NEW_CUSTOMER_formikContactPersons';
 
 export const NewCustomer = ({getCurrentPageTitle}: Props) => {
   const navigate = useNavigate();
@@ -24,28 +68,90 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
 
   const [activeStep, setActiveStep] = useState(0);
   const [disableNextBtn, setDisableNextBtn] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [openResumeProgressDialog, setOpenResumeProgressDialog] =
+    useState(false);
 
   const {mutateAsync: createCustomer} = useCreateCustomer(
     'Customer created successfully',
   );
 
-  const [basicCustomerFormError, setBasicCustomerFormError] = useState<
-    FormikErrors<BasicCustomerFormModel>
-  >({});
-
-  const [basicCustomerFormValues, setBasicCustomerFormValues] =
-    useState<BasicCustomerFormModel>({
+  const formikBasicInfo = useFormik<CustomerBasicInfoFormModel>({
+    initialValues: {
       name: '',
       phone: '',
+      secondaryPhoneNumber: '',
       url: '',
       email: '',
-      postalAddress: null,
-      billingAddress: null,
+      billingEmail: '',
       priority: Priority.NONE,
       externalId: '',
       registrationDate: new Date(),
       costCenter: '',
-    });
+      taxNumber: '',
+    },
+    onSubmit: () => {},
+    validationSchema: validationSchemaBasicInfo,
+  });
+
+  const formikAddress = useFormik<CustomerAddressFormModel>({
+    initialValues: {
+      billingAddress: null,
+      beneficiaryAddress: null,
+      otherAddress: null,
+    },
+    onSubmit: () => {},
+    validationSchema: validationSchemaAddress,
+  });
+
+  const formikContactPersons = useFormik<CustomerContactPersonsFormModel>({
+    enableReinitialize: true,
+    initialValues: {
+      contactPersons: [],
+    },
+    onSubmit: () => {},
+    validationSchema: validationSchemaContactPersons,
+  });
+
+  useEffectAfterMount(() => {
+    localStorage.setItem(
+      localStorageFormikBasicInfoKey,
+      JSON.stringify(formikBasicInfo.values),
+    );
+    localStorage.setItem(
+      localStorageFormikAddressKey,
+      JSON.stringify(formikAddress.values),
+    );
+    localStorage.setItem(
+      localStorageFormikContactPersonsKey,
+      JSON.stringify(formikContactPersons.values),
+    );
+  }, [
+    formikBasicInfo.values,
+    formikAddress.values,
+    formikContactPersons.values,
+  ]);
+
+  // show resume progress modal if there's previous stored state in local storage
+  useEffect(() => {
+    const localStorageFormikBasicInfo = localStorage.getItem(
+      localStorageFormikBasicInfoKey,
+    );
+
+    const localStorageFormikBasicInfoParsed = JSON.parse(
+      localStorageFormikBasicInfo ?? '{}',
+    ) as CustomerBasicInfoFormModel;
+
+    if (
+      localStorageFormikBasicInfo &&
+      !isEqual(
+        omit(localStorageFormikBasicInfoParsed, 'registrationDate'),
+        omit(formikBasicInfo.values, 'registrationDate'),
+      )
+    ) {
+      setOpenResumeProgressDialog(true);
+    }
+  }, []);
 
   useLayoutEffect(() => {
     if (getCurrentPageTitle) {
@@ -54,41 +160,84 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
   }, []);
 
   useEffect(() => {
-    if (activeStep === 0 && Object.keys(basicCustomerFormError).length) {
+    if (
+      (activeStep === 0 && Object.keys(formikBasicInfo.errors).length) ||
+      (activeStep === 1 && Object.keys(formikAddress.errors).length) ||
+      (activeStep === 2 && Object.keys(formikContactPersons.errors).length)
+    ) {
       return setDisableNextBtn(true);
     }
-
     return setDisableNextBtn(false);
-  }, [activeStep, basicCustomerFormError]);
+  }, [activeStep, formikBasicInfo, formikAddress, formikContactPersons]);
 
-  useEffect(() => {
-    setActiveStep(0);
-  }, []);
+  const restoreFormikFromLocalStorage = () => {
+    const localStorageFormikBasicInfo = localStorage.getItem(
+      localStorageFormikBasicInfoKey,
+    );
+    const localStorageFormikAddress = localStorage.getItem(
+      localStorageFormikAddressKey,
+    );
+    const localStorageFormikContactPersons = localStorage.getItem(
+      localStorageFormikContactPersonsKey,
+    );
+    if (localStorageFormikBasicInfo) {
+      formikBasicInfo.setValues(JSON.parse(localStorageFormikBasicInfo!));
+    }
+    if (localStorageFormikAddress) {
+      formikAddress.setValues(JSON.parse(localStorageFormikAddress!));
+    }
+    if (localStorageFormikContactPersons) {
+      formikContactPersons.setValues(
+        JSON.parse(localStorageFormikContactPersons!),
+      );
+    }
+    setOpenResumeProgressDialog(false);
+  };
+
+  const resetLocalStorage = () => {
+    [
+      localStorageFormikBasicInfoKey,
+      localStorageFormikAddressKey,
+      localStorageFormikContactPersonsKey,
+    ].forEach((key) => {
+      localStorage.removeItem(key);
+    });
+    setOpenResumeProgressDialog(false);
+  };
 
   const handleCancel = () => {
-    setActiveStep(0);
+    setOpenDialog(true);
+  };
+
+  const onCancel = () => {
+    resetLocalStorage();
+    navigate(-1);
   };
 
   const addNewEmployee = async () => {
     const body: NewCustomerBody = {
-      billingAddress: basicCustomerFormValues.billingAddress,
-      businessAddress: null,
       contact: {
-        email: basicCustomerFormValues.email,
-        phone: `+${basicCustomerFormValues.phone.replaceAll('+', '')}`,
-        url: basicCustomerFormValues.url,
+        email: formikBasicInfo.values.email,
+        phone: formikBasicInfo.values.phone
+          ? formatPhoneNumber(formikBasicInfo.values.phone)
+          : '',
+        url: formikBasicInfo.values.url,
       },
-      externalId: basicCustomerFormValues.externalId,
-      name: basicCustomerFormValues.name,
-      postalAddress: basicCustomerFormValues.postalAddress,
-      billingEmail: basicCustomerFormValues.billingEmail,
-      priority: basicCustomerFormValues.priority,
+      externalId: formikBasicInfo.values.externalId,
+      name: formikBasicInfo.values.name,
+      billingEmail: formikBasicInfo.values.billingEmail,
+      priority: formikBasicInfo.values.priority,
       serviceCompanyId: user!.userAccount.serviceCompany.id,
-      registrationDate: basicCustomerFormValues.registrationDate,
-      costCenter: basicCustomerFormValues.costCenter,
-      secondaryPhoneNumber: basicCustomerFormValues.secondaryPhoneNumber
-        ? formatPhoneNumber(basicCustomerFormValues.secondaryPhoneNumber)
+      registrationDate: formikBasicInfo.values.registrationDate,
+      costCenter: formikBasicInfo.values.costCenter,
+      taxNumber: formikBasicInfo.values.taxNumber,
+      secondaryPhoneNumber: formikBasicInfo.values.secondaryPhoneNumber
+        ? formatPhoneNumber(formikBasicInfo.values.secondaryPhoneNumber)
         : '',
+      billingAddress: formikAddress.values.billingAddress,
+      beneficiaryAddress: formikAddress.values.beneficiaryAddress,
+      otherAddress: formikAddress.values.otherAddress,
+      contactPersons: formikContactPersons.values.contactPersons,
     };
 
     const response = await createCustomer(body);
@@ -100,6 +249,7 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
         customerNumber: response.value,
         creationDate: Date.now(),
       });
+      resetLocalStorage();
       navigate(`/customers/details/${response.value}?tab=0`, {replace: true});
     }
   };
@@ -122,18 +272,28 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       <FlexContainer>
         {activeStep === 0 ? (
           <FlexContainer containerStyle={{mt: '2em'}}>
-            <BasicCustomerForm
-              getBasicCustomerFormErrors={(errors) =>
-                setBasicCustomerFormError(errors)
-              }
-              getBasicCustomerFormValues={(values) =>
-                setBasicCustomerFormValues(values)
-              }
-              initialValues={basicCustomerFormValues}
-            />
+            <BasicCustomerForm formik={formikBasicInfo} />
+          </FlexContainer>
+        ) : activeStep === 1 ? (
+          <FlexContainer containerStyle={{mt: '2em'}}>
+            <CustomerAddressForm formik={formikAddress} />
+          </FlexContainer>
+        ) : activeStep === 2 ? (
+          <FlexContainer containerStyle={{mt: '2em'}}>
+            <CustomerContactPersonsForm formik={formikContactPersons} />
           </FlexContainer>
         ) : null}
       </FlexContainer>
+      <ConfirmCancel
+        open={openDialog}
+        onConfirm={onCancel}
+        onClose={() => setOpenDialog(false)}
+      />
+      <ResumeProgress
+        open={openResumeProgressDialog}
+        onConfirm={restoreFormikFromLocalStorage}
+        onClose={resetLocalStorage}
+      />
     </Stepper>
   );
 };

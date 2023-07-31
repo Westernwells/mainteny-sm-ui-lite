@@ -144,6 +144,7 @@ export const sr = {
   'JPEG, PNG, BMP, GIF, WEBP or SVG': 'JPEG, PNG, BMP, GIF, WEBP ili SVG',
   'No description added.': 'Nije dodat opis',
   'Payment terms': 'Uslovi plaćanja',
+  'Payment Terms': 'Uslovi Plaćanja',
   'No payment terms applied': 'Nisu primenjeni uslovi plaćanja',
   'Choose your payment term': 'Izaberite svoj uslov plaćanja',
   Choosed: 'Izabrani',
@@ -425,6 +426,7 @@ export const sr = {
   'Select Supplier': 'Odaberi dobavljača',
   'Purchase order number': 'Broj narudžbe',
   'Full invoice': 'Potpuna faktura',
+  'Partial Invoice': 'Djelimična faktura',
   'Customer specific order number': 'Broj narudžbe specifičan za kupca',
   'Print order': 'Ispiši narudžbu',
   'The PDFs are not generated yet.': 'PDF dokumenti još nisu generirani.',
@@ -453,6 +455,8 @@ export const sr = {
   'Technician is required': 'Potreban je serviser',
   'Order Article': 'Naručite proizvod',
   'SUPPLIER NO.': 'SUPPLIER NO',
+  'Reschedule Order': 'Ponovo zakažite narudžbu',
+  'Do you want to cancel the order?': 'Da li želite da otkažete porudžbinu?',
 
   // Add new unit
   Customer: 'Kupac',
@@ -718,6 +722,7 @@ export const sr = {
   'Selected technician': 'Izabrani serviser',
   'Description (Optional)': 'Opis (opciono)',
   'Select date, time & technicians': 'Izaberite , datum, vrijeme i serviser',
+  'Date, time & technicians': 'Datum, vreme i tehničari',
   'Select date': 'Izaberite datum',
   Print: 'Printaj',
   'Mark as rejected': 'Označi kao odbijeno',
@@ -780,7 +785,7 @@ export const sr = {
   VAT: 'PDV.',
   'Invoice Amount': 'Iznos',
   '(incl VAT)': '( sa PDV )',
-  'Partial Payment': 'Partial Payment',
+  'Partial Payment': 'Djelimično plaćanje',
   'Add Description': 'Dodaj opis',
   'Delete Article': 'Izbriši artikal',
   'Additional Information': 'Dodatne Informacije',
@@ -839,6 +844,7 @@ export const sr = {
   'Article Name': 'Naziv članka',
   PRIORITY: 'Prioritet',
   NONE: 'NIJEDAN',
+  None: 'Nijedan',
   'NO. OF CONTRACTS': 'BROJ UGOVORA',
   'Basic Details': 'Osnovni detalji',
   'Billing Address': 'Adresa za naplatu',
@@ -892,6 +898,46 @@ export const sr = {
   'Add Articles & Spare part': 'Dodajte artikle i rezervni deo',
   'Customer {{customerName}} updated successfully!':
     'Klijent {{customerName}} je uspešno ažuriran!',
+  'Add basic information': 'Dodajte osnovne informacije',
+  'Address information': 'Informacije o adresi',
+  'Add contact persons': 'Dodajte kontakt osobe',
+  'Cancel your progress?': 'Želite li da otkažete svoj napredak?',
+  'Are you sure you want to cancel your progress in creating a new customer?':
+    'Da li ste sigurni da želite da otkažete svoj napredak u stvaranju novog klijenta?',
+  'Cancel creation': 'Otkažite kreiranje',
+  'Customer Name is required': 'Ime klijenta je obavezno',
+  'Phone number is not valid': 'Broj telefona nije važeći',
+  'Postal address': 'Poštanska adresa',
+  'Address line 1': 'Adresna linija 1',
+  'Address line 2': 'Adresna linija 2',
+  City: 'Grad',
+  'ZIP/Postal Code': 'Poštanski broj',
+  Country: 'Država',
+  'State/Province/Region': 'Država/Provincija/Region',
+  'Different billing address': 'Drugačija adresa za obračun',
+  'Billing address': 'Adresa za naplatu',
+  'Send invoice via different address': 'Pošaljite fakturu preko druge adrese',
+  'Send invoice via': 'Pošaljite fakturu preko',
+  'No Contact Persons. Do you want to add someone?':
+    'Nema kontakt osoba. Da li želite da dodate nekoga?',
+  'Contact person': 'Kontakt osoba',
+  'Customer created successfully': 'Klijen je uspješno kreiran',
+  'DIFFERENT BILLING ADDRESS': 'RAZLIČITA ADRESA ZA FAKULTET',
+  'SEND INVOICE VIA ADDRESS': 'POŠALJITE FAKTURU PREKO ADRESE',
+  'VAT/TAX NUMBER': 'PDV/PORESKI BROJ',
+  'VAT/Tax number': 'PDV/Poreski broj',
+  'Do you want to delete {{customerName}} from the contact persons list?':
+    'Da li želite da izbrišete {{customerName}} sa liste kontakt osoba?',
+  'Resume your progress?': 'Nastavite svoj napredak?',
+  "We've saved your progress from the previous session. Would you like to continue where you left off or start from scratch?":
+    'Sačuvali smo vaš napredak iz prethodne sesije. Da li biste želeli da nastavite tamo gde ste stali ili da počnete od nule?',
+  'Start from scratch': 'Početi od nule',
+  'Resume progress': 'Nastavite napredak',
+  'Beneficiary address': 'Adresa korisnika',
+  'Add Beneficiary Address': 'Dodajte adresu korisnika',
+  'Add Send invoice via': 'Dodaj Pošalji fakturu putem',
+  'Add Contact person': 'Dodaj kontakt osobu',
+  'BENEFICIARY ADDRESS': 'ADRESA KORISNIKA',
 
   // Toast
   'Uh oh! As a Property Manager, please login at':
@@ -965,8 +1011,8 @@ export const sr = {
     'Još nema unosa podataka. Oni će se pojaviti ovde kada se dodaju.',
   'There are no entires for the applied filters.':
     'FNe postoje cjeline za primjenjene filtere.',
-  // "Sorry, we couldn't find any ${placeholder} that matches the search text. If you like to add a new ${placeholder}, please click the button below.":
-  //   'Entschuldigung, wir konnten für Ihre Suche keine Informationen finden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
+  "Sorry, we couldn't find any {{placeholderText}} that matches the search text. For adding a new {{placeholderText}}, please click the button below":
+    'Žao nam je, nismo mogli da pronađemo nijedan {{placeholderText}}  koji odgovara tekstu pretrage. Ako želite da dodate novi  {{placeholderText}} kliknite na dugme ispod',
   // 'No ${placeholder} yet. Please click the button below to add.':
   //   'Keine Informationen vorhanden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.',
   'Please click the button below to add.':
@@ -1093,6 +1139,14 @@ export const sr = {
   Checklist: 'Kontrolna lista',
   'No checklist yet.': 'Još nema kontrolne liste.',
   'Order Details': 'Detalji narudžbe',
+  'Task 1': 'Zadatak 1',
+  'Checklist name': 'Ime kontrolne liste',
+  'New Category': 'Nova Kategorija',
+  'New Task': 'Novi zadatak',
+  'Option per task': 'Opcija po zadatku',
+  'New Option': 'Nova opcija',
+  'My Service': 'Moja služba',
+  'My Checklist': 'Moja kontrolna lista',
 
   //  Notifications
   Notifications: 'Obavještenja',
@@ -1147,7 +1201,7 @@ export const sr = {
   'Revoke Access': 'Opozovi pristup',
   'Create Service Order': 'Stvori servisni nalog',
   'Service Information': 'Servisne informacije',
-  'No options': 'No options',
+  'No options': 'Nema opcija',
   'Address is required': 'Adresa je obavezna',
   'Category is required': 'Kategorija je obavezna',
   'Unit type is required': 'Potrebna je vrsta jedinice',
@@ -1182,6 +1236,7 @@ export const sr = {
   'Paid in full': 'Plaćeno u potpunosti',
   'Paid amount': 'Plaćeni iznos',
   'Paid amount (excl. VAT)': 'Plaćeni iznos (bez PDV)',
+  'Paid amount (incl. VAT)': 'Gezahlter Betrag ( sa PDV )',
   Preview: 'Pregled',
   Edit: 'Urediti',
   Payment: 'Plaćanje',
@@ -1233,6 +1288,8 @@ export const sr = {
   'Overdue notice sent': 'Poslato opomena',
   'Invoice paid': 'Faktura plaćena',
   'Invoice expired': 'Faktura je istekla',
+  'Invoice overdue': 'Faktura je dospela',
+  'The invoice was overdue': 'Faktura je kasnila',
   'Payment received': 'Primila uplatu',
   'Payment updated': 'Plaćanje je ažurirano',
   'Payment deleted': 'Uplata je obrisana',
@@ -1258,7 +1315,6 @@ export const sr = {
   'No checklist for selected service order':
     'Nema kontrolne liste za odabranu narudžbu usluge',
   'Add checklist to invoice': 'Dodajte kontrolni popis na fakturu',
-  'Billing email address': 'Adresa e-pošte za naplatu',
   'No report for selected service order':
     'Nema izvješća za odabrani nalog usluge',
   'Maintenance contract': 'Maintenance contract',
@@ -1322,4 +1378,41 @@ export const sr = {
   'Report downloaded successfully!': 'Izvješće je uspješno preuzeto!',
   'Max time range exceeded, the max time range is 90 days':
     'Maksimalni vremenski raspon je premašen, maksimalni vremenski raspon je 90 dana',
+  'Total Payable': 'Ukupan iznos za plaćanje',
+  German: 'Nemački',
+  Europe: 'Evropa',
+  'Europe/Berlin': 'Evropa/Berlin',
+  'Europe/Belfast': 'Evropa/Belfast',
+  'Europe/Dublin': 'Evropa/Dublin',
+  'Europe/London': 'Evropa/London',
+  English: 'Engleski jezik',
+  'Add New': 'Dodaj novi',
+  'Invitation sent': 'Pozivnica poslana',
+  'Search by number, customer, status etc.':
+    'Pretražujte po broju, kupcu, statusu itd.',
+  'Create new unit': 'Napravite novu jedinicu',
+  'Create New Unit': 'Napravite Novu Jedinicu',
+  'No units yet. They will appear here once added!':
+    'Još nema jedinica. Pojaviće se ovde kada se unesu!',
+  'Manage Payment Terms': 'Upravljajte uslovima plaćanja',
+  'Choose a payment term to be used on your invoice':
+    'Izaberite uslov plaćanja koji će se koristiti na vašoj fakturi',
+  'Write your term here': 'Ovde napišite svoj uslov',
+  'Add your payment terms that would be used later in invoicing':
+    'Dodajte uslove plaćanja koji će se kasnije koristiti u fakturisanju',
+  'New Payment Term': 'Novi uslov plaćanja',
+  Pay: 'Plati',
+  Dashboard: 'Komandna table',
+  'Resend code': 'Pošalji ponovo šifru',
+  'Send reset code': 'Pošalji kod za resetovanje',
+  'Enter your email address': 'Unesite svoju imejl adresu',
+  'Enter your password': 'Enter your password',
+  Jobs: 'Naređenja',
+  'Select or Add Payment Terms': 'Izaberite ili dodajte uslove plaćanja',
+  'Select Invoice Cycle': 'Izaberite Ciklus fakture',
+  'Select Contract Type': 'Izaberite Tip ugovora',
+  'Should be higher than 0': 'Trebalo bi da bude veće od 0',
+  'Yearly Contract Price is required': 'Godišnja cena ugovora je obavezna',
+  'Should be higher or equals to 0': 'Trebalo bi da bude veće ili jednako 0',
+  'Partially Paid': 'Delimično plaćeno',
 };

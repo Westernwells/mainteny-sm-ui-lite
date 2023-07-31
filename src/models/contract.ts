@@ -1,5 +1,5 @@
 import {Client} from './client';
-import {ServiceCompany, ServiceCompanySimpleView} from './service-company';
+import {ServiceCompany} from './service-company';
 import {Amount, Meta, Order, TimeWindowRecord, TimeWindowType} from './misc';
 import {Elevator, ElevatorSimpleView, ElevatorView} from './elevator';
 import {PropertyOwnerSimpleView} from './propertyManager';
@@ -43,14 +43,12 @@ export interface ContractElevator {
 export interface Contract {
   id: string;
   propertyOwner: Client;
-  serviceCompany: ServiceCompany;
   type: string;
   elevators: ContractElevator[];
   visitsNumber: number;
   sla: number;
   spendingLimit: number;
   price: number;
-  hourlyRate: number;
   currency: string;
   startTime: string;
   endTime: string;
@@ -112,17 +110,13 @@ export interface ContractView {
   additionalInfo: ContractAdditionalInfo;
   id: string;
   propertyOwner: PropertyOwnerSimpleView;
-  serviceCompany: ServiceCompanySimpleView;
   name: string;
   type: ContractTypes;
   visitsNumber: number;
   number: number;
   externalId: string;
-
   sla: number;
   spendingLimit: number;
-
-  hourlyRate: number;
   currency: string;
   startTime: string;
   endTime: string;
@@ -140,7 +134,6 @@ export interface ContractSimpleView {
   sla: number;
   spendingLimit: number;
   price: number;
-  hourlyRate: number;
   number: number;
   currency: string;
   startTime: string;
@@ -159,7 +152,6 @@ export interface CreateContractRecord {
   sla: number;
   spendingLimit: number;
   price: number;
-  hourlyRate: number;
   currency: string;
   startDate: string;
   endDate: string;
@@ -173,7 +165,6 @@ export interface UpdateContractRecord {
   sla: number;
   spendingLimit: number;
   price: number;
-  hourlyRate: number;
   currency: string;
   startDate: string;
   endDate: string;
@@ -224,7 +215,6 @@ export interface ContractRequestBody {
   currency?: string;
   endDate?: string;
   externalId?: string;
-  hourlyRate?: number;
   price?: ContractPrice;
   sla?: number;
   spendingLimit?: number;
@@ -253,7 +243,6 @@ export interface ContractTermsFormModal {
   netAmount: number | string;
   renewalTerms: number | string;
   spendingLimit: number | string;
-  hourlyRate: number | string;
   annualPriceAdjustmentPercentage: number | string;
   serviceLevelAgreement: number | string;
   firstMaintenance?: FirstMaintenance;
@@ -276,7 +265,6 @@ export interface ContractUpdateRequest {
   annualPriceAdjustmentPercentage?: number;
   discounts?: number;
   noticePeriodInMonth?: number;
-  hourlyRate?: number;
   firstMaintenance?: FirstMaintenance;
   firstInvoiceDate?: string;
   paymentTerms?: string;
@@ -294,4 +282,13 @@ export interface ContractPaymentTermView {
 export interface NewContractPaymentTermBody {
   serviceCompanyId: string;
   term: string;
+}
+
+export interface UpdateContractPaymentTermRecord {
+  term: string;
+}
+
+export interface UpdateContractPaymentTermView {
+  term: string;
+  id: string;
 }

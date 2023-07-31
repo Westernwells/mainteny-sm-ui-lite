@@ -1,9 +1,7 @@
 import {useContext, useEffect, useState} from 'react';
 import Grid from '@mui/material/Grid';
 import {
-  Elevator,
   LowPriority,
-  FileCopy,
   Email,
   Home,
   LocalPhone,
@@ -11,6 +9,8 @@ import {
   HomeWork,
   AttachMoney,
   Language,
+  Payment,
+  CalendarToday,
 } from '@mui/icons-material';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
@@ -68,10 +68,25 @@ export const CustomerOverviewTab = ({
     if (customer) {
       setBasicDetails({
         ...basicDetails,
-        address: {
-          label: 'ADDRESS',
-          value: customer.postalAddress?.fullName,
+        billingAddress: {
+          label: 'BILLING ADDRESS',
+          value: customer.billingAddress?.fullName ?? '-',
           icon: <Home sx={{color: theme.palette.info.dark}} />,
+        },
+        beneficiaryAddress: {
+          label: 'BENEFICIARY ADDRESS',
+          value: customer.beneficiaryAddress?.fullName ?? '-',
+          icon: <HomeWork sx={{color: theme.palette.info.dark}} />,
+        },
+        otherAddress: {
+          label: 'SEND INVOICE VIA ADDRESS',
+          value: customer.otherAddress?.fullName ?? '-',
+          icon: <HomeWork sx={{color: theme.palette.info.dark}} />,
+        },
+        costCenter: {
+          label: 'COST CENTER',
+          value: customer.additionalInfo.costCenter || '-',
+          icon: <AttachMoney sx={{color: theme.palette.info.dark}} />,
         },
         phone: {
           label: 'PHONE',
@@ -79,14 +94,14 @@ export const CustomerOverviewTab = ({
           icon: <LocalPhone sx={{color: theme.palette.info.dark}} />,
         },
         email: {
-          label: 'EMAIL ID',
-          value: customer.contact.email,
+          label: 'EMAIL',
+          value: customer.contact.email || '-',
           icon: <Email sx={{color: theme.palette.info.dark}} />,
         },
-        billingAddress: {
-          label: 'BILLING ADDRESS',
-          value: customer.billingAddress?.fullName || '-',
-          icon: <HomeWork sx={{color: theme.palette.info.dark}} />,
+        priority: {
+          label: 'PRIORITY',
+          value: t(customer.additionalInfo.priority),
+          icon: <LowPriority sx={{color: theme.palette.info.dark}} />,
         },
         secondaryPhoneNumber: {
           label: '2nd PHONE',
@@ -100,26 +115,6 @@ export const CustomerOverviewTab = ({
           value: customer.additionalInfo.billingEmail || '-',
           icon: <Email sx={{color: theme.palette.info.dark}} />,
         },
-        costCenter: {
-          label: 'COST CENTER',
-          value: customer.additionalInfo.costCenter || '-',
-          icon: <AttachMoney sx={{color: theme.palette.info.dark}} />,
-        },
-        numberOfUnits: {
-          label: 'NO. OF UNITS',
-          value: totalUnits.toString() || '-',
-          icon: <Elevator sx={{color: theme.palette.info.dark}} />,
-        },
-        numberOfContracts: {
-          label: 'NO. OF CONTRACTS',
-          value: totalContracts.toString() || '-',
-          icon: <FileCopy sx={{color: theme.palette.info.dark}} />,
-        },
-        priority: {
-          label: 'PRIORITY',
-          value: t(customer.additionalInfo.priority),
-          icon: <LowPriority sx={{color: theme.palette.info.dark}} />,
-        },
         website: {
           label: 'WEBSITE/URL',
           value: customer.contact.url || '-',
@@ -131,7 +126,12 @@ export const CustomerOverviewTab = ({
             (formatDate(
               getDateObject(customer.additionalInfo.registrationDate),
             ) as string) || '-',
-          icon: <Language sx={{color: theme.palette.info.dark}} />,
+          icon: <CalendarToday sx={{color: theme.palette.info.dark}} />,
+        },
+        taxNumber: {
+          label: 'VAT/TAX NUMBER',
+          value: customer.additionalInfo.taxNumber || '-',
+          icon: <Payment sx={{color: theme.palette.info.dark}} />,
         },
       });
     }

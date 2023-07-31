@@ -7,6 +7,7 @@ import {useArticles} from 'hooks/reactQuery/useArticle';
 import {ArticleView} from 'models/article';
 import {formatCurrency} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {useTranslation} from 'react-i18next';
 import {NoRowsEmptySection} from './NoRowsEmptySection';
 import {styles} from './style';
 
@@ -82,6 +83,7 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
 const pageSize = 25;
 
 export const ArticlesDataGrid = ({setRowItem, search, setSearch}: Props) => {
+  const {t} = useTranslation();
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
@@ -149,7 +151,7 @@ export const ArticlesDataGrid = ({setRowItem, search, setSearch}: Props) => {
         }
         noRowsEmptySection={
           <NoRowsEmptySection
-            placeholder="article"
+            placeholder={t('Article')}
             action={() => window.open('/articles/new', '_blank')}
           />
         }

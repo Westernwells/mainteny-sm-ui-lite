@@ -19,12 +19,12 @@ export const EmergencyPhoneSchema = ({label, elevator}: Props) => {
   const theme = useTheme();
   const renderSection = () => {
     switch (label) {
-      case 'manufacturer':
+      case 'emergencyPhoneProvider':
         return (
           <CardProps
             icon={<HomeRepairService sx={{color: theme.palette.info.dark}} />}
             label="MANUFACTURER"
-            bodyText={elevator.additionalInfo?.manufacturer || '-'}
+            bodyText={elevator.additionalInfo?.emergencyPhoneProvider || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"

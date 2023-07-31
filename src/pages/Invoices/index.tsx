@@ -25,6 +25,7 @@ import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryState} from 'hooks/useQueryState';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {columns, makeRows} from './InvoicesDataGridProps';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
 import {Widget} from '../../components/Widget';
@@ -32,6 +33,7 @@ import {Widget} from '../../components/Widget';
 const pageSize = 25;
 
 export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
+  const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
@@ -138,7 +140,14 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
 
   useEffect(() => {
     if (!isLoading) {
-      setRows(makeRows(invoiceResource.data, downloadUrls, formatDate));
+      setRows(
+        makeRows(
+          invoiceResource.data,
+          downloadUrls,
+          user?.userAccount.serviceCompany.id,
+          formatDate,
+        ),
+      );
     }
   }, [invoiceResource, isLoading, downloadUrls]);
 

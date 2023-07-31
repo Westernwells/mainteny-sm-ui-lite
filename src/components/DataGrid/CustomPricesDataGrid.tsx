@@ -28,7 +28,7 @@ interface Props {
 export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
-    headerName: 'article no.',
+    headerName: 'article number',
     flex: 0,
   }),
   getColumnProps({

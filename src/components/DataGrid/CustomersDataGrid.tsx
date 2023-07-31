@@ -19,13 +19,13 @@ export const columns: GridColDef[] = [
     field: 'name',
     headerName: 'customer',
     cellClassName: 'truncateText',
-    flex: 1.5,
+    flex: 1,
   }),
   getColumnProps({
     field: 'number',
     headerName: 'customer no.',
     align: 'center',
-    flex: 0,
+    flex: 1,
   }),
   getColumnProps({
     field: 'address',
@@ -36,12 +36,13 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'units',
     headerName: 'no. of units',
-    align: 'right',
-    flex: 0,
+    align: 'center',
+    flex: 1,
   }),
   getColumnProps({
     field: 'phone',
     headerName: 'phone no.',
+    align: 'right',
   }),
 ];
 
@@ -51,7 +52,7 @@ export const makeRows = (customers: PropertyOwnerView[]): GridRowsProp =>
         id: index,
         name: item.name,
         number: item.externalId,
-        address: item.postalAddress?.fullName,
+        address: item.billingAddress?.fullName,
         units: item.unitNumber,
         phone: item.contact.phone,
         propertyOwner: item,
@@ -71,13 +72,17 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
     isLoading,
     isFetching,
     isIdle,
+    refetch,
   } = useQueryCustomers(
     {
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
-      query: search,
+      query: encodeURIComponent(search!!),
     },
-    {keepPreviousData: true},
+    {
+      keepPreviousData: true,
+      enabled: false,
+    },
   );
 
   useEffect(() => {
@@ -85,8 +90,22 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
   }, [customerResource, page.pageSize]);
 
   useEffect(() => {
-    setRows(makeRows(customerResource.data));
-  }, [customerResource]);
+    if (!isIdle && !isLoading) {
+      setRows(makeRows(customerResource.data));
+    }
+  }, [isFetching]);
+
+  useEffect(() => {
+    if (search === '' || (search !== '' && page.pageIndex === 0)) {
+      refetch();
+    }
+  }, [search, page.pageIndex]);
+
+  useEffect(() => {
+    if (page.pageIndex) {
+      setPage({...page, pageIndex: 0});
+    }
+  }, [search]);
 
   if (isIdle || isLoading) {
     return (

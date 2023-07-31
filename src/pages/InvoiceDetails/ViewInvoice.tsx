@@ -23,7 +23,7 @@ import {InvoiceActivityView, InvoiceStatus, InvoiceView} from 'models/invoice';
 import {ServiceOrderReportView} from 'models/service-order';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {PdfGenerationStatus} from 'models/misc';
-import {formatNetAmount} from 'utils/currency';
+import {formatGrossAmount} from 'utils/currency';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
@@ -118,6 +118,8 @@ export const ViewInvoice = ({
           setIsDeleteDialogOpen(true);
         },
       });
+    } else if (invoice.sentDate) {
+      return items.filter((item) => item.label !== t('Edit'));
     }
     return items;
   }, [downloadUrl]);
@@ -207,7 +209,7 @@ export const ViewInvoice = ({
                 sx={{color: 'text.main', textTransform: 'initial'}}
               />
               <Typography variant="subtitle1">
-                {formatNetAmount(invoice.totalAmount)}
+                {formatGrossAmount(invoice.totalAmount)}
               </Typography>
             </Box>
           </PageCard>

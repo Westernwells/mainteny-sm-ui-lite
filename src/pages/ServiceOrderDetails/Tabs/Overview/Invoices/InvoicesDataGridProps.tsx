@@ -26,9 +26,11 @@ export const getInvoiceStatusStyles = (
     case InvoiceStatus.DRAFT:
       return {label: 'Draft', color: 'default'};
     case InvoiceStatus.EXPIRED:
-      return {label: 'Expired', color: 'error'};
+      return {label: 'Overdue', color: 'error'};
     case InvoiceStatus.NOT_PAID:
       return {label: 'Unpaid', color: 'primary'};
+    case InvoiceStatus.PARTIALLY_PAID:
+      return {label: 'Partially Paid', color: 'warning'};
     default:
       return {label: '-', color: 'default'};
   }
@@ -74,6 +76,7 @@ export const columns: GridColDef[] = [
 
 export const makeRows = (
   invoices: InvoiceView[],
+  serviceCompanyId?: string,
   formatDate: FormatDate = () => '',
 ): GridRowsProp =>
   invoices.length
@@ -96,7 +99,7 @@ export const makeRows = (
         status: item.status,
         actions: {
           pdfPath: item.additionalInfo.pdfPath,
-          serviceCompanyId: item.serviceCompany.id,
+          serviceCompanyId,
         },
         invoice: item,
         navigateTo: `/invoices/details/${item.id}`,

@@ -13,8 +13,8 @@ export const EditEmergencyPhoneForm = ({formik}: Props) => (
       <FormInput
         props={{
           label: 'Manufacturer',
-          name: 'manufacturer',
-          value: formik.values.manufacturer,
+          name: 'emergencyPhoneProvider',
+          value: formik.values.emergencyPhoneProvider,
           onChange: formik.handleChange,
           onBlur: formik.handleBlur,
         }}

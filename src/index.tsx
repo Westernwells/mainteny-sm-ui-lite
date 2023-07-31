@@ -10,6 +10,7 @@ import {LanguageProvider} from 'context/LanguageProvider';
 import * as Sentry from '@sentry/react';
 import {App} from './App';
 import {theme} from './theme';
+import './assets/fonts/Aventa/Aventa-Regular.ttf';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,6 +31,14 @@ Sentry.init({
   dsn: import.meta.env.REACT_APP_SENTRY_DSN,
   environment: isProduction ? 'production' : import.meta.env.MODE,
   debug: !isProduction,
+  replaysSessionSampleRate: isProduction ? 0.1 : 1.0,
+  replaysOnErrorSampleRate: 1.0,
+  integrations: [
+    new Sentry.Replay({
+      maskAllText: true,
+      blockAllMedia: true,
+    }),
+  ],
 });
 
 ReactDOM.render(
