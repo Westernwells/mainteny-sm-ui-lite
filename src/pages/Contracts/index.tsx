@@ -26,12 +26,14 @@ import {
   getStartEndPrice,
 } from 'utils/contract-utils';
 import {useCurrentCurrency} from 'utils/currency';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {columns, makeRows} from './ContractsDataGridProps';
 
 const pageSize = 25;
 
 export const Contracts = () => {
   const currentCurrency = useCurrentCurrency();
+  const {user} = useUserSession();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
   const [search, setSearch] = useQueryState('searchContracts');
@@ -104,12 +106,14 @@ export const Contracts = () => {
     const options: string[] = [];
 
     if (!isLoading && !isFetching && !isIdle) {
-      contractResource.data.forEach((item: ContractView) => {
+      contractResource.data.forEach(() => {
         if (
-          !options.includes(item.serviceCompany.name) &&
-          !contractorFilterItems.includes(item.serviceCompany.name)
+          !options.includes(user?.userAccount.serviceCompany.name!) &&
+          !contractorFilterItems.includes(
+            user?.userAccount.serviceCompany.name!,
+          )
         ) {
-          options.push(item.serviceCompany.name);
+          options.push(user?.userAccount.serviceCompany.name!);
         }
       });
       setRows(makeRows(contractResource.data, formatDate));

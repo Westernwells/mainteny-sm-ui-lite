@@ -25,9 +25,9 @@ import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryState} from 'hooks/useQueryState';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {DataSyncType} from 'models/service-company';
 import useLastSyncedItem from 'hooks/useLastSyncedItem';
-import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useCompanyXeroInfo} from 'hooks/reactQuery/useCompanies';
 import {Widget} from '../../components/Widget';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
@@ -150,7 +150,14 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
 
   useEffect(() => {
     if (!isLoading) {
-      setRows(makeRows(invoiceResource.data, downloadUrls, formatDate));
+      setRows(
+        makeRows(
+          invoiceResource.data,
+          downloadUrls,
+          user?.userAccount.serviceCompany.id,
+          formatDate,
+        ),
+      );
     }
   }, [invoiceResource, isLoading, downloadUrls]);
 

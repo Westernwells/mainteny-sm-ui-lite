@@ -11,6 +11,7 @@ import {getDataGridHeight} from 'utils/utils';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {columns, makeRows} from './InvoicesDataGridProps';
 
 interface Props {
@@ -19,6 +20,7 @@ interface Props {
 
 export const Invoices = ({serviceOrderId}: Props) => {
   const {t} = useTranslation();
+  const {user} = useUserSession();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -34,7 +36,13 @@ export const Invoices = ({serviceOrderId}: Props) => {
 
   useEffect(() => {
     if (!isLoading) {
-      setRows(makeRows(InvoiceList || [], formatDate));
+      setRows(
+        makeRows(
+          InvoiceList || [],
+          user?.userAccount.serviceCompany.id,
+          formatDate,
+        ),
+      );
     }
   }, [InvoiceList, isLoading]);
 

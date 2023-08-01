@@ -270,7 +270,7 @@ export const sr = {
   Discard: 'Discard',
 
   // Invoices
-  Invoices: 'fakture',
+  Invoices: 'Fakture',
   'Edit Invoice': 'Uredi fakturu',
   'New Invoice': 'Nova faktura',
   'INVOICE DATE': 'DATUM FAKTURE',
@@ -1097,7 +1097,7 @@ export const sr = {
   'No service order has been created for this quotation yet!':
     'Još uvijek nije kreiran nalog za ovu ponudu!',
   Addresses: 'adrese',
-  Settings: 'Informacije o plaćanju',
+  Settings: 'Postavke',
   'Legal Information': 'informacije o naplati',
   'Payment Information': 'Politika kompanije',
   'Defined contract names': 'Definirani nazivi ugovora',
@@ -1415,4 +1415,7 @@ export const sr = {
   'Should be higher than 0': 'Trebalo bi da bude veće od 0',
   'Yearly Contract Price is required': 'Godišnja cena ugovora je obavezna',
   'Should be higher or equals to 0': 'Trebalo bi da bude veće ili jednako 0',
+  Serbian: 'Srpski',
+  'New Job': 'Novi nalog',
+  'Partially Paid': 'Delimično plaćeno',
 };
