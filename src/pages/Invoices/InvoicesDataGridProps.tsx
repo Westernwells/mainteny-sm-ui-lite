@@ -42,6 +42,8 @@ export const getInvoiceStatusStyles = (
       return {label: InvoiceStatusView.EXPIRED, color: 'error'};
     case InvoiceStatus.NOT_PAID:
       return {label: InvoiceStatusView.NOT_PAID, color: 'primary'};
+    case InvoiceStatus.PARTIALLY_PAID:
+      return {label: InvoiceStatusView.PARTIALLY_PAID, color: 'warning'};
     default:
       return {label: '-', color: 'default'};
   }
@@ -137,6 +139,7 @@ export const columns: GridColDef[] = [
 export const makeRows = (
   invoices: InvoiceView[],
   downloadUrls: {[key: string]: string} | undefined,
+  serviceCompanyId?: string,
   formatDate: FormatDate = () => '',
 ): GridRowsProp =>
   invoices.length
@@ -159,7 +162,7 @@ export const makeRows = (
         status: item.status,
         actions: {
           pdfPath: item.additionalInfo.pdfPath,
-          serviceCompanyId: item.serviceCompany.id,
+          serviceCompanyId,
         },
         downloadUrl: downloadUrls?.[item.additionalInfo.pdfPath] ?? '',
         invoice: item,

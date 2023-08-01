@@ -1416,4 +1416,5 @@ export const sr = {
   'Should be higher or equals to 0': 'Trebalo bi da bude veće ili jednako 0',
   Serbian: 'Srpski',
   'New Job': 'Novi nalog',
+  'Partially Paid': 'Delimično plaćeno',
 };

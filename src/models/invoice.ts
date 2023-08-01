@@ -20,6 +20,7 @@ export enum InvoiceStatus {
   NOT_PAID = 'NOT_PAID',
   DRAFT = 'DRAFT',
   EXPIRED = 'EXPIRED',
+  PARTIALLY_PAID = 'PARTIALLY_PAID',
 }
 
 export enum InvoiceCycle {
@@ -35,6 +36,7 @@ export enum InvoiceStatusView {
   NOT_PAID = 'Sent',
   DRAFT = 'Draft',
   EXPIRED = 'Overdue',
+  PARTIALLY_PAID = 'Partially Paid',
 }
 
 export interface InvoiceItem {
@@ -110,7 +112,6 @@ export interface InvoiceView {
   sentDate: string;
   dueDate: string;
   status: InvoiceStatus;
-  serviceCompany: ServiceCompanySimpleView;
   serviceOrder?: ServiceOrderView;
   propertyOwner: PropertyOwnerSimpleView;
   items: InvoiceItem[];
