@@ -28,7 +28,7 @@ import {ReactComponent as ArticlesIcon} from 'assets/icons/Articles.svg';
 import {ReactComponent as EmployeesIcon} from 'assets/icons/Employees.svg';
 import {ReactComponent as AnalyticsIcon} from 'assets/icons/Analytics.svg';
 import {ReactComponent as SettingsIcon} from 'assets/icons/Settings.svg';
-import {ReactComponent as MaintenyLogo} from 'assets/icons/Mainteny.svg';
+import {ReactComponent as MaintenyLogoWhite} from 'assets/icons/MaintenyLogoWhite.svg';
 import Fade from '@mui/material/Fade';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
@@ -350,7 +350,12 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     open
       ? drawerHeader(
           <IconButton
-            sx={{mr: '4em'}}
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-start',
+              ml: '1.3em',
+              marginBottom: '1em',
+            }}
             edge="start"
             disableRipple
             onClick={() => {
@@ -358,17 +363,18 @@ export const AppDrawer = ({open, setOpen}: Props) => {
               Mixpanel.identifyAndTrack(mixpanelEvents.MENU_HOME_CLICKED);
               navigate('/');
             }}>
-            <MaintenyLogo
-              style={{marginRight: '0.5em'}}
-              width={55.22}
-              height={32}
-            />
+            <MaintenyLogoWhite width={118.43} height={24} />
           </IconButton>,
           <ArrowBackIosNewIcon />,
         )
       : drawerHeader(
-          <IconButton>
-            <Logo style={{marginRight: '0.5em'}} width={55.22} height={32} />
+          <IconButton
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginBottom: '1em',
+            }}>
+            <Logo width={55.22} height={24} />
           </IconButton>,
           <ArrowForwardIos />,
         );
@@ -399,12 +405,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                   style={{
                     paddingTop: 15,
                     paddingBottom: 15,
-                    ...(open
-                      ? {
-                          marginLeft: '5px',
-                          marginRight: '5px',
-                        }
-                      : null),
                   }}
                   sx={{
                     transition: (theme) =>
@@ -418,8 +418,24 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                   }}
                   key={text}>
                   <ListItemIcon
-                    sx={{minWidth: 0, pr: '1em', pl: '.25em'}}
-                    color={selectedPath === path ? '#FFF' : '#8F9BB3'}>
+                    sx={{
+                      minWidth: 0,
+                      mr: '12px',
+                      ml:
+                        open && selectedPath === path
+                          ? '20px'
+                          : open && selectedPath !== path
+                          ? '24px'
+                          : !open && selectedPath === path
+                          ? '0px'
+                          : !open && selectedPath !== path
+                          ? '4px'
+                          : '0px',
+                    }}
+                    color={selectedPath === path ? '#FFF' : '#8F9BB3'}
+                    className={
+                      selectedPath === path ? 'active-icon' : 'inactive-icon'
+                    }>
                     {icon}
                   </ListItemIcon>
                   <ListItemText
@@ -427,7 +443,8 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                       <Fade in={open}>
                         <Typography
                           variant="subtitle1"
-                          color={selectedPath === path ? '#FFF' : '#8F9BB3'}>
+                          color={selectedPath === path ? '#FFF' : '#8F9BB3'}
+                          ml="12px">
                           {t(text)}
                         </Typography>
                       </Fade>

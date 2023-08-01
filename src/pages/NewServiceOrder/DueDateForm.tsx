@@ -61,6 +61,7 @@ export const DueDateForm = ({
         textFieldProps={{
           label: t('Due date'),
           name: 'date',
+          required: true,
           helperText:
             formik.errors.date && formik.touched.date ? formik.errors.date : '',
           error: !!(formik.touched.date && formik.errors.date),

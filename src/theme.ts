@@ -284,7 +284,7 @@ export const theme = createTheme({
           '&.Mui-selected': {
             background: '#40748054',
             boxSizing: 'border-box',
-            borderLeft: '6px solid #00D1FF',
+            borderLeft: '4px solid #00D1FF',
           },
         },
       },

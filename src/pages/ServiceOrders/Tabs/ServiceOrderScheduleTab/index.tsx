@@ -162,7 +162,7 @@ export const ServiceOrderScheduleTab = () => {
   const renderWidget = () => (
     <Widget
       filterItems={renderFilterItems()}
-      btnLabel="New Order"
+      btnLabel="New Job"
       hideSearchInput
     />
   );
