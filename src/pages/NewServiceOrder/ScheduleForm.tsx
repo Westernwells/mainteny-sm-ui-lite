@@ -79,6 +79,7 @@ export const ScheduleForm = ({
         textFieldProps={{
           label: t('Due date'),
           name: 'date',
+          required: true,
           helperText:
             formik.errors.date && formik.touched.date ? formik.errors.date : '',
           error: !!(formik.touched.date && formik.errors.date),
@@ -107,6 +108,7 @@ export const ScheduleForm = ({
                   formik.errors.startTime && formik.touched.startTime
                     ? formik.errors.startTime
                     : '',
+                required: true,
                 error: !!(formik.errors.startTime && formik.touched.startTime),
                 onBlur: formik.handleBlur,
               }}
@@ -129,6 +131,7 @@ export const ScheduleForm = ({
                   formik.errors.endTime && formik.touched.endTime
                     ? formik.errors.endTime
                     : '',
+                required: true,
                 error: !!(formik.errors.endTime && formik.touched.endTime),
                 onBlur: formik.handleBlur,
               }}

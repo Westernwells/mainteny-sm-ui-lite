@@ -121,7 +121,13 @@ export const AuthLayout = ({children}: Props) => {
           }}>
           <MenuBtn
             startIcon={<Language />}
-            label={selectedLng === 'EN' ? 'English' : 'Deutsch'}
+            label={
+              selectedLng === 'EN'
+                ? 'English'
+                : selectedLng === 'DE'
+                ? 'Deutsch'
+                : 'Serbian'
+            }
             menu={[
               {
                 label: 'English',
@@ -130,6 +136,10 @@ export const AuthLayout = ({children}: Props) => {
               {
                 label: 'Deutsch',
                 action: () => changeLanguage('de-DE', 'DE'),
+              },
+              {
+                label: 'Serbian',
+                action: () => changeLanguage('sr-rs', 'SR'),
               },
             ]}
           />

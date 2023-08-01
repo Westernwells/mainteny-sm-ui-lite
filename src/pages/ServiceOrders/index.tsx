@@ -74,7 +74,7 @@ export const ServiceOrders = () => {
       tabItems={tabItems}
       showMenuActionBtn
       menu={menu}
-      btnLabel="New Order"
+      btnLabel="New Job"
       currentIndex={tabValue}
       pageTitle="Service Orders"
       onChange={(index) => {

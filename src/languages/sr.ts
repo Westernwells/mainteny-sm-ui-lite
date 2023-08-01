@@ -1414,4 +1414,6 @@ export const sr = {
   'Should be higher than 0': 'Trebalo bi da bude veće od 0',
   'Yearly Contract Price is required': 'Godišnja cena ugovora je obavezna',
   'Should be higher or equals to 0': 'Trebalo bi da bude veće ili jednako 0',
+  Serbian: 'Srpski',
+  'New Job': 'Novi nalog',
 };

@@ -1447,4 +1447,6 @@ export const de = {
   'Yearly Contract Price is required':
     'Jährlicher Vertragspreis ist erforderlich',
   'Should be higher or equals to 0': 'Sollte höher oder gleich 0 sein',
+  Serbian: 'Serbisch',
+  'New Job': 'Neuer Auftrag',
 };
