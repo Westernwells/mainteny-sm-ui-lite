@@ -7,8 +7,12 @@ import {Progress} from 'components/Progress';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {NoRowsEmptySection} from './NoRowsEmptySection';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useCompanyXeroInfo} from 'hooks/reactQuery/useCompanies';
+import useLastSyncedItem from 'hooks/useLastSyncedItem';
+import {DataSyncType} from 'models/service-company';
 import {styles} from './style';
+import {NoRowsEmptySection} from './NoRowsEmptySection';
 
 interface Props {
   setRowItem: (row: PropertyOwnerView) => void;
@@ -62,10 +66,18 @@ export const makeRows = (customers: PropertyOwnerView[]): GridRowsProp =>
 const pageSize = 25;
 
 export const CustomersDataGrid = ({setRowItem}: Props) => {
+  const {user} = useUserSession();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
+
+  const {data: xeroInfoData} = useCompanyXeroInfo(
+    user?.userAccount.serviceCompany.id,
+  );
+  const {lastSyncedText} = useLastSyncedItem({
+    syncType: DataSyncType.PROPERTY_OWNER,
+  });
 
   const {
     data: customerResource = createEmptyResource<PropertyOwnerView>(pageSize),
@@ -137,6 +149,7 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
           pageSize={page.pageSize}
           pageIndex={page.pageIndex + 1}
           pageCount={pageCount}
+          lastSyncedText={xeroInfoData?.enabled ? lastSyncedText : ''}
           handlePageChange={(value) =>
             setPage((prev) => ({
               ...prev,

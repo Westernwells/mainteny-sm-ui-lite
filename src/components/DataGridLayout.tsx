@@ -238,7 +238,7 @@ export const DataGridLayout = ({
         checkboxSelection={checkboxSelection}
         sx={{
           ...olStyles.scrollbar,
-          height: '100%',
+          height: '95%',
           width: '100%',
           my: '0.5em',
           borderLeft: 'none',

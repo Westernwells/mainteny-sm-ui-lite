@@ -36,6 +36,7 @@ import {columns, makeRows} from './InvoicesDataGridProps';
 const pageSize = 25;
 
 export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
+  const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
@@ -53,6 +54,13 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
     () => getStartEndPrice(cost),
     [cost],
   );
+
+  const {data: xeroInfoData} = useCompanyXeroInfo(
+    user?.userAccount.serviceCompany.id,
+  );
+  const {lastSyncedText} = useLastSyncedItem({
+    syncType: DataSyncType.INVOICE,
+  });
 
   const {
     data: allInvoiceResource = createEmptyResource<InvoiceView>(10),
@@ -115,14 +123,6 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   const {data: downloadUrls} = useDownloadUrl(
     invoiceResource.data ? pdfPaths : [],
   );
-
-  const {user} = useUserSession();
-  const {data: xeroInfoData} = useCompanyXeroInfo(
-    user?.userAccount.serviceCompany.id,
-  );
-  const {lastSyncedText} = useLastSyncedItem({
-    syncType: DataSyncType.PROPERTY_OWNER,
-  });
 
   useEffect(() => {
     if (page.pageIndex) {

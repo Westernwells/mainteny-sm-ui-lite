@@ -62,7 +62,7 @@ export const CustomPagination = ({
       sx={{
         display: 'flex',
         justifyContent: showPageCount ? 'space-between' : 'center',
-        py: '1em',
+        py: '0.1em',
         height: '100%',
       }}>
       {showPageCount ? (

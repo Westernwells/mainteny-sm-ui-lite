@@ -65,6 +65,7 @@ export const Customer = () => {
   totalCustomerRef.current = totalCustomerRef.current || customerResource.total;
 
   const {user} = useUserSession();
+
   const {data: xeroInfoData} = useCompanyXeroInfo(
     user?.userAccount.serviceCompany.id,
   );
