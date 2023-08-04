@@ -74,4 +74,6 @@ export const queryKeys = {
   fetchServiceOrderChecklist: 'fetchServiceOrderChecklist',
   fetchcompanyNextNumber: 'fetchcompanyNextNumber',
   fetchAutoNumberConfig: 'fetchAutoNumberConfig',
+  fetchSyncStatusXero: 'fetchSyncStatusXero',
+  fetchXeroIntegration: 'fetchXeroIntegration',
 };

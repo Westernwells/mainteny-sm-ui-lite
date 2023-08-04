@@ -24,7 +24,6 @@ import {EmptySection} from './EmptySection';
 interface Props extends DataGridProps {
   rows: GridRowsProp;
   columns: GridColDef[];
-  hideFooter?: boolean;
   height?: string | number;
   containerStyle?: {[key: string]: string | number};
   loading?: boolean;
@@ -45,6 +44,7 @@ interface Props extends DataGridProps {
   isWidget?: boolean;
   headerHeight?: number;
   scrollToTop?: any;
+  lastSyncedText?: string;
 }
 
 interface ColumnProps extends GridColDef {
@@ -97,7 +97,6 @@ export const getColumnProps = ({
 export const DataGridLayout = ({
   rows,
   columns,
-  hideFooter = false,
   height,
   containerStyle,
   loading,
@@ -121,6 +120,7 @@ export const DataGridLayout = ({
   isWidget = false,
   headerHeight,
   scrollToTop,
+  lastSyncedText,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
@@ -146,16 +146,24 @@ export const DataGridLayout = ({
       }
     }
   }, [scrollToTop]);
-
   const renderFooter = () => (
-    <CustomPagination
-      pageSize={pageSize}
-      pageIndex={pageIndex}
-      handlePageSizeChange={handlePageSizeChange}
-      handlePageChange={handlePageChange}
-      pageCount={pageCount}
-      totalRows={totalRows}
-    />
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        height: '100%',
+      }}>
+      <CustomPagination
+        pageSize={pageSize}
+        pageIndex={pageIndex}
+        handlePageSizeChange={handlePageSizeChange}
+        handlePageChange={handlePageChange}
+        pageCount={pageCount}
+        totalRows={totalRows}
+        lastSyncedText={lastSyncedText}
+      />
+    </Box>
   );
 
   const noRowsOverlay = () => {
@@ -182,11 +190,11 @@ export const DataGridLayout = ({
       )
     );
   };
-
   return (
     <Box
       sx={{
         flexGrow: fullHeight ? 1 : 'unset',
+        display: 'flex',
         ...(!fullHeight && {height}),
       }}>
       <DataGrid
@@ -205,7 +213,6 @@ export const DataGridLayout = ({
         disableColumnFilter
         disableColumnMenu
         selectionModel={selectionModel}
-        hideFooter={hideFooter}
         sortingMode="server"
         onCellClick={
           onCellClick ||
@@ -231,7 +238,7 @@ export const DataGridLayout = ({
         checkboxSelection={checkboxSelection}
         sx={{
           ...olStyles.scrollbar,
-
+          height: '95%',
           width: '100%',
           my: '0.5em',
           borderLeft: 'none',
@@ -239,6 +246,16 @@ export const DataGridLayout = ({
           borderTop: 'none',
           borderBottom: '2px solid',
           borderColor: 'background.default',
+          '& > div:nth-of-type(3)': {
+            display: 'flex',
+            flexDirection: 'column',
+            height:
+              pageSize === 5
+                ? '19.8%'
+                : rows.length >= 11
+                ? '13%'
+                : `${16 + 6.9 * (11 - rows.length)}%`,
+          },
           '& .MuiDataGrid-virtualScroller': {
             '&:hover': {
               ...olStyles.verticlaScrollBar,

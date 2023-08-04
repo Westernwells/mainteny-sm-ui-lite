@@ -166,7 +166,6 @@ export const PriorityTechnician = ({
         <DataGridLayout
           fullHeight={false}
           height={getDataGridHeight(rows.length, showAll ? rows.length : 3)}
-          hideFooter
           rows={rows}
           isWidget
           columns={columns(getEditableTechnician, getDeletableTechnician)}

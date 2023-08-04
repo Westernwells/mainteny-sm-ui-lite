@@ -96,7 +96,6 @@ const WorkHourWidget = () => {
       <DataGridLayout
         rows={rows}
         columns={columnsWidget}
-        hideFooter={pageCount <= 1}
         pageSize={page.pageSize}
         handlePageSizeChange={(newPageSize: number) =>
           setPage({...page, pageSize: newPageSize})

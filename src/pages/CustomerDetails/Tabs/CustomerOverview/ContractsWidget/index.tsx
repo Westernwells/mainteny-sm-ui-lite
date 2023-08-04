@@ -141,7 +141,6 @@ export const ContractsWidget = ({
             containerStyle={{
               borderBottom: 'none',
             }}
-            hideFooter={pageCount <= 1}
             pageIndex={page.pageIndex + 1}
             pageSize={page.pageSize}
             handlePageSizeChange={(newPageSize: number) =>

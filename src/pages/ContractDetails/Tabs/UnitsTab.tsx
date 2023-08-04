@@ -49,7 +49,6 @@ export const UnitsTab: FC<Props> = ({elevators}) => {
   return (
     <TabContentContainer>
       <DataGridLayout
-        hideFooter={pageCount <= 1}
         noRowsEmptySection={
           <EmptySection
             illustration="clipboard"

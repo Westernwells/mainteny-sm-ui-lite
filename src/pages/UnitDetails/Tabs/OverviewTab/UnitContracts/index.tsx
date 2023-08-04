@@ -37,7 +37,6 @@ export const UnitContracts = ({containerStyles, contracts}: Props) => {
       <DataGridLayout
         fullHeight={false}
         height={getDataGridHeight(rows.length, 3)}
-        hideFooter
         isWidget
         rows={rows}
         columns={columns}

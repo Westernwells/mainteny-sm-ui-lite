@@ -21,7 +21,22 @@ export enum ServiceCompanyTimeUnit {
   FULLY = 'FULLY',
 }
 
-export enum ServiceCompanyNextNumberType {
+export enum ServiceCompanyNumberType {
+  ARTICLE = 'ARTICLE',
+  SERVICE_ORDER = 'SERVICE_ORDER',
+  SERVICE_ORDER_REPORT = 'SERVICE_ORDER_REPORT',
+  CONTRACT = 'CONTRACT',
+  INVOICE = 'INVOICE',
+  QUOTATION = 'QUOTATION',
+  EMPLOYEE = 'EMPLOYEE',
+  PROPERTY_OWNER = 'PROPERTY_OWNER',
+  PROPERTY_CONTACT_PERSON = 'PROPERTY_CONTACT_PERSON',
+  CHECK_LIST = 'CHECK_LIST',
+  ELEVATOR = 'ELEVATOR',
+  ARTICLE_ORDER = 'ARTICLE_ORDER',
+}
+
+export enum DataSyncType {
   ARTICLE = 'ARTICLE',
   SERVICE_ORDER = 'SERVICE_ORDER',
   SERVICE_ORDER_REPORT = 'SERVICE_ORDER_REPORT',
@@ -174,14 +189,14 @@ export interface SystemSettingsUpdateBody {
 
 export interface ServiceCompanyNextNumberParams {
   serviceCompanyId: string;
-  type: ServiceCompanyNextNumberType;
+  type: ServiceCompanyNumberType;
 }
 
-export interface ServiceCompanyNextNumber {
+export interface StringValueResponse {
   value: string;
 }
 
-export interface ServiceCompanyConfigRecord {
+export interface AutoNumberConfigRecord {
   type: string;
   prefix: string;
   numberOfDigits: number;
@@ -189,6 +204,22 @@ export interface ServiceCompanyConfigRecord {
   startFrom: number;
 }
 
-export interface ServiceCompanyAutoNumberConfig {
-  configRecords: ServiceCompanyConfigRecord[];
+export interface AutoNumberConfig {
+  configRecords: AutoNumberConfigRecord[];
+}
+
+export interface DataSyncStatusParams {
+  serviceCompanyId?: string;
+  type: DataSyncType;
+}
+
+export interface DataSyncStatus {
+  lastSyncedTime: Date;
+}
+
+export interface XeroIntegration {
+  enabled: boolean;
+  clientId: string;
+  secret: string;
+  tenantId: string;
 }
