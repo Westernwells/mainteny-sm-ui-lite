@@ -1,6 +1,7 @@
 import {Typography} from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import {useTranslation} from 'react-i18next';
+import useTheme from '@mui/material/styles/useTheme';
 
 interface Props {
   lastSyncedText?: string;
@@ -8,9 +9,10 @@ interface Props {
 
 const LastSyncedItem = ({lastSyncedText}: Props) => {
   const {t} = useTranslation();
+  const theme = useTheme();
   return (
     <Typography
-      color="#8F9BB3"
+      color={theme.palette.text.secondary}
       sx={{
         alignSelf: 'flex-end',
         p: '0.2em 0em 0.1em 0em',
