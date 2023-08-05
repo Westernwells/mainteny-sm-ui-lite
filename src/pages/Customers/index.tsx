@@ -20,8 +20,12 @@ import {PropertyOwnerView} from 'models/propertyManager';
 import {getFilterUnitNumber} from 'utils/customer-utils';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
-import {Widget} from '../../components/Widget';
+import {DataSyncType} from 'models/service-company';
+import useLastSyncedItem from 'hooks/useLastSyncedItem';
+import {useCompanyXeroInfo} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {columns, makeRows} from './CustomerDataGridProps';
+import {Widget} from '../../components/Widget';
 
 const pageSize = 25;
 
@@ -59,6 +63,15 @@ export const Customer = () => {
     {keepPreviousData: true},
   );
   totalCustomerRef.current = totalCustomerRef.current || customerResource.total;
+
+  const {user} = useUserSession();
+
+  const {data: xeroInfoData} = useCompanyXeroInfo(
+    user?.userAccount.serviceCompany.id,
+  );
+  const {lastSyncedText} = useLastSyncedItem({
+    syncType: DataSyncType.PROPERTY_OWNER,
+  });
 
   useEffect(() => {
     if (page.pageIndex) {
@@ -99,25 +112,6 @@ export const Customer = () => {
       pageName: 'Customers',
     });
   }, []);
-
-  if (isIdle || isLoading) {
-    return <Progress />;
-  }
-
-  if (isFetched && !totalCustomerRef.current) {
-    return (
-      <EmptySection
-        label="No customers yet. Please click the button below to add."
-        showActionBtn
-        btnLabel="Add Customer"
-        btnAction={() => navigate('/customers/new')}
-        containerStyle={{
-          height: '100%',
-          mb: '10em',
-        }}
-      />
-    );
-  }
 
   const handleNumberOfUnitsChange = (value: string[]) => {
     setNumberOfUnits(value);
@@ -170,6 +164,25 @@ export const Customer = () => {
     </FilterFields>
   );
 
+  if (isIdle || isLoading) {
+    return <Progress />;
+  }
+
+  if (isFetched && !totalCustomerRef.current) {
+    return (
+      <EmptySection
+        label="No customers yet. Please click the button below to add."
+        showActionBtn
+        btnLabel="Add Customer"
+        btnAction={() => navigate('/customers/new')}
+        containerStyle={{
+          height: '100%',
+          mb: '10em',
+        }}
+      />
+    );
+  }
+
   return (
     <PageListingLayout
       renderWidget={
@@ -188,7 +201,6 @@ export const Customer = () => {
         columns={columns}
         scrollToTop={search}
         loading={isFetching}
-        hideFooter={pageCount <= 1}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
@@ -199,6 +211,7 @@ export const Customer = () => {
         }
         pageCount={pageCount}
         totalRows={customerResource.total}
+        lastSyncedText={xeroInfoData?.enabled ? lastSyncedText : ''}
       />
     </PageListingLayout>
   );

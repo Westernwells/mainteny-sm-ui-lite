@@ -60,7 +60,7 @@ export const AuthLayout = ({children}: Props) => {
         </Box>
 
         <Box>
-          <Box marginBottom="5rem">
+          <Box marginBottom="32px">
             <Typography variant="h3" color="#fff" textAlign="center">
               Mainteny
             </Typography>
@@ -96,18 +96,38 @@ export const AuthLayout = ({children}: Props) => {
         <Box style={{position: 'absolute', bottom: 0, left: 0, right: 0}}>
           <PolygonBottom width="100%" />
         </Box>
+      </Box>
+
+      <Box
+        display="flex"
+        flexGrow={1}
+        justifyContent="center"
+        alignItems="center"
+        position="relative">
+        <Box>
+          <Box display="flex" justifyContent="center">
+            <MaintenyLogo width={236} height={49} />
+          </Box>
+          {children}
+        </Box>
         <Box
           sx={{
             position: 'absolute',
-            bottom: 0,
-            left: 0,
+            bottom: '1%',
+            left: '2%',
             '& .MuiButton-root': {
               color: 'text.secondary',
             },
           }}>
           <MenuBtn
             startIcon={<Language />}
-            label={selectedLng}
+            label={
+              selectedLng === 'EN'
+                ? 'English'
+                : selectedLng === 'DE'
+                ? 'Deutsch'
+                : 'Serbian'
+            }
             menu={[
               {
                 label: 'English',
@@ -117,21 +137,32 @@ export const AuthLayout = ({children}: Props) => {
                 label: 'Deutsch',
                 action: () => changeLanguage('de-DE', 'DE'),
               },
+              {
+                label: 'Serbian',
+                action: () => changeLanguage('sr-rs', 'SR'),
+              },
             ]}
           />
         </Box>
-      </Box>
 
-      <Box
-        display="flex"
-        flexGrow={1}
-        justifyContent="center"
-        alignItems="center">
-        <Box>
-          <Box display="flex" justifyContent="center">
-            <MaintenyLogo width={236} height={49} />
-          </Box>
-          {children}
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: '1.5%',
+            right: '2%',
+            '& .MuiButton-root': {
+              color: 'text.secondary',
+            },
+          }}>
+          <Typography
+            sx={{
+              color: 'text.secondary',
+              fontSize: '0.8rem',
+              letterSpacing: '0.035em',
+            }}>
+            ©2023 Mainteny. All rights reserved. <br /> Mainteny® is a
+            registered trademark.
+          </Typography>
         </Box>
       </Box>
     </Box>

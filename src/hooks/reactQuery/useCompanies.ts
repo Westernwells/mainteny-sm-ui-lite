@@ -11,14 +11,15 @@ import {
 import {
   ServiceCompanyActivity,
   ServiceCompanyActivityParams,
-  ServiceCompanyAutoNumberConfig,
+  AutoNumberConfig,
   ServiceCompanyItem,
-  ServiceCompanyNextNumber,
+  StringValueResponse,
   ServiceCompanyNextNumberParams,
   ServiceCompanySummary,
   ServiceCompanySummaryParams,
   ServiceCompanyUpdateBody,
   SystemSettingsUpdateBody,
+  XeroIntegration,
 } from 'models/service-company';
 import {
   useInfiniteQuery,
@@ -311,7 +312,7 @@ export const useQueryContractPaymentTerms = ({
 };
 
 export const getCompanyAutoNumberConfig = async (companyId: string) => {
-  const response = await axiosClient.get<ServiceCompanyAutoNumberConfig>(
+  const response = await axiosClient.get<AutoNumberConfig>(
     `/api/serviceCompanies/${companyId}/settings/autoNumber`,
   );
   return response.data;
@@ -336,11 +337,13 @@ const getCompanyNextNumber = async (
   params: Partial<ServiceCompanyNextNumberParams>,
   companyId?: string,
 ) => {
-  const response: AxiosResponse<ServiceCompanyNextNumber> =
-    await axiosClient.get(`/api/serviceCompanies/${companyId}/nextNumber`, {
+  const response: AxiosResponse<StringValueResponse> = await axiosClient.get(
+    `/api/serviceCompanies/${companyId}/nextNumber`,
+    {
       params,
       paramsSerializer,
-    });
+    },
+  );
   return response.data;
 };
 
@@ -355,3 +358,25 @@ export const useCompanyNextNumber = (
       enabled: !!companyId,
     },
   );
+
+export const getCompanyXeroInfo = async (companyId: string) => {
+  const response = await axiosClient.get<XeroIntegration>(
+    `/api/serviceCompanies/${companyId}/settings/xero`,
+  );
+  return response.data;
+};
+
+export const useCompanyXeroInfo = (companyId?: string) => {
+  const {showError} = useSnackbar();
+  return useQuery(
+    [queryKeys.fetchXeroIntegration, companyId],
+    () => getCompanyXeroInfo(companyId!),
+    {
+      enabled: !!companyId,
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};

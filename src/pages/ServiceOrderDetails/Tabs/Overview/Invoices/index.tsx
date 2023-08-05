@@ -81,7 +81,6 @@ export const Invoices = ({serviceOrderId}: Props) => {
           height={getDataGridHeight(rows.length, 3)}
           columns={columns}
           fullHeight={false}
-          hideFooter
           containerStyle={{
             borderBottom: 'none',
           }}

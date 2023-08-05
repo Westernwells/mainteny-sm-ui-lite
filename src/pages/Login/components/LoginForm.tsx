@@ -36,7 +36,7 @@ export const LoginForm = ({
   const {t} = useTranslation();
 
   return (
-    <Box display="flex" justifyContent="center" width="100%" mt={10} mb={10}>
+    <Box display="flex" justifyContent="center" width="100%" mt="60px" mb={0}>
       <form style={{width: '18rem'}} onSubmit={handleSubmit}>
         <TextField
           sx={{}}
@@ -56,9 +56,8 @@ export const LoginForm = ({
           }}
           placeholder={t('Enter your email address')}
         />
-        <Box>
+        <Box sx={{marginTop: '24px', marginBottom: '0px'}}>
           <TextField
-            sx={{marginTop: 4}}
             id="password"
             name="password"
             label={t('Password')}
@@ -97,7 +96,7 @@ export const LoginForm = ({
           label={t('Login')}
           buttonProps={{
             sx: {
-              marginTop: 5,
+              marginTop: '24px',
               width: '100%',
               fontWeight: '400',
               letterSpacing: '0.02em',

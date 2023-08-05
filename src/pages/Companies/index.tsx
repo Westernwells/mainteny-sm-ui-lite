@@ -109,7 +109,6 @@ export const Companies = () => {
         columns={columns}
         scrollToTop={search}
         loading={isFetching}
-        hideFooter={pageCount <= 1}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>

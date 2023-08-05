@@ -6,6 +6,7 @@ import Pagination from '@mui/material/Pagination';
 import {SelectChangeEvent} from '@mui/material/Select';
 import {makePage} from 'utils/paging-utils';
 import {CustomSelect} from './CustomSelect';
+import LastSyncedItem from './LastSyncedItem';
 
 interface Props {
   pageSize?: number;
@@ -16,6 +17,7 @@ interface Props {
   pageIndex?: number;
   showPageCount?: boolean;
   showPagePerSize?: boolean;
+  lastSyncedText?: string;
 }
 
 export const CustomPagination = ({
@@ -27,6 +29,7 @@ export const CustomPagination = ({
   pageIndex,
   showPageCount,
   showPagePerSize,
+  lastSyncedText,
 }: Props) => {
   const theme = useTheme();
   const [page, setPage] = useState(makePage(pageIndex || 0, pageSize || 10));
@@ -59,7 +62,8 @@ export const CustomPagination = ({
       sx={{
         display: 'flex',
         justifyContent: showPageCount ? 'space-between' : 'center',
-        py: '1em',
+        py: '0.1em',
+        height: '100%',
       }}>
       {showPageCount ? (
         <Box>
@@ -75,6 +79,8 @@ export const CustomPagination = ({
         sx={{
           display: 'flex',
           justifyContent: 'center',
+          height: '100%',
+          width: '100%',
         }}>
         {showPagePerSize ? (
           <Box>
@@ -92,38 +98,53 @@ export const CustomPagination = ({
             />
           </Box>
         ) : null}
-
-        <Pagination
-          count={pageCount || 10}
-          page={pageIndex || 1}
-          shape="rounded"
-          variant="outlined"
-          onChange={(event: React.ChangeEvent<unknown>, newPage: number) => {
-            event.preventDefault();
-            if (handlePageChange) {
-              handlePageChange(newPage);
-            }
-            setPage({...page, pageIndex: newPage});
-          }}
+        <Box
           sx={{
-            mt: '0.3em',
-            '& .MuiPaginationItem-previousNext': {},
-            '& .MuiPaginationItem-root.Mui-selected': {
-              background: theme.palette.primary.main,
-              color: 'white',
-              '&:hover': {
-                backgroundColor: theme.palette.primary.main,
-              },
-            },
-            '&.MuiPagination-root': {
-              background: '#fff',
-              py: '0.2em',
-            },
-            '& .MuiPaginationItem-page': {
-              border: 0,
-            },
-          }}
-        />
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            height: '100%',
+            width: '100%',
+          }}>
+          {lastSyncedText && <LastSyncedItem lastSyncedText={lastSyncedText} />}
+
+          {pageCount! > 1 && (
+            <Pagination
+              count={pageCount || 10}
+              page={pageIndex || 1}
+              shape="rounded"
+              variant="outlined"
+              onChange={(
+                event: React.ChangeEvent<unknown>,
+                newPage: number,
+              ) => {
+                event.preventDefault();
+                if (handlePageChange) {
+                  handlePageChange(newPage);
+                }
+                setPage({...page, pageIndex: newPage});
+              }}
+              sx={{
+                m: '0 auto',
+                '& .MuiPaginationItem-previousNext': {},
+                '& .MuiPaginationItem-root.Mui-selected': {
+                  background: theme.palette.primary.main,
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: theme.palette.primary.main,
+                  },
+                },
+                '&.MuiPagination-root': {
+                  background: '#fff',
+                  py: '0.2em',
+                },
+                '& .MuiPaginationItem-page': {
+                  border: 0,
+                },
+              }}
+            />
+          )}
+        </Box>
       </Box>
     </Box>
   );

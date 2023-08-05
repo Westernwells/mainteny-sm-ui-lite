@@ -144,7 +144,6 @@ export const ServiceHistoryTab = () => {
         />
       }>
       <DataGridLayout
-        hideFooter={pageCount <= 1}
         rows={rows}
         columns={columns}
         loading={isFetching}

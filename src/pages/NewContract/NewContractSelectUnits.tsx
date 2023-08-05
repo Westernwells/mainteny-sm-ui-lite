@@ -150,7 +150,6 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
         />
       </Box>
       <DataGridLayout
-        hideFooter={pageCount <= 1 || elevatorResponse.total === 0}
         onRowClick={(row) => setElevators(row.id as string)}
         selectionModel={formik.values.elevators}
         disableSelectionOnClick={false}

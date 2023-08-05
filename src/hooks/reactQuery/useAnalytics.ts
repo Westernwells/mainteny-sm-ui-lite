@@ -1,4 +1,4 @@
-import {useQuery} from 'react-query';
+import {UseQueryOptions, useQuery} from 'react-query';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {
@@ -8,6 +8,12 @@ import {
   ReportType,
 } from 'models/analytics';
 import {toRestDateTime} from 'utils/datetime';
+import {DataSyncStatus, DataSyncStatusParams} from 'models/service-company';
+import {AxiosResponse} from 'axios';
+import {queryKeys} from 'reactQuery/constants';
+import {RestError} from 'models/misc';
+import {useUserSession} from './useUserSession';
+import {useCompanyXeroInfo} from './useCompanies';
 
 export const download = (blob: Blob, filename: string) => {
   const a = document.createElement('a');
@@ -171,6 +177,35 @@ export const useInvoicesXero = (
         showError(err);
       },
       enabled: false,
+    },
+  );
+};
+
+const fetchSyncStatusXero = async (params: DataSyncStatusParams) => {
+  const response: AxiosResponse<DataSyncStatus> = await axiosClient.get(
+    `/api/system/xero/synchronization/status`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useSyncStatusXero = (
+  params: DataSyncStatusParams,
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {user} = useUserSession();
+  const {data: xeroInfoData} = useCompanyXeroInfo(
+    user?.userAccount.serviceCompany.id,
+  );
+  return useQuery<DataSyncStatus, RestError>(
+    [queryKeys.fetchSyncStatusXero, params.serviceCompanyId, params.type],
+    () => fetchSyncStatusXero(params),
+    {
+      enabled: !!user && !!params.serviceCompanyId && !!xeroInfoData?.enabled,
+      ...options,
     },
   );
 };
