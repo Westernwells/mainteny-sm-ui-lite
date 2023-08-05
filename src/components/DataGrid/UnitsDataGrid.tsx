@@ -169,7 +169,6 @@ export const UnitsDataGrid = ({
           pageSize={page.pageSize}
           pageIndex={page.pageIndex + 1}
           pageCount={pageCount}
-          hideFooter={pageCount <= 1}
           handlePageChange={(value) =>
             setPage((prev) => ({
               ...prev,
