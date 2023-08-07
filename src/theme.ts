@@ -285,6 +285,11 @@ export const theme = createTheme({
             background: '#40748054',
             boxSizing: 'border-box',
             borderLeft: '4px solid #00D1FF',
+
+            '&:hover': {
+              background: '#40748054',
+              borderLeft: '4px solid #00D1FF',
+            },
           },
         },
       },
