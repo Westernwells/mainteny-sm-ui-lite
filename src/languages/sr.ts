@@ -1418,4 +1418,5 @@ export const sr = {
   Serbian: 'Srpski',
   'New Job': 'Novi nalog',
   'Partially Paid': 'Delimično plaćeno',
+  Okay: 'Dobro',
 };

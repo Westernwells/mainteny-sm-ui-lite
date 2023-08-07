@@ -164,6 +164,17 @@ export const MarkAsPaidDialog = ({
         <Button
           buttonProps={{
             size: 'medium',
+            variant: 'text',
+            onClick: () => onClose(),
+            sx: {
+              textTransform: 'capitalize',
+            },
+          }}>
+          <Typography variant="subtitle2">{t('Cancel')}</Typography>
+        </Button>
+        <Button
+          buttonProps={{
+            size: 'medium',
             variant: 'contained',
             autoFocus: true,
             disabled: formik.isSubmitting,
@@ -172,7 +183,7 @@ export const MarkAsPaidDialog = ({
               textTransform: 'capitalize',
             },
           }}>
-          <Typography variant="subtitle2">{t('Pay')}</Typography>
+          <Typography variant="subtitle2">{t('Okay')}</Typography>
         </Button>
       </DialogActions>
     </Dialog>
