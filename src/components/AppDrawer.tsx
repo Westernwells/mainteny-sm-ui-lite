@@ -15,7 +15,6 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
 import {ReactComponent as DashboardIcon} from 'assets/icons/Dashboard.svg';
 import {ReactComponent as DashboardIconColor} from 'assets/icons/DashboardIconColor.svg';
@@ -39,6 +38,8 @@ import {ReactComponent as AnalyticsIcon} from 'assets/icons/Analytics.svg';
 import {ReactComponent as AnalyticsIconColor} from 'assets/icons/AnalyticsIconColor.svg';
 import {ReactComponent as SettingsIcon} from 'assets/icons/Settings.svg';
 import {ReactComponent as SettingsIconColor} from 'assets/icons/SettingsIconColor.svg';
+import {ReactComponent as CompanyIcon} from 'assets/icons/Company.svg';
+import {ReactComponent as CompanyIconColor} from 'assets/icons/CompanyIconColor.svg';
 import {ReactComponent as MaintenyLogoWhite} from 'assets/icons/MaintenyLogoWhite.svg';
 import Fade from '@mui/material/Fade';
 import {Mixpanel} from 'mixpanel/mixpanel';
@@ -307,8 +308,8 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     },
     {
       text: 'Companies',
-      icon: <CorporateFareIcon sx={{color: '#fff', fontSize: '1.5rem'}} />,
-      selectIcon: <SettingsIconColor fontSize="1.5rem" />,
+      icon: <CompanyIcon fontSize="1.5rem" />,
+      selectIcon: <CompanyIconColor fontSize="1.5rem" />,
       path: '/admin/companies',
       access: isAdmin,
       onClick: (
@@ -378,7 +379,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
               display: 'flex',
               justifyContent: 'flex-start',
               ml: '1.3em',
-              marginBottom: '1em',
+              marginBottom: '0.5em',
             }}
             edge="start"
             disableRipple
@@ -396,7 +397,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             sx={{
               display: 'flex',
               justifyContent: 'center',
-              marginBottom: '1em',
+              marginBottom: '0.5em',
             }}>
             <Logo width={55.22} height={24} />
           </IconButton>,
@@ -428,8 +429,8 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                     onClick={(e) => onClick(e, index)}
                     selected={selectedPath === path}
                     style={{
-                      paddingTop: 15,
-                      paddingBottom: 15,
+                      paddingTop: 12,
+                      paddingBottom: 12,
                     }}
                     sx={{
                       transition: (theme) =>
@@ -448,16 +449,15 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                         mr: '12px',
                         ml:
                           open && selectedPath === path
-                            ? '20px'
+                            ? '0px'
                             : open && selectedPath !== path
-                            ? '24px'
+                            ? '4px'
                             : !open && selectedPath === path
                             ? '0px'
                             : !open && selectedPath !== path
                             ? '4px'
                             : '0px',
-                      }}
-                      color={selectedPath === path ? '#FFF' : '#8F9BB3'}>
+                      }}>
                       {selectedPath === path ? selectIcon : icon}
                     </ListItemIcon>
                     <ListItemText
