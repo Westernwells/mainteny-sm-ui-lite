@@ -113,7 +113,6 @@ export const theme = createTheme({
       fontWeight: 600,
       fontSize: '1.25rem',
       lineHeight: 1.33,
-      letterSpacing: '-1.5px',
     },
     h6: {
       fontWeight: 600,

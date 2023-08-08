@@ -25,4 +25,7 @@ export const formatInvoiceRecord = (value: InvoiceFormData) => ({
   costCenter: value.costCenter,
   customerSpecificOrderNumber: value.customerSpecificOrderNumber,
   moreInfo: value.moreInfo,
+  billingAddress: value.billingAddress,
+  beneficiaryAddress: value.beneficiaryAddress,
+  alternativeAddress: value.alternativeAddress,
 });
