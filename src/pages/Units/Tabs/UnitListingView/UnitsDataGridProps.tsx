@@ -86,13 +86,19 @@ export const columns: GridColDef[] = [
     align: 'center',
     headerAlign: 'center',
     renderCell: (params) => (
-      <Box display="flex" alignItems="center" justifyContent="center" gap={3}>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        gap={3}
+        width={120}>
         <StatusChip
           label={params.row.activeContracts ? 'Yes' : 'No'}
           color={params.row.activeContracts ? 'success' : 'info'}
           variant="filled"
           size="small"
           maxChars={3}
+          style={{flex: '0 0 50%'}}
         />
         <Actions id={params.row.id} />
       </Box>
