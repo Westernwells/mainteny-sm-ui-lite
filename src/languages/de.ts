@@ -1451,4 +1451,5 @@ export const de = {
   Serbian: 'Serbisch',
   'New Job': 'Neuer Auftrag',
   'Partially Paid': 'Teilw. bezahlt',
+  Okay: 'Ok',
 };
