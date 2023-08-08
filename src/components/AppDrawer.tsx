@@ -15,19 +15,31 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
 import {ReactComponent as DashboardIcon} from 'assets/icons/Dashboard.svg';
+import {ReactComponent as DashboardIconColor} from 'assets/icons/DashboardIconColor.svg';
 import {ReactComponent as JobsIcon} from 'assets/icons/Jobs.svg';
+import {ReactComponent as JobsIconColor} from 'assets/icons/JobsIconColor.svg';
 import {ReactComponent as UnitsIcon} from 'assets/icons/Units.svg';
+import {ReactComponent as UnitsIconColor} from 'assets/icons/UnitsIconColor.svg';
 import {ReactComponent as CustomersIcon} from 'assets/icons/Customers.svg';
+import {ReactComponent as CustomersIconColor} from 'assets/icons/CustomersIconColor.svg';
 import {ReactComponent as ContractIcon} from 'assets/icons/Contract.svg';
+import {ReactComponent as ContractIconColor} from 'assets/icons/ContractIconColor.svg';
 import {ReactComponent as QuotationIcon} from 'assets/icons/Quotation.svg';
+import {ReactComponent as QuotationIconColor} from 'assets/icons/QuotationIconColor.svg';
 import {ReactComponent as InvoicesIcon} from 'assets/icons/Invoices.svg';
+import {ReactComponent as InvoicesIconColor} from 'assets/icons/InvoicesIconColor.svg';
 import {ReactComponent as ArticlesIcon} from 'assets/icons/Articles.svg';
+import {ReactComponent as ArticlesIconColor} from 'assets/icons/ArticlesIconColor.svg';
 import {ReactComponent as EmployeesIcon} from 'assets/icons/Employees.svg';
+import {ReactComponent as EmployeesIconColor} from 'assets/icons/EmployeesIconColor.svg';
 import {ReactComponent as AnalyticsIcon} from 'assets/icons/Analytics.svg';
+import {ReactComponent as AnalyticsIconColor} from 'assets/icons/AnalyticsIconColor.svg';
 import {ReactComponent as SettingsIcon} from 'assets/icons/Settings.svg';
+import {ReactComponent as SettingsIconColor} from 'assets/icons/SettingsIconColor.svg';
+import {ReactComponent as CompanyIcon} from 'assets/icons/Company.svg';
+import {ReactComponent as CompanyIconColor} from 'assets/icons/CompanyIconColor.svg';
 import {ReactComponent as MaintenyLogoWhite} from 'assets/icons/MaintenyLogoWhite.svg';
 import Fade from '@mui/material/Fade';
 import {Mixpanel} from 'mixpanel/mixpanel';
@@ -111,6 +123,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     {
       text: 'Dashboard',
       icon: <DashboardIcon fontSize="1.5rem" />,
+      selectIcon: <DashboardIconColor fontSize="1.5rem" />,
       path: '/',
       access: !isAdmin,
       onClick: (
@@ -127,6 +140,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     {
       text: 'Jobs',
       icon: <JobsIcon fontSize="1.5rem" />,
+      selectIcon: <JobsIconColor fontSize="1.5rem" />,
       path: '/orders',
       access: !isAdmin,
       onClick: (
@@ -143,6 +157,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     {
       text: 'Units',
       icon: <UnitsIcon fontSize="1.5rem" />,
+      selectIcon: <UnitsIconColor fontSize="1.5rem" />,
       path: '/units',
       access: !isAdmin,
       onClick: (
@@ -159,6 +174,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     {
       text: 'Customers',
       icon: <CustomersIcon fontSize="1.5rem" />,
+      selectIcon: <CustomersIconColor fontSize="1.5rem" />,
       path: '/customers',
       access: !isAdmin,
       onClick: (
@@ -175,6 +191,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     {
       text: 'Contracts',
       icon: <ContractIcon fontSize="1.5rem" />,
+      selectIcon: <ContractIconColor fontSize="1.5rem" />,
       path: '/contracts',
       access: !isAdmin,
       onClick: (
@@ -191,6 +208,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     {
       text: 'Quotations',
       icon: <QuotationIcon fontSize="1.5rem" />,
+      selectIcon: <QuotationIconColor fontSize="1.5rem" />,
       path: '/quotations',
       access: !isAdmin,
       onClick: (
@@ -207,6 +225,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     {
       text: 'Invoices',
       icon: <InvoicesIcon fontSize="1.5rem" />,
+      selectIcon: <InvoicesIconColor fontSize="1.5rem" />,
       path: '/invoices',
       access: !isAdmin,
       onClick: (
@@ -223,6 +242,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     {
       text: 'Articles',
       icon: <ArticlesIcon fontSize="1.5rem" />,
+      selectIcon: <ArticlesIconColor fontSize="1.5rem" />,
       path: '/articles',
       access: !isAdmin,
       onClick: (
@@ -239,6 +259,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     {
       text: 'Employees',
       icon: <EmployeesIcon fontSize="1.5rem" />,
+      selectIcon: <EmployeesIconColor fontSize="1.5rem" />,
       path: '/employees',
       access: !isAdmin,
       onClick: (
@@ -255,6 +276,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     {
       text: 'Analytics',
       icon: <AnalyticsIcon fontSize="1.5rem" />,
+      selectIcon: <AnalyticsIconColor fontSize="1.5rem" />,
       path: '/analytics',
       access: !isAdmin,
       onClick: (
@@ -270,6 +292,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     {
       text: 'Settings',
       icon: <SettingsIcon fontSize="1.5rem" />,
+      selectIcon: <SettingsIconColor fontSize="1.5rem" />,
       path: '/settings',
       access: !isAdmin && isManager,
       onClick: (
@@ -285,7 +308,8 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     },
     {
       text: 'Companies',
-      icon: <CorporateFareIcon sx={{color: '#fff'}} />,
+      icon: <CompanyIcon fontSize="1.5rem" />,
+      selectIcon: <CompanyIconColor fontSize="1.5rem" />,
       path: '/admin/companies',
       access: isAdmin,
       onClick: (
@@ -301,7 +325,8 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     },
     {
       text: 'Settings',
-      icon: <SettingsIcon />,
+      icon: <SettingsIcon fontSize="1.5rem" />,
+      selectIcon: <SettingsIconColor fontSize="1.5rem" />,
       path: '/admin/system-settings',
       access: isAdmin,
       onClick: (
@@ -354,7 +379,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
               display: 'flex',
               justifyContent: 'flex-start',
               ml: '1.3em',
-              marginBottom: '1em',
+              marginBottom: '0.5em',
             }}
             edge="start"
             disableRipple
@@ -372,7 +397,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             sx={{
               display: 'flex',
               justifyContent: 'center',
-              marginBottom: '1em',
+              marginBottom: '0.5em',
             }}>
             <Logo width={55.22} height={24} />
           </IconButton>,
@@ -396,63 +421,61 @@ export const AppDrawer = ({open, setOpen}: Props) => {
           {renderDrawerHeader()}
 
           <List>
-            {drawerList.map(({text, icon, onClick, path, access}, index) => {
-              if (!access) return null;
-              return (
-                <ListItemButton
-                  onClick={(e) => onClick(e, index)}
-                  selected={selectedPath === path}
-                  style={{
-                    paddingTop: 15,
-                    paddingBottom: 15,
-                  }}
-                  sx={{
-                    transition: (theme) =>
-                      theme.transitions.create('margin', {
-                        easing: theme.transitions.easing.sharp,
-                        duration: theme.transitions.duration.leavingScreen,
-                      }),
-                    '&:hover': {
-                      background: '#40748054',
-                    },
-                  }}
-                  key={text}>
-                  <ListItemIcon
-                    sx={{
-                      minWidth: 0,
-                      mr: '12px',
-                      ml:
-                        open && selectedPath === path
-                          ? '20px'
-                          : open && selectedPath !== path
-                          ? '24px'
-                          : !open && selectedPath === path
-                          ? '0px'
-                          : !open && selectedPath !== path
-                          ? '4px'
-                          : '0px',
+            {drawerList.map(
+              ({text, icon, selectIcon, onClick, path, access}, index) => {
+                if (!access) return null;
+                return (
+                  <ListItemButton
+                    onClick={(e) => onClick(e, index)}
+                    selected={selectedPath === path}
+                    style={{
+                      paddingTop: 12,
+                      paddingBottom: 12,
                     }}
-                    color={selectedPath === path ? '#FFF' : '#8F9BB3'}
-                    className={
-                      selectedPath === path ? 'active-icon' : 'inactive-icon'
-                    }>
-                    {icon}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Fade in={open}>
-                        <Typography
-                          variant="subtitle1"
-                          color={selectedPath === path ? '#FFF' : '#8F9BB3'}
-                          ml="12px">
-                          {t(text)}
-                        </Typography>
-                      </Fade>
-                    }
-                  />
-                </ListItemButton>
-              );
-            })}
+                    sx={{
+                      transition: (theme) =>
+                        theme.transitions.create('margin', {
+                          easing: theme.transitions.easing.sharp,
+                          duration: theme.transitions.duration.leavingScreen,
+                        }),
+                      '&:hover': {
+                        background: '#40748054',
+                      },
+                    }}
+                    key={text}>
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 0,
+                        mr: '12px',
+                        ml:
+                          open && selectedPath === path
+                            ? '0px'
+                            : open && selectedPath !== path
+                            ? '4px'
+                            : !open && selectedPath === path
+                            ? '0px'
+                            : !open && selectedPath !== path
+                            ? '4px'
+                            : '0px',
+                      }}>
+                      {selectedPath === path ? selectIcon : icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <Fade in={open}>
+                          <Typography
+                            variant="subtitle1"
+                            color={selectedPath === path ? '#FFF' : '#8F9BB3'}
+                            ml="12px">
+                            {t(text)}
+                          </Typography>
+                        </Fade>
+                      }
+                    />
+                  </ListItemButton>
+                );
+              },
+            )}
           </List>
         </Drawer>
       </ClickAwayListener>
