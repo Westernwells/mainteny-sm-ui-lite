@@ -1429,4 +1429,9 @@ export const sr = {
   'New Job': 'Novi nalog',
   'Partially Paid': 'Dio plaćen',
   Okay: 'Dobro',
+  'Payment terms used': 'Korišćeni uslovi plaćanja',
+  'This payment term is linked to one or more contracts.':
+    'Ova klauzula plaćanja je povezana sa jednim ili više ugovora.',
+  'Remove it from all contracts before deleting here.':
+    'Uklonite ga iz svih ugovora pre brisanja ovde.',
 };
