@@ -81,7 +81,7 @@ const NewSupplier = () => {
               props={{
                 label: 'Name',
                 name: 'name',
-                placeholder: 'e.g. Flat cable, 16G0.75+2x(2x0.5)',
+                placeholder: 'e.g. Würth',
                 type: 'text',
                 required: true,
                 value: formik.values.name,
@@ -180,7 +180,7 @@ const NewSupplier = () => {
               props={{
                 label: 'Category',
                 name: 'category',
-                placeholder: 'e.g. Cable',
+                placeholder: 'e.g. Fastening technology',
                 type: 'text',
                 value: formik.values.category,
                 helperText: formik.touched.category && formik.errors.category,
