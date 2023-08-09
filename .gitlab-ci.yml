@@ -94,7 +94,7 @@ lint-project:
   rules:
     - if: $CI_MERGE_REQUEST_ID
       when: never
-    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_AUTHOR =~ /^gitlab_ci_user.*/'
+    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_AUTHOR =~ '/^gitlab_ci_user.*/'
       when: never
     - when: always
 
@@ -105,7 +105,7 @@ build-stage:
   rules:
     - if: $CI_MERGE_REQUEST_ID
       when: never
-    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_AUTHOR =~ /^gitlab_ci_user.*/'
+    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_AUTHOR =~ '/^gitlab_ci_user.*/'
       when: never
     - when: on_success
 
