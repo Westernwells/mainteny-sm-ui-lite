@@ -52,17 +52,6 @@ html::-webkit-scrollbar {
   font-weight: 300;
 }
 
-.active-icon > svg > g > path,
-.active-icon > svg > path {
-  stroke: #00d1ff;
-  fill: none;
-}
-
-.inactive-icon > svg > g > path {
-  stroke: #ffffff;
-  fill: none;
-}
-
 .MuiDataGrid-main {
   height: inherit;
 }

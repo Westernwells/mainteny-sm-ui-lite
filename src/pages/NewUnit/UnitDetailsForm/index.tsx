@@ -29,7 +29,7 @@ const validationSchema = Yup.object().shape({
       'Invalid unit category',
     )
     .required('Category is required'),
-  unitType: Yup.string().nullable().required('Unit type is required'),
+  unitType: Yup.string().nullable(),
 });
 
 export const UnitDetailsForm = ({
@@ -151,7 +151,7 @@ export const UnitDetailsForm = ({
                 placeholder: 'e.g. Hydraulic',
                 name: 'unitType',
                 label: 'Unit Type',
-                required: true,
+                required: false,
                 onBlur: formik.handleBlur,
                 error: !!(formik.touched.unitType && formik.errors.unitType),
                 helperText:
