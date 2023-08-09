@@ -72,6 +72,9 @@ export interface InvoiceAdditionalInfo {
   customerSpecificOrderNumber?: string;
   beneficialDetails?: BeneficialDetails;
   moreInfo?: string;
+  billingAddress?: AddressRecord;
+  beneficiaryAddress?: AddressRecord;
+  alternativeAddress?: AddressRecord;
 }
 
 export enum InvoiceOverdueNoticeStatus {
@@ -175,6 +178,9 @@ export interface InvoiceFormData {
   beneficialName?: string;
   beneficialAddress?: AddressRecord;
   moreInfo?: string;
+  billingAddress?: AddressRecord;
+  beneficiaryAddress?: AddressRecord;
+  alternativeAddress?: AddressRecord;
 }
 
 export interface CreateInvoice {

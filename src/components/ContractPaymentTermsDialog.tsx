@@ -29,7 +29,6 @@ interface Props {
   open?: boolean;
   onCancel: () => void;
   title: string;
-  alertText?: string;
 }
 
 const validationSchema = Yup.object().shape({
@@ -43,12 +42,7 @@ const validationSchema = Yup.object().shape({
 
 const pageSize = 50;
 
-export const ContractPaymentTermsDialog = ({
-  open,
-  onCancel,
-  title,
-  alertText,
-}: Props) => {
+export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
   const {mutate: createContractPaymentTerm} = useCreateContractPaymentTerm();
@@ -173,8 +167,26 @@ export const ContractPaymentTermsDialog = ({
       </DialogTitle>
 
       <DialogContent sx={{pb: 1}}>
-        <Alert severity="info" sx={{mb: 3, mt: 3}}>
-          {alertText}
+        <Alert severity="warning" sx={{mt: '1em', mb: '1em', py: '1em'}}>
+          <Typography
+            sx={{
+              fontWeight: '600',
+              marginTop: '-0.3em',
+              marginBottom: '0.3em',
+            }}>
+            {t('Payment terms used')} <br />
+          </Typography>
+
+          <Typography
+            sx={{
+              lineHeight: '1.4',
+              fontSize: '1em',
+              letterSpacing: '0.02em',
+            }}>
+            {t('This payment term is linked to one or more contracts.')}
+            <br />
+            {t('Remove it from all contracts before deleting here.')}
+          </Typography>
         </Alert>
 
         <Grid container rowSpacing={2} pt={1} pb={2}>
