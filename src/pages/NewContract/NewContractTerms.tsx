@@ -360,9 +360,6 @@ const NewContractTerms: FC<Props> = ({formik}) => {
 
       <ContractPaymentTermsDialog
         title={t('Manage Payment Terms')}
-        alertText={t(
-          'Add your payment terms that would be used later in invoicing',
-        )}
         open={openContractPaymentTermsDialog}
         onCancel={() => setOpenContractPaymentTermsDialog(false)}
       />
