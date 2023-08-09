@@ -162,7 +162,6 @@ export const AddUnitsDataGrid = ({
             formik.setFieldValue('elevators', newSelection)
           }
           isRowSelectable={() => true}
-          hideFooter
           noRowsEmptySection={
             <NoRowsEmptySection
               placeholder="unit"

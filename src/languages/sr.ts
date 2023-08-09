@@ -270,7 +270,7 @@ export const sr = {
   Discard: 'Discard',
 
   // Invoices
-  Invoices: 'fakture',
+  Invoices: 'Fakture',
   'Edit Invoice': 'Uredi fakturu',
   'New Invoice': 'Nova faktura',
   'INVOICE DATE': 'DATUM FAKTURE',
@@ -814,6 +814,16 @@ export const sr = {
   'Create Credit note': 'Stvori kredit',
   'This action will create a credit note from this invoice details.':
     'Ova će radnja stvoriti knjižno odobrenje iz pojedinosti ove fakture.',
+  'Add New Customer': 'Dodaj novog kupca',
+  'Add Billing Address': 'Dodajte adresu za obračun',
+  'Edit Billing Address': 'Izmenite adresu za obračun',
+  'Beneficiary Address': 'Adresa korisnika',
+  'Edit Beneficiary Address': 'Uredite adresu korisnika',
+  'Alternative Invoice Destination': 'Alternativno odredište fakture',
+  'Enter address to receive invoice if different from billing or shipping address. Ensure accuracy to prevent misdelivery.':
+    'Unesite adresu za primanje fakture ako se razlikuje od adrese za obračun ili dostavu. Obezbedite tačnost da biste sprečili pogrešnu isporuku.',
+  'Add Alternative Address': 'Dodajte alternativnu adresu',
+  'Edit Alternative Address': 'Uredi alternativnu adresu',
 
   // Quotations
   'No quotations have been created yet. Please click the button below to create one!':
@@ -1097,7 +1107,7 @@ export const sr = {
   'No service order has been created for this quotation yet!':
     'Još uvijek nije kreiran nalog za ovu ponudu!',
   Addresses: 'adrese',
-  Settings: 'Informacije o plaćanju',
+  Settings: 'Postavke',
   'Legal Information': 'informacije o naplati',
   'Payment Information': 'Politika kompanije',
   'Defined contract names': 'Definirani nazivi ugovora',
@@ -1408,11 +1418,15 @@ export const sr = {
   'Enter your email address': 'Unesite svoju imejl adresu',
   'Enter your password': 'Enter your password',
   Jobs: 'Naređenja',
+  'Synced with XERO': 'Sinkronizovano sa XERO',
   'Select or Add Payment Terms': 'Izaberite ili dodajte uslove plaćanja',
   'Select Invoice Cycle': 'Izaberite Ciklus fakture',
   'Select Contract Type': 'Izaberite Tip ugovora',
   'Should be higher than 0': 'Trebalo bi da bude veće od 0',
   'Yearly Contract Price is required': 'Godišnja cena ugovora je obavezna',
   'Should be higher or equals to 0': 'Trebalo bi da bude veće ili jednako 0',
-  'Partially Paid': 'Delimično plaćeno',
+  Serbian: 'Srpski',
+  'New Job': 'Novi nalog',
+  'Partially Paid': 'Dio plaćen',
+  Okay: 'Dobro',
 };

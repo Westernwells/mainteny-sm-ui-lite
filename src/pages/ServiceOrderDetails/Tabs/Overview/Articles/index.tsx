@@ -212,7 +212,6 @@ export const Articles = ({
           <DataGridLayout
             fullHeight={false}
             height={getDataGridHeight(rows.length, 3)}
-            hideFooter
             rows={rows}
             columns={columns((item, actionType) =>
               handleAction(item, actionType),

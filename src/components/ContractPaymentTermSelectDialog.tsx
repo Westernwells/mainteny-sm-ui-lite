@@ -24,7 +24,7 @@ interface Props {
 }
 
 const validationSchema = Yup.object().shape({
-  paymentTerms: Yup.string().min(1).required('Payment term is required'),
+  paymentTerms: Yup.string(),
 });
 
 const pageSize = 50;
@@ -129,7 +129,6 @@ export const ContractPaymentTermSelectDialog = ({
           buttonProps={{
             variant: 'contained',
             size: 'medium',
-            disabled: !formik.isValid,
             onClick: () => formik.handleSubmit(),
           }}>
           <Typography variant="subtitle2">{t('Save')}</Typography>

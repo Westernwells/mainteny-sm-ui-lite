@@ -113,7 +113,6 @@ export const theme = createTheme({
       fontWeight: 600,
       fontSize: '1.25rem',
       lineHeight: 1.33,
-      letterSpacing: '-1.5px',
     },
     h6: {
       fontWeight: 600,
@@ -284,7 +283,12 @@ export const theme = createTheme({
           '&.Mui-selected': {
             background: '#40748054',
             boxSizing: 'border-box',
-            borderLeft: '6px solid #00D1FF',
+            borderLeft: '4px solid #00D1FF',
+
+            '&:hover': {
+              background: '#40748054',
+              borderLeft: '4px solid #00D1FF',
+            },
           },
         },
       },

@@ -7,7 +7,7 @@ import {SelectButton} from './SelectButton';
 import {SelectModal} from './SelectModal';
 
 interface Props {
-  label: string;
+  label: string | ReactNode;
   labelRequired?: boolean;
   selected: boolean;
   buttonText: string;
@@ -38,7 +38,11 @@ export const SelectCombined = ({
 
   return (
     <Box>
-      <FormLabel text={t(label)} required={labelRequired} />
+      {typeof label === 'string' ? (
+        <FormLabel text={t(label)} required={labelRequired} />
+      ) : (
+        label
+      )}
 
       {selected ? (
         <SelectCard header={cardHeader} body={cardBody} onClose={cardOnClose} />

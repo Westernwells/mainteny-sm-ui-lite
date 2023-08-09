@@ -1,3 +1,9 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
 html {
   font-size: 16px;
 }
@@ -44,4 +50,8 @@ html::-webkit-scrollbar {
   src: local('Aventa'),
     url('./assets/fonts/Aventa/Aventa-Regular.ttf') format('truetype');
   font-weight: 300;
+}
+
+.MuiDataGrid-main {
+  height: inherit;
 }
