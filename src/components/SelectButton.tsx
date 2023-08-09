@@ -5,11 +5,12 @@ import {Button} from './Button';
 
 interface Props {
   text: string;
+  icon?: JSX.Element;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   sxContainer?: SxProps<Theme>;
 }
 
-export const SelectButton = ({text, onClick, sxContainer}: Props) => (
+export const SelectButton = ({text, icon, onClick, sxContainer}: Props) => (
   <Box
     bgcolor="inputBackground.main"
     minHeight="5em"
@@ -30,6 +31,7 @@ export const SelectButton = ({text, onClick, sxContainer}: Props) => (
           background: 'transparent',
           textTransform: 'none',
         },
+        startIcon: icon,
         onClick,
       }}
     />

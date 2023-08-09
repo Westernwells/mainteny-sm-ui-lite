@@ -814,6 +814,16 @@ export const sr = {
   'Create Credit note': 'Stvori kredit',
   'This action will create a credit note from this invoice details.':
     'Ova će radnja stvoriti knjižno odobrenje iz pojedinosti ove fakture.',
+  'Add New Customer': 'Dodaj novog kupca',
+  'Add Billing Address': 'Dodajte adresu za obračun',
+  'Edit Billing Address': 'Izmenite adresu za obračun',
+  'Beneficiary Address': 'Adresa korisnika',
+  'Edit Beneficiary Address': 'Uredite adresu korisnika',
+  'Alternative Invoice Destination': 'Alternativno odredište fakture',
+  'Enter address to receive invoice if different from billing or shipping address. Ensure accuracy to prevent misdelivery.':
+    'Unesite adresu za primanje fakture ako se razlikuje od adrese za obračun ili dostavu. Obezbedite tačnost da biste sprečili pogrešnu isporuku.',
+  'Add Alternative Address': 'Dodajte alternativnu adresu',
+  'Edit Alternative Address': 'Uredi alternativnu adresu',
 
   // Quotations
   'No quotations have been created yet. Please click the button below to create one!':
@@ -1419,4 +1429,9 @@ export const sr = {
   'New Job': 'Novi nalog',
   'Partially Paid': 'Dio plaćen',
   Okay: 'Dobro',
+  'Payment terms used': 'Korišćeni uslovi plaćanja',
+  'This payment term is linked to one or more contracts.':
+    'Ova klauzula plaćanja je povezana sa jednim ili više ugovora.',
+  'Remove it from all contracts before deleting here.':
+    'Uklonite ga iz svih ugovora pre brisanja ovde.',
 };

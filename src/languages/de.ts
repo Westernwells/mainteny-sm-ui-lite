@@ -818,6 +818,16 @@ export const de = {
   'Create Credit note': 'Gutschrift erstellen',
   'This action will create a credit note from this invoice details.':
     'Mit dieser Aktion wird eine Gutschrift aus den Rechnungsdaten erstellt.',
+  'Add New Customer': 'Kunden anlegen',
+  'Add Billing Address': 'Rechnungsadresse hinzufügen',
+  'Edit Billing Address': 'Rechnungsadresse bearbeiten',
+  'Beneficiary Address': 'Leistungsempfänger',
+  'Edit Beneficiary Address': 'Leistungsempfänger bearbeiten',
+  'Alternative Invoice Destination': 'Rechnung über',
+  'Enter address to receive invoice if different from billing or shipping address. Ensure accuracy to prevent misdelivery.':
+    'Geben Sie die Adresse ein, an die die Rechnung zugestellt werden soll, wenn sie von der Rechnungs- oder Leistungsempfänger abweicht.',
+  'Add Alternative Address': 'Rechnung über hinzufügen',
+  'Edit Alternative Address': 'Rechnung über bearbeiten',
 
   // Quotations
   'No quotations have been created yet. Please click the button below to create one!':
@@ -1452,4 +1462,9 @@ export const de = {
   'New Job': 'Neuer Auftrag',
   'Partially Paid': 'Teilw. bezahlt',
   Okay: 'Ok',
+  'Payment terms used': 'Zahlungsbedingung hinterlegt',
+  'This payment term is linked to one or more contracts.':
+    'Die Zahlungsbedingung ist bei Verträgen hinterlegt.',
+  'Remove it from all contracts before deleting here.':
+    'Enfernen Sie die Zahlungsbedingung von allen Verträgen, bevor Sie diese löschen.',
 };
