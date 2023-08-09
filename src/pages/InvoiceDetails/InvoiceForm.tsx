@@ -14,8 +14,10 @@ import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import Print from '@mui/icons-material/Print';
 import Send from '@mui/icons-material/Send';
 import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {SelectCombined} from 'components/SelectCombined';
+import {SelectAndEditCombined} from 'components/SelectAndEditCombined';
 import {ArticleItemsTable} from 'components/ArticleItemsTable';
 import {CustomersDataGrid} from 'components/DataGrid/CustomersDataGrid';
 import {ServiceOrdersDataGrid} from 'components/DataGrid/ServiceOrderDataGrid';
@@ -92,6 +94,9 @@ const toolTipText = (
     <br />
   </div>
 );
+
+const alternativeInvoiceDestinationTooltip =
+  'Enter address to receive invoice if different from billing or shipping address. Ensure accuracy to prevent misdelivery.';
 
 export const InvoiceForm = ({
   invoice,
@@ -209,6 +214,9 @@ export const InvoiceForm = ({
     customerSpecificOrderNumber:
       invoice?.additionalInfo?.customerSpecificOrderNumber || '',
     moreInfo: invoice?.additionalInfo?.moreInfo ?? '',
+    billingAddress: invoice?.additionalInfo?.billingAddress,
+    beneficiaryAddress: invoice?.additionalInfo?.beneficiaryAddress,
+    alternativeAddress: invoice?.additionalInfo?.alternativeAddress,
   };
 
   const validationSchema = Yup.object().shape({
@@ -228,6 +236,12 @@ export const InvoiceForm = ({
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
+    formik.setValues({
+      ...formik.values,
+      billingAddress: row.billingAddress,
+      beneficiaryAddress: row.beneficiaryAddress,
+      alternativeAddress: row.otherAddress,
+    });
   };
 
   const handleSelectServiceOrder = (row: ServiceOrderView) => {
@@ -266,8 +280,15 @@ export const InvoiceForm = ({
 
   useEffect(() => {
     if (invoice) {
+      const invoiceCustomer = invoice.serviceOrder?.elevator.propertyOwner;
       setServiceOrder(invoice.serviceOrder);
-      setCustomer(invoice.serviceOrder?.elevator.propertyOwner);
+      setCustomer(invoiceCustomer);
+      formik.setValues({
+        ...formik.values,
+        billingAddress: invoiceCustomer?.billingAddress,
+        beneficiaryAddress: invoiceCustomer?.beneficiaryAddress,
+        alternativeAddress: invoiceCustomer?.otherAddress,
+      });
     }
 
     formik.setFieldValue(
@@ -286,7 +307,18 @@ export const InvoiceForm = ({
 
   useEffect(() => {
     if (serviceOrder) {
-      setCustomer(serviceOrder.elevator.propertyOwner);
+      const serviceOrderCustomer = serviceOrder.elevator.propertyOwner;
+      setCustomer(serviceOrderCustomer);
+
+      // if customer is changed, then update billing address
+      if (serviceOrderCustomer.id !== customer?.id) {
+        formik.setValues({
+          ...formik.values,
+          billingAddress: serviceOrderCustomer?.billingAddress,
+          beneficiaryAddress: serviceOrderCustomer?.beneficiaryAddress,
+          alternativeAddress: serviceOrderCustomer?.otherAddress,
+        });
+      }
 
       formik.setFieldValue(
         'propertyOwnerId',
@@ -466,6 +498,12 @@ export const InvoiceForm = ({
     setOpenContractPaymentTermsDialog(false);
   };
 
+  const removeAddress = (
+    addressType: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress',
+  ) => {
+    formik.setFieldValue(addressType, undefined);
+  };
+
   return (
     <Box>
       {invoice && (
@@ -536,23 +574,26 @@ export const InvoiceForm = ({
                 </Box>
                 <SelectCombined
                   selected={customer !== undefined}
-                  label="To"
+                  label={
+                    <Box
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="center">
+                      <FormLabel text={t('Customer')} required />
+                      <Button
+                        label="Add New Customer"
+                        buttonProps={{
+                          size: 'small',
+                          startIcon: <AddIcon />,
+                          onClick: () => navigate('/customers/new'),
+                        }}
+                      />
+                    </Box>
+                  }
                   buttonText="Select Customer"
                   cardHeader={
                     customer && (
                       <Typography variant="body2">{customer.name}</Typography>
-                    )
-                  }
-                  cardBody={
-                    customer && (
-                      <>
-                        <Typography variant="caption">
-                          {customer.billingAddress?.fullName ?? '-'}
-                        </Typography>
-                        <Typography variant="caption" component="p">
-                          {customer.contact.phone}
-                        </Typography>
-                      </>
                     )
                   }
                   cardOnClose={() => {
@@ -565,6 +606,88 @@ export const InvoiceForm = ({
                   }
                   labelRequired
                 />
+
+                {customer && (
+                  <>
+                    <SelectAndEditCombined
+                      selected={!!formik.values.billingAddress}
+                      label="Billing Address"
+                      buttonText="Add Billing Address"
+                      cardHeader={
+                        formik.values.billingAddress ? (
+                          <Typography variant="body2">
+                            {formik.values.billingAddress.fullName}
+                          </Typography>
+                        ) : null
+                      }
+                      cardOnClose={() => removeAddress('billingAddress')}
+                      editButtonText="Edit Billing Address"
+                      modalHeader="Edit Billing Address"
+                      addressType="billingAddress"
+                      formik={formik}
+                    />
+
+                    <SelectAndEditCombined
+                      selected={!!formik.values.beneficiaryAddress}
+                      label="Beneficiary Address"
+                      buttonText="Add Beneficiary Address"
+                      cardHeader={
+                        formik.values.beneficiaryAddress ? (
+                          <Typography variant="body2">
+                            {formik.values.beneficiaryAddress.fullName}
+                          </Typography>
+                        ) : null
+                      }
+                      cardOnClose={() => removeAddress('beneficiaryAddress')}
+                      editButtonText="Edit Beneficiary Address"
+                      modalHeader="Edit Beneficiary Address"
+                      addressType="beneficiaryAddress"
+                      formik={formik}
+                    />
+
+                    <SelectAndEditCombined
+                      selected={!!formik.values.alternativeAddress}
+                      label={
+                        <Box>
+                          <FormLabel
+                            text={t('Alternative Invoice Destination')}
+                          />
+                          <Tooltip
+                            title={t(alternativeInvoiceDestinationTooltip)}
+                            placement="top"
+                            componentsProps={{
+                              tooltip: {
+                                sx: {
+                                  bgcolor: 'common.gray',
+                                  maxWidth: 500,
+                                  padding: '1em',
+                                  fontSize: '0.85rem',
+                                },
+                              },
+                            }}>
+                            <IconButton sx={{fontSize: '1.375rem'}}>
+                              <InfoOutlinedIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      }
+                      buttonText="Add Alternative Address"
+                      cardHeader={
+                        formik.values.alternativeAddress ? (
+                          <Typography variant="body2">
+                            {formik.values.alternativeAddress.fullName}
+                          </Typography>
+                        ) : null
+                      }
+                      cardOnClose={() => removeAddress('alternativeAddress')}
+                      editButtonText="Edit Alternative Address"
+                      modalHeader="Edit Alternative Address"
+                      addressType="alternativeAddress"
+                      formik={formik}
+                    />
+                  </>
+                )}
+
                 <SelectCombined
                   selected={serviceOrder !== undefined}
                   label="Order Number"
