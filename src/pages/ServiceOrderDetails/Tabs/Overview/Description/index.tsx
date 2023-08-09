@@ -57,7 +57,10 @@ export const Description = ({content = '', serviceOrderId = ''}: Props) => {
           setOpenDialog(true);
         }}>
         {content ? (
-          <Typography variant="body1" color="text.secondary">
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{whiteSpace: 'pre-line'}}>
             {content}
           </Typography>
         ) : (
