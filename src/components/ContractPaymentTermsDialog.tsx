@@ -174,7 +174,7 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
               marginTop: '-0.3em',
               marginBottom: '0.3em',
             }}>
-            Payment terms used <br />
+            {t('Payment terms used')} <br />
           </Typography>
 
           <Typography
@@ -183,8 +183,9 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
               fontSize: '1em',
               letterSpacing: '0.02em',
             }}>
-            This payment term is linked to one or more contracts. <br /> Remove
-            it from all contracts before deleting here.
+            {t('This payment term is linked to one or more contracts.')}
+            <br />
+            {t('Remove it from all contracts before deleting here.')}
           </Typography>
         </Alert>
 

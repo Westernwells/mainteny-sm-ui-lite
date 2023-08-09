@@ -1462,4 +1462,9 @@ export const de = {
   'New Job': 'Neuer Auftrag',
   'Partially Paid': 'Teilw. bezahlt',
   Okay: 'Ok',
+  'Payment terms used': 'Zahlungsbedingung hinterlegt',
+  'This payment term is linked to one or more contracts.':
+    'Die Zahlungsbedingung ist bei Verträgen hinterlegt.',
+  'Remove it from all contracts before deleting here.':
+    'Enfernen Sie die Zahlungsbedingung von allen Verträgen, bevor Sie diese löschen.',
 };
