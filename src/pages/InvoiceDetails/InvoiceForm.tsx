@@ -653,7 +653,7 @@ export const InvoiceForm = ({
                             text={t('Alternative Invoice Destination')}
                           />
                           <Tooltip
-                            title={alternativeInvoiceDestinationTooltip}
+                            title={t(alternativeInvoiceDestinationTooltip)}
                             placement="top"
                             componentsProps={{
                               tooltip: {
