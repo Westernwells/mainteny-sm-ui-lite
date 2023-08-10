@@ -378,7 +378,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             sx={{
               display: 'flex',
               justifyContent: 'flex-start',
-              ml: '1.3em',
+              marginLeft: '11px',
               marginBottom: '0.5em',
             }}
             edge="start"
