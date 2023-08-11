@@ -58,10 +58,10 @@ export const EditLocationForm = ({formik}: Props) => (
       <FormInput
         props={{
           size: 'small',
-          placeholder: 'e.g. Outside key box, pin: 0000',
-          label: 'Key Location',
-          name: 'keyLocation',
-          value: formik.values.keyLocation,
+          placeholder: 'e.g. central parking lot',
+          label: 'Parking',
+          name: 'parking',
+          value: formik.values.parking,
           onChange: formik.handleChange,
         }}
       />
@@ -71,11 +71,13 @@ export const EditLocationForm = ({formik}: Props) => (
       <FormInput
         props={{
           size: 'small',
-          placeholder: 'e.g. central parking lot',
-          label: 'Parking',
-          name: 'parking',
-          value: formik.values.parking,
+          placeholder: 'e.g. Outside key box, pin: 0000',
+          label: 'Key Location',
+          name: 'keyLocation',
+          value: formik.values.keyLocation,
           onChange: formik.handleChange,
+          multiline: true,
+          rows: 4,
         }}
       />
     </Grid>
