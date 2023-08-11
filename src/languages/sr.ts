@@ -1434,4 +1434,5 @@ export const sr = {
     'Ova klauzula plaćanja je povezana sa jednim ili više ugovora.',
   'Remove it from all contracts before deleting here.':
     'Uklonite ga iz svih ugovora pre brisanja ovde.',
+  'Contract is created': 'Ugovor je napravljen',
 };

@@ -1467,4 +1467,5 @@ export const de = {
     'Die Zahlungsbedingung ist bei Verträgen hinterlegt.',
   'Remove it from all contracts before deleting here.':
     'Enfernen Sie die Zahlungsbedingung von allen Verträgen, bevor Sie diese löschen.',
+  'Contract is created': 'Vertrag ist angelegt',
 };
