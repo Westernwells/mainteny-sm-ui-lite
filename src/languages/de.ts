@@ -981,7 +981,7 @@ export const de = {
   'Sorry, there was an error while deleting the todo. Please try again.':
     'Entschuldigung, beim Löschen der Aufgabe ist ein Fehler aufgetreten. Bitte versuche es erneut.',
   'Invoice sent successfully': 'Rechnung erfolgreich versandt',
-  'Invoice marked as paid': 'Rechnung als bezahlt markiert',
+  'Invoice marked as paid!': 'Rechnung als bezahlt markiert!',
   'Invoice created successfully': 'Rechnung wurde erfolgreich erstellt',
   'Invoice updated successfully': 'Rechnung wurde erfolgreich aktualisiert',
   'Invoice deleted successfully': 'Rechnung wurde erfolgreich gelöscht',
