@@ -167,25 +167,10 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
       </DialogTitle>
 
       <DialogContent sx={{pb: 1}}>
-        <Alert severity="warning" sx={{mt: '1em', mb: '1em', py: '1em'}}>
-          <Typography
-            sx={{
-              fontWeight: '600',
-              marginTop: '-0.3em',
-              marginBottom: '0.3em',
-            }}>
-            {t('Payment terms used')} <br />
-          </Typography>
-
-          <Typography
-            sx={{
-              lineHeight: '1.4',
-              fontSize: '1em',
-              letterSpacing: '0.02em',
-            }}>
-            {t('This payment term is linked to one or more contracts.')}
+        <Alert severity="info" sx={{mt: '1em', mb: '1em', py: '0.6em'}}>
+          <Typography>
+            {t('Add your payment terms that would be used later in invoicing')}
             <br />
-            {t('Remove it from all contracts before deleting here.')}
           </Typography>
         </Alert>
 
