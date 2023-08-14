@@ -53,5 +53,5 @@ html::-webkit-scrollbar {
 }
 
 .MuiDataGrid-main {
-  height: inherit;
+  min-height: 95%;
 }

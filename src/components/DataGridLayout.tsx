@@ -249,12 +249,7 @@ export const DataGridLayout = ({
           '& > div:nth-of-type(3)': {
             display: 'flex',
             flexDirection: 'column',
-            height:
-              pageSize === 5
-                ? '19.8%'
-                : rows.length >= 11
-                ? '13%'
-                : `${16 + 6.9 * (11 - rows.length)}%`,
+            height: '100%',
           },
           '& .MuiDataGrid-virtualScroller': {
             '&:hover': {
