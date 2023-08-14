@@ -184,7 +184,7 @@ export const useInvoicePaymentStatus = () => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
         queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
-        enqueueSnackbar(`Invoice marked as paid`, {
+        enqueueSnackbar(`Invoice marked as paid!`, {
           variant: 'success',
         });
         navigate(`/invoices/details/${invoiceId}`);
