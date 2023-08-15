@@ -65,6 +65,8 @@ import {addYears} from 'date-fns';
 import {InvoiceCheckbox} from 'pages/InvoiceDetails/InvoiceCheckbox';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {IconButton} from '@mui/material';
+import {useQueryContractPaymentTerms} from 'hooks/reactQuery/useCompanies';
+import {createEmptyResource} from 'utils/paging-utils';
 import {BeneficiaryDetails} from './BeneficiaryDetails';
 import {formatInvoiceRecord} from './utils';
 
@@ -97,6 +99,8 @@ const toolTipText = (
 
 const alternativeInvoiceDestinationTooltip =
   'Enter address to receive invoice if different from billing or shipping address. Ensure accuracy to prevent misdelivery.';
+
+const pageSize = 50;
 
 export const InvoiceForm = ({
   invoice,
@@ -163,6 +167,15 @@ export const InvoiceForm = ({
   const [dueDate, setDueDate] = useState<Date | null>(
     invoice ? new Date(invoice.dueDate) : null,
   );
+
+  const {data: contractPaymentTerms = createEmptyResource(pageSize)} =
+    useQueryContractPaymentTerms({
+      page: {
+        pageIndex: 0,
+        pageSize,
+      },
+      query: '',
+    });
 
   const invoiceTypeOptions = useRef([
     {
@@ -493,8 +506,11 @@ export const InvoiceForm = ({
     }
   };
 
-  const handleContractPaymentTermsModal = (paymentTerms: string) => {
-    formik.setFieldValue('paymentTerms', paymentTerms);
+  const handleContractPaymentTermsModal = (paymentTermId: string) => {
+    const paymentTermObj = contractPaymentTerms?.data.find(
+      ({id}) => id === paymentTermId,
+    );
+    formik.setFieldValue('paymentTerms', paymentTermObj?.term);
     setOpenContractPaymentTermsDialog(false);
   };
 

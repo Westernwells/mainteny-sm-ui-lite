@@ -33,8 +33,6 @@ const NewContractTerms: FC<Props> = ({formik}) => {
       },
       query: '',
     });
-  console.log(contractPaymentTerms, 'contractPayemtTerms');
-  console.log(formik.values, 'formik.valies');
   return (
     <Grid container spacing={2}>
       <Grid item xs={4}>
