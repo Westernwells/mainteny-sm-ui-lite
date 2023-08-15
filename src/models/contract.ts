@@ -250,7 +250,7 @@ export interface ContractTermsFormModal {
   invoiceDueDays?: number;
   discounts?: ContractDiscount[];
   noticePeriodInMonth?: number;
-  paymentTerms?: string;
+  paymentTermId?: string;
 }
 
 export interface ContractUpdateRequest {
