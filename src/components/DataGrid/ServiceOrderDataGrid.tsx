@@ -28,14 +28,12 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
     headerName: 'order number',
-    align: 'center',
-    flex: 0,
   }),
   getColumnProps({
     field: 'customer',
     headerName: 'customer',
     cellClassName: 'truncateText',
-    flex: 1.5,
+    flex: 1,
   }),
   getColumnProps({
     field: 'address',
