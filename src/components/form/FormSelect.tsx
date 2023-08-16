@@ -114,7 +114,7 @@ export const FormSelect = ({
             {t(option.label)}
           </MenuItem>
         ))}
-        {selectProps?.name === 'paymentTerms' && [
+        {selectProps?.name === 'paymentTermId' && [
           options.length === 0 && (
             <MenuItem
               disabled
