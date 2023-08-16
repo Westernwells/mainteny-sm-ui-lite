@@ -174,6 +174,11 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
               action={() => window.open('/customers/new', '_blank')}
             />
           }
+          containerStyle={{
+            '& .MuiDataGrid-columnHeader, & .MuiDataGrid-cell': {
+              padding: '0 1.75rem',
+            },
+          }}
         />
       </Box>
     </>

@@ -15,6 +15,7 @@ import {
   GridRowsProp,
 } from '@mui/x-data-grid';
 import LinearProgress from '@mui/material/LinearProgress';
+import {SxProps, Theme} from '@mui/system';
 import {useNavigate} from 'react-router-dom';
 import {olStyles} from 'styles';
 import {convertToText} from 'utils/utils';
@@ -25,7 +26,7 @@ interface Props extends DataGridProps {
   rows: GridRowsProp;
   columns: GridColDef[];
   height?: string | number;
-  containerStyle?: {[key: string]: string | number};
+  containerStyle?: SxProps<Theme>;
   loading?: boolean;
   onCellClick?: GridEventListener<GridEvents.cellClick>;
   pageSize?: number;
@@ -80,6 +81,7 @@ export const getColumnProps = ({
   align = 'left',
   editable = false,
   sortable = false,
+  ...rest
 }: ColumnProps): GridColDef => ({
   field,
   type,
@@ -92,6 +94,7 @@ export const getColumnProps = ({
   align,
   editable,
   sortable,
+  ...rest,
 });
 
 export const DataGridLayout = ({
