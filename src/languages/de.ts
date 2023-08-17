@@ -1470,4 +1470,5 @@ export const de = {
   'Contract is created': 'Vertrag ist angelegt',
   'Deleting this payment term will also remove it from any contracts it’s associated with.':
     'Wenn Sie diese Zahlungsbedingung löschen, wird sie auch aus allen Verträgen entfernt, in denen sie hinterlegt ist.',
+  'Add Service Order': 'Neuer Auftrag',
 };
