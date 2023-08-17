@@ -64,7 +64,7 @@ export const Pictures = ({elevator}: Props) => {
       }}
       bodyContainerStyle={{
         [theme.breakpoints.up('lg')]: {
-          height: '25em',
+          height: '100%',
           overflowY: 'hidden',
 
           '&:hover': {
