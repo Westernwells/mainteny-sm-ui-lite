@@ -158,8 +158,8 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
         },
       }}
       bodyContainerStyle={{
-        [theme.breakpoints.up('md')]: {
-          height: '12em',
+        [theme.breakpoints.up('lg')]: {
+          height: '25em',
           overflowY: 'hidden',
 
           '&:hover': {
@@ -186,9 +186,10 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
             {elevator.additionalInfo?.pictures?.map((picture, index) => (
               <Grid
                 item
-                xs={2}
-                sm={4}
+                xs={12}
+                sm={6}
                 md={4}
+                lg={4}
                 key={picture.id}
                 display="flex"
                 flexDirection="column">
@@ -205,15 +206,15 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
                   sx={{cursor: 'pointer'}}>
                   <img
                     alt=""
-                    width={72}
-                    height="100%"
+                    width="100%"
+                    height="262px"
                     src={downloadUrls[picture.uri]}
                     style={{objectFit: 'cover'}}
                   />
                 </Box>
 
                 {editingFileId === picture.id ? (
-                  <Box sx={{display: 'flex'}}>
+                  <Box sx={{display: 'flex', mt: '1em'}}>
                     <FormInput
                       props={{
                         value: fileName,
@@ -247,32 +248,29 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
                     </IconButton>
                   </Box>
                 ) : (
-                  <>
-                    <Box display="flex">
-                      <Typography
-                        variant="body1"
-                        pl={2}
-                        pr={1.75}
-                        sx={{
-                          wordBreak: 'break-word',
-                          overflowWrap: 'anywhere',
-                        }}>
-                        {picture.description}
-                      </Typography>
-                      <IconButton
-                        onClick={() => handleFileNameChange(picture.id)}
-                        edge="start">
-                        <EditIcon sx={{mt: '-0.2rem', fontSize: '1rem'}} />
-                      </IconButton>
-                    </Box>
-
+                  <Box display="flex" alignItems="center" mt="1em">
+                    <Typography
+                      variant="body1"
+                      pl={2}
+                      pr={1.75}
+                      sx={{
+                        wordBreak: 'break-word',
+                        overflowWrap: 'anywhere',
+                      }}>
+                      {picture.description}
+                    </Typography>
+                    <IconButton
+                      onClick={() => handleFileNameChange(picture.id)}
+                      edge="end">
+                      <EditIcon sx={{mt: '-0.2rem', fontSize: '1rem'}} />
+                    </IconButton>
                     <IconButton
                       size="small"
                       onClick={() => onDeletePicture(picture.id)}
                       sx={{ml: 'auto'}}>
                       <DeleteIcon />
                     </IconButton>
-                  </>
+                  </Box>
                 )}
               </Grid>
             ))}
