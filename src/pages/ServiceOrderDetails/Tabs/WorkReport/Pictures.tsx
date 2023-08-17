@@ -1,51 +1,29 @@
 import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
-import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
 import MUIDialog from '@mui/material/Dialog';
 import useTheme from '@mui/material/styles/useTheme';
-import EditIcon from '@mui/icons-material/Edit';
-import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
-import CancelIcon from '@mui/icons-material/Cancel';
-import DeleteIcon from '@mui/icons-material/Delete';
-import IconButton from '@mui/material/IconButton';
-import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
-import {FormInput} from 'components/form/FormInput';
 import {Carousel} from 'components/Carousel';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {ElevatorView} from 'models/elevator';
 import {useState} from 'react';
-import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
-import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmptySection} from 'components/EmptySection';
 import {olStyles} from 'styles';
 import {Grid} from '@mui/material';
+import {format} from 'date-fns';
 
 interface Props {
   elevator: ElevatorView;
-  propertyOwnerId?: string;
 }
 
-export const Pictures = ({elevator, propertyOwnerId}: Props) => {
+export const Pictures = ({elevator}: Props) => {
   const {t} = useTranslation();
-  const [openDialog, setOpenDialog] = useState(false);
   const [openPreview, setOpenPreview] = useState(false);
-  const [editingFileId, setEditingFileId] = useState('');
-  const [fileName, setFileName] = useState('');
   const theme = useTheme();
-  const {user} = useUserSession();
-  const [acceptedFiles, setAcceptedFiles] = useState<FileWithPreview[]>([]);
 
   const [activeStep, setActiveStep] = useState(0);
 
-  const {mutateAsync: uploadImages, isLoading} = useUploadFiles(
-    'Image uploaded successfully',
-  );
-  const {mutateAsync: updateElevator} = useUpdateElevator(
-    'Elevator updated successfully',
-  );
   const {data: downloadUrls = {}} = useDownloadUrl(
     elevator.additionalInfo.pictures
       ? elevator.additionalInfo?.pictures?.map((item) => item.uri)
@@ -55,79 +33,6 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
   const isEmpty =
     !elevator.additionalInfo.pictures ||
     elevator.additionalInfo.pictures.length === 0;
-
-  const onSave = async () => {
-    const serviceCompanyId = user?.userAccount.serviceCompany.id;
-    const uploadPath = `${serviceCompanyId}/elevators/${elevator.id}/images`;
-    await uploadImages({files: acceptedFiles, uploadPath});
-
-    const updatedPictures = elevator.additionalInfo.pictures
-      ? [
-          ...elevator.additionalInfo.pictures,
-          ...acceptedFiles.map((item) => ({
-            description: item.name.split('.')[0],
-            type: item.type,
-            uri: `${uploadPath}/${item.name}`,
-          })),
-        ]
-      : [
-          ...acceptedFiles.map((item) => ({
-            description: item.name.split('.')[0],
-            type: item.type,
-            uri: `${uploadPath}/${item.name}`,
-          })),
-        ];
-
-    await updateElevator({
-      body: {
-        propertyOwnerId,
-        pictures: updatedPictures,
-      },
-      elevatorId: elevator.id,
-    });
-
-    setOpenDialog(false);
-  };
-
-  const onDeletePicture = async (id: string) => {
-    const filteredPictures = elevator.additionalInfo.pictures.filter(
-      (pic) => pic.id !== id,
-    );
-    await updateElevator({
-      elevatorId: elevator.id,
-      body: {
-        propertyOwnerId,
-        pictures: filteredPictures,
-      },
-    });
-  };
-
-  const handleFileNameChange = (fileId?: string) => {
-    if (fileId) {
-      const file = elevator.additionalInfo.pictures.find(
-        (p) => p.id === fileId,
-      );
-      setFileName(file?.description ?? '');
-      setEditingFileId(fileId);
-    } else {
-      setEditingFileId('');
-      setFileName('');
-    }
-  };
-
-  const onSaveFileName = async (fileId: string) => {
-    const updatedPictures = elevator.additionalInfo?.pictures?.map((p) =>
-      p.id === fileId ? {...p, description: fileName} : p,
-    );
-    await updateElevator({
-      elevatorId: elevator.id,
-      body: {
-        propertyOwnerId,
-        pictures: updatedPictures,
-      },
-    });
-    handleFileNameChange();
-  };
 
   const renderEmptySection = () => (
     <Box
@@ -172,10 +77,6 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
           overflowY: 'auto',
         },
       }}
-      headerActionIcon={
-        <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
-      }
-      handleAction={() => setOpenDialog(true)}
       showHeaderBackground
       header={<Typography variant="subtitle1">{t('Pictures')}</Typography>}>
       {isEmpty ? (
@@ -213,95 +114,29 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
                   />
                 </Box>
 
-                {editingFileId === picture.id ? (
-                  <Box sx={{display: 'flex', mt: '1em'}}>
-                    <FormInput
-                      props={{
-                        value: fileName,
-                        size: 'small',
-                        sx: {ml: '0.1rem'},
-                        type: 'text',
-                        onChange: (e) => setFileName(e.target.value),
-                      }}
-                    />
-                    <IconButton
-                      onClick={() => onSaveFileName(picture.id)}
-                      edge="start"
-                      sx={{ml: '0.1rem'}}>
-                      <CheckCircleRounded
-                        sx={{
-                          color: theme.palette.primary.main,
-                          fontSize: '1.2rem',
-                        }}
-                      />
-                    </IconButton>
-
-                    <IconButton
-                      onClick={() => handleFileNameChange()}
-                      edge="start">
-                      <CancelIcon
-                        sx={{
-                          color: theme.palette.primary.main,
-                          fontSize: '1.2rem',
-                        }}
-                      />
-                    </IconButton>
-                  </Box>
-                ) : (
-                  <Box display="flex" alignItems="center" mt="1em">
-                    <Typography
-                      variant="body1"
-                      pl={2}
-                      pr={1.75}
-                      sx={{
-                        wordBreak: 'break-word',
-                        overflowWrap: 'anywhere',
-                      }}>
-                      {picture.description}
-                    </Typography>
-                    <IconButton
-                      onClick={() => handleFileNameChange(picture.id)}
-                      edge="end">
-                      <EditIcon sx={{mt: '-0.2rem', fontSize: '1rem'}} />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => onDeletePicture(picture.id)}
-                      sx={{ml: 'auto'}}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                )}
+                <Typography
+                  variant="body1"
+                  color={theme.palette.text.primary}
+                  pl={0}
+                  mt={2}
+                  pr={1.75}
+                  sx={{
+                    wordBreak: 'break-word',
+                    overflowWrap: 'anywhere',
+                  }}>
+                  {picture.description}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color={theme.palette.text.secondary}>
+                  {format(new Date(picture.createdAt), 'dd.MM.yyyy, HH:mm')}h
+                </Typography>
               </Grid>
             ))}
           </Grid>
         </Box>
       ) : null}
 
-      <Dialog
-        title="Add Pictures"
-        isSaving={isLoading}
-        onCancel={() => setOpenDialog(false)}
-        onSave={() => onSave()}
-        dialogProps={{
-          maxWidth: 'md',
-          open: openDialog || false,
-        }}>
-        <MyDropZone
-          acceptedFileTypes={[
-            'image/png',
-            'image/jpeg',
-            'image/bmp',
-            'image/gif',
-            'image/webp',
-            'image/svg+xml',
-          ]}
-          hint="JPEG, PNG, BMP, GIF, WEBP or SVG"
-          getAcceptedFiles={(files) => {
-            setAcceptedFiles(files);
-          }}
-        />
-      </Dialog>
       <MUIDialog
         onClose={() => setOpenPreview(false)}
         open={openPreview}
