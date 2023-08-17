@@ -276,9 +276,9 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
                 fontSize: '1em',
                 letterSpacing: '0.02em',
               }}>
-              {t('This payment term is linked to one or more contracts.')}
-              <br />
-              {t('Remove it from all contracts before deleting here.')}
+              {t(
+                `Deleting this payment term will also remove it from any contracts it’s associated with.`,
+              )}
             </Typography>
           </Alert>
         ) : (
