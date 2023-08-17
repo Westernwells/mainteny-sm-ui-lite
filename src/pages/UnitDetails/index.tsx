@@ -57,7 +57,7 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
   const [unitName, setUnitName] = useState('');
   useLayoutEffect(() => {
     if (getCurrentPageTitle) {
-      getCurrentPageTitle(`${t('Manufacturer')} - ${unitName}`);
+      getCurrentPageTitle(`${t('Unit Details')} - ${unitName}`);
     }
   }, [unitName, language]);
 

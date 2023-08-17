@@ -33,7 +33,6 @@ const NewContractTerms: FC<Props> = ({formik}) => {
       },
       query: '',
     });
-
   return (
     <Grid container spacing={2}>
       <Grid item xs={4}>
@@ -338,19 +337,19 @@ const NewContractTerms: FC<Props> = ({formik}) => {
           <FormSelect
             labelId="Payment Terms"
             label={t('Select or Add Payment Terms')}
-            options={contractPaymentTerms?.data?.map(({term}) => ({
+            options={contractPaymentTerms?.data?.map(({term, id}) => ({
               label: term,
-              value: term,
+              value: id,
             }))}
             selectProps={{
-              id: 'paymentTerms',
-              value: formik.values.paymentTerms
-                ? formik.values.paymentTerms
-                : undefined,
+              id: 'paymentTermId',
+              value: formik.values.paymentTermId
+                ? formik.values.paymentTermId
+                : '',
               onChange: formik.handleChange,
-              name: 'paymentTerms',
+              name: 'paymentTermId',
               error: !!(
-                formik.touched.paymentTerms && formik.errors.paymentTerms
+                formik.touched.paymentTermId && formik.errors.paymentTermId
               ),
             }}
             onClickPaymentTerms={() => setOpenContractPaymentTermsDialog(true)}

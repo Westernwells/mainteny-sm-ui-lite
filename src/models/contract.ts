@@ -67,6 +67,7 @@ export interface QueryContractParams {
   status?: string[];
   priceStart: number;
   priceEnd: number;
+  paymentTermId?: string;
 }
 
 export enum InvoiceCyle {
@@ -97,7 +98,6 @@ export interface ContractAdditionalInfo {
   discounts?: ContractDiscount[];
   firstMaintenance: FirstMaintenance;
   firstInvoiceDate: string;
-  paymentTerms?: string;
 }
 
 export interface ContractElevatorSimpleView {
@@ -126,6 +126,7 @@ export interface ContractView {
   status: ContractStatus;
   search: string;
   meta: Meta;
+  paymentTerm?: ContractPaymentTermView;
 }
 export interface ContractSimpleView {
   id: string;
@@ -227,7 +228,7 @@ export interface ContractRequestBody {
   invoiceDueDays?: number;
   discounts?: ContractDiscount[];
   noticePeriodInMonth?: number;
-  paymentTerms?: string;
+  paymentTermId?: string;
 }
 
 export interface ContractBasicInfoFormModel {
@@ -250,7 +251,7 @@ export interface ContractTermsFormModal {
   invoiceDueDays?: number;
   discounts?: ContractDiscount[];
   noticePeriodInMonth?: number;
-  paymentTerms?: string;
+  paymentTermId?: string;
 }
 
 export interface ContractUpdateRequest {
@@ -267,7 +268,7 @@ export interface ContractUpdateRequest {
   noticePeriodInMonth?: number;
   firstMaintenance?: FirstMaintenance;
   firstInvoiceDate?: string;
-  paymentTerms?: string;
+  paymentTermId?: string;
   description?: string;
 }
 

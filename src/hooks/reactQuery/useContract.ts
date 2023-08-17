@@ -47,7 +47,6 @@ export const useQueryContract = (
       }),
     {
       ...options,
-      enabled: !!user,
     },
   );
 };
