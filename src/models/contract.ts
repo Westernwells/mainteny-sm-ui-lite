@@ -67,6 +67,7 @@ export interface QueryContractParams {
   status?: string[];
   priceStart: number;
   priceEnd: number;
+  paymentTermId?: string;
 }
 
 export enum InvoiceCyle {
