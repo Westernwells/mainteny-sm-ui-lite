@@ -83,7 +83,7 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
     {
       enabled:
         !!paymentTermId &&
-        contractPaymentTerms.data.filter((item) => item.id === paymentTermId)
+        contractPaymentTerms?.data.filter((item) => item.id === paymentTermId)
           .length > 0,
       refetchOnWindowFocus: false,
     },
@@ -103,7 +103,7 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
       }));
 
       const comparisonResult = compareArrays(
-        contractPaymentTerms.data,
+        contractPaymentTerms?.data,
         filteredValues,
       );
 
@@ -167,7 +167,7 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
 
   const asyncFetchContractResource = async () => {
     if (
-      contractPaymentTerms.data.filter((item) => item.id === paymentTermId)
+      contractPaymentTerms?.data.filter((item) => item.id === paymentTermId)
         .length > 0
     ) {
       const data = await refetchContractResource();
@@ -209,7 +209,7 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
         setPaymentTermId('');
       }
 
-      if (contractPaymentTerms.data.length) {
+      if (contractPaymentTerms?.data.length) {
         formik.setFieldValue('otherPaymentTerms', [
           ...contractPaymentTerms.data,
         ]);
@@ -222,7 +222,7 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
         ]);
       }
     } else {
-      formik.setFieldValue('otherPaymentTerms', contractPaymentTerms.data);
+      formik.setFieldValue('otherPaymentTerms', contractPaymentTerms?.data);
     }
   }, [open]);
 
@@ -231,7 +231,7 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
   }, []);
 
   useEffect(() => {
-    setToggleItems(contractPaymentTerms.data);
+    setToggleItems(contractPaymentTerms?.data);
   }, [contractPaymentTerms]);
 
   return (
