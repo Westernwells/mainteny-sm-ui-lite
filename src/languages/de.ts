@@ -1468,4 +1468,6 @@ export const de = {
   'Remove it from all contracts before deleting here.':
     'Enfernen Sie die Zahlungsbedingung von allen Verträgen, bevor Sie diese löschen.',
   'Contract is created': 'Vertrag ist angelegt',
+  'Deleting this payment term will also remove it from any contracts it’s associated with.':
+    'Wenn Sie diese Zahlungsbedingung löschen, wird sie auch aus allen Verträgen entfernt, in denen sie hinterlegt ist.',
 };
