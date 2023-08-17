@@ -227,10 +227,7 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
         <ArticleItemsTable items={items} setItems={setItems} />
 
         <Box mt="1em">
-          <Pictures
-            elevator={report.elevator}
-            propertyOwnerId={report.elevator.propertyOwner.id}
-          />
+          <Pictures elevator={report.elevator} />
         </Box>
         <Box mt="1em">
           <FormLabel text="Description Of Service" />
