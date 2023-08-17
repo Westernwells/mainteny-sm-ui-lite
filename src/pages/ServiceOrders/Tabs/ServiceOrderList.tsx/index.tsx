@@ -184,19 +184,6 @@ export const ServiceOrderList = () => {
   return (
     <FlexContainer>
       {renderWidget()}
-      <EmptySection
-        label="No orders yet. Please click the button above to add."
-        showActionBtn
-        btnLabel="Add Service Order"
-        btnAction={() => {
-          Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ORDER_BUTTON_CLICKED);
-          navigate('/orders/new?type=regular');
-        }}
-        containerStyle={{
-          height: '100%',
-          mb: '10em',
-        }}
-      />
       <DataGridLayout
         rows={rows}
         columns={columns}
