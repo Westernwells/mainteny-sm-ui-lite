@@ -67,7 +67,6 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {IconButton} from '@mui/material';
 import {useQueryContractPaymentTerms} from 'hooks/reactQuery/useCompanies';
 import {createEmptyResource} from 'utils/paging-utils';
-import {BeneficiaryDetails} from './BeneficiaryDetails';
 import {formatInvoiceRecord} from './utils';
 
 interface Props {
@@ -1039,8 +1038,6 @@ export const InvoiceForm = ({
                 }}
               />
             </Box>
-
-            <BeneficiaryDetails formik={formik} />
           </Box>
         </Box>
       </Box>
