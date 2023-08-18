@@ -30,6 +30,7 @@ import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
 import {ArticleItemsTable} from './ArticleItemsTable';
+import {Pictures} from './Pictures';
 
 interface Props {
   orderId?: string;
@@ -225,6 +226,9 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
 
         <ArticleItemsTable items={items} setItems={setItems} />
 
+        <Box mt="1em">
+          <Pictures elevator={report.elevator} />
+        </Box>
         <Box mt="1em">
           <FormLabel text="Description Of Service" />
           <Typography variant="body2" sx={{py: '0.5rem'}}>
