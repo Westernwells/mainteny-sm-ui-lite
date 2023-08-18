@@ -705,7 +705,7 @@ export const de = {
   Absence: 'Abwesenheit',
   'Search by order type, order number etc.':
     'Suche nach Auftragsart, Auftragsnummer usw.',
-  'ARTICLE NO': 'ARTIKELNUMMER',
+  'ARTICLE NO': 'ARTIKELNR.',
   TIME: 'UHRZEIT',
   to: 'zu',
   'Start Date': 'Startdatum',
