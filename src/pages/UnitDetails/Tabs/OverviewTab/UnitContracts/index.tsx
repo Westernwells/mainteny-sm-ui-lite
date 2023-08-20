@@ -25,7 +25,7 @@ export const UnitContracts = ({containerStyles, contracts}: Props) => {
   useEffect(() => {
     setRows(makeRows(!showAll ? contracts.slice(0, 3) : contracts, formatDate));
   }, [contracts]);
-
+  console.log(contracts, 'contracts');
   const {t} = useTranslation();
   return (
     <InfoCard

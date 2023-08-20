@@ -100,7 +100,7 @@ export const makeRows = (
 ): GridRowsProp =>
   contracts.map((item: ContractSimpleView) => ({
     id: item.id,
-    number: item.number,
+    number: item.externalId,
     contractType: convertToText(item.type),
     startDate: formatDate(new Date(item.startTime)) || '-',
     expiryDate: formatDate(new Date(item.endTime)) || '-',
