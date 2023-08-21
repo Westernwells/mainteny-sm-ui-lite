@@ -21,7 +21,7 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
     headerName: `article no`,
-    flex: 0,
+    flex: 1,
   }),
   getColumnProps({
     field: 'name',
@@ -42,18 +42,21 @@ export const columns: GridColDef[] = [
     field: 'manufacturer',
     headerName: 'manufacturer',
     cellClassName: 'truncateText',
-    flex: 1.5,
+    flex: 1,
   }),
   getColumnProps({
     field: 'description',
     headerName: 'description',
     cellClassName: 'truncateText',
-    flex: 1.5,
+    headerAlign: 'right',
+    flex: 2,
   }),
   getColumnProps({
     field: 'price',
     headerName: 'unit price',
+    headerAlign: 'right',
     align: 'right',
+    flex: 1.5,
   }),
 ];
 

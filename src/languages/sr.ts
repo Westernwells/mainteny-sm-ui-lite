@@ -1435,4 +1435,7 @@ export const sr = {
   'Remove it from all contracts before deleting here.':
     'Uklonite ga iz svih ugovora pre brisanja ovde.',
   'Contract is created': 'Ugovor je napravljen',
+  'Deleting this payment term will also remove it from any contracts it’s associated with.':
+    'Brisanjem ovog uslova plaćanja takođe ćete ga ukloniti iz svih ugovora sa kojima je povezan.',
+  'Add Service Order': 'Dodajte Broj servisa',
 };

@@ -123,7 +123,7 @@ const NewContract = () => {
       invoiceDueDays: 0,
       discounts: [{days: 14, discountPercentage: 0}],
       noticePeriodInMonth: 0,
-      paymentTerms: '',
+      paymentTermId: '',
     },
     onSubmit: () => {},
     validationSchema: validationSchemaContractTerms,
@@ -208,7 +208,7 @@ const NewContract = () => {
       invoiceDueDays: formikContractTerms.values.invoiceDueDays,
       discounts: formikContractTerms.values.discounts,
       noticePeriodInMonth: formikContractTerms.values.noticePeriodInMonth,
-      paymentTerms: formikContractTerms.values.paymentTerms,
+      paymentTermId: formikContractTerms.values.paymentTermId,
     };
 
     await createContract(newContract);

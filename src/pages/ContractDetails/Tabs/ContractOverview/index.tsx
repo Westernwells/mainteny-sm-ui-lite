@@ -111,7 +111,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       noticePeriodInMonth: contractDetails?.additionalInfo?.noticePeriodInMonth,
       firstMaintenance: contractDetails?.additionalInfo?.firstMaintenance,
       firstInvoiceDate: contractDetails?.additionalInfo?.firstInvoiceDate,
-      paymentTerms: contractDetails?.additionalInfo.paymentTerms,
+      paymentTermId: contractDetails?.paymentTerm?.id,
       description: contractDetails?.description,
     },
     onSubmit: () => {},
@@ -153,7 +153,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       noticePeriodInMonth: formik.values.noticePeriodInMonth,
       firstMaintenance: formik.values.firstMaintenance,
       firstInvoiceDate: formik.values.firstInvoiceDate,
-      paymentTerms: formik.values.paymentTerms,
+      paymentTermId: formik.values.paymentTermId,
       description: formik.values.description,
     };
 
@@ -210,11 +210,11 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     );
   };
 
-  const handleContractPaymentTermsModal = (paymentTerms: string) => {
+  const handleContractPaymentTermsModal = (paymentTermId: string) => {
     updateContract(
       {
         body: {
-          paymentTerms,
+          paymentTermId,
         } as Partial<ContractRequestBody>,
         contractId: contractId!,
       },
@@ -245,7 +245,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   }
 
   const uploadedDocument = contractDetails?.additionalInfo?.documents;
-
   return (
     <Box>
       <Grid
@@ -263,7 +262,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             header={
               <Box>
                 <Typography variant="subtitle1">
-                  {contractDetails?.number}
+                  {contractDetails?.externalId}
                 </Typography>
               </Box>
             }
@@ -588,9 +587,9 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             }
             headerActionIcon={<EditIcon />}
             headerAction={() => setOpenContractPaymentTermSelectDialog(true)}>
-            {contractDetails.additionalInfo.paymentTerms ? (
+            {contractDetails?.paymentTerm?.term ? (
               <Typography variant="body2">
-                {contractDetails.additionalInfo.paymentTerms}
+                {contractDetails.paymentTerm.term}
               </Typography>
             ) : (
               <EmptySection
