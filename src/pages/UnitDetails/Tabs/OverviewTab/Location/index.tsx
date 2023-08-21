@@ -52,8 +52,8 @@ export const Location = ({
     'address',
     'building',
     'propertySegment',
-    'keyLocation',
     'parking',
+    'keyLocation',
   ]).current;
 
   const onSave = async () => {

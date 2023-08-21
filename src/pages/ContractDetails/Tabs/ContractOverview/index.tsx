@@ -245,7 +245,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   }
 
   const uploadedDocument = contractDetails?.additionalInfo?.documents;
-
   return (
     <Box>
       <Grid
@@ -263,7 +262,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             header={
               <Box>
                 <Typography variant="subtitle1">
-                  {contractDetails?.number}
+                  {contractDetails?.externalId}
                 </Typography>
               </Box>
             }

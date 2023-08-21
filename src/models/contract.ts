@@ -141,6 +141,7 @@ export interface ContractSimpleView {
   endTime: string;
   search: string;
   status: ContractStatus;
+  externalId: string;
   meta: Meta;
 }
 
