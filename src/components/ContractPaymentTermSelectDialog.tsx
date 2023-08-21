@@ -16,7 +16,7 @@ import {FormSelect} from './form/FormSelect';
 
 interface Props {
   open?: boolean;
-  onSave: (paymentTerms: string) => void;
+  onSave: (paymentTermId: string) => void;
   onCancel: () => void;
   title: string;
   alertText?: string;
@@ -24,7 +24,7 @@ interface Props {
 }
 
 const validationSchema = Yup.object().shape({
-  paymentTerms: Yup.string(),
+  paymentTermId: Yup.string(),
 });
 
 const pageSize = 50;
@@ -40,14 +40,14 @@ export const ContractPaymentTermSelectDialog = ({
   const {t} = useTranslation();
 
   const formik = useFormik<{
-    paymentTerms: string;
+    paymentTermId: string;
   }>({
     isInitialValid: false,
     initialValues: {
-      paymentTerms: '',
+      paymentTermId: '',
     },
     onSubmit: (values, {resetForm}) => {
-      onSave(values.paymentTerms);
+      onSave(values.paymentTermId);
       resetForm();
       onCancel();
     },
@@ -92,20 +92,20 @@ export const ContractPaymentTermSelectDialog = ({
         <FormSelect
           labelId="Payment Terms"
           label={t('Payment Terms')}
-          options={contractPaymentTerms?.data?.map(({term}) => ({
+          options={contractPaymentTerms?.data?.map(({term, id}) => ({
             label: term,
-            value: term,
+            value: id,
           }))}
           selectProps={{
-            id: 'paymentTerms',
-            value: formik.values.paymentTerms
-              ? formik.values.paymentTerms
-              : undefined,
+            id: 'paymentTermId',
+            value: formik.values.paymentTermId
+              ? formik.values.paymentTermId
+              : '',
             onChange: formik.handleChange,
-            name: 'paymentTerms',
+            name: 'paymentTermId',
             placeholder: t('Choose your payment term'),
             error: !!(
-              formik.touched.paymentTerms && formik.errors.paymentTerms
+              formik.touched.paymentTermId && formik.errors.paymentTermId
             ),
           }}
           onClickPaymentTerms={onClickPaymentTerms}

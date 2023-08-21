@@ -184,7 +184,6 @@ export const ServiceOrderList = () => {
   return (
     <FlexContainer>
       {renderWidget()}
-
       <DataGridLayout
         rows={rows}
         columns={columns}

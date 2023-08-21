@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useFormik, getIn} from 'formik';
 import * as Yup from 'yup';
@@ -23,6 +23,10 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useQueryContractPaymentTerms} from 'hooks/reactQuery/useCompanies';
 import {createEmptyResource} from 'utils/paging-utils';
 import {compareArrays} from 'utils/contract-terms';
+import DeleteIcon from '@mui/icons-material/Delete';
+import {Order} from 'models/misc';
+import {useQueryContract} from 'hooks/reactQuery/useContract';
+import {ContractOrderField} from 'models/contract';
 import {FormInput} from './form/FormInput';
 
 interface Props {
@@ -45,6 +49,12 @@ const pageSize = 50;
 export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
+  const [isShow, setIsShow] = useState(false);
+  const [paymentTermId, setPaymentTermId] = useState('');
+  const [toggleItems, setToggleItems] = useState<
+    {id: string; term: string; isShow?: boolean}[]
+  >([]);
+
   const {mutate: createContractPaymentTerm} = useCreateContractPaymentTerm();
   const {mutateAsync: updateContractPaymentTerm} =
     useUpdateContractPaymentTerm();
@@ -59,6 +69,26 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
       query: '',
     });
 
+  const {refetch: refetchContractResource} = useQueryContract(
+    {
+      order: Order.DESC,
+      orderBy: ContractOrderField.CREATED_TIME,
+      pageIndex: 0,
+      pageSize: 25,
+      query: '',
+      priceStart: -9999999,
+      priceEnd: 9999999,
+      paymentTermId: encodeURI(paymentTermId),
+    },
+    {
+      enabled:
+        !!paymentTermId &&
+        contractPaymentTerms?.data.filter((item) => item.id === paymentTermId)
+          .length > 0,
+      refetchOnWindowFocus: false,
+    },
+  );
+
   const formik = useFormik<{
     otherPaymentTerms: {id: string; term: string}[];
   }>({
@@ -67,9 +97,14 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
       otherPaymentTerms: [],
     },
     onSubmit: (values, {resetForm}) => {
+      const filteredValues = values.otherPaymentTerms.map((item) => ({
+        id: item.id,
+        term: item.term,
+      }));
+
       const comparisonResult = compareArrays(
-        contractPaymentTerms.data,
-        values.otherPaymentTerms,
+        contractPaymentTerms?.data,
+        filteredValues,
       );
 
       if (comparisonResult.itemsInFirstOnly) {
@@ -111,6 +146,45 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
     validationSchema,
   });
 
+  const handleToggle = (id: string) => {
+    const modifiedItems = toggleItems?.map((item) => {
+      if (item.id === id) {
+        setIsShow(!item.isShow);
+        return {...item, isShow: true};
+      }
+      return item;
+    });
+    setToggleItems(modifiedItems);
+  };
+
+  const removeTerm = (id: string) => {
+    formik.setFieldValue(
+      'otherPaymentTerms',
+      toggleItems.filter((pt) => pt.id !== id),
+    );
+    setIsShow(false);
+  };
+
+  const asyncFetchContractResource = async () => {
+    if (
+      contractPaymentTerms?.data.filter((item) => item.id === paymentTermId)
+        .length > 0
+    ) {
+      const data = await refetchContractResource();
+      if (data.data?.total! > 0) {
+        handleToggle(paymentTermId);
+      } else {
+        removeTerm(paymentTermId);
+      }
+    } else {
+      removeTerm(paymentTermId);
+    }
+  };
+
+  useEffect(() => {
+    asyncFetchContractResource();
+  }, [paymentTermId]);
+
   const addNewTerm = () => {
     formik.setFieldValue('otherPaymentTerms', [
       ...formik.values.otherPaymentTerms,
@@ -121,16 +195,21 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
     ]);
   };
 
-  const removeTerm = (id: string) => {
-    formik.setFieldValue(
-      'otherPaymentTerms',
-      formik.values.otherPaymentTerms.filter((pt) => pt.id !== id),
-    );
-  };
+  useEffect(() => {
+    const newItems = formik.values.otherPaymentTerms.map((item) => ({
+      ...item,
+      isShow: false,
+    }));
+    setToggleItems(newItems);
+  }, [formik.values.otherPaymentTerms]);
 
   useEffect(() => {
     if (open) {
-      if (contractPaymentTerms.data.length) {
+      if (paymentTermId !== '') {
+        setPaymentTermId('');
+      }
+
+      if (contractPaymentTerms?.data.length) {
         formik.setFieldValue('otherPaymentTerms', [
           ...contractPaymentTerms.data,
         ]);
@@ -142,13 +221,26 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
           },
         ]);
       }
+    } else {
+      formik.setFieldValue('otherPaymentTerms', contractPaymentTerms?.data);
     }
   }, [open]);
+
+  useEffect(() => {
+    setIsShow(false);
+  }, []);
+
+  useEffect(() => {
+    setToggleItems(contractPaymentTerms?.data);
+  }, [contractPaymentTerms]);
 
   return (
     <Dialog
       open={open || false}
-      onClose={onCancel}
+      onClose={() => {
+        onCancel();
+        setIsShow(false);
+      }}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       fullWidth
@@ -167,30 +259,41 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
       </DialogTitle>
 
       <DialogContent sx={{pb: 1}}>
-        <Alert severity="warning" sx={{mt: '1em', mb: '1em', py: '1em'}}>
-          <Typography
-            sx={{
-              fontWeight: '600',
-              marginTop: '-0.3em',
-              marginBottom: '0.3em',
-            }}>
-            {t('Payment terms used')} <br />
-          </Typography>
+        {isShow ? (
+          <Alert severity="warning" sx={{mt: '1em', mb: '1em', py: '1em'}}>
+            <Typography
+              sx={{
+                fontWeight: '600',
+                marginTop: '-0.3em',
+                marginBottom: '0.3em',
+              }}>
+              {t('Payment terms used')} <br />
+            </Typography>
 
-          <Typography
-            sx={{
-              lineHeight: '1.4',
-              fontSize: '1em',
-              letterSpacing: '0.02em',
-            }}>
-            {t('This payment term is linked to one or more contracts.')}
-            <br />
-            {t('Remove it from all contracts before deleting here.')}
-          </Typography>
-        </Alert>
+            <Typography
+              sx={{
+                lineHeight: '1.4',
+                fontSize: '1em',
+                letterSpacing: '0.02em',
+              }}>
+              {t(
+                `Deleting this payment term will also remove it from any contracts it’s associated with.`,
+              )}
+            </Typography>
+          </Alert>
+        ) : (
+          <Alert severity="info" sx={{mt: '1em', mb: '1em', py: '0.6em'}}>
+            <Typography>
+              {t(
+                'Add your payment terms that would be used later in invoicing',
+              )}
+              <br />
+            </Typography>
+          </Alert>
+        )}
 
         <Grid container rowSpacing={2} pt={1} pb={2}>
-          {formik.values.otherPaymentTerms.map?.((pt, index) => (
+          {toggleItems.map?.((pt, index) => (
             <Grid
               container
               item
@@ -204,7 +307,7 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
                     placeholder: t('Write your term here'),
                     variant: 'outlined',
                     type: 'text',
-                    value: formik.values.otherPaymentTerms[index].term,
+                    value: toggleItems[index].term,
                     error: !!(
                       getIn(formik.touched, `otherPaymentTerms[${index}]`) &&
                       getIn(formik.errors, `otherPaymentTerms[${index}]`)
@@ -227,9 +330,21 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
                 />
               </Grid>
               <Grid container item xs={1} justifyContent="center">
-                <IconButton onClick={() => removeTerm(pt.id)}>
-                  <Close />
-                </IconButton>
+                {pt.isShow ? (
+                  <IconButton onClick={() => removeTerm(pt.id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                ) : (
+                  <IconButton
+                    onClick={() => {
+                      setPaymentTermId(pt.id);
+                      if (paymentTermId === pt.id) {
+                        asyncFetchContractResource();
+                      }
+                    }}>
+                    <Close />
+                  </IconButton>
+                )}
               </Grid>
             </Grid>
           ))}

@@ -974,7 +974,7 @@ export const sr = {
   'Sorry, there was an error while deleting the todo. Please try again.':
     'Žao nam je, došlo je do greške prilikom brisanja obaveze. Molim Vas, pokušajte ponovo.',
   'Invoice sent successfully': 'Faktura je uspješno poslana',
-  'Invoice marked as paid': 'Faktura je označena kao plaćena',
+  'Invoice marked as paid!': 'Faktura je označena kao plaćena!',
   'Invoice created successfully': 'Faktura je uspješno napravljena',
   'Invoice updated successfully': 'Faktura je uspješno ažurirana',
   'Invoice deleted successfully': 'Faktura je uspješno izbrisana',
@@ -1434,4 +1434,8 @@ export const sr = {
     'Ova klauzula plaćanja je povezana sa jednim ili više ugovora.',
   'Remove it from all contracts before deleting here.':
     'Uklonite ga iz svih ugovora pre brisanja ovde.',
+  'Contract is created': 'Ugovor je napravljen',
+  'Deleting this payment term will also remove it from any contracts it’s associated with.':
+    'Brisanjem ovog uslova plaćanja takođe ćete ga ukloniti iz svih ugovora sa kojima je povezan.',
+  'Add Service Order': 'Dodajte Broj servisa',
 };
