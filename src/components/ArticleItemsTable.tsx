@@ -344,6 +344,19 @@ export const ArticleItemsTable = ({
     isFetchedCreditNoteArticle,
   ]);
 
+  useEffect(() => {
+    setItems((prev) =>
+      prev.map((item) => ({
+        ...item,
+        unitAmount: {
+          ...item.unitAmount,
+          percentageVat,
+        },
+      })),
+    );
+  }, [percentageVat]);
+  console.log(items, 'items');
+
   const renderHeader = () => (
     <Box
       px=".5em"
@@ -583,6 +596,9 @@ export const ArticleItemsTable = ({
                           partialPrice * (percentageVat / 100),
                           {
                             currency: currentCurrency.code,
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                            roundingMode: 'floor',
                           },
                           selectedLng,
                         )
@@ -590,6 +606,9 @@ export const ArticleItemsTable = ({
                           totalPrice * (percentageVat / 100),
                           {
                             currency: currentCurrency.code,
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                            roundingMode: 'floor',
                           },
                           selectedLng,
                         )}
@@ -617,6 +636,9 @@ export const ArticleItemsTable = ({
                           partialPrice * (1 + percentageVat / 100),
                           {
                             currency: currentCurrency.code,
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                            roundingMode: 'floor',
                           },
                           selectedLng,
                         )
@@ -624,6 +646,9 @@ export const ArticleItemsTable = ({
                           totalPrice * (1 + percentageVat / 100),
                           {
                             currency: currentCurrency.code,
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                            roundingMode: 'floor',
                           },
                           selectedLng,
                         )}
