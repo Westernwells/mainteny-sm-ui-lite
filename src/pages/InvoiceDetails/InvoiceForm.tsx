@@ -74,6 +74,7 @@ interface Props {
   serviceOrderResource?: ServiceOrderView;
   formType?: 'new' | 'edit';
   invoiceType?: InvoiceType;
+  customer?: PropertyOwnerView;
 }
 
 const payment = {
@@ -106,6 +107,7 @@ export const InvoiceForm = ({
   serviceOrderResource,
   formType = 'new',
   invoiceType,
+  customer: customerByProp,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -146,7 +148,7 @@ export const InvoiceForm = ({
 
   const [customer, setCustomer] = useState<
     PropertyOwnerView | PropertyOwnerSimpleView | undefined
-  >(undefined);
+  >(customerByProp);
   const [serviceOrder, setServiceOrder] = useState<
     ServiceOrderView | undefined
   >(serviceOrderResource ?? undefined);

@@ -4,13 +4,19 @@ import Box from '@mui/material/Box';
 import {Progress} from 'components/Progress';
 import {useServiceOrderDetails} from 'hooks/reactQuery/useServiceOrder';
 import {useInvoiceDetail} from 'hooks/reactQuery/useInvoice';
+import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {InvoiceType} from 'models/invoice';
 import {InvoiceForm} from './InvoiceForm';
 
 export const NewInvoice = () => {
   const {search} = useLocation();
 
-  const {orderId, invoiceId = '', invoiceType = ''} = queryString.parse(search);
+  const {
+    orderId,
+    invoiceId = '',
+    invoiceType = '',
+    customerId = '',
+  } = queryString.parse(search);
 
   const {data: serviceOrderDetails, isLoading} =
     typeof orderId === 'string'
@@ -22,7 +28,12 @@ export const NewInvoice = () => {
       ? useInvoiceDetail(invoiceId)
       : {data: undefined, isLoading: false};
 
-  if (isLoading || isLoadingInvoice) {
+  const {data: customer, isLoading: isLoadingCustomer} =
+    typeof customerId === 'string'
+      ? useGetCustomer(customerId)
+      : {data: undefined, isLoading: false};
+
+  if (isLoading || isLoadingInvoice || isLoadingCustomer) {
     return (
       <Box
         display="flex"
@@ -38,6 +49,7 @@ export const NewInvoice = () => {
       serviceOrderResource={serviceOrderDetails}
       invoice={invoice}
       invoiceType={invoiceType as InvoiceType}
+      customer={customer}
     />
   );
 };
