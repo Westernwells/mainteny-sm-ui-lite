@@ -3,6 +3,7 @@ import {
   AddressRecord,
   Contact,
   Meta,
+  Order,
   Priority,
   WithOptional,
 } from './misc';
@@ -74,6 +75,12 @@ export interface PropertyManager {
   meta: Meta;
 }
 
+export enum PropertyOwnerOrderField {
+  CREATED_TIME = 'CREATED_TIME',
+  NAME = 'NAME',
+  XERO_LAST_SYNC_TIME = 'XERO_LAST_SYNC_TIME',
+}
+
 export interface QueryPropertyOwnersParams {
   pageIndex: number;
   pageSize: number;
@@ -81,6 +88,8 @@ export interface QueryPropertyOwnersParams {
   serviceCompanyId: string;
   unitNumberStart?: number;
   unitNumberEnd?: number;
+  order?: Order;
+  orderBy?: PropertyOwnerOrderField;
 }
 
 export interface ContactPropertyOwner extends Contact {

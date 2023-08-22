@@ -64,10 +64,14 @@ const createCustomer = async (body: NewCustomerBody): Promise<StringValue> => {
 
 export const useCreateCustomer = (successMsg: string) => {
   const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
   return useMutation((body: NewCustomerBody) => createCustomer(body), {
     onSuccess: () => {
       enqueueSnackbar(successMsg, {
         variant: 'success',
+      });
+      queryClient.invalidateQueries(queryKeys.queryCustomers, {
+        refetchInactive: true,
       });
     },
     onError: (err) => {
