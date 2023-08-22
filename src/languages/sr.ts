@@ -1438,4 +1438,5 @@ export const sr = {
   'Deleting this payment term will also remove it from any contracts it’s associated with.':
     'Brisanjem ovog uslova plaćanja takođe ćete ga ukloniti iz svih ugovora sa kojima je povezan.',
   'Add Service Order': 'Dodajte Broj servisa',
+  'Total amount (excl VAT)': 'Ukupna suma ( bez PDV-a )',
 };

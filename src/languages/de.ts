@@ -428,7 +428,7 @@ export const de = {
   'Select Supplier': 'Lieferant auswählen',
   'Purchase order number': 'Kundenbestellnummer',
   'Full invoice': 'Gesamtrechnung',
-  'Partial invoice': 'Teilrechnung',
+  'Partial invoice': 'Abschlag',
   'Credit Note invoice': 'Gutschrift',
   'Print order': 'Bestellung drucken',
   'The PDFs are not generated yet.': 'Die PDFs sind noch nicht erstellt.',
@@ -1471,4 +1471,6 @@ export const de = {
   'Deleting this payment term will also remove it from any contracts it’s associated with.':
     'Wenn Sie diese Zahlungsbedingung löschen, wird sie auch aus allen Verträgen entfernt, in denen sie hinterlegt ist.',
   'Add Service Order': 'Neuer Auftrag',
+  'Password created successfully': 'Passwort wurde erfolgreich geändert',
+  'Total amount (excl VAT)': 'Gesamtbetrag(ohne MwSt.)',
 };
