@@ -1439,4 +1439,5 @@ export const sr = {
     'Brisanjem ovog uslova plaćanja takođe ćete ga ukloniti iz svih ugovora sa kojima je povezan.',
   'Add Service Order': 'Dodajte Broj servisa',
   'Total amount (excl VAT)': 'Ukupna suma ( bez PDV-a )',
+  Final: 'Konačni',
 };

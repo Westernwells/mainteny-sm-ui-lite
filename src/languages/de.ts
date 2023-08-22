@@ -1473,4 +1473,5 @@ export const de = {
   'Add Service Order': 'Neuer Auftrag',
   'Password created successfully': 'Passwort wurde erfolgreich geändert',
   'Total amount (excl VAT)': 'Gesamtbetrag(ohne MwSt.)',
+  Final: 'Abschluss',
 };
