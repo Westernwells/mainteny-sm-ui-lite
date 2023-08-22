@@ -1438,4 +1438,18 @@ export const sr = {
   'Deleting this payment term will also remove it from any contracts it’s associated with.':
     'Brisanjem ovog uslova plaćanja takođe ćete ga ukloniti iz svih ugovora sa kojima je povezan.',
   'Add Service Order': 'Dodajte Broj servisa',
+  'Automatic ID generation': 'Automatsko generisanje ID-a',
+  'Auto generated ID': 'Automatski generisani ID',
+  'Any service with disabled auto ID generation will need to be populated manually.':
+    'Svaka usluga sa onemogućenim automatskim generisanjem ID-a moraće da se popuni ručno.',
+  'Configure and enable to populate automatically.':
+    'Konfigurišite i omogućite automatsko popunjavanje.',
+  '# of digits': 'Broj cifara',
+  Prefix: 'Prefiks',
+  'Start from': 'Početi od',
+  Disabled: 'Onemogućeno',
+  Enabled: 'Omogućeno',
+  'Purchase Order': 'Porudžbina',
+  'Document not ready': 'Dokument nije spreman',
+  Employee: 'Zaposleni',
 };

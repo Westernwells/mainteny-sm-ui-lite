@@ -1471,4 +1471,18 @@ export const de = {
   'Deleting this payment term will also remove it from any contracts it’s associated with.':
     'Wenn Sie diese Zahlungsbedingung löschen, wird sie auch aus allen Verträgen entfernt, in denen sie hinterlegt ist.',
   'Add Service Order': 'Neuer Auftrag',
+  'Automatic ID generation': 'Automatische ID-Generierung',
+  'Auto generated ID': 'Automatisch generierte ID',
+  'Any service with disabled auto ID generation will need to be populated manually.':
+    'Jede Kategorie, bei dem die automatische ID-Generierung deaktiviert ist, muss manuell ausgefüllt werden.',
+  'Configure and enable to populate automatically.':
+    'Konfigurieren und aktivieren Sie die automatische ID-Generierung.',
+  '# of digits': '# Anzahl der Nummern',
+  Prefix: 'Präfix',
+  'Start from': 'Start von',
+  Disabled: 'Deaktiviert',
+  Enabled: 'Aktiviert',
+  'Purchase Order': 'Bestellnummer',
+  'Document not ready': 'Dokument nicht versandfertig',
+  Employee: 'Mitarbeiter',
 };
