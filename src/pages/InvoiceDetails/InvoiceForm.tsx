@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import printJS from 'print-js';
@@ -60,7 +60,7 @@ import {Amount, PdfGenerationStatus, WithOptional} from 'models/misc';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {Notes} from 'pages/InvoiceDetails/Notes';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {convertToText} from 'utils/utils';
+import {convertToText, formatSearchParams} from 'utils/utils';
 import {addYears} from 'date-fns';
 import {InvoiceCheckbox} from 'pages/InvoiceDetails/InvoiceCheckbox';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -68,12 +68,14 @@ import {IconButton} from '@mui/material';
 import {useQueryContractPaymentTerms} from 'hooks/reactQuery/useCompanies';
 import {createEmptyResource} from 'utils/paging-utils';
 import {formatInvoiceRecord} from './utils';
+import NewCustomer from './NewCustomer';
 
 interface Props {
   invoice?: InvoiceView;
   serviceOrderResource?: ServiceOrderView;
   formType?: 'new' | 'edit';
   invoiceType?: InvoiceType;
+  customer?: PropertyOwnerView;
 }
 
 const payment = {
@@ -106,11 +108,13 @@ export const InvoiceForm = ({
   serviceOrderResource,
   formType = 'new',
   invoiceType,
+  customer: customerByProp,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const formatDate = useFormatDate();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const {user} = useUserSession();
 
@@ -128,6 +132,8 @@ export const InvoiceForm = ({
   );
 
   const [isDrawerOpen] = useState<boolean>(true);
+  const [isAddNewCustomerDialogOpen, setIsAddNewCustomerDialogOpen] =
+    useState<boolean>(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
@@ -146,7 +152,7 @@ export const InvoiceForm = ({
 
   const [customer, setCustomer] = useState<
     PropertyOwnerView | PropertyOwnerSimpleView | undefined
-  >(undefined);
+  >(customerByProp);
   const [serviceOrder, setServiceOrder] = useState<
     ServiceOrderView | undefined
   >(serviceOrderResource ?? undefined);
@@ -519,6 +525,10 @@ export const InvoiceForm = ({
     formik.setFieldValue(addressType, undefined);
   };
 
+  const setNewlyCreatedCustomer = (customerId: string) => {
+    setSearchParams(formatSearchParams({customerId}, searchParams));
+  };
+
   return (
     <Box>
       {invoice && (
@@ -600,7 +610,7 @@ export const InvoiceForm = ({
                         buttonProps={{
                           size: 'small',
                           startIcon: <AddIcon />,
-                          onClick: () => navigate('/customers/new'),
+                          onClick: () => setIsAddNewCustomerDialogOpen(true),
                         }}
                       />
                     </Box>
@@ -1066,6 +1076,11 @@ export const InvoiceForm = ({
             />
           ) : null
         }
+      />
+      <NewCustomer
+        isDialogOpen={isAddNewCustomerDialogOpen}
+        onClose={() => setIsAddNewCustomerDialogOpen(false)}
+        onSave={setNewlyCreatedCustomer}
       />
       <SendEmailDialog
         open={isSendEmailDialogOpen}
