@@ -1474,4 +1474,11 @@ export const de = {
   'Password created successfully': 'Passwort wurde erfolgreich geändert',
   'Total amount (excl VAT)': 'Gesamtbetrag(ohne MwSt.)',
   Final: 'Abschluss',
+  'Send Overdue Notice': 'Mahnung senden',
+  'Overdue Notice': 'Mahnung',
+  'Customer Address': 'Kundenadresse',
+  'Initial amount': 'Rechnungssumme',
+  'Handling fee': 'Mahngebühr',
+  'The invoice is overdue [XX] days. We remind you to please pay the outstanding amount.':
+    'Die Rechnung ist seit [XX] Tagen überfällig. Wir erinnern Sie daran, den ausstehenden Betrag zu begleichen.',
 };

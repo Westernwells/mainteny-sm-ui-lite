@@ -1440,4 +1440,11 @@ export const sr = {
   'Add Service Order': 'Dodajte Broj servisa',
   'Total amount (excl VAT)': 'Ukupna suma ( bez PDV-a )',
   Final: 'Konačni',
+  'Send Overdue Notice': 'Pošaljite obaveštenje o kašnjenju',
+  'Overdue Notice': 'Obaveštenje o kašnjenju',
+  'Customer Address': 'Adresa klijenta',
+  'Initial amount': 'Početni iznos',
+  'Handling fee': 'Naknadna za obradu',
+  'The invoice is overdue [XX] days. We remind you to please pay the outstanding amount.':
+    'Faktura kasni [XX] dana. Podsećamo vas da platite neplaćeni iznos.',
 };
