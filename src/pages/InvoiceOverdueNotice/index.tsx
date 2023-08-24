@@ -182,7 +182,7 @@ export const InvoiceOverdueNotice = () => {
             flexDirection: 'column',
             gap: '1.5rem',
           }}>
-          <Typography variant="h6">Overdue notice</Typography>
+          <Typography variant="h6">{t('Overdue Notice')}</Typography>
           <Box>
             <FormLabel text={t('From')} />
             <Box
@@ -234,7 +234,7 @@ export const InvoiceOverdueNotice = () => {
           <FormInput
             props={{
               name: 'invoiceNumber',
-              label: t('Invoice number'),
+              label: t('Invoice Number'),
               variant: 'outlined',
               value: formik.values.invoiceNumber,
               error: !!(
@@ -345,7 +345,7 @@ export const InvoiceOverdueNotice = () => {
             display="flex"
             justifyContent="space-between">
             <Typography sx={{color: 'primary.contrastText'}}>
-              {t('Total amount')}
+              {t('Total Amount')}
               <Typography variant="caption" component="span" ml="1ch">
                 {t('(incl VAT)')}
               </Typography>
