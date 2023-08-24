@@ -269,7 +269,7 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
         creationDate: Date.now(),
       });
       resetLocalStorage();
-      navigate(`/customers/details/${response.value}?tab=0`, {replace: true});
+      navigate(`/invoices/new?customerId=${response.value}`, {replace: true});
     }
   };
 
