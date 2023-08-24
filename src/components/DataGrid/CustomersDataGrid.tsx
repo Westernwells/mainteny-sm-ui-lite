@@ -1,14 +1,18 @@
 import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router';
 import Box from '@mui/material/Box';
 import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
+import NewCustomer from 'pages/InvoiceDetails/NewCustomer';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
 import {Button} from 'components/Button';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
-import {PropertyOwnerView} from 'models/propertyManager';
+import {
+  PropertyOwnerOrderField,
+  PropertyOwnerView,
+} from 'models/propertyManager';
+import {Order} from 'models/misc';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useCompanyXeroInfo} from 'hooks/reactQuery/useCompanies';
@@ -64,7 +68,8 @@ const pageSize = 25;
 
 export const CustomersDataGrid = ({setRowItem}: Props) => {
   const {user} = useUserSession();
-  const navigate = useNavigate();
+  const [isAddNewCustomerDialogOpen, setIsAddNewCustomerDialogOpen] =
+    useState<boolean>(false);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -88,6 +93,8 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: encodeURIComponent(search!!),
+      order: Order.DESC,
+      orderBy: PropertyOwnerOrderField.CREATED_TIME,
     },
     {
       keepPreviousData: true,
@@ -143,7 +150,7 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
           buttonProps={{
             size: 'small',
             startIcon: <AddIcon />,
-            onClick: () => navigate('/customers/new'),
+            onClick: () => setIsAddNewCustomerDialogOpen(true),
             variant: 'outlined',
             sx: {
               background: 'transparent',
@@ -174,8 +181,18 @@ export const CustomersDataGrid = ({setRowItem}: Props) => {
               action={() => window.open('/customers/new', '_blank')}
             />
           }
+          containerStyle={{
+            '& .MuiDataGrid-columnHeader, & .MuiDataGrid-cell': {
+              padding: '0 1.75rem',
+            },
+          }}
         />
       </Box>
+      <NewCustomer
+        isDialogOpen={isAddNewCustomerDialogOpen}
+        onClose={() => setIsAddNewCustomerDialogOpen(false)}
+        onSave={() => setIsAddNewCustomerDialogOpen(false)}
+      />
     </>
   );
 };

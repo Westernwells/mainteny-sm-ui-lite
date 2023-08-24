@@ -93,6 +93,7 @@ export const SelectAndEditCombined = ({
         title={modalHeader}
         onCancel={onCloseDialog}
         onSave={() => setIsModalOpen(false)}
+        disableSaveBtn={!formik.values?.[addressType]?.fullName}
         dialogProps={{
           maxWidth: 'md',
           open: isModalOpen || false,

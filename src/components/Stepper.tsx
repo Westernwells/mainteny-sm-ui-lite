@@ -20,6 +20,7 @@ interface Props {
   getActiveStep?: (val: number) => void;
   disableNextBtn?: boolean;
   submitting?: boolean;
+  disableNavigateBack?: boolean;
 }
 
 export const Stepper = ({
@@ -34,6 +35,7 @@ export const Stepper = ({
   stepperStyles,
   stepperWidth,
   submitting,
+  disableNavigateBack = false,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -90,7 +92,7 @@ export const Stepper = ({
             <Button
               onClick={() => {
                 setActiveStep(0);
-                if (activeStep === 0) {
+                if (activeStep === 0 && !disableNavigateBack) {
                   navigate(-1);
                 } else {
                   handleCancel();
