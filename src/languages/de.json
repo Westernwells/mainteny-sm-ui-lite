@@ -1213,7 +1213,7 @@
   "DATE FORMAT": "DATUMSFORMAT",
   "TIME FORMAT": "ZEITFORMAT",
   "TIME ZONE": "ZEITZONE",
-  "MANAGING DIRECTOR": "GESCHÄFTSFÜHRER",
+  "MANAGING DIRECTOR": "GESCHÄFTSFÜHER:IN",
   "ARBITRATION COURT": "REGISTERGERICHT",
   "TRADE REGISTER NUMBER": "HANDELSREGISTERNUMMER",
   "ACCOUNT NUMBER": "KONTONUMMER",
@@ -1414,5 +1414,15 @@
   "Handling fee": "Mahngebühr",
   "The invoice is overdue [XX] days. We remind you to please pay the outstanding amount.": "Die Rechnung ist seit [XX] Tagen überfällig. Wir erinnern Sie daran, den ausstehenden Betrag zu begleichen.",
   "©2023 Mainteny. All rights reserved.": "©2023 Mainteny. Alle Rechte vorbehalten.",
-  "Mainteny® is a registered trademark.": "Mainteny® ist eine registrierte Marke."
+  "Mainteny® is a registered trademark.": "Mainteny® ist eine registrierte Marke.",
+  "CONTRACT NAME": "VERTRAGSNAME",
+  "MAINTENANCE": "WARTUNG",
+  "REPAIR": "REPARATUR",
+  "CALLOUT": "STÖRUNG",
+  "EMERGENCY": "PERSONENEINSCHLUSS",
+  "INSPECTION": "ZÜS PRÜFUNG",
+  "INSTALLATION": "INSTALLATION",
+  "ARTICLE NAME": "ARTIKELBEZEICHNUNG",
+  "YEAR BUILT": "BAUJAHR",
+  "INVOICE CYCLE": "RECHNUNGSZYKLUS"
 }
