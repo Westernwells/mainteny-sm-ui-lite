@@ -6,12 +6,17 @@ import {isEqual, omit} from 'lodash';
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {Priority} from 'models/service-order';
-import {useCreateCustomer} from 'hooks/reactQuery/useCustomers';
+import {
+  useCreateCustomer,
+  useQueryCustomers,
+} from 'hooks/reactQuery/useCustomers';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
+import {PropertyOwnerView} from 'models/propertyManager';
+import {createEmptyResource} from 'utils/paging-utils';
 import {
   CustomerAddressFormModel,
   CustomerBasicInfoFormModel,
@@ -159,9 +164,23 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
     }
   }, []);
 
+  const {data: customerResource = createEmptyResource<PropertyOwnerView>(50)} =
+    useQueryCustomers(
+      {
+        pageIndex: 0,
+        pageSize: 50,
+        query: formikBasicInfo.values.externalId,
+      },
+      {keepPreviousData: true},
+    );
+
   useEffect(() => {
     if (
       (activeStep === 0 && Object.keys(formikBasicInfo.errors).length) ||
+      (formikBasicInfo.values.externalId &&
+        customerResource.data.filter(
+          (item) => item.externalId === formikBasicInfo.values.externalId,
+        ).length > 0) ||
       (activeStep === 1 && Object.keys(formikAddress.errors).length) ||
       (activeStep === 2 && Object.keys(formikContactPersons.errors).length)
     ) {
@@ -272,7 +291,10 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       <FlexContainer>
         {activeStep === 0 ? (
           <FlexContainer containerStyle={{mt: '2em'}}>
-            <BasicCustomerForm formik={formikBasicInfo} />
+            <BasicCustomerForm
+              formik={formikBasicInfo}
+              customerResource={customerResource.data}
+            />
           </FlexContainer>
         ) : activeStep === 1 ? (
           <FlexContainer containerStyle={{mt: '2em'}}>

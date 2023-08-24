@@ -989,6 +989,7 @@ export const sr = {
   'Sorry! User account creation failed. Please try again.':
     'Izvinjavam se! Kreiranje korisničkog naloga nije uspelo. Molim Vas, pokušajte ponovo.',
   'updated successfully.': 'je uspješno ažuriran.',
+  'Updated successfully.': 'Je uspješno ažuriran.',
   'Sorry! Unable to save changes right now. Please try again.':
     'Izvinjavam se! Trenutno nije moguće sačuvati promene. Molim Vas, pokušajte ponovo.',
   'Article created successfully': 'Artikal je uspješno kreiran',

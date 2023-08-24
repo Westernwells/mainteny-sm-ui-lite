@@ -197,7 +197,7 @@ export interface StringValueResponse {
 }
 
 export interface AutoNumberConfigRecord {
-  type: string;
+  type: ServiceCompanyNumberType;
   prefix?: string;
   numberOfDigits?: number;
   enabled?: boolean;

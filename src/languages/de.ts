@@ -996,6 +996,7 @@ export const de = {
   'Sorry! User account creation failed. Please try again.':
     'Es tut uns leid! Die Erstellung des Benutzerkontos ist fehlgeschlagen. Bitte versuchen Sie erneut.',
   'updated successfully.': 'wurde erfolgreich aktualisiert.',
+  'Updated successfully.': 'Wurde erfolgreich aktualisiert.',
   'Sorry! Unable to save changes right now. Please try again.':
     'Es tut uns leid! Änderungen können derzeit nicht gespeichert werden. Bitte versuchen Sie es erneut.',
   'Article created successfully': 'Der Artikel wurde erfolgreich erstellt',

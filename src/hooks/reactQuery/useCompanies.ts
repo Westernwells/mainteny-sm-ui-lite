@@ -20,7 +20,6 @@ import {
   ServiceCompanyUpdateBody,
   SystemSettingsUpdateBody,
   XeroIntegration,
-  AutoNumberConfigRecord,
 } from 'models/service-company';
 import {
   useInfiniteQuery,
