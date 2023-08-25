@@ -15,7 +15,7 @@ export const de = {
   meters: 'Zähler',
 
   // LOGIN
-  'Service Manager Portal': 'Service Manager Portal',
+  'Service Manager Portal': 'Büroanwendung',
   'The unified Application made for Service Managers with smart job assignments, real-time overview of Units under Maintenance (UuM) and out-of-the-box ERP Integrations!':
     'Das Dashboard für Service Manager mit intelligenter Ressourcenzuteilung, Echtzeit-Übersicht des Anlagenportfolios und sofort einsatzbereite ERP-Integrationen!',
   Login: 'Anmelden',
@@ -428,7 +428,7 @@ export const de = {
   'Select Supplier': 'Lieferant auswählen',
   'Purchase order number': 'Kundenbestellnummer',
   'Full invoice': 'Gesamtrechnung',
-  'Partial invoice': 'Teilrechnung',
+  'Partial invoice': 'Abschlag',
   'Credit Note invoice': 'Gutschrift',
   'Print order': 'Bestellung drucken',
   'The PDFs are not generated yet.': 'Die PDFs sind noch nicht erstellt.',
@@ -1486,4 +1486,18 @@ export const de = {
   'Purchase Order': 'Bestellnummer',
   'Document not ready': 'Dokument nicht versandfertig',
   Employee: 'Mitarbeiter',
+  'Password created successfully': 'Passwort wurde erfolgreich geändert',
+  'Total amount (excl VAT)': 'Gesamtbetrag(ohne MwSt.)',
+  Final: 'Abschluss',
+  'Send Overdue Notice': 'Mahnung senden',
+  'Overdue Notice': 'Mahnung',
+  'Customer Address': 'Kundenadresse',
+  'Initial amount': 'Rechnungssumme',
+  'Handling fee': 'Mahngebühr',
+  'The invoice is overdue [XX] days. We remind you to please pay the outstanding amount.':
+    'Die Rechnung ist seit [XX] Tagen überfällig. Wir erinnern Sie daran, den ausstehenden Betrag zu begleichen.',
+  'Generate ID': 'ID generieren',
+  'Customizable in Settings': 'Anpassbar in den Einstellungen',
+  'Enable Automatic ID Generation': 'Automatische ID-Generierung einschalten',
+  'Allows for easier number input': 'Ermöglicht eine vereinfachte Nummerierung',
 };

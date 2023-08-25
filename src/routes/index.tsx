@@ -302,7 +302,7 @@ export const Router = () => {
                 </Helmet>
                 <PageLayout
                   pageScrollable
-                  backBtnLabel="Overdue notice"
+                  backBtnLabel="Overdue Notice"
                   showBackAction>
                   <InvoiceOverdueNotice />
                 </PageLayout>
