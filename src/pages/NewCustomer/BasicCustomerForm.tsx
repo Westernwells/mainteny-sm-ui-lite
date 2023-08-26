@@ -37,7 +37,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
   const {user} = useUserSession();
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [activeField, setActiveField] = useState('');
+  const [activeField, setActiveField] = useState<string>('');
 
   const handleFocus = (e: any) => {
     setActiveField(e.target.name);
@@ -218,7 +218,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
                   fontSize="0.75rem"
                   letterSpacing="0.03em"
                   padding="0.45em 0.65em">
-                  This ID is already taken. Please enter a different one.
+                  {t('This ID is already taken. Please enter a different one.')}
                 </Typography>
               )}
             {activeField === 'externalId' &&

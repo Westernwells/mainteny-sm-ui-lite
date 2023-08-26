@@ -4,7 +4,10 @@ import {FormikErrors} from 'formik';
 
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
-import {useEmployeeAccount} from 'hooks/reactQuery/useUserAccount';
+import {
+  useEmployeeAccount,
+  useQueryUserAccounts,
+} from 'hooks/reactQuery/useUserAccount';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   AdditionalInformationEmployeeFormModel,
@@ -13,8 +16,9 @@ import {
   RoleEmployeeFormModel,
 } from 'models/employee';
 import {getRoles} from 'utils/work-hours-utils';
-import {Role} from 'models/user';
+import {Role, UserView} from 'models/user';
 import {ServiceOrderType} from 'models/service-order';
+import {createEmptyResource} from 'utils/paging-utils';
 import {EmployeeAccountData} from './model';
 import {AdditionalInformationEmployeeForm} from './AdditionalInformationEmployeeForm';
 import {BasicEmployeeForm} from './BasicEmployeeForm';
@@ -77,6 +81,17 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
     password: '',
     confirmPassword: '',
   });
+
+  const {data: employeeResource = createEmptyResource<UserView>(500)} =
+    useQueryUserAccounts(
+      {
+        pageIndex: 0,
+        pageSize: 500,
+        query: '',
+        roles: [Role.SERVICE_MANAGER, Role.TECHNICIAN],
+      },
+      {keepPreviousData: true},
+    );
 
   useLayoutEffect(() => {
     if (getCurrentPageTitle) {
@@ -181,6 +196,7 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
                 setBasicEmployeeFormValues(values)
               }
               initialValues={basicEmployeeFormValues}
+              employeeResource={employeeResource.data}
             />
           </FlexContainer>
         ) : null}
