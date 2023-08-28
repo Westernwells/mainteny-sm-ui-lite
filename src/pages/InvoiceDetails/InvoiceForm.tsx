@@ -293,7 +293,7 @@ export const InvoiceForm = ({
       workReportGenerated || false,
       true,
     );
-    formik.setFieldValue('includeCheckList', checkListGenerated || '', true);
+    formik.setFieldValue('includeCheckList', checkListGenerated, true);
   }, [serviceOrder]);
 
   useEffect(() => {

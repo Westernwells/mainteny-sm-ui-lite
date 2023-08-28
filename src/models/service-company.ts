@@ -197,11 +197,11 @@ export interface StringValueResponse {
 }
 
 export interface AutoNumberConfigRecord {
-  type: string;
-  prefix: string;
-  numberOfDigits: number;
-  enabled: boolean;
-  startFrom: number;
+  type: ServiceCompanyNumberType;
+  prefix?: string;
+  numberOfDigits?: number;
+  enabled?: boolean;
+  startFrom?: number;
 }
 
 export interface AutoNumberConfig {

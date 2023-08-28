@@ -333,6 +333,43 @@ export const useCompanyAutoNumberConfig = (companyId?: string) => {
   );
 };
 
+const updateAutoNumberConfig = async (
+  body: AutoNumberConfig,
+  companyId: string,
+) => {
+  await axiosClient.put<StringValue>(
+    `/api/serviceCompanies/${companyId}/settings/autoNumber`,
+    {
+      ...body,
+    },
+  );
+};
+
+export const useUpdateAutoNumberConfig = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    ({body, companyId}: {body: AutoNumberConfig; companyId: string}) =>
+      updateAutoNumberConfig(body, companyId),
+    {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onSuccess: async (__, {companyId}) => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.fetchAutoNumberConfig);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
 const getCompanyNextNumber = async (
   params: Partial<ServiceCompanyNextNumberParams>,
   companyId?: string,

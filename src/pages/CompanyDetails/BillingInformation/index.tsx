@@ -5,7 +5,6 @@ import * as Yup from 'yup';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
-
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
 import {ServiceCompanyItem} from 'models/service-company';

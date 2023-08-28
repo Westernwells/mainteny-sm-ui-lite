@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import useTheme from '@mui/material/styles/useTheme';
 import {SxProps} from '@mui/system';
 import {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -10,12 +11,13 @@ interface Props {
   bodyTextVariant?: any;
   titleTextVariant?: any;
   iconBackground?: string;
-  bodyText: string | JSX.Element | ReactNode;
+  bodyText?: string | JSX.Element | ReactNode;
   iconMaxHeight?: string | number;
   containerStyles?: {[key: string]: any};
   bodyStyle?: {[key: string]: any};
   labelStyle?: {[key: string]: any};
   iconContainerStyles?: SxProps;
+  enabled?: boolean;
 }
 
 export const CardProps = ({
@@ -30,10 +32,12 @@ export const CardProps = ({
   bodyStyle,
   labelStyle,
   iconContainerStyles = {},
+  enabled,
 }: Props) => {
   const {t} = useTranslation();
+  const theme = useTheme();
   return (
-    <Box display="flex" sx={{...containerStyles}}>
+    <Box display="flex" alignItems="center" sx={{...containerStyles}}>
       {/* remove width to make this component more generic */}
       <Box
         sx={{
@@ -51,7 +55,9 @@ export const CardProps = ({
         <Typography
           component="div"
           variant={titleTextVariant || 'caption'}
-          color="textSecondary"
+          color={
+            enabled ? theme.palette.text.primary : theme.palette.text.secondary
+          }
           sx={{textTransform: 'capitalize', ...labelStyle}}>
           {t(label)}
         </Typography>

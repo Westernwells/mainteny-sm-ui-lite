@@ -418,7 +418,7 @@ export const ArticleItemsTable = ({
         gap: '.5em',
       }}>
       <FormLabel text="No" />
-      <FormLabel text="Note name" sx={{justifySelf: 'start'}} />
+      <FormLabel text="Description" sx={{justifySelf: 'start'}} />
       <FormLabel text="Total amount (excl VAT)" />
     </Box>
   );
