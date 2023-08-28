@@ -208,8 +208,9 @@ export interface StringValueResponse {
 }
 
 export interface Money {
-  value: number;
+  value?: number;
   currency: string;
+  fractionDigits?: number;
 }
 
 export interface Price {

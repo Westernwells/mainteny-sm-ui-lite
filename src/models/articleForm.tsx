@@ -1,3 +1,5 @@
+import {Money} from './misc';
+
 export interface ArticleBasicFormModel {
   category: string;
   manufacturer?: string;
@@ -13,6 +15,10 @@ export interface ArticleBasicFormModel {
   unitSellingVat: number;
   unitSellingAmount: number;
   unitSellingAmountCurrency: string;
+  costPackage?: {
+    labor: Money;
+    material: Money;
+  };
 }
 
 export interface ArticleDescriptionFormModel {
