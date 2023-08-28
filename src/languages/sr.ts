@@ -988,6 +988,7 @@ export const sr = {
   'Sorry! User account creation failed. Please try again.':
     'Izvinjavam se! Kreiranje korisničkog naloga nije uspelo. Molim Vas, pokušajte ponovo.',
   'updated successfully.': 'je uspješno ažuriran.',
+  'Updated successfully.': 'Je uspješno ažuriran.',
   'Sorry! Unable to save changes right now. Please try again.':
     'Izvinjavam se! Trenutno nije moguće sačuvati promene. Molim Vas, pokušajte ponovo.',
   'Article created successfully': 'Artikal je uspješno kreiran',
@@ -1436,6 +1437,20 @@ export const sr = {
   'Deleting this payment term will also remove it from any contracts it’s associated with.':
     'Brisanjem ovog uslova plaćanja takođe ćete ga ukloniti iz svih ugovora sa kojima je povezan.',
   'Add Service Order': 'Dodajte Broj servisa',
+  'Automatic ID generation': 'Automatsko generisanje ID-a',
+  'Auto generated ID': 'Automatski generisani ID',
+  'Any service with disabled auto ID generation will need to be populated manually.':
+    'Svaka usluga sa onemogućenim automatskim generisanjem ID-a moraće da se popuni ručno.',
+  'Configure and enable to populate automatically.':
+    'Konfigurišite i omogućite automatsko popunjavanje.',
+  '# of digits': 'Broj cifara',
+  Prefix: 'Prefiks',
+  'Start from': 'Početi od',
+  Disabled: 'Onemogućeno',
+  Enabled: 'Omogućeno',
+  'Purchase Order': 'Porudžbina',
+  'Document not ready': 'Dokument nije spreman',
+  Employee: 'Zaposleni',
   'Total amount (excl VAT)': 'Ukupna suma ( bez PDV-a )',
   Final: 'Konačni',
   'Send Overdue Notice': 'Pošaljite obaveštenje o kašnjenju',
@@ -1445,4 +1460,8 @@ export const sr = {
   'Handling fee': 'Naknadna za obradu',
   'The invoice is overdue [XX] days. We remind you to please pay the outstanding amount.':
     'Faktura kasni [XX] dana. Podsećamo vas da platite neplaćeni iznos.',
+  'Generate ID': 'Generišite ID',
+  'Customizable in Settings': 'Prilagodljivo u podešavanjima',
+  'Enable Automatic ID Generation': 'Omogućite automatsko generisanje ID-a',
+  'Allows for easier number input': 'Omogućava lakši unos brojeva',
 };

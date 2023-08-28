@@ -7,10 +7,17 @@ interface Props {
   containerStyles?: {[key: string]: any};
   props?: TextFieldProps;
   inputLabelProps?: InputLabelProps;
+  handleFocus?: (e: any) => void;
 }
 
-export const FormInput = ({props, containerStyles, inputLabelProps}: Props) => {
+export const FormInput = ({
+  props,
+  containerStyles,
+  inputLabelProps,
+  handleFocus,
+}: Props) => {
   const {t} = useTranslation();
+
   return (
     <FormControl sx={{...containerStyles}} fullWidth>
       <TextField
@@ -23,6 +30,7 @@ export const FormInput = ({props, containerStyles, inputLabelProps}: Props) => {
         label={t(props!.label as string)}
         helperText={t(props!.helperText as string)}
         placeholder={t(props!.placeholder as string)}
+        onFocus={handleFocus}
       />
     </FormControl>
   );

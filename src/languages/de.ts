@@ -15,7 +15,7 @@ export const de = {
   meters: 'Zähler',
 
   // LOGIN
-  'Service Manager Portal': 'Service Manager Portal',
+  'Service Manager Portal': 'Büroanwendung',
   'The unified Application made for Service Managers with smart job assignments, real-time overview of Units under Maintenance (UuM) and out-of-the-box ERP Integrations!':
     'Das Dashboard für Service Manager mit intelligenter Ressourcenzuteilung, Echtzeit-Übersicht des Anlagenportfolios und sofort einsatzbereite ERP-Integrationen!',
   Login: 'Anmelden',
@@ -996,6 +996,7 @@ export const de = {
   'Sorry! User account creation failed. Please try again.':
     'Es tut uns leid! Die Erstellung des Benutzerkontos ist fehlgeschlagen. Bitte versuchen Sie erneut.',
   'updated successfully.': 'wurde erfolgreich aktualisiert.',
+  'Updated successfully.': 'Wurde erfolgreich aktualisiert.',
   'Sorry! Unable to save changes right now. Please try again.':
     'Es tut uns leid! Änderungen können derzeit nicht gespeichert werden. Bitte versuchen Sie es erneut.',
   'Article created successfully': 'Der Artikel wurde erfolgreich erstellt',
@@ -1471,6 +1472,20 @@ export const de = {
   'Deleting this payment term will also remove it from any contracts it’s associated with.':
     'Wenn Sie diese Zahlungsbedingung löschen, wird sie auch aus allen Verträgen entfernt, in denen sie hinterlegt ist.',
   'Add Service Order': 'Neuer Auftrag',
+  'Automatic ID generation': 'Automatische ID-Generierung',
+  'Auto generated ID': 'Automatisch generierte ID',
+  'Any service with disabled auto ID generation will need to be populated manually.':
+    'Jede Kategorie, bei dem die automatische ID-Generierung deaktiviert ist, muss manuell ausgefüllt werden.',
+  'Configure and enable to populate automatically.':
+    'Konfigurieren und aktivieren Sie die automatische ID-Generierung.',
+  '# of digits': '# Anzahl der Nummern',
+  Prefix: 'Präfix',
+  'Start from': 'Start von',
+  Disabled: 'Deaktiviert',
+  Enabled: 'Aktiviert',
+  'Purchase Order': 'Bestellnummer',
+  'Document not ready': 'Dokument nicht versandfertig',
+  Employee: 'Mitarbeiter',
   'Password created successfully': 'Passwort wurde erfolgreich geändert',
   'Total amount (excl VAT)': 'Gesamtbetrag(ohne MwSt.)',
   Final: 'Abschluss',
@@ -1481,4 +1496,8 @@ export const de = {
   'Handling fee': 'Mahngebühr',
   'The invoice is overdue [XX] days. We remind you to please pay the outstanding amount.':
     'Die Rechnung ist seit [XX] Tagen überfällig. Wir erinnern Sie daran, den ausstehenden Betrag zu begleichen.',
+  'Generate ID': 'ID generieren',
+  'Customizable in Settings': 'Anpassbar in den Einstellungen',
+  'Enable Automatic ID Generation': 'Automatische ID-Generierung einschalten',
+  'Allows for easier number input': 'Ermöglicht eine vereinfachte Nummerierung',
 };
