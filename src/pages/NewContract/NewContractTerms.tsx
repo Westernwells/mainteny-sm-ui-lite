@@ -3,7 +3,7 @@ import {Grid, InputAdornment} from '@mui/material';
 import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
-import {ContractTermsFormModal} from 'models/contract';
+import {ContractTermsFormModal, ContractTypes} from 'models/contract';
 import {FC, useState} from 'react';
 import {useCurrentCurrency} from 'utils/currency';
 import {invoiceCycle} from 'utils/contract-utils';
@@ -15,11 +15,12 @@ import {createEmptyResource} from 'utils/paging-utils';
 
 interface Props {
   formik: FormikProps<ContractTermsFormModal>;
+  contractTypePass: ContractTypes;
 }
 
 const pageSize = 50;
 
-const NewContractTerms: FC<Props> = ({formik}) => {
+const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
@@ -33,6 +34,7 @@ const NewContractTerms: FC<Props> = ({formik}) => {
       },
       query: '',
     });
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={4}>
@@ -61,10 +63,20 @@ const NewContractTerms: FC<Props> = ({formik}) => {
         <FormSelect
           labelId="invoiceDueSelect-label"
           label="Select Invoice Cycle"
-          options={Object.keys(invoiceCycle).map((key) => ({
-            label: invoiceCycle[key],
-            value: key,
-          }))}
+          options={Object.keys(invoiceCycle)
+            .filter((_, index) => {
+              if (
+                index === 0 &&
+                contractTypePass === ContractTypes.NON_SERVICE
+              ) {
+                return false;
+              }
+              return true;
+            })
+            .map((key) => ({
+              label: invoiceCycle[key],
+              value: key,
+            }))}
           selectProps={{
             id: 'invoiceDueSelect',
             value: formik.values.invoiceCycle,
