@@ -14,7 +14,12 @@ import {
   startOfDay,
   subDays,
 } from 'date-fns';
-import {getDateObject, getEndOfWeek, getStartOfWeek} from 'utils/datetime';
+import {
+  getDateObject,
+  getEndOfWeek,
+  getStartOfWeek,
+  toRestDate,
+} from 'utils/datetime';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useTranslation} from 'react-i18next';
 import {ScheduleContainer} from 'components/Schedules/ScheduleContainer';
@@ -28,7 +33,14 @@ import {WeekPair} from 'models/misc';
 import {ServiceOrderView} from 'models/service-order';
 import CardHeader from '@mui/material/CardHeader';
 import {useTheme} from '@mui/material/styles';
-import {EmployeesView} from 'models/employee';
+import {
+  EmployeeStatus,
+  EmployeeStatusView,
+  EmployeesView,
+} from 'models/employee';
+import {useQueryServiceCompanyEmployeeStatus} from 'hooks/reactQuery/useEmployee';
+import {Role} from 'models/user';
+import {createEmptyResource} from 'utils/paging-utils';
 import {styles as sx} from './styles';
 import {ScheduleControls} from './ScheduleControls';
 import {ScheduleLabel} from './ScheduleLabel';
@@ -58,6 +70,7 @@ interface Props {
   cardHeaderLabel?: string;
   customCardHeader?: JSX.Element;
   checkedValues?: string[];
+  currentDate?: Date;
 }
 
 const gridWidth = 200;
@@ -81,6 +94,7 @@ export const Schedule = ({
   footerContainerStyles,
   technicians,
   checkedValues = [],
+  currentDate,
 }: Props) => {
   const formatDate = useFormatDate();
   const {t} = useTranslation();
@@ -232,6 +246,15 @@ export const Schedule = ({
     });
   };
 
+  const {
+    data: technicianResource = createEmptyResource<EmployeeStatusView>(5),
+  } = useQueryServiceCompanyEmployeeStatus({
+    date: toRestDate(currentDate!),
+    pageIndex: 0,
+    pageSize: 500,
+    roles: [Role.TECHNICIAN],
+  });
+
   return (
     <Card sx={[sx.card, {...containerStyles}]}>
       {customCardHeader || cardHeaderLabel ? (
@@ -304,83 +327,94 @@ export const Schedule = ({
             <ScheduleBody>
               {bodyRow.map((dayRow, rowIndex) => (
                 <ScheduleRow key={rowIndex}>
-                  {Object.keys(dayRow).map((key) =>
-                    dayRow[key].map((item, index) => {
-                      if (index === 0) {
-                        const label =
-                          scheduleType === 'date'
-                            ? lookupDate[key]
-                            : lookupTechnician[key] &&
-                              `${lookupTechnician[key][0].userAccount.firstName} ${lookupTechnician[key][0].userAccount.lastName}`;
-                        const employeeUrl =
-                          scheduleType === 'people' && lookupTechnician[key]
-                            ? `/employees/details/${lookupTechnician[key][0].userAccount.id}`
-                            : undefined;
+                  {Object.keys(dayRow)
+                    .filter((id) =>
+                      technicianResource.data.some(
+                        (item) =>
+                          item.employee.id === id &&
+                          !(
+                            item.status === EmployeeStatus.SICK_LEAVE ||
+                            item.status === EmployeeStatus.HOLIDAY
+                          ),
+                      ),
+                    )
+                    .map((key) =>
+                      dayRow[key].map((item, index) => {
+                        if (index === 0) {
+                          const label =
+                            scheduleType === 'date'
+                              ? lookupDate[key]
+                              : lookupTechnician[key] &&
+                                `${lookupTechnician[key][0].userAccount.firstName} ${lookupTechnician[key][0].userAccount.lastName}`;
+                          const employeeUrl =
+                            scheduleType === 'people' && lookupTechnician[key]
+                              ? `/employees/details/${lookupTechnician[key][0].userAccount.id}`
+                              : undefined;
 
+                          return (
+                            <ScheduleBodyCell
+                              cellWidth={gridWidth}
+                              cellHeight={cellHeight}
+                              key={`${rowIndex}-${index}`}>
+                              <ScheduleLabel
+                                id={key}
+                                checkboxValue={key}
+                                makeLabelSelectable={makeLabelSelectable}
+                                getCheckedValue={getCheckedValue}
+                                scheduleType={scheduleType}
+                                scheduleItems={scheduleItems}
+                                item={label || ''}
+                                checkedValues={checkedValues}
+                                navigateTo={employeeUrl}
+                              />
+                            </ScheduleBodyCell>
+                          );
+                        }
+
+                        if (index === 1) {
+                          return Object.keys(scheduleItems).map((xKey) => {
+                            if (xKey === key) {
+                              return (
+                                <ScheduleBodyCell
+                                  cellHeight={cellHeight}
+                                  key={`${rowIndex}-${index}`}
+                                  cellWidth={gridWidth}>
+                                  <ScheduleItemContainer>
+                                    {scheduleItems[xKey].map((scheduleItem) =>
+                                      renderCellItem(
+                                        scheduleItem,
+                                        getItemWidth({
+                                          startDateTime:
+                                            scheduleItem.schedules[0].startTime,
+                                          endDateTime:
+                                            scheduleItem.schedules[0].endTime,
+                                          gridWidth,
+                                        }),
+                                        getItemPosition({
+                                          scheduleItemGroup,
+                                          startDateTime:
+                                            scheduleItem.schedules[0].startTime,
+                                          rowKey: xKey,
+                                          orderId: scheduleItem.id,
+                                          gridWidth,
+                                        }),
+                                      ),
+                                    )}
+                                  </ScheduleItemContainer>
+                                </ScheduleBodyCell>
+                              );
+                            }
+                            return null;
+                          });
+                        }
                         return (
                           <ScheduleBodyCell
-                            cellWidth={gridWidth}
                             cellHeight={cellHeight}
-                            key={`${rowIndex}-${index}`}>
-                            <ScheduleLabel
-                              id={key}
-                              checkboxValue={key}
-                              makeLabelSelectable={makeLabelSelectable}
-                              getCheckedValue={getCheckedValue}
-                              scheduleType={scheduleType}
-                              scheduleItems={scheduleItems}
-                              item={label || ''}
-                              checkedValues={checkedValues}
-                              navigateTo={employeeUrl}
-                            />
-                          </ScheduleBodyCell>
+                            key={`${rowIndex}-${index}`}
+                          />
                         );
-                      }
-
-                      if (index === 1) {
-                        return Object.keys(scheduleItems).map((xKey) => {
-                          if (xKey === key) {
-                            return (
-                              <ScheduleBodyCell
-                                cellHeight={cellHeight}
-                                key={`${rowIndex}-${index}`}
-                                cellWidth={gridWidth}>
-                                <ScheduleItemContainer>
-                                  {scheduleItems[xKey].map((scheduleItem) =>
-                                    renderCellItem(
-                                      scheduleItem,
-                                      getItemWidth({
-                                        startDateTime:
-                                          scheduleItem.schedules[0].startTime,
-                                        endDateTime:
-                                          scheduleItem.schedules[0].endTime,
-                                        gridWidth,
-                                      }),
-                                      getItemPosition({
-                                        scheduleItemGroup,
-                                        startDateTime:
-                                          scheduleItem.schedules[0].startTime,
-                                        rowKey: xKey,
-                                        orderId: scheduleItem.id,
-                                        gridWidth,
-                                      }),
-                                    ),
-                                  )}
-                                </ScheduleItemContainer>
-                              </ScheduleBodyCell>
-                            );
-                          }
-                          return null;
-                        });
-                      }
-                      return (
-                        <ScheduleBodyCell
-                          cellHeight={cellHeight}
-                          key={`${rowIndex}-${index}`}
-                        />
-                      );
-                    }),
-                  )}
+                      }),
+                    )}
                 </ScheduleRow>
               ))}
             </ScheduleBody>
