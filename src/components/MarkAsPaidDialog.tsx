@@ -59,7 +59,8 @@ export const MarkAsPaidDialog = ({
           body: {
             amount: {
               value:
-                values.amount.value * 10 ** invoice.totalAmount.fractionDigits!,
+                (values.amount?.value ?? 0) *
+                10 ** invoice.totalAmount.fractionDigits!,
               currency: values.amount.currency,
             },
             paidDate: formatDate(values.paidDate, 'yyyy-MM-dd')!,
