@@ -8,13 +8,16 @@ import {
   AddressRecord,
   CompanyContact,
   PdfGenerationStatus,
+  Money,
 } from './misc';
 
 export enum ArticleType {
   PART = 'PART',
   PRODUCT = 'PRODUCT',
   SERVICE = 'SERVICE',
-  SYSTEM = 'SYSTEM',
+  LABOR = 'LABOR',
+  MATERIAL = 'MATERIAL',
+  PACKAGE = 'PACKAGE',
 }
 
 export interface ArticleItem {
@@ -77,6 +80,10 @@ export interface CreateArticleRecord {
   unit: string;
   unitPurchaseAmount: AmountRecord;
   unitSellingAmount: AmountRecord;
+  costPackage?: {
+    labor: Money;
+    material: Money;
+  };
 }
 
 export interface UpdateArticleRecord {

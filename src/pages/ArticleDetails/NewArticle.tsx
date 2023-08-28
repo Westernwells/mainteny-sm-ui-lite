@@ -9,26 +9,42 @@ import _ from 'lodash';
 import cloneDeep from 'lodash/cloneDeep';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
-import {FlexContainer} from '../../components/FlexContainer';
-import {useCreateArticle} from '../../hooks/reactQuery/useArticle';
-import {Stepper} from '../../components/Stepper';
-import {useUserSession} from '../../hooks/reactQuery/useUserSession';
-import {SupplierRecord} from '../../models/article';
-import {PageCard} from '../../components/PageCard';
-import {FormInput} from '../../components/form/FormInput';
-import {Button} from '../../components/Button';
-import {SupplierItem} from './Suppliers/SupplierItem';
-import {
-  ArticleBasicFormModel,
-  ArticleStockFormModel,
-} from '../../models/articleForm';
-import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';
-import {AddStockForm} from './Stock/AddStockForm';
+import {FlexContainer} from 'components/FlexContainer';
+import {useCreateArticle} from 'hooks/reactQuery/useArticle';
+import {Stepper} from 'components/Stepper';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {PageCard} from 'components/PageCard';
+import {FormInput} from 'components/form/FormInput';
+import {Button} from 'components/Button';
+import {ArticleType, SupplierRecord} from 'models/article';
+import {ArticleBasicFormModel, ArticleStockFormModel} from 'models/articleForm';
+import {Money} from 'models/misc';
 import {
   amountRecordForBackend,
+  currencyFactor,
   makeAmountRecord,
   useCurrentCurrency,
-} from '../../utils/currency';
+} from 'utils/currency';
+import {SupplierItem} from './Suppliers/SupplierItem';
+import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';
+import {AddStockForm} from './Stock/AddStockForm';
+
+interface TestContextExtended {
+  from: [
+    {
+      value: Money;
+    },
+    {
+      value: {
+        labor: Money;
+        material: Money;
+      };
+    },
+    {
+      value: ArticleBasicFormModel;
+    },
+  ];
+}
 
 const validationSchema = Yup.object().shape({
   category: Yup.string().nullable().required('Category is required'),
@@ -40,6 +56,28 @@ const validationSchema = Yup.object().shape({
   unitSellingAmount: Yup.number()
     .nullable()
     .required('Selling price is required'),
+  costPackage: Yup.object().shape({
+    labor: Yup.object().shape({
+      // amount should be required and sum of labor and material should be less than unitSellingAmount
+      value: Yup.number()
+        .required('Labor price is required')
+        .test(
+          'value',
+          'The sum of labor and material prices should be less than Selling price',
+          (value, context) => {
+            const {from} = context as Yup.TestContext & TestContextExtended;
+            const main = from[2];
+            if (value && main.value.unitSellingAmount) {
+              return (
+                value + (main.value.costPackage?.material?.value ?? 0) <=
+                main.value.unitSellingAmount
+              );
+            }
+            return true;
+          },
+        ),
+    }),
+  }),
 });
 
 export const NewArticle = () => {
@@ -90,7 +128,7 @@ export const NewArticle = () => {
       name: '',
       externalId: '',
       storageLocation: '',
-      type: '',
+      type: ArticleType.LABOR,
       unit: '',
       unitPurchaseVat: percentageVat,
       unitPurchaseAmount: 0,
@@ -98,6 +136,16 @@ export const NewArticle = () => {
       unitSellingVat: percentageVat,
       unitSellingAmount: 0,
       unitSellingAmountCurrency: currentCurrency.code,
+      costPackage: {
+        labor: {
+          value: 0,
+          currency: currentCurrency.code,
+        },
+        material: {
+          value: 0,
+          currency: currentCurrency.code,
+        },
+      },
     },
     onSubmit: () => {},
     validationSchema,
@@ -125,11 +173,26 @@ export const NewArticle = () => {
     return setDisableNextBtn(false);
   }, [activeStep, formik, suppliers]);
 
+  useEffect(() => {
+    // whenever unitSellingAmount changes, update costPackage labor and material to 50% 50% of unitSellingAmount
+    formik.setFieldValue('costPackage', {
+      labor: {
+        value: formik.values.unitSellingAmount * 0.5,
+        currency: currentCurrency.code,
+      },
+      material: {
+        value: formik.values.unitSellingAmount * 0.5,
+        currency: currentCurrency.code,
+      },
+    });
+  }, [formik.values.unitSellingAmount]);
+
   const handleCancel = () => {
     setActiveStep(0);
   };
 
   const createNewArticle = async () => {
+    const factor = currencyFactor({currency: currentCurrency.code});
     const article = {
       category: formik.values.category,
       description,
@@ -164,6 +227,19 @@ export const NewArticle = () => {
           formik.values.unitSellingVat,
         ),
       ),
+      costPackage: {
+        ...formik.values.costPackage,
+        labor: {
+          ...formik.values.costPackage?.labor,
+          value: (formik.values.costPackage?.labor?.value ?? 0) * factor,
+          currency: currentCurrency.code,
+        },
+        material: {
+          ...formik.values.costPackage?.material,
+          value: (formik.values.costPackage?.material?.value ?? 0) * factor,
+          currency: currentCurrency.code,
+        },
+      },
     };
     const result = await createArticle(article);
     navigate(`/articles/details/${result.value}`);
