@@ -185,3 +185,6 @@ export const titleCase = (str: string) =>
   `${str[0].toUpperCase()}${str.slice(1).toLowerCase()}`;
 
 export const getUniqueId = () => Math.random().toString(36).substring(2, 9);
+
+export const getPercentage = (num: number, total: number) =>
+  Math.round((num / total) * 100);
