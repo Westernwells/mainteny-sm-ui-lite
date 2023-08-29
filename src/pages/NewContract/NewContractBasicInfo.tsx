@@ -27,7 +27,6 @@ const NewContractBasicInfo: FC<Props> = ({
       getCustomer(customer);
     }
   }, [customer]);
-
   return (
     <Grid container spacing={2}>
       <Grid item xs={4}>
