@@ -1075,10 +1075,10 @@
   "Create Job": "Stvori servisni nalog",
   "Search job type, customer, address etc.": "Претражите врсту поруџбине, клијента, адресу итд.",
   "New Emergency Job": "Nova hitna narudžba",
-  "New Callout": "Novi poziv",
+  "New Callout Job": "Novi poziv",
   "New Repair Job": "Novi popravak",
   "New Maintenance Job": "Novo održavanje",
-  "New Inspection": "Nova inspekcija",
+  "New Inspection Job": "Nova inspekcija",
   "New Installation Job": "Nova instalacija",
   "New Job": "Novi nalog",
   "Regular": "Redovno",
@@ -1498,5 +1498,12 @@
   "INSTALLATION": "INSTALACIJA",
   "ARTICLE NAME": "NAZIV ČLANKA",
   "YEAR BUILT": "GODINA IZGRADNJE",
-  "INVOICE CYCLE": "CIKLUS FAKTURE"
+  "INVOICE CYCLE": "CIKLUS FAKTURE",
+  "MODERNIZATION": "MODERNIZACIJA",
+  "GENERAL": "OPŠTE",
+  "Modernization": "Modernizacija",
+  "General": "Opšte",
+  "New Modernization Job": "Novi posao modernizacije",
+  "New General Job": "Novi opšti posao",
+  "Select date, time & technicians": "Izaberite , datum, vrijeme i serviser"
 }
