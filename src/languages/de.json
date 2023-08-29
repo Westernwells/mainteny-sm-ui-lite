@@ -1457,5 +1457,11 @@
   "ARTICLE NAME": "ARTIKELBEZEICHNUNG",
   "YEAR BUILT": "BAUJAHR",
   "INVOICE CYCLE": "RECHNUNGSZYKLUS",
+  "MODERNIZATION": "MODERNISIERUNG",
+  "GENERAL": "Sonstiger",
+  "Modernization": "Modernisierung",
+  "General": "Sonstiger",
+  "New Modernization Job": "Neuer Modernisierungsauftrag",
+  "New General Job": "Neuer Sonstiger Auftrag",
   "Select date, time & technicians": "Wähle: Datum, Uhrzeit und Techniker"
 }
