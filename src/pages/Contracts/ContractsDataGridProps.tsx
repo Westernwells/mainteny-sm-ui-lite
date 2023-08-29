@@ -37,7 +37,7 @@ export const columns: GridColDef[] = [
   }),
   getColumnProps({
     field: 'type',
-    headerName: 'contact type',
+    headerName: 'contract type',
     align: 'center',
   }),
   getColumnProps({
