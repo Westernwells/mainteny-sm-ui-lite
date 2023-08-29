@@ -5,6 +5,8 @@ import Typography from '@mui/material/Typography';
 import {Settings} from '@mui/icons-material';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import BuildCircleIcon from '@mui/icons-material/BuildCircle';
+import UploadIcon from '@mui/icons-material/Upload';
+import HandymanIcon from '@mui/icons-material/Handyman';
 
 import {ReactComponent as EmergencyIcon} from 'assets/icons/Emergency.svg';
 import {ReactComponent as RegularIcon} from 'assets/icons/Regular.svg';
@@ -47,6 +49,16 @@ export const SelectServiceOrderTypes = ({values, setFieldValue}: Props) => {
       checked: values.serviceOrderTypes.includes(
         ServiceOrderType.NEW_INSTALLATION,
       ),
+    },
+    MODERNIZATION: {
+      label: ServiceOrderType.MODERNIZATION,
+      checked: values.serviceOrderTypes.includes(
+        ServiceOrderType.MODERNIZATION,
+      ),
+    },
+    GENERAL: {
+      label: ServiceOrderType.GENERAL,
+      checked: values.serviceOrderTypes.includes(ServiceOrderType.GENERAL),
     },
   });
 
@@ -136,6 +148,38 @@ export const SelectServiceOrderTypes = ({values, setFieldValue}: Props) => {
             }}
           />
           <Typography variant="body2">{t('Installation')}</Typography>
+        </Box>
+      ),
+    },
+    {
+      checked: serviceOrderTypes.MODERNIZATION.checked,
+      name: serviceOrderTypes.MODERNIZATION.label,
+      label: (
+        <Box display="flex" alignItems="center">
+          <UploadIcon
+            style={{
+              color: theme.palette.primary.main,
+              height: '1em',
+              marginRight: '0.25em',
+            }}
+          />
+          <Typography variant="body2">{t('Modernization')}</Typography>
+        </Box>
+      ),
+    },
+    {
+      checked: serviceOrderTypes.GENERAL.checked,
+      name: serviceOrderTypes.GENERAL.label,
+      label: (
+        <Box display="flex" alignItems="center">
+          <HandymanIcon
+            style={{
+              color: theme.palette.primary.main,
+              height: '1em',
+              marginRight: '0.25em',
+            }}
+          />
+          <Typography variant="body2">{t('General')}</Typography>
         </Box>
       ),
     },

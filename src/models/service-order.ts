@@ -40,6 +40,8 @@ export enum ServiceOrderType {
   CALLOUT = 'CALLOUT',
   INSPECTION = 'INSPECTION',
   NEW_INSTALLATION = 'NEW_INSTALLATION',
+  MODERNIZATION = 'MODERNIZATION',
+  GENERAL = 'GENERAL',
 }
 
 export enum ServiceOrderOrderField {
@@ -47,13 +49,6 @@ export enum ServiceOrderOrderField {
   LAST_VISIT_DATE = 'LAST_VISIT_DATE',
   NEXT_VISIT_DATE = 'NEXT_VISIT_DATE',
 }
-
-export const ServiceOrderTypeValue = {
-  [ServiceOrderType.EMERGENCY]: 1,
-  [ServiceOrderType.CALLOUT]: 2,
-  [ServiceOrderType.REPAIR]: 3,
-  [ServiceOrderType.REGULAR]: 4,
-};
 
 export enum DispatchPlanStatus {
   INIT = 'INIT',

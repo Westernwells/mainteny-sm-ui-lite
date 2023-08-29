@@ -29,7 +29,7 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
       getCurrentPageTitle(
         `New ${serviceOrderTypeToString(
           convertToMacro(currentParams.type),
-        )} Order`,
+        )} Job`,
       );
     }
   }, []);
@@ -63,6 +63,16 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
       ) : currentParams.type === 'new_installation' ? (
         <ScheduleServiceOrder
           type={ServiceOrderType.NEW_INSTALLATION}
+          quotation={quotation}
+        />
+      ) : currentParams.type === 'modernization' ? (
+        <ScheduleServiceOrder
+          type={ServiceOrderType.MODERNIZATION}
+          quotation={quotation}
+        />
+      ) : currentParams.type === 'general' ? (
+        <ScheduleServiceOrder
+          type={ServiceOrderType.GENERAL}
           quotation={quotation}
         />
       ) : null}
