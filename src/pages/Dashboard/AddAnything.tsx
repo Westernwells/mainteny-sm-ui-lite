@@ -9,6 +9,8 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import BuildCircleIcon from '@mui/icons-material/BuildCircle';
+import UploadIcon from '@mui/icons-material/Upload';
+import HandymanIcon from '@mui/icons-material/Handyman';
 import Elevator from '@mui/icons-material/Elevator';
 import People from '@mui/icons-material/People';
 import FileCopy from '@mui/icons-material/FileCopy';
@@ -183,6 +185,16 @@ export const AddAnything = () => {
           action: () =>
             track(() => navigate('/orders/new?type=new_installation')),
           icon: <BuildCircleIcon fontSize="small" />,
+        },
+        {
+          label: 'Modernization',
+          action: () => track(() => navigate('/orders/new?type=modernization')),
+          icon: <UploadIcon fontSize="small" />,
+        },
+        {
+          label: 'General',
+          action: () => track(() => navigate('/orders/new?type=general')),
+          icon: <HandymanIcon fontSize="small" />,
         },
       ],
     },

@@ -6,6 +6,8 @@ import {amber, grey} from '@mui/material/colors';
 import SettingsIcon from '@mui/icons-material/Settings';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import BuildCircleIcon from '@mui/icons-material/BuildCircle';
+import UploadIcon from '@mui/icons-material/Upload';
+import HandymanIcon from '@mui/icons-material/Handyman';
 import {ServiceOrderType} from '../models/service-order';
 
 interface Props {
@@ -42,6 +44,20 @@ export const ServiceOrderIcons = ({serviceOrderType, style, size}: Props) => {
         <BuildCircleIcon
           fontSize={size}
           sx={{color: theme.palette.secondary.dark, ...style}}
+        />
+      );
+    case ServiceOrderType.MODERNIZATION:
+      return (
+        <UploadIcon
+          fontSize={size}
+          sx={{color: theme.palette.primary.main, ...style}}
+        />
+      );
+    case ServiceOrderType.GENERAL:
+      return (
+        <HandymanIcon
+          fontSize={size}
+          sx={{color: theme.palette.primary.main, ...style}}
         />
       );
     default:
