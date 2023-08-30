@@ -1,176 +1,109 @@
 import {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
-  GridAlignment,
   GridColDef,
   GridColumnHeaderParams,
-  GridRenderCellParams,
   GridRowsProp,
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import InfoOutlined from '@mui/icons-material/InfoOutlined';
 import {useNavigate} from 'react-router-dom';
 import _ from 'lodash';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
-import {ArticleType, ArticleView} from '../../../models/article';
-import {formatNetAmount} from '../../../utils/currency';
-import {createEmptyResource, makePage} from '../../../utils/paging-utils';
-import {useArticles} from '../../../hooks/reactQuery/useArticle';
-import {Progress} from '../../../components/Progress';
-import {DataGridLayout} from '../../../components/DataGridLayout';
-import {EmptySection} from '../../../components/EmptySection';
-import {StatusChip} from '../../../components/StatusChip';
-import {FilterFields} from '../../../components/FilterFields';
-import {MultipleSelectCheckmarks} from '../../../components/MultipleSelectCheckmarks';
-import {Widget} from '../../../components/Widget';
-import {PageListingLayout} from '../../../components/PageListingLayout';
-import {convertToText} from '../../../utils/utils';
-
-const defaultProps = {
-  editable: false,
-  sortable: false,
-  renderHeader: (params: GridColumnHeaderParams) => {
-    const {t} = useTranslation();
-
-    return (
-      <Typography variant="subtitle2" color="textSecondary">
-        {params.colDef.headerName && t(params.colDef.headerName)}
-      </Typography>
-    );
-  },
-  renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" mx="0.5em" style={{overflowWrap: 'anywhere'}}>
-      {params.value || '-'}
-    </Typography>
-  ),
-};
-const defaultAlignment: {
-  flex: number;
-  headerAlign: GridAlignment;
-  align: GridAlignment;
-} = {
-  flex: 1,
-  headerAlign: 'left',
-  align: 'left',
-};
+import {ArticleType, ArticleView} from 'models/article';
+import {formatNetAmount} from 'utils/currency';
+import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {useArticles} from 'hooks/reactQuery/useArticle';
+import {Progress} from 'components/Progress';
+import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
+import {EmptySection} from 'components/EmptySection';
+import {FilterFields} from 'components/FilterFields';
+import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
+import {Widget} from 'components/Widget';
+import {PageListingLayout} from 'components/PageListingLayout';
+import {convertToText} from 'utils/utils';
 
 export const columns: GridColDef[] = [
-  {
-    field: 'externalId',
-    headerName: 'NUMBER',
-    type: 'string',
-    cellClassName: 'nowrap',
-    flex: 1,
-    headerAlign: 'left',
-    align: 'left',
-    ...defaultProps,
-  },
-  {
+  getColumnProps({
     field: 'name',
     headerName: 'NAME',
-    type: 'string',
     cellClassName: 'truncateText',
-    flex: 4,
-    headerAlign: 'left',
-    align: 'left',
-    ...defaultProps,
-  },
-  {
-    field: 'category',
-    headerName: 'CATEGORY',
-    type: 'string',
+  }),
+  getColumnProps({
+    field: 'type',
+    headerName: 'TYPE',
     cellClassName: 'truncateText',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'manufacturer',
-    headerName: 'MANUFACTURER',
-    type: 'string',
+  }),
+  getColumnProps({
+    field: 'unit',
+    headerName: 'UNIT',
     cellClassName: 'truncateText',
-    flex: 2,
-    headerAlign: 'left',
-    align: 'left',
-    ...defaultProps,
-  },
-  {
-    field: 'model',
-    headerName: 'MODEL',
-    type: 'string',
-    cellClassName: 'truncateText',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'supplier',
-    headerName: 'SUPPLIER',
-    type: 'string',
-    flex: 2,
-    cellClassName: 'truncateText',
-    ...defaultProps,
-  },
-  {
-    field: 'purchasePrice',
-    headerName: 'PURCHASE PRICE',
-    type: 'string',
-    flex: 2,
-    cellClassName: 'truncateText',
-    headerAlign: 'right',
-    align: 'right',
-    ...defaultProps,
-  },
-  {
-    field: 'sellingPrice',
-    headerName: 'SELLING PRICE',
-    type: 'string',
-    flex: 2,
-    cellClassName: 'truncateText',
-    headerAlign: 'right',
-    align: 'right',
-    ...defaultProps,
-  },
-  {
-    field: 'stock',
-    headerName: 'STOCK',
-    type: 'string',
-    flex: 1,
-    headerAlign: 'center',
-    align: 'center',
-    editable: false,
-    sortable: false,
     renderHeader: (params: GridColumnHeaderParams) => {
       const {t} = useTranslation();
 
       return (
-        <Typography variant="subtitle2" color="textSecondary">
-          {params.colDef.headerName && t(params.colDef.headerName)}
-        </Typography>
+        <>
+          <Typography variant="subtitle2" color="textSecondary">
+            {params.colDef.headerName && t(params.colDef.headerName)}
+          </Typography>
+          <Tooltip
+            title={t(
+              'The item will be measured in terms of this unit (e.g. kg, piece, set)',
+            )}
+            placement="top"
+            arrow
+            PopperProps={{
+              modifiers: [
+                {
+                  name: 'offset',
+                  options: {
+                    offset: [0, -10],
+                  },
+                },
+              ],
+            }}>
+            <IconButton sx={{color: 'action.active'}}>
+              <InfoOutlined fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </>
       );
     },
-    renderCell: (params: GridRenderCellParams<any, any, any>) => (
-      <StatusChip
-        label={params.value}
-        color="success"
-        variant="filled"
-        maxChars={3}
-      />
-    ),
-  },
+  }),
+  getColumnProps({
+    field: 'sellingPrice',
+    headerName: 'SELLING PRICE (EXCL. VAT)',
+    cellClassName: 'truncateText',
+    align: 'right',
+  }),
+  getColumnProps({
+    field: 'description',
+    headerName: 'DESCRIPTION',
+    cellClassName: 'truncateText',
+  }),
+  getColumnProps({
+    field: 'taxes',
+    headerName: 'TAXES (VAT)',
+    cellClassName: 'truncateText',
+    align: 'right',
+  }),
 ];
 
 export const makeRows = (articles: ArticleView[]): GridRowsProp =>
   _.map(articles, (item, index) => ({
     id: index,
-    externalId: item.externalId,
     name: item.name,
-    category: item.category,
-    manufacturer: item.manufacturer,
-    model: item.model,
-    purchasePrice: formatNetAmount(item.unitPurchaseAmount),
+    type: item.type,
+    unit: item.unit,
     sellingPrice: formatNetAmount(item.unitSellingAmount),
-    stock: item.stock.currentStock,
-    supplier: item.additionalInfo.suppliers?.map((x) => x.name).join(', '),
+    description: item.description,
+    taxes: item.unitSellingAmount.percentageVat
+      ? `${item.unitSellingAmount.percentageVat}%`
+      : '-',
     navigateTo: `details/${item.id}`,
     item,
   }));
