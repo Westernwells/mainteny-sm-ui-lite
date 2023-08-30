@@ -10,13 +10,13 @@ import cloneDeep from 'lodash/cloneDeep';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {FlexContainer} from 'components/FlexContainer';
-import {useCreateArticle} from 'hooks/reactQuery/useArticle';
+import {useArticles, useCreateArticle} from 'hooks/reactQuery/useArticle';
 import {Stepper} from 'components/Stepper';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {PageCard} from 'components/PageCard';
 import {FormInput} from 'components/form/FormInput';
 import {Button} from 'components/Button';
-import {ArticleType, SupplierRecord} from 'models/article';
+import {ArticleType, ArticleView, SupplierRecord} from 'models/article';
 import {ArticleBasicFormModel, ArticleStockFormModel} from 'models/articleForm';
 import {Money} from 'models/misc';
 import {
@@ -25,6 +25,7 @@ import {
   makeAmountRecord,
   useCurrentCurrency,
 } from 'utils/currency';
+import {createEmptyResource} from 'utils/paging-utils';
 import {SupplierItem} from './Suppliers/SupplierItem';
 import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';
 import {AddStockForm} from './Stock/AddStockForm';
@@ -294,6 +295,27 @@ export const NewArticle = () => {
     </Box>
   ));
 
+  const [type, setType] = useState<ArticleType[]>([]);
+
+  const {
+    data: articleResource = createEmptyResource<ArticleView>(10),
+    isIdle,
+    isLoading,
+    isFetching,
+    isFetched,
+  } = useArticles(
+    {
+      pageIndex: 0,
+      pageSize: 500,
+      query: formik.values.externalId,
+      type,
+    },
+    {keepPreviousData: true},
+    true,
+  );
+
+  console.log(articleResource, 'articleResource');
+
   return (
     <Stepper
       handleCancel={handleCancel}
@@ -321,6 +343,7 @@ export const NewArticle = () => {
                   mr: '0.25rem',
                   my: '1rem',
                 }}
+                customerResource={articleResource.data}
               />
             </PageCard>
           </FlexContainer>

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import InputAdornment from '@mui/material/InputAdornment';
 import RadioGroup from '@mui/material/RadioGroup';
 import {FormikProps, getIn} from 'formik';
-import {ArticleType} from 'models/article';
+import {ArticleType, ArticleView} from 'models/article';
 import {FormInput} from 'components/form/FormInput';
 import {FormRadio} from 'components/form/FormRadio';
 import {FormLabel} from 'components/form/FormLabel';
@@ -14,9 +14,17 @@ import {ComboBox} from 'components/ComboBox';
 import {ArticleBasicFormModel} from 'models/articleForm';
 import {createEmptyResource} from 'utils/paging-utils';
 import {useCacheValues} from 'hooks/reactQuery/useElevator';
-import {CacheTypes} from 'models/misc';
+import {CacheTypes, Resource} from 'models/misc';
 import {getCurrencySymbol, useCurrentCurrency} from 'utils/currency';
 import {getPercentage} from 'utils/utils';
+import {AutoAwesome} from '@mui/icons-material';
+import {Button} from '@mui/material';
+import {ServiceCompanyNumberType} from 'models/service-company';
+import {
+  useCompanyAutoNumberConfig,
+  useCompanyNextNumber,
+} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 export const articleTypes = [
   {
@@ -46,12 +54,15 @@ export const articleTypes = [
 export const AddBasicInfoForm = ({
   containerStyles,
   formik,
+  customerResource,
 }: {
   containerStyles?: {[key: string]: any};
   formik: FormikProps<ArticleBasicFormModel>;
+  customerResource: ArticleView[];
 }) => {
   const {t} = useTranslation();
   const theme = useTheme();
+  const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
   const [modelQuery, setModelQuery] = useState('');
   const selectedArticleType = formik.values.type;
@@ -64,6 +75,30 @@ export const AddBasicInfoForm = ({
       },
       CacheTypes.ELEVATOR_MODEL,
     );
+
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [activeField, setActiveField] = useState<string>('');
+
+  const handleFocus = (e: any) => {
+    setActiveField(e.target.name);
+  };
+
+  const {data: companyAutoNumberConfig} = useCompanyAutoNumberConfig(
+    user?.userAccount.serviceCompany.id,
+  );
+
+  const {data: companyNextNumber, refetch: refetchCompanyNumber} =
+    useCompanyNextNumber(
+      {
+        type: ServiceCompanyNumberType.ARTICLE,
+      },
+      user?.userAccount.serviceCompany.id,
+    );
+
+  useEffect(() => {
+    formik.setFieldValue('externalId', companyNextNumber?.value);
+  }, [companyNextNumber]);
+
   return (
     <Box display="flex" flexWrap="wrap" component="form">
       <FormInput
@@ -81,20 +116,125 @@ export const AddBasicInfoForm = ({
         }}
       />
 
-      <FormInput
-        containerStyles={{...containerStyles}}
-        props={{
-          label: t('Number'),
-          name: 'externalId',
-          placeholder: t('e.g. 000001'),
-          type: 'text',
-          required: true,
-          value: formik.values.externalId,
-          error: !!(formik.touched.externalId && formik.errors.externalId),
-          onBlur: formik.handleBlur,
-          onChange: formik.handleChange,
-        }}
-      />
+      <Box width="33.3%" display="flex" flexDirection="column">
+        <FormInput
+          containerStyles={{...containerStyles}}
+          props={{
+            label: t('Number'),
+            name: 'externalId',
+            placeholder: t('e.g. 000001'),
+            type: 'text',
+            required: true,
+            value: formik.values.externalId,
+            error: !!(formik.touched.externalId && formik.errors.externalId),
+            onBlur: formik.handleBlur,
+            onChange: formik.handleChange,
+            sx: {width: '100%'},
+          }}
+        />
+        {(activeField === 'externalId' || formik.touched.externalId) &&
+          formik.values.externalId &&
+          customerResource.filter(
+            (item) => item.externalId === formik.values.externalId,
+          ).length > 0 && (
+            <Typography
+              color="error"
+              fontSize="0.75rem"
+              letterSpacing="0.03em"
+              padding="0.45em 0.65em">
+              {t('This ID is already taken. Please enter a different one.')}
+            </Typography>
+          )}
+        {activeField === 'externalId' &&
+        !formik.values.externalId &&
+        companyAutoNumberConfig?.configRecords.find(
+          (item) => item.type === ServiceCompanyNumberType.ARTICLE,
+        )?.enabled ? (
+          <Box
+            sx={{
+              borderRadius: '4px',
+              boxShadow: '0px 9px 46px 8px #0000001F',
+              marginTop: '0.2em',
+            }}>
+            <Button
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                textAlign: 'left',
+                alignItems: 'flex-start',
+                width: '100%',
+                padding: '1em 2em',
+              }}
+              onClick={() => {
+                refetchCompanyNumber();
+                formik.setFieldValue('externalId', companyNextNumber?.value);
+              }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingBottom: '0.6em',
+                }}>
+                <AutoAwesome />
+                <Typography variant="subtitle2" sx={{paddingLeft: '0.5em'}}>
+                  {t('Generate ID')}
+                </Typography>
+              </Box>
+
+              <Typography variant="body2" color={theme.palette.text.secondary}>
+                {t('Customizable in Settings')}
+              </Typography>
+            </Button>
+          </Box>
+        ) : (
+          activeField === 'externalId' &&
+          !formik.values.externalId &&
+          !companyAutoNumberConfig?.configRecords.find(
+            (item) => item.type === ServiceCompanyNumberType.ARTICLE,
+          )?.enabled && (
+            <Box
+              sx={{
+                borderRadius: '4px',
+                boxShadow: '0px 9px 46px 8px #0000001F',
+                marginTop: '0.2em',
+              }}>
+              <Button
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  textAlign: 'left',
+                  alignItems: 'flex-start',
+                  width: '100%',
+                  padding: '1em 2em',
+                }}
+                onClick={() => setOpenDialog(true)}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingBottom: '0.6em',
+                  }}>
+                  <AutoAwesome />
+                  <Typography variant="subtitle2" sx={{paddingLeft: '0.5em'}}>
+                    {t('Enable Automatic ID Generation')}
+                  </Typography>
+                </Box>
+
+                <Typography
+                  variant="body2"
+                  color={theme.palette.text.secondary}>
+                  {t('Allows for easier number input')}
+                </Typography>
+              </Button>
+            </Box>
+          )
+        )}
+      </Box>
+
       <FormInput
         containerStyles={{...containerStyles}}
         props={{
