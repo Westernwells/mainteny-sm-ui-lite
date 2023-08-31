@@ -295,26 +295,17 @@ export const NewArticle = () => {
     </Box>
   ));
 
-  const [type, setType] = useState<ArticleType[]>([]);
-
-  const {
-    data: articleResource = createEmptyResource<ArticleView>(10),
-    isIdle,
-    isLoading,
-    isFetching,
-    isFetched,
-  } = useArticles(
-    {
-      pageIndex: 0,
-      pageSize: 500,
-      query: formik.values.externalId,
-      type,
-    },
-    {keepPreviousData: true},
-    true,
-  );
-
-  console.log(articleResource, 'articleResource');
+  const {data: articleResource = createEmptyResource<ArticleView>(10)} =
+    useArticles(
+      {
+        pageIndex: 0,
+        pageSize: 500,
+        query: formik.values.externalId,
+        type: [],
+      },
+      {keepPreviousData: true},
+      true,
+    );
 
   return (
     <Stepper
