@@ -81,7 +81,7 @@ export const CustomerPricesForm = ({
   const initialValues: PropertyOwnerArticleRecord = {
     name: article?.name ?? '',
     externalId: article?.externalId ?? '',
-    type: article?.type ?? ArticleType.SERVICE,
+    type: article?.type ?? ArticleType.LABOR,
     category: article?.category ?? '',
     unit: article?.unit ?? '',
     unitPurchaseAmount: article?.unitPurchaseAmount
@@ -154,11 +154,7 @@ export const CustomerPricesForm = ({
           <Box display="flex" gap="1em">
             <MultipleSelectCheckmarks
               label="Type"
-              options={[
-                ArticleType.SERVICE,
-                ArticleType.PRODUCT,
-                ArticleType.PART,
-              ].map((i) => convertToText(i))}
+              options={Object.keys(ArticleType).map((i) => convertToText(i))}
               getSelectedValue={(items: string[]) =>
                 setFieldValue('type', items[0].toUpperCase() as ArticleType)
               }
@@ -166,7 +162,7 @@ export const CustomerPricesForm = ({
               initialSelectedItems={
                 values.type
                   ? [convertToText(values.type)]
-                  : [convertToText(ArticleType.SERVICE)]
+                  : [convertToText(ArticleType.LABOR)]
               }
               multiple={false}
               containerStyles={{marginTop: '0.5em', width: '100%'}}

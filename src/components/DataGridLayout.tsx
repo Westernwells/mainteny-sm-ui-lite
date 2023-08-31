@@ -74,9 +74,18 @@ export const getColumnProps = ({
       </Typography>
     );
   },
-  renderCell = (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2">{params.value || '-'}</Typography>
-  ),
+  renderCell = (params: GridRenderCellParams<any, any, any>) => {
+    const {t} = useTranslation();
+    return (
+      <Typography variant="body2">
+        {params.value
+          ? typeof params.value === 'string'
+            ? t(params.value)
+            : params.value
+          : '-'}
+      </Typography>
+    );
+  },
   flex = 1,
   align = 'left',
   editable = false,

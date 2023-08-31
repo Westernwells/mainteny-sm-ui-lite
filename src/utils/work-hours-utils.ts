@@ -60,6 +60,13 @@ export const formatServiceName = (
     name === ServiceOrderType.NEW_INSTALLATION
   )
     return 'Installation';
+  if (
+    name === WorkHoursType.MODERNIZATION ||
+    name === ServiceOrderType.MODERNIZATION
+  )
+    return 'Modernization';
+  if (name === WorkHoursType.GENERAL || name === ServiceOrderType.GENERAL)
+    return 'General';
   return name;
 };
 

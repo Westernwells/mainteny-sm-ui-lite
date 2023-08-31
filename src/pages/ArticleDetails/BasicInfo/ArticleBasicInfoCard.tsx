@@ -10,21 +10,23 @@ import AssignmentIndRoundedIcon from '@mui/icons-material/AssignmentIndRounded';
 import ExpandRoundedIcon from '@mui/icons-material/ExpandRounded';
 import LocalOfferRoundedIcon from '@mui/icons-material/LocalOfferRounded';
 import FmdGoodRoundedIcon from '@mui/icons-material/FmdGoodRounded';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import _ from 'lodash';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
-import {ArticleView} from '../../../models/article';
-import {ArticleBasicFormModel} from '../../../models/articleForm';
-import {Dialog} from '../../../components/Dialog';
-import {useUpdateArticle} from '../../../hooks/reactQuery/useArticle';
-import {CardProps} from '../../../components/CardProps';
-import {InfoCard} from '../../../components/InfoCard';
+import {ArticleView} from 'models/article';
+import {ArticleBasicFormModel} from 'models/articleForm';
+import {Dialog} from 'components/Dialog';
+import {useUpdateArticle} from 'hooks/reactQuery/useArticle';
+import {CardProps} from 'components/CardProps';
+import {InfoCard} from 'components/InfoCard';
 import {
   amountRecordForBackend,
   currencyFactor,
   formatNetAmount,
   makeAmountRecord,
-} from '../../../utils/currency';
+} from 'utils/currency';
+import {convertToText} from 'utils/utils';
 import {EditBasicInfoForm} from './EditBasicInfoForm';
 
 const validationSchema = Yup.object().shape({
@@ -171,6 +173,11 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       body: article.unitPurchaseAmount
         ? article?.unitPurchaseAmount.percentageVat.toString().concat('%')
         : 0,
+    },
+    {
+      label: t('Type'),
+      icon: <InfoOutlinedIcon sx={{color: theme.palette.info.dark}} />,
+      body: article?.type ? t(convertToText(article.type)) : '-',
     },
   ];
 

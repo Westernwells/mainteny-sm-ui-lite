@@ -45,7 +45,7 @@ export const articleTypes = [
   {
     value: ArticleType.PACKAGE,
     label: 'Package',
-    title: 'Mix of Work and Items',
+    title: 'Mix of Labor and Material',
     subTitle:
       "With the 'Package' choice, you can combine work (labor) and items (materials).",
     isPackage: true,

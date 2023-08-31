@@ -125,6 +125,16 @@ export interface InvoiceView {
   overdueNotices: InvoiceOverdueNoticeSimpleView[];
   commentCount?: number;
   partialInvoices?: InvoiceItem[];
+  payments: InvoicePaymentView[];
+}
+
+export interface InvoicePaymentView {
+  additionalInfo: InvoiceAdditionalInfo;
+  amount: Money;
+  id: string;
+  invoiceId: string;
+  meta: Meta;
+  paidDate: string;
 }
 
 export interface QueryInvoiceParams {

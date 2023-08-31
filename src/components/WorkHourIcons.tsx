@@ -10,6 +10,8 @@ import DesignServicesIcon from '@mui/icons-material/DesignServices';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import BuildCircleIcon from '@mui/icons-material/BuildCircle';
+import UploadIcon from '@mui/icons-material/Upload';
+import HandymanIcon from '@mui/icons-material/Handyman';
 import {grey} from '@mui/material/colors';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {WorkHoursType} from 'models/workHours';
@@ -46,6 +48,20 @@ export const WorkHourIcons = ({workHourType, style, size}: Props) => {
         <BuildCircleIcon
           fontSize={size}
           sx={{color: theme.palette.secondary.dark, ...style}}
+        />
+      );
+    case WorkHoursType.MODERNIZATION:
+      return (
+        <UploadIcon
+          fontSize={size}
+          sx={{color: theme.palette.primary.main, ...style}}
+        />
+      );
+    case WorkHoursType.GENERAL:
+      return (
+        <HandymanIcon
+          fontSize={size}
+          sx={{color: theme.palette.primary.main, ...style}}
         />
       );
     case WorkHoursType.OTHERS:

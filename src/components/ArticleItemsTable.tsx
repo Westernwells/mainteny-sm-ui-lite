@@ -18,7 +18,7 @@ import {TabsBody} from 'components/TabsBody';
 import {QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord, InvoiceType, InvoiceView} from 'models/invoice';
 import {Amount} from 'models/misc';
-import {ArticleType, ArticleView} from 'models/article';
+import {ArticleView} from 'models/article';
 import {
   useArticles,
   useCreatePartialArticle,
@@ -84,7 +84,6 @@ export const ArticleItemsTable = ({
       pageIndex: 0,
       pageSize: 1,
       query: '[internallabel:partial]',
-      type: [ArticleType.SYSTEM],
     },
     {},
     true,
@@ -97,7 +96,6 @@ export const ArticleItemsTable = ({
       pageIndex: 0,
       pageSize: 1,
       query: '[internallabel:credit_note]',
-      type: [ArticleType.SYSTEM],
     },
     {},
     true,

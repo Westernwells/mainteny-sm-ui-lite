@@ -10,6 +10,7 @@ import {useUuid} from 'hooks/reactQuery/useUuid';
 import {
   ContractBasicInfoFormModel,
   ContractTermsFormModal,
+  ContractTypes,
 } from 'models/contract';
 import {PropertyOwnerView} from 'models/propertyManager';
 import React, {useEffect, useState} from 'react';
@@ -90,6 +91,8 @@ const NewContract = () => {
   );
 
   const {data: uuid} = useUuid();
+
+  const [contractTypePass, setContractTypePass] = useState<ContractTypes>();
 
   const formikBasicInfo = useFormik<ContractBasicInfoFormModel>({
     initialValues: {
@@ -217,6 +220,14 @@ const NewContract = () => {
     navigate(`/contracts/details/${contractId}`, {replace: true});
   };
 
+  useEffect(() => {
+    setContractTypePass(
+      user?.userAccount?.serviceCompany?.settings?.contractNameTypes.find(
+        (item) => item.name === formikBasicInfo.values.name,
+      )?.type!,
+    );
+  }, [formikBasicInfo]);
+
   return (
     <Stepper
       handleCancel={handleCancel}
@@ -258,7 +269,10 @@ const NewContract = () => {
               headerLabel="Contract Terms"
               minHeight="100%"
               contentContainerStyles={{height: '100%'}}>
-              <NewContractTerms formik={formikContractTerms} />
+              <NewContractTerms
+                formik={formikContractTerms}
+                contractTypePass={contractTypePass!}
+              />
             </PageCard>
           </FlexContainer>
         )}

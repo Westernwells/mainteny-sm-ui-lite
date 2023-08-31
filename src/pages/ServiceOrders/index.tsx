@@ -61,6 +61,14 @@ export const ServiceOrders = () => {
       label: 'Installation',
       action: () => track(() => navigate('/orders/new?type=new_installation')),
     },
+    {
+      label: 'Modernization',
+      action: () => track(() => navigate('/orders/new?type=modernization')),
+    },
+    {
+      label: 'General',
+      action: () => track(() => navigate('/orders/new?type=general')),
+    },
   ]).current;
 
   useEffect(() => {

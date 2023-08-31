@@ -86,18 +86,6 @@ const payment = {
 
 const dateToString = (date: Date) => date.toISOString().split('T')[0];
 
-const toolTipText = (
-  <div>
-    Full - Standard invoice for the full amount. <br />
-    Partial - Partial payment when less than the full amount is due.
-    <br />
-    Final - Final invoice after partial invoices have been created before.
-    <br />
-    Credit note - Is issued to indicate a return of funds.
-    <br />
-  </div>
-);
-
 const alternativeInvoiceDestinationTooltip =
   'Enter address to receive invoice if different from billing or shipping address. Ensure accuracy to prevent misdelivery.';
 
@@ -528,6 +516,20 @@ export const InvoiceForm = ({
   const setNewlyCreatedCustomer = (customerId: string) => {
     setSearchParams(formatSearchParams({customerId}, searchParams));
   };
+
+  const toolTipText = (
+    <div>
+      {t('Full')} - {t('Standard invoice for the full amount.')} <br />
+      {t('Partial')} -{' '}
+      {t('Partial payment when less than the full amount is due.')}
+      <br />
+      {t('Final')} -{' '}
+      {t('Final invoice after partial invoices have been created before.')}
+      <br />
+      {t('Credit note - Is issued to indicate a return of funds.')}
+      <br />
+    </div>
+  );
 
   return (
     <Box>
