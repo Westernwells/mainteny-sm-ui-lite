@@ -28,31 +28,43 @@ interface Props {
   ) => void;
   getBasicEmployeeFormValues?: (val: BasicEmployeeFormModel) => void;
   initialValues?: BasicEmployeeFormModel;
-  employeeResource: UserView[];
+  customerResource: UserView[];
 }
 
 export const phoneValidationRE =
   /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
-const validationSchema = Yup.object().shape({
-  firstName: Yup.string().required('First name is required'),
-  lastName: Yup.string().required('Last name is required'),
-  email: Yup.string()
-    .email('Enter a valid email')
-    .required('Email is required'),
-  team: Yup.string().matches(/^[0-9]+$/, 'Team is not valid'),
-  phone: Yup.string()
-    .required('Phone number is required')
-    .matches(phoneValidationRE, 'Phone number is not valid'),
-  address: Yup.object().required(),
-});
-
 export const BasicEmployeeForm = ({
   getBasicEmployeeFormErrors,
   getBasicEmployeeFormValues,
   initialValues,
-  employeeResource,
+  customerResource,
 }: Props) => {
+  const validationSchema = Yup.object().shape({
+    firstName: Yup.string().required('First name is required'),
+    lastName: Yup.string().required('Last name is required'),
+    email: Yup.string()
+      .email('Enter a valid email')
+      .required('Email is required')
+      .test(
+        'email',
+        t('User already exists'),
+        (value) =>
+          !customerResource.some((user) => user.userAccount.username === value),
+      ),
+    employeeId: Yup.string().test(
+      'employeeId',
+      t('This ID is already taken. Please enter a different one.'),
+      (value) =>
+        !customerResource.some((user) => user.userData.externalId === value),
+    ),
+    team: Yup.string().matches(/^[0-9]+$/, 'Team is not valid'),
+    phone: Yup.string()
+      .required('Phone number is required')
+      .matches(phoneValidationRE, 'Phone number is not valid'),
+    address: Yup.object().required(),
+  });
+
   const formik = useFormik<BasicEmployeeFormModel>({
     initialValues: {
       firstName: initialValues?.firstName || '',
@@ -250,19 +262,6 @@ export const BasicEmployeeForm = ({
                 />
               ))}
             </Box>
-            {(activeField === 'employeeId' || formik.touched.employeeId) &&
-              formik.values.employeeId &&
-              employeeResource.filter(
-                (item) => item.userData.number === formik.values.employeeId,
-              ).length > 0 && (
-                <Typography
-                  color="error"
-                  fontSize="0.75rem"
-                  letterSpacing="0.03em"
-                  padding="0.45em 0.65em">
-                  {t('This ID is already taken. Please enter a different one.')}
-                </Typography>
-              )}
             {activeField === 'employeeId' &&
             !formik.values.employeeId &&
             companyAutoNumberConfig?.configRecords.find(

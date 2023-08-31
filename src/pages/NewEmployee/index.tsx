@@ -87,7 +87,8 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
       {
         pageIndex: 0,
         pageSize: 500,
-        query: '',
+        query:
+          basicEmployeeFormValues.employeeId || basicEmployeeFormValues.email,
         roles: [Role.SERVICE_MANAGER, Role.TECHNICIAN],
       },
       {keepPreviousData: true},
@@ -196,7 +197,7 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
                 setBasicEmployeeFormValues(values)
               }
               initialValues={basicEmployeeFormValues}
-              employeeResource={employeeResource.data}
+              customerResource={employeeResource.data}
             />
           </FlexContainer>
         ) : null}

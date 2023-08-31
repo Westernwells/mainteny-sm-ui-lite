@@ -32,17 +32,6 @@ interface Props {
   customerResource: ElevatorView[];
 }
 
-const validationSchema = Yup.object().shape({
-  category: Yup.string()
-    .nullable()
-    .oneOf(
-      Object.values(ElevatorCategory).map((c) => convertToText(c)),
-      'Invalid unit category',
-    )
-    .required('Category is required'),
-  unitType: Yup.string().nullable(),
-});
-
 export const UnitDetailsForm = ({
   getUnitDetailsFormErrors,
   getUnitDetailsFormValues,
@@ -52,6 +41,23 @@ export const UnitDetailsForm = ({
   const {t} = useTranslation();
   const [unitTypeQuery, setUnitTypeQuery] = useState('');
   const [modelQuery, setModelQuery] = useState('');
+
+  const validationSchema = Yup.object().shape({
+    category: Yup.string()
+      .nullable()
+      .oneOf(
+        Object.values(ElevatorCategory).map((c) => convertToText(c)),
+        'Invalid unit category',
+      )
+      .required('Category is required'),
+    unitType: Yup.string().nullable(),
+    externalId: Yup.string().test(
+      'externalId',
+      t('This ID is already taken. Please enter a different one.'),
+      (value) => !customerResource.some((item) => item.externalId === value),
+    ),
+  });
+
   const formik = useFormik<UnitDetailsFormModel>({
     initialValues: {
       category: initialValues?.category,
@@ -230,19 +236,6 @@ export const UnitDetailsForm = ({
               }}
               handleFocus={handleFocus}
             />
-            {(activeField === 'externalId' || formik.touched.externalId) &&
-              formik.values.externalId &&
-              customerResource.filter(
-                (item) => item.externalId === formik.values.externalId,
-              ).length > 0 && (
-                <Typography
-                  color="error"
-                  fontSize="0.75rem"
-                  letterSpacing="0.03em"
-                  padding="0.45em 0.65em">
-                  {t('This ID is already taken. Please enter a different one.')}
-                </Typography>
-              )}
             {activeField === 'externalId' &&
             !formik.values.externalId &&
             companyAutoNumberConfig?.configRecords.find(
