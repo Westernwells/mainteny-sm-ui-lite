@@ -6,18 +6,18 @@ import MUIDialog from '@mui/material/Dialog';
 import useTheme from '@mui/material/styles/useTheme';
 import {Carousel} from 'components/Carousel';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {ElevatorView} from 'models/elevator';
 import {useState} from 'react';
 import {EmptySection} from 'components/EmptySection';
 import {olStyles} from 'styles';
 import {Grid} from '@mui/material';
 import {format} from 'date-fns';
+import {ServiceOrderReportAttachmentView} from 'models/service-order';
 
 interface Props {
-  elevator: ElevatorView;
+  attachments: ServiceOrderReportAttachmentView[];
 }
 
-export const Pictures = ({elevator}: Props) => {
+export const Pictures = ({attachments}: Props) => {
   const {t} = useTranslation();
   const [openPreview, setOpenPreview] = useState(false);
   const theme = useTheme();
@@ -25,14 +25,10 @@ export const Pictures = ({elevator}: Props) => {
   const [activeStep, setActiveStep] = useState(0);
 
   const {data: downloadUrls = {}} = useDownloadUrl(
-    elevator.additionalInfo.pictures
-      ? elevator.additionalInfo?.pictures?.map((item) => item.uri)
-      : [],
+    attachments ? attachments?.map((item) => item.fileResource.uri) : [],
   );
 
-  const isEmpty =
-    !elevator.additionalInfo.pictures ||
-    elevator.additionalInfo.pictures.length === 0;
+  const isEmpty = !attachments || attachments.length === 0;
 
   const renderEmptySection = () => (
     <Box
@@ -81,10 +77,10 @@ export const Pictures = ({elevator}: Props) => {
       header={<Typography variant="subtitle1">{t('Pictures')}</Typography>}>
       {isEmpty ? (
         renderEmptySection()
-      ) : elevator.additionalInfo.pictures.length ? (
+      ) : attachments.length ? (
         <Box display="flex" flexDirection="column">
           <Grid container spacing={3}>
-            {elevator.additionalInfo?.pictures?.map((picture, index) => (
+            {attachments?.map((picture, index) => (
               <Grid
                 item
                 xs={12}
@@ -109,7 +105,7 @@ export const Pictures = ({elevator}: Props) => {
                     alt=""
                     width="100%"
                     height="262px"
-                    src={downloadUrls[picture.uri]}
+                    src={downloadUrls[picture.fileResource.uri]}
                     style={{objectFit: 'cover'}}
                   />
                 </Box>
@@ -124,12 +120,16 @@ export const Pictures = ({elevator}: Props) => {
                     wordBreak: 'break-word',
                     overflowWrap: 'anywhere',
                   }}>
-                  {picture.description}
+                  {picture.fileResource.description}
                 </Typography>
                 <Typography
                   variant="caption"
                   color={theme.palette.text.secondary}>
-                  {format(new Date(picture.createdAt), 'dd.MM.yyyy, HH:mm')}h
+                  {format(
+                    new Date(picture.fileResource.createdAt),
+                    'dd.MM.yyyy, HH:mm',
+                  )}
+                  h
                 </Typography>
               </Grid>
             ))}
@@ -142,9 +142,9 @@ export const Pictures = ({elevator}: Props) => {
         open={openPreview}
         maxWidth="sm">
         <Carousel
-          images={elevator?.additionalInfo?.pictures?.map((p) => ({
-            label: p.description,
-            imgPath: downloadUrls[p.uri],
+          images={attachments?.map((p) => ({
+            label: p.fileResource.description,
+            imgPath: downloadUrls[p.fileResource.uri],
           }))}
           onClose={() => setOpenPreview(false)}
           activeStep={activeStep}
