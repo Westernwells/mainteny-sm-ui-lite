@@ -1463,5 +1463,6 @@
   "General": "Sonstiger",
   "New Modernization Job": "Neuer Modernisierungsauftrag",
   "New General Job": "Neuer Sonstiger Auftrag",
-  "Select date, time & technicians": "Wähle: Datum, Uhrzeit und Techniker"
+  "Select date, time & technicians": "Wähle: Datum, Uhrzeit und Techniker",
+  "User already exists": "Benutzer existiert bereits"
 }
