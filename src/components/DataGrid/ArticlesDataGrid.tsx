@@ -42,13 +42,13 @@ export const columns: GridColDef[] = [
     field: 'manufacturer',
     headerName: 'manufacturer',
     cellClassName: 'truncateText',
-    flex: 1,
+    flex: 1.3,
   }),
   getColumnProps({
     field: 'description',
     headerName: 'description',
     cellClassName: 'truncateText',
-    headerAlign: 'right',
+    headerAlign: 'left',
     flex: 2,
   }),
   getColumnProps({

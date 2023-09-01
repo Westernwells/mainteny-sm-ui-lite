@@ -82,7 +82,6 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
   const action = useMemo(() => {
     if (invoice.status === InvoiceStatus.DRAFT) {
       return (

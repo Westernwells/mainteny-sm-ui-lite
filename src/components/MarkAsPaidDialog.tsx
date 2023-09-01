@@ -17,6 +17,7 @@ import {FormInput} from 'components/form/FormInput';
 import {Button} from 'components/Button';
 import {DatePicker} from 'components/DatePicker';
 import {FormCheckbox} from 'components/form/FormCheckbox';
+import {State} from 'models/misc';
 
 interface Props {
   open?: boolean;
@@ -46,7 +47,11 @@ export const MarkAsPaidDialog = ({
       amount: {
         value:
           invoice.totalAmount.grossAmount /
-          10 ** invoice.totalAmount.fractionDigits!,
+            10 ** invoice.totalAmount.fractionDigits! -
+          invoice.payments
+            .filter((item) => item.meta.state === State.ACTIVE)
+            .reduce((partialSum, a) => partialSum + a.amount.value!, 0) /
+            10 ** invoice.totalAmount.fractionDigits!,
         currency: invoice.totalAmount.currency,
       },
       paidDate: new Date().toString(),
@@ -78,7 +83,6 @@ export const MarkAsPaidDialog = ({
     },
     validationSchema,
   });
-
   return (
     <Dialog
       open={open || false}

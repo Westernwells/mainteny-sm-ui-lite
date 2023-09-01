@@ -17,7 +17,6 @@ import {
   ServiceOrderArticleRecord,
   CreateArticleOrderRecord,
   ArticleOrderView,
-  ArticleType,
   CreateArticleSupplierRecord,
   ArticleSupplierView,
   UpdateArticleSupplierRecord,
@@ -55,14 +54,7 @@ export function useArticles(
   const {user} = useUserSession();
   return useQuery<Resource<ArticleView>, RestError>(
     [qk.fetchArticles, params, user?.userAccount.id],
-    () =>
-      fetchArticles(
-        {
-          type: [ArticleType.SERVICE, ArticleType.PRODUCT, ArticleType.PART],
-          ...params,
-        },
-        user!.userAccount.serviceCompany.id,
-      ),
+    () => fetchArticles(params, user!.userAccount.serviceCompany.id),
     {
       enabled: !!user,
       select: useCallback(
@@ -449,11 +441,7 @@ export function usePropertyOwnerArticles(
   const {user} = useUserSession();
   return useQuery<Resource<ArticleView>, RestError>(
     [qk.fetchPropertyOwnerArticles, params, propertyOwnerId],
-    () =>
-      fetchPropertyOwnerArticles(propertyOwnerId, {
-        type: [ArticleType.SERVICE, ArticleType.PRODUCT, ArticleType.PART],
-        ...params,
-      }),
+    () => fetchPropertyOwnerArticles(propertyOwnerId, params),
     {
       enabled: !!user && !!propertyOwnerId,
       ...options,

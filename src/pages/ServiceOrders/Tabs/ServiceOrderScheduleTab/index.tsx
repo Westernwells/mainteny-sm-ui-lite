@@ -17,7 +17,6 @@ import {Schedule} from 'components/Schedules';
 import {ScheduleItem} from 'components/Schedules/ScheduleItem';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {useServiceOrderStatusColor} from 'hooks/useServiceOrderStatusColor';
-
 import {OrderDetails} from 'components/OrderDetails';
 import {useTranslation} from 'react-i18next';
 import {addDays, endOfDay, startOfDay, subDays} from 'date-fns';
