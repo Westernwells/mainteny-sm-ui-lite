@@ -91,7 +91,6 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
       setItems(temp);
     }
   }, [report]);
-
   if (isIdle || isLoading) {
     return (
       <Box
@@ -227,7 +226,7 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
         <ArticleItemsTable items={items} setItems={setItems} />
 
         <Box mt="1em">
-          <Pictures elevator={report.elevator} />
+          <Pictures attachments={report.attachments} />
         </Box>
         <Box mt="1em">
           <FormLabel text="Description Of Service" />
