@@ -1526,5 +1526,6 @@
   "Service Orders": "Aufträge",
   "ORDER TYPE": "AUFTRAGSART",
   "Search order type, customer, address etc.": "Suche nach Auftragsart, Kunde, Adresse usw.",
-  "Order Type": "Auftragsart"
+  "Order Type": "Auftragsart",
+  "Search by order type, order number etc.": "Suche nach Auftragsart, Auftragsnummer usw."
 }
