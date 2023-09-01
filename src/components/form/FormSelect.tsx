@@ -95,8 +95,8 @@ export const FormSelect = ({
         sx={selectStyles}
         MenuProps={MenuProps}
         {...selectProps}>
-        <>
-          {options.map((option) => (
+        {[
+          options.map((option) => (
             <MenuItem
               key={option.label}
               value={option.value}
@@ -113,8 +113,8 @@ export const FormSelect = ({
               ) : null}
               {t(option.label)}
             </MenuItem>
-          ))}
-          {selectProps?.name === 'paymentTermId' && [
+          )),
+          selectProps?.name === 'paymentTermId' && [
             options.length === 0 && (
               <MenuItem
                 disabled
@@ -143,8 +143,8 @@ export const FormSelect = ({
               />{' '}
               {t('Manage Payment Terms')}
             </MenuItem>,
-          ]}
-        </>
+          ],
+        ]}
       </Select>
       <FormHelperText sx={{color: 'error.main'}}>{errorText}</FormHelperText>
     </FormControl>
