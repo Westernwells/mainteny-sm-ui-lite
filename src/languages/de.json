@@ -1523,5 +1523,8 @@
   "List": "Liste",
   "Order types": "Auftragsarten",
   "Order Types": "Auftragsarten",
-  "Service Orders": "Aufträge"
+  "Service Orders": "Aufträge",
+  "ORDER TYPE": "AUFTRAGSART",
+  "Search order type, customer, address etc.": "Suche nach Auftragsart, Kunde, Adresse usw.",
+  "Order Type": "Auftragsart"
 }
