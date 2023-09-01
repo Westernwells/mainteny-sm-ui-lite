@@ -187,7 +187,7 @@ export const Router = () => {
             element={
               <>
                 <Helmet>
-                  <title>{`New service order - ${titleTail}`}</title>
+                  <title>{`New Unit - ${titleTail}`}</title>
                 </Helmet>
                 <PageLayout backBtnLabel="New Unit" showBackAction>
                   <NewUnit />

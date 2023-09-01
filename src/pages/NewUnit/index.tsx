@@ -1,9 +1,9 @@
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {FormikErrors} from 'formik';
-import {useAddElevator} from 'hooks/reactQuery/useElevator';
+import {useAddElevator, useAllElevators} from 'hooks/reactQuery/useElevator';
 import {useFormatDate} from 'hooks/useFormatDate';
-import {ElevatorStatus} from 'models/elevator';
+import {ElevatorStatus, ElevatorView} from 'models/elevator';
 import {Priority} from 'models/misc';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {
@@ -17,6 +17,7 @@ import {mapDaysOfWeekOptions} from 'pages/UnitDetails/Tabs/OverviewTab/Appointme
 import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {convertToMacro} from 'utils/utils';
+import {createEmptyResource} from 'utils/paging-utils';
 import {AppointmentPreferenceForm} from './AppointmentPreferenceForm';
 import {CustomerForm} from './CustomerForm';
 import {LocationForm} from './LocationForm/index';
@@ -209,6 +210,16 @@ export const NewUnit = () => {
     }
   };
 
+  const {data: elevatorResponse = createEmptyResource<ElevatorView>(10)} =
+    useAllElevators(
+      {
+        query: unitDetailsFormValues.externalId,
+        pageIndex: 0,
+        pageSize: 50,
+      },
+      {keepPreviousData: true},
+    );
+
   return (
     <Stepper
       handleCancel={() => {}}
@@ -252,6 +263,7 @@ export const NewUnit = () => {
               setUnitDetailsFormValues(values)
             }
             initialValues={unitDetailsFormValues}
+            customerResource={elevatorResponse.data}
           />
         ) : null}
 

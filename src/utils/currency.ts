@@ -9,7 +9,9 @@ import {
 
 export const formatCurrency = (
   amount: number,
-  options?: Intl.NumberFormatOptions,
+  options?: Intl.NumberFormatOptions & {
+    roundingMode?: 'floor' | 'ceil' | 'trunc' | undefined;
+  },
   selectedLang?: string,
 ) =>
   amount.toLocaleString(
