@@ -441,8 +441,8 @@ export const InvoiceForm = ({
   };
 
   async function onSave(values: InvoiceFormData) {
-    if (!values.description.length) values.description = ' ';
-    if (!values?.moreInfo?.length) values.moreInfo = ' ';
+    if (!values.description.length) values.description = '';
+    if (!values?.moreInfo?.length) values.moreInfo = '';
 
     const dueDateToString: string =
       formik.values.type === InvoiceType.CREDIT_NOTE
