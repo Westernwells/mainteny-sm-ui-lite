@@ -1564,5 +1564,6 @@
   "No. of technicians is required": "Potreban je broj tehničara",
   "Days of the week": "Dani u nedjelji",
   "Opening Hour": "Radno vrijeme",
-  "Closing Hour": "Završno vrijeme"
+  "Closing Hour": "Završno vrijeme",
+  "Notification Due": "Rok za obavještenje"
 }

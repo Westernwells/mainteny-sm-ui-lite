@@ -1546,5 +1546,6 @@
   "No. of technicians is required": "Anzahl der Techniker ist erforderlich",
   "Days of the week": "Wochentage",
   "Opening Hour": "Öffnungszeiten",
-  "Closing Hour": "Schließzeiten"
+  "Closing Hour": "Schließzeiten",
+  "Notification Due": "Benachrichtigung Fällig"
 }
