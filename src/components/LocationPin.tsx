@@ -102,7 +102,7 @@ export const LocationPin = ({
       </Box>
 
       <Button
-        label="More details"
+        label="More Details"
         buttonProps={{
           variant: 'outlined',
           size: 'small',
