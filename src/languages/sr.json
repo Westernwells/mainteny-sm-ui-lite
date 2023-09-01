@@ -1556,5 +1556,7 @@
   "Total time": "Ukupno vrijeme",
   "Elevator Address:": "Adresa lifta:",
   "Last Visit:": "Posljednja posjeta:",
-  "Next Visit:": "Sljedeća posjeta:"
+  "Next Visit:": "Sljedeća posjeta:",
+  "Unit Category": "Kategorija jedinice",
+  "Invalid unit category": "Nevažeći kategorija jedinice"
 }
