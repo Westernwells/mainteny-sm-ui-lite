@@ -11,13 +11,13 @@ export const getQuotationActivityTitle = (
     case QuotationActivityType.SENT:
       return 'Quotation sent';
     case QuotationActivityType.ACCEPTED:
-      return 'Quotation Accepted';
+      return 'Quotation accepted';
     case QuotationActivityType.REJECTED:
-      return 'Quotation Rejected';
+      return 'Quotation rejected';
     case QuotationActivityType.SERVICE_ORDER_ADDED:
-      return 'Service order added';
+      return 'Service Job added';
     case QuotationActivityType.SERVICE_ORDER_REMOVED:
-      return 'Service order removed';
+      return 'Service Job removed';
     default:
       return '';
   }
