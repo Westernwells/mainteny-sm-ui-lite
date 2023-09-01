@@ -1510,5 +1510,6 @@
   "Username already exists": "Korisničko već postoji",
   "Total (excl. VAT)": "Ukupno vrijeme (bez PDV-a)",
   "Quotation created": "Ponuda cene kreirana",
-  "Quotation accepted": "Ponuda cene prihvaćena"
+  "Quotation accepted": "Ponuda cene prihvaćena",
+  "Quotation rejected": "Ponuda cene je odbijena"
 }
