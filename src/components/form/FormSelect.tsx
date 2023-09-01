@@ -95,56 +95,56 @@ export const FormSelect = ({
         sx={selectStyles}
         MenuProps={MenuProps}
         {...selectProps}>
-        [
-        {options.map((option) => (
-          <MenuItem
-            key={option.label}
-            value={option.value}
-            sx={{color: theme.palette.primary.main}}>
-            {selectProps?.multiple ? (
-              <Checkbox
-                size="small"
-                checked={
-                  selectProps && selectProps.value
-                    ? selectProps.value.includes(option.value)
-                    : false
-                }
-              />
-            ) : null}
-            {t(option.label)}
-          </MenuItem>
-        ))}
-        {selectProps?.name === 'paymentTermId' && [
-          options.length === 0 && (
+        <>
+          {options.map((option) => (
             <MenuItem
-              disabled
-              style={{
-                margin: '0.3em 0.5em 0.3em 0em',
-                backgroundColor: 'white',
-              }}
-              key="none"
-              value="none">
-              {t('None')}
+              key={option.label}
+              value={option.value}
+              sx={{color: theme.palette.primary.main}}>
+              {selectProps?.multiple ? (
+                <Checkbox
+                  size="small"
+                  checked={
+                    selectProps && selectProps.value
+                      ? selectProps.value.includes(option.value)
+                      : false
+                  }
+                />
+              ) : null}
+              {t(option.label)}
             </MenuItem>
-          ),
+          ))}
+          {selectProps?.name === 'paymentTermId' && [
+            options.length === 0 && (
+              <MenuItem
+                disabled
+                style={{
+                  margin: '0.3em 0.5em 0.3em 0em',
+                  backgroundColor: 'white',
+                }}
+                key="none"
+                value="none">
+                {t('None')}
+              </MenuItem>
+            ),
 
-          <MenuItem
-            onClick={onClickPaymentTerms}
-            style={{
-              background: 'none',
-              fontWeight: '600',
-              color: theme.palette.primary.main,
-            }}
-            key="onClickPaymentTerms">
-            <SettingsIcon
+            <MenuItem
+              onClick={onClickPaymentTerms}
               style={{
-                margin: '0.1em 0.3em 0.1em 0em',
+                background: 'none',
+                fontWeight: '600',
+                color: theme.palette.primary.main,
               }}
-            />{' '}
-            {t('Manage Payment Terms')}
-          </MenuItem>,
-        ]}
-        ]
+              key="onClickPaymentTerms">
+              <SettingsIcon
+                style={{
+                  margin: '0.1em 0.3em 0.1em 0em',
+                }}
+              />{' '}
+              {t('Manage Payment Terms')}
+            </MenuItem>,
+          ]}
+        </>
       </Select>
       <FormHelperText sx={{color: 'error.main'}}>{errorText}</FormHelperText>
     </FormControl>
