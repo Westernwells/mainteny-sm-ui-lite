@@ -53,10 +53,10 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const {mutate: cancelServiceOrder} = useCancelServiceOrders();
   const {mutate: unscheduleServiceOrder} = useUnscheduleServiceOrders();
   const {mutate: rescheduleServiceOrder} = useRedispatchServiceOrders(
-    'Service order rescheduled successfully',
+    'Service job rescheduled successfully',
   );
   const {mutate: scheduleServiceOrder} = useUpdateServiceOrderSchedule(
-    'Service order scheduled successfully',
+    'Service job scheduled successfully',
   );
   const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
   const [openUnscheduleConfirm, setOpenUnscheduleConfirm] = useState(false);
@@ -274,7 +274,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         }}
         onClose={() => setOpenUnscheduleConfirm(false)}
         title="Confirm"
-        content="Do you want to unschedule the service order?"
+        content="Do you want to unschedule the service job?"
       />
 
       <ScheduleDialog

@@ -215,7 +215,7 @@ export const ViewQuotation = ({
         </Grid>
         <Grid item xs sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
           <PageCard
-            headerLabel="Service Order"
+            headerLabel="Service Job"
             contentContainerStyles={{
               display: 'flex',
               gap: '1em',
@@ -254,12 +254,10 @@ export const ViewQuotation = ({
             ) : (
               <>
                 <Typography variant="subtitle2" textAlign="center">
-                  {t(
-                    'No service order has been created for this quotation yet!',
-                  )}
+                  {t('No service job has been created for this quotation yet!')}
                 </Typography>
                 <Button
-                  label="Create Service Order"
+                  label="Create Service Job"
                   buttonProps={{
                     variant: 'outlined',
                     size: 'small',
@@ -353,7 +351,7 @@ export const ViewQuotation = ({
         helperText="This action is irreversible."
       />
       <Dialog
-        title="Create Service Order"
+        title="Create Service Job"
         onCancel={() => setIsOrderDialogOpen(false)}
         disableSaveBtn={!formik.values.createServiceOrder}
         onSave={() => formik.handleSubmit()}

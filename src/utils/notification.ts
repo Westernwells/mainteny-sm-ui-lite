@@ -40,9 +40,9 @@ export const notificationTypeToString = (type: MessageType | string) => {
 
   switch (type) {
     case MessageType.EMERGENCY_ORDER_ACCEPTED:
-      return t('Service Order Accepted');
+      return t('Service Job Accepted');
     case MessageType.NON_TECHNICIAN_ASSIGNMENT_FOR_SERVICE_ORDER:
-      return t('Service Order Unassigned');
+      return t('Service Job Unassigned');
     case MessageType.TECHNICIAN_JOB_SCHEDULE_UPDATED:
       return t('Schedule Updated');
     default:
@@ -88,7 +88,7 @@ export const notificationSubtitle = (
       const technician = (notificationData as ServiceOrderAssignedData)
         .serviceOrder.technician.userAccount;
       return t(
-        '{{firstName}} {{lastName}} accepted the service order request at {{address}}',
+        '{{firstName}} {{lastName}} accepted the service job request at {{address}}',
         {
           firstName: technician.firstName,
           lastName: technician.lastName,
@@ -99,7 +99,7 @@ export const notificationSubtitle = (
     }
     case MessageType.NON_TECHNICIAN_ASSIGNMENT_FOR_SERVICE_ORDER: {
       return t(
-        'No technicians accepted the service order request at {{address}}',
+        'No technicians accepted the service job request at {{address}}',
         {
           address: (notificationData as NonTechnicianAssignmentData)
             .serviceOrder.elevator.address.fullName,

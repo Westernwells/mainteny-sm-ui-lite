@@ -472,9 +472,9 @@ export const Router = () => {
             element={
               <>
                 <Helmet>
-                  <title>{`Service Orders - ${titleTail}`}</title>
+                  <title>{`Service Jobs - ${titleTail}`}</title>
                 </Helmet>
-                <PageLayout pageTitle="Service Orders">
+                <PageLayout pageTitle="Service Jobs">
                   <ServiceOrders />
                 </PageLayout>
               </>
@@ -486,11 +486,11 @@ export const Router = () => {
             element={
               <>
                 <Helmet>
-                  <title>{`Service Orders - ${titleTail}`}</title>
+                  <title>{`Service Jobs - ${titleTail}`}</title>
                 </Helmet>
                 <PageLayout
                   pageScrollable
-                  backBtnLabel="Order Details"
+                  backBtnLabel="Job Details"
                   showBackAction>
                   <ServiceOrderDetails />
                 </PageLayout>
@@ -503,7 +503,7 @@ export const Router = () => {
             element={
               <>
                 <Helmet>
-                  <title>{`New service order - ${titleTail}`}</title>
+                  <title>{`New service job - ${titleTail}`}</title>
                 </Helmet>
                 <PageLayout backBtnLabel={currentPageTitle} showBackAction>
                   <NewServiceOrder

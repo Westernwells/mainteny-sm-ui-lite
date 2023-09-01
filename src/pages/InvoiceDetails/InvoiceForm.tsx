@@ -913,7 +913,7 @@ export const InvoiceForm = ({
                     disabled={!isWorkReportPDFGenerated}
                     handleChange={formik.handleChange}
                     showTooltip={showWorkReportTooltip}
-                    tooltipTitle="No work report for the selected service order"
+                    tooltipTitle="No work report for the selected service job"
                     title="Work Report"
                     checkboxLabel="Add work report to invoice"
                     checked={
@@ -929,7 +929,7 @@ export const InvoiceForm = ({
                     disabled={!isCheckListPDFGenerated}
                     handleChange={formik.handleChange}
                     showTooltip={showCheckListTooltip}
-                    tooltipTitle="No checklist for selected service order"
+                    tooltipTitle="No checklist for selected service job"
                     title="Checklist"
                     checkboxLabel="Add checklist to invoice"
                     checked={
@@ -975,7 +975,7 @@ export const InvoiceForm = ({
               },
             ].map((i) => (
               <Box mt="1em" key={i.id}>
-                <FormLabel text={i.id} required={i.required} />
+                <FormLabel text={t(i.id)} required={i.required} />
                 <FormInput
                   props={{
                     id: i.id,

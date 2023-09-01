@@ -517,7 +517,7 @@ export const useCancelServiceOrders = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        enqueueSnackbar('Service order has been cancelled', {
+        enqueueSnackbar('Service job has been cancelled', {
           variant: 'success',
         });
       },
@@ -554,7 +554,7 @@ export const useUpdateServiceOrderCheckListAnswers = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        enqueueSnackbar('Service order check list updated', {
+        enqueueSnackbar('Service job checklist updated', {
           variant: 'success',
         });
       },
@@ -591,7 +591,7 @@ export const useCompleteServiceOrder = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        enqueueSnackbar('Service order completed', {
+        enqueueSnackbar('Service job completed', {
           variant: 'success',
         });
       },
@@ -618,7 +618,7 @@ export const useUnscheduleServiceOrders = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        enqueueSnackbar('Service order has been unscheduled', {
+        enqueueSnackbar('Service job has been unscheduled', {
           variant: 'success',
         });
       },

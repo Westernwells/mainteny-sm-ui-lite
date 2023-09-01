@@ -28,7 +28,7 @@ const tabItems = [
     icon: <ManageSearchIcon />,
   },
   {
-    label: 'Service Orders',
+    label: 'Service Jobs',
     icon: <EngineeringOutlinedIcon />,
   },
   {
