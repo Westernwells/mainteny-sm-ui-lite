@@ -1559,5 +1559,7 @@
   "Next Visit:": "Sljedeća posjeta:",
   "Unit Category": "Kategorija jedinice",
   "Invalid unit category": "Nevažeći kategorija jedinice",
-  "REQUIRED NO. OF TECHNICIANS": "OBAVEZNO BR. SERVISERA"
+  "REQUIRED NO. OF TECHNICIANS": "OBAVEZNO BR. SERVISERA",
+  "No. of Technicians": "Broj servisera",
+  "No. of technicians is required": "Potreban je broj tehničara"
 }

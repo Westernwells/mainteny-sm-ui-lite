@@ -1541,5 +1541,7 @@
   "Next Visit:": "Nächster Besuch:",
   "Unit Category": "Anlagenkategorie",
   "Invalid unit category": "Ungültiger Anlagenkategorie",
-  "REQUIRED NO. OF TECHNICIANS": "ERFORDERLICHE ANZAHL TECHNIKER"
+  "REQUIRED NO. OF TECHNICIANS": "ERFORDERLICHE ANZAHL TECHNIKER",
+  "No. of Technicians": "Anzahl der Techniker",
+  "No. of technicians is required": "Anzahl der Techniker ist erforderlich"
 }
