@@ -86,7 +86,6 @@ export const EditQuotation = ({quotation}: Props) => {
     onSubmit: (values) => {
       if (!values.description.length) values.description = ' ';
       if (!values.moreInfo.length) values.moreInfo = ' ';
-
       updateQuotation(
         {
           data: values as UpdateQuotation,
