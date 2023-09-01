@@ -44,7 +44,7 @@ export const MyUnits = () => {
       btnLabel="New Unit"
       btnOnClick={onClickNewUnitBtn}
       currentIndex={tabValue}
-      pageTitle="Service Orders"
+      pageTitle="Service Jobs"
       onChange={(index) => {
         setQueryParams(
           formatSearchParams({tab: index.toString()}, queryParams),

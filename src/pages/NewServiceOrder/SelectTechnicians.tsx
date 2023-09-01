@@ -52,7 +52,7 @@ const otherOptions = [
   {
     value: RadioOptions.DUE_DATE,
     label: 'Select a due date',
-    subText: `Select a date before which this service order has to be completed`,
+    subText: `Select a date before which this service job has to be completed`,
   },
   {
     value: RadioOptions.SCHEDULE_TECHNICIAN,
@@ -65,7 +65,7 @@ const calloutOptions = [
   {
     value: RadioOptions.IMMEDIATE,
     label: 'Immediate',
-    subText: 'Select a technician for attending this service order immediately',
+    subText: 'Select a technician for attending this service job immediately',
   },
   ...otherOptions,
 ];

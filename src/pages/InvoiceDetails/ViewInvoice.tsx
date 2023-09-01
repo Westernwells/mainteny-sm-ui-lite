@@ -227,7 +227,7 @@ export const ViewInvoice = ({
         </Grid>
         <Grid item xs sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
           <PageCard
-            headerLabel="Service Order"
+            headerLabel="Service Job"
             contentContainerStyles={{
               display: 'flex',
               gap: '1em',

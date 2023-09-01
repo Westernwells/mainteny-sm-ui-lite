@@ -164,7 +164,7 @@ export const ServiceOrderList = () => {
       <EmptySection
         label="No orders yet. Please click the button above to add."
         showActionBtn
-        btnLabel="Add Service Order"
+        btnLabel="Add Service Job"
         btnAction={() => {
           Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ORDER_BUTTON_CLICKED);
           navigate('/orders/new?type=regular');

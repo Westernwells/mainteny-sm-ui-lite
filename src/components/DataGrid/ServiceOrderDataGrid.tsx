@@ -152,7 +152,7 @@ export const ServiceOrdersDataGrid = ({
           }
           noRowsEmptySection={
             <NoRowsEmptySection
-              placeholder="service order"
+              placeholder="service job"
               action={() => window.open('/orders/new?type=regular', '_blank')}
             />
           }

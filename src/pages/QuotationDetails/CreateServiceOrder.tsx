@@ -11,7 +11,7 @@ interface Props {
 export const CreateServiceOrder = ({value, onChange}: Props) => (
   <FormSelect
     labelId="createServiceOrder-label"
-    label="Service Order Type"
+    label="Service Job Type"
     options={Object.keys(ServiceOrderType).map((i) => ({
       label: serviceOrderTypeToString(i as ServiceOrderType),
       value: convertToText(i),

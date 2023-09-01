@@ -33,7 +33,7 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
   const formatDateDistance = useFormatDateDistance();
   const formatDate = useFormatDate();
   const [openDialog, setOpenDialog] = useState(false);
-  const successMessage = 'Service order scheduled successfully';
+  const successMessage = 'Service job scheduled successfully';
   const {mutate: rescheduleServiceOrder} =
     useRedispatchServiceOrders(successMessage);
   const {mutate: scheduleServiceOrder} =

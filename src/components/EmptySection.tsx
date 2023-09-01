@@ -96,7 +96,7 @@ export const EmptySection = ({
       )}
       {showActionBtn ? (
         <Button
-          label="Create Service Order"
+          label="Create Service Job"
           buttonProps={{
             onClick: btnAction,
             variant: 'contained',

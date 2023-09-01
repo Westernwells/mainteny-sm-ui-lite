@@ -84,7 +84,7 @@ export const ServiceOrders = () => {
       menu={menu}
       btnLabel="New Job"
       currentIndex={tabValue}
-      pageTitle="Service Orders"
+      pageTitle="Service Jobs"
       onChange={(index) => {
         setQueryParams(
           formatSearchParams({tab: index.toString()}, queryParams),
