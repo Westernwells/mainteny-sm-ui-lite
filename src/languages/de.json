@@ -1544,5 +1544,7 @@
   "REQUIRED NO. OF TECHNICIANS": "ERFORDERLICHE ANZAHL TECHNIKER",
   "No. of Technicians": "Anzahl der Techniker",
   "No. of technicians is required": "Anzahl der Techniker ist erforderlich",
-  "Days of the week": "Wochentage"
+  "Days of the week": "Wochentage",
+  "Opening Hour": "Öffnungszeiten",
+  "Closing Hour": "Schließzeiten"
 }
