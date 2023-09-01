@@ -1466,5 +1466,7 @@
   "Select date, time & technicians": "Wähle: Datum, Uhrzeit und Techniker",
   "User already exists": "Benutzer existiert bereits",
   "Username already exists": "Benutzername existiert bereits",
-  "Total (excl. VAT)": "Gesamt (exkl. MwSt.)"
+  "Total (excl. VAT)": "Gesamt (exkl. MwSt.)",
+  "Quotation created": "Angebot erstellt",
+  "Quotation Accepted": "Angebot akzeptiert"
 }
