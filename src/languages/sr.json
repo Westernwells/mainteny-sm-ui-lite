@@ -1505,5 +1505,14 @@
   "General": "Opšte",
   "New Modernization Job": "Novi posao modernizacije",
   "New General Job": "Novi opšti posao",
-  "Select date, time & technicians": "Izaberite , datum, vrijeme i serviser"
+  "Select date, time & technicians": "Izaberite , datum, vrijeme i serviser",
+  "User already exists": "Korisnik već postoji",
+  "Username already exists": "Korisničko već postoji",
+  "Total (excl. VAT)": "Ukupno vrijeme (bez PDV-a)",
+  "Quotation created": "Ponuda cene kreirana",
+  "Quotation accepted": "Ponuda cene prihvaćena",
+  "Quotation rejected": "Ponuda cene je odbijena",
+  "Quotation updated": "Ponuda cene je ažurirana",
+  "Service Job added": "Servisni posao je dodan",
+  "Service Job removed": "Servisni posao je uklonjen"
 }

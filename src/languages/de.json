@@ -1158,7 +1158,7 @@
   "Quotation updated successfully": "Angebot wurde erfolgreich aktualisiert",
   "Quotation deleted successfully": "Angebot wurde erfolgreich gelöscht",
   "\nQuotation sent": "Angebot gesendet",
-  "Quotation history": "Geschichte des Angebots",
+  "Quotation history": "Angebotshistorie",
   "Job has been cancelled": "Auftrag wurde storniert",
   "Job has been unscheduled": "Auftrag wurde storniert",
   "Invoice created": "Rechnung erstellt",
@@ -1463,5 +1463,14 @@
   "General": "Sonstiger",
   "New Modernization Job": "Neuer Modernisierungsauftrag",
   "New General Job": "Neuer Sonstiger Auftrag",
-  "Select date, time & technicians": "Wähle: Datum, Uhrzeit und Techniker"
+  "Select date, time & technicians": "Wähle: Datum, Uhrzeit und Techniker",
+  "User already exists": "Benutzer existiert bereits",
+  "Username already exists": "Benutzername existiert bereits",
+  "Total (excl. VAT)": "Gesamt (exkl. MwSt.)",
+  "Quotation created": "Angebot erstellt",
+  "Quotation accepted": "Angebot akzeptiert",
+  "Quotation rejected": "Angebot abgelehnt",
+  "Quotation updated": "Angebot aktualisiert",
+  "Service Job added": "Auftrag hinzugefügt",
+  "Service Job removed": "Auftrag entfernt"
 }
