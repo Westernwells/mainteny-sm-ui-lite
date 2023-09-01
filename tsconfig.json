@@ -3,7 +3,7 @@
     "baseUrl": "src",
     "target": "esnext",
     "downlevelIteration": true, 
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": ["dom", "dom.iterable", "esnext", "es2020"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
