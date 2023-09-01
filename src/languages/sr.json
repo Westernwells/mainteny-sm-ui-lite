@@ -1545,5 +1545,6 @@
   "Show Unassigned Orders ({{count}})": "Prikaži nedodjeljene naloge ({{count}})",
   "List": "List",
   "Order types": "Vrste naloga",
-  "Order Types": "Vrste naloga"
+  "Order Types": "Vrste naloga",
+  "Service Orders": "Servisni nalog"
 }

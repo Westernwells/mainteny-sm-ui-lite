@@ -1522,5 +1522,6 @@
   "Show Unassigned Orders ({{count}})": "Nicht zugewiesene Aufträge anzeigen ({{count}})",
   "List": "Liste",
   "Order types": "Auftragsarten",
-  "Order Types": "Auftragsarten"
+  "Order Types": "Auftragsarten",
+  "Service Orders": "Aufträge"
 }
