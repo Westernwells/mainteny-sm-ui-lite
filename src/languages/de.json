@@ -1505,6 +1505,8 @@
   "Service job has been unscheduled": "Auftrag wurde abgemeldet",
   "No work report for the selected service job": "Kein Arbeitsschein für den ausgewählten Auftrag vorhanden",
   "No checklist for selected service job": "Keine Checkliste für den ausgewählten Auftrag vorhanden",
+  "Select a date before which this service job has to be completed": "Bitte wählen Sie ein Datum bis wann der Auftrag ausgeführt sein soll",
+  "Select a technician for attending this service job immediately": "Bitte wählen Sie einen Techniker für den Auftrag",
   "Contract ID": "Vertragsnr",
   "NEXT VISIT": "NÄCHSTER BESUCH",
   "PRIORITY TECHNICIAN": "VORRANGIGER TECHNIKER",
@@ -1527,5 +1529,8 @@
   "ORDER TYPE": "AUFTRAGSART",
   "Search order type, customer, address etc.": "Suche nach Auftragsart, Kunde, Adresse usw.",
   "Order Type": "Auftragsart",
-  "Search by order type, order number etc.": "Suche nach Auftragsart, Auftragsnummer usw."
+  "Search by order type, order number etc.": "Suche nach Auftragsart, Auftragsnummer usw.",
+  "\"+ Add\"": "\"+ Hinzufügen\"",
+  "No work report yet. It will appear here once the order is completed.": "Es wurde noch kein Arbeitsbericht erstellt. Er erscheint hier, sobald der Auftrag abgeschlossen ist.",
+  "Total time": "Gesamtzeit"
 }

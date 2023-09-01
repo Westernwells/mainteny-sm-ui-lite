@@ -1546,5 +1546,12 @@
   "List": "List",
   "Order types": "Vrste naloga",
   "Order Types": "Vrste naloga",
-  "Service Orders": "Servisni nalog"
+  "Service Orders": "Servisni nalog",
+  "ORDER TYPE": "Vrsta naloga",
+  "Search order type, customer, address etc.": "Pretražite vrstu naloga, klijenta, adresu itd.",
+  "Order Type": "Vrsta naloga",
+  "Search by order type, order number etc.": "Pretražujte po vrsti narudžbe, broju narudžbe itd.",
+  "\"+ Add\"": "\"+ Dodaj\"",
+  "No work report yet. It will appear here once the order is completed.": "Još nema izvještaja o radu. Pojaviće se ovde kada se nalog završi.",
+  "Total time": "Ukupno vrijeme"
 }
