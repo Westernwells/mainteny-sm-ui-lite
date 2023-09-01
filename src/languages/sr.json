@@ -653,7 +653,7 @@
   "Battery": "Baterija",
   "Emergency Phase Usage": "Upotreba hitne faze",
   "Emergency Battery Level": "Nivo baterije za hitne slučajeve",
-  "Cabin Door Rolls": "Otvaranje kabinskih vrata",
+  "Cabin Door Rolls (EOL)": "Otvaranje kabinskih vrata",
   "Rolls Shaft Door": "Otvaranje spratnih vrata",
   "Stop": "Zaustavljeno",
   "Total worked": "Ukupno vrijeme rada",
@@ -794,7 +794,7 @@
   "JPEG, PNG, BMP, GIF, WEBP or SVG": "JPEG, PNG, BMP, GIF, WEBP ili SVG",
   "TYPE": "TIP",
   "NUMBER OF VISITS": "Broj posjeta",
-  "PRICE/YEAR (excl VAT)": "Cijena / godina ( bez PDV )",
+  "PRICE/YEAR (Excl VAT)": "Cijena / godina ( bez PDV )",
   "RENEWAL PERIOD": "Period obnove",
   "INVOICE DUE": "Dospjela faktura",
   "Contract expires in 120 days": "Ugovor ističe za 120 dana",
@@ -1570,5 +1570,9 @@
   "Phone Number": "Broj telefona",
   "Sim Card Number": "Broj SIM kartice",
   "Call Center": "Call centar",
-  "Place Of Installation": "Mjesto ugradnje"
+  "Place Of Installation": "Mjesto ugradnje",
+  "Technicians Name": "Ime servisera",
+  "Technician is required": "Potreban je serviser",
+  "Performance Analytics": "Analitika performansi",
+  "Search by name, role, address etc.": "Traži po imenu, poziciji, adresi itd."
 }
