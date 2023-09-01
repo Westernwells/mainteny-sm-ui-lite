@@ -1553,5 +1553,6 @@
   "Search by order type, order number etc.": "Pretražujte po vrsti narudžbe, broju narudžbe itd.",
   "\"+ Add\"": "\"+ Dodaj\"",
   "No work report yet. It will appear here once the order is completed.": "Još nema izvještaja o radu. Pojaviće se ovde kada se nalog završi.",
-  "Total time": "Ukupno vrijeme"
+  "Total time": "Ukupno vrijeme",
+  "Elevator Address:": "Adresa lifta"
 }

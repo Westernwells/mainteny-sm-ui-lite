@@ -1532,5 +1532,6 @@
   "Search by order type, order number etc.": "Suche nach Auftragsart, Auftragsnummer usw.",
   "\"+ Add\"": "\"+ Hinzufügen\"",
   "No work report yet. It will appear here once the order is completed.": "Es wurde noch kein Arbeitsbericht erstellt. Er erscheint hier, sobald der Auftrag abgeschlossen ist.",
-  "Total time": "Gesamtzeit"
+  "Total time": "Gesamtzeit",
+  "Elevator Address:": "Aufzug Adresse:"
 }
