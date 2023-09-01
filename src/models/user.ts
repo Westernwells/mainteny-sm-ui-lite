@@ -117,6 +117,7 @@ export interface UserData {
   meta: Meta;
   team: string;
   externalId: string;
+  number: string;
 }
 
 export interface ServiceManagerData {}
