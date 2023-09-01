@@ -91,7 +91,6 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
       setItems(temp);
     }
   }, [report]);
-  console.log(report, 'report');
   if (isIdle || isLoading) {
     return (
       <Box
