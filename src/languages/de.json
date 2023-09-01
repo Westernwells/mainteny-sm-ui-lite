@@ -1543,5 +1543,6 @@
   "Invalid unit category": "Ungültiger Anlagenkategorie",
   "REQUIRED NO. OF TECHNICIANS": "ERFORDERLICHE ANZAHL TECHNIKER",
   "No. of Technicians": "Anzahl der Techniker",
-  "No. of technicians is required": "Anzahl der Techniker ist erforderlich"
+  "No. of technicians is required": "Anzahl der Techniker ist erforderlich",
+  "Days of the week": "Wochentage"
 }

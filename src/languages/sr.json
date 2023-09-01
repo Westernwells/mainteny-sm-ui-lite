@@ -1561,5 +1561,6 @@
   "Invalid unit category": "Nevažeći kategorija jedinice",
   "REQUIRED NO. OF TECHNICIANS": "OBAVEZNO BR. SERVISERA",
   "No. of Technicians": "Broj servisera",
-  "No. of technicians is required": "Potreban je broj tehničara"
+  "No. of technicians is required": "Potreban je broj tehničara",
+  "Days of the week": "Dani u nedjelji"
 }
