@@ -88,7 +88,7 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
         pageIndex: 0,
         pageSize: 500,
         query:
-          basicEmployeeFormValues.employeeId || basicEmployeeFormValues.email,
+          basicEmployeeFormValues.email || basicEmployeeFormValues.employeeId,
         roles: [Role.SERVICE_MANAGER, Role.TECHNICIAN],
       },
       {keepPreviousData: true},
