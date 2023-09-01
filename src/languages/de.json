@@ -1468,5 +1468,9 @@
   "Username already exists": "Benutzername existiert bereits",
   "Total (excl. VAT)": "Gesamt (exkl. MwSt.)",
   "Quotation created": "Angebot erstellt",
-  "Quotation accepted": "Angebot akzeptiert"
+  "Quotation accepted": "Angebot akzeptiert",
+  "Quotation rejected": "Angebot abgelehnt",
+  "Quotation updated": "Angebot aktualisiert",
+  "Service Job added": "Auftrag hinzugefügt",
+  "Service Job removed": "Auftrag entfernt"
 }
