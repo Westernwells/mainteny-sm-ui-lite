@@ -355,7 +355,6 @@ export const ArticleItemsTable = ({
       })),
     );
   }, [percentageVat]);
-  console.log(items, 'items');
 
   const renderHeader = () => (
     <Box
