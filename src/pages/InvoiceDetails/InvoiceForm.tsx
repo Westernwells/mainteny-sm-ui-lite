@@ -244,6 +244,7 @@ export const InvoiceForm = ({
     setCustomer(row);
     formik.setValues({
       ...formik.values,
+      propertyOwnerId: row.id,
       billingAddress: row.billingAddress,
       beneficiaryAddress: row.beneficiaryAddress,
       alternativeAddress: row.otherAddress,
@@ -286,11 +287,12 @@ export const InvoiceForm = ({
 
   useEffect(() => {
     if (invoice) {
-      const invoiceCustomer = invoice.serviceOrder?.elevator.propertyOwner;
+      const invoiceCustomer = invoice.propertyOwner;
       setServiceOrder(invoice.serviceOrder);
       setCustomer(invoiceCustomer);
       formik.setValues({
         ...formik.values,
+        propertyOwnerId: invoiceCustomer?.id ?? '',
         billingAddress: invoiceCustomer?.billingAddress,
         beneficiaryAddress: invoiceCustomer?.beneficiaryAddress,
         alternativeAddress: invoiceCustomer?.otherAddress,
@@ -408,8 +410,7 @@ export const InvoiceForm = ({
     const valid =
       formik.values.subject &&
       formik.values.type.length &&
-      formik.values.items.length &&
-      serviceOrder !== undefined;
+      formik.values.items.length;
     if (formik.values.type !== InvoiceType.CREDIT_NOTE) {
       return !!(valid && dueDate !== null);
     }
@@ -751,7 +752,6 @@ export const InvoiceForm = ({
                       propertyOwnerId={customer?.id ?? ''}
                     />
                   }
-                  labelRequired
                 />
               </Box>
               <Box

@@ -226,72 +226,74 @@ export const ViewInvoice = ({
           )}
         </Grid>
         <Grid item xs sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
-          <PageCard
-            headerLabel="Service Job"
-            contentContainerStyles={{
-              display: 'flex',
-              gap: '1em',
-              flexDirection: 'column',
-              mx: 0,
-              pt: '0.5rem',
-            }}
-            headerActionIcon={
-              <OpenInNewIcon
-                fontSize="small"
-                sx={{color: theme.palette.secondary.dark}}
-              />
-            }
-            headerStyles={{
-              mx: 0,
-              px: '1rem',
-            }}
-            handleAction={() =>
-              navigate(`/orders/details/${invoice.serviceOrder?.id}`)
-            }>
-            <Box>
-              <Box sx={{float: 'right'}}>
+          {!!invoice.serviceOrder && (
+            <PageCard
+              headerLabel="Service Job"
+              contentContainerStyles={{
+                display: 'flex',
+                gap: '1em',
+                flexDirection: 'column',
+                mx: 0,
+                pt: '0.5rem',
+              }}
+              headerActionIcon={
+                <OpenInNewIcon
+                  fontSize="small"
+                  sx={{color: theme.palette.secondary.dark}}
+                />
+              }
+              headerStyles={{
+                mx: 0,
+                px: '1rem',
+              }}
+              handleAction={() =>
+                navigate(`/orders/details/${invoice.serviceOrder?.id}`)
+              }>
+              <Box>
+                <Box sx={{float: 'right'}}>
+                  {invoice.serviceOrder && (
+                    <StatusChip
+                      color={getServiceOrderStatusColor(
+                        invoice.serviceOrder.status,
+                      )}
+                      label={serviceOrderStatusToString(
+                        invoice.serviceOrder.status,
+                      )}
+                      size="small"
+                    />
+                  )}
+                </Box>
+                <FormLabel text="Order Number" sx={{color: 'text.main'}} />
+                <Typography variant="caption" component="div">
+                  {invoice.serviceOrder?.number}
+                </Typography>
                 {invoice.serviceOrder && (
-                  <StatusChip
-                    color={getServiceOrderStatusColor(
-                      invoice.serviceOrder.status,
-                    )}
-                    label={serviceOrderStatusToString(
-                      invoice.serviceOrder.status,
-                    )}
+                  <Typography
+                    variant="caption"
+                    sx={{color: 'text.secondary'}}
+                    display="block"
+                    mt="-0.25rem">
+                    {`${t('Created on')} ${formatDate(
+                      invoice.serviceOrder.meta.createdAt,
+                    )}`}
+                  </Typography>
+                )}
+                <Box display="flex" alignItems="center" gap=".2em" mt="1em">
+                  <ServiceOrderIcons
+                    serviceOrderType={invoice.serviceOrder?.type}
                     size="small"
                   />
-                )}
-              </Box>
-              <FormLabel text="Order Number" sx={{color: 'text.main'}} />
-              <Typography variant="caption" component="div">
-                {invoice.serviceOrder?.number}
-              </Typography>
-              {invoice.serviceOrder && (
-                <Typography
-                  variant="caption"
-                  sx={{color: 'text.secondary'}}
-                  display="block"
-                  mt="-0.25rem">
-                  {`${t('Created on')} ${formatDate(
-                    invoice.serviceOrder.meta.createdAt,
-                  )}`}
+                  <ServiceOrderTypeText
+                    serviceOrderType={invoice.serviceOrder?.type}
+                    capitalizeText
+                  />
+                </Box>
+                <Typography variant="caption">
+                  {invoice.serviceOrder?.description}
                 </Typography>
-              )}
-              <Box display="flex" alignItems="center" gap=".2em" mt="1em">
-                <ServiceOrderIcons
-                  serviceOrderType={invoice.serviceOrder?.type}
-                  size="small"
-                />
-                <ServiceOrderTypeText
-                  serviceOrderType={invoice.serviceOrder?.type}
-                  capitalizeText
-                />
               </Box>
-              <Typography variant="caption">
-                {invoice.serviceOrder?.description}
-              </Typography>
-            </Box>
-          </PageCard>
+            </PageCard>
+          )}
 
           {workReport && (
             <PageCard
