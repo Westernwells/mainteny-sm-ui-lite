@@ -175,7 +175,7 @@ export const Dashboard = () => {
           <Typography variant="subtitle1" color={theme.palette.text.secondary}>
             {t('There are')}{' '}
             <Typography variant="subtitle1" color="#01a0cc" component="span">
-              {dailyNumberOfOrders} {t('orders')}
+              {dailyNumberOfOrders} {t('jobs')}
             </Typography>{' '}
             {t('to be finished today')}
           </Typography>
