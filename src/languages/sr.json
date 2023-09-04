@@ -1372,10 +1372,10 @@
   "Contract": "Ugovor",
   "Quotation": "Ponuda",
   "Repeat Password": "Ponovite lozinku",
-  "No appointments": "Nema zakazivanja",
-  "No Invoices": "Nema faktura",
-  "No quotations": "Bez ponuda",
-  "No working engineers": "Nema radnih servisera",
+  "No appointments.": "Nema zakazivanja",
+  "No Invoices.": "Nema faktura",
+  "No quotations.": "Bez ponuda",
+  "No working engineers.": "Nema radnih servisera",
   "NOTES": "NAPOMENE",
   "Add New Unit": "Dodaj novu jedinicu",
   "Add New Contract": "Dodaj novi ugovor",
@@ -1610,5 +1610,6 @@
   "Technicians Name": "Ime servisera",
   "Technician is required": "Potreban je serviser",
   "Performance Analytics": "Analitika performansi",
-  "Search by name, role, address etc.": "Traži po imenu, poziciji, adresi itd."
+  "Search by name, role, address etc.": "Traži po imenu, poziciji, adresi itd.",
+  "jobs": "naređenja"
 }

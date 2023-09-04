@@ -1352,10 +1352,10 @@
   "Contract": "Vertrag",
   "Quotation": "Angebot",
   "Repeat Password": "Wiederhole Passwort",
-  "No appointments": "Keine Termine",
-  "No Invoices": "Keine Rechnungen",
-  "No quotations": "Keine Angebote",
-  "No working engineers": "Keine arbeitenden Techniker",
+  "No appointments.": "Keine Termine.",
+  "No Invoices.": "Keine Rechnungen.",
+  "No quotations.": "Keine Angebote.",
+  "No working engineers.": "Keine arbeitenden Techniker.",
   "NOTES": "NOTIZEN",
   "Add New Unit": "Anlage hinzufügen",
   "Add New Contract": "Vertrag hinzufügen",
@@ -1587,5 +1587,6 @@
   "Technicians Name": "Techniker Name",
   "Technician is required": "Techniker ist notwendig",
   "Performance Analytics": "Leistungsanalyse",
-  "Search by name, role, address etc.": "Suche nach Name, Funktion, Adresse usw."
+  "Search by name, role, address etc.": "Suche nach Name, Funktion, Adresse usw.",
+  "jobs": "Aufträge"
 }
