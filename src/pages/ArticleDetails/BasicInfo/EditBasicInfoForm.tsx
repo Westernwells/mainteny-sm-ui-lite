@@ -187,7 +187,7 @@ export const EditBasicInfoForm = ({
           containerStyles={{pr: '1rem'}}
           props={{
             name: 'unitPurchaseAmount',
-            label: t('Purchase Price (excl. VAT)'),
+            label: t('Purchase price (excl. VAT)'),
             placeholder: t(`e.g. 150{{currencySymbol}}`, {currencySymbol}),
             inputProps: {min: 0},
             type: 'number',
@@ -208,7 +208,7 @@ export const EditBasicInfoForm = ({
         <FormInput
           props={{
             name: 'unitSellingAmount',
-            label: t('Selling Price (excl. VAT)'),
+            label: t('Selling price (excl. VAT)'),
             placeholder: t(`e.g. 200{{currencySymbol}}`, {currencySymbol}),
             inputProps: {min: 0},
             type: 'number',

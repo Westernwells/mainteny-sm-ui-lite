@@ -52,7 +52,7 @@ export const NotificationCard = ({
   const navigate = useNavigate();
   const [openAssignTechnicianDialog, setOpenAssignTechnicianDialog] =
     useState(false);
-  const successMessage = 'Service order scheduled successfully';
+  const successMessage = 'Service job scheduled successfully';
   const {mutate: rescheduleServiceOrder} =
     useRedispatchServiceOrders(successMessage);
   const {mutate: scheduleServiceOrder} =
