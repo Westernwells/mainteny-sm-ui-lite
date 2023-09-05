@@ -146,7 +146,7 @@ export const makeRows = (
     ? invoices.map((item, index: number) => ({
         id: index,
         date: item.sentDate ? formatDate(toDate(item.sentDate)) : '-',
-        number: item.number,
+        number: item.externalId,
         order: item.serviceOrder?.number,
         customer: item.propertyOwner.name,
         type: item.serviceOrder?.type,

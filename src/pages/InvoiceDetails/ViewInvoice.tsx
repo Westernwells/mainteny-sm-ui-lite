@@ -200,7 +200,7 @@ export const ViewInvoice = ({
             contentContainerStyles={{display: 'flex', gap: '1.5em'}}>
             <Box>
               <FormLabel text="Invoice Number" sx={{color: 'text.main'}} />
-              <Typography variant="subtitle1">{invoice.number}</Typography>
+              <Typography variant="subtitle1">{invoice.externalId}</Typography>
             </Box>
 
             <Box>
