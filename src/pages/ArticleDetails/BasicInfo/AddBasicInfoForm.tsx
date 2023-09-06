@@ -273,8 +273,13 @@ export const AddBasicInfoForm = ({
             inputProps: {min: 0, max: 100},
             type: 'number',
             required: true,
-            disabled: true,
             value: formik.values.unitPurchaseVat,
+            error: !!(
+              formik.touched.unitPurchaseVat && formik.errors.unitPurchaseVat
+            ),
+            helperText: formik.errors.unitPurchaseVat,
+            onBlur: formik.handleBlur,
+            onChange: formik.handleChange,
             InputProps: {
               startAdornment: (
                 <InputAdornment position="start">%</InputAdornment>
@@ -292,8 +297,13 @@ export const AddBasicInfoForm = ({
             inputProps: {min: 0, max: 100},
             type: 'number',
             required: true,
-            disabled: true,
             value: formik.values.unitSellingVat,
+            error: !!(
+              formik.touched.unitSellingVat && formik.errors.unitSellingVat
+            ),
+            helperText: formik.errors.unitSellingVat,
+            onBlur: formik.handleBlur,
+            onChange: formik.handleChange,
             InputProps: {
               startAdornment: (
                 <InputAdornment position="start">%</InputAdornment>

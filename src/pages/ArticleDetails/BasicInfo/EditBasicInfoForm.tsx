@@ -115,8 +115,11 @@ export const EditBasicInfoForm = ({
             inputProps: {min: 0, max: 100},
             type: 'number',
             value: formik.values.unitPurchaseVat,
+            error: !!(
+              formik.touched.unitPurchaseVat && formik.errors.unitPurchaseVat
+            ),
             helperText: formik.errors.unitPurchaseVat,
-            disabled: true,
+            required: true,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
             InputProps: {
@@ -140,7 +143,7 @@ export const EditBasicInfoForm = ({
               formik.touched.unitSellingVat && formik.errors.unitSellingVat
             ),
             helperText: formik.errors.unitSellingVat,
-            disabled: true,
+            required: true,
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
             InputProps: {

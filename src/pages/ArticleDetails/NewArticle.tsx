@@ -36,7 +36,14 @@ const validationSchema = Yup.object().shape({
   externalId: Yup.string().nullable().required('External Id is required'),
   type: Yup.string().nullable().required('Type is required'),
   unit: Yup.string().nullable().required('Unit is required'),
-  unitSellingVat: Yup.number().nullable().required('Selling VAT is required'),
+  unitPurchaseVat: Yup.number()
+    .required('Purchase VAT is required')
+    .min(0)
+    .max(100),
+  unitSellingVat: Yup.number()
+    .required('Selling VAT is required')
+    .min(0)
+    .max(100),
   unitSellingAmount: Yup.number()
     .nullable()
     .required('Selling price is required'),
