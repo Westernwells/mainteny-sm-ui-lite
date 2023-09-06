@@ -31,3 +31,20 @@ export interface ArticleStockFormModel {
   minOrderQuantity: number;
   minStock: number;
 }
+
+export interface TestContextExtended {
+  from: [
+    {
+      value: Money;
+    },
+    {
+      value: {
+        labor: Money;
+        material: Money;
+      };
+    },
+    {
+      value: ArticleBasicFormModel;
+    },
+  ];
+}
