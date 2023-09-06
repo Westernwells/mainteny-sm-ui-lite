@@ -17,11 +17,7 @@ import {PageCard} from 'components/PageCard';
 import {FormInput} from 'components/form/FormInput';
 import {Button} from 'components/Button';
 import {ArticleType, ArticleView, SupplierRecord} from 'models/article';
-import {
-  ArticleBasicFormModel,
-  ArticleStockFormModel,
-  TestContextExtended,
-} from 'models/articleForm';
+import {ArticleBasicFormModel, ArticleStockFormModel} from 'models/articleForm';
 import {
   amountRecordForBackend,
   currencyFactor,
@@ -29,6 +25,7 @@ import {
   useCurrentCurrency,
 } from 'utils/currency';
 import {createEmptyResource} from 'utils/paging-utils';
+import {handleCostPackageValidation} from 'utils/article-utils';
 import {SupplierItem} from './Suppliers/SupplierItem';
 import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';
 import {AddStockForm} from './Stock/AddStockForm';
@@ -44,28 +41,23 @@ const validationSchema = Yup.object().shape({
     .nullable()
     .required('Selling price is required'),
   costPackage: Yup.object().shape({
+    // amount should be required and sum of labor and material should be equal to unitSellingAmount
     labor: Yup.object().shape({
-      // amount should be required and sum of labor and material should be less than unitSellingAmount
       value: Yup.number()
         .required('Labor price is required')
         .test(
           'value',
           'The sum of labor and material prices should be equal to Selling price',
-          (value, context) => {
-            const {from} = context as Yup.TestContext & TestContextExtended;
-            const main = from[2];
-            if (
-              value &&
-              main.value.unitSellingAmount &&
-              main.value.type === ArticleType.PACKAGE
-            ) {
-              return (
-                value + (main.value.costPackage?.material?.value ?? 0) ===
-                main.value.unitSellingAmount
-              );
-            }
-            return true;
-          },
+          handleCostPackageValidation,
+        ),
+    }),
+    material: Yup.object().shape({
+      value: Yup.number()
+        .required('Material price is required')
+        .test(
+          'value',
+          'The sum of labor and material prices should be equal to Selling price',
+          handleCostPackageValidation,
         ),
     }),
   }),

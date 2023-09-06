@@ -14,8 +14,8 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import _ from 'lodash';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
-import {ArticleType, ArticleView} from 'models/article';
-import {ArticleBasicFormModel, TestContextExtended} from 'models/articleForm';
+import {ArticleView} from 'models/article';
+import {ArticleBasicFormModel} from 'models/articleForm';
 import {Dialog} from 'components/Dialog';
 import {useUpdateArticle} from 'hooks/reactQuery/useArticle';
 import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
@@ -29,6 +29,7 @@ import {
   useCurrentCurrency,
 } from 'utils/currency';
 import {convertToText} from 'utils/utils';
+import {handleCostPackageValidation} from 'utils/article-utils';
 import {EditBasicInfoForm} from './EditBasicInfoForm';
 
 const validationSchema = Yup.object().shape({
@@ -42,27 +43,24 @@ const validationSchema = Yup.object().shape({
     .nullable()
     .required('Selling price is required'),
   costPackage: Yup.object().shape({
+    // amount should be required and sum of labor and material should be equal to unitSellingAmount
     labor: Yup.object().shape({
-      // amount should be required and sum of labor and material should be equal to unitSellingAmount
-      value: Yup.number().test(
-        'value',
-        'The sum of labor and material prices should be equal to Selling price',
-        (value, context) => {
-          const {from} = context as Yup.TestContext & TestContextExtended;
-          const main = from[2];
-          if (
-            value &&
-            main.value.unitSellingAmount &&
-            main.value.type === ArticleType.PACKAGE
-          ) {
-            return (
-              value + (main.value.costPackage?.material?.value ?? 0) ===
-              main.value.unitSellingAmount
-            );
-          }
-          return true;
-        },
-      ),
+      value: Yup.number()
+        .required('Labor price is required')
+        .test(
+          'value',
+          'The sum of labor and material prices should be equal to Selling price',
+          handleCostPackageValidation,
+        ),
+    }),
+    material: Yup.object().shape({
+      value: Yup.number()
+        .required('Material price is required')
+        .test(
+          'value',
+          'The sum of labor and material prices should be equal to Selling price',
+          handleCostPackageValidation,
+        ),
     }),
   }),
 });
