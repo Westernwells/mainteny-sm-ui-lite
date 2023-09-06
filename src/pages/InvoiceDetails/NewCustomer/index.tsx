@@ -9,12 +9,17 @@ import DialogTitle from '@mui/material/DialogTitle';
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {Priority} from 'models/service-order';
-import {useCreateCustomer} from 'hooks/reactQuery/useCustomers';
+import {
+  useCreateCustomer,
+  useQueryCustomers,
+} from 'hooks/reactQuery/useCustomers';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
+import {PropertyOwnerView} from 'models/propertyManager';
+import {createEmptyResource} from 'utils/paging-utils';
 import {
   CustomerAddressFormModel,
   CustomerBasicInfoFormModel,
@@ -101,10 +106,6 @@ export const NewCustomer = ({
   const [activeStep, setActiveStep] = useState(0);
   const [disableNextBtn, setDisableNextBtn] = useState(false);
 
-  const {mutateAsync: createCustomer} = useCreateCustomer(
-    'Customer created successfully',
-  );
-
   const formikBasicInfo = useFormik<CustomerBasicInfoFormModel>({
     initialValues: {
       name: '',
@@ -141,6 +142,19 @@ export const NewCustomer = ({
     onSubmit: () => {},
     validationSchema: validationSchemaContactPersons,
   });
+
+  const {mutateAsync: createCustomer} = useCreateCustomer(
+    'Customer created successfully',
+  );
+  const {data: customerResource = createEmptyResource<PropertyOwnerView>(50)} =
+    useQueryCustomers(
+      {
+        pageIndex: 0,
+        pageSize: 50,
+        query: formikBasicInfo.values.externalId,
+      },
+      {keepPreviousData: true},
+    );
 
   useEffectAfterMount(() => {
     localStorage.setItem(
@@ -242,7 +256,10 @@ export const NewCustomer = ({
             <FlexContainer>
               {activeStep === 0 ? (
                 <FlexContainer containerStyle={{mt: '2em'}}>
-                  <BasicCustomerForm formik={formikBasicInfo} />
+                  <BasicCustomerForm
+                    formik={formikBasicInfo}
+                    customerResource={customerResource.data}
+                  />
                 </FlexContainer>
               ) : activeStep === 1 ? (
                 <FlexContainer containerStyle={{mt: '2em'}}>
