@@ -9,6 +9,9 @@ export const handleCostPackageValidation = (
 ) => {
   const {from} = context as Yup.TestContext & TestContextExtended;
   const main = from[2];
+  if (!value && main.value.type === ArticleType.PACKAGE) {
+    return false;
+  }
   if (
     value &&
     main.value.unitSellingAmount &&

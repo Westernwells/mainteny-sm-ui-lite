@@ -45,22 +45,18 @@ const validationSchema = Yup.object().shape({
   costPackage: Yup.object().shape({
     // amount should be required and sum of labor and material should be equal to unitSellingAmount
     labor: Yup.object().shape({
-      value: Yup.number()
-        .required('Labor price is required')
-        .test(
-          'value',
-          'The sum of labor and material prices should be equal to Selling price',
-          handleCostPackageValidation,
-        ),
+      value: Yup.number().test(
+        'value',
+        'The sum of labor and material prices should be equal to Selling price',
+        handleCostPackageValidation,
+      ),
     }),
     material: Yup.object().shape({
-      value: Yup.number()
-        .required('Material price is required')
-        .test(
-          'value',
-          'The sum of labor and material prices should be equal to Selling price',
-          handleCostPackageValidation,
-        ),
+      value: Yup.number().test(
+        'value',
+        'The sum of labor and material prices should be equal to Selling price',
+        handleCostPackageValidation,
+      ),
     }),
   }),
 });
