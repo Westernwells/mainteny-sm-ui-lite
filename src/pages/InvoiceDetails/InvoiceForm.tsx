@@ -516,6 +516,7 @@ export const InvoiceForm = ({
 
   const setNewlyCreatedCustomer = (customerId: string) => {
     setSearchParams(formatSearchParams({customerId}, searchParams));
+    setIsAddNewCustomerDialogOpen(false);
   };
 
   const toolTipText = (
