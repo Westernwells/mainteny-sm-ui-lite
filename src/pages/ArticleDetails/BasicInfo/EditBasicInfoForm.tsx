@@ -2,17 +2,15 @@ import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
-import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
-import {ArticleType} from '../../../models/article';
-import {FormInput} from '../../../components/form/FormInput';
-import {convertToText} from '../../../utils/utils';
-import {ComboBox} from '../../../components/ComboBox';
-import {ArticleBasicFormModel} from '../../../models/articleForm';
-import {createEmptyResource} from '../../../utils/paging-utils';
-import {useCacheValues} from '../../../hooks/reactQuery/useElevator';
-import {CacheTypes} from '../../../models/misc';
-import {getCurrencySymbol} from '../../../utils/currency';
+import {FormInput} from 'components/form/FormInput';
+import {ComboBox} from 'components/ComboBox';
+import {ArticleBasicFormModel} from 'models/articleForm';
+import {createEmptyResource} from 'utils/paging-utils';
+import {useCacheValues} from 'hooks/reactQuery/useElevator';
+import {CacheTypes} from 'models/misc';
+import {getCurrencySymbol} from 'utils/currency';
+import {SelectArticleType} from './SelectArticleType';
 
 export const EditBasicInfoForm = ({
   containerStyles,
@@ -46,19 +44,6 @@ export const EditBasicInfoForm = ({
           required: true,
           value: formik.values.name,
           error: !!(formik.touched.name && formik.errors.name),
-          onBlur: formik.handleBlur,
-          onChange: formik.handleChange,
-        }}
-      />
-      <FormInput
-        containerStyles={{...containerStyles}}
-        props={{
-          label: t('Category'),
-          name: 'category',
-          placeholder: t('e.g. Cable'),
-          type: 'text',
-          value: formik.values.category,
-          error: !!(formik.touched.category && formik.errors.category),
           onBlur: formik.handleBlur,
           onChange: formik.handleChange,
         }}
@@ -100,6 +85,19 @@ export const EditBasicInfoForm = ({
           type: 'text',
           value: formik.values.model,
           helperText: formik.errors.model,
+          onBlur: formik.handleBlur,
+          onChange: formik.handleChange,
+        }}
+      />
+      <FormInput
+        containerStyles={{...containerStyles}}
+        props={{
+          label: t('Category'),
+          name: 'category',
+          placeholder: t('e.g. Cable'),
+          type: 'text',
+          value: formik.values.category,
+          error: !!(formik.touched.category && formik.errors.category),
           onBlur: formik.handleBlur,
           onChange: formik.handleChange,
         }}
@@ -246,25 +244,9 @@ export const EditBasicInfoForm = ({
           onChange: formik.handleChange,
         }}
       />
-
-      <FormSelect
-        containerStyles={{...containerStyles}}
-        labelId="typeSelect-label"
-        label={t('Types')}
-        options={Object.keys(ArticleType).map((key) => ({
-          label: convertToText(key),
-          value: convertToText(key),
-        }))}
-        selectProps={{
-          id: 'typeSelect',
-          value: formik.values.type
-            ? convertToText(formik.values.type)
-            : undefined,
-          onChange: formik.handleChange,
-          name: 'type',
-          placeholder: t('e.g. Select type'),
-          error: !!(formik.touched.type && formik.errors.type),
-        }}
+      <SelectArticleType
+        selectedArticleType={formik.values.type}
+        formik={formik}
       />
     </Box>
   );

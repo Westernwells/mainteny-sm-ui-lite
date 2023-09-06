@@ -14,10 +14,11 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import _ from 'lodash';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
-import {ArticleView} from 'models/article';
-import {ArticleBasicFormModel} from 'models/articleForm';
+import {ArticleType, ArticleView} from 'models/article';
+import {ArticleBasicFormModel, TestContextExtended} from 'models/articleForm';
 import {Dialog} from 'components/Dialog';
 import {useUpdateArticle} from 'hooks/reactQuery/useArticle';
+import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {CardProps} from 'components/CardProps';
 import {InfoCard} from 'components/InfoCard';
 import {
@@ -25,6 +26,7 @@ import {
   currencyFactor,
   formatNetAmount,
   makeAmountRecord,
+  useCurrentCurrency,
 } from 'utils/currency';
 import {convertToText} from 'utils/utils';
 import {EditBasicInfoForm} from './EditBasicInfoForm';
@@ -39,12 +41,37 @@ const validationSchema = Yup.object().shape({
   unitSellingAmount: Yup.number()
     .nullable()
     .required('Selling price is required'),
+  costPackage: Yup.object().shape({
+    labor: Yup.object().shape({
+      // amount should be required and sum of labor and material should be equal to unitSellingAmount
+      value: Yup.number().test(
+        'value',
+        'The sum of labor and material prices should be equal to Selling price',
+        (value, context) => {
+          const {from} = context as Yup.TestContext & TestContextExtended;
+          const main = from[2];
+          if (
+            value &&
+            main.value.unitSellingAmount &&
+            main.value.type === ArticleType.PACKAGE
+          ) {
+            return (
+              value + (main.value.costPackage?.material?.value ?? 0) ===
+              main.value.unitSellingAmount
+            );
+          }
+          return true;
+        },
+      ),
+    }),
+  }),
 });
 
 export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
   const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
   const {t} = useTranslation();
+  const currentCurrency = useCurrentCurrency();
   const {mutateAsync: updateArticle, isLoading} = useUpdateArticle(
     t('Article updated successfully'),
   );
@@ -77,12 +104,29 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
           currencyFactor(article.unitSellingAmount),
       ),
       unitSellingAmountCurrency: article.unitSellingAmount.currency,
+      costPackage: article.additionalInfo.costPackage
+        ? {
+            labor: {
+              ...article.additionalInfo.costPackage.labor,
+              value:
+                (article.additionalInfo.costPackage.labor?.value ?? 0) /
+                currencyFactor(article.additionalInfo.costPackage.labor),
+            },
+            material: {
+              ...article.additionalInfo.costPackage.material,
+              value:
+                (article.additionalInfo.costPackage.material?.value ?? 0) /
+                currencyFactor(article.additionalInfo.costPackage.material),
+            },
+          }
+        : undefined,
     },
     onSubmit: () => {},
     validationSchema,
   });
 
   const saveArticle = async () => {
+    const factor = currencyFactor({currency: currentCurrency.code});
     const temp = {
       category: formik.values.category,
       description: article.description,
@@ -115,8 +159,39 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
           formik.values.unitSellingVat,
         ),
       ),
+      costPackage: {
+        ...formik.values.costPackage,
+        labor: {
+          ...formik.values.costPackage?.labor,
+          value: (formik.values.costPackage?.labor?.value ?? 0) * factor,
+          currency: currentCurrency.code,
+        },
+        material: {
+          ...formik.values.costPackage?.material,
+          value: (formik.values.costPackage?.material?.value ?? 0) * factor,
+          currency: currentCurrency.code,
+        },
+      },
     };
     await updateArticle({articleId: article!.id, article: temp});
+    setOpenDialog(false);
+  };
+
+  useEffectAfterMount(() => {
+    // whenever unitSellingAmount changes, update costPackage labor and material to 50% 50% of unitSellingAmount
+    formik.setFieldValue('costPackage', {
+      labor: {
+        value: formik.values.unitSellingAmount * 0.5,
+        currency: currentCurrency.code,
+      },
+      material: {
+        value: formik.values.unitSellingAmount * 0.5,
+        currency: currentCurrency.code,
+      },
+    });
+  }, [formik.values.unitSellingAmount]);
+
+  const handleCancel = () => {
     setOpenDialog(false);
   };
 
@@ -205,13 +280,14 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       <Dialog
         title={t('Edit Basic Information')}
         isSaving={isLoading}
-        onCancel={() => setOpenDialog(false)}
+        onCancel={handleCancel}
         disableSaveBtn={
           !!Object.keys(formik.errors).length || !formik.values.type
         }
         onSave={saveArticle}
         dialogProps={{
           open: openDialog || false,
+          maxWidth: 'lg',
         }}>
         <EditBasicInfoForm
           containerStyles={{

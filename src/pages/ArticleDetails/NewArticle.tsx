@@ -17,8 +17,11 @@ import {PageCard} from 'components/PageCard';
 import {FormInput} from 'components/form/FormInput';
 import {Button} from 'components/Button';
 import {ArticleType, ArticleView, SupplierRecord} from 'models/article';
-import {ArticleBasicFormModel, ArticleStockFormModel} from 'models/articleForm';
-import {Money} from 'models/misc';
+import {
+  ArticleBasicFormModel,
+  ArticleStockFormModel,
+  TestContextExtended,
+} from 'models/articleForm';
 import {
   amountRecordForBackend,
   currencyFactor,
@@ -29,23 +32,6 @@ import {createEmptyResource} from 'utils/paging-utils';
 import {SupplierItem} from './Suppliers/SupplierItem';
 import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';
 import {AddStockForm} from './Stock/AddStockForm';
-
-interface TestContextExtended {
-  from: [
-    {
-      value: Money;
-    },
-    {
-      value: {
-        labor: Money;
-        material: Money;
-      };
-    },
-    {
-      value: ArticleBasicFormModel;
-    },
-  ];
-}
 
 const validationSchema = Yup.object().shape({
   category: Yup.string().nullable().required('Category is required'),
@@ -64,13 +50,17 @@ const validationSchema = Yup.object().shape({
         .required('Labor price is required')
         .test(
           'value',
-          'The sum of labor and material prices should be less than Selling price',
+          'The sum of labor and material prices should be equal to Selling price',
           (value, context) => {
             const {from} = context as Yup.TestContext & TestContextExtended;
             const main = from[2];
-            if (value && main.value.unitSellingAmount) {
+            if (
+              value &&
+              main.value.unitSellingAmount &&
+              main.value.type === ArticleType.PACKAGE
+            ) {
               return (
-                value + (main.value.costPackage?.material?.value ?? 0) <=
+                value + (main.value.costPackage?.material?.value ?? 0) ===
                 main.value.unitSellingAmount
               );
             }

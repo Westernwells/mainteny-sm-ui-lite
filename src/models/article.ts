@@ -27,6 +27,10 @@ export interface ArticleAdditionalInfo {
   pictureUrls: string[];
   qrCode: FileResource;
   suppliers: Supplier[];
+  costPackage?: {
+    labor: Money;
+    material: Money;
+  };
 }
 
 export interface ArticleView {
