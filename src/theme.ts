@@ -167,7 +167,7 @@ export const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          textTransform: 'capitalize',
+          textTransform: 'inherit',
         },
       },
       variants: [
