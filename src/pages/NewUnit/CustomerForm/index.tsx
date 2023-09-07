@@ -18,7 +18,11 @@ interface Props {
 }
 
 const validationSchema = Yup.object().shape({
-  propertyOwnerId: Yup.string().nullable().required('Customer is required'),
+  propertyOwnerId: Yup.string()
+    .nullable()
+    .required(
+      "Please select an existing customer. To add a new one, go to the 'Customers' section",
+    ),
 });
 
 export const CustomerForm = ({

@@ -33,7 +33,9 @@ const steps = [
 const validationSchemaBasicInfo = Yup.object().shape({
   propertyOwnerId: Yup.string()
     .transform((id) => (id.length > 0 ? id : null))
-    .required('Customer is required'),
+    .required(
+      "Please select an existing customer. To add a new one, go to the 'Customers' section",
+    ),
   name: Yup.string().required('Contract name is required'),
   startDate: Yup.date().nullable().required('Start date is required'),
   endDate: Yup.date()
