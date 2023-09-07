@@ -1593,5 +1593,5 @@
   "jobs": "Aufträge",
   "Please select an existing customer. To add a new one, go to the 'Customers' section": "Bitte wählen Sie einen bestehenden Kunden aus. Um einen neuen Kunden hinzuzufügen, gehen Sie zum Bereich \"Kunden\".",
   "customer no.": "Kunden-Nr.",
-  "{{discount}}% when paid in 14 days ": "{{discount}}% bei Zahlung innerhalb von 14 Tagen"
+  "{{discount}}% when paid in {{days}} days ": "{{discount}}% bei Zahlung innerhalb von {{days}} Tagen"
 }
