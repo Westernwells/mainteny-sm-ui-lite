@@ -108,7 +108,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       discounts:
         contractDetails?.additionalInfo &&
         contractDetails?.additionalInfo?.discounts &&
-        contractDetails?.additionalInfo?.discounts[0].days,
+        contractDetails?.additionalInfo?.discounts[0].discountPercentage,
       noticePeriodInMonth: contractDetails?.additionalInfo?.noticePeriodInMonth,
       firstMaintenance: contractDetails?.additionalInfo?.firstMaintenance,
       firstInvoiceDate: contractDetails?.additionalInfo?.firstInvoiceDate,
