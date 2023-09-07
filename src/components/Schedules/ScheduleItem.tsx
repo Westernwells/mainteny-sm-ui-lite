@@ -27,7 +27,7 @@ export const ScheduleItem = ({
   position,
   titleLeftAdornment,
   subtitle,
-  height = '50px',
+  height = '60px',
   cardStatusAccent,
   tooltip: TooltipComponent,
   order,
@@ -54,6 +54,8 @@ export const ScheduleItem = ({
         marginTop: '0.5em',
         border: `1px solid ${theme.palette.info.light}`,
         borderLeft: 'none',
+        minWidth: '13px',
+        minHeight: '65px',
         '&::before': {
           content: '""',
           width: '6px',
