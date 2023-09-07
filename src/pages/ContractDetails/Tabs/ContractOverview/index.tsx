@@ -55,6 +55,7 @@ const validationSchema = Yup.object().shape({
   renewalTerms: Yup.number()
     .min(0, 'Renewal period must be between 0-12 months')
     .max(12, 'Renewal period must be between 0-12 months'),
+  discounts: Yup.number().min(0, 'Discount can not be less than 0'),
 });
 
 export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
@@ -147,9 +148,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       invoiceDueDays: formik.values.invoiceDueDays,
       annualPriceAdjustmentPercentage:
         formik.values.annualPriceAdjustmentPercentage,
-      discounts: formik.values.discounts && [
-        {days: 14, discountPercentage: formik.values.discounts},
-      ],
+      discounts: [{days: 14, discountPercentage: formik.values.discounts}],
       noticePeriodInMonth: formik.values.noticePeriodInMonth,
       firstMaintenance: formik.values.firstMaintenance,
       firstInvoiceDate: formik.values.firstInvoiceDate,

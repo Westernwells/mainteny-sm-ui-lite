@@ -190,6 +190,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
             error: !!formik.errors.discounts,
+            helperText: formik.errors.discounts,
             InputProps: {
               endAdornment: (
                 <InputAdornment position="end" color="text.primary">
