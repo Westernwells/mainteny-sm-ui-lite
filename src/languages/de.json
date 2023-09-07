@@ -347,6 +347,8 @@
   "With the 'Package' choice, you can combine work (labor) and items (materials).": "Mit der Option 'Paket' können Sie Lohn- und Materialkosten kombinieren.",
   "Labor price": "Lohnkosten",
   "Labor price is required": "Lohnkosten sind erforderlich",
+  "Material price is required": "Materialkosten erforderlich",
+  "The sum of labor and material prices should be equal to Selling price": "Die Summe aus Material- und Lohnkosten sollten  die Gesamtsummer wiedergeben.",
   "Material price": "Materialkosten",
   "Enter Description": "Beschreibung eingeben",
   "Stock Information": "Informationen zum Lagerbestand",
@@ -1588,5 +1590,8 @@
   "Technician is required": "Techniker ist notwendig",
   "Performance Analytics": "Leistungsanalyse",
   "Search by name, role, address etc.": "Suche nach Name, Funktion, Adresse usw.",
-  "jobs": "Aufträge"
+  "jobs": "Aufträge",
+  "Please select an existing customer. To add a new one, go to the 'Customers' section": "Bitte wählen Sie einen bestehenden Kunden aus. Um einen neuen Kunden hinzuzufügen, gehen Sie zum Bereich \"Kunden\".",
+  "customer no.": "Kunden-Nr.",
+  "{{discount}}% when paid in 14 days ": "{{discount}}% bei Zahlung innerhalb von 14 Tagen"
 }
