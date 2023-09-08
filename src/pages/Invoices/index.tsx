@@ -128,24 +128,33 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
     if (page.pageIndex) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
     }
+
+    setPage({
+      ...page,
+      pageIndex: 0,
+    });
+
     if (textInput.current) {
       textInput.current.value = search;
     }
   }, [search, status, cost]);
 
   useEffect(() => {
+    // Conditionally set the initial pageIndex based on queryParams
     const currentParams = Object.fromEntries([...queryParams]);
+    const initialPageIndex = currentParams.pageIndex
+      ? Number(currentParams.pageIndex) - 1
+      : 0;
 
-    if (currentParams.pageSize)
-      setPage({
-        ...page,
-        pageSize: Number(currentParams.pageSize),
-      });
-    if (currentParams.pageIndex)
-      setPage({
-        ...page,
-        pageIndex: Number(currentParams.pageIndex) - 1,
-      });
+    if (initialPageIndex > 0) {
+      setQueryParams(
+        formatSearchParamsPageIndex(initialPageIndex + 1, queryParams),
+      );
+    }
+
+    if (textInput.current) {
+      textInput.current.value = search;
+    }
   }, [queryParams]);
 
   useEffect(() => {
@@ -245,13 +254,17 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
         loading={isFetching}
         scrollToTop={search}
         pageSize={page.pageSize}
-        pageIndex={page.pageIndex + 1}
+        pageIndex={parseInt(queryParams.get('pageIndex') || '1', 10)}
         handlePageSizeChange={(newPageSize: number) =>
           setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
         }
-        handlePageChange={(newPage: number) =>
-          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-        }
+        handlePageChange={(newPage: number) => {
+          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams));
+          setPage({
+            ...page,
+            pageIndex: newPage - 1,
+          });
+        }}
         pageCount={pageCount}
         totalRows={invoiceResource?.total}
         lastSyncedText={xeroInfoData?.enabled ? lastSyncedText : ''}
