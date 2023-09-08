@@ -18,25 +18,30 @@ export const columns = (
   getColumnProps({
     field: 'no',
     headerName: 'No.',
+    flex: 0.3,
   }),
   getColumnProps({
     field: 'name',
     headerName: 'NAME',
     cellClassName: 'truncateText',
+    flex: 2,
   }),
   getColumnProps({
     field: 'number',
     headerName: 'NUMBER',
+    flex: 1,
   }),
   getColumnProps({
     field: 'unitPrice',
     headerName: 'UNIT PRICE',
-    align: 'right',
+    align: 'center',
+    flex: 2,
   }),
   getColumnProps({
     field: 'quantity',
     headerName: 'QUANTITY',
-    align: 'right',
+    align: 'center',
+    flex: 1,
   }),
   getColumnProps({
     field: 'unit',
@@ -46,11 +51,13 @@ export const columns = (
   getColumnProps({
     field: 'total',
     headerName: 'Total',
-    align: 'right',
+    align: 'center',
+    flex: 2,
   }),
   getColumnProps({
     field: 'actions',
     headerName: 'ACTIONS',
+    headerAlign: 'right',
     renderCell(params) {
       return (
         <Box>
