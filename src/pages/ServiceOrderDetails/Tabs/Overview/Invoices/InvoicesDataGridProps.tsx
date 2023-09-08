@@ -48,14 +48,14 @@ export const columns: GridColDef[] = [
     field: 'number',
     headerName: 'invoice number',
     align: 'center',
-    flex: 0,
+    flex: 2,
     variant: 'titleCase',
   }),
   getColumnProps({
     field: 'amount',
     headerName: 'total amount',
-    align: 'right',
-    flex: 0.75,
+    align: 'center',
+    flex: 1,
     variant: 'titleCase',
   }),
   getColumnProps({
@@ -70,7 +70,7 @@ export const columns: GridColDef[] = [
         maxChars={8}
       />
     ),
-    flex: 0.75,
+    flex: 1,
   }),
 ];
 
