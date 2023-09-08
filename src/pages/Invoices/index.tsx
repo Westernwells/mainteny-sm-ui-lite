@@ -254,7 +254,11 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
         loading={isFetching}
         scrollToTop={search}
         pageSize={page.pageSize}
-        pageIndex={parseInt(queryParams.get('pageIndex') || '1', 10)}
+        pageIndex={
+          pageCount < parseInt(queryParams.get('pageIndex')!, 10)
+            ? 0
+            : parseInt(queryParams.get('pageIndex') || '1', 10)
+        }
         handlePageSizeChange={(newPageSize: number) =>
           setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
         }
