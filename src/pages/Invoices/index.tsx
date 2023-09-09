@@ -41,8 +41,8 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
   const [search, setSearch] = useQueryState('searchInvoices');
-  const [page, setPage] = useState(makePage(0, pageSize));
   const [queryParams, setQueryParams] = useSearchParams();
+  const [page, setPage] = useState(makePage(0, pageSize));
   const totalInvoiceRef = useRef(0);
   const [status, setStatus] = useState<InvoiceStatus>();
   const [cost, setCost] = useState<number[][]>([]);
@@ -125,37 +125,35 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   );
 
   useEffect(() => {
-    if (page.pageIndex) {
+    if (invoiceResource.total > 0 && invoiceResource.data.length === 0) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+      setPage({
+        ...page,
+        pageIndex: 0,
+      });
     }
-
-    setPage({
-      ...page,
-      pageIndex: 0,
-    });
-
     if (textInput.current) {
       textInput.current.value = search;
     }
-  }, [search, status, cost]);
+  }, [search, status, cost, invoiceResource]);
 
   useEffect(() => {
-    // Conditionally set the initial pageIndex based on queryParams
-    const currentParams = Object.fromEntries([...queryParams]);
-    const initialPageIndex = currentParams.pageIndex
-      ? Number(currentParams.pageIndex) - 1
-      : 0;
-
-    if (initialPageIndex > 0) {
-      setQueryParams(
-        formatSearchParamsPageIndex(initialPageIndex + 1, queryParams),
-      );
-    }
-
     if (textInput.current) {
       textInput.current.value = search;
     }
   }, [queryParams]);
+
+  useEffect(() => {
+    const currentParams = Object.fromEntries([...queryParams]);
+    const initialPageIndex = currentParams.pageIndex
+      ? Number(currentParams.pageIndex)
+      : 0;
+
+    setPage({
+      ...page,
+      pageIndex: initialPageIndex > 0 ? initialPageIndex - 1 : 0,
+    });
+  }, []);
 
   useEffect(() => {
     if (!isLoading) {
@@ -254,11 +252,7 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
         loading={isFetching}
         scrollToTop={search}
         pageSize={page.pageSize}
-        pageIndex={
-          pageCount < parseInt(queryParams.get('pageIndex')!, 10)
-            ? 0
-            : parseInt(queryParams.get('pageIndex') || '1', 10)
-        }
+        pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
           setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
         }
