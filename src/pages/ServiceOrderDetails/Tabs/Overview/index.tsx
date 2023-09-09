@@ -2,6 +2,7 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import {
   useServiceOrderActivities,
+  useServiceOrderArticles,
   useServiceOrderDetails,
 } from 'hooks/reactQuery/useServiceOrder';
 import {Progress} from 'components/Progress';
@@ -37,6 +38,7 @@ export const Overview = ({orderId}: Props) => {
     useServiceOrderDetails(orderId);
   const {data: serviceOrderActivities = []} =
     useServiceOrderActivities(orderId);
+  const {data: serviceOrderArticles} = useServiceOrderArticles(orderId);
 
   const iconType = (icon: string) => {
     switch (icon) {
@@ -89,7 +91,7 @@ export const Overview = ({orderId}: Props) => {
 
           <Box mt="1em" flexGrow={1}>
             <Articles
-              serviceOrderArticles={serviceOrderDetails?.articles}
+              serviceOrderArticles={serviceOrderArticles}
               serviceOrderId={serviceOrderDetails?.id}
             />
           </Box>

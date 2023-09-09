@@ -26,6 +26,7 @@ import {mixpanelEvents} from 'mixpanel/constants';
 import {CheckList} from 'models/checklist';
 import {LanguageContext} from 'context/LanguageProvider';
 import {languageContextMap} from 'utils/utils';
+import {ServiceOrderArticleRecord} from 'models/article';
 import {
   AssignmentBasedOrderBody,
   UpdateServiceOrderScheduleBody,
@@ -43,6 +44,8 @@ import {
   CompleteServiceOrder,
   UpdateServiceOrderBody,
   AppointmentConfirmationRequiredOrdersQueryParams,
+  UpdateServiceOrderArticleRecord,
+  ServiceOrderArticleView,
 } from '../../models/service-order';
 import {
   Order,
@@ -998,6 +1001,130 @@ export const usePublishWorkReport = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.fetchServiceOrderWorkReport]);
         enqueueSnackbar(`Work report sent successfully!`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+export const deleteServiceOrderArticle = async (
+  serviceOrder: string,
+  serviceOrderArticleId: string,
+) => {
+  await axiosClient.delete(
+    `api/serviceOrders/${serviceOrder}/articles/${serviceOrderArticleId}`,
+  );
+};
+
+export const useDeleteServiceOrderArticle = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+
+  return useMutation(
+    ({
+      serviceOrder,
+      serviceOrderArticleId,
+    }: {
+      serviceOrder: string;
+      serviceOrderArticleId: string;
+    }) => deleteServiceOrderArticle(serviceOrder, serviceOrderArticleId),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(`Job Article deleted successfully`, {
+          variant: 'success',
+        });
+        queryClient.invalidateQueries([queryKeys.fetchServiceJobArticles]);
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+const createServiceOrderArticle = async (
+  serviceOrder: string,
+  body: ServiceOrderArticleRecord,
+) =>
+  axiosClient.post<StringValue>(`/api/serviceOrders/${serviceOrder}/articles`, {
+    ...body,
+  });
+
+export const useCreateServiceOrderArticle = () => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    ({
+      serviceOrder,
+      body,
+    }: {
+      serviceOrder: string;
+      body: ServiceOrderArticleRecord;
+    }) => createServiceOrderArticle(serviceOrder, body),
+    {
+      onSuccess: () => {
+        enqueueSnackbar('Service Job article added successfully', {
+          variant: 'success',
+        });
+        queryClient.invalidateQueries([queryKeys.fetchServiceJobArticles]);
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+const fetchServiceJobArticles = async (serviceOrder: string) => {
+  const response = await axiosClient.get<ServiceOrderArticleView[]>(
+    `/api/serviceOrders/${serviceOrder}/articles`,
+  );
+  return response.data;
+};
+
+export const useServiceOrderArticles = (serviceOrder?: string) =>
+  useQuery([queryKeys.fetchServiceJobArticles, serviceOrder], () =>
+    fetchServiceJobArticles(serviceOrder!),
+  );
+
+export const putNewServiceOrderArticles = async (
+  body: UpdateServiceOrderArticleRecord,
+  serviceOrder: string,
+  serviceOrderArticleId: string,
+) => {
+  await axiosClient.put(
+    `api/serviceOrders/${serviceOrder}/articles/${serviceOrderArticleId}`,
+    body,
+  );
+};
+
+export const useNewUpdateServiceOrderArticles = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+
+  return useMutation(
+    ({
+      data,
+      serviceOrder,
+      serviceOrderArticleId,
+    }: {
+      data: UpdateServiceOrderArticleRecord;
+      serviceOrder: string;
+      serviceOrderArticleId: string;
+    }) => putNewServiceOrderArticles(data, serviceOrder, serviceOrderArticleId),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.fetchServiceJobArticles]);
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        enqueueSnackbar(`Service Job updated successfully!`, {
           variant: 'success',
         });
       },

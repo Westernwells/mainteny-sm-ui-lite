@@ -11,10 +11,14 @@ import Box from '@mui/material/Box';
 import {SelectModal} from 'components/SelectModal';
 import {ArticlesModalDataGrid} from 'components/ArticleModalDataGrid';
 import {ArticleView} from 'models/article';
-import {useUpdateServiceOrderArticles} from 'hooks/reactQuery/useArticle';
 import {Progress} from 'components/Progress';
 import {Confirm} from 'components/Confirm';
 import {Dialog} from 'components/Dialog';
+import {
+  useCreateServiceOrderArticle,
+  useDeleteServiceOrderArticle,
+  useNewUpdateServiceOrderArticles,
+} from 'hooks/reactQuery/useServiceOrder';
 import {EditArticleForm} from './EditArticleForm';
 import {ActionTypes, columns, makeRows} from './ArticleDataGridProps';
 import {EditArticleFormModel} from './models';
@@ -24,14 +28,11 @@ import {
 } from '../../../../../utils/currency';
 
 interface Props {
-  serviceOrderArticles?: ServiceOrderArticleView[];
+  serviceOrderArticles: ServiceOrderArticleView[] | undefined;
   serviceOrderId?: string;
 }
 
-export const Articles = ({
-  serviceOrderArticles = [],
-  serviceOrderId,
-}: Props) => {
+export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
   const {t} = useTranslation();
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -44,11 +45,18 @@ export const Articles = ({
   const [openConfirm, setOpenConfirm] = useState(false);
   const [currentArticle, setCurrentArticle] =
     useState<ServiceOrderArticleView>();
-  const {mutateAsync: updateServiceOrderArticles, isLoading} =
-    useUpdateServiceOrderArticles('Article added successfully');
+
+  const {mutateAsync: createServiceOrderArticle} =
+    useCreateServiceOrderArticle();
+
+  const {mutateAsync: updateServiceOrderArticle, isLoading} =
+    useNewUpdateServiceOrderArticles();
+
+  const {mutateAsync: deleteServiceOrderArticle} =
+    useDeleteServiceOrderArticle();
 
   useEffect(() => {
-    setRows(makeRows(serviceOrderArticles));
+    setRows(makeRows(serviceOrderArticles!));
   }, [serviceOrderArticles]);
 
   useEffect(() => {
@@ -64,69 +72,38 @@ export const Articles = ({
     }
   }, [isLoading]);
 
-  const getArticleUpdateBody = () =>
-    serviceOrderArticles?.map((item) => ({
-      articleId: item.article.id,
-      description: item.article.description,
-      name: item.article.name,
-      quantity: item.quantity,
-      unitAmount: {
-        currency: item.unitAmount.currency,
-        netAmount: item.unitAmount.netAmount,
-        percentageVat: item.unitAmount.percentageVat,
-      },
-    }));
-
   const handleSelectArticle = async (article: ArticleView) => {
-    const articleExists = serviceOrderArticles.filter(
+    const articleExists = serviceOrderArticles?.filter(
       (item) => item.article.id === article.id,
     );
-    if (articleExists.length > 0) {
+
+    if (articleExists!.length > 0) {
       setOpenSelectModal(false);
       return;
     }
-    let body = getArticleUpdateBody();
-
-    body = [
-      ...body,
-      {
-        articleId: article.id,
-        description: article.description,
-        name: article.name,
-        quantity: 1,
-        unitAmount: {
-          currency: article.unitSellingAmount.currency,
-          netAmount: article.unitSellingAmount.netAmount,
-          percentageVat: article.unitSellingAmount.percentageVat,
-        },
+    const body = {
+      articleId: article.id,
+      description: article.description,
+      name: article.name,
+      quantity: 1,
+      unitAmount: {
+        currency: article.unitSellingAmount.currency,
+        netAmount: article.unitSellingAmount.netAmount,
+        percentageVat: article.unitSellingAmount.percentageVat,
       },
-    ];
-    await updateServiceOrderArticles({
+    };
+
+    await createServiceOrderArticle({
+      serviceOrder: serviceOrderId!,
       body,
-      serviceOrderId: serviceOrderId!,
     });
     setOpenSelectModal(false);
   };
 
   const deleteArticle = async () => {
-    const result = serviceOrderArticles.filter(
-      (item) => item.id !== currentArticle?.id,
-    );
-    const body = result?.map((item) => ({
-      articleId: item.article.id,
-      description: item.article.description,
-      name: item.article.name,
-      quantity: item.quantity,
-      unitAmount: {
-        currency: item.unitAmount.currency,
-        netAmount: item.unitAmount.netAmount,
-        percentageVat: item.unitAmount.percentageVat,
-      },
-    }));
-
-    await updateServiceOrderArticles({
-      body,
-      serviceOrderId: serviceOrderId!,
+    await deleteServiceOrderArticle({
+      serviceOrder: serviceOrderId!,
+      serviceOrderArticleId: currentArticle?.id!,
     });
     setOpenConfirm(false);
   };
@@ -147,23 +124,10 @@ export const Articles = ({
   };
 
   const handleUpdateArticle = async () => {
-    const body = serviceOrderArticles.map((item) => {
-      if (item.article.id !== currentArticle?.article.id) {
-        return {
-          articleId: item.article.id,
-          description: item.article.description,
-          name: item.article.name,
-          quantity: item.quantity,
-          unitAmount: {
-            currency: item.unitAmount.currency,
-            netAmount: item.unitAmount.netAmount,
-            percentageVat: item.unitAmount.percentageVat,
-          },
-        };
-      }
-
-      return {
-        articleId: currentArticle!.article.id,
+    const body = serviceOrderArticles!
+      .filter((item) => item.article.id === currentArticle?.article.id)
+      .map((item) => ({
+        articleId: item.article.id,
         description: formikValues!.description,
         name: formikValues!.name,
         quantity: formikValues!.quantity,
@@ -174,12 +138,14 @@ export const Articles = ({
             currentArticle!.unitAmount.percentageVat,
           ),
         ),
-      };
+      }))[0];
+    await updateServiceOrderArticle({
+      data: body!,
+      serviceOrder: serviceOrderId!,
+      serviceOrderArticleId: currentArticle?.id!,
     });
-
-    await updateServiceOrderArticles({body, serviceOrderId: serviceOrderId!});
+    setOpenEditDialog(false);
   };
-
   const renderNoRowsSection = () => (
     <Box
       sx={{
@@ -206,7 +172,7 @@ export const Articles = ({
         headerActionIcon={
           <Typography color="info.main">{t('+ Add')}</Typography>
         }>
-        {serviceOrderArticles.length === 0 ? (
+        {serviceOrderArticles?.length! < 1 ? (
           renderNoRowsSection()
         ) : (
           <DataGridLayout

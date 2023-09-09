@@ -1,5 +1,5 @@
 import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
-import {multipleAmount, formatNetAmount} from 'utils/currency';
+import {formatCurrency} from 'utils/currency';
 import {ServiceOrderArticleView} from 'models/service-order';
 import {getColumnProps} from 'components/DataGridLayout';
 import Box from '@mui/material/Box';
@@ -84,12 +84,15 @@ export const makeRows = (articles: ServiceOrderArticleView[]): GridRowsProp =>
       number: item.article.externalId,
       name: item.name,
       unit: item.article.unit,
-      total: formatNetAmount(
-        multipleAmount(item.article.unitSellingAmount, item.quantity),
+      total: formatCurrency(
+        (item.unitAmount.netAmount * item.quantity) /
+          10 ** item.unitAmount.fractionDigits!,
       ),
       model: item.article.model,
       supplier: item.article.manufacturer,
-      unitPrice: formatNetAmount(item.article.unitSellingAmount),
+      unitPrice: formatCurrency(
+        item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!,
+      ),
       quantity: item.quantity,
       actions: item,
       navigateTo: `/articles/details/${item.article.id}`,

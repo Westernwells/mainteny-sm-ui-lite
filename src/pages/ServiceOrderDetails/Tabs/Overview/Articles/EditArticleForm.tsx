@@ -6,7 +6,7 @@ import {useEffect} from 'react';
 import InputAdornment from '@mui/material/InputAdornment';
 import * as Yup from 'yup';
 import {ServiceOrderArticleView} from 'models/service-order';
-import {amountForView, getCurrencySymbol} from 'utils/currency';
+import {getCurrencySymbol} from 'utils/currency';
 import {EditArticleFormModel} from './models';
 
 interface Props {
@@ -28,10 +28,11 @@ export const EditArticleForm = ({
 }: Props) => {
   const formik = useFormik<EditArticleFormModel>({
     initialValues: {
-      name: serviceOrderArticle.article.name,
-      description: serviceOrderArticle.article.description,
-      unitPrice: amountForView(serviceOrderArticle.article.unitSellingAmount)
-        .netAmount,
+      name: serviceOrderArticle.name,
+      description: serviceOrderArticle.description,
+      unitPrice:
+        serviceOrderArticle.unitAmount.netAmount /
+        10 ** serviceOrderArticle.unitAmount.fractionDigits!,
       quantity: serviceOrderArticle.quantity,
     },
     onSubmit: () => {},
