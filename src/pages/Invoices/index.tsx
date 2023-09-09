@@ -132,6 +132,7 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
         pageIndex: 0,
       });
     }
+
     if (textInput.current) {
       textInput.current.value = search;
     }

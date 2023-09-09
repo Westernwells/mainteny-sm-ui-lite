@@ -76,19 +76,26 @@ export const ServiceOrderList = () => {
     totalOrederRef.current || serviceOrdersResource.total;
 
   useEffect(() => {
-    if (page.pageIndex) {
+    if (
+      serviceOrdersResource.total > 0 &&
+      serviceOrdersResource.data.length === 0
+    ) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+      setPage({
+        ...page,
+        pageIndex: 0,
+      });
     }
-
-    setPage({
-      ...page,
-      pageIndex: 0,
-    });
 
     if (textInput.current) {
       textInput.current.value = searchQuery;
     }
-  }, [searchQuery, selectedOrderTypes, selectedOrderStatus]);
+  }, [
+    searchQuery,
+    selectedOrderTypes,
+    selectedOrderStatus,
+    serviceOrdersResource,
+  ]);
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
@@ -106,6 +113,18 @@ export const ServiceOrderList = () => {
       textInput.current.value = searchQuery;
     }
   }, [queryParams]);
+
+  useEffect(() => {
+    const currentParams = Object.fromEntries([...queryParams]);
+    const initialPageIndex = currentParams.pageIndex
+      ? Number(currentParams.pageIndex)
+      : 0;
+
+    setPage({
+      ...page,
+      pageIndex: initialPageIndex > 0 ? initialPageIndex - 1 : 0,
+    });
+  }, []);
 
   useEffect(() => {
     if (!isLoading) {
