@@ -418,7 +418,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               </Box>
             }
             headerActionIcon={
-              <Typography color="#2196F3">{t('+ Add')}</Typography>
+              <Typography color="#2196F3">{`+ ${t('Add')}`}</Typography>
             }
             headerAction={() => setOpenDocumentDialog(true)}>
             {uploadedDocument && uploadedDocument[0] ? (

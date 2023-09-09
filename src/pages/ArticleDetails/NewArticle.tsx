@@ -378,7 +378,7 @@ export const NewArticle = () => {
               </Box>
               <Box display="flex">
                 <Button
-                  label={t('+ Add Supplier')}
+                  label={`+ ${t('Add Supplier')}`}
                   style={{mt: '0.5rem'}}
                   buttonProps={{
                     onClick: () => addSupplier(),

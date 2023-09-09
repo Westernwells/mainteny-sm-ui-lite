@@ -170,7 +170,7 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
         showHeaderBackground
         handleAction={() => setOpenSelectModal(true)}
         headerActionIcon={
-          <Typography color="info.main">{t('+ Add')}</Typography>
+          <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
         }>
         {serviceOrderArticles?.length! < 1 ? (
           renderNoRowsSection()

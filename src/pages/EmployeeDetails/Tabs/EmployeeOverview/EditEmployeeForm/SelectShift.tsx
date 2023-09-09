@@ -191,7 +191,7 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
 
       <Box mt="1em">
         <Button
-          label="+ Add"
+          label={`+ ${t('Add')}`}
           buttonProps={{
             variant: 'outlined',
             color: 'info',
