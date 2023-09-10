@@ -76,24 +76,22 @@ export const columns = (
 ];
 
 export const makeRows = (articles: ServiceOrderArticleView[]): GridRowsProp =>
-  articles
-    .sort((a, b) => a.article.name.localeCompare(b.article.name))
-    .map((item, index) => ({
-      id: index,
-      no: index + 1,
-      number: item.article.externalId,
-      name: item.name,
-      unit: item.article.unit,
-      total: formatCurrency(
-        (item.unitAmount.netAmount * item.quantity) /
-          10 ** item.unitAmount.fractionDigits!,
-      ),
-      model: item.article.model,
-      supplier: item.article.manufacturer,
-      unitPrice: formatCurrency(
-        item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!,
-      ),
-      quantity: item.quantity,
-      actions: item,
-      navigateTo: `/articles/details/${item.article.id}`,
-    }));
+  articles.map((item, index) => ({
+    id: index,
+    no: index + 1,
+    number: item.article.externalId,
+    name: item.name,
+    unit: item.article.unit,
+    total: formatCurrency(
+      (item.unitAmount.netAmount * item.quantity) /
+        10 ** item.unitAmount.fractionDigits!,
+    ),
+    model: item.article.model,
+    supplier: item.article.manufacturer,
+    unitPrice: formatCurrency(
+      item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!,
+    ),
+    quantity: item.quantity,
+    actions: item,
+    navigateTo: `/articles/details/${item.article.id}`,
+  }));
