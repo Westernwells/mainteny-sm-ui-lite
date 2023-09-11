@@ -279,10 +279,12 @@ export const InvoiceForm = ({
     setIsCheckListPDFGenerated(checkListGenerated);
     formik.setFieldValue(
       'includeWorkReport',
-      workReportGenerated || false,
-      true,
+      invoice?.additionalInfo.includeWorkReport || false,
     );
-    formik.setFieldValue('includeCheckList', checkListGenerated, true);
+    formik.setFieldValue(
+      'includeCheckList',
+      invoice?.additionalInfo.includeCheckList || false,
+    );
   }, [serviceOrder]);
 
   useEffect(() => {
