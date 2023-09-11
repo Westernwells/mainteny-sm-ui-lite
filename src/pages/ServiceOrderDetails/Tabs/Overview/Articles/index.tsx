@@ -113,7 +113,6 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
     action: ActionTypes,
   ) => {
     setCurrentArticle(serviceOrderArticle);
-
     if (action === ActionTypes.EDIT) {
       setIsEditing(true);
     }
