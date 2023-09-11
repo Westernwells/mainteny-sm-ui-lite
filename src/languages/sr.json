@@ -1612,5 +1612,6 @@
   "Technician is required": "Potreban je serviser",
   "Performance Analytics": "Analitika performansi",
   "Search by name, role, address etc.": "Traži po imenu, poziciji, adresi itd.",
-  "jobs": "naređenja"
+  "jobs": "naređenja",
+  "Please select an existing customer. To add a new one, go to the 'Customers' section": "Izaberite postojećeg kupca. Da biste dodali novi, idite na odeljak „Kupci“."
 }
