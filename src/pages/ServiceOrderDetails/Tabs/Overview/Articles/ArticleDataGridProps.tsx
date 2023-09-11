@@ -36,6 +36,7 @@ export const columns = (
     headerName: 'UNIT PRICE',
     align: 'center',
     flex: 2,
+    headerAlign: 'center',
   }),
   getColumnProps({
     field: 'quantity',
