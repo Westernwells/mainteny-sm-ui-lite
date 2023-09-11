@@ -76,7 +76,7 @@ export const columns = (
 ];
 
 export const makeRows = (articles: ServiceOrderArticleView[]): GridRowsProp =>
-  articles.map((item, index) => ({
+  articles?.map((item, index) => ({
     id: index,
     no: index + 1,
     number: item.article.externalId,

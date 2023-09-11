@@ -56,7 +56,7 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
     useDeleteServiceOrderArticle();
 
   useEffect(() => {
-    setRows(makeRows(serviceOrderArticles!));
+    setRows(makeRows(serviceOrderArticles || []));
   }, [serviceOrderArticles]);
 
   useEffect(() => {
@@ -172,7 +172,7 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
         headerActionIcon={
           <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
         }>
-        {serviceOrderArticles?.length! < 1 ? (
+        {!serviceOrderArticles?.length ? (
           renderNoRowsSection()
         ) : (
           <DataGridLayout
