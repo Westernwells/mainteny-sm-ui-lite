@@ -76,27 +76,55 @@ export const ServiceOrderList = () => {
     totalOrederRef.current || serviceOrdersResource.total;
 
   useEffect(() => {
-    if (page.pageIndex) {
+    if (
+      serviceOrdersResource.total > 0 &&
+      serviceOrdersResource.data.length === 0
+    ) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+      setPage({
+        ...page,
+        pageIndex: 0,
+      });
     }
+
     if (textInput.current) {
       textInput.current.value = searchQuery;
     }
-  }, [searchQuery, selectedOrderTypes, selectedOrderStatus]);
+  }, [
+    searchQuery,
+    selectedOrderTypes,
+    selectedOrderStatus,
+    serviceOrdersResource,
+  ]);
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
-    if (currentParams.pageSize)
-      setPage({
-        ...page,
-        pageSize: Number(currentParams.pageSize),
-      });
-    if (currentParams.pageIndex)
-      setPage({
-        ...page,
-        pageIndex: Number(currentParams.pageIndex) - 1,
-      });
+    const initialPageIndex = currentParams.pageIndex
+      ? Number(currentParams.pageIndex) - 1
+      : 0;
+
+    if (initialPageIndex > 0) {
+      setQueryParams(
+        formatSearchParamsPageIndex(initialPageIndex + 1, queryParams),
+      );
+    }
+
+    if (textInput.current) {
+      textInput.current.value = searchQuery;
+    }
   }, [queryParams]);
+
+  useEffect(() => {
+    const currentParams = Object.fromEntries([...queryParams]);
+    const initialPageIndex = currentParams.pageIndex
+      ? Number(currentParams.pageIndex)
+      : 0;
+
+    setPage({
+      ...page,
+      pageIndex: initialPageIndex > 0 ? initialPageIndex - 1 : 0,
+    });
+  }, []);
 
   useEffect(() => {
     if (!isLoading) {
@@ -190,13 +218,21 @@ export const ServiceOrderList = () => {
         loading={isFetching}
         pageSize={page.pageSize}
         scrollToTop={searchQuery}
-        pageIndex={page.pageIndex + 1}
+        pageIndex={
+          pageCount < parseInt(queryParams.get('pageIndex')!, 10)
+            ? 0
+            : parseInt(queryParams.get('pageIndex') || '1', 10)
+        }
         handlePageSizeChange={(newPageSize: number) =>
           setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
         }
-        handlePageChange={(newPage: number) =>
-          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-        }
+        handlePageChange={(newPage: number) => {
+          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams));
+          setPage({
+            ...page,
+            pageIndex: newPage - 1,
+          });
+        }}
         pageCount={pageCount}
         totalRows={serviceOrdersResource.total}
       />

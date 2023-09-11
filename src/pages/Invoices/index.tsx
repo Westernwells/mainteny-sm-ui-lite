@@ -41,8 +41,8 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
   const [search, setSearch] = useQueryState('searchInvoices');
-  const [page, setPage] = useState(makePage(0, pageSize));
   const [queryParams, setQueryParams] = useSearchParams();
+  const [page, setPage] = useState(makePage(0, pageSize));
   const totalInvoiceRef = useRef(0);
   const [status, setStatus] = useState<InvoiceStatus>();
   const [cost, setCost] = useState<number[][]>([]);
@@ -125,28 +125,36 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   );
 
   useEffect(() => {
-    if (page.pageIndex) {
+    if (invoiceResource.total > 0 && invoiceResource.data.length === 0) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+      setPage({
+        ...page,
+        pageIndex: 0,
+      });
     }
+
     if (textInput.current) {
       textInput.current.value = search;
     }
-  }, [search, status, cost]);
+  }, [search, status, cost, invoiceResource]);
+
+  useEffect(() => {
+    if (textInput.current) {
+      textInput.current.value = search;
+    }
+  }, [queryParams]);
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
+    const initialPageIndex = currentParams.pageIndex
+      ? Number(currentParams.pageIndex)
+      : 0;
 
-    if (currentParams.pageSize)
-      setPage({
-        ...page,
-        pageSize: Number(currentParams.pageSize),
-      });
-    if (currentParams.pageIndex)
-      setPage({
-        ...page,
-        pageIndex: Number(currentParams.pageIndex) - 1,
-      });
-  }, [queryParams]);
+    setPage({
+      ...page,
+      pageIndex: initialPageIndex > 0 ? initialPageIndex - 1 : 0,
+    });
+  }, []);
 
   useEffect(() => {
     if (!isLoading) {
@@ -249,9 +257,13 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
         handlePageSizeChange={(newPageSize: number) =>
           setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
         }
-        handlePageChange={(newPage: number) =>
-          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-        }
+        handlePageChange={(newPage: number) => {
+          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams));
+          setPage({
+            ...page,
+            pageIndex: newPage - 1,
+          });
+        }}
         pageCount={pageCount}
         totalRows={invoiceResource?.total}
         lastSyncedText={xeroInfoData?.enabled ? lastSyncedText : ''}
