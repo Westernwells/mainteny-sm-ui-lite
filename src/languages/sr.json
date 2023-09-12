@@ -1614,11 +1614,16 @@
   "jobs": "naređenja",
   "Please select an existing customer. To add a new one, go to the 'Customers' section": "Izaberite postojećeg kupca. Da biste dodali novi, idite na odeljak „Kupci“.",
   "customer no.": "kupac br.",
-  "{{item.discountPercentage}}% when paid in {{item.days}} days ": "{{item.discount Percentage}}% kada se plati za {{item.dais}} dana",
+  "{{item.discountPercentage}}% when paid in {{item.days}} days ": "{{item.discountPercentage}}% kada se plati za {{item.days}} dana",
   "Discount can not be less than 0": "Popust ne može biti manji od 0",
   "The item will be measured in terms of this unit (e.g. kg, piece, set)": "Stavka će se meriti u smislu ove jedinice (npr. kg, komad, set)",
   "Job Details": "Detalji narudžbe",
   "Created on {{createdAt}}": "Napravljeno {{createdAt}}",
   "NO.": "NO.",
-  "No.": "No."
+  "No.": "No.",
+  "You are logged as [name] ": "Prijavljeni ste kao",
+  "Elevator": "Lift",
+  "The final amount includes {{materialCost}}{{currencyCode}} material and {{laborCost}}{{currencyCode}} labor cost.": "Konačni iznos uključuje {{materialCost}}{{currenciCode}} materijal i {{laborCost}}{{currenciCode}} troškove rada.",
+  "The final amount includes {{materialCost}}{{currencyCode}} material cost.": "Konačni iznos uključuje {{materialCost}}{{currencyCode}} materijalne troškove.",
+  "The final amount includes {{laborCost}}{{currencyCode}} labor cost.": "Konačni iznos uključuje {{laborCost}}{{currencyCode}} troškove rada."
 }
