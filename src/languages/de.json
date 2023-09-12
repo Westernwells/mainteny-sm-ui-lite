@@ -1592,11 +1592,16 @@
   "jobs": "Aufträge",
   "Please select an existing customer. To add a new one, go to the 'Customers' section": "Bitte wählen Sie einen bestehenden Kunden aus. Um einen neuen Kunden hinzuzufügen, gehen Sie zum Bereich \"Kunden\".",
   "customer no.": "Kunden-Nr.",
-  "{{item.discountPercentage}}% when paid in {{item.days}} days ": "{{item.discount}}% bei Zahlung innerhalb von {{item.days}} Tagen",
+  "{{item.discountPercentage}}% when paid in {{item.days}} days ": "{{item.discountPercentage}}% bei Zahlung innerhalb von {{item.days}} Tagen",
   "Discount can not be less than 0": "Der Rabatt darf nicht kleiner als 0 sein.",
   "The item will be measured in terms of this unit (e.g. kg, piece, set)": "Der Artikel wird in dieser Einheit gemessen (z.B. kg, Stk.)",
   "Job Details": "Auftragsdetails",
   "Created on {{createdAt}}": "Erstellt am {{createdAt}}",
   "NO.": "NR.",
-  "No.": "Nr."
+  "No.": "Nr.",
+  "You are logged as [name] ": "Sie sind angemeldet als [name]",
+  "Elevator": "Aufzug",
+  "The final amount includes {{materialCost}}{{currencyCode}} material and {{laborCost}}{{currencyCode}} labor cost.": "Der Endbetrag umfasst {{materialCost}}{{currencyCode}} Material- und {{laborCost}}{{currencyCode}} Lohnkosten.",
+  "The final amount includes {{materialCost}}{{currencyCode}} material cost.": "Der Endbetrag umfasst {{materialCost}}{{currencyCode}} Materialkosten.",
+  "The final amount includes {{laborCost}}{{currencyCode}} labor cost.": "Der Endbetrag umfasst {{laborCost}}{{currencyCode}} Lohnkosten."
 }
