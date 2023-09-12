@@ -912,7 +912,7 @@
   "PRICE": "Cijena",
   "Invoice Amount": "Iznos",
   "Save Draft": "Sačuvaj nacrt",
-  "Invoice details": "Detalji računa",
+  "Invoice Details": "Detalji računa",
   "Create Credit note": "Stvori kredit",
   "This action will create a credit note from this invoice details.": "Ova će radnja stvoriti knjižno odobrenje iz pojedinosti ove fakture.",
   "Add New Customer": "Dodaj novog kupca",
@@ -1618,5 +1618,7 @@
   "Discount can not be less than 0": "Popust ne može biti manji od 0",
   "The item will be measured in terms of this unit (e.g. kg, piece, set)": "Stavka će se meriti u smislu ove jedinice (npr. kg, komad, set)",
   "Job Details": "Detalji narudžbe",
-  "Created on {{createdAt}}": "Napravljeno {{createdAt}}"
+  "Created on {{createdAt}}": "Napravljeno {{createdAt}}",
+  "NO.": "NO.",
+  "No.": "No."
 }
