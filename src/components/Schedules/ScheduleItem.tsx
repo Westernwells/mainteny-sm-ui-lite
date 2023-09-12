@@ -107,6 +107,7 @@ export const ScheduleItem = ({
                   overflow: 'hidden',
                   marginLeft: '0.5em',
                   mt: '0.3em',
+                  lineHeight: 1.2,
                 }}>
                 {title}
               </Typography>

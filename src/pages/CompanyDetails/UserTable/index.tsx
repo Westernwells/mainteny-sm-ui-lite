@@ -214,7 +214,7 @@ export const UserTable = ({companyId}: Props) => {
         headerStyles={{mt: '0.5em'}}
         handleAction={onCreateUser}
         headerActionIcon={
-          <Typography color="info.main">{t('+ Add')}</Typography>
+          <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
         }
         showHeaderBackground>
         <DataGridLayout

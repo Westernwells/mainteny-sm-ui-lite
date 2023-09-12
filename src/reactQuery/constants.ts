@@ -76,4 +76,5 @@ export const queryKeys = {
   fetchAutoNumberConfig: 'fetchAutoNumberConfig',
   fetchSyncStatusXero: 'fetchSyncStatusXero',
   fetchXeroIntegration: 'fetchXeroIntegration',
+  fetchServiceJobArticles: 'fetchServiceJobArticles',
 };

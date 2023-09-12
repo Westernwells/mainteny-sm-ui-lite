@@ -6,7 +6,15 @@ import {
   ElevatorView,
 } from './elevator';
 import {Contract, ContractSimpleView} from './contract';
-import {Amount, Fee, JobStatus, Meta, Order, PdfGenerationStatus} from './misc';
+import {
+  Amount,
+  Fee,
+  JobStatus,
+  Meta,
+  Order,
+  PdfGenerationStatus,
+  AmountRecord,
+} from './misc';
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
@@ -413,6 +421,14 @@ export interface ServiceOrderItemRecord {
   name: string;
   quantity: number;
   unitAmount: Amount;
+}
+
+export interface UpdateServiceOrderArticleRecord {
+  articleId: string;
+  description: string;
+  name: string;
+  quantity: number;
+  unitAmount: AmountRecord;
 }
 
 export interface AppointmentConfirmationRequiredOrdersQueryParams {
