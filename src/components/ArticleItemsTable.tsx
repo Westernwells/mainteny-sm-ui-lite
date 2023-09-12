@@ -140,6 +140,8 @@ export const ArticleItemsTable = ({
       name: article.name,
       quantity: 1,
       unitAmount: article.unitSellingAmount,
+      type: article.type,
+      costPackage: article.additionalInfo?.costPackage,
     };
     return getItemRecord(record);
   };

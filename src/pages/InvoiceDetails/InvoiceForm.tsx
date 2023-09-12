@@ -67,6 +67,8 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {IconButton} from '@mui/material';
 import {useQueryContractPaymentTerms} from 'hooks/reactQuery/useCompanies';
 import {createEmptyResource} from 'utils/paging-utils';
+import {getCurrencySymbol, useCurrentCurrency} from 'utils/currency';
+import {calculateCostPackage} from 'utils/calculate-total';
 import {formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
 
@@ -105,6 +107,7 @@ export const InvoiceForm = ({
   const [searchParams, setSearchParams] = useSearchParams();
 
   const {user} = useUserSession();
+  const currentCurrency = useCurrentCurrency();
 
   const {mutateAsync: updateInvoiceAsync, isLoading: isUpdating} =
     useUpdateInvoice();
@@ -160,6 +163,7 @@ export const InvoiceForm = ({
   const [dueDate, setDueDate] = useState<Date | null>(
     invoice ? new Date(invoice.dueDate) : null,
   );
+  const [finalAmountText, setFinalAmountText] = useState('');
 
   const {data: contractPaymentTerms = createEmptyResource(pageSize)} =
     useQueryContractPaymentTerms({
@@ -366,7 +370,37 @@ export const InvoiceForm = ({
       ),
       true,
     );
-  }, [invoiceItems]);
+    const currencyCode = getCurrencySymbol[currentCurrency.code];
+    const {materialCost, laborCost} = calculateCostPackage(invoiceItems);
+    setFinalAmountText(
+      materialCost && laborCost
+        ? t(
+            `The final amount includes {{materialCost}}{{currencyCode}} material and {{laborCost}}{{currencyCode}} labor cost.`,
+            {
+              materialCost,
+              laborCost,
+              currencyCode,
+            },
+          )
+        : materialCost
+        ? t(
+            `The final amount includes {{materialCost}}{{currencyCode}} material cost.`,
+            {
+              materialCost,
+              currencyCode,
+            },
+          )
+        : laborCost
+        ? t(
+            `The final amount includes {{laborCost}}{{currencyCode}} labor cost.`,
+            {
+              laborCost,
+              currencyCode,
+            },
+          )
+        : '',
+    );
+  }, [invoiceItems, t]);
 
   const actions = useMemo(() => {
     const items = [
@@ -1006,6 +1040,27 @@ export const InvoiceForm = ({
               propertyOwnerId={customer?.id ?? ''}
               formType={formType}
             />
+
+            {finalAmountText && (
+              <FormInput
+                containerStyles={{mt: '1rem'}}
+                props={{
+                  size: 'small',
+                  label: 'Final Amount',
+                  name: 'finalAmountText',
+                  value: finalAmountText,
+                  disabled: true,
+                  sx: {
+                    '& .MuiInputBase-input.Mui-disabled': {
+                      WebkitTextFillColor: theme.palette.text.primary,
+                    },
+                  },
+                  InputLabelProps: {
+                    style: {color: theme.palette.text.secondary},
+                  },
+                }}
+              />
+            )}
 
             <InfoCard
               containerStyles={{

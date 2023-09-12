@@ -22,15 +22,17 @@ export interface ArticleItem {
   quantity: number;
 }
 
+export interface CostPackage {
+  labor: Money;
+  material: Money;
+}
+
 export interface ArticleAdditionalInfo {
   items: ArticleItem[];
   pictureUrls: string[];
   qrCode: FileResource;
   suppliers: Supplier[];
-  costPackage?: {
-    labor: Money;
-    material: Money;
-  };
+  costPackage?: CostPackage;
 }
 
 export interface ArticleView {

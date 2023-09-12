@@ -1,4 +1,4 @@
-import {ArticleView} from './article';
+import {ArticleType, ArticleView, CostPackage} from './article';
 import {
   Address,
   AddressRecord,
@@ -159,6 +159,8 @@ export interface InvoiceItemRecord<T> {
   name: string;
   quantity: number;
   unitAmount: T;
+  type?: ArticleType;
+  costPackage?: CostPackage;
 }
 
 export enum InvoiceType {
