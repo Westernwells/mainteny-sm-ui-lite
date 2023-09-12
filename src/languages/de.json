@@ -899,7 +899,7 @@
   "PRICE": "PREIS",
   "Invoice Amount": "Rechnungsbetrag",
   "Save Draft": "Entwurf speichern",
-  "Invoice details": "Rechnungsdetails",
+  "Invoice Details": "Rechnungsdetails",
   "Create Credit note": "Gutschrift erstellen",
   "This action will create a credit note from this invoice details.": "Mit dieser Aktion wird eine Gutschrift aus den Rechnungsdaten erstellt.",
   "Add New Customer": "Kunden anlegen",
@@ -1596,5 +1596,7 @@
   "Discount can not be less than 0": "Der Rabatt darf nicht kleiner als 0 sein.",
   "The item will be measured in terms of this unit (e.g. kg, piece, set)": "Der Artikel wird in dieser Einheit gemessen (z.B. kg, Stk.)",
   "Job Details": "Auftragsdetails",
-  "Created on {{createdAt}}": "Erstellt am {{createdAt}}"
+  "Created on {{createdAt}}": "Erstellt am {{createdAt}}",
+  "NO.": "NR.",
+  "No.": "Nr."
 }
