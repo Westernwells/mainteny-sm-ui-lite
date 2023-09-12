@@ -382,7 +382,7 @@
   "Packages": "Paketi",
   "Search by name, package number": "Pretraži po imenu, broju paketa",
   "New Package": "Novi paket",
-  "Add": "Dodati",
+  "Add": "Dodaj",
   "Create Article": "Kreiraj artikal",
   "Article Number": "Broj artikla",
   "Stock": "zaliha",
@@ -1247,7 +1247,7 @@
   "There are no entires for the applied filters.": "Ne postoje cjeline za primjenjene filtere.",
   "Sorry, we couldn't find any ${placeholder} that matches the search text. If you like to add a new ${placeholder}, please click the button below.": "Žao nam je, nismo mogli da pronađemo nijedan ${placeholder} koji odgovara tekstu pretrage. Ako želite da dodate novi ${placeholder}, kliknite na dugme ispod.",
   "No ${placeholder} yet. Please click the button below to add.": "Još uvek nema ${placeholder}. Kliknite na dugme ispod da biste dodali.",
-  "No contracts yet. Please click the button below to add!": "Još nema ugovora. Kliknite na dugme ispod da biste dodali.",
+  "No contracts yet. Please click the button below to add.": "Još nema ugovora. Kliknite na dugme ispod da biste dodali.",
   "No units yet. Please click the button below add.": "Još nema jedinica. Kliknite na dugme ispod dodaj.",
   "No customers yet. Please click the button below to add.": "Još nema kupaca. Kliknite na dugme ispod da biste dodali.",
   "No employees yet. Please click the button below to add.": "Još nema zaposlenih. Kliknite na dugme ispod da biste dodali.",
@@ -1588,7 +1588,6 @@
   "Search order type, customer, address etc.": "Pretražite vrstu naloga, klijenta, adresu itd.",
   "Order Type": "Vrsta naloga",
   "Search by order type, order number etc.": "Pretražujte po vrsti narudžbe, broju narudžbe itd.",
-  "\"+ Add\"": "\"+ Dodaj\"",
   "No work report yet. It will appear here once the order is completed.": "Još nema izvještaja o radu. Pojaviće se ovde kada se nalog završi.",
   "Total time": "Ukupno vrijeme",
   "Elevator Address:": "Adresa lifta:",
@@ -1613,5 +1612,11 @@
   "Performance Analytics": "Analitika performansi",
   "Search by name, role, address etc.": "Traži po imenu, poziciji, adresi itd.",
   "jobs": "naređenja",
-  "Please select an existing customer. To add a new one, go to the 'Customers' section": "Izaberite postojećeg kupca. Da biste dodali novi, idite na odeljak „Kupci“."
+  "Please select an existing customer. To add a new one, go to the 'Customers' section": "Izaberite postojećeg kupca. Da biste dodali novi, idite na odeljak „Kupci“.",
+  "customer no.": "kupac br.",
+  "{{item.discountPercentage}}% when paid in {{item.days}} days ": "{{item.discount Percentage}}% kada se plati za {{item.dais}} dana",
+  "Discount can not be less than 0": "Popust ne može biti manji od 0",
+  "The item will be measured in terms of this unit (e.g. kg, piece, set)": "Stavka će se meriti u smislu ove jedinice (npr. kg, komad, set)",
+  "Job Details": "Detalji narudžbe",
+  "Created on {{createdAt}}": "Napravljeno {{createdAt}}"
 }

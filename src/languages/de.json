@@ -1229,7 +1229,7 @@
   "There are no entires for the applied filters.": "Für die angewendeten Filter sind keine Einträge vorhanden.",
   "Sorry, we couldn't find any ${placeholder} that matches the search text. If you like to add a new ${placeholder}, please click the button below.": "Entschuldigung, wir konnten für Ihre Suche keine Informationen finden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.",
   "No ${placeholder} yet. Please click the button below to add.": "Keine Informationen vorhanden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.",
-  "No contracts yet. Please click the button below to add!": "Es sind noch keine Verträge vorhanden. Bitte klicken Sie zum Hinzufügen auf die Schaltfläche unten.",
+  "No contracts yet. Please click the button below to add.": "Es sind noch keine Verträge vorhanden. Bitte klicken Sie zum Hinzufügen auf die Schaltfläche unten.",
   "No units yet. Please click the button below add.": "Es wurden noch keine Anlagen angelegt. Bitte klicken Sie auf die Schaltfläche unten, um eine Anlage hinzuzufügen!",
   "No customers yet. Please click the button below to add.": "Es sind noch keine Kunden vorhanden. Bitte klicken Sie zum Hinzufügen auf die Schaltfläche unten.",
   "No employees yet. Please click the button below to add.": "Es sind noch keine Mitarbeiter vorhanden. Bitte klicken Sie zum Hinzufügen auf die Schaltfläche unten.",
@@ -1566,7 +1566,6 @@
   "Search order type, customer, address etc.": "Suche nach Auftragsart, Kunde, Adresse usw.",
   "Order Type": "Auftragsart",
   "Search by order type, order number etc.": "Suche nach Auftragsart, Auftragsnummer usw.",
-  "\"+ Add\"": "\"+ Hinzufügen\"",
   "No work report yet. It will appear here once the order is completed.": "Es wurde noch kein Arbeitsbericht erstellt. Er erscheint hier, sobald der Auftrag abgeschlossen ist.",
   "Total time": "Gesamtzeit",
   "Elevator Address:": "Aufzug Adresse:",
@@ -1593,5 +1592,9 @@
   "jobs": "Aufträge",
   "Please select an existing customer. To add a new one, go to the 'Customers' section": "Bitte wählen Sie einen bestehenden Kunden aus. Um einen neuen Kunden hinzuzufügen, gehen Sie zum Bereich \"Kunden\".",
   "customer no.": "Kunden-Nr.",
-  "{{item.discountPercentage}}% when paid in {{item.days}} days ": "{{item.discount}}% bei Zahlung innerhalb von {{item.days}} Tagen"
+  "{{item.discountPercentage}}% when paid in {{item.days}} days ": "{{item.discount}}% bei Zahlung innerhalb von {{item.days}} Tagen",
+  "Discount can not be less than 0": "Der Rabatt darf nicht kleiner als 0 sein.",
+  "The item will be measured in terms of this unit (e.g. kg, piece, set)": "Der Artikel wird in dieser Einheit gemessen (z.B. kg, Stk.)",
+  "Job Details": "Auftragsdetails",
+  "Created on {{createdAt}}": "Erstellt am {{createdAt}}"
 }
