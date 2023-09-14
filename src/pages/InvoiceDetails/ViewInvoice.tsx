@@ -300,7 +300,18 @@ export const ViewInvoice = ({
               headerLabel={t('Work Report')}
               headerStyles={{
                 pt: '11px',
-              }}>
+                mx: 0,
+                px: '1rem',
+              }}
+              headerActionIcon={
+                <OpenInNewIcon
+                  fontSize="small"
+                  sx={{color: theme.palette.secondary.dark}}
+                />
+              }
+              handleAction={() =>
+                navigate(`/orders/details/${workReport.serviceOrder?.id}?tab=1`)
+              }>
               <Typography variant="body1">
                 {formatDate(workReport.serviceOrder.actualStartTime)}:{' '}
                 {workReport.description || '-'}
