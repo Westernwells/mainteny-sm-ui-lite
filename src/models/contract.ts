@@ -65,8 +65,8 @@ export interface QueryContractParams {
   query: string;
   serviceCompanyId: string;
   status?: string[];
-  priceStart: number;
-  priceEnd: number;
+  priceStart?: number;
+  priceEnd?: number;
   paymentTermId?: string;
 }
 
@@ -230,6 +230,7 @@ export interface ContractRequestBody {
   discounts?: ContractDiscount[];
   noticePeriodInMonth?: number;
   paymentTermId?: string;
+  description?: string;
 }
 
 export interface ContractBasicInfoFormModel {
@@ -237,6 +238,8 @@ export interface ContractBasicInfoFormModel {
   startDate: Date | null;
   endDate: Date | null;
   name: string;
+  externalId: string;
+  description: string;
 }
 
 export interface ContractTermsFormModal {

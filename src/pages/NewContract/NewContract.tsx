@@ -3,20 +3,27 @@ import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {PageCard} from 'components/PageCard';
 import {Stepper} from 'components/Stepper';
 import {useFormik} from 'formik';
-import {useCreateContract} from 'hooks/reactQuery/useContract';
+import {
+  useCreateContract,
+  useQueryContract,
+} from 'hooks/reactQuery/useContract';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useUuid} from 'hooks/reactQuery/useUuid';
 import {
   ContractBasicInfoFormModel,
+  ContractOrderField,
   ContractTermsFormModal,
   ContractTypes,
+  ContractView,
 } from 'models/contract';
 import {PropertyOwnerView} from 'models/propertyManager';
+import {Order} from 'models/misc';
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {amountRecordForBackend, useCurrentCurrency} from 'utils/currency';
 import {toRestDate} from 'utils/datetime';
+import {createEmptyResource} from 'utils/paging-utils';
 import * as Yup from 'yup';
 import NewContractBasicInfo from './NewContractBasicInfo';
 import NewContractDocuments from './NewContractDocuments';
@@ -102,6 +109,8 @@ const NewContract = () => {
       startDate: null,
       endDate: null,
       name: '',
+      externalId: '',
+      description: '',
     },
     validateOnMount: true,
 
@@ -141,6 +150,18 @@ const NewContract = () => {
     },
     onSubmit: () => {},
   });
+
+  const {data: contractResource = createEmptyResource<ContractView>(50)} =
+    useQueryContract(
+      {
+        pageIndex: 0,
+        pageSize: 50,
+        query: formikBasicInfo.values.externalId,
+        order: Order.DESC,
+        orderBy: ContractOrderField.CREATED_TIME,
+      },
+      {keepPreviousData: true},
+    );
 
   useEffect(() => {
     if (
@@ -214,6 +235,8 @@ const NewContract = () => {
       discounts: formikContractTerms.values.discounts,
       noticePeriodInMonth: formikContractTerms.values.noticePeriodInMonth,
       paymentTermId: formikContractTerms.values.paymentTermId,
+      externalId: formikBasicInfo.values.externalId,
+      description: formikBasicInfo.values.description,
     };
 
     await createContract(newContract);
@@ -253,6 +276,7 @@ const NewContract = () => {
                 formik={formikBasicInfo}
                 getCustomer={(item) => setCustomer(item)}
                 initialCustomer={customer}
+                contractResource={contractResource.data}
               />
             </PageCard>
           </FlexContainer>
