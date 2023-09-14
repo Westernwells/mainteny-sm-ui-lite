@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import printJS from 'print-js';
@@ -40,6 +40,7 @@ import {Confirm} from 'components/Confirm';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useSnackbar} from 'notistack';
 import {Notes} from './Notes';
 import {InvoiceActivities} from './InvoiceActivities';
 
@@ -48,6 +49,7 @@ interface Props {
   invoice: InvoiceView;
   workReport: ServiceOrderReportView;
   invoiceActivities: InvoiceActivityView[];
+  isLoadingDownloadUrl: boolean;
 }
 
 export const ViewInvoice = ({
@@ -55,6 +57,7 @@ export const ViewInvoice = ({
   invoice,
   workReport,
   invoiceActivities,
+  isLoadingDownloadUrl,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -149,6 +152,16 @@ export const ViewInvoice = ({
     );
   };
 
+  const {enqueueSnackbar} = useSnackbar();
+
+  useEffect(() => {
+    if (isLoadingDownloadUrl) {
+      enqueueSnackbar(`PDF generation is in progress. Please wait...`, {
+        variant: 'info',
+      });
+    }
+  }, [isLoadingDownloadUrl]);
+
   return (
     <Box>
       <Grid container width="100%" mt="2.5em" mb="2em" gap={2}>
@@ -213,8 +226,9 @@ export const ViewInvoice = ({
               </Typography>
             </Box>
           </PageCard>
+
           {invoice!.additionalInfo.pdfGenerationStatus ===
-            PdfGenerationStatus.DONE && downloadUrl.length ? (
+            PdfGenerationStatus.DONE && !isLoadingDownloadUrl ? (
             <PDFContainer url={downloadUrl} />
           ) : (
             <PageCard>

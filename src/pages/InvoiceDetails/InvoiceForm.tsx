@@ -816,9 +816,9 @@ export const InvoiceForm = ({
                   },
                   {
                     label: 'Invoice Date',
-                    value: formatDate(
-                      invoice ? invoice.meta.createdAt : new Date(),
-                    ),
+                    value: invoice?.sentDate
+                      ? formatDate(invoice.sentDate)
+                      : '-',
                   },
                 ].map((i) => (
                   <Box key={i.label}>

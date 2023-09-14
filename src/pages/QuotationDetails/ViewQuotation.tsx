@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useFormik} from 'formik';
 import printJS from 'print-js';
@@ -37,6 +37,7 @@ import {
 } from 'models/quotation';
 import {formatCurrency} from 'utils/currency';
 import {useTranslation} from 'react-i18next';
+import {useSnackbar} from 'notistack';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -46,12 +47,14 @@ interface Props {
   downloadUrl: string;
   quotation: QuotationView;
   quotationActivities: QuotationActivityView[];
+  isLoadingDownloadUrl: boolean;
 }
 
 export const ViewQuotation = ({
   downloadUrl,
   quotation,
   quotationActivities,
+  isLoadingDownloadUrl,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -80,7 +83,7 @@ export const ViewQuotation = ({
 
   const isPDFGenerated =
     quotation.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
-    downloadUrl;
+    !isLoadingDownloadUrl;
 
   const actions = useMemo(() => {
     const items = [];
@@ -133,6 +136,16 @@ export const ViewQuotation = ({
     }
     return items;
   }, [downloadUrl]);
+
+  const {enqueueSnackbar} = useSnackbar();
+
+  useEffect(() => {
+    if (isLoadingDownloadUrl) {
+      enqueueSnackbar(`PDF generation is in progress. Please wait...`, {
+        variant: 'info',
+      });
+    }
+  }, [isLoadingDownloadUrl]);
 
   return (
     <Box>

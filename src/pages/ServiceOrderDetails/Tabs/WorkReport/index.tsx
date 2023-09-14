@@ -81,9 +81,9 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
   }, [isFetched]);
 
   useEffect(() => {
-    if (isFetched && serviceOrderReportSource?.length)
+    if (serviceOrderReportSource?.length)
       setReport(serviceOrderReportSource[0]);
-  }, [isFetched]);
+  }, [serviceOrderReportSource]);
 
   useEffect(() => {
     if (report && report.serviceOrder && 'articles' in report.serviceOrder) {
@@ -91,6 +91,7 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
       setItems(temp);
     }
   }, [report]);
+
   if (isIdle || isLoading) {
     return (
       <Box
