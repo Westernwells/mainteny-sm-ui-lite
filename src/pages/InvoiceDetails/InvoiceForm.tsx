@@ -385,9 +385,8 @@ export const InvoiceForm = ({
       formik.setFieldValue('serviceOrderId', serviceOrder.id, true);
       formik.setFieldValue(
         'subject',
-        t('Invoice {{invoiceNumber}} for Order {{orderNumber}}', {
+        t(`${customer?.name} - ${t('Invoice')} {{invoiceNumber}}`, {
           invoiceNumber: invoice?.number ?? '',
-          orderNumber: serviceOrder?.number ?? '',
         }),
         true,
       );
@@ -413,7 +412,7 @@ export const InvoiceForm = ({
     setFinalAmountText(
       materialCost && laborCost
         ? t(
-            `The final amount includes {{materialCost}}{{currencyCode}} material and {{laborCost}}{{currencyCode}} labor cost.`,
+            `Labor costs: {{laborCost}}{{currencyCode}}, Material costs: {{materialCost}}{{currencyCode}}`,
             {
               materialCost,
               laborCost,
@@ -421,21 +420,15 @@ export const InvoiceForm = ({
             },
           )
         : materialCost
-        ? t(
-            `The final amount includes {{materialCost}}{{currencyCode}} material cost.`,
-            {
-              materialCost,
-              currencyCode,
-            },
-          )
+        ? t(`Material costs: {{materialCost}}{{currencyCode}}`, {
+            materialCost,
+            currencyCode,
+          })
         : laborCost
-        ? t(
-            `The final amount includes {{laborCost}}{{currencyCode}} labor cost.`,
-            {
-              laborCost,
-              currencyCode,
-            },
-          )
+        ? t(`Labor costs: {{laborCost}}{{currencyCode}}`, {
+            laborCost,
+            currencyCode,
+          })
         : '',
     );
   }, [invoiceItems, t]);
@@ -1245,14 +1238,14 @@ export const InvoiceForm = ({
                   name: 'finalAmountText',
                   value: finalAmountText,
                   disabled: true,
-                  sx: {
-                    '& .MuiInputBase-input.Mui-disabled': {
-                      WebkitTextFillColor: theme.palette.text.primary,
-                    },
-                  },
-                  InputLabelProps: {
-                    style: {color: theme.palette.text.secondary},
-                  },
+                  // sx: {
+                  //   '& .MuiInputBase-input.Mui-disabled': {
+                  //     WebkitTextFillColor: theme.palette.text.primary,
+                  //   },
+                  // },
+                  // InputLabelProps: {
+                  //   style: {color: theme.palette.text.secondary},
+                  // },
                 }}
               />
             )}
@@ -1356,7 +1349,9 @@ export const InvoiceForm = ({
           navigate(`/invoices/details/${invoiceId}`);
         }}
         email={customer?.additionalInfo.billingEmail || customer?.contact.email}
-        subject={formik.values.subject}
+        subject={t(`${customer?.name} - ${t('Invoice')} {{invoiceNumber}}`, {
+          invoiceNumber: invoice?.number ?? '',
+        })}
         content={formik.values.description}
       />
       <Confirm

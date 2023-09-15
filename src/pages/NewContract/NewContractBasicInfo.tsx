@@ -56,6 +56,10 @@ const NewContractBasicInfo: FC<Props> = ({
     }
   }, [customer]);
 
+  useEffect(() => {
+    formik.setFieldValue('externalId', companyNextNumber?.value);
+  }, [companyNextNumber]);
+
   const handleFocus = (e: any) => {
     setExternalIdActive(e.target.name);
   };

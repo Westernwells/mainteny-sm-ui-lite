@@ -313,7 +313,8 @@ export const ViewInvoice = ({
                 navigate(`/orders/details/${workReport.serviceOrder?.id}?tab=1`)
               }>
               <Typography variant="body1">
-                {formatDate(workReport.serviceOrder.actualStartTime)}:{' '}
+                {!!workReport.serviceOrder.actualStartTime &&
+                  `${formatDate(workReport.serviceOrder.actualStartTime)}: `}
                 {workReport.description || '-'}
               </Typography>
             </PageCard>
@@ -372,7 +373,12 @@ export const ViewInvoice = ({
           invoice.propertyOwner?.additionalInfo.billingEmail ||
           invoice.propertyOwner?.contact.email
         }
-        subject={invoice.subject}
+        subject={t(
+          `${invoice.propertyOwner?.name} - ${t('Invoice')} {{invoiceNumber}}`,
+          {
+            invoiceNumber: invoice?.number ?? '',
+          },
+        )}
         content={invoice.description}
       />
 
