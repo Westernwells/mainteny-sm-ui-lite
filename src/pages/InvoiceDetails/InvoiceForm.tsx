@@ -121,7 +121,12 @@ export const InvoiceForm = ({
   const {data: downloadUrl} = useDownloadUrl(
     invoice ? [invoice.additionalInfo.pdfPath] : [],
   );
-
+  const [finalDownloadUrl, setFinalDownloadUrl] = useState<
+    | {
+        [key: string]: string;
+      }
+    | undefined
+  >();
   const [isDrawerOpen] = useState<boolean>(true);
   const [isAddNewCustomerDialogOpen, setIsAddNewCustomerDialogOpen] =
     useState<boolean>(false);
@@ -442,6 +447,13 @@ export const InvoiceForm = ({
     return items;
   }, [downloadUrl]);
 
+  useEffect(() => {
+    setFinalDownloadUrl(downloadUrl);
+  }, [invoice]);
+
+  console.log(finalDownloadUrl, 'finalDownloadUrl');
+  console.log(invoice, 'invoice');
+
   const isValid = () => {
     const valid =
       formik.values.subject &&
@@ -520,18 +532,19 @@ export const InvoiceForm = ({
             content: '',
           },
         },
-        {
-          onSuccess: () => {
-            setIsConfirmPrintDialogOpen(false);
-            if (downloadUrl) {
-              printJS({
-                printable: Object.values(downloadUrl)[0],
-                type: 'pdf',
-                showModal: true,
-              });
-            }
-          },
-        },
+        // {
+        //   onSuccess: () => {
+        //     setIsConfirmPrintDialogOpen(false);
+
+        //     if(finalDownloadUrl){
+        //       printJS({
+        //         printable: Object.values(finalDownloadUrl)[0],
+        //         type: 'pdf',
+        //         showModal: true,
+        //       });
+        //     }
+        //   },
+        // },
       );
     }
   };

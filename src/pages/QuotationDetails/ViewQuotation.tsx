@@ -140,9 +140,13 @@ export const ViewQuotation = ({
   const {enqueueSnackbar} = useSnackbar();
 
   useEffect(() => {
-    if (isLoadingDownloadUrl) {
+    if (
+      quotation?.additionalInfo.pdfGenerationStatus ===
+      PdfGenerationStatus.RUNNING
+    ) {
       enqueueSnackbar(`PDF generation is in progress. Please wait...`, {
         variant: 'info',
+        autoHideDuration: 5000,
       });
     }
   }, [isLoadingDownloadUrl]);

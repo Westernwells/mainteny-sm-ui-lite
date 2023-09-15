@@ -155,9 +155,13 @@ export const ViewInvoice = ({
   const {enqueueSnackbar} = useSnackbar();
 
   useEffect(() => {
-    if (isLoadingDownloadUrl) {
+    if (
+      invoice?.additionalInfo.pdfGenerationStatus ===
+      PdfGenerationStatus.RUNNING
+    ) {
       enqueueSnackbar(`PDF generation is in progress. Please wait...`, {
         variant: 'info',
+        autoHideDuration: 5000,
       });
     }
   }, [isLoadingDownloadUrl]);
