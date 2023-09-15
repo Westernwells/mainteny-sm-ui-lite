@@ -194,7 +194,9 @@ export const InvoiceForm = ({
     );
 
   useEffect(() => {
-    formik.setFieldValue('externalId', companyNextNumber?.value);
+    if (formType === 'new') {
+      formik.setFieldValue('externalId', companyNextNumber?.value);
+    }
   }, [companyNextNumber]);
 
   const [totalAmountFrom, totalAmountTo] = useMemo(
@@ -612,7 +614,7 @@ export const InvoiceForm = ({
       },
       {keepPreviousData: true},
     );
-  console.log(activeField, 'activeField');
+
   return (
     <Box>
       {invoice && (
@@ -892,6 +894,7 @@ export const InvoiceForm = ({
                   {(activeField === 'externalId' ||
                     formik.touched.externalId) &&
                     formik.values.externalId &&
+                    invoice?.externalId !== formik.values.externalId &&
                     allInvoiceResource.data.filter(
                       (item) => item.externalId === formik.values.externalId,
                     ).length > 0 && (
