@@ -1161,7 +1161,9 @@ export const InvoiceForm = ({
           navigate(`/invoices/details/${invoiceId}`);
         }}
         email={customer?.additionalInfo.billingEmail || customer?.contact.email}
-        subject={formik.values.subject}
+        subject={t(`${customer?.name} - ${t('Invoice')} {{invoiceNumber}}`, {
+          invoiceNumber: invoice?.number ?? '',
+        })}
         content={formik.values.description}
       />
       <Confirm

@@ -372,7 +372,12 @@ export const ViewInvoice = ({
           invoice.propertyOwner?.additionalInfo.billingEmail ||
           invoice.propertyOwner?.contact.email
         }
-        subject={invoice.subject}
+        subject={t(
+          `${invoice.propertyOwner?.name} - ${t('Invoice')} {{invoiceNumber}}`,
+          {
+            invoiceNumber: invoice?.number ?? '',
+          },
+        )}
         content={invoice.description}
       />
 
