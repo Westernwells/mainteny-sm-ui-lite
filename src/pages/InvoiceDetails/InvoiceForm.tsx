@@ -347,9 +347,8 @@ export const InvoiceForm = ({
       formik.setFieldValue('serviceOrderId', serviceOrder.id, true);
       formik.setFieldValue(
         'subject',
-        t('Invoice {{invoiceNumber}} for Order {{orderNumber}}', {
+        t(`${customer?.name} - ${t('Invoice')} {{invoiceNumber}}`, {
           invoiceNumber: invoice?.number ?? '',
-          orderNumber: serviceOrder?.number ?? '',
         }),
         true,
       );
