@@ -193,6 +193,7 @@ export interface InvoiceFormData {
   billingAddress?: AddressRecord;
   beneficiaryAddress?: AddressRecord;
   alternativeAddress?: AddressRecord;
+  externalId?: string;
 }
 
 export interface CreateInvoice {
@@ -214,6 +215,7 @@ export interface CreateInvoice {
   customerSpecificOrderNumber?: string;
   beneficialDetails?: BeneficialDetailsRecord;
   moreInfo?: string;
+  externalId?: string;
 }
 
 export interface UpdateInvoice {
@@ -231,6 +233,7 @@ export interface UpdateInvoice {
   customerSpecificOrderNumber?: string;
   beneficialDetails?: BeneficialDetailsRecord;
   moreInfo?: string;
+  externalId?: string;
 }
 
 export interface QueryInvoiceCommentsParams {

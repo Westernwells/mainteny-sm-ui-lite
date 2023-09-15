@@ -50,6 +50,7 @@ export const NewInvoice = () => {
       invoice={invoice}
       invoiceType={invoiceType as InvoiceType}
       customer={customer}
+      // customerResource={customerResource.data}
     />
   );
 };
