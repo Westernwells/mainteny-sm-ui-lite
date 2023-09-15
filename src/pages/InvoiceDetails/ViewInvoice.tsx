@@ -314,9 +314,7 @@ export const ViewInvoice = ({
               }>
               <Typography variant="body1">
                 {!!workReport.serviceOrder.actualStartTime &&
-                  `${formatDate(
-                    workReport.serviceOrder.actualStartTime,
-                  )}:`}{' '}
+                  `${formatDate(workReport.serviceOrder.actualStartTime)}: `}
                 {workReport.description || '-'}
               </Typography>
             </PageCard>
