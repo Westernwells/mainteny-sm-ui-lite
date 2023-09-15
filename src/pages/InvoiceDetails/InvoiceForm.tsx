@@ -374,7 +374,7 @@ export const InvoiceForm = ({
     setFinalAmountText(
       materialCost && laborCost
         ? t(
-            `The final amount includes {{materialCost}}{{currencyCode}} material and {{laborCost}}{{currencyCode}} labor cost.`,
+            `Labor costs: {{laborCost}}{{currencyCode}}, Material costs: {{materialCost}}{{currencyCode}}`,
             {
               materialCost,
               laborCost,
@@ -382,21 +382,15 @@ export const InvoiceForm = ({
             },
           )
         : materialCost
-        ? t(
-            `The final amount includes {{materialCost}}{{currencyCode}} material cost.`,
-            {
-              materialCost,
-              currencyCode,
-            },
-          )
+        ? t(`Material costs: {{materialCost}}{{currencyCode}}`, {
+            materialCost,
+            currencyCode,
+          })
         : laborCost
-        ? t(
-            `The final amount includes {{laborCost}}{{currencyCode}} labor cost.`,
-            {
-              laborCost,
-              currencyCode,
-            },
-          )
+        ? t(`Labor costs: {{laborCost}}{{currencyCode}}`, {
+            laborCost,
+            currencyCode,
+          })
         : '',
     );
   }, [invoiceItems, t]);
@@ -1049,14 +1043,14 @@ export const InvoiceForm = ({
                   name: 'finalAmountText',
                   value: finalAmountText,
                   disabled: true,
-                  sx: {
-                    '& .MuiInputBase-input.Mui-disabled': {
-                      WebkitTextFillColor: theme.palette.text.primary,
-                    },
-                  },
-                  InputLabelProps: {
-                    style: {color: theme.palette.text.secondary},
-                  },
+                  // sx: {
+                  //   '& .MuiInputBase-input.Mui-disabled': {
+                  //     WebkitTextFillColor: theme.palette.text.primary,
+                  //   },
+                  // },
+                  // InputLabelProps: {
+                  //   style: {color: theme.palette.text.secondary},
+                  // },
                 }}
               />
             )}
