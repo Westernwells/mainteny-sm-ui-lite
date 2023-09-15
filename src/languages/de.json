@@ -1607,5 +1607,6 @@
   "The final amount includes {{laborCost}}{{currencyCode}} labor cost.": "Der Endbetrag umfasst {{laborCost}}{{currencyCode}} Lohnkosten.",
   "Both Technician & Service Manager": "Techniker und Service Manager",
   "Must contain 1 special character.": "Muss 1 Sonderzeichen enthalten.",
-  "User account for [name] created successfully.": "Benutzerkonto für [name] erfolgreich erstellt."
+  "User account for [name] created successfully.": "Benutzerkonto für [name] erfolgreich erstellt.",
+  "Order successfully created.": "Auftrag wurde erfolgreich angelegt."
 }
