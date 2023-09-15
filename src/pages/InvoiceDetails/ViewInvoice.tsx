@@ -140,13 +140,15 @@ export const ViewInvoice = ({
       {
         onSuccess: () => {
           setIsConfirmPrintDialogOpen(false);
-          if (downloadUrl) {
-            printJS({
-              printable: downloadUrl,
-              type: 'pdf',
-              showModal: true,
-            });
-          }
+          setTimeout(() => {
+            if (downloadUrl) {
+              printJS({
+                printable: downloadUrl,
+                type: 'pdf',
+                showModal: true,
+              });
+            }
+          }, 6000);
         },
       },
     );

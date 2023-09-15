@@ -108,11 +108,13 @@ export const ViewQuotation = ({
         icon: <Print />,
         onClick: () =>
           downloadUrl &&
-          printJS({
-            printable: downloadUrl,
-            type: 'pdf',
-            showModal: true,
-          }),
+          setTimeout(() => {
+            printJS({
+              printable: downloadUrl,
+              type: 'pdf',
+              showModal: true,
+            });
+          }, 6000),
       });
     }
 
