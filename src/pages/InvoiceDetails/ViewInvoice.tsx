@@ -313,7 +313,10 @@ export const ViewInvoice = ({
                 navigate(`/orders/details/${workReport.serviceOrder?.id}?tab=1`)
               }>
               <Typography variant="body1">
-                {formatDate(workReport.serviceOrder.actualStartTime)}:{' '}
+                {!!workReport.serviceOrder.actualStartTime &&
+                  `${formatDate(
+                    workReport.serviceOrder.actualStartTime,
+                  )}:`}{' '}
                 {workReport.description || '-'}
               </Typography>
             </PageCard>
