@@ -28,4 +28,5 @@ export const formatInvoiceRecord = (value: InvoiceFormData) => ({
   billingAddress: value.billingAddress,
   beneficiaryAddress: value.beneficiaryAddress,
   alternativeAddress: value.alternativeAddress,
+  externalId: value.externalId,
 });
