@@ -1698,5 +1698,7 @@
   "Azerbaijan": "Azerbejdžan",
   "Georgia": "Gruzija",
   "Kazakhstan": "Kazahstan",
-  "Select a specific date, time and technician and update the technicians schedule for that day": "Izaberite određeni datum, vreme i tehničara i ažurirajte raspored tehničara za taj dan"
+  "Select a specific date, time and technician and update the technicians schedule for that day": "Izaberite određeni datum, vreme i tehničara i ažurirajte raspored tehničara za taj dan",
+  "PDF generation is in progress. Please wait...": "PDF generisanje je u toku. Sačekajte...",
+  "Company updated successfully": "Kompanija je uspešno ažurirana"
 }
