@@ -1614,7 +1614,7 @@
   "jobs": "naređenja",
   "Please select an existing customer. To add a new one, go to the 'Customers' section": "Izaberite postojećeg kupca. Da biste dodali novi, idite na odeljak „Kupci“.",
   "customer no.": "kupac br.",
-  "{{discountPercentage}}% when paid in {{days}} days ": "{{discountPercentage}}% kada se plati za {{days}} dana",
+  "{{discountPercentage}}% when paid in {{days}} days": "{{discountPercentage}}% kada se plati za {{days}} dana",
   "Discount can not be less than 0": "Popust ne može biti manji od 0",
   "The item will be measured in terms of this unit (e.g. kg, piece, set)": "Stavka će se meriti u smislu ove jedinice (npr. kg, komad, set)",
   "Job Details": "Detalji narudžbe",
