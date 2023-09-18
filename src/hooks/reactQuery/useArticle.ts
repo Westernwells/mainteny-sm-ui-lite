@@ -268,7 +268,8 @@ export const useCreateArticleOrder = (successMsg: string) => {
     {
       onSuccess: () => {
         enqueueSnackbar(successMsg, {
-          variant: 'success',
+          variant: 'info',
+          autoHideDuration: 12000,
         });
         queryClient.invalidateQueries([queryKeys.fetchArticleOrder]);
       },

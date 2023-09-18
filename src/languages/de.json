@@ -1594,7 +1594,7 @@
   "jobs": "Aufträge",
   "Please select an existing customer. To add a new one, go to the 'Customers' section": "Bitte wählen Sie einen bestehenden Kunden aus. Um einen neuen Kunden hinzuzufügen, gehen Sie zum Bereich \"Kunden\".",
   "customer no.": "Kunden-Nr.",
-  "{{discountPercentage}}% when paid in {{days}} days ": "{{discountPercentage}}% bei Zahlung innerhalb von {{days}} Tagen",
+  "{{discountPercentage}}% when paid in {{days}} days": "{{discountPercentage}}% bei Zahlung innerhalb von {{days}} Tagen",
   "Discount can not be less than 0": "Der Rabatt darf nicht kleiner als 0 sein.",
   "The item will be measured in terms of this unit (e.g. kg, piece, set)": "Der Artikel wird in dieser Einheit gemessen (z.B. kg, Stk.)",
   "Job Details": "Auftragsdetails",

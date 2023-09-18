@@ -61,7 +61,7 @@ export const OrderArticle = () => {
   const [isPrinted, setIsPrinted] = useState(false);
   const {data: articleOrder, refetch} = useArticleOrder(orderId);
   const {mutate: createArticleOrder} = useCreateArticleOrder(
-    'The PDF generation is in progress. Please wait...',
+    'PDF generation is in progress. Please wait...',
   );
   const [supplier, setSupplier] = useState<ArticleSupplierView | undefined>(
     undefined,

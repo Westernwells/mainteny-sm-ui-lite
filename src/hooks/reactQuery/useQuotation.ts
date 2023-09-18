@@ -175,6 +175,7 @@ export const useCreateQuotation = () => {
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries([qk.fetchQuotations]);
       queryClient.invalidateQueries([qk.quotationById]);
+      queryClient.invalidateQueries([qk.fetchQuotationActivities]);
       enqueueSnackbar(`Quotation created successfully`, {
         variant: 'success',
       });

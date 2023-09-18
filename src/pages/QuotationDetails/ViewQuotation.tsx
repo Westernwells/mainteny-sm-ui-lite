@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useFormik} from 'formik';
 import printJS from 'print-js';
@@ -37,6 +37,7 @@ import {
 } from 'models/quotation';
 import {formatCurrency} from 'utils/currency';
 import {useTranslation} from 'react-i18next';
+import {useSnackbar} from 'notistack';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -46,14 +47,17 @@ interface Props {
   downloadUrl: string;
   quotation: QuotationView;
   quotationActivities: QuotationActivityView[];
+  isLoadingDownloadUrl: boolean;
 }
 
 export const ViewQuotation = ({
   downloadUrl,
   quotation,
   quotationActivities,
+  isLoadingDownloadUrl,
 }: Props) => {
   const {t} = useTranslation();
+  const {enqueueSnackbar} = useSnackbar();
   const theme = useTheme();
   const {user} = useUserSession();
   const navigate = useNavigate();
@@ -80,7 +84,7 @@ export const ViewQuotation = ({
 
   const isPDFGenerated =
     quotation.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
-    downloadUrl;
+    !isLoadingDownloadUrl;
 
   const actions = useMemo(() => {
     const items = [];
@@ -105,11 +109,13 @@ export const ViewQuotation = ({
         icon: <Print />,
         onClick: () =>
           downloadUrl &&
-          printJS({
-            printable: downloadUrl,
-            type: 'pdf',
-            showModal: true,
-          }),
+          setTimeout(() => {
+            printJS({
+              printable: downloadUrl,
+              type: 'pdf',
+              showModal: true,
+            });
+          }, 8000),
       });
     }
 
@@ -133,6 +139,18 @@ export const ViewQuotation = ({
     }
     return items;
   }, [downloadUrl]);
+
+  useEffect(() => {
+    if (
+      quotation?.additionalInfo.pdfGenerationStatus ===
+      PdfGenerationStatus.RUNNING
+    ) {
+      enqueueSnackbar(`PDF generation is in progress. Please wait...`, {
+        variant: 'info',
+        autoHideDuration: 8000,
+      });
+    }
+  }, [quotation]);
 
   return (
     <Box>

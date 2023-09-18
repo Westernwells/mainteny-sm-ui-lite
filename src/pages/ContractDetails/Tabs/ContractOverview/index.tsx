@@ -306,7 +306,10 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               }
               discount={contractDetails?.additionalInfo?.discounts?.map(
                 (item) =>
-                  `${item.discountPercentage}% when paid in ${item.days} days`,
+                  `${t('{{discountPercentage}}% when paid in {{days}} days', {
+                    discountPercentage: item.discountPercentage,
+                    days: item.days,
+                  })}`,
               )}
               firstMaintenance={contractDetails.additionalInfo.firstMaintenance}
               firstInvoiceDate={contractDetails.additionalInfo.firstInvoiceDate}
