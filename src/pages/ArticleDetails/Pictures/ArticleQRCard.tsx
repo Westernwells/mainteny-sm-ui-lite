@@ -18,7 +18,7 @@ export const ArticleQRCard = ({article}: {article: ArticleView}) => {
   const {t} = useTranslation();
 
   const {mutateAsync: updateArticle} = useUpdateArticle(
-    t('Article updated successfully'),
+    t('Article updated successfully.'),
   );
   const {data: qrUrls = {}} = useDownloadUrl(
     article.additionalInfo.qrCode ? [article.additionalInfo.qrCode.uri] : [],

@@ -25,7 +25,7 @@ export const ArticleStockCard = ({article}: {article: ArticleView}) => {
   const [openDialog, setOpenDialog] = useState(false);
   const {t} = useTranslation();
   const {mutateAsync: updateArticle, isLoading} = useUpdateArticle(
-    t('Article updated successfully'),
+    t('Article updated successfully.'),
   );
 
   const formik = useFormik<ArticleStockFormModel>({

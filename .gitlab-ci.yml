@@ -39,7 +39,7 @@ variables:
       --cache=true
       --context $CI_PROJECT_DIR 
       --dockerfile Dockerfile 
-      --destination ${DOCKER_REGISTRY}/sm-lite:${IMAGE_SUFFIX}-${ENV}
+      --destination ${DOCKER_REGISTRY}/sm-lite:${IMAGE_SUFFIX}-${IMAGE_ENV}
       --build-arg ENV=${ENV}
 
 .deploy_project: &deploy-template
@@ -47,7 +47,7 @@ variables:
   allow_failure: false
   image: node:lts-gallium
   before_script:
-    - curl -fsSL https://get.pulumi.com | sh -s -- --version 3.57.1 # Install Pulumi
+    - curl -fsSL https://get.pulumi.com/ | bash # Install Pulumi
     - export PATH=$PATH:$HOME/.pulumi/bin
     - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" # Install AWS CLI
     - unzip -qq awscliv2.zip
@@ -92,41 +92,63 @@ lint-project:
     - yarn check-types
     - yarn check-lint
   rules:
-    - if: $CI_MERGE_REQUEST_ID
-      when: never
-    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_AUTHOR =~ '/^gitlab_ci_user.*/'
-      when: never
-    - when: always
+    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop'
+    - when: never
+
+build-feature-branch:
+  <<: *build-template
+  variables:
+    ENV: stage
+  rules:
+    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop'
+    - when: never
 
 build-stage:
   <<: *build-template
   variables:
     ENV: stage
   rules:
-    - if: $CI_MERGE_REQUEST_ID
-      when: never
-    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_AUTHOR =~ '/^gitlab_ci_user.*/'
-      when: never
-    - when: on_success
+    - if: $CI_COMMIT_REF_NAME == 'develop'
+    - when: never
+
+build-release:
+  <<: *build-template
+  variables:
+    ENV: stage
+  rules:
+    - if: $CI_COMMIT_REF_NAME == 'main'
+    - when: never
 
 build-prod:
   <<: *build-template
-  rules:
-    - if: $CI_COMMIT_REF_NAME == 'main'
-      when: on_success
-    - when: never
   variables:
     ENV: prod
+  rules:
+    - if: $CI_COMMIT_REF_NAME == 'main'
+    - when: never
 
 build-stage-image:
   <<: *build-image-template
   dependencies:
     - build-stage
   rules:
+    - if: $CI_COMMIT_REF_NAME == 'develop'
+      when: on_success
+      variables:
+        ENV: stage
+        IMAGE_ENV: stage
+    - when: never
+
+build-release-image:
+  <<: *build-image-template
+  dependencies:
+    - build-release
+  rules:
     - if: $CI_COMMIT_REF_NAME == 'main'
       when: on_success
       variables:
         ENV: stage
+        IMAGE_ENV: release
     - when: never
 
 build-prod-image:
@@ -138,6 +160,7 @@ build-prod-image:
       when: on_success
       variables:
         ENV: prod
+        IMAGE_ENV: prod
     - when: never
 
 deploy-stage:
@@ -145,11 +168,25 @@ deploy-stage:
   dependencies:
     - build-stage-image
   rules:
-    - if: "$CI_COMMIT_REF_NAME == 'main'"
+    - if: "$CI_COMMIT_REF_NAME == 'develop'"
       variables:
         ENV: stage
         STACK: stage
         IMAGE_ENV: stage
+        CACHE_PATH: /*
+      when: on_success
+    - when: never
+
+deploy-release:
+  <<: *deploy-template
+  dependencies:
+    - build-stage-image
+  rules:
+    - if: "$CI_COMMIT_REF_NAME == 'main'"
+      variables:
+        ENV: stage
+        STACK: release
+        IMAGE_ENV: release
         CACHE_PATH: /*
       when: on_success
     - when: never

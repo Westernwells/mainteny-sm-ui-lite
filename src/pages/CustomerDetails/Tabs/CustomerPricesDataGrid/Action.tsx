@@ -24,7 +24,7 @@ export const Actions = ({article}: Props) => {
   const {mutateAsync: deleteElevator, isLoading: isDeleting} =
     useDeletePropertyOwnerArticle('Article deleted successfully');
   const {mutateAsync: updateArticle} = useUpdatePropertyOwnerArticle(
-    t('Article updated successfully'),
+    t('Article updated successfully.'),
   );
 
   const onClose = () => {

@@ -74,7 +74,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const {mutateAsync: updateArticle, isLoading} = useUpdateArticle(
-    t('Article updated successfully'),
+    t('Article updated successfully.'),
   );
 
   const formik = useFormik<ArticleBasicFormModel>({
