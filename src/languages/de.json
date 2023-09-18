@@ -151,6 +151,8 @@
   "New Customer": "Neuer Kunde",
   "JOINED DATE": "Kunde seit",
   "NO. OF CONTRACTS": "ANZAHL VERTRÄGE",
+  "Business Address": "Geschäftsadresse",
+  "Postal Address": "Anschrift",
   "Billing Address": "Rechnungsadresse",
   "Search by unit, category": "Suche nach Anlage, Kategorie",
   "Search by id, revenue, date": "Suche nach ID, Umsatz, Datum",
@@ -1599,7 +1601,7 @@
   "Created on {{createdAt}}": "Erstellt am {{createdAt}}",
   "NO.": "NR.",
   "No.": "Nr.",
-  "You are logged as [name].": "Sie sind angemeldet als [name].",
+  "You are logged as {{name}}.": "Sie sind angemeldet als {{name}}.",
   "Elevator": "Aufzug",
   "Article updated successfully.": "Artikel erfolgreich aktualisiert.",
   "The final amount includes {{materialCost}}{{currencyCode}} material and {{laborCost}}{{currencyCode}} labor cost.": "Der Endbetrag umfasst {{materialCost}}{{currencyCode}} Material- und {{laborCost}}{{currencyCode}} Lohnkosten.",
@@ -1676,5 +1678,6 @@
   "Azerbaijan": "Aserbaidschan",
   "Georgia": "Georgien",
   "Kazakhstan": "Kasachstan",
-  "Select a specific date, time and technician and update the technicians schedule for that day": "Wählen Sie ein bestimmtes Datum, eine bestimmte Uhrzeit und einen Techniker und aktualisieren Sie den Zeitplan des Technikers für diesen Tag."
+  "Select a specific date, time and technician and update the technicians schedule for that day": "Wählen Sie ein bestimmtes Datum, eine bestimmte Uhrzeit und einen Techniker und aktualisieren Sie den Zeitplan des Technikers für diesen Tag.",
+  "PDF generation is in progress. Please wait...": "Die PDF-Generierung ist in Bearbeitung. Bitte warten.."
 }
