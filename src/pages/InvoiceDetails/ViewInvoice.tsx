@@ -166,7 +166,7 @@ export const ViewInvoice = ({
         autoHideDuration: 5000,
       });
     }
-  }, [isLoadingDownloadUrl]);
+  }, [invoice]);
 
   return (
     <Box>

@@ -151,7 +151,7 @@ export const ViewQuotation = ({
         autoHideDuration: 5000,
       });
     }
-  }, [isLoadingDownloadUrl]);
+  }, [quotation]);
 
   return (
     <Box>
