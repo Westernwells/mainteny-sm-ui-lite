@@ -53,6 +53,7 @@ ReactDOM.render(
             vertical: 'top',
             horizontal: 'right',
           }}
+          hideIconVariant
           maxSnack={3}>
           <App />
         </SnackbarProvider>

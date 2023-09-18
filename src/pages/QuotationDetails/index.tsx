@@ -6,6 +6,8 @@ import {
 } from 'hooks/reactQuery/useQuotation';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
+import {PdfGenerationStatus} from 'models/misc';
+import {useEffect} from 'react';
 import {ViewQuotation} from './ViewQuotation';
 
 export const QuotationDetails = () => {
@@ -16,13 +18,29 @@ export const QuotationDetails = () => {
     isIdle,
     isLoading,
     isFetched,
+    refetch,
   } = useQuotationDetails(quotationId);
   const {data: quotationActivities, isLoading: isLoadingQuotationActivities} =
     useQuotationActivities({quotationId: quotationId ?? ''});
 
-  const {data: downloadUrl} = useDownloadUrl(
+  const {data: downloadUrl, isLoading: isLoadingDownloadUrl} = useDownloadUrl(
     isFetched ? [quotation!.additionalInfo.pdfPath] : [],
   );
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (
+        quotation?.additionalInfo.pdfGenerationStatus ===
+        PdfGenerationStatus.RUNNING
+      ) {
+        refetch();
+      }
+    }, 3000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [quotation]);
 
   if (isIdle || isLoading || isLoadingQuotationActivities) {
     return <Progress />;
@@ -33,6 +51,7 @@ export const QuotationDetails = () => {
       downloadUrl={downloadUrl ? Object.values(downloadUrl)[0] : ''}
       quotation={quotation}
       quotationActivities={quotationActivities!}
+      isLoadingDownloadUrl={isLoadingDownloadUrl}
     />
   ) : (
     <EmptySection label="Sorry, we couldn't find the quotation." />

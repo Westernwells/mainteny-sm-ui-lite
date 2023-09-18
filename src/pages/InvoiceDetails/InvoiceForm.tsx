@@ -130,7 +130,6 @@ export const InvoiceForm = ({
   const {data: downloadUrl} = useDownloadUrl(
     invoice ? [invoice.additionalInfo.pdfPath] : [],
   );
-
   const [isDrawerOpen] = useState<boolean>(true);
   const [isAddNewCustomerDialogOpen, setIsAddNewCustomerDialogOpen] =
     useState<boolean>(false);
@@ -556,13 +555,15 @@ export const InvoiceForm = ({
         {
           onSuccess: () => {
             setIsConfirmPrintDialogOpen(false);
-            if (downloadUrl) {
-              printJS({
-                printable: Object.values(downloadUrl)[0],
-                type: 'pdf',
-                showModal: true,
-              });
-            }
+            setTimeout(() => {
+              if (downloadUrl) {
+                printJS({
+                  printable: downloadUrl,
+                  type: 'pdf',
+                  showModal: true,
+                });
+              }
+            }, 6000);
           },
         },
       );
@@ -862,9 +863,9 @@ export const InvoiceForm = ({
                   },
                   {
                     label: 'Invoice Date',
-                    value: formatDate(
-                      invoice ? invoice.meta.createdAt : new Date(),
-                    ),
+                    value: invoice?.sentDate
+                      ? formatDate(invoice.sentDate)
+                      : '-',
                   },
                 ].map((i) => (
                   <Box key={i.label}>
