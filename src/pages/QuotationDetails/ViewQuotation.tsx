@@ -57,6 +57,7 @@ export const ViewQuotation = ({
   isLoadingDownloadUrl,
 }: Props) => {
   const {t} = useTranslation();
+  const {enqueueSnackbar} = useSnackbar();
   const theme = useTheme();
   const {user} = useUserSession();
   const navigate = useNavigate();
@@ -114,7 +115,7 @@ export const ViewQuotation = ({
               type: 'pdf',
               showModal: true,
             });
-          }, 6000),
+          }, 8000),
       });
     }
 
@@ -139,8 +140,6 @@ export const ViewQuotation = ({
     return items;
   }, [downloadUrl]);
 
-  const {enqueueSnackbar} = useSnackbar();
-
   useEffect(() => {
     if (
       quotation?.additionalInfo.pdfGenerationStatus ===
@@ -148,7 +147,7 @@ export const ViewQuotation = ({
     ) {
       enqueueSnackbar(`PDF generation is in progress. Please wait...`, {
         variant: 'info',
-        autoHideDuration: 5000,
+        autoHideDuration: 8000,
       });
     }
   }, [quotation]);

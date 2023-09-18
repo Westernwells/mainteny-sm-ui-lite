@@ -60,6 +60,7 @@ export const ViewInvoice = ({
   isLoadingDownloadUrl,
 }: Props) => {
   const {t} = useTranslation();
+  const {enqueueSnackbar} = useSnackbar();
   const theme = useTheme();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
@@ -148,13 +149,11 @@ export const ViewInvoice = ({
                 showModal: true,
               });
             }
-          }, 6000);
+          }, 8000);
         },
       },
     );
   };
-
-  const {enqueueSnackbar} = useSnackbar();
 
   useEffect(() => {
     if (
@@ -163,7 +162,7 @@ export const ViewInvoice = ({
     ) {
       enqueueSnackbar(`PDF generation is in progress. Please wait...`, {
         variant: 'info',
-        autoHideDuration: 5000,
+        autoHideDuration: 8000,
       });
     }
   }, [invoice]);
