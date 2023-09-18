@@ -1621,7 +1621,7 @@
   "Created on {{createdAt}}": "Napravljeno {{createdAt}}",
   "NO.": "NO.",
   "No.": "No.",
-  "You are logged as [name].": "Prijavljeni ste kao",
+  "You are logged as {{name}}.": "Prijavljeni ste kao",
   "Elevator": "Lift",
   "Article updated successfully.": "Artikal je uspešno ažuriran.",
   "The final amount includes {{materialCost}}{{currencyCode}} material and {{laborCost}}{{currencyCode}} labor cost.": "Konačni iznos uključuje {{materialCost}}{{currenciCode}} materijal i {{laborCost}}{{currenciCode}} troškove rada.",
