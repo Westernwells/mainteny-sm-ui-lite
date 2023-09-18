@@ -320,9 +320,21 @@ export const ViewInvoice = ({
               headerLabel={t('Work Report')}
               headerStyles={{
                 pt: '11px',
-              }}>
+                mx: 0,
+                px: '1rem',
+              }}
+              headerActionIcon={
+                <OpenInNewIcon
+                  fontSize="small"
+                  sx={{color: theme.palette.secondary.dark}}
+                />
+              }
+              handleAction={() =>
+                navigate(`/orders/details/${workReport.serviceOrder?.id}?tab=1`)
+              }>
               <Typography variant="body1">
-                {formatDate(workReport.serviceOrder.actualStartTime)}:{' '}
+                {!!workReport.serviceOrder.actualStartTime &&
+                  `${formatDate(workReport.serviceOrder.actualStartTime)}: `}
                 {workReport.description || '-'}
               </Typography>
             </PageCard>
@@ -381,7 +393,12 @@ export const ViewInvoice = ({
           invoice.propertyOwner?.additionalInfo.billingEmail ||
           invoice.propertyOwner?.contact.email
         }
-        subject={invoice.subject}
+        subject={t(
+          `${invoice.propertyOwner?.name} - ${t('Invoice')} {{invoiceNumber}}`,
+          {
+            invoiceNumber: invoice?.number ?? '',
+          },
+        )}
         content={invoice.description}
       />
 

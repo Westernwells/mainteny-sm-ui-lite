@@ -274,6 +274,7 @@ export interface ContractUpdateRequest {
   firstInvoiceDate?: string;
   paymentTermId?: string;
   description?: string;
+  externalId?: string;
 }
 
 export interface ContractPaymentTermView {

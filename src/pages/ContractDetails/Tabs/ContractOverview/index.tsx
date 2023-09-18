@@ -114,6 +114,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       firstInvoiceDate: contractDetails?.additionalInfo?.firstInvoiceDate,
       paymentTermId: contractDetails?.paymentTerm?.id,
       description: contractDetails?.description,
+      externalId: contractDetails?.externalId ?? '',
     },
     onSubmit: () => {},
     enableReinitialize: true,
@@ -154,6 +155,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       firstInvoiceDate: formik.values.firstInvoiceDate,
       paymentTermId: formik.values.paymentTermId,
       description: formik.values.description,
+      externalId: formik.values.externalId,
     };
 
     await updateContract({
