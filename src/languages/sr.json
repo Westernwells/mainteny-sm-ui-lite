@@ -1217,9 +1217,9 @@
   "Payment received": "Primila uplatu",
   "Payment updated": "Plaćanje je ažurirano",
   "Payment deleted": "Uplata je obrisana",
-  "User account for ${accountData.firstName} created successfully.": "Korisnički nalog za ${accountData.firstName} je uspješno napravljen.",
+  "User account for {{name}} created successfully.": "Korisnički nalog za {{name}} je uspješno napravljen.",
   "Sorry! User account creation failed. Please try again.": "Izvinjavam se! Kreiranje korisničkog naloga nije uspelo. Molim Vas, pokušajte ponovo.",
-  "User account for ${accountData.firstName} updated successfully.": "Korisnički nalog za ${accountData.firstName} je uspješno ažuriran.",
+  "User account for {{name}} updated successfully.": "Korisnički nalog za {{name}} je uspješno ažuriran.",
   "Sorry! Unable to save changes right now. Please try again.": "Izvinjavam se! Trenutno nije moguće sačuvati promene. Molim Vas, pokušajte ponovo.",
   "Article is created successfully": "Artikal je uspješno kreiran",
   "Article is deleted successfully": "Artikal je uspješno obrisan",
@@ -1512,7 +1512,7 @@
   "General": "Opšte",
   "New Modernization Job": "Novi posao modernizacije",
   "New General Job": "Novi opšti posao",
-  "Select date, time & technician": "Izaberite , datum, vrijeme i serviser",
+  "Select a date, time & technician": "Izaberite , datum, vrijeme i serviser",
   "User already exists": "Korisnik već postoji",
   "Username already exists": "Korisničko već postoji",
   "Total (excl. VAT)": "Ukupno vrijeme (bez PDV-a)",
@@ -1632,7 +1632,7 @@
   "Labor costs: {{laborCost}}{{currencyCode}}": "Troškovi rada: {{laborCost}}{{currencyCode}}",
   "Both Technician & Service Manager": "I tehničar i menadžer servisa",
   "Must contain 1 special character": "Mora da sadrži jedan poseban znak",
-  "User account for {{name}} created successfully": "Korisnički nalog za [name] je uspešno kreiran.",
+  "User account for {{name}} created successfully": "Korisnički nalog za {{name}} je uspešno kreiran.",
   "Order created successfully": "Porudžbina je uspešno napravljena.",
   "Reschedule to": "Prebacite na",
   "Service Job updated successfully.": "Servisni zadatak je uspešno ažuriran",
@@ -1727,5 +1727,7 @@
   "Each (ea)": "Svaki (ea)",
   "Sets": "Setovi",
   "Appliances (ea)": "Aparati (ea)",
-  "Vehicles (ea)": "Vozila (ea)"
+  "Vehicles (ea)": "Vozila (ea)",
+  "(incl VAT)": "( sa PDV )",
+  "Service Manager, Technician": "Rukovodilac servisa, Serviser"
 }
