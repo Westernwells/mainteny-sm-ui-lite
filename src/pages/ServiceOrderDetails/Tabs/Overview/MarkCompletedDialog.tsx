@@ -36,7 +36,9 @@ export const MarkCompletedDialog = ({
   serviceOrderDetails,
 }: Props) => {
   const {t} = useTranslation();
-  const {mutate: completeServiceOrder} = useCompleteServiceOrder();
+  const {mutate: completeServiceOrder} = useCompleteServiceOrder(
+    'Service job completed',
+  );
   const formik = useFormik<CompleteServiceOrder>({
     initialValues: {
       serviceTime:

@@ -9,6 +9,7 @@ import {SelectCombined} from 'components/SelectCombined';
 import {EmptySection} from 'components/EmptySection';
 import {FormLabel} from 'components/form/FormLabel';
 import {
+  useCompleteServiceOrder,
   usePublishWorkReport,
   useServiceOrderReport,
   useUpdateServiceOrderArticles,
@@ -23,6 +24,7 @@ import {PageCard} from 'components/PageCard';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
+import {FormInput} from 'components/form/FormInput';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {serviceOrderStatusToString} from 'utils/service-order-utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -51,6 +53,7 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
 
   const [items, setItems] = useState<ServiceOrderArticleView[]>([]);
   const [report, setReport] = useState<ServiceOrderReportView>();
+  const [description, setDescription] = useState('');
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const {mutate: publishWorkReport, isLoading: publishingWorkReport} =
     usePublishWorkReport();
@@ -67,6 +70,8 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
       : [],
     {enabled: !!(serviceOrderReportSource && serviceOrderReportSource.length)},
   );
+
+  const {mutate: completeServiceOrder} = useCompleteServiceOrder();
 
   useEffect(() => {
     if (serviceOrderReportSource && serviceOrderReportSource.length) {
@@ -86,9 +91,12 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
   }, [serviceOrderReportSource]);
 
   useEffect(() => {
-    if (report && report.serviceOrder && 'articles' in report.serviceOrder) {
-      const temp = report ? report.serviceOrder.articles : [];
-      setItems(temp);
+    if (report) {
+      if (report.serviceOrder && 'articles' in report.serviceOrder) {
+        const temp = report ? report.serviceOrder.articles : [];
+        setItems(temp);
+      }
+      setDescription(report?.description ?? '');
     }
   }, [report]);
 
@@ -230,10 +238,18 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
           <Pictures attachments={report.attachments} />
         </Box>
         <Box mt="1em">
-          <FormLabel text="Description Of Service" />
-          <Typography variant="body2" sx={{py: '0.5rem'}}>
-            {report.description || '-'}
-          </Typography>
+          <FormInput
+            containerStyles={{width: '100%', py: '1rem'}}
+            props={{
+              name: 'description',
+              label: t('Description of Service'),
+              multiline: true,
+              minRows: 4,
+              type: 'text',
+              value: description,
+              onChange: (e) => setDescription(e.target.value),
+            }}
+          />
         </Box>
 
         <Box mt="1em" mb="1.5em">
@@ -299,9 +315,17 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
               ),
               orderId,
             });
+          if (description !== (report?.description ?? '')) {
+            completeServiceOrder({
+              serviceOrderId: report?.serviceOrder.id,
+              body: {
+                description,
+              },
+            });
+          }
         }}
         listItems={[]}
-        isValid={!!items.length}
+        isValid={!!items.length || description !== (report?.description ?? '')}
       />
       <SendEmailDialog
         open={isSendEmailDialogOpen}
@@ -314,7 +338,7 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
           report.elevator.propertyOwner?.contact.email
         }
         subject=""
-        content={report.description}
+        content={description}
         callback={(emailRecord) => {
           publishWorkReport(
             {
