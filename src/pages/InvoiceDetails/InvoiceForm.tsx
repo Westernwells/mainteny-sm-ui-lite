@@ -880,7 +880,7 @@ export const InvoiceForm = ({
                       id: 'externalId',
                       name: 'externalId',
                       placeholder: 'e.g 1234',
-                      label: 'Invoice ID',
+                      label: 'Invoice Number',
                       value: formik.values.externalId,
                       onChange: formik.handleChange,
                       onBlur: formik.handleBlur,
