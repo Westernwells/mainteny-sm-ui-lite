@@ -367,11 +367,29 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
             <FormInput
               props={{
                 size: 'small',
-                label: 'VAT/Tax number',
+                label: 'VAT ID',
                 name: 'taxNumber',
                 value: formik.values.taxNumber,
                 helperText: formik.touched.taxNumber && formik.errors.taxNumber,
                 error: !!formik.errors.taxNumber && formik.touched.taxNumber,
+                ...defaultProps,
+              }}
+              handleFocus={handleFocus}
+            />
+          </Grid>
+          <Grid item md={4}>
+            <FormInput
+              props={{
+                size: 'small',
+                label: 'Offsetting Account',
+                name: 'offsettingAccount',
+                value: formik.values.offsettingAccount,
+                helperText:
+                  formik.touched.offsettingAccount &&
+                  formik.errors.offsettingAccount,
+                error:
+                  !!formik.errors.offsettingAccount &&
+                  formik.touched.offsettingAccount,
                 ...defaultProps,
               }}
               handleFocus={handleFocus}

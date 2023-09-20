@@ -94,6 +94,7 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       registrationDate: new Date(),
       costCenter: '',
       taxNumber: '',
+      offsettingAccount: '',
     },
     onSubmit: () => {},
     validationSchema: validationSchemaBasicInfo,

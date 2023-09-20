@@ -14,6 +14,7 @@ export type CustomerBasicInfoFormModel = {
   registrationDate: Date;
   costCenter: string;
   taxNumber: string;
+  offsettingAccount: string;
 };
 
 export type CustomerAddressFormModel = {
