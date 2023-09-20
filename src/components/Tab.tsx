@@ -83,7 +83,7 @@ export const Tabs = ({
             buttonProps={{
               onClick: () => (btnOnClick ? btnOnClick() : () => {}),
               sx: {
-                textTransform: 'capitalize',
+                textTransform: 'inherit',
                 ml: '0.8em',
                 height: '100%',
                 ...actionButtonStyles,
@@ -93,7 +93,7 @@ export const Tabs = ({
               size: 'small',
               startIcon: actionButtonIcon || <AddIcon />,
             }}>
-            <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
+            <Typography variant="body1" sx={{textTransform: 'inherit'}}>
               {t(btnLabel)}
             </Typography>
           </Button>
@@ -109,7 +109,7 @@ export const Tabs = ({
             size="medium"
             color="primary"
             sx={{
-              textTransform: 'capitalize',
+              textTransform: 'inherit',
               ml: '0.8em',
               py: '0.7em',
               height: '100%',

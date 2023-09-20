@@ -11,7 +11,6 @@ import Box from '@mui/material/Box';
 import RadioGroup from '@mui/material/RadioGroup';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
-import Print from '@mui/icons-material/Print';
 import Send from '@mui/icons-material/Send';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
@@ -145,9 +144,6 @@ export const InvoiceForm = ({
   ] = useState(false);
   const [showCheckListTooltip, setShowCheckListTooltip] = useState(false);
   const [showWorkReportTooltip, setShowWorlReportTooltip] = useState(false);
-  const [isInvoicePDFGenerated] = useState(
-    invoice?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE,
-  );
 
   const [customer, setCustomer] = useState<
     PropertyOwnerView | PropertyOwnerSimpleView | undefined
@@ -460,17 +456,6 @@ export const InvoiceForm = ({
         },
       });
     }
-    if (
-      isInvoicePDFGenerated &&
-      (invoice?.status === InvoiceStatus.DRAFT ||
-        invoice?.status === InvoiceStatus.EXPIRED)
-    ) {
-      items.splice(1, 0, {
-        label: t('Print'),
-        icon: <Print />,
-        onClick: () => setIsConfirmPrintDialogOpen(true),
-      });
-    }
     return items;
   }, [downloadUrl]);
 
@@ -563,7 +548,7 @@ export const InvoiceForm = ({
                   showModal: true,
                 });
               }
-            }, 6000);
+            }, 8000);
           },
         },
       );
@@ -880,7 +865,7 @@ export const InvoiceForm = ({
                       id: 'externalId',
                       name: 'externalId',
                       placeholder: 'e.g 1234',
-                      label: 'Invoice ID',
+                      label: 'Invoice Number',
                       value: formik.values.externalId,
                       onChange: formik.handleChange,
                       onBlur: formik.handleBlur,
