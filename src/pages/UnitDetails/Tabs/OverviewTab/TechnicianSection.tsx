@@ -9,7 +9,6 @@ import CallOutlinedIcon from '@mui/icons-material/CallOutlined';
 import Avatar from '@mui/material/Avatar';
 import useTheme from '@mui/material/styles/useTheme';
 import {PageCard} from 'components/PageCard';
-
 import technicianImage from 'assets/images/avatar.png';
 import {MaintainerView, TechnicianView} from 'models/technician';
 import {TechnSectionStyles as sx} from '../../styles';
