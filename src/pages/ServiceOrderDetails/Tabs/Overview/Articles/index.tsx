@@ -203,7 +203,7 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
         onConfirm={() => deleteArticle()}
         onClose={() => setOpenConfirm(false)}
         title="Confirm"
-        content="Do you want to delete this note?"
+        content="Do you want to delete this article?"
       />
 
       <Dialog
