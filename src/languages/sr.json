@@ -1243,6 +1243,7 @@
   "QR code image uploaded successfully": "QR kod",
   "Contract types updated successfully": "Vrste ugovora uspješno ažurirane",
   "Customer deleted successfully": "Kupac je uspješno izbrisan",
+  "Contact added successfully": "Kupac je uspješno dodan",
   "No data entries yet. They will appear here once added.": "Još nema unosa podataka. Oni će se pojaviti ovde kada se dodaju.",
   "There are no entires for the applied filters.": "Ne postoje cjeline za primjenjene filtere.",
   "Sorry, we couldn't find any ${placeholder} that matches the search text. If you like to add a new ${placeholder}, please click the button below.": "Žao nam je, nismo mogli da pronađemo nijedan ${placeholder} koji odgovara tekstu pretrage. Ako želite da dodate novi ${placeholder}, kliknite na dugme ispod.",
