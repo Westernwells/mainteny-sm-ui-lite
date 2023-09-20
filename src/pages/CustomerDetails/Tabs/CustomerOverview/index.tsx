@@ -11,7 +11,9 @@ import {
   Language,
   Payment,
   CalendarToday,
+  AccountBalance,
 } from '@mui/icons-material';
+
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
@@ -129,9 +131,14 @@ export const CustomerOverviewTab = ({
           icon: <CalendarToday sx={{color: theme.palette.info.dark}} />,
         },
         taxNumber: {
-          label: 'VAT/TAX NUMBER',
+          label: 'VAT ID',
           value: customer.additionalInfo.taxNumber || '-',
           icon: <Payment sx={{color: theme.palette.info.dark}} />,
+        },
+        offsettingAccount: {
+          label: 'OFFSETTING ACCOUNT',
+          value: '-',
+          icon: <AccountBalance sx={{color: theme.palette.info.dark}} />,
         },
       });
     }

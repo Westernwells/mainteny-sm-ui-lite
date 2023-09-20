@@ -15,4 +15,5 @@ export type CustomerEditForm = {
   registrationDate?: string;
   secondaryPhoneNumber?: string;
   taxNumber: string;
+  offsettingAccount: string;
 };

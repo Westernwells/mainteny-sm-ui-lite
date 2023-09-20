@@ -56,6 +56,7 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
     priority: customer.additionalInfo.priority,
     externalId: customer.externalId,
     taxNumber: customer.additionalInfo.taxNumber || '',
+    offsettingAccount: '',
   };
 
   return (
