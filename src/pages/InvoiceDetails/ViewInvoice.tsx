@@ -61,7 +61,7 @@ export const ViewInvoice = ({
   isLoadingDownloadUrl,
 }: Props) => {
   const {t} = useTranslation();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, closeSnackbar} = useSnackbar();
   const theme = useTheme();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
@@ -164,7 +164,7 @@ export const ViewInvoice = ({
       enqueueSnackbar(
         <Box display="flex" padding="0em" margin="0em" alignItems="center">
           <img alt={t('Path Image')} src={PathImage} />{' '}
-          <Typography margin="0em" paddingLeft="0.5em">
+          <Typography margin="0em" paddingLeft="0.5em" variant="body2">
             {t('PDF generation is in progress. Please wait...')}
           </Typography>
         </Box>,
@@ -173,6 +173,13 @@ export const ViewInvoice = ({
           autoHideDuration: 8000,
         },
       );
+    }
+
+    if (
+      invoice?.additionalInfo.pdfGenerationStatus !==
+      PdfGenerationStatus.RUNNING
+    ) {
+      closeSnackbar();
     }
   }, [invoice]);
 

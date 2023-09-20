@@ -27,6 +27,7 @@ import {
 } from 'models/article';
 import {PdfGenerationStatus} from 'models/misc';
 import {waitForSeconds} from 'utils/utils';
+import {useSnackbar} from 'notistack';
 import {ArticleItemsTable} from './ArticleItemsTable';
 
 const validationSchema = Yup.object().shape({
@@ -54,6 +55,7 @@ const validationSchema = Yup.object().shape({
 export const OrderArticle = () => {
   const {t} = useTranslation();
   const location = useLocation();
+  const {closeSnackbar} = useSnackbar();
   const articleFromLocation = (location.state as {article: ArticleView})
     ?.article;
   const formatDate = useFormatDate();
@@ -64,7 +66,7 @@ export const OrderArticle = () => {
   const {mutate: createArticleOrder} = useCreateArticleOrder(
     <Box display="flex" padding="0em" margin="0em" alignItems="center">
       <img alt={t('Path Image')} src={PathImage} />{' '}
-      <Typography margin="0em" paddingLeft="0.5em">
+      <Typography margin="0em" paddingLeft="0.5em" variant="body2">
         {t('PDF generation is in progress. Please wait...')}
       </Typography>
     </Box>,
@@ -153,6 +155,14 @@ export const OrderArticle = () => {
     }
   }, [articleFromLocation]);
 
+  useEffect(() => {
+    if (
+      articleOrder?.additionalInfo.pdfGenerationStatus !==
+      PdfGenerationStatus.RUNNING
+    ) {
+      closeSnackbar();
+    }
+  }, [articleOrder]);
   return (
     <Box>
       <Box
