@@ -366,7 +366,7 @@ export const ArticleItemsTable = ({
         placeItems: 'center start',
         gap: '.5em',
       }}>
-      <FormLabel text="No" textTranslationContext="number" />
+      <FormLabel text="No." textTranslationContext="number" />
       <FormLabel text="Article Name" sx={{justifySelf: 'start'}} />
       <FormLabel text="Unit Price" sx={{textTransform: 'none'}} />
       <FormLabel text="Quantity" />
@@ -416,7 +416,7 @@ export const ArticleItemsTable = ({
         placeItems: 'center start',
         gap: '.5em',
       }}>
-      <FormLabel text="No" />
+      <FormLabel text="No." />
       <FormLabel text="Description" sx={{justifySelf: 'start'}} />
       <FormLabel text="Total amount (excl VAT)" />
     </Box>
