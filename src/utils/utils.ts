@@ -1,4 +1,3 @@
-import {t} from 'i18next';
 import {Language} from 'models/misc';
 
 export const capitalize = (role: any[]) => {
@@ -6,7 +5,7 @@ export const capitalize = (role: any[]) => {
   role.forEach((value: string, index: number) => {
     const item = value
       .split('_')
-      .map((x) => t(`${x[0]}${x.slice(1).toLowerCase()}`))
+      .map((x) => `${x[0]}${x.slice(1).toLowerCase()}`)
       .join(' ');
 
     if (index > 0) {
@@ -44,13 +43,11 @@ export const formatSearchParamsPageSize = (
 
 // Converts macro to text, eg: 'SERVICE_MANAGER' -> 'Service Manager'
 export const convertToText = (macro: string) =>
-  t(
-    macro
-      .toLowerCase()
-      .split('_')
-      .join(' ')
-      .replace(/\w\S*/g, (w) => w.replace(/^\w/, (c) => c.toUpperCase())),
-  );
+  macro
+    .toLowerCase()
+    .split('_')
+    .join(' ')
+    .replace(/\w\S*/g, (w) => w.replace(/^\w/, (c) => c.toUpperCase()));
 
 // Converts text to macro, eg: 'Service Manager' -> 'SERVICE_MANAGER'
 export const convertToMacro = (text: string) =>
