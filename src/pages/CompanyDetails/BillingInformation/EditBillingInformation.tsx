@@ -53,6 +53,22 @@ export const EditBillingInformation = ({formik}: Props) => {
           }}
         />
       </Grid>
+      <Grid item xs={12}>
+        <FormInput
+          props={{
+            size: 'small',
+            placeholder: 'e.g. 123456789',
+            label: 'Tax Number',
+            name: 'taxId',
+            helperText: formik.touched.taxId && formik.errors.taxId,
+            error: !!formik.errors.taxId && formik.touched.taxId,
+            required: true,
+            value: formik.values.taxId,
+            sx: {mb: '1em'},
+            ...defaultProps,
+          }}
+        />
+      </Grid>
     </Grid>
   );
 };
