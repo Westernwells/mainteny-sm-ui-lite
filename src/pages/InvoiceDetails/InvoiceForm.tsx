@@ -10,7 +10,6 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import RadioGroup from '@mui/material/RadioGroup';
 import DeleteIcon from '@mui/icons-material/Delete';
-import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import Send from '@mui/icons-material/Send';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
@@ -1299,20 +1298,6 @@ export const InvoiceForm = ({
           showBorder: actions[actions.length - 1] !== item,
         }))}
         isValid={isValid()}
-        secondaryButton={
-          invoice?.status === InvoiceStatus.DRAFT ||
-          invoice?.status === InvoiceStatus.EXPIRED ? (
-            <Button
-              label="Preview"
-              buttonProps={{
-                variant: 'outlined',
-                sx: {bgcolor: theme.palette.inputBackground.main},
-                startIcon: <RemoveRedEye />,
-                onClick: () => navigate(`/invoices/details/${invoice.id}`),
-              }}
-            />
-          ) : null
-        }
       />
       <NewCustomer
         isDialogOpen={isAddNewCustomerDialogOpen}
