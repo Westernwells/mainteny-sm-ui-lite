@@ -48,3 +48,19 @@ export interface TestContextExtended {
     },
   ];
 }
+
+export enum MeasurementUnit {
+  'Hours (hr)' = 'Hours (hr)',
+  'Square Meters (sq m)' = 'Square Meters (sq m)',
+  'Linear Meters (m)' = 'Linear Meters (m)',
+  'Cubic Meters (cu m)' = 'Cubic Meters (cu m)',
+  'Pieces or Units (ea)' = 'Pieces or Units (ea)',
+  'Liters (L)' = 'Liters (L)',
+  'Kilograms (kg)' = 'Kilograms (kg)',
+  'Cubic Feet (cu ft)' = 'Cubic Feet (cu ft)',
+  'Milliliters (ml)' = 'Milliliters (ml)',
+  'Each (ea)' = 'Each (ea)',
+  'Sets' = 'Sets',
+  'Appliances (ea)' = 'Appliances (ea)',
+  'Vehicles (ea)' = 'Vehicles (ea)',
+}

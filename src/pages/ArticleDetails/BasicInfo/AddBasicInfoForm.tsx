@@ -7,11 +7,8 @@ import InputAdornment from '@mui/material/InputAdornment';
 import {FormikProps} from 'formik';
 import {ArticleView} from 'models/article';
 import {FormInput} from 'components/form/FormInput';
-import {ComboBox} from 'components/ComboBox';
-import {ArticleBasicFormModel} from 'models/articleForm';
-import {createEmptyResource} from 'utils/paging-utils';
-import {useCacheValues} from 'hooks/reactQuery/useElevator';
-import {CacheTypes} from 'models/misc';
+import {FormSelect} from 'components/form/FormSelect';
+import {ArticleBasicFormModel, MeasurementUnit} from 'models/articleForm';
 import {getCurrencySymbol, useCurrentCurrency} from 'utils/currency';
 import {AutoAwesome} from '@mui/icons-material';
 import {Button} from '@mui/material';
@@ -37,16 +34,6 @@ export const AddBasicInfoForm = ({
   const theme = useTheme();
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
-  const [modelQuery, setModelQuery] = useState('');
-  const {data: elevatorModelsResource = createEmptyResource<string>()} =
-    useCacheValues(
-      {
-        pageIndex: 0,
-        pageSize: 10,
-        query: modelQuery,
-      },
-      CacheTypes.ELEVATOR_MODEL,
-    );
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [activeField, setActiveField] = useState<string>('');
@@ -313,30 +300,23 @@ export const AddBasicInfoForm = ({
         />
       </Box>
 
-      <ComboBox
+      <FormSelect
         containerStyles={{...containerStyles}}
-        options={elevatorModelsResource.data.map((item) => ({
+        labelId="select-unit-label"
+        label="Unit"
+        options={Object.keys(MeasurementUnit).map((item) => ({
           label: item,
           value: item,
         }))}
-        getValue={(item) => formik.setFieldValue('unit', item?.value)}
-        initialValue={
-          formik.values.unit
-            ? {
-                label: formik.values.unit,
-                value: formik.values.unit,
-              }
-            : null
-        }
-        initialQuery={formik.values.unit}
-        getQuery={(item) => setModelQuery(item || '')}
-        textFieldProps={{
-          name: 'unit',
-          label: t('Unit'),
-          required: true,
-          placeholder: t('Select Unit'),
+        selectProps={{
+          id: 'select-unit',
+          value: formik.values.unit,
+          onChange: formik.handleChange,
           error: !!(formik.touched.unit && formik.errors.unit),
+          placeholder: t('Select Unit'),
+          name: 'unit',
         }}
+        required
       />
 
       <FormInput

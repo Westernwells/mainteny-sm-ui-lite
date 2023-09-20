@@ -39,7 +39,7 @@ export const EmployeeOverview = ({
     if (employee) {
       setBasicDetails(employeeDetailSchema(employee));
     }
-  }, [employee]);
+  }, [employee, t]);
 
   if (isLoading) {
     return <Progress />;
