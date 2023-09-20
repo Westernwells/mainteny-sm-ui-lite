@@ -240,8 +240,9 @@ const NewContract = () => {
     };
 
     await createContract(newContract);
-    await uploadFiles({files: formikDocuments.values.documents, uploadPath});
-
+    if (formikDocuments.values.documents.length) {
+      await uploadFiles({files: formikDocuments.values.documents, uploadPath});
+    }
     navigate(`/contracts/details/${contractId}`, {replace: true});
   };
 
