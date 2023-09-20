@@ -10,6 +10,7 @@ import {SelectCombined} from 'components/SelectCombined';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {FormLabel} from 'components/form/FormLabel';
 import {FormInput} from 'components/form/FormInput';
+import PathImage from 'assets/images/Path.svg';
 import {SuppliersDataGrid} from 'components/DataGrid/SuppliersDataGrid';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useFormatDate} from 'hooks/useFormatDate';
@@ -61,7 +62,12 @@ export const OrderArticle = () => {
   const [isPrinted, setIsPrinted] = useState(false);
   const {data: articleOrder, refetch} = useArticleOrder(orderId);
   const {mutate: createArticleOrder} = useCreateArticleOrder(
-    'PDF generation is in progress. Please wait...',
+    <Box display="flex" padding="0em" margin="0em" alignItems="center">
+      <img alt={t('Path Image')} src={PathImage} />{' '}
+      <Typography margin="0em" paddingLeft="0.5em">
+        {t('PDF generation is in progress. Please wait...')}
+      </Typography>
+    </Box>,
   );
   const [supplier, setSupplier] = useState<ArticleSupplierView | undefined>(
     undefined,

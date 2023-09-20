@@ -38,6 +38,7 @@ import {
 import {formatCurrency} from 'utils/currency';
 import {useTranslation} from 'react-i18next';
 import {useSnackbar} from 'notistack';
+import PathImage from 'assets/images/Path.svg';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -145,10 +146,18 @@ export const ViewQuotation = ({
       quotation?.additionalInfo.pdfGenerationStatus ===
       PdfGenerationStatus.RUNNING
     ) {
-      enqueueSnackbar(`PDF generation is in progress. Please wait...`, {
-        variant: 'info',
-        autoHideDuration: 8000,
-      });
+      enqueueSnackbar(
+        <Box display="flex" padding="0em" margin="0em" alignItems="center">
+          <img alt={t('Path Image')} src={PathImage} />{' '}
+          <Typography margin="0em" paddingLeft="0.5em">
+            {t('PDF generation is in progress. Please wait...')}
+          </Typography>
+        </Box>,
+        {
+          variant: 'info',
+          autoHideDuration: 8000,
+        },
+      );
     }
   }, [quotation]);
 
