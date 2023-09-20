@@ -119,6 +119,7 @@ export const NewCustomer = ({
       registrationDate: new Date(),
       costCenter: '',
       taxNumber: '',
+      offsettingAccount: '',
     },
     onSubmit: () => {},
     validationSchema: validationSchemaBasicInfo,
