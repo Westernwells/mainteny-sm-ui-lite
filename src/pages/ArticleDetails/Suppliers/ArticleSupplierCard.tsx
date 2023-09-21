@@ -15,10 +15,10 @@ import {makeAmountRecord} from '../../../utils/currency';
 
 export const ArticleSupplierCard = ({article}: {article: ArticleView}) => {
   const [openDialog, setOpenDialog] = useState(false);
-  const {mutateAsync: updateArticle, isLoading} = useUpdateArticle(
-    'Article updated successfully.',
-  );
   const {t} = useTranslation();
+  const {mutateAsync: updateArticle, isLoading} = useUpdateArticle(
+    t('Supplier updated successfully.'),
+  );
 
   const saveArticle = async (suppliers: SupplierRecord[]) => {
     const temp = {
