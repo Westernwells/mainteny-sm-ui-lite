@@ -17,7 +17,6 @@ import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import {Divider} from '@mui/material';
-
 import {CardProps} from 'components/CardProps';
 import {InfoCard} from 'components/InfoCard';
 import {Progress} from 'components/Progress';
