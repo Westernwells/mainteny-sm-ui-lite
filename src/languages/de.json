@@ -464,6 +464,7 @@
   "Spending Limit": "Ausgabenlimit",
   "e.g. 500€": "z.B. 500€",
   "Year Built": "Baujahr",
+  "Edit Engineer": "Bearbeite Techniker",
   "e.g. 2000": "z.B. 2000",
   "Unit Type": "Anlagentyp",
   "e.g. Hydraulic": "z.B. Hydraulisch",
@@ -596,6 +597,7 @@
   "Controller User Manual": "Steuerungs Benutzerhandbuch",
   "Add ": "hinzufügen",
   "Lower the number here, higher is the priority": "1 is die höchste Priorität",
+  "Mo, Tu, We, Th, Fr, Sa, Su": "Mo, Di, Mi, Do, Fr, Sa, So",
   "Edit Location": "Adresse bearbeiten",
   "Edit Unit Details": "Anlagendetails bearbeiten",
   "Please edit this in the associated contract": "Bitte bearbeiten Sie dies im zugehörigen Vertrag",
@@ -1715,5 +1717,7 @@
   "Selected Technician": "Ausgewählter Techniker",
   "Order scheduled successfully": "Auftrag erfolgreich geplant.",
   "Work report updated successfully!": "Arbeitsschein erfolgreich aktualisiert.",
-  "Select date, time & technicians": "Wähle Datum, Uhrzeit & Techniker"
+  "Select date, time & technicians": "Wähle Datum, Uhrzeit & Techniker",
+  "Supplier updated successfully.": "Zulieferer erfolgreich aktualisiert.",
+  "BUSINESS ADDRESS": "GESCHÄFTSADRESSE"
 }

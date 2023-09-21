@@ -18,7 +18,7 @@ import {
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
-import {ArticleView} from './article';
+import {ArticleView, ServiceOrderArticleRecord} from './article';
 import {FileResource} from './media';
 
 export enum Priority {
@@ -237,6 +237,7 @@ export interface CompleteServiceOrder {
   description?: string;
   externalId?: string;
   serviceTime?: number;
+  articles?: ServiceOrderArticleRecord[];
 }
 
 export interface CheckListAnswerRecord {

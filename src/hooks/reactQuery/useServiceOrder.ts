@@ -594,6 +594,7 @@ export const useCompleteServiceOrder = (successMsg?: string) => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        queryClient.invalidateQueries([queryKeys.fetchServiceOrderReport]);
         if (successMsg) {
           enqueueSnackbar(successMsg, {
             variant: 'success',
