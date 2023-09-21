@@ -34,6 +34,7 @@ export enum ServiceCompanyNumberType {
   CHECK_LIST = 'CHECK_LIST',
   ELEVATOR = 'ELEVATOR',
   ARTICLE_ORDER = 'ARTICLE_ORDER',
+  ARTICLE_SUPPLIER = 'ARTICLE_SUPPLIER',
 }
 
 export enum DataSyncType {
@@ -49,6 +50,7 @@ export enum DataSyncType {
   CHECK_LIST = 'CHECK_LIST',
   ELEVATOR = 'ELEVATOR',
   ARTICLE_ORDER = 'ARTICLE_ORDER',
+  ARTICLE_SUPPLIER = 'ARTICLE_SUPPLIER',
 }
 
 export enum ActivityMessageType {
