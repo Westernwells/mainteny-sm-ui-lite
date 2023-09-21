@@ -41,21 +41,22 @@ export const columns: GridColDef[] = [
     field: 'date',
     headerName: 'invoice date',
     align: 'center',
-    flex: 0.75,
+    flex: 1,
     variant: 'titleCase',
   }),
   getColumnProps({
     field: 'number',
     headerName: 'invoice number',
     align: 'center',
-    flex: 2,
+    flex: 1,
     variant: 'titleCase',
   }),
   getColumnProps({
     field: 'amount',
     headerName: 'total amount',
-    align: 'center',
+    align: 'right',
     flex: 1,
+    headerAlign: 'right',
     variant: 'titleCase',
   }),
   getColumnProps({
@@ -89,7 +90,7 @@ export const makeRows = (
         type: item.serviceOrder?.type,
         amount: `${formatCurrency(
           item
-            ? item.totalAmount.netAmount /
+            ? item.totalAmount.grossAmount /
                 10 ** item.totalAmount.fractionDigits!
             : 0,
           {

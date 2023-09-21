@@ -233,10 +233,10 @@ export interface UpdateJobSchedule {
 }
 
 export interface CompleteServiceOrder {
-  answers: CheckListAnswerRecord[];
-  description: string;
-  externalId: string;
-  serviceTime: number;
+  answers?: CheckListAnswerRecord[];
+  description?: string;
+  externalId?: string;
+  serviceTime?: number;
 }
 
 export interface CheckListAnswerRecord {

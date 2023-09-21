@@ -260,7 +260,7 @@ const createArticleOrder = async (
   return response.data;
 };
 
-export const useCreateArticleOrder = (successMsg: string) => {
+export const useCreateArticleOrder = (successMsg: string | JSX.Element) => {
   const queryClient = useQueryClient();
   const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
@@ -268,7 +268,8 @@ export const useCreateArticleOrder = (successMsg: string) => {
     {
       onSuccess: () => {
         enqueueSnackbar(successMsg, {
-          variant: 'success',
+          variant: 'info',
+          autoHideDuration: 12000,
         });
         queryClient.invalidateQueries([queryKeys.fetchArticleOrder]);
       },

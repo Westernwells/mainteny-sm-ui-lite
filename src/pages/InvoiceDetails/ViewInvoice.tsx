@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import printJS from 'print-js';
@@ -37,9 +37,11 @@ import {
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import {Confirm} from 'components/Confirm';
+import PathImage from 'assets/images/Path.svg';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useSnackbar} from 'notistack';
 import {Notes} from './Notes';
 import {InvoiceActivities} from './InvoiceActivities';
 
@@ -48,6 +50,7 @@ interface Props {
   invoice: InvoiceView;
   workReport: ServiceOrderReportView;
   invoiceActivities: InvoiceActivityView[];
+  isLoadingDownloadUrl: boolean;
 }
 
 export const ViewInvoice = ({
@@ -55,8 +58,10 @@ export const ViewInvoice = ({
   invoice,
   workReport,
   invoiceActivities,
+  isLoadingDownloadUrl,
 }: Props) => {
   const {t} = useTranslation();
+  const {enqueueSnackbar, closeSnackbar} = useSnackbar();
   const theme = useTheme();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
@@ -137,17 +142,46 @@ export const ViewInvoice = ({
       {
         onSuccess: () => {
           setIsConfirmPrintDialogOpen(false);
-          if (downloadUrl) {
-            printJS({
-              printable: downloadUrl,
-              type: 'pdf',
-              showModal: true,
-            });
-          }
+          setTimeout(() => {
+            if (downloadUrl) {
+              printJS({
+                printable: downloadUrl,
+                type: 'pdf',
+                showModal: true,
+              });
+            }
+          }, 8000);
         },
       },
     );
   };
+
+  useEffect(() => {
+    if (
+      invoice?.additionalInfo.pdfGenerationStatus ===
+      PdfGenerationStatus.RUNNING
+    ) {
+      enqueueSnackbar(
+        <Box display="flex" padding="0em" margin="0em" alignItems="center">
+          <img alt={t('Path Image')} src={PathImage} />{' '}
+          <Typography margin="0em" paddingLeft="0.5em" variant="body2">
+            {t('PDF generation is in progress. Please wait...')}
+          </Typography>
+        </Box>,
+        {
+          variant: 'info',
+          autoHideDuration: 8000,
+        },
+      );
+    }
+
+    if (
+      invoice?.additionalInfo.pdfGenerationStatus !==
+      PdfGenerationStatus.RUNNING
+    ) {
+      closeSnackbar();
+    }
+  }, [invoice]);
 
   return (
     <Box>
@@ -213,8 +247,9 @@ export const ViewInvoice = ({
               </Typography>
             </Box>
           </PageCard>
+
           {invoice!.additionalInfo.pdfGenerationStatus ===
-            PdfGenerationStatus.DONE && downloadUrl.length ? (
+            PdfGenerationStatus.DONE && !isLoadingDownloadUrl ? (
             <PDFContainer url={downloadUrl} />
           ) : (
             <PageCard>

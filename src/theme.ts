@@ -321,7 +321,7 @@ export const theme = createTheme({
             fontSize: '0.875rem',
             lineHeight: 1.71,
             letterSpacing: '0.4px',
-            textTransform: 'capitalize',
+            textTransform: 'inherit',
           },
         },
         {

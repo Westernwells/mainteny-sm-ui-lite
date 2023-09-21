@@ -50,7 +50,7 @@ export const ContractDetails = () => {
         currentIndex={tabValue}
         onChange={(index) => setTabValue(index)}
         showActionBtn
-        btnLabel="Download contract"
+        btnLabel="Download Contract"
         actionBtnVariant="outlined"
         disableBtnAction={!Object.values(downloadUrl || {}).length}
         actionButtonIcon={<FileDownloadIcon color="primary" />}
@@ -75,7 +75,7 @@ export const ContractDetails = () => {
                 onClick: () => setOpenSelectUnitModal(true),
                 variant: 'contained',
                 sx: {
-                  textTransform: 'capitalize',
+                  textTransform: 'inherit',
                   ml: '0.8em',
                   height: '100%',
                 },

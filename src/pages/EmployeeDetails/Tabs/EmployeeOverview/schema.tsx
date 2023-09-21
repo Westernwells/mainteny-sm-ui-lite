@@ -1,3 +1,4 @@
+import {t} from 'i18next';
 import Box from '@mui/material/Box';
 import HomeIcon from '@mui/icons-material/Home';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
@@ -22,7 +23,7 @@ export const employeeDetailSchema = (employee: UserView) => {
     const formatOrderText =
       orderTypes &&
       orderTypes.length > 0 &&
-      orderTypes.map((item) => formatServiceName(item));
+      orderTypes.map((item) => t(formatServiceName(item) ?? ''));
     if (formatOrderText) {
       return capitalize(formatOrderText);
     }
@@ -32,7 +33,7 @@ export const employeeDetailSchema = (employee: UserView) => {
   const renderShiftTime = (time: TimeWindowRecord[]) => {
     const formatShiftTime = time.map(
       (item: TimeWindowRecord) =>
-        `${convertToText(item.type)} ${item.fromTime} - ${item.toTime}`,
+        `${t(convertToText(item.type))} ${item.fromTime} - ${item.toTime}`,
     );
     return capitalize(formatShiftTime);
   };

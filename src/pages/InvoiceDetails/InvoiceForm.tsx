@@ -10,8 +10,6 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import RadioGroup from '@mui/material/RadioGroup';
 import DeleteIcon from '@mui/icons-material/Delete';
-import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
-import Print from '@mui/icons-material/Print';
 import Send from '@mui/icons-material/Send';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
@@ -130,7 +128,6 @@ export const InvoiceForm = ({
   const {data: downloadUrl} = useDownloadUrl(
     invoice ? [invoice.additionalInfo.pdfPath] : [],
   );
-
   const [isDrawerOpen] = useState<boolean>(true);
   const [isAddNewCustomerDialogOpen, setIsAddNewCustomerDialogOpen] =
     useState<boolean>(false);
@@ -146,9 +143,6 @@ export const InvoiceForm = ({
   ] = useState(false);
   const [showCheckListTooltip, setShowCheckListTooltip] = useState(false);
   const [showWorkReportTooltip, setShowWorlReportTooltip] = useState(false);
-  const [isInvoicePDFGenerated] = useState(
-    invoice?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE,
-  );
 
   const [customer, setCustomer] = useState<
     PropertyOwnerView | PropertyOwnerSimpleView | undefined
@@ -461,17 +455,6 @@ export const InvoiceForm = ({
         },
       });
     }
-    if (
-      isInvoicePDFGenerated &&
-      (invoice?.status === InvoiceStatus.DRAFT ||
-        invoice?.status === InvoiceStatus.EXPIRED)
-    ) {
-      items.splice(1, 0, {
-        label: t('Print'),
-        icon: <Print />,
-        onClick: () => setIsConfirmPrintDialogOpen(true),
-      });
-    }
     return items;
   }, [downloadUrl]);
 
@@ -556,13 +539,15 @@ export const InvoiceForm = ({
         {
           onSuccess: () => {
             setIsConfirmPrintDialogOpen(false);
-            if (downloadUrl) {
-              printJS({
-                printable: Object.values(downloadUrl)[0],
-                type: 'pdf',
-                showModal: true,
-              });
-            }
+            setTimeout(() => {
+              if (downloadUrl) {
+                printJS({
+                  printable: downloadUrl,
+                  type: 'pdf',
+                  showModal: true,
+                });
+              }
+            }, 8000);
           },
         },
       );
@@ -862,9 +847,9 @@ export const InvoiceForm = ({
                   },
                   {
                     label: 'Invoice Date',
-                    value: formatDate(
-                      invoice ? invoice.meta.createdAt : new Date(),
-                    ),
+                    value: invoice?.sentDate
+                      ? formatDate(invoice.sentDate)
+                      : '-',
                   },
                 ].map((i) => (
                   <Box key={i.label}>
@@ -879,7 +864,7 @@ export const InvoiceForm = ({
                       id: 'externalId',
                       name: 'externalId',
                       placeholder: 'e.g 1234',
-                      label: 'Invoice ID',
+                      label: 'Invoice Number',
                       value: formik.values.externalId,
                       onChange: formik.handleChange,
                       onBlur: formik.handleBlur,
@@ -1313,20 +1298,6 @@ export const InvoiceForm = ({
           showBorder: actions[actions.length - 1] !== item,
         }))}
         isValid={isValid()}
-        secondaryButton={
-          invoice?.status === InvoiceStatus.DRAFT ||
-          invoice?.status === InvoiceStatus.EXPIRED ? (
-            <Button
-              label="Preview"
-              buttonProps={{
-                variant: 'outlined',
-                sx: {bgcolor: theme.palette.inputBackground.main},
-                startIcon: <RemoveRedEye />,
-                onClick: () => navigate(`/invoices/details/${invoice.id}`),
-              }}
-            />
-          ) : null
-        }
       />
       <NewCustomer
         isDialogOpen={isAddNewCustomerDialogOpen}

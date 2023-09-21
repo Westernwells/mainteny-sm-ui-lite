@@ -579,7 +579,7 @@ const completeServiceOrder = async (
   );
 };
 
-export const useCompleteServiceOrder = () => {
+export const useCompleteServiceOrder = (successMsg?: string) => {
   const queryClient = useQueryClient();
   const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
@@ -594,9 +594,11 @@ export const useCompleteServiceOrder = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        enqueueSnackbar('Service job completed', {
-          variant: 'success',
-        });
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
       },
       onError: (err) => {
         console.log(err);
