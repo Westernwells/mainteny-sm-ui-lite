@@ -290,6 +290,7 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
             <AddDescription
               getDescription={(val) => setDescription(val)}
               initialDescription={description}
+              selectedRadioOption={selectedRadioOption}
               selectedUnit={selectedUnit}
               selectedTechnicians={selectedTechnicians}
               selectedDateString={selectedDateString || ''}
