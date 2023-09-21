@@ -1730,5 +1730,10 @@
   "Appliances (ea)": "Aparati (ea)",
   "Vehicles (ea)": "Vozila (ea)",
   "(incl VAT)": "( sa PDV )",
-  "Service Manager, Technician": "Rukovodilac servisa, Serviser"
+  "Service Manager, Technician": "Rukovodilac servisa, Serviser",
+  "Selected Technician": "Izabrani serviser",
+  "Order scheduled successfully": "Porudžbina je uspešno zakazana",
+  "Work report updated successfully!": "Izveštaj o radu je uspešno ažuriran!",
+  "Select date, time & technicians": "Izaberite datum, vreme i tehničare",
+  "Supplier updated successfully.": "Dobavljač je uspešno ažuriran."
 }
