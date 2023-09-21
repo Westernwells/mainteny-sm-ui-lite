@@ -7,6 +7,7 @@ import {EmployeesView} from 'models/employee';
 import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Summary, SummaryItem} from './Summary';
+import {RadioOptions} from './models';
 
 interface Props {
   getDescription?: (val: string) => void;
@@ -15,6 +16,7 @@ interface Props {
   selectedTechnicians?: EmployeesView[];
   selectedDateString?: string;
   selectedTimeString?: string;
+  selectedRadioOption?: string;
 }
 
 export const AddDescription = ({
@@ -24,6 +26,7 @@ export const AddDescription = ({
   selectedTechnicians = [],
   selectedDateString,
   selectedTimeString,
+  selectedRadioOption,
 }: Props) => {
   const {t} = useTranslation();
   const [description, setDescription] = useState(initialDescription);
@@ -57,7 +60,8 @@ export const AddDescription = ({
         </Summary>
       ) : null}
 
-      {selectedDateString || selectedTimeString ? (
+      {(selectedDateString || selectedTimeString) &&
+      selectedRadioOption !== RadioOptions.IMMEDIATE ? (
         <Summary label="Selected Date & Time" containerStyle={{mt: '1em'}}>
           {selectedDateString ? (
             <SummaryItem
