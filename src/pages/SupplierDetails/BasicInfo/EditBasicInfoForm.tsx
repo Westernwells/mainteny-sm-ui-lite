@@ -138,7 +138,7 @@ export const EditBasicInfoForm = ({
                   textAlign: 'left',
                   alignItems: 'flex-start',
                   width: '100%',
-                  padding: '1em 2em',
+                  padding: '1em',
                 },
               }}>
               <Box
@@ -149,12 +149,17 @@ export const EditBasicInfoForm = ({
                   paddingBottom: '0.6em',
                 }}>
                 <AutoAwesome />
-                <Typography variant="subtitle2" sx={{paddingLeft: '0.5em'}}>
+                <Typography
+                  variant="caption"
+                  fontWeight="700"
+                  sx={{paddingLeft: '0.5em'}}>
                   {t('Generate ID')}
                 </Typography>
               </Box>
 
-              <Typography variant="body2" color={theme.palette.text.secondary}>
+              <Typography
+                variant="caption"
+                color={theme.palette.text.secondary}>
                 {t('Customizable in Settings')}
               </Typography>
             </Button>
@@ -183,7 +188,7 @@ export const EditBasicInfoForm = ({
                     textAlign: 'left',
                     alignItems: 'flex-start',
                     width: '100%',
-                    padding: '1em 2em',
+                    padding: '1em',
                   },
                 }}>
                 <Box
@@ -194,13 +199,16 @@ export const EditBasicInfoForm = ({
                     paddingBottom: '0.6em',
                   }}>
                   <AutoAwesome />
-                  <Typography variant="subtitle2" sx={{paddingLeft: '0.5em'}}>
+                  <Typography
+                    variant="caption"
+                    sx={{paddingLeft: '0.5em'}}
+                    fontWeight="700">
                     {t('Enable Automatic ID Generation')}
                   </Typography>
                 </Box>
 
                 <Typography
-                  variant="body2"
+                  variant="caption"
                   color={theme.palette.text.secondary}>
                   {t('Allows for easier number input')}
                 </Typography>
