@@ -1,4 +1,4 @@
-import {Language} from 'models/misc';
+import {Address, Language} from 'models/misc';
 
 export const capitalize = (role: any[]) => {
   let roles = '';
@@ -188,3 +188,21 @@ export const getUniqueId = () => Math.random().toString(36).substring(2, 9);
 
 export const getPercentage = (num: number, total: number) =>
   Math.round((num / total) * 100);
+
+export const formatAddress = (address: Address | undefined) => {
+  if (!address) return '-';
+
+  const name = address?.component?.name ? address?.component?.name : '';
+  const address1 = address?.component?.street ? address?.component?.street : '';
+  const address2 = address?.component?.street2
+    ? address?.component?.street2
+    : '';
+  const zip = address?.component?.postalCode
+    ? address?.component?.postalCode
+    : '';
+  const city = address?.component?.city ? address?.component?.city : '';
+
+  return [name, address1, address2, zip, city]
+    .filter((x) => x !== '')
+    .join(', ');
+};
