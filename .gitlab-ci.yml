@@ -1,5 +1,4 @@
 stages:
-  - lint
   - build-project
   - build-images
   - deploy
@@ -15,6 +14,9 @@ variables:
   script:
     - yarn prepare_env
     - yarn install --frozen-lockfile
+    - yarn check-format
+    - yarn check-types
+    - yarn check-lint
     - yarn build:${ENV}
   artifacts:
     paths:
@@ -83,24 +85,12 @@ variables:
     - if: "$CI_MERGE_REQUEST_ID"
       when: never
 
-lint-project:
-  stage: lint
-  image: node:lts-gallium
-  script:
-    - yarn install --frozen-lockfile
-    - yarn check-format
-    - yarn check-types
-    - yarn check-lint
-  rules:
-    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop'
-    - when: never
-
 build-feature-branch:
   <<: *build-template
   variables:
     ENV: stage
   rules:
-    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop'
+    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
     - when: never
 
 build-stage:
