@@ -28,6 +28,7 @@ export const AddressAutoComplete = ({
   noOptionsText = 'No options',
 }: Props) => {
   const [address, setAddress] = useState<any>(null);
+  const [open, setOpen] = useState(false);
   const [queryView, setQueryView] = useState(initialValue);
 
   const {t} = useTranslation();
@@ -52,16 +53,29 @@ export const AddressAutoComplete = ({
     if (!queryView && getAddress) {
       getAddress();
     }
+
+    if (queryView.length === 0) {
+      setOpen(false);
+    } else {
+      setOpen(true);
+    }
   }, [queryView]);
 
   const onInputChange = (e: any) => {
     setQueryView(e.target.value);
+
+    // if (queryView.length === 0) {
+    //   if (open) {
+    //     setOpen(false);
+    //   } else if (!open) setOpen(true);
+    // }
   };
   return (
     <AddressAutocomplete
       noOptionsText={
         typeof noOptionsText === 'string' ? t(noOptionsText) : noOptionsText
       }
+      open={open}
       inputValue={queryView}
       value={address}
       apiKey={import.meta.env.REACT_APP_GOOGLE_MAPS_KEY!}
