@@ -11,6 +11,8 @@ interface Props {
   getSelectedTime?: (state: Date | null) => void;
   containerStyles?: {[key: string]: any};
   textFieldProps?: TextFieldProps;
+  minTime?: Date | null;
+  maxTime?: Date | null;
 }
 
 export const TimePicker = ({
@@ -18,6 +20,8 @@ export const TimePicker = ({
   getSelectedTime,
   containerStyles,
   textFieldProps,
+  minTime,
+  maxTime,
 }: Props) => {
   const [value, setValue] = useState<Date | null>(null);
 
@@ -43,6 +47,8 @@ export const TimePicker = ({
           onChange={(newValue) => {
             setValue(newValue);
           }}
+          minTime={minTime}
+          maxTime={maxTime}
           renderInput={(params) => (
             <FormInput
               props={{
