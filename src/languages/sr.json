@@ -1739,6 +1739,6 @@
   "Supplier updated successfully.": "Dobavljač je uspešno ažuriran.",
   "BUSINESS ADDRESS": "POSLOVNA ADRESA",
   "External Id is required": "Potreban je spoljni ID",
-  "{{time}} days": "{{time}} 7 dana",
-  "{{time}} day": "{{time}} 7 dan"
+  "{{time}} days": "{{time}} dana",
+  "{{time}} day": "{{time}} dan"
 }
