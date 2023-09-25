@@ -1738,5 +1738,7 @@
   "Select date, time & technicians": "Izaberite datum, vreme i tehničare",
   "Supplier updated successfully.": "Dobavljač je uspešno ažuriran.",
   "BUSINESS ADDRESS": "POSLOVNA ADRESA",
-  "External Id is required": "Potreban je spoljni ID"
+  "External Id is required": "Potreban je spoljni ID",
+  "{{time}} days": "{{time}} 7 dana",
+  "{{time}} day": "{{time}} 7 dan"
 }
