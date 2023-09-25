@@ -92,7 +92,7 @@ export const Location = ({
             {elevator.propertyOwner.name}
           </Typography>
           <Typography variant="caption" component="div">
-            {t('Property Manager')}
+            {t('Customer')}
           </Typography>
         </Box>
       </Box>

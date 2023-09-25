@@ -1,12 +1,11 @@
-import {t} from 'i18next';
-import {Language} from 'models/misc';
+import {Address, Language} from 'models/misc';
 
 export const capitalize = (role: any[]) => {
   let roles = '';
   role.forEach((value: string, index: number) => {
     const item = value
       .split('_')
-      .map((x) => t(`${x[0]}${x.slice(1).toLowerCase()}`))
+      .map((x) => `${x[0]}${x.slice(1).toLowerCase()}`)
       .join(' ');
 
     if (index > 0) {
@@ -44,13 +43,11 @@ export const formatSearchParamsPageSize = (
 
 // Converts macro to text, eg: 'SERVICE_MANAGER' -> 'Service Manager'
 export const convertToText = (macro: string) =>
-  t(
-    macro
-      .toLowerCase()
-      .split('_')
-      .join(' ')
-      .replace(/\w\S*/g, (w) => w.replace(/^\w/, (c) => c.toUpperCase())),
-  );
+  macro
+    .toLowerCase()
+    .split('_')
+    .join(' ')
+    .replace(/\w\S*/g, (w) => w.replace(/^\w/, (c) => c.toUpperCase()));
 
 // Converts text to macro, eg: 'Service Manager' -> 'SERVICE_MANAGER'
 export const convertToMacro = (text: string) =>
@@ -191,3 +188,21 @@ export const getUniqueId = () => Math.random().toString(36).substring(2, 9);
 
 export const getPercentage = (num: number, total: number) =>
   Math.round((num / total) * 100);
+
+export const formatAddress = (address: Address | undefined) => {
+  if (!address) return '-';
+
+  const name = address?.component?.name ? address?.component?.name : '';
+  const address1 = address?.component?.street ? address?.component?.street : '';
+  const address2 = address?.component?.street2
+    ? address?.component?.street2
+    : '';
+  const zip = address?.component?.postalCode
+    ? address?.component?.postalCode
+    : '';
+  const city = address?.component?.city ? address?.component?.city : '';
+
+  return [name, address1, address2, zip, city]
+    .filter((x) => x !== '')
+    .join(', ');
+};

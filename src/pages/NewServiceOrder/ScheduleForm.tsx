@@ -93,6 +93,7 @@ export const ScheduleForm = ({
             <TimePicker
               defaultTime={defaultStartDate}
               containerStyles={{mr: '1em'}}
+              maxTime={formik.values.endTime}
               getSelectedTime={(time) => {
                 if (time && !Number.isNaN(time.getTime())) {
                   formik.setValues({
@@ -116,6 +117,7 @@ export const ScheduleForm = ({
 
             <TimePicker
               defaultTime={defaultEndDate}
+              minTime={formik.values.startTime}
               getSelectedTime={(time) => {
                 if (time && !Number.isNaN(time.getTime())) {
                   formik.setValues({

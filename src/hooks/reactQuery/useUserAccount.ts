@@ -76,7 +76,7 @@ export const useEmployeeAccount = () => {
 
       if (status === 200) {
         enqueueSnackbar(
-          t('User account for {{name}} created successfully', {
+          t('User account for {{name}} created successfully.', {
             name: accountData.firstName,
           }),
           {
@@ -108,7 +108,7 @@ export const useEmployeeAccount = () => {
 
       if (status === 200) {
         enqueueSnackbar(
-          t('User account for {{name}} updated successfully', {
+          t('User account for {{name}} updated successfully.', {
             name: accountData.firstName,
           }),
           {

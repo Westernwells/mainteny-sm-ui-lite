@@ -19,7 +19,6 @@ import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import {Divider} from '@mui/material';
-
 import {CardProps} from 'components/CardProps';
 import {InfoCard} from 'components/InfoCard';
 import {Progress} from 'components/Progress';
@@ -28,6 +27,7 @@ import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import EmployeeAvatar from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EmployeeAvatar';
 import {formatDate, getDateObject} from 'utils/datetime';
+import {formatAddress} from 'utils/utils';
 import {LanguageContext} from 'context/LanguageProvider';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
@@ -72,17 +72,17 @@ export const CustomerOverviewTab = ({
         ...basicDetails,
         billingAddress: {
           label: 'BILLING ADDRESS',
-          value: customer.billingAddress?.fullName ?? '-',
+          value: formatAddress(customer.billingAddress),
           icon: <Home sx={{color: theme.palette.info.dark}} />,
         },
         beneficiaryAddress: {
           label: 'BENEFICIARY ADDRESS',
-          value: customer.beneficiaryAddress?.fullName ?? '-',
+          value: formatAddress(customer.beneficiaryAddress),
           icon: <HomeWork sx={{color: theme.palette.info.dark}} />,
         },
         otherAddress: {
           label: 'SEND INVOICE VIA ADDRESS',
-          value: customer.otherAddress?.fullName ?? '-',
+          value: formatAddress(customer.otherAddress),
           icon: <HomeWork sx={{color: theme.palette.info.dark}} />,
         },
         costCenter: {

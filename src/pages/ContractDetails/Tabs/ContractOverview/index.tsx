@@ -9,8 +9,6 @@ import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
 import {useMediaQuery} from '@mui/material';
 import {useParams} from 'react-router-dom';
-import {toDate} from 'utils/datetime';
-import {differenceInDays, isBefore} from 'date-fns';
 import {useFormik} from 'formik';
 import {
   ContractRequestBody,
@@ -38,7 +36,11 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {LanguageContext} from 'context/LanguageProvider';
-import {contractTypeMap, invoiceCycle} from 'utils/contract-utils';
+import {
+  calculateRenewDays,
+  contractTypeMap,
+  invoiceCycle,
+} from 'utils/contract-utils';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
@@ -236,10 +238,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     [],
   );
 
-  const unUsedContractDays =
-    !isLoading && isBefore(new Date(), toDate(contractDetails?.endTime))
-      ? differenceInDays(toDate(contractDetails?.endTime), new Date())
-      : 0;
+  const unUsedContractDays = !isLoading && calculateRenewDays(contractDetails);
 
   if (isLoading) {
     return <Progress />;

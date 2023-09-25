@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import {useFormik} from 'formik';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -12,11 +13,9 @@ import {
   useCompleteServiceOrder,
   usePublishWorkReport,
   useServiceOrderReport,
-  useUpdateServiceOrderArticles,
 } from 'hooks/reactQuery/useServiceOrder';
 import {
   ServiceOrderArticleView,
-  ServiceOrderItemRecord,
   ServiceOrderReportView,
 } from 'models/service-order';
 import {Progress} from 'components/Progress';
@@ -53,11 +52,9 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
 
   const [items, setItems] = useState<ServiceOrderArticleView[]>([]);
   const [report, setReport] = useState<ServiceOrderReportView>();
-  const [description, setDescription] = useState('');
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const {mutate: publishWorkReport, isLoading: publishingWorkReport} =
     usePublishWorkReport();
-  const {mutate: updateArticles} = useUpdateServiceOrderArticles();
   const [signatureKeys, setSignatureKeys] = useState<{[key: string]: string}>(
     {},
   );
@@ -71,7 +68,32 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
     {enabled: !!(serviceOrderReportSource && serviceOrderReportSource.length)},
   );
 
-  const {mutate: completeServiceOrder} = useCompleteServiceOrder();
+  const {mutate: completeServiceOrder, isLoading: updatingServiceOrder} =
+    useCompleteServiceOrder('Work report updated successfully!');
+  const formik = useFormik<{
+    items: ServiceOrderArticleView[];
+    description: string;
+  }>({
+    initialValues: {
+      items,
+      description: '',
+    },
+    onSubmit: (values) => {
+      completeServiceOrder({
+        serviceOrderId: report?.serviceOrder.id ?? '',
+        body: {
+          description: values.description,
+          articles: items.map((i) => ({
+            articleId: i.article.id,
+            description: i.description,
+            name: i.name,
+            quantity: i.quantity,
+            unitAmount: i.unitAmount,
+          })),
+        },
+      });
+    },
+  });
 
   useEffect(() => {
     if (serviceOrderReportSource && serviceOrderReportSource.length) {
@@ -92,13 +114,22 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
 
   useEffect(() => {
     if (report) {
+      let temp: ServiceOrderArticleView[] = [];
       if (report.serviceOrder && 'articles' in report.serviceOrder) {
-        const temp = report ? report.serviceOrder.articles : [];
-        setItems(temp);
+        temp = report ? report.serviceOrder.articles : [];
       }
-      setDescription(report?.description ?? '');
+      setItems(temp);
+      formik.resetForm({
+        values: {items: temp, description: report?.description ?? ''},
+      });
     }
   }, [report]);
+
+  useEffect(() => {
+    if (items.length) {
+      formik.setFieldValue('items', items);
+    }
+  }, [items]);
 
   if (isIdle || isLoading) {
     return (
@@ -232,7 +263,7 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
         </Box>
         <Maintenance serviceReport={report} />
 
-        <ArticleItemsTable items={items} setItems={setItems} />
+        <ArticleItemsTable items={formik.values.items} setItems={setItems} />
 
         <Box mt="1em">
           <Pictures attachments={report.attachments} />
@@ -246,8 +277,9 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
               multiline: true,
               minRows: 4,
               type: 'text',
-              value: description,
-              onChange: (e) => setDescription(e.target.value),
+              value: formik.values.description,
+              onChange: formik.handleChange,
+              onBlur: formik.handleBlur,
             }}
           />
         </Box>
@@ -300,32 +332,10 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
       <BottomDrawer
         isOpen
         primaryButtonLabel="Save"
-        primaryButtonAction={() => {
-          if (items.length && orderId)
-            updateArticles({
-              data: items.map(
-                (i): ServiceOrderItemRecord => ({
-                  articleId: i.article.id,
-                  articleUnit: i.article.unit,
-                  description: i.description,
-                  name: i.name,
-                  quantity: i.quantity,
-                  unitAmount: i.unitAmount,
-                }),
-              ),
-              orderId,
-            });
-          if (description !== (report?.description ?? '')) {
-            completeServiceOrder({
-              serviceOrderId: report?.serviceOrder.id,
-              body: {
-                description,
-              },
-            });
-          }
-        }}
+        primaryButtonAction={formik.handleSubmit}
         listItems={[]}
-        isValid={!!items.length || description !== (report?.description ?? '')}
+        isSaving={updatingServiceOrder}
+        isValid={formik.dirty}
       />
       <SendEmailDialog
         open={isSendEmailDialogOpen}
@@ -338,7 +348,7 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
           report.elevator.propertyOwner?.contact.email
         }
         subject=""
-        content={description}
+        content={formik.values.description}
         callback={(emailRecord) => {
           publishWorkReport(
             {

@@ -1,5 +1,5 @@
 stages:
-  - lint
+  - build-builder-image
   - build-project
   - build-images
   - deploy
@@ -11,10 +11,14 @@ variables:
 
 .build-project: &build-template
   stage: build-project
-  image: node:lts-gallium
+  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/builder:sm-ui-5dedeb5b-1014954528
   script:
-    - yarn prepare_env
+    - cp -rf /home/sm-ui-lite/node_modules .
     - yarn install --frozen-lockfile
+    - yarn prepare_env
+    - yarn check-format
+    - yarn check-types
+    - yarn check-lint
     - yarn build:${ENV}
   artifacts:
     paths:
@@ -83,16 +87,24 @@ variables:
     - if: "$CI_MERGE_REQUEST_ID"
       when: never
 
-lint-project:
-  stage: lint
-  image: node:lts-gallium
+build-builder-image:
+  stage: build-project
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  before_script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"credsStore\":\"ecr-login\",\"credHelpers\":{\"$DOCKER_REGISTRY\":\"ecr-login\"}}" > /kaniko/.docker/config.json
   script:
-    - yarn install --frozen-lockfile
-    - yarn check-format
-    - yarn check-types
-    - yarn check-lint
+    - >
+      /kaniko/executor
+      --cache=true
+      --context $CI_PROJECT_DIR 
+      --dockerfile Dockerfile.builder
+      --destination ${DOCKER_REGISTRY}/builder:sm-ui-${IMAGE_SUFFIX}
   rules:
-    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop'
+    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
+      when: manual
     - when: never
 
 build-feature-branch:
@@ -100,7 +112,7 @@ build-feature-branch:
   variables:
     ENV: stage
   rules:
-    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop'
+    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
     - when: never
 
 build-stage:
