@@ -1721,5 +1721,7 @@
   "Select date, time & technicians": "Wähle Datum, Uhrzeit & Techniker",
   "Supplier updated successfully.": "Zulieferer erfolgreich aktualisiert.",
   "BUSINESS ADDRESS": "GESCHÄFTSADRESSE",
-  "External Id is required": "Externe ID ist erforderlich."
+  "External Id is required": "Externe ID ist erforderlich.",
+  "{{time}} days": "{{time}} Tage",
+  "{{time}} day": "{{time}} Tag"
 }
