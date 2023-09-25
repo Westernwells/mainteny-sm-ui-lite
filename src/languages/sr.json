@@ -86,7 +86,7 @@
   "Upload Company Logo": "Učitaj logo preduzeća",
   "Mark Completed": "Označi dovršeno",
   "meters": "Brojač",
-  "Replace image": "Zamjenite sliku",
+  "Replace Image": "Zamjenite sliku",
   "Replace Picture": "Zamjenite sliku",
   "Do you want to delete this contract?": "Da li želite da izbrišete ovaj ugovor?",
   "BASIC": "oSNOVNO",
@@ -1736,5 +1736,7 @@
   "Order scheduled successfully": "Porudžbina je uspešno zakazana",
   "Work report updated successfully!": "Izveštaj o radu je uspešno ažuriran!",
   "Select date, time & technicians": "Izaberite datum, vreme i tehničare",
-  "Supplier updated successfully.": "Dobavljač je uspešno ažuriran."
+  "Supplier updated successfully.": "Dobavljač je uspešno ažuriran.",
+  "BUSINESS ADDRESS": "POSLOVNA ADRESA",
+  "External Id is required": "Potreban je spoljni ID"
 }
