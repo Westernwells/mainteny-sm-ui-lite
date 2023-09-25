@@ -98,6 +98,7 @@ export interface ContractAdditionalInfo {
   discounts?: ContractDiscount[];
   firstMaintenance: FirstMaintenance;
   firstInvoiceDate: string;
+  autoRenewalCancelled: boolean;
 }
 
 export interface ContractElevatorSimpleView {
