@@ -85,8 +85,8 @@ export interface AddressComponent {
 }
 
 export interface AddressRecord {
-  fullName: string;
-  countryCode?: string;
+  fullName: string | null;
+  countryCode?: string | null;
   location?: Location | null;
   component?: AddressComponent | null;
 }

@@ -1,4 +1,5 @@
 import {CustomerEditForm} from 'pages/CustomerDetails/Tabs/CustomerOverview/EditCustomerForm/model';
+import {formatAddressFullname} from './utils';
 
 export const formatPhoneNumber = (phoneNumber: string) =>
   `+${phoneNumber.replaceAll('+', '')}`;
@@ -7,9 +8,9 @@ export const phoneNumberDigitsOnly = (phoneNumber: string) =>
   phoneNumber.replace(/[^\d]/g, '');
 
 export const formatUpdateCustomer = (data: CustomerEditForm) => ({
-  billingAddress: data.billingAddress,
-  beneficiaryAddress: data.beneficiaryAddress,
-  otherAddress: data.otherAddress,
+  billingAddress: formatAddressFullname(data.billingAddress),
+  beneficiaryAddress: formatAddressFullname(data.beneficiaryAddress),
+  otherAddress: formatAddressFullname(data.otherAddress),
   contact: {
     email: data.email,
     phone: data.phone ? formatPhoneNumber(data.phone) : '',

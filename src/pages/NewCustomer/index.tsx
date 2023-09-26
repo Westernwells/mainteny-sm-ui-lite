@@ -17,6 +17,7 @@ import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {createEmptyResource} from 'utils/paging-utils';
+import {formatAddressFullname} from 'utils/utils';
 import {
   CustomerAddressFormModel,
   CustomerBasicInfoFormModel,
@@ -253,9 +254,13 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       secondaryPhoneNumber: formikBasicInfo.values.secondaryPhoneNumber
         ? formatPhoneNumber(formikBasicInfo.values.secondaryPhoneNumber)
         : '',
-      billingAddress: formikAddress.values.billingAddress,
-      beneficiaryAddress: formikAddress.values.beneficiaryAddress,
-      otherAddress: formikAddress.values.otherAddress,
+      billingAddress: formatAddressFullname(
+        formikAddress.values.billingAddress,
+      ),
+      beneficiaryAddress: formatAddressFullname(
+        formikAddress.values.beneficiaryAddress,
+      ),
+      otherAddress: formatAddressFullname(formikAddress.values.otherAddress),
       contactPersons: formikContactPersons.values.contactPersons,
     };
 
