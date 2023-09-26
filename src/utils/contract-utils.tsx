@@ -1,4 +1,12 @@
-import {ContractTypes} from 'models/contract';
+import {
+  differenceInDays,
+  endOfDay,
+  isBefore,
+  startOfDay,
+  subMonths,
+} from 'date-fns';
+import {ContractTypes, ContractView} from 'models/contract';
+import {toDate} from 'utils/datetime';
 
 export const costRangeConvertor = (
   selectedItems: string[],
@@ -52,4 +60,25 @@ export const invoiceCycle: {[key: string]: string} = {
   '4': '4 months',
   '6': '6 months',
   '12': '12 months',
+};
+
+export const calculateRenewDays = (contractDetails: ContractView) => {
+  const noticePeriodInMonths =
+    contractDetails.additionalInfo.noticePeriodInMonth || 0;
+  const contractEndTime = endOfDay(toDate(contractDetails?.endTime));
+  const today = startOfDay(new Date());
+
+  if (
+    contractDetails.additionalInfo.autoRenewalCancelled ||
+    !isBefore(today, contractEndTime)
+  ) {
+    return 0;
+  }
+
+  const contractEndTimeWithoutNotice = subMonths(
+    contractEndTime,
+    noticePeriodInMonths,
+  );
+
+  return differenceInDays(contractEndTimeWithoutNotice, today);
 };

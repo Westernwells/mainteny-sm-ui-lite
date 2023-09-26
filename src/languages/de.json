@@ -86,7 +86,7 @@
   "Upload Company Logo": "Firmenlogo hochladen",
   "Mark Completed": "Als erledigt markieren",
   "meters": "Zähler",
-  "Replace image": "Bild ersetzen",
+  "Replace Image": "Bild ersetzen",
   "Replace Picture": "Bild ersetzen",
   "Do you want to delete this contract?": "Möchten Sie diesen Vertrag löschen?",
   "BASIC": "BASIC",
@@ -1720,5 +1720,8 @@
   "Work report updated successfully!": "Arbeitsschein erfolgreich aktualisiert.",
   "Select date, time & technicians": "Wähle Datum, Uhrzeit & Techniker",
   "Supplier updated successfully.": "Zulieferer erfolgreich aktualisiert.",
-  "BUSINESS ADDRESS": "GESCHÄFTSADRESSE"
+  "BUSINESS ADDRESS": "GESCHÄFTSADRESSE",
+  "External Id is required": "Externe ID ist erforderlich.",
+  "{{time}} days": "{{time}} Tage",
+  "{{time}} day": "{{time}} Tag"
 }
