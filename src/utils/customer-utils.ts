@@ -24,7 +24,8 @@ export const formatUpdateCustomer = (data: CustomerEditForm) => ({
   secondaryPhoneNumber: data.secondaryPhoneNumber
     ? formatPhoneNumber(data.secondaryPhoneNumber)
     : '',
-  taxNumber: data.taxNumber,
+  vatId: data.vatId,
+  offsettingAccount: data.offsettingAccount,
 });
 
 export const getFilterUnitNumber = (value: string, type: 'start' | 'end') => {

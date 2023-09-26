@@ -14,6 +14,6 @@ export type CustomerEditForm = {
   billingEmail?: string;
   registrationDate?: string;
   secondaryPhoneNumber?: string;
-  taxNumber: string;
+  vatId: string;
   offsettingAccount: string;
 };

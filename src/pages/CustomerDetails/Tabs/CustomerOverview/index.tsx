@@ -130,14 +130,14 @@ export const CustomerOverviewTab = ({
             ) as string) || '-',
           icon: <CalendarToday sx={{color: theme.palette.info.dark}} />,
         },
-        taxNumber: {
+        vatId: {
           label: 'VAT ID',
-          value: customer.additionalInfo.taxNumber || '-',
+          value: customer.additionalInfo.vatId || '-',
           icon: <Payment sx={{color: theme.palette.info.dark}} />,
         },
         offsettingAccount: {
           label: 'OFFSETTING ACCOUNT',
-          value: '-',
+          value: customer.additionalInfo.offsettingAccount || '-',
           icon: <AccountBalance sx={{color: theme.palette.info.dark}} />,
         },
       });

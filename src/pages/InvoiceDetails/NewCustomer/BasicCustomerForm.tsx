@@ -360,10 +360,10 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
             props={{
               size: 'small',
               label: 'VAT ID',
-              name: 'taxNumber',
-              value: formik.values.taxNumber,
-              helperText: formik.touched.taxNumber && formik.errors.taxNumber,
-              error: !!formik.errors.taxNumber && formik.touched.taxNumber,
+              name: 'vatId',
+              value: formik.values.vatId,
+              helperText: formik.touched.vatId && formik.errors.vatId,
+              error: !!formik.errors.vatId && formik.touched.vatId,
               ...defaultProps,
             }}
             handleFocus={handleFocus}

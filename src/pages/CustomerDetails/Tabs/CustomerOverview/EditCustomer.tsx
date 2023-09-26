@@ -55,8 +55,8 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
     otherAddress: customer.otherAddress ? customer.otherAddress : null,
     priority: customer.additionalInfo.priority,
     externalId: customer.externalId,
-    taxNumber: customer.additionalInfo.taxNumber || '',
-    offsettingAccount: '',
+    vatId: customer.additionalInfo.vatId || '',
+    offsettingAccount: customer.additionalInfo.offsettingAccount || '',
   };
 
   return (

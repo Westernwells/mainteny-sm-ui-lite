@@ -408,10 +408,10 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
             props={{
               size: 'small',
               label: 'VAT ID',
-              name: 'taxNumber',
-              value: values.taxNumber,
-              helperText: touched.taxNumber && errors.taxNumber,
-              error: !!errors.taxNumber && touched.taxNumber,
+              name: 'vatId',
+              value: values.vatId,
+              helperText: touched.vatId && errors.vatId,
+              error: !!errors.vatId && touched.vatId,
               ...defaultProps,
             }}
             handleFocus={handleFocus}

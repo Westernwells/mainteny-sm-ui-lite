@@ -13,7 +13,7 @@ export type CustomerBasicInfoFormModel = {
   externalId: string;
   registrationDate: Date;
   costCenter: string;
-  taxNumber: string;
+  vatId: string;
   offsettingAccount: string;
 };
 
@@ -77,5 +77,6 @@ export type NewCustomerBody = {
   billingEmail?: string;
   secondaryPhoneNumber?: string;
   contactPersons?: CustomerContactPersonFormModel[];
-  taxNumber?: string;
+  vatId?: string;
+  offsettingAccount?: string;
 };
