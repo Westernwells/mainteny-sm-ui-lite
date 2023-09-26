@@ -31,7 +31,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
 
   useEffect(() => {
     if (getUnitName && elevator) {
-      getUnitName(elevator?.address.fullName);
+      getUnitName(elevator?.address?.fullName ?? '');
     }
   }, [elevator]);
 
