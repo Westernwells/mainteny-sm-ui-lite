@@ -40,7 +40,7 @@ export const BillingInformationSchema = ({label, company}: Props) => {
           <CardProps
             icon={<Receipt sx={{color: theme.palette.info.dark}} />}
             label="Tax Number"
-            bodyText="-"
+            bodyText={company?.settings?.taxNumber || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
             containerStyles={{mt: '0.5em'}}

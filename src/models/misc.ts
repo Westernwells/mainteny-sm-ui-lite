@@ -42,6 +42,7 @@ export interface Settings {
   dateFormat: string;
   percentageVat: number;
   vatId: string;
+  taxNumber: string;
   emailAddresses: string[];
   emailBasedServiceOrderProvider: string;
   timezone: string;
