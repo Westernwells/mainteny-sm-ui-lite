@@ -34,7 +34,10 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
       },
       query: '',
     });
-
+  console.log(
+    Number(formik.values.netAmount).toString(),
+    'Number(formik.values.netAmount).toString()',
+  );
   return (
     <Grid container spacing={2}>
       <Grid item xs={4}>
@@ -45,7 +48,7 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             placeholder: '4',
             type: 'number',
             required: true,
-            value: Number(formik.values.visitsNumber).toString(),
+            value: formik.values.visitsNumber,
             error: !!(
               formik.touched.visitsNumber && formik.errors.visitsNumber
             ),
@@ -103,7 +106,7 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             placeholder: '1500',
             type: 'number',
             required: true,
-            value: Number(formik.values.netAmount).toString(),
+            value: formik.values.netAmount,
             helperText:
               formik.errors.netAmount && formik.touched.netAmount
                 ? formik.errors.netAmount
@@ -128,7 +131,7 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             name: 'renewalTerms',
             placeholder: '12',
             type: 'number',
-            value: Number(formik.values.renewalTerms).toString(),
+            value: formik.values.renewalTerms,
             helperText:
               formik.errors.renewalTerms && formik.touched.renewalTerms
                 ? formik.errors.renewalTerms
@@ -150,7 +153,7 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             name: 'spendingLimit',
             placeholder: '1500',
             type: 'number',
-            value: Number(formik.values.spendingLimit).toString(),
+            value: formik.values.spendingLimit,
             helperText:
               formik.errors.spendingLimit && formik.touched.spendingLimit
                 ? formik.errors.spendingLimit
@@ -177,7 +180,7 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             name: 'invoiceDueDays',
             placeholder: 'Enter payment due (in days)',
             type: 'number',
-            value: formik.values.invoiceDueDays,
+            value: formik.values.invoiceDueDays ?? null,
             helperText:
               formik.errors.invoiceDueDays && formik.touched.invoiceDueDays
                 ? formik.errors.invoiceDueDays
@@ -197,7 +200,7 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             name: 'discounts[0].days',
             placeholder: 'Enter payment due (in days)',
             type: 'number',
-            value: formik.values.discounts?.[0]?.days ?? 0,
+            value: formik.values.discounts?.[0]?.days ?? '',
             helperText:
               formik.errors.discounts && formik.touched.discounts
                 ? formik.errors.discounts
@@ -244,9 +247,7 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             name: 'annualPriceAdjustmentPercentage',
             placeholder: '2.5',
             type: 'number',
-            value: Number(
-              formik.values.annualPriceAdjustmentPercentage,
-            ).toString(),
+            value: formik.values.annualPriceAdjustmentPercentage,
             helperText:
               formik.errors.annualPriceAdjustmentPercentage &&
               formik.touched.annualPriceAdjustmentPercentage
@@ -268,7 +269,7 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             name: 'serviceLevelAgreement',
             placeholder: '120',
             type: 'number',
-            value: Number(formik.values.serviceLevelAgreement).toString(),
+            value: formik.values.serviceLevelAgreement,
             helperText:
               formik.errors.serviceLevelAgreement &&
               formik.touched.serviceLevelAgreement
