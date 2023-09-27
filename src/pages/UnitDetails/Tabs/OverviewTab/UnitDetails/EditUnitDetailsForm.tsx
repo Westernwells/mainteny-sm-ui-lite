@@ -222,7 +222,6 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
         <FormInput
           props={{
             size: 'small',
-            disabled: true,
             placeholder: 'Enter Spending Limit',
             label: 'Spending Limit',
             name: 'spendingLimit',
