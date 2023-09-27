@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from 'react';
+import {ReactNode, useContext, useEffect, useState} from 'react';
 import Grid from '@mui/material/Grid';
 import {
   LowPriority,
@@ -19,6 +19,7 @@ import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import {Divider} from '@mui/material';
+import {Address} from 'models/misc';
 import {CardProps} from 'components/CardProps';
 import {InfoCard} from 'components/InfoCard';
 import {Progress} from 'components/Progress';
@@ -27,7 +28,6 @@ import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import EmployeeAvatar from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EmployeeAvatar';
 import {formatDate, getDateObject} from 'utils/datetime';
-import {formatAddress} from 'utils/utils';
 import {LanguageContext} from 'context/LanguageProvider';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
@@ -44,13 +44,41 @@ interface Props {
 
 interface BasicDetailsValue {
   label: string;
-  value: string;
+  value: string | ReactNode;
   icon: JSX.Element;
 }
 
 interface BasicDetails {
   [key: string]: BasicDetailsValue;
 }
+
+export const formatAddress = (address: Address | undefined) => {
+  if (!address) return '-';
+
+  const name = address?.component?.name ? address?.component?.name : '';
+  const address1 = address?.component?.street ? address?.component?.street : '';
+  const address2 = address?.component?.street2
+    ? address?.component?.street2
+    : '';
+  const zip = address?.component?.postalCode
+    ? address?.component?.postalCode
+    : '';
+  const city = address?.component?.city ? address?.component?.city : '';
+  const country = address?.component?.country
+    ? address?.component?.country
+    : '';
+
+  return (
+    <>
+      <Typography variant="body2">{name}</Typography>
+      <Typography variant="body2">{address1}</Typography>
+      <Typography variant="body2">{address2}</Typography>
+      <Typography variant="body2">
+        {zip} {city} {country}
+      </Typography>
+    </>
+  );
+};
 
 export const CustomerOverviewTab = ({
   customerId,

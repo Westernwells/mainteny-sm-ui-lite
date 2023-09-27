@@ -89,7 +89,7 @@ export const OrderDetails = ({order, close}: Props) => {
             color: theme.palette.text.secondary,
           }}
         />,
-        order.elevator.address.fullName,
+        order.elevator.address?.fullName ?? '',
       )}
       <Box
         sx={{
