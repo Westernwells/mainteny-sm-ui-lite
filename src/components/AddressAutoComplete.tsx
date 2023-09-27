@@ -1,4 +1,4 @@
-import {FocusEvent, useEffect, useState} from 'react';
+import {FocusEvent, useContext, useEffect, useState} from 'react';
 import AddressAutocomplete from 'mui-address-autocomplete';
 import Box from '@mui/material/Box';
 import LocationIcon from '@mui/icons-material/LocationOn';
@@ -7,6 +7,7 @@ import {AddressRecord} from 'models/misc';
 import {FormInput} from 'components/form/FormInput';
 import {TextFieldProps} from '@mui/material/TextField';
 import {useTranslation} from 'react-i18next';
+import {LanguageContext} from 'context/LanguageProvider';
 
 interface Props {
   getAddress?: (val?: AddressRecord) => void;
@@ -29,6 +30,7 @@ export const AddressAutoComplete = ({
 }: Props) => {
   const [address, setAddress] = useState<any>(null);
   const [queryView, setQueryView] = useState(initialValue);
+  const {language = 'en'} = useContext(LanguageContext);
 
   const {t} = useTranslation();
 
@@ -57,6 +59,7 @@ export const AddressAutoComplete = ({
   const onInputChange = (e: any) => {
     setQueryView(e.target.value);
   };
+
   return (
     <AddressAutocomplete
       noOptionsText={
@@ -74,6 +77,9 @@ export const AddressAutoComplete = ({
       ]}
       onChange={(_, value: any) => {
         setAddress(value);
+      }}
+      requestOptions={{
+        language,
       }}
       size="small"
       sx={{width: '100%'}}
