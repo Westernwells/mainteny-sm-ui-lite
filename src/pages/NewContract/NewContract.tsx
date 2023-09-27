@@ -135,7 +135,7 @@ const NewContract = () => {
       annualPriceAdjustmentPercentage: '',
       serviceLevelAgreement: '',
       invoiceDueDays: 0,
-      discounts: [{days: 14, discountPercentage: 0}],
+      discounts: [{days: 0, discountPercentage: 0}],
       noticePeriodInMonth: 0,
       paymentTermId: '',
     },

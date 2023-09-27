@@ -64,6 +64,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
             error: !!(formik.touched.category && formik.errors.category),
             helperText: formik.errors.category,
             placeholder: t('e.g Escalator'),
+            required: true,
           }}
         />
       </Grid>

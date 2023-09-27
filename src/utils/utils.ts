@@ -1,4 +1,4 @@
-import {Address, Language} from 'models/misc';
+import {AddressRecord, Language} from 'models/misc';
 
 export const capitalize = (role: any[]) => {
   let roles = '';
@@ -189,8 +189,8 @@ export const getUniqueId = () => Math.random().toString(36).substring(2, 9);
 export const getPercentage = (num: number, total: number) =>
   Math.round((num / total) * 100);
 
-export const formatAddress = (address: Address | undefined) => {
-  if (!address) return '-';
+export const formatAddressFullname = (address: AddressRecord | null) => {
+  if (!address) return null;
 
   const name = address?.component?.name ? address?.component?.name : '';
   const address1 = address?.component?.street ? address?.component?.street : '';
@@ -201,8 +201,27 @@ export const formatAddress = (address: Address | undefined) => {
     ? address?.component?.postalCode
     : '';
   const city = address?.component?.city ? address?.component?.city : '';
+  const state = address?.component?.state ? address?.component?.state : '';
+  const country = address?.component?.country
+    ? address?.component?.country
+    : '';
 
-  return [name, address1, address2, zip, city]
-    .filter((x) => x !== '')
-    .join(', ');
+  return {
+    ...address,
+    component: {
+      name,
+      street: address1,
+      street2: address2,
+      postalCode: zip,
+      city,
+      state,
+      country,
+    },
+    fullName:
+      address.fullName === null
+        ? null
+        : [name, address1, address2, zip, city, state, country]
+            .filter((x) => x !== '')
+            .join(', '),
+  };
 };

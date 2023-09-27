@@ -62,8 +62,8 @@ export const CustomerAddressForm = ({formik}: Props) => {
             props={{
               size: 'small',
               label: 'Name',
-              name: 'billingAddress.fullName',
-              value: formik.values.billingAddress?.fullName ?? '',
+              name: 'billingAddress.component.name',
+              value: formik.values.billingAddress?.component?.name ?? '',
               ...defaultProps,
             }}
           />
@@ -164,8 +164,8 @@ export const CustomerAddressForm = ({formik}: Props) => {
               props={{
                 size: 'small',
                 label: 'Name',
-                name: 'beneficiaryAddress.fullName',
-                value: formik.values.beneficiaryAddress?.fullName ?? '',
+                name: 'beneficiaryAddress.component.name',
+                value: formik.values.beneficiaryAddress?.component?.name ?? '',
                 ...defaultProps,
               }}
             />
@@ -285,8 +285,8 @@ export const CustomerAddressForm = ({formik}: Props) => {
               props={{
                 size: 'small',
                 label: 'Name',
-                name: 'otherAddress.fullName',
-                value: formik.values.otherAddress?.fullName ?? '',
+                name: 'otherAddress.component.name',
+                value: formik.values.otherAddress?.component?.name ?? '',
                 ...defaultProps,
               }}
             />

@@ -428,8 +428,8 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
             props={{
               size: 'small',
               label: 'Name',
-              name: 'billingAddress.fullName',
-              value: values.billingAddress?.fullName ?? '',
+              name: 'billingAddress.component.name',
+              value: values.billingAddress?.component?.name ?? '',
               ...defaultProps,
             }}
             handleFocus={handleFocus}
@@ -533,8 +533,8 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
               props={{
                 size: 'small',
                 label: 'Name',
-                name: 'beneficiaryAddress.fullName',
-                value: values.beneficiaryAddress?.fullName ?? '',
+                name: 'beneficiaryAddress.component.name',
+                value: values.beneficiaryAddress?.component?.name ?? '',
                 ...defaultProps,
               }}
               handleFocus={handleFocus}
@@ -655,8 +655,8 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
               props={{
                 size: 'small',
                 label: 'Name',
-                name: 'otherAddress.fullName',
-                value: values.otherAddress?.fullName ?? '',
+                name: 'otherAddress.component.name',
+                value: values.otherAddress?.component?.name ?? '',
                 ...defaultProps,
               }}
               handleFocus={handleFocus}
