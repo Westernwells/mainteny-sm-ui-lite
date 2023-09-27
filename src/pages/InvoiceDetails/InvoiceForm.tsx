@@ -851,10 +851,6 @@ export const InvoiceForm = ({
                       ? formatDate(invoice.sentDate)
                       : '-',
                   },
-                  {
-                    label: 'Tax number',
-                    value: '-',
-                  },
                 ].map((i) => (
                   <Box key={i.label}>
                     <FormLabel text={i.label} />
