@@ -59,7 +59,7 @@ export const BillingInformation = ({containerStyles, company}: Props) => {
     setOpenDialog(false);
   };
 
-  const labels = useRef(['vatId', 'percentageVat', 'taxId']).current;
+  const labels = useRef(['vatId', 'percentageVat', 'taxNumber']).current;
 
   useEffect(() => {
     formik.validateForm();
