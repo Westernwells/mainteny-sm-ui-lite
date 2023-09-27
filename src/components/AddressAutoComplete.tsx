@@ -59,17 +59,16 @@ export const AddressAutoComplete = ({
     } else {
       setOpen(true);
     }
+
+    if (queryView === address?.formatted_address) {
+      setOpen(false);
+    }
   }, [queryView]);
 
   const onInputChange = (e: any) => {
     setQueryView(e.target.value);
-
-    // if (queryView.length === 0) {
-    //   if (open) {
-    //     setOpen(false);
-    //   } else if (!open) setOpen(true);
-    // }
   };
+
   return (
     <AddressAutocomplete
       noOptionsText={
@@ -86,9 +85,14 @@ export const AddressAutoComplete = ({
         'geometry',
         'place_id',
       ]}
-      onChange={(_, value: any) => {
+      onChange={(_, value: any, reason: string) => {
         setAddress(value);
+        if (reason === 'clear') {
+          setQueryView('');
+          setAddress(null);
+        }
       }}
+      onClose={() => setOpen(false)}
       size="small"
       sx={{width: '100%'}}
       renderOption={(props, option: any) => (
