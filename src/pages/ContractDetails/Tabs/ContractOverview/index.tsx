@@ -238,7 +238,8 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     [],
   );
 
-  const unUsedContractDays = !isLoading && calculateRenewDays(contractDetails);
+  const unUsedContractDays =
+    (!isLoading && calculateRenewDays(contractDetails)) || 0;
 
   if (isLoading) {
     return <Progress />;
@@ -381,7 +382,9 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             <ContractParties
               name={user?.userAccount.serviceCompany.name}
               occupation="Service Company"
-              address={user?.userAccount.serviceCompany.postalAddress?.fullName}
+              address={
+                user?.userAccount.serviceCompany.postalAddress?.fullName ?? ''
+              }
               phoneNumber={user?.userAccount.serviceCompany.contact.phone}
               partyType="CONTRACTOR"
               chipStyles={{
@@ -392,7 +395,9 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             <ContractParties
               name={contractDetails?.propertyOwner.name}
               occupation="Property Owner"
-              address={contractDetails?.propertyOwner.billingAddress?.fullName}
+              address={
+                contractDetails?.propertyOwner.billingAddress?.fullName ?? ''
+              }
               phoneNumber={contractDetails?.propertyOwner.contact.phone}
               partyType="CUSTOMER"
               chipStyles={{

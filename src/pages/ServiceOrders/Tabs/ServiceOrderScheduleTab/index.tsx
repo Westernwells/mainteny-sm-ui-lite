@@ -226,7 +226,7 @@ export const ServiceOrderScheduleTab = () => {
                 />
               }
               title={order.elevator.propertyOwner.name}
-              subtitle={order.elevator.address.fullName}
+              subtitle={order.elevator.address?.fullName ?? ''}
               width={width}
               tooltip={OrderDetails}
               order={order}
