@@ -94,7 +94,8 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       externalId: '',
       registrationDate: new Date(),
       costCenter: '',
-      taxNumber: '',
+      vatId: '',
+      offsettingAccount: '',
     },
     onSubmit: () => {},
     validationSchema: validationSchemaBasicInfo,
@@ -250,7 +251,8 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       serviceCompanyId: user!.userAccount.serviceCompany.id,
       registrationDate: formikBasicInfo.values.registrationDate,
       costCenter: formikBasicInfo.values.costCenter,
-      taxNumber: formikBasicInfo.values.taxNumber,
+      vatId: formikBasicInfo.values.vatId,
+      offsettingAccount: formikBasicInfo.values.offsettingAccount,
       secondaryPhoneNumber: formikBasicInfo.values.secondaryPhoneNumber
         ? formatPhoneNumber(formikBasicInfo.values.secondaryPhoneNumber)
         : '',

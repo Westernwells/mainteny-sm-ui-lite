@@ -35,6 +35,17 @@ export const BillingInformationSchema = ({label, company}: Props) => {
             containerStyles={{mt: '0.5em'}}
           />
         );
+      case 'taxNumber':
+        return (
+          <CardProps
+            icon={<Receipt sx={{color: theme.palette.info.dark}} />}
+            label="Tax Number"
+            bodyText={company?.settings?.taxNumber || '-'}
+            iconBackground={theme.palette.info.outlinedHoverBg}
+            iconMaxHeight="3em"
+            containerStyles={{mt: '0.5em'}}
+          />
+        );
 
       default:
         return null;
