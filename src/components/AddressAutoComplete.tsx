@@ -1,4 +1,4 @@
-import {FocusEvent, useEffect, useState} from 'react';
+import {FocusEvent, useContext, useEffect, useState} from 'react';
 import AddressAutocomplete from 'mui-address-autocomplete';
 import Box from '@mui/material/Box';
 import LocationIcon from '@mui/icons-material/LocationOn';
@@ -7,6 +7,7 @@ import {AddressRecord} from 'models/misc';
 import {FormInput} from 'components/form/FormInput';
 import {TextFieldProps} from '@mui/material/TextField';
 import {useTranslation} from 'react-i18next';
+import {LanguageContext} from 'context/LanguageProvider';
 
 interface Props {
   getAddress?: (val?: AddressRecord) => void;
@@ -28,7 +29,9 @@ export const AddressAutoComplete = ({
   noOptionsText = 'No options',
 }: Props) => {
   const [address, setAddress] = useState<any>(null);
+  const [open, setOpen] = useState(false);
   const [queryView, setQueryView] = useState(initialValue);
+  const {language = 'en'} = useContext(LanguageContext);
 
   const {t} = useTranslation();
 
@@ -52,16 +55,24 @@ export const AddressAutoComplete = ({
     if (!queryView && getAddress) {
       getAddress();
     }
+
+    if (queryView.length === 0 || queryView === address?.formatted_address) {
+      setOpen(false);
+    } else {
+      setOpen(true);
+    }
   }, [queryView]);
 
   const onInputChange = (e: any) => {
     setQueryView(e.target.value);
   };
+
   return (
     <AddressAutocomplete
       noOptionsText={
         typeof noOptionsText === 'string' ? t(noOptionsText) : noOptionsText
       }
+      open={open}
       inputValue={queryView}
       value={address}
       apiKey={import.meta.env.REACT_APP_GOOGLE_MAPS_KEY!}
@@ -72,9 +83,17 @@ export const AddressAutoComplete = ({
         'geometry',
         'place_id',
       ]}
-      onChange={(_, value: any) => {
+      onChange={(_, value: any, reason: string) => {
         setAddress(value);
+        if (reason === 'clear') {
+          setQueryView('');
+          setAddress(null);
+        }
       }}
+      requestOptions={{
+        language,
+      }}
+      onClose={() => setOpen(false)}
       size="small"
       sx={{width: '100%'}}
       renderOption={(props, option: any) => (

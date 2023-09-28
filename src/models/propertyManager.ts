@@ -34,7 +34,8 @@ export interface PropertyOwnerAdditionalInfo {
   costCenter: string;
   secondaryPhoneNumber: string;
   registrationDate: string;
-  taxNumber?: string;
+  vatId?: string;
+  offsettingAccount?: string;
 }
 
 export interface PropertyOwnerView {

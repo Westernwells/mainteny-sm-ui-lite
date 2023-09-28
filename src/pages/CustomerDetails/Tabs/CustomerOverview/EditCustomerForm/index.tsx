@@ -407,14 +407,27 @@ export const EditCustomerForm = ({openDialog, onClose}: Props) => {
           <FormInput
             props={{
               size: 'small',
-              label: 'VAT/Tax number',
-              name: 'taxNumber',
-              value: values.taxNumber,
-              helperText: touched.taxNumber && errors.taxNumber,
-              error: !!errors.taxNumber && touched.taxNumber,
+              label: 'VAT ID',
+              name: 'vatId',
+              value: values.vatId,
+              helperText: touched.vatId && errors.vatId,
+              error: !!errors.vatId && touched.vatId,
               ...defaultProps,
             }}
             handleFocus={handleFocus}
+          />
+        </Grid>
+        <Grid item md={4}>
+          <FormInput
+            props={{
+              size: 'small',
+              label: 'Offsetting Account',
+              name: 'offsettingAccount',
+              value: values.offsettingAccount,
+              helperText: touched.offsettingAccount && errors.offsettingAccount,
+              error: !!errors.offsettingAccount && touched.offsettingAccount,
+              ...defaultProps,
+            }}
           />
         </Grid>
       </Grid>
