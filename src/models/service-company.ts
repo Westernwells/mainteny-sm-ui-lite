@@ -174,7 +174,7 @@ export interface ServiceCompanyUpdateBody {
   arbitrationCourt?: string;
   tradeRegisterNumber?: string;
   vatId?: string;
-  taxNumber: string;
+  taxNumber?: string;
   percentageVat?: number;
   timezone?: string;
   currencies?: string[];
