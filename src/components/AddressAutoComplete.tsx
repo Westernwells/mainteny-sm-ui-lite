@@ -54,14 +54,10 @@ export const AddressAutoComplete = ({
       getAddress();
     }
 
-    if (queryView.length === 0) {
+    if (queryView.length === 0 || queryView === address?.formatted_address) {
       setOpen(false);
     } else {
       setOpen(true);
-    }
-
-    if (queryView === address?.formatted_address) {
-      setOpen(false);
     }
   }, [queryView]);
 
