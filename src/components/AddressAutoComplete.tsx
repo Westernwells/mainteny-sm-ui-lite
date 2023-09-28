@@ -29,6 +29,7 @@ export const AddressAutoComplete = ({
   noOptionsText = 'No options',
 }: Props) => {
   const [address, setAddress] = useState<any>(null);
+  const [open, setOpen] = useState(false);
   const [queryView, setQueryView] = useState(initialValue);
   const {language = 'en'} = useContext(LanguageContext);
 
@@ -54,6 +55,12 @@ export const AddressAutoComplete = ({
     if (!queryView && getAddress) {
       getAddress();
     }
+
+    if (queryView.length === 0 || queryView === address?.formatted_address) {
+      setOpen(false);
+    } else {
+      setOpen(true);
+    }
   }, [queryView]);
 
   const onInputChange = (e: any) => {
@@ -65,6 +72,7 @@ export const AddressAutoComplete = ({
       noOptionsText={
         typeof noOptionsText === 'string' ? t(noOptionsText) : noOptionsText
       }
+      open={open}
       inputValue={queryView}
       value={address}
       apiKey={import.meta.env.REACT_APP_GOOGLE_MAPS_KEY!}
@@ -75,12 +83,17 @@ export const AddressAutoComplete = ({
         'geometry',
         'place_id',
       ]}
-      onChange={(_, value: any) => {
+      onChange={(_, value: any, reason: string) => {
         setAddress(value);
+        if (reason === 'clear') {
+          setQueryView('');
+          setAddress(null);
+        }
       }}
       requestOptions={{
         language,
       }}
+      onClose={() => setOpen(false)}
       size="small"
       sx={{width: '100%'}}
       renderOption={(props, option: any) => (
