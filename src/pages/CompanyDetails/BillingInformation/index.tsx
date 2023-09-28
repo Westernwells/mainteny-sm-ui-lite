@@ -20,6 +20,7 @@ interface Props {
 
 const validationSchema = Yup.object().shape({
   vatId: Yup.string().nullable().required('VAT ID is required'),
+  taxNumber: Yup.number().nullable().required('Tax Number is required'),
   percentageVat: Yup.number()
     .nullable()
     .required('% VAT is required')
@@ -38,6 +39,7 @@ export const BillingInformation = ({containerStyles, company}: Props) => {
   const formik = useFormik<BillingInformationCompanyFormModel>({
     initialValues: {
       vatId: company?.settings?.vatId || '',
+      taxNumber: company?.settings?.taxNumber || '',
       percentageVat: company?.settings?.percentageVat || 0,
     },
     onSubmit: () => {},
@@ -49,6 +51,7 @@ export const BillingInformation = ({containerStyles, company}: Props) => {
       body: {
         vatId: formik.values.vatId,
         percentageVat: formik.values.percentageVat,
+        taxNumber: formik.values.taxNumber,
       },
       companyId: company?.id || '',
     });
@@ -56,7 +59,7 @@ export const BillingInformation = ({containerStyles, company}: Props) => {
     setOpenDialog(false);
   };
 
-  const labels = useRef(['vatId', 'percentageVat']).current;
+  const labels = useRef(['vatId', 'percentageVat', 'taxNumber']).current;
 
   useEffect(() => {
     formik.validateForm();
