@@ -145,7 +145,13 @@ export const OrderArticle = () => {
           {
             articleId: articleFromLocation.id,
             articleName: articleFromLocation.name,
-            supplierArticleNumber: articleFromLocation.externalId,
+            supplierArticleNumber:
+              ((articleFromLocation?.additionalInfo?.suppliers?.length ?? 0) > 1
+                ? articleFromLocation?.additionalInfo?.suppliers?.find(
+                    (s) => s.isPreferred,
+                  )?.number
+                : articleFromLocation?.additionalInfo?.suppliers?.[0]
+                    ?.number) ?? '-',
             quantity: 1,
             unit: articleFromLocation.unit,
             description: articleFromLocation.description,
