@@ -40,6 +40,7 @@ const phoneValidationRE =
 const validationSchemaBasicInfo = Yup.object().shape({
   name: Yup.string().required('Customer Name is required'),
   email: Yup.string().email('Enter a valid email'),
+  // externalId: Yup.string().required('External Id is required'),
   billingEmail: Yup.string().email('Enter a valid email'),
   phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),
   secondaryPhoneNumber: Yup.string().matches(

@@ -4,18 +4,22 @@ import {AutoAwesome} from '@mui/icons-material';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {ServiceCompanyNumberType} from 'models/service-company';
 import {FormInput} from 'components/form/FormInput';
+import {ArticleView} from 'models/article';
 
 interface AutoDropdownProps {
   formik: any;
   t: any;
   theme: any;
   activeField: string;
+  fieldProps: any;
   companyAutoNumberConfig: any;
   companyNextNumber: any;
   refetchCompanyNumber: () => void;
   setOpenDialog: (value: boolean) => void;
-  customerResource: PropertyOwnerView[];
+  customerResource: PropertyOwnerView[] | ArticleView[];
   handleFocus: any;
+  idContainerStyles?: {[key: string]: any};
+  numberType: ServiceCompanyNumberType;
 }
 
 const AutoDropdown: React.FC<AutoDropdownProps> = ({
@@ -23,12 +27,15 @@ const AutoDropdown: React.FC<AutoDropdownProps> = ({
   t,
   theme,
   activeField,
+  fieldProps,
   companyAutoNumberConfig,
   companyNextNumber,
   refetchCompanyNumber,
   setOpenDialog,
   customerResource,
   handleFocus,
+  idContainerStyles,
+  numberType,
 }) => {
   const defaultProps = {
     InputLabelProps: {shrink: true},
@@ -37,14 +44,9 @@ const AutoDropdown: React.FC<AutoDropdownProps> = ({
   return (
     <>
       <FormInput
+        containerStyles={{...idContainerStyles}}
         props={{
-          size: 'small',
-          placeholder: 'e.g 1234',
-          label: 'Customer Number',
-          name: 'externalId',
-          value: formik.values.externalId,
-          helperText: formik.touched.externalId && formik.errors.externalId,
-          error: !!formik.errors.externalId && formik.touched.externalId,
+          ...fieldProps,
           ...defaultProps,
         }}
         handleFocus={handleFocus}
@@ -65,7 +67,7 @@ const AutoDropdown: React.FC<AutoDropdownProps> = ({
       {activeField === 'externalId' &&
       !formik.values.externalId &&
       companyAutoNumberConfig?.configRecords.find(
-        (item: any) => item.type === ServiceCompanyNumberType.PROPERTY_OWNER,
+        (item: any) => item.type === numberType,
       )?.enabled ? (
         <Box
           sx={{
@@ -109,7 +111,7 @@ const AutoDropdown: React.FC<AutoDropdownProps> = ({
         activeField === 'externalId' &&
         !formik.values.externalId &&
         !companyAutoNumberConfig?.configRecords.find(
-          (item: any) => item.type === ServiceCompanyNumberType.PROPERTY_OWNER,
+          (item: any) => item.type === numberType,
         )?.enabled && (
           <Box
             sx={{
