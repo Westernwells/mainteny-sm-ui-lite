@@ -9,6 +9,7 @@ import {ElevatorView} from 'models/elevator';
 import {useTranslation} from 'react-i18next';
 import {InvoiceView} from 'models/invoice';
 import {UserData} from 'models/user';
+import {ContractView} from 'models/contract';
 
 interface Props {
   formik: any;
@@ -24,7 +25,8 @@ interface Props {
     | ElevatorView[]
     | InvoiceView[]
     | UserData[]
-    | ArticleSupplierView[];
+    | ArticleSupplierView[]
+    | ContractView[];
   handleFocus: any;
   idContainerStyles?: {[key: string]: any};
   numberType: ServiceCompanyNumberType;
