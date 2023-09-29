@@ -7,8 +7,9 @@ import {FormInput} from 'components/form/FormInput';
 import {ArticleView} from 'models/article';
 import {ElevatorView} from 'models/elevator';
 import {useTranslation} from 'react-i18next';
+import {InvoiceView} from 'models/invoice';
 
-interface AutoDropdownProps {
+interface Props {
   formik: any;
   activeField: string;
   fieldProps: any;
@@ -16,13 +17,17 @@ interface AutoDropdownProps {
   companyNextNumber: any;
   refetchCompanyNumber: () => void;
   setOpenDialog: (value: boolean) => void;
-  customerResource: PropertyOwnerView[] | ArticleView[] | ElevatorView[];
+  customerResource:
+    | PropertyOwnerView[]
+    | ArticleView[]
+    | ElevatorView[]
+    | InvoiceView[];
   handleFocus: any;
   idContainerStyles?: {[key: string]: any};
   numberType: ServiceCompanyNumberType;
 }
 
-const AutoDropdown: React.FC<AutoDropdownProps> = ({
+const AutoDropdown = ({
   formik,
   activeField,
   fieldProps,
@@ -34,7 +39,7 @@ const AutoDropdown: React.FC<AutoDropdownProps> = ({
   handleFocus,
   idContainerStyles,
   numberType,
-}) => {
+}: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
 
