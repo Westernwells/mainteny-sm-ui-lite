@@ -23,6 +23,7 @@ import {
   useEmployeeWorkingHoursCSV,
   useEmployeeWorkingHoursXLSX,
   useInvoicesDatev,
+  useInvoicesXLSX,
   useInvoicesXero,
 } from 'hooks/reactQuery/useAnalytics';
 import {convertToText} from 'utils/utils';
@@ -91,23 +92,29 @@ export const Reports = () => {
   });
   const getInvoicesDatev = useInvoicesDatev(serviceCompanyId, reportParams);
   const getInvoicesXero = useInvoicesXero(serviceCompanyId, reportParams);
+  const getInvoicesXLSX = useInvoicesXLSX(serviceCompanyId, reportParams);
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const {formatType} = formik.values;
-    if (formatType === FormatType.CSV)
-      return getEmployeeWorkingHoursCSV.refetch();
-    if (formatType === FormatType.EXCEL)
-      return getEmployeeWorkingHoursXLSX.refetch();
-    if (formatType === FormatType.DATEV) return getInvoicesDatev.refetch();
-    if (formatType === FormatType.XERO) return getInvoicesXero.refetch();
+    const {formatType, reportType} = formik.values;
+    if (reportType === ReportType.WORK_HOURS) {
+      if (formatType === FormatType.CSV)
+        return getEmployeeWorkingHoursCSV.refetch();
+      if (formatType === FormatType.EXCEL)
+        return getEmployeeWorkingHoursXLSX.refetch();
+    } else if (reportType === ReportType.FINANCIALS) {
+      if (formatType === FormatType.DATEV) return getInvoicesDatev.refetch();
+      if (formatType === FormatType.XERO) return getInvoicesXero.refetch();
+      if (formatType === FormatType.EXCEL) return getInvoicesXLSX.refetch();
+    }
   };
 
   const isDownloading =
     getEmployeeWorkingHoursCSV.isFetching ||
     getEmployeeWorkingHoursXLSX.isFetching ||
     getInvoicesDatev.isFetching ||
-    getInvoicesXero.isFetching;
+    getInvoicesXero.isFetching ||
+    getInvoicesXLSX.isFetching;
 
   const renderReportType = (option: Option, index: number) => {
     const selected = formik.values.reportType === option.value;
@@ -182,6 +189,10 @@ export const Reports = () => {
         {
           label: FormatType.DATEV,
           value: FormatType.DATEV,
+        },
+        {
+          label: FormatType.EXCEL,
+          value: FormatType.EXCEL,
         },
       ];
     }
