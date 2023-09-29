@@ -1,6 +1,5 @@
 import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
 import {FormikProps} from 'formik';
@@ -29,7 +28,6 @@ export const AddBasicInfoForm = ({
   customerResource: ArticleView[];
 }) => {
   const {t} = useTranslation();
-  const theme = useTheme();
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
 
@@ -95,8 +93,6 @@ export const AddBasicInfoForm = ({
       <Box flex="0 0 33.3%" display="flex" flexDirection="column">
         <AutoDropdown
           formik={formik}
-          t={t}
-          theme={theme}
           activeField={activeField}
           fieldProps={externalIdInputProps}
           companyAutoNumberConfig={companyAutoNumberConfig}

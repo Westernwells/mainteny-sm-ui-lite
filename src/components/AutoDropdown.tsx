@@ -1,22 +1,22 @@
 import React from 'react';
-import {Typography, Box, Button} from '@mui/material';
+import {Typography, Box, Button, useTheme} from '@mui/material';
 import {AutoAwesome} from '@mui/icons-material';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {ServiceCompanyNumberType} from 'models/service-company';
 import {FormInput} from 'components/form/FormInput';
 import {ArticleView} from 'models/article';
+import {ElevatorView} from 'models/elevator';
+import {useTranslation} from 'react-i18next';
 
 interface AutoDropdownProps {
   formik: any;
-  t: any;
-  theme: any;
   activeField: string;
   fieldProps: any;
   companyAutoNumberConfig: any;
   companyNextNumber: any;
   refetchCompanyNumber: () => void;
   setOpenDialog: (value: boolean) => void;
-  customerResource: PropertyOwnerView[] | ArticleView[];
+  customerResource: PropertyOwnerView[] | ArticleView[] | ElevatorView[];
   handleFocus: any;
   idContainerStyles?: {[key: string]: any};
   numberType: ServiceCompanyNumberType;
@@ -24,8 +24,6 @@ interface AutoDropdownProps {
 
 const AutoDropdown: React.FC<AutoDropdownProps> = ({
   formik,
-  t,
-  theme,
   activeField,
   fieldProps,
   companyAutoNumberConfig,
@@ -37,6 +35,9 @@ const AutoDropdown: React.FC<AutoDropdownProps> = ({
   idContainerStyles,
   numberType,
 }) => {
+  const theme = useTheme();
+  const {t} = useTranslation();
+
   const defaultProps = {
     InputLabelProps: {shrink: true},
   };
