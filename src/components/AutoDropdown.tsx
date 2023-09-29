@@ -4,7 +4,7 @@ import {AutoAwesome} from '@mui/icons-material';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {ServiceCompanyNumberType} from 'models/service-company';
 import {FormInput} from 'components/form/FormInput';
-import {ArticleView} from 'models/article';
+import {ArticleSupplierView, ArticleView} from 'models/article';
 import {ElevatorView} from 'models/elevator';
 import {useTranslation} from 'react-i18next';
 import {InvoiceView} from 'models/invoice';
@@ -23,7 +23,8 @@ interface Props {
     | ArticleView[]
     | ElevatorView[]
     | InvoiceView[]
-    | UserData[];
+    | UserData[]
+    | ArticleSupplierView[];
   handleFocus: any;
   idContainerStyles?: {[key: string]: any};
   numberType: ServiceCompanyNumberType;
