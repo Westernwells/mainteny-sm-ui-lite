@@ -8,6 +8,7 @@ import {ArticleView} from 'models/article';
 import {ElevatorView} from 'models/elevator';
 import {useTranslation} from 'react-i18next';
 import {InvoiceView} from 'models/invoice';
+import {UserData} from 'models/user';
 
 interface Props {
   formik: any;
@@ -21,7 +22,8 @@ interface Props {
     | PropertyOwnerView[]
     | ArticleView[]
     | ElevatorView[]
-    | InvoiceView[];
+    | InvoiceView[]
+    | UserData[];
   handleFocus: any;
   idContainerStyles?: {[key: string]: any};
   numberType: ServiceCompanyNumberType;
@@ -46,7 +48,7 @@ const AutoDropdown = ({
   const defaultProps = {
     InputLabelProps: {shrink: true},
   };
-
+  console.log(activeField, 'activeField');
   return (
     <>
       <FormInput
@@ -57,10 +59,10 @@ const AutoDropdown = ({
         }}
         handleFocus={handleFocus}
       />
-      {(activeField === 'externalId' || formik.touched.externalId) &&
-        formik.values.externalId &&
+      {(activeField === 'externalId' || formik.touched[activeField]) &&
+        formik.values[activeField] &&
         customerResource.filter(
-          (item) => item.externalId === formik.values.externalId,
+          (item) => item.externalId === formik.values[activeField],
         ).length > 0 && (
           <Typography
             color="error"
@@ -71,7 +73,7 @@ const AutoDropdown = ({
           </Typography>
         )}
       {activeField === 'externalId' &&
-      !formik.values.externalId &&
+      !formik.values[activeField] &&
       companyAutoNumberConfig?.configRecords.find(
         (item: any) => item.type === numberType,
       )?.enabled ? (
@@ -115,7 +117,7 @@ const AutoDropdown = ({
         </Box>
       ) : (
         activeField === 'externalId' &&
-        !formik.values.externalId &&
+        !formik.values[activeField] &&
         !companyAutoNumberConfig?.configRecords.find(
           (item: any) => item.type === numberType,
         )?.enabled && (
