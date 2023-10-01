@@ -37,24 +37,14 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
   const theme = useTheme();
 
   const {user} = useUserSession();
-
-  const {
-    values,
-    touched,
-    errors,
-    handleChange,
-    handleBlur,
-    handleSubmit,
-    setFieldValue,
-    submitForm,
-  } = useFormikContext<EmployeeAccountData>();
+  const formik = useFormikContext<EmployeeAccountData>();
 
   const defaultProps = {
-    onChange: handleChange,
-    onBlur: handleBlur,
+    onChange: formik.handleChange,
+    onBlur: formik.handleBlur,
   };
 
-  const [initId, setInitId] = useState(values.employeeId);
+  const [initId, setInitId] = useState(formik.values.employeeId);
 
   const [openNewDialog, setOpenNewDialog] = useState<boolean>(false);
   const [activeField, setActiveField] = useState<string>('');
@@ -68,7 +58,7 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
       {
         pageIndex: 0,
         pageSize: 25,
-        query: values.employeeId,
+        query: formik.values.employeeId,
         roles: getRoles(''),
       },
       {keepPreviousData: true},
@@ -87,22 +77,22 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
     );
 
   useEffect(() => {
-    setInitId(values.employeeId);
+    setInitId(formik.values.employeeId);
   }, []);
 
   return (
     <Dialog
       title="Edit Basic Information"
       onCancel={onClose}
-      onSave={submitForm}
-      disableSaveBtn={!!Object.keys(errors).length}
+      onSave={formik.submitForm}
+      disableSaveBtn={!!Object.keys(formik.errors).length}
       dialogProps={{
         maxWidth: 'md',
         open: openDialog || false,
       }}>
       <Box
         component="form"
-        onSubmit={handleSubmit}
+        onSubmit={formik.handleSubmit}
         height="100%"
         display="flex"
         flexDirection="column"
@@ -122,18 +112,21 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                     id: 'firstName',
                     label: t('First Name'),
                     placeholder: 'Blake',
-                    value: values.firstName,
-                    helperText: touched.firstName && errors.firstName,
-                    error: !!errors.firstName && touched.firstName,
+                    value: formik.values.firstName,
+                    helperText:
+                      formik.touched.firstName && formik.errors.firstName,
+                    error:
+                      !!formik.errors.firstName && formik.touched.firstName,
                     required: true,
                   },
                   {
                     id: 'lastName',
                     label: t('Last Name'),
                     placeholder: 'Norton',
-                    value: values.lastName,
-                    helperText: touched.lastName && errors.lastName,
-                    error: !!errors.lastName && touched.lastName,
+                    value: formik.values.lastName,
+                    helperText:
+                      formik.touched.lastName && formik.errors.lastName,
+                    error: !!formik.errors.lastName && formik.touched.lastName,
                     required: true,
                   },
                 ].map((item, index) => (
@@ -152,7 +145,7 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                     id: 'phone',
                     label: t('Phone'),
                     placeholder: '49 17163 995801',
-                    value: values.phone,
+                    value: formik.values.phone,
                     InputProps: {
                       startAdornment: (
                         <InputAdornment position="start"> + </InputAdornment>
@@ -163,8 +156,8 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                         </InputAdornment>
                       ),
                     },
-                    helperText: touched.phone && errors.phone,
-                    error: !!errors.phone && touched.phone,
+                    helperText: formik.touched.phone && formik.errors.phone,
+                    error: !!formik.errors.phone && formik.touched.phone,
                   },
                 ].map((item, index) => (
                   <FormInput
@@ -182,9 +175,9 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                     id: 'team',
                     label: t('Team'),
                     placeholder: '100',
-                    value: values.team,
-                    helperText: touched.team && errors.team,
-                    error: !!errors.team && touched.team,
+                    value: formik.values.team,
+                    helperText: formik.touched.team && formik.errors.team,
+                    error: !!formik.errors.team && formik.touched.team,
                   },
                 ].map((item, index) => (
                   <FormInput
@@ -216,9 +209,9 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                       </InputAdornment>
                     ),
                   },
-                  value: values.email,
-                  helperText: touched.email && errors.email,
-                  error: !!errors.email && touched.email,
+                  value: formik.values.email,
+                  helperText: formik.touched.email && formik.errors.email,
+                  error: !!formik.errors.email && formik.touched.email,
                   required: true,
                 },
               ].map((item, index) => (
@@ -238,12 +231,18 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                   name: 'employeeId',
                   label: t('Employee ID'),
                   placeholder: '12345678',
-                  value: values.employeeId,
-                  helperText: touched.employeeId && errors.employeeId,
-                  error: !!errors.employeeId && touched.employeeId,
+                  value: formik.values.employeeId,
+                  helperText:
+                    formik.touched.employeeId && formik.errors.employeeId,
+                  error:
+                    !!formik.errors.employeeId && formik.touched.employeeId,
                 },
               ].map((item, index) => (
-                <>
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  sx={{minWidth: '28.125em'}}
+                  gap="0em">
                   <FormInput
                     key={index}
                     props={{
@@ -252,12 +251,14 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                     }}
                     handleFocus={handleFocus}
                   />
-                  {(activeField === 'employeeId' || touched.employeeId) &&
-                    values.employeeId &&
-                    initId !== values.employeeId &&
+                  {(activeField === 'employeeId' ||
+                    formik.touched.employeeId) &&
+                    formik.values.employeeId &&
+                    initId !== formik.values.employeeId &&
                     userAccountResource?.data.filter(
                       (userItem: UserView) =>
-                        userItem.userData.externalId === values.employeeId,
+                        userItem.userData.externalId ===
+                        formik.values.employeeId,
                     ).length > 0 && (
                       <Typography
                         color="error"
@@ -270,7 +271,7 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                       </Typography>
                     )}
                   {activeField === 'employeeId' &&
-                  !values.employeeId &&
+                  !formik.values.employeeId &&
                   companyAutoNumberConfig?.configRecords.find(
                     (configRecord) =>
                       configRecord.type === ServiceCompanyNumberType.EMPLOYEE,
@@ -285,7 +286,7 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                         buttonProps={{
                           onClick: () => {
                             refetchCompanyNumber();
-                            setFieldValue(
+                            formik.setFieldValue(
                               'employeeId',
                               companyNextNumber?.value,
                             );
@@ -325,7 +326,7 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                     </Box>
                   ) : (
                     activeField === 'employeeId' &&
-                    !values.employeeId &&
+                    !formik.values.employeeId &&
                     !companyAutoNumberConfig?.configRecords.find(
                       (configRecord) =>
                         configRecord.type === ServiceCompanyNumberType.EMPLOYEE,
@@ -376,11 +377,11 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                       </Box>
                     )
                   )}
-                </>
+                </Box>
               ))}
             </Box>
           </Box>
-          {values.roles.includes(Role.TECHNICIAN) && (
+          {formik.values.roles.includes(Role.TECHNICIAN) && (
             <>
               <Typography
                 variant="h6"
@@ -389,8 +390,8 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                 {t('Order Types')}
               </Typography>
               <SelectServiceOrderTypes
-                values={values}
-                setFieldValue={setFieldValue}
+                values={formik.values}
+                setFieldValue={formik.setFieldValue}
               />
             </>
           )}
@@ -403,7 +404,10 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
               *
             </Typography>
           </Typography>
-          <SelectShift values={values} setFieldValue={setFieldValue} />
+          <SelectShift
+            values={formik.values}
+            setFieldValue={formik.setFieldValue}
+          />
         </Box>
       </Box>
 
