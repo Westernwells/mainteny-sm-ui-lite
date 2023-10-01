@@ -51,7 +51,7 @@ const AutoDropdown = ({
   const defaultProps = {
     InputLabelProps: {shrink: true},
   };
-  console.log(activeField, 'activeField');
+
   return (
     <>
       <FormInput
@@ -62,7 +62,7 @@ const AutoDropdown = ({
         }}
         handleFocus={handleFocus}
       />
-      {(activeField === 'externalId' || formik.touched[activeField]) &&
+      {(activeField || formik.touched[activeField]) &&
         formik.values[activeField] &&
         customerResource.filter(
           (item) => item.externalId === formik.values[activeField],
@@ -75,7 +75,7 @@ const AutoDropdown = ({
             {t('This ID is already taken. Please enter a different one.')}
           </Typography>
         )}
-      {activeField === 'externalId' &&
+      {activeField &&
       !formik.values[activeField] &&
       companyAutoNumberConfig?.configRecords.find(
         (item: any) => item.type === numberType,
@@ -119,7 +119,7 @@ const AutoDropdown = ({
           </Button>
         </Box>
       ) : (
-        activeField === 'externalId' &&
+        activeField &&
         !formik.values[activeField] &&
         !companyAutoNumberConfig?.configRecords.find(
           (item: any) => item.type === numberType,
