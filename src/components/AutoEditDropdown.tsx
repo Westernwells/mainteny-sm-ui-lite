@@ -14,6 +14,7 @@ import {Dispatch, SetStateAction} from 'react';
 import {ContractView} from 'models/contract';
 import {UserData} from 'models/user';
 import {ArticleSupplierView, ArticleView} from 'models/article';
+import {ElevatorView} from 'models/elevator';
 import {FormInput} from './form/FormInput';
 
 type Props = {
@@ -24,6 +25,7 @@ type Props = {
     | ContractView[]
     | ArticleView[]
     | ArticleSupplierView[]
+    | ElevatorView[]
     | UserData[];
   activeField: string;
   numberType: ServiceCompanyNumberType;

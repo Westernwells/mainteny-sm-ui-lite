@@ -49,8 +49,6 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
       {keepPreviousData: true},
     );
 
-  const currencySymbol = getCurrencySymbol[currency];
-
   const handleFocus = (e: any) => {
     setActiveField(e.target.name);
   };
@@ -77,6 +75,8 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
     onChange: formik.handleChange,
     onBlur: handleBlur,
   };
+
+  const currencySymbol = getCurrencySymbol[currency];
 
   return (
     <Grid container spacing={2} sx={{mt: '0.5em'}}>
