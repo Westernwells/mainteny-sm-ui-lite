@@ -15,6 +15,7 @@ import {ContractView} from 'models/contract';
 import {UserData} from 'models/user';
 import {ArticleSupplierView, ArticleView} from 'models/article';
 import {ElevatorView} from 'models/elevator';
+import {PropertyOwnerView} from 'models/propertyManager';
 import {FormInput} from './form/FormInput';
 
 type Props = {
@@ -26,6 +27,7 @@ type Props = {
     | ArticleView[]
     | ArticleSupplierView[]
     | ElevatorView[]
+    | PropertyOwnerView[]
     | UserData[];
   activeField: string;
   numberType: ServiceCompanyNumberType;
