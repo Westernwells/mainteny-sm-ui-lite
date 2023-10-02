@@ -62,6 +62,18 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
     setInitId(formik.values.employeeId);
   }, []);
 
+  const externalIdInputProps = {
+    id: 'employeeId',
+    name: 'employeeId',
+    label: t('Employee ID'),
+    placeholder: '12345678',
+    value: formik.values.employeeId,
+    helperText: formik.touched.employeeId && formik.errors.employeeId,
+    error: !!formik.errors.employeeId && formik.touched.employeeId,
+    onBlur: formik.handleBlur,
+    onChange: formik.handleChange,
+  };
+
   return (
     <Dialog
       title="Edit Basic Information"
@@ -207,176 +219,24 @@ export const EditEmployeeForm = ({openDialog, onClose}: Props) => {
                 />
               ))}
 
-              {[
-                {
-                  id: 'employeeId',
-                  name: 'employeeId',
-                  label: t('Employee ID'),
-                  placeholder: '12345678',
-                  value: formik.values.employeeId,
-                  helperText:
-                    formik.touched.employeeId && formik.errors.employeeId,
-                  error:
-                    !!formik.errors.employeeId && formik.touched.employeeId,
-                  onBlur: formik.handleBlur,
-                  onChange: formik.handleChange,
-                },
-              ].map((item, index) => (
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  sx={{minWidth: '28.125em'}}
-                  gap="0em">
-                  <AutoEditDropdown
-                    key={index}
-                    formik={formik}
-                    initId={initId}
-                    setOpenNewDialog={setOpenNewDialog}
-                    numberType={ServiceCompanyNumberType.EMPLOYEE}
-                    serviceTypeResource={userAccountResource?.data.map(
-                      (acctResource) => acctResource.userData,
-                    )}
-                    activeField={activeField}
-                    fieldProps={item}
-                    handleFocus={handleFocus}
-                  />
-
-                  {/* <FormInput
-                    key={index}
-                    props={{
-                      ...item,
-                      ...defaultProps,
-                    }}
-                    handleFocus={handleFocus}
-                  /> */}
-                  {/* {(activeField === 'employeeId' ||
-                    formik.touched.employeeId) &&
-                    formik.values.employeeId &&
-                    initId !== formik.values.employeeId &&
-                    userAccountResource?.data.filter(
-                      (userItem: UserView) =>
-                        userItem.userData.externalId ===
-                        formik.values.employeeId,
-                    ).length > 0 && (
-                      <Typography
-                        color="error"
-                        fontSize="0.75rem"
-                        letterSpacing="0.03em"
-                        padding="0.45em 0.65em">
-                        {t(
-                          'This ID is already taken. Please enter a different one.',
-                        )}
-                      </Typography>
-                    )}
-                  {activeField === 'employeeId' &&
-                  !formik.values.employeeId &&
-                  companyAutoNumberConfig?.configRecords.find(
-                    (configRecord) =>
-                      configRecord.type === ServiceCompanyNumberType.EMPLOYEE,
-                  )?.enabled ? (
-                    <Box
-                      sx={{
-                        borderRadius: '4px',
-                        boxShadow: '0px 9px 46px 8px #0000001F',
-                        marginTop: '0.2em',
-                      }}>
-                      <Button
-                        buttonProps={{
-                          onClick: () => {
-                            refetchCompanyNumber();
-                            formik.setFieldValue(
-                              'employeeId',
-                              companyNextNumber?.value,
-                            );
-                          },
-                          sx: {
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'flex-start',
-                            textAlign: 'left',
-                            alignItems: 'flex-start',
-                            width: '100%',
-                            padding: '1em',
-                          },
-                        }}>
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            paddingBottom: '0.6em',
-                          }}>
-                          <AutoAwesome />
-                          <Typography
-                            variant="caption"
-                            fontWeight="700"
-                            sx={{paddingLeft: '0.5em'}}>
-                            {t('Generate ID')}
-                          </Typography>
-                        </Box>
-
-                        <Typography
-                          variant="caption"
-                          color={theme.palette.text.secondary}>
-                          {t('Customizable in Settings')}
-                        </Typography>
-                      </Button>
-                    </Box>
-                  ) : (
-                    activeField === 'employeeId' &&
-                    !formik.values.employeeId &&
-                    !companyAutoNumberConfig?.configRecords.find(
-                      (configRecord) =>
-                        configRecord.type === ServiceCompanyNumberType.EMPLOYEE,
-                    )?.enabled && (
-                      <Box
-                        sx={{
-                          borderRadius: '4px',
-                          boxShadow: '0px 9px 46px 8px #0000001F',
-                          marginTop: '-1em',
-                        }}>
-                        <Button
-                          buttonProps={{
-                            size: 'medium',
-                            variant: 'outlined',
-                            onClick: () => setOpenNewDialog(true),
-                            sx: {
-                              display: 'flex',
-                              flexDirection: 'column',
-                              justifyContent: 'flex-start',
-                              textAlign: 'left',
-                              alignItems: 'flex-start',
-                              width: '100%',
-                              padding: '1em',
-                            },
-                          }}>
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              paddingBottom: '0.6em',
-                            }}>
-                            <AutoAwesome />
-                            <Typography
-                              variant="caption"
-                              sx={{paddingLeft: '0.5em'}}
-                              fontWeight="700">
-                              {t('Enable Automatic ID Generation')}
-                            </Typography>
-                          </Box>
-
-                          <Typography
-                            variant="caption"
-                            color={theme.palette.text.secondary}>
-                            {t('Allows for easier number input')}
-                          </Typography>
-                        </Button>
-                      </Box>
-                    )
-                  )} */}
-                </Box>
-              ))}
+              <Box
+                display="flex"
+                flexDirection="column"
+                sx={{minWidth: '28.125em'}}
+                gap="0em">
+                <AutoEditDropdown
+                  formik={formik}
+                  initId={initId}
+                  setOpenNewDialog={setOpenNewDialog}
+                  numberType={ServiceCompanyNumberType.EMPLOYEE}
+                  serviceTypeResource={userAccountResource?.data.map(
+                    (acctResource) => acctResource.userData,
+                  )}
+                  activeField={activeField}
+                  fieldProps={externalIdInputProps}
+                  handleFocus={handleFocus}
+                />
+              </Box>
             </Box>
           </Box>
           {formik.values.roles.includes(Role.TECHNICIAN) && (

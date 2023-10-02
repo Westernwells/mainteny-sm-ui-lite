@@ -270,7 +270,9 @@ export const BasicEmployeeForm = ({
                 companyNextNumber={companyNextNumber}
                 refetchCompanyNumber={refetchCompanyNumber}
                 setOpenDialog={setOpenDialog}
-                customerResource={customerResource.map((item) => item.userData)}
+                serviceTypeResource={customerResource.map(
+                  (item) => item.userData,
+                )}
                 handleFocus={handleFocus}
                 numberType={ServiceCompanyNumberType.EMPLOYEE}
               />

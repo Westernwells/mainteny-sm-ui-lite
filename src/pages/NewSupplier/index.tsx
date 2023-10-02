@@ -162,7 +162,7 @@ const NewSupplier = () => {
               companyNextNumber={companyNextNumber}
               refetchCompanyNumber={refetchCompanyNumber}
               setOpenDialog={setOpenDialog}
-              customerResource={articleSupplierResource.data}
+              serviceTypeResource={articleSupplierResource.data}
               handleFocus={handleFocus}
               numberType={ServiceCompanyNumberType.ARTICLE_SUPPLIER}
             />

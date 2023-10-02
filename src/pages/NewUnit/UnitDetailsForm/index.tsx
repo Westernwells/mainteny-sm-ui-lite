@@ -238,7 +238,7 @@ export const UnitDetailsForm = ({
               companyNextNumber={companyNextNumber}
               refetchCompanyNumber={refetchCompanyNumber}
               setOpenDialog={setOpenDialog}
-              customerResource={customerResource}
+              serviceTypeResource={customerResource}
               handleFocus={handleFocus}
               numberType={ServiceCompanyNumberType.ELEVATOR}
             />

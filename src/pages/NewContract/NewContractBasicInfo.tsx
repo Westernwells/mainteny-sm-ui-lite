@@ -175,7 +175,7 @@ const NewContractBasicInfo: FC<Props> = ({
           companyNextNumber={companyNextNumber}
           refetchCompanyNumber={refetchCompanyNumber}
           setOpenDialog={setOpenDialog}
-          customerResource={contractResource}
+          serviceTypeResource={contractResource}
           handleFocus={handleFocus}
           numberType={ServiceCompanyNumberType.CONTRACT}
         />

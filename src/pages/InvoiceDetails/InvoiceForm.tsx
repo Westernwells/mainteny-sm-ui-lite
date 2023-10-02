@@ -879,7 +879,7 @@ export const InvoiceForm = ({
                     companyNextNumber={companyNextNumber}
                     refetchCompanyNumber={refetchCompanyNumber}
                     setOpenDialog={setOpenDialog}
-                    customerResource={allInvoiceResource.data}
+                    serviceTypeResource={allInvoiceResource.data}
                     handleFocus={handleFocus}
                     numberType={ServiceCompanyNumberType.INVOICE}
                   />

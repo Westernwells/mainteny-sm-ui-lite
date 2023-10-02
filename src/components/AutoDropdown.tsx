@@ -19,7 +19,7 @@ interface Props {
   companyNextNumber: any;
   refetchCompanyNumber: () => void;
   setOpenDialog: (value: boolean) => void;
-  customerResource:
+  serviceTypeResource:
     | PropertyOwnerView[]
     | ArticleView[]
     | ElevatorView[]
@@ -40,7 +40,7 @@ const AutoDropdown = ({
   companyNextNumber,
   refetchCompanyNumber,
   setOpenDialog,
-  customerResource,
+  serviceTypeResource,
   handleFocus,
   idContainerStyles,
   numberType,
@@ -64,7 +64,7 @@ const AutoDropdown = ({
       />
       {(activeField || formik.touched[activeField]) &&
         formik.values[activeField] &&
-        customerResource.filter(
+        serviceTypeResource.filter(
           (item) => item.externalId === formik.values[activeField],
         ).length > 0 && (
           <Typography
