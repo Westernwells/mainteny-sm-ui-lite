@@ -218,6 +218,7 @@ export const UnitDetailsForm = ({
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
               }}
+              handleFocus={handleFocus}
             />
           </Grid>
 
