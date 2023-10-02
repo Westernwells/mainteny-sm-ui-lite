@@ -65,7 +65,6 @@ import {InvoiceCheckbox} from 'pages/InvoiceDetails/InvoiceCheckbox';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {IconButton} from '@mui/material';
 import {
-  useCompanyAutoNumberConfig,
   useCompanyNextNumber,
   useQueryContractPaymentTerms,
 } from 'hooks/reactQuery/useCompanies';
@@ -175,17 +174,12 @@ export const InvoiceForm = ({
     setActiveField(e.target.name);
   };
 
-  const {data: companyAutoNumberConfig} = useCompanyAutoNumberConfig(
+  const {data: companyNextNumber} = useCompanyNextNumber(
+    {
+      type: ServiceCompanyNumberType.INVOICE,
+    },
     user?.userAccount.serviceCompany.id,
   );
-
-  const {data: companyNextNumber, refetch: refetchCompanyNumber} =
-    useCompanyNextNumber(
-      {
-        type: ServiceCompanyNumberType.INVOICE,
-      },
-      user?.userAccount.serviceCompany.id,
-    );
 
   useEffect(() => {
     if (formType === 'new') {
