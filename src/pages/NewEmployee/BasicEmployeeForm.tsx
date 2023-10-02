@@ -255,17 +255,19 @@ export const BasicEmployeeForm = ({
                   handleFocus={handleFocus}
                 />
               ))}
-              <AutoDropdown
-                formik={formik}
-                activeField={activeField}
-                fieldProps={externalIdInputProps}
-                setOpenDialog={setOpenDialog}
-                serviceTypeResource={customerResource.map(
-                  (item) => item.userData,
-                )}
-                handleFocus={handleFocus}
-                numberType={ServiceCompanyNumberType.EMPLOYEE}
-              />
+              <Box sx={{width: '100%'}}>
+                <AutoDropdown
+                  formik={formik}
+                  activeField={activeField}
+                  fieldProps={externalIdInputProps}
+                  setOpenDialog={setOpenDialog}
+                  serviceTypeResource={customerResource.map(
+                    (item) => item.userData,
+                  )}
+                  handleFocus={handleFocus}
+                  numberType={ServiceCompanyNumberType.EMPLOYEE}
+                />
+              </Box>
             </Box>
           </Grid>
         </Grid>
