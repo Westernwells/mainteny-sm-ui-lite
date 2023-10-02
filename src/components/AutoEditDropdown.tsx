@@ -65,8 +65,7 @@ const AutoEditDropdown = ({
   const defaultProps = {
     InputLabelProps: {shrink: true},
   };
-  console.log(formik.values, 'formik');
-  console.log(formik, 'formik');
+
   return (
     <>
       <FormInput
