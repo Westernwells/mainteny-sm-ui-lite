@@ -11,7 +11,6 @@ interface Props {
 }
 
 export const PDFContainer = ({url}: Props) => {
-  const [height, setHeight] = useState('100%');
   const [pages, setPages] = useState<number>(0);
 
   const pageRef = useRef<HTMLDivElement>(null);
@@ -26,7 +25,6 @@ export const PDFContainer = ({url}: Props) => {
         width="100%"
         overflow="hidden"
         sx={{
-          height,
           overflowY: pages > 1 ? 'scroll' : 'initial',
 
           '& .react-pdf__Page__canvas': {
@@ -52,15 +50,9 @@ export const PDFContainer = ({url}: Props) => {
               <Page
                 key={i}
                 renderTextLayer={false}
+                renderAnnotationLayer={false}
                 pageIndex={i}
                 inputRef={pageRef}
-                onRenderSuccess={() => {
-                  setHeight(
-                    pageRef.current
-                      ? `${pageRef.current!.clientHeight}px !important`
-                      : '100%',
-                  );
-                }}
               />
             ))}
         </Document>

@@ -181,6 +181,50 @@ export const useInvoicesXero = (
   );
 };
 
+export const fetchInvoicesXLSX = async (
+  serviceCompanyId: string,
+  params: QueryFinancials,
+) => {
+  const response = await axiosClient.get(
+    `/api/reports/${serviceCompanyId}/invoices.xlsx`,
+    {
+      headers: {
+        accept:
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      },
+      responseType: 'blob',
+      params,
+      paramsSerializer,
+    },
+  );
+
+  return response.data;
+};
+
+export const useInvoicesXLSX = (
+  serviceCompanyId: string,
+  params: QueryFinancials,
+) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  return useQuery(
+    [FormatType.EXCEL, serviceCompanyId, params],
+    () => fetchInvoicesXLSX(serviceCompanyId, params),
+    {
+      onSuccess: (data) => {
+        download(data, ReportType.FINANCIALS);
+        enqueueSnackbar('Report downloaded successfully!', {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+      enabled: false,
+    },
+  );
+};
+
 const fetchSyncStatusXero = async (params: DataSyncStatusParams) => {
   const response: AxiosResponse<DataSyncStatus> = await axiosClient.get(
     `/api/system/xero/synchronization/status`,
