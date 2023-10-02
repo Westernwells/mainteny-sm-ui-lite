@@ -1742,5 +1742,7 @@
   "{{time}} days": "{{time}} dana",
   "{{time}} day": "{{time}} dan",
   "Address not found": "Adresa nije pronađena",
-  "Total Amount (Excl VAT)": "Ukupan iznos (bez PDV-a)"
+  "Total Amount (Excl VAT)": "Ukupan iznos (bez PDV-a)",
+  "Credit Note invoice": "Kredit faktura",
+  "Description updated successfully": "Opis je uspešno ažuriran"
 }
