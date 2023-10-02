@@ -193,9 +193,9 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
       <Grid item xs={4}>
         <FormInput
           props={{
-            label: 'Discount (first 14 days)',
+            label: 'Discount',
             name: 'discounts[0].days',
-            placeholder: 'Enter payment due (in days)',
+            placeholder: 'Enter discount value(in percentage)',
             type: 'number',
             value: formik.values.discounts?.[0]?.days ?? 0,
             helperText:
