@@ -65,7 +65,8 @@ const AutoEditDropdown = ({
   const defaultProps = {
     InputLabelProps: {shrink: true},
   };
-
+  console.log(formik.values, 'formik');
+  console.log(formik, 'formik');
   return (
     <>
       <FormInput
@@ -76,11 +77,11 @@ const AutoEditDropdown = ({
         }}
         handleFocus={handleFocus}
       />
-      {(activeField === 'externalId' || formik.touched.externalId) &&
-        formik.values.externalId &&
-        initId !== formik.values.externalId &&
+      {(activeField === fieldProps.name || formik.touched[fieldProps.name]) &&
+        formik.values[fieldProps.name] &&
+        initId !== formik.values[fieldProps.name] &&
         serviceTypeResource.filter(
-          (item) => item.externalId === formik.values.externalId,
+          (item) => item.externalId === formik.values[fieldProps.name],
         ).length > 0 && (
           <Typography
             color="error"
@@ -90,8 +91,8 @@ const AutoEditDropdown = ({
             {t('This ID is already taken. Please enter a different one.')}
           </Typography>
         )}
-      {activeField === 'externalId' &&
-      !formik.values.externalId &&
+      {activeField === fieldProps.name &&
+      !formik.values[fieldProps.name] &&
       companyAutoNumberConfig?.configRecords.find(
         (item) => item.type === numberType,
       )?.enabled ? (
@@ -112,7 +113,7 @@ const AutoEditDropdown = ({
             }}
             onClick={() => {
               refetchCompanyNumber();
-              formik.setFieldValue('externalId', companyNextNumber?.value);
+              formik.setFieldValue(fieldProps.name, companyNextNumber?.value);
             }}>
             <Box
               sx={{
@@ -133,8 +134,8 @@ const AutoEditDropdown = ({
           </Button>
         </Box>
       ) : (
-        activeField === 'externalId' &&
-        !formik.values.externalId &&
+        activeField === fieldProps.name &&
+        !formik.values[fieldProps.name] &&
         !companyAutoNumberConfig?.configRecords.find(
           (item) => item.type === numberType,
         )?.enabled && (
