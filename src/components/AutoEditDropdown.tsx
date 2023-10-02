@@ -11,24 +11,13 @@ import {ServiceCompanyNumberType} from 'models/service-company';
 import {useTranslation} from 'react-i18next';
 import {theme} from 'theme';
 import {Dispatch, SetStateAction} from 'react';
-import {ContractView} from 'models/contract';
-import {UserData} from 'models/user';
-import {ArticleSupplierView, ArticleView} from 'models/article';
-import {ElevatorView} from 'models/elevator';
-import {PropertyOwnerView} from 'models/propertyManager';
 import {FormInput} from './form/FormInput';
 
 type Props = {
   formik: any;
   initId?: string;
   fieldProps: any;
-  serviceTypeResource:
-    | ContractView[]
-    | ArticleView[]
-    | ArticleSupplierView[]
-    | ElevatorView[]
-    | PropertyOwnerView[]
-    | UserData[];
+  serviceTypeResource: any[];
   activeField: string;
   numberType: ServiceCompanyNumberType;
   idContainerStyles?: {[key: string]: any};

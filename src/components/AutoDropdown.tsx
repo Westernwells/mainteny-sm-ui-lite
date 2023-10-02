@@ -1,15 +1,9 @@
 import React from 'react';
 import {Typography, Box, Button, useTheme} from '@mui/material';
 import {AutoAwesome} from '@mui/icons-material';
-import {PropertyOwnerView} from 'models/propertyManager';
 import {ServiceCompanyNumberType} from 'models/service-company';
 import {FormInput} from 'components/form/FormInput';
-import {ArticleSupplierView, ArticleView} from 'models/article';
-import {ElevatorView} from 'models/elevator';
 import {useTranslation} from 'react-i18next';
-import {InvoiceView} from 'models/invoice';
-import {UserData} from 'models/user';
-import {ContractView} from 'models/contract';
 import {
   useCompanyAutoNumberConfig,
   useCompanyNextNumber,
@@ -21,14 +15,7 @@ interface Props {
   activeField: string;
   fieldProps: any;
   setOpenDialog: (value: boolean) => void;
-  serviceTypeResource:
-    | PropertyOwnerView[]
-    | ArticleView[]
-    | ElevatorView[]
-    | InvoiceView[]
-    | UserData[]
-    | ArticleSupplierView[]
-    | ContractView[];
+  serviceTypeResource: any[];
   handleFocus: any;
   idContainerStyles?: {[key: string]: any};
   numberType: ServiceCompanyNumberType;
@@ -75,10 +62,10 @@ const AutoDropdown = ({
         }}
         handleFocus={handleFocus}
       />
-      {(activeField || formik.touched[activeField]) &&
+      {(activeField === fieldProps.name || formik.touched[fieldProps.name]) &&
         formik.values[activeField] &&
         serviceTypeResource.filter(
-          (item) => item.externalId === formik.values[activeField],
+          (item) => item.externalId === formik.values[fieldProps.name],
         ).length > 0 && (
           <Typography
             color="error"
@@ -88,8 +75,8 @@ const AutoDropdown = ({
             {t('This ID is already taken. Please enter a different one.')}
           </Typography>
         )}
-      {activeField &&
-      !formik.values[activeField] &&
+      {activeField === fieldProps.name &&
+      !formik.values[fieldProps.name] &&
       companyAutoNumberConfig?.configRecords.find(
         (item: any) => item.type === numberType,
       )?.enabled ? (
@@ -111,7 +98,7 @@ const AutoDropdown = ({
             }}
             onClick={() => {
               refetchCompanyNumber();
-              formik.setFieldValue('externalId', companyNextNumber?.value);
+              formik.setFieldValue(fieldProps.name, companyNextNumber?.value);
             }}>
             <Box
               sx={{
@@ -132,8 +119,8 @@ const AutoDropdown = ({
           </Button>
         </Box>
       ) : (
-        activeField &&
-        !formik.values[activeField] &&
+        activeField === fieldProps.name &&
+        !formik.values[fieldProps.name] &&
         !companyAutoNumberConfig?.configRecords.find(
           (item: any) => item.type === numberType,
         )?.enabled && (
