@@ -58,13 +58,12 @@ export const AddressAutoComplete = ({
 
     if (queryView.length === 0 || queryView === address?.formatted_address) {
       setOpen(false);
-    } else {
-      setOpen(true);
     }
   }, [queryView]);
 
   const onInputChange = (e: any) => {
     setQueryView(e.target.value);
+    setOpen(true);
   };
 
   return (

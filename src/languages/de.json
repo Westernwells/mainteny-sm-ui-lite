@@ -1723,5 +1723,9 @@
   "BUSINESS ADDRESS": "GESCHÄFTSADRESSE",
   "External Id is required": "Externe ID ist erforderlich.",
   "{{time}} days": "{{time}} Tage",
-  "{{time}} day": "{{time}} Tag"
+  "{{time}} day": "{{time}} Tag",
+  "Address not found": "Adresse wurde nicht gefunden",
+  "Total Amount (Excl VAT)": "Gesamtpreis (ohne MwSt.)",
+  "Credit Note invoice": "Gutschrift",
+  "Description updated successfully": "Beschreibung wurde erfolgreich aktualisiert"
 }

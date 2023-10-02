@@ -45,7 +45,10 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             placeholder: '4',
             type: 'number',
             required: true,
-            value: Number(formik.values.visitsNumber).toString(),
+            value:
+              formik.values.visitsNumber === 0
+                ? ''
+                : formik.values.visitsNumber.toString(),
             error: !!(
               formik.touched.visitsNumber && formik.errors.visitsNumber
             ),
@@ -103,7 +106,10 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             placeholder: '1500',
             type: 'number',
             required: true,
-            value: Number(formik.values.netAmount).toString(),
+            value:
+              formik.values.netAmount === 0
+                ? ''
+                : formik.values.netAmount.toString(),
             helperText:
               formik.errors.netAmount && formik.touched.netAmount
                 ? formik.errors.netAmount
@@ -128,7 +134,10 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             name: 'renewalTerms',
             placeholder: '12',
             type: 'number',
-            value: Number(formik.values.renewalTerms).toString(),
+            value:
+              formik.values.renewalTerms === 0
+                ? ''
+                : formik.values.renewalTerms.toString(),
             helperText:
               formik.errors.renewalTerms && formik.touched.renewalTerms
                 ? formik.errors.renewalTerms
@@ -150,7 +159,10 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             name: 'spendingLimit',
             placeholder: '1500',
             type: 'number',
-            value: Number(formik.values.spendingLimit).toString(),
+            value:
+              formik.values.spendingLimit === 0
+                ? ''
+                : formik.values.spendingLimit.toString(),
             helperText:
               formik.errors.spendingLimit && formik.touched.spendingLimit
                 ? formik.errors.spendingLimit
@@ -177,7 +189,10 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             name: 'invoiceDueDays',
             placeholder: 'Enter payment due (in days)',
             type: 'number',
-            value: formik.values.invoiceDueDays,
+            value:
+              formik.values.invoiceDueDays! === 0
+                ? ''
+                : formik.values.invoiceDueDays!.toString(),
             helperText:
               formik.errors.invoiceDueDays && formik.touched.invoiceDueDays
                 ? formik.errors.invoiceDueDays
@@ -197,7 +212,10 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             name: 'discounts[0].days',
             placeholder: 'Enter discount value(in percentage)',
             type: 'number',
-            value: formik.values.discounts?.[0]?.days ?? 0,
+            value:
+              formik.values.discounts?.[0]?.days === 0
+                ? ''
+                : formik.values.discounts?.[0]?.days.toString(),
             helperText:
               formik.errors.discounts && formik.touched.discounts
                 ? formik.errors.discounts
@@ -222,7 +240,10 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             name: 'noticePeriodInMonth',
             placeholder: 'Enter notice period',
             type: 'number',
-            value: formik.values.noticePeriodInMonth,
+            value:
+              formik.values.noticePeriodInMonth! === 0
+                ? ''
+                : formik.values.noticePeriodInMonth!.toString(),
             helperText:
               formik.errors.noticePeriodInMonth &&
               formik.touched.noticePeriodInMonth
@@ -244,9 +265,10 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             name: 'annualPriceAdjustmentPercentage',
             placeholder: '2.5',
             type: 'number',
-            value: Number(
-              formik.values.annualPriceAdjustmentPercentage,
-            ).toString(),
+            value:
+              formik.values.annualPriceAdjustmentPercentage === 0
+                ? ''
+                : formik.values.annualPriceAdjustmentPercentage.toString(),
             helperText:
               formik.errors.annualPriceAdjustmentPercentage &&
               formik.touched.annualPriceAdjustmentPercentage
@@ -268,7 +290,10 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             name: 'serviceLevelAgreement',
             placeholder: '120',
             type: 'number',
-            value: Number(formik.values.serviceLevelAgreement).toString(),
+            value:
+              formik.values.serviceLevelAgreement === 0
+                ? ''
+                : formik.values.serviceLevelAgreement.toString(),
             helperText:
               formik.errors.serviceLevelAgreement &&
               formik.touched.serviceLevelAgreement
