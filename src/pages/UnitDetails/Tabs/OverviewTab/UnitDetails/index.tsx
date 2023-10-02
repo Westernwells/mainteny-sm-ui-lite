@@ -114,6 +114,7 @@ export const UnitDetails = ({
       unitCapacity: elevator.capacity,
       spendingLimit: validContract?.spendingLimit,
       yearBuilt: elevator.additionalInfo.builtYear,
+      externalId: elevator.externalId,
     });
   }, [openDialog]);
 
