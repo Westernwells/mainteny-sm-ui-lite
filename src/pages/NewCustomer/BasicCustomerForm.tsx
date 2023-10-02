@@ -208,9 +208,6 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
               formik={formik}
               activeField={activeField}
               fieldProps={externalIdInputProps}
-              companyAutoNumberConfig={companyAutoNumberConfig}
-              companyNextNumber={companyNextNumber}
-              refetchCompanyNumber={refetchCompanyNumber}
               setOpenDialog={setOpenDialog}
               serviceTypeResource={customerResource}
               handleFocus={handleFocus}

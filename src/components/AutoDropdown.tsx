@@ -10,14 +10,16 @@ import {useTranslation} from 'react-i18next';
 import {InvoiceView} from 'models/invoice';
 import {UserData} from 'models/user';
 import {ContractView} from 'models/contract';
+import {
+  useCompanyAutoNumberConfig,
+  useCompanyNextNumber,
+} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 interface Props {
   formik: any;
   activeField: string;
   fieldProps: any;
-  companyAutoNumberConfig: any;
-  companyNextNumber: any;
-  refetchCompanyNumber: () => void;
   setOpenDialog: (value: boolean) => void;
   serviceTypeResource:
     | PropertyOwnerView[]
@@ -36,9 +38,6 @@ const AutoDropdown = ({
   formik,
   activeField,
   fieldProps,
-  companyAutoNumberConfig,
-  companyNextNumber,
-  refetchCompanyNumber,
   setOpenDialog,
   serviceTypeResource,
   handleFocus,
@@ -47,6 +46,20 @@ const AutoDropdown = ({
 }: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
+
+  const {user} = useUserSession();
+
+  const {data: companyAutoNumberConfig} = useCompanyAutoNumberConfig(
+    user?.userAccount.serviceCompany.id,
+  );
+
+  const {data: companyNextNumber, refetch: refetchCompanyNumber} =
+    useCompanyNextNumber(
+      {
+        type: numberType,
+      },
+      user?.userAccount.serviceCompany.id,
+    );
 
   const defaultProps = {
     InputLabelProps: {shrink: true},

@@ -158,9 +158,6 @@ const NewSupplier = () => {
               formik={formik}
               activeField={activeField}
               fieldProps={externalIdInputProps}
-              companyAutoNumberConfig={companyAutoNumberConfig}
-              companyNextNumber={companyNextNumber}
-              refetchCompanyNumber={refetchCompanyNumber}
               setOpenDialog={setOpenDialog}
               serviceTypeResource={articleSupplierResource.data}
               handleFocus={handleFocus}
