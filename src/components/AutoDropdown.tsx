@@ -9,13 +9,26 @@ import {
   useCompanyNextNumber,
 } from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {InvoiceView} from 'models/invoice';
+import {ArticleSupplierView, ArticleView} from 'models/article';
+import {ContractView} from 'models/contract';
+import {PropertyOwnerView} from 'models/propertyManager';
+import {UserData} from 'models/user';
+import {ElevatorView} from 'models/elevator';
 
 interface Props {
   formik: any;
   activeField: string;
   fieldProps: any;
   setOpenDialog: (value: boolean) => void;
-  serviceTypeResource: any[];
+  serviceTypeResource:
+    | InvoiceView[]
+    | ArticleView[]
+    | ContractView[]
+    | PropertyOwnerView[]
+    | UserData[]
+    | ArticleSupplierView[]
+    | ElevatorView[];
   handleFocus: any;
   idContainerStyles?: {[key: string]: any};
   numberType: ServiceCompanyNumberType;
@@ -52,6 +65,17 @@ const AutoDropdown = ({
     InputLabelProps: {shrink: true},
   };
 
+  const filteredResources = (serviceTypeResource as InvoiceView[]).filter(
+    (item) => {
+      if ('externalId' in item) {
+        return item.externalId === formik.values[fieldProps.name];
+      }
+      return false;
+    },
+  );
+
+  const isResourceFound = filteredResources.length > 0;
+
   return (
     <>
       <FormInput
@@ -64,9 +88,7 @@ const AutoDropdown = ({
       />
       {(activeField === fieldProps.name || formik.touched[fieldProps.name]) &&
         formik.values[activeField] &&
-        serviceTypeResource.filter(
-          (item) => item.externalId === formik.values[fieldProps.name],
-        ).length > 0 && (
+        isResourceFound && (
           <Typography
             color="error"
             fontSize="0.75rem"
