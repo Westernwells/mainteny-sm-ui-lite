@@ -210,7 +210,7 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
           props={{
             label: 'Discount',
             name: 'discounts[0].days',
-            placeholder: 'Enter discount value(in percentage)',
+            placeholder: 'Enter discount value (in percentage)',
             type: 'number',
             value:
               formik.values.discounts?.[0]?.days === 0
