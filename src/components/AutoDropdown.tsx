@@ -29,7 +29,7 @@ interface Props {
     | UserData[]
     | ArticleSupplierView[]
     | ElevatorView[];
-  handleFocus: any;
+  handleFocus: (e: any) => void;
   idContainerStyles?: {[key: string]: any};
   numberType: ServiceCompanyNumberType;
 }
