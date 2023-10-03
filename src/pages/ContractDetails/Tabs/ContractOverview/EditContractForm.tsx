@@ -251,7 +251,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
       <Grid item md={6}>
         <FormInput
           props={{
-            placeholder: 'Enter discount value(in percentage)',
+            placeholder: 'Enter discount value (in percentage)',
             label: 'Discount',
             name: 'discounts',
             type: 'number',
