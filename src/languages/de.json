@@ -1727,5 +1727,6 @@
   "Address not found": "Adresse wurde nicht gefunden",
   "Total Amount (Excl VAT)": "Gesamtpreis (ohne MwSt.)",
   "Credit Note invoice": "Gutschrift",
-  "Description updated successfully": "Beschreibung wurde erfolgreich aktualisiert"
+  "Description updated successfully": "Beschreibung wurde erfolgreich aktualisiert",
+  "Discount": "Skonto"
 }
