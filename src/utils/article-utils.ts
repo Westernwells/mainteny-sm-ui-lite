@@ -2,6 +2,9 @@ import * as Yup from 'yup';
 import {AnyObject} from 'yup/lib/types';
 import {TestContextExtended} from 'models/articleForm';
 import {ArticleType} from 'models/article';
+import {QuotationItemRecord} from 'models/quotation';
+import {InvoiceItemRecord} from 'models/invoice';
+import {Amount} from 'models/misc';
 
 export const handleCostPackageValidation = (
   value: number | undefined,
@@ -24,4 +27,23 @@ export const handleCostPackageValidation = (
     );
   }
   return true;
+};
+
+export const getItemRecord = (
+  record: QuotationItemRecord | InvoiceItemRecord<Amount>,
+  percentageVat: number,
+) => {
+  const {netAmount} = record.unitAmount;
+  const vat =
+    (percentageVat * netAmount) / 10 ** record.unitAmount.fractionDigits;
+  return {
+    ...record,
+    unitAmount: {
+      ...record.unitAmount,
+      netAmount,
+      percentageVat,
+      vat,
+      grossAmount: netAmount + vat,
+    },
+  };
 };
