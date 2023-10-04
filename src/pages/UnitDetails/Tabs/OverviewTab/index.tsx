@@ -70,7 +70,6 @@ export const OverviewTab = ({getUnitName}: Props) => {
               },
             }}
             elevator={elevator!}
-            validContract={validContract}
             propertyOwnerId={elevator?.propertyOwner.id}
           />
         </Grid>
