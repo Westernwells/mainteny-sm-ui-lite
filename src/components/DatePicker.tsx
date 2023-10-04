@@ -48,7 +48,7 @@ export const DatePicker = ({
 
   useEffect(() => {
     setValue(defaultDate);
-  }, []);
+  }, [defaultDate]);
 
   useEffect(() => {
     if (reset) {
