@@ -31,6 +31,7 @@ import {createEmptyResource} from 'utils/paging-utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {LanguageContext} from 'context/LanguageProvider';
 import {calculateTotal} from 'utils/calculate-total';
+import {getItemRecord} from 'utils/article-utils';
 import {NumericFormat} from 'react-number-format';
 import {TextField} from '@mui/material';
 import {ArticleItemRow} from './ArticleItemRow';
@@ -112,24 +113,6 @@ export const ArticleItemsTable = ({
 
   const {language: selectedLng} = useContext(LanguageContext);
 
-  const getItemRecord = (
-    record: QuotationItemRecord | InvoiceItemRecord<Amount>,
-  ) => {
-    const {netAmount} = record.unitAmount;
-    const vat =
-      (percentageVat * netAmount) / 10 ** record.unitAmount.fractionDigits;
-    return {
-      ...record,
-      unitAmount: {
-        ...record.unitAmount,
-        netAmount,
-        percentageVat,
-        vat,
-        grossAmount: netAmount + vat,
-      },
-    };
-  };
-
   const articleViewToItem = (
     article: ArticleView,
   ): QuotationItemRecord | InvoiceItemRecord<Amount> => {
@@ -143,7 +126,7 @@ export const ArticleItemsTable = ({
       type: article.type,
       costPackage: article.additionalInfo?.costPackage,
     };
-    return getItemRecord(record);
+    return getItemRecord(record, percentageVat);
   };
   const tabItems: TabItems[] = useMemo(() => {
     const tItems = [
@@ -235,10 +218,13 @@ export const ArticleItemsTable = ({
         setArticleResourceAndPrice(partialArticleResource.data[0]);
       } else if (isCreditNote && isFetchedCreditNoteArticle) {
         setArticleResourceAndPrice(creditNoteArticleResource.data[0]);
-      } else if (!isCreditNote && !isPartial) {
-        if (formType === 'new') {
-          setItems([]);
-        }
+      } else if (
+        !isCreditNote &&
+        !isPartial &&
+        formType === 'new' &&
+        !items.length
+      ) {
+        setItems([]);
       }
     } else if (invoice) {
       if (
