@@ -11,11 +11,12 @@ import {ServiceCompanyNumberType} from 'models/service-company';
 import {useTranslation} from 'react-i18next';
 import {theme} from 'theme';
 import {Dispatch, SetStateAction} from 'react';
+import {ArticleView, ArticleSupplierView} from 'models/article';
 import {ContractView} from 'models/contract';
-import {UserData} from 'models/user';
-import {ArticleSupplierView, ArticleView} from 'models/article';
 import {ElevatorView} from 'models/elevator';
+import {InvoiceView} from 'models/invoice';
 import {PropertyOwnerView} from 'models/propertyManager';
+import {UserData} from 'models/user';
 import {FormInput} from './form/FormInput';
 
 type Props = {
@@ -23,16 +24,17 @@ type Props = {
   initId?: string;
   fieldProps: any;
   serviceTypeResource:
-    | ContractView[]
+    | InvoiceView[]
     | ArticleView[]
-    | ArticleSupplierView[]
-    | ElevatorView[]
+    | ContractView[]
     | PropertyOwnerView[]
-    | UserData[];
+    | UserData[]
+    | ArticleSupplierView[]
+    | ElevatorView[];
   activeField: string;
   numberType: ServiceCompanyNumberType;
   idContainerStyles?: {[key: string]: any};
-  handleFocus: any;
+  handleFocus: (e: any) => void;
   setOpenNewDialog: Dispatch<SetStateAction<boolean>>;
 };
 
@@ -66,6 +68,17 @@ const AutoEditDropdown = ({
     InputLabelProps: {shrink: true},
   };
 
+  const filteredResources = (serviceTypeResource as InvoiceView[]).filter(
+    (item) => {
+      if ('externalId' in item) {
+        return item.externalId === formik.values[fieldProps.name];
+      }
+      return false;
+    },
+  );
+
+  const isResourceFound = filteredResources.length > 0;
+
   return (
     <>
       <FormInput
@@ -79,9 +92,7 @@ const AutoEditDropdown = ({
       {(activeField === fieldProps.name || formik.touched[fieldProps.name]) &&
         formik.values[fieldProps.name] &&
         initId !== formik.values[fieldProps.name] &&
-        serviceTypeResource.filter(
-          (item) => item.externalId === formik.values[fieldProps.name],
-        ).length > 0 && (
+        isResourceFound && (
           <Typography
             color="error"
             fontSize="0.75rem"

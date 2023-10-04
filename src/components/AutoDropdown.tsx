@@ -1,20 +1,20 @@
 import React from 'react';
 import {Typography, Box, Button, useTheme} from '@mui/material';
 import {AutoAwesome} from '@mui/icons-material';
-import {PropertyOwnerView} from 'models/propertyManager';
 import {ServiceCompanyNumberType} from 'models/service-company';
 import {FormInput} from 'components/form/FormInput';
-import {ArticleSupplierView, ArticleView} from 'models/article';
-import {ElevatorView} from 'models/elevator';
 import {useTranslation} from 'react-i18next';
-import {InvoiceView} from 'models/invoice';
-import {UserData} from 'models/user';
-import {ContractView} from 'models/contract';
 import {
   useCompanyAutoNumberConfig,
   useCompanyNextNumber,
 } from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {InvoiceView} from 'models/invoice';
+import {ArticleSupplierView, ArticleView} from 'models/article';
+import {ContractView} from 'models/contract';
+import {PropertyOwnerView} from 'models/propertyManager';
+import {UserData} from 'models/user';
+import {ElevatorView} from 'models/elevator';
 
 interface Props {
   formik: any;
@@ -22,14 +22,14 @@ interface Props {
   fieldProps: any;
   setOpenDialog: (value: boolean) => void;
   serviceTypeResource:
-    | PropertyOwnerView[]
-    | ArticleView[]
-    | ElevatorView[]
     | InvoiceView[]
+    | ArticleView[]
+    | ContractView[]
+    | PropertyOwnerView[]
     | UserData[]
     | ArticleSupplierView[]
-    | ContractView[];
-  handleFocus: any;
+    | ElevatorView[];
+  handleFocus: (e: any) => void;
   idContainerStyles?: {[key: string]: any};
   numberType: ServiceCompanyNumberType;
 }
@@ -65,6 +65,17 @@ const AutoDropdown = ({
     InputLabelProps: {shrink: true},
   };
 
+  const filteredResources = (serviceTypeResource as InvoiceView[]).filter(
+    (item) => {
+      if ('externalId' in item) {
+        return item.externalId === formik.values[fieldProps.name];
+      }
+      return false;
+    },
+  );
+
+  const isResourceFound = filteredResources.length > 0;
+
   return (
     <>
       <FormInput
@@ -75,11 +86,9 @@ const AutoDropdown = ({
         }}
         handleFocus={handleFocus}
       />
-      {(activeField || formik.touched[activeField]) &&
+      {(activeField === fieldProps.name || formik.touched[fieldProps.name]) &&
         formik.values[activeField] &&
-        serviceTypeResource.filter(
-          (item) => item.externalId === formik.values[activeField],
-        ).length > 0 && (
+        isResourceFound && (
           <Typography
             color="error"
             fontSize="0.75rem"
@@ -88,8 +97,8 @@ const AutoDropdown = ({
             {t('This ID is already taken. Please enter a different one.')}
           </Typography>
         )}
-      {activeField &&
-      !formik.values[activeField] &&
+      {activeField === fieldProps.name &&
+      !formik.values[fieldProps.name] &&
       companyAutoNumberConfig?.configRecords.find(
         (item: any) => item.type === numberType,
       )?.enabled ? (
@@ -111,7 +120,7 @@ const AutoDropdown = ({
             }}
             onClick={() => {
               refetchCompanyNumber();
-              formik.setFieldValue('externalId', companyNextNumber?.value);
+              formik.setFieldValue(fieldProps.name, companyNextNumber?.value);
             }}>
             <Box
               sx={{
@@ -132,8 +141,8 @@ const AutoDropdown = ({
           </Button>
         </Box>
       ) : (
-        activeField &&
-        !formik.values[activeField] &&
+        activeField === fieldProps.name &&
+        !formik.values[fieldProps.name] &&
         !companyAutoNumberConfig?.configRecords.find(
           (item: any) => item.type === numberType,
         )?.enabled && (
