@@ -279,7 +279,6 @@ export const DataGridLayout = ({
             borderTop: 'none',
             borderBottom: '2px solid',
             borderColor: 'background.default',
-            borderRadius: '4px',
             ...(isWidget && {
               border: `1px solid ${theme.palette.text.disabled}`,
               borderRadius: '4px',
