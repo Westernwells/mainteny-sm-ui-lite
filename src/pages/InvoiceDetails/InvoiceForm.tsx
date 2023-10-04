@@ -60,7 +60,7 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {Notes} from 'pages/InvoiceDetails/Notes';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {convertToText, formatSearchParams} from 'utils/utils';
-import {addYears} from 'date-fns';
+import {addDays, addYears} from 'date-fns';
 import {InvoiceCheckbox} from 'pages/InvoiceDetails/InvoiceCheckbox';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {IconButton} from '@mui/material';
@@ -317,6 +317,15 @@ export const InvoiceForm = ({
       'includeCheckList',
       invoice?.additionalInfo.includeCheckList || false,
     );
+
+    const dueDays = serviceOrder?.contract?.additionalInfo?.invoiceDueDays || 0;
+
+    if (dueDays > 0) {
+      const currentDate = new Date();
+      const futureDate = addDays(currentDate, dueDays);
+
+      setDueDate(futureDate);
+    }
   }, [serviceOrder]);
 
   useEffect(() => {
