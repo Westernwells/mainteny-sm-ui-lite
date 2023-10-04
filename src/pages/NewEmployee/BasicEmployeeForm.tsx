@@ -48,12 +48,6 @@ export const BasicEmployeeForm = ({
         (value) =>
           !customerResource.some((user) => user.userAccount.username === value),
       ),
-    employeeId: Yup.string().test(
-      'employeeId',
-      t('This ID is already taken. Please enter a different one.'),
-      (value) =>
-        !customerResource.some((user) => user.userData.externalId === value),
-    ),
     team: Yup.string().matches(/^[0-9]+$/, 'Team is not valid'),
     phone: Yup.string()
       .required('Phone number is required')
@@ -255,17 +249,19 @@ export const BasicEmployeeForm = ({
                   handleFocus={handleFocus}
                 />
               ))}
-              <AutoDropdown
-                formik={formik}
-                activeField={activeField}
-                fieldProps={externalIdInputProps}
-                setOpenDialog={setOpenDialog}
-                serviceTypeResource={customerResource.map(
-                  (item) => item.userData,
-                )}
-                handleFocus={handleFocus}
-                numberType={ServiceCompanyNumberType.EMPLOYEE}
-              />
+              <Box sx={{width: '100%'}}>
+                <AutoDropdown
+                  formik={formik}
+                  activeField={activeField}
+                  fieldProps={externalIdInputProps}
+                  setOpenDialog={setOpenDialog}
+                  serviceTypeResource={customerResource.map(
+                    (item) => item.userData,
+                  )}
+                  handleFocus={handleFocus}
+                  numberType={ServiceCompanyNumberType.EMPLOYEE}
+                />
+              </Box>
             </Box>
           </Grid>
         </Grid>

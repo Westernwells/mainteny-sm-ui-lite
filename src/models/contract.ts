@@ -144,6 +144,7 @@ export interface ContractSimpleView {
   status: ContractStatus;
   externalId: string;
   meta: Meta;
+  additionalInfo: ContractAdditionalInfo;
 }
 
 export interface CreateContractRecord {
