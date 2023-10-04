@@ -108,7 +108,6 @@ export const UnitDetails = ({
       model: elevator.model,
       serialNumber: elevator.serialNumber,
       unitCapacity: elevator.capacity,
-      // spendingLimit: validContract?.spendingLimit,
       yearBuilt: elevator.additionalInfo.builtYear,
       externalId: elevator.externalId,
     });
