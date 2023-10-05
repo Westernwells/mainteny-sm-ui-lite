@@ -38,7 +38,6 @@ import {
   ServiceOrderView,
   CreateScheduledServiceOrderBody,
   CreateNonScheduledServiceOrderBody,
-  ServiceOrderReportView,
   CheckListAnswerRecord,
   ServiceOrderItemRecord,
   CompleteServiceOrder,
@@ -62,10 +61,6 @@ import {
   ElevatorView,
 } from '../../models/elevator';
 import {useUserSession} from './useUserSession';
-
-interface ServiceOrderReportPayload {
-  serviceOrderId: string | string[];
-}
 
 const filterByNextVisit = (
   serviceOrderViewRes: Resource<ServiceOrderView>,
@@ -207,51 +202,6 @@ export const useFetchElevatorAvailability = (elevatorIds: string[]) => {
     },
   );
 };
-
-export const fetchServiceOrderReport = async (
-  params: ServiceOrderReportPayload,
-) => {
-  const response = await axiosClient.get<ServiceOrderReportView[]>(
-    `/api/serviceOrders/reports`,
-    {
-      params,
-      paramsSerializer,
-    },
-  );
-  return response.data;
-};
-
-export function useServiceOrderReport(
-  params: ServiceOrderReportPayload,
-  options?: UseQueryOptions<any, any, any>,
-) {
-  return useQuery<ServiceOrderReportView[]>(
-    [queryKeys.fetchServiceOrderReport, params],
-    () => fetchServiceOrderReport(params as ServiceOrderReportPayload),
-    {
-      enabled: !!params.serviceOrderId || !!params.serviceOrderId.length,
-      ...options,
-    },
-  );
-}
-
-export const fetchServiceOrderWorkReport = async (serviceOrderId: string) => {
-  const response = await axiosClient.get<ServiceOrderReportView>(
-    `/api/serviceOrders/${serviceOrderId}/report`,
-  );
-  return response.data;
-};
-
-export function useServiceOrderWorkReport(
-  serviceOrderId: string,
-  options?: UseQueryOptions<any, any, any>,
-) {
-  return useQuery<ServiceOrderReportView, RestError>(
-    [queryKeys.fetchServiceOrderWorkReport, serviceOrderId],
-    () => fetchServiceOrderWorkReport(serviceOrderId),
-    {...options},
-  );
-}
 
 export const queryServiceOrders = async (
   params: ServiceOrderQueryParams,
@@ -594,7 +544,6 @@ export const useCompleteServiceOrder = (successMsg?: string) => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        queryClient.invalidateQueries([queryKeys.fetchServiceOrderReport]);
         if (successMsg) {
           enqueueSnackbar(successMsg, {
             variant: 'success',
@@ -847,7 +796,6 @@ export const useUpdateServiceOrderArticles = () => {
       putServiceOrderArticles(data, orderId),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries([queryKeys.fetchServiceOrderReport]);
         queryClient.invalidateQueries([queryKeys.fetchServiceOrderArticles]);
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         enqueueSnackbar(`Work report updated successfully!`, {
@@ -994,7 +942,6 @@ export const publishWorkReport = async (
 };
 
 export const usePublishWorkReport = () => {
-  const queryClient = useQueryClient();
   const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(
@@ -1002,7 +949,6 @@ export const usePublishWorkReport = () => {
       publishWorkReport(id, body),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries([queryKeys.fetchServiceOrderWorkReport]);
         enqueueSnackbar(`Work report sent successfully!`, {
           variant: 'success',
         });

@@ -3,20 +3,18 @@ import {Divider, Typography} from '@mui/material';
 import Box from '@mui/material/Box';
 import {FormLabel} from 'components/form/FormLabel';
 import {useFormatDate} from 'hooks/useFormatDate';
-import {ServiceOrderReportView} from 'models/service-order';
+import {ServiceOrderView} from 'models/service-order';
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {convertDigitalMinsToHM} from 'utils/datetime';
 
 interface Props {
-  serviceReport: ServiceOrderReportView;
+  serviceOrder: ServiceOrderView;
 }
-export const Maintenance = ({serviceReport}: Props) => {
+export const Maintenance = ({serviceOrder}: Props) => {
   const theme = useTheme();
   const [schedule] = useState(
-    serviceReport.serviceOrder.schedules[
-      serviceReport.serviceOrder.schedules.length - 1
-    ],
+    serviceOrder.schedules?.[serviceOrder.schedules.length - 1],
   );
   const formatDate = useFormatDate();
   const {t} = useTranslation();
@@ -30,7 +28,7 @@ export const Maintenance = ({serviceReport}: Props) => {
           borderColor="grey.300"
           borderRadius="4px"
           p=".5em">
-          {!serviceReport.additionalInfo.onlyShowTotalTime && (
+          {!serviceOrder?.report?.additionalInfo.onlyShowTotalTime && (
             <>
               <Box
                 px="1em"
@@ -52,12 +50,12 @@ export const Maintenance = ({serviceReport}: Props) => {
                 {[
                   {
                     label: t('Start'),
-                    date: serviceReport.serviceOrder.actualStartTime
-                      ? formatDate(serviceReport.serviceOrder.actualStartTime)
+                    date: serviceOrder.actualStartTime
+                      ? formatDate(serviceOrder.actualStartTime)
                       : '-',
-                    time: serviceReport.serviceOrder.actualStartTime
+                    time: serviceOrder.actualStartTime
                       ? new Date(
-                          serviceReport.serviceOrder.actualStartTime!,
+                          serviceOrder.actualStartTime!,
                         ).toLocaleTimeString(navigator.language, {
                           hour: '2-digit',
                           minute: '2-digit',
@@ -66,12 +64,12 @@ export const Maintenance = ({serviceReport}: Props) => {
                   },
                   {
                     label: t('End'),
-                    date: serviceReport.serviceOrder.actualEndTime
-                      ? formatDate(serviceReport.serviceOrder.actualEndTime)
+                    date: serviceOrder.actualEndTime
+                      ? formatDate(serviceOrder.actualEndTime)
                       : '-',
-                    time: serviceReport.serviceOrder.actualEndTime
+                    time: serviceOrder.actualEndTime
                       ? new Date(
-                          serviceReport.serviceOrder.actualEndTime!,
+                          serviceOrder.actualEndTime!,
                         ).toLocaleTimeString(navigator.language, {
                           hour: '2-digit',
                           minute: '2-digit',
@@ -118,7 +116,9 @@ export const Maintenance = ({serviceReport}: Props) => {
             </Typography>
             <Box />
             <Typography sx={{color: 'primary.contrastText'}}>
-              {convertDigitalMinsToHM(serviceReport.actualServiceTime)}
+              {convertDigitalMinsToHM(
+                serviceOrder.report?.actualServiceTime ?? 0,
+              )}
             </Typography>
           </Box>
         </Box>

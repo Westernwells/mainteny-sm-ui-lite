@@ -3,9 +3,7 @@ import Box from '@mui/material/Box';
 import {
   useServiceOrderActivities,
   useServiceOrderArticles,
-  useServiceOrderDetails,
 } from 'hooks/reactQuery/useServiceOrder';
-import {Progress} from 'components/Progress';
 import {PageCard} from 'components/PageCard';
 
 import useTheme from '@mui/material/styles/useTheme';
@@ -15,6 +13,7 @@ import ComputerIcon from '@mui/icons-material/Computer';
 import PersonIcon from '@mui/icons-material/Person';
 import {olStyles} from 'styles';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {ServiceOrderView} from 'models/service-order';
 import {OrderInfoCard} from './OrderInfoCard';
 import {Quotation} from './Quotations';
 import {Invoices} from './Invoices';
@@ -22,7 +21,7 @@ import {Articles} from './Articles';
 import {Description} from './Description';
 
 interface Props {
-  orderId?: string;
+  serviceOrder: ServiceOrderView;
 }
 
 export const serviceOrderActivitiesLang: {[key: string]: string} = {
@@ -30,15 +29,14 @@ export const serviceOrderActivitiesLang: {[key: string]: string} = {
   DE: 'DE_DE',
 };
 
-export const Overview = ({orderId}: Props) => {
+export const Overview = ({serviceOrder}: Props) => {
   const theme = useTheme();
 
   const formatDate = useFormatDate();
-  const {data: serviceOrderDetails, isLoading} =
-    useServiceOrderDetails(orderId);
-  const {data: serviceOrderActivities = []} =
-    useServiceOrderActivities(orderId);
-  const {data: serviceOrderArticles} = useServiceOrderArticles(orderId);
+  const {data: serviceOrderActivities = []} = useServiceOrderActivities(
+    serviceOrder.id,
+  );
+  const {data: serviceOrderArticles} = useServiceOrderArticles(serviceOrder.id);
 
   const iconType = (icon: string) => {
     switch (icon) {
@@ -50,10 +48,6 @@ export const Overview = ({orderId}: Props) => {
         return null;
     }
   };
-
-  if (isLoading) {
-    return <Progress />;
-  }
 
   return (
     <Grid
@@ -80,28 +74,28 @@ export const Overview = ({orderId}: Props) => {
             flexDirection: 'column',
           }}>
           <Box>
-            <OrderInfoCard serviceOrderDetails={serviceOrderDetails!} />
+            <OrderInfoCard serviceOrderDetails={serviceOrder!} />
           </Box>
           <Box mt="1em" flexGrow={1}>
             <Description
-              content={serviceOrderDetails?.description}
-              serviceOrderId={serviceOrderDetails?.id}
+              content={serviceOrder?.description}
+              serviceOrderId={serviceOrder?.id}
             />
           </Box>
 
           <Box mt="1em" flexGrow={1}>
             <Articles
               serviceOrderArticles={serviceOrderArticles}
-              serviceOrderId={serviceOrderDetails?.id}
+              serviceOrderId={serviceOrder?.id}
             />
           </Box>
 
           <Box mt="1em" flexGrow={1}>
-            <Invoices serviceOrderId={serviceOrderDetails?.id} />
+            <Invoices serviceOrderId={serviceOrder?.id} />
           </Box>
 
           <Box mt="1em" flexGrow={1}>
-            <Quotation serviceOrder={serviceOrderDetails} />
+            <Quotation serviceOrder={serviceOrder} />
           </Box>
         </Box>
       </Grid>

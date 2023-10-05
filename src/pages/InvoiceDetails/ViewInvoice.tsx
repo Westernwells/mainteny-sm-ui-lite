@@ -20,7 +20,6 @@ import {PDFContainer} from 'components/PDFContainer';
 import {FormLabel} from 'components/form/FormLabel';
 import {EmptySection} from 'components/EmptySection';
 import {InvoiceActivityView, InvoiceStatus, InvoiceView} from 'models/invoice';
-import {ServiceOrderReportView} from 'models/service-order';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {PdfGenerationStatus} from 'models/misc';
 import {formatGrossAmount} from 'utils/currency';
@@ -48,7 +47,6 @@ import {InvoiceActivities} from './InvoiceActivities';
 interface Props {
   downloadUrl: string;
   invoice: InvoiceView;
-  workReport: ServiceOrderReportView;
   invoiceActivities: InvoiceActivityView[];
   isLoadingDownloadUrl: boolean;
 }
@@ -56,7 +54,6 @@ interface Props {
 export const ViewInvoice = ({
   downloadUrl,
   invoice,
-  workReport,
   invoiceActivities,
   isLoadingDownloadUrl,
 }: Props) => {
@@ -79,8 +76,9 @@ export const ViewInvoice = ({
   const isInvoicePDFGenerated =
     invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
     downloadUrl;
+  const serviceOrder = invoice?.serviceOrder;
   const isWorkReportPDFGenerated = invoice?.additionalInfo?.includeWorkReport
-    ? workReport?.additionalInfo?.pdfGenerationStatus ===
+    ? serviceOrder?.report?.additionalInfo?.pdfGenerationStatus ===
       PdfGenerationStatus.DONE
     : true;
   const isPDFsGenerated = !!isWorkReportPDFGenerated && isInvoicePDFGenerated;
@@ -261,7 +259,7 @@ export const ViewInvoice = ({
           )}
         </Grid>
         <Grid item xs sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
-          {!!invoice.serviceOrder && (
+          {!!serviceOrder && (
             <PageCard
               headerLabel="Service Job"
               contentContainerStyles={{
@@ -282,55 +280,51 @@ export const ViewInvoice = ({
                 px: '1rem',
               }}
               handleAction={() =>
-                navigate(`/orders/details/${invoice.serviceOrder?.id}`)
+                navigate(`/orders/details/${serviceOrder?.id}`)
               }>
               <Box>
                 <Box sx={{float: 'right'}}>
-                  {invoice.serviceOrder && (
+                  {serviceOrder && (
                     <StatusChip
-                      color={getServiceOrderStatusColor(
-                        invoice.serviceOrder.status,
-                      )}
-                      label={serviceOrderStatusToString(
-                        invoice.serviceOrder.status,
-                      )}
+                      color={getServiceOrderStatusColor(serviceOrder.status)}
+                      label={serviceOrderStatusToString(serviceOrder.status)}
                       size="small"
                     />
                   )}
                 </Box>
                 <FormLabel text="Order Number" sx={{color: 'text.main'}} />
                 <Typography variant="caption" component="div">
-                  {invoice.serviceOrder?.number}
+                  {serviceOrder?.number}
                 </Typography>
-                {invoice.serviceOrder && (
+                {serviceOrder && (
                   <Typography
                     variant="caption"
                     sx={{color: 'text.secondary'}}
                     display="block"
                     mt="-0.25rem">
                     {`${t('Created on')} ${formatDate(
-                      invoice.serviceOrder.meta.createdAt,
+                      serviceOrder.meta.createdAt,
                     )}`}
                   </Typography>
                 )}
                 <Box display="flex" alignItems="center" gap=".2em" mt="1em">
                   <ServiceOrderIcons
-                    serviceOrderType={invoice.serviceOrder?.type}
+                    serviceOrderType={serviceOrder?.type}
                     size="small"
                   />
                   <ServiceOrderTypeText
-                    serviceOrderType={invoice.serviceOrder?.type}
+                    serviceOrderType={serviceOrder?.type}
                     capitalizeText
                   />
                 </Box>
                 <Typography variant="caption">
-                  {invoice.serviceOrder?.description}
+                  {serviceOrder?.description}
                 </Typography>
               </Box>
             </PageCard>
           )}
 
-          {workReport && (
+          {serviceOrder?.report && (
             <PageCard
               headerLabel={t('Work Report')}
               headerStyles={{
@@ -345,12 +339,12 @@ export const ViewInvoice = ({
                 />
               }
               handleAction={() =>
-                navigate(`/orders/details/${workReport.serviceOrder?.id}?tab=1`)
+                navigate(`/orders/details/${serviceOrder?.id}?tab=1`)
               }>
               <Typography variant="body1">
-                {!!workReport.serviceOrder.actualStartTime &&
-                  `${formatDate(workReport.serviceOrder.actualStartTime)}: `}
-                {workReport.description || '-'}
+                {!!serviceOrder.actualStartTime &&
+                  `${formatDate(serviceOrder.actualStartTime)}: `}
+                {serviceOrder.report?.description ?? '-'}
               </Typography>
             </PageCard>
           )}

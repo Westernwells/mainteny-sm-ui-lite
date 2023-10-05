@@ -54,7 +54,6 @@ export const PageLayout = ({
       ) {
         [
           queryKeys.queryServiceOrders,
-          queryKeys.fetchServiceOrderWorkReport,
           queryKeys.queryDueServiceOrders,
           queryKeys.getServiceOrderDetails,
           queryKeys.fetchServiceOrderChecklist,

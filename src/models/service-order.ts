@@ -137,6 +137,7 @@ export interface ServiceOrderView {
   labels: string[];
   search: string;
   meta: Meta;
+  report?: ServiceOrderReportView;
   additionalInfo: ServiceOrderAdditionalInfo;
 }
 
@@ -302,6 +303,7 @@ export interface ServiceOrderReportSignatureView {
 export interface ServiceOrderReportView {
   number: string;
   actualServiceTime: number;
+  actualTravelTime?: number;
   additionalInfo: ServiceOrderReportAdditionalInfo;
   attachments: ServiceOrderReportAttachmentView[];
   description: string;

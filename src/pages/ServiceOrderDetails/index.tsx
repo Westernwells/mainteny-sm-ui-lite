@@ -5,8 +5,9 @@ import FactCheck from '@mui/icons-material/FactCheck';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
+import {Progress} from 'components/Progress';
 import {PdfGenerationStatus} from 'models/misc';
-import {useServiceOrderReport} from 'hooks/reactQuery/useServiceOrder';
+import {useServiceOrderDetails} from 'hooks/reactQuery/useServiceOrder';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useParams, useSearchParams} from 'react-router-dom';
 import {formatSearchParams} from 'utils/utils';
@@ -33,22 +34,22 @@ export const ServiceOrderDetails = () => {
   const [tabValue, setTabValue] = useState(0);
   const {id: serviceOrderId} = useParams();
   const [queryParams, setQueryParams] = useSearchParams();
-  const {data: serviceOrderReportSource} = useServiceOrderReport({
-    serviceOrderId: typeof serviceOrderId === 'string' ? serviceOrderId : [],
-  });
-
-  const workReport = serviceOrderReportSource?.[0];
+  const {data: serviceOrder, isLoading} =
+    useServiceOrderDetails(serviceOrderId);
 
   const isWorkReportPdfGenerated =
-    workReport?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE;
+    serviceOrder?.report?.additionalInfo.pdfGenerationStatus ===
+    PdfGenerationStatus.DONE;
 
   const {data: workReportPdfDownloadUrl = {}} = useDownloadUrl(
-    isWorkReportPdfGenerated ? [workReport!.additionalInfo.pdfPath] : [],
+    isWorkReportPdfGenerated
+      ? [serviceOrder?.report!.additionalInfo.pdfPath]
+      : [],
   );
 
   const downloadWorkReport = () => {
     const url = isWorkReportPdfGenerated
-      ? workReport!.additionalInfo.pdfPath
+      ? serviceOrder?.report!.additionalInfo.pdfPath
       : '';
     window.open(workReportPdfDownloadUrl[url], '_blank');
   };
@@ -57,6 +58,10 @@ export const ServiceOrderDetails = () => {
     const currentParams = Object.fromEntries([...queryParams]);
     if (currentParams.tab) setTabValue(Number(currentParams.tab));
   }, []);
+
+  if (isLoading) {
+    return <Progress />;
+  }
 
   return (
     <Tabs
@@ -76,11 +81,11 @@ export const ServiceOrderDetails = () => {
         setTabValue(index);
       }}>
       <TabsBody value={tabValue} index={0} containerStyle={{height: 2}}>
-        <Overview orderId={serviceOrderId} />
+        <Overview serviceOrder={serviceOrder!} />
       </TabsBody>
       <TabsBody value={tabValue} index={1}>
         <WorkReport
-          orderId={serviceOrderId}
+          serviceOrder={serviceOrder!}
           downloadWorkReport={
             isWorkReportPdfGenerated ? downloadWorkReport : null
           }
@@ -90,7 +95,7 @@ export const ServiceOrderDetails = () => {
         value={tabValue}
         index={2}
         containerStyle={{height: '1px', overflow: 'auto'}}>
-        <CheckList orderId={serviceOrderId} />
+        <CheckList serviceOrder={serviceOrder!} />
       </TabsBody>
     </Tabs>
   );

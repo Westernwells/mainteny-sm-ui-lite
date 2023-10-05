@@ -12,13 +12,8 @@ import {FormLabel} from 'components/form/FormLabel';
 import {
   useCompleteServiceOrder,
   usePublishWorkReport,
-  useServiceOrderReport,
 } from 'hooks/reactQuery/useServiceOrder';
-import {
-  ServiceOrderArticleView,
-  ServiceOrderReportView,
-} from 'models/service-order';
-import {Progress} from 'components/Progress';
+import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
 import {PageCard} from 'components/PageCard';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {Button} from 'components/Button';
@@ -34,38 +29,28 @@ import {ArticleItemsTable} from './ArticleItemsTable';
 import {Pictures} from './Pictures';
 
 interface Props {
-  orderId?: string;
+  serviceOrder: ServiceOrderView;
   downloadWorkReport: (() => void) | null;
 }
 
-export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
+export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
-  const {
-    data: serviceOrderReportSource,
-    isFetched,
-    isIdle,
-    isLoading,
-  } = useServiceOrderReport({
-    serviceOrderId: typeof orderId === 'string' ? orderId : [],
-  });
 
   const [items, setItems] = useState<ServiceOrderArticleView[]>([]);
-  const [report, setReport] = useState<ServiceOrderReportView>();
+  const report = serviceOrder?.report;
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const {mutate: publishWorkReport, isLoading: publishingWorkReport} =
     usePublishWorkReport();
-  const [signatureKeys, setSignatureKeys] = useState<{[key: string]: string}>(
-    {},
-  );
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+  const signatureKeys = {
+    CUSTOMER: `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/report/CUSTOMER.png`,
+    TECHNICIAN: `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/report/TECHNICIAN.png`,
+  };
 
   const {data: downloadUrls = {}} = useDownloadUrl(
-    serviceOrderReportSource && serviceOrderReportSource.length
-      ? serviceOrderReportSource[0].signatures.map(
-          (item) => item.fileResource.uri,
-        )
-      : [],
-    {enabled: !!(serviceOrderReportSource && serviceOrderReportSource.length)},
+    report?.signatures?.map((item) => item.fileResource.uri) ?? [],
+    {enabled: !!report?.signatures?.length},
   );
 
   const {mutate: completeServiceOrder, isLoading: updatingServiceOrder} =
@@ -80,7 +65,7 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
     },
     onSubmit: (values) => {
       completeServiceOrder({
-        serviceOrderId: report?.serviceOrder.id ?? '',
+        serviceOrderId: serviceOrder.id ?? '',
         body: {
           description: values.description,
           articles: items.map((i) => ({
@@ -96,27 +81,10 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
   });
 
   useEffect(() => {
-    if (serviceOrderReportSource && serviceOrderReportSource.length) {
-      const serviceCompanyId = user?.userAccount.serviceCompany.id;
-      const serviceOrderId = serviceOrderReportSource[0].serviceOrder.id;
-      const keys = {
-        CUSTOMER: `${serviceCompanyId}/serviceOrders/${serviceOrderId}/report/CUSTOMER.png`,
-        TECHNICIAN: `${serviceCompanyId}/serviceOrders/${serviceOrderId}/report/TECHNICIAN.png`,
-      };
-      setSignatureKeys(keys);
-    }
-  }, [isFetched]);
-
-  useEffect(() => {
-    if (serviceOrderReportSource?.length)
-      setReport(serviceOrderReportSource[0]);
-  }, [serviceOrderReportSource]);
-
-  useEffect(() => {
     if (report) {
       let temp: ServiceOrderArticleView[] = [];
-      if (report.serviceOrder && 'articles' in report.serviceOrder) {
-        temp = report ? report.serviceOrder.articles : [];
+      if ('articles' in serviceOrder) {
+        temp = serviceOrder.articles;
       }
       setItems(temp);
       formik.resetForm({
@@ -131,18 +99,6 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
     }
   }, [items]);
 
-  if (isIdle || isLoading) {
-    return (
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        flexGrow={1}>
-        <Progress height="100%" />
-      </Box>
-    );
-  }
-
   if (!report) {
     return (
       <PageCard containerStyles={{py: '3em'}}>
@@ -155,9 +111,9 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
     <Box width="min(calc(1240px + 1.25em), 100%)" mx="auto">
       <ReportCard
         date={report.meta.createdAt}
-        type={report.serviceOrder.type}
-        number={report.serviceOrder.number}
-        status={report.serviceOrder.status}
+        type={serviceOrder.type}
+        number={serviceOrder.number}
+        status={serviceOrder.status}
       />
       <A4Layout>
         <Box display="flex" mt="1em" gap="2em">
@@ -167,30 +123,26 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
               label="Customer Details"
               buttonText=""
               cardHeader={
-                report && (
-                  <Typography variant="body2">
-                    {report.elevator.propertyOwner.name}
-                  </Typography>
-                )
+                <Typography variant="body2">
+                  {serviceOrder.elevator.propertyOwner.name}
+                </Typography>
               }
               cardBody={
-                report && (
-                  <>
-                    <Typography variant="caption">
-                      {report.elevator.propertyOwner.billingAddress?.fullName ??
-                        '-'}
-                    </Typography>
-                    <Typography variant="caption" component="p">
-                      {report.elevator.propertyOwner.contact.phone}
-                    </Typography>
-                    <Typography variant="subtitle2" component="p">
-                      {t('Customer Number')}
-                    </Typography>
-                    <Typography variant="caption" component="p">
-                      {report.elevator.propertyOwner.externalId || '-'}
-                    </Typography>
-                  </>
-                )
+                <>
+                  <Typography variant="caption">
+                    {serviceOrder.elevator.propertyOwner.billingAddress
+                      ?.fullName ?? '-'}
+                  </Typography>
+                  <Typography variant="caption" component="p">
+                    {serviceOrder.elevator.propertyOwner.contact.phone}
+                  </Typography>
+                  <Typography variant="subtitle2" component="p">
+                    {t('Customer Number')}
+                  </Typography>
+                  <Typography variant="caption" component="p">
+                    {serviceOrder.elevator.propertyOwner.externalId || '-'}
+                  </Typography>
+                </>
               }
               modalHeader=""
               modalBody={null}
@@ -200,26 +152,22 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
               label="Unit Details"
               buttonText=""
               cardHeader={
-                report && (
-                  <Typography variant="body2">
-                    {report.elevator.model}
-                  </Typography>
-                )
+                <Typography variant="body2">
+                  {serviceOrder.elevator.model}
+                </Typography>
               }
               cardBody={
-                report && (
-                  <>
-                    <Typography variant="caption">
-                      {report.elevator.address.fullName}
-                    </Typography>
-                    <Typography variant="subtitle2" component="p">
-                      {t('Unit Number')}
-                    </Typography>
-                    <Typography variant="caption" component="p">
-                      {report.elevator.externalId || '-'}
-                    </Typography>
-                  </>
-                )
+                <>
+                  <Typography variant="caption">
+                    {serviceOrder.elevator.address.fullName}
+                  </Typography>
+                  <Typography variant="subtitle2" component="p">
+                    {t('Unit Number')}
+                  </Typography>
+                  <Typography variant="caption" component="p">
+                    {serviceOrder.elevator.externalId || '-'}
+                  </Typography>
+                </>
               }
               modalHeader=""
               modalBody={null}
@@ -239,18 +187,18 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
                 },
                 {
                   label: 'Order ID',
-                  value: report.serviceOrder.number,
+                  value: serviceOrder.number,
                 },
                 {
                   label: 'Technician',
                   value:
-                    report.serviceOrder.schedules.length &&
-                    `${report.serviceOrder.schedules[0].technician.userAccount.firstName} ${report.serviceOrder.schedules[0].technician.userAccount.lastName}`,
+                    serviceOrder.schedules.length &&
+                    `${serviceOrder.schedules[0].technician.userAccount.firstName} ${serviceOrder.schedules[0].technician.userAccount.lastName}`,
                 },
                 {
                   label: 'Status',
                   value: `${t(
-                    serviceOrderStatusToString(report.serviceOrder.status),
+                    serviceOrderStatusToString(serviceOrder.status),
                   )}`,
                 },
               ].map((i) => (
@@ -261,7 +209,7 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
               ))}
           </Box>
         </Box>
-        <Maintenance serviceReport={report} />
+        <Maintenance serviceOrder={serviceOrder} />
 
         <ArticleItemsTable items={formik.values.items} setItems={setItems} />
 
@@ -288,14 +236,14 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
           <FormLabel text="Signature" />
           <Box display="flex" justifyContent="space-between">
             <Signature
-              name={report.elevator.propertyOwner.name}
+              name={serviceOrder.elevator.propertyOwner.name}
               designation="Customer"
               url={downloadUrls[signatureKeys.CUSTOMER]}
             />
             <Signature
               name={
-                report.serviceOrder.schedules.length
-                  ? `${report.serviceOrder.schedules[0].technician.userAccount.firstName} ${report.serviceOrder.schedules[0].technician.userAccount.lastName}`
+                serviceOrder.schedules.length
+                  ? `${serviceOrder.schedules[0].technician.userAccount.firstName} ${serviceOrder.schedules[0].technician.userAccount.lastName}`
                   : '-'
               }
               designation="Technician"
@@ -344,15 +292,15 @@ export const WorkReport = ({orderId, downloadWorkReport}: Props) => {
         title="Send work report"
         confirmBtnLabel="Send Work Report"
         email={
-          report.elevator.propertyOwner?.additionalInfo.billingEmail ||
-          report.elevator.propertyOwner?.contact.email
+          serviceOrder.elevator.propertyOwner?.additionalInfo.billingEmail ||
+          serviceOrder.elevator.propertyOwner?.contact.email
         }
         subject=""
         content={formik.values.description}
         callback={(emailRecord) => {
           publishWorkReport(
             {
-              id: orderId!,
+              id: serviceOrder.id,
               body: {
                 email: emailRecord.email,
                 subject: emailRecord.subject,

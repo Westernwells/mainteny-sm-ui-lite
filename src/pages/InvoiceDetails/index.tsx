@@ -5,7 +5,6 @@ import {
 } from 'hooks/reactQuery/useInvoice';
 import {useParams} from 'react-router-dom';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {useServiceOrderWorkReport} from 'hooks/reactQuery/useServiceOrder';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {LanguageContext} from 'context/LanguageProvider';
@@ -29,12 +28,6 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
   const {data: invoiceActivities, isLoading: isLoadingInvoiceActivities} =
     useInvoiceActivities({invoiceId: invoiceId ?? ''});
   const {language} = useContext(LanguageContext);
-  const {data: workReport, isLoading: isLoadingWorkReport} =
-    useServiceOrderWorkReport(invoice?.serviceOrder?.id ?? '', {
-      useErrorBoundary: false,
-      retry: false,
-      enabled: !!invoice?.serviceOrder?.additionalInfo?.workReportGenerated,
-    });
 
   const {data: downloadUrl, isLoading: isLoadingDownloadUrl} = useDownloadUrl(
     isFetched ? [invoice!.additionalInfo.pdfPath] : [],
@@ -61,14 +54,13 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
     };
   }, [invoice]);
 
-  if (isLoading || isLoadingWorkReport || isLoadingInvoiceActivities) {
+  if (isLoading || isLoadingInvoiceActivities) {
     return <Progress />;
   }
   return isFetched && invoice ? (
     <ViewInvoice
       downloadUrl={downloadUrl ? Object.values(downloadUrl)[0] : ''}
       invoice={invoice}
-      workReport={workReport!}
       invoiceActivities={invoiceActivities!}
       isLoadingDownloadUrl={isLoadingDownloadUrl}
     />

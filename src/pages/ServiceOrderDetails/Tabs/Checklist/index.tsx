@@ -16,7 +16,6 @@ import {Button} from 'components/Button';
 import {
   usePublishChecklist,
   useServiceOrderCheckList,
-  useServiceOrderDetails,
   useUpdateServiceOrderCheckListAnswers,
 } from 'hooks/reactQuery/useServiceOrder';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
@@ -28,7 +27,7 @@ import {
 } from 'utils/service-order-utils';
 import {grey} from '@mui/material/colors';
 import {FormCheckbox} from 'components/form/FormCheckbox';
-import {ChecklistStatus, ServiceOrderStatus} from 'models/service-order';
+import {ChecklistStatus, ServiceOrderView} from 'models/service-order';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {PdfGenerationStatus} from 'models/misc';
 import {SendEmailDialog} from 'components/SendEmailDialog';
@@ -50,44 +49,42 @@ const EmptyCheckList = () => (
 );
 
 interface Props {
-  orderId?: string;
+  serviceOrder: ServiceOrderView;
 }
 
 interface FormikValues {
   checkListAnswers: CheckListQuestion[];
 }
 
-export const CheckList = ({orderId}: Props) => {
+export const CheckList = ({serviceOrder}: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const {mutate: updateServiceOrderCheckListAnswers} =
     useUpdateServiceOrderCheckListAnswers();
 
-  const {data: serviceOrderDetails, isLoading: isLoadingServiceOrder} =
-    useServiceOrderDetails(orderId);
-
   const {mutateAsync: publishCheckList, isLoading: publishingCheckList} =
     usePublishChecklist();
 
   const {data: serviceOrderCheckList, isLoading: isLoadingCheckList} =
     useServiceOrderCheckList(
-      serviceOrderDetails?.additionalInfo.checkListInfo?.checkListId && orderId,
+      serviceOrder?.additionalInfo.checkListInfo?.checkListId &&
+        serviceOrder.id,
     );
   const isPdfGenerated = useRef(
-    serviceOrderDetails?.additionalInfo.checkListInfo?.pdfGenerationStatus ===
+    serviceOrder?.additionalInfo.checkListInfo?.pdfGenerationStatus ===
       PdfGenerationStatus.DONE,
   ).current;
 
   const {data: pdfDownloadUrl = {}} = useDownloadUrl(
-    isPdfGenerated && serviceOrderDetails!.additionalInfo.checkListInfo
-      ? [serviceOrderDetails!.additionalInfo.checkListInfo?.pdfPath]
+    isPdfGenerated && serviceOrder!.additionalInfo.checkListInfo
+      ? [serviceOrder!.additionalInfo.checkListInfo?.pdfPath]
       : [],
   );
 
   const {data: signatureDownloadUrls = {}} = useDownloadUrl(
-    serviceOrderDetails?.additionalInfo.checkListInfo?.checkListId
-      ? [serviceOrderDetails.additionalInfo.checkListInfo.technicianSignature]
+    serviceOrder?.additionalInfo.checkListInfo?.checkListId
+      ? [serviceOrder.additionalInfo.checkListInfo.technicianSignature]
       : [],
   );
 
@@ -97,7 +94,7 @@ export const CheckList = ({orderId}: Props) => {
     },
     onSubmit: async (values: FormikValues) => {
       await updateServiceOrderCheckListAnswers({
-        serviceOrderId: orderId || '',
+        serviceOrderId: serviceOrder.id || '',
         body: values.checkListAnswers.map((q) => ({
           questionId: q.id,
           answer: q.question,
@@ -120,7 +117,7 @@ export const CheckList = ({orderId}: Props) => {
   }, [serviceOrderCheckList]);
 
   const technicianUserAccount =
-    serviceOrderDetails?.schedules?.[0]?.technician?.userAccount;
+    serviceOrder?.schedules?.[0]?.technician?.userAccount;
   const technicianName = technicianUserAccount
     ? `${technicianUserAccount.firstName} ${technicianUserAccount.lastName}`
     : '';
@@ -177,21 +174,21 @@ export const CheckList = ({orderId}: Props) => {
 
   const signaturePath = useMemo(
     () =>
-      serviceOrderDetails &&
-      serviceOrderDetails.additionalInfo.checkListInfo &&
+      serviceOrder &&
+      serviceOrder.additionalInfo.checkListInfo &&
       signatureDownloadUrls[
-        serviceOrderDetails.additionalInfo.checkListInfo.technicianSignature
+        serviceOrder.additionalInfo.checkListInfo.technicianSignature
       ],
-    [serviceOrderDetails, signatureDownloadUrls],
+    [serviceOrder, signatureDownloadUrls],
   );
 
-  if (isLoadingServiceOrder || isLoadingCheckList) {
+  if (isLoadingCheckList) {
     return <Progress />;
   }
 
   if (
-    !serviceOrderDetails?.additionalInfo.checkListInfo?.checkListId ||
-    serviceOrderDetails?.additionalInfo.checkListInfo?.status !==
+    !serviceOrder?.additionalInfo.checkListInfo?.checkListId ||
+    serviceOrder?.additionalInfo.checkListInfo?.status !==
       ChecklistStatus.COMPLETED
   ) {
     return (
@@ -232,9 +229,7 @@ export const CheckList = ({orderId}: Props) => {
           }}>
           <Box>
             <FormLabel text="Date" sx={{color: theme.palette.text.primary}} />
-            <Typography variant="subtitle1">
-              {serviceOrderDetails.dueDate}
-            </Typography>
+            <Typography variant="subtitle1">{serviceOrder.dueDate}</Typography>
           </Box>
 
           <Box>
@@ -244,11 +239,11 @@ export const CheckList = ({orderId}: Props) => {
             />
             <Box display="flex" alignItems="flex-end" gap="0.5rem">
               <ServiceOrderIcons
-                serviceOrderType={serviceOrderDetails.type}
+                serviceOrderType={serviceOrder.type}
                 size="medium"
               />
               <ServiceOrderTypeText
-                serviceOrderType={serviceOrderDetails.type}
+                serviceOrderType={serviceOrder.type}
                 capitalizeText
                 variant="subtitle1"
               />
@@ -260,17 +255,15 @@ export const CheckList = ({orderId}: Props) => {
               text="Order ID"
               sx={{color: theme.palette.text.primary}}
             />
-            <Typography variant="subtitle1">
-              {serviceOrderDetails.number}
-            </Typography>
+            <Typography variant="subtitle1">{serviceOrder.number}</Typography>
           </Box>
 
           <Box>
             <FormLabel text="Status" sx={{color: theme.palette.text.primary}} />
             <Typography variant="subtitle1">
               <StatusChip
-                color={getServiceOrderStatusColor(serviceOrderDetails.status)}
-                label={serviceOrderStatusToString(serviceOrderDetails.status)}
+                color={getServiceOrderStatusColor(serviceOrder.status)}
+                label={serviceOrderStatusToString(serviceOrder.status)}
               />
             </Typography>
           </Box>
@@ -398,8 +391,7 @@ export const CheckList = ({orderId}: Props) => {
                   disabled: !isPdfGenerated,
                   onClick: () => {
                     const url = isPdfGenerated
-                      ? serviceOrderDetails!.additionalInfo.checkListInfo!
-                          .pdfPath
+                      ? serviceOrder!.additionalInfo.checkListInfo!.pdfPath
                       : '';
                     window.open(pdfDownloadUrl[url], '_blank');
                   },
@@ -431,15 +423,15 @@ export const CheckList = ({orderId}: Props) => {
               onClose={() => setIsSendEmailDialogOpen(false)}
               confirmBtnDisabled={publishingCheckList}
               email={
-                serviceOrderDetails.elevator.propertyOwner?.additionalInfo
+                serviceOrder.elevator.propertyOwner?.additionalInfo
                   .billingEmail ||
-                serviceOrderDetails.elevator.propertyOwner?.contact.email
+                serviceOrder.elevator.propertyOwner?.contact.email
               }
-              content={serviceOrderDetails.description}
+              content={serviceOrder.description}
               callback={async (emailRecord) => {
                 setIsSendEmailDialogOpen(false);
                 await publishCheckList({
-                  id: serviceOrderDetails!.id,
+                  id: serviceOrder!.id,
                   body: {
                     email: emailRecord.email,
                     subject: emailRecord.subject,
