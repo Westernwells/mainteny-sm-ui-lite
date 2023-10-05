@@ -11,14 +11,12 @@ import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {convertToMacro, convertToText} from 'utils/utils';
 import {UnitDetailsFormModel} from 'models/unitForm';
-import {ContractSimpleView} from 'models/contract';
 import {UnitDetailsSchema} from './UnitDetailsSchema';
 import {EditUnitDetailsForm} from './EditUnitDetailsForm';
 
 interface Props {
   containerStyles?: {[key: string]: any};
   elevator: ElevatorView;
-  validContract?: ContractSimpleView;
   propertyOwnerId?: string;
 }
 
@@ -36,7 +34,6 @@ export const UnitDetails = ({
   containerStyles,
   elevator,
   propertyOwnerId,
-  validContract,
 }: Props) => {
   const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
@@ -56,7 +53,6 @@ export const UnitDetails = ({
       model: elevator.model,
       serialNumber: elevator.serialNumber,
       unitCapacity: elevator.capacity,
-      spendingLimit: validContract?.spendingLimit,
       yearBuilt: elevator.additionalInfo.builtYear,
     },
     onSubmit: () => {},
@@ -112,7 +108,6 @@ export const UnitDetails = ({
       model: elevator.model,
       serialNumber: elevator.serialNumber,
       unitCapacity: elevator.capacity,
-      spendingLimit: validContract?.spendingLimit,
       yearBuilt: elevator.additionalInfo.builtYear,
       externalId: elevator.externalId,
     });
@@ -128,12 +123,7 @@ export const UnitDetails = ({
       <Grid container spacing={2}>
         {labels.map((label) => (
           <Grid key={label} item xs={12} sm={4} md={6}>
-            <UnitDetailsSchema
-              label={label}
-              elevator={elevator}
-              currency={validContract?.currency}
-              spendingLimit={validContract?.spendingLimit}
-            />
+            <UnitDetailsSchema label={label} elevator={elevator} />
           </Grid>
         ))}
       </Grid>
