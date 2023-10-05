@@ -262,22 +262,6 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
       <Grid item md={6}>
         <FormInput
           props={{
-            size: 'small',
-            placeholder: 'Enter Spending Limit',
-            label: 'Spending Limit',
-            name: 'spendingLimit',
-            error: !!formik.errors.spendingLimit,
-            value: formik.values.spendingLimit,
-            onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
-          }}
-          handleFocus={handleFocus}
-        />
-      </Grid>
-
-      <Grid item md={6}>
-        <FormInput
-          props={{
             name: 'yearBuilt',
             label: 'Year Built',
             placeholder: 'Enter year build',

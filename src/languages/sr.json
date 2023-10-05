@@ -1740,5 +1740,11 @@
   "BUSINESS ADDRESS": "POSLOVNA ADRESA",
   "External Id is required": "Potreban je spoljni ID",
   "{{time}} days": "{{time}} dana",
-  "{{time}} day": "{{time}} dan"
+  "{{time}} day": "{{time}} dan",
+  "Address not found": "Adresa nije pronađena",
+  "Total Amount (Excl VAT)": "Ukupan iznos (bez PDV-a)",
+  "Credit Note invoice": "Kredit faktura",
+  "Description updated successfully": "Opis je uspešno ažuriran",
+  "Enter discount value (in percentage)": "Unesite vrednost popusta (u procentima)",
+  "Discount": "Popust"
 }

@@ -77,7 +77,6 @@ export const NewUnit = () => {
       model: '',
       serialNumber: '',
       unitCapacity: '',
-      spendingLimit: undefined,
       emergencyContactNumber: '',
       yearBuilt: undefined,
       modelOfController: '',

@@ -46,11 +46,6 @@ export const UnitDetailsForm = ({
       )
       .required('Category is required'),
     unitType: Yup.string().nullable(),
-    externalId: Yup.string().test(
-      'externalId',
-      t('This ID is already taken. Please enter a different one.'),
-      (value) => !customerResource.some((item) => item.externalId === value),
-    ),
   });
 
   const formik = useFormik<UnitDetailsFormModel>({
@@ -65,7 +60,6 @@ export const UnitDetailsForm = ({
       model: initialValues?.model,
       serialNumber: initialValues?.serialNumber,
       unitCapacity: initialValues?.unitCapacity,
-      spendingLimit: initialValues?.spendingLimit,
       emergencyContactNumber: initialValues?.emergencyContactNumber,
       yearBuilt: initialValues?.yearBuilt,
       modelOfController: initialValues?.modelOfController,
@@ -218,6 +212,7 @@ export const UnitDetailsForm = ({
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
               }}
+              handleFocus={handleFocus}
             />
           </Grid>
 
@@ -331,23 +326,6 @@ export const UnitDetailsForm = ({
                 label: 'Cabin Type',
                 name: 'cabinType',
                 value: formik.values.cabinType,
-                onBlur: formik.handleBlur,
-                onChange: formik.handleChange,
-              }}
-              handleFocus={handleFocus}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={4} md={4}>
-            <FormInput
-              props={{
-                size: 'small',
-                disabled: true,
-                placeholder: 'Enter Spending Limit',
-                label: 'Spending Limit',
-                name: 'spendingLimit',
-                error: !!formik.errors.spendingLimit,
-                value: formik.values.spendingLimit,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
               }}
