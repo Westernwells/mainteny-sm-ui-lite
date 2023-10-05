@@ -273,7 +273,8 @@ export const InvoiceForm = ({
     billingAddress: invoice?.additionalInfo?.billingAddress,
     beneficiaryAddress: invoice?.additionalInfo?.beneficiaryAddress,
     alternativeAddress: invoice?.additionalInfo?.alternativeAddress,
-    externalId: invoice?.externalId ?? '',
+    externalId:
+      formType === 'new' ? companyNextNumber?.value : invoice?.externalId ?? '',
   };
 
   const validationSchema = Yup.object().shape({
@@ -405,10 +406,10 @@ export const InvoiceForm = ({
         'subject',
         t(
           `${customer?.name ?? serviceOrderCustomer?.name} - ${t(
-            'Invoice',
+            'Invoice for',
           )} {{invoiceNumber}}`,
           {
-            invoiceNumber: invoice?.number ?? '',
+            invoiceNumber: invoice?.externalId ?? '',
           },
         ),
         true,
