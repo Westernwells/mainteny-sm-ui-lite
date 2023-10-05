@@ -274,7 +274,7 @@ export const InvoiceForm = ({
     beneficiaryAddress: invoice?.additionalInfo?.beneficiaryAddress,
     alternativeAddress: invoice?.additionalInfo?.alternativeAddress,
     externalId:
-      formType === 'new' ? companyNextNumber?.value : invoice?.externalId && '',
+      formType === 'new' ? companyNextNumber?.value : invoice?.externalId ?? '',
   };
 
   const validationSchema = Yup.object().shape({
