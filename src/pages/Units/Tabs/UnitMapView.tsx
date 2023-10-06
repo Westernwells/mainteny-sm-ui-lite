@@ -16,12 +16,19 @@ import {Widget} from 'components/Widget';
 import {FlexContainer} from 'components/FlexContainer';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 export const UnitMapsView = () => {
   const formatDate = useFormatDate();
+  const {user} = useUserSession();
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const fallback = useRef({
     elevator: createEmptyResource<ElevatorView>(10),
-    centerCoord: {longitude: 13.390206, latitude: 52.535152},
+    centerCoord: {
+      longitude: company?.businessAddress?.location?.longitude ?? 13.390206,
+      latitude: company?.businessAddress?.location?.latitude ?? 52.535152,
+    },
   }).current;
   const mapRef = useRef<any>();
   const [lastVisitStart, setLastVisitStart] = useState<Date | null>(null);
