@@ -112,7 +112,7 @@ export const InvoiceForm = ({
   const formatDate = useFormatDate();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const [resetDueDatePicker, setResetDueDatePicker] = useState(false);
   const {user} = useUserSession();
   const percentageVat =
     user?.userAccount?.serviceCompany?.settings?.percentageVat ?? 0;
@@ -345,6 +345,7 @@ export const InvoiceForm = ({
       const futureDate = addDays(currentDate, dueDays);
 
       setDueDate(futureDate);
+      setResetDueDatePicker(true);
     }
   }, [serviceOrder]);
 
@@ -1067,6 +1068,12 @@ export const InvoiceForm = ({
                 <Box mt="2em" width="32ch">
                   <DatePicker
                     defaultDate={dueDate}
+                    reset={resetDueDatePicker}
+                    getReset={(_reset) => {
+                      if (_reset) {
+                        setResetDueDatePicker(false);
+                      }
+                    }}
                     minDate={new Date()}
                     getSelectedDate={(newValue) => {
                       if (newValue) setDueDate(newValue);
