@@ -856,6 +856,7 @@ export const InvoiceForm = ({
                   modalBody={
                     <ServiceOrdersDataGrid
                       setRowItem={handleSelectServiceOrder}
+                      selectedCustomer={customer}
                       searchCustomer={customer?.name}
                       propertyOwnerId={customer?.id ?? ''}
                     />
