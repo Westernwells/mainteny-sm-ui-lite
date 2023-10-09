@@ -48,6 +48,19 @@ export const SelectArticleType = ({
   const {t} = useTranslation();
   const theme = useTheme();
   const currentCurrency = useCurrentCurrency();
+
+  if (!formik.values.costPackage) {
+    formik.values.costPackage = {
+      labor: {
+        value: 0,
+        currency: 'EUR',
+      },
+      material: {
+        value: 0,
+        currency: 'EUR',
+      },
+    };
+  }
   return (
     <RadioGroup name="radio-buttons-group" sx={{pt: 1}}>
       <FormLabel
@@ -115,7 +128,10 @@ export const SelectArticleType = ({
                       }),
                       inputProps: {min: 0},
                       type: 'number',
-                      value: formik.values.costPackage?.labor.value,
+                      value:
+                        formik.values.costPackage?.labor.value === 0
+                          ? ''
+                          : formik.values.costPackage?.labor.value,
                       error: !!getIn(formik.errors, 'costPackage.labor.value'),
                       helperText: getIn(
                         formik.errors,
@@ -164,7 +180,10 @@ export const SelectArticleType = ({
                       }),
                       inputProps: {min: 0},
                       type: 'number',
-                      value: formik.values.costPackage?.material.value,
+                      value:
+                        formik.values.costPackage?.material.value === 0
+                          ? ''
+                          : formik.values.costPackage?.material.value,
                       error: !!getIn(
                         formik.errors,
                         'costPackage.material.value',
