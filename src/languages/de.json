@@ -1729,5 +1729,6 @@
   "Credit Note invoice": "Gutschrift",
   "Description updated successfully": "Beschreibung wurde erfolgreich aktualisiert",
   "Enter discount value (in percentage)": "Skonto eingeben (in Prozent)",
-  "Discount": "Skonto"
+  "Discount": "Skonto",
+  "Yearly Contract Price (excl. VAT, in {{currencySymbol}})": "Jährlicher Vertragspreis (ohne MwSt., in {{currencySymbol}})"
 }
