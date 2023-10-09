@@ -171,6 +171,8 @@ export const UnitMapsView = () => {
     lng: number,
     clusterId: number,
   ) => {
+    console.log('Clicked Cluster ID:', clusterId);
+    console.log(superCluster, 'superCluster');
     const expansionZoom = Math.min(
       superCluster.getClusterExpansionZoom(clusterId),
       20,
@@ -190,7 +192,7 @@ export const UnitMapsView = () => {
       textInput.current.value = '';
     }
   };
-
+  console.log(clusters, 'clusters');
   const renderFilterItems = () => (
     <FilterFields onClear={() => clearFilters()} wrapperStyle={{width: '90%'}}>
       <DatePicker
