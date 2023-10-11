@@ -155,11 +155,13 @@ export const ViewInvoice = ({
   };
 
   useEffect(() => {
+    let snackbarId: any;
+
     if (
       invoice?.additionalInfo.pdfGenerationStatus ===
       PdfGenerationStatus.RUNNING
     ) {
-      enqueueSnackbar(
+      snackbarId = enqueueSnackbar(
         <Box display="flex" padding="0em" margin="0em" alignItems="center">
           <img alt={t('Path Image')} src={PathImage} />{' '}
           <Typography margin="0em" paddingLeft="0.5em" variant="body2">
@@ -168,18 +170,17 @@ export const ViewInvoice = ({
         </Box>,
         {
           variant: 'info',
-          autoHideDuration: 8000,
+          autoHideDuration: null,
         },
       );
     }
 
-    if (
-      invoice?.additionalInfo.pdfGenerationStatus !==
-      PdfGenerationStatus.RUNNING
-    ) {
-      closeSnackbar();
-    }
-  }, [invoice]);
+    return () => {
+      if (snackbarId) {
+        closeSnackbar(snackbarId);
+      }
+    };
+  }, [invoice?.additionalInfo.pdfGenerationStatus]);
 
   return (
     <Box>
