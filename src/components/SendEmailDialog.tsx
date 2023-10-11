@@ -149,7 +149,7 @@ export const SendEmailDialog = ({
               onChange: formik.handleChange,
               multiline: true,
               minRows: 5,
-              maxRows: 5,
+              maxRows: 20,
             }}
           />
         </Box>
