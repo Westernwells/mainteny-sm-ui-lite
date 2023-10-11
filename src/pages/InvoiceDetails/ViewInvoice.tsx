@@ -155,7 +155,7 @@ export const ViewInvoice = ({
   };
 
   useEffect(() => {
-    let snackbarId: any;
+    let snackbarId: string | number;
 
     if (
       invoice?.additionalInfo.pdfGenerationStatus ===
