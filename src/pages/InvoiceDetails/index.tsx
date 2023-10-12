@@ -9,7 +9,6 @@ import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useTranslation} from 'react-i18next';
-import {PdfGenerationStatus} from 'models/misc';
 import {ViewInvoice} from './ViewInvoice';
 
 interface Props {
@@ -29,9 +28,11 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
     useInvoiceActivities({invoiceId: invoiceId ?? ''});
   const {language} = useContext(LanguageContext);
 
-  const {data: downloadUrl, isLoading: isLoadingDownloadUrl} = useDownloadUrl(
-    isFetched ? [invoice!.additionalInfo.pdfPath] : [],
-  );
+  const {
+    data: downloadUrl,
+    isLoading: isLoadingDownloadUrl,
+    refetch: refetchDownloadUrl,
+  } = useDownloadUrl(isFetched ? [invoice!.additionalInfo.pdfPath] : []);
 
   useLayoutEffect(() => {
     if (getCurrentPageTitle) {
@@ -40,21 +41,11 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
   }, [language]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      if (
-        invoice?.additionalInfo.pdfGenerationStatus ===
-        PdfGenerationStatus.RUNNING
-      ) {
-        refetch();
-      }
-    }, 3000);
+    refetch();
+    refetchDownloadUrl();
+  }, [invoice?.additionalInfo.pdfGenerationStatus]);
 
-    return () => {
-      clearInterval(timer);
-    };
-  }, [invoice]);
-
-  if (isLoading || isLoadingInvoiceActivities) {
+  if (isLoading || isLoadingInvoiceActivities || isLoadingDownloadUrl) {
     return <Progress />;
   }
   return isFetched && invoice ? (
