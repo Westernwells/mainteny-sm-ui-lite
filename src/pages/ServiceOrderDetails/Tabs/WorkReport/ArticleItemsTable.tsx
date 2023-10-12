@@ -43,10 +43,7 @@ export const ArticleItemsTable = ({
   };
 
   const handleSelectItem = (row: ArticleView) => {
-    if (items.filter((item) => item.article.id === row.id).length === 0) {
-      setItems([...items, articleViewToItem(row)]);
-    }
-
+    setItems([...items, articleViewToItem(row)]);
     setIsArticleModalOpen(false);
   };
 
