@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import {endOfYear, startOfYear} from 'date-fns';
 import Box from '@mui/material/Box';
@@ -14,12 +14,19 @@ import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
-import {NoRowsEmptySection} from './NoRowsEmptySection';
+import {
+  PropertyOwnerSimpleView,
+  PropertyOwnerView,
+} from 'models/propertyManager';
+import {EmptySection} from 'components/EmptySection';
+import {useTranslation} from 'react-i18next';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import {styles} from './style';
 
 interface Props {
   setRowItem: (row: ServiceOrderView) => void;
   searchCustomer?: string;
+  selectedCustomer?: PropertyOwnerView | PropertyOwnerSimpleView;
   elevatorId?: string;
   propertyOwnerId?: string;
 }
@@ -89,11 +96,13 @@ export const ServiceOrdersDataGrid = ({
   searchCustomer,
   elevatorId,
   propertyOwnerId,
+  selectedCustomer,
 }: Props) => {
   const [search, setSearch] = useState(searchCustomer || '');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
+  const {t} = useTranslation();
 
   const {
     data: serviceOrdersResource = createEmptyResource<ServiceOrderView>(
@@ -151,9 +160,35 @@ export const ServiceOrdersDataGrid = ({
             }))
           }
           noRowsEmptySection={
-            <NoRowsEmptySection
-              placeholder="service job"
-              action={() => window.open('/orders/new?type=regular', '_blank')}
+            <EmptySection
+              illustration="clipboard"
+              size="tiny"
+              containerStyle={{
+                width: '60%',
+                m: 'auto',
+                paddingTop: '50px',
+              }}
+              label={t('Add a unit and create your first job')}
+              subLabel={t(
+                "Once you have units for this customer, you'll be able to create jobs and generate invoices for them",
+              )}
+              showActionBtn
+              actionButtonIcon={<div />}
+              actionButtonEndIcon={<ArrowForwardIcon />}
+              btnLabel={t('Get Started')}
+              btnAction={() => {
+                if (selectedCustomer) {
+                  const localSelectedCustomer =
+                    selectedCustomer as PropertyOwnerView;
+
+                  if (localSelectedCustomer.unitNumber === 0) {
+                    window.open('/units/new', '_blank');
+                    return;
+                  }
+                }
+
+                window.open('/orders/new?type=regular', '_blank');
+              }}
             />
           }
         />

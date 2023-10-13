@@ -282,3 +282,19 @@ export interface InvoiceActivityView {
   additionalInfo: string;
   meta: Meta;
 }
+
+export interface MyInvoiceActivityView {
+  id: string;
+  type: InvoiceActivityType;
+  data: string;
+  text: string;
+  additionalInfo: string;
+  meta: Meta;
+  overdueNoticeId: string;
+  count: number;
+}
+
+export interface InvoiceActivityOverdueNoticeSentData {
+  email: string;
+  overdueNoticeId: string;
+}

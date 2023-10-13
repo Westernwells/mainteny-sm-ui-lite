@@ -27,6 +27,7 @@ interface Props extends BoxProps {
   btnLabel?: string;
   btnAction?: () => void;
   actionButtonIcon?: JSX.Element;
+  actionButtonEndIcon?: JSX.Element;
   subLabel?: string;
   subLabelProps?: TypographyProps;
 }
@@ -42,6 +43,7 @@ export const EmptySection = ({
   showActionBtn = false,
   btnAction,
   actionButtonIcon,
+  actionButtonEndIcon,
   subLabel = '',
   subLabelProps = {},
 }: Props) => {
@@ -102,6 +104,7 @@ export const EmptySection = ({
             variant: 'contained',
             size: 'medium',
             startIcon: actionButtonIcon || <AddIcon />,
+            endIcon: actionButtonEndIcon || null,
           }}>
           {t(btnLabel)}
         </Button>
