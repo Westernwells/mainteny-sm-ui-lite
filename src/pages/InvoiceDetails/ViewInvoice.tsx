@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import ReplayIcon from '@mui/icons-material/Replay';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import SendIcon from '@mui/icons-material/Send';
 import Print from '@mui/icons-material/Print';
 import Edit from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -90,11 +91,18 @@ export const ViewInvoice = ({
       (invoice.status === InvoiceStatus.DRAFT ||
         invoice.status === InvoiceStatus.EXPIRED)
     ) {
-      items.unshift({
-        label: t('Print'),
-        icon: <Print />,
-        onClick: () => setIsConfirmPrintDialogOpen(true),
-      });
+      items.unshift(
+        {
+          label: t('Send Overdue Notice'),
+          icon: <SendIcon />,
+          onClick: () => navigate(`/invoices/${invoice.id}/overdue-notice`),
+        },
+        {
+          label: t('Print'),
+          icon: <Print />,
+          onClick: () => setIsConfirmPrintDialogOpen(true),
+        },
+      );
     } else if (invoice.status === InvoiceStatus.NOT_PAID) {
       items.unshift({
         label: t('Resend'),
@@ -155,11 +163,13 @@ export const ViewInvoice = ({
   };
 
   useEffect(() => {
+    let snackbarId: string | number;
+
     if (
       invoice?.additionalInfo.pdfGenerationStatus ===
       PdfGenerationStatus.RUNNING
     ) {
-      enqueueSnackbar(
+      snackbarId = enqueueSnackbar(
         <Box display="flex" padding="0em" margin="0em" alignItems="center">
           <img alt={t('Path Image')} src={PathImage} />{' '}
           <Typography margin="0em" paddingLeft="0.5em" variant="body2">
@@ -168,18 +178,17 @@ export const ViewInvoice = ({
         </Box>,
         {
           variant: 'info',
-          autoHideDuration: 8000,
+          autoHideDuration: null,
         },
       );
     }
 
-    if (
-      invoice?.additionalInfo.pdfGenerationStatus !==
-      PdfGenerationStatus.RUNNING
-    ) {
-      closeSnackbar();
-    }
-  }, [invoice]);
+    return () => {
+      if (snackbarId) {
+        closeSnackbar(snackbarId);
+      }
+    };
+  }, [invoice?.additionalInfo.pdfGenerationStatus]);
 
   return (
     <Box>

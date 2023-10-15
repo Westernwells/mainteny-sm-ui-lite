@@ -58,7 +58,7 @@ export const EditBasicInfoForm = ({
   const externalIdInputProps = {
     size: 'small',
     placeholder: 'e.g 1234',
-    label: 'Contract Number',
+    label: 'Article Number',
     name: 'externalId',
     value: formik.values.externalId,
     helperText: formik.touched.externalId && formik.errors.externalId,

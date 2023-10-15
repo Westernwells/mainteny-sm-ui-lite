@@ -294,7 +294,7 @@ export const Router = () => {
           />
 
           <Route
-            path="/invoices/overdue-notice/:id"
+            path="/invoices/:id/overdue-notice"
             element={
               <>
                 <Helmet>

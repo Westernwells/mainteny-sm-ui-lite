@@ -152,9 +152,7 @@ export const ArticleItemsTable = ({
   };
 
   const handleSelectItem = (row: ArticleView) => {
-    if (items.filter((item) => item.articleId === row.id).length === 0) {
-      setItems([...items, articleViewToItem(row)]);
-    }
+    setItems([...items, articleViewToItem(row)]);
     setIsArticleModalOpen(false);
   };
 
@@ -486,20 +484,12 @@ export const ArticleItemsTable = ({
 
                       <Typography sx={{justifySelf: 'end'}}>
                         {isPartial
-                          ? formatCurrency(
-                              newPartialTotal,
-                              {
-                                currency: currentCurrency.code,
-                              },
-                              selectedLng,
-                            )
-                          : formatCurrency(
-                              totalPrice,
-                              {
-                                currency: currentCurrency.code,
-                              },
-                              selectedLng,
-                            )}
+                          ? formatCurrency(newPartialTotal, {
+                              currency: currentCurrency.code,
+                            })
+                          : formatCurrency(totalPrice, {
+                              currency: currentCurrency.code,
+                            })}
                       </Typography>
                     </>
                   )}
@@ -517,20 +507,12 @@ export const ArticleItemsTable = ({
 
                   <Typography>
                     {isPartial
-                      ? formatCurrency(
-                          partialPrice,
-                          {
-                            currency: currentCurrency.code,
-                          },
-                          selectedLng,
-                        )
-                      : formatCurrency(
-                          totalPrice,
-                          {
-                            currency: currentCurrency.code,
-                          },
-                          selectedLng,
-                        )}
+                      ? formatCurrency(partialPrice, {
+                          currency: currentCurrency.code,
+                        })
+                      : formatCurrency(totalPrice, {
+                          currency: currentCurrency.code,
+                        })}
                   </Typography>
                   <Box
                     sx={{
@@ -577,26 +559,18 @@ export const ArticleItemsTable = ({
                   </Box>
                   <Typography sx={{paddingTop: '0.75em'}}>
                     {isPartial
-                      ? formatCurrency(
-                          partialPrice * (percentageVat / 100),
-                          {
-                            currency: currentCurrency.code,
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                            roundingMode: 'floor',
-                          },
-                          selectedLng,
-                        )
-                      : formatCurrency(
-                          totalPrice * (percentageVat / 100),
-                          {
-                            currency: currentCurrency.code,
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                            roundingMode: 'floor',
-                          },
-                          selectedLng,
-                        )}
+                      ? formatCurrency(partialPrice * (percentageVat / 100), {
+                          currency: currentCurrency.code,
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                          roundingMode: 'floor',
+                        })
+                      : formatCurrency(totalPrice * (percentageVat / 100), {
+                          currency: currentCurrency.code,
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                          roundingMode: 'floor',
+                        })}
                   </Typography>
                 </Box>
                 <Box
@@ -625,18 +599,13 @@ export const ArticleItemsTable = ({
                             maximumFractionDigits: 2,
                             roundingMode: 'floor',
                           },
-                          selectedLng,
                         )
-                      : formatCurrency(
-                          totalPrice * (1 + percentageVat / 100),
-                          {
-                            currency: currentCurrency.code,
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                            roundingMode: 'floor',
-                          },
-                          selectedLng,
-                        )}
+                      : formatCurrency(totalPrice * (1 + percentageVat / 100), {
+                          currency: currentCurrency.code,
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                          roundingMode: 'floor',
+                        })}
                   </Typography>
                 </Box>
               </Box>
