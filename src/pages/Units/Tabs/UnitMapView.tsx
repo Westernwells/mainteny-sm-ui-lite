@@ -16,12 +16,19 @@ import {Widget} from 'components/Widget';
 import {FlexContainer} from 'components/FlexContainer';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 export const UnitMapsView = () => {
   const formatDate = useFormatDate();
+  const {user} = useUserSession();
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const fallback = useRef({
     elevator: createEmptyResource<ElevatorView>(10),
-    centerCoord: {longitude: 13.390206, latitude: 52.535152},
+    centerCoord: {
+      longitude: company?.businessAddress?.location?.longitude ?? 13.390206,
+      latitude: company?.businessAddress?.location?.latitude ?? 52.535152,
+    },
   }).current;
   const mapRef = useRef<any>();
   const [lastVisitStart, setLastVisitStart] = useState<Date | null>(null);
@@ -183,7 +190,6 @@ export const UnitMapsView = () => {
       textInput.current.value = '';
     }
   };
-
   const renderFilterItems = () => (
     <FilterFields onClear={() => clearFilters()} wrapperStyle={{width: '90%'}}>
       <DatePicker
@@ -294,14 +300,17 @@ export const UnitMapsView = () => {
           }
         }
         zoom={10}>
-        {clusters.map((cluster) => {
+        {clusters.map((cluster, index) => {
           const [longitude, latitude] = cluster.geometry.coordinates;
           const {cluster: isCluster, point_count: pointCount} =
             cluster.properties;
 
           if (isCluster) {
             return (
-              <LocationPin key={cluster.id} lat={latitude} lng={longitude}>
+              <LocationPin
+                key={`${cluster.id}-${index}`}
+                lat={latitude}
+                lng={longitude}>
                 <Box
                   onClick={() => {
                     if (supercluster) {
@@ -338,7 +347,7 @@ export const UnitMapsView = () => {
 
           return (
             <LocationPin
-              key={cluster.properties.elevator.address.id}
+              key={`${cluster.properties.elevator.address.id}-${index}`}
               elevator={cluster.properties.elevator}
               lat={cluster.properties.elevator.address.location.latitude}
               lng={cluster.properties.elevator.address.location.longitude}
