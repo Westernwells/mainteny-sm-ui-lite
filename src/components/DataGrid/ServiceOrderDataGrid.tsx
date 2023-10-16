@@ -34,7 +34,7 @@ interface Props {
 export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
-    headerName: 'order number',
+    headerName: 'job number',
   }),
   getColumnProps({
     field: 'customer',
@@ -50,7 +50,7 @@ export const columns: GridColDef[] = [
   }),
   getColumnProps({
     field: 'type',
-    headerName: 'order type',
+    headerName: 'job type',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <>
         <ServiceOrderIcons serviceOrderType={params.row.type} size="small" />
