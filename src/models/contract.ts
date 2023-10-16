@@ -128,6 +128,8 @@ export interface ContractView {
   search: string;
   meta: Meta;
   paymentTerm?: ContractPaymentTermView;
+  start: string;
+  end: string;
 }
 export interface ContractSimpleView {
   id: string;
@@ -277,6 +279,9 @@ export interface ContractUpdateRequest {
   paymentTermId?: string;
   description?: string;
   externalId?: string;
+  startDate: string;
+  endDate: string;
+  autoRenewalCancelled: boolean;
 }
 
 export interface ContractPaymentTermView {

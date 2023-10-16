@@ -287,7 +287,21 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       disableNextBtn={disableNextBtn}
       initialActiveStep={0}
       stepperStyles={{width: '80%'}}
-      getActiveStep={(val) => setActiveStep(val)}
+      getActiveStep={(val) => {
+        if (
+          val === 1 &&
+          !formikAddress.values.billingAddress?.component?.name
+        ) {
+          formikAddress.setFieldValue('billingAddress', {
+            ...formikAddress.values.billingAddress,
+            component: {
+              ...formikAddress.values.billingAddress?.component,
+              name: formikBasicInfo.values.name,
+            },
+          });
+        }
+        setActiveStep(val);
+      }}
       steps={steps}
       containerStyles={{
         flexGrow: 1,
