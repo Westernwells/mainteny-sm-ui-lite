@@ -171,8 +171,6 @@ export const UnitMapsView = () => {
     lng: number,
     clusterId: number,
   ) => {
-    console.log('Clicked Cluster ID:', clusterId);
-    console.log(superCluster, 'superCluster');
     const expansionZoom = Math.min(
       superCluster.getClusterExpansionZoom(clusterId),
       20,
@@ -192,7 +190,6 @@ export const UnitMapsView = () => {
       textInput.current.value = '';
     }
   };
-  console.log(clusters, 'clusters');
   const renderFilterItems = () => (
     <FilterFields onClear={() => clearFilters()} wrapperStyle={{width: '90%'}}>
       <DatePicker
@@ -303,14 +300,17 @@ export const UnitMapsView = () => {
           }
         }
         zoom={10}>
-        {clusters.map((cluster) => {
+        {clusters.map((cluster, index) => {
           const [longitude, latitude] = cluster.geometry.coordinates;
           const {cluster: isCluster, point_count: pointCount} =
             cluster.properties;
 
           if (isCluster) {
             return (
-              <LocationPin key={cluster.id} lat={latitude} lng={longitude}>
+              <LocationPin
+                key={`${cluster.id}-${index}`}
+                lat={latitude}
+                lng={longitude}>
                 <Box
                   onClick={() => {
                     if (supercluster) {
@@ -347,7 +347,7 @@ export const UnitMapsView = () => {
 
           return (
             <LocationPin
-              key={cluster.properties.elevator.address.id}
+              key={`${cluster.properties.elevator.address.id}-${index}`}
               elevator={cluster.properties.elevator}
               lat={cluster.properties.elevator.address.location.latitude}
               lng={cluster.properties.elevator.address.location.longitude}
