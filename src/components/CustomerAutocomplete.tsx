@@ -28,6 +28,12 @@ export const CustomerAutoComplete = ({
     initialValue,
   );
 
+  useEffect(() => {
+    if (!customer) {
+      setCustomer(initialValue);
+    }
+  }, [initialValue]);
+
   const {data: customerResource = createEmptyResource(10)} = useQueryCustomers({
     pageIndex: 0,
     pageSize: 6,
@@ -85,6 +91,7 @@ export const CustomerAutoComplete = ({
       }}
       getOptionLabel={(option) => option.name}
       onInputChange={onInputChange}
+      value={customer}
       inputValue={queryView}
       renderInput={(params) => (
         <FormInput

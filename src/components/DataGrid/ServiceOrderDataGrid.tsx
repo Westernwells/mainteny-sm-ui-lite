@@ -182,7 +182,10 @@ export const ServiceOrdersDataGrid = ({
                     selectedCustomer as PropertyOwnerView;
 
                   if (localSelectedCustomer.unitNumber === 0) {
-                    window.open('/units/new', '_blank');
+                    window.open(
+                      `/units/new?customer=${selectedCustomer.id}`,
+                      '_blank',
+                    );
                     return;
                   }
                 }

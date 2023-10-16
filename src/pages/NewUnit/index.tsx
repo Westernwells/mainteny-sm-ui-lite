@@ -15,9 +15,10 @@ import {
 } from 'models/unitForm';
 import {mapDaysOfWeekOptions} from 'pages/UnitDetails/Tabs/OverviewTab/AppointmentPreference/EditAppointmentForm';
 import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {convertToMacro} from 'utils/utils';
 import {createEmptyResource} from 'utils/paging-utils';
+import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {AppointmentPreferenceForm} from './AppointmentPreferenceForm';
 import {CustomerForm} from './CustomerForm';
 import {LocationForm} from './LocationForm/index';
@@ -36,15 +37,21 @@ export const NewUnit = () => {
   const formatDate = useFormatDate();
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
+  const [queryParams] = useSearchParams();
+  const {data} = useGetCustomer(queryParams.get('customer') || undefined);
 
   const [customerFormError, setCustomerFormError] = useState<
     FormikErrors<CustomerFormModel>
   >({});
   const [customerFormValues, setCustomerFormValues] =
     useState<CustomerFormModel>({
-      propertyOwnerId: '',
+      propertyOwnerId: queryParams.get('customer') || '',
     });
   const [customer, setCustomer] = useState<PropertyOwnerView>();
+
+  useEffect(() => {
+    setCustomer(data);
+  }, [data]);
 
   const {mutateAsync: addNewUnit, isLoading: isSubmitting} = useAddElevator(
     'Unit created successfully',
