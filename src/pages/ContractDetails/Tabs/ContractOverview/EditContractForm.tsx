@@ -292,7 +292,7 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
                 ...formik.values,
                 firstMaintenance: {
                   year: getYear(date),
-                  month: getMonth(date),
+                  month: getMonth(date) + 1,
                 },
               });
             }
