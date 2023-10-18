@@ -242,7 +242,7 @@ export const InvoiceForm = ({
   const initialValues: InvoiceFormData = {
     subject:
       invoice?.subject ||
-      t('Invoice {{invoiceNumber}} for Order {{orderNumber}}', {
+      t('Invoice {{invoiceNumber}} for Job {{orderNumber}}', {
         invoiceNumber: invoice?.number ?? '',
         orderNumber: serviceOrder?.number ?? '',
       }),
@@ -827,8 +827,8 @@ export const InvoiceForm = ({
 
                 <SelectCombined
                   selected={serviceOrder !== undefined}
-                  label="Order Number"
-                  buttonText="Select Order"
+                  label="Job Number"
+                  buttonText="Select Job"
                   cardHeader={
                     serviceOrder && (
                       <Typography variant="body2">
@@ -853,10 +853,11 @@ export const InvoiceForm = ({
                     )
                   }
                   cardOnClose={() => setServiceOrder(undefined)}
-                  modalHeader="Select Order"
+                  modalHeader="Select Job"
                   modalBody={
                     <ServiceOrdersDataGrid
                       setRowItem={handleSelectServiceOrder}
+                      selectedCustomer={customer}
                       searchCustomer={customer?.name}
                       propertyOwnerId={customer?.id ?? ''}
                     />

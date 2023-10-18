@@ -4,7 +4,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
-import {ReactNode} from 'react';
+import Box from '@mui/material/Box';
+import React, {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Button} from './Button';
 
@@ -17,6 +18,7 @@ interface Props {
   dialogProps: DialogProps;
   isSaving?: boolean;
   saveBtnType?: 'button' | 'submit' | 'reset';
+  leftButton?: React.ReactNode;
 }
 
 export const Dialog = ({
@@ -28,6 +30,7 @@ export const Dialog = ({
   dialogProps,
   saveBtnType,
   isSaving = false,
+  leftButton,
 }: Props) => {
   const {t} = useTranslation();
   return (
@@ -49,23 +52,32 @@ export const Dialog = ({
           {children}
         </DialogContentText>
       </DialogContent>
-      <DialogActions sx={{mt: '1.5em', padding: '0px 24px 20px 0px'}}>
-        <Button buttonProps={{onClick: onCancel, size: 'large'}}>
-          <Typography variant="subtitle2">{t('Cancel')}</Typography>
-        </Button>
-        <Button
-          buttonProps={{
-            size: 'large',
-            variant: 'contained',
-            onClick: onSave,
-            autoFocus: true,
-            disabled: disableSaveBtn || isSaving,
-            type: saveBtnType,
-          }}>
-          <Typography variant="subtitle2">
-            {isSaving ? `${t('Saving')}...` : t('Save')}
-          </Typography>
-        </Button>
+      <DialogActions
+        sx={{
+          mt: '1.5em',
+          padding: '0px 24px 20px 0px',
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}>
+        {leftButton}
+        <Box sx={{marginLeft: 'auto'}}>
+          <Button buttonProps={{onClick: onCancel, size: 'large'}}>
+            <Typography variant="subtitle2">{t('Cancel')}</Typography>
+          </Button>
+          <Button
+            buttonProps={{
+              size: 'large',
+              variant: 'contained',
+              onClick: onSave,
+              autoFocus: true,
+              disabled: disableSaveBtn || isSaving,
+              type: saveBtnType,
+            }}>
+            <Typography variant="subtitle2">
+              {isSaving ? `${t('Saving')}...` : t('Save')}
+            </Typography>
+          </Button>
+        </Box>
       </DialogActions>
     </MuiDialog>
   );

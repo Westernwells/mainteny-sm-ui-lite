@@ -22,15 +22,20 @@ import {format, getMonth, getYear} from 'date-fns';
 import {toDate} from 'utils/datetime';
 import {createEmptyResource} from 'utils/paging-utils';
 import AutoEditDropdown from 'components/AutoEditDropdown';
+import {Typography} from '@mui/material';
+import Alert from '@mui/material/Alert';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   formik: FormikProps<ContractUpdateRequest>;
   currency: string;
+  initialValues: ContractUpdateRequest;
 }
 
-const EditContractForm: FC<Props> = ({formik, currency}) => {
+const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
+  const formatDate = useFormatDate();
 
   const [openNewDialog, setOpenNewDialog] = useState<boolean>(false);
   const [activeField, setActiveField] = useState<string>('');
@@ -64,6 +69,10 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
     setInitId(formik.values.externalId);
   }, []);
 
+  useEffect(() => {
+    formik.setValues(initialValues);
+  }, [initialValues]);
+
   const externalIdInputProps = {
     size: 'small',
     placeholder: 'e.g 1234',
@@ -79,7 +88,23 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
   const currencySymbol = getCurrencySymbol[currency];
 
   return (
-    <Grid container spacing={2} sx={{mt: '0.5em'}}>
+    <Grid container spacing={1.8} sx={{mt: '0.1em'}}>
+      {formik.values.autoRenewalCancelled && (
+        <Grid item md={12}>
+          <Alert severity="error">
+            {t('This contract is ending on {{endDate}}', {
+              endDate: formatDate(formik.values.endDate),
+            })}
+          </Alert>
+        </Grid>
+      )}
+
+      <Grid item md={12} mb={0.5}>
+        <Typography variant="body2" color="textSecondary">
+          {t('General Information')}
+        </Typography>
+      </Grid>
+
       <Grid item md={6}>
         <FormSelect
           labelId="typeSelect-label"
@@ -127,6 +152,15 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
           }}
         />
       </Grid>
+
+      <Grid md={6} />
+
+      <Grid item md={12} marginY={0.5}>
+        <Typography variant="body2" color="textSecondary">
+          {t('Price Details')}
+        </Typography>
+      </Grid>
+
       <Grid item md={6}>
         <FormInput
           props={{
@@ -152,6 +186,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
           }}
         />
       </Grid>
+
       <Grid item md={6}>
         <FormInput
           props={{
@@ -173,46 +208,6 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
               ),
             },
           }}
-        />
-      </Grid>
-      <Grid item md={6}>
-        <FormInput
-          props={{
-            placeholder: 'Enter renewal period (in months)',
-            label: 'Renewal Period (in months)',
-            name: 'renewalTerms',
-            type: 'number',
-            value: formik.values.renewalTerms,
-            onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
-            error: !!formik.errors.renewalTerms,
-            helperText: formik.errors.renewalTerms,
-            inputProps: {
-              min: 0,
-              max: 12,
-            },
-          }}
-        />
-      </Grid>
-      <Grid item md={6}>
-        <FormSelect
-          labelId="invoiceDueSelect-label"
-          label="Invoice Cycle"
-          options={Object.keys(invoiceCycle).map((key) => ({
-            label: invoiceCycle[key],
-            value: key,
-          }))}
-          selectProps={{
-            id: 'invoiceCycleSelect',
-            value:
-              formik.values.invoiceCycle >= 0
-                ? t(formik.values.invoiceCycle.toString())
-                : '',
-            onChange: formik.handleChange,
-            error: !!formik.errors.invoiceCycle,
-            name: 'invoiceCycle',
-          }}
-          required
         />
       </Grid>
 
@@ -271,19 +266,12 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
         />
       </Grid>
 
-      <Grid item md={6}>
-        <FormInput
-          props={{
-            placeholder: 'Enter notice period',
-            label: 'Notice Period (in months)',
-            name: 'noticePeriodInMonth',
-            type: 'number',
-            value: Number(formik.values.noticePeriodInMonth).toString(),
-            onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
-            error: !!formik.errors.noticePeriodInMonth,
-          }}
-        />
+      <Grid item md={6} />
+
+      <Grid item md={12} my={0.5}>
+        <Typography variant="body2" color="textSecondary">
+          {t('Date Settings')}
+        </Typography>
       </Grid>
 
       <Grid item md={6}>
@@ -304,7 +292,7 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
                 ...formik.values,
                 firstMaintenance: {
                   year: getYear(date),
-                  month: getMonth(date),
+                  month: getMonth(date) + 1,
                 },
               });
             }
@@ -357,6 +345,124 @@ const EditContractForm: FC<Props> = ({formik, currency}) => {
           }}
         />
       </Grid>
+
+      <Grid item md={6}>
+        <DatePicker
+          defaultDate={
+            formik.values.startDate ? toDate(formik.values.startDate) : null
+          }
+          containerStyles={{mr: '1em', width: '100%'}}
+          getSelectedDate={(date) => {
+            if (date) {
+              formik.setValues({
+                ...formik.values,
+                startDate: format(date, 'yyyy-MM-dd'),
+              });
+            }
+          }}
+          disableMask
+          textFieldProps={{
+            label: t('Contract Start Date'),
+            name: 'startDate',
+            helperText:
+              formik.errors.startDate && formik.touched.startDate
+                ? formik.errors.startDate
+                : '',
+            error: !!(formik.touched.startDate && formik.errors.startDate),
+            sx: {width: '100%'},
+            onBlur: formik.handleBlur,
+          }}
+        />
+      </Grid>
+
+      <Grid item md={6}>
+        <DatePicker
+          defaultDate={
+            formik.values.endDate ? toDate(formik.values.endDate) : null
+          }
+          containerStyles={{mr: '1em', width: '100%'}}
+          getSelectedDate={(date) => {
+            if (date) {
+              formik.setValues({
+                ...formik.values,
+                endDate: format(date, 'yyyy-MM-dd'),
+              });
+            }
+          }}
+          disableMask
+          textFieldProps={{
+            label: t('Contract End Date'),
+            name: 'endDate',
+            helperText:
+              formik.errors.endDate && formik.touched.endDate
+                ? formik.errors.endDate
+                : '',
+            error: !!(formik.touched.endDate && formik.errors.endDate),
+            sx: {width: '100%'},
+            onBlur: formik.handleBlur,
+            disabled: formik.values.autoRenewalCancelled,
+          }}
+        />
+      </Grid>
+
+      <Grid item md={6}>
+        <FormInput
+          props={{
+            placeholder: 'Enter renewal period (in months)',
+            label: 'Renewal Period (in months)',
+            name: 'renewalTerms',
+            type: 'number',
+            value: formik.values.renewalTerms,
+            onBlur: formik.handleBlur,
+            onChange: formik.handleChange,
+            error: !!formik.errors.renewalTerms,
+            helperText: formik.errors.renewalTerms,
+            inputProps: {
+              min: 0,
+              max: 12,
+            },
+            disabled: formik.values.autoRenewalCancelled,
+          }}
+        />
+      </Grid>
+
+      <Grid item md={6}>
+        <FormSelect
+          labelId="invoiceDueSelect-label"
+          label="Invoice Cycle"
+          options={Object.keys(invoiceCycle).map((key) => ({
+            label: invoiceCycle[key],
+            value: key,
+          }))}
+          selectProps={{
+            id: 'invoiceCycleSelect',
+            value:
+              formik.values.invoiceCycle >= 0
+                ? t(formik.values.invoiceCycle.toString())
+                : '',
+            onChange: formik.handleChange,
+            error: !!formik.errors.invoiceCycle,
+            name: 'invoiceCycle',
+          }}
+          required
+        />
+      </Grid>
+
+      <Grid item md={6}>
+        <FormInput
+          props={{
+            placeholder: 'Enter notice period',
+            label: 'Notice Period (in months)',
+            name: 'noticePeriodInMonth',
+            type: 'number',
+            value: Number(formik.values.noticePeriodInMonth).toString(),
+            onBlur: formik.handleBlur,
+            onChange: formik.handleChange,
+            error: !!formik.errors.noticePeriodInMonth,
+          }}
+        />
+      </Grid>
+
       <AutoGeneratedIdDialog
         openDialog={openNewDialog}
         setOpenDialog={setOpenNewDialog}

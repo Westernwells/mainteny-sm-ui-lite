@@ -88,7 +88,7 @@ export const CustomerForm = ({
                   formik.touched.propertyOwnerId
                     ? t(formik.errors.propertyOwnerId)
                     : '',
-                label: t('Customer Name'),
+                label: t('Search Customer Name'),
                 name: 'propertyOwnerId',
                 onBlur: formik.handleBlur,
               }}

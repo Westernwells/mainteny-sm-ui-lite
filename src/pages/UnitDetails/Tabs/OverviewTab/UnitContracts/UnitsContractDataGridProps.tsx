@@ -85,6 +85,8 @@ export const columns: GridColDef[] = [
             ? 'success'
             : params.value === ContractStatus.PENDING
             ? 'secondary'
+            : params.value === ContractStatus.EXPIRING
+            ? 'warning'
             : 'error'
         }
         variant="filled"

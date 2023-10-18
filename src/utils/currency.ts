@@ -1,4 +1,5 @@
 import Dinero, {Currency} from 'dinero.js';
+import i18n from 'i18n';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   Amount,
@@ -12,10 +13,10 @@ export const formatCurrency = (
   options?: Intl.NumberFormatOptions & {
     roundingMode?: 'floor' | 'ceil' | 'trunc' | undefined;
   },
-  selectedLang?: string,
-) =>
-  amount.toLocaleString(
-    selectedLang === 'DE' || selectedLang === 'SR' ? 'de-DE' : 'en-US',
+) => {
+  const selectedLang = i18n.resolvedLanguage;
+  return amount.toLocaleString(
+    selectedLang === 'de' || selectedLang === 'sr' ? 'de-DE' : 'en-US',
     {
       style: 'currency',
       currencyDisplay: 'narrowSymbol',
@@ -24,6 +25,7 @@ export const formatCurrency = (
       ...options,
     },
   );
+};
 
 function formatAmount(amount?: Amount, value?: number): string {
   if (!amount) {

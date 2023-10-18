@@ -38,9 +38,7 @@ const validationSchemaContactPerson = Yup.object().shape({
     firstName: Yup.string().required('First name is required'),
     lastName: Yup.string().required('Last name is required'),
     contact: Yup.object().shape({
-      email: Yup.string()
-        .email('Enter a valid email')
-        .required('Email is required'),
+      email: Yup.string().email('Enter a valid email'),
       phone: Yup.string().matches(
         phoneValidationRE,
         'Phone number is not valid',

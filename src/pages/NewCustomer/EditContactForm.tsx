@@ -124,7 +124,6 @@ export const EditContactForm = ({formik}: Props) => {
             value: email,
             helperText: emailHelperText,
             error: !!emailHelperText,
-            required: true,
             ...defaultProps,
           }}
         />

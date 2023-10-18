@@ -320,7 +320,7 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
                 ...formik.values,
                 firstMaintenance: {
                   year: getYear(date),
-                  month: getMonth(date),
+                  month: getMonth(date) + 1,
                 },
               });
             }

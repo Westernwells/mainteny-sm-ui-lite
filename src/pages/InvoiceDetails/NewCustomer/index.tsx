@@ -64,9 +64,7 @@ const validationSchemaContactPersons = Yup.object().shape({
         firstName: Yup.string().required('First name is required'),
         lastName: Yup.string().required('Last name is required'),
         contact: Yup.object().shape({
-          email: Yup.string()
-            .email('Enter a valid email')
-            .required('Email is required'),
+          email: Yup.string().email('Enter a valid email'),
           phone: Yup.string().matches(
             phoneValidationRE,
             'Phone number is not valid',
@@ -246,7 +244,21 @@ export const NewCustomer = ({
             disableNextBtn={disableNextBtn}
             initialActiveStep={0}
             stepperStyles={{width: '80%'}}
-            getActiveStep={(val) => setActiveStep(val)}
+            getActiveStep={(val) => {
+              if (
+                val === 1 &&
+                !formikAddress.values.billingAddress?.component?.name
+              ) {
+                formikAddress.setFieldValue('billingAddress', {
+                  ...formikAddress.values.billingAddress,
+                  component: {
+                    ...formikAddress.values.billingAddress?.component,
+                    name: formikBasicInfo.values.name,
+                  },
+                });
+              }
+              setActiveStep(val);
+            }}
             steps={steps}
             containerStyles={{
               flexGrow: 1,

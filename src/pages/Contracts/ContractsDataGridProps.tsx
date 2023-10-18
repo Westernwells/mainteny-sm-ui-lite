@@ -1,9 +1,30 @@
-import {GridColDef} from '@mui/x-data-grid';
+import {GridColDef, GridRenderCellParams} from '@mui/x-data-grid';
 import {getColumnProps} from 'components/DataGridLayout';
 import {formatNetAmount} from 'utils/currency';
 import {FormatDate} from 'models/misc';
-import {ContractView} from 'models/contract';
+import {ContractStatus, ContractView} from 'models/contract';
+import {StatusChip} from 'components/StatusChip';
 import {Actions} from './Actions';
+
+export const getContractStatusStyles = (
+  status: string,
+): {
+  label: string;
+  color: 'success' | 'warning' | 'error' | 'info' | 'default' | 'primary';
+} => {
+  switch (status) {
+    case ContractStatus.VALID:
+      return {label: 'Active', color: 'success'};
+    case ContractStatus.EXPIRED:
+      return {label: 'Inactive', color: 'error'};
+    case ContractStatus.EXPIRING:
+      return {label: 'Expiring', color: 'warning'};
+    case ContractStatus.PENDING:
+      return {label: 'Inactive', color: 'error'};
+    default:
+      return {label: '-', color: 'default'};
+  }
+};
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -41,6 +62,22 @@ export const columns: GridColDef[] = [
     align: 'center',
   }),
   getColumnProps({
+    field: 'status',
+    headerName: 'contract status',
+    align: 'left',
+    headerAlign: 'left',
+    renderCell: (params: GridRenderCellParams<any, any, any>) => (
+      <StatusChip
+        label={getContractStatusStyles(params.value).label}
+        color={getContractStatusStyles(params.value).color}
+        variant="filled"
+        size="small"
+        maxChars={9}
+      />
+    ),
+    flex: 1,
+  }),
+  getColumnProps({
     field: 'cost',
     headerName: 'cost/year',
     align: 'right',
@@ -75,6 +112,7 @@ export const makeRows = (
         end: formatDate(item.endTime),
         type: item.type,
         cost: formatNetAmount(item.additionalInfo?.price) || '-',
+        status: item.status,
         actions: {
           url:
             item?.additionalInfo?.documents &&

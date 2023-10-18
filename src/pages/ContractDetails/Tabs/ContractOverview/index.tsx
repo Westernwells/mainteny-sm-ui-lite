@@ -1,4 +1,4 @@
-import {FC, useContext, useMemo, useState} from 'react';
+import {FC, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -12,12 +12,12 @@ import {useParams} from 'react-router-dom';
 import {useFormik} from 'formik';
 import {
   ContractRequestBody,
+  ContractStatus,
   ContractUpdateRequest,
   ContractView,
 } from 'models/contract';
 import {InfoCard} from 'components/InfoCard';
 import {Dialog} from 'components/Dialog';
-
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
@@ -35,12 +35,16 @@ import {
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {LanguageContext} from 'context/LanguageProvider';
 import {
   calculateRenewDays,
   contractTypeMap,
   invoiceCycle,
 } from 'utils/contract-utils';
+import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
+import Tooltip from '@mui/material/Tooltip';
+import {formatDate} from 'utils/datetime';
+import {StatusChip} from 'components/StatusChip';
+import {capitalize} from 'lodash';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
@@ -64,7 +68,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const currency = contractDetails?.currency ?? currentCurrency.code;
-  const {language: selectedLng} = useContext(LanguageContext);
   const {id: contractId} = useParams();
   const theme = useTheme();
   const {mutateAsync: updateContract} = useUpdateContract('Contract updated');
@@ -117,6 +120,10 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       paymentTermId: contractDetails?.paymentTerm?.id,
       description: contractDetails?.description,
       externalId: contractDetails?.externalId ?? '',
+      startDate: contractDetails?.start ?? '',
+      endDate: contractDetails?.end ?? '',
+      autoRenewalCancelled:
+        contractDetails?.additionalInfo.autoRenewalCancelled ?? false,
     },
     onSubmit: () => {},
     enableReinitialize: true,
@@ -158,6 +165,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       paymentTermId: formik.values.paymentTermId,
       description: formik.values.description,
       externalId: formik.values.externalId,
+      autoRenewalCancelled: formik.values.autoRenewalCancelled,
     };
 
     await updateContract({
@@ -225,6 +233,13 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     );
   };
 
+  const handleAutoRenewal = () => {
+    formik.setFieldValue(
+      'autoRenewalCancelled',
+      !formik.values.autoRenewalCancelled,
+    );
+  };
+
   const headerStyles = useMemo(
     () => ({
       display: 'flex',
@@ -261,16 +276,34 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             bodyContainerStyle={{}}
             handleAction={() => setOpenContractDialog(true)}
             header={
-              <Box>
+              <Box sx={{display: 'flex', alignItems: 'center'}}>
                 <Typography variant="subtitle1">
                   {contractDetails?.externalId}
                 </Typography>
+
+                <StatusChip
+                  color={
+                    contractDetails?.status === ContractStatus.VALID
+                      ? 'success'
+                      : contractDetails?.status === ContractStatus.EXPIRING
+                      ? 'warning'
+                      : 'error'
+                  }
+                  label={
+                    contractDetails?.status === ContractStatus.PENDING ||
+                    contractDetails?.status === ContractStatus.EXPIRED
+                      ? 'Inactive'
+                      : ContractStatus.VALID
+                      ? 'Active'
+                      : capitalize(contractDetails?.status!)
+                  }
+                  style={{ml: '2em'}}
+                />
               </Box>
             }
             headerActionIcon={<EditIcon />}>
             {/** TODO: Pass down the full contract instead of long props */}
             <ContractBasic
-              status={contractDetails?.status}
               numberOfVisits={contractDetails?.visitsNumber}
               costPerYear={
                 formatCurrency(
@@ -279,13 +312,11 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                       (contractDetails?.additionalInfo?.price
                         ?.fractionDigits! || 0),
                   {currency},
-                  selectedLng,
                 ) || '-'
               }
               spendingLimit={formatCurrency(
                 contractDetails ? contractDetails?.spendingLimit : 0,
                 {currency},
-                selectedLng,
               )}
               renewalPeriod={contractDetails?.additionalInfo?.renewalTerms}
               invoiceCycle={
@@ -319,9 +350,51 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               onCancel={() => setOpenContractDialog(false)}
               disableSaveBtn={!!Object.keys(formik.errors).length}
               onSave={() => onContractSave()}
-              dialogProps={{open: openContractDialog || false}}>
+              dialogProps={{open: openContractDialog || false}}
+              leftButton={
+                <Tooltip
+                  title={
+                    !formik.values.autoRenewalCancelled
+                      ? t('This contract is ending on {{endDate}}', {
+                          endDate: formatDate(formik.values.endDate),
+                        })
+                      : ''
+                  }
+                  placement="top-end"
+                  arrow
+                  PopperProps={{
+                    sx: {
+                      marginRight: '-4.6em !important',
+                    },
+                  }}>
+                  <span>
+                    <Button
+                      buttonProps={{
+                        onClick: handleAutoRenewal,
+                        size: 'large',
+                        sx: {marginLeft: '1em'},
+                        color: !formik.values.autoRenewalCancelled
+                          ? 'error'
+                          : 'primary',
+                        endIcon: !formik.values.autoRenewalCancelled && (
+                          <ReportProblemOutlinedIcon />
+                        ),
+                      }}>
+                      <Typography variant="subtitle2">
+                        {!formik.values.autoRenewalCancelled
+                          ? t('End Contract')
+                          : t('Resume Contract')}
+                      </Typography>
+                    </Button>
+                  </span>
+                </Tooltip>
+              }>
               {!isLoading && (
-                <EditContractForm formik={formik} currency={currency} />
+                <EditContractForm
+                  formik={formik}
+                  currency={currency}
+                  initialValues={formik.initialValues}
+                />
               )}
             </Dialog>
           </InfoCard>

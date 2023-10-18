@@ -2,12 +2,14 @@ import {Box} from '@mui/system';
 import {AddressAutoComplete} from 'components/AddressAutoComplete';
 import {FormInput} from 'components/form/FormInput';
 import Grid from '@mui/material/Grid';
-import {FormikErrors, FormikValues, useFormik} from 'formik';
+import {FormikErrors, FormikValues, getIn, useFormik} from 'formik';
 import {LocationFormModel} from 'models/unitForm';
 import * as Yup from 'yup';
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 import {PageCard} from 'components/PageCard';
 import {useTranslation} from 'react-i18next';
+import {FormSelect} from 'components/form/FormSelect';
+import {countriesOptions, getStatesByCountry} from 'utils/countries';
 
 interface Props {
   getLocationFormErrors?: (val: FormikErrors<LocationFormModel>) => void;
@@ -16,7 +18,17 @@ interface Props {
 }
 
 const validationSchema = Yup.object().shape({
-  address: Yup.object().nullable().required('Address is required'),
+  address: Yup.object()
+    .nullable()
+    .shape({
+      fullName: Yup.string().nullable().required('Address is required'),
+      component: Yup.object().shape({
+        country: Yup.string().required('Country is required'),
+        postalCode: Yup.string().required('Postal code is required'),
+        state: Yup.string().required('State is required'),
+        city: Yup.string().required('City is required'),
+      }),
+    }),
 });
 
 export const LocationForm = ({
@@ -27,7 +39,9 @@ export const LocationForm = ({
   const {t} = useTranslation();
   const formik = useFormik<LocationFormModel>({
     initialValues: {
-      address: initialValues?.address,
+      address: initialValues?.address || {
+        fullName: '',
+      },
       building: initialValues?.building,
       propertySegment: initialValues?.propertySegment,
       keyLocation: initialValues?.keyLocation,
@@ -47,6 +61,11 @@ export const LocationForm = ({
     }
   }, [formik]);
 
+  const statesByCountry = useCallback(
+    (country?: string) => getStatesByCountry(country ?? ''),
+    [formik.values.address?.component?.country],
+  );
+
   return (
     <PageCard
       headerLabel="Location Information"
@@ -57,25 +76,94 @@ export const LocationForm = ({
           <Grid item xs={12} sm={4} md={4}>
             <AddressAutoComplete
               initialValue={formik.values.address?.fullName || ''}
+              initialAddress={formik.values.address}
               inputError={
-                formik.errors.address && formik.touched.address
-                  ? formik.errors.address
+                getIn(formik.errors, 'address.fullName') &&
+                getIn(formik.touched, 'address.fullName')
+                  ? getIn(formik.errors, 'address.fullName')
                   : ''
               }
               handleBlur={formik.handleBlur}
               textFieldProps={{
                 placeholder: t('e.g. 34-36 Exmouth Market, London EC1R 4QE'),
                 required: true,
+                name: 'address.fullName',
               }}
-              getAddress={(address) =>
+              allowMap
+              getAddress={(address) => {
                 formik.setValues({
                   ...formik.values,
-                  address,
-                })
-              }
+                  address: address
+                    ? {
+                        ...address,
+                        fullName: address?.fullName as string,
+                      }
+                    : undefined,
+                });
+              }}
             />
           </Grid>
-
+          <Grid item xs={12} sm={4} md={4}>
+            <FormInput
+              props={{
+                size: 'small',
+                placeholder: '',
+                label: 'City',
+                name: 'address.component.city',
+                required: true,
+                value: formik.values.address?.component?.city ?? '',
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4} md={4}>
+            <FormInput
+              props={{
+                size: 'small',
+                placeholder: '',
+                label: 'ZIP/Postal Code',
+                name: 'address.component.postalCode',
+                required: true,
+                value: formik.values.address?.component?.postalCode ?? '',
+                onChange: formik.handleChange,
+                onBlur: formik.handleBlur,
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4} md={4}>
+            <FormSelect
+              labelId="address.component.country"
+              label="Country"
+              options={countriesOptions}
+              selectProps={{
+                id: 'address.component.country',
+                name: 'address.component.country',
+                value: formik.values.address?.component?.country ?? '',
+                multiple: false,
+                onChange: formik.handleChange,
+              }}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={4} md={4}>
+            <FormSelect
+              labelId="address.component.state"
+              label="State/Province/Region"
+              options={statesByCountry(
+                formik.values.address?.component?.country,
+              )}
+              selectProps={{
+                id: 'address.component.state',
+                name: 'address.component.state',
+                value: formik.values.address?.component?.state ?? '',
+                multiple: false,
+                onChange: formik.handleChange,
+              }}
+              required
+            />
+          </Grid>
+        </Grid>
+        <Grid sx={{mt: '3em'}} container spacing={2}>
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{

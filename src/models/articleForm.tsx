@@ -59,4 +59,7 @@ export enum MeasurementUnit {
   ml = 'ml',
   l = 'l',
   pcs = 'pcs',
+  h = 'h',
+  s = 's',
+  min = 'min',
 }

@@ -35,9 +35,6 @@ interface Props {
 const validationSchema = Yup.object().shape({
   firstName: Yup.string().required('First name is required'),
   lastName: Yup.string().required('Last name is required'),
-  email: Yup.string()
-    .email('Enter a valid email')
-    .required('Email is required'),
   phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),
   roles: Yup.string().required('Role is required'),
 });
