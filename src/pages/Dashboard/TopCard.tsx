@@ -1,4 +1,5 @@
 import useTheme from '@mui/material/styles/useTheme';
+import {useNavigate} from 'react-router';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
@@ -14,6 +15,7 @@ interface Props {
   title: string;
   value: string;
   subValue?: string;
+  url?: string;
 }
 
 export const TopCard = ({
@@ -23,9 +25,11 @@ export const TopCard = ({
   title,
   value,
   subValue = '',
+  url,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
+  const navigate = useNavigate();
   return (
     <Grid
       container
@@ -62,7 +66,9 @@ export const TopCard = ({
                 label={subValue}
                 variant="outlined"
                 size="small"
-                sx={{borderColor: '#E4E9F2'}}
+                sx={{borderColor: url === 'contracts' ? 'warning' : '#E4E9F2'}}
+                onClick={() => navigate(url || '')}
+                color={url === 'contracts' ? 'warning' : 'primary'}
               />
             </Grid>
           )}

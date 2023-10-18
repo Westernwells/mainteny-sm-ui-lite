@@ -9,6 +9,7 @@ export enum ContractStatus {
   PENDING = 'PENDING',
   VALID = 'VALID',
   EXPIRED = 'EXPIRED',
+  EXPIRING = 'EXPIRING',
 }
 
 export enum ContractOrderField {

@@ -12,6 +12,7 @@ import {useParams} from 'react-router-dom';
 import {useFormik} from 'formik';
 import {
   ContractRequestBody,
+  ContractStatus,
   ContractUpdateRequest,
   ContractView,
 } from 'models/contract';
@@ -42,6 +43,8 @@ import {
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import Tooltip from '@mui/material/Tooltip';
 import {formatDate} from 'utils/datetime';
+import {StatusChip} from 'components/StatusChip';
+import {capitalize} from 'lodash';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
@@ -273,16 +276,34 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             bodyContainerStyle={{}}
             handleAction={() => setOpenContractDialog(true)}
             header={
-              <Box>
+              <Box sx={{display: 'flex', alignItems: 'center'}}>
                 <Typography variant="subtitle1">
                   {contractDetails?.externalId}
                 </Typography>
+
+                <StatusChip
+                  color={
+                    contractDetails?.status === ContractStatus.VALID
+                      ? 'success'
+                      : contractDetails?.status === ContractStatus.EXPIRING
+                      ? 'warning'
+                      : 'error'
+                  }
+                  label={
+                    contractDetails?.status === ContractStatus.PENDING ||
+                    contractDetails?.status === ContractStatus.EXPIRED
+                      ? 'Inactive'
+                      : ContractStatus.VALID
+                      ? 'Active'
+                      : capitalize(contractDetails?.status!)
+                  }
+                  style={{ml: '2em'}}
+                />
               </Box>
             }
             headerActionIcon={<EditIcon />}>
             {/** TODO: Pass down the full contract instead of long props */}
             <ContractBasic
-              status={contractDetails?.status}
               numberOfVisits={contractDetails?.visitsNumber}
               costPerYear={
                 formatCurrency(
