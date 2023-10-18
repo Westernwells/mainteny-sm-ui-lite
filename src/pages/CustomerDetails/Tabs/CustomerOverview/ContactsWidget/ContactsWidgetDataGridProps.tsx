@@ -169,6 +169,7 @@ export const columns = (
         onDelete={() => getDeletableContacts(params.value)}
         contactId={params.value.id}
         status={params.value.userAccount.status}
+        canInvite={!!params.value.userAccount.contact.email}
       />
     ),
     ...defaultAlignment,

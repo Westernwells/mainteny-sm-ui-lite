@@ -86,7 +86,6 @@ export const EditContactForm = ({formik}: Props) => {
               value: formik.values.email,
               helperText: formik.touched.email && formik.errors.email,
               error: !!formik.errors.email && formik.touched.email,
-              required: true,
             },
           ].map((item, index) => (
             <FormInput

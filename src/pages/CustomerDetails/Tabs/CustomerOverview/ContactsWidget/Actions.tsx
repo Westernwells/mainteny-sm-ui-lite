@@ -16,9 +16,16 @@ interface Props {
   onDelete: () => void;
   contactId: string;
   status: string;
+  canInvite: boolean;
 }
 
-export const Actions = ({onEdit, onDelete, contactId, status}: Props) => {
+export const Actions = ({
+  onEdit,
+  onDelete,
+  contactId,
+  status,
+  canInvite,
+}: Props) => {
   const {t} = useTranslation();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -95,6 +102,7 @@ export const Actions = ({onEdit, onDelete, contactId, status}: Props) => {
           },
         }}>
         <MenuItem
+          disabled={!canInvite}
           onClick={() => {
             handleClose();
             getTypeInvite().action();
