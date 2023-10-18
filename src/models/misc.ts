@@ -309,3 +309,44 @@ export enum Language {
   DE_DE = 'DE_DE',
   SR_RS = 'SR_RS',
 }
+
+export interface Coord {
+  lat: number | (() => number);
+  lng: number | (() => number);
+}
+
+export interface GeocodeAddressViewport {
+  northeast: Coord;
+  southwest: Coord;
+}
+
+export interface GeocodeAddressGeometry {
+  location: Coord;
+  location_type: string;
+  viewport: GeocodeAddressViewport;
+}
+
+export interface GeocodeAddressComponent {
+  long_name: string;
+  short_name: string;
+  types: string[];
+}
+
+export interface GeocodeAddress {
+  address_components: GeocodeAddressComponent[];
+  formatted_address: string;
+  place_id: string;
+  types?: string[];
+  geometry: GeocodeAddressGeometry;
+  components?: {[key: string]: {short_name: string; long_name: string}[]};
+  description?: string;
+}
+
+export interface GeocodeAddressView {
+  plus_code: {
+    compound_code: string;
+    global_code: string;
+  };
+  results: GeocodeAddress[];
+  status: string;
+}
