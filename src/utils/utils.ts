@@ -1,4 +1,4 @@
-import {AddressRecord, Language} from 'models/misc';
+import {AddressRecord, Coord, GeocodeAddress, Language} from 'models/misc';
 
 export const capitalize = (role: any[]) => {
   let roles = '';
@@ -224,4 +224,30 @@ export const formatAddressFullname = (address: AddressRecord | null) => {
             .filter((x) => x !== '')
             .join(', '),
   };
+};
+
+export const simplifyAddressCoords = (
+  address?: GeocodeAddress | AddressRecord,
+): Coord | null => {
+  if ((address as GeocodeAddress)?.geometry) {
+    const location = (address as GeocodeAddress)?.geometry?.location;
+
+    return {
+      lat: (typeof location.lat === 'number'
+        ? location.lat
+        : location.lat()) as number,
+      lng: (typeof location.lng === 'number'
+        ? location.lng
+        : location.lng()) as number,
+    };
+  }
+
+  if ((address as AddressRecord)?.location) {
+    return {
+      lat: (address as AddressRecord).location?.latitude as number,
+      lng: (address as AddressRecord).location?.longitude as number,
+    };
+  }
+
+  return null;
 };

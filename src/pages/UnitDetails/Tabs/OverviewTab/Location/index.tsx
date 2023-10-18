@@ -23,7 +23,17 @@ interface Props {
 }
 
 const validationSchema = Yup.object().shape({
-  address: Yup.object().nullable().required('Address is required'),
+  address: Yup.object()
+    .nullable()
+    .shape({
+      fullName: Yup.string().nullable().required('Address is required'),
+      component: Yup.object().shape({
+        country: Yup.string().optional(),
+        postalCode: Yup.string().optional(),
+        state: Yup.string().optional(),
+        city: Yup.string().optional(),
+      }),
+    }),
 });
 
 export const Location = ({
@@ -39,7 +49,9 @@ export const Location = ({
   );
   const formik = useFormik<LocationFormModel>({
     initialValues: {
-      address: elevator.address,
+      address: elevator.address || {
+        fullName: '',
+      },
       building: elevator.additionalInfo.buildingLocation,
       propertySegment: elevator.additionalInfo.propertySegment,
       keyLocation: elevator.additionalInfo.keyLocation,
