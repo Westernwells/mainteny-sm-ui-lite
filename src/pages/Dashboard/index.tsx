@@ -6,7 +6,8 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import ReportProblemOutlined from '@mui/icons-material/ReportProblemOutlined';
-import Refresh from '@mui/icons-material/Refresh';
+import ElevatorIcon from '@mui/icons-material/Elevator';
+import ContactsIcon from '@mui/icons-material/Contacts';
 import {Progress} from 'components/Progress';
 import {
   useAppointmentConfirmationRequiredOrders,
@@ -33,6 +34,13 @@ import {
   ServiceCompanyTimeUnit,
 } from 'models/service-company';
 import {useTranslation} from 'react-i18next';
+import {useQueryContract} from 'hooks/reactQuery/useContract';
+import {
+  ContractView,
+  ContractOrderField,
+  ContractStatus,
+} from 'models/contract';
+import {Order} from 'models/misc';
 import {AddAnything} from './AddAnything';
 import {TopCard} from './TopCard';
 import {TechniciansWorking} from './TechniciansWorking';
@@ -102,6 +110,40 @@ export const Dashboard = () => {
     status: [InvoiceStatus.DRAFT],
   });
   const {
+    data: activeContract = createEmptyResource<ContractView>(10),
+    isLoading: isContractLoading,
+  } = useQueryContract(
+    {
+      order: Order.DESC,
+      orderBy: ContractOrderField.CREATED_TIME,
+      pageIndex: 0,
+      pageSize: 25,
+      query: '',
+      status: [ContractStatus.VALID],
+      priceStart: -9999999,
+      priceEnd: 9999999,
+    },
+    {keepPreviousData: true},
+  );
+
+  const {
+    data: expiringContract = createEmptyResource<ContractView>(10),
+    isLoading: isContractExpiringLoading,
+  } = useQueryContract(
+    {
+      order: Order.DESC,
+      orderBy: ContractOrderField.CREATED_TIME,
+      pageIndex: 0,
+      pageSize: 25,
+      query: '',
+      status: [ContractStatus.EXPIRING],
+      priceStart: -9999999,
+      priceEnd: 9999999,
+    },
+    {keepPreviousData: true},
+  );
+
+  const {
     data: technicians = createEmptyResource<EmployeeStatusView>(5),
     isLoading: isLoadingTechnicians,
   } = useQueryServiceCompanyEmployeeStatus({
@@ -160,6 +202,8 @@ export const Dashboard = () => {
     isLoadingAppointments ||
     isLoadingQuotations ||
     isLoadingInvoices ||
+    isContractLoading ||
+    isContractExpiringLoading ||
     isLoadingTechnicians ||
     isLoadingActivities;
 
@@ -182,10 +226,11 @@ export const Dashboard = () => {
         </Box>
         <AddAnything />
       </Grid>
+
       <Grid container py="2rem" spacing={2}>
-        <Grid item xs={12} xl={9}>
+        <Grid item xs={12} xl={12}>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} lg={3}>
+            <Grid item xs={12} sm={6} lg={2.4}>
               <TopCard
                 title="Completed Today"
                 value={`${dailyNumberOfCompletedOrders}/${dailyNumberOfOrders}`}
@@ -199,13 +244,13 @@ export const Dashboard = () => {
                 }%`}
               />
             </Grid>
-            <Grid item xs={12} sm={6} lg={3}>
+            <Grid item xs={12} sm={6} lg={2.4}>
               <TopCard
                 title="Quarterly"
                 value={`${quarterlyNumberOfCompletedOrders}/${quarterlyNumberOfOrders}`}
               />
             </Grid>
-            <Grid item xs={12} sm={6} lg={3}>
+            <Grid item xs={12} sm={6} lg={2.4}>
               <TopCard
                 title="Overdue"
                 value={`${
@@ -217,19 +262,37 @@ export const Dashboard = () => {
                 iconBackgroundColor={theme.palette.error.outlinedHoverBg}
               />
             </Grid>
-            <Grid item xs={12} sm={6} lg={3}>
+            <Grid item xs={12} sm={6} lg={2.4}>
               <TopCard
                 title="Active units"
                 value={`${fullNumberOfActiveUnits}`}
-                icon={Refresh}
+                icon={ElevatorIcon}
                 iconColor={theme.palette.secondary.dark}
                 iconBackgroundColor={theme.palette.info.outlinedHoverBg}
               />
             </Grid>
-            <Grid item xs={12} lg={6}>
+            <Grid item xs={12} sm={6} lg={2.4}>
+              <TopCard
+                title="Active contracts"
+                value={`${activeContract.total}`}
+                icon={ContactsIcon}
+                iconColor={theme.palette.secondary.dark}
+                iconBackgroundColor={theme.palette.info.outlinedHoverBg}
+                subValue={`${t('{{totalNumberOfExpiringContracts}} expiring', {
+                  totalNumberOfExpiringContracts: expiringContract.total,
+                })}`}
+                url="contracts"
+              />
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Grid item container spacing={2}>
+          <Grid item container spacing={2} xs={12} lg={12} xl={9}>
+            <Grid item xs={12} lg={6} xl={6}>
               <TechniciansWorking technicians={technicians} />
             </Grid>
-            <Grid item xs={12} lg={6}>
+            <Grid item xs={12} lg={6} xl={6}>
               <AppointmentsToBeScheduled
                 appointments={appointments}
                 appointmentNotificationMutation={
@@ -238,20 +301,20 @@ export const Dashboard = () => {
                 confirmAppointmentMutation={confirmAppointmentMutation}
               />
             </Grid>
-            <Grid item xs={12} lg={6}>
+            <Grid item xs={12} lg={6} xl={6}>
               <OpenQuotations quotations={quotations} />
             </Grid>
-            <Grid item xs={12} lg={6}>
+            <Grid item xs={12} lg={6} xl={6}>
               <InvoiceDrafts invoices={invoices} />
             </Grid>
           </Grid>
-        </Grid>
-        <Grid item xs={12} xl={3}>
-          <FieldActivities
-            activities={activities}
-            inViewRef={ref}
-            isFetchingNextActivitiesPage={isFetchingNextActivitiesPage}
-          />
+          <Grid item xs={12} xl={3}>
+            <FieldActivities
+              activities={activities}
+              inViewRef={ref}
+              isFetchingNextActivitiesPage={isFetchingNextActivitiesPage}
+            />
+          </Grid>
         </Grid>
       </Grid>
     </>

@@ -153,7 +153,9 @@ export const Contracts = () => {
       <PriceRangeDropdown cost={cost} costRangeConvertor={costRangeConvertor} />
       <MultipleSelectCheckmarks
         label="Status"
-        options={['VALID', 'EXPIRED'].map((item) => convertToText(item))}
+        options={['VALID', 'EXPIRED', 'EXPIRING'].map((item) =>
+          convertToText(item),
+        )}
         initialSelectedItems={status}
         getSelectedValue={(item) =>
           setStatus(item.map((val) => convertToMacro(val)))
