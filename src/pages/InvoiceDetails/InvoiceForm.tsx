@@ -280,7 +280,7 @@ export const InvoiceForm = ({
   const validationSchema = Yup.object().shape({
     subject: Yup.string().required('Subject is required'),
   });
-
+  console.log(invoice?.subject, 'subject');
   const formik = useFormik({
     initialValues,
     validationSchema,
@@ -306,6 +306,25 @@ export const InvoiceForm = ({
   const handleSelectServiceOrder = (row: ServiceOrderView) => {
     setServiceOrder(row);
   };
+
+  useEffect(() => {
+    if (formType === 'new') {
+      formik.setFieldValue(
+        'subject',
+        t(
+          `${
+            formik.values.type === InvoiceType.CREDIT_NOTE
+              ? 'Credit note'
+              : 'Invoice'
+          } {{invoiceNumber}}for Job {{orderNumber}}`,
+          {
+            invoiceNumber: invoice?.number ?? '',
+            orderNumber: serviceOrder?.number ?? '',
+          },
+        ),
+      );
+    }
+  }, [formik.values.type]);
 
   useEffect(() => {
     if (user && user.userAccount) {
@@ -405,14 +424,18 @@ export const InvoiceForm = ({
       formik.setFieldValue('serviceOrderId', serviceOrder.id, true);
       formik.setFieldValue(
         'subject',
-        t(
-          `${customer?.name ?? serviceOrderCustomer?.name} - ${t(
-            'Invoice for',
-          )} {{invoiceNumber}}`,
-          {
-            invoiceNumber: invoice?.externalId ?? '',
-          },
-        ),
+        invoice?.subject ??
+          t(
+            `{{customerName}} - ${
+              formik.values.type === InvoiceType.CREDIT_NOTE
+                ? 'Credit note for'
+                : 'Invoice for'
+            } {{invoiceNumber}}`,
+            {
+              invoiceNumber: invoice?.externalId ?? '',
+              customerName: customer?.name ?? serviceOrderCustomer?.name,
+            },
+          ),
         true,
       );
     }

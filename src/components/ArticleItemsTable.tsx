@@ -402,7 +402,7 @@ export const ArticleItemsTable = ({
       }}>
       <FormLabel text="No." />
       <FormLabel text="Description" sx={{justifySelf: 'start'}} />
-      <FormLabel text="Total amount (excl VAT)" />
+      <FormLabel text="Total Amount (Excl VAT)" />
     </Box>
   );
 
