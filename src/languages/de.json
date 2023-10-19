@@ -1762,5 +1762,6 @@
   "s": "Sek",
   "Can't be less than 1": "Darf nicht kleiner als 1 sein",
   "Invoice {{invoiceNumber}}for Job {{orderNumber}}": "Rechnung {{invoiceNumber}}zum Auftrag {{orderNumber}}",
-  "Credit note {{invoiceNumber}}for Job {{orderNumber}}": "Gutschrift {{invoiceNumber}}zum Auftrag {{orderNumber}}"
+  "Credit note {{invoiceNumber}}for Job {{orderNumber}}": "Gutschrift {{invoiceNumber}}zum Auftrag {{orderNumber}}",
+  "Address not found. Please check and try again": "Adresse wurde nicht gefunden. Bitte checke"
 }
