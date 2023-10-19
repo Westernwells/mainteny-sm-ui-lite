@@ -30,42 +30,49 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'number',
     headerName: 'number',
-    align: 'center',
+    align: 'left',
+    headerAlign: 'left',
     flex: 1.25,
   }),
   getColumnProps({
     field: 'customer',
     headerName: 'customer',
     cellClassName: 'truncateText',
+    align: 'left',
+    headerAlign: 'left',
     flex: 1.5,
   }),
   getColumnProps({
     field: 'units',
     headerName: 'no. of units',
     align: 'center',
+    headerAlign: 'center',
   }),
   getColumnProps({
     field: 'start',
     headerName: 'start date',
     align: 'center',
+    headerAlign: 'center',
     flex: 0.75,
   }),
   getColumnProps({
     field: 'end',
     headerName: 'expiry date',
     align: 'center',
+    headerAlign: 'center',
     flex: 0.75,
   }),
   getColumnProps({
     field: 'type',
     headerName: 'contract type',
-    align: 'center',
+    align: 'left',
+    headerAlign: 'left',
   }),
   getColumnProps({
     field: 'status',
     headerName: 'contract status',
-    align: 'left',
-    headerAlign: 'left',
+    align: 'center',
+    headerAlign: 'center',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
         label={getContractStatusStyles(params.value).label}
@@ -81,12 +88,14 @@ export const columns: GridColDef[] = [
     field: 'cost',
     headerName: 'cost/year',
     align: 'right',
-    flex: 0.5,
+    headerAlign: 'right',
+    flex: 1,
   }),
   getColumnProps({
     field: 'actions',
     headerName: 'actions',
     align: 'center',
+    headerAlign: 'center',
     renderCell: (params) => (
       <Actions
         url={params.value.url}
@@ -94,7 +103,7 @@ export const columns: GridColDef[] = [
         contractId={params.value.contractId}
       />
     ),
-    flex: 0,
+    flex: 1,
   }),
 ];
 
