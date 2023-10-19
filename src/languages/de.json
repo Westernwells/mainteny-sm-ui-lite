@@ -1740,8 +1740,8 @@
   "Get Started": "Loslegen",
   "NON_SERVICE": "ALLG. VERTRAG",
   "Yearly Contract Price (excl. VAT, in {{currencySymbol}})": "Jährlicher Vertragspreis (ohne MwSt., in {{currencySymbol}})",
-  "Invoice for {{invoiceNumber}}": "Rechnung für {{invoiceNumber}}",
-  "Credit note for {{invoiceNumber}}": "Gutschrift zur Rechnung {{invoiceNumber}}",
+  "{{customerName}} - Invoice for {{invoiceNumber}}": "{{customerName}} - Rechnung für {{invoiceNumber}}",
+  "{{customerName}} - Credit note for {{invoiceNumber}}": "{{customerName}} - Gutschrift zur Rechnung {{invoiceNumber}}",
   "General Information": "Allgemeine Informationen",
   "Price Details": "Preisdetails",
   "Date Settings": "Datumseinstellungen",
@@ -1760,5 +1760,7 @@
   "pcs": "Stk",
   "h": "Std",
   "s": "Sek",
-  "Can't be less than 1": "Darf nicht kleiner als 1 sein"
+  "Can't be less than 1": "Darf nicht kleiner als 1 sein",
+  "Invoice {{invoiceNumber}}for Job {{orderNumber}}": "Rechnung {{invoiceNumber}}zum Auftrag {{orderNumber}}",
+  "Credit note {{invoiceNumber}}for Job {{orderNumber}}": "Gutschrift {{invoiceNumber}}zum Auftrag {{orderNumber}}"
 }
