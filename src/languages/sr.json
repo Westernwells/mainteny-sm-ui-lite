@@ -925,7 +925,7 @@
   "Enter address to receive invoice if different from billing or shipping address. Ensure accuracy to prevent misdelivery.": "Unesite adresu za primanje fakture ako se razlikuje od adrese za obračun ili dostavu. Obezbedite tačnost da biste sprečili pogrešnu isporuku.",
   "Add Alternative Address": "Dodajte alternativnu adresu",
   "Edit Alternative Address": "Uredi alternativnu adresu",
-  "Select job": "Izaberite nalog",
+  "Select Job": "Izaberite nalog",
   "Select invoice type": "Izaberite tip naloga",
   "ENGINEERS": "Serviser",
   "SCHEDULED DATE & TIME": "Zakazano vrijeme i datum",
