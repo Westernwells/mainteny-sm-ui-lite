@@ -4,16 +4,25 @@ import {queryKeys} from 'reactQuery/constants';
 import {useSnackbar} from 'hooks/useSnackbar';
 
 import {Coord, GeocodeAddressView} from 'models/misc';
+import {LanguageContext} from 'context/LanguageProvider';
+import {useContext} from 'react';
 
 const BASE_URL = 'https://maps.googleapis.com/maps/api';
 
-export const coordsToAddress = async (payload: Coord | null) => {
+interface CoordsToAddressPayload extends Coord {
+  language?: string;
+}
+
+export const coordsToAddress = async (
+  payload: CoordsToAddressPayload | null,
+) => {
   const latlng = `${payload!?.lat},${payload!?.lng}`;
 
   const url = `${BASE_URL}/geocode/json`;
   const queryString = {
     latlng,
     key: import.meta.env.REACT_APP_GOOGLE_MAPS_KEY,
+    language: payload?.language,
   };
 
   const response = await axios.get<GeocodeAddressView>(url, {
@@ -22,8 +31,13 @@ export const coordsToAddress = async (payload: Coord | null) => {
   return response.data;
 };
 
-export const useCoordsToAddress = (payload: Coord | null) => {
+export const useCoordsToAddress = (payload: CoordsToAddressPayload | null) => {
   const {showError} = useSnackbar();
+  const {language} = useContext(LanguageContext);
+
+  if (payload) {
+    payload.language = language;
+  }
 
   return useQuery(
     [queryKeys.coordsToAddress, payload!?.lat, payload!?.lng],

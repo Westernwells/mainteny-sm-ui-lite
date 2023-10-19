@@ -2,8 +2,9 @@ import {useContext} from 'react';
 import {useQuery} from 'react-query';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 
-import {AddressRecord, RestError} from 'models/misc';
+import {AddressRecord, Language, RestError} from 'models/misc';
 import {LanguageContext} from 'context/LanguageProvider';
+import {languageContextMap} from 'utils/utils';
 import {useUserSession} from './useUserSession';
 
 export interface fetchAddressObjectByNameParam {
@@ -27,7 +28,7 @@ export function useFetchAddressObjectByName(name: string) {
   const {language} = useContext(LanguageContext);
 
   const payload: fetchAddressObjectByNameParam = {
-    lang: language,
+    lang: languageContextMap[language] || Language.EN_US,
     name,
     serviceCompanyId: user?.userAccount.serviceCompany.id as string,
   };
