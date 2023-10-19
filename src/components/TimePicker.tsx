@@ -1,18 +1,19 @@
 import {TextFieldProps} from '@mui/material/TextField';
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
-import {TimePicker as MuiTimePicker} from '@mui/x-date-pickers/TimePicker';
+import {
+  TimePicker as MuiTimePicker,
+  TimePickerProps,
+} from '@mui/x-date-pickers/TimePicker';
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import {FormInput} from './form/FormInput';
 
-interface Props {
+interface Props extends Partial<TimePickerProps<Date, Date>> {
   defaultTime?: Date | null;
   getSelectedTime?: (state: Date | null) => void;
   containerStyles?: {[key: string]: any};
   textFieldProps?: TextFieldProps;
-  minTime?: Date | null;
-  maxTime?: Date | null;
 }
 
 export const TimePicker = ({
@@ -22,6 +23,7 @@ export const TimePicker = ({
   textFieldProps,
   minTime,
   maxTime,
+  ...props
 }: Props) => {
   const [value, setValue] = useState<Date | null>(null);
 
@@ -41,6 +43,7 @@ export const TimePicker = ({
     <Box sx={{...containerStyles}}>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <MuiTimePicker
+          {...props}
           inputFormat="HH:mm"
           ampm={false}
           value={value}

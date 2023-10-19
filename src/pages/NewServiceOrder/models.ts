@@ -1,7 +1,7 @@
 export interface ScheduleTechnicianForm {
   date: Date | null;
-  startTime: Date | null;
-  endTime: Date | null;
+  startTime: Date | undefined;
+  endTime: Date | undefined;
   technicianId: string | null;
 }
 

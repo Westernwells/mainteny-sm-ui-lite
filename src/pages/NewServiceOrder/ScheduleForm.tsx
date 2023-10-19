@@ -44,8 +44,8 @@ export const ScheduleForm = ({
   const formik = useFormik<ScheduleTechnicianForm>({
     initialValues: {
       date: defaultStartDate || null,
-      startTime: defaultStartDate || null,
-      endTime: defaultEndDate || null,
+      startTime: defaultStartDate || undefined,
+      endTime: defaultEndDate || undefined,
       technicianId: defaultTechnician?.id || null,
     },
     onSubmit: () => {},

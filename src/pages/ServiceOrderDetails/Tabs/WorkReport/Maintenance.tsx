@@ -1,22 +1,20 @@
 import useTheme from '@mui/material/styles/useTheme';
 import {Divider, Typography} from '@mui/material';
 import Box from '@mui/material/Box';
-import {FormLabel} from 'components/form/FormLabel';
-import {useFormatDate} from 'hooks/useFormatDate';
 import {ServiceOrderView} from 'models/service-order';
-import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {convertDigitalMinsToHM} from 'utils/datetime';
+import {Construction, DirectionsCar} from '@mui/icons-material';
+import {FormLabel} from 'components/form/FormLabel';
+import {DatePicker} from 'components/DatePicker';
+import {TimePicker} from 'components/TimePicker';
 
 interface Props {
   serviceOrder: ServiceOrderView;
 }
 export const Maintenance = ({serviceOrder}: Props) => {
   const theme = useTheme();
-  const [schedule] = useState(
-    serviceOrder.schedules?.[serviceOrder.schedules.length - 1],
-  );
-  const formatDate = useFormatDate();
+  const schedule = serviceOrder.schedules?.[serviceOrder.schedules.length - 1];
   const {t} = useTranslation();
   return (
     <Box mt="1em">
@@ -30,68 +28,186 @@ export const Maintenance = ({serviceOrder}: Props) => {
           p=".5em">
           {!serviceOrder?.report?.additionalInfo.onlyShowTotalTime && (
             <>
-              <Box
-                px="1em"
-                py=".75em"
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: '8ch 1fr 4fr',
-                  placeItems: 'start',
-                  gap: '.5em',
-                }}>
-                <FormLabel text="" />
-                <FormLabel text="Date" sx={{justifySelf: 'start'}} />
-                <FormLabel text="Time" />
+              <Box px="1rem" pt=".5rem" pb="1.5rem" display="flex">
+                <Box display="flex" alignItems="center" gap={0.5} flex={1}>
+                  <DirectionsCar sx={{color: 'action.active'}} />
+                  <Typography variant="caption">{t('Travel')}</Typography>
+                </Box>
+                <Box display="flex" alignItems="center" gap={0.5} flex={1}>
+                  <Construction sx={{color: 'action.active'}} />
+                  <Typography variant="caption">{t('Work')}</Typography>
+                </Box>
               </Box>
               <Box
                 bgcolor="grey.50"
                 boxShadow="0px 4px 15px 0px #90909033"
-                px=".5em">
-                {[
-                  {
-                    label: t('Start'),
-                    date: serviceOrder.actualStartTime
-                      ? formatDate(serviceOrder.actualStartTime)
-                      : '-',
-                    time: serviceOrder.actualStartTime
-                      ? new Date(
-                          serviceOrder.actualStartTime!,
-                        ).toLocaleTimeString(navigator.language, {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })
-                      : '-',
-                  },
-                  {
-                    label: t('End'),
-                    date: serviceOrder.actualEndTime
-                      ? formatDate(serviceOrder.actualEndTime)
-                      : '-',
-                    time: serviceOrder.actualEndTime
-                      ? new Date(
-                          serviceOrder.actualEndTime!,
-                        ).toLocaleTimeString(navigator.language, {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })
-                      : '-',
-                  },
-                ].map((i) => (
-                  <Box
-                    key={i.label}
-                    px=".5em"
-                    py="1em"
-                    sx={{
-                      display: 'grid',
-                      gridTemplateColumns: '8ch 1fr 4fr',
-                      placeItems: 'start',
-                      gap: '.5em',
-                    }}>
-                    <Typography variant="body2">{i.label}</Typography>
-                    <Typography variant="body2">{i.date}</Typography>
-                    <Typography variant="body2">{i.time}</Typography>
+                p="1rem"
+                display="flex">
+                <Box display="flex" flexWrap="wrap" gap={1.2} flex={1}>
+                  <Box display="flex" gap={1.2}>
+                    <DatePicker
+                      defaultDate={
+                        serviceOrder.travelStartTime
+                          ? new Date(serviceOrder.travelStartTime)
+                          : null
+                      }
+                      containerStyles={{maxWidth: '11rem'}}
+                      disabled
+                      textFieldProps={{
+                        sx: {
+                          svg: {color: theme.palette.action.active},
+                          '& .MuiInputBase-input.Mui-disabled': {
+                            WebkitTextFillColor: theme.palette.text.primary,
+                          },
+                        },
+                        disabled: true,
+                      }}
+                    />
+
+                    <TimePicker
+                      defaultTime={
+                        serviceOrder.travelStartTime
+                          ? new Date(serviceOrder.travelStartTime)
+                          : null
+                      }
+                      containerStyles={{maxWidth: '8rem'}}
+                      disabled
+                      textFieldProps={{
+                        sx: {
+                          svg: {color: theme.palette.action.active},
+                          '& .MuiInputBase-input.Mui-disabled': {
+                            WebkitTextFillColor: theme.palette.text.primary,
+                          },
+                          width: '100%',
+                        },
+                        disabled: true,
+                      }}
+                    />
                   </Box>
-                ))}
+
+                  <Box display="flex" gap={1.2}>
+                    <DatePicker
+                      defaultDate={
+                        serviceOrder.travelEndTime
+                          ? new Date(serviceOrder.travelEndTime)
+                          : null
+                      }
+                      containerStyles={{maxWidth: '11rem'}}
+                      disabled
+                      textFieldProps={{
+                        sx: {
+                          svg: {color: theme.palette.action.active},
+                          '& .MuiInputBase-input.Mui-disabled': {
+                            WebkitTextFillColor: theme.palette.text.primary,
+                          },
+                        },
+                        disabled: true,
+                      }}
+                    />
+
+                    <TimePicker
+                      defaultTime={
+                        serviceOrder.travelEndTime
+                          ? new Date(serviceOrder.travelEndTime)
+                          : null
+                      }
+                      containerStyles={{maxWidth: '8rem'}}
+                      disabled
+                      textFieldProps={{
+                        sx: {
+                          svg: {color: theme.palette.action.active},
+                          '& .MuiInputBase-input.Mui-disabled': {
+                            WebkitTextFillColor: theme.palette.text.primary,
+                          },
+                        },
+                        disabled: true,
+                      }}
+                    />
+                  </Box>
+                </Box>
+
+                <Box display="flex" flexWrap="wrap" gap={1.2} flex={1}>
+                  <Box display="flex" gap={1.2}>
+                    <DatePicker
+                      defaultDate={
+                        serviceOrder.actualStartTime
+                          ? new Date(serviceOrder.actualStartTime)
+                          : null
+                      }
+                      containerStyles={{maxWidth: '11rem'}}
+                      disabled
+                      textFieldProps={{
+                        sx: {
+                          svg: {color: theme.palette.action.active},
+                          '& .MuiInputBase-input.Mui-disabled': {
+                            WebkitTextFillColor: theme.palette.text.primary,
+                          },
+                        },
+                        disabled: true,
+                      }}
+                    />
+
+                    <TimePicker
+                      defaultTime={
+                        serviceOrder.actualStartTime
+                          ? new Date(serviceOrder.actualStartTime)
+                          : null
+                      }
+                      containerStyles={{maxWidth: '8rem'}}
+                      disabled
+                      textFieldProps={{
+                        sx: {
+                          svg: {color: theme.palette.action.active},
+                          '& .MuiInputBase-input.Mui-disabled': {
+                            WebkitTextFillColor: theme.palette.text.primary,
+                          },
+                          width: '100%',
+                        },
+                        disabled: true,
+                      }}
+                    />
+                  </Box>
+
+                  <Box display="flex" gap={1.2}>
+                    <DatePicker
+                      defaultDate={
+                        serviceOrder.actualEndTime
+                          ? new Date(serviceOrder.actualEndTime)
+                          : null
+                      }
+                      containerStyles={{maxWidth: '11rem'}}
+                      disabled
+                      textFieldProps={{
+                        sx: {
+                          svg: {color: theme.palette.action.active},
+                          '& .MuiInputBase-input.Mui-disabled': {
+                            WebkitTextFillColor: theme.palette.text.primary,
+                          },
+                        },
+                        disabled: true,
+                      }}
+                    />
+
+                    <TimePicker
+                      defaultTime={
+                        serviceOrder.actualEndTime
+                          ? new Date(serviceOrder.actualEndTime)
+                          : null
+                      }
+                      containerStyles={{maxWidth: '8rem'}}
+                      disabled
+                      textFieldProps={{
+                        sx: {
+                          svg: {color: theme.palette.action.active},
+                          '& .MuiInputBase-input.Mui-disabled': {
+                            WebkitTextFillColor: theme.palette.text.primary,
+                          },
+                        },
+                        disabled: true,
+                      }}
+                    />
+                  </Box>
+                </Box>
               </Box>
               <Divider
                 sx={{

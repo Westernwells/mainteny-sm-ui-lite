@@ -131,6 +131,8 @@ export interface ServiceOrderView {
   expectedVisitDate: string;
   actualStartTime?: string;
   actualEndTime?: string;
+  travelStartTime?: string;
+  travelEndTime?: string;
   dueDate: string;
   serviceTime?: number;
   schedules: ServiceOrderScheduleSimpleView[];
@@ -144,6 +146,8 @@ export interface ServiceOrderView {
 export interface ServiceOrderSimpleView {
   actualStartTime?: string;
   actualEndTime?: string;
+  travelStartTime?: string;
+  travelEndTime?: string;
   additionalInfo: ServiceOrderAdditionalInfo;
   description: string;
   dueDate: string;
