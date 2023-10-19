@@ -918,7 +918,7 @@
   "Enter address to receive invoice if different from billing or shipping address. Ensure accuracy to prevent misdelivery.": "Geben Sie die Adresse ein, an die die Rechnung zugestellt werden soll, wenn sie von der Rechnungs- oder Leistungsempfänger abweicht.",
   "Add Alternative Address": "Rechnung über hinzufügen",
   "Edit Alternative Address": "Rechnung über bearbeiten",
-  "Select job": "Auftrag auswählen",
+  "Select Job": "Auftrag auswählen",
   "Select invoice type": "Rechnungsart wählen",
   "ENGINEERS": "TECHNIKER",
   "SCHEDULED DATE & TIME": "GEPLANTES DATUM UND UHRZEIT",
@@ -1763,5 +1763,7 @@
   "Can't be less than 1": "Darf nicht kleiner als 1 sein",
   "Invoice {{invoiceNumber}}for Job {{orderNumber}}": "Rechnung {{invoiceNumber}}zum Auftrag {{orderNumber}}",
   "Credit note {{invoiceNumber}}for Job {{orderNumber}}": "Gutschrift {{invoiceNumber}}zum Auftrag {{orderNumber}}",
-  "Address not found. Please check and try again": "Adresse wurde nicht gefunden. Bitte checke"
+  "Address not found. Please check and try again": "Adresse wurde nicht gefunden. Bitte überprüfen und versuchen Sie es erneut.",
+  "Pick your address location": "Wählen Sie Ihren Standort",
+  "Confirm Location": "Bestätigen Sie Ihren Standort"
 }
