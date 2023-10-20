@@ -11,6 +11,7 @@ import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {InfoBanner} from 'components/InfoBanner';
 import {
   CustomerContactPersonFormModel,
   CustomerContactPersonsFormModel,
@@ -189,6 +190,10 @@ export const CustomerContactPersonsForm = ({formik}: Props) => {
         </Typography>
       }
       showHeaderBackground>
+      <InfoBanner
+        title="To invite others to Mainteny an email address is required."
+        body="But it is optional when setting up account."
+      />
       {rows.length ? (
         <DataGridLayout
           fullHeight={false}

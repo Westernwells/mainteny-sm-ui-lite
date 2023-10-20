@@ -25,6 +25,7 @@ import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {formatPhoneNumber} from 'utils/customer-utils';
+import {InfoBanner} from 'components/InfoBanner';
 import {columns, makeRows} from './ContactsWidgetDataGridProps';
 import {EditContactForm} from './EditContactForm';
 
@@ -225,6 +226,14 @@ export const ContactsWidget = ({customerId}: Props) => {
           </Typography>
         }
         showHeaderBackground>
+        <InfoBanner
+          title="To invite others to Mainteny an email address is required."
+          body={[
+            'But it is optional when setting up account.',
+            'Add it by editing the Contact Person information.',
+          ]}
+        />
+
         <DataGridLayout
           fullHeight={false}
           isCellClickable={false}
