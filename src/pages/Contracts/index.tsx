@@ -4,8 +4,12 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
 import {useQueryContract} from 'hooks/reactQuery/useContract';
-import {ContractOrderField, ContractView} from 'models/contract';
-import {Order} from 'models/misc';
+import {
+  ContractOrderField,
+  ContractView,
+  QueryContractParams,
+} from 'models/contract';
+import {Order, WithOptional} from 'models/misc';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
@@ -49,7 +53,23 @@ export const Contracts = () => {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const textInput = useRef<HTMLInputElement>(null);
 
+  let queryParam: WithOptional<QueryContractParams, 'serviceCompanyId'> = {
+    order: Order.DESC,
+    orderBy: ContractOrderField.CREATED_TIME,
+    pageIndex: page.pageIndex || 0,
+    pageSize: page.pageSize || 25,
+    query: search,
+    status,
+  };
+
   const [priceStart, priceEnd] = useMemo(() => getStartEndPrice(cost), [cost]);
+  if (cost.length) {
+    queryParam = {
+      ...queryParam,
+      priceStart,
+      priceEnd,
+    };
+  }
 
   const {
     data: contractResource = createEmptyResource<ContractView>(10),
@@ -57,19 +77,7 @@ export const Contracts = () => {
     isFetching,
     isFetched,
     isIdle,
-  } = useQueryContract(
-    {
-      order: Order.DESC,
-      orderBy: ContractOrderField.CREATED_TIME,
-      pageIndex: page.pageIndex || 0,
-      pageSize: page.pageSize || 25,
-      query: search,
-      status,
-      priceStart,
-      priceEnd,
-    },
-    {keepPreviousData: true},
-  );
+  } = useQueryContract(queryParam, {keepPreviousData: true});
 
   totalContractRef.current = totalContractRef.current || contractResource.total;
 
