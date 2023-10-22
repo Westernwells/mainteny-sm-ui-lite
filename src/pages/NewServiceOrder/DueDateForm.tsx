@@ -59,7 +59,7 @@ export const DueDateForm = ({
           });
         }}
         textFieldProps={{
-          label: t('Due date'),
+          label: t('Due Date'),
           name: 'date',
           required: true,
           helperText:
