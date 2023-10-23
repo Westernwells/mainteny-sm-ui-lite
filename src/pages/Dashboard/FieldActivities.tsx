@@ -103,7 +103,7 @@ export const FieldActivities = ({
                     <Grid item xs={6}>
                       <CardProps
                         icon={<Tag sx={{color: theme.palette.info.dark}} />}
-                        label={t('ORDER ID')}
+                        label={t('JOB ID')}
                         bodyText={activity.data.number}
                         iconBackground={theme.palette.info.outlinedHoverBg}
                         iconContainerStyles={iconContainerStyles}

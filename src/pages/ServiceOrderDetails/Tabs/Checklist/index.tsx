@@ -251,10 +251,7 @@ export const CheckList = ({serviceOrder}: Props) => {
           </Box>
 
           <Box>
-            <FormLabel
-              text="Order ID"
-              sx={{color: theme.palette.text.primary}}
-            />
+            <FormLabel text="Job ID" sx={{color: theme.palette.text.primary}} />
             <Typography variant="subtitle1">{serviceOrder.number}</Typography>
           </Box>
 

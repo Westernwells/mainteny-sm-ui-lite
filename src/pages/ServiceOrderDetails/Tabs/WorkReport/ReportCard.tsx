@@ -44,7 +44,7 @@ export const ReportCard = ({date, type, number, status}: Props) => {
         </Box>
       </Box>
       <Box>
-        <FormLabel text="Order ID" sx={{display: 'block'}} />
+        <FormLabel text="Job ID" sx={{display: 'block'}} />
         <Typography variant="subtitle1">{number}</Typography>
       </Box>
       <Box>

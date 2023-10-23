@@ -186,7 +186,7 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
                   value: report.number,
                 },
                 {
-                  label: 'Order ID',
+                  label: 'Job ID',
                   value: serviceOrder.number,
                 },
                 {
