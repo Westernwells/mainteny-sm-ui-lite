@@ -800,7 +800,7 @@
   "RENEWAL PERIOD": "Period obnove",
   "INVOICE DUE": "Dospjela faktura",
   "Contract expires in 120 days": "Ugovor ističe za 120 dana",
-  "Contract renews in120 days": "Ugovor sa obnavlja za 120 dana",
+  "Contract renews in 120 days": "Ugovor sa obnavlja za 120 dana",
   "MONTHLY": "Mjesečno",
   "Contract ends": "Ugovor ističe",
   "Contract signed": "Ugovor potpisan",
@@ -1775,6 +1775,8 @@
   "h": "sati (s)",
   "s": "s",
   "Can't be less than 1": "Ne može biti manje od 1",
+  "Invoice {{invoiceNumber}}for Job {{orderNumber}}": "Faktura {{invoiceNumber}}za posao {{orderNumber}}",
+  "Credit note {{invoiceNumber}}for Job {{orderNumber}}": "Kredit {{invoiceNumber}}za posao {{orderNumber}}",
   "Address not found. Please check and try again": "Adresa nije pronađena. Proverite i pokušajte ponovo",
   "Pick your address location": "Izaberite lokaciju svoje adrese",
   "Confirm Location": "Potvrdite lokaciju"
