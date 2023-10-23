@@ -1774,5 +1774,8 @@
   "pcs": "kom",
   "h": "sati (s)",
   "s": "s",
-  "Can't be less than 1": "Ne može biti manje od 1"
+  "Can't be less than 1": "Ne može biti manje od 1",
+  "Address not found. Please check and try again": "Adresa nije pronađena. Proverite i pokušajte ponovo",
+  "Pick your address location": "Izaberite lokaciju svoje adrese",
+  "Confirm Location": "Potvrdite lokaciju"
 }
