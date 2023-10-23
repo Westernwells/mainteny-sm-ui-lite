@@ -11,6 +11,7 @@ import ExpandRoundedIcon from '@mui/icons-material/ExpandRounded';
 import LocalOfferRoundedIcon from '@mui/icons-material/LocalOfferRounded';
 import FmdGoodRoundedIcon from '@mui/icons-material/FmdGoodRounded';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import Tag from '@mui/icons-material/Tag';
 import _ from 'lodash';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
@@ -254,6 +255,11 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       label: t('Type'),
       icon: <InfoOutlinedIcon sx={{color: theme.palette.info.dark}} />,
       body: article?.type ? t(convertToText(article.type)) : '-',
+    },
+    {
+      label: t('Article ID'),
+      icon: <Tag sx={{color: theme.palette.info.dark}} />,
+      body: article.externalId ? article.externalId : '-',
     },
   ];
 
