@@ -293,7 +293,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                     contractDetails?.status === ContractStatus.PENDING ||
                     contractDetails?.status === ContractStatus.EXPIRED
                       ? 'Inactive'
-                      : ContractStatus.VALID
+                      : contractDetails?.status === ContractStatus.VALID
                       ? 'Active'
                       : capitalize(contractDetails?.status!)
                   }
