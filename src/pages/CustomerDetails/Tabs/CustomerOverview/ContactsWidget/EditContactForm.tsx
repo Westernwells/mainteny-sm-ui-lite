@@ -7,12 +7,14 @@ import {ContactFormModel} from 'models/contacts';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {convertToText} from 'utils/utils';
 import {propertyContactPersonRoleOptions} from 'pages/NewCustomer/model';
+import {InfoBanner} from 'components/InfoBanner';
 
 interface Props {
   formik: FormikProps<ContactFormModel>;
+  typeAction?: 'edit' | 'create' | 'invite';
 }
 
-export const EditContactForm = ({formik}: Props) => {
+export const EditContactForm = ({formik, typeAction}: Props) => {
   const defaultProps = {
     InputLabelProps: {shrink: true},
     onChange: formik.handleChange,
@@ -22,6 +24,14 @@ export const EditContactForm = ({formik}: Props) => {
   return (
     <Box sx={{mt: '0.5em'}}>
       <Grid container spacing={2}>
+        {typeAction === 'invite' && (
+          <Grid item xs={12} sx={{marginBottom: '0.7em'}}>
+            <InfoBanner
+              title="Invite the Contact Person"
+              body="To invite this contact an email address is required to send the invitation with a password"
+            />
+          </Grid>
+        )}
         <Grid item md={6}>
           <FormInput
             props={{
@@ -86,6 +96,7 @@ export const EditContactForm = ({formik}: Props) => {
               value: formik.values.email,
               helperText: formik.touched.email && formik.errors.email,
               error: !!formik.errors.email && formik.touched.email,
+              required: typeAction === 'invite',
             },
           ].map((item, index) => (
             <FormInput

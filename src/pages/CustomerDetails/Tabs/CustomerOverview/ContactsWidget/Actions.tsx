@@ -14,6 +14,7 @@ import {useTranslation} from 'react-i18next';
 interface Props {
   onEdit: () => void;
   onDelete: () => void;
+  onInvite: () => void;
   contactId: string;
   status: string;
   canInvite: boolean;
@@ -22,6 +23,7 @@ interface Props {
 export const Actions = ({
   onEdit,
   onDelete,
+  onInvite,
   contactId,
   status,
   canInvite,
@@ -40,9 +42,13 @@ export const Actions = ({
   };
 
   const handleInvite = async () => {
-    await inviteContact({
-      userName: contactId || '',
-    });
+    if (!canInvite) {
+      onInvite();
+    } else {
+      await inviteContact({
+        userName: contactId || '',
+      });
+    }
 
     handleClose();
   };
@@ -102,7 +108,6 @@ export const Actions = ({
           },
         }}>
         <MenuItem
-          disabled={!canInvite}
           onClick={() => {
             handleClose();
             getTypeInvite().action();

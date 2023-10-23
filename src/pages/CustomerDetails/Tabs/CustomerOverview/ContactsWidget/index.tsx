@@ -13,6 +13,7 @@ import {
   useContacts,
   useCreateContact,
   useDeleteContact,
+  useInviteContact,
   useUpdateContact,
 } from 'hooks/reactQuery/useContacts';
 import {ContactsView, ContactFormModel} from 'models/contacts';
@@ -26,6 +27,7 @@ import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {formatPhoneNumber} from 'utils/customer-utils';
+import {InfoBanner} from 'components/InfoBanner';
 import {columns, makeRows} from './ContactsWidgetDataGridProps';
 import {EditContactForm} from './EditContactForm';
 
@@ -38,6 +40,14 @@ const validationSchema = Yup.object().shape({
   lastName: Yup.string().required('Last name is required'),
   phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),
   roles: Yup.string().required('Role is required'),
+});
+
+const validationSchemaWithEmailRequired = Yup.object().shape({
+  firstName: Yup.string().required('First name is required'),
+  lastName: Yup.string().required('Last name is required'),
+  phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),
+  roles: Yup.string().required('Role is required'),
+  email: Yup.string().required('Email is required'),
 });
 
 export const ContactsWidget = ({customerId}: Props) => {
@@ -53,9 +63,9 @@ export const ContactsWidget = ({customerId}: Props) => {
   const [activeContact, setActiveContact] = useState<ContactsView | undefined>(
     undefined,
   );
-  const [typeAction, setTypeAction] = useState<'edit' | 'create' | undefined>(
-    undefined,
-  );
+  const [typeAction, setTypeAction] = useState<
+    'edit' | 'create' | 'invite' | undefined
+  >(undefined);
 
   const {mutateAsync: updateContact} = useUpdateContact(
     'Contact updated successfully',
@@ -67,6 +77,9 @@ export const ContactsWidget = ({customerId}: Props) => {
 
   const {mutateAsync: deleteContact} = useDeleteContact(
     'Contact deleted successfully',
+  );
+  const {mutateAsync: inviteContact} = useInviteContact(
+    'Contact invited successfully',
   );
 
   const formik = useFormik<ContactFormModel>({
@@ -81,7 +94,10 @@ export const ContactsWidget = ({customerId}: Props) => {
     onSubmit: (values, {resetForm}) => {
       resetForm();
     },
-    validationSchema,
+    validationSchema:
+      typeAction === 'invite'
+        ? validationSchemaWithEmailRequired
+        : validationSchema,
   });
 
   const {data: contactsResource = createEmptyResource<ContactsView>(5)} =
@@ -106,6 +122,22 @@ export const ContactsWidget = ({customerId}: Props) => {
     setActiveContact(item);
     setOpenDialog(true);
     setTypeAction('edit');
+  };
+
+  const getInvitableContacts = (item: ContactsView) => {
+    formik.setValues({
+      phone: item?.userAccount.contact.phone.replace(/[^\d]/g, '') || '',
+      secondaryPhone:
+        item?.additionalInfo?.secondaryPhone?.replace(/[^\d]/g, '') ?? '',
+      firstName: item?.userAccount.firstName || '',
+      lastName: item?.userAccount.lastName || '',
+      email: item?.userAccount.contact.email || '',
+      roles: item?.userAccount.roles[0] || '',
+    });
+
+    setActiveContact(item);
+    setOpenDialog(true);
+    setTypeAction('invite');
   };
 
   const onCreateContact = () => {
@@ -151,10 +183,44 @@ export const ContactsWidget = ({customerId}: Props) => {
           lastName: formik.values.lastName,
           photoUrl: activeContact?.userAccount.photoUrl || '',
           title: activeContact?.userAccount.title || '',
-          username: activeContact?.userAccount.username || '',
+          username: formik.values.email || '',
         },
       },
       contactId: activeContact?.id || '',
+    });
+
+    setOpenDialog(false);
+  };
+
+  const updateCurrentContactAndInvite = async () => {
+    await updateContact({
+      body: {
+        propertyContactPerson: {
+          externalId: customerId,
+          roles: [convertToMacro(formik.values.roles)],
+          secondaryPhone: formik.values.secondaryPhone
+            ? formatPhoneNumber(formik.values.secondaryPhone)
+            : '',
+        },
+        userAccount: {
+          category: activeContact?.userAccount.category || '',
+          contact: {
+            email: formik.values.email,
+            phone: formik.values.phone
+              ? formatPhoneNumber(formik.values.phone)
+              : '',
+          },
+          firstName: formik.values.firstName,
+          lastName: formik.values.lastName,
+          photoUrl: activeContact?.userAccount.photoUrl || '',
+          title: activeContact?.userAccount.title || '',
+          username: formik.values.email || '',
+        },
+      },
+      contactId: activeContact?.id || '',
+    });
+    await inviteContact({
+      userName: activeContact?.id || '',
     });
 
     setOpenDialog(false);
@@ -206,6 +272,20 @@ export const ContactsWidget = ({customerId}: Props) => {
     setOpenCancelConfirm(false);
   };
 
+  const handleEditOnSave = () => {
+    if (typeAction === 'edit') {
+      updateCurrentContact();
+    }
+
+    if (typeAction === 'create') {
+      saveNewContact();
+    }
+
+    if (typeAction === 'invite') {
+      updateCurrentContactAndInvite();
+    }
+  };
+
   return (
     <Box>
       <InfoCard
@@ -226,13 +306,26 @@ export const ContactsWidget = ({customerId}: Props) => {
           </Typography>
         }
         showHeaderBackground>
+        <InfoBanner
+          title="To invite others to Mainteny an email address is required."
+          body={[
+            'But it is optional when setting up account.',
+            'Add it by editing the Contact Person information.',
+          ]}
+        />
+
         <DataGridLayout
           fullHeight={false}
           isCellClickable={false}
           height={400}
           rows={rows}
           columns={useCallback(
-            () => columns(getEditableContacts, getDeletableContacts),
+            () =>
+              columns(
+                getEditableContacts,
+                getDeletableContacts,
+                getInvitableContacts,
+              ),
             [],
           )()}
           noRowsEmptySection={
@@ -264,8 +357,11 @@ export const ContactsWidget = ({customerId}: Props) => {
       </InfoCard>
       <Dialog
         title={
-          typeAction === 'edit' ? 'Edit Contact Person' : 'Add Contact Person'
+          typeAction === 'edit' || 'invite'
+            ? 'Edit Contact Person'
+            : 'Add Contact Person'
         }
+        saveButtonText={typeAction === 'invite' ? 'Save and Send' : 'Save'}
         disableSaveBtn={!!Object.keys(formik.errors).length}
         onCancel={() => {
           if (typeAction !== 'edit') {
@@ -281,12 +377,12 @@ export const ContactsWidget = ({customerId}: Props) => {
 
           setOpenDialog(false);
         }}
-        onSave={typeAction === 'edit' ? updateCurrentContact : saveNewContact}
+        onSave={handleEditOnSave}
         dialogProps={{
           maxWidth: 'sm',
           open: openDialog || false,
         }}>
-        <EditContactForm formik={formik} />
+        <EditContactForm typeAction={typeAction} formik={formik} />
       </Dialog>
       <Confirm
         open={openCancelConfirm}

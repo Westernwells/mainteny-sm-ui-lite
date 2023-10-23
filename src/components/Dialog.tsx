@@ -19,6 +19,7 @@ interface Props {
   isSaving?: boolean;
   saveBtnType?: 'button' | 'submit' | 'reset';
   leftButton?: React.ReactNode;
+  saveButtonText?: string;
 }
 
 export const Dialog = ({
@@ -31,6 +32,7 @@ export const Dialog = ({
   saveBtnType,
   isSaving = false,
   leftButton,
+  saveButtonText = 'Save',
 }: Props) => {
   const {t} = useTranslation();
   return (
@@ -74,7 +76,7 @@ export const Dialog = ({
               type: saveBtnType,
             }}>
             <Typography variant="subtitle2">
-              {isSaving ? `${t('Saving')}...` : t('Save')}
+              {isSaving ? `${t('Saving')}...` : t(saveButtonText)}
             </Typography>
           </Button>
         </Box>

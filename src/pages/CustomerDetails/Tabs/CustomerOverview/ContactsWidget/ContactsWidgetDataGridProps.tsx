@@ -45,6 +45,7 @@ const defaultAlignment: {
 export const columns = (
   getEditableContacts: (item: ContactsView) => void,
   getDeletableContacts: (item: ContactsView) => void,
+  getInvitableContacts: (item: ContactsView) => void,
 ): GridColDef[] => [
   {
     field: 'name',
@@ -167,6 +168,7 @@ export const columns = (
       <Actions
         onEdit={() => getEditableContacts(params.value)}
         onDelete={() => getDeletableContacts(params.value)}
+        onInvite={() => getInvitableContacts(params.value)}
         contactId={params.value.id}
         status={params.value.userAccount.status}
         canInvite={!!params.value.userAccount.contact.email}
