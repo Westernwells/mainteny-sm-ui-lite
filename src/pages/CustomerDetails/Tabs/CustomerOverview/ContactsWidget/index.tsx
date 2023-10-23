@@ -18,9 +18,10 @@ import {
 } from 'hooks/reactQuery/useContacts';
 import {ContactsView, ContactFormModel} from 'models/contacts';
 import {phoneValidationRE} from 'pages/NewEmployee/BasicEmployeeForm';
+import {PropertyContactPersonRole} from 'pages/NewCustomer/model';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmptySection} from 'components/EmptySection';
-import {convertToMacro} from 'utils/utils';
+import {convertToMacro, convertToText} from 'utils/utils';
 import {Confirm} from 'components/Confirm';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
@@ -88,7 +89,7 @@ export const ContactsWidget = ({customerId}: Props) => {
       firstName: '',
       lastName: '',
       email: '',
-      roles: '',
+      roles: convertToText(PropertyContactPersonRole.FACILITY_MANAGER),
     },
     onSubmit: (values, {resetForm}) => {
       resetForm();
@@ -146,7 +147,7 @@ export const ContactsWidget = ({customerId}: Props) => {
       firstName: '',
       lastName: '',
       email: '',
-      roles: '',
+      roles: convertToText(PropertyContactPersonRole.FACILITY_MANAGER),
     });
 
     setActiveContact(undefined);

@@ -570,7 +570,7 @@
   "SafeLine": "SafeLine",
   "UNIT TYPE": "ANLAGENTYP",
   "Automatic": "Automatisch",
-  "SERIAL NUMBER": "SERIENNUMMER",
+  "SERIAL NUMBER": "FABRIKNUMMER",
   "UNIT CAPACITY": "KAPAZITÄT",
   "SPENDING LIMIT": "AUSGABENLIMIT",
   "LAST INSPECTION": "LETZTE ZÜS Prüfung",
@@ -792,7 +792,7 @@
   "RENEWAL PERIOD": "VERLÄNGERUNGSZEITRAUM",
   "INVOICE DUE": "RECHNUNG FÄLLIG",
   "Contract expires in 120 days": "Vertrag läuft in 120 Tagen aus",
-  "Contract renews in120 days": "Vertrag verlängert sich in 120 Tagen",
+  "Contract renews in 120 days!": "Vertrag verlängert sich in 120 Tagen",
   "MONTHLY": "MONATLICH",
   "Contract ends": "Vertrag endet am",
   "Contract signed": "Vertrag unterzeichnet am",
@@ -1765,5 +1765,8 @@
   "Credit note {{invoiceNumber}}for Job {{orderNumber}}": "Gutschrift {{invoiceNumber}}zum Auftrag {{orderNumber}}",
   "Address not found. Please check and try again": "Adresse wurde nicht gefunden. Bitte überprüfen und versuchen Sie es erneut.",
   "Pick your address location": "Wählen Sie Ihren Standort",
-  "Confirm Location": "Bestätigen Sie Ihren Standort"
+  "Confirm Location": "Bestätigen Sie Ihren Standort",
+  "CONTRACT STATUS": "VERTRAGSSTATUS",
+  "Expiring": "Läuft ab",
+  "Article ID": "Artikel ID"
 }
