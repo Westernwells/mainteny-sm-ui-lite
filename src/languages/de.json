@@ -792,7 +792,7 @@
   "RENEWAL PERIOD": "VERLÄNGERUNGSZEITRAUM",
   "INVOICE DUE": "RECHNUNG FÄLLIG",
   "Contract expires in 120 days": "Vertrag läuft in 120 Tagen aus",
-  "Contract renews in 120 days": "Vertrag verlängert sich in 120 Tagen",
+  "Contract renews in 120 days!": "Vertrag verlängert sich in 120 Tagen",
   "MONTHLY": "MONATLICH",
   "Contract ends": "Vertrag endet am",
   "Contract signed": "Vertrag unterzeichnet am",
@@ -1766,5 +1766,7 @@
   "Address not found. Please check and try again": "Adresse wurde nicht gefunden. Bitte überprüfen und versuchen Sie es erneut.",
   "Pick your address location": "Wählen Sie Ihren Standort",
   "Confirm Location": "Bestätigen Sie Ihren Standort",
-  "CONTRACT STATUS": "VERTRAGSSTATUS"
+  "CONTRACT STATUS": "VERTRAGSSTATUS",
+  "Expiring": "Läuft ab",
+  "Article ID": "Artikel ID"
 }
