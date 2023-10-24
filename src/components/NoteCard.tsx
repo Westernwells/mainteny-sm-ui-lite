@@ -6,6 +6,7 @@ import Edit from '@mui/icons-material/Edit';
 import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import {format} from 'date-fns';
 import {Comment} from 'models/comment';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 interface Props extends BoxProps {
   note: Comment;
@@ -15,7 +16,7 @@ interface Props extends BoxProps {
 
 export const NoteCard = ({note, onDelete, onEdit, ...rest}: Props) => {
   const theme = useTheme();
-
+  const {user} = useUserSession();
   return (
     <Box>
       <Box
@@ -39,14 +40,17 @@ export const NoteCard = ({note, onDelete, onEdit, ...rest}: Props) => {
               note.meta.creator?.lastName
             } - ${format(new Date(note.meta.createdAt), 'dd.MM.yyyy, HH:mm')}`}
           </Typography>
-          <Box display="flex" alignItems="center">
-            <IconButton size="small" onClick={onEdit}>
-              <Edit fontSize="small" />
-            </IconButton>
-            <IconButton size="small" onClick={onDelete}>
-              <DeleteOutline fontSize="small" />
-            </IconButton>
-          </Box>
+
+          {note.meta.creator?.id === user?.userAccount.id && (
+            <Box display="flex" alignItems="center">
+              <IconButton size="small" onClick={onEdit}>
+                <Edit fontSize="small" />
+              </IconButton>
+              <IconButton size="small" onClick={onDelete}>
+                <DeleteOutline fontSize="small" />
+              </IconButton>
+            </Box>
+          )}
         </Box>
 
         <Typography variant="h6" pt="1rem">
