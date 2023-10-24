@@ -4,8 +4,9 @@ import {queryKeys} from 'reactQuery/constants';
 import {useSnackbar} from 'hooks/useSnackbar';
 
 import {Coord, GeocodeAddressView} from 'models/misc';
-import {LanguageContext} from 'context/LanguageProvider';
 import {useContext} from 'react';
+import {UserCompanyContext} from 'context/UserCompanyProvider';
+import {companyLanguageContextMap} from 'utils/utils';
 
 const BASE_URL = 'https://maps.googleapis.com/maps/api';
 
@@ -33,7 +34,8 @@ export const coordsToAddress = async (
 
 export const useCoordsToAddress = (payload: CoordsToAddressPayload | null) => {
   const {showError} = useSnackbar();
-  const {language} = useContext(LanguageContext);
+  const {company} = useContext(UserCompanyContext);
+  const language = companyLanguageContextMap[company?.language || 'en-us'];
 
   if (payload) {
     payload.language = language;

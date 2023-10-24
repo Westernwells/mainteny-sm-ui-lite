@@ -181,6 +181,18 @@ export const languageContextMap: {[key: string]: Language} = {
   SR: Language.SR_RS,
 };
 
+export const companyLanguageContextMap: {[key: string]: string} = {
+  'de-de': 'de',
+  'en-us': 'en',
+  'sr-rs': 'sr',
+};
+
+export const companyLanguageToUppercaseMap: {[key: string]: string} = {
+  'de-de': Language.DE_DE,
+  'en-us': Language.EN_US,
+  'sr-rs': Language.SR_RS,
+};
+
 export const titleCase = (str: string) =>
   `${str[0].toUpperCase()}${str.slice(1).toLowerCase()}`;
 
