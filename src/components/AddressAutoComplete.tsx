@@ -3,14 +3,15 @@ import AddressAutocomplete from 'mui-address-autocomplete';
 import Box from '@mui/material/Box';
 import LocationIcon from '@mui/icons-material/LocationOn';
 import Typography from '@mui/material/Typography';
-import {AddressRecord, GeocodeAddress} from 'models/misc';
+import {AddressRecord, GeocodeAddress, Language} from 'models/misc';
 import {FormInput} from 'components/form/FormInput';
 import {TextFieldProps} from '@mui/material/TextField';
 import {useTranslation} from 'react-i18next';
-import {LanguageContext} from 'context/LanguageProvider';
 import MapIcon from '@mui/icons-material/Map';
 import {IconButton, InputAdornment} from '@mui/material';
 import {useFetchAddressObjectByName} from 'hooks/reactQuery/useAddress';
+import {UserCompanyContext} from 'context/UserCompanyProvider';
+import {companyLanguageContextMap} from 'utils/utils';
 import {MapLocationPicker} from './MapLocationPicker';
 
 interface Props {
@@ -39,11 +40,14 @@ export const AddressAutoComplete = ({
   const [address, setAddress] = useState<any>(null);
   const [open, setOpen] = useState(false);
   const [queryView, setQueryView] = useState(initialValue);
-  const {language = 'en'} = useContext(LanguageContext);
+  const {company} = useContext(UserCompanyContext);
   const [isMapOpen, setIsMapOpen] = useState(false);
   const {data: addressData} = useFetchAddressObjectByName(
     address?.formatted_address,
   );
+
+  const language =
+    companyLanguageContextMap[company?.language || Language.EN_US];
 
   const {t} = useTranslation();
 

@@ -9,6 +9,8 @@ import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
 import {ServiceCompanyItem} from 'models/service-company';
 import {useUpdateCompany} from 'hooks/reactQuery/useCompanies';
+import {useQueryClient} from 'react-query';
+import {queryKeys} from 'reactQuery/constants';
 import {SettingsSchema} from './SettingsSchema';
 import {SettingsCompanyFormModel} from './model';
 import {EditSettings} from './EditSettings';
@@ -21,6 +23,7 @@ interface Props {
 export const Settings = ({containerStyles, company}: Props) => {
   const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
+  const queryClient = useQueryClient();
 
   const {mutateAsync: updateCompany} = useUpdateCompany(
     'Company updated successfully',
@@ -46,6 +49,8 @@ export const Settings = ({containerStyles, company}: Props) => {
       },
       companyId: company?.id || '',
     });
+
+    await queryClient.invalidateQueries([queryKeys.fetchCompany, company?.id]);
 
     setOpenDialog(false);
   };

@@ -8,6 +8,7 @@ import {MutationErrorHandler, queryErrorHandler} from 'reactQuery/handlers';
 import {SnackbarProvider} from 'notistack';
 import {LanguageProvider} from 'context/LanguageProvider';
 import * as Sentry from '@sentry/react';
+import {UserCompanyProvider} from 'context/UserCompanyProvider';
 import {App} from './App';
 import {theme} from './theme';
 import './assets/fonts/Aventa/Aventa-Regular.ttf';
@@ -55,8 +56,11 @@ ReactDOM.render(
           }}
           hideIconVariant
           maxSnack={3}>
-          <App />
+          <UserCompanyProvider>
+            <App />
+          </UserCompanyProvider>
         </SnackbarProvider>
+
         <ReactQueryDevtools />
       </QueryClientProvider>
     </LanguageProvider>
