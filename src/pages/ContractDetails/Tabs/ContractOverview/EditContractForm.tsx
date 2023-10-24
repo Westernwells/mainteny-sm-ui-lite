@@ -87,6 +87,18 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
 
   const currencySymbol = getCurrencySymbol[currency];
 
+  const generateDefaultDate = (formikValues: ContractUpdateRequest) => {
+    const {firstMaintenance} = formikValues;
+
+    if (firstMaintenance) {
+      const year = firstMaintenance?.year ?? 0;
+      const month = firstMaintenance?.month ?? 1;
+      return new Date(year, month - 1);
+    }
+
+    return null;
+  };
+
   return (
     <Grid container spacing={1.8} sx={{mt: '0.1em'}}>
       {formik.values.autoRenewalCancelled && (
@@ -276,13 +288,7 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
 
       <Grid item md={6}>
         <DatePicker
-          defaultDate={
-            formik.values.firstMaintenance &&
-            new Date(
-              formik.values.firstMaintenance?.year,
-              formik.values.firstMaintenance?.month,
-            )
-          }
+          defaultDate={generateDefaultDate(formik.values)}
           dateFormat="MMM yyyy"
           disableMask
           containerStyles={{mr: '1em', width: '100%'}}
