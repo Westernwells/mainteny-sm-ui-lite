@@ -357,7 +357,7 @@ export const ContactsWidget = ({customerId}: Props) => {
       </InfoCard>
       <Dialog
         title={
-          typeAction === 'edit' || 'invite'
+          typeAction === 'edit' || typeAction === 'invite'
             ? 'Edit Contact Person'
             : 'Add Contact Person'
         }
