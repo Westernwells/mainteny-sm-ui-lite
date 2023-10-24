@@ -1768,5 +1768,12 @@
   "Confirm Location": "Bestätigen Sie Ihren Standort",
   "CONTRACT STATUS": "VERTRAGSSTATUS",
   "Expiring": "Läuft ab",
-  "Article ID": "Artikel ID"
+  "Article ID": "Artikel ID",
+  "ARTICLE ID": "ARTIKEL ID",
+  "Invite the Contact Person": "Kontaktperson einladen",
+  "An email address is required to send an invitation with password": "Eine Email-Adresse ist erforderlich, um eine Einladung mit Passwort zu versenden",
+  "An email address is required to invite others to Mainteny": "Eine Email-Adresse ist erforderlich, um Andere zu Mainteny einzuladen.",
+  "But it is optional when setting up account": "Beim Einrichten eines Logins ist dies jedoch optional",
+  "Add an email address by editing the contact person information.": "Fügen Sie eine Email-Adresse hinzu, indem Sie die Kontaktpersoneninformationen bearbeiten",
+  "Save and Send": "Speichern und senden"
 }

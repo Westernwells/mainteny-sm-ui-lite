@@ -1779,5 +1779,12 @@
   "Credit note {{invoiceNumber}}for Job {{orderNumber}}": "Kredit {{invoiceNumber}}za posao {{orderNumber}}",
   "Address not found. Please check and try again": "Adresa nije pronađena. Proverite i pokušajte ponovo",
   "Pick your address location": "Izaberite lokaciju svoje adrese",
-  "Confirm Location": "Potvrdite lokaciju"
+  "Confirm Location": "Potvrdite lokaciju",
+  "CONTRACT STATUS": "STATUS UGOVORA",
+  "Expiring": "Ističe",
+  "Article ID": "Artikl ID",
+  "ARTICLE ID": "ARTIKL ID",
+  "Invite the Contact Person": "Pozovite osobu za kontakt",
+  "But it is optional when setting up account": "Ali to je opciono prilikom podešavanja naloga",
+  "Save and Send": "Sačuvaj i pošalji"
 }
