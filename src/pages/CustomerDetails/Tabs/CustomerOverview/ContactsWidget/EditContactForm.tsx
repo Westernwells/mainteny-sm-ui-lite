@@ -28,7 +28,7 @@ export const EditContactForm = ({formik, typeAction}: Props) => {
           <Grid item xs={12} sx={{marginBottom: '0.7em'}}>
             <InfoBanner
               title="Invite the Contact Person"
-              body="To invite this contact an email address is required to send the invitation with a password"
+              body="An email address is required to send an invitation with password"
             />
           </Grid>
         )}
