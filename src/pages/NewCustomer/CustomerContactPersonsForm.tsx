@@ -191,7 +191,7 @@ export const CustomerContactPersonsForm = ({formik}: Props) => {
       }
       showHeaderBackground>
       <InfoBanner
-        title="To invite others to Mainteny an email address is required."
+        title="An email address is required to invite others to Mainteny"
         body="But it is optional when setting up account."
       />
       {rows.length ? (
