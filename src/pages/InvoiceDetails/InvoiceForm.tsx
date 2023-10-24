@@ -280,7 +280,7 @@ export const InvoiceForm = ({
   const validationSchema = Yup.object().shape({
     subject: Yup.string().required('Subject is required'),
   });
-  console.log(invoice?.subject, 'subject');
+
   const formik = useFormik({
     initialValues,
     validationSchema,
