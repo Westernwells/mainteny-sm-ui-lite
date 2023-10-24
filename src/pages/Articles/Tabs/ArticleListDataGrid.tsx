@@ -34,14 +34,20 @@ export const columns: GridColDef[] = [
     cellClassName: 'truncateText',
   }),
   getColumnProps({
+    field: 'externalId',
+    headerName: 'Article ID',
+  }),
+  getColumnProps({
     field: 'type',
     headerName: 'TYPE',
     cellClassName: 'truncateText',
+    flex: 0.5,
   }),
   getColumnProps({
     field: 'unit',
     headerName: 'UNIT',
     cellClassName: 'truncateText',
+    flex: 0.5,
     renderHeader: (params: GridColumnHeaderParams) => {
       const {t} = useTranslation();
 
@@ -97,6 +103,7 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
   _.map(articles, (item, index) => ({
     id: index,
     name: item.name,
+    externalId: item.externalId ? item.externalId : '-',
     type: item.type,
     unit: item.unit,
     sellingPrice: formatNetAmount(item.unitSellingAmount),
