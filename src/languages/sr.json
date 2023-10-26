@@ -1785,6 +1785,9 @@
   "Article ID": "Artikl ID",
   "ARTICLE ID": "ARTIKL ID",
   "Invite the Contact Person": "Pozovite osobu za kontakt",
+  "An email address is required to send an invitation with password": "Za slanje pozivnice sa lozinkom potrebna je adresa e-pošte",
+  "An email address is required to invite others to Mainteny": "Imejl adresa je potrebna da biste pozvali druge u Mainteni",
   "But it is optional when setting up account": "Ali to je opciono prilikom podešavanja naloga",
+  "Add an email address by editing the contact person information.": "Dodajte adresu e-pošte tako što ćete urediti informacije o kontakt osobi.",
   "Save and Send": "Sačuvaj i pošalji"
 }
