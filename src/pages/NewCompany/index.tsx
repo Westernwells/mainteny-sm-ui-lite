@@ -146,7 +146,6 @@ export const NewCompany = ({getCurrentPageTitle}: Props) => {
       phone: formattedPhone ? `+${formattedPhone}` : '',
       email: basicCompanyFormValues.email,
       url: basicCompanyFormValues.url,
-
       language: settingsCompanyFormValues.language,
       totalYearlyVacationDaysAllowed:
         Number(settingsCompanyFormValues.totalYearlyVacationDaysAllowed) || 0,
@@ -163,7 +162,7 @@ export const NewCompany = ({getCurrentPageTitle}: Props) => {
       vatId: paymentCompanyFormValues.vatId,
       percentageVat: Number(paymentCompanyFormValues.percentageVat) || 0,
       timezone: settingsCompanyFormValues.timeZone,
-      currencies: [],
+      currencies: ['EUR'],
     };
 
     const response = await createServiceCompany(body);
