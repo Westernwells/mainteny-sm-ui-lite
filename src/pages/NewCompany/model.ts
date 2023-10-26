@@ -18,6 +18,7 @@ export type SettingsFormModel = {
   companyDispatchStrategy: DispatchStrategy | string;
   nightlyShuffleEnabled: boolean;
   totalYearlyVacationDaysAllowed: number | string;
+  currency: string;
 };
 
 export type CompanyInformationFormModel = {

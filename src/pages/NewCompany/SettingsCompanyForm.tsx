@@ -17,6 +17,7 @@ import {
   timeFormats,
   timeZones,
 } from 'pages/CompanyDetails/Settings/EditSettings';
+import {getCurrencySymbol} from 'utils/currency';
 import {SettingsFormModel} from './model';
 
 interface Props {
@@ -55,6 +56,7 @@ export const SettingsCompanyForm = ({
       nightlyShuffleEnabled: initialValues?.nightlyShuffleEnabled || false,
       totalYearlyVacationDaysAllowed:
         initialValues?.totalYearlyVacationDaysAllowed || '',
+      currency: initialValues.currency ?? 'EUR',
     },
     isInitialValid: false,
   });
@@ -235,6 +237,27 @@ export const SettingsCompanyForm = ({
                 ...defaultProps,
               }}
             />
+          </Grid>
+          <Grid item xs={5}>
+            <Box>
+              <FormSelect
+                labelId="currency-label"
+                label="Currency"
+                options={Object.entries(getCurrencySymbol).map(([label]) => ({
+                  label,
+                  value: label,
+                }))}
+                selectProps={{
+                  id: 'currency',
+                  value: formik.values.currency,
+                  error: !!(formik.touched.currency && formik.errors.currency),
+                  name: 'currency',
+                  ...defaultProps,
+                }}
+                errorText={formik.touched.currency && formik.errors.currency}
+                required
+              />
+            </Box>
           </Grid>
         </Grid>
       </Box>

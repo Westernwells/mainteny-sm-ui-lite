@@ -65,6 +65,7 @@ export const NewCompany = ({getCurrentPageTitle}: Props) => {
       companyDispatchStrategy: '',
       nightlyShuffleEnabled: false,
       totalYearlyVacationDaysAllowed: '',
+      currency: '',
     });
 
   const [paymentCompanyFormError, setPaymentCompanyFormError] = useState<
@@ -162,7 +163,7 @@ export const NewCompany = ({getCurrentPageTitle}: Props) => {
       vatId: paymentCompanyFormValues.vatId,
       percentageVat: Number(paymentCompanyFormValues.percentageVat) || 0,
       timezone: settingsCompanyFormValues.timeZone,
-      currencies: ['EUR'],
+      currencies: [settingsCompanyFormValues.currency],
     };
 
     const response = await createServiceCompany(body);
