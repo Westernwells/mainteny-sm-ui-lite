@@ -1861,5 +1861,9 @@
   "Duplicate property owner name": "Duplikovano ime vlasnika nekretnine",
   "Multiple currency found": "Pronađeno je više valuta",
   "Article is not allowed to delete": "Članak nije dozvoljeno brisati",
-  "Unit deleted successfully": "Jedinica je uspešno izbrisana"
+  "Unit deleted successfully": "Jedinica je uspešno izbrisana",
+  "Travel": "Putovanje",
+  "Work": "Rad",
+  "Total time must be in 00:00 format": "Ukupno vreme mora biti u formatu 00:00",
+  "Show only total time to the customer": "Prikaži samo ukupno vreme klijentu"
 }
