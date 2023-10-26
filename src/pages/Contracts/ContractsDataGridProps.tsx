@@ -63,8 +63,8 @@ export const columns: GridColDef[] = [
     flex: 0.75,
   }),
   getColumnProps({
-    field: 'type',
-    headerName: 'contract type',
+    field: 'name',
+    headerName: 'contract name',
     align: 'left',
     headerAlign: 'left',
   }),
@@ -119,7 +119,7 @@ export const makeRows = (
         units: item.elevators.length,
         start: formatDate(item.startTime),
         end: formatDate(item.endTime),
-        type: item.type,
+        name: item.name,
         cost: formatNetAmount(item.additionalInfo?.price) || '-',
         status: item.status,
         actions: {
