@@ -38,7 +38,7 @@ export const calculateTotalTime = (workHours: WorkHoursItem[]) => {
     0,
   );
 
-  return convertDigitalMinsToHM(total);
+  return `${convertDigitalMinsToHM(total)} h`;
 };
 
 export const formatServiceName = (

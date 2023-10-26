@@ -19,7 +19,7 @@ import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
 import {ArticleView, ServiceOrderArticleRecord} from './article';
-import {FileResource} from './media';
+import {FileResource, FileResourceRecord} from './media';
 
 export enum Priority {
   A = 'A',
@@ -238,10 +238,17 @@ export interface UpdateJobSchedule {
 }
 
 export interface CompleteServiceOrder {
-  answers?: CheckListAnswerRecord[];
-  description?: string;
   externalId?: string;
+  description?: string;
   serviceTime?: number;
+  travelTime?: number;
+  attachments?: FileResourceRecord[];
+  signatures?: FileResourceRecord[];
+  startTime?: string;
+  endTime?: string;
+  travelStartTime?: string;
+  travelEndTime?: string;
+  onlyShowTotalTime?: boolean;
   articles?: ServiceOrderArticleRecord[];
 }
 

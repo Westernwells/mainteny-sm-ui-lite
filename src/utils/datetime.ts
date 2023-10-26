@@ -131,7 +131,14 @@ export const convertMinsToHM = (minutes: number, padStart: number = 1) => {
 export const convertDigitalMinsToHM = (minutes: number) => {
   const m = Math.floor(minutes % 60).toString();
   const h = Math.floor(minutes / 60).toString();
-  return `${h.padStart(2, '0')}:${m.padStart(2, '0')} h`;
+  return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`;
+};
+
+export const convertHMToMins = (time: string) => {
+  const parts = time.split(':');
+  const hour = parseInt(parts[0], 10);
+  const minutes = parseInt(parts[1], 10);
+  return hour * 60 + minutes;
 };
 
 export const getLastWeek = () => {
