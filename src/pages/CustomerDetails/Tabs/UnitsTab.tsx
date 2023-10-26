@@ -92,7 +92,7 @@ export const UnitsTab = ({customerId}: Props) => {
   }, [elevatorResource]);
 
   const addNewUnit = () => {
-    navigate('/units/new');
+    navigate(`/units/new?customer=${customerId}`);
   };
 
   const clearFilters = () => {
