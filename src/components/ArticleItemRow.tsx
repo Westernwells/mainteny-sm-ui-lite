@@ -60,14 +60,10 @@ export const ArticleItemRow = ({
   const [showDescription, setShowDescription] = useState<boolean>(
     !!articleItem.description,
   );
-  const [quantity, setQuantity] = useState<string>(
-    articleItem.quantity.toString(),
-  );
-  const [price, setPrice] = useState<string>(
-    (
-      articleItem.unitAmount.netAmount /
-      10 ** articleItem.unitAmount.fractionDigits!
-    ).toString(),
+  const [quantity, setQuantity] = useState<number>(articleItem.quantity);
+  const [price, setPrice] = useState(
+    articleItem.unitAmount.netAmount /
+      10 ** articleItem.unitAmount.fractionDigits!,
   );
 
   const {language: selectedLng} = useContext(LanguageContext);
@@ -81,7 +77,7 @@ export const ArticleItemRow = ({
   };
 
   useEffect(() => {
-    articleItem.quantity = Number(quantity);
+    articleItem.quantity = quantity;
 
     setItems((prev) =>
       prev.map((item) => {
@@ -138,7 +134,7 @@ export const ArticleItemRow = ({
               ...item.unitAmount,
               netAmount: isPartial
                 ? partialPrice * 10 ** item.unitAmount.fractionDigits!
-                : Number(price) * 10 ** item.unitAmount.fractionDigits!,
+                : price * 10 ** item.unitAmount.fractionDigits!,
             },
           };
         }
@@ -289,14 +285,14 @@ export const ArticleItemRow = ({
           }}
           onValueChange={(values) => {
             const {floatValue} = values;
-            if (floatValue || floatValue === 0) {
+            if (floatValue) {
               if (isPartial) {
                 setPartialPrice(floatValue);
               } else {
-                setPrice(floatValue.toString());
+                setPrice(floatValue);
               }
             } else {
-              setPrice('');
+              setPrice(0);
               setPartialPrice(0);
             }
           }}
@@ -324,10 +320,10 @@ export const ArticleItemRow = ({
               size="small"
               onValueChange={(values) => {
                 const {floatValue} = values;
-                if (floatValue || floatValue === 0) {
-                  setQuantity(floatValue.toString());
+                if (floatValue) {
+                  setQuantity(floatValue);
                 } else {
-                  setQuantity('');
+                  setQuantity(0);
                 }
               }}
             />
@@ -339,7 +335,7 @@ export const ArticleItemRow = ({
             />
 
             <NumericFormat
-              value={Number(price) * Number(quantity)}
+              value={price * quantity}
               customInput={TextField}
               decimalScale={2}
               fixedDecimalScale
