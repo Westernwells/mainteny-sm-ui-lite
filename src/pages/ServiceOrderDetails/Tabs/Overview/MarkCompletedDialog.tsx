@@ -26,7 +26,6 @@ const validationSchema = Yup.object().shape({
   serviceTime: Yup.number().min(1).nullable().required('Duration is required'),
   description: Yup.string().nullable(),
   externalId: Yup.string().nullable(),
-  answers: Yup.array().nullable(),
 });
 
 export const MarkCompletedDialog = ({
@@ -48,7 +47,6 @@ export const MarkCompletedDialog = ({
           : 1,
       description: serviceOrderDetails?.description,
       externalId: serviceOrderDetails?.externalId,
-      answers: [],
     },
     onSubmit: async (values: CompleteServiceOrder) => {
       await completeServiceOrder({

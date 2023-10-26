@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useFormik} from 'formik';
+import * as Yup from 'yup';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -13,14 +14,22 @@ import {
   useCompleteServiceOrder,
   usePublishWorkReport,
 } from 'hooks/reactQuery/useServiceOrder';
-import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
+import {
+  CompleteServiceOrder,
+  ServiceOrderArticleView,
+  ServiceOrderView,
+} from 'models/service-order';
 import {PageCard} from 'components/PageCard';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {FormInput} from 'components/form/FormInput';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {serviceOrderStatusToString} from 'utils/service-order-utils';
+import {
+  articleViewToArticleRecord,
+  serviceOrderStatusToString,
+} from 'utils/service-order-utils';
+import {convertDigitalMinsToHM, convertHMToMins} from 'utils/datetime';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
@@ -33,11 +42,19 @@ interface Props {
   downloadWorkReport: (() => void) | null;
 }
 
+const validationSchema = Yup.object().shape({
+  serviceTimeHM: Yup.string()
+    .required()
+    .matches(/^[0-9]{2}:[0-9]{2}$/, {
+      message: 'Total time must be in 00:00 format',
+    }),
+});
+
 export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
 
-  const [items, setItems] = useState<ServiceOrderArticleView[]>([]);
+  const [articles, setArticles] = useState<ServiceOrderArticleView[]>([]);
   const report = serviceOrder?.report;
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const {mutate: publishWorkReport, isLoading: publishingWorkReport} =
@@ -55,29 +72,33 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
 
   const {mutate: completeServiceOrder, isLoading: updatingServiceOrder} =
     useCompleteServiceOrder('Work report updated successfully!');
-  const formik = useFormik<{
-    items: ServiceOrderArticleView[];
-    description: string;
-  }>({
+  const formik = useFormik<CompleteServiceOrder & {serviceTimeHM: string}>({
     initialValues: {
-      items,
+      articles: articleViewToArticleRecord(articles),
       description: '',
+      startTime: serviceOrder?.actualStartTime,
+      endTime: serviceOrder?.actualEndTime,
+      travelStartTime: serviceOrder?.travelStartTime,
+      travelEndTime: serviceOrder?.travelEndTime,
+      serviceTimeHM: convertDigitalMinsToHM(report?.actualServiceTime ?? 0),
+      onlyShowTotalTime: report?.additionalInfo?.onlyShowTotalTime ?? false,
     },
     onSubmit: (values) => {
       completeServiceOrder({
         serviceOrderId: serviceOrder.id ?? '',
         body: {
           description: values.description,
-          articles: items.map((i) => ({
-            articleId: i.article.id,
-            description: i.description,
-            name: i.name,
-            quantity: i.quantity,
-            unitAmount: i.unitAmount,
-          })),
+          articles: articleViewToArticleRecord(articles),
+          startTime: values.startTime,
+          endTime: values.endTime,
+          travelStartTime: values.travelStartTime,
+          travelEndTime: values.travelEndTime,
+          serviceTime: convertHMToMins(values.serviceTimeHM) ?? 0,
+          onlyShowTotalTime: values.onlyShowTotalTime,
         },
       });
     },
+    validationSchema,
   });
 
   useEffect(() => {
@@ -86,18 +107,27 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
       if ('articles' in serviceOrder) {
         temp = serviceOrder.articles;
       }
-      setItems(temp);
+      setArticles(temp);
       formik.resetForm({
-        values: {items: temp, description: report?.description ?? ''},
+        values: {
+          articles: articleViewToArticleRecord(temp),
+          description: report?.description ?? '',
+          startTime: serviceOrder?.actualStartTime,
+          endTime: serviceOrder?.actualEndTime,
+          travelStartTime: serviceOrder?.travelStartTime,
+          travelEndTime: serviceOrder?.travelEndTime,
+          serviceTimeHM: convertDigitalMinsToHM(report?.actualServiceTime ?? 0),
+          onlyShowTotalTime: report?.additionalInfo?.onlyShowTotalTime ?? false,
+        },
       });
     }
   }, [report]);
 
   useEffect(() => {
-    if (items.length) {
-      formik.setFieldValue('items', items);
+    if (articles.length) {
+      formik.setFieldValue('articles', articleViewToArticleRecord(articles));
     }
-  }, [items]);
+  }, [articles]);
 
   if (!report) {
     return (
@@ -209,9 +239,9 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
               ))}
           </Box>
         </Box>
-        <Maintenance serviceOrder={serviceOrder} />
+        <Maintenance serviceOrder={serviceOrder} formik={formik} />
 
-        <ArticleItemsTable items={formik.values.items} setItems={setItems} />
+        <ArticleItemsTable items={articles} setItems={setArticles} />
 
         <Box mt="1em">
           <Pictures attachments={report.attachments} />
@@ -283,7 +313,7 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
         primaryButtonAction={formik.handleSubmit}
         listItems={[]}
         isSaving={updatingServiceOrder}
-        isValid={formik.dirty}
+        isValid={formik.dirty && formik.isValid && !formik.isSubmitting}
       />
       <SendEmailDialog
         open={isSendEmailDialogOpen}

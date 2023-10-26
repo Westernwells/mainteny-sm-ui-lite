@@ -1,5 +1,6 @@
 import {differenceInMinutes} from 'date-fns';
 import {
+  ServiceOrderArticleView,
   ServiceOrderStatus,
   ServiceOrderType,
   ServiceOrderView,
@@ -151,3 +152,14 @@ export const serviceOrderTypeToEnum = (type: string) => {
       return ServiceOrderType.REPAIR;
   }
 };
+
+export const articleViewToArticleRecord = (
+  articles: ServiceOrderArticleView[],
+) =>
+  articles.map((i) => ({
+    articleId: i.article.id,
+    description: i.description,
+    name: i.name,
+    quantity: i.quantity,
+    unitAmount: i.unitAmount,
+  }));
