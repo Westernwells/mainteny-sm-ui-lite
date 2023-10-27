@@ -64,7 +64,13 @@ export const PageLayout = ({
     },
   });
 
-  const {setOpen} = useOutletContext<OpenContext>();
+  const outletContext: OpenContext | null = useOutletContext();
+
+  if (!outletContext || typeof outletContext.setOpen !== 'function') {
+    return null;
+  }
+
+  const {setOpen} = outletContext;
 
   const handleDrawerClose = () => {
     setOpen(false);
