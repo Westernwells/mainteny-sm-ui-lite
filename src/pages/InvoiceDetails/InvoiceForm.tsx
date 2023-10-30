@@ -376,9 +376,15 @@ export const InvoiceForm = ({
       formik.setValues({
         ...formik.values,
         propertyOwnerId: invoiceCustomer?.id ?? '',
-        billingAddress: invoiceCustomer?.billingAddress,
-        beneficiaryAddress: invoiceCustomer?.beneficiaryAddress,
-        alternativeAddress: invoiceCustomer?.otherAddress,
+        billingAddress:
+          invoice.additionalInfo?.billingAddress ??
+          invoiceCustomer?.billingAddress,
+        beneficiaryAddress:
+          invoice.additionalInfo?.beneficiaryAddress ??
+          invoiceCustomer?.beneficiaryAddress,
+        alternativeAddress:
+          invoice.additionalInfo?.alternativeAddress ??
+          invoiceCustomer?.otherAddress,
       });
     }
 
