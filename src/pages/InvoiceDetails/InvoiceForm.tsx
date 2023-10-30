@@ -623,7 +623,7 @@ export const InvoiceForm = ({
   const removeAddress = (
     addressType: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress',
   ) => {
-    formik.setFieldValue(addressType, undefined);
+    formik.setFieldValue(addressType, {fullName: null});
   };
 
   const setNewlyCreatedCustomer = (customerId: string) => {
@@ -776,7 +776,7 @@ export const InvoiceForm = ({
                 {customer && (
                   <>
                     <SelectAndEditCombined
-                      selected={!!formik.values.billingAddress}
+                      selected={!!formik.values.billingAddress?.fullName}
                       label="Billing Address"
                       buttonText="Add Billing Address"
                       cardHeader={
@@ -794,7 +794,7 @@ export const InvoiceForm = ({
                     />
 
                     <SelectAndEditCombined
-                      selected={!!formik.values.beneficiaryAddress}
+                      selected={!!formik.values.beneficiaryAddress?.fullName}
                       label="Beneficiary Address"
                       buttonText="Add Beneficiary Address"
                       cardHeader={
@@ -812,7 +812,7 @@ export const InvoiceForm = ({
                     />
 
                     <SelectAndEditCombined
-                      selected={!!formik.values.alternativeAddress}
+                      selected={!!formik.values.alternativeAddress?.fullName}
                       label={
                         <Box>
                           <FormLabel
