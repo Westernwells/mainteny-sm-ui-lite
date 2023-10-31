@@ -148,7 +148,11 @@ export const makeRows = (
       : '-',
     activeContracts:
       !!elevator.contracts.length &&
-      elevator.contracts.some((it) => it.status === ContractStatus.VALID),
+      elevator.contracts.some(
+        (it) =>
+          it.status === ContractStatus.VALID ||
+          it.status === ContractStatus.EXPIRING,
+      ),
     elevator,
     navigateTo: `details/${elevator.id}`,
   }));
