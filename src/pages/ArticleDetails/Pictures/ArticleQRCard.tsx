@@ -4,14 +4,13 @@ import EditIcon from '@mui/icons-material/Create';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import _ from 'lodash';
-import {ArticleView} from '../../../models/article';
-import {useUpdateArticle} from '../../../hooks/reactQuery/useArticle';
-import {useDownloadUrl} from '../../../hooks/reactQuery/useDownloadUrl';
-import {InfoCard} from '../../../components/InfoCard';
+import {useUpdateArticle} from 'hooks/reactQuery/useArticle';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {InfoCard} from 'components/InfoCard';
+import {ArticleView} from 'models/article';
+import {FileResourceRecord} from 'models/media';
 import {ArticleImageUploadForm} from './ArticleImageUploadForm';
 import {NoItemSection} from '../NoItemSection';
-import {FileResourceRecord} from '../../../models/media';
-import {makeAmountRecord} from '../../../utils/currency';
 
 export const ArticleQRCard = ({article}: {article: ArticleView}) => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -25,34 +24,10 @@ export const ArticleQRCard = ({article}: {article: ArticleView}) => {
   );
 
   const saveArticle = async (files: FileResourceRecord[]) => {
-    const temp = {
-      category: article.category,
-      description: article.description,
-      manufacturer: article.manufacturer,
-      model: article.model,
-      name: article.name,
-      externalId: article.externalId,
-      pictureUrls: article.additionalInfo.pictureUrls,
-      qrCode: files.length ? files[0] : undefined,
-      serviceCompanyId: article.serviceCompanyId!,
-      stock: article.stock,
-      storageLocation: article.storageLocation,
-      subCategory: article.subCategory,
-      suppliers: article.additionalInfo.suppliers || [],
-      type: article.type.toUpperCase(),
-      unit: article.unit,
-      unitPurchaseAmount: makeAmountRecord(
-        article.unitPurchaseAmount.netAmount,
-        article.unitPurchaseAmount.currency,
-        article.unitPurchaseAmount.percentageVat,
-      ),
-      unitSellingAmount: makeAmountRecord(
-        article.unitSellingAmount.netAmount,
-        article.unitSellingAmount.currency,
-        article.unitSellingAmount.percentageVat,
-      ),
-    };
-    await updateArticle({articleId: article!.id, article: temp});
+    await updateArticle({
+      articleId: article!.id,
+      article: {qrCode: files.length ? files[0] : undefined},
+    });
     setOpenDialog(false);
   };
 

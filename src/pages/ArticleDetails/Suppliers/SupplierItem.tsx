@@ -1,128 +1,121 @@
-import React from 'react';
+import {useState} from 'react';
 import Box from '@mui/material/Box';
+import useTheme from '@mui/material/styles/useTheme';
+import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
-import {SupplierRecord} from '../../../models/article';
-import {FormInput} from '../../../components/form/FormInput';
-import {FormRadio} from '../../../components/form/FormRadio';
-import {AddressAutoComplete} from '../../../components/AddressAutoComplete';
-import {FormCheckbox} from '../../../components/form/FormCheckbox';
+import {ArticleSupplierView, ExtendedSupplierRecord} from 'models/article';
+import {FormInput} from 'components/form/FormInput';
+import {FormRadio} from 'components/form/FormRadio';
+import {ComboBox} from 'components/ComboBox';
+import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {useQueryArticleSuppliers} from 'hooks/reactQuery/useArticle';
+import {Button} from 'components/Button';
 
 interface Props {
-  supplier: SupplierRecord;
-  updateSupplier: (item: SupplierRecord) => void;
+  index: number;
+  supplier: ExtendedSupplierRecord;
+  updateSupplier: (item: ExtendedSupplierRecord) => void;
+  setIsPreferred: (id: string) => void;
+  removeSupplier: (id: string) => void;
   containerStyles?: {[key: string]: any};
-  useCheckBox: boolean;
+  showRemoveButton?: boolean;
 }
 
+const pageSize = 50;
+
 export const SupplierItem = ({
+  index,
   supplier,
   updateSupplier,
+  setIsPreferred,
+  removeSupplier,
   containerStyles,
-  useCheckBox,
+  showRemoveButton = false,
 }: Props) => {
+  const theme = useTheme();
   const {t} = useTranslation();
+  const [modelQuery, setModelQuery] = useState('');
+  const {
+    data: articleSupplierResource = createEmptyResource<ArticleSupplierView>(
+      pageSize,
+    ),
+  } = useQueryArticleSuppliers(makePage(0, pageSize), modelQuery, {
+    keepPreviousData: true,
+  });
+
   return (
-    <Box display="flex" flexWrap="wrap">
-      <FormInput
+    <Box display="flex" flexWrap="wrap" py={2} maxWidth="54rem">
+      <Box
+        display="flex"
+        flexBasis="100%"
+        justifyContent="space-between"
+        alignItems="center">
+        <Typography variant="caption">{`${t('SUPPLIER')} #${
+          index + 1
+        }`}</Typography>
+
+        {showRemoveButton && (
+          <Button
+            style={{
+              color: theme.palette.error.main,
+            }}
+            buttonProps={{
+              onClick: () => {
+                removeSupplier(supplier.id);
+              },
+            }}>
+            {t('Remove')}
+          </Button>
+        )}
+      </Box>
+      <ComboBox
         containerStyles={{...containerStyles}}
-        props={{
-          id: 'supplierName',
-          label: t('Supplier Name'),
-          placeholder: t('e.g. Hydronic'),
-          value: supplier.name,
-          variant: 'outlined',
-          type: 'text',
-          onChange: (e) => {
-            supplier.name = e.target.value;
-            updateSupplier(supplier);
-          },
+        options={articleSupplierResource.data.map((item) => ({
+          label: item.name,
+          value: item.id,
+        }))}
+        getValue={(item) => {
+          if (item?.value) {
+            updateSupplier({...supplier, supplierId: item.value});
+          }
+        }}
+        initialValue={
+          supplier.supplierId
+            ? {
+                label:
+                  articleSupplierResource.data.find(
+                    (item) => item.id === supplier.supplierId,
+                  )?.name ?? '',
+                value: supplier.supplierId,
+              }
+            : null
+        }
+        getQuery={(item) => setModelQuery(item || '')}
+        textFieldProps={{
+          name: 'supplierId',
+          label: t('Supplier name'),
         }}
       />
       <FormInput
         containerStyles={{...containerStyles}}
         props={{
           id: 'supplierNumber',
-          label: t('Supplier Article Number'),
+          label: t('Supplier specific article number'),
           placeholder: t('e.g. 00000001'),
           value: supplier.number,
           variant: 'outlined',
           type: 'text',
-          onChange: (e) => {
-            supplier.number = e.target.value;
-            updateSupplier(supplier);
-          },
+          onChange: (e) =>
+            updateSupplier({...supplier, number: e.target.value}),
         }}
       />
-      <Box sx={{...containerStyles}}>
-        <AddressAutoComplete
-          initialValue={supplier.address?.fullName || ''}
-          textFieldProps={{
-            label: t('Supplier Address'),
-            placeholder: t('e.g. 34-36 Exmouth Market, London EC1R 4QE'),
-            value: supplier.address?.fullName,
-            variant: 'outlined',
-            type: 'text',
-          }}
-          getAddress={(address) => {
-            supplier.address = address;
-            updateSupplier(supplier);
-          }}
-        />
-      </Box>
-      <FormInput
-        containerStyles={{...containerStyles}}
-        props={{
-          id: 'supplierPhone',
-          label: t('Supplier Phone Number'),
-          placeholder: t('e.g. +49 1000 000000'),
-          value: supplier.phone,
-          variant: 'outlined',
-          type: 'text',
-          onChange: (e) => {
-            supplier.phone = e.target.value;
-            updateSupplier(supplier);
-          },
-        }}
-      />
-      <FormInput
-        containerStyles={{...containerStyles}}
-        props={{
-          id: 'supplierEmailAddress',
-          label: t('Supplier Email Address'),
-          placeholder: 'supplier.part@mail.com',
-          value: supplier.email,
-          variant: 'outlined',
-          type: 'text',
-          onChange: (e) => {
-            supplier.email = e.target.value;
-            updateSupplier(supplier);
-          },
-        }}
-      />
-      {!useCheckBox && (
+      <Box flexBasis="100%">
         <FormRadio
           checked={supplier.isPreferred}
-          handleChange={(e) => {
-            supplier.isPreferred = e.target.checked;
-            updateSupplier(supplier);
-          }}
+          handleChange={() => setIsPreferred(supplier.id)}
           label={t('Preferred Supplier')}
-          radioProps={{
-            sx: {color: 'textSecondary'},
-          }}
         />
-      )}
-      {useCheckBox && (
-        <FormCheckbox
-          checked={supplier.isPreferred}
-          name={supplier.name}
-          label={t('Preferred Supplier')}
-          handleChange={(e) => {
-            supplier.isPreferred = e.target.checked;
-            updateSupplier(supplier);
-          }}
-        />
-      )}
+      </Box>
     </Box>
   );
 };

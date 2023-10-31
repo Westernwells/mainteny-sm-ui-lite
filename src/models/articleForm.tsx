@@ -1,3 +1,4 @@
+import {ExtendedSupplierRecord} from './article';
 import {Money} from './misc';
 
 export interface ArticleBasicFormModel {
@@ -30,6 +31,7 @@ export interface ArticleStockFormModel {
   maxStock: number;
   minOrderQuantity: number;
   minStock: number;
+  suppliers?: ExtendedSupplierRecord[];
 }
 
 export interface TestContextExtended {

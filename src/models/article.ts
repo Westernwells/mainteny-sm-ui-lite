@@ -31,7 +31,6 @@ export interface ArticleAdditionalInfo {
   items: ArticleItem[];
   pictureUrls: string[];
   qrCode: FileResource;
-  suppliers: Supplier[];
   costPackage?: CostPackage;
 }
 
@@ -90,23 +89,24 @@ export interface CreateArticleRecord {
 }
 
 export interface UpdateArticleRecord {
-  category: string;
+  category?: string;
   description?: string;
   manufacturer?: string;
   model?: string;
-  name: string;
-  externalId: string;
+  name?: string;
+  externalId?: string;
   pictureUrls?: (string | undefined)[];
   qrCode?: FileResourceRecord;
-  serviceCompanyId: string;
+  serviceCompanyId?: string;
   stock?: Stock;
   storageLocation?: string;
   subCategory?: string;
-  suppliers: SupplierRecord[];
-  type: string;
-  unit: string;
+  suppliers?: SupplierRecord[];
+  type?: string;
+  unit?: string;
   unitPurchaseAmount?: AmountRecord;
-  unitSellingAmount: AmountRecord;
+  unitSellingAmount?: AmountRecord;
+  costPackage?: CostPackage;
 }
 
 export interface QueryArticleParams {
@@ -125,35 +125,23 @@ export interface Stock {
   minStock: number;
 }
 
-export interface Supplier {
-  name: string;
-  number: string;
-  email: string;
-  phone: string;
-  website: string;
-  address: Address;
-  isPreferred: boolean;
-}
-
 export interface ArticleSupplierItemView {
   id: string;
   articleId: string;
   supplier: ArticleSupplierView;
   number: string;
-  isPreferred: boolean;
+  isPreferred?: boolean;
   additionalInfo: string;
-  preferred: boolean;
 }
 
 export interface SupplierRecord {
-  name: string;
-  number: string;
-  email: string;
-  phone: string;
-  website: string;
-  address?: AddressRecord;
-  isPreferred: boolean;
+  supplierId?: string;
+  number?: string;
+  isPreferred?: boolean;
 }
+
+export type ExtendedSupplierRecord = SupplierRecord & {id: string};
+
 export interface ServiceOrderArticleRecord {
   articleId: string;
   description: string;
@@ -184,12 +172,12 @@ export interface ArticleSupplierView {
   serviceCompanyId: string;
   externalId: string;
   name: string;
-  address: Address;
+  address?: Address;
   contact: CompanyContact;
   additionalInfo: string;
   search: string;
   meta: Meta;
-  category: string;
+  category?: string;
 }
 
 export interface ArticleSupplierSimpleView {
@@ -262,13 +250,13 @@ export interface CreateArticleSupplierRecord {
 }
 
 export interface UpdateArticleSupplierRecord {
-  externalId: string;
-  name: string;
-  email: string;
-  phone: string;
-  url: string;
-  address: AddressRecord;
-  category: string;
+  externalId?: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  url?: string;
+  address?: AddressRecord;
+  category?: string;
 }
 
 export interface PropertyOwnerArticleRecord {

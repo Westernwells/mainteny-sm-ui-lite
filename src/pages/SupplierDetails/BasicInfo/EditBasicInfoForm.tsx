@@ -34,9 +34,13 @@ export const EditBasicInfoForm = ({
     data: articleSupplierResource = createEmptyResource<ArticleSupplierView>(
       25,
     ),
-  } = useQueryArticleSuppliers(makePage(0, 50), formik.values.externalId, {
-    keepPreviousData: true,
-  });
+  } = useQueryArticleSuppliers(
+    makePage(0, 50),
+    formik.values?.externalId ?? '',
+    {
+      keepPreviousData: true,
+    },
+  );
 
   useEffect(() => {
     setInitId(formik.values.externalId);
@@ -123,8 +127,8 @@ export const EditBasicInfoForm = ({
         <AddressAutoComplete
           initialValue={formik.values.address?.fullName || ''}
           inputError={
-            formik.errors.address?.fullName && formik.touched.address
-              ? formik.errors.address.fullName
+            formik.errors.address && formik.touched.address
+              ? formik.errors.address
               : ''
           }
           handleBlur={formik.handleBlur}

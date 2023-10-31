@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
-import Divider from '@mui/material/Divider';
-import _ from 'lodash';
+import AddIcon from '@mui/icons-material/Add';
+import LocalShipping from '@mui/icons-material/LocalShipping';
 import cloneDeep from 'lodash/cloneDeep';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
@@ -16,7 +16,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {PageCard} from 'components/PageCard';
 import {FormInput} from 'components/form/FormInput';
 import {Button} from 'components/Button';
-import {ArticleType, ArticleView, SupplierRecord} from 'models/article';
+import {ArticleType, ArticleView, ExtendedSupplierRecord} from 'models/article';
 import {ArticleBasicFormModel, ArticleStockFormModel} from 'models/articleForm';
 import {
   amountRecordForBackend,
@@ -26,6 +26,7 @@ import {
 } from 'utils/currency';
 import {createEmptyResource} from 'utils/paging-utils';
 import {handleCostPackageValidation} from 'utils/article-utils';
+import {getUniqueId} from 'utils/utils';
 import {SupplierItem} from './Suppliers/SupplierItem';
 import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';
 import {AddStockForm} from './Stock/AddStockForm';
@@ -34,6 +35,11 @@ const validationSchema = Yup.object().shape({
   category: Yup.string().nullable().required('Category is required'),
   name: Yup.string().nullable().required('Name is required'),
   externalId: Yup.string().nullable().required('External Id is required'),
+  suppliers: Yup.array().of(
+    Yup.object().shape({
+      supplierId: Yup.string().uuid().required('Supplier is required'),
+    }),
+  ),
   type: Yup.string().nullable().required('Type is required'),
   unit: Yup.string().nullable().required('Unit is required'),
   unitPurchaseVat: Yup.number()
@@ -77,21 +83,11 @@ export const NewArticle = () => {
     t('Article created successfully'),
   );
   const [description, setDescription] = useState('');
-  const [suppliers, setSuppliers] = useState<SupplierRecord[]>([
+  const [suppliers, setSuppliers] = useState<ExtendedSupplierRecord[]>([
     {
-      name: '',
+      id: getUniqueId(),
+      supplierId: '',
       number: '',
-      email: '',
-      phone: '',
-      website: '',
-      address: {
-        fullName: '',
-        countryCode: 'DE',
-        location: {
-          longitude: -1,
-          latitude: -1,
-        },
-      },
       isPreferred: true,
     },
   ]);
@@ -156,6 +152,17 @@ export const NewArticle = () => {
           formik.values.unitPurchaseVat > 100,
       );
     }
+    if (activeStep === 2) {
+      const schema = Yup.object().shape({
+        supplierId: Yup.string().uuid(),
+      });
+      return setDisableNextBtn(
+        suppliers.some(
+          (s) =>
+            s.supplierId && !schema.isValidSync({supplierId: s.supplierId}),
+        ),
+      );
+    }
     return setDisableNextBtn(false);
   }, [activeStep, formik, suppliers]);
 
@@ -196,7 +203,7 @@ export const NewArticle = () => {
       },
       storageLocation: formik.values.storageLocation,
       subCategory: '',
-      suppliers,
+      suppliers: suppliers.filter((s) => !!s.supplierId),
       type: formik.values.type.toUpperCase(),
       unit: formik.values.unit,
       unitPurchaseAmount: amountRecordForBackend(
@@ -233,51 +240,44 @@ export const NewArticle = () => {
 
   const addSupplier = () => {
     const origin = cloneDeep(suppliers);
-    const supplier = {
-      name: '',
+    const supplier: ExtendedSupplierRecord = {
+      id: getUniqueId(),
+      supplierId: '',
       number: '',
-      email: '',
-      phone: '',
-      website: '',
-      address: {
-        fullName: '',
-        countryCode: 'DE',
-        location: {
-          longitude: -1,
-          latitude: -1,
-        },
-      },
       isPreferred: false,
     };
     origin.push(supplier);
     setSuppliers(origin);
   };
 
-  const updateSupplier = (item: SupplierRecord) => {
-    if (item.isPreferred) {
-      _.chain(suppliers)
-        .filter((it) => it !== item)
-        .each((it) => {
-          it.isPreferred = false;
-        })
-        .value();
-    }
-    const modified = cloneDeep(suppliers);
-    setSuppliers(modified);
+  const updateSupplier = (item: ExtendedSupplierRecord) => {
+    setSuppliers(suppliers.map((s) => (s.id === item.id ? item : s)));
   };
 
-  const supplierItem = _.map(suppliers, (supplier, key) => (
-    <Box key={key}>
-      <SupplierItem
-        supplier={supplier}
-        updateSupplier={updateSupplier}
-        containerStyles={{width: '33%', pr: '1rem', my: '1rem'}}
-        useCheckBox={suppliers.length === 1}
-      />
-      {suppliers.length > 1 && key !== suppliers.length - 1 && (
-        <Divider sx={{my: '1rem'}} />
-      )}
-    </Box>
+  const setIsPreferred = (id: string) => {
+    setSuppliers(
+      suppliers.map((supplier) => ({
+        ...supplier,
+        isPreferred: supplier.id === id,
+      })),
+    );
+  };
+
+  const removeSupplier = (id: string) => {
+    setSuppliers(suppliers.filter((supplier) => supplier.id !== id));
+  };
+
+  const supplierItem = suppliers.map((supplier, index) => (
+    <SupplierItem
+      index={index}
+      key={supplier.id}
+      supplier={supplier}
+      updateSupplier={updateSupplier}
+      setIsPreferred={setIsPreferred}
+      removeSupplier={removeSupplier}
+      containerStyles={{width: '50%', pr: '1rem', mt: '1rem', mb: '0.5rem'}}
+      showRemoveButton={suppliers.length > 1}
+    />
   ));
 
   const {data: articleResource = createEmptyResource<ArticleView>(10)} =
@@ -356,33 +356,43 @@ export const NewArticle = () => {
               />
               <Box
                 display="flex"
-                flexDirection="column"
-                sx={{
-                  boxShadow:
-                    suppliers.length > 1 ? '0 2px 5px -3px gray' : 'none',
-                }}>
+                justifyContent="space-between"
+                alignItems="center"
+                pt={3}>
                 <Typography
                   variant="subtitle2"
                   sx={{
                     color: theme.palette.text.primary,
                     minHeight: '2rem',
                     mt: '2em',
-                    boxShadow:
-                      suppliers.length > 1 ? '0 2px 5px -3px gray' : 'none',
                   }}>
                   {t('Suppliers Information')}
                 </Typography>
-                <Box sx={{height: '210px', overflowY: 'auto'}} component="form">
-                  {supplierItem}
-                </Box>
+                <Button
+                  style={{
+                    color: theme.palette.primary.light,
+                  }}
+                  buttonProps={{
+                    startIcon: <LocalShipping color="primary" />,
+                    onClick: () =>
+                      window.open('/articles/newSupplier', '_blank'),
+                  }}>
+                  {t('Create Supplier')}
+                </Button>
               </Box>
+              <Box component="form">{supplierItem}</Box>
               <Box display="flex">
                 <Button
-                  label={`+ ${t('Add Supplier')}`}
+                  label="Add Supplier"
                   style={{mt: '0.5rem'}}
                   buttonProps={{
                     onClick: () => addSupplier(),
                     variant: 'outlined',
+                    startIcon: <AddIcon />,
+                    size: 'medium',
+                    sx: {
+                      background: 'transparent',
+                    },
                   }}
                 />
               </Box>

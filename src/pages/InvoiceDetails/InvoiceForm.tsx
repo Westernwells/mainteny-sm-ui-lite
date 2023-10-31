@@ -444,6 +444,11 @@ export const InvoiceForm = ({
           ),
         true,
       );
+      if (!invoiceItems.length) {
+        setInvoiceItems(
+          serviceOrder?.articles?.map((item) => articleViewToItem(item)),
+        );
+      }
     }
   }, [serviceOrder, formik.values.type]);
 

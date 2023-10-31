@@ -146,12 +146,10 @@ export const OrderArticle = () => {
             articleId: articleFromLocation.id,
             articleName: articleFromLocation.name,
             supplierArticleNumber:
-              ((articleFromLocation?.additionalInfo?.suppliers?.length ?? 0) > 1
-                ? articleFromLocation?.additionalInfo?.suppliers?.find(
-                    (s) => s.isPreferred,
-                  )?.number
-                : articleFromLocation?.additionalInfo?.suppliers?.[0]
-                    ?.number) ?? '-',
+              ((articleFromLocation?.suppliers?.length ?? 0) > 1
+                ? articleFromLocation?.suppliers?.find((s) => s.isPreferred)
+                    ?.number
+                : articleFromLocation?.suppliers?.[0]?.number) ?? '-',
             quantity: 1,
             unit: articleFromLocation.unit,
             description: articleFromLocation.description,

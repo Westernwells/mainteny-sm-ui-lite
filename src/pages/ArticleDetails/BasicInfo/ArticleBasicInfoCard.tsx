@@ -15,7 +15,7 @@ import Tag from '@mui/icons-material/Tag';
 import _ from 'lodash';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
-import {ArticleView} from 'models/article';
+import {ArticleView, UpdateArticleRecord} from 'models/article';
 import {ArticleBasicFormModel} from 'models/articleForm';
 import {Dialog} from 'components/Dialog';
 import {useUpdateArticle} from 'hooks/reactQuery/useArticle';
@@ -129,20 +129,13 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
 
   const saveArticle = async () => {
     const factor = currencyFactor({currency: currentCurrency.code});
-    const temp = {
+    const temp: UpdateArticleRecord = {
       category: formik.values.category,
-      description: article.description,
       manufacturer: formik.values.manufacturer,
       model: formik.values.model,
       name: formik.values.name,
       externalId: formik.values.externalId,
-      pictureUrls: article.additionalInfo.pictureUrls,
-      qrCode: article.additionalInfo.qrCode,
-      serviceCompanyId: article.serviceCompanyId!,
-      stock: article.stock,
       storageLocation: formik.values.storageLocation,
-      subCategory: article.subCategory,
-      suppliers: article.additionalInfo.suppliers || [],
       type: formik.values.type.toUpperCase(),
       unit: formik.values.unit,
       unitPurchaseAmount: amountRecordForBackend(

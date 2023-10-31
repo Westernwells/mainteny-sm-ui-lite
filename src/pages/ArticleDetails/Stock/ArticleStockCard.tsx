@@ -10,15 +10,14 @@ import ViewComfyIcon from '@mui/icons-material/ViewComfy';
 import Filter1Icon from '@mui/icons-material/Filter1';
 import {useFormik} from 'formik';
 import _ from 'lodash';
-import {ArticleView} from '../../../models/article';
-import {useUpdateArticle} from '../../../hooks/reactQuery/useArticle';
-import {CardProps} from '../../../components/CardProps';
+import {ArticleView} from 'models/article';
+import {useUpdateArticle} from 'hooks/reactQuery/useArticle';
+import {CardProps} from 'components/CardProps';
+import {InfoCard} from 'components/InfoCard';
+import {Dialog} from 'components/Dialog';
+import {ArticleStockFormModel} from 'models/articleForm';
 import {NoItemSection} from '../NoItemSection';
-import {InfoCard} from '../../../components/InfoCard';
 import {EditStockForm} from './EditStockForm';
-import {Dialog} from '../../../components/Dialog';
-import {ArticleStockFormModel} from '../../../models/articleForm';
-import {makeAmountRecord} from '../../../utils/currency';
 
 export const ArticleStockCard = ({article}: {article: ArticleView}) => {
   const theme = useTheme();
@@ -39,39 +38,17 @@ export const ArticleStockCard = ({article}: {article: ArticleView}) => {
   });
 
   const saveArticle = async () => {
-    const temp = {
-      category: article.category,
-      description: article.description,
-      manufacturer: article.manufacturer,
-      model: article.model,
-      name: article.name,
-      externalId: article.externalId,
-      pictureUrls: article.additionalInfo.pictureUrls,
-      qrCode: article.additionalInfo.qrCode,
-      serviceCompanyId: article.serviceCompanyId!,
-      stock: {
-        currentStock: formik.values.currentStock,
-        maxStock: formik.values.maxStock,
-        minOrderQuantity: formik.values.minOrderQuantity,
-        minStock: formik.values.minStock,
+    await updateArticle({
+      articleId: article!.id,
+      article: {
+        stock: {
+          currentStock: formik.values.currentStock,
+          maxStock: formik.values.maxStock,
+          minOrderQuantity: formik.values.minOrderQuantity,
+          minStock: formik.values.minStock,
+        },
       },
-      storageLocation: article.storageLocation,
-      subCategory: article.subCategory,
-      suppliers: article.additionalInfo.suppliers || [],
-      type: article.type.toUpperCase(),
-      unit: article.unit,
-      unitPurchaseAmount: makeAmountRecord(
-        article.unitPurchaseAmount.netAmount,
-        article.unitPurchaseAmount.currency,
-        article.unitPurchaseAmount.percentageVat,
-      ),
-      unitSellingAmount: makeAmountRecord(
-        article.unitSellingAmount.netAmount,
-        article.unitSellingAmount.currency,
-        article.unitSellingAmount.percentageVat,
-      ),
-    };
-    await updateArticle({articleId: article!.id, article: temp});
+    });
     setOpenDialog(false);
   };
 

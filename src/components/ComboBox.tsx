@@ -82,6 +82,7 @@ export const ComboBox = ({
         },
         ...containerStyles,
       }}
+      isOptionEqualToValue={(option, value) => option.value === value.value}
       renderInput={(params) => (
         <FormInput
           props={{

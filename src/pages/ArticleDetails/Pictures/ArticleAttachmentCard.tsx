@@ -5,14 +5,13 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import useTheme from '@mui/material/styles/useTheme';
 import _ from 'lodash';
-import {ArticleView} from '../../../models/article';
-import {useDownloadUrl} from '../../../hooks/reactQuery/useDownloadUrl';
+import {InfoCard} from 'components/InfoCard';
+import {ArticleView} from 'models/article';
+import {FileResourceRecord} from 'models/media';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {useUpdateArticle} from 'hooks/reactQuery/useArticle';
 import {NoItemSection} from '../NoItemSection';
-import {InfoCard} from '../../../components/InfoCard';
-import {useUpdateArticle} from '../../../hooks/reactQuery/useArticle';
 import {ArticleImageUploadForm} from './ArticleImageUploadForm';
-import {FileResourceRecord} from '../../../models/media';
-import {makeAmountRecord} from '../../../utils/currency';
 
 export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
   const theme = useTheme();
@@ -34,37 +33,15 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
   }, [pictureUrls]);
 
   const saveArticle = async (files: FileResourceRecord[]) => {
-    const temp = {
-      category: article.category,
-      description: article.description,
-      manufacturer: article.manufacturer,
-      model: article.model,
-      name: article.name,
-      externalId: article.externalId,
-      pictureUrls: [
-        ...(article.additionalInfo.pictureUrls || []),
-        ...files.map((it) => it.uri),
-      ],
-      qrCode: article.additionalInfo.qrCode,
-      serviceCompanyId: article.serviceCompanyId!,
-      stock: article.stock,
-      storageLocation: article.storageLocation,
-      subCategory: article.subCategory,
-      suppliers: article.additionalInfo.suppliers || [],
-      type: article.type.toUpperCase(),
-      unit: article.unit,
-      unitPurchaseAmount: makeAmountRecord(
-        article.unitPurchaseAmount.netAmount,
-        article.unitPurchaseAmount.currency,
-        article.unitPurchaseAmount.percentageVat,
-      ),
-      unitSellingAmount: makeAmountRecord(
-        article.unitSellingAmount.netAmount,
-        article.unitSellingAmount.currency,
-        article.unitSellingAmount.percentageVat,
-      ),
-    };
-    await updateArticle({articleId: article!.id, article: temp});
+    await updateArticle({
+      articleId: article!.id,
+      article: {
+        pictureUrls: [
+          ...(article.additionalInfo.pictureUrls || []),
+          ...files.map((it) => it.uri),
+        ],
+      },
+    });
     setOpenDialog(false);
   };
 
