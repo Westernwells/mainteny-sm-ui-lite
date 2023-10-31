@@ -75,6 +75,7 @@ export const queryKeys = {
   fetchSyncStatusXero: 'fetchSyncStatusXero',
   fetchXeroIntegration: 'fetchXeroIntegration',
   fetchServiceJobArticles: 'fetchServiceJobArticles',
+  fetchEntitiesStates: 'fetchEntitiesStates',
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',

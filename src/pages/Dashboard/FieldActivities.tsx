@@ -1,6 +1,8 @@
+import {useCallback} from 'react';
 import {InfiniteData} from 'react-query';
 import {useTranslation} from 'react-i18next';
 import {format} from 'date-fns';
+import {uniq} from 'lodash';
 import {Link as RouterLink} from 'react-router-dom';
 import useTheme from '@mui/material/styles/useTheme';
 import Grid from '@mui/material/Grid';
@@ -13,11 +15,12 @@ import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineDot from '@mui/lab/TimelineDot';
 import {Engineering, LocationOn, Tag} from '@mui/icons-material';
-import {Resource} from 'models/misc';
+import {IdStateType, Resource, State} from 'models/misc';
 import {ServiceCompanyActivity} from 'models/service-company';
 import {ServiceOrder} from 'models/service-order';
 import {InfoCard} from 'components/InfoCard';
 import {CardProps} from 'components/CardProps';
+import {useEntitiesStates} from 'hooks/reactQuery/useEntity';
 import {getFieldActivityColor, getFieldActivityTitle} from 'utils/dashboard';
 import {FieldActivitiesSkeleton} from './FieldActivitiesSkeleton';
 
@@ -40,6 +43,21 @@ export const FieldActivities = ({
 }) => {
   const {t} = useTranslation();
   const theme = useTheme();
+  const {data: entitiesStates} = useEntitiesStates({
+    // making ids array unique to avoid duplicated api calls and use cache
+    id: uniq(
+      activities.pages
+        .map((page) => page.data.map((activity) => activity.data.elevator.id))
+        .flat(),
+    ),
+    type: IdStateType.ELEVATOR,
+  });
+  const isElevatorDeleted = useCallback(
+    (elevatorId: string) =>
+      entitiesStates?.find((entityState) => entityState.id === elevatorId)
+        ?.state === State.DELETED ?? true,
+    [entitiesStates],
+  );
 
   return (
     <InfoCard
@@ -129,14 +147,20 @@ export const FieldActivities = ({
                         }
                         label={t('UNIT ADDRESS')}
                         bodyText={
-                          <Link
-                            component={RouterLink}
-                            to={`/units/details/${activity.data.elevator.id}`}
-                            underline="hover"
-                            variant="body2"
-                            color={theme.palette.info.dark}>
-                            {activity.data.elevator.address.fullName}
-                          </Link>
+                          isElevatorDeleted(activity.data.elevator.id) ? (
+                            <Typography variant="body2">
+                              {activity.data.elevator.address.fullName}
+                            </Typography>
+                          ) : (
+                            <Link
+                              component={RouterLink}
+                              to={`/units/details/${activity.data.elevator.id}`}
+                              underline="hover"
+                              variant="body2"
+                              color={theme.palette.info.dark}>
+                              {activity.data.elevator.address.fullName}
+                            </Link>
+                          )
                         }
                         iconBackground={theme.palette.info.outlinedHoverBg}
                         iconContainerStyles={iconContainerStyles}

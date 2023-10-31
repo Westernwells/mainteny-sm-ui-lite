@@ -350,3 +350,30 @@ export interface GeocodeAddressView {
   results: GeocodeAddress[];
   status: string;
 }
+
+export enum IdStateType {
+  ADDRESS = 'ADDRESS',
+  ARTICLE = 'ARTICLE',
+  ARTICLE_SUPPLIER = 'ARTICLE_SUPPLIER',
+  ARTICLE_ORDER = 'ARTICLE_ORDER',
+  CONTRACT = 'CONTRACT',
+  ELEVATOR = 'ELEVATOR',
+  EMPLOYEE = 'EMPLOYEE',
+  INVOICE = 'INVOICE',
+  PROPERTY_OWNER = 'PROPERTY_OWNER',
+  PROPERTY_CONTACT_PERSON = 'PROPERTY_CONTACT_PERSON',
+  QUOTATION = 'QUOTATION',
+  SERVICE_COMPANY = 'SERVICE_COMPANY',
+  SERVICE_ORDER = 'SERVICE_ORDER',
+  SERVICE_ORDER_REPORT = 'SERVICE_ORDER_REPORT',
+}
+
+export interface IdStateParams {
+  id: string[];
+  type: IdStateType;
+}
+
+export interface IdState {
+  id: string;
+  state: State;
+}
