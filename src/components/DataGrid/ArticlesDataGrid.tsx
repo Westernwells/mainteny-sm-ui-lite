@@ -60,33 +60,34 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = (articles: ArticleView[]): GridRowsProp =>
-  articles
-    ? articles.map((item, index) => ({
-        id: index,
-        name: item.name,
-        number: item.externalId,
-        type: item.type,
-        model: item.model,
-        manufacturer: item.manufacturer,
-        description: item.description,
-        price: `${formatCurrency(
-          item
-            ? item.unitSellingAmount.netAmount /
-                10 ** item.unitSellingAmount.fractionDigits!
-            : 0,
-          {
-            currency: item.unitSellingAmount.currency,
-          },
-        )}`,
-        article: item,
-      }))
-    : [];
-
 const pageSize = 25;
 
 export const ArticlesDataGrid = ({setRowItem, search, setSearch}: Props) => {
   const {t} = useTranslation();
+
+  const makeRows = (articles: ArticleView[]): GridRowsProp =>
+    articles
+      ? articles.map((item, index) => ({
+          id: index,
+          name: item.name,
+          number: item.externalId,
+          type: `${t(item.type)}`,
+          model: item.model,
+          manufacturer: item.manufacturer,
+          description: item.description,
+          price: `${formatCurrency(
+            item
+              ? item.unitSellingAmount.netAmount /
+                  10 ** item.unitSellingAmount.fractionDigits!
+              : 0,
+            {
+              currency: item.unitSellingAmount.currency,
+            },
+          )}`,
+          article: item,
+        }))
+      : [];
+
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
