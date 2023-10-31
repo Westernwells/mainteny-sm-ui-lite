@@ -99,25 +99,24 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = (articles: ArticleView[]): GridRowsProp =>
-  _.map(articles, (item, index) => ({
-    id: index,
-    name: item.name,
-    externalId: item.externalId ? item.externalId : '-',
-    type: item.type,
-    unit: item.unit,
-    sellingPrice: formatNetAmount(item.unitSellingAmount),
-    description: item.description,
-    taxes: item.unitSellingAmount.percentageVat
-      ? `${item.unitSellingAmount.percentageVat}%`
-      : '-',
-    navigateTo: `details/${item.id}`,
-    item,
-  }));
-
-const pageSize = 25;
-
 export const ArticleListDataGrid = () => {
+  const {t} = useTranslation();
+  const pageSize = 25;
+  const makeRows = (articles: ArticleView[]): GridRowsProp =>
+    _.map(articles, (item, index) => ({
+      id: index,
+      name: item.name,
+      externalId: item.externalId ? item.externalId : '-',
+      type: `${t(item.type)}`,
+      unit: item.unit,
+      sellingPrice: formatNetAmount(item.unitSellingAmount),
+      description: item.description,
+      taxes: item.unitSellingAmount.percentageVat
+        ? `${item.unitSellingAmount.percentageVat}%`
+        : '-',
+      navigateTo: `details/${item.id}`,
+      item,
+    }));
   const navigate = useNavigate();
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);

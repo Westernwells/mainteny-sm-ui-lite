@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography';
 import {capitalize} from 'utils/utils';
 import {WorkHoursType} from 'models/workHours';
 import {formatServiceName} from 'utils/work-hours-utils';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   workHourType?: WorkHoursType | null;
@@ -16,10 +17,13 @@ export const WorkHourTypeText = ({
   style,
   variant,
   capitalizeText,
-}: Props) => (
-  <Typography component="span" variant={variant || 'caption'} sx={{...style}}>
-    {capitalizeText
-      ? capitalize([formatServiceName(workHourType)])
-      : formatServiceName(workHourType)}
-  </Typography>
-);
+}: Props) => {
+  const {t} = useTranslation();
+  return (
+    <Typography component="span" variant={variant || 'caption'} sx={{...style}}>
+      {capitalizeText
+        ? `${t(capitalize([formatServiceName(workHourType)]))}`
+        : formatServiceName(workHourType)}
+    </Typography>
+  );
+};
