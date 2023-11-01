@@ -8,6 +8,7 @@ import {ReactComponent as AttachmentIllustration} from 'assets/illustrations/Att
 import {ReactComponent as QRCodeIllustration} from 'assets/illustrations/QR.svg';
 import {ReactComponent as StockIllustration} from 'assets/illustrations/Stock.svg';
 import {ReactComponent as SupplierIllustration} from 'assets/illustrations/Supplier.svg';
+import {ReactComponent as MobileUsabilityTesting} from 'assets/illustrations/MobileUsabilityTesting.svg';
 import {Button} from './Button';
 
 interface Props extends BoxProps {
@@ -22,7 +23,8 @@ interface Props extends BoxProps {
     | 'laptop'
     | 'qrcode'
     | 'stock'
-    | 'supplier';
+    | 'supplier'
+    | 'checklist';
   showActionBtn?: boolean;
   btnLabel?: string;
   btnAction?: () => void;
@@ -70,6 +72,10 @@ export const EmptySection = ({
         return <StockIllustration style={{width: '100%', height: '100%'}} />;
       case 'supplier':
         return <SupplierIllustration style={{width: '100%', height: '100%'}} />;
+      case 'checklist':
+        return (
+          <MobileUsabilityTesting style={{width: '100%', height: '100%'}} />
+        );
       default:
         return <LaptopIllustration style={{width: '100%', height: '100%'}} />;
     }
@@ -102,7 +108,7 @@ export const EmptySection = ({
           buttonProps={{
             onClick: btnAction,
             variant: 'contained',
-            size: 'medium',
+            size: 'large',
             startIcon: actionButtonIcon || <AddIcon />,
             endIcon: actionButtonEndIcon || null,
           }}>

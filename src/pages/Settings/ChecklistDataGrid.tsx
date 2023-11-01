@@ -115,7 +115,7 @@ export const ChecklistDataGrid = () => {
         columns={columns}
         noRowsEmptySection={
           <EmptySection
-            illustration="clipboard"
+            illustration="checklist"
             label="No checklists yet"
             subLabel="Create and customize your own list"
             showActionBtn
