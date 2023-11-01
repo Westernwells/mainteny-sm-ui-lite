@@ -136,10 +136,9 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
         (item) => item.name === formik.values.name,
       );
     const updatedContract = {
-      ...contractDetails,
+      ...contractDetails?.additionalInfo,
       type: contractNameType?.type || '',
       name: formik.values?.name || '',
-      ...contractDetails?.additionalInfo,
       renewalTerms: formik.values.renewalTerms,
       price: {
         ...amountRecordForBackend({
@@ -152,8 +151,8 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       invoiceCycle: formik.values.invoiceCycle || '',
       visitsNumber: +formik.values.visitsNumber,
       spendingLimit: +formik.values.spendingLimit,
-      startDate: contractDetails?.startTime,
-      endDate: contractDetails?.endTime,
+      startDate: formik.values.startDate,
+      endDate: formik.values.endDate,
       timePreference: contractDetails?.timePreference || [],
       invoiceDueDays: formik.values.invoiceDueDays,
       annualPriceAdjustmentPercentage:
@@ -189,9 +188,8 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
           uri: `${uploadPath}/${item.name}`,
         })),
       ],
-      startDate: contractDetails?.startTime,
-      endDate: contractDetails?.endTime,
-      timePreference: contractDetails?.timePreference || [],
+      startDate: contractDetails?.start,
+      endDate: contractDetails?.end,
     };
     await updateContract({
       body: updatedContract as Partial<ContractRequestBody>,
