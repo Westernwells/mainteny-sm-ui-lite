@@ -1,6 +1,6 @@
 import {GridColDef, GridRenderCellParams} from '@mui/x-data-grid';
 import {getColumnProps} from 'components/DataGridLayout';
-import {formatNetAmount} from 'utils/currency';
+import {formatCurrency} from 'utils/currency';
 import {FormatDate} from 'models/misc';
 import {ContractStatus, ContractView} from 'models/contract';
 import {StatusChip} from 'components/StatusChip';
@@ -120,7 +120,11 @@ export const makeRows = (
         start: formatDate(item.startTime),
         end: formatDate(item.endTime),
         name: item.name,
-        cost: formatNetAmount(item.additionalInfo?.price) || '-',
+        cost:
+          `${formatCurrency(
+            (item.additionalInfo?.price?.netAmount ?? 0) /
+              10 ** (item.additionalInfo?.price?.fractionDigits ?? 0),
+          )}` || '-',
         status: item.status,
         actions: {
           url:
