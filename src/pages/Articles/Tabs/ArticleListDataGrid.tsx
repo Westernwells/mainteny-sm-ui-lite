@@ -25,7 +25,7 @@ import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {Widget} from 'components/Widget';
 import {PageListingLayout} from 'components/PageListingLayout';
-import {convertToText} from 'utils/utils';
+import {convertToText, stringToTitleCase} from 'utils/utils';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -107,9 +107,7 @@ export const ArticleListDataGrid = () => {
       id: index,
       name: item.name,
       externalId: item.externalId ? item.externalId : '-',
-      type: `${t(
-        item.type.toLowerCase().replace(/\b\w/g, (s) => s.toUpperCase()),
-      )}`,
+      type: `${t(stringToTitleCase(item.type))}`,
       unit: item.unit,
       sellingPrice: formatCurrency(
         (item.unitSellingAmount.netAmount ?? 0) /

@@ -263,3 +263,6 @@ export const simplifyAddressCoords = (
 
   return null;
 };
+
+export const stringToTitleCase = (textString: string) =>
+  textString.toLowerCase().replace(/\b\w/g, (s) => s.toUpperCase());
