@@ -264,25 +264,29 @@ export interface ContractTermsFormModal {
 }
 
 export interface ContractUpdateRequest {
-  type: ContractTypes;
-  name: string;
-  price: number | string;
-  invoiceCycle: number;
-  renewalTerms: number | string;
+  name?: string;
+  type?: ContractTypes;
   visitsNumber: number | string;
+  sla?: number;
   spendingLimit: number | string;
-  invoiceDueDays?: number;
-  annualPriceAdjustmentPercentage?: number;
-  discounts?: number;
-  noticePeriodInMonth?: number;
-  firstMaintenance?: FirstMaintenance;
-  firstInvoiceDate?: string;
-  paymentTermId?: string;
-  description?: string;
-  externalId?: string;
+  currency?: string;
   startDate: string;
   endDate: string;
+  externalId?: string;
+  price: number | string;
+  renewalTerms: number | string;
+  annualPriceAdjustmentPercentage?: number;
+  invoiceCycle: number;
+  documents?: FileResource[];
+  scope?: string[];
+  noticePeriodInMonth?: number;
+  firstMaintenance?: FirstMaintenance;
+  invoiceDueDays?: number;
+  discounts?: number;
+  firstInvoiceDate?: string;
   autoRenewalCancelled: boolean;
+  description?: string;
+  paymentTermId?: string;
 }
 
 export interface ContractPaymentTermView {
