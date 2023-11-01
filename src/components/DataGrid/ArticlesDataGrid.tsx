@@ -8,6 +8,7 @@ import {ArticleView} from 'models/article';
 import {formatCurrency} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {useTranslation} from 'react-i18next';
+import {stringToTitleCase} from 'utils/utils';
 import {NoRowsEmptySection} from './NoRowsEmptySection';
 import {styles} from './style';
 
@@ -71,7 +72,7 @@ export const ArticlesDataGrid = ({setRowItem, search, setSearch}: Props) => {
           id: index,
           name: item.name,
           number: item.externalId,
-          type: `${t(item.type)}`,
+          type: `${t(stringToTitleCase(item.type))}`,
           model: item.model,
           manufacturer: item.manufacturer,
           description: item.description,
