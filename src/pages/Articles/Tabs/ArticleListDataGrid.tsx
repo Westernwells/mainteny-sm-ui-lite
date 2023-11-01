@@ -15,7 +15,7 @@ import _ from 'lodash';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {ArticleType, ArticleView} from 'models/article';
-import {formatNetAmount} from 'utils/currency';
+import {formatCurrency} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {Progress} from 'components/Progress';
@@ -107,9 +107,17 @@ export const ArticleListDataGrid = () => {
       id: index,
       name: item.name,
       externalId: item.externalId ? item.externalId : '-',
-      type: `${t(item.type)}`,
+      type: `${t(
+        item.type.toLowerCase().replace(/\b\w/g, (s) => s.toUpperCase()),
+      )}`,
       unit: item.unit,
-      sellingPrice: formatNetAmount(item.unitSellingAmount),
+      sellingPrice: formatCurrency(
+        (item.unitSellingAmount.netAmount ?? 0) /
+          (10 ** item.unitSellingAmount.fractionDigits ?? 0),
+        {
+          currency: item.unitSellingAmount.currency,
+        },
+      ),
       description: item.description,
       taxes: item.unitSellingAmount.percentageVat
         ? `${item.unitSellingAmount.percentageVat}%`
