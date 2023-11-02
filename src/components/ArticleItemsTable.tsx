@@ -144,10 +144,8 @@ export const ArticleItemsTable = ({
     return tItems;
   }, [propertyOwnerId]);
 
-  const deleteItem = (
-    item: QuotationItemRecord | InvoiceItemRecord<Amount>,
-  ) => {
-    const newItems = items.filter((i) => i !== item);
+  const deleteItem = (indexPos: number) => {
+    const newItems = items.filter((_, index) => indexPos !== index);
     setItems(newItems);
   };
 
@@ -429,9 +427,9 @@ export const ArticleItemsTable = ({
           gap="1em">
           {items.map((item, index) => (
             <ArticleItemRow
-              key={item.articleId}
+              key={index + item.articleId}
               articleItem={item}
-              index={index + 1}
+              index={index}
               deleteItem={deleteItem}
               setItems={setItems}
               isPartial={isPartial}

@@ -13,7 +13,7 @@ import {LanguageContext} from 'context/LanguageProvider';
 interface Props<T> {
   articleItem: T;
   index: number;
-  deleteItem: (item: T) => void;
+  deleteItem: (indexPos: number) => void;
   setItems: React.Dispatch<React.SetStateAction<T[]>>;
 }
 
@@ -60,7 +60,7 @@ export const ArticleItemRow = ({
           gap: '1.5rem',
           alignItems: 'baseline',
         }}>
-        <Typography variant="body2">{index}</Typography>
+        <Typography variant="body2">{index + 1}</Typography>
 
         <Box sx={{justifySelf: 'stretch'}}>
           <Typography variant="body2">{articleItem.name}</Typography>
@@ -132,7 +132,7 @@ export const ArticleItemRow = ({
             size: 'small',
             color: 'error',
             endIcon: <DeleteIcon />,
-            onClick: () => deleteItem(articleItem),
+            onClick: () => deleteItem(index),
             sx: {
               bgcolor: '#FF182F14',
               px: '7px',

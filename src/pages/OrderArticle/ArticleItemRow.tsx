@@ -9,7 +9,7 @@ import {Button} from 'components/Button';
 interface Props<T> {
   articleItem: T;
   index: number;
-  deleteItem: (item: T) => void;
+  deleteItem: (indexPos: number) => void;
   setItems: React.Dispatch<React.SetStateAction<T[]>>;
 }
 
@@ -54,7 +54,7 @@ export const ArticleItemRow = ({
           placeItems: 'start',
           gap: '.5em',
         }}>
-        <Box alignSelf="center">{index}</Box>
+        <Box alignSelf="center">{index + 1}</Box>
         <Box sx={{justifySelf: 'stretch'}}>
           <TextField
             value={name}
@@ -119,7 +119,7 @@ export const ArticleItemRow = ({
           buttonProps={{
             color: 'error',
             endIcon: <DeleteIcon />,
-            onClick: () => deleteItem(articleItem),
+            onClick: () => deleteItem(index),
             sx: {
               bgcolor: '#FF182F14',
               mx: '.5em',

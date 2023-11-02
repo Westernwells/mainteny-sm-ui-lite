@@ -37,8 +37,8 @@ export const ArticleItemsTable = ({
     return record;
   };
 
-  const deleteItem = (item: ServiceOrderArticleView) => {
-    const newItems = items.filter((i) => i.article.id !== item.article.id);
+  const deleteItem = (indexPos: number) => {
+    const newItems = items.filter((_, index) => indexPos !== index);
     setItems(newItems);
   };
 
@@ -76,9 +76,9 @@ export const ArticleItemsTable = ({
         gap="1em">
         {items.map((item, index) => (
           <ArticleItemRow
-            key={item.article.id}
+            key={index + item.article.id}
             articleItem={item}
-            index={index + 1}
+            index={index}
             deleteItem={deleteItem}
             setItems={setItems}
           />
