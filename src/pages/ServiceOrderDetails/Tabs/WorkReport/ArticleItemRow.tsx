@@ -83,8 +83,9 @@ export const ArticleItemRow = ({
           {articleItem.article.externalId || '-'}
         </Typography>
         <NumericFormat
-          value={quantity}
+          value={quantity !== 0 ? quantity : ''}
           customInput={TextField}
+          allowLeadingZeros={false}
           decimalScale={2}
           decimalSeparator={
             selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'

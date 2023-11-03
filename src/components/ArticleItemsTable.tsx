@@ -521,9 +521,10 @@ export const ArticleItemsTable = ({
                     }}>
                     <FormLabel text="VAT" sx={{paddingRight: '1em'}} />
                     <NumericFormat
-                      value={percentageVat}
+                      value={percentageVat !== 0 ? percentageVat : ''}
                       customInput={TextField}
                       suffix="%"
+                      allowLeadingZeros={false}
                       decimalScale={2}
                       decimalSeparator={
                         selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
