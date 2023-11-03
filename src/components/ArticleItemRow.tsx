@@ -209,7 +209,13 @@ export const ArticleItemRow = ({
             />
 
             <NumericFormat
-              value={isPartial ? newPartialTotal : totalPrice}
+              value={
+                isPartial && newPartialTotal !== 0
+                  ? newPartialTotal
+                  : !isPartial && totalPrice !== 0
+                  ? totalPrice
+                  : ''
+              }
               customInput={TextField}
               decimalScale={2}
               decimalSeparator={
@@ -266,8 +272,15 @@ export const ArticleItemRow = ({
         )}
 
         <NumericFormat
-          value={isPartial ? partialPrice : price}
+          value={
+            isPartial && partialPrice !== 0
+              ? partialPrice
+              : !isPartial && price !== 0
+              ? price
+              : ''
+          }
           customInput={TextField}
+          allowLeadingZeros={false}
           decimalScale={2}
           decimalSeparator={
             selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
@@ -301,8 +314,9 @@ export const ArticleItemRow = ({
         {!isPartial && !isCreditNote && (
           <>
             <NumericFormat
-              value={quantity}
+              value={quantity !== 0 ? quantity : ''}
               customInput={TextField}
+              allowLeadingZeros={false}
               decimalScale={2}
               decimalSeparator={
                 selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
@@ -335,7 +349,7 @@ export const ArticleItemRow = ({
             />
 
             <NumericFormat
-              value={price * quantity}
+              value={Number(price) * Number(quantity)}
               customInput={TextField}
               decimalScale={2}
               fixedDecimalScale
