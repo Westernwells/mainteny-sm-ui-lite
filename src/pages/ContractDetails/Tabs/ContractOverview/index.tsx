@@ -139,7 +139,9 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       ...contractDetails?.additionalInfo,
       type: contractNameType?.type || '',
       name: formik.values?.name || '',
-      renewalTerms: formik.values.renewalTerms,
+      renewalTerms: formik.values.renewalTerms
+        ? formik.values.renewalTerms
+        : null,
       price: {
         ...amountRecordForBackend({
           netAmount: +formik.values.price,
@@ -158,7 +160,9 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       annualPriceAdjustmentPercentage:
         formik.values.annualPriceAdjustmentPercentage,
       discounts: [{days: 14, discountPercentage: formik.values.discounts}],
-      noticePeriodInMonth: formik.values.noticePeriodInMonth,
+      noticePeriodInMonth: formik.values.noticePeriodInMonth
+        ? formik.values.noticePeriodInMonth
+        : null,
       firstMaintenance: formik.values.firstMaintenance,
       firstInvoiceDate: formik.values.firstInvoiceDate,
       paymentTermId: formik.values.paymentTermId,
