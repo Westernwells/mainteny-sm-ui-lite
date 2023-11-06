@@ -82,28 +82,36 @@ export const Contracts = () => {
   totalContractRef.current = totalContractRef.current || contractResource.total;
 
   useEffect(() => {
-    if (page.pageIndex) {
+    if (contractResource.total > 0 && contractResource.data.length === 0) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+      setPage({
+        ...page,
+        pageIndex: 0,
+      });
     }
+
     if (textInput.current) {
       textInput.current.value = search;
     }
-  }, [search, cost, status]);
+  }, [search, cost, status, contractResource]);
+
+  useEffect(() => {
+    if (textInput.current) {
+      textInput.current.value = search;
+    }
+  }, [queryParams]);
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
+    const initialPageIndex = currentParams.pageIndex
+      ? Number(currentParams.pageIndex)
+      : 0;
 
-    if (currentParams.pageSize)
-      setPage({
-        ...page,
-        pageSize: Number(currentParams.pageSize),
-      });
-    if (currentParams.pageIndex)
-      setPage({
-        ...page,
-        pageIndex: Number(currentParams.pageIndex) - 1,
-      });
-  }, [queryParams]);
+    setPage({
+      ...page,
+      pageIndex: initialPageIndex > 0 ? initialPageIndex - 1 : 0,
+    });
+  }, []);
 
   const costRangeConvertor = (selectedItems: string[]) => {
     const range = crConverter(selectedItems, currentCurrency.symbol);
@@ -131,7 +139,7 @@ export const Contracts = () => {
 
   useEffect(() => {
     setPageCount(Math.ceil(contractResource.total / page.pageSize));
-  }, [contractResource, page.pageSize]);
+  }, [contractResource, pageSize]);
 
   if (isFetched && !totalContractRef.current) {
     return (
@@ -199,11 +207,15 @@ export const Contracts = () => {
         handlePageSizeChange={(newPageSize: number) =>
           setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
         }
-        handlePageChange={(newPage: number) =>
-          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-        }
+        handlePageChange={(newPage: number) => {
+          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams));
+          setPage({
+            ...page,
+            pageIndex: newPage - 1,
+          });
+        }}
         pageCount={pageCount}
-        totalRows={contractResource.total}
+        totalRows={contractResource?.total}
       />
     </PageListingLayout>
   );
