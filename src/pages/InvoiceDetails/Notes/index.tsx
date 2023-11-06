@@ -276,20 +276,9 @@ export const Notes = ({invoice}: Props) => {
                 multiline: true,
                 minRows: 5,
                 maxRows: 5,
-                onKeyDown: (e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    formik.handleSubmit();
-                  }
-                },
               }}
             />
-            <Box display="flex" justifyContent="space-between" pt="0.625rem">
-              <Typography
-                variant="tooltip"
-                color={theme.palette.text.secondary}>
-                {t('Press Enter to submit note')}
-              </Typography>
+            <Box display="flex" justifyContent="flex-end" pt="0.625rem">
               <Button
                 buttonProps={{
                   type: 'submit',
