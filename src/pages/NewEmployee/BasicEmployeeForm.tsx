@@ -121,7 +121,7 @@ export const BasicEmployeeForm = ({
       containerStyles={{flexGrow: 1}}
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
-        <Grid container spacing={2}>
+        <Grid container spacing={2} minHeight={100}>
           <Grid item md={4}>
             <Box display="flex" gap="1em" marginBottom="1em">
               {[
@@ -157,26 +157,8 @@ export const BasicEmployeeForm = ({
                 />
               ))}
             </Box>
-            <Box display="flex" gap="1em" marginBottom="1em">
-              <AddressAutoComplete
-                initialValue={formik.values.address?.fullName || ''}
-                inputError={
-                  formik.errors.address && formik.touched.address
-                    ? formik.errors.address
-                    : ''
-                }
-                handleBlur={formik.handleBlur}
-                textFieldProps={{
-                  InputLabelProps: {shrink: true},
-                  placeholder: 'e.g. Karl-Liebknecht-Str. 32, 10178 Berlin',
-                  required: true,
-                }}
-                getAddress={(address) =>
-                  formik.setFieldValue('address', address)
-                }
-              />
-            </Box>
           </Grid>
+
           <Grid item md={8}>
             <Box display="flex" gap="1em" marginBottom="1em">
               {[
@@ -228,6 +210,33 @@ export const BasicEmployeeForm = ({
                 />
               ))}
             </Box>
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={2} minHeight={100}>
+          <Grid item md={4}>
+            <Box display="flex" gap="1em" marginBottom="1em">
+              <AddressAutoComplete
+                initialValue={formik.values.address?.fullName || ''}
+                inputError={
+                  formik.errors.address && formik.touched.address
+                    ? formik.errors.address
+                    : ''
+                }
+                handleBlur={formik.handleBlur}
+                textFieldProps={{
+                  InputLabelProps: {shrink: true},
+                  placeholder: 'e.g. Karl-Liebknecht-Str. 32, 10178 Berlin',
+                  required: true,
+                }}
+                getAddress={(address) =>
+                  formik.setFieldValue('address', address)
+                }
+              />
+            </Box>
+          </Grid>
+
+          <Grid item md={8}>
             <Box display="flex" gap="1em">
               {[
                 {
