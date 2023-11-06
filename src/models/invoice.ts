@@ -298,3 +298,10 @@ export interface InvoiceActivityOverdueNoticeSentData {
   email: string;
   overdueNoticeId: string;
 }
+
+export const ALL_MANUAL_INVOICE_TYPES = [
+  InvoiceType.CREDIT_NOTE,
+  InvoiceType.FINAL,
+  InvoiceType.FULL,
+  InvoiceType.PARTIAL,
+];
