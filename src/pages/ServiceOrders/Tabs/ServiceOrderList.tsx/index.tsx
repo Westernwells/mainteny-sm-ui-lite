@@ -1,5 +1,4 @@
 import Box from '@mui/material/Box';
-import {useTranslation} from 'react-i18next';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {FilterFields} from 'components/FilterFields';
@@ -37,7 +36,6 @@ import {columns, makeRows} from './ServiceOrderDataGridProps';
 export const ServiceOrderList = () => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-  const {t} = useTranslation();
   const [page, setPage] = useState(makePage(0, 25));
   const [queryParams, setQueryParams] = useSearchParams();
   const [pageCount, setPageCount] = useState(0);
@@ -163,12 +161,11 @@ export const ServiceOrderList = () => {
       <MultipleSelectCheckmarks
         label="Order types"
         options={Object.keys(ServiceOrderType).map((i) =>
-          t(serviceOrderTypeToString(i)),
+          serviceOrderTypeToString(i),
         )}
         initialSelectedItems={selectedOrderTypes}
         getSelectedValue={(item) => {
           const orderTypes = item.map((i) => serviceOrderTypeToEnum(i));
-
           setSelectedOrderTypes(orderTypes as ServiceOrderType[]);
         }}
         multiple
