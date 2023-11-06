@@ -52,6 +52,11 @@ export const Contracts = () => {
   );
   const [rows, setRows] = useState<GridRowsProp>([]);
   const textInput = useRef<HTMLInputElement>(null);
+  const statusMapping: Record<string, string> = {
+    Active: 'VALID',
+    Inactive: 'EXPIRED',
+    Expiring: 'EXPIRING',
+  };
 
   let queryParam: WithOptional<QueryContractParams, 'serviceCompanyId'> = {
     order: Order.DESC,
@@ -161,12 +166,12 @@ export const Contracts = () => {
       <PriceRangeDropdown cost={cost} costRangeConvertor={costRangeConvertor} />
       <MultipleSelectCheckmarks
         label="Status"
-        options={['VALID', 'EXPIRED', 'EXPIRING'].map((item) =>
+        options={['ACTIVE', 'INACTIVE', 'EXPIRING'].map((item) =>
           convertToText(item),
         )}
         initialSelectedItems={status}
         getSelectedValue={(item) =>
-          setStatus(item.map((val) => convertToMacro(val)))
+          setStatus(item.map((val) => convertToMacro(statusMapping[val])))
         }
       />
     </FilterFields>
