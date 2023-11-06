@@ -49,6 +49,7 @@ import {
   InvoiceType,
   InvoiceStatus,
   InvoiceFormData,
+  ALL_MANUAL_INVOICE_TYPES,
 } from 'models/invoice';
 import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
 import {
@@ -386,6 +387,20 @@ export const InvoiceForm = ({
           invoice.additionalInfo?.alternativeAddress ??
           invoiceCustomer?.otherAddress,
       });
+      if (!ALL_MANUAL_INVOICE_TYPES.includes(invoice.type)) {
+        const newItems = invoice.items.map(
+          (i): InvoiceItemRecord<Amount> => ({
+            articleId: i.article.id,
+            description: i.description || i.article.description,
+            name: i.name || i.article.name,
+            articleUnit: i.article.unit,
+            quantity: i.quantity,
+            unitAmount: invoice.totalAmount,
+          }),
+        );
+
+        setInvoiceItems(newItems);
+      }
     }
 
     formik.setFieldValue(
