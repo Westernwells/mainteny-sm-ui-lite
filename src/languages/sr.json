@@ -1887,5 +1887,7 @@
   "Supplier specific article number": "Broj artikla specifičan za dobavljača",
   "Article created successfully": "Artikal je uspješno kreiran",
   "MATERIAL": "MATERIJAL",
-  "LABOR": "RAD"
+  "LABOR": "RAD",
+  "Should not be less than 0": "Ne bi trebalo da bude manje od 0",
+  "Others invoice": "Druge fakture"
 }

@@ -1851,5 +1851,6 @@
   "Supplier specific article number": "Lieferantenartikelnummer",
   "Article created successfully": "Der Artikel wurde erfolgreich erstellt",
   "MATERIAL": "MATERIAL",
-  "LABOR": "LOHN"
+  "LABOR": "LOHN",
+  "Should not be less than 0": "Sollte nicht kleiner als 0 sein"
 }
