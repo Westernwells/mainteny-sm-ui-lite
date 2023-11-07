@@ -63,14 +63,14 @@ const validationSchemaBasicInfo = Yup.object().shape({
 const validationSchemaContractTerms = Yup.object().shape({
   visitsNumber: Yup.number()
     .nullable()
-    .min(1, 'Should be higher than 0')
+    .min(0, 'Should not be less than 0')
     .required('Visit number is required'),
   invoiceCycle: Yup.string().required('Invoice cycle is required'),
   netAmount: Yup.number()
     .nullable()
     .min(1, 'Should be higher than 0')
     .required('Yearly Contract Price is required'),
-  renewalTerms: Yup.number().min(0, 'Should be higher than 0'),
+  renewalTerms: Yup.number().min(0, 'Should be higher or equals to 0'),
   spendingLimit: Yup.number().min(0, 'Should be higher or equals to 0'),
   annualPriceAdjustmentPercentage: Yup.number().min(
     0,

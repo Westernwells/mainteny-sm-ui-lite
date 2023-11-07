@@ -112,7 +112,7 @@ export const makeRows = (
 ): GridRowsProp =>
   contracts.map((item: ContractView, index: number) => ({
     id: index,
-    contractNumber: item.number,
+    contractNumber: item.externalId,
     customer: item.propertyOwner.name,
     units: item.elevators.length,
     startDate: formatDate(item.startTime),
