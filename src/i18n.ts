@@ -3,6 +3,7 @@ import {initReactI18next} from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import de from './languages/de.json';
 import sr from './languages/sr.json';
+import it from './languages/it.json';
 
 export const resources = {
   de: {
@@ -13,6 +14,9 @@ export const resources = {
   },
   sr: {
     translation: sr,
+  },
+  it: {
+    translation: it,
   },
 };
 
