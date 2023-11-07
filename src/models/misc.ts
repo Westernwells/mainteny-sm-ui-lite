@@ -308,6 +308,7 @@ export enum Language {
   EN_US = 'EN_US',
   DE_DE = 'DE_DE',
   SR_RS = 'SR_RS',
+  IT_IT = 'IT_IT',
 }
 
 export interface Coord {

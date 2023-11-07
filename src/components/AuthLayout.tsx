@@ -37,7 +37,6 @@ export const AuthLayout = ({children}: Props) => {
     const {language} = i18n;
     setSelectedLng(language.split('-')[0].toUpperCase());
   }, []);
-
   const changeLanguage = (lang: string, label: string) => {
     setSelectedLng(label);
     i18n.changeLanguage(lang);
@@ -126,7 +125,9 @@ export const AuthLayout = ({children}: Props) => {
                 ? 'English'
                 : selectedLng === 'DE'
                 ? 'Deutsch'
-                : 'Serbian'
+                : selectedLng === 'SR'
+                ? 'Serbian'
+                : 'Italian'
             }
             menu={[
               {
@@ -140,6 +141,10 @@ export const AuthLayout = ({children}: Props) => {
               {
                 label: 'Serbian',
                 action: () => changeLanguage('sr-rs', 'SR'),
+              },
+              {
+                label: 'Italian',
+                action: () => changeLanguage('it-it', 'IT'),
               },
             ]}
           />
