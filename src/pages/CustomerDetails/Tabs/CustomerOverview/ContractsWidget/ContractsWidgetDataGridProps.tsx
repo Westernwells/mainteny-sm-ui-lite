@@ -71,7 +71,7 @@ export const makeRows = (
   contracts
     ? contracts.data.map((item: ContractView, index: number) => ({
         id: index,
-        contractNumber: item.number,
+        contractNumber: item.externalId,
         cost: formatNetAmount(item.additionalInfo.price) || '-',
         expiryDate: formatDate(item.endTime),
         navigateTo: `/contracts/details/${item.id}`,

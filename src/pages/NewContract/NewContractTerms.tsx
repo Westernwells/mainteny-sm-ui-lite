@@ -46,7 +46,7 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             type: 'number',
             required: true,
             value:
-              formik.values.visitsNumber === 0
+              Number(formik.values.visitsNumber) < 0
                 ? ''
                 : formik.values.visitsNumber.toString(),
             error: !!(
@@ -135,7 +135,7 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             placeholder: '12',
             type: 'number',
             value:
-              formik.values.renewalTerms === 0
+              Number(formik.values.renewalTerms) <= 0
                 ? ''
                 : formik.values.renewalTerms.toString(),
             helperText:
