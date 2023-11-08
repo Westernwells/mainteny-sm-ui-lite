@@ -38,15 +38,23 @@ export const Dialog = ({
   return (
     <MuiDialog
       fullWidth
+      sx={{height: '74%', margin: 'auto 0'}}
       onClose={onCancel}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       {...dialogProps}>
-      <DialogTitle id="alert-dialog-title">
+      <DialogTitle
+        id="alert-dialog-title"
+        sx={{
+          background: 'white',
+          boxShadow: '0px 4px 15px 0px #90909033',
+          padding: '1em 1.5em',
+          mb: '0.5em',
+        }}>
         {typeof title === 'string' ? t(title) : title}
       </DialogTitle>
 
-      <DialogContent>
+      <DialogContent sx={{pt: '1em'}}>
         <DialogContentText
           id="alert-dialog-description"
           component="div"
@@ -56,10 +64,11 @@ export const Dialog = ({
       </DialogContent>
       <DialogActions
         sx={{
-          mt: '1.5em',
-          padding: '0px 24px 20px 0px',
+          padding: '1.5em 24px 1.5em 0px',
           display: 'flex',
           justifyContent: 'space-between',
+          background: 'white',
+          boxShadow: '0px 4px 15px 0px #90909033',
         }}>
         {leftButton}
         <Box sx={{marginLeft: 'auto'}}>
