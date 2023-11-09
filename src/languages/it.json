@@ -1894,5 +1894,6 @@
   "Supplier specific article number": "Numero di articolo specifico del fornitore",
   "Article created successfully": "Articolo creato con successo",
   "MATERIAL": "MATERIALE",
-  "LABOR": "LAVORO"
+  "LABOR": "LAVORO",
+  "Credit note for {{invoiceNumber}}": "Nota di credito per {{invoiceNumber}}"
 }
