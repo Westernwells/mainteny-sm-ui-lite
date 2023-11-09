@@ -445,18 +445,22 @@ export const InvoiceForm = ({
       formik.setFieldValue('serviceOrderId', serviceOrder.id, true);
       formik.setFieldValue(
         'subject',
-        invoice?.subject ??
-          t(
-            `{{customerName}} - ${
-              formik.values.type === InvoiceType.CREDIT_NOTE
-                ? 'Credit note for'
-                : 'Invoice for'
-            } {{invoiceNumber}}`,
-            {
-              invoiceNumber: invoice?.externalId ?? '',
-              customerName: customer?.name ?? serviceOrderCustomer?.name,
-            },
-          ),
+        invoiceType === InvoiceType.CREDIT_NOTE
+          ? t('Credit note for {{invoiceNumber}}', {
+              invoiceNumber: invoice?.number ?? '',
+            })
+          : invoice?.subject ??
+              t(
+                `{{customerName}} - ${
+                  formik.values.type === InvoiceType.CREDIT_NOTE
+                    ? 'Credit note for'
+                    : 'Invoice for'
+                } {{invoiceNumber}}`,
+                {
+                  invoiceNumber: invoice?.externalId ?? '',
+                  customerName: customer?.name ?? serviceOrderCustomer?.name,
+                },
+              ),
         true,
       );
       if (!invoiceItems.length) {
