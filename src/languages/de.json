@@ -954,7 +954,7 @@
   "Total Price (excl VAT)": "Gesamtpreis (ohne MwSt.)",
   "VAT": "MwSt.",
   "Total Price (incl VAT)": "Gesamtpreis (inkl. MwSt.)",
-  "Additional Information": "Nachbemerkung",
+  "Additional Information": "Zusätzliche Informationen",
   "Customer will be billed monthly in advance of the provision of Services and payment of such fees will be due within thirty (30) days of the date of each invoice": "Der Kunde erhält monatlich im Voraus eine Rechnung für die Erbringung der Dienstleistungen, die innerhalb von dreißig (30) Tagen nach Rechnungsdatum zu begleichen ist.",
   "Full Invoice": "Gesamtrechnung",
   "Unit Price": "Preis je Einheit",
@@ -999,7 +999,7 @@
   "Preview": "Vorschau",
   "Delete Invoice": "Rechnung löschen",
   "Do you want to delete this Invoice?": "Möchten Sie diese Rechnung löschen?",
-  "No checklist for selected job": "Keine Checkliste für ausgewählten Serviceauftrag",
+  "No checklist for selected job": "Keine Checkliste für ausgewählten Auftrag",
   "Add checklist to invoice": "Checkliste zur Rechnung hinzufügen",
   "Billing email address": "Rechnungs-E-Mail-Adresse",
   "No report for selected job": "Kein Wartungsbericht für den ausgewählten Serviceauftrag",
@@ -1852,5 +1852,6 @@
   "Article created successfully": "Der Artikel wurde erfolgreich erstellt",
   "MATERIAL": "MATERIAL",
   "LABOR": "LOHN",
-  "Should not be less than 0": "Sollte nicht kleiner als 0 sein"
+  "Should not be less than 0": "Sollte nicht kleiner als 0 sein",
+  "Credit note for {{invoiceNumber}}": "Gutschrift zur Rechnung {{invoiceNumber}}"
 }
