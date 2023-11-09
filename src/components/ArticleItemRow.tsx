@@ -80,8 +80,8 @@ export const ArticleItemRow = ({
     articleItem.quantity = quantity;
 
     setItems((prev) =>
-      prev.map((item) => {
-        if (item.articleId === articleItem.articleId) {
+      prev.map((item, itemIndex) => {
+        if (item.articleId === articleItem.articleId && itemIndex === index) {
           return {
             ...item,
             quantity: articleItem.quantity,
@@ -96,8 +96,8 @@ export const ArticleItemRow = ({
     articleItem.name = name;
 
     setItems((prev) =>
-      prev.map((item) => {
-        if (item.articleId === articleItem.articleId) {
+      prev.map((item, itemIndex) => {
+        if (item.articleId === articleItem.articleId && itemIndex === index) {
           return {
             ...item,
             name: articleItem.name,
@@ -112,8 +112,8 @@ export const ArticleItemRow = ({
     articleItem.description = description;
 
     setItems((prev) =>
-      prev.map((item) => {
-        if (item.articleId === articleItem.articleId) {
+      prev.map((item, itemIndex) => {
+        if (item.articleId === articleItem.articleId && itemIndex === index) {
           return {
             ...item,
             description: articleItem.description,
@@ -126,8 +126,8 @@ export const ArticleItemRow = ({
 
   useEffect(() => {
     setItems((prev) =>
-      prev.map((item) => {
-        if (item.articleId === articleItem.articleId) {
+      prev.map((item, itemIndex) => {
+        if (item.articleId === articleItem.articleId && itemIndex === index) {
           return {
             ...item,
             unitAmount: {
