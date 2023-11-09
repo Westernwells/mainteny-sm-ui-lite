@@ -38,8 +38,10 @@ export const ArticleItemRow = ({
     else articleItem.description = ' ';
 
     setItems((prev) =>
-      prev.map((item) =>
-        item.articleId === articleItem.articleId ? articleItem : item,
+      prev.map((item, itemIndex) =>
+        item.articleId === articleItem.articleId && itemIndex === index
+          ? articleItem
+          : item,
       ),
     );
   }, [name, supplierArticleNumber, quantity, unit, description]);
