@@ -24,6 +24,7 @@ import {
 } from 'models/article';
 import {Page, Resource, RestError, StringValue} from 'models/misc';
 import {data} from 'utils/partial-article-data';
+import {FileResourceRecord} from 'models/media';
 import {useUserSession} from './useUserSession';
 
 export const fetchArticles = async (
@@ -550,4 +551,40 @@ export const useDeletePropertyOwnerArticle = (successMsg?: string) => {
       showError(err);
     },
   });
+};
+
+const createArticlePictures = async (
+  body: FileResourceRecord,
+  articleId: string,
+): Promise<StringValue> => {
+  const response = await axiosClient.post<StringValue>(
+    `/api/articles/${articleId}/pictures`,
+    {
+      ...body,
+    },
+  );
+  return response.data;
+};
+
+export const useCreateArticlePictures = (
+  successMsg: string,
+  articleId: string,
+) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    (body: FileResourceRecord) => createArticlePictures(body, articleId),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+        queryClient.invalidateQueries(queryKeys.fetchArticleDetail);
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
 };

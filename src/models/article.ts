@@ -32,6 +32,7 @@ export interface ArticleAdditionalInfo {
   pictureUrls: string[];
   qrCode: FileResource;
   costPackage?: CostPackage;
+  pictures: FileResource[];
 }
 
 export interface ArticleView {
