@@ -7,9 +7,9 @@ import useTheme from '@mui/material/styles/useTheme';
 import _ from 'lodash';
 import {InfoCard} from 'components/InfoCard';
 import {ArticleView} from 'models/article';
-import {FileResourceRecord} from 'models/media';
+import {FileResource, FileResourceRecord} from 'models/media';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {useUpdateArticle} from 'hooks/reactQuery/useArticle';
+import {useCreateArticlePictures} from 'hooks/reactQuery/useArticle';
 import {NoItemSection} from '../NoItemSection';
 import {ArticleImageUploadForm} from './ArticleImageUploadForm';
 
@@ -19,11 +19,16 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
   const [openDialog, setOpenDialog] = useState(false);
   const {t} = useTranslation();
 
-  const {mutateAsync: updateArticle} = useUpdateArticle(
+  const {mutateAsync: updateArticlePictures} = useCreateArticlePictures(
     t('Article updated successfully.'),
+    article.id,
   );
+
   const {data: pictureUrls = {}} = useDownloadUrl(
-    _.map(article.additionalInfo.pictureUrls, (item) => item),
+    _.map(
+      article.additionalInfo.pictures?.map((item: FileResource) => item.uri),
+      (item) => item,
+    ),
   );
 
   useEffect(() => {
@@ -33,15 +38,7 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
   }, [pictureUrls]);
 
   const saveArticle = async (files: FileResourceRecord[]) => {
-    await updateArticle({
-      articleId: article!.id,
-      article: {
-        pictureUrls: [
-          ...(article.additionalInfo.pictureUrls || []),
-          ...files.map((it) => it.uri),
-        ],
-      },
-    });
+    await Promise.all(files.map((file) => updateArticlePictures(file)));
     setOpenDialog(false);
   };
 
