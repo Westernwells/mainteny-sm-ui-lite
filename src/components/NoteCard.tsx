@@ -53,7 +53,7 @@ export const NoteCard = ({note, onDelete, onEdit, ...rest}: Props) => {
           )}
         </Box>
 
-        <Typography variant="h6" pt="1rem">
+        <Typography variant="h6" pt="1rem" sx={{whiteSpace: 'pre-line'}}>
           {note.content}
         </Typography>
       </Box>
