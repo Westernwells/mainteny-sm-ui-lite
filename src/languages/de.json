@@ -1853,5 +1853,9 @@
   "MATERIAL": "MATERIAL",
   "LABOR": "LOHN",
   "Should not be less than 0": "Sollte nicht kleiner als 0 sein",
-  "Credit note for {{invoiceNumber}}": "Gutschrift zur Rechnung {{invoiceNumber}}"
+  "Credit note for {{invoiceNumber}}": "Gutschrift zur Rechnung {{invoiceNumber}}",
+  "Caller": "Anrufer",
+  "Call Time": "Anrufzeit",
+  "Name Surname": "Vorname Nachname",
+  "Select technicians": "Wählen Sie einen Techniker"
 }

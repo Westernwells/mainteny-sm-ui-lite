@@ -1891,5 +1891,8 @@
   "Should not be less than 0": "Ne bi trebalo da bude manje od 0",
   "Others invoice": "Druge fakture",
   "Credit note for {{invoiceNumber}}": "Kredit za {{invoiceNumber}}",
-  "Caller": "Pozivalac"
+  "Caller": "Pozivalac",
+  "Call Time": "Vreme poziva",
+  "Name Surname": "Ime prezime",
+  "Select technicians": "Izaberite tehničare"
 }
