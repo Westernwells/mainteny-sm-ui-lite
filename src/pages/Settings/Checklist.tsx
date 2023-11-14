@@ -121,7 +121,7 @@ export const Checklist = () => {
   const initialValues = useMemo(
     () => ({
       name: checklist?.name ?? '',
-      components: checklist.name
+      components: checklist?.name
         ? checkListComponentViewToExtendedCreateCheckListRecord(
             checklist.components,
           )
