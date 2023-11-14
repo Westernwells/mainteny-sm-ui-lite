@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import {SxProps, Theme} from '@mui/system';
 import {useOutletContext} from 'react-router';
 import {useTranslation} from 'react-i18next';
 import {Dispatch, ReactNode, SetStateAction, Suspense} from 'react';
@@ -13,6 +14,7 @@ interface Props {
   children: ReactNode;
   excludeDefaultSpacing?: boolean;
   pageScrollable?: boolean;
+  containerStyles?: SxProps<Theme>;
   pageTitle?: string;
   showBackAction?: boolean;
   backBtnLabel?: string;
@@ -27,6 +29,7 @@ export const PageLayout = ({
   children,
   excludeDefaultSpacing,
   pageScrollable,
+  containerStyles,
   pageTitle,
   showBackAction,
   backBtnLabel,
@@ -85,6 +88,7 @@ export const PageLayout = ({
         ...(pageScrollable
           ? {minHeight: '100vh', overflowY: 'scroll'}
           : {height: '98vh', overflowY: 'hidden'}),
+        ...containerStyles,
       }}
       onTouchMove={handleDrawerClose}
       onTouchStart={handleDrawerClose}>

@@ -9,6 +9,7 @@ import {ReactComponent as QRCodeIllustration} from 'assets/illustrations/QR.svg'
 import {ReactComponent as StockIllustration} from 'assets/illustrations/Stock.svg';
 import {ReactComponent as SupplierIllustration} from 'assets/illustrations/Supplier.svg';
 import {ReactComponent as MobileUsabilityTesting} from 'assets/illustrations/MobileUsabilityTesting.svg';
+import {ReactComponent as UXAnalytics} from 'assets/illustrations/UXAnalytics.svg';
 import {Button} from './Button';
 
 interface Props extends BoxProps {
@@ -24,7 +25,8 @@ interface Props extends BoxProps {
     | 'qrcode'
     | 'stock'
     | 'supplier'
-    | 'checklist';
+    | 'checklist'
+    | 'emptyChecklistComponents';
   showActionBtn?: boolean;
   btnLabel?: string;
   btnAction?: () => void;
@@ -76,6 +78,8 @@ export const EmptySection = ({
         return (
           <MobileUsabilityTesting style={{width: '100%', height: '100%'}} />
         );
+      case 'emptyChecklistComponents':
+        return <UXAnalytics style={{width: '100%', height: '100%'}} />;
       default:
         return <LaptopIllustration style={{width: '100%', height: '100%'}} />;
     }

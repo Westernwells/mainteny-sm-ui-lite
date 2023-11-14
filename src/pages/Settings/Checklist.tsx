@@ -1,32 +1,31 @@
 import {useEffect, useMemo, useState} from 'react';
-import {useTranslation} from 'react-i18next';
+import {t} from 'i18next';
 import {useLocation, useNavigate} from 'react-router-dom';
 import * as Yup from 'yup';
-import {getIn, useFormik} from 'formik';
+import {useFormik} from 'formik';
 import {
   DragDropContext,
   Droppable,
   Draggable,
   DropResult,
   DraggableProvided,
+  BeforeCapture,
 } from 'react-beautiful-dnd';
-import _ from 'lodash';
 import useTheme from '@mui/material/styles/useTheme';
-import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
-import Cancel from '@mui/icons-material/Cancel';
-import Edit from '@mui/icons-material/Edit';
-import Add from '@mui/icons-material/Add';
-import {DragHandle} from '@mui/icons-material';
-import Close from '@mui/icons-material/Close';
-import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
+import {
+  CheckBox,
+  RadioButtonChecked,
+  Subject,
+  Title,
+} from '@mui/icons-material';
+import PhoneAndroid from '@mui/icons-material/PhoneAndroid';
 import {PageCard} from 'components/PageCard';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {Button} from 'components/Button';
 import {FormInput} from 'components/form/FormInput';
+import {EmptySection} from 'components/EmptySection';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateChecklist,
@@ -34,103 +33,79 @@ import {
 } from 'hooks/reactQuery/useChecklists';
 import {
   CheckList,
-  CheckListQuestionOption,
-  CheckListQuestionOptionColor,
-  CheckListQuestionType,
+  CheckListComponentOptionColor,
+  CheckListComponentType,
+  CreateCheckListRecord,
+  UpdateCheckListRecord,
+  ExtendedCreateCheckListRecord,
+  ExtendedUpdateCheckListRecord,
 } from 'models/checklist';
-import {getUniqueId} from 'utils/utils';
-import {getQuestionsGroupedByCategory, getOptions} from 'utils/checklist';
-import ChecklistPreview from './ChecklistPreview';
-
-declare module 'yup' {
-  interface ArraySchema<T> {
-    unique(propertyPath: string, message: string): ArraySchema<T>;
-  }
-}
-
-Yup.addMethod(Yup.array, 'unique', function fn(propertyPath, message) {
-  return this.test('unique', '', function fn2(list) {
-    const errors: string | Yup.ValidationError | Yup.ValidationError[] = [];
-
-    list?.forEach((item, index) => {
-      const propertyValue = _.get(item, propertyPath);
-
-      if (
-        propertyValue &&
-        _.filter(list, [propertyPath, propertyValue]).length > 1
-      ) {
-        errors.push(
-          this.createError({
-            path: `${this.path}[${index}].${propertyPath}`,
-            message,
-          }),
-        );
-      }
-    });
-
-    if (!_.isEmpty(errors)) {
-      throw new Yup.ValidationError(errors);
-    }
-
-    return true;
-  });
-});
+import {
+  checkListComponentViewToExtendedCreateCheckListRecord,
+  getComponentMock,
+} from 'utils/checklist';
+import {ChecklistComponent} from './ChecklistComponent';
+import {ChecklistPreview} from './ChecklistPreview';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
-  category: Yup.string(),
-  categories: Yup.array()
-    .of(
-      Yup.object().shape({
-        name: Yup.string().required(),
-        questions: Yup.array()
+  components: Yup.array().of(
+    Yup.object().shape({
+      subject: Yup.string().required(),
+      type: Yup.string()
+        .oneOf(Object.values(CheckListComponentType))
+        .required(),
+      options: Yup.array().when('type', {
+        is: (v: string) => v === CheckListComponentType.SINGLE_CHECK,
+        then: Yup.array()
           .of(
             Yup.object().shape({
-              question: Yup.string().required(),
-              type: Yup.string()
-                .oneOf(Object.values(CheckListQuestionType))
+              text: Yup.string().required(),
+              color: Yup.string()
+                .oneOf(Object.keys(CheckListComponentOptionColor))
                 .required(),
             }),
           )
-          .min(1),
-      }),
-    )
-    .unique('name', 'Category name must be unique')
-    .min(1),
-  options: Yup.array()
-    .of(
-      Yup.object().shape({
-        text: Yup.string().required(),
-        color: Yup.string()
-          .oneOf(Object.keys(CheckListQuestionOptionColor))
+          .min(1)
           .required(),
       }),
-    )
-    .min(1),
+      orderNumber: Yup.number().required(),
+      moreInfoInNote: Yup.boolean(),
+    }),
+  ),
 });
 
-const optionMock = {
-  id: getUniqueId(),
-  text: '',
-  color: CheckListQuestionOptionColor.DEFAULT,
-};
-
-const questionMock = {
-  id: getUniqueId(),
-  question: '',
-  type: CheckListQuestionType.SINGLE_CHECK,
-  additionalInfo: {orderNumber: 0},
-};
+const availableComponents = [
+  {
+    icon: RadioButtonChecked,
+    label: 'Multi-Choice',
+    type: CheckListComponentType.SINGLE_CHECK,
+  },
+  {
+    icon: CheckBox,
+    label: 'Checkbox',
+    type: CheckListComponentType.YES_NO,
+  },
+  {
+    icon: Title,
+    label: 'Header',
+    type: CheckListComponentType.HEAD,
+  },
+  {
+    icon: Subject,
+    label: 'Text Area',
+    type: CheckListComponentType.TEXT,
+  },
+];
 
 export const Checklist = () => {
-  const {t} = useTranslation();
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const checklist = (location.state as {checklist: CheckList})?.checklist;
   const {user} = useUserSession();
   const [isPreviewing, setIsPreviewing] = useState(false);
-  const [editingQuestionCategory, setEditingQuestionCategory] = useState('');
+  const [draggingComponentId, setDraggingComponentId] = useState<string>('');
   const {mutate: createChecklist, isLoading: isCreating} = useCreateChecklist(
     'Checklist saved successfully!',
   );
@@ -140,519 +115,247 @@ export const Checklist = () => {
 
   useEffect(() => {
     const hasEdit = location.search.includes('edit=1');
-    setIsPreviewing(hasEdit ? false : !!checklist);
+    setIsPreviewing(hasEdit);
   }, []);
-
-  const categories = getQuestionsGroupedByCategory(checklist?.questions ?? []);
-  const options = getOptions(checklist?.questions ?? []).map(
-    (option: CheckListQuestionOption) => ({...option, id: getUniqueId()}),
-  );
 
   const initialValues = useMemo(
     () => ({
       name: checklist?.name ?? '',
-      category: checklist?.category ?? '',
-      categories: categories.length
-        ? categories
-        : [
-            {
-              id: getUniqueId(),
-              name: t('Category'),
-              questions: [
-                {...questionMock, question: t('Task 1'), id: getUniqueId()},
-              ],
-            },
-          ],
-      options: options.length ? options : [{...optionMock, id: getUniqueId()}],
+      components: checklist.name
+        ? checkListComponentViewToExtendedCreateCheckListRecord(
+            checklist.components,
+          )
+        : [getComponentMock(CheckListComponentType.SINGLE_CHECK)],
     }),
     [],
   );
 
-  const handleSubmit = (values: typeof initialValues) => {
-    const questions = values.categories
-      .map((category) =>
-        category.questions.map((question) => ({
-          category: category.name,
-          question: question.question,
-          type: question.type,
-          options: values.options,
-        })),
-      )
-      .flat();
-    const questionsWithOrderNumber = questions.map((q, index) => ({
-      ...q,
-      orderNumber: index + 1,
-    }));
+  const handleSubmit = (
+    values: ExtendedCreateCheckListRecord | ExtendedUpdateCheckListRecord,
+  ) => {
+    const componentsWithOrderNumber = values.components?.map((c, index) => {
+      const {options, ...rest} = c;
+      return {
+        ...rest,
+        ...(c.type !== CheckListComponentType.YES_NO
+          ? {
+              options,
+            }
+          : {options: []}),
+        orderNumber: index + 1,
+      };
+    });
 
     if (checklist?.id) {
-      const data = {
+      const data: UpdateCheckListRecord = {
         name: values.name,
         externalId: checklist.externalId,
-        category: values.category,
-        questions: questionsWithOrderNumber,
+        components: componentsWithOrderNumber,
       };
       updateChecklist(
         {id: checklist.id, checklist: data},
         {onSuccess: () => navigate(-1)},
       );
     } else {
-      const data = {
+      const data: CreateCheckListRecord = {
         serviceCompanyId: user!.userAccount.serviceCompany.id,
-        name: values.name,
-        category: values.category,
-        questions: questionsWithOrderNumber,
+        name: values?.name ?? '',
+        components: componentsWithOrderNumber,
       };
       createChecklist(data, {onSuccess: () => navigate(-1)});
     }
   };
 
-  const formik = useFormik({
+  const formik = useFormik<
+    ExtendedCreateCheckListRecord | ExtendedUpdateCheckListRecord
+  >({
     validateOnMount: true,
     initialValues,
     validationSchema,
     onSubmit: handleSubmit,
   });
 
-  const onDragQuestionEnd = (result: DropResult, categoryId: string) => {
+  const onDragComponentEnd = (result: DropResult) => {
     // dropped outside the list
     if (!result.destination) {
       return;
     }
 
-    const startIndex = result.source.index;
-    const endIndex = result.destination.index;
-    const categoryItem = formik.values.categories.find(
-      (category) => category.id === categoryId,
-    );
-    const newQuestions = Array.from(categoryItem?.questions ?? []);
-    const [removed] = newQuestions.splice(startIndex, 1);
-    newQuestions.splice(endIndex, 0, removed);
-
-    const newCategories = formik.values.categories.map((category) =>
-      category.id === categoryId
-        ? {
-            ...category,
-            questions: newQuestions,
-          }
-        : category,
-    );
-    formik.setFieldValue('categories', newCategories);
+    const sourceIndex = result.source.index;
+    const destinationIndex = result.destination.index;
+    const componentItem = formik.values.components[sourceIndex];
+    const newComponents = formik.values.components
+      .toSpliced(sourceIndex, 1)
+      .toSpliced(destinationIndex, 0, componentItem!);
+    formik.setFieldValue('components', newComponents);
+    setDraggingComponentId('');
   };
 
-  const onDragOptionEnd = (result: DropResult) => {
-    // dropped outside the list
-    if (!result.destination) {
-      return;
-    }
-
-    const startIndex = result.source.index;
-    const endIndex = result.destination.index;
-    const newOptions = Array.from(formik.values.options);
-    const [removed] = newOptions.splice(startIndex, 1);
-    newOptions.splice(endIndex, 0, removed);
-
-    formik.setFieldValue('options', newOptions);
+  const onBeforeCapture = ({draggableId}: BeforeCapture) => {
+    setDraggingComponentId(draggableId);
   };
 
-  const addNewCategory = () => {
-    formik.setFieldValue('categories', [
-      ...formik.values.categories,
-      {
-        id: getUniqueId(),
-        name: 'Category',
-        questions: [{...questionMock, id: getUniqueId()}],
-      },
+  const addComponent = (type: CheckListComponentType) => {
+    formik.setFieldValue('components', [
+      ...formik.values.components,
+      getComponentMock(type),
     ]);
   };
-
-  const removeCategory = (categoryId: string) => {
-    formik.setFieldValue(
-      'categories',
-      formik.values.categories.filter((category) => category.id !== categoryId),
-    );
-  };
-
-  const addNewQuestion = (categoryId: string) => {
-    const newCategories = formik.values.categories.map((category) =>
-      category.id === categoryId
-        ? {
-            ...category,
-            questions: [
-              ...category.questions,
-              {...questionMock, id: getUniqueId()},
-            ],
-          }
-        : category,
-    );
-    formik.setFieldValue('categories', newCategories);
-  };
-
-  const removeQuestion = (categoryId: string, questionId: string) => {
-    const newCategories = formik.values.categories.map((category) =>
-      category.id === categoryId
-        ? {
-            ...category,
-            questions: category.questions.filter((q) => q.id !== questionId),
-          }
-        : category,
-    );
-    formik.setFieldValue('categories', newCategories);
-  };
-
-  const addNewOption = () => {
-    formik.setFieldValue('options', [
-      ...formik.values.options,
-      {...optionMock, id: getUniqueId()},
-    ]);
-  };
-
-  const removeOption = (optionId: string) => {
-    formik.setFieldValue(
-      'options',
-      formik.values.options.filter((option) => option.id !== optionId),
-    );
-  };
-
-  const checklistData = useMemo(
-    () => ({
-      serviceCompanyId: user!.userAccount.serviceCompany.id,
-      name: formik.values.name,
-      category: formik.values.category,
-      questions: formik.values.categories
-        .map((category) =>
-          category.questions.map((question) => ({
-            id: question.id,
-            category: category.name,
-            question: question.question,
-            type: question.type,
-            checkListId: '',
-            additionalInfo: {
-              options: formik.values.options,
-              orderNumber: question.additionalInfo.orderNumber,
-              note: '',
-            },
-          })),
-        )
-        .flat(),
-    }),
-    [formik.values],
-  );
 
   return (
     <>
-      {isPreviewing ? (
-        <ChecklistPreview checklist={checklistData} />
-      ) : (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="flex-start"
+        mt="1.5rem"
+        mb="5rem"
+        gap={3}>
+        <Box width="100%" maxWidth="47rem">
+          <PageCard
+            containerStyles={{
+              p: 4,
+              pb: formik.values.components.length ? 4 : 8,
+            }}
+            contentContainerStyles={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
+              p: 0,
+              m: 0,
+              ':last-child': {
+                pb: 0,
+                mb: -2,
+              },
+            }}>
+            <FormInput
+              props={{
+                name: 'name',
+                placeholder: t('Enter your checklist name...'),
+                variant: 'standard',
+                value: formik.values.name,
+                error: !!(formik.touched.name && formik.errors.name),
+                onBlur: formik.handleBlur,
+                onChange: formik.handleChange,
+                required: true,
+                sx: {
+                  '& .MuiInputBase-root': {
+                    height: '38px',
+                    pt: 2,
+                    fontSize: '31px',
+                  },
+                },
+                inputProps: {
+                  sx: {
+                    p: 0,
+                  },
+                },
+                InputProps: {disableUnderline: true},
+              }}
+            />
+
+            {formik.values.components.length ? (
+              <DragDropContext
+                onDragEnd={onDragComponentEnd}
+                onBeforeCapture={onBeforeCapture}>
+                <Droppable droppableId="droppable">
+                  {(provided) => (
+                    <Box
+                      pt={4}
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}>
+                      {formik.values.components?.map((component, index) => (
+                        <Draggable
+                          key={component.id}
+                          draggableId={component.id}
+                          index={index}>
+                          {(draggableProvided: DraggableProvided) => (
+                            <ChecklistComponent
+                              index={index}
+                              component={component}
+                              formik={formik}
+                              draggableProvided={draggableProvided}
+                              isDragging={draggingComponentId === component.id}
+                            />
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </Box>
+                  )}
+                </Droppable>
+              </DragDropContext>
+            ) : null}
+          </PageCard>
+
+          {formik.values.components.length ? null : (
+            <EmptySection
+              illustration="emptyChecklistComponents"
+              label="Start adding components"
+              labelVariant="h5"
+              subLabel="Choose some of the components from the menu up right"
+              subLabelProps={{
+                color: theme.palette.text.secondary,
+              }}
+              containerStyle={{
+                maxWidth: '16rem',
+                margin: 'auto',
+                pt: 16,
+                gap: 1,
+              }}
+            />
+          )}
+        </Box>
+
         <PageCard
-          headerLabel="Basic Information"
           containerStyles={{
-            mb: '5rem',
-            mt: '1.5rem',
             width: '100%',
-            maxWidth: '57rem',
-            alignSelf: 'center',
+            maxWidth: '5.5rem',
+            position: 'sticky',
+            top: '2rem',
           }}
-          headerStyles={{mt: '1rem'}}>
-          <Grid container>
-            <Grid item xs={12} md={6}>
-              <FormInput
-                props={{
-                  name: 'name',
-                  label: t('Checklist name'),
-                  variant: 'outlined',
-                  value: formik.values.name,
-                  error: !!(formik.touched.name && formik.errors.name),
-                  onBlur: formik.handleBlur,
-                  onChange: formik.handleChange,
-                  required: true,
-                }}
-              />
-            </Grid>
-          </Grid>
-
-          <Grid
-            container
-            justifyContent="flex-end"
-            alignItems="center"
-            pt={2}
-            pb={2.75}>
+          contentContainerStyles={{
+            p: 0,
+            ':last-child': {
+              pb: 0,
+            },
+            margin: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}>
+          <Typography variant="caption" fontSize="0.625rem" pt={3} pb={1.5}>
+            {t('ADD NEW')}
+          </Typography>
+          {availableComponents.map((component) => (
             <Button
+              key={component.label}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                px: 0,
+                py: 1.5,
+                borderRadius: 0,
+              }}
               buttonProps={{
-                size: 'large',
-                variant: 'text',
-                onClick: addNewCategory,
-                autoFocus: true,
-                startIcon: <Add />,
+                fullWidth: true,
+                onClick: () => addComponent(component.type),
               }}>
-              <Typography variant="subtitle2">{t('New Category')}</Typography>
+              <component.icon />
+              <Typography variant="caption" fontSize="0.625rem">
+                {t(component.label)}
+              </Typography>
             </Button>
-          </Grid>
-
-          {formik.values.categories.map((category, index) => {
-            const indexString = index.toString();
-            return (
-              <Grid
-                key={index}
-                container
-                p={4}
-                mb={5}
-                bgcolor={theme.palette.inputBackground.main}>
-                <Grid
-                  container
-                  justifyContent="space-between"
-                  alignItems="center">
-                  <Box display="flex">
-                    {editingQuestionCategory === indexString ? (
-                      <>
-                        <FormInput
-                          props={{
-                            name: `categories[${index}].name`,
-                            value: formik.values.categories[index].name,
-                            size: 'small',
-                            fullWidth: true,
-                            type: 'text',
-                            onChange: formik.handleChange,
-                          }}
-                        />
-                        <IconButton
-                          onClick={() => {
-                            setEditingQuestionCategory('');
-                          }}
-                          edge="start"
-                          sx={{mt: '0.7em', ml: '0.2em'}}>
-                          <CheckCircleRounded
-                            sx={{
-                              mt: '-0.8em',
-                              color: theme.palette.primary.main,
-                            }}
-                          />
-                        </IconButton>
-
-                        <IconButton
-                          onClick={() => {
-                            setEditingQuestionCategory('');
-                          }}
-                          edge="start"
-                          sx={{mt: '0.7em'}}>
-                          <Cancel
-                            sx={{
-                              mt: '-0.8em',
-                              color: theme.palette.primary.main,
-                            }}
-                          />
-                        </IconButton>
-                      </>
-                    ) : (
-                      <>
-                        <Typography variant="h6">
-                          {t(formik.values.categories[index].name)}
-                        </Typography>
-                        <IconButton
-                          onClick={() => {
-                            setEditingQuestionCategory(indexString);
-                          }}
-                          edge="start"
-                          sx={{mt: '-0.2rem', pl: 2.5}}>
-                          <Edit sx={{fontSize: '1rem'}} />
-                        </IconButton>
-                      </>
-                    )}
-                  </Box>
-                  {formik.values.categories.length > 1 ? (
-                    <Button
-                      buttonProps={{
-                        size: 'large',
-                        variant: 'text',
-                        sx: {
-                          color: theme.palette.error.main,
-                        },
-                        onClick: () => removeCategory(category.id),
-                      }}>
-                      <Typography variant="subtitle2">
-                        {t('Delete Category')}
-                      </Typography>
-                    </Button>
-                  ) : null}
-                </Grid>
-
-                <DragDropContext
-                  onDragEnd={(result) =>
-                    onDragQuestionEnd(result, category.id)
-                  }>
-                  <Droppable droppableId="droppable">
-                    {(provided) => (
-                      <Grid
-                        container
-                        item
-                        xs={12}
-                        pt={2}
-                        rowGap={2}
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}>
-                        {category.questions.map((item, questionIndex) => (
-                          <Draggable
-                            key={item.id}
-                            draggableId={item.id}
-                            index={questionIndex}>
-                            {(draggableProvided: DraggableProvided) => (
-                              <Grid
-                                container
-                                item
-                                xs={12}
-                                ref={draggableProvided.innerRef}
-                                {...draggableProvided.draggableProps}>
-                                <Box pr={1.5}>
-                                  <IconButton
-                                    {...draggableProvided.dragHandleProps}>
-                                    <DragHandle />
-                                  </IconButton>
-                                </Box>
-                                <Grid item xs={10}>
-                                  <FormInput
-                                    props={{
-                                      name: `categories[${index}].questions[${questionIndex}].question`,
-                                      variant: 'outlined',
-                                      value: t(
-                                        formik.values.categories[index]
-                                          .questions[questionIndex].question,
-                                      ),
-                                      error: !!(
-                                        formik.touched.categories?.[index]
-                                          ?.questions?.[questionIndex] &&
-                                        getIn(
-                                          formik.errors.categories?.[index],
-                                          `questions[${questionIndex}]`,
-                                        )
-                                      ),
-                                      onBlur: formik.handleBlur,
-                                      onChange: formik.handleChange,
-                                      required: true,
-                                      sx: {
-                                        bgcolor: 'white',
-                                      },
-                                    }}
-                                  />
-                                </Grid>
-                                <Grid
-                                  container
-                                  item
-                                  xs={1}
-                                  justifyContent="center">
-                                  <IconButton
-                                    onClick={() =>
-                                      removeQuestion(category.id, item.id)
-                                    }>
-                                    <Close />
-                                  </IconButton>
-                                </Grid>
-                              </Grid>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                        <Button
-                          buttonProps={{
-                            size: 'large',
-                            variant: 'text',
-                            onClick: () => addNewQuestion(category.id),
-                            autoFocus: true,
-                            startIcon: <Add />,
-                          }}>
-                          <Typography variant="subtitle2">
-                            {t('New Task')}
-                          </Typography>
-                        </Button>
-                      </Grid>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-              </Grid>
-            );
-          })}
-
-          {/* OPTIONS */}
-          <Typography variant="h6">{t('Option per task')}</Typography>
-          <DragDropContext onDragEnd={onDragOptionEnd}>
-            <Droppable droppableId="droppableOptions">
-              {(provided) => (
-                <Grid
-                  container
-                  item
-                  xs={12}
-                  pt={2}
-                  rowGap={2}
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}>
-                  {formik.values.options.map((option, optionIndex) => (
-                    <Draggable
-                      key={option.id}
-                      draggableId={option.id}
-                      index={optionIndex}>
-                      {(draggableProvided: DraggableProvided) => (
-                        <Grid item xs={12}>
-                          <Grid
-                            container
-                            item
-                            xs={12}
-                            md={7}
-                            ref={draggableProvided.innerRef}
-                            {...draggableProvided.draggableProps}>
-                            <Box pr={1.5}>
-                              <IconButton
-                                {...draggableProvided.dragHandleProps}>
-                                <DragHandle />
-                              </IconButton>
-                            </Box>
-                            <Grid item xs={10} md={9}>
-                              <FormInput
-                                props={{
-                                  name: `options[${optionIndex}].text`,
-                                  variant: 'outlined',
-                                  value:
-                                    formik.values.options[optionIndex].text,
-                                  error: !!(
-                                    formik.touched?.options?.[optionIndex] &&
-                                    formik.errors.options?.[optionIndex]
-                                  ),
-                                  onBlur: formik.handleBlur,
-                                  onChange: formik.handleChange,
-                                  required: true,
-                                  sx: {
-                                    bgcolor: 'white',
-                                  },
-                                }}
-                              />
-                            </Grid>
-                            <Grid container item xs={1} justifyContent="center">
-                              <IconButton
-                                onClick={() => removeOption(option.id)}>
-                                <Close />
-                              </IconButton>
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                  <Button
-                    buttonProps={{
-                      size: 'large',
-                      variant: 'text',
-                      onClick: addNewOption,
-                      autoFocus: true,
-                      startIcon: <Add />,
-                    }}>
-                    <Typography variant="subtitle2">
-                      {t('New Option')}
-                    </Typography>
-                  </Button>
-                </Grid>
-              )}
-            </Droppable>
-          </DragDropContext>
+          ))}
         </PageCard>
-      )}
+      </Box>
+
+      <ChecklistPreview
+        isPreviewing={isPreviewing}
+        onClosePreview={() => setIsPreviewing(false)}
+        formik={formik}
+      />
 
       <BottomDrawer
         isOpen
@@ -663,12 +366,13 @@ export const Checklist = () => {
         isValid={formik.isValid}
         secondaryButton={
           <Button
-            label={isPreviewing ? 'Edit' : 'Preview'}
+            label="Show Preview"
+            disabled={!formik.isValid}
             buttonProps={{
               variant: 'outlined',
               sx: {bgcolor: theme.palette.inputBackground.main},
-              startIcon: isPreviewing ? <Edit /> : <RemoveRedEye />,
-              onClick: () => setIsPreviewing((currState) => !currState),
+              startIcon: <PhoneAndroid />,
+              onClick: () => setIsPreviewing(true),
             }}
           />
         }
