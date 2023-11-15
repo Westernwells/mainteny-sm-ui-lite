@@ -425,13 +425,14 @@ export const ChecklistComponent = ({
   isDragging: Boolean;
 }) => {
   const duplicateComponent = () => {
-    formik.setFieldValue(
-      'components',
-      formik.values.components.toSpliced(index + 1, 0, {
+    formik.setFieldValue('components', [
+      ...formik.values.components.slice(0, index + 1),
+      {
         ...component,
         id: getUniqueId(),
-      }),
-    );
+      },
+      ...formik.values.components.slice(index + 1),
+    ]);
   };
 
   const deleteComponent = () => {

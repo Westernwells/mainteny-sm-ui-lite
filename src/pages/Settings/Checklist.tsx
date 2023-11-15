@@ -183,10 +183,9 @@ export const Checklist = () => {
 
     const sourceIndex = result.source.index;
     const destinationIndex = result.destination.index;
-    const componentItem = formik.values.components[sourceIndex];
-    const newComponents = formik.values.components
-      .toSpliced(sourceIndex, 1)
-      .toSpliced(destinationIndex, 0, componentItem!);
+    const newComponents = [...formik.values.components];
+    const [movedComponent] = newComponents.splice(sourceIndex, 1);
+    newComponents.splice(destinationIndex, 0, movedComponent);
     formik.setFieldValue('components', newComponents);
     setDraggingComponentId('');
   };
