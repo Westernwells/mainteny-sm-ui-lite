@@ -42,6 +42,7 @@ import {SendEmailDialog} from 'components/SendEmailDialog';
 import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useSnackbar} from 'notistack';
+import {isAfter, parseISO, startOfDay} from 'date-fns';
 import {Notes} from './Notes';
 import {InvoiceActivities} from './InvoiceActivities';
 
@@ -189,6 +190,31 @@ export const ViewInvoice = ({
       }
     };
   }, [invoice?.additionalInfo.pdfGenerationStatus]);
+
+  const isDueDateBeforeCreation = () => {
+    const issuedDate = invoice?.issuedDate || startOfDay(new Date());
+    const localDueDate = invoice.dueDate as string;
+    const dueDateObject = parseISO(new Date(localDueDate).toISOString());
+    const invoiceDateObject = parseISO(new Date(issuedDate).toISOString());
+
+    return isAfter(invoiceDateObject, dueDateObject);
+  };
+
+  const onInvoiceSend = () => {
+    if (isDueDateBeforeCreation()) {
+      const errorMessage = t(
+        'The invoice due date cannot be earlier than the invoice creation date. Please enter a valid due date',
+      );
+
+      enqueueSnackbar(errorMessage, {
+        variant: 'error',
+      });
+
+      return;
+    }
+
+    setIsSendEmailDialogOpen(true);
+  };
 
   return (
     <Box>
@@ -389,7 +415,7 @@ export const ViewInvoice = ({
             invoice.status === InvoiceStatus.DRAFT ||
             invoice.status === InvoiceStatus.EXPIRED
           ) {
-            setIsSendEmailDialogOpen(true);
+            onInvoiceSend();
           } else {
             setIsDialogOpen(true);
           }

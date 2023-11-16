@@ -11,6 +11,7 @@ import {mapLanguageToLocale} from 'utils/utils';
 import {useEffect, useState} from 'react';
 import {locales} from 'utils/datetime';
 import Box from '@mui/material/Box';
+import {Typography} from '@mui/material';
 import {FormInput} from './form/FormInput';
 
 interface Props extends Partial<DatePickerProps<Date, Date>> {
@@ -26,6 +27,7 @@ interface Props extends Partial<DatePickerProps<Date, Date>> {
   required?: boolean;
   dateFormat?: string;
   disableMask?: boolean;
+  errorMessage?: string;
 }
 
 export const DatePicker = ({
@@ -41,6 +43,7 @@ export const DatePicker = ({
   required,
   dateFormat,
   disableMask,
+  errorMessage,
   ...props
 }: Props) => {
   const {user} = useUserSession();
@@ -64,6 +67,13 @@ export const DatePicker = ({
       getSelectedDate(value);
     }
   }, [value]);
+
+  const errorProps: any = {};
+
+  if (errorMessage) {
+    errorProps.error = true;
+  }
+
   return (
     <Box sx={{...containerStyles}}>
       <LocalizationProvider
@@ -91,12 +101,18 @@ export const DatePicker = ({
                 onKeyDown: (e) => {
                   e.preventDefault();
                 },
+                ...errorProps,
               }}
               inputLabelProps={inputLabelProps}
             />
           )}
         />
       </LocalizationProvider>
+      {!!errorMessage && (
+        <Typography color="error" variant="body2">
+          {errorMessage}
+        </Typography>
+      )}
     </Box>
   );
 };
