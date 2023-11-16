@@ -175,8 +175,8 @@ export const UnitMapsView = () => {
       superCluster.getClusterExpansionZoom(clusterId),
       20,
     );
-    mapRef.current.setZoom(expansionZoom);
-    mapRef.current.panTo({lat, lng});
+    mapRef?.current?.setZoom(expansionZoom);
+    mapRef?.current?.panTo({lat, lng});
   };
 
   const clearFilters = () => {
