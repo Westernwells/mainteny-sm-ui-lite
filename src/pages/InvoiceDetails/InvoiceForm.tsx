@@ -50,6 +50,7 @@ import {
   InvoiceStatus,
   InvoiceFormData,
   ALL_MANUAL_INVOICE_TYPES,
+  InvoiceAdditionalInfo,
 } from 'models/invoice';
 import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
 import {
@@ -161,6 +162,16 @@ export const InvoiceForm = ({
     serviceOrder?.additionalInfo.checkListInfo?.pdfGenerationStatus ===
       PdfGenerationStatus.DONE,
   );
+  const [laborMaterialCosts, setLaborMaterialCosts] = useState<
+    InvoiceAdditionalInfo['laborMaterialCosts']
+  >({
+    LABOR:
+      invoice?.additionalInfo?.laborMaterialCosts?.LABOR ||
+      'Your labor cost is {LABOR_COST}',
+    MATERIAL:
+      invoice?.additionalInfo?.laborMaterialCosts?.MATERIAL ||
+      'Your material cost is {MATERIAL_COST}',
+  });
 
   const articleViewToItem = (
     article: ServiceOrderArticleView,
@@ -185,7 +196,7 @@ export const InvoiceForm = ({
   const [dueDate, setDueDate] = useState<Date | null>(
     invoice ? new Date(invoice.dueDate) : null,
   );
-  const [finalAmountText, setFinalAmountText] = useState('');
+  const [, setFinalAmountText] = useState('');
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [activeField, setActiveField] = useState<string>('');
@@ -274,6 +285,10 @@ export const InvoiceForm = ({
     billingAddress: invoice?.additionalInfo?.billingAddress,
     beneficiaryAddress: invoice?.additionalInfo?.beneficiaryAddress,
     alternativeAddress: invoice?.additionalInfo?.alternativeAddress,
+    laborMaterialCosts: invoice?.additionalInfo.laborMaterialCosts || {
+      LABOR: '',
+      MATERIAL: '',
+    },
     externalId:
       formType === 'new' ? companyNextNumber?.value : invoice?.externalId ?? '',
   };
@@ -401,6 +416,15 @@ export const InvoiceForm = ({
 
         setInvoiceItems(newItems);
       }
+
+      setLaborMaterialCosts({
+        LABOR:
+          invoice.additionalInfo?.laborMaterialCosts?.LABOR ||
+          'Your labor cost is {LABOR_COST}',
+        MATERIAL:
+          invoice.additionalInfo?.laborMaterialCosts?.MATERIAL ||
+          'Your material cost is {MATERIAL_COST}',
+      });
     }
 
     formik.setFieldValue(
@@ -591,6 +615,10 @@ export const InvoiceForm = ({
           includeWorkReport: values.includeWorkReport,
           includeCheckList: values.includeCheckList,
           dueDate: dueDateToString,
+          laborMaterialCosts: {
+            LABOR: laborMaterialCosts.LABOR,
+            MATERIAL: laborMaterialCosts.MATERIAL,
+          },
         }),
         invoiceId: invoice.id,
       });
@@ -602,6 +630,10 @@ export const InvoiceForm = ({
         includeWorkReport: values.includeWorkReport,
         includeCheckList: values.includeCheckList,
         dueDate: dueDateToString,
+        laborMaterialCosts: {
+          LABOR: laborMaterialCosts.LABOR,
+          MATERIAL: laborMaterialCosts.MATERIAL,
+        },
       }),
     });
   }
@@ -1192,26 +1224,41 @@ export const InvoiceForm = ({
               formType={formType}
             />
 
-            {finalAmountText && (
+            <Box sx={{display: 'flex', flexDirection: 'row', columnGap: 2}}>
               <FormInput
                 containerStyles={{mt: '1rem'}}
                 props={{
                   size: 'small',
-                  label: 'Final Amount',
+                  label: 'Final Material Cost',
                   name: 'finalAmountText',
-                  value: finalAmountText,
-                  disabled: true,
-                  // sx: {
-                  //   '& .MuiInputBase-input.Mui-disabled': {
-                  //     WebkitTextFillColor: theme.palette.text.primary,
-                  //   },
-                  // },
-                  // InputLabelProps: {
-                  //   style: {color: theme.palette.text.secondary},
-                  // },
+
+                  value: laborMaterialCosts.MATERIAL,
+                  disabled: false,
+                  onChange: (e) => {
+                    setLaborMaterialCosts({
+                      ...laborMaterialCosts,
+                      MATERIAL: e.target.value,
+                    });
+                  },
                 }}
               />
-            )}
+              <FormInput
+                containerStyles={{mt: '1rem'}}
+                props={{
+                  size: 'small',
+                  label: 'Final Labor Cost',
+                  name: 'finalAmountText',
+                  value: laborMaterialCosts.LABOR,
+                  disabled: false,
+                  onChange: (e) => {
+                    setLaborMaterialCosts({
+                      ...laborMaterialCosts,
+                      LABOR: e.target.value,
+                    });
+                  },
+                }}
+              />
+            </Box>
 
             <InfoCard
               containerStyles={{
