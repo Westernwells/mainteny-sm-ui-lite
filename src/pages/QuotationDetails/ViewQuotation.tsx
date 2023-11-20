@@ -39,6 +39,7 @@ import {formatCurrency} from 'utils/currency';
 import {useTranslation} from 'react-i18next';
 import {useSnackbar} from 'notistack';
 import PathImage from 'assets/images/Path.svg';
+import {convertToMacro} from 'utils/utils';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -76,9 +77,9 @@ export const ViewQuotation = ({
     onSubmit: (values) => {
       if (values.createServiceOrder && quotation)
         navigate(
-          `/orders/new?type=${values.createServiceOrder.toLowerCase()}&quotationId=${
-            quotation.id
-          }`,
+          `/orders/new?type=${convertToMacro(
+            values.createServiceOrder,
+          ).toLowerCase()}&quotationId=${quotation.id}`,
         );
     },
   });
