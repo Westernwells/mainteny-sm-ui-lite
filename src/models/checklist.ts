@@ -127,6 +127,7 @@ export interface ExtendedCheckListComponentRecord {
   orderNumber?: number;
   moreInfoInNote?: Boolean;
   checked?: Boolean;
+  note?: string;
 }
 
 export interface ExtendedCreateCheckListRecord {

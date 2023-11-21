@@ -275,26 +275,44 @@ export const ChecklistPreview = ({
                   </Typography>
                 </Box>
               ) : component.type === CheckListComponentType.TEXT ? (
-                <TextField
-                  name={`components[${index}].subject`}
-                  variant="outlined"
-                  size="small"
-                  placeholder={t('Write down all the text you’ll ever need...')}
-                  multiline
-                  fullWidth
-                  minRows={5}
-                  value={component.subject}
-                  onChange={formik.handleChange}
-                  sx={{
-                    bgcolor: theme.palette.inputBackground.main,
-                    '& .MuiOutlinedInput-root': {
-                      fontSize: '0.875rem',
-                      fieldset: {
-                        border: '1px solid #E4E9F2',
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  p={1.5}
+                  boxShadow="0px 4px 10px 0px #E6EEFB"
+                  borderRadius={2.5}
+                  border="1px solid #E4E9F2">
+                  <Typography variant="subtitle2" fontSize="13px">
+                    {component.subject}
+                  </Typography>
+                  <TextField
+                    name={`components[${index}].note`}
+                    variant="outlined"
+                    size="small"
+                    placeholder={t(
+                      'Write down all the text you’ll ever need...',
+                    )}
+                    multiline
+                    fullWidth
+                    minRows={5}
+                    value={component.note}
+                    onChange={formik.handleChange}
+                    sx={{
+                      bgcolor: theme.palette.inputBackground.main,
+                      mt: 1.5,
+                      '& .MuiOutlinedInput-root': {
+                        p: 1,
+                        fontSize: '0.875rem',
+                        fontWeight: 400,
+                        lineHeight: 1.43,
+                        letterSpacing: '0.15px',
+                        fieldset: {
+                          border: '1px solid #E4E9F2',
+                        },
                       },
-                    },
-                  }}
-                />
+                    }}
+                  />
+                </Box>
               ) : component.type === CheckListComponentType.HEAD ? (
                 <Typography variant="subtitle2" py={0.5}>
                   {component.subject}

@@ -252,10 +252,14 @@ export const MultiChoiceComponent = ({
             <Switch
               value={!!component.moreInfoInNote}
               getValue={handleMoreInfoInNote}
-              label="“Enter Your Choice”"
+              label="Enter Your Choice"
             />
             <Tooltip
-              title="A custom choice input will be added to the mobile checklist conterpart."
+              title={
+                t(
+                  "Enable 'Enter Your Choice' to add a custom text input field to your mobile checklist. This allows for personalized responses in the multi-choice form.",
+                ) ?? ''
+              }
               placement="top"
               arrow>
               <IconButton size="small" sx={{ml: -1}}>
@@ -367,45 +371,77 @@ export const HeaderComponent = ({
   </Box>
 );
 
+interface TextareaComponentProps extends ComponentProps {
+  isDragging: Boolean;
+}
+
 export const TextComponent = ({
   index,
   formik,
   component,
   duplicateComponent,
   deleteComponent,
-}: ComponentProps) => (
+  isDragging,
+}: TextareaComponentProps) => (
   <>
-    <TextField
-      name={`components[${index}].subject`}
-      variant="outlined"
-      size="small"
-      placeholder={t('Write down all the text you’ll ever need...')}
-      multiline
-      fullWidth
-      value={component.subject}
-      minRows={5}
-      error={
-        !!(
-          getIn(formik.touched, `components[${index}].subject`) &&
-          getIn(formik.errors, `components[${index}].subject`)
-        )
-      }
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      sx={{
-        bgcolor: 'white',
-        '& .MuiOutlinedInput-root': {
-          fieldset: {
-            borderColor: '#E4E9F2',
+    <Box display="flex" alignItems="center">
+      <FormInput
+        props={{
+          name: `components[${index}].subject`,
+          placeholder: t('Enter textarea name...'),
+          variant: 'standard',
+          value: component.subject,
+          error: !!(
+            getIn(formik.touched, `components[${index}].subject`) &&
+            getIn(formik.errors, `components[${index}].subject`)
+          ),
+          onBlur: formik.handleBlur,
+          onChange: formik.handleChange,
+          required: true,
+          inputProps: {
+            sx: {
+              p: 0,
+            },
           },
-        },
-      }}
-      required
-    />
-    <ComponentActions
-      duplicateComponent={duplicateComponent}
-      deleteComponent={deleteComponent}
-    />
+          InputProps: {disableUnderline: true},
+        }}
+      />
+      <ComponentActions
+        duplicateComponent={duplicateComponent}
+        deleteComponent={deleteComponent}
+      />
+    </Box>
+
+    {!isDragging ? (
+      <TextField
+        name={`components[${index}].note`}
+        variant="outlined"
+        size="small"
+        placeholder={t('Write down all the text you’ll ever need...')}
+        multiline
+        fullWidth
+        value={component.note}
+        minRows={5}
+        error={
+          !!(
+            getIn(formik.touched, `components[${index}].note`) &&
+            getIn(formik.errors, `components[${index}].note`)
+          )
+        }
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        sx={{
+          mt: 1.5,
+          bgcolor: 'white',
+          '& .MuiOutlinedInput-root': {
+            fieldset: {
+              borderColor: '#E4E9F2',
+            },
+          },
+        }}
+        required
+      />
+    ) : null}
   </>
 );
 
@@ -521,16 +557,14 @@ export const ChecklistComponent = ({
   ) : component.type === CheckListComponentType.TEXT ? (
     <DraggableContainer
       isDragging={isDragging}
-      draggableProvided={draggableProvided}
-      display="flex"
-      justifyContent="space-between"
-      alignItems="flex-start">
+      draggableProvided={draggableProvided}>
       <TextComponent
         index={index}
         formik={formik}
         component={component}
         duplicateComponent={duplicateComponent}
         deleteComponent={deleteComponent}
+        isDragging={isDragging}
       />
     </DraggableContainer>
   ) : null;
