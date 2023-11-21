@@ -366,7 +366,6 @@ export const Checklist = () => {
         secondaryButton={
           <Button
             label="Show Preview"
-            disabled={!formik.isValid}
             buttonProps={{
               variant: 'outlined',
               sx: {bgcolor: theme.palette.inputBackground.main},
