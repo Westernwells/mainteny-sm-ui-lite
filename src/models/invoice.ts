@@ -79,6 +79,7 @@ export interface InvoiceAdditionalInfo {
     LABOR: string;
     MATERIAL: string;
   };
+  laborMaterialCostText?: string;
 }
 
 export enum InvoiceOverdueNoticeStatus {
@@ -202,6 +203,7 @@ export interface InvoiceFormData {
     LABOR: string;
     MATERIAL: string;
   };
+  laborMaterialCostText: string;
 }
 
 export interface CreateInvoice {
@@ -228,6 +230,7 @@ export interface CreateInvoice {
     LABOR: string;
     MATERIAL: string;
   };
+  laborMaterialCostText?: string;
 }
 
 export interface UpdateInvoice {
@@ -250,6 +253,7 @@ export interface UpdateInvoice {
     LABOR: string;
     MATERIAL: string;
   };
+  laborMaterialCostText?: string;
 }
 
 export interface QueryInvoiceCommentsParams {
