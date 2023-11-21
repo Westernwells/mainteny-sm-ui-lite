@@ -697,7 +697,10 @@ export const Router = () => {
                 <PageLayout
                   backBtnLabel="Checklist"
                   pageScrollable
-                  showBackAction>
+                  showBackAction
+                  containerStyles={{
+                    overflow: 'visible',
+                  }}>
                   <Checklist />
                 </PageLayout>
               </>
