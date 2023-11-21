@@ -28,6 +28,11 @@ export enum Priority {
   NONE = 'NONE',
 }
 
+export interface CallerInfo {
+  name: string;
+  calledAt?: string;
+}
+
 export enum ServiceOrderStatus {
   ALL = 'ALL',
   INIT = 'INIT',
@@ -389,6 +394,14 @@ export interface AssignmentBasedOrderBody {
   technicianIds: string[];
   time: string;
   type: ServiceOrderType;
+  purchaseOrderNumber?: string;
+  callerInfo?: CallerInfo;
+}
+
+export interface AssignmentDescriptionOrderModel {
+  callerName: string;
+  callTime: string;
+  purchaseOrderNumber: string;
 }
 
 export interface CreateScheduledServiceOrderBody {
@@ -405,6 +418,8 @@ export interface CreateScheduledServiceOrderBody {
   startTime: string;
   technicianIds: string[];
   type: ServiceOrderType;
+  purchaseOrderNumber: string;
+  callerInfo: CallerInfo;
 }
 
 export interface CreateNonScheduledServiceOrderBody {

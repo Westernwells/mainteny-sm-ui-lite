@@ -3,7 +3,11 @@ import {Stepper} from 'components/Stepper';
 import {useAssignmentBasedOrder} from 'hooks/reactQuery/useServiceOrder';
 import {ElevatorView} from 'models/elevator';
 import {useEffect, useState} from 'react';
-import {Priority, ServiceOrderType} from 'models/service-order';
+import {
+  AssignmentDescriptionOrderModel,
+  Priority,
+  ServiceOrderType,
+} from 'models/service-order';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmployeesView} from 'models/employee';
 import {toRestDateTime} from 'utils/datetime';
@@ -36,6 +40,12 @@ export const NewEmergency = ({quotation}: Props) => {
   const [selectedTechnicians, setSelectedTechnicians] = useState<
     EmployeesView[]
   >([]);
+  const [descriptionValues, setDescriptionValues] =
+    useState<AssignmentDescriptionOrderModel>({
+      callTime: '',
+      callerName: '',
+      purchaseOrderNumber: '',
+    });
 
   useEffect(() => {
     if (activeStep === 0 && !selectedUnit) {
@@ -76,6 +86,11 @@ export const NewEmergency = ({quotation}: Props) => {
       time: toRestDateTime(new Date()),
       type: ServiceOrderType.EMERGENCY,
       quotationId: quotation ? quotation.id : '',
+      callerInfo: {
+        calledAt: descriptionValues.callTime ?? null,
+        name: descriptionValues.callerName ?? '',
+      },
+      purchaseOrderNumber: descriptionValues.purchaseOrderNumber ?? '',
     };
     await createEmergencyOrder(body);
     navigate('/orders?tab=1');
@@ -128,6 +143,8 @@ export const NewEmergency = ({quotation}: Props) => {
               initialDescription={description}
               selectedUnit={selectedUnit}
               selectedTechnicians={selectedTechnicians}
+              getDescriptionValues={(values) => setDescriptionValues(values)}
+              initialValues={descriptionValues}
             />
           </FlexContainer>
         ) : null}
