@@ -111,6 +111,12 @@ export const InvoiceForm = ({
   customer: customerByProp,
 }: Props) => {
   const {t} = useTranslation();
+  const DEFAULT_LABOR_COST_TEXT = t('Labor costs without VAT: {LABOR_COST}');
+  const DEFAULT_MATERIAL_COST_TEXT = t(
+    'Material costs without VAT: {MATERIAL_COST}',
+  );
+  const DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT = `${DEFAULT_LABOR_COST_TEXT}\n${DEFAULT_MATERIAL_COST_TEXT}`;
+
   const theme = useTheme();
   const formatDate = useFormatDate();
   const navigate = useNavigate();
@@ -174,6 +180,10 @@ export const InvoiceForm = ({
       invoice?.additionalInfo?.laborMaterialCosts?.MATERIAL ||
       'Your material cost is {MATERIAL_COST}',
   });
+
+  const [laborMaterialCostText, setLaborMaterialCostText] = useState(
+    DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
+  );
 
   const articleViewToItem = (
     article: ServiceOrderArticleView,
@@ -292,6 +302,9 @@ export const InvoiceForm = ({
       LABOR: '',
       MATERIAL: '',
     },
+    laborMaterialCostText:
+      invoice?.additionalInfo.laborMaterialCostText ||
+      DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
     externalId:
       formType === 'new' ? companyNextNumber?.value : invoice?.externalId ?? '',
   };
@@ -428,6 +441,11 @@ export const InvoiceForm = ({
           invoice.additionalInfo?.laborMaterialCosts?.MATERIAL ||
           'Your material cost is {MATERIAL_COST}',
       });
+
+      setLaborMaterialCostText(
+        invoice.additionalInfo.laborMaterialCostText ||
+          DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
+      );
     }
 
     formik.setFieldValue(
@@ -648,6 +666,7 @@ export const InvoiceForm = ({
             LABOR: laborMaterialCosts.LABOR,
             MATERIAL: laborMaterialCosts.MATERIAL,
           },
+          laborMaterialCostText,
         }),
         invoiceId: invoice.id,
       });
@@ -663,6 +682,7 @@ export const InvoiceForm = ({
           LABOR: laborMaterialCosts.LABOR,
           MATERIAL: laborMaterialCosts.MATERIAL,
         },
+        laborMaterialCostText,
       }),
     });
   }
@@ -1260,32 +1280,15 @@ export const InvoiceForm = ({
                 containerStyles={{mt: '1rem'}}
                 props={{
                   size: 'small',
-                  label: 'Final Material Cost',
-                  name: 'finalAmountText',
-
-                  value: laborMaterialCosts.MATERIAL,
+                  label: 'Final Amount',
+                  name: 'laborMaterialCostText',
+                  minRows: 2,
+                  maxRows: 5,
+                  multiline: true,
+                  value: laborMaterialCostText,
                   disabled: false,
                   onChange: (e) => {
-                    setLaborMaterialCosts({
-                      ...laborMaterialCosts,
-                      MATERIAL: e.target.value,
-                    });
-                  },
-                }}
-              />
-              <FormInput
-                containerStyles={{mt: '1rem'}}
-                props={{
-                  size: 'small',
-                  label: 'Final Labor Cost',
-                  name: 'finalAmountText',
-                  value: laborMaterialCosts.LABOR,
-                  disabled: false,
-                  onChange: (e) => {
-                    setLaborMaterialCosts({
-                      ...laborMaterialCosts,
-                      LABOR: e.target.value,
-                    });
+                    setLaborMaterialCostText(e.target.value);
                   },
                 }}
               />

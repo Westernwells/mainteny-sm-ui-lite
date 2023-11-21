@@ -30,4 +30,5 @@ export const formatInvoiceRecord = (value: InvoiceFormData) => ({
   alternativeAddress: value.alternativeAddress,
   externalId: value.externalId,
   laborMaterialCosts: value.laborMaterialCosts,
+  laborMaterialCostText: value.laborMaterialCostText,
 });
