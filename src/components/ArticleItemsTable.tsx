@@ -30,7 +30,7 @@ import {
 import {createEmptyResource} from 'utils/paging-utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {LanguageContext} from 'context/LanguageProvider';
-import {calculateTotal} from 'utils/calculate-total';
+import {calculateInvoiceTotal, calculateTotal} from 'utils/calculate-total';
 import {getItemRecord} from 'utils/article-utils';
 import {NumericFormat} from 'react-number-format';
 import {TextField} from '@mui/material';
@@ -52,6 +52,7 @@ interface Props<T> {
   isCreditNote?: boolean;
   unitSellingAmount?: Amount;
   formType?: string;
+  orderPartialInvoices?: InvoiceView[];
 }
 
 export const ArticleItemsTable = ({
@@ -63,6 +64,7 @@ export const ArticleItemsTable = ({
   isCreditNote,
   unitSellingAmount,
   formType,
+  orderPartialInvoices,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -111,6 +113,8 @@ export const ArticleItemsTable = ({
 
   const [newPartialTotal, setNewPartialTotal] = useState(0);
 
+  const [partialInvoiceTotal, setPartialInvoiceTotal] = useState(0);
+
   const {language: selectedLng} = useContext(LanguageContext);
 
   const articleViewToItem = (
@@ -153,6 +157,12 @@ export const ArticleItemsTable = ({
     setItems([...items, articleViewToItem(row)]);
     setIsArticleModalOpen(false);
   };
+
+  useEffect(() => {
+    if (orderPartialInvoices) {
+      setPartialInvoiceTotal(calculateInvoiceTotal(orderPartialInvoices));
+    }
+  }, [orderPartialInvoices]);
 
   useEffect(() => {
     setTotalPrice(calculateTotal(items));
@@ -443,6 +453,7 @@ export const ArticleItemsTable = ({
               setPartialPrice={setPartialPrice}
               newPartialTotal={newPartialTotal}
               setNewPartialTotal={setNewPartialTotal}
+              partialInvoiceTotal={partialInvoiceTotal}
             />
           ))}
           {items.length ? (

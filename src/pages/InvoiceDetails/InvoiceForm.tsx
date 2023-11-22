@@ -39,6 +39,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateInvoice,
   useDeleteInvoice,
+  useFetchServiceOrderInvoices,
   useInvoices,
   usePublishInvoice,
   useUpdateInvoice,
@@ -725,6 +726,10 @@ export const InvoiceForm = ({
     setOpenContractPaymentTermsDialog(false);
   };
 
+  const {data: InvoiceList = []} = useFetchServiceOrderInvoices(
+    serviceOrder?.id,
+  );
+
   const removeAddress = (
     addressType: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress',
   ) => {
@@ -1273,6 +1278,9 @@ export const InvoiceForm = ({
               unitSellingAmount={invoice?.totalAmount}
               propertyOwnerId={customer?.id ?? ''}
               formType={formType}
+              orderPartialInvoices={InvoiceList.filter(
+                (item) => item.type === InvoiceType.PARTIAL,
+              )}
             />
 
             <Box sx={{display: 'flex', flexDirection: 'row', columnGap: 2}}>
