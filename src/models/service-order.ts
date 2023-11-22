@@ -28,6 +28,11 @@ export enum Priority {
   NONE = 'NONE',
 }
 
+export interface CallerInfo {
+  name: string;
+  calledAt?: string;
+}
+
 export enum ServiceOrderStatus {
   ALL = 'ALL',
   INIT = 'INIT',
@@ -115,6 +120,13 @@ export interface ServiceOrderAdditionalInfo {
   moreInformation: string;
   quotationId: string;
   workReportGenerated: boolean;
+  confirmationInfo?: ServiceOrderConfirmationInfo;
+}
+
+export interface ServiceOrderConfirmationInfo {
+  sentDate: string;
+  pdfGenerationStatus?: PdfGenerationStatus;
+  pdfPath?: string;
 }
 
 export interface ServiceOrderView {
@@ -389,6 +401,14 @@ export interface AssignmentBasedOrderBody {
   technicianIds: string[];
   time: string;
   type: ServiceOrderType;
+  purchaseOrderNumber?: string;
+  callerInfo?: CallerInfo;
+}
+
+export interface AssignmentDescriptionOrderModel {
+  callerName: string;
+  callTime: string;
+  purchaseOrderNumber: string;
 }
 
 export interface CreateScheduledServiceOrderBody {
@@ -405,6 +425,8 @@ export interface CreateScheduledServiceOrderBody {
   startTime: string;
   technicianIds: string[];
   type: ServiceOrderType;
+  purchaseOrderNumber: string;
+  callerInfo: CallerInfo;
 }
 
 export interface CreateNonScheduledServiceOrderBody {
@@ -443,6 +465,13 @@ export interface UpdateServiceOrderArticleRecord {
   name: string;
   quantity: number;
   unitAmount: AmountRecord;
+}
+
+export interface ServiceOrderConfirmationPublishBody {
+  email: string;
+  emails: string[];
+  subject: string;
+  content: string;
 }
 
 export interface AppointmentConfirmationRequiredOrdersQueryParams {

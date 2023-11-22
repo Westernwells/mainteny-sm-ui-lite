@@ -34,6 +34,7 @@ interface Props<T> {
   setPartialPrice: Dispatch<SetStateAction<number>>;
   newPartialTotal: number;
   setNewPartialTotal: Dispatch<SetStateAction<number>>;
+  partialInvoiceTotal: number;
 }
 
 export const ArticleItemRow = ({
@@ -50,6 +51,7 @@ export const ArticleItemRow = ({
   setPartialPrice,
   newPartialTotal,
   setNewPartialTotal,
+  partialInvoiceTotal,
 }: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -248,7 +250,11 @@ export const ArticleItemRow = ({
             />
 
             <NumericFormat
-              value={isPartial ? newPartialTotal - partialPrice : totalPrice}
+              value={
+                isPartial
+                  ? newPartialTotal - partialInvoiceTotal - partialPrice
+                  : totalPrice
+              }
               customInput={TextField}
               decimalScale={2}
               fixedDecimalScale
@@ -365,6 +371,7 @@ export const ArticleItemRow = ({
           </>
         )}
       </Box>
+
       <Box sx={{float: 'right', mt: '1em'}}>
         {!showDescription && !isCreditNote && (
           <Button

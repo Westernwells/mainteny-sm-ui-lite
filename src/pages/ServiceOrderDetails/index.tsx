@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import GradingIcon from '@mui/icons-material/Grading';
 import FactCheck from '@mui/icons-material/FactCheck';
@@ -7,13 +7,21 @@ import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import {Progress} from 'components/Progress';
 import {PdfGenerationStatus} from 'models/misc';
-import {useServiceOrderDetails} from 'hooks/reactQuery/useServiceOrder';
+import {
+  usePostServiceOrderConfirmationPublish,
+  useServiceOrderDetails,
+} from 'hooks/reactQuery/useServiceOrder';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useParams, useSearchParams} from 'react-router-dom';
 import {formatSearchParams} from 'utils/utils';
-import {Overview} from './Tabs/Overview';
-import {WorkReport} from './Tabs/WorkReport';
+import {Box, Typography} from '@mui/material';
+import {useTranslation} from 'react-i18next';
+import {useSnackbar} from 'hooks/useSnackbar';
+import PathImage from 'assets/images/Path.svg';
+import {SnackbarKey} from 'notistack';
 import {CheckList} from './Tabs/Checklist';
+import {WorkReport} from './Tabs/WorkReport';
+import {Overview} from './Tabs/Overview';
 
 const tabItems = [
   {
@@ -30,22 +38,40 @@ const tabItems = [
   },
 ];
 
+const ACTION_BUTTON_LABEL: {[key: number]: string} = {
+  0: 'Download Job Overview',
+  1: 'Download Work Report',
+};
+
 export const ServiceOrderDetails = () => {
   const [tabValue, setTabValue] = useState(0);
   const {id: serviceOrderId} = useParams();
   const [queryParams, setQueryParams] = useSearchParams();
   const {data: serviceOrder, isLoading} =
     useServiceOrderDetails(serviceOrderId);
-
   const isWorkReportPdfGenerated =
     serviceOrder?.report?.additionalInfo.pdfGenerationStatus ===
     PdfGenerationStatus.DONE;
+  const isJobOverviewPdfGenerated =
+    serviceOrder?.additionalInfo.confirmationInfo?.pdfGenerationStatus ===
+    PdfGenerationStatus.DONE;
+  const {enqueueSnackbar, showError, closeSnackbar} = useSnackbar();
+  const {t} = useTranslation();
+  const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
 
   const {data: workReportPdfDownloadUrl = {}} = useDownloadUrl(
     isWorkReportPdfGenerated
       ? [serviceOrder?.report!.additionalInfo.pdfPath]
       : [],
   );
+  const {data: workOverviewPdfDownloadUrl = {}} = useDownloadUrl(
+    isJobOverviewPdfGenerated
+      ? [serviceOrder?.additionalInfo.confirmationInfo?.pdfPath as string]
+      : [],
+  );
+
+  const {mutateAsync: postServiceOrderConfirmationPublish} =
+    usePostServiceOrderConfirmationPublish();
 
   const downloadWorkReport = () => {
     const url = isWorkReportPdfGenerated
@@ -54,9 +80,73 @@ export const ServiceOrderDetails = () => {
     window.open(workReportPdfDownloadUrl[url], '_blank');
   };
 
+  const downloadWorkOverview = () => {
+    const pdfPath = isJobOverviewPdfGenerated
+      ? (serviceOrder?.additionalInfo.confirmationInfo?.pdfPath as string)
+      : '';
+    const url = workOverviewPdfDownloadUrl[pdfPath];
+
+    if (url) {
+      window.open(url, '_blank');
+    }
+  };
+
+  const generateWorkOverview = async () => {
+    try {
+      if (isJobOverviewPdfGenerated) {
+        downloadWorkOverview();
+        return;
+      }
+
+      overviewPdfSnackBarRef.current = enqueueSnackbar(
+        <Box display="flex" padding="0em" margin="0em" alignItems="center">
+          <img alt={t('Path Image')} src={PathImage} />{' '}
+          <Typography margin="0em" paddingLeft="0.5em" variant="body2">
+            {t('PDF generation is in progress. Please wait...')}
+          </Typography>
+        </Box>,
+        {
+          variant: 'info',
+          autoHideDuration: null,
+        },
+      );
+
+      await postServiceOrderConfirmationPublish({
+        serviceOrder: serviceOrderId as string,
+        data: {
+          email: '',
+          emails: [],
+          subject: '',
+          content: '',
+        },
+      });
+    } catch (e) {
+      showError(e);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      isJobOverviewPdfGenerated &&
+      overviewPdfSnackBarRef.current &&
+      Object.keys(workOverviewPdfDownloadUrl || {}).length
+    ) {
+      closeSnackbar(overviewPdfSnackBarRef.current);
+      overviewPdfSnackBarRef.current = null;
+      downloadWorkOverview();
+    }
+  }, [workOverviewPdfDownloadUrl]);
+
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
     if (currentParams.tab) setTabValue(Number(currentParams.tab));
+
+    return () => {
+      if (overviewPdfSnackBarRef.current) {
+        closeSnackbar(overviewPdfSnackBarRef.current);
+        overviewPdfSnackBarRef.current = null;
+      }
+    };
   }, []);
 
   if (isLoading) {
@@ -65,13 +155,20 @@ export const ServiceOrderDetails = () => {
 
   return (
     <Tabs
-      showActionBtn={tabValue === 1}
-      btnLabel="Download Work Report"
+      showActionBtn={tabValue === 1 || tabValue === 0}
+      btnLabel={ACTION_BUTTON_LABEL[tabValue] || undefined}
       actionBtnVariant="outlined"
       actionButtonIcon={<FileDownloadIcon />}
-      btnOnClick={downloadWorkReport}
+      btnOnClick={() => {
+        if (tabValue === 0) {
+          generateWorkOverview();
+        }
+        if (tabValue === 1) {
+          downloadWorkReport();
+        }
+      }}
       actionButtonStyles={{background: 'transparent'}}
-      disableBtnAction={!isWorkReportPdfGenerated}
+      disableBtnAction={tabValue === 1 && !isWorkReportPdfGenerated}
       tabItems={tabItems}
       currentIndex={tabValue}
       onChange={(index) => {

@@ -75,6 +75,11 @@ export interface InvoiceAdditionalInfo {
   billingAddress?: AddressRecord;
   beneficiaryAddress?: AddressRecord;
   alternativeAddress?: AddressRecord;
+  laborMaterialCosts: {
+    LABOR: string;
+    MATERIAL: string;
+  };
+  laborMaterialCostText?: string;
 }
 
 export enum InvoiceOverdueNoticeStatus {
@@ -194,6 +199,11 @@ export interface InvoiceFormData {
   beneficiaryAddress?: AddressRecord;
   alternativeAddress?: AddressRecord;
   externalId?: string;
+  laborMaterialCosts: {
+    LABOR: string;
+    MATERIAL: string;
+  };
+  laborMaterialCostText: string;
 }
 
 export interface CreateInvoice {
@@ -216,6 +226,11 @@ export interface CreateInvoice {
   beneficialDetails?: BeneficialDetailsRecord;
   moreInfo?: string;
   externalId?: string;
+  laborMaterialCosts: {
+    LABOR: string;
+    MATERIAL: string;
+  };
+  laborMaterialCostText?: string;
 }
 
 export interface UpdateInvoice {
@@ -234,6 +249,11 @@ export interface UpdateInvoice {
   beneficialDetails?: BeneficialDetailsRecord;
   moreInfo?: string;
   externalId?: string;
+  laborMaterialCosts: {
+    LABOR: string;
+    MATERIAL: string;
+  };
+  laborMaterialCostText?: string;
 }
 
 export interface QueryInvoiceCommentsParams {

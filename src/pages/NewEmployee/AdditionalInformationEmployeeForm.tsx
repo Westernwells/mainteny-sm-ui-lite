@@ -4,7 +4,6 @@ import {Box} from '@mui/system';
 import Grid from '@mui/material/Grid';
 import {useFormik} from 'formik';
 import useTheme from '@mui/material/styles/useTheme';
-
 import {PageCard} from 'components/PageCard';
 import {AdditionalInformationEmployeeFormModel} from 'models/employee';
 import {SelectServiceOrderTypes} from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/SelectServiceOrderTypes';

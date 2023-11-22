@@ -1038,7 +1038,7 @@
   "Main control board renewal": "Erneuerung der Steuerung",
   "Renew elevator control": "Aufzugssteuerung erneuern",
   "Installation and Inspection control of Junction box...": "Installation und Inspektionskontrolle des Verteilerkastens...",
-  "UNIT ADDRESS": "ANLAGEADRESSE",
+  "UNIT ADDRESS": "ANLAGENADRESSE",
   "DATE": "DATUM",
   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.": "Lorem Ipsum ist einfach der Blindtext der Druck- und Setzindustrie. Lorem Ipsum ist der Standard-Blindtext der Industrie seit den 1500er Jahren, als ein unbekannter Drucker eine Druckfahne nahm und sie verschlüsselte, um ein Buch mit Schriftproben zu erstellen. Es hat nicht nur fünf Jahrhunderte überlebt, sondern auch den Sprung zum elektronischen Schriftsatz und ist im Wesentlichen unverändert geblieben.",
   "Po": "Po",
@@ -1857,5 +1857,9 @@
   "Caller": "Anrufer",
   "Call Time": "Anrufzeit",
   "Name Surname": "Vorname Nachname",
-  "Select technicians": "Wählen Sie einen Techniker"
+  "Select technicians": "Wählen Sie einen Techniker",
+  "The invoice due date cannot be earlier than the invoice creation date. Please enter a valid due date": "Das Fälligkeitsdatum der Rechnung darf nicht vor dem Rechnungserstellungsdatum liegen. Bitte geben Sie ein gültiges Fälligkeitsdatum ein.",
+  "The system will automatically create the related work orders": "Das System erstellt automatisch die zugehörigen Arbeitsaufträge.",
+  "Labor costs without VAT: {LABOR_COST}": "Lohnkostenanteil netto ohne USt. nach §35a EstG: {LABOR_COST}",
+  "Material costs without VAT: {MATERIAL_COST}": "Materialkosten ohne MwSt.: {MATERIAL_COST}"
 }

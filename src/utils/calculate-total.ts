@@ -1,5 +1,5 @@
 import {ArticleType} from 'models/article';
-import {InvoiceItemRecord} from 'models/invoice';
+import {InvoiceItemRecord, InvoiceView} from 'models/invoice';
 import {Amount} from 'models/misc';
 
 export const calculateTotal = (arr: InvoiceItemRecord<Amount>[]) => {
@@ -42,4 +42,15 @@ export const calculateCostPackage = (arr: InvoiceItemRecord<Amount>[]) => {
     laborCost,
     materialCost,
   };
+};
+
+export const calculateInvoiceTotal = (arr: InvoiceView[]) => {
+  const sum = 0;
+
+  return arr
+    .map(
+      (item) =>
+        item.totalAmount.netAmount / 10 ** item.totalAmount.fractionDigits!,
+    )
+    .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
 };

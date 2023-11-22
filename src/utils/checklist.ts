@@ -1,31 +1,39 @@
-import _ from 'lodash';
-import {CheckListQuestion} from 'models/checklist';
+import {
+  CheckListComponentOptionColor,
+  CheckListComponentType,
+  CheckListComponentView,
+} from 'models/checklist';
 import {getUniqueId} from './utils';
 
-export const categoriesSortedByOrderNumber = (
-  questions: {
-    id: string;
-    name: string;
-    questions: CheckListQuestion[];
-  }[],
+export const getOptionMock = () => ({
+  id: getUniqueId(),
+  text: '',
+  color: CheckListComponentOptionColor.DEFAULT,
+  isDefault: false,
+});
+
+export const getComponentMock = (type: CheckListComponentType) => ({
+  id: getUniqueId(),
+  subject: '',
+  type,
+  options: [getOptionMock()],
+  orderNumber: 0,
+  moreInfoInNote: false,
+  checked: false,
+});
+
+export const checkListComponentViewToExtendedCreateCheckListRecord = (
+  components: CheckListComponentView[],
 ) =>
-  _.sortBy(questions, (c) =>
-    c.questions.map((q) => q.additionalInfo.orderNumber),
-  );
-
-export const getQuestionsGroupedByCategory = (questions: CheckListQuestion[]) =>
-  categoriesSortedByOrderNumber(
-    Object.entries(_.groupBy(questions, 'category')).map(
-      ([category, value]) => ({
-        id: getUniqueId(),
-        name: category,
-        questions: _.sortBy(value, 'additionalInfo.orderNumber'),
-      }),
-    ),
-  );
-
-export const getOptions = (questions: CheckListQuestion[]) =>
-  _.uniqBy(
-    _.flatMap(_.flatMap(questions, 'additionalInfo'), 'options'),
-    'text',
-  );
+  components.map((c) => ({
+    id: c.id,
+    subject: c.subject,
+    type: c.type,
+    options: c.additionalInfo.options.map((o) => ({
+      id: getUniqueId(),
+      text: o.text,
+      color: o.color,
+    })),
+    orderNumber: c.additionalInfo.orderNumber,
+    moreInfoInNote: c.additionalInfo.moreInfoInNote,
+  }));

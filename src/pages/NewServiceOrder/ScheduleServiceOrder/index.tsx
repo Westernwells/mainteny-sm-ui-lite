@@ -7,7 +7,11 @@ import {
 } from 'hooks/reactQuery/useServiceOrder';
 import {ElevatorView} from 'models/elevator';
 import {useEffect, useState} from 'react';
-import {Priority, ServiceOrderType} from 'models/service-order';
+import {
+  AssignmentDescriptionOrderModel,
+  Priority,
+  ServiceOrderType,
+} from 'models/service-order';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmployeesView} from 'models/employee';
 import {QuotationView} from 'models/quotation';
@@ -57,6 +61,13 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
     mutateAsync: createImmediateCalloutOrder,
     isLoading: isCreatingImmediateCalloutOrder,
   } = useAssignmentBasedOrder('Order created successfully');
+
+  const [descriptionValues, setDescriptionValues] =
+    useState<AssignmentDescriptionOrderModel>({
+      callTime: '',
+      callerName: '',
+      purchaseOrderNumber: '',
+    });
 
   const {
     mutateAsync: createScheduledServiceOrder,
@@ -160,6 +171,11 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
       time: toRestDateTime(new Date()),
       type,
       quotationId: quotation ? quotation.id : '',
+      callerInfo: {
+        calledAt: descriptionValues.callTime ?? null,
+        name: descriptionValues.callerName ?? '',
+      },
+      purchaseOrderNumber: descriptionValues.purchaseOrderNumber ?? '',
     };
     await createImmediateCalloutOrder(body);
     navigate('/orders?tab=1');
@@ -192,6 +208,11 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
       startTime,
       endTime,
       quotationId: quotation ? quotation.id : '',
+      callerInfo: {
+        calledAt: descriptionValues.callTime ?? null,
+        name: descriptionValues.callerName ?? '',
+      },
+      purchaseOrderNumber: descriptionValues.purchaseOrderNumber ?? '',
     };
 
     await createScheduledServiceOrder(body);
@@ -210,6 +231,11 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
       type,
       dueDate,
       quotationId: quotation ? quotation.id : '',
+      callerInfo: {
+        calledAt: descriptionValues.callTime ?? null,
+        name: descriptionValues.callerName ?? '',
+      },
+      purchaseOrderNumber: descriptionValues.purchaseOrderNumber ?? '',
     };
 
     await createNonScheduledServiceOrder(body);
@@ -295,6 +321,8 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
               selectedTechnicians={selectedTechnicians}
               selectedDateString={selectedDateString || ''}
               selectedTimeString={selectedTimeString || ''}
+              getDescriptionValues={(values) => setDescriptionValues(values)}
+              initialValues={descriptionValues}
             />
           </FlexContainer>
         ) : null}

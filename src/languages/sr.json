@@ -1894,5 +1894,9 @@
   "Caller": "Pozivalac",
   "Call Time": "Vreme poziva",
   "Name Surname": "Ime prezime",
-  "Select technicians": "Izaberite tehničare"
+  "Select technicians": "Izaberite tehničare",
+  "The invoice due date cannot be earlier than the invoice creation date. Please enter a valid due date": "Datum dospeća fakture ne može biti raniji od datuma kreiranja fakture. Unesite važeći rok",
+  "The system will automatically create the related work orders": "Sistem će automatski kreirati povezane radne naloge",
+  "Labor costs without VAT: {LABOR_COST}": "Troškovi rada bez PDV-a: {LABOR_COST}",
+  "Material costs without VAT: {MATERIAL_COST}": "Materijalni troškovi bez PDV-a: {MATERIAL_COST}"
 }
