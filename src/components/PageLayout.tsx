@@ -43,6 +43,7 @@ export const PageLayout = ({
       queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
       if (event === MessageType.FILE_UPDATED) {
         queryClient.invalidateQueries([queryKeys.invoiceById]);
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
       }
       if (
         [
