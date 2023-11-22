@@ -120,6 +120,13 @@ export interface ServiceOrderAdditionalInfo {
   moreInformation: string;
   quotationId: string;
   workReportGenerated: boolean;
+  confirmationInfo?: ServiceOrderConfirmationInfo;
+}
+
+export interface ServiceOrderConfirmationInfo {
+  sentDate: string;
+  pdfGenerationStatus?: PdfGenerationStatus;
+  pdfPath?: string;
 }
 
 export interface ServiceOrderView {
@@ -458,6 +465,13 @@ export interface UpdateServiceOrderArticleRecord {
   name: string;
   quantity: number;
   unitAmount: AmountRecord;
+}
+
+export interface ServiceOrderConfirmationPublishBody {
+  email: string;
+  emails: string[];
+  subject: string;
+  content: string;
 }
 
 export interface AppointmentConfirmationRequiredOrdersQueryParams {
