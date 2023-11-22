@@ -201,6 +201,8 @@ export const Checklist = () => {
     ]);
   };
 
+  const isNameInvalid = !!(formik.touched.name && formik.errors.name);
+
   return (
     <>
       <Box
@@ -233,7 +235,7 @@ export const Checklist = () => {
                 placeholder: t('Enter your checklist name...'),
                 variant: 'standard',
                 value: formik.values.name,
-                error: !!(formik.touched.name && formik.errors.name),
+                error: isNameInvalid,
                 onBlur: formik.handleBlur,
                 onChange: formik.handleChange,
                 required: true,
@@ -247,6 +249,9 @@ export const Checklist = () => {
                 inputProps: {
                   sx: {
                     p: 0,
+                    '&::placeholder': {
+                      color: isNameInvalid ? 'error.main' : 'text.primary',
+                    },
                   },
                 },
                 InputProps: {disableUnderline: true},
@@ -362,7 +367,7 @@ export const Checklist = () => {
         primaryButtonLabel={t('Save')}
         primaryButtonAction={formik.handleSubmit}
         listItems={[]}
-        isValid={formik.isValid}
+        isValid
         secondaryButton={
           <Button
             label="Show Preview"
