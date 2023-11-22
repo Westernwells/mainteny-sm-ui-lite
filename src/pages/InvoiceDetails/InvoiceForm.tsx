@@ -430,7 +430,6 @@ export const InvoiceForm = ({
             unitAmount: invoice.totalAmount,
           }),
         );
-
         setInvoiceItems(newItems);
       }
 
@@ -509,11 +508,6 @@ export const InvoiceForm = ({
               ),
         true,
       );
-      if (!invoiceItems.length) {
-        setInvoiceItems(
-          serviceOrder?.articles?.map((item) => articleViewToItem(item)),
-        );
-      }
     }
   }, [serviceOrder, formik.values.type]);
 
