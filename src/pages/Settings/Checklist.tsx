@@ -228,11 +228,19 @@ export const Checklist = () => {
     setDraggingComponentId(draggableId);
   };
 
-  const addComponent = (type: CheckListComponentType) => {
+  const addComponent = async (type: CheckListComponentType) => {
     formik.setFieldValue('components', [
       ...formik.values.components,
       getComponentMock(type),
     ]);
+
+    // workaround because setFieldValue do not recieve callback
+    await Promise.resolve();
+
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: 'smooth',
+    });
   };
 
   const isNameInvalid = !!(formik.touched.name && formik.errors.name);
