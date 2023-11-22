@@ -37,8 +37,6 @@ export const useDownloadUrl = (
     () => fetchDownloadUrl(filePath, fetchId!),
     {
       enabled: !!filePath.length && !!fetchId,
-      refetchInterval: 1000 * 300, // refetch signedURL after every 5 minutes
-      refetchIntervalInBackground: true,
       cacheTime: 0,
       ...options,
     },
