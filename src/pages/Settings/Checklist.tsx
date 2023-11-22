@@ -29,6 +29,7 @@ import {EmptySection} from 'components/EmptySection';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateChecklist,
+  useQueryChecklists,
   useUpdateChecklist,
 } from 'hooks/reactQuery/useChecklists';
 import {
@@ -44,6 +45,7 @@ import {
   checkListComponentViewToExtendedCreateCheckListRecord,
   getComponentMock,
 } from 'utils/checklist';
+import {makePage} from 'utils/paging-utils';
 import {ChecklistComponent} from './ChecklistComponent';
 import {ChecklistPreview} from './ChecklistPreview';
 
@@ -112,11 +114,12 @@ export const Checklist = () => {
   const {mutate: updateChecklist, isLoading: isUpdating} = useUpdateChecklist(
     'Checklist updated successfully!',
   );
-
-  useEffect(() => {
-    const hasEdit = location.search.includes('edit=1');
-    setIsPreviewing(hasEdit);
-  }, []);
+  const checklistTitle = t('Checklist Title');
+  const {refetch: refetchChecklists} = useQueryChecklists(
+    makePage(0, 500),
+    checklistTitle,
+    {enabled: false},
+  );
 
   const initialValues = useMemo(
     () => ({
@@ -174,6 +177,37 @@ export const Checklist = () => {
     validationSchema,
     onSubmit: handleSubmit,
   });
+
+  useEffect(() => {
+    const hasEdit = location.search.includes('edit=1');
+    setIsPreviewing(hasEdit);
+
+    // When we create a new checklist add title by default 'Checklist Title'.
+    // If a duplicate checklist is created with the same name we are doing workaround for it.
+    // We add number to the title of the checklist +1.
+    (async () => {
+      if (initialValues.name) {
+        return;
+      }
+
+      const {data: refetchedChecklists} = await refetchChecklists();
+
+      if (!refetchedChecklists?.data.length) {
+        formik.setFieldValue('name', checklistTitle);
+        return;
+      }
+
+      const filteredChecklists = refetchedChecklists.data.filter((c) =>
+        c.name.startsWith(checklistTitle),
+      );
+      if (filteredChecklists.length) {
+        formik.setFieldValue(
+          'name',
+          `${checklistTitle} ${filteredChecklists.length + 1}`,
+        );
+      }
+    })();
+  }, []);
 
   const onDragComponentEnd = (result: DropResult) => {
     // dropped outside the list
