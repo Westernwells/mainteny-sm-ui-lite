@@ -63,7 +63,14 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {Notes} from 'pages/InvoiceDetails/Notes';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {convertToText, formatSearchParams} from 'utils/utils';
-import {addDays, addYears, isAfter, parseISO, startOfDay} from 'date-fns';
+import {
+  addDays,
+  addYears,
+  isAfter,
+  isBefore,
+  parseISO,
+  startOfDay,
+} from 'date-fns';
 import {InvoiceCheckbox} from 'pages/InvoiceDetails/InvoiceCheckbox';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {IconButton} from '@mui/material';
@@ -551,6 +558,16 @@ export const InvoiceForm = ({
     );
   }, [invoiceItems, t]);
 
+  const isDueDateInPast = () => {
+    const localDueDate = invoice?.dueDate as string;
+    const dueDateObject = startOfDay(
+      parseISO(new Date(localDueDate).toISOString()),
+    );
+    const todayObject = startOfDay(new Date());
+
+    return isBefore(dueDateObject, todayObject);
+  };
+
   const isDueDateBeforeCreation = () => {
     const issuedDate = invoice?.issuedDate || startOfDay(new Date());
     const localDueDate = dueDate as Date;
@@ -560,12 +577,26 @@ export const InvoiceForm = ({
     return isAfter(invoiceDateObject, dueDateObject);
   };
 
-  const onInvoiceSaveAndSend = () => {
+  const validateDueDate = () => {
+    let errorMessage = '';
+
+    if (isDueDateInPast()) {
+      errorMessage = t(`The due date for the invoice has expired`);
+    }
+
     if (isDueDateBeforeCreation()) {
-      const errorMessage = t(
+      errorMessage = t(
         'The invoice due date cannot be earlier than the invoice creation date. Please enter a valid due date',
       );
+    }
 
+    return errorMessage;
+  };
+
+  const onInvoiceSaveAndSend = () => {
+    const errorMessage = validateDueDate();
+
+    if (errorMessage) {
       setDueDateError(errorMessage);
       enqueueSnackbar(errorMessage, {
         variant: 'error',
