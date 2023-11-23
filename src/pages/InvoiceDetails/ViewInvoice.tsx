@@ -42,7 +42,7 @@ import {SendEmailDialog} from 'components/SendEmailDialog';
 import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useSnackbar} from 'notistack';
-import {isAfter, parseISO, startOfDay} from 'date-fns';
+import {isAfter, isBefore, parseISO, startOfDay} from 'date-fns';
 import {Notes} from './Notes';
 import {InvoiceActivities} from './InvoiceActivities';
 
@@ -200,12 +200,36 @@ export const ViewInvoice = ({
     return isAfter(invoiceDateObject, dueDateObject);
   };
 
-  const onInvoiceSend = () => {
+  const isDueDateInPast = () => {
+    const localDueDate = invoice.dueDate as string;
+    const dueDateObject = startOfDay(
+      parseISO(new Date(localDueDate).toISOString()),
+    );
+    const todayObject = startOfDay(new Date());
+
+    return isBefore(dueDateObject, todayObject);
+  };
+
+  const validateDueDate = () => {
+    let errorMessage = '';
+
+    if (isDueDateInPast()) {
+      errorMessage = t(`The due date for the invoice has expired`);
+    }
+
     if (isDueDateBeforeCreation()) {
-      const errorMessage = t(
+      errorMessage = t(
         'The invoice due date cannot be earlier than the invoice creation date. Please enter a valid due date',
       );
+    }
 
+    return errorMessage;
+  };
+
+  const onInvoiceSend = () => {
+    const errorMessage = validateDueDate();
+
+    if (errorMessage) {
       enqueueSnackbar(errorMessage, {
         variant: 'error',
       });
