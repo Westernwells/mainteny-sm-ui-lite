@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import GradingIcon from '@mui/icons-material/Grading';
 import FactCheck from '@mui/icons-material/FactCheck';
@@ -58,36 +58,36 @@ export const ServiceOrderDetails = () => {
   const {enqueueSnackbar, showError, closeSnackbar} = useSnackbar();
   const {t} = useTranslation();
   const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
+  const [filePathToDownload, setFilePathToDownload] = useState('');
 
-  const {data: workReportPdfDownloadUrl = {}} = useDownloadUrl(
-    isWorkReportPdfGenerated
-      ? [serviceOrder?.report!.additionalInfo.pdfPath]
-      : [],
+  const filePaths = useMemo(
+    () => (filePathToDownload ? [filePathToDownload] : []),
+    [filePathToDownload],
   );
-  const {data: workOverviewPdfDownloadUrl = {}} = useDownloadUrl(
-    isJobOverviewPdfGenerated
-      ? [serviceOrder?.additionalInfo.confirmationInfo?.pdfPath as string]
-      : [],
-  );
+
+  const {data: fileDownloadURLs = {}} = useDownloadUrl(filePaths, {
+    refetchOnWindowFocus: false,
+  });
 
   const {mutateAsync: postServiceOrderConfirmationPublish} =
     usePostServiceOrderConfirmationPublish();
 
   const downloadWorkReport = () => {
-    const url = isWorkReportPdfGenerated
+    const pdfPath = isWorkReportPdfGenerated
       ? serviceOrder?.report!.additionalInfo.pdfPath
       : '';
-    window.open(workReportPdfDownloadUrl[url], '_blank');
+
+    if (pdfPath) {
+      setFilePathToDownload(pdfPath);
+    }
   };
 
   const downloadWorkOverview = () => {
     const pdfPath = isJobOverviewPdfGenerated
       ? (serviceOrder?.additionalInfo.confirmationInfo?.pdfPath as string)
       : '';
-    const url = workOverviewPdfDownloadUrl[pdfPath];
-
-    if (url) {
-      window.open(url, '_blank');
+    if (pdfPath) {
+      setFilePathToDownload(pdfPath);
     }
   };
 
@@ -125,17 +125,37 @@ export const ServiceOrderDetails = () => {
     }
   };
 
+  const downloadFile = () => {
+    const url = fileDownloadURLs[filePathToDownload];
+
+    if (url) {
+      setFilePathToDownload('');
+      window.open(url, '_blank');
+    }
+  };
+
   useEffect(() => {
     if (
-      isJobOverviewPdfGenerated &&
-      overviewPdfSnackBarRef.current &&
-      Object.keys(workOverviewPdfDownloadUrl || {}).length
+      serviceOrder?.additionalInfo.confirmationInfo?.pdfGenerationStatus ===
+        PdfGenerationStatus.DONE &&
+      overviewPdfSnackBarRef.current
     ) {
-      closeSnackbar(overviewPdfSnackBarRef.current);
-      overviewPdfSnackBarRef.current = null;
       downloadWorkOverview();
     }
-  }, [workOverviewPdfDownloadUrl]);
+  }, [serviceOrder]);
+
+  useEffect(() => {
+    if (!Object.keys(fileDownloadURLs || {}).length) {
+      return;
+    }
+
+    downloadFile();
+
+    if (overviewPdfSnackBarRef.current) {
+      closeSnackbar(overviewPdfSnackBarRef.current);
+      overviewPdfSnackBarRef.current = null;
+    }
+  }, [fileDownloadURLs]);
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
