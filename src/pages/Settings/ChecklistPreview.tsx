@@ -233,7 +233,7 @@ export const ChecklistPreview = ({
                           variant="body2"
                           color="text.secondary"
                           sx={{textDecoration: 'underline'}}>
-                          Enter Your Choice
+                          {t('Enter Your Choice')}
                         </Typography>
                       </Box>
                     ) : null}
