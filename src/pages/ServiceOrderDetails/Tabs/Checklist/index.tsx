@@ -1,9 +1,13 @@
 import {useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Grid, Typography} from '@mui/material';
+import {
+  Grid,
+  LinearProgress,
+  Typography,
+  linearProgressClasses,
+} from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import Send from '@mui/icons-material/Send';
-import * as _ from 'lodash';
 import {Box} from '@mui/system';
 import useTheme from '@mui/material/styles/useTheme';
 import {FormikProps, useFormik} from 'formik';
@@ -25,19 +29,12 @@ import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
-import {grey} from '@mui/material/colors';
-import {FormCheckbox} from 'components/form/FormCheckbox';
 import {ChecklistStatus, ServiceOrderView} from 'models/service-order';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {PdfGenerationStatus} from 'models/misc';
 import {SendEmailDialog} from 'components/SendEmailDialog';
-import {CheckListQuestionType, CheckListQuestion} from 'models/checklist';
-import {optionStates} from './Checklist.styles';
-
-const YES_NO_ANSWER: {[key: string]: string} = {
-  y: 'Yes',
-  n: 'No',
-};
+import {CheckListQuestion, CheckListComponentType} from 'models/checklist';
+import {ChecklistComponent} from './ChecklistComponent';
 
 const EmptyCheckList = () => (
   <EmptySection
@@ -109,68 +106,11 @@ export const CheckList = ({serviceOrder}: Props) => {
     },
   });
 
-  const questions = useMemo(() => {
-    const sortedQuestions = _.sortBy(serviceOrderCheckList?.questions, [
-      (obj) => obj.additionalInfo.orderNumber,
-    ]);
-    return _.groupBy(sortedQuestions, (question) => question.category);
-  }, [serviceOrderCheckList]);
-
   const technicianUserAccount =
     serviceOrder?.schedules?.[0]?.technician?.userAccount;
   const technicianName = technicianUserAccount
     ? `${technicianUserAccount.firstName} ${technicianUserAccount.lastName}`
     : '';
-
-  const questionLabel = (question: CheckListQuestion) => {
-    const YES_NO = !(
-      question.type === CheckListQuestionType.SINGLE_CHECK ||
-      question.type === CheckListQuestionType.MULTIPLE_CHECKS
-    );
-    const checked = !!question.additionalInfo.answer;
-    const {options} = question.additionalInfo;
-    const answers = question.additionalInfo.answer;
-    const notes = question.additionalInfo.note;
-
-    return (
-      <Box>
-        <Box sx={{display: 'flex', mt: '0.1em'}}>
-          <Typography
-            variant="body2"
-            color={checked ? 'text.secondary' : 'primary'}
-            sx={{textDecoration: checked ? 'line-through' : 'none'}}>
-            {question.question}
-          </Typography>
-          {answers?.map((answer, index) => {
-            const color = YES_NO ? 'DEFAULT' : options[Number(answer)].color;
-            return (
-              <StatusChip
-                key={`${answer}_${index}`}
-                variant="outlined"
-                label={
-                  YES_NO ? YES_NO_ANSWER[answer] : options[Number(answer)].text
-                }
-                style={{
-                  ml: 0.5,
-                  ...optionStates[color],
-
-                  border: 'none',
-                }}
-                maxChars={10}
-              />
-            );
-          })}
-        </Box>
-        {notes ? (
-          <Box
-            sx={{py: '0.5rem', px: '0.5rem', borderRadius: '4px'}}
-            bgcolor="grey.100">
-            <Typography variant="body2">{notes}</Typography>
-          </Box>
-        ) : null}
-      </Box>
-    );
-  };
 
   const signaturePath = useMemo(
     () =>
@@ -180,6 +120,32 @@ export const CheckList = ({serviceOrder}: Props) => {
         serviceOrder.additionalInfo.checkListInfo.technicianSignature
       ],
     [serviceOrder, signatureDownloadUrls],
+  );
+
+  const checklistSummary = useMemo(() => {
+    const componentsWithoutHead =
+      serviceOrderCheckList?.components.filter(
+        (c) => c.type !== CheckListComponentType.HEAD,
+      ) ?? [];
+    const doneList = componentsWithoutHead.filter((item) => {
+      if (item.type === CheckListComponentType.TEXT) {
+        return !!item.additionalInfo.note;
+      }
+
+      if (item.additionalInfo.moreInfoInNote && !!item.additionalInfo.note) {
+        return true;
+      }
+
+      return (item.additionalInfo.answer?.length || 0) > 0;
+    });
+
+    return {all: componentsWithoutHead.length, done: doneList.length};
+  }, [serviceOrderCheckList?.components]);
+
+  const percentComplete = Math.round(
+    checklistSummary.all === 0
+      ? 0
+      : (checklistSummary.done / checklistSummary.all) * 100,
   );
 
   if (isLoadingCheckList) {
@@ -214,25 +180,28 @@ export const CheckList = ({serviceOrder}: Props) => {
       alignItems="center"
       justifyContent="center"
       pt="1.5rem"
-      gap="1.5rem">
-      <Grid item xs={12} md={10}>
+      rowGap="27px">
+      <Grid item xs={12} lg={7} flexBasis="100%">
         <PageCard
           containerStyles={{
             borderRadius: '0.5rem',
           }}
           contentContainerStyles={{
             display: 'flex',
-            justifyContent: 'space-between',
             alignItems: 'center',
             flexWrap: 'wrap',
-            gap: '0.5rem',
+            columnGap: {xs: 10, lg: 15},
+            padding: 1.25,
+            '&:last-child': {
+              pb: 1.25,
+            },
           }}>
-          <Box>
+          <Box flex={1}>
             <FormLabel text="Date" sx={{color: theme.palette.text.primary}} />
             <Typography variant="subtitle1">{serviceOrder.dueDate}</Typography>
           </Box>
 
-          <Box>
+          <Box flex={1}>
             <FormLabel
               text="Type"
               sx={{color: theme.palette.text.primary, display: 'block'}}
@@ -250,12 +219,12 @@ export const CheckList = ({serviceOrder}: Props) => {
             </Box>
           </Box>
 
-          <Box>
+          <Box flex={1}>
             <FormLabel text="Job ID" sx={{color: theme.palette.text.primary}} />
             <Typography variant="subtitle1">{serviceOrder.number}</Typography>
           </Box>
 
-          <Box>
+          <Box flex={1}>
             <FormLabel text="Status" sx={{color: theme.palette.text.primary}} />
             <Typography variant="subtitle1">
               <StatusChip
@@ -266,61 +235,75 @@ export const CheckList = ({serviceOrder}: Props) => {
           </Box>
         </PageCard>
       </Grid>
-      <Grid item xs={12} md={10} pb="5rem">
+      <Grid item xs={12} lg={7} pb="5rem">
         <Box
-          bgcolor="grey.300"
-          border="2px solid"
-          borderColor="text.disabled"
-          borderRadius=".5em"
-          sx={{px: '1.25rem', py: '1.5rem'}}>
-          <Box bgcolor="white" px="1rem" py="0.625rem">
-            <Typography variant="subtitle1" sx={{color: grey[700]}}>
-              {serviceOrderCheckList?.name}
-            </Typography>
+          bgcolor="white"
+          border="2px solid #eee"
+          borderRadius="10px"
+          sx={{px: 1, py: 3}}>
+          <Box p={2} pt={0}>
+            <Box display="flex" justifyContent="space-between">
+              <Typography variant="subtitle1" color="text.secondary">
+                {t('Checklist overview')}
+              </Typography>
+              <Box minWidth="250px">
+                <Box display="flex" justifyContent="space-between" pb={0.5}>
+                  <Typography variant="caption">
+                    {checklistSummary.done}/{checklistSummary.all}{' '}
+                    {t('options')}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {percentComplete}% complete
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={percentComplete}
+                  sx={{
+                    backgroundColor: `${theme.palette.text.secondary}66`,
+                    [`& .${linearProgressClasses.bar}`]: {
+                      backgroundColor: '#4CAF50',
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+
             <Box
-              bgcolor="grey.50"
-              border="1px solid"
-              borderColor="grey.300"
-              mt="0.5rem"
-              mb="2rem"
+              bgcolor="grey.100"
               borderRadius="4px"
-              py="1rem"
-              px="0.5rem"
+              mt={2}
+              p={1}
               display="flex"
               flexDirection="column"
               gap="1rem">
-              {Object.keys(questions).map((category) => (
-                <Box
-                  boxShadow="0px 4px 15px 0px #90909033"
-                  p="1rem"
-                  bgcolor="grey.50"
-                  key={category}>
-                  <Typography
-                    variant="subtitle2"
-                    color={theme.palette.text.primary}>
-                    {category}:
-                  </Typography>
-                  <Grid container pt="0.25rem">
-                    {questions[category].map((question) => (
-                      <Grid item xs={12} key={question.id}>
-                        <FormCheckbox
-                          checked={!!question.additionalInfo.answer}
-                          value={question.id}
-                          id={question.id}
-                          // handleChange={handleChange}
-                          label={questionLabel(question)}
-                          typographyProps={{
-                            fontSize: '0.875rem',
-                            py: '0.5rem',
-                          }}
-                          sx={{alignItems: 'flex-start'}}
-                        />
-                      </Grid>
-                    ))}
-                  </Grid>
+              <Box
+                bgcolor="white"
+                p={4}
+                display="flex"
+                flexDirection="column"
+                rowGap={2}>
+                <Typography
+                  variant="h5"
+                  color={theme.palette.primary.dark}
+                  fontSize="31px"
+                  py={2}>
+                  {serviceOrderCheckList?.name ?? ''}
+                </Typography>
+
+                <Box display="flex" flexDirection="column" rowGap={3}>
+                  {serviceOrderCheckList?.components.map((component) => (
+                    <ChecklistComponent
+                      key={component.id}
+                      component={component}
+                    />
+                  ))}
                 </Box>
-              ))}
+              </Box>
             </Box>
+          </Box>
+
+          <Box bgcolor="white" px="1rem" py={4}>
             <Typography variant="caption" color={theme.palette.text.secondary}>
               {t('Signature')}
             </Typography>
@@ -337,7 +320,7 @@ export const CheckList = ({serviceOrder}: Props) => {
               borderRadius="0.5rem"
               position="relative"
               maxWidth="15rem"
-              maxHeight="5rem">
+              maxHeight="7rem">
               <Box>
                 {signaturePath ? (
                   <img
@@ -360,7 +343,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                   flexDirection="column"
                   alignItems="center"
                   justifyContent="center"
-                  top="4.1rem"
+                  top="6rem"
                   bgcolor="white"
                   px="0.625rem"
                   position="absolute"

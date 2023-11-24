@@ -74,7 +74,6 @@ export interface CheckListComponentView {
   subject: string;
   type: CheckListComponentType;
   answer: any;
-  note?: string;
   additionalInfo: CheckListComponentAdditionalInfo;
 }
 
