@@ -10,7 +10,6 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import Send from '@mui/icons-material/Send';
 import {Box} from '@mui/system';
 import useTheme from '@mui/material/styles/useTheme';
-import {FormikProps, useFormik} from 'formik';
 import {EmptySection} from 'components/EmptySection';
 import {FormLabel} from 'components/form/FormLabel';
 import {InfoCard} from 'components/InfoCard';
@@ -20,7 +19,6 @@ import {Button} from 'components/Button';
 import {
   usePublishChecklist,
   useServiceOrderCheckList,
-  useUpdateServiceOrderCheckListAnswers,
 } from 'hooks/reactQuery/useServiceOrder';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
@@ -33,7 +31,7 @@ import {ChecklistStatus, ServiceOrderView} from 'models/service-order';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {PdfGenerationStatus} from 'models/misc';
 import {SendEmailDialog} from 'components/SendEmailDialog';
-import {CheckListQuestion, CheckListComponentType} from 'models/checklist';
+import {CheckListComponentType} from 'models/checklist';
 import {ChecklistComponent} from './ChecklistComponent';
 
 const EmptyCheckList = () => (
@@ -49,16 +47,10 @@ interface Props {
   serviceOrder: ServiceOrderView;
 }
 
-interface FormikValues {
-  checkListAnswers: CheckListQuestion[];
-}
-
 export const CheckList = ({serviceOrder}: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
-  const {mutate: updateServiceOrderCheckListAnswers} =
-    useUpdateServiceOrderCheckListAnswers();
 
   const {mutateAsync: publishCheckList, isLoading: publishingCheckList} =
     usePublishChecklist();
@@ -84,27 +76,6 @@ export const CheckList = ({serviceOrder}: Props) => {
       ? [serviceOrder.additionalInfo.checkListInfo.technicianSignature]
       : [],
   );
-
-  const formik: FormikProps<FormikValues> = useFormik<FormikValues>({
-    initialValues: {
-      checkListAnswers: [],
-    },
-    onSubmit: async (values: FormikValues) => {
-      await updateServiceOrderCheckListAnswers({
-        serviceOrderId: serviceOrder.id || '',
-        body: values.checkListAnswers.map((q) => ({
-          questionId: q.id,
-          answer: q.question,
-        })),
-      });
-      formik.resetForm({
-        values: {
-          ...formik.values,
-          checkListAnswers: [...values.checkListAnswers],
-        },
-      });
-    },
-  });
 
   const technicianUserAccount =
     serviceOrder?.schedules?.[0]?.technician?.userAccount;

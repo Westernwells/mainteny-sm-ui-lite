@@ -265,8 +265,9 @@ export interface CompleteServiceOrder {
 }
 
 export interface CheckListAnswerRecord {
-  answer: string;
-  questionId: string;
+  componentId: string;
+  values: string[];
+  note: string;
 }
 
 export interface ServiceOrderSummary {

@@ -1,10 +1,9 @@
 import {useEffect, useRef, useState} from 'react';
-import _ from 'lodash';
 import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import {useNavigate} from 'react-router-dom';
-import {CheckList} from 'models/checklist';
+import {CheckList, CheckListComponentType} from 'models/checklist';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {useQueryChecklists} from 'hooks/reactQuery/useChecklists';
 import {Progress} from 'components/Progress';
@@ -25,13 +24,13 @@ export const columns: GridColDef[] = [
     headerName: 'date created',
   }),
   getColumnProps({
-    field: 'categories',
-    headerName: 'categories',
+    field: 'dateUpdated',
+    headerName: 'date updated',
     align: 'right',
   }),
   getColumnProps({
     field: 'totalTasks',
-    headerName: 'total tasks',
+    headerName: 'number of questions',
     align: 'right',
   }),
   getColumnProps({
@@ -48,10 +47,11 @@ export const makeRows = (checklists: CheckList[]): GridRowsProp =>
     id: index,
     name: item.name,
     dateCreated: formatDate(item.meta.createdAt),
-    categories: Object.keys(
-      _.groupBy(item.questions, (question) => question.category),
+    dateUpdated: formatDate(item.meta.lastUpdatedAt),
+    totalTasks: (
+      item.components.filter((c) => c.type !== CheckListComponentType.HEAD) ??
+      []
     ).length,
-    totalTasks: item.questions.length,
     checklist: item,
     navigateTo: `/settings/checklists/${item.id}`,
     navigateOptions: {state: {checklist: item}},

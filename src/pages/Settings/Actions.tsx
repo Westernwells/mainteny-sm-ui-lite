@@ -10,7 +10,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import MoreIcon from '@mui/icons-material/MoreVert';
-import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import Edit from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {Confirm} from 'components/Confirm';
@@ -42,15 +41,6 @@ export const Actions = ({checklist}: Props) => {
 
   const actions = useMemo(() => {
     const items = [
-      {
-        label: t('Preview'),
-        icon: <RemoveRedEye />,
-        onClick: () => {
-          navigate(`/settings/checklists/${checklist.id}`, {
-            state: {checklist},
-          });
-        },
-      },
       {
         label: t('Edit'),
         icon: <Edit />,

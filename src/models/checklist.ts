@@ -1,12 +1,4 @@
-import {Meta, Priority} from './misc';
-
-export enum CheckListQuestionType {
-  HEAD = 'HEAD',
-  TEXT = 'TEXT',
-  SINGLE_CHECK = 'SINGLE_CHECK',
-  MULTIPLE_CHECKS = 'MULTIPLE_CHECKS',
-  YES_NO = 'YES_NO',
-}
+import {Meta} from './misc';
 
 export enum CheckListComponentType {
   HEAD = 'HEAD',
@@ -16,13 +8,6 @@ export enum CheckListComponentType {
   YES_NO = 'YES_NO',
 }
 
-export enum CheckListQuestionOptionColor {
-  DEFAULT,
-  RED,
-  YELLOW,
-  GREEN,
-}
-
 export enum CheckListComponentOptionColor {
   DEFAULT,
   RED,
@@ -30,33 +15,10 @@ export enum CheckListComponentOptionColor {
   GREEN,
 }
 
-export interface CheckListQuestionOption {
-  text: string;
-  color: CheckListQuestionOptionColor;
-  isDefault?: Boolean;
-  moreInfoInNote?: Boolean;
-}
-
 export interface CheckListComponentOption {
   text: string;
   color: CheckListComponentOptionColor;
   isDefault?: Boolean;
-}
-
-export interface CheckListQuestionAdditionalInfo {
-  options: CheckListQuestionOption[];
-  orderNumber: number;
-  answer?: string[];
-  note: string;
-}
-
-export interface CheckListQuestion {
-  id: string;
-  checkListId: string;
-  category: string;
-  question: string;
-  type: CheckListQuestionType;
-  additionalInfo: CheckListQuestionAdditionalInfo;
 }
 
 export interface CheckListComponentAdditionalInfo {
@@ -73,7 +35,6 @@ export interface CheckListComponentView {
   id: string;
   subject: string;
   type: CheckListComponentType;
-  answer: any;
   additionalInfo: CheckListComponentAdditionalInfo;
 }
 
@@ -85,7 +46,6 @@ export interface CheckList {
   name: string;
   category: string;
   components: CheckListComponentView[];
-  questions: CheckListQuestion[];
   search: string;
   meta: Meta;
 }

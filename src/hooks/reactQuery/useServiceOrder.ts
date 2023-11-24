@@ -38,7 +38,6 @@ import {
   ServiceOrderView,
   CreateScheduledServiceOrderBody,
   CreateNonScheduledServiceOrderBody,
-  CheckListAnswerRecord,
   ServiceOrderItemRecord,
   CompleteServiceOrder,
   UpdateServiceOrderBody,
@@ -472,43 +471,6 @@ export const useCancelServiceOrders = () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
         enqueueSnackbar('Service job has been cancelled', {
-          variant: 'success',
-        });
-      },
-      onError: (err) => {
-        console.log(err);
-        showError(err);
-      },
-    },
-  );
-};
-
-const updateServiceOrderCheckListAnswers = async (
-  serviceOrderId: string,
-  body: CheckListAnswerRecord[],
-) => {
-  await axiosClient.put<StringValue>(
-    `/api/serviceOrders/${serviceOrderId}/checkListAnswers`,
-    [...body],
-  );
-};
-
-export const useUpdateServiceOrderCheckListAnswers = () => {
-  const queryClient = useQueryClient();
-  const {enqueueSnackbar, showError} = useSnackbar();
-  return useMutation(
-    ({
-      serviceOrderId,
-      body,
-    }: {
-      serviceOrderId: string;
-      body: CheckListAnswerRecord[];
-    }) => updateServiceOrderCheckListAnswers(serviceOrderId, body),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
-        queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        enqueueSnackbar('Service job checklist updated', {
           variant: 'success',
         });
       },
