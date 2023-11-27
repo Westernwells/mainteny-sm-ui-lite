@@ -234,7 +234,7 @@ export const Dashboard = () => {
               <TopCard
                 title="Completed Today"
                 value={`${dailyNumberOfCompletedOrders}/${dailyNumberOfOrders}`}
-                subValue={`${
+                subText={`${
                   dailyNumberOfOrders > 0
                     ? (
                         (dailyNumberOfCompletedOrders / dailyNumberOfOrders) *
@@ -278,9 +278,10 @@ export const Dashboard = () => {
                 icon={ContactsIcon}
                 iconColor={theme.palette.secondary.dark}
                 iconBackgroundColor={theme.palette.info.outlinedHoverBg}
-                subValue={`${t('{{totalNumberOfExpiringContracts}} expiring', {
+                subText={`${t('{{totalNumberOfExpiringContracts}} expiring', {
                   totalNumberOfExpiringContracts: expiringContract.total,
                 })}`}
+                subValue={expiringContract.total}
                 url="contracts"
               />
             </Grid>
