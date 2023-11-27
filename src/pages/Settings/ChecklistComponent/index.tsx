@@ -421,7 +421,7 @@ export const TextComponent = ({
         <FormInput
           props={{
             name: `components[${index}].subject`,
-            placeholder: t('Enter textarea name...'),
+            placeholder: t('Enter text area name...'),
             variant: 'standard',
             value: component.subject,
             error: isSubjectInvalid,
@@ -450,7 +450,7 @@ export const TextComponent = ({
           name={`components[${index}].note`}
           variant="outlined"
           size="small"
-          placeholder={t('Write down all the text you’ll ever need...')}
+          placeholder={t('Enter your text here...')}
           multiline
           fullWidth
           value={component.note}

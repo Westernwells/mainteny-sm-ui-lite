@@ -151,7 +151,7 @@ export const ChecklistPreview = ({
               {checklistSummary.done}/{checklistSummary.all} {t('options')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {percentComplete}% complete
+              {percentComplete}% {t('complete')}
             </Typography>
           </Box>
           <LinearProgress
@@ -289,9 +289,7 @@ export const ChecklistPreview = ({
                     name={`components[${index}].note`}
                     variant="outlined"
                     size="small"
-                    placeholder={t(
-                      'Write down all the text you’ll ever need...',
-                    )}
+                    placeholder={t('Enter your text here...')}
                     multiline
                     fullWidth
                     minRows={5}

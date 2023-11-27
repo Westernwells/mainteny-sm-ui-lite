@@ -370,7 +370,12 @@ export const Checklist = () => {
             flexDirection: 'column',
             alignItems: 'center',
           }}>
-          <Typography variant="caption" fontSize="0.625rem" pt={3} pb={1.5}>
+          <Typography
+            variant="caption"
+            fontSize="0.625rem"
+            pt={3}
+            pb={1.5}
+            textAlign="center">
             {t('ADD NEW')}
           </Typography>
           {availableComponents.map((component) => (

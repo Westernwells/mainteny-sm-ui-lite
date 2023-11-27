@@ -224,7 +224,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                     {t('options')}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    {percentComplete}% complete
+                    {percentComplete}% {t('complete')}
                   </Typography>
                 </Box>
                 <LinearProgress
