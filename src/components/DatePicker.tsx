@@ -8,15 +8,14 @@ import {
 import {InputLabelProps} from '@mui/material/InputLabel';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {mapLanguageToLocale} from 'utils/utils';
-import {ReactNode, useEffect, useState} from 'react';
+import {ReactNode, useEffect, useRef, useState} from 'react';
 import {locales} from 'utils/datetime';
 import Box from '@mui/material/Box';
 import {SxProps, Typography} from '@mui/material';
-import {FormInput} from './form/FormInput';
 import CustomActionBar from './CustomActionBar';
 import CustomToolbar from './CustomToolbar';
 
-interface Props extends Partial<DatePickerProps<Date, Date>> {
+interface Props extends Partial<DatePickerProps<Date>> {
   defaultDate?: Date | null;
   getSelectedDate?: (state: Date | null) => void;
   containerStyles?: {[key: string]: any};
@@ -38,13 +37,12 @@ export const DatePicker = ({
   containerStyles,
   minDate,
   maxDate,
-  textFieldProps,
   inputLabelProps,
+  textFieldProps,
   reset = false,
   getReset = () => {},
   required,
   dateFormat,
-  disableMask,
   errorMessage,
   ...props
 }: Props) => {
@@ -53,9 +51,16 @@ export const DatePicker = ({
   const locale = mapLanguageToLocale[language!];
   const [value, setValue] = useState<Date | null>(defaultDate);
   const [open, setOpen] = useState<boolean>(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const handleOpen = () => {
     setOpen(true);
+
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 100);
   };
 
   const handleClose = () => {
@@ -87,10 +92,10 @@ export const DatePicker = ({
 
   const popperSx: SxProps = {
     '& .MuiPickersPopper-paper': {
-      height: '440px',
+      height: '480px',
       width: '350px',
     },
-    '& . MuiCalendarOrClockPicker-root ': {
+    '& .MuiCalendarOrClockPicker-root ': {
       minHeight: '320px',
     },
     '& .MuiCalendarPicker-root': {
@@ -127,13 +132,14 @@ export const DatePicker = ({
     },
     '& .MuiPickersCalendarHeader-labelContainer': {
       position: 'absolute',
-      left: '38%',
       textAlign: 'center',
+      left: '39%',
+      margin: '-15px 0 0 -15px',
     },
     '& .MuiIconButton-edgeStart': {
       position: 'absolute',
       right: '0',
-      marginRight: '1.4em',
+      marginRight: '1em',
       marginTop: '-1em',
       border: '1px solid #222B451F',
       padding: '5px',
@@ -142,16 +148,20 @@ export const DatePicker = ({
     '& .MuiIconButton-edgeEnd': {
       position: 'absolute',
       left: '0',
-      marginLeft: '1.4em',
+      marginLeft: '1em',
       marginTop: '-1em',
       border: '1px solid #222B451F',
       padding: '5px',
       borderRadius: 0,
     },
+    '& .MuiPickersLayout-root': {
+      display: 'flex',
+      flexDirection: 'column',
+    },
   };
 
   const renderToolbar = (label: ReactNode) => (
-    <CustomToolbar toolBarTitle={label} onClose={handleClose} />
+    <CustomToolbar toolBarTitle={label} onClose={handleClose} isDatePicker />
   );
   return (
     <Box sx={{...containerStyles}}>
@@ -163,44 +173,48 @@ export const DatePicker = ({
           open={open}
           onClose={() => setOpen(false)}
           showDaysOutsideCurrentMonth
-          PopperProps={{sx: popperSx}}
           closeOnSelect={false}
-          showToolbar
-          ToolbarComponent={() => renderToolbar(textFieldProps?.label)}
-          componentsProps={{
+          slotProps={{
             actionBar: {
               actions: ['clear', 'accept'],
             },
+            toolbar: {
+              hidden: false,
+            },
+            popper: {
+              sx: popperSx,
+            },
+            textField: {
+              ...textFieldProps,
+              InputLabelProps: {
+                shrink: true,
+                required,
+                ...inputLabelProps,
+              },
+              inputProps: {
+                type: 'input',
+                onClick: handleOpen,
+                ref: inputRef,
+              },
+            },
+            inputAdornment: {
+              position: 'end',
+              onClick: handleOpen,
+            },
           }}
-          components={{
-            ActionBar: CustomActionBar,
+          slots={{
+            toolbar: () => renderToolbar(textFieldProps?.label),
+            actionBar: CustomActionBar,
           }}
-          inputFormat={
+          format={
             dateFormat || user?.userAccount.serviceCompany.settings.dateFormat
           }
-          disableMaskedInput={disableMask}
           value={value}
           minDate={minDate}
           maxDate={maxDate}
           onChange={(newValue) => {
             setValue(newValue);
           }}
-          renderInput={(params) => (
-            <FormInput
-              props={{
-                ...params,
-                size: 'small',
-                required,
-                ...textFieldProps,
-                onKeyDown: (e) => {
-                  e.preventDefault();
-                },
-                onClick: handleOpen,
-                ...errorProps,
-              }}
-              inputLabelProps={inputLabelProps}
-            />
-          )}
         />
       </LocalizationProvider>
       {!!errorMessage && (

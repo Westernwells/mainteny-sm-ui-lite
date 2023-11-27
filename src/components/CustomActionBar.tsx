@@ -19,7 +19,7 @@ const CustomActionBar: React.FC<CustomActionBarProps> = ({
         display: 'flex',
         justifyContent: 'space-between',
         padding: '1em 0em',
-        margin: '0.5em 1.4em 0.5em 1.4em',
+        margin: '1em 1em 0.5em 1em',
         position: 'absolute',
         width: '88%',
         bottom: '0',
