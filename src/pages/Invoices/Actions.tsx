@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router';
 import printJS from 'print-js';
@@ -26,6 +26,7 @@ import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useDeleteInvoice, usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {InvoiceStatus, InvoiceView, InvoiceType} from 'models/invoice';
 import {PdfGenerationStatus} from 'models/misc';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 
 interface Props {
   invoice: InvoiceView;
@@ -64,16 +65,28 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
   const {mutateAsync: publishInvoice} = usePublishInvoice({
     shouldNavigate: false,
   });
+  const [pdfPathToDownload, setPdfPathToDownload] = useState('');
+
+  const {data: downloadUrls} = useDownloadUrl(
+    pdfPathToDownload ? [pdfPathToDownload] : [],
+  );
 
   const {mutate: deleteInvoice} = useDeleteInvoice();
 
   const isInvoicePDFGenerated =
     invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
-    downloadUrl;
+    !!invoice.additionalInfo.pdfPath;
   const isWorkReportPDFGenerated = invoice?.additionalInfo?.includeWorkReport
     ? invoice?.serviceOrder?.additionalInfo.workReportGenerated
     : true;
   const isPDFsGenerated = !!isWorkReportPDFGenerated && isInvoicePDFGenerated;
+
+  useEffect(() => {
+    if (downloadUrls?.[pdfPathToDownload]) {
+      window.open(downloadUrls?.[pdfPathToDownload], '_blank');
+      setPdfPathToDownload('');
+    }
+  }, [downloadUrls]);
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -171,7 +184,9 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
               {
                 label: t('Download'),
                 icon: <FileDownload />,
-                onClick: () => window.open(downloadUrl, '_blank'),
+                onClick: () => {
+                  setPdfPathToDownload(invoice.additionalInfo.pdfPath);
+                },
               },
             ]
           : []),

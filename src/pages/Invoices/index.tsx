@@ -23,7 +23,6 @@ import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
 import {useFormatDate} from 'hooks/useFormatDate';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryState} from 'hooks/useQueryState';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {DataSyncType} from 'models/service-company';
@@ -117,13 +116,6 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
 
   totalInvoiceRef.current = totalInvoiceRef.current || invoiceResource.total;
 
-  const pdfPaths = invoiceResource.data
-    .map((i) => i.additionalInfo.pdfPath)
-    .filter((pdfPath) => pdfPath !== undefined);
-  const {data: downloadUrls} = useDownloadUrl(
-    invoiceResource.data ? pdfPaths : [],
-  );
-
   useEffect(() => {
     if (invoiceResource.total > 0 && invoiceResource.data.length === 0) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
@@ -161,13 +153,12 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
       setRows(
         makeRows(
           invoiceResource.data,
-          downloadUrls,
           user?.userAccount.serviceCompany.id,
           formatDate,
         ),
       );
     }
-  }, [invoiceResource, isLoading, downloadUrls]);
+  }, [invoiceResource, isLoading]);
 
   useEffect(() => {
     setPageCount(Math.ceil(invoiceResource.total / page.pageSize));
