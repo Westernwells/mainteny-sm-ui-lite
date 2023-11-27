@@ -1906,5 +1906,6 @@
   "Checklist overview": "Checklisten Übersicht",
   "Checklist Title": "Checklisten Titel",
   "Please note that cancelled invoices remain accessible on this dashboard. You can view and manage them here.": "Bitte beachten Sie, dass stornierte Rechnungen weiterhin über dieses Dashboard zugänglich sind. Sie können diese hier einsehen und verwalten.",
-  "The due date is missing for this invoice": "Für diese Rechnung fehlt das Fälligkeitsdatum"
+  "The due date is missing for this invoice": "Für diese Rechnung fehlt das Fälligkeitsdatum",
+  "Payment term is required": "Zahlungsbedingung ist erforderlich"
 }
