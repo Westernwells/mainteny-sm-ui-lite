@@ -14,7 +14,8 @@ interface Props {
   iconBackgroundColor?: string;
   title: string;
   value: string;
-  subValue?: string;
+  subValue?: number;
+  subText?: string;
   url?: string;
 }
 
@@ -24,7 +25,8 @@ export const TopCard = ({
   iconBackgroundColor = 'success.outlinedHoverBg',
   title,
   value,
-  subValue = '',
+  subValue,
+  subText,
   url,
 }: Props) => {
   const {t} = useTranslation();
@@ -60,10 +62,10 @@ export const TopCard = ({
           <Grid item>
             <Typography variant="h4">{value}</Typography>
           </Grid>
-          {subValue && (
+          {subText && subValue !== 0 && (
             <Grid item>
               <Chip
-                label={subValue}
+                label={subText}
                 variant="outlined"
                 size="small"
                 sx={{borderColor: url === 'contracts' ? 'warning' : '#E4E9F2'}}
