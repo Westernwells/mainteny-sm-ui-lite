@@ -211,19 +211,19 @@ export const ViewInvoice = ({
   };
 
   const validateDueDate = () => {
-    let errorMessage = '';
+    if (!invoice.dueDate) {
+      return t(`The due date is missing for this invoice`);
+    }
 
     if (isDueDateInPast()) {
-      errorMessage = t(`The due date for the invoice has expired`);
+      return t(`The due date for the invoice has expired`);
     }
 
     if (isDueDateBeforeCreation()) {
-      errorMessage = t(
+      return t(
         'The invoice due date cannot be earlier than the invoice creation date. Please enter a valid due date',
       );
     }
-
-    return errorMessage;
   };
 
   const onInvoiceSend = () => {
