@@ -1926,5 +1926,9 @@
   "complete": "završiti",
   "Engineer's Signature": "Potpis inženjera",
   "Complete": "Završi",
-  "Checklist overview": "Pregled kontrolne liste"
+  "Checklist overview": "Pregled kontrolne liste",
+  "Checklist Title": "Naslov kontrolne liste",
+  "Please note that cancelled invoices remain accessible on this dashboard. You can view and manage them here.": "Imajte na umu da poništene fakture ostaju dostupne na ovoj kontrolnoj tabli. Možete ih pregledati i upravljati njima ovde.",
+  "The due date is missing for this invoice": "Nedostaje rok za ovu fakturu",
+  "Payment term is required": "Uslov plaćanja je obavezan"
 }
