@@ -1895,5 +1895,6 @@
   "Article created successfully": "Articolo creato con successo",
   "MATERIAL": "MATERIALE",
   "LABOR": "LAVORO",
-  "Credit note for {{invoiceNumber}}": "Nota di credito per {{invoiceNumber}}"
+  "Credit note for {{invoiceNumber}}": "Nota di credito per {{invoiceNumber}}",
+  "Paid amount (incl. VAT)": "Importo pagato  (IVA inclusa)"
 }
