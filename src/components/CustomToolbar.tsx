@@ -6,29 +6,32 @@ import {Button} from './Button';
 
 interface Props {
   toolBarTitle: React.ReactNode;
+  isDatePicker: boolean;
   onClose: () => void;
 }
 
-const CustomToolBar = ({toolBarTitle, onClose}: Props) => {
+const CustomToolBar = ({toolBarTitle, onClose, isDatePicker}: Props) => {
   const {t} = useTranslation();
   return (
     <div
       style={{
         display: 'flex',
         justifyContent: 'space-between',
-        margin: '0em 0.5em 0em 1.4em',
+        margin: '0em 0em 0em 1.4em',
         padding: '1em 0em 0em 0em',
         alignItems: 'center',
       }}>
       <Typography variant="subtitle2">{t(`${toolBarTitle}`)}</Typography>
 
-      <Button
-        buttonProps={{
-          onClick: onClose,
-          autoFocus: true,
-        }}>
-        <CloseIcon />
-      </Button>
+      {isDatePicker && (
+        <Button
+          buttonProps={{
+            onClick: onClose,
+            autoFocus: true,
+          }}>
+          <CloseIcon />
+        </Button>
+      )}
     </div>
   );
 };
