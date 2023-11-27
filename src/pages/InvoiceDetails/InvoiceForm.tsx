@@ -214,7 +214,7 @@ export const InvoiceForm = ({
   );
 
   const [dueDate, setDueDate] = useState<Date | null>(
-    invoice ? new Date(invoice.dueDate) : null,
+    invoice?.dueDate ? new Date(invoice.dueDate) : null,
   );
   const [dueDateError, setDueDateError] = useState('');
   const [, setFinalAmountText] = useState('');
