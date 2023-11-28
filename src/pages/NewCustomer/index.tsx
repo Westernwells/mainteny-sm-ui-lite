@@ -121,22 +121,25 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
   });
 
   useEffectAfterMount(() => {
-    localStorage.setItem(
-      localStorageFormikBasicInfoKey,
-      JSON.stringify(formikBasicInfo.values),
-    );
-    localStorage.setItem(
-      localStorageFormikAddressKey,
-      JSON.stringify(formikAddress.values),
-    );
-    localStorage.setItem(
-      localStorageFormikContactPersonsKey,
-      JSON.stringify(formikContactPersons.values),
-    );
+    if (!openResumeProgressDialog) {
+      localStorage.setItem(
+        localStorageFormikBasicInfoKey,
+        JSON.stringify(formikBasicInfo.values),
+      );
+      localStorage.setItem(
+        localStorageFormikAddressKey,
+        JSON.stringify(formikAddress.values),
+      );
+      localStorage.setItem(
+        localStorageFormikContactPersonsKey,
+        JSON.stringify(formikContactPersons.values),
+      );
+    }
   }, [
     formikBasicInfo.values,
     formikAddress.values,
     formikContactPersons.values,
+    openResumeProgressDialog,
   ]);
 
   // show resume progress modal if there's previous stored state in local storage
@@ -149,11 +152,12 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       localStorageFormikBasicInfo ?? '{}',
     ) as CustomerBasicInfoFormModel;
 
+    const fieldsToIgnore = ['registrationDate', 'externalId'];
     if (
       localStorageFormikBasicInfo &&
       !isEqual(
-        omit(localStorageFormikBasicInfoParsed, 'registrationDate'),
-        omit(formikBasicInfo.values, 'registrationDate'),
+        omit(localStorageFormikBasicInfoParsed, fieldsToIgnore),
+        omit(formikBasicInfo.values, fieldsToIgnore),
       )
     ) {
       setOpenResumeProgressDialog(true);
