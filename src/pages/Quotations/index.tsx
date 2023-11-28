@@ -62,13 +62,6 @@ export const Quotations = () => {
   totalQuotationsRef.current =
     totalQuotationsRef.current || quotationsResource.total;
 
-  const pdfPaths = quotationsResource.data
-    .map((q) => q.additionalInfo.pdfPath)
-    .filter((pdfPath) => pdfPath !== undefined);
-  const {data: downloadUrls} = useDownloadUrl(
-    quotationsResource.data ? pdfPaths : [],
-  );
-
   useEffect(() => {
     if (page.pageIndex) {
       setQueryParams(formatSearchParamsPageIndex(1, queryParams));
@@ -80,9 +73,9 @@ export const Quotations = () => {
 
   useEffect(() => {
     if (!isLoading) {
-      setRows(makeRows(quotationsResource, downloadUrls, formatDate));
+      setRows(makeRows(quotationsResource, formatDate));
     }
-  }, [quotationsResource, isLoading, downloadUrls]);
+  }, [quotationsResource, isLoading]);
 
   useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);

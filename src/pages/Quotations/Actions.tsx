@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import printJS from 'print-js';
@@ -30,13 +30,13 @@ import {
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {QuotationStatus, QuotationView} from 'models/quotation';
 import {PdfGenerationStatus} from 'models/misc';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 
 interface Props {
   quotation: QuotationView;
-  downloadUrl: string;
 }
 
-export const Actions = ({quotation, downloadUrl}: Props) => {
+export const Actions = ({quotation}: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
   const {user} = useUserSession();
@@ -46,13 +46,19 @@ export const Actions = ({quotation, downloadUrl}: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-
+  const [pathToDownload, setPathToDownload] = useState('');
+  const [actionType, setActionType] = useState('');
   const {mutate: markAsAccepted} = useReplyQuotation();
   const {mutate: deleteQuotation} = useDeleteQuotation();
 
+  const {pdfPath} = quotation.additionalInfo;
   const isPDFGenerated =
     quotation.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
-    downloadUrl;
+    pdfPath;
+
+  const {data: downloadUrls} = useDownloadUrl(
+    pathToDownload ? [pathToDownload] : [],
+  );
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -86,13 +92,10 @@ export const Actions = ({quotation, downloadUrl}: Props) => {
               {
                 label: t('Print'),
                 icon: <Print />,
-                onClick: () =>
-                  downloadUrl &&
-                  printJS({
-                    printable: downloadUrl,
-                    type: 'pdf',
-                    showModal: true,
-                  }),
+                onClick: () => {
+                  setActionType('PRINT');
+                  setPathToDownload(quotation.additionalInfo.pdfPath as string);
+                },
               },
             ]
           : []),
@@ -108,7 +111,10 @@ export const Actions = ({quotation, downloadUrl}: Props) => {
               {
                 label: t('Download'),
                 icon: <FileDownload />,
-                onClick: () => window.open(downloadUrl, '_blank'),
+                onClick: () => {
+                  setActionType('DOWNLOAD');
+                  setPathToDownload(quotation.additionalInfo.pdfPath as string);
+                },
               },
             ]
           : []),
@@ -144,7 +150,28 @@ export const Actions = ({quotation, downloadUrl}: Props) => {
     }
 
     return items;
-  }, [downloadUrl]);
+  }, [pdfPath]);
+
+  useEffect(() => {
+    const url = downloadUrls?.[pathToDownload];
+
+    if (url) {
+      if (actionType === 'DOWNLOAD') {
+        window.open(url, '_blank');
+      }
+
+      if (actionType === 'PRINT') {
+        printJS({
+          printable: url,
+          type: 'pdf',
+          showModal: true,
+        });
+      }
+
+      setPathToDownload('');
+      setActionType('');
+    }
+  }, [downloadUrls]);
 
   return (
     <Box>
