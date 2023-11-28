@@ -281,7 +281,7 @@ export const InvoiceForm = ({
       }),
     description: invoice?.description || '',
     dueDate: '',
-    issuedDate: dateToString(new Date()),
+    sentDate: dateToString(new Date()),
     type:
       typeof invoiceType === 'string' &&
       invoiceType &&
@@ -569,10 +569,10 @@ export const InvoiceForm = ({
   };
 
   const isDueDateBeforeCreation = () => {
-    const issuedDate = invoice?.issuedDate || startOfDay(new Date());
+    const sentDate = invoice?.sentDate || startOfDay(new Date());
     const localDueDate = dueDate as Date;
     const dueDateObject = parseISO(new Date(localDueDate).toISOString());
-    const invoiceDateObject = parseISO(new Date(issuedDate).toISOString());
+    const invoiceDateObject = parseISO(new Date(sentDate).toISOString());
 
     return isAfter(invoiceDateObject, dueDateObject);
   };

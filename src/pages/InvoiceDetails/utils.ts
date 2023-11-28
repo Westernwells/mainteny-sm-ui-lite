@@ -4,7 +4,7 @@ export const formatInvoiceRecord = (value: InvoiceFormData) => ({
   subject: value.subject,
   description: value.description,
   dueDate: value.dueDate,
-  issuedDate: value.issuedDate,
+  sentDate: value.sentDate,
   type: value.type,
   items: value.items,
   paymentTerms: value.paymentTerms,

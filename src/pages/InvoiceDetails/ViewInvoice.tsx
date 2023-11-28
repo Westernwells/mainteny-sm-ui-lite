@@ -192,10 +192,10 @@ export const ViewInvoice = ({
   }, [invoice?.additionalInfo.pdfGenerationStatus]);
 
   const isDueDateBeforeCreation = () => {
-    const issuedDate = invoice?.issuedDate || startOfDay(new Date());
+    const sentDate = invoice?.sentDate || startOfDay(new Date());
     const localDueDate = invoice.dueDate as string;
     const dueDateObject = parseISO(new Date(localDueDate).toISOString());
-    const invoiceDateObject = parseISO(new Date(issuedDate).toISOString());
+    const invoiceDateObject = parseISO(new Date(sentDate).toISOString());
 
     return isAfter(invoiceDateObject, dueDateObject);
   };

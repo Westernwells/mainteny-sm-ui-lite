@@ -116,8 +116,7 @@ export interface InvoiceView {
   subject: string;
   type: InvoiceType;
   totalAmount: Amount;
-  issuedDate: string;
-  sentDate: string;
+  sentDate?: string;
   dueDate: string;
   status: InvoiceStatus;
   serviceOrder?: ServiceOrderView;
@@ -179,7 +178,7 @@ export interface InvoiceFormData {
   subject: string;
   description: string;
   dueDate: string;
-  issuedDate: string;
+  sentDate: string;
   items: QuotationItemRecord[] | InvoiceItemRecord<Amount>[];
   paymentInfo: PaymentInfo;
   paymentTerms: string;
@@ -210,7 +209,7 @@ export interface CreateInvoice {
   subject: string;
   description: string;
   dueDate: string;
-  issuedDate: string;
+  sentDate: string;
   items: QuotationItemRecord[] | InvoiceItemRecord<Amount>[];
   paymentInfo: PaymentInfo;
   paymentTerms: string;
@@ -237,7 +236,7 @@ export interface UpdateInvoice {
   description: string;
   subject: string;
   dueDate: string;
-  issuedDate: string;
+  sentDate: string;
   items: WithOptional<InvoiceItemRecord<AmountRecord>, 'articleUnit'>[];
   paymentInfo?: PaymentInfo;
   paymentTerms?: string;
