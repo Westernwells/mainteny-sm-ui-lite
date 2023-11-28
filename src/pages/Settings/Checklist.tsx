@@ -207,6 +207,8 @@ export const Checklist = () => {
         );
       }
     })();
+    // focus on name input when page is loaded
+    document.querySelector<HTMLInputElement>('input[name="name"]')?.focus?.();
   }, []);
 
   const onDragComponentEnd = (result: DropResult) => {
