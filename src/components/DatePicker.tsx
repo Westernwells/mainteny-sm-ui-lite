@@ -12,6 +12,7 @@ import {ReactNode, useEffect, useRef, useState} from 'react';
 import {locales} from 'utils/datetime';
 import Box from '@mui/material/Box';
 import {SxProps, Typography} from '@mui/material';
+import {useTranslation} from 'react-i18next';
 import CustomActionBar from './CustomActionBar';
 import CustomToolbar from './CustomToolbar';
 
@@ -46,6 +47,7 @@ export const DatePicker = ({
   errorMessage,
   ...props
 }: Props) => {
+  const {t} = useTranslation();
   const {user} = useUserSession();
   const language = user?.userAccount.serviceCompany.language;
   const locale = mapLanguageToLocale[language!];
@@ -92,35 +94,93 @@ export const DatePicker = ({
 
   const popperSx: SxProps = {
     '& .MuiPickersPopper-paper': {
-      height: '480px',
       width: '350px',
     },
-    '& .MuiCalendarOrClockPicker-root ': {
-      minHeight: '320px',
+    '& .MuiDayCalendar-header': {
+      width: '100%',
+    },
+    '& .MuiPickersLayout-contentWrapper': {
+      position: 'relative',
+    },
+    '& .MuiPickersLayout-contentWrapper > .MuiDateCalendar-root': {
+      height: '100%',
+      position: 'relative',
+    },
+    '& .MuiDayCalendar-header > .MuiDayCalendar-weekDayLabel': {
+      width: '40px',
+      fontSize: '0.85rem',
+    },
+    '& .MuiDayCalendar-root > .MuiDayCalendar-slideTransition': {
+      minHeight: '180px',
+      overflow: 'hidden',
     },
     '& .MuiCalendarPicker-root': {
       boxShadow: '0px 9px 46px 8px #0000001F',
       overflow: 'hidden',
     },
-    '& .MuiPickersDay-dayWithMargin': {
-      border: '1px solid #222B451F',
+    '& .MuiButtonBase-root .MuiPickersDay-root .MuiPickersDay-dayWithMargin .MuiPickersDay-today':
+      {
+        border: 'none',
+      },
+    '& .MuiDayCalendar-weekContainer > .MuiPickersDay-dayWithMargin': {
+      border: 'none',
+      borderRight: '1px solid #222B451F',
+      borderBottom: '1px solid #222B451F',
       borderRadius: 0,
       margin: 0,
-      padding: '10px 20px',
-      fontSize: '0.8rem',
+      padding: '15px 22px',
+      fontSize: '0.9rem',
+
+      '&:hover': {
+        background: '#00D1FF80',
+        color: '#222B45',
+        fontWeight: '400',
+      },
     },
+    '& .MuiButtonBase-root MuiPickersDay-root MuiPickersDay-dayWithMargin': {
+      color: 'white',
+    },
+    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer .MuiPickersDay-dayWithMargin:first-child':
+      {
+        borderLeft: '1px solid #222B451F',
+      },
+    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:first-child .MuiPickersDay-dayWithMargin:nth-child(-n + 7)':
+      {
+        borderTop: '1px solid #222B451F',
+      },
+    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:last-child .MuiPickersDay-dayWithMargin:nth-last-child(-n+7)':
+      {
+        borderBottom: '1px solid #222B451F',
+        borderTop: '0',
+      },
+    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:first-child .MuiPickersDay-dayWithMargin:first-child':
+      {
+        borderTopLeftRadius: '4px',
+      },
+    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:first-child .MuiPickersDay-dayWithMargin:last-child':
+      {
+        borderTopRightRadius: '4px',
+      },
+    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:last-child .MuiPickersDay-dayWithMargin:nth-last-child(7)':
+      {
+        borderBottomLeftRadius: '4px',
+      },
+    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:last-child .MuiPickersDay-dayWithMargin:last-child':
+      {
+        borderBottomRightRadius: '4px',
+      },
     '& .MuiPickersDay-dayWithMargin:hover': {
-      background: '#00D1FF80',
-      color: '#222B45',
-      fontWeight: '400',
+      color: 'white',
     },
-    '& .MuiDayPicker-weekContainer': {
+    '& .MuiDayCalendar-weekContainer': {
       margin: 0,
       padding: 0,
     },
-    '& .MuiPickersDay-dayOutsideMonth:hover': {
-      color: '#8F9BB3',
-      background: 'none',
+    '& .MuiPickersDay-dayOutsideMonth': {
+      '&:hover': {
+        color: '#8F9BB3',
+        background: 'none',
+      },
     },
     '& .MuiPickersCalendarHeader-switchViewButton': {
       display: 'none',
@@ -129,6 +189,7 @@ export const DatePicker = ({
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
+      position: 'relative',
     },
     '& .MuiPickersCalendarHeader-labelContainer': {
       position: 'absolute',
@@ -139,20 +200,20 @@ export const DatePicker = ({
     '& .MuiIconButton-edgeStart': {
       position: 'absolute',
       right: '0',
-      marginRight: '1em',
+      marginRight: '0em',
       marginTop: '-1em',
       border: '1px solid #222B451F',
       padding: '5px',
-      borderRadius: 0,
+      borderRadius: '4px',
     },
     '& .MuiIconButton-edgeEnd': {
       position: 'absolute',
       left: '0',
-      marginLeft: '1em',
+      marginLeft: '0em',
       marginTop: '-1em',
       border: '1px solid #222B451F',
       padding: '5px',
-      borderRadius: 0,
+      borderRadius: '4px',
     },
     '& .MuiPickersLayout-root': {
       display: 'flex',
@@ -186,6 +247,9 @@ export const DatePicker = ({
             },
             textField: {
               ...textFieldProps,
+              size: textFieldProps?.size || 'small',
+              label: t(`${textFieldProps?.label}`),
+              sx: {width: '100%'},
               InputLabelProps: {
                 shrink: true,
                 required,
