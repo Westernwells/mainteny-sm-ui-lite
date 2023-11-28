@@ -50,6 +50,7 @@ export const Actions = ({quotation}: Props) => {
   const [actionType, setActionType] = useState('');
   const {mutate: markAsAccepted} = useReplyQuotation();
   const {mutate: deleteQuotation} = useDeleteQuotation();
+  const {mutateAsync: publishQuotation} = usePublishQuotation();
 
   const {pdfPath} = quotation.additionalInfo;
   const isPDFGenerated =
@@ -66,6 +67,37 @@ export const Actions = ({quotation}: Props) => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const printQuotation = async (url: string) => {
+    if (quotation.status !== QuotationStatus.DRAFT) {
+      printJS({
+        printable: url,
+        type: 'pdf',
+        showModal: true,
+      });
+      return;
+    }
+
+    await publishQuotation(
+      {
+        id: quotation.id,
+        body: {
+          email: '',
+          subject: '',
+          content: '',
+        },
+      },
+      {
+        onSuccess: () => {
+          printJS({
+            printable: url,
+            type: 'pdf',
+            showModal: true,
+          });
+        },
+      },
+    );
   };
 
   const actions = useMemo(() => {
@@ -161,11 +193,7 @@ export const Actions = ({quotation}: Props) => {
       }
 
       if (actionType === 'PRINT') {
-        printJS({
-          printable: url,
-          type: 'pdf',
-          showModal: true,
-        });
+        printQuotation(url);
       }
 
       setPathToDownload('');

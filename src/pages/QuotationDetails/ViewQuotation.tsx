@@ -69,6 +69,7 @@ export const ViewQuotation = ({
   const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
 
   const {mutate: markAsAccepted} = useReplyQuotation();
+  const {mutateAsync: publishQuotation} = usePublishQuotation();
 
   const formik = useFormik({
     initialValues: {
@@ -87,6 +88,41 @@ export const ViewQuotation = ({
   const isPDFGenerated =
     quotation.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
     !isLoadingDownloadUrl;
+
+  const onPrintQuotation = async () => {
+    if (quotation.status !== QuotationStatus.DRAFT) {
+      if (downloadUrl) {
+        printJS({
+          printable: downloadUrl,
+          type: 'pdf',
+          showModal: true,
+        });
+      }
+      return;
+    }
+
+    await publishQuotation(
+      {
+        id: quotation.id,
+        body: {
+          email: '',
+          subject: '',
+          content: '',
+        },
+      },
+      {
+        onSuccess: () => {
+          if (downloadUrl) {
+            printJS({
+              printable: downloadUrl,
+              type: 'pdf',
+              showModal: true,
+            });
+          }
+        },
+      },
+    );
+  };
 
   const actions = useMemo(() => {
     const items = [];
@@ -109,15 +145,7 @@ export const ViewQuotation = ({
       items.push({
         label: t('Print'),
         icon: <Print />,
-        onClick: () =>
-          downloadUrl &&
-          setTimeout(() => {
-            printJS({
-              printable: downloadUrl,
-              type: 'pdf',
-              showModal: true,
-            });
-          }, 8000),
+        onClick: onPrintQuotation,
       });
     }
 
