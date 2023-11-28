@@ -1916,6 +1916,7 @@
   "Choice one": "Izbor jedan",
   "New Choice": "Novi izbor",
   "Enter Your Choice": "Unesite svoj izbor",
+  "Your Choice": "Vaš izbor",
   "Enable 'Enter Your Choice' to add a custom text input field to your mobile checklist. This allows for personalized responses in the multi-choice form.": "Omogućite „Unesite svoj izbor“ da dodate prilagođeno polje za unos teksta na kontrolnu listu za mobilni uređaj. Ovo omogućava personalizovane odgovore u obliku sa više izbora.",
   "Enter header name...": "Unesite naziv zaglavlja",
   "Enter text area name...": "Unesite ime tekstualne oblasti...",
