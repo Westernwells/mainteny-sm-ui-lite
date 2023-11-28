@@ -17,9 +17,10 @@ const CustomToolBar = ({toolBarTitle, onClose, isDatePicker}: Props) => {
       style={{
         display: 'flex',
         justifyContent: 'space-between',
-        margin: '0em 0em 0em 1.4em',
+        margin: '0em 1em 0em 1em',
         padding: '1em 0em 0em 0em',
         alignItems: 'center',
+        position: 'relative',
       }}>
       <Typography variant="subtitle2">{t(`${toolBarTitle}`)}</Typography>
 
@@ -28,6 +29,7 @@ const CustomToolBar = ({toolBarTitle, onClose, isDatePicker}: Props) => {
           buttonProps={{
             onClick: onClose,
             autoFocus: true,
+            sx: {minWidth: '10px'},
           }}>
           <CloseIcon />
         </Button>
