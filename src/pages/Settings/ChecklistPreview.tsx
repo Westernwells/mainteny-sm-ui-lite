@@ -229,10 +229,7 @@ export const ChecklistPreview = ({
                             },
                           }}
                         />
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{textDecoration: 'underline'}}>
+                        <Typography variant="body2" color="text.secondary">
                           {t('Enter Your Choice')}
                         </Typography>
                       </Box>
