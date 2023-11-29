@@ -564,26 +564,11 @@ export const InvoiceForm = ({
     return isBefore(dueDateObject, todayObject);
   };
 
-  const isDueDateBeforeCreation = () => {
-    const sentDate = invoice?.sentDate || startOfDay(new Date());
-    const localDueDate = dueDate as Date;
-    const dueDateObject = parseISO(new Date(localDueDate).toISOString());
-    const invoiceDateObject = parseISO(new Date(sentDate).toISOString());
-
-    return isAfter(invoiceDateObject, dueDateObject);
-  };
-
   const validateDueDate = () => {
     let errorMessage = '';
 
     if (isDueDateInPast()) {
       errorMessage = t(`The due date for the invoice has expired`);
-    }
-
-    if (isDueDateBeforeCreation()) {
-      errorMessage = t(
-        'The invoice due date cannot be earlier than the invoice creation date. Please enter a valid due date',
-      );
     }
 
     return errorMessage;

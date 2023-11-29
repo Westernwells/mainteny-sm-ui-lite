@@ -27,6 +27,8 @@ import {useDeleteInvoice, usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {InvoiceStatus, InvoiceView, InvoiceType} from 'models/invoice';
 import {PdfGenerationStatus} from 'models/misc';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {useSnackbar} from 'hooks/useSnackbar';
+import {isAfter, isBefore, parseISO, startOfDay} from 'date-fns';
 
 interface Props {
   invoice: InvoiceView;
@@ -72,6 +74,7 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
   );
 
   const {mutate: deleteInvoice} = useDeleteInvoice();
+  const {enqueueSnackbar} = useSnackbar();
 
   const isInvoicePDFGenerated =
     invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
@@ -220,7 +223,37 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
     return items;
   }, [downloadUrl]);
 
+  const isDueDateInPast = () => {
+    const localDueDate = invoice.dueDate as string;
+    const dueDateObject = startOfDay(
+      parseISO(new Date(localDueDate).toISOString()),
+    );
+    const todayObject = startOfDay(new Date());
+
+    return isBefore(dueDateObject, todayObject);
+  };
+
+  const validateDueDate = () => {
+    if (!invoice.dueDate) {
+      return t(`The due date is missing for this invoice`);
+    }
+
+    if (isDueDateInPast()) {
+      return t(`The due date for the invoice has expired`);
+    }
+  };
+
   const onPrintInvoice = async () => {
+    const errorMessage = validateDueDate();
+
+    if (errorMessage) {
+      enqueueSnackbar(errorMessage, {
+        variant: 'error',
+      });
+
+      return;
+    }
+
     await publishInvoice(
       {
         id: invoice.id,
