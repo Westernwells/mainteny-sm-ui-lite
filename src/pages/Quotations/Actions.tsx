@@ -22,6 +22,7 @@ import Close from '@mui/icons-material/Close';
 import FileDownload from '@mui/icons-material/FileDownload';
 import {Confirm} from 'components/Confirm';
 import {SendEmailDialog} from 'components/SendEmailDialog';
+import {ConfirmPrintQuotation} from 'components/ConfirmPrintQuotation';
 import {
   useDeleteQuotation,
   usePublishQuotation,
@@ -48,6 +49,8 @@ export const Actions = ({quotation}: Props) => {
   const open = Boolean(anchorEl);
   const [pathToDownload, setPathToDownload] = useState('');
   const [actionType, setActionType] = useState('');
+  const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
+    useState(false);
   const {mutate: markAsAccepted} = useReplyQuotation();
   const {mutate: deleteQuotation} = useDeleteQuotation();
   const {mutateAsync: publishQuotation} = usePublishQuotation();
@@ -76,6 +79,7 @@ export const Actions = ({quotation}: Props) => {
         type: 'pdf',
         showModal: true,
       });
+      setIsConfirmPrintDialogOpen(false);
       return;
     }
 
@@ -90,6 +94,7 @@ export const Actions = ({quotation}: Props) => {
       },
       {
         onSuccess: () => {
+          setIsConfirmPrintDialogOpen(false);
           printJS({
             printable: url,
             type: 'pdf',
@@ -124,10 +129,7 @@ export const Actions = ({quotation}: Props) => {
               {
                 label: t('Print'),
                 icon: <Print />,
-                onClick: () => {
-                  setActionType('PRINT');
-                  setPathToDownload(quotation.additionalInfo.pdfPath as string);
-                },
+                onClick: () => setIsConfirmPrintDialogOpen(true),
               },
             ]
           : []),
@@ -315,6 +317,14 @@ export const Actions = ({quotation}: Props) => {
         title="Delete Quotation"
         content="Do you want to delete this Quotation?"
         helperText="This action is irreversible."
+      />
+      <ConfirmPrintQuotation
+        open={isConfirmPrintDialogOpen}
+        onConfirm={() => {
+          setActionType('PRINT');
+          setPathToDownload(quotation.additionalInfo.pdfPath as string);
+        }}
+        onClose={() => setIsConfirmPrintDialogOpen(false)}
       />
     </Box>
   );

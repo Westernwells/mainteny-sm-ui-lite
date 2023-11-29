@@ -23,6 +23,7 @@ import {BottomDrawer} from 'components/BottomDrawer';
 import {EmptySection} from 'components/EmptySection';
 import {Confirm} from 'components/Confirm';
 import {SendEmailDialog} from 'components/SendEmailDialog';
+import {ConfirmPrintQuotation} from 'components/ConfirmPrintQuotation';
 import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps';
 import {
   usePublishQuotation,
@@ -67,6 +68,8 @@ export const ViewQuotation = ({
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isRejectedDialogOpen, setIsRejectedDialogOpen] = useState(false);
   const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
+  const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
+    useState(false);
 
   const {mutate: markAsAccepted} = useReplyQuotation();
   const {mutateAsync: publishQuotation} = usePublishQuotation();
@@ -98,6 +101,7 @@ export const ViewQuotation = ({
           showModal: true,
         });
       }
+      setIsConfirmPrintDialogOpen(false);
       return;
     }
 
@@ -112,6 +116,7 @@ export const ViewQuotation = ({
       },
       {
         onSuccess: () => {
+          setIsConfirmPrintDialogOpen(false);
           if (downloadUrl) {
             printJS({
               printable: downloadUrl,
@@ -145,7 +150,7 @@ export const ViewQuotation = ({
       items.push({
         label: t('Print'),
         icon: <Print />,
-        onClick: onPrintQuotation,
+        onClick: () => setIsConfirmPrintDialogOpen(true),
       });
     }
 
@@ -429,6 +434,11 @@ export const ViewQuotation = ({
           />
         </Box>
       </Dialog>
+      <ConfirmPrintQuotation
+        open={isConfirmPrintDialogOpen}
+        onConfirm={onPrintQuotation}
+        onClose={() => setIsConfirmPrintDialogOpen(false)}
+      />
     </Box>
   );
 };
