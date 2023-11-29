@@ -191,15 +191,6 @@ export const ViewInvoice = ({
     };
   }, [invoice?.additionalInfo.pdfGenerationStatus]);
 
-  const isDueDateBeforeCreation = () => {
-    const sentDate = invoice?.sentDate || startOfDay(new Date());
-    const localDueDate = invoice.dueDate as string;
-    const dueDateObject = parseISO(new Date(localDueDate).toISOString());
-    const invoiceDateObject = parseISO(new Date(sentDate).toISOString());
-
-    return isAfter(invoiceDateObject, dueDateObject);
-  };
-
   const isDueDateInPast = () => {
     const localDueDate = invoice.dueDate as string;
     const dueDateObject = startOfDay(
@@ -217,12 +208,6 @@ export const ViewInvoice = ({
 
     if (isDueDateInPast()) {
       return t(`The due date for the invoice has expired`);
-    }
-
-    if (isDueDateBeforeCreation()) {
-      return t(
-        'The invoice due date cannot be earlier than the invoice creation date. Please enter a valid due date',
-      );
     }
   };
 
