@@ -4,7 +4,6 @@ import {useTranslation} from 'react-i18next';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
-import printJS from 'print-js';
 import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -29,7 +28,6 @@ import {StatusChip} from 'components/StatusChip';
 import {FormRadio} from 'components/form/FormRadio';
 import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
-import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {Tooltip} from 'components/Tooltip';
 import {InfoCard} from 'components/InfoCard';
 import {EmptySection} from 'components/EmptySection';
@@ -153,8 +151,6 @@ export const InvoiceForm = ({
     useState<boolean>(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
-    useState(false);
   const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
     useState(false);
   const [
@@ -712,36 +708,6 @@ export const InvoiceForm = ({
       }),
     });
   }
-
-  const onPrintInvoice = async () => {
-    if (invoice) {
-      await onSave(formik.values);
-      await publishInvoice(
-        {
-          id: invoice.id,
-          body: {
-            email: '',
-            subject: '',
-            content: '',
-          },
-        },
-        {
-          onSuccess: () => {
-            setIsConfirmPrintDialogOpen(false);
-            setTimeout(() => {
-              if (downloadUrl) {
-                printJS({
-                  printable: downloadUrl,
-                  type: 'pdf',
-                  showModal: true,
-                });
-              }
-            }, 8000);
-          },
-        },
-      );
-    }
-  };
 
   const handleContractPaymentTermsModal = (paymentTermId: string) => {
     const paymentTermObj = contractPaymentTerms?.data.find(
@@ -1429,12 +1395,6 @@ export const InvoiceForm = ({
         content="Do you want to delete this Invoice?"
         helperText="This action is irreversible."
       />
-      <ConfirmPrintInvoice
-        open={isConfirmPrintDialogOpen}
-        onConfirm={onPrintInvoice}
-        onClose={() => setIsConfirmPrintDialogOpen(false)}
-      />
-
       <ContractPaymentTermSelectDialog
         title={t('Payment Terms')}
         alertText={t('Choose a payment term to be used on your invoice')}
