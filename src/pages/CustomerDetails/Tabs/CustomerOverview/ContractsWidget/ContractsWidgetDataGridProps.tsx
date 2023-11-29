@@ -73,7 +73,7 @@ export const makeRows = (
         id: index,
         contractNumber: item.externalId,
         cost: formatNetAmount(item.additionalInfo.price) || '-',
-        expiryDate: formatDate(item.endTime),
+        expiryDate: formatDate(item.end),
         navigateTo: `/contracts/details/${item.id}`,
       }))
     : console.error('No Data');

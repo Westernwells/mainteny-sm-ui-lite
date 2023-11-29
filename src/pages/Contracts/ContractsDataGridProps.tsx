@@ -117,8 +117,8 @@ export const makeRows = (
         number: item.externalId || '-',
         customer: item.propertyOwner.name,
         units: item.elevators.length,
-        start: formatDate(item.startTime),
-        end: formatDate(item.endTime),
+        start: formatDate(item.start),
+        end: formatDate(item.end),
         name: item.name,
         cost:
           `${formatCurrency(

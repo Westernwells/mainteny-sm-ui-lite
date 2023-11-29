@@ -38,7 +38,7 @@ export const ContractTimeline = ({
         <Box>
           <Typography variant="subtitle1">{t('Contract ends')}</Typography>
           <Typography variant="body1">
-            {formatDate(contractDetails?.endTime)}
+            {formatDate(contractDetails?.end)}
           </Typography>
         </Box>
       </Box>
@@ -72,7 +72,7 @@ export const ContractTimeline = ({
         <Box>
           <Typography variant="subtitle1">{t('Contract signed')}</Typography>
           <Typography variant="body1">
-            {formatDate(contractDetails?.startTime)}
+            {formatDate(contractDetails?.start)}
           </Typography>
         </Box>
       </Box>

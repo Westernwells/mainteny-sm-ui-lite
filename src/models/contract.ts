@@ -1,5 +1,4 @@
 import {Client} from './client';
-import {ServiceCompany} from './service-company';
 import {Amount, Meta, Order, TimeWindowRecord, TimeWindowType} from './misc';
 import {Elevator, ElevatorSimpleView, ElevatorView} from './elevator';
 import {PropertyOwnerSimpleView} from './propertyManager';
@@ -120,8 +119,6 @@ export interface ContractView {
   sla: number;
   spendingLimit: number;
   currency: string;
-  startTime: string;
-  endTime: string;
   elevators: ContractElevatorSimpleView[];
   timePreference: ContractTimeWindow[];
   description: string;
@@ -141,8 +138,8 @@ export interface ContractSimpleView {
   price: number;
   number: number;
   currency: string;
-  startTime: string;
-  endTime: string;
+  start: string;
+  end: string;
   search: string;
   status: ContractStatus;
   externalId: string;
