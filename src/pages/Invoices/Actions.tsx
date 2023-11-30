@@ -224,6 +224,10 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
   }, [downloadUrl]);
 
   const isDueDateInPast = () => {
+    if (invoice.status !== InvoiceStatus.DRAFT) {
+      return false;
+    }
+
     const localDueDate = invoice.dueDate as string;
     const dueDateObject = startOfDay(
       parseISO(new Date(localDueDate).toISOString()),
