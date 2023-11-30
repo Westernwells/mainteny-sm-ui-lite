@@ -1933,5 +1933,11 @@
   "The due date is missing for this invoice": "Nedostaje rok za ovu fakturu",
   "Payment term is required": "Uslov plaćanja je obavezan",
   "Print quotation": "Odštampajte ponudu",
-  "This action will set the status of the quotation to \"Sent\". The quotation can not be edited or deleted after.": "Ova radnja će postaviti status ponude na „Poslato“. Ponuda se nakon toga ne može menjati ili brisati."
+  "This action will set the status of the quotation to \"Sent\". The quotation can not be edited or deleted after.": "Ova radnja će postaviti status ponude na „Poslato“. Ponuda se nakon toga ne može menjati ili brisati.",
+  "You are about to permanently delete this invoice.": "Spremate se da trajno izbrišete ovu fakturu",
+  "Are you sure you want to proceed?": "Da li ste sigurni da želite da nastavite?",
+  "Invoice deleted": "Faktura je izbrisana",
+  "You are about to cancel this invoice.": "Spremate se da otkažete ovu fakturu.",
+  "Invoice cancelled": "Faktura je poništena",
+  "Unassigned": "Neraspoređena"
 }
