@@ -85,6 +85,7 @@ import {getStartEndPrice} from 'utils/contract-utils';
 import {getItemRecord} from 'utils/article-utils';
 import AutoDropdown from 'components/AutoDropdown';
 import {useSnackbar} from 'hooks/useSnackbar';
+import CustomSnackbar from 'components/CustomSnackbar';
 import {formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
 
@@ -138,7 +139,7 @@ export const InvoiceForm = ({
     useUpdateInvoice();
   const {mutateAsync: createNewInvoice, isLoading: isCreating} =
     useCreateInvoice();
-  const {mutate: deleteInvoice} = useDeleteInvoice();
+  const {mutateAsync: deleteInvoice} = useDeleteInvoice();
   const {mutateAsync: publishInvoice, isLoading: isPublishing} =
     usePublishInvoice({
       shouldNavigate: false,
@@ -747,7 +748,7 @@ export const InvoiceForm = ({
   const externalIdInputProps = {
     id: 'externalId',
     name: 'externalId',
-    placeholder: 'e.g 1234',
+    placeholder: !formik.values.externalId && t('Unassigned'),
     label: 'Invoice Number',
     value: formik.values.externalId,
     onChange: formik.handleChange,
@@ -1372,7 +1373,23 @@ export const InvoiceForm = ({
         open={isDeleteDialogOpen}
         onConfirm={() => {
           if (invoice)
-            deleteInvoice({invoiceId: invoice.id, shouldNavigate: true});
+            deleteInvoice(
+              {invoiceId: invoice.id, shouldNavigate: true},
+              {
+                onSuccess: () => {
+                  enqueueSnackbar(
+                    <CustomSnackbar
+                      message="Invoice deleted"
+                      snackIcon="delete"
+                    />,
+                    {
+                      variant: 'info',
+                      anchorOrigin: {horizontal: 'right', vertical: 'bottom'},
+                    },
+                  );
+                },
+              },
+            );
           setIsDeleteDialogOpen(false);
         }}
         onClose={() => setIsDeleteDialogOpen(false)}

@@ -12,6 +12,7 @@ import {queryKeys as qk, queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {useNavigate} from 'react-router-dom';
+
 // FIXME: Dummy Import
 
 import {
@@ -306,7 +307,7 @@ export const deleteInvoice = async (id: string, navigate: boolean) => {
 
 export const useDeleteInvoice = () => {
   const queryClient = useQueryClient();
-  const {enqueueSnackbar, showError} = useSnackbar();
+  const {showError} = useSnackbar();
   const navigate = useNavigate();
 
   return useMutation(
@@ -321,9 +322,6 @@ export const useDeleteInvoice = () => {
       onSuccess: (__, {shouldNavigate}) => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
-        enqueueSnackbar(`Invoice deleted successfully`, {
-          variant: 'success',
-        });
         if (shouldNavigate) navigate(`/invoices?pageIndex=1&pageSize=25`);
       },
       onError: (err) => {
@@ -630,3 +628,26 @@ export const useElevatorInvoices = (
     () => fetchElevatorInvoices(elevatorId, params),
     {enabled: !!elevatorId, ...options},
   );
+
+export const cancelInvoice = async (id: string) => {
+  await axiosClient.put(`api/invoices/${id}/cancel`);
+};
+
+export const useCancelInvoice = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const {showError} = useSnackbar();
+
+  return useMutation((invoiceId: string) => cancelInvoice(invoiceId), {
+    onSuccess: () => {
+      queryClient.invalidateQueries([qk.fetchInvoices]);
+      queryClient.invalidateQueries([qk.invoiceById]);
+      queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
+      navigate(`/invoices/`);
+    },
+    onError: (err) => {
+      console.log(err);
+      showError(err);
+    },
+  });
+};

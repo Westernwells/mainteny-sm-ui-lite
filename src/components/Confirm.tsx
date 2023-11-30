@@ -13,6 +13,7 @@ interface Props {
   onClose: () => void;
   title?: string;
   content?: string | any[];
+  secondContent?: string | any[];
   helperText?: string;
   disableActions?: boolean;
 }
@@ -23,6 +24,7 @@ export const Confirm = ({
   onClose,
   title,
   content,
+  secondContent,
   helperText,
   disableActions = false,
 }: Props) => {
@@ -43,12 +45,13 @@ export const Confirm = ({
           <Typography>
             {typeof content === 'string' ? t(content) : content}
           </Typography>
-          {helperText && (
-            <Typography variant="subtitle2">{t(helperText)}</Typography>
-          )}
+          <Typography>
+            {typeof content === 'string' ? t(secondContent) : secondContent}
+          </Typography>
+          {helperText && <Typography>{t(helperText)}</Typography>}
         </DialogContentText>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{padding: '1em'}}>
         <Button
           disabled={disableActions}
           label={t('Create Service Job')}
@@ -66,6 +69,14 @@ export const Confirm = ({
           buttonProps={{
             onClick: onConfirm,
             autoFocus: true,
+            sx: {
+              bgcolor: 'error.light',
+              color: 'primary.contrastText',
+              '&:hover': {
+                bgcolor: 'error.light',
+                color: 'primary.contrastText',
+              },
+            },
           }}>
           <Typography variant="subtitle2">{t('Yes')}</Typography>
         </Button>

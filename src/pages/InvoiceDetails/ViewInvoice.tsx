@@ -43,6 +43,7 @@ import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useSnackbar} from 'notistack';
 import {isAfter, isBefore, parseISO, startOfDay} from 'date-fns';
+import CustomSnackbar from 'components/CustomSnackbar';
 import {Notes} from './Notes';
 import {InvoiceActivities} from './InvoiceActivities';
 
@@ -70,7 +71,7 @@ export const ViewInvoice = ({
   const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
     useState(false);
   const {mutate: markAsPaid} = useInvoicePaymentStatus();
-  const {mutate: deleteInvoice} = useDeleteInvoice();
+  const {mutateAsync: deleteInvoice} = useDeleteInvoice();
   const {mutateAsync: publishInvoice} = usePublishInvoice({
     shouldNavigate: false,
   });
@@ -130,11 +131,11 @@ export const ViewInvoice = ({
           setIsDeleteDialogOpen(true);
         },
       });
-    } else if (invoice.sentDate) {
+    } else if (invoice.sentDate || invoice.status === InvoiceStatus.CANCELLED) {
       return items.filter((item) => item.label !== t('Edit'));
     }
     return items;
-  }, [downloadUrl]);
+  }, [downloadUrl, invoice.status]);
 
   const onPrintInvoice = async () => {
     await publishInvoice(
@@ -466,7 +467,23 @@ export const ViewInvoice = ({
         open={isDeleteDialogOpen}
         onConfirm={() => {
           if (invoice.id)
-            deleteInvoice({invoiceId: invoice.id, shouldNavigate: true});
+            deleteInvoice(
+              {invoiceId: invoice.id, shouldNavigate: true},
+              {
+                onSuccess: () => {
+                  enqueueSnackbar(
+                    <CustomSnackbar
+                      message="Invoice deleted"
+                      snackIcon="delete"
+                    />,
+                    {
+                      variant: 'info',
+                      anchorOrigin: {horizontal: 'right', vertical: 'bottom'},
+                    },
+                  );
+                },
+              },
+            );
           setIsDeleteDialogOpen(false);
         }}
         onClose={() => setIsDeleteDialogOpen(false)}
