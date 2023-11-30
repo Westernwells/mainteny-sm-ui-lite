@@ -65,7 +65,7 @@ export const invoiceCycle: {[key: string]: string} = {
 export const calculateRenewDays = (contractDetails: ContractView) => {
   const noticePeriodInMonths =
     contractDetails.additionalInfo.noticePeriodInMonth || 0;
-  const contractEndTime = endOfDay(toDate(contractDetails?.endTime));
+  const contractEndTime = endOfDay(toDate(contractDetails?.end));
   const today = startOfDay(new Date());
 
   if (
