@@ -1910,5 +1910,11 @@
   "The due date is missing for this invoice": "Für diese Rechnung fehlt das Fälligkeitsdatum",
   "Payment term is required": "Zahlungsbedingung ist erforderlich",
   "Print quotation": "Angebot ausdrucken",
-  "This action will set the status of the quotation to \"Sent\". The quotation can not be edited or deleted after.": "Durch diese Aktion wird der Status des Angebots auf „Gesendet“ gesetzt. Das Angebot kann danach nicht mehr bearbeitet oder gelöscht werden."
+  "This action will set the status of the quotation to \"Sent\". The quotation can not be edited or deleted after.": "Durch diese Aktion wird der Status des Angebots auf „Gesendet“ gesetzt. Das Angebot kann danach nicht mehr bearbeitet oder gelöscht werden.",
+  "You are about to permanently delete this invoice.": "Sie sind dabei, diese Rechnung endgültig zu löschen.",
+  "Are you sure you want to proceed?": "Sind Sie sicher, dass Sie fortfahren möchten?",
+  "Invoice deleted": "Rechnung wurde gelöscht ",
+  "You are about to cancel this invoice.": "Sie sind dabei, diese Rechnung zu stornieren.",
+  "Invoice cancelled": "Rechnung wurde storniert",
+  "Unassigned": "Nicht zugewiesen"
 }
