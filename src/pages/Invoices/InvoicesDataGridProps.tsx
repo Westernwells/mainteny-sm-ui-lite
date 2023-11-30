@@ -31,7 +31,8 @@ export const getInvoiceStatusStyles = (
     | 'info'
     | 'success'
     | 'warning'
-    | 'action.active';
+    | 'action.active'
+    | 'warning.dark';
 } => {
   switch (status) {
     case InvoiceStatus.PAID:
@@ -44,6 +45,8 @@ export const getInvoiceStatusStyles = (
       return {label: InvoiceStatusView.NOT_PAID, color: 'primary'};
     case InvoiceStatus.PARTIALLY_PAID:
       return {label: InvoiceStatusView.PARTIALLY_PAID, color: 'warning'};
+    case InvoiceStatus.CANCELLED:
+      return {label: InvoiceStatusView.CANCELLED, color: 'warning.dark'};
     default:
       return {label: '-', color: 'default'};
   }
@@ -145,7 +148,7 @@ export const makeRows = (
     ? invoices.map((item, index: number) => ({
         id: index,
         date: item.sentDate ? formatDate(toDate(item.sentDate)) : '-',
-        number: item.externalId,
+        number: item.externalId !== '' ? item.externalId : 'Unassigned',
         order: item.serviceOrder?.number,
         customer: item.propertyOwner.name,
         type: item.serviceOrder?.type,

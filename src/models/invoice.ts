@@ -21,6 +21,7 @@ export enum InvoiceStatus {
   DRAFT = 'DRAFT',
   EXPIRED = 'EXPIRED',
   PARTIALLY_PAID = 'PARTIALLY_PAID',
+  CANCELLED = 'CANCELLED',
 }
 
 export enum InvoiceCycle {
@@ -37,6 +38,7 @@ export enum InvoiceStatusView {
   DRAFT = 'Draft',
   EXPIRED = 'Overdue',
   PARTIALLY_PAID = 'Partially Paid',
+  CANCELLED = 'Cancelled',
 }
 
 export interface InvoiceItem {

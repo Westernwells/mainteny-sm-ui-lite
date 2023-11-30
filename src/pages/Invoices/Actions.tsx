@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import SendIcon from '@mui/icons-material/Send';
+import CancelIcon from '@mui/icons-material/Cancel';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Print from '@mui/icons-material/Print';
 import Payments from '@mui/icons-material/Payments';
@@ -23,12 +24,17 @@ import {Confirm} from 'components/Confirm';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
 import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
-import {useDeleteInvoice, usePublishInvoice} from 'hooks/reactQuery/useInvoice';
+import {
+  useCancelInvoice,
+  useDeleteInvoice,
+  usePublishInvoice,
+} from 'hooks/reactQuery/useInvoice';
 import {InvoiceStatus, InvoiceView, InvoiceType} from 'models/invoice';
 import {PdfGenerationStatus} from 'models/misc';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useSnackbar} from 'hooks/useSnackbar';
-import {isAfter, isBefore, parseISO, startOfDay} from 'date-fns';
+import CustomSnackbar from 'components/CustomSnackbar';
+import {isBefore, parseISO, startOfDay} from 'date-fns';
 
 interface Props {
   invoice: InvoiceView;
@@ -55,9 +61,11 @@ const Tooltip = ({children, ...props}: TooltipProps) => (
 export const Actions = ({invoice, downloadUrl}: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
+  const {enqueueSnackbar} = useSnackbar();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isCancelledDialogOpen, setIsCancelledDialogOpen] = useState(false);
   const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
     useState(false);
   const [isCreateCreditNoteDialogOpen, setIsCreateCreditNoteDialogOpen] =
@@ -73,8 +81,8 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
     pdfPathToDownload ? [pdfPathToDownload] : [],
   );
 
-  const {mutate: deleteInvoice} = useDeleteInvoice();
-  const {enqueueSnackbar} = useSnackbar();
+  const {mutateAsync: deleteInvoice} = useDeleteInvoice();
+  const {mutateAsync: cancelInvoice} = useCancelInvoice();
 
   const isInvoicePDFGenerated =
     invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
@@ -98,6 +106,31 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const cancelItem = {
+    label: t('Cancel'),
+    icon: <CancelIcon />,
+    onClick: () => {
+      setIsCancelledDialogOpen(true);
+    },
+  };
+
+  const previewItem = {
+    label: t('Preview'),
+    icon: <RemoveRedEye />,
+    onClick: () => {
+      navigate(`/invoices/details/${invoice.id}`);
+    },
+  };
+
+  const downloadItem = {
+    label: t('Download'),
+    icon: <FileDownload />,
+    onClick: () => {
+      setPdfPathToDownload(invoice.additionalInfo.pdfPath);
+    },
+  };
+
   const action = useMemo(() => {
     if (invoice.status === InvoiceStatus.DRAFT) {
       return (
@@ -140,59 +173,28 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
 
   const actions = useMemo(() => {
     const items = [];
-    if (invoice.status === InvoiceStatus.EXPIRED) {
-      items.unshift({
-        label: t('Send Overdue Notice'),
-        icon: <SendIcon />,
-        onClick: () => navigate(`/invoices/${invoice.id}/overdue-notice`),
-      });
-    }
-    if (isInvoicePDFGenerated && invoice.status === InvoiceStatus.DRAFT) {
-      items.unshift({
-        label: t('Print'),
-        icon: <Print />,
-        onClick: () => setIsConfirmPrintDialogOpen(true),
-      });
-    } else if (
-      invoice.status === InvoiceStatus.NOT_PAID ||
-      invoice.status === InvoiceStatus.EXPIRED ||
-      invoice.status === InvoiceStatus.PARTIALLY_PAID
-    ) {
-      items.push({
-        label: t('Payment'),
-        icon: <Payments />,
-        onClick: () => setIsDialogOpen(true),
-      });
-    }
-    if (invoice.status !== InvoiceStatus.DRAFT) {
-      items.push({
-        label: t('Create Credit note'),
-        icon: <Payments />,
-        onClick: () => setIsCreateCreditNoteDialogOpen(true),
-      });
-    }
-    if (invoice.status !== InvoiceStatus.PAID) {
-      items.push({
-        label: t('Preview'),
-        icon: <RemoveRedEye />,
-        onClick: () => {
-          navigate(`/invoices/details/${invoice.id}`);
+
+    if (invoice.status === InvoiceStatus.CANCELLED) {
+      items.push(
+        previewItem,
+        {
+          label: t('Send'),
+          icon: <SendIcon />,
+          onClick: () => {
+            setIsSendEmailDialogOpen(true);
+          },
         },
-      });
-    }
-    items.push(
-      ...[
-        ...(isInvoicePDFGenerated
-          ? [
-              {
-                label: t('Download'),
-                icon: <FileDownload />,
-                onClick: () => {
-                  setPdfPathToDownload(invoice.additionalInfo.pdfPath);
-                },
-              },
-            ]
-          : []),
+        ...(isInvoicePDFGenerated ? [downloadItem] : []),
+      );
+    } else if (invoice.status === InvoiceStatus.DRAFT) {
+      items.push(
+        previewItem,
+        {
+          label: t('Print'),
+          icon: <Print />,
+          onClick: () => setIsConfirmPrintDialogOpen(true),
+        },
+        ...(isInvoicePDFGenerated ? [downloadItem] : []),
         {
           label: t('Edit'),
           icon: <Edit />,
@@ -200,28 +202,115 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
             navigate(`/invoices/details/${invoice.id}/edit`);
           },
         },
-      ],
-    );
-    if (
-      ![
-        InvoiceStatus.NOT_PAID,
-        InvoiceStatus.EXPIRED,
-        InvoiceStatus.PARTIALLY_PAID,
-      ].includes(invoice.status)
-    ) {
-      items.push({
-        label: t('Delete'),
-        icon: <DeleteIcon />,
-        onClick: () => {
-          setIsDeleteDialogOpen(true);
+        {
+          label: t('Delete'),
+          icon: <DeleteIcon />,
+          onClick: () => {
+            setIsDeleteDialogOpen(true);
+          },
         },
-      });
+      );
+    } else if (invoice.status === InvoiceStatus.NOT_PAID) {
+      items.push(
+        {
+          label: t('Preview'),
+          icon: <RemoveRedEye />,
+          onClick: () => {
+            navigate(`/invoices/details/${invoice.id}`);
+          },
+        },
+        {
+          label: t('Payment'),
+          icon: <Payments />,
+          onClick: () => setIsDialogOpen(true),
+        },
+        {
+          label: t('Create Credit note'),
+          icon: <Payments />,
+          onClick: () => setIsCreateCreditNoteDialogOpen(true),
+        },
+        ...(isInvoicePDFGenerated ? [downloadItem] : []),
+        cancelItem,
+      );
+    } else if (invoice.status === InvoiceStatus.EXPIRED) {
+      items.push(
+        {
+          label: t('Preview'),
+          icon: <RemoveRedEye />,
+          onClick: () => {
+            navigate(`/invoices/details/${invoice.id}`);
+          },
+        },
+        {
+          label: t('Send Overdue Notice'),
+          icon: <SendIcon />,
+          onClick: () => navigate(`/invoices/${invoice.id}/overdue-notice`),
+        },
+        {
+          label: t('Payment'),
+          icon: <Payments />,
+          onClick: () => setIsDialogOpen(true),
+        },
+        {
+          label: t('Create Credit note'),
+          icon: <Payments />,
+          onClick: () => setIsCreateCreditNoteDialogOpen(true),
+        },
+        ...(isInvoicePDFGenerated ? [downloadItem] : []),
+        cancelItem,
+      );
+    } else if (invoice.status === InvoiceStatus.PAID) {
+      items.push(
+        {
+          label: t('Preview'),
+          icon: <RemoveRedEye />,
+          onClick: () => {
+            navigate(`/invoices/details/${invoice.id}`);
+          },
+        },
+        {
+          label: t('Create Credit note'),
+          icon: <Payments />,
+          onClick: () => setIsCreateCreditNoteDialogOpen(true),
+        },
+        ...(isInvoicePDFGenerated ? [downloadItem] : []),
+      );
+    } else if (invoice.status === InvoiceStatus.PARTIALLY_PAID) {
+      items.push(
+        {
+          label: t('Preview'),
+          icon: <RemoveRedEye />,
+          onClick: () => {
+            navigate(`/invoices/details/${invoice.id}`);
+          },
+        },
+        {
+          label: t('Payment'),
+          icon: <Payments />,
+          onClick: () => setIsDialogOpen(true),
+        },
+        {
+          label: t('Send Overdue Notice'),
+          icon: <SendIcon />,
+          onClick: () => navigate(`/invoices/${invoice.id}/overdue-notice`),
+        },
+        {
+          label: t('Create Credit note'),
+          icon: <Payments />,
+          onClick: () => setIsCreateCreditNoteDialogOpen(true),
+        },
+        ...(isInvoicePDFGenerated ? [downloadItem] : []),
+      );
     }
+
     if (invoice.sentDate) {
-      return items.filter((item) => item.label !== t('Edit'));
+      return items.filter(
+        (item) => item.label !== t('Edit') && item.label !== t('Delete'),
+      );
     }
+
     return items;
-  }, [downloadUrl]);
+  }, [downloadUrl, invoice.status]);
 
   const isDueDateInPast = () => {
     const localDueDate = invoice.dueDate as string;
@@ -358,13 +447,57 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
         open={isDeleteDialogOpen}
         onConfirm={() => {
           if (invoice.id)
-            deleteInvoice({invoiceId: invoice.id, shouldNavigate: false});
+            deleteInvoice(
+              {invoiceId: invoice.id, shouldNavigate: false},
+              {
+                onSuccess: () => {
+                  enqueueSnackbar(
+                    <CustomSnackbar
+                      message="Invoice deleted"
+                      snackIcon="delete"
+                    />,
+                    {
+                      variant: 'info',
+                      anchorOrigin: {horizontal: 'right', vertical: 'bottom'},
+                    },
+                  );
+                },
+              },
+            );
           setIsDeleteDialogOpen(false);
         }}
         onClose={() => setIsDeleteDialogOpen(false)}
         title="Delete Invoice"
-        content="Do you want to delete this Invoice?"
-        helperText="This action is irreversible."
+        content="You are about to permanently delete this invoice."
+        secondContent="This action is irreversible."
+        helperText="Are you sure you want to proceed?"
+      />
+
+      <Confirm
+        open={isCancelledDialogOpen}
+        onConfirm={() => {
+          if (invoice.id)
+            cancelInvoice(invoice.id, {
+              onSuccess: () => {
+                enqueueSnackbar(
+                  <CustomSnackbar
+                    message="Invoice cancelled"
+                    snackIcon="cancel"
+                  />,
+                  {
+                    variant: 'info',
+                    anchorOrigin: {horizontal: 'right', vertical: 'bottom'},
+                  },
+                );
+              },
+            });
+
+          setIsCancelledDialogOpen(false);
+        }}
+        onClose={() => setIsCancelledDialogOpen(false)}
+        title="Cancel Invoice"
+        content="You are about to cancel this invoice."
+        helperText="Are you sure you want to proceed?"
       />
 
       <ConfirmPrintInvoice

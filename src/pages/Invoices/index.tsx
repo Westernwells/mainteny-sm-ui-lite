@@ -28,6 +28,9 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {DataSyncType} from 'models/service-company';
 import useLastSyncedItem from 'hooks/useLastSyncedItem';
 import {useCompanyXeroInfo} from 'hooks/reactQuery/useCompanies';
+import {Alert, Typography} from '@mui/material';
+import {theme} from 'theme';
+import {useTranslation} from 'react-i18next';
 import {Widget} from '../../components/Widget';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
 import {columns, makeRows} from './InvoicesDataGridProps';
@@ -35,6 +38,7 @@ import {columns, makeRows} from './InvoicesDataGridProps';
 const pageSize = 25;
 
 export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
+  const {t} = useTranslation();
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
@@ -238,6 +242,13 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
           filterItems={renderFilterItems()}
         />
       }>
+      <Alert sx={{m: '1em 0em'}} severity="info">
+        <Typography color={theme.palette.info.infoAlert}>
+          {t(
+            'Please note that cancelled invoices remain accessible on this dashboard. You can view and manage them here.',
+          )}
+        </Typography>
+      </Alert>
       <DataGridLayout
         rows={rows || []}
         columns={columns}
