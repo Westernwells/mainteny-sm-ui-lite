@@ -17,7 +17,7 @@ const CustomToolBar = ({toolBarTitle, onClose, isDatePicker}: Props) => {
       style={{
         display: 'flex',
         justifyContent: 'space-between',
-        margin: '0em 1em 0em 1em',
+        margin: isDatePicker ? '0em 1em 0em 1.3em' : '0em 1em 0em 1.7em',
         padding: '1em 0em 0em 0em',
         alignItems: 'center',
         position: 'relative',

@@ -54,8 +54,8 @@ export const TimePicker = ({
 
   const popperSx: SxProps = {
     '& .MuiPickersPopper-paper': {
-      width: '245px',
-      height: '400px',
+      width: '215px',
+      height: '368px',
     },
     '& .MuiPickersLayout-root': {
       display: 'flex',
@@ -98,18 +98,31 @@ export const TimePicker = ({
       left: '38%',
       textAlign: 'center',
     },
+    '& .MuiPickersLayout-contentWrapper': {
+      height: '253px',
+    },
     '& .MuiPickersLayout-contentWrapper > .MuiMultiSectionDigitalClock-root': {
       display: 'flex',
       justifyContent: 'center',
       overflow: 'hidden',
+      borderBottom: 'none',
+      padding: '0 24px',
     },
     '& .MuiMultiSectionDigitalClock-root > .MuiList-padding:nth-child(1)': {
       borderLeft: '1px solid #8F9BB380',
+      borderBottom: '1px solid #8F9BB380',
+      borderTopLeftRadius: '4px',
+      borderBottomLeftRadius: '4px',
+    },
+    '& .MuiMultiSectionDigitalClock-root > .MuiList-padding:nth-child(2)': {
+      borderBottom: '1px solid #8F9BB380',
+      borderTopRightRadius: '4px',
+      borderBottomRightRadius: '4px',
     },
     '& .MuiMultiSectionDigitalClock-root > .MuiList-padding': {
       borderRight: '1px solid #8F9BB380',
       borderTop: '1px solid #8F9BB380',
-      width: '83px',
+      width: '82px',
       overflowY: 'scroll',
       maxHeight: '260px',
       marginTop: '1em',
@@ -122,7 +135,7 @@ export const TimePicker = ({
     },
     '& .MuiMultiSectionDigitalClock-root > .MuiMultiSectionDigitalClock-root > .MuiButtonBase-root':
       {
-        padding: '0.75em 0.4em',
+        padding: '0.3em 0.4em',
         width: '100%',
         margin: '0',
 
@@ -130,12 +143,25 @@ export const TimePicker = ({
           background: '#00D1FF80',
         },
       },
+    '& .MuiMultiSectionDigitalClock-root > .MuiMultiSectionDigitalClock-root': {
+      '&::after': {
+        height: 0,
+      },
+    },
   };
 
   const renderToolbar = (label: ReactNode) => (
     <CustomToolbar
       toolBarTitle={label}
       onClose={handleClose}
+      isDatePicker={false}
+    />
+  );
+
+  const renderActionBar = () => (
+    <CustomActionBar
+      onAccept={handleClose}
+      onClear={handleClose}
       isDatePicker={false}
     />
   );
@@ -179,7 +205,7 @@ export const TimePicker = ({
           }}
           slots={{
             toolbar: () => renderToolbar(textFieldProps?.label),
-            actionBar: CustomActionBar,
+            actionBar: () => renderActionBar(),
           }}
           value={value}
           onChange={(newValue) => {
