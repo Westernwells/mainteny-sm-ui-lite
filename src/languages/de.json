@@ -606,6 +606,7 @@
   "Edit Service": "Service bearbeiten",
   "Visits per Year": "Wartung pro Jahr",
   "Required Time": "Wartungszeit",
+  "Cancel Job": "Auftrag stornieren",
   "Edit Appointment Preferences": "Terminpräferenzen bearbeiten",
   "Do you want to delete this techinician?": "Willst du diesen Techniker löschen?",
   "Edit Priority Engineers": "Prioritäts Techniker bearbeiten",
@@ -1916,5 +1917,10 @@
   "Invoice deleted": "Rechnung wurde gelöscht ",
   "You are about to cancel this invoice.": "Sie sind dabei, diese Rechnung zu stornieren.",
   "Invoice cancelled": "Rechnung wurde storniert",
-  "Unassigned": "Nicht zugewiesen"
+  "Unassigned": "Nicht zugewiesen",
+  "Emergency order created successfully": "Personeneinschluss-Auftrag erfolgreich erstellt",
+  "Selected technicians below will be contacted by phone automatically": "Die unten ausgewählten Techniker werden automatisch telefonisch kontaktiert",
+  "Technicians": "Techniker",
+  "Recommended Technician": "Empfohlener Techniker",
+  "No reached-out technicians accepted the order. Please assign manually": "Keiner der kontaktierten Techniker nahm den Auftrag an. Bitte manuell zuweisen"
 }
