@@ -146,7 +146,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
     ) {
       return [
         {
-          label: t('Cancel'),
+          label: t('Cancel Job'),
           action: () => setOpenCancelConfirm(true),
         },
         {
@@ -175,7 +175,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
           action: () => setOpenMarkCompletedDialog(true),
         },
         {
-          label: t('Cancel'),
+          label: t('Cancel Job'),
           action: () => setOpenCancelConfirm(true),
         },
       ];
