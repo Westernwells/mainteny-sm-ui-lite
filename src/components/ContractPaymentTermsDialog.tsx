@@ -35,19 +35,18 @@ interface Props {
   title: string;
 }
 
-const validationSchema = Yup.object().shape({
-  otherPaymentTerms: Yup.array().of(
-    Yup.object().shape({
-      id: Yup.string(),
-      term: Yup.string().min(1).required('Payment term is required'),
-    }),
-  ),
-});
-
 const pageSize = 50;
 
 export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
   const {t} = useTranslation();
+  const validationSchema = Yup.object().shape({
+    otherPaymentTerms: Yup.array().of(
+      Yup.object().shape({
+        id: Yup.string(),
+        term: Yup.string().min(1).required(t('Payment term is required')),
+      }),
+    ),
+  });
   const {user} = useUserSession();
   const [isShow, setIsShow] = useState(false);
   const [paymentTermId, setPaymentTermId] = useState('');

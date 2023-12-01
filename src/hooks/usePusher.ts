@@ -4,6 +4,7 @@ import * as PusherTypes from 'pusher-js';
 import {getStoredUser} from 'userStorage';
 import {UserSession} from 'models/session';
 import {MessageType} from 'models/notification';
+import {useTranslation} from 'react-i18next';
 import {useSnackbar} from './useSnackbar';
 
 const useEvent = <D>(
@@ -29,6 +30,7 @@ export const usePusher = ({
 }: {
   onMessageReceived: (event: MessageType | string) => void;
 }) => {
+  const {t} = useTranslation();
   const {enqueueSnackbar} = useSnackbar();
   const [channel, setChannel] = useState<PusherTypes.Channel>();
 
@@ -37,7 +39,9 @@ export const usePusher = ({
     MessageType.NON_TECHNICIAN_ASSIGNMENT_FOR_SERVICE_ORDER,
     () => {
       enqueueSnackbar(
-        'No reached-out technicians accepted the order. Please assign manually.',
+        t(
+          'No reached-out technicians accepted the order. Please assign manually',
+        ),
         {
           variant: 'warning',
         },

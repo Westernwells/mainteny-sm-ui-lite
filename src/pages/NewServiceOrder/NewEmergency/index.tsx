@@ -13,6 +13,7 @@ import {EmployeesView} from 'models/employee';
 import {toRestDateTime} from 'utils/datetime';
 import {useNavigate} from 'react-router-dom';
 import {QuotationView} from 'models/quotation';
+import {useTranslation} from 'react-i18next';
 import {AddDescription} from '../AddDescription';
 import {SelectTechnicians} from '../SelectTechnicians';
 import {SelectUnit} from '../SelectUnit';
@@ -25,6 +26,7 @@ interface Props {
 const steps = ['Select unit', 'Select technicians', 'Add description'];
 
 export const NewEmergency = ({quotation}: Props) => {
+  const {t} = useTranslation();
   const [activeStep, setActiveStep] = useState(0);
   const [selectedUnit, setSelectedUnit] = useState<ElevatorView>();
   const [disableNextBtn, setDisableNextBtn] = useState(false);
@@ -32,7 +34,7 @@ export const NewEmergency = ({quotation}: Props) => {
   const navigate = useNavigate();
   const [description, setDescription] = useState('');
   const {mutateAsync: createEmergencyOrder} = useAssignmentBasedOrder(
-    'Emergency order created successfully',
+    t('Emergency order created successfully'),
   );
   const [recommendedTechnicians, setRecommendedTechnicians] = useState<
     EmployeesView[]
