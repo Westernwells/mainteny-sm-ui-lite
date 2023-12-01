@@ -224,6 +224,14 @@ export const DatePicker = ({
   const renderToolbar = (label: ReactNode) => (
     <CustomToolbar toolBarTitle={label} onClose={handleClose} isDatePicker />
   );
+
+  const renderActionBar = () => (
+    <CustomActionBar
+      onAccept={handleClose}
+      onClear={handleClose}
+      isDatePicker
+    />
+  );
   return (
     <Box sx={{...containerStyles}}>
       <LocalizationProvider
@@ -268,7 +276,7 @@ export const DatePicker = ({
           }}
           slots={{
             toolbar: () => renderToolbar(textFieldProps?.label),
-            actionBar: CustomActionBar,
+            actionBar: () => renderActionBar(),
           }}
           format={
             dateFormat || user?.userAccount.serviceCompany.settings.dateFormat
