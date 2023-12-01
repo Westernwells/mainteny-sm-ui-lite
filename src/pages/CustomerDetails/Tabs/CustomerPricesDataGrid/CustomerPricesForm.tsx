@@ -1,4 +1,3 @@
-import {useState} from 'react';
 import {FormikHelpers, useFormik} from 'formik';
 import * as Yup from 'yup';
 import Grid from '@mui/material/Grid';
@@ -7,15 +6,12 @@ import InputAdornment from '@mui/material/InputAdornment';
 import {FormInput} from 'components/form/FormInput';
 import {Dialog} from 'components/Dialog';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
-import {ComboBox} from 'components/ComboBox';
 import {
   ArticleType,
   ArticleView,
   PropertyOwnerArticleRecord,
 } from 'models/article';
-import {CacheTypes} from 'models/misc';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {useCacheValues} from 'hooks/reactQuery/useElevator';
 import {
   amountForView,
   amountRecordForBackend,
@@ -23,8 +19,10 @@ import {
   makeAmountRecord,
   useCurrentCurrency,
 } from 'utils/currency';
-import {createEmptyResource} from 'utils/paging-utils';
 import {convertToText} from 'utils/utils';
+import {MeasurementUnit} from 'models/articleForm';
+import {FormSelect} from 'components/form/FormSelect';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   title: string;
@@ -64,17 +62,7 @@ export const CustomerPricesForm = ({
 }: Props) => {
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
-  const [modelQuery, setModelQuery] = useState('');
-  const {data: elevatorModelsResource = createEmptyResource<string>()} =
-    useCacheValues(
-      {
-        pageIndex: 0,
-        pageSize: 10,
-        query: modelQuery,
-      },
-      CacheTypes.ELEVATOR_MODEL,
-    );
-
+  const {t} = useTranslation();
   const percentageVat =
     user?.userAccount?.serviceCompany?.settings?.percentageVat ?? 0;
 
@@ -201,29 +189,23 @@ export const CustomerPricesForm = ({
         </Grid>
 
         <Grid item xs={12}>
-          <ComboBox
-            options={elevatorModelsResource.data.map((item) => ({
+          <FormSelect
+            labelId="select-unit-label"
+            label="Unit"
+            options={Object.keys(MeasurementUnit).map((item) => ({
               label: item,
               value: item,
             }))}
-            getValue={(item) => setFieldValue('unit', item?.value)}
-            initialValue={
-              values.unit
-                ? {
-                    label: values.unit,
-                    value: values.unit,
-                  }
-                : null
-            }
-            initialQuery={values.unit}
-            getQuery={(item) => setModelQuery(item || '')}
-            textFieldProps={{
+            selectProps={{
+              id: 'select-unit',
+              value: values.unit,
+              onChange: handleChange,
+              error: !!(touched.unit && errors.unit),
+              placeholder: t('Select Unit'),
               name: 'unit',
               label: 'Unit',
-              placeholder: 'Select Unit',
-              error: !!(touched.unit && errors.unit),
-              ...defaultProps,
             }}
+            required
           />
         </Grid>
 
