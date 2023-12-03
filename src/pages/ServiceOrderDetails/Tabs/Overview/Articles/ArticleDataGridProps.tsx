@@ -92,11 +92,13 @@ export const makeRows = (articles: ServiceOrderArticleView[]): GridRowsProp =>
     total: formatCurrency(
       (item.unitAmount.netAmount * item.quantity) /
         10 ** item.unitAmount.fractionDigits!,
+      {currency: item.unitAmount.currency},
     ),
     model: item.article.model,
     supplier: item.article.manufacturer,
     unitPrice: formatCurrency(
       item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!,
+      {currency: item.unitAmount.currency},
     ),
     quantity: item.quantity,
     actions: item,
