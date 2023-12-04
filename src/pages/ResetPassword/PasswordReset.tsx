@@ -4,7 +4,6 @@ import {useNavigate} from 'react-router-dom';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
-import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -13,6 +12,10 @@ import InputAdornment from '@mui/material/InputAdornment';
 import CircularProgress from '@mui/material/CircularProgress';
 import {useResetPassword} from 'hooks/useResetPassword';
 import {AuthLayout} from 'components/AuthLayout';
+import {useTheme} from '@mui/material/styles';
+import CloseIcon from '@mui/icons-material/Close';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import {SUCCESS_COLOR} from 'theme';
 
 interface Props {
   handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -49,7 +52,7 @@ export const PasswordReset = ({
 }: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
-
+  const theme = useTheme();
   const [reEnterPassword, setReEnterPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -164,44 +167,54 @@ export const PasswordReset = ({
               {!reEnterPassword ? (
                 <>
                   <Box mt={1} display="flex">
-                    <CheckCircleRounded
-                      color={password.length >= 8 ? 'success' : 'disabled'}
-                    />
+                    {password.length >= 8 ? (
+                      <CheckCircleOutlineIcon htmlColor={SUCCESS_COLOR} />
+                    ) : (
+                      <CloseIcon color="error" />
+                    )}
                     <Typography
                       variant="body1"
                       ml={1}
-                      color={password.length >= 8 ? 'body1' : 'text.disabled'}>
+                      color={
+                        password.length >= 8
+                          ? SUCCESS_COLOR
+                          : theme.palette.error.light
+                      }>
                       {t('Password should contain at least 8 characters')}
                     </Typography>
                   </Box>
 
                   <Box mt={1} display="flex">
-                    <CheckCircleRounded
-                      color={password.match(/\d/) ? 'success' : 'disabled'}
-                    />
+                    {password.match(/\d/) ? (
+                      <CheckCircleOutlineIcon htmlColor={SUCCESS_COLOR} />
+                    ) : (
+                      <CloseIcon color="error" />
+                    )}
                     <Typography
                       variant="body1"
                       ml={1}
-                      color={password.match(/\d/) ? 'body1' : 'text.disabled'}>
+                      color={
+                        password.match(/\d/)
+                          ? SUCCESS_COLOR
+                          : theme.palette.error.light
+                      }>
                       {t('Password should contain at least 1 number')}
                     </Typography>
                   </Box>
 
                   <Box mt={1} display="flex">
-                    <CheckCircleRounded
-                      color={
-                        password.match(/[!@#$%^&*(),.?":{}|<>_]/g)
-                          ? 'success'
-                          : 'disabled'
-                      }
-                    />
+                    {password.match(/[!@#$%^&*(),.?":{}|<>_]/g) ? (
+                      <CheckCircleOutlineIcon htmlColor={SUCCESS_COLOR} />
+                    ) : (
+                      <CloseIcon color="error" />
+                    )}
                     <Typography
                       variant="body1"
                       ml={1}
                       color={
                         password.match(/[!@#$%^&*(),.?":{}|<>_]/g)
-                          ? 'body1'
-                          : 'text.disabled'
+                          ? SUCCESS_COLOR
+                          : theme.palette.error.light
                       }>
                       {t('Password should contain at least 1 symbol')}
                     </Typography>

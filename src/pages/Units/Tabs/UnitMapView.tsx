@@ -18,6 +18,7 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useTheme} from '@mui/system';
 
 export const UnitMapsView = () => {
   const formatDate = useFormatDate();
@@ -46,6 +47,7 @@ export const UnitMapsView = () => {
     centerCoord: Location;
   }>(fallback);
   const textInput = useRef<HTMLInputElement>(null);
+  const theme = useTheme();
 
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
@@ -325,19 +327,14 @@ export const UnitMapsView = () => {
                   sx={{
                     width: `${10 + (pointCount / points.length) * 60}px`,
                     height: `${10 + (pointCount / points.length) * 60}px`,
-                    p: '1.5em',
+                    p: '2em',
                     borderRadius: '50%',
-                    background:
-                      pointCount > 0 && pointCount <= 10
-                        ? '#007bff'
-                        : pointCount > 10 && pointCount <= 100
-                        ? '#ffc107'
-                        : pointCount > 100 && pointCount <= 1000
-                        ? '#dc3545'
-                        : '#e83e8c',
+                    background: theme.palette.action.active,
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
+                    color: 'white',
+                    border: '2px solid white',
                   }}>
                   <Typography>{pointCount}</Typography>
                 </Box>

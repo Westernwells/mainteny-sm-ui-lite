@@ -74,7 +74,7 @@ export const WorkHourIcons = ({workHourType, style, size}: Props) => {
       );
     case WorkHoursType.OFFICE_HOURS:
       return (
-        <TimelapseIcon fontSize={size} sx={{color: '#4CAF50', ...style}} />
+        <TimelapseIcon fontSize={size} sx={{color: '#00D68F', ...style}} />
       );
     case WorkHoursType.SICK_LEAVE:
       return <SickIcon fontSize={size} sx={{color: '#8F9BB3', ...style}} />;

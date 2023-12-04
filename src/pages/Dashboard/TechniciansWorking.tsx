@@ -64,7 +64,7 @@ export const TechniciansWorking = ({
                       ? theme.palette.info.main
                       : technician.status === EmployeeStatus.SICK_LEAVE
                       ? theme.palette.warning.main
-                      : theme.palette.primary.main,
+                      : theme.palette.primary.mainLight,
                 }}
               />
             }>

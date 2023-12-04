@@ -10,7 +10,7 @@ import {toDate} from './datetime';
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
   switch (status) {
     case ServiceOrderStatus.SCHEDULED:
-      return 'primary';
+      return 'primary.mainLight';
     case ServiceOrderStatus.IN_PROGRESS:
       return 'warning';
     case ServiceOrderStatus.CANCELLED:

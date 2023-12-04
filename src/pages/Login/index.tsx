@@ -5,11 +5,12 @@ import {useFormik} from 'formik';
 import {useLocation} from 'react-router-dom';
 import queryString from 'query-string';
 import * as Yup from 'yup';
-import {ReactComponent as CheckMark} from 'assets/icons/CheckMark.svg';
 import {useAuth} from 'hooks/useAuth';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {AuthLayout} from 'components/AuthLayout';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import {SUCCESS_COLOR} from 'theme';
 import {LoginForm} from './components/LoginForm';
 
 export const Login = () => {
@@ -41,17 +42,26 @@ export const Login = () => {
   return (
     <AuthLayout>
       {authType === 'reset' ? (
-        <Box display="flex" justifyContent="center">
+        <Box
+          sx={{background: '#2A796133', padding: 3, mt: 4}}
+          display="flex"
+          alignItems="center"
+          justifyContent="center">
           <Box
             display="flex"
             flexDirection="column"
             justifyContent="flex-end"
             mr={2}>
-            <CheckMark />
+            <CheckCircleOutlineIcon
+              htmlColor={SUCCESS_COLOR}
+              sx={{width: 33, height: 33}}
+            />
           </Box>
-          <Typography variant="h4" mt={7}>
-            {t('Password created successfully')}
-          </Typography>
+          <Box>
+            <Typography color={SUCCESS_COLOR} variant="h5">
+              {t('Password created successfully')}
+            </Typography>
+          </Box>
         </Box>
       ) : null}
 

@@ -139,7 +139,7 @@ export const columns = (
           return (
             <StatusChip
               label="Invitation sent"
-              style={{background: theme.palette.primary.main}}
+              style={{background: theme.palette.primary.mainLight}}
             />
           );
         default:

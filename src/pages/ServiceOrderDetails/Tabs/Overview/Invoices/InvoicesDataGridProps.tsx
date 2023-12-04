@@ -18,6 +18,7 @@ export const getInvoiceStatusStyles = (
     | 'error'
     | 'info'
     | 'success'
+    | 'action.active'
     | 'warning'
     | 'warning.dark';
 } => {
@@ -25,11 +26,11 @@ export const getInvoiceStatusStyles = (
     case InvoiceStatus.PAID:
       return {label: 'Paid', color: 'success'};
     case InvoiceStatus.DRAFT:
-      return {label: 'Draft', color: 'default'};
+      return {label: 'Draft', color: 'action.active'};
     case InvoiceStatus.EXPIRED:
       return {label: 'Overdue', color: 'error'};
     case InvoiceStatus.NOT_PAID:
-      return {label: 'Unpaid', color: 'primary'};
+      return {label: 'Unpaid', color: 'warning'};
     case InvoiceStatus.CANCELLED:
       return {label: 'Cancelled', color: 'warning.dark'};
     case InvoiceStatus.PARTIALLY_PAID:

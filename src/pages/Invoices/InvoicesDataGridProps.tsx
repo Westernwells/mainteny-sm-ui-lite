@@ -28,9 +28,13 @@ export const getInvoiceStatusStyles = (
     | 'primary'
     | 'secondary'
     | 'error'
+    | 'error.light'
     | 'info'
     | 'success'
     | 'warning'
+    | 'warning.light'
+    | 'action.active'
+    | 'primary.mainLight'
     | 'action.active'
     | 'warning.dark';
 } => {
@@ -40,11 +44,11 @@ export const getInvoiceStatusStyles = (
     case InvoiceStatus.DRAFT:
       return {label: InvoiceStatusView.DRAFT, color: 'action.active'};
     case InvoiceStatus.EXPIRED:
-      return {label: InvoiceStatusView.EXPIRED, color: 'error'};
+      return {label: InvoiceStatusView.EXPIRED, color: 'error.light'};
     case InvoiceStatus.NOT_PAID:
-      return {label: InvoiceStatusView.NOT_PAID, color: 'primary'};
+      return {label: InvoiceStatusView.NOT_PAID, color: 'primary.mainLight'};
     case InvoiceStatus.PARTIALLY_PAID:
-      return {label: InvoiceStatusView.PARTIALLY_PAID, color: 'warning'};
+      return {label: InvoiceStatusView.PARTIALLY_PAID, color: 'warning.light'};
     case InvoiceStatus.CANCELLED:
       return {label: InvoiceStatusView.CANCELLED, color: 'warning.dark'};
     default:

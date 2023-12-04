@@ -835,6 +835,7 @@ export const InvoiceForm = ({
                       <FormLabel text={t('Customer')} required />
                       <Button
                         label="Add New Customer"
+                        style={{color: theme.palette.primary.light}}
                         buttonProps={{
                           size: 'small',
                           startIcon: <AddIcon />,

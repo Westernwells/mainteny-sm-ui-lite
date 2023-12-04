@@ -23,7 +23,7 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
       case 'customer':
         return (
           <CardProps
-            icon={<PeopleIcon sx={{color: theme.palette.info.dark}} />}
+            icon={<PeopleIcon sx={{color: theme.palette.info.main}} />}
             label="CUSTOMER"
             bodyText={serviceOrderDetails.elevator.propertyOwner.name || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
@@ -34,7 +34,7 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
       case 'unitNumber':
         return (
           <CardProps
-            icon={<Grid3x3Icon sx={{color: theme.palette.info.dark}} />}
+            icon={<Grid3x3Icon sx={{color: theme.palette.info.main}} />}
             label="UNIT NUMBER"
             bodyText={serviceOrderDetails.elevator.externalId || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
@@ -45,7 +45,7 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
       case 'unitAddress':
         return (
           <CardProps
-            icon={<HomeIcon sx={{color: theme.palette.info.dark}} />}
+            icon={<HomeIcon sx={{color: theme.palette.info.main}} />}
             label="UNIT ADDRESS"
             bodyText={serviceOrderDetails.elevator.address.fullName || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
@@ -56,7 +56,7 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
       case 'dueDate':
         return (
           <CardProps
-            icon={<FlagIcon sx={{color: theme.palette.info.dark}} />}
+            icon={<FlagIcon sx={{color: theme.palette.info.main}} />}
             label="DUE DATE"
             bodyText={formatDate(new Date(serviceOrderDetails.dueDate)) || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
@@ -67,7 +67,7 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
       case 'schedule':
         return (
           <CardProps
-            icon={<TimelapseIcon sx={{color: theme.palette.info.dark}} />}
+            icon={<TimelapseIcon sx={{color: theme.palette.info.main}} />}
             label="SCHEDULE"
             bodyText={
               serviceOrderDetails.schedules &&
@@ -88,7 +88,7 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
       case 'technicians':
         return (
           <CardProps
-            icon={<ManageAccountsIcon sx={{color: theme.palette.info.dark}} />}
+            icon={<ManageAccountsIcon sx={{color: theme.palette.info.main}} />}
             label="TECHNICIAN"
             bodyText={
               serviceOrderDetails.schedules &&

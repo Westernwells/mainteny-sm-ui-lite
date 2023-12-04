@@ -1,5 +1,6 @@
 import {ReactNode, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import useTheme from '@mui/material/styles/useTheme';
 import {FormikProps} from 'formik';
 import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
@@ -40,6 +41,7 @@ export const SelectAndEditCombined = ({
 }: Props) => {
   const {t} = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const theme = useTheme();
 
   const initialValues: AddressRecord | undefined = useMemo(
     () => formik.values[addressType],
@@ -75,6 +77,7 @@ export const SelectAndEditCombined = ({
                 sx: {
                   display: 'inline-flex',
                   mt: '10px',
+                  color: theme.palette.primary.light,
                 },
               }}
             />

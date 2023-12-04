@@ -7,6 +7,7 @@ import {FileWithPath, useDropzone, FileRejection} from 'react-dropzone';
 import useTheme from '@mui/material/styles/useTheme';
 import {Cropper} from 'react-cropper';
 import 'styles/cropper.css';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 import {Dialog} from 'components/Dialog';
 import {Button} from '../Button';
@@ -260,14 +261,20 @@ export const MyDropZone = ({
           borderRadius: '4px',
         }}>
         <input {...getInputProps()} />
+        <CloudUploadIcon
+          htmlColor={theme.palette.action.disabled}
+          sx={{width: 50, height: 50}}
+        />
         <Box sx={{display: 'flex', alignItems: 'center'}}>
           <Button
             label={t('Select file to upload')}
-            style={{textTransform: 'inherit'}}
+            style={{
+              textTransform: 'inherit',
+              color: theme.palette.primary.light,
+            }}
             buttonProps={{
               variant: 'text',
               size: 'medium',
-              color: 'primary',
               onClick: open,
             }}
           />

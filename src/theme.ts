@@ -3,9 +3,10 @@ import {createTheme} from '@mui/material/styles';
 export const theme = createTheme({
   palette: {
     primary: {
-      light: '#457892',
+      light: '#0092B2',
       main: '#000034',
       dark: '#000034',
+      mainLight: '#0F4C64',
       contrastText: '#FFFFFF',
       outlinedHoverBg: 'rgba(15, 76, 100, 0.08)',
     },
@@ -24,7 +25,7 @@ export const theme = createTheme({
       disabled: 'rgba(143, 155, 179, 0.5)',
     },
     action: {
-      active: '#8F9BB3',
+      active: '#0F4C6480',
       hover: '#F2F6F8',
       selected: '#40748054',
       disabled: 'rgba(143, 155, 179, 0.5)',
@@ -67,7 +68,7 @@ export const theme = createTheme({
     inputBackground: {main: '#F7F9FC'},
     divider: '#F3F5F6',
     amber: {main: '#FF8F00', light: '#FFF8E1'},
-    eden: {main: 'rgba(15, 76, 100)', light: 'rgba(15, 76, 100, 0.5)'},
+    eden: {main: 'rgba(15, 76, 100)', light: '#0F4C6480'},
     suvaGrey: {main: 'rgba(144, 144, 144))', light: 'rgba(144, 144, 144, 0.2)'},
     // Used by `getContrastText()` to maximize the contrast between
     // the background and the text.
@@ -414,6 +415,7 @@ export const theme = createTheme({
     },
   },
 });
+export const SUCCESS_COLOR = '#2A7961';
 
 // Breakponts
 theme.typography.h4 = {

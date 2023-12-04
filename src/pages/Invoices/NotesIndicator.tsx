@@ -13,7 +13,7 @@ export const NotesIndicator = ({invoice}: Props) => (
       <NoteAlt
         fontSize="small"
         sx={{
-          color: invoice.commentCount ? 'primary.main' : 'text.disabled',
+          color: invoice.commentCount ? 'primary.mainLight' : 'text.disabled',
         }}
       />
     </IconButton>

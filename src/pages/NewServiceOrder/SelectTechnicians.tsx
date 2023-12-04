@@ -236,8 +236,15 @@ export const SelectTechnicians = ({
                     mr: '1em',
                     px: '1.2em',
                     py: '1.125rem',
-                    border: `1px solid ${theme.palette.eden.light}`,
+                    border:
+                      selectedOption === option.value
+                        ? `2px solid ${theme.palette.primary.mainLight}`
+                        : `1.5px solid ${theme.palette.eden.light}`,
                     borderRadius: 2,
+                    bgcolor:
+                      selectedOption === option.value
+                        ? '#00D1FF14'
+                        : 'transparent',
                   }}>
                   <FormRadio
                     value={option.value}
@@ -257,7 +264,10 @@ export const SelectTechnicians = ({
                         sx={{
                           display: 'flex',
                           alignItems: 'center',
-                          color: theme.palette.text.secondary,
+                          color:
+                            selectedOption === option.value
+                              ? theme.palette.text.primary
+                              : theme.palette.text.secondary,
                         }}>
                         {t(option.label)}
                       </Typography>

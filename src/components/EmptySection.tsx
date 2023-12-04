@@ -1,6 +1,7 @@
 import Typography, {TypographyProps} from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
 import Box, {BoxProps} from '@mui/material/Box';
+import {useTheme} from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import {ReactComponent as LaptopIllustration} from 'assets/illustrations/Laptop.svg';
 import {ReactComponent as ClipboardIllustration} from 'assets/illustrations/Clipboard.svg';
@@ -52,6 +53,7 @@ export const EmptySection = ({
   subLabelProps = {},
 }: Props) => {
   const {t} = useTranslation();
+  const theme = useTheme();
   const Width = {
     tiny: '56px',
     small: '128px',
@@ -115,6 +117,9 @@ export const EmptySection = ({
             size: 'large',
             startIcon: actionButtonIcon || <AddIcon />,
             endIcon: actionButtonEndIcon || null,
+            style: {
+              backgroundColor: theme.palette.primary.mainLight,
+            },
           }}>
           {t(btnLabel)}
         </Button>
