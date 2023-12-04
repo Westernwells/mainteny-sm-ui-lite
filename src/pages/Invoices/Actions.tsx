@@ -310,7 +310,7 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
     }
 
     return items;
-  }, [downloadUrl, invoice.status]);
+  }, [downloadUrl, invoice.status, t]);
 
   const isDueDateInPast = () => {
     if (invoice.status !== InvoiceStatus.DRAFT) {
