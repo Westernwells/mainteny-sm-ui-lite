@@ -313,12 +313,12 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                     10 **
                       (contractDetails?.additionalInfo?.price
                         ?.fractionDigits! || 0),
-                  {currency},
+                  {currency: contractDetails.additionalInfo.price?.currency},
                 ) || '-'
               }
               spendingLimit={formatCurrency(
                 contractDetails ? contractDetails?.spendingLimit : 0,
-                {currency},
+                {currency: contractDetails.additionalInfo.price?.currency},
               )}
               renewalPeriod={contractDetails?.additionalInfo?.renewalTerms}
               invoiceCycle={

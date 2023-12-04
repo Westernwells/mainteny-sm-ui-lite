@@ -124,6 +124,7 @@ export const makeRows = (
           `${formatCurrency(
             (item.additionalInfo?.price?.netAmount ?? 0) /
               10 ** (item.additionalInfo?.price?.fractionDigits ?? 0),
+            {currency: item.additionalInfo.price?.currency},
           )}` || '-',
         status: item.status,
         actions: {

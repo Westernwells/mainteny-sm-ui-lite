@@ -132,6 +132,7 @@ export const getCurrencySymbol: {[key: string]: string} = {
   GBP: '£',
   CNY: '¥',
   JPY: '¥',
+  BAM: 'KM',
 };
 
 export const useCurrentCurrency = (): CurrencyModalType => {
