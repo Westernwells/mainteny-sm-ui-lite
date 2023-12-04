@@ -113,11 +113,30 @@ export const TimePicker = ({
       borderBottom: '1px solid #8F9BB380',
       borderTopLeftRadius: '4px',
       borderBottomLeftRadius: '4px',
+      '&::after': {
+        content: "''",
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        width: '100%',
+        height: '11px',
+        background: 'linear-gradient(#FFFFFF 35%, #8F9BB380)',
+      },
     },
     '& .MuiMultiSectionDigitalClock-root > .MuiList-padding:nth-child(2)': {
       borderBottom: '1px solid #8F9BB380',
       borderTopRightRadius: '4px',
       borderBottomRightRadius: '4px',
+
+      '&::after': {
+        content: "''",
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        width: '100%',
+        height: '11px',
+        background: 'linear-gradient(#FFFFFF 35%, #8F9BB380)',
+      },
     },
     '& .MuiMultiSectionDigitalClock-root > .MuiList-padding': {
       borderRight: '1px solid #8F9BB380',
