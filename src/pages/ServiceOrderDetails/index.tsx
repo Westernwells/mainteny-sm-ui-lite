@@ -93,11 +93,6 @@ export const ServiceOrderDetails = () => {
 
   const generateWorkOverview = async () => {
     try {
-      if (isJobOverviewPdfGenerated) {
-        downloadWorkOverview();
-        return;
-      }
-
       overviewPdfSnackBarRef.current = enqueueSnackbar(
         <Box display="flex" padding="0em" margin="0em" alignItems="center">
           <img alt={t('Path Image')} src={PathImage} />{' '}
