@@ -50,11 +50,13 @@ export const ScheduleLabel = ({
     <Typography variant="caption" sx={{color: grey[600]}}>
       {scheduleType === 'date'
         ? getDayString(item[0]) || ''
-        : scheduleItems[id]
-        ? `${scheduleItems[id].length} ${
-            scheduleItems[id].length < 2 ? ` ${t('Order')}` : ` ${t('Orders')}`
-          }`
-        : `0 ${t('Order')}`}
+        : scheduleItems[id]?.length === 1
+        ? t('1 Order')
+        : scheduleItems[id]?.length > 1
+        ? t('{{numberOfOrders}} Orders', {
+            numberOfOrders: scheduleItems[id]?.length,
+          })
+        : t('0 Order')}
     </Typography>
   );
 
