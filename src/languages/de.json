@@ -1916,11 +1916,15 @@
   "Are you sure you want to proceed?": "Sind Sie sicher, dass Sie fortfahren möchten?",
   "Invoice deleted": "Rechnung wurde gelöscht ",
   "You are about to cancel this invoice.": "Sie sind dabei, diese Rechnung zu stornieren.",
-  "Invoice cancelled": "Rechnung wurde storniert",
+  "Invoice cancelled": "Rechnung storniert",
   "Unassigned": "Nicht zugewiesen",
   "Emergency order created successfully": "Personeneinschluss-Auftrag erfolgreich erstellt",
   "Selected technicians below will be contacted by phone automatically": "Die unten ausgewählten Techniker werden automatisch telefonisch kontaktiert",
   "Technicians": "Techniker",
   "Recommended Technician": "Empfohlener Techniker",
-  "No reached-out technicians accepted the order. Please assign manually": "Keiner der kontaktierten Techniker nahm den Auftrag an. Bitte manuell zuweisen"
+  "No reached-out technicians accepted the order. Please assign manually": "Keiner der kontaktierten Techniker nahm den Auftrag an. Bitte manuell zuweisen",
+  "Last character can't be a digit": "Das letzte Zeichen darf keine Ziffer sein",
+  "1 Order": "1 Bestellung",
+  "{{numberOfOrders}} Orders": "{{numberOfOrders}} Bestellungen",
+  "0 Order": "0 Bestellung"
 }

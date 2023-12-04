@@ -1945,5 +1945,9 @@
   "Selected technicians below will be contacted by phone automatically": "Odabrani tehničari u nastavku će biti automatski kontaktirani telefonom",
   "Technicians": "Technicians",
   "Recommended Technician": "Preporučeni tehničar",
-  "No reached-out technicians accepted the order. Please assign manually": "Nijedan tehničar nije prihvatio narudžbu. Dodelite ručno"
+  "No reached-out technicians accepted the order. Please assign manually": "Nijedan tehničar nije prihvatio narudžbu. Dodelite ručno",
+  "Last character can't be a digit": "Poslednji znak ne može biti cifra",
+  "1 Order": "1 Narudžba",
+  "{{numberOfOrders}} Orders": "{{numberOfOrders}} Porudžbine",
+  "0 Order": "0 Narudžba"
 }
