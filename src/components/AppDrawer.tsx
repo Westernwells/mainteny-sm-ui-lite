@@ -438,8 +438,10 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                           easing: theme.transitions.easing.sharp,
                           duration: theme.transitions.duration.leavingScreen,
                         }),
+                      color: selectedPath === path ? '#FFF' : '#8F9BB3',
                       '&:hover': {
                         background: '#40748054',
+                        color: '#FFF',
                       },
                     }}
                     key={text}>
@@ -463,10 +465,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                     <ListItemText
                       primary={
                         <Fade in={open}>
-                          <Typography
-                            variant="subtitle1"
-                            color={selectedPath === path ? '#FFF' : '#8F9BB3'}
-                            ml="12px">
+                          <Typography variant="subtitle1" ml="12px">
                             {t(text)}
                           </Typography>
                         </Fade>
