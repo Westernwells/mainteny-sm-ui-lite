@@ -58,7 +58,7 @@ export const BottomDrawer = ({
           background: 'white',
           color: 'primary.main',
           py: '1em',
-          zIndex: 'mobileStepper',
+          zIndex: '900',
         },
       }}
       variant="persistent"
