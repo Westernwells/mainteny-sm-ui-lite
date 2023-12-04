@@ -115,6 +115,16 @@ export const InvoiceOverdueNotice = () => {
     onSubmit: () => {},
   });
 
+  const sendEmailDescription = t(
+    'Hello,\n\nWe hope this message finds you well. Please find attached the invoice for the services we provided in [Month].\n\nInvoice Details:\n- Invoice Number: {{invoiceNumber}}\n- Due Date: {{dueDate}}\n- Amount: {{amountDue}}\n\nPlease process the payment by the due date to ensure uninterrupted service.\n\nFor any questions or clarifications, feel free to reach out to our accounts department.\n\nKind regards,\n{{companyName}}',
+    {
+      invoiceNumber: invoice?.externalId ?? '',
+      dueDate: formatDate(invoice?.dueDate ?? ''),
+      amountDue: formatGrossAmount(invoice?.totalAmount),
+      companyName: user?.userAccount.serviceCompany.name ?? '',
+    },
+  );
+
   const factor = currencyFactor({
     currency: invoice?.totalAmount.currency ?? '',
   });
@@ -191,16 +201,6 @@ export const InvoiceOverdueNotice = () => {
     });
     return items;
   }, []);
-
-  const sendEmailDescription = t(
-    'Hello,\n\nWe hope this message finds you well. Please find attached the invoice for the services we provided in [Month].\n\nInvoice Details:\n- Invoice Number: {{invoiceNumber}}\n- Due Date: {{dueDate}}\n- Amount: {{amountDue}}\n\nPlease process the payment by the due date to ensure uninterrupted service.\n\nFor any questions or clarifications, feel free to reach out to our accounts department.\n\nKind regards,\n{{companyName}}',
-    {
-      invoiceNumber: invoice?.externalId ?? '',
-      dueDate: formatDate(invoice?.dueDate ?? ''),
-      amountDue: formatGrossAmount(invoice?.totalAmount),
-      companyName: user?.userAccount.serviceCompany.name ?? '',
-    },
-  );
 
   if (isLoading) {
     return <Progress />;
@@ -479,7 +479,7 @@ export const InvoiceOverdueNotice = () => {
           invoice?.propertyOwner?.contact.email
         }
         subject={formik.values.subject}
-        content={sendEmailDescription}
+        content={formik.values.description || sendEmailDescription}
         callback={(values) => onSubmitHandler(values)}
         loadingProgress={isEditing ? fakeProgress : 0}
       />
