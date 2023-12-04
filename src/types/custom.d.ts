@@ -30,6 +30,7 @@ declare module '@mui/material/styles' {
     outlinedHoverBg?: string;
     containedHoverBackground?: string;
     infoAlert?: string;
+    mainLight?: string;
   }
   interface PaletteColor extends CustomPalleteColor {}
   interface SimplePaletteColorOptions extends CustomPalleteColor {}

@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 import ViewListIcon from '@mui/icons-material/ViewList';
-import GridViewIcon from '@mui/icons-material/GridView';
+import MapIcon from '@mui/icons-material/Map';
+
 import {formatSearchParams} from 'utils/utils';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {Mixpanel} from 'mixpanel/mixpanel';
@@ -17,7 +18,7 @@ const tabItems = [
   },
   {
     label: 'Map View',
-    icon: <GridViewIcon />,
+    icon: <MapIcon />,
   },
 ];
 

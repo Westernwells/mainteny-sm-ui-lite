@@ -159,7 +159,9 @@ export const ArticleItemRow = ({
           placeItems: 'start',
           gap: '.5em',
         }}>
-        <Box alignSelf="center">{index + 1}</Box>
+        <Box sx={{marginTop: '0.5rem'}} alignSelf="flex-start">
+          {index + 1}
+        </Box>
         <Box sx={{justifySelf: 'stretch'}}>
           <TextField
             value={name}

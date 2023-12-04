@@ -22,14 +22,10 @@ import {ReactComponent as JobsIcon} from 'assets/icons/Jobs.svg';
 import {ReactComponent as JobsIconColor} from 'assets/icons/JobsIconColor.svg';
 import {ReactComponent as UnitsIcon} from 'assets/icons/Units.svg';
 import {ReactComponent as UnitsIconColor} from 'assets/icons/UnitsIconColor.svg';
-import {ReactComponent as CustomersIcon} from 'assets/icons/Customers.svg';
-import {ReactComponent as CustomersIconColor} from 'assets/icons/CustomersIconColor.svg';
-import {ReactComponent as ContractIcon} from 'assets/icons/Contract.svg';
-import {ReactComponent as ContractIconColor} from 'assets/icons/ContractIconColor.svg';
+import {ReactComponent as BriefcaseIconActive} from 'assets/icons/briefcaseActive.svg';
+import {ReactComponent as BriefcaseIcon} from 'assets/icons/briefcase.svg';
 import {ReactComponent as QuotationIcon} from 'assets/icons/Quotation.svg';
 import {ReactComponent as QuotationIconColor} from 'assets/icons/QuotationIconColor.svg';
-import {ReactComponent as InvoicesIcon} from 'assets/icons/Invoices.svg';
-import {ReactComponent as InvoicesIconColor} from 'assets/icons/InvoicesIconColor.svg';
 import {ReactComponent as ArticlesIcon} from 'assets/icons/Articles.svg';
 import {ReactComponent as ArticlesIconColor} from 'assets/icons/ArticlesIconColor.svg';
 import {ReactComponent as EmployeesIcon} from 'assets/icons/Employees.svg';
@@ -41,6 +37,10 @@ import {ReactComponent as SettingsIconColor} from 'assets/icons/SettingsIconColo
 import {ReactComponent as CompanyIcon} from 'assets/icons/Company.svg';
 import {ReactComponent as CompanyIconColor} from 'assets/icons/CompanyIconColor.svg';
 import {ReactComponent as MaintenyLogoWhite} from 'assets/icons/MaintenyLogoWhite.svg';
+import {ReactComponent as AccountingInvoiceMailActive} from 'assets/icons/accounting-invoice-mail-active.svg';
+import {ReactComponent as AccountingInvoiceMail} from 'assets/icons/accounting-invoice-mail.svg';
+import {ReactComponent as BusinessContractApproveActive} from 'assets/icons/business-contract-approve-active.svg';
+import {ReactComponent as BusinessContractApprove} from 'assets/icons/business-contract-approve.svg';
 import Fade from '@mui/material/Fade';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
@@ -173,8 +173,8 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     },
     {
       text: 'Customers',
-      icon: <CustomersIcon fontSize="1.5rem" />,
-      selectIcon: <CustomersIconColor fontSize="1.5rem" />,
+      icon: <BriefcaseIcon fontSize="1.5rem" />,
+      selectIcon: <BriefcaseIconActive fontSize="1.5rem" />,
       path: '/customers',
       access: !isAdmin,
       onClick: (
@@ -190,8 +190,8 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     },
     {
       text: 'Contracts',
-      icon: <ContractIcon fontSize="1.5rem" />,
-      selectIcon: <ContractIconColor fontSize="1.5rem" />,
+      icon: <BusinessContractApprove fontSize="1.5rem" />,
+      selectIcon: <BusinessContractApproveActive fontSize="1.5rem" />,
       path: '/contracts',
       access: !isAdmin,
       onClick: (
@@ -224,8 +224,8 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     },
     {
       text: 'Invoices',
-      icon: <InvoicesIcon fontSize="1.5rem" />,
-      selectIcon: <InvoicesIconColor fontSize="1.5rem" />,
+      icon: <AccountingInvoiceMail fontSize="1.5rem" />,
+      selectIcon: <AccountingInvoiceMailActive fontSize="1.5rem" />,
       path: '/invoices',
       access: !isAdmin,
       onClick: (

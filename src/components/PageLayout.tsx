@@ -93,7 +93,7 @@ export const PageLayout = ({
       }}
       onTouchMove={handleDrawerClose}
       onTouchStart={handleDrawerClose}>
-      <Box sx={{mx: '2.2em', my: '0.5em'}}>
+      <Box sx={{px: '2.2em', py: '0.5em', backgroundColor: 'white'}}>
         <AppTopBar
           pageTitle={pageTitle && t(pageTitle)}
           showBackAction={showBackAction}

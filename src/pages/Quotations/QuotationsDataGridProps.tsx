@@ -18,6 +18,8 @@ export const getQuotationStatusStyles = (
     | 'info'
     | 'default'
     | 'primary'
+    | 'primary.main'
+    | 'primary.mainLight'
     | 'eden.light'
     | 'action.active';
 } => {
@@ -29,7 +31,7 @@ export const getQuotationStatusStyles = (
     case QuotationStatus.REJECTED:
       return {label: 'Denied', color: 'error'};
     case QuotationStatus.SENT_TO_CLIENT:
-      return {label: 'Sent', color: 'primary'};
+      return {label: 'Sent', color: 'primary.mainLight'};
     default:
       return {label: '-', color: 'default'};
   }

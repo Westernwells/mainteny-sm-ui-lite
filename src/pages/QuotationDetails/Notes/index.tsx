@@ -214,14 +214,17 @@ export const Notes = ({quotation}: Props) => {
             gap: 0.5,
           },
         }}>
-        <NoteAlt fontSize="small" />
-        <Typography variant="subtitle2">{t('Notes')}</Typography>
+        <NoteAlt htmlColor={theme.palette.primary.mainLight} fontSize="small" />
+        <Typography color="primary.mainLight" variant="subtitle2">
+          {t('Notes')}
+        </Typography>
         <Chip
           label={totalNotes}
-          color="primary"
           size="small"
           sx={{
             marginLeft: '0.5rem',
+            backgroundColor: theme.palette.primary.mainLight,
+            color: 'white',
           }}
         />
       </Button>

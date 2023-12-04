@@ -3,7 +3,6 @@ import {useInView} from 'react-intersection-observer';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import Badge from '@mui/material/Badge';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import {
   Chip,
   Divider,
@@ -28,6 +27,7 @@ import {
 import {useFormatDate} from 'hooks/useFormatDate';
 import {NotificationCard} from './NotificationCard';
 import {NotificationCardSkeleton} from './NotificationCardSkeleton';
+import AlarmBell from '../../assets/icons/alarm-bell.svg';
 
 export const Notifications = () => {
   const theme = useTheme();
@@ -306,7 +306,16 @@ export const Notifications = () => {
           color: '#FF4B55',
           cursor: 'pointer',
         }}>
-        <NotificationsNoneIcon color="primary" sx={{mr: '0.5rem'}} />
+        <img
+          src={AlarmBell}
+          alt="notification-bell"
+          style={{
+            marginRight: '0.5rem',
+            width: 25,
+            height: 25,
+            paddingRight: '3px',
+          }}
+        />
       </Badge>
       <Drawer
         anchor="right"

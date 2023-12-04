@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
-import Language from '@mui/icons-material/Language';
 import {axiosClient} from 'utils/axios-utils';
 import {languageMap} from 'utils/utils';
 import useTheme from '@mui/material/styles/useTheme';
@@ -13,6 +12,7 @@ import {ReactComponent as PolygonTop} from '../assets/icons/polygonTop.svg';
 import {ReactComponent as PolygonBottom} from '../assets/icons/polygonBottom.svg';
 import {ReactComponent as MaintenyLogo} from '../assets/icons/MaintenyLogo.svg';
 import {MenuBtn} from './MenuBtn';
+import EcologyGlobeMessage from '../assets/icons/EcologyGlobeMessage.svg';
 
 interface Props {
   children: React.ReactNode;
@@ -119,7 +119,13 @@ export const AuthLayout = ({children}: Props) => {
             },
           }}>
           <MenuBtn
-            startIcon={<Language />}
+            startIcon={
+              <img
+                style={{width: 25, height: 25}}
+                src={EcologyGlobeMessage}
+                alt="globe"
+              />
+            }
             label={
               selectedLng === 'EN'
                 ? 'English'

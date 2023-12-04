@@ -87,11 +87,9 @@ export const ArticleItemsTable = ({
           <Button
             label="Article"
             buttonProps={{
-              variant: 'outlined',
+              variant: 'contained',
               sx: {
                 alignSelf: 'self-start',
-                color: 'primary.main',
-                background: 'transparent',
               },
               startIcon: <AddIcon />,
               onClick: () => setIsArticleModalOpen(true),

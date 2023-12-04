@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import {useTranslation} from 'react-i18next';
-import LanguageIcon from '@mui/icons-material/Language';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
 import useTheme from '@mui/material/styles/useTheme';
@@ -20,6 +19,7 @@ import {Language} from 'models/misc';
 import {useUserSession} from '../hooks/reactQuery/useUserSession';
 import {MenuBtn} from './MenuBtn';
 import {BackAction} from './BackAction';
+import EcologyGlobeMessage from '../assets/icons/EcologyGlobeMessage.svg';
 
 interface Props {
   pageTitle?: string;
@@ -111,7 +111,13 @@ export const AppTopBar = ({
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" mt={1} alignItems="center">
             <MenuBtn
-              startIcon={<LanguageIcon sx={{color: '#231F20'}} />}
+              startIcon={
+                <img
+                  style={{width: 25, height: 25}}
+                  src={EcologyGlobeMessage}
+                  alt="globe"
+                />
+              }
               label={selectedLng}
               menu={[
                 {

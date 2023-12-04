@@ -3,6 +3,7 @@ import {Avatar, Box, Grid, TextField, Typography} from '@mui/material';
 import {FormikProps} from 'formik';
 import {Role} from 'models/user';
 import {useTranslation} from 'react-i18next';
+import {useTheme} from '@mui/material/styles';
 
 import {DatePicker} from 'components/DatePicker';
 import {FormSelect} from 'components/form/FormSelect';
@@ -17,6 +18,7 @@ type Props = {
 
 const FormAbsence = ({formik, roles, name}: Props) => {
   const {t} = useTranslation();
+  const theme = useTheme();
 
   const options = [
     {label: t('1 Day'), value: '1 day'},
@@ -73,6 +75,10 @@ const FormAbsence = ({formik, roles, name}: Props) => {
                   formik.values.typeAbsence === 'Sick'
                     ? 'primary.main'
                     : '#ecf1f3',
+                backgroundColor:
+                  formik.values.typeAbsence === 'Sick'
+                    ? '#2196F314'
+                    : 'transparent',
                 width: '100%',
                 transition: '0.2s',
                 borderRadius: '0.250em',
@@ -80,9 +86,16 @@ const FormAbsence = ({formik, roles, name}: Props) => {
                 cursor: 'pointer',
                 '&:hover': {
                   borderColor: 'primary.main',
+                  backgroundColor: '#2196F314',
                 },
               }}>
-              <Sick />
+              <Sick
+                htmlColor={
+                  formik.values.typeAbsence === 'Sick'
+                    ? theme.palette.primary.main
+                    : theme.palette.success.dark
+                }
+              />
               <Typography sx={{marginTop: '0.625em'}}> {t('Sick')}</Typography>
             </Box>
           </Grid>
@@ -103,11 +116,22 @@ const FormAbsence = ({formik, roles, name}: Props) => {
                 borderRadius: '0.250em',
                 padding: '1.25em 0',
                 cursor: 'pointer',
+                backgroundColor:
+                  formik.values.typeAbsence === 'Holiday'
+                    ? '#2196F314'
+                    : 'transparent',
                 '&:hover': {
                   borderColor: 'primary.main',
+                  backgroundColor: '#2196F314',
                 },
               }}>
-              <WbSunny sx={{color: 'amber.main'}} />
+              <WbSunny
+                htmlColor={
+                  formik.values.typeAbsence === 'Holiday'
+                    ? theme.palette.primary.main
+                    : theme.palette.amber.main
+                }
+              />
               <Typography sx={{marginTop: '0.625em'}}>
                 {t('Holiday')}
               </Typography>

@@ -32,7 +32,7 @@ export const ContractTimeline = ({
             borderRadius: '50%',
             backgroundColor: unUsedContractDays
               ? theme.palette.text.secondary
-              : theme.palette.success.main,
+              : theme.palette.success.dark,
           }}
         />
         <Box>
