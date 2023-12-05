@@ -21,8 +21,8 @@ export const formatCurrency = (
       style: 'currency',
       currencyDisplay: 'narrowSymbol',
       useGrouping: true,
-      currency: options?.currency ?? 'EUR',
       ...options,
+      currency: options?.currency ?? 'EUR',
     },
   );
 };

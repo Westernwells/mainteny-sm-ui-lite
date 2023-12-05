@@ -109,6 +109,7 @@ export const columns: GridColDef[] = [
 
 export const makeRows = (
   contracts: ContractView[],
+  currencyCode: string,
   formatDate: FormatDate = () => '',
 ) =>
   contracts
@@ -124,7 +125,7 @@ export const makeRows = (
           `${formatCurrency(
             (item.additionalInfo?.price?.netAmount ?? 0) /
               10 ** (item.additionalInfo?.price?.fractionDigits ?? 0),
-            {currency: item.additionalInfo.price?.currency},
+            {currency: item.additionalInfo.price?.currency || currencyCode},
           )}` || '-',
         status: item.status,
         actions: {

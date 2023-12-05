@@ -137,7 +137,14 @@ export const Contracts = () => {
           options.push(user?.userAccount.serviceCompany.name!);
         }
       });
-      setRows(makeRows(contractResource.data, formatDate));
+
+      const companyCurrencies =
+        user?.userAccount.serviceCompany.settings.currencies || [];
+      const companyCurrencyCode = companyCurrencies[0]
+        ? companyCurrencies[0]?.code
+        : 'EUR';
+
+      setRows(makeRows(contractResource.data, companyCurrencyCode, formatDate));
       setContractorFilterItems([...contractorFilterItems, ...options]);
     }
   }, [contractResource, isLoading, isFetching, isIdle]);
