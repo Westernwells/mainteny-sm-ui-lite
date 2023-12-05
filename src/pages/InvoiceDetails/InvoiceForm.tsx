@@ -61,14 +61,7 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {Notes} from 'pages/InvoiceDetails/Notes';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {convertToText, formatSearchParams} from 'utils/utils';
-import {
-  addDays,
-  addYears,
-  isAfter,
-  isBefore,
-  parseISO,
-  startOfDay,
-} from 'date-fns';
+import {addDays, addYears, isBefore, parseISO, startOfDay} from 'date-fns';
 import {InvoiceCheckbox} from 'pages/InvoiceDetails/InvoiceCheckbox';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {IconButton} from '@mui/material';
