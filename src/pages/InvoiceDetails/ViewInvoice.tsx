@@ -42,7 +42,7 @@ import {SendEmailDialog} from 'components/SendEmailDialog';
 import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useSnackbar} from 'notistack';
-import {isAfter, isBefore, parseISO, startOfDay} from 'date-fns';
+import {isBefore, parseISO, startOfDay} from 'date-fns';
 import CustomSnackbar from 'components/CustomSnackbar';
 import {Notes} from './Notes';
 import {InvoiceActivities} from './InvoiceActivities';

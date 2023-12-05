@@ -24,7 +24,6 @@ import {
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {useFormatDate} from 'hooks/useFormatDate';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryState} from 'hooks/useQueryState';
 import {columns, makeRows} from './QuotationsDataGridProps';
 
