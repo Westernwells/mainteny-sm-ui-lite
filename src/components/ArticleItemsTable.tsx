@@ -32,6 +32,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {LanguageContext} from 'context/LanguageProvider';
 import {calculateInvoiceTotal, calculateTotal} from 'utils/calculate-total';
 import {getItemRecord} from 'utils/article-utils';
+import {fixRounding} from 'utils/utils';
 import {NumericFormat} from 'react-number-format';
 import {TextField} from '@mui/material';
 import {ArticleItemRow} from './ArticleItemRow';
@@ -580,18 +581,24 @@ export const ArticleItemsTable = ({
                   </Box>
                   <Typography sx={{paddingTop: '0.75em'}}>
                     {isPartial
-                      ? formatCurrency(partialPrice * (percentageVat / 100), {
-                          currency: currentCurrency.code,
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                          roundingMode: 'floor',
-                        })
-                      : formatCurrency(totalPrice * (percentageVat / 100), {
-                          currency: currentCurrency.code,
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                          roundingMode: 'floor',
-                        })}
+                      ? formatCurrency(
+                          fixRounding(partialPrice * (percentageVat / 100), 2),
+                          {
+                            currency: currentCurrency.code,
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                            roundingMode: 'floor',
+                          },
+                        )
+                      : formatCurrency(
+                          fixRounding(totalPrice * (percentageVat / 100), 2),
+                          {
+                            currency: currentCurrency.code,
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                            roundingMode: 'floor',
+                          },
+                        )}
                   </Typography>
                 </Box>
                 <Box
@@ -613,7 +620,10 @@ export const ArticleItemsTable = ({
                   <Typography sx={{color: 'primary.contrastText'}}>
                     {isPartial
                       ? formatCurrency(
-                          partialPrice * (1 + percentageVat / 100),
+                          fixRounding(
+                            partialPrice * (1 + percentageVat / 100),
+                            2,
+                          ),
                           {
                             currency: currentCurrency.code,
                             minimumFractionDigits: 2,
@@ -621,12 +631,18 @@ export const ArticleItemsTable = ({
                             roundingMode: 'floor',
                           },
                         )
-                      : formatCurrency(totalPrice * (1 + percentageVat / 100), {
-                          currency: currentCurrency.code,
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                          roundingMode: 'floor',
-                        })}
+                      : formatCurrency(
+                          fixRounding(
+                            totalPrice * (1 + percentageVat / 100),
+                            2,
+                          ),
+                          {
+                            currency: currentCurrency.code,
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                            roundingMode: 'floor',
+                          },
+                        )}
                   </Typography>
                 </Box>
               </Box>
