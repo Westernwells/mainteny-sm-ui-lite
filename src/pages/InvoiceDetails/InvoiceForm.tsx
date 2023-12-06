@@ -676,6 +676,9 @@ export const InvoiceForm = ({
     return createNewInvoice({
       data: formatInvoiceRecord({
         ...values,
+        serviceCompanyId:
+          values.serviceCompanyId ||
+          (user?.userAccount.serviceCompany.id ?? ''),
         includeWorkReport: values.includeWorkReport,
         includeCheckList: values.includeCheckList,
         dueDate: dueDateToString,
