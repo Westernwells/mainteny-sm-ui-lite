@@ -677,7 +677,8 @@ export const InvoiceForm = ({
       data: formatInvoiceRecord({
         ...values,
         serviceCompanyId:
-          values.serviceCompanyId ?? user?.userAccount.serviceCompany.id,
+          values.serviceCompanyId ||
+          (user?.userAccount.serviceCompany.id ?? ''),
         includeWorkReport: values.includeWorkReport,
         includeCheckList: values.includeCheckList,
         dueDate: dueDateToString,
