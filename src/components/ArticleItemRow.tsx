@@ -19,6 +19,7 @@ import {Amount} from 'models/misc';
 import {Button} from 'components/Button';
 import {useCurrentCurrency} from 'utils/currency';
 import {LanguageContext} from 'context/LanguageProvider';
+import {fixRounding} from 'utils/utils';
 
 interface Props<T> {
   articleItem: T;
@@ -134,9 +135,12 @@ export const ArticleItemRow = ({
             ...item,
             unitAmount: {
               ...item.unitAmount,
-              netAmount: isPartial
-                ? partialPrice * 10 ** item.unitAmount.fractionDigits!
-                : price * 10 ** item.unitAmount.fractionDigits!,
+              netAmount: fixRounding(
+                isPartial
+                  ? partialPrice * 10 ** item.unitAmount.fractionDigits!
+                  : price * 10 ** item.unitAmount.fractionDigits,
+                2,
+              ),
             },
           };
         }
