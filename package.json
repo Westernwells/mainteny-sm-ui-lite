@@ -54,6 +54,7 @@
     "react-router-dom": "^6.2.1",
     "react-swipeable-views": "^0.14.0",
     "react-top-loading-bar": "^2.1.0",
+    "smartlook-client": "^8.2.0",
     "supercluster": "^7.1.5",
     "use-supercluster": "^0.4.0",
     "vite-plugin-env-compatible": "^2.0.1",

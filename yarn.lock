@@ -6462,6 +6462,11 @@ slice-ansi@^5.0.0:
     ansi-styles "^6.0.0"
     is-fullwidth-code-point "^4.0.0"
 
+smartlook-client@^8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/smartlook-client/-/smartlook-client-8.2.0.tgz#3d4d372a320e4a17d6c7a5ce35195e87cb740531"
+  integrity sha512-zIGEV7jeSDqLrwW2bBooSNFYIExuzgYtFkVi7fySVOgW4S5dy/pYh4fAnf/d+GA3oodS+x7/zT2E7xhbsNXLDg==
+
 source-map-js@^1.0.2:
   version "1.0.2"
   resolved "https://registry.npmjs.org/source-map-js/-/source-map-js-1.0.2.tgz"

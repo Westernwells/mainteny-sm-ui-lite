@@ -270,3 +270,9 @@ export const simplifyAddressCoords = (
 
 export const stringToTitleCase = (textString: string) =>
   textString.toLowerCase().replace(/\b\w/g, (s) => s.toUpperCase());
+
+// https://stackoverflow.com/a/10880710/9183715
+export const fixRounding = (value: number, precision: number) => {
+  const power = 10 ** (precision || 0);
+  return Math.round(value * power) / power;
+};

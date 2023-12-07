@@ -72,10 +72,12 @@ export const SelectArticleType = ({
         {articleTypes.map((articleType) => (
           <Box
             key={articleType.label}
+            component="label"
             sx={{
               width: '32.3%',
               px: '1.5rem',
               py: '1rem',
+              cursor: 'pointer',
               border:
                 selectedArticleType === articleType.value
                   ? `1px solid ${theme.palette.eden.main}`

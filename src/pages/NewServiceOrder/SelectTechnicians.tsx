@@ -231,11 +231,13 @@ export const SelectTechnicians = ({
               {options.map((option) => (
                 <Box
                   key={option.label}
+                  component="label"
                   sx={{
                     width: '35%',
                     mr: '1em',
                     px: '1.2em',
                     py: '1.125rem',
+                    cursor: 'pointer',
                     border:
                       selectedOption === option.value
                         ? `2px solid ${theme.palette.primary.mainLight}`
