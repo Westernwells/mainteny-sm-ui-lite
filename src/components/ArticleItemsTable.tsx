@@ -307,7 +307,17 @@ export const ArticleItemsTable = ({
                 name: i.name || i.article.name,
                 articleUnit: i.article.unit,
                 quantity: i.quantity,
-                unitAmount: invoice.totalAmount,
+                unitAmount: {
+                  ...invoice.totalAmount,
+                  netAmount:
+                    invoice.totalAmount.netAmount >= 0
+                      ? -1 * invoice.totalAmount.netAmount
+                      : invoice.totalAmount.netAmount,
+                  grossAmount:
+                    invoice.totalAmount.grossAmount >= 0
+                      ? -1 * invoice.totalAmount.grossAmount
+                      : invoice.totalAmount.grossAmount,
+                },
               }),
             ),
           );
