@@ -9,6 +9,7 @@ import {SnackbarProvider} from 'notistack';
 import {LanguageProvider} from 'context/LanguageProvider';
 import * as Sentry from '@sentry/react';
 import {UserCompanyProvider} from 'context/UserCompanyProvider';
+import {initSmartlook} from 'utils/smart-look';
 import {App} from './App';
 import {theme} from './theme';
 import './assets/fonts/Aventa/Aventa-Regular.ttf';
@@ -41,6 +42,9 @@ Sentry.init({
     }),
   ],
 });
+
+// Initializa smartlook
+initSmartlook();
 
 ReactDOM.render(
   <ThemeProvider theme={theme}>
