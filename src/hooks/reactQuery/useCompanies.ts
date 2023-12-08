@@ -353,7 +353,7 @@ export const useUpdateAutoNumberConfig = (successMsg?: string) => {
     ({body, companyId}: {body: AutoNumberConfig; companyId: string}) =>
       updateAutoNumberConfig(body, companyId),
     {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
       onSuccess: async (__, {companyId}) => {
         if (successMsg) {
           enqueueSnackbar(successMsg, {

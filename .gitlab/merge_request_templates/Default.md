@@ -4,6 +4,10 @@
 ## Checklist
 - [ ] I have performed a self-review of my code before submitting the pull request.
 - [ ] I have checked and updated translations for the changes made. (if applicable)
+- [ ] Added Tests (mandatory)
+- [ ] Ticket Link (mandatory)
+- [ ] Added/updated documentation (optional; as and when needed)
+- [ ] Added PR description (mandatory)
 
 ## Additional Notes
 [Add any additional notes or context that may be helpful for the reviewers.]

@@ -127,7 +127,7 @@ export const MarkCompletedDialog = ({
           <Button
             buttonProps={{
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              onClick: (_e) => formik.handleSubmit(),
+              onClick: () => formik.handleSubmit(),
               autoFocus: true,
               disabled: !formik.isValid,
             }}>
