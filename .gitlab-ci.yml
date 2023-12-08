@@ -1,4 +1,6 @@
 stages:
+  - lint
+  - test
   - build-builder-image
   - build-project
   - build-images
@@ -34,7 +36,7 @@ variables:
     GIT_STRATEGY: none
   image:
     name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
+    entrypoint: ['']
   before_script:
     - mkdir -p /kaniko/.docker
     - echo "{\"credsStore\":\"ecr-login\",\"credHelpers\":{\"$DOCKER_REGISTRY\":\"ecr-login\"}}" > /kaniko/.docker/config.json
@@ -85,14 +87,37 @@ variables:
       \"icon_emoji\": \":rocket:\"
        }" $SLACK_WEBHOOK_URL
   rules:
-    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_MERGE_REQUEST_ID'
       when: never
+
+lint-project:
+  stage: lint
+  image: node:lts-gallium
+  script:
+    - yarn install --frozen-lockfile
+    - yarn check-all
+    
+tests:
+  stage: test
+  image: node:lts-gallium
+  variables:
+    ENV: stage
+    REACT_APP_BASE_URL: http://localhost:5173/pm
+    REACT_APP_API_URL: $REACT_APP_API_URL_STAGE
+    REACT_APP_MIXPANEL_TOKEN: $REACT_APP_MIXPANEL_TOKEN_STAGE
+    REACT_APP_GOOGLE_MAPS_KEY: $REACT_APP_GOOGLE_MAPS_KEY_STAGE
+  script:
+    - apt-get -y update
+    - apt-get install -y xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libgbm1 libnss3 libxss1 libasound2 --fix-missing
+    - yarn install
+    - yarn start & # Start the application in the background
+    - yarn cypress:run # Run Cypress tests
 
 build-builder-image:
   stage: build-project
   image:
     name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
+    entrypoint: ['']
   before_script:
     - mkdir -p /kaniko/.docker
     - echo "{\"credsStore\":\"ecr-login\",\"credHelpers\":{\"$DOCKER_REGISTRY\":\"ecr-login\"}}" > /kaniko/.docker/config.json

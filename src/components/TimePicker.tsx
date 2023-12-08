@@ -107,15 +107,18 @@ export const TimePicker = ({
       overflow: 'hidden',
       borderBottom: 'none',
       padding: '0 24px',
+      position: 'relative',
     },
     '& .MuiMultiSectionDigitalClock-root > .MuiList-padding:nth-child(1)': {
+      position: 'relative',
       borderLeft: '1px solid #8F9BB380',
       borderBottom: '1px solid #8F9BB380',
       borderTopLeftRadius: '4px',
       borderBottomLeftRadius: '4px',
+
       '&::after': {
         content: "''",
-        position: 'absolute',
+        position: 'sticky',
         bottom: 0,
         left: 0,
         width: '100%',
@@ -127,10 +130,11 @@ export const TimePicker = ({
       borderBottom: '1px solid #8F9BB380',
       borderTopRightRadius: '4px',
       borderBottomRightRadius: '4px',
+      position: 'relative',
 
       '&::after': {
         content: "''",
-        position: 'absolute',
+        position: 'sticky',
         bottom: 0,
         left: 0,
         width: '100%',

@@ -33,12 +33,14 @@ export const ContractTypeRadio = ({
     <RadioGroup name="radio-buttons-group">
       <Box sx={{display: 'flex'}}>
         <Box
+          component="label"
           sx={{
             width: '100%',
             background: checked ? 'rgba(0, 209, 255, 0.08)' : null,
             mr: '1em',
             px: '1.2em',
             py: '1.125rem',
+            cursor: 'pointer',
             border: `1px solid ${theme.palette.eden.light}`,
             borderRadius: 2,
           }}>

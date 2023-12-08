@@ -20,7 +20,8 @@ export const UnitsTab: FC<Props> = ({elevators}) => {
   const navigate = useNavigate();
   const [page, setPage] = useState(makePage(0, 25)); // TODO: implement paging
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const [pageCount, setPageCount] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_pageCount, setPageCount] = useState(0);
 
   useEffect(() => {
     if (elevators.length) {
