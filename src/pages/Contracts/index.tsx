@@ -13,13 +13,8 @@ import {Order, WithOptional} from 'models/misc';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
-import {
-  convertToMacro,
-  convertToText,
-  formatSearchParamsPageIndex,
-  formatSearchParamsPageSize,
-} from 'utils/utils';
-import {useNavigate, useSearchParams} from 'react-router-dom';
+import {convertToMacro, convertToText, objectKeyByValue} from 'utils/utils';
+import {useNavigate} from 'react-router-dom';
 import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
 import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
@@ -40,12 +35,15 @@ export const Contracts = () => {
   const {user} = useUserSession();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-  const [search, setSearch] = useQueryState('searchContracts');
-  const [queryParams, setQueryParams] = useSearchParams();
-  const [page, setPage] = useState(makePage(0, pageSize));
+  const [search, setSearch, clearFilters] = useQueryState('searchContracts');
+  const [page, setPage] = useQueryState('page', {
+    defaultValue: makePage(0, pageSize),
+  });
   const totalContractRef = useRef(0);
-  const [status, setStatus] = useState<string[]>([]);
-  const [cost, setCost] = useState<number[][]>([]);
+  const [status, setStatus] = useQueryState<string[]>('status', {
+    defaultValue: [],
+  });
+  const [cost, setCost] = useQueryState<number[][]>('cost', {defaultValue: []});
   const [pageCount, setPageCount] = useState(0);
   const [contractorFilterItems, setContractorFilterItems] = useState<string[]>(
     [],
@@ -88,7 +86,6 @@ export const Contracts = () => {
 
   useEffect(() => {
     if (contractResource.total > 0 && contractResource.data.length === 0) {
-      setQueryParams(formatSearchParamsPageIndex(1, queryParams));
       setPage({
         ...page,
         pageIndex: 0,
@@ -99,24 +96,6 @@ export const Contracts = () => {
       textInput.current.value = search;
     }
   }, [search, cost, status, contractResource]);
-
-  useEffect(() => {
-    if (textInput.current) {
-      textInput.current.value = search;
-    }
-  }, [queryParams]);
-
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-    const initialPageIndex = currentParams.pageIndex
-      ? Number(currentParams.pageIndex)
-      : 0;
-
-    setPage({
-      ...page,
-      pageIndex: initialPageIndex > 0 ? initialPageIndex - 1 : 0,
-    });
-  }, []);
 
   const costRangeConvertor = (selectedItems: string[]) => {
     const range = crConverter(selectedItems, currentCurrency.symbol);
@@ -169,22 +148,16 @@ export const Contracts = () => {
   }
 
   const renderFilterItems = () => (
-    <FilterFields
-      onClear={() => {
-        setStatus([]);
-        setCost([]);
-        setSearch('');
-        if (textInput.current) {
-          textInput.current.value = '';
-        }
-      }}>
+    <FilterFields onClear={clearFilters}>
       <PriceRangeDropdown cost={cost} costRangeConvertor={costRangeConvertor} />
       <MultipleSelectCheckmarks
         label="Status"
         options={['ACTIVE', 'INACTIVE', 'EXPIRING'].map((item) =>
           convertToText(item),
         )}
-        initialSelectedItems={status}
+        initialSelectedItems={status.map((item) =>
+          objectKeyByValue(statusMapping, item),
+        )}
         getSelectedValue={(item) =>
           setStatus(item.map((val) => convertToMacro(statusMapping[val])))
         }
@@ -217,15 +190,17 @@ export const Contracts = () => {
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
-          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+          setPage({
+            ...page,
+            pageSize: newPageSize,
+          })
         }
-        handlePageChange={(newPage: number) => {
-          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams));
+        handlePageChange={(newPage: number) =>
           setPage({
             ...page,
             pageIndex: newPage - 1,
-          });
-        }}
+          })
+        }
         pageCount={pageCount}
         totalRows={contractResource?.total}
       />

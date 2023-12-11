@@ -32,15 +32,39 @@ export const UnitMapsView = () => {
     },
   }).current;
   const mapRef = useRef<any>();
-  const [lastVisitStart, setLastVisitStart] = useState<Date | null>(null);
-  const [lastVisitEnd, setLastVisitEnd] = useState<Date | null>(null);
-  const [nextVisitStart, setNextVisitStart] = useState<Date | null>(null);
-  const [nextVisitEnd, setNextVisitEnd] = useState<Date | null>(null);
+  const [lastVisitStart, setLastVisitStart, clearFilters] =
+    useQueryState<Date | null>('lastVisitStart', {
+      defaultValue: null,
+      isDate: true,
+    });
+  const [lastVisitEnd, setLastVisitEnd] = useQueryState<Date | null>(
+    'lastVisitEnd',
+    {
+      defaultValue: null,
+      isDate: true,
+    },
+  );
+  const [nextVisitStart, setNextVisitStart] = useQueryState<Date | null>(
+    'nextVisitStart',
+    {
+      defaultValue: null,
+      isDate: true,
+    },
+  );
+  const [nextVisitEnd, setNextVisitEnd] = useQueryState<Date | null>(
+    'nextVisitEnd',
+    {
+      defaultValue: null,
+      isDate: true,
+    },
+  );
   const [zoom, setZoom] = useState(20);
   const [search, setSearch] = useQueryState('searchUnitsMapView');
   const [points, setPoints] = useState<any>([]);
   const [bounds, setBounds] = useState<any>([]);
-  const [page, setPage] = useState(makePage(0, 100));
+  const [page, setPage] = useQueryState('page', {
+    defaultValue: makePage(0, 100),
+  });
   const [resetDatePicker, setResetDatePicker] = useState(false);
   const [elevatorView, setElevatorView] = useState<{
     elevator: Resource<ElevatorView>;
@@ -181,19 +205,8 @@ export const UnitMapsView = () => {
     mapRef?.current?.panTo({lat, lng});
   };
 
-  const clearFilters = () => {
-    setLastVisitStart(null);
-    setLastVisitEnd(null);
-    setNextVisitStart(null);
-    setNextVisitEnd(null);
-    setResetDatePicker(true);
-    setSearch('');
-    if (textInput.current) {
-      textInput.current.value = '';
-    }
-  };
   const renderFilterItems = () => (
-    <FilterFields onClear={() => clearFilters()} wrapperStyle={{width: '90%'}}>
+    <FilterFields onClear={clearFilters} wrapperStyle={{width: '90%'}}>
       <DatePicker
         defaultDate={lastVisitStart}
         containerStyles={{mr: '1em'}}
@@ -269,6 +282,7 @@ export const UnitMapsView = () => {
       <Widget
         searchPlaceholder="Search by number, model, customer, address etc."
         getSearchValue={(val) => setSearch(val)}
+        defaultSearchValue={search}
         filterItems={renderFilterItems()}
         refInput={textInput}
       />

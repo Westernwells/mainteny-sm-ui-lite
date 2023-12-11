@@ -1,26 +1,93 @@
 import {useCallback} from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import qs from 'query-string';
+import {isJson} from 'utils/utils';
 
-export const useQueryState = (
+export const useQueryState = <T = string>(
   query: string,
-): [string, (value: string) => void] => {
-  const location = useLocation();
+  {
+    defaultValue = '' as T,
+    isDate = false,
+    reset = false,
+    parserOptions,
+  }: {
+    defaultValue?: T;
+    isDate?: boolean;
+    reset?: boolean;
+    parserOptions?: qs.ParseOptions | undefined;
+  } = {},
+): [T, (value: T) => void, () => void] => {
+  const {location} = window;
   const navigate = useNavigate();
 
   const setQuery = useCallback(
-    (value: string) => {
-      const existingQueries = qs.parse(location.search);
+    (value) => {
+      if (reset) {
+        const queryString = qs.stringify(
+          {[query]: value},
+          {
+            skipNull: true,
+            arrayFormat: 'bracket',
+          },
+        );
 
-      const queryString = qs.stringify(
-        {...existingQueries, [query]: value},
-        {skipNull: true},
-      );
+        navigate(`${location.pathname}?${queryString}`, {replace: true});
+        return;
+      }
+
+      const existingQueries = qs.parse(location.search, {
+        arrayFormat: 'bracket',
+        ...parserOptions,
+      });
+
+      if (
+        value === null ||
+        value === '' ||
+        (Array.isArray(value) && value.length === 0)
+      ) {
+        delete existingQueries[query];
+      } else if (value instanceof Date) {
+        existingQueries[query] = value.toISOString();
+      } else if (typeof value === 'object') {
+        existingQueries[query] = JSON.stringify(value);
+      } else {
+        existingQueries[query] = value;
+      }
+
+      const queryString = qs.stringify(existingQueries, {
+        skipNull: true,
+        arrayFormat: 'bracket',
+      });
 
       navigate(`${location.pathname}?${queryString}`, {replace: true});
     },
-    [navigate, location, query],
+    [navigate, query],
   );
 
-  return [(qs.parse(location.search)?.[query] ?? '') as string, setQuery];
+  const clearFilters = () => {
+    const existingQueries = qs.parse(location.search, {
+      arrayFormat: 'bracket',
+      ...parserOptions,
+    });
+    if (existingQueries.tab) {
+      navigate(`${location.pathname}?tab=${existingQueries.tab}`, {
+        replace: true,
+      });
+      return;
+    }
+    navigate(`${location.pathname}`, {replace: true});
+  };
+
+  let parsedValue =
+    qs.parse(location.search, {arrayFormat: 'bracket', ...parserOptions})?.[
+      query
+    ] ?? defaultValue;
+
+  if (isDate && typeof parsedValue === 'string') {
+    parsedValue = new Date(parsedValue) as T;
+  } else if (typeof parsedValue === 'string' && isJson(parsedValue)) {
+    parsedValue = JSON.parse(parsedValue) as T;
+  }
+
+  return [parsedValue as T, setQuery, clearFilters];
 };

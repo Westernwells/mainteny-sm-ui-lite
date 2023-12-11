@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {useNavigate, useSearchParams} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {GridRowsProp} from '@mui/x-data-grid';
 
 import {PageListingLayout} from 'components/PageListingLayout';
@@ -7,10 +7,6 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
 import {useFormatDate} from 'hooks/useFormatDate';
-import {
-  formatSearchParamsPageIndex,
-  formatSearchParamsPageSize,
-} from 'utils/utils';
 import {useCompanies} from 'hooks/reactQuery/useCompanies';
 import {useQueryState} from 'hooks/useQueryState';
 import {ServiceCompanyItem} from 'models/service-company';
@@ -24,9 +20,10 @@ export const Companies = () => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
   const [search, setSearch] = useQueryState('searchCompanies');
-  const [queryParams, setQueryParams] = useSearchParams();
   const totalCompaniesRef = useRef(0);
-  const [page, setPage] = useState(makePage(0, pageSize));
+  const [page, setPage] = useQueryState('page', {
+    defaultValue: makePage(0, pageSize),
+  });
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
   const textInput = useRef<HTMLInputElement>(null);
@@ -43,28 +40,16 @@ export const Companies = () => {
     totalCompaniesRef.current || companiesResource.total;
 
   useEffect(() => {
-    if (page.pageIndex) {
-      setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    if (companiesResource.total > 0 && companiesResource.data.length === 0) {
+      setPage({
+        ...page,
+        pageIndex: 0,
+      });
     }
     if (textInput.current) {
       textInput.current.value = search;
     }
   }, [search]);
-
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-
-    if (currentParams.pageSize)
-      setPage({
-        ...page,
-        pageSize: Number(currentParams.pageSize),
-      });
-    if (currentParams.pageIndex)
-      setPage({
-        ...page,
-        pageIndex: Number(currentParams.pageIndex) - 1,
-      });
-  }, [queryParams]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -112,10 +97,16 @@ export const Companies = () => {
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
-          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+          setPage({
+            ...page,
+            pageSize: newPageSize,
+          })
         }
         handlePageChange={(newPage: number) =>
-          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+          setPage({
+            ...page,
+            pageIndex: newPage - 1,
+          })
         }
         pageCount={pageCount}
         totalRows={companiesResource.total}

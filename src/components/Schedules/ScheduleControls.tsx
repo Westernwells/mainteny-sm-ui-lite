@@ -12,6 +12,7 @@ interface Props {
   nextWeek?: () => void;
   searchPlaceholder?: string;
   getSearchValue?: (val: string) => void;
+  defaultValue?: string;
 }
 
 export const ScheduleControls = ({
@@ -21,6 +22,7 @@ export const ScheduleControls = ({
   nextWeek = () => {},
   searchPlaceholder = '',
   getSearchValue = () => {},
+  defaultValue = '',
 }: Props) => {
   const renderDateContols = () => (
     <Box sx={{display: 'flex'}}>
@@ -50,6 +52,7 @@ export const ScheduleControls = ({
         background: '#fff',
         width: '90%',
       }}
+      defaultValue={defaultValue}
     />
   );
 
