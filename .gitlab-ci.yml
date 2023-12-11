@@ -63,6 +63,7 @@ variables:
     - cd sm-ui-lite-deployment
     - npm ci
     - pulumi login s3://mainteny-pulumi-state
+    - pulumi config set aws:region eu-central-1
   variables:
     ENV: stage
     CACHE_PATH: /*
