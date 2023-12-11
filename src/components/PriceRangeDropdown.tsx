@@ -1,4 +1,5 @@
 import {useCurrentCurrency} from 'utils/currency';
+import {rangeConvertorInverse} from 'utils/contract-utils';
 import {
   MultipleSelectCheckmarks,
   Props as MultipleSelectCheckmarksProps,
@@ -22,7 +23,7 @@ export const PriceRangeDropdown = ({
         `${symbol}500 - ${symbol}1,000`,
         `> ${symbol}1,000`,
       ]}
-      initialSelectedItems={cost}
+      initialSelectedItems={rangeConvertorInverse(cost, symbol)}
       getSelectedValue={(item) => costRangeConvertor(item)}
       {...props}
     />

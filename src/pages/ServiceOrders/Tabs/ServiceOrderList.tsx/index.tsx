@@ -12,13 +12,9 @@ import {useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {endOfDay, startOfDay, subDays} from 'date-fns';
-import {useNavigate, useSearchParams} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {GridRowsProp} from '@mui/x-data-grid';
-import {
-  formatSearchParamsPageIndex,
-  formatSearchParamsPageSize,
-} from 'utils/utils';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {FlexContainer} from 'components/FlexContainer';
@@ -27,6 +23,7 @@ import {
   getSelectedOrderStatuses,
   serviceOrderTypeToEnum,
   serviceOrderTypeToString,
+  serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import {Widget} from 'components/Widget';
 import {useFormatDate} from 'hooks/useFormatDate';
@@ -36,18 +33,18 @@ import {columns, makeRows} from './ServiceOrderDataGridProps';
 export const ServiceOrderList = () => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-  const [page, setPage] = useState(makePage(0, 25));
-  const [queryParams, setQueryParams] = useSearchParams();
+  const [page, setPage] = useQueryState('page', {
+    defaultValue: makePage(0, 25),
+  });
   const [pageCount, setPageCount] = useState(0);
   const totalOrederRef = useRef(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [searchQuery, setSearchQuery] = useQueryState('searchServiceOrders');
-  const [selectedOrderStatus, setSelectedOrderStatus] = useState<
+  const [selectedOrderStatus, setSelectedOrderStatus] = useQueryState<
     ServiceOrderStatus[]
-  >([]);
-  const [selectedOrderTypes, setSelectedOrderTypes] = useState<
-    ServiceOrderType[]
-  >([]);
+  >('selectedOrderStatus', {defaultValue: []});
+  const [selectedOrderTypes, setSelectedOrderTypes, clearFilters] =
+    useQueryState<ServiceOrderType[]>('selectedOrderTypes', {defaultValue: []});
   const textInput = useRef<HTMLInputElement>(null);
   const [currentDate] = useState(new Date());
 
@@ -78,7 +75,6 @@ export const ServiceOrderList = () => {
       serviceOrdersResource.total > 0 &&
       serviceOrdersResource.data.length === 0
     ) {
-      setQueryParams(formatSearchParamsPageIndex(1, queryParams));
       setPage({
         ...page,
         pageIndex: 0,
@@ -94,35 +90,6 @@ export const ServiceOrderList = () => {
     selectedOrderStatus,
     serviceOrdersResource,
   ]);
-
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-    const initialPageIndex = currentParams.pageIndex
-      ? Number(currentParams.pageIndex) - 1
-      : 0;
-
-    if (initialPageIndex > 0) {
-      setQueryParams(
-        formatSearchParamsPageIndex(initialPageIndex + 1, queryParams),
-      );
-    }
-
-    if (textInput.current) {
-      textInput.current.value = searchQuery;
-    }
-  }, [queryParams]);
-
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-    const initialPageIndex = currentParams.pageIndex
-      ? Number(currentParams.pageIndex)
-      : 0;
-
-    setPage({
-      ...page,
-      pageIndex: initialPageIndex > 0 ? initialPageIndex - 1 : 0,
-    });
-  }, []);
 
   useEffect(() => {
     if (!isLoading) {
@@ -142,9 +109,7 @@ export const ServiceOrderList = () => {
   const renderFilterItems = () => (
     <FilterFields
       onClear={() => {
-        setSelectedOrderStatus([]);
-        setSelectedOrderTypes([]);
-        setSearchQuery('');
+        clearFilters();
         if (textInput.current) {
           textInput.current.value = '';
         }
@@ -154,7 +119,9 @@ export const ServiceOrderList = () => {
         label="Status"
         options={getServiceOrderStatusList()}
         getSelectedValue={getSelectedStatusValues}
-        initialSelectedItems={selectedOrderStatus}
+        initialSelectedItems={selectedOrderStatus.map((i) =>
+          serviceOrderStatusToString(i),
+        )}
         multiple
       />
 
@@ -163,7 +130,9 @@ export const ServiceOrderList = () => {
         options={Object.keys(ServiceOrderType).map((i) =>
           serviceOrderTypeToString(i),
         )}
-        initialSelectedItems={selectedOrderTypes}
+        initialSelectedItems={selectedOrderTypes.map((i) =>
+          serviceOrderTypeToString(i),
+        )}
         getSelectedValue={(item) => {
           const orderTypes = item.map((i) => serviceOrderTypeToEnum(i));
           setSelectedOrderTypes(orderTypes as ServiceOrderType[]);
@@ -215,16 +184,14 @@ export const ServiceOrderList = () => {
         loading={isFetching}
         pageSize={page.pageSize}
         scrollToTop={searchQuery}
-        pageIndex={
-          pageCount < parseInt(queryParams.get('pageIndex')!, 10)
-            ? 0
-            : parseInt(queryParams.get('pageIndex') || '1', 10)
-        }
+        pageIndex={pageCount < page.pageIndex ? 0 : page.pageIndex + 1 || 1}
         handlePageSizeChange={(newPageSize: number) =>
-          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+          setPage({
+            ...page,
+            pageSize: newPageSize,
+          })
         }
         handlePageChange={(newPage: number) => {
-          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams));
           setPage({
             ...page,
             pageIndex: newPage - 1,
