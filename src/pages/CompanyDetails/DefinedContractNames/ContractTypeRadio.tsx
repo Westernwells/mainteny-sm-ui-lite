@@ -41,7 +41,9 @@ export const ContractTypeRadio = ({
             px: '1.2em',
             py: '1.125rem',
             cursor: 'pointer',
-            border: `1px solid ${theme.palette.eden.light}`,
+            border: checked
+              ? `2px solid ${theme.palette.primary.mainLight}`
+              : `2px solid ${theme.palette.eden.light}`,
             borderRadius: 2,
           }}>
           <FormRadio
