@@ -120,7 +120,7 @@ export const Reports = () => {
     const selected = formik.values.reportType === option.value;
     const textColor = selected ? 'white' : theme.palette.text.primary;
     const iconColor = selected ? 'white' : theme.palette.action.active;
-    const backgroundColor = selected ? theme.palette.secondary.dark : 'white';
+    const backgroundColor = selected ? theme.palette.primary.main : 'white';
 
     return (
       <Card

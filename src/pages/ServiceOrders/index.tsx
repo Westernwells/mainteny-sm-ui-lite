@@ -1,12 +1,12 @@
-import {useEffect, useRef, useState} from 'react';
+import {useRef} from 'react';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ListAltIcon from '@mui/icons-material/ListAlt';
-import {useNavigate, useSearchParams} from 'react-router-dom';
-import {formatSearchParams} from 'utils/utils';
+import {useNavigate} from 'react-router-dom';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
+import {useQueryState} from 'hooks/useQueryState';
 import {ServiceOrderScheduleTab} from './Tabs/ServiceOrderScheduleTab';
 import {ServiceOrderList} from './Tabs/ServiceOrderList.tsx';
 
@@ -22,14 +22,12 @@ const tabItems = [
 ];
 
 export const ServiceOrders = () => {
-  const [tabValue, setTabValue] = useState(0);
-  const [queryParams, setQueryParams] = useSearchParams();
+  const [tabValue, setTabValue] = useQueryState('tab', {
+    defaultValue: 0,
+    reset: true,
+    parserOptions: {parseNumbers: true},
+  });
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-    if (currentParams.tab) setTabValue(Number(currentParams.tab));
-  }, []);
 
   const track = (cb: () => void) => {
     Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ORDER_BUTTON_CLICKED);
@@ -71,11 +69,6 @@ export const ServiceOrders = () => {
     },
   ]).current;
 
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-    if (currentParams.tab) setTabValue(Number(currentParams.tab));
-  }, []);
-
   return (
     <Tabs
       hideBackIcon
@@ -85,12 +78,7 @@ export const ServiceOrders = () => {
       btnLabel="New Job"
       currentIndex={tabValue}
       pageTitle="Service Jobs"
-      onChange={(index) => {
-        setQueryParams(
-          formatSearchParams({tab: index.toString()}, queryParams),
-        );
-        setTabValue(index);
-      }}>
+      onChange={(index) => setTabValue(index)}>
       <TabsBody value={tabValue} index={0}>
         <ServiceOrderScheduleTab />
       </TabsBody>

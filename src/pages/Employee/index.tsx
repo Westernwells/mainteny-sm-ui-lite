@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {useNavigate, useSearchParams} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {addDays, endOfDay, startOfDay} from 'date-fns';
 import {GridRowsProp} from '@mui/x-data-grid';
 import * as _ from 'lodash';
@@ -18,10 +18,6 @@ import {TechnicianEventType} from 'models/misc';
 import {UserView, Role} from 'models/user';
 import {TechnicianEventPair} from 'models/technician';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {
-  formatSearchParamsPageIndex,
-  formatSearchParamsPageSize,
-} from 'utils/utils';
 import {toRestDateTime} from 'utils/datetime';
 import {getRoles} from 'utils/work-hours-utils';
 import {columns, makeRows} from './EmployeeDataGridProps';
@@ -31,13 +27,14 @@ const pageSize = 25;
 export const Employees = () => {
   const navigate = useNavigate();
 
-  const [page, setPage] = useState(makePage(0, pageSize));
-  const [queryParams, setQueryParams] = useSearchParams();
+  const [page, setPage] = useQueryState('page', {
+    defaultValue: makePage(0, pageSize),
+  });
   const totalEmployeeRef = useRef(0);
   const [pageCount, setPageCount] = useState(0);
-  const [search, setSearch] = useQueryState('searchEmployees');
+  const [search, setSearch, clearFilters] = useQueryState('searchEmployees');
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const [role, setRole] = useState<Role | string>('');
+  const [role, setRole] = useQueryState<Role | string>('role');
   const textInput = useRef<HTMLInputElement>(null);
 
   const {
@@ -68,28 +65,16 @@ export const Employees = () => {
     totalEmployeeRef.current || userAccountResource.total;
 
   useEffect(() => {
-    if (page.pageIndex) {
-      setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    if (
+      userAccountResource.total > 0 &&
+      userAccountResource.data.length === 0
+    ) {
+      setPage({...page, pageIndex: 0});
     }
     if (textInput.current) {
       textInput.current.value = search;
     }
   }, [search, role]);
-
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-
-    if (currentParams.pageSize)
-      setPage({
-        ...page,
-        pageSize: Number(currentParams.pageSize),
-      });
-    if (currentParams.pageIndex)
-      setPage({
-        ...page,
-        pageIndex: Number(currentParams.pageIndex) - 1,
-      });
-  }, [queryParams]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -127,19 +112,11 @@ export const Employees = () => {
     setRole(value[0] as Role);
   };
 
-  const handleClearFilters = () => {
-    setSearch('');
-    setRole('');
-    if (textInput.current) {
-      textInput.current.value = '';
-    }
-  };
-
   const renderFilterItems = () => (
     <FilterFields
       containerStyle={{alignSelf: 'center', height: '100%'}}
       wrapperStyle={{alignItems: 'center'}}
-      onClear={handleClearFilters}>
+      onClear={clearFilters}>
       <MultipleSelectCheckmarks
         label="Role"
         initialSelectedItems={role ? [role] : []}
@@ -169,6 +146,7 @@ export const Employees = () => {
           btnLabel="New Employee"
           refInput={textInput}
           filterItems={renderFilterItems()}
+          defaultSearchValue={search}
         />
       }>
       <DataGridLayout
@@ -179,10 +157,16 @@ export const Employees = () => {
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
-          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+          setPage({
+            ...page,
+            pageSize: newPageSize,
+          })
         }
         handlePageChange={(newPage: number) =>
-          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+          setPage({
+            ...page,
+            pageIndex: newPage - 1,
+          })
         }
         pageCount={pageCount}
         totalRows={userAccountResource.total}

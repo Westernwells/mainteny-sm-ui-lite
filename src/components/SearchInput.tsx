@@ -13,6 +13,7 @@ interface Props {
   variant?: 'standard' | 'filled' | 'outlined' | undefined;
   label?: string;
   refInput?: RefObject<HTMLInputElement>;
+  defaultValue?: string;
 }
 
 export const SearchInput = ({
@@ -23,6 +24,7 @@ export const SearchInput = ({
   variant,
   label,
   refInput,
+  defaultValue = '',
 }: Props) => {
   const {t} = useTranslation();
 
@@ -71,6 +73,7 @@ export const SearchInput = ({
       placeholder={placeholder && t(placeholder)}
       variant={variant}
       label={label && t(label)}
+      defaultValue={defaultValue}
       inputRef={refInput}
       onChange={debouncedChangeHandler}
       InputLabelProps={{shrink: variant === 'outlined'}}

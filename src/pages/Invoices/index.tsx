@@ -6,11 +6,7 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
 import {useElevatorInvoices, useInvoices} from 'hooks/reactQuery/useInvoice';
 import {PageListingLayout} from 'components/PageListingLayout';
-import {
-  formatSearchParamsPageIndex,
-  formatSearchParamsPageSize,
-} from 'utils/utils';
-import {useSearchParams, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {
@@ -43,12 +39,15 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-  const [search, setSearch] = useQueryState('searchInvoices');
-  const [queryParams, setQueryParams] = useSearchParams();
-  const [page, setPage] = useState(makePage(0, pageSize));
+  const [search, setSearch, clearFilters] = useQueryState('searchInvoices');
+  const [page, setPage] = useQueryState('page', {
+    defaultValue: makePage(0, pageSize),
+  });
   const totalInvoiceRef = useRef(0);
-  const [status, setStatus] = useState<InvoiceStatus>();
-  const [cost, setCost] = useState<number[][]>([]);
+  const [status, setStatus] = useQueryState<InvoiceStatus>('status');
+  const [cost, setCost] = useQueryState<number[][]>('cost', {
+    defaultValue: [],
+  });
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
   const textInput = useRef<HTMLInputElement>(null);
@@ -122,7 +121,6 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
 
   useEffect(() => {
     if (invoiceResource.total > 0 && invoiceResource.data.length === 0) {
-      setQueryParams(formatSearchParamsPageIndex(1, queryParams));
       setPage({
         ...page,
         pageIndex: 0,
@@ -133,24 +131,6 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
       textInput.current.value = search;
     }
   }, [search, status, cost, invoiceResource]);
-
-  useEffect(() => {
-    if (textInput.current) {
-      textInput.current.value = search;
-    }
-  }, [queryParams]);
-
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-    const initialPageIndex = currentParams.pageIndex
-      ? Number(currentParams.pageIndex)
-      : 0;
-
-    setPage({
-      ...page,
-      pageIndex: initialPageIndex > 0 ? initialPageIndex - 1 : 0,
-    });
-  }, []);
 
   useEffect(() => {
     if (!isLoading) {
@@ -180,14 +160,7 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
 
   const renderFilterItems = () => (
     <FilterFields
-      onClear={() => {
-        setStatus(undefined);
-        setCost([]);
-        setSearch('');
-        if (textInput.current) {
-          textInput.current.value = '';
-        }
-      }}
+      onClear={clearFilters}
       wrapperStyle={{flex: 1, gap: 1.5}}
       containerStyle={{width: '35%', gap: 1.5}}>
       <PriceRangeDropdown
@@ -199,11 +172,13 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
       <MultipleSelectCheckmarks
         label="Status"
         options={Object.values(InvoiceStatusView).map((value) => value)}
-        getSelectedValue={(items: string[]) =>
-          setStatus(mapInvoiceStatus((items as InvoiceStatusView[])[0]))
-        }
+        getSelectedValue={(items) => {
+          if (items.length > 0) {
+            setStatus(mapInvoiceStatus(items[0] as InvoiceStatusView));
+          }
+        }}
         multiple={false}
-        initialSelectedItems={status ? [status] : []}
+        initialSelectedItems={status ? [InvoiceStatusView[status]] : []}
         formControlStyles={{width: '100%'}}
         containerStyles={{flex: 1}}
       />
@@ -257,15 +232,17 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
-          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+          setPage({
+            ...page,
+            pageSize: newPageSize,
+          })
         }
-        handlePageChange={(newPage: number) => {
-          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams));
+        handlePageChange={(newPage: number) =>
           setPage({
             ...page,
             pageIndex: newPage - 1,
-          });
-        }}
+          })
+        }
         pageCount={pageCount}
         totalRows={invoiceResource?.total}
         lastSyncedText={xeroInfoData?.enabled ? lastSyncedText : ''}

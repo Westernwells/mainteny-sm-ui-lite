@@ -8,6 +8,7 @@ import _ from 'lodash';
 import {ArticleSupplierView} from 'models/article';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {useQueryArticleSuppliers} from 'hooks/reactQuery/useArticle';
+import {useQueryState} from 'hooks/useQueryState';
 import {Progress} from 'components/Progress';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {EmptySection} from 'components/EmptySection';
@@ -80,10 +81,12 @@ const pageSize = 25;
 
 export const SupplierListDataGrid = () => {
   const navigate = useNavigate();
-  const [page, setPage] = useState(makePage(0, pageSize));
+  const [page, setPage] = useQueryState('page', {
+    defaultValue: makePage(0, pageSize),
+  });
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useQueryState('query');
   const textInput = useRef<HTMLInputElement>(null);
   const {
     data: articleSupplierResource = createEmptyResource<ArticleSupplierView>(
@@ -95,7 +98,10 @@ export const SupplierListDataGrid = () => {
   } = useQueryArticleSuppliers(page, query, {keepPreviousData: true});
 
   useEffect(() => {
-    if (page.pageIndex) {
+    if (
+      articleSupplierResource.total > 0 &&
+      articleSupplierResource.data.length === 0
+    ) {
       setPage({...page, pageIndex: 0});
     }
   }, [query]);
@@ -129,6 +135,7 @@ export const SupplierListDataGrid = () => {
           searchPlaceholder="Search"
           getSearchValue={setQuery}
           refInput={textInput}
+          defaultSearchValue={query}
         />
       }>
       <DataGridLayout
@@ -152,10 +159,10 @@ export const SupplierListDataGrid = () => {
         pageIndex={page.pageIndex + 1}
         pageCount={pageCount}
         handlePageChange={(value) =>
-          setPage((prev) => ({
-            ...prev,
+          setPage({
+            ...page,
             pageIndex: value - 1,
-          }))
+          })
         }
         containerStyle={{
           py: 1.5,
