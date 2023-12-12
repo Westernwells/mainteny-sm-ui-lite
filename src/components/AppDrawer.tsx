@@ -428,11 +428,9 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                   <ListItemButton
                     onClick={(e) => onClick(e, index)}
                     selected={selectedPath === path}
-                    style={{
-                      paddingTop: 12,
-                      paddingBottom: 12,
-                    }}
                     sx={{
+                      paddingTop: 2,
+                      paddingBottom: 2,
                       transition: (theme) =>
                         theme.transitions.create('margin', {
                           easing: theme.transitions.easing.sharp,
@@ -442,6 +440,9 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                       '&:hover': {
                         background: '#40748054',
                         color: '#FFF',
+                        '.MuiListItemIcon-root > svg > g': {
+                          opacity: 1.0,
+                        },
                       },
                     }}
                     key={text}>
