@@ -63,13 +63,13 @@ variables:
     - cd sm-ui-lite-deployment
     - npm ci
     - pulumi login s3://mainteny-pulumi-state
+    - pulumi stack select "sm-ui-lite.${STACK}"
     - pulumi config set aws:region eu-central-1
   variables:
     ENV: stage
     CACHE_PATH: /*
   script:
     - echo "Deploying ${IMAGE_SUFFIX} on environment $STACK"
-    - pulumi stack select "sm-ui-lite.${STACK}"
     - pulumi config set --path "mainteny:imageName" ${DOCKER_REGISTRY}/sm-lite:${IMAGE_SUFFIX}-${IMAGE_ENV}
     - pulumi config set mainteny:version ${CI_COMMIT_SHORT_SHA}_$(date '+%Y%m%d')
     - pulumi config set mainteny:deploymentTimeStamp "$(date)"
