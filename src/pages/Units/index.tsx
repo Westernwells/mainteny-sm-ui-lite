@@ -1,11 +1,10 @@
-import {useEffect, useState} from 'react';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import MapIcon from '@mui/icons-material/Map';
 
-import {formatSearchParams} from 'utils/utils';
-import {useNavigate, useSearchParams} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
+import {useQueryState} from 'hooks/useQueryState';
 import {Tabs} from 'components/Tab';
 import {TabsBody} from 'components/TabsBody';
 import {UnitListingView} from './Tabs/UnitListingView';
@@ -24,13 +23,11 @@ const tabItems = [
 
 export const MyUnits = () => {
   const navigate = useNavigate();
-  const [tabValue, setTabValue] = useState(0);
-  const [queryParams, setQueryParams] = useSearchParams();
-
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-    if (currentParams.tab) setTabValue(Number(currentParams.tab));
-  }, []);
+  const [tabValue, setTabValue] = useQueryState('tab', {
+    defaultValue: 0,
+    reset: true,
+    parserOptions: {parseNumbers: true},
+  });
 
   const onClickNewUnitBtn = () => {
     Mixpanel.identifyAndTrack(mixpanelEvents.NEW_UNIT_BUTTON_CLICKED);
@@ -46,12 +43,7 @@ export const MyUnits = () => {
       btnOnClick={onClickNewUnitBtn}
       currentIndex={tabValue}
       pageTitle="Service Jobs"
-      onChange={(index) => {
-        setQueryParams(
-          formatSearchParams({tab: index.toString()}, queryParams),
-        );
-        setTabValue(index);
-      }}>
+      onChange={(index) => setTabValue(index)}>
       <TabsBody value={tabValue} index={0}>
         <UnitListingView />
       </TabsBody>

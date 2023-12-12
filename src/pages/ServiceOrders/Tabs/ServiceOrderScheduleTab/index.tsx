@@ -35,25 +35,30 @@ import {
   getSelectedOrderStatuses,
   serviceOrderTypeToString,
   serviceOrderTypeToEnum,
+  serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import Typography from '@mui/material/Typography';
 import {useWhen} from 'hooks/useWhen';
+import {useQueryState} from 'hooks/useQueryState';
 import {UnAssignedServiceOrders} from './UnAssigedServiceOrder';
 
 export const ServiceOrderScheduleTab = () => {
   const {t} = useTranslation();
   const getWhen = useWhen();
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();
-  const [technicianSearch, setTechnicianSearch] = useState('');
+  const [technicianSearch, setTechnicianSearch] =
+    useQueryState('technicianSearch');
   const [orders, setOrders] = useState<{[key: string]: ServiceOrderView[]}>({});
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useQueryState('currentDate', {
+    defaultValue: new Date(),
+    isDate: true,
+  });
   const [switchActive, setSwitchActive] = useState(false);
-  const [selectedOrderStatus, setSelectedOrderStatus] = useState<
+  const [selectedOrderStatus, setSelectedOrderStatus] = useQueryState<
     ServiceOrderStatus[] | []
-  >([]);
-  const [selectedOrderTypes, setSelectedOrderTypes] = useState<
-    ServiceOrderType[]
-  >([]);
+  >('selectedOrderStatus', {defaultValue: []});
+  const [selectedOrderTypes, setSelectedOrderTypes, clearFilters] =
+    useQueryState<ServiceOrderType[]>('selectedOrderTypes', {defaultValue: []});
   const [page] = useState(makePage(0, 500));
 
   const {data: technicianResource = createEmptyResource<EmployeesView>(10)} =
@@ -131,17 +136,15 @@ export const ServiceOrderScheduleTab = () => {
   };
 
   const renderFilterItems = () => (
-    <FilterFields
-      onClear={() => {
-        setSelectedOrderStatus([]);
-        setSelectedOrderTypes([]);
-      }}>
+    <FilterFields onClear={clearFilters}>
       <MultipleSelectCheckmarks
         label="Order Types"
         options={Object.keys(ServiceOrderType).map((i) =>
           serviceOrderTypeToString(i),
         )}
-        initialSelectedItems={selectedOrderTypes}
+        initialSelectedItems={selectedOrderTypes.map((i) =>
+          serviceOrderTypeToString(i),
+        )}
         getSelectedValue={(item) => {
           const orderTypes = item.map((i) => serviceOrderTypeToEnum(i));
           setSelectedOrderTypes(orderTypes as ServiceOrderType[]);
@@ -152,7 +155,9 @@ export const ServiceOrderScheduleTab = () => {
         label="Status"
         options={getServiceOrderStatusList()}
         getSelectedValue={getSelectedStatusValues}
-        initialSelectedItems={selectedOrderStatus}
+        initialSelectedItems={selectedOrderStatus.map((i) =>
+          serviceOrderStatusToString(i),
+        )}
         multiple
       />
     </FilterFields>
@@ -213,7 +218,10 @@ export const ServiceOrderScheduleTab = () => {
           scheduleItems={orders}
           scheduleType="people"
           searchPlaceholder="e.g. Tobias"
-          handleSearch={(value) => setTechnicianSearch(value)}
+          handleSearch={(value) => {
+            setTechnicianSearch(value);
+          }}
+          defaultSearchValue={technicianSearch}
           technicians={technicianResource.data}
           labelWidth="14rem"
           renderCellItem={(order: ServiceOrderView, width, position) => (

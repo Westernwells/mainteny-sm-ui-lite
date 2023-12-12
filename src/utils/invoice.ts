@@ -45,7 +45,7 @@ export const mapInvoiceStatus = (invoiceStatus: InvoiceStatusView) => {
     case InvoiceStatusView.CANCELLED:
       return InvoiceStatus.CANCELLED;
     default:
-      return undefined;
+      return InvoiceStatus.DRAFT;
   }
 };
 

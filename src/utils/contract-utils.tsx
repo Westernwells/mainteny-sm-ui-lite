@@ -34,6 +34,32 @@ export const costRangeConvertor = (
   return range;
 };
 
+export const rangeConvertorInverse = (
+  selectedItems: number[][],
+  currencySymbol: string,
+) => {
+  const range: string[] = [];
+  selectedItems.forEach((item) => {
+    switch (true) {
+      case item[0] === 0 && item[1] === 50000:
+        range.push(`0 - ${currencySymbol}500`);
+        break;
+
+      case item[0] === 50000 && item[1] === 100000:
+        range.push(`${currencySymbol}500 - ${currencySymbol}1,000`);
+        break;
+
+      case item[0] === 100000 && item[1] === 9999999:
+        range.push(`> ${currencySymbol}1,000`);
+        break;
+
+      default:
+        break;
+    }
+  });
+  return range;
+};
+
 export const getStartEndPrice = (price: number[][]) => {
   const numbers =
     price.length &&

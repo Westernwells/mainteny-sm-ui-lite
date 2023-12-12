@@ -1949,5 +1949,15 @@
   "Last character can't be a digit": "Poslednji znak ne može biti cifra",
   "1 Order": "1 Narudžba",
   "{{numberOfOrders}} Orders": "{{numberOfOrders}} Porudžbine",
-  "0 Order": "0 Narudžba"
+  "0 Order": "0 Narudžba",
+  "Job Status": "Poslovni status",
+  "Invoice Status": "Status fakture",
+  "Not Paid": "Neplaćen",
+  "Auto Generated": "Automatski generirano",
+  "Called By": "Pozivalac",
+  "Purchase Order Number": "Broj narudžbenice",
+  "Scheduled Date": "Zakazan datum",
+  "Invoiced Sum (incl. VAT)": "Fakturisani iznos (sa PDV-om)",
+  "Total Sum (excl. VAT)": "Ukupna suma (bez PDV)",
+  "Edit Article": "Uredi stavku"
 }

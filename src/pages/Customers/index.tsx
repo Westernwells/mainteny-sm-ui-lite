@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {useNavigate, useSearchParams} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {Box} from '@mui/material';
 import {Mixpanel} from 'mixpanel/mixpanel';
@@ -11,10 +11,6 @@ import {FilterFields} from 'components/FilterFields';
 import {Progress} from 'components/Progress';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
-import {
-  formatSearchParamsPageIndex,
-  formatSearchParamsPageSize,
-} from 'utils/utils';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {getFilterUnitNumber} from 'utils/customer-utils';
@@ -33,11 +29,15 @@ export const Customer = () => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
 
-  const [search, setSearch] = useQueryState('searchCustomers');
-  const [numberOfUnits, setNumberOfUnits] = useState<string[]>([]);
-  const [queryParams, setQueryParams] = useSearchParams();
+  const [search, setSearch, clearFilters] = useQueryState('searchCustomers');
+  const [numberOfUnits, setNumberOfUnits] = useQueryState<string[]>(
+    'numberOfUnits',
+    {defaultValue: []},
+  );
   const totalCustomerRef = useRef(0);
-  const [page, setPage] = useState(makePage(0, pageSize));
+  const [page, setPage] = useQueryState('page', {
+    defaultValue: makePage(0, pageSize),
+  });
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
   const textInput = useRef<HTMLInputElement>(null);
@@ -75,27 +75,12 @@ export const Customer = () => {
 
   useEffect(() => {
     if (page.pageIndex) {
-      setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+      setPage({...page, pageIndex: 0});
     }
     if (textInput.current) {
       textInput.current.value = search;
     }
-  }, [search, numberOfUnits]);
-
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-
-    if (currentParams.pageSize)
-      setPage({
-        ...page,
-        pageSize: Number(currentParams.pageSize),
-      });
-    if (currentParams.pageIndex)
-      setPage({
-        ...page,
-        pageIndex: Number(currentParams.pageIndex) - 1,
-      });
-  }, [queryParams]);
+  }, [search, `${numberOfUnits}`]); // hack to not re-render when number of units array reference changes
 
   useEffect(() => {
     if (!isLoading) {
@@ -117,19 +102,11 @@ export const Customer = () => {
     setNumberOfUnits(value);
   };
 
-  const handleClearFilters = () => {
-    setSearch('');
-    setNumberOfUnits([]);
-    if (textInput.current) {
-      textInput.current.value = '';
-    }
-  };
-
   const renderFilterItems = () => (
     <FilterFields
       containerStyle={{alignSelf: 'center', height: '100%'}}
       wrapperStyle={{alignItems: 'center'}}
-      onClear={handleClearFilters}>
+      onClear={clearFilters}>
       <Box
         sx={{
           minWidth: '21.875em',
@@ -194,6 +171,7 @@ export const Customer = () => {
           btnOnClick={() => navigate('/customers/new')}
           btnLabel="New Customer"
           filterItems={renderFilterItems()}
+          defaultSearchValue={search}
         />
       }>
       <DataGridLayout
@@ -204,10 +182,16 @@ export const Customer = () => {
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
-          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+          setPage({
+            ...page,
+            pageSize: newPageSize,
+          })
         }
         handlePageChange={(newPage: number) =>
-          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+          setPage({
+            ...page,
+            pageIndex: newPage - 1,
+          })
         }
         pageCount={pageCount}
         totalRows={customerResource.total}

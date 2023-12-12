@@ -13,6 +13,7 @@ import {PageCard} from 'components/PageCard';
 import {DatePicker} from 'components/DatePicker';
 import {ServiceOrderView} from 'models/service-order';
 import {useDueServiceOrders} from 'hooks/reactQuery/useServiceOrder';
+import {useQueryState} from 'hooks/useQueryState';
 import {useInView} from 'react-intersection-observer';
 import {endOfDay, startOfDay, addDays} from 'date-fns';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
@@ -26,18 +27,22 @@ interface Props extends BoxProps {
 
 export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
   const {t} = useTranslation();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useQueryState('searchServiceOrders');
   const {ref, inView} = useInView();
   const [page, setPage] = useState(makePage(0, 50));
   const [hasMore, setHasMore] = useState(false);
   const [serviceOrdersView, setServiceOrdersView] = useState<
     Resource<ServiceOrderView>
   >(createEmptyResource<ServiceOrderView>(page.pageSize));
-  const [startDate, setStartDate] = useState(
-    startOfDay(addDays(new Date(), -90)),
-  );
-  const [endDate, setEndDate] = useState(endOfDay(addDays(new Date(), 90)));
-  const [order, setOrder] = useState(Order.DESC);
+  const [startDate, setStartDate] = useQueryState('startDate', {
+    defaultValue: startOfDay(addDays(new Date(), -90)),
+    isDate: true,
+  });
+  const [endDate, setEndDate] = useQueryState('endDate', {
+    defaultValue: endOfDay(addDays(new Date(), 90)),
+    isDate: true,
+  });
+  const [order, setOrder] = useQueryState('order', {defaultValue: Order.DESC});
 
   const {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(page.pageSize),
@@ -112,6 +117,7 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
               placeholder="e.g. REWE AG"
               variant="outlined"
               label="Search"
+              defaultValue={search}
               onValueChanged={(searchValue) => setSearch(searchValue)}
               containerStyle={{
                 background: '#fff',
