@@ -13,11 +13,7 @@ import {DatePicker} from 'components/DatePicker';
 import {Order} from 'models/misc';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
-import {
-  formatSearchParamsPageIndex,
-  formatSearchParamsPageSize,
-} from 'utils/utils';
-import {useNavigate, useSearchParams} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {FlexContainer} from 'components/FlexContainer';
@@ -29,20 +25,45 @@ const pageInfo = makePage(0, 50);
 export const UnitListingView = () => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-  const [queryParams, setQueryParams] = useSearchParams();
-  const [lastVisitStart, setLastVisitStart] = useState<Date | null>(null);
-  const [lastVisitEnd, setLastVisitEnd] = useState<Date | null>(null);
-  const [nextVisitStart, setNextVisitStart] = useState<Date | null>(null);
-  const [nextVisitEnd, setNextVisitEnd] = useState<Date | null>(null);
-  const [sortOrder, setSortOrder] = useState<Order | undefined>();
-  const [orderBy, setOrderBy] = useState<ServiceOrderOrderField | undefined>();
+  const [lastVisitStart, setLastVisitStart, clearFilters] =
+    useQueryState<Date | null>('lastVisitStart', {
+      defaultValue: null,
+      isDate: true,
+    });
+  const [lastVisitEnd, setLastVisitEnd] = useQueryState<Date | null>(
+    'lastVisitEnd',
+    {
+      defaultValue: null,
+      isDate: true,
+    },
+  );
+  const [nextVisitStart, setNextVisitStart] = useQueryState<Date | null>(
+    'nextVisitStart',
+    {
+      defaultValue: null,
+      isDate: true,
+    },
+  );
+  const [nextVisitEnd, setNextVisitEnd] = useQueryState<Date | null>(
+    'nextVisitEnd',
+    {
+      defaultValue: null,
+      isDate: true,
+    },
+  );
+  const [sortOrder, setSortOrder] = useQueryState<Order | undefined>(
+    'sortOrder',
+    undefined,
+  );
+  const [orderBy, setOrderBy] = useQueryState<
+    ServiceOrderOrderField | undefined
+  >('orderBy', undefined);
   const [search, setSearch] = useQueryState('searchUnits');
-  const [page, setPage] = useState(pageInfo);
+  const [page, setPage] = useQueryState('page', {defaultValue: pageInfo});
   const totalUnitsRef = useRef(0);
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [resetDatePicker, setResetDatePicker] = useState(false);
-  const textInput = useRef<HTMLInputElement>(null);
 
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
@@ -76,10 +97,7 @@ export const UnitListingView = () => {
 
   useEffect(() => {
     if (page.pageIndex) {
-      setQueryParams(formatSearchParamsPageIndex(1, queryParams));
-    }
-    if (textInput.current) {
-      textInput.current.value = search;
+      setPage({...page, pageIndex: 0});
     }
   }, [search, lastVisitStart, lastVisitEnd, nextVisitStart, nextVisitEnd]);
 
@@ -88,20 +106,6 @@ export const UnitListingView = () => {
       setRows(makeRows(elevatorResponse.data, formatDate));
     }
   }, [elevatorResponse, isLoading]);
-
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-    if (currentParams.pageSize)
-      setPage({
-        ...page,
-        pageSize: Number(currentParams.pageSize),
-      });
-    if (currentParams.pageIndex)
-      setPage({
-        ...page,
-        pageIndex: Number(currentParams.pageIndex) - 1,
-      });
-  }, [queryParams]);
 
   useEffect(() => {
     if (elevatorResponse) {
@@ -114,18 +118,6 @@ export const UnitListingView = () => {
     setSortOrder(sortModel[0].sort?.toUpperCase() as Order);
     setOrderBy(sortModel[0].field as ServiceOrderOrderField);
   }, []);
-
-  const clearFilters = () => {
-    setLastVisitStart(null);
-    setLastVisitEnd(null);
-    setNextVisitStart(null);
-    setNextVisitEnd(null);
-    setResetDatePicker(true);
-    setSearch('');
-    if (textInput.current) {
-      textInput.current.value = '';
-    }
-  };
 
   if (isFetched && !totalUnitsRef.current) {
     return (
@@ -146,7 +138,7 @@ export const UnitListingView = () => {
   }
 
   const renderFilterItems = () => (
-    <FilterFields onClear={() => clearFilters()} wrapperStyle={{width: '90%'}}>
+    <FilterFields onClear={clearFilters} wrapperStyle={{width: '90%'}}>
       <DatePicker
         defaultDate={lastVisitStart}
         containerStyles={{mr: '1em'}}
@@ -226,7 +218,7 @@ export const UnitListingView = () => {
       <Widget
         searchPlaceholder="Search by number, model, customer, address etc."
         getSearchValue={(val) => setSearch(val)}
-        refInput={textInput}
+        defaultSearchValue={search}
         filterItems={renderFilterItems()}
       />
     </Box>
@@ -248,11 +240,17 @@ export const UnitListingView = () => {
         pageIndex={page.pageIndex + 1}
         onSortModelChange={handleSortModelChange}
         handlePageSizeChange={(newPageSize: number) =>
-          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+          setPage({
+            ...page,
+            pageSize: newPageSize,
+          })
         }
-        handlePageChange={(newPage: number) =>
-          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
-        }
+        handlePageChange={(newPage: number) => {
+          setPage({
+            ...page,
+            pageIndex: newPage - 1,
+          });
+        }}
         pageCount={pageCount}
         totalRows={elevatorResponse.total}
       />

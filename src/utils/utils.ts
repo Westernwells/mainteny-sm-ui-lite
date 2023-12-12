@@ -17,28 +17,12 @@ export const capitalize = (role: any[]) => {
   return roles;
 };
 
-export const formatSearchParamsPageIndex = (
-  pageIndex: number,
-  queryParams: URLSearchParams,
-) => {
-  const currentParams = Object.fromEntries([...queryParams]);
-  return {...currentParams, pageIndex: pageIndex.toString()};
-};
-
 export const formatSearchParams = (
   options: {[key: string]: string},
   queryParams: URLSearchParams,
 ) => {
   const currentParams = Object.fromEntries([...queryParams]);
   return {...currentParams, ...options};
-};
-
-export const formatSearchParamsPageSize = (
-  newPageSize: number,
-  queryParams: URLSearchParams,
-) => {
-  const currentParams = Object.fromEntries([...queryParams]);
-  return {...currentParams, pageSize: newPageSize.toString()};
 };
 
 // Converts macro to text, eg: 'SERVICE_MANAGER' -> 'Service Manager'
@@ -276,3 +260,17 @@ export const fixRounding = (value: number, precision: number) => {
   const power = 10 ** (precision || 0);
   return Math.round(value * power) / power;
 };
+
+export const isJson = (item: string) => {
+  let value;
+  try {
+    value = JSON.parse(item);
+  } catch (e) {
+    return false;
+  }
+
+  return typeof value === 'object' && value !== null;
+};
+
+export const objectKeyByValue = (obj: Record<string, any>, value: string) =>
+  Object.keys(obj)[Object.values(obj).indexOf(value)];

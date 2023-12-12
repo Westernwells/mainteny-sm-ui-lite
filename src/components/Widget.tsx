@@ -12,6 +12,7 @@ interface Props {
   searchPlaceholder?: string;
   hideSearchInput?: boolean;
   getSearchValue?: (val: string) => void;
+  defaultSearchValue?: string;
   showActionBtn?: boolean;
   showMenuActionBtn?: Boolean;
   btnLabel?: string;
@@ -28,6 +29,7 @@ export const Widget = ({
   hideSearchInput = false,
   btnLabel = '',
   getSearchValue,
+  defaultSearchValue = '',
   btnOnClick,
   containerStyles,
   showMenuActionBtn,
@@ -48,6 +50,7 @@ export const Widget = ({
             onValueChanged={(value: string) =>
               getSearchValue && getSearchValue(value)
             }
+            defaultValue={defaultSearchValue}
             refInput={refInput}
           />
         </Box>

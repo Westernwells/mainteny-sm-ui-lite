@@ -60,6 +60,7 @@ interface Props {
   defaultTypeLabel?: string;
   searchPlaceholder?: string;
   handleSearch?: (val: string) => void;
+  defaultSearchValue?: string;
   containerStyles?: {[key: string]: any};
   footerContainerStyles?: {[key: string]: any};
   cardFooter?: ReactNode;
@@ -82,6 +83,7 @@ export const Schedule = ({
   scheduleType = 'default',
   searchPlaceholder = 'Search',
   handleSearch,
+  defaultSearchValue = '',
   containerStyles,
   cardFooter,
   defaultTypeLabel = '',
@@ -294,6 +296,7 @@ export const Schedule = ({
                           }
                           searchPlaceholder={t(searchPlaceholder)}
                           scheduleType={scheduleType}
+                          defaultValue={defaultSearchValue}
                         />
                       </ScheduleHeaderCell>
                     );

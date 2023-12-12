@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {useNavigate, useSearchParams} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
@@ -15,12 +15,7 @@ import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
-import {
-  convertToMacro,
-  convertToText,
-  formatSearchParamsPageIndex,
-  formatSearchParamsPageSize,
-} from 'utils/utils';
+import {convertToMacro, convertToText, objectKeyByValue} from 'utils/utils';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {useFormatDate} from 'hooks/useFormatDate';
@@ -33,11 +28,14 @@ export const Quotations = () => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
 
-  const [search, setSearch] = useQueryState('searchQuotations');
+  const [search, setSearch, clearFilters] = useQueryState('searchQuotations');
   const totalQuotationsRef = useRef(0);
-  const [status, setStatus] = useState<QuotationStatus[]>([]);
-  const [page, setPage] = useState(makePage(0, pageSize));
-  const [queryParams, setQueryParams] = useSearchParams();
+  const [status, setStatus] = useQueryState<QuotationStatus[]>('status', {
+    defaultValue: [],
+  });
+  const [page, setPage] = useQueryState('page', {
+    defaultValue: makePage(0, pageSize),
+  });
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const textInput = useRef<HTMLInputElement>(null);
@@ -62,49 +60,22 @@ export const Quotations = () => {
     totalQuotationsRef.current || quotationsResource.total;
 
   useEffect(() => {
-    if (page.pageIndex) {
-      setQueryParams(formatSearchParamsPageIndex(1, queryParams));
+    if (quotationsResource.total > 0 && quotationsResource.data.length === 0) {
+      setPage({
+        ...page,
+        pageIndex: 0,
+      });
     }
     if (textInput.current) {
       textInput.current.value = search;
     }
-  }, [search, status]);
+  }, [quotationsResource, search, `${status}`]); // hack to not re-render when number of units array reference changes
 
   useEffect(() => {
     if (!isLoading) {
       setRows(makeRows(quotationsResource, formatDate));
     }
   }, [quotationsResource, isLoading]);
-
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-
-    if (currentParams.pageSize)
-      setPage({
-        ...page,
-        pageSize: Number(currentParams.pageSize),
-      });
-    if (currentParams.pageIndex)
-      setPage({
-        ...page,
-        pageIndex: Number(currentParams.pageIndex) - 1,
-      });
-  }, [queryParams]);
-
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-
-    if (currentParams.pageSize)
-      setPage({
-        ...page,
-        pageSize: Number(currentParams.pageSize),
-      });
-    if (currentParams.pageIndex)
-      setPage({
-        ...page,
-        pageIndex: Number(currentParams.pageIndex) - 1,
-      });
-  }, [queryParams]);
 
   useEffect(() => {
     setPageCount(Math.ceil(quotationsResource.total / page.pageSize));
@@ -130,18 +101,13 @@ export const Quotations = () => {
     );
   }
   const renderFilterItems = () => (
-    <FilterFields
-      onClear={() => {
-        setSearch('');
-        setStatus([]);
-        if (textInput.current) {
-          textInput.current.value = '';
-        }
-      }}>
+    <FilterFields onClear={clearFilters}>
       <MultipleSelectCheckmarks
         label="Status"
         options={Object.keys(QuotationStatusView).map((i) => convertToText(i))}
-        initialSelectedItems={status}
+        initialSelectedItems={status.map((i) =>
+          convertToText(objectKeyByValue(QuotationStatusView, i)),
+        )}
         getSelectedValue={(item) =>
           setStatus(
             item
@@ -183,10 +149,16 @@ export const Quotations = () => {
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
         handlePageSizeChange={(newPageSize: number) =>
-          setQueryParams(formatSearchParamsPageSize(newPageSize, queryParams))
+          setPage({
+            ...page,
+            pageSize: newPageSize,
+          })
         }
         handlePageChange={(newPage: number) =>
-          setQueryParams(formatSearchParamsPageIndex(newPage, queryParams))
+          setPage({
+            ...page,
+            pageIndex: newPage - 1,
+          })
         }
         pageCount={pageCount}
         totalRows={quotationsResource.total}

@@ -26,6 +26,7 @@ import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {Widget} from 'components/Widget';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {convertToText, stringToTitleCase} from 'utils/utils';
+import {useQueryState} from 'hooks/useQueryState';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -124,11 +125,15 @@ export const ArticleListDataGrid = () => {
       item,
     }));
   const navigate = useNavigate();
-  const [page, setPage] = useState(makePage(0, pageSize));
+  const [page, setPage] = useQueryState('page', {
+    defaultValue: makePage(0, pageSize),
+  });
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
-  const [type, setType] = useState<ArticleType[]>([]);
-  const [query, setQuery] = useState('');
+  const [type, setType] = useQueryState<ArticleType[]>('type', {
+    defaultValue: [],
+  });
+  const [query, setQuery, clearFilters] = useQueryState('query');
   const textInput = useRef<HTMLInputElement>(null);
 
   const totalArticlesRef = useRef(0);
@@ -151,21 +156,13 @@ export const ArticleListDataGrid = () => {
 
   totalArticlesRef.current = totalArticlesRef.current || articleResource.total;
 
-  const clearAllFilters = () => {
-    setQuery('');
-    setType([]);
-    if (textInput.current) {
-      textInput.current.value = '';
-    }
-  };
-
   const navigateToNewArticle = () => {
     Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ARTICLE_BUTTON_CLICKED);
     navigate('/articles/new');
   };
 
   useEffect(() => {
-    if (page.pageIndex) {
+    if (articleResource.total > 0 && articleResource.data.length === 0) {
       setPage({...page, pageIndex: 0});
     }
   }, [query, type]);
@@ -214,8 +211,9 @@ export const ArticleListDataGrid = () => {
           searchPlaceholder="Search by name, category, manufacturer etc."
           getSearchValue={setQuery}
           refInput={textInput}
+          defaultSearchValue={query}
           filterItems={
-            <FilterFields onClear={() => clearAllFilters()}>
+            <FilterFields onClear={clearFilters}>
               <MultipleSelectCheckmarks
                 label="Type"
                 options={Object.keys(ArticleType).map((it) =>
@@ -225,7 +223,10 @@ export const ArticleListDataGrid = () => {
                   items[0] && setType([items[0].toUpperCase()] as ArticleType[])
                 }
                 multiple={false}
-                initialSelectedItems={type}
+                initialSelectedItems={
+                  type.length ? [convertToText(type[0])] : []
+                }
+                disableClearBtn
               />
             </FilterFields>
           }
@@ -240,10 +241,10 @@ export const ArticleListDataGrid = () => {
         pageIndex={page.pageIndex + 1}
         pageCount={pageCount}
         handlePageChange={(value) =>
-          setPage((prev) => ({
-            ...prev,
+          setPage({
+            ...page,
             pageIndex: value - 1,
-          }))
+          })
         }
       />
     </PageListingLayout>

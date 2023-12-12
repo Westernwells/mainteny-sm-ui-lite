@@ -1926,5 +1926,15 @@
   "Last character can't be a digit": "Das letzte Zeichen darf keine Ziffer sein",
   "1 Order": "1 Bestellung",
   "{{numberOfOrders}} Orders": "{{numberOfOrders}} Bestellungen",
-  "0 Order": "0 Bestellung"
+  "0 Order": "0 Bestellung",
+  "Job Status": "Auftragsstatus",
+  "Invoice Status": "Rechnungsstatus",
+  "Not Paid": "Nicht bezahlt",
+  "Auto Generated": "Auto. generiert",
+  "Called By": "Angerufen von",
+  "Purchase Order Number": "Bestellnummer",
+  "Scheduled Date": "Geplantes Datum",
+  "Invoiced Sum (incl. VAT)": "Rechnungsbetrag (inkl. MwSt.)",
+  "Total Sum (excl. VAT)": "Gesamtsumme (exkl. MwSt.)",
+  "Edit Article": "Artikel bearbeiten"
 }
