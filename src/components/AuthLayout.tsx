@@ -126,6 +126,8 @@ export const AuthLayout = ({children}: Props) => {
                 alt="globe"
               />
             }
+            menuListProps={{id: 'selectLanguageMenuList'}}
+            id="selectLanguageButton"
             label={
               selectedLng === 'EN'
                 ? 'English'

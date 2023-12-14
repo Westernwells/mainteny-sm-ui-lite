@@ -6,6 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import {MenuBtnProps} from 'models/misc';
 import IconButton from '@mui/material/IconButton';
 import {MouseEvent, useState} from 'react';
+import {MenuListProps} from '@mui/material';
 
 interface Props extends ButtonProps {
   label?: string | JSX.Element;
@@ -17,6 +18,7 @@ interface Props extends ButtonProps {
   anchorIcon?: JSX.Element | null;
   disableIcon?: boolean;
   persistList?: boolean;
+  menuListProps?: MenuListProps;
 }
 
 export const MenuBtn = ({
@@ -29,6 +31,7 @@ export const MenuBtn = ({
   anchorIcon = null,
   disableIcon,
   persistList = false,
+  menuListProps = {},
   ...rest
 }: Props) => {
   const {t} = useTranslation();
@@ -69,6 +72,7 @@ export const MenuBtn = ({
         onClose={handleClose}
         MenuListProps={{
           'aria-labelledby': 'basic-button',
+          ...menuListProps,
         }}
         {...menuProps}>
         {menu.map((item, index) => (
