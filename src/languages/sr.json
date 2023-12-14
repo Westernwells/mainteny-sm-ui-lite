@@ -1959,5 +1959,10 @@
   "Scheduled Date": "Zakazan datum",
   "Invoiced Sum (incl. VAT)": "Fakturisani iznos (sa PDV-om)",
   "Total Sum (excl. VAT)": "Ukupna suma (bez PDV)",
-  "Edit Article": "Uredi stavku"
+  "Edit Article": "Uredi stavku",
+  "Payment Status": "Status plaćanja",
+  "PAYMENT STATUS": "STATUS PLAĆANJA",
+  "Only the service orders created out of a quotation will have entries here.": "Ovde će se unositi samo nalozi usluga kreirani iz ponude.",
+  "JOB STATUS": "Poslovni status",
+  "Completed On": "Završeno"
 }
