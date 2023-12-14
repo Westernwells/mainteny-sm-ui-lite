@@ -1,4 +1,6 @@
-import { defineConfig } from 'cypress'
+import {defineConfig} from 'cypress';
+
+require('dotenv').config({path: '.env.stage'});
 
 export default defineConfig({
   e2e: {
@@ -8,7 +10,7 @@ export default defineConfig({
   component: {
     devServer: {
       framework: 'react',
-      bundler: 'vite'
-    }
-  }
-})
+      bundler: 'vite',
+    },
+  },
+});
