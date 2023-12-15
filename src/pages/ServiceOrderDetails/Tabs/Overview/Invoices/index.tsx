@@ -12,7 +12,19 @@ import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import {Button} from 'components/Button';
+import {ReactComponent as FinalInvoiceIcon} from 'assets/icons/FinalInvoiceIcon.svg';
+import {ReactComponent as UpfrontInvoiceIcon} from 'assets/icons/UpfrontInvoiceIcon.svg';
+import {ReactComponent as PartialInvoiceIcon} from 'assets/icons/PartialInvoiceIcon.svg';
+import {ReactComponent as CreditNoteIcon} from 'assets/icons/CreditNoteIcon.svg';
+import {RadioGroup} from '@mui/material';
+import {InvoiceType} from 'models/invoice';
 import {columns, makeRows} from './InvoicesDataGridProps';
+import InvoiceOption from './InvoiceOption';
 
 interface Props {
   serviceOrderId?: string;
@@ -24,6 +36,13 @@ export const Invoices = ({serviceOrderId}: Props) => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
   const [rows, setRows] = useState<GridRowsProp>([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [value, setValue] = useState<InvoiceType | null>(null);
+
+  const handleChange = (invoiceType: InvoiceType) => {
+    setValue(invoiceType);
+  };
+
   let totalInvoiceRef = useRef(0).current;
 
   const {
@@ -45,6 +64,43 @@ export const Invoices = ({serviceOrderId}: Props) => {
       );
     }
   }, [InvoiceList, isLoading]);
+
+  const iconStyle = {
+    fontSize: '3.5rem',
+    flex: '0 0 20%',
+  };
+
+  const invoiceTypeOptions = [
+    {
+      label: 'Final Invoice',
+      description:
+        'Straight-forward transaction requiring full payment upon delivery of goods or completion of services.',
+      icon: <FinalInvoiceIcon style={iconStyle} />,
+      invoiceType: InvoiceType.FINAL,
+    },
+    {
+      label: 'Partial Invoice',
+      description:
+        'For transactions where the payment will be made in multiple installments over a period of time.',
+      icon: <PartialInvoiceIcon style={iconStyle} />,
+      invoiceType: InvoiceType.PARTIAL,
+    },
+
+    {
+      label: 'Upfront Invoice',
+      description:
+        'Use when full payment is required before the delivery of goods or services.',
+      icon: <UpfrontInvoiceIcon style={iconStyle} />,
+      invoiceType: InvoiceType.UPFRONT,
+    },
+    {
+      label: 'Credit Note',
+      description:
+        'Correction or adjustment to an already issued invoice, typically used for refunds, returns, or errors.',
+      icon: <CreditNoteIcon style={iconStyle} />,
+      invoiceType: InvoiceType.CREDIT_NOTE,
+    },
+  ];
 
   const renderNoRowsSection = () => (
     <Box
@@ -70,7 +126,7 @@ export const Invoices = ({serviceOrderId}: Props) => {
   return (
     <InfoCard
       header={<Typography variant="subtitle1">{t('Invoices')}</Typography>}
-      handleAction={() => navigate(`/invoices/new?orderId=${serviceOrderId}`)}
+      handleAction={() => setOpenDialog(true)}
       headerActionIcon={
         <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
       }
@@ -88,6 +144,69 @@ export const Invoices = ({serviceOrderId}: Props) => {
           }}
         />
       )}
+      <Dialog
+        open={openDialog || false}
+        onClose={() => {
+          setOpenDialog(false);
+          setValue(null);
+        }}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{
+          sx: {
+            p: '1.5rem',
+          },
+        }}>
+        <DialogTitle id="alert-dialog-title" sx={{px: 0, pt: 0}}>
+          {t('Create new invoice')}
+        </DialogTitle>
+        <DialogContent sx={{p: 0, pb: '0.5rem'}}>
+          <RadioGroup
+            aria-labelledby="demo-controlled-radio-buttons-group"
+            name="controlled-radio-buttons-group"
+            value={value}>
+            {invoiceTypeOptions.map((item) => (
+              <InvoiceOption
+                key={item.invoiceType}
+                label={item.label}
+                description={item.description}
+                icon={item.icon}
+                invoiceType={item.invoiceType}
+                activeValue={value}
+                handleClick={() => handleChange(item.invoiceType)}
+              />
+            ))}
+          </RadioGroup>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            buttonProps={{
+              size: 'medium',
+              variant: 'text',
+              onClick: () => setOpenDialog(false),
+              sx: {
+                textTransform: 'capitalize',
+              },
+            }}>
+            <Typography variant="subtitle2">{t('Cancel')}</Typography>
+          </Button>
+          <Button
+            buttonProps={{
+              size: 'medium',
+              variant: 'contained',
+              autoFocus: true,
+              disabled: !value,
+              onClick: () => navigate(`/invoices/new?invoiceType=${value}`),
+              sx: {
+                textTransform: 'capitalize',
+              },
+            }}>
+            <Typography variant="subtitle2">{t('Create')}</Typography>
+          </Button>
+        </DialogActions>
+      </Dialog>
     </InfoCard>
   );
 };
