@@ -181,6 +181,7 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
         initialSelectedItems={status ? [InvoiceStatusView[status]] : []}
         formControlStyles={{width: '100%'}}
         containerStyles={{flex: 1}}
+        disableClearBtn
       />
     </FilterFields>
   );

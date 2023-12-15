@@ -14,10 +14,19 @@ variables:
 .build-project: &build-template
   stage: build-project
   image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/builder:sm-ui-5dedeb5b-1014954528
+  dependencies:
+    - lint-project
+    - tests
+  cache:
+    - key:
+        files:
+          - yarn.lock
+      paths:
+        - .yarn-cache/
   script:
     - cp -rf /home/sm-ui-lite/node_modules .
     - export NODE_OPTIONS='--max-old-space-size=4096'
-    - yarn install --frozen-lockfile
+    - yarn install --frozen-lockfile --cache-folder .yarn-cache
     - yarn prepare_env
     - yarn check-format
     - yarn check-types
@@ -29,6 +38,9 @@ variables:
       - Dockerfile
       - nginx.prod.conf
       - nginx.stage.conf
+  rules:
+    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
+    - when: never
 
 .build-images: &build-image-template
   stage: build-images
@@ -36,7 +48,7 @@ variables:
     GIT_STRATEGY: none
   image:
     name: gcr.io/kaniko-project/executor:debug
-    entrypoint: ['']
+    entrypoint: [""]
   before_script:
     - mkdir -p /kaniko/.docker
     - echo "{\"credsStore\":\"ecr-login\",\"credHelpers\":{\"$DOCKER_REGISTRY\":\"ecr-login\"}}" > /kaniko/.docker/config.json
@@ -52,23 +64,18 @@ variables:
 .deploy_project: &deploy-template
   stage: deploy
   allow_failure: false
-  image: node:lts-gallium
+  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:latest
   before_script:
-    - curl -fsSL https://get.pulumi.com/ | bash # Install Pulumi
-    - export PATH=$PATH:$HOME/.pulumi/bin
-    - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" # Install AWS CLI
-    - unzip -qq awscliv2.zip
-    - ./aws/install
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/mainteny/infra/sm-ui-lite-deployment
     - cd sm-ui-lite-deployment
     - npm ci
     - pulumi login s3://mainteny-pulumi-state
-    - pulumi stack select "sm-ui-lite.${STACK}"
-    - pulumi config set aws:region eu-central-1
   variables:
     ENV: stage
     CACHE_PATH: /*
   script:
+    - pulumi stack select "sm-ui-lite.${STACK}"
+    - pulumi config set aws:region eu-central-1
     - echo "Deploying ${IMAGE_SUFFIX} on environment $STACK"
     - pulumi config set --path "mainteny:imageName" ${DOCKER_REGISTRY}/sm-lite:${IMAGE_SUFFIX}-${IMAGE_ENV}
     - pulumi config set mainteny:version ${CI_COMMIT_SHORT_SHA}_$(date '+%Y%m%d')
@@ -88,29 +95,39 @@ variables:
       \"icon_emoji\": \":rocket:\"
        }" $SLACK_WEBHOOK_URL
   rules:
-    - if: '$CI_MERGE_REQUEST_ID'
+    - if: "$CI_MERGE_REQUEST_ID"
       when: never
 
 lint-project:
   stage: lint
-  image: node:lts-gallium
+  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:latest
+  cache:
+    - key:
+        files:
+          - yarn.lock
+      paths:
+        - .yarn-cache/
   script:
-    - yarn install --frozen-lockfile
+    - yarn install --frozen-lockfile --cache-folder .yarn-cache
     - yarn check-all
-    
+
 tests:
   stage: test
-  image: node:lts-gallium
+  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:latest
+  cache:
+    - key:
+        files:
+          - yarn.lock
+      paths:
+        - .yarn-cache/
   variables:
     ENV: stage
-    REACT_APP_BASE_URL: http://localhost:5173/pm
+    REACT_APP_BASE_URL: http://localhost:5173
     REACT_APP_API_URL: $REACT_APP_API_URL_STAGE
     REACT_APP_MIXPANEL_TOKEN: $REACT_APP_MIXPANEL_TOKEN_STAGE
     REACT_APP_GOOGLE_MAPS_KEY: $REACT_APP_GOOGLE_MAPS_KEY_STAGE
   script:
-    - apt-get -y update
-    - apt-get install -y xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libgbm1 libnss3 libxss1 libasound2 --fix-missing
-    - yarn install
+    - yarn install --cache-folder .yarn-cache
     - yarn start & # Start the application in the background
     - yarn cypress:run # Run Cypress tests
 
@@ -118,7 +135,7 @@ build-builder-image:
   stage: build-project
   image:
     name: gcr.io/kaniko-project/executor:debug
-    entrypoint: ['']
+    entrypoint: [""]
   before_script:
     - mkdir -p /kaniko/.docker
     - echo "{\"credsStore\":\"ecr-login\",\"credHelpers\":{\"$DOCKER_REGISTRY\":\"ecr-login\"}}" > /kaniko/.docker/config.json
@@ -148,7 +165,7 @@ build-stage:
   variables:
     ENV: stage
   rules:
-    - if: $CI_COMMIT_REF_NAME == 'develop'
+    - if: $CI_COMMIT_REF_NAME == 'develop'  && $CI_MERGE_REQUEST_ID
     - when: never
 
 build-release:
