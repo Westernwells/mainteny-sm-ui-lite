@@ -64,6 +64,7 @@ export const UnitListingView = () => {
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [resetDatePicker, setResetDatePicker] = useState(false);
+  const textInput = useRef<HTMLInputElement>(null);
 
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
@@ -98,6 +99,9 @@ export const UnitListingView = () => {
   useEffect(() => {
     if (page.pageIndex) {
       setPage({...page, pageIndex: 0});
+    }
+    if (textInput.current) {
+      textInput.current.value = search;
     }
   }, [search, lastVisitStart, lastVisitEnd, nextVisitStart, nextVisitEnd]);
 
@@ -138,7 +142,12 @@ export const UnitListingView = () => {
   }
 
   const renderFilterItems = () => (
-    <FilterFields onClear={clearFilters} wrapperStyle={{width: '90%'}}>
+    <FilterFields
+      onClear={() => {
+        clearFilters();
+        setResetDatePicker(true);
+      }}
+      wrapperStyle={{width: '90%'}}>
       <DatePicker
         defaultDate={lastVisitStart}
         containerStyles={{mr: '1em'}}
@@ -220,6 +229,7 @@ export const UnitListingView = () => {
         getSearchValue={(val) => setSearch(val)}
         defaultSearchValue={search}
         filterItems={renderFilterItems()}
+        refInput={textInput}
       />
     </Box>
   );
