@@ -174,6 +174,7 @@ export enum InvoiceType {
   FULL = 'FULL',
   PARTIAL = 'PARTIAL',
   CREDIT_NOTE = 'CREDIT_NOTE',
+  UPFRONT = 'UPFRONT',
 }
 
 export interface InvoiceFormData {
