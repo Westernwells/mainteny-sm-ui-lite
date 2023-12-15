@@ -1948,5 +1948,6 @@
   "Use when full payment is required before the delivery of goods or services.": "Verwenden Sie diese Option, wenn vor der Lieferung von Waren oder Dienstleistungen eine vollständige Zahlung erforderlich ist.",
   "Correction or adjustment to an already issued invoice, typically used for refunds, returns, or errors.": "Korrektur oder Anpassung einer bereits ausgestellten Rechnung, normalerweise verwendet für Rückerstattungen, Retouren oder Fehler.",
   "Upfront Invoice": "Abschlagsrechnung",
-  "Final Invoice": "Abschlussrechnung"
+  "Final Invoice": "Abschlussrechnung",
+  "Non maintenance": "Sonstiger Vertrag"
 }
