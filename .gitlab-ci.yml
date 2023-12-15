@@ -69,6 +69,7 @@ variables:
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/mainteny/infra/sm-ui-lite-deployment
     - cd sm-ui-lite-deployment
     - npm ci
+    - aws sts get-caller-identity
     - pulumi login s3://mainteny-pulumi-state
   variables:
     ENV: stage
