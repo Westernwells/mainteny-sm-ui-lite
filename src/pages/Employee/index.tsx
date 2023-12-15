@@ -131,6 +131,7 @@ export const Employees = () => {
         }}
         getSelectedValue={(item) => handleRoleChange(item)}
         multiple={false}
+        disableClearBtn
       />
     </FilterFields>
   );
