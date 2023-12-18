@@ -1,6 +1,7 @@
 import {ArticleType} from 'models/article';
 import {InvoiceItemRecord, InvoiceView} from 'models/invoice';
 import {Amount} from 'models/misc';
+import {ServiceOrderArticleView} from 'models/service-order';
 
 export const calculateTotal = (arr: InvoiceItemRecord<Amount>[]) => {
   const sum = 0;
@@ -51,6 +52,29 @@ export const calculateInvoiceTotal = (arr: InvoiceView[]) => {
     .map(
       (item) =>
         item.totalAmount.netAmount / 10 ** item.totalAmount.fractionDigits!,
+    )
+    .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
+};
+
+export const calculateGrossInvoiceTotal = (arr: InvoiceView[]) => {
+  const sum = 0;
+
+  return arr
+    ?.map(
+      (item) =>
+        item.totalAmount.grossAmount / 10 ** item.totalAmount.fractionDigits!,
+    )
+    .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
+};
+
+export const calculateOrderArticlesTotal = (arr: ServiceOrderArticleView[]) => {
+  const sum = 0;
+
+  return arr
+    ?.map(
+      (item) =>
+        (item.unitAmount.netAmount * item.quantity) /
+        10 ** item.unitAmount.fractionDigits!,
     )
     .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
 };

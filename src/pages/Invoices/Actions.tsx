@@ -39,6 +39,7 @@ import {isBefore, parseISO, startOfDay} from 'date-fns';
 interface Props {
   invoice: InvoiceView;
   downloadUrl: string;
+  isInvoiceList?: boolean;
 }
 
 const Tooltip = ({children, ...props}: TooltipProps) => (
@@ -58,7 +59,11 @@ const Tooltip = ({children, ...props}: TooltipProps) => (
   </MUITooltip>
 );
 
-export const Actions = ({invoice, downloadUrl}: Props) => {
+export const Actions = ({
+  invoice,
+  downloadUrl,
+  isInvoiceList = true,
+}: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
   const {enqueueSnackbar} = useSnackbar();
@@ -375,7 +380,7 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
 
   return (
     <Box>
-      {action}
+      {isInvoiceList && action}
 
       <Tooltip title={t('More')} placement="right" arrow>
         <IconButton onClick={handleClick}>

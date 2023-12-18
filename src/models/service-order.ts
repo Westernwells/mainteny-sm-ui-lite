@@ -20,6 +20,7 @@ import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
 import {ArticleView, ServiceOrderArticleRecord} from './article';
 import {FileResource, FileResourceRecord} from './media';
+import {ServiceOrderPaymentStatusView} from 'utils/service-order-utils';
 
 export enum Priority {
   A = 'A',
@@ -43,7 +44,16 @@ export enum ServiceOrderStatus {
   COMPLETED = 'COMPLETED',
   CANCELLED = 'CANCELLED',
   EXPIRED = 'EXPIRED',
+  INVOICE_ISSUED = 'INVOICE_ISSUED',
   DONE = 'DONE',
+}
+
+export enum ServiceOrderPaymentStatus {
+  NOT_PAID = 'NOT_PAID',
+  PARTIALLY_PAID = 'PARTIALLY_PAID',
+  PAID = 'PAID',
+  AUTO_GENERATED = 'AUTO_GENERATED',
+  NONE = 'NONE',
 }
 
 export enum ServiceOrderType {
@@ -121,6 +131,9 @@ export interface ServiceOrderAdditionalInfo {
   quotationId: string;
   workReportGenerated: boolean;
   confirmationInfo?: ServiceOrderConfirmationInfo;
+  purchaseOrderNumber?: string;
+  callerInfo?: CallerInfo;
+  paymentStatus?: ServiceOrderPaymentStatus;
 }
 
 export interface ServiceOrderConfirmationInfo {
@@ -367,6 +380,7 @@ export interface ServiceOrderQueryParams {
   order?: Order;
   orderBy?: ServiceOrderOrderField;
   types?: ServiceOrderType[];
+  paymentStatus?: ServiceOrderPaymentStatus[];
 }
 
 export interface ServiceOrderActivityView {
@@ -481,3 +495,22 @@ export interface AppointmentConfirmationRequiredOrdersQueryParams {
   query?: string;
   serviceCompanyId?: string;
 }
+
+export const mapServiceOrderPaymentStatus = (
+  invoiceStatus: ServiceOrderPaymentStatusView,
+) => {
+  switch (invoiceStatus) {
+    case ServiceOrderPaymentStatusView.PAID:
+      return ServiceOrderPaymentStatus.PAID;
+    case ServiceOrderPaymentStatusView.NOT_PAID:
+      return ServiceOrderPaymentStatus.NOT_PAID;
+    case ServiceOrderPaymentStatusView.PARTIALLY_PAID:
+      return ServiceOrderPaymentStatus.PARTIALLY_PAID;
+    case ServiceOrderPaymentStatusView.AUTO_GENERATED:
+      return ServiceOrderPaymentStatus.AUTO_GENERATED;
+    case ServiceOrderPaymentStatusView.NONE:
+      return ServiceOrderPaymentStatus.NONE;
+    default:
+      return ServiceOrderPaymentStatus.NONE;
+  }
+};

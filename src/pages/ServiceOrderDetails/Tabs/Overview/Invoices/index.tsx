@@ -23,14 +23,18 @@ import {ReactComponent as PartialInvoiceIcon} from 'assets/icons/PartialInvoiceI
 import {ReactComponent as CreditNoteIcon} from 'assets/icons/CreditNoteIcon.svg';
 import {RadioGroup} from '@mui/material';
 import {InvoiceType} from 'models/invoice';
-import {columns, makeRows} from './InvoicesDataGridProps';
+import {getServiceOrderPaymentStatusStyles} from 'pages/ServiceOrders/Tabs/ServiceOrderList.tsx/ServiceOrderDataGridProps';
+import {StatusChip} from 'components/StatusChip';
+import {ServiceOrderPaymentStatus} from 'models/service-order';
 import InvoiceOption from './InvoiceOption';
+import {columns, makeRows} from './InvoicesDataGridProps';
 
 interface Props {
   serviceOrderId?: string;
+  paymentStatus?: ServiceOrderPaymentStatus;
 }
 
-export const Invoices = ({serviceOrderId}: Props) => {
+export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
   const navigate = useNavigate();
@@ -44,6 +48,11 @@ export const Invoices = ({serviceOrderId}: Props) => {
   };
 
   let totalInvoiceRef = useRef(0).current;
+
+  const paymentStatusStyles = getServiceOrderPaymentStatusStyles(
+    paymentStatus!,
+  );
+  const hasValidPaymentStatus = paymentStatusStyles.label !== '-';
 
   const {
     data: InvoiceList = [],
@@ -125,7 +134,20 @@ export const Invoices = ({serviceOrderId}: Props) => {
 
   return (
     <InfoCard
-      header={<Typography variant="subtitle1">{t('Invoices')}</Typography>}
+      header={
+        <Box sx={{display: 'flex', alignItems: 'center'}}>
+          <Typography variant="subtitle1" sx={{marginRight: '1em'}}>
+            {t('Invoices')}
+          </Typography>
+          {hasValidPaymentStatus && (
+            <StatusChip
+              label={paymentStatusStyles.label}
+              color={paymentStatusStyles.color}
+              maxChars={8}
+            />
+          )}
+        </Box>
+      }
       handleAction={() => setOpenDialog(true)}
       headerActionIcon={
         <Typography color="info.main">{`+ ${t('Add')}`}</Typography>

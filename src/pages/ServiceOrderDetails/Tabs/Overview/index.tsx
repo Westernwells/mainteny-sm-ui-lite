@@ -4,16 +4,14 @@ import {
   useServiceOrderActivities,
   useServiceOrderArticles,
 } from 'hooks/reactQuery/useServiceOrder';
-import {PageCard} from 'components/PageCard';
-
 import useTheme from '@mui/material/styles/useTheme';
 import {Timeline} from 'components/Timeline';
 import Typography from '@mui/material/Typography';
-import ComputerIcon from '@mui/icons-material/Computer';
-import PersonIcon from '@mui/icons-material/Person';
 import {olStyles} from 'styles';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {ServiceOrderView} from 'models/service-order';
+import {InfoCard} from 'components/InfoCard';
+import {useTranslation} from 'react-i18next';
 import {OrderInfoCard} from './OrderInfoCard';
 import {Quotation} from './Quotations';
 import {Invoices} from './Invoices';
@@ -31,23 +29,13 @@ export const serviceOrderActivitiesLang: {[key: string]: string} = {
 
 export const Overview = ({serviceOrder}: Props) => {
   const theme = useTheme();
+  const {t} = useTranslation();
 
   const formatDate = useFormatDate();
   const {data: serviceOrderActivities = []} = useServiceOrderActivities(
     serviceOrder.id,
   );
   const {data: serviceOrderArticles} = useServiceOrderArticles(serviceOrder.id);
-
-  const iconType = (icon: string) => {
-    switch (icon) {
-      case 'system':
-        return <ComputerIcon fontSize="small" color="action" />;
-      case 'people':
-        return <PersonIcon fontSize="small" color="action" />;
-      default:
-        return null;
-    }
-  };
 
   return (
     <Grid
@@ -59,7 +47,7 @@ export const Overview = ({serviceOrder}: Props) => {
       <Grid
         item
         sm={12}
-        md={8}
+        md={9}
         sx={{
           [theme.breakpoints.up('md')]: {
             height: '100%',
@@ -76,12 +64,6 @@ export const Overview = ({serviceOrder}: Props) => {
           <Box>
             <OrderInfoCard serviceOrderDetails={serviceOrder!} />
           </Box>
-          <Box mt="1em" flexGrow={1}>
-            <Description
-              content={serviceOrder?.description}
-              serviceOrderId={serviceOrder?.id}
-            />
-          </Box>
 
           <Box mt="1em" flexGrow={1}>
             <Articles
@@ -91,11 +73,21 @@ export const Overview = ({serviceOrder}: Props) => {
           </Box>
 
           <Box mt="1em" flexGrow={1}>
-            <Invoices serviceOrderId={serviceOrder?.id} />
+            <Invoices
+              serviceOrderId={serviceOrder?.id}
+              paymentStatus={serviceOrder.additionalInfo?.paymentStatus!}
+            />
           </Box>
 
           <Box mt="1em" flexGrow={1}>
             <Quotation serviceOrder={serviceOrder} />
+          </Box>
+
+          <Box mt="1em" flexGrow={1}>
+            <Description
+              content={serviceOrder?.description}
+              serviceOrderId={serviceOrder?.id}
+            />
           </Box>
         </Box>
       </Grid>
@@ -103,22 +95,23 @@ export const Overview = ({serviceOrder}: Props) => {
       <Grid
         item
         sm={12}
-        md={4}
+        md={3}
         sx={{
           [theme.breakpoints.up('md')]: {
             height: '100%',
           },
           width: '100%',
         }}>
-        <PageCard
-          headerLabel="Timeline"
-          headerStyles={{pl: '0.3em'}}
+        <InfoCard
+          header={<Typography variant="subtitle1">{t('Timeline')}</Typography>}
+          showHeaderBackground
           containerStyles={{
             ...olStyles.scrollbar,
             height: '100%',
             overflowY: 'scroll',
-          }}>
-          <Box sx={{height: '100%'}}>
+          }}
+          headerStyles={{pl: '0.3em'}}>
+          <Box sx={{height: '100%', paddingLeft: '0.5em'}}>
             {serviceOrderActivities.map((activity, index) => {
               const dateString = new Date(activity.actionTime);
               const date = formatDate(dateString);
@@ -131,23 +124,13 @@ export const Overview = ({serviceOrder}: Props) => {
                     !!(index === serviceOrderActivities.length - 1)
                   }
                   containerStyle={{pt: index > 0 ? '1em' : 'initial'}}
-                  header={`${date} (${time})`}
-                  body={activity.description}
-                  footer={
-                    <Typography component="div" display="flex">
-                      {iconType(activity.creator ? 'people' : 'system')}
-                      <Typography variant="caption" component="div" ml="0.5em">
-                        {activity.creator
-                          ? `${activity.creator.firstName} ${activity.creator.lastName}`
-                          : 'System'}
-                      </Typography>
-                    </Typography>
-                  }
+                  header={activity.description}
+                  body={`${date} | ${time}`}
                 />
               );
             })}
           </Box>
-        </PageCard>
+        </InfoCard>
       </Grid>
     </Grid>
   );

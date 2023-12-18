@@ -6,6 +6,8 @@ import {InvoiceStatus, InvoiceView} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
 import {toDate} from 'utils/datetime';
 import {FormatDate} from 'models/misc';
+import {Actions} from 'pages/Invoices/Actions';
+import i18next from 'i18next';
 
 export const getInvoiceStatusStyles = (
   status: string,
@@ -43,8 +45,9 @@ export const getInvoiceStatusStyles = (
 export const columns: GridColDef[] = [
   getColumnProps({
     field: 'date',
-    headerName: 'invoice date',
-    align: 'center',
+    headerName: 'date',
+    align: 'left',
+    headerAlign: 'left',
     flex: 1,
     variant: 'titleCase',
   }),
@@ -56,6 +59,35 @@ export const columns: GridColDef[] = [
     variant: 'titleCase',
   }),
   getColumnProps({
+    field: 'order',
+    headerName: 'job number',
+    align: 'center',
+    flex: 1,
+    variant: 'titleCase',
+  }),
+  getColumnProps({
+    field: 'invoiceType',
+    headerName: 'type',
+    align: 'center',
+    flex: 1,
+    variant: 'titleCase',
+  }),
+  getColumnProps({
+    field: 'status',
+    headerName: 'invoice status',
+    align: 'center',
+    variant: 'titleCase',
+    renderCell: (params: GridRenderCellParams<any, any, any>) => (
+      <StatusChip
+        label={getInvoiceStatusStyles(params.value).label}
+        color={getInvoiceStatusStyles(params.value).color}
+        maxChars={8}
+        variant="outlined"
+      />
+    ),
+    flex: 1,
+  }),
+  getColumnProps({
     field: 'amount',
     headerName: 'total amount',
     align: 'right',
@@ -64,15 +96,16 @@ export const columns: GridColDef[] = [
     variant: 'titleCase',
   }),
   getColumnProps({
-    field: 'status',
-    headerName: 'status',
-    align: 'center',
+    field: 'actions',
+    headerName: 'actions',
+    align: 'right',
+    headerAlign: 'right',
     variant: 'titleCase',
-    renderCell: (params: GridRenderCellParams<any, any, any>) => (
-      <StatusChip
-        label={getInvoiceStatusStyles(params.value).label}
-        color={getInvoiceStatusStyles(params.value).color}
-        maxChars={8}
+    renderCell: (params) => (
+      <Actions
+        invoice={params.row.invoice}
+        downloadUrl={params.row.downloadUrl}
+        isInvoiceList={false}
       />
     ),
     flex: 1,
@@ -88,10 +121,10 @@ export const makeRows = (
     ? invoices.map((item, index: number) => ({
         id: index,
         date: item.sentDate ? formatDate(toDate(item.sentDate)) : '-',
-        number: item.number,
-        order: item.serviceOrder?.number,
+        number: item.externalId ?? '-',
+        order: item.serviceOrder?.externalId ?? '-',
         customer: item.propertyOwner.name,
-        type: item.serviceOrder?.type,
+        type: i18next.t(item.serviceOrder?.type!),
         amount: `${formatCurrency(
           item
             ? item.totalAmount.grossAmount /
@@ -101,6 +134,7 @@ export const makeRows = (
             currency: item.totalAmount.currency,
           },
         )}`,
+        invoiceType: item.type ?? '-',
         status: item.status,
         actions: {
           pdfPath: item.additionalInfo.pdfPath,

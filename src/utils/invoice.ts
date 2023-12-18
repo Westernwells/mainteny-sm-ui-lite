@@ -78,6 +78,31 @@ export const getInvoiceActivityTitle = (type: InvoiceActivityType): string => {
   }
 };
 
+export const invoiceStatusToString = (type: InvoiceActivityType): string => {
+  switch (type) {
+    case InvoiceActivityType.SENT:
+      return 'Invoice sent';
+    case InvoiceActivityType.PRINTED:
+      return 'Invoice printed';
+    case InvoiceActivityType.OVERDUE_NOTICE_SENT:
+      return 'Overdue notice sent';
+    case InvoiceActivityType.CANCELLED:
+      return 'Invoice cancelled';
+    case InvoiceActivityType.PAID:
+      return 'Invoice paid';
+    case InvoiceActivityType.EXPIRED:
+      return 'Invoice overdue';
+    case InvoiceActivityType.PAYMENT_RECEIVED:
+      return 'Payment received';
+    case InvoiceActivityType.PAYMENT_UPDATED:
+      return 'Payment updated';
+    case InvoiceActivityType.PAYMENT_DELETED:
+      return 'Payment deleted';
+    default:
+      return '';
+  }
+};
+
 export const getInvoiceActivityColor = (type: InvoiceActivityType): string => {
   const theme = useTheme();
   switch (type) {

@@ -261,9 +261,15 @@ export const DataGridLayout = ({
           '& > div:nth-of-type(3)': {
             display: 'flex',
             flexDirection: 'column',
-            height: '100%',
           },
           '& .MuiDataGrid-virtualScroller': {
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
+
+            '&::-webkit-scrollbar': {
+              display: 'none',
+            },
+
             '&:hover': {
               ...olStyles.verticlaScrollBar,
             },
@@ -282,6 +288,7 @@ export const DataGridLayout = ({
             ...(isWidget && {
               border: `1px solid ${theme.palette.text.disabled}`,
               borderRadius: '4px',
+              padding: '0.5em 0em',
             }),
           },
           '& .MuiDataGrid-columnHeaderTitleContainer': {
@@ -350,7 +357,7 @@ export const DataGridLayout = ({
               display: '-webkit-box',
               maxWidth: '100%',
               // Limit to number of lines
-              WebkitLineClamp: '2 ',
+              WebkitLineClamp: '2',
               WebkitBoxOrient: 'vertical',
             },
           },
