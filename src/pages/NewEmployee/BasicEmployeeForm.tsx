@@ -269,6 +269,7 @@ export const BasicEmployeeForm = ({
                   )}
                   handleFocus={handleFocus}
                   numberType={ServiceCompanyNumberType.EMPLOYEE}
+                  setActiveField={() => setActiveField('')}
                 />
               </Box>
             </Box>

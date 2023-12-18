@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {Typography, Box, Button, useTheme} from '@mui/material';
 import {AutoAwesome} from '@mui/icons-material';
 import {ServiceCompanyNumberType} from 'models/service-company';
@@ -32,6 +32,7 @@ interface Props {
   handleFocus: (e: any) => void;
   idContainerStyles?: {[key: string]: any};
   numberType: ServiceCompanyNumberType;
+  setActiveField: () => void;
 }
 
 const AutoDropdown = ({
@@ -43,6 +44,7 @@ const AutoDropdown = ({
   handleFocus,
   idContainerStyles,
   numberType,
+  setActiveField,
 }: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
@@ -76,8 +78,26 @@ const AutoDropdown = ({
 
   const isResourceFound = filteredResources.length > 0;
 
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setActiveField();
+      }
+    };
+
+    if (ref.current && activeField === fieldProps.name) {
+      document.addEventListener('click', handleClickOutside, true);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true);
+    };
+  }, [setActiveField]);
+
   return (
-    <>
+    <Box ref={ref}>
       <FormInput
         containerStyles={{...idContainerStyles}}
         props={{
@@ -183,7 +203,7 @@ const AutoDropdown = ({
           </Box>
         )
       )}
-    </>
+    </Box>
   );
 };
 

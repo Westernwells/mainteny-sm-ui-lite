@@ -154,6 +154,7 @@ const NewSupplier = () => {
               serviceTypeResource={articleSupplierResource.data}
               handleFocus={handleFocus}
               numberType={ServiceCompanyNumberType.ARTICLE_SUPPLIER}
+              setActiveField={() => setActiveField('')}
             />
           </Grid>
 

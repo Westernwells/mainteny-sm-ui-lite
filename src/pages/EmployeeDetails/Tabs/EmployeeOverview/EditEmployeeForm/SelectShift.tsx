@@ -1,14 +1,11 @@
 import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import TimePicker from '@mui/lab/TimePicker';
+import {TimePicker} from 'components/TimePicker';
 import {TimeWindowType} from 'models/misc';
 import {Button} from 'components/Button';
 import {convertToMacro, convertToText} from 'utils/utils';
@@ -38,20 +35,20 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
 
   const [shifts, setShifts] = useState<Shift<Date | null>[]>(
     values.shifts && values.shifts.length
-      ? values.shifts.map((item: any) => ({
+      ? values?.shifts.map((item: any) => ({
           fromTime: new Date(
             0,
             0,
             0,
-            item.fromTime.split(':')[0] as unknown as number,
-            item.fromTime.split(':')[1] as unknown as number,
+            (item?.fromTime?.split(':')[0] as unknown as number) ?? 0,
+            (item?.fromTime?.split(':')[1] as unknown as number) ?? 0,
           ),
           toTime: new Date(
             0,
             0,
             0,
-            item.toTime.split(':')[0] as unknown as number,
-            item.toTime.split(':')[1] as unknown as number,
+            (item?.toTime?.split(':')[0] as unknown as number) ?? 0,
+            (item?.toTime?.split(':')[1] as unknown as number) ?? 0,
           ),
           type: convertToText(item.type),
         }))
@@ -98,52 +95,40 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
           gap="1em"
           alignItems="flex-end"
           mt="1em">
-          <LocalizationProvider
-            dateAdapter={AdapterDateFns}
-            sx={{width: '14em'}}>
-            <TimePicker
-              label={t('Start Time')}
-              ampm={false}
-              value={shift.fromTime}
-              disabled={index < shifts.length - 1}
-              onChange={(newValue) => {
-                const oldShifts = shifts.filter((item) => item !== shift);
-                const newShift = shift;
-                newShift.fromTime = newValue;
-                setShifts([...oldShifts, newShift]);
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  size="small"
-                  sx={{width: '6.875em'}}
-                  onKeyDown={(e) => e.preventDefault()}
-                />
-              )}
-            />
-          </LocalizationProvider>
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <TimePicker
-              label={t('End Time')}
-              ampm={false}
-              value={shift.toTime}
-              disabled={index < shifts.length - 1}
-              onChange={(newValue) => {
-                const oldShifts = shifts.filter((item) => item !== shift);
-                const newShift = shift;
-                newShift.toTime = newValue;
-                setShifts([...oldShifts, newShift]);
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  size="small"
-                  sx={{width: '6.875em'}}
-                  onKeyDown={(e) => e.preventDefault()}
-                />
-              )}
-            />
-          </LocalizationProvider>
+          <TimePicker
+            defaultTime={shift.fromTime}
+            containerStyles={{mr: '1em'}}
+            maxTime={shift.toTime ?? undefined}
+            getSelectedTime={(newValue) => {
+              const oldShifts = shifts.filter((item) => item !== shift);
+              const newShift = shift;
+              newShift.fromTime = newValue;
+              setShifts([...oldShifts, newShift]);
+            }}
+            textFieldProps={{
+              label: t('Start Time'),
+              required: true,
+              disabled: index < shifts.length - 1,
+              onKeyDown: (e) => e.preventDefault(),
+            }}
+          />
+
+          <TimePicker
+            defaultTime={shift.toTime}
+            containerStyles={{mr: '1em'}}
+            getSelectedTime={(newValue) => {
+              const oldShifts = shifts.filter((item) => item !== shift);
+              const newShift = shift;
+              newShift.toTime = newValue;
+              setShifts([...oldShifts, newShift]);
+            }}
+            textFieldProps={{
+              label: t('End Time'),
+              required: true,
+              onKeyDown: (e) => e.preventDefault(),
+              disabled: index < shifts.length - 1,
+            }}
+          />
 
           <FormControl sx={{width: '14em'}}>
             <InputLabel

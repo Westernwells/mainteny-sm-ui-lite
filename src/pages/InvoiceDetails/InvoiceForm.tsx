@@ -1022,6 +1022,7 @@ export const InvoiceForm = ({
                     serviceTypeResource={allInvoiceResource.data}
                     handleFocus={handleFocus}
                     numberType={ServiceCompanyNumberType.INVOICE}
+                    setActiveField={() => setActiveField('')}
                   />
                 </Box>
 

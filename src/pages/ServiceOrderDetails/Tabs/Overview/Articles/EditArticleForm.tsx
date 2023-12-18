@@ -51,7 +51,7 @@ export const EditArticleForm = ({
 
   return (
     <Box sx={{mt: '0.5em'}} component="form">
-      <Grid container spacing={1}>
+      <Grid container spacing={2}>
         <Grid item sm={12}>
           <FormInput
             props={{
@@ -67,6 +67,21 @@ export const EditArticleForm = ({
                   : '',
               onChange: formik.handleChange,
               required: true,
+            }}
+          />
+        </Grid>
+        <Grid item sm={12}>
+          <FormInput
+            props={{
+              placeholder:
+                'e.g. Flat cables used for door engine from the following suppliers...',
+              label: 'Description',
+              name: 'description',
+              value: formik.values.description,
+              onBlur: formik.handleBlur,
+              onChange: formik.handleChange,
+              multiline: true,
+              rows: 4,
             }}
           />
         </Grid>
@@ -93,21 +108,6 @@ export const EditArticleForm = ({
                   </InputAdornment>
                 ),
               },
-            }}
-          />
-        </Grid>
-        <Grid item sm={12}>
-          <FormInput
-            props={{
-              placeholder:
-                'e.g. Flat cables used for door engine from the following suppliers...',
-              label: 'Description',
-              name: 'description',
-              value: formik.values.description,
-              onBlur: formik.handleBlur,
-              onChange: formik.handleChange,
-              multiline: true,
-              rows: 4,
             }}
           />
         </Grid>

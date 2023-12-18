@@ -1,6 +1,7 @@
 import {differenceInMinutes} from 'date-fns';
 import {
   ServiceOrderArticleView,
+  ServiceOrderPaymentStatus,
   ServiceOrderStatus,
   ServiceOrderType,
   ServiceOrderView,
@@ -9,10 +10,12 @@ import {toDate} from './datetime';
 
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
   switch (status) {
+    case ServiceOrderStatus.SCHEDULING:
+      return 'secondary';
     case ServiceOrderStatus.SCHEDULED:
       return 'primary.mainLight';
     case ServiceOrderStatus.IN_PROGRESS:
-      return 'warning';
+      return 'warning.light';
     case ServiceOrderStatus.CANCELLED:
       return 'action.active';
     case ServiceOrderStatus.EXPIRED:
@@ -27,6 +30,8 @@ export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
 
 export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
   switch (status) {
+    case ServiceOrderStatus.SCHEDULING:
+      return 'Scheduling';
     case ServiceOrderStatus.SCHEDULED:
       return 'Pending';
     case ServiceOrderStatus.IN_PROGRESS:
@@ -45,6 +50,8 @@ export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
 
 export const serviceOrderStatusToEnum = (status: string) => {
   switch (status) {
+    case 'Scheduling':
+      return ServiceOrderStatus.SCHEDULING;
     case 'Pending':
       return ServiceOrderStatus.SCHEDULED;
     case 'Ongoing':
@@ -59,6 +66,14 @@ export const serviceOrderStatusToEnum = (status: string) => {
       return 'Unscheduled';
   }
 };
+
+export enum ServiceOrderPaymentStatusView {
+  PAID = 'Paid',
+  NOT_PAID = 'Not Paid',
+  AUTO_GENERATED = 'Auto Generated',
+  PARTIALLY_PAID = 'Partially Paid',
+  NONE = 'None',
+}
 
 export const getServiceOrderStatusList = () => {
   let mappedOptions: string[] = [];
@@ -150,6 +165,42 @@ export const serviceOrderTypeToEnum = (type: string) => {
       return ServiceOrderType.GENERAL;
     default:
       return ServiceOrderType.REPAIR;
+  }
+};
+
+export const serviceOrderPaymentStatusToString = (
+  type: ServiceOrderPaymentStatus | string,
+) => {
+  switch (type) {
+    case ServiceOrderPaymentStatus.NOT_PAID:
+      return 'Not Paid';
+    case ServiceOrderPaymentStatus.PAID:
+      return 'Paid';
+    case ServiceOrderPaymentStatus.PARTIALLY_PAID:
+      return 'Partially Paid';
+    case ServiceOrderPaymentStatus.AUTO_GENERATED:
+      return 'Auto Generated';
+    case ServiceOrderPaymentStatus.NONE:
+      return '-';
+    default:
+      return '-';
+  }
+};
+
+export const serviceOrderPaymentStatusToEnum = (type: string) => {
+  switch (type) {
+    case 'Paid':
+      return ServiceOrderPaymentStatus.PAID;
+    case 'Not Paid':
+      return ServiceOrderPaymentStatus.NOT_PAID;
+    case 'Auto Generated':
+      return ServiceOrderPaymentStatus.AUTO_GENERATED;
+    case 'Partially Paid':
+      return ServiceOrderPaymentStatus.PARTIALLY_PAID;
+    case '-':
+      return ServiceOrderPaymentStatus.NONE;
+    default:
+      return ServiceOrderPaymentStatus.NONE;
   }
 };
 

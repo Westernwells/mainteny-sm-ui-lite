@@ -1959,5 +1959,18 @@
   "Scheduled Date": "Zakazan datum",
   "Invoiced Sum (incl. VAT)": "Fakturisani iznos (sa PDV-om)",
   "Total Sum (excl. VAT)": "Ukupna suma (bez PDV)",
-  "Edit Article": "Uredi stavku"
+  "Edit Article": "Uredi stavku",
+  "Payment Status": "Status plaćanja",
+  "PAYMENT STATUS": "STATUS PLAĆANJA",
+  "Only the service orders created out of a quotation will have entries here.": "Ovde će se unositi samo nalozi usluga kreirani iz ponude.",
+  "JOB STATUS": "Poslovni status",
+  "Completed On": "Završeno",
+  "No contract yet. Please click the button below to add.": "Još nema ugovora. Kliknite na dugme ispod da biste dodali.",
+  "Straight-forward transaction requiring full payment upon delivery of goods or completion of services.": "Direktna transakcija koja zahteva puno plaćanje po isporuci robe ili završetku usluga.",
+  "For transactions where the payment will be made in multiple installments over a period of time.": "Za transakcije u kojima će se plaćanje vršiti u više rata tokom određenog vremenskog perioda.",
+  "Use when full payment is required before the delivery of goods or services.": "Koristite kada je potrebna puna uplata pre isporuke robe ili usluga.",
+  "Correction or adjustment to an already issued invoice, typically used for refunds, returns, or errors.": "Ispravka ili prilagođavanje već izdate fakture, koja se obično koristi za refundiranje, vraćanje ili greške.",
+  "Upfront Invoice": "Avansna faktura",
+  "Final Invoice": "Konačna faktura",
+  "Non maintenance": "Neodržavanje"
 }

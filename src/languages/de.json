@@ -1288,7 +1288,7 @@
   "ACCOUNT NUMBER": "KONTONUMMER",
   "VAT ID": "UMSATZSTEUER-ID",
   "% VAT": "% MwSt.",
-  "YEARLY VACATION DAYS": "URLAUBSTAGE PRO JAHE",
+  "YEARLY VACATION DAYS": "URLAUBSTAGE PRO JAHR",
   "WEBSITE": "WEBSITE",
   "BILLING ADDRESS": "RECHNUNGSADRESSE",
   "POSTAL ADDRESS": "POSTANSCHRIFT",
@@ -1936,5 +1936,18 @@
   "Scheduled Date": "Geplantes Datum",
   "Invoiced Sum (incl. VAT)": "Rechnungsbetrag (inkl. MwSt.)",
   "Total Sum (excl. VAT)": "Gesamtsumme (exkl. MwSt.)",
-  "Edit Article": "Artikel bearbeiten"
+  "Edit Article": "Artikel bearbeiten",
+  "Payment Status": "Zahlungsstatus",
+  "PAYMENT STATUS": "ZAHLUNGSSTATUS",
+  "Only the service orders created out of a quotation will have entries here.": "Nur die Serviceaufträge, die aus einem Angebot erstellt wurden, werden hier Einträge haben.",
+  "JOB STATUS": "AUFTRAGSSTATUS",
+  "Completed On": "Abgeschlossen am",
+  "No contract yet. Please click the button below to add.": "Noch kein Vertrag hinterlegt. Klicken Sie zum Hinzufügen bitte auf die Schaltfläche unten.",
+  "Straight-forward transaction requiring full payment upon delivery of goods or completion of services.": "Einfache Transaktion, die die vollständige Zahlung bei Lieferung der Waren oder Erbringung der Dienstleistungen erfordert.",
+  "For transactions where the payment will be made in multiple installments over a period of time.": "Für Transaktionen, bei denen die Zahlung in mehreren Raten über einen bestimmten Zeitraum erfolgt.",
+  "Use when full payment is required before the delivery of goods or services.": "Verwenden Sie diese Option, wenn vor der Lieferung von Waren oder Dienstleistungen eine vollständige Zahlung erforderlich ist.",
+  "Correction or adjustment to an already issued invoice, typically used for refunds, returns, or errors.": "Korrektur oder Anpassung einer bereits ausgestellten Rechnung, normalerweise verwendet für Rückerstattungen, Retouren oder Fehler.",
+  "Upfront Invoice": "Abschlagsrechnung",
+  "Final Invoice": "Abschlussrechnung",
+  "Non maintenance": "Sonstiger Vertrag"
 }
