@@ -618,7 +618,7 @@ export const InvoiceForm = ({
       formik.values.type.length &&
       formik.values.items.length;
     if (formik.values.type !== InvoiceType.CREDIT_NOTE) {
-      return !!(valid && dueDate !== null);
+      return !!valid;
     }
     return !!valid;
   };
@@ -1199,7 +1199,6 @@ export const InvoiceForm = ({
                       label: 'Due Date',
                       InputLabelProps: {shrink: true},
                     }}
-                    required
                   />
                 </Box>
               </>
