@@ -92,6 +92,7 @@ export const AddBasicInfoForm = ({
           handleFocus={handleFocus}
           idContainerStyles={idContainerStyles}
           numberType={ServiceCompanyNumberType.ARTICLE}
+          setActiveField={() => setActiveField('')}
         />
       </Box>
 
