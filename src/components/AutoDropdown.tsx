@@ -86,7 +86,11 @@ const AutoDropdown = ({
         setActiveField();
       }
     };
-    document.addEventListener('click', handleClickOutside, true);
+
+    if (ref.current && activeField === fieldProps.name) {
+      document.addEventListener('click', handleClickOutside, true);
+    }
+
     return () => {
       document.removeEventListener('click', handleClickOutside, true);
     };
