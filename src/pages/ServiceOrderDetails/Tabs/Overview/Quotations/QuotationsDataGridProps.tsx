@@ -4,6 +4,7 @@ import {getColumnProps} from 'components/DataGridLayout';
 import {formatCurrency} from 'utils/currency';
 import {QuotationStatus, QuotationView} from 'models/quotation';
 import {FormatDate} from 'models/misc';
+import {Actions} from 'pages/Quotations/Actions';
 
 export const getQuotationStatusStyles = (
   status: string,
@@ -41,12 +42,7 @@ export const columns: GridColDef[] = [
   }),
   getColumnProps({
     field: 'number',
-    headerName: 'NUMBER',
-    variant: 'titleCase',
-  }),
-  getColumnProps({
-    field: 'totalAmount',
-    headerName: 'TOTAL AMOUNT',
+    headerName: 'QUOTATION NUMBER',
     variant: 'titleCase',
   }),
   getColumnProps({
@@ -58,12 +54,28 @@ export const columns: GridColDef[] = [
       <StatusChip
         label={getQuotationStatusStyles(params.value).label}
         color={getQuotationStatusStyles(params.value).color}
-        variant="filled"
+        variant="outlined"
         size="small"
         maxChars={9}
       />
     ),
     flex: 0.75,
+  }),
+  getColumnProps({
+    field: 'totalAmount',
+    headerName: 'TOTAL AMOUNT',
+    variant: 'titleCase',
+    align: 'right',
+    headerAlign: 'right',
+  }),
+  getColumnProps({
+    field: 'actions',
+    headerName: 'actions',
+    align: 'right',
+    headerAlign: 'right',
+    variant: 'titleCase',
+    renderCell: (params) => <Actions quotation={params.row.quotation} />,
+    flex: 0.5,
   }),
 ];
 
@@ -85,5 +97,6 @@ export const makeRows = (
       },
     )}`,
     status: item.status,
+    quotation: item,
     navigateTo: `/quotations/details/${item.id}`,
   }));

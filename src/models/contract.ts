@@ -132,6 +132,7 @@ export interface ContractView {
 export interface ContractSimpleView {
   id: string;
   type: string;
+  name: string;
   visitsNumber: number;
   sla: number;
   spendingLimit: number;

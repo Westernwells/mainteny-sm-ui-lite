@@ -35,12 +35,13 @@ export const Timeline = ({
             display: 'block',
             borderRadius: '50%',
             textAlign: 'center',
-            height: '1.5rem',
-            width: '1.5rem',
+            height: '1rem',
+            width: '1rem',
             position: 'absolute',
-            top: 0,
-            left: '-0.7rem',
-            background: theme.palette.text.secondary,
+            top: '15%',
+            left: '-1%',
+            border: `1px solid ${theme.palette.text.secondary}`,
+            fontSize: '0rem',
             color: '#fff',
             zIndex: 5,
           },
@@ -56,15 +57,24 @@ export const Timeline = ({
               borderLeftColor: 'grey.400',
               position: 'absolute',
               left: 0,
-              height: '70%',
+              height: '50%',
               marginTop: '2em',
               display: 'block',
+              top: '20%',
             },
-            // mt: '0.5em'
           }}>
-          {header ? <Typography variant="body1">{header}</Typography> : header}
+          {header ? (
+            <Typography variant="body1" sx={{whiteSpace: 'pre-line'}}>
+              {header}
+            </Typography>
+          ) : (
+            header
+          )}
           {body ? (
-            <Typography variant="caption" component="div">
+            <Typography
+              variant="body2"
+              color={theme.palette.text.secondary}
+              component="div">
               {body}
             </Typography>
           ) : (

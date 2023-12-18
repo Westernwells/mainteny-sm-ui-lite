@@ -30,6 +30,7 @@ import {MenuBtn} from 'components/MenuBtn';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {olStyles} from 'styles';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useTheme} from '@mui/material';
 import {ScheduleDialog} from './ScheduleDialog';
 import {MarkCompletedDialog} from './MarkCompletedDialog';
 import {OrderInfo} from './schema';
@@ -38,14 +39,50 @@ interface Props {
   serviceOrderDetails: ServiceOrderView;
 }
 
-const orderInfo = [
-  'customer',
-  'unitNumber',
-  'unitAddress',
-  'dueDate',
-  'schedule',
-  'technicians',
-];
+interface OrderInfoProps {
+  serviceOrderDetails: ServiceOrderView;
+  label: string;
+  details: string[];
+}
+
+const customerDetailCells = ['customer', 'calledBy', 'purchaseOrderNumber'];
+const unitDetailCells = ['unitAddress', 'unitNumber'];
+const contractDetailCells = ['contractNumber', 'contractName', 'contractType'];
+const jobDetailCells = ['technicians', 'dueDate', 'dateScheduled'];
+
+const OrderInfoItem = ({
+  serviceOrderDetails,
+  label,
+  details,
+}: OrderInfoProps) => {
+  const {t} = useTranslation();
+  const theme = useTheme();
+  return (
+    <Grid
+      item
+      xs={3}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        borderRight: '1px solid #0F4C6414',
+        paddingRight: details ? '0.5em' : '0em',
+
+        '&:nth-last-child(1)': {
+          borderRight: 'none',
+        },
+      }}>
+      <Typography variant="body2" color={theme.palette.text.secondary}>
+        {t(label)}
+      </Typography>
+      {details &&
+        details.map((item, index) => (
+          <Grid item key={`${item}-${index}`} sx={{mt: '0.5em'}}>
+            <OrderInfo serviceOrderDetails={serviceOrderDetails} label={item} />
+          </Grid>
+        ))}
+    </Grid>
+  );
+};
 
 export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const {t} = useTranslation();
@@ -132,8 +169,8 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const renderDialogTitle = () =>
     serviceOrderDetails.status === ServiceOrderStatus.SCHEDULED ||
     serviceOrderDetails.status === ServiceOrderStatus.IN_PROGRESS
-      ? t('Reschedule Order')
-      : t('Schedule Order');
+      ? t('Reschedule Job')
+      : t('Schedule Job');
 
   const orderAction = () => {
     if (
@@ -185,11 +222,6 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
 
   const renderHeaderLeftWidget = () => (
     <Box sx={{display: 'flex'}}>
-      <StatusChip
-        color={getServiceOrderStatusColor(serviceOrderDetails.status)}
-        label={serviceOrderStatusToString(serviceOrderDetails.status)}
-        style={{...olStyles.orderStatus, letterSpacing: 'normal'}}
-      />
       {![ServiceOrderStatus.COMPLETED, ServiceOrderStatus.CANCELLED].includes(
         serviceOrderDetails.status,
       ) ? (
@@ -216,12 +248,12 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
             display: 'flex',
             justifyContent: 'space-between',
           }}>
-          <Box sx={{display: 'flex', height: '100%'}}>
+          <Box sx={{display: 'flex', height: '100%', alignItems: 'center'}}>
             <Box sx={{alignSelf: 'center'}}>
               <ServiceOrderIcons serviceOrderType={serviceOrderDetails.type} />
             </Box>
 
-            <Box sx={{}}>
+            <Box>
               <ServiceOrderTypeText
                 variant="subtitle1"
                 style={{ml: '0.5em'}}
@@ -236,24 +268,45 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
               sx={{
                 ml: '0.4em',
                 alignSelf: 'center',
-                // mt: '0.2em',
               }}>
               {`#${serviceOrderDetails.number}`}
             </Typography>
+
+            <StatusChip
+              color={getServiceOrderStatusColor(serviceOrderDetails.status)}
+              label={serviceOrderStatusToString(serviceOrderDetails.status)}
+              style={{
+                ...olStyles.orderStatus,
+                letterSpacing: 'normal',
+                marginLeft: '2em',
+              }}
+            />
           </Box>
 
           {renderHeaderLeftWidget()}
         </Box>
       }>
-      <Grid container>
-        {orderInfo.map((label, index) => (
-          <Grid item xs={4} key={`${label}-${index}`}>
-            <OrderInfo
-              serviceOrderDetails={serviceOrderDetails}
-              label={label}
-            />
-          </Grid>
-        ))}
+      <Grid container columnSpacing={4}>
+        <OrderInfoItem
+          label="Customer Details"
+          details={customerDetailCells}
+          serviceOrderDetails={serviceOrderDetails}
+        />
+        <OrderInfoItem
+          label="Unit Details"
+          details={unitDetailCells}
+          serviceOrderDetails={serviceOrderDetails}
+        />
+        <OrderInfoItem
+          label="Contract"
+          details={contractDetailCells}
+          serviceOrderDetails={serviceOrderDetails}
+        />
+        <OrderInfoItem
+          label="Job"
+          details={jobDetailCells}
+          serviceOrderDetails={serviceOrderDetails}
+        />
       </Grid>
 
       <Confirm

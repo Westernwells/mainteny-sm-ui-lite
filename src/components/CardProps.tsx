@@ -2,12 +2,15 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
 import {SxProps} from '@mui/system';
-import {ReactNode} from 'react';
+import React, {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
+import Link from '@mui/material/Link';
+import {Link as RouterLink} from 'react-router-dom';
 
 interface Props {
   icon: JSX.Element;
   label: string;
+  navigateTo?: string;
   bodyTextVariant?: any;
   titleTextVariant?: any;
   iconBackground?: string;
@@ -22,6 +25,7 @@ interface Props {
 
 export const CardProps = ({
   label,
+  navigateTo,
   bodyTextVariant,
   titleTextVariant,
   icon,
@@ -36,16 +40,27 @@ export const CardProps = ({
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
+
+  const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (event.currentTarget.getAttribute('to') !== '') {
+      return;
+    }
+    event.preventDefault();
+  };
+
   return (
-    <Box display="flex" alignItems="center" sx={{...containerStyles}}>
-      {/* remove width to make this component more generic */}
+    <Box
+      display="flex"
+      alignItems="flex-start"
+      sx={{...containerStyles}}
+      height="60px">
       <Box
         sx={{
           backgroundColor: iconBackground,
           p: '0.7em',
           display: 'flex',
           justifyContent: 'center',
-          mr: '1em',
+          mr: '0.8em',
           maxHeight: iconMaxHeight || 'default',
           ...iconContainerStyles,
         }}>
@@ -62,7 +77,36 @@ export const CardProps = ({
           {t(label)}
         </Typography>
 
-        {typeof bodyText === 'string' ? (
+        {navigateTo ? (
+          <Link
+            component={RouterLink}
+            onClick={handleLinkClick}
+            to={`${navigateTo}`}
+            underline="hover"
+            variant="body2"
+            style={{paddingTop: '0.2em', display: 'flex', fontWeight: '400'}}
+            color={theme.palette.info.main}>
+            {typeof bodyText === 'string' ? (
+              <Typography
+                component="div"
+                variant={bodyTextVariant || 'body2'}
+                sx={{
+                  ...bodyStyle,
+                  fontSize: '0.9rem',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'wrap',
+                  WebkitLineClamp: '2',
+                  WebkitBoxOrient: 'vertical',
+                  display: '-webkit-box',
+                }}>
+                {t(bodyText)}
+              </Typography>
+            ) : (
+              bodyText
+            )}
+          </Link>
+        ) : typeof bodyText === 'string' ? (
           <Typography
             component="div"
             variant={bodyTextVariant || 'body2'}

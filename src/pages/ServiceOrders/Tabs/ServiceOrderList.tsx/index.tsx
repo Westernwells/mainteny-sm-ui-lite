@@ -4,6 +4,7 @@ import {mixpanelEvents} from 'mixpanel/constants';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {
+  ServiceOrderPaymentStatus,
   ServiceOrderStatus,
   ServiceOrderType,
   ServiceOrderView,
@@ -20,10 +21,12 @@ import {EmptySection} from 'components/EmptySection';
 import {FlexContainer} from 'components/FlexContainer';
 import {
   getServiceOrderStatusList,
-  getSelectedOrderStatuses,
   serviceOrderTypeToEnum,
   serviceOrderTypeToString,
+  serviceOrderPaymentStatusToString,
+  serviceOrderPaymentStatusToEnum,
   serviceOrderStatusToString,
+  serviceOrderStatusToEnum,
 } from 'utils/service-order-utils';
 import {Widget} from 'components/Widget';
 import {useFormatDate} from 'hooks/useFormatDate';
@@ -40,6 +43,9 @@ export const ServiceOrderList = () => {
   const totalOrederRef = useRef(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [searchQuery, setSearchQuery] = useQueryState('searchServiceOrders');
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useQueryState<
+    ServiceOrderPaymentStatus[]
+  >('selectedPaymentStatus', {defaultValue: []});
   const [selectedOrderStatus, setSelectedOrderStatus] = useQueryState<
     ServiceOrderStatus[]
   >('selectedOrderStatus', {defaultValue: []});
@@ -63,6 +69,7 @@ export const ServiceOrderList = () => {
       query: searchQuery,
       status: selectedOrderStatus,
       types: selectedOrderTypes,
+      paymentStatus: selectedPaymentStatus,
     },
     {keepPreviousData: true},
   );
@@ -89,6 +96,7 @@ export const ServiceOrderList = () => {
     selectedOrderTypes,
     selectedOrderStatus,
     serviceOrdersResource,
+    selectedPaymentStatus,
   ]);
 
   useEffect(() => {
@@ -101,11 +109,6 @@ export const ServiceOrderList = () => {
     setPageCount(Math.ceil(serviceOrdersResource.total / page.pageSize));
   }, [serviceOrdersResource, page.pageSize]);
 
-  const getSelectedStatusValues = (items: string[]) => {
-    const selectedOrderStatuses = getSelectedOrderStatuses(items);
-    setSelectedOrderStatus(selectedOrderStatuses as ServiceOrderStatus[]);
-  };
-
   const renderFilterItems = () => (
     <FilterFields
       onClear={() => {
@@ -115,10 +118,30 @@ export const ServiceOrderList = () => {
         }
       }}
       showFilter>
+      <Box sx={{width: '100%'}}>
+        <MultipleSelectCheckmarks
+          label="Job Type"
+          options={Object.keys(ServiceOrderType).map((i) =>
+            serviceOrderTypeToString(i),
+          )}
+          initialSelectedItems={selectedOrderTypes.map((i) =>
+            serviceOrderTypeToString(i),
+          )}
+          getSelectedValue={(item) => {
+            const orderTypes = item.map((i) => serviceOrderTypeToEnum(i));
+            setSelectedOrderTypes(orderTypes as ServiceOrderType[]);
+          }}
+          multiple
+        />
+      </Box>
+
       <MultipleSelectCheckmarks
-        label="Status"
+        label="Job Status"
         options={getServiceOrderStatusList()}
-        getSelectedValue={getSelectedStatusValues}
+        getSelectedValue={(item) => {
+          const orderStatus = item.map((i) => serviceOrderStatusToEnum(i));
+          setSelectedOrderStatus(orderStatus as ServiceOrderStatus[]);
+        }}
         initialSelectedItems={selectedOrderStatus.map((i) =>
           serviceOrderStatusToString(i),
         )}
@@ -126,17 +149,21 @@ export const ServiceOrderList = () => {
       />
 
       <MultipleSelectCheckmarks
-        label="Order types"
-        options={Object.keys(ServiceOrderType).map((i) =>
-          serviceOrderTypeToString(i),
-        )}
-        initialSelectedItems={selectedOrderTypes.map((i) =>
-          serviceOrderTypeToString(i),
+        label="Payment Status"
+        options={Object.values(ServiceOrderPaymentStatus).map((value) =>
+          serviceOrderPaymentStatusToString(value),
         )}
         getSelectedValue={(item) => {
-          const orderTypes = item.map((i) => serviceOrderTypeToEnum(i));
-          setSelectedOrderTypes(orderTypes as ServiceOrderType[]);
+          const paymentStatus = item.map((i) =>
+            serviceOrderPaymentStatusToEnum(i),
+          );
+          setSelectedPaymentStatus(
+            paymentStatus as ServiceOrderPaymentStatus[],
+          );
         }}
+        initialSelectedItems={selectedPaymentStatus.map((i) =>
+          serviceOrderPaymentStatusToString(i),
+        )}
         multiple
       />
     </FilterFields>
