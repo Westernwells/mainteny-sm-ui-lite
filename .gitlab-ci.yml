@@ -53,6 +53,8 @@ variables:
     - mkdir -p /kaniko/.docker
     - echo "{\"credsStore\":\"ecr-login\",\"credHelpers\":{\"$DOCKER_REGISTRY\":\"ecr-login\"}}" > /kaniko/.docker/config.json
   script:
+    - pwd
+    - ls -la
     - >
       /kaniko/executor
       --cache=true
