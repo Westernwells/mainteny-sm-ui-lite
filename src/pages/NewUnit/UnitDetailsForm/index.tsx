@@ -225,6 +225,7 @@ export const UnitDetailsForm = ({
               serviceTypeResource={customerResource}
               handleFocus={handleFocus}
               numberType={ServiceCompanyNumberType.ELEVATOR}
+              setActiveField={() => setActiveField('')}
             />
           </Grid>
 

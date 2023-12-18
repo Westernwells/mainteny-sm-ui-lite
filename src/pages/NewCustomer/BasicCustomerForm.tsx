@@ -204,6 +204,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
               serviceTypeResource={customerResource}
               handleFocus={handleFocus}
               numberType={ServiceCompanyNumberType.PROPERTY_OWNER}
+              setActiveField={() => setActiveField('')}
             />
           </Grid>
           <Grid item md={4}>

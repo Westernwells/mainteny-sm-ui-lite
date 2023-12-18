@@ -168,6 +168,7 @@ const NewContractBasicInfo: FC<Props> = ({
           serviceTypeResource={contractResource}
           handleFocus={handleFocus}
           numberType={ServiceCompanyNumberType.CONTRACT}
+          setActiveField={() => setActiveField('')}
         />
       </Grid>
       <Box width="100%" />
