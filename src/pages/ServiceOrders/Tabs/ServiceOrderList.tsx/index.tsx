@@ -208,6 +208,7 @@ export const ServiceOrderList = () => {
       <DataGridLayout
         rows={rows}
         columns={columns}
+        aria-label="jobs-grid"
         loading={isFetching}
         pageSize={page.pageSize}
         scrollToTop={searchQuery}

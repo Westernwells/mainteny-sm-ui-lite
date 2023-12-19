@@ -118,6 +118,8 @@ export const AppTopBar = ({
                   alt="globe"
                 />
               }
+              menuListProps={{id: 'selectLanguageMenuList'}}
+              id="selectLanguageButton"
               label={selectedLng}
               menu={[
                 {

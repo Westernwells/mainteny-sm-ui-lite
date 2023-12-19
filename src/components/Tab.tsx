@@ -151,6 +151,7 @@ export const Tabs = ({
           <Tab
             key={`${item.label}`}
             disableRipple
+            data-aria-label={`tab-item-${index}`}
             label={
               <Box
                 display="flex"
