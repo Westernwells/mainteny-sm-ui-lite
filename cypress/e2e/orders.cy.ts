@@ -19,17 +19,13 @@ describe('Orders page - list page', () => {
   });
 
   it('filter orders by status', () => {
-    const statuses = ['Unscheduled', 'Pending', 'Completed'];
-    const newId = 'Job Status';
+    const statuses = ['Unscheduled', 'Pending', 'Completed', 'Scheduling', 'Ongoing', 'Cancelled', 'Expired'];
 
     OrderPage.changeStatusFilter(statuses);
 
     const commaSeparatedText = statuses.join(',');
-
-    cy.get(`div#${newId}[role="button"]`).should(
-      'have.text',
-      commaSeparatedText,
-    );
+    
+    cy.get('div#Job\\ Status[role="button"]').should('have.text', commaSeparatedText);
 
     cy.get(`div[aria-label="jobs-grid"]`)
       .find('div[role="row"]')
