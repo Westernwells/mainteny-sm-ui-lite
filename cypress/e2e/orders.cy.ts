@@ -20,10 +20,11 @@ describe('Orders page - list page', () => {
 
   it('filter orders by status', () => {
     const statuses = ['Unscheduled', 'Pending', 'Completed'];
-
+    cy.get('div#Status[role="button"]', { timeout: 10000 }).should('be.visible').click();
     OrderPage.changeStatusFilter(statuses);
 
     const commaSeparatedText = statuses.join(',');
+    
     cy.get('div#Status[role="button"]').should('have.text', commaSeparatedText);
 
     cy.get(`div[aria-label="jobs-grid"]`)
