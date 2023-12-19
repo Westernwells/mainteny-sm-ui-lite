@@ -75,7 +75,7 @@ export const getStartEndPrice = (price: number[][]) => {
 
 export const contractTypeMap = {
   [ContractTypes.SERVICE]: 'Maintenance',
-  [ContractTypes.NON_SERVICE]: 'Non  maintenance',
+  [ContractTypes.NON_SERVICE]: 'Non maintenance',
 };
 
 export const invoiceCycle: {[key: string]: string} = {
