@@ -20,12 +20,16 @@ describe('Orders page - list page', () => {
 
   it('filter orders by status', () => {
     const statuses = ['Unscheduled', 'Pending', 'Completed'];
-    cy.get('div#Status[role="button"]', { timeout: 10000 }).should('be.visible').click();
+    const newId = 'Job Status';
+
     OrderPage.changeStatusFilter(statuses);
 
     const commaSeparatedText = statuses.join(',');
-    
-    cy.get('div#Status[role="button"]').should('have.text', commaSeparatedText);
+
+    cy.get(`div#${newId}[role="button"]`).should(
+      'have.text',
+      commaSeparatedText,
+    );
 
     cy.get(`div[aria-label="jobs-grid"]`)
       .find('div[role="row"]')
