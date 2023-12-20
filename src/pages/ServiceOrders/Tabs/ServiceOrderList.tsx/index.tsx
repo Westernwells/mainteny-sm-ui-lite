@@ -32,7 +32,7 @@ import {useQueryState} from 'hooks/useQueryState';
 import {columns, makeRows} from './ServiceOrderDataGridProps';
 
 const serviceOrderStatusMap = {
-  Unscheduled: ServiceOrderStatus.READY_TO_SCHEDULE || ServiceOrderStatus.INIT,
+  Unscheduled: ServiceOrderStatus.READY_TO_SCHEDULE,
   Scheduling: ServiceOrderStatus.SCHEDULING,
   Pending: ServiceOrderStatus.SCHEDULED,
   Ongoing: ServiceOrderStatus.IN_PROGRESS,
@@ -162,9 +162,6 @@ export const ServiceOrderList = () => {
             ),
           )
         }
-        initialSelectedItems={selectedOrderStatus.map((i) =>
-          serviceOrderStatusToString(i),
-        )}
         multiple
       />
 

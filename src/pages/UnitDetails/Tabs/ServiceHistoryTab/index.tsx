@@ -27,7 +27,7 @@ import {columns, makeRows} from './ServiceHistoryDataGridProps';
 const pageSize = 25;
 
 const serviceOrderStatusMap = {
-  Unscheduled: ServiceOrderStatus.READY_TO_SCHEDULE || ServiceOrderStatus.INIT,
+  Unscheduled: ServiceOrderStatus.READY_TO_SCHEDULE,
   Scheduling: ServiceOrderStatus.SCHEDULING,
   Pending: ServiceOrderStatus.SCHEDULED,
   Ongoing: ServiceOrderStatus.IN_PROGRESS,
