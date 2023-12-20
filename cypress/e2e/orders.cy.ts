@@ -24,7 +24,13 @@ describe('Orders page - list page', () => {
     OrderPage.changeStatusFilter(statuses);
 
     const commaSeparatedText = statuses.join(',');
-    cy.get('div#Status[role="button"]').should('have.text', commaSeparatedText);
+
+    cy.get('div#Job\\ Status[role="button').should(
+      'have.text',
+      commaSeparatedText,
+    );
+
+    cy.wait(2000);
 
     cy.get(`div[aria-label="jobs-grid"]`)
       .find('div[role="row"]')
@@ -35,8 +41,7 @@ describe('Orders page - list page', () => {
           .trim();
 
         if (!statusText) return;
-
-        // Check if the statusText matches any of the expected statuses
+    
         if (!statuses.includes(statusText)) {
           throw new Error(
             `Unexpected status at row ${index + 1}: ${statusText}`,

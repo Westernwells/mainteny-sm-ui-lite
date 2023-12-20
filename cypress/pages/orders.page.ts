@@ -9,8 +9,9 @@ export default class OrdersPage {
     cy.get(`div[role="tablist"] [data-aria-label="tab-item-${index}"]`).click();
   };
 
+
   static changeStatusFilter = (statuses: string[]) => {
-    cy.get('div#Status[role="button"]').click();
+    cy.get('div#Job\\ Status[role="button"]').click();
 
     statuses.forEach((item) => {
       cy.get('ul[role="listbox"]')

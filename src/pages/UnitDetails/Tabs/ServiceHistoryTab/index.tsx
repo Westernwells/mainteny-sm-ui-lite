@@ -28,6 +28,7 @@ const pageSize = 25;
 
 const serviceOrderStatusMap = {
   Unscheduled: ServiceOrderStatus.READY_TO_SCHEDULE,
+  Scheduling: ServiceOrderStatus.SCHEDULING,
   Pending: ServiceOrderStatus.SCHEDULED,
   Ongoing: ServiceOrderStatus.IN_PROGRESS,
   Completed: ServiceOrderStatus.COMPLETED,
@@ -89,7 +90,7 @@ export const ServiceHistoryTab = () => {
   const renderFilterItems = () => (
     <FilterFields>
       <MultipleSelectCheckmarks
-        label="Order Type"
+        label="Job Type"
         options={Object.keys(ServiceOrderType).map((item) =>
           serviceOrderTypeToString(item),
         )}
@@ -98,9 +99,10 @@ export const ServiceHistoryTab = () => {
         }
       />
       <MultipleSelectCheckmarks
-        label="Status"
+        label="Job Status"
         options={[
           ServiceOrderStatus.READY_TO_SCHEDULE,
+          ServiceOrderStatus.SCHEDULING,
           ServiceOrderStatus.SCHEDULED,
           ServiceOrderStatus.IN_PROGRESS,
           ServiceOrderStatus.COMPLETED,
