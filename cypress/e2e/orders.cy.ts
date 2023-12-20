@@ -19,7 +19,7 @@ describe('Orders page - list page', () => {
   });
 
   it('filter orders by status', () => {
-    const statuses = ['Unscheduled', 'Pending', 'Completed'];
+    const statuses = ['Unscheduled', 'Pending', 'Completed', 'Scheduling', 'Ongoing', 'Cancelled', 'Expired'];
 
     OrderPage.changeStatusFilter(statuses);
 
