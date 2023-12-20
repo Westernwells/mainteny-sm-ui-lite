@@ -26,7 +26,7 @@ import {
   serviceOrderPaymentStatusToString,
   serviceOrderPaymentStatusToEnum,
   serviceOrderStatusToString,
-  serviceOrderStatusToEnum,
+  getSelectedOrderStatuses,
 } from 'utils/service-order-utils';
 import {Widget} from 'components/Widget';
 import {useFormatDate} from 'hooks/useFormatDate';
@@ -138,9 +138,9 @@ export const ServiceOrderList = () => {
       <MultipleSelectCheckmarks
         label="Job Status"
         options={getServiceOrderStatusList()}
-        getSelectedValue={(item) => {
-          const orderStatus = item.map((i) => serviceOrderStatusToEnum(i));
-          setSelectedOrderStatus(orderStatus as ServiceOrderStatus[]);
+        getSelectedValue={(items) => {
+          const selectedOrderStatuses = getSelectedOrderStatuses(items, false);
+          setSelectedOrderStatus(selectedOrderStatuses as ServiceOrderStatus[]);
         }}
         initialSelectedItems={selectedOrderStatus.map((i) =>
           serviceOrderStatusToString(i),
