@@ -63,6 +63,7 @@ export const useAuth = (): UseAuth => {
               variant: 'warning',
             },
           );
+          setLoading(false);
           return;
         }
         axiosClient.defaults.headers.common.Authorization = `Bearer ${user.token}`;
