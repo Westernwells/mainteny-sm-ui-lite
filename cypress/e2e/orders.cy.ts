@@ -41,8 +41,6 @@ describe('Orders page - list page', () => {
           .trim();
 
         if (!statusText) return;
-
-        cy.log(`Row ${index + 1} - Status: ${statusText}`);
     
         if (!statuses.includes(statusText)) {
           throw new Error(
