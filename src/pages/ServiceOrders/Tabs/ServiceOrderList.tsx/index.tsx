@@ -162,6 +162,9 @@ export const ServiceOrderList = () => {
             ),
           )
         }
+        initialSelectedItems={selectedOrderStatus.map((i) =>
+          serviceOrderStatusToString(i),
+        )}
         multiple
       />
 
