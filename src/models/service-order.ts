@@ -45,7 +45,6 @@ export enum ServiceOrderStatus {
   CANCELLED = 'CANCELLED',
   EXPIRED = 'EXPIRED',
   INVOICE_ISSUED = 'INVOICE_ISSUED',
-  DONE = 'DONE',
 }
 
 export enum ServiceOrderPaymentStatus {
