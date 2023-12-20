@@ -30,6 +30,9 @@ export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
 
 export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
   switch (status) {
+    case ServiceOrderStatus.READY_TO_SCHEDULE:
+    case ServiceOrderStatus.INIT:
+      return 'Unscheduled';
     case ServiceOrderStatus.SCHEDULING:
       return 'Scheduling';
     case ServiceOrderStatus.SCHEDULED:
@@ -50,6 +53,8 @@ export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
 
 export const serviceOrderStatusToEnum = (status: string) => {
   switch (status) {
+    case 'Unscheduled':
+      return ServiceOrderStatus.READY_TO_SCHEDULE;
     case 'Scheduling':
       return ServiceOrderStatus.SCHEDULING;
     case 'Pending':
@@ -63,7 +68,7 @@ export const serviceOrderStatusToEnum = (status: string) => {
     case 'Completed':
       return ServiceOrderStatus.COMPLETED;
     default:
-      return 'Unscheduled';
+      return ServiceOrderStatus.INIT;
   }
 };
 
