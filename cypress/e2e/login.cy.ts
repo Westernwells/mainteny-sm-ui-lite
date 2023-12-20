@@ -16,9 +16,7 @@ describe('Login Page', () => {
   });
 
   it('navigate to dashboard after login', () => {
-    LoginPage.fillEmail('e2etest@mainteny.com');
-    LoginPage.fillPassword('!!abc123');
-    LoginPage.submitLoginForm();
+    LoginPage.login();
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/`);
   });

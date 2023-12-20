@@ -5,6 +5,12 @@ export default class LoginPage {
     });
   };
 
+  static login = () => {
+    LoginPage.fillEmail('e2etest@mainteny.com');
+    LoginPage.fillPassword('!!abc123');
+    LoginPage.submitLoginForm();
+  };
+
   static fillEmail = (email) => {
     cy.get('#email').type(email);
   };

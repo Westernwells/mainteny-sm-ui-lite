@@ -20,18 +20,27 @@ import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {FlexContainer} from 'components/FlexContainer';
 import {
-  getServiceOrderStatusList,
   serviceOrderTypeToEnum,
   serviceOrderTypeToString,
   serviceOrderPaymentStatusToString,
   serviceOrderPaymentStatusToEnum,
   serviceOrderStatusToString,
-  serviceOrderStatusToEnum,
 } from 'utils/service-order-utils';
 import {Widget} from 'components/Widget';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
 import {columns, makeRows} from './ServiceOrderDataGridProps';
+
+const serviceOrderStatusMap = {
+  Unscheduled: ServiceOrderStatus.READY_TO_SCHEDULE,
+  Scheduling: ServiceOrderStatus.SCHEDULING,
+  Pending: ServiceOrderStatus.SCHEDULED,
+  Ongoing: ServiceOrderStatus.IN_PROGRESS,
+  Completed: ServiceOrderStatus.COMPLETED,
+  Cancelled: ServiceOrderStatus.CANCELLED,
+  Expired: ServiceOrderStatus.EXPIRED,
+};
+type serviceOrderStatusMapKey = keyof typeof serviceOrderStatusMap;
 
 export const ServiceOrderList = () => {
   const navigate = useNavigate();
@@ -137,11 +146,22 @@ export const ServiceOrderList = () => {
 
       <MultipleSelectCheckmarks
         label="Job Status"
-        options={getServiceOrderStatusList()}
-        getSelectedValue={(item) => {
-          const orderStatus = item.map((i) => serviceOrderStatusToEnum(i));
-          setSelectedOrderStatus(orderStatus as ServiceOrderStatus[]);
-        }}
+        options={[
+          ServiceOrderStatus.READY_TO_SCHEDULE,
+          ServiceOrderStatus.SCHEDULING,
+          ServiceOrderStatus.SCHEDULED,
+          ServiceOrderStatus.IN_PROGRESS,
+          ServiceOrderStatus.COMPLETED,
+          ServiceOrderStatus.CANCELLED,
+          ServiceOrderStatus.EXPIRED,
+        ].map((item) => serviceOrderStatusToString(item))}
+        getSelectedValue={(item) =>
+          setSelectedOrderStatus(
+            item.map(
+              (i) => serviceOrderStatusMap[i as serviceOrderStatusMapKey],
+            ),
+          )
+        }
         initialSelectedItems={selectedOrderStatus.map((i) =>
           serviceOrderStatusToString(i),
         )}
@@ -161,9 +181,9 @@ export const ServiceOrderList = () => {
             paymentStatus as ServiceOrderPaymentStatus[],
           );
         }}
-        initialSelectedItems={selectedPaymentStatus.map((i) =>
-          serviceOrderPaymentStatusToString(i),
-        )}
+        // initialSelectedItems={selectedPaymentStatus.map((i) =>
+        //   serviceOrderPaymentStatusToString(i),
+        // )}
         multiple
       />
     </FilterFields>
@@ -208,6 +228,7 @@ export const ServiceOrderList = () => {
       <DataGridLayout
         rows={rows}
         columns={columns}
+        aria-label="jobs-grid"
         loading={isFetching}
         pageSize={page.pageSize}
         scrollToTop={searchQuery}

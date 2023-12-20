@@ -138,7 +138,7 @@ export const ServiceOrderScheduleTab = () => {
   const renderFilterItems = () => (
     <FilterFields onClear={clearFilters}>
       <MultipleSelectCheckmarks
-        label="Order Types"
+        label="Job Types"
         options={Object.keys(ServiceOrderType).map((i) =>
           serviceOrderTypeToString(i),
         )}
@@ -152,7 +152,7 @@ export const ServiceOrderScheduleTab = () => {
         multiple
       />
       <MultipleSelectCheckmarks
-        label="Status"
+        label="Job Status"
         options={getServiceOrderStatusList()}
         getSelectedValue={getSelectedStatusValues}
         initialSelectedItems={selectedOrderStatus.map((i) =>

@@ -10,6 +10,7 @@ variables:
   DOCKER_REGISTRY: 155174012160.dkr.ecr.eu-central-1.amazonaws.com
   DOCKER_DRIVER: overlay
   IMAGE_SUFFIX: ${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_ID}
+  GIT_STRATEGY: clone
 
 .build-project: &build-template
   stage: build-project
@@ -45,7 +46,7 @@ variables:
 .build-images: &build-image-template
   stage: build-images
   variables:
-    GIT_STRATEGY: none
+    GIT_STRATEGY: clone
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -53,6 +54,8 @@ variables:
     - mkdir -p /kaniko/.docker
     - echo "{\"credsStore\":\"ecr-login\",\"credHelpers\":{\"$DOCKER_REGISTRY\":\"ecr-login\"}}" > /kaniko/.docker/config.json
   script:
+    - pwd
+    - ls -la
     - >
       /kaniko/executor
       --cache=true
