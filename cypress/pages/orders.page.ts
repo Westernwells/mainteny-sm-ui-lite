@@ -24,27 +24,31 @@ export default class OrdersPage {
   // Recursively wait for all job query api calls until the provided query parameter is matched
   static waitForAllJobQueryApi = (
     apiAlias: string,
-    queryParamsToMatch = {},
-    callback,
+    queryParamsToMatch: {[key: string]: string | string[]},
+    callback: () => void,
   ) => {
     cy.wait(apiAlias).then((interception) => {
       const queryParams = new URLSearchParams(interception.request.url);
 
       let isAllMatched = true;
 
-      for (const key in queryParamsToMatch) {
-        const isObject = typeof queryParamsToMatch[key] === 'object';
-        const queryValue = isObject
-          ? queryParams.getAll(key)
-          : queryParams.get(key);
+      if (queryParamsToMatch) {
+        const keys = Object.keys(queryParamsToMatch);
 
-        if (isObject && !isEqual(queryValue, queryParamsToMatch[key])) {
-          isAllMatched = false;
-        }
+        keys.forEach((key) => {
+          const isObject = typeof queryParamsToMatch[key] === 'object';
+          const queryValue = isObject
+            ? queryParams.getAll(key)
+            : queryParams.get(key);
 
-        if (!isObject && queryValue !== queryParamsToMatch[key]) {
-          isAllMatched = false;
-        }
+          if (isObject && !isEqual(queryValue, queryParamsToMatch[key])) {
+            isAllMatched = false;
+          }
+
+          if (!isObject && queryValue !== queryParamsToMatch[key]) {
+            isAllMatched = false;
+          }
+        });
       }
 
       if (isAllMatched) {
