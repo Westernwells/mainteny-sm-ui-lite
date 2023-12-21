@@ -163,7 +163,7 @@ build-stage:
   variables:
     ENV: stage
   rules:
-    - if: $CI_COMMIT_REF_NAME == 'develop'  && $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_REF_NAME == 'develop'
     - when: never
 
 build-release:
