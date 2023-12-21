@@ -127,7 +127,7 @@ export const makeRows = (
         type: i18next.t(item.serviceOrder?.type!),
         amount: `${formatCurrency(
           item
-            ? item.totalAmount.grossAmount /
+            ? item.totalAmount.grossAmount! /
                 10 ** item.totalAmount.fractionDigits!
             : 0,
           {

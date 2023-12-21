@@ -54,11 +54,9 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
       articleId: article.id,
       article: {
         id: article.id,
-        name: article.name,
         externalId: article.externalId,
         type: article.type,
         unit: article.unit,
-        unitSellingAmount: article.unitSellingAmount,
         costPackage: article.costPackage!,
       },
       description: article.description,
