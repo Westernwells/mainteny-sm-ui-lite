@@ -1,6 +1,11 @@
+import {ArticleType, CostPackage} from 'models/article';
+
 export interface EditArticleFormModel {
   name: string;
-  description: string;
-  unitPrice: number;
+  unit: string;
+  unitSellingAmount: number;
   quantity: number;
+  type: ArticleType;
+  costPackage?: CostPackage;
+  unitPurchaseAmountCurrency: string;
 }

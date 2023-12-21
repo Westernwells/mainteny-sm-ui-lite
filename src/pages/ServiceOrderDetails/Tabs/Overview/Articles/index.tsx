@@ -10,7 +10,7 @@ import {EmptySection} from 'components/EmptySection';
 import Box from '@mui/material/Box';
 import {SelectModal} from 'components/SelectModal';
 import {ArticlesModalDataGrid} from 'components/ArticleModalDataGrid';
-import {ArticleView} from 'models/article';
+import {ArticleView, ServiceOrderArticleRecord} from 'models/article';
 import {Progress} from 'components/Progress';
 import {
   useCreateServiceOrderArticle,
@@ -50,8 +50,17 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
       setOpenSelectModal(false);
       return;
     }
-    const body = {
+    const body: ServiceOrderArticleRecord = {
       articleId: article.id,
+      article: {
+        id: article.id,
+        name: article.name,
+        externalId: article.externalId,
+        type: article.type,
+        unit: article.unit,
+        unitSellingAmount: article.unitSellingAmount,
+        costPackage: article.costPackage!,
+      },
       description: article.description,
       name: article.name,
       quantity: 1,

@@ -51,7 +51,7 @@ export const CardProps = ({
   return (
     <Box
       display="flex"
-      alignItems="flex-start"
+      alignItems={bodyText ? 'flex-start' : 'center'}
       sx={{...containerStyles}}
       height="60px">
       <Box
@@ -110,7 +110,15 @@ export const CardProps = ({
           <Typography
             component="div"
             variant={bodyTextVariant || 'body2'}
-            sx={{...bodyStyle}}>
+            sx={{
+              fontSize: '0.9rem',
+              WebkitLineClamp: '2',
+              WebkitBoxOrient: 'vertical',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'wrap',
+              display: '-webkit-box',
+              ...bodyStyle,
+            }}>
             {t(bodyText)}
           </Typography>
         ) : (
