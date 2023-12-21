@@ -76,7 +76,7 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
             icon={<LocationOn sx={{color: theme.palette.info.main}} />}
             label="UNIT ADDRESS"
             bodyText={serviceOrderDetails.elevator.address.fullName || '-'}
-            navigateTo={`/units/details/${serviceOrderDetails.elevator.id}`}
+            navigateTo={`/units?tab=1&searchUnitsMapView=${serviceOrderDetails.elevator.address.fullName}`}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
