@@ -47,18 +47,16 @@ export const Dialog = ({
         id="alert-dialog-title"
         sx={{
           background: 'white',
-          boxShadow: '0px 4px 15px 0px #90909033',
           padding: '1em 1.5em',
-          mb: '0.5em',
         }}>
         {typeof title === 'string' ? t(title) : title}
       </DialogTitle>
 
-      <DialogContent sx={{pt: '1em'}}>
+      <DialogContent sx={{margin: '1em 0em 0em 0em'}}>
         <DialogContentText
           id="alert-dialog-description"
           component="div"
-          sx={{color: 'text.primary', pt: '0.5rem'}}>
+          sx={{color: 'text.primary', mt: '1em'}}>
           {children}
         </DialogContentText>
       </DialogContent>
@@ -68,7 +66,6 @@ export const Dialog = ({
           display: 'flex',
           justifyContent: 'space-between',
           background: 'white',
-          boxShadow: '0px 4px 15px 0px #90909033',
         }}>
         {leftButton}
         <Box sx={{marginLeft: 'auto'}}>
