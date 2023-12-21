@@ -1,4 +1,4 @@
-import {ExtendedSupplierRecord} from './article';
+import {ArticleType, ExtendedSupplierRecord} from './article';
 import {Money} from './misc';
 
 export interface ArticleBasicFormModel {
@@ -8,7 +8,7 @@ export interface ArticleBasicFormModel {
   name: string;
   externalId: string;
   storageLocation?: string;
-  type: string;
+  type: ArticleType;
   unit: string;
   unitPurchaseVat: number;
   unitPurchaseAmount: number;
@@ -20,6 +20,7 @@ export interface ArticleBasicFormModel {
     labor: Money;
     material: Money;
   };
+  quantity?: number;
 }
 
 export interface ArticleDescriptionFormModel {

@@ -13,7 +13,7 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {Confirm} from 'components/Confirm';
-import {ArticleView} from 'models/article';
+import {ArticleView, ServiceOrderArticleRecord} from 'models/article';
 import {
   useDeleteServiceOrderArticle,
   useNewUpdateServiceOrderArticles,
@@ -21,10 +21,12 @@ import {
 } from 'hooks/reactQuery/useServiceOrder';
 import {RemoveRedEye} from '@mui/icons-material';
 import {Dialog} from 'components/Dialog';
+import {ArticleBasicFormModel} from 'models/articleForm';
 import {amountRecordForBackend, makeAmountRecord} from 'utils/currency';
 import {ServiceOrderArticleView} from 'models/service-order';
-import {EditArticleForm} from './EditArticleForm';
+import {FormikErrors} from 'formik';
 import {EditArticleFormModel} from './models';
+import {EditArticleForm} from './EditArticleForm';
 
 interface Props {
   article: ArticleView;
@@ -47,9 +49,11 @@ export const Actions = ({
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [currentArticle, setCurrentArticle] =
     useState<ServiceOrderArticleView>();
-  const [formikErrors, setFormikErrors] = useState({});
+  const [formikErrors, setFormikErrors] = useState<
+    FormikErrors<EditArticleFormModel | ArticleBasicFormModel>
+  >({});
   const [formikValues, setFormikValues] = useState<
-    EditArticleFormModel | undefined
+    EditArticleFormModel | ArticleBasicFormModel
   >();
 
   const {mutateAsync: deleteServiceOrderArticle} =
@@ -132,16 +136,25 @@ export const Actions = ({
   };
 
   const handleUpdateArticle = async () => {
-    const body = serviceOrderArticles!
+    const body: ServiceOrderArticleRecord = serviceOrderArticles!
       .filter((item) => item.article.id === currentArticle?.article.id)
       .map((item) => ({
         articleId: item.article.id,
-        description: formikValues!.description,
+        article: {
+          id: item.article.id,
+          name: formikValues!.name,
+          externalId: item.article.externalId,
+          type: formikValues!.type,
+          unit: formikValues!.unit,
+          unitSellingAmount: item.article.unitSellingAmount,
+          costPackage: formikValues!.costPackage!,
+        },
         name: formikValues!.name,
-        quantity: formikValues!.quantity,
+        description: item.description,
+        quantity: Number(formikValues!.quantity!),
         unitAmount: amountRecordForBackend(
           makeAmountRecord(
-            formikValues!.unitPrice,
+            Number(formikValues!.unitSellingAmount),
             currentArticle!.unitAmount.currency,
             currentArticle!.unitAmount.percentageVat,
           ),
@@ -204,7 +217,7 @@ export const Actions = ({
         onSave={() => handleUpdateArticle()}
         isSaving={isLoading}
         dialogProps={{
-          maxWidth: 'sm',
+          maxWidth: 'lg',
           open: openEditDialog,
         }}>
         <EditArticleForm
@@ -213,8 +226,8 @@ export const Actions = ({
               (item) => article.id === item.article.id,
             )!
           }
-          getFormikErrors={(val) => setFormikErrors(val)}
-          getFormikValues={(val) => setFormikValues(val)}
+          setFormikValues={setFormikValues}
+          getFormErrors={(errors) => setFormikErrors(errors)}
         />
       </Dialog>
 

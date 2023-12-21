@@ -164,6 +164,7 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
           containerStyle={{
             borderBottom: 'none',
           }}
+          isWidget
         />
       )}
       <Dialog

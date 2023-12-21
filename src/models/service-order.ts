@@ -18,7 +18,13 @@ import {
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
-import {ArticleView, ServiceOrderArticleRecord} from './article';
+import {
+  ArticleAdditionalInfo,
+  ArticleType,
+  ArticleView,
+  CostPackage,
+  ServiceOrderArticleRecord,
+} from './article';
 import {FileResource, FileResourceRecord} from './media';
 import {ServiceOrderPaymentStatusView} from 'utils/service-order-utils';
 
@@ -456,14 +462,15 @@ export interface CreateNonScheduledServiceOrderBody {
 }
 
 export interface ServiceOrderArticleView {
-  article: ArticleView;
-  description: string;
   id: string;
   name: string;
-  quantity: number;
+  description: string;
   serviceOrderId: string;
+  article: ArticleView;
   unitAmount: Amount;
+  quantity: number;
 }
+
 export interface ServiceOrderItemRecord {
   articleId: string;
   articleUnit: string;
@@ -471,14 +478,6 @@ export interface ServiceOrderItemRecord {
   name: string;
   quantity: number;
   unitAmount: Amount;
-}
-
-export interface UpdateServiceOrderArticleRecord {
-  articleId: string;
-  description: string;
-  name: string;
-  quantity: number;
-  unitAmount: AmountRecord;
 }
 
 export interface ServiceOrderConfirmationPublishBody {

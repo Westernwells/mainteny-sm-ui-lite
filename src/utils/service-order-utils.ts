@@ -211,6 +211,7 @@ export const articleViewToArticleRecord = (
 ) =>
   articles.map((i) => ({
     articleId: i.article.id,
+    article: i.article,
     description: i.description,
     name: i.name,
     quantity: i.quantity,
