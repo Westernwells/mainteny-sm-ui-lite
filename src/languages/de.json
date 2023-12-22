@@ -1949,5 +1949,6 @@
   "Correction or adjustment to an already issued invoice, typically used for refunds, returns, or errors.": "Korrektur oder Anpassung einer bereits ausgestellten Rechnung, normalerweise verwendet für Rückerstattungen, Retouren oder Fehler.",
   "Upfront Invoice": "Abschlagsrechnung",
   "Final Invoice": "Abschlussrechnung",
-  "Non maintenance": "Sonstiger Vertrag"
+  "Non maintenance": "Sonstiger Vertrag",
+  "No Invoice": "Keine Rechnung"
 }
