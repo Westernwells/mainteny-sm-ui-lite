@@ -36,7 +36,6 @@ export const Overview = ({serviceOrder}: Props) => {
     serviceOrder.id,
   );
   const {data: serviceOrderArticles} = useServiceOrderArticles(serviceOrder.id);
-
   return (
     <Grid
       container

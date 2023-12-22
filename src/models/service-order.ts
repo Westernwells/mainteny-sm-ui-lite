@@ -18,13 +18,7 @@ import {
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
-import {
-  ArticleAdditionalInfo,
-  ArticleType,
-  ArticleView,
-  CostPackage,
-  ServiceOrderArticleRecord,
-} from './article';
+import {ArticleRecord, ArticleView, ServiceOrderArticleRecord} from './article';
 import {FileResource, FileResourceRecord} from './media';
 import {ServiceOrderPaymentStatusView} from 'utils/service-order-utils';
 
@@ -466,7 +460,7 @@ export interface ServiceOrderArticleView {
   name: string;
   description: string;
   serviceOrderId: string;
-  article: ArticleView;
+  article: ArticleRecord;
   unitAmount: Amount;
   quantity: number;
 }

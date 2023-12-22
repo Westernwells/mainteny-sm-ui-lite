@@ -53,7 +53,7 @@ export const CardProps = ({
       display="flex"
       alignItems={bodyText ? 'flex-start' : 'center'}
       sx={{...containerStyles}}
-      height="60px">
+      minHeight="60px">
       <Box
         sx={{
           backgroundColor: iconBackground,

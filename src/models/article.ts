@@ -153,15 +153,6 @@ export interface ServiceOrderArticleRecord {
   article: ArticleRecord;
 }
 
-export interface UpdateServiceOrderArticleItem {
-  articleId: string;
-  description: string;
-  name: string;
-  quantity: number;
-  unitAmount: AmountRecord;
-  article: ArticleRecord;
-}
-
 export interface ArticleOrderItemRecord {
   articleId: string;
   articleName: string;
@@ -284,10 +275,8 @@ export interface PropertyOwnerArticleRecord {
 
 export interface ArticleRecord {
   id: string;
-  name: string;
   externalId: string;
   type: ArticleType;
   unit: string;
-  unitSellingAmount: AmountRecord;
   costPackage?: CostPackage;
 }

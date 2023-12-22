@@ -164,7 +164,7 @@ export const AppointmentPreference = ({
       headerActionIcon={<EditIcon />}
       showHeaderBackground
       bodyContainerStyle={{
-        overflowY: 'auto',
+        overflowY: 'hidden',
       }}>
       <Grid container spacing={2}>
         {elevator?.timeRules.length ? renderTimeRules() : null}

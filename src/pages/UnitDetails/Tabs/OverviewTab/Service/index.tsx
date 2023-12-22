@@ -97,7 +97,7 @@ export const Service = ({
       headerActionIcon={<EditIcon />}
       showHeaderBackground
       bodyContainerStyle={{
-        overflowY: 'auto',
+        overflowY: 'hidden',
       }}>
       <Grid container spacing={2}>
         {labels.map((label) => (

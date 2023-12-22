@@ -79,7 +79,7 @@ export const Quotation = ({serviceOrder}: Props) => {
       ) : (
         <DataGridLayout
           fullHeight={false}
-          height={getDataGridHeight(rows.length, 3)}
+          height={getDataGridHeight(rows.length, 100)}
           isWidget
           rows={rows}
           columns={columns}
