@@ -104,8 +104,6 @@ export const makeRows = (articles: ServiceOrderArticleView[]): GridRowsProp =>
         10 ** item.unitAmount.fractionDigits!,
       {currency: item.unitAmount.currency},
     ),
-    model: item.article.model,
-    supplier: item.article.manufacturer,
     unitPrice: formatCurrency(
       item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!,
       {currency: item.unitAmount.currency},

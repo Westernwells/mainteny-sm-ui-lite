@@ -86,22 +86,11 @@ export const Actions = ({
       icon: <EditIcon />,
       onClick: () => {
         setOpenEditDialog(true);
-        setCurrentArticle({
-          article,
-          id: serviceOrderArticleId,
-          serviceOrderId,
-          description: article.description,
-          name: article.name,
-          quantity: 1,
-          unitAmount: {
-            fractionDigits: article.unitSellingAmount.fractionDigits,
-            grossAmount: article.unitSellingAmount.grossAmount,
-            vat: article.unitSellingAmount.vat,
-            currency: article.unitSellingAmount.currency,
-            netAmount: article.unitSellingAmount.netAmount,
-            percentageVat: article.unitSellingAmount.percentageVat,
-          },
-        });
+        setCurrentArticle(
+          serviceOrderArticles?.find(
+            (item) => item.id === serviceOrderArticleId,
+          ),
+        );
       },
     });
 
@@ -142,11 +131,9 @@ export const Actions = ({
         articleId: item.article.id,
         article: {
           id: item.article.id,
-          name: formikValues!.name,
           externalId: item.article.externalId,
           type: formikValues!.type,
           unit: formikValues!.unit,
-          unitSellingAmount: item.article.unitSellingAmount,
           costPackage: formikValues!.costPackage!,
         },
         name: formikValues!.name,

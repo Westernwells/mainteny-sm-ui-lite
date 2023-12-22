@@ -183,9 +183,9 @@ export const serviceOrderPaymentStatusToString = (
     case ServiceOrderPaymentStatus.AUTO_GENERATED:
       return 'Auto Generated';
     case ServiceOrderPaymentStatus.NONE:
-      return '-';
+      return 'No Invoice';
     default:
-      return '-';
+      return 'No Invoice';
   }
 };
 

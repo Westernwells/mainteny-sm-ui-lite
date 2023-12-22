@@ -192,9 +192,9 @@ export const InvoiceForm = ({
       description: article.description,
       name: article.name,
       quantity: 1,
-      unitAmount: article.article.unitSellingAmount,
+      unitAmount: article.unitAmount,
       type: article.article.type,
-      costPackage: article.article.additionalInfo?.costPackage,
+      costPackage: article.article.costPackage!,
     };
     return getItemRecord(record, percentageVat);
   };

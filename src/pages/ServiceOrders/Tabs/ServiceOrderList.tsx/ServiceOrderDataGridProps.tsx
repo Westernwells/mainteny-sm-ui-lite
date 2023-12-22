@@ -45,9 +45,9 @@ export const getServiceOrderPaymentStatusStyles = (
     case ServiceOrderPaymentStatus.AUTO_GENERATED:
       return {label: 'Auto Generated', color: 'primary.mainLight'};
     case ServiceOrderPaymentStatus.NONE:
-      return {label: '-', color: 'info'};
+      return {label: 'No Invoice', color: 'info'};
     default:
-      return {label: '-', color: 'info'};
+      return {label: 'No Invoice', color: 'info'};
   }
 };
 
@@ -154,5 +154,5 @@ export const makeRows = (
       : '-',
     status: item.status,
     navigateTo: `details/${item.id}`,
-    paymentStatus: item.additionalInfo.paymentStatus || '-',
+    paymentStatus: item.additionalInfo.paymentStatus,
   }));
