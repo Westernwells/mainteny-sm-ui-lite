@@ -87,6 +87,12 @@ export const ServiceOrderList = () => {
     totalOrederRef.current || serviceOrdersResource.total;
 
   useEffect(() => {
+    if (textInput.current && !textInput.current.value) {
+      textInput.current.value = searchQuery;
+    }
+  }, []);
+
+  useEffect(() => {
     if (
       serviceOrdersResource.total > 0 &&
       serviceOrdersResource.data.length === 0
@@ -95,10 +101,6 @@ export const ServiceOrderList = () => {
         ...page,
         pageIndex: 0,
       });
-    }
-
-    if (textInput.current) {
-      textInput.current.value = searchQuery;
     }
   }, [
     searchQuery,
