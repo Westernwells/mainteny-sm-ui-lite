@@ -21,32 +21,47 @@ describe('Orders page - list page', () => {
   it('filter orders by status', () => {
     const statuses = ['Unscheduled', 'Pending', 'Completed'];
 
+    const serviceOrderAPI = `${
+      Cypress.env().REACT_APP_API_URL
+    }/api/serviceOrders?*`;
+
+    cy.intercept('GET', serviceOrderAPI).as('serviceOrderAPI');
+
     OrderPage.changeStatusFilter(statuses);
 
-    const commaSeparatedText = statuses.join(',');
+    // Recursively wait for all job query api calls until the provided query parameter is matched
+    OrderPage.waitForAllJobQueryApi(
+      '@serviceOrderAPI',
+      {
+        status: ['READY_TO_SCHEDULE', 'SCHEDULED', 'COMPLETED'],
+      },
 
-    cy.get('div#Job\\ Status[role="button').should(
-      'have.text',
-      commaSeparatedText,
+      () => {
+        cy.wait(100); // Very small delay for the DOM to be updated, can be anything any small amount
+        const commaSeparatedText = statuses.join(',');
+
+        cy.get('div#Job\\ Status[role="button').should(
+          'have.text',
+          commaSeparatedText,
+        );
+
+        cy.get(`div[aria-label="jobs-grid"]`)
+          .find('div[role="row"]')
+          .each((rowElement, index) => {
+            const statusText = rowElement
+              .find("div[data-field='status'][role='cell']")
+              .text()
+              .trim();
+
+            if (!statusText) return;
+
+            if (!statuses.includes(statusText)) {
+              throw new Error(
+                `Unexpected status at row ${index + 1}: ${statusText}`,
+              );
+            }
+          });
+      },
     );
-
-    cy.wait(2000);
-
-    cy.get(`div[aria-label="jobs-grid"]`)
-      .find('div[role="row"]')
-      .each((rowElement, index) => {
-        const statusText = rowElement
-          .find("div[data-field='status'][role='cell']")
-          .text()
-          .trim();
-
-        if (!statusText) return;
-    
-        if (!statuses.includes(statusText)) {
-          throw new Error(
-            `Unexpected status at row ${index + 1}: ${statusText}`,
-          );
-        }
-      });
   });
 });
