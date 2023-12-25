@@ -57,6 +57,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
             containerStyles={{
               [theme.breakpoints.up('md')]: {
                 minHeight: '35rem',
+                height: '100%',
               },
             }}
             elevator={elevator!}
@@ -67,6 +68,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
             containerStyles={{
               [theme.breakpoints.up('md')]: {
                 minHeight: '35rem',
+                height: '100%',
               },
             }}
             elevator={elevator!}

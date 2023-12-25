@@ -79,7 +79,7 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
             navigateTo={`/units?tab=1&searchUnitsMapView=${serviceOrderDetails.elevator.address.fullName}`}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
-            iconMaxHeight="3em"
+            iconMaxHeight="30em"
           />
         );
       case 'unitNumber':
