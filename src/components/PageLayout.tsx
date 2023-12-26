@@ -100,12 +100,14 @@ export const PageLayout = ({
           backBtnLabel={backBtnLabel && t(backBtnLabel)}
         />
       </Box>
-      <Box sx={{display: 'flex', flexGrow: 1, width: '100%'}}>
+      <Box
+        sx={{display: 'flex', flexGrow: 1, width: '100%', overflowY: 'hidden'}}>
         <Box width="4.5rem" />
         <Box
           sx={{
             pt: '1em',
             mx: !excludeDefaultSpacing ? '2.2em' : null,
+            overflowY: 'hidden',
           }}
           display="flex"
           flexGrow="1"
