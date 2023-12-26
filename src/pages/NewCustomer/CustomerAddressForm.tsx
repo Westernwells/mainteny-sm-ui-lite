@@ -54,7 +54,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
   return (
     <PageCard
       headerLabel="Billing Address"
-      containerStyles={{flexGrow: 1, p: '0.5rem'}}
+      containerStyles={{flexGrow: 1, p: '0.5rem', overflowY: 'scroll'}}
       headerStyles={{m: 0, p: '1.5rem', pb: 0}}>
       <Grid container spacing={3}>
         <Grid item md={2.5}>

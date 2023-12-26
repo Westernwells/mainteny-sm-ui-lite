@@ -312,8 +312,9 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
         ml: '0',
         display: 'flex',
         flexDirection: 'column',
+        overflowY: 'hidden',
       }}>
-      <FlexContainer>
+      <FlexContainer containerStyle={{overflowY: 'hidden'}}>
         {activeStep === 0 ? (
           <FlexContainer containerStyle={{mt: '2em'}}>
             <BasicCustomerForm
@@ -322,7 +323,7 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
             />
           </FlexContainer>
         ) : activeStep === 1 ? (
-          <FlexContainer containerStyle={{mt: '2em'}}>
+          <FlexContainer containerStyle={{mt: '2em', overflowY: 'hidden'}}>
             <CustomerAddressForm formik={formikAddress} />
           </FlexContainer>
         ) : activeStep === 2 ? (
