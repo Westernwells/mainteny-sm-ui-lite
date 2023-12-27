@@ -1,5 +1,6 @@
+import {applyDiscount} from 'pages/InvoiceDetails/utils';
 import {ArticleType} from 'models/article';
-import {InvoiceItemRecord, InvoiceView} from 'models/invoice';
+import {DiscountType, InvoiceItemRecord, InvoiceView} from 'models/invoice';
 import {Amount} from 'models/misc';
 import {ServiceOrderArticleView} from 'models/service-order';
 
@@ -7,10 +8,15 @@ export const calculateTotal = (arr: InvoiceItemRecord<Amount>[]) => {
   const sum = 0;
 
   return arr
-    .map(
-      (item) =>
-        item.quantity *
-        (item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!),
+    .map((item) =>
+      applyDiscount({
+        actualValue:
+          (item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!) *
+          item.quantity,
+        ...(item.discount?.type === DiscountType.AMOUNT
+          ? {amount: item.discount?.amount?.value ?? 0}
+          : {percentage: item.discount?.percentage ?? 0}),
+      }),
     )
     .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
 };
@@ -20,22 +26,22 @@ export const calculateCostPackage = (arr: InvoiceItemRecord<Amount>[]) => {
   let materialCost = 0;
 
   arr.forEach((item) => {
-    if (item.type !== ArticleType.PACKAGE) {
+    if (item.article?.type !== ArticleType.PACKAGE) {
       const cost =
         (item.quantity * (item.unitAmount?.netAmount ?? 0)) /
         10 ** (item.unitAmount?.fractionDigits ?? 0);
-      if (item.type === ArticleType.LABOR) {
+      if (item.article?.type === ArticleType.LABOR) {
         laborCost += cost;
       } else {
         materialCost += cost;
       }
     } else {
       laborCost +=
-        (item.quantity * (item.costPackage?.labor?.value ?? 0)) /
-        10 ** (item.costPackage?.labor?.fractionDigits ?? 0);
+        (item.quantity * (item.article?.costPackage?.labor?.value ?? 0)) /
+        10 ** (item.article?.costPackage?.labor?.fractionDigits ?? 0);
       materialCost +=
-        (item.quantity * (item.costPackage?.material?.value ?? 0)) /
-        10 ** (item.costPackage?.material?.fractionDigits ?? 0);
+        (item.quantity * (item.article?.costPackage?.material?.value ?? 0)) /
+        10 ** (item.article?.costPackage?.material?.fractionDigits ?? 0);
     }
   });
 

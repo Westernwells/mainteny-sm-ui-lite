@@ -1,22 +1,17 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
-import {useEffect, useMemo, useRef, useState} from 'react';
-import {useTranslation} from 'react-i18next';
+import React, {useEffect, useMemo, useState} from 'react';
+import {t} from 'i18next';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
-import useTheme from '@mui/material/styles/useTheme';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import RadioGroup from '@mui/material/RadioGroup';
+import {theme} from 'theme';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Send from '@mui/icons-material/Send';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {SelectCombined} from 'components/SelectCombined';
 import {SelectAndEditCombined} from 'components/SelectAndEditCombined';
-import {ArticleItemsTable} from 'components/ArticleItemsTable';
-import {CustomersDataGrid} from 'components/DataGrid/CustomersDataGrid';
+// import {ArticleItemsTable} from 'components/ArticleItemsTable';
+// import {CustomersDataGrid} from 'components/DataGrid/CustomersDataGrid';
 import {ServiceOrdersDataGrid} from 'components/DataGrid/ServiceOrderDataGrid';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {FormLabel} from 'components/form/FormLabel';
@@ -24,20 +19,19 @@ import {FormInput} from 'components/form/FormInput';
 import {DatePicker} from 'components/DatePicker';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {Confirm} from 'components/Confirm';
-import {StatusChip} from 'components/StatusChip';
-import {FormRadio} from 'components/form/FormRadio';
+// import {FormRadio} from 'components/form/FormRadio';
 import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {Tooltip} from 'components/Tooltip';
-import {InfoCard} from 'components/InfoCard';
-import {EmptySection} from 'components/EmptySection';
+// import {InfoCard} from 'components/InfoCard';
+// import {EmptySection} from 'components/EmptySection';
 import {ContractPaymentTermSelectDialog} from 'components/ContractPaymentTermSelectDialog';
 import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateInvoice,
   useDeleteInvoice,
-  useFetchServiceOrderInvoices,
+  // useFetchServiceOrderInvoices,
   useInvoices,
   usePublishInvoice,
   useUpdateInvoice,
@@ -47,24 +41,36 @@ import {
   InvoiceView,
   InvoiceType,
   InvoiceStatus,
-  InvoiceFormData,
   ALL_MANUAL_INVOICE_TYPES,
   InvoiceAdditionalInfo,
+  InvoiceFormData,
+  CreateInvoice,
 } from 'models/invoice';
 import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
 import {
   PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from 'models/propertyManager';
-import {Amount, PdfGenerationStatus, WithOptional} from 'models/misc';
-import {useFormatDate} from 'hooks/useFormatDate';
-import {Notes} from 'pages/InvoiceDetails/Notes';
+import {AddressRecord, Amount, PdfGenerationStatus} from 'models/misc';
+// import {useFormatDate} from 'hooks/useFormatDate';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {convertToText, formatSearchParams} from 'utils/utils';
+import {
+  // convertToText,
+  formatAddressFullname,
+  formatSearchParams,
+} from 'utils/utils';
 import {addDays, addYears, isBefore, parseISO, startOfDay} from 'date-fns';
-import {InvoiceCheckbox} from 'pages/InvoiceDetails/InvoiceCheckbox';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import {IconButton} from '@mui/material';
+import {
+  Avatar,
+  Grid,
+  IconButton,
+  Typography,
+  Box,
+  // RadioGroup,
+  Menu,
+  Divider,
+} from '@mui/material';
 import {
   useCompanyNextNumber,
   useQueryContractPaymentTerms,
@@ -79,8 +85,22 @@ import {getItemRecord} from 'utils/article-utils';
 import AutoDropdown from 'components/AutoDropdown';
 import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
+import {CustomerAutoComplete} from 'components/CustomerAutocomplete';
+import {ArticleItemsTableNEW} from 'components/ArticleItemsTableNEW';
+import {ReactComponent as MapPinIllustration} from 'assets/illustrations/invoice/map-pin.svg';
+import {ReactComponent as HeaderIllustration} from 'assets/illustrations/invoice/header.svg';
+import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrations/invoice/wrench-screwdriver.svg';
+import {ReactComponent as FooterIllustration} from 'assets/illustrations/invoice/footer.svg';
+import {ReactComponent as PinIllustration} from 'assets/illustrations/invoice/pin.svg';
+import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/invoice/task-list-pen.svg';
+import {ReactComponent as AppWindowEyeIllustration} from 'assets/illustrations/invoice/app-window-eye.svg';
+import {ReactComponent as EyeViewIllustration} from 'assets/illustrations/invoice/eye-view.svg';
+import {ReactComponent as EyeViewOffIllustration} from 'assets/illustrations/invoice/eye-view-off.svg';
+import AvatarImg from 'assets/images/avatar.png';
 import {formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
+import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
+import {EditFrom} from './EditFrom';
 
 interface Props {
   invoice?: InvoiceView;
@@ -103,6 +123,174 @@ const alternativeInvoiceDestinationTooltip =
 
 const pageSize = 50;
 
+export const SectionTitle = ({
+  Icon,
+  title,
+  actionComponent,
+}: {
+  Icon: React.FunctionComponent<
+    React.SVGProps<SVGSVGElement> & {title?: string | undefined}
+  >;
+  title: string;
+  actionComponent?: React.ReactNode;
+}) => (
+  <Box display="flex" alignItems="center" justifyContent="space-between">
+    <Box display="flex" alignItems="center" gap={1.5}>
+      <Icon width="2rem" height="2rem" style={{marginBottom: '4px'}} />
+      <Typography variant="h5">{t(title)}</Typography>
+    </Box>
+    {actionComponent}
+  </Box>
+);
+
+export const BasicMenu = () => {
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const [sections, setSections] = useState([
+    {
+      section: 'Address Information',
+      hide: false,
+    },
+    {
+      section: 'Header',
+      hide: false,
+    },
+    {
+      section: 'Articles',
+      hide: false,
+    },
+    {
+      section: 'Partial Payment',
+      hide: false,
+      subSections: [
+        {
+          section: 'Invoiced',
+          hide: true,
+        },
+        {
+          section: 'Payment History',
+          hide: true,
+        },
+      ],
+    },
+    {
+      section: 'Footer',
+      hide: false,
+    },
+  ]);
+
+  const toggleSection = (section: string, subSectionOf?: string) => {
+    if (subSectionOf) {
+      setSections(
+        sections.map((s) =>
+          s.section === subSectionOf
+            ? {
+                ...s,
+                hide: !s.hide,
+              }
+            : s,
+        ),
+      );
+    } else {
+      setSections(
+        sections.map((s) =>
+          s.section === section
+            ? {
+                ...s,
+                hide: !s.hide,
+              }
+            : s,
+        ),
+      );
+    }
+  };
+
+  const renderSection = (
+    section: {section: string; hide: boolean},
+    subSectionOf?: string,
+  ) => (
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      sx={{cursor: 'pointer'}}
+      onClick={() => toggleSection(section.section, subSectionOf)}>
+      <Typography
+        variant="body2"
+        color={section.hide ? 'text.secondary' : 'primary.dark'}>
+        {section.section}
+      </Typography>
+      {section.hide ? (
+        <EyeViewOffIllustration fontSize={24} />
+      ) : (
+        <EyeViewIllustration fontSize={24} />
+      )}
+    </Box>
+  );
+
+  return (
+    <div>
+      <IconButton size="small" onClick={handleClick}>
+        <EditIcon />
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        PaperProps={{
+          sx: {
+            width: 234,
+            maxWidth: '100%',
+            py: 1,
+          },
+        }}
+        MenuListProps={{
+          sx: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1,
+            py: 0.75,
+            px: 2,
+          },
+        }}>
+        <Box>
+          <Typography variant="subtitle1">
+            {t('Display invoice sections')}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Selected section will be shown on the invoice once printed out.
+          </Typography>
+        </Box>
+        <Divider sx={{borderColor: theme.palette.action.focus}} />
+        <Box display="flex" flexDirection="column" gap={1}>
+          {sections.map((section) => [
+            renderSection(section),
+            ...(section.subSections?.map((subSection) => (
+              <Box pl={2}>{renderSection(subSection, section.section)}</Box>
+            )) ?? []),
+          ])}
+        </Box>
+      </Menu>
+    </div>
+  );
+};
+
 export const InvoiceForm = ({
   invoice,
   serviceOrderResource,
@@ -110,15 +298,13 @@ export const InvoiceForm = ({
   invoiceType,
   customer: customerByProp,
 }: Props) => {
-  const {t} = useTranslation();
   const DEFAULT_LABOR_COST_TEXT = t('Labor costs without VAT: {LABOR_COST}');
   const DEFAULT_MATERIAL_COST_TEXT = t(
     'Material costs without VAT: {MATERIAL_COST}',
   );
   const DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT = `${DEFAULT_LABOR_COST_TEXT}\n${DEFAULT_MATERIAL_COST_TEXT}`;
 
-  const theme = useTheme();
-  const formatDate = useFormatDate();
+  // const formatDate = useFormatDate();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [resetDueDatePicker, setResetDueDatePicker] = useState(false);
@@ -143,6 +329,8 @@ export const InvoiceForm = ({
   const [isDrawerOpen] = useState<boolean>(true);
   const [isAddNewCustomerDialogOpen, setIsAddNewCustomerDialogOpen] =
     useState<boolean>(false);
+  const [isEditFromDialogOpen, setIsEditFromDialogOpen] =
+    useState<boolean>(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
@@ -151,8 +339,6 @@ export const InvoiceForm = ({
     openContractPaymentTermSelectDialog,
     setOpenContractPaymentTermSelectDialog,
   ] = useState(false);
-  const [showCheckListTooltip, setShowCheckListTooltip] = useState(false);
-  const [showWorkReportTooltip, setShowWorlReportTooltip] = useState(false);
 
   const [customer, setCustomer] = useState<
     PropertyOwnerView | PropertyOwnerSimpleView | undefined
@@ -187,14 +373,14 @@ export const InvoiceForm = ({
     article: ServiceOrderArticleView,
   ): InvoiceItemRecord<Amount> => {
     const record = {
-      articleId: article.article.id,
-      articleUnit: article.article.unit,
+      // articleId: article.article.id,
+      // articleUnit: article.article.unit,
       description: article.description,
       name: article.name,
       quantity: 1,
       unitAmount: article.unitAmount,
       type: article.article.type,
-      costPackage: article.article.costPackage!,
+      costPackage: article.article.costPackage,
     };
     return getItemRecord(record, percentageVat);
   };
@@ -223,12 +409,6 @@ export const InvoiceForm = ({
     user?.userAccount.serviceCompany.id,
   );
 
-  useEffect(() => {
-    if (formType === 'new') {
-      formik.setFieldValue('externalId', companyNextNumber?.value);
-    }
-  }, [companyNextNumber]);
-
   const [totalAmountFrom, totalAmountTo] = useMemo(
     () => getStartEndPrice([]),
     [[]],
@@ -243,24 +423,24 @@ export const InvoiceForm = ({
       query: '',
     });
 
-  const invoiceTypeOptions = useRef([
-    {
-      value: InvoiceType.FULL,
-      label: 'Full',
-    },
-    {
-      value: InvoiceType.PARTIAL,
-      label: 'Partial',
-    },
-    {
-      value: InvoiceType.FINAL,
-      label: 'Final',
-    },
-    {
-      value: InvoiceType.CREDIT_NOTE,
-      label: 'Credit Note',
-    },
-  ]).current;
+  // const invoiceTypeOptions = useRef([
+  //   {
+  //     value: InvoiceType.FULL,
+  //     label: 'Full',
+  //   },
+  //   {
+  //     value: InvoiceType.PARTIAL,
+  //     label: 'Partial',
+  //   },
+  //   {
+  //     value: InvoiceType.FINAL,
+  //     label: 'Final',
+  //   },
+  //   {
+  //     value: InvoiceType.CREDIT_NOTE,
+  //     label: 'Credit Note',
+  //   },
+  // ]).current;
 
   const initialValues: InvoiceFormData = {
     subject:
@@ -288,7 +468,6 @@ export const InvoiceForm = ({
     includeWorkReport: false,
     includeCheckList: false,
     beneficialName: invoice?.additionalInfo.beneficialDetails?.name || '',
-    beneficialAddress: invoice?.additionalInfo.beneficialDetails?.address,
     costCenter: invoice?.additionalInfo?.costCenter || '',
     customerSpecificOrderNumber:
       invoice?.additionalInfo?.customerSpecificOrderNumber || '',
@@ -305,22 +484,77 @@ export const InvoiceForm = ({
       DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
     externalId:
       formType === 'new' ? companyNextNumber?.value : invoice?.externalId ?? '',
+    unitNumber: serviceOrder?.elevator.externalId || '-',
+    alternativeServiceCompanyInfo: invoice?.additionalInfo
+      .alternativeServiceCompanyInfo ?? {
+      name: user?.userAccount.serviceCompany.name ?? '',
+      address: user?.userAccount.serviceCompany.postalAddress,
+    },
   };
 
   const validationSchema = Yup.object().shape({
     subject: Yup.string().required('Subject is required'),
   });
 
+  async function onSave(values: InvoiceFormData) {
+    if (!values.description.length) values.description = '';
+    if (!values?.moreInfo?.length) values.moreInfo = '';
+
+    const dueDateToString: string =
+      values.type === InvoiceType.CREDIT_NOTE
+        ? dateToString(addYears(new Date(), 1))
+        : values.dueDate;
+
+    if (formType === 'edit' && invoice) {
+      return updateInvoiceAsync({
+        data: formatInvoiceRecord({
+          ...values,
+          includeWorkReport: values.includeWorkReport,
+          includeCheckList: values.includeCheckList,
+          dueDate: dueDateToString,
+          laborMaterialCosts: {
+            LABOR: laborMaterialCosts.LABOR,
+            MATERIAL: laborMaterialCosts.MATERIAL,
+          },
+          laborMaterialCostText,
+        }),
+        invoiceId: invoice.id,
+      });
+    }
+
+    return createNewInvoice({
+      data: formatInvoiceRecord({
+        ...values,
+        serviceCompanyId:
+          values.serviceCompanyId ||
+          (user?.userAccount.serviceCompany.id ?? ''),
+        includeWorkReport: values.includeWorkReport,
+        includeCheckList: values.includeCheckList,
+        dueDate: dueDateToString,
+        laborMaterialCosts: {
+          LABOR: laborMaterialCosts.LABOR,
+          MATERIAL: laborMaterialCosts.MATERIAL,
+        },
+        laborMaterialCostText,
+      }) as CreateInvoice,
+    });
+  }
+
   const formik = useFormik({
     initialValues,
     validationSchema,
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     onSubmit: async (values) => {
       const response = await onSave(values);
       const invoiceId = formType === 'new' ? response.value : invoice?.id;
       navigate(`/invoices/details/${invoiceId}`);
     },
   });
+
+  useEffect(() => {
+    if (formType === 'new') {
+      formik.setFieldValue('externalId', companyNextNumber?.value);
+    }
+  }, [companyNextNumber]);
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
@@ -419,12 +653,12 @@ export const InvoiceForm = ({
       if (!ALL_MANUAL_INVOICE_TYPES.includes(invoice.type)) {
         const newItems = invoice.items.map(
           (i): InvoiceItemRecord<Amount> => ({
-            articleId: i.article.id,
+            // articleId: i.article.id,
             description: i.description || i.article.description,
             name: i.name || i.article.name,
-            articleUnit: i.article.unit,
             quantity: i.quantity,
             unitAmount: invoice.totalAmount,
+            // articleUnit: i.article.unit,
           }),
         );
         setInvoiceItems(newItems);
@@ -512,12 +746,13 @@ export const InvoiceForm = ({
     formik.setFieldValue(
       'items',
       invoiceItems.map(
-        (item): WithOptional<InvoiceItemRecord<Amount>, 'articleUnit'> => ({
-          articleId: item.articleId,
+        (item): InvoiceItemRecord<Amount> => ({
+          // articleId: item.articleId,
           description: item.description,
           name: item.name,
           quantity: item.quantity,
           unitAmount: item.unitAmount,
+          // articleUnit: item.articleUnit,
         }),
       ),
       true,
@@ -623,74 +858,6 @@ export const InvoiceForm = ({
     return !!valid;
   };
 
-  const handleCheckListMouseEnter = () => {
-    if (!isCheckListPDFGenerated) {
-      setShowCheckListTooltip(true);
-    }
-  };
-
-  const handleCheckListMouseLeave = () => {
-    if (showCheckListTooltip) {
-      setShowCheckListTooltip(false);
-    }
-  };
-
-  const handleWorkReportMouseEnter = () => {
-    if (!isWorkReportPDFGenerated) {
-      setShowWorlReportTooltip(true);
-    }
-  };
-
-  const handleWorkReportMouseLeave = () => {
-    if (showWorkReportTooltip) {
-      setShowWorlReportTooltip(false);
-    }
-  };
-
-  async function onSave(values: InvoiceFormData) {
-    if (!values.description.length) values.description = '';
-    if (!values?.moreInfo?.length) values.moreInfo = '';
-
-    const dueDateToString: string =
-      formik.values.type === InvoiceType.CREDIT_NOTE
-        ? dateToString(addYears(new Date(), 1))
-        : values.dueDate;
-
-    if (formType === 'edit' && invoice) {
-      return updateInvoiceAsync({
-        data: formatInvoiceRecord({
-          ...values,
-          includeWorkReport: values.includeWorkReport,
-          includeCheckList: values.includeCheckList,
-          dueDate: dueDateToString,
-          laborMaterialCosts: {
-            LABOR: laborMaterialCosts.LABOR,
-            MATERIAL: laborMaterialCosts.MATERIAL,
-          },
-          laborMaterialCostText,
-        }),
-        invoiceId: invoice.id,
-      });
-    }
-
-    return createNewInvoice({
-      data: formatInvoiceRecord({
-        ...values,
-        serviceCompanyId:
-          values.serviceCompanyId ||
-          (user?.userAccount.serviceCompany.id ?? ''),
-        includeWorkReport: values.includeWorkReport,
-        includeCheckList: values.includeCheckList,
-        dueDate: dueDateToString,
-        laborMaterialCosts: {
-          LABOR: laborMaterialCosts.LABOR,
-          MATERIAL: laborMaterialCosts.MATERIAL,
-        },
-        laborMaterialCostText,
-      }),
-    });
-  }
-
   const handleContractPaymentTermsModal = (paymentTermId: string) => {
     const paymentTermObj = contractPaymentTerms?.data.find(
       ({id}) => id === paymentTermId,
@@ -699,9 +866,9 @@ export const InvoiceForm = ({
     setOpenContractPaymentTermsDialog(false);
   };
 
-  const {data: InvoiceList = []} = useFetchServiceOrderInvoices(
-    serviceOrder?.id,
-  );
+  // const {data: InvoiceList = []} = useFetchServiceOrderInvoices(
+  //   serviceOrder?.id,
+  // );
 
   const removeAddress = (
     addressType: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress',
@@ -714,19 +881,24 @@ export const InvoiceForm = ({
     setIsAddNewCustomerDialogOpen(false);
   };
 
-  const toolTipText = (
-    <div>
-      {t('Full')} - {t('Standard invoice for the full amount.')} <br />
-      {t('Partial')} -{' '}
-      {t('Partial payment when less than the full amount is due.')}
-      <br />
-      {t('Final')} -{' '}
-      {t('Final invoice after partial invoices have been created before.')}
-      <br />
-      {t('Credit note - Is issued to indicate a return of funds.')}
-      <br />
-    </div>
-  );
+  // const setNewlyCreatedCustomer = (customerId: string) => {
+  //   // setSearchParams(formatSearchParams({customerId}, searchParams));
+  //   setIsAddNewCustomerDialogOpen(false);
+  // };
+
+  // const toolTipText = (
+  //   <div>
+  //     {t('Full')} - {t('Standard invoice for the full amount.')} <br />
+  //     {t('Partial')} -{' '}
+  //     {t('Partial payment when less than the full amount is due.')}
+  //     <br />
+  //     {t('Final')} -{' '}
+  //     {t('Final invoice after partial invoices have been created before.')}
+  //     <br />
+  //     {t('Credit note - Is issued to indicate a return of funds.')}
+  //     <br />
+  //   </div>
+  // );
 
   const {data: allInvoiceResource = createEmptyResource<InvoiceView>(10)} =
     useInvoices(
@@ -745,7 +917,7 @@ export const InvoiceForm = ({
     id: 'externalId',
     name: 'externalId',
     placeholder: !formik.values.externalId && t('Unassigned'),
-    label: 'Invoice Number',
+    label: 'Invoice ID',
     value: formik.values.externalId,
     onChange: formik.handleChange,
     onBlur: formik.handleBlur,
@@ -753,9 +925,23 @@ export const InvoiceForm = ({
     helperText: formik.touched.externalId && formik.errors.externalId,
   };
 
+  const handleEditFrom = ({
+    name,
+    address,
+  }: {
+    name?: string;
+    address?: AddressRecord;
+  }) => {
+    formik.setFieldValue('alternativeServiceCompanyInfo', {
+      name,
+      address,
+    });
+    setIsEditFromDialogOpen(false);
+  };
+
   return (
     <Box>
-      {invoice && (
+      {/* {invoice && (
         <Box
           display="flex"
           alignItems="flex-end"
@@ -768,8 +954,571 @@ export const InvoiceForm = ({
           />
           <Notes invoice={invoice!} />
         </Box>
-      )}
-      <Box
+      )} */}
+      <Grid
+        container
+        columnGap={3}
+        justifyContent="space-between"
+        alignItems="flex-start"
+        wrap="nowrap"
+        mb={12}>
+        <Grid container item xs={8} xl={9} rowGap={2} borderRadius={1}>
+          {/* ADDRESS INFORMATION */}
+          <Grid
+            container
+            item
+            xs={12}
+            bgcolor="white"
+            p={3}
+            rowGap={2}
+            flexWrap="wrap">
+            <Grid item xs={12}>
+              <Box pb={0.5}>
+                <SectionTitle
+                  Icon={MapPinIllustration}
+                  title="Address information"
+                />
+              </Box>
+            </Grid>
+
+            <Grid container item xs={12}>
+              <Grid item xs={6}>
+                <Box>
+                  <FormLabel text={t('From')} />
+                  <Box
+                    display="flex"
+                    bgcolor="inputBackground.main"
+                    alignItems="start"
+                    justifyContent="space-between"
+                    px={1.5}
+                    py={1}
+                    border="1px solid"
+                    borderColor="text.disabled"
+                    borderRadius={1}>
+                    <Box position="relative" width="100%">
+                      <Typography variant="body2">
+                        {formik.values.alternativeServiceCompanyInfo?.name ??
+                          ''}
+                      </Typography>
+                      <Box color="text.secondary">
+                        {formik.values.alternativeServiceCompanyInfo?.address
+                          ?.fullName ? (
+                          <Typography variant="caption">
+                            {
+                              formatAddressFullname(
+                                formik.values.alternativeServiceCompanyInfo
+                                  .address,
+                              )?.fullName
+                            }
+                          </Typography>
+                        ) : (
+                          ''
+                        )}
+                      </Box>
+                      <IconButton
+                        size="small"
+                        onClick={() => setIsEditFromDialogOpen(true)}
+                        sx={{
+                          position: 'absolute',
+                          top: 0,
+                          right: 0,
+                          p: 0,
+                        }}>
+                        <EditIcon sx={{fontSize: 16}} />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                </Box>
+                <Box pt={2}>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center">
+                    <FormLabel text={t('To (Customer)')} required />
+                    <Button
+                      label="Add New Customer"
+                      style={{color: theme.palette.primary.dark}}
+                      buttonProps={{
+                        size: 'small',
+                        startIcon: <AddIcon />,
+                        onClick: () => setIsAddNewCustomerDialogOpen(true),
+                      }}
+                    />
+                  </Box>
+                  <CustomerAutoComplete
+                    getCustomer={(value) => {
+                      if (value) {
+                        handleSelectCustomer(value);
+                      } else {
+                        setCustomer(undefined);
+                        setServiceOrder(undefined);
+                      }
+                    }}
+                    initialValue={(customer as PropertyOwnerView) || null}
+                    textFieldProps={{
+                      error: !!(
+                        formik.errors.propertyOwnerId &&
+                        formik.touched.propertyOwnerId
+                      ),
+                      helperText:
+                        formik.errors.propertyOwnerId &&
+                        formik.touched.propertyOwnerId
+                          ? t(formik.errors.propertyOwnerId)
+                          : '',
+                      name: 'propertyOwnerId',
+                      onBlur: formik.handleBlur,
+                    }}
+                  />
+                </Box>
+              </Grid>
+            </Grid>
+
+            {customer && (
+              <>
+                <Grid item xs={6}>
+                  <SelectAndEditCombined
+                    selected={!!formik.values.billingAddress?.fullName}
+                    label="Billing Address"
+                    buttonText="Add Billing Address"
+                    cardHeader={
+                      formik.values.billingAddress ? (
+                        <Typography variant="body2">
+                          {formik.values.billingAddress.fullName}
+                        </Typography>
+                      ) : null
+                    }
+                    cardOnClose={() => removeAddress('billingAddress')}
+                    editButtonText="Edit Billing Address"
+                    modalHeader="Edit Billing Address"
+                    addressType="billingAddress"
+                    formik={formik}
+                  />
+                </Grid>
+                <Grid item xs={6} pl={2}>
+                  <SelectAndEditCombined
+                    selected={!!formik.values.beneficiaryAddress?.fullName}
+                    label="Beneficiary Address"
+                    buttonText="Add Beneficiary Address"
+                    cardHeader={
+                      formik.values.beneficiaryAddress ? (
+                        <Typography variant="body2">
+                          {formik.values.beneficiaryAddress.fullName}
+                        </Typography>
+                      ) : null
+                    }
+                    cardOnClose={() => removeAddress('beneficiaryAddress')}
+                    editButtonText="Edit Beneficiary Address"
+                    modalHeader="Edit Beneficiary Address"
+                    addressType="beneficiaryAddress"
+                    formik={formik}
+                  />
+                </Grid>
+
+                <Grid item xs={6}>
+                  <SelectAndEditCombined
+                    selected={!!formik.values.alternativeAddress?.fullName}
+                    label={
+                      <Box>
+                        <FormLabel
+                          text={t('Alternative Invoice Destination')}
+                        />
+                        <Tooltip
+                          title={t(alternativeInvoiceDestinationTooltip) || ''}
+                          placement="top"
+                          componentsProps={{
+                            tooltip: {
+                              sx: {
+                                bgcolor: 'common.gray',
+                                maxWidth: 500,
+                                padding: '1em',
+                                fontSize: '0.85rem',
+                              },
+                            },
+                          }}>
+                          <IconButton sx={{fontSize: '1.375rem'}}>
+                            <InfoOutlinedIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    }
+                    buttonText="Add Alternative Address"
+                    cardHeader={
+                      formik.values.alternativeAddress ? (
+                        <Typography variant="body2">
+                          {formik.values.alternativeAddress.fullName}
+                        </Typography>
+                      ) : null
+                    }
+                    cardOnClose={() => removeAddress('alternativeAddress')}
+                    editButtonText="Edit Alternative Address"
+                    modalHeader="Edit Alternative Address"
+                    addressType="alternativeAddress"
+                    formik={formik}
+                  />
+                </Grid>
+              </>
+            )}
+
+            <Grid item xs={12}>
+              <SelectCombined
+                selected={serviceOrder !== undefined}
+                label="Job"
+                buttonText="Select Job"
+                cardHeader={
+                  serviceOrder && (
+                    <Typography variant="body2">
+                      {serviceOrder.number}
+                    </Typography>
+                  )
+                }
+                cardBody={
+                  serviceOrder && (
+                    <>
+                      <ServiceOrderTypeText
+                        serviceOrderType={serviceOrder.type}
+                        capitalizeText
+                        variant="caption"
+                      />
+                      <Typography variant="caption" component="p">
+                        {serviceOrder.schedules.length
+                          ? `${serviceOrder.schedules[0].technician.userAccount.firstName} ${serviceOrder.schedules[0].technician.userAccount.lastName}`
+                          : '-'}
+                      </Typography>
+                    </>
+                  )
+                }
+                cardOnClose={() => setServiceOrder(undefined)}
+                modalHeader="Select Job"
+                modalBody={
+                  <ServiceOrdersDataGrid
+                    setRowItem={handleSelectServiceOrder}
+                    selectedCustomer={customer}
+                    searchCustomer={customer?.name}
+                    propertyOwnerId={customer?.id ?? ''}
+                  />
+                }
+              />
+            </Grid>
+          </Grid>
+
+          {/* HEADER */}
+          <Grid container item xs={12} bgcolor="white" p={3} rowGap={2.5}>
+            <Box pb={0.5}>
+              <SectionTitle Icon={HeaderIllustration} title="Header" />
+            </Box>
+            <FormInput
+              props={{
+                id: 'subject',
+                value: formik.values.subject,
+                label: 'Subject',
+                onChange: formik.handleChange,
+                onBlur: formik.handleBlur,
+                error: !!(formik.touched.subject && formik.errors.subject),
+                helperText: formik.touched.subject && formik.errors.subject,
+                fullWidth: true,
+              }}
+            />
+
+            <FormInput
+              props={{
+                id: 'description',
+                value: formik.values.description,
+                label: 'Description',
+                onChange: formik.handleChange,
+                onBlur: formik.handleBlur,
+                error: !!(
+                  formik.touched.description && formik.errors.description
+                ),
+                helperText:
+                  formik.touched.description && formik.errors.description,
+                minRows: 2,
+                multiline: true,
+                fullWidth: true,
+              }}
+            />
+          </Grid>
+
+          {/* ARTICLES */}
+          <Grid item xs={12} bgcolor="white" p={3}>
+            <Box pb={2}>
+              <SectionTitle
+                Icon={WrenchScrewdriverIllustration}
+                title="Articles"
+              />
+            </Box>
+            <ArticleItemsTableNEW
+              invoice={invoice}
+              items={invoiceItems}
+              setItems={setInvoiceItems}
+              propertyOwnerId={customer?.id ?? ''}
+              formType={formType}
+            />
+          </Grid>
+
+          {/* FOOTER */}
+          <Grid container item xs={12} bgcolor="white" p={3} rowGap={2.5}>
+            <Box pb={0.5}>
+              <SectionTitle Icon={FooterIllustration} title="Footer" />
+            </Box>
+            <FormInput
+              props={{
+                size: 'small',
+                label: 'Labor and material cost',
+                name: 'laborMaterialCostText',
+                minRows: 2,
+                multiline: true,
+                value: formik.values.laborMaterialCostText,
+                onChange: formik.handleChange,
+              }}
+            />
+            <FormInput
+              props={{
+                size: 'small',
+                label: 'Payment terms',
+                name: 'paymentTerms',
+                minRows: 2,
+                multiline: true,
+                value: formik.values.paymentTerms,
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+        </Grid>
+
+        {/* GENERAL INFORMATION */}
+        <Grid
+          container
+          item
+          xs={4}
+          xl={3}
+          rowGap={4}
+          bgcolor="white"
+          p={3}
+          borderRadius={1}>
+          <Grid container item xs={12} rowGap={2.5}>
+            <Box pb={0.5}>
+              <SectionTitle
+                Icon={PinIllustration}
+                title="General information"
+              />
+            </Box>
+            <Box display="flex" justifyContent="space-between" width="100%">
+              <Box>
+                <Typography variant="body2" color="grey.700">
+                  {t('Invoice type')}
+                </Typography>
+                <Typography variant="subtitle2" color="primary.dark" pt={0.5}>
+                  {t('Partial invoice')}
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="body2" color="grey.700">
+                  {t('Created By')}
+                </Typography>
+                <Box display="flex" alignItems="center" gap={1} pt={0.5}>
+                  <Avatar src={AvatarImg} sx={{width: 24, height: 24}} />
+                  <Typography variant="subtitle2" color="primary.dark">
+                    {t('Nico Eggart')}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              gap={1}
+              width="100%">
+              <DatePicker
+                defaultDate={dueDate}
+                reset={resetDueDatePicker}
+                getReset={(_reset) => {
+                  if (_reset) {
+                    setResetDueDatePicker(false);
+                  }
+                }}
+                errorMessage={dueDateError}
+                minDate={new Date()}
+                getSelectedDate={(newValue) => {
+                  setDueDateError('');
+                  if (newValue) setDueDate(newValue);
+                }}
+                textFieldProps={{
+                  label: 'Invoice Date',
+                  InputLabelProps: {shrink: true},
+                }}
+              />
+              <DatePicker
+                defaultDate={dueDate}
+                reset={resetDueDatePicker}
+                getReset={(_reset) => {
+                  if (_reset) {
+                    setResetDueDatePicker(false);
+                  }
+                }}
+                errorMessage={dueDateError}
+                minDate={new Date()}
+                getSelectedDate={(newValue) => {
+                  setDueDateError('');
+                  if (newValue) setDueDate(newValue);
+                }}
+                textFieldProps={{
+                  label: 'Payment Due Date',
+                  InputLabelProps: {shrink: true},
+                }}
+              />
+            </Box>
+            <Box width="100%">
+              <DatePicker
+                defaultDate={dueDate}
+                reset={resetDueDatePicker}
+                getReset={(_reset) => {
+                  if (_reset) {
+                    setResetDueDatePicker(false);
+                  }
+                }}
+                errorMessage={dueDateError}
+                minDate={new Date()}
+                getSelectedDate={(newValue) => {
+                  setDueDateError('');
+                  if (newValue) setDueDate(newValue);
+                }}
+                textFieldProps={{
+                  label: 'Service Deliver Date',
+                  InputLabelProps: {shrink: true},
+                }}
+              />
+            </Box>
+            <Box width="100%">
+              <AutoDropdown
+                formik={formik}
+                activeField={activeField}
+                fieldProps={externalIdInputProps}
+                setOpenDialog={setOpenDialog}
+                serviceTypeResource={allInvoiceResource.data}
+                handleFocus={handleFocus}
+                numberType={ServiceCompanyNumberType.INVOICE}
+                setActiveField={() => setActiveField('')}
+              />
+            </Box>
+            <FormInput
+              props={{
+                id: 'unitNumber',
+                name: 'unitNumber',
+                label: 'Unit Number',
+                value: formik.values.unitNumber,
+                onChange: formik.handleChange,
+                onBlur: formik.handleBlur,
+                error: !!(
+                  formik.touched.unitNumber && formik.errors.unitNumber
+                ),
+                helperText:
+                  formik.touched.unitNumber && formik.errors.unitNumber,
+                // sx: {mt: '1em'},
+              }}
+              handleFocus={handleFocus}
+            />
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              gap={1}
+              width="100%">
+              <FormInput
+                props={{
+                  id: 'customerSpecificOrderNumber',
+                  name: 'customerSpecificOrderNumber',
+                  placeholder: 'e.g 000 000 000',
+                  label: 'Purchase order no.',
+                  value: formik.values.customerSpecificOrderNumber,
+                  onChange: formik.handleChange,
+                  onBlur: formik.handleBlur,
+                  error: !!(
+                    formik.touched.customerSpecificOrderNumber &&
+                    formik.errors.customerSpecificOrderNumber
+                  ),
+                  helperText:
+                    formik.touched.customerSpecificOrderNumber &&
+                    formik.errors.customerSpecificOrderNumber,
+                }}
+                handleFocus={handleFocus}
+              />
+              <FormInput
+                props={{
+                  id: 'costCenter',
+                  name: 'costCenter',
+                  placeholder: 'e.g 000 000 000',
+                  label: 'Cost Center',
+                  value: formik.values.costCenter,
+                  onChange: formik.handleChange,
+                  onBlur: formik.handleBlur,
+                  error: !!(
+                    formik.touched.costCenter && formik.errors.costCenter
+                  ),
+                  helperText:
+                    formik.touched.costCenter && formik.errors.costCenter,
+                }}
+                handleFocus={handleFocus}
+              />
+            </Box>
+          </Grid>
+
+          {/* ADDITIONAL DOCUMENTS */}
+          <Grid container item xs={12}>
+            <Box pb={0.5}>
+              <SectionTitle
+                Icon={TaskListPenIllustration}
+                title="Additional documents"
+              />
+            </Box>
+            <InvoiceCheckboxNEW
+              disabled={!isWorkReportPDFGenerated}
+              handleChange={() => {
+                formik.setFieldValue(
+                  'includeWorkReport',
+                  !formik.values.includeWorkReport,
+                );
+              }}
+              tooltipTitle="No work report for the selected service job"
+              checkboxLabel="Add work report to invoice"
+              checked={
+                !!(isWorkReportPDFGenerated && formik.values.includeWorkReport)
+              }
+            />
+
+            <InvoiceCheckboxNEW
+              disabled={!isCheckListPDFGenerated}
+              handleChange={() => {
+                formik.setFieldValue(
+                  'includeCheckList',
+                  !formik.values.includeCheckList,
+                );
+              }}
+              tooltipTitle="No checklist for selected service job"
+              checkboxLabel="Add checklist to invoice"
+              checked={
+                !!(isCheckListPDFGenerated && formik.values.includeCheckList)
+              }
+            />
+          </Grid>
+
+          {/* INVOICE SECTIONS */}
+          <Grid item xs={12}>
+            <SectionTitle
+              Icon={AppWindowEyeIllustration}
+              title="Invoice sections"
+              actionComponent={<BasicMenu />}
+            />
+          </Grid>
+        </Grid>
+      </Grid>
+
+      {/* 
+sdsdsd
+sdsdsds
+
+sdsdsds
+
+sdsds */}
+      {/* <Box
         width="min(calc(1240px + 1.25em), 100%)"
         mx="auto"
         mb="8em"
@@ -903,7 +1652,9 @@ export const InvoiceForm = ({
                             text={t('Alternative Invoice Destination')}
                           />
                           <Tooltip
-                            title={t(alternativeInvoiceDestinationTooltip)}
+                            title={
+                              t(alternativeInvoiceDestinationTooltip) || ''
+                            }
                             placement="top"
                             componentsProps={{
                               tooltip: {
@@ -1324,7 +2075,7 @@ export const InvoiceForm = ({
             </Box>
           </Box>
         </Box>
-      </Box>
+      </Box> */}
 
       <BottomDrawer
         isOpen={isDrawerOpen}
@@ -1341,6 +2092,14 @@ export const InvoiceForm = ({
         isDialogOpen={isAddNewCustomerDialogOpen}
         onClose={() => setIsAddNewCustomerDialogOpen(false)}
         onSave={setNewlyCreatedCustomer}
+      />
+      <EditFrom
+        isDialogOpen={isEditFromDialogOpen}
+        onClose={() => setIsEditFromDialogOpen(false)}
+        onSave={handleEditFrom}
+        alternativeServiceCompanyInfo={
+          formik.values.alternativeServiceCompanyInfo
+        }
       />
       <SendEmailDialog
         open={isSendEmailDialogOpen}

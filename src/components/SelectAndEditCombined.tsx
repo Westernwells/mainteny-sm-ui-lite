@@ -4,7 +4,6 @@ import useTheme from '@mui/material/styles/useTheme';
 import {FormikProps} from 'formik';
 import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
-import AddIcon from '@mui/icons-material/Add';
 import {InvoiceFormData} from 'models/invoice';
 import {EditCustomerForm} from 'pages/InvoiceDetails/EditCustomerForm';
 import {AddressRecord} from 'models/misc';
@@ -77,7 +76,7 @@ export const SelectAndEditCombined = ({
                 sx: {
                   display: 'inline-flex',
                   mt: '10px',
-                  color: theme.palette.primary.light,
+                  color: theme.palette.primary.dark,
                 },
               }}
             />
@@ -87,8 +86,8 @@ export const SelectAndEditCombined = ({
       ) : (
         <SelectButton
           text={t(buttonText)}
-          icon={<AddIcon />}
           onClick={() => setIsModalOpen(true)}
+          buttonProps={{size: 'small'}}
         />
       )}
 

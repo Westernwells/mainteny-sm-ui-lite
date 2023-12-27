@@ -58,7 +58,7 @@ export const ArticleItemRow = ({
   const currentCurrency = useCurrentCurrency();
   const [name, setName] = useState(articleItem.name);
   const [description, setDescription] = useState<string>(
-    articleItem.description,
+    articleItem.description ?? '',
   );
   const [showDescription, setShowDescription] = useState<boolean>(
     !!articleItem.description,
