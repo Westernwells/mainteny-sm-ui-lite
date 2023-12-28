@@ -182,10 +182,12 @@ export const serviceOrderPaymentStatusToString = (
       return 'Partially Paid';
     case ServiceOrderPaymentStatus.AUTO_GENERATED:
       return 'Auto Generated';
+    case ServiceOrderPaymentStatus.NOT_SENT:
+      return 'Not Sent';
     case ServiceOrderPaymentStatus.NONE:
       return 'No Invoice';
     default:
-      return 'No Invoice';
+      return '-';
   }
 };
 
@@ -199,6 +201,8 @@ export const serviceOrderPaymentStatusToEnum = (type: string) => {
       return ServiceOrderPaymentStatus.AUTO_GENERATED;
     case 'Partially Paid':
       return ServiceOrderPaymentStatus.PARTIALLY_PAID;
+    case 'Not Sent':
+      return ServiceOrderPaymentStatus.NOT_SENT;
     case '-':
       return ServiceOrderPaymentStatus.NONE;
     default:

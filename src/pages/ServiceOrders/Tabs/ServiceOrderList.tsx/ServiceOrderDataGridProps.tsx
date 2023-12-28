@@ -33,7 +33,8 @@ export const getServiceOrderPaymentStatusStyles = (
     | 'action.active'
     | 'warning'
     | 'warning.dark'
-    | 'warning.light';
+    | 'warning.light'
+    | 'info.light';
 } => {
   switch (status) {
     case ServiceOrderPaymentStatus.PAID:
@@ -44,10 +45,12 @@ export const getServiceOrderPaymentStatusStyles = (
       return {label: 'Partially Paid', color: 'warning.light'};
     case ServiceOrderPaymentStatus.AUTO_GENERATED:
       return {label: 'Auto Generated', color: 'primary.mainLight'};
+    case ServiceOrderPaymentStatus.NOT_SENT:
+      return {label: 'Not Sent', color: 'info'};
     case ServiceOrderPaymentStatus.NONE:
-      return {label: 'No Invoice', color: 'info'};
+      return {label: 'No Invoice', color: 'info.light'};
     default:
-      return {label: 'No Invoice', color: 'info'};
+      return {label: '-', color: 'info.light'};
   }
 };
 
