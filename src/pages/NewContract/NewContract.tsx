@@ -19,12 +19,12 @@ import {
 } from 'models/contract';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {Order} from 'models/misc';
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {amountRecordForBackend, useCurrentCurrency} from 'utils/currency';
 import {toRestDate} from 'utils/datetime';
-import {createEmptyResource} from 'utils/paging-utils';
 import * as Yup from 'yup';
+import {createEmptyResource} from 'utils/paging-utils';
 import NewContractBasicInfo from './NewContractBasicInfo';
 import NewContractDocuments from './NewContractDocuments';
 import NewContractSelectUnits from './NewContractSelectUnits';
@@ -37,56 +37,97 @@ const steps = [
   'Attach documents',
 ];
 
-const validationSchemaBasicInfo = Yup.object().shape({
-  propertyOwnerId: Yup.string()
-    .transform((id) => (id.length > 0 ? id : null))
-    .required(
-      "Please select an existing customer. To add a new one, go to the 'Customers' section",
-    ),
-  name: Yup.string().required('Contract name is required'),
-  startDate: Yup.date().nullable().required('Start date is required'),
-  endDate: Yup.date()
-    .default(null)
-    .when('startDate', (startDate, schema) => {
-      if (startDate) {
-        const dayAfter = new Date(startDate.getTime() + 86400000);
+const isExternalIdUnique = async (
+  contractResource: ContractView[],
+  value?: string,
+) => {
+  if (!value) {
+    return true;
+  }
 
-        return schema.min(dayAfter, 'End date has to be after than start date');
-      }
-
-      return schema;
-    })
-    .nullable()
-    .required('End date is required'),
-});
-
-const validationSchemaContractTerms = Yup.object().shape({
-  visitsNumber: Yup.number()
-    .nullable()
-    .min(0, 'Should not be less than 0')
-    .required('Visit number is required'),
-  invoiceCycle: Yup.string().required('Invoice cycle is required'),
-  netAmount: Yup.number()
-    .nullable()
-    .min(1, 'Should be higher than 0')
-    .required('Yearly Contract Price is required'),
-  renewalTerms: Yup.number().min(0, 'Should be higher or equals to 0'),
-  spendingLimit: Yup.number().min(0, 'Should be higher or equals to 0'),
-  annualPriceAdjustmentPercentage: Yup.number().min(
-    0,
-    'Should be higher or equals to 0',
-  ),
-  serviceLevelAgreement: Yup.number().min(0, 'Should be higher or equals to 0'),
-});
+  try {
+    return !(
+      contractResource &&
+      contractResource.some((item) => item.externalId === value)
+    );
+  } catch (error) {
+    console.error('Error checking externalId uniqueness:', error);
+    return true;
+  }
+};
 
 const NewContract = () => {
   const currentCurrency = useCurrentCurrency();
   const [activeStep, setActiveStep] = useState(0);
   const [disableNextBtn, setDisableNextBtn] = useState(false);
+  const [externalId, setExternalId] = useState('');
 
   const [customer, setCustomer] = useState<PropertyOwnerView>();
 
   const navigate = useNavigate();
+
+  const {data: contractResource = createEmptyResource<ContractView>(50)} =
+    useQueryContract(
+      {
+        pageIndex: 0,
+        pageSize: 50,
+        query: externalId,
+        order: Order.DESC,
+        orderBy: ContractOrderField.CREATED_TIME,
+      },
+      {keepPreviousData: true},
+    );
+
+  const validationSchemaBasicInfo = Yup.object().shape({
+    propertyOwnerId: Yup.string()
+      .transform((id) => (id.length > 0 ? id : null))
+      .required(
+        "Please select an existing customer. To add a new one, go to the 'Customers' section",
+      ),
+    name: Yup.string().required('Contract name is required'),
+    startDate: Yup.date().nullable().required('Start date is required'),
+    endDate: Yup.date()
+      .default(null)
+      .when('startDate', (startDate, schema) => {
+        if (startDate) {
+          const dayAfter = new Date(startDate.getTime() + 86400000);
+          return schema.min(
+            dayAfter,
+            'End date has to be after than start date',
+          );
+        }
+        return schema;
+      })
+      .nullable()
+      .required('End date is required'),
+    externalId: Yup.string().test(
+      'checkExternalId',
+      'This ID is already taken. Please enter a different one.',
+      async (value) => isExternalIdUnique(contractResource.data, value),
+    ),
+  });
+
+  const validationSchemaContractTerms = Yup.object().shape({
+    visitsNumber: Yup.number()
+      .nullable()
+      .min(0, 'Should not be less than 0')
+      .required('Visit number is required'),
+    invoiceCycle: Yup.string().required('Invoice cycle is required'),
+    netAmount: Yup.number()
+      .nullable()
+      .min(1, 'Should be higher than 0')
+      .required('Yearly Contract Price is required'),
+    renewalTerms: Yup.number().min(0, 'Should be higher or equals to 0'),
+    spendingLimit: Yup.number().min(0, 'Should be higher or equals to 0'),
+    annualPriceAdjustmentPercentage: Yup.number().min(
+      0,
+      'Should be higher or equals to 0',
+    ),
+    serviceLevelAgreement: Yup.number().min(
+      0,
+      'Should be higher or equals to 0',
+    ),
+  });
 
   const {user} = useUserSession();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
@@ -113,10 +154,13 @@ const NewContract = () => {
       description: '',
     },
     validateOnMount: true,
-
     onSubmit: () => {},
     validationSchema: validationSchemaBasicInfo,
   });
+
+  useEffect(() => {
+    setExternalId(formikBasicInfo.values.externalId);
+  }, [formikBasicInfo]);
 
   const formikUnits = useFormik<{elevators: string[]}>({
     initialValues: {
@@ -150,18 +194,6 @@ const NewContract = () => {
     },
     onSubmit: () => {},
   });
-
-  const {data: contractResource = createEmptyResource<ContractView>(50)} =
-    useQueryContract(
-      {
-        pageIndex: 0,
-        pageSize: 50,
-        query: formikBasicInfo.values.externalId,
-        order: Order.DESC,
-        orderBy: ContractOrderField.CREATED_TIME,
-      },
-      {keepPreviousData: true},
-    );
 
   useEffect(() => {
     if (
@@ -277,7 +309,6 @@ const NewContract = () => {
                 formik={formikBasicInfo}
                 getCustomer={(item) => setCustomer(item)}
                 initialCustomer={customer}
-                contractResource={contractResource.data}
               />
             </PageCard>
           </FlexContainer>

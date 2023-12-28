@@ -1,6 +1,4 @@
 import {Formik} from 'formik';
-import * as Yup from 'yup';
-
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useCustomer} from 'hooks/reactQuery/useCustomers';
 import {phoneNumberDigitsOnly} from 'utils/customer-utils';
@@ -14,23 +12,6 @@ interface Props {
   openDialog: boolean;
   onClose: () => void;
 }
-
-const phoneValidationRE =
-  /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
-
-const validationSchema = Yup.object().shape({
-  name: Yup.string().required('Customer Name is required'),
-  email: Yup.string().email('Enter a valid email'),
-  billingEmail: Yup.string().email('Enter a valid email'),
-  phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),
-  secondaryPhoneNumber: Yup.string().matches(
-    phoneValidationRE,
-    'Phone number is not valid',
-  ),
-  billingAddress: Yup.object().nullable(),
-  beneficiaryAddress: Yup.object().nullable(),
-  otherAddress: Yup.object().nullable(),
-});
 
 export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
   const {updateCustomer} = useCustomer();
@@ -62,7 +43,6 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={validationSchema}
       enableReinitialize
       onSubmit={async (values, {resetForm}) => {
         updateCustomer({...values}, customer.id, () => {

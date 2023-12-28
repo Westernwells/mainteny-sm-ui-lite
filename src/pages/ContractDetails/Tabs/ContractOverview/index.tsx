@@ -1,16 +1,20 @@
-import {FC, useMemo, useState} from 'react';
+import {FC, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
-import {useUpdateContract} from 'hooks/reactQuery/useContract';
+import {
+  useQueryContract,
+  useUpdateContract,
+} from 'hooks/reactQuery/useContract';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
 import {useMediaQuery} from '@mui/material';
 import {useParams} from 'react-router-dom';
 import {useFormik} from 'formik';
 import {
+  ContractOrderField,
   ContractRequestBody,
   ContractStatus,
   ContractUpdateRequest,
@@ -45,6 +49,8 @@ import Tooltip from '@mui/material/Tooltip';
 import {formatDate} from 'utils/datetime';
 import {StatusChip} from 'components/StatusChip';
 import {capitalize} from 'lodash';
+import {Order} from 'models/misc';
+import {createEmptyResource} from 'utils/paging-utils';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
@@ -57,12 +63,17 @@ interface Props {
   isLoading: boolean;
 }
 
-const validationSchema = Yup.object().shape({
-  renewalTerms: Yup.number()
-    .min(0, 'Renewal period must be between 0-12 months')
-    .max(12, 'Renewal period must be between 0-12 months'),
-  discounts: Yup.number().min(0, 'Discount can not be less than 0'),
-});
+const isExternalIdUnique = async (resource: ContractView[], value?: string) => {
+  if (!value) {
+    return true;
+  }
+  try {
+    return !(resource && resource.some((item) => item.externalId === value));
+  } catch (error) {
+    console.error('Error checking externalId uniqueness:', error);
+    return true;
+  }
+};
 
 export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const {t} = useTranslation();
@@ -95,6 +106,38 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       ? contractDetails.additionalInfo.documents.map((item) => item.uri)
       : [],
   );
+
+  const [initValue, setInitValue] = useState('');
+  const [updatedValue, setUpdatedValue] = useState('');
+
+  const {data: contractResource = createEmptyResource<ContractView>(50)} =
+    useQueryContract(
+      {
+        pageIndex: 0,
+        pageSize: 50,
+        query: updatedValue ?? '',
+        order: Order.DESC,
+        orderBy: ContractOrderField.CREATED_TIME,
+      },
+      {keepPreviousData: true},
+    );
+
+  const validationSchema = Yup.object().shape({
+    renewalTerms: Yup.number()
+      .min(0, 'Renewal period must be between 0-12 months')
+      .max(12, 'Renewal period must be between 0-12 months'),
+    discounts: Yup.number().min(0, 'Discount can not be less than 0'),
+    externalId: Yup.string().test(
+      'checkExternalId',
+      'This ID is already taken. Please enter a different one.',
+      async (value) => {
+        if (value !== initValue) {
+          return isExternalIdUnique(contractResource.data, value);
+        }
+        return true;
+      },
+    ),
+  });
 
   const formik = useFormik<ContractUpdateRequest>({
     initialValues: {
@@ -129,6 +172,14 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     enableReinitialize: true,
     validationSchema,
   });
+
+  useEffect(() => {
+    setInitValue(formik.values.externalId!);
+  }, []);
+
+  useEffect(() => {
+    setUpdatedValue(formik.values.externalId!);
+  }, [formik]);
 
   const onContractSave = async () => {
     const contractNameType =
@@ -242,6 +293,11 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     );
   };
 
+  const handleCancel = () => {
+    formik.resetForm();
+    setOpenContractDialog(false);
+  };
+
   const headerStyles = useMemo(
     () => ({
       display: 'flex',
@@ -349,8 +405,10 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             />
             <Dialog
               title="Edit Contract"
-              onCancel={() => setOpenContractDialog(false)}
-              disableSaveBtn={!!Object.keys(formik.errors).length}
+              onCancel={handleCancel}
+              disableSaveBtn={
+                !!Object.keys(formik.errors).length || !formik.dirty
+              }
               onSave={() => onContractSave()}
               dialogProps={{open: openContractDialog || false}}
               leftButton={
