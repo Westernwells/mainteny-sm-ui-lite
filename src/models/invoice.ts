@@ -8,11 +8,9 @@ import {
   Money,
   PaymentInfo,
   PdfGenerationStatus,
-  WithOptional,
 } from './misc';
 import {PropertyOwnerSimpleView} from './propertyManager';
 import {QuotationItemRecord} from './quotation';
-import {ServiceCompanySimpleView} from './service-company';
 import {ServiceOrderView, ServiceOrderType} from './service-order';
 
 export enum InvoiceStatus {
@@ -170,6 +168,11 @@ export enum DiscountType {
   NONE = 'NONE',
 }
 
+export enum DiscountTypeOptions {
+  AMOUNT = 'Lump-sum',
+  PERCENTAGE = 'Percentage',
+}
+
 export interface Discount {
   type: DiscountType;
   amount?: Money;
@@ -234,8 +237,6 @@ export interface InvoiceItemRecord<T> {
   quantity: number;
   discount?: Discount;
   payment?: InvoiceItemPaymentRecord;
-  // // TODO adding articleUnit temporarily until we have it in backend
-  // articleUnit: string;
 }
 
 export enum InvoiceType {

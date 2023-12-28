@@ -4,14 +4,13 @@ import {useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import {theme} from 'theme';
+import {addDays, addYears, isBefore, parseISO, startOfDay} from 'date-fns';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Send from '@mui/icons-material/Send';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import {SelectCombined} from 'components/SelectCombined';
 import {SelectAndEditCombined} from 'components/SelectAndEditCombined';
-// import {ArticleItemsTable} from 'components/ArticleItemsTable';
-// import {CustomersDataGrid} from 'components/DataGrid/CustomersDataGrid';
 import {ServiceOrdersDataGrid} from 'components/DataGrid/ServiceOrderDataGrid';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {FormLabel} from 'components/form/FormLabel';
@@ -19,19 +18,15 @@ import {FormInput} from 'components/form/FormInput';
 import {DatePicker} from 'components/DatePicker';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {Confirm} from 'components/Confirm';
-// import {FormRadio} from 'components/form/FormRadio';
 import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {Tooltip} from 'components/Tooltip';
-// import {InfoCard} from 'components/InfoCard';
-// import {EmptySection} from 'components/EmptySection';
 import {ContractPaymentTermSelectDialog} from 'components/ContractPaymentTermSelectDialog';
 import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateInvoice,
   useDeleteInvoice,
-  // useFetchServiceOrderInvoices,
   useInvoices,
   usePublishInvoice,
   useUpdateInvoice,
@@ -52,14 +47,8 @@ import {
   PropertyOwnerView,
 } from 'models/propertyManager';
 import {AddressRecord, Amount, PdfGenerationStatus} from 'models/misc';
-// import {useFormatDate} from 'hooks/useFormatDate';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {
-  // convertToText,
-  formatAddressFullname,
-  formatSearchParams,
-} from 'utils/utils';
-import {addDays, addYears, isBefore, parseISO, startOfDay} from 'date-fns';
+import {formatAddressFullname, formatSearchParams} from 'utils/utils';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {
   Avatar,
@@ -67,7 +56,6 @@ import {
   IconButton,
   Typography,
   Box,
-  // RadioGroup,
   Menu,
   Divider,
 } from '@mui/material';
@@ -309,8 +297,6 @@ export const InvoiceForm = ({
   const [searchParams, setSearchParams] = useSearchParams();
   const [resetDueDatePicker, setResetDueDatePicker] = useState(false);
   const {user} = useUserSession();
-  const percentageVat =
-    user?.userAccount?.serviceCompany?.settings?.percentageVat ?? 0;
   const currentCurrency = useCurrentCurrency();
   const {enqueueSnackbar} = useSnackbar();
 
@@ -372,22 +358,15 @@ export const InvoiceForm = ({
   const articleViewToItem = (
     article: ServiceOrderArticleView,
   ): InvoiceItemRecord<Amount> => {
-    const record = {
-      // articleId: article.article.id,
-      // articleUnit: article.article.unit,
-      description: article.description,
+    const record: InvoiceItemRecord<Amount> = {
+      article,
       name: article.name,
+      description: article.description,
       quantity: 1,
       unitAmount: article.unitAmount,
-      type: article.article.type,
-      costPackage: article.article.costPackage,
     };
-    return getItemRecord(record, percentageVat);
+    return getItemRecord(record, record.unitAmount.percentageVat);
   };
-  const [invoiceItems, setInvoiceItems] = useState<InvoiceItemRecord<Amount>[]>(
-    serviceOrderResource?.articles?.map((item) => articleViewToItem(item)) ??
-      [],
-  );
 
   const [dueDate, setDueDate] = useState<Date | null>(
     invoice?.dueDate ? new Date(invoice.dueDate) : null,
@@ -458,7 +437,9 @@ export const InvoiceForm = ({
       invoiceType in InvoiceType
         ? InvoiceType[invoiceType as InvoiceType]
         : InvoiceType.FULL,
-    items: [],
+    items:
+      serviceOrderResource?.articles?.map((item) => articleViewToItem(item)) ??
+      [],
     paymentTerms: '',
     propertyOwnerId: '',
     serviceCompanyId: '',
@@ -540,7 +521,7 @@ export const InvoiceForm = ({
     });
   }
 
-  const formik = useFormik({
+  const formik = useFormik<InvoiceFormData>({
     initialValues,
     validationSchema,
     onSubmit: async (values) => {
@@ -661,7 +642,8 @@ export const InvoiceForm = ({
             // articleUnit: i.article.unit,
           }),
         );
-        setInvoiceItems(newItems);
+        // setInvoiceItems(newItems);
+        formik.setFieldValue('items', newItems);
       }
 
       setLaborMaterialCosts({
@@ -743,22 +725,22 @@ export const InvoiceForm = ({
   }, [serviceOrder, formik.values.type]);
 
   useEffect(() => {
-    formik.setFieldValue(
-      'items',
-      invoiceItems.map(
-        (item): InvoiceItemRecord<Amount> => ({
-          // articleId: item.articleId,
-          description: item.description,
-          name: item.name,
-          quantity: item.quantity,
-          unitAmount: item.unitAmount,
-          // articleUnit: item.articleUnit,
-        }),
-      ),
-      true,
-    );
+    // formik.setFieldValue(
+    //   'items',
+    //   invoiceItems.map(
+    //     (item): InvoiceItemRecord<Amount> => ({
+    //       // articleId: item.articleId,
+    //       description: item.description,
+    //       name: item.name,
+    //       quantity: item.quantity,
+    //       unitAmount: item.unitAmount,
+    //       // articleUnit: item.articleUnit,
+    //     }),
+    //   ),
+    //   true,
+    // );
     const currencyCode = getCurrencySymbol[currentCurrency.code];
-    const {materialCost, laborCost} = calculateCostPackage(invoiceItems);
+    const {materialCost, laborCost} = calculateCostPackage(formik.values.items);
     setFinalAmountText(
       materialCost && laborCost
         ? t(
@@ -781,7 +763,7 @@ export const InvoiceForm = ({
           })
         : '',
     );
-  }, [invoiceItems, t]);
+  }, [formik.values.items, t]);
 
   const isDueDateInPast = () => {
     const localDueDate = invoice?.dueDate as string;
@@ -937,6 +919,10 @@ export const InvoiceForm = ({
       address,
     });
     setIsEditFromDialogOpen(false);
+  };
+
+  const setInvoiceItems = (invoiceItems: InvoiceItemRecord<Amount>[]) => {
+    formik.setFieldValue('items', invoiceItems);
   };
 
   return (
@@ -1248,8 +1234,9 @@ export const InvoiceForm = ({
             </Box>
             <ArticleItemsTableNEW
               invoice={invoice}
-              items={invoiceItems}
+              items={formik.values.items}
               setItems={setInvoiceItems}
+              formik={formik}
               propertyOwnerId={customer?.id ?? ''}
               formType={formType}
             />
@@ -1510,572 +1497,6 @@ export const InvoiceForm = ({
           </Grid>
         </Grid>
       </Grid>
-
-      {/* 
-sdsdsd
-sdsdsds
-
-sdsdsds
-
-sdsds */}
-      {/* <Box
-        width="min(calc(1240px + 1.25em), 100%)"
-        mx="auto"
-        mb="8em"
-        mt="1.5em">
-        <Box
-          p="1em"
-          bgcolor="grey.300"
-          border="2px solid"
-          borderColor="text.disabled"
-          borderRadius=".5em">
-          <Box bgcolor="white" p="1em">
-            <Box display="flex" mt="1em" gap="2em">
-              <Box
-                flexGrow={1}
-                display="flex"
-                flexDirection="column"
-                gap="1.5rem">
-                <Box>
-                  <FormLabel text={t('From')} />
-                  <Box
-                    display="flex"
-                    bgcolor="grey.200"
-                    alignItems="start"
-                    justifyContent="space-between"
-                    px="0.75rem"
-                    py=".5rem"
-                    border="1px solid"
-                    borderColor="inputBackground.main"
-                    borderRadius="4px">
-                    <Box>
-                      <Typography variant="body2">
-                        {user?.userAccount.serviceCompany.name || ''}
-                      </Typography>
-                      <Box color="text.secondary">
-                        {user &&
-                        'businessAddress' in user.userAccount.serviceCompany &&
-                        user.userAccount.serviceCompany.postalAddress
-                          ?.fullName ? (
-                          <Typography variant="caption">
-                            {
-                              user.userAccount.serviceCompany.postalAddress
-                                ?.fullName
-                            }
-                          </Typography>
-                        ) : (
-                          ''
-                        )}
-                      </Box>
-                    </Box>
-                  </Box>
-                </Box>
-                <SelectCombined
-                  selected={customer !== undefined}
-                  label={
-                    <Box
-                      display="flex"
-                      justifyContent="space-between"
-                      alignItems="center">
-                      <FormLabel text={t('Customer')} required />
-                      <Button
-                        label="Add New Customer"
-                        style={{color: theme.palette.primary.light}}
-                        buttonProps={{
-                          size: 'small',
-                          startIcon: <AddIcon />,
-                          onClick: () => setIsAddNewCustomerDialogOpen(true),
-                        }}
-                      />
-                    </Box>
-                  }
-                  buttonText="Select Customer"
-                  cardHeader={
-                    customer && (
-                      <Typography variant="body2">{customer.name}</Typography>
-                    )
-                  }
-                  cardOnClose={() => {
-                    setCustomer(undefined);
-                    setServiceOrder(undefined);
-                  }}
-                  modalHeader="Select Customer"
-                  modalBody={
-                    <CustomersDataGrid setRowItem={handleSelectCustomer} />
-                  }
-                  labelRequired
-                />
-
-                {customer && (
-                  <>
-                    <SelectAndEditCombined
-                      selected={!!formik.values.billingAddress?.fullName}
-                      label="Billing Address"
-                      buttonText="Add Billing Address"
-                      cardHeader={
-                        formik.values.billingAddress ? (
-                          <Typography variant="body2">
-                            {formik.values.billingAddress.fullName}
-                          </Typography>
-                        ) : null
-                      }
-                      cardOnClose={() => removeAddress('billingAddress')}
-                      editButtonText="Edit Billing Address"
-                      modalHeader="Edit Billing Address"
-                      addressType="billingAddress"
-                      formik={formik}
-                    />
-
-                    <SelectAndEditCombined
-                      selected={!!formik.values.beneficiaryAddress?.fullName}
-                      label="Beneficiary Address"
-                      buttonText="Add Beneficiary Address"
-                      cardHeader={
-                        formik.values.beneficiaryAddress ? (
-                          <Typography variant="body2">
-                            {formik.values.beneficiaryAddress.fullName}
-                          </Typography>
-                        ) : null
-                      }
-                      cardOnClose={() => removeAddress('beneficiaryAddress')}
-                      editButtonText="Edit Beneficiary Address"
-                      modalHeader="Edit Beneficiary Address"
-                      addressType="beneficiaryAddress"
-                      formik={formik}
-                    />
-
-                    <SelectAndEditCombined
-                      selected={!!formik.values.alternativeAddress?.fullName}
-                      label={
-                        <Box>
-                          <FormLabel
-                            text={t('Alternative Invoice Destination')}
-                          />
-                          <Tooltip
-                            title={
-                              t(alternativeInvoiceDestinationTooltip) || ''
-                            }
-                            placement="top"
-                            componentsProps={{
-                              tooltip: {
-                                sx: {
-                                  bgcolor: 'common.gray',
-                                  maxWidth: 500,
-                                  padding: '1em',
-                                  fontSize: '0.85rem',
-                                },
-                              },
-                            }}>
-                            <IconButton sx={{fontSize: '1.375rem'}}>
-                              <InfoOutlinedIcon />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                      }
-                      buttonText="Add Alternative Address"
-                      cardHeader={
-                        formik.values.alternativeAddress ? (
-                          <Typography variant="body2">
-                            {formik.values.alternativeAddress.fullName}
-                          </Typography>
-                        ) : null
-                      }
-                      cardOnClose={() => removeAddress('alternativeAddress')}
-                      editButtonText="Edit Alternative Address"
-                      modalHeader="Edit Alternative Address"
-                      addressType="alternativeAddress"
-                      formik={formik}
-                    />
-                  </>
-                )}
-
-                <SelectCombined
-                  selected={serviceOrder !== undefined}
-                  label="Job Number"
-                  buttonText="Select Job"
-                  cardHeader={
-                    serviceOrder && (
-                      <Typography variant="body2">
-                        {serviceOrder.number}
-                      </Typography>
-                    )
-                  }
-                  cardBody={
-                    serviceOrder && (
-                      <>
-                        <ServiceOrderTypeText
-                          serviceOrderType={serviceOrder.type}
-                          capitalizeText
-                          variant="caption"
-                        />
-                        <Typography variant="caption" component="p">
-                          {serviceOrder.schedules.length
-                            ? `${serviceOrder.schedules[0].technician.userAccount.firstName} ${serviceOrder.schedules[0].technician.userAccount.lastName}`
-                            : '-'}
-                        </Typography>
-                      </>
-                    )
-                  }
-                  cardOnClose={() => setServiceOrder(undefined)}
-                  modalHeader="Select Job"
-                  modalBody={
-                    <ServiceOrdersDataGrid
-                      setRowItem={handleSelectServiceOrder}
-                      selectedCustomer={customer}
-                      searchCustomer={customer?.name}
-                      propertyOwnerId={customer?.id ?? ''}
-                    />
-                  }
-                />
-              </Box>
-              <Box
-                width="35%"
-                display="flex"
-                flexDirection="column"
-                gap="1.5rem"
-                px="2rem">
-                {[
-                  {
-                    label: 'Invoice Type',
-                    value: formik.values.type
-                      ? t(`${convertToText(formik.values.type)} invoice`)
-                      : '-',
-                  },
-                  {
-                    label: 'Unit Number',
-                    value: serviceOrder?.elevator.externalId || '-',
-                  },
-                  {
-                    label: 'Created By',
-                    value: invoice?.meta.creator
-                      ? `${invoice.meta.creator?.firstName} ${invoice.meta.creator?.lastName}`
-                      : `${user?.userAccount.firstName} ${user?.userAccount.lastName}`,
-                  },
-                  {
-                    label: 'Invoice Date',
-                    value: invoice?.sentDate
-                      ? formatDate(invoice.sentDate)
-                      : '-',
-                  },
-                ].map((i) => (
-                  <Box key={i.label}>
-                    <FormLabel text={i.label} />
-                    <Typography>{i.value}</Typography>
-                  </Box>
-                ))}
-
-                <Box>
-                  <AutoDropdown
-                    formik={formik}
-                    activeField={activeField}
-                    fieldProps={externalIdInputProps}
-                    setOpenDialog={setOpenDialog}
-                    serviceTypeResource={allInvoiceResource.data}
-                    handleFocus={handleFocus}
-                    numberType={ServiceCompanyNumberType.INVOICE}
-                    setActiveField={() => setActiveField('')}
-                  />
-                </Box>
-
-                <FormInput
-                  props={{
-                    id: 'customerSpecificOrderNumber',
-                    name: 'customerSpecificOrderNumber',
-                    placeholder: 'e.g 000 000 000',
-                    label: 'Purchase order number',
-                    value: formik.values.customerSpecificOrderNumber,
-                    onChange: formik.handleChange,
-                    onBlur: formik.handleBlur,
-                    error: !!(
-                      formik.touched.customerSpecificOrderNumber &&
-                      formik.errors.customerSpecificOrderNumber
-                    ),
-                    helperText:
-                      formik.touched.customerSpecificOrderNumber &&
-                      formik.errors.customerSpecificOrderNumber,
-                    sx: {mt: '1em'},
-                  }}
-                  handleFocus={handleFocus}
-                />
-                <FormInput
-                  props={{
-                    id: 'costCenter',
-                    name: 'costCenter',
-                    placeholder: 'e.g 000 000 000',
-                    label: 'Cost Center',
-                    value: formik.values.costCenter,
-                    onChange: formik.handleChange,
-                    onBlur: formik.handleBlur,
-                    error: !!(
-                      formik.touched.costCenter && formik.errors.costCenter
-                    ),
-                    helperText:
-                      formik.touched.costCenter && formik.errors.costCenter,
-                    sx: {mt: '1em'},
-                  }}
-                  handleFocus={handleFocus}
-                />
-              </Box>
-            </Box>
-
-            <Box mt="2em">
-              <Typography variant="body1" color={theme.palette.text.secondary}>
-                {t('Invoice Type')}{' '}
-                <Tooltip
-                  title={toolTipText}
-                  placement="top"
-                  componentsProps={{
-                    tooltip: {
-                      sx: {
-                        bgcolor: 'common.gray',
-                        maxWidth: 500,
-                        padding: '1em',
-                        fontSize: '0.85rem',
-                      },
-                    },
-                  }}>
-                  <IconButton>
-                    <InfoOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              </Typography>
-
-              <RadioGroup
-                name="radio-buttons-group"
-                sx={{flexDirection: 'row'}}>
-                {(invoice?.type === InvoiceType.FULL ||
-                  invoice?.type === InvoiceType.CREDIT_NOTE) &&
-                !invoice.partialInvoices?.length
-                  ? invoiceTypeOptions
-                      .filter((option) => option.value !== InvoiceType.FINAL)
-                      .map((option) => (
-                        <FormRadio
-                          key={option.value}
-                          name="type"
-                          value={option.value}
-                          checked={formik.values.type === option.value}
-                          handleChange={formik.handleChange}
-                          label={t(option.label)}
-                          radioProps={{
-                            sx: {color: theme.palette.text.secondary},
-                          }}
-                          disabled={formType === 'edit'}
-                        />
-                      ))
-                  : invoice?.type === InvoiceType.FINAL &&
-                    invoice.partialInvoices?.length
-                  ? invoiceTypeOptions
-                      .filter((option) => option.value !== InvoiceType.FULL)
-                      .map((option) => (
-                        <FormRadio
-                          key={option.value}
-                          name="type"
-                          value={option.value}
-                          checked={formik.values.type === option.value}
-                          handleChange={formik.handleChange}
-                          label={t(option.label)}
-                          radioProps={{
-                            sx: {color: theme.palette.text.secondary},
-                          }}
-                          disabled={formType === 'edit'}
-                        />
-                      ))
-                  : invoiceTypeOptions.map((option) => (
-                      <FormRadio
-                        key={option.value}
-                        name="type"
-                        value={option.value}
-                        checked={formik.values.type === option.value}
-                        handleChange={formik.handleChange}
-                        label={t(option.label)}
-                        radioProps={{
-                          sx: {color: theme.palette.text.secondary},
-                        }}
-                        disabled={formType === 'edit'}
-                      />
-                    ))}
-              </RadioGroup>
-            </Box>
-
-            {formik.values.type !== InvoiceType.CREDIT_NOTE && (
-              <>
-                <Box sx={{display: 'flex'}}>
-                  <InvoiceCheckbox
-                    onMouseEnter={handleWorkReportMouseEnter}
-                    onMouseLeave={handleWorkReportMouseLeave}
-                    checkboxName="includeWorkReport"
-                    disabled={!isWorkReportPDFGenerated}
-                    handleChange={formik.handleChange}
-                    showTooltip={showWorkReportTooltip}
-                    tooltipTitle="No work report for the selected service job"
-                    title="Work Report"
-                    checkboxLabel="Add work report to invoice"
-                    checked={
-                      isWorkReportPDFGenerated &&
-                      formik.values.includeWorkReport
-                    }
-                  />
-
-                  <InvoiceCheckbox
-                    onMouseEnter={handleCheckListMouseEnter}
-                    onMouseLeave={handleCheckListMouseLeave}
-                    checkboxName="includeCheckList"
-                    disabled={!isCheckListPDFGenerated}
-                    handleChange={formik.handleChange}
-                    showTooltip={showCheckListTooltip}
-                    tooltipTitle="No checklist for selected service job"
-                    title="Checklist"
-                    checkboxLabel="Add checklist to invoice"
-                    checked={
-                      isCheckListPDFGenerated && formik.values.includeCheckList
-                    }
-                  />
-                </Box>
-                <Box mt="2em" width="32ch">
-                  <DatePicker
-                    defaultDate={dueDate}
-                    reset={resetDueDatePicker}
-                    getReset={(_reset) => {
-                      if (_reset) {
-                        setResetDueDatePicker(false);
-                      }
-                    }}
-                    errorMessage={dueDateError}
-                    minDate={new Date()}
-                    getSelectedDate={(newValue) => {
-                      setDueDateError('');
-                      if (newValue) setDueDate(newValue);
-                    }}
-                    textFieldProps={{
-                      label: 'Due Date',
-                      InputLabelProps: {shrink: true},
-                    }}
-                  />
-                </Box>
-              </>
-            )}
-
-            {[
-              {
-                id: 'subject',
-                value: formik.values.subject,
-                error: !!(formik.touched.subject && formik.errors.subject),
-                helperText: formik.touched.subject && formik.errors.subject,
-                minRows: 1,
-                maxRows: 3,
-                required: true,
-              },
-              {
-                id: 'description',
-                value: formik.values.description,
-                error: false,
-                helperText: undefined,
-                minRows: 2,
-                maxRows: 6,
-                required: false,
-              },
-            ].map((i) => (
-              <Box mt="1em" key={i.id}>
-                <FormLabel text={t(i.id)} required={i.required} />
-                <FormInput
-                  props={{
-                    id: i.id,
-                    value: i.value,
-                    onChange: formik.handleChange,
-                    onBlur: formik.handleBlur,
-                    error: i.error,
-                    helperText: i.helperText,
-                    minRows: i.minRows,
-                    maxRows: i.maxRows,
-                    multiline: true,
-                    fullWidth: true,
-                  }}
-                />
-              </Box>
-            ))}
-
-            <ArticleItemsTable
-              invoice={invoice}
-              items={invoiceItems}
-              setItems={setInvoiceItems}
-              isPartial={!(formik.values.type !== InvoiceType.PARTIAL)}
-              isCreditNote={formik.values.type === InvoiceType.CREDIT_NOTE}
-              unitSellingAmount={invoice?.totalAmount}
-              propertyOwnerId={customer?.id ?? ''}
-              formType={formType}
-              orderPartialInvoices={InvoiceList.filter(
-                (item) => item.type === InvoiceType.PARTIAL,
-              )}
-            />
-
-            <Box sx={{display: 'flex', flexDirection: 'row', columnGap: 2}}>
-              <FormInput
-                containerStyles={{mt: '1rem'}}
-                props={{
-                  size: 'small',
-                  label: 'Final Amount',
-                  name: 'laborMaterialCostText',
-                  minRows: 2,
-                  maxRows: 5,
-                  multiline: true,
-                  value: laborMaterialCostText,
-                  disabled: false,
-                  onChange: (e) => {
-                    setLaborMaterialCostText(e.target.value);
-                  },
-                }}
-              />
-            </Box>
-
-            <InfoCard
-              containerStyles={{
-                my: '1rem',
-                boxShadow: 'none',
-                border: '1px solid #E4E9F2',
-              }}
-              headerActionIcon={<EditIcon />}
-              handleAction={() => setOpenContractPaymentTermSelectDialog(true)}
-              showHeaderBackground
-              header={
-                <Typography variant="subtitle1">
-                  {t('Payment Terms')}
-                </Typography>
-              }>
-              {formik.values.paymentTerms ? (
-                <Typography variant="body2">
-                  {formik.values.paymentTerms}
-                </Typography>
-              ) : (
-                <EmptySection
-                  label="No payment terms applied"
-                  illustration="clipboard"
-                  size="tiny"
-                  containerStyle={{
-                    height: '100%',
-                    gap: '0.5rem',
-                  }}
-                />
-              )}
-            </InfoCard>
-
-            <Box my="1.5em">
-              <FormLabel text="Additional Information" />
-              <FormInput
-                props={{
-                  id: 'moreInfo',
-                  name: 'moreInfo',
-                  value: formik.values.moreInfo,
-                  onChange: formik.handleChange,
-                  minRows: 2,
-                  maxRows: 4,
-                  multiline: true,
-                  fullWidth: true,
-                }}
-              />
-            </Box>
-          </Box>
-        </Box>
-      </Box> */}
 
       <BottomDrawer
         isOpen={isDrawerOpen}

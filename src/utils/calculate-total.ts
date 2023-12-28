@@ -1,6 +1,11 @@
 import {applyDiscount} from 'pages/InvoiceDetails/utils';
 import {ArticleType} from 'models/article';
-import {DiscountType, InvoiceItemRecord, InvoiceView} from 'models/invoice';
+import {
+  DiscountType,
+  InvoiceFormData,
+  InvoiceItemRecord,
+  InvoiceView,
+} from 'models/invoice';
 import {Amount} from 'models/misc';
 import {ServiceOrderArticleView} from 'models/service-order';
 
@@ -8,7 +13,17 @@ export const calculateTotal = (arr: InvoiceItemRecord<Amount>[]) => {
   const sum = 0;
 
   return arr
-    .map((item) =>
+    .map(
+      (item) =>
+        item.quantity *
+        (item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!),
+    )
+    .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
+};
+
+export const calculateTotalWithPerItemDiscount = (invoice: InvoiceFormData) => {
+  const sum = invoice.items
+    .map((item: InvoiceItemRecord<Amount>) =>
       applyDiscount({
         actualValue:
           (item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!) *
@@ -18,7 +33,25 @@ export const calculateTotal = (arr: InvoiceItemRecord<Amount>[]) => {
           : {percentage: item.discount?.percentage ?? 0}),
       }),
     )
-    .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
+    .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
+
+  return sum;
+};
+
+export const calculateTotalAmountInclVats = ({
+  subtotalExclVatAfterDiscount,
+  percentageVats,
+}: {
+  subtotalExclVatAfterDiscount: number;
+  percentageVats: {percentageVat: number; vat: number}[];
+}) => {
+  let totalAmountInclVats = subtotalExclVatAfterDiscount;
+
+  percentageVats.forEach((v) => {
+    totalAmountInclVats += v.vat;
+  });
+
+  return totalAmountInclVats;
 };
 
 export const calculateCostPackage = (arr: InvoiceItemRecord<Amount>[]) => {
