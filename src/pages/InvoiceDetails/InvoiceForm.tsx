@@ -5,6 +5,8 @@ import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import {theme} from 'theme';
 import {addDays, addYears, isBefore, parseISO, startOfDay} from 'date-fns';
+import {Avatar, Grid, IconButton, Typography, Box} from '@mui/material';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Send from '@mui/icons-material/Send';
 import EditIcon from '@mui/icons-material/Edit';
@@ -49,16 +51,6 @@ import {
 import {AddressRecord, Amount, PdfGenerationStatus} from 'models/misc';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {formatAddressFullname, formatSearchParams} from 'utils/utils';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import {
-  Avatar,
-  Grid,
-  IconButton,
-  Typography,
-  Box,
-  Menu,
-  Divider,
-} from '@mui/material';
 import {
   useCompanyNextNumber,
   useQueryContractPaymentTerms,
@@ -81,9 +73,6 @@ import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrati
 import {ReactComponent as FooterIllustration} from 'assets/illustrations/invoice/footer.svg';
 import {ReactComponent as PinIllustration} from 'assets/illustrations/invoice/pin.svg';
 import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/invoice/task-list-pen.svg';
-import {ReactComponent as AppWindowEyeIllustration} from 'assets/illustrations/invoice/app-window-eye.svg';
-import {ReactComponent as EyeViewIllustration} from 'assets/illustrations/invoice/eye-view.svg';
-import {ReactComponent as EyeViewOffIllustration} from 'assets/illustrations/invoice/eye-view-off.svg';
 import AvatarImg from 'assets/images/avatar.png';
 import {formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
@@ -130,154 +119,6 @@ export const SectionTitle = ({
     {actionComponent}
   </Box>
 );
-
-export const BasicMenu = () => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const [sections, setSections] = useState([
-    {
-      section: 'Address Information',
-      hide: false,
-    },
-    {
-      section: 'Header',
-      hide: false,
-    },
-    {
-      section: 'Articles',
-      hide: false,
-    },
-    {
-      section: 'Partial Payment',
-      hide: false,
-      subSections: [
-        {
-          section: 'Invoiced',
-          hide: true,
-        },
-        {
-          section: 'Payment History',
-          hide: true,
-        },
-      ],
-    },
-    {
-      section: 'Footer',
-      hide: false,
-    },
-  ]);
-
-  const toggleSection = (section: string, subSectionOf?: string) => {
-    if (subSectionOf) {
-      setSections(
-        sections.map((s) =>
-          s.section === subSectionOf
-            ? {
-                ...s,
-                hide: !s.hide,
-              }
-            : s,
-        ),
-      );
-    } else {
-      setSections(
-        sections.map((s) =>
-          s.section === section
-            ? {
-                ...s,
-                hide: !s.hide,
-              }
-            : s,
-        ),
-      );
-    }
-  };
-
-  const renderSection = (
-    section: {section: string; hide: boolean},
-    subSectionOf?: string,
-  ) => (
-    <Box
-      display="flex"
-      justifyContent="space-between"
-      sx={{cursor: 'pointer'}}
-      onClick={() => toggleSection(section.section, subSectionOf)}>
-      <Typography
-        variant="body2"
-        color={section.hide ? 'text.secondary' : 'primary.dark'}>
-        {section.section}
-      </Typography>
-      {section.hide ? (
-        <EyeViewOffIllustration fontSize={24} />
-      ) : (
-        <EyeViewIllustration fontSize={24} />
-      )}
-    </Box>
-  );
-
-  return (
-    <div>
-      <IconButton size="small" onClick={handleClick}>
-        <EditIcon />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        PaperProps={{
-          sx: {
-            width: 234,
-            maxWidth: '100%',
-            py: 1,
-          },
-        }}
-        MenuListProps={{
-          sx: {
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 1,
-            py: 0.75,
-            px: 2,
-          },
-        }}>
-        <Box>
-          <Typography variant="subtitle1">
-            {t('Display invoice sections')}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            Selected section will be shown on the invoice once printed out.
-          </Typography>
-        </Box>
-        <Divider sx={{borderColor: theme.palette.action.focus}} />
-        <Box display="flex" flexDirection="column" gap={1}>
-          {sections.map((section) => [
-            renderSection(section),
-            ...(section.subSections?.map((subSection) => (
-              <Box pl={2}>{renderSection(subSection, section.section)}</Box>
-            )) ?? []),
-          ])}
-        </Box>
-      </Menu>
-    </div>
-  );
-};
 
 export const InvoiceForm = ({
   invoice,
@@ -1484,15 +1325,6 @@ export const InvoiceForm = ({
               checked={
                 !!(isCheckListPDFGenerated && formik.values.includeCheckList)
               }
-            />
-          </Grid>
-
-          {/* INVOICE SECTIONS */}
-          <Grid item xs={12}>
-            <SectionTitle
-              Icon={AppWindowEyeIllustration}
-              title="Invoice sections"
-              actionComponent={<BasicMenu />}
             />
           </Grid>
         </Grid>
