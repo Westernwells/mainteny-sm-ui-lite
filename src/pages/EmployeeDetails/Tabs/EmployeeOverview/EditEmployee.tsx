@@ -1,7 +1,5 @@
 import React from 'react';
 import {Formik} from 'formik';
-import * as Yup from 'yup';
-
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useEmployeeAccount} from 'hooks/reactQuery/useUserAccount';
 import {UserView, Role} from 'models/user';
@@ -49,24 +47,9 @@ export const EditEmployee = ({employee, openDialog, onClose}: Props) => {
     team: employee.userData.team,
   };
 
-  const phoneValidationRE =
-    /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
-
-  const validationSchema = Yup.object().shape({
-    firstName: Yup.string().required('First name is required'),
-    lastName: Yup.string().required('Last name is required'),
-    email: Yup.string()
-      .email('Enter a valid email')
-      .required('Email is required'),
-    team: Yup.string().matches(/^[0-9]+$/, 'Team is not valid'),
-    address: Yup.object().nullable().required('Address is required'),
-    phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),
-  });
-
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={validationSchema}
       onSubmit={async (values, {resetForm}) => {
         updateEmployeeAccount(values, employee.userData.employeeId, () => {
           resetForm();

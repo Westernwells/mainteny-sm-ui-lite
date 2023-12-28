@@ -6,11 +6,12 @@ import {ElevatorCategory, ElevatorView} from 'models/elevator';
 import {InfoCard} from 'components/InfoCard';
 import {useEffect, useRef, useState} from 'react';
 import {Dialog} from 'components/Dialog';
-import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
+import {useAllElevators, useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {convertToMacro, convertToText} from 'utils/utils';
 import {UnitDetailsFormModel} from 'models/unitForm';
+import {createEmptyResource} from 'utils/paging-utils';
 import {UnitDetailsSchema} from './UnitDetailsSchema';
 import {EditUnitDetailsForm} from './EditUnitDetailsForm';
 
@@ -20,15 +21,17 @@ interface Props {
   propertyOwnerId?: string;
 }
 
-const validationSchema = Yup.object().shape({
-  category: Yup.string()
-    .nullable()
-    .oneOf(
-      Object.values(ElevatorCategory).map((c) => convertToText(c)),
-      'Invalid unit category',
-    )
-    .required('Category is required'),
-});
+const isExternalIdUnique = async (resource: ElevatorView[], value?: string) => {
+  if (!value) {
+    return true;
+  }
+  try {
+    return !(resource && resource.some((item) => item.externalId === value));
+  } catch (error) {
+    console.error('Error checking externalId uniqueness:', error);
+    return true;
+  }
+};
 
 export const UnitDetails = ({
   containerStyles,
@@ -40,6 +43,38 @@ export const UnitDetails = ({
   const {mutateAsync: updateElevator} = useUpdateElevator(
     'Unit details updated successfully',
   );
+  const [initValue, setInitValue] = useState('');
+  const [externalIdValue, setExternalIdValue] = useState('');
+
+  const {data: elevatorResponse = createEmptyResource<ElevatorView>(10)} =
+    useAllElevators(
+      {
+        query: externalIdValue,
+        pageIndex: 0,
+        pageSize: 50,
+      },
+      {keepPreviousData: true},
+    );
+
+  const validationSchema = Yup.object().shape({
+    category: Yup.string()
+      .nullable()
+      .oneOf(
+        Object.values(ElevatorCategory).map((c) => convertToText(c)),
+        'Invalid unit category',
+      )
+      .required('Category is required'),
+    externalId: Yup.string().test(
+      'checkExternalId',
+      'This ID is already taken. Please enter a different one.',
+      async (value) => {
+        if (value !== initValue) {
+          return isExternalIdUnique(elevatorResponse.data, value);
+        }
+        return true;
+      },
+    ),
+  });
 
   const formik = useFormik<UnitDetailsFormModel>({
     initialValues: {
@@ -58,6 +93,10 @@ export const UnitDetails = ({
     onSubmit: () => {},
     validationSchema,
   });
+
+  useEffect(() => {
+    setInitValue(formik.values.externalId!);
+  }, []);
 
   const labels = useRef([
     'category',
@@ -113,6 +152,10 @@ export const UnitDetails = ({
     });
   }, [openDialog]);
 
+  useEffect(() => {
+    setExternalIdValue(formik.values.externalId!);
+  }, [formik]);
+
   return (
     <InfoCard
       containerStyles={{...containerStyles}}
@@ -130,7 +173,7 @@ export const UnitDetails = ({
       <Dialog
         title="Edit Unit Details"
         onCancel={() => setOpenDialog(false)}
-        disableSaveBtn={!!Object.keys(formik.errors).length}
+        disableSaveBtn={!!Object.keys(formik.errors).length || !formik.dirty}
         onSave={() => onSave()}
         dialogProps={{
           maxWidth: 'md',
