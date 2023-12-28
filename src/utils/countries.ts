@@ -3,6 +3,7 @@ export const countries = [
     name: 'Germany',
     states: [
       'Baden-Württemberg',
+      'Bayern',
       'Bavaria',
       'Berlin',
       'Brandenburg',

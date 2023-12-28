@@ -61,6 +61,7 @@ export const AddressAutoComplete = ({
           country: addressData?.component?.country,
           city: addressData?.component?.city,
           state: addressData?.component?.state,
+          street: addressData?.component?.street,
         },
         location: {
           latitude: addressData?.location?.latitude as number,
