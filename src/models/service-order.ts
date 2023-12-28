@@ -52,6 +52,7 @@ export enum ServiceOrderPaymentStatus {
   PARTIALLY_PAID = 'PARTIALLY_PAID',
   PAID = 'PAID',
   AUTO_GENERATED = 'AUTO_GENERATED',
+  NOT_SENT = 'NOT_SENT',
   NONE = 'NONE',
 }
 

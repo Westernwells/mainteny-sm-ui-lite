@@ -199,7 +199,6 @@ export const Actions = ({
           icon: <Print />,
           onClick: () => setIsConfirmPrintDialogOpen(true),
         },
-        ...(isInvoicePDFGenerated ? [downloadItem] : []),
         {
           label: t('Edit'),
           icon: <Edit />,
@@ -214,6 +213,7 @@ export const Actions = ({
             setIsDeleteDialogOpen(true);
           },
         },
+        ...(isInvoicePDFGenerated ? [downloadItem] : []),
       );
     } else if (invoice.status === InvoiceStatus.NOT_PAID) {
       items.push(
@@ -308,7 +308,7 @@ export const Actions = ({
       );
     }
 
-    if (invoice.sentDate) {
+    if (invoice.sentDate && invoice.status !== InvoiceStatus.DRAFT) {
       return items.filter(
         (item) => item.label !== t('Edit') && item.label !== t('Delete'),
       );

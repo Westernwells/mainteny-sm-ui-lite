@@ -183,9 +183,9 @@ export const ServiceOrderList = () => {
             paymentStatus as ServiceOrderPaymentStatus[],
           );
         }}
-        // initialSelectedItems={selectedPaymentStatus.map((i) =>
-        //   serviceOrderPaymentStatusToString(i),
-        // )}
+        initialSelectedItems={selectedPaymentStatus.map((i) =>
+          serviceOrderPaymentStatusToString(i),
+        )}
         multiple
       />
     </FilterFields>
