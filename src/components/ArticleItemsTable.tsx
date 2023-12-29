@@ -76,7 +76,9 @@ export const ArticleItemsTable = ({
 
   const {user} = useUserSession();
   const [percentageVat, setPercentageVat] = useState(
-    user?.userAccount?.serviceCompany?.settings?.percentageVat ?? 0,
+    invoice?.totalAmount?.percentageVat ??
+      user?.userAccount?.serviceCompany?.settings?.percentageVat ??
+      0,
   );
   const [tabValue, setTabValue] = useState(0);
   const [search, setSearch] = useState('');
