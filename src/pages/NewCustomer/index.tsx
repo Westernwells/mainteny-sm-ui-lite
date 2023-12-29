@@ -37,26 +37,21 @@ interface Props {
 const phoneValidationRE =
   /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
-const validationSchemaBasicInfo = Yup.object().shape({
-  name: Yup.string().required('Customer Name is required'),
-  email: Yup.string().email('Enter a valid email'),
-  billingEmail: Yup.string().email('Enter a valid email'),
-  phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),
-  secondaryPhoneNumber: Yup.string().matches(
-    phoneValidationRE,
-    'Phone number is not valid',
-  ),
-});
+const isExternalIdUnique = async (
+  resource: PropertyOwnerView[],
+  value?: string,
+) => {
+  if (!value) {
+    return true;
+  }
 
-const validationSchemaAddress = Yup.object().shape({
-  billingAddress: Yup.object().nullable(),
-  beneficiaryAddress: Yup.object().nullable(),
-  otherAddress: Yup.object().nullable(),
-});
-
-const validationSchemaContactPersons = Yup.object().shape({
-  contactPersons: Yup.object().nullable(),
-});
+  try {
+    return !(resource && resource.some((item) => item.externalId === value));
+  } catch (error) {
+    console.error('Error checking externalId uniqueness:', error);
+    return true;
+  }
+};
 
 const steps = [
   'Add basic information',
@@ -77,6 +72,45 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [openResumeProgressDialog, setOpenResumeProgressDialog] =
     useState(false);
+  const [externalId, setExternalId] = useState('');
+
+  const {data: customerResource = createEmptyResource<PropertyOwnerView>(50)} =
+    useQueryCustomers(
+      {
+        pageIndex: 0,
+        pageSize: 50,
+        query: externalId,
+      },
+      {keepPreviousData: true},
+    );
+
+  const validationSchemaBasicInfo = Yup.object().shape({
+    name: Yup.string().required('Customer Name is required'),
+    email: Yup.string().email('Enter a valid email'),
+    billingEmail: Yup.string().email('Enter a valid email'),
+    phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),
+    secondaryPhoneNumber: Yup.string().matches(
+      phoneValidationRE,
+      'Phone number is not valid',
+    ),
+    externalId: Yup.string()
+      .required('Customer Number is required')
+      .test(
+        'checkExternalId',
+        'This ID is already taken. Please enter a different one.',
+        async (value) => isExternalIdUnique(customerResource.data, value),
+      ),
+  });
+
+  const validationSchemaAddress = Yup.object().shape({
+    billingAddress: Yup.object().nullable(),
+    beneficiaryAddress: Yup.object().nullable(),
+    otherAddress: Yup.object().nullable(),
+  });
+
+  const validationSchemaContactPersons = Yup.object().shape({
+    contactPersons: Yup.object().nullable(),
+  });
 
   const {mutateAsync: createCustomer} = useCreateCustomer(
     'Customer created successfully',
@@ -142,6 +176,10 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
     openResumeProgressDialog,
   ]);
 
+  useEffect(() => {
+    setExternalId(formikBasicInfo.values.externalId);
+  }, [formikBasicInfo]);
+
   // show resume progress modal if there's previous stored state in local storage
   useEffect(() => {
     const localStorageFormikBasicInfo = localStorage.getItem(
@@ -169,16 +207,6 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       getCurrentPageTitle('New Customer');
     }
   }, []);
-
-  const {data: customerResource = createEmptyResource<PropertyOwnerView>(50)} =
-    useQueryCustomers(
-      {
-        pageIndex: 0,
-        pageSize: 50,
-        query: formikBasicInfo.values.externalId,
-      },
-      {keepPreviousData: true},
-    );
 
   useEffect(() => {
     if (
@@ -317,10 +345,7 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       <FlexContainer containerStyle={{overflowY: 'hidden'}}>
         {activeStep === 0 ? (
           <FlexContainer containerStyle={{mt: '2em'}}>
-            <BasicCustomerForm
-              formik={formikBasicInfo}
-              customerResource={customerResource.data}
-            />
+            <BasicCustomerForm formik={formikBasicInfo} />
           </FlexContainer>
         ) : activeStep === 1 ? (
           <FlexContainer containerStyle={{mt: '2em', overflowY: 'hidden'}}>

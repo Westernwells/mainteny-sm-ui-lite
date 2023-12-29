@@ -1,4 +1,5 @@
 import FormControl from '@mui/material/FormControl';
+import {FormHelperText} from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Checkbox from '@mui/material/Checkbox';
@@ -7,7 +8,6 @@ import useTheme from '@mui/material/styles/useTheme';
 import {SxProps} from '@mui/system';
 import {capitalize} from 'utils/utils';
 import {useTranslation} from 'react-i18next';
-import {FormHelperText} from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 interface Props<T> {

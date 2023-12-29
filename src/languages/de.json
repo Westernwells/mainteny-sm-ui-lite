@@ -1950,5 +1950,6 @@
   "Upfront Invoice": "Abschlagsrechnung",
   "Final Invoice": "Abschlussrechnung",
   "Non maintenance": "Sonstiger Vertrag",
-  "No Invoice": "Keine Rechnung"
+  "No Invoice": "Keine Rechnung",
+  "Duration (in minutes)": "Dauer (in Minuten)"
 }

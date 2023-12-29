@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Create';
 import Typography from '@mui/material/Typography';
@@ -16,24 +16,29 @@ import {useFormik} from 'formik';
 import {ArticleSupplierView, UpdateArticleSupplierRecord} from 'models/article';
 import {phoneValidationRE} from 'pages/NewEmployee/BasicEmployeeForm';
 import {Dialog} from 'components/Dialog';
-import {useUpdateSupplier} from 'hooks/reactQuery/useArticle';
+import {
+  useQueryArticleSuppliers,
+  useUpdateSupplier,
+} from 'hooks/reactQuery/useArticle';
 import {CardProps} from 'components/CardProps';
 import {InfoCard} from 'components/InfoCard';
+import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {EditBasicInfoForm} from './EditBasicInfoForm';
 
-const validationSchema = Yup.object().shape({
-  name: Yup.string().required('Name is required'),
-  externalId: Yup.string().nullable().required('External Id is required'),
-  email: Yup.string()
-    .email('Enter a valid email')
-    .required('Email is required'),
-  phone: Yup.string()
-    .required('Phone number is required')
-    .matches(phoneValidationRE, 'Phone number is not valid'),
-  address: Yup.object().nullable().required('Address is required'),
-  url: Yup.string().nullable(),
-  category: Yup.string().nullable(),
-});
+const isExternalIdUnique = async (
+  resource: ArticleSupplierView[],
+  value?: string,
+) => {
+  if (!value) {
+    return true;
+  }
+  try {
+    return !(resource && resource.some((item) => item.externalId === value));
+  } catch (error) {
+    console.error('Error checking externalId uniqueness:', error);
+    return true;
+  }
+};
 
 export const SupplierBasicInfoCard = ({
   supplier,
@@ -45,6 +50,43 @@ export const SupplierBasicInfoCard = ({
   const {mutateAsync: updateArticle, isLoading} = useUpdateSupplier(
     'Supplier details updated successfully!',
   );
+
+  const [initValue, setInitValue] = useState('');
+  const [updatedValue, setUpdatedValue] = useState('');
+
+  const {
+    data: articleSupplierResource = createEmptyResource<ArticleSupplierView>(
+      25,
+    ),
+  } = useQueryArticleSuppliers(makePage(0, 50), updatedValue ?? '', {
+    keepPreviousData: true,
+  });
+
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required('Name is required'),
+    externalId: Yup.string()
+      .nullable()
+      .required('External Id is required')
+      .test(
+        'checkExternalId',
+        'This ID is already taken. Please enter a different one.',
+        async (value) => {
+          if (value !== initValue) {
+            return isExternalIdUnique(articleSupplierResource.data, value!);
+          }
+          return true;
+        },
+      ),
+    email: Yup.string()
+      .email('Enter a valid email')
+      .required('Email is required'),
+    phone: Yup.string()
+      .required('Phone number is required')
+      .matches(phoneValidationRE, 'Phone number is not valid'),
+    address: Yup.object().nullable().required('Address is required'),
+    url: Yup.string().nullable(),
+    category: Yup.string().nullable(),
+  });
 
   const formik = useFormik<UpdateArticleSupplierRecord>({
     initialValues: {
@@ -78,6 +120,18 @@ export const SupplierBasicInfoCard = ({
     validationSchema,
   });
 
+  useEffect(() => {
+    setInitValue(formik.values.externalId!);
+  }, []);
+
+  useEffect(() => {
+    setUpdatedValue(formik.values.externalId!);
+  }, [formik]);
+
+  const handleCancel = () => {
+    formik.resetForm();
+    setOpenDialog(false);
+  };
   const basicInfoItems = [
     {
       label: 'id',
@@ -134,8 +188,8 @@ export const SupplierBasicInfoCard = ({
       <Dialog
         title="Edit Basic Information"
         isSaving={isLoading}
-        onCancel={() => setOpenDialog(false)}
-        disableSaveBtn={!formik.isValid}
+        onCancel={handleCancel}
+        disableSaveBtn={!formik.isValid || !formik.dirty}
         onSave={formik.handleSubmit}
         dialogProps={{
           open: openDialog,
