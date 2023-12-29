@@ -438,7 +438,7 @@ export const InvoiceForm = ({
             name: i.name || i.article.name,
             articleUnit: i.article.unit,
             quantity: i.quantity,
-            unitAmount: invoice.totalAmount,
+            unitAmount: i.unitAmount,
           }),
         );
         setInvoiceItems(newItems);
