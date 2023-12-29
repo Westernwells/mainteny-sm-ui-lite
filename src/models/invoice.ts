@@ -250,8 +250,8 @@ export enum InvoiceType {
 export interface InvoiceFormData {
   subject: string;
   description: string;
-  dueDate: string;
-  sentDate: string;
+  dueDate?: Date;
+  sentDate?: Date;
   items: QuotationItemRecord[] | InvoiceItemRecord<Amount>[];
   paymentInfo: PaymentInfo;
   paymentTerms: string;
@@ -279,6 +279,8 @@ export interface InvoiceFormData {
   alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
   discount?: Discount;
   payment?: Payment;
+  deliveryStartDate?: Date;
+  deliveryEndDate?: Date;
 }
 
 export interface CreateInvoice {
@@ -289,6 +291,7 @@ export interface CreateInvoice {
   subject?: string;
   description?: string;
   dueDate?: string;
+  sentDate?: string;
   type?: InvoiceType;
   items: InvoiceItemRecord<Amount>[];
   paymentTerms?: string;
@@ -313,6 +316,8 @@ export interface CreateInvoice {
   alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
   discount?: Discount;
   payment?: Payment;
+  deliveryStartDate?: string;
+  deliveryEndDate?: string;
 }
 
 export interface UpdateInvoice {
@@ -322,6 +327,7 @@ export interface UpdateInvoice {
   subject?: string;
   description?: string;
   dueDate?: string;
+  sentDate?: string;
   items?: InvoiceItemRecord<AmountRecord>[];
   paymentTerms?: string;
   paymentInfo?: PaymentInfo;
@@ -344,6 +350,8 @@ export interface UpdateInvoice {
   alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
   discount?: Discount;
   payment?: Payment;
+  deliveryStartDate?: string;
+  deliveryEndDate?: string;
 }
 
 export interface QueryInvoiceCommentsParams {
