@@ -165,8 +165,8 @@ export const ArticleItemsTableNEW = ({
     const newItems = invoice?.items.map(
       (i): InvoiceItemRecord<Amount> => ({
         article: i.article,
-        description: i.description || i.article.description,
-        name: i.name || i.article.name,
+        description: i.description,
+        name: i.name,
         quantity: i.quantity,
         unitAmount: i.unitAmount,
       }),

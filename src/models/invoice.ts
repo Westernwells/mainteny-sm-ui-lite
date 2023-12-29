@@ -11,6 +11,7 @@ import {
 } from './misc';
 import {PropertyOwnerSimpleView} from './propertyManager';
 import {QuotationItemRecord} from './quotation';
+import {ServiceCompanySimpleView} from './service-company';
 import {ServiceOrderView, ServiceOrderType} from './service-order';
 
 export enum InvoiceStatus {
@@ -41,14 +42,19 @@ export enum InvoiceStatusView {
 
 export interface InvoiceItem {
   totalAmount: Amount;
-  article: ArticleView;
+  article?: ArticleView;
   data: string;
   description: string;
   id: string;
   invoiceId: string;
+  articleId?: string;
   name: string;
   quantity: number;
   unitAmount: Amount;
+  additionalInfo?: {
+    discount?: Discount;
+    payment?: InvoiceItemPaymentRecord;
+  };
 }
 
 export interface BeneficialDetails {
@@ -86,6 +92,10 @@ export interface InvoiceAdditionalInfo {
   };
   laborMaterialCostText?: string;
   alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
+  discount?: Discount;
+  payment?: Payment;
+  deliveryStartDate?: string;
+  deliveryEndDate?: string;
 }
 
 export enum InvoiceOverdueNoticeStatus {
@@ -121,12 +131,13 @@ export interface InvoiceView {
   description: string;
   subject: string;
   type: InvoiceType;
-  totalAmount: Amount;
+  totalAmount: AggregatedAmount;
   sentDate?: string;
-  dueDate: string;
+  dueDate?: string;
   status: InvoiceStatus;
   serviceOrder?: ServiceOrderView;
   propertyOwner: PropertyOwnerSimpleView;
+  serviceCompany: ServiceCompanySimpleView;
   items: InvoiceItem[];
   search: string;
   meta: Meta;

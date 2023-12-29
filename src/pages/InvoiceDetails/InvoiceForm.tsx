@@ -40,6 +40,7 @@ import {
   InvoiceStatus,
   InvoiceFormData,
   CreateInvoice,
+  InvoiceItem,
 } from 'models/invoice';
 import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
 import {
@@ -144,6 +145,21 @@ const articleViewToItem = (
     description: articleView.description,
     quantity: 1,
     unitAmount: articleView.unitAmount,
+  };
+  return getItemRecord(record, record.unitAmount.percentageVat);
+};
+
+const invoiceItemToInvoiceItemRecord = (
+  invoiceItem: InvoiceItem,
+): InvoiceItemRecord<Amount> => {
+  const record: InvoiceItemRecord<Amount> = {
+    article: invoiceItem.article,
+    name: invoiceItem.name,
+    description: invoiceItem.description,
+    quantity: 1,
+    unitAmount: invoiceItem.unitAmount,
+    discount: invoiceItem.additionalInfo?.discount,
+    payment: invoiceItem.additionalInfo?.payment,
   };
   return getItemRecord(record, record.unitAmount.percentageVat);
 };
@@ -268,8 +284,11 @@ export const InvoiceForm = ({
     externalId: Yup.string().test(
       'checkExternalId',
       'This ID is already taken. Please enter a different one.',
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      async (value) => isExternalIdUnique(allInvoiceResource.data, value),
+      async (value) =>
+        formType === 'edit' && value === invoice?.externalId
+          ? true
+          : // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            isExternalIdUnique(allInvoiceResource.data, value),
     ),
   });
 
@@ -330,6 +349,18 @@ export const InvoiceForm = ({
     formik.setFieldValue(
       'items',
       selectedServiceOrder.articles.map((a) => articleViewToItem(a)),
+    );
+    formik.setFieldValue(
+      'deliveryStartDate',
+      serviceOrder?.actualStartTime
+        ? new Date(serviceOrder.actualStartTime)
+        : undefined,
+    );
+    formik.setFieldValue(
+      'deliveryEndDate',
+      serviceOrder?.actualEndTime
+        ? new Date(serviceOrder.actualEndTime)
+        : undefined,
     );
   };
 
@@ -419,7 +450,10 @@ export const InvoiceForm = ({
       );
       formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '');
       formik.setFieldValue('type', invoice?.type || formik.values.type);
-      formik.setFieldValue('items', invoice.items);
+      formik.setFieldValue(
+        'items',
+        invoice.items.map(invoiceItemToInvoiceItemRecord),
+      );
       formik.setFieldValue('laborMaterialCosts', {
         LABOR:
           invoice?.additionalInfo?.laborMaterialCosts?.LABOR ||
@@ -433,6 +467,19 @@ export const InvoiceForm = ({
         invoice?.additionalInfo.laborMaterialCostText ||
           DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
       );
+      formik.setFieldValue('discount', invoice?.additionalInfo?.discount);
+      formik.setFieldValue(
+        'deliveryStartDate',
+        invoice?.additionalInfo?.deliveryStartDate
+          ? new Date(invoice.additionalInfo.deliveryStartDate)
+          : undefined,
+      );
+      formik.setFieldValue(
+        'deliveryEndDate',
+        invoice?.additionalInfo?.deliveryEndDate
+          ? new Date(invoice.additionalInfo.deliveryEndDate)
+          : undefined,
+      );
     }
   }, [invoice]);
 
@@ -445,18 +492,6 @@ export const InvoiceForm = ({
         serviceOrder.elevator.propertyOwner.id,
       );
       formik.setFieldValue('serviceOrderId', serviceOrder.id);
-      formik.setFieldValue(
-        'deliveryStartDate',
-        serviceOrder?.actualStartTime
-          ? new Date(serviceOrder.actualStartTime)
-          : undefined,
-      );
-      formik.setFieldValue(
-        'deliveryEndDate',
-        serviceOrder?.actualEndTime
-          ? new Date(serviceOrder.actualEndTime)
-          : undefined,
-      );
       formik.setFieldValue(
         'unitNumber',
         serviceOrder?.elevator.externalId || '-',
