@@ -74,7 +74,7 @@ export const MarkCompletedDialog = ({
                 <FormInput
                   props={{
                     type: 'number',
-                    label: 'Duration (in minutes)',
+                    label: t('Duration (in minutes)'),
                     name: 'serviceTime',
                     value: formik.values.serviceTime,
                     onBlur: formik.handleBlur,
@@ -121,7 +121,7 @@ export const MarkCompletedDialog = ({
               onClick: onClose,
             }}>
             <Typography variant="subtitle2" color="text.secondary">
-              No
+              ${t('No')}
             </Typography>
           </Button>
           <Button
@@ -131,7 +131,7 @@ export const MarkCompletedDialog = ({
               autoFocus: true,
               disabled: !formik.isValid,
             }}>
-            <Typography variant="subtitle2">Yes</Typography>
+            <Typography variant="subtitle2">${t('Yes')}</Typography>
           </Button>
         </DialogActions>
       </Dialog>
