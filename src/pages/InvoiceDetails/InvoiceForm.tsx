@@ -136,14 +136,14 @@ export const SectionTitle = ({
 );
 
 const articleViewToItem = (
-  article: ServiceOrderArticleView,
+  articleView: ServiceOrderArticleView,
 ): InvoiceItemRecord<Amount> => {
   const record: InvoiceItemRecord<Amount> = {
-    article,
-    name: article.name,
-    description: article.description,
+    article: articleView.article,
+    name: articleView.name,
+    description: articleView.description,
     quantity: 1,
-    unitAmount: article.unitAmount,
+    unitAmount: articleView.unitAmount,
   };
   return getItemRecord(record, record.unitAmount.percentageVat);
 };
