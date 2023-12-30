@@ -5,6 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {ArticleOrderItemRecord} from 'models/article';
 import {Button} from 'components/Button';
+import {useTranslation} from 'react-i18next';
 
 interface Props<T> {
   articleItem: T;
@@ -19,6 +20,7 @@ export const ArticleItemRow = ({
   deleteItem,
   setItems,
 }: Props<ArticleOrderItemRecord>) => {
+  const {t} = useTranslation();
   const [name, setName] = useState(articleItem.articleName);
   const [supplierArticleNumber, setSupplierArticleNumber] = useState(
     articleItem.supplierArticleNumber,
@@ -96,7 +98,7 @@ export const ArticleItemRow = ({
           required
         />
         <TextField
-          value={unit}
+          value={t(unit)}
           onChange={(e) => setUnit(e.target.value)}
           size="small"
           required

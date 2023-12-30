@@ -211,7 +211,7 @@ export const EditBasicInfoForm = ({
         labelId="select-unit-label"
         label="Unit"
         options={Object.keys(MeasurementUnit).map((item) => ({
-          label: item,
+          label: t(item),
           value: item,
         }))}
         selectProps={{
