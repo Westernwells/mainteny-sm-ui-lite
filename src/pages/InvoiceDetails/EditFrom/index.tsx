@@ -49,6 +49,7 @@ export const EditFrom = ({
       });
     },
     validationSchema: validationSchemaAddress,
+    enableReinitialize: true,
   });
 
   const statesByCountry = useCallback(
