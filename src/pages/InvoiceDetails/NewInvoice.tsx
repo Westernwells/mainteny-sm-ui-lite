@@ -7,7 +7,6 @@ import {useInvoiceDetail} from 'hooks/reactQuery/useInvoice';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {InvoiceType} from 'models/invoice';
 import {InvoiceForm} from './InvoiceForm';
-// import {InvoiceFormNEW} from './InvoiceFormNEW';
 
 export const NewInvoice = () => {
   const {search} = useLocation();
@@ -53,14 +52,6 @@ export const NewInvoice = () => {
       customer={customer}
     />
   );
-  // return (
-  //   <InvoiceForm
-  //     serviceOrderResource={serviceOrderDetails}
-  //     invoice={invoice}
-  //     invoiceType={invoiceType as InvoiceType}
-  //     customer={customer}
-  //   />
-  // );
 };
 
 export default NewInvoice;
