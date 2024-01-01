@@ -1,6 +1,7 @@
 import {MouseEventHandler} from 'react';
 import Box from '@mui/material/Box';
 import {SxProps, Theme} from '@mui/system';
+import {ButtonProps} from '@mui/material';
 import {Button} from './Button';
 
 interface Props {
@@ -8,9 +9,16 @@ interface Props {
   icon?: JSX.Element;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   sxContainer?: SxProps<Theme>;
+  buttonProps?: ButtonProps;
 }
 
-export const SelectButton = ({text, icon, onClick, sxContainer}: Props) => (
+export const SelectButton = ({
+  text,
+  icon,
+  onClick,
+  sxContainer,
+  buttonProps,
+}: Props) => (
   <Box
     bgcolor="inputBackground.main"
     minHeight="5em"
@@ -33,6 +41,7 @@ export const SelectButton = ({text, icon, onClick, sxContainer}: Props) => (
         },
         startIcon: icon,
         onClick,
+        ...buttonProps,
       }}
     />
   </Box>

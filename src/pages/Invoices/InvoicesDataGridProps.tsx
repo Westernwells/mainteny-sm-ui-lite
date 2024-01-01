@@ -158,7 +158,7 @@ export const makeRows = (
         type: item.serviceOrder?.type,
         amount: `${formatCurrency(
           item
-            ? item.totalAmount.grossAmount /
+            ? (item.totalAmount?.grossAmount ?? 0) /
                 10 ** item.totalAmount.fractionDigits!
             : 0,
           {

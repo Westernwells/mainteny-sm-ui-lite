@@ -30,7 +30,6 @@ import {
   PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from 'models/propertyManager';
-import {WithOptional} from 'models/misc';
 
 export const DraftQuotation = () => {
   const [queryParams] = useSearchParams();
@@ -112,10 +111,9 @@ export const DraftQuotation = () => {
       setQuotationItems(
         quotation.items.map(
           (i): QuotationItemRecord => ({
-            articleId: i.article.id,
+            article: i.article,
             description: i.description || i.article.description,
             name: i.name || i.article.name,
-            articleUnit: i.article.unit,
             quantity: i.quantity,
             unitAmount: i.unitAmount,
           }),
@@ -139,8 +137,8 @@ export const DraftQuotation = () => {
     formik.setFieldValue(
       'items',
       quotationItems.map(
-        (item): WithOptional<QuotationItemRecord, 'articleUnit'> => ({
-          articleId: item.articleId,
+        (item): QuotationItemRecord => ({
+          article: item.article,
           description: item.description,
           name: item.name,
           quantity: item.quantity,

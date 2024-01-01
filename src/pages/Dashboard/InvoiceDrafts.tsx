@@ -77,7 +77,7 @@ export const InvoiceDrafts = ({
               <ListItemText>
                 {formatCurrency(
                   invoice
-                    ? invoice.totalAmount.netAmount /
+                    ? (invoice.totalAmount?.netAmount ?? 0) /
                         10 ** invoice.totalAmount.fractionDigits!
                     : 0,
                   {

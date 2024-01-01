@@ -8,7 +8,6 @@ import {
   Money,
   PaymentInfo,
   PdfGenerationStatus,
-  WithOptional,
 } from './misc';
 import {PropertyOwnerSimpleView} from './propertyManager';
 import {QuotationItemRecord} from './quotation';
@@ -43,14 +42,19 @@ export enum InvoiceStatusView {
 
 export interface InvoiceItem {
   totalAmount: Amount;
-  article: ArticleView;
+  article?: ArticleView;
   data: string;
   description: string;
   id: string;
   invoiceId: string;
+  articleId?: string;
   name: string;
   quantity: number;
   unitAmount: Amount;
+  additionalInfo?: {
+    discount?: Discount;
+    payment?: InvoiceItemPaymentRecord;
+  };
 }
 
 export interface BeneficialDetails {
@@ -61,6 +65,11 @@ export interface BeneficialDetails {
 export interface BeneficialDetailsRecord {
   name: string;
   address: AddressRecord;
+}
+
+export interface AlternativeServiceCompanyInfo {
+  name?: string;
+  address?: AddressRecord;
 }
 
 export interface InvoiceAdditionalInfo {
@@ -82,6 +91,11 @@ export interface InvoiceAdditionalInfo {
     MATERIAL: string;
   };
   laborMaterialCostText?: string;
+  alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
+  discount?: Discount;
+  payment?: Payment;
+  deliveryStartDate?: string;
+  deliveryEndDate?: string;
 }
 
 export enum InvoiceOverdueNoticeStatus {
@@ -117,12 +131,13 @@ export interface InvoiceView {
   description: string;
   subject: string;
   type: InvoiceType;
-  totalAmount: Amount;
+  totalAmount: AggregatedAmount;
   sentDate?: string;
-  dueDate: string;
+  dueDate?: string;
   status: InvoiceStatus;
   serviceOrder?: ServiceOrderView;
   propertyOwner: PropertyOwnerSimpleView;
+  serviceCompany: ServiceCompanySimpleView;
   items: InvoiceItem[];
   search: string;
   meta: Meta;
@@ -158,15 +173,81 @@ export interface InvoiceFilters {
   serviceType: ServiceOrderType[];
 }
 
-export interface InvoiceItemRecord<T> {
-  articleId: string;
-  articleUnit: string;
-  description: string;
-  name: string;
-  quantity: number;
-  unitAmount: T;
+export enum DiscountType {
+  AMOUNT = 'AMOUNT',
+  PERCENTAGE = 'PERCENTAGE',
+  NONE = 'NONE',
+}
+
+export enum DiscountTypeOptions {
+  AMOUNT = 'Lump-sum',
+  PERCENTAGE = 'Percentage',
+}
+
+export interface Discount {
+  type: DiscountType;
+  amount?: Money;
+  percentage?: number;
+}
+
+export enum PaymentType {
+  LUMP_SUM = 'LUMP_SUM',
+  PERCENTAGE = 'PERCENTAGE',
+  PER_ITEM = 'PER_ITEM',
+  NONE = 'NONE',
+}
+
+export interface VatAmount {
+  vat: number;
+  percentageVat: number;
+}
+
+export interface AggregatedAmount {
+  netAmount?: number;
+  grossAmount?: number;
+  currency: string;
+  vats: VatAmount[];
+  vat?: number;
+  percentageVat?: number;
+  fractionDigits?: number;
+}
+
+export interface Payment {
+  type: PaymentType;
+  amount?: AggregatedAmount;
+  percentage?: number;
+  description?: string;
+}
+
+export enum InvoiceItemPaymentType {
+  AMOUNT = 'AMOUNT',
+  PERCENTAGE = 'PERCENTAGE',
+}
+
+export interface InvoiceItemPaymentRecord {
+  type: InvoiceItemPaymentType;
+  amount?: Money;
+  percentage?: number;
+}
+
+export interface ArticleRecord {
+  id?: string;
+  name?: string;
+  externalId?: string;
   type?: ArticleType;
+  unit?: string;
+  unitSellingAmount?: Amount;
   costPackage?: CostPackage;
+}
+
+export interface InvoiceItemRecord<T> {
+  article?: ArticleRecord;
+  name: string;
+  description?: string;
+  unitAmount: T;
+  quantity: number;
+  discount?: Discount;
+  payment?: InvoiceItemPaymentRecord;
 }
 
 export enum InvoiceType {
@@ -180,8 +261,8 @@ export enum InvoiceType {
 export interface InvoiceFormData {
   subject: string;
   description: string;
-  dueDate: string;
-  sentDate: string;
+  dueDate?: Date;
+  sentDate?: Date;
   items: QuotationItemRecord[] | InvoiceItemRecord<Amount>[];
   paymentInfo: PaymentInfo;
   paymentTerms: string;
@@ -195,7 +276,6 @@ export interface InvoiceFormData {
   costCenter?: string;
   customerSpecificOrderNumber?: string;
   beneficialName?: string;
-  beneficialAddress?: AddressRecord;
   moreInfo?: string;
   billingAddress?: AddressRecord;
   beneficiaryAddress?: AddressRecord;
@@ -206,56 +286,83 @@ export interface InvoiceFormData {
     MATERIAL: string;
   };
   laborMaterialCostText: string;
+  unitNumber?: string;
+  alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
+  discount?: Discount;
+  payment?: Payment;
+  deliveryStartDate?: Date;
+  deliveryEndDate?: Date;
 }
 
 export interface CreateInvoice {
-  subject: string;
-  description: string;
-  dueDate: string;
-  sentDate: string;
-  items: QuotationItemRecord[] | InvoiceItemRecord<Amount>[];
-  paymentInfo: PaymentInfo;
-  paymentTerms: string;
-  propertyOwnerId: string;
   serviceCompanyId: string;
+  propertyOwnerId: string;
   serviceOrderId?: string;
-  shouldSendOut: boolean;
-  type: InvoiceType;
+  externalId?: string;
+  subject?: string;
+  description?: string;
+  dueDate?: string;
+  sentDate?: string;
+  type?: InvoiceType;
+  items: InvoiceItemRecord<Amount>[];
+  paymentTerms?: string;
+  paymentInfo?: PaymentInfo;
+  shouldSendOut?: boolean;
   includeWorkReport?: boolean;
   includeCheckList?: boolean;
   costCenter?: string;
   customerSpecificOrderNumber?: string;
-  beneficialDetails?: BeneficialDetailsRecord;
+  integration?: {
+    xeroEntityId?: string;
+  };
   moreInfo?: string;
-  externalId?: string;
-  laborMaterialCosts: {
-    LABOR: string;
-    MATERIAL: string;
+  billingAddress?: AddressRecord;
+  beneficiaryAddress?: AddressRecord;
+  alternativeAddress?: AddressRecord;
+  laborMaterialCosts?: {
+    LABOR?: string;
+    MATERIAL?: string;
   };
   laborMaterialCostText?: string;
+  alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
+  discount?: Discount;
+  payment?: Payment;
+  deliveryStartDate?: string;
+  deliveryEndDate?: string;
 }
 
 export interface UpdateInvoice {
-  description: string;
-  subject: string;
-  dueDate: string;
-  sentDate: string;
-  items: WithOptional<InvoiceItemRecord<AmountRecord>, 'articleUnit'>[];
-  paymentInfo?: PaymentInfo;
-  paymentTerms?: string;
   serviceOrderId?: string;
-  type: InvoiceType;
+  propertyOwnerId?: string;
+  externalId?: string;
+  subject?: string;
+  description?: string;
+  dueDate?: string;
+  sentDate?: string;
+  items?: InvoiceItemRecord<AmountRecord>[];
+  paymentTerms?: string;
+  paymentInfo?: PaymentInfo;
   includeWorkReport?: boolean;
+  includeCheckList?: boolean;
   costCenter?: string;
   customerSpecificOrderNumber?: string;
-  beneficialDetails?: BeneficialDetailsRecord;
+  integration?: {
+    xeroEntityId?: string;
+  };
   moreInfo?: string;
-  externalId?: string;
-  laborMaterialCosts: {
-    LABOR: string;
-    MATERIAL: string;
+  billingAddress?: AddressRecord;
+  beneficiaryAddress?: AddressRecord;
+  alternativeAddress?: AddressRecord;
+  laborMaterialCosts?: {
+    LABOR?: string;
+    MATERIAL?: string;
   };
   laborMaterialCostText?: string;
+  alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
+  discount?: Discount;
+  payment?: Payment;
+  deliveryStartDate?: string;
+  deliveryEndDate?: string;
 }
 
 export interface QueryInvoiceCommentsParams {

@@ -1,6 +1,7 @@
 import Dinero, {Currency} from 'dinero.js';
 import i18n from 'i18n';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {AggregatedAmount} from 'models/invoice';
 import {
   Amount,
   AmountRecord,
@@ -43,8 +44,21 @@ export function formatNetAmount(amount?: Amount): string {
   return formatAmount(amount, amount?.netAmount);
 }
 
-export function formatGrossAmount(amount?: Amount): string {
-  return formatAmount(amount, amount?.grossAmount);
+export function aggregatedAmountToAmount(
+  aggregatedAmount?: AggregatedAmount,
+): Amount {
+  return {
+    currency: aggregatedAmount?.currency ?? 'EUR',
+    fractionDigits: aggregatedAmount?.fractionDigits ?? 2,
+    grossAmount: aggregatedAmount?.grossAmount ?? 0,
+    netAmount: aggregatedAmount?.netAmount ?? 0,
+    percentageVat: aggregatedAmount?.percentageVat ?? 0,
+    vat: aggregatedAmount?.vat ?? 0,
+  };
+}
+
+export function formatGrossAmount(amount?: AggregatedAmount): string {
+  return formatAmount(aggregatedAmountToAmount(amount), amount?.grossAmount);
 }
 
 export function formatVatAmount(amount?: Amount): string {
