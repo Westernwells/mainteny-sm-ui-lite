@@ -34,8 +34,8 @@ export const EditCustomerForm = ({
           props={{
             size: 'small',
             label: 'Name',
-            name: `${address}.component.name`,
-            value: value?.component?.name ?? '',
+            name: `${address}.fullName`,
+            value: value?.fullName ?? '',
             ...defaultProps,
           }}
         />
