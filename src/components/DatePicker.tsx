@@ -70,8 +70,10 @@ export const DatePicker = ({
   };
 
   useEffect(() => {
-    setValue(defaultDate);
-  }, []);
+    if (defaultDate && !value) {
+      setValue(defaultDate);
+    }
+  }, [defaultDate]);
 
   useEffect(() => {
     if (reset) {
