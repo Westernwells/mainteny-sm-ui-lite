@@ -84,7 +84,10 @@ export const ArticleItemRow = ({
 
     setItems((prev) =>
       prev.map((item, itemIndex) => {
-        if (item.articleId === articleItem.articleId && itemIndex === index) {
+        if (
+          item.article?.id === articleItem.article?.id &&
+          itemIndex === index
+        ) {
           return {
             ...item,
             quantity: articleItem.quantity,
@@ -100,7 +103,10 @@ export const ArticleItemRow = ({
 
     setItems((prev) =>
       prev.map((item, itemIndex) => {
-        if (item.articleId === articleItem.articleId && itemIndex === index) {
+        if (
+          item.article?.id === articleItem.article?.id &&
+          itemIndex === index
+        ) {
           return {
             ...item,
             name: articleItem.name,
@@ -116,7 +122,10 @@ export const ArticleItemRow = ({
 
     setItems((prev) =>
       prev.map((item, itemIndex) => {
-        if (item.articleId === articleItem.articleId && itemIndex === index) {
+        if (
+          item.article?.id === articleItem.article?.id &&
+          itemIndex === index
+        ) {
           return {
             ...item,
             description: articleItem.description,
@@ -130,7 +139,10 @@ export const ArticleItemRow = ({
   useEffect(() => {
     setItems((prev) =>
       prev.map((item, itemIndex) => {
-        if (item.articleId === articleItem.articleId && itemIndex === index) {
+        if (
+          item.article?.id === articleItem.article?.id &&
+          itemIndex === index
+        ) {
           return {
             ...item,
             unitAmount: {
@@ -355,7 +367,7 @@ export const ArticleItemRow = ({
             />
 
             <TextField
-              defaultValue={t(articleItem.articleUnit)}
+              defaultValue={t(articleItem.article?.unit || '')}
               size="small"
               disabled
             />

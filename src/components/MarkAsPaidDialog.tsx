@@ -46,7 +46,7 @@ export const MarkAsPaidDialog = ({
     initialValues: {
       amount: {
         value:
-          invoice.totalAmount.grossAmount /
+          (invoice.totalAmount?.grossAmount ?? 0) /
             10 ** invoice.totalAmount.fractionDigits! -
           invoice.payments
             .filter((item) => item.meta.state === State.ACTIVE)

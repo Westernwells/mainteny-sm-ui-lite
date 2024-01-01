@@ -90,7 +90,8 @@ export const calculateInvoiceTotal = (arr: InvoiceView[]) => {
   return arr
     .map(
       (item) =>
-        item.totalAmount.netAmount / 10 ** item.totalAmount.fractionDigits!,
+        (item.totalAmount?.netAmount ?? 0) /
+        10 ** item.totalAmount.fractionDigits!,
     )
     .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
 };
@@ -101,7 +102,8 @@ export const calculateGrossInvoiceTotal = (arr: InvoiceView[]) => {
   return arr
     ?.map(
       (item) =>
-        item.totalAmount.grossAmount / 10 ** item.totalAmount.fractionDigits!,
+        (item.totalAmount?.grossAmount ?? 0) /
+        10 ** item.totalAmount.fractionDigits!,
     )
     .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
 };

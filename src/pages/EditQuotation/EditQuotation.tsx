@@ -37,7 +37,7 @@ import {
   PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from 'models/propertyManager';
-import {PdfGenerationStatus, WithOptional} from 'models/misc';
+import {PdfGenerationStatus} from 'models/misc';
 import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
@@ -124,10 +124,9 @@ export const EditQuotation = ({quotation}: Props) => {
     setQuotationItems(
       quotation.items.map(
         (i): QuotationItemRecord => ({
-          articleId: i.article.id,
-          description: i.description || i.article.description,
-          name: i.name || i.article.name,
-          articleUnit: i.article.unit,
+          article: i.article,
+          name: i.name,
+          description: i.description,
           quantity: i.quantity,
           unitAmount: i.unitAmount,
         }),
@@ -148,10 +147,10 @@ export const EditQuotation = ({quotation}: Props) => {
     formik.setFieldValue(
       'items',
       quotationItems.map(
-        (item): WithOptional<QuotationItemRecord, 'articleUnit'> => ({
-          articleId: item.articleId,
-          description: item.description,
+        (item): QuotationItemRecord => ({
+          article: item.article,
           name: item.name,
+          description: item.description,
           quantity: item.quantity,
           unitAmount: item.unitAmount,
         }),

@@ -1,4 +1,4 @@
-import {ArticleView} from './article';
+import {ArticleType, ArticleView, CostPackage} from './article';
 import {ElevatorView} from './elevator';
 import {Amount, Meta} from './misc';
 import {ServiceCompanySimpleView} from './service-company';
@@ -32,13 +32,22 @@ export interface QuotationItem {
   unitAmount: Amount;
 }
 
+export interface ArticleRecord {
+  id?: string;
+  name?: string;
+  externalId?: string;
+  type?: ArticleType;
+  unit?: string;
+  unitSellingAmount?: Amount;
+  costPackage?: CostPackage;
+}
+
 export interface QuotationItemRecord {
-  articleId: string;
-  articleUnit: string;
-  description: string;
+  article?: ArticleRecord;
   name: string;
-  quantity: number;
   unitAmount: Amount;
+  quantity: number;
+  description?: string;
 }
 
 export interface QuotationView {
