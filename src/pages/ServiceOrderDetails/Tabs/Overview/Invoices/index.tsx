@@ -15,6 +15,8 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {getServiceOrderPaymentStatusStyles} from 'pages/ServiceOrders/Tabs/ServiceOrderList.tsx/ServiceOrderDataGridProps';
 import {StatusChip} from 'components/StatusChip';
 import {ServiceOrderPaymentStatus} from 'models/service-order';
+import {calculateGrossInvoiceTotal} from 'utils/calculate-total';
+import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
 import {columns, makeRows} from './InvoicesDataGridProps';
 
 interface Props {
@@ -79,6 +81,15 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
 
   return (
     <InfoCard
+      footer={
+        InvoiceList &&
+        InvoiceList?.length !== 0 && (
+          <InfoCardTotalSumFooter
+            amount={InvoiceList && calculateGrossInvoiceTotal(InvoiceList)}
+            label={t('Invoiced Sum (incl. VAT)')}
+          />
+        )
+      }
       header={
         <Box sx={{display: 'flex', alignItems: 'center'}}>
           <Typography variant="subtitle1" sx={{marginRight: '1em'}}>
