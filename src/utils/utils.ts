@@ -274,3 +274,5 @@ export const isJson = (item: string) => {
 
 export const objectKeyByValue = (obj: Record<string, any>, value: string) =>
   Object.keys(obj)[Object.values(obj).indexOf(value)];
+
+export const dateToString = (date: Date) => date.toISOString().split('T')[0];
