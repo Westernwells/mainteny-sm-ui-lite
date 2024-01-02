@@ -92,19 +92,16 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
         ? article.unitPurchaseAmount.percentageVat
         : 0,
       unitPurchaseAmount: article.unitPurchaseAmount
-        ? Math.round(
-            article.unitPurchaseAmount.netAmount /
-              currencyFactor(article.unitPurchaseAmount),
-          )
+        ? article.unitPurchaseAmount.netAmount /
+          currencyFactor(article.unitPurchaseAmount)
         : 0,
       unitPurchaseAmountCurrency: article.unitPurchaseAmount
         ? article.unitPurchaseAmount.currency
         : article.unitSellingAmount.currency,
       unitSellingVat: article.unitSellingAmount.percentageVat,
-      unitSellingAmount: Math.round(
+      unitSellingAmount:
         article.unitSellingAmount.netAmount /
-          currencyFactor(article.unitSellingAmount),
-      ),
+        currencyFactor(article.unitSellingAmount),
       unitSellingAmountCurrency: article.unitSellingAmount.currency,
       costPackage: article.additionalInfo.costPackage
         ? {
