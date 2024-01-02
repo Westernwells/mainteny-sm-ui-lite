@@ -16,9 +16,8 @@ import {
   useCreateServiceOrderArticle,
   useNewUpdateServiceOrderArticles,
 } from 'hooks/reactQuery/useServiceOrder';
-import {useTheme} from '@mui/material';
 import {calculateOrderArticlesTotal} from 'utils/calculate-total';
-import {formatCurrency} from 'utils/currency';
+import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
 import {columns, makeRows} from './ArticleDataGridProps';
 
 interface Props {
@@ -28,7 +27,6 @@ interface Props {
 
 export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
   const {t} = useTranslation();
-  const theme = useTheme();
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [openSelectModal, setOpenSelectModal] = useState(false);
 
@@ -99,34 +97,13 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
         footer={
           serviceOrderArticles &&
           serviceOrderArticles?.length !== 0 && (
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                width: '100%',
-                background: theme.palette.inputBackground.main,
-                padding: '0.8em',
-                alignItems: 'center',
-                borderTop: '1px solid #0F4C6414',
-                borderBottom: '1px solid #0F4C6414',
-              }}>
-              <Typography
-                color={theme.palette.text.secondary}
-                variant="subtitle2"
-                sx={{paddingRight: '2em'}}>
-                {t('Total Sum (excl. VAT)')}
-              </Typography>
-              <Typography
-                color={theme.palette.text.primary}
-                variant="subtitle1"
-                fontWeight="600"
-                sx={{marginRight: '14%'}}>
-                {serviceOrderArticles &&
-                  formatCurrency(
-                    calculateOrderArticlesTotal(serviceOrderArticles),
-                  )}
-              </Typography>
-            </Box>
+            <InfoCardTotalSumFooter
+              label={t('Total Sum (excl. VAT)')}
+              amount={
+                serviceOrderArticles &&
+                calculateOrderArticlesTotal(serviceOrderArticles)
+              }
+            />
           )
         }
         header={

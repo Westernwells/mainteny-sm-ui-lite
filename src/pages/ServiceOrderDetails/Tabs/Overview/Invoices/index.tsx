@@ -15,9 +15,8 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {getServiceOrderPaymentStatusStyles} from 'pages/ServiceOrders/Tabs/ServiceOrderList.tsx/ServiceOrderDataGridProps';
 import {StatusChip} from 'components/StatusChip';
 import {ServiceOrderPaymentStatus} from 'models/service-order';
-import {useTheme} from '@mui/material';
-import {formatCurrency} from 'utils/currency';
 import {calculateGrossInvoiceTotal} from 'utils/calculate-total';
+import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
 import {columns, makeRows} from './InvoicesDataGridProps';
 
 interface Props {
@@ -31,7 +30,6 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const theme = useTheme();
 
   let totalInvoiceRef = useRef(0).current;
 
@@ -86,32 +84,10 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
       footer={
         InvoiceList &&
         InvoiceList?.length !== 0 && (
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              width: '100%',
-              background: theme.palette.inputBackground.main,
-              padding: '0.8em',
-              alignItems: 'center',
-              borderTop: '1px solid #0F4C6414',
-              borderBottom: '1px solid #0F4C6414',
-            }}>
-            <Typography
-              color={theme.palette.text.secondary}
-              variant="subtitle2"
-              sx={{paddingRight: '2em'}}>
-              {t('Invoiced Sum (incl. VAT)')}
-            </Typography>
-            <Typography
-              color={theme.palette.text.primary}
-              variant="subtitle1"
-              fontWeight="600"
-              sx={{marginRight: '14%'}}>
-              {InvoiceList &&
-                formatCurrency(calculateGrossInvoiceTotal(InvoiceList))}
-            </Typography>
-          </Box>
+          <InfoCardTotalSumFooter
+            amount={InvoiceList && calculateGrossInvoiceTotal(InvoiceList)}
+            label={t('Invoiced Sum (incl. VAT)')}
+          />
         )
       }
       header={
