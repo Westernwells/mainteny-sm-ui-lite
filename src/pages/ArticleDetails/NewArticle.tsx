@@ -170,11 +170,11 @@ export const NewArticle = () => {
     // whenever unitSellingAmount changes, update costPackage labor and material to 50% 50% of unitSellingAmount
     formik.setFieldValue('costPackage', {
       labor: {
-        value: formik.values.unitSellingAmount * 0.5,
+        value: Number(formik.values.unitSellingAmount) * 0.5,
         currency: currentCurrency.code,
       },
       material: {
-        value: formik.values.unitSellingAmount * 0.5,
+        value: Number(formik.values.unitSellingAmount) * 0.5,
         currency: currentCurrency.code,
       },
     });
@@ -208,14 +208,14 @@ export const NewArticle = () => {
       unit: formik.values.unit,
       unitPurchaseAmount: amountRecordForBackend(
         makeAmountRecord(
-          formik.values.unitPurchaseAmount,
+          Number(formik.values.unitPurchaseAmount),
           formik.values.unitPurchaseAmountCurrency,
           formik.values.unitPurchaseVat,
         ),
       ),
       unitSellingAmount: amountRecordForBackend(
         makeAmountRecord(
-          formik.values.unitSellingAmount,
+          Number(formik.values.unitSellingAmount),
           formik.values.unitSellingAmountCurrency,
           formik.values.unitSellingVat,
         ),
