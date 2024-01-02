@@ -180,7 +180,7 @@ export interface InvoiceFormData {
   subject: string;
   description: string;
   dueDate: string;
-  sentDate: string;
+  sentDate?: Date;
   items: QuotationItemRecord[] | InvoiceItemRecord<Amount>[];
   paymentInfo: PaymentInfo;
   paymentTerms: string;

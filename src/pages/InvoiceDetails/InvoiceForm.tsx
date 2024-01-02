@@ -57,10 +57,9 @@ import {
   PropertyOwnerView,
 } from 'models/propertyManager';
 import {Amount, PdfGenerationStatus, WithOptional} from 'models/misc';
-import {useFormatDate} from 'hooks/useFormatDate';
 import {Notes} from 'pages/InvoiceDetails/Notes';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {convertToText, formatSearchParams} from 'utils/utils';
+import {convertToText, dateToString, formatSearchParams} from 'utils/utils';
 import {addDays, addYears, isBefore, parseISO, startOfDay} from 'date-fns';
 import {InvoiceCheckbox} from 'pages/InvoiceDetails/InvoiceCheckbox';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -96,8 +95,6 @@ const payment = {
   iban: '',
 };
 
-const dateToString = (date: Date) => date.toISOString().split('T')[0];
-
 const alternativeInvoiceDestinationTooltip =
   'Enter address to receive invoice if different from billing or shipping address. Ensure accuracy to prevent misdelivery.';
 
@@ -118,7 +115,6 @@ export const InvoiceForm = ({
   const DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT = `${DEFAULT_LABOR_COST_TEXT}\n${DEFAULT_MATERIAL_COST_TEXT}`;
 
   const theme = useTheme();
-  const formatDate = useFormatDate();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [resetDueDatePicker, setResetDueDatePicker] = useState(false);
@@ -271,7 +267,6 @@ export const InvoiceForm = ({
       }),
     description: invoice?.description || '',
     dueDate: '',
-    sentDate: dateToString(new Date()),
     type:
       typeof invoiceType === 'string' &&
       invoiceType &&
@@ -452,6 +447,11 @@ export const InvoiceForm = ({
     );
     formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '', true);
     formik.setFieldValue('dueDate', invoice?.dueDate || '', true);
+    formik.setFieldValue(
+      'sentDate',
+      invoice?.sentDate ? new Date(invoice.sentDate) : new Date(),
+    );
+
     formik.setFieldValue(
       'serviceOrderId',
       invoice?.serviceOrder?.id || '',
@@ -1000,18 +1000,22 @@ export const InvoiceForm = ({
                       ? `${invoice.meta.creator?.firstName} ${invoice.meta.creator?.lastName}`
                       : `${user?.userAccount.firstName} ${user?.userAccount.lastName}`,
                   },
-                  {
-                    label: 'Invoice Date',
-                    value: invoice?.sentDate
-                      ? formatDate(invoice.sentDate)
-                      : '-',
-                  },
                 ].map((i) => (
                   <Box key={i.label}>
                     <FormLabel text={i.label} />
                     <Typography>{i.value}</Typography>
                   </Box>
                 ))}
+
+                <DatePicker
+                  defaultDate={formik.values.sentDate}
+                  getSelectedDate={(newValue) => {
+                    if (newValue) formik.setFieldValue('sentDate', newValue);
+                  }}
+                  textFieldProps={{
+                    label: 'Invoice Date',
+                  }}
+                />
 
                 <Box>
                   <AutoDropdown
