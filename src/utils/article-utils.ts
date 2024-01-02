@@ -23,7 +23,7 @@ export const handleCostPackageValidation = (
     return (
       (main.value.costPackage?.labor?.value ?? 0) +
         (main.value.costPackage?.material?.value ?? 0) ===
-      main.value.unitSellingAmount
+      Number(main.value.unitSellingAmount)
     );
   }
   return true;
