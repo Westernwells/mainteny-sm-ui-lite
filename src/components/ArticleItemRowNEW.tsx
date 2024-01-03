@@ -48,7 +48,8 @@ export const ArticleItemRowNEW = ({
     formik.values.unitAmount.netAmount /
     10 ** formik.values.unitAmount.fractionDigits!;
 
-  const totalPriceExclVat = applyDiscount({
+  const totalPriceExclVat = price * formik.values.quantity;
+  const totalPriceExclVatAfterDiscount = applyDiscount({
     actualValue: price * formik.values.quantity,
     ...(formik.values.discount?.type === DiscountType.AMOUNT
       ? {amount: formik.values.discount?.amount?.value ?? 0}
@@ -253,22 +254,22 @@ export const ArticleItemRowNEW = ({
                 ? formik.values.discount?.amount?.value
                 : formik.values.discount?.percentage
             }
-            max={
-              formik.values.discount?.type === DiscountType.AMOUNT
-                ? formik.values.discount?.amount?.value
-                : 100
-            }
-            min={0}
             isAllowed={(values) => {
               const {floatValue} = values;
               if (!floatValue) {
                 return true;
               }
 
-              return (
-                formik.values.discount?.type === DiscountType.AMOUNT ||
-                floatValue <= 100
-              );
+              if (floatValue < 0) {
+                return false;
+              }
+
+              const maxDiscount: number =
+                formik.values.discount?.type === DiscountType.AMOUNT
+                  ? totalPriceExclVat
+                  : 100;
+
+              return floatValue <= maxDiscount;
             }}
             customInput={TextField}
             allowLeadingZeros={false}
@@ -313,7 +314,7 @@ export const ArticleItemRowNEW = ({
 
         <TableCell>
           <NumericFormat
-            value={totalPriceExclVat}
+            value={totalPriceExclVatAfterDiscount}
             customInput={TextField}
             decimalScale={2}
             fixedDecimalScale

@@ -1,4 +1,10 @@
-import {CreateInvoice, InvoiceFormData, UpdateInvoice} from 'models/invoice';
+import {
+  CreateInvoice,
+  InvoiceFormData,
+  InvoiceItemRecord,
+  UpdateInvoice,
+} from 'models/invoice';
+import {Amount} from 'models/misc';
 import {dateToString} from 'utils/utils';
 
 export const formatInvoiceRecord = (
@@ -55,3 +61,24 @@ export const applyDiscount = ({
 
   return discountedPrice;
 };
+
+export const getAggregatedItemsVats = (
+  items: InvoiceItemRecord<Amount>[],
+  subtotalExclVatAfterDiscount: number,
+) =>
+  items.reduce((acc, item) => {
+    const {percentageVat} = item.unitAmount;
+    const vat = subtotalExclVatAfterDiscount * (percentageVat / 100);
+
+    const existingItemIndex = acc.findIndex(
+      (i) => i.percentageVat === percentageVat,
+    );
+
+    if (existingItemIndex !== -1) {
+      acc[existingItemIndex].vat += vat;
+    } else {
+      acc.push({percentageVat, vat});
+    }
+
+    return acc;
+  }, [] as {percentageVat: number; vat: number}[]);

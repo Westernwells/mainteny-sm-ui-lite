@@ -346,22 +346,6 @@ export const InvoiceForm = ({
 
   const handleSelectServiceOrder = (selectedServiceOrder: ServiceOrderView) => {
     setServiceOrder(selectedServiceOrder);
-    formik.setFieldValue(
-      'items',
-      selectedServiceOrder.articles.map((a) => articleViewToItem(a)),
-    );
-    formik.setFieldValue(
-      'deliveryStartDate',
-      serviceOrder?.actualStartTime
-        ? new Date(serviceOrder.actualStartTime)
-        : undefined,
-    );
-    formik.setFieldValue(
-      'deliveryEndDate',
-      serviceOrder?.actualEndTime
-        ? new Date(serviceOrder.actualEndTime)
-        : undefined,
-    );
   };
 
   useEffect(() => {
@@ -496,6 +480,24 @@ export const InvoiceForm = ({
         'unitNumber',
         serviceOrder?.elevator.externalId || '-',
       );
+      formik.setFieldValue(
+        'deliveryStartDate',
+        serviceOrder?.actualStartTime
+          ? new Date(serviceOrder.actualStartTime)
+          : undefined,
+      );
+      formik.setFieldValue(
+        'deliveryEndDate',
+        serviceOrder?.actualEndTime
+          ? new Date(serviceOrder.actualEndTime)
+          : undefined,
+      );
+      if (!formik.values.items.length) {
+        formik.setFieldValue(
+          'items',
+          serviceOrder.articles.map(articleViewToItem),
+        );
+      }
 
       // if customer is changed, then update billing address
       if (serviceOrderCustomer.id !== customer?.id) {
@@ -657,6 +659,18 @@ export const InvoiceForm = ({
     formik.setFieldValue('items', invoiceItems);
   };
 
+  const handleCustomerChange = (value: PropertyOwnerView | null) => {
+    if (value) {
+      handleSelectCustomer(value);
+    } else {
+      // remove service order if there was a customer before but now there isn't
+      if (customer) {
+        setServiceOrder(undefined);
+      }
+      setCustomer(undefined);
+    }
+  };
+
   return (
     <Box>
       {/* {invoice && (
@@ -764,14 +778,7 @@ export const InvoiceForm = ({
                     />
                   </Box>
                   <CustomerAutoComplete
-                    getCustomer={(value) => {
-                      if (value) {
-                        handleSelectCustomer(value);
-                      } else {
-                        setCustomer(undefined);
-                        setServiceOrder(undefined);
-                      }
-                    }}
+                    getCustomer={handleCustomerChange}
                     initialValue={(customer as PropertyOwnerView) || null}
                     textFieldProps={{
                       error: !!(
@@ -1089,7 +1096,6 @@ export const InvoiceForm = ({
               <Box display="flex" justifyContent="space-between" gap={1}>
                 <DatePicker
                   defaultDate={formik.values.deliveryStartDate}
-                  minDate={new Date()}
                   getSelectedDate={(newValue) => {
                     if (newValue)
                       formik.setFieldValue('deliveryStartDate', newValue);
@@ -1100,7 +1106,6 @@ export const InvoiceForm = ({
                 />
                 <DatePicker
                   defaultDate={formik.values.deliveryEndDate}
-                  minDate={new Date()}
                   getSelectedDate={(newValue) => {
                     if (newValue)
                       formik.setFieldValue('deliveryEndDate', newValue);
