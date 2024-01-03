@@ -20,7 +20,10 @@ import AddIcon from '@mui/icons-material/Add';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import CloseIcon from '@mui/icons-material/Close';
-import {applyDiscount} from 'pages/InvoiceDetails/utils';
+import {
+  applyDiscount,
+  getAggregatedItemsVats,
+} from 'pages/InvoiceDetails/utils';
 import {TabItems, Tabs} from 'components/Tab';
 import {TabsBody} from 'components/TabsBody';
 import {
@@ -99,11 +102,7 @@ export const ArticleItemsTableNEW = ({
               (items[0].unitAmount.percentageVat / 100),
           },
         ]
-      : items.map((i) => ({
-          percentageVat: i.unitAmount.percentageVat,
-          vat:
-            subtotalExclVatAfterDiscount * (i.unitAmount.percentageVat / 100),
-        }))
+      : getAggregatedItemsVats(items, subtotalExclVatAfterDiscount)
     : [];
 
   const totalAmountInclVats = calculateTotalAmountInclVats({
