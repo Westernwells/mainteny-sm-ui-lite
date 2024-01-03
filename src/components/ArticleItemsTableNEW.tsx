@@ -364,22 +364,22 @@ export const ArticleItemsTableNEW = ({
                             ? formik.values.discount?.amount?.value
                             : formik.values.discount?.percentage
                         }
-                        max={
-                          formik.values.discount?.type === DiscountType.AMOUNT
-                            ? formik.values.discount?.amount?.value
-                            : 100
-                        }
-                        min={0}
                         isAllowed={(values) => {
                           const {floatValue} = values;
                           if (!floatValue) {
                             return true;
                           }
 
-                          return (
-                            formik.values.discount?.type ===
-                              DiscountType.AMOUNT || floatValue <= 100
-                          );
+                          if (floatValue < 0) {
+                            return false;
+                          }
+
+                          const MAX_LIMIT: number =
+                            formik.values.discount?.type === DiscountType.AMOUNT
+                              ? subtotalExclVat
+                              : 100;
+
+                          return floatValue <= MAX_LIMIT;
                         }}
                         customInput={TextField}
                         allowLeadingZeros={false}
