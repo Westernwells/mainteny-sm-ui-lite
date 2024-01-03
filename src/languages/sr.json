@@ -1972,5 +1972,22 @@
   "Correction or adjustment to an already issued invoice, typically used for refunds, returns, or errors.": "Ispravka ili prilagođavanje već izdate fakture, koja se obično koristi za refundiranje, vraćanje ili greške.",
   "Upfront Invoice": "Avansna faktura",
   "Final Invoice": "Konačna faktura",
-  "Non maintenance": "Neodržavanje"
+  "Non maintenance": "Neodržavanje",
+  "No Invoice": "BEz fakture",
+  "Duration (in minutes)": "Trajanje (u minutama)",
+  "Edit from": "Uredi od",
+  "Update": "Ažuriranje",
+  "Invoice type": "Tip fakture",
+  "Payment Due Date": "Isplata do datuma",
+  "Service Deliver Date": "Datum isporuke usluge",
+  "Purchase order no.": "Nalog za kupovinu br.",
+  "Additional documents": "Dodatni dokumenti",
+  "To (Customer)": "Za (kupac)",
+  "Total Price (excl. VAT)": "Ukupna cena (bez PDV-a)",
+  "Remove Description": "Ukloni opis",
+  "Subtotal (excl. VAT)": "Međuzbir (bez PDV)",
+  "Total amount (incl. VAT)": "Ukupan iznos (sa PDV-om)",
+  "Add Discount": "Dodaj popust",
+  "Lump-sum": "Ukupna suma",
+  "Percentage": "Percenat"
 }

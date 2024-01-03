@@ -1951,5 +1951,19 @@
   "Final Invoice": "Abschlussrechnung",
   "Non maintenance": "Sonstiger Vertrag",
   "No Invoice": "Keine Rechnung",
-  "Duration (in minutes)": "Dauer (in Minuten)"
+  "Duration (in minutes)": "Dauer (in Minuten)",
+  "Update": "Aktualisieren",
+  "Invoice type": "Rechnungsart",
+  "Payment Due Date": "Fälligkeitsdatum",
+  "Service Deliver Date": "Leistungszeitraum",
+  "Purchase order no.": "Bestellnummer",
+  "Additional documents": "Zusätzliche Dokumente",
+  "To (Customer)": "An (Kunde)",
+  "Total Price (excl. VAT)": "Gesamtpreis (exkl. MwSt.)",
+  "Remove Description": "Beschreibung entfernen",
+  "Subtotal (excl. VAT)": "Zwischensumme (exkl. MwSt.)",
+  "Total amount (incl. VAT)": "Gesamtbetrag (inkl. MwSt.)",
+  "Add Discount": "Rabatt hinzufügen",
+  "Lump-sum": "Pauschalbetrag",
+  "Percentage": "Prozent"
 }
