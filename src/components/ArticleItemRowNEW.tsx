@@ -264,12 +264,12 @@ export const ArticleItemRowNEW = ({
                 return false;
               }
 
-              const MAX_LIMIT: number =
+              const maxDiscount: number =
                 formik.values.discount?.type === DiscountType.AMOUNT
                   ? totalPriceExclVat
                   : 100;
 
-              return floatValue <= MAX_LIMIT;
+              return floatValue <= maxDiscount;
             }}
             customInput={TextField}
             allowLeadingZeros={false}
