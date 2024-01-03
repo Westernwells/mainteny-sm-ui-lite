@@ -492,10 +492,12 @@ export const InvoiceForm = ({
           ? new Date(serviceOrder.actualEndTime)
           : undefined,
       );
-      formik.setFieldValue(
-        'items',
-        serviceOrder.articles.map(articleViewToItem),
-      );
+      if (!formik.values.items.length) {
+        formik.setFieldValue(
+          'items',
+          serviceOrder.articles.map(articleViewToItem),
+        );
+      }
 
       // if customer is changed, then update billing address
       if (serviceOrderCustomer.id !== customer?.id) {
