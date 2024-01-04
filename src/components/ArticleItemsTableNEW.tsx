@@ -226,6 +226,8 @@ export const ArticleItemsTableNEW = ({
     }
   };
 
+  const discountText = selectedLng === 'DE' ? 'Rabatt' : t('Discount');
+
   const columns: {name: string; align?: TableCellProps['align']}[] = [
     {name: '#'},
     {name: 'Name'},
@@ -233,7 +235,7 @@ export const ArticleItemsTableNEW = ({
     {name: 'Quantity', align: 'right'},
     {name: 'VAT (%)', align: 'right'},
     {name: 'Unit'},
-    {name: 'Discount'},
+    {name: discountText},
     {name: 'Total Price (excl. VAT)'},
     {name: ''},
   ];
@@ -333,7 +335,7 @@ export const ArticleItemsTableNEW = ({
                 formik.values.discount?.type === DiscountType.PERCENTAGE ? (
                   <>
                     <Typography variant="body2" color="text.secondary">
-                      {t('Discount')}
+                      {discountText}
                     </Typography>
                     <Box display="flex" alignItems="center" gap={1}>
                       <FormSelect
