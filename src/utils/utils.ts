@@ -283,4 +283,4 @@ export const getUserFullName = ({
 }: {
   firstName?: string;
   lastName?: string;
-}) => `${firstName} ${lastName}`;
+}) => `${firstName} ${lastName}`.trim();
