@@ -958,8 +958,8 @@
   "Additional Information": "Zusätzliche Informationen",
   "Customer will be billed monthly in advance of the provision of Services and payment of such fees will be due within thirty (30) days of the date of each invoice": "Der Kunde erhält monatlich im Voraus eine Rechnung für die Erbringung der Dienstleistungen, die innerhalb von dreißig (30) Tagen nach Rechnungsdatum zu begleichen ist.",
   "Full Invoice": "Gesamtrechnung",
-  "Unit Price": "Preis je Einheit",
   "Quantity": "Menge",
+  "Unit Price": "Einzelpreis",
   "Total Price": "Gesamtpreis",
   "(excl VAT)": "(ohne MwSt.)",
   "Partial Invoice": "Teilrechnung",
@@ -1970,5 +1970,7 @@
   "Labor and material cost": "Lohn- und Materialkosten",
   "Final invoice": "Abschlussrechnung",
   "Auto-generated": "Auto. generiert",
-  "Not Sent": "Nicht gesendet"
+  "Not Sent": "Nicht gesendet",
+  "VAT (%)": "MwSt. (%)",
+  "Click to hide this section from the invoice. Hidden sections won't appear in the final document or any exported versions.": "Klicken Sie, um diesen Abschnitt aus der Rechnung auszublenden. Ausgeblendete Abschnitte werden weder im endgültigen Dokument noch in exportierten Versionen angezeigt."
 }

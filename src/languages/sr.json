@@ -963,8 +963,8 @@
   "Total Price (incl VAT)": "Ukupna cijena ( sa PDV )",
   "Additional Information": "Dodatne Informacije",
   "Customer will be billed monthly in advance of the provision of Services and payment of such fees will be due within thirty (30) days of the date of each invoice": "Kupcu će se naplaćivati mjesečno prije pružanja Servisa i plaćanje takvih naknada će biti dospjelo u roku od trideset (30) dana od datuma svake fakture",
-  "Unit Price": "Cijena po jedinici",
   "Quantity": "Količina",
+  "Unit Price": "Cijena po jedinici",
   "Total Price": "Ukupna cijena",
   "(excl VAT)": "( bez PDV-a )",
   "Partial Invoice": "Djelimična faktura",
@@ -1989,5 +1989,11 @@
   "Total amount (incl. VAT)": "Ukupan iznos (sa PDV-om)",
   "Add Discount": "Dodaj popust",
   "Lump-sum": "Ukupna suma",
-  "Percentage": "Percenat"
+  "Percentage": "Percenat",
+  "Labor and material cost": "Troškovi rada i materijala",
+  "Final invoice": "Konačna faktura",
+  "Auto-generated": "Automatski generisano",
+  "Not Sent": "Nije poslata",
+  "VAT (%)": "PDV %",
+  "Click to hide this section from the invoice. Hidden sections won't appear in the final document or any exported versions.": "Kliknite da biste sakrili ovaj odeljak sa fakture. Skriveni odeljci se neće pojaviti u konačnom dokumentu ili bilo kojoj izvezenoj verziji."
 }
