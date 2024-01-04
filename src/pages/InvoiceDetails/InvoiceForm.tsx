@@ -1082,7 +1082,7 @@ export const InvoiceForm = ({
             <Box pb={0.5}>
               <SectionTitle
                 Icon={PinIllustration}
-                title="General information"
+                title="General Information"
               />
             </Box>
             <Box display="flex" justifyContent="space-between" width="100%">
