@@ -702,23 +702,30 @@ export const InvoiceForm = ({
     }
   };
 
+  const isEditAndNoCreator = formType === 'edit' && !invoice?.meta.creator;
+  const hasInvoiceCreator = invoice?.meta?.creator ?? false;
+
+  const createdByName = isEditAndNoCreator
+    ? t('Auto-generated')
+    : getUserFullName(
+        hasInvoiceCreator
+          ? {
+              firstName: invoice?.meta?.creator?.firstName,
+              lastName: invoice?.meta?.creator?.lastName,
+            }
+          : {
+              firstName: user?.userAccount.firstName,
+              lastName: user?.userAccount.lastName,
+            },
+      );
+
+  const createdByPhotoUrl = isEditAndNoCreator
+    ? undefined
+    : invoice?.meta?.creator?.photoUrl ?? user?.userAccount.photoUrl;
+
   const createdBy = {
-    name:
-      formType === 'edit' && !invoice?.meta.creator
-        ? t('Auto-generated')
-        : invoice?.meta.creator
-        ? getUserFullName({
-            firstName: invoice.meta.creator.firstName,
-            lastName: invoice.meta.creator.lastName,
-          })
-        : getUserFullName({
-            firstName: user?.userAccount.firstName,
-            lastName: user?.userAccount.lastName,
-          }),
-    photoUrl:
-      formType === 'edit' && !invoice?.meta.creator
-        ? undefined
-        : invoice?.meta.creator?.photoUrl ?? user?.userAccount.photoUrl,
+    name: createdByName,
+    photoUrl: createdByPhotoUrl,
   };
 
   return (
