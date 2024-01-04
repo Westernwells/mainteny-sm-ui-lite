@@ -702,6 +702,32 @@ export const InvoiceForm = ({
     }
   };
 
+  const isEditAndNoCreator = formType === 'edit' && !invoice?.meta.creator;
+  const hasInvoiceCreator = invoice?.meta?.creator ?? false;
+
+  const createdByName = isEditAndNoCreator
+    ? t('Auto-generated')
+    : getUserFullName(
+        hasInvoiceCreator
+          ? {
+              firstName: invoice?.meta?.creator?.firstName,
+              lastName: invoice?.meta?.creator?.lastName,
+            }
+          : {
+              firstName: user?.userAccount.firstName,
+              lastName: user?.userAccount.lastName,
+            },
+      );
+
+  const createdByPhotoUrl = isEditAndNoCreator
+    ? undefined
+    : invoice?.meta?.creator?.photoUrl ?? user?.userAccount.photoUrl;
+
+  const createdBy = {
+    name: createdByName,
+    photoUrl: createdByPhotoUrl,
+  };
+
   return (
     <Box>
       {/* {invoice && (
@@ -1074,13 +1100,11 @@ export const InvoiceForm = ({
                 </Typography>
                 <Box display="flex" alignItems="center" gap={1} pt={0.5}>
                   <Avatar
-                    src={user?.userAccount.photoUrl}
+                    src={createdBy.photoUrl}
                     sx={{width: 24, height: 24}}
                   />
                   <Typography variant="subtitle2" color="primary.dark">
-                    {user?.userAccount
-                      ? getUserFullName(user.userAccount)
-                      : null}
+                    {createdBy.name}
                   </Typography>
                 </Box>
               </Box>

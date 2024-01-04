@@ -1,5 +1,4 @@
 import {AddressRecord, Coord, GeocodeAddress, Language} from 'models/misc';
-import {UserAccount} from 'models/user';
 
 export const capitalize = (role: any[]) => {
   let roles = '';
@@ -278,5 +277,10 @@ export const objectKeyByValue = (obj: Record<string, any>, value: string) =>
 
 export const dateToString = (date: Date) => date.toISOString().split('T')[0];
 
-export const getUserFullName = (user: UserAccount) =>
-  `${user.firstName} ${user.lastName}`;
+export const getUserFullName = ({
+  firstName = '',
+  lastName = '',
+}: {
+  firstName?: string;
+  lastName?: string;
+}) => `${firstName} ${lastName}`.trim();
