@@ -1952,6 +1952,7 @@
   "Non maintenance": "Sonstiger Vertrag",
   "No Invoice": "Keine Rechnung",
   "Duration (in minutes)": "Dauer (in Minuten)",
+  "Edit from": "Bearbeite Sender",
   "Update": "Aktualisieren",
   "Invoice type": "Rechnungsart",
   "Payment Due Date": "Fälligkeitsdatum",
@@ -1965,5 +1966,7 @@
   "Total amount (incl. VAT)": "Gesamtbetrag (inkl. MwSt.)",
   "Add Discount": "Rabatt hinzufügen",
   "Lump-sum": "Pauschalbetrag",
-  "Percentage": "Prozent"
+  "Percentage": "Prozent",
+  "Labor and material cost": "Lohn- und Materialkosten",
+  "Final invoice": "Abschlussrechnung"
 }
