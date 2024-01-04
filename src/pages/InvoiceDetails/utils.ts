@@ -16,7 +16,24 @@ export const formatInvoiceRecord = (
   dueDate: value.dueDate ? dateToString(value.dueDate) : '',
   sentDate: value.sentDate ? dateToString(value.sentDate) : '',
   type: value.type,
-  items: value.items,
+  items: value.items.map((item) => ({
+    ...item,
+    discount: item.discount
+      ? {
+          ...item.discount,
+          amount:
+            item.discount.type === 'AMOUNT'
+              ? {
+                  ...item.discount?.amount,
+                  currency: item.discount?.amount?.currency!,
+                  value:
+                    (item.discount?.amount?.value ?? 0) *
+                    10 ** (item.discount?.amount?.fractionDigits ?? 2),
+                }
+              : undefined,
+        }
+      : undefined,
+  })),
   paymentTerms: value.paymentTerms,
   propertyOwnerId: value.propertyOwnerId,
   serviceCompanyId: value.serviceCompanyId,
@@ -40,6 +57,21 @@ export const formatInvoiceRecord = (
   deliveryEndDate: value.deliveryEndDate
     ? dateToString(value.deliveryEndDate)
     : '',
+  ...(value.discount && {
+    discount: {
+      ...value.discount,
+      amount:
+        value.discount?.type === 'AMOUNT'
+          ? {
+              ...value.discount?.amount,
+              currency: value.discount?.amount?.currency!,
+              value:
+                (value.discount?.amount?.value ?? 0) *
+                10 ** (value.discount?.amount?.fractionDigits ?? 2),
+            }
+          : undefined,
+    },
+  }),
 });
 
 export const applyDiscount = ({
@@ -70,13 +102,9 @@ export const getAggregatedItemsVats = (
     const {percentageVat} = item.unitAmount;
     const vat = subtotalExclVatAfterDiscount * (percentageVat / 100);
 
-    const existingItemIndex = acc.findIndex(
-      (i) => i.percentageVat === percentageVat,
-    );
+    const hasPercentageVat = acc.find((i) => i.percentageVat === percentageVat);
 
-    if (existingItemIndex !== -1) {
-      acc[existingItemIndex].vat += vat;
-    } else {
+    if (!hasPercentageVat) {
       acc.push({percentageVat, vat});
     }
 

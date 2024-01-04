@@ -143,7 +143,7 @@ const articleViewToItem = (
     article: articleView.article,
     name: articleView.name,
     description: articleView.description,
-    quantity: 1,
+    quantity: articleView.quantity,
     unitAmount: articleView.unitAmount,
   };
   return getItemRecord(record, record.unitAmount.percentageVat);
@@ -156,9 +156,23 @@ const invoiceItemToInvoiceItemRecord = (
     article: invoiceItem.article,
     name: invoiceItem.name,
     description: invoiceItem.description,
-    quantity: 1,
+    quantity: invoiceItem.quantity,
     unitAmount: invoiceItem.unitAmount,
-    discount: invoiceItem.additionalInfo?.discount,
+    discount: invoiceItem.additionalInfo?.discount
+      ? {
+          ...invoiceItem.additionalInfo?.discount,
+          amount: invoiceItem.additionalInfo?.discount?.amount
+            ? {
+                ...invoiceItem.additionalInfo?.discount?.amount,
+                value:
+                  (invoiceItem.additionalInfo?.discount?.amount?.value ?? 0) /
+                  10 **
+                    (invoiceItem.additionalInfo.discount.amount
+                      .fractionDigits ?? 2),
+              }
+            : undefined,
+        }
+      : undefined,
     payment: invoiceItem.additionalInfo?.payment,
   };
   return getItemRecord(record, record.unitAmount.percentageVat);
@@ -451,7 +465,24 @@ export const InvoiceForm = ({
         invoice?.additionalInfo.laborMaterialCostText ||
           DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
       );
-      formik.setFieldValue('discount', invoice?.additionalInfo?.discount);
+      formik.setFieldValue(
+        'discount',
+        invoice?.additionalInfo?.discount
+          ? {
+              ...invoice?.additionalInfo?.discount,
+              amount: invoice?.additionalInfo?.discount?.amount
+                ? {
+                    ...invoice?.additionalInfo?.discount?.amount,
+                    value:
+                      (invoice?.additionalInfo?.discount?.amount?.value ?? 0) /
+                        10 **
+                          (invoice?.additionalInfo?.discount?.amount
+                            ?.fractionDigits ?? 2) || 0,
+                  }
+                : undefined,
+            }
+          : undefined,
+      );
       formik.setFieldValue(
         'deliveryStartDate',
         invoice?.additionalInfo?.deliveryStartDate

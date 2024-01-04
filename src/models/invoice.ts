@@ -263,7 +263,7 @@ export interface InvoiceFormData {
   description: string;
   dueDate?: Date;
   sentDate?: Date;
-  items: QuotationItemRecord[] | InvoiceItemRecord<Amount>[];
+  items: InvoiceItemRecord<Amount>[];
   paymentInfo: PaymentInfo;
   paymentTerms: string;
   propertyOwnerId: string;
