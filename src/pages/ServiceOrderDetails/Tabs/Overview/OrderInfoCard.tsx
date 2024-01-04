@@ -28,7 +28,6 @@ import {
 } from 'utils/service-order-utils';
 import {MenuBtn} from 'components/MenuBtn';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
-import {olStyles} from 'styles';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useTheme} from '@mui/material';
 import {ScheduleDialog} from './ScheduleDialog';
@@ -276,8 +275,6 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
               color={getServiceOrderStatusColor(serviceOrderDetails.status)}
               label={serviceOrderStatusToString(serviceOrderDetails.status)}
               style={{
-                ...olStyles.orderStatus,
-                letterSpacing: 'normal',
                 marginLeft: '2em',
               }}
             />
