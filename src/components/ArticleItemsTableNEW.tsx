@@ -22,6 +22,8 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   applyDiscount,
+  applyGlobalDiscountOnItems,
+  applyPerItemDiscountOnItems,
   getAggregatedItemsVats,
 } from 'pages/InvoiceDetails/utils';
 import {TabItems, Tabs} from 'components/Tab';
@@ -87,22 +89,29 @@ export const ArticleItemsTableNEW = ({
       : {percentage: formik.values.discount?.percentage ?? 0}),
   });
 
-  const allItemsHasSameVAT = items.every(
+  const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(items);
+
+  const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
+    itemsAfterPerItemDiscount,
+    formik.values.discount,
+  );
+
+  const allItemsHasSameVAT = itemsAfterGlobalDiscount.every(
     (item) =>
       item.unitAmount.percentageVat === items[0].unitAmount.percentageVat,
   );
 
-  const percentageVats = items.length
+  const percentageVats = itemsAfterGlobalDiscount.length
     ? allItemsHasSameVAT
       ? [
           {
-            percentageVat: items[0].unitAmount.percentageVat,
+            percentageVat: itemsAfterGlobalDiscount[0].unitAmount.percentageVat,
             vat:
               subtotalExclVatAfterDiscount *
-              (items[0].unitAmount.percentageVat / 100),
+              (itemsAfterGlobalDiscount[0].unitAmount.percentageVat / 100),
           },
         ]
-      : getAggregatedItemsVats(items, subtotalExclVatAfterDiscount)
+      : getAggregatedItemsVats(itemsAfterGlobalDiscount)
     : [];
 
   const totalAmountInclVats = calculateTotalAmountInclVats({
