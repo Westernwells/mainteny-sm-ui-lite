@@ -119,8 +119,9 @@ export const UnitListingView = () => {
 
   const handleSortModelChange = useCallback((sortModel: GridSortModel) => {
     // Here you save the data you need from the sort model
-    setSortOrder(sortModel[0].sort?.toUpperCase() as Order);
-    setOrderBy(sortModel[0].field as ServiceOrderOrderField);
+
+    setSortOrder(sortModel[0]?.sort?.toUpperCase() as Order);
+    setOrderBy(sortModel[0]?.field as ServiceOrderOrderField);
   }, []);
 
   if (isFetched && !totalUnitsRef.current) {
