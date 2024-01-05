@@ -859,16 +859,10 @@ export const InvoiceForm = ({
               <>
                 <Grid item xs={6}>
                   <SelectAndEditCombined
-                    selected={!!formik.values.billingAddress?.fullName}
+                    selected={!!formik.values.billingAddress?.component?.name}
                     label="Billing Address"
                     buttonText="Add Billing Address"
-                    cardHeader={
-                      formik.values.billingAddress ? (
-                        <Typography variant="body2">
-                          {formik.values.billingAddress.fullName}
-                        </Typography>
-                      ) : null
-                    }
+                    address={formik.values.billingAddress}
                     cardOnClose={() => removeAddress('billingAddress')}
                     editButtonText="Edit Billing Address"
                     modalHeader="Edit Billing Address"
@@ -878,16 +872,12 @@ export const InvoiceForm = ({
                 </Grid>
                 <Grid item xs={6} pl={2}>
                   <SelectAndEditCombined
-                    selected={!!formik.values.beneficiaryAddress?.fullName}
+                    selected={
+                      !!formik.values.beneficiaryAddress?.component?.name
+                    }
                     label="Beneficiary Address"
                     buttonText="Add Beneficiary Address"
-                    cardHeader={
-                      formik.values.beneficiaryAddress ? (
-                        <Typography variant="body2">
-                          {formik.values.beneficiaryAddress.fullName}
-                        </Typography>
-                      ) : null
-                    }
+                    address={formik.values.beneficiaryAddress}
                     cardOnClose={() => removeAddress('beneficiaryAddress')}
                     editButtonText="Edit Beneficiary Address"
                     modalHeader="Edit Beneficiary Address"
@@ -898,7 +888,9 @@ export const InvoiceForm = ({
 
                 <Grid item xs={6}>
                   <SelectAndEditCombined
-                    selected={!!formik.values.alternativeAddress?.fullName}
+                    selected={
+                      !!formik.values.alternativeAddress?.component?.name
+                    }
                     label={
                       <Box>
                         <FormLabel
@@ -924,13 +916,7 @@ export const InvoiceForm = ({
                       </Box>
                     }
                     buttonText="Add Alternative Address"
-                    cardHeader={
-                      formik.values.alternativeAddress ? (
-                        <Typography variant="body2">
-                          {formik.values.alternativeAddress.fullName}
-                        </Typography>
-                      ) : null
-                    }
+                    address={formik.values.alternativeAddress}
                     cardOnClose={() => removeAddress('alternativeAddress')}
                     editButtonText="Edit Alternative Address"
                     modalHeader="Edit Alternative Address"
