@@ -13,6 +13,7 @@ interface Props {
   handleChange: (val: ChangeEvent<HTMLInputElement>) => void;
   tooltipTitle: string;
   disabled: boolean;
+  handleAction: () => void;
 }
 
 export const InvoiceCheckboxNEW = ({
@@ -21,6 +22,7 @@ export const InvoiceCheckboxNEW = ({
   handleChange,
   tooltipTitle,
   disabled,
+  handleAction,
 }: Props) => (
   <Tooltip
     disableHoverListener={!disabled}
@@ -40,7 +42,7 @@ export const InvoiceCheckboxNEW = ({
         typographyProps={{variant: 'body2'}}
         checkboxProps={{sx: {py: 0}}}
       />
-      <IconButton disabled={disabled}>
+      <IconButton disabled={disabled} onClick={handleAction}>
         <OpenInNew
           fontSize="small"
           sx={{color: theme.palette.secondary.dark}}
