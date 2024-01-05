@@ -200,7 +200,7 @@ export const BasicCustomerForm = ({formik}: Props) => {
                 externalIdValue: formik.values.externalId,
                 handleAction: companyAutoNumberConfig?.configRecords.find(
                   (item: any) =>
-                    item.type === ServiceCompanyNumberType.PROPERTY_OWNER,
+                    item?.type === ServiceCompanyNumberType.PROPERTY_OWNER,
                 )?.enabled
                   ? () => {
                       generateNextNumber();
@@ -210,7 +210,7 @@ export const BasicCustomerForm = ({formik}: Props) => {
                     },
                 isEnabled: companyAutoNumberConfig?.configRecords.find(
                   (item: any) =>
-                    item.type === ServiceCompanyNumberType.PROPERTY_OWNER,
+                    item?.type === ServiceCompanyNumberType.PROPERTY_OWNER,
                 )?.enabled,
               }}
               textFieldProps={{
