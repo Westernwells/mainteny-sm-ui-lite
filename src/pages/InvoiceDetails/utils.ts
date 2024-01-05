@@ -1,5 +1,7 @@
 import {
   CreateInvoice,
+  Discount,
+  DiscountType,
   InvoiceFormData,
   InvoiceItemRecord,
   UpdateInvoice,
@@ -94,19 +96,95 @@ export const applyDiscount = ({
   return discountedPrice;
 };
 
-export const getAggregatedItemsVats = (
-  items: InvoiceItemRecord<Amount>[],
-  subtotalExclVatAfterDiscount: number,
-) =>
+export const getAggregatedItemsVats = (items: InvoiceItemRecord<Amount>[]) =>
   items.reduce((acc, item) => {
     const {percentageVat} = item.unitAmount;
-    const vat = subtotalExclVatAfterDiscount * (percentageVat / 100);
 
-    const hasPercentageVat = acc.find((i) => i.percentageVat === percentageVat);
+    const vat =
+      (item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!) *
+      (percentageVat / 100);
 
-    if (!hasPercentageVat) {
+    const foundPercentageVat = acc.find(
+      (i) => i.percentageVat === percentageVat,
+    );
+
+    if (foundPercentageVat) {
+      foundPercentageVat.vat += vat;
+    } else {
       acc.push({percentageVat, vat});
     }
 
     return acc;
   }, [] as {percentageVat: number; vat: number}[]);
+
+export const applyPerItemDiscountOnItems = (arr: InvoiceItemRecord<Amount>[]) =>
+  arr.map((item) => {
+    if (!item.discount) {
+      return item;
+    }
+
+    return {
+      ...item,
+      unitAmount: {
+        ...item.unitAmount,
+        netAmount: applyDiscount({
+          actualValue: item.unitAmount.netAmount * item.quantity,
+          ...(item.discount?.type === DiscountType.AMOUNT
+            ? {
+                amount:
+                  (item.discount?.amount?.value ?? 0) *
+                    10 ** (item.discount?.amount?.fractionDigits ?? 2) ?? 0,
+              }
+            : {percentage: item.discount?.percentage ?? 0}),
+        }),
+      },
+    };
+  });
+
+export const applyGlobalDiscountOnItems = (
+  arr: InvoiceItemRecord<Amount>[],
+  globalDiscount?: Discount,
+) => {
+  if (!globalDiscount) {
+    return arr;
+  }
+
+  if (globalDiscount.type === DiscountType.PERCENTAGE) {
+    return arr.map((item) => ({
+      ...item,
+      unitAmount: {
+        ...item.unitAmount,
+        netAmount: applyDiscount({
+          actualValue: item.unitAmount.netAmount,
+          percentage: globalDiscount.percentage,
+        }),
+      },
+    }));
+  }
+
+  const total = arr
+    .map((item) => item.unitAmount.netAmount)
+    .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
+
+  const globalDiscountAmount =
+    (globalDiscount.amount?.value ?? 0) *
+    10 ** (globalDiscount.amount?.fractionDigits ?? 2);
+
+  return arr.map((item) => {
+    const portion =
+      item.unitAmount.netAmount === total
+        ? 1
+        : item.unitAmount.netAmount / total;
+    const discount = globalDiscountAmount * portion;
+    return {
+      ...item,
+      unitAmount: {
+        ...item.unitAmount,
+        netAmount: applyDiscount({
+          actualValue: item.unitAmount.netAmount,
+          amount: discount,
+        }),
+      },
+    };
+  });
+};
