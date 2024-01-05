@@ -12,13 +12,13 @@ interface Props {
 export const SelectCard = ({header, body, onClose}: Props) => (
   <Box
     display="flex"
-    bgcolor="grey.200"
+    bgcolor="inputBackground.main"
     alignItems="start"
     justifyContent="space-between"
-    px="1em"
-    py=".5em"
+    px={1.5}
+    py={1}
     border="1px solid"
-    borderColor="inputBackground.main"
+    borderColor="text.disabled"
     borderRadius="4px"
     {...(!!body && {minHeight: '5em'})}>
     <Box>
