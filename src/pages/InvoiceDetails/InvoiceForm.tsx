@@ -1297,6 +1297,12 @@ export const InvoiceForm = ({
               checked={
                 !!(isWorkReportPDFGenerated && formik.values.includeWorkReport)
               }
+              handleAction={() =>
+                window.open(
+                  `/orders/details/${serviceOrder?.id}?tab=1`,
+                  '_blank',
+                )
+              }
             />
 
             <InvoiceCheckboxNEW
@@ -1311,6 +1317,12 @@ export const InvoiceForm = ({
               checkboxLabel="Add checklist to invoice"
               checked={
                 !!(isCheckListPDFGenerated && formik.values.includeCheckList)
+              }
+              handleAction={() =>
+                window.open(
+                  `/orders/details/${serviceOrder?.id}?tab=2`,
+                  '_blank',
+                )
               }
             />
           </Grid>
