@@ -5,12 +5,20 @@ import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import {theme} from 'theme';
 import {addDays, addYears, isBefore, parseISO, startOfDay} from 'date-fns';
-import {Avatar, Grid, IconButton, Typography, Box} from '@mui/material';
+import {
+  Avatar,
+  Grid,
+  IconButton,
+  Typography,
+  Box,
+  InputAdornment,
+} from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Send from '@mui/icons-material/Send';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import {SelectCombined} from 'components/SelectCombined';
 import {SelectAndEditCombined} from 'components/SelectAndEditCombined';
 import {ServiceOrdersDataGrid} from 'components/DataGrid/ServiceOrderDataGrid';
@@ -1049,6 +1057,25 @@ export const InvoiceForm = ({
                 multiline: true,
                 value: formik.values.paymentTerms,
                 onChange: formik.handleChange,
+                InputProps: {
+                  endAdornment: (
+                    <InputAdornment
+                      component={IconButton}
+                      disableRipple
+                      position="end"
+                      sx={{
+                        mt: 1,
+                        mr: -1,
+                        alignSelf: 'flex-start',
+                      }}
+                      onClick={() =>
+                        setOpenContractPaymentTermSelectDialog(true)
+                      }
+                      size="small">
+                      <TextSnippetIcon />
+                    </InputAdornment>
+                  ),
+                },
               }}
             />
           </Grid>
