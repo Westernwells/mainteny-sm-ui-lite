@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useContext, useEffect, useMemo, useState} from 'react';
 import {t} from 'i18next';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
@@ -33,6 +33,7 @@ import {SendEmailDialog} from 'components/SendEmailDialog';
 import {Tooltip} from 'components/Tooltip';
 import {ContractPaymentTermSelectDialog} from 'components/ContractPaymentTermSelectDialog';
 import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
+import {LanguageContext} from 'context/LanguageProvider';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateInvoice,
@@ -200,6 +201,7 @@ export const InvoiceForm = ({
   customer: customerByProp,
 }: Props) => {
   const navigate = useNavigate();
+  const {language: selectedLng} = useContext(LanguageContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const [resetDueDatePicker, setResetDueDatePicker] = useState(false);
   const {user} = useUserSession();
@@ -290,12 +292,7 @@ export const InvoiceForm = ({
     beneficialName: '',
     costCenter: '',
     customerSpecificOrderNumber: '',
-    moreInfo: '',
-    laborMaterialCosts: {
-      LABOR: '',
-      MATERIAL: '',
-    },
-    laborMaterialCostText: DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
+    moreInfo: DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
     unitNumber: '-',
   };
 
@@ -459,19 +456,6 @@ export const InvoiceForm = ({
       formik.setFieldValue(
         'items',
         invoice.items.map(invoiceItemToInvoiceItemRecord),
-      );
-      formik.setFieldValue('laborMaterialCosts', {
-        LABOR:
-          invoice?.additionalInfo?.laborMaterialCosts?.LABOR ||
-          'Your labor cost is {LABOR_COST}',
-        MATERIAL:
-          invoice?.additionalInfo?.laborMaterialCosts?.MATERIAL ||
-          'Your material cost is {MATERIAL_COST}',
-      });
-      formik.setFieldValue(
-        'laborMaterialCostText',
-        invoice?.additionalInfo.laborMaterialCostText ||
-          DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
       );
       formik.setFieldValue(
         'discount',
@@ -735,6 +719,8 @@ export const InvoiceForm = ({
     name: createdByName,
     photoUrl: createdByPhotoUrl,
   };
+
+  const notesText = selectedLng === 'DE' ? 'Anmerkungen' : t('Notes');
 
   return (
     <Box>
@@ -1040,11 +1026,11 @@ export const InvoiceForm = ({
             <FormInput
               props={{
                 size: 'small',
-                label: 'Labor and material cost',
-                name: 'laborMaterialCostText',
+                label: notesText,
+                name: 'moreInfo',
                 minRows: 2,
                 multiline: true,
-                value: formik.values.laborMaterialCostText,
+                value: formik.values.moreInfo,
                 onChange: formik.handleChange,
               }}
             />
