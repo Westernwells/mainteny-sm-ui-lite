@@ -82,6 +82,13 @@ export const columns: GridColDef[] = [
     sortable: true,
   }),
   getColumnProps({
+    field: InvoiceOrderField.DUE_DATE,
+    headerName: 'due date',
+    align: 'left',
+    flex: 0.75,
+    sortable: true,
+  }),
+  getColumnProps({
     field: 'order',
     headerName: 'order number',
     align: 'left',
@@ -159,6 +166,9 @@ export const makeRows = (
         id: index,
         [InvoiceOrderField.CREATED_DATE]: item.sentDate
           ? formatDate(toDate(item.sentDate))
+          : '-',
+        [InvoiceOrderField.DUE_DATE]: item.dueDate
+          ? formatDate(toDate(item.dueDate))
           : '-',
         [InvoiceOrderField.NUMBER]:
           item.externalId !== '' ? item.externalId : 'Unassigned',
