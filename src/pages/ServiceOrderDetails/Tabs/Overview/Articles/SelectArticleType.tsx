@@ -169,7 +169,7 @@ export const SelectArticleType = ({
                       color={theme.palette.primary.main}>
                       {getPercentage(
                         formik.values.costPackage?.labor.value ?? 0,
-                        formik.values.unitSellingAmount,
+                        +formik.values.unitSellingAmount,
                       )}
                       {'% '}
                       {t('labor')}
@@ -223,7 +223,7 @@ export const SelectArticleType = ({
                       color={theme.palette.primary.main}>
                       {getPercentage(
                         formik.values.costPackage?.material.value ?? 0,
-                        formik.values.unitSellingAmount,
+                        +formik.values.unitSellingAmount,
                       )}
                       {'% '}
                       {t('material')}

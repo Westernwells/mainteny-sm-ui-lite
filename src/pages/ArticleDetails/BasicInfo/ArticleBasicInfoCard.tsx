@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Create';
@@ -130,20 +130,20 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       unitPurchaseVat: article.unitPurchaseAmount
         ? article.unitPurchaseAmount.percentageVat
         : 0,
-      unitPurchaseAmount: article.unitPurchaseAmount
-        ? Math.round(
-            article.unitPurchaseAmount.netAmount /
-              currencyFactor(article.unitPurchaseAmount),
-          )
-        : 0,
+      unitPurchaseAmount: (article.unitPurchaseAmount
+        ? article.unitPurchaseAmount.netAmount /
+          currencyFactor(article.unitPurchaseAmount)
+        : 0
+      ).toFixed(2),
       unitPurchaseAmountCurrency: article.unitPurchaseAmount
         ? article.unitPurchaseAmount.currency
         : article.unitSellingAmount.currency,
       unitSellingVat: article.unitSellingAmount.percentageVat,
-      unitSellingAmount: Math.round(
-        article.unitSellingAmount.netAmount /
-          currencyFactor(article.unitSellingAmount),
-      ),
+      unitSellingAmount: (article.unitSellingAmount
+        ? article.unitSellingAmount.netAmount /
+          currencyFactor(article.unitSellingAmount)
+        : 0
+      ).toFixed(2),
       unitSellingAmountCurrency: article.unitSellingAmount.currency,
       costPackage: article.additionalInfo.costPackage
         ? {
@@ -187,7 +187,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       unit: formik.values.unit,
       unitPurchaseAmount: amountRecordForBackend(
         makeAmountRecord(
-          formik.values.unitPurchaseAmount,
+          formik.values.unitPurchaseAmount as number,
           article.unitPurchaseAmount
             ? article.unitPurchaseAmount.currency
             : article.unitSellingAmount.currency,
@@ -196,7 +196,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       ),
       unitSellingAmount: amountRecordForBackend(
         makeAmountRecord(
-          formik.values.unitSellingAmount,
+          formik.values.unitSellingAmount as number,
           article.unitSellingAmount.currency,
           formik.values.unitSellingVat,
         ),
@@ -219,15 +219,35 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
     setOpenDialog(false);
   };
 
+  // Re-format the amount(s) after article edit
+  useEffect(() => {
+    formik.setFieldValue(
+      'unitPurchaseAmount',
+      (article.unitPurchaseAmount
+        ? article.unitPurchaseAmount.netAmount /
+          currencyFactor(article.unitPurchaseAmount)
+        : 0
+      ).toFixed(2),
+    );
+    formik.setFieldValue(
+      'unitSellingAmount',
+      (article.unitSellingAmount
+        ? article.unitSellingAmount.netAmount /
+          currencyFactor(article.unitSellingAmount)
+        : 0
+      ).toFixed(2),
+    );
+  }, [article]);
+
   useEffectAfterMount(() => {
     // whenever unitSellingAmount changes, update costPackage labor and material to 50% 50% of unitSellingAmount
     formik.setFieldValue('costPackage', {
       labor: {
-        value: formik.values.unitSellingAmount * 0.5,
+        value: (formik.values.unitSellingAmount as number) * 0.5,
         currency: currentCurrency.code,
       },
       material: {
-        value: formik.values.unitSellingAmount * 0.5,
+        value: (formik.values.unitSellingAmount as number) * 0.5,
         currency: currentCurrency.code,
       },
     });
