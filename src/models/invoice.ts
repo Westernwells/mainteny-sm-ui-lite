@@ -281,11 +281,11 @@ export interface InvoiceFormData {
   beneficiaryAddress?: AddressRecord;
   alternativeAddress?: AddressRecord;
   externalId?: string;
-  laborMaterialCosts: {
+  laborMaterialCosts?: {
     LABOR: string;
     MATERIAL: string;
   };
-  laborMaterialCostText: string;
+  laborMaterialCostText?: string;
   unitNumber?: string;
   alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
   discount?: Discount;
