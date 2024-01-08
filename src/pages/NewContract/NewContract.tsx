@@ -19,12 +19,13 @@ import {
 } from 'models/contract';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {Order} from 'models/misc';
-import {useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {amountRecordForBackend, useCurrentCurrency} from 'utils/currency';
 import {toRestDate} from 'utils/datetime';
 import * as Yup from 'yup';
 import {createEmptyResource} from 'utils/paging-utils';
+import {UserCompanyContext} from 'context/UserCompanyProvider';
 import NewContractBasicInfo from './NewContractBasicInfo';
 import NewContractDocuments from './NewContractDocuments';
 import NewContractSelectUnits from './NewContractSelectUnits';
@@ -62,6 +63,7 @@ const NewContract = () => {
   const [disableNextBtn, setDisableNextBtn] = useState(false);
   const [externalId, setExternalId] = useState('');
 
+  const {company} = useContext(UserCompanyContext);
   const [customer, setCustomer] = useState<PropertyOwnerView>();
 
   const navigate = useNavigate();
@@ -248,8 +250,7 @@ const NewContract = () => {
       price: amountRecordForBackend({
         currency: currentCurrency.code,
         netAmount: +formikContractTerms.values.netAmount,
-        percentageVat:
-          +formikContractTerms.values.annualPriceAdjustmentPercentage,
+        percentageVat: company?.settings?.percentageVat ?? 0,
       }),
       sla: +formikContractTerms.values.serviceLevelAgreement,
       propertyOwnerId: formikBasicInfo.values.propertyOwnerId,
