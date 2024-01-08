@@ -12,7 +12,12 @@ import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {getColumnProps} from 'components/DataGridLayout';
 // import {fetchDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
+import {
+  InvoiceOrderField,
+  InvoiceStatus,
+  InvoiceStatusView,
+  InvoiceView,
+} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
 import {FormatDate} from 'models/misc';
 import {toDate} from '../../utils/datetime';
@@ -35,7 +40,6 @@ export const getInvoiceStatusStyles = (
     | 'warning.light'
     | 'action.active'
     | 'primary.mainLight'
-    | 'action.active'
     | 'warning.dark';
 } => {
   switch (status) {
@@ -58,10 +62,11 @@ export const getInvoiceStatusStyles = (
 
 export const columns: GridColDef[] = [
   getColumnProps({
-    field: 'number',
+    field: InvoiceOrderField.NUMBER,
     headerName: 'number',
     align: 'left',
     flex: 0.5,
+    sortable: true,
   }),
   getColumnProps({
     field: 'customer',
@@ -70,10 +75,11 @@ export const columns: GridColDef[] = [
     flex: 1.5,
   }),
   getColumnProps({
-    field: 'date',
+    field: InvoiceOrderField.CREATED_DATE,
     headerName: 'invoice date',
     align: 'left',
     flex: 0.75,
+    sortable: true,
   }),
   getColumnProps({
     field: 'order',
@@ -151,8 +157,11 @@ export const makeRows = (
   invoices.length
     ? invoices.map((item, index: number) => ({
         id: index,
-        date: item.sentDate ? formatDate(toDate(item.sentDate)) : '-',
-        number: item.externalId !== '' ? item.externalId : 'Unassigned',
+        [InvoiceOrderField.CREATED_DATE]: item.sentDate
+          ? formatDate(toDate(item.sentDate))
+          : '-',
+        [InvoiceOrderField.NUMBER]:
+          item.externalId !== '' ? item.externalId : 'Unassigned',
         order: item.serviceOrder?.number,
         customer: item.propertyOwner.name,
         type: item.serviceOrder?.type,
