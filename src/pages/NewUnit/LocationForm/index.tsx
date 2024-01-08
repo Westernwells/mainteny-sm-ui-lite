@@ -27,6 +27,7 @@ const validationSchema = Yup.object().shape({
         postalCode: Yup.string().required('Postal code is required'),
         state: Yup.string().required('State is required'),
         city: Yup.string().required('City is required'),
+        street: Yup.string().required('Street is required'),
       }),
     }),
 });
@@ -108,6 +109,34 @@ export const LocationForm = ({
               props={{
                 size: 'small',
                 placeholder: '',
+                label: 'Street',
+                name: 'address.component.street',
+                required: true,
+                value: formik.values.address?.component?.street ?? '',
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4} md={4}>
+            <FormInput
+              props={{
+                size: 'small',
+                placeholder: '',
+                label: 'Street 2',
+                name: 'address.component.street2',
+                required: false,
+                value: formik.values.address?.component?.street2 ?? '',
+                onChange: formik.handleChange,
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4} md={4}>
+            <FormInput
+              props={{
+                size: 'small',
+                placeholder: '',
                 label: 'City',
                 name: 'address.component.city',
                 required: true,
@@ -116,6 +145,7 @@ export const LocationForm = ({
               }}
             />
           </Grid>
+
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
               props={{
@@ -130,6 +160,7 @@ export const LocationForm = ({
               }}
             />
           </Grid>
+
           <Grid item xs={12} sm={4} md={4}>
             <FormSelect
               labelId="address.component.country"
@@ -145,6 +176,7 @@ export const LocationForm = ({
               required
             />
           </Grid>
+
           <Grid item xs={12} sm={4} md={4}>
             <FormSelect
               labelId="address.component.state"

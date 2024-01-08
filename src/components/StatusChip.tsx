@@ -24,6 +24,7 @@ const statusColor = {
   'action.active': 'action.active',
   'eden.light': 'eden.light',
   'warning.dark': 'warning.dark',
+  'info.light': 'text.secondary.light',
 };
 interface Props {
   label: string | ReactNode;

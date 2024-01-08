@@ -14,7 +14,6 @@ import {
   CreateArticleRecord,
   QueryArticleParams,
   UpdateArticleRecord,
-  ServiceOrderArticleRecord,
   CreateArticleOrderRecord,
   ArticleOrderView,
   CreateArticleSupplierRecord,
@@ -172,35 +171,6 @@ export const useUpdateArticle = (successMsg?: string) => {
       onError: (err: any) => {
         console.log(err);
         showError(err);
-      },
-    },
-  );
-};
-
-export const updateServiceOrderArticle = async (
-  serviceOrderId: string,
-  body: Partial<ServiceOrderArticleRecord>[],
-) => axiosClient.put(`/api/serviceOrders/${serviceOrderId}/articles`, body);
-
-export const useUpdateServiceOrderArticles = (successMsg?: string) => {
-  const {enqueueSnackbar} = useSnackbar();
-  const queryClient = useQueryClient();
-  return useMutation(
-    ({
-      body,
-      serviceOrderId,
-    }: {
-      body: Partial<ServiceOrderArticleRecord>[];
-      serviceOrderId: string;
-    }) => updateServiceOrderArticle(serviceOrderId, body),
-    {
-      onSuccess: () => {
-        if (successMsg) {
-          enqueueSnackbar(successMsg, {
-            variant: 'success',
-          });
-        }
-        queryClient.invalidateQueries(qk.getServiceOrderDetails);
       },
     },
   );

@@ -58,6 +58,7 @@ export interface ArticleView {
   unitPurchaseAmount: Amount;
   unitSellingAmount: Amount;
   suppliers: ArticleSupplierItemView[];
+  costPackage?: CostPackage;
 }
 
 export interface ArticleViewItem {
@@ -149,6 +150,7 @@ export interface ServiceOrderArticleRecord {
   name: string;
   quantity: number;
   unitAmount: AmountRecord;
+  article: ArticleRecord;
 }
 
 export interface ArticleOrderItemRecord {
@@ -269,4 +271,12 @@ export interface PropertyOwnerArticleRecord {
   unit: string;
   unitPurchaseAmount: AmountRecord;
   unitSellingAmount: AmountRecord;
+}
+
+export interface ArticleRecord {
+  id: string;
+  externalId: string;
+  type: ArticleType;
+  unit: string;
+  costPackage?: CostPackage;
 }

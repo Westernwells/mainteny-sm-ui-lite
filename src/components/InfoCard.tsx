@@ -5,6 +5,7 @@ import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';
 import useTheme from '@mui/material/styles/useTheme';
 import {useTranslation} from 'react-i18next';
+import {CardActions} from '@mui/material';
 
 export interface Props {
   bodyContainerStyle?: {[key: string]: any};
@@ -12,6 +13,7 @@ export interface Props {
   headerStyles?: {[key: string]: string | number};
   minHeight?: string | number;
   header?: string | ReactNode;
+  footer?: string | ReactNode;
   headerActionIcon?: JSX.Element;
   children: ReactNode;
   showHeaderBackground?: boolean;
@@ -25,6 +27,7 @@ export const InfoCard = ({
   minHeight,
   containerStyles,
   header,
+  footer,
   children,
   headerStyles,
   showHeaderBackground,
@@ -40,6 +43,7 @@ export const InfoCard = ({
         minHeight: minHeight || '5rem',
         boxShadow: '0px 4px 15px rgba(144, 144, 144, 0.2)',
         px: '1em',
+        pb: '1em',
         ...containerStyles,
       }}>
       {!disabledHeader && (
@@ -65,6 +69,8 @@ export const InfoCard = ({
         sx={{py: '0', minHeight: '5rem', px: '0', ...bodyContainerStyle}}>
         {children}
       </CardContent>
+
+      <CardActions>{footer}</CardActions>
     </Card>
   );
 };

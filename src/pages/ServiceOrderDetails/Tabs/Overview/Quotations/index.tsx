@@ -11,6 +11,8 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {EmptySection} from 'components/EmptySection';
 import {ServiceOrderView} from 'models/service-order';
 import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
+import {Info} from '@mui/icons-material';
+import {Tooltip} from 'components/Tooltip';
 import {columns, makeRows} from './QuotationsDataGridProps';
 
 interface Props {
@@ -54,14 +56,30 @@ export const Quotation = ({serviceOrder}: Props) => {
   return (
     <InfoCard
       header={<Typography variant="subtitle1">{t('Quotations')}</Typography>}
-      showHeaderBackground>
+      showHeaderBackground
+      headerActionIcon={
+        <Tooltip
+          componentsProps={{
+            tooltip: {
+              sx: {
+                color: 'dark',
+              },
+            },
+          }}
+          title={t(
+            'Only the service orders created out of a quotation will have entries here.',
+          )}
+          arrow
+          placement="top">
+          <Info />
+        </Tooltip>
+      }>
       {!totalQuotationRef ? (
         renderNoRowsSection()
       ) : (
         <DataGridLayout
           fullHeight={false}
-          headerHeight={30}
-          height={getDataGridHeight(rows.length, 3)}
+          height={getDataGridHeight(rows.length, 100)}
           isWidget
           rows={rows}
           columns={columns}

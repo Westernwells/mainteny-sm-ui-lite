@@ -18,7 +18,7 @@ import {useFormik} from 'formik';
 import {ArticleView, UpdateArticleRecord} from 'models/article';
 import {ArticleBasicFormModel} from 'models/articleForm';
 import {Dialog} from 'components/Dialog';
-import {useUpdateArticle} from 'hooks/reactQuery/useArticle';
+import {useArticles, useUpdateArticle} from 'hooks/reactQuery/useArticle';
 import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {CardProps} from 'components/CardProps';
 import {InfoCard} from 'components/InfoCard';
@@ -31,43 +31,20 @@ import {
 } from 'utils/currency';
 import {convertToText} from 'utils/utils';
 import {handleCostPackageValidation} from 'utils/article-utils';
+import {createEmptyResource} from 'utils/paging-utils';
 import {EditBasicInfoForm} from './EditBasicInfoForm';
 
-const validationSchema = Yup.object().shape({
-  category: Yup.string().nullable(),
-  name: Yup.string().nullable().required('Name is required'),
-  externalId: Yup.string().nullable(),
-  type: Yup.string().nullable().required('Type is required'),
-  unit: Yup.string().nullable(),
-  unitPurchaseVat: Yup.number()
-    .required('Purchase VAT is required')
-    .min(0)
-    .max(100),
-  unitSellingVat: Yup.number()
-    .required('Selling VAT is required')
-    .min(0)
-    .max(100),
-  unitSellingAmount: Yup.number()
-    .nullable()
-    .required('Selling price is required'),
-  costPackage: Yup.object().shape({
-    // amount should be required and sum of labor and material should be equal to unitSellingAmount
-    labor: Yup.object().shape({
-      value: Yup.number().test(
-        'value',
-        'The sum of labor and material prices should be equal to Selling price',
-        handleCostPackageValidation,
-      ),
-    }),
-    material: Yup.object().shape({
-      value: Yup.number().test(
-        'value',
-        'The sum of labor and material prices should be equal to Selling price',
-        handleCostPackageValidation,
-      ),
-    }),
-  }),
-});
+const isExternalIdUnique = async (resource: ArticleView[], value?: string) => {
+  if (!value) {
+    return true;
+  }
+  try {
+    return !(resource && resource.some((item) => item.externalId === value));
+  } catch (error) {
+    console.error('Error checking externalId uniqueness:', error);
+    return true;
+  }
+};
 
 export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
   const theme = useTheme();
@@ -77,6 +54,68 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
   const {mutateAsync: updateArticle, isLoading} = useUpdateArticle(
     t('Article updated successfully.'),
   );
+
+  const [initValue, setInitValue] = useState('');
+  const [updatedValue, setUpdatedValue] = useState('');
+
+  const {data: articleResource = createEmptyResource<ArticleView>(50)} =
+    useArticles(
+      {
+        pageIndex: 0,
+        pageSize: 50,
+        query: updatedValue,
+        type: [],
+      },
+      {keepPreviousData: true},
+      true,
+    );
+
+  const validationSchema = Yup.object().shape({
+    category: Yup.string().nullable(),
+    name: Yup.string().nullable().required('Name is required'),
+    externalId: Yup.string()
+      .nullable()
+      .test(
+        'checkExternalId',
+        'This ID is already taken. Please enter a different one.',
+        async (value) => {
+          if (value !== initValue) {
+            return isExternalIdUnique(articleResource.data, value!);
+          }
+          return true;
+        },
+      ),
+    type: Yup.string().nullable().required('Type is required'),
+    unit: Yup.string().nullable(),
+    unitPurchaseVat: Yup.number()
+      .required('Purchase VAT is required')
+      .min(0)
+      .max(100),
+    unitSellingVat: Yup.number()
+      .required('Selling VAT is required')
+      .min(0)
+      .max(100),
+    unitSellingAmount: Yup.number()
+      .nullable()
+      .required('Selling price is required'),
+    costPackage: Yup.object().shape({
+      // amount should be required and sum of labor and material should be equal to unitSellingAmount
+      labor: Yup.object().shape({
+        value: Yup.number().test(
+          'value',
+          'The sum of labor and material prices should be equal to Selling price',
+          handleCostPackageValidation,
+        ),
+      }),
+      material: Yup.object().shape({
+        value: Yup.number().test(
+          'value',
+          'The sum of labor and material prices should be equal to Selling price',
+          handleCostPackageValidation,
+        ),
+      }),
+    }),
+  });
 
   const formik = useFormik<ArticleBasicFormModel>({
     initialValues: {
@@ -126,6 +165,14 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
     onSubmit: () => {},
     validationSchema,
   });
+
+  useEffect(() => {
+    setInitValue(formik.values.externalId!);
+  }, []);
+
+  useEffect(() => {
+    setUpdatedValue(formik.values.externalId);
+  }, [formik]);
 
   const saveArticle = async () => {
     const factor = currencyFactor({currency: currentCurrency.code});
@@ -207,6 +254,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
   }, [formik.values.unitSellingAmount]);
 
   const handleCancel = () => {
+    formik.resetForm();
     setOpenDialog(false);
   };
 
@@ -302,7 +350,9 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
         isSaving={isLoading}
         onCancel={handleCancel}
         disableSaveBtn={
-          !!Object.keys(formik.errors).length || !formik.values.type
+          !!Object.keys(formik.errors).length ||
+          !formik.values.type ||
+          !formik.dirty
         }
         onSave={saveArticle}
         dialogProps={{

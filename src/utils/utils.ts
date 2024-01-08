@@ -276,3 +276,11 @@ export const objectKeyByValue = (obj: Record<string, any>, value: string) =>
   Object.keys(obj)[Object.values(obj).indexOf(value)];
 
 export const dateToString = (date: Date) => date.toISOString().split('T')[0];
+
+export const getUserFullName = ({
+  firstName = '',
+  lastName = '',
+}: {
+  firstName?: string;
+  lastName?: string;
+}) => `${firstName} ${lastName}`.trim();

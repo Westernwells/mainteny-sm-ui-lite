@@ -4,6 +4,7 @@ import {mixpanelEvents} from 'mixpanel/constants';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {
+  ServiceOrderPaymentStatus,
   ServiceOrderStatus,
   ServiceOrderType,
   ServiceOrderView,
@@ -19,16 +20,27 @@ import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {FlexContainer} from 'components/FlexContainer';
 import {
-  getServiceOrderStatusList,
-  getSelectedOrderStatuses,
   serviceOrderTypeToEnum,
   serviceOrderTypeToString,
+  serviceOrderPaymentStatusToString,
+  serviceOrderPaymentStatusToEnum,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import {Widget} from 'components/Widget';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
 import {columns, makeRows} from './ServiceOrderDataGridProps';
+
+const serviceOrderStatusMap = {
+  Unscheduled: ServiceOrderStatus.READY_TO_SCHEDULE,
+  Scheduling: ServiceOrderStatus.SCHEDULING,
+  Pending: ServiceOrderStatus.SCHEDULED,
+  Ongoing: ServiceOrderStatus.IN_PROGRESS,
+  Completed: ServiceOrderStatus.COMPLETED,
+  Cancelled: ServiceOrderStatus.CANCELLED,
+  Expired: ServiceOrderStatus.EXPIRED,
+};
+type serviceOrderStatusMapKey = keyof typeof serviceOrderStatusMap;
 
 export const ServiceOrderList = () => {
   const navigate = useNavigate();
@@ -40,6 +52,9 @@ export const ServiceOrderList = () => {
   const totalOrederRef = useRef(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [searchQuery, setSearchQuery] = useQueryState('searchServiceOrders');
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useQueryState<
+    ServiceOrderPaymentStatus[]
+  >('selectedPaymentStatus', {defaultValue: []});
   const [selectedOrderStatus, setSelectedOrderStatus] = useQueryState<
     ServiceOrderStatus[]
   >('selectedOrderStatus', {defaultValue: []});
@@ -63,12 +78,19 @@ export const ServiceOrderList = () => {
       query: searchQuery,
       status: selectedOrderStatus,
       types: selectedOrderTypes,
+      paymentStatus: selectedPaymentStatus,
     },
     {keepPreviousData: true},
   );
 
   totalOrederRef.current =
     totalOrederRef.current || serviceOrdersResource.total;
+
+  useEffect(() => {
+    if (textInput.current && !textInput.current.value) {
+      textInput.current.value = searchQuery;
+    }
+  }, []);
 
   useEffect(() => {
     if (
@@ -80,15 +102,12 @@ export const ServiceOrderList = () => {
         pageIndex: 0,
       });
     }
-
-    if (textInput.current) {
-      textInput.current.value = searchQuery;
-    }
   }, [
     searchQuery,
     selectedOrderTypes,
     selectedOrderStatus,
     serviceOrdersResource,
+    selectedPaymentStatus,
   ]);
 
   useEffect(() => {
@@ -101,11 +120,6 @@ export const ServiceOrderList = () => {
     setPageCount(Math.ceil(serviceOrdersResource.total / page.pageSize));
   }, [serviceOrdersResource, page.pageSize]);
 
-  const getSelectedStatusValues = (items: string[]) => {
-    const selectedOrderStatuses = getSelectedOrderStatuses(items);
-    setSelectedOrderStatus(selectedOrderStatuses as ServiceOrderStatus[]);
-  };
-
   const renderFilterItems = () => (
     <FilterFields
       onClear={() => {
@@ -115,10 +129,41 @@ export const ServiceOrderList = () => {
         }
       }}
       showFilter>
+      <Box sx={{width: '100%'}}>
+        <MultipleSelectCheckmarks
+          label="Job Type"
+          options={Object.keys(ServiceOrderType).map((i) =>
+            serviceOrderTypeToString(i),
+          )}
+          initialSelectedItems={selectedOrderTypes.map((i) =>
+            serviceOrderTypeToString(i),
+          )}
+          getSelectedValue={(item) => {
+            const orderTypes = item.map((i) => serviceOrderTypeToEnum(i));
+            setSelectedOrderTypes(orderTypes as ServiceOrderType[]);
+          }}
+          multiple
+        />
+      </Box>
+
       <MultipleSelectCheckmarks
-        label="Status"
-        options={getServiceOrderStatusList()}
-        getSelectedValue={getSelectedStatusValues}
+        label="Job Status"
+        options={[
+          ServiceOrderStatus.READY_TO_SCHEDULE,
+          ServiceOrderStatus.SCHEDULING,
+          ServiceOrderStatus.SCHEDULED,
+          ServiceOrderStatus.IN_PROGRESS,
+          ServiceOrderStatus.COMPLETED,
+          ServiceOrderStatus.CANCELLED,
+          ServiceOrderStatus.EXPIRED,
+        ].map((item) => serviceOrderStatusToString(item))}
+        getSelectedValue={(item) =>
+          setSelectedOrderStatus(
+            item.map(
+              (i) => serviceOrderStatusMap[i as serviceOrderStatusMapKey],
+            ),
+          )
+        }
         initialSelectedItems={selectedOrderStatus.map((i) =>
           serviceOrderStatusToString(i),
         )}
@@ -126,17 +171,21 @@ export const ServiceOrderList = () => {
       />
 
       <MultipleSelectCheckmarks
-        label="Order types"
-        options={Object.keys(ServiceOrderType).map((i) =>
-          serviceOrderTypeToString(i),
-        )}
-        initialSelectedItems={selectedOrderTypes.map((i) =>
-          serviceOrderTypeToString(i),
+        label="Payment Status"
+        options={Object.values(ServiceOrderPaymentStatus).map((value) =>
+          serviceOrderPaymentStatusToString(value),
         )}
         getSelectedValue={(item) => {
-          const orderTypes = item.map((i) => serviceOrderTypeToEnum(i));
-          setSelectedOrderTypes(orderTypes as ServiceOrderType[]);
+          const paymentStatus = item.map((i) =>
+            serviceOrderPaymentStatusToEnum(i),
+          );
+          setSelectedPaymentStatus(
+            paymentStatus as ServiceOrderPaymentStatus[],
+          );
         }}
+        initialSelectedItems={selectedPaymentStatus.map((i) =>
+          serviceOrderPaymentStatusToString(i),
+        )}
         multiple
       />
     </FilterFields>
@@ -181,6 +230,7 @@ export const ServiceOrderList = () => {
       <DataGridLayout
         rows={rows}
         columns={columns}
+        aria-label="jobs-grid"
         loading={isFetching}
         pageSize={page.pageSize}
         scrollToTop={searchQuery}

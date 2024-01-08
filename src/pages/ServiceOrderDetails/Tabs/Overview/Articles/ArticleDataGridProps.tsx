@@ -3,28 +3,26 @@ import {formatCurrency} from 'utils/currency';
 import {ServiceOrderArticleView} from 'models/service-order';
 import {getColumnProps} from 'components/DataGridLayout';
 import Box from '@mui/material/Box';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import IconButton from '@mui/material/IconButton';
+import {Actions} from './Actions';
 
 export enum ActionTypes {
   EDIT = 'EDIT',
   DELETE = 'DELETE',
 }
 
-export const columns = (
-  handleAction: (val: ServiceOrderArticleView, actionType: ActionTypes) => void,
-): GridColDef[] => [
+export const columns: GridColDef[] = [
   getColumnProps({
     field: 'no',
     headerName: 'No.',
     flex: 0.3,
+    variant: 'titleCase',
   }),
   getColumnProps({
     field: 'name',
     headerName: 'NAME',
     cellClassName: 'truncateText',
     flex: 2,
+    variant: 'titleCase',
   }),
   getColumnProps({
     field: 'number',
@@ -32,6 +30,7 @@ export const columns = (
     flex: 1,
     align: 'right',
     headerAlign: 'right',
+    variant: 'titleCase',
   }),
   getColumnProps({
     field: 'unitPrice',
@@ -39,12 +38,14 @@ export const columns = (
     align: 'right',
     flex: 2,
     headerAlign: 'right',
+    variant: 'titleCase',
   }),
   getColumnProps({
     field: 'quantity',
     headerName: 'QUANTITY',
     align: 'center',
     headerAlign: 'center',
+    variant: 'titleCase',
     flex: 1.5,
   }),
   getColumnProps({
@@ -52,30 +53,39 @@ export const columns = (
     headerName: 'UNIT',
     align: 'right',
     headerAlign: 'right',
+    variant: 'titleCase',
     flex: 1,
   }),
-
+  // getColumnProps({
+  //   field: 'percent',
+  //   headerName: '%',
+  //   align: 'center',
+  //   variant: 'titleCase',
+  //   flex: 1.5,
+  // }),
   getColumnProps({
     field: 'total',
     headerName: 'Total',
-    align: 'center',
-    flex: 1.5,
+    headerAlign: 'right',
+    align: 'right',
+    variant: 'titleCase',
+    flex: 1,
   }),
   getColumnProps({
     field: 'actions',
-    headerName: 'ACTIONS',
+    headerName: 'actions',
     headerAlign: 'right',
+    align: 'right',
+    variant: 'titleCase',
+    flex: 1.5,
     renderCell(params) {
       return (
         <Box>
-          <IconButton
-            onClick={() => handleAction(params.value, ActionTypes.EDIT)}>
-            <EditIcon />
-          </IconButton>
-          <IconButton
-            onClick={() => handleAction(params.value, ActionTypes.DELETE)}>
-            <DeleteIcon />
-          </IconButton>
+          <Actions
+            article={params.value.article}
+            serviceOrderId={params.value.serviceOrderId}
+            serviceOrderArticleId={params.value.id}
+          />
         </Box>
       );
     },
@@ -94,13 +104,12 @@ export const makeRows = (articles: ServiceOrderArticleView[]): GridRowsProp =>
         10 ** item.unitAmount.fractionDigits!,
       {currency: item.unitAmount.currency},
     ),
-    model: item.article.model,
-    supplier: item.article.manufacturer,
     unitPrice: formatCurrency(
       item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!,
       {currency: item.unitAmount.currency},
     ),
     quantity: item.quantity,
+    // percent: '-',
     actions: item,
     navigateTo: `/articles/details/${item.article.id}`,
   }));

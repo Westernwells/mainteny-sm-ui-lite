@@ -39,6 +39,7 @@ import {isBefore, parseISO, startOfDay} from 'date-fns';
 interface Props {
   invoice: InvoiceView;
   downloadUrl: string;
+  isInvoiceList?: boolean;
 }
 
 const Tooltip = ({children, ...props}: TooltipProps) => (
@@ -58,7 +59,11 @@ const Tooltip = ({children, ...props}: TooltipProps) => (
   </MUITooltip>
 );
 
-export const Actions = ({invoice, downloadUrl}: Props) => {
+export const Actions = ({
+  invoice,
+  downloadUrl,
+  isInvoiceList = true,
+}: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
   const {enqueueSnackbar} = useSnackbar();
@@ -194,7 +199,6 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
           icon: <Print />,
           onClick: () => setIsConfirmPrintDialogOpen(true),
         },
-        ...(isInvoicePDFGenerated ? [downloadItem] : []),
         {
           label: t('Edit'),
           icon: <Edit />,
@@ -209,6 +213,7 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
             setIsDeleteDialogOpen(true);
           },
         },
+        ...(isInvoicePDFGenerated ? [downloadItem] : []),
       );
     } else if (invoice.status === InvoiceStatus.NOT_PAID) {
       items.push(
@@ -303,7 +308,7 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
       );
     }
 
-    if (invoice.sentDate) {
+    if (invoice.sentDate && invoice.status !== InvoiceStatus.DRAFT) {
       return items.filter(
         (item) => item.label !== t('Edit') && item.label !== t('Delete'),
       );
@@ -375,7 +380,7 @@ export const Actions = ({invoice, downloadUrl}: Props) => {
 
   return (
     <Box>
-      {action}
+      {isInvoiceList && action}
 
       <Tooltip title={t('More')} placement="right" arrow>
         <IconButton onClick={handleClick}>

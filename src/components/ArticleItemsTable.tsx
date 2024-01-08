@@ -75,6 +75,7 @@ export const ArticleItemsTable = ({
       : currentCurrency.code;
 
   const {user} = useUserSession();
+
   const [percentageVat, setPercentageVat] = useState(
     invoice?.totalAmount?.percentageVat ??
       user?.userAccount?.serviceCompany?.settings?.percentageVat ??
@@ -124,14 +125,12 @@ export const ArticleItemsTable = ({
     article: ArticleView,
   ): QuotationItemRecord | InvoiceItemRecord<Amount> => {
     const record = {
-      articleId: article.id,
-      articleUnit: article.unit,
+      article,
       description: article.description,
       name: article.name,
       quantity: 1,
       unitAmount: article.unitSellingAmount,
       type: article.type,
-      costPackage: article.additionalInfo?.costPackage,
     };
     return getItemRecord(record, percentageVat);
   };
@@ -185,18 +184,18 @@ export const ArticleItemsTable = ({
 
   const createCreditArticleResource = (invoiceArg: InvoiceView) => {
     const article = [articleViewToItem(creditNoteArticleResource.data[0])];
-    if (article[0].articleId !== invoiceArg.id) {
+    if (article[0].article?.id !== invoiceArg.id) {
       const newItems = article.map((articleItem) => ({
         ...articleItem,
         unitAmount: {
           ...articleItem.unitAmount,
           netAmount:
-            invoiceArg.totalAmount.netAmount >= 0
-              ? -1 * invoiceArg.totalAmount.netAmount
+            (invoiceArg.totalAmount?.netAmount ?? 0) >= 0
+              ? -1 * (invoiceArg.totalAmount?.netAmount ?? 0)
               : invoiceArg.totalAmount.netAmount,
           grossAmount:
-            invoiceArg.totalAmount.netAmount >= 0
-              ? -1 * invoiceArg.totalAmount.grossAmount
+            (invoiceArg.totalAmount?.netAmount ?? 0) >= 0
+              ? -1 * (invoiceArg.totalAmount?.grossAmount ?? 0)
               : invoiceArg.totalAmount.netAmount,
         },
       }));
@@ -207,10 +206,9 @@ export const ArticleItemsTable = ({
   const setFinalAndFullArticles = (invoiceArg: InvoiceView) => {
     const newItems = invoiceArg.items.map(
       (i): InvoiceItemRecord<Amount> => ({
-        articleId: i.article.id,
-        description: i.description || i.article.description,
-        name: i.name || i.article.name,
-        articleUnit: i.article.unit,
+        article: i.article,
+        name: i.name,
+        description: i.description,
         quantity: i.quantity,
         unitAmount: i.unitAmount,
       }),
@@ -247,25 +245,25 @@ export const ArticleItemsTable = ({
             createPartial();
           } else {
             const article = [articleViewToItem(partialArticleResource.data[0])];
-            if (article[0].articleId !== invoice.id || !items.length) {
+            if (article[0].article?.id !== invoice.id || !items.length) {
               const newItems = article.map((articleItem) => ({
                 ...articleItem,
                 unitAmount: {
                   ...articleItem.unitAmount,
                   netAmount:
-                    invoice.totalAmount.netAmount >= 0
-                      ? invoice.totalAmount.netAmount
-                      : -1 * invoice.totalAmount.netAmount,
+                    (invoice.totalAmount?.netAmount ?? 0) >= 0
+                      ? invoice.totalAmount?.netAmount ?? 0
+                      : -1 * (invoice.totalAmount?.netAmount ?? 0),
                   grossAmount:
-                    invoice.totalAmount.netAmount >= 0
-                      ? invoice.totalAmount.grossAmount
-                      : -1 * invoice.totalAmount.netAmount,
+                    (invoice.totalAmount?.netAmount ?? 0) >= 0
+                      ? invoice.totalAmount?.grossAmount ?? 0
+                      : -1 * (invoice.totalAmount?.netAmount ?? 0),
                 },
               }));
               setItemsAndCalculatePrice(newItems);
               if (invoice.partialInvoices && invoice.partialInvoices.length) {
                 setNewPartialTotal(
-                  invoice.totalAmount.netAmount /
+                  (invoice.totalAmount?.netAmount ?? 0) /
                     10 ** invoice.totalAmount.fractionDigits!,
                 );
               } else {
@@ -283,12 +281,11 @@ export const ArticleItemsTable = ({
           } else {
             const newItems = invoice.items.map(
               (i): InvoiceItemRecord<Amount> => ({
-                articleId: i.article.id,
-                description: i.description || i.article.description,
-                name: i.name || i.article.name,
-                articleUnit: i.article.unit,
+                article: i.article,
+                name: i.name,
+                description: i.description,
                 quantity: i.quantity,
-                unitAmount: invoice.totalAmount,
+                unitAmount: i.unitAmount,
               }),
             );
             setNewPartialTotal(calculateTotal(newItems));
@@ -304,21 +301,20 @@ export const ArticleItemsTable = ({
           setItems(
             invoice?.items.map(
               (i): InvoiceItemRecord<Amount> => ({
-                articleId: i.article.id,
-                description: i.description || i.article.description,
-                name: i.name || i.article.name,
-                articleUnit: i.article.unit,
+                article: i.article,
+                name: i.name,
+                description: i.description,
                 quantity: i.quantity,
                 unitAmount: {
-                  ...invoice.totalAmount,
+                  ...i.unitAmount,
                   netAmount:
-                    invoice.totalAmount.netAmount >= 0
-                      ? -1 * invoice.totalAmount.netAmount
-                      : invoice.totalAmount.netAmount,
+                    (invoice.totalAmount?.netAmount ?? 0) >= 0
+                      ? -1 * (invoice.totalAmount?.netAmount ?? 0)
+                      : invoice.totalAmount?.netAmount ?? 0,
                   grossAmount:
-                    invoice.totalAmount.grossAmount >= 0
-                      ? -1 * invoice.totalAmount.grossAmount
-                      : invoice.totalAmount.grossAmount,
+                    (invoice.totalAmount?.grossAmount ?? 0) >= 0
+                      ? -1 * (invoice.totalAmount?.grossAmount ?? 0)
+                      : invoice.totalAmount?.grossAmount ?? 0,
                 },
               }),
             ),
@@ -328,7 +324,7 @@ export const ArticleItemsTable = ({
             createPartial();
           } else {
             const article = [articleViewToItem(partialArticleResource.data[0])];
-            if (article[0].articleId !== invoice.id) {
+            if (article[0].article?.id !== invoice.id) {
               const newItems = article.map((articleItem) => ({
                 ...articleItem,
                 unitAmount: {
@@ -336,11 +332,11 @@ export const ArticleItemsTable = ({
                   netAmount:
                     invoice.type === InvoiceType.CREDIT_NOTE
                       ? 0
-                      : invoice.totalAmount.netAmount,
+                      : invoice.totalAmount?.netAmount ?? 0,
                   grossAmount:
                     invoice.type === InvoiceType.CREDIT_NOTE
                       ? 0
-                      : invoice.totalAmount.netAmount,
+                      : invoice.totalAmount?.netAmount ?? 0,
                 },
               }));
               setNewPartialTotal(calculateTotal(newItems));
@@ -461,7 +457,7 @@ export const ArticleItemsTable = ({
           gap="1em">
           {items.map((item, index) => (
             <ArticleItemRow
-              key={index + item.articleId}
+              key={index + (item.article?.id || item.name)}
               articleItem={item}
               index={index}
               deleteItem={deleteItem}

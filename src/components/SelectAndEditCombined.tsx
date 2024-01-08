@@ -3,11 +3,12 @@ import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
 import {FormikProps} from 'formik';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
-import AddIcon from '@mui/icons-material/Add';
 import {InvoiceFormData} from 'models/invoice';
 import {EditCustomerForm} from 'pages/InvoiceDetails/EditCustomerForm';
 import {AddressRecord} from 'models/misc';
+import {formatAddressFullname} from 'utils/utils';
 import {FormLabel} from './form/FormLabel';
 import {SelectCard} from './SelectCard';
 import {SelectButton} from './SelectButton';
@@ -19,12 +20,12 @@ interface Props {
   labelRequired?: boolean;
   selected: boolean;
   buttonText: string;
-  cardHeader: ReactNode;
   cardOnClose?: () => void;
   editButtonText: string;
   modalHeader: string;
   addressType: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress';
   formik: FormikProps<InvoiceFormData>;
+  address?: AddressRecord;
 }
 
 export const SelectAndEditCombined = ({
@@ -32,12 +33,12 @@ export const SelectAndEditCombined = ({
   labelRequired,
   selected,
   buttonText,
-  cardHeader,
   cardOnClose,
   editButtonText,
   modalHeader,
   addressType,
   formik,
+  address,
 }: Props) => {
   const {t} = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -56,6 +57,18 @@ export const SelectAndEditCombined = ({
     });
   };
 
+  const onSaveAddress = () => {
+    formik.setValues({
+      ...formik.values,
+      [addressType]: {
+        ...formik.values[addressType],
+        fullName: formatAddressFullname(formik.values?.[addressType] ?? null)
+          ?.fullName,
+      },
+    });
+    setIsModalOpen(false);
+  };
+
   return (
     <Box>
       {typeof label === 'string' ? (
@@ -66,7 +79,18 @@ export const SelectAndEditCombined = ({
 
       {selected ? (
         <SelectCard
-          header={cardHeader}
+          header={
+            address ? (
+              <>
+                <Typography variant="body2">
+                  {address.component?.name ?? ''}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {formatAddressFullname(address)?.fullName}
+                </Typography>
+              </>
+            ) : null
+          }
           body={
             <Button
               label={t(editButtonText)}
@@ -77,7 +101,7 @@ export const SelectAndEditCombined = ({
                 sx: {
                   display: 'inline-flex',
                   mt: '10px',
-                  color: theme.palette.primary.light,
+                  color: theme.palette.primary.dark,
                 },
               }}
             />
@@ -87,16 +111,16 @@ export const SelectAndEditCombined = ({
       ) : (
         <SelectButton
           text={t(buttonText)}
-          icon={<AddIcon />}
           onClick={() => setIsModalOpen(true)}
+          buttonProps={{size: 'small'}}
         />
       )}
 
       <Dialog
         title={modalHeader}
         onCancel={onCloseDialog}
-        onSave={() => setIsModalOpen(false)}
-        disableSaveBtn={!formik.values?.[addressType]?.fullName}
+        onSave={onSaveAddress}
+        disableSaveBtn={!formik.values?.[addressType]?.component?.name}
         dialogProps={{
           maxWidth: 'md',
           open: isModalOpen || false,

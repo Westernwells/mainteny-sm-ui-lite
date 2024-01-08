@@ -65,7 +65,8 @@ export const filterByAmount = (
 ) =>
   invoicesRes.data.filter((item) => {
     const value =
-      item.totalAmount.netAmount / 10 ** item.totalAmount.fractionDigits!;
+      (item.totalAmount?.netAmount ?? 0) /
+      10 ** item.totalAmount.fractionDigits!;
     return value >= amount[0] && value <= amount[1];
   });
 
@@ -322,6 +323,7 @@ export const useDeleteInvoice = () => {
       onSuccess: (__, {shouldNavigate}) => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
+        queryClient.invalidateQueries([qk.fetchServiceOrderInvoices]);
         if (shouldNavigate) navigate(`/invoices?pageIndex=1&pageSize=25`);
       },
       onError: (err) => {

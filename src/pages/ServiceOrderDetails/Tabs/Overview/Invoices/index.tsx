@@ -12,19 +12,31 @@ import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {getServiceOrderPaymentStatusStyles} from 'pages/ServiceOrders/Tabs/ServiceOrderList.tsx/ServiceOrderDataGridProps';
+import {StatusChip} from 'components/StatusChip';
+import {ServiceOrderPaymentStatus} from 'models/service-order';
+import {calculateGrossInvoiceTotal} from 'utils/calculate-total';
+import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
 import {columns, makeRows} from './InvoicesDataGridProps';
 
 interface Props {
   serviceOrderId?: string;
+  paymentStatus?: ServiceOrderPaymentStatus;
 }
 
-export const Invoices = ({serviceOrderId}: Props) => {
+export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
   const [rows, setRows] = useState<GridRowsProp>([]);
+
   let totalInvoiceRef = useRef(0).current;
+
+  const paymentStatusStyles = getServiceOrderPaymentStatusStyles(
+    paymentStatus!,
+  );
+  const hasValidPaymentStatus = paymentStatusStyles.label !== '-';
 
   const {
     data: InvoiceList = [],
@@ -69,7 +81,29 @@ export const Invoices = ({serviceOrderId}: Props) => {
 
   return (
     <InfoCard
-      header={<Typography variant="subtitle1">{t('Invoices')}</Typography>}
+      footer={
+        InvoiceList &&
+        InvoiceList?.length !== 0 && (
+          <InfoCardTotalSumFooter
+            amount={InvoiceList && calculateGrossInvoiceTotal(InvoiceList)}
+            label={t('Invoiced Sum (incl. VAT)')}
+          />
+        )
+      }
+      header={
+        <Box sx={{display: 'flex', alignItems: 'center'}}>
+          <Typography variant="subtitle1" sx={{marginRight: '1em'}}>
+            {t('Invoices')}
+          </Typography>
+          {hasValidPaymentStatus && (
+            <StatusChip
+              label={paymentStatusStyles.label}
+              color={paymentStatusStyles.color}
+              maxChars={8}
+            />
+          )}
+        </Box>
+      }
       handleAction={() => navigate(`/invoices/new?orderId=${serviceOrderId}`)}
       headerActionIcon={
         <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
@@ -80,12 +114,13 @@ export const Invoices = ({serviceOrderId}: Props) => {
       ) : (
         <DataGridLayout
           rows={rows}
-          height={getDataGridHeight(rows.length, 3)}
+          height={getDataGridHeight(rows.length, 100)}
           columns={columns}
           fullHeight={false}
           containerStyle={{
             borderBottom: 'none',
           }}
+          isWidget
         />
       )}
     </InfoCard>

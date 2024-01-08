@@ -10,22 +10,15 @@ import {EmptySection} from 'components/EmptySection';
 import Box from '@mui/material/Box';
 import {SelectModal} from 'components/SelectModal';
 import {ArticlesModalDataGrid} from 'components/ArticleModalDataGrid';
-import {ArticleView} from 'models/article';
+import {ArticleView, ServiceOrderArticleRecord} from 'models/article';
 import {Progress} from 'components/Progress';
-import {Confirm} from 'components/Confirm';
-import {Dialog} from 'components/Dialog';
 import {
   useCreateServiceOrderArticle,
-  useDeleteServiceOrderArticle,
   useNewUpdateServiceOrderArticles,
 } from 'hooks/reactQuery/useServiceOrder';
-import {EditArticleForm} from './EditArticleForm';
-import {ActionTypes, columns, makeRows} from './ArticleDataGridProps';
-import {EditArticleFormModel} from './models';
-import {
-  amountRecordForBackend,
-  makeAmountRecord,
-} from '../../../../../utils/currency';
+import {calculateOrderArticlesTotal} from 'utils/calculate-total';
+import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
+import {columns, makeRows} from './ArticleDataGridProps';
 
 interface Props {
   serviceOrderArticles: ServiceOrderArticleView[] | undefined;
@@ -35,42 +28,16 @@ interface Props {
 export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
   const {t} = useTranslation();
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const [isEditing, setIsEditing] = useState(false);
-  const [formikErrors, setFormikErrors] = useState({});
-  const [formikValues, setFormikValues] = useState<
-    EditArticleFormModel | undefined
-  >();
   const [openSelectModal, setOpenSelectModal] = useState(false);
-  const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [openConfirm, setOpenConfirm] = useState(false);
-  const [currentArticle, setCurrentArticle] =
-    useState<ServiceOrderArticleView>();
 
   const {mutateAsync: createServiceOrderArticle} =
     useCreateServiceOrderArticle();
 
-  const {mutateAsync: updateServiceOrderArticle, isLoading} =
-    useNewUpdateServiceOrderArticles();
-
-  const {mutateAsync: deleteServiceOrderArticle} =
-    useDeleteServiceOrderArticle();
+  const {isLoading} = useNewUpdateServiceOrderArticles();
 
   useEffect(() => {
     setRows(makeRows(serviceOrderArticles || []));
   }, [serviceOrderArticles]);
-
-  useEffect(() => {
-    if (isEditing && currentArticle) {
-      setOpenEditDialog(true);
-    }
-  }, [isEditing, currentArticle]);
-
-  useEffect(() => {
-    if (!isLoading) {
-      setIsEditing(false);
-      setOpenEditDialog(false);
-    }
-  }, [isLoading]);
 
   const handleSelectArticle = async (article: ArticleView) => {
     const articleExists = serviceOrderArticles?.filter(
@@ -81,8 +48,15 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
       setOpenSelectModal(false);
       return;
     }
-    const body = {
+    const body: ServiceOrderArticleRecord = {
       articleId: article.id,
+      article: {
+        id: article.id,
+        externalId: article.externalId,
+        type: article.type,
+        unit: article.unit,
+        costPackage: article.costPackage!,
+      },
       description: article.description,
       name: article.name,
       quantity: 1,
@@ -100,51 +74,6 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
     setOpenSelectModal(false);
   };
 
-  const deleteArticle = async () => {
-    await deleteServiceOrderArticle({
-      serviceOrder: serviceOrderId!,
-      serviceOrderArticleId: currentArticle?.id!,
-    });
-    setOpenConfirm(false);
-  };
-
-  const handleAction = async (
-    serviceOrderArticle: ServiceOrderArticleView,
-    action: ActionTypes,
-  ) => {
-    setCurrentArticle(serviceOrderArticle);
-    if (action === ActionTypes.EDIT) {
-      setIsEditing(true);
-    }
-
-    if (action === ActionTypes.DELETE) {
-      setOpenConfirm(true);
-    }
-  };
-
-  const handleUpdateArticle = async () => {
-    const body = serviceOrderArticles!
-      .filter((item) => item.article.id === currentArticle?.article.id)
-      .map((item) => ({
-        articleId: item.article.id,
-        description: formikValues!.description,
-        name: formikValues!.name,
-        quantity: formikValues!.quantity,
-        unitAmount: amountRecordForBackend(
-          makeAmountRecord(
-            formikValues!.unitPrice,
-            currentArticle!.unitAmount.currency,
-            currentArticle!.unitAmount.percentageVat,
-          ),
-        ),
-      }))[0];
-    await updateServiceOrderArticle({
-      data: body!,
-      serviceOrder: serviceOrderId!,
-      serviceOrderArticleId: currentArticle?.id!,
-    });
-    setOpenEditDialog(false);
-  };
   const renderNoRowsSection = () => (
     <Box
       sx={{
@@ -165,7 +94,23 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
   return (
     <>
       <InfoCard
-        header={<Typography variant="subtitle1">{t('Articles')}</Typography>}
+        footer={
+          serviceOrderArticles &&
+          serviceOrderArticles?.length !== 0 && (
+            <InfoCardTotalSumFooter
+              label={t('Total Sum (excl. VAT)')}
+              amount={
+                serviceOrderArticles &&
+                calculateOrderArticlesTotal(serviceOrderArticles)
+              }
+            />
+          )
+        }
+        header={
+          <Typography variant="subtitle1">
+            {t('Articles & Spare parts')}
+          </Typography>
+        }
         showHeaderBackground
         handleAction={() => setOpenSelectModal(true)}
         headerActionIcon={
@@ -176,14 +121,13 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
         ) : (
           <DataGridLayout
             fullHeight={false}
-            height={getDataGridHeight(rows.length, 3)}
+            height={getDataGridHeight(rows.length, 100)}
             rows={rows}
-            columns={columns((item, actionType) =>
-              handleAction(item, actionType),
-            )}
+            columns={columns}
             containerStyle={{
               borderBottom: 'none',
             }}
+            isWidget
           />
         )}
       </InfoCard>
@@ -198,33 +142,6 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
           <ArticlesModalDataGrid setRowItem={handleSelectArticle} />
         )}
       </SelectModal>
-      <Confirm
-        open={openConfirm}
-        onConfirm={() => deleteArticle()}
-        onClose={() => setOpenConfirm(false)}
-        title="Confirm"
-        content="Do you want to delete this article?"
-      />
-
-      <Dialog
-        title="Edit Article"
-        onCancel={() => {
-          setOpenEditDialog(false);
-          setIsEditing(false);
-        }}
-        disableSaveBtn={!!Object.keys(formikErrors).length}
-        onSave={() => handleUpdateArticle()}
-        isSaving={isLoading}
-        dialogProps={{
-          maxWidth: 'sm',
-          open: openEditDialog,
-        }}>
-        <EditArticleForm
-          serviceOrderArticle={currentArticle!}
-          getFormikErrors={(val) => setFormikErrors(val)}
-          getFormikValues={(val) => setFormikValues(val)}
-        />
-      </Dialog>
     </>
   );
 };

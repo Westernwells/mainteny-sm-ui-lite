@@ -38,11 +38,9 @@ import {
   ServiceOrderView,
   CreateScheduledServiceOrderBody,
   CreateNonScheduledServiceOrderBody,
-  ServiceOrderItemRecord,
   CompleteServiceOrder,
   UpdateServiceOrderBody,
   AppointmentConfirmationRequiredOrdersQueryParams,
-  UpdateServiceOrderArticleRecord,
   ServiceOrderArticleView,
   ServiceOrderConfirmationPublishBody,
 } from '../../models/service-order';
@@ -743,36 +741,6 @@ export const useCreateNonScheduledServiceOrder = (successMsg: string) => {
   );
 };
 
-export const putServiceOrderArticles = async (
-  body: ServiceOrderItemRecord[],
-  id: string,
-) => {
-  await axiosClient.put(`api/serviceOrders/${id}/articles`, body);
-};
-
-export const useUpdateServiceOrderArticles = () => {
-  const queryClient = useQueryClient();
-  const {enqueueSnackbar, showError} = useSnackbar();
-
-  return useMutation(
-    ({data, orderId}: {data: ServiceOrderItemRecord[]; orderId: string}) =>
-      putServiceOrderArticles(data, orderId),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries([queryKeys.fetchServiceOrderArticles]);
-        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
-        enqueueSnackbar(`Work report updated successfully!`, {
-          variant: 'success',
-        });
-      },
-      onError: (err) => {
-        console.log(err);
-        showError(err);
-      },
-    },
-  );
-};
-
 export const queryAppointmentConfirmationRequiredOrders = async (
   params: AppointmentConfirmationRequiredOrdersQueryParams,
 ): Promise<Resource<ServiceOrderView>> => {
@@ -1008,7 +976,7 @@ export const useServiceOrderArticles = (serviceOrder?: string) =>
   );
 
 export const putNewServiceOrderArticles = async (
-  body: UpdateServiceOrderArticleRecord,
+  body: ServiceOrderArticleRecord,
   serviceOrder: string,
   serviceOrderArticleId: string,
 ) => {
@@ -1028,7 +996,7 @@ export const useNewUpdateServiceOrderArticles = () => {
       serviceOrder,
       serviceOrderArticleId,
     }: {
-      data: UpdateServiceOrderArticleRecord;
+      data: ServiceOrderArticleRecord;
       serviceOrder: string;
       serviceOrderArticleId: string;
     }) => putNewServiceOrderArticles(data, serviceOrder, serviceOrderArticleId),

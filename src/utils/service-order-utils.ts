@@ -1,6 +1,7 @@
 import {differenceInMinutes} from 'date-fns';
 import {
   ServiceOrderArticleView,
+  ServiceOrderPaymentStatus,
   ServiceOrderStatus,
   ServiceOrderType,
   ServiceOrderView,
@@ -9,16 +10,17 @@ import {toDate} from './datetime';
 
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
   switch (status) {
+    case ServiceOrderStatus.SCHEDULING:
+      return 'secondary';
     case ServiceOrderStatus.SCHEDULED:
       return 'primary.mainLight';
     case ServiceOrderStatus.IN_PROGRESS:
-      return 'warning';
+      return 'warning.light';
     case ServiceOrderStatus.CANCELLED:
       return 'action.active';
     case ServiceOrderStatus.EXPIRED:
       return 'error';
     case ServiceOrderStatus.COMPLETED:
-    case ServiceOrderStatus.DONE:
       return 'success';
     default:
       return 'default';
@@ -27,6 +29,10 @@ export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
 
 export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
   switch (status) {
+    case ServiceOrderStatus.READY_TO_SCHEDULE:
+      return 'Unscheduled';
+    case ServiceOrderStatus.SCHEDULING:
+      return 'Scheduling';
     case ServiceOrderStatus.SCHEDULED:
       return 'Pending';
     case ServiceOrderStatus.IN_PROGRESS:
@@ -36,7 +42,6 @@ export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
     case ServiceOrderStatus.EXPIRED:
       return 'Expired';
     case ServiceOrderStatus.COMPLETED:
-    case ServiceOrderStatus.DONE:
       return 'Completed';
     default:
       return 'Unscheduled';
@@ -45,6 +50,10 @@ export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
 
 export const serviceOrderStatusToEnum = (status: string) => {
   switch (status) {
+    case 'Unscheduled':
+      return ServiceOrderStatus.READY_TO_SCHEDULE;
+    case 'Scheduling':
+      return ServiceOrderStatus.SCHEDULING;
     case 'Pending':
       return ServiceOrderStatus.SCHEDULED;
     case 'Ongoing':
@@ -56,9 +65,17 @@ export const serviceOrderStatusToEnum = (status: string) => {
     case 'Completed':
       return ServiceOrderStatus.COMPLETED;
     default:
-      return 'Unscheduled';
+      return ServiceOrderStatus.INIT;
   }
 };
+
+export enum ServiceOrderPaymentStatusView {
+  PAID = 'Paid',
+  NOT_PAID = 'Not Paid',
+  AUTO_GENERATED = 'Auto Generated',
+  PARTIALLY_PAID = 'Partially Paid',
+  NONE = 'None',
+}
 
 export const getServiceOrderStatusList = () => {
   let mappedOptions: string[] = [];
@@ -153,11 +170,52 @@ export const serviceOrderTypeToEnum = (type: string) => {
   }
 };
 
+export const serviceOrderPaymentStatusToString = (
+  type: ServiceOrderPaymentStatus | string,
+) => {
+  switch (type) {
+    case ServiceOrderPaymentStatus.NOT_PAID:
+      return 'Not Paid';
+    case ServiceOrderPaymentStatus.PAID:
+      return 'Paid';
+    case ServiceOrderPaymentStatus.PARTIALLY_PAID:
+      return 'Partially Paid';
+    case ServiceOrderPaymentStatus.AUTO_GENERATED:
+      return 'Auto Generated';
+    case ServiceOrderPaymentStatus.NOT_SENT:
+      return 'Not Sent';
+    case ServiceOrderPaymentStatus.NONE:
+      return 'No Invoice';
+    default:
+      return '-';
+  }
+};
+
+export const serviceOrderPaymentStatusToEnum = (type: string) => {
+  switch (type) {
+    case 'Paid':
+      return ServiceOrderPaymentStatus.PAID;
+    case 'Not Paid':
+      return ServiceOrderPaymentStatus.NOT_PAID;
+    case 'Auto Generated':
+      return ServiceOrderPaymentStatus.AUTO_GENERATED;
+    case 'Partially Paid':
+      return ServiceOrderPaymentStatus.PARTIALLY_PAID;
+    case 'Not Sent':
+      return ServiceOrderPaymentStatus.NOT_SENT;
+    case '-':
+      return ServiceOrderPaymentStatus.NONE;
+    default:
+      return ServiceOrderPaymentStatus.NONE;
+  }
+};
+
 export const articleViewToArticleRecord = (
   articles: ServiceOrderArticleView[],
 ) =>
   articles.map((i) => ({
     articleId: i.article.id,
+    article: i.article,
     description: i.description,
     name: i.name,
     quantity: i.quantity,
