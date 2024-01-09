@@ -1171,7 +1171,6 @@ export const InvoiceForm = ({
               width="100%">
               <DatePicker
                 defaultDate={formik.values.sentDate}
-                minDate={new Date()}
                 getSelectedDate={(newValue) => {
                   if (newValue) formik.setFieldValue('sentDate', newValue);
                 }}
@@ -1188,7 +1187,6 @@ export const InvoiceForm = ({
                   }
                 }}
                 errorMessage={dueDateError}
-                minDate={new Date()}
                 getSelectedDate={(newValue) => {
                   setDueDateError('');
                   if (newValue) formik.setFieldValue('dueDate', newValue);
