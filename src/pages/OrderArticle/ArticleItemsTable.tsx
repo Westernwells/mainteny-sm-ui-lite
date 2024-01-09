@@ -23,17 +23,17 @@ export const ArticleItemsTable = ({
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
   const [search, setSearch] = useState('');
 
-  const articleViewToItem = (article: ArticleView): ArticleOrderItemRecord => {
-    const record: ArticleOrderItemRecord = {
-      articleId: article.id,
-      articleName: article.name,
-      supplierArticleNumber: article.externalId,
-      quantity: 1,
-      unit: article.unit,
-      description: article.description,
-    };
-    return record;
-  };
+  const articleViewToItem = (article: ArticleView): ArticleOrderItemRecord => ({
+    articleId: article.id,
+    articleName: article.name,
+    supplierArticleNumber:
+      ((article?.suppliers?.length ?? 0) > 1
+        ? article?.suppliers?.find((s) => s.isPreferred)?.number
+        : article?.suppliers?.[0]?.number) ?? article.externalId,
+    quantity: 1,
+    unit: article.unit,
+    description: article.description,
+  });
 
   const deleteItem = (indexPos: number) => {
     const newItems = items.filter((_, index) => indexPos !== index);
