@@ -44,7 +44,7 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {useSnackbar} from 'notistack';
 import {isBefore, parseISO, startOfDay} from 'date-fns';
 import CustomSnackbar from 'components/CustomSnackbar';
-import {Notes} from './Notes';
+import {Notes} from 'components/Notes';
 import {InvoiceActivities} from './InvoiceActivities';
 
 interface Props {
@@ -251,7 +251,11 @@ export const ViewInvoice = ({
               alignItems="center"
               justifyContent="flex-end"
               gap={0.5}>
-              <Notes invoice={invoice!} />
+              <Notes
+                parentId={invoice.propertyOwner.id}
+                title="Customer Notes"
+                type="customer"
+              />
             </Grid>
 
             <Grid item xs={4} textAlign="end">

@@ -6,7 +6,9 @@ import ElevatorIcon from '@mui/icons-material/Elevator';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import {Box} from '@mui/material';
 import {formatSearchParams} from 'utils/utils';
+import {Notes} from 'components/Notes';
 import {CustomerOverviewTab} from './Tabs/CustomerOverview';
 import {ContractsTab} from './Tabs/ContractsTab';
 import {UnitsTab} from './Tabs/UnitsTab';
@@ -53,33 +55,41 @@ export const CustomerDetails = ({getCurrentPageTitle}: Props) => {
   }, []);
 
   return (
-    <Tabs
-      tabItems={tabItems}
-      currentIndex={tabValue}
-      onChange={(index) => {
-        setQueryParams(
-          formatSearchParams({tab: index.toString()}, queryParams),
-        );
-        setTabValue(index);
-      }}
-      backBtnLabel={customerName}>
-      <TabsBody value={tabValue} index={0}>
-        <CustomerOverviewTab
-          customerId={customerId}
-          getCustomerName={(name) => setCustomerName(name)}
-          getCurrentTabIndex={(index) => setTabValue(index)}
-        />
-      </TabsBody>
-      <TabsBody value={tabValue} index={1}>
-        <UnitsTab customerId={customerId} />
-      </TabsBody>
-      <TabsBody value={tabValue} index={2}>
-        <ContractsTab customerId={customerId} />
-      </TabsBody>
-      <TabsBody value={tabValue} index={3}>
-        <CustomPricesTab propertyOwnerId={customerId} />
-      </TabsBody>
-    </Tabs>
+    <Box display="flex" justifyContent="space-between">
+      <Tabs
+        tabItems={tabItems}
+        currentIndex={tabValue}
+        onChange={(index) => {
+          setQueryParams(
+            formatSearchParams({tab: index.toString()}, queryParams),
+          );
+          setTabValue(index);
+        }}
+        backBtnLabel={customerName}
+        showMenuActionBtn
+        secondaryButtonStyles={{mt: '1rem'}}
+        hideDivider
+        secondaryBtn={
+          <Notes parentId={customerId} title="Customer Notes" type="customer" />
+        }>
+        <TabsBody value={tabValue} index={0}>
+          <CustomerOverviewTab
+            customerId={customerId}
+            getCustomerName={(name) => setCustomerName(name)}
+            getCurrentTabIndex={(index) => setTabValue(index)}
+          />
+        </TabsBody>
+        <TabsBody value={tabValue} index={1}>
+          <UnitsTab customerId={customerId} />
+        </TabsBody>
+        <TabsBody value={tabValue} index={2}>
+          <ContractsTab customerId={customerId} />
+        </TabsBody>
+        <TabsBody value={tabValue} index={3}>
+          <CustomPricesTab propertyOwnerId={customerId} />
+        </TabsBody>
+      </Tabs>
+    </Box>
   );
 };
 
