@@ -379,7 +379,7 @@ export const InvoiceForm = ({
   const generateSubject = () => {
     if (invoiceType === InvoiceType.CREDIT_NOTE) {
       if (!serviceOrder) {
-        return '';
+        return t('Credit Note');
       }
 
       return t('{{jobType}} - Credit note for {{invoiceNumber}}', {
@@ -393,16 +393,10 @@ export const InvoiceForm = ({
     }
 
     if (!serviceOrder) {
-      return '';
+      return t('Invoice');
     }
 
-    return t('{{jobType}} - Invoice for {{invoiceNumber}}', {
-      invoiceNumber:
-        formType === 'new'
-          ? companyNextNumber?.value
-          : invoice?.externalId ?? '',
-      jobType: t(capitalize([serviceOrder?.type])) ?? '',
-    });
+    return t(capitalize([serviceOrder?.type]));
   };
 
   useEffect(() => {
