@@ -124,6 +124,7 @@ export const EditQuotation = ({quotation}: Props) => {
     setQuotationItems(
       quotation.items.map(
         (i): QuotationItemRecord => ({
+          articleId: i.article.id,
           article: i.article,
           name: i.name,
           description: i.description,
@@ -148,6 +149,7 @@ export const EditQuotation = ({quotation}: Props) => {
       'items',
       quotationItems.map(
         (item): QuotationItemRecord => ({
+          articleId: item.article?.id,
           article: item.article,
           name: item.name,
           description: item.description,

@@ -40,6 +40,7 @@ interface Props {
   pageTitle?: string;
   hideDivider?: boolean;
   disableBtnAction?: boolean;
+  secondaryButtonStyles?: SxProps;
 }
 
 const a11yProps = (index: number) => ({
@@ -63,6 +64,8 @@ export const Tabs = ({
   actionButtonStyles,
   disableBtnAction,
   secondaryBtn,
+  secondaryButtonStyles,
+  hideDivider = false,
 }: Props) => {
   const theme = useTheme();
 
@@ -99,7 +102,12 @@ export const Tabs = ({
           </Button>
         ) : null}
 
-        {secondaryBtn}
+        <Box
+          sx={{
+            ...secondaryButtonStyles,
+          }}>
+          {secondaryBtn}
+        </Box>
 
         {showMenuActionBtn && menu ? (
           <MenuBtn
@@ -201,14 +209,16 @@ export const Tabs = ({
             {...a11yProps(index)}
           />
         ))}
-        <Divider
-          sx={{
-            flexBasis: '100%',
-            border: `0.5px solid ${theme.palette.action.disabledBackground}`,
-            mt: '-0.5em',
-            mb: '1em',
-          }}
-        />
+        {hideDivider ? null : (
+          <Divider
+            sx={{
+              flexBasis: '100%',
+              border: `0.5px solid ${theme.palette.action.disabledBackground}`,
+              mt: '-0.5em',
+              mb: '1em',
+            }}
+          />
+        )}
       </MuiTabs>
     );
   };
