@@ -69,10 +69,11 @@ export const columns: GridColDef[] = [
     sortable: true,
   }),
   getColumnProps({
-    field: 'customer',
+    field: InvoiceOrderField.CUSTOMER_NAME,
     headerName: 'customer',
     cellClassName: 'truncateText',
     flex: 1.5,
+    sortable: true,
   }),
   getColumnProps({
     field: InvoiceOrderField.CREATED_DATE,
@@ -173,7 +174,7 @@ export const makeRows = (
         [InvoiceOrderField.NUMBER]:
           item.externalId !== '' ? item.externalId : 'Unassigned',
         order: item.serviceOrder?.number,
-        customer: item.propertyOwner.name,
+        [InvoiceOrderField.CUSTOMER_NAME]: item.propertyOwner.name,
         type: item.serviceOrder?.type,
         amount: `${formatCurrency(
           item
