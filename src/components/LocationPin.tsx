@@ -5,7 +5,7 @@ import {useNavigate} from 'react-router-dom';
 import Tooltip from '@mui/material/Tooltip';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useTranslation} from 'react-i18next';
-import {ReactComponent as Pin} from '../assets/icons/Pin.svg';
+import {ReactComponent as MaintenyPin} from '../assets/icons/MaintenyPin.svg';
 import {ElevatorStatus, ElevatorView} from '../models/elevator';
 import {StatusIndicator} from './StatusIndicator';
 import {Button} from './Button';
@@ -131,7 +131,7 @@ export const LocationPin = ({
             arrow
             placement="top">
             <Box width="2rem" height="2rem">
-              <Pin style={{width: '100%', height: '100%'}} />
+              <MaintenyPin style={{width: '100%', height: '100%'}} />
             </Box>
           </Tooltip>
         </Box>
