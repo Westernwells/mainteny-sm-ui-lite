@@ -378,6 +378,19 @@ export const Actions = ({
     );
   };
 
+  const generateEmailSubject = () => {
+    const name =
+      invoice.type === InvoiceType.CREDIT_NOTE
+        ? invoice.serviceCompany.name
+        : invoice.propertyOwner?.name;
+    const type =
+      invoice.type === InvoiceType.CREDIT_NOTE ? 'Credit Note' : 'Invoice';
+
+    return t(`${name} - ${t(type)} {{invoiceNumber}}`, {
+      invoiceNumber: invoice?.number ?? '',
+    });
+  };
+
   return (
     <Box>
       {isInvoiceList && action}
@@ -443,12 +456,7 @@ export const Actions = ({
           invoice.propertyOwner?.additionalInfo.billingEmail ||
           invoice.propertyOwner?.contact.email
         }
-        subject={t(
-          `${invoice.propertyOwner?.name} - ${t('Invoice')} {{invoiceNumber}}`,
-          {
-            invoiceNumber: invoice?.number ?? '',
-          },
-        )}
+        subject={generateEmailSubject()}
         content={invoice.description}
       />
 
