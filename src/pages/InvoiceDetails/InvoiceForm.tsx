@@ -160,13 +160,21 @@ const articleViewToItem = (
 
 const invoiceItemToInvoiceItemRecord = (
   invoiceItem: InvoiceItem,
+  invoiceType: InvoiceType,
 ): InvoiceItemRecord<Amount> => {
   const record: InvoiceItemRecord<Amount> = {
     article: invoiceItem.article,
     name: invoiceItem.name,
     description: invoiceItem.description,
     quantity: invoiceItem.quantity,
-    unitAmount: invoiceItem.unitAmount,
+    unitAmount:
+      invoiceType === InvoiceType.CREDIT_NOTE
+        ? {
+            ...invoiceItem.unitAmount,
+            grossAmount: -Math.abs(invoiceItem.unitAmount.grossAmount),
+            netAmount: -Math.abs(invoiceItem.unitAmount.netAmount),
+          }
+        : invoiceItem.unitAmount,
     discount: invoiceItem.additionalInfo?.discount
       ? {
           ...invoiceItem.additionalInfo?.discount,
@@ -367,20 +375,28 @@ export const InvoiceForm = ({
     setServiceOrder(selectedServiceOrder);
   };
 
+  const generateSubject = () => {
+    if (formik.values.type === InvoiceType.CREDIT_NOTE) {
+      return t('Credit note for {{invoiceNumber}}', {
+        invoiceNumber: invoice?.number ?? '',
+      });
+    }
+
+    if (invoice?.subject) {
+      return invoice?.subject;
+    }
+
+    return t('{{customerName}} - Invoice for {{invoiceNumber}}', {
+      invoiceNumber:
+        formType === 'new'
+          ? companyNextNumber?.value
+          : invoice?.externalId ?? '',
+      customerName: customer?.name ?? '',
+    });
+  };
+
   useEffect(() => {
-    const subject = invoice?.subject
-      ? invoice?.subject
-      : formik.values.type === InvoiceType.CREDIT_NOTE
-      ? t('Credit note for {{invoiceNumber}}', {
-          invoiceNumber: invoice?.number ?? '',
-        })
-      : t('{{customerName}} - Invoice for {{invoiceNumber}}', {
-          invoiceNumber:
-            formType === 'new'
-              ? companyNextNumber?.value
-              : invoice?.externalId ?? '',
-          customerName: customer?.name ?? '',
-        });
+    const subject = generateSubject();
     formik.setFieldValue('subject', subject);
   }, [formik.values.type, companyNextNumber, invoice, customer]);
 
@@ -452,10 +468,17 @@ export const InvoiceForm = ({
         invoice?.sentDate ? new Date(invoice.sentDate) : new Date(),
       );
       formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '');
-      formik.setFieldValue('type', invoice?.type || formik.values.type);
+      formik.setFieldValue(
+        'type',
+        formik.values.type === InvoiceType.CREDIT_NOTE
+          ? InvoiceType.CREDIT_NOTE
+          : invoice?.type || formik.values.type,
+      );
       formik.setFieldValue(
         'items',
-        invoice.items.map(invoiceItemToInvoiceItemRecord),
+        invoice.items.map((invoiceItem) =>
+          invoiceItemToInvoiceItemRecord(invoiceItem, formik.values.type),
+        ),
       );
       formik.setFieldValue(
         'discount',
@@ -550,7 +573,7 @@ export const InvoiceForm = ({
   }, [serviceOrder]);
 
   const isDueDateInPast = () => {
-    const localDueDate = invoice?.dueDate as string;
+    const localDueDate = formik.values.dueDate as Date;
     const dueDateObject = startOfDay(
       parseISO(new Date(localDueDate).toISOString()),
     );
@@ -721,6 +744,29 @@ export const InvoiceForm = ({
   };
 
   const notesText = selectedLng === 'DE' ? 'Anmerkungen' : t('Notes');
+
+  const generateEmailSubject = () => {
+    const name =
+      formik.values?.type === InvoiceType.CREDIT_NOTE
+        ? invoice?.serviceCompany.name
+        : customer?.name;
+    const type =
+      formik.values?.type === InvoiceType.CREDIT_NOTE
+        ? 'Credit Note'
+        : 'Invoice';
+
+    return t(`${name} - ${t(type)} {{invoiceNumber}}`, {
+      invoiceNumber: invoice?.number ?? '',
+    });
+  };
+
+  const getInvoiceTypeText = () => {
+    const invoiceLabel =
+      formik.values.type !== InvoiceType.CREDIT_NOTE ? 'Invoice' : '';
+    const text = `${convertToText(formik.values.type)} ${invoiceLabel}`.trim();
+
+    return t(text);
+  };
 
   return (
     <Box>
@@ -1090,7 +1136,7 @@ export const InvoiceForm = ({
                   {t('Invoice type')}
                 </Typography>
                 <Typography variant="subtitle2" color="primary.dark" pt={0.5}>
-                  {t(`${convertToText(formik.values.type)} invoice`)}
+                  {getInvoiceTypeText()}
                 </Typography>
               </Box>
               <Box>
@@ -1371,9 +1417,7 @@ export const InvoiceForm = ({
           navigate(`/invoices/details/${invoiceId}`);
         }}
         email={customer?.additionalInfo.billingEmail || customer?.contact.email}
-        subject={t(`${customer?.name} - ${t('Invoice')} {{invoiceNumber}}`, {
-          invoiceNumber: invoice?.number ?? '',
-        })}
+        subject={generateEmailSubject()}
         content={formik.values.description}
       />
       <Confirm
