@@ -20,7 +20,12 @@ import {BottomDrawer} from 'components/BottomDrawer';
 import {PDFContainer} from 'components/PDFContainer';
 import {FormLabel} from 'components/form/FormLabel';
 import {EmptySection} from 'components/EmptySection';
-import {InvoiceActivityView, InvoiceStatus, InvoiceView} from 'models/invoice';
+import {
+  InvoiceActivityView,
+  InvoiceStatus,
+  InvoiceType,
+  InvoiceView,
+} from 'models/invoice';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {PdfGenerationStatus} from 'models/misc';
 import {formatGrossAmount} from 'utils/currency';
@@ -228,6 +233,19 @@ export const ViewInvoice = ({
     }
 
     setIsSendEmailDialogOpen(true);
+  };
+
+  const generateEmailSubject = () => {
+    const name =
+      invoice?.type === InvoiceType.CREDIT_NOTE
+        ? invoice.serviceCompany?.name
+        : invoice.propertyOwner?.name;
+    const type =
+      invoice?.type === InvoiceType.CREDIT_NOTE ? 'Credit Note' : 'Invoice';
+
+    return t(`${name} - ${t(type)} {{invoiceNumber}}`, {
+      invoiceNumber: invoice?.number ?? '',
+    });
   };
 
   return (
@@ -451,12 +469,7 @@ export const ViewInvoice = ({
           invoice.propertyOwner?.additionalInfo.billingEmail ||
           invoice.propertyOwner?.contact.email
         }
-        subject={t(
-          `${invoice.propertyOwner?.name} - ${t('Invoice')} {{invoiceNumber}}`,
-          {
-            invoiceNumber: invoice?.number ?? '',
-          },
-        )}
+        subject={generateEmailSubject()}
         content={invoice.description}
       />
 
