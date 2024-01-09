@@ -43,6 +43,7 @@ export interface ArticleRecord {
 }
 
 export interface QuotationItemRecord {
+  articleId?: string;
   article?: ArticleRecord;
   name: string;
   unitAmount: Amount;
