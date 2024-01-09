@@ -1,9 +1,14 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
-import {GridRowsProp} from '@mui/x-data-grid';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {GridRowsProp, GridSortModel} from '@mui/x-data-grid';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {DataGridLayout} from 'components/DataGridLayout';
-import {InvoiceStatus, InvoiceStatusView, InvoiceView} from 'models/invoice';
+import {
+  InvoiceOrderField,
+  InvoiceStatus,
+  InvoiceStatusView,
+  InvoiceView,
+} from 'models/invoice';
 import {useElevatorInvoices, useInvoices} from 'hooks/reactQuery/useInvoice';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {useNavigate} from 'react-router-dom';
@@ -30,6 +35,7 @@ import {useTranslation} from 'react-i18next';
 import {Widget} from '../../components/Widget';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
 import {columns, makeRows} from './InvoicesDataGridProps';
+import {Order} from '../../models/misc';
 
 const pageSize = 25;
 
@@ -40,6 +46,12 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
   const [search, setSearch, clearFilters] = useQueryState('searchInvoices');
+  const [sortOrder, setSortOrder] = useQueryState<Order | undefined>(
+    'sortOrder',
+  );
+  const [orderByField, setOrderByField] = useQueryState<
+    InvoiceOrderField | undefined
+  >('orderByField');
   const [page, setPage] = useQueryState('page', {
     defaultValue: makePage(0, pageSize),
   });
@@ -78,6 +90,8 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
       status: status ? [status] : [],
       totalAmountFrom,
       totalAmountTo,
+      ...(sortOrder && {order: sortOrder}),
+      ...(orderByField && {orderByField}),
     },
     {keepPreviousData: true},
   );
@@ -97,6 +111,8 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
       status: status ? [status] : [],
       totalAmountFrom,
       totalAmountTo,
+      ...(sortOrder && {order: sortOrder}),
+      ...(orderByField && {orderByField}),
     },
     {keepPreviousData: true},
   );
@@ -157,6 +173,11 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
     const range = crConverter(selectedItems, currentCurrency.symbol);
     setCost(range);
   };
+
+  const handleSortModelChange = useCallback((sortModel: GridSortModel) => {
+    setSortOrder(sortModel[0]?.sort?.toUpperCase() as Order);
+    setOrderByField(sortModel[0]?.field as InvoiceOrderField);
+  }, []);
 
   const renderFilterItems = () => (
     <FilterFields
@@ -232,6 +253,7 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
         scrollToTop={search}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
+        onSortModelChange={handleSortModelChange}
         handlePageSizeChange={(newPageSize: number) =>
           setPage({
             ...page,

@@ -6,11 +6,11 @@ import {
   AmountRecord,
   Meta,
   Money,
+  Order,
   PaymentInfo,
   PdfGenerationStatus,
 } from './misc';
 import {PropertyOwnerSimpleView} from './propertyManager';
-import {QuotationItemRecord} from './quotation';
 import {ServiceCompanySimpleView} from './service-company';
 import {ServiceOrderView, ServiceOrderType} from './service-order';
 
@@ -103,6 +103,14 @@ export enum InvoiceOverdueNoticeStatus {
   SENT = 'SENT',
 }
 
+export enum InvoiceOrderField {
+  CREATED_DATE = 'CREATED_DATE',
+  CUSTOMER_NAME = 'CUSTOMER_NAME',
+  DUE_DATE = 'DUE_DATE',
+  NUMBER = 'NUMBER',
+  XERO_LAST_SYNC_TIME = 'XERO_LAST_SYNC_TIME',
+}
+
 export interface InvoiceOverdueNoticeAdditionalInfo {
   pdfPath: string;
   pdfGenerationStatus: PdfGenerationStatus;
@@ -165,6 +173,8 @@ export interface QueryInvoiceParams {
   status: InvoiceStatus[];
   totalAmountFrom?: number;
   totalAmountTo?: number;
+  order?: Order;
+  orderByField?: InvoiceOrderField;
 }
 
 export interface InvoiceFilters {
