@@ -1972,5 +1972,6 @@
   "Auto-generated": "Auto. generiert",
   "Not Sent": "Nicht gesendet",
   "VAT (%)": "MwSt. (%)",
-  "Click to hide this section from the invoice. Hidden sections won't appear in the final document or any exported versions.": "Klicken Sie, um diesen Abschnitt aus der Rechnung auszublenden. Ausgeblendete Abschnitte werden weder im endgültigen Dokument noch in exportierten Versionen angezeigt."
+  "Click to hide this section from the invoice": "Klicken Sie hier, um diesen Abschnitt aus der Rechnung auszublenden",
+  "Footer": "Fußzeile"
 }

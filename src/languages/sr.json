@@ -1995,5 +1995,6 @@
   "Auto-generated": "Automatski generisano",
   "Not Sent": "Nije poslata",
   "VAT (%)": "PDV %",
-  "Click to hide this section from the invoice. Hidden sections won't appear in the final document or any exported versions.": "Kliknite da biste sakrili ovaj odeljak sa fakture. Skriveni odeljci se neće pojaviti u konačnom dokumentu ili bilo kojoj izvezenoj verziji."
+  "Click to hide this section from the invoice": "Kliknite da biste sakrili ovaj odeljak sa fakture",
+  "Footer": "Podnožje"
 }
