@@ -20,7 +20,7 @@ interface Props {
 
 const validationSchema = Yup.object().shape({
   vatId: Yup.string().nullable().required('VAT ID is required'),
-  taxNumber: Yup.number().nullable().required('Tax Number is required'),
+  taxNumber: Yup.string().nullable().required('Tax Number is required'),
   percentageVat: Yup.number()
     .nullable()
     .required('% VAT is required')
