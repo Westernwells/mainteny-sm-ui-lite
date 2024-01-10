@@ -29,7 +29,7 @@ export const formatCurrency = (
 };
 
 function formatAmount(amount?: Amount, value?: number): string {
-  if (!amount) {
+  if (!amount || (!value && typeof value !== 'number')) {
     return '';
   }
 
