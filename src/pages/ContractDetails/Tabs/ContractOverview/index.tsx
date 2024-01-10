@@ -174,8 +174,8 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   });
 
   useEffect(() => {
-    setInitValue(formik.values.externalId!);
-  }, []);
+    setInitValue(contractDetails?.externalId);
+  }, [contractDetails?.externalId, openContractDialog]);
 
   useEffect(() => {
     setUpdatedValue(formik.values.externalId!);
