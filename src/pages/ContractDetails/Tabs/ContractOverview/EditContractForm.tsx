@@ -183,6 +183,10 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
 
       <Grid item md={6}>
         <FormInput
+          onValueChange={(values) => {
+            formik.setFieldValue(values.name as string, values.value);
+          }}
+          inputType="currency"
           props={{
             placeholder: t('Enter price/year (in {{currencySymbol}})', {
               currencySymbol,
@@ -194,7 +198,7 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
             type: 'number',
             value: Number(formik.values.price).toString(),
             onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
+
             required: true,
             InputProps: {
               startAdornment: (
@@ -209,6 +213,10 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
 
       <Grid item md={6}>
         <FormInput
+          onValueChange={(values) => {
+            formik.setFieldValue(values.name as string, values.value);
+          }}
+          inputType="currency"
           props={{
             placeholder: t(`Enter spending limit (in {{currencySymbol}})`, {
               currencySymbol,
@@ -219,7 +227,7 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
             name: 'spendingLimit',
             value: Number(formik.values.spendingLimit).toString(),
             onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
+
             InputProps: {
               startAdornment: (
                 <InputAdornment position="start" color="text.primary">

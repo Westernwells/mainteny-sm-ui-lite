@@ -13,6 +13,7 @@ interface Props {
   handleFocus?: (e: any) => void;
   onValueChange?: (values: {name?: string; value?: number}) => void;
   inputType?: 'text' | 'currency';
+  fullWidth?: boolean;
 }
 
 export const FormInput = ({
@@ -21,13 +22,14 @@ export const FormInput = ({
   inputLabelProps,
   onValueChange,
   handleFocus,
+  fullWidth = true,
   inputType = 'text',
 }: Props) => {
   const {t} = useTranslation();
   const {language: selectedLng} = useContext(LanguageContext);
 
   return (
-    <FormControl sx={{...containerStyles}} fullWidth>
+    <FormControl sx={{...containerStyles}} fullWidth={fullWidth}>
       {inputType === 'currency' ? (
         <NumericFormat
           value={Number(props!.value)}
