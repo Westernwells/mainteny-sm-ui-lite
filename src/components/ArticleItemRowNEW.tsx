@@ -301,6 +301,7 @@ export const ArticleItemRowNEW = ({
                     '&:hover': {
                       bgcolor: 'action.hover',
                     },
+                    width: '20%',
                   }}
                   onClick={handleDiscountTypeChange}
                   size="small">
