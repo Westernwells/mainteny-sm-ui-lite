@@ -1,6 +1,6 @@
 import ForgotPasswordPage from '../pages/forgotPassword.page';
 
-describe('Forget Page', () => {
+describe('Forget Password Page', () => {
     beforeEach(() => {
         ForgotPasswordPage.visitForgotPasswordPage();
     });
