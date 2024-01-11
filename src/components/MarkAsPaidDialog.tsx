@@ -113,6 +113,10 @@ export const MarkAsPaidDialog = ({
         </DialogContentText>
         <Box display="flex" flexDirection="column" gap={1} pt="2rem">
           <FormInput
+            inputType="currency"
+            onValueChange={(values) => {
+              formik.setFieldValue(values.name as string, values.value);
+            }}
             props={{
               placeholder: 'e.g. 200',
               label: t('Paid amount (incl. VAT)'),
@@ -120,7 +124,6 @@ export const MarkAsPaidDialog = ({
               id: 'amount.value',
               value: formik.values.amount.value,
               onBlur: formik.handleBlur,
-              onChange: formik.handleChange,
               error: !!(
                 formik.touched.amount?.value && formik.errors.amount?.value
               ),
