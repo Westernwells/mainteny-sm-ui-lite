@@ -106,10 +106,8 @@ export const ComboBox = ({
   }, [textFieldProps?.value]);
 
   const handleFocus = () => {
-    if (!textFieldProps?.value) {
-      setIsFocused(true);
-      setOpen(true);
-    }
+    setIsFocused(true);
+    setOpen(true);
   };
 
   const handleBlur = () => {
