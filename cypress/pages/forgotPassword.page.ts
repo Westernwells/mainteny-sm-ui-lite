@@ -11,7 +11,7 @@ export default class ForgotPassword {
     };
 
     static fillEmail = (email) => {
-        cy.get('#email').type(email);
+        cy.get('#email').type(email).should('exist');
     };
 
     static fillPassword = (password) => {

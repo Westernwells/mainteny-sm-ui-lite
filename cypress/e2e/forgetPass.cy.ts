@@ -29,7 +29,7 @@ describe('Forget Password Page', () => {
         ForgotPasswordPage.shouldSubmitBtnDisabled(false);
     });
 
-    it('should validate password', () => {
+    it('should display error for insufficient password length', () => {
         ForgotPasswordPage.resetPassword();
         ForgotPasswordPage.fillPassword('fake');
         cy.contains('Reset code must be at least 6 characters');
