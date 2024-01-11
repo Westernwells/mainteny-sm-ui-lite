@@ -17,6 +17,7 @@ import {
   useCompanyAutoNumberConfig,
   useCompanyNextNumber,
 } from 'hooks/reactQuery/useCompanies';
+import {ComboBoxNew} from 'components/ComboBoxNew';
 
 interface Props {
   formik: FormikProps<UnitDetailsFormModel>;
@@ -67,7 +68,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
   return (
     <Grid container spacing={2} sx={{mt: '0.5em'}} component="form">
       <Grid item md={6}>
-        <ComboBox
+        <ComboBoxNew
           options={Object.keys(ElevatorCategory).map((item) => ({
             label: t(convertToText(item)),
             value: convertToText(item),
@@ -194,7 +195,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
       </Grid>
 
       <Grid item md={6}>
-        <ComboBox
+        <ComboBoxNew
           options={elevatorTypeResource.data.map((item) => ({
             label: item,
             value: item,
@@ -219,7 +220,7 @@ export const EditUnitDetailsForm = ({formik}: Props) => {
       </Grid>
 
       <Grid item md={6}>
-        <ComboBox
+        <ComboBoxNew
           options={elevatorModelsResource.data.map((item) => ({
             label: item,
             value: item,
