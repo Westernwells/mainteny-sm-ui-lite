@@ -89,6 +89,9 @@ import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/in
 
 import {ComboBox} from 'components/ComboBox';
 
+import {StatusChip} from 'components/StatusChip';
+import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
+import {Notes} from 'components/Notes';
 import {formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
@@ -774,10 +777,12 @@ export const InvoiceForm = ({
 
   return (
     <Box>
-      {/* {invoice && (
+      {invoice && (
         <Box
           display="flex"
           alignItems="flex-end"
+          mb={3}
+          mt={1}
           justifyContent="space-between">
           <StatusChip
             label={getInvoiceStatusStyles(invoice?.status ?? '').label}
@@ -785,9 +790,13 @@ export const InvoiceForm = ({
             size="small"
             variant="filled"
           />
-          <Notes invoice={invoice!} />
+          <Notes
+            parentId={invoice.propertyOwner.id}
+            title="Customer Notes"
+            type="customer"
+          />
         </Box>
-      )} */}
+      )}
       <Grid
         container
         columnGap={3}
