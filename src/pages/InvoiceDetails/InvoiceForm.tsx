@@ -59,6 +59,7 @@ import {
 import {AddressRecord, Amount, PdfGenerationStatus} from 'models/misc';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {
+  capitalize,
   convertToText,
   formatAddressFullname,
   formatSearchParams,
@@ -376,9 +377,14 @@ export const InvoiceForm = ({
   };
 
   const generateSubject = () => {
-    if (formik.values.type === InvoiceType.CREDIT_NOTE) {
-      return t('Credit note for {{invoiceNumber}}', {
+    if (invoiceType === InvoiceType.CREDIT_NOTE) {
+      if (!serviceOrder) {
+        return t('Credit Note');
+      }
+
+      return t('{{jobType}} - Credit note for {{invoiceNumber}}', {
         invoiceNumber: invoice?.number ?? '',
+        jobType: t(capitalize([serviceOrder?.type])) ?? '',
       });
     }
 
@@ -386,19 +392,17 @@ export const InvoiceForm = ({
       return invoice?.subject;
     }
 
-    return t('{{customerName}} - Invoice for {{invoiceNumber}}', {
-      invoiceNumber:
-        formType === 'new'
-          ? companyNextNumber?.value
-          : invoice?.externalId ?? '',
-      customerName: customer?.name ?? '',
-    });
+    if (!serviceOrder) {
+      return t('Invoice');
+    }
+
+    return t(capitalize([serviceOrder?.type]));
   };
 
   useEffect(() => {
     const subject = generateSubject();
     formik.setFieldValue('subject', subject);
-  }, [formik.values.type, companyNextNumber, invoice, customer]);
+  }, [formik.values.type, companyNextNumber, invoice, customer, serviceOrder]);
 
   useEffect(() => {
     formik.setFieldValue(
@@ -573,7 +577,7 @@ export const InvoiceForm = ({
   }, [serviceOrder]);
 
   const isDueDateInPast = () => {
-    const localDueDate = invoice?.dueDate as string;
+    const localDueDate = formik.values.dueDate as Date;
     const dueDateObject = startOfDay(
       parseISO(new Date(localDueDate).toISOString()),
     );
@@ -747,11 +751,13 @@ export const InvoiceForm = ({
 
   const generateEmailSubject = () => {
     const name =
-      invoice?.type === InvoiceType.CREDIT_NOTE
+      formik.values?.type === InvoiceType.CREDIT_NOTE
         ? invoice?.serviceCompany.name
         : customer?.name;
     const type =
-      invoice?.type === InvoiceType.CREDIT_NOTE ? 'Credit Note' : 'Invoice';
+      formik.values?.type === InvoiceType.CREDIT_NOTE
+        ? 'Credit Note'
+        : 'Invoice';
 
     return t(`${name} - ${t(type)} {{invoiceNumber}}`, {
       invoiceNumber: invoice?.number ?? '',
@@ -1159,7 +1165,6 @@ export const InvoiceForm = ({
               width="100%">
               <DatePicker
                 defaultDate={formik.values.sentDate}
-                minDate={new Date()}
                 getSelectedDate={(newValue) => {
                   if (newValue) formik.setFieldValue('sentDate', newValue);
                 }}
@@ -1176,7 +1181,6 @@ export const InvoiceForm = ({
                   }
                 }}
                 errorMessage={dueDateError}
-                minDate={new Date()}
                 getSelectedDate={(newValue) => {
                   setDueDateError('');
                   if (newValue) formik.setFieldValue('dueDate', newValue);

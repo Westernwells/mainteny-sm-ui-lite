@@ -95,8 +95,8 @@ export const UnitDetails = ({
   });
 
   useEffect(() => {
-    setInitValue(formik.values.externalId!);
-  }, []);
+    setInitValue(elevator.externalId);
+  }, [elevator.externalId, openDialog]);
 
   const labels = useRef([
     'category',
@@ -172,7 +172,10 @@ export const UnitDetails = ({
       </Grid>
       <Dialog
         title="Edit Unit Details"
-        onCancel={() => setOpenDialog(false)}
+        onCancel={() => {
+          formik.resetForm();
+          setOpenDialog(false);
+        }}
         disableSaveBtn={!!Object.keys(formik.errors).length || !formik.dirty}
         onSave={() => onSave()}
         dialogProps={{
