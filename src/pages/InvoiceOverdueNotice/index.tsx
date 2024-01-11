@@ -7,7 +7,6 @@ import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
-import TextField from '@mui/material/TextField';
 import Cancel from '@mui/icons-material/Cancel';
 import Print from '@mui/icons-material/Print';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
@@ -350,35 +349,41 @@ export const InvoiceOverdueNotice = () => {
               display="flex"
               justifyContent="space-between"
               alignItems="center">
-              <Typography variant="body2">{t('Initial amount')}</Typography>
-              <TextField
-                name="initialAmount"
-                size="small"
-                value={formik.values.initialAmount}
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                error={
-                  !!(
-                    formik.touched.initialAmount && formik.errors.initialAmount
-                  )
-                }
-                sx={{width: '120px'}}
-                InputProps={{
-                  inputProps: {
-                    type: 'number',
-                    min: 0,
-                  },
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      {
-                        getCurrencySymbol[
-                          invoice?.totalAmount.currency ?? 'EUR'
-                        ]
-                      }
-                    </InputAdornment>
-                  ),
+              <Typography flex={1} variant="body2">
+                {t('Initial amount')}
+              </Typography>
+              <FormInput
+                fullWidth={false}
+                onValueChange={(values) => {
+                  formik.setFieldValue(values.name as string, values.value);
                 }}
-                required
+                inputType="currency"
+                props={{
+                  name: 'initialAmount',
+                  size: 'small',
+                  value: formik.values.initialAmount,
+                  onBlur: formik.handleBlur,
+                  error: !!(
+                    formik.touched.initialAmount && formik.errors.initialAmount
+                  ),
+
+                  sx: {width: '120px'},
+                  InputProps: {
+                    inputProps: {
+                      min: 0,
+                    },
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        {
+                          getCurrencySymbol[
+                            invoice?.totalAmount.currency ?? 'EUR'
+                          ]
+                        }
+                      </InputAdornment>
+                    ),
+                  },
+                  required: true,
+                }}
               />
             </Box>
 
@@ -387,32 +392,37 @@ export const InvoiceOverdueNotice = () => {
               justifyContent="space-between"
               alignItems="center">
               <Typography variant="body2">{t('Handling fee')}</Typography>
-              <TextField
-                name="handlingFee"
-                size="small"
-                value={formik.values.handlingFee}
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                error={
-                  !!(formik.touched.handlingFee && formik.errors.handlingFee)
-                }
-                sx={{width: '120px'}}
-                InputProps={{
-                  inputProps: {
-                    type: 'number',
-                    min: 0,
-                  },
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      {
-                        getCurrencySymbol[
-                          invoice?.totalAmount.currency ?? 'EUR'
-                        ]
-                      }
-                    </InputAdornment>
-                  ),
+              <FormInput
+                fullWidth={false}
+                onValueChange={(values) => {
+                  formik.setFieldValue(values.name as string, values.value);
                 }}
-                required
+                inputType="currency"
+                props={{
+                  name: 'handlingFee',
+                  size: 'small',
+                  value: formik.values.handlingFee,
+                  onBlur: formik.handleBlur,
+                  error: !!(
+                    formik.touched.handlingFee && formik.errors.handlingFee
+                  ),
+                  sx: {width: '120px'},
+                  InputProps: {
+                    inputProps: {
+                      min: 0,
+                    },
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        {
+                          getCurrencySymbol[
+                            invoice?.totalAmount.currency ?? 'EUR'
+                          ]
+                        }
+                      </InputAdornment>
+                    ),
+                  },
+                  required: true,
+                }}
               />
             </Box>
 
