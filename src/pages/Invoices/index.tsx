@@ -88,8 +88,10 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
       pageSize: page.pageSize,
       query: search,
       status: status ? [status] : [],
-      totalAmountFrom,
-      totalAmountTo,
+      ...(cost.length > 0 && {
+        totalAmountFrom,
+        totalAmountTo,
+      }),
       ...(sortOrder && {order: sortOrder}),
       ...(orderByField && {orderByField}),
     },
