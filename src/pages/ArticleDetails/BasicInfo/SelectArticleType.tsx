@@ -122,6 +122,10 @@ export const SelectArticleType = ({
                 <Box>
                   <FormInput
                     containerStyles={{pr: '1rem'}}
+                    onValueChange={(values) => {
+                      formik.setFieldValue(values.name as string, values.value);
+                    }}
+                    inputType="currency"
                     props={{
                       name: 'costPackage.labor.value',
                       label: t('Labor price'),
@@ -140,7 +144,6 @@ export const SelectArticleType = ({
                         'costPackage.labor.value',
                       ),
                       onBlur: formik.handleBlur,
-                      onChange: formik.handleChange,
                       InputProps: {
                         startAdornment: (
                           <InputAdornment position="start">
@@ -174,6 +177,10 @@ export const SelectArticleType = ({
 
                 <Box>
                   <FormInput
+                    onValueChange={(values) => {
+                      formik.setFieldValue(values.name as string, values.value);
+                    }}
+                    inputType="currency"
                     props={{
                       name: 'costPackage.material.value',
                       label: t('Material price'),
@@ -195,7 +202,7 @@ export const SelectArticleType = ({
                         'costPackage.material.value',
                       ),
                       onBlur: formik.handleBlur,
-                      onChange: formik.handleChange,
+
                       InputProps: {
                         startAdornment: (
                           <InputAdornment position="start">
