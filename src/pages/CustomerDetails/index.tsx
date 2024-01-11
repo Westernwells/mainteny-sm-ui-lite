@@ -55,7 +55,7 @@ export const CustomerDetails = ({getCurrentPageTitle}: Props) => {
   }, []);
 
   return (
-    <Box display="flex" justifyContent="space-between">
+    <Box display="flex" flex={1} justifyContent="space-between">
       <Tabs
         tabItems={tabItems}
         currentIndex={tabValue}
