@@ -22,6 +22,7 @@ export const Button = ({
     <MuiButton
       disabled={disabled}
       disableRipple
+      data-test-id="btn-test"
       disableFocusRipple
       disableElevation
       variant="text"

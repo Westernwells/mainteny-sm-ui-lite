@@ -70,6 +70,7 @@ export const BasicInformation = ({containerStyles, company}: Props) => {
   return (
     <>
       <InfoCard
+        testId="basic-info"
         containerStyles={{...containerStyles}}
         handleAction={() => setOpenDialog(true)}
         header={
