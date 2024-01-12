@@ -88,6 +88,7 @@ export const BasicInformation = ({containerStyles, company}: Props) => {
       </InfoCard>
       <Dialog
         title="Edit Basic Information"
+        saveBtnType="submit"
         onCancel={() => setOpenDialog(false)}
         onSave={() => onSave()}
         disableSaveBtn={!!Object.keys(formik.errors).length}
