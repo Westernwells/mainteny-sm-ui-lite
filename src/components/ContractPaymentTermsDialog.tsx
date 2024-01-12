@@ -91,7 +91,6 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
   const formik = useFormik<{
     otherPaymentTerms: {id: string; term: string}[];
   }>({
-    isInitialValid: false,
     initialValues: {
       otherPaymentTerms: [],
     },
@@ -143,6 +142,7 @@ export const ContractPaymentTermsDialog = ({open, onCancel, title}: Props) => {
       onCancel();
     },
     validationSchema,
+    validateOnMount: false,
   });
 
   const handleToggle = (id: string) => {
