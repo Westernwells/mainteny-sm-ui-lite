@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {t} from 'i18next';
 import {theme} from 'theme';
 import {
@@ -20,14 +20,22 @@ import {
 import {FormikProps} from 'formik';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {FormInput} from 'components/form/FormInput';
-import {InvoiceFormData, InvoiceView, PaymentType} from 'models/invoice';
+import {
+  InvoiceFormData,
+  InvoiceType,
+  InvoiceView,
+  PaymentType,
+} from 'models/invoice';
 import {LanguageContext} from 'context/LanguageProvider';
 import {
   formatCurrency,
   getCurrencySymbol,
   useCurrentCurrency,
 } from 'utils/currency';
-import {calculateTotalAmountInclVats} from 'utils/calculate-total';
+import {
+  calculateTotalAmountInclVats,
+  calculateTotalWithPerItemDiscount,
+} from 'utils/calculate-total';
 import {fixRounding} from 'utils/utils';
 import {formatDate, toDate} from 'utils/datetime';
 import {ReactComponent as PartialInvoiceIcon} from 'assets/icons/PartialInvoiceIcon.svg';
@@ -167,6 +175,25 @@ export const PartialPaymentsSection = ({formik, previousInvoices}: Props) => {
       roundingMode: 'floor',
     },
   );
+
+  useEffect(() => {
+    // prefill amount if it's a final invoice after partial invoices
+    const isFinalAfterPartial =
+      previousInvoices.length > 1 && formik.values.type === InvoiceType.FINAL;
+    if (
+      isFinalAfterPartial &&
+      formik.values.payment?.type === PaymentType.LUMP_SUM
+    ) {
+      const subtotalExclVat = calculateTotalWithPerItemDiscount(formik.values);
+      formik.setFieldValue('payment', {
+        ...formik.values.payment,
+        amount: {
+          ...formik.values.payment?.amount,
+          value: subtotalExclVat - previousInvoicesTotalExclVat,
+        },
+      });
+    }
+  }, []);
 
   const invoicedSectionColumns: {
     name: string;
