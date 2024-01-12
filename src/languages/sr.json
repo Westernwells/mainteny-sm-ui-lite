@@ -1999,5 +1999,7 @@
   "Footer": "Podnožje",
   "Customer Notes": "Napomene kupaca",
   "{{jobType}} - Invoice for {{invoiceNumber}}": "{{jobType}} – Faktura za {{invoiceNumber}}",
-  "{{jobType}} - Credit note for {{invoiceNumber}}": "{{jobType}} – Kredit za {{invoiceNumber}}"
+  "{{jobType}} - Credit note for {{invoiceNumber}}": "{{jobType}} – Kredit za {{invoiceNumber}}",
+  "pack": "pakovanje",
+  "Created on {{creationDate}}": "Napravljeno {{creationDate}}"
 }
