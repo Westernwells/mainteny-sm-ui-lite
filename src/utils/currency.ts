@@ -7,6 +7,7 @@ import {
   AmountRecord,
   StringMap,
   Currency as CurrencyModalType,
+  Money,
 } from '../models/misc';
 
 export const formatCurrency = (
@@ -160,3 +161,9 @@ export const useCurrentCurrency = (): CurrencyModalType => {
     }
   );
 };
+
+export const moneyRecordForBackend = (money?: Money) => ({
+  fractionDigits: money?.fractionDigits ?? 2,
+  currency: money?.currency ?? 'EUR',
+  value: (money?.value ?? 0) * 10 ** (money?.fractionDigits ?? 2),
+});

@@ -12,6 +12,9 @@ import {
   Typography,
   Box,
   InputAdornment,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -38,6 +41,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateInvoice,
   useDeleteInvoice,
+  useFetchServiceOrderInvoices,
   useInvoices,
   usePublishInvoice,
   useUpdateInvoice,
@@ -50,6 +54,8 @@ import {
   InvoiceFormData,
   CreateInvoice,
   InvoiceItem,
+  PaymentTypeOptions,
+  PaymentType,
 } from 'models/invoice';
 import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
 import {
@@ -80,6 +86,7 @@ import CustomSnackbar from 'components/CustomSnackbar';
 
 import {CustomerAutoComplete} from 'components/CustomerAutocomplete';
 import {ArticleItemsTableNEW} from 'components/ArticleItemsTableNEW';
+import {Progress} from 'components/Progress';
 import {ReactComponent as MapPinIllustration} from 'assets/illustrations/invoice/map-pin.svg';
 import {ReactComponent as HeaderIllustration} from 'assets/illustrations/invoice/header.svg';
 import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrations/invoice/wrench-screwdriver.svg';
@@ -93,6 +100,8 @@ import {formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
 import {EditFrom} from './EditFrom';
+import {SectionTitle} from './SectionTitle';
+import {PartialPaymentsSection} from './PartialPaymentsSection';
 
 interface Props {
   invoice?: InvoiceView;
@@ -125,26 +134,6 @@ const isExternalIdUnique = async (resource: InvoiceView[], value?: string) => {
 };
 
 const pageSize = 50;
-
-export const SectionTitle = ({
-  Icon,
-  title,
-  actionComponent,
-}: {
-  Icon: React.FunctionComponent<
-    React.SVGProps<SVGSVGElement> & {title?: string | undefined}
-  >;
-  title: string;
-  actionComponent?: React.ReactNode;
-}) => (
-  <Box display="flex" alignItems="center" justifyContent="space-between">
-    <Box display="flex" alignItems="center" gap={1.5}>
-      <Icon width="2rem" height="2rem" style={{marginBottom: '4px'}} />
-      <Typography variant="h5">{t(title)}</Typography>
-    </Box>
-    {actionComponent}
-  </Box>
-);
 
 const articleViewToItem = (
   articleView: ServiceOrderArticleView,
@@ -303,6 +292,9 @@ export const InvoiceForm = ({
     customerSpecificOrderNumber: '',
     moreInfo: DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
     unitNumber: '-',
+    payment: {
+      type: PaymentType.LUMP_SUM,
+    },
   };
 
   const validationSchema = Yup.object().shape({
@@ -356,6 +348,28 @@ export const InvoiceForm = ({
       navigate(`/invoices/details/${invoiceId}`);
     },
   });
+
+  const {data: previousInvoices = [], isLoading: isLoadingPreviousInvoices} =
+    useFetchServiceOrderInvoices(formik.values.serviceOrderId);
+  const sortedPreviousInvoices = useMemo(
+    () =>
+      [...previousInvoices]
+        .sort(
+          (a, b) =>
+            new Date(a.meta.createdAt).getTime() -
+            new Date(b.meta.createdAt).getTime(),
+        )
+        .map((i) => ({
+          ...i,
+          totalAmount: {
+            ...i.totalAmount,
+            vats: [...i.totalAmount.vats].sort(
+              (a, b) => b.percentageVat - a.percentageVat,
+            ),
+          },
+        })),
+    [previousInvoices],
+  );
 
   useEffect(() => {
     formik.setFieldValue(
@@ -1068,6 +1082,19 @@ export const InvoiceForm = ({
             />
           </Grid>
 
+          {/* PARTIAL PAYMENTS */}
+          {formik.values.type === InvoiceType.PARTIAL ||
+          previousInvoices.length > 0 ? (
+            isLoadingPreviousInvoices ? (
+              <Progress />
+            ) : (
+              <PartialPaymentsSection
+                formik={formik}
+                previousInvoices={sortedPreviousInvoices}
+              />
+            )
+          ) : null}
+
           {/* FOOTER */}
           <Grid container item xs={12} bgcolor="white" p={3} rowGap={2.5}>
             <Box pb={0.5}>
@@ -1320,6 +1347,32 @@ export const InvoiceForm = ({
                     formik.touched.costCenter && formik.errors.costCenter,
                 }}
               />
+            </Box>
+
+            {/* PAYMENT TYPE */}
+            <Box>
+              <Typography variant="body2" color="grey.700">
+                {t('Payment type')}
+              </Typography>
+              <RadioGroup
+                defaultValue={PaymentType.LUMP_SUM}
+                name="radio-buttons-group">
+                {Object.entries(PaymentTypeOptions).map(([key, value]) => (
+                  <FormControlLabel
+                    key={key}
+                    value={key}
+                    control={<Radio size="small" />}
+                    label={t(value)}
+                    componentsProps={{typography: {variant: 'body2'}}}
+                    onChange={() => formik.setFieldValue('payment.type', key)}
+                    checked={formik.values.payment?.type === key}
+                    disabled={
+                      previousInvoices.length > 0 &&
+                      key === PaymentType.PER_ITEM
+                    }
+                  />
+                ))}
+              </RadioGroup>
             </Box>
           </Grid>
 
