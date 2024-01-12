@@ -11,7 +11,7 @@ import MapIcon from '@mui/icons-material/Map';
 import {IconButton, InputAdornment} from '@mui/material';
 import {useFetchAddressObjectByName} from 'hooks/reactQuery/useAddress';
 import {UserCompanyContext} from 'context/UserCompanyProvider';
-import {companyLanguageContextMap} from 'utils/utils';
+import {companyLanguageContextMap, formatAddressFullname} from 'utils/utils';
 import {MapLocationPicker} from './MapLocationPicker';
 
 interface Props {
@@ -53,7 +53,7 @@ export const AddressAutoComplete = ({
 
   useEffect(() => {
     if (getAddress && addressData) {
-      getAddress({
+      const data: AddressRecord = {
         countryCode: addressData?.countryCode,
         fullName: addressData?.fullName as string,
         component: {
@@ -68,7 +68,8 @@ export const AddressAutoComplete = ({
           latitude: addressData?.location?.latitude as number,
           longitude: addressData?.location?.longitude as number,
         },
-      });
+      };
+      getAddress(formatAddressFullname(data) as AddressRecord);
     }
   }, [addressData]);
 

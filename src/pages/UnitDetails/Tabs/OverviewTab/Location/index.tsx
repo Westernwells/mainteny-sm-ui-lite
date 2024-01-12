@@ -13,6 +13,8 @@ import {Dialog} from 'components/Dialog';
 import * as Yup from 'yup';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {LocationFormModel} from 'models/unitForm';
+import {formatAddressFullname} from 'utils/utils';
+import {AddressRecord} from 'models/misc';
 import {LocationSchema} from './LocationSchema';
 import {EditLocationForm} from './EditLocationForm';
 
@@ -70,10 +72,13 @@ export const Location = ({
 
   const onSave = async () => {
     setOpenDialog(false);
+
     await updateElevator({
       body: {
         propertyOwnerId,
-        address: formik.values.address,
+        address: formatAddressFullname(formik.values.address) as
+          | AddressRecord
+          | undefined,
         buildingLocation: formik.values.building || '',
         propertySegment: formik.values.propertySegment!,
         keyLocation: formik.values.keyLocation!,
