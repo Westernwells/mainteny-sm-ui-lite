@@ -28,17 +28,19 @@ export const CustomerAutoComplete = ({
     initialValue,
   );
 
+  const {data: customerResource = createEmptyResource(10)} = useQueryCustomers({
+    pageIndex: 0,
+    pageSize: 6,
+    query: query ? encodeURIComponent(query) : '',
+  });
+
   useEffect(() => {
     if (!customer) {
       setCustomer(initialValue);
     }
-  }, [initialValue]);
 
-  const {data: customerResource = createEmptyResource(10)} = useQueryCustomers({
-    pageIndex: 0,
-    pageSize: 6,
-    query,
-  });
+    setQuery(initialValue?.name!);
+  }, [initialValue]);
 
   const debouncedChangeHandler = useCallback(
     _.debounce((newValue: string) => {
@@ -52,9 +54,13 @@ export const CustomerAutoComplete = ({
     newValue: string,
     reason: string,
   ) => {
-    setQueryView(newValue);
-    debouncedChangeHandler(newValue);
+    if (newValue) {
+      setQueryView(newValue);
+      debouncedChangeHandler(newValue);
+    }
+
     if (reason === 'clear') {
+      setQuery('');
       setQueryView('');
       setCustomer(null);
     }
@@ -86,6 +92,11 @@ export const CustomerAutoComplete = ({
       id="combo-box-demo"
       sx={{minHeight: 0}}
       options={customerResource.data}
+      isOptionEqualToValue={(option, value) => {
+        const optionId = option && option.id;
+        const valueId = value && value.id;
+        return optionId === valueId;
+      }}
       onChange={(event: any, newValue: PropertyOwnerView | null) => {
         setCustomer(newValue);
       }}

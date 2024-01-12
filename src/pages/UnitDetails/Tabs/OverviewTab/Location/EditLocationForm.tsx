@@ -54,6 +54,32 @@ export const EditLocationForm = ({formik}: Props) => {
           props={{
             size: 'small',
             placeholder: '',
+            label: 'Street',
+            name: 'address.component.street',
+            required: true,
+            value: formik.values.address?.component?.street ?? '',
+            onChange: formik.handleChange,
+          }}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <FormInput
+          props={{
+            size: 'small',
+            placeholder: '',
+            label: 'Street 2',
+            name: 'address.component.street2',
+            required: false,
+            value: formik.values.address?.component?.street2 ?? '',
+            onChange: formik.handleChange,
+          }}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <FormInput
+          props={{
+            size: 'small',
+            placeholder: '',
             label: 'City',
             name: 'address.component.city',
 

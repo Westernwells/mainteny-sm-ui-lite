@@ -1,13 +1,14 @@
 import {
   Address,
   AddressRecord,
+  CompanyContact,
   Contact,
   Meta,
   Order,
   Priority,
   WithOptional,
 } from './misc';
-import {ServiceCompany} from './service-company';
+import {ServiceCompany, ServiceCompanySimpleView} from './service-company';
 import {UserAccount, UserAccountSimpleView} from './user';
 
 export interface PropertyOwner {
@@ -52,6 +53,8 @@ export interface PropertyOwnerView {
   additionalInfo: PropertyOwnerAdditionalInfo;
   labels: string[];
   externalId: string;
+  serviceCompany: ServiceCompanySimpleView;
+  contactPersons: CompanyContact;
 }
 
 export interface PropertyOwnerSimpleView {
