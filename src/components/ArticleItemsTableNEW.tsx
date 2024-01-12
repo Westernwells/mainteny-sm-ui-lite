@@ -1,4 +1,4 @@
-import {useContext, useEffect, useMemo, useState} from 'react';
+import React, {useContext, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {FormikProps} from 'formik';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
@@ -453,8 +453,8 @@ export const ArticleItemsTableNEW = ({
                     </Typography>
                   </>
                 ) : (
-                  percentageVats.map((v) => (
-                    <>
+                  percentageVats.map((v, index) => (
+                    <React.Fragment key={index + v.percentageVat}>
                       <Typography color="primary.dark">
                         {t('VAT')} {v.percentageVat}%
                       </Typography>
@@ -466,7 +466,7 @@ export const ArticleItemsTableNEW = ({
                           roundingMode: 'floor',
                         })}
                       </Typography>
-                    </>
+                    </React.Fragment>
                   ))
                 )}
                 <Typography color="primary.dark">

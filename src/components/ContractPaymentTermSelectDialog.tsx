@@ -42,7 +42,6 @@ export const ContractPaymentTermSelectDialog = ({
   const formik = useFormik<{
     paymentTermId: string;
   }>({
-    isInitialValid: false,
     initialValues: {
       paymentTermId: '',
     },
@@ -52,6 +51,7 @@ export const ContractPaymentTermSelectDialog = ({
       onCancel();
     },
     validationSchema,
+    validateOnMount: false,
   });
 
   const {data: contractPaymentTerms = createEmptyResource(pageSize)} =

@@ -189,8 +189,10 @@ export const getUniqueId = () => Math.random().toString(36).substring(2, 9);
 export const getPercentage = (num: number, total: number) =>
   Math.round((num / total) * 100);
 
-export const formatAddressFullname = (address: AddressRecord | null) => {
-  if (!address) return null;
+export const formatAddressFullname = (
+  address: AddressRecord | null | undefined,
+) => {
+  if (!address) return address;
 
   const name = address?.component?.name ? address?.component?.name : '';
   const address1 = address?.component?.street ? address?.component?.street : '';

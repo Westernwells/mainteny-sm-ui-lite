@@ -83,7 +83,6 @@ import {getStartEndPrice} from 'utils/contract-utils';
 import {getItemRecord} from 'utils/article-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
-
 import {CustomerAutoComplete} from 'components/CustomerAutocomplete';
 import {ArticleItemsTableNEW} from 'components/ArticleItemsTableNEW';
 import {Progress} from 'components/Progress';
@@ -93,9 +92,10 @@ import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrati
 import {ReactComponent as FooterIllustration} from 'assets/illustrations/invoice/footer.svg';
 import {ReactComponent as PinIllustration} from 'assets/illustrations/invoice/pin.svg';
 import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/invoice/task-list-pen.svg';
-
 import {ComboBox} from 'components/ComboBox';
-
+import {StatusChip} from 'components/StatusChip';
+import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
+import {Notes} from 'components/Notes';
 import {formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
@@ -688,8 +688,11 @@ export const InvoiceForm = ({
     useInvoices(
       {
         pageIndex: 0,
-        pageSize: 25,
-        query: String(formik.values.externalId!),
+        pageSize: 4,
+        query:
+          formik.values.externalId && formik.values.externalId !== ''
+            ? encodeURIComponent(formik.values.externalId!)
+            : '',
         status: [],
         totalAmountFrom,
         totalAmountTo,
@@ -788,10 +791,12 @@ export const InvoiceForm = ({
 
   return (
     <Box>
-      {/* {invoice && (
+      {invoice && (
         <Box
           display="flex"
           alignItems="flex-end"
+          mb={3}
+          mt={1}
           justifyContent="space-between">
           <StatusChip
             label={getInvoiceStatusStyles(invoice?.status ?? '').label}
@@ -799,9 +804,13 @@ export const InvoiceForm = ({
             size="small"
             variant="filled"
           />
-          <Notes invoice={invoice!} />
+          <Notes
+            parentId={invoice.propertyOwner.id}
+            title="Customer Notes"
+            type="customer"
+          />
         </Box>
-      )} */}
+      )}
       <Grid
         container
         columnGap={3}
@@ -1035,6 +1044,7 @@ export const InvoiceForm = ({
             <FormInput
               props={{
                 id: 'subject',
+                name: 'subject',
                 value: formik.values.subject,
                 label: 'Subject',
                 onChange: formik.handleChange,
@@ -1048,6 +1058,7 @@ export const InvoiceForm = ({
             <FormInput
               props={{
                 id: 'description',
+                name: 'description',
                 value: formik.values.description,
                 label: 'Description',
                 onChange: formik.handleChange,
@@ -1102,6 +1113,7 @@ export const InvoiceForm = ({
             </Box>
             <FormInput
               props={{
+                id: 'moreInfo',
                 size: 'small',
                 label: notesText,
                 name: 'moreInfo',
@@ -1113,6 +1125,7 @@ export const InvoiceForm = ({
             />
             <FormInput
               props={{
+                id: 'paymentTerms',
                 size: 'small',
                 label: 'Payment terms',
                 name: 'paymentTerms',
@@ -1440,11 +1453,14 @@ export const InvoiceForm = ({
         }))}
         isValid={isValid()}
       />
-      <NewCustomer
-        isDialogOpen={isAddNewCustomerDialogOpen}
-        onClose={() => setIsAddNewCustomerDialogOpen(false)}
-        onSave={setNewlyCreatedCustomer}
-      />
+      {isAddNewCustomerDialogOpen && (
+        <NewCustomer
+          isDialogOpen={isAddNewCustomerDialogOpen}
+          onClose={() => setIsAddNewCustomerDialogOpen(false)}
+          onSave={setNewlyCreatedCustomer}
+        />
+      )}
+
       <EditFrom
         isDialogOpen={isEditFromDialogOpen}
         onClose={() => setIsEditFromDialogOpen(false)}
@@ -1503,25 +1519,32 @@ export const InvoiceForm = ({
         content="Do you want to delete this Invoice?"
         helperText="This action is irreversible."
       />
-      <ContractPaymentTermSelectDialog
-        title={t('Payment Terms')}
-        alertText={t('Choose a payment term to be used on your invoice')}
-        open={openContractPaymentTermSelectDialog}
-        onSave={handleContractPaymentTermsModal}
-        onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
-        onClickPaymentTerms={() => setOpenContractPaymentTermsDialog(true)}
-      />
 
-      <ContractPaymentTermsDialog
-        title={t('Manage Payment Terms')}
-        open={openContractPaymentTermsDialog}
-        onCancel={() => setOpenContractPaymentTermsDialog(false)}
-      />
+      {openContractPaymentTermSelectDialog && (
+        <ContractPaymentTermSelectDialog
+          title={t('Payment Terms')}
+          alertText={t('Choose a payment term to be used on your invoice')}
+          open={openContractPaymentTermSelectDialog}
+          onSave={handleContractPaymentTermsModal}
+          onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
+          onClickPaymentTerms={() => setOpenContractPaymentTermsDialog(true)}
+        />
+      )}
 
-      <AutoGeneratedIdDialog
-        openDialog={openDialog}
-        setOpenDialog={setOpenDialog}
-      />
+      {openContractPaymentTermsDialog && (
+        <ContractPaymentTermsDialog
+          title={t('Manage Payment Terms')}
+          open={openContractPaymentTermsDialog}
+          onCancel={() => setOpenContractPaymentTermsDialog(false)}
+        />
+      )}
+
+      {openDialog && (
+        <AutoGeneratedIdDialog
+          openDialog={openDialog}
+          setOpenDialog={setOpenDialog}
+        />
+      )}
     </Box>
   );
 };

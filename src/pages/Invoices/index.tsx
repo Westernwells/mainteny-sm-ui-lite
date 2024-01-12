@@ -201,7 +201,7 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
           }
         }}
         multiple={false}
-        initialSelectedItems={status ? [InvoiceStatusView[status]] : []}
+        initialSelectedItems={status && [InvoiceStatusView[status]]}
         formControlStyles={{width: '100%'}}
         containerStyles={{flex: 1}}
         disableClearBtn

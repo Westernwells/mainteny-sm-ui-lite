@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, FormEvent, ChangeEvent, FocusEvent} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 import ArrowForward from '@mui/icons-material/ArrowForward';
@@ -18,9 +18,9 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import {SUCCESS_COLOR} from 'theme';
 
 interface Props {
-  handleSubmit: (e?: React.FormEvent<HTMLFormElement> | undefined) => void;
-  handleChange: (e: React.ChangeEvent<any>) => void;
-  handleBlur: (e: React.FocusEvent<any, Element>) => void;
+  handleSubmit: (e?: FormEvent<HTMLFormElement> | undefined) => void;
+  handleChange: (e: ChangeEvent<any>) => void;
+  handleBlur: (e: FocusEvent<any, Element>) => void;
   token: string;
   tokenError: string | undefined;
   tokenTouched: boolean | undefined;
@@ -57,9 +57,9 @@ export const PasswordReset = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [heading, setHeading] = useState(t('Forgot Password'));
-  const [swap, setSwap] = useState<Boolean>(false);
+  const [swap, setSwap] = useState<boolean>(false);
   const {request} = useResetPassword();
-  const handleSwap = (value: Boolean, option: number) => {
+  const handleSwap = (value: boolean, option: number) => {
     setSwap(value);
     switch (option) {
       case 1:
@@ -123,6 +123,7 @@ export const PasswordReset = ({
                 <Button
                   sx={{width: '100%', marginTop: 1}}
                   variant="text"
+                  data-testid="back"
                   onClick={() => navigate('/reset-password')}
                   size="large"
                   startIcon={<ArrowBack />}>
@@ -131,6 +132,7 @@ export const PasswordReset = ({
                 <Typography color="text.secondary" textAlign="center" mt={5}>
                   <Typography
                     color="secondary.dark"
+                    data-testid="resend"
                     component="span"
                     onClick={() => request(email)}
                     sx={{cursor: 'pointer'}}>

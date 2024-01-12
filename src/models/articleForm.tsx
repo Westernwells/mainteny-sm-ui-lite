@@ -65,4 +65,5 @@ export enum MeasurementUnit {
   h = 'h',
   s = 's',
   min = 'min',
+  pack = 'pack',
 }

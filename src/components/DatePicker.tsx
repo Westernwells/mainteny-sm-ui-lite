@@ -142,32 +142,32 @@ export const DatePicker = ({
     '& .MuiButtonBase-root MuiPickersDay-root MuiPickersDay-dayWithMargin': {
       color: 'white',
     },
-    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer .MuiPickersDay-dayWithMargin:first-child':
+    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer .MuiPickersDay-dayWithMargin:first-of-type':
       {
         borderLeft: '1px solid #222B451F',
       },
-    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:first-child .MuiPickersDay-dayWithMargin:nth-child(-n + 7)':
+    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:first-of-type .MuiPickersDay-dayWithMargin:nth-of-type(-n + 7)':
       {
         borderTop: '1px solid #222B451F',
       },
-    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:last-child .MuiPickersDay-dayWithMargin:nth-last-child(-n+7)':
+    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:last-of-type .MuiPickersDay-dayWithMargin:nth-last-of-type(-n+7)':
       {
         borderBottom: '1px solid #222B451F',
         borderTop: '0',
       },
-    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:first-child .MuiPickersDay-dayWithMargin:first-child':
+    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:first-of-type .MuiPickersDay-dayWithMargin:first-of-type':
       {
         borderTopLeftRadius: '4px',
       },
-    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:first-child .MuiPickersDay-dayWithMargin:last-child':
+    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:first-of-type .MuiPickersDay-dayWithMargin:last-of-type':
       {
         borderTopRightRadius: '4px',
       },
-    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:last-child .MuiPickersDay-dayWithMargin:nth-last-child(7)':
+    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:last-of-type .MuiPickersDay-dayWithMargin:nth-last-of-type(7)':
       {
         borderBottomLeftRadius: '4px',
       },
-    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:last-child .MuiPickersDay-dayWithMargin:last-child':
+    '& .MuiDayCalendar-monthContainer .MuiDayCalendar-weekContainer:last-of-type .MuiPickersDay-dayWithMargin:last-of-type':
       {
         borderBottomRightRadius: '4px',
       },
