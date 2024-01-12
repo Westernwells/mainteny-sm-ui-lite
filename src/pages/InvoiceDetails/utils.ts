@@ -140,7 +140,7 @@ export const applyPerItemDiscountOnItems = (arr: InvoiceItemRecord<Amount>[]) =>
       unitAmount: {
         ...item.unitAmount,
         netAmount: applyDiscount({
-          actualValue: item.unitAmount.netAmount * item.quantity,
+          actualValue: item.unitAmount.netAmount,
           ...(item.discount?.type === DiscountType.AMOUNT
             ? {
                 amount:
