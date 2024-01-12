@@ -70,6 +70,7 @@ export const Addresses = ({containerStyles, company}: Props) => {
     <>
       <InfoCard
         containerStyles={{...containerStyles}}
+        testId="address-info"
         handleAction={() => setOpenDialog(true)}
         header={<Typography variant="subtitle1">{t('Addresses')}</Typography>}
         showHeaderBackground
@@ -84,6 +85,7 @@ export const Addresses = ({containerStyles, company}: Props) => {
       </InfoCard>
       <Dialog
         title="Edit Addresses"
+        saveBtnType="submit"
         onCancel={() => setOpenDialog(false)}
         onSave={() => onSave()}
         disableSaveBtn={!!Object.keys(formik.errors).length}

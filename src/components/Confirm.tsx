@@ -78,7 +78,9 @@ export const Confirm = ({
               },
             },
           }}>
-          <Typography variant="subtitle2">{t('Yes')}</Typography>
+          <Typography data-test-id="remove" variant="subtitle2">
+            {t('Yes')}
+          </Typography>
         </Button>
       </DialogActions>
     </Dialog>
