@@ -1084,12 +1084,10 @@ export const InvoiceForm = ({
               />
             </Box>
             <ArticleItemsTableNEW
-              invoice={invoice}
               items={formik.values.items}
               setItems={setInvoiceItems}
               formik={formik}
               propertyOwnerId={customer?.id ?? ''}
-              formType={formType}
             />
           </Grid>
 
