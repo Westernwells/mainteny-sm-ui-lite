@@ -18,4 +18,20 @@ export default class SettingsPage {
             cy.get(attribute).focus().clear();
         }
     };
+
+    static fillContractName = (text) => {
+        cy.get('input[name="contractName"]').type(text);
+    };
+
+
+    static checkContract = () => {
+        cy.get('input[value="SERVICE"]').click();
+    };
+
+    static createContract = () => {
+        SettingsPage.fillContractName('TEST1');
+        SettingsPage.checkContract();
+        cy.get('button[type="submit"]').click();
+
+    };
 }

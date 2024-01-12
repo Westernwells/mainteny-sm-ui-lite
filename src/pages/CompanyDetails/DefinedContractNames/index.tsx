@@ -98,6 +98,7 @@ export const DefinedContractNames = ({company, containerStyles}: Props) => {
       </InfoCard>
       <Dialog
         title="New contract name"
+        saveBtnType="submit"
         onCancel={() => setOpenDialog(false)}
         onSave={() => formik.handleSubmit()}
         disableSaveBtn={!!Object.keys(formik.errors).length}

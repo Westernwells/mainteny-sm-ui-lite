@@ -65,6 +65,14 @@ describe('Settings page', () => {
         button.should('not.be.disabled');
     });
 
+    it('email is invalid', () => {
+        cy.get(`[data-test-id="basic-info"]`).click();
+        const input = cy.get('input[name="email"]');
+        input.clear().type('invalid');
+        cy.get('input[name="name"]').click();
+        input.parent().siblings('p').should('have.text', 'Enter a valid email');
+    });
+
     it('basic info. submit basic info', () => {
         cy.get('[data-test-id="basic-info"]').click();
         cy.get('button[type="submit"]').click();
@@ -77,17 +85,41 @@ describe('Settings page', () => {
         button.should('be.disabled');
     });
 
-    it('address. should not be disabled button when email is not empty', () => {
+    it('address. should not be disabled button', () => {
         SettingsPage.changeModalInput('billingAddress', 'test', 'address-info', false);
         const button = cy.get('button[type="submit"]');
         button.should('not.be.disabled');
     });
+
+    it('validate address inputs', () => {
+        cy.get(`[data-test-id="address-info"]`).click();
+        const billingAddress = cy.get('input[name="billingAddress"]');
+        const postalAddress = cy.get('input[name="postalAddress"]');
+        const businessAddress = cy.get('input[name="businessAddress"]');
+        const outside = cy.get('#alert-dialog-title');
+        billingAddress.clear();
+        postalAddress.clear();
+        businessAddress.clear();
+        outside.click()
+        billingAddress.parent().siblings('p').should('have.text', 'Billing Address is required');
+        businessAddress.parent().siblings('p').should('have.text', 'Business Address is required');
+        postalAddress.parent().siblings('p').should('have.text', 'Postal Address is required');
+    });
+
 
     it('address. submit address info', () => {
         cy.get('[data-test-id="address-info"]').click();
         cy.get('button[type="submit"]').click();
         cy.contains('Company updated successfully');
     });
+
+
+    it('add contract', () => {
+        cy.get('[data-test-id="contract-info"]').click({ multiple: true, force: true });
+        SettingsPage.createContract();
+        cy.contains('Contract types updated successfully');
+    });
+
 
     it('contract. delete contract', () => {
         cy.get('[data-test-id="delete-contract"]').click({ multiple: true, force: true });
