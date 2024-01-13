@@ -115,7 +115,7 @@ export const ArticleItemRowNEW = ({
     <>
       <TableRow>
         <TableCell>{index + 1}</TableCell>
-        <TableCell sx={{width: '35%'}}>
+        <TableCell sx={{width: '45%'}}>
           <TextField
             name="name"
             value={formik.values.name}
@@ -126,7 +126,7 @@ export const ArticleItemRowNEW = ({
           />
         </TableCell>
 
-        <TableCell sx={{width: '12%'}}>
+        <TableCell sx={{width: '9%'}}>
           <NumericFormat
             value={price !== 0 ? price : ''}
             customInput={TextField}
@@ -160,7 +160,7 @@ export const ArticleItemRowNEW = ({
           />
         </TableCell>
 
-        <TableCell sx={{width: '7%'}}>
+        <TableCell sx={{width: '6%'}}>
           <NumericFormat
             value={formik.values.quantity !== 0 ? formik.values.quantity : ''}
             customInput={TextField}
@@ -178,7 +178,7 @@ export const ArticleItemRowNEW = ({
               min: 0,
               max: Infinity,
               step: '0.05',
-              sx: {textAlign: 'right'},
+              sx: {textAlign: 'right', width: '100%'},
             }}
             size="small"
             onValueChange={(values) => {
@@ -192,7 +192,7 @@ export const ArticleItemRowNEW = ({
           />
         </TableCell>
 
-        <TableCell sx={{width: '7%'}}>
+        <TableCell sx={{width: '6%'}}>
           <NumericFormat
             value={
               formik.values.unitAmount.percentageVat !== 0
@@ -216,7 +216,7 @@ export const ArticleItemRowNEW = ({
               max: Infinity,
               step: '0.05',
               label: 'VAT',
-              sx: {textAlign: 'right'},
+              sx: {textAlign: 'right', width: '100%'},
             }}
             size="small"
             onValueChange={(values) => {
@@ -244,12 +244,13 @@ export const ArticleItemRowNEW = ({
               onChange: formik.handleChange,
               placeholder: t('Select Unit'),
               name: 'article.unit',
+              sx: {width: '100%'},
             }}
           />
         </TableCell>
 
         {/* DISCOUNT */}
-        <TableCell sx={{width: '12%'}}>
+        <TableCell sx={{width: '9%'}}>
           <NumericFormat
             value={
               formik.values.discount?.type === DiscountType.AMOUNT
@@ -284,6 +285,7 @@ export const ArticleItemRowNEW = ({
             }
             size="small"
             sx={{
+              width: '100%',
               '& .MuiInputBase-root': {
                 pr: 0,
               },
@@ -315,7 +317,7 @@ export const ArticleItemRowNEW = ({
           />
         </TableCell>
 
-        <TableCell sx={{width: '15%'}}>
+        <TableCell sx={{width: '18%'}}>
           <NumericFormat
             value={totalPriceExclVatAfterDiscount}
             customInput={TextField}
@@ -329,6 +331,7 @@ export const ArticleItemRowNEW = ({
             }
             size="small"
             disabled
+            sx={{width: '100%'}}
           />
         </TableCell>
 
