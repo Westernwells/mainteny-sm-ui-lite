@@ -20,6 +20,7 @@ import './commands'
 // require('./commands')
 
 import { mount } from 'cypress/react'
+import '@cypress/code-coverage/support';
 // Ensure global app styles are loaded:
 // import '../../src/index.css';
 
