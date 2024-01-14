@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import svgrPlugin from 'vite-plugin-svgr';
 import envCompatible from 'vite-plugin-env-compatible';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import istanbul from 'vite-plugin-istanbul';
 // import shimReactPdf from "vite-plugin-shim-react-pdf";
 
 // https://vitejs.dev/config/
@@ -17,6 +18,12 @@ export default defineConfig({
     react(),
     envCompatible(),
     tsconfigPaths(),
+    istanbul({
+      include: 'src/*',
+      exclude: ['node_modules', 'test/', 'cypress/'],
+      extension: ['.js', '.ts', '.tsx'],
+      requireEnv: false, // Only instrument code when process.env.CYPRESS is true
+    }),
     // shimReactPdf(),
     svgrPlugin({
       svgrOptions: {

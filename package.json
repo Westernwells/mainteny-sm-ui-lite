@@ -67,6 +67,7 @@
     "start": "vite",
     "build": "tsc && vite build",
     "test": "vite test",
+    "cy": "cypress run",
     "start:stage": "env-cmd -f .env.stage vite --mode stage",
     "start:prod": "env-cmd -f .env.prod vite --mode prod",
     "build:stage": "env-cmd -f .env.stage tsc && vite build --mode stage",
@@ -92,6 +93,7 @@
     ]
   },
   "devDependencies": {
+    "@cypress/code-coverage": "^3.12.18",
     "@testing-library/cypress": "^10.0.1",
     "@types/google-map-react": "^2.1.5",
     "@types/mixpanel-browser": "^2.38.0",
@@ -118,6 +120,7 @@
     "prettier": "^2.5.1",
     "typescript": "latest",
     "vite": "^4.0.4",
+    "vite-plugin-istanbul": "^5.0.0",
     "vite-plugin-shim-react-pdf": "^1.0.7",
     "vite-plugin-svgr": "^2.4.0",
     "vite-tsconfig-paths": "^4.2.1"
@@ -126,6 +129,21 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
+  },
+  "nyc": {
+    "reporter": [
+      "cobertura",
+      "html"
+    ],
+    "extension": [
+      ".js",
+      ".cjs",
+      ".mjs",
+      ".ts",
+      ".tsx",
+      ".jsx",
+      ".vue"
+    ]
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json}": [
