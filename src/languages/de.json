@@ -1976,5 +1976,7 @@
   "Footer": "Fußzeile",
   "Customer Notes": "Kunden Notizen",
   "{{jobType}} - Invoice for {{invoiceNumber}}": "{{jobType}} – Rechnung für {{invoiceNumber}}",
-  "{{jobType}} - Credit note for {{invoiceNumber}}": "{{jobType}} – Gutschrift zu Rechnung {{invoiceNumber}}"
+  "{{jobType}} - Credit note for {{invoiceNumber}}": "{{jobType}} – Gutschrift zu Rechnung {{invoiceNumber}}",
+  "pack": "Pkt.",
+  "Created on {{creationDate}}": "Erstellt am {{creationDate}}"
 }

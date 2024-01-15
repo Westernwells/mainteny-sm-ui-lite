@@ -8,6 +8,7 @@ interface Props {
   style?: {[key: string]: any};
   buttonProps?: ButtonProps;
   disabled?: boolean;
+  testId?: string;
 }
 
 export const Button = ({
@@ -16,12 +17,14 @@ export const Button = ({
   style,
   buttonProps,
   disabled,
+  testId,
 }: Props) => {
   const {t} = useTranslation();
   return (
     <MuiButton
       disabled={disabled}
       disableRipple
+      data-test-id={testId}
       disableFocusRipple
       disableElevation
       variant="text"

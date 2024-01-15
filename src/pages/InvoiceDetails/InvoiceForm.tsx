@@ -62,7 +62,12 @@ import {
   PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from 'models/propertyManager';
-import {AddressRecord, Amount, PdfGenerationStatus} from 'models/misc';
+import {
+  AddressComponent,
+  AddressRecord,
+  Amount,
+  PdfGenerationStatus,
+} from 'models/misc';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {
   capitalize,
@@ -801,6 +806,9 @@ export const InvoiceForm = ({
     return t(text);
   };
 
+  const hasAddressValues = (addressComponent?: AddressComponent) =>
+    Object.values(addressComponent ?? {}).some((value) => !!value);
+
   return (
     <Box>
       {invoice && (
@@ -938,7 +946,9 @@ export const InvoiceForm = ({
               <>
                 <Grid item xs={6}>
                   <SelectAndEditCombined
-                    selected={!!formik.values.billingAddress?.component?.name}
+                    selected={hasAddressValues(
+                      formik.values.billingAddress?.component!,
+                    )}
                     label="Billing Address"
                     buttonText="Add Billing Address"
                     address={formik.values.billingAddress}
@@ -951,9 +961,9 @@ export const InvoiceForm = ({
                 </Grid>
                 <Grid item xs={6} pl={2}>
                   <SelectAndEditCombined
-                    selected={
-                      !!formik.values.beneficiaryAddress?.component?.name
-                    }
+                    selected={hasAddressValues(
+                      formik.values.beneficiaryAddress?.component!,
+                    )}
                     label="Beneficiary Address"
                     buttonText="Add Beneficiary Address"
                     address={formik.values.beneficiaryAddress}
@@ -967,9 +977,9 @@ export const InvoiceForm = ({
 
                 <Grid item xs={6}>
                   <SelectAndEditCombined
-                    selected={
-                      !!formik.values.alternativeAddress?.component?.name
-                    }
+                    selected={hasAddressValues(
+                      formik.values.alternativeAddress?.component!,
+                    )}
                     label={
                       <Box>
                         <FormLabel

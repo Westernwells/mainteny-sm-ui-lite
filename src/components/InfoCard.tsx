@@ -19,6 +19,7 @@ export interface Props {
   showHeaderBackground?: boolean;
   disabledHeader?: boolean;
   handleAction?: () => void;
+  testId?: string;
 }
 
 export const InfoCard = ({
@@ -33,6 +34,7 @@ export const InfoCard = ({
   showHeaderBackground,
   disabledHeader = false,
   handleAction,
+  testId,
 }: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
@@ -59,7 +61,9 @@ export const InfoCard = ({
           }}
           action={
             headerActionIcon ? (
-              <IconButton onClick={handleAction}>{headerActionIcon}</IconButton>
+              <IconButton data-test-id={testId} onClick={handleAction}>
+                {headerActionIcon}
+              </IconButton>
             ) : null
           }
           title={typeof header === 'string' ? t(header) : header || undefined}
