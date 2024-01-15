@@ -426,7 +426,7 @@ export const ArticleItemsTableNEW = ({
                   </>
                 ) : (
                   percentageVats.map((v, index) => (
-                    <React.Fragment key={index + v.percentageVat}>
+                    <React.Fragment key={`${index}-${v.percentageVat}`}>
                       <Typography color="primary.dark">
                         {t('VAT')} {v.percentageVat}%
                       </Typography>
