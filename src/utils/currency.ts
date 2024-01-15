@@ -58,6 +58,16 @@ export function aggregatedAmountToAmount(
   };
 }
 
+export function aggregatedAmountToMoney(
+  aggregatedAmount?: AggregatedAmount,
+): Money {
+  return {
+    value: aggregatedAmount?.netAmount ?? 0,
+    currency: aggregatedAmount?.currency ?? 'EUR',
+    fractionDigits: aggregatedAmount?.fractionDigits ?? 2,
+  };
+}
+
 export function formatGrossAmount(amount?: AggregatedAmount): string {
   return formatAmount(aggregatedAmountToAmount(amount), amount?.grossAmount);
 }
