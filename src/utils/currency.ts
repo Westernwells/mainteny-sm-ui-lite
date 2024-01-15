@@ -7,6 +7,7 @@ import {
   AmountRecord,
   StringMap,
   Currency as CurrencyModalType,
+  Money,
 } from '../models/misc';
 
 export const formatCurrency = (
@@ -54,6 +55,16 @@ export function aggregatedAmountToAmount(
     netAmount: aggregatedAmount?.netAmount ?? 0,
     percentageVat: aggregatedAmount?.percentageVat ?? 0,
     vat: aggregatedAmount?.vat ?? 0,
+  };
+}
+
+export function aggregatedAmountToMoney(
+  aggregatedAmount?: AggregatedAmount,
+): Money {
+  return {
+    value: aggregatedAmount?.netAmount ?? 0,
+    currency: aggregatedAmount?.currency ?? 'EUR',
+    fractionDigits: aggregatedAmount?.fractionDigits ?? 2,
   };
 }
 
@@ -160,3 +171,9 @@ export const useCurrentCurrency = (): CurrencyModalType => {
     }
   );
 };
+
+export const moneyRecordForBackend = (money?: Money) => ({
+  fractionDigits: money?.fractionDigits ?? 2,
+  currency: money?.currency ?? 'EUR',
+  value: (money?.value ?? 0) * 10 ** (money?.fractionDigits ?? 2),
+});

@@ -1,0 +1,23 @@
+import React from 'react';
+import {t} from 'i18next';
+import {Box, Typography} from '@mui/material';
+
+export const SectionTitle = ({
+  Icon,
+  title,
+  actionComponent,
+}: {
+  Icon: React.FunctionComponent<
+    React.SVGProps<SVGSVGElement> & {title?: string | undefined}
+  >;
+  title: string;
+  actionComponent?: React.ReactNode;
+}) => (
+  <Box display="flex" alignItems="center" justifyContent="space-between">
+    <Box display="flex" alignItems="center" gap={1.5}>
+      <Icon width="2rem" height="2rem" style={{marginBottom: '4px'}} />
+      <Typography variant="h5">{t(title)}</Typography>
+    </Box>
+    {actionComponent}
+  </Box>
+);

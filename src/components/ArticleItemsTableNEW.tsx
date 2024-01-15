@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useMemo, useState} from 'react';
+import React, {useContext, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {FormikProps} from 'formik';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
@@ -33,7 +33,6 @@ import {
   DiscountTypeOptions,
   InvoiceFormData,
   InvoiceItemRecord,
-  InvoiceView,
 } from 'models/invoice';
 import {Amount} from 'models/misc';
 import {ArticleView} from 'models/article';
@@ -55,20 +54,16 @@ import {ArticleItemRowNEW} from './ArticleItemRowNEW';
 import {FormSelect} from './form/FormSelect';
 
 interface Props {
-  invoice?: InvoiceView | undefined;
   items: InvoiceItemRecord<Amount>[];
   setItems: (items: InvoiceItemRecord<Amount>[]) => void;
   propertyOwnerId: string;
-  formType?: string;
   formik: FormikProps<InvoiceFormData>;
 }
 
 export const ArticleItemsTableNEW = ({
-  invoice,
   items,
   setItems,
   propertyOwnerId,
-  formType,
   formik,
 }: Props) => {
   const {t} = useTranslation();
@@ -168,29 +163,6 @@ export const ArticleItemsTableNEW = ({
     setItems([...items, articleViewToItem(row)]);
     setIsArticleModalOpen(false);
   };
-
-  const setFinalArticles = () => {
-    const newItems = invoice?.items.map(
-      (i): InvoiceItemRecord<Amount> => ({
-        article: i.article,
-        description: i.description,
-        name: i.name,
-        quantity: i.quantity,
-        unitAmount: i.unitAmount,
-      }),
-    );
-    setItems(newItems || []);
-  };
-
-  useEffect(() => {
-    if (!invoice) {
-      if (formType === 'new' && !items.length) {
-        setItems([]);
-      }
-      return;
-    }
-    setFinalArticles();
-  }, []);
 
   const setItemAtIndex = (
     indexPos: number,
@@ -454,7 +426,7 @@ export const ArticleItemsTableNEW = ({
                   </>
                 ) : (
                   percentageVats.map((v, index) => (
-                    <React.Fragment key={index + v.percentageVat}>
+                    <React.Fragment key={`${index}-${v.percentageVat}`}>
                       <Typography color="primary.dark">
                         {t('VAT')} {v.percentageVat}%
                       </Typography>

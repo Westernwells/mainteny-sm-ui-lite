@@ -1,6 +1,7 @@
 import {useContext, useEffect, useState} from 'react';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {useTranslation} from 'react-i18next';
+import {isEqual} from 'lodash';
 import {
   IconButton,
   TableCell,
@@ -57,16 +58,18 @@ export const ArticleItemRowNEW = ({
   });
 
   useEffect(() => {
-    setItemAtIndex(index, {
-      ...formik.values,
-      unitAmount: {
-        ...formik.values.unitAmount,
-        netAmount: fixRounding(
-          price * 10 ** formik.values.unitAmount.fractionDigits,
-          2,
-        ),
-      },
-    });
+    if (!isEqual(articleItem, formik.values)) {
+      setItemAtIndex(index, {
+        ...formik.values,
+        unitAmount: {
+          ...formik.values.unitAmount,
+          netAmount: fixRounding(
+            price * 10 ** formik.values.unitAmount.fractionDigits,
+            2,
+          ),
+        },
+      });
+    }
   }, [formik.values]);
 
   const {language: selectedLng} = useContext(LanguageContext);
