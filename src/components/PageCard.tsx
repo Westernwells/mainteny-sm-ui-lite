@@ -3,11 +3,11 @@ import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
-
 import IconButton from '@mui/material/IconButton';
 import useTheme from '@mui/material/styles/useTheme';
 import {useTranslation} from 'react-i18next';
 import {SxProps, Theme} from '@mui/system';
+import {Box} from '@mui/material';
 
 export interface Props {
   children: ReactNode;
@@ -15,6 +15,7 @@ export interface Props {
   headerTextOverrideStyles?: {[key: string]: string | number};
   headerActionIcon?: JSX.Element;
   minHeight?: number | string;
+  headerIcon?: JSX.Element;
   headerLabel?: string;
   customHeader?: JSX.Element;
   containerStyles?: {[key: string]: any};
@@ -24,6 +25,7 @@ export interface Props {
 
 export const PageCard = ({
   children,
+  headerIcon,
   headerLabel = '',
   containerStyles,
   headerStyles,
@@ -60,14 +62,18 @@ export const PageCard = ({
           }
           title={
             customHeader || (
-              <Typography
-                variant="h6"
-                sx={{
-                  color: theme.palette.text.primary,
-                  ...headerTextOverrideStyles,
-                }}>
-                {t(headerLabel)}
-              </Typography>
+              <Box sx={{display: 'flex', alignItems: 'center'}}>
+                {headerIcon && headerIcon}
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: theme.palette.text.primary,
+                    marginLeft: headerIcon ? '0.5em' : '0em',
+                    ...headerTextOverrideStyles,
+                  }}>
+                  {t(headerLabel)}
+                </Typography>
+              </Box>
             )
           }
         />

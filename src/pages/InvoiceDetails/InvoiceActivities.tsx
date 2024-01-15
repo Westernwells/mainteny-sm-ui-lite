@@ -18,8 +18,9 @@ import {
   InvoiceActivityView,
   MyInvoiceActivityView,
 } from 'models/invoice';
-import {InfoCard} from 'components/InfoCard';
-import {getInvoiceActivityColor, getInvoiceActivityTitle} from 'utils/invoice';
+import {getInvoiceActivityTitle} from 'utils/invoice';
+import {PageCard} from 'components/PageCard';
+import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
 
 export const InvoiceActivities = ({
   activities,
@@ -49,19 +50,13 @@ export const InvoiceActivities = ({
   }, [activities]);
 
   return (
-    <InfoCard
-      bodyContainerStyle={{
-        paddingBottom: '0px !important',
-        overflowY: 'auto',
-      }}
-      header={
-        <Typography variant="subtitle1">{t('Invoice history')}</Typography>
-      }
+    <PageCard
+      headerLabel={t('Invoice history')}
+      headerIcon={<HistoryOutlinedIcon sx={{color: '#8F9BB380'}} />}
       headerStyles={{
         py: '0.25rem',
         px: '0.5rem',
-      }}
-      showHeaderBackground>
+      }}>
       <Timeline sx={{padding: 0, marginTop: 0}}>
         {activitiesWithOverdueNoticeCount.map((activity) => (
           <TimelineItem
@@ -74,13 +69,14 @@ export const InvoiceActivities = ({
             <TimelineSeparator>
               <TimelineDot
                 sx={{
-                  bgcolor: getInvoiceActivityColor(activity.type),
+                  bgcolor: 'white',
+                  borderColor: '#BDBDBD',
                   boxShadow: 'none',
                 }}
               />
-              <TimelineConnector />
+              <TimelineConnector sx={{background: '#BDBDBD'}} />
             </TimelineSeparator>
-            <TimelineContent>
+            <TimelineContent sx={{marginTop: '-0.5em'}}>
               {activity.type === InvoiceActivityType.OVERDUE_NOTICE_SENT &&
               (activity as MyInvoiceActivityView).overdueNoticeId ? (
                 <Link
@@ -110,21 +106,18 @@ export const InvoiceActivities = ({
                 </Typography>
               )}
 
-              <Typography variant="subtitle2">
+              <Typography
+                variant="caption"
+                sx={{color: 'text.secondary', fontSize: '0.9rem'}}>
                 {format(
                   new Date(activity.meta.createdAt),
-                  'dd.MM.yyyy - HH:mm',
+                  'dd.MM.yyyy | HH:mm',
                 )}
-              </Typography>
-              <Typography variant="subtitle2">
-                {activity.type === InvoiceActivityType.EXPIRED
-                  ? t('The invoice was overdue')
-                  : activity.text}
               </Typography>
             </TimelineContent>
           </TimelineItem>
         ))}
       </Timeline>
-    </InfoCard>
+    </PageCard>
   );
 };
