@@ -28,6 +28,7 @@ import {
 } from 'models/invoice';
 import {LanguageContext} from 'context/LanguageProvider';
 import {
+  aggregatedAmountToMoney,
   formatCurrency,
   getCurrencySymbol,
   useCurrentCurrency,
@@ -94,6 +95,7 @@ export const PartialPaymentsSection = ({
   const currentCurrency = useCurrentCurrency();
   const {language: selectedLng} = useContext(LanguageContext);
   const isEditing = !!invoice;
+  const subtotalExclVat = calculateTotalWithPerItemDiscount(formik.values);
 
   const handlePartialPaymentChange = (values: NumberFormatValues) => {
     const {floatValue} = values;
@@ -106,6 +108,11 @@ export const PartialPaymentsSection = ({
           fractionDigits: currentCurrency.fractionDigits,
         },
       });
+    } else if (formik.values.payment?.type === PaymentType.PERCENTAGE) {
+      formik.setFieldValue('payment', {
+        ...formik.values.payment,
+        percentage: floatValue || 0,
+      });
     }
   };
 
@@ -114,10 +121,36 @@ export const PartialPaymentsSection = ({
     if (!floatValue) {
       return true;
     }
-    if (floatValue < 0) {
+    if (
+      floatValue < 0 ||
+      formik.values.payment?.type === PaymentType.PERCENTAGE
+    ) {
       return false;
     }
     return true;
+  };
+
+  const prevInvoicesPercentage = previousInvoices
+    .map((i) => i.additionalInfo.payment?.percentage ?? 0)
+    .reduce((a, b) => a + b, 0);
+
+  const isAllowedPercentageField = (values: NumberFormatValues) => {
+    const {floatValue} = values;
+    if (!floatValue) {
+      return true;
+    }
+
+    if (floatValue < 0) {
+      return false;
+    }
+
+    const maxPercentage = isEditing
+      ? 100 -
+        (prevInvoicesPercentage -
+          (invoice.additionalInfo.payment?.percentage ?? 0))
+      : 100 - prevInvoicesPercentage;
+
+    return floatValue <= maxPercentage;
   };
 
   const previousInvoicesTotalExclVat = previousInvoices
@@ -127,7 +160,12 @@ export const PartialPaymentsSection = ({
         10 ** (i.totalAmount?.fractionDigits ?? 2),
     )
     .reduce((a, b) => a + b, 0);
-  const amount = formik.values.payment?.amount?.value ?? 0;
+  const amount =
+    formik.values.payment?.type === PaymentType.LUMP_SUM
+      ? formik.values.payment?.amount?.value ?? 0
+      : formik.values.payment?.type === PaymentType.PERCENTAGE
+      ? (subtotalExclVat * (formik.values.payment?.percentage ?? 0)) / 100
+      : 0;
   const amountFormatted = formatCurrency(amount, {
     currency: currentCurrency.code,
     minimumFractionDigits: 2,
@@ -198,25 +236,61 @@ export const PartialPaymentsSection = ({
     },
   );
 
+  const hasPreviousInvoices = previousInvoices.length > 0;
+
   useEffect(() => {
-    // prefill amount if it's a final invoice after partial invoices
+    const lastInvoice = previousInvoices[previousInvoices.length - 1];
+    const lastInvoicePaymentType = lastInvoice?.additionalInfo.payment?.type;
     const isFinalAfterPartial =
-      previousInvoices.length > 1 && formik.values.type === InvoiceType.FINAL;
-    if (
-      isFinalAfterPartial &&
-      formik.values.payment?.type === PaymentType.LUMP_SUM &&
-      !isEditing
-    ) {
-      const subtotalExclVat = calculateTotalWithPerItemDiscount(formik.values);
+      hasPreviousInvoices && formik.values.type === InvoiceType.FINAL;
+
+    if (isEditing) {
+      // do nothing
+    } else if (isFinalAfterPartial) {
+      // prefill percentage/amount if it's a final invoice after partial invoices
       formik.setFieldValue('payment', {
         ...formik.values.payment,
-        amount: {
-          ...formik.values.payment?.amount,
-          value: subtotalExclVat - previousInvoicesTotalExclVat,
-        },
+        ...(lastInvoicePaymentType === PaymentType.PERCENTAGE
+          ? {
+              type: PaymentType.PERCENTAGE,
+              percentage: 100 - prevInvoicesPercentage,
+            }
+          : {
+              type: PaymentType.LUMP_SUM,
+              amount: {
+                ...formik.values.payment?.amount,
+                value: subtotalExclVat - previousInvoicesTotalExclVat,
+              },
+            }),
+      });
+    } else if (lastInvoicePaymentType === PaymentType.PERCENTAGE) {
+      // change payment type to percentage if last invoice has percentage payment type
+      formik.setFieldValue('payment', {
+        ...formik.values.payment,
+        type: PaymentType.PERCENTAGE,
+      });
+    } else {
+      formik.setFieldValue('payment', {
+        ...formik.values.payment,
+        type: PaymentType.LUMP_SUM,
       });
     }
-  }, []);
+  }, [previousInvoices]);
+
+  useEffect(() => {
+    // initialize payment object if it's not set
+    if (invoice?.additionalInfo.payment && !formik.values.payment) {
+      const amountMoney = aggregatedAmountToMoney(
+        invoice.additionalInfo.payment.amount,
+      );
+      amountMoney.value =
+        (amountMoney?.value ?? 0) / 10 ** (amountMoney?.fractionDigits ?? 2);
+      formik.setFieldValue('payment', {
+        ...invoice.additionalInfo.payment,
+        amount: amountMoney,
+      });
+    }
+  }, [invoice]);
 
   const invoicedSectionColumns: {
     name: string;
@@ -472,7 +546,7 @@ export const PartialPaymentsSection = ({
         borderRadius={1}
         p={2}>
         <Grid container rowGap={2.5} justifyContent="space-between">
-          {previousInvoices.length > 0 &&
+          {hasPreviousInvoices &&
             previousInvoices.map((prevInvoice) => (
               <Fragment key={prevInvoice.id}>
                 <Grid item xs={7}>
@@ -495,16 +569,50 @@ export const PartialPaymentsSection = ({
                     }}
                   />
                 </Grid>
-                <Grid item xs={4} display="flex" justifyContent="flex-end">
+                <Grid
+                  item
+                  xs={4}
+                  display="flex"
+                  justifyContent="flex-end"
+                  gap={2}>
+                  {prevInvoice.additionalInfo.payment?.type ===
+                    PaymentType.PERCENTAGE && (
+                    <NumericFormat
+                      {...(prevInvoice.id === invoice?.id
+                        ? {
+                            value: formik.values.payment?.percentage,
+                            isAllowed: isAllowedPercentageField,
+                            onValueChange: handlePartialPaymentChange,
+                          }
+                        : {
+                            value:
+                              prevInvoice.additionalInfo.payment.percentage,
+                            disabled: true,
+                          })}
+                      value={prevInvoice.additionalInfo.payment.percentage}
+                      customInput={TextField}
+                      label={t('Percentage')}
+                      allowLeadingZeros={false}
+                      size="small"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">%</InputAdornment>
+                        ),
+                        inputProps: {
+                          style: {textAlign: 'right'},
+                        },
+                      }}
+                    />
+                  )}
                   <NumericFormat
                     {...(prevInvoice.id === invoice?.id
                       ? {
-                          value:
-                            formik.values.payment?.type === PaymentType.LUMP_SUM
-                              ? amount
-                              : formik.values.payment?.percentage,
+                          value: amount,
                           isAllowed: isAllowedAmountField,
                           onValueChange: handlePartialPaymentChange,
+                          disabled:
+                            formik.values.payment?.type ===
+                            PaymentType.PERCENTAGE,
                         }
                       : {
                           value:
@@ -555,12 +663,35 @@ export const PartialPaymentsSection = ({
                   }}
                 />
               </Grid>
-              <Grid item xs={4} display="flex" justifyContent="flex-end">
+              <Grid
+                item
+                xs={4}
+                display="flex"
+                justifyContent="flex-end"
+                gap={2}>
+                {formik.values.payment?.type === PaymentType.PERCENTAGE && (
+                  <NumericFormat
+                    value={formik.values.payment?.percentage}
+                    isAllowed={isAllowedPercentageField}
+                    customInput={TextField}
+                    label={t('Percentage')}
+                    allowLeadingZeros={false}
+                    size="small"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">%</InputAdornment>
+                      ),
+                      inputProps: {
+                        style: {textAlign: 'right'},
+                      },
+                    }}
+                    onValueChange={handlePartialPaymentChange}
+                  />
+                )}
                 <NumericFormat
-                  value={
-                    formik.values.payment?.type === PaymentType.LUMP_SUM
-                      ? amount
-                      : formik.values.payment?.percentage
+                  value={amount}
+                  disabled={
+                    formik.values.payment?.type === PaymentType.PERCENTAGE
                   }
                   isAllowed={isAllowedAmountField}
                   customInput={TextField}
@@ -584,7 +715,11 @@ export const PartialPaymentsSection = ({
                       style: {textAlign: 'right'},
                     },
                   }}
-                  onValueChange={handlePartialPaymentChange}
+                  {...(formik.values.payment?.type === PaymentType.LUMP_SUM
+                    ? {
+                        onValueChange: handlePartialPaymentChange,
+                      }
+                    : {})}
                 />
               </Grid>
             </>
@@ -649,7 +784,7 @@ export const PartialPaymentsSection = ({
           </Typography>
         </Box>
 
-        {previousInvoices.length > 0 && (
+        {hasPreviousInvoices ? (
           <>
             {/* INVOICED SECTION */}
             <Divider sx={{borderColor: theme.palette.grey[300]}} />
@@ -663,7 +798,7 @@ export const PartialPaymentsSection = ({
               </>
             ) : null}
           </>
-        )}
+        ) : null}
       </Box>
     </Grid>
   );
