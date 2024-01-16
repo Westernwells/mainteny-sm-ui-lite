@@ -28,6 +28,7 @@ import {
 } from 'hooks/reactQuery/useAnalytics';
 import {convertToText} from 'utils/utils';
 import {toRestDate} from 'utils/datetime';
+import {FormCheckbox} from 'components/form/FormCheckbox';
 
 const validationSchema = Yup.object().shape({
   reportType: Yup.string()
@@ -72,6 +73,7 @@ export const Reports = () => {
       formatType: FormatType.XERO,
       startDate: null,
       endDate: null,
+      excludePreviouslyDownloadedData: false,
     },
     onSubmit: () => {},
     validationSchema,
@@ -90,7 +92,10 @@ export const Reports = () => {
     serviceCompanyId,
     ...reportParams,
   });
-  const getInvoicesDatev = useInvoicesDatev(serviceCompanyId, reportParams);
+  const getInvoicesDatev = useInvoicesDatev(serviceCompanyId, {
+    ...reportParams,
+    full: !formik.values.excludePreviouslyDownloadedData,
+  });
   const getInvoicesXero = useInvoicesXero(serviceCompanyId, reportParams);
   const getInvoicesXLSX = useInvoicesXLSX(serviceCompanyId, reportParams);
 
@@ -305,6 +310,18 @@ export const Reports = () => {
               </Grid>
             </Grid>
           </Grid>
+
+          {formik?.values?.reportType === ReportType.FINANCIALS &&
+            formik?.values?.formatType === FormatType.DATEV && (
+              <Grid item xs={12}>
+                <FormCheckbox
+                  value={formik.values.excludePreviouslyDownloadedData.toString()}
+                  name="excludePreviouslyDownloadedData"
+                  handleChange={formik.handleChange}
+                  label="Exclude previously downloaded data"
+                />
+              </Grid>
+            )}
 
           <Grid item xs={12} textAlign="end">
             <Button
