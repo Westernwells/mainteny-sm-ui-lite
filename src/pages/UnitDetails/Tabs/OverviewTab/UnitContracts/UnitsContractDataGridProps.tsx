@@ -8,9 +8,10 @@ import {
 import Typography from '@mui/material/Typography';
 import {StatusChip} from 'components/StatusChip';
 import {convertToText} from 'utils/utils';
-import {ContractStatus, ContractSimpleView} from 'models/contract';
+import {ContractSimpleView} from 'models/contract';
 import {useTranslation} from 'react-i18next';
 import {FormatDate} from 'models/misc';
+import {getContractStatusStyles} from 'utils/contract-utils';
 
 const defaultProps = {
   editable: false,
@@ -79,16 +80,8 @@ export const columns: GridColDef[] = [
     ...defaultProps,
     renderCell: (params) => (
       <StatusChip
-        label={convertToText(params.value)}
-        color={
-          params.value === ContractStatus.VALID
-            ? 'success'
-            : params.value === ContractStatus.PENDING
-            ? 'secondary'
-            : params.value === ContractStatus.EXPIRING
-            ? 'warning'
-            : 'error'
-        }
+        label={getContractStatusStyles(params.value).label}
+        color={getContractStatusStyles(params.value).color}
         variant="filled"
         maxChars={8}
       />
