@@ -213,7 +213,7 @@ export const ArticleItemsTableNEW = ({
     {name: '#'},
     {name: 'Name'},
     {name: 'Unit Price'},
-    {name: 'Quantity', align: 'right'},
+    {name: 'Quantity'},
     {name: 'VAT (%)'},
     {name: 'Unit'},
     {name: discountText},

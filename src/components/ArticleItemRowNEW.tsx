@@ -142,6 +142,11 @@ export const ArticleItemRowNEW = ({
               selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
             }
             size="small"
+            sx={{
+              '& .MuiOutlinedInput-input': {
+                textAlign: 'right',
+              },
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -292,6 +297,9 @@ export const ArticleItemRowNEW = ({
               '& .MuiInputBase-root': {
                 pr: 0,
               },
+              '& .MuiOutlinedInput-input': {
+                textAlign: 'right',
+              },
             }}
             InputProps={{
               endAdornment: (
@@ -334,7 +342,12 @@ export const ArticleItemRowNEW = ({
             }
             size="small"
             disabled
-            sx={{width: '100%'}}
+            sx={{
+              width: '100%',
+              '& .MuiOutlinedInput-input': {
+                textAlign: 'right',
+              },
+            }}
           />
         </TableCell>
 
