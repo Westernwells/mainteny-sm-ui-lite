@@ -119,11 +119,10 @@ export const getContractStatusStyles = (
     case ContractStatus.VALID:
       return {label: 'Active', color: 'success'};
     case ContractStatus.EXPIRED:
+    case ContractStatus.PENDING:
       return {label: 'Inactive', color: 'error'};
     case ContractStatus.EXPIRING:
       return {label: 'Expiring', color: 'warning'};
-    case ContractStatus.PENDING:
-      return {label: 'Inactive', color: 'error'};
     default:
       return {label: '-', color: 'default'};
   }
