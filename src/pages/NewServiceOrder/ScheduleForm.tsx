@@ -2,7 +2,6 @@ import Box from '@mui/material/Box';
 import {useTranslation} from 'react-i18next';
 import {DatePicker} from 'components/DatePicker';
 import {TimePicker} from 'components/TimePicker';
-import {startOfDay} from 'date-fns';
 import {useFormik} from 'formik';
 import {useEffect} from 'react';
 import * as Yup from 'yup';
@@ -69,7 +68,6 @@ export const ScheduleForm = ({
       <DatePicker
         defaultDate={defaultStartDate}
         containerStyles={{mr: '1em', width: '100%'}}
-        minDate={startOfDay(new Date())}
         getSelectedDate={(date) => {
           formik.setValues({
             ...formik.values,

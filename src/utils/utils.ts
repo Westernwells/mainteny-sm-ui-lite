@@ -286,3 +286,8 @@ export const getUserFullName = ({
   firstName?: string;
   lastName?: string;
 }) => `${firstName} ${lastName}`.trim();
+
+export const hasProtocol = (url: string) => {
+  const pattern = /^(http:\/\/|https:\/\/)/;
+  return pattern.test(url);
+};
