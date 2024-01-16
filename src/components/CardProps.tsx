@@ -6,6 +6,7 @@ import React, {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
 import Link from '@mui/material/Link';
 import {Link as RouterLink} from 'react-router-dom';
+import {hasProtocol} from '../utils/utils';
 
 interface Props {
   icon: JSX.Element;
@@ -100,7 +101,7 @@ export const CardProps = ({
                   WebkitBoxOrient: 'vertical',
                   display: '-webkit-box',
                 }}>
-                {t(bodyText)}
+                {hasProtocol(bodyText) ? bodyText : t(bodyText)}
               </Typography>
             ) : (
               bodyText
@@ -119,7 +120,7 @@ export const CardProps = ({
               display: '-webkit-box',
               ...bodyStyle,
             }}>
-            {t(bodyText)}
+            {hasProtocol(bodyText) ? bodyText : t(bodyText)}
           </Typography>
         ) : (
           bodyText
