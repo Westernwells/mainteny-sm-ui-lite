@@ -2,29 +2,10 @@ import {GridColDef, GridRenderCellParams} from '@mui/x-data-grid';
 import {getColumnProps} from 'components/DataGridLayout';
 import {formatCurrency} from 'utils/currency';
 import {FormatDate} from 'models/misc';
-import {ContractStatus, ContractView} from 'models/contract';
+import {ContractView} from 'models/contract';
 import {StatusChip} from 'components/StatusChip';
+import {getContractStatusStyles} from 'utils/contract-utils';
 import {Actions} from './Actions';
-
-export const getContractStatusStyles = (
-  status: string,
-): {
-  label: string;
-  color: 'success' | 'warning' | 'error' | 'info' | 'default' | 'primary';
-} => {
-  switch (status) {
-    case ContractStatus.VALID:
-      return {label: 'Active', color: 'success'};
-    case ContractStatus.EXPIRED:
-      return {label: 'Inactive', color: 'error'};
-    case ContractStatus.EXPIRING:
-      return {label: 'Expiring', color: 'warning'};
-    case ContractStatus.PENDING:
-      return {label: 'Inactive', color: 'error'};
-    default:
-      return {label: '-', color: 'default'};
-  }
-};
 
 export const columns: GridColDef[] = [
   getColumnProps({
