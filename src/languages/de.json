@@ -250,7 +250,7 @@
   "Article": "Artikel",
   "CATEGORY": "KATEGORIE",
   "MANUFACTURER": "HERSTELLER",
-  "UNIT": "ANLAGE",
+  "UNIT": "EINHEIT",
   "SELLING PRICE": "VERKAUFSPREIS",
   "PURCHASE PRICE": "EINKAUFSPREIS",
   "STORAGE LOCATION": "LAGERORT",
@@ -304,7 +304,7 @@
   "Category": "Kategorie",
   "Purchase VAT": "MwSt Kauf",
   "Selling VAT": "MwSt Verkauf",
-  "Unit": "Anlage",
+  "Unit": "Einheit",
   "Purchase Price": "Einkaufspreis",
   "e.g. Select type": "Typ wählen",
   "Selling Price": "Verkaufspreis",
@@ -1288,7 +1288,6 @@
   "ACCOUNT NUMBER": "KONTONUMMER",
   "VAT ID": "UMSATZSTEUER-ID",
   "% VAT": "% MwSt.",
-  "Tax Number": "Steuernummer",
   "YEARLY VACATION DAYS": "URLAUBSTAGE PRO JAHR",
   "WEBSITE": "WEBSITE",
   "BILLING ADDRESS": "RECHNUNGSADRESSE",
@@ -1926,7 +1925,7 @@
   "No reached-out technicians accepted the order. Please assign manually": "Keiner der kontaktierten Techniker nahm den Auftrag an. Bitte manuell zuweisen",
   "Last character can't be a digit": "Das letzte Zeichen darf keine Ziffer sein",
   "1 Order": "1 Bestellung",
-  "{{numberOfOrders}} Orders": "{{numberOfOrders}} Bestellungen",
+  "{{numberOfOrders}} Orders": "{{numberOfOrders}} Aufträge",
   "0 Order": "0 Bestellung",
   "Job Status": "Auftragsstatus",
   "Invoice Status": "Rechnungsstatus",
@@ -1979,5 +1978,6 @@
   "{{jobType}} - Invoice for {{invoiceNumber}}": "{{jobType}} – Rechnung für {{invoiceNumber}}",
   "{{jobType}} - Credit note for {{invoiceNumber}}": "{{jobType}} – Gutschrift zu Rechnung {{invoiceNumber}}",
   "pack": "Pkt.",
-  "Created on {{creationDate}}": "Erstellt am {{creationDate}}"
+  "Created on {{creationDate}}": "Erstellt am {{creationDate}}",
+  "Exclude previously downloaded data": "Zuvor heruntergeladene Daten ausschließen"
 }
