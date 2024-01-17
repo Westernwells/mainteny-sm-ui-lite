@@ -1973,5 +1973,6 @@
   "Not Sent": "Nicht gesendet",
   "VAT (%)": "MwSt. (%)",
   "Click to hide this section from the invoice": "Klicken Sie hier, um diesen Abschnitt aus der Rechnung auszublenden",
-  "Footer": "Fußzeile"
+  "Footer": "Fußzeile",
+  "{{jobType}} - Credit note for {{invoiceNumber}}": "{{jobType}} – Gutschrift zu Rechnung {{invoiceNumber}}"
 }
