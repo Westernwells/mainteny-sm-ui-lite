@@ -288,7 +288,7 @@ export const InvoiceForm = ({
       invoiceType &&
       invoiceType in InvoiceType
         ? InvoiceType[invoiceType as InvoiceType]
-        : InvoiceType.FINAL,
+        : InvoiceType.FULL,
     items: [],
     paymentTerms: '',
     propertyOwnerId: '',
