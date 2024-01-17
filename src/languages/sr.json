@@ -1997,5 +1997,7 @@
   "VAT (%)": "PDV %",
   "Click to hide this section from the invoice": "Kliknite da biste sakrili ovaj odeljak sa fakture",
   "Footer": "Podnožje",
-  "{{jobType}} - Credit note for {{invoiceNumber}}": "{{jobType}} – Kredit za {{invoiceNumber}}"
+  "{{jobType}} - Credit note for {{invoiceNumber}}": "{{jobType}} – Kredit za {{invoiceNumber}}",
+  "Created on {{creationDate}}": "Napravljeno {{creationDate}}",
+  "Exclude previously downloaded data": "Izuzmi prethodno preuzete podatke"
 }
