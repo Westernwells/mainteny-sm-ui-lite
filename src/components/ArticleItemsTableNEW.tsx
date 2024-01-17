@@ -210,7 +210,7 @@ export const ArticleItemsTableNEW = ({
   const discountText = selectedLng === 'DE' ? 'Rabatt' : t('Discount');
 
   const columns: {name: string; align?: TableCellProps['align']}[] = [
-    {name: '#'},
+    {name: '#', align: 'right'},
     {name: 'Name'},
     {name: 'Unit Price'},
     {name: 'Quantity'},
@@ -228,7 +228,8 @@ export const ArticleItemsTableNEW = ({
       border="1px solid"
       borderColor="action.focus"
       borderRadius={1}
-      p={2}>
+      px={1.5}
+      py={2}>
       <TableContainer>
         <Table
           sx={{
@@ -390,7 +391,7 @@ export const ArticleItemsTableNEW = ({
                       />
                       <IconButton
                         onClick={handleRemoveDiscount}
-                        sx={{p: '0px', mr: -4, color: 'text.disabled'}}>
+                        sx={{p: '0px', mr: -3.3, color: 'text.disabled'}}>
                         <CloseIcon />
                       </IconButton>
                     </Box>
