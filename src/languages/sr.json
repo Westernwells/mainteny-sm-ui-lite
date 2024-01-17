@@ -2001,5 +2001,6 @@
   "{{jobType}} - Invoice for {{invoiceNumber}}": "{{jobType}} – Faktura za {{invoiceNumber}}",
   "{{jobType}} - Credit note for {{invoiceNumber}}": "{{jobType}} – Kredit za {{invoiceNumber}}",
   "pack": "pakovanje",
-  "Created on {{creationDate}}": "Napravljeno {{creationDate}}"
+  "Created on {{creationDate}}": "Napravljeno {{creationDate}}",
+  "Exclude previously downloaded data": "Izuzmi prethodno preuzete podatke"
 }
