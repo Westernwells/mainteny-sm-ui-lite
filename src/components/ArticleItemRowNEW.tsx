@@ -117,8 +117,8 @@ export const ArticleItemRowNEW = ({
   return (
     <>
       <TableRow>
-        <TableCell>{index + 1}</TableCell>
-        <TableCell sx={{width: '45%'}}>
+        <TableCell sx={{width: '1%'}}>{index + 1}</TableCell>
+        <TableCell sx={{width: '35%'}}>
           <TextField
             name="name"
             value={formik.values.name}
@@ -129,7 +129,7 @@ export const ArticleItemRowNEW = ({
           />
         </TableCell>
 
-        <TableCell sx={{width: '9%'}}>
+        <TableCell sx={{width: '17%'}}>
           <NumericFormat
             value={price !== 0 ? price : ''}
             customInput={TextField}
@@ -145,6 +145,7 @@ export const ArticleItemRowNEW = ({
             sx={{
               '& .MuiOutlinedInput-input': {
                 textAlign: 'right',
+                width: '100%',
               },
             }}
             InputProps={{
@@ -238,7 +239,7 @@ export const ArticleItemRowNEW = ({
           />
         </TableCell>
 
-        <TableCell sx={{width: '10%'}}>
+        <TableCell sx={{width: '8%'}}>
           <FormSelect
             labelId="select-unit-label"
             label=""
@@ -258,7 +259,7 @@ export const ArticleItemRowNEW = ({
         </TableCell>
 
         {/* DISCOUNT */}
-        <TableCell sx={{width: '9%'}}>
+        <TableCell sx={{width: '11%'}}>
           <NumericFormat
             value={
               formik.values.discount?.type === DiscountType.AMOUNT
@@ -299,6 +300,7 @@ export const ArticleItemRowNEW = ({
               },
               '& .MuiOutlinedInput-input': {
                 textAlign: 'right',
+                width: '100%',
               },
             }}
             InputProps={{
@@ -328,7 +330,7 @@ export const ArticleItemRowNEW = ({
           />
         </TableCell>
 
-        <TableCell sx={{width: '18%'}}>
+        <TableCell sx={{width: '15%'}}>
           <NumericFormat
             value={totalPriceExclVatAfterDiscount}
             customInput={TextField}
@@ -346,13 +348,22 @@ export const ArticleItemRowNEW = ({
               width: '100%',
               '& .MuiOutlinedInput-input': {
                 textAlign: 'right',
+                width: '100%',
               },
             }}
           />
         </TableCell>
 
-        <TableCell sx={{width: '2%'}}>
-          <IconButton onClick={() => deleteItem(index)}>
+        <TableCell
+          sx={{
+            paddingLeft: '0px !important',
+            paddingRight: '0px !important',
+          }}>
+          <IconButton
+            onClick={() => deleteItem(index)}
+            sx={{
+              padding: '0px !important',
+            }}>
             <DeleteIcon />
           </IconButton>
         </TableCell>
