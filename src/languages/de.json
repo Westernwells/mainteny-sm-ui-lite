@@ -1925,7 +1925,7 @@
   "No reached-out technicians accepted the order. Please assign manually": "Keiner der kontaktierten Techniker nahm den Auftrag an. Bitte manuell zuweisen",
   "Last character can't be a digit": "Das letzte Zeichen darf keine Ziffer sein",
   "1 Order": "1 Bestellung",
-  "{{numberOfOrders}} Orders": "{{numberOfOrders}} Bestellungen",
+  "{{numberOfOrders}} Orders": "{{numberOfOrders}} Aufträge",
   "0 Order": "0 Bestellung",
   "Job Status": "Auftragsstatus",
   "Invoice Status": "Rechnungsstatus",
@@ -1974,5 +1974,7 @@
   "VAT (%)": "MwSt. (%)",
   "Click to hide this section from the invoice": "Klicken Sie hier, um diesen Abschnitt aus der Rechnung auszublenden",
   "Footer": "Fußzeile",
-  "{{jobType}} - Credit note for {{invoiceNumber}}": "{{jobType}} – Gutschrift zu Rechnung {{invoiceNumber}}"
+  "{{jobType}} - Credit note for {{invoiceNumber}}": "{{jobType}} – Gutschrift zu Rechnung {{invoiceNumber}}",
+  "Created on {{creationDate}}": "Erstellt am {{creationDate}}",
+  "Exclude previously downloaded data": "Zuvor heruntergeladene Daten ausschließen"
 }
