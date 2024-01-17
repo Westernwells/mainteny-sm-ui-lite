@@ -1996,5 +1996,6 @@
   "Not Sent": "Nije poslata",
   "VAT (%)": "PDV %",
   "Click to hide this section from the invoice": "Kliknite da biste sakrili ovaj odeljak sa fakture",
-  "Footer": "Podnožje"
+  "Footer": "Podnožje",
+  "{{jobType}} - Credit note for {{invoiceNumber}}": "{{jobType}} – Kredit za {{invoiceNumber}}"
 }
