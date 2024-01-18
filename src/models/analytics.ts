@@ -19,4 +19,5 @@ export interface QueryWorkingHours {
 export interface QueryFinancials {
   startDate: string;
   endDate: string;
+  full?: boolean;
 }
