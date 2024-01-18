@@ -274,6 +274,14 @@ export enum InvoiceType {
   UPFRONT = 'UPFRONT',
 }
 
+export const InvoiceTypeMap = {
+  FINAL: 'Final',
+  FULL: 'Full',
+  PARTIAL: 'Partial',
+  CREDIT_NOTE: 'Credit Note',
+  UPFRONT: 'Upfront',
+};
+
 export interface InvoiceFormData {
   subject: string;
   description: string;
