@@ -24,6 +24,7 @@ import {
   InvoiceActivityView,
   InvoiceStatus,
   InvoiceType,
+  InvoiceTypeMap,
   InvoiceView,
 } from 'models/invoice';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
@@ -348,7 +349,7 @@ export const ViewInvoice = ({
             <Box>
               <FormLabel text="Invoice Type" sx={{color: 'text.main'}} />
               <Typography variant="subtitle1" fontWeight="600">
-                {t(invoice.type)}
+                {t(InvoiceTypeMap[invoice.type]).toUpperCase()}
               </Typography>
             </Box>
 
