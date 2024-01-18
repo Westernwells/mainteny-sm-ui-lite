@@ -20,12 +20,10 @@ import {ArticleType, ArticleView, ExtendedSupplierRecord} from 'models/article';
 import {ArticleBasicFormModel, ArticleStockFormModel} from 'models/articleForm';
 import {
   amountRecordForBackend,
-  currencyFactor,
   makeAmountRecord,
   useCurrentCurrency,
 } from 'utils/currency';
 import {createEmptyResource} from 'utils/paging-utils';
-import {handleCostPackageValidation} from 'utils/article-utils';
 import {getUniqueId} from 'utils/utils';
 import {SupplierItem} from './Suppliers/SupplierItem';
 import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';
@@ -115,23 +113,7 @@ export const NewArticle = () => {
     unitSellingAmount: Yup.number()
       .nullable()
       .required('Selling price is required'),
-    costPackage: Yup.object().shape({
-      // amount should be required and sum of labor and material should be equal to unitSellingAmount
-      labor: Yup.object().shape({
-        value: Yup.number().test(
-          'value',
-          'The sum of labor and material prices should be equal to Selling price',
-          handleCostPackageValidation,
-        ),
-      }),
-      material: Yup.object().shape({
-        value: Yup.number().test(
-          'value',
-          'The sum of labor and material prices should be equal to Selling price',
-          handleCostPackageValidation,
-        ),
-      }),
-    }),
+    laborPercentage: Yup.number(),
   });
 
   const formik = useFormik<ArticleBasicFormModel>({
@@ -151,14 +133,8 @@ export const NewArticle = () => {
       unitSellingAmount: 0,
       unitSellingAmountCurrency: currentCurrency.code,
       costPackage: {
-        labor: {
-          value: 0,
-          currency: currentCurrency.code,
-        },
-        material: {
-          value: 0,
-          currency: currentCurrency.code,
-        },
+        laborPercentage: 0,
+        materialPercentage: 0,
       },
     },
     onSubmit: () => {},
@@ -202,26 +178,11 @@ export const NewArticle = () => {
     return setDisableNextBtn(false);
   }, [activeStep, formik, suppliers]);
 
-  useEffect(() => {
-    // whenever unitSellingAmount changes, update costPackage labor and material to 50% 50% of unitSellingAmount
-    formik.setFieldValue('costPackage', {
-      labor: {
-        value: Number(formik.values.unitSellingAmount) * 0.5,
-        currency: currentCurrency.code,
-      },
-      material: {
-        value: Number(formik.values.unitSellingAmount) * 0.5,
-        currency: currentCurrency.code,
-      },
-    });
-  }, [formik.values.unitSellingAmount]);
-
   const handleCancel = () => {
     setActiveStep(0);
   };
 
   const createNewArticle = async () => {
-    const factor = currencyFactor({currency: currentCurrency.code});
     const article = {
       category: formik.values.category,
       description,
@@ -258,16 +219,8 @@ export const NewArticle = () => {
       ),
       costPackage: {
         ...formik.values.costPackage,
-        labor: {
-          ...formik.values.costPackage?.labor,
-          value: (formik.values.costPackage?.labor?.value ?? 0) * factor,
-          currency: currentCurrency.code,
-        },
-        material: {
-          ...formik.values.costPackage?.material,
-          value: (formik.values.costPackage?.material?.value ?? 0) * factor,
-          currency: currentCurrency.code,
-        },
+        laborPercentage: formik.values.costPackage?.laborPercentage,
+        materialPercentage: formik.values.costPackage?.materialPercentage,
       },
     };
     const result = await createArticle(article);

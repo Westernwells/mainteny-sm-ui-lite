@@ -85,9 +85,10 @@ const CreateNewInvoiceModal = ({open, onClose, orderId}: Props) => {
           aria-labelledby="demo-controlled-radio-buttons-group"
           name="controlled-radio-buttons-group"
           value={selectedValue}>
-          {invoiceTypeOptions.map((item) => (
+          {invoiceTypeOptions.map((item, index) => (
             <Grid
               tabIndex={0}
+              key={`{${item}-${index}`}
               sx={{
                 display: 'flex',
                 alignItems: 'center',

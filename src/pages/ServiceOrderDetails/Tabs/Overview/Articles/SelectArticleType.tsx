@@ -2,17 +2,19 @@ import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import InputAdornment from '@mui/material/InputAdornment';
 import RadioGroup from '@mui/material/RadioGroup';
 import {FormikProps, getIn} from 'formik';
 import {ArticleType} from 'models/article';
-import {FormInput} from 'components/form/FormInput';
 import {FormRadio} from 'components/form/FormRadio';
 import {FormLabel} from 'components/form/FormLabel';
 import {ArticleBasicFormModel} from 'models/articleForm';
-import {getCurrencySymbol, useCurrentCurrency} from 'utils/currency';
-import {getPercentage} from 'utils/utils';
+import {useCurrentCurrency} from 'utils/currency';
+import {getAmountFromPercentage} from 'utils/utils';
 import {EditArticleFormModel} from 'pages/ServiceOrderDetails/Tabs/Overview/Articles/models';
+import {TextField} from '@mui/material';
+import {NumericFormat} from 'react-number-format';
+import {LanguageContext} from 'context/LanguageProvider';
+import {useContext, useEffect} from 'react';
 
 export const articleTypes = [
   {
@@ -51,19 +53,18 @@ export const SelectArticleType = ({
   const {t} = useTranslation();
   const theme = useTheme();
   const currentCurrency = useCurrentCurrency();
+  const {language: selectedLng} = useContext(LanguageContext);
 
-  if (!formik.values.costPackage) {
-    formik.values.costPackage = {
-      labor: {
-        value: 0,
-        currency: 'EUR',
-      },
-      material: {
-        value: 0,
-        currency: 'EUR',
-      },
-    };
-  }
+  useEffect(() => {
+    if (formik.values.type !== ArticleType.PACKAGE) {
+      formik.setFieldValue('costPackage', {
+        ...formik.values.costPackage,
+        laborPercentage: 0,
+        materialPercentage: 0,
+      });
+    }
+  }, [formik.values.type]);
+
   return (
     <RadioGroup name="radio-buttons-group" sx={{pt: 1}}>
       <FormLabel
@@ -125,115 +126,168 @@ export const SelectArticleType = ({
             {articleType.isPackage && (
               <Box display="flex" justifyContent="space-between" pt="1.8rem">
                 <Box>
-                  <FormInput
-                    containerStyles={{pr: '1rem'}}
-                    onValueChange={(values) => {
-                      formik.setFieldValue(values.name as string, values.value);
+                  <NumericFormat
+                    value={formik.values.costPackage?.laborPercentage}
+                    customInput={TextField}
+                    suffix="%"
+                    allowLeadingZeros={false}
+                    decimalScale={2}
+                    decimalSeparator={
+                      selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
+                    }
+                    thousandSeparator={
+                      selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
+                    }
+                    sx={{
+                      width: '100%',
+                      bgcolor: 'white',
+                      '& .MuiInputBase-root': {
+                        pr: 0,
+                      },
+                      '& .MuiOutlinedInput-input': {
+                        textAlign: 'right',
+                        background: '#FFFFFF',
+                      },
                     }}
-                    inputType="currency"
-                    props={{
-                      name: 'costPackage.labor.value',
-                      label: t('Labor price'),
-                      placeholder: t(`e.g. 150{{currencySymbol}}`, {
-                        currencySymbol: currentCurrency.symbol,
-                      }),
-                      inputProps: {min: 0},
-                      type: 'number',
-                      value:
-                        formik.values.costPackage?.labor.value === 0
-                          ? ''
-                          : formik.values.costPackage?.labor.value,
-                      error: !!getIn(formik.errors, 'costPackage.labor.value'),
-                      helperText: getIn(
+                    isAllowed={(values) => {
+                      const {floatValue} = values;
+                      if (!floatValue) {
+                        return true;
+                      }
+
+                      if (floatValue < 0) {
+                        return false;
+                      }
+
+                      const maxValue = 100;
+
+                      return floatValue <= maxValue;
+                    }}
+                    InputProps={{
+                      name: 'costPackage.laborPercentage',
+                      placeholder: t(`e.g. 50%`),
+                      id: `costPackage.laborPercentage`,
+                      inputMode: 'numeric',
+                      error: !!getIn(
                         formik.errors,
-                        'costPackage.labor.value',
+                        'costPackage.laborPercentage',
                       ),
                       onBlur: formik.handleBlur,
-                      InputProps: {
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            {
-                              getCurrencySymbol[
-                                formik.values.costPackage?.labor.currency ??
-                                  'EUR'
-                              ]
-                            }
-                          </InputAdornment>
-                        ),
-                      },
-                      sx: {
-                        bgcolor: 'white',
-                      },
+                      disabled: formik.values.type !== ArticleType.PACKAGE,
                     }}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    label={t('Labor')}
+                    onValueChange={(values) => {
+                      formik.setFieldValue(
+                        'costPackage.laborPercentage',
+                        Number(values.value),
+                      );
+                    }}
+                    size="small"
                   />
-                  {!!formik.values.unitSellingAmount && (
+                  {!!formik.values.costPackage?.laborPercentage && (
                     <Typography
                       variant="caption"
-                      color={theme.palette.primary.main}>
-                      {getPercentage(
-                        formik.values.costPackage?.labor.value ?? 0,
-                        +formik.values.unitSellingAmount,
-                      )}
-                      {'% '}
-                      {t('labor')}
+                      color={theme.palette.primary.main}
+                      sx={{
+                        justifyContent: 'right',
+                        display: 'flex',
+                        py: 1,
+                        pr: 2,
+                      }}>
+                      {getAmountFromPercentage(
+                        Number(formik.values.costPackage?.laborPercentage),
+                        Number(formik.values.unitSellingAmount),
+                      ).toFixed(2)}
+                      {currentCurrency.symbol ?? 'EUR'}
                     </Typography>
                   )}
                 </Box>
 
-                <Box>
-                  <FormInput
-                    onValueChange={(values) => {
-                      formik.setFieldValue(values.name as string, values.value);
+                <Box pl={2}>
+                  <NumericFormat
+                    value={
+                      formik.values.type === ArticleType.PACKAGE
+                        ? 100 -
+                          Number(formik.values.costPackage?.laborPercentage)
+                        : 0
+                    }
+                    customInput={TextField}
+                    suffix="%"
+                    allowLeadingZeros={false}
+                    decimalScale={2}
+                    decimalSeparator={
+                      selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
+                    }
+                    thousandSeparator={
+                      selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
+                    }
+                    sx={{
+                      width: '100%',
+                      bgcolor: 'white',
+                      '& .MuiInputBase-root': {
+                        pr: 0,
+                      },
+                      '& .MuiOutlinedInput-input': {
+                        textAlign: 'right',
+                        background: '#FFFFFF',
+                      },
                     }}
-                    inputType="currency"
-                    props={{
-                      name: 'costPackage.material.value',
-                      label: t('Material price'),
-                      placeholder: t(`e.g. 200{{currencySymbol}}`, {
-                        currencySymbol: currentCurrency.symbol,
-                      }),
-                      inputProps: {min: 0},
-                      type: 'number',
-                      value:
-                        formik.values.costPackage?.material.value === 0
-                          ? ''
-                          : formik.values.costPackage?.material.value,
+                    isAllowed={(values) => {
+                      const {floatValue} = values;
+                      if (!floatValue) {
+                        return true;
+                      }
+
+                      if (floatValue < 0) {
+                        return false;
+                      }
+
+                      const maxValue = 100;
+
+                      return floatValue <= maxValue;
+                    }}
+                    InputProps={{
+                      name: 'costPackage.materialPercentage',
+                      placeholder: t(`e.g. 20%`),
+                      id: `costPackage.materialPercentage`,
+                      inputMode: 'numeric',
+                      disabled: true,
+                      required: false,
                       error: !!getIn(
                         formik.errors,
-                        'costPackage.material.value',
-                      ),
-                      helperText: getIn(
-                        formik.errors,
-                        'costPackage.material.value',
+                        'costPackage.materialPercentage',
                       ),
                       onBlur: formik.handleBlur,
-
-                      InputProps: {
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            {
-                              getCurrencySymbol[
-                                formik.values.unitPurchaseAmountCurrency
-                              ]
-                            }
-                          </InputAdornment>
-                        ),
-                      },
-                      sx: {
-                        bgcolor: 'white',
-                      },
                     }}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    label={t('Material')}
+                    onValueChange={(values) => {
+                      formik.setFieldValue(
+                        'costPackage.materialPercentage',
+                        Number(values.value),
+                      );
+                    }}
+                    size="small"
                   />
-                  {!!formik.values.unitSellingAmount && (
+
+                  {!!formik.values.costPackage?.laborPercentage && (
                     <Typography
                       variant="caption"
-                      color={theme.palette.primary.main}>
-                      {getPercentage(
-                        formik.values.costPackage?.material.value ?? 0,
-                        +formik.values.unitSellingAmount,
-                      )}
-                      {'% '}
-                      {t('material')}
+                      color={theme.palette.primary.main}
+                      sx={{justifyContent: 'right', display: 'flex', py: 1}}>
+                      {(
+                        Number(formik.values.unitSellingAmount) -
+                        getAmountFromPercentage(
+                          Number(formik.values.costPackage?.laborPercentage),
+                          Number(formik.values.unitSellingAmount),
+                        )
+                      ).toFixed(2)}
+                      {currentCurrency.symbol ?? 'EUR'}
                     </Typography>
                   )}
                 </Box>
