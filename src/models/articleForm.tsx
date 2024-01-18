@@ -17,8 +17,10 @@ export interface ArticleBasicFormModel {
   unitSellingAmount: number | string;
   unitSellingAmountCurrency: string;
   costPackage?: {
-    labor: Money;
-    material: Money;
+    labor?: Money;
+    material?: Money;
+    laborPercentage?: number;
+    materialPercentage?: number;
   };
   quantity?: number;
 }

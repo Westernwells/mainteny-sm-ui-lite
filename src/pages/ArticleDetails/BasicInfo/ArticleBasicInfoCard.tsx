@@ -19,7 +19,6 @@ import {ArticleView, UpdateArticleRecord} from 'models/article';
 import {ArticleBasicFormModel} from 'models/articleForm';
 import {Dialog} from 'components/Dialog';
 import {useArticles, useUpdateArticle} from 'hooks/reactQuery/useArticle';
-import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {CardProps} from 'components/CardProps';
 import {InfoCard} from 'components/InfoCard';
 import {
@@ -27,10 +26,8 @@ import {
   currencyFactor,
   formatNetAmount,
   makeAmountRecord,
-  useCurrentCurrency,
 } from 'utils/currency';
 import {convertToText} from 'utils/utils';
-import {handleCostPackageValidation} from 'utils/article-utils';
 import {createEmptyResource} from 'utils/paging-utils';
 import {EditBasicInfoForm} from './EditBasicInfoForm';
 
@@ -50,7 +47,6 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
   const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
   const {t} = useTranslation();
-  const currentCurrency = useCurrentCurrency();
   const {mutateAsync: updateArticle, isLoading} = useUpdateArticle(
     t('Article updated successfully.'),
   );
@@ -99,83 +95,91 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       .nullable()
       .required('Selling price is required'),
     costPackage: Yup.object().shape({
-      // amount should be required and sum of labor and material should be equal to unitSellingAmount
-      labor: Yup.object().shape({
-        value: Yup.number().test(
-          'value',
-          'The sum of labor and material prices should be equal to Selling price',
-          handleCostPackageValidation,
-        ),
-      }),
-      material: Yup.object().shape({
-        value: Yup.number().test(
-          'value',
-          'The sum of labor and material prices should be equal to Selling price',
-          handleCostPackageValidation,
-        ),
-      }),
+      laborPercentage: Yup.number(),
+      materialPercentage: Yup.number(),
     }),
   });
 
+  const initialValues = {
+    category: article.category,
+    manufacturer: article.manufacturer,
+    model: article.model,
+    name: article.name,
+    externalId: article.externalId,
+    storageLocation: article.storageLocation,
+    type: article.type,
+    unit: article.unit,
+    unitPurchaseVat: article.unitPurchaseAmount
+      ? article.unitPurchaseAmount.percentageVat
+      : 0,
+    unitPurchaseAmount: (article.unitPurchaseAmount
+      ? article.unitPurchaseAmount.netAmount /
+        currencyFactor(article.unitPurchaseAmount)
+      : 0
+    ).toFixed(2),
+    unitPurchaseAmountCurrency: article.unitPurchaseAmount
+      ? article.unitPurchaseAmount.currency
+      : article.unitSellingAmount.currency,
+    unitSellingVat: article.unitSellingAmount.percentageVat,
+    unitSellingAmount: (article.unitSellingAmount
+      ? article.unitSellingAmount.netAmount /
+        currencyFactor(article.unitSellingAmount)
+      : 0
+    ).toFixed(2),
+    unitSellingAmountCurrency: article.unitSellingAmount.currency,
+    costPackage: {
+      laborPercentage: article.additionalInfo?.costPackage?.laborPercentage,
+      materialPercentage:
+        article.additionalInfo?.costPackage?.materialPercentage,
+    },
+  };
+
   const formik = useFormik<ArticleBasicFormModel>({
     initialValues: {
-      category: article.category,
-      manufacturer: article.manufacturer,
-      model: article.model,
-      name: article.name,
-      externalId: article.externalId,
-      storageLocation: article.storageLocation,
-      type: article.type,
-      unit: article.unit,
-      unitPurchaseVat: article.unitPurchaseAmount
-        ? article.unitPurchaseAmount.percentageVat
-        : 0,
-      unitPurchaseAmount: (article.unitPurchaseAmount
-        ? article.unitPurchaseAmount.netAmount /
-          currencyFactor(article.unitPurchaseAmount)
-        : 0
-      ).toFixed(2),
-      unitPurchaseAmountCurrency: article.unitPurchaseAmount
-        ? article.unitPurchaseAmount.currency
-        : article.unitSellingAmount.currency,
-      unitSellingVat: article.unitSellingAmount.percentageVat,
-      unitSellingAmount: (article.unitSellingAmount
-        ? article.unitSellingAmount.netAmount /
-          currencyFactor(article.unitSellingAmount)
-        : 0
-      ).toFixed(2),
-      unitSellingAmountCurrency: article.unitSellingAmount.currency,
-      costPackage: article.additionalInfo.costPackage
-        ? {
-            labor: {
-              ...article.additionalInfo.costPackage.labor,
-              value:
-                (article.additionalInfo.costPackage.labor?.value ?? 0) /
-                currencyFactor(article.additionalInfo.costPackage.labor),
-            },
-            material: {
-              ...article.additionalInfo.costPackage.material,
-              value:
-                (article.additionalInfo.costPackage.material?.value ?? 0) /
-                currencyFactor(article.additionalInfo.costPackage.material),
-            },
-          }
-        : undefined,
+      ...initialValues,
     },
     onSubmit: () => {},
     validationSchema,
   });
 
   useEffect(() => {
-    setInitValue(formik.values.externalId!);
-  }, []);
-
-  useEffect(() => {
     setUpdatedValue(formik.values.externalId);
   }, [formik]);
 
+  // Re-format the amount(s) after article edit
+  useEffect(() => {
+    formik.setValues({
+      ...formik.values,
+      unitPurchaseAmount: (article.unitPurchaseAmount
+        ? article.unitPurchaseAmount.netAmount /
+          currencyFactor(article.unitPurchaseAmount)
+        : 0
+      ).toFixed(2),
+      unitSellingAmount: (article.unitSellingAmount
+        ? article.unitSellingAmount.netAmount /
+          currencyFactor(article.unitSellingAmount)
+        : 0
+      ).toFixed(2),
+      costPackage: {
+        laborPercentage: article.additionalInfo.costPackage?.laborPercentage,
+        materialPercentage:
+          article.additionalInfo.costPackage?.materialPercentage,
+      },
+      externalId: article.externalId,
+    });
+    setInitValue(article.externalId);
+  }, [article]);
+
+  const handleCancel = () => {
+    formik.resetForm({
+      values: {
+        ...initialValues,
+      },
+    });
+    setOpenDialog(false);
+  };
+
   const saveArticle = async () => {
-    const factor = currencyFactor({currency: currentCurrency.code});
     const temp: UpdateArticleRecord = {
       category: formik.values.category,
       manufacturer: formik.values.manufacturer,
@@ -202,59 +206,11 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
         ),
       ),
       costPackage: {
-        ...formik.values.costPackage,
-        labor: {
-          ...formik.values.costPackage?.labor,
-          value: (formik.values.costPackage?.labor?.value ?? 0) * factor,
-          currency: currentCurrency.code,
-        },
-        material: {
-          ...formik.values.costPackage?.material,
-          value: (formik.values.costPackage?.material?.value ?? 0) * factor,
-          currency: currentCurrency.code,
-        },
+        laborPercentage: formik.values.costPackage?.laborPercentage,
+        materialPercentage: formik.values.costPackage?.materialPercentage,
       },
     };
     await updateArticle({articleId: article!.id, article: temp});
-    setOpenDialog(false);
-  };
-
-  // Re-format the amount(s) after article edit
-  useEffect(() => {
-    formik.setFieldValue(
-      'unitPurchaseAmount',
-      (article.unitPurchaseAmount
-        ? article.unitPurchaseAmount.netAmount /
-          currencyFactor(article.unitPurchaseAmount)
-        : 0
-      ).toFixed(2),
-    );
-    formik.setFieldValue(
-      'unitSellingAmount',
-      (article.unitSellingAmount
-        ? article.unitSellingAmount.netAmount /
-          currencyFactor(article.unitSellingAmount)
-        : 0
-      ).toFixed(2),
-    );
-  }, [article]);
-
-  useEffectAfterMount(() => {
-    // whenever unitSellingAmount changes, update costPackage labor and material to 50% 50% of unitSellingAmount
-    formik.setFieldValue('costPackage', {
-      labor: {
-        value: (formik.values.unitSellingAmount as number) * 0.5,
-        currency: currentCurrency.code,
-      },
-      material: {
-        value: (formik.values.unitSellingAmount as number) * 0.5,
-        currency: currentCurrency.code,
-      },
-    });
-  }, [formik.values.unitSellingAmount]);
-
-  const handleCancel = () => {
-    formik.resetForm();
     setOpenDialog(false);
   };
 
@@ -349,11 +305,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
         title={t('Edit Basic Information')}
         isSaving={isLoading}
         onCancel={handleCancel}
-        disableSaveBtn={
-          !!Object.keys(formik.errors).length ||
-          !formik.values.type ||
-          !formik.dirty
-        }
+        disableSaveBtn={!!Object.keys(formik.errors).length || !formik.dirty}
         onSave={saveArticle}
         dialogProps={{
           open: openDialog || false,

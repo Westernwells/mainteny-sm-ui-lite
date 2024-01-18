@@ -189,6 +189,9 @@ export const getUniqueId = () => Math.random().toString(36).substring(2, 9);
 export const getPercentage = (num: number, total: number) =>
   Math.round((num / total) * 100);
 
+export const getAmountFromPercentage = (percent: number, totalAmount: number) =>
+  (percent / 100) * totalAmount;
+
 export const formatAddressFullname = (
   address: AddressRecord | null | undefined,
 ) => {
