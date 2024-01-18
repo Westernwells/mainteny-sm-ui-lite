@@ -291,7 +291,7 @@
   "Supplier deleted successfully": "Dobavljač uspešno obrisan!",
   "Do you want to delete this supplier?": "Želite li obrisati dobavljača?",
   "No attachments yet. Please click the button below to add!": "Još nema priloga. Kliknite na dugme ispod da dodate!",
-  "Add Attachmants": "Dodajte priloge",
+  "Add Attachments": "Dodaj priloge",
   "No QR code yet. Please click the button below to add!": "Još nema QR koda. Kliknite na dugme ispod da dodate.",
   "Add QR Code": "Dodajte QR kod",
   "Do you want to delete this article?": "Da li želite da izbrišete ovaj artikal?",
@@ -450,7 +450,6 @@
   "Add service info": "Dodajte informacije o usluzi",
   "Add appointment preferences": "Dodajte podešavanja termina",
   "Add priority engineer": "Dodaj prioritetnog servisera",
-  "Add Attachments": "Dodaj priloge",
   "Location Information": "Informacije o lokaciji",
   "Address*": "Adresa*",
   "e.g. 34-36 Exmouth Market, London EC1R 4QE": "na primjer. 34-36 Ekmouth Market, London EC1R 4KE",
@@ -2002,5 +2001,9 @@
   "{{jobType}} - Credit note for {{invoiceNumber}}": "{{jobType}} – Kredit za {{invoiceNumber}}",
   "pack": "pakovanje",
   "Created on {{creationDate}}": "Napravljeno {{creationDate}}",
-  "Exclude previously downloaded data": "Izuzmi prethodno preuzete podatke"
+  "Exclude previously downloaded data": "Izuzmi prethodno preuzete podatke",
+  "Article cannot be empty": "Stavka ne može biti prazna",
+  "Article Type": "Tip stavka",
+  "Article #": "Stavka #",
+  "Selling Price (excl. VAT)": "Prodajna cena (bez PDV-a)"
 }
