@@ -261,14 +261,7 @@ export const ArticleItemsTable = ({
                 },
               }));
               setItemsAndCalculatePrice(newItems);
-              if (invoice.partialInvoices && invoice.partialInvoices.length) {
-                setNewPartialTotal(
-                  (invoice.totalAmount?.netAmount ?? 0) /
-                    10 ** invoice.totalAmount.fractionDigits!,
-                );
-              } else {
-                setNewPartialTotal(calculateTotal(newItems));
-              }
+              setNewPartialTotal(calculateTotal(newItems));
             }
           }
         } else if (isCreditNote && isFetchedCreditNoteArticle) {
