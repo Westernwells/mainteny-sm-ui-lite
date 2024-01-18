@@ -153,7 +153,6 @@ export interface InvoiceView {
   paymentTerms: string;
   overdueNotices: InvoiceOverdueNoticeSimpleView[];
   commentCount?: number;
-  partialInvoices?: InvoiceItem[];
   payments: InvoicePaymentView[];
 }
 
