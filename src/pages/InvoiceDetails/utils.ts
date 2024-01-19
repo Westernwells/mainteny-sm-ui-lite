@@ -3,6 +3,7 @@ import {
   Discount,
   DiscountType,
   InvoiceFormData,
+  InvoiceItemPaymentType,
   InvoiceItemRecord,
   PaymentType,
   UpdateInvoice,
@@ -36,6 +37,12 @@ export const formatInvoiceRecord = (
                 }
               : undefined,
         }
+      : undefined,
+    payment: item.payment
+      ? item.payment
+      : value.payment?.type === PaymentType.PER_ITEM
+      ? // set payment percentage to 0 because it's required even if item is already paid and payment type is per item
+        {type: InvoiceItemPaymentType.PERCENTAGE, percentage: 0}
       : undefined,
   })),
   paymentTerms: value.paymentTerms,

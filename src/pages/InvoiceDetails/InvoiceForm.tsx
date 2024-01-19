@@ -1387,7 +1387,7 @@ export const InvoiceForm = ({
                     checked={formik.values.payment?.type === key}
                     disabled={
                       previousInvoices.length > 0 &&
-                      key === PaymentType.PER_ITEM
+                      key !== previousInvoices[0].additionalInfo.payment?.type
                     }
                   />
                 ))}

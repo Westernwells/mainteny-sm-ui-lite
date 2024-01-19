@@ -4,7 +4,7 @@ import TextField, {TextFieldProps} from '@mui/material/TextField';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useContext} from 'react';
 import {useTranslation} from 'react-i18next';
-import {NumericFormat} from 'react-number-format';
+import {NumericFormat, NumericFormatProps} from 'react-number-format';
 
 interface Props {
   containerStyles?: {[key: string]: any};
@@ -14,6 +14,7 @@ interface Props {
   onValueChange?: (values: {name?: string; value?: number}) => void;
   inputType?: 'text' | 'currency';
   fullWidth?: boolean;
+  numericFormatProps?: NumericFormatProps<TextFieldProps>;
 }
 
 export const FormInput = ({
@@ -24,6 +25,7 @@ export const FormInput = ({
   handleFocus,
   fullWidth = true,
   inputType = 'text',
+  numericFormatProps,
 }: Props) => {
   const {t} = useTranslation();
   const {language: selectedLng} = useContext(LanguageContext);
@@ -59,6 +61,7 @@ export const FormInput = ({
           }
           size="small"
           sx={props!.sx}
+          {...numericFormatProps}
         />
       ) : (
         <TextField
