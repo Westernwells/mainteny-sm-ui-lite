@@ -290,6 +290,33 @@ export const getUserFullName = ({
   lastName?: string;
 }) => `${firstName} ${lastName}`.trim();
 
+export const addTimeToDate = (dateObject: string | Date, timeObject: Date) => {
+  if (!timeObject) return '';
+  const newTime = new Date(dateObject || timeObject);
+
+  newTime.setUTCHours(
+    timeObject.getUTCHours(),
+    timeObject.getUTCMinutes(),
+    timeObject.getUTCSeconds(),
+  );
+
+  return newTime.toISOString() ?? '';
+};
+
+export const addDateToTime = (timeObject: Date | string, dateObject: Date) => {
+  if (!dateObject) return '';
+
+  const newDate = new Date(timeObject || dateObject);
+
+  newDate.setUTCFullYear(
+    dateObject.getUTCFullYear(),
+    dateObject.getUTCMonth(),
+    dateObject.getUTCDate(),
+  );
+
+  return newDate?.toISOString() ?? '';
+};
+
 export const hasProtocol = (url: string) => {
   const pattern = /^(http:\/\/|https:\/\/)/;
   return pattern.test(url);
