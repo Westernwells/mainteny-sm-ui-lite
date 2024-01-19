@@ -171,11 +171,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
   }, [article]);
 
   const handleCancel = () => {
-    formik.resetForm({
-      values: {
-        ...initialValues,
-      },
-    });
+    formik.resetForm({});
     setOpenDialog(false);
   };
 
@@ -319,6 +315,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
             my: '0.5rem',
           }}
           formik={formik}
+          articleCostPackage={article?.additionalInfo?.costPackage}
         />
       </Dialog>
     </InfoCard>

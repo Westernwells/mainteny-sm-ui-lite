@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import RadioGroup from '@mui/material/RadioGroup';
 import {FormikProps, getIn} from 'formik';
-import {ArticleType} from 'models/article';
+import {ArticleType, CostPackage} from 'models/article';
 import {FormRadio} from 'components/form/FormRadio';
 import {FormLabel} from 'components/form/FormLabel';
 import {ArticleBasicFormModel} from 'models/articleForm';
@@ -45,10 +45,12 @@ export const SelectArticleType = ({
   selectedArticleType,
   formik,
   handleSelectChange,
+  articleCostPackage,
 }: {
   selectedArticleType: string;
   formik: FormikProps<ArticleBasicFormModel | EditArticleFormModel>;
   handleSelectChange: (value: string) => void;
+  articleCostPackage?: CostPackage;
 }) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -56,13 +58,20 @@ export const SelectArticleType = ({
   const {language: selectedLng} = useContext(LanguageContext);
 
   useEffect(() => {
-    if (formik.values.type !== ArticleType.PACKAGE) {
-      formik.setFieldValue('costPackage', {
-        ...formik.values.costPackage,
-        laborPercentage: 0,
-        materialPercentage: 0,
-      });
-    }
+    const defaultPackageValues = {
+      laborPercentage:
+        formik.values.type === ArticleType.PACKAGE
+          ? articleCostPackage?.laborPercentage || 50
+          : 0,
+      materialPercentage:
+        formik.values.type === ArticleType.PACKAGE
+          ? articleCostPackage?.materialPercentage || 50
+          : 0,
+    };
+    formik.setFieldValue('costPackage', {
+      ...formik.values.costPackage,
+      ...defaultPackageValues,
+    });
   }, [formik.values.type]);
 
   return (

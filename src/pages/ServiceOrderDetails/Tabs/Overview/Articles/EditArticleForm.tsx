@@ -171,6 +171,7 @@ export const EditArticleForm = ({
         handleSelectChange={(value) => {
           formik.setFieldValue('type', value);
         }}
+        articleCostPackage={serviceOrderArticle?.article?.costPackage}
       />
     </Box>
   );
