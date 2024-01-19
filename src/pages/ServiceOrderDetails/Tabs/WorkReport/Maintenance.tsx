@@ -9,6 +9,7 @@ import {DatePicker} from 'components/DatePicker';
 import {TimePicker} from 'components/TimePicker';
 import {FormInput} from 'components/form/FormInput';
 import {FormCheckbox} from 'components/form/FormCheckbox';
+import {addDateToTime, addTimeToDate} from 'utils/utils';
 
 interface Props {
   serviceOrder: ServiceOrderView;
@@ -57,12 +58,16 @@ export const Maintenance = ({serviceOrder, formik}: Props) => {
                     if (travelStartTime) {
                       formik.setValues({
                         ...formik.values,
-                        travelStartTime: travelStartTime.toISOString(),
+                        travelStartTime: addDateToTime(
+                          formik.values.travelStartTime as string,
+                          travelStartTime,
+                        ),
                       });
                     }
                   }}
                   textFieldProps={{
                     name: 'travelStartTime',
+                    label: 'Start Date',
                     helperText:
                       formik.errors.travelStartTime &&
                       formik.touched.travelStartTime
@@ -87,12 +92,16 @@ export const Maintenance = ({serviceOrder, formik}: Props) => {
                     if (time && !Number.isNaN(time.getTime())) {
                       formik.setValues({
                         ...formik.values,
-                        travelEndTime: time.toISOString(),
+                        travelStartTime: addTimeToDate(
+                          formik.values.travelStartTime as string,
+                          time,
+                        ),
                       });
                     }
                   }}
                   textFieldProps={{
                     name: 'travelStartTime',
+                    label: 'Start Time',
                     helperText:
                       formik.errors.travelStartTime &&
                       formik.touched.travelStartTime
@@ -119,12 +128,16 @@ export const Maintenance = ({serviceOrder, formik}: Props) => {
                     if (travelEndTime) {
                       formik.setValues({
                         ...formik.values,
-                        travelEndTime: travelEndTime.toISOString(),
+                        travelEndTime: addDateToTime(
+                          formik.values.travelEndTime as string,
+                          travelEndTime,
+                        ),
                       });
                     }
                   }}
                   textFieldProps={{
                     name: 'travelEndTime',
+                    label: 'End Date',
                     helperText:
                       formik.errors.travelEndTime &&
                       formik.touched.travelEndTime
@@ -149,12 +162,16 @@ export const Maintenance = ({serviceOrder, formik}: Props) => {
                     if (time && !Number.isNaN(time.getTime())) {
                       formik.setValues({
                         ...formik.values,
-                        travelEndTime: time.toISOString(),
+                        travelEndTime: addTimeToDate(
+                          formik.values.travelEndTime as string,
+                          time,
+                        ),
                       });
                     }
                   }}
                   textFieldProps={{
                     name: 'travelEndTime',
+                    label: 'End Time',
                     helperText:
                       formik.errors.travelEndTime &&
                       formik.touched.travelEndTime
@@ -183,12 +200,16 @@ export const Maintenance = ({serviceOrder, formik}: Props) => {
                     if (startTime) {
                       formik.setValues({
                         ...formik.values,
-                        startTime: startTime.toISOString(),
+                        startTime: addDateToTime(
+                          formik.values.startTime as string,
+                          startTime,
+                        ),
                       });
                     }
                   }}
                   textFieldProps={{
                     name: 'startTime',
+                    label: 'Start Date',
                     helperText:
                       formik.errors.startTime && formik.touched.startTime
                         ? formik.errors.startTime
@@ -211,12 +232,16 @@ export const Maintenance = ({serviceOrder, formik}: Props) => {
                     if (time && !Number.isNaN(time.getTime())) {
                       formik.setValues({
                         ...formik.values,
-                        travelEndTime: time.toISOString(),
+                        startTime: addTimeToDate(
+                          formik.values.startTime as string,
+                          time,
+                        ),
                       });
                     }
                   }}
                   textFieldProps={{
                     name: 'startTime',
+                    label: 'Start Time',
                     helperText:
                       formik.errors.startTime && formik.touched.startTime
                         ? formik.errors.startTime
@@ -241,12 +266,16 @@ export const Maintenance = ({serviceOrder, formik}: Props) => {
                     if (endTime) {
                       formik.setValues({
                         ...formik.values,
-                        endTime: endTime.toISOString(),
+                        endTime: addDateToTime(
+                          formik.values.endTime as string,
+                          endTime,
+                        ),
                       });
                     }
                   }}
                   textFieldProps={{
                     name: 'endTime',
+                    label: 'End Date',
                     helperText:
                       formik.errors.endTime && formik.touched.endTime
                         ? formik.errors.endTime
@@ -267,12 +296,16 @@ export const Maintenance = ({serviceOrder, formik}: Props) => {
                     if (time && !Number.isNaN(time.getTime())) {
                       formik.setValues({
                         ...formik.values,
-                        travelEndTime: time.toISOString(),
+                        endTime: addTimeToDate(
+                          formik.values.endTime as string,
+                          time,
+                        ),
                       });
                     }
                   }}
                   textFieldProps={{
                     name: 'endTime',
+                    label: 'End Time',
                     helperText:
                       formik.errors.endTime && formik.touched.endTime
                         ? formik.errors.endTime
