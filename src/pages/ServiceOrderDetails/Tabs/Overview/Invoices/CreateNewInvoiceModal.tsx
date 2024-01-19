@@ -16,7 +16,7 @@ import {
 import {InvoiceType} from 'models/invoice';
 import {Button} from 'components/Button';
 import {ReactComponent as FinalInvoiceIcon} from 'assets/icons/FinalInvoiceIcon.svg';
-// import {ReactComponent as UpfrontInvoiceIcon} from 'assets/icons/UpfrontInvoiceIcon.svg';
+import {ReactComponent as UpfrontInvoiceIcon} from 'assets/icons/UpfrontInvoiceIcon.svg';
 import {ReactComponent as PartialInvoiceIcon} from 'assets/icons/PartialInvoiceIcon.svg';
 
 interface Props {
@@ -45,14 +45,13 @@ const invoiceTypeOptions = [
     icon: <PartialInvoiceIcon style={iconStyle} />,
     invoiceType: InvoiceType.PARTIAL,
   },
-  // TODO: uncomment upfront invoice option when it's ready
-  // {
-  //   label: 'Upfront Invoice',
-  //   description:
-  //     'Use when full payment is required before the delivery of goods or services.',
-  //   icon: <UpfrontInvoiceIcon style={iconStyle} />,
-  //   invoiceType: InvoiceType.UPFRONT,
-  // },
+  {
+    label: 'Upfront Invoice',
+    description:
+      'Use when full payment is required before the delivery of goods or services.',
+    icon: <UpfrontInvoiceIcon style={iconStyle} />,
+    invoiceType: InvoiceType.UPFRONT,
+  },
 ];
 
 const CreateNewInvoiceModal = ({open, onClose, orderId}: Props) => {
