@@ -1,15 +1,16 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {t} from 'i18next';
 import {useLocation, useNavigate} from 'react-router-dom';
+import {VariableSizeList} from 'react-window';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-  DraggableProvided,
   BeforeCapture,
+  DragDropContext,
+  Draggable,
+  DraggableProvided,
+  Droppable,
+  DropResult,
 } from 'react-beautiful-dnd';
 import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
@@ -37,15 +38,16 @@ import {
   CheckListComponentOptionColor,
   CheckListComponentType,
   CreateCheckListRecord,
-  UpdateCheckListRecord,
   ExtendedCreateCheckListRecord,
   ExtendedUpdateCheckListRecord,
+  UpdateCheckListRecord,
 } from 'models/checklist';
 import {
   checkListComponentViewToExtendedCreateCheckListRecord,
   getComponentMock,
 } from 'utils/checklist';
 import {makePage} from 'utils/paging-utils';
+import AutoSizer from 'react-virtualized-auto-sizer';
 import {ChecklistComponent} from './ChecklistComponent';
 import {ChecklistPreview} from './ChecklistPreview';
 
@@ -108,6 +110,7 @@ export const Checklist = () => {
   const {user} = useUserSession();
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [draggingComponentId, setDraggingComponentId] = useState<string>('');
+  const listRef = useRef<VariableSizeList>(null);
   const {mutate: createChecklist, isLoading: isCreating} = useCreateChecklist(
     'Checklist saved successfully!',
   );
@@ -168,7 +171,6 @@ export const Checklist = () => {
       createChecklist(data, {onSuccess: () => navigate(-1)});
     }
   };
-
   const formik = useFormik<
     ExtendedCreateCheckListRecord | ExtendedUpdateCheckListRecord
   >({
@@ -224,6 +226,9 @@ export const Checklist = () => {
     newComponents.splice(destinationIndex, 0, movedComponent);
     formik.setFieldValue('components', newComponents);
     setDraggingComponentId('');
+    if (listRef.current) {
+      listRef.current?.resetAfterIndex(0);
+    }
   };
 
   const onBeforeCapture = ({draggableId}: BeforeCapture) => {
@@ -236,6 +241,10 @@ export const Checklist = () => {
       getComponentMock(type),
     ]);
 
+    if (listRef.current) {
+      listRef.current.resetAfterIndex(0);
+    }
+
     // workaround because setFieldValue do not recieve callback
     await Promise.resolve();
 
@@ -246,6 +255,47 @@ export const Checklist = () => {
   };
 
   const isNameInvalid = !!(formik.touched.name && formik.errors.name);
+
+  const rowRenderer = ({index, style}: {index: number; style: any}) => {
+    const component = formik.values.components[index];
+    return (
+      <Box style={style}>
+        <Draggable key={component.id} draggableId={component.id} index={index}>
+          {(draggableProvided: DraggableProvided) => (
+            <Box
+              ref={draggableProvided.innerRef}
+              {...draggableProvided.draggableProps}
+              {...draggableProvided.dragHandleProps}
+              style={{...draggableProvided.draggableProps.style}}>
+              <ChecklistComponent
+                listRef={listRef}
+                index={index}
+                component={component}
+                formik={formik}
+                draggableProvided={draggableProvided}
+                isDragging={draggingComponentId === component.id}
+              />
+            </Box>
+          )}
+        </Draggable>
+      </Box>
+    );
+  };
+  const getSize = (index: number) => {
+    const type = formik.values.components[index]?.type;
+    switch (type) {
+      case CheckListComponentType.YES_NO:
+        return 70;
+      case CheckListComponentType.HEAD:
+        return 50;
+      case CheckListComponentType.SINGLE_CHECK:
+        return 158;
+      case CheckListComponentType.TEXT:
+        return 200;
+      default:
+        return 80;
+    }
+  };
 
   return (
     <>
@@ -284,7 +334,7 @@ export const Checklist = () => {
                 onChange: formik.handleChange,
                 required: true,
                 sx: {
-                  '& .MuiInputBase-root': {
+                  '& .MfuiInputBase-root': {
                     height: '38px',
                     pt: 2,
                     fontSize: '31px',
@@ -310,25 +360,22 @@ export const Checklist = () => {
                   {(provided) => (
                     <Box
                       pt={4}
+                      style={{height: '70vh'}}
                       {...provided.droppableProps}
                       ref={provided.innerRef}>
-                      {formik.values.components?.map((component, index) => (
-                        <Draggable
-                          key={component.id}
-                          draggableId={component.id}
-                          index={index}>
-                          {(draggableProvided: DraggableProvided) => (
-                            <ChecklistComponent
-                              index={index}
-                              component={component}
-                              formik={formik}
-                              draggableProvided={draggableProvided}
-                              isDragging={draggingComponentId === component.id}
-                            />
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
+                      <AutoSizer>
+                        {({height, width}) => (
+                          <VariableSizeList
+                            ref={listRef}
+                            height={height}
+                            width={width}
+                            itemCount={formik.values.components.length}
+                            itemData={formik.values.components}
+                            itemSize={getSize}>
+                            {rowRenderer}
+                          </VariableSizeList>
+                        )}
+                      </AutoSizer>
                     </Box>
                   )}
                 </Droppable>
