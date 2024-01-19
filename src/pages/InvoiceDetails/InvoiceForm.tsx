@@ -1376,35 +1376,45 @@ export const InvoiceForm = ({
             </Box>
 
             {/* PAYMENT TYPE */}
-            <Box>
-              <Typography variant="body2" color="grey.700">
-                {t('Payment type')}
-              </Typography>
-              <RadioGroup
-                defaultValue={PaymentType.LUMP_SUM}
-                name="radio-buttons-group">
-                {Object.entries(PaymentTypeOptions).map(([key, value]) =>
-                  // don't show per-item for upfront invoices
-                  formik.values.type === InvoiceType.UPFRONT &&
-                  key === PaymentType.PER_ITEM ? null : (
-                    <FormControlLabel
-                      key={key}
-                      value={key}
-                      control={<Radio size="small" />}
-                      label={t(value)}
-                      componentsProps={{typography: {variant: 'body2'}}}
-                      onChange={() => formik.setFieldValue('payment.type', key)}
-                      checked={formik.values.payment?.type === key}
-                      disabled={
-                        formik.values.type !== InvoiceType.UPFRONT &&
-                        previousInvoices.length > 0 &&
-                        key !== previousInvoices[0].additionalInfo.payment?.type
-                      }
-                    />
-                  ),
-                )}
-              </RadioGroup>
-            </Box>
+            {/* don't show payment type for FULL and CREDIT_NOTE invoices */}
+            {[
+              InvoiceType.PARTIAL,
+              InvoiceType.UPFRONT,
+              InvoiceType.FINAL,
+            ].includes(formik.values.type) ? (
+              <Box>
+                <Typography variant="body2" color="grey.700">
+                  {t('Payment type')}
+                </Typography>
+                <RadioGroup
+                  defaultValue={PaymentType.LUMP_SUM}
+                  name="radio-buttons-group">
+                  {Object.entries(PaymentTypeOptions).map(([key, value]) =>
+                    // don't show per-item for upfront invoices
+                    formik.values.type === InvoiceType.UPFRONT &&
+                    key === PaymentType.PER_ITEM ? null : (
+                      <FormControlLabel
+                        key={key}
+                        value={key}
+                        control={<Radio size="small" />}
+                        label={t(value)}
+                        componentsProps={{typography: {variant: 'body2'}}}
+                        onChange={() =>
+                          formik.setFieldValue('payment.type', key)
+                        }
+                        checked={formik.values.payment?.type === key}
+                        disabled={
+                          formik.values.type !== InvoiceType.UPFRONT &&
+                          previousInvoices.length > 0 &&
+                          key !==
+                            previousInvoices[0].additionalInfo.payment?.type
+                        }
+                      />
+                    ),
+                  )}
+                </RadioGroup>
+              </Box>
+            ) : null}
           </Grid>
 
           {/* ADDITIONAL DOCUMENTS */}
