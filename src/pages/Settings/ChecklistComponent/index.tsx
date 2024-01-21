@@ -1,5 +1,5 @@
-import React, {MutableRefObject, useCallback} from 'react';
-import {FormikProps, getIn} from 'formik';
+import React, {MutableRefObject} from 'react';
+import {getIn} from 'formik';
 import {theme} from 'theme';
 import {t} from 'i18next';
 import {
@@ -31,6 +31,7 @@ import {
 } from 'models/checklist';
 import {getUniqueId} from 'utils/utils';
 import {getOptionMock} from 'utils/checklist';
+import {Controller, UseFormReturn} from 'react-hook-form';
 
 interface ComponentActionsProps {
   duplicateComponent: () => void;
@@ -98,7 +99,7 @@ const DraggableContainer: React.FC<
 
 interface ComponentProps {
   index: number;
-  formik: FormikProps<
+  formik: UseFormReturn<
     ExtendedCreateCheckListRecord | ExtendedUpdateCheckListRecord
   >;
   component: ExtendedCheckListComponentRecord;
@@ -114,189 +115,197 @@ interface MultiChoiceComponentProps extends ComponentProps {
   isDragging: Boolean;
 }
 
-export const MultiChoiceComponent = React.memo(
-  ({
-    index,
-    formik,
-    component,
-    duplicateComponent,
-    deleteComponent,
-    handleCheckOption,
-    removeOption,
-    addOption,
-    handleMoreInfoInNote,
-    isDragging,
-  }: MultiChoiceComponentProps) => {
-    const isSubjectInvalid = !!(
-      getIn(formik.touched, `components[${index}].subject`) &&
-      getIn(formik.errors, `components[${index}].subject`)
-    );
-    return (
-      <>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          flex={1}>
-          <FormInput
-            props={{
-              name: `components[${index}].subject`,
-              placeholder: t('Enter multi-choice name...'),
-              variant: 'standard',
-              value: component.subject,
-              error: isSubjectInvalid,
-              onBlur: formik.handleBlur,
-              onChange: formik.handleChange,
-              required: true,
-              inputProps: {
-                sx: {
-                  p: 0,
-                  '&::placeholder': {
-                    color: isSubjectInvalid ? 'error.main' : 'text.primary',
+export const MultiChoiceComponent = ({
+  index,
+  formik,
+  component,
+  duplicateComponent,
+  deleteComponent,
+  handleCheckOption,
+  removeOption,
+  addOption,
+  handleMoreInfoInNote,
+  isDragging,
+}: MultiChoiceComponentProps) => {
+  const isSubjectInvalid = !!(
+    getIn(formik.formState.touchedFields, `components.${index}.subject`) &&
+    getIn(formik.formState.errors, `components.${index}.subject`)
+  );
+
+  return (
+    <>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        flex={1}>
+        <Controller
+          control={formik.control}
+          defaultValue={component.subject ?? undefined}
+          name={`components.${index}.subject`}
+          render={({field: {onChange, value, onBlur}}) => (
+            <FormInput
+              props={{
+                name: `components.${index}.subject`,
+                placeholder: t('Enter multi-choice name...'),
+                variant: 'standard',
+                value,
+                error: isSubjectInvalid,
+                onBlur,
+                onChange,
+                required: true,
+                inputProps: {
+                  sx: {
+                    p: 0,
+                    '&::placeholder': {
+                      color: isSubjectInvalid ? 'error.main' : 'text.primary',
+                    },
                   },
                 },
-              },
-              InputProps: {disableUnderline: true},
-            }}
-          />
-          <ComponentActions
-            duplicateComponent={duplicateComponent}
-            deleteComponent={deleteComponent}
-          />
-        </Box>
+                InputProps: {disableUnderline: true},
+              }}
+            />
+          )}
+        />
+        <ComponentActions
+          duplicateComponent={duplicateComponent}
+          deleteComponent={deleteComponent}
+        />
+      </Box>
 
-        {!isDragging ? (
-          <>
-            <Box
-              display="flex"
-              flexDirection="column"
-              rowGap={1.5}
-              pt={3}
-              pb={2}>
-              {component.options.map((option, optionIndex) => {
-                const isOptionInvalid = !!(
-                  getIn(
-                    formik.touched,
-                    `components[${index}].options[${optionIndex}].text`,
-                  ) &&
-                  getIn(
-                    formik.errors,
-                    `components[${index}].options[${optionIndex}].text`,
-                  )
-                );
-                return (
-                  <Box
-                    key={option.id}
-                    display="flex"
-                    justifyContent="space-between"
-                    ml={-1}>
-                    <Radio
-                      size="small"
-                      checked={!!option.isDefault}
-                      name={`components[${index}].options[${optionIndex}].isDefault`}
-                      onChange={() => handleCheckOption(option.id)}
-                      sx={{
-                        '&.Mui-checked': {
-                          color: '#4CAF50',
-                        },
-                      }}
-                    />
-                    <FormInput
-                      props={{
-                        name: `components[${index}].options[${optionIndex}].text`,
-                        placeholder: 'Choice one',
-                        variant: 'outlined',
-                        value: option.text,
-                        error: isOptionInvalid,
-                        onBlur: formik.handleBlur,
-                        onChange: formik.handleChange,
-                        required: true,
-                        sx: {
-                          bgcolor: 'white',
-                          '& .MuiOutlinedInput-root': {
-                            fieldset: {
-                              borderColor: '#E4E9F2',
-                            },
-                          },
-                        },
-                        inputProps: {
-                          sx: {
-                            '&::placeholder': {
-                              color: isOptionInvalid
-                                ? 'error.main'
-                                : 'text.primary',
-                            },
-                          },
-                        },
-                      }}
-                    />
-                    <IconButton
-                      size="small"
-                      sx={{opacity: 0.5}}
-                      onClick={() => removeOption(option.id)}>
-                      <Close sx={{fontSize: '1.25rem'}} />
-                    </IconButton>
-                  </Box>
-                );
-              })}
-              {component.moreInfoInNote ? (
-                <Box display="flex" justifyContent="space-between" ml={-1}>
-                  <Radio size="small" checked={false} disabled />
-                  <FormInput
-                    props={{
-                      variant: 'outlined',
-                      value: t('Your Choice'),
-                      sx: {
-                        bgcolor: 'white',
+      {!isDragging ? (
+        <>
+          <Box display="flex" flexDirection="column" rowGap={1.5} pt={3} pb={2}>
+            {component.options.map((option, optionIndex) => {
+              console.log('component', component);
+              const isOptionInvalid = !!(
+                getIn(
+                  formik.formState.touchedFields,
+                  `components[${index}].options[${optionIndex}].text`,
+                ) &&
+                getIn(
+                  formik.formState.errors,
+                  `components[${index}].options[${optionIndex}].text`,
+                )
+              );
+              return (
+                <Box
+                  key={option.id}
+                  display="flex"
+                  justifyContent="space-between"
+                  ml={-1}>
+                  <Radio
+                    size="small"
+                    checked={!!option.isDefault}
+                    name={`components.${index}.options.${optionIndex}.isDefault`}
+                    onChange={() => handleCheckOption(option.id)}
+                    sx={{
+                      '&.Mui-checked': {
+                        color: '#4CAF50',
                       },
-                      disabled: true,
                     }}
                   />
-                  <IconButton size="small" sx={{opacity: 0.5}} disabled>
+                  <Controller
+                    control={formik.control}
+                    defaultValue={option.text ?? undefined}
+                    name={`components.${index}.options.${optionIndex}.text`}
+                    render={({field: {onChange, value, onBlur}}) => (
+                      <FormInput
+                        props={{
+                          name: `components[${index}].options[${optionIndex}].text`,
+                          placeholder: 'Choice one',
+                          variant: 'outlined',
+                          value,
+                          error: isOptionInvalid,
+                          onBlur,
+                          onChange,
+                          required: true,
+                          sx: {
+                            bgcolor: 'white',
+                            '& .MuiOutlinedInput-root': {
+                              fieldset: {
+                                borderColor: '#E4E9F2',
+                              },
+                            },
+                          },
+                          inputProps: {
+                            sx: {
+                              '&::placeholder': {
+                                color: isOptionInvalid
+                                  ? 'error.main'
+                                  : 'text.primary',
+                              },
+                            },
+                          },
+                        }}
+                      />
+                    )}
+                  />
+                  <IconButton
+                    size="small"
+                    sx={{opacity: 0.5}}
+                    onClick={() => removeOption(option.id)}>
                     <Close sx={{fontSize: '1.25rem'}} />
                   </IconButton>
                 </Box>
-              ) : null}
-            </Box>
-
-            <Box display="flex" justifyContent="space-between" ml={-1}>
-              <Button
-                buttonProps={{
-                  size: 'small',
-                  variant: 'text',
-                  onClick: addOption,
-                  autoFocus: true,
-                  startIcon: <Add />,
-                }}>
-                <Typography variant="subtitle2">{t('New Choice')}</Typography>
-              </Button>
-
-              <Box display="flex" alignItems="center">
-                <Switch
-                  value={!!component.moreInfoInNote}
-                  getValue={handleMoreInfoInNote}
-                  label="Enter Your Choice"
+              );
+            })}
+            {component.moreInfoInNote ? (
+              <Box display="flex" justifyContent="space-between" ml={-1}>
+                <Radio size="small" checked={false} disabled />
+                <FormInput
+                  props={{
+                    variant: 'outlined',
+                    value: t('Your Choice'),
+                    sx: {
+                      bgcolor: 'white',
+                    },
+                    disabled: true,
+                  }}
                 />
-                <Tooltip
-                  title={
-                    t(
-                      "Enable 'Enter Your Choice' to add a custom text input field to your mobile checklist. This allows for personalized responses in the multi-choice form.",
-                    ) ?? ''
-                  }
-                  placement="top"
-                  arrow>
-                  <IconButton size="small" sx={{ml: -1}}>
-                    <Info sx={{fontSize: '1.25rem'}} />
-                  </IconButton>
-                </Tooltip>
+                <IconButton size="small" sx={{opacity: 0.5}} disabled>
+                  <Close sx={{fontSize: '1.25rem'}} />
+                </IconButton>
               </Box>
+            ) : null}
+          </Box>
+
+          <Box display="flex" justifyContent="space-between" ml={-1}>
+            <Button
+              buttonProps={{
+                size: 'small',
+                variant: 'text',
+                onClick: addOption,
+                startIcon: <Add />,
+              }}>
+              <Typography variant="subtitle2">{t('New Choice')}</Typography>
+            </Button>
+
+            <Box display="flex" alignItems="center">
+              <Switch
+                value={!!component.moreInfoInNote}
+                getValue={handleMoreInfoInNote}
+                label="Enter Your Choice"
+              />
+              <Tooltip
+                title={
+                  t(
+                    "Enable 'Enter Your Choice' to add a custom text input field to your mobile checklist. This allows for personalized responses in the multi-choice form.",
+                  ) ?? ''
+                }
+                placement="top"
+                arrow>
+                <IconButton size="small" sx={{ml: -1}}>
+                  <Info sx={{fontSize: '1.25rem'}} />
+                </IconButton>
+              </Tooltip>
             </Box>
-          </>
-        ) : null}
-      </>
-    );
-  },
-);
+          </Box>
+        </>
+      ) : null}
+    </>
+  );
+};
 
 interface CheckboxComponentProps extends ComponentProps {
   handleCheckCheckbox: () => void;
@@ -324,27 +333,37 @@ export const CheckboxComponent = React.memo(
           },
         }}
       />
-      <FormInput
-        props={{
-          name: `components[${index}].subject`,
-          value: component.subject,
-          variant: 'outlined',
-          error: !!(
-            getIn(formik.touched, `components[${index}].subject`) &&
-            getIn(formik.errors, `components[${index}].subject`)
-          ),
-          onBlur: formik.handleBlur,
-          onChange: formik.handleChange,
-          required: true,
-          sx: {
-            bgcolor: 'white',
-            '& .MuiOutlinedInput-root': {
-              fieldset: {
-                borderColor: '#E4E9F2',
+      <Controller
+        control={formik.control}
+        defaultValue={component.subject ?? undefined}
+        name={`components.${index}.subject`}
+        render={({field: {onChange, value, onBlur}}) => (
+          <FormInput
+            props={{
+              name: `components[${index}].subject`,
+              value,
+              variant: 'outlined',
+              error: !!(
+                getIn(
+                  formik.formState.touchedFields,
+                  `components[${index}].subject`,
+                ) &&
+                getIn(formik.formState.errors, `components[${index}].subject`)
+              ),
+              onBlur,
+              onChange,
+              required: true,
+              sx: {
+                bgcolor: 'white',
+                '& .MuiOutlinedInput-root': {
+                  fieldset: {
+                    borderColor: '#E4E9F2',
+                  },
+                },
               },
-            },
-          },
-        }}
+            }}
+          />
+        )}
       />
       <ComponentActions
         duplicateComponent={duplicateComponent}
@@ -364,8 +383,8 @@ export const HeaderComponent = React.memo(
     deleteComponent,
   }: ComponentProps) => {
     const isSubjectInvalid = !!(
-      getIn(formik.touched, `components[${index}].subject`) &&
-      getIn(formik.errors, `components[${index}].subject`)
+      getIn(formik.formState.touchedFields, `components[${index}].subject`) &&
+      getIn(formik.formState.errors, `components[${index}].subject`)
     );
     return (
       <Box
@@ -373,36 +392,40 @@ export const HeaderComponent = React.memo(
         justifyContent="space-between"
         alignItems="center"
         flex={1}>
-        <FormInput
-          props={{
-            name: `components[${index}].subject`,
-            placeholder: t('Enter header name...'),
-            variant: 'standard',
-            value: component.subject,
-            error: isSubjectInvalid,
-            onBlur: formik.handleBlur,
-            onChange: (e) => {
-              e.stopPropagation();
-              formik.handleChange(e);
-            },
-            required: true,
-            sx: {
-              '& .MuiInputBase-input': {
-                p: 0,
-              },
-              '& .MuiInputBase-root': {
-                fontSize: '1.25rem',
-              },
-            },
-            InputProps: {disableUnderline: true},
-            inputProps: {
-              sx: {
-                '&::placeholder': {
-                  color: isSubjectInvalid ? 'error.main' : 'text.primary',
+        <Controller
+          control={formik.control}
+          defaultValue={component.subject ?? undefined}
+          name={`components.${index}.subject`}
+          render={({field: {onChange, value, onBlur}}) => (
+            <FormInput
+              props={{
+                name: `components[${index}].subject`,
+                placeholder: t('Enter header name...'),
+                variant: 'standard',
+                value,
+                error: isSubjectInvalid,
+                onBlur,
+                onChange,
+                required: true,
+                sx: {
+                  '& .MuiInputBase-input': {
+                    p: 0,
+                  },
+                  '& .MuiInputBase-root': {
+                    fontSize: '1.25rem',
+                  },
                 },
-              },
-            },
-          }}
+                InputProps: {disableUnderline: true},
+                inputProps: {
+                  sx: {
+                    '&::placeholder': {
+                      color: isSubjectInvalid ? 'error.main' : 'text.primary',
+                    },
+                  },
+                },
+              }}
+            />
+          )}
         />
         <ComponentActions
           duplicateComponent={duplicateComponent}
@@ -427,32 +450,39 @@ export const TextComponent = React.memo(
     isDragging,
   }: TextareaComponentProps) => {
     const isSubjectInvalid = !!(
-      getIn(formik.touched, `components[${index}].subject`) &&
-      getIn(formik.errors, `components[${index}].subject`)
+      getIn(formik.formState.touchedFields, `components[${index}].subject`) &&
+      getIn(formik.formState.errors, `components[${index}].subject`)
     );
     return (
       <>
         <Box display="flex" alignItems="center">
-          <FormInput
-            props={{
-              name: `components[${index}].subject`,
-              placeholder: t('Enter text area name...'),
-              variant: 'standard',
-              value: component.subject,
-              error: isSubjectInvalid,
-              onBlur: formik.handleBlur,
-              onChange: formik.handleChange,
-              required: true,
-              inputProps: {
-                sx: {
-                  p: 0,
-                  '&::placeholder': {
-                    color: isSubjectInvalid ? 'error.main' : 'text.primary',
+          <Controller
+            control={formik.control}
+            defaultValue={component.subject ?? undefined}
+            name={`components.${index}.subject`}
+            render={({field: {onChange, value, onBlur}}) => (
+              <FormInput
+                props={{
+                  name: `components[${index}].subject`,
+                  placeholder: t('Enter text area name...'),
+                  variant: 'standard',
+                  value,
+                  error: isSubjectInvalid,
+                  onBlur,
+                  onChange,
+                  required: true,
+                  inputProps: {
+                    sx: {
+                      p: 0,
+                      '&::placeholder': {
+                        color: isSubjectInvalid ? 'error.main' : 'text.primary',
+                      },
+                    },
                   },
-                },
-              },
-              InputProps: {disableUnderline: true},
-            }}
+                  InputProps: {disableUnderline: true},
+                }}
+              />
+            )}
           />
           <ComponentActions
             duplicateComponent={duplicateComponent}
@@ -461,33 +491,43 @@ export const TextComponent = React.memo(
         </Box>
 
         {!isDragging ? (
-          <TextField
-            name={`components[${index}].note`}
-            variant="outlined"
-            size="small"
-            placeholder={t('Enter your text here...')}
-            multiline
-            fullWidth
-            value={component.note}
-            minRows={5}
-            error={
-              !!(
-                getIn(formik.touched, `components[${index}].note`) &&
-                getIn(formik.errors, `components[${index}].note`)
-              )
-            }
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            sx={{
-              mt: 1.5,
-              bgcolor: 'white',
-              '& .MuiOutlinedInput-root': {
-                fieldset: {
-                  borderColor: '#E4E9F2',
-                },
-              },
-            }}
-            required
+          <Controller
+            control={formik.control}
+            defaultValue={component.note ?? undefined}
+            name={`components.${index}.note`}
+            render={({field: {onChange, value, onBlur}}) => (
+              <TextField
+                name={`components[${index}].note`}
+                variant="outlined"
+                size="small"
+                placeholder={t('Enter your text here...')}
+                multiline
+                fullWidth
+                value={value}
+                minRows={5}
+                error={
+                  !!(
+                    getIn(
+                      formik.formState.touchedFields,
+                      `components[${index}].note`,
+                    ) &&
+                    getIn(formik.formState.errors, `components[${index}].note`)
+                  )
+                }
+                onChange={onChange}
+                onBlur={onBlur}
+                sx={{
+                  mt: 1.5,
+                  bgcolor: 'white',
+                  '& .MuiOutlinedInput-root': {
+                    fieldset: {
+                      borderColor: '#E4E9F2',
+                    },
+                  },
+                }}
+                required
+              />
+            )}
           />
         ) : null}
       </>
@@ -495,167 +535,161 @@ export const TextComponent = React.memo(
   },
 );
 
-export const ChecklistComponent = React.memo(
-  ({
-    index,
-    component,
-    formik,
-    draggableProvided,
-    isDragging,
-    listRef,
-  }: {
-    index: number;
-    component: ExtendedCheckListComponentRecord;
-    formik: FormikProps<
-      ExtendedCreateCheckListRecord | ExtendedUpdateCheckListRecord
-    >;
-    draggableProvided: DraggableProvided;
-    isDragging: Boolean;
-    listRef: MutableRefObject<any>;
-  }) => {
-    const duplicateComponent = () => {
-      formik.setFieldValue('components', [
-        ...formik.values.components.slice(0, index + 1),
-        {
-          ...component,
-          id: getUniqueId(),
-        },
-        ...formik.values.components.slice(index + 1),
-      ]);
-      if (listRef.current) {
-        listRef.current.resetAfterIndex(0);
-      }
-    };
+export const ChecklistComponent = ({
+  index,
+  component,
+  formik,
+  draggableProvided,
+  isDragging,
+  listRef,
+}: {
+  index: number;
+  component: ExtendedCheckListComponentRecord;
+  formik: UseFormReturn<
+    ExtendedCreateCheckListRecord | ExtendedUpdateCheckListRecord
+  >;
+  draggableProvided: DraggableProvided;
+  isDragging: Boolean;
+  listRef: MutableRefObject<any>;
+}) => {
+  const values = formik.getValues();
+  const duplicateComponent = () => {
+    formik.setValue('components', [
+      ...values.components.slice(0, index + 1),
+      {
+        ...component,
+        id: getUniqueId(),
+      },
+      ...values.components.slice(index + 1),
+    ]);
+  };
 
-    const deleteComponent = () => {
-      const removedItem = formik.values.components.filter(
-        (c) => c.id !== component.id,
+  const deleteComponent = () => {
+    const removedItem = values.components.filter((c) => c.id !== component.id);
+    formik.setValue('components', removedItem);
+    if (listRef.current) {
+      listRef.current.resetAfterIndex(0);
+    }
+  };
+
+  const handleCheckOption = (id: string) => {
+    formik.setValue(
+      `components.${index}.options`,
+      values.components[index].options.map((o) => ({
+        ...o,
+        isDefault: o.id === id,
+      })),
+    );
+  };
+
+  const addOption = () => {
+    formik.setValue(`components.${index}.options`, [
+      ...values.components[index].options,
+      getOptionMock(),
+    ]);
+    if (listRef.current) {
+      listRef.current.resetAfterIndex(0, true);
+    }
+  };
+
+  const removeOption = (id: string) => {
+    formik.setValue(
+      `components.${index}.options`,
+      values.components[index].options.filter((o) => o.id !== id),
+    );
+    if (listRef.current) {
+      listRef.current.resetAfterIndex(0);
+    }
+  };
+
+  const handleMoreInfoInNote = (value: Boolean) => {
+    formik.setValue(`components.${index}.moreInfoInNote`, value);
+    if (listRef.current) {
+      listRef.current.resetAfterIndex(0, true);
+    }
+  };
+
+  const handleCheckCheckbox = () => {
+    formik.setValue(`components.${index}.checked`, !component.checked);
+    if (listRef.current) {
+      listRef.current.resetAfterIndex(0, true);
+    }
+  };
+
+  const renderContent = () => {
+    if (component.type === CheckListComponentType.SINGLE_CHECK) {
+      return (
+        <DraggableContainer
+          isDragging={isDragging}
+          draggableProvided={draggableProvided}>
+          <MultiChoiceComponent
+            index={index}
+            formik={formik}
+            component={component}
+            duplicateComponent={duplicateComponent}
+            deleteComponent={deleteComponent}
+            handleCheckOption={handleCheckOption}
+            removeOption={removeOption}
+            addOption={addOption}
+            handleMoreInfoInNote={handleMoreInfoInNote}
+            isDragging={isDragging}
+          />
+        </DraggableContainer>
       );
-      formik.setFieldValue('components', removedItem);
-      if (listRef.current) {
-        listRef.current.resetAfterIndex(0);
-      }
-    };
+    }
 
-    const handleCheckOption = useCallback(
-      (id: string) => {
-        formik.setFieldValue(
-          `components[${index}].options`,
-          formik.values.components[index].options.map((o) => ({
-            ...o,
-            isDefault: o.id === id,
-          })),
-        );
-      },
-      [formik.values.components, index],
-    );
+    if (component.type === CheckListComponentType.HEAD) {
+      return (
+        <DraggableContainer
+          isDragging={isDragging}
+          draggableProvided={draggableProvided}>
+          <HeaderComponent
+            index={index}
+            formik={formik}
+            component={component}
+            duplicateComponent={duplicateComponent}
+            deleteComponent={deleteComponent}
+          />
+        </DraggableContainer>
+      );
+    }
 
-    const addOption = useCallback(() => {
-      formik.setFieldValue(`components[${index}].options`, [
-        ...formik.values.components[index].options,
-        getOptionMock(),
-      ]);
-      if (listRef.current) {
-        listRef.current.resetAfterIndex(0);
-      }
-    }, [formik.values.components, index]);
+    if (component.type === CheckListComponentType.YES_NO) {
+      return (
+        <DraggableContainer
+          isDragging={isDragging}
+          draggableProvided={draggableProvided}
+          display="flex"
+          justifyContent="space-between">
+          <CheckboxComponent
+            index={index}
+            formik={formik}
+            component={component}
+            duplicateComponent={duplicateComponent}
+            deleteComponent={deleteComponent}
+            handleCheckCheckbox={handleCheckCheckbox}
+          />
+        </DraggableContainer>
+      );
+    }
 
-    const removeOption = useCallback(
-      (id: string) => {
-        formik.setFieldValue(
-          `components[${index}].options`,
-          formik.values.components[index].options.filter((o) => o.id !== id),
-        );
-        if (listRef.current) {
-          listRef.current.resetAfterIndex(0);
-        }
-      },
-      [formik.values.components, index],
-    );
-
-    const handleMoreInfoInNote = (value: Boolean) => {
-      formik.setFieldValue(`components[${index}].moreInfoInNote`, value);
-    };
-
-    const handleCheckCheckbox = useCallback(() => {
-      formik.setFieldValue(`components[${index}].checked`, !component.checked);
-    }, [formik, index, component.checked]);
-
-    const renderContent = () => {
-      if (component.type === CheckListComponentType.SINGLE_CHECK) {
-        return (
-          <DraggableContainer
+    if (component.type === CheckListComponentType.TEXT) {
+      return (
+        <DraggableContainer
+          isDragging={isDragging}
+          draggableProvided={draggableProvided}>
+          <TextComponent
+            index={index}
+            formik={formik}
+            component={component}
+            duplicateComponent={duplicateComponent}
+            deleteComponent={deleteComponent}
             isDragging={isDragging}
-            draggableProvided={draggableProvided}>
-            <MultiChoiceComponent
-              index={index}
-              formik={formik}
-              component={component}
-              duplicateComponent={duplicateComponent}
-              deleteComponent={deleteComponent}
-              handleCheckOption={handleCheckOption}
-              removeOption={removeOption}
-              addOption={addOption}
-              handleMoreInfoInNote={handleMoreInfoInNote}
-              isDragging={isDragging}
-            />
-          </DraggableContainer>
-        );
-      }
+          />
+        </DraggableContainer>
+      );
+    }
+  };
 
-      if (component.type === CheckListComponentType.HEAD) {
-        return (
-          <DraggableContainer
-            isDragging={isDragging}
-            draggableProvided={draggableProvided}>
-            <HeaderComponent
-              index={index}
-              formik={formik}
-              component={component}
-              duplicateComponent={duplicateComponent}
-              deleteComponent={deleteComponent}
-            />
-          </DraggableContainer>
-        );
-      }
-
-      if (component.type === CheckListComponentType.YES_NO) {
-        return (
-          <DraggableContainer
-            isDragging={isDragging}
-            draggableProvided={draggableProvided}
-            display="flex"
-            justifyContent="space-between">
-            <CheckboxComponent
-              index={index}
-              formik={formik}
-              component={component}
-              duplicateComponent={duplicateComponent}
-              deleteComponent={deleteComponent}
-              handleCheckCheckbox={handleCheckCheckbox}
-            />
-          </DraggableContainer>
-        );
-      }
-
-      if (component.type === CheckListComponentType.TEXT) {
-        return (
-          <DraggableContainer
-            isDragging={isDragging}
-            draggableProvided={draggableProvided}>
-            <TextComponent
-              index={index}
-              formik={formik}
-              component={component}
-              duplicateComponent={duplicateComponent}
-              deleteComponent={deleteComponent}
-              isDragging={isDragging}
-            />
-          </DraggableContainer>
-        );
-      }
-    };
-
-    return renderContent() ?? null;
-  },
-);
+  return renderContent() ?? null;
+};
