@@ -3,10 +3,13 @@ import {
   Discount,
   DiscountType,
   InvoiceFormData,
+  InvoiceItemPaymentType,
   InvoiceItemRecord,
+  PaymentType,
   UpdateInvoice,
 } from 'models/invoice';
 import {Amount} from 'models/misc';
+import {moneyRecordForBackend} from 'utils/currency';
 import {dateToString} from 'utils/utils';
 
 export const formatInvoiceRecord = (
@@ -34,6 +37,12 @@ export const formatInvoiceRecord = (
                 }
               : undefined,
         }
+      : undefined,
+    payment: item.payment
+      ? item.payment
+      : value.payment?.type === PaymentType.PER_ITEM
+      ? // set payment percentage to 0 because it's required even if item is already paid and payment type is per item
+        {type: InvoiceItemPaymentType.PERCENTAGE, percentage: 0}
       : undefined,
   })),
   paymentTerms: value.paymentTerms,
@@ -74,6 +83,15 @@ export const formatInvoiceRecord = (
           : undefined,
     },
   }),
+  ...(value.payment && {
+    payment: {
+      ...value.payment,
+      amount:
+        value.payment?.type === PaymentType.LUMP_SUM
+          ? moneyRecordForBackend(value.payment.amount)
+          : undefined,
+    },
+  }),
 });
 
 export const applyDiscount = ({
@@ -102,7 +120,8 @@ export const getAggregatedItemsVats = (items: InvoiceItemRecord<Amount>[]) =>
 
     const vat =
       (item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!) *
-      (percentageVat / 100);
+      (percentageVat / 100) *
+      item.quantity;
 
     const foundPercentageVat = acc.find(
       (i) => i.percentageVat === percentageVat,
@@ -128,7 +147,7 @@ export const applyPerItemDiscountOnItems = (arr: InvoiceItemRecord<Amount>[]) =>
       unitAmount: {
         ...item.unitAmount,
         netAmount: applyDiscount({
-          actualValue: item.unitAmount.netAmount * item.quantity,
+          actualValue: item.unitAmount.netAmount,
           ...(item.discount?.type === DiscountType.AMOUNT
             ? {
                 amount:
@@ -187,4 +206,32 @@ export const applyGlobalDiscountOnItems = (
       },
     };
   });
+};
+
+export const getAggregatedPartialPaymentsVats = (
+  items: InvoiceItemRecord<Amount>[],
+  totalAmountExclVat: number,
+) => {
+  const total = items
+    .map((item) => item.unitAmount.netAmount * item.quantity)
+    .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
+
+  return items.reduce((acc, item) => {
+    const {percentageVat} = item.unitAmount;
+    const totalNetAmount = item.unitAmount.netAmount * item.quantity;
+    const portion = totalNetAmount === total ? 1 : totalNetAmount / total;
+    const vat = totalAmountExclVat * (percentageVat / 100) * portion;
+
+    const foundPercentageVat = acc.find(
+      (i) => i.percentageVat === percentageVat,
+    );
+
+    if (foundPercentageVat) {
+      foundPercentageVat.vat += vat;
+    } else {
+      acc.push({percentageVat, vat});
+    }
+
+    return acc;
+  }, [] as {percentageVat: number; vat: number}[]);
 };

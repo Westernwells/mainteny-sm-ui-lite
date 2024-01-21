@@ -68,6 +68,7 @@ export const SettingsPage = ({getCurrentPageTitle}: Props) => {
     <Tabs
       showActionBtn={!!tabValue}
       btnLabel={t('New Checklist')}
+      testId="checklist"
       btnOnClick={() => navigate('/settings/checklist/new')}
       actionButtonIcon={<ListAltIcon />}
       tabItems={tabItems}

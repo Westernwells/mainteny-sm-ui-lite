@@ -23,8 +23,10 @@ export interface ArticleItem {
 }
 
 export interface CostPackage {
-  labor: Money;
-  material: Money;
+  laborPercentage?: number;
+  materialPercentage?: number;
+  labor?: Money;
+  material?: Money;
 }
 
 export interface ArticleAdditionalInfo {
@@ -85,8 +87,10 @@ export interface CreateArticleRecord {
   unitPurchaseAmount: AmountRecord;
   unitSellingAmount: AmountRecord;
   costPackage?: {
-    labor: Money;
-    material: Money;
+    labor?: Money;
+    material?: Money;
+    laborPercentage?: number;
+    materialPercentage?: number;
   };
 }
 

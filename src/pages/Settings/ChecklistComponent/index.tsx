@@ -187,6 +187,7 @@ export const MultiChoiceComponent = ({
                   <Radio
                     size="small"
                     checked={!!option.isDefault}
+                    disabled
                     name={`components[${index}].options[${optionIndex}].isDefault`}
                     onChange={() => handleCheckOption(option.id)}
                     sx={{
@@ -308,6 +309,7 @@ export const CheckboxComponent = ({
       name={`components[${index}].checked`}
       checked={!!component.checked}
       onChange={handleCheckCheckbox}
+      disabled
       size="small"
       sx={{
         ml: -1,
@@ -452,6 +454,7 @@ export const TextComponent = ({
           size="small"
           placeholder={t('Enter your text here...')}
           multiline
+          disabled
           fullWidth
           value={component.note}
           minRows={5}

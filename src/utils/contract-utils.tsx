@@ -5,7 +5,7 @@ import {
   startOfDay,
   subMonths,
 } from 'date-fns';
-import {ContractTypes, ContractView} from 'models/contract';
+import {ContractStatus, ContractTypes, ContractView} from 'models/contract';
 import {toDate} from 'utils/datetime';
 
 export const costRangeConvertor = (
@@ -107,4 +107,23 @@ export const calculateRenewDays = (contractDetails: ContractView) => {
   );
 
   return differenceInDays(contractEndTimeWithoutNotice, today);
+};
+
+export const getContractStatusStyles = (
+  status: string,
+): {
+  label: string;
+  color: 'success' | 'warning' | 'error' | 'info' | 'default' | 'primary';
+} => {
+  switch (status) {
+    case ContractStatus.VALID:
+      return {label: 'Active', color: 'success'};
+    case ContractStatus.EXPIRED:
+    case ContractStatus.PENDING:
+      return {label: 'Inactive', color: 'error'};
+    case ContractStatus.EXPIRING:
+      return {label: 'Expiring', color: 'warning'};
+    default:
+      return {label: '-', color: 'default'};
+  }
 };

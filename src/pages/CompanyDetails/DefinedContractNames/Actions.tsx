@@ -77,11 +77,13 @@ export const Actions = ({id, contractNameTypes, contractNameType}: Props) => {
       <Box>
         <IconButton
           onClick={() => setOpenDialog(true)}
+          data-test-id="edit-contract"
           sx={{color: 'action.active'}}>
           <Edit fontSize="small" />
         </IconButton>
         <IconButton
           onClick={() => setOpenDeleteConfirm(true)}
+          data-test-id="delete-contract"
           sx={{color: 'action.active'}}>
           <DeleteOutline fontSize="small" />
         </IconButton>

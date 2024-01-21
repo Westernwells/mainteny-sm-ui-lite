@@ -1,6 +1,7 @@
 import {useContext, useEffect, useState} from 'react';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {useTranslation} from 'react-i18next';
+import {isEqual} from 'lodash';
 import {
   IconButton,
   TableCell,
@@ -57,16 +58,18 @@ export const ArticleItemRowNEW = ({
   });
 
   useEffect(() => {
-    setItemAtIndex(index, {
-      ...formik.values,
-      unitAmount: {
-        ...formik.values.unitAmount,
-        netAmount: fixRounding(
-          price * 10 ** formik.values.unitAmount.fractionDigits,
-          2,
-        ),
-      },
-    });
+    if (!isEqual(articleItem, formik.values)) {
+      setItemAtIndex(index, {
+        ...formik.values,
+        unitAmount: {
+          ...formik.values.unitAmount,
+          netAmount: fixRounding(
+            price * 10 ** formik.values.unitAmount.fractionDigits,
+            2,
+          ),
+        },
+      });
+    }
   }, [formik.values]);
 
   const {language: selectedLng} = useContext(LanguageContext);
@@ -114,8 +117,8 @@ export const ArticleItemRowNEW = ({
   return (
     <>
       <TableRow>
-        <TableCell>{index + 1}</TableCell>
-        <TableCell>
+        <TableCell sx={{width: '1%'}}>{index + 1}</TableCell>
+        <TableCell sx={{width: '35%'}}>
           <TextField
             name="name"
             value={formik.values.name}
@@ -126,7 +129,7 @@ export const ArticleItemRowNEW = ({
           />
         </TableCell>
 
-        <TableCell>
+        <TableCell sx={{width: '17%'}}>
           <NumericFormat
             value={price !== 0 ? price : ''}
             customInput={TextField}
@@ -139,6 +142,12 @@ export const ArticleItemRowNEW = ({
               selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
             }
             size="small"
+            sx={{
+              '& .MuiOutlinedInput-input': {
+                textAlign: 'right',
+                width: '100%',
+              },
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -160,7 +169,7 @@ export const ArticleItemRowNEW = ({
           />
         </TableCell>
 
-        <TableCell>
+        <TableCell sx={{width: '6%'}}>
           <NumericFormat
             value={formik.values.quantity !== 0 ? formik.values.quantity : ''}
             customInput={TextField}
@@ -178,6 +187,7 @@ export const ArticleItemRowNEW = ({
               min: 0,
               max: Infinity,
               step: '0.05',
+              sx: {textAlign: 'right', width: '100%'},
             }}
             size="small"
             onValueChange={(values) => {
@@ -191,7 +201,7 @@ export const ArticleItemRowNEW = ({
           />
         </TableCell>
 
-        <TableCell>
+        <TableCell sx={{width: '6%'}}>
           <NumericFormat
             value={
               formik.values.unitAmount.percentageVat !== 0
@@ -215,6 +225,7 @@ export const ArticleItemRowNEW = ({
               max: Infinity,
               step: '0.05',
               label: 'VAT',
+              sx: {textAlign: 'right', width: '100%'},
             }}
             size="small"
             onValueChange={(values) => {
@@ -228,7 +239,7 @@ export const ArticleItemRowNEW = ({
           />
         </TableCell>
 
-        <TableCell>
+        <TableCell sx={{width: '8%'}}>
           <FormSelect
             labelId="select-unit-label"
             label=""
@@ -242,12 +253,13 @@ export const ArticleItemRowNEW = ({
               onChange: formik.handleChange,
               placeholder: t('Select Unit'),
               name: 'article.unit',
+              sx: {width: '100%'},
             }}
           />
         </TableCell>
 
         {/* DISCOUNT */}
-        <TableCell>
+        <TableCell sx={{width: '11%'}}>
           <NumericFormat
             value={
               formik.values.discount?.type === DiscountType.AMOUNT
@@ -282,8 +294,13 @@ export const ArticleItemRowNEW = ({
             }
             size="small"
             sx={{
+              width: '100%',
               '& .MuiInputBase-root': {
                 pr: 0,
+              },
+              '& .MuiOutlinedInput-input': {
+                textAlign: 'right',
+                width: '100%',
               },
             }}
             InputProps={{
@@ -299,6 +316,7 @@ export const ArticleItemRowNEW = ({
                     '&:hover': {
                       bgcolor: 'action.hover',
                     },
+                    width: '20%',
                   }}
                   onClick={handleDiscountTypeChange}
                   size="small">
@@ -312,7 +330,7 @@ export const ArticleItemRowNEW = ({
           />
         </TableCell>
 
-        <TableCell>
+        <TableCell sx={{width: '15%'}}>
           <NumericFormat
             value={totalPriceExclVatAfterDiscount}
             customInput={TextField}
@@ -326,11 +344,26 @@ export const ArticleItemRowNEW = ({
             }
             size="small"
             disabled
+            sx={{
+              width: '100%',
+              '& .MuiOutlinedInput-input': {
+                textAlign: 'right',
+                width: '100%',
+              },
+            }}
           />
         </TableCell>
 
-        <TableCell>
-          <IconButton onClick={() => deleteItem(index)}>
+        <TableCell
+          sx={{
+            paddingLeft: '0px !important',
+            paddingRight: '0px !important',
+          }}>
+          <IconButton
+            onClick={() => deleteItem(index)}
+            sx={{
+              padding: '0px !important',
+            }}>
             <DeleteIcon />
           </IconButton>
         </TableCell>

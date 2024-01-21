@@ -88,8 +88,10 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
       pageSize: page.pageSize,
       query: search,
       status: status ? [status] : [],
-      totalAmountFrom,
-      totalAmountTo,
+      ...(cost.length > 0 && {
+        totalAmountFrom,
+        totalAmountTo,
+      }),
       ...(sortOrder && {order: sortOrder}),
       ...(orderByField && {orderByField}),
     },
@@ -199,7 +201,7 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
           }
         }}
         multiple={false}
-        initialSelectedItems={status ? [InvoiceStatusView[status]] : []}
+        initialSelectedItems={status && [InvoiceStatusView[status]]}
         formControlStyles={{width: '100%'}}
         containerStyles={{flex: 1}}
         disableClearBtn

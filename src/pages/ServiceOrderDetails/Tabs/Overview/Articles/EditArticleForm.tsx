@@ -99,6 +99,10 @@ export const EditArticleForm = ({
 
       <FormInput
         containerStyles={{pr: '1rem', width: '15%'}}
+        onValueChange={(values) => {
+          formik.setFieldValue(values.name as string, values.value);
+        }}
+        inputType="currency"
         props={{
           name: 'unitSellingAmount',
           label: t('Selling price (excl. VAT)'),
@@ -112,9 +116,7 @@ export const EditArticleForm = ({
           ),
           helperText: formik.errors.unitSellingAmount,
           onBlur: formik.handleBlur,
-          onChange: (e: ChangeEvent<HTMLInputElement>) => {
-            formik.setFieldValue('unitSellingAmount', e.target.value);
-          },
+
           InputProps: {
             startAdornment: (
               <InputAdornment position="start">{currencySymbol}</InputAdornment>
@@ -169,6 +171,7 @@ export const EditArticleForm = ({
         handleSelectChange={(value) => {
           formik.setFieldValue('type', value);
         }}
+        articleCostPackage={serviceOrderArticle?.article?.costPackage}
       />
     </Box>
   );

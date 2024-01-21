@@ -73,7 +73,7 @@ export const Overview = ({serviceOrder}: Props) => {
 
           <Box mt="1em" flexGrow={1}>
             <Invoices
-              serviceOrderId={serviceOrder?.id}
+              serviceOrderId={serviceOrder.id}
               paymentStatus={serviceOrder.additionalInfo?.paymentStatus!}
             />
           </Box>

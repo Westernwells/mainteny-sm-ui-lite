@@ -70,6 +70,7 @@ export const BasicInformation = ({containerStyles, company}: Props) => {
   return (
     <>
       <InfoCard
+        testId="basic-info"
         containerStyles={{...containerStyles}}
         handleAction={() => setOpenDialog(true)}
         header={
@@ -87,6 +88,7 @@ export const BasicInformation = ({containerStyles, company}: Props) => {
       </InfoCard>
       <Dialog
         title="Edit Basic Information"
+        saveBtnType="submit"
         onCancel={() => setOpenDialog(false)}
         onSave={() => onSave()}
         disableSaveBtn={!!Object.keys(formik.errors).length}

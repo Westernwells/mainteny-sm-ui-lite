@@ -18,6 +18,8 @@ import {mixpanelEvents} from 'mixpanel/constants';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {createEmptyResource} from 'utils/paging-utils';
 import {formatAddressFullname} from 'utils/utils';
+import {AddressRecord} from 'models/misc';
+
 import {
   CustomerAddressFormModel,
   CustomerBasicInfoFormModel,
@@ -290,11 +292,13 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
         : '',
       billingAddress: formatAddressFullname(
         formikAddress.values.billingAddress,
-      ),
+      ) as AddressRecord | null,
       beneficiaryAddress: formatAddressFullname(
         formikAddress.values.beneficiaryAddress,
-      ),
-      otherAddress: formatAddressFullname(formikAddress.values.otherAddress),
+      ) as AddressRecord | null,
+      otherAddress: formatAddressFullname(
+        formikAddress.values.otherAddress,
+      ) as AddressRecord | null,
       contactPersons: formikContactPersons.values.contactPersons,
     };
 

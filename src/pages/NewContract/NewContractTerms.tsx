@@ -95,6 +95,10 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
       </Grid>
       <Grid item xs={4}>
         <FormInput
+          onValueChange={(values) => {
+            formik.setFieldValue(values.name as string, values.value);
+          }}
+          inputType="currency"
           props={{
             label: t(
               'Yearly Contract Price (excl. VAT, in {{currencySymbol}})',
@@ -106,17 +110,14 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
             placeholder: '1500',
             type: 'number',
             required: true,
-            value:
-              formik.values.netAmount === 0
-                ? ''
-                : formik.values.netAmount.toString(),
+            value: formik.values.netAmount,
             helperText:
               formik.errors.netAmount && formik.touched.netAmount
                 ? formik.errors.netAmount
                 : '',
             error: !!(formik.touched.netAmount && formik.errors.netAmount),
             onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
+
             InputProps: {
               startAdornment: (
                 <InputAdornment position="start">
@@ -152,6 +153,10 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
       </Grid>
       <Grid item xs={4}>
         <FormInput
+          onValueChange={(values) => {
+            formik.setFieldValue(values.name as string, values.value);
+          }}
+          inputType="currency"
           props={{
             label: t('Spending Allowance (in {{currencySymbol}})', {
               currencySymbol: currentCurrency.symbol,
@@ -171,7 +176,6 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
               formik.touched.spendingLimit && formik.errors.spendingLimit
             ),
             onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
             InputProps: {
               startAdornment: (
                 <InputAdornment position="start">

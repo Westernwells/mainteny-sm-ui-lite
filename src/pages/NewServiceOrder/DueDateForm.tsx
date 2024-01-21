@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import {DatePicker} from 'components/DatePicker';
-import {startOfDay} from 'date-fns';
 import {useFormik} from 'formik';
 import {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -51,7 +50,6 @@ export const DueDateForm = ({
       <DatePicker
         defaultDate={defaultStartDate}
         containerStyles={{mr: '1em', width: '100%'}}
-        minDate={startOfDay(new Date())}
         getSelectedDate={(date) => {
           formik.setValues({
             ...formik.values,
