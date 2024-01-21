@@ -25,7 +25,7 @@ export const Switch = ({label = '', value, getValue, onChanged}: Props) => {
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked);
-
+    getValue?.(checked);
     if (onChanged) {
       onChanged(event.target.checked);
     }
