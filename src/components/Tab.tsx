@@ -41,6 +41,7 @@ interface Props {
   hideDivider?: boolean;
   disableBtnAction?: boolean;
   secondaryButtonStyles?: SxProps;
+  testId?: string;
 }
 
 const a11yProps = (index: number) => ({
@@ -65,6 +66,7 @@ export const Tabs = ({
   disableBtnAction,
   secondaryBtn,
   secondaryButtonStyles,
+  testId,
   hideDivider = false,
 }: Props) => {
   const theme = useTheme();
@@ -83,6 +85,7 @@ export const Tabs = ({
           <Button
             label="Filter"
             disabled={disableBtnAction}
+            testId={testId}
             buttonProps={{
               onClick: () => (btnOnClick ? btnOnClick() : () => {}),
               sx: {

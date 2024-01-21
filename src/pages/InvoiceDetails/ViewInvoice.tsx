@@ -24,6 +24,7 @@ import {
   InvoiceActivityView,
   InvoiceStatus,
   InvoiceType,
+  InvoiceTypeMap,
   InvoiceView,
 } from 'models/invoice';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
@@ -50,6 +51,13 @@ import {useSnackbar} from 'notistack';
 import {isBefore, parseISO, startOfDay} from 'date-fns';
 import CustomSnackbar from 'components/CustomSnackbar';
 import {Notes} from 'components/Notes';
+import {LinearProgress, linearProgressClasses} from '@mui/material';
+import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
+import GradingOutlinedIcon from '@mui/icons-material/GradingOutlined';
+import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
+import {useServiceOrderCheckList} from 'hooks/reactQuery/useServiceOrder';
+import {CheckListComponentType} from 'models/checklist';
+import {ChecklistStatus} from 'models/service-order';
 import {InvoiceActivities} from './InvoiceActivities';
 
 interface Props {
@@ -90,6 +98,36 @@ export const ViewInvoice = ({
       PdfGenerationStatus.DONE
     : true;
   const isPDFsGenerated = !!isWorkReportPDFGenerated && isInvoicePDFGenerated;
+
+  const {data: serviceOrderCheckList} = useServiceOrderCheckList(
+    serviceOrder?.additionalInfo.checkListInfo?.checkListId && serviceOrder.id,
+  );
+
+  const checklistSummary = useMemo(() => {
+    const componentsWithoutHead =
+      serviceOrderCheckList?.components.filter(
+        (c) => c.type !== CheckListComponentType.HEAD,
+      ) ?? [];
+    const doneList = componentsWithoutHead.filter((item) => {
+      if (item.type === CheckListComponentType.TEXT) {
+        return !!item.additionalInfo.note;
+      }
+
+      if (item.additionalInfo.moreInfoInNote && !!item.additionalInfo.note) {
+        return true;
+      }
+
+      return (item.additionalInfo.answer?.length || 0) > 0;
+    });
+
+    return {all: componentsWithoutHead.length, done: doneList.length};
+  }, [serviceOrderCheckList?.components]);
+
+  const percentComplete = Math.round(
+    checklistSummary.all === 0
+      ? 0
+      : (checklistSummary.done! / checklistSummary.all!) * 100,
+  );
 
   const actions = useMemo(() => {
     const items = [];
@@ -300,10 +338,19 @@ export const ViewInvoice = ({
         <Grid item xs={8}>
           <PageCard
             containerStyles={{mb: '1.5em'}}
-            contentContainerStyles={{display: 'flex', gap: '1.5em'}}>
+            contentContainerStyles={{display: 'flex', gap: '4em'}}>
             <Box>
               <FormLabel text="Invoice Number" sx={{color: 'text.main'}} />
-              <Typography variant="subtitle1">{invoice.externalId}</Typography>
+              <Typography variant="subtitle1" fontWeight="600">
+                {invoice.externalId || t('Unassigned')}
+              </Typography>
+            </Box>
+
+            <Box>
+              <FormLabel text="Invoice Type" sx={{color: 'text.main'}} />
+              <Typography variant="subtitle1" fontWeight="600">
+                {t(InvoiceTypeMap[invoice.type]).toUpperCase()}
+              </Typography>
             </Box>
 
             <Box>
@@ -311,7 +358,7 @@ export const ViewInvoice = ({
                 text="Total"
                 sx={{color: 'text.main', textTransform: 'initial'}}
               />
-              <Typography variant="subtitle1">
+              <Typography variant="subtitle1" fontWeight="600">
                 {formatGrossAmount(invoice.totalAmount)}
               </Typography>
             </Box>
@@ -329,10 +376,16 @@ export const ViewInvoice = ({
             </PageCard>
           )}
         </Grid>
+
         <Grid item xs sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
+          {/* SERVICE ORDER CARD */}
+
           {!!serviceOrder && (
             <PageCard
               headerLabel="Service Job"
+              headerIcon={
+                <ManageSearchOutlinedIcon sx={{color: '#8F9BB380'}} />
+              }
               contentContainerStyles={{
                 display: 'flex',
                 gap: '1em',
@@ -363,19 +416,27 @@ export const ViewInvoice = ({
                     />
                   )}
                 </Box>
-                <FormLabel text="Order Number" sx={{color: 'text.main'}} />
-                <Typography variant="caption" component="div">
+                <FormLabel text="Job Number" sx={{color: 'text.main'}} />
+                <Typography
+                  variant="caption"
+                  component="div"
+                  color={theme.palette.primary.mainLight}
+                  sx={{
+                    fontSize: '0.9rem',
+                    fontWeight: '400',
+                    p: '0.2em 0em 0.5em 0em',
+                  }}>
                   {serviceOrder?.number}
                 </Typography>
                 {serviceOrder && (
                   <Typography
                     variant="caption"
-                    sx={{color: 'text.secondary'}}
+                    sx={{color: 'text.secondary', fontSize: '0.6rem'}}
                     display="block"
                     mt="-0.25rem">
-                    {`${t('Created on')} ${formatDate(
-                      serviceOrder.meta.createdAt,
-                    )}`}
+                    {t('Created on {{creationDate}}', {
+                      creationDate: formatDate(serviceOrder.meta.createdAt),
+                    })}
                   </Typography>
                 )}
                 <Box display="flex" alignItems="center" gap=".2em" mt="1em">
@@ -395,9 +456,11 @@ export const ViewInvoice = ({
             </PageCard>
           )}
 
+          {/* WORK REPORT CARD */}
           {serviceOrder?.report && (
             <PageCard
               headerLabel={t('Work Report')}
+              headerIcon={<GradingOutlinedIcon sx={{color: '#8F9BB380'}} />}
               headerStyles={{
                 pt: '11px',
                 mx: 0,
@@ -414,11 +477,57 @@ export const ViewInvoice = ({
               }>
               <Typography variant="body1">
                 {!!serviceOrder.actualStartTime &&
-                  `${formatDate(serviceOrder.actualStartTime)}: `}
+                  `${formatDate(serviceOrder.actualStartTime)} :`}
                 {serviceOrder.report?.description ?? '-'}
               </Typography>
             </PageCard>
           )}
+
+          {/* CHECKLIST CARD */}
+          {serviceOrder?.additionalInfo.checkListInfo?.status ===
+            ChecklistStatus.COMPLETED && (
+            <PageCard
+              headerLabel={t('Checklist')}
+              headerIcon={<FactCheckOutlinedIcon sx={{color: '#8F9BB380'}} />}
+              headerStyles={{
+                pt: '11px',
+                mx: 0,
+                px: '1rem',
+              }}
+              headerActionIcon={
+                <OpenInNewIcon
+                  fontSize="small"
+                  sx={{color: theme.palette.secondary.dark}}
+                />
+              }
+              handleAction={() =>
+                navigate(`/orders/details/${serviceOrder?.id}?tab=2`)
+              }>
+              <Typography variant="body1" sx={{m: '0em 0em 0.8em 0em'}}>
+                {serviceOrderCheckList?.name}
+              </Typography>
+              <Box display="flex" justifyContent="space-between">
+                <Typography variant="caption" sx={{fontWeight: '600'}}>
+                  {checklistSummary.done}/{checklistSummary.all} {t('options')}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {percentComplete}% {t('complete')}
+                </Typography>
+              </Box>
+              <LinearProgress
+                variant="determinate"
+                value={percentComplete}
+                sx={{
+                  backgroundColor: `${theme.palette.text.secondary}`,
+                  [`& .${linearProgressClasses.bar}`]: {
+                    backgroundColor: '#4CAF50',
+                  },
+                }}
+              />
+            </PageCard>
+          )}
+
+          {/* INVOICE ACTIVITY CARD */}
 
           {invoiceActivities?.length ? (
             <InvoiceActivities activities={invoiceActivities} />

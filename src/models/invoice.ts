@@ -93,7 +93,7 @@ export interface InvoiceAdditionalInfo {
   laborMaterialCostText?: string;
   alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
   discount?: Discount;
-  payment?: Payment;
+  payment?: Payment<AggregatedAmount>;
   deliveryStartDate?: string;
   deliveryEndDate?: string;
 }
@@ -153,7 +153,6 @@ export interface InvoiceView {
   paymentTerms: string;
   overdueNotices: InvoiceOverdueNoticeSimpleView[];
   commentCount?: number;
-  partialInvoices?: InvoiceItem[];
   payments: InvoicePaymentView[];
 }
 
@@ -207,6 +206,12 @@ export enum PaymentType {
   NONE = 'NONE',
 }
 
+export enum PaymentTypeOptions {
+  LUMP_SUM = 'Lump-sum',
+  PERCENTAGE = 'Percentage',
+  PER_ITEM = 'Per Article',
+}
+
 export interface VatAmount {
   vat: number;
   percentageVat: number;
@@ -222,9 +227,9 @@ export interface AggregatedAmount {
   fractionDigits?: number;
 }
 
-export interface Payment {
+export interface Payment<T = Money> {
   type: PaymentType;
-  amount?: AggregatedAmount;
+  amount?: T;
   percentage?: number;
   description?: string;
 }
@@ -267,6 +272,14 @@ export enum InvoiceType {
   CREDIT_NOTE = 'CREDIT_NOTE',
   UPFRONT = 'UPFRONT',
 }
+
+export const InvoiceTypeMap = {
+  FINAL: 'Final',
+  FULL: 'Full',
+  PARTIAL: 'Partial',
+  CREDIT_NOTE: 'Credit Note',
+  UPFRONT: 'Upfront',
+};
 
 export interface InvoiceFormData {
   subject: string;

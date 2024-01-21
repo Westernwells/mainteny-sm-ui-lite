@@ -18,9 +18,15 @@ export const PDFContainer = ({url}: Props) => {
   function onDocumentLoadSuccess({numPages}: {numPages: number}) {
     setPages(numPages);
   }
-
   return (
-    <PageCard>
+    <PageCard
+      containerStyles={{boxShadow: 'none'}}
+      contentContainerStyles={{
+        background: '#f2f6f8',
+        boxShadow: 'none',
+        padding: '16px',
+        mx: '0em',
+      }}>
       <Box
         width="100%"
         overflow="hidden"
@@ -47,13 +53,21 @@ export const PDFContainer = ({url}: Props) => {
         <Document file={url} onLoadSuccess={onDocumentLoadSuccess}>
           {pages &&
             [...Array(pages).keys()].map((i) => (
-              <Page
+              <div
                 key={i}
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-                pageIndex={i}
-                inputRef={pageRef}
-              />
+                style={{
+                  marginBottom: '2em',
+                  background: 'rgb(247, 249, 252)',
+                  padding: '2em',
+                  border: '40px solid white',
+                }}>
+                <Page
+                  renderTextLayer={false}
+                  renderAnnotationLayer={false}
+                  pageIndex={i}
+                  inputRef={pageRef}
+                />
+              </div>
             ))}
         </Document>
       </Box>

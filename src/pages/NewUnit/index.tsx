@@ -4,7 +4,7 @@ import {FormikErrors} from 'formik';
 import {useAddElevator, useAllElevators} from 'hooks/reactQuery/useElevator';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {ElevatorStatus, ElevatorView} from 'models/elevator';
-import {Priority} from 'models/misc';
+import {AddressRecord, Priority} from 'models/misc';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {
   AppointmentFormModel,
@@ -16,7 +16,7 @@ import {
 import {mapDaysOfWeekOptions} from 'pages/UnitDetails/Tabs/OverviewTab/AppointmentPreference/EditAppointmentForm';
 import {useEffect, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
-import {convertToMacro} from 'utils/utils';
+import {convertToMacro, formatAddressFullname} from 'utils/utils';
 import {createEmptyResource} from 'utils/paging-utils';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {AppointmentPreferenceForm} from './AppointmentPreferenceForm';
@@ -150,7 +150,9 @@ export const NewUnit = () => {
 
   const createNewUnit = async () => {
     const body = {
-      address: locationFormValues.address,
+      address: formatAddressFullname(locationFormValues.address) as
+        | AddressRecord
+        | undefined,
       buildingLocation: locationFormValues.building,
       builtYear: unitDetailsFormValues.yearBuilt,
       cabinType: unitDetailsFormValues.cabinType,

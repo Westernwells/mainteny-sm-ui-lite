@@ -252,6 +252,10 @@ export const AddBasicInfoForm = ({
         sx={{...containerStyles}}>
         <FormInput
           containerStyles={{pr: '1rem'}}
+          onValueChange={(values) => {
+            formik.setFieldValue(values.name as string, values.value);
+          }}
+          inputType="currency"
           props={{
             name: 'unitPurchaseAmount',
             label: t('Purchase Price'),
@@ -263,7 +267,6 @@ export const AddBasicInfoForm = ({
             value: formik.values.unitPurchaseAmount,
             helperText: formik.errors.unitPurchaseAmount,
             onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
             InputProps: {
               startAdornment: (
                 <InputAdornment position="start">
@@ -275,6 +278,10 @@ export const AddBasicInfoForm = ({
         />
 
         <FormInput
+          onValueChange={(values) => {
+            formik.setFieldValue(values.name as string, values.value);
+          }}
+          inputType="currency"
           props={{
             name: 'unitSellingAmount',
             label: t('Selling Price'),
@@ -291,7 +298,6 @@ export const AddBasicInfoForm = ({
             ),
             helperText: formik.errors.unitSellingAmount,
             onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
             InputProps: {
               startAdornment: (
                 <InputAdornment position="start">

@@ -150,7 +150,9 @@ export const NewCustomer = ({
       {
         pageIndex: 0,
         pageSize: 50,
-        query: formikBasicInfo.values.externalId,
+        query: formikBasicInfo.values.externalId
+          ? encodeURIComponent(formikBasicInfo.values.externalId!)
+          : '',
       },
       {keepPreviousData: true},
     );

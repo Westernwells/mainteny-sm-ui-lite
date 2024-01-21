@@ -91,6 +91,7 @@ export const ScheduleItem = ({
         {children || (
           <Box
             sx={{
+              width,
               display: 'flex',
               flexDirection: 'column',
               flex: 1,

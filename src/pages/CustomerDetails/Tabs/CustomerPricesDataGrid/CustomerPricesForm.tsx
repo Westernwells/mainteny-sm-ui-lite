@@ -211,6 +211,10 @@ export const CustomerPricesForm = ({
 
         <Grid item xs={12}>
           <FormInput
+            onValueChange={(vals) => {
+              setFieldValue(vals.name as string, vals.value);
+            }}
+            inputType="currency"
             props={{
               label: 'Purchase price (excl. VAT)',
               name: 'unitPurchaseAmount.netAmount',
@@ -241,6 +245,10 @@ export const CustomerPricesForm = ({
 
         <Grid item xs={12}>
           <FormInput
+            onValueChange={(vals) => {
+              setFieldValue(vals.name as string, vals.value);
+            }}
+            inputType="currency"
             props={{
               label: 'Selling price (excl. VAT)',
               name: 'unitSellingAmount.netAmount',

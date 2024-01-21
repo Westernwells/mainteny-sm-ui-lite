@@ -1,4 +1,4 @@
-import {useContext, useEffect, useMemo, useState} from 'react';
+import React, {useContext, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {FormikProps} from 'formik';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
@@ -33,7 +33,6 @@ import {
   DiscountTypeOptions,
   InvoiceFormData,
   InvoiceItemRecord,
-  InvoiceView,
 } from 'models/invoice';
 import {Amount} from 'models/misc';
 import {ArticleView} from 'models/article';
@@ -55,20 +54,16 @@ import {ArticleItemRowNEW} from './ArticleItemRowNEW';
 import {FormSelect} from './form/FormSelect';
 
 interface Props {
-  invoice?: InvoiceView | undefined;
   items: InvoiceItemRecord<Amount>[];
   setItems: (items: InvoiceItemRecord<Amount>[]) => void;
   propertyOwnerId: string;
-  formType?: string;
   formik: FormikProps<InvoiceFormData>;
 }
 
 export const ArticleItemsTableNEW = ({
-  invoice,
   items,
   setItems,
   propertyOwnerId,
-  formType,
   formik,
 }: Props) => {
   const {t} = useTranslation();
@@ -169,29 +164,6 @@ export const ArticleItemsTableNEW = ({
     setIsArticleModalOpen(false);
   };
 
-  const setFinalArticles = () => {
-    const newItems = invoice?.items.map(
-      (i): InvoiceItemRecord<Amount> => ({
-        article: i.article,
-        description: i.description,
-        name: i.name,
-        quantity: i.quantity,
-        unitAmount: i.unitAmount,
-      }),
-    );
-    setItems(newItems || []);
-  };
-
-  useEffect(() => {
-    if (!invoice) {
-      if (formType === 'new' && !items.length) {
-        setItems([]);
-      }
-      return;
-    }
-    setFinalArticles();
-  }, []);
-
   const setItemAtIndex = (
     indexPos: number,
     item: InvoiceItemRecord<Amount>,
@@ -238,11 +210,11 @@ export const ArticleItemsTableNEW = ({
   const discountText = selectedLng === 'DE' ? 'Rabatt' : t('Discount');
 
   const columns: {name: string; align?: TableCellProps['align']}[] = [
-    {name: '#'},
+    {name: '#', align: 'right'},
     {name: 'Name'},
     {name: 'Unit Price'},
-    {name: 'Quantity', align: 'right'},
-    {name: 'VAT (%)', align: 'right'},
+    {name: 'Quantity'},
+    {name: 'VAT (%)'},
     {name: 'Unit'},
     {name: discountText},
     {name: 'Total Price (excl. VAT)'},
@@ -256,7 +228,8 @@ export const ArticleItemsTableNEW = ({
       border="1px solid"
       borderColor="action.focus"
       borderRadius={1}
-      p={2}>
+      px={1.5}
+      py={2}>
       <TableContainer>
         <Table
           sx={{
@@ -418,7 +391,7 @@ export const ArticleItemsTableNEW = ({
                       />
                       <IconButton
                         onClick={handleRemoveDiscount}
-                        sx={{p: '0px', mr: -4, color: 'text.disabled'}}>
+                        sx={{p: '0px', mr: -3.3, color: 'text.disabled'}}>
                         <CloseIcon />
                       </IconButton>
                     </Box>
@@ -453,8 +426,8 @@ export const ArticleItemsTableNEW = ({
                     </Typography>
                   </>
                 ) : (
-                  percentageVats.map((v) => (
-                    <>
+                  percentageVats.map((v, index) => (
+                    <React.Fragment key={`${index}-${v.percentageVat}`}>
                       <Typography color="primary.dark">
                         {t('VAT')} {v.percentageVat}%
                       </Typography>
@@ -466,7 +439,7 @@ export const ArticleItemsTableNEW = ({
                           roundingMode: 'floor',
                         })}
                       </Typography>
-                    </>
+                    </React.Fragment>
                   ))
                 )}
                 <Typography color="primary.dark">

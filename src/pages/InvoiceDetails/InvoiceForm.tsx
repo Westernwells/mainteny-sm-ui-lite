@@ -12,6 +12,9 @@ import {
   Typography,
   Box,
   InputAdornment,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -38,6 +41,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateInvoice,
   useDeleteInvoice,
+  useFetchServiceOrderInvoices,
   useInvoices,
   usePublishInvoice,
   useUpdateInvoice,
@@ -50,13 +54,20 @@ import {
   InvoiceFormData,
   CreateInvoice,
   InvoiceItem,
+  PaymentTypeOptions,
+  PaymentType,
 } from 'models/invoice';
 import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
 import {
   PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from 'models/propertyManager';
-import {AddressRecord, Amount, PdfGenerationStatus} from 'models/misc';
+import {
+  AddressComponent,
+  AddressRecord,
+  Amount,
+  PdfGenerationStatus,
+} from 'models/misc';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {
   capitalize,
@@ -77,22 +88,26 @@ import {getStartEndPrice} from 'utils/contract-utils';
 import {getItemRecord} from 'utils/article-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
-
 import {CustomerAutoComplete} from 'components/CustomerAutocomplete';
 import {ArticleItemsTableNEW} from 'components/ArticleItemsTableNEW';
+import {Progress} from 'components/Progress';
 import {ReactComponent as MapPinIllustration} from 'assets/illustrations/invoice/map-pin.svg';
 import {ReactComponent as HeaderIllustration} from 'assets/illustrations/invoice/header.svg';
 import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrations/invoice/wrench-screwdriver.svg';
 import {ReactComponent as FooterIllustration} from 'assets/illustrations/invoice/footer.svg';
 import {ReactComponent as PinIllustration} from 'assets/illustrations/invoice/pin.svg';
 import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/invoice/task-list-pen.svg';
-
 import {ComboBox} from 'components/ComboBox';
-
+import {StatusChip} from 'components/StatusChip';
+import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
+import {Notes} from 'components/Notes';
 import {formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
 import {EditFrom} from './EditFrom';
+import {SectionTitle} from './SectionTitle';
+import {PartialPaymentsSection} from './PartialPaymentsSection';
+import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
 
 interface Props {
   invoice?: InvoiceView;
@@ -125,26 +140,6 @@ const isExternalIdUnique = async (resource: InvoiceView[], value?: string) => {
 };
 
 const pageSize = 50;
-
-export const SectionTitle = ({
-  Icon,
-  title,
-  actionComponent,
-}: {
-  Icon: React.FunctionComponent<
-    React.SVGProps<SVGSVGElement> & {title?: string | undefined}
-  >;
-  title: string;
-  actionComponent?: React.ReactNode;
-}) => (
-  <Box display="flex" alignItems="center" justifyContent="space-between">
-    <Box display="flex" alignItems="center" gap={1.5}>
-      <Icon width="2rem" height="2rem" style={{marginBottom: '4px'}} />
-      <Typography variant="h5">{t(title)}</Typography>
-    </Box>
-    {actionComponent}
-  </Box>
-);
 
 const articleViewToItem = (
   articleView: ServiceOrderArticleView,
@@ -356,6 +351,28 @@ export const InvoiceForm = ({
       navigate(`/invoices/details/${invoiceId}`);
     },
   });
+
+  const {data: previousInvoices = [], isLoading: isLoadingPreviousInvoices} =
+    useFetchServiceOrderInvoices(formik.values.serviceOrderId);
+  const sortedPreviousInvoices = useMemo(
+    () =>
+      [...previousInvoices]
+        .sort(
+          (a, b) =>
+            new Date(a.meta.createdAt).getTime() -
+            new Date(b.meta.createdAt).getTime(),
+        )
+        .map((i) => ({
+          ...i,
+          totalAmount: {
+            ...i.totalAmount,
+            vats: [...i.totalAmount.vats].sort(
+              (a, b) => b.percentageVat - a.percentageVat,
+            ),
+          },
+        })),
+    [previousInvoices],
+  );
 
   useEffect(() => {
     formik.setFieldValue(
@@ -674,8 +691,11 @@ export const InvoiceForm = ({
     useInvoices(
       {
         pageIndex: 0,
-        pageSize: 25,
-        query: String(formik.values.externalId!),
+        pageSize: 4,
+        query:
+          formik.values.externalId && formik.values.externalId !== ''
+            ? encodeURIComponent(formik.values.externalId!)
+            : '',
         status: [],
         totalAmountFrom,
         totalAmountTo,
@@ -772,12 +792,17 @@ export const InvoiceForm = ({
     return t(text);
   };
 
+  const hasAddressValues = (addressComponent?: AddressComponent) =>
+    Object.values(addressComponent ?? {}).some((value) => !!value);
+
   return (
     <Box>
-      {/* {invoice && (
+      {invoice && (
         <Box
           display="flex"
           alignItems="flex-end"
+          mb={3}
+          mt={1}
           justifyContent="space-between">
           <StatusChip
             label={getInvoiceStatusStyles(invoice?.status ?? '').label}
@@ -785,9 +810,13 @@ export const InvoiceForm = ({
             size="small"
             variant="filled"
           />
-          <Notes invoice={invoice!} />
+          <Notes
+            parentId={invoice.propertyOwner.id}
+            title="Customer Notes"
+            type="customer"
+          />
         </Box>
-      )} */}
+      )}
       <Grid
         container
         columnGap={3}
@@ -903,7 +932,9 @@ export const InvoiceForm = ({
               <>
                 <Grid item xs={6}>
                   <SelectAndEditCombined
-                    selected={!!formik.values.billingAddress?.component?.name}
+                    selected={hasAddressValues(
+                      formik.values.billingAddress?.component!,
+                    )}
                     label="Billing Address"
                     buttonText="Add Billing Address"
                     address={formik.values.billingAddress}
@@ -916,9 +947,9 @@ export const InvoiceForm = ({
                 </Grid>
                 <Grid item xs={6} pl={2}>
                   <SelectAndEditCombined
-                    selected={
-                      !!formik.values.beneficiaryAddress?.component?.name
-                    }
+                    selected={hasAddressValues(
+                      formik.values.beneficiaryAddress?.component!,
+                    )}
                     label="Beneficiary Address"
                     buttonText="Add Beneficiary Address"
                     address={formik.values.beneficiaryAddress}
@@ -932,9 +963,9 @@ export const InvoiceForm = ({
 
                 <Grid item xs={6}>
                   <SelectAndEditCombined
-                    selected={
-                      !!formik.values.alternativeAddress?.component?.name
-                    }
+                    selected={hasAddressValues(
+                      formik.values.alternativeAddress?.component!,
+                    )}
                     label={
                       <Box>
                         <FormLabel
@@ -1021,6 +1052,7 @@ export const InvoiceForm = ({
             <FormInput
               props={{
                 id: 'subject',
+                name: 'subject',
                 value: formik.values.subject,
                 label: 'Subject',
                 onChange: formik.handleChange,
@@ -1034,6 +1066,7 @@ export const InvoiceForm = ({
             <FormInput
               props={{
                 id: 'description',
+                name: 'description',
                 value: formik.values.description,
                 label: 'Description',
                 onChange: formik.handleChange,
@@ -1059,14 +1092,32 @@ export const InvoiceForm = ({
               />
             </Box>
             <ArticleItemsTableNEW
-              invoice={invoice}
               items={formik.values.items}
               setItems={setInvoiceItems}
               formik={formik}
               propertyOwnerId={customer?.id ?? ''}
-              formType={formType}
             />
           </Grid>
+
+          {/* PARTIAL PAYMENTS */}
+          {formik.values.type === InvoiceType.PARTIAL ||
+          (previousInvoices.length > 0 &&
+            formik.values.type === InvoiceType.FINAL) ? (
+            isLoadingPreviousInvoices ? (
+              <Progress />
+            ) : (
+              <PartialPaymentsSection
+                formik={formik}
+                previousInvoices={sortedPreviousInvoices}
+                invoice={invoice}
+              />
+            )
+          ) : null}
+
+          {/* UPFRONT PAYMENTS */}
+          {formik.values.type === InvoiceType.UPFRONT ? (
+            <UpfrontPaymentsSection formik={formik} invoice={invoice} />
+          ) : null}
 
           {/* FOOTER */}
           <Grid container item xs={12} bgcolor="white" p={3} rowGap={2.5}>
@@ -1075,6 +1126,7 @@ export const InvoiceForm = ({
             </Box>
             <FormInput
               props={{
+                id: 'moreInfo',
                 size: 'small',
                 label: notesText,
                 name: 'moreInfo',
@@ -1086,6 +1138,7 @@ export const InvoiceForm = ({
             />
             <FormInput
               props={{
+                id: 'paymentTerms',
                 size: 'small',
                 label: 'Payment terms',
                 name: 'paymentTerms',
@@ -1321,6 +1374,47 @@ export const InvoiceForm = ({
                 }}
               />
             </Box>
+
+            {/* PAYMENT TYPE */}
+            {/* don't show payment type for FULL and CREDIT_NOTE invoices */}
+            {[
+              InvoiceType.PARTIAL,
+              InvoiceType.UPFRONT,
+              InvoiceType.FINAL,
+            ].includes(formik.values.type) ? (
+              <Box>
+                <Typography variant="body2" color="grey.700">
+                  {t('Payment type')}
+                </Typography>
+                <RadioGroup
+                  defaultValue={PaymentType.LUMP_SUM}
+                  name="radio-buttons-group">
+                  {Object.entries(PaymentTypeOptions).map(([key, value]) =>
+                    // don't show per-item for upfront invoices
+                    formik.values.type === InvoiceType.UPFRONT &&
+                    key === PaymentType.PER_ITEM ? null : (
+                      <FormControlLabel
+                        key={key}
+                        value={key}
+                        control={<Radio size="small" />}
+                        label={t(value)}
+                        componentsProps={{typography: {variant: 'body2'}}}
+                        onChange={() =>
+                          formik.setFieldValue('payment.type', key)
+                        }
+                        checked={formik.values.payment?.type === key}
+                        disabled={
+                          formik.values.type !== InvoiceType.UPFRONT &&
+                          previousInvoices.length > 0 &&
+                          key !==
+                            previousInvoices[0].additionalInfo.payment?.type
+                        }
+                      />
+                    ),
+                  )}
+                </RadioGroup>
+              </Box>
+            ) : null}
           </Grid>
 
           {/* ADDITIONAL DOCUMENTS */}
@@ -1387,11 +1481,14 @@ export const InvoiceForm = ({
         }))}
         isValid={isValid()}
       />
-      <NewCustomer
-        isDialogOpen={isAddNewCustomerDialogOpen}
-        onClose={() => setIsAddNewCustomerDialogOpen(false)}
-        onSave={setNewlyCreatedCustomer}
-      />
+      {isAddNewCustomerDialogOpen && (
+        <NewCustomer
+          isDialogOpen={isAddNewCustomerDialogOpen}
+          onClose={() => setIsAddNewCustomerDialogOpen(false)}
+          onSave={setNewlyCreatedCustomer}
+        />
+      )}
+
       <EditFrom
         isDialogOpen={isEditFromDialogOpen}
         onClose={() => setIsEditFromDialogOpen(false)}
@@ -1450,25 +1547,32 @@ export const InvoiceForm = ({
         content="Do you want to delete this Invoice?"
         helperText="This action is irreversible."
       />
-      <ContractPaymentTermSelectDialog
-        title={t('Payment Terms')}
-        alertText={t('Choose a payment term to be used on your invoice')}
-        open={openContractPaymentTermSelectDialog}
-        onSave={handleContractPaymentTermsModal}
-        onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
-        onClickPaymentTerms={() => setOpenContractPaymentTermsDialog(true)}
-      />
 
-      <ContractPaymentTermsDialog
-        title={t('Manage Payment Terms')}
-        open={openContractPaymentTermsDialog}
-        onCancel={() => setOpenContractPaymentTermsDialog(false)}
-      />
+      {openContractPaymentTermSelectDialog && (
+        <ContractPaymentTermSelectDialog
+          title={t('Payment Terms')}
+          alertText={t('Choose a payment term to be used on your invoice')}
+          open={openContractPaymentTermSelectDialog}
+          onSave={handleContractPaymentTermsModal}
+          onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
+          onClickPaymentTerms={() => setOpenContractPaymentTermsDialog(true)}
+        />
+      )}
 
-      <AutoGeneratedIdDialog
-        openDialog={openDialog}
-        setOpenDialog={setOpenDialog}
-      />
+      {openContractPaymentTermsDialog && (
+        <ContractPaymentTermsDialog
+          title={t('Manage Payment Terms')}
+          open={openContractPaymentTermsDialog}
+          onCancel={() => setOpenContractPaymentTermsDialog(false)}
+        />
+      )}
+
+      {openDialog && (
+        <AutoGeneratedIdDialog
+          openDialog={openDialog}
+          setOpenDialog={setOpenDialog}
+        />
+      )}
     </Box>
   );
 };
