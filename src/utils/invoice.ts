@@ -74,7 +74,7 @@ export const getInvoiceActivityTitle = (type: InvoiceActivityType): string => {
     case InvoiceActivityType.PAYMENT_DELETED:
       return 'Payment deleted';
     case InvoiceActivityType.INVOICE_EMAIL_SENT_FAILED:
-      return 'Invoice not successfully sent';
+      return 'Invoice not sent';
     default:
       return '';
   }
@@ -101,7 +101,7 @@ export const invoiceStatusToString = (type: InvoiceActivityType): string => {
     case InvoiceActivityType.PAYMENT_DELETED:
       return 'Payment deleted';
     case InvoiceActivityType.INVOICE_EMAIL_SENT_FAILED:
-      return 'Invoice not successfully sent';
+      return 'Invoice not sent';
     default:
       return '';
   }
