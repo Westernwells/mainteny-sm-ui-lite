@@ -5,7 +5,12 @@ import {Grid, Typography, Box, InputAdornment, Divider} from '@mui/material';
 import {FormikProps} from 'formik';
 import {NumberFormatValues} from 'react-number-format';
 import {FormInput} from 'components/form/FormInput';
-import {InvoiceFormData, InvoiceView, PaymentType} from 'models/invoice';
+import {
+  InvoiceFormData,
+  InvoiceType,
+  InvoiceView,
+  PaymentType,
+} from 'models/invoice';
 import {
   aggregatedAmountToMoney,
   formatCurrency,
@@ -22,14 +27,20 @@ import {SectionTitle} from './SectionTitle';
 
 interface Props {
   formik: FormikProps<InvoiceFormData>;
+  previousInvoices: InvoiceView[];
   invoice?: InvoiceView;
 }
 
-export const UpfrontPaymentsSection = ({formik, invoice}: Props) => {
+export const UpfrontPaymentsSection = ({
+  formik,
+  previousInvoices,
+  invoice,
+}: Props) => {
   const currentCurrency = useCurrentCurrency();
+  const isEditing = !!invoice;
   const subtotalExclVat = calculateTotalWithPerItemDiscount(formik.values);
 
-  const handlePartialPaymentChange = (values: {
+  const handleUpfrontPaymentChange = (values: {
     name?: string;
     value?: number;
   }) => {
@@ -67,6 +78,10 @@ export const UpfrontPaymentsSection = ({formik, invoice}: Props) => {
     return floatValue <= subtotalExclVat;
   };
 
+  const prevInvoicesPercentage = previousInvoices
+    .map((i) => i.additionalInfo.payment?.percentage ?? 0)
+    .reduce((a, b) => a + b, 0);
+
   const isAllowedPercentageField = (values: NumberFormatValues) => {
     const {floatValue} = values;
     if (!floatValue) {
@@ -77,7 +92,11 @@ export const UpfrontPaymentsSection = ({formik, invoice}: Props) => {
       return false;
     }
 
-    const maxPercentage = 100;
+    const maxPercentage = isEditing
+      ? 100 -
+        (prevInvoicesPercentage -
+          (invoice.additionalInfo.payment?.percentage ?? 0))
+      : 100 - prevInvoicesPercentage;
 
     return floatValue <= maxPercentage;
   };
@@ -89,7 +108,20 @@ export const UpfrontPaymentsSection = ({formik, invoice}: Props) => {
       ? (subtotalExclVat * (formik.values.payment?.percentage ?? 0)) / 100
       : 0;
 
-  const totalAmountExclVat = amount;
+  const previousInvoicesTotalExclVat = previousInvoices
+    .map(
+      (i) =>
+        (i.totalAmount?.netAmount ?? 0) /
+        10 ** (i.totalAmount?.fractionDigits ?? 2),
+    )
+    .reduce((a, b) => a + b, 0);
+
+  const totalAmountExclVat = isEditing
+    ? amount +
+      previousInvoicesTotalExclVat -
+      (invoice.totalAmount?.netAmount ?? 0) /
+        10 ** (invoice.totalAmount?.fractionDigits ?? 2)
+    : amount + previousInvoicesTotalExclVat;
   const totalAmountExclVatFormatted = formatCurrency(
     fixRounding(totalAmountExclVat, 2),
     {
@@ -137,6 +169,45 @@ export const UpfrontPaymentsSection = ({formik, invoice}: Props) => {
     },
   );
 
+  const hasPreviousInvoices = previousInvoices.length > 0;
+
+  useEffect(() => {
+    const firstInvoice = previousInvoices[0];
+    const firstInvoicePaymentType = firstInvoice?.additionalInfo.payment?.type;
+    const isFinalAfterPreviousInvoices =
+      hasPreviousInvoices && formik.values.type === InvoiceType.FINAL;
+
+    if (isEditing) {
+      // do nothing
+    } else if (isFinalAfterPreviousInvoices) {
+      // prefill percentage/amount if it's a final invoice after previous invoices
+      formik.setFieldValue('payment', {
+        ...formik.values.payment,
+        ...(firstInvoicePaymentType === PaymentType.PERCENTAGE
+          ? {
+              type: PaymentType.PERCENTAGE,
+              percentage: 100 - prevInvoicesPercentage,
+            }
+          : {
+              type: PaymentType.LUMP_SUM,
+              amount: {
+                ...formik.values.payment?.amount,
+                value: subtotalExclVat - previousInvoicesTotalExclVat,
+              },
+            }),
+      });
+    } else {
+      // change payment type according to first invoice
+      formik.setFieldValue('payment', {
+        ...formik.values.payment,
+        type:
+          firstInvoicePaymentType === PaymentType.PERCENTAGE
+            ? PaymentType.PERCENTAGE
+            : PaymentType.LUMP_SUM,
+      });
+    }
+  }, [previousInvoices]);
+
   useEffect(() => {
     // initialize payment object if it's not set
     if (!formik.values.payment) {
@@ -177,70 +248,182 @@ export const UpfrontPaymentsSection = ({formik, invoice}: Props) => {
         borderRadius={1}
         p={2}>
         <Grid container rowGap={2.5} justifyContent="space-between">
-          <Grid item xs={7}>
-            <FormInput
-              props={{
-                size: 'small',
-                label: 'Name',
-                name: 'payment.description',
-                value: formik.values.payment?.description,
-                onChange: formik.handleChange,
-              }}
-            />
-          </Grid>
-          <Grid item xs={4} display="flex" justifyContent="flex-end" gap={2}>
-            {formik.values.payment?.type === PaymentType.PERCENTAGE && (
-              <FormInput
-                inputType="currency"
-                onValueChange={handlePartialPaymentChange}
-                props={{
-                  value: formik.values.payment?.percentage,
-                  label: 'Percentage',
-                  InputProps: {
-                    endAdornment: (
-                      <InputAdornment position="end">%</InputAdornment>
-                    ),
-                    inputProps: {
-                      style: {textAlign: 'right'},
+          {hasPreviousInvoices &&
+            previousInvoices.map((prevInvoice) => (
+              <Fragment key={prevInvoice.id}>
+                <Grid item xs={7}>
+                  <FormInput
+                    props={{
+                      size: 'small',
+                      label: 'Name',
+                      ...(prevInvoice.id === invoice?.id
+                        ? {
+                            name: 'payment.description',
+                            value: formik.values.payment?.description,
+                            onChange: formik.handleChange,
+                          }
+                        : {
+                            value:
+                              prevInvoice.additionalInfo.payment?.description ??
+                              '',
+                            disabled: true,
+                          }),
+                    }}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  xs={4}
+                  display="flex"
+                  justifyContent="flex-end"
+                  gap={2}>
+                  {prevInvoice.additionalInfo.payment?.type ===
+                    PaymentType.PERCENTAGE && (
+                    <FormInput
+                      inputType="currency"
+                      {...(prevInvoice.id === invoice?.id && {
+                        onValueChange: handleUpfrontPaymentChange,
+                      })}
+                      props={{
+                        value:
+                          prevInvoice.id === invoice?.id
+                            ? formik.values.payment?.percentage
+                            : prevInvoice.additionalInfo.payment.percentage,
+                        size: 'small',
+                        label: 'Percentage',
+                        InputProps: {
+                          endAdornment: (
+                            <InputAdornment position="end">%</InputAdornment>
+                          ),
+                          inputProps: {
+                            style: {textAlign: 'right'},
+                          },
+                        },
+                      }}
+                      numericFormatProps={{
+                        disabled: prevInvoice.id !== invoice?.id,
+                        allowLeadingZeros: false,
+                        decimalScale: 0,
+                        isAllowed: isAllowedPercentageField,
+                      }}
+                    />
+                  )}
+                  <FormInput
+                    inputType="currency"
+                    {...(formik.values.payment?.type === PaymentType.LUMP_SUM
+                      ? {
+                          onValueChange: handleUpfrontPaymentChange,
+                        }
+                      : {})}
+                    props={{
+                      value:
+                        prevInvoice.id === invoice?.id
+                          ? amount
+                          : (prevInvoice.totalAmount?.netAmount ?? 0) /
+                            10 **
+                              (prevInvoice.totalAmount?.fractionDigits ?? 2),
+                      label: 'Amount (excl. VAT)',
+                      InputProps: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            {currentCurrency.symbol}
+                          </InputAdornment>
+                        ),
+                        inputProps: {
+                          style: {textAlign: 'right'},
+                        },
+                      },
+                    }}
+                    numericFormatProps={{
+                      ...(prevInvoice.id === invoice?.id
+                        ? {
+                            disabled:
+                              formik.values.payment?.type ===
+                              PaymentType.PERCENTAGE,
+                          }
+                        : {
+                            disabled: true,
+                          }),
+                      isAllowed: isAllowedAmountField,
+                      allowLeadingZeros: false,
+                    }}
+                  />
+                </Grid>
+              </Fragment>
+            ))}
+          {isEditing ? null : (
+            <>
+              <Grid item xs={7}>
+                <FormInput
+                  props={{
+                    size: 'small',
+                    label: 'Name',
+                    name: 'payment.description',
+                    value: formik.values.payment?.description,
+                    onChange: formik.handleChange,
+                  }}
+                />
+              </Grid>
+              <Grid
+                item
+                xs={4}
+                display="flex"
+                justifyContent="flex-end"
+                gap={2}>
+                {formik.values.payment?.type === PaymentType.PERCENTAGE && (
+                  <FormInput
+                    inputType="currency"
+                    onValueChange={handleUpfrontPaymentChange}
+                    props={{
+                      value: formik.values.payment?.percentage,
+                      label: 'Percentage',
+                      InputProps: {
+                        endAdornment: (
+                          <InputAdornment position="end">%</InputAdornment>
+                        ),
+                        inputProps: {
+                          style: {textAlign: 'right'},
+                        },
+                      },
+                    }}
+                    numericFormatProps={{
+                      allowLeadingZeros: false,
+                      decimalScale: 0,
+                      isAllowed: isAllowedPercentageField,
+                    }}
+                  />
+                )}
+                <FormInput
+                  inputType="currency"
+                  {...(formik.values.payment?.type === PaymentType.LUMP_SUM
+                    ? {
+                        onValueChange: handleUpfrontPaymentChange,
+                      }
+                    : {})}
+                  props={{
+                    value: amount,
+                    label: 'Amount (excl. VAT)',
+                    InputProps: {
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          {currentCurrency.symbol}
+                        </InputAdornment>
+                      ),
+                      inputProps: {
+                        style: {textAlign: 'right'},
+                      },
                     },
-                  },
-                }}
-                numericFormatProps={{
-                  allowLeadingZeros: false,
-                  decimalScale: 0,
-                  isAllowed: isAllowedPercentageField,
-                }}
-              />
-            )}
-            <FormInput
-              inputType="currency"
-              {...(formik.values.payment?.type === PaymentType.LUMP_SUM
-                ? {
-                    onValueChange: handlePartialPaymentChange,
-                  }
-                : {})}
-              props={{
-                value: amount,
-                label: 'Amount (excl. VAT)',
-                InputProps: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      {currentCurrency.symbol}
-                    </InputAdornment>
-                  ),
-                  inputProps: {
-                    style: {textAlign: 'right'},
-                  },
-                },
-              }}
-              numericFormatProps={{
-                disabled:
-                  formik.values.payment?.type === PaymentType.PERCENTAGE,
-                isAllowed: isAllowedAmountField,
-                allowLeadingZeros: false,
-              }}
-            />
-          </Grid>
+                  }}
+                  numericFormatProps={{
+                    disabled:
+                      formik.values.payment?.type === PaymentType.PERCENTAGE,
+                    isAllowed: isAllowedAmountField,
+                    allowLeadingZeros: false,
+                  }}
+                />
+              </Grid>
+            </>
+          )}
         </Grid>
 
         <Divider sx={{borderColor: theme.palette.grey[300]}} />

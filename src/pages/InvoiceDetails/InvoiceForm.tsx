@@ -1102,6 +1102,7 @@ export const InvoiceForm = ({
           {/* PARTIAL PAYMENTS */}
           {formik.values.type === InvoiceType.PARTIAL ||
           (previousInvoices.length > 0 &&
+            previousInvoices[0].type === InvoiceType.PARTIAL &&
             formik.values.type === InvoiceType.FINAL) ? (
             isLoadingPreviousInvoices ? (
               <Progress />
@@ -1115,8 +1116,19 @@ export const InvoiceForm = ({
           ) : null}
 
           {/* UPFRONT PAYMENTS */}
-          {formik.values.type === InvoiceType.UPFRONT ? (
-            <UpfrontPaymentsSection formik={formik} invoice={invoice} />
+          {formik.values.type === InvoiceType.UPFRONT ||
+          (previousInvoices.length > 0 &&
+            previousInvoices[0].type === InvoiceType.UPFRONT &&
+            formik.values.type === InvoiceType.FINAL) ? (
+            isLoadingPreviousInvoices ? (
+              <Progress />
+            ) : (
+              <UpfrontPaymentsSection
+                formik={formik}
+                previousInvoices={sortedPreviousInvoices}
+                invoice={invoice}
+              />
+            )
           ) : null}
 
           {/* FOOTER */}
@@ -1404,7 +1416,6 @@ export const InvoiceForm = ({
                         }
                         checked={formik.values.payment?.type === key}
                         disabled={
-                          formik.values.type !== InvoiceType.UPFRONT &&
                           previousInvoices.length > 0 &&
                           key !==
                             previousInvoices[0].additionalInfo.payment?.type
