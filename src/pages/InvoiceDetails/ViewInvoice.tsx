@@ -48,7 +48,6 @@ import {SendEmailDialog} from 'components/SendEmailDialog';
 import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useSnackbar} from 'notistack';
-import {isBefore, parseISO, startOfDay} from 'date-fns';
 import CustomSnackbar from 'components/CustomSnackbar';
 import {Notes} from 'components/Notes';
 import {LinearProgress, linearProgressClasses} from '@mui/material';
@@ -58,6 +57,7 @@ import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import {useServiceOrderCheckList} from 'hooks/reactQuery/useServiceOrder';
 import {CheckListComponentType} from 'models/checklist';
 import {ChecklistStatus} from 'models/service-order';
+import {validateDueDate} from 'utils/invoice-utils';
 import {InvoiceActivities} from './InvoiceActivities';
 
 interface Props {
@@ -235,35 +235,11 @@ export const ViewInvoice = ({
     };
   }, [invoice?.additionalInfo.pdfGenerationStatus]);
 
-  const isDueDateInPast = () => {
-    if (invoice?.status !== InvoiceStatus.DRAFT) {
-      return false;
-    }
-
-    const localDueDate = invoice.dueDate as string;
-    const dueDateObject = startOfDay(
-      parseISO(new Date(localDueDate).toISOString()),
-    );
-    const todayObject = startOfDay(new Date());
-
-    return isBefore(dueDateObject, todayObject);
-  };
-
-  const validateDueDate = () => {
-    if (!invoice.dueDate) {
-      return t(`The due date is missing for this invoice`);
-    }
-
-    if (isDueDateInPast()) {
-      return t(`The due date for the invoice has expired`);
-    }
-  };
-
   const onInvoiceSend = () => {
-    const errorMessage = validateDueDate();
+    const errorMessage = validateDueDate(invoice);
 
     if (errorMessage) {
-      enqueueSnackbar(errorMessage, {
+      enqueueSnackbar(t(errorMessage), {
         variant: 'error',
       });
 
