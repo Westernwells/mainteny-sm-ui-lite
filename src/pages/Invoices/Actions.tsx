@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router';
 import printJS from 'print-js';
@@ -34,7 +34,7 @@ import {PdfGenerationStatus} from 'models/misc';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
-import {isBefore, parseISO, startOfDay} from 'date-fns';
+import {validateDueDate} from 'utils/invoice-utils';
 
 interface Props {
   invoice: InvoiceView;
@@ -112,6 +112,20 @@ export const Actions = ({
     setAnchorEl(null);
   };
 
+  const handleOpenSendInvoiceModal = useCallback(() => {
+    const errorMessage = validateDueDate(invoice);
+
+    if (errorMessage) {
+      enqueueSnackbar(t(errorMessage), {
+        variant: 'error',
+      });
+
+      return;
+    }
+
+    setIsSendEmailDialogOpen(true);
+  }, [invoice]);
+
   const cancelItem = {
     label: t('Cancel'),
     icon: <CancelIcon />,
@@ -147,9 +161,7 @@ export const Actions = ({
           arrow>
           <span>
             <IconButton
-              onClick={() => {
-                setIsSendEmailDialogOpen(true);
-              }}
+              onClick={handleOpenSendInvoiceModal}
               sx={{color: 'action.active'}}
               disabled={!isPDFsGenerated}>
               <SendIcon fontSize="small" />
@@ -317,35 +329,11 @@ export const Actions = ({
     return items;
   }, [downloadUrl, invoice.status, t]);
 
-  const isDueDateInPast = () => {
-    if (invoice.status !== InvoiceStatus.DRAFT) {
-      return false;
-    }
-
-    const localDueDate = invoice.dueDate as string;
-    const dueDateObject = startOfDay(
-      parseISO(new Date(localDueDate).toISOString()),
-    );
-    const todayObject = startOfDay(new Date());
-
-    return isBefore(dueDateObject, todayObject);
-  };
-
-  const validateDueDate = () => {
-    if (!invoice.dueDate) {
-      return t(`The due date is missing for this invoice`);
-    }
-
-    if (isDueDateInPast()) {
-      return t(`The due date for the invoice has expired`);
-    }
-  };
-
   const onPrintInvoice = async () => {
-    const errorMessage = validateDueDate();
+    const errorMessage = validateDueDate(invoice);
 
     if (errorMessage) {
-      enqueueSnackbar(errorMessage, {
+      enqueueSnackbar(t(errorMessage), {
         variant: 'error',
       });
 
