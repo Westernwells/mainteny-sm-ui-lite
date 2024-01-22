@@ -1,9 +1,14 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState, MutableRefObject} from 'react';
 import {t} from 'i18next';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {VariableSizeList} from 'react-window';
-// import * as Yup from 'yup';
-import {Controller, useForm} from 'react-hook-form';
+import {
+  Controller,
+  useForm,
+  UseFormReturn,
+  useFieldArray,
+  UseFieldArrayReturn,
+} from 'react-hook-form';
 import {
   BeforeCapture,
   DragDropContext,
@@ -35,9 +40,9 @@ import {
 } from 'hooks/reactQuery/useChecklists';
 import {
   CheckList,
-  // CheckListComponentOptionColor,
   CheckListComponentType,
   CreateCheckListRecord,
+  ExtendedCheckListComponentRecord,
   ExtendedCreateCheckListRecord,
   ExtendedUpdateCheckListRecord,
   UpdateCheckListRecord,
@@ -50,34 +55,6 @@ import {makePage} from 'utils/paging-utils';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import {ChecklistComponent} from './ChecklistComponent';
 // import {ChecklistPreview} from './ChecklistPreview';
-
-// const validationSchema = Yup.object().shape({
-//   name: Yup.string().required('Name is required'),
-//   components: Yup.array().of(
-//     Yup.object().shape({
-//       subject: Yup.string().required(),
-//       type: Yup.string()
-//         .oneOf(Object.values(CheckListComponentType))
-//         .required(),
-//       options: Yup.array().when('type', {
-//         is: (v: string) => v === CheckListComponentType.SINGLE_CHECK,
-//         then: Yup.array()
-//           .of(
-//             Yup.object().shape({
-//               text: Yup.string().required(),
-//               color: Yup.string()
-//                 .oneOf(Object.keys(CheckListComponentOptionColor))
-//                 .required(),
-//             }),
-//           )
-//           .min(1)
-//           .required(),
-//       }),
-//       orderNumber: Yup.number().required(),
-//       moreInfoInNote: Yup.boolean(),
-//     }),
-//   ),
-// });
 
 const availableComponents = [
   {
@@ -101,6 +78,53 @@ const availableComponents = [
     type: CheckListComponentType.TEXT,
   },
 ];
+
+const Row = ({
+  style,
+  index,
+  data,
+}: {
+  style: any;
+  index: number;
+  data: {
+    listRef: MutableRefObject<any>;
+    form: UseFormReturn<
+      ExtendedCreateCheckListRecord | ExtendedUpdateCheckListRecord
+    >;
+    arrayFields: UseFieldArrayReturn<
+      ExtendedCreateCheckListRecord | ExtendedUpdateCheckListRecord,
+      'components'
+    >;
+    draggingComponentId: string;
+  };
+}) => {
+  const component = data.arrayFields.fields[
+    index
+  ] as ExtendedCheckListComponentRecord;
+  return (
+    <Box style={style}>
+      <Draggable key={component.id} draggableId={component.id} index={index}>
+        {(draggableProvided: DraggableProvided) => (
+          <Box
+            ref={draggableProvided.innerRef}
+            {...draggableProvided.draggableProps}
+            {...draggableProvided.dragHandleProps}
+            style={{...draggableProvided.draggableProps.style}}>
+            <ChecklistComponent
+              listRef={data.listRef}
+              index={index}
+              component={component}
+              form={data.form}
+              arrayFields={data.arrayFields}
+              draggableProvided={draggableProvided}
+              isDragging={data.draggingComponentId === component.id}
+            />
+          </Box>
+        )}
+      </Draggable>
+    </Box>
+  );
+};
 
 export const Checklist = () => {
   const theme = useTheme();
@@ -171,16 +195,8 @@ export const Checklist = () => {
       createChecklist(data, {onSuccess: () => navigate(-1)});
     }
   };
-  // const formik = useFormik<
-  //   ExtendedCreateCheckListRecord | ExtendedUpdateCheckListRecord
-  // >({
-  //   validateOnMount: true,
-  //   initialValues,
-  //   validationSchema,
-  //   // onSubmit: handleSubmit,
-  // });
 
-  const formik = useForm<
+  const form = useForm<
     ExtendedCreateCheckListRecord | ExtendedUpdateCheckListRecord
   >({
     defaultValues: {
@@ -188,8 +204,12 @@ export const Checklist = () => {
     },
   });
 
-  const values = formik.getValues();
+  const arrayFields = useFieldArray({
+    control: form.control,
+    name: 'components',
+  });
 
+  const values = form.getValues();
   useEffect(() => {
     // const hasEdit = location.search.includes('edit=1');
     // setIsPreviewing(hasEdit);
@@ -205,7 +225,7 @@ export const Checklist = () => {
       const {data: refetchedChecklists} = await refetchChecklists();
 
       if (!refetchedChecklists?.data.length) {
-        formik.setValue('name', checklistTitle);
+        form.setValue('name', checklistTitle);
         return;
       }
 
@@ -213,7 +233,7 @@ export const Checklist = () => {
         c.name.startsWith(checklistTitle),
       );
       if (filteredChecklists.length) {
-        formik.setValue(
+        form.setValue(
           'name',
           `${checklistTitle} ${filteredChecklists.length + 1}`,
         );
@@ -234,7 +254,7 @@ export const Checklist = () => {
     const newComponents = [...values.components];
     const [movedComponent] = newComponents.splice(sourceIndex, 1);
     newComponents.splice(destinationIndex, 0, movedComponent);
-    formik.setValue('components', newComponents);
+    form.setValue('components', newComponents);
     setDraggingComponentId('');
     if (listRef.current) {
       listRef.current?.resetAfterIndex(0);
@@ -246,10 +266,10 @@ export const Checklist = () => {
   };
 
   const addComponent = async (type: CheckListComponentType) => {
-    formik.setValue('components', [
-      ...values.components,
-      getComponentMock(type),
-    ]);
+    arrayFields.append({
+      ...arrayFields,
+      ...getComponentMock(type),
+    });
 
     if (listRef.current) {
       listRef.current.resetAfterIndex(0);
@@ -265,35 +285,9 @@ export const Checklist = () => {
   };
 
   const isNameInvalid = true;
-
-  const rowRenderer = ({index, style}: {index: number; style: any}) => {
-    const component = values.components[index];
-    return (
-      <Box style={style}>
-        <Draggable key={component.id} draggableId={component.id} index={index}>
-          {(draggableProvided: DraggableProvided) => (
-            <Box
-              ref={draggableProvided.innerRef}
-              {...draggableProvided.draggableProps}
-              {...draggableProvided.dragHandleProps}
-              style={{...draggableProvided.draggableProps.style}}>
-              <ChecklistComponent
-                listRef={listRef}
-                index={index}
-                component={component}
-                formik={formik}
-                draggableProvided={draggableProvided}
-                isDragging={draggingComponentId === component.id}
-              />
-            </Box>
-          )}
-        </Draggable>
-      </Box>
-    );
-  };
   const getSize = (index: number) => {
-    const type = values.components[index]?.type;
-    const {length} = values.components[index].options;
+    const type = arrayFields.fields[index]?.type;
+    const length = arrayFields.fields[index]?.options.length;
     const PADDING_VERTICAL = 48;
     const MARGIN_BOTTOM = 16;
     const calculateHeightOfSingleCheck =
@@ -314,7 +308,7 @@ export const Checklist = () => {
   };
 
   return (
-    <>
+    <form>
       <Box
         display="flex"
         justifyContent="center"
@@ -326,7 +320,7 @@ export const Checklist = () => {
           <PageCard
             containerStyles={{
               p: 4,
-              pb: values.components.length ? 4 : 8,
+              pb: arrayFields.fields.length ? 4 : 8,
             }}
             contentContainerStyles={{
               display: 'flex',
@@ -340,7 +334,7 @@ export const Checklist = () => {
               },
             }}>
             <Controller
-              control={formik.control}
+              control={form.control}
               defaultValue={values.name ?? undefined}
               name="name"
               rules={{required: true}}
@@ -376,7 +370,7 @@ export const Checklist = () => {
               )}
             />
 
-            {values.components?.length ? (
+            {arrayFields.fields?.length ? (
               <DragDropContext
                 onDragEnd={onDragComponentEnd}
                 onBeforeCapture={onBeforeCapture}>
@@ -393,10 +387,15 @@ export const Checklist = () => {
                             ref={listRef}
                             height={height}
                             width={width}
-                            itemCount={values.components.length}
-                            itemData={values.components}
+                            itemCount={arrayFields.fields.length}
+                            itemData={{
+                              listRef,
+                              form,
+                              draggingComponentId,
+                              arrayFields,
+                            }}
                             itemSize={getSize}>
-                            {rowRenderer}
+                            {Row}
                           </VariableSizeList>
                         )}
                       </AutoSizer>
@@ -407,7 +406,7 @@ export const Checklist = () => {
             ) : null}
           </PageCard>
 
-          {values.components.length ? null : (
+          {arrayFields.fields.length ? null : (
             <EmptySection
               illustration="emptyChecklistComponents"
               label="Start adding components"
@@ -485,7 +484,7 @@ export const Checklist = () => {
         isOpen
         isSaving={isCreating || isUpdating}
         primaryButtonLabel={t('Save')}
-        primaryButtonAction={formik.handleSubmit(handleSubmitData)}
+        primaryButtonAction={form.handleSubmit(handleSubmitData)}
         listItems={[]}
         isValid
         secondaryButton={
@@ -500,7 +499,7 @@ export const Checklist = () => {
           />
         }
       />
-    </>
+    </form>
   );
 };
 
