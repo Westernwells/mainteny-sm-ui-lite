@@ -1,6 +1,5 @@
 import {useTranslation} from 'react-i18next';
 import {useEffect, useRef, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import Typography from '@mui/material/Typography';
@@ -18,7 +17,7 @@ import {ServiceOrderPaymentStatus} from 'models/service-order';
 import {calculateGrossInvoiceTotal} from 'utils/calculate-total';
 import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
 import {columns, makeRows} from './InvoicesDataGridProps';
-// import CreateNewInvoiceModal from './CreateNewInvoiceModal';
+import CreateNewInvoiceModal from './CreateNewInvoiceModal';
 
 interface Props {
   serviceOrderId: string;
@@ -28,10 +27,9 @@ interface Props {
 export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
-  const navigate = useNavigate();
   const formatDate = useFormatDate();
   const [rows, setRows] = useState<GridRowsProp>([]);
-  // const [openDialog, setOpenDialog] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
 
   let totalInvoiceRef = useRef(0).current;
 
@@ -106,8 +104,7 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
           )}
         </Box>
       }
-      // handleAction={() => setOpenDialog(true)}
-      handleAction={() => navigate(`/invoices/new?orderId=${serviceOrderId}`)}
+      handleAction={() => setOpenDialog(true)}
       headerActionIcon={
         <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
       }
@@ -126,13 +123,13 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
           isWidget
         />
       )}
-      {/* <CreateNewInvoiceModal
+      <CreateNewInvoiceModal
         open={openDialog}
         onClose={() => {
           setOpenDialog(false);
         }}
         orderId={serviceOrderId}
-      /> */}
+      />
     </InfoCard>
   );
 };
