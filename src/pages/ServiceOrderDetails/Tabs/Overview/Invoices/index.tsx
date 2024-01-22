@@ -1,5 +1,5 @@
 import {useTranslation} from 'react-i18next';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import Typography from '@mui/material/Typography';
@@ -14,6 +14,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {getServiceOrderPaymentStatusStyles} from 'pages/ServiceOrders/Tabs/ServiceOrderList.tsx/ServiceOrderDataGridProps';
 import {StatusChip} from 'components/StatusChip';
 import {ServiceOrderPaymentStatus} from 'models/service-order';
+import {InvoiceType} from 'models/invoice';
 import {calculateGrossInvoiceTotal} from 'utils/calculate-total';
 import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
 import {columns, makeRows} from './InvoicesDataGridProps';
@@ -39,24 +40,49 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
   const hasValidPaymentStatus = paymentStatusStyles.label !== '-';
 
   const {
-    data: InvoiceList = [],
+    data: jobInvoices = [],
     isLoading,
     isIdle,
   } = useFetchServiceOrderInvoices(serviceOrderId);
 
-  totalInvoiceRef = totalInvoiceRef || InvoiceList.length;
+  totalInvoiceRef = totalInvoiceRef || jobInvoices.length;
+
+  const invoiceTypesToShow = useMemo(() => {
+    const jobHasFullInvoice = jobInvoices.find(
+      (i) => i.type === InvoiceType.FULL,
+    );
+    if (jobHasFullInvoice) {
+      return [InvoiceType.FULL];
+    }
+
+    const jobHasPartialInvoice = jobInvoices.find(
+      (i) => i.type === InvoiceType.PARTIAL,
+    );
+    if (jobHasPartialInvoice) {
+      return [InvoiceType.FINAL, InvoiceType.PARTIAL];
+    }
+
+    const jobHasUpfrontInvoice = jobInvoices.find(
+      (i) => i.type === InvoiceType.UPFRONT,
+    );
+    if (jobHasUpfrontInvoice) {
+      return [InvoiceType.FINAL, InvoiceType.UPFRONT];
+    }
+
+    return [];
+  }, [jobInvoices]);
 
   useEffect(() => {
     if (!isLoading) {
       setRows(
         makeRows(
-          InvoiceList || [],
+          jobInvoices || [],
           user?.userAccount.serviceCompany.id,
           formatDate,
         ),
       );
     }
-  }, [InvoiceList, isLoading]);
+  }, [jobInvoices, isLoading]);
 
   const renderNoRowsSection = () => (
     <Box
@@ -82,10 +108,10 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
   return (
     <InfoCard
       footer={
-        InvoiceList &&
-        InvoiceList?.length !== 0 && (
+        jobInvoices &&
+        jobInvoices?.length !== 0 && (
           <InfoCardTotalSumFooter
-            amount={InvoiceList && calculateGrossInvoiceTotal(InvoiceList)}
+            amount={jobInvoices && calculateGrossInvoiceTotal(jobInvoices)}
             label={t('Invoiced Sum (incl. VAT)')}
           />
         )
@@ -129,6 +155,7 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
           setOpenDialog(false);
         }}
         orderId={serviceOrderId}
+        invoiceTypesToShow={invoiceTypesToShow}
       />
     </InfoCard>
   );
