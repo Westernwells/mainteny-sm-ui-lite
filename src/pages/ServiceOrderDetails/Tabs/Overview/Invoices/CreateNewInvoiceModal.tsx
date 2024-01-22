@@ -23,6 +23,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   orderId: string;
+  invoiceTypesToShow?: InvoiceType[];
 }
 
 const iconStyle = {
@@ -32,9 +33,16 @@ const iconStyle = {
 
 const invoiceTypeOptions = [
   {
-    label: 'Final Invoice',
+    label: 'Full Invoice',
     description:
       'Straight-forward transaction requiring full payment upon delivery of goods or completion of services.',
+    icon: <FinalInvoiceIcon style={iconStyle} />,
+    invoiceType: InvoiceType.FULL,
+  },
+  {
+    label: 'Final Invoice',
+    description:
+      'Consolidates all previous partial or upfront payments for a job, addressing any remaining balance and marking the financial conclusion of the work.',
     icon: <FinalInvoiceIcon style={iconStyle} />,
     invoiceType: InvoiceType.FINAL,
   },
@@ -54,7 +62,12 @@ const invoiceTypeOptions = [
   },
 ];
 
-const CreateNewInvoiceModal = ({open, onClose, orderId}: Props) => {
+const CreateNewInvoiceModal = ({
+  open,
+  onClose,
+  orderId,
+  invoiceTypesToShow,
+}: Props) => {
   const navigate = useNavigate();
   const {t} = useTranslation();
   const [selectedValue, setSelectedValue] = useState<InvoiceType | null>(null);
@@ -84,79 +97,85 @@ const CreateNewInvoiceModal = ({open, onClose, orderId}: Props) => {
           aria-labelledby="demo-controlled-radio-buttons-group"
           name="controlled-radio-buttons-group"
           value={selectedValue}>
-          {invoiceTypeOptions.map((item, index) => (
-            <Grid
-              tabIndex={0}
-              key={`{${item}-${index}`}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                color:
-                  selectedValue === item.invoiceType
-                    ? theme.palette.inputBackground.main
-                    : theme.palette.primary.main,
-                background:
-                  selectedValue === item.invoiceType
-                    ? theme.palette.primary.main
-                    : theme.palette.inputBackground.main,
-                border: '1px solid #E4E9F2',
-                borderRadius: 1,
-                my: 1,
-                p: 2.5,
-                cursor: 'pointer',
-                transition: 'background 0.2s, border 0.3s',
-                svg: {
-                  color:
-                    selectedValue === item.invoiceType
-                      ? theme.palette.secondary.main
-                      : theme.palette.primary.light,
-                },
-                '&:hover': {
-                  svg: {
-                    color: theme.palette.secondary.main,
-                  },
-                  background: theme.palette.primary.main,
+          {invoiceTypeOptions
+            .filter((item) =>
+              !invoiceTypesToShow?.length
+                ? true
+                : invoiceTypesToShow?.includes(item.invoiceType),
+            )
+            .map((item, index) => (
+              <Grid
+                tabIndex={0}
+                key={`{${item}-${index}`}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
                   color:
                     selectedValue === item.invoiceType
                       ? theme.palette.inputBackground.main
                       : theme.palette.primary.main,
-                  border: '1px solid #000034',
-                  h6: {
-                    color: theme.palette.inputBackground.main,
+                  background:
+                    selectedValue === item.invoiceType
+                      ? theme.palette.primary.main
+                      : theme.palette.inputBackground.main,
+                  border: '1px solid #E4E9F2',
+                  borderRadius: 1,
+                  my: 1,
+                  p: 2.5,
+                  cursor: 'pointer',
+                  transition: 'background 0.2s, border 0.3s',
+                  svg: {
+                    color:
+                      selectedValue === item.invoiceType
+                        ? theme.palette.secondary.main
+                        : theme.palette.primary.light,
                   },
-                  p: {
-                    color: theme.palette.inputBackground.main,
+                  '&:hover': {
+                    svg: {
+                      color: theme.palette.secondary.main,
+                    },
+                    background: theme.palette.primary.main,
+                    color:
+                      selectedValue === item.invoiceType
+                        ? theme.palette.inputBackground.main
+                        : theme.palette.primary.main,
+                    border: '1px solid #000034',
+                    h6: {
+                      color: theme.palette.inputBackground.main,
+                    },
+                    p: {
+                      color: theme.palette.inputBackground.main,
+                    },
                   },
-                },
-                '&:focus-visible': {
-                  border: '1px solid #000034',
-                  outline: 'none',
-                },
-              }}
-              onClick={() => handleClick(item.invoiceType)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  handleClick(item.invoiceType);
-                }
-              }}>
-              <FormControlLabel
-                value={item.invoiceType}
-                control={
-                  <>
-                    {item.icon}
-                    <Box>
-                      <Typography variant="h6">{t(item.label)}</Typography>
-                      <Typography variant="body2" sx={{py: '0.4rem'}}>
-                        {t(item.description)}
-                      </Typography>
-                    </Box>
-                  </>
-                }
-                label=""
-                checked={selectedValue === item.invoiceType}
-              />
-            </Grid>
-          ))}
+                  '&:focus-visible': {
+                    border: '1px solid #000034',
+                    outline: 'none',
+                  },
+                }}
+                onClick={() => handleClick(item.invoiceType)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleClick(item.invoiceType);
+                  }
+                }}>
+                <FormControlLabel
+                  value={item.invoiceType}
+                  control={
+                    <>
+                      {item.icon}
+                      <Box>
+                        <Typography variant="h6">{t(item.label)}</Typography>
+                        <Typography variant="body2" sx={{py: '0.4rem'}}>
+                          {t(item.description)}
+                        </Typography>
+                      </Box>
+                    </>
+                  }
+                  label=""
+                  checked={selectedValue === item.invoiceType}
+                />
+              </Grid>
+            ))}
         </RadioGroup>
       </DialogContent>
       <DialogActions>
