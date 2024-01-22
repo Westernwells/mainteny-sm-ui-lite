@@ -73,6 +73,8 @@ export const getInvoiceActivityTitle = (type: InvoiceActivityType): string => {
       return 'Payment updated';
     case InvoiceActivityType.PAYMENT_DELETED:
       return 'Payment deleted';
+    case InvoiceActivityType.INVOICE_EMAIL_SENT_FAILED:
+      return 'Invoice not successfully sent';
     default:
       return '';
   }
@@ -98,6 +100,8 @@ export const invoiceStatusToString = (type: InvoiceActivityType): string => {
       return 'Payment updated';
     case InvoiceActivityType.PAYMENT_DELETED:
       return 'Payment deleted';
+    case InvoiceActivityType.INVOICE_EMAIL_SENT_FAILED:
+      return 'Invoice not successfully sent';
     default:
       return '';
   }
@@ -116,6 +120,7 @@ export const getInvoiceActivityColor = (type: InvoiceActivityType): string => {
       return theme.palette.success.main;
     case InvoiceActivityType.EXPIRED:
     case InvoiceActivityType.PAYMENT_DELETED:
+    case InvoiceActivityType.INVOICE_EMAIL_SENT_FAILED:
       return theme.palette.error.main;
     case InvoiceActivityType.CREATED:
     case InvoiceActivityType.UPDATED:
