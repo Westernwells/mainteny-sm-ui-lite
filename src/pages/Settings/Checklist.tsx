@@ -266,27 +266,35 @@ export const Checklist = () => {
 
   const isNameInvalid = true;
 
+  const renderDraggableItem = ({provided, item, index}: any) => (
+    <Box
+      ref={provided.innerRef}
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+      style={{userSelect: 'none'}}>
+      <ChecklistComponent
+        listRef={listRef}
+        index={index}
+        component={item}
+        formik={formik}
+        draggableProvided={provided}
+        isDragging={draggingComponentId === item.id}
+      />
+    </Box>
+  );
+
   const rowRenderer = ({index, style}: {index: number; style: any}) => {
     const component = values.components[index];
     return (
       <Box style={style}>
         <Draggable key={component.id} draggableId={component.id} index={index}>
-          {(draggableProvided: DraggableProvided) => (
-            <Box
-              ref={draggableProvided.innerRef}
-              {...draggableProvided.draggableProps}
-              {...draggableProvided.dragHandleProps}
-              style={{...draggableProvided.draggableProps.style}}>
-              <ChecklistComponent
-                listRef={listRef}
-                index={index}
-                component={component}
-                formik={formik}
-                draggableProvided={draggableProvided}
-                isDragging={draggingComponentId === component.id}
-              />
-            </Box>
-          )}
+          {(draggableProvided: DraggableProvided) =>
+            renderDraggableItem({
+              provided: draggableProvided,
+              item: component,
+              index,
+            })
+          }
         </Draggable>
       </Box>
     );
@@ -380,7 +388,15 @@ export const Checklist = () => {
               <DragDropContext
                 onDragEnd={onDragComponentEnd}
                 onBeforeCapture={onBeforeCapture}>
-                <Droppable droppableId="droppable">
+                <Droppable
+                  droppableId="droppable"
+                  mode="virtual"
+                  renderClone={(provided, snapshot, rubric) =>
+                    renderDraggableItem({
+                      provided,
+                      item: values.components[rubric.source.index],
+                    })
+                  }>
                   {(provided) => (
                     <Box
                       pt={4}
