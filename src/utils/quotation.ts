@@ -18,6 +18,8 @@ export const getQuotationActivityTitle = (
       return 'Service Job added';
     case QuotationActivityType.SERVICE_ORDER_REMOVED:
       return 'Service Job removed';
+    case QuotationActivityType.PRINTED:
+      return 'Quotation printed';
     default:
       return '';
   }

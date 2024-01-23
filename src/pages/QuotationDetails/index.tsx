@@ -7,10 +7,15 @@ import {
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {PdfGenerationStatus} from 'models/misc';
-import {useEffect} from 'react';
+import {useEffect, useLayoutEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {ViewQuotation} from './ViewQuotation';
 
-export const QuotationDetails = () => {
+interface Props {
+  getCurrentPageTitle?: (title: string) => void;
+}
+
+export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
   const {id: quotationId} = useParams();
 
   const {
@@ -20,12 +25,20 @@ export const QuotationDetails = () => {
     isFetched,
     refetch,
   } = useQuotationDetails(quotationId);
+  const {t} = useTranslation();
   const {data: quotationActivities, isLoading: isLoadingQuotationActivities} =
     useQuotationActivities({quotationId: quotationId ?? ''});
 
   const {data: downloadUrl, isLoading: isLoadingDownloadUrl} = useDownloadUrl(
     isFetched ? [quotation!.additionalInfo.pdfPath] : [],
   );
+  const [externalId, setExternalId] = useState('');
+
+  useLayoutEffect(() => {
+    if (getCurrentPageTitle) {
+      getCurrentPageTitle(`${t('Quotation Details')} - ${externalId}`);
+    }
+  }, [externalId, t]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -36,7 +49,7 @@ export const QuotationDetails = () => {
         refetch();
       }
     }, 3000);
-
+    setExternalId(quotation?.externalId || '');
     return () => {
       clearInterval(timer);
     };

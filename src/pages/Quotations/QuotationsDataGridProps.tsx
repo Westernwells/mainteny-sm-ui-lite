@@ -29,7 +29,7 @@ export const getQuotationStatusStyles = (
     case QuotationStatus.DRAFT:
       return {label: 'Draft', color: 'eden.light'};
     case QuotationStatus.REJECTED:
-      return {label: 'Denied', color: 'error'};
+      return {label: 'Rejected', color: 'error'};
     case QuotationStatus.SENT_TO_CLIENT:
       return {label: 'Sent', color: 'primary.mainLight'};
     default:

@@ -121,6 +121,7 @@ export enum QuotationActivityType {
   REJECTED = 'REJECTED',
   SERVICE_ORDER_ADDED = 'SERVICE_ORDER_ADDED',
   SERVICE_ORDER_REMOVED = 'SERVICE_ORDER_REMOVED',
+  PRINTED = 'PRINTED',
 }
 
 export interface QuotationActivityView {

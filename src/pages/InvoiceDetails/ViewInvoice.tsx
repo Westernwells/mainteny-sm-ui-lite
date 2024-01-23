@@ -407,7 +407,7 @@ export const ViewInvoice = ({
                 {serviceOrder && (
                   <Typography
                     variant="caption"
-                    sx={{color: 'text.secondary', fontSize: '0.6rem'}}
+                    sx={{color: 'text.secondary', fontSize: '0.7rem'}}
                     display="block"
                     mt="-0.25rem">
                     {t('Created on {{creationDate}}', {

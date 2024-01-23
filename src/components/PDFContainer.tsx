@@ -24,7 +24,7 @@ export const PDFContainer = ({url}: Props) => {
       contentContainerStyles={{
         background: '#f2f6f8',
         boxShadow: 'none',
-        padding: '16px',
+        padding: '0px',
         mx: '0em',
       }}>
       <Box
@@ -32,7 +32,9 @@ export const PDFContainer = ({url}: Props) => {
         overflow="hidden"
         sx={{
           overflowY: pages > 1 ? 'scroll' : 'initial',
-
+          '& .react-pdf__message': {
+            margin: '1em',
+          },
           '& .react-pdf__Page__canvas': {
             margin: '0 auto',
             width: '100% !important',
@@ -58,8 +60,8 @@ export const PDFContainer = ({url}: Props) => {
                 style={{
                   marginBottom: '2em',
                   background: 'rgb(247, 249, 252)',
-                  padding: '2em',
-                  border: '40px solid white',
+                  padding: '1.5em',
+                  border: '20px solid white',
                 }}>
                 <Page
                   renderTextLayer={false}
