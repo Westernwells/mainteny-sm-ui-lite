@@ -1982,5 +1982,8 @@
   "Article cannot be empty": "Der Artikel darf nicht leer sein",
   "Article Type": "Artikeltyp",
   "Article #": "Artikel Nr.",
-  "Selling Price (excl. VAT)": "Verkaufspreis (exkl. MwSt.)"
+  "Selling Price (excl. VAT)": "Verkaufspreis (exkl. MwSt.)",
+  "Invoice not sent": "Rechnung nicht erfolgreich gesendet",
+  "Rejected": "Abgelehnt",
+  "Sales Price Range": "Verkaufspreisspanne"
 }
