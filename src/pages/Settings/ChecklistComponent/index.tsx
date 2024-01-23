@@ -542,11 +542,16 @@ export const ChecklistComponent = ({
       id: getUniqueId(),
     });
     if (listRef.current) {
-      listRef.current.resetAfterIndex(0, true);
+      listRef.current.resetAfterIndex(index, true);
     }
   };
 
-  const deleteComponent = () => arrayFields.remove(index);
+  const deleteComponent = () => {
+    arrayFields.remove(index);
+    if (listRef.current) {
+      listRef.current.resetAfterIndex(0, true);
+    }
+  };
 
   const handleCheckOption = (id: string) => {
     const newData = {...form.getValues()};
@@ -576,7 +581,7 @@ export const ChecklistComponent = ({
     data.components[index].options.splice(foundIndex, 1);
     form.reset(data);
     if (listRef.current) {
-      listRef.current.resetAfterIndex(0, true);
+      listRef.current.resetAfterIndex(index, true);
     }
   };
 
@@ -585,7 +590,7 @@ export const ChecklistComponent = ({
     data.components[index].moreInfoInNote = value;
     form.reset(data);
     if (listRef.current) {
-      listRef.current.resetAfterIndex(0, true);
+      listRef.current.resetAfterIndex(index, true);
     }
   };
 

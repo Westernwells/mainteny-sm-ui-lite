@@ -374,7 +374,7 @@ export const Checklist = () => {
                     onChange,
                     required: true,
                     sx: {
-                      '& .MfuiInputBase-root': {
+                      '& .MuiInputBase-root': {
                         height: '38px',
                         pt: 2,
                         fontSize: '31px',
