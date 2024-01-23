@@ -54,7 +54,7 @@ import {
 import {makePage} from 'utils/paging-utils';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import {ChecklistComponent} from './ChecklistComponent';
-// import {ChecklistPreview} from './ChecklistPreview';
+import {ChecklistPreview} from './ChecklistPreview';
 
 const availableComponents = [
   {
@@ -79,13 +79,7 @@ const availableComponents = [
   },
 ];
 
-const Row = ({
-  style,
-  index,
-  data,
-}: {
-  style: any;
-  index: number;
+interface Props {
   data: {
     listRef: MutableRefObject<any>;
     form: UseFormReturn<
@@ -97,30 +91,57 @@ const Row = ({
     >;
     draggingComponentId: string;
   };
-}) => {
+}
+
+const renderDraggableItem = ({
+  provided,
+  component,
+  index,
+  data,
+}: {
+  index: number;
+  component: ExtendedCheckListComponentRecord;
+  provided: DraggableProvided;
+} & Props) => (
+  <Box
+    ref={provided.innerRef}
+    {...provided.draggableProps}
+    {...provided.dragHandleProps}
+    style={{userSelect: 'none'}}>
+    <ChecklistComponent
+      listRef={data.listRef}
+      index={index}
+      component={component}
+      form={data.form}
+      arrayFields={data.arrayFields}
+      draggableProvided={provided}
+      isDragging={data.draggingComponentId === component.id}
+    />
+  </Box>
+);
+
+const Row = ({
+  style,
+  index,
+  data,
+}: {
+  style: any;
+  index: number;
+} & Props) => {
   const component = data.arrayFields.fields[
     index
   ] as ExtendedCheckListComponentRecord;
   return (
     <Box style={style}>
       <Draggable key={component.id} draggableId={component.id} index={index}>
-        {(draggableProvided: DraggableProvided) => (
-          <Box
-            ref={draggableProvided.innerRef}
-            {...draggableProvided.draggableProps}
-            {...draggableProvided.dragHandleProps}
-            style={{...draggableProvided.draggableProps.style}}>
-            <ChecklistComponent
-              listRef={data.listRef}
-              index={index}
-              component={component}
-              form={data.form}
-              arrayFields={data.arrayFields}
-              draggableProvided={draggableProvided}
-              isDragging={data.draggingComponentId === component.id}
-            />
-          </Box>
-        )}
+        {(draggableProvided: DraggableProvided) =>
+          renderDraggableItem({
+            provided: draggableProvided,
+            component,
+            index,
+            data,
+          })
+        }
       </Draggable>
     </Box>
   );
@@ -132,7 +153,7 @@ export const Checklist = () => {
   const location = useLocation();
   const checklist = (location.state as {checklist: CheckList})?.checklist;
   const {user} = useUserSession();
-  // const [isPreviewing, setIsPreviewing] = useState(false);
+  const [isPreviewing, setIsPreviewing] = useState(false);
   const [draggingComponentId, setDraggingComponentId] = useState<string>('');
   const listRef = useRef<VariableSizeList>(null);
   const {mutate: createChecklist, isLoading: isCreating} = useCreateChecklist(
@@ -211,8 +232,8 @@ export const Checklist = () => {
 
   const values = form.getValues();
   useEffect(() => {
-    // const hasEdit = location.search.includes('edit=1');
-    // setIsPreviewing(hasEdit);
+    const hasEdit = location.search.includes('edit=1');
+    setIsPreviewing(hasEdit);
 
     // When we create a new checklist add title by default 'Checklist Title'.
     // If a duplicate checklist is created with the same name we are doing workaround for it.
@@ -271,23 +292,20 @@ export const Checklist = () => {
       ...getComponentMock(type),
     });
 
-    if (listRef.current) {
-      listRef.current.resetAfterIndex(0);
-    }
-
     // workaround because setFieldValue do not recieve callback
     await Promise.resolve();
 
-    window.scrollTo({
-      top: document.body.scrollHeight,
-      behavior: 'smooth',
-    });
+    if (listRef.current) {
+      listRef.current.scrollToItem(arrayFields.fields.length, 'end');
+    }
   };
 
-  const isNameInvalid = true;
+  const isNameInvalid = !form.getValues('name');
+
   const getSize = (index: number) => {
     const type = arrayFields.fields[index]?.type;
-    const length = arrayFields.fields[index]?.options.length;
+    const moreInfo = arrayFields.fields[index]?.moreInfoInNote ? 1 : 0;
+    const length = (arrayFields.fields[index]?.options.length ?? 0) + moreInfo;
     const PADDING_VERTICAL = 48;
     const MARGIN_BOTTOM = 16;
     const calculateHeightOfSingleCheck =
@@ -374,7 +392,17 @@ export const Checklist = () => {
               <DragDropContext
                 onDragEnd={onDragComponentEnd}
                 onBeforeCapture={onBeforeCapture}>
-                <Droppable droppableId="droppable">
+                <Droppable
+                  droppableId="droppable"
+                  mode="virtual"
+                  renderClone={(provided, snapshot, rubric) =>
+                    renderDraggableItem({
+                      provided,
+                      component: values.components[rubric.source.index],
+                      data: {listRef, form, draggingComponentId, arrayFields},
+                      index: rubric.source.index,
+                    })
+                  }>
                   {(provided) => (
                     <Box
                       pt={4}
@@ -474,11 +502,11 @@ export const Checklist = () => {
         </PageCard>
       </Box>
 
-      {/* <ChecklistPreview */}
-      {/*  isPreviewing={isPreviewing} */}
-      {/*  onClosePreview={() => setIsPreviewing(false)} */}
-      {/*  formik={formik} */}
-      {/* /> */}
+      <ChecklistPreview
+        isPreviewing={isPreviewing}
+        onClosePreview={() => setIsPreviewing(false)}
+        form={form}
+      />
 
       <BottomDrawer
         isOpen
@@ -494,7 +522,7 @@ export const Checklist = () => {
               variant: 'outlined',
               sx: {bgcolor: theme.palette.inputBackground.main},
               startIcon: <PhoneAndroid />,
-              // onClick: () => setIsPreviewing(true),
+              onClick: () => setIsPreviewing(true),
             }}
           />
         }
