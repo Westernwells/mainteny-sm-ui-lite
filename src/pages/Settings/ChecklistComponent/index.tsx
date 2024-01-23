@@ -1,5 +1,5 @@
 import React, {MutableRefObject} from 'react';
-import {getIn} from 'formik';
+import {get} from 'lodash';
 import {theme} from 'theme';
 import {t} from 'i18next';
 import {
@@ -127,10 +127,7 @@ export const MultiChoiceComponent = ({
   handleMoreInfoInNote,
   isDragging,
 }: MultiChoiceComponentProps) => {
-  const isSubjectInvalid = !!(
-    getIn(form.formState.touchedFields, `components.${index}.subject`) &&
-    getIn(form.formState.errors, `components.${index}.subject`)
-  );
+  const isSubjectInvalid = !form.getValues(`components.${index}.subject`);
 
   const inputRef = form.register(`components.${index}.subject`, {
     required: true,
@@ -179,11 +176,11 @@ export const MultiChoiceComponent = ({
                 },
               );
               const isOptionInvalid = !!(
-                getIn(
+                get(
                   form.formState.touchedFields,
                   `components.${index}.options.${optionIndex}.text`,
                 ) &&
-                getIn(
+                get(
                   form.formState.errors,
                   `components.${index}.options.${optionIndex}.text`,
                 )
@@ -309,7 +306,6 @@ export const CheckboxComponent = ({
   const inputRef = form.register(`components.${index}.subject`, {
     required: true,
   });
-
   return (
     <>
       <Controller
@@ -338,10 +334,8 @@ export const CheckboxComponent = ({
           name: `components.${index}.subject`,
           variant: 'outlined',
           error: !!(
-            getIn(
-              form.formState.touchedFields,
-              `components.${index}.subject`,
-            ) && getIn(form.formState.errors, `components.${index}.subject`)
+            get(form.formState.touchedFields, `components.${index}.subject`) &&
+            get(form.formState.errors, `components.${index}.subject`)
           ),
           required: true,
           sx: {
@@ -371,8 +365,8 @@ export const HeaderComponent = ({
   deleteComponent,
 }: ComponentProps) => {
   const isSubjectInvalid = !!(
-    getIn(form.formState.touchedFields, `components.${index}.subject`) &&
-    getIn(form.formState.errors, `components.${index}.subject`)
+    get(form.formState.touchedFields, `components.${index}.subject`) &&
+    get(form.formState.errors, `components.${index}.subject`)
   );
 
   const inputRef = form.register(`components.${index}.subject`, {
@@ -434,8 +428,8 @@ export const TextComponent = ({
   isDragging,
 }: TextareaComponentProps) => {
   const isSubjectInvalid = !!(
-    getIn(form.formState.touchedFields, `components.${index}.subject`) &&
-    getIn(form.formState.errors, `components.${index}.subject`)
+    get(form.formState.touchedFields, `components.${index}.subject`) &&
+    get(form.formState.errors, `components.${index}.subject`)
   );
 
   const titleRef = form.register(`components.${index}.subject`, {
@@ -487,10 +481,10 @@ export const TextComponent = ({
               minRows={5}
               error={
                 !!(
-                  getIn(
+                  get(
                     form.formState.touchedFields,
                     `components[${index}].note`,
-                  ) && getIn(form.formState.errors, `components[${index}].note`)
+                  ) && get(form.formState.errors, `components[${index}].note`)
                 )
               }
               onChange={onChange}
