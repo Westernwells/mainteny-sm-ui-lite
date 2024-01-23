@@ -319,7 +319,7 @@ export const CheckboxComponent = ({
             onChange={onChange}
             size="small"
             sx={{
-              ml: -1,
+              ml: 1,
               '&.Mui-checked': {
                 color: '#4CAF50',
               },
