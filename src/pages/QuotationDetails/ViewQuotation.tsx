@@ -41,6 +41,7 @@ import {useTranslation} from 'react-i18next';
 import {useSnackbar} from 'notistack';
 import PathImage from 'assets/images/Path.svg';
 import {convertToMacro} from 'utils/utils';
+import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -253,15 +254,17 @@ export const ViewQuotation = ({
             contentContainerStyles={{display: 'flex', gap: '1.5em'}}>
             <Box>
               <FormLabel text="Quotation Number" sx={{color: 'text.main'}} />
-              <Typography variant="subtitle1">{quotation.number}</Typography>
+              <Typography variant="subtitle1" fontWeight="600">
+                {quotation.externalId || t('Unassigned')}
+              </Typography>
             </Box>
 
             <Box>
               <FormLabel
-                text="Total (excl. VAT)"
+                text="Total"
                 sx={{color: 'text.main', textTransform: 'initial'}}
               />
-              <Typography variant="subtitle1">
+              <Typography variant="subtitle1" fontWeight="600">
                 {formatCurrency(
                   quotation.totalAmount.netAmount /
                     10 ** quotation.totalAmount.fractionDigits!,
@@ -284,6 +287,7 @@ export const ViewQuotation = ({
         <Grid item xs sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
           <PageCard
             headerLabel="Service Job"
+            headerIcon={<ManageSearchOutlinedIcon sx={{color: '#8F9BB380'}} />}
             contentContainerStyles={{
               display: 'flex',
               gap: '1em',
