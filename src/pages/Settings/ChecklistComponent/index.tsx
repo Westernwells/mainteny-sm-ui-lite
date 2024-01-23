@@ -541,6 +541,9 @@ export const ChecklistComponent = ({
       ...(textAreaType ? {note} : {}),
       id: getUniqueId(),
     });
+    if (listRef.current) {
+      listRef.current.resetAfterIndex(0, true);
+    }
   };
 
   const deleteComponent = () => arrayFields.remove(index);
