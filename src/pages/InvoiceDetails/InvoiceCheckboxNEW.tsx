@@ -28,7 +28,8 @@ export const InvoiceCheckboxNEW = ({
     disableHoverListener={!disabled}
     title={t(tooltipTitle) || ''}
     placement="bottom"
-    arrow>
+    arrow
+    followCursor>
     <Box
       display="flex"
       justifyContent="space-between"
@@ -45,7 +46,7 @@ export const InvoiceCheckboxNEW = ({
       <IconButton disabled={disabled} onClick={handleAction}>
         <OpenInNew
           fontSize="small"
-          sx={{color: theme.palette.secondary.dark}}
+          sx={{color: disabled ? 'inherit' : theme.palette.secondary.dark}}
         />
       </IconButton>
     </Box>
