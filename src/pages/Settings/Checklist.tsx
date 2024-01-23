@@ -334,7 +334,7 @@ export const Checklist = () => {
         mt="1.5rem"
         mb="5rem"
         gap={3}>
-        <Box width="10%" maxWidth="47rem">
+        <Box width="100%" maxWidth="47rem">
           <PageCard
             containerStyles={{
               p: 4,

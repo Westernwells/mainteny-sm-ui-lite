@@ -60,7 +60,7 @@ export const ChecklistPreview = ({
       case CheckListComponentType.HEAD:
         return 30 + PADDING_VERTICAL + MARGIN_BOTTOM;
       case CheckListComponentType.SINGLE_CHECK:
-        return 200 + calculateHeightOfSingleCheck - (length - 1) * 12;
+        return 141 + calculateHeightOfSingleCheck - (length - 1) * 12;
       case CheckListComponentType.TEXT:
         return 174 + PADDING_VERTICAL + MARGIN_BOTTOM;
       default:
