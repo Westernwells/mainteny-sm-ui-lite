@@ -42,6 +42,7 @@ interface Props {
   disableBtnAction?: boolean;
   secondaryButtonStyles?: SxProps;
   testId?: string;
+  isTextCap?: boolean;
 }
 
 const a11yProps = (index: number) => ({
@@ -68,6 +69,7 @@ export const Tabs = ({
   secondaryButtonStyles,
   testId,
   hideDivider = false,
+  isTextCap = false,
 }: Props) => {
   const theme = useTheme();
 
@@ -185,7 +187,11 @@ export const Tabs = ({
                   },
                 }}>
                 <Box className="item-icon">{item.icon}</Box>
-                <Typography variant="subtitle1">{t(item.label)}</Typography>
+                <Typography
+                  variant="subtitle1"
+                  sx={{textTransform: isTextCap ? 'uppercase' : 'inherit'}}>
+                  {t(item.label)}
+                </Typography>
               </Box>
             }
             sx={{

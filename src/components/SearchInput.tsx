@@ -78,6 +78,8 @@ export const SearchInput = ({
       onChange={debouncedChangeHandler}
       InputLabelProps={{shrink: variant === 'outlined'}}
       InputProps={{
+        id: label,
+        name: label,
         endAdornment: (
           <InputAdornment position="end">
             <SearchIcon />

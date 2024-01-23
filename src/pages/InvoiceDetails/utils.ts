@@ -16,35 +16,42 @@ export const formatInvoiceRecord = (
   value: InvoiceFormData,
 ): CreateInvoice | UpdateInvoice => ({
   ...value,
+  ...value,
   subject: value.subject,
   description: value.description,
   dueDate: value.dueDate ? dateToString(value.dueDate) : '',
   sentDate: value.sentDate ? dateToString(value.sentDate) : '',
   type: value.type,
-  items: value.items.map((item) => ({
-    ...item,
-    discount: item.discount
-      ? {
-          ...item.discount,
-          amount:
-            item.discount.type === 'AMOUNT'
-              ? {
-                  ...item.discount?.amount,
-                  currency: item.discount?.amount?.currency!,
-                  value:
-                    (item.discount?.amount?.value ?? 0) *
-                    10 ** (item.discount?.amount?.fractionDigits ?? 2),
-                }
-              : undefined,
-        }
-      : undefined,
-    payment: item.payment
-      ? item.payment
-      : value.payment?.type === PaymentType.PER_ITEM
-      ? // set payment percentage to 0 because it's required even if item is already paid and payment type is per item
-        {type: InvoiceItemPaymentType.PERCENTAGE, percentage: 0}
-      : undefined,
-  })),
+  items: value.items.map((item) => {
+    const {article, ...rest} = item;
+    const modifiedArticle = {...article};
+    delete modifiedArticle.id;
+
+    return {
+      ...rest,
+      article: modifiedArticle,
+      discount: rest.discount
+        ? {
+            ...rest.discount,
+            amount:
+              rest.discount.type === 'AMOUNT'
+                ? {
+                    ...rest.discount.amount,
+                    currency: rest.discount.amount?.currency!,
+                    value:
+                      (rest.discount.amount?.value ?? 0) *
+                      10 ** (rest.discount.amount?.fractionDigits ?? 2),
+                  }
+                : undefined,
+          }
+        : undefined,
+      payment: rest.payment
+        ? rest.payment
+        : value.payment?.type === PaymentType.PER_ITEM
+        ? {type: InvoiceItemPaymentType.PERCENTAGE, percentage: 0}
+        : undefined,
+    };
+  }),
   paymentTerms: value.paymentTerms,
   propertyOwnerId: value.propertyOwnerId,
   serviceCompanyId: value.serviceCompanyId,

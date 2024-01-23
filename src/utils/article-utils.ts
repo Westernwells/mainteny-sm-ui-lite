@@ -47,3 +47,16 @@ export const getItemRecord = (
     },
   };
 };
+
+export const getArticleTypeText = (type: ArticleType): string => {
+  switch (type) {
+    case ArticleType.LABOR:
+      return 'Labor';
+    case ArticleType.MATERIAL:
+      return 'Material';
+    case ArticleType.PACKAGE:
+      return 'Package';
+    default:
+      return '';
+  }
+};
