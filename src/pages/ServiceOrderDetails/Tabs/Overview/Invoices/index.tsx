@@ -66,7 +66,7 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
       (i) => i.type === InvoiceType.UPFRONT,
     );
     if (jobHasUpfrontInvoice) {
-      return [InvoiceType.FINAL, InvoiceType.UPFRONT];
+      return [InvoiceType.FINAL, InvoiceType.PARTIAL, InvoiceType.UPFRONT];
     }
 
     return [];

@@ -795,6 +795,24 @@ export const InvoiceForm = ({
   const hasAddressValues = (addressComponent?: AddressComponent) =>
     Object.values(addressComponent ?? {}).some((value) => !!value);
 
+  const hasPreviousInvoices = previousInvoices.length > 0;
+  const firstInvoiceType = sortedPreviousInvoices?.[0]?.type ?? null;
+  const isFinalInvoice = formik.values.type === InvoiceType.FINAL;
+  const havePartialInvoices = previousInvoices.some(
+    (i) => i.type === InvoiceType.PARTIAL,
+  );
+  const isPartialInvoice =
+    formik.values.type === InvoiceType.PARTIAL ||
+    (hasPreviousInvoices &&
+      ((firstInvoiceType === InvoiceType.PARTIAL && isFinalInvoice) ||
+        (firstInvoiceType === InvoiceType.UPFRONT && havePartialInvoices)));
+  const isUpfrontInvoice =
+    !isPartialInvoice &&
+    (formik.values.type === InvoiceType.UPFRONT ||
+      (hasPreviousInvoices &&
+        firstInvoiceType === InvoiceType.UPFRONT &&
+        isFinalInvoice));
+
   return (
     <Box>
       {invoice && (
@@ -1100,10 +1118,7 @@ export const InvoiceForm = ({
           </Grid>
 
           {/* PARTIAL PAYMENTS */}
-          {formik.values.type === InvoiceType.PARTIAL ||
-          (previousInvoices.length > 0 &&
-            previousInvoices[0].type === InvoiceType.PARTIAL &&
-            formik.values.type === InvoiceType.FINAL) ? (
+          {isPartialInvoice ? (
             isLoadingPreviousInvoices ? (
               <Progress />
             ) : (
@@ -1116,10 +1131,7 @@ export const InvoiceForm = ({
           ) : null}
 
           {/* UPFRONT PAYMENTS */}
-          {formik.values.type === InvoiceType.UPFRONT ||
-          (previousInvoices.length > 0 &&
-            previousInvoices[0].type === InvoiceType.UPFRONT &&
-            formik.values.type === InvoiceType.FINAL) ? (
+          {isUpfrontInvoice ? (
             isLoadingPreviousInvoices ? (
               <Progress />
             ) : (
@@ -1418,7 +1430,8 @@ export const InvoiceForm = ({
                         disabled={
                           previousInvoices.length > 0 &&
                           key !==
-                            previousInvoices[0].additionalInfo.payment?.type
+                            sortedPreviousInvoices[0].additionalInfo.payment
+                              ?.type
                         }
                       />
                     ),
