@@ -17,12 +17,28 @@ export const capitalize = (role: any[]) => {
   return roles;
 };
 
+export const formatSearchParamsPageIndex = (
+  pageIndex: number,
+  queryParams: URLSearchParams,
+) => {
+  const currentParams = Object.fromEntries([...queryParams]);
+  return {...currentParams, pageIndex: pageIndex.toString()};
+};
+
 export const formatSearchParams = (
   options: {[key: string]: string},
   queryParams: URLSearchParams,
 ) => {
   const currentParams = Object.fromEntries([...queryParams]);
   return {...currentParams, ...options};
+};
+
+export const formatSearchParamsPageSize = (
+  newPageSize: number,
+  queryParams: URLSearchParams,
+) => {
+  const currentParams = Object.fromEntries([...queryParams]);
+  return {...currentParams, pageSize: newPageSize.toString()};
 };
 
 // Converts macro to text, eg: 'SERVICE_MANAGER' -> 'Service Manager'
@@ -189,8 +205,8 @@ export const getUniqueId = () => Math.random().toString(36).substring(2, 9);
 export const getPercentage = (num: number, total: number) =>
   Math.round((num / total) * 100);
 
-export const getAmountFromPercentage = (percent: number, totalAmount: number) =>
-  (percent / 100) * totalAmount;
+export const getAmountFromPercentage = (percent: number, amount: number) =>
+  (percent / 100) * amount;
 
 export const formatAddressFullname = (
   address: AddressRecord | null | undefined,

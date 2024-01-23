@@ -11,6 +11,7 @@ import {ReactComponent as StockIllustration} from 'assets/illustrations/Stock.sv
 import {ReactComponent as SupplierIllustration} from 'assets/illustrations/Supplier.svg';
 import {ReactComponent as MobileUsabilityTesting} from 'assets/illustrations/MobileUsabilityTesting.svg';
 import {ReactComponent as UXAnalytics} from 'assets/illustrations/UXAnalytics.svg';
+import {ReactComponent as NotePadIcon} from 'assets/icons/NotePadIcon.svg';
 import {Button} from './Button';
 
 interface Props extends BoxProps {
@@ -27,6 +28,7 @@ interface Props extends BoxProps {
     | 'stock'
     | 'supplier'
     | 'checklist'
+    | 'articles'
     | 'emptyChecklistComponents';
   showActionBtn?: boolean;
   btnLabel?: string;
@@ -82,6 +84,8 @@ export const EmptySection = ({
         );
       case 'emptyChecklistComponents':
         return <UXAnalytics style={{width: '100%', height: '100%'}} />;
+      case 'articles':
+        return <NotePadIcon style={{width: '50%', height: '100%'}} />;
       default:
         return <LaptopIllustration style={{width: '100%', height: '100%'}} />;
     }

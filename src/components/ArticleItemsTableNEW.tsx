@@ -1,4 +1,4 @@
-import React, {useContext, useMemo, useState} from 'react';
+import React, {useContext} from 'react';
 import {useTranslation} from 'react-i18next';
 import {FormikProps} from 'formik';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
@@ -17,8 +17,6 @@ import {
   IconButton,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
-import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   applyDiscount,
@@ -26,8 +24,6 @@ import {
   applyPerItemDiscountOnItems,
   getAggregatedItemsVats,
 } from 'pages/InvoiceDetails/utils';
-import {TabItems, Tabs} from 'components/Tab';
-import {TabsBody} from 'components/TabsBody';
 import {
   DiscountType,
   DiscountTypeOptions,
@@ -35,7 +31,7 @@ import {
   InvoiceItemRecord,
 } from 'models/invoice';
 import {Amount} from 'models/misc';
-import {ArticleView} from 'models/article';
+import {ArticleType, ArticleView} from 'models/article';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {LanguageContext} from 'context/LanguageProvider';
 import {
@@ -43,13 +39,9 @@ import {
   calculateTotalWithPerItemDiscount,
 } from 'utils/calculate-total';
 import {getItemRecord} from 'utils/article-utils';
-import {fixRounding} from 'utils/utils';
+import {fixRounding, getUniqueId} from 'utils/utils';
 import {Button} from './Button';
-import {SelectModal} from './SelectModal';
-import {ArticlesDataGrid} from './DataGrid/ArticlesDataGrid';
-import {CustomPricesDataGrid} from './DataGrid/CustomPricesDataGrid';
 import {SelectButton} from './SelectButton';
-import {SearchInput} from './SearchInput';
 import {ArticleItemRowNEW} from './ArticleItemRowNEW';
 import {FormSelect} from './form/FormSelect';
 
@@ -68,10 +60,6 @@ export const ArticleItemsTableNEW = ({
 }: Props) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
-  const [tabValue, setTabValue] = useState(0);
-  const [search, setSearch] = useState('');
-
-  const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
 
   const subtotalExclVat = calculateTotalWithPerItemDiscount(formik.values);
   const subtotalExclVatFormatted = formatCurrency(subtotalExclVat, {
@@ -138,30 +126,20 @@ export const ArticleItemsTableNEW = ({
     };
     return getItemRecord(record, record.unitAmount.percentageVat);
   };
-  const tabItems: TabItems[] = useMemo(() => {
-    const tItems = [
-      {
-        label: 'Articles & Spare parts',
-        icon: <HomeRepairServiceIcon />,
-      },
-    ];
-    if (propertyOwnerId) {
-      tItems.push({
-        label: 'Custom prices',
-        icon: <ReceiptLongIcon />,
-      });
-    }
-    return tItems;
-  }, [propertyOwnerId]);
 
   const deleteItem = (indexPos: number) => {
     const newItems = items.filter((_, index) => indexPos !== index);
     setItems(newItems);
   };
 
-  const handleSelectItem = (row: ArticleView) => {
-    setItems([...items, articleViewToItem(row)]);
-    setIsArticleModalOpen(false);
+  const handleSelectItem = (row: ArticleView, indexPosition: number) => {
+    if (indexPosition >= 0 && indexPosition < items.length) {
+      const updatedItems = [...items];
+      updatedItems[indexPosition] = articleViewToItem(row);
+      setItems(updatedItems);
+    } else {
+      setItems([...items, articleViewToItem(row)]);
+    }
   };
 
   const setItemAtIndex = (
@@ -209,9 +187,44 @@ export const ArticleItemsTableNEW = ({
 
   const discountText = selectedLng === 'DE' ? 'Rabatt' : t('Discount');
 
+  const createEmptyItem = () => {
+    const blankItem = {
+      article: {
+        id: getUniqueId(),
+        name: '',
+        type: ArticleType.LABOR,
+        unitSellingAmount: {
+          netAmount: 0,
+          fractionDigits: currentCurrency.fractionDigits,
+          currency: currentCurrency.code,
+          grossAmount: 0,
+          percentageVat: 0,
+          vat: 0,
+        },
+      },
+      name: '',
+      description: '',
+      quantity: 0,
+      unitAmount: {
+        netAmount: 0,
+        fractionDigits: currentCurrency.fractionDigits,
+        currency: currentCurrency.code,
+        grossAmount: 0,
+        percentageVat: 0,
+        vat: 0,
+      },
+      discount: {
+        type: DiscountType.PERCENTAGE,
+        percentage: 0,
+      },
+    };
+    setItems([...items, blankItem]);
+  };
+
   const columns: {name: string; align?: TableCellProps['align']}[] = [
     {name: '#', align: 'right'},
     {name: 'Name'},
+    {name: 'Type'},
     {name: 'Unit Price'},
     {name: 'Quantity'},
     {name: 'VAT (%)'},
@@ -274,6 +287,8 @@ export const ArticleItemsTableNEW = ({
                 index={index}
                 deleteItem={deleteItem}
                 setItemAtIndex={setItemAtIndex}
+                propertyOwnerId={propertyOwnerId}
+                handleSelectItem={handleSelectItem}
               />
             ))}
           </TableBody>
@@ -293,7 +308,7 @@ export const ArticleItemsTableNEW = ({
                 variant: 'contained',
                 sx: {alignSelf: 'self-start'},
                 startIcon: <AddIcon />,
-                onClick: () => setIsArticleModalOpen(true),
+                onClick: createEmptyItem,
               }}
             />
             <Box px={3} pt={3} borderTop="1px solid" borderColor="grey.300">
@@ -391,7 +406,7 @@ export const ArticleItemsTableNEW = ({
                       />
                       <IconButton
                         onClick={handleRemoveDiscount}
-                        sx={{p: '0px', mr: -3.3, color: 'text.disabled'}}>
+                        sx={{p: '0px', mr: -3.1, color: 'text.disabled'}}>
                         <CloseIcon />
                       </IconButton>
                     </Box>
@@ -455,50 +470,13 @@ export const ArticleItemsTableNEW = ({
           <Box display="flex" alignItems="center" my="1em" gap="1em">
             <Typography variant="body2">1</Typography>
             <SelectButton
-              text="Select Articles & Custom Prices"
-              onClick={() => setIsArticleModalOpen(true)}
+              text="Add Article"
+              onClick={() => createEmptyItem()}
               sxContainer={{flexGrow: 1}}
             />
           </Box>
         )}
       </Box>
-      <SelectModal
-        isOpen={isArticleModalOpen}
-        onClose={() => setIsArticleModalOpen(false)}
-        header="Select Articles & Custom Prices">
-        <Box
-          sx={{
-            position: 'absolute',
-            right: 10,
-            zIndex: 9999,
-          }}>
-          <SearchInput
-            variant="outlined"
-            label="Search"
-            onValueChanged={(value) => setSearch(value)}
-          />
-        </Box>
-        <Tabs
-          tabItems={tabItems}
-          currentIndex={tabValue}
-          onChange={(index) => setTabValue(index)}>
-          <TabsBody value={tabValue} index={0}>
-            <ArticlesDataGrid
-              search={search}
-              setRowItem={handleSelectItem}
-              setSearch={() => setSearch('')}
-            />
-          </TabsBody>
-          <TabsBody value={tabValue} index={1}>
-            <CustomPricesDataGrid
-              search={search}
-              setSearch={() => setSearch('')}
-              setRowItem={handleSelectItem}
-              propertyOwnerId={propertyOwnerId}
-            />
-          </TabsBody>
-        </Tabs>
-      </SelectModal>
     </Box>
   );
 };

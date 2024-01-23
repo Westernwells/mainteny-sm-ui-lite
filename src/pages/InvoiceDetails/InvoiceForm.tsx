@@ -1065,7 +1065,7 @@ export const InvoiceForm = ({
 
             <FormInput
               props={{
-                id: 'description',
+                id: 'header-description',
                 name: 'description',
                 value: formik.values.description,
                 label: 'Description',
