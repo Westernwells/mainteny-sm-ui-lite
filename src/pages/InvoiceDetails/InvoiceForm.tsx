@@ -1400,12 +1400,10 @@ export const InvoiceForm = ({
             </Box>
 
             {/* PAYMENT TYPE */}
-            {/* don't show payment type for FULL and CREDIT_NOTE invoices */}
-            {[
-              InvoiceType.PARTIAL,
-              InvoiceType.UPFRONT,
-              InvoiceType.FINAL,
-            ].includes(formik.values.type) ? (
+            {/* don't show payment type for FULL, FINAL and CREDIT_NOTE invoices */}
+            {[InvoiceType.PARTIAL, InvoiceType.UPFRONT].includes(
+              formik.values.type,
+            ) ? (
               <Box>
                 <Typography variant="body2" color="grey.700">
                   {t('Payment type')}
