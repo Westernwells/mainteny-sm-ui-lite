@@ -66,11 +66,12 @@ export const Quotations = () => {
         pageIndex: 0,
       });
     }
-    if (textInput.current) {
+  }, [quotationsResource, search, `${status}`]); // hack to not re-render when number of units array reference changes
+  useEffect(() => {
+    if (textInput.current && !textInput.current.value) {
       textInput.current.value = search;
     }
-  }, [quotationsResource, search, `${status}`]); // hack to not re-render when number of units array reference changes
-
+  }, []);
   useEffect(() => {
     if (!isLoading) {
       setRows(makeRows(quotationsResource, formatDate));
