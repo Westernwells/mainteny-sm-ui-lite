@@ -352,6 +352,9 @@ export const InvoiceForm = ({
     },
   });
 
+  const alternativeAddress = formik.values.alternativeAddress?.component;
+  const beneficiaryAddress = formik.values.beneficiaryAddress?.component;
+  const billingAddress = formik.values.billingAddress?.component;
   const {data: previousInvoices = [], isLoading: isLoadingPreviousInvoices} =
     useFetchServiceOrderInvoices(formik.values.serviceOrderId);
   const sortedPreviousInvoices = useMemo(
@@ -694,7 +697,7 @@ export const InvoiceForm = ({
         pageSize: 4,
         query:
           formik.values.externalId && formik.values.externalId !== ''
-            ? encodeURIComponent(formik.values.externalId!)
+            ? encodeURIComponent(formik.values.externalId)
             : '',
         status: [],
         totalAmountFrom,
@@ -950,47 +953,57 @@ export const InvoiceForm = ({
               <>
                 <Grid item xs={6}>
                   <SelectAndEditCombined
-                    selected={hasAddressValues(
-                      formik.values.billingAddress?.component!,
-                    )}
+                    selected={hasAddressValues(billingAddress!)}
                     label="Billing Address"
                     buttonText="Add Billing Address"
                     address={formik.values.billingAddress}
                     cardOnClose={() => removeAddress('billingAddress')}
-                    editButtonText="Edit Billing Address"
-                    modalHeader="Edit Billing Address"
+                    editButtonText={
+                      !billingAddress
+                        ? 'Add Billing Address'
+                        : 'Edit Billing Address'
+                    }
+                    modalHeader={
+                      !billingAddress
+                        ? 'Add Billing Address'
+                        : 'Edit Billing Address'
+                    }
                     addressType="billingAddress"
                     formik={formik}
                   />
                 </Grid>
                 <Grid item xs={6} pl={2}>
                   <SelectAndEditCombined
-                    selected={hasAddressValues(
-                      formik.values.beneficiaryAddress?.component!,
-                    )}
+                    selected={hasAddressValues(beneficiaryAddress!)}
                     label="Beneficiary Address"
                     buttonText="Add Beneficiary Address"
                     address={formik.values.beneficiaryAddress}
                     cardOnClose={() => removeAddress('beneficiaryAddress')}
-                    editButtonText="Edit Beneficiary Address"
-                    modalHeader="Edit Beneficiary Address"
+                    editButtonText={
+                      !beneficiaryAddress
+                        ? 'Add Beneficiary Address'
+                        : 'Edit Beneficiary Address'
+                    }
+                    modalHeader={
+                      !beneficiaryAddress
+                        ? 'Add Beneficiary Address'
+                        : 'Edit Beneficiary Address'
+                    }
                     addressType="beneficiaryAddress"
                     formik={formik}
                   />
                 </Grid>
 
-                <Grid item xs={6}>
+                <Grid item xs={6} display="flex" flexDirection="column" gap={3}>
                   <SelectAndEditCombined
-                    selected={hasAddressValues(
-                      formik.values.alternativeAddress?.component!,
-                    )}
+                    selected={hasAddressValues(alternativeAddress!)}
                     label={
                       <Box>
                         <FormLabel
                           text={t('Alternative Invoice Destination')}
                         />
                         <Tooltip
-                          title={t(alternativeInvoiceDestinationTooltip) || ''}
+                          title={t(alternativeInvoiceDestinationTooltip) ?? ''}
                           placement="top"
                           componentsProps={{
                             tooltip: {
@@ -1002,8 +1015,13 @@ export const InvoiceForm = ({
                               },
                             },
                           }}>
-                          <IconButton sx={{fontSize: '1.375rem'}}>
-                            <InfoOutlinedIcon />
+                          <IconButton
+                            sx={{
+                              fontSize: '1.375rem',
+                              paddingTop: 0,
+                              paddingBottom: 0,
+                            }}>
+                            <InfoOutlinedIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       </Box>
@@ -1011,8 +1029,16 @@ export const InvoiceForm = ({
                     buttonText="Add Alternative Address"
                     address={formik.values.alternativeAddress}
                     cardOnClose={() => removeAddress('alternativeAddress')}
-                    editButtonText="Edit Alternative Address"
-                    modalHeader="Edit Alternative Address"
+                    editButtonText={
+                      !alternativeAddress
+                        ? 'Add Alternative Address'
+                        : 'Edit Alternative Address'
+                    }
+                    modalHeader={
+                      !alternativeAddress
+                        ? 'Add Alternative Address'
+                        : 'Edit Alternative Address'
+                    }
                     addressType="alternativeAddress"
                     formik={formik}
                   />
