@@ -324,7 +324,7 @@
   "Add Supplier": "Lieferant hinzufügen",
   "Save": "Speichern",
   "Edit Attachments": "Anhänge bearbeiten",
-  "Drag and Drop": "Drag and Drop",
+  "Drag and Drop": "Drag & Drop",
   "or": "oder",
   "Select File": "Datei auswählen",
   "Edit QR Code": "QR-Code bearbeiten",
@@ -399,7 +399,6 @@
   "Enter current stock": "Aktuellen Bestand eingeben",
   "Enter minimum stock": "Mindestbestand eingeben",
   "Enter minimum order quantity": "Mindestbestellmenge eingeben",
-  "Drag and Drap": "Drag & Drop",
   "OR": "ODER",
   "Add articles": "Artikel hinzufügen",
   "Enter package name": "Paketname eingeben",
@@ -1985,5 +1984,9 @@
   "Selling Price (excl. VAT)": "Verkaufspreis (exkl. MwSt.)",
   "Invoice not sent": "Rechnung nicht erfolgreich gesendet",
   "Rejected": "Abgelehnt",
-  "Sales Price Range": "Verkaufspreisspanne"
+  "Sales Price Range": "Verkaufspreisspanne",
+  "Service Info": "Wartungs Info",
+  "Notification Due (in days)": "Fällige Benachrichtigung (in Tagen)",
+  "Notes, Pictures and Attachments": "Notizen, Bilder und Anhänge",
+  "This job isn't linked to any quotation.": "Dieser Auftrag ist mit keinem Angebot verknüpft."
 }
