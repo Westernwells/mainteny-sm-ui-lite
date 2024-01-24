@@ -144,11 +144,13 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
         pageIndex: 0,
       });
     }
+  }, [search, status, cost, invoiceResource]);
 
-    if (textInput.current) {
+  useEffect(() => {
+    if (textInput.current && !textInput.current.value) {
       textInput.current.value = search;
     }
-  }, [search, status, cost, invoiceResource]);
+  }, []);
 
   useEffect(() => {
     if (!isLoading) {
