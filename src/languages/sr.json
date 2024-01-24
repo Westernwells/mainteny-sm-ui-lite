@@ -2000,5 +2000,9 @@
   "Service Info": "Servisne Informacije",
   "Notification Due (in days)": "Rok za obaveštenje (u danima)",
   "Notes, Pictures and Attachments": "Beleške, slike i prilozi",
-  "This job isn't linked to any quotation.": "Ovaj posao nije povezan ni sa jednim citatom."
+  "This job isn't linked to any quotation.": "Ovaj posao nije povezan ni sa jednim citatom.",
+  "Email with {{invoiceDetails}} by {{creator}} to {{email}} not delivered": "Imejl sa {{invoiceDetails}} od {{creator}} na {{email}} nije isporučen",
+  "Email with {{invoiceDetails}} by {{creator}} to {{email}} delivered": "Isporučena e-pošta sa {{invoiceDetails}} od {{creator}} na {{email}}",
+  "Email with {{invoiceDetails}}  to {{email}} not delivered": "Poruka e-pošte sa {{invoiceDetails}} na {{email}} nije isporučena",
+  "Email with {{invoiceDetails}}  to {{email}} delivered": "Isporučena e-pošta sa {{invoiceDetails}} na {{email}}"
 }
