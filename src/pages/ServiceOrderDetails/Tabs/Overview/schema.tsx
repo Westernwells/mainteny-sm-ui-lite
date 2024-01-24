@@ -100,10 +100,7 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
             icon={<InfoOutlined sx={{color: theme.palette.info.main}} />}
             label="NUMBER"
             bodyText={serviceOrderDetails.contract?.externalId || '-'}
-            navigateTo={
-              serviceOrderDetails.contract?.externalId &&
-              `/contracts/details/${serviceOrderDetails.contract?.id}`
-            }
+            navigateTo={`/contracts/details/${serviceOrderDetails.contract?.id}`}
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
             iconMaxHeight="3em"
