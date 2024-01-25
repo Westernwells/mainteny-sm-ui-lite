@@ -1,5 +1,5 @@
 import {defineConfig} from 'cypress';
-import coverage from '@cypress/code-coverage/task'
+import coverage from '@cypress/code-coverage/task';
 
 require('dotenv').config({path: '.env.stage'});
 
@@ -8,8 +8,8 @@ export default defineConfig({
     baseUrl: process.env.REACT_APP_BASE_URL,
     chromeWebSecurity: false,
     setupNodeEvents(on, config) {
-      coverage(on, config)
-      return config
+      coverage(on, config);
+      return config;
     },
   },
   component: {
@@ -17,13 +17,12 @@ export default defineConfig({
       framework: 'react',
       bundler: 'vite',
     },
-    setupNodeEvents(on, config){
-      coverage(on, config)
-      return config
-    }
+    setupNodeEvents(on, config) {
+      coverage(on, config);
+      return config;
+    },
   },
   env: {
     REACT_APP_API_URL: process.env.REACT_APP_API_URL,
   },
-  pageLoadTimeout: 90000
 });
