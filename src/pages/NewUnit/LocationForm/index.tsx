@@ -24,7 +24,6 @@ const validationSchema = Yup.object().shape({
       fullName: Yup.string().nullable().required('Address is required'),
       component: Yup.object().shape({
         country: Yup.string().required('Country is required'),
-        postalCode: Yup.string().required('Postal code is required'),
         state: Yup.string().required('State is required'),
         city: Yup.string().required('City is required'),
         street: Yup.string().required('Street is required'),
@@ -153,7 +152,6 @@ export const LocationForm = ({
                 placeholder: '',
                 label: 'ZIP/Postal Code',
                 name: 'address.component.postalCode',
-                required: true,
                 value: formik.values.address?.component?.postalCode ?? '',
                 onChange: formik.handleChange,
                 onBlur: formik.handleBlur,
