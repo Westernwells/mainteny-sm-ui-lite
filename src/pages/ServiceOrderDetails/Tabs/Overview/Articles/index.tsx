@@ -121,7 +121,7 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
         ) : (
           <DataGridLayout
             fullHeight={false}
-            height={getDataGridHeight(rows.length, 100)}
+            height={getDataGridHeight(rows.length, rows.length, 70)}
             rows={rows}
             columns={columns}
             containerStyle={{
