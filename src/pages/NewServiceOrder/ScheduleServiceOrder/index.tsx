@@ -125,6 +125,7 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
     selectedTechnicians,
     scheduleFormErrored,
     dueDateFormErrored,
+    selectedRadioOption,
   ]);
 
   useEffect(() => {

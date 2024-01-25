@@ -147,7 +147,14 @@ export const SelectAndEditCombined = ({
         title={modalHeader}
         onCancel={onCloseDialog}
         onSave={onSaveAddress}
-        disableSaveBtn={!formik.values?.[addressType]?.component?.name}
+        disableSaveBtn={
+          addressType === 'billingAddress'
+            ? !formik.values?.[addressType]?.component?.street ||
+              !formik.values?.[addressType]?.component?.city ||
+              !formik.values?.[addressType]?.component?.country ||
+              !formik.values?.[addressType]?.component?.postalCode
+            : !formik.values?.[addressType]?.component?.name
+        }
         dialogProps={{
           maxWidth: 'md',
           open: isModalOpen || false,
