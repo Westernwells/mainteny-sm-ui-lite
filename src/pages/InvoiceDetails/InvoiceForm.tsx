@@ -733,10 +733,6 @@ export const InvoiceForm = ({
     if (value) {
       handleSelectCustomer(value);
     } else {
-      // remove service order if there was a customer before but now there isn't
-      if (customer) {
-        setServiceOrder(undefined);
-      }
       setCustomer(undefined);
     }
   };
@@ -1036,8 +1032,6 @@ export const InvoiceForm = ({
                   <ServiceOrdersDataGrid
                     setRowItem={handleSelectServiceOrder}
                     selectedCustomer={customer}
-                    searchCustomer={customer?.name}
-                    propertyOwnerId={customer?.id ?? ''}
                   />
                 }
               />
