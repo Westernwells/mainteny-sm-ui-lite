@@ -24,7 +24,6 @@ const validationSchema = Yup.object().shape({
       fullName: Yup.string().nullable().required('Address is required'),
       component: Yup.object().shape({
         country: Yup.string().required('Country is required'),
-        postalCode: Yup.string().required('Postal code is required'),
         state: Yup.string().required('State is required'),
         city: Yup.string().required('City is required'),
         street: Yup.string().required('Street is required'),
@@ -87,7 +86,6 @@ export const LocationForm = ({
               handleBlur={formik.handleBlur}
               textFieldProps={{
                 placeholder: t('e.g. 34-36 Exmouth Market, London EC1R 4QE'),
-                required: true,
                 name: 'address.fullName',
               }}
               allowMap
