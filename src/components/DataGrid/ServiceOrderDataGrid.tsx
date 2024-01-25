@@ -25,10 +25,8 @@ import {styles} from './style';
 
 interface Props {
   setRowItem: (row: ServiceOrderView) => void;
-  searchCustomer?: string;
   selectedCustomer?: PropertyOwnerView | PropertyOwnerSimpleView;
   elevatorId?: string;
-  propertyOwnerId?: string;
 }
 
 export const columns: GridColDef[] = [
@@ -93,12 +91,10 @@ const pageSize = 25;
 
 export const ServiceOrdersDataGrid = ({
   setRowItem,
-  searchCustomer,
   elevatorId,
-  propertyOwnerId,
   selectedCustomer,
 }: Props) => {
-  const [search, setSearch] = useState(searchCustomer || '');
+  const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
@@ -118,7 +114,6 @@ export const ServiceOrdersDataGrid = ({
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: search,
-      ...(propertyOwnerId ? {propertyOwnerId} : {}),
     },
     {keepPreviousData: true},
   );
