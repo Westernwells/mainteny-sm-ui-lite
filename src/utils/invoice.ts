@@ -1,12 +1,15 @@
 import useTheme from '@mui/material/styles/useTheme';
 import {
   InvoiceActivityType,
+  InvoiceActivityView,
   InvoiceItemRecord,
   InvoiceStatus,
   InvoiceStatusView,
+  InvoiceView,
 } from 'models/invoice';
 import {Amount} from 'models/misc';
 import {QuotationItemRecord} from 'models/quotation';
+import {useTranslation} from 'react-i18next';
 
 export const getTotalFromArticles = (
   items: QuotationItemRecord[] | InvoiceItemRecord<Amount>[],
@@ -75,6 +78,51 @@ export const getInvoiceActivityTitle = (type: InvoiceActivityType): string => {
       return 'Payment deleted';
     case InvoiceActivityType.INVOICE_EMAIL_SENT_FAILED:
       return 'Invoice not sent';
+    default:
+      return '';
+  }
+};
+
+export const getInvoiceActivityDescription = (
+  activity: InvoiceActivityView,
+  invoice: InvoiceView,
+): string => {
+  const {t} = useTranslation();
+  switch (activity.type) {
+    case InvoiceActivityType.SENT: {
+      const invoiceNumber = invoice.externalId ?? '';
+      const creatorInfo =
+        activity.meta.creator?.firstName ||
+        activity.meta.creator?.lastName ||
+        activity.meta.creator?.username;
+      return t(
+        `Email with {{invoiceDetails}} ${
+          creatorInfo ? `by {{creator}}` : ''
+        } to {{email}} delivered`,
+        {
+          creator: creatorInfo,
+          email: JSON.parse(activity.data).email || '',
+          invoiceDetails: invoiceNumber,
+        },
+      );
+    }
+    case InvoiceActivityType.INVOICE_EMAIL_SENT_FAILED: {
+      const invoiceNumber = invoice.externalId ?? '';
+      const creatorInfo =
+        activity.meta.creator?.firstName ||
+        activity.meta.creator?.lastName ||
+        activity.meta.creator?.username;
+      return t(
+        `Email with {{invoiceDetails}} ${
+          creatorInfo ? `by {{creator}}` : ''
+        } to {{email}} not delivered`,
+        {
+          creator: creatorInfo,
+          email: JSON.parse(activity.data).receivers[0] || '',
+          invoiceDetails: invoiceNumber,
+        },
+      );
+    }
     default:
       return '';
   }
