@@ -75,6 +75,10 @@ export const timeZones = [
     label: 'Europe/London',
     value: 'Europe/London',
   },
+  {
+    label: 'Africa/Lagos',
+    value: 'Africa/Lagos',
+  },
 ];
 
 export const EditSettings = ({formik}: Props) => {

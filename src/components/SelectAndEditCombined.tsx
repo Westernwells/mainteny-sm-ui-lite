@@ -1,4 +1,4 @@
-import {ReactNode, useMemo, useState} from 'react';
+import React, {ReactNode, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
 import {FormikProps} from 'formik';
@@ -9,6 +9,7 @@ import {InvoiceFormData} from 'models/invoice';
 import {EditCustomerForm} from 'pages/InvoiceDetails/EditCustomerForm';
 import {AddressRecord} from 'models/misc';
 import {formatAddressFullname} from 'utils/utils';
+import AddIcon from '@mui/icons-material/Add';
 import {FormLabel} from './form/FormLabel';
 import {SelectCard} from './SelectCard';
 import {SelectButton} from './SelectButton';
@@ -69,6 +70,36 @@ export const SelectAndEditCombined = ({
     setIsModalOpen(false);
   };
 
+  const renderSelectedButton = () => {
+    if (addressType === 'alternativeAddress') {
+      return (
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          flexDirection="column"
+          alignItems="flex-start">
+          <Button
+            label={t(buttonText)}
+            style={{color: theme.palette.primary.dark}}
+            buttonProps={{
+              size: 'small',
+              startIcon: <AddIcon />,
+              onClick: () => setIsModalOpen(true),
+            }}
+          />
+        </Box>
+      );
+    }
+
+    return (
+      <SelectButton
+        text={t(buttonText)}
+        onClick={() => setIsModalOpen(true)}
+        buttonProps={{size: 'small'}}
+      />
+    );
+  };
+
   return (
     <Box>
       {typeof label === 'string' ? (
@@ -109,18 +140,21 @@ export const SelectAndEditCombined = ({
           onClose={cardOnClose}
         />
       ) : (
-        <SelectButton
-          text={t(buttonText)}
-          onClick={() => setIsModalOpen(true)}
-          buttonProps={{size: 'small'}}
-        />
+        renderSelectedButton()
       )}
 
       <Dialog
         title={modalHeader}
         onCancel={onCloseDialog}
         onSave={onSaveAddress}
-        disableSaveBtn={!formik.values?.[addressType]?.component?.name}
+        disableSaveBtn={
+          addressType === 'billingAddress'
+            ? !formik.values?.[addressType]?.component?.street ||
+              !formik.values?.[addressType]?.component?.city ||
+              !formik.values?.[addressType]?.component?.country ||
+              !formik.values?.[addressType]?.component?.postalCode
+            : !formik.values?.[addressType]?.component?.name
+        }
         dialogProps={{
           maxWidth: 'md',
           open: isModalOpen || false,

@@ -91,11 +91,13 @@ export const Contracts = () => {
         pageIndex: 0,
       });
     }
+  }, [search, cost, status, contractResource]);
 
-    if (textInput.current) {
+  useEffect(() => {
+    if (textInput.current && !textInput.current.value) {
       textInput.current.value = search;
     }
-  }, [search, cost, status, contractResource]);
+  }, []);
 
   const costRangeConvertor = (selectedItems: string[]) => {
     const range = crConverter(selectedItems, currentCurrency.symbol);

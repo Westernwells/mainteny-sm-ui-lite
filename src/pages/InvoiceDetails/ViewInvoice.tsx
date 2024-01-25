@@ -49,7 +49,6 @@ import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useSnackbar} from 'notistack';
 import CustomSnackbar from 'components/CustomSnackbar';
-import {Notes} from 'components/Notes';
 import {LinearProgress, linearProgressClasses} from '@mui/material';
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
 import GradingOutlinedIcon from '@mui/icons-material/GradingOutlined';
@@ -59,6 +58,7 @@ import {CheckListComponentType} from 'models/checklist';
 import {ChecklistStatus} from 'models/service-order';
 import {validateDueDate} from 'utils/invoice-utils';
 import {InvoiceActivities} from './InvoiceActivities';
+import {Notes} from './Notes';
 
 interface Props {
   downloadUrl: string;
@@ -283,11 +283,7 @@ export const ViewInvoice = ({
               alignItems="center"
               justifyContent="flex-end"
               gap={0.5}>
-              <Notes
-                parentId={invoice.propertyOwner.id}
-                title="Customer Notes"
-                type="customer"
-              />
+              <Notes invoice={invoice!} />
             </Grid>
 
             <Grid item xs={4} textAlign="end">
@@ -506,7 +502,10 @@ export const ViewInvoice = ({
           {/* INVOICE ACTIVITY CARD */}
 
           {invoiceActivities?.length ? (
-            <InvoiceActivities activities={invoiceActivities} />
+            <InvoiceActivities
+              activities={invoiceActivities}
+              invoice={invoice}
+            />
           ) : null}
         </Grid>
       </Grid>

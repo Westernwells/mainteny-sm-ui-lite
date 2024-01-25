@@ -89,18 +89,15 @@ import {getItemRecord} from 'utils/article-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
 import {CustomerAutoComplete} from 'components/CustomerAutocomplete';
-import {ArticleItemsTableNEW} from 'components/ArticleItemsTableNEW';
 import {Progress} from 'components/Progress';
 import {ReactComponent as MapPinIllustration} from 'assets/illustrations/invoice/map-pin.svg';
 import {ReactComponent as HeaderIllustration} from 'assets/illustrations/invoice/header.svg';
-import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrations/invoice/wrench-screwdriver.svg';
 import {ReactComponent as FooterIllustration} from 'assets/illustrations/invoice/footer.svg';
 import {ReactComponent as PinIllustration} from 'assets/illustrations/invoice/pin.svg';
 import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/invoice/task-list-pen.svg';
 import {ComboBox} from 'components/ComboBox';
 import {StatusChip} from 'components/StatusChip';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
-import {Notes} from 'components/Notes';
 import {formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
@@ -108,6 +105,7 @@ import {EditFrom} from './EditFrom';
 import {SectionTitle} from './SectionTitle';
 import {PartialPaymentsSection} from './PartialPaymentsSection';
 import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
+import InvoiceFormArticleSection from './InvoiceFormArticleSection';
 
 interface Props {
   invoice?: InvoiceView;
@@ -352,6 +350,9 @@ export const InvoiceForm = ({
     },
   });
 
+  const alternativeAddress = formik.values.alternativeAddress?.component;
+  const beneficiaryAddress = formik.values.beneficiaryAddress?.component;
+  const billingAddress = formik.values.billingAddress?.component;
   const {data: previousInvoices = [], isLoading: isLoadingPreviousInvoices} =
     useFetchServiceOrderInvoices(formik.values.serviceOrderId);
   const sortedPreviousInvoices = useMemo(
@@ -480,14 +481,12 @@ export const InvoiceForm = ({
           invoiceCustomer?.otherAddress,
       );
 
-      formik.setFieldValue(
-        'dueDate',
-        invoice?.dueDate ? new Date(invoice.dueDate) : new Date(),
-      );
-      formik.setFieldValue(
-        'sentDate',
-        invoice?.sentDate ? new Date(invoice.sentDate) : new Date(),
-      );
+      if (invoice.dueDate) {
+        formik.setFieldValue('dueDate', new Date(invoice.dueDate));
+      }
+      if (invoice.sentDate) {
+        formik.setFieldValue('sentDate', new Date(invoice.sentDate));
+      }
       formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '');
       formik.setFieldValue(
         'type',
@@ -584,7 +583,7 @@ export const InvoiceForm = ({
 
       const dueDays =
         serviceOrder.contract?.additionalInfo?.invoiceDueDays || 0;
-      if (dueDays > 0) {
+      if (dueDays > 0 && formType === 'new') {
         formik.setFieldValue('dueDate', addDays(new Date(), dueDays));
         setResetDueDatePicker(true);
       }
@@ -624,7 +623,6 @@ export const InvoiceForm = ({
 
       return;
     }
-
     setIsSendEmailDialogOpen(true);
   };
 
@@ -694,7 +692,7 @@ export const InvoiceForm = ({
         pageSize: 4,
         query:
           formik.values.externalId && formik.values.externalId !== ''
-            ? encodeURIComponent(formik.values.externalId!)
+            ? encodeURIComponent(formik.values.externalId)
             : '',
         status: [],
         totalAmountFrom,
@@ -828,11 +826,6 @@ export const InvoiceForm = ({
             size="small"
             variant="filled"
           />
-          <Notes
-            parentId={invoice.propertyOwner.id}
-            title="Customer Notes"
-            type="customer"
-          />
         </Box>
       )}
       <Grid
@@ -950,47 +943,57 @@ export const InvoiceForm = ({
               <>
                 <Grid item xs={6}>
                   <SelectAndEditCombined
-                    selected={hasAddressValues(
-                      formik.values.billingAddress?.component!,
-                    )}
+                    selected={hasAddressValues(billingAddress!)}
                     label="Billing Address"
                     buttonText="Add Billing Address"
                     address={formik.values.billingAddress}
                     cardOnClose={() => removeAddress('billingAddress')}
-                    editButtonText="Edit Billing Address"
-                    modalHeader="Edit Billing Address"
+                    editButtonText={
+                      !billingAddress
+                        ? 'Add Billing Address'
+                        : 'Edit Billing Address'
+                    }
+                    modalHeader={
+                      !billingAddress
+                        ? 'Add Billing Address'
+                        : 'Edit Billing Address'
+                    }
                     addressType="billingAddress"
                     formik={formik}
                   />
                 </Grid>
                 <Grid item xs={6} pl={2}>
                   <SelectAndEditCombined
-                    selected={hasAddressValues(
-                      formik.values.beneficiaryAddress?.component!,
-                    )}
+                    selected={hasAddressValues(beneficiaryAddress!)}
                     label="Beneficiary Address"
                     buttonText="Add Beneficiary Address"
                     address={formik.values.beneficiaryAddress}
                     cardOnClose={() => removeAddress('beneficiaryAddress')}
-                    editButtonText="Edit Beneficiary Address"
-                    modalHeader="Edit Beneficiary Address"
+                    editButtonText={
+                      !beneficiaryAddress
+                        ? 'Add Beneficiary Address'
+                        : 'Edit Beneficiary Address'
+                    }
+                    modalHeader={
+                      !beneficiaryAddress
+                        ? 'Add Beneficiary Address'
+                        : 'Edit Beneficiary Address'
+                    }
                     addressType="beneficiaryAddress"
                     formik={formik}
                   />
                 </Grid>
 
-                <Grid item xs={6}>
+                <Grid item xs={6} display="flex" flexDirection="column" gap={3}>
                   <SelectAndEditCombined
-                    selected={hasAddressValues(
-                      formik.values.alternativeAddress?.component!,
-                    )}
+                    selected={hasAddressValues(alternativeAddress!)}
                     label={
                       <Box>
                         <FormLabel
                           text={t('Alternative Invoice Destination')}
                         />
                         <Tooltip
-                          title={t(alternativeInvoiceDestinationTooltip) || ''}
+                          title={t(alternativeInvoiceDestinationTooltip) ?? ''}
                           placement="top"
                           componentsProps={{
                             tooltip: {
@@ -1002,8 +1005,13 @@ export const InvoiceForm = ({
                               },
                             },
                           }}>
-                          <IconButton sx={{fontSize: '1.375rem'}}>
-                            <InfoOutlinedIcon />
+                          <IconButton
+                            sx={{
+                              fontSize: '1.375rem',
+                              paddingTop: 0,
+                              paddingBottom: 0,
+                            }}>
+                            <InfoOutlinedIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       </Box>
@@ -1011,8 +1019,16 @@ export const InvoiceForm = ({
                     buttonText="Add Alternative Address"
                     address={formik.values.alternativeAddress}
                     cardOnClose={() => removeAddress('alternativeAddress')}
-                    editButtonText="Edit Alternative Address"
-                    modalHeader="Edit Alternative Address"
+                    editButtonText={
+                      !alternativeAddress
+                        ? 'Add Alternative Address'
+                        : 'Edit Alternative Address'
+                    }
+                    modalHeader={
+                      !alternativeAddress
+                        ? 'Add Alternative Address'
+                        : 'Edit Alternative Address'
+                    }
                     addressType="alternativeAddress"
                     formik={formik}
                   />
@@ -1102,20 +1118,11 @@ export const InvoiceForm = ({
           </Grid>
 
           {/* ARTICLES */}
-          <Grid item xs={12} bgcolor="white" p={3}>
-            <Box pb={2}>
-              <SectionTitle
-                Icon={WrenchScrewdriverIllustration}
-                title="Articles"
-              />
-            </Box>
-            <ArticleItemsTableNEW
-              items={formik.values.items}
-              setItems={setInvoiceItems}
-              formik={formik}
-              propertyOwnerId={customer?.id ?? ''}
-            />
-          </Grid>
+          <InvoiceFormArticleSection
+            setItems={setInvoiceItems}
+            formik={formik}
+            propertyOwnerId={customer?.id ?? ''}
+          />
 
           {/* PARTIAL PAYMENTS */}
           {isPartialInvoice ? (
@@ -1400,12 +1407,10 @@ export const InvoiceForm = ({
             </Box>
 
             {/* PAYMENT TYPE */}
-            {/* don't show payment type for FULL and CREDIT_NOTE invoices */}
-            {[
-              InvoiceType.PARTIAL,
-              InvoiceType.UPFRONT,
-              InvoiceType.FINAL,
-            ].includes(formik.values.type) ? (
+            {/* don't show payment type for FULL, FINAL and CREDIT_NOTE invoices */}
+            {[InvoiceType.PARTIAL, InvoiceType.UPFRONT].includes(
+              formik.values.type,
+            ) ? (
               <Box>
                 <Typography variant="body2" color="grey.700">
                   {t('Payment type')}

@@ -46,7 +46,7 @@ import {
 } from 'utils/contract-utils';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import Tooltip from '@mui/material/Tooltip';
-import {formatDate} from 'utils/datetime';
+import {formatDate, isDateInPast} from 'utils/datetime';
 import {StatusChip} from 'components/StatusChip';
 import {capitalize} from 'lodash';
 import {Order} from 'models/misc';
@@ -186,13 +186,17 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       user?.userAccount?.serviceCompany?.settings?.contractNameTypes.find(
         (item) => item.name === formik.values.name,
       );
+    const isContractRenewable =
+      !formik.values.renewalTerms && isDateInPast(formik.values.endDate);
+
     const updatedContract = {
       ...contractDetails?.additionalInfo,
       type: contractNameType?.type || '',
       name: formik.values?.name || '',
-      renewalTerms: formik.values.renewalTerms
-        ? formik.values.renewalTerms
-        : null,
+      renewalTerms: formik.values.renewalTerms ? formik.values.renewalTerms : 0,
+      renewalDate: isContractRenewable
+        ? null
+        : contractDetails?.additionalInfo.renewalDate,
       price: {
         ...amountRecordForBackend({
           netAmount: +formik.values.price,
@@ -219,7 +223,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       paymentTermId: formik.values.paymentTermId,
       description: formik.values.description,
       externalId: formik.values.externalId,
-      autoRenewalCancelled: formik.values.autoRenewalCancelled,
+      autoRenewalCancelled: isContractRenewable,
     };
 
     await updateContract({

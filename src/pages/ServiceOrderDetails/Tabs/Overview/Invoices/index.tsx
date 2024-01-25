@@ -140,7 +140,7 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
       ) : (
         <DataGridLayout
           rows={rows}
-          height={getDataGridHeight(rows.length, 100)}
+          height={getDataGridHeight(rows.length, rows.length, 70)}
           columns={columns}
           fullHeight={false}
           containerStyle={{
