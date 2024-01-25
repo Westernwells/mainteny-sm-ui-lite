@@ -89,11 +89,9 @@ import {getItemRecord} from 'utils/article-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
 import {CustomerAutoComplete} from 'components/CustomerAutocomplete';
-import {ArticleItemsTableNEW} from 'components/ArticleItemsTableNEW';
 import {Progress} from 'components/Progress';
 import {ReactComponent as MapPinIllustration} from 'assets/illustrations/invoice/map-pin.svg';
 import {ReactComponent as HeaderIllustration} from 'assets/illustrations/invoice/header.svg';
-import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrations/invoice/wrench-screwdriver.svg';
 import {ReactComponent as FooterIllustration} from 'assets/illustrations/invoice/footer.svg';
 import {ReactComponent as PinIllustration} from 'assets/illustrations/invoice/pin.svg';
 import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/invoice/task-list-pen.svg';
@@ -108,6 +106,7 @@ import {EditFrom} from './EditFrom';
 import {SectionTitle} from './SectionTitle';
 import {PartialPaymentsSection} from './PartialPaymentsSection';
 import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
+import InvoiceFormArticleSection from './InvoiceFormArticleSection';
 
 interface Props {
   invoice?: InvoiceView;
@@ -1102,20 +1101,11 @@ export const InvoiceForm = ({
           </Grid>
 
           {/* ARTICLES */}
-          <Grid item xs={12} bgcolor="white" p={3}>
-            <Box pb={2}>
-              <SectionTitle
-                Icon={WrenchScrewdriverIllustration}
-                title="Articles"
-              />
-            </Box>
-            <ArticleItemsTableNEW
-              items={formik.values.items}
-              setItems={setInvoiceItems}
-              formik={formik}
-              propertyOwnerId={customer?.id ?? ''}
-            />
-          </Grid>
+          <InvoiceFormArticleSection
+            setItems={setInvoiceItems}
+            formik={formik}
+            propertyOwnerId={customer?.id ?? ''}
+          />
 
           {/* PARTIAL PAYMENTS */}
           {isPartialInvoice ? (

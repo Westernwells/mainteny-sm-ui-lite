@@ -1,4 +1,9 @@
-import {applyDiscount} from 'pages/InvoiceDetails/utils';
+import {
+  applyDiscount,
+  applyGlobalDiscountOnItems,
+  applyPerItemDiscountOnItems,
+  getAggregatedItemsVats,
+} from 'pages/InvoiceDetails/utils';
 import {ArticleType} from 'models/article';
 import {
   DiscountType,
@@ -6,8 +11,10 @@ import {
   InvoiceItemRecord,
   InvoiceView,
 } from 'models/invoice';
-import {Amount} from 'models/misc';
+import {Amount, Currency} from 'models/misc';
 import {ServiceOrderArticleView} from 'models/service-order';
+import {formatCurrency} from './currency';
+import {fixRounding} from './utils';
 
 export const calculateTotal = (arr: InvoiceItemRecord<Amount>[]) => {
   const sum = 0;
@@ -118,4 +125,55 @@ export const calculateOrderArticlesTotal = (arr: ServiceOrderArticleView[]) => {
         10 ** item.unitAmount.fractionDigits!,
     )
     .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
+};
+
+export const calculateArticleTotalWithVatFormatted = (
+  invoice: InvoiceFormData,
+  currentCurrency: Currency,
+) => {
+  const subtotalExclVat = calculateTotalWithPerItemDiscount(invoice);
+  const subtotalExclVatAfterDiscount = applyDiscount({
+    actualValue: subtotalExclVat,
+    ...(invoice.discount?.type === DiscountType.AMOUNT
+      ? {amount: invoice.discount?.amount?.value ?? 0}
+      : {percentage: invoice.discount?.percentage ?? 0}),
+  });
+
+  const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(invoice.items);
+
+  const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
+    itemsAfterPerItemDiscount,
+    invoice.discount,
+  );
+
+  const allItemsHasSameVAT = itemsAfterGlobalDiscount.every(
+    (item) =>
+      item.unitAmount.percentageVat ===
+      invoice.items[0].unitAmount.percentageVat,
+  );
+
+  const percentageVats = itemsAfterGlobalDiscount.length
+    ? allItemsHasSameVAT
+      ? [
+          {
+            percentageVat: itemsAfterGlobalDiscount[0].unitAmount.percentageVat,
+            vat:
+              subtotalExclVatAfterDiscount *
+              (itemsAfterGlobalDiscount[0].unitAmount.percentageVat / 100),
+          },
+        ]
+      : getAggregatedItemsVats(itemsAfterGlobalDiscount)
+    : [];
+
+  const totalAmountInclVats = calculateTotalAmountInclVats({
+    subtotalExclVatAfterDiscount,
+    percentageVats,
+  });
+
+  return formatCurrency(fixRounding(totalAmountInclVats, 2), {
+    currency: currentCurrency.code,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    roundingMode: 'floor',
+  });
 };
