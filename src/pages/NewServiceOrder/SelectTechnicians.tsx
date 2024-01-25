@@ -309,6 +309,22 @@ export const SelectTechnicians = ({
     </Box>
   );
 
+  const getSchedulePeriod = (period: 'start' | 'end' | 'now') => {
+    const now = new Date();
+    // add 5min to the current time
+    if (period === 'start') {
+      now.setMinutes(now.getMinutes() + 5);
+      return now;
+    }
+    // add a 1 hour, 5mins to the current time
+    if (period === 'end') {
+      now.setMinutes(now.getMinutes() + 65);
+      return now;
+    }
+    // retuns current time
+    return now;
+  };
+
   const renderCellItem = (
     order: ServiceOrderView,
     width: string,
@@ -377,7 +393,7 @@ export const SelectTechnicians = ({
 
         {selectedOption === RadioOptions.DUE_DATE ? (
           <DueDateForm
-            defaultStartDate={null}
+            defaultStartDate={getSchedulePeriod('start')}
             getDueDateFormValues={(form: DueDateFormProps) =>
               getDueDateFormValues(form)
             }
@@ -390,9 +406,9 @@ export const SelectTechnicians = ({
         {selectedOption === RadioOptions.SCHEDULE_TECHNICIAN ? (
           <ScheduleForm
             containerStyles={{pl: '1em', mt: '2em', maxWidth: '30%'}}
-            defaultEndDate={null}
+            defaultEndDate={getSchedulePeriod('end')}
             currentRadioOption={selectedOption}
-            defaultStartDate={null}
+            defaultStartDate={getSchedulePeriod('start')}
             defaultTechnician={null}
             scheduleFormIsErrored={(val) =>
               scheduleFormIsErrored && scheduleFormIsErrored(val)
