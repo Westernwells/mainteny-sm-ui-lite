@@ -99,6 +99,7 @@ export interface ContractAdditionalInfo {
   firstMaintenance: FirstMaintenance;
   firstInvoiceDate: string;
   autoRenewalCancelled: boolean;
+  renewalDate: string;
 }
 
 export interface ContractElevatorSimpleView {
