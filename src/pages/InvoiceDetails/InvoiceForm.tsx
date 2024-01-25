@@ -482,14 +482,12 @@ export const InvoiceForm = ({
           invoiceCustomer?.otherAddress,
       );
 
-      formik.setFieldValue(
-        'dueDate',
-        invoice?.dueDate ? new Date(invoice.dueDate) : new Date(),
-      );
-      formik.setFieldValue(
-        'sentDate',
-        invoice?.sentDate ? new Date(invoice.sentDate) : new Date(),
-      );
+      if (invoice.dueDate) {
+        formik.setFieldValue('dueDate', new Date(invoice.dueDate));
+      }
+      if (invoice.sentDate) {
+        formik.setFieldValue('sentDate', new Date(invoice.sentDate));
+      }
       formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '');
       formik.setFieldValue(
         'type',
@@ -586,7 +584,7 @@ export const InvoiceForm = ({
 
       const dueDays =
         serviceOrder.contract?.additionalInfo?.invoiceDueDays || 0;
-      if (dueDays > 0) {
+      if (dueDays > 0 && formType === 'new') {
         formik.setFieldValue('dueDate', addDays(new Date(), dueDays));
         setResetDueDatePicker(true);
       }
