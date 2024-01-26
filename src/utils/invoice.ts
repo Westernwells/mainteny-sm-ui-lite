@@ -1,4 +1,5 @@
 import useTheme from '@mui/material/styles/useTheme';
+import {t} from 'i18next';
 import {
   InvoiceActivityType,
   InvoiceActivityView,
@@ -9,7 +10,6 @@ import {
 } from 'models/invoice';
 import {Amount} from 'models/misc';
 import {QuotationItemRecord} from 'models/quotation';
-import {useTranslation} from 'react-i18next';
 
 export const getTotalFromArticles = (
   items: QuotationItemRecord[] | InvoiceItemRecord<Amount>[],
@@ -87,7 +87,6 @@ export const getInvoiceActivityDescription = (
   activity: InvoiceActivityView,
   invoice: InvoiceView,
 ): string => {
-  const {t} = useTranslation();
   switch (activity.type) {
     case InvoiceActivityType.SENT: {
       const invoiceNumber = invoice.externalId ?? '';
