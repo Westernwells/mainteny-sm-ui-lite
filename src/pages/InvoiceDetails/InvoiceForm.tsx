@@ -98,6 +98,7 @@ import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/in
 import {ComboBox} from 'components/ComboBox';
 import {StatusChip} from 'components/StatusChip';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
+import {MeasurementUnit} from 'models/articleForm';
 import {formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
@@ -655,11 +656,22 @@ export const InvoiceForm = ({
     return items;
   }, [downloadUrl, formik.values.dueDate]);
 
+  const hasArticleError = () =>
+    formik.values.items.some(
+      (item) =>
+        !item.article?.unit ||
+        !MeasurementUnit[item.article?.unit as MeasurementUnit] ||
+        !item.name,
+    );
+
   const isValid = () => {
     const valid =
       formik.values.subject &&
       formik.values.type.length &&
-      formik.values.items.length;
+      formik.values.items.length &&
+      !hasArticleError() &&
+      !!customer;
+
     if (formik.values.type !== InvoiceType.CREDIT_NOTE) {
       return !!valid;
     }
