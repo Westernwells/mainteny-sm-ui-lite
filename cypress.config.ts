@@ -26,4 +26,5 @@ export default defineConfig({
     REACT_APP_API_URL: process.env.REACT_APP_API_URL,
   },
   pageLoadTimeout: 120000,
+  defaultCommandTimeout: 10000,
 });
