@@ -256,10 +256,10 @@ export const DatePicker = ({
               sx: popperSx,
             },
             textField: {
+              sx: {width: '100%'},
               ...textFieldProps,
               size: textFieldProps?.size || 'small',
               label: t(`${textFieldProps?.label}`),
-              sx: {width: '100%'},
               InputLabelProps: {
                 shrink: true,
                 required,

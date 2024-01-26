@@ -1300,6 +1300,17 @@ export const InvoiceForm = ({
                   }}
                   textFieldProps={{
                     label: 'Start Date',
+                    ...(serviceOrder &&
+                      !formik.values.deliveryStartDate && {
+                        placeholder: t('No Start Date set'),
+                        sx: {
+                          input: {
+                            '&::placeholder': {
+                              typography: 'caption',
+                            },
+                          },
+                        },
+                      }),
                   }}
                 />
                 <DatePicker
@@ -1310,6 +1321,17 @@ export const InvoiceForm = ({
                   }}
                   textFieldProps={{
                     label: 'End Date',
+                    ...(serviceOrder &&
+                      !formik.values.deliveryEndDate && {
+                        placeholder: t('No End Date set'),
+                        sx: {
+                          input: {
+                            '&::placeholder': {
+                              typography: 'caption',
+                            },
+                          },
+                        },
+                      }),
                   }}
                 />
               </Box>
