@@ -321,7 +321,7 @@ export const ViewInvoice = ({
             <Box>
               <FormLabel text="Invoice Type" sx={{color: 'text.main'}} />
               <Typography variant="subtitle1" fontWeight="600">
-                {t(InvoiceTypeMap[invoice.type]).toUpperCase()}
+                {t(`${InvoiceTypeMap[invoice.type]} invoice`)}
               </Typography>
             </Box>
 
