@@ -367,13 +367,13 @@ export const fetchInvoiceComments = async (
 };
 
 export function useInvoiceComments(
-  id: string,
+  invoiceId: string,
   params: QueryInvoiceCommentsParams,
   options?: UseQueryOptions<any, any, any>,
 ) {
   return useQuery<Resource<Comment>, RestError>(
-    [qk.fetchInvoiceComments, params, id],
-    () => fetchInvoiceComments(id, params),
+    [qk.fetchInvoiceComments, params, invoiceId],
+    () => fetchInvoiceComments(invoiceId, params),
     {
       ...options,
     },
@@ -381,14 +381,14 @@ export function useInvoiceComments(
 }
 
 export function useInfiniteInvoiceComments(
-  id: string,
+  invoiceid: string,
   params: QueryInvoiceCommentsParams,
   options?: UseInfiniteQueryOptions<any, any, any>,
 ) {
   return useInfiniteQuery<Resource<Comment>, RestError, Resource<Comment>>(
-    [qk.fetchInvoiceComments, params, id, {infinite: true}],
+    [qk.fetchInvoiceComments, params, invoiceid, {infinite: true}],
     ({pageParam = 0}) =>
-      fetchInvoiceComments(id, {...params, pageIndex: pageParam}),
+      fetchInvoiceComments(invoiceid, {...params, pageIndex: pageParam}),
     {
       getNextPageParam: (lastPage) => {
         const currentTotal =
@@ -404,11 +404,11 @@ export function useInfiniteInvoiceComments(
 }
 
 export const postInvoiceComment = async (
-  id: string,
+  invoiceId: string,
   body: CreateInvoiceComment,
 ) => {
   const {data} = await axiosClient.post<{value: string}>(
-    `/api/invoices/${id}/comments`,
+    `/api/invoices/${invoiceId}/comments`,
     body,
   );
   return data;
@@ -419,8 +419,8 @@ export const useCreateInvoiceComment = () => {
   const {showError} = useSnackbar();
 
   return useMutation(
-    ({id, body}: {id: string; body: CreateInvoiceComment}) =>
-      postInvoiceComment(id, body),
+    ({invoiceId, body}: {invoiceId: string; body: CreateInvoiceComment}) =>
+      postInvoiceComment(invoiceId, body),
     {
       onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
       onError: (err) => {
@@ -431,9 +431,12 @@ export const useCreateInvoiceComment = () => {
   );
 };
 
-export const deleteInvoiceComment = async (id: string, nodeId: string) => {
+export const deleteInvoiceComment = async (
+  invoiceId: string,
+  commentId: string,
+) => {
   const {data} = await axiosClient.delete<{value: string}>(
-    `/api/invoices/${id}/comments/${nodeId}`,
+    `/api/invoices/${invoiceId}/comments/${commentId}`,
   );
   return data;
 };
@@ -443,8 +446,8 @@ export const useDeleteInvoiceComment = () => {
   const {showError} = useSnackbar();
 
   return useMutation(
-    ({id, noteId}: {id: string; noteId: string}) =>
-      deleteInvoiceComment(id, noteId),
+    ({invoiceId, commentId}: {invoiceId: string; commentId: string}) =>
+      deleteInvoiceComment(invoiceId, commentId),
     {
       onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
       onError: (err) => {
@@ -456,12 +459,12 @@ export const useDeleteInvoiceComment = () => {
 };
 
 export const updateInvoiceComment = async (
-  id: string,
-  noteId: string,
+  invoiceId: string,
+  commentId: string,
   body: CreateInvoiceComment,
 ) => {
   const {data} = await axiosClient.put<{value: string}>(
-    `/api/invoices/${id}/comments/${noteId}`,
+    `/api/invoices/${invoiceId}/comments/${commentId}`,
     body,
   );
   return data;
@@ -473,14 +476,14 @@ export const useUpdateInvoiceComment = () => {
 
   return useMutation(
     ({
-      id,
-      noteId,
+      invoiceId,
+      commentId,
       body,
     }: {
-      id: string;
-      noteId: string;
+      invoiceId: string;
+      commentId: string;
       body: CreateInvoiceComment;
-    }) => updateInvoiceComment(id, noteId, body),
+    }) => updateInvoiceComment(invoiceId, commentId, body),
     {
       onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
       onError: (err) => {

@@ -8,7 +8,6 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import {Box} from '@mui/material';
 import {formatSearchParams} from 'utils/utils';
-import {Notes} from 'components/Notes';
 import {CustomerOverviewTab} from './Tabs/CustomerOverview';
 import {ContractsTab} from './Tabs/ContractsTab';
 import {UnitsTab} from './Tabs/UnitsTab';
@@ -68,10 +67,7 @@ export const CustomerDetails = ({getCurrentPageTitle}: Props) => {
         backBtnLabel={customerName}
         showMenuActionBtn
         secondaryButtonStyles={{mt: '1rem'}}
-        hideDivider
-        secondaryBtn={
-          <Notes parentId={customerId} title="Customer Notes" type="customer" />
-        }>
+        hideDivider>
         <TabsBody value={tabValue} index={0}>
           <CustomerOverviewTab
             customerId={customerId}

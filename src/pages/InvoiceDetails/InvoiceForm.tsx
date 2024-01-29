@@ -100,7 +100,6 @@ import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/in
 import {ComboBox} from 'components/ComboBox';
 import {StatusChip} from 'components/StatusChip';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
-import {Notes} from 'components/Notes';
 import {formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
@@ -624,7 +623,6 @@ export const InvoiceForm = ({
 
       return;
     }
-
     setIsSendEmailDialogOpen(true);
   };
 
@@ -805,11 +803,6 @@ export const InvoiceForm = ({
             color={getInvoiceStatusStyles(invoice?.status ?? '').color}
             size="small"
             variant="filled"
-          />
-          <Notes
-            parentId={invoice.propertyOwner.id}
-            title="Customer Notes"
-            type="customer"
           />
         </Box>
       )}

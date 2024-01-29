@@ -65,12 +65,12 @@ export const Notes = ({invoice}: Props) => {
       if (selectedNoteId) {
         updateInvoiceComment(
           {
-            id: invoice.id,
-            noteId: selectedNoteId,
+            invoiceId: invoice.id,
             body: {
               content: values.note,
               subject: '',
             },
+            commentId: selectedNoteId,
           },
           {
             onSuccess: () => {
@@ -83,7 +83,7 @@ export const Notes = ({invoice}: Props) => {
       } else {
         createInvoiceComment(
           {
-            id: invoice.id,
+            invoiceId: invoice.id,
             body: {
               content: values.note,
               subject: '',
@@ -297,8 +297,8 @@ export const Notes = ({invoice}: Props) => {
         onConfirm={() => {
           deleteInvoiceComment(
             {
-              id: invoice.id,
-              noteId: selectedNoteId,
+              invoiceId: invoice.id,
+              commentId: selectedNoteId,
             },
             {onSettled: () => setSelectedNoteId('')},
           );

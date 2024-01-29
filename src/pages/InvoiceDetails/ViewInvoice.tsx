@@ -50,7 +50,6 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {useSnackbar} from 'notistack';
 import {isBefore, parseISO, startOfDay} from 'date-fns';
 import CustomSnackbar from 'components/CustomSnackbar';
-import {Notes} from 'components/Notes';
 import {LinearProgress, linearProgressClasses} from '@mui/material';
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
 import GradingOutlinedIcon from '@mui/icons-material/GradingOutlined';
@@ -59,6 +58,7 @@ import {useServiceOrderCheckList} from 'hooks/reactQuery/useServiceOrder';
 import {CheckListComponentType} from 'models/checklist';
 import {ChecklistStatus} from 'models/service-order';
 import {InvoiceActivities} from './InvoiceActivities';
+import {Notes} from './Notes';
 
 interface Props {
   downloadUrl: string;
@@ -307,11 +307,7 @@ export const ViewInvoice = ({
               alignItems="center"
               justifyContent="flex-end"
               gap={0.5}>
-              <Notes
-                parentId={invoice.propertyOwner.id}
-                title="Customer Notes"
-                type="customer"
-              />
+              <Notes invoice={invoice!} />
             </Grid>
 
             <Grid item xs={4} textAlign="end">
