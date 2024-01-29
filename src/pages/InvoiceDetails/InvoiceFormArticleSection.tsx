@@ -25,10 +25,12 @@ export const ArticleSectionTitleAction = ({
   shouldShow,
   setShouldShow,
   amount,
+  enableCollapse,
 }: {
   shouldShow: boolean;
   setShouldShow: Dispatch<SetStateAction<boolean>>;
   amount: string;
+  enableCollapse?: boolean;
 }) => {
   const {t} = useTranslation();
 
@@ -54,22 +56,25 @@ export const ArticleSectionTitleAction = ({
         </Box>
       </Fade>
 
-      {shouldShow ? (
-        <Tooltip
-          arrow
-          placement="top"
-          title={t(`Click to hide this section from the invoice`)}>
-          <VisibilityIcon
-            onClick={() => setShouldShow(false)}
+      {enableCollapse &&
+        (shouldShow ? (
+          <Tooltip
+            arrow
+            placement="top"
+            title={t(
+              `Click to hide this section from the invoice. Hidden section will appear in the invoice or any exported versions`,
+            )}>
+            <VisibilityIcon
+              onClick={() => setShouldShow(false)}
+              sx={{width: 25, height: 25, cursor: 'pointer'}}
+            />
+          </Tooltip>
+        ) : (
+          <VisibilityOffIcon
+            onClick={() => setShouldShow(true)}
             sx={{width: 25, height: 25, cursor: 'pointer'}}
           />
-        </Tooltip>
-      ) : (
-        <VisibilityOffIcon
-          onClick={() => setShouldShow(true)}
-          sx={{width: 25, height: 25, cursor: 'pointer'}}
-        />
-      )}
+        ))}
     </Box>
   );
 };
@@ -78,14 +83,16 @@ interface Props {
   setItems: (items: InvoiceItemRecord<Amount>[]) => void;
   propertyOwnerId: string;
   formik: FormikProps<InvoiceFormData>;
+  enableCollapse?: boolean;
 }
 
 const InvoiceFormArticleSection = ({
   setItems,
   formik,
   propertyOwnerId,
+  enableCollapse = false,
 }: Props) => {
-  const [shouldShow, setShouldShow] = useState(true);
+  const [shouldShow, setShouldShow] = useState(!enableCollapse);
   const currentCurrency = useCurrentCurrency();
 
   const totalAmountInclVatsFormatted = useMemo(
@@ -105,6 +112,7 @@ const InvoiceFormArticleSection = ({
               shouldShow={shouldShow}
               amount={totalAmountInclVatsFormatted}
               setShouldShow={setShouldShow}
+              enableCollapse={enableCollapse}
             />
           }
           Icon={WrenchScrewdriverIllustration}
