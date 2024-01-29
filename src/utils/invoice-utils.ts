@@ -1,5 +1,6 @@
 import {isBefore, parseISO, startOfDay} from 'date-fns';
-import {InvoiceStatus, InvoiceView} from 'models/invoice';
+import {InvoiceStatus, InvoiceView} from '../models/invoice';
+import {PdfGenerationStatus} from '../models/misc';
 
 const isDueDateInPast = (invoice: InvoiceView) => {
   if (invoice?.status !== InvoiceStatus.DRAFT) {
@@ -23,4 +24,26 @@ export const validateDueDate = (invoice: InvoiceView) => {
   if (isDueDateInPast(invoice)) {
     return 'The due date for the invoice has expired';
   }
+};
+
+interface InvoicePDFStatuses {
+  isInvoicePDFGenerated: boolean;
+  isWorkReportPDFGenerated: boolean;
+  isPDFsGenerated: boolean;
+}
+export const getInvoicePDFStatuses = (
+  invoice: InvoiceView,
+): InvoicePDFStatuses => {
+  const isInvoicePDFGenerated =
+    invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
+    !!invoice.additionalInfo.pdfPath;
+  const isWorkReportPDFGenerated = invoice?.additionalInfo?.includeWorkReport
+    ? invoice?.serviceOrder?.additionalInfo.workReportGenerated
+    : true;
+
+  return {
+    isInvoicePDFGenerated,
+    isWorkReportPDFGenerated: !!isWorkReportPDFGenerated,
+    isPDFsGenerated: !!isWorkReportPDFGenerated && isInvoicePDFGenerated,
+  };
 };

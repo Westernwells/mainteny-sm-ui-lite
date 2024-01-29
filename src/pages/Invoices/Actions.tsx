@@ -30,11 +30,10 @@ import {
   usePublishInvoice,
 } from 'hooks/reactQuery/useInvoice';
 import {InvoiceStatus, InvoiceView, InvoiceType} from 'models/invoice';
-import {PdfGenerationStatus} from 'models/misc';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
-import {validateDueDate} from 'utils/invoice-utils';
+import {getInvoicePDFStatuses, validateDueDate} from 'utils/invoice-utils';
 
 interface Props {
   invoice: InvoiceView;
@@ -89,13 +88,8 @@ export const Actions = ({
   const {mutateAsync: deleteInvoice} = useDeleteInvoice();
   const {mutateAsync: cancelInvoice} = useCancelInvoice();
 
-  const isInvoicePDFGenerated =
-    invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
-    !!invoice.additionalInfo.pdfPath;
-  const isWorkReportPDFGenerated = invoice?.additionalInfo?.includeWorkReport
-    ? invoice?.serviceOrder?.additionalInfo.workReportGenerated
-    : true;
-  const isPDFsGenerated = !!isWorkReportPDFGenerated && isInvoicePDFGenerated;
+  const {isPDFsGenerated, isInvoicePDFGenerated} =
+    getInvoicePDFStatuses(invoice);
 
   useEffect(() => {
     if (downloadUrls?.[pdfPathToDownload]) {

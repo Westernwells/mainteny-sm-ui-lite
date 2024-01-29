@@ -56,7 +56,7 @@ import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import {useServiceOrderCheckList} from 'hooks/reactQuery/useServiceOrder';
 import {CheckListComponentType} from 'models/checklist';
 import {ChecklistStatus} from 'models/service-order';
-import {validateDueDate} from 'utils/invoice-utils';
+import {validateDueDate, getInvoicePDFStatuses} from 'utils/invoice-utils';
 import {InvoiceActivities} from './InvoiceActivities';
 import {Notes} from './Notes';
 
@@ -89,15 +89,9 @@ export const ViewInvoice = ({
     shouldNavigate: false,
   });
 
-  const isInvoicePDFGenerated =
-    invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
-    downloadUrl;
+  const {isInvoicePDFGenerated, isPDFsGenerated} =
+    getInvoicePDFStatuses(invoice);
   const serviceOrder = invoice?.serviceOrder;
-  const isWorkReportPDFGenerated = invoice?.additionalInfo?.includeWorkReport
-    ? serviceOrder?.report?.additionalInfo?.pdfGenerationStatus ===
-      PdfGenerationStatus.DONE
-    : true;
-  const isPDFsGenerated = !!isWorkReportPDFGenerated && isInvoicePDFGenerated;
 
   const {data: serviceOrderCheckList} = useServiceOrderCheckList(
     serviceOrder?.additionalInfo.checkListInfo?.checkListId && serviceOrder.id,
