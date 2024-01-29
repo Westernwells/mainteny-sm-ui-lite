@@ -176,20 +176,24 @@ export const UpfrontPaymentsSection = ({
     const firstInvoicePaymentType = firstInvoice?.additionalInfo.payment?.type;
     const isFinalAfterPreviousInvoices =
       hasPreviousInvoices && formik.values.type === InvoiceType.FINAL;
+    const invoiceIndex = previousInvoices.length + 1;
 
     if (isEditing) {
       // do nothing
     } else if (isFinalAfterPreviousInvoices) {
+      const description = `${invoiceIndex}. ${t('Final invoice')}`;
       // prefill percentage/amount if it's a final invoice after previous invoices
       formik.setFieldValue('payment', {
         ...formik.values.payment,
         ...(firstInvoicePaymentType === PaymentType.PERCENTAGE
           ? {
               type: PaymentType.PERCENTAGE,
+              description,
               percentage: 100 - prevInvoicesPercentage,
             }
           : {
               type: PaymentType.LUMP_SUM,
+              description,
               amount: {
                 ...formik.values.payment?.amount,
                 value: subtotalExclVat - previousInvoicesTotalExclVat,
@@ -204,33 +208,23 @@ export const UpfrontPaymentsSection = ({
           firstInvoicePaymentType === PaymentType.PERCENTAGE
             ? PaymentType.PERCENTAGE
             : PaymentType.LUMP_SUM,
+        description: `${invoiceIndex}. ${t('Upfront invoice')}`,
       });
     }
   }, [previousInvoices]);
 
   useEffect(() => {
     // initialize payment object if it's not set
-    if (!formik.values.payment) {
-      if (invoice?.additionalInfo.payment) {
-        const amountMoney = aggregatedAmountToMoney(
-          invoice.additionalInfo.payment.amount,
-        );
-        amountMoney.value =
-          (amountMoney?.value ?? 0) / 10 ** (amountMoney?.fractionDigits ?? 2);
-        formik.setFieldValue('payment', {
-          ...invoice.additionalInfo.payment,
-          amount: amountMoney,
-        });
-      } else {
-        formik.setFieldValue('payment', {
-          type: PaymentType.LUMP_SUM,
-          amount: {
-            value: 0,
-            currency: currentCurrency.code,
-            fractionDigits: currentCurrency.fractionDigits,
-          },
-        });
-      }
+    if (invoice?.additionalInfo.payment && !formik.values.payment) {
+      const amountMoney = aggregatedAmountToMoney(
+        invoice.additionalInfo.payment.amount,
+      );
+      amountMoney.value =
+        (amountMoney?.value ?? 0) / 10 ** (amountMoney?.fractionDigits ?? 2);
+      formik.setFieldValue('payment', {
+        ...invoice.additionalInfo.payment,
+        amount: amountMoney,
+      });
     }
   }, [invoice]);
 

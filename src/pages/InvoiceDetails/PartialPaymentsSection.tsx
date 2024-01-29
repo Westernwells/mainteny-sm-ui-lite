@@ -260,24 +260,29 @@ export const PartialPaymentsSection = ({
     const firstInvoicePaymentType = firstInvoice?.additionalInfo.payment?.type;
     const isFinalAfterPartial =
       hasPreviousInvoices && formik.values.type === InvoiceType.FINAL;
+    const invoiceIndex = previousInvoices.length + 1;
 
     if (isEditing) {
       // do nothing
     } else if (isFinalAfterPartial) {
+      const description = `${invoiceIndex}. ${t('Final invoice')}`;
       // prefill percentage/amount if it's a final invoice after partial invoices
       formik.setFieldValue('payment', {
         ...formik.values.payment,
         ...(firstInvoicePaymentType === PaymentType.PERCENTAGE
           ? {
               type: PaymentType.PERCENTAGE,
+              description,
               percentage: 100 - prevInvoicesPercentage,
             }
           : firstInvoicePaymentType === PaymentType.PER_ITEM
           ? {
               type: PaymentType.PER_ITEM,
+              description,
             }
           : {
               type: PaymentType.LUMP_SUM,
+              description,
               amount: {
                 ...formik.values.payment?.amount,
                 value: subtotalExclVat - previousInvoicesTotalExclVat,
@@ -294,6 +299,7 @@ export const PartialPaymentsSection = ({
             : firstInvoicePaymentType === PaymentType.PER_ITEM
             ? PaymentType.PER_ITEM
             : PaymentType.LUMP_SUM,
+        description: `${invoiceIndex}. ${t('Partial invoice')}`,
       });
     }
   }, [previousInvoices]);
