@@ -39,7 +39,7 @@ import {
   calculateTotalAmountInclVats,
   calculateTotalWithPerItemDiscount,
 } from 'utils/calculate-total';
-import {fixRounding} from 'utils/utils';
+import {fixRounding, isNumber} from 'utils/utils';
 import {formatDate, toDate} from 'utils/datetime';
 import {ReactComponent as PartialInvoiceIcon} from 'assets/icons/PartialInvoiceIcon.svg';
 import {getAggregatedPartialPaymentsVats} from './utils';
@@ -257,10 +257,37 @@ export const PartialPaymentsSection = ({
 
   useEffect(() => {
     const firstInvoice = previousInvoices[0];
+    const lastInvoice = previousInvoices[previousInvoices.length - 1];
     const firstInvoicePaymentType = firstInvoice?.additionalInfo.payment?.type;
     const isFinalAfterPartial =
       hasPreviousInvoices && formik.values.type === InvoiceType.FINAL;
-    const invoiceIndex = previousInvoices.length + 1;
+
+    // if first invoice is upfront and 2nd or later invoice is partial, then invoice index should be different
+    // for example, if there are no partial invoices,
+    // 1. Upfront invoice
+    // 2. Upfront invoice
+    // 3. Final invoice
+    // but if there are partial invoices,
+    // 1. Upfront invoice
+    // 1. Partial invoice
+    // 2. Partial invoice
+    // 3. Final invoice
+    // see the change in invoice index above.
+    const lastInvoiceDescription =
+      lastInvoice?.additionalInfo.payment?.description;
+    const lastInvoiceIndexString =
+      lastInvoiceDescription?.split?.('.')?.[0] ?? '';
+    const lastInvoiceIndexNumber = Number(lastInvoiceIndexString);
+    const lastInvoiceIndex = isNumber(lastInvoiceIndexNumber)
+      ? lastInvoiceIndexNumber
+      : 0;
+    const firstInvoiceIsUpfront = firstInvoice?.type === InvoiceType.UPFRONT;
+    const lastInvoiceIsPartial = lastInvoice?.type === InvoiceType.PARTIAL;
+    const invoiceIndex = firstInvoiceIsUpfront
+      ? lastInvoiceIsPartial
+        ? lastInvoiceIndex + 1
+        : 1
+      : previousInvoices.length + 1;
 
     if (isEditing) {
       // do nothing
