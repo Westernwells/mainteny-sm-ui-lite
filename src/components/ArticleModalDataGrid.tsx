@@ -82,6 +82,7 @@ export const ArticlesModalDataGrid = ({setRowItem}: Props) => {
       query: search,
     },
     {keepPreviousData: true},
+    true,
   );
 
   useEffect(() => {
@@ -134,7 +135,7 @@ export const ArticlesModalDataGrid = ({setRowItem}: Props) => {
           onCellClick={(params) => setRowItem(params.row.article)}
           loading={isFetching}
           pageSize={page.pageSize}
-          pageIndex={page.pageIndex}
+          pageIndex={page.pageIndex + 1}
           pageCount={pageCount}
           handlePageChange={(value) =>
             setPage((prev) => ({
