@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useMemo, useState} from 'react';
+import {useContext, useEffect, useMemo, useState} from 'react';
 import {t} from 'i18next';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
@@ -98,6 +98,7 @@ import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/in
 import {ComboBox} from 'components/ComboBox';
 import {StatusChip} from 'components/StatusChip';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
+import {MeasurementUnit} from 'models/articleForm';
 import {formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
@@ -384,10 +385,40 @@ export const InvoiceForm = ({
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
-    formik.setFieldValue('propertyOwnerId', row.id);
-    formik.setFieldValue('billingAddress', row.billingAddress);
-    formik.setFieldValue('beneficiaryAddress', row.beneficiaryAddress);
-    formik.setFieldValue('alternativeAddress', row.otherAddress);
+    // If the chosen customer was already set as the property owner of the invoice
+    if (row.id !== invoice?.propertyOwner.id) {
+      const emptyAddressState = {fullName: null};
+      formik.setFieldValue('propertyOwnerId', row.id);
+      formik.setFieldValue(
+        'billingAddress',
+        row.billingAddress || emptyAddressState,
+      );
+      formik.setFieldValue(
+        'beneficiaryAddress',
+        row.beneficiaryAddress || emptyAddressState,
+      );
+      formik.setFieldValue(
+        'alternativeAddress',
+        row.otherAddress || emptyAddressState,
+      );
+    } else {
+      const invoiceCustomer = invoice?.propertyOwner;
+      formik.setFieldValue(
+        'billingAddress',
+        invoice?.additionalInfo?.billingAddress ||
+          invoiceCustomer?.billingAddress,
+      );
+      formik.setFieldValue(
+        'beneficiaryAddress',
+        invoice?.additionalInfo?.beneficiaryAddress ||
+          invoiceCustomer?.beneficiaryAddress,
+      );
+      formik.setFieldValue(
+        'alternativeAddress',
+        invoice?.additionalInfo.alternativeAddress ||
+          invoiceCustomer?.otherAddress,
+      );
+    }
   };
 
   const handleSelectServiceOrder = (selectedServiceOrder: ServiceOrderView) => {
@@ -429,13 +460,14 @@ export const InvoiceForm = ({
     );
     formik.setFieldValue(
       'alternativeServiceCompanyInfo',
-      invoice?.additionalInfo.alternativeServiceCompanyInfo ?? {
+      invoice?.additionalInfo.alternativeServiceCompanyInfo || {
         name: user?.userAccount.serviceCompany.name || '',
         address: user?.userAccount.serviceCompany.postalAddress,
       },
     );
   }, [user, invoice]);
 
+  // Set initial values of Invoice Edit Form
   useEffect(() => {
     if (invoice) {
       const invoiceCustomer = invoice.propertyOwner;
@@ -467,17 +499,17 @@ export const InvoiceForm = ({
       formik.setFieldValue('moreInfo', invoice?.additionalInfo?.moreInfo ?? '');
       formik.setFieldValue(
         'billingAddress',
-        invoice.additionalInfo?.billingAddress ??
+        invoice.additionalInfo?.billingAddress ||
           invoiceCustomer?.billingAddress,
       );
       formik.setFieldValue(
         'beneficiaryAddress',
-        invoice.additionalInfo?.beneficiaryAddress ??
+        invoice.additionalInfo?.beneficiaryAddress ||
           invoiceCustomer?.beneficiaryAddress,
       );
       formik.setFieldValue(
         'alternativeAddress',
-        invoice.additionalInfo?.alternativeAddress ??
+        invoice.additionalInfo.alternativeAddress ||
           invoiceCustomer?.otherAddress,
       );
 
@@ -565,22 +597,6 @@ export const InvoiceForm = ({
         );
       }
 
-      // if customer is changed, then update billing address
-      if (serviceOrderCustomer.id !== customer?.id) {
-        formik.setFieldValue(
-          'billingAddress',
-          serviceOrderCustomer?.billingAddress,
-        );
-        formik.setFieldValue(
-          'beneficiaryAddress',
-          serviceOrderCustomer?.beneficiaryAddress,
-        );
-        formik.setFieldValue(
-          'alternativeAddress',
-          serviceOrderCustomer?.otherAddress,
-        );
-      }
-
       const dueDays =
         serviceOrder.contract?.additionalInfo?.invoiceDueDays || 0;
       if (dueDays > 0 && formType === 'new') {
@@ -655,11 +671,22 @@ export const InvoiceForm = ({
     return items;
   }, [downloadUrl, formik.values.dueDate]);
 
+  const hasArticleError = () =>
+    formik.values.items.some(
+      (item) =>
+        !item.article?.unit ||
+        !MeasurementUnit[item.article?.unit as MeasurementUnit] ||
+        !item.name,
+    );
+
   const isValid = () => {
     const valid =
       formik.values.subject &&
       formik.values.type.length &&
-      formik.values.items.length;
+      formik.values.items.length &&
+      !hasArticleError() &&
+      !!customer;
+
     if (formik.values.type !== InvoiceType.CREDIT_NOTE) {
       return !!valid;
     }
@@ -1122,6 +1149,7 @@ export const InvoiceForm = ({
             setItems={setInvoiceItems}
             formik={formik}
             propertyOwnerId={customer?.id ?? ''}
+            enableCollapse={formik.values.type !== InvoiceType.FULL}
           />
 
           {/* PARTIAL PAYMENTS */}

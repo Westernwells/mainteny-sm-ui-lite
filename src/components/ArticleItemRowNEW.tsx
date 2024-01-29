@@ -68,17 +68,26 @@ interface TableRowProps {
   handleSelectItem: (row: ArticleView, index: number) => void;
 }
 
+const createHighlightedText = (text: string, searchText: string) =>
+  useHighlightText({
+    text: text !== '' ? text : '-',
+    highlight: searchText,
+  });
+
 const TableRowComponent = ({
   index,
   item,
   searchText,
   handleSelectItem,
 }: TableRowProps) => {
-  const highlightedName = useHighlightText({
-    text: item.name,
-    highlight: searchText,
-    highlightStyle: {backgroundColor: 'yellow'},
-  });
+  const highlightedName = createHighlightedText(item.name, searchText);
+
+  const highlightedExternalId = createHighlightedText(
+    item.externalId,
+    searchText,
+  );
+
+  const highlightedCategory = createHighlightedText(item.category, searchText);
 
   return (
     <TableRow
@@ -91,14 +100,10 @@ const TableRowComponent = ({
         <Typography variant="subtitle1">{highlightedName}</Typography>
       </TableCell>
       <TableCell sx={{width: '25%'}}>
-        <Typography variant="subtitle1">
-          {item.externalId !== '' ? item.externalId : '-'}
-        </Typography>
+        <Typography variant="subtitle1">{highlightedExternalId}</Typography>
       </TableCell>
       <TableCell sx={{width: '15%'}}>
-        <Typography variant="subtitle1">
-          {item.category !== '' ? item.category : '-'}
-        </Typography>
+        <Typography variant="subtitle1">{highlightedCategory}</Typography>
       </TableCell>
       <TableCell
         sx={{
@@ -430,12 +435,17 @@ export const ArticleItemRowNEW = ({
                 id={`name-${index}`}
                 value={formik.values.name}
                 onChange={handleTextFieldChange}
+                onBlur={formik.handleBlur}
                 size="small"
                 fullWidth
                 sx={{width: '100%'}}
                 required
-                helperText={formik.errors.name ? formik.errors.name : ''}
-                error={!!formik.errors.name}
+                helperText={
+                  formik.errors.name && formik.touched.name
+                    ? formik.errors.name
+                    : ''
+                }
+                error={!!(formik.errors.name && formik.touched.name)}
                 autoComplete="off"
                 onClick={handleTextFieldClick}
               />
@@ -450,7 +460,9 @@ export const ArticleItemRowNEW = ({
                   <Paper
                     sx={{
                       maxHeight: '380px',
-                      p: 2,
+                      pl: 2,
+                      pr: 0.7,
+                      py: 2,
                       boxShadow: '0px 4px 15px 0px #90909033',
                     }}>
                     <div>
@@ -495,9 +507,6 @@ export const ArticleItemRowNEW = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: formik.errors.name
-                    ? '1px solid red'
-                    : '1px solid #E4E9F2',
                   background: '#00D1FF0A',
                 }}
                 tabIndex={0}>
@@ -542,7 +551,7 @@ export const ArticleItemRowNEW = ({
 
         <TableCell sx={{width: '14%', '& .MuiTextField-root': {width: '100%'}}}>
           <NumericFormat
-            value={price !== 0 ? price : ''}
+            value={price !== 0 ? price : 0}
             customInput={TextField}
             allowLeadingZeros={false}
             decimalScale={2}
@@ -567,7 +576,6 @@ export const ArticleItemRowNEW = ({
                   {currentCurrency.symbol}
                 </InputAdornment>
               ),
-              error: !!formik.errors.name,
             }}
             onValueChange={(values) => {
               const {floatValue} = values;
@@ -585,7 +593,7 @@ export const ArticleItemRowNEW = ({
 
         <TableCell sx={{width: '6%'}}>
           <NumericFormat
-            value={formik.values.quantity !== 0 ? formik.values.quantity : ''}
+            value={formik.values.quantity !== 0 ? formik.values.quantity : 0}
             customInput={TextField}
             allowLeadingZeros={false}
             decimalScale={2}
@@ -615,7 +623,6 @@ export const ArticleItemRowNEW = ({
               name: 'quantity',
               id: `quantity-${index}`,
               inputMode: 'numeric',
-              error: !!formik.errors.name,
             }}
           />
         </TableCell>
@@ -625,7 +632,7 @@ export const ArticleItemRowNEW = ({
             value={
               formik.values.unitAmount.percentageVat !== 0
                 ? formik.values.unitAmount.percentageVat
-                : ''
+                : 0
             }
             customInput={TextField}
             suffix="%"
@@ -664,7 +671,6 @@ export const ArticleItemRowNEW = ({
               name: 'unitAmount.percentageVat',
               id: `unitAmount.percentageVat-${index}`,
               inputMode: 'numeric',
-              error: !!formik.errors.name,
             }}
             onValueChange={(values) => {
               const {floatValue} = values;
@@ -689,7 +695,11 @@ export const ArticleItemRowNEW = ({
               name: 'article.unit',
               sx: {width: '100%'},
               required: true,
-              error: !!formik.errors.name,
+              error:
+                !formik.values.article?.unit ||
+                !MeasurementUnit[
+                  formik.values.article?.unit as MeasurementUnit
+                ],
             }}
           />
         </TableCell>
@@ -818,8 +828,8 @@ export const ArticleItemRowNEW = ({
                 multiline
                 fullWidth
                 value={formik.values.description}
-                minRows={4}
-                maxRows={4}
+                minRows={1}
+                maxRows={10}
                 onChange={formik.handleChange}
                 sx={{mt: 0.5}}
               />

@@ -40,6 +40,7 @@ import {
 } from 'utils/calculate-total';
 import {getItemRecord} from 'utils/article-utils';
 import {fixRounding, getUniqueId} from 'utils/utils';
+import {useTheme} from '@mui/material/styles';
 import {Button} from './Button';
 import {SelectButton} from './SelectButton';
 import {ArticleItemRowNEW} from './ArticleItemRowNEW';
@@ -59,6 +60,7 @@ export const ArticleItemsTableNEW = ({
   formik,
 }: Props) => {
   const {t} = useTranslation();
+  const theme = useTheme();
   const currentCurrency = useCurrentCurrency();
 
   const subtotalExclVat = calculateTotalWithPerItemDiscount(formik.values);
@@ -315,6 +317,9 @@ export const ArticleItemsTableNEW = ({
               <Box
                 pl="20%"
                 sx={{
+                  [theme.breakpoints.up('xl')]: {
+                    pl: '50%',
+                  },
                   display: 'grid',
                   gridTemplateColumns: 'repeat(2, 1fr)',
                   justifyItems: 'end',
