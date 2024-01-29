@@ -1149,6 +1149,7 @@ export const InvoiceForm = ({
             setItems={setInvoiceItems}
             formik={formik}
             propertyOwnerId={customer?.id ?? ''}
+            enableCollapse={formik.values.type !== InvoiceType.FULL}
           />
 
           {/* PARTIAL PAYMENTS */}
