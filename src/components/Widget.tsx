@@ -21,6 +21,7 @@ interface Props {
   menu?: MenuBtnProps[];
   filterItems?: ReactNode;
   refInput?: RefObject<HTMLInputElement>;
+  searchInputVariant?: 'standard' | 'filled' | 'outlined' | undefined;
 }
 
 export const Widget = ({
@@ -36,6 +37,7 @@ export const Widget = ({
   menu,
   filterItems,
   refInput,
+  searchInputVariant,
 }: Props) => {
   const {t} = useTranslation();
   return (
@@ -52,6 +54,7 @@ export const Widget = ({
             }
             defaultValue={defaultSearchValue}
             refInput={refInput}
+            variant={searchInputVariant}
           />
         </Box>
       ) : null}

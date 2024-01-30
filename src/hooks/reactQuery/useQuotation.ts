@@ -10,7 +10,13 @@ import {
 import {useSnackbar} from 'hooks/useSnackbar';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {useNavigate} from 'react-router-dom';
-import {Language, Resource, RestError, SimpleEmailRecord} from 'models/misc';
+import {
+  Language,
+  Resource,
+  RestError,
+  SimpleEmailRecord,
+  StringValue,
+} from 'models/misc';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
   CreateQuotation,
@@ -195,7 +201,11 @@ export const useCreateQuotation = () => {
 };
 
 export const putQuotation = async (body: UpdateQuotation, id: string) => {
-  await axiosClient.put(`api/quotations/${id}`, body);
+  const {data} = await axiosClient.put<StringValue>(
+    `api/quotations/${id}`,
+    body,
+  );
+  return data;
 };
 
 export const useUpdateQuotation = () => {

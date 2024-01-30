@@ -1,4 +1,10 @@
-import {QuotationActivityType} from 'models/quotation';
+import {DiscountType} from 'models/invoice';
+import {
+  QuotationActivityType,
+  QuotationFormData,
+  QuotationItemRecord,
+} from 'models/quotation';
+import {applyDiscount} from 'pages/InvoiceDetails/utils';
 
 export const getQuotationActivityTitle = (
   type: QuotationActivityType,
@@ -23,4 +29,23 @@ export const getQuotationActivityTitle = (
     default:
       return '';
   }
+};
+
+export const calculateQuotationTotalWithPerItemDiscount = (
+  invoice: QuotationFormData,
+) => {
+  const sum = invoice.items
+    .map((item: QuotationItemRecord) =>
+      applyDiscount({
+        actualValue:
+          (item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!) *
+          item.quantity,
+        ...(item.discount?.type === DiscountType.AMOUNT
+          ? {amount: item.discount?.amount?.value ?? 0}
+          : {percentage: item.discount?.percentage ?? 0}),
+      }),
+    )
+    .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
+
+  return sum;
 };
