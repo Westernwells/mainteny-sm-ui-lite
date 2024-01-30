@@ -2030,7 +2030,12 @@
   "Payment history": "Istorija plaćanja",
   "Outstanding payments": "Sjajna plaćanja",
   "Upfront Payments": "Uplate unapred",
+  "Click to hide this section from the invoice. Hidden section will appear in the invoice or any exported versions": "Kliknite da biste sakrili ovaj odeljak sa fakture. Skriveni odeljak će se pojaviti na fakturi ili bilo kojoj izvezenoj verziji",
   "Unit details": "Detalji jedinice",
   "Appointment preferences": "Preferencije termina",
-  "Priority engineers": "Prioritetni serviseri"
+  "Priority engineers": "Prioritetni serviseri",
+  "Create Unit": "Napravite jedinicu",
+  "Reference Number": "Referentni broj",
+  "Quotation ID": "ID ponude",
+  "Offer valid until": "Ponuda važi do"
 }
