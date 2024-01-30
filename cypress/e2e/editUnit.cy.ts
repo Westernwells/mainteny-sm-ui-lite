@@ -53,10 +53,7 @@ describe('Edit Unit', () => {
       } else {
         cy.get('input[name="category"]').type('Escalator');
       }
-      cy.get('input[name="externalId"]').type('42');
-      cy.get('input[name="manufacturer"]').type('42');
-      cy.get('input[name="numberOfStops"]').type('7');
-      cy.get('input[name="cabinType"]').type('test');
+      cy.get('input[name="cabinType"]').clear().type('test');
       outside.click();
       cy.contains('button', 'Save').should('not.be.disabled').click();
       cy.contains('Unit details updated successfully');

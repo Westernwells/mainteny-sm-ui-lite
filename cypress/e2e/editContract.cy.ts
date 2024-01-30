@@ -26,16 +26,16 @@ describe('Edit Contracts', () => {
     ContractsPage.openDialog();
     const outside = cy.get('#alert-dialog-title');
     cy.get('#typeSelect').click();
-    cy.get('#typeSelect').then((input) => {
+    cy.get('input[name="name"]').then((input) => {
       const val = input.val();
       if (val === 'PREMIUM') {
         cy.get('[data-value="BASIC"]').click();
       } else {
         cy.get('[data-value="PREMIUM"]').click();
       }
-      cy.get('input[name="annualPriceAdjustmentPercentage"]').type('42');
-      cy.get('input[name="externalId"]').type('42');
-      cy.get('input[name="visitsNumber"]').type('7');
+      cy.get('input[name="annualPriceAdjustmentPercentage"]')
+        .clear()
+        .type('42');
       outside.click();
       cy.contains('button', 'Save').should('not.be.disabled').click();
       cy.contains('Contract updated');
