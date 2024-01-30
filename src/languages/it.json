@@ -1883,5 +1883,8 @@
   "MATERIAL": "MATERIALE",
   "LABOR": "LAVORO",
   "Credit note for {{invoiceNumber}}": "Nota di credito per {{invoiceNumber}}",
-  "Paid amount (incl. VAT)": "Importo pagato  (IVA inclusa)"
+  "Paid amount (incl. VAT)": "Importo pagato  (IVA inclusa)",
+  "Unit details": "Dettagli dell'unità",
+  "Appointment preferences": "Preferenze di appuntamento",
+  "Priority engineers": "Ingegneri prioritari"
 }
