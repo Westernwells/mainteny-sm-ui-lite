@@ -39,7 +39,7 @@ export const columns: GridColDef[] = [
   }),
   getColumnProps({
     field: 'address',
-    headerName: 'address',
+    headerName: 'unit address',
     cellClassName: 'truncateText',
     flex: 1.5,
   }),

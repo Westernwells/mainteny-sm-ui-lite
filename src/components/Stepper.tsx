@@ -21,6 +21,7 @@ interface Props {
   disableNextBtn?: boolean;
   submitting?: boolean;
   disableNavigateBack?: boolean;
+  submitLabel?: string;
 }
 
 export const Stepper = ({
@@ -36,12 +37,23 @@ export const Stepper = ({
   stepperWidth,
   submitting,
   disableNavigateBack = false,
+  submitLabel,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
 
   const navigate = useNavigate();
+
+  const getButtonLabel = () => {
+    if (activeStep === steps.length - 1) {
+      if (submitting) {
+        return `${t('Submitting')}...`;
+      }
+      return submitLabel ? t(`${submitLabel}`) : t('Submit');
+    }
+    return t('Next');
+  };
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -122,11 +134,7 @@ export const Stepper = ({
               onClick={
                 activeStep === steps.length - 1 ? handleSubmit : handleNext
               }>
-              {activeStep === steps.length - 1
-                ? submitting
-                  ? `${t('Submitting')}...`
-                  : t('Submit')
-                : t('Next')}
+              {getButtonLabel()}
             </Button>
           </Box>
         </Box>

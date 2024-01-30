@@ -1,6 +1,7 @@
 import {ArticleType, ArticleView, CostPackage} from './article';
 import {ElevatorView} from './elevator';
-import {Amount, Meta} from './misc';
+import {AlternativeServiceCompanyInfo, Discount} from './invoice';
+import {AddressRecord, Amount, Meta} from './misc';
 import {ServiceCompanySimpleView} from './service-company';
 
 export enum QuotationStatus {
@@ -49,10 +50,12 @@ export interface QuotationItemRecord {
   unitAmount: Amount;
   quantity: number;
   description?: string;
+  discount?: Discount;
 }
 
 export interface QuotationView {
   id: string;
+  serviceCompany: ServiceCompanySimpleView;
   elevator: ElevatorView;
   number: string;
   externalId: string;
@@ -79,21 +82,72 @@ export interface QueryQuotationParams {
 
 export interface QuotationFilters {}
 
-export interface CreateQuotation {
+export interface QuotationFormData {
+  serviceCompanyId: string;
+  elevatorId: string;
+  externalId?: string;
   subject: string;
   description: string;
-  moreInfo: string;
-  elevatorId: string;
+  moreInfo?: string;
   items: QuotationItemRecord[];
+  integration?: {
+    xeroEntityId?: string;
+  };
+  discount?: Discount;
+  billingAddress?: AddressRecord;
+  beneficiaryAddress?: AddressRecord;
+  alternativeAddress?: AddressRecord;
+  paymentTerms?: string;
+  notes?: string;
+  sentDate?: Date;
+  expiryDate?: Date;
+  referenceNumber?: string;
+  alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
+}
+
+export interface CreateQuotation {
   serviceCompanyId: string;
+  elevatorId: string;
+  externalId?: string;
+  subject: string;
+  description: string;
+  moreInfo?: string;
+  items: QuotationItemRecord[];
+  integration?: {
+    xeroEntityId?: string;
+  };
+  discount?: Discount;
+  billingAddress?: AddressRecord;
+  beneficiaryAddress?: AddressRecord;
+  alternativeAddress?: AddressRecord;
+  paymentTerms?: string;
+  notes?: string;
+  sentDate?: string;
+  expiryDate?: string;
+  referenceNumber?: string;
+  alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
 }
 
 export interface UpdateQuotation {
   subject: string;
   description: string;
-  moreInfo: string;
+  moreInfo?: string;
   elevatorId: string;
   items: QuotationItemRecord[];
+  externalId?: string;
+  integration?: {
+    xeroEntityId?: string;
+  };
+  discount?: Discount;
+  billingAddress?: AddressRecord;
+  beneficiaryAddress?: AddressRecord;
+  alternativeAddress?: AddressRecord;
+  paymentTerms?: string;
+  notes?: string;
+  sentDate?: string;
+  expiryDate?: string;
+  referenceNumber?: string;
+  alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
 }
 
 export interface ReplyQuotation {
