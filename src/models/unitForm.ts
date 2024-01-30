@@ -1,4 +1,10 @@
 import {AddressRecord} from 'models/misc';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {FileResourceRecord} from './media';
+
+export interface AttachmentFormModel {
+  documents?: FileWithPreview[];
+}
 
 export interface LocationFormModel {
   address?: AddressRecord;

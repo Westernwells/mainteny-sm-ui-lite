@@ -2,7 +2,7 @@ import {useParams} from 'react-router-dom';
 import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
-import {EditQuotation} from './EditQuotation';
+import DraftQuotation from 'pages/QuotationDetails/DraftQuotation';
 
 export const EditQuotationPage = () => {
   const {id: quotationId} = useParams();
@@ -17,7 +17,7 @@ export const EditQuotationPage = () => {
   }
 
   return isFetched && quotation ? (
-    <EditQuotation quotation={quotation} />
+    <DraftQuotation formType="edit" quotation={quotation} />
   ) : (
     <EmptySection label="Sorry, we couldn't find the quotation." />
   );

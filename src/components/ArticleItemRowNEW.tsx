@@ -385,7 +385,7 @@ export const ArticleItemRowNEW = ({
             },
           }}
           aria-label="spanning table">
-          <TableHead>
+          <TableHead sx={{position: 'sticky', top: 0, background: '#FFFFFF'}}>
             <TableRow>
               {columns.map((column) => (
                 <TableCell

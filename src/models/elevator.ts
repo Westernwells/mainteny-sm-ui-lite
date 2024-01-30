@@ -20,6 +20,7 @@ import {
   PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from './propertyManager';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 
 export enum ElevatorCommentType {
   TODO = 'TODO',
@@ -335,7 +336,6 @@ export interface ElevatorRequestBody {
   category: string;
   controllerManufacturer: string;
   controllerModel: string;
-  documents: FileResourceRecord[];
   emergencyContactNumber: string;
   emergencyPhoneProvider: string;
   keyLocation: string;
@@ -347,6 +347,7 @@ export interface ElevatorRequestBody {
   numberOfStops: number;
   parking: string;
   pictures: FileResourceRecord[];
+  documents: FileResourceRecord[] | FileWithPreview[];
   priority: Priority;
   properties: {[key: string]: string | undefined};
   propertyManagerId: string;
@@ -361,6 +362,7 @@ export interface ElevatorRequestBody {
   elevatorPhone: Partial<ElevatorPhone>;
   timeRule: Partial<ElevatorTimeRuleRecord>;
   customerAppointment: CustomerAppointment;
+  technicianWeights: {[key: string]: string | number};
 }
 
 export interface ElevatorComment {

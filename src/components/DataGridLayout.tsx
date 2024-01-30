@@ -45,6 +45,7 @@ interface Props extends DataGridProps {
   isWidget?: boolean;
   headerHeight?: number;
   scrollToTop?: any;
+  isEvenRowDifferentColor?: boolean;
   lastSyncedText?: string;
 }
 
@@ -133,6 +134,7 @@ export const DataGridLayout = ({
   headerHeight,
   scrollToTop,
   lastSyncedText,
+  isEvenRowDifferentColor,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
@@ -250,6 +252,12 @@ export const DataGridLayout = ({
         checkboxSelection={checkboxSelection}
         sx={{
           ...olStyles.scrollbar,
+          '&.MuiDataGrid-root': {
+            height: isEvenRowDifferentColor ? '91%' : '95%',
+          },
+          '& .MuiDataGrid-row:nth-of-type(even)': {
+            background: isEvenRowDifferentColor ? '#F2F6F8' : '#FFF',
+          },
           height: '95%',
           width: '100%',
           my: '0.5em',
