@@ -149,7 +149,7 @@
   "Invite": "Einladen",
   "Search by number, name, address etc.": "Suche nach Nummer, Name, Adresse usw.",
   "New Customer": "Neuer Kunde",
-  "JOINED DATE": "Kunde seit",
+  "JOINED DATE": "KUNDE SEIT",
   "NO. OF CONTRACTS": "ANZAHL VERTRÄGE",
   "Business Address": "Geschäftsadresse",
   "Postal Address": "Anschrift",
@@ -1974,7 +1974,7 @@
   "Invoice not sent": "Rechnung nicht erfolgreich gesendet",
   "Rejected": "Abgelehnt",
   "Sales Price Range": "Verkaufspreisspanne",
-  "Service Info": "Wartungs Info",
+  "Service info": "Wartungs Info",
   "Notification Due (in days)": "Fällige Benachrichtigung (in Tagen)",
   "Notes, Pictures and Attachments": "Notizen, Bilder und Anhänge",
   "This job isn't linked to any quotation.": "Dieser Auftrag ist mit keinem Angebot verknüpft.",
@@ -2006,5 +2006,8 @@
   "Payment history": "Zahlungsverlauf",
   "Outstanding payments": "Ausstehende Zahlungen",
   "Upfront Payments": "Vorab-Zahlungen",
-  "Click to hide this section from the invoice. Hidden section will appear in the invoice or any exported versions": "Klicken Sie darauf, um diesen Abschnitt auf der Rechnung auszublenden. Der ausgeblendete Abschnitt wird in der Rechnung oder in exportierten Versionen angezeigt."
+  "Click to hide this section from the invoice. Hidden section will appear in the invoice or any exported versions": "Klicken Sie darauf, um diesen Abschnitt auf der Rechnung auszublenden. Der ausgeblendete Abschnitt wird in der Rechnung oder in exportierten Versionen angezeigt.",
+  "Unit details": "Anlagendetails",
+  "Appointment preferences": "Terminpräferenz",
+  "Priority engineers": "Prioritäts Techniker"
 }

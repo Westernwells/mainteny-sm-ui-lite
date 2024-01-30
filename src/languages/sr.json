@@ -1997,7 +1997,7 @@
   "Invoice not sent": "Faktura nije poslana",
   "Rejected": "Odbijen",
   "Sales Price Range": "Raspon prodajnih cena",
-  "Service Info": "Servisne Informacije",
+  "Service info": "Servisne Informacije",
   "Notification Due (in days)": "Rok za obaveštenje (u danima)",
   "Notes, Pictures and Attachments": "Beleške, slike i prilozi",
   "This job isn't linked to any quotation.": "Ovaj posao nije povezan ni sa jednim citatom.",
@@ -2029,5 +2029,8 @@
   "VAT amount": "Iznos PDV-a",
   "Payment history": "Istorija plaćanja",
   "Outstanding payments": "Sjajna plaćanja",
-  "Upfront Payments": "Uplate unapred"
+  "Upfront Payments": "Uplate unapred",
+  "Unit details": "Detalji jedinice",
+  "Appointment preferences": "Preferencije termina",
+  "Priority engineers": "Prioritetni serviseri"
 }
