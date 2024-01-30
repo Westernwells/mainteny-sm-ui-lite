@@ -153,15 +153,8 @@ export const UserTable = ({companyId}: Props) => {
       firstName: formik.values.firstName,
       lastName: formik.values.lastName,
       address: formik.values.address,
+      username: formik.values.email,
     };
-
-    await updateEmployeeAccount(
-      body,
-      activeUser?.userData?.employeeId || '',
-      () => {
-        formik.resetForm();
-      },
-    );
 
     if (formik.values.password) {
       await updateUserPassword(
@@ -172,6 +165,15 @@ export const UserTable = ({companyId}: Props) => {
         },
       );
     }
+
+    await updateEmployeeAccount(
+      body,
+      activeUser?.userData?.employeeId || '',
+      () => {
+        formik.resetForm();
+      },
+    );
+
     setOpenDialog(false);
   };
 

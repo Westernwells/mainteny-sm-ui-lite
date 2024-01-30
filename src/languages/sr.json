@@ -3,6 +3,7 @@
   "The unified Application made for Service Managers with smart job assignments, real-time overview of Units under Maintenance (UuM) and out-of-the-box ERP Integrations!": "Jedinstvena aplikacija napravljena za menadžere usluga sa pametnim dodeljivanjem poslova, pregledom jedinica na održavanju u realnom vremenu (UuM) i ERP integracijama van kutije!",
   "Login": "Prijavite se",
   "Email address": "Adresa E-pošte",
+  "Email address / Username": "Adresa E-pošte / Korisničko ime",
   "Password": "Lozinka",
   "Forgot Password?": "Zaboravili ste lozinku?",
   "Enter a valid email": "Unesite važeću e-poštu",
@@ -2030,7 +2031,12 @@
   "Payment history": "Istorija plaćanja",
   "Outstanding payments": "Sjajna plaćanja",
   "Upfront Payments": "Uplate unapred",
+  "Click to hide this section from the invoice. Hidden section will appear in the invoice or any exported versions": "Kliknite da biste sakrili ovaj odeljak sa fakture. Skriveni odeljak će se pojaviti na fakturi ili bilo kojoj izvezenoj verziji",
   "Unit details": "Detalji jedinice",
   "Appointment preferences": "Preferencije termina",
-  "Priority engineers": "Prioritetni serviseri"
+  "Priority engineers": "Prioritetni serviseri",
+  "Create Unit": "Napravite jedinicu",
+  "Reference Number": "Referentni broj",
+  "Quotation ID": "ID ponude",
+  "Offer valid until": "Ponuda važi do"
 }

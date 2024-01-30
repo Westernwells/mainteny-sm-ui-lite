@@ -2,7 +2,7 @@ import {isBefore, parseISO, startOfDay} from 'date-fns';
 import {InvoiceStatus, InvoiceView} from '../models/invoice';
 import {PdfGenerationStatus} from '../models/misc';
 
-const isDueDateInPast = (invoice: InvoiceView) => {
+export const isDueDateInPast = (invoice: InvoiceView) => {
   if (invoice?.status !== InvoiceStatus.DRAFT) {
     return false;
   }

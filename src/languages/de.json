@@ -3,6 +3,7 @@
   "The unified Application made for Service Managers with smart job assignments, real-time overview of Units under Maintenance (UuM) and out-of-the-box ERP Integrations!": "Das Dashboard für Service Manager mit intelligenter Ressourcenzuteilung, Echtzeit-Übersicht des Anlagenportfolios und sofort einsatzbereite ERP-Integrationen!",
   "Login": "Anmelden",
   "Email address": "E-Mail Adresse",
+  "Email address / Username": "E-Mail Adresse / Benutzername",
   "Password": "Passwort",
   "Forgot Password?": "Passwort vergessen?",
   "Enter a valid email": "Geben Sie eine gültige E-Mail ein",
@@ -2006,8 +2007,12 @@
   "Payment history": "Zahlungsverlauf",
   "Outstanding payments": "Ausstehende Zahlungen",
   "Upfront Payments": "Vorab-Zahlungen",
-  "Click to hide this section from the invoice. Hidden section will appear in the invoice or any exported versions": "Klicken Sie darauf, um diesen Abschnitt auf der Rechnung auszublenden. Der ausgeblendete Abschnitt wird in der Rechnung oder in exportierten Versionen angezeigt.",
+  "Click to hide this section from the invoice. Hidden section will appear in the invoice or any exported versions": "Klicken Sie hier, um diesen Abschnitt auf der Rechnung auszublenden. Der ausgeblendete Abschnitt wird in der Rechnung oder in exportierten Versionen angezeigt.",
   "Unit details": "Anlagendetails",
   "Appointment preferences": "Terminpräferenz",
-  "Priority engineers": "Prioritäts Techniker"
+  "Priority engineers": "Prioritäts Techniker",
+  "Create Unit": "Anlage erstellen",
+  "Reference Number": "Referenznummer",
+  "Quotation ID": "Angebots Nr.",
+  "Offer valid until": "Angebot gültig bis"
 }
