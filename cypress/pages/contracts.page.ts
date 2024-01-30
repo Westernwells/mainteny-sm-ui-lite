@@ -6,7 +6,7 @@ export default class ContractsPage {
   };
 
   static navigateToDetailsPage = () => {
-    cy.get('div[data-colindex="1"]').eq(0).click();
+    cy.get('div[data-colindex="1"]').eq(2).click();
   };
 
   static openDialog = () => {
