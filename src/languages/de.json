@@ -2006,8 +2006,12 @@
   "Payment history": "Zahlungsverlauf",
   "Outstanding payments": "Ausstehende Zahlungen",
   "Upfront Payments": "Vorab-Zahlungen",
-  "Click to hide this section from the invoice. Hidden section will appear in the invoice or any exported versions": "Klicken Sie darauf, um diesen Abschnitt auf der Rechnung auszublenden. Der ausgeblendete Abschnitt wird in der Rechnung oder in exportierten Versionen angezeigt.",
+  "Click to hide this section from the invoice. Hidden section will appear in the invoice or any exported versions": "Klicken Sie hier, um diesen Abschnitt auf der Rechnung auszublenden. Der ausgeblendete Abschnitt wird in der Rechnung oder in exportierten Versionen angezeigt.",
   "Unit details": "Anlagendetails",
   "Appointment preferences": "Terminpräferenz",
-  "Priority engineers": "Prioritäts Techniker"
+  "Priority engineers": "Prioritäts Techniker",
+  "Create Unit": "Anlage erstellen",
+  "Reference Number": "Referenznummer",
+  "Quotation ID": "Angebots Nr.",
+  "Offer valid until": "Angebot gültig bis"
 }
