@@ -109,7 +109,7 @@ export const TimePicker = ({
       padding: '0 24px',
       position: 'relative',
     },
-    '& .MuiMultiSectionDigitalClock-root > .MuiList-padding:nth-child(1)': {
+    '& .MuiMultiSectionDigitalClock-root > .MuiList-padding::nth-of-type(1)': {
       position: 'relative',
       borderLeft: '1px solid #8F9BB380',
       borderBottom: '1px solid #8F9BB380',
@@ -126,7 +126,7 @@ export const TimePicker = ({
         background: 'linear-gradient(#FFFFFF 35%, #8F9BB380)',
       },
     },
-    '& .MuiMultiSectionDigitalClock-root > .MuiList-padding:nth-child(2)': {
+    '& .MuiMultiSectionDigitalClock-root > .MuiList-padding::nth-of-type(2)': {
       borderBottom: '1px solid #8F9BB380',
       borderTopRightRadius: '4px',
       borderBottomRightRadius: '4px',
