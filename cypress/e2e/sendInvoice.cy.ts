@@ -2,7 +2,7 @@ import InvoicesPage from '../pages/invoices.page';
 import LoginPage from '../pages/login.page';
 import { InvoiceStatusView } from '../../src/models/invoice';
 import AppTopBarPage from '../pages/appTopBar.page';
-import {getInvoicePDFStatuses} from '../../src/utils/invoice-utils';
+import {getInvoicePDFStatuses, isDueDateInPast} from '../../src/utils/invoice-utils';
 
 
 describe('Send Invoice via Email', () => {
@@ -31,8 +31,7 @@ describe('Send Invoice via Email', () => {
             // First valid invoice
             const validInvoice = invoicesData.find((invoice) => {
                 const {isPDFsGenerated} = getInvoicePDFStatuses(invoice);
-                const dueDate = invoice.dueDate ? new Date(invoice.dueDate) : undefined;
-                return dueDate && dueDate > new Date() && isPDFsGenerated && invoice?.number;
+                return invoice?.dueDate && !isDueDateInPast(invoice) && isPDFsGenerated && invoice?.number;
             });
 
             // if valid invoice was found
@@ -59,12 +58,11 @@ describe('Send Invoice via Email', () => {
             // First invoice where invoice.dueDate is expired or undefined
             const invoiceWithDateIssues = invoicesData.find(invoice => {
                 const {isPDFsGenerated} = getInvoicePDFStatuses(invoice);
-                const dueDate = invoice.dueDate ? new Date(invoice.dueDate) : undefined;
-                return (!dueDate || dueDate <= new Date()) && isPDFsGenerated && invoice.number;
+                return !invoice?.dueDate || (!invoice?.dueDate && isDueDateInPast(invoice)) && isPDFsGenerated && invoice.number;
             });
 
             // if invoice with dueDate issues was found
-            if(invoiceWithDateIssues){
+            if(invoiceWithDateIssues?.number){
                 InvoicesPage.openSendInvoiceModalByInvoiceNumber(invoiceWithDateIssues.number);
                 cy.contains(!invoiceWithDateIssues.dueDate ? 'The due date is missing for this invoice' : 'The due date for the invoice has expired');
             }

@@ -7,7 +7,7 @@ export default class InvoicesPage {
     })
   };
 
-  static filterInvoicesListByStatus = (status: InvoiceStatusView.DRAFT) => {
+  static filterInvoicesListByStatus = (status: InvoiceStatusView) => {
     cy.get('div[role="button"][id="Status"]').click();
     cy.get('ul[role="listbox"] li').contains(status).click();
   }
@@ -16,14 +16,19 @@ export default class InvoicesPage {
     cy.get('span[aria-label="Send"] button:last').click({ force: true }); 
   };
 
+  static openPaymentModal = () => {
+    cy.get('svg[data-testid="PaymentsIcon"]').first().parent('button[aria-label="Payment"]').click();
+  }
+
+  static markInvoiceAsPaid = () => {
+    cy.get('input[name="markAsPaid"]').click()
+  }
+
   static openSendInvoiceModalByInvoiceNumber = (invoiceNumber: string) => {
     cy.contains('div[data-field="NUMBER"]', invoiceNumber)
       .parent()
       .find('div[data-field="actions"] span[aria-label="Send"] button')
-      .then(el => {
-        el[0].scrollIntoView();
-        return el;
-      })
+      .scrollIntoView()
       .should('be.visible')
       .click();
   }
