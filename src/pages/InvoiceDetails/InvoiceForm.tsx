@@ -97,7 +97,6 @@ import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrati
 import {ReactComponent as FooterIllustration} from 'assets/illustrations/invoice/footer.svg';
 import {ReactComponent as PinIllustration} from 'assets/illustrations/invoice/pin.svg';
 import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/invoice/task-list-pen.svg';
-import {ComboBox} from 'components/ComboBox';
 import {StatusChip} from 'components/StatusChip';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {formatInvoiceRecord} from './utils';
@@ -253,7 +252,7 @@ export const InvoiceForm = ({
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
-  const {data: companyNextNumber} = useCompanyNextNumber(
+  const {data: companyNextNumber, refetch} = useCompanyNextNumber(
     {
       type: ServiceCompanyNumberType.INVOICE,
     },
@@ -314,6 +313,24 @@ export const InvoiceForm = ({
     ),
   });
 
+  const {data: companyAutoNumberConfig} = useCompanyAutoNumberConfig(
+    user?.userAccount.serviceCompany.id,
+  );
+
+  const isAutogenerateIdEnabled = companyAutoNumberConfig?.configRecords.find(
+    (item: any) => item.type === ServiceCompanyNumberType.INVOICE,
+  )?.enabled;
+
+  const generateNextNumber = async () => {
+    if (isAutogenerateIdEnabled) {
+      if (!companyNextNumber?.value) {
+        const {data: refetchedCompanyNextNumber} = await refetch();
+        return refetchedCompanyNextNumber?.value;
+      }
+      return companyNextNumber?.value;
+    }
+  };
+
   async function onSave(values: InvoiceFormData) {
     if (!values.description.length) values.description = '';
     if (!values?.moreInfo?.length) values.moreInfo = '';
@@ -327,6 +344,7 @@ export const InvoiceForm = ({
       return updateInvoiceAsync({
         data: formatInvoiceRecord({
           ...values,
+          externalId: values.externalId || (await generateNextNumber()),
           dueDate,
         }),
         invoiceId: invoice.id,
@@ -336,6 +354,7 @@ export const InvoiceForm = ({
     return createNewInvoice({
       data: formatInvoiceRecord({
         ...values,
+        externalId: values.externalId || (await generateNextNumber()),
         dueDate,
       }) as CreateInvoice,
     });
@@ -376,7 +395,7 @@ export const InvoiceForm = ({
   useEffect(() => {
     formik.setFieldValue(
       'externalId',
-      formType === 'new' ? companyNextNumber?.value : invoice?.externalId ?? '',
+      formType === 'edit' ? invoice?.externalId : '',
     );
   }, [companyNextNumber, invoice]);
 
@@ -715,14 +734,6 @@ export const InvoiceForm = ({
       },
       {keepPreviousData: true},
     );
-
-  const {data: companyAutoNumberConfig} = useCompanyAutoNumberConfig(
-    user?.userAccount.serviceCompany.id,
-  );
-
-  const generateNextNumber = () => {
-    formik.setFieldValue('externalId', companyNextNumber?.value);
-  };
 
   const handleEditFrom = ({
     name,
@@ -1274,40 +1285,13 @@ export const InvoiceForm = ({
               </Box>
             </Box>
             <Box width="100%">
-              <ComboBox
-                options={[]}
-                initialValue={
-                  formik.values.externalId
-                    ? {
-                        label: formik.values.externalId,
-                        value: formik.values.externalId,
-                      }
-                    : null
-                }
-                initialQuery={formik.values.externalId}
-                getValue={(item) => {
-                  formik.setFieldValue('externalId', item?.value);
-                }}
-                autoIdProps={{
-                  handleAction: companyAutoNumberConfig?.configRecords.find(
-                    (item: any) =>
-                      item.type === ServiceCompanyNumberType.INVOICE,
-                  )?.enabled
-                    ? () => {
-                        generateNextNumber();
-                      }
-                    : () => {
-                        setOpenDialog(true);
-                      },
-                  isEnabled: companyAutoNumberConfig?.configRecords.find(
-                    (item: any) =>
-                      item.type === ServiceCompanyNumberType.INVOICE,
-                  )?.enabled,
-                }}
-                textFieldProps={{
+              <FormInput
+                props={{
                   id: 'externalId',
                   name: 'externalId',
-                  placeholder: !formik.values.externalId ? t('Unassigned') : '',
+                  placeholder: isAutogenerateIdEnabled
+                    ? t('Automatically assigned')
+                    : t('Unassigned'),
                   label: 'Invoice Number',
                   value: formik.values.externalId,
                   onChange: formik.handleChange,
