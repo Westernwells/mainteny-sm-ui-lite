@@ -337,3 +337,6 @@ export const hasProtocol = (url: string) => {
   const pattern = /^(http:\/\/|https:\/\/)/;
   return pattern.test(url);
 };
+
+export const isNumber = (value: string | number) =>
+  !Number.isNaN(Number(value));

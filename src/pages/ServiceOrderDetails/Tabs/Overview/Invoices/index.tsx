@@ -69,7 +69,7 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
       return [InvoiceType.FINAL, InvoiceType.PARTIAL, InvoiceType.UPFRONT];
     }
 
-    return [];
+    return [InvoiceType.FULL, InvoiceType.PARTIAL, InvoiceType.UPFRONT];
   }, [jobInvoices]);
 
   useEffect(() => {
