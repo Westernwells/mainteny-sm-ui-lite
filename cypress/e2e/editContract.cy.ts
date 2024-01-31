@@ -12,10 +12,10 @@ describe('Edit Contracts', () => {
     cy.wait('@loginApi').then(() => {
       AppTopBarPage.selectLanguage('English');
 
-      const elevatorApi = `${
+      const contractInfoURL = `${
         Cypress.env().REACT_APP_API_URL
-      }/api/contracts?order=DESC&orderBy=CREATED_TIME&pageIndex=0&pageSize=25&query=&serviceCompanyId=*`;
-      cy.intercept('GET', elevatorApi).as('contractApi');
+      }/api/contracts/*`;
+      cy.intercept('GET', contractInfoURL).as('contractInfoApi');
 
       ContractsPage.visit();
     });
@@ -23,22 +23,38 @@ describe('Edit Contracts', () => {
 
   it('validate and submit data', () => {
     ContractsPage.navigateToDetailsPage();
-    ContractsPage.openDialog();
-    const outside = cy.get('#alert-dialog-title');
-    cy.get('#typeSelect').click();
-    cy.get('#typeSelect').then((input) => {
-      const val = input.val();
-      if (val === 'PREMIUM') {
-        cy.get('[data-value="BASIC"]').click();
-      } else {
-        cy.get('[data-value="PREMIUM"]').click();
-      }
-      cy.get('input[name="annualPriceAdjustmentPercentage"]').type('42');
-      cy.get('input[name="externalId"]').type('42');
-      cy.get('input[name="visitsNumber"]').type('7');
-      outside.click();
-      cy.contains('button', 'Save').should('not.be.disabled').click();
-      cy.contains('Contract updated');
+
+    cy.wait('@contractInfoApi', { timeout: 15000 }).its('response').then(response => {
+      const { body: contractData } = response;
+
+      ContractsPage.openDialog();
+      cy.wait(1500);
+      const outside = cy.get('#alert-dialog-title');
+
+      cy.get('#typeSelect').click();
+
+
+      cy.get('ul[aria-labelledBy="typeSelect-label"]').find('li').then((options) => {
+        if (options.length === 1) {
+          // Only one option, click it directly
+          cy.contains('[data-value]', /PREMIUM|BASIC/).click();
+        } else {
+          cy.get('input[name="name"]').then((input) => {
+            const val = input.val();
+            if (val === 'PREMIUM') {
+              cy.get('[data-value="BASIC"]').click();
+            } else {
+              cy.get('[data-value="PREMIUM"]').click();
+            }
+          });
+        }
+
+        const nextAnnualPrice:string = String((contractData?.additionalInfo?.annualPriceAdjustmentPercentage || 0) + 1)
+        cy.get('input[name="annualPriceAdjustmentPercentage"]').clear().type(nextAnnualPrice);
+        outside.click();
+        cy.contains('button', 'Save').should('not.be.disabled').click();
+        cy.contains('Contract updated');
+      });
     });
   });
 });
