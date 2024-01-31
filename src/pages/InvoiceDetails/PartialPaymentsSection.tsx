@@ -183,7 +183,7 @@ export const PartialPaymentsSection = ({
           .reduce((a, b) => a + b, 0)
       : 0;
 
-  const amountFormatted = formatCurrency(amount, {
+  const amountFormatted = formatCurrency(fixRounding(amount, 2), {
     currency: currentCurrency.code,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
