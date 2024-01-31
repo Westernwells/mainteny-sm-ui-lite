@@ -3,6 +3,7 @@
   "The unified Application made for Service Managers with smart job assignments, real-time overview of Units under Maintenance (UuM) and out-of-the-box ERP Integrations!": "L'applicazione unificata fatta per i gestori dei servizi con incarichi di lavoro intelligente, panoramica in tempo reale delle unità in manutenzione (UUM) e integrazioni ERP fuori box!",
   "Login": "Login",
   "Email address": "Indirizzo e-mail",
+  "Email address / Username": "Indirizzo e-mail / Nome utente",
   "Password": "Parola d'ordine",
   "Forgot Password?": "Ha dimenticato la password?",
   "Enter a valid email": "Inserisci un'e -mail valida",
@@ -1883,5 +1884,8 @@
   "MATERIAL": "MATERIALE",
   "LABOR": "LAVORO",
   "Credit note for {{invoiceNumber}}": "Nota di credito per {{invoiceNumber}}",
-  "Paid amount (incl. VAT)": "Importo pagato  (IVA inclusa)"
+  "Paid amount (incl. VAT)": "Importo pagato  (IVA inclusa)",
+  "Unit details": "Dettagli dell'unità",
+  "Appointment preferences": "Preferenze di appuntamento",
+  "Priority engineers": "Ingegneri prioritari"
 }

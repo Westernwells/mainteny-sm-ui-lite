@@ -244,7 +244,7 @@ export const MyDropZone = ({
       className="container"
       component="section"
       width="100%"
-      maxWidth="57rem">
+      maxWidth="100rem">
       <Box
         component="div"
         {...getRootProps({className: 'dropzone'})}
@@ -270,7 +270,7 @@ export const MyDropZone = ({
             label={t('Select file to upload')}
             style={{
               textTransform: 'inherit',
-              color: theme.palette.primary.light,
+              color: theme.palette.primary.main,
             }}
             buttonProps={{
               variant: 'text',

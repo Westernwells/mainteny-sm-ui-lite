@@ -427,7 +427,7 @@ export const Router = () => {
                   pageScrollable
                   backBtnLabel="New Quotation"
                   showBackAction>
-                  <DraftQuotation />
+                  <DraftQuotation formType="new" />
                 </PageLayout>
               </>
             }

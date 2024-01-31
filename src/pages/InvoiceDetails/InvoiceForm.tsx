@@ -685,7 +685,8 @@ export const InvoiceForm = ({
       formik.values.type.length &&
       formik.values.items.length &&
       !hasArticleError() &&
-      !!customer;
+      !!customer &&
+      Object.keys(formik.errors).length === 0;
 
     if (formik.values.type !== InvoiceType.CREDIT_NOTE) {
       return !!valid;
