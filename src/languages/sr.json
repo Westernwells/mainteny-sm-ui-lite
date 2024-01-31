@@ -2005,5 +2005,6 @@
   "Article cannot be empty": "Stavka ne može biti prazna",
   "Article Type": "Tip stavka",
   "Article #": "Stavka #",
-  "Selling Price (excl. VAT)": "Prodajna cena (bez PDV-a)"
+  "Selling Price (excl. VAT)": "Prodajna cena (bez PDV-a)",
+  "Automatically assigned": "Automatski dodeljeno"
 }
