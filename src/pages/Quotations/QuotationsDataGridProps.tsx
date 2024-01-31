@@ -1,11 +1,22 @@
-import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
+import {
+  GridColDef,
+  GridColumnHeaderParams,
+  GridRenderCellParams,
+  GridRowsProp,
+} from '@mui/x-data-grid';
 import {StatusChip} from 'components/StatusChip';
-import {getColumnProps} from 'components/DataGridLayout';
 import {formatCurrency} from 'utils/currency';
-import {QuotationStatus, QuotationView} from 'models/quotation';
+import {
+  QuotationOrderField,
+  QuotationStatus,
+  QuotationView,
+} from 'models/quotation';
 import {FormatDate, Resource} from 'models/misc';
-import {Actions} from './Actions';
+import {Typography} from '@mui/material';
+import {t} from 'i18next';
+import CustomTableHeader from 'components/CustomTableHeader';
 import {NotesIndicator} from './NotesIndicator';
+import {Actions} from './Actions';
 
 export const getQuotationStatusStyles = (
   status: string,
@@ -37,46 +48,89 @@ export const getQuotationStatusStyles = (
   }
 };
 
-export const columns: GridColDef[] = [
-  getColumnProps({
+export const columns = (handleSortModelChange: any): GridColDef[] => [
+  {
     field: 'number',
-    headerName: 'number',
     align: 'left',
     flex: 0.5,
-  }),
-  getColumnProps({
-    field: 'customer',
-    headerName: 'customer',
+    sortable: false,
+    renderHeader: () => (
+      <Typography variant="subtitle2" color="textSecondary">
+        {t('NUMBER')}
+      </Typography>
+    ),
+  },
+  {
+    field: QuotationOrderField.CUSTOMER_NAME,
+    headerName: 'CUSTOMER',
     cellClassName: 'truncateText',
     flex: 1.5,
-  }),
-  getColumnProps({
+    sortable: false,
+    renderHeader: (params: GridColumnHeaderParams) => (
+      <CustomTableHeader
+        onSortChange={handleSortModelChange}
+        column={params.colDef}
+      />
+    ),
+  },
+  {
     field: 'address',
     headerName: 'address',
     cellClassName: 'truncateText',
     flex: 1.5,
-  }),
-  getColumnProps({
-    field: 'created',
-    headerName: 'created date',
+    sortable: false,
+    renderHeader: () => (
+      <Typography variant="subtitle2" color="textSecondary">
+        {t('ADDRESS')}
+      </Typography>
+    ),
+  },
+  {
+    field: QuotationOrderField.CREATED_DATE,
+    headerName: 'CREATED DATE',
     align: 'center',
+    headerAlign: 'center',
     flex: 0.75,
-  }),
-  getColumnProps({
-    field: 'amount',
-    headerName: 'total amount',
+    sortable: false,
+    renderHeader: (params: GridColumnHeaderParams) => (
+      <CustomTableHeader
+        onSortChange={handleSortModelChange}
+        column={params.colDef}
+      />
+    ),
+  },
+  {
+    field: QuotationOrderField.SALES_PRICE,
+    headerName: 'Total amount (excl. VAT)',
+    flex: 1,
+    sortable: false,
     align: 'right',
-  }),
-  getColumnProps({
+    headerAlign: 'right',
+    renderHeader: (params: GridColumnHeaderParams) => (
+      <CustomTableHeader
+        onSortChange={handleSortModelChange}
+        column={params.colDef}
+      />
+    ),
+  },
+  {
     field: 'notes',
     headerName: 'notes',
     align: 'center',
-    renderCell: (params) => <NotesIndicator quotation={params.row.quotation} />,
+    renderCell: (params: GridRenderCellParams<any, any, any>) => (
+      <NotesIndicator quotation={params.row.quotation} />
+    ),
     flex: 0.5,
-  }),
-  getColumnProps({
+    sortable: false,
+    headerAlign: 'center',
+    renderHeader: () => (
+      <Typography variant="subtitle2" color="textSecondary">
+        {t('NOTES')}
+      </Typography>
+    ),
+  },
+  {
     field: 'status',
-    headerName: 'status',
     align: 'center',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
@@ -88,14 +142,29 @@ export const columns: GridColDef[] = [
       />
     ),
     flex: 0.5,
-  }),
-  getColumnProps({
+    sortable: false,
+    headerAlign: 'center',
+    renderHeader: () => (
+      <Typography variant="subtitle2" color="textSecondary">
+        {t('STATUS')}
+      </Typography>
+    ),
+  },
+  {
     field: 'actions',
-    headerName: 'actions',
-    align: 'center',
-    renderCell: (params) => <Actions quotation={params.row.quotation} />,
+    align: 'right',
+    renderCell: (params: GridRenderCellParams<any, any, any>) => (
+      <Actions quotation={params.row.quotation} />
+    ),
     flex: 0.5,
-  }),
+    sortable: false,
+    headerAlign: 'right',
+    renderHeader: () => (
+      <Typography variant="subtitle2" color="textSecondary">
+        {t('ACTIONS')}
+      </Typography>
+    ),
+  },
 ];
 
 export const makeRows = (
@@ -107,10 +176,10 @@ export const makeRows = (
     id: index,
     quotationId: item.id,
     number: item.number,
-    customer: item.elevator.propertyOwner.name,
+    [QuotationOrderField.CUSTOMER_NAME]: item.elevator.propertyOwner.name,
     address: item.elevator.propertyOwner.billingAddress?.fullName ?? '-',
-    created: formatDate(item.meta.createdAt),
-    amount: `${formatCurrency(
+    [QuotationOrderField.CREATED_DATE]: formatDate(item.meta.createdAt),
+    [QuotationOrderField.SALES_PRICE]: `${formatCurrency(
       item
         ? item.totalAmount.netAmount / 10 ** item.totalAmount.fractionDigits!
         : 0,
