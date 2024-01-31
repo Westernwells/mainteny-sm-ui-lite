@@ -92,7 +92,7 @@ const InvoiceFormArticleSection = ({
   propertyOwnerId,
   enableCollapse = false,
 }: Props) => {
-  const [shouldShow, setShouldShow] = useState(!enableCollapse);
+  const [shouldShow, setShouldShow] = useState(true);
   const currentCurrency = useCurrentCurrency();
 
   const totalAmountInclVatsFormatted = useMemo(
