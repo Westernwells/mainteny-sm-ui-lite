@@ -1687,7 +1687,7 @@
   "Article successfully created": "Artikel wurde erfolgreich angelegt. ",
   "Preferred": "Bevorzugt",
   "Edit Quotation": "Angebot bearbeiten",
-  "It will be deleted from the list.": "Sie wird von der Liste entfernt.",
+  "@noman@mainteny.com": "Sie wird von der Liste entfernt.",
   "Contact updated successfully": "Kontaktperson erfolgreich aktualisiert. ",
   "Access": "Zugang",
   "dd.mm.yyyy": "tt.mm.jjjj",
@@ -2017,6 +2017,6 @@
   "Descending": "Absteigend",
   "Ascending": "Aufsteigend",
   "Order": "Reihenfolge",
-  "Error: A payment due date is required to send the invoice. Please add this information to proceed": "Fehler: Zum Versenden der Rechnung ist ein Zahlungsziel erforderlich. Bitte fügen Sie diese Informationen hinzu, um fortzufahren",
+  "A payment due date is required to send the invoice. Please add this information to proceed": "Zum Versenden der Rechnung ist ein Zahlungsziel erforderlich. Bitte fügen Sie diese Informationen hinzu, um fortzufahren",
   "Upfront": "Abschlag"
 }
