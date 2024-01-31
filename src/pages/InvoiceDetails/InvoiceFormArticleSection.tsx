@@ -50,7 +50,7 @@ export const ArticleSectionTitleAction = ({
           justifyContent="flex-end"
           mr={2}>
           <Typography color="text.secondary" mr={2}>
-            Total amount:
+            {t('Total amount (incl. VAT)')}:
           </Typography>
           <Typography color="primary.dark">{amount}</Typography>
         </Box>
@@ -92,7 +92,7 @@ const InvoiceFormArticleSection = ({
   propertyOwnerId,
   enableCollapse = false,
 }: Props) => {
-  const [shouldShow, setShouldShow] = useState(!enableCollapse);
+  const [shouldShow, setShouldShow] = useState(true);
   const currentCurrency = useCurrentCurrency();
 
   const totalAmountInclVatsFormatted = useMemo(

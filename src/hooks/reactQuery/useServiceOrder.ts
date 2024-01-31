@@ -919,6 +919,7 @@ export const useDeleteServiceOrderArticle = () => {
           variant: 'success',
         });
         queryClient.invalidateQueries([queryKeys.fetchServiceJobArticles]);
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
       },
       onError: (err) => {
         console.log(err);
@@ -954,6 +955,7 @@ export const useCreateServiceOrderArticle = () => {
           variant: 'success',
         });
         queryClient.invalidateQueries([queryKeys.fetchServiceJobArticles]);
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
       },
       onError: (err) => {
         console.log(err);

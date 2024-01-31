@@ -64,7 +64,7 @@ describe('Send Invoice via Email', () => {
             // if invoice with dueDate issues was found
             if(invoiceWithDateIssues?.number){
                 InvoicesPage.openSendInvoiceModalByInvoiceNumber(invoiceWithDateIssues.number);
-                cy.contains(!invoiceWithDateIssues.dueDate ? 'The due date is missing for this invoice' : 'The due date for the invoice has expired');
+                cy.contains(!invoiceWithDateIssues.dueDate ? 'Error: A payment due date is required to send the invoice. Please add this information to proceed' : 'The due date for the invoice has expired');
             }
         });
     });

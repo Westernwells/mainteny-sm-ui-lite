@@ -2013,5 +2013,10 @@
   "Create Unit": "Anlage erstellen",
   "Reference Number": "Referenznummer",
   "Quotation ID": "Angebots Nr.",
-  "Offer valid until": "Angebot gültig bis"
+  "Offer valid until": "Angebot gültig bis",
+  "Descending": "Absteigend",
+  "Ascending": "Aufsteigend",
+  "Order": "Reihenfolge",
+  "Error: A payment due date is required to send the invoice. Please add this information to proceed": "Fehler: Zum Versenden der Rechnung ist ein Zahlungsziel erforderlich. Bitte fügen Sie diese Informationen hinzu, um fortzufahren",
+  "Upfront": "Abschlag"
 }

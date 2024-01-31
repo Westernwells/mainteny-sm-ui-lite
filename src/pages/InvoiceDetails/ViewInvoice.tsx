@@ -315,7 +315,7 @@ export const ViewInvoice = ({
             <Box>
               <FormLabel text="Invoice Type" sx={{color: 'text.main'}} />
               <Typography variant="subtitle1" fontWeight="600">
-                {t(InvoiceTypeMap[invoice.type]).toUpperCase()}
+                {t(`${InvoiceTypeMap[invoice.type]} invoice`)}
               </Typography>
             </Box>
 
@@ -428,8 +428,8 @@ export const ViewInvoice = ({
               headerLabel={t('Work Report')}
               headerIcon={<GradingOutlinedIcon sx={{color: '#8F9BB380'}} />}
               headerStyles={{
-                pt: '11px',
                 mx: 0,
+                mt: 0,
                 px: '1rem',
               }}
               headerActionIcon={
@@ -441,11 +441,13 @@ export const ViewInvoice = ({
               handleAction={() =>
                 navigate(`/orders/details/${serviceOrder?.id}?tab=1`)
               }>
-              <Typography variant="body1">
-                {!!serviceOrder.actualStartTime &&
-                  `${formatDate(serviceOrder.actualStartTime)} :`}
-                {serviceOrder.report?.description ?? '-'}
-              </Typography>
+              {serviceOrder.actualStartTime &&
+              serviceOrder.report?.description ? (
+                <Typography variant="body1">
+                  {formatDate(serviceOrder.actualStartTime)}:
+                  {serviceOrder.report.description}
+                </Typography>
+              ) : null}
             </PageCard>
           )}
 

@@ -11,11 +11,11 @@ import {StatusChip} from 'components/StatusChip';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {getColumnProps} from 'components/DataGridLayout';
-// import {fetchDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {
   InvoiceOrderField,
   InvoiceStatus,
   InvoiceStatusView,
+  InvoiceTypeMap,
   InvoiceView,
 } from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
@@ -90,10 +90,14 @@ export const columns: GridColDef[] = [
     sortable: true,
   }),
   getColumnProps({
-    field: 'order',
-    headerName: 'order number',
+    field: 'jobNumber',
+    headerName: 'job number',
     align: 'left',
     flex: 0.75,
+  }),
+  getColumnProps({
+    field: 'invoiceType',
+    headerName: 'invoice type',
   }),
   getColumnProps({
     field: 'type',
@@ -173,8 +177,9 @@ export const makeRows = (
           : '-',
         [InvoiceOrderField.NUMBER]:
           item.externalId !== '' ? item.externalId : 'Unassigned',
-        order: item.serviceOrder?.number,
+        jobNumber: item.serviceOrder?.number,
         [InvoiceOrderField.CUSTOMER_NAME]: item.propertyOwner.name,
+        invoiceType: InvoiceTypeMap[item.type],
         type: item.serviceOrder?.type,
         amount: `${formatCurrency(
           item

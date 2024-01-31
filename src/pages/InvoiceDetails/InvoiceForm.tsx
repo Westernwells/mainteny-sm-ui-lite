@@ -34,8 +34,8 @@ import {Confirm} from 'components/Confirm';
 import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {Tooltip} from 'components/Tooltip';
-import {ContractPaymentTermSelectDialog} from 'components/ContractPaymentTermSelectDialog';
-import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
+import {InvoiceContractPaymentTermInput} from 'components/InvoiceContractPaymentTermInput';
+import {InvoiceContractPaymentTerm} from 'components/InvoiceContractPaymentTerm';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
@@ -99,6 +99,7 @@ import {ComboBox} from 'components/ComboBox';
 import {StatusChip} from 'components/StatusChip';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {MeasurementUnit} from 'models/articleForm';
+import {ContractPaymentTermView} from 'models/contract';
 import {formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
@@ -235,6 +236,9 @@ export const InvoiceForm = ({
     openContractPaymentTermSelectDialog,
     setOpenContractPaymentTermSelectDialog,
   ] = useState(false);
+  const [paymentTermToEdit, setPaymentTermToEdit] = useState<
+    ContractPaymentTermView | undefined
+  >(undefined);
 
   const [customer, setCustomer] = useState<
     PropertyOwnerView | PropertyOwnerSimpleView | undefined
@@ -698,8 +702,10 @@ export const InvoiceForm = ({
     const paymentTermObj = contractPaymentTerms?.data.find(
       ({id}) => id === paymentTermId,
     );
-    formik.setFieldValue('paymentTerms', paymentTermObj?.term);
-    setOpenContractPaymentTermsDialog(false);
+    formik.setFieldValue('paymentTerms', paymentTermObj?.term || '');
+    if (paymentTermId) {
+      setOpenContractPaymentTermsDialog(false);
+    }
   };
 
   const removeAddress = (
@@ -838,7 +844,6 @@ export const InvoiceForm = ({
       (hasPreviousInvoices &&
         firstInvoiceType === InvoiceType.UPFRONT &&
         isFinalInvoice));
-
   return (
     <Box>
       {invoice && (
@@ -1217,9 +1222,7 @@ export const InvoiceForm = ({
                         mr: -1,
                         alignSelf: 'flex-start',
                       }}
-                      onClick={() =>
-                        setOpenContractPaymentTermSelectDialog(true)
-                      }
+                      onClick={() => setOpenContractPaymentTermsDialog(true)}
                       size="small">
                       <TextSnippetIcon />
                     </InputAdornment>
@@ -1317,6 +1320,17 @@ export const InvoiceForm = ({
                   }}
                   textFieldProps={{
                     label: 'Start Date',
+                    ...(serviceOrder &&
+                      !formik.values.deliveryStartDate && {
+                        placeholder: t('No Start Date set'),
+                        sx: {
+                          input: {
+                            '&::placeholder': {
+                              typography: 'caption',
+                            },
+                          },
+                        },
+                      }),
                   }}
                 />
                 <DatePicker
@@ -1327,6 +1341,17 @@ export const InvoiceForm = ({
                   }}
                   textFieldProps={{
                     label: 'End Date',
+                    ...(serviceOrder &&
+                      !formik.values.deliveryEndDate && {
+                        placeholder: t('No End Date set'),
+                        sx: {
+                          input: {
+                            '&::placeholder': {
+                              typography: 'caption',
+                            },
+                          },
+                        },
+                      }),
                   }}
                 />
               </Box>
@@ -1607,21 +1632,26 @@ export const InvoiceForm = ({
       />
 
       {openContractPaymentTermSelectDialog && (
-        <ContractPaymentTermSelectDialog
-          title={t('Payment Terms')}
-          alertText={t('Choose a payment term to be used on your invoice')}
+        <InvoiceContractPaymentTermInput
+          title={t('New payment term')}
           open={openContractPaymentTermSelectDialog}
-          onSave={handleContractPaymentTermsModal}
           onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
-          onClickPaymentTerms={() => setOpenContractPaymentTermsDialog(true)}
+          defaultPaymentTerm={paymentTermToEdit}
+          setPaymentToEdit={setPaymentTermToEdit}
         />
       )}
 
       {openContractPaymentTermsDialog && (
-        <ContractPaymentTermsDialog
-          title={t('Manage Payment Terms')}
+        <InvoiceContractPaymentTerm
+          title={t('Payment Terms')}
           open={openContractPaymentTermsDialog}
           onCancel={() => setOpenContractPaymentTermsDialog(false)}
+          onSave={handleContractPaymentTermsModal}
+          defaultPayment={formik.values.paymentTerms}
+          onClickNewPaymentTerm={() =>
+            setOpenContractPaymentTermSelectDialog(true)
+          }
+          setPaymentToEdit={setPaymentTermToEdit}
         />
       )}
 

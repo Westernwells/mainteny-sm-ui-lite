@@ -18,6 +18,13 @@ export enum QuotationStatusView {
   SENT = 'SENT_TO_CLIENT',
 }
 
+export enum QuotationOrderField {
+  CUSTOMER_NAME = 'CUSTOMER_NAME',
+  CREATED_DATE = 'CREATED_DATE',
+  SALES_PRICE = 'SALES_PRICE',
+  XERO_LAST_SYNC_TIME = 'XERO_LAST_SYNC_TIME',
+}
+
 export type QuotationAdditionalInfo = {
   [key: string | number]: any;
 };
@@ -76,8 +83,10 @@ export interface QueryQuotationParams {
   pageSize: number;
   query: string;
   status: QuotationStatus[];
-  createdDateStart?: string;
-  createdDateEnd?: string;
+  createdDateStart?: Date;
+  createdDateEnd?: Date;
+  salesPriceStart?: number;
+  salesPriceEnd?: number;
 }
 
 export interface QuotationFilters {}
