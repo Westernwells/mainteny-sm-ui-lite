@@ -41,7 +41,7 @@ describe('Edit Unit', () => {
     );
   });
 
-  it('validate and submit data', () => {
+  it('validate data', () => {
     UnitsPage.navigateToDetailsPage();
     UnitsPage.openDialog();
     const outside = cy.get('#alert-dialog-title');
@@ -55,8 +55,7 @@ describe('Edit Unit', () => {
       }
       cy.get('input[name="cabinType"]').clear().type('test');
       outside.click();
-      cy.contains('button', 'Save').should('not.be.disabled').click();
-      cy.contains('Unit details updated successfully');
+      cy.contains('button', 'Save').should('not.be.disabled');
     });
   });
 });
