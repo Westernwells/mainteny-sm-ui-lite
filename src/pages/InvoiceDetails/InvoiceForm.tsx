@@ -77,7 +77,6 @@ import {
   getUserFullName,
 } from 'utils/utils';
 import {
-  useCompanyAutoNumberConfig,
   useCompanyNextNumber,
   useQueryContractPaymentTerms,
 } from 'hooks/reactQuery/useCompanies';
@@ -252,7 +251,7 @@ export const InvoiceForm = ({
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
-  const {data: companyNextNumber, refetch} = useCompanyNextNumber(
+  const {data: companyNextNumber} = useCompanyNextNumber(
     {
       type: ServiceCompanyNumberType.INVOICE,
     },
@@ -313,24 +312,6 @@ export const InvoiceForm = ({
     ),
   });
 
-  const {data: companyAutoNumberConfig} = useCompanyAutoNumberConfig(
-    user?.userAccount.serviceCompany.id,
-  );
-
-  const isAutogenerateIdEnabled = companyAutoNumberConfig?.configRecords.find(
-    (item: any) => item.type === ServiceCompanyNumberType.INVOICE,
-  )?.enabled;
-
-  const generateNextNumber = async () => {
-    if (isAutogenerateIdEnabled) {
-      if (!companyNextNumber?.value) {
-        const {data: refetchedCompanyNextNumber} = await refetch();
-        return refetchedCompanyNextNumber?.value;
-      }
-      return companyNextNumber?.value;
-    }
-  };
-
   async function onSave(values: InvoiceFormData) {
     if (!values.description.length) values.description = '';
     if (!values?.moreInfo?.length) values.moreInfo = '';
@@ -344,7 +325,6 @@ export const InvoiceForm = ({
       return updateInvoiceAsync({
         data: formatInvoiceRecord({
           ...values,
-          externalId: values.externalId || (await generateNextNumber()),
           dueDate,
         }),
         invoiceId: invoice.id,
@@ -354,7 +334,6 @@ export const InvoiceForm = ({
     return createNewInvoice({
       data: formatInvoiceRecord({
         ...values,
-        externalId: values.externalId || (await generateNextNumber()),
         dueDate,
       }) as CreateInvoice,
     });
@@ -1289,9 +1268,7 @@ export const InvoiceForm = ({
                 props={{
                   id: 'externalId',
                   name: 'externalId',
-                  placeholder: isAutogenerateIdEnabled
-                    ? t('Automatically assigned')
-                    : t('Unassigned'),
+                  placeholder: t('Automatically assigned'),
                   label: 'Invoice Number',
                   value: formik.values.externalId,
                   onChange: formik.handleChange,
