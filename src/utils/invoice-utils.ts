@@ -18,7 +18,7 @@ export const isDueDateInPast = (invoice: InvoiceView) => {
 
 export const validateDueDate = (invoice: InvoiceView) => {
   if (!invoice.dueDate) {
-    return 'The due date is missing for this invoice';
+    return 'Error: A payment due date is required to send the invoice. Please add this information to proceed';
   }
 
   if (isDueDateInPast(invoice)) {

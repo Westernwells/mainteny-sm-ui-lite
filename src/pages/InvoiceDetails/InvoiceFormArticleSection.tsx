@@ -50,7 +50,7 @@ export const ArticleSectionTitleAction = ({
           justifyContent="flex-end"
           mr={2}>
           <Typography color="text.secondary" mr={2}>
-            {t('Total amount:')}
+            {t('Total amount (incl. VAT)')}:
           </Typography>
           <Typography color="primary.dark">{amount}</Typography>
         </Box>
