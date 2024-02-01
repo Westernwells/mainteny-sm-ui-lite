@@ -308,7 +308,7 @@ export const ViewInvoice = ({
             <Box>
               <FormLabel text="Invoice Number" sx={{color: 'text.main'}} />
               <Typography variant="subtitle1" fontWeight="600">
-                {invoice.externalId || t('Unassigned')}
+                {invoice.externalId || t('Automatically assigned')}
               </Typography>
             </Box>
 

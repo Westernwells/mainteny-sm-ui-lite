@@ -151,7 +151,6 @@ export const LocationForm = ({
                 placeholder: '',
                 label: 'ZIP/Postal Code',
                 name: 'address.component.postalCode',
-                required: true,
                 value: formik.values.address?.component?.postalCode ?? '',
                 onChange: formik.handleChange,
                 onBlur: formik.handleBlur,

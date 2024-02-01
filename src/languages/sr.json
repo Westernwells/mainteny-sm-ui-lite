@@ -1698,7 +1698,7 @@
   "Article successfully created": "Artikel je uspešno kreiran",
   "Preferred": "Poželjno",
   "Edit Quotation": "Uredi ponudu",
-  "It will be deleted from the list.": "Biće izbrisan sa liste.",
+  "@noman@mainteny.com": "Biće izbrisan sa liste.",
   "Contact updated successfully": "Kontakt je uspešno ažuriran",
   "Access": "Pristup",
   "dd.mm.yyyy": "dd.mm.gggg",
@@ -2037,5 +2037,16 @@
   "Create Unit": "Napravite jedinicu",
   "Reference Number": "Referentni broj",
   "Quotation ID": "ID ponude",
-  "Offer valid until": "Ponuda važi do"
+  "Offer valid until": "Ponuda važi do",
+  "Descending": "Silazni",
+  "Ascending": "Uzlazni",
+  "Order": "Red",
+  "A payment due date is required to send the invoice. Please add this information to proceed": "Za slanje fakture potreban je rok za plaćanje. Dodajte ove informacije da biste nastavili",
+  "Upfront": "Unapred",
+  "Created Date Range": "Kreirani opseg datuma",
+  "Automatically assigned": "Automatski dodeljeno",
+  "Select Unit": "Izaberite jedinicu",
+  "Text": "Tekst",
+  "Select a unit": "Izabrite jedinicu",
+  "Invalid unit": "Nevažeća jedinica"
 }

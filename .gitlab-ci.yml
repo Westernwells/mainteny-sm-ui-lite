@@ -1,7 +1,6 @@
 stages:
   - lint
   - test
-  - build-builder-image
   - build-project
   - build-images
   - deploy
@@ -13,7 +12,7 @@ variables:
 
 .build-project: &build-template
   stage: build-project
-  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/builder:sm-ui-5dedeb5b-1014954528
+  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
   dependencies:
     - lint-project
     - tests
@@ -24,7 +23,7 @@ variables:
       paths:
         - .yarn-cache/
   script:
-    - cp -rf /home/sm-ui-lite/node_modules .
+    - node -v
     - export NODE_OPTIONS='--max-old-space-size=4096'
     - yarn install --frozen-lockfile --cache-folder .yarn-cache
     - yarn prepare_env
@@ -61,7 +60,7 @@ variables:
 .deploy_project: &deploy-template
   stage: deploy
   allow_failure: false
-  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:latest
+  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
   before_script:
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/mainteny/infra/sm-ui-lite-deployment
     - cd sm-ui-lite-deployment
@@ -98,7 +97,7 @@ variables:
 
 lint-project:
   stage: lint
-  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:latest
+  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
   cache:
     - key:
         files:
@@ -109,9 +108,10 @@ lint-project:
     - yarn install --frozen-lockfile --cache-folder .yarn-cache
     - yarn check-all
 
+
 tests:
   stage: test
-  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:latest
+  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
   cache:
     - key:
         files:
@@ -128,27 +128,6 @@ tests:
     - yarn install --cache-folder .yarn-cache
     - yarn start & # Start the application in the background
     - yarn cypress:run # Run Cypress tests
-
-build-builder-image:
-  stage: build-project
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
-  before_script:
-    - mkdir -p /kaniko/.docker
-    - echo "{\"credsStore\":\"ecr-login\",\"credHelpers\":{\"$DOCKER_REGISTRY\":\"ecr-login\"}}" > /kaniko/.docker/config.json
-  script:
-    - >
-      /kaniko/executor
-      --cache=true
-      --context $CI_PROJECT_DIR 
-      --dockerfile Dockerfile.builder
-      --destination ${DOCKER_REGISTRY}/builder:sm-ui-${IMAGE_SUFFIX}
-  rules:
-    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
-      when: manual
-    - when: never
-  allow_failure: true
 
 build-feature-branch:
   <<: *build-template

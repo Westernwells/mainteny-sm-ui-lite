@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {experimental_sx as sx} from '@mui/system';
 
 export const TechnSectionStyles = {

@@ -1500,4 +1500,5 @@ export const de = {
   'Customizable in Settings': 'Anpassbar in den Einstellungen',
   'Enable Automatic ID Generation': 'Automatische ID-Generierung einschalten',
   'Allows for easier number input': 'Ermöglicht eine vereinfachte Nummerierung',
+  'Automatically assigned': 'Automatisch erstellt',
 };

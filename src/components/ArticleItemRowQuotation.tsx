@@ -25,7 +25,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-import {useFormik} from 'formik';
+import {getIn, useFormik} from 'formik';
 import {DiscountType} from 'models/invoice';
 import {MeasurementUnit} from 'models/articleForm';
 import {Button} from 'components/Button';
@@ -46,6 +46,7 @@ import useHighlightText from 'hooks/useHighlightText';
 import {getArticleTypeText} from 'utils/article-utils';
 import {QuotationItemRecord} from 'models/quotation';
 import {applyQuotationDiscount} from 'pages/QuotationDetails/utils';
+import {DragIndicator} from '@mui/icons-material';
 import {FormSelect} from './form/FormSelect';
 import {TabItems, Tabs} from './Tab';
 import {TabsBody} from './TabsBody';
@@ -129,6 +130,16 @@ const TableRowComponent = ({
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Article cannot be empty'),
+  article: Yup.object().shape({
+    type: Yup.string().required('Article type is required'),
+    unit: Yup.string()
+      .required('Select a unit')
+      .test(
+        'validUnit',
+        'Invalid unit',
+        (value) => MeasurementUnit[value as MeasurementUnit] !== undefined,
+      ),
+  }),
 });
 
 export const ArticleItemRowQuotation = ({
@@ -427,7 +438,22 @@ export const ArticleItemRowQuotation = ({
   return (
     <>
       <TableRow sx={{verticalAlign: 'top'}}>
-        <TableCell sx={{width: '1%'}}>{index + 1}</TableCell>
+        <TableCell sx={{width: '2%'}}>
+          {index + 1}
+
+          <IconButton
+            className="drag-indicator"
+            size="large"
+            sx={{
+              visibility: 'hidden',
+              position: 'absolute',
+              left: '1%',
+              top: '50%',
+              transform: 'translate(-50%,-50%)',
+            }}>
+            <DragIndicator sx={{fontSize: '1.25rem'}} />
+          </IconButton>
+        </TableCell>
 
         <TableCell sx={{width: '35%'}}>
           <ClickAwayListener onClickAway={handlePopperClose}>
@@ -440,7 +466,7 @@ export const ArticleItemRowQuotation = ({
                 size="small"
                 onBlur={formik.handleBlur}
                 fullWidth
-                sx={{width: '100%'}}
+                sx={{width: '100%', '& .MuiFormHelperText-root': {mx: '0em'}}}
                 required
                 helperText={
                   formik.errors.name && formik.touched.name
@@ -693,16 +719,23 @@ export const ArticleItemRowQuotation = ({
             selectProps={{
               value: formik.values.article?.unit ?? '',
               onChange: formik.handleChange,
+              onBlur: formik.handleBlur,
               placeholder: t('Select Unit'),
               name: 'article.unit',
               sx: {width: '100%'},
               required: true,
-              error:
-                !formik.values.article?.unit ||
-                !MeasurementUnit[
-                  formik.values.article?.unit as MeasurementUnit
-                ],
+              error: !!(
+                formik.values.name !== '' &&
+                getIn(formik.errors, 'article.unit')
+              ),
             }}
+            errorText={
+              formik.values.name !== '' ||
+              (getIn(formik.touched, `article.unit`) &&
+                getIn(formik.errors, `article.unit`))
+                ? getIn(formik.errors, `article.unit`)
+                : undefined
+            }
           />
         </TableCell>
 

@@ -102,7 +102,11 @@ export const EditEmployee = ({employee, openDialog, onClose}: Props) => {
   });
 
   const handleSubmit = async (values: EmployeeAccountData) => {
-    updateEmployeeAccount(values, employee.userData.employeeId, () => {
+    const body = {
+      ...values,
+      username: values?.email,
+    };
+    updateEmployeeAccount(body, employee.userData.employeeId, () => {
       onClose();
     });
   };
