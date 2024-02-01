@@ -316,6 +316,15 @@ export const InvoiceForm = ({
           : // eslint-disable-next-line @typescript-eslint/no-use-before-define
             isExternalIdUnique(allInvoiceResource.data, value),
     ),
+    payment: Yup.object().when('type', {
+      is: (v: string) =>
+        v === InvoiceType.PARTIAL ||
+        v === InvoiceType.UPFRONT ||
+        v === InvoiceType.FINAL,
+      then: Yup.object().shape({
+        description: Yup.string().required('Name is required'),
+      }),
+    }),
   });
 
   async function onSave(values: InvoiceFormData) {
@@ -1487,10 +1496,12 @@ export const InvoiceForm = ({
                         }
                         checked={formik.values.payment?.type === key}
                         disabled={
-                          previousInvoices.length > 0 &&
-                          key !==
-                            sortedPreviousInvoices[0].additionalInfo.payment
-                              ?.type
+                          (!previousInvoices.length && formType === 'new') ||
+                          (previousInvoices.length === 1 && formType === 'edit')
+                            ? false
+                            : key !==
+                              sortedPreviousInvoices?.[0]?.additionalInfo
+                                ?.payment?.type
                         }
                       />
                     ),

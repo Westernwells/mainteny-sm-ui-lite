@@ -18,7 +18,7 @@ import {
   TableCellProps,
   SxProps,
 } from '@mui/material';
-import {FormikProps} from 'formik';
+import {FormikProps, getIn} from 'formik';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {FormInput} from 'components/form/FormInput';
 import {
@@ -87,6 +87,36 @@ const Table = ({children, headStyles, bodyStyles, ...props}: TableProps) => (
   </MuiTable>
 );
 
+interface NameInputProps {
+  formik: FormikProps<InvoiceFormData>;
+  paymentDescriptionError?: string;
+  disabledValue?: string;
+}
+
+const NameInput = ({
+  formik,
+  paymentDescriptionError,
+  disabledValue,
+}: NameInputProps) => (
+  <FormInput
+    props={{
+      size: 'small',
+      label: 'Name',
+      ...(disabledValue
+        ? {disabled: true, value: disabledValue}
+        : {
+            name: 'payment.description',
+            value: formik.values.payment?.description,
+            onChange: formik.handleChange,
+            onBlur: formik.handleBlur,
+            required: true,
+            error: !!paymentDescriptionError,
+            helperText: paymentDescriptionError,
+          }),
+    }}
+  />
+);
+
 interface Props {
   formik: FormikProps<InvoiceFormData>;
   previousInvoices: InvoiceView[];
@@ -122,6 +152,14 @@ export const PartialPaymentsSection = ({
     }
   };
 
+  const previousInvoicesTotalExclVat = previousInvoices
+    .map(
+      (i) =>
+        (i.totalAmount?.netAmount ?? 0) /
+        10 ** (i.totalAmount?.fractionDigits ?? 2),
+    )
+    .reduce((a, b) => a + b, 0);
+
   const isAllowedAmountField = (values: NumberFormatValues) => {
     const {floatValue} = values;
     if (!floatValue) {
@@ -133,7 +171,16 @@ export const PartialPaymentsSection = ({
     ) {
       return false;
     }
-    return true;
+
+    const maxAmount =
+      subtotalExclVat -
+      previousInvoicesTotalExclVat +
+      (isEditing
+        ? (invoice.totalAmount?.netAmount ?? 0) /
+          10 ** (invoice.totalAmount?.fractionDigits ?? 2)
+        : 0);
+
+    return floatValue <= maxAmount;
   };
 
   const prevInvoicesPercentage = previousInvoices
@@ -159,13 +206,6 @@ export const PartialPaymentsSection = ({
     return floatValue <= maxPercentage;
   };
 
-  const previousInvoicesTotalExclVat = previousInvoices
-    .map(
-      (i) =>
-        (i.totalAmount?.netAmount ?? 0) /
-        10 ** (i.totalAmount?.fractionDigits ?? 2),
-    )
-    .reduce((a, b) => a + b, 0);
   const amount =
     formik.values.payment?.type === PaymentType.LUMP_SUM
       ? formik.values.payment?.amount?.value ?? 0
@@ -346,6 +386,10 @@ export const PartialPaymentsSection = ({
     }
   }, [invoice]);
 
+  const paymentDescriptionError: string | undefined =
+    getIn(formik.touched, 'payment.description') &&
+    getIn(formik.errors, 'payment.description');
+
   const perItemSectionColumns: {
     name: string;
     align?: TableCellProps['align'];
@@ -398,23 +442,14 @@ export const PartialPaymentsSection = ({
           previousInvoices.map((prevInvoice, idx) => (
             <Fragment key={prevInvoice.id}>
               <Grid item xs={12}>
-                <FormInput
-                  props={{
-                    size: 'small',
-                    label: 'Name',
-                    ...(prevInvoice.id === invoice?.id
-                      ? {
-                          name: 'payment.description',
-                          value: formik.values.payment?.description ?? '',
-                          onChange: formik.handleChange,
-                        }
-                      : {
-                          value:
-                            prevInvoice.additionalInfo.payment?.description ??
-                            '',
-                          disabled: true,
-                        }),
-                  }}
+                <NameInput
+                  formik={formik}
+                  paymentDescriptionError={paymentDescriptionError}
+                  disabledValue={
+                    prevInvoice.id !== invoice?.id
+                      ? prevInvoice.additionalInfo.payment?.description ?? ''
+                      : ''
+                  }
                 />
               </Grid>
               <Grid item xs={12}>
@@ -573,14 +608,9 @@ export const PartialPaymentsSection = ({
         {!isEditing && (
           <>
             <Grid item xs={12}>
-              <FormInput
-                props={{
-                  size: 'small',
-                  label: 'Name',
-                  name: 'payment.description',
-                  value: formik.values.payment?.description,
-                  onChange: formik.handleChange,
-                }}
+              <NameInput
+                formik={formik}
+                paymentDescriptionError={paymentDescriptionError}
               />
             </Grid>
             <Grid item xs={12}>
@@ -977,23 +1007,15 @@ export const PartialPaymentsSection = ({
               previousInvoices.map((prevInvoice) => (
                 <Fragment key={prevInvoice.id}>
                   <Grid item xs={7}>
-                    <FormInput
-                      props={{
-                        size: 'small',
-                        label: 'Name',
-                        ...(prevInvoice.id === invoice?.id
-                          ? {
-                              name: 'payment.description',
-                              value: formik.values.payment?.description,
-                              onChange: formik.handleChange,
-                            }
-                          : {
-                              value:
-                                prevInvoice.additionalInfo.payment
-                                  ?.description ?? '',
-                              disabled: true,
-                            }),
-                      }}
+                    <NameInput
+                      formik={formik}
+                      paymentDescriptionError={paymentDescriptionError}
+                      disabledValue={
+                        prevInvoice.id !== invoice?.id
+                          ? prevInvoice.additionalInfo.payment?.description ??
+                            ''
+                          : ''
+                      }
                     />
                   </Grid>
                   <Grid
@@ -1002,8 +1024,7 @@ export const PartialPaymentsSection = ({
                     display="flex"
                     justifyContent="flex-end"
                     gap={2}>
-                    {prevInvoice.additionalInfo.payment?.type ===
-                      PaymentType.PERCENTAGE && (
+                    {formik.values.payment?.type === PaymentType.PERCENTAGE && (
                       <NumericFormat
                         {...(prevInvoice.id === invoice?.id
                           ? {
@@ -1013,10 +1034,10 @@ export const PartialPaymentsSection = ({
                             }
                           : {
                               value:
-                                prevInvoice.additionalInfo.payment.percentage,
+                                prevInvoice.additionalInfo.payment
+                                  ?.percentage ?? 0,
                               disabled: true,
                             })}
-                        value={prevInvoice.additionalInfo.payment.percentage}
                         customInput={TextField}
                         label={t('Percentage')}
                         allowLeadingZeros={false}
@@ -1085,14 +1106,9 @@ export const PartialPaymentsSection = ({
             {!isEditing && (
               <>
                 <Grid item xs={7}>
-                  <FormInput
-                    props={{
-                      size: 'small',
-                      label: 'Name',
-                      name: 'payment.description',
-                      value: formik.values.payment?.description,
-                      onChange: formik.handleChange,
-                    }}
+                  <NameInput
+                    formik={formik}
+                    paymentDescriptionError={paymentDescriptionError}
                   />
                 </Grid>
                 <Grid
