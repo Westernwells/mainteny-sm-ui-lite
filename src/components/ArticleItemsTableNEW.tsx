@@ -41,6 +41,7 @@ import {
 import {getItemRecord} from 'utils/article-utils';
 import {fixRounding, getUniqueId} from 'utils/utils';
 import {useTheme} from '@mui/material/styles';
+import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd';
 import {Button} from './Button';
 import {SelectButton} from './SelectButton';
 import {ArticleItemRowNEW} from './ArticleItemRowNEW';
@@ -223,18 +224,31 @@ export const ArticleItemsTableNEW = ({
     setItems([...items, blankItem]);
   };
 
-  const columns: {name: string; align?: TableCellProps['align']}[] = [
-    {name: '#', align: 'right'},
-    {name: 'Name'},
-    {name: 'Type'},
-    {name: 'Unit Price'},
-    {name: 'Quantity'},
-    {name: 'VAT (%)'},
-    {name: 'Unit'},
-    {name: discountText},
-    {name: 'Total Price (excl. VAT)'},
+  const columns: {
+    name: string;
+    align?: TableCellProps['align'];
+    width?: TableCellProps['width'];
+  }[] = [
+    {name: '#', align: 'left', width: '2%'},
+    {name: 'Name', width: '34%'},
+    {name: 'Type', width: '4.5%'},
+    {name: 'Unit Price', width: '13.5%'},
+    {name: 'Quantity', width: '6%'},
+    {name: 'VAT (%)', width: '6%'},
+    {name: 'Unit', width: '9.5%'},
+    {name: discountText, width: '9%'},
+    {name: 'Total Price (excl. VAT)', width: '13%'},
     {name: ''},
   ];
+
+  const onDragEnd = (result: any) => {
+    if (!result.destination) return;
+
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setItems(items);
+  };
 
   return (
     <Box
@@ -275,25 +289,59 @@ export const ArticleItemsTableNEW = ({
           <TableHead>
             <TableRow>
               {columns.map((column) => (
-                <TableCell key={column.name} align={column.align || 'left'}>
+                <TableCell
+                  key={column.name}
+                  align={column.align || 'left'}
+                  sx={{display: 'inline-block'}}
+                  width={column.width}>
                   {t(column.name)}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
-          <TableBody>
-            {items.map((item, index) => (
-              <ArticleItemRowNEW
-                key={index + (item.article?.id || item.name)}
-                articleItem={item}
-                index={index}
-                deleteItem={deleteItem}
-                setItemAtIndex={setItemAtIndex}
-                propertyOwnerId={propertyOwnerId}
-                handleSelectItem={handleSelectItem}
-              />
-            ))}
-          </TableBody>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="article-items">
+              {(providedDrop) => (
+                <TableBody
+                  ref={providedDrop.innerRef}
+                  {...providedDrop.droppableProps}>
+                  {items.map((item, index) => (
+                    <Draggable
+                      key={index + (item.article?.id || item.name)}
+                      draggableId={index + (item.article?.id || item.name)}
+                      index={index}>
+                      {(provided) => (
+                        <TableRow
+                          sx={{
+                            position: 'relative',
+                            width: '100%',
+                            ':hover': {
+                              '.drag-indicator': {
+                                visibility: 'visible',
+                              },
+                            },
+                          }}
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}>
+                          <ArticleItemRowNEW
+                            key={index + (item.article?.id || item.name)}
+                            articleItem={item}
+                            index={index}
+                            deleteItem={deleteItem}
+                            setItemAtIndex={setItemAtIndex}
+                            propertyOwnerId={propertyOwnerId}
+                            handleSelectItem={handleSelectItem}
+                          />
+                        </TableRow>
+                      )}
+                    </Draggable>
+                  ))}
+                  {providedDrop.placeholder}
+                </TableBody>
+              )}
+            </Droppable>
+          </DragDropContext>
         </Table>
       </TableContainer>
       <Box
