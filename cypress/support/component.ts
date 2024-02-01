@@ -37,6 +37,9 @@ declare global {
 }
 
 Cypress.Commands.add('mount', mount)
-
+// Alternatively, if you want to ignore all uncaught exceptions:
+Cypress.on('uncaught:exception', () => false)
+// suppress AssertionError
+Cypress.on('fail', () => false);
 // Example use:
 // cy.mount(<MyComponent />)

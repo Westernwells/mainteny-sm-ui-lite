@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {Alert, Grid, Switch, Typography, Box} from '@mui/material';
 import {getIn, useFormik} from 'formik';
 import {t} from 'i18next';

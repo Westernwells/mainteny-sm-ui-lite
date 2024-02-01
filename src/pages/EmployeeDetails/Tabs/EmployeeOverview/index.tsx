@@ -31,8 +31,9 @@ export const EmployeeOverview = ({
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
-  const [basicDetails, setBasicDetails] =
-    useState<{[key: string]: BasicDetailsValue}>();
+  const [basicDetails, setBasicDetails] = useState<{
+    [key: string]: BasicDetailsValue;
+  }>();
   const [openDialog, setOpenDialog] = useState(false);
 
   useEffect(() => {

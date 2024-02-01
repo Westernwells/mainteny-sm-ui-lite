@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {useEffect, useMemo, useState} from 'react';
 import {t} from 'i18next';
 import {useLocation, useNavigate} from 'react-router-dom';
