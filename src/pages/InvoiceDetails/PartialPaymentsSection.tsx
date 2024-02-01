@@ -87,6 +87,36 @@ const Table = ({children, headStyles, bodyStyles, ...props}: TableProps) => (
   </MuiTable>
 );
 
+interface NameInputProps {
+  formik: FormikProps<InvoiceFormData>;
+  paymentDescriptionError?: string;
+  disabledValue?: string;
+}
+
+const NameInput = ({
+  formik,
+  paymentDescriptionError,
+  disabledValue,
+}: NameInputProps) => (
+  <FormInput
+    props={{
+      size: 'small',
+      label: 'Name',
+      ...(disabledValue
+        ? {disabled: true, value: disabledValue}
+        : {
+            name: 'payment.description',
+            value: formik.values.payment?.description,
+            onChange: formik.handleChange,
+            onBlur: formik.handleBlur,
+            required: true,
+            error: !!paymentDescriptionError,
+            helperText: paymentDescriptionError,
+          }),
+    }}
+  />
+);
+
 interface Props {
   formik: FormikProps<InvoiceFormData>;
   previousInvoices: InvoiceView[];
@@ -346,7 +376,7 @@ export const PartialPaymentsSection = ({
     }
   }, [invoice]);
 
-  const paymentDescriptionError =
+  const paymentDescriptionError: string | undefined =
     getIn(formik.touched, 'payment.description') &&
     getIn(formik.errors, 'payment.description');
 
@@ -402,27 +432,14 @@ export const PartialPaymentsSection = ({
           previousInvoices.map((prevInvoice, idx) => (
             <Fragment key={prevInvoice.id}>
               <Grid item xs={12}>
-                <FormInput
-                  props={{
-                    size: 'small',
-                    label: 'Name',
-                    ...(prevInvoice.id === invoice?.id
-                      ? {
-                          name: 'payment.description',
-                          value: formik.values.payment?.description ?? '',
-                          onChange: formik.handleChange,
-                          onBlur: formik.handleBlur,
-                          required: true,
-                          error: !!paymentDescriptionError,
-                          helperText: paymentDescriptionError,
-                        }
-                      : {
-                          value:
-                            prevInvoice.additionalInfo.payment?.description ??
-                            '',
-                          disabled: true,
-                        }),
-                  }}
+                <NameInput
+                  formik={formik}
+                  paymentDescriptionError={paymentDescriptionError}
+                  disabledValue={
+                    prevInvoice.id !== invoice?.id
+                      ? prevInvoice.additionalInfo.payment?.description ?? ''
+                      : ''
+                  }
                 />
               </Grid>
               <Grid item xs={12}>
@@ -581,18 +598,9 @@ export const PartialPaymentsSection = ({
         {!isEditing && (
           <>
             <Grid item xs={12}>
-              <FormInput
-                props={{
-                  size: 'small',
-                  label: 'Name',
-                  name: 'payment.description',
-                  value: formik.values.payment?.description,
-                  onChange: formik.handleChange,
-                  onBlur: formik.handleBlur,
-                  required: true,
-                  error: !!paymentDescriptionError,
-                  helperText: paymentDescriptionError,
-                }}
+              <NameInput
+                formik={formik}
+                paymentDescriptionError={paymentDescriptionError}
               />
             </Grid>
             <Grid item xs={12}>
@@ -989,27 +997,15 @@ export const PartialPaymentsSection = ({
               previousInvoices.map((prevInvoice) => (
                 <Fragment key={prevInvoice.id}>
                   <Grid item xs={7}>
-                    <FormInput
-                      props={{
-                        size: 'small',
-                        label: 'Name',
-                        ...(prevInvoice.id === invoice?.id
-                          ? {
-                              name: 'payment.description',
-                              value: formik.values.payment?.description,
-                              onChange: formik.handleChange,
-                              onBlur: formik.handleBlur,
-                              required: true,
-                              error: !!paymentDescriptionError,
-                              helperText: paymentDescriptionError,
-                            }
-                          : {
-                              value:
-                                prevInvoice.additionalInfo.payment
-                                  ?.description ?? '',
-                              disabled: true,
-                            }),
-                      }}
+                    <NameInput
+                      formik={formik}
+                      paymentDescriptionError={paymentDescriptionError}
+                      disabledValue={
+                        prevInvoice.id !== invoice?.id
+                          ? prevInvoice.additionalInfo.payment?.description ??
+                            ''
+                          : ''
+                      }
                     />
                   </Grid>
                   <Grid
@@ -1100,18 +1096,9 @@ export const PartialPaymentsSection = ({
             {!isEditing && (
               <>
                 <Grid item xs={7}>
-                  <FormInput
-                    props={{
-                      size: 'small',
-                      label: 'Name',
-                      name: 'payment.description',
-                      value: formik.values.payment?.description,
-                      onChange: formik.handleChange,
-                      onBlur: formik.handleBlur,
-                      required: true,
-                      error: !!paymentDescriptionError,
-                      helperText: paymentDescriptionError,
-                    }}
+                  <NameInput
+                    formik={formik}
+                    paymentDescriptionError={paymentDescriptionError}
                   />
                 </Grid>
                 <Grid
