@@ -2045,5 +2045,8 @@
   "Upfront": "Unapred",
   "Created Date Range": "Kreirani opseg datuma",
   "Automatically assigned": "Automatski dodeljeno",
-  "Select Unit": "Izaberite jedinicu"
+  "Select Unit": "Izaberite jedinicu",
+  "Text": "Tekst",
+  "Select a unit": "Izabrite jedinicu",
+  "Invalid unit": "Nevažeća jedinica"
 }
