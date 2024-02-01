@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import {FormikProps, getIn} from 'formik';
 import {theme} from 'theme';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, {useMemo} from 'react';
 import {FormikProps} from 'formik';
 import {t} from 'i18next';

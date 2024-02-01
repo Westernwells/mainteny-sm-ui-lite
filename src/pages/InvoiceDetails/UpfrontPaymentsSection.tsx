@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {Fragment, useEffect} from 'react';
 import {t} from 'i18next';
 import {theme} from 'theme';

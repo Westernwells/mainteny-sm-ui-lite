@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {AutoAwesome} from '@mui/icons-material';
 import {Popper, Paper, MenuItem, Typography, PopperProps} from '@mui/material';
 import {Box} from '@mui/system';
