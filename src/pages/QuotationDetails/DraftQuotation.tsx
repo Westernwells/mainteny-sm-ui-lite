@@ -275,6 +275,8 @@ export const DraftQuotation = ({formType, quotation}: Props) => {
 
   const handleSelectUnit = (row: ElevatorView) => {
     setUnit(row);
+    setCustomer(row.propertyOwner);
+    formik.setFieldValue('elevatorId', row.id);
   };
 
   const handleCustomerChange = (value: PropertyOwnerView | null) => {
@@ -761,7 +763,7 @@ export const DraftQuotation = ({formType, quotation}: Props) => {
                     />
                   </Box>
                 }
-                buttonText="Select unit"
+                buttonText="Select Unit"
                 cardHeader={
                   unit && <Typography variant="body2">{unit.model}</Typography>
                 }
