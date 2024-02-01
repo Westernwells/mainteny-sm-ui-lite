@@ -2044,5 +2044,6 @@
   "A payment due date is required to send the invoice. Please add this information to proceed": "Za slanje fakture potreban je rok za plaćanje. Dodajte ove informacije da biste nastavili",
   "Upfront": "Unapred",
   "Created Date Range": "Kreirani opseg datuma",
-  "Automatically assigned": "Automatski dodeljeno"
+  "Automatically assigned": "Automatski dodeljeno",
+  "Select Unit": "Izaberite jedinicu"
 }
