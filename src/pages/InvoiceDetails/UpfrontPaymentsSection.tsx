@@ -62,6 +62,14 @@ export const UpfrontPaymentsSection = ({
     }
   };
 
+  const previousInvoicesTotalExclVat = previousInvoices
+    .map(
+      (i) =>
+        (i.totalAmount?.netAmount ?? 0) /
+        10 ** (i.totalAmount?.fractionDigits ?? 2),
+    )
+    .reduce((a, b) => a + b, 0);
+
   const isAllowedAmountField = (values: NumberFormatValues) => {
     const {floatValue} = values;
     if (!floatValue) {
@@ -75,7 +83,15 @@ export const UpfrontPaymentsSection = ({
       return false;
     }
 
-    return floatValue <= subtotalExclVat;
+    const maxAmount =
+      subtotalExclVat -
+      previousInvoicesTotalExclVat +
+      (isEditing
+        ? (invoice.totalAmount?.netAmount ?? 0) /
+          10 ** (invoice.totalAmount?.fractionDigits ?? 2)
+        : 0);
+
+    return floatValue <= maxAmount;
   };
 
   const prevInvoicesPercentage = previousInvoices
@@ -107,14 +123,6 @@ export const UpfrontPaymentsSection = ({
       : formik.values.payment?.type === PaymentType.PERCENTAGE
       ? (subtotalExclVat * (formik.values.payment?.percentage ?? 0)) / 100
       : 0;
-
-  const previousInvoicesTotalExclVat = previousInvoices
-    .map(
-      (i) =>
-        (i.totalAmount?.netAmount ?? 0) /
-        10 ** (i.totalAmount?.fractionDigits ?? 2),
-    )
-    .reduce((a, b) => a + b, 0);
 
   const totalAmountExclVat = isEditing
     ? amount +
