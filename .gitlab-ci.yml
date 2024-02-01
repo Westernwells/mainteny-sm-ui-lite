@@ -13,7 +13,6 @@ variables:
 .build-project: &build-template
   stage: build-project
   image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
-  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
   dependencies:
     - lint-project
     - tests
@@ -62,7 +61,6 @@ variables:
   stage: deploy
   allow_failure: false
   image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
-  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
   before_script:
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/mainteny/infra/sm-ui-lite-deployment
     - cd sm-ui-lite-deployment
@@ -100,7 +98,6 @@ variables:
 lint-project:
   stage: lint
   image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
-  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
   cache:
     - key:
         files:
@@ -120,7 +117,6 @@ lint-project:
 
 tests:
   stage: test
-  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
   image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
   cache:
     - key:
