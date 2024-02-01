@@ -107,12 +107,6 @@ lint-project:
   script:
     - yarn install --frozen-lockfile --cache-folder .yarn-cache
     - yarn check-all
-  rules:
-    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
-    - when: never
-  rules:
-    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
-    - when: never
 
 
 tests:
@@ -134,9 +128,6 @@ tests:
     - yarn install --cache-folder .yarn-cache
     - yarn start & # Start the application in the background
     - yarn cypress:run # Run Cypress tests
-  rules:
-    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
-    - when: never
 
 build-feature-branch:
   <<: *build-template
