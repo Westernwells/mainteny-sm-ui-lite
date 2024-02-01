@@ -67,7 +67,7 @@ export const UserForm = ({formik, typeForm}: Props) => {
           {[
             {
               id: 'email',
-              label: 'Email address / Username',
+              label: 'Email address',
               placeholder: 'e.g johndoe@example.com',
               InputProps: {
                 endAdornment: (
@@ -79,6 +79,7 @@ export const UserForm = ({formik, typeForm}: Props) => {
               value: formik.values.email,
               helperText: formik.touched.email && formik.errors.email,
               error: !!formik.errors.email && formik.touched.email,
+              disabled: typeForm === 'edit' && true,
               required: true,
             },
           ].map((item, index) => (
