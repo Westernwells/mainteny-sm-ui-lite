@@ -2,7 +2,7 @@ import {Fragment, useEffect} from 'react';
 import {t} from 'i18next';
 import {theme} from 'theme';
 import {Grid, Typography, Box, InputAdornment, Divider} from '@mui/material';
-import {FormikProps} from 'formik';
+import {FormikProps, getIn} from 'formik';
 import {NumberFormatValues} from 'react-number-format';
 import {FormInput} from 'components/form/FormInput';
 import {
@@ -228,6 +228,10 @@ export const UpfrontPaymentsSection = ({
     }
   }, [invoice]);
 
+  const paymentDescriptionError =
+    getIn(formik.touched, 'payment.description') &&
+    getIn(formik.errors, 'payment.description');
+
   return (
     <Grid item xs={12} bgcolor="white" p={3}>
       <Box pb={2}>
@@ -255,6 +259,10 @@ export const UpfrontPaymentsSection = ({
                             name: 'payment.description',
                             value: formik.values.payment?.description,
                             onChange: formik.handleChange,
+                            onBlur: formik.handleBlur,
+                            required: true,
+                            error: !!paymentDescriptionError,
+                            helperText: paymentDescriptionError,
                           }
                         : {
                             value:
@@ -271,8 +279,7 @@ export const UpfrontPaymentsSection = ({
                   display="flex"
                   justifyContent="flex-end"
                   gap={2}>
-                  {prevInvoice.additionalInfo.payment?.type ===
-                    PaymentType.PERCENTAGE && (
+                  {formik.values.payment?.type === PaymentType.PERCENTAGE && (
                     <FormInput
                       inputType="currency"
                       {...(prevInvoice.id === invoice?.id && {
@@ -282,7 +289,8 @@ export const UpfrontPaymentsSection = ({
                         value:
                           prevInvoice.id === invoice?.id
                             ? formik.values.payment?.percentage
-                            : prevInvoice.additionalInfo.payment.percentage,
+                            : prevInvoice.additionalInfo.payment?.percentage ??
+                              0,
                         size: 'small',
                         label: 'Percentage',
                         InputProps: {
@@ -355,6 +363,10 @@ export const UpfrontPaymentsSection = ({
                     name: 'payment.description',
                     value: formik.values.payment?.description,
                     onChange: formik.handleChange,
+                    onBlur: formik.handleBlur,
+                    required: true,
+                    error: !!paymentDescriptionError,
+                    helperText: paymentDescriptionError,
                   }}
                 />
               </Grid>
