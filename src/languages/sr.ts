@@ -1464,4 +1464,5 @@ export const sr = {
   'Customizable in Settings': 'Prilagodljivo u podešavanjima',
   'Enable Automatic ID Generation': 'Omogućite automatsko generisanje ID-a',
   'Allows for easier number input': 'Omogućava lakši unos brojeva',
+  'Automatically assigned': 'Automatski dodeljeno',
 };

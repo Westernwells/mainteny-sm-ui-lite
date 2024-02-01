@@ -594,7 +594,6 @@ export const ArticleItemRowNEW = ({
               },
             }}
             min={0}
-            max={Infinity}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
