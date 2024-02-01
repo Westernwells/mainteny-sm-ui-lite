@@ -1487,10 +1487,12 @@ export const InvoiceForm = ({
                         }
                         checked={formik.values.payment?.type === key}
                         disabled={
-                          previousInvoices.length > 0 &&
-                          key !==
-                            sortedPreviousInvoices[0].additionalInfo.payment
-                              ?.type
+                          (!previousInvoices.length && formType === 'new') ||
+                          (previousInvoices.length === 1 && formType === 'edit')
+                            ? false
+                            : key !==
+                              sortedPreviousInvoices?.[0]?.additionalInfo
+                                ?.payment?.type
                         }
                       />
                     ),
