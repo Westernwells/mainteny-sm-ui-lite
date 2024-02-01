@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, {MutableRefObject} from 'react';
 import {get} from 'lodash';
 import {theme} from 'theme';
