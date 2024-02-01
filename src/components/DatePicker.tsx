@@ -1,3 +1,4 @@
+import {theme} from 'theme';
 import {TextFieldProps} from '@mui/material/TextField';
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
@@ -124,6 +125,9 @@ export const DatePicker = ({
       {
         border: 'none',
       },
+    '& .MuiPickersDay-today:not(.Mui-selected)': {
+      background: theme.palette.secondary.main,
+    },
     '& .MuiDayCalendar-weekContainer > .MuiPickersDay-dayWithMargin': {
       border: 'none',
       borderRight: '1px solid #222B451F',
