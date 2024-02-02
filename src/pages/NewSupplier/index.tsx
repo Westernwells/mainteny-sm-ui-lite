@@ -112,14 +112,21 @@ const NewSupplier = () => {
     user?.userAccount.serviceCompany.id,
   );
 
-  const {data: companyNextNumber} = useCompanyNextNumber(
+  const {data: companyNextNumber, refetch} = useCompanyNextNumber(
     {
       type: ServiceCompanyNumberType.ARTICLE_SUPPLIER,
     },
     user?.userAccount.serviceCompany.id,
   );
 
-  const generateNextNumber = () => {
+  const generateNextNumber = async () => {
+    if (!companyNextNumber?.value) {
+      const {data: refetchedCompanyNextNumber} = await refetch();
+      return formik.setFieldValue(
+        'externalId',
+        refetchedCompanyNextNumber?.value,
+      );
+    }
     formik.setFieldValue('externalId', companyNextNumber?.value);
   };
 

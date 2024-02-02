@@ -39,7 +39,7 @@ export const BasicCustomerForm = ({formik}: Props) => {
     user?.userAccount.serviceCompany.id,
   );
 
-  const {data: companyNextNumber} = useCompanyNextNumber(
+  const {data: companyNextNumber, refetch} = useCompanyNextNumber(
     {
       type: ServiceCompanyNumberType.PROPERTY_OWNER,
     },
@@ -50,7 +50,14 @@ export const BasicCustomerForm = ({formik}: Props) => {
     formik.setFieldValue('externalId', companyNextNumber?.value);
   }, [companyNextNumber]);
 
-  const generateNextNumber = () => {
+  const generateNextNumber = async () => {
+    if (!companyNextNumber?.value) {
+      const {data: refetchedCompanyNextNumber} = await refetch();
+      return formik.setFieldValue(
+        'externalId',
+        refetchedCompanyNextNumber?.value,
+      );
+    }
     formik.setFieldValue('externalId', companyNextNumber?.value);
   };
 
