@@ -831,44 +831,47 @@ export const PartialPaymentsSection = ({
                 </TableRow>
               );
             })}
-            {!isEditing && (
-              <TableRow>
-                <TableCell />
-                <TableCell width="25%">{t('Invoice amount')}</TableCell>
-                <TableCell />
-                <TableCell align="right">{amountFormatted}</TableCell>
-                <TableCell align="right">
-                  {currentInvoiceAmountPercentageVats.map((v, idx) => (
-                    <p key={idx}>{v.percentageVat}%</p>
-                  ))}
-                </TableCell>
-                <TableCell align="right">
-                  {currentInvoiceAmountPercentageVats.map((v, idx) => {
-                    const vatAmountFormatted = formatCurrency(v.vat, {
-                      currency: currentCurrency.code,
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                      roundingMode: 'floor',
-                    });
-                    return <p key={idx}>{vatAmountFormatted}</p>;
-                  })}
-                </TableCell>
-                <TableCell align="right">
-                  {formatCurrency(
-                    amount +
-                      currentInvoiceAmountPercentageVats
-                        .map((v) => v.vat)
-                        .reduce((a, b) => a + b, 0),
-                    {
-                      currency: currentCurrency.code,
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                      roundingMode: 'floor',
-                    },
-                  )}
-                </TableCell>
-              </TableRow>
-            )}
+            <TableRow
+              sx={{
+                '& .MuiTableCell-root': {
+                  fontWeight: 600,
+                },
+              }}>
+              <TableCell />
+              <TableCell width="25%">{t('Invoice amount')}</TableCell>
+              <TableCell />
+              <TableCell align="right">{amountFormatted}</TableCell>
+              <TableCell align="right">
+                {currentInvoiceAmountPercentageVats.map((v, idx) => (
+                  <p key={idx}>{v.percentageVat}%</p>
+                ))}
+              </TableCell>
+              <TableCell align="right">
+                {currentInvoiceAmountPercentageVats.map((v, idx) => {
+                  const vatAmountFormatted = formatCurrency(v.vat, {
+                    currency: currentCurrency.code,
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                    roundingMode: 'floor',
+                  });
+                  return <p key={idx}>{vatAmountFormatted}</p>;
+                })}
+              </TableCell>
+              <TableCell align="right">
+                {formatCurrency(
+                  amount +
+                    currentInvoiceAmountPercentageVats
+                      .map((v) => v.vat)
+                      .reduce((a, b) => a + b, 0),
+                  {
+                    currency: currentCurrency.code,
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                    roundingMode: 'floor',
+                  },
+                )}
+              </TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>
