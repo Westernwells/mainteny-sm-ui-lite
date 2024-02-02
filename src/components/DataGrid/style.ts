@@ -1,17 +1,18 @@
 // @ts-nocheck
-import {experimental_sx as sx} from '@mui/system';
+import {SxProps} from '@mui/system';
+import {theme} from 'theme';
 
 export const styles = {
-  scrollBar: sx({
+  scrollBar: theme.unstable_sx({
     '& ::-webkit-scrollbar': {
-      width: '0.25em',
+      width: '6rem',
     },
     '& ::-webkit-scrollbar-track': {
       background: 'transparent',
     },
     '& ::-webkit-scrollbar-thumb': {
-      background: 'grey',
-      borderRadius: '0.25em',
+      background: 'yellow',
+      borderRadius: '6rem',
     },
-  }),
+  }) as SxProps,
 };
