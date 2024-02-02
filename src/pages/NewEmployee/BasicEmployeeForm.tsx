@@ -47,7 +47,7 @@ export const BasicEmployeeForm = ({
     user?.userAccount.serviceCompany.id,
   );
 
-  const {data: companyNextNumber} = useCompanyNextNumber(
+  const {data: companyNextNumber, refetch} = useCompanyNextNumber(
     {
       type: ServiceCompanyNumberType.EMPLOYEE,
     },
@@ -113,10 +113,16 @@ export const BasicEmployeeForm = ({
     formik.setFieldValue('employeeId', companyNextNumber?.value);
   }, [companyNextNumber]);
 
-  const generateNextNumber = () => {
-    formik.setFieldValue('employeeId', companyNextNumber?.value);
+  const generateNextNumber = async () => {
+    if (!companyNextNumber?.value) {
+      const {data: refetchedCompanyNextNumber} = await refetch();
+      return formik.setFieldValue(
+        'externalId',
+        refetchedCompanyNextNumber?.value,
+      );
+    }
+    formik.setFieldValue('externalId', companyNextNumber?.value);
   };
-
   return (
     <PageCard
       headerLabel="Basic Information"
