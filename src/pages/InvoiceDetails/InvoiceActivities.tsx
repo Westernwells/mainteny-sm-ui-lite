@@ -16,16 +16,22 @@ import {
   InvoiceActivityOverdueNoticeSentData,
   InvoiceActivityType,
   InvoiceActivityView,
+  InvoiceView,
   MyInvoiceActivityView,
 } from 'models/invoice';
-import {getInvoiceActivityTitle} from 'utils/invoice';
+import {
+  getInvoiceActivityDescription,
+  getInvoiceActivityTitle,
+} from 'utils/invoice';
 import {PageCard} from 'components/PageCard';
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
 
 export const InvoiceActivities = ({
   activities,
+  invoice,
 }: {
   activities: InvoiceActivityView[];
+  invoice: InvoiceView;
 }) => {
   const {id: invoiceId} = useParams();
   const {t} = useTranslation();
@@ -113,6 +119,9 @@ export const InvoiceActivities = ({
                   new Date(activity.meta.createdAt),
                   'dd.MM.yyyy | HH:mm',
                 )}
+              </Typography>
+              <Typography variant="subtitle2">
+                {getInvoiceActivityDescription(activity, invoice)}
               </Typography>
             </TimelineContent>
           </TimelineItem>
