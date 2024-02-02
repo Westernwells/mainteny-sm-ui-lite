@@ -69,6 +69,10 @@ const DatePickerRange = ({
     setDateSelectionFinalized(false);
   };
 
+  const handleClear = () => {
+    setValue([null, null]);
+  };
+
   useEffect(() => {
     if (defaultDate) {
       setValue([
@@ -112,7 +116,7 @@ const DatePickerRange = ({
   const renderActionBar = () => (
     <DateRangeActionBar
       onAccept={handleClose}
-      onClear={handleClose}
+      onClear={handleClear}
       isDatePicker
     />
   );

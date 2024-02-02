@@ -60,6 +60,7 @@ interface Props {
   setItemAtIndex: (indexPos: number, item: QuotationItemRecord) => void;
   propertyOwnerId: string;
   handleSelectItem: (row: ArticleView, indexPosition: number) => void;
+  isHovered?: boolean;
 }
 
 interface TableRowProps {
@@ -149,6 +150,7 @@ export const ArticleItemRowQuotation = ({
   setItemAtIndex,
   propertyOwnerId,
   handleSelectItem,
+  isHovered,
 }: Props) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -437,480 +439,486 @@ export const ArticleItemRowQuotation = ({
 
   return (
     <>
-      <TableRow sx={{verticalAlign: 'top'}}>
-        <TableCell sx={{width: '2%'}}>
-          {index + 1}
+      <TableCell
+        sx={{width: '2%', display: 'inline-block', verticalAlign: 'top'}}>
+        {index + 1}
 
-          <IconButton
-            className="drag-indicator"
-            size="large"
-            sx={{
-              visibility: 'hidden',
-              position: 'absolute',
-              left: '1%',
-              top: '50%',
-              transform: 'translate(-50%,-50%)',
-            }}>
-            <DragIndicator sx={{fontSize: '1.25rem'}} />
-          </IconButton>
-        </TableCell>
-
-        <TableCell sx={{width: '35%'}}>
-          <ClickAwayListener onClickAway={handlePopperClose}>
-            <Box>
-              <TextField
-                name="name"
-                id={`name-${index}`}
-                value={formik.values.name}
-                onChange={handleTextFieldChange}
-                size="small"
-                onBlur={formik.handleBlur}
-                fullWidth
-                sx={{width: '100%', '& .MuiFormHelperText-root': {mx: '0em'}}}
-                required
-                helperText={
-                  formik.errors.name && formik.touched.name
-                    ? formik.errors.name
-                    : ''
-                }
-                error={!!(formik.errors.name && formik.touched.name)}
-                autoComplete="off"
-                onClick={handleTextFieldClick}
-              />
-              <Box>
-                <Popper
-                  open={popperOpen}
-                  placement="bottom-start"
-                  anchorEl={
-                    popperOpen ? document.getElementById(`name-${index}`) : null
-                  }
-                  sx={{width: '800px', zIndex: 10}}>
-                  <Paper
-                    sx={{
-                      maxHeight: '380px',
-                      pl: 2,
-                      pr: 0.7,
-                      py: 2,
-                      boxShadow: '0px 4px 15px 0px #90909033',
-                    }}>
-                    <div>
-                      <Tabs
-                        hideDivider
-                        tabItems={tabItems}
-                        currentIndex={tabValue}
-                        onChange={(indexValue) => setTabValue(indexValue)}
-                        isTextCap>
-                        <TabsBody value={tabValue} index={0}>
-                          {renderTable(articleResource.data, isArticleLoading)}
-                        </TabsBody>
-                        <TabsBody value={tabValue} index={1}>
-                          {renderTable(
-                            customArticleResource.data,
-                            isCustomPriceLoading,
-                          )}
-                        </TabsBody>
-                      </Tabs>
-                    </div>
-                  </Paper>
-                </Popper>
-              </Box>
-            </Box>
-          </ClickAwayListener>
-        </TableCell>
-
-        <TableCell sx={{width: '4%'}}>
-          <>
-            <Tooltip
-              title={t(getArticleTypeText(formik.values.article?.type!))}
-              arrow
-              placement="top">
-              <Box
-                onClick={handleClick}
-                sx={{
-                  width: '100%',
-                  borderRadius: '4px',
-                  height: 41,
-                  cursor: 'pointer',
-                  textAlign: 'center',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: '#00D1FF0A',
-                }}
-                tabIndex={0}>
-                {formik.values.article?.type === ArticleType.PACKAGE ? (
-                  <PackageIcon fontSize="2rem" />
-                ) : formik.values.article?.type === ArticleType.MATERIAL ? (
-                  <MaterialIcon fontSize="2rem" />
-                ) : (
-                  <LaborIcon fontSize="2rem" />
-                )}
-              </Box>
-            </Tooltip>
-            <Popover
-              open={open}
-              anchorEl={anchorEl}
-              onClose={handleClose}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              sx={{
-                '& .MuiPaper-root': {
-                  width: '350px',
-                  minHeight: '250px',
-                  pt: 1,
-                  pb: 2,
-                  px: 3,
-                },
-              }}>
-              <ArticleTypeCard
-                formik={formik}
-                unitPrice={price}
-                handleClose={handleClose}
-              />
-            </Popover>
-          </>
-        </TableCell>
-
-        <TableCell sx={{width: '14%', '& .MuiTextField-root': {width: '100%'}}}>
-          <NumericFormat
-            value={price !== 0 ? price : 0}
-            customInput={TextField}
-            allowLeadingZeros={false}
-            decimalScale={2}
-            decimalSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-            }
-            thousandSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-            }
-            size="small"
-            sx={{
-              '& .MuiOutlinedInput-input': {
-                textAlign: 'right',
-                width: '100%',
-              },
-            }}
-            min={0}
-            max={Infinity}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  {currentCurrency.symbol}
-                </InputAdornment>
-              ),
-            }}
-            onValueChange={(values) => {
-              const {floatValue} = values;
-              if (floatValue) {
-                formik.setFieldValue(
-                  'unitAmount.netAmount',
-                  floatValue * 10 ** formik.values.unitAmount.fractionDigits,
-                );
-              } else {
-                formik.setFieldValue('unitAmount.netAmount', 0);
-              }
-            }}
-          />
-        </TableCell>
-
-        <TableCell sx={{width: '6%'}}>
-          <NumericFormat
-            value={formik.values.quantity !== 0 ? formik.values.quantity : 0}
-            customInput={TextField}
-            allowLeadingZeros={false}
-            decimalScale={2}
-            decimalSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-            }
-            thousandSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-            }
-            size="small"
-            onValueChange={(values) => {
-              const {floatValue} = values;
-              formik.setFieldValue('quantity', floatValue || 0);
-            }}
-            isAllowed={(values) => /^\d*\.?\d*$/g.test(values.value)}
-            sx={{
-              width: '100%',
-              '& .MuiInputBase-root': {
-                pr: 0,
-              },
-              '& .MuiOutlinedInput-input': {
-                textAlign: 'right',
-                width: '100%',
-              },
-            }}
-            InputProps={{
-              name: 'quantity',
-              id: `quantity-${index}`,
-              inputMode: 'numeric',
-            }}
-          />
-        </TableCell>
-
-        <TableCell sx={{width: '6%'}}>
-          <NumericFormat
-            value={
-              formik.values.unitAmount.percentageVat !== 0
-                ? formik.values.unitAmount.percentageVat
-                : 0
-            }
-            customInput={TextField}
-            suffix="%"
-            allowLeadingZeros={false}
-            decimalScale={2}
-            decimalSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-            }
-            thousandSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-            }
-            sx={{
-              width: '100%',
-              '& .MuiInputBase-root': {
-                pr: 0,
-              },
-              '& .MuiOutlinedInput-input': {
-                textAlign: 'right',
-              },
-            }}
-            isAllowed={(values) => {
-              const {floatValue} = values;
-              if (!floatValue) {
-                return true;
-              }
-
-              if (floatValue < 0) {
-                return false;
-              }
-
-              const maxValue = 100;
-
-              return floatValue <= maxValue;
-            }}
-            InputProps={{
-              name: 'unitAmount.percentageVat',
-              id: `unitAmount.percentageVat-${index}`,
-              inputMode: 'numeric',
-            }}
-            onValueChange={(values) => {
-              const {floatValue} = values;
-              formik.setFieldValue('unitAmount.percentageVat', floatValue || 0);
-            }}
-            size="small"
-          />
-        </TableCell>
-
-        <TableCell sx={{width: '10%'}}>
-          <FormSelect
-            labelId={`select-unit-label-${index}`}
-            label=""
-            options={Object.keys(MeasurementUnit).map((item) => ({
-              label: item,
-              value: item,
-            }))}
-            selectProps={{
-              value: formik.values.article?.unit ?? '',
-              onChange: formik.handleChange,
-              onBlur: formik.handleBlur,
-              placeholder: t('Select Unit'),
-              name: 'article.unit',
-              sx: {width: '100%'},
-              required: true,
-              error: !!(
-                formik.values.name !== '' &&
-                getIn(formik.errors, 'article.unit')
-              ),
-            }}
-            errorText={
-              formik.values.name !== '' ||
-              (getIn(formik.touched, `article.unit`) &&
-                getIn(formik.errors, `article.unit`))
-                ? getIn(formik.errors, `article.unit`)
-                : undefined
-            }
-          />
-        </TableCell>
-
-        {/* DISCOUNT */}
-        <TableCell sx={{width: '9%'}}>
-          <NumericFormat
-            value={
-              formik.values.discount?.type === DiscountType.AMOUNT
-                ? formik.values.discount?.amount?.value
-                : formik.values.discount?.percentage
-            }
-            isAllowed={(values) => {
-              const {floatValue} = values;
-              if (!floatValue) {
-                return true;
-              }
-
-              if (floatValue < 0) {
-                return false;
-              }
-
-              const maxDiscount: number =
-                formik.values.discount?.type === DiscountType.AMOUNT
-                  ? totalPriceExclVat
-                  : 100;
-
-              return floatValue <= maxDiscount;
-            }}
-            customInput={TextField}
-            allowLeadingZeros={false}
-            decimalScale={2}
-            decimalSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-            }
-            thousandSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-            }
-            size="small"
-            sx={{
-              width: '100%',
-              '& .MuiInputBase-root': {
-                pr: 0,
-              },
-              '& .MuiOutlinedInput-input': {
-                textAlign: 'right',
-              },
-            }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment
-                  component={IconButton}
-                  position="end"
-                  sx={{
-                    py: 2,
-                    height: '100%',
-                    bgcolor: 'action.hover',
-                    borderRadius: 0,
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                    },
-                    width: '20%',
-                  }}
-                  onClick={handleDiscountTypeChange}
-                  size="small">
-                  {formik.values.discount?.type === DiscountType.AMOUNT
-                    ? currentCurrency.symbol
-                    : '%'}
-                </InputAdornment>
-              ),
-            }}
-            onValueChange={handleDiscountValueChange}
-          />
-        </TableCell>
-
-        <TableCell sx={{width: '15%'}}>
-          <NumericFormat
-            value={totalPriceExclVatAfterDiscount}
-            customInput={TextField}
-            decimalScale={2}
-            fixedDecimalScale
-            decimalSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-            }
-            thousandSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-            }
-            size="small"
-            disabled
-            sx={{
-              width: '100%',
-              '& .MuiOutlinedInput-input': {
-                textAlign: 'right',
-              },
-            }}
-          />
-        </TableCell>
-
-        <TableCell
+        <IconButton
+          className="drag-indicator"
+          size="large"
           sx={{
-            paddingLeft: '0px !important',
-            paddingRight: '0px !important',
-            display: 'flex !important',
-            paddingTop: '0.5em !important',
+            visibility: 'hidden',
+            position: 'absolute',
+            left: '1%',
+            top: '50%',
+            transform: 'translate(-50%,-50%)',
           }}>
-          <IconButton
-            onClick={() => deleteItem(index)}
+          <DragIndicator sx={{fontSize: '1.25rem'}} />
+        </IconButton>
+      </TableCell>
+
+      <TableCell sx={{width: '32%', display: 'inline-block'}}>
+        <ClickAwayListener onClickAway={handlePopperClose}>
+          <Box>
+            <TextField
+              name="name"
+              id={`name-${index}`}
+              value={formik.values.name}
+              onChange={handleTextFieldChange}
+              size="small"
+              onBlur={formik.handleBlur}
+              fullWidth
+              sx={{width: '100%', '& .MuiFormHelperText-root': {mx: '0em'}}}
+              required
+              helperText={
+                (!isHovered && formik.errors.name) ||
+                (formik.errors.name && formik.touched.name)
+                  ? formik.errors.name
+                  : ''
+              }
+              error={
+                !!(!isHovered && formik.errors.name) ||
+                !!(formik.errors.name && formik.touched.name)
+              }
+              autoComplete="off"
+              onClick={handleTextFieldClick}
+            />
+            <Box>
+              <Popper
+                open={popperOpen}
+                placement="bottom-start"
+                anchorEl={
+                  popperOpen ? document.getElementById(`name-${index}`) : null
+                }
+                sx={{width: '800px', zIndex: 10}}>
+                <Paper
+                  sx={{
+                    maxHeight: '380px',
+                    pl: 2,
+                    pr: 0.7,
+                    py: 2,
+                    boxShadow: '0px 4px 15px 0px #90909033',
+                  }}>
+                  <div>
+                    <Tabs
+                      hideDivider
+                      tabItems={tabItems}
+                      currentIndex={tabValue}
+                      onChange={(indexValue) => setTabValue(indexValue)}
+                      isTextCap>
+                      <TabsBody value={tabValue} index={0}>
+                        {renderTable(articleResource.data, isArticleLoading)}
+                      </TabsBody>
+                      <TabsBody value={tabValue} index={1}>
+                        {renderTable(
+                          customArticleResource.data,
+                          isCustomPriceLoading,
+                        )}
+                      </TabsBody>
+                    </Tabs>
+                  </div>
+                </Paper>
+              </Popper>
+            </Box>
+          </Box>
+        </ClickAwayListener>
+      </TableCell>
+
+      <TableCell sx={{width: '4%', display: 'inline-block'}}>
+        <>
+          <Tooltip
+            title={t(getArticleTypeText(formik.values.article?.type!))}
+            arrow
+            placement="top">
+            <Box
+              onClick={handleClick}
+              sx={{
+                width: '100%',
+                borderRadius: '4px',
+                height: 41,
+                cursor: 'pointer',
+                textAlign: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: '#00D1FF0A',
+              }}
+              tabIndex={0}>
+              {formik.values.article?.type === ArticleType.PACKAGE ? (
+                <PackageIcon fontSize="2rem" />
+              ) : formik.values.article?.type === ArticleType.MATERIAL ? (
+                <MaterialIcon fontSize="2rem" />
+              ) : (
+                <LaborIcon fontSize="2rem" />
+              )}
+            </Box>
+          </Tooltip>
+          <Popover
+            open={open}
+            anchorEl={anchorEl}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
             sx={{
-              padding: '0px !important',
+              '& .MuiPaper-root': {
+                width: '350px',
+                minHeight: '250px',
+                pt: 1,
+                pb: 2,
+                px: 3,
+              },
             }}>
-            <DeleteIcon />
-          </IconButton>
-        </TableCell>
-      </TableRow>
+            <ArticleTypeCard
+              formik={formik}
+              unitPrice={price}
+              handleClose={handleClose}
+            />
+          </Popover>
+        </>
+      </TableCell>
+
+      <TableCell
+        sx={{
+          width: '14%',
+          display: 'inline-block',
+          '& .MuiTextField-root': {width: '100%'},
+        }}>
+        <NumericFormat
+          value={price !== 0 ? price : 0}
+          customInput={TextField}
+          allowLeadingZeros={false}
+          decimalScale={2}
+          decimalSeparator={
+            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
+          }
+          thousandSeparator={
+            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
+          }
+          size="small"
+          sx={{
+            '& .MuiOutlinedInput-input': {
+              textAlign: 'right',
+              width: '100%',
+            },
+          }}
+          min={0}
+          max={Infinity}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                {currentCurrency.symbol}
+              </InputAdornment>
+            ),
+          }}
+          onValueChange={(values) => {
+            const {floatValue} = values;
+            if (floatValue) {
+              formik.setFieldValue(
+                'unitAmount.netAmount',
+                floatValue * 10 ** formik.values.unitAmount.fractionDigits,
+              );
+            } else {
+              formik.setFieldValue('unitAmount.netAmount', 0);
+            }
+          }}
+        />
+      </TableCell>
+
+      <TableCell sx={{width: '6%', display: 'inline-block'}}>
+        <NumericFormat
+          value={formik.values.quantity !== 0 ? formik.values.quantity : 0}
+          customInput={TextField}
+          allowLeadingZeros={false}
+          decimalScale={2}
+          decimalSeparator={
+            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
+          }
+          thousandSeparator={
+            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
+          }
+          size="small"
+          onValueChange={(values) => {
+            const {floatValue} = values;
+            formik.setFieldValue('quantity', floatValue || 0);
+          }}
+          isAllowed={(values) => /^\d*\.?\d*$/g.test(values.value)}
+          sx={{
+            width: '100%',
+            '& .MuiInputBase-root': {
+              pr: 0,
+            },
+            '& .MuiOutlinedInput-input': {
+              textAlign: 'right',
+              width: '100%',
+            },
+          }}
+          InputProps={{
+            name: 'quantity',
+            id: `quantity-${index}`,
+            inputMode: 'numeric',
+          }}
+        />
+      </TableCell>
+
+      <TableCell sx={{width: '6%', display: 'inline-block'}}>
+        <NumericFormat
+          value={
+            formik.values.unitAmount.percentageVat !== 0
+              ? formik.values.unitAmount.percentageVat
+              : 0
+          }
+          customInput={TextField}
+          suffix="%"
+          allowLeadingZeros={false}
+          decimalScale={2}
+          decimalSeparator={
+            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
+          }
+          thousandSeparator={
+            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
+          }
+          sx={{
+            width: '100%',
+            '& .MuiInputBase-root': {
+              pr: 0,
+            },
+            '& .MuiOutlinedInput-input': {
+              textAlign: 'right',
+            },
+          }}
+          isAllowed={(values) => {
+            const {floatValue} = values;
+            if (!floatValue) {
+              return true;
+            }
+
+            if (floatValue < 0) {
+              return false;
+            }
+
+            const maxValue = 100;
+
+            return floatValue <= maxValue;
+          }}
+          InputProps={{
+            name: 'unitAmount.percentageVat',
+            id: `unitAmount.percentageVat-${index}`,
+            inputMode: 'numeric',
+          }}
+          onValueChange={(values) => {
+            const {floatValue} = values;
+            formik.setFieldValue('unitAmount.percentageVat', floatValue || 0);
+          }}
+          size="small"
+        />
+      </TableCell>
+
+      <TableCell sx={{width: '10%', display: 'inline-block'}}>
+        <FormSelect
+          labelId={`select-unit-label-${index}`}
+          label=""
+          options={Object.keys(MeasurementUnit).map((item) => ({
+            label: item,
+            value: item,
+          }))}
+          selectProps={{
+            value: formik.values.article?.unit ?? '',
+            onChange: formik.handleChange,
+            onBlur: formik.handleBlur,
+            placeholder: t('Select Unit'),
+            name: 'article.unit',
+            sx: {width: '100%'},
+            required: true,
+            error: !!(
+              formik.values.name !== '' && getIn(formik.errors, 'article.unit')
+            ),
+          }}
+          errorText={
+            formik.values.name !== '' ||
+            (getIn(formik.touched, `article.unit`) &&
+              getIn(formik.errors, `article.unit`))
+              ? getIn(formik.errors, `article.unit`)
+              : undefined
+          }
+        />
+      </TableCell>
+
+      {/* DISCOUNT */}
+      <TableCell sx={{width: '9%', display: 'inline-block'}}>
+        <NumericFormat
+          value={
+            formik.values.discount?.type === DiscountType.AMOUNT
+              ? formik.values.discount?.amount?.value
+              : formik.values.discount?.percentage
+          }
+          isAllowed={(values) => {
+            const {floatValue} = values;
+            if (!floatValue) {
+              return true;
+            }
+
+            if (floatValue < 0) {
+              return false;
+            }
+
+            const maxDiscount: number =
+              formik.values.discount?.type === DiscountType.AMOUNT
+                ? totalPriceExclVat
+                : 100;
+
+            return floatValue <= maxDiscount;
+          }}
+          customInput={TextField}
+          allowLeadingZeros={false}
+          decimalScale={2}
+          decimalSeparator={
+            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
+          }
+          thousandSeparator={
+            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
+          }
+          size="small"
+          sx={{
+            width: '100%',
+            '& .MuiInputBase-root': {
+              pr: 0,
+            },
+            '& .MuiOutlinedInput-input': {
+              textAlign: 'right',
+            },
+          }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment
+                component={IconButton}
+                position="end"
+                sx={{
+                  py: 2,
+                  height: '100%',
+                  bgcolor: 'action.hover',
+                  borderRadius: 0,
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  },
+                  width: '20%',
+                }}
+                onClick={handleDiscountTypeChange}
+                size="small">
+                {formik.values.discount?.type === DiscountType.AMOUNT
+                  ? currentCurrency.symbol
+                  : '%'}
+              </InputAdornment>
+            ),
+          }}
+          onValueChange={handleDiscountValueChange}
+        />
+      </TableCell>
+
+      <TableCell sx={{width: '15%', display: 'inline-block'}}>
+        <NumericFormat
+          value={totalPriceExclVatAfterDiscount}
+          customInput={TextField}
+          decimalScale={2}
+          fixedDecimalScale
+          decimalSeparator={
+            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
+          }
+          thousandSeparator={
+            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
+          }
+          size="small"
+          disabled
+          sx={{
+            width: '100%',
+            '& .MuiOutlinedInput-input': {
+              textAlign: 'right',
+            },
+          }}
+        />
+      </TableCell>
+
+      <TableCell
+        sx={{
+          paddingLeft: '0px !important',
+          paddingRight: '0px !important',
+          display: 'inline-block',
+          paddingTop: '0.5em !important',
+          width: '2%',
+        }}>
+        <IconButton
+          onClick={() => deleteItem(index)}
+          sx={{
+            padding: '0px !important',
+          }}>
+          <DeleteIcon />
+        </IconButton>
+      </TableCell>
 
       {showDescription ? (
         <>
-          <TableRow>
-            <TableCell />
-            <TableCell colSpan={12}>
-              <TextField
-                name="description"
-                id={`description-${index}`}
-                size="small"
-                placeholder={t('Description')}
-                multiline
-                fullWidth
-                value={formik.values.description}
-                minRows={1}
-                maxRows={10}
-                onChange={formik.handleChange}
-                sx={{mt: 0.5}}
-              />
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell />
-            <TableCell colSpan={7}>
-              <Button
-                label="Remove Description"
-                buttonProps={{
-                  variant: 'text',
-                  size: 'small',
-                  onClick: () => {
-                    formik.setFieldValue('description', '');
-                    setShowDescription(false);
-                  },
-                  sx: {
-                    color: 'error.main',
-                    fontWeight: 300,
-                    px: 0,
-                  },
-                }}
-              />
-            </TableCell>
-          </TableRow>
-        </>
-      ) : (
-        <TableRow>
-          <TableCell />
-          <TableCell colSpan={7}>
+          <TableCell
+            colSpan={12}
+            sx={{width: '98%', display: 'inline-block', ml: '2%'}}>
+            <TextField
+              name="description"
+              id={`description-${index}`}
+              size="small"
+              placeholder={t('Description')}
+              multiline
+              fullWidth
+              value={formik.values.description}
+              minRows={1}
+              maxRows={10}
+              onChange={formik.handleChange}
+              sx={{mt: 0.5}}
+            />
+          </TableCell>
+
+          <TableCell
+            colSpan={12}
+            sx={{width: '98%', display: 'inline-block', ml: '2%'}}>
             <Button
-              label="Add Description"
+              label="Remove Description"
               buttonProps={{
                 variant: 'text',
                 size: 'small',
-                onClick: () => setShowDescription(true),
+                onClick: () => {
+                  formik.setFieldValue('description', '');
+                  setShowDescription(false);
+                },
                 sx: {
-                  color: 'text.secondary',
+                  color: 'error.main',
                   fontWeight: 300,
                   px: 0,
                 },
               }}
             />
           </TableCell>
-        </TableRow>
+        </>
+      ) : (
+        <TableCell
+          colSpan={12}
+          sx={{width: '98%', display: 'inline-block', ml: '2%'}}>
+          <Button
+            label="Add Description"
+            buttonProps={{
+              variant: 'text',
+              size: 'small',
+              onClick: () => setShowDescription(true),
+              sx: {
+                color: 'text.secondary',
+                fontWeight: 300,
+                px: 0,
+              },
+            }}
+          />
+        </TableCell>
       )}
     </>
   );
