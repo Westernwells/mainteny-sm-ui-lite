@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {FormikProps} from 'formik';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
@@ -63,6 +63,8 @@ export const ArticleItemsTableNEW = ({
   const {t} = useTranslation();
   const theme = useTheme();
   const currentCurrency = useCurrentCurrency();
+
+  const [isHovered, setIsHovered] = useState<boolean>(true);
 
   const subtotalExclVat = calculateTotalWithPerItemDiscount(formik.values);
   const subtotalExclVatFormatted = formatCurrency(subtotalExclVat, {
@@ -230,15 +232,15 @@ export const ArticleItemsTableNEW = ({
     width?: TableCellProps['width'];
   }[] = [
     {name: '#', align: 'left', width: '2%'},
-    {name: 'Name', width: '34%'},
-    {name: 'Type', width: '4.5%'},
-    {name: 'Unit Price', width: '13.5%'},
+    {name: 'Name', width: '32%'},
+    {name: 'Type', width: '4%'},
+    {name: 'Unit Price', width: '14%'},
     {name: 'Quantity', width: '6%'},
     {name: 'VAT (%)', width: '6%'},
-    {name: 'Unit', width: '9.5%'},
+    {name: 'Unit', width: '10%'},
     {name: discountText, width: '9%'},
-    {name: 'Total Price (excl. VAT)', width: '13%'},
-    {name: ''},
+    {name: 'Total Price (excl. VAT)', width: '15%'},
+    {name: '', width: '2%'},
   ];
 
   const onDragEnd = (result: any) => {
@@ -259,7 +261,10 @@ export const ArticleItemsTableNEW = ({
       borderRadius={1}
       px={1.5}
       py={2}>
-      <TableContainer>
+      <TableContainer
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        sx={{overflowX: 'hidden'}}>
         <Table
           sx={{
             minWidth: 700,
@@ -315,6 +320,9 @@ export const ArticleItemsTableNEW = ({
                           sx={{
                             position: 'relative',
                             width: '100%',
+                            '& .MuiTableCell-root': {
+                              verticalAlign: 'top',
+                            },
                             ':hover': {
                               '.drag-indicator': {
                                 visibility: 'visible',
@@ -332,6 +340,7 @@ export const ArticleItemsTableNEW = ({
                             setItemAtIndex={setItemAtIndex}
                             propertyOwnerId={propertyOwnerId}
                             handleSelectItem={handleSelectItem}
+                            isHovered={isHovered}
                           />
                         </TableRow>
                       )}

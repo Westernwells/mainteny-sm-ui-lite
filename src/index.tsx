@@ -1,7 +1,7 @@
 import * as React from 'react';
-import ReactDOM from 'react-dom';
 import {QueryClient, QueryClientProvider} from 'react-query';
 import {ReactQueryDevtools} from 'react-query/devtools';
+import {createRoot} from 'react-dom/client';
 import CssBaseline from '@mui/material/CssBaseline';
 import {ThemeProvider} from '@mui/material/styles';
 import {MutationErrorHandler, queryErrorHandler} from 'reactQuery/handlers';
@@ -46,9 +46,12 @@ Sentry.init({
 // Initializa smartlook
 initSmartlook();
 
-ReactDOM.render(
+// Updated part for React 18
+const container = document.querySelector('#root') as Element;
+const root = createRoot(container); // Create a root.
+
+root.render(
   <ThemeProvider theme={theme}>
-    {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
     <CssBaseline />
     <LanguageProvider>
       <QueryClientProvider client={queryClient}>
@@ -69,5 +72,4 @@ ReactDOM.render(
       </QueryClientProvider>
     </LanguageProvider>
   </ThemeProvider>,
-  document.querySelector('#root'),
 );

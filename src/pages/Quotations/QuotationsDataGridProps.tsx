@@ -89,8 +89,8 @@ export const columns = (handleSortModelChange: any): GridColDef[] => [
   {
     field: QuotationOrderField.CREATED_DATE,
     headerName: 'CREATED DATE',
-    align: 'center',
-    headerAlign: 'center',
+    align: 'right',
+    headerAlign: 'right',
     flex: 0.75,
     sortable: false,
     renderHeader: (params: GridColumnHeaderParams) => (

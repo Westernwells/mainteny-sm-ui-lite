@@ -108,7 +108,6 @@ lint-project:
     - yarn install --frozen-lockfile --cache-folder .yarn-cache
     - yarn check-all
 
-
 tests:
   stage: test
   image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
