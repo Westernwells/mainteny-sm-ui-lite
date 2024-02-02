@@ -1,4 +1,5 @@
 import {
+  ArticleRecord,
   CreateInvoice,
   Discount,
   DiscountType,
@@ -16,7 +17,6 @@ export const formatInvoiceRecord = (
   value: InvoiceFormData,
 ): CreateInvoice | UpdateInvoice => ({
   ...value,
-  ...value,
   subject: value.subject,
   description: value.description,
   dueDate: value.dueDate ? dateToString(value.dueDate) : '',
@@ -25,11 +25,26 @@ export const formatInvoiceRecord = (
   items: value.items.map((item) => {
     const {article, ...rest} = item;
     const modifiedArticle = {...article};
+    const unitSellingAmount = modifiedArticle?.unitSellingAmount;
+    const unitAmount = item?.unitAmount;
     delete modifiedArticle.id;
 
     return {
       ...rest,
-      article: modifiedArticle,
+      articleId: article?.id,
+      article: {
+        ...modifiedArticle,
+        unitSellingAmount: {
+          netAmount: unitSellingAmount?.netAmount,
+          percentageVat: unitSellingAmount?.percentageVat,
+          currency: unitSellingAmount?.currency,
+        },
+      } as ArticleRecord,
+      unitAmount: {
+        netAmount: unitAmount?.netAmount,
+        percentageVat: unitAmount?.percentageVat,
+        currency: unitAmount?.currency,
+      },
       discount: rest.discount
         ? {
             ...rest.discount,
