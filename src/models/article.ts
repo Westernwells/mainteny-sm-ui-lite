@@ -279,8 +279,10 @@ export interface PropertyOwnerArticleRecord {
 
 export interface ArticleRecord {
   id: string;
+  name?: string;
   externalId: string;
   type: ArticleType;
   unit: string;
+  unitSellingAmount?: AmountRecord;
   costPackage?: CostPackage;
 }
