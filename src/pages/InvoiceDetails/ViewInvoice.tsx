@@ -526,7 +526,10 @@ export const ViewInvoice = ({
           {/* INVOICE ACTIVITY CARD */}
 
           {invoiceActivities?.length ? (
-            <InvoiceActivities activities={invoiceActivities} />
+            <InvoiceActivities
+              activities={invoiceActivities}
+              invoice={invoice}
+            />
           ) : null}
         </Grid>
       </Grid>
