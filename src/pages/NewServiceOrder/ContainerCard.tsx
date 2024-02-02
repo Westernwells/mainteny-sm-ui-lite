@@ -8,6 +8,7 @@ import CardHeader from '@mui/material/CardHeader';
 import {useTheme} from '@mui/material/styles';
 import {styles as sx} from 'components/Schedules/styles';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {SystemCssProperties} from '@mui/system';
 
 interface Props {
   containerStyles?: {[key: string]: any};
@@ -55,7 +56,8 @@ export const ContainerCard = ({
   }, []);
 
   return (
-    <Card sx={[sx.card, {...containerStyles}]}>
+    <Card
+      sx={[sx.card as unknown as SystemCssProperties, {...containerStyles}]}>
       {customCardHeader || cardHeaderLabel ? (
         <CardHeader
           sx={{
@@ -75,11 +77,20 @@ export const ContainerCard = ({
         />
       ) : null}
 
-      <Box ref={elementRef} sx={[sx.mainContainer, {...contentContainerStyle}]}>
+      <Box
+        ref={elementRef}
+        sx={[
+          sx.mainContainer as unknown as SystemCssProperties,
+          {...contentContainerStyle},
+        ]}>
         <CardContent sx={{padding: 0}}>{children}</CardContent>
 
         {cardFooter ? (
-          <Box sx={[sx.footerContainer, footerContainerStyles || {}]}>
+          <Box
+            sx={[
+              sx.footerContainer as unknown as SystemCssProperties,
+              footerContainerStyles || {},
+            ]}>
             {cardFooter}
           </Box>
         ) : null}
