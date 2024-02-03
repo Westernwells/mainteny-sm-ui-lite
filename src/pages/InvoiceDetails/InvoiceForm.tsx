@@ -35,8 +35,8 @@ import {Confirm} from 'components/Confirm';
 import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {Tooltip} from 'components/Tooltip';
-import {InvoiceContractPaymentTermInput} from 'components/InvoiceContractPaymentTermInput';
-import {InvoiceContractPaymentTerm} from 'components/InvoiceContractPaymentTerm';
+import {ContractPaymentTermInput} from 'components/ContractPaymentTermInput';
+import {ContractPaymentTerm} from 'components/ContractPaymentTerm';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
@@ -1590,7 +1590,7 @@ export const InvoiceForm = ({
       />
 
       {openContractPaymentTermSelectDialog && (
-        <InvoiceContractPaymentTermInput
+        <ContractPaymentTermInput
           title={t('New payment term')}
           open={openContractPaymentTermSelectDialog}
           onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
@@ -1600,7 +1600,7 @@ export const InvoiceForm = ({
       )}
 
       {openContractPaymentTermsDialog && (
-        <InvoiceContractPaymentTerm
+        <ContractPaymentTerm
           title={t('Payment Terms')}
           open={openContractPaymentTermsDialog}
           onCancel={() => setOpenContractPaymentTermsDialog(false)}

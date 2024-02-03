@@ -1,15 +1,14 @@
+import {Dispatch, SetStateAction, useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useFormik} from 'formik';
-import {ReactComponent as LeftRightArrow} from 'assets/icons/LeftRightArrow.svg';
 import DialogContent from '@mui/material/DialogContent';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
-import {Drawer, Box, InputAdornment} from '@mui/material';
+import {Drawer, Box} from '@mui/material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import {createEmptyResource} from 'utils/paging-utils';
 import {useQueryContractPaymentTerms} from 'hooks/reactQuery/useCompanies';
 import {Button} from 'components/Button';
-import {Dispatch, SetStateAction} from 'react';
 import {Button as LoadingButton} from 'components/LoadingButton';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {getUniqueId} from 'utils/utils';
@@ -33,7 +32,7 @@ interface Props {
 
 const pageSize = 50;
 
-export const InvoiceContractPaymentTermInput = ({
+export const ContractPaymentTermInput = ({
   open,
   onCancel,
   title,
@@ -105,6 +104,16 @@ export const InvoiceContractPaymentTermInput = ({
     validateOnMount: false,
   });
 
+  useEffect(() => {
+    if (defaultPaymentTerm) {
+      // try to set using effect sometimes data is not set properly
+      formik.setFieldValue('otherPaymentTerm', {
+        id: defaultPaymentTerm ? defaultPaymentTerm.id : getUniqueId(),
+        term: defaultPaymentTerm ? defaultPaymentTerm.term : '',
+      });
+    }
+  }, [defaultPaymentTerm]);
+
   return (
     <Drawer
       open={open ?? false}
@@ -145,13 +154,6 @@ export const InvoiceContractPaymentTermInput = ({
             value: formik.values.otherPaymentTerm.term,
             helperText: formik.errors.otherPaymentTerm?.term,
             error: !!formik.errors.otherPaymentTerm?.term,
-            InputProps: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <LeftRightArrow />
-                </InputAdornment>
-              ),
-            },
             sx: {
               mt: '0.5em',
             },
