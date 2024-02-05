@@ -24,6 +24,7 @@ import {queryKeys as qks, queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {formatUpdateCustomer} from 'utils/customer-utils';
 import {CreateCustomerNote} from 'models/customer';
+import {Comment} from 'models/comment';
 import {useUserSession} from './useUserSession';
 
 export const queryCustomers = async (params: QueryPropertyOwnersParams) => {
