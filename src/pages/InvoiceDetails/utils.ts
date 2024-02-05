@@ -114,6 +114,7 @@ export const formatInvoiceRecord = (
           : undefined,
     },
   }),
+  showArticleSection: value.showArticleSection,
 });
 
 export const applyDiscount = ({

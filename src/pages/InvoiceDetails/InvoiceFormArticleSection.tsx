@@ -14,21 +14,21 @@ import {FormikProps} from 'formik';
 import {Amount} from 'models/misc';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-
-import {Dispatch, SetStateAction, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useCurrentCurrency} from 'utils/currency';
 import {calculateArticleTotalWithVatFormatted} from 'utils/calculate-total';
+
 import {SectionTitle} from './SectionTitle';
 
 export const ArticleSectionTitleAction = ({
   shouldShow,
-  setShouldShow,
   amount,
   enableCollapse,
+  onToggle,
 }: {
   shouldShow: boolean;
-  setShouldShow: Dispatch<SetStateAction<boolean>>;
+  onToggle: (newState: boolean) => void;
   amount: string;
   enableCollapse?: boolean;
 }) => {
@@ -65,13 +65,13 @@ export const ArticleSectionTitleAction = ({
               `Click to hide this section from the invoice. Hidden section will appear in the invoice or any exported versions`,
             )}>
             <VisibilityIcon
-              onClick={() => setShouldShow(false)}
+              onClick={() => onToggle(false)}
               sx={{width: 25, height: 25, cursor: 'pointer'}}
             />
           </Tooltip>
         ) : (
           <VisibilityOffIcon
-            onClick={() => setShouldShow(true)}
+            onClick={() => onToggle(true)}
             sx={{width: 25, height: 25, cursor: 'pointer'}}
           />
         ))}
@@ -84,6 +84,7 @@ interface Props {
   propertyOwnerId: string;
   formik: FormikProps<InvoiceFormData>;
   enableCollapse?: boolean;
+  showArticleSection?: boolean;
 }
 
 const InvoiceFormArticleSection = ({
@@ -91,14 +92,24 @@ const InvoiceFormArticleSection = ({
   formik,
   propertyOwnerId,
   enableCollapse = false,
+  showArticleSection = true,
 }: Props) => {
-  const [shouldShow, setShouldShow] = useState(true);
+  const [shouldShow, setShouldShow] = useState(showArticleSection);
   const currentCurrency = useCurrentCurrency();
+
+  useEffect(() => {
+    setShouldShow(showArticleSection);
+  }, [showArticleSection]);
 
   const totalAmountInclVatsFormatted = useMemo(
     () => calculateArticleTotalWithVatFormatted(formik.values, currentCurrency),
     [formik.values, currentCurrency],
   );
+
+  const onToggle = (newState: boolean) => {
+    setShouldShow(newState);
+    formik.setFieldValue('showArticleSection', newState);
+  };
 
   return (
     <Grid item xs={12} bgcolor="white" p={3}>
@@ -111,7 +122,7 @@ const InvoiceFormArticleSection = ({
             <ArticleSectionTitleAction
               shouldShow={shouldShow}
               amount={totalAmountInclVatsFormatted}
-              setShouldShow={setShouldShow}
+              onToggle={onToggle}
               enableCollapse={enableCollapse}
             />
           }
