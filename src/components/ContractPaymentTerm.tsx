@@ -108,8 +108,6 @@ export const ContractPaymentTerm = ({
     validateOnMount: false,
   });
   useEffect(() => {
-    console.log('defaultPayment', contractPaymentTerms);
-
     if (defaultPayment) {
       // try to set using effect sometimes data is not set properly
       formik.setFieldValue(
@@ -314,7 +312,6 @@ export const ContractPaymentTerm = ({
                       size="small"
                       onClick={() => {
                         if (pt) {
-                          console.log('pt', pt);
                           setPaymentToEdit(pt as ContractPaymentTermView);
                           onClickNewPaymentTerm();
                         }
