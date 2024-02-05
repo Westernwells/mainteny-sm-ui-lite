@@ -289,6 +289,7 @@ export const InvoiceForm = ({
     customerSpecificOrderNumber: '',
     moreInfo: DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
     unitNumber: '-',
+    showArticleSection: true,
   };
 
   const validationSchema = Yup.object().shape({
@@ -563,6 +564,10 @@ export const InvoiceForm = ({
         invoice?.additionalInfo?.deliveryEndDate
           ? new Date(invoice.additionalInfo.deliveryEndDate)
           : undefined,
+      );
+      formik.setFieldValue(
+        'showArticleSection',
+        invoice?.additionalInfo?.showArticleSection ?? true,
       );
     }
   }, [invoice]);
@@ -1139,6 +1144,7 @@ export const InvoiceForm = ({
           <InvoiceFormArticleSection
             setItems={setInvoiceItems}
             formik={formik}
+            showArticleSection={formik.values.showArticleSection}
             propertyOwnerId={customer?.id ?? ''}
             enableCollapse={formik.values.type !== InvoiceType.FULL}
           />
