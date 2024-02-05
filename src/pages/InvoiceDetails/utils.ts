@@ -27,7 +27,6 @@ export const formatInvoiceRecord = (
     const modifiedArticle = {...article};
     const unitSellingAmount = modifiedArticle?.unitSellingAmount;
     const unitAmount = item?.unitAmount;
-    delete modifiedArticle.id;
 
     return {
       ...rest,

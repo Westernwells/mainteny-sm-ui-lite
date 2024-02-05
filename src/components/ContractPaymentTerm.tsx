@@ -34,7 +34,7 @@ interface Props {
 
 const pageSize = 50;
 
-export const InvoiceContractPaymentTerm = ({
+export const ContractPaymentTerm = ({
   open,
   onCancel,
   title,
@@ -107,6 +107,16 @@ export const InvoiceContractPaymentTerm = ({
     validationSchema,
     validateOnMount: false,
   });
+  useEffect(() => {
+    if (defaultPayment) {
+      // try to set using effect sometimes data is not set properly
+      formik.setFieldValue(
+        'paymentTermId',
+        contractPaymentTerms?.data?.find((p) => p.term === defaultPayment)
+          ?.id ?? '',
+      );
+    }
+  }, [contractPaymentTerms?.data?.length, defaultPayment]);
 
   const handleToggle = (id: string) => {
     const modifiedItems = toggleItems?.map((item) => {
