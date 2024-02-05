@@ -1501,4 +1501,6 @@ export const de = {
   'Enable Automatic ID Generation': 'Automatische ID-Generierung einschalten',
   'Allows for easier number input': 'Ermöglicht eine vereinfachte Nummerierung',
   'Automatically assigned': 'Automatisch erstellt',
+  'Some required information is missing. Please check the highlighted fields.':
+    'Einige erforderliche Informationen fehlen. Bitte überprüfen Sie die hervorgehobenen Felder.',
 };

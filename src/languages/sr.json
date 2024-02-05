@@ -2048,5 +2048,6 @@
   "Select Unit": "Izaberite jedinicu",
   "Text": "Tekst",
   "Select a unit": "Izabrite jedinicu",
-  "Invalid unit": "Nevažeća jedinica"
+  "Invalid unit": "Nevažeća jedinica",
+  "Some required information is missing. Please check the highlighted fields.": "Nedostaju neke potrebne informacije. Proverite označena polja."
 }

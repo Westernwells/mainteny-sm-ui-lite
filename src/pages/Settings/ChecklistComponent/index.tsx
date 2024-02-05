@@ -128,7 +128,7 @@ export const MultiChoiceComponent = ({
   handleMoreInfoInNote,
   isDragging,
 }: MultiChoiceComponentProps) => {
-  const isSubjectInvalid = !form.getValues(`components.${index}.subject`);
+  const watchToItem = form.watch(`components.${index}.subject`);
 
   const inputRef = form.register(`components.${index}.subject`, {
     required: true,
@@ -147,13 +147,13 @@ export const MultiChoiceComponent = ({
             name: `components.${index}.subject`,
             placeholder: t('Enter multi-choice name...'),
             variant: 'standard',
-            error: isSubjectInvalid,
+            error: !watchToItem,
             required: true,
             inputProps: {
               sx: {
                 p: 0,
                 '&::placeholder': {
-                  color: isSubjectInvalid ? 'error.main' : 'text.primary',
+                  color: !watchToItem ? 'error.main' : 'text.primary',
                 },
               },
             },
@@ -176,15 +176,8 @@ export const MultiChoiceComponent = ({
                   required: true,
                 },
               );
-              const isOptionInvalid = !!(
-                get(
-                  form.formState.touchedFields,
-                  `components.${index}.options.${optionIndex}.text`,
-                ) &&
-                get(
-                  form.formState.errors,
-                  `components.${index}.options.${optionIndex}.text`,
-                )
+              const watchToOption = form.watch(
+                `components.${index}.options.${optionIndex}.text`,
               );
               return (
                 <Box
@@ -210,7 +203,7 @@ export const MultiChoiceComponent = ({
                       name: `components.${index}.options.${optionIndex}.text`,
                       placeholder: 'Choice one',
                       variant: 'outlined',
-                      error: isOptionInvalid,
+                      error: !watchToOption,
                       required: true,
                       sx: {
                         bgcolor: 'white',
@@ -223,7 +216,7 @@ export const MultiChoiceComponent = ({
                       inputProps: {
                         sx: {
                           '&::placeholder': {
-                            color: isOptionInvalid
+                            color: !watchToOption
                               ? 'error.main'
                               : 'text.primary',
                           },
@@ -304,6 +297,7 @@ export const CheckboxComponent = ({
   duplicateComponent,
   deleteComponent,
 }: ComponentProps) => {
+  const watchToItem = form.watch(`components.${index}.subject`);
   const inputRef = form.register(`components.${index}.subject`, {
     required: true,
   });
@@ -334,10 +328,7 @@ export const CheckboxComponent = ({
           ...inputRef,
           name: `components.${index}.subject`,
           variant: 'outlined',
-          error: !!(
-            get(form.formState.touchedFields, `components.${index}.subject`) &&
-            get(form.formState.errors, `components.${index}.subject`)
-          ),
+          error: !watchToItem,
           required: true,
           sx: {
             bgcolor: 'white',
@@ -365,11 +356,7 @@ export const HeaderComponent = ({
   duplicateComponent,
   deleteComponent,
 }: ComponentProps) => {
-  const isSubjectInvalid = !!(
-    get(form.formState.touchedFields, `components.${index}.subject`) &&
-    get(form.formState.errors, `components.${index}.subject`)
-  );
-
+  const watchToItem = form.watch(`components.${index}.subject`);
   const inputRef = form.register(`components.${index}.subject`, {
     required: true,
   });
@@ -387,7 +374,7 @@ export const HeaderComponent = ({
           name: `components.${index}.subject`,
           placeholder: t('Enter header name...'),
           variant: 'standard',
-          error: isSubjectInvalid,
+          error: !watchToItem,
           required: true,
           sx: {
             '& .MuiInputBase-input': {
@@ -401,7 +388,7 @@ export const HeaderComponent = ({
           inputProps: {
             sx: {
               '&::placeholder': {
-                color: isSubjectInvalid ? 'error.main' : 'text.primary',
+                color: !watchToItem ? 'error.main' : 'text.primary',
               },
             },
           },
@@ -428,10 +415,7 @@ export const TextComponent = ({
   deleteComponent,
   isDragging,
 }: TextareaComponentProps) => {
-  const isSubjectInvalid = !!(
-    get(form.formState.touchedFields, `components.${index}.subject`) &&
-    get(form.formState.errors, `components.${index}.subject`)
-  );
+  const watchToItem = form.watch(`components.${index}.subject`);
 
   const titleRef = form.register(`components.${index}.subject`, {
     required: true,
@@ -446,13 +430,13 @@ export const TextComponent = ({
             name: `components.${index}.subject`,
             placeholder: t('Enter text area name...'),
             variant: 'standard',
-            error: isSubjectInvalid,
+            error: !watchToItem,
             required: true,
             inputProps: {
               sx: {
                 p: 0,
                 '&::placeholder': {
-                  color: isSubjectInvalid ? 'error.main' : 'text.primary',
+                  color: !watchToItem ? 'error.main' : 'text.primary',
                 },
               },
             },

@@ -1,14 +1,14 @@
 // @ts-nocheck
-import {useEffect, useMemo, useRef, useState, MutableRefObject} from 'react';
+import {MutableRefObject, useEffect, useMemo, useRef, useState} from 'react';
 import {t} from 'i18next';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {VariableSizeList} from 'react-window';
 import {
   Controller,
-  useForm,
-  UseFormReturn,
   useFieldArray,
   UseFieldArrayReturn,
+  useForm,
+  UseFormReturn,
 } from 'react-hook-form';
 import {
   BeforeCapture,
@@ -57,6 +57,7 @@ import {makePage} from 'utils/paging-utils';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import {ChecklistComponent} from './ChecklistComponent';
 import {ChecklistPreview} from './ChecklistPreview';
+import {styles} from './style';
 
 const availableComponents = [
   {
@@ -149,6 +150,13 @@ const Row = ({
   );
 };
 
+const isStringEmpty = (str) => str.trim() === '';
+
+const isValidSubject = (subject) => !isStringEmpty(subject);
+
+const areOptionsValid = (options) =>
+  options.every((option) => !isStringEmpty(option.text));
+
 export const Checklist = () => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -227,6 +235,7 @@ export const Checklist = () => {
     },
   });
 
+  const allFields = form.watch();
   const arrayFields = useFieldArray({
     control: form.control,
     name: 'components',
@@ -332,6 +341,26 @@ export const Checklist = () => {
     }
   };
 
+  const isValidForm = useMemo(() => {
+    const components = values?.components;
+    if (!values.name) return false;
+
+    if (components?.length) {
+      for (const component of components) {
+        if (!isValidSubject(component.subject)) {
+          return false;
+        }
+        if (component.type === CheckListComponentType.SINGLE_CHECK) {
+          if (!areOptionsValid(component.options)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+    return true;
+  }, [allFields, allFields.name, allFields.components?.length]);
+
   return (
     <form>
       <Box
@@ -341,7 +370,7 @@ export const Checklist = () => {
         mt="1.5rem"
         mb="5rem"
         gap={3}>
-        <Box width="100%" maxWidth="47rem">
+        <Box width="100%" maxWidth="47rem" sx={styles.scrollBar}>
           <PageCard
             containerStyles={{
               p: 4,
@@ -358,6 +387,18 @@ export const Checklist = () => {
                 mb: -2,
               },
             }}>
+            {!isValidForm && (
+              <Typography
+                variant="caption"
+                pt={3}
+                pb={1.5}
+                textAlign="center"
+                color="error.main">
+                {t(
+                  'Some required information is missing. Please check the highlighted fields.',
+                )}
+              </Typography>
+            )}
             <Controller
               control={form.control}
               defaultValue={values.name ?? undefined}
@@ -521,7 +562,7 @@ export const Checklist = () => {
         primaryButtonLabel={t('Save')}
         primaryButtonAction={form.handleSubmit(handleSubmitData)}
         listItems={[]}
-        isValid
+        isValid={isValidForm}
         secondaryButton={
           <Button
             label="Show Preview"

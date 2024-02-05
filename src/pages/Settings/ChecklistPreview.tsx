@@ -26,6 +26,7 @@ import {Button} from 'components/Button';
 import {Controller, UseFormReturn} from 'react-hook-form';
 import {VariableSizeList} from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import {styles} from './style';
 
 interface Props {
   isPreviewing: boolean;
@@ -61,8 +62,9 @@ export const ChecklistPreview = ({
       case CheckListComponentType.HEAD:
         return 30 + PADDING_VERTICAL + MARGIN_BOTTOM;
       case CheckListComponentType.SINGLE_CHECK:
-        console.log('length', moreInfo, length);
-        return 90 + calculateHeightOfSingleCheck + (length - 1) * 5;
+        const subject = values.components[index]?.subject;
+        const lines = (Math.ceil((7 * subject?.length) / 250) - 1) * 21;
+        return 90 + calculateHeightOfSingleCheck + lines + (length - 1) * 5;
       case CheckListComponentType.TEXT:
         return 150 + PADDING_VERTICAL + MARGIN_BOTTOM;
       default:
@@ -292,15 +294,21 @@ export const ChecklistPreview = ({
     data: {
       components: ExtendedCheckListComponentRecord[];
     };
-  }) => <Box style={style}>{renderContent(data.components[index], index)}</Box>;
+  }) => (
+    <Box style={{...style, padding: '0px 14px 0px 14px'}}>
+      {renderContent(data.components[index], index)}
+    </Box>
+  );
 
   return (
     <Dialog
       onClose={handleClose}
       open={isPreviewing}
+      sx={styles.scrollBar}
       PaperProps={{
         sx: {
           backgroundColor: theme.palette.background.default,
+          ...styles.scrollBar,
         },
       }}>
       <img
@@ -376,7 +384,6 @@ export const ChecklistPreview = ({
           display="flex"
           flexDirection="column"
           gap={2}
-          px={2}
           pt={3}
           style={{height: '70vh'}}
           pb={2.5}>
@@ -404,6 +411,7 @@ export const ChecklistPreview = ({
                       component="div"
                       variant="caption"
                       color="text.secondary"
+                      mt={1.5}
                       pb={1}>
                       {t("Engineer's Signature")}
                       <Typography variant="caption" sx={{color: '#DB2C66'}}>
@@ -419,6 +427,9 @@ export const ChecklistPreview = ({
                     <Button
                       buttonProps={{
                         variant: 'contained',
+                        sx: {
+                          marginTop: '7px',
+                        },
                         fullWidth: true,
                         size: 'large',
                         onClick: handleClose,
