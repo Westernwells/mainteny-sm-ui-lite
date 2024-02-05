@@ -62,7 +62,7 @@ export const ArticleSectionTitleAction = ({
             arrow
             placement="top"
             title={t(
-              `Click to hide this section from the invoice. Hidden section will appear in the invoice or any exported versions`,
+              `Click to hide this section from the invoice. Hidden sections won't appear in the final document or any exported versions`,
             )}>
             <VisibilityIcon
               onClick={() => onToggle(false)}
