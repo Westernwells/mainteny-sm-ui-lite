@@ -76,6 +76,7 @@ import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import queryString from 'query-string';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {Progress} from 'components/Progress';
+import {debounce} from 'lodash';
 import {formatQuotationRecord} from './utils';
 import NewUnit from './NewUnit';
 
@@ -116,6 +117,10 @@ export const DraftQuotation = ({formType, quotation}: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
   const {search} = useLocation();
+
+  const [isHovered, setIsHovered] = useState<boolean>(true);
+
+  const debouncedSetIsHovered = debounce((value) => setIsHovered(value), 300);
 
   const {elevatorId = '', customerId = ''} = queryString.parse(search);
 
@@ -831,7 +836,13 @@ export const DraftQuotation = ({formType, quotation}: Props) => {
           </Grid>
 
           {/* ARTICLES */}
-          <Grid item xs={12} bgcolor="white" p={3}>
+          <Grid
+            item
+            xs={12}
+            bgcolor="white"
+            p={3}
+            onMouseEnter={() => debouncedSetIsHovered(true)}
+            onMouseLeave={() => debouncedSetIsHovered(false)}>
             <Box pb={2}>
               <SectionTitle
                 Icon={WrenchScrewdriverIllustration}
@@ -842,6 +853,7 @@ export const DraftQuotation = ({formType, quotation}: Props) => {
                 setItems={setQuotationItems}
                 formik={formik}
                 propertyOwnerId={customer?.id ?? ''}
+                isHovered={isHovered}
               />
             </Box>
           </Grid>

@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext} from 'react';
 import {useTranslation} from 'react-i18next';
 import {FormikProps} from 'formik';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
@@ -45,6 +45,7 @@ interface Props {
   setItems: (items: QuotationItemRecord[]) => void;
   propertyOwnerId: string;
   formik: FormikProps<QuotationFormData>;
+  isHovered?: boolean;
 }
 
 export const ArticleItemsTableQuotation = ({
@@ -52,12 +53,11 @@ export const ArticleItemsTableQuotation = ({
   setItems,
   propertyOwnerId,
   formik,
+  isHovered,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const currentCurrency = useCurrentCurrency();
-
-  const [isHovered, setIsHovered] = useState<boolean>(true);
 
   const subtotalExclVat = calculateQuotationTotalWithPerItemDiscount(
     formik.values,
@@ -251,10 +251,7 @@ export const ArticleItemsTableQuotation = ({
       borderRadius={1}
       px={1.5}
       py={2}>
-      <TableContainer
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        sx={{overflowX: 'hidden'}}>
+      <TableContainer sx={{overflowX: 'hidden'}}>
         <Table
           sx={{
             minWidth: 700,
