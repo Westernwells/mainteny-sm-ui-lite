@@ -2048,5 +2048,7 @@
   "Select Unit": "Izaberite jedinicu",
   "Text": "Tekst",
   "Select a unit": "Izabrite jedinicu",
-  "Invalid unit": "Nevažeća jedinica"
+  "Invalid unit": "Nevažeća jedinica",
+  "Click to hide this section from the invoice. Hidden sections won't appear in the final document or any exported versions": "Kliknite da biste sakrili ovaj odeljak sa fakture. Skriveni odeljci se neće pojaviti u konačnom dokumentu ili bilo kojoj izvezenoj verziji",
+  "Some required information is missing. Please check the highlighted fields.": "Nedostaju neke potrebne informacije. Proverite označena polja."
 }
