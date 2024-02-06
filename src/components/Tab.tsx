@@ -15,6 +15,7 @@ import {MenuBtn} from './MenuBtn';
 export interface TabItems {
   label: string;
   icon: JSX.Element;
+  iconPosition?: 'start' | 'end';
 }
 
 interface Props {
@@ -23,13 +24,13 @@ interface Props {
   onChange?: (tabIndex: number) => void;
   currentIndex?: number;
   renderWidget?: JSX.Element | null;
-  tabStyle?: {[key: string]: string | number};
+  tabStyle?: SxProps;
   label?: string;
   showActionBtn?: boolean;
   showMenuActionBtn?: Boolean;
   btnLabel?: string;
   btnOnClick?: () => void;
-  containerStyles?: {[key: string]: string | number};
+  containerStyles?: SxProps;
   menu?: MenuBtnProps[];
   actionButtonIcon?: JSX.Element;
   actionBtnVariant?: 'contained' | 'outlined' | 'text';
@@ -70,6 +71,7 @@ export const Tabs = ({
   testId,
   hideDivider = false,
   isTextCap = false,
+  containerStyles,
 }: Props) => {
   const theme = useTheme();
 
@@ -186,12 +188,17 @@ export const Tabs = ({
                     transform: 'translateX(-50%)',
                   },
                 }}>
-                <Box className="item-icon">{item.icon}</Box>
+                {item.iconPosition !== 'end' && (
+                  <Box className="item-icon">{item.icon}</Box>
+                )}
                 <Typography
                   variant="subtitle1"
                   sx={{textTransform: isTextCap ? 'uppercase' : 'inherit'}}>
                   {t(item.label)}
                 </Typography>
+                {item.iconPosition === 'end' && (
+                  <Box className="item-icon">{item.icon}</Box>
+                )}
               </Box>
             }
             sx={{
@@ -239,6 +246,7 @@ export const Tabs = ({
         display: 'flex',
         flexDirection: 'column',
         flexGrow: 1,
+        ...containerStyles,
       }}>
       <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
         {renderTabItems()}

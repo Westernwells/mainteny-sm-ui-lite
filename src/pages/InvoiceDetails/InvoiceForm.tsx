@@ -35,8 +35,8 @@ import {Confirm} from 'components/Confirm';
 import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {Tooltip} from 'components/Tooltip';
-import {InvoiceContractPaymentTermInput} from 'components/InvoiceContractPaymentTermInput';
-import {InvoiceContractPaymentTerm} from 'components/InvoiceContractPaymentTerm';
+import {ContractPaymentTermInput} from 'components/ContractPaymentTermInput';
+import {ContractPaymentTerm} from 'components/ContractPaymentTerm';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
@@ -289,6 +289,7 @@ export const InvoiceForm = ({
     customerSpecificOrderNumber: '',
     moreInfo: DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
     unitNumber: '-',
+    showArticleSection: true,
   };
 
   const validationSchema = Yup.object().shape({
@@ -563,6 +564,10 @@ export const InvoiceForm = ({
         invoice?.additionalInfo?.deliveryEndDate
           ? new Date(invoice.additionalInfo.deliveryEndDate)
           : undefined,
+      );
+      formik.setFieldValue(
+        'showArticleSection',
+        invoice?.additionalInfo?.showArticleSection ?? true,
       );
     }
   }, [invoice]);
@@ -1139,6 +1144,7 @@ export const InvoiceForm = ({
           <InvoiceFormArticleSection
             setItems={setInvoiceItems}
             formik={formik}
+            showArticleSection={formik.values.showArticleSection}
             propertyOwnerId={customer?.id ?? ''}
             enableCollapse={formik.values.type !== InvoiceType.FULL}
           />
@@ -1590,7 +1596,7 @@ export const InvoiceForm = ({
       />
 
       {openContractPaymentTermSelectDialog && (
-        <InvoiceContractPaymentTermInput
+        <ContractPaymentTermInput
           title={t('New payment term')}
           open={openContractPaymentTermSelectDialog}
           onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
@@ -1600,7 +1606,7 @@ export const InvoiceForm = ({
       )}
 
       {openContractPaymentTermsDialog && (
-        <InvoiceContractPaymentTerm
+        <ContractPaymentTerm
           title={t('Payment Terms')}
           open={openContractPaymentTermsDialog}
           onCancel={() => setOpenContractPaymentTermsDialog(false)}

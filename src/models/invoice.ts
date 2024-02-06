@@ -96,6 +96,7 @@ export interface InvoiceAdditionalInfo {
   payment?: Payment<AggregatedAmount>;
   deliveryStartDate?: string;
   deliveryEndDate?: string;
+  showArticleSection?: boolean;
 }
 
 export enum InvoiceOverdueNoticeStatus {
@@ -315,6 +316,7 @@ export interface InvoiceFormData {
   payment?: Payment;
   deliveryStartDate?: Date;
   deliveryEndDate?: Date;
+  showArticleSection?: boolean;
 }
 
 export interface CreateInvoice {
@@ -352,6 +354,7 @@ export interface CreateInvoice {
   payment?: Payment;
   deliveryStartDate?: string;
   deliveryEndDate?: string;
+  showArticleSection?: boolean;
 }
 
 export interface UpdateInvoice {
