@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {SxProps} from '@mui/system';
 import {theme} from 'theme';
 
