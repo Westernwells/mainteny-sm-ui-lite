@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, {Fragment, useContext, useEffect} from 'react';
 import {t} from 'i18next';
 import {theme} from 'theme';
@@ -45,6 +44,7 @@ import {formatDate, toDate} from 'utils/datetime';
 import {ReactComponent as PartialInvoiceIcon} from 'assets/icons/PartialInvoiceIcon.svg';
 import {getAggregatedPartialPaymentsVats} from './utils';
 import {SectionTitle} from './SectionTitle';
+import {T} from 'utils/i18n-utils';
 
 interface TableProps extends React.ComponentProps<typeof MuiTable> {
   children: React.ReactNode;
@@ -472,7 +472,7 @@ export const PartialPaymentsSection = ({
                           <TableCell
                             key={column.name}
                             align={column.align || 'left'}>
-                            {t(column.name)}
+                            {T(column.name)}
                           </TableCell>
                         ))}
                       </TableRow>
@@ -633,7 +633,7 @@ export const PartialPaymentsSection = ({
                         <TableCell
                           key={column.name}
                           align={column.align || 'left'}>
-                          {t(column.name)}
+                          {T(column.name)}
                         </TableCell>
                       ))}
                     </TableRow>
@@ -771,7 +771,7 @@ export const PartialPaymentsSection = ({
   const renderInvoicedSection = () => (
     <>
       <Typography variant="h6" color="primary.dark">
-        {t('Invoiced')}
+        {T('Invoiced')}
       </Typography>
       <TableContainer>
         <Table>
@@ -779,7 +779,7 @@ export const PartialPaymentsSection = ({
             <TableRow>
               {invoicedSectionColumns.map((column) => (
                 <TableCell key={column.name} align={column.align || 'left'}>
-                  {t(column.name)}
+                  {T(column.name)}
                 </TableCell>
               ))}
             </TableRow>
@@ -851,7 +851,7 @@ export const PartialPaymentsSection = ({
                 },
               }}>
               <TableCell />
-              <TableCell width="25%">{t('Invoice amount')}</TableCell>
+              <TableCell width="25%">{T('Invoice amount')}</TableCell>
               <TableCell />
               <TableCell align="right">{amountFormatted}</TableCell>
               <TableCell align="right">
@@ -925,7 +925,7 @@ export const PartialPaymentsSection = ({
   const renderPaymentHistorySection = () => (
     <>
       <Typography variant="h6" color="primary.dark">
-        {t('Payment history')}
+        {T('Payment history')}
       </Typography>
       <TableContainer>
         <Table>
@@ -933,7 +933,7 @@ export const PartialPaymentsSection = ({
             <TableRow>
               {paymentHistorySectionColumns.map((column) => (
                 <TableCell key={column.name} align={column.align || 'left'}>
-                  {t(column.name)}
+                  {T(column.name)}
                 </TableCell>
               ))}
             </TableRow>
@@ -941,7 +941,7 @@ export const PartialPaymentsSection = ({
           <TableBody>
             <TableRow>
               <TableCell />
-              <TableCell width="40%">{t('Total amount (incl. VAT)')}</TableCell>
+              <TableCell width="40%">{T('Total amount (incl. VAT)')}</TableCell>
               <TableCell />
               <TableCell align="right">
                 {totalAmountInclVatsFormatted}
@@ -987,7 +987,7 @@ export const PartialPaymentsSection = ({
             <TableRow>
               <TableCell />
               <TableCell width="40%" sx={{typography: 'h6', fontWeight: 600}}>
-                {t('Outstanding payments')}
+                {T('Outstanding payments')}
               </TableCell>
               <TableCell />
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
@@ -1203,7 +1203,7 @@ export const PartialPaymentsSection = ({
             gap: 2,
           }}>
           <Typography variant="subtitle2" color="text.secondary">
-            {t('Total amount (excl. VAT)')}
+            {T('Total amount (excl. VAT)')}
           </Typography>
 
           <Typography variant="subtitle2" color="primary.dark">
@@ -1213,7 +1213,7 @@ export const PartialPaymentsSection = ({
           {allItemsHasSameVAT ? (
             <>
               <Typography variant="body1" color="primary.dark">
-                {t('VAT')} {percentageVats?.[0]?.percentageVat ?? 0}%
+                {T('VAT')} {percentageVats?.[0]?.percentageVat ?? 0}%
               </Typography>
               <Typography variant="body1" color="text.secondary">
                 {formatCurrency(fixRounding(percentageVats?.[0]?.vat ?? 0, 2), {
@@ -1228,7 +1228,7 @@ export const PartialPaymentsSection = ({
             percentageVats.map((v) => (
               <Fragment key={v.percentageVat}>
                 <Typography variant="body1" color="primary.dark">
-                  {t('VAT')} {v.percentageVat}%
+                  {T('VAT')} {v.percentageVat}%
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
                   {formatCurrency(fixRounding(v.vat, 2), {
@@ -1242,7 +1242,7 @@ export const PartialPaymentsSection = ({
             ))
           )}
           <Typography variant="subtitle1" color="primary.dark" fontWeight={600}>
-            {t('Total amount (incl. VAT)')}
+            {T('Total amount (incl. VAT)')}
           </Typography>
           <Typography variant="subtitle1" color="primary.dark" fontWeight={600}>
             {totalAmountInclVatsFormatted}

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, {useMemo} from 'react';
 import {t} from 'i18next';
 import {theme} from 'theme';
@@ -27,6 +26,7 @@ import {Controller, UseFormReturn} from 'react-hook-form';
 import {VariableSizeList} from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import {styles} from './style';
+import {T} from 'utils/i18n-utils';
 
 interface Props {
   isPreviewing: boolean;
@@ -182,7 +182,7 @@ export const ChecklistPreview = ({
                   }}
                 />
                 <Typography variant="body2" color="text.secondary">
-                  {t('Enter Your Choice')}
+                  {T('Enter Your Choice')}
                 </Typography>
               </Box>
             ) : null}
@@ -342,7 +342,7 @@ export const ChecklistPreview = ({
 
         <Box sx={{px: 2, py: 3}}>
           <Typography variant="caption" color="text.secondary">
-            {t('Select Checklist')}
+            {T('Select Checklist')}
           </Typography>
           <Box
             display="flex"
@@ -360,10 +360,10 @@ export const ChecklistPreview = ({
           </Box>
           <Box display="flex" justifyContent="space-between">
             <Typography variant="caption">
-              {checklistSummary.done}/{checklistSummary.all} {t('options')}
+              {checklistSummary.done}/{checklistSummary.all} {T('options')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {percentComplete}% {t('complete')}
+              {percentComplete}% {T('complete')}
             </Typography>
           </Box>
           <LinearProgress
@@ -413,7 +413,7 @@ export const ChecklistPreview = ({
                       color="text.secondary"
                       mt={1.5}
                       pb={1}>
-                      {t("Engineer's Signature")}
+                      {T("Engineer's Signature")}
                       <Typography variant="caption" sx={{color: '#DB2C66'}}>
                         *
                       </Typography>
@@ -434,7 +434,7 @@ export const ChecklistPreview = ({
                         size: 'large',
                         onClick: handleClose,
                       }}>
-                      {t('Complete')}
+                      {T('Complete')}
                     </Button>
                   </Box>
                 </Box>

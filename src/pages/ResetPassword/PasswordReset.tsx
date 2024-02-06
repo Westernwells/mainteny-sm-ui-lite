@@ -1,5 +1,10 @@
-// @ts-nocheck
-import React, {useState, FormEvent, ChangeEvent, FocusEvent} from 'react';
+import React, {
+  useState,
+  FormEvent,
+  ChangeEvent,
+  FocusEvent,
+  ReactNode,
+} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 import ArrowForward from '@mui/icons-material/ArrowForward';
@@ -76,7 +81,7 @@ export const PasswordReset = ({
   return (
     <AuthLayout>
       <Typography variant="h5" mt={7} textAlign="center">
-        {heading}
+        {heading as unknown as ReactNode}
       </Typography>
       <Box mt={3} display="flex" justifyContent="center" width="100%">
         <form style={{width: 'min(18rem, 100%)'}} onSubmit={handleSubmit}>

@@ -2,6 +2,7 @@ import {DateRange, LocalizationProvider} from '@mui/x-date-pickers-pro/';
 import {
   DateRangePicker,
   DateRangePickerProps,
+  DateRangePickerSlotsComponentsProps,
 } from '@mui/x-date-pickers-pro/DateRangePicker';
 import {SingleInputDateRangeField} from '@mui/x-date-pickers-pro/SingleInputDateRangeField';
 import {DemoContainer} from '@mui/x-date-pickers/internals/demo';
@@ -149,34 +150,36 @@ const DatePickerRange = ({
               setValue(newDateRange);
               setDateSelectionFinalized(true);
             }}
-            slotProps={{
-              actionBar: {
-                actions: ['clear', 'accept'],
-              },
-              toolbar: {
-                hidden: false,
-              },
-              popper: {
-                sx: popperSx,
-              },
-              textField: {
-                ...textFieldProps,
-                size: textFieldProps?.size || 'small',
-                error: false,
-                label: t(`${textFieldProps?.label}`),
-                sx: {width: '100%', background: 'white'},
-                InputProps: {endAdornment: <Calendar />, onClick: handleOpen},
-                InputLabelProps: {
-                  shrink: true,
-                  ...inputLabelProps,
+            slotProps={
+              {
+                actionBar: {
+                  actions: ['clear', 'accept'],
                 },
-                inputProps: {
-                  type: 'input',
-                  onClick: handleOpen,
-                  ref: inputRef,
+                toolbar: {
+                  hidden: false,
                 },
-              },
-            }}
+                popper: {
+                  sx: popperSx,
+                },
+                textField: {
+                  ...textFieldProps,
+                  size: textFieldProps?.size || 'small',
+                  error: false,
+                  label: t(`${textFieldProps?.label}`),
+                  sx: {width: '100%', background: 'white'},
+                  InputProps: {endAdornment: <Calendar />, onClick: handleOpen},
+                  InputLabelProps: {
+                    shrink: true,
+                    ...inputLabelProps,
+                  },
+                  inputProps: {
+                    type: 'input',
+                    onClick: handleOpen,
+                    ref: inputRef,
+                  },
+                },
+              } as unknown as DateRangePickerSlotsComponentsProps<Date>
+            }
           />
         </DemoContainer>
       </LocalizationProvider>

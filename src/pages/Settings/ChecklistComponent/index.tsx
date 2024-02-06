@@ -261,7 +261,7 @@ export const MultiChoiceComponent = ({
                 onClick: addOption,
                 startIcon: <Add />,
               }}>
-              <Typography variant="subtitle2">{t('New Choice')}</Typography>
+              <Typography variant="subtitle2">{T('New Choice')}</Typography>
             </Button>
 
             <Box display="flex" alignItems="center">
@@ -272,7 +272,7 @@ export const MultiChoiceComponent = ({
               />
               <Tooltip
                 title={
-                  t(
+                  T(
                     "Enable 'Enter Your Choice' to add a custom text input field to your mobile checklist. This allows for personalized responses in the multi-choice form.",
                   ) ?? ''
                 }

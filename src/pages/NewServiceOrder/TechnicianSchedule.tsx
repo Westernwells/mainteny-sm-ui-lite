@@ -1,5 +1,4 @@
-// @ts-nocheck
-import {useEffect, useRef, useState} from 'react';
+import {ReactNode, useEffect, useRef, useState} from 'react';
 import {twentyFourHourTime} from 'utils/utils';
 import * as _ from 'lodash';
 import {getDateObject} from 'utils/datetime';
@@ -179,27 +178,29 @@ export const TechnicianSchedule = ({
                           key={`${rowIndex}-${index}`}
                           cellWidth={gridWidth}>
                           <ScheduleItemContainer>
-                            {scheduleItems[xKey].map((scheduleItem) =>
-                              renderCellItem(
-                                scheduleItem,
-                                getItemWidth({
-                                  startDateTime:
-                                    scheduleItem.schedules[0].startTime,
-                                  endDateTime:
-                                    scheduleItem.schedules[0].endTime,
-                                  gridWidth,
-                                }),
-                                getItemPosition({
-                                  scheduleItemGroup,
-                                  startDateTime:
-                                    scheduleItem.schedules[0].startTime,
-                                  rowKey: xKey,
-                                  orderId: scheduleItem.id,
-                                  gridWidth,
-                                }),
-                                // calculatePosition,
-                              ),
-                            )}
+                            {
+                              scheduleItems[xKey].map((scheduleItem) =>
+                                renderCellItem(
+                                  scheduleItem,
+                                  getItemWidth({
+                                    startDateTime:
+                                      scheduleItem.schedules[0].startTime,
+                                    endDateTime:
+                                      scheduleItem.schedules[0].endTime,
+                                    gridWidth,
+                                  }),
+                                  getItemPosition({
+                                    scheduleItemGroup,
+                                    startDateTime:
+                                      scheduleItem.schedules[0].startTime,
+                                    rowKey: xKey,
+                                    orderId: scheduleItem.id,
+                                    gridWidth,
+                                  }),
+                                  // calculatePosition,
+                                ),
+                              ) as ReactNode
+                            }
                           </ScheduleItemContainer>
                         </ScheduleBodyCell>
                       );

@@ -10,7 +10,7 @@ import {
 } from 'hooks/reactQuery/useContract';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
-import {useMediaQuery} from '@mui/material';
+import {PopperProps, useMediaQuery} from '@mui/material';
 import {useParams} from 'react-router-dom';
 import {useFormik} from 'formik';
 import {
@@ -431,11 +431,13 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   }
                   placement="top-end"
                   arrow
-                  PopperProps={{
-                    sx: {
-                      marginRight: '-4.6em !important',
-                    },
-                  }}>
+                  PopperProps={
+                    {
+                      sx: {
+                        marginRight: '-4.6em !important',
+                      },
+                    } as Partial<PopperProps> | undefined
+                  }>
                   <span>
                     <Button
                       buttonProps={{
