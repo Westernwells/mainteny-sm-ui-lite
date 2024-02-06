@@ -56,17 +56,17 @@ export const ChecklistPreview = ({
     const calculateHeightOfSingleCheck =
       (PADDING_VERTICAL + MARGIN_BOTTOM) * (length - 1);
     // PADDING_VERTICAL and MARGIN_BOTTOM we are getting from block items. Any change there, we should change here
+    const subject = values.components[index]?.subject;
+    const lines = (Math.ceil((7 * subject?.length) / 250) - 1) * 21;
     switch (type) {
       case CheckListComponentType.YES_NO:
-        return 40 + PADDING_VERTICAL + MARGIN_BOTTOM;
+        return 40 + PADDING_VERTICAL + MARGIN_BOTTOM + lines;
       case CheckListComponentType.HEAD:
-        return 30 + PADDING_VERTICAL + MARGIN_BOTTOM;
+        return 30 + PADDING_VERTICAL + MARGIN_BOTTOM + lines;
       case CheckListComponentType.SINGLE_CHECK:
-        const subject = values.components[index]?.subject;
-        const lines = (Math.ceil((7 * subject?.length) / 250) - 1) * 21;
         return 90 + calculateHeightOfSingleCheck + lines + (length - 1) * 5;
       case CheckListComponentType.TEXT:
-        return 150 + PADDING_VERTICAL + MARGIN_BOTTOM;
+        return 150 + PADDING_VERTICAL + MARGIN_BOTTOM + lines;
       default:
         return 65 + PADDING_VERTICAL + MARGIN_BOTTOM;
     }

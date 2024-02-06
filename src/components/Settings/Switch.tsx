@@ -13,14 +13,12 @@ interface Props {
 export const Switch = ({label = '', value, onValueChange}: Props) => {
   const {t} = useTranslation();
 
-  // Use the value prop directly as the initial state
   const [checked, setChecked] = useState<boolean>(value || false);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.checked;
     setChecked(newValue);
 
-    // Call the callback function with the new value
     onValueChange?.(newValue);
   };
 

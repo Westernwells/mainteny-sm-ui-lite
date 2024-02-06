@@ -30,9 +30,9 @@ export const formatInvoiceRecord = (
 
     return {
       ...rest,
-      articleId: article?.id,
       article: {
         ...modifiedArticle,
+        externalId: value.externalId,
         unitSellingAmount: {
           netAmount: unitSellingAmount?.netAmount,
           percentageVat: unitSellingAmount?.percentageVat,
