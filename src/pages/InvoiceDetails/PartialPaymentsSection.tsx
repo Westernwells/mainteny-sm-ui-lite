@@ -126,12 +126,20 @@ interface Props {
 
 export const PartialPaymentsSection = ({
   formik,
-  previousInvoices,
+  previousInvoices: allPreviousInvoices,
   invoice,
 }: Props) => {
   const currentCurrency = useCurrentCurrency();
   const {language: selectedLng} = useContext(LanguageContext);
   const isEditing = !!invoice;
+  // if editing, we need to show only past invoices till this one (editing invoice included)
+  // if creating, we need to show all invoices
+  const previousInvoices = isEditing
+    ? allPreviousInvoices.slice(
+        0,
+        allPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
+      )
+    : allPreviousInvoices;
   const subtotalExclVat = calculateTotalWithPerItemDiscount(formik.values);
 
   const handlePartialPaymentChange = (values: NumberFormatValues) => {
@@ -778,6 +786,10 @@ export const PartialPaymentsSection = ({
           </TableHead>
           <TableBody>
             {previousInvoices.map((i, index) => {
+              // don't render anything for the editing invoice
+              if (isEditing && index === previousInvoices.length - 1) {
+                return null;
+              }
               const invoiceTotalAmount = i.totalAmount;
               const fractionDigits = invoiceTotalAmount?.fractionDigits ?? 2;
               const amountExclVat =
@@ -1240,8 +1252,13 @@ export const PartialPaymentsSection = ({
         {hasPreviousInvoices ? (
           <>
             {/* INVOICED SECTION */}
-            <Divider sx={{borderColor: theme.palette.grey[300]}} />
-            {renderInvoicedSection()}
+            {/* if editing, show invoiced section if there is more than one previous invoice */}
+            {!isEditing || (isEditing && previousInvoices.length > 1) ? (
+              <>
+                <Divider sx={{borderColor: theme.palette.grey[300]}} />
+                {renderInvoicedSection()}
+              </>
+            ) : null}
 
             {/* PAYMENT HISTORY SECTION */}
             {hasPayments ? (

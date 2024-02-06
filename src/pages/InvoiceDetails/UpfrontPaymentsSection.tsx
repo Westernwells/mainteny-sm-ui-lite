@@ -34,11 +34,20 @@ interface Props {
 
 export const UpfrontPaymentsSection = ({
   formik,
-  previousInvoices,
+  previousInvoices: allPreviousInvoices,
   invoice,
 }: Props) => {
   const currentCurrency = useCurrentCurrency();
   const isEditing = !!invoice;
+  // if editing, we need to show only past invoices till this one (editing invoice included)
+  // if creating, we need to show all invoices
+  const previousInvoices = isEditing
+    ? allPreviousInvoices.slice(
+        0,
+        allPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
+      )
+    : allPreviousInvoices;
+
   const subtotalExclVat = calculateTotalWithPerItemDiscount(formik.values);
 
   const handleUpfrontPaymentChange = (values: {
