@@ -18,7 +18,7 @@ import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useCurrentCurrency} from 'utils/currency';
 import {calculateArticleTotalWithVatFormatted} from 'utils/calculate-total';
-
+import {debounce} from 'lodash';
 import {SectionTitle} from './SectionTitle';
 
 export const ArticleSectionTitleAction = ({
@@ -97,6 +97,10 @@ const InvoiceFormArticleSection = ({
   const [shouldShow, setShouldShow] = useState(showArticleSection);
   const currentCurrency = useCurrentCurrency();
 
+  const [isHovered, setIsHovered] = useState<boolean>(true);
+
+  const debouncedSetIsHovered = debounce((value) => setIsHovered(value), 300);
+
   useEffect(() => {
     setShouldShow(showArticleSection);
   }, [showArticleSection]);
@@ -112,7 +116,13 @@ const InvoiceFormArticleSection = ({
   };
 
   return (
-    <Grid item xs={12} bgcolor="white" p={3}>
+    <Grid
+      item
+      xs={12}
+      bgcolor="white"
+      p={3}
+      onMouseEnter={() => debouncedSetIsHovered(true)}
+      onMouseLeave={() => debouncedSetIsHovered(false)}>
       <Accordion
         TransitionProps={{unmountOnExit: true}}
         expanded={shouldShow}
@@ -142,6 +152,7 @@ const InvoiceFormArticleSection = ({
             setItems={setItems}
             formik={formik}
             propertyOwnerId={propertyOwnerId}
+            isHovered={isHovered}
           />
         </AccordionDetails>
       </Accordion>
