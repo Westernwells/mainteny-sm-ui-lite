@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext} from 'react';
 import {useTranslation} from 'react-i18next';
 import {FormikProps} from 'formik';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
@@ -52,6 +52,7 @@ interface Props {
   setItems: (items: InvoiceItemRecord<Amount>[]) => void;
   propertyOwnerId: string;
   formik: FormikProps<InvoiceFormData>;
+  isHovered?: boolean;
 }
 
 export const ArticleItemsTableNEW = ({
@@ -59,12 +60,11 @@ export const ArticleItemsTableNEW = ({
   setItems,
   propertyOwnerId,
   formik,
+  isHovered,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const currentCurrency = useCurrentCurrency();
-
-  const [isHovered, setIsHovered] = useState<boolean>(true);
 
   const subtotalExclVat = calculateTotalWithPerItemDiscount(formik.values);
   const subtotalExclVatFormatted = formatCurrency(subtotalExclVat, {
@@ -261,10 +261,7 @@ export const ArticleItemsTableNEW = ({
       borderRadius={1}
       px={1.5}
       py={2}>
-      <TableContainer
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        sx={{overflowX: 'hidden'}}>
+      <TableContainer sx={{overflowX: 'hidden'}}>
         <Table
           sx={{
             minWidth: 700,
