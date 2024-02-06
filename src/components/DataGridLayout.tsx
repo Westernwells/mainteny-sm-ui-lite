@@ -255,9 +255,11 @@ export const DataGridLayout = ({
           '&.MuiDataGrid-root': {
             height: isEvenRowDifferentColor ? '91%' : '95%',
           },
-          '& .MuiDataGrid-row:nth-of-type(even)': {
-            background: isEvenRowDifferentColor ? '#F2F6F8' : '#FFF',
-          },
+          ...(isEvenRowDifferentColor && {
+            '& .MuiDataGrid-row:nth-of-type(even)': {
+              background: isEvenRowDifferentColor ? '#F2F6F8' : '#FFF',
+            },
+          }),
           height: '95%',
           width: '100%',
           my: '0.5em',

@@ -889,7 +889,7 @@
   "Date Created": "Erstellungsdatum",
   "Invoice Type": "Rechnungsart",
   "Full": "Vollständig",
-  "Partial": "Abschlag",
+  "Partial": "Teilrechnung",
   "Final": "Abschluss",
   "Credit Note": "Gutschrift",
   "Subject is required": "Betreff erforderlich",
@@ -2021,6 +2021,10 @@
   "Upfront": "Abschlag",
   "Created Date Range": "Erstellter Zeitraum",
   "Automatically assigned": "Automatisch erstellt",
+  "Text": "Text",
+  "Select a unit": "Wählen Sie eine Anlage",
+  "Invalid unit": "Ungültige Einheit",
+  "Click to hide this section from the invoice. Hidden sections won't appear in the final document or any exported versions": "Klicken Sie, um diesen Abschnitt aus der Rechnung auszublenden. Ausgeblendete Abschnitte werden weder im endgültigen Dokument noch in exportierten Versionen angezeigt",
   "Select Unit": "Anlage auswählen",
   "Some required information is missing. Please check the highlighted fields.": "Einige erforderliche Informationen fehlen. Bitte überprüfen Sie die hervorgehobenen Felder."
 }
