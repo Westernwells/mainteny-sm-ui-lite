@@ -1,4 +1,4 @@
-import {DiscountType, Discount} from 'models/invoice';
+import {DiscountType, Discount, ArticleRecord} from 'models/invoice';
 import {
   CreateQuotation,
   QuotationFormData,
@@ -17,11 +17,24 @@ export const formatQuotationRecord = (
   items: value.items.map((item) => {
     const {article, ...rest} = item;
     const modifiedArticle = {...article};
-    delete modifiedArticle.id;
-
+    const unitSellingAmount = modifiedArticle?.unitSellingAmount;
+    const isPreDefinedArticle =
+      modifiedArticle?.id && modifiedArticle?.id?.length > 8;
+    if (!isPreDefinedArticle) {
+      delete modifiedArticle?.id;
+    }
     return {
       ...rest,
-      article: modifiedArticle,
+      article: {
+        ...modifiedArticle,
+        ...(isPreDefinedArticle && {id: modifiedArticle?.id}),
+        externalId: value.externalId,
+        unitSellingAmount: {
+          netAmount: unitSellingAmount?.netAmount,
+          percentageVat: unitSellingAmount?.percentageVat,
+          currency: unitSellingAmount?.currency,
+        },
+      } as ArticleRecord,
       discount: rest.discount
         ? {
             ...rest.discount,
