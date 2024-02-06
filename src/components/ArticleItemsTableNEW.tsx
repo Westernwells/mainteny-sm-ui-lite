@@ -39,7 +39,7 @@ import {
   calculateTotalWithPerItemDiscount,
 } from 'utils/calculate-total';
 import {getItemRecord} from 'utils/article-utils';
-import {fixRounding} from 'utils/utils';
+import {fixRounding, getUniqueId} from 'utils/utils';
 import {useTheme} from '@mui/material/styles';
 import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd';
 import {Button} from './Button';
@@ -195,6 +195,7 @@ export const ArticleItemsTableNEW = ({
   const createEmptyItem = () => {
     const blankItem = {
       article: {
+        id: getUniqueId(),
         name: '',
         type: ArticleType.LABOR,
         unitSellingAmount: {
