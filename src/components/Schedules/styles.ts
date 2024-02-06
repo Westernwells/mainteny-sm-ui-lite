@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {SxProps, style} from '@mui/system';
 import {theme} from 'theme';
 export const styles = {

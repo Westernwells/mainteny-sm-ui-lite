@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {ChangeEvent} from 'react';
 import {t} from 'i18next';
 import {theme} from 'theme';
@@ -7,6 +6,7 @@ import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import OpenInNew from '@mui/icons-material/OpenInNew';
 import {FormCheckbox} from 'components/form/FormCheckbox';
+import {T} from 'utils/i18n-utils';
 
 interface Props {
   checkboxLabel: string;
@@ -27,7 +27,7 @@ export const InvoiceCheckboxNEW = ({
 }: Props) => (
   <Tooltip
     disableHoverListener={!disabled}
-    title={t(tooltipTitle) || ''}
+    title={T(tooltipTitle) || ''}
     placement="bottom"
     arrow
     followCursor>
@@ -40,7 +40,7 @@ export const InvoiceCheckboxNEW = ({
         disabled={disabled}
         checked={checked}
         handleChange={handleChange}
-        label={t(checkboxLabel)}
+        label={checkboxLabel}
         typographyProps={{variant: 'body2'}}
         checkboxProps={{sx: {py: 0}}}
       />

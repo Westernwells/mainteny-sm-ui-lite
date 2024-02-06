@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
   GridColDef,
   GridColumnHeaderParams,
@@ -14,10 +13,10 @@ import {
 } from 'models/quotation';
 import {FormatDate, Resource} from 'models/misc';
 import {Typography} from '@mui/material';
-import {t} from 'i18next';
 import CustomTableHeader from 'components/CustomTableHeader';
 import {NotesIndicator} from './NotesIndicator';
 import {Actions} from './Actions';
+import {T} from 'utils/i18n-utils';
 
 export const getQuotationStatusStyles = (
   status: string,
@@ -57,7 +56,7 @@ export const columns = (handleSortModelChange: any): GridColDef[] => [
     sortable: false,
     renderHeader: () => (
       <Typography variant="subtitle2" color="textSecondary">
-        {t('NUMBER')}
+        {T('NUMBER')}
       </Typography>
     ),
   },
@@ -82,7 +81,7 @@ export const columns = (handleSortModelChange: any): GridColDef[] => [
     sortable: false,
     renderHeader: () => (
       <Typography variant="subtitle2" color="textSecondary">
-        {t('ADDRESS')}
+        {T('ADDRESS')}
       </Typography>
     ),
   },
@@ -126,7 +125,7 @@ export const columns = (handleSortModelChange: any): GridColDef[] => [
     headerAlign: 'center',
     renderHeader: () => (
       <Typography variant="subtitle2" color="textSecondary">
-        {t('NOTES')}
+        {T('NOTES')}
       </Typography>
     ),
   },
@@ -147,7 +146,7 @@ export const columns = (handleSortModelChange: any): GridColDef[] => [
     headerAlign: 'center',
     renderHeader: () => (
       <Typography variant="subtitle2" color="textSecondary">
-        {t('STATUS')}
+        {T('STATUS')}
       </Typography>
     ),
   },
@@ -162,7 +161,7 @@ export const columns = (handleSortModelChange: any): GridColDef[] => [
     headerAlign: 'right',
     renderHeader: () => (
       <Typography variant="subtitle2" color="textSecondary">
-        {t('ACTIONS')}
+        {T('ACTIONS')}
       </Typography>
     ),
   },

@@ -1,7 +1,6 @@
-// @ts-nocheck
 import React from 'react';
-import {t} from 'i18next';
 import {Box, SxProps, Typography} from '@mui/material';
+import {T} from 'utils/i18n-utils';
 
 export const SectionTitle = ({
   Icon,
@@ -23,7 +22,7 @@ export const SectionTitle = ({
     justifyContent="space-between">
     <Box display="flex" alignItems="center" gap={1.5}>
       <Icon width="2rem" height="2rem" style={{marginBottom: '4px'}} />
-      <Typography variant="h5">{t(title)}</Typography>
+      <Typography variant="h5">{T(title)}</Typography>
     </Box>
     {actionComponent}
   </Box>

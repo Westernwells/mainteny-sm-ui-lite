@@ -1,4 +1,3 @@
-// @ts-nocheck
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {useEffect, useState} from 'react';
 import {FormikErrors} from 'formik';
@@ -39,6 +38,7 @@ import {AppointmentPreferenceForm} from './AppointmentPreferenceForm';
 import {CustomerForm} from './CustomerForm';
 import {PriorityEngineersForm} from './PriorityEngineersForm';
 import {AttachmentForm} from './AttachmentForm';
+import {T} from 'utils/i18n-utils';
 
 const steps = [
   'Select customer',
@@ -317,7 +317,7 @@ export const NewUnit = ({
       open={isDialogOpen}
       onClose={onClose}
       {...dialogProps}>
-      <DialogTitle id="alert-dialog-title">{t('Create New Unit')}</DialogTitle>
+      <DialogTitle id="alert-dialog-title">{T('Create New Unit')}</DialogTitle>
 
       <DialogContent>
         <DialogContentText

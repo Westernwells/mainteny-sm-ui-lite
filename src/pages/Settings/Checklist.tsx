@@ -524,7 +524,7 @@ export const Checklist = () => {
             pt={3}
             pb={1.5}
             textAlign="center">
-            {t('ADD NEW')}
+            {T('ADD NEW')}
           </Typography>
           {availableComponents.map((component) => (
             <Button
@@ -543,7 +543,7 @@ export const Checklist = () => {
               }}>
               <component.icon />
               <Typography variant="caption" fontSize="0.625rem">
-                {t(component.label)}
+                {T(component.label)}
               </Typography>
             </Button>
           ))}

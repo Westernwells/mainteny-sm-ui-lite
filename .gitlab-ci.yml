@@ -107,6 +107,10 @@ lint-project:
   script:
     - yarn install --frozen-lockfile --cache-folder .yarn-cache
     - yarn check-all
+  rules:
+    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
+    - when: never
+
 
 tests:
   stage: test

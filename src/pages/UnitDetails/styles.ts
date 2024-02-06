@@ -1,5 +1,4 @@
-// @ts-nocheck
-import {SxProps, style} from '@mui/system';
+import {SxProps} from '@mui/system';
 import {theme} from 'theme';
 export const TechnSectionStyles = {
   icon: theme.unstable_sx({

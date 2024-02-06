@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {useContext, useEffect, useMemo, useState} from 'react';
 import {t} from 'i18next';
 import {useNavigate, useSearchParams} from 'react-router-dom';
@@ -103,6 +102,8 @@ import {SectionTitle} from './SectionTitle';
 import {PartialPaymentsSection} from './PartialPaymentsSection';
 import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
 import InvoiceFormArticleSection from './InvoiceFormArticleSection';
+import {T} from 'utils/i18n-utils';
+import {ArticleRecord} from 'models/article';
 
 interface Props {
   invoice?: InvoiceView;
@@ -140,7 +141,9 @@ const articleViewToItem = (
   articleView: ServiceOrderArticleView,
 ): InvoiceItemRecord<Amount> => {
   const record: InvoiceItemRecord<Amount> = {
-    article: articleView.article,
+    article: articleView.article as Omit<ArticleRecord, 'unitSellingAmount'> & {
+      unitSellingAmount: Amount;
+    },
     name: articleView.name,
     description: articleView.description,
     quantity: articleView.quantity,
@@ -835,7 +838,6 @@ export const InvoiceForm = ({
       (hasPreviousInvoices &&
         firstInvoiceType === InvoiceType.UPFRONT &&
         isFinalInvoice));
-
   return (
     <Box>
       {invoice && (
@@ -954,7 +956,7 @@ export const InvoiceForm = ({
                       helperText:
                         formik.errors.propertyOwnerId &&
                         formik.touched.propertyOwnerId
-                          ? t(formik.errors.propertyOwnerId)
+                          ? T(formik.errors.propertyOwnerId)
                           : '',
                       name: 'propertyOwnerId',
                       onBlur: formik.handleBlur,
@@ -1018,7 +1020,7 @@ export const InvoiceForm = ({
                           text={t('Alternative Invoice Destination')}
                         />
                         <Tooltip
-                          title={t(alternativeInvoiceDestinationTooltip) ?? ''}
+                          title={T(alternativeInvoiceDestinationTooltip) ?? ''}
                           placement="top"
                           componentsProps={{
                             tooltip: {
@@ -1244,7 +1246,7 @@ export const InvoiceForm = ({
             <Box display="flex" justifyContent="space-between" width="100%">
               <Box>
                 <Typography variant="body2" color="grey.700">
-                  {t('Invoice type')}
+                  {T('Invoice type')}
                 </Typography>
                 <Typography variant="subtitle2" color="primary.dark" pt={0.5}>
                   {getInvoiceTypeText()}
@@ -1252,7 +1254,7 @@ export const InvoiceForm = ({
               </Box>
               <Box>
                 <Typography variant="body2" color="grey.700">
-                  {t('Created By')}
+                  {T('Created By')}
                 </Typography>
                 <Box display="flex" alignItems="center" gap={1} pt={0.5}>
                   <Avatar
@@ -1300,7 +1302,7 @@ export const InvoiceForm = ({
             {/* DELIVERY DATE */}
             <Box width="100%">
               <Typography variant="body2" color="grey.700" pb={1.5}>
-                {t('Service Deliver Date')}
+                {T('Service Deliver Date')}
               </Typography>
               <Box display="flex" justifyContent="space-between" gap={1}>
                 <DatePicker
@@ -1429,7 +1431,7 @@ export const InvoiceForm = ({
             ) ? (
               <Box>
                 <Typography variant="body2" color="grey.700">
-                  {t('Payment type')}
+                  {T('Payment type')}
                 </Typography>
                 <RadioGroup
                   defaultValue={PaymentType.LUMP_SUM}
@@ -1442,7 +1444,7 @@ export const InvoiceForm = ({
                         key={key}
                         value={key}
                         control={<Radio size="small" />}
-                        label={t(value)}
+                        label={T(value)}
                         componentsProps={{typography: {variant: 'body2'}}}
                         onChange={() =>
                           formik.setFieldValue('payment.type', key)

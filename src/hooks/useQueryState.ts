@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
 import qs from 'query-string';
@@ -20,8 +19,8 @@ export const useQueryState = <T = string>(
 ): [T, (value: T) => void, () => void] => {
   const {location} = window;
   const navigate = useNavigate();
-
-  const setQuery = useCallback(
+  type CallbackFunction<X> = (arg: X) => void;
+  const setQuery = useCallback<CallbackFunction<T>>(
     (value) => {
       if (reset) {
         const queryString = qs.stringify(
@@ -52,7 +51,7 @@ export const useQueryState = <T = string>(
       } else if (typeof value === 'object') {
         existingQueries[query] = JSON.stringify(value);
       } else {
-        existingQueries[query] = value;
+        existingQueries[query] = value as string | (string | null)[] | null;
       }
 
       const queryString = qs.stringify(existingQueries, {

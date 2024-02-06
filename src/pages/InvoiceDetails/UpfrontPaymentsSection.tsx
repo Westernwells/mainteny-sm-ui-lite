@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {Fragment, useEffect} from 'react';
 import {t} from 'i18next';
 import {theme} from 'theme';
@@ -25,6 +24,7 @@ import {fixRounding} from 'utils/utils';
 import {ReactComponent as UpfrontInvoiceIcon} from 'assets/icons/UpfrontInvoiceIcon.svg';
 import {getAggregatedPartialPaymentsVats} from './utils';
 import {SectionTitle} from './SectionTitle';
+import {T} from 'utils/i18n-utils';
 
 interface Props {
   formik: FormikProps<InvoiceFormData>;
@@ -462,7 +462,7 @@ export const UpfrontPaymentsSection = ({
             gap: 2,
           }}>
           <Typography variant="subtitle2" color="text.secondary">
-            {t('Total amount (excl. VAT)')}
+            {T('Total amount (excl. VAT)')}
           </Typography>
 
           <Typography variant="subtitle2" color="primary.dark">
@@ -472,7 +472,7 @@ export const UpfrontPaymentsSection = ({
           {allItemsHasSameVAT ? (
             <>
               <Typography variant="body1" color="primary.dark">
-                {t('VAT')} {percentageVats?.[0]?.percentageVat ?? 0}%
+                {T('VAT')} {percentageVats?.[0]?.percentageVat ?? 0}%
               </Typography>
               <Typography variant="body1" color="text.secondary">
                 {formatCurrency(fixRounding(percentageVats?.[0]?.vat ?? 0, 2), {
@@ -487,7 +487,7 @@ export const UpfrontPaymentsSection = ({
             percentageVats.map((v) => (
               <Fragment key={v.percentageVat}>
                 <Typography variant="body1" color="primary.dark">
-                  {t('VAT')} {v.percentageVat}%
+                  {T('VAT')} {v.percentageVat}%
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
                   {formatCurrency(fixRounding(v.vat, 2), {
@@ -501,7 +501,7 @@ export const UpfrontPaymentsSection = ({
             ))
           )}
           <Typography variant="subtitle1" color="primary.dark" fontWeight={600}>
-            {t('Total amount (incl. VAT)')}
+            {T('Total amount (incl. VAT)')}
           </Typography>
           <Typography variant="subtitle1" color="primary.dark" fontWeight={600}>
             {totalAmountInclVatsFormatted}

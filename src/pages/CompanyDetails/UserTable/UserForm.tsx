@@ -79,7 +79,6 @@ export const UserForm = ({formik, typeForm}: Props) => {
               value: formik.values.email,
               helperText: formik.touched.email && formik.errors.email,
               error: !!formik.errors.email && formik.touched.email,
-              disabled: typeForm === 'edit' && true,
               required: true,
             },
           ].map((item, index) => (
