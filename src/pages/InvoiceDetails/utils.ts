@@ -27,15 +27,16 @@ export const formatInvoiceRecord = (
     const modifiedArticle = {...article};
     const unitSellingAmount = modifiedArticle?.unitSellingAmount;
     const unitAmount = item?.unitAmount;
-    const canSend = modifiedArticle?.id && modifiedArticle?.id?.length > 8;
-    if (!canSend) {
+    const isPreDefinedArticle =
+      modifiedArticle?.id && modifiedArticle?.id?.length > 8;
+    if (!isPreDefinedArticle) {
       delete modifiedArticle?.id;
     }
     return {
       ...rest,
       article: {
         ...modifiedArticle,
-        ...(canSend && {id: modifiedArticle?.id}),
+        ...(isPreDefinedArticle && {id: modifiedArticle?.id}),
         externalId: value.externalId,
         unitSellingAmount: {
           netAmount: unitSellingAmount?.netAmount,
