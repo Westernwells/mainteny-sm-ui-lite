@@ -17,7 +17,7 @@ describe('Create Unit', () => {
   });
 
   it('submit unit', () => {
-    UnitsPage.navigateToCreatePAge();
+    UnitsPage.navigateToCreatePage();
     UnitsPage.getFieldByName('propertyOwnerId').click();
     cy.wait(100);
     cy.get('body').click(0, 0);

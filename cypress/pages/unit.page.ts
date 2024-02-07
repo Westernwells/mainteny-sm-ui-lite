@@ -9,7 +9,7 @@ export default class UnitsPage {
     cy.get('div[data-colindex="1"]').eq(0).click();
   };
 
-  static navigateToCreatePAge = () => {
+  static navigateToCreatePage = () => {
     cy.contains('p', 'New Unit').closest('button').click();
   };
 
