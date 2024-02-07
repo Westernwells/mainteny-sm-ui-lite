@@ -354,10 +354,10 @@ export const useCreateQuotationComment = () => {
 
 export const deleteQuotationComment = async (
   quotationId: string,
-  commentId: string,
+  noteId: string,
 ) => {
   const {data} = await axiosClient.delete<{value: string}>(
-    `/api/quotations/${quotationId}/comments/${commentId}`,
+    `/api/quotations/${quotationId}/comments/${noteId}`,
   );
   return data;
 };
@@ -367,8 +367,8 @@ export const useDeleteQuotationComment = () => {
   const {showError} = useSnackbar();
 
   return useMutation(
-    ({quotationId, commentId}: {quotationId: string; commentId: string}) =>
-      deleteQuotationComment(quotationId, commentId),
+    ({quotationId, noteId}: {quotationId: string; noteId: string}) =>
+      deleteQuotationComment(quotationId, noteId),
     {
       onSuccess: () =>
         queryClient.invalidateQueries([qk.fetchQuotationComments]),
@@ -382,11 +382,11 @@ export const useDeleteQuotationComment = () => {
 
 export const updateQuotationComment = async (
   quotationId: string,
-  commentId: string,
+  noteId: string,
   body: CreateQuotationComment,
 ) => {
   const {data} = await axiosClient.put<{value: string}>(
-    `/api/quotations/${quotationId}/comments/${commentId}`,
+    `/api/quotations/${quotationId}/comments/${noteId}`,
     body,
   );
   return data;
@@ -399,13 +399,13 @@ export const useUpdateQuotationComment = () => {
   return useMutation(
     ({
       quotationId,
-      commentId,
+      noteId,
       body,
     }: {
       quotationId: string;
-      commentId: string;
+      noteId: string;
       body: CreateQuotationComment;
-    }) => updateQuotationComment(quotationId, commentId, body),
+    }) => updateQuotationComment(quotationId, noteId, body),
     {
       onSuccess: () =>
         queryClient.invalidateQueries([qk.fetchQuotationComments]),

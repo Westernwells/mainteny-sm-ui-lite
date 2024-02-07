@@ -163,7 +163,7 @@ export const Notes = ({invoice}: Props) => {
           }}
           containerStyles={{
             height: '80vh',
-            overflow: 'scroll',
+            overflowY: 'scroll',
             paddingBottom: 0,
             '& > div:first-of-type': {
               position: 'sticky',
