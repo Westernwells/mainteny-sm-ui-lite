@@ -39,7 +39,8 @@ export const formatInvoiceRecord = (
       type: article?.type,
       unit: article?.unit,
       costPackage: article?.costPackage,
-      ...(value.externalId && {externalId: value.externalId}),
+      ...(isPreDefinedArticle &&
+        article?.externalId && {externalId: article?.externalId}),
       unitSellingAmount: {
         netAmount: unitSellingAmount?.netAmount,
         percentageVat: unitSellingAmount?.percentageVat,

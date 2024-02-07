@@ -18,23 +18,31 @@ export const formatQuotationRecord = (
     const {article, ...rest} = item;
     const modifiedArticle = {...article};
     const unitSellingAmount = modifiedArticle?.unitSellingAmount;
+
     const isPreDefinedArticle =
       modifiedArticle?.id && modifiedArticle?.id?.length > 8;
     if (!isPreDefinedArticle) {
       delete modifiedArticle?.id;
     }
+
+    const articleToSend = {
+      ...(isPreDefinedArticle && {id: modifiedArticle?.id}),
+      name: article?.name,
+      type: article?.type,
+      unit: article?.unit,
+      costPackage: article?.costPackage,
+      ...(isPreDefinedArticle &&
+        article?.externalId && {externalId: article?.externalId}),
+      unitSellingAmount: {
+        netAmount: unitSellingAmount?.netAmount,
+        percentageVat: unitSellingAmount?.percentageVat,
+        currency: unitSellingAmount?.currency,
+      },
+    } as ArticleRecord;
+
     return {
       ...rest,
-      article: {
-        ...modifiedArticle,
-        ...(isPreDefinedArticle && {id: modifiedArticle?.id}),
-        externalId: value.externalId,
-        unitSellingAmount: {
-          netAmount: unitSellingAmount?.netAmount,
-          percentageVat: unitSellingAmount?.percentageVat,
-          currency: unitSellingAmount?.currency,
-        },
-      } as ArticleRecord,
+      article: articleToSend,
       discount: rest.discount
         ? {
             ...rest.discount,
