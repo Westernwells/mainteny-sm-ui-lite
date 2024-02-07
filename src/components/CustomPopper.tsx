@@ -1,9 +1,8 @@
-// @ts-nocheck
 import {AutoAwesome} from '@mui/icons-material';
 import {Popper, Paper, MenuItem, Typography, PopperProps} from '@mui/material';
 import {Box} from '@mui/system';
-import {t} from 'i18next';
 import {theme} from 'theme';
+import {T} from 'utils/i18n-utils';
 
 const CustomPopper = (
   props: PopperProps & {isEnabled?: boolean; handleAction: any; query: string},
@@ -36,12 +35,12 @@ const CustomPopper = (
               }}>
               <AutoAwesome />
               <Typography variant="subtitle2" sx={{paddingLeft: '0.5em'}}>
-                {t('Generate ID')}
+                {T('Generate ID')}
               </Typography>
             </Box>
 
             <Typography variant="body2" color={theme.palette.text.secondary}>
-              {t('Customizable in Settings')}
+              {T('Customizable in Settings')}
             </Typography>
           </MenuItem>
         ) : (
@@ -62,12 +61,12 @@ const CustomPopper = (
               }}>
               <AutoAwesome />
               <Typography variant="subtitle2" sx={{paddingLeft: '0.5em'}}>
-                {t('Enable Automatic ID Generation')}
+                {T('Enable Automatic ID Generation')}
               </Typography>
             </Box>
 
             <Typography variant="body2" color={theme.palette.text.secondary}>
-              {t('Allows for easier number input')}
+              {T('Allows for easier number input')}
             </Typography>
           </MenuItem>
         )}

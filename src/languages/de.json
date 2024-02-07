@@ -1404,7 +1404,7 @@
   "Callout Job Unassigned": "Störung nicht zugewiesen",
   "Callout Job Accepted": "Störung angenommen",
   "Standard invoice for the full amount.": "Standardrechnung über den Gesamtbetrag.",
-  "Partial payment when less than the full amount is due.": "Abschlagszahlung, wenn weniger als der Gesamtbetrag fällig ist.",
+  "Partial payment when less than the full amount is due.": "Teilzahlung, wenn weniger als der Gesamtbetrag fällig ist.",
   "Final invoice after partial invoices have been created before.": "Schlussrechnung, nachdem zuvor Abschlagsrechnungen erstellt worden sind.",
   "Credit note - Is issued to indicate a return of funds.": "Gutschrift - Wird ausgestellt, um eine Rückerstattung anzuzeigen.",
   "Reschedule Job": "Auftrag umplanen",
@@ -2021,10 +2021,10 @@
   "Upfront": "Abschlag",
   "Created Date Range": "Erstellter Zeitraum",
   "Automatically assigned": "Automatisch erstellt",
+  "Select Unit": "Anlage auswählen",
   "Text": "Text",
   "Select a unit": "Wählen Sie eine Anlage",
   "Invalid unit": "Ungültige Einheit",
   "Click to hide this section from the invoice. Hidden sections won't appear in the final document or any exported versions": "Klicken Sie, um diesen Abschnitt aus der Rechnung auszublenden. Ausgeblendete Abschnitte werden weder im endgültigen Dokument noch in exportierten Versionen angezeigt",
-  "Select Unit": "Anlage auswählen",
   "Some required information is missing. Please check the highlighted fields.": "Einige erforderliche Informationen fehlen. Bitte überprüfen Sie die hervorgehobenen Felder."
 }

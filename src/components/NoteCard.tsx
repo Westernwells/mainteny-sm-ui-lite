@@ -47,7 +47,7 @@ export const NoteCard = ({
             alignItems: 'center',
             flexWrap: 'wrap',
           }}>
-          <Typography variant="body2" color={theme.palette.text.secondary}>
+          <Typography variant="caption" color={theme.palette.text.secondary}>
             {`${note.meta.creator?.firstName} ${note.meta.creator?.lastName} - `}
             {isEditing ? (
               <span>

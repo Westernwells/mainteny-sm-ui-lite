@@ -153,6 +153,7 @@ export const UserTable = ({companyId}: Props) => {
       firstName: formik.values.firstName,
       lastName: formik.values.lastName,
       address: formik.values.address,
+      username: formik.values.email,
     };
 
     if (formik.values.password) {

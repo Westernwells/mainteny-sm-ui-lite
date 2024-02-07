@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
@@ -215,7 +214,7 @@ export const SelectTechnicians = ({
   }, [checkboxState]);
 
   const getCheckedValue = useCallback(
-    (checked, value) => setCheckboxState({checked, value}),
+    (checked: boolean, value: string) => setCheckboxState({checked, value}),
     [],
   );
 

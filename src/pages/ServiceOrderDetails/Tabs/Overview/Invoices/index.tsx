@@ -14,7 +14,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {getServiceOrderPaymentStatusStyles} from 'pages/ServiceOrders/Tabs/ServiceOrderList.tsx/ServiceOrderDataGridProps';
 import {StatusChip} from 'components/StatusChip';
 import {ServiceOrderPaymentStatus} from 'models/service-order';
-import {InvoiceType} from 'models/invoice';
+import {InvoiceStatus, InvoiceType} from 'models/invoice';
 import {calculateGrossInvoiceTotal} from 'utils/calculate-total';
 import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
 import {columns, makeRows} from './InvoicesDataGridProps';
@@ -48,6 +48,19 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
   totalInvoiceRef = totalInvoiceRef || jobInvoices.length;
 
   const invoiceTypesToShow = useMemo(() => {
+    const defaultTypes = [
+      InvoiceType.FULL,
+      InvoiceType.PARTIAL,
+      InvoiceType.UPFRONT,
+    ];
+
+    const allJobsAreCancelled = jobInvoices.every(
+      (i) => i.status === InvoiceStatus.CANCELLED,
+    );
+    if (allJobsAreCancelled) {
+      return defaultTypes;
+    }
+
     const jobHasFullInvoice = jobInvoices.find(
       (i) => i.type === InvoiceType.FULL,
     );
@@ -69,7 +82,7 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
       return [InvoiceType.FINAL, InvoiceType.PARTIAL, InvoiceType.UPFRONT];
     }
 
-    return [InvoiceType.FULL, InvoiceType.PARTIAL, InvoiceType.UPFRONT];
+    return defaultTypes;
   }, [jobInvoices]);
 
   useEffect(() => {

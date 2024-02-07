@@ -168,6 +168,7 @@ export const Quotations = () => {
           },
           size: 'small',
         }}
+        onClear={() => setSelectedDateRange([null, null])}
       />
       <PriceRangeDropdown
         cost={cost}

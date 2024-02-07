@@ -2,6 +2,7 @@ import {DateRange, LocalizationProvider} from '@mui/x-date-pickers-pro/';
 import {
   DateRangePicker,
   DateRangePickerProps,
+  DateRangePickerSlotsComponentsProps,
 } from '@mui/x-date-pickers-pro/DateRangePicker';
 import {SingleInputDateRangeField} from '@mui/x-date-pickers-pro/SingleInputDateRangeField';
 import {DemoContainer} from '@mui/x-date-pickers/internals/demo';
@@ -27,6 +28,7 @@ interface Props extends Partial<DateRangePickerProps<Date>> {
   containerStyles?: {[key: string]: any};
   textFieldProps?: TextFieldProps;
   inputLabelProps?: InputLabelProps;
+  onClear: () => void;
 }
 
 const DatePickerRange = ({
@@ -38,6 +40,7 @@ const DatePickerRange = ({
   containerStyles,
   textFieldProps,
   inputLabelProps,
+  onClear,
   ...props
 }: Props) => {
   const {t} = useTranslation();
@@ -48,8 +51,8 @@ const DatePickerRange = ({
   const [open, setOpen] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleOpen = () => {
-    setOpen(true);
+  const handleOpen = (openState: boolean) => {
+    setOpen(!openState);
 
     setTimeout(() => {
       if (inputRef.current) {
@@ -60,17 +63,22 @@ const DatePickerRange = ({
   const [dateSelectionFinalized, setDateSelectionFinalized] =
     useState<boolean>(false);
 
-  const handleClose = () => {
+  const handleSelect = () => {
     if (dateSelectionFinalized) {
       getSelectedDate(value);
     }
-
-    setOpen(false);
     setDateSelectionFinalized(false);
+    setOpen(false);
+  };
+
+  const handleClose = () => {
+    onClear();
+    setOpen(false);
   };
 
   const handleClear = () => {
     setValue([null, null]);
+    onClear();
   };
 
   useEffect(() => {
@@ -115,7 +123,7 @@ const DatePickerRange = ({
 
   const renderActionBar = () => (
     <DateRangeActionBar
-      onAccept={handleClose}
+      onAccept={handleSelect}
       onClear={handleClear}
       isDatePicker
     />
@@ -149,34 +157,40 @@ const DatePickerRange = ({
               setValue(newDateRange);
               setDateSelectionFinalized(true);
             }}
-            slotProps={{
-              actionBar: {
-                actions: ['clear', 'accept'],
-              },
-              toolbar: {
-                hidden: false,
-              },
-              popper: {
-                sx: popperSx,
-              },
-              textField: {
-                ...textFieldProps,
-                size: textFieldProps?.size || 'small',
-                error: false,
-                label: t(`${textFieldProps?.label}`),
-                sx: {width: '100%', background: 'white'},
-                InputProps: {endAdornment: <Calendar />, onClick: handleOpen},
-                InputLabelProps: {
-                  shrink: true,
-                  ...inputLabelProps,
+            slotProps={
+              {
+                actionBar: {
+                  actions: ['clear', 'accept'],
                 },
-                inputProps: {
-                  type: 'input',
-                  onClick: handleOpen,
-                  ref: inputRef,
+                toolbar: {
+                  hidden: false,
                 },
-              },
-            }}
+                popper: {
+                  sx: popperSx,
+                },
+                textField: {
+                  ...textFieldProps,
+                  size: textFieldProps?.size || 'small',
+                  error: false,
+                  label: t(`${textFieldProps?.label}`),
+                  sx: {width: '100%', background: 'white'},
+                  InputProps: {
+                    endAdornment: <Calendar />,
+                    onClick: () => handleOpen(open),
+                    sx: {cursor: 'pointer'},
+                  },
+                  InputLabelProps: {
+                    shrink: true,
+                    ...inputLabelProps,
+                  },
+                  inputProps: {
+                    type: 'input',
+                    onClick: () => handleOpen(open),
+                    ref: inputRef,
+                  },
+                },
+              } as unknown as DateRangePickerSlotsComponentsProps<Date>
+            }
           />
         </DemoContainer>
       </LocalizationProvider>
