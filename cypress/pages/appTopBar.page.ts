@@ -3,6 +3,7 @@ const DE_LANG = {
   Deutsche: 'Deutsche',
   Serbian: 'Serbian',
   Italian: 'Italian',
+  Russian: 'Russisch',
 };
 
 const SR_LANG = {
@@ -10,6 +11,7 @@ const SR_LANG = {
   Deutsche: 'Deutsche',
   Serbian: 'Serbian',
   Italian: 'Italian',
+  Russian: 'Russian',
 };
 
 const IT_LANG = {
@@ -17,6 +19,15 @@ const IT_LANG = {
   Deutsche: 'Deutsche',
   Serbian: 'Serbian',
   Italian: 'Italian',
+  Russian: 'Ruski',
+};
+
+const RU_LANG = {
+  English: 'Английский',
+  Deutsche: 'Немецкий',
+  Serbian: 'Сербия',
+  Italian: 'Италия',
+  Russian: 'Русский',
 };
 
 export default class AppTopBarPage {
@@ -51,6 +62,12 @@ export default class AppTopBarPage {
         if (text === 'IT') {
           cy.get('#selectLanguageMenuList li')
             .contains(IT_LANG[languageText])
+            .click();
+        }
+
+        if (text === 'RU') {
+          cy.get('#selectLanguageMenuList li')
+            .contains(RU_LANG[languageText])
             .click();
         }
       });

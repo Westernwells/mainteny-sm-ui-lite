@@ -26,6 +26,10 @@ export const languages = [
     label: 'Italian',
     value: 'it-it',
   },
+  {
+    label: 'Russian',
+    value: 'ru-ru',
+  },
 ];
 
 export const timeFormats = [

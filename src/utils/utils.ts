@@ -98,6 +98,7 @@ export const languageMap: {[key: string]: string} = {
   'de-DE': 'de-de',
   'sr-SP': 'sr-sp',
   'it-IT': 'it-it',
+  'ru-RU': 'ru-ru',
 };
 
 export const mapLanguageToLocale: {[key: string]: string} = {
@@ -105,6 +106,7 @@ export const mapLanguageToLocale: {[key: string]: string} = {
   'de-de': 'de',
   'sr-SP': 'sr',
   'it-it': 'it',
+  'ru-ru': 'ru',
 };
 
 export const getDataGridHeight = (
@@ -181,6 +183,7 @@ export const languageContextMap: {[key: string]: Language} = {
   EN: Language.EN_US,
   DE: Language.DE_DE,
   SR: Language.SR_RS,
+  RU: Language.RU_RU,
 };
 
 export const companyLanguageContextMap: {[key: string]: string} = {
@@ -188,6 +191,7 @@ export const companyLanguageContextMap: {[key: string]: string} = {
   'en-us': 'en',
   'sr-rs': 'sr',
   'it-it': 'it',
+  'ru-ru': 'ru',
 };
 
 export const companyLanguageToUppercaseMap: {[key: string]: string} = {
@@ -195,6 +199,7 @@ export const companyLanguageToUppercaseMap: {[key: string]: string} = {
   'en-us': Language.EN_US,
   'sr-rs': Language.SR_RS,
   'it-it': Language.IT_IT,
+  'ru-ru': Language.RU_RU,
 };
 
 export const titleCase = (str: string) =>
