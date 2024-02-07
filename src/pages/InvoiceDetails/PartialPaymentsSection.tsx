@@ -30,6 +30,7 @@ import {
 } from 'models/invoice';
 import {LanguageContext} from 'context/LanguageProvider';
 import {
+  Currencies,
   aggregatedAmountToMoney,
   formatCurrency,
   getCurrencySymbol,
@@ -225,7 +226,7 @@ export const PartialPaymentsSection = ({
           .map(
             (item) =>
               (item.unitAmount.netAmount /
-                10 ** item.unitAmount.fractionDigits /
+                10 ** Currencies[item.unitAmount.currency] /
                 100) *
               (item.payment?.percentage ?? 0),
           )
@@ -648,7 +649,7 @@ export const PartialPaymentsSection = ({
                       .map((item, index) => {
                         const itemTotalPriceExclVat =
                           item.unitAmount.netAmount /
-                          10 ** item.unitAmount.fractionDigits;
+                          10 ** Currencies[item.unitAmount.currency];
                         const itemCurrencySymbol =
                           getCurrencySymbol[item.unitAmount.currency];
                         const itemAmountToBePaid =

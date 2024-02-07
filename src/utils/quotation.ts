@@ -5,6 +5,7 @@ import {
   QuotationItemRecord,
 } from 'models/quotation';
 import {applyDiscount} from 'pages/InvoiceDetails/utils';
+import {Currencies} from './currency';
 
 export const getQuotationActivityTitle = (
   type: QuotationActivityType,
@@ -38,7 +39,8 @@ export const calculateQuotationTotalWithPerItemDiscount = (
     .map((item: QuotationItemRecord) =>
       applyDiscount({
         actualValue:
-          (item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!) *
+          (item.unitAmount.netAmount /
+            10 ** Currencies[item.unitAmount.currency]) *
           item.quantity,
         ...(item.discount?.type === DiscountType.AMOUNT
           ? {amount: item.discount?.amount?.value ?? 0}

@@ -11,7 +11,6 @@ import {ArticleItemsTableNEW} from 'components/ArticleItemsTableNEW';
 import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrations/invoice/wrench-screwdriver.svg';
 import {InvoiceFormData, InvoiceItemRecord} from 'models/invoice';
 import {FormikProps} from 'formik';
-import {Amount} from 'models/misc';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import {useEffect, useMemo, useState} from 'react';
@@ -80,7 +79,7 @@ export const ArticleSectionTitleAction = ({
 };
 
 interface Props {
-  setItems: (items: InvoiceItemRecord<Amount>[]) => void;
+  setItems: (items: InvoiceItemRecord[]) => void;
   propertyOwnerId: string;
   formik: FormikProps<InvoiceFormData>;
   enableCollapse?: boolean;

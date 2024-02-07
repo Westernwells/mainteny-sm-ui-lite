@@ -66,7 +66,7 @@ export const ArticleItemsTable = ({
   unitSellingAmount,
   formType,
   orderPartialInvoices,
-}: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
+}: Props<QuotationItemRecord | InvoiceItemRecord>) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const currencyCode =
@@ -123,7 +123,7 @@ export const ArticleItemsTable = ({
 
   const articleViewToItem = (
     article: ArticleView,
-  ): QuotationItemRecord | InvoiceItemRecord<Amount> => {
+  ): QuotationItemRecord | InvoiceItemRecord => {
     const record = {
       article,
       description: article.description,
@@ -205,7 +205,7 @@ export const ArticleItemsTable = ({
 
   const setFinalAndFullArticles = (invoiceArg: InvoiceView) => {
     const newItems = invoiceArg.items.map(
-      (i): InvoiceItemRecord<Amount> => ({
+      (i): InvoiceItemRecord => ({
         article: i.article,
         name: i.name,
         description: i.description,
@@ -273,7 +273,7 @@ export const ArticleItemsTable = ({
             createPartial();
           } else {
             const newItems = invoice.items.map(
-              (i): InvoiceItemRecord<Amount> => ({
+              (i): InvoiceItemRecord => ({
                 article: i.article,
                 name: i.name,
                 description: i.description,
@@ -293,7 +293,7 @@ export const ArticleItemsTable = ({
         if (isCreditNote && isFetchedCreditNoteArticle) {
           setItems(
             invoice?.items.map(
-              (i): InvoiceItemRecord<Amount> => ({
+              (i): InvoiceItemRecord => ({
                 article: i.article,
                 name: i.name,
                 description: i.description,
@@ -304,10 +304,6 @@ export const ArticleItemsTable = ({
                     (invoice.totalAmount?.netAmount ?? 0) >= 0
                       ? -1 * (invoice.totalAmount?.netAmount ?? 0)
                       : invoice.totalAmount?.netAmount ?? 0,
-                  grossAmount:
-                    (invoice.totalAmount?.grossAmount ?? 0) >= 0
-                      ? -1 * (invoice.totalAmount?.grossAmount ?? 0)
-                      : invoice.totalAmount?.grossAmount ?? 0,
                 },
               }),
             ),

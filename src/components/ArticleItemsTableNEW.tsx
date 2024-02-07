@@ -22,6 +22,7 @@ import {
   applyDiscount,
   applyGlobalDiscountOnItems,
   applyPerItemDiscountOnItems,
+  articleViewToInvoiceItemRecord,
   getAggregatedItemsVats,
 } from 'pages/InvoiceDetails/utils';
 import {
@@ -30,7 +31,6 @@ import {
   InvoiceFormData,
   InvoiceItemRecord,
 } from 'models/invoice';
-import {Amount} from 'models/misc';
 import {ArticleType, ArticleView} from 'models/article';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {LanguageContext} from 'context/LanguageProvider';
@@ -38,7 +38,6 @@ import {
   calculateTotalAmountInclVats,
   calculateTotalWithPerItemDiscount,
 } from 'utils/calculate-total';
-import {getItemRecord} from 'utils/article-utils';
 import {fixRounding, getUniqueId} from 'utils/utils';
 import {useTheme} from '@mui/material/styles';
 import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd';
@@ -48,8 +47,8 @@ import {ArticleItemRowNEW} from './ArticleItemRowNEW';
 import {FormSelect} from './form/FormSelect';
 
 interface Props {
-  items: InvoiceItemRecord<Amount>[];
-  setItems: (items: InvoiceItemRecord<Amount>[]) => void;
+  items: InvoiceItemRecord[];
+  setItems: (items: InvoiceItemRecord[]) => void;
   propertyOwnerId: string;
   formik: FormikProps<InvoiceFormData>;
   isHovered?: boolean;
@@ -119,19 +118,6 @@ export const ArticleItemsTableNEW = ({
 
   const {language: selectedLng} = useContext(LanguageContext);
 
-  const articleViewToItem = (
-    article: ArticleView,
-  ): InvoiceItemRecord<Amount> => {
-    const record: InvoiceItemRecord<Amount> = {
-      article,
-      name: article.name,
-      description: article.description,
-      quantity: 1,
-      unitAmount: article.unitSellingAmount,
-    };
-    return getItemRecord(record, record.unitAmount.percentageVat);
-  };
-
   const deleteItem = (indexPos: number) => {
     const newItems = items.filter((_, index) => indexPos !== index);
     setItems(newItems);
@@ -140,17 +126,14 @@ export const ArticleItemsTableNEW = ({
   const handleSelectItem = (row: ArticleView, indexPosition: number) => {
     if (indexPosition >= 0 && indexPosition < items.length) {
       const updatedItems = [...items];
-      updatedItems[indexPosition] = articleViewToItem(row);
+      updatedItems[indexPosition] = articleViewToInvoiceItemRecord(row);
       setItems(updatedItems);
     } else {
-      setItems([...items, articleViewToItem(row)]);
+      setItems([...items, articleViewToInvoiceItemRecord(row)]);
     }
   };
 
-  const setItemAtIndex = (
-    indexPos: number,
-    item: InvoiceItemRecord<Amount>,
-  ) => {
+  const setItemAtIndex = (indexPos: number, item: InvoiceItemRecord) => {
     const prevItems = [...items];
     prevItems[indexPos] = item;
     setItems(prevItems);

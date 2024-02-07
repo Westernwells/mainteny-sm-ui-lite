@@ -1,7 +1,7 @@
 import {ArticleType, ArticleView, CostPackage} from './article';
 import {ElevatorView} from './elevator';
 import {AlternativeServiceCompanyInfo, Discount} from './invoice';
-import {AddressRecord, Amount, Meta} from './misc';
+import {AddressRecord, Amount, AmountRecord, Meta} from './misc';
 import {ServiceCompanySimpleView} from './service-company';
 
 export enum QuotationStatus {
@@ -46,7 +46,7 @@ export interface ArticleRecord {
   externalId?: string;
   type?: ArticleType;
   unit?: string;
-  unitSellingAmount?: Amount;
+  unitSellingAmount?: AmountRecord;
   costPackage?: CostPackage;
 }
 
@@ -54,7 +54,7 @@ export interface QuotationItemRecord {
   articleId?: string;
   article?: ArticleRecord;
   name: string;
-  unitAmount: Amount;
+  unitAmount: AmountRecord;
   quantity: number;
   description?: string;
   discount?: Discount;
