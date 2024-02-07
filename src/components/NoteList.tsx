@@ -12,14 +12,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import {Theme} from '@mui/material/styles';
 import {FormikProps} from 'formik';
 import {Comment} from 'models/comment';
-
-interface Note {
-  id: string;
-  content: string;
-  meta: {
-    createdAt: string;
-  };
-}
+import {Note} from 'models/note';
 
 interface GroupedNotes {
   [key: string]: Note[];
