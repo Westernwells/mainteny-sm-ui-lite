@@ -8,7 +8,7 @@ import {TabItems, Tabs} from 'components/Tab';
 import {TabsBody} from 'components/TabsBody';
 import {QuotationView} from 'models/quotation';
 import {useInfiniteQuotationComments} from 'hooks/reactQuery/useQuotation';
-import {useInfiniteElevatorComments} from 'hooks/reactQuery/useElevator';
+import {useInfiniteCustomerNotes} from 'hooks/reactQuery/useCustomers';
 import useTotalNotesData from 'hooks/useTotalNotesData';
 import QuotationNotes from './QuotationNotes';
 import CustomerNotes from './CustomerNotes';
@@ -32,8 +32,8 @@ export const Notes = ({quotation}: Props) => {
     quotation.id,
   );
   const totalCustomerNotes = useTotalNotesData(
-    useInfiniteElevatorComments,
-    quotation?.elevator?.id,
+    useInfiniteCustomerNotes,
+    quotation?.elevator?.propertyOwner.id,
   );
 
   const handleOpenSideDrawer = () => {
