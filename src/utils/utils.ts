@@ -1,4 +1,4 @@
-import {AddressRecord, Coord, GeocodeAddress, Language} from 'models/misc';
+import {AddressRecord, Coord, GeocodeAddress, Language} from '../models/misc';
 
 export const capitalize = (role: any[]) => {
   let roles = '';
