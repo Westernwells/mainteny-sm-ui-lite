@@ -48,6 +48,7 @@ export const ArticleOverView = () => {
       <Box display="flex" justifyContent="flex-end" gap={3} mb="1.5rem">
         <Button
           label={t('Order Article')}
+          data-testid="orderArticle"
           buttonProps={{
             onClick: () =>
               navigate(`/articles/order`, {
@@ -61,6 +62,7 @@ export const ArticleOverView = () => {
               textTransform: 'none',
             },
           }}
+          testId="orderArticle"
         />
 
         {articleDetail && articleDetail.canDelete && (
@@ -75,6 +77,7 @@ export const ArticleOverView = () => {
               },
               startIcon: <DeleteIcon />,
             }}
+            testId="articleDelete"
           />
         )}
       </Box>
