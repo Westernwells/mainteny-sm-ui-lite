@@ -2050,5 +2050,12 @@
   "Select a unit": "Izabrite jedinicu",
   "Invalid unit": "Nevažeća jedinica",
   "Click to hide this section from the invoice. Hidden sections won't appear in the final document or any exported versions": "Kliknite da biste sakrili ovaj odeljak sa fakture. Skriveni odeljci se neće pojaviti u konačnom dokumentu ili bilo kojoj izvezenoj verziji",
-  "Some required information is missing. Please check the highlighted fields.": "Nedostaju neke potrebne informacije. Proverite označena polja."
+  "Some required information is missing. Please check the highlighted fields.": "Nedostaju neke potrebne informacije. Proverite označena polja.",
+  "Europe/Berlin": "Evropa/Berlin",
+  "Europe/Belfast": "Evropa/Belfast",
+  "Europe/Dublin": "Evropa/Dublin",
+  "Europe/Lisbon": "Evropa/Lisbon",
+  "Europe/London": "Evropa/London",
+  "Europe/Copenhagen": "Evropa/Copenhagen",
+  "Europe/Tbilisi": "Evropa/Tbilisi"
 }

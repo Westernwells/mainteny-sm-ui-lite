@@ -2026,5 +2026,14 @@
   "Select a unit": "Wählen Sie eine Anlage",
   "Invalid unit": "Ungültige Einheit",
   "Click to hide this section from the invoice. Hidden sections won't appear in the final document or any exported versions": "Klicken Sie, um diesen Abschnitt aus der Rechnung auszublenden. Ausgeblendete Abschnitte werden weder im endgültigen Dokument noch in exportierten Versionen angezeigt",
-  "Some required information is missing. Please check the highlighted fields.": "Einige erforderliche Informationen fehlen. Bitte überprüfen Sie die hervorgehobenen Felder."
+  "Some required information is missing. Please check the highlighted fields.": "Einige erforderliche Informationen fehlen. Bitte überprüfen Sie die hervorgehobenen Felder.",
+  "Europe/Berlin": "Europa/Berlin",
+  "Europe/Belfast": "Europa/Belfast",
+  "Europe/Dublin": "Europa/Dublin",
+  "Europe/Lisbon": "Europa/Lissabon",
+  "Europe/London": "Europa/London",
+  "Europe/Copenhagen": "Europa/Kopenhagen",
+  "Europe/Tbilisi": "Europa/Tbilisi",
+  "Russian": "Russisch",
+  "Africa/Lagos": "Afrika/Lagos"
 }
