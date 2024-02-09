@@ -1,5 +1,5 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {GridRowsProp, GridSortModel} from '@mui/x-data-grid';
+import {useEffect, useMemo, useRef, useState} from 'react';
+import {GridRowsProp} from '@mui/x-data-grid';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {DataGridLayout} from 'components/DataGridLayout';
@@ -32,10 +32,11 @@ import {useCompanyXeroInfo} from 'hooks/reactQuery/useCompanies';
 import {Alert, Typography} from '@mui/material';
 import {theme} from 'theme';
 import {useTranslation} from 'react-i18next';
+import {useSearchValues} from 'hooks/useSearchValues';
 import {Widget} from '../../components/Widget';
 import {createEmptyResource, makePage} from '../../utils/paging-utils';
 import {columns, makeRows} from './InvoicesDataGridProps';
-import {Order} from '../../models/misc';
+import {OrderByParams} from '../../models/misc';
 
 const pageSize = 25;
 
@@ -45,13 +46,12 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-  const [search, setSearch, clearFilters] = useQueryState('searchInvoices');
-  const [sortOrder, setSortOrder] = useQueryState<Order | undefined>(
-    'sortOrder',
-  );
-  const [orderByField, setOrderByField] = useQueryState<
-    InvoiceOrderField | undefined
-  >('orderByField');
+
+  const {values, clearValues} =
+    useSearchValues<OrderByParams<InvoiceOrderField>>();
+  const {sortOrder, orderByField} = values;
+
+  const [search, setSearch] = useQueryState('searchInvoices');
   const [page, setPage] = useQueryState('page', {
     defaultValue: makePage(0, pageSize),
   });
@@ -178,14 +178,9 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
     setCost(range);
   };
 
-  const handleSortModelChange = useCallback((sortModel: GridSortModel) => {
-    setSortOrder(sortModel[0]?.sort?.toUpperCase() as Order);
-    setOrderByField(sortModel[0]?.field as InvoiceOrderField);
-  }, []);
-
   const renderFilterItems = () => (
     <FilterFields
-      onClear={clearFilters}
+      onClear={clearValues}
       wrapperStyle={{flex: 1, gap: 1.5}}
       containerStyle={{width: '35%', gap: 1.5}}>
       <PriceRangeDropdown
@@ -257,7 +252,6 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
         scrollToTop={search}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
-        onSortModelChange={handleSortModelChange}
         handlePageSizeChange={(newPageSize: number) =>
           setPage({
             ...page,

@@ -1,4 +1,4 @@
-import {useEffect, useRef} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -13,12 +13,16 @@ import {
   GridRenderCellParams,
   GridRowParams,
   GridRowsProp,
+  GridSortDirection,
+  GridSortModel,
 } from '@mui/x-data-grid';
 import LinearProgress from '@mui/material/LinearProgress';
 import {SxProps, Theme} from '@mui/system';
 import {useNavigate} from 'react-router-dom';
 import {olStyles} from 'styles';
 import {convertToText} from 'utils/utils';
+import {useQueryState} from 'hooks/useQueryState';
+import {Order} from 'models/misc';
 import {CustomPagination} from './CustomPagination';
 import {EmptySection} from './EmptySection';
 
@@ -141,6 +145,11 @@ export const DataGridLayout = ({
   const theme = useTheme();
   const gridRef = useRef<any>();
 
+  const [sortOrder, setSortOrder] = useQueryState<Order | undefined | null>(
+    'sortOrder',
+  );
+  const [orderByField, setOrderByField] = useQueryState<string>('orderByField');
+
   const rowClassNames: any[string] = [];
   rows.forEach((item) => {
     if (item.showHeader) {
@@ -151,6 +160,20 @@ export const DataGridLayout = ({
       };
     }
   });
+
+  const handleSortModelChange = useCallback(
+    (sortingFields: GridSortModel) => {
+      if (!sortingFields.length) {
+        setSortOrder(undefined);
+        setOrderByField('');
+        return;
+      }
+      const {sort, field} = sortingFields[0];
+      setSortOrder(sort?.toUpperCase() as Order);
+      setOrderByField(field);
+    },
+    [setSortOrder, setOrderByField],
+  );
 
   useEffect(() => {
     if (gridRef.current) {
@@ -228,6 +251,17 @@ export const DataGridLayout = ({
         disableColumnMenu
         selectionModel={selectionModel}
         sortingMode="server"
+        initialState={{
+          sorting: {
+            sortModel: [
+              {
+                field: orderByField,
+                sort: sortOrder?.toLowerCase() as GridSortDirection,
+              },
+            ],
+          },
+        }}
+        onSortModelChange={handleSortModelChange}
         onCellClick={
           onCellClick ||
           ((params, e) => {

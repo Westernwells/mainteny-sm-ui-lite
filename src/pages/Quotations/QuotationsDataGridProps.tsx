@@ -48,7 +48,7 @@ export const getQuotationStatusStyles = (
   }
 };
 
-export const columns = (handleSortModelChange: any): GridColDef[] => [
+export const columns: GridColDef[] = [
   {
     field: 'number',
     align: 'left',
@@ -65,13 +65,7 @@ export const columns = (handleSortModelChange: any): GridColDef[] => [
     headerName: 'CUSTOMER',
     cellClassName: 'truncateText',
     flex: 1.5,
-    sortable: false,
-    renderHeader: (params: GridColumnHeaderParams) => (
-      <CustomTableHeader
-        onSortChange={handleSortModelChange}
-        column={params.colDef}
-      />
-    ),
+    sortable: true,
   },
   {
     field: 'address',
@@ -91,27 +85,13 @@ export const columns = (handleSortModelChange: any): GridColDef[] => [
     align: 'right',
     headerAlign: 'right',
     flex: 0.75,
-    sortable: false,
-    renderHeader: (params: GridColumnHeaderParams) => (
-      <CustomTableHeader
-        onSortChange={handleSortModelChange}
-        column={params.colDef}
-      />
-    ),
   },
   {
     field: QuotationOrderField.SALES_PRICE,
     headerName: 'Total amount (excl. VAT)',
     flex: 1,
-    sortable: false,
     align: 'right',
     headerAlign: 'right',
-    renderHeader: (params: GridColumnHeaderParams) => (
-      <CustomTableHeader
-        onSortChange={handleSortModelChange}
-        column={params.colDef}
-      />
-    ),
   },
   {
     field: 'notes',
