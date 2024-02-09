@@ -879,6 +879,9 @@ export const InvoiceForm = ({
       (hasPreviousInvoices &&
         firstInvoiceType === InvoiceType.UPFRONT &&
         isFinalInvoice));
+  const paymentTypeTooltip = isPartialInvoice
+    ? 'Choose a payment type for the partial invoice from Lump-Sum, Percentage or per Article, You can’t change your selection later.'
+    : 'Choose a payment type for the upfront invoice from Lump-Sum or Percentage. You can’t change your selection later for the subsequent invoices.';
   return (
     <Box>
       {invoice && (
@@ -1473,6 +1476,24 @@ export const InvoiceForm = ({
               <Box>
                 <Typography variant="body2" color="grey.700">
                   {T('Payment type')}
+                  <Tooltip
+                    title={T(paymentTypeTooltip)}
+                    placement="top"
+                    componentsProps={{
+                      tooltip: {
+                        sx: {
+                          bgcolor: 'common.gray',
+                        },
+                      },
+                    }}>
+                    <IconButton
+                      sx={{
+                        p: 0,
+                        ml: 0.5,
+                      }}>
+                      <InfoOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                 </Typography>
                 <RadioGroup
                   defaultValue={PaymentType.LUMP_SUM}
