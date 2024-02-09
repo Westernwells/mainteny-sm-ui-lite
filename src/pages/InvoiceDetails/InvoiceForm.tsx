@@ -210,16 +210,11 @@ export const InvoiceForm = ({
 
   const {
     data: creditNoteArticlesResource = createEmptyResource<ArticleView>(1),
-  } = useArticles(
-    {
-      pageIndex: 0,
-      pageSize: 1,
-      query: '[internallabel:credit_note]',
-    },
-    // {
-    //   enabled: invoiceType === InvoiceType.CREDIT_NOTE && formType === 'new',
-    // },
-  );
+  } = useArticles({
+    pageIndex: 0,
+    pageSize: 1,
+    query: '[internallabel:credit_note]',
+  });
 
   const {mutateAsync: updateInvoiceAsync, isLoading: isUpdating} =
     useUpdateInvoice();
@@ -502,13 +497,6 @@ export const InvoiceForm = ({
   };
 
   useEffect(() => {
-    // if (creditNoteArticlesResource.data.length) {
-    //   console.log(
-    //     '🚀 ~ useEffect ~ creditNoteArticlesResource.data:',
-    //     creditNoteArticlesResource.data,
-    //   );
-    //   setCreditNoteArticles();
-    // }
     if (invoice) {
       if (
         invoiceType === InvoiceType.CREDIT_NOTE &&
@@ -529,10 +517,6 @@ export const InvoiceForm = ({
       }
     }
   }, [invoice, creditNoteArticlesResource.data]);
-  console.log(
-    '🚀 ~ useEffect ~ creditNoteArticlesResource.data:',
-    creditNoteArticlesResource.data,
-  );
 
   // Set initial values of Invoice Edit Form
   useEffect(() => {
@@ -593,12 +577,6 @@ export const InvoiceForm = ({
           ? InvoiceType.CREDIT_NOTE
           : invoice?.type || formik.values.type,
       );
-      // formik.setFieldValue(
-      //   'items',
-      //   invoice.items.map((invoiceItem) =>
-      //     invoiceItemToInvoiceItemRecord(invoiceItem, formik.values.type),
-      //   ),
-      // );
       formik.setFieldValue(
         'discount',
         invoice?.additionalInfo?.discount
