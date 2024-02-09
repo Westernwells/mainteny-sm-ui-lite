@@ -284,8 +284,10 @@ export const UpfrontPaymentsSection = ({
                           }
                         : {
                             value:
-                              prevInvoice.additionalInfo.payment?.description ??
-                              '',
+                              prevInvoice.type === InvoiceType.CREDIT_NOTE
+                                ? t('Credit Note invoice')
+                                : prevInvoice.additionalInfo.payment
+                                    ?.description || '',
                             disabled: true,
                           }),
                     }}
