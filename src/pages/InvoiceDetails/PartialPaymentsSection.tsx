@@ -22,6 +22,7 @@ import {FormikProps, getIn} from 'formik';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {FormInput} from 'components/form/FormInput';
 import {
+  DiscountType,
   InvoiceFormData,
   InvoiceItemPaymentType,
   InvoiceType,
@@ -43,7 +44,7 @@ import {
 import {fixRounding, isNumber} from 'utils/utils';
 import {formatDate, toDate} from 'utils/datetime';
 import {ReactComponent as PartialInvoiceIcon} from 'assets/icons/PartialInvoiceIcon.svg';
-import {getAggregatedPartialPaymentsVats} from './utils';
+import {applyDiscount, getAggregatedPartialPaymentsVats} from './utils';
 import {SectionTitle} from './SectionTitle';
 import {T} from 'utils/i18n-utils';
 
@@ -141,7 +142,15 @@ export const PartialPaymentsSection = ({
         allPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
       )
     : allPreviousInvoices;
-  const subtotalExclVat = calculateTotalWithPerItemDiscount(formik.values);
+  const subtotalExclVatAfterPerItemDiscount = calculateTotalWithPerItemDiscount(
+    formik.values,
+  );
+  const subtotalExclVat = applyDiscount({
+    actualValue: subtotalExclVatAfterPerItemDiscount,
+    ...(formik.values.discount?.type === DiscountType.AMOUNT
+      ? {amount: formik.values.discount?.amount?.value ?? 0}
+      : {percentage: formik.values.discount?.percentage ?? 0}),
+  });
 
   const handlePartialPaymentChange = (values: NumberFormatValues) => {
     const {floatValue} = values;
