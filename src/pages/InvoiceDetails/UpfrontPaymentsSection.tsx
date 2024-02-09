@@ -6,6 +6,7 @@ import {FormikProps, getIn} from 'formik';
 import {NumberFormatValues} from 'react-number-format';
 import {FormInput} from 'components/form/FormInput';
 import {
+  DiscountType,
   InvoiceFormData,
   InvoiceType,
   InvoiceView,
@@ -22,7 +23,7 @@ import {
 } from 'utils/calculate-total';
 import {fixRounding} from 'utils/utils';
 import {ReactComponent as UpfrontInvoiceIcon} from 'assets/icons/UpfrontInvoiceIcon.svg';
-import {getAggregatedPartialPaymentsVats} from './utils';
+import {applyDiscount, getAggregatedPartialPaymentsVats} from './utils';
 import {SectionTitle} from './SectionTitle';
 import {T} from 'utils/i18n-utils';
 
@@ -48,7 +49,15 @@ export const UpfrontPaymentsSection = ({
       )
     : allPreviousInvoices;
 
-  const subtotalExclVat = calculateTotalWithPerItemDiscount(formik.values);
+  const subtotalExclVatAfterPerItemDiscount = calculateTotalWithPerItemDiscount(
+    formik.values,
+  );
+  const subtotalExclVat = applyDiscount({
+    actualValue: subtotalExclVatAfterPerItemDiscount,
+    ...(formik.values.discount?.type === DiscountType.AMOUNT
+      ? {amount: formik.values.discount?.amount?.value ?? 0}
+      : {percentage: formik.values.discount?.percentage ?? 0}),
+  });
 
   const handleUpfrontPaymentChange = (values: {
     name?: string;
