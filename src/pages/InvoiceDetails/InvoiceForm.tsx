@@ -38,6 +38,7 @@ import {ContractPaymentTermInput} from 'components/ContractPaymentTermInput';
 import {ContractPaymentTerm} from 'components/ContractPaymentTerm';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useArticles} from 'hooks/reactQuery/useArticle';
 import {
   useCreateInvoice,
   useDeleteInvoice,
@@ -94,7 +95,8 @@ import {StatusChip} from 'components/StatusChip';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {MeasurementUnit} from 'models/articleForm';
 import {ContractPaymentTermView} from 'models/contract';
-import {formatInvoiceRecord} from './utils';
+import {ArticleView} from 'models/article';
+import {articleViewToInvoiceItemRecord, formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
 import {EditFrom} from './EditFrom';
@@ -103,7 +105,6 @@ import {PartialPaymentsSection} from './PartialPaymentsSection';
 import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
 import InvoiceFormArticleSection from './InvoiceFormArticleSection';
 import {T} from 'utils/i18n-utils';
-import {ArticleRecord} from 'models/article';
 
 interface Props {
   invoice?: InvoiceView;
@@ -139,11 +140,9 @@ const pageSize = 50;
 
 const articleViewToItem = (
   articleView: ServiceOrderArticleView,
-): InvoiceItemRecord<Amount> => {
-  const record: InvoiceItemRecord<Amount> = {
-    article: articleView.article as Omit<ArticleRecord, 'unitSellingAmount'> & {
-      unitSellingAmount: Amount;
-    },
+): InvoiceItemRecord => {
+  const record: InvoiceItemRecord = {
+    article: articleView.article,
     name: articleView.name,
     description: articleView.description,
     quantity: articleView.quantity,
@@ -155,8 +154,8 @@ const articleViewToItem = (
 const invoiceItemToInvoiceItemRecord = (
   invoiceItem: InvoiceItem,
   invoiceType: InvoiceType,
-): InvoiceItemRecord<Amount> => {
-  const record: InvoiceItemRecord<Amount> = {
+): InvoiceItemRecord => {
+  const record: InvoiceItemRecord = {
     article: invoiceItem.article,
     name: invoiceItem.name,
     description: invoiceItem.description,
@@ -208,6 +207,14 @@ export const InvoiceForm = ({
   const [resetDueDatePicker, setResetDueDatePicker] = useState(false);
   const {user} = useUserSession();
   const {enqueueSnackbar} = useSnackbar();
+
+  const {
+    data: creditNoteArticlesResource = createEmptyResource<ArticleView>(1),
+  } = useArticles({
+    pageIndex: 0,
+    pageSize: 1,
+    query: '[internallabel:credit_note]',
+  });
 
   const {mutateAsync: updateInvoiceAsync, isLoading: isUpdating} =
     useUpdateInvoice();
@@ -473,6 +480,44 @@ export const InvoiceForm = ({
     );
   }, [user, invoice]);
 
+  const setCreditNoteArticles = () => {
+    const creditNoteArticle = articleViewToInvoiceItemRecord(
+      creditNoteArticlesResource.data[0],
+    );
+    formik.setFieldValue('items', [
+      {
+        ...creditNoteArticle,
+        unitAmount: {
+          ...creditNoteArticle.unitAmount,
+          netAmount: -Math.abs(invoice?.totalAmount?.netAmount ?? 0),
+          percentageVat: invoice?.totalAmount?.percentageVat ?? 0,
+        },
+      },
+    ]);
+  };
+
+  useEffect(() => {
+    if (invoice) {
+      if (
+        invoiceType === InvoiceType.CREDIT_NOTE &&
+        formType === 'new' &&
+        creditNoteArticlesResource.data.length &&
+        [InvoiceType.PARTIAL, InvoiceType.UPFRONT, InvoiceType.FINAL].includes(
+          invoice?.type || InvoiceType.FULL,
+        )
+      ) {
+        setCreditNoteArticles();
+      } else {
+        formik.setFieldValue(
+          'items',
+          invoice.items.map((invoiceItem) =>
+            invoiceItemToInvoiceItemRecord(invoiceItem, formik.values.type),
+          ),
+        );
+      }
+    }
+  }, [invoice, creditNoteArticlesResource.data]);
+
   // Set initial values of Invoice Edit Form
   useEffect(() => {
     if (invoice) {
@@ -531,12 +576,6 @@ export const InvoiceForm = ({
         formik.values.type === InvoiceType.CREDIT_NOTE
           ? InvoiceType.CREDIT_NOTE
           : invoice?.type || formik.values.type,
-      );
-      formik.setFieldValue(
-        'items',
-        invoice.items.map((invoiceItem) =>
-          invoiceItemToInvoiceItemRecord(invoiceItem, formik.values.type),
-        ),
       );
       formik.setFieldValue(
         'discount',
@@ -755,7 +794,7 @@ export const InvoiceForm = ({
     setIsEditFromDialogOpen(false);
   };
 
-  const setInvoiceItems = (invoiceItems: InvoiceItemRecord<Amount>[]) => {
+  const setInvoiceItems = (invoiceItems: InvoiceItemRecord[]) => {
     formik.setFieldValue('items', invoiceItems);
   };
 
@@ -824,12 +863,14 @@ export const InvoiceForm = ({
   const hasPreviousInvoices = previousInvoices.length > 0;
   const firstInvoiceType = sortedPreviousInvoices?.[0]?.type ?? null;
   const isFinalInvoice = formik.values.type === InvoiceType.FINAL;
+  const isCreditNoteInvoice = formik.values.type === InvoiceType.CREDIT_NOTE;
   const havePartialInvoices = previousInvoices.some(
     (i) => i.type === InvoiceType.PARTIAL,
   );
   const isPartialInvoice =
     formik.values.type === InvoiceType.PARTIAL ||
     (hasPreviousInvoices &&
+      !isCreditNoteInvoice &&
       ((firstInvoiceType === InvoiceType.PARTIAL && isFinalInvoice) ||
         (firstInvoiceType === InvoiceType.UPFRONT && havePartialInvoices)));
   const isUpfrontInvoice =

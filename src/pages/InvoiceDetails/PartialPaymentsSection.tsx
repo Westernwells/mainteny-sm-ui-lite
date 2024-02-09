@@ -30,6 +30,7 @@ import {
 } from 'models/invoice';
 import {LanguageContext} from 'context/LanguageProvider';
 import {
+  Currencies,
   aggregatedAmountToMoney,
   formatCurrency,
   getCurrencySymbol,
@@ -225,7 +226,7 @@ export const PartialPaymentsSection = ({
           .map(
             (item) =>
               (item.unitAmount.netAmount /
-                10 ** item.unitAmount.fractionDigits /
+                10 ** Currencies[item.unitAmount.currency] /
                 100) *
               (item.payment?.percentage ?? 0),
           )
@@ -455,8 +456,10 @@ export const PartialPaymentsSection = ({
                   formik={formik}
                   paymentDescriptionError={paymentDescriptionError}
                   disabledValue={
-                    prevInvoice.id !== invoice?.id
-                      ? prevInvoice.additionalInfo.payment?.description ?? ''
+                    prevInvoice.type === InvoiceType.CREDIT_NOTE
+                      ? t('Credit Note invoice')
+                      : prevInvoice.id !== invoice?.id
+                      ? prevInvoice.additionalInfo.payment?.description || '-'
                       : ''
                   }
                 />
@@ -648,7 +651,7 @@ export const PartialPaymentsSection = ({
                       .map((item, index) => {
                         const itemTotalPriceExclVat =
                           item.unitAmount.netAmount /
-                          10 ** item.unitAmount.fractionDigits;
+                          10 ** Currencies[item.unitAmount.currency];
                         const itemCurrencySymbol =
                           getCurrencySymbol[item.unitAmount.currency];
                         const itemAmountToBePaid =
@@ -791,17 +794,23 @@ export const PartialPaymentsSection = ({
                 return null;
               }
               const invoiceTotalAmount = i.totalAmount;
+              const description =
+                i.type === InvoiceType.CREDIT_NOTE
+                  ? t('Credit Note invoice')
+                  : i.additionalInfo?.payment?.description || '';
               const fractionDigits = invoiceTotalAmount?.fractionDigits ?? 2;
-              const amountExclVat =
-                (invoiceTotalAmount?.netAmount ?? 0) / 10 ** fractionDigits;
+              const amountExclVat = Math.abs(
+                (invoiceTotalAmount?.netAmount ?? 0) / 10 ** fractionDigits,
+              );
               const amountExclVatFormatted = formatCurrency(amountExclVat, {
                 currency: currentCurrency.code,
                 minimumFractionDigits: fractionDigits,
                 maximumFractionDigits: fractionDigits,
                 roundingMode: 'floor',
               });
-              const totalAmountInclVat =
-                (invoiceTotalAmount?.grossAmount ?? 0) / 10 ** fractionDigits;
+              const totalAmountInclVat = Math.abs(
+                (invoiceTotalAmount?.grossAmount ?? 0) / 10 ** fractionDigits,
+              );
               const totalAmountInclVatFormatted = formatCurrency(
                 totalAmountInclVat,
                 {
@@ -811,16 +820,20 @@ export const PartialPaymentsSection = ({
                   roundingMode: 'floor',
                 },
               );
+              const signBeforeNumber =
+                i.type === InvoiceType.CREDIT_NOTE ? '+' : '-';
+
               return (
                 <TableRow key={i.id}>
                   <TableCell>{index + 1}</TableCell>
-                  <TableCell width="25%">
-                    {i.additionalInfo?.payment?.description ?? ''}
-                  </TableCell>
+                  <TableCell width="25%">{description}</TableCell>
                   <TableCell>
                     {i.sentDate ? formatDate(toDate(i.sentDate)) : '-'}
                   </TableCell>
-                  <TableCell align="right">-{amountExclVatFormatted}</TableCell>
+                  <TableCell align="right">
+                    {signBeforeNumber}
+                    {amountExclVatFormatted}
+                  </TableCell>
                   <TableCell align="right">
                     {invoiceTotalAmount.vats.map((v, idx) => (
                       <p key={idx}>{v.percentageVat}%</p>
@@ -828,7 +841,9 @@ export const PartialPaymentsSection = ({
                   </TableCell>
                   <TableCell align="right">
                     {invoiceTotalAmount.vats.map((v, idx) => {
-                      const vatAmount = (v?.vat ?? 0) / 10 ** fractionDigits;
+                      const vatAmount = Math.abs(
+                        (v?.vat ?? 0) / 10 ** fractionDigits,
+                      );
                       const vatAmountFormatted = formatCurrency(vatAmount, {
                         currency: currentCurrency.code,
                         minimumFractionDigits: fractionDigits,
@@ -839,7 +854,8 @@ export const PartialPaymentsSection = ({
                     })}
                   </TableCell>
                   <TableCell align="right">
-                    -{totalAmountInclVatFormatted}
+                    {signBeforeNumber}
+                    {totalAmountInclVatFormatted}
                   </TableCell>
                 </TableRow>
               );
@@ -1027,9 +1043,11 @@ export const PartialPaymentsSection = ({
                       formik={formik}
                       paymentDescriptionError={paymentDescriptionError}
                       disabledValue={
-                        prevInvoice.id !== invoice?.id
-                          ? prevInvoice.additionalInfo.payment?.description ??
-                            ''
+                        prevInvoice.type === InvoiceType.CREDIT_NOTE
+                          ? t('Credit Note invoice')
+                          : prevInvoice.id !== invoice?.id
+                          ? prevInvoice.additionalInfo.payment?.description ||
+                            '-'
                           : ''
                       }
                     />

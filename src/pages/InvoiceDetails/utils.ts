@@ -1,3 +1,4 @@
+import {ArticleView} from 'models/article';
 import {
   ArticleRecord,
   CreateInvoice,
@@ -9,8 +10,8 @@ import {
   PaymentType,
   UpdateInvoice,
 } from 'models/invoice';
-import {Amount} from 'models/misc';
-import {moneyRecordForBackend} from 'utils/currency';
+import {getItemRecord} from 'utils/article-utils';
+import {Currencies, moneyRecordForBackend} from 'utils/currency';
 import {dateToString} from 'utils/utils';
 
 export const formatInvoiceRecord = (
@@ -148,12 +149,13 @@ export const applyDiscount = ({
   return discountedPrice;
 };
 
-export const getAggregatedItemsVats = (items: InvoiceItemRecord<Amount>[]) =>
+export const getAggregatedItemsVats = (items: InvoiceItemRecord[]) =>
   items.reduce((acc, item) => {
     const {percentageVat} = item.unitAmount;
 
     const vat =
-      (item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!) *
+      (item.unitAmount.netAmount /
+        10 ** Currencies[item.unitAmount.currency]!) *
       (percentageVat / 100) *
       item.quantity;
 
@@ -170,7 +172,7 @@ export const getAggregatedItemsVats = (items: InvoiceItemRecord<Amount>[]) =>
     return acc;
   }, [] as {percentageVat: number; vat: number}[]);
 
-export const applyPerItemDiscountOnItems = (arr: InvoiceItemRecord<Amount>[]) =>
+export const applyPerItemDiscountOnItems = (arr: InvoiceItemRecord[]) =>
   arr.map((item) => {
     if (!item.discount) {
       return item;
@@ -195,7 +197,7 @@ export const applyPerItemDiscountOnItems = (arr: InvoiceItemRecord<Amount>[]) =>
   });
 
 export const applyGlobalDiscountOnItems = (
-  arr: InvoiceItemRecord<Amount>[],
+  arr: InvoiceItemRecord[],
   globalDiscount?: Discount,
 ) => {
   if (!globalDiscount) {
@@ -243,7 +245,7 @@ export const applyGlobalDiscountOnItems = (
 };
 
 export const getAggregatedPartialPaymentsVats = (
-  items: InvoiceItemRecord<Amount>[],
+  items: InvoiceItemRecord[],
   totalAmountExclVat: number,
 ) => {
   const total = items
@@ -268,4 +270,17 @@ export const getAggregatedPartialPaymentsVats = (
 
     return acc;
   }, [] as {percentageVat: number; vat: number}[]);
+};
+
+export const articleViewToInvoiceItemRecord = (
+  article: ArticleView,
+): InvoiceItemRecord => {
+  const record: InvoiceItemRecord = {
+    article,
+    name: article.name,
+    description: article.description,
+    quantity: 1,
+    unitAmount: article.unitSellingAmount,
+  };
+  return getItemRecord(record, record.unitAmount.percentageVat);
 };

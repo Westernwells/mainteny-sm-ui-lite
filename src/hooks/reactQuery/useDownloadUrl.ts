@@ -45,12 +45,14 @@ export const useDownloadUrl = (
     },
   );
 
-  const promises = batches.map((batch) => fetchBatchDownloadUrls(batch));
-
   return useQuery(
     [qk.invoiceDownloadUrl, filePath, fetchId],
-    () =>
-      Promise.all(promises).then((results) => Object.assign({}, ...results)),
+    () => {
+      const promises = batches.map((batch) => fetchBatchDownloadUrls(batch));
+      return Promise.all(promises).then((results) =>
+        Object.assign({}, ...results),
+      );
+    },
     {
       enabled: !!filePath.length && !!fetchId,
       cacheTime: 0,

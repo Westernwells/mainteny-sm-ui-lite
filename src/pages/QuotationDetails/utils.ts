@@ -5,6 +5,7 @@ import {
   QuotationItemRecord,
   UpdateQuotation,
 } from 'models/quotation';
+import {Currencies} from 'utils/currency';
 import {dateToString} from 'utils/utils';
 
 export const formatQuotationRecord = (
@@ -112,7 +113,7 @@ export const getQuotationAggregatedItemsVats = (items: QuotationItemRecord[]) =>
     const {percentageVat} = item.unitAmount;
 
     const vat =
-      (item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!) *
+      (item.unitAmount.netAmount / 10 ** Currencies[item.unitAmount.currency]) *
       (percentageVat / 100) *
       item.quantity;
 

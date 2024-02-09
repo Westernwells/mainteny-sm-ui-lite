@@ -9,7 +9,6 @@ import {getAmountFromPercentage} from 'utils/utils';
 import {Button} from 'components/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import {InvoiceItemRecord} from 'models/invoice';
-import {Amount} from 'models/misc';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useCurrentCurrency} from 'utils/currency';
 import {useTranslation} from 'react-i18next';
@@ -32,7 +31,7 @@ const articleTypes = [
 ];
 
 type Props = {
-  formik: FormikProps<InvoiceItemRecord<Amount>>;
+  formik: FormikProps<InvoiceItemRecord>;
   unitPrice: number;
   handleClose: () => void;
 };

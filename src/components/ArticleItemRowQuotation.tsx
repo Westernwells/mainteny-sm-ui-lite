@@ -30,7 +30,7 @@ import {DiscountType} from 'models/invoice';
 import {MeasurementUnit} from 'models/articleForm';
 import {Button} from 'components/Button';
 import {LanguageContext} from 'context/LanguageProvider';
-import {formatCurrency, useCurrentCurrency} from 'utils/currency';
+import {Currencies, formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {fixRounding} from 'utils/utils';
 import {ArticleType, ArticleView} from 'models/article';
 import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
@@ -168,7 +168,7 @@ export const ArticleItemRowQuotation = ({
 
   const price =
     formik.values.unitAmount.netAmount /
-    10 ** formik.values.unitAmount.fractionDigits!;
+    10 ** Currencies[formik.values.unitAmount.currency];
 
   const totalPriceExclVat = price * formik.values.quantity;
   const totalPriceExclVatAfterDiscount = applyQuotationDiscount({
@@ -192,7 +192,7 @@ export const ArticleItemRowQuotation = ({
         unitAmount: {
           ...formik.values.unitAmount,
           netAmount: fixRounding(
-            price * 10 ** formik.values.unitAmount.fractionDigits,
+            price * 10 ** Currencies[formik.values.unitAmount.currency],
             2,
           ),
         },
@@ -621,7 +621,8 @@ export const ArticleItemRowQuotation = ({
             if (floatValue) {
               formik.setFieldValue(
                 'unitAmount.netAmount',
-                floatValue * 10 ** formik.values.unitAmount.fractionDigits,
+                floatValue *
+                  10 ** Currencies[formik.values.unitAmount.currency],
               );
             } else {
               formik.setFieldValue('unitAmount.netAmount', 0);

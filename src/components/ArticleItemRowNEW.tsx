@@ -27,11 +27,10 @@ import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import {getIn, useFormik} from 'formik';
 import {DiscountType, InvoiceItemRecord} from 'models/invoice';
-import {Amount} from 'models/misc';
 import {MeasurementUnit} from 'models/articleForm';
 import {Button} from 'components/Button';
 import {LanguageContext} from 'context/LanguageProvider';
-import {formatCurrency, useCurrentCurrency} from 'utils/currency';
+import {Currencies, formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {fixRounding} from 'utils/utils';
 import {applyDiscount} from 'pages/InvoiceDetails/utils';
 import {ArticleType, ArticleView} from 'models/article';
@@ -54,10 +53,10 @@ import {EmptySection} from './EmptySection';
 import ArticleTypeCard from './ArticleTypeCard';
 
 interface Props {
-  articleItem: InvoiceItemRecord<Amount>;
+  articleItem: InvoiceItemRecord;
   index: number;
   deleteItem: (indexPos: number) => void;
-  setItemAtIndex: (indexPos: number, item: InvoiceItemRecord<Amount>) => void;
+  setItemAtIndex: (indexPos: number, item: InvoiceItemRecord) => void;
   propertyOwnerId: string;
   handleSelectItem: (row: ArticleView, indexPosition: number) => void;
   isHovered?: boolean;
@@ -157,7 +156,7 @@ export const ArticleItemRowNEW = ({
 
   const {language: selectedLng} = useContext(LanguageContext);
 
-  const formik = useFormik<InvoiceItemRecord<Amount>>({
+  const formik = useFormik<InvoiceItemRecord>({
     initialValues: articleItem,
     onSubmit: () => {},
     validationSchema,
@@ -165,7 +164,7 @@ export const ArticleItemRowNEW = ({
 
   const price =
     formik.values.unitAmount.netAmount /
-    10 ** formik.values.unitAmount.fractionDigits!;
+    10 ** Currencies[formik.values.unitAmount.currency];
 
   const totalPriceExclVat = price * formik.values.quantity;
   const totalPriceExclVatAfterDiscount = applyDiscount({
@@ -189,7 +188,7 @@ export const ArticleItemRowNEW = ({
         unitAmount: {
           ...formik.values.unitAmount,
           netAmount: fixRounding(
-            price * 10 ** formik.values.unitAmount.fractionDigits,
+            price * 10 ** Currencies[formik.values.unitAmount.currency],
             2,
           ),
         },
@@ -615,7 +614,8 @@ export const ArticleItemRowNEW = ({
             if (floatValue) {
               formik.setFieldValue(
                 'unitAmount.netAmount',
-                floatValue * 10 ** formik.values.unitAmount.fractionDigits,
+                floatValue *
+                  10 ** Currencies[formik.values.unitAmount.currency],
               );
             } else {
               formik.setFieldValue('unitAmount.netAmount', 0);

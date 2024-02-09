@@ -11,29 +11,31 @@ import {
   InvoiceItemRecord,
   InvoiceView,
 } from 'models/invoice';
-import {Amount, Currency} from 'models/misc';
+import {Currency} from 'models/misc';
 import {ServiceOrderArticleView} from 'models/service-order';
-import {formatCurrency} from './currency';
+import {Currencies, formatCurrency} from './currency';
 import {fixRounding} from './utils';
 
-export const calculateTotal = (arr: InvoiceItemRecord<Amount>[]) => {
+export const calculateTotal = (arr: InvoiceItemRecord[]) => {
   const sum = 0;
 
   return arr
     .map(
       (item) =>
         item.quantity *
-        (item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!),
+        (item.unitAmount.netAmount /
+          10 ** Currencies[item.unitAmount.currency]),
     )
     .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
 };
 
 export const calculateTotalWithPerItemDiscount = (invoice: InvoiceFormData) => {
   const sum = invoice.items
-    .map((item: InvoiceItemRecord<Amount>) =>
+    .map((item: InvoiceItemRecord) =>
       applyDiscount({
         actualValue:
-          (item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!) *
+          (item.unitAmount.netAmount /
+            10 ** Currencies[item.unitAmount.currency]) *
           item.quantity,
         ...(item.discount?.type === DiscountType.AMOUNT
           ? {amount: item.discount?.amount?.value ?? 0}
@@ -61,7 +63,7 @@ export const calculateTotalAmountInclVats = ({
   return totalAmountInclVats;
 };
 
-export const calculateCostPackage = (arr: InvoiceItemRecord<Amount>[]) => {
+export const calculateCostPackage = (arr: InvoiceItemRecord[]) => {
   let laborCost = 0;
   let materialCost = 0;
 
@@ -69,7 +71,7 @@ export const calculateCostPackage = (arr: InvoiceItemRecord<Amount>[]) => {
     if (item.article?.type !== ArticleType.PACKAGE) {
       const cost =
         (item.quantity * (item.unitAmount?.netAmount ?? 0)) /
-        10 ** (item.unitAmount?.fractionDigits ?? 0);
+        10 ** Currencies[item.unitAmount.currency];
       if (item.article?.type === ArticleType.LABOR) {
         laborCost += cost;
       } else {
