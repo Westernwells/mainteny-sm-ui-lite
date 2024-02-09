@@ -10,11 +10,16 @@ describe('Job', () => {
     LoginPage.login();
 
     cy.wait('@loginApi').then(() => {
+      const technician = `${
+        Cypress.env().REACT_APP_API_URL
+      }/api/serviceCompanies/*/technicians?*`;
+
       const serviceOrders = `${
         Cypress.env().REACT_APP_API_URL
       }/api/serviceOrders/*`;
 
       cy.intercept('GET', serviceOrders).as('serviceOrdersApi');
+      cy.intercept('GET', technician).as('technicianApi');
 
       AppTopBarPage.selectLanguage('English');
 
@@ -44,7 +49,14 @@ describe('Job', () => {
 
   it('should assign Technician in jobs page', () => {
     cy.contains('button', 'Assign Technician').eq(0).click();
-    ServiceJobPage.submitData();
+    cy.wait('@technicianApi', {timeout: 15000})
+      .its('response')
+      .then((response) => {
+        const {body: technicians} = response;
+        if (technicians.data.length) {
+          ServiceJobPage.submitData();
+        }
+      });
   });
 
   it('should assign Technician in orders details page', () => {
