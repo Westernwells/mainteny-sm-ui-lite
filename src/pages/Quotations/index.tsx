@@ -29,9 +29,10 @@ import {
 } from 'utils/contract-utils';
 import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
 import {useTranslation} from 'react-i18next';
-import {Order} from 'models/misc';
+import {OrderByParams} from 'models/misc';
 import DatePickerRange from 'components/DatePickerRange';
 import {DateRange} from '@mui/x-date-pickers-pro';
+import {useSearchValues} from 'hooks/useSearchValues';
 import {columns, makeRows} from './QuotationsDataGridProps';
 
 const pageSize = 25;
@@ -42,14 +43,8 @@ export const Quotations = () => {
   const formatDate = useFormatDate();
   const currentCurrency = useCurrentCurrency();
 
-  const [search, setSearch, clearFilters] = useQueryState('searchQuotations');
+  const [search, setSearch] = useQueryState('searchQuotations');
   const totalQuotationsRef = useRef(0);
-  const [sortOrder, setSortOrder] = useQueryState<Order | undefined>(
-    'sortOrder',
-  );
-  const [orderByField, setOrderByField] = useQueryState<
-    QuotationOrderField | undefined
-  >('orderByField');
   const [status, setStatus] = useQueryState<QuotationStatus[]>('status', {
     defaultValue: [],
   });
@@ -59,6 +54,10 @@ export const Quotations = () => {
   const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const textInput = useRef<HTMLInputElement>(null);
+
+  const {values, clearValues} =
+    useSearchValues<OrderByParams<QuotationOrderField>>();
+  const {sortOrder, orderByField} = values;
 
   const [cost, setCost] = useQueryState<number[][]>('cost', {defaultValue: []});
 
@@ -115,11 +114,6 @@ export const Quotations = () => {
     setSelectedDateRange(dateValues);
   };
 
-  const handleSortModelChange = (sortingField: any, sortingOrder: any) => {
-    setSortOrder(sortingOrder.toUpperCase() as Order);
-    setOrderByField(sortingField as QuotationOrderField);
-  };
-
   useEffect(() => {
     if (quotationsResource.total > 0 && quotationsResource.data.length === 0) {
       setPage({
@@ -147,7 +141,7 @@ export const Quotations = () => {
 
   const renderFilterItems = () => (
     <FilterFields
-      onClear={clearFilters}
+      onClear={clearValues}
       containerStyle={{alignItems: 'center'}}
       wrapperStyle={{alignItems: 'center'}}>
       <DatePickerRange
@@ -231,12 +225,11 @@ export const Quotations = () => {
       }>
       <DataGridLayout
         rows={rows || []}
-        columns={columns(handleSortModelChange)}
+        columns={columns}
         loading={isFetching}
         scrollToTop={search}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
-        onSortModelChange={handleSortModelChange}
         handlePageSizeChange={(newPageSize: number) =>
           setPage({
             ...page,
