@@ -33,18 +33,25 @@ export const formatInvoiceRecord = (
     if (!isPreDefinedArticle) {
       delete modifiedArticle?.id;
     }
+
+    const articleToSend = {
+      ...(isPreDefinedArticle && {id: modifiedArticle?.id}),
+      name: article?.name,
+      type: article?.type,
+      unit: article?.unit,
+      costPackage: article?.costPackage,
+      ...(isPreDefinedArticle &&
+        article?.externalId && {externalId: article?.externalId}),
+      unitSellingAmount: {
+        netAmount: unitSellingAmount?.netAmount,
+        percentageVat: unitSellingAmount?.percentageVat,
+        currency: unitSellingAmount?.currency,
+      },
+    } as ArticleRecord;
+
     return {
       ...rest,
-      article: {
-        ...modifiedArticle,
-        ...(isPreDefinedArticle && {id: modifiedArticle?.id}),
-        externalId: value.externalId,
-        unitSellingAmount: {
-          netAmount: unitSellingAmount?.netAmount,
-          percentageVat: unitSellingAmount?.percentageVat,
-          currency: unitSellingAmount?.currency,
-        },
-      } as ArticleRecord,
+      article: articleToSend,
       unitAmount: {
         netAmount: unitAmount?.netAmount,
         percentageVat: unitAmount?.percentageVat,

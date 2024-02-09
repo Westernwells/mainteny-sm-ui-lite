@@ -71,6 +71,7 @@ const NoteList: React.FC<Props> = ({
                   }}
                   onEdit={() => {
                     setActiveNote({id: note.id, action: 'edit'});
+                    if (activeNote.id === note.id) return;
                     formik.setValues({note: note.content});
                   }}
                   isEditing={
