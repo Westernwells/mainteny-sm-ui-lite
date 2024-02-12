@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {MutableRefObject, useEffect, useMemo, useRef, useState} from 'react';
 import {t} from 'i18next';
 import {useLocation, useNavigate} from 'react-router-dom';
@@ -43,6 +42,7 @@ import {
   CheckList,
   CheckListComponentType,
   CreateCheckListRecord,
+  ExtendedCheckListComponentOption,
   ExtendedCheckListComponentRecord,
   ExtendedCreateCheckListRecord,
   ExtendedUpdateCheckListRecord,
@@ -57,6 +57,7 @@ import {makePage} from 'utils/paging-utils';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import {ChecklistComponent} from './ChecklistComponent';
 import {ChecklistPreview} from './ChecklistPreview';
+import {T} from 'utils/i18n-utils';
 import {styles} from './style';
 
 const availableComponents = [
@@ -150,11 +151,11 @@ const Row = ({
   );
 };
 
-const isStringEmpty = (str) => str.trim() === '';
+const isStringEmpty = (str: string) => str.trim() === '';
 
-const isValidSubject = (subject) => !isStringEmpty(subject);
+const isValidSubject = (subject: string) => !isStringEmpty(subject);
 
-const areOptionsValid = (options) =>
+const areOptionsValid = (options: ExtendedCheckListComponentOption[]) =>
   options.every((option) => !isStringEmpty(option.text));
 
 export const Checklist = () => {
@@ -394,7 +395,7 @@ export const Checklist = () => {
                 pb={1.5}
                 textAlign="center"
                 color="error.main">
-                {t(
+                {T(
                   'Some required information is missing. Please check the highlighted fields.',
                 )}
               </Typography>
