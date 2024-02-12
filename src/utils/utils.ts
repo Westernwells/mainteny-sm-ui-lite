@@ -1,3 +1,4 @@
+import {formatISO} from 'date-fns';
 import {AddressRecord, Coord, GeocodeAddress, Language} from '../models/misc';
 
 export const capitalize = (role: any[]) => {
@@ -301,7 +302,7 @@ export const isJson = (item: string) => {
 export const objectKeyByValue = (obj: Record<string, any>, value: string) =>
   Object.keys(obj)[Object.values(obj).indexOf(value)];
 
-export const dateToString = (date: Date) => date.toISOString().split('T')[0];
+export const dateToString = (date: Date) => formatISO(date).split('T')[0];
 
 export const getUserFullName = ({
   firstName = '',
