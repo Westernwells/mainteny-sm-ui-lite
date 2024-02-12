@@ -2057,5 +2057,9 @@
   "Europe/Lisbon": "Evropa/Lisbon",
   "Europe/London": "Evropa/London",
   "Europe/Copenhagen": "Evropa/Copenhagen",
-  "Europe/Tbilisi": "Evropa/Tbilisi"
+  "Europe/Tbilisi": "Evropa/Tbilisi",
+  "Russian": "Ruski",
+  "Africa/Lagos": "Afrika/Lagos",
+  "Choose a payment type for the partial invoice from Lump-Sum, Percentage or per Article, You can’t change your selection later.": "Izaberite vrstu plaćanja za delimičnu fakturu iz paušalnog iznosa, procenta ili po artiklu. Ne možete kasnije da promenite svoj izbor.",
+  "Choose a payment type for the upfront invoice from Lump-Sum or Percentage. You can’t change your selection later for the subsequent invoices.": "Izaberite vrstu plaćanja za fakturu unapred iz paušalnog iznosa ili procenta. Ne možete kasnije da promenite svoj izbor za naredne fakture."
 }
