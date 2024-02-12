@@ -20,8 +20,9 @@ import {
   ArticleSupplierView,
   UpdateArticleSupplierRecord,
   PropertyOwnerArticleRecord,
+  QueryArticleSuppliersParams,
 } from 'models/article';
-import {Page, Resource, RestError, StringValue} from 'models/misc';
+import {Resource, RestError, StringValue, WithOptional} from 'models/misc';
 import {data} from 'utils/partial-article-data';
 import {FileResourceRecord} from 'models/media';
 import {useUserSession} from './useUserSession';
@@ -253,17 +254,12 @@ export const useCreateArticleOrder = (successMsg: string | JSX.Element) => {
 };
 
 export const queryArticleSuppliers = async (
-  serviceCompanyId: string,
-  page: Page,
-  query: string,
+  params: QueryArticleSuppliersParams,
 ) => {
   const response = await axiosClient.get<Resource<ArticleSupplierView>>(
-    `/api/serviceCompanies/${serviceCompanyId}/articleSuppliers`,
+    `/api/serviceCompanies/${params.serviceCompanyId}/articleSuppliers`,
     {
-      params: {
-        query,
-        ...page,
-      },
+      params,
       paramsSerializer,
     },
   );
@@ -271,15 +267,17 @@ export const queryArticleSuppliers = async (
 };
 
 export const useQueryArticleSuppliers = (
-  page: Page,
-  query: string,
+  params: WithOptional<QueryArticleSuppliersParams, 'serviceCompanyId'>,
   options?: UseQueryOptions<any, any, any>,
 ) => {
   const {user} = useUserSession();
   return useQuery<Resource<ArticleSupplierView>, RestError>(
-    [queryKeys.queryArticleSuppliers, page, query],
+    [queryKeys.queryArticleSuppliers, params],
     () =>
-      queryArticleSuppliers(user!.userAccount.serviceCompany.id, page, query),
+      queryArticleSuppliers({
+        ...params,
+        serviceCompanyId: user!.userAccount.serviceCompany.id,
+      }),
     {
       enabled: !!user,
       ...options,

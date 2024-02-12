@@ -14,6 +14,7 @@ export enum ContractStatus {
 export enum ContractOrderField {
   EXPIRY_TIME = 'EXPIRY_TIME',
   CREATED_TIME = 'CREATED_TIME',
+  START_TIME = 'START_TIME',
 }
 
 export enum ContractTypes {

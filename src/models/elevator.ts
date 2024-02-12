@@ -51,6 +51,12 @@ export enum ElevatorCategory {
   OTHERS = 'OTHERS',
 }
 
+export enum ElevatorOrderField {
+  CREATED_TIME = 'CREATED_TIME',
+  LAST_VISIT_DATE = 'LAST_VISIT_DATE',
+  NEXT_VISIT_DATE = 'NEXT_VISIT_DATE',
+}
+
 export interface ElevatorQueryParams {
   id: string;
   lastVisitDateEnd: any;
@@ -60,8 +66,7 @@ export interface ElevatorQueryParams {
   nextVisitDateEnd: any;
   nextVisitDateStart: any;
   order: Order;
-  orderBy: ServiceOrderOrderField;
-  LAST_VISIT_DATE: string;
+  orderBy: ElevatorOrderField;
   pageIndex: number;
   pageSize: number;
   query: string;

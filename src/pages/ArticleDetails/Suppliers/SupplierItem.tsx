@@ -39,9 +39,12 @@ export const SupplierItem = ({
     data: articleSupplierResource = createEmptyResource<ArticleSupplierView>(
       pageSize,
     ),
-  } = useQueryArticleSuppliers(makePage(0, pageSize), modelQuery, {
-    keepPreviousData: true,
-  });
+  } = useQueryArticleSuppliers(
+    {...makePage(0, pageSize), query: modelQuery},
+    {
+      keepPreviousData: true,
+    },
+  );
 
   return (
     <Box display="flex" flexWrap="wrap" py={2} maxWidth="54rem">

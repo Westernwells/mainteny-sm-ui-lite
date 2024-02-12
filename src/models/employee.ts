@@ -3,7 +3,12 @@ import {Address, Meta} from './misc';
 import {ServiceOrderType} from './service-order';
 import {Role, UserAccountView} from './user';
 
+export enum UserOrderField {
+  CREATED_DATE = 'CREATED_DATE',
+}
+
 export interface UserQueryParams {
+  serviceCompanyId: string;
   pageIndex: number;
   pageSize: number;
   query: string;

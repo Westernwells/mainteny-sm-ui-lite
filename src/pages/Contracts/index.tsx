@@ -4,12 +4,8 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
 import {useQueryContract} from 'hooks/reactQuery/useContract';
-import {
-  ContractOrderField,
-  ContractView,
-  QueryContractParams,
-} from 'models/contract';
-import {Order, WithOptional} from 'models/misc';
+import {ContractOrderField, ContractView} from 'models/contract';
+import {Order, OrderByParams} from 'models/misc';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
@@ -26,6 +22,7 @@ import {
 } from 'utils/contract-utils';
 import {useCurrentCurrency} from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useSearchValues} from 'hooks/useSearchValues';
 import {columns, makeRows} from './ContractsDataGridProps';
 
 const pageSize = 25;
@@ -35,7 +32,7 @@ export const Contracts = () => {
   const {user} = useUserSession();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-  const [search, setSearch, clearFilters] = useQueryState('searchContracts');
+  const [search, setSearch] = useQueryState('searchContracts');
   const [page, setPage] = useQueryState('page', {
     defaultValue: makePage(0, pageSize),
   });
@@ -56,23 +53,11 @@ export const Contracts = () => {
     Expiring: 'EXPIRING',
   };
 
-  let queryParam: WithOptional<QueryContractParams, 'serviceCompanyId'> = {
-    order: Order.DESC,
-    orderBy: ContractOrderField.CREATED_TIME,
-    pageIndex: page.pageIndex || 0,
-    pageSize: page.pageSize || 25,
-    query: search,
-    status,
-  };
+  const {values, clearValues} =
+    useSearchValues<OrderByParams<ContractOrderField>>();
+  const {sortOrder, orderByField} = values;
 
   const [priceStart, priceEnd] = useMemo(() => getStartEndPrice(cost), [cost]);
-  if (cost.length) {
-    queryParam = {
-      ...queryParam,
-      priceStart,
-      priceEnd,
-    };
-  }
 
   const {
     data: contractResource = createEmptyResource<ContractView>(10),
@@ -80,7 +65,18 @@ export const Contracts = () => {
     isFetching,
     isFetched,
     isIdle,
-  } = useQueryContract(queryParam, {keepPreviousData: true});
+  } = useQueryContract(
+    {
+      pageIndex: page.pageIndex || 0,
+      pageSize: page.pageSize || 25,
+      query: search,
+      status,
+      order: sortOrder || Order.DESC,
+      orderBy: orderByField || ContractOrderField.CREATED_TIME,
+      ...(cost.length && {priceStart, priceEnd}),
+    },
+    {keepPreviousData: true},
+  );
 
   totalContractRef.current = totalContractRef.current || contractResource.total;
 
@@ -150,7 +146,7 @@ export const Contracts = () => {
   }
 
   const renderFilterItems = () => (
-    <FilterFields onClear={clearFilters}>
+    <FilterFields onClear={clearValues}>
       <PriceRangeDropdown cost={cost} costRangeConvertor={costRangeConvertor} />
       <MultipleSelectCheckmarks
         label="Status"
