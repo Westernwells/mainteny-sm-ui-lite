@@ -80,6 +80,10 @@ export const timeZones = [
     value: 'Europe/London',
   },
   {
+    label: 'Europe/Tbilisi',
+    value: 'Europe/Tbilisi',
+  },
+  {
     label: 'Africa/Lagos',
     value: 'Africa/Lagos',
   },
