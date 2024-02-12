@@ -68,7 +68,10 @@ export const SuppliersDataGrid = ({setRowItem}: Props) => {
     isLoading,
     isFetching,
     isIdle,
-  } = useQueryArticleSuppliers(page, search, {keepPreviousData: true});
+  } = useQueryArticleSuppliers(
+    {...page, query: search},
+    {keepPreviousData: true},
+  );
 
   useEffect(() => {
     setPageCount(Math.ceil(articleSupplierResource.total / page.pageSize));

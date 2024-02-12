@@ -2,9 +2,10 @@ import {GridColDef, GridRenderCellParams} from '@mui/x-data-grid';
 import {getColumnProps} from 'components/DataGridLayout';
 import {formatCurrency} from 'utils/currency';
 import {FormatDate} from 'models/misc';
-import {ContractView} from 'models/contract';
+import {ContractOrderField, ContractView} from 'models/contract';
 import {StatusChip} from 'components/StatusChip';
 import {getContractStatusStyles} from 'utils/contract-utils';
+import {toDate} from 'utils/datetime';
 import {Actions} from './Actions';
 
 export const columns: GridColDef[] = [
@@ -30,18 +31,20 @@ export const columns: GridColDef[] = [
     headerAlign: 'center',
   }),
   getColumnProps({
-    field: 'start',
+    field: ContractOrderField.START_TIME,
     headerName: 'start date',
     align: 'center',
     headerAlign: 'center',
     flex: 0.75,
+    sortable: true,
   }),
   getColumnProps({
-    field: 'end',
+    field: ContractOrderField.EXPIRY_TIME,
     headerName: 'expiry date',
     align: 'center',
     headerAlign: 'center',
     flex: 0.75,
+    sortable: true,
   }),
   getColumnProps({
     field: 'name',
@@ -99,8 +102,12 @@ export const makeRows = (
         number: item.externalId || '-',
         customer: item.propertyOwner.name,
         units: item.elevators.length,
-        start: formatDate(item.start),
-        end: formatDate(item.end),
+        [ContractOrderField.START_TIME]: item.start
+          ? formatDate(toDate(item.start))
+          : '-',
+        [ContractOrderField.EXPIRY_TIME]: item.end
+          ? formatDate(toDate(item.end))
+          : '-',
         name: item.name,
         cost:
           `${formatCurrency(

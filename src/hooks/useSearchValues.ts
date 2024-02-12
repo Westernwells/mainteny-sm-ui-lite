@@ -10,7 +10,7 @@ type UseSearchValuesResult<T> = {
     newValues?: NullablePartial<T> | null,
     resetPrev?: boolean,
   ) => void;
-  clearValues: (exclusions?: string[] | null) => void;
+  clearValues: (exclusions?: string[]) => void;
 };
 
 /**
@@ -43,7 +43,7 @@ export const useSearchValues = <T = AnyRecord>(): UseSearchValuesResult<T> => {
   );
 
   const clearValues = useCallback(
-    (exclusions?: string[] | null) => {
+    (exclusions: string[] = ['tab']) => {
       const valuesToKeep = exclusions ? pick(values, exclusions) : {};
       const queryString = qs.stringify(valuesToKeep);
 

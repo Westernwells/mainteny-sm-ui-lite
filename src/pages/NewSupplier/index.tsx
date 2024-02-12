@@ -57,9 +57,12 @@ const NewSupplier = () => {
     data: articleSupplierResource = createEmptyResource<ArticleSupplierView>(
       pageSize,
     ),
-  } = useQueryArticleSuppliers(makePage(0, pageSize), externalIdValue, {
-    keepPreviousData: true,
-  });
+  } = useQueryArticleSuppliers(
+    {...makePage(0, pageSize), query: externalIdValue},
+    {
+      keepPreviousData: true,
+    },
+  );
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),

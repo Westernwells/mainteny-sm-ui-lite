@@ -5,7 +5,7 @@ import {IconButton} from '@mui/material';
 import Email from '@mui/icons-material/Email';
 import {useNavigate} from 'react-router-dom';
 import _ from 'lodash';
-import {ArticleSupplierView} from 'models/article';
+import {ArticleSupplierView, SupplierOrderField} from 'models/article';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {useQueryArticleSuppliers} from 'hooks/reactQuery/useArticle';
 import {useQueryState} from 'hooks/useQueryState';
@@ -14,6 +14,8 @@ import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {EmptySection} from 'components/EmptySection';
 import {Widget} from 'components/Widget';
 import {PageListingLayout} from 'components/PageListingLayout';
+import {useSearchValues} from 'hooks/useSearchValues';
+import {OrderByParams} from 'models/misc';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -88,6 +90,10 @@ export const SupplierListDataGrid = () => {
   const [pageCount, setPageCount] = useState(0);
   const [query, setQuery] = useQueryState('query');
   const textInput = useRef<HTMLInputElement>(null);
+
+  const {values} = useSearchValues<OrderByParams<SupplierOrderField>>();
+  const {sortOrder, orderByField} = values;
+
   const {
     data: articleSupplierResource = createEmptyResource<ArticleSupplierView>(
       pageSize,
@@ -95,7 +101,15 @@ export const SupplierListDataGrid = () => {
     isIdle,
     isLoading,
     isFetching,
-  } = useQueryArticleSuppliers(page, query, {keepPreviousData: true});
+  } = useQueryArticleSuppliers(
+    {
+      query,
+      ...page,
+      ...(sortOrder && {order: sortOrder}),
+      ...(orderByField && {orderBy: orderByField}),
+    },
+    {keepPreviousData: true},
+  );
 
   useEffect(() => {
     if (

@@ -1,16 +1,15 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
-import {ElevatorView} from 'models/elevator';
+import {useEffect, useRef, useState} from 'react';
+import {ElevatorOrderField, ElevatorView} from 'models/elevator';
 import {Widget} from 'components/Widget';
-import {GridRowsProp, GridSortModel} from '@mui/x-data-grid';
+import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {FilterFields} from 'components/FilterFields';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
-import {ServiceOrderOrderField} from 'models/service-order';
 import {DatePicker} from 'components/DatePicker';
-import {Order} from 'models/misc';
+import {Order, OrderByParams} from 'models/misc';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
 import {useNavigate} from 'react-router-dom';
@@ -18,6 +17,7 @@ import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {FlexContainer} from 'components/FlexContainer';
 import Box from '@mui/material/Box';
+import {useSearchValues} from 'hooks/useSearchValues';
 import {columns, makeRows} from './UnitsDataGridProps';
 
 const pageInfo = makePage(0, 50);
@@ -25,11 +25,13 @@ const pageInfo = makePage(0, 50);
 export const UnitListingView = () => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-  const [lastVisitStart, setLastVisitStart, clearFilters] =
-    useQueryState<Date | null>('lastVisitStart', {
+  const [lastVisitStart, setLastVisitStart] = useQueryState<Date | null>(
+    'lastVisitStart',
+    {
       defaultValue: null,
       isDate: true,
-    });
+    },
+  );
   const [lastVisitEnd, setLastVisitEnd] = useQueryState<Date | null>(
     'lastVisitEnd',
     {
@@ -51,13 +53,7 @@ export const UnitListingView = () => {
       isDate: true,
     },
   );
-  const [sortOrder, setSortOrder] = useQueryState<Order | undefined>(
-    'sortOrder',
-    undefined,
-  );
-  const [orderBy, setOrderBy] = useQueryState<
-    ServiceOrderOrderField | undefined
-  >('orderBy', undefined);
+
   const [search, setSearch] = useQueryState('searchUnits');
   const [page, setPage] = useQueryState('page', {defaultValue: pageInfo});
   const totalUnitsRef = useRef(0);
@@ -65,6 +61,10 @@ export const UnitListingView = () => {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [resetDatePicker, setResetDatePicker] = useState(false);
   const textInput = useRef<HTMLInputElement>(null);
+
+  const {values, clearValues} =
+    useSearchValues<OrderByParams<ElevatorOrderField>>();
+  const {sortOrder, orderByField} = values;
 
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
@@ -88,8 +88,8 @@ export const UnitListingView = () => {
       ...(nextVisitEnd && {
         nextVisitDateEnd: formatDate(nextVisitEnd, 'yyyy-MM-dd'),
       }),
-      ...(sortOrder && {order: sortOrder}),
-      ...(orderBy && {orderBy}),
+      orderBy: orderByField || ElevatorOrderField.CREATED_TIME,
+      order: sortOrder || Order.DESC,
     },
     {keepPreviousData: true},
   );
@@ -117,13 +117,6 @@ export const UnitListingView = () => {
     }
   }, [elevatorResponse, page]);
 
-  const handleSortModelChange = useCallback((sortModel: GridSortModel) => {
-    // Here you save the data you need from the sort model
-
-    setSortOrder(sortModel[0]?.sort?.toUpperCase() as Order);
-    setOrderBy(sortModel[0]?.field as ServiceOrderOrderField);
-  }, []);
-
   if (isFetched && !totalUnitsRef.current) {
     return (
       <EmptySection
@@ -145,7 +138,7 @@ export const UnitListingView = () => {
   const renderFilterItems = () => (
     <FilterFields
       onClear={() => {
-        clearFilters();
+        clearValues();
         setResetDatePicker(true);
       }}
       wrapperStyle={{width: '90%'}}>
@@ -249,7 +242,6 @@ export const UnitListingView = () => {
         loading={isFetching}
         pageSize={page.pageSize}
         pageIndex={page.pageIndex + 1}
-        onSortModelChange={handleSortModelChange}
         handlePageSizeChange={(newPageSize: number) =>
           setPage({
             ...page,

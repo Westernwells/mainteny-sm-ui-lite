@@ -14,12 +14,14 @@ import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useQueryTechnicianEvents} from 'hooks/reactQuery/useTechnician';
 import {useQueryUserAccounts} from 'hooks/reactQuery/useUserAccount';
 import {useQueryState} from 'hooks/useQueryState';
-import {TechnicianEventType} from 'models/misc';
+import {OrderByParams, TechnicianEventType} from 'models/misc';
 import {UserView, Role} from 'models/user';
 import {TechnicianEventPair} from 'models/technician';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {toRestDateTime} from 'utils/datetime';
 import {getRoles} from 'utils/work-hours-utils';
+import {useSearchValues} from 'hooks/useSearchValues';
+import {UserOrderField} from 'models/employee';
 import {columns, makeRows} from './EmployeeDataGridProps';
 
 const pageSize = 25;
@@ -37,6 +39,9 @@ export const Employees = () => {
   const [role, setRole] = useQueryState<Role | string>('role');
   const textInput = useRef<HTMLInputElement>(null);
 
+  const {values} = useSearchValues<OrderByParams<UserOrderField>>();
+  const {sortOrder, orderByField} = values;
+
   const {
     data: userAccountResource = createEmptyResource<UserView>(pageSize),
     isFetched,
@@ -49,6 +54,8 @@ export const Employees = () => {
       pageSize: page.pageSize,
       query: search,
       roles: getRoles(role),
+      ...(sortOrder && {order: sortOrder}),
+      ...(orderByField && {orderBy: orderByField}),
     },
     {keepPreviousData: true},
   );
