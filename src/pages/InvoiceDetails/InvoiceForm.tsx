@@ -210,6 +210,7 @@ export const InvoiceForm = ({
 
   const {
     data: creditNoteArticlesResource = createEmptyResource<ArticleView>(1),
+    isFetching: isFetchingCreditNoteArticles,
   } = useArticles({
     pageIndex: 0,
     pageSize: 1,
@@ -516,7 +517,7 @@ export const InvoiceForm = ({
         );
       }
     }
-  }, [invoice, creditNoteArticlesResource.data]);
+  }, [invoice, isFetchingCreditNoteArticles]);
 
   // Set initial values of Invoice Edit Form
   useEffect(() => {
