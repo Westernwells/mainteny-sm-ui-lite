@@ -9,12 +9,32 @@ import {
   CompanyContact,
   PdfGenerationStatus,
   Money,
+  Order,
 } from './misc';
 
 export enum ArticleType {
   LABOR = 'LABOR',
   MATERIAL = 'MATERIAL',
   PACKAGE = 'PACKAGE',
+}
+
+export enum ArticleOrderField {
+  NAME = 'NAME',
+  CREATED_DATE = 'CREATED_DATE',
+  XERO_LAST_SYNC_TIME = 'XERO_LAST_SYNC_TIME',
+}
+
+export enum SupplierOrderField {
+  CREATED_DATE = 'CREATED_DATE',
+}
+
+export interface QueryArticleSuppliersParams {
+  serviceCompanyId: string;
+  pageIndex: number;
+  pageSize: number;
+  query: string;
+  order?: Order;
+  orderBy?: SupplierOrderField;
 }
 
 export interface ArticleItem {
@@ -122,6 +142,8 @@ export interface QueryArticleParams {
   type?: ArticleType[];
   manufacturer?: string;
   supplier?: string;
+  order?: Order;
+  orderBy?: ArticleOrderField;
 }
 
 export interface Stock {

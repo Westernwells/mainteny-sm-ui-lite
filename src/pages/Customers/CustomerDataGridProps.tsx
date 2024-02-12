@@ -1,6 +1,9 @@
 import {GridColDef, GridRowModel} from '@mui/x-data-grid';
 import {getColumnProps} from 'components/DataGridLayout';
-import {PropertyOwnerView} from 'models/propertyManager';
+import {
+  PropertyOwnerOrderField,
+  PropertyOwnerView,
+} from 'models/propertyManager';
 import {getDateObject} from 'utils/datetime';
 import {Typography} from '@mui/material';
 import {FormatDate} from 'models/misc';
@@ -24,10 +27,11 @@ export const columns: GridColDef[] = [
     ),
   }),
   getColumnProps({
-    field: 'name',
+    field: PropertyOwnerOrderField.NAME,
     headerName: 'name',
     cellClassName: 'truncateText',
     flex: 1.5,
+    sortable: true,
   }),
   getColumnProps({
     field: 'address',
@@ -72,7 +76,7 @@ export const makeRows = (
 ): GridRowModel<{[key: string]: any}[]> =>
   customers.map((item, index: number) => ({
     id: index,
-    name: item.name,
+    [PropertyOwnerOrderField.NAME]: item.name,
     number: item.externalId,
     address: item.billingAddress?.fullName,
     units: item.unitNumber,

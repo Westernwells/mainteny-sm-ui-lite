@@ -14,7 +14,7 @@ import {useNavigate} from 'react-router-dom';
 import _ from 'lodash';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
-import {ArticleType, ArticleView} from 'models/article';
+import {ArticleOrderField, ArticleType, ArticleView} from 'models/article';
 import {formatCurrency} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {useArticles} from 'hooks/reactQuery/useArticle';
@@ -27,12 +27,15 @@ import {Widget} from 'components/Widget';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {convertToText, stringToTitleCase} from 'utils/utils';
 import {useQueryState} from 'hooks/useQueryState';
+import {useSearchValues} from 'hooks/useSearchValues';
+import {Order, OrderByParams} from 'models/misc';
 
 export const columns: GridColDef[] = [
   getColumnProps({
-    field: 'name',
+    field: ArticleOrderField.NAME,
     headerName: 'NAME',
     cellClassName: 'truncateText',
+    sortable: true,
   }),
   getColumnProps({
     field: 'externalId',
@@ -106,7 +109,7 @@ export const ArticleListDataGrid = () => {
   const makeRows = (articles: ArticleView[]): GridRowsProp =>
     _.map(articles, (item, index) => ({
       id: index,
-      name: item.name,
+      [ArticleOrderField.NAME]: item.name,
       externalId: item.externalId ? item.externalId : '-',
       type: `${t(stringToTitleCase(item.type))}`,
       unit: item.unit,
@@ -133,8 +136,12 @@ export const ArticleListDataGrid = () => {
   const [type, setType] = useQueryState<ArticleType[]>('type', {
     defaultValue: [],
   });
-  const [query, setQuery, clearFilters] = useQueryState('query');
+  const [query, setQuery] = useQueryState('query');
   const textInput = useRef<HTMLInputElement>(null);
+
+  const {values, clearValues} =
+    useSearchValues<OrderByParams<ArticleOrderField>>();
+  const {sortOrder, orderByField} = values;
 
   const totalArticlesRef = useRef(0);
   const {
@@ -149,6 +156,8 @@ export const ArticleListDataGrid = () => {
       pageSize: page.pageSize,
       query,
       type,
+      order: sortOrder || Order.DESC,
+      orderBy: orderByField || ArticleOrderField.CREATED_DATE,
     },
     {keepPreviousData: true},
     true,
@@ -213,7 +222,7 @@ export const ArticleListDataGrid = () => {
           refInput={textInput}
           defaultSearchValue={query}
           filterItems={
-            <FilterFields onClear={clearFilters}>
+            <FilterFields onClear={clearValues}>
               <MultipleSelectCheckmarks
                 label="Type"
                 options={Object.keys(ArticleType).map((it) =>

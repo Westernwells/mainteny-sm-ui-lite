@@ -69,8 +69,7 @@ export enum ServiceOrderType {
 
 export enum ServiceOrderOrderField {
   CREATED_TIME = 'CREATED_TIME',
-  LAST_VISIT_DATE = 'LAST_VISIT_DATE',
-  NEXT_VISIT_DATE = 'NEXT_VISIT_DATE',
+  DUE_DATE = 'DUE_DATE',
 }
 
 export enum DispatchPlanStatus {

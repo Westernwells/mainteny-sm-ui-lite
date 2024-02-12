@@ -4,6 +4,7 @@ import {mixpanelEvents} from 'mixpanel/constants';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {
+  ServiceOrderOrderField,
   ServiceOrderPaymentStatus,
   ServiceOrderStatus,
   ServiceOrderType,
@@ -29,6 +30,8 @@ import {
 import {Widget} from 'components/Widget';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
+import {Order, OrderByParams} from 'models/misc';
+import {useSearchValues} from 'hooks/useSearchValues';
 import {columns, makeRows} from './ServiceOrderDataGridProps';
 
 const serviceOrderStatusMap = {
@@ -58,10 +61,15 @@ export const ServiceOrderList = () => {
   const [selectedOrderStatus, setSelectedOrderStatus] = useQueryState<
     ServiceOrderStatus[]
   >('selectedOrderStatus', {defaultValue: []});
-  const [selectedOrderTypes, setSelectedOrderTypes, clearFilters] =
-    useQueryState<ServiceOrderType[]>('selectedOrderTypes', {defaultValue: []});
+  const [selectedOrderTypes, setSelectedOrderTypes] = useQueryState<
+    ServiceOrderType[]
+  >('selectedOrderTypes', {defaultValue: []});
   const textInput = useRef<HTMLInputElement>(null);
   const [currentDate] = useState(new Date());
+
+  const {values, clearValues} =
+    useSearchValues<OrderByParams<ServiceOrderOrderField>>();
+  const {sortOrder, orderByField} = values;
 
   const {
     data: serviceOrdersResource = createEmptyResource<ServiceOrderView>(10),
@@ -79,6 +87,8 @@ export const ServiceOrderList = () => {
       status: selectedOrderStatus,
       types: selectedOrderTypes,
       paymentStatus: selectedPaymentStatus,
+      orderBy: orderByField || ServiceOrderOrderField.CREATED_TIME,
+      order: sortOrder || Order.DESC,
     },
     {keepPreviousData: true},
   );
@@ -123,7 +133,7 @@ export const ServiceOrderList = () => {
   const renderFilterItems = () => (
     <FilterFields
       onClear={() => {
-        clearFilters();
+        clearValues();
         if (textInput.current) {
           textInput.current.value = '';
         }

@@ -1,6 +1,7 @@
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import {
+  ServiceOrderOrderField,
   ServiceOrderPaymentStatus,
   ServiceOrderView,
 } from 'models/service-order';
@@ -17,6 +18,7 @@ import {getColumnProps} from 'components/DataGridLayout';
 import {olStyles} from 'styles';
 import {Typography} from '@mui/material';
 import {FormatDate} from 'models/misc';
+import {toDate} from 'utils/datetime';
 
 export const getServiceOrderPaymentStatusStyles = (
   status: string,
@@ -80,10 +82,11 @@ export const columns: GridColDef[] = [
     flex: 1,
   }),
   getColumnProps({
-    field: 'date',
+    field: ServiceOrderOrderField.DUE_DATE,
     headerName: 'due date',
     align: 'center',
     flex: 0.75,
+    sortable: true,
   }),
   getColumnProps({
     field: 'technician',
@@ -141,6 +144,9 @@ export const makeRows = (
 ): GridRowsProp =>
   serviceOrders.map((item: ServiceOrderView, index: number) => ({
     id: index,
+    [ServiceOrderOrderField.DUE_DATE]: item.dueDate
+      ? formatDate(toDate(item.dueDate))
+      : '-',
     number: item.number,
     type: item.type,
     customer: item.elevator.propertyOwner.name,

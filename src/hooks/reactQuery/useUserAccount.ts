@@ -4,7 +4,7 @@ import {queryKeys as qks} from 'reactQuery/constants';
 import {useSnackbar} from 'hooks/useSnackbar';
 
 import {UserQueryParams} from 'models/employee';
-import {Resource} from 'models/misc';
+import {Resource, WithOptional} from 'models/misc';
 import {UserView} from 'models/user';
 import {EmployeeAccountData} from 'pages/NewEmployee/model';
 import {EmployeeAccountData as EditEmployeeAccountData} from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/model';
@@ -15,12 +15,9 @@ import {
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useUserSession} from './useUserSession';
 
-export const queryUserAccounts = async (
-  params: UserQueryParams,
-  serviceCompanyId: string,
-) => {
+export const queryUserAccounts = async (params: UserQueryParams) => {
   const response = await axiosClient.get<Resource<UserView>>(
-    `/api/serviceCompanies/${serviceCompanyId}/users`,
+    `/api/serviceCompanies/${params.serviceCompanyId}/users`,
     {
       params,
       paramsSerializer,
@@ -31,7 +28,7 @@ export const queryUserAccounts = async (
 };
 
 export const useQueryUserAccounts = (
-  params: UserQueryParams,
+  params: WithOptional<UserQueryParams, 'serviceCompanyId'>,
   options?: any,
   companyId?: string,
 ) => {
@@ -39,7 +36,11 @@ export const useQueryUserAccounts = (
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
   return useQuery(
     [qks.queryUserAccounts, params],
-    () => queryUserAccounts(params, companyId || serviceCompanyId!),
+    () =>
+      queryUserAccounts({
+        ...params,
+        serviceCompanyId: companyId || serviceCompanyId!,
+      }),
     {
       ...options,
       enabled: !!serviceCompanyId,
