@@ -33,6 +33,7 @@ import {
 import {getUniqueId} from 'utils/utils';
 import {getOptionMock} from 'utils/checklist';
 import {Controller, UseFieldArrayReturn, UseFormReturn} from 'react-hook-form';
+import {T} from 'utils/i18n-utils';
 
 interface ComponentActionsProps {
   duplicateComponent: () => void;
