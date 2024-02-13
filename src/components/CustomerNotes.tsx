@@ -1,4 +1,3 @@
-import {QuotationView} from 'models/quotation';
 import Notes from 'components/Notes';
 import {FC} from 'react';
 import {CreateNoteVars, DeleteNoteVars, UpdateNoteVars} from 'models/note';
@@ -11,12 +10,10 @@ import {
 } from 'hooks/reactQuery/useCustomers';
 
 interface Props {
-  quotation: QuotationView;
+  propertyOwnerId: string;
 }
 
-export const CustomerNotes: FC<Props> = ({quotation}) => {
-  const propertyOwnerId = quotation?.elevator?.propertyOwner.id;
-
+export const CustomerNotes: FC<Props> = ({propertyOwnerId}) => {
   const {
     data: notes = {
       pages: [],

@@ -10,8 +10,8 @@ import {QuotationView} from 'models/quotation';
 import {useInfiniteQuotationComments} from 'hooks/reactQuery/useQuotation';
 import {useInfiniteCustomerNotes} from 'hooks/reactQuery/useCustomers';
 import useTotalNotesData from 'hooks/useTotalNotesData';
+import CustomerNotes from 'components/CustomerNotes';
 import QuotationNotes from './QuotationNotes';
-import CustomerNotes from './CustomerNotes';
 
 interface Props {
   quotation: QuotationView;
@@ -174,7 +174,9 @@ export const Notes = ({quotation}: Props) => {
             <QuotationNotes quotation={quotation} />
           </TabsBody>
           <TabsBody value={tabValue} index={TabIndex.Customer}>
-            <CustomerNotes quotation={quotation} />
+            <CustomerNotes
+              propertyOwnerId={quotation?.elevator?.propertyOwner.id}
+            />
           </TabsBody>
         </Tabs>
       </Drawer>

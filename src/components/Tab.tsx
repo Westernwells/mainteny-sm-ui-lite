@@ -248,7 +248,12 @@ export const Tabs = ({
         flexGrow: 1,
         ...containerStyles,
       }}>
-      <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
         {renderTabItems()}
         {renderActionButtons()}
       </Box>
