@@ -27,7 +27,7 @@ import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import {getIn, useFormik} from 'formik';
 import {DiscountType, InvoiceItemRecord} from 'models/invoice';
-import {MeasurementUnit} from 'models/articleForm';
+import {MeasurementUnit, createMeasurementOptions} from 'models/articleForm';
 import {Button} from 'components/Button';
 import {LanguageContext} from 'context/LanguageProvider';
 import {Currencies, formatCurrency, useCurrentCurrency} from 'utils/currency';
@@ -717,10 +717,7 @@ export const ArticleItemRowNEW = ({
         <FormSelect
           labelId={`select-unit-label-${index}`}
           label=""
-          options={Object.keys(MeasurementUnit).map((item) => ({
-            label: item,
-            value: item,
-          }))}
+          options={createMeasurementOptions(selectedLng, MeasurementUnit.UE)}
           selectProps={{
             value: formik.values.article?.unit ?? '',
             onChange: formik.handleChange,

@@ -5,10 +5,21 @@ import {FormikErrors, useFormik} from 'formik';
 import {ServiceOrderArticleView} from 'models/service-order';
 import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
-import {ArticleBasicFormModel, MeasurementUnit} from 'models/articleForm';
+import {
+  ArticleBasicFormModel,
+  MeasurementUnit,
+  createMeasurementOptions,
+} from 'models/articleForm';
 import {getCurrencySymbol} from 'utils/currency';
 import * as Yup from 'yup';
-import {ChangeEvent, Dispatch, SetStateAction, useEffect} from 'react';
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+} from 'react';
+import {LanguageContext} from 'context/LanguageProvider';
 import {EditArticleFormModel} from './models';
 import {SelectArticleType} from './SelectArticleType';
 
@@ -39,6 +50,7 @@ export const EditArticleForm = ({
   ) => void;
 }) => {
   const {t} = useTranslation();
+  const {language: selectedLng} = useContext(LanguageContext);
 
   const formik = useFormik<EditArticleFormModel | ArticleBasicFormModel>({
     initialValues: {
@@ -150,10 +162,7 @@ export const EditArticleForm = ({
         containerStyles={{...containerStyles, width: '15%'}}
         labelId="select-unit-label"
         label="Unit"
-        options={Object.keys(MeasurementUnit).map((item) => ({
-          label: item,
-          value: item,
-        }))}
+        options={createMeasurementOptions(selectedLng, MeasurementUnit.UE)}
         selectProps={{
           id: 'select-unit',
           value: formik.values.unit,
