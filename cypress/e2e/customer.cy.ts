@@ -10,16 +10,11 @@ describe('Customer', () => {
     LoginPage.login();
 
     cy.wait('@loginApi').then(() => {
-      const technician = `${
+      const propertyOwners = `${
         Cypress.env().REACT_APP_API_URL
-      }/api/serviceCompanies/*/technicians?*`;
+      }/api/propertyOwners?*`;
 
-      const serviceOrders = `${
-        Cypress.env().REACT_APP_API_URL
-      }/api/serviceOrders/*`;
-
-      cy.intercept('GET', serviceOrders).as('serviceOrdersApi');
-      cy.intercept('GET', technician).as('technicianApi');
+      cy.intercept('GET', propertyOwners).as('propertyOwnersApi');
 
       AppTopBarPage.selectLanguage('English');
 
@@ -27,13 +22,26 @@ describe('Customer', () => {
     });
   });
 
-  it('validate Add basic info', () => {
+  it('validate and submit', () => {
     cy.contains('button', 'New Customer').eq(0).click();
-    cy.get('input[name="name"]')
-      .click()
-      .parent()
-      .siblings('p')
-      .should('have.text', 'Customer Name is required');
-    cy.contains('button', 'Next').should('be.disabled');
+    CustomerPage.fillFirstStep();
+    CustomerPage.next();
+    CustomerPage.fillSecondStep();
+    CustomerPage.next();
+    CustomerPage.fillThirdStep();
+  });
+
+  it('delete created customer', () => {
+    cy.wait('@propertyOwnersApi', {timeout: 15000})
+      .its('response')
+      .then((response) => {
+        const {body: propertyOwners} = response;
+        if (propertyOwners.data.length) {
+          cy.get('[data-testid="DeleteIcon"]').eq(0).click();
+          cy.contains('Confirm');
+          cy.get('[data-test-id="remove"]').click();
+          cy.contains('Customer deleted successfully');
+        }
+      });
   });
 });
