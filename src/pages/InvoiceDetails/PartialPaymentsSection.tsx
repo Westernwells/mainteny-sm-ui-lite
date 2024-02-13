@@ -1,5 +1,6 @@
 import React, {Fragment, useContext, useEffect} from 'react';
 import {t} from 'i18next';
+import {uniq} from 'lodash';
 import {theme} from 'theme';
 import {
   Grid,
@@ -923,10 +924,9 @@ export const PartialPaymentsSection = ({
     {name: '#'},
     {name: 'Name'},
     {name: 'Invoice Date'},
-    // TODO: as discussed with marius, we will add these columns when we have data for it
-    // {name: 'Paid amount (excl. VAT)', align: 'right'},
-    // {name: 'VAT (%)', align: 'right'},
-    // {name: 'VAT amount', align: 'right'},
+    {name: 'Paid amount (excl. VAT)', align: 'right'},
+    {name: 'VAT (%)', align: 'right'},
+    {name: 'VAT amount', align: 'right'},
     {name: 'Total amount (incl. VAT)', align: 'right'},
   ];
 
@@ -967,8 +967,7 @@ export const PartialPaymentsSection = ({
             <TableRow>
               <TableCell />
               <TableCell width="40%">{T('Total amount (incl. VAT)')}</TableCell>
-              <TableCell />
-              <TableCell align="right">
+              <TableCell align="right" colSpan={5}>
                 {totalAmountInclVatsFormatted}
               </TableCell>
             </TableRow>
@@ -977,13 +976,69 @@ export const PartialPaymentsSection = ({
                 return null;
               }
 
-              const totalPriceInclVat = i.payments
+              const description =
+                i.type === InvoiceType.CREDIT_NOTE
+                  ? t('Credit Note invoice')
+                  : i.additionalInfo?.payment?.description || '';
+
+              const paidAmountExclVat = Math.abs(
+                i.payments
+                  .map(
+                    (p) =>
+                      (p.additionalInfo.paymentDetails?.netAmount ?? 0) /
+                      10 **
+                        (p.additionalInfo.paymentDetails?.fractionDigits ?? 2),
+                  )
+                  .reduce((a, b) => a + b, 0),
+              );
+
+              const paidAmountExclVatFormatted = formatCurrency(
+                paidAmountExclVat,
+                {
+                  currency: currentCurrency.code,
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                  roundingMode: 'floor',
+                },
+              );
+
+              const percentageVats = uniq(
+                i.payments
+                  .map((p) =>
+                    p.additionalInfo.paymentDetails?.vats.map(
+                      (v) => v.percentageVat,
+                    ),
+                  )
+                  .flat(),
+              );
+
+              const vats = i.payments
                 .map(
                   (p) =>
-                    (p.amount?.value ?? 0) /
-                    10 ** (p.amount?.fractionDigits ?? 2),
+                    (p.additionalInfo.paymentDetails?.vats
+                      .map((v) => v.vat)
+                      .reduce((a, b) => a + b, 0) ?? 0) /
+                    10 **
+                      (p.additionalInfo.paymentDetails?.fractionDigits ?? 2),
                 )
-                .reduce((a, b) => a + b, 0);
+                .map((v) =>
+                  formatCurrency(Math.abs(v), {
+                    currency: currentCurrency.code,
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                    roundingMode: 'floor',
+                  }),
+                );
+
+              const totalPriceInclVat = Math.abs(
+                i.payments
+                  .map(
+                    (p) =>
+                      (p.amount?.value ?? 0) /
+                      10 ** (p.amount?.fractionDigits ?? 2),
+                  )
+                  .reduce((a, b) => a + b, 0),
+              );
 
               const totalPriceInclVatFormatted = formatCurrency(
                 totalPriceInclVat,
@@ -994,17 +1049,33 @@ export const PartialPaymentsSection = ({
                   roundingMode: 'floor',
                 },
               );
+              const signBeforeNumber =
+                i.type === InvoiceType.CREDIT_NOTE ? '+' : '-';
+
               return (
                 <TableRow key={i.id}>
                   <TableCell>{index + 1}</TableCell>
-                  <TableCell width="40%">
-                    {i.additionalInfo?.payment?.description ?? ''}
-                  </TableCell>
+                  <TableCell width="40%">{description}</TableCell>
                   <TableCell>
                     {i.sentDate ? formatDate(toDate(i.sentDate)) : '-'}
                   </TableCell>
                   <TableCell align="right">
-                    -{totalPriceInclVatFormatted}
+                    {signBeforeNumber}
+                    {paidAmountExclVatFormatted}
+                  </TableCell>
+                  <TableCell align="right">
+                    {percentageVats.map((pV) => (
+                      <p key={pV}>{pV}%</p>
+                    ))}
+                  </TableCell>
+                  <TableCell align="right">
+                    {vats.map((vat, idx) => (
+                      <p key={`${vat}-${idx}`}>{vat}</p>
+                    ))}
+                  </TableCell>
+                  <TableCell align="right">
+                    {signBeforeNumber}
+                    {totalPriceInclVatFormatted}
                   </TableCell>
                 </TableRow>
               );
@@ -1014,8 +1085,10 @@ export const PartialPaymentsSection = ({
               <TableCell width="40%" sx={{typography: 'h6', fontWeight: 600}}>
                 {T('Outstanding payments')}
               </TableCell>
-              <TableCell />
-              <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
+              <TableCell
+                align="right"
+                colSpan={5}
+                sx={{typography: 'h6', fontWeight: 600}}>
                 {outstandingAmountFormatted}
               </TableCell>
             </TableRow>

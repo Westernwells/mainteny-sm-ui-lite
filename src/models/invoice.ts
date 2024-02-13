@@ -157,8 +157,16 @@ export interface InvoiceView {
   payments: InvoicePaymentView[];
 }
 
+export interface InvoicePaymentAdditionalInfo {
+  xero?: {
+    xeroEntityId: string;
+    lastSyncedTime: string;
+  };
+  paymentDetails?: AggregatedAmount;
+}
+
 export interface InvoicePaymentView {
-  additionalInfo: InvoiceAdditionalInfo;
+  additionalInfo: InvoicePaymentAdditionalInfo;
   amount: Money;
   id: string;
   invoiceId: string;
