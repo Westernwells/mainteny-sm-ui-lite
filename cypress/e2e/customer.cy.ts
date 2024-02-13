@@ -22,7 +22,7 @@ describe('Customer', () => {
     });
   });
 
-  it('validate and submit', () => {
+  it('should create new customer', () => {
     cy.contains('button', 'New Customer').eq(0).click();
     CustomerPage.fillFirstStep();
     CustomerPage.next();
@@ -31,7 +31,7 @@ describe('Customer', () => {
     CustomerPage.fillThirdStep();
   });
 
-  it('delete created customer', () => {
+  it('should delete created customer', () => {
     cy.wait('@propertyOwnersApi', {timeout: 15000})
       .its('response')
       .then((response) => {
