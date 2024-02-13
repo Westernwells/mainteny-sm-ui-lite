@@ -68,4 +68,17 @@ export enum MeasurementUnit {
   s = 's',
   min = 'min',
   pack = 'pack',
+  km = 'km',
+  UE = 'UE',
 }
+
+export const createMeasurementOptions = (
+  selectedLang: string,
+  excludedItem: MeasurementUnit,
+) =>
+  Object.keys(MeasurementUnit)
+    .filter((item) => !(selectedLang === 'EN' && item === excludedItem))
+    .map((item) => ({
+      label: item,
+      value: item,
+    }));

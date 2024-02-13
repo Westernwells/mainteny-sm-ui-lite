@@ -13,7 +13,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import {useFormik} from 'formik';
 import {DiscountType, InvoiceItemRecord} from 'models/invoice';
 import {Amount} from 'models/misc';
-import {MeasurementUnit} from 'models/articleForm';
+import {MeasurementUnit, createMeasurementOptions} from 'models/articleForm';
 import {Button} from 'components/Button';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useCurrentCurrency} from 'utils/currency';
@@ -243,10 +243,7 @@ export const ArticleItemRowNEW = ({
           <FormSelect
             labelId="select-unit-label"
             label=""
-            options={Object.keys(MeasurementUnit).map((item) => ({
-              label: item,
-              value: item,
-            }))}
+            options={createMeasurementOptions(selectedLng, MeasurementUnit.UE)}
             selectProps={{
               id: 'select-unit',
               value: formik.values.article?.unit,
