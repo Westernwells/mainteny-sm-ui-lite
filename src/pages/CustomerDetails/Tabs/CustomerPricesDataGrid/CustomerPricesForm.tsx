@@ -20,9 +20,11 @@ import {
   useCurrentCurrency,
 } from 'utils/currency';
 import {convertToText} from 'utils/utils';
-import {MeasurementUnit} from 'models/articleForm';
+import {MeasurementUnit, createMeasurementOptions} from 'models/articleForm';
 import {FormSelect} from 'components/form/FormSelect';
 import {useTranslation} from 'react-i18next';
+import {useContext} from 'react';
+import {LanguageContext} from 'context/LanguageProvider';
 
 interface Props {
   title: string;
@@ -62,6 +64,8 @@ export const CustomerPricesForm = ({
 }: Props) => {
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
+  const {language: selectedLng} = useContext(LanguageContext);
+
   const {t} = useTranslation();
   const percentageVat =
     user?.userAccount?.serviceCompany?.settings?.percentageVat ?? 0;
@@ -192,10 +196,7 @@ export const CustomerPricesForm = ({
           <FormSelect
             labelId="select-unit-label"
             label="Unit"
-            options={Object.keys(MeasurementUnit).map((item) => ({
-              label: t(item),
-              value: item,
-            }))}
+            options={createMeasurementOptions(selectedLng, MeasurementUnit.UE)}
             selectProps={{
               id: 'select-unit',
               value: values.unit,
