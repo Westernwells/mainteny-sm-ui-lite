@@ -20,7 +20,7 @@ import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
 import {ArticleRecord, ArticleView, ServiceOrderArticleRecord} from './article';
 import {FileResource, FileResourceRecord} from './media';
-import {ServiceOrderPaymentStatusView} from 'utils/service-order-utils';
+import {ServiceOrderPaymentStatusView} from '../utils/service-order-utils';
 
 export enum Priority {
   A = 'A',
@@ -65,6 +65,17 @@ export enum ServiceOrderType {
   NEW_INSTALLATION = 'NEW_INSTALLATION',
   MODERNIZATION = 'MODERNIZATION',
   GENERAL = 'GENERAL',
+}
+
+export enum ServiceOrderTypeKeys {
+  'Maintenance' = ServiceOrderType.REGULAR,
+  'Emergency' = ServiceOrderType.EMERGENCY,
+  'Repair' = ServiceOrderType.REPAIR,
+  'Callout' = ServiceOrderType.CALLOUT,
+  'Inspection' = ServiceOrderType.INSPECTION,
+  'Installation' = ServiceOrderType.NEW_INSTALLATION,
+  'Modernization' = ServiceOrderType.MODERNIZATION,
+  'General' = ServiceOrderType.GENERAL,
 }
 
 export enum ServiceOrderOrderField {
