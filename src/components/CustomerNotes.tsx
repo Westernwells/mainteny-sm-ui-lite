@@ -1,4 +1,3 @@
-import {QuotationView} from 'models/quotation';
 import Notes from 'components/Notes';
 import {FC} from 'react';
 import {CreateNoteVars, DeleteNoteVars, UpdateNoteVars} from 'models/note';
@@ -11,12 +10,10 @@ import {
 } from 'hooks/reactQuery/useCustomers';
 
 interface Props {
-  quotation: QuotationView;
+  propertyOwnerId: string;
 }
 
-export const CustomerNotes: FC<Props> = ({quotation}) => {
-  const propertyOwnerId = quotation?.elevator?.propertyOwner.id;
-
+export const CustomerNotes: FC<Props> = ({propertyOwnerId}) => {
   const {
     data: notes = {
       pages: [],
@@ -30,7 +27,8 @@ export const CustomerNotes: FC<Props> = ({quotation}) => {
     pageIndex: 0,
     pageSize: 10,
   });
-  const {mutate: createCustomerNote} = useCreateCustomerNote();
+  const {mutate: createCustomerNote, isLoading: isCreating} =
+    useCreateCustomerNote();
   const {mutate: deleteCustomerNote, isLoading: isDeleting} =
     useDeleteCustomerNote();
   const {mutate: updateCustomerNote, isLoading: isUpdating} =
@@ -64,6 +62,7 @@ export const CustomerNotes: FC<Props> = ({quotation}) => {
       isFetchingNextPage={isFetchingNextPage}
       isDeleting={isDeleting}
       isUpdating={isUpdating}
+      isCreating={isCreating}
       hasNextPage={hasNextPage}
       fetchNextPage={fetchNextPage}
       createNote={createNote}

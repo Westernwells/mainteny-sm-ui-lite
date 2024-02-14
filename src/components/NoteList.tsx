@@ -2,6 +2,7 @@ import React, {
   Dispatch,
   Fragment,
   MutableRefObject,
+  RefObject,
   SetStateAction,
 } from 'react';
 import Box from '@mui/material/Box';
@@ -24,6 +25,7 @@ interface Props {
   formik: FormikProps<{note: string}>;
   isDeleting: boolean;
   isUpdating: boolean;
+  inputRef?: RefObject<HTMLDivElement>;
   notesRef: (node?: Element | null | undefined) => void;
   notesTopRef: MutableRefObject<HTMLElement | undefined>;
   activeNote: {id: string; action: 'edit' | 'delete' | undefined};
@@ -42,6 +44,7 @@ const NoteList: React.FC<Props> = ({
   isDeleting,
   isUpdating,
   notesRef,
+  inputRef,
   notesTopRef,
   activeNote,
   setActiveNote,
@@ -71,6 +74,7 @@ const NoteList: React.FC<Props> = ({
                   }}
                   onEdit={() => {
                     setActiveNote({id: note.id, action: 'edit'});
+                    inputRef?.current?.focus();
                     if (activeNote.id === note.id) return;
                     formik.setValues({note: note.content});
                   }}

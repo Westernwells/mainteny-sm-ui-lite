@@ -28,7 +28,8 @@ export const InvoiceNotes: FC<Props> = ({invoice}) => {
     pageIndex: 0,
     pageSize: 10,
   });
-  const {mutate: createInvoiceComment} = useCreateInvoiceComment();
+  const {mutate: createInvoiceComment, isLoading: isCreating} =
+    useCreateInvoiceComment();
   const {mutate: deleteInvoiceComment, isLoading: isDeleting} =
     useDeleteInvoiceComment();
   const {mutate: updateInvoiceComment, isLoading: isUpdating} =
@@ -71,6 +72,7 @@ export const InvoiceNotes: FC<Props> = ({invoice}) => {
       isFetchingNextPage={isFetchingNextPage}
       isDeleting={isDeleting}
       isUpdating={isUpdating}
+      isCreating={isCreating}
       hasNextPage={hasNextPage}
       fetchNextPage={fetchNextPage}
       createNote={createNote}

@@ -30,7 +30,8 @@ export const CustomerNotes: FC<Props> = ({invoice}) => {
     pageIndex: 0,
     pageSize: 10,
   });
-  const {mutate: createCustomerNote} = useCreateCustomerNote();
+  const {mutate: createCustomerNote, isLoading: isCreating} =
+    useCreateCustomerNote();
   const {mutate: deleteCustomerNote, isLoading: isDeleting} =
     useDeleteCustomerNote();
   const {mutate: updateCustomerNote, isLoading: isUpdating} =
@@ -64,6 +65,7 @@ export const CustomerNotes: FC<Props> = ({invoice}) => {
       isFetchingNextPage={isFetchingNextPage}
       isDeleting={isDeleting}
       isUpdating={isUpdating}
+      isCreating={isCreating}
       hasNextPage={hasNextPage}
       fetchNextPage={fetchNextPage}
       createNote={createNote}
