@@ -4,12 +4,11 @@ import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {groupBy} from 'lodash';
 import useTheme from '@mui/material/styles/useTheme';
-import LinearProgress from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
 import {EmptySection} from 'components/EmptySection';
 import {NoteCardSkeleton} from 'components/NoteCardSkeleton';
 import {FormInput} from 'components/form/FormInput';
-import {Button} from 'components/Button';
+import {Button as LoadingButton} from 'components/LoadingButton';
 import {ConfirmDelete} from 'components/ConfirmDelete';
 import {useTranslation} from 'react-i18next';
 import NoteList from 'components/NoteList';
@@ -175,11 +174,6 @@ const Notes: FC<Props> = ({
           bottom: 0,
           p: '1.5rem',
         }}>
-        {isCreating ? (
-          <Box height="4px" marginBottom="1rem">
-            <LinearProgress />
-          </Box>
-        ) : null}
         <form onSubmit={formik.handleSubmit}>
           <FormInput
             props={{
@@ -195,15 +189,16 @@ const Notes: FC<Props> = ({
             }}
           />
           <Box display="flex" justifyContent="flex-end" pt="0.625rem">
-            <Button
+            <LoadingButton
               buttonProps={{
                 type: 'submit',
                 size: 'medium',
                 variant: 'contained',
                 disabled: !formik.values.note || formik.isSubmitting,
+                loading: isCreating || isUpdating,
               }}>
               {t('Submit note')}
-            </Button>
+            </LoadingButton>
           </Box>
         </form>
       </Box>
