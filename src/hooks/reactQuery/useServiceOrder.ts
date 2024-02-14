@@ -43,21 +43,21 @@ import {
   AppointmentConfirmationRequiredOrdersQueryParams,
   ServiceOrderArticleView,
   ServiceOrderConfirmationPublishBody,
-} from '../../models/service-order';
+} from 'models/service-order';
 import {
   Order,
   Resource,
   RestError,
   SimpleEmailRecord,
   StringValue,
-} from '../../models/misc';
+} from 'models/misc';
 import {
   ElevatorAvailability,
   ElevatorAvailabilityParams,
   ElevatorOrderPair,
   ElevatorsByAddress,
   ElevatorView,
-} from '../../models/elevator';
+} from 'models/elevator';
 import {useUserSession} from './useUserSession';
 
 const filterByNextVisit = (
@@ -227,6 +227,8 @@ export function useServiceOrders(
       queryServiceOrders({
         ...params,
         serviceCompanyId: user!.userAccount.serviceCompany.id,
+        order: Order.ASC,
+        orderBy: ServiceOrderOrderField.CREATED_TIME,
       }),
     {enabled: !!user, ...options},
   );
