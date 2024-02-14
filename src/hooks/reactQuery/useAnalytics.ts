@@ -225,6 +225,49 @@ export const useInvoicesXLSX = (
   );
 };
 
+export const fetchInvoicesSage50 = async (
+  serviceCompanyId: string,
+  params: QueryFinancials,
+) => {
+  const response = await axiosClient.get(
+    `/api/reports/${serviceCompanyId}/saga50.csv`,
+    {
+      headers: {
+        accept: 'text/csv',
+      },
+      responseType: 'blob',
+      params,
+      paramsSerializer,
+    },
+  );
+
+  return response.data;
+};
+
+export const useInvoicesSage50 = (
+  serviceCompanyId: string,
+  params: QueryFinancials,
+) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  return useQuery(
+    [FormatType.SAGE50, serviceCompanyId, params],
+    () => fetchInvoicesSage50(serviceCompanyId, params),
+    {
+      onSuccess: (data) => {
+        download(data, ReportType.FINANCIALS);
+        enqueueSnackbar('Report downloaded successfully!', {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+      enabled: false,
+    },
+  );
+};
+
 const fetchSyncStatusXero = async (params: DataSyncStatusParams) => {
   const response: AxiosResponse<DataSyncStatus> = await axiosClient.get(
     `/api/system/xero/synchronization/status`,

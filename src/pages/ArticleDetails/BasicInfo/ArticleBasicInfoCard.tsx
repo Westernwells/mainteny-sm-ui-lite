@@ -24,7 +24,7 @@ import {InfoCard} from 'components/InfoCard';
 import {
   amountRecordForBackend,
   currencyFactor,
-  formatNetAmount,
+  formatCurrency,
   makeAmountRecord,
 } from 'utils/currency';
 import {convertToText} from 'utils/utils';
@@ -240,12 +240,18 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
     {
       label: t('Selling Price'),
       icon: <LocalOfferRoundedIcon sx={{color: theme.palette.info.dark}} />,
-      body: formatNetAmount(article.unitSellingAmount),
+      body: formatCurrency(
+        article.unitSellingAmount.netAmount /
+          10 ** article.unitSellingAmount.fractionDigits!,
+      ),
     },
     {
       label: t('Purchase Price'),
       icon: <LocalOfferRoundedIcon sx={{color: theme.palette.info.dark}} />,
-      body: formatNetAmount(article.unitPurchaseAmount),
+      body: formatCurrency(
+        article.unitPurchaseAmount.netAmount /
+          10 ** article.unitPurchaseAmount.fractionDigits!,
+      ),
     },
     {
       label: t('Storage Location'),

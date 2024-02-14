@@ -4,6 +4,7 @@ import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {
   TimePicker as MuiTimePicker,
   TimePickerProps,
+  TimePickerSlotsComponentsProps,
 } from '@mui/x-date-pickers/TimePicker';
 import {ReactNode, useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
@@ -109,7 +110,7 @@ export const TimePicker = ({
       padding: '0 24px',
       position: 'relative',
     },
-    '& .MuiMultiSectionDigitalClock-root > .MuiList-padding:nth-child(1)': {
+    '& .MuiMultiSectionDigitalClock-root > .MuiList-padding::nth-of-type(1)': {
       position: 'relative',
       borderLeft: '1px solid #8F9BB380',
       borderBottom: '1px solid #8F9BB380',
@@ -126,7 +127,7 @@ export const TimePicker = ({
         background: 'linear-gradient(#FFFFFF 35%, #8F9BB380)',
       },
     },
-    '& .MuiMultiSectionDigitalClock-root > .MuiList-padding:nth-child(2)': {
+    '& .MuiMultiSectionDigitalClock-root > .MuiList-padding::nth-of-type(2)': {
       borderBottom: '1px solid #8F9BB380',
       borderTopRightRadius: '4px',
       borderBottomRightRadius: '4px',
@@ -197,35 +198,37 @@ export const TimePicker = ({
           open={open}
           onClose={() => setOpen(false)}
           ampm={false}
-          slotProps={{
-            actionBar: {
-              actions: ['clear', 'accept'],
-            },
-            toolbar: {
-              hidden: false,
-            },
-            popper: {
-              sx: popperSx,
-            },
-            textField: {
-              ...textFieldProps,
-              label: t(`${textFieldProps?.label}`),
-              size: textFieldProps?.size || 'small',
-              sx: {width: '100%'},
-              InputLabelProps: {
-                shrink: true,
+          slotProps={
+            {
+              actionBar: {
+                actions: ['clear', 'accept'],
+              },
+              toolbar: {
+                hidden: false,
+              },
+              popper: {
+                sx: popperSx,
+              },
+              textField: {
+                ...textFieldProps,
+                label: t(`${textFieldProps?.label}`),
+                size: textFieldProps?.size || 'small',
+                sx: {width: '100%'},
+                InputLabelProps: {
+                  shrink: true,
+                  onClick: handleOpen,
+                },
+                inputProps: {
+                  type: 'input',
+                  onClick: handleOpen,
+                },
+              },
+              inputAdornment: {
+                position: 'end',
                 onClick: handleOpen,
               },
-              inputProps: {
-                type: 'input',
-                onClick: handleOpen,
-              },
-            },
-            inputAdornment: {
-              position: 'end',
-              onClick: handleOpen,
-            },
-          }}
+            } as TimePickerSlotsComponentsProps<Date> | undefined
+          }
           slots={{
             toolbar: () => renderToolbar(textFieldProps?.label),
             actionBar: () => renderActionBar(),

@@ -26,6 +26,10 @@ export const languages = [
     label: 'Italian',
     value: 'it-it',
   },
+  {
+    label: 'Russian',
+    value: 'ru-ru',
+  },
 ];
 
 export const timeFormats = [
@@ -74,6 +78,14 @@ export const timeZones = [
   {
     label: 'Europe/London',
     value: 'Europe/London',
+  },
+  {
+    label: 'Europe/Tbilisi',
+    value: 'Europe/Tbilisi',
+  },
+  {
+    label: 'Africa/Lagos',
+    value: 'Africa/Lagos',
   },
 ];
 

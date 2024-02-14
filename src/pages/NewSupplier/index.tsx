@@ -57,9 +57,12 @@ const NewSupplier = () => {
     data: articleSupplierResource = createEmptyResource<ArticleSupplierView>(
       pageSize,
     ),
-  } = useQueryArticleSuppliers(makePage(0, pageSize), externalIdValue, {
-    keepPreviousData: true,
-  });
+  } = useQueryArticleSuppliers(
+    {...makePage(0, pageSize), query: externalIdValue},
+    {
+      keepPreviousData: true,
+    },
+  );
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
@@ -112,14 +115,21 @@ const NewSupplier = () => {
     user?.userAccount.serviceCompany.id,
   );
 
-  const {data: companyNextNumber} = useCompanyNextNumber(
+  const {data: companyNextNumber, refetch} = useCompanyNextNumber(
     {
       type: ServiceCompanyNumberType.ARTICLE_SUPPLIER,
     },
     user?.userAccount.serviceCompany.id,
   );
 
-  const generateNextNumber = () => {
+  const generateNextNumber = async () => {
+    if (!companyNextNumber?.value) {
+      const {data: refetchedCompanyNextNumber} = await refetch();
+      return formik.setFieldValue(
+        'externalId',
+        refetchedCompanyNextNumber?.value,
+      );
+    }
     formik.setFieldValue('externalId', companyNextNumber?.value);
   };
 

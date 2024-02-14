@@ -66,7 +66,7 @@ const OrderInfoItem = ({
         borderRight: '1px solid #0F4C6414',
         paddingRight: details ? '0.5em' : '0em',
 
-        '&:nth-last-child(1)': {
+        '&:nth-last-of-type(1)': {
           borderRight: 'none',
         },
       }}>

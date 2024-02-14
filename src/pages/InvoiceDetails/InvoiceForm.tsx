@@ -34,10 +34,11 @@ import {Confirm} from 'components/Confirm';
 import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {Tooltip} from 'components/Tooltip';
-import {ContractPaymentTermSelectDialog} from 'components/ContractPaymentTermSelectDialog';
-import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
+import {ContractPaymentTermInput} from 'components/ContractPaymentTermInput';
+import {ContractPaymentTerm} from 'components/ContractPaymentTerm';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useArticles} from 'hooks/reactQuery/useArticle';
 import {
   useCreateInvoice,
   useDeleteInvoice,
@@ -84,23 +85,26 @@ import {getItemRecord} from 'utils/article-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
 import {CustomerAutoComplete} from 'components/CustomerAutocomplete';
-import {ArticleItemsTableNEW} from 'components/ArticleItemsTableNEW';
 import {Progress} from 'components/Progress';
 import {ReactComponent as MapPinIllustration} from 'assets/illustrations/invoice/map-pin.svg';
 import {ReactComponent as HeaderIllustration} from 'assets/illustrations/invoice/header.svg';
-import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrations/invoice/wrench-screwdriver.svg';
 import {ReactComponent as FooterIllustration} from 'assets/illustrations/invoice/footer.svg';
 import {ReactComponent as PinIllustration} from 'assets/illustrations/invoice/pin.svg';
 import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/invoice/task-list-pen.svg';
 import {StatusChip} from 'components/StatusChip';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
-import {formatInvoiceRecord} from './utils';
+import {MeasurementUnit} from 'models/articleForm';
+import {ContractPaymentTermView} from 'models/contract';
+import {ArticleView} from 'models/article';
+import {articleViewToInvoiceItemRecord, formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
 import {EditFrom} from './EditFrom';
 import {SectionTitle} from './SectionTitle';
 import {PartialPaymentsSection} from './PartialPaymentsSection';
 import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
+import InvoiceFormArticleSection from './InvoiceFormArticleSection';
+import {T} from 'utils/i18n-utils';
 
 interface Props {
   invoice?: InvoiceView;
@@ -136,8 +140,8 @@ const pageSize = 50;
 
 const articleViewToItem = (
   articleView: ServiceOrderArticleView,
-): InvoiceItemRecord<Amount> => {
-  const record: InvoiceItemRecord<Amount> = {
+): InvoiceItemRecord => {
+  const record: InvoiceItemRecord = {
     article: articleView.article,
     name: articleView.name,
     description: articleView.description,
@@ -150,8 +154,8 @@ const articleViewToItem = (
 const invoiceItemToInvoiceItemRecord = (
   invoiceItem: InvoiceItem,
   invoiceType: InvoiceType,
-): InvoiceItemRecord<Amount> => {
-  const record: InvoiceItemRecord<Amount> = {
+): InvoiceItemRecord => {
+  const record: InvoiceItemRecord = {
     article: invoiceItem.article,
     name: invoiceItem.name,
     description: invoiceItem.description,
@@ -204,6 +208,15 @@ export const InvoiceForm = ({
   const {user} = useUserSession();
   const {enqueueSnackbar} = useSnackbar();
 
+  const {
+    data: creditNoteArticlesResource = createEmptyResource<ArticleView>(1),
+    isFetching: isFetchingCreditNoteArticles,
+  } = useArticles({
+    pageIndex: 0,
+    pageSize: 1,
+    query: '[internallabel:credit_note]',
+  });
+
   const {mutateAsync: updateInvoiceAsync, isLoading: isUpdating} =
     useUpdateInvoice();
   const {mutateAsync: createNewInvoice, isLoading: isCreating} =
@@ -229,6 +242,9 @@ export const InvoiceForm = ({
     openContractPaymentTermSelectDialog,
     setOpenContractPaymentTermSelectDialog,
   ] = useState(false);
+  const [paymentTermToEdit, setPaymentTermToEdit] = useState<
+    ContractPaymentTermView | undefined
+  >(undefined);
 
   const [customer, setCustomer] = useState<
     PropertyOwnerView | PropertyOwnerSimpleView | undefined
@@ -284,6 +300,7 @@ export const InvoiceForm = ({
     customerSpecificOrderNumber: '',
     moreInfo: DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
     unitNumber: '-',
+    showArticleSection: true,
   };
 
   const validationSchema = Yup.object().shape({
@@ -299,6 +316,15 @@ export const InvoiceForm = ({
           : // eslint-disable-next-line @typescript-eslint/no-use-before-define
             isExternalIdUnique(allInvoiceResource.data, value),
     ),
+    payment: Yup.object().when('type', {
+      is: (v: string) =>
+        v === InvoiceType.PARTIAL ||
+        v === InvoiceType.UPFRONT ||
+        v === InvoiceType.FINAL,
+      then: Yup.object().shape({
+        description: Yup.string().required('Name is required'),
+      }),
+    }),
   });
 
   async function onSave(values: InvoiceFormData) {
@@ -337,6 +363,10 @@ export const InvoiceForm = ({
       navigate(`/invoices/details/${invoiceId}`);
     },
   });
+
+  const alternativeAddress = formik.values.alternativeAddress?.component;
+  const beneficiaryAddress = formik.values.beneficiaryAddress?.component;
+  const billingAddress = formik.values.billingAddress?.component;
 
   const {data: previousInvoices = [], isLoading: isLoadingPreviousInvoices} =
     useFetchServiceOrderInvoices(formik.values.serviceOrderId);
@@ -451,6 +481,44 @@ export const InvoiceForm = ({
     );
   }, [user, invoice]);
 
+  const setCreditNoteArticles = () => {
+    const creditNoteArticle = articleViewToInvoiceItemRecord(
+      creditNoteArticlesResource.data[0],
+    );
+    formik.setFieldValue('items', [
+      {
+        ...creditNoteArticle,
+        unitAmount: {
+          ...creditNoteArticle.unitAmount,
+          netAmount: -Math.abs(invoice?.totalAmount?.netAmount ?? 0),
+          percentageVat: invoice?.totalAmount?.percentageVat ?? 0,
+        },
+      },
+    ]);
+  };
+
+  useEffect(() => {
+    if (invoice) {
+      if (
+        invoiceType === InvoiceType.CREDIT_NOTE &&
+        formType === 'new' &&
+        creditNoteArticlesResource.data.length &&
+        [InvoiceType.PARTIAL, InvoiceType.UPFRONT, InvoiceType.FINAL].includes(
+          invoice?.type || InvoiceType.FULL,
+        )
+      ) {
+        setCreditNoteArticles();
+      } else {
+        formik.setFieldValue(
+          'items',
+          invoice.items.map((invoiceItem) =>
+            invoiceItemToInvoiceItemRecord(invoiceItem, formik.values.type),
+          ),
+        );
+      }
+    }
+  }, [invoice, isFetchingCreditNoteArticles]);
+
   // Set initial values of Invoice Edit Form
   useEffect(() => {
     if (invoice) {
@@ -497,26 +565,18 @@ export const InvoiceForm = ({
           invoiceCustomer?.otherAddress,
       );
 
-      formik.setFieldValue(
-        'dueDate',
-        invoice?.dueDate ? new Date(invoice.dueDate) : new Date(),
-      );
-      formik.setFieldValue(
-        'sentDate',
-        invoice?.sentDate ? new Date(invoice.sentDate) : new Date(),
-      );
+      if (invoice.dueDate) {
+        formik.setFieldValue('dueDate', new Date(invoice.dueDate));
+      }
+      if (invoice.sentDate) {
+        formik.setFieldValue('sentDate', new Date(invoice.sentDate));
+      }
       formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '');
       formik.setFieldValue(
         'type',
         formik.values.type === InvoiceType.CREDIT_NOTE
           ? InvoiceType.CREDIT_NOTE
           : invoice?.type || formik.values.type,
-      );
-      formik.setFieldValue(
-        'items',
-        invoice.items.map((invoiceItem) =>
-          invoiceItemToInvoiceItemRecord(invoiceItem, formik.values.type),
-        ),
       );
       formik.setFieldValue(
         'discount',
@@ -547,6 +607,10 @@ export const InvoiceForm = ({
         invoice?.additionalInfo?.deliveryEndDate
           ? new Date(invoice.additionalInfo.deliveryEndDate)
           : undefined,
+      );
+      formik.setFieldValue(
+        'showArticleSection',
+        invoice?.additionalInfo?.showArticleSection ?? true,
       );
     }
   }, [invoice]);
@@ -585,7 +649,7 @@ export const InvoiceForm = ({
 
       const dueDays =
         serviceOrder.contract?.additionalInfo?.invoiceDueDays || 0;
-      if (dueDays > 0) {
+      if (dueDays > 0 && formType === 'new') {
         formik.setFieldValue('dueDate', addDays(new Date(), dueDays));
         setResetDueDatePicker(true);
       }
@@ -657,11 +721,23 @@ export const InvoiceForm = ({
     return items;
   }, [downloadUrl, formik.values.dueDate]);
 
+  const hasArticleError = () =>
+    formik.values.items.some(
+      (item) =>
+        !item.article?.unit ||
+        !MeasurementUnit[item.article?.unit as MeasurementUnit] ||
+        !item.name,
+    );
+
   const isValid = () => {
     const valid =
       formik.values.subject &&
       formik.values.type.length &&
-      formik.values.items.length;
+      formik.values.items.length &&
+      !hasArticleError() &&
+      !!customer &&
+      Object.keys(formik.errors).length === 0;
+
     if (formik.values.type !== InvoiceType.CREDIT_NOTE) {
       return !!valid;
     }
@@ -672,8 +748,10 @@ export const InvoiceForm = ({
     const paymentTermObj = contractPaymentTerms?.data.find(
       ({id}) => id === paymentTermId,
     );
-    formik.setFieldValue('paymentTerms', paymentTermObj?.term);
-    setOpenContractPaymentTermsDialog(false);
+    formik.setFieldValue('paymentTerms', paymentTermObj?.term || '');
+    if (paymentTermId) {
+      setOpenContractPaymentTermsDialog(false);
+    }
   };
 
   const removeAddress = (
@@ -694,7 +772,7 @@ export const InvoiceForm = ({
         pageSize: 4,
         query:
           formik.values.externalId && formik.values.externalId !== ''
-            ? encodeURIComponent(formik.values.externalId!)
+            ? encodeURIComponent(formik.values.externalId)
             : '',
         status: [],
         totalAmountFrom,
@@ -717,7 +795,7 @@ export const InvoiceForm = ({
     setIsEditFromDialogOpen(false);
   };
 
-  const setInvoiceItems = (invoiceItems: InvoiceItemRecord<Amount>[]) => {
+  const setInvoiceItems = (invoiceItems: InvoiceItemRecord[]) => {
     formik.setFieldValue('items', invoiceItems);
   };
 
@@ -783,6 +861,28 @@ export const InvoiceForm = ({
   const hasAddressValues = (addressComponent?: AddressComponent) =>
     Object.values(addressComponent ?? {}).some((value) => !!value);
 
+  const hasPreviousInvoices = previousInvoices.length > 0;
+  const firstInvoiceType = sortedPreviousInvoices?.[0]?.type ?? null;
+  const isFinalInvoice = formik.values.type === InvoiceType.FINAL;
+  const isCreditNoteInvoice = formik.values.type === InvoiceType.CREDIT_NOTE;
+  const havePartialInvoices = previousInvoices.some(
+    (i) => i.type === InvoiceType.PARTIAL,
+  );
+  const isPartialInvoice =
+    formik.values.type === InvoiceType.PARTIAL ||
+    (hasPreviousInvoices &&
+      !isCreditNoteInvoice &&
+      ((firstInvoiceType === InvoiceType.PARTIAL && isFinalInvoice) ||
+        (firstInvoiceType === InvoiceType.UPFRONT && havePartialInvoices)));
+  const isUpfrontInvoice =
+    !isPartialInvoice &&
+    (formik.values.type === InvoiceType.UPFRONT ||
+      (hasPreviousInvoices &&
+        firstInvoiceType === InvoiceType.UPFRONT &&
+        isFinalInvoice));
+  const paymentTypeTooltip = isPartialInvoice
+    ? 'Choose a payment type for the partial invoice from Lump-Sum, Percentage or per Article, You can’t change your selection later.'
+    : 'Choose a payment type for the upfront invoice from Lump-Sum or Percentage. You can’t change your selection later for the subsequent invoices.';
   return (
     <Box>
       {invoice && (
@@ -901,7 +1001,7 @@ export const InvoiceForm = ({
                       helperText:
                         formik.errors.propertyOwnerId &&
                         formik.touched.propertyOwnerId
-                          ? t(formik.errors.propertyOwnerId)
+                          ? T(formik.errors.propertyOwnerId)
                           : '',
                       name: 'propertyOwnerId',
                       onBlur: formik.handleBlur,
@@ -915,47 +1015,57 @@ export const InvoiceForm = ({
               <>
                 <Grid item xs={6}>
                   <SelectAndEditCombined
-                    selected={hasAddressValues(
-                      formik.values.billingAddress?.component!,
-                    )}
+                    selected={hasAddressValues(billingAddress!)}
                     label="Billing Address"
                     buttonText="Add Billing Address"
                     address={formik.values.billingAddress}
                     cardOnClose={() => removeAddress('billingAddress')}
-                    editButtonText="Edit Billing Address"
-                    modalHeader="Edit Billing Address"
+                    editButtonText={
+                      !billingAddress
+                        ? 'Add Billing Address'
+                        : 'Edit Billing Address'
+                    }
+                    modalHeader={
+                      !billingAddress
+                        ? 'Add Billing Address'
+                        : 'Edit Billing Address'
+                    }
                     addressType="billingAddress"
                     formik={formik}
                   />
                 </Grid>
                 <Grid item xs={6} pl={2}>
                   <SelectAndEditCombined
-                    selected={hasAddressValues(
-                      formik.values.beneficiaryAddress?.component!,
-                    )}
+                    selected={hasAddressValues(beneficiaryAddress!)}
                     label="Beneficiary Address"
                     buttonText="Add Beneficiary Address"
                     address={formik.values.beneficiaryAddress}
                     cardOnClose={() => removeAddress('beneficiaryAddress')}
-                    editButtonText="Edit Beneficiary Address"
-                    modalHeader="Edit Beneficiary Address"
+                    editButtonText={
+                      !beneficiaryAddress
+                        ? 'Add Beneficiary Address'
+                        : 'Edit Beneficiary Address'
+                    }
+                    modalHeader={
+                      !beneficiaryAddress
+                        ? 'Add Beneficiary Address'
+                        : 'Edit Beneficiary Address'
+                    }
                     addressType="beneficiaryAddress"
                     formik={formik}
                   />
                 </Grid>
 
-                <Grid item xs={6}>
+                <Grid item xs={6} display="flex" flexDirection="column" gap={3}>
                   <SelectAndEditCombined
-                    selected={hasAddressValues(
-                      formik.values.alternativeAddress?.component!,
-                    )}
+                    selected={hasAddressValues(alternativeAddress!)}
                     label={
                       <Box>
                         <FormLabel
                           text={t('Alternative Invoice Destination')}
                         />
                         <Tooltip
-                          title={t(alternativeInvoiceDestinationTooltip) || ''}
+                          title={T(alternativeInvoiceDestinationTooltip) ?? ''}
                           placement="top"
                           componentsProps={{
                             tooltip: {
@@ -967,8 +1077,13 @@ export const InvoiceForm = ({
                               },
                             },
                           }}>
-                          <IconButton sx={{fontSize: '1.375rem'}}>
-                            <InfoOutlinedIcon />
+                          <IconButton
+                            sx={{
+                              fontSize: '1.375rem',
+                              paddingTop: 0,
+                              paddingBottom: 0,
+                            }}>
+                            <InfoOutlinedIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       </Box>
@@ -976,8 +1091,16 @@ export const InvoiceForm = ({
                     buttonText="Add Alternative Address"
                     address={formik.values.alternativeAddress}
                     cardOnClose={() => removeAddress('alternativeAddress')}
-                    editButtonText="Edit Alternative Address"
-                    modalHeader="Edit Alternative Address"
+                    editButtonText={
+                      !alternativeAddress
+                        ? 'Add Alternative Address'
+                        : 'Edit Alternative Address'
+                    }
+                    modalHeader={
+                      !alternativeAddress
+                        ? 'Add Alternative Address'
+                        : 'Edit Alternative Address'
+                    }
                     addressType="alternativeAddress"
                     formik={formik}
                   />
@@ -1046,7 +1169,7 @@ export const InvoiceForm = ({
 
             <FormInput
               props={{
-                id: 'description',
+                id: 'header-description',
                 name: 'description',
                 value: formik.values.description,
                 label: 'Description',
@@ -1065,25 +1188,16 @@ export const InvoiceForm = ({
           </Grid>
 
           {/* ARTICLES */}
-          <Grid item xs={12} bgcolor="white" p={3}>
-            <Box pb={2}>
-              <SectionTitle
-                Icon={WrenchScrewdriverIllustration}
-                title="Articles"
-              />
-            </Box>
-            <ArticleItemsTableNEW
-              items={formik.values.items}
-              setItems={setInvoiceItems}
-              formik={formik}
-              propertyOwnerId={customer?.id ?? ''}
-            />
-          </Grid>
+          <InvoiceFormArticleSection
+            setItems={setInvoiceItems}
+            formik={formik}
+            showArticleSection={formik.values.showArticleSection}
+            propertyOwnerId={customer?.id ?? ''}
+            enableCollapse={formik.values.type !== InvoiceType.FULL}
+          />
 
           {/* PARTIAL PAYMENTS */}
-          {formik.values.type === InvoiceType.PARTIAL ||
-          (previousInvoices.length > 0 &&
-            formik.values.type === InvoiceType.FINAL) ? (
+          {isPartialInvoice ? (
             isLoadingPreviousInvoices ? (
               <Progress />
             ) : (
@@ -1096,8 +1210,16 @@ export const InvoiceForm = ({
           ) : null}
 
           {/* UPFRONT PAYMENTS */}
-          {formik.values.type === InvoiceType.UPFRONT ? (
-            <UpfrontPaymentsSection formik={formik} invoice={invoice} />
+          {isUpfrontInvoice ? (
+            isLoadingPreviousInvoices ? (
+              <Progress />
+            ) : (
+              <UpfrontPaymentsSection
+                formik={formik}
+                previousInvoices={sortedPreviousInvoices}
+                invoice={invoice}
+              />
+            )
           ) : null}
 
           {/* FOOTER */}
@@ -1138,9 +1260,7 @@ export const InvoiceForm = ({
                         mr: -1,
                         alignSelf: 'flex-start',
                       }}
-                      onClick={() =>
-                        setOpenContractPaymentTermSelectDialog(true)
-                      }
+                      onClick={() => setOpenContractPaymentTermsDialog(true)}
                       size="small">
                       <TextSnippetIcon />
                     </InputAdornment>
@@ -1171,7 +1291,7 @@ export const InvoiceForm = ({
             <Box display="flex" justifyContent="space-between" width="100%">
               <Box>
                 <Typography variant="body2" color="grey.700">
-                  {t('Invoice type')}
+                  {T('Invoice type')}
                 </Typography>
                 <Typography variant="subtitle2" color="primary.dark" pt={0.5}>
                   {getInvoiceTypeText()}
@@ -1179,7 +1299,7 @@ export const InvoiceForm = ({
               </Box>
               <Box>
                 <Typography variant="body2" color="grey.700">
-                  {t('Created By')}
+                  {T('Created By')}
                 </Typography>
                 <Box display="flex" alignItems="center" gap={1} pt={0.5}>
                   <Avatar
@@ -1227,7 +1347,7 @@ export const InvoiceForm = ({
             {/* DELIVERY DATE */}
             <Box width="100%">
               <Typography variant="body2" color="grey.700" pb={1.5}>
-                {t('Service Deliver Date')}
+                {T('Service Deliver Date')}
               </Typography>
               <Box display="flex" justifyContent="space-between" gap={1}>
                 <DatePicker
@@ -1238,6 +1358,17 @@ export const InvoiceForm = ({
                   }}
                   textFieldProps={{
                     label: 'Start Date',
+                    ...(serviceOrder &&
+                      !formik.values.deliveryStartDate && {
+                        placeholder: t('No Start Date set'),
+                        sx: {
+                          input: {
+                            '&::placeholder': {
+                              typography: 'caption',
+                            },
+                          },
+                        },
+                      }),
                   }}
                 />
                 <DatePicker
@@ -1248,6 +1379,17 @@ export const InvoiceForm = ({
                   }}
                   textFieldProps={{
                     label: 'End Date',
+                    ...(serviceOrder &&
+                      !formik.values.deliveryEndDate && {
+                        placeholder: t('No End Date set'),
+                        sx: {
+                          input: {
+                            '&::placeholder': {
+                              typography: 'caption',
+                            },
+                          },
+                        },
+                      }),
                   }}
                 />
               </Box>
@@ -1328,15 +1470,31 @@ export const InvoiceForm = ({
             </Box>
 
             {/* PAYMENT TYPE */}
-            {/* don't show payment type for FULL and CREDIT_NOTE invoices */}
-            {[
-              InvoiceType.PARTIAL,
-              InvoiceType.UPFRONT,
-              InvoiceType.FINAL,
-            ].includes(formik.values.type) ? (
+            {/* don't show payment type for FULL, FINAL and CREDIT_NOTE invoices */}
+            {[InvoiceType.PARTIAL, InvoiceType.UPFRONT].includes(
+              formik.values.type,
+            ) ? (
               <Box>
                 <Typography variant="body2" color="grey.700">
-                  {t('Payment type')}
+                  {T('Payment type')}
+                  <Tooltip
+                    title={T(paymentTypeTooltip)}
+                    placement="top"
+                    componentsProps={{
+                      tooltip: {
+                        sx: {
+                          bgcolor: 'common.gray',
+                        },
+                      },
+                    }}>
+                    <IconButton
+                      sx={{
+                        p: 0,
+                        ml: 0.5,
+                      }}>
+                      <InfoOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                 </Typography>
                 <RadioGroup
                   defaultValue={PaymentType.LUMP_SUM}
@@ -1349,17 +1507,19 @@ export const InvoiceForm = ({
                         key={key}
                         value={key}
                         control={<Radio size="small" />}
-                        label={t(value)}
+                        label={T(value)}
                         componentsProps={{typography: {variant: 'body2'}}}
                         onChange={() =>
                           formik.setFieldValue('payment.type', key)
                         }
                         checked={formik.values.payment?.type === key}
                         disabled={
-                          formik.values.type !== InvoiceType.UPFRONT &&
-                          previousInvoices.length > 0 &&
-                          key !==
-                            previousInvoices[0].additionalInfo.payment?.type
+                          (!previousInvoices.length && formType === 'new') ||
+                          (previousInvoices.length === 1 && formType === 'edit')
+                            ? false
+                            : key !==
+                              sortedPreviousInvoices?.[0]?.additionalInfo
+                                ?.payment?.type
                         }
                       />
                     ),
@@ -1501,21 +1661,26 @@ export const InvoiceForm = ({
       />
 
       {openContractPaymentTermSelectDialog && (
-        <ContractPaymentTermSelectDialog
-          title={t('Payment Terms')}
-          alertText={t('Choose a payment term to be used on your invoice')}
+        <ContractPaymentTermInput
+          title={t('New payment term')}
           open={openContractPaymentTermSelectDialog}
-          onSave={handleContractPaymentTermsModal}
           onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
-          onClickPaymentTerms={() => setOpenContractPaymentTermsDialog(true)}
+          defaultPaymentTerm={paymentTermToEdit}
+          setPaymentToEdit={setPaymentTermToEdit}
         />
       )}
 
       {openContractPaymentTermsDialog && (
-        <ContractPaymentTermsDialog
-          title={t('Manage Payment Terms')}
+        <ContractPaymentTerm
+          title={t('Payment Terms')}
           open={openContractPaymentTermsDialog}
           onCancel={() => setOpenContractPaymentTermsDialog(false)}
+          onSave={handleContractPaymentTermsModal}
+          defaultPayment={formik.values.paymentTerms}
+          onClickNewPaymentTerm={() =>
+            setOpenContractPaymentTermSelectDialog(true)
+          }
+          setPaymentToEdit={setPaymentTermToEdit}
         />
       )}
 

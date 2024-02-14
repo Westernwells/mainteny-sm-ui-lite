@@ -1,6 +1,5 @@
 import {useTranslation} from 'react-i18next';
-import {useEffect, useRef, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import Typography from '@mui/material/Typography';
@@ -15,10 +14,11 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {getServiceOrderPaymentStatusStyles} from 'pages/ServiceOrders/Tabs/ServiceOrderList.tsx/ServiceOrderDataGridProps';
 import {StatusChip} from 'components/StatusChip';
 import {ServiceOrderPaymentStatus} from 'models/service-order';
+import {InvoiceStatus, InvoiceType} from 'models/invoice';
 import {calculateGrossInvoiceTotal} from 'utils/calculate-total';
 import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
 import {columns, makeRows} from './InvoicesDataGridProps';
-// import CreateNewInvoiceModal from './CreateNewInvoiceModal';
+import CreateNewInvoiceModal from './CreateNewInvoiceModal';
 
 interface Props {
   serviceOrderId: string;
@@ -28,10 +28,9 @@ interface Props {
 export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
-  const navigate = useNavigate();
   const formatDate = useFormatDate();
   const [rows, setRows] = useState<GridRowsProp>([]);
-  // const [openDialog, setOpenDialog] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
 
   let totalInvoiceRef = useRef(0).current;
 
@@ -41,24 +40,62 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
   const hasValidPaymentStatus = paymentStatusStyles.label !== '-';
 
   const {
-    data: InvoiceList = [],
+    data: jobInvoices = [],
     isLoading,
     isIdle,
   } = useFetchServiceOrderInvoices(serviceOrderId);
 
-  totalInvoiceRef = totalInvoiceRef || InvoiceList.length;
+  totalInvoiceRef = totalInvoiceRef || jobInvoices.length;
+
+  const invoiceTypesToShow = useMemo(() => {
+    const defaultTypes = [
+      InvoiceType.FULL,
+      InvoiceType.PARTIAL,
+      InvoiceType.UPFRONT,
+    ];
+
+    const allJobsAreCancelled = jobInvoices.every(
+      (i) => i.status === InvoiceStatus.CANCELLED,
+    );
+    if (allJobsAreCancelled) {
+      return defaultTypes;
+    }
+
+    const jobHasFullInvoice = jobInvoices.find(
+      (i) => i.type === InvoiceType.FULL,
+    );
+    if (jobHasFullInvoice) {
+      return [InvoiceType.FULL];
+    }
+
+    const jobHasPartialInvoice = jobInvoices.find(
+      (i) => i.type === InvoiceType.PARTIAL,
+    );
+    if (jobHasPartialInvoice) {
+      return [InvoiceType.FINAL, InvoiceType.PARTIAL];
+    }
+
+    const jobHasUpfrontInvoice = jobInvoices.find(
+      (i) => i.type === InvoiceType.UPFRONT,
+    );
+    if (jobHasUpfrontInvoice) {
+      return [InvoiceType.FINAL, InvoiceType.PARTIAL, InvoiceType.UPFRONT];
+    }
+
+    return defaultTypes;
+  }, [jobInvoices]);
 
   useEffect(() => {
     if (!isLoading) {
       setRows(
         makeRows(
-          InvoiceList || [],
+          jobInvoices || [],
           user?.userAccount.serviceCompany.id,
           formatDate,
         ),
       );
     }
-  }, [InvoiceList, isLoading]);
+  }, [jobInvoices, isLoading]);
 
   const renderNoRowsSection = () => (
     <Box
@@ -84,10 +121,10 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
   return (
     <InfoCard
       footer={
-        InvoiceList &&
-        InvoiceList?.length !== 0 && (
+        jobInvoices &&
+        jobInvoices?.length !== 0 && (
           <InfoCardTotalSumFooter
-            amount={InvoiceList && calculateGrossInvoiceTotal(InvoiceList)}
+            amount={jobInvoices && calculateGrossInvoiceTotal(jobInvoices)}
             label={t('Invoiced Sum (incl. VAT)')}
           />
         )
@@ -106,8 +143,7 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
           )}
         </Box>
       }
-      // handleAction={() => setOpenDialog(true)}
-      handleAction={() => navigate(`/invoices/new?orderId=${serviceOrderId}`)}
+      handleAction={() => setOpenDialog(true)}
       headerActionIcon={
         <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
       }
@@ -117,7 +153,7 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
       ) : (
         <DataGridLayout
           rows={rows}
-          height={getDataGridHeight(rows.length, 100)}
+          height={getDataGridHeight(rows.length, rows.length, 70)}
           columns={columns}
           fullHeight={false}
           containerStyle={{
@@ -126,13 +162,14 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
           isWidget
         />
       )}
-      {/* <CreateNewInvoiceModal
+      <CreateNewInvoiceModal
         open={openDialog}
         onClose={() => {
           setOpenDialog(false);
         }}
         orderId={serviceOrderId}
-      /> */}
+        invoiceTypesToShow={invoiceTypesToShow}
+      />
     </InfoCard>
   );
 };

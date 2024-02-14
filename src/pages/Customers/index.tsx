@@ -12,7 +12,10 @@ import {Progress} from 'components/Progress';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {PropertyOwnerView} from 'models/propertyManager';
+import {
+  PropertyOwnerOrderField,
+  PropertyOwnerView,
+} from 'models/propertyManager';
 import {getFilterUnitNumber} from 'utils/customer-utils';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
@@ -20,6 +23,8 @@ import {DataSyncType} from 'models/service-company';
 import useLastSyncedItem from 'hooks/useLastSyncedItem';
 import {useCompanyXeroInfo} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {Order, OrderByParams} from 'models/misc';
+import {useSearchValues} from 'hooks/useSearchValues';
 import {columns, makeRows} from './CustomerDataGridProps';
 import {Widget} from '../../components/Widget';
 
@@ -29,7 +34,7 @@ export const Customer = () => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
 
-  const [search, setSearch, clearFilters] = useQueryState('searchCustomers');
+  const [search, setSearch] = useQueryState('searchCustomers');
   const [numberOfUnits, setNumberOfUnits] = useQueryState<string[]>(
     'numberOfUnits',
     {defaultValue: []},
@@ -41,6 +46,10 @@ export const Customer = () => {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
   const textInput = useRef<HTMLInputElement>(null);
+
+  const {values, clearValues} =
+    useSearchValues<OrderByParams<PropertyOwnerOrderField>>();
+  const {sortOrder, orderByField} = values;
 
   const {
     data: customerResource = createEmptyResource<PropertyOwnerView>(pageSize),
@@ -59,6 +68,8 @@ export const Customer = () => {
       ...(numberOfUnits[0] && {
         unitNumberEnd: getFilterUnitNumber(numberOfUnits[0], 'end'),
       }),
+      orderBy: orderByField || PropertyOwnerOrderField.CREATED_TIME,
+      order: sortOrder || Order.DESC,
     },
     {keepPreviousData: true},
   );
@@ -106,7 +117,7 @@ export const Customer = () => {
     <FilterFields
       containerStyle={{alignSelf: 'center', height: '100%'}}
       wrapperStyle={{alignItems: 'center'}}
-      onClear={clearFilters}>
+      onClear={clearValues}>
       <Box
         sx={{
           minWidth: '21.875em',

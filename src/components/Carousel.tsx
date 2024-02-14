@@ -68,7 +68,7 @@ export const Carousel = ({
         enableMouseEvents
         containerStyle={{alignItems: 'center'}}>
         {images.map((step, index) => (
-          <div key={step.label}>
+          <div key={`${step.label} - ${index}`}>
             {Math.abs(activeStep - index) <= 2 ? (
               <img width="100%" src={step.imgPath} alt={step.label} />
             ) : null}

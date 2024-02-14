@@ -10,7 +10,13 @@ import {
 import {useSnackbar} from 'hooks/useSnackbar';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {useNavigate} from 'react-router-dom';
-import {Language, Resource, RestError, SimpleEmailRecord} from 'models/misc';
+import {
+  Language,
+  Resource,
+  RestError,
+  SimpleEmailRecord,
+  StringValue,
+} from 'models/misc';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
   CreateQuotation,
@@ -195,7 +201,11 @@ export const useCreateQuotation = () => {
 };
 
 export const putQuotation = async (body: UpdateQuotation, id: string) => {
-  await axiosClient.put(`api/quotations/${id}`, body);
+  const {data} = await axiosClient.put<StringValue>(
+    `api/quotations/${id}`,
+    body,
+  );
+  return data;
 };
 
 export const useUpdateQuotation = () => {
@@ -344,10 +354,10 @@ export const useCreateQuotationComment = () => {
 
 export const deleteQuotationComment = async (
   quotationId: string,
-  commentId: string,
+  noteId: string,
 ) => {
   const {data} = await axiosClient.delete<{value: string}>(
-    `/api/quotations/${quotationId}/comments/${commentId}`,
+    `/api/quotations/${quotationId}/comments/${noteId}`,
   );
   return data;
 };
@@ -357,8 +367,8 @@ export const useDeleteQuotationComment = () => {
   const {showError} = useSnackbar();
 
   return useMutation(
-    ({quotationId, commentId}: {quotationId: string; commentId: string}) =>
-      deleteQuotationComment(quotationId, commentId),
+    ({quotationId, noteId}: {quotationId: string; noteId: string}) =>
+      deleteQuotationComment(quotationId, noteId),
     {
       onSuccess: () =>
         queryClient.invalidateQueries([qk.fetchQuotationComments]),
@@ -372,11 +382,11 @@ export const useDeleteQuotationComment = () => {
 
 export const updateQuotationComment = async (
   quotationId: string,
-  commentId: string,
+  noteId: string,
   body: CreateQuotationComment,
 ) => {
   const {data} = await axiosClient.put<{value: string}>(
-    `/api/quotations/${quotationId}/comments/${commentId}`,
+    `/api/quotations/${quotationId}/comments/${noteId}`,
     body,
   );
   return data;
@@ -389,13 +399,13 @@ export const useUpdateQuotationComment = () => {
   return useMutation(
     ({
       quotationId,
-      commentId,
+      noteId,
       body,
     }: {
       quotationId: string;
-      commentId: string;
+      noteId: string;
       body: CreateQuotationComment;
-    }) => updateQuotationComment(quotationId, commentId, body),
+    }) => updateQuotationComment(quotationId, noteId, body),
     {
       onSuccess: () =>
         queryClient.invalidateQueries([qk.fetchQuotationComments]),

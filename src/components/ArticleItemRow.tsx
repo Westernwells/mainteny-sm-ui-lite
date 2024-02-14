@@ -15,9 +15,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord} from 'models/invoice';
-import {Amount} from 'models/misc';
 import {Button} from 'components/Button';
-import {useCurrentCurrency} from 'utils/currency';
+import {Currencies, useCurrentCurrency} from 'utils/currency';
 import {LanguageContext} from 'context/LanguageProvider';
 import {fixRounding} from 'utils/utils';
 
@@ -53,7 +52,7 @@ export const ArticleItemRow = ({
   newPartialTotal,
   setNewPartialTotal,
   partialInvoiceTotal,
-}: Props<QuotationItemRecord | InvoiceItemRecord<Amount>>) => {
+}: Props<QuotationItemRecord | InvoiceItemRecord>) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const [name, setName] = useState(articleItem.name);
@@ -66,7 +65,7 @@ export const ArticleItemRow = ({
   const [quantity, setQuantity] = useState<number>(articleItem.quantity);
   const [price, setPrice] = useState(
     articleItem.unitAmount.netAmount /
-      10 ** articleItem.unitAmount.fractionDigits!,
+      10 ** Currencies[articleItem.unitAmount.currency],
   );
 
   const {language: selectedLng} = useContext(LanguageContext);
@@ -149,8 +148,8 @@ export const ArticleItemRow = ({
               ...item.unitAmount,
               netAmount: fixRounding(
                 isPartial
-                  ? partialPrice * 10 ** item.unitAmount.fractionDigits!
-                  : price * 10 ** item.unitAmount.fractionDigits,
+                  ? partialPrice * 10 ** Currencies[item.unitAmount.currency]
+                  : price * 10 ** Currencies[item.unitAmount.currency],
                 2,
               ),
             },

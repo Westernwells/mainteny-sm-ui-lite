@@ -79,13 +79,15 @@ export const PageCard = ({
         />
       ) : null}
 
-      <CardContent
-        sx={{
-          mx: '0.5em',
-          ...contentContainerStyles,
-        }}>
-        {children}
-      </CardContent>
+      {children ? (
+        <CardContent
+          sx={{
+            mx: '0.5em',
+            ...contentContainerStyles,
+          }}>
+          {children}
+        </CardContent>
+      ) : null}
     </Card>
   );
 };

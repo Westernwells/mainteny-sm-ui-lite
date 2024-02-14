@@ -58,9 +58,12 @@ export const SupplierBasicInfoCard = ({
     data: articleSupplierResource = createEmptyResource<ArticleSupplierView>(
       25,
     ),
-  } = useQueryArticleSuppliers(makePage(0, 50), updatedValue ?? '', {
-    keepPreviousData: true,
-  });
+  } = useQueryArticleSuppliers(
+    {...makePage(0, 50), query: updatedValue ?? ''},
+    {
+      keepPreviousData: true,
+    },
+  );
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),

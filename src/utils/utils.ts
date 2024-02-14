@@ -1,4 +1,5 @@
-import {AddressRecord, Coord, GeocodeAddress, Language} from 'models/misc';
+import {formatISO} from 'date-fns';
+import {AddressRecord, Coord, GeocodeAddress, Language} from '../models/misc';
 
 export const capitalize = (role: any[]) => {
   let roles = '';
@@ -17,12 +18,28 @@ export const capitalize = (role: any[]) => {
   return roles;
 };
 
+export const formatSearchParamsPageIndex = (
+  pageIndex: number,
+  queryParams: URLSearchParams,
+) => {
+  const currentParams = Object.fromEntries([...queryParams]);
+  return {...currentParams, pageIndex: pageIndex.toString()};
+};
+
 export const formatSearchParams = (
   options: {[key: string]: string},
   queryParams: URLSearchParams,
 ) => {
   const currentParams = Object.fromEntries([...queryParams]);
   return {...currentParams, ...options};
+};
+
+export const formatSearchParamsPageSize = (
+  newPageSize: number,
+  queryParams: URLSearchParams,
+) => {
+  const currentParams = Object.fromEntries([...queryParams]);
+  return {...currentParams, pageSize: newPageSize.toString()};
 };
 
 // Converts macro to text, eg: 'SERVICE_MANAGER' -> 'Service Manager'
@@ -82,6 +99,7 @@ export const languageMap: {[key: string]: string} = {
   'de-DE': 'de-de',
   'sr-SP': 'sr-sp',
   'it-IT': 'it-it',
+  'ru-RU': 'ru-ru',
 };
 
 export const mapLanguageToLocale: {[key: string]: string} = {
@@ -89,6 +107,7 @@ export const mapLanguageToLocale: {[key: string]: string} = {
   'de-de': 'de',
   'sr-SP': 'sr',
   'it-it': 'it',
+  'ru-ru': 'ru',
 };
 
 export const getDataGridHeight = (
@@ -165,6 +184,7 @@ export const languageContextMap: {[key: string]: Language} = {
   EN: Language.EN_US,
   DE: Language.DE_DE,
   SR: Language.SR_RS,
+  RU: Language.RU_RU,
 };
 
 export const companyLanguageContextMap: {[key: string]: string} = {
@@ -172,6 +192,7 @@ export const companyLanguageContextMap: {[key: string]: string} = {
   'en-us': 'en',
   'sr-rs': 'sr',
   'it-it': 'it',
+  'ru-ru': 'ru',
 };
 
 export const companyLanguageToUppercaseMap: {[key: string]: string} = {
@@ -179,6 +200,7 @@ export const companyLanguageToUppercaseMap: {[key: string]: string} = {
   'en-us': Language.EN_US,
   'sr-rs': Language.SR_RS,
   'it-it': Language.IT_IT,
+  'ru-ru': Language.RU_RU,
 };
 
 export const titleCase = (str: string) =>
@@ -189,8 +211,8 @@ export const getUniqueId = () => Math.random().toString(36).substring(2, 9);
 export const getPercentage = (num: number, total: number) =>
   Math.round((num / total) * 100);
 
-export const getAmountFromPercentage = (percent: number, totalAmount: number) =>
-  (percent / 100) * totalAmount;
+export const getAmountFromPercentage = (percent: number, amount: number) =>
+  (percent / 100) * amount;
 
 export const formatAddressFullname = (
   address: AddressRecord | null | undefined,
@@ -280,7 +302,7 @@ export const isJson = (item: string) => {
 export const objectKeyByValue = (obj: Record<string, any>, value: string) =>
   Object.keys(obj)[Object.values(obj).indexOf(value)];
 
-export const dateToString = (date: Date) => date.toISOString().split('T')[0];
+export const dateToString = (date: Date) => formatISO(date).split('T')[0];
 
 export const getUserFullName = ({
   firstName = '',
@@ -321,3 +343,6 @@ export const hasProtocol = (url: string) => {
   const pattern = /^(http:\/\/|https:\/\/)/;
   return pattern.test(url);
 };
+
+export const isNumber = (value: string | number) =>
+  !Number.isNaN(Number(value));

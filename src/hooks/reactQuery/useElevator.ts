@@ -1,4 +1,6 @@
 import {
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
   useMutation,
   useQuery,
   useQueryClient,
@@ -227,6 +229,32 @@ export const useQueryElevatorComments = (params: Page, elevatorId: string) =>
     },
   );
 
+export const useInfiniteElevatorComments = (
+  elevatorId: string,
+  params: Page,
+  options?: UseInfiniteQueryOptions<any, any, any>,
+) =>
+  useInfiniteQuery<
+    Resource<ElevatorComment>,
+    RestError,
+    Resource<ElevatorComment>
+  >(
+    [queryKeys.queryElevatorComment, params, elevatorId, {infinite: true}],
+    ({pageParam = 0}) =>
+      queryElevatorComment({...params, pageIndex: pageParam}, elevatorId),
+    {
+      getNextPageParam: (lastPage) => {
+        const currentTotal =
+          (lastPage.page.pageIndex + 1) * lastPage.page.pageSize;
+        if (lastPage.total && currentTotal < lastPage.total) {
+          return lastPage.page.pageIndex + 1;
+        }
+        return undefined;
+      },
+      ...options,
+    },
+  );
+
 const updateElevatorComment = async (
   body: Partial<ElevatorCommentRecord>,
   elevatorId: string,
@@ -249,7 +277,7 @@ export const useUpdateElevatorComment = (successMsg?: string) => {
       elevatorId,
       noteId,
     }: {
-      body: Partial<ElevatorCommentRecord>;
+      body: ElevatorCommentRecord;
       elevatorId: string;
       noteId: string;
     }) => updateElevatorComment(body, elevatorId, noteId),
@@ -283,13 +311,8 @@ export const useAddElevatorComment = (successMsg?: string) => {
   const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation(
-    ({
-      body,
-      elevatorId,
-    }: {
-      body: Partial<ElevatorCommentRecord>;
-      elevatorId: string;
-    }) => addElevatorComment(body, elevatorId),
+    ({body, elevatorId}: {body: ElevatorCommentRecord; elevatorId: string}) =>
+      addElevatorComment(body, elevatorId),
     {
       onSuccess: () => {
         if (successMsg) {

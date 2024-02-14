@@ -6,8 +6,10 @@ import ElevatorIcon from '@mui/icons-material/Elevator';
 import {getColumnProps} from 'components/DataGridLayout';
 import {FormatDate} from 'models/misc';
 import {StatusChip} from 'components/StatusChip';
+import {toDate} from 'utils/datetime';
 import {
   ElevatorAssignmentSimpleView,
+  ElevatorOrderField,
   ElevatorView,
 } from '../../../../models/elevator';
 import {Actions} from './Action';
@@ -139,8 +141,12 @@ export const makeRows = (
     building: elevator.additionalInfo.buildingLocation,
     actions: elevator.id,
     customer: elevator.propertyOwner.name,
-    LAST_VISIT_DATE: formatDate(elevator.lastVisitDate),
-    NEXT_VISIT_DATE: formatDate(elevator.nextVisitDate),
+    [ElevatorOrderField.LAST_VISIT_DATE]: elevator.lastVisitDate
+      ? formatDate(toDate(elevator.lastVisitDate))
+      : '-',
+    [ElevatorOrderField.NEXT_VISIT_DATE]: elevator.nextVisitDate
+      ? formatDate(toDate(elevator.nextVisitDate))
+      : '-',
     address: elevator.address.fullName,
     headerText: elevator.address.fullName,
     priorityTechnician: elevator.assignments.length

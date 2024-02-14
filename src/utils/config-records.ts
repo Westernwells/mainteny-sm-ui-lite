@@ -60,4 +60,11 @@ export const configRecords: AutoNumberConfigRecord[] = [
     enabled: false,
     startFrom: 1,
   },
+  {
+    type: ServiceCompanyNumberType.QUOTATION,
+    prefix: '',
+    numberOfDigits: 1,
+    enabled: false,
+    startFrom: 1,
+  },
 ];

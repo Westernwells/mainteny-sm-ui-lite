@@ -24,7 +24,8 @@ export const UnitContracts = ({containerStyles, contracts}: Props) => {
 
   useEffect(() => {
     setRows(makeRows(!showAll ? contracts.slice(0, 3) : contracts, formatDate));
-  }, [contracts]);
+  }, [contracts, showAll]);
+
   const {t} = useTranslation();
   return (
     <InfoCard
@@ -42,11 +43,24 @@ export const UnitContracts = ({containerStyles, contracts}: Props) => {
         containerStyle={{
           borderBottom: 'none',
         }}
+        sx={
+          !showAll && contracts.length > 3
+            ? {
+                '.MuiDataGrid-virtualScrollerRenderZone > div:last-child': {
+                  mask: 'linear-gradient(#FFFFFF, transparent)',
+                },
+              }
+            : {
+                '& .MuiDataGrid-virtualScroller': {
+                  overflow: showAll ? 'auto' : 'hidden',
+                },
+              }
+        }
       />
       {contracts.length > 3 ? (
         <Box
           sx={{textAlign: 'center', cursor: 'pointer'}}
-          onClick={() => setShowAll(!showAll)}>
+          onClick={() => setShowAll((prev) => !prev)}>
           <Typography variant="caption" color={theme.palette.info.main}>
             {showAll ? t('see less') : t('see more')}
           </Typography>

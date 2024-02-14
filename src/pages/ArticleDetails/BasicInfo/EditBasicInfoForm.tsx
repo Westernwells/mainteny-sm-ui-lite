@@ -68,6 +68,7 @@ export const EditBasicInfoForm = ({
           required: true,
           value: formik.values.name,
           error: !!(formik.touched.name && formik.errors.name),
+          helperText: formik.touched.name ? formik.errors.name : '',
           onBlur: formik.handleBlur,
           onChange: formik.handleChange,
         }}
