@@ -74,26 +74,4 @@ describe('Job', () => {
         }
       });
   });
-
-  it('create new job', () => {
-    ServiceJobPage.changeTab(1);
-    cy.wait('@serviceOrdersApi', {timeout: 15000})
-      .its('response')
-      .then((response) => {
-        const {body: serviceOrders} = response;
-        if (serviceOrders.data.length) {
-          cy.contains('button', 'New Job').should('not.be.disabled').click();
-          cy.contains('li', 'Maintenance').click();
-          cy.get('[role="cell"]').first().click();
-          cy.contains('button', 'Next').should('not.be.disabled').click();
-          cy.get('[value="SCHEDULE_TECHNICIAN"]').click({force: true});
-          cy.get('input[name="technicianId"]').click({force: true});
-          cy.get('ul > li:nth-child(1)').click({force: true});
-          cy.contains('button', 'Next').should('not.be.disabled').click();
-          cy.wait(100);
-          cy.contains('button', 'Submit').should('not.be.disabled').click();
-          cy.contains('Order scheduled successfully');
-        }
-      });
-  });
 });

@@ -5,7 +5,7 @@ import {
   ServiceOrderStatus,
   ServiceOrderType,
   ServiceOrderView,
-} from 'models/service-order';
+} from '../models/service-order';
 import {toDate} from './datetime';
 
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
