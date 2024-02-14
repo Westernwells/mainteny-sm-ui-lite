@@ -182,12 +182,12 @@ export const Checklist = () => {
 
   const initialValues = useMemo(
     () => ({
-      name: checklist?.name ?? '',
+      name: checklist?.name ?? checklistTitle,
       components: checklist?.name
         ? checkListComponentViewToExtendedCreateCheckListRecord(
             checklist.components,
           )
-        : [],
+        : [getComponentMock(CheckListComponentType.SINGLE_CHECK)],
     }),
     [],
   );
@@ -252,12 +252,11 @@ export const Checklist = () => {
     // If a duplicate checklist is created with the same name we are doing workaround for it.
     // We add number to the title of the checklist +1.
     (async () => {
-      if (initialValues.name) {
+      if (initialValues.name !== checklistTitle) {
         return;
       }
 
       const {data: refetchedChecklists} = await refetchChecklists();
-
       if (!refetchedChecklists?.data.length) {
         form.setValue('name', checklistTitle);
         return;
