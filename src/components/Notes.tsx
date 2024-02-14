@@ -4,7 +4,8 @@ import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {groupBy} from 'lodash';
 import useTheme from '@mui/material/styles/useTheme';
-import {Box} from '@mui/material';
+import LinearProgress from '@mui/material/LinearProgress';
+import Box from '@mui/material/Box';
 import {EmptySection} from 'components/EmptySection';
 import {NoteCardSkeleton} from 'components/NoteCardSkeleton';
 import {FormInput} from 'components/form/FormInput';
@@ -30,6 +31,7 @@ interface Props {
   hasNextPage: boolean | undefined;
   isDeleting: boolean;
   isUpdating: boolean;
+  isCreating: boolean;
   fetchNextPage: () => void;
   createNote: MutateFunction<unknown, any, CreateNoteVars, unknown>;
   updateNote: MutateFunction<unknown, any, UpdateNoteVars, unknown>;
@@ -46,6 +48,7 @@ const Notes: FC<Props> = ({
   isFetchingNextPage,
   isDeleting,
   isUpdating,
+  isCreating,
   hasNextPage,
   fetchNextPage,
   createNote,
@@ -62,6 +65,7 @@ const Notes: FC<Props> = ({
 
   const notesTopRef = useRef<HTMLElement>();
   const {ref: notesRef, inView: notesInView} = useInView();
+  const formInputRef = useRef<HTMLDivElement>(null);
 
   const formik = useFormik<{note: string}>({
     initialValues: {
@@ -159,6 +163,7 @@ const Notes: FC<Props> = ({
           theme={theme}
           isDeleting={isDeleting}
           isUpdating={isUpdating}
+          inputRef={formInputRef}
         />
       )}
       {isFetchingNextPage && <NoteCardSkeleton length={1} />}
@@ -170,6 +175,11 @@ const Notes: FC<Props> = ({
           bottom: 0,
           p: '1.5rem',
         }}>
+        {isCreating ? (
+          <Box height="4px" marginBottom="1rem">
+            <LinearProgress />
+          </Box>
+        ) : null}
         <form onSubmit={formik.handleSubmit}>
           <FormInput
             props={{
@@ -181,6 +191,7 @@ const Notes: FC<Props> = ({
               multiline: true,
               minRows: 5,
               maxRows: 5,
+              inputRef: formInputRef,
             }}
           />
           <Box display="flex" justifyContent="flex-end" pt="0.625rem">
