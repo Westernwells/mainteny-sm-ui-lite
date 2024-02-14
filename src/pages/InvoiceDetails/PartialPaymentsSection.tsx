@@ -1070,7 +1070,10 @@ export const PartialPaymentsSection = ({
                   </TableCell>
                   <TableCell align="right">
                     {vats.map((vat, idx) => (
-                      <p key={`${vat}-${idx}`}>{vat}</p>
+                      <p key={`${vat}-${idx}`}>
+                        {signBeforeNumber}
+                        {vat}
+                      </p>
                     ))}
                   </TableCell>
                   <TableCell align="right">
