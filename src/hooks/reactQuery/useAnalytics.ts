@@ -225,7 +225,7 @@ export const useInvoicesXLSX = (
   );
 };
 
-export const fetchInvoicesSaga50 = async (
+export const fetchInvoicesSage50 = async (
   serviceCompanyId: string,
   params: QueryFinancials,
 ) => {
@@ -244,14 +244,14 @@ export const fetchInvoicesSaga50 = async (
   return response.data;
 };
 
-export const useInvoicesSaga50 = (
+export const useInvoicesSage50 = (
   serviceCompanyId: string,
   params: QueryFinancials,
 ) => {
   const {enqueueSnackbar, showError} = useSnackbar();
   return useQuery(
-    [FormatType.SAGA50, serviceCompanyId, params],
-    () => fetchInvoicesSaga50(serviceCompanyId, params),
+    [FormatType.SAGE50, serviceCompanyId, params],
+    () => fetchInvoicesSage50(serviceCompanyId, params),
     {
       onSuccess: (data) => {
         download(data, ReportType.FINANCIALS);

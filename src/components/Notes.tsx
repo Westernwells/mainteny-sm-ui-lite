@@ -4,11 +4,11 @@ import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {groupBy} from 'lodash';
 import useTheme from '@mui/material/styles/useTheme';
-import {Box} from '@mui/material';
+import Box from '@mui/material/Box';
 import {EmptySection} from 'components/EmptySection';
 import {NoteCardSkeleton} from 'components/NoteCardSkeleton';
 import {FormInput} from 'components/form/FormInput';
-import {Button} from 'components/Button';
+import {Button as LoadingButton} from 'components/LoadingButton';
 import {ConfirmDelete} from 'components/ConfirmDelete';
 import {useTranslation} from 'react-i18next';
 import NoteList from 'components/NoteList';
@@ -30,6 +30,7 @@ interface Props {
   hasNextPage: boolean | undefined;
   isDeleting: boolean;
   isUpdating: boolean;
+  isCreating: boolean;
   fetchNextPage: () => void;
   createNote: MutateFunction<unknown, any, CreateNoteVars, unknown>;
   updateNote: MutateFunction<unknown, any, UpdateNoteVars, unknown>;
@@ -46,6 +47,7 @@ const Notes: FC<Props> = ({
   isFetchingNextPage,
   isDeleting,
   isUpdating,
+  isCreating,
   hasNextPage,
   fetchNextPage,
   createNote,
@@ -62,6 +64,7 @@ const Notes: FC<Props> = ({
 
   const notesTopRef = useRef<HTMLElement>();
   const {ref: notesRef, inView: notesInView} = useInView();
+  const formInputRef = useRef<HTMLDivElement>(null);
 
   const formik = useFormik<{note: string}>({
     initialValues: {
@@ -159,6 +162,7 @@ const Notes: FC<Props> = ({
           theme={theme}
           isDeleting={isDeleting}
           isUpdating={isUpdating}
+          inputRef={formInputRef}
         />
       )}
       {isFetchingNextPage && <NoteCardSkeleton length={1} />}
@@ -181,18 +185,20 @@ const Notes: FC<Props> = ({
               multiline: true,
               minRows: 5,
               maxRows: 5,
+              inputRef: formInputRef,
             }}
           />
           <Box display="flex" justifyContent="flex-end" pt="0.625rem">
-            <Button
+            <LoadingButton
               buttonProps={{
                 type: 'submit',
                 size: 'medium',
                 variant: 'contained',
                 disabled: !formik.values.note || formik.isSubmitting,
+                loading: isCreating || isUpdating,
               }}>
               {t('Submit note')}
-            </Button>
+            </LoadingButton>
           </Box>
         </form>
       </Box>

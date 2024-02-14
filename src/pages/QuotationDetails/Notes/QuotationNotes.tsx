@@ -28,7 +28,8 @@ export const QuotationNotes: FC<Props> = ({quotation}) => {
     pageIndex: 0,
     pageSize: 10,
   });
-  const {mutate: createQuotationComment} = useCreateQuotationComment();
+  const {mutate: createQuotationComment, isLoading: isCreating} =
+    useCreateQuotationComment();
   const {mutate: deleteQuotationComment, isLoading: isDeleting} =
     useDeleteQuotationComment();
   const {mutate: updateQuotationComment, isLoading: isUpdating} =
@@ -71,6 +72,7 @@ export const QuotationNotes: FC<Props> = ({quotation}) => {
       isFetchingNextPage={isFetchingNextPage}
       isDeleting={isDeleting}
       isUpdating={isUpdating}
+      isCreating={isCreating}
       hasNextPage={hasNextPage}
       fetchNextPage={fetchNextPage}
       createNote={createNote}
