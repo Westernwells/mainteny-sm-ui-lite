@@ -5,7 +5,7 @@ import {
   DoorSliding,
   Equalizer,
   EventAvailable,
-  Flourescent,
+  Fluorescent,
   Forward10,
   History,
   PermContactCalendar,
@@ -115,7 +115,7 @@ export const UnitDetails = () => {
         </Grid>
         <Grid item xs={4}>
           <CardProps
-            icon={<Flourescent sx={{color: theme.palette.info.dark}} />}
+            icon={<Fluorescent sx={{color: theme.palette.info.dark}} />}
             label="CURRENT FLOOR"
             bodyText="4"
             bodyTextVariant="body1"

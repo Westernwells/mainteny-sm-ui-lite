@@ -107,7 +107,7 @@ export const PageLayout = ({
           sx={{
             pt: '1em',
             mx: !excludeDefaultSpacing ? '2.2em' : null,
-            overflowY: 'hidden',
+            overflowY: 'auto',
           }}
           display="flex"
           flexGrow="1"

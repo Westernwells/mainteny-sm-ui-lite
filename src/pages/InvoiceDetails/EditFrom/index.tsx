@@ -1,5 +1,4 @@
 import {useCallback} from 'react';
-import {t} from 'i18next';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import MuiDialog, {DialogProps} from '@mui/material/Dialog';
@@ -17,6 +16,7 @@ import {FormSelect} from 'components/form/FormSelect';
 import {countriesOptions, getStatesByCountry} from 'utils/countries';
 import {AddressRecord} from 'models/misc';
 import {AlternativeServiceCompanyInfo} from 'models/invoice';
+import {T} from 'utils/i18n-utils';
 
 const validationSchemaAddress = Yup.object().shape({
   address: Yup.object().nullable(),
@@ -70,12 +70,12 @@ export const EditFrom = ({
       open={isDialogOpen}
       onClose={onClose}
       {...dialogProps}>
-      <DialogTitle id="alert-dialog-title">{t('Edit from')}</DialogTitle>
+      <DialogTitle id="alert-dialog-title">{T('Edit from')}</DialogTitle>
 
       <DialogContent sx={{color: 'text.primary', px: 3, py: 2}}>
         <Box pt="0.5rem">
           <Typography variant="h6" color="text.secondary" pb={2}>
-            {t('Postal address')}
+            {T('Postal address')}
           </Typography>
           <Grid container spacing={3}>
             <Grid item md={4}>
@@ -163,7 +163,7 @@ export const EditFrom = ({
             onClick: onClose,
           }}>
           <Typography variant="subtitle2" color="text.secondary">
-            {t('Cancel')}
+            {T('Cancel')}
           </Typography>
         </Button>
         <Button
@@ -172,7 +172,7 @@ export const EditFrom = ({
             variant: 'contained',
             onClick: () => formik.handleSubmit(),
           }}>
-          <Typography variant="subtitle2">{t('Update')}</Typography>
+          <Typography variant="subtitle2">{T('Update')}</Typography>
         </Button>
       </DialogActions>
     </MuiDialog>

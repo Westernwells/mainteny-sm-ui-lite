@@ -2,7 +2,7 @@
 import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
 import {DataGridLayout} from 'components/DataGridLayout';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {getDataGridHeight} from 'utils/utils';
 import {InfoCard} from 'components/InfoCard';
 import {GridRowsProp} from '@mui/x-data-grid';
@@ -23,14 +23,11 @@ export const Quotation = ({serviceOrder}: Props) => {
   const formatDate = useFormatDate();
   const {t} = useTranslation();
   const [rows, setRows] = useState<GridRowsProp>([]);
-  let totalQuotationRef = useRef(0).current;
   const {data: quotation} = useQuotationDetails(
     serviceOrder && serviceOrder.additionalInfo.quotationId
       ? serviceOrder.additionalInfo.quotationId
       : '',
   );
-
-  totalQuotationRef = totalQuotationRef || quotation ? 1 : 0;
 
   useEffect(() => {
     if (quotation) setRows(makeRows([quotation], formatDate));
@@ -57,24 +54,24 @@ export const Quotation = ({serviceOrder}: Props) => {
     <InfoCard
       header={<Typography variant="subtitle1">{t('Quotations')}</Typography>}
       showHeaderBackground
-      headerActionIcon={
-        <Tooltip
-          componentsProps={{
-            tooltip: {
-              sx: {
-                color: 'dark',
+      {...(!quotation && {
+        headerActionIcon: (
+          <Tooltip
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  color: 'dark',
+                },
               },
-            },
-          }}
-          title={t(
-            'Only the service orders created out of a quotation will have entries here.',
-          )}
-          arrow
-          placement="top">
-          <Info />
-        </Tooltip>
-      }>
-      {!totalQuotationRef ? (
+            }}
+            title={t("This job isn't linked to any quotation.")}
+            arrow
+            placement="top">
+            <Info />
+          </Tooltip>
+        ),
+      })}>
+      {!quotation ? (
         renderNoRowsSection()
       ) : (
         <DataGridLayout

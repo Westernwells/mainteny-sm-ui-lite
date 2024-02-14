@@ -1,4 +1,6 @@
+import {ArticleView} from 'models/article';
 import {
+  ArticleRecord,
   CreateInvoice,
   Discount,
   DiscountType,
@@ -8,8 +10,8 @@ import {
   PaymentType,
   UpdateInvoice,
 } from 'models/invoice';
-import {Amount} from 'models/misc';
-import {moneyRecordForBackend} from 'utils/currency';
+import {getItemRecord} from 'utils/article-utils';
+import {Currencies, moneyRecordForBackend} from 'utils/currency';
 import {dateToString} from 'utils/utils';
 
 export const formatInvoiceRecord = (
@@ -21,30 +23,62 @@ export const formatInvoiceRecord = (
   dueDate: value.dueDate ? dateToString(value.dueDate) : '',
   sentDate: value.sentDate ? dateToString(value.sentDate) : '',
   type: value.type,
-  items: value.items.map((item) => ({
-    ...item,
-    discount: item.discount
-      ? {
-          ...item.discount,
-          amount:
-            item.discount.type === 'AMOUNT'
-              ? {
-                  ...item.discount?.amount,
-                  currency: item.discount?.amount?.currency!,
-                  value:
-                    (item.discount?.amount?.value ?? 0) *
-                    10 ** (item.discount?.amount?.fractionDigits ?? 2),
-                }
-              : undefined,
-        }
-      : undefined,
-    payment: item.payment
-      ? item.payment
-      : value.payment?.type === PaymentType.PER_ITEM
-      ? // set payment percentage to 0 because it's required even if item is already paid and payment type is per item
-        {type: InvoiceItemPaymentType.PERCENTAGE, percentage: 0}
-      : undefined,
-  })),
+  items: value.items.map((item) => {
+    const {article, ...rest} = item;
+    const modifiedArticle = {...article};
+    const unitSellingAmount = modifiedArticle?.unitSellingAmount;
+    const unitAmount = item?.unitAmount;
+    const isPreDefinedArticle =
+      modifiedArticle?.id && modifiedArticle?.id?.length > 8;
+    if (!isPreDefinedArticle) {
+      delete modifiedArticle?.id;
+    }
+
+    const articleToSend = {
+      ...(isPreDefinedArticle && {id: modifiedArticle?.id}),
+      name: article?.name,
+      type: article?.type,
+      unit: article?.unit,
+      costPackage: article?.costPackage,
+      ...(isPreDefinedArticle &&
+        article?.externalId && {externalId: article?.externalId}),
+      unitSellingAmount: {
+        netAmount: unitSellingAmount?.netAmount,
+        percentageVat: unitSellingAmount?.percentageVat,
+        currency: unitSellingAmount?.currency,
+      },
+    } as ArticleRecord;
+
+    return {
+      ...rest,
+      article: articleToSend,
+      unitAmount: {
+        netAmount: unitAmount?.netAmount,
+        percentageVat: unitAmount?.percentageVat,
+        currency: unitAmount?.currency,
+      },
+      discount: rest.discount
+        ? {
+            ...rest.discount,
+            amount:
+              rest.discount.type === 'AMOUNT'
+                ? {
+                    ...rest.discount.amount,
+                    currency: rest.discount.amount?.currency!,
+                    value:
+                      (rest.discount.amount?.value ?? 0) *
+                      10 ** (rest.discount.amount?.fractionDigits ?? 2),
+                  }
+                : undefined,
+          }
+        : undefined,
+      payment: rest.payment
+        ? rest.payment
+        : value.payment?.type === PaymentType.PER_ITEM
+        ? {type: InvoiceItemPaymentType.PERCENTAGE, percentage: 0}
+        : undefined,
+    };
+  }),
   paymentTerms: value.paymentTerms,
   propertyOwnerId: value.propertyOwnerId,
   serviceCompanyId: value.serviceCompanyId,
@@ -92,6 +126,7 @@ export const formatInvoiceRecord = (
           : undefined,
     },
   }),
+  showArticleSection: value.showArticleSection,
 });
 
 export const applyDiscount = ({
@@ -114,12 +149,13 @@ export const applyDiscount = ({
   return discountedPrice;
 };
 
-export const getAggregatedItemsVats = (items: InvoiceItemRecord<Amount>[]) =>
+export const getAggregatedItemsVats = (items: InvoiceItemRecord[]) =>
   items.reduce((acc, item) => {
     const {percentageVat} = item.unitAmount;
 
     const vat =
-      (item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!) *
+      (item.unitAmount.netAmount /
+        10 ** Currencies[item.unitAmount.currency]!) *
       (percentageVat / 100) *
       item.quantity;
 
@@ -136,7 +172,7 @@ export const getAggregatedItemsVats = (items: InvoiceItemRecord<Amount>[]) =>
     return acc;
   }, [] as {percentageVat: number; vat: number}[]);
 
-export const applyPerItemDiscountOnItems = (arr: InvoiceItemRecord<Amount>[]) =>
+export const applyPerItemDiscountOnItems = (arr: InvoiceItemRecord[]) =>
   arr.map((item) => {
     if (!item.discount) {
       return item;
@@ -161,7 +197,7 @@ export const applyPerItemDiscountOnItems = (arr: InvoiceItemRecord<Amount>[]) =>
   });
 
 export const applyGlobalDiscountOnItems = (
-  arr: InvoiceItemRecord<Amount>[],
+  arr: InvoiceItemRecord[],
   globalDiscount?: Discount,
 ) => {
   if (!globalDiscount) {
@@ -209,7 +245,7 @@ export const applyGlobalDiscountOnItems = (
 };
 
 export const getAggregatedPartialPaymentsVats = (
-  items: InvoiceItemRecord<Amount>[],
+  items: InvoiceItemRecord[],
   totalAmountExclVat: number,
 ) => {
   const total = items
@@ -234,4 +270,17 @@ export const getAggregatedPartialPaymentsVats = (
 
     return acc;
   }, [] as {percentageVat: number; vat: number}[]);
+};
+
+export const articleViewToInvoiceItemRecord = (
+  article: ArticleView,
+): InvoiceItemRecord => {
+  const record: InvoiceItemRecord = {
+    article,
+    name: article.name,
+    description: article.description,
+    quantity: 1,
+    unitAmount: article.unitSellingAmount,
+  };
+  return getItemRecord(record, record.unitAmount.percentageVat);
 };

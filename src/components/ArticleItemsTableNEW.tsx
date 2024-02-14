@@ -1,4 +1,4 @@
-import React, {useContext, useMemo, useState} from 'react';
+import React, {useContext} from 'react';
 import {useTranslation} from 'react-i18next';
 import {FormikProps} from 'formik';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
@@ -17,47 +17,41 @@ import {
   IconButton,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
-import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   applyDiscount,
   applyGlobalDiscountOnItems,
   applyPerItemDiscountOnItems,
+  articleViewToInvoiceItemRecord,
   getAggregatedItemsVats,
 } from 'pages/InvoiceDetails/utils';
-import {TabItems, Tabs} from 'components/Tab';
-import {TabsBody} from 'components/TabsBody';
 import {
   DiscountType,
   DiscountTypeOptions,
   InvoiceFormData,
   InvoiceItemRecord,
 } from 'models/invoice';
-import {Amount} from 'models/misc';
-import {ArticleView} from 'models/article';
+import {ArticleType, ArticleView} from 'models/article';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {LanguageContext} from 'context/LanguageProvider';
 import {
   calculateTotalAmountInclVats,
   calculateTotalWithPerItemDiscount,
 } from 'utils/calculate-total';
-import {getItemRecord} from 'utils/article-utils';
-import {fixRounding} from 'utils/utils';
+import {fixRounding, getUniqueId} from 'utils/utils';
+import {useTheme} from '@mui/material/styles';
+import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd';
 import {Button} from './Button';
-import {SelectModal} from './SelectModal';
-import {ArticlesDataGrid} from './DataGrid/ArticlesDataGrid';
-import {CustomPricesDataGrid} from './DataGrid/CustomPricesDataGrid';
 import {SelectButton} from './SelectButton';
-import {SearchInput} from './SearchInput';
 import {ArticleItemRowNEW} from './ArticleItemRowNEW';
 import {FormSelect} from './form/FormSelect';
 
 interface Props {
-  items: InvoiceItemRecord<Amount>[];
-  setItems: (items: InvoiceItemRecord<Amount>[]) => void;
+  items: InvoiceItemRecord[];
+  setItems: (items: InvoiceItemRecord[]) => void;
   propertyOwnerId: string;
   formik: FormikProps<InvoiceFormData>;
+  isHovered?: boolean;
 }
 
 export const ArticleItemsTableNEW = ({
@@ -65,13 +59,11 @@ export const ArticleItemsTableNEW = ({
   setItems,
   propertyOwnerId,
   formik,
+  isHovered,
 }: Props) => {
   const {t} = useTranslation();
+  const theme = useTheme();
   const currentCurrency = useCurrentCurrency();
-  const [tabValue, setTabValue] = useState(0);
-  const [search, setSearch] = useState('');
-
-  const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
 
   const subtotalExclVat = calculateTotalWithPerItemDiscount(formik.values);
   const subtotalExclVatFormatted = formatCurrency(subtotalExclVat, {
@@ -126,48 +118,22 @@ export const ArticleItemsTableNEW = ({
 
   const {language: selectedLng} = useContext(LanguageContext);
 
-  const articleViewToItem = (
-    article: ArticleView,
-  ): InvoiceItemRecord<Amount> => {
-    const record: InvoiceItemRecord<Amount> = {
-      article,
-      name: article.name,
-      description: article.description,
-      quantity: 1,
-      unitAmount: article.unitSellingAmount,
-    };
-    return getItemRecord(record, record.unitAmount.percentageVat);
-  };
-  const tabItems: TabItems[] = useMemo(() => {
-    const tItems = [
-      {
-        label: 'Articles & Spare parts',
-        icon: <HomeRepairServiceIcon />,
-      },
-    ];
-    if (propertyOwnerId) {
-      tItems.push({
-        label: 'Custom prices',
-        icon: <ReceiptLongIcon />,
-      });
-    }
-    return tItems;
-  }, [propertyOwnerId]);
-
   const deleteItem = (indexPos: number) => {
     const newItems = items.filter((_, index) => indexPos !== index);
     setItems(newItems);
   };
 
-  const handleSelectItem = (row: ArticleView) => {
-    setItems([...items, articleViewToItem(row)]);
-    setIsArticleModalOpen(false);
+  const handleSelectItem = (row: ArticleView, indexPosition: number) => {
+    if (indexPosition >= 0 && indexPosition < items.length) {
+      const updatedItems = [...items];
+      updatedItems[indexPosition] = articleViewToInvoiceItemRecord(row);
+      setItems(updatedItems);
+    } else {
+      setItems([...items, articleViewToInvoiceItemRecord(row)]);
+    }
   };
 
-  const setItemAtIndex = (
-    indexPos: number,
-    item: InvoiceItemRecord<Amount>,
-  ) => {
+  const setItemAtIndex = (indexPos: number, item: InvoiceItemRecord) => {
     const prevItems = [...items];
     prevItems[indexPos] = item;
     setItems(prevItems);
@@ -209,17 +175,65 @@ export const ArticleItemsTableNEW = ({
 
   const discountText = selectedLng === 'DE' ? 'Rabatt' : t('Discount');
 
-  const columns: {name: string; align?: TableCellProps['align']}[] = [
-    {name: '#', align: 'right'},
-    {name: 'Name'},
-    {name: 'Unit Price'},
-    {name: 'Quantity'},
-    {name: 'VAT (%)'},
-    {name: 'Unit'},
-    {name: discountText},
-    {name: 'Total Price (excl. VAT)'},
-    {name: ''},
+  const createEmptyItem = () => {
+    const blankItem = {
+      article: {
+        id: getUniqueId(),
+        name: '',
+        type: ArticleType.LABOR,
+        unitSellingAmount: {
+          netAmount: 0,
+          fractionDigits: currentCurrency.fractionDigits,
+          currency: currentCurrency.code,
+          grossAmount: 0,
+          percentageVat: 0,
+          vat: 0,
+        },
+      },
+      name: '',
+      description: '',
+      quantity: 0,
+      unitAmount: {
+        netAmount: 0,
+        fractionDigits: currentCurrency.fractionDigits,
+        currency: currentCurrency.code,
+        grossAmount: 0,
+        percentageVat: 0,
+        vat: 0,
+      },
+      discount: {
+        type: DiscountType.PERCENTAGE,
+        percentage: 0,
+      },
+    };
+    setItems([...items, blankItem]);
+  };
+
+  const columns: {
+    name: string;
+    align?: TableCellProps['align'];
+    width?: TableCellProps['width'];
+  }[] = [
+    {name: '#', align: 'left', width: '2%'},
+    {name: 'Name', width: '32%'},
+    {name: 'Type', width: '4%'},
+    {name: 'Unit Price', width: '14%'},
+    {name: 'Quantity', width: '6%'},
+    {name: 'VAT (%)', width: '6%'},
+    {name: 'Unit', width: '10%'},
+    {name: discountText, width: '9%'},
+    {name: 'Total Price (excl. VAT)', width: '15%'},
+    {name: '', width: '2%'},
   ];
+
+  const onDragEnd = (result: any) => {
+    if (!result.destination) return;
+
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setItems(items);
+  };
 
   return (
     <Box
@@ -230,7 +244,7 @@ export const ArticleItemsTableNEW = ({
       borderRadius={1}
       px={1.5}
       py={2}>
-      <TableContainer>
+      <TableContainer sx={{overflowX: 'hidden'}}>
         <Table
           sx={{
             minWidth: 700,
@@ -260,23 +274,63 @@ export const ArticleItemsTableNEW = ({
           <TableHead>
             <TableRow>
               {columns.map((column) => (
-                <TableCell key={column.name} align={column.align || 'left'}>
+                <TableCell
+                  key={column.name}
+                  align={column.align || 'left'}
+                  sx={{display: 'inline-block'}}
+                  width={column.width}>
                   {t(column.name)}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
-          <TableBody>
-            {items.map((item, index) => (
-              <ArticleItemRowNEW
-                key={index + (item.article?.id || item.name)}
-                articleItem={item}
-                index={index}
-                deleteItem={deleteItem}
-                setItemAtIndex={setItemAtIndex}
-              />
-            ))}
-          </TableBody>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="article-items">
+              {(providedDrop) => (
+                <TableBody
+                  ref={providedDrop.innerRef}
+                  {...providedDrop.droppableProps}>
+                  {items.map((item, index) => (
+                    <Draggable
+                      key={index + (item.article?.id || item.name)}
+                      draggableId={index + (item.article?.id || item.name)}
+                      index={index}>
+                      {(provided) => (
+                        <TableRow
+                          sx={{
+                            position: 'relative',
+                            width: '100%',
+                            '& .MuiTableCell-root': {
+                              verticalAlign: 'top',
+                            },
+                            ':hover': {
+                              '.drag-indicator': {
+                                visibility: 'visible',
+                              },
+                            },
+                          }}
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}>
+                          <ArticleItemRowNEW
+                            key={index + (item.article?.id || item.name)}
+                            articleItem={item}
+                            index={index}
+                            deleteItem={deleteItem}
+                            setItemAtIndex={setItemAtIndex}
+                            propertyOwnerId={propertyOwnerId}
+                            handleSelectItem={handleSelectItem}
+                            isHovered={isHovered}
+                          />
+                        </TableRow>
+                      )}
+                    </Draggable>
+                  ))}
+                  {providedDrop.placeholder}
+                </TableBody>
+              )}
+            </Droppable>
+          </DragDropContext>
         </Table>
       </TableContainer>
       <Box
@@ -293,13 +347,16 @@ export const ArticleItemsTableNEW = ({
                 variant: 'contained',
                 sx: {alignSelf: 'self-start'},
                 startIcon: <AddIcon />,
-                onClick: () => setIsArticleModalOpen(true),
+                onClick: createEmptyItem,
               }}
             />
             <Box px={3} pt={3} borderTop="1px solid" borderColor="grey.300">
               <Box
                 pl="20%"
                 sx={{
+                  [theme.breakpoints.up('xl')]: {
+                    pl: '50%',
+                  },
                   display: 'grid',
                   gridTemplateColumns: 'repeat(2, 1fr)',
                   justifyItems: 'end',
@@ -391,7 +448,7 @@ export const ArticleItemsTableNEW = ({
                       />
                       <IconButton
                         onClick={handleRemoveDiscount}
-                        sx={{p: '0px', mr: -3.3, color: 'text.disabled'}}>
+                        sx={{p: '0px', mr: -3.1, color: 'text.disabled'}}>
                         <CloseIcon />
                       </IconButton>
                     </Box>
@@ -455,50 +512,13 @@ export const ArticleItemsTableNEW = ({
           <Box display="flex" alignItems="center" my="1em" gap="1em">
             <Typography variant="body2">1</Typography>
             <SelectButton
-              text="Select Articles & Custom Prices"
-              onClick={() => setIsArticleModalOpen(true)}
+              text="Add Article"
+              onClick={() => createEmptyItem()}
               sxContainer={{flexGrow: 1}}
             />
           </Box>
         )}
       </Box>
-      <SelectModal
-        isOpen={isArticleModalOpen}
-        onClose={() => setIsArticleModalOpen(false)}
-        header="Select Articles & Custom Prices">
-        <Box
-          sx={{
-            position: 'absolute',
-            right: 10,
-            zIndex: 9999,
-          }}>
-          <SearchInput
-            variant="outlined"
-            label="Search"
-            onValueChanged={(value) => setSearch(value)}
-          />
-        </Box>
-        <Tabs
-          tabItems={tabItems}
-          currentIndex={tabValue}
-          onChange={(index) => setTabValue(index)}>
-          <TabsBody value={tabValue} index={0}>
-            <ArticlesDataGrid
-              search={search}
-              setRowItem={handleSelectItem}
-              setSearch={() => setSearch('')}
-            />
-          </TabsBody>
-          <TabsBody value={tabValue} index={1}>
-            <CustomPricesDataGrid
-              search={search}
-              setSearch={() => setSearch('')}
-              setRowItem={handleSelectItem}
-              propertyOwnerId={propertyOwnerId}
-            />
-          </TabsBody>
-        </Tabs>
-      </SelectModal>
     </Box>
   );
 };

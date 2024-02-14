@@ -4,5 +4,15 @@
   "singleQuote": true,
   "trailingComma": "all",
   "semi": true,
-  "printWidth": 80
+  "printWidth": 80,
+  "overrides": [
+    {
+      "files": ["cypress/e2e/**/*.cy.ts"],
+      "options": {
+        "tabWidth": 4,
+        "useTabs": false,
+        "printWidth": 150
+      }
+    }
+  ]
 }

@@ -48,7 +48,6 @@ import {SendEmailDialog} from 'components/SendEmailDialog';
 import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useSnackbar} from 'notistack';
-import {isBefore, parseISO, startOfDay} from 'date-fns';
 import CustomSnackbar from 'components/CustomSnackbar';
 import {LinearProgress, linearProgressClasses} from '@mui/material';
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
@@ -57,6 +56,7 @@ import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import {useServiceOrderCheckList} from 'hooks/reactQuery/useServiceOrder';
 import {CheckListComponentType} from 'models/checklist';
 import {ChecklistStatus} from 'models/service-order';
+import {validateDueDate, getInvoicePDFStatuses} from 'utils/invoice-utils';
 import {InvoiceActivities} from './InvoiceActivities';
 import {Notes} from './Notes';
 
@@ -89,15 +89,9 @@ export const ViewInvoice = ({
     shouldNavigate: false,
   });
 
-  const isInvoicePDFGenerated =
-    invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
-    downloadUrl;
+  const {isInvoicePDFGenerated, isPDFsGenerated} =
+    getInvoicePDFStatuses(invoice);
   const serviceOrder = invoice?.serviceOrder;
-  const isWorkReportPDFGenerated = invoice?.additionalInfo?.includeWorkReport
-    ? serviceOrder?.report?.additionalInfo?.pdfGenerationStatus ===
-      PdfGenerationStatus.DONE
-    : true;
-  const isPDFsGenerated = !!isWorkReportPDFGenerated && isInvoicePDFGenerated;
 
   const {data: serviceOrderCheckList} = useServiceOrderCheckList(
     serviceOrder?.additionalInfo.checkListInfo?.checkListId && serviceOrder.id,
@@ -235,35 +229,11 @@ export const ViewInvoice = ({
     };
   }, [invoice?.additionalInfo.pdfGenerationStatus]);
 
-  const isDueDateInPast = () => {
-    if (invoice?.status !== InvoiceStatus.DRAFT) {
-      return false;
-    }
-
-    const localDueDate = invoice.dueDate as string;
-    const dueDateObject = startOfDay(
-      parseISO(new Date(localDueDate).toISOString()),
-    );
-    const todayObject = startOfDay(new Date());
-
-    return isBefore(dueDateObject, todayObject);
-  };
-
-  const validateDueDate = () => {
-    if (!invoice.dueDate) {
-      return t(`The due date is missing for this invoice`);
-    }
-
-    if (isDueDateInPast()) {
-      return t(`The due date for the invoice has expired`);
-    }
-  };
-
   const onInvoiceSend = () => {
-    const errorMessage = validateDueDate();
+    const errorMessage = validateDueDate(invoice);
 
     if (errorMessage) {
-      enqueueSnackbar(errorMessage, {
+      enqueueSnackbar(t(errorMessage), {
         variant: 'error',
       });
 
@@ -345,7 +315,7 @@ export const ViewInvoice = ({
             <Box>
               <FormLabel text="Invoice Type" sx={{color: 'text.main'}} />
               <Typography variant="subtitle1" fontWeight="600">
-                {t(InvoiceTypeMap[invoice.type]).toUpperCase()}
+                {t(`${InvoiceTypeMap[invoice.type]} invoice`)}
               </Typography>
             </Box>
 
@@ -427,7 +397,7 @@ export const ViewInvoice = ({
                 {serviceOrder && (
                   <Typography
                     variant="caption"
-                    sx={{color: 'text.secondary', fontSize: '0.6rem'}}
+                    sx={{color: 'text.secondary', fontSize: '0.7rem'}}
                     display="block"
                     mt="-0.25rem">
                     {t('Created on {{creationDate}}', {
@@ -458,8 +428,8 @@ export const ViewInvoice = ({
               headerLabel={t('Work Report')}
               headerIcon={<GradingOutlinedIcon sx={{color: '#8F9BB380'}} />}
               headerStyles={{
-                pt: '11px',
                 mx: 0,
+                mt: 0,
                 px: '1rem',
               }}
               headerActionIcon={
@@ -471,11 +441,13 @@ export const ViewInvoice = ({
               handleAction={() =>
                 navigate(`/orders/details/${serviceOrder?.id}?tab=1`)
               }>
-              <Typography variant="body1">
-                {!!serviceOrder.actualStartTime &&
-                  `${formatDate(serviceOrder.actualStartTime)} :`}
-                {serviceOrder.report?.description ?? '-'}
-              </Typography>
+              {serviceOrder.actualStartTime &&
+              serviceOrder.report?.description ? (
+                <Typography variant="body1">
+                  {formatDate(serviceOrder.actualStartTime)}:
+                  {serviceOrder.report.description}
+                </Typography>
+              ) : null}
             </PageCard>
           )}
 

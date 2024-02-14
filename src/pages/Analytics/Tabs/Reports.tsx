@@ -25,6 +25,7 @@ import {
   useInvoicesDatev,
   useInvoicesXLSX,
   useInvoicesXero,
+  useInvoicesSage50,
 } from 'hooks/reactQuery/useAnalytics';
 import {convertToText} from 'utils/utils';
 import {toRestDate} from 'utils/datetime';
@@ -98,6 +99,7 @@ export const Reports = () => {
   });
   const getInvoicesXero = useInvoicesXero(serviceCompanyId, reportParams);
   const getInvoicesXLSX = useInvoicesXLSX(serviceCompanyId, reportParams);
+  const getInvoicesSage50 = useInvoicesSage50(serviceCompanyId, reportParams);
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -111,6 +113,7 @@ export const Reports = () => {
       if (formatType === FormatType.DATEV) return getInvoicesDatev.refetch();
       if (formatType === FormatType.XERO) return getInvoicesXero.refetch();
       if (formatType === FormatType.EXCEL) return getInvoicesXLSX.refetch();
+      if (formatType === FormatType.SAGE50) return getInvoicesSage50.refetch();
     }
   };
 
@@ -198,6 +201,10 @@ export const Reports = () => {
         {
           label: FormatType.EXCEL,
           value: FormatType.EXCEL,
+        },
+        {
+          label: FormatType.SAGE50,
+          value: FormatType.SAGE50,
         },
       ];
     }

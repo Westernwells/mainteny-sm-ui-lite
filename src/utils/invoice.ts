@@ -8,28 +8,34 @@ import {
   InvoiceStatusView,
   InvoiceView,
 } from 'models/invoice';
-import {Amount} from 'models/misc';
 import {QuotationItemRecord} from 'models/quotation';
+import {Currencies} from './currency';
+import {getAmountFromPercentage} from './utils';
 
 export const getTotalFromArticles = (
-  items: QuotationItemRecord[] | InvoiceItemRecord<Amount>[],
+  items: QuotationItemRecord[] | InvoiceItemRecord[],
 ): number =>
   items
     .map(
       (item) =>
         item.quantity *
-        (item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!),
+        (item.unitAmount.netAmount /
+          10 ** Currencies[item.unitAmount.currency]),
     )
     .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
 
 export const getTotalWithVatFromArticles = (
-  items: QuotationItemRecord[] | InvoiceItemRecord<Amount>[],
+  items: QuotationItemRecord[] | InvoiceItemRecord[],
 ): number =>
   items
     .map(
       (item) =>
         item.quantity *
-        (item.unitAmount.vat / 10 ** item.unitAmount.fractionDigits!),
+        (getAmountFromPercentage(
+          item.unitAmount.percentageVat,
+          item.unitAmount.netAmount,
+        ) /
+          10 ** Currencies[item.unitAmount.currency]),
     )
     .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
 
@@ -78,7 +84,6 @@ export const getInvoiceActivityTitle = (type: InvoiceActivityType): string => {
       return 'Payment deleted';
     case InvoiceActivityType.INVOICE_EMAIL_SENT_FAILED:
       return 'Invoice not sent';
-
     default:
       return '';
   }

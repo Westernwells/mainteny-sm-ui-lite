@@ -14,6 +14,7 @@ export enum ContractStatus {
 export enum ContractOrderField {
   EXPIRY_TIME = 'EXPIRY_TIME',
   CREATED_TIME = 'CREATED_TIME',
+  START_TIME = 'START_TIME',
 }
 
 export enum ContractTypes {
@@ -99,6 +100,7 @@ export interface ContractAdditionalInfo {
   firstMaintenance: FirstMaintenance;
   firstInvoiceDate: string;
   autoRenewalCancelled: boolean;
+  renewalDate: string;
 }
 
 export interface ContractElevatorSimpleView {

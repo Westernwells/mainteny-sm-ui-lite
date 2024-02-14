@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import OpenInNew from '@mui/icons-material/OpenInNew';
 import {FormCheckbox} from 'components/form/FormCheckbox';
+import {T} from 'utils/i18n-utils';
 
 interface Props {
   checkboxLabel: string;
@@ -26,9 +27,10 @@ export const InvoiceCheckboxNEW = ({
 }: Props) => (
   <Tooltip
     disableHoverListener={!disabled}
-    title={t(tooltipTitle) || ''}
+    title={T(tooltipTitle) || ''}
     placement="bottom"
-    arrow>
+    arrow
+    followCursor>
     <Box
       display="flex"
       justifyContent="space-between"
@@ -38,14 +40,14 @@ export const InvoiceCheckboxNEW = ({
         disabled={disabled}
         checked={checked}
         handleChange={handleChange}
-        label={t(checkboxLabel)}
+        label={checkboxLabel}
         typographyProps={{variant: 'body2'}}
         checkboxProps={{sx: {py: 0}}}
       />
       <IconButton disabled={disabled} onClick={handleAction}>
         <OpenInNew
           fontSize="small"
-          sx={{color: theme.palette.secondary.dark}}
+          sx={{color: disabled ? 'inherit' : theme.palette.secondary.dark}}
         />
       </IconButton>
     </Box>

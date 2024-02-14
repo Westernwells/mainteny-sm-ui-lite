@@ -1,8 +1,10 @@
+import {theme} from 'theme';
 import {TextFieldProps} from '@mui/material/TextField';
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {
   DatePickerProps,
+  DatePickerSlotsComponentsProps,
   DatePicker as MuiDatePicker,
 } from '@mui/x-date-pickers/DatePicker';
 import {InputLabelProps} from '@mui/material/InputLabel';
@@ -124,6 +126,9 @@ export const DatePicker = ({
       {
         border: 'none',
       },
+    '& .MuiPickersDay-today:not(.Mui-selected)': {
+      background: theme.palette.secondary.main,
+    },
     '& .MuiDayCalendar-weekContainer > .MuiPickersDay-dayWithMargin': {
       border: 'none',
       borderRight: '1px solid #222B451F',
@@ -245,37 +250,39 @@ export const DatePicker = ({
           onClose={() => setOpen(false)}
           showDaysOutsideCurrentMonth
           closeOnSelect={false}
-          slotProps={{
-            actionBar: {
-              actions: ['clear', 'accept'],
-            },
-            toolbar: {
-              hidden: false,
-            },
-            popper: {
-              sx: popperSx,
-            },
-            textField: {
-              ...textFieldProps,
-              size: textFieldProps?.size || 'small',
-              label: t(`${textFieldProps?.label}`),
-              sx: {width: '100%'},
-              InputLabelProps: {
-                shrink: true,
-                required,
-                ...inputLabelProps,
+          slotProps={
+            {
+              actionBar: {
+                actions: ['clear', 'accept'],
               },
-              inputProps: {
-                type: 'input',
+              toolbar: {
+                hidden: false,
+              },
+              popper: {
+                sx: popperSx,
+              },
+              textField: {
+                sx: {width: '100%'},
+                ...textFieldProps,
+                size: textFieldProps?.size || 'small',
+                label: t(`${textFieldProps?.label}`),
+                InputLabelProps: {
+                  shrink: true,
+                  required,
+                  ...inputLabelProps,
+                },
+                inputProps: {
+                  type: 'input',
+                  onClick: handleOpen,
+                  ref: inputRef,
+                },
+              },
+              inputAdornment: {
+                position: 'end',
                 onClick: handleOpen,
-                ref: inputRef,
               },
-            },
-            inputAdornment: {
-              position: 'end',
-              onClick: handleOpen,
-            },
-          }}
+            } as unknown as DatePickerSlotsComponentsProps<Date> | undefined
+          }
           slots={{
             toolbar: () => renderToolbar(textFieldProps?.label),
             actionBar: () => renderActionBar(),

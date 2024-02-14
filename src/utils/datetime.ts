@@ -245,3 +245,13 @@ export const formatDueDate = (date: string | number | Date) => {
   });
   return `${t('Due in')} ${finalDate}`;
 };
+
+export const isDateInPast = (date: Date | string): boolean => {
+  const currentDate = new Date();
+  const providedDate = new Date(date);
+
+  providedDate.setHours(0, 0, 0, 0);
+  currentDate.setHours(0, 0, 0, 0);
+
+  return providedDate < currentDate;
+};

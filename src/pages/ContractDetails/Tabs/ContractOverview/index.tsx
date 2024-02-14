@@ -10,11 +10,12 @@ import {
 } from 'hooks/reactQuery/useContract';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
-import {useMediaQuery} from '@mui/material';
+import {PopperProps, useMediaQuery} from '@mui/material';
 import {useParams} from 'react-router-dom';
 import {useFormik} from 'formik';
 import {
   ContractOrderField,
+  ContractPaymentTermView,
   ContractRequestBody,
   ContractStatus,
   ContractUpdateRequest,
@@ -26,8 +27,6 @@ import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import {Button} from 'components/Button';
-import {ContractPaymentTermSelectDialog} from 'components/ContractPaymentTermSelectDialog';
-import {ContractPaymentTermsDialog} from 'components/ContractPaymentTermsDialog';
 import * as Yup from 'yup';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import {
@@ -46,11 +45,13 @@ import {
 } from 'utils/contract-utils';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import Tooltip from '@mui/material/Tooltip';
-import {formatDate} from 'utils/datetime';
+import {formatDate, isDateInPast} from 'utils/datetime';
 import {StatusChip} from 'components/StatusChip';
 import {capitalize} from 'lodash';
 import {Order} from 'models/misc';
 import {createEmptyResource} from 'utils/paging-utils';
+import {ContractPaymentTermInput} from 'components/ContractPaymentTermInput';
+import {ContractPaymentTerm} from 'components/ContractPaymentTerm';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
@@ -96,6 +97,10 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     openContractPaymentTermSelectDialog,
     setOpenContractPaymentTermSelectDialog,
   ] = useState(false);
+
+  const [paymentTermToEdit, setPaymentTermToEdit] = useState<
+    ContractPaymentTermView | undefined
+  >(undefined);
 
   const {mutateAsync: uploadFiles} = useUploadFiles(
     'Documents uploaded successfully',
@@ -186,13 +191,17 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       user?.userAccount?.serviceCompany?.settings?.contractNameTypes.find(
         (item) => item.name === formik.values.name,
       );
+    const isContractRenewable =
+      !formik.values.renewalTerms && isDateInPast(formik.values.endDate);
+
     const updatedContract = {
       ...contractDetails?.additionalInfo,
       type: contractNameType?.type || '',
       name: formik.values?.name || '',
-      renewalTerms: formik.values.renewalTerms
-        ? formik.values.renewalTerms
-        : null,
+      renewalTerms: formik.values.renewalTerms ? formik.values.renewalTerms : 0,
+      renewalDate: isContractRenewable
+        ? null
+        : contractDetails?.additionalInfo.renewalDate,
       price: {
         ...amountRecordForBackend({
           netAmount: +formik.values.price,
@@ -219,7 +228,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       paymentTermId: formik.values.paymentTermId,
       description: formik.values.description,
       externalId: formik.values.externalId,
-      autoRenewalCancelled: formik.values.autoRenewalCancelled,
+      autoRenewalCancelled: isContractRenewable,
     };
 
     await updateContract({
@@ -422,11 +431,13 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   }
                   placement="top-end"
                   arrow
-                  PopperProps={{
-                    sx: {
-                      marginRight: '-4.6em !important',
-                    },
-                  }}>
+                  PopperProps={
+                    {
+                      sx: {
+                        marginRight: '-4.6em !important',
+                      },
+                    } as Partial<PopperProps> | undefined
+                  }>
                   <span>
                     <Button
                       buttonProps={{
@@ -727,7 +738,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               </Box>
             }
             headerActionIcon={<EditIcon />}
-            headerAction={() => setOpenContractPaymentTermSelectDialog(true)}>
+            headerAction={() => setOpenContractPaymentTermsDialog(true)}>
             {contractDetails?.paymentTerm?.term ? (
               <Typography variant="body2">
                 {contractDetails.paymentTerm.term}
@@ -743,21 +754,24 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               />
             )}
 
-            <ContractPaymentTermSelectDialog
-              title={t('Payment Terms')}
-              alertText={t('Choose a payment term to be used on your invoice')}
+            <ContractPaymentTermInput
+              title={t('New payment term')}
               open={openContractPaymentTermSelectDialog}
-              onSave={handleContractPaymentTermsModal}
               onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
-              onClickPaymentTerms={() =>
-                setOpenContractPaymentTermsDialog(true)
-              }
+              defaultPaymentTerm={paymentTermToEdit}
+              setPaymentToEdit={setPaymentTermToEdit}
             />
 
-            <ContractPaymentTermsDialog
-              title={t('Manage Payment Terms')}
+            <ContractPaymentTerm
+              title={t('Payment Terms')}
               open={openContractPaymentTermsDialog}
               onCancel={() => setOpenContractPaymentTermsDialog(false)}
+              onSave={handleContractPaymentTermsModal}
+              defaultPayment={contractDetails?.paymentTerm?.term}
+              onClickNewPaymentTerm={() =>
+                setOpenContractPaymentTermSelectDialog(true)
+              }
+              setPaymentToEdit={setPaymentTermToEdit}
             />
           </ContractCard>
         </Grid>

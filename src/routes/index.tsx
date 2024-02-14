@@ -427,7 +427,7 @@ export const Router = () => {
                   pageScrollable
                   backBtnLabel="New Quotation"
                   showBackAction>
-                  <DraftQuotation />
+                  <DraftQuotation formType="new" />
                 </PageLayout>
               </>
             }
@@ -442,9 +442,11 @@ export const Router = () => {
                 </Helmet>
                 <PageLayout
                   pageScrollable
-                  backBtnLabel="Quotation Details"
+                  backBtnLabel={currentPageTitle}
                   showBackAction>
-                  <QuotationDetails />
+                  <QuotationDetails
+                    getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                  />
                 </PageLayout>
               </>
             }

@@ -40,22 +40,16 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
   }, [serviceOrderArticles]);
 
   const handleSelectArticle = async (article: ArticleView) => {
-    const articleExists = serviceOrderArticles?.filter(
-      (item) => item.article.id === article.id,
-    );
-
-    if (articleExists!.length > 0) {
-      setOpenSelectModal(false);
-      return;
-    }
     const body: ServiceOrderArticleRecord = {
       articleId: article.id,
       article: {
         id: article.id,
+        name: article.name,
         externalId: article.externalId,
         type: article.type,
         unit: article.unit,
         costPackage: article.costPackage!,
+        unitSellingAmount: article.unitSellingAmount,
       },
       description: article.description,
       name: article.name,
@@ -121,7 +115,7 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
         ) : (
           <DataGridLayout
             fullHeight={false}
-            height={getDataGridHeight(rows.length, 100)}
+            height={getDataGridHeight(rows.length, rows.length, 70)}
             rows={rows}
             columns={columns}
             containerStyle={{

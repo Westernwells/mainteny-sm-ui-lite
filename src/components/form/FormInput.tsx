@@ -49,7 +49,6 @@ export const FormInput = ({
           placeholder={props!.placeholder}
           error={props!.error}
           decimalScale={2}
-          fixedDecimalScale
           inputProps={props!.inputProps} // eslint-disable-next-line react/jsx-no-duplicate-props
           InputProps={props!.InputProps}
           customInput={TextField}

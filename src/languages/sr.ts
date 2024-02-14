@@ -1465,4 +1465,6 @@ export const sr = {
   'Enable Automatic ID Generation': 'Omogućite automatsko generisanje ID-a',
   'Allows for easier number input': 'Omogućava lakši unos brojeva',
   'Automatically assigned': 'Automatski dodeljeno',
+  'Some required information is missing. Please check the highlighted fields.':
+    'Nedostaju neke potrebne informacije. Proverite označena polja.',
 };

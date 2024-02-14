@@ -12,6 +12,7 @@ import {CustomerOverviewTab} from './Tabs/CustomerOverview';
 import {ContractsTab} from './Tabs/ContractsTab';
 import {UnitsTab} from './Tabs/UnitsTab';
 import {CustomPricesTab} from './Tabs/CustomPricesTab';
+import CustomerNotes from './Notes';
 
 interface Props {
   getCurrentPageTitle?: (title: string) => void;
@@ -66,7 +67,7 @@ export const CustomerDetails = ({getCurrentPageTitle}: Props) => {
         }}
         backBtnLabel={customerName}
         showMenuActionBtn
-        secondaryButtonStyles={{mt: '1rem'}}
+        secondaryBtn={<CustomerNotes customerId={customerId} />}
         hideDivider>
         <TabsBody value={tabValue} index={0}>
           <CustomerOverviewTab

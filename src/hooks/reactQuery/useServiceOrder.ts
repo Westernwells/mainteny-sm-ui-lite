@@ -43,21 +43,21 @@ import {
   AppointmentConfirmationRequiredOrdersQueryParams,
   ServiceOrderArticleView,
   ServiceOrderConfirmationPublishBody,
-} from '../../models/service-order';
+} from 'models/service-order';
 import {
   Order,
   Resource,
   RestError,
   SimpleEmailRecord,
   StringValue,
-} from '../../models/misc';
+} from 'models/misc';
 import {
   ElevatorAvailability,
   ElevatorAvailabilityParams,
   ElevatorOrderPair,
   ElevatorsByAddress,
   ElevatorView,
-} from '../../models/elevator';
+} from 'models/elevator';
 import {useUserSession} from './useUserSession';
 
 const filterByNextVisit = (
@@ -227,8 +227,8 @@ export function useServiceOrders(
       queryServiceOrders({
         ...params,
         serviceCompanyId: user!.userAccount.serviceCompany.id,
+        order: Order.ASC,
         orderBy: ServiceOrderOrderField.CREATED_TIME,
-        order: Order.DESC,
       }),
     {enabled: !!user, ...options},
   );
@@ -919,6 +919,7 @@ export const useDeleteServiceOrderArticle = () => {
           variant: 'success',
         });
         queryClient.invalidateQueries([queryKeys.fetchServiceJobArticles]);
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
       },
       onError: (err) => {
         console.log(err);
@@ -954,6 +955,7 @@ export const useCreateServiceOrderArticle = () => {
           variant: 'success',
         });
         queryClient.invalidateQueries([queryKeys.fetchServiceJobArticles]);
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
       },
       onError: (err) => {
         console.log(err);

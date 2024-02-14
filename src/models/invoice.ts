@@ -96,6 +96,7 @@ export interface InvoiceAdditionalInfo {
   payment?: Payment<AggregatedAmount>;
   deliveryStartDate?: string;
   deliveryEndDate?: string;
+  showArticleSection?: boolean;
 }
 
 export enum InvoiceOverdueNoticeStatus {
@@ -156,8 +157,16 @@ export interface InvoiceView {
   payments: InvoicePaymentView[];
 }
 
+export interface InvoicePaymentAdditionalInfo {
+  xero?: {
+    xeroEntityId: string;
+    lastSyncedTime: string;
+  };
+  paymentDetails?: AggregatedAmount;
+}
+
 export interface InvoicePaymentView {
-  additionalInfo: InvoiceAdditionalInfo;
+  additionalInfo: InvoicePaymentAdditionalInfo;
   amount: Money;
   id: string;
   invoiceId: string;
@@ -251,15 +260,15 @@ export interface ArticleRecord {
   externalId?: string;
   type?: ArticleType;
   unit?: string;
-  unitSellingAmount?: Amount;
+  unitSellingAmount?: AmountRecord;
   costPackage?: CostPackage;
 }
 
-export interface InvoiceItemRecord<T> {
+export interface InvoiceItemRecord {
   article?: ArticleRecord;
   name: string;
   description?: string;
-  unitAmount: T;
+  unitAmount: AmountRecord;
   quantity: number;
   discount?: Discount;
   payment?: InvoiceItemPaymentRecord;
@@ -286,7 +295,7 @@ export interface InvoiceFormData {
   description: string;
   dueDate?: Date;
   sentDate?: Date;
-  items: InvoiceItemRecord<Amount>[];
+  items: InvoiceItemRecord[];
   paymentInfo: PaymentInfo;
   paymentTerms: string;
   propertyOwnerId: string;
@@ -315,6 +324,7 @@ export interface InvoiceFormData {
   payment?: Payment;
   deliveryStartDate?: Date;
   deliveryEndDate?: Date;
+  showArticleSection?: boolean;
 }
 
 export interface CreateInvoice {
@@ -327,7 +337,7 @@ export interface CreateInvoice {
   dueDate?: string;
   sentDate?: string;
   type?: InvoiceType;
-  items: InvoiceItemRecord<Amount>[];
+  items: InvoiceItemRecord[];
   paymentTerms?: string;
   paymentInfo?: PaymentInfo;
   shouldSendOut?: boolean;
@@ -352,6 +362,7 @@ export interface CreateInvoice {
   payment?: Payment;
   deliveryStartDate?: string;
   deliveryEndDate?: string;
+  showArticleSection?: boolean;
 }
 
 export interface UpdateInvoice {
@@ -362,7 +373,7 @@ export interface UpdateInvoice {
   description?: string;
   dueDate?: string;
   sentDate?: string;
-  items?: InvoiceItemRecord<AmountRecord>[];
+  items?: InvoiceItemRecord[];
   paymentTerms?: string;
   paymentInfo?: PaymentInfo;
   includeWorkReport?: boolean;

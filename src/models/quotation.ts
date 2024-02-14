@@ -1,6 +1,7 @@
 import {ArticleType, ArticleView, CostPackage} from './article';
 import {ElevatorView} from './elevator';
-import {Amount, Meta} from './misc';
+import {AlternativeServiceCompanyInfo, Discount} from './invoice';
+import {AddressRecord, Amount, AmountRecord, Meta} from './misc';
 import {ServiceCompanySimpleView} from './service-company';
 
 export enum QuotationStatus {
@@ -15,6 +16,13 @@ export enum QuotationStatusView {
   DRAFT = 'DRAFT',
   REJECTED = 'REJECTED',
   SENT = 'SENT_TO_CLIENT',
+}
+
+export enum QuotationOrderField {
+  CUSTOMER_NAME = 'CUSTOMER_NAME',
+  CREATED_DATE = 'CREATED_DATE',
+  SALES_PRICE = 'SALES_PRICE',
+  XERO_LAST_SYNC_TIME = 'XERO_LAST_SYNC_TIME',
 }
 
 export type QuotationAdditionalInfo = {
@@ -38,7 +46,7 @@ export interface ArticleRecord {
   externalId?: string;
   type?: ArticleType;
   unit?: string;
-  unitSellingAmount?: Amount;
+  unitSellingAmount?: AmountRecord;
   costPackage?: CostPackage;
 }
 
@@ -46,13 +54,15 @@ export interface QuotationItemRecord {
   articleId?: string;
   article?: ArticleRecord;
   name: string;
-  unitAmount: Amount;
+  unitAmount: AmountRecord;
   quantity: number;
   description?: string;
+  discount?: Discount;
 }
 
 export interface QuotationView {
   id: string;
+  serviceCompany: ServiceCompanySimpleView;
   elevator: ElevatorView;
   number: string;
   externalId: string;
@@ -73,27 +83,80 @@ export interface QueryQuotationParams {
   pageSize: number;
   query: string;
   status: QuotationStatus[];
-  createdDateStart?: string;
-  createdDateEnd?: string;
+  createdDateStart?: Date;
+  createdDateEnd?: Date;
+  salesPriceStart?: number;
+  salesPriceEnd?: number;
 }
 
 export interface QuotationFilters {}
 
-export interface CreateQuotation {
+export interface QuotationFormData {
+  serviceCompanyId: string;
+  elevatorId: string;
+  externalId?: string;
   subject: string;
   description: string;
-  moreInfo: string;
-  elevatorId: string;
+  moreInfo?: string;
   items: QuotationItemRecord[];
+  integration?: {
+    xeroEntityId?: string;
+  };
+  discount?: Discount;
+  billingAddress?: AddressRecord;
+  beneficiaryAddress?: AddressRecord;
+  alternativeAddress?: AddressRecord;
+  paymentTerms?: string;
+  notes?: string;
+  sentDate?: Date;
+  expiryDate?: Date;
+  referenceNumber?: string;
+  alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
+}
+
+export interface CreateQuotation {
   serviceCompanyId: string;
+  elevatorId: string;
+  externalId?: string;
+  subject: string;
+  description: string;
+  moreInfo?: string;
+  items: QuotationItemRecord[];
+  integration?: {
+    xeroEntityId?: string;
+  };
+  discount?: Discount;
+  billingAddress?: AddressRecord;
+  beneficiaryAddress?: AddressRecord;
+  alternativeAddress?: AddressRecord;
+  paymentTerms?: string;
+  notes?: string;
+  sentDate?: string;
+  expiryDate?: string;
+  referenceNumber?: string;
+  alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
 }
 
 export interface UpdateQuotation {
   subject: string;
   description: string;
-  moreInfo: string;
+  moreInfo?: string;
   elevatorId: string;
   items: QuotationItemRecord[];
+  externalId?: string;
+  integration?: {
+    xeroEntityId?: string;
+  };
+  discount?: Discount;
+  billingAddress?: AddressRecord;
+  beneficiaryAddress?: AddressRecord;
+  alternativeAddress?: AddressRecord;
+  paymentTerms?: string;
+  notes?: string;
+  sentDate?: string;
+  expiryDate?: string;
+  referenceNumber?: string;
+  alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
 }
 
 export interface ReplyQuotation {
@@ -121,6 +184,7 @@ export enum QuotationActivityType {
   REJECTED = 'REJECTED',
   SERVICE_ORDER_ADDED = 'SERVICE_ORDER_ADDED',
   SERVICE_ORDER_REMOVED = 'SERVICE_ORDER_REMOVED',
+  PRINTED = 'PRINTED',
 }
 
 export interface QuotationActivityView {

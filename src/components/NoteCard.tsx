@@ -7,14 +7,25 @@ import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import {format} from 'date-fns';
 import {Comment} from 'models/comment';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {SxProps} from '@mui/system/styleFunctionSx/styleFunctionSx';
+import {Chip} from '@mui/material';
 
 interface Props extends BoxProps {
   note: Comment;
   onDelete: () => void;
   onEdit: () => void;
+  styles?: SxProps;
+  isEditing?: boolean;
 }
 
-export const NoteCard = ({note, onDelete, onEdit, ...rest}: Props) => {
+export const NoteCard = ({
+  note,
+  onDelete,
+  onEdit,
+  isEditing = false,
+  styles,
+  ...rest
+}: Props) => {
   const theme = useTheme();
   const {user} = useUserSession();
   return (
@@ -26,6 +37,7 @@ export const NoteCard = ({note, onDelete, onEdit, ...rest}: Props) => {
           '&:hover': {
             backgroundColor: theme.palette.action.hover,
           },
+          ...styles,
         }}
         {...rest}>
         <Box
@@ -35,10 +47,15 @@ export const NoteCard = ({note, onDelete, onEdit, ...rest}: Props) => {
             alignItems: 'center',
             flexWrap: 'wrap',
           }}>
-          <Typography variant="body2" color={theme.palette.text.secondary}>
-            {`${note.meta.creator?.firstName} ${
-              note.meta.creator?.lastName
-            } - ${format(new Date(note.meta.createdAt), 'dd.MM.yyyy, HH:mm')}`}
+          <Typography variant="caption" color={theme.palette.text.secondary}>
+            {`${note.meta.creator?.firstName} ${note.meta.creator?.lastName} - `}
+            {isEditing ? (
+              <span>
+                <Chip label="Editing" size="small" variant="outlined" />
+              </span>
+            ) : (
+              format(new Date(note.meta.createdAt), 'dd.MM.yyyy, HH:mm')
+            )}
           </Typography>
 
           {note.meta.creator?.id === user?.userAccount.id && (

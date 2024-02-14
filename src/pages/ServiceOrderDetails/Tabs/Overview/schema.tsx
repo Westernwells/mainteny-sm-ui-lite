@@ -101,7 +101,7 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
             label="NUMBER"
             bodyText={serviceOrderDetails.contract?.externalId || '-'}
             navigateTo={
-              serviceOrderDetails.contract?.externalId &&
+              serviceOrderDetails.contract &&
               `/contracts/details/${serviceOrderDetails.contract?.id}`
             }
             iconBackground={theme.palette.info.outlinedHoverBg}

@@ -1,6 +1,5 @@
 import {useTranslation} from 'react-i18next';
 import {format} from 'date-fns';
-import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import Timeline from '@mui/lab/Timeline';
 import TimelineItem from '@mui/lab/TimelineItem';
@@ -18,7 +17,6 @@ export const QuotationActivities = ({
   activities: QuotationActivityView[];
 }) => {
   const {t} = useTranslation();
-  const theme = useTheme();
 
   return (
     <InfoCard
@@ -46,20 +44,23 @@ export const QuotationActivities = ({
             <TimelineSeparator>
               <TimelineDot
                 sx={{
-                  bgcolor: theme.palette.grey[400],
+                  bgcolor: 'white',
+                  borderColor: '#BDBDBD',
                   boxShadow: 'none',
                 }}
               />
-              <TimelineConnector />
+              <TimelineConnector sx={{background: '#BDBDBD'}} />
             </TimelineSeparator>
-            <TimelineContent>
+            <TimelineContent sx={{marginTop: '-0.2em'}}>
               <Typography variant="subtitle1">
                 {t(getQuotationActivityTitle(activity.type))}
               </Typography>
-              <Typography variant="subtitle2">
+              <Typography
+                variant="caption"
+                sx={{color: 'text.secondary', fontSize: '0.9rem'}}>
                 {format(
                   new Date(activity.meta.createdAt),
-                  'dd.MM.yyyy - HH:mm',
+                  'dd.MM.yyyy | HH:mm',
                 )}
               </Typography>
               <Typography variant="subtitle2">{activity.text}</Typography>

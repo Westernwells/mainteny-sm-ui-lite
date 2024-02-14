@@ -4,7 +4,7 @@ import {TestContextExtended} from 'models/articleForm';
 import {ArticleType} from 'models/article';
 import {QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord} from 'models/invoice';
-import {Amount} from 'models/misc';
+import {Currencies} from './currency';
 
 export const handleCostPackageValidation = (
   value: number | undefined,
@@ -30,12 +30,12 @@ export const handleCostPackageValidation = (
 };
 
 export const getItemRecord = (
-  record: QuotationItemRecord | InvoiceItemRecord<Amount>,
+  record: QuotationItemRecord | InvoiceItemRecord,
   percentageVat: number,
 ) => {
   const {netAmount} = record.unitAmount;
   const vat =
-    (percentageVat * netAmount) / 10 ** record.unitAmount.fractionDigits;
+    (percentageVat * netAmount) / 10 ** Currencies[record.unitAmount.currency];
   return {
     ...record,
     unitAmount: {
@@ -46,4 +46,17 @@ export const getItemRecord = (
       grossAmount: netAmount + vat,
     },
   };
+};
+
+export const getArticleTypeText = (type: ArticleType): string => {
+  switch (type) {
+    case ArticleType.LABOR:
+      return 'Labor';
+    case ArticleType.MATERIAL:
+      return 'Material';
+    case ArticleType.PACKAGE:
+      return 'Package';
+    default:
+      return '';
+  }
 };

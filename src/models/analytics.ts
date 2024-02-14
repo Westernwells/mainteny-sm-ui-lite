@@ -8,6 +8,7 @@ export enum FormatType {
   CSV = 'CSV',
   XERO = 'Xero',
   DATEV = 'DATEV',
+  SAGE50 = 'Sage50 (csv)',
 }
 
 export interface QueryWorkingHours {
