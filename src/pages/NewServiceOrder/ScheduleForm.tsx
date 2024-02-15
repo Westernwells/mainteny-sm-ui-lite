@@ -91,13 +91,15 @@ export const ScheduleForm = ({
             <TimePicker
               defaultTime={defaultStartDate}
               containerStyles={{mr: '1em'}}
-              maxTime={formik.values.endTime}
               getSelectedTime={(time) => {
                 if (time && !Number.isNaN(time.getTime())) {
-                  formik.setValues({
-                    ...formik.values,
-                    startTime: time,
-                  });
+                  const newStartTime = time;
+                  formik.setFieldValue('startTime', newStartTime);
+
+                  const newEndTime = new Date(
+                    newStartTime.getTime() + 65 * 60000,
+                  );
+                  formik.setFieldValue('endTime', newEndTime);
                 }
               }}
               textFieldProps={{
@@ -114,14 +116,11 @@ export const ScheduleForm = ({
             />
 
             <TimePicker
-              defaultTime={defaultEndDate}
+              defaultTime={formik.values.endTime || defaultEndDate}
               minTime={formik.values.startTime}
               getSelectedTime={(time) => {
                 if (time && !Number.isNaN(time.getTime())) {
-                  formik.setValues({
-                    ...formik.values,
-                    endTime: time,
-                  });
+                  formik.setFieldValue('endTime', time);
                 }
               }}
               textFieldProps={{
