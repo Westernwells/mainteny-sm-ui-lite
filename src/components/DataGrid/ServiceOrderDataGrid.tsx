@@ -8,7 +8,7 @@ import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {StatusChip} from 'components/StatusChip';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
-import {ServiceOrderView} from 'models/service-order';
+import {ServiceOrderOrderField, ServiceOrderView} from 'models/service-order';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {
   getServiceOrderStatusColor,
@@ -21,6 +21,7 @@ import {
 import {EmptySection} from 'components/EmptySection';
 import {useTranslation} from 'react-i18next';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import {Order} from 'models/misc';
 import {styles} from './style';
 
 interface Props {
@@ -114,6 +115,8 @@ export const ServiceOrdersDataGrid = ({
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: search,
+      order: Order.DESC,
+      orderBy: ServiceOrderOrderField.CREATED_TIME,
     },
     {keepPreviousData: true},
   );

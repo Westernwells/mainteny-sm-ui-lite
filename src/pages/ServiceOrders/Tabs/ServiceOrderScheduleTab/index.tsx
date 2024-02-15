@@ -95,7 +95,7 @@ export const ServiceOrderScheduleTab = () => {
     pageIndex: page.pageIndex,
     query: '',
     status: [ServiceOrderStatus.READY_TO_SCHEDULE, ServiceOrderStatus.INIT],
-    order: Order.ASC,
+    order: Order.DESC,
     orderBy: ServiceOrderOrderField.CREATED_TIME,
   });
 
