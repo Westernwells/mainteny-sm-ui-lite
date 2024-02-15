@@ -522,6 +522,7 @@ export const ArticleItemsTableQuotation = ({
               text="Add Article"
               onClick={() => createEmptyItem()}
               sxContainer={{flexGrow: 1}}
+              testId="AddArticle"
             />
           </Box>
         )}
