@@ -4,6 +4,7 @@ import {endOfYear, startOfYear} from 'date-fns';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {
+  ServiceOrderOrderField,
   ServiceOrderStatus,
   ServiceOrderType,
   ServiceOrderView,
@@ -22,6 +23,7 @@ import {
   serviceOrderTypeToEnum,
   serviceOrderTypeToString,
 } from 'utils/service-order-utils';
+import {Order} from 'models/misc';
 import {columns, makeRows} from './ServiceHistoryDataGridProps';
 
 const pageSize = 25;
@@ -64,6 +66,8 @@ export const ServiceHistoryTab = () => {
     pageIndex: page.pageIndex,
     pageSize: page.pageSize,
     query: search,
+    order: Order.DESC,
+    orderBy: ServiceOrderOrderField.CREATED_TIME,
     status,
     types,
   });
