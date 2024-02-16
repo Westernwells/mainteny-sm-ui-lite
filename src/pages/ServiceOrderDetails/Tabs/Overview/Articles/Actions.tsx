@@ -86,11 +86,10 @@ export const Actions = ({
       icon: <EditIcon />,
       onClick: () => {
         setOpenEditDialog(true);
-        setCurrentArticle(
-          serviceOrderArticles?.find(
-            (item) => item.id === serviceOrderArticleId,
-          ),
+        const current = serviceOrderArticles?.find(
+          (item) => item.id === serviceOrderArticleId,
         );
+        setCurrentArticle(current);
       },
     });
 
@@ -153,6 +152,7 @@ export const Actions = ({
       serviceOrderArticleId: currentArticle?.id!,
     });
     setOpenEditDialog(false);
+    setCurrentArticle(undefined);
   };
 
   return (
@@ -210,7 +210,7 @@ export const Actions = ({
         <EditArticleForm
           serviceOrderArticle={
             serviceOrderArticles?.find(
-              (item) => article.id === item.article.id,
+              (item) => item.id === serviceOrderArticleId,
             )!
           }
           setFormikValues={setFormikValues}
