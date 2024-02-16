@@ -158,6 +158,11 @@ export const getCurrencySymbol: {[key: string]: string} = {
   CNY: '¥',
   JPY: '¥',
   BAM: 'KM',
+  CHF: '₣',
+  RUB: '₽',
+  DKK: 'kr.',
+  NGN: '₦',
+  GEL: '₾',
 };
 
 export const useCurrentCurrency = (): CurrencyModalType => {
