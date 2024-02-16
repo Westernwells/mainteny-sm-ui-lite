@@ -2040,5 +2040,6 @@
   "Choose a payment type for the partial invoice from Lump-Sum, Percentage or per Article, You can’t change your selection later.": "Wählen Sie eine Zahlungsart für die Teilrechnung: Pauschal, Prozentsatz oder pro Artikel. Sie können Ihre Auswahl später nicht mehr ändern.",
   "Choose a payment type for the upfront invoice from Lump-Sum or Percentage. You can’t change your selection later for the subsequent invoices.": "Wählen Sie eine Zahlungsart für die Abschlagsrechnung aus: Pauschalbetrag oder Prozentsatz. Sie können Ihre Auswahl später für die Folgerechnungen nicht mehr ändern.",
   "New Company": "Neues Unternehmen",
-  "Companies": "Unternehmen "
+  "Companies": "Unternehmen ",
+  "Asia/Tbilisi": "Asien/Tbilisi"
 }
