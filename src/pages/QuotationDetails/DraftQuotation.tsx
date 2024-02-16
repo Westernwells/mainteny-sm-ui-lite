@@ -213,8 +213,24 @@ export const DraftQuotation = ({formType, quotation}: Props) => {
     });
 
   const initialValues: QuotationFormData = {
+<<<<<<< HEAD
     subject: quotation?.subject || t('Quotation'),
     description: quotation?.description || '',
+=======
+    subject:
+      quotation?.subject ||
+      t('New Quotation - {{companyName}}', {
+        companyName: user?.userAccount.serviceCompany.name,
+      }),
+    description:
+      quotation?.description ||
+      t(
+        'Thank you for considering {{companyName}} offer. We are pleased to present you with a comprehensive quotation tailored to meet your requirements.',
+        {
+          companyName: user?.userAccount.serviceCompany.name,
+        },
+      ),
+>>>>>>> 985e5ab55b1633998fc013b78ade1537c2135fb8
     elevatorId: quotation?.elevator.id || '',
     notes: quotation?.additionalInfo.notes || '',
     items: quotation?.items || [],
@@ -797,8 +813,13 @@ export const DraftQuotation = ({formType, quotation}: Props) => {
                 label: 'Subject',
                 onChange: formik.handleChange,
                 onBlur: formik.handleBlur,
+<<<<<<< HEAD
                 error: !!formik.errors.subject,
                 helperText: formik.errors.subject ? formik.errors.subject : '',
+=======
+                error: !!(formik.touched.subject && formik.errors.subject),
+                helperText: formik.touched.subject && formik.errors.subject,
+>>>>>>> 985e5ab55b1633998fc013b78ade1537c2135fb8
                 fullWidth: true,
                 required: true,
               }}

@@ -201,7 +201,7 @@ export const Checklist = () => {
         ? checkListComponentViewToExtendedCreateCheckListRecord(
             checklist.components,
           )
-        : [getComponentMock(CheckListComponentType.SINGLE_CHECK)],
+        : [],
     }),
     [],
   );

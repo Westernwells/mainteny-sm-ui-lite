@@ -227,8 +227,6 @@ export function useServiceOrders(
       queryServiceOrders({
         ...params,
         serviceCompanyId: user!.userAccount.serviceCompany.id,
-        order: Order.ASC,
-        orderBy: ServiceOrderOrderField.CREATED_TIME,
       }),
     {enabled: !!user, ...options},
   );
