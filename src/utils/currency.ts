@@ -94,6 +94,11 @@ export const Currencies: StringMap<number> = {
   USD: 2,
   GBP: 2,
   JPY: 0,
+  CHF: 2,
+  RUB: 2,
+  DKK: 2,
+  NGN: 2,
+  GEL: 2,
 };
 
 export function getCurrencyFractionDigits(currency: string) {
