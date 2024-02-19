@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router';
 import printJS from 'print-js';
@@ -24,6 +24,7 @@ import {Confirm} from 'components/Confirm';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
 import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
+import {LanguageContext} from 'context/LanguageProvider';
 import {
   useCancelInvoice,
   useDeleteInvoice,
@@ -64,6 +65,7 @@ export const Actions = ({
   isInvoiceList = true,
 }: Props) => {
   const {t} = useTranslation();
+  const {language: selectedLng} = useContext(LanguageContext);
   const navigate = useNavigate();
   const {enqueueSnackbar} = useSnackbar();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -120,8 +122,9 @@ export const Actions = ({
     setIsSendEmailDialogOpen(true);
   }, [invoice]);
 
+  const cancelText = selectedLng === 'DE' ? 'Stornieren' : t('Cancel');
   const cancelItem = {
-    label: t('Cancel'),
+    label: cancelText,
     icon: <CancelIcon />,
     onClick: () => {
       setIsCancelledDialogOpen(true);
