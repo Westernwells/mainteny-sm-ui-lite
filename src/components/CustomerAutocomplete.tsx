@@ -22,8 +22,7 @@ export const CustomerAutoComplete = ({
   textFieldProps,
   disabled,
 }: Props) => {
-  const [query, setQuery] = useState<string>('');
-  const [queryView, setQueryView] = useState(initialValue?.name || '');
+  const [query, setQuery] = useState<string>(initialValue?.name || '');
   const [customer, setCustomer] = useState<PropertyOwnerView | null>(
     initialValue,
   );
@@ -39,7 +38,7 @@ export const CustomerAutoComplete = ({
       setCustomer(initialValue);
     }
 
-    setQuery(initialValue?.name!);
+    setQuery(initialValue?.name || '');
   }, [initialValue]);
 
   const debouncedChangeHandler = useCallback(
@@ -54,14 +53,10 @@ export const CustomerAutoComplete = ({
     newValue: string,
     reason: string,
   ) => {
-    if (newValue) {
-      setQueryView(newValue);
-      debouncedChangeHandler(newValue);
-    }
+    debouncedChangeHandler(newValue);
 
     if (reason === 'clear') {
       setQuery('');
-      setQueryView('');
       setCustomer(null);
     }
   };
@@ -73,15 +68,13 @@ export const CustomerAutoComplete = ({
   }, [customer]);
 
   useEffect(() => {
-    if (getQuery) {
-      getQuery(queryView);
-    }
-
-    if (!queryView) {
+    if (!query) {
       setCustomer(null);
-      if (getQuery) getQuery('');
+      getQuery?.('');
+    } else {
+      getQuery?.(query);
     }
-  }, [queryView]);
+  }, [query]);
 
   return (
     <Autocomplete
@@ -103,7 +96,7 @@ export const CustomerAutoComplete = ({
       getOptionLabel={(option) => option.name}
       onInputChange={onInputChange}
       value={customer}
-      inputValue={queryView}
+      inputValue={query}
       renderInput={(params) => (
         <FormInput
           props={{
