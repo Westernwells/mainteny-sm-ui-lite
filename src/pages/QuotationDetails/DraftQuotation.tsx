@@ -272,10 +272,39 @@ export const DraftQuotation = ({formType, quotation}: Props) => {
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
-    formik.setFieldValue('propertyOwnerId', row.id);
-    formik.setFieldValue('billingAddress', row.billingAddress);
-    formik.setFieldValue('beneficiaryAddress', row.beneficiaryAddress);
-    formik.setFieldValue('alternativeAddress', row.otherAddress);
+    const quotationCustomer = quotation?.elevator.propertyOwner;
+    if (row.id !== quotationCustomer?.id) {
+      const emptyAddressState = {fullName: null};
+      formik.setFieldValue('propertyOwnerId', row.id);
+      formik.setFieldValue(
+        'billingAddress',
+        row.billingAddress || emptyAddressState,
+      );
+      formik.setFieldValue(
+        'beneficiaryAddress',
+        row.beneficiaryAddress || emptyAddressState,
+      );
+      formik.setFieldValue(
+        'alternativeAddress',
+        row.otherAddress || emptyAddressState,
+      );
+    } else {
+      formik.setFieldValue(
+        'billingAddress',
+        quotation?.additionalInfo?.billingAddress ||
+          quotationCustomer?.billingAddress,
+      );
+      formik.setFieldValue(
+        'beneficiaryAddress',
+        quotation?.additionalInfo?.beneficiaryAddress ||
+          quotationCustomer?.beneficiaryAddress,
+      );
+      formik.setFieldValue(
+        'alternativeAddress',
+        quotation?.additionalInfo.alternativeAddress ||
+          quotationCustomer?.otherAddress,
+      );
+    }
   };
 
   const handleSelectUnit = (row: ElevatorView) => {
@@ -461,18 +490,18 @@ export const DraftQuotation = ({formType, quotation}: Props) => {
 
       formik.setFieldValue(
         'billingAddress',
-        quotation.additionalInfo?.billingAddress ??
+        quotation.additionalInfo?.billingAddress ||
           quotationCustomer?.billingAddress,
       );
 
       formik.setFieldValue(
         'beneficiaryAddress',
-        quotation.additionalInfo?.beneficiaryAddress ??
+        quotation.additionalInfo?.beneficiaryAddress ||
           quotationCustomer?.beneficiaryAddress,
       );
       formik.setFieldValue(
         'alternativeAddress',
-        quotation.additionalInfo?.alternativeAddress ??
+        quotation.additionalInfo?.alternativeAddress ||
           quotationCustomer?.otherAddress,
       );
 
@@ -554,7 +583,7 @@ export const DraftQuotation = ({formType, quotation}: Props) => {
     );
     formik.setFieldValue(
       'alternativeServiceCompanyInfo',
-      quotation?.additionalInfo.alternativeServiceCompanyInfo ?? {
+      quotation?.additionalInfo.alternativeServiceCompanyInfo || {
         name: user?.userAccount.serviceCompany.name || '',
         address: user?.userAccount.serviceCompany.postalAddress,
       },
