@@ -311,17 +311,28 @@ export const SelectTechnicians = ({
 
   const getSchedulePeriod = (period: 'start' | 'end' | 'now') => {
     const now = new Date();
-    // add 5min to the current time
     if (period === 'start') {
-      now.setMinutes(now.getMinutes() + 5);
+      now.setMinutes(now.getMinutes());
       return now;
     }
-    // add a 1 hour, 5mins to the current time
     if (period === 'end') {
-      now.setMinutes(now.getMinutes() + 65);
+      now.setMinutes(now.getMinutes() + 60);
       return now;
     }
     // retuns current time
+    return now;
+  };
+
+  const getScheduledPeriodDivisbleByFive = (period: 'start' | 'end') => {
+    const now = getSchedulePeriod(period);
+    const minutes = now.getMinutes();
+    const divisibleByFive = minutes % 5 === 0;
+    if (divisibleByFive) {
+      return now;
+    }
+    const remainder = minutes % 5;
+    const diff = 5 - remainder;
+    now.setMinutes(minutes + diff);
     return now;
   };
 
@@ -406,9 +417,9 @@ export const SelectTechnicians = ({
         {selectedOption === RadioOptions.SCHEDULE_TECHNICIAN ? (
           <ScheduleForm
             containerStyles={{pl: '1em', mt: '2em', maxWidth: '30%'}}
-            defaultEndDate={getSchedulePeriod('end')}
+            defaultEndDate={getScheduledPeriodDivisbleByFive('end')}
             currentRadioOption={selectedOption}
-            defaultStartDate={getSchedulePeriod('start')}
+            defaultStartDate={getScheduledPeriodDivisbleByFive('start')}
             defaultTechnician={null}
             scheduleFormIsErrored={(val) =>
               scheduleFormIsErrored && scheduleFormIsErrored(val)
