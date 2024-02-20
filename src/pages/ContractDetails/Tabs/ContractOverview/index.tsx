@@ -1,4 +1,4 @@
-import {FC, useEffect, useMemo, useState} from 'react';
+import React, {FC, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -17,7 +17,6 @@ import {
   ContractOrderField,
   ContractPaymentTermView,
   ContractRequestBody,
-  ContractStatus,
   ContractUpdateRequest,
   ContractView,
 } from 'models/contract';
@@ -38,26 +37,30 @@ import {
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {
-  calculateRenewDays,
-  contractTypeMap,
-  invoiceCycle,
-} from 'utils/contract-utils';
+import {calculateRenewDays} from 'utils/contract-utils';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import Tooltip from '@mui/material/Tooltip';
-import {formatDate, isDateInPast} from 'utils/datetime';
-import {StatusChip} from 'components/StatusChip';
-import {capitalize} from 'lodash';
+import {formatDate} from 'utils/datetime';
+import {ReactComponent as BusinessContractApprove} from 'assets/icons/business-contract-approve-gray.svg';
 import {Order} from 'models/misc';
 import {createEmptyResource} from 'utils/paging-utils';
 import {ContractPaymentTermInput} from 'components/ContractPaymentTermInput';
 import {ContractPaymentTerm} from 'components/ContractPaymentTerm';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Divider from '@mui/material/Divider';
+import Menu from '@mui/material/Menu';
+import MoreIcon from '@mui/icons-material/MoreVert';
+import IconButton from '@mui/material/IconButton';
+import CancelIcon from '@mui/icons-material/Cancel';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
 import EditContractForm from './EditContractForm';
 import {ContractParties} from './ContractParties';
 import {DescriptionForm} from './DescriptionForm';
+import {SectionTitle} from '../../../InvoiceDetails/SectionTitle';
 
 interface Props {
   contractDetails: ContractView;
@@ -101,7 +104,8 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const [paymentTermToEdit, setPaymentTermToEdit] = useState<
     ContractPaymentTermView | undefined
   >(undefined);
-
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
   const {mutateAsync: uploadFiles} = useUploadFiles(
     'Documents uploaded successfully',
   );
@@ -172,6 +176,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       endDate: contractDetails?.end ?? '',
       autoRenewalCancelled:
         contractDetails?.additionalInfo.autoRenewalCancelled ?? false,
+      numberOfUnits: contractDetails?.elevators?.length,
     },
     onSubmit: () => {},
     enableReinitialize: true,
@@ -191,15 +196,13 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       user?.userAccount?.serviceCompany?.settings?.contractNameTypes.find(
         (item) => item.name === formik.values.name,
       );
-    const isContractRenewable =
-      !formik.values.renewalTerms && isDateInPast(formik.values.endDate);
 
     const updatedContract = {
       ...contractDetails?.additionalInfo,
       type: contractNameType?.type || '',
       name: formik.values?.name || '',
       renewalTerms: formik.values.renewalTerms ? formik.values.renewalTerms : 0,
-      renewalDate: isContractRenewable
+      renewalDate: formik.values.autoRenewalCancelled
         ? null
         : contractDetails?.additionalInfo.renewalDate,
       price: {
@@ -228,7 +231,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       paymentTermId: formik.values.paymentTermId,
       description: formik.values.description,
       externalId: formik.values.externalId,
-      autoRenewalCancelled: isContractRenewable,
+      autoRenewalCancelled: formik.values.autoRenewalCancelled,
     };
 
     await updateContract({
@@ -320,12 +323,83 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     [],
   );
 
+  const actions = useMemo(() => {
+    const items = [];
+
+    items.push({
+      label: t('Edit'),
+      icon: <EditIcon />,
+      onClick: () => setOpenContractDialog(true),
+    });
+
+    items.push({
+      label: t('Cancel contract'),
+      icon: <CancelIcon />,
+      onClick: () => setOpenContractDialog(false),
+    });
+
+    return items;
+  }, []);
+
   const unUsedContractDays =
     (!isLoading && calculateRenewDays(contractDetails)) || 0;
 
   if (isLoading) {
     return <Progress />;
   }
+
+  const handleClick = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const renderMenu = () => (
+    <Menu
+      id="actions-menu"
+      anchorEl={anchorEl}
+      open={open}
+      onClose={handleClose}
+      MenuListProps={{
+        'aria-labelledby': 'actions-button',
+      }}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      transformOrigin={{
+        vertical: 'bottom',
+        horizontal: 'right',
+      }}>
+      {actions.map((item, index) => (
+        <Box key={`${item.label}-${index}`}>
+          <MenuItem
+            onClick={() => {
+              item.onClick();
+              handleClose();
+            }}
+            sx={{py: '0.5rem'}}>
+            <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItemText>
+              <Typography variant="body2">{item.label}</Typography>
+            </ListItemText>
+          </MenuItem>
+          {index === 0 && actions.length > 0 && (
+            <Divider
+              sx={{
+                flexBasis: '100%',
+                border: `0.5px solid ${theme.palette.action.disabledBackground}`,
+                mt: '-0.5em',
+                mb: '1em',
+              }}
+            />
+          )}
+        </Box>
+      ))}
+    </Menu>
+  );
 
   const uploadedDocument = contractDetails?.additionalInfo?.documents;
   return (
@@ -341,37 +415,23 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             minHeight="12rem"
             headerStyles={headerStyles}
             bodyContainerStyle={{}}
-            handleAction={() => setOpenContractDialog(true)}
             header={
-              <Box sx={{display: 'flex', alignItems: 'center'}}>
-                <Typography variant="subtitle1">
-                  {contractDetails?.externalId}
-                </Typography>
-
-                <StatusChip
-                  color={
-                    contractDetails?.status === ContractStatus.VALID
-                      ? 'success'
-                      : contractDetails?.status === ContractStatus.EXPIRING
-                      ? 'warning'
-                      : 'error'
-                  }
-                  label={
-                    contractDetails?.status === ContractStatus.PENDING ||
-                    contractDetails?.status === ContractStatus.EXPIRED
-                      ? 'Inactive'
-                      : contractDetails?.status === ContractStatus.VALID
-                      ? 'Active'
-                      : capitalize(contractDetails?.status!)
-                  }
-                  style={{ml: '2em'}}
-                />
-              </Box>
+              <SectionTitle
+                Icon={BusinessContractApprove}
+                title="Basic Information"
+              />
             }
-            headerActionIcon={<EditIcon />}>
+            headerActionIcon={
+              <>
+                <IconButton onClick={handleClick}>
+                  <MoreIcon fontSize="small" sx={{color: 'action.active'}} />
+                </IconButton>
+                {renderMenu()}
+              </>
+            }>
             {/** TODO: Pass down the full contract instead of long props */}
             <ContractBasic
-              numberOfVisits={contractDetails?.visitsNumber}
+              autoRenewal={contractDetails?.additionalInfo.autoRenewalCancelled}
               costPerYear={
                 formatCurrency(
                   (contractDetails?.additionalInfo?.price?.netAmount || 0) /
@@ -381,25 +441,13 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   {currency: contractDetails.additionalInfo.price?.currency},
                 ) || '-'
               }
-              spendingLimit={formatCurrency(
-                contractDetails ? contractDetails?.spendingLimit : 0,
-                {currency: contractDetails.additionalInfo.price?.currency},
-              )}
               renewalPeriod={contractDetails?.additionalInfo?.renewalTerms}
-              invoiceCycle={
-                contractDetails?.additionalInfo?.invoiceCycle !== undefined &&
-                contractDetails?.additionalInfo?.invoiceCycle >= 0
-                  ? invoiceCycle[contractDetails?.additionalInfo?.invoiceCycle]
-                  : ''
-              }
               numberOfUnits={contractDetails?.elevators?.length}
-              type={contractTypeMap[contractDetails?.type]}
               name={contractDetails?.name}
-              paymentDue={contractDetails?.additionalInfo?.invoiceDueDays}
               yearlyPriceAdjustment={
                 contractDetails?.additionalInfo?.annualPriceAdjustmentPercentage
               }
-              noticePreiod={
+              noticePeriod={
                 contractDetails?.additionalInfo?.noticePeriodInMonth
               }
               discount={contractDetails?.additionalInfo?.discounts?.map(
@@ -409,8 +457,9 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                     days: item.days,
                   })}`,
               )}
-              firstMaintenance={contractDetails.additionalInfo.firstMaintenance}
-              firstInvoiceDate={contractDetails.additionalInfo.firstInvoiceDate}
+              start={contractDetails.start}
+              end={contractDetails.end}
+              contractNumber={contractDetails.externalId}
             />
             <Dialog
               title="Edit Contract"
@@ -418,8 +467,11 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               disableSaveBtn={
                 !!Object.keys(formik.errors).length || !formik.dirty
               }
+              dialogProps={{
+                maxWidth: 'md',
+                open: openContractDialog || false,
+              }}
               onSave={() => onContractSave()}
-              dialogProps={{open: openContractDialog || false}}
               leftButton={
                 <Tooltip
                   title={

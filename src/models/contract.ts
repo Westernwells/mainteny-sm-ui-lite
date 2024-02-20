@@ -287,6 +287,7 @@ export interface ContractUpdateRequest {
   autoRenewalCancelled: boolean;
   description?: string;
   paymentTermId?: string;
+  numberOfUnits?: number;
 }
 
 export interface ContractPaymentTermView {
