@@ -25,9 +25,9 @@ export const useServiceCompanyXeroSettings = (serviceCompanyId: string) =>
 
 export const updateXeroIntegration = async (
   serviceCompanyId: string,
-  data: Omit<XeroIntegrationRecord, 'enabled'>,
+  data: XeroIntegrationRecord,
 ) => {
-  const response = await axiosClient.put(
+  const response = await axiosClient.put<XeroIntegrationView>(
     `/api/serviceCompanies/${serviceCompanyId}/settings/xero`,
     data,
     {
@@ -39,6 +39,31 @@ export const updateXeroIntegration = async (
 };
 
 export const useUpdateServiceCompanyXeroSettings = (serviceCompanyId: string) =>
-  useMutation((data: Omit<XeroIntegrationRecord, 'enabled'>) =>
+  useMutation((data: XeroIntegrationRecord) =>
     updateXeroIntegration(serviceCompanyId, data),
   );
+
+export const deleteXeroIntegration = async (serviceCompanyId: string) => {
+  const response = await axiosClient.delete(
+    `/api/serviceCompanies/${serviceCompanyId}/settings/xero/disconnect`,
+    {
+      params: {serviceCompanyId},
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useDeleteServiceCompanyXeroSettings = (serviceCompanyId: string) =>
+  useMutation(() => deleteXeroIntegration(serviceCompanyId));
+
+export const getXeroAuthUrl = async (serviceCompanyId: string) => {
+  const response = await axiosClient.get<string>(
+    `/api/serviceCompanies/${serviceCompanyId}/xero/auth/url`,
+  );
+  return response.data;
+};
+export const useServiceCompanyXeroAuthUrl = (serviceCompanyId: string) =>
+  useQuery(queryKeys.fetchXeroAuthUrl, () => getXeroAuthUrl(serviceCompanyId), {
+    enabled: !!serviceCompanyId,
+  });

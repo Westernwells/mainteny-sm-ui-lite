@@ -20,8 +20,9 @@ import {Button as LoadingButton} from 'components/LoadingButton';
 interface Props {
   open: boolean;
   isLoading?: boolean;
+  hasError?: boolean;
   integration?: XeroIntegrationView;
-  onSave: (data: Omit<XeroIntegrationRecord, 'enabled'>) => void;
+  onSave: (data: XeroIntegrationRecord) => void;
   onCancel: () => void;
 }
 
@@ -30,6 +31,7 @@ const XeroDialog: FC<Props> = ({
   onCancel,
   onSave,
   isLoading,
+  hasError,
   integration,
 }) => {
   const {t} = useTranslation();
@@ -39,9 +41,8 @@ const XeroDialog: FC<Props> = ({
     watch,
     reset,
     formState: {errors},
-  } = useForm<Omit<XeroIntegrationRecord, 'enabled'>>({
+  } = useForm<XeroIntegrationRecord>({
     mode: 'onBlur',
-    defaultValues: {...integration, secret: integration?.secretFingerprint},
   });
   const watchAllFields = watch();
 
@@ -49,25 +50,38 @@ const XeroDialog: FC<Props> = ({
     reset();
   }, [integration, reset]);
 
-  const onSubmit: SubmitHandler<Omit<XeroIntegrationRecord, 'enabled'>> = (
-    data,
-  ) => {
+  const onSubmit: SubmitHandler<XeroIntegrationRecord> = (data) => {
     onSave(data);
-    if (!isLoading) {
-      onCancel();
-    }
   };
 
-  const renderAlert = () => (
-    <Alert severity="info">
-      <Typography variant="subtitle2">{t('Xero integration')}</Typography>
-      <Typography variant="body1">
-        {t(
-          'After you’ve entered the information bellow you will be redirected to Xero official page.',
-        )}
-      </Typography>
-    </Alert>
-  );
+  const renderAlert = () => {
+    if (hasError) {
+      return (
+        <Alert severity="error">
+          <Typography variant="subtitle2">{t('Connection failed')}</Typography>
+          <Typography variant="body1">
+            {t(
+              'This can happen due to third-party providers. Try changing your credentials and try again or contact the Mainteny team at ',
+            )}
+            <a style={{color: 'inherit'}} href="mailto:support@mainteny.com">
+              support@mainteny.com
+            </a>
+            .
+          </Typography>
+        </Alert>
+      );
+    }
+    return (
+      <Alert severity="info">
+        <Typography variant="subtitle2">{t('Xero integration')}</Typography>
+        <Typography variant="body1">
+          {t(
+            'After you’ve entered the information bellow you will be redirected to Xero official page.',
+          )}
+        </Typography>
+      </Alert>
+    );
+  };
 
   return (
     <Dialog

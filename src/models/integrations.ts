@@ -3,6 +3,7 @@ export interface XeroIntegrationView {
   clientId: string;
   tenantId: string;
   secretFingerprint: string;
+  xeroAuthUrl?: string;
 }
 
 export interface XeroIntegrationRecord {
