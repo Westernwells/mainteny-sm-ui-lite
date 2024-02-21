@@ -618,7 +618,9 @@ export const InvoiceForm = ({
   useEffect(() => {
     if (serviceOrder) {
       const serviceOrderCustomer = serviceOrder.elevator.propertyOwner;
-
+      if (!formik.values.description && serviceOrder.report?.description) {
+        formik.setFieldValue('description', serviceOrder.report.description);
+      }
       formik.setFieldValue(
         'propertyOwnerId',
         serviceOrder.elevator.propertyOwner.id,
