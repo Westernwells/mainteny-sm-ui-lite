@@ -153,10 +153,6 @@ export const ArticleItemRowNEW = ({
   const formik = useFormik<InvoiceItemRecord>({
     initialValues: {
       ...articleItem,
-      article: {
-        ...articleItem.article,
-        unit: articleItem.article?.unit ?? 'pcs',
-      },
       quantity: articleItem.quantity !== 0 ? articleItem.quantity : 1,
       unitAmount: {
         ...articleItem.unitAmount,
