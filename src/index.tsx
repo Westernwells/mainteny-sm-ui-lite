@@ -13,7 +13,6 @@ import {initSmartlook} from 'utils/smart-look';
 import {App} from './App';
 import {theme} from './theme';
 import './assets/fonts/Aventa/Aventa-Regular.ttf';
-import {LicenseInfo} from '@mui/x-license-pro';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -50,8 +49,6 @@ initSmartlook();
 // Updated part for React 18
 const container = document.querySelector('#root') as Element;
 const root = createRoot(container); // Create a root.
-
-LicenseInfo.setLicenseKey(import.meta.env.REACT_APP_MUI_PRO_LICENSE);
 
 root.render(
   <ThemeProvider theme={theme}>
