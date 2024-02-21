@@ -10,7 +10,7 @@ import {
 } from 'hooks/reactQuery/useContract';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
-import {PopperProps, useMediaQuery} from '@mui/material';
+import {useMediaQuery} from '@mui/material';
 import {useParams} from 'react-router-dom';
 import {useFormik} from 'formik';
 import {
@@ -38,10 +38,8 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {calculateRenewDays} from 'utils/contract-utils';
-import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
-import Tooltip from '@mui/material/Tooltip';
-import {formatDate} from 'utils/datetime';
 import {ReactComponent as BusinessContractApprove} from 'assets/icons/business-contract-approve-gray.svg';
+import {ReactComponent as BriefcaseGray} from 'assets/icons/briefcase-gray.svg';
 import {Order} from 'models/misc';
 import {createEmptyResource} from 'utils/paging-utils';
 import {ContractPaymentTermInput} from 'components/ContractPaymentTermInput';
@@ -61,6 +59,7 @@ import EditContractForm from './EditContractForm';
 import {ContractParties} from './ContractParties';
 import {DescriptionForm} from './DescriptionForm';
 import {SectionTitle} from '../../../InvoiceDetails/SectionTitle';
+import {CancelContract} from './CancelContract';
 
 interface Props {
   contractDetails: ContractView;
@@ -85,12 +84,18 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const currency = contractDetails?.currency ?? currentCurrency.code;
   const {id: contractId} = useParams();
   const theme = useTheme();
-  const {mutateAsync: updateContract} = useUpdateContract('Contract updated');
+  const {mutateAsync: updateContract, isLoading: isUpdateLoading} =
+    useUpdateContract('Contract updated');
   const {user} = useUserSession();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [openContractDialog, setOpenContractDialog] = useState(false);
   const [openDocumentDialog, setOpenDocumentDialog] = useState(false);
+
+  const [openCancelContract, setCancelContract] = useState(false);
+  const [cancellationDate, setCancellationDate] = useState(
+    contractDetails?.end || '',
+  );
 
   const [documents, setDocuments] = useState<FileWithPreview[]>([]);
   const [openDescriptionDialog, setOpenDescriptionDialog] = useState(false);
@@ -191,6 +196,12 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     setUpdatedValue(formik.values.externalId!);
   }, [formik]);
 
+  useEffect(() => {
+    if (contractDetails?.end) {
+      setCancellationDate(contractDetails?.end);
+    }
+  }, [contractDetails?.end]);
+
   const onContractSave = async () => {
     const contractNameType =
       user?.userAccount?.serviceCompany?.settings?.contractNameTypes.find(
@@ -239,6 +250,19 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       contractId: contractId!,
     });
     setOpenContractDialog(false);
+  };
+
+  const onCancelContract = async () => {
+    const updatedContract = {
+      autoRenewalCancelled: true,
+      endDate: cancellationDate,
+    };
+
+    await updateContract({
+      body: updatedContract as any,
+      contractId: contractId!,
+    });
+    setCancelContract(false);
   };
 
   const onDocsPreview = async () => {
@@ -298,13 +322,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     );
   };
 
-  const handleAutoRenewal = () => {
-    formik.setFieldValue(
-      'autoRenewalCancelled',
-      !formik.values.autoRenewalCancelled,
-    );
-  };
-
   const handleCancel = () => {
     formik.resetForm();
     setOpenContractDialog(false);
@@ -335,7 +352,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     items.push({
       label: t('Cancel contract'),
       icon: <CancelIcon />,
-      onClick: () => setOpenContractDialog(false),
+      onClick: () => setCancelContract(true),
     });
 
     return items;
@@ -413,12 +430,11 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
         <Grid item xs={12} md={8}>
           <InfoCard
             minHeight="12rem"
-            headerStyles={headerStyles}
-            bodyContainerStyle={{}}
             header={
               <SectionTitle
                 Icon={BusinessContractApprove}
                 title="Basic Information"
+                containerSx={{backgroundColor: 'unset'}}
               />
             }
             headerActionIcon={
@@ -463,6 +479,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             />
             <Dialog
               title="Edit Contract"
+              isSaving={isUpdateLoading}
               onCancel={handleCancel}
               disableSaveBtn={
                 !!Object.keys(formik.errors).length || !formik.dirty
@@ -471,47 +488,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 maxWidth: 'md',
                 open: openContractDialog || false,
               }}
-              onSave={() => onContractSave()}
-              leftButton={
-                <Tooltip
-                  title={
-                    !formik.values.autoRenewalCancelled
-                      ? t('This contract is ending on {{endDate}}', {
-                          endDate: formatDate(formik.values.endDate),
-                        })
-                      : ''
-                  }
-                  placement="top-end"
-                  arrow
-                  PopperProps={
-                    {
-                      sx: {
-                        marginRight: '-4.6em !important',
-                      },
-                    } as Partial<PopperProps> | undefined
-                  }>
-                  <span>
-                    <Button
-                      buttonProps={{
-                        onClick: handleAutoRenewal,
-                        size: 'large',
-                        sx: {marginLeft: '1em'},
-                        color: !formik.values.autoRenewalCancelled
-                          ? 'error'
-                          : 'primary',
-                        endIcon: !formik.values.autoRenewalCancelled && (
-                          <ReportProblemOutlinedIcon />
-                        ),
-                      }}>
-                      <Typography variant="subtitle2">
-                        {!formik.values.autoRenewalCancelled
-                          ? t('End Contract')
-                          : t('Resume Contract')}
-                      </Typography>
-                    </Button>
-                  </span>
-                </Tooltip>
-              }>
+              onSave={() => onContractSave()}>
               {!isLoading && (
                 <EditContractForm
                   formik={formik}
@@ -520,6 +497,14 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 />
               )}
             </Dialog>
+            <CancelContract
+              isLoading={isUpdateLoading}
+              onCancelContract={onCancelContract}
+              setCancelContract={setCancelContract}
+              openCancelContract={openCancelContract}
+              setCancellationDate={setCancellationDate}
+              endDate={cancellationDate}
+            />
           </InfoCard>
         </Grid>
         <Grid item xs={12} md={4}>
@@ -569,12 +554,44 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               height: 'calc(100% - 1em)',
             }}
             header={
-              <Box sx={headerStyles}>
-                <Typography variant="subtitle1" mr="0.5em">
-                  {t('Parties')}
-                </Typography>
+              <Box>
+                <SectionTitle
+                  Icon={BriefcaseGray}
+                  title="Parties"
+                  containerSx={{backgroundColor: 'unset'}}
+                />
               </Box>
             }>
+            <Grid
+              container
+              sx={{
+                flexBasis: '100%',
+                borderBottom: `2px solid ${theme.palette.action.disabledBackground}`,
+                mt: '0.5em',
+                mb: '1em',
+                lineHeight: '38px',
+              }}>
+              <Grid
+                item
+                xs={5}
+                sx={{color: theme.palette.text.secondary, fontWeight: 600}}>
+                {t('CONTRACT PARTY')}
+              </Grid>
+              <Grid
+                item
+                xs={5}
+                alignSelf="center"
+                sx={{color: theme.palette.text.secondary, fontWeight: 600}}>
+                {t('ADDRESS')}
+              </Grid>
+              <Grid
+                item
+                xs={2}
+                alignSelf="center"
+                sx={{color: theme.palette.text.secondary, fontWeight: 600}}>
+                {t('PARTY TYPE')}
+              </Grid>
+            </Grid>
             <ContractParties
               name={user?.userAccount.serviceCompany.name}
               occupation="Service Company"

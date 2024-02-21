@@ -3,16 +3,15 @@ import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
-import AddIcon from '@mui/icons-material/Add';
 import {ReactComponent as Invoices} from 'assets/icons/contract-invoices.svg';
 import {useContractDetails} from 'hooks/reactQuery/useContract';
 import {useParams} from 'react-router-dom';
-import {Button} from 'components/Button';
 import {SelectModal} from 'components/SelectModal';
 import {UnitsTab} from './Tabs/UnitsTab';
 import {ContractOverview} from './Tabs/ContractOverview';
 import {AddUnitsDataGrid} from './AddUnitsDataGrid';
 import CustomerNotes from '../CustomerDetails/Notes';
+import InvoicesTab from './Tabs/Invoices/InvoicesTab';
 
 const tabItems = [
   {
@@ -38,25 +37,6 @@ export const ContractDetails = () => {
   const renderButtons = () => {
     if (contractDetails?.propertyOwner?.id) {
       return <CustomerNotes customerId={contractDetails?.propertyOwner?.id} />;
-    }
-    if (tabValue === 1) {
-      return (
-        <Button
-          label="Add Unit"
-          buttonProps={{
-            onClick: () => setOpenSelectUnitModal(true),
-            variant: 'contained',
-            sx: {
-              textTransform: 'inherit',
-              ml: '0.8em',
-              height: '100%',
-            },
-            color: 'primary',
-            size: 'large',
-            startIcon: <AddIcon />,
-          }}
-        />
-      );
     }
     return null;
   };
@@ -91,7 +71,13 @@ export const ContractDetails = () => {
           />
         </TabsBody>
         <TabsBody value={tabValue} index={1}>
-          <UnitsTab elevators={contractDetails?.elevators || []} />
+          <UnitsTab
+            elevators={contractDetails?.elevators || []}
+            setOpenSelectUnitModal={setOpenSelectUnitModal}
+          />
+        </TabsBody>
+        <TabsBody value={tabValue} index={2}>
+          <InvoicesTab />
         </TabsBody>
       </Tabs>
       <SelectModal

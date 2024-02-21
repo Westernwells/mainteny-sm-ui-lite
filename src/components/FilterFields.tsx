@@ -8,17 +8,21 @@ interface Props {
   children: ReactNode;
   containerStyle?: {[key: string]: string | number};
   wrapperStyle?: {[key: string]: string | number};
+  textStyles?: {[key: string]: string | number};
   showFilter?: boolean;
   hideClear?: boolean;
   onClear?: () => void;
+  text?: string;
 }
 
 export const FilterFields = ({
   children,
   containerStyle,
   wrapperStyle,
+  textStyles,
   hideClear,
   showFilter = true,
+  text = 'Clear filter',
   onClear,
 }: Props) => {
   const {t} = useTranslation();
@@ -33,8 +37,12 @@ export const FilterFields = ({
           component="div"
           onClick={() => onClear && onClear()}
           mt="0.5em"
-          sx={{cursor: 'pointer', color: theme.palette.info.main}}>
-          {t('Clear filter')}
+          sx={{
+            cursor: 'pointer',
+            color: theme.palette.info.main,
+            ...textStyles,
+          }}>
+          {t(text)}
         </Typography>
       ) : null}
     </Box>

@@ -1,4 +1,4 @@
-import {FC, useEffect, useState} from 'react';
+import {Dispatch, FC, SetStateAction, useEffect, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 
 import {DataGridLayout} from 'components/DataGridLayout';
@@ -9,14 +9,23 @@ import {useNavigate} from 'react-router-dom';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {ContractElevatorSimpleView} from 'models/contract';
 import {ElevatorView} from 'models/elevator';
+import {Typography} from '@mui/material';
+import {Box} from '@mui/system';
+import useTheme from '@mui/material/styles/useTheme';
+import {useTranslation} from 'react-i18next';
+import AddIcon from '@mui/icons-material/Add';
+import {Button} from 'components/Button';
 import {columns, makeRows} from './UnitsDataGridProps';
 
 interface Props {
   elevators: ContractElevatorSimpleView[];
+  setOpenSelectUnitModal: Dispatch<SetStateAction<boolean>>;
 }
 
-export const UnitsTab: FC<Props> = ({elevators}) => {
+export const UnitsTab: FC<Props> = ({elevators, setOpenSelectUnitModal}) => {
   const formatDate = useFormatDate();
+  const {t} = useTranslation();
+  const theme = useTheme();
   const navigate = useNavigate();
   const [page, setPage] = useState(makePage(0, 25)); // TODO: implement paging
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -49,7 +58,33 @@ export const UnitsTab: FC<Props> = ({elevators}) => {
 
   return (
     <TabContentContainer>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        sx={{pt: 3, pb: 3, backgroundColor: '#FFFFFF', mt: 3}}>
+        <Typography
+          sx={{pl: 2}}
+          variant="h6"
+          color={theme.palette.info.infoAlert}>
+          {t('Units under the Contract')}
+        </Typography>
+        <Button
+          label="Add Unit"
+          buttonProps={{
+            onClick: () => setOpenSelectUnitModal(true),
+            sx: {
+              height: '100%',
+              color: theme.palette.primary.dark,
+              border: `1px solid ${theme.palette.primary.dark}`,
+              mr: 2,
+            },
+            startIcon: <AddIcon />,
+          }}
+        />
+      </Box>
       <DataGridLayout
+        containerStyle={{margin: 'unset'}}
         noRowsEmptySection={
           <EmptySection
             illustration="clipboard"

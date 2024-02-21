@@ -1,7 +1,6 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
-import Avatar from '@mui/material/Avatar';
 import {ServiceCompanyView} from 'models/service-company';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useTranslation} from 'react-i18next';
@@ -46,8 +45,6 @@ export const ContractParties = ({
     <Grid container sx={{...containerStyle, marginBottom: 2}}>
       <Grid item xs={5}>
         <Box display="flex" alignItems="center">
-          <Avatar sx={{width: '3rem', height: '3rem', mr: '1em'}}>H</Avatar>
-
           <Box display="flex" flexDirection="column">
             <Typography variant="subtitle1" sx={{display: 'block'}}>
               {name || ''}
