@@ -1,8 +1,9 @@
-import {FC, useState} from 'react';
+import {FC, useEffect, useState} from 'react';
 import {ReactComponent as XeroIcon} from 'assets/icons/Xero.svg';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useDeleteServiceCompanyXeroSettings,
+  useServiceCompanySettingXeroConnect,
   useServiceCompanyXeroSettings,
   useUpdateServiceCompanyXeroSettings,
 } from 'hooks/reactQuery/useXero';
@@ -10,6 +11,7 @@ import {XeroIntegrationRecord} from 'models/integrations';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {Progress} from 'components/Progress';
 import {Confirm} from 'components/Confirm';
+import {useSearchValues} from 'hooks/useSearchValues';
 import IntegrationCard from '../IntegrationCard';
 import {IIntegrationInfo} from '..';
 import XeroDialog from './Dialog';
@@ -21,31 +23,52 @@ const integrationInfo: IIntegrationInfo = {
   icon: <XeroIcon style={{minWidth: '3rem', minHeight: '3rem'}} />,
 };
 
-// const successMsg = 'New integration added!';
-
 const XeroIntegration: FC = () => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {user} = useUserSession();
   const serviceCompanyId = user!.userAccount.serviceCompany.id;
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const {
+    values: {code, error},
+  } = useSearchValues<{code: string; error: string}>();
 
-  // const {enqueueSnackbar, showError} = useSnackbar();
-  const {showError} = useSnackbar();
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
 
   const {data: integration, isLoading} =
     useServiceCompanyXeroSettings(serviceCompanyId);
-  const {
-    mutate: updateXeroSettings,
-    isLoading: isUpdating,
-    isError: updateError,
-  } = useUpdateServiceCompanyXeroSettings(serviceCompanyId);
-  const {mutate: deleteXeroSettings, isLoading: isDeleting} =
+  const {mutate: updateXeroSettings, isLoading: isUpdating} =
+    useUpdateServiceCompanyXeroSettings(serviceCompanyId);
+  const {mutate: disconnectFromXero, isLoading: isDisconnecting} =
     useDeleteServiceCompanyXeroSettings(serviceCompanyId);
+  const {
+    mutate: connectToXero,
+    isLoading: isConnecting,
+    isError: isErrorConnecting,
+  } = useServiceCompanySettingXeroConnect(serviceCompanyId);
 
-  console.log('integration', integration);
+  // Send code to server to connect integration, after redirection from Xero login page
+  useEffect(() => {
+    if (code) {
+      connectToXero(
+        {code},
+        {
+          onSuccess: () => {
+            enqueueSnackbar('New integration added!');
+          },
+          onError: (err: unknown) => {
+            console.log(err);
+            if (err instanceof Error) {
+              showError(err.message);
+            }
+          },
+        },
+      );
+    } else if (error) {
+      showError('Connection failed');
+    }
+  }, [code, error]);
 
-  const handleCancel = () => {
+  const handleCloseDialog = () => {
     setIsDialogOpen(false);
   };
 
@@ -58,7 +81,11 @@ const XeroIntegration: FC = () => {
       {...formData, enabled: false},
       {
         onSuccess: (data) => {
-          console.log('data', data);
+          // Redirect to XERO login page
+          const URL = data?.xeroAuthUrl;
+          if (URL) {
+            window.location.href = URL;
+          }
         },
         onError: (err: unknown) => {
           console.log(err);
@@ -70,7 +97,7 @@ const XeroIntegration: FC = () => {
     );
   };
 
-  if (isLoading) {
+  if (isLoading || isConnecting || isDisconnecting) {
     return <Progress />;
   }
 
@@ -78,24 +105,24 @@ const XeroIntegration: FC = () => {
     <>
       <XeroDialog
         open={isDialogOpen}
-        onCancel={handleCancel}
+        onCancel={handleCloseDialog}
         onSave={handleSave}
         isLoading={isUpdating}
-        hasError={updateError}
+        hasError={isErrorConnecting || Boolean(error)}
         integration={integration}
       />
       <IntegrationCard
         enabled={integration?.enabled || false}
-        hasError={updateError}
+        hasError={isErrorConnecting || Boolean(error)}
         onConnect={handleOpenDialog}
         onDisconnect={() => setOpenDeleteConfirm(true)}
         {...integrationInfo}
       />
       <Confirm
-        disableActions={isDeleting}
+        disableActions={isDisconnecting}
         open={openDeleteConfirm}
         onConfirm={async () => {
-          await deleteXeroSettings();
+          await disconnectFromXero();
           setOpenDeleteConfirm(false);
         }}
         onClose={() => setOpenDeleteConfirm(false)}

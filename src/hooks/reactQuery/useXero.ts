@@ -67,3 +67,22 @@ export const useServiceCompanyXeroAuthUrl = (serviceCompanyId: string) =>
   useQuery(queryKeys.fetchXeroAuthUrl, () => getXeroAuthUrl(serviceCompanyId), {
     enabled: !!serviceCompanyId,
   });
+
+export const createServiceCompanySettingXeroConnect = async (
+  serviceCompanyId: string,
+  code: string,
+) => {
+  const response = await axiosClient.post(
+    `/api/serviceCompanies/${serviceCompanyId}/xero/connect`,
+    {
+      serviceCompanyId,
+      code,
+    },
+  );
+  return response.data;
+};
+
+export const useServiceCompanySettingXeroConnect = (serviceCompanyId: string) =>
+  useMutation(({code}: {code: string}) =>
+    createServiceCompanySettingXeroConnect(serviceCompanyId, code),
+  );
