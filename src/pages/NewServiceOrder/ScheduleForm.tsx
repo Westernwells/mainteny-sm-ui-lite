@@ -3,7 +3,7 @@ import {useTranslation} from 'react-i18next';
 import {DatePicker} from 'components/DatePicker';
 import {TimePicker} from 'components/TimePicker';
 import {useFormik} from 'formik';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import * as Yup from 'yup';
 import {EmployeesView} from 'models/employee';
 import {RadioOptions, ScheduleTechnicianForm} from './models';
@@ -50,6 +50,8 @@ export const ScheduleForm = ({
     onSubmit: () => {},
     validationSchema,
   });
+  const [maxTimeError, setMaxTimeError] = useState(false);
+  const [minTimeError, setMinTimeError] = useState(false);
 
   useEffect(() => {
     if (getScheduleFormValues) {
@@ -59,10 +61,11 @@ export const ScheduleForm = ({
 
   useEffect(() => {
     if (scheduleFormIsErrored) {
-      scheduleFormIsErrored(!!Object.keys(formik.errors).length);
+      scheduleFormIsErrored(
+        !!Object.keys(formik.errors).length || maxTimeError || minTimeError,
+      );
     }
-  }, [formik.errors]);
-
+  }, [formik.errors, maxTimeError, minTimeError]);
   return (
     <Box sx={{...containerStyles}}>
       <DatePicker
@@ -91,15 +94,10 @@ export const ScheduleForm = ({
             <TimePicker
               defaultTime={defaultStartDate}
               containerStyles={{mr: '1em'}}
+              maxTime={formik.values.endTime}
               getSelectedTime={(time) => {
                 if (time && !Number.isNaN(time.getTime())) {
-                  const newStartTime = time;
-                  formik.setFieldValue('startTime', newStartTime);
-
-                  const newEndTime = new Date(
-                    newStartTime.getTime() + 65 * 60000,
-                  );
-                  formik.setFieldValue('endTime', newEndTime);
+                  formik.setFieldValue('startTime', time);
                 }
               }}
               textFieldProps={{
@@ -110,13 +108,18 @@ export const ScheduleForm = ({
                     ? formik.errors.startTime
                     : '',
                 required: true,
-                error: !!(formik.errors.startTime && formik.touched.startTime),
+                error:
+                  !!(formik.errors.startTime && formik.touched.startTime) ||
+                  maxTimeError,
                 onBlur: formik.handleBlur,
+              }}
+              onError={(newError) => {
+                setMaxTimeError(newError === 'maxTime');
               }}
             />
 
             <TimePicker
-              defaultTime={formik.values.endTime || defaultEndDate}
+              defaultTime={defaultEndDate}
               minTime={formik.values.startTime}
               getSelectedTime={(time) => {
                 if (time && !Number.isNaN(time.getTime())) {
@@ -131,8 +134,13 @@ export const ScheduleForm = ({
                     ? formik.errors.endTime
                     : '',
                 required: true,
-                error: !!(formik.errors.endTime && formik.touched.endTime),
+                error:
+                  !!(formik.errors.endTime && formik.touched.endTime) ||
+                  minTimeError,
                 onBlur: formik.handleBlur,
+              }}
+              onError={(newError) => {
+                setMinTimeError(newError === 'minTime');
               }}
             />
           </Box>
