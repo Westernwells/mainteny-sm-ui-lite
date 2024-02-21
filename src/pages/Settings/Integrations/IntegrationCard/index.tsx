@@ -53,7 +53,7 @@ const IntegrationCard: FC<Props> = ({
         gap={1}>
         <Grid container wrap="nowrap" alignItems="center" gap={2}>
           {icon}
-          <Grid direction="column">
+          <Grid container direction="column">
             <Typography variant="h6" noWrap>
               {title}
             </Typography>
@@ -79,7 +79,7 @@ const IntegrationCard: FC<Props> = ({
                 }}
               />
               <IconButton
-                onClick={() => console.log('edit contract')}
+                onClick={onConnect}
                 data-test-id="edit-contract"
                 sx={{color: 'action.active'}}>
                 <Edit fontSize="small" />
