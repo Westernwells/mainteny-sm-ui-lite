@@ -12,7 +12,7 @@ import {
 } from 'models/invoice';
 import {getItemRecord} from 'utils/article-utils';
 import {Currencies, moneyRecordForBackend} from 'utils/currency';
-import {dateToString} from 'utils/utils';
+import {dateToString, fixRounding} from 'utils/utils';
 
 export const formatInvoiceRecord = (
   value: InvoiceFormData,
@@ -146,7 +146,7 @@ export const applyDiscount = ({
     amount || (percentage ? (actualValue * percentage) / 100 : 0);
   const discountedPrice = actualValue - discountAmount;
 
-  return discountedPrice;
+  return fixRounding(discountedPrice, 2);
 };
 
 export const getAggregatedItemsVats = (items: InvoiceItemRecord[]) =>
