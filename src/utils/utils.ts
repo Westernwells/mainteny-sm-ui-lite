@@ -289,7 +289,8 @@ export const stringToTitleCase = (textString: string) =>
 // https://stackoverflow.com/a/10880710/9183715
 export const fixRounding = (value: number, precision: number) => {
   const power = 10 ** (precision || 0);
-  return Math.round(value * power) / power;
+  const sign = Math.sign(value);
+  return (sign * Math.round(Math.abs(value) * power)) / power;
 };
 
 export const isJson = (item: string) => {

@@ -210,12 +210,17 @@ export const InvoiceForm = ({
 
   const {
     data: creditNoteArticlesResource = createEmptyResource<ArticleView>(1),
-    isFetching: isFetchingCreditNoteArticles,
-  } = useArticles({
-    pageIndex: 0,
-    pageSize: 1,
-    query: '[internallabel:credit_note]',
-  });
+    isLoading: isLoadingCreditNoteArticles,
+  } = useArticles(
+    {
+      pageIndex: 0,
+      pageSize: 1,
+      query: '[internallabel:credit_note]',
+    },
+    {
+      refetchOnWindowFocus: false,
+    },
+  );
 
   const {mutateAsync: updateInvoiceAsync, isLoading: isUpdating} =
     useUpdateInvoice();
@@ -517,7 +522,7 @@ export const InvoiceForm = ({
         );
       }
     }
-  }, [invoice, isFetchingCreditNoteArticles]);
+  }, [invoice, isLoadingCreditNoteArticles]);
 
   // Set initial values of Invoice Edit Form
   useEffect(() => {
@@ -618,7 +623,9 @@ export const InvoiceForm = ({
   useEffect(() => {
     if (serviceOrder) {
       const serviceOrderCustomer = serviceOrder.elevator.propertyOwner;
-
+      if (!formik.values.description && serviceOrder.report?.description) {
+        formik.setFieldValue('description', serviceOrder.report.description);
+      }
       formik.setFieldValue(
         'propertyOwnerId',
         serviceOrder.elevator.propertyOwner.id,
