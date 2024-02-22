@@ -22,6 +22,12 @@ export enum ArticleOrderField {
   NAME = 'NAME',
   CREATED_DATE = 'CREATED_DATE',
   XERO_LAST_SYNC_TIME = 'XERO_LAST_SYNC_TIME',
+  EXTERNAL_ID = 'EXTERNAL_ID',
+  TYPE = 'TYPE',
+  UNIT = 'UNIT',
+  DESCRIPTION = 'DESCRIPTION',
+  SELLING_NET_AMOUNT = 'SELLING_NET_AMOUNT',
+  SELLING_PERCENTAGE_VAT = 'SELLING_PERCENTAGE_VAT',
 }
 
 export enum SupplierOrderField {
@@ -143,7 +149,7 @@ export interface QueryArticleParams {
   manufacturer?: string;
   supplier?: string;
   order?: Order;
-  orderBy?: ArticleOrderField;
+  orderByField?: ArticleOrderField;
 }
 
 export interface Stock {
