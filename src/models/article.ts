@@ -31,7 +31,12 @@ export enum ArticleOrderField {
 }
 
 export enum SupplierOrderField {
-  CREATED_DATE = 'CREATED_DATE',
+  EXTERNAL_ID = 'EXTERNAL_ID',
+  NAME = 'NAME',
+  CATEGORY = 'CATEGORY',
+  ADDRESS = 'ADDRESS',
+  PHONE = 'PHONE',
+  EMAIL = 'EMAIL',
 }
 
 export interface QueryArticleSuppliersParams {
