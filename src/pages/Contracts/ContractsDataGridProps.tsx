@@ -25,6 +25,12 @@ export const columns: GridColDef[] = [
     flex: 1.5,
   }),
   getColumnProps({
+    field: 'name',
+    headerName: 'contract name',
+    align: 'left',
+    headerAlign: 'left',
+  }),
+  getColumnProps({
     field: 'units',
     headerName: 'no. of units',
     align: 'center',
@@ -32,29 +38,29 @@ export const columns: GridColDef[] = [
   }),
   getColumnProps({
     field: ContractOrderField.START_TIME,
-    headerName: 'start date',
-    align: 'center',
-    headerAlign: 'center',
-    flex: 0.75,
+    headerName: 'start',
+    align: 'left',
+    headerAlign: 'left',
+    flex: 0.5,
     sortable: true,
   }),
   getColumnProps({
     field: ContractOrderField.EXPIRY_TIME,
-    headerName: 'expiry date',
-    align: 'center',
-    headerAlign: 'center',
-    flex: 0.75,
+    headerName: 'expiry',
+    align: 'left',
+    headerAlign: 'left',
+    flex: 0.5,
     sortable: true,
   }),
   getColumnProps({
-    field: 'name',
-    headerName: 'contract name',
+    field: 'type',
+    headerName: 'type',
     align: 'left',
     headerAlign: 'left',
   }),
   getColumnProps({
     field: 'status',
-    headerName: 'contract status',
+    headerName: 'status',
     align: 'center',
     headerAlign: 'center',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
@@ -70,7 +76,7 @@ export const columns: GridColDef[] = [
   }),
   getColumnProps({
     field: 'cost',
-    headerName: 'cost/year',
+    headerName: 'Price (excl. VAT)',
     align: 'right',
     headerAlign: 'right',
     flex: 1,
@@ -108,6 +114,7 @@ export const makeRows = (
         [ContractOrderField.EXPIRY_TIME]: item.end
           ? formatDate(toDate(item.end))
           : '-',
+        type: item.type,
         name: item.name,
         cost:
           `${formatCurrency(
