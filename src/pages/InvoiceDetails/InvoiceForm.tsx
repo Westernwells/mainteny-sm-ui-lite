@@ -724,8 +724,8 @@ export const InvoiceForm = ({
   const hasArticleError = () =>
     formik.values.items.some(
       (item) =>
-        !item.article?.unit ||
-        !MeasurementUnit[item.article?.unit as MeasurementUnit] ||
+        (item.article?.unit &&
+          !MeasurementUnit[item.article?.unit as MeasurementUnit]) ||
         !item.name,
     );
 
