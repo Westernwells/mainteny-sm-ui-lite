@@ -27,6 +27,8 @@ const XeroIntegration: FC = () => {
   const {user} = useUserSession();
   const serviceCompanyId = user!.userAccount.serviceCompany.id;
   const {enqueueSnackbar, showError} = useSnackbar();
+  const redirectionUrl = `${window.location.origin}/settings?tab=2`;
+
   const {
     values: {code, error},
   } = useSearchValues<{code: string; error: string}>();
@@ -50,7 +52,7 @@ const XeroIntegration: FC = () => {
   useEffect(() => {
     if (code) {
       connectToXero(
-        {code},
+        {code, redirectionUrl},
         {
           onSuccess: () => {
             enqueueSnackbar('New integration added!');
@@ -78,11 +80,12 @@ const XeroIntegration: FC = () => {
 
   const handleSave = (formData: XeroIntegrationRecord) => {
     updateXeroSettings(
-      {...formData, enabled: false},
+      {...formData, enabled: false, redirectionUrl},
       {
         onSuccess: (data) => {
           // Redirect to XERO login page
           const URL = data?.xeroAuthUrl;
+          // const URL = `https://login.xero.com/identity/connect/authorize?response_type=code&client_id=AB40A2886C4C44828C5173C5436A2629&redirect_uri=http://localhost:3000/settings?tab=2&scope=accounting.transactions+accounting.settings+accounting.contacts+offline_access&state=b7af889d-3a6a-4113-b6e1-b34acda8fcdb`;
           if (URL) {
             window.location.href = URL;
           }

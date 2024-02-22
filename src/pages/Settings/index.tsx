@@ -30,9 +30,9 @@ interface Props {
 }
 
 enum TabValues {
-  'BasicInformation',
-  'Checklists',
-  'Integrations',
+  'BasicInformation' = 0,
+  'Checklists' = 1,
+  'Integrations' = 2, // WARNING: please do not change the order of these values
 }
 
 export const SettingsPage = ({getCurrentPageTitle}: Props) => {

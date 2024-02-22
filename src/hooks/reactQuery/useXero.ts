@@ -6,10 +6,6 @@ import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 export const getXeroIntegration = async (serviceCompanyId: string) => {
   const response = await axiosClient.get<XeroIntegrationView>(
     `/api/serviceCompanies/${serviceCompanyId}/settings/xero`,
-    {
-      params: {serviceCompanyId},
-      paramsSerializer,
-    },
   );
   return response.data;
 };
@@ -30,10 +26,6 @@ export const updateXeroIntegration = async (
   const response = await axiosClient.put<XeroIntegrationView>(
     `/api/serviceCompanies/${serviceCompanyId}/settings/xero`,
     data,
-    {
-      params: {serviceCompanyId},
-      paramsSerializer,
-    },
   );
   return response.data;
 };
@@ -46,10 +38,6 @@ export const useUpdateServiceCompanyXeroSettings = (serviceCompanyId: string) =>
 export const deleteXeroIntegration = async (serviceCompanyId: string) => {
   const response = await axiosClient.delete(
     `/api/serviceCompanies/${serviceCompanyId}/settings/xero/disconnect`,
-    {
-      params: {serviceCompanyId},
-      paramsSerializer,
-    },
   );
   return response.data;
 };
@@ -71,18 +59,22 @@ export const useServiceCompanyXeroAuthUrl = (serviceCompanyId: string) =>
 export const createServiceCompanySettingXeroConnect = async (
   serviceCompanyId: string,
   code: string,
+  redirectionUrl: string,
 ) => {
   const response = await axiosClient.post(
-    `/api/serviceCompanies/${serviceCompanyId}/xero/connect`,
-    {
-      serviceCompanyId,
-      code,
-    },
+    `/api/serviceCompanies/${serviceCompanyId}/settings/xero/connect`,
+    undefined,
+    {params: {code, redirectionUrl}, paramsSerializer},
   );
   return response.data;
 };
 
 export const useServiceCompanySettingXeroConnect = (serviceCompanyId: string) =>
-  useMutation(({code}: {code: string}) =>
-    createServiceCompanySettingXeroConnect(serviceCompanyId, code),
+  useMutation(
+    ({code, redirectionUrl}: {code: string; redirectionUrl: string}) =>
+      createServiceCompanySettingXeroConnect(
+        serviceCompanyId,
+        code,
+        redirectionUrl,
+      ),
   );
