@@ -1,7 +1,7 @@
 import {ArticleType, ArticleView, CostPackage} from './article';
 import {ElevatorView} from './elevator';
 import {AlternativeServiceCompanyInfo, Discount} from './invoice';
-import {AddressRecord, Amount, AmountRecord, Meta} from './misc';
+import {AddressRecord, Amount, AmountRecord, Meta, Order} from './misc';
 import {ServiceCompanySimpleView} from './service-company';
 
 export enum QuotationStatus {
@@ -23,6 +23,11 @@ export enum QuotationOrderField {
   CREATED_DATE = 'CREATED_DATE',
   SALES_PRICE = 'SALES_PRICE',
   XERO_LAST_SYNC_TIME = 'XERO_LAST_SYNC_TIME',
+  EXTERNAL_ID = 'EXTERNAL_ID',
+  PROPERTY_OWNER_NAME = 'PROPERTY_OWNER_NAME',
+  ELEVATOR_ADDRESS = 'ELEVATOR_ADDRESS',
+  TOTAL_NET_AMOUNT = 'TOTAL_NET_AMOUNT',
+  COMMENT_COUNT = 'COMMENT_COUNT',
 }
 
 export type QuotationAdditionalInfo = {
@@ -87,6 +92,8 @@ export interface QueryQuotationParams {
   createdDateEnd?: Date;
   salesPriceStart?: number;
   salesPriceEnd?: number;
+  order?: Order;
+  orderByField?: QuotationOrderField;
 }
 
 export interface QuotationFilters {}
