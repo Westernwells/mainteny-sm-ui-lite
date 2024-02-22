@@ -57,3 +57,12 @@ export interface InvoiceView {
   commentCount?: number;
   payments: InvoicePaymentView[];
 }
+
+export const statusMapping: Record<string, string> = {
+  Active: 'VALID',
+  Inactive: 'EXPIRED',
+  Expiring: 'EXPIRING',
+};
+
+export const convertToMacro = (text: string) =>
+  text.toUpperCase().split(' ').join('_');
