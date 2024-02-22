@@ -7,6 +7,7 @@ export interface XeroIntegrationView {
 }
 
 export interface XeroIntegrationRecord {
+  redirectionUrl?: string;
   enabled: boolean;
   clientId: string;
   secret?: string;

@@ -51,16 +51,13 @@ const XeroDialog: FC<Props> = ({
   });
   const watchAllFields = watch();
 
-  // reset form if there is an error and user wants to edit credentials
   useEffect(() => {
-    if (hasError) {
-      reset({
-        clientId: integration?.clientId,
-        tenantId: integration?.tenantId,
-        secret: '',
-      });
-    }
-  }, [reset, hasError]);
+    reset({
+      clientId: integration?.clientId,
+      tenantId: integration?.tenantId,
+      secret: '',
+    });
+  }, [reset, integration]);
 
   const onSubmit: SubmitHandler<XeroIntegrationRecord> = (data) => {
     onSave(data);
