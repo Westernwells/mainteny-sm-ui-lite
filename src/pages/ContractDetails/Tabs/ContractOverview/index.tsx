@@ -15,7 +15,6 @@ import {useParams} from 'react-router-dom';
 import {useFormik} from 'formik';
 import {
   ContractOrderField,
-  ContractPaymentTermView,
   ContractRequestBody,
   ContractUpdateRequest,
   ContractView,
@@ -39,11 +38,9 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {calculateRenewDays} from 'utils/contract-utils';
 import {ReactComponent as BusinessContractApprove} from 'assets/icons/business-contract-approve-gray.svg';
-import {ReactComponent as BriefcaseGray} from 'assets/icons/briefcase-gray.svg';
+import {ReactComponent as TimeIcon} from 'assets/icons/time.svg';
 import {Order} from 'models/misc';
 import {createEmptyResource} from 'utils/paging-utils';
-import {ContractPaymentTermInput} from 'components/ContractPaymentTermInput';
-import {ContractPaymentTerm} from 'components/ContractPaymentTerm';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -52,14 +49,15 @@ import Menu from '@mui/material/Menu';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import IconButton from '@mui/material/IconButton';
 import CancelIcon from '@mui/icons-material/Cancel';
+import {UserSession} from 'models/session';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
 import EditContractForm from './EditContractForm';
-import {ContractParties} from './ContractParties';
 import {DescriptionForm} from './DescriptionForm';
 import {SectionTitle} from '../../../InvoiceDetails/SectionTitle';
 import {CancelContract} from './CancelContract';
+import {Parties} from './Parties';
 
 interface Props {
   contractDetails: ContractView;
@@ -99,16 +97,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
 
   const [documents, setDocuments] = useState<FileWithPreview[]>([]);
   const [openDescriptionDialog, setOpenDescriptionDialog] = useState(false);
-  const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
-    useState(false);
-  const [
-    openContractPaymentTermSelectDialog,
-    setOpenContractPaymentTermSelectDialog,
-  ] = useState(false);
 
-  const [paymentTermToEdit, setPaymentTermToEdit] = useState<
-    ContractPaymentTermView | undefined
-  >(undefined);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const {mutateAsync: uploadFiles} = useUploadFiles(
@@ -310,18 +299,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     );
   };
 
-  const handleContractPaymentTermsModal = (paymentTermId: string) => {
-    updateContract(
-      {
-        body: {
-          paymentTermId,
-        } as Partial<ContractRequestBody>,
-        contractId: contractId!,
-      },
-      {onSuccess: () => setOpenContractPaymentTermsDialog(false)},
-    );
-  };
-
   const handleCancel = () => {
     formik.resetForm();
     setOpenContractDialog(false);
@@ -518,22 +495,25 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   paddingY: 0.5,
                   paddingX: 1,
                   borderRadius: '4px',
+                  fontWeight: '600',
+                  display: 'flex',
+                  gap: '10px',
+                  alignItems: 'center',
                 }}>
-                {t('Contract Timeline')}
+                <TimeIcon width="1.5em" height="1.5em" />
+                {t('History')}
               </Typography>
             }>
             {unUsedContractDays > 0 && unUsedContractDays <= 30 ? (
               <Alert
-                variant="filled"
-                severity="warning"
-                sx={{
-                  mb: '1em',
-                  background: theme.palette.warning.outlinedHoverBg,
-                  color: theme.palette.warning.main,
-                }}>
-                {t('Contract renews in {{unUsedContractDays}} days!', {
-                  unUsedContractDays,
-                })}
+                severity="info"
+                sx={{mt: '1em', mb: '1em', py: '0.6em', alignItems: 'center'}}>
+                <Typography>
+                  {t('Contract renews in {{unUsedContractDays}} days!', {
+                    unUsedContractDays,
+                  })}
+                  <br />
+                </Typography>
               </Alert>
             ) : null}
 
@@ -544,81 +524,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
           </ContractCard>
         </Grid>
 
-        <Grid item xs={12} md={8}>
-          <ContractCard
-            containerStyles={{
-              mt: '1em',
-              '& .MuiCardHeader-root': {
-                pb: 0,
-              },
-              height: 'calc(100% - 1em)',
-            }}
-            header={
-              <Box>
-                <SectionTitle
-                  Icon={BriefcaseGray}
-                  title="Parties"
-                  containerSx={{backgroundColor: 'unset'}}
-                />
-              </Box>
-            }>
-            <Grid
-              container
-              sx={{
-                flexBasis: '100%',
-                borderBottom: `2px solid ${theme.palette.action.disabledBackground}`,
-                mt: '0.5em',
-                mb: '1em',
-                lineHeight: '38px',
-              }}>
-              <Grid
-                item
-                xs={5}
-                sx={{color: theme.palette.text.secondary, fontWeight: 600}}>
-                {t('CONTRACT PARTY')}
-              </Grid>
-              <Grid
-                item
-                xs={5}
-                alignSelf="center"
-                sx={{color: theme.palette.text.secondary, fontWeight: 600}}>
-                {t('ADDRESS')}
-              </Grid>
-              <Grid
-                item
-                xs={2}
-                alignSelf="center"
-                sx={{color: theme.palette.text.secondary, fontWeight: 600}}>
-                {t('PARTY TYPE')}
-              </Grid>
-            </Grid>
-            <ContractParties
-              name={user?.userAccount.serviceCompany.name}
-              occupation="Service Company"
-              address={
-                user?.userAccount.serviceCompany.postalAddress?.fullName ?? ''
-              }
-              phoneNumber={user?.userAccount.serviceCompany.contact.phone}
-              partyType="CONTRACTOR"
-              chipStyles={{
-                chipMaxChars: 15,
-                chipColor: 'warning',
-              }}
-            />
-            <ContractParties
-              name={contractDetails?.propertyOwner.name}
-              occupation="Property Owner"
-              address={
-                contractDetails?.propertyOwner.billingAddress?.fullName ?? ''
-              }
-              phoneNumber={contractDetails?.propertyOwner.contact.phone}
-              partyType="CUSTOMER"
-              chipStyles={{
-                chipColor: 'primary',
-              }}
-            />
-          </ContractCard>
-        </Grid>
+        <Parties contractDetails={contractDetails} user={user as UserSession} />
 
         <Grid item xs={12} md={4}>
           <ContractCard
@@ -781,67 +687,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               }}>
               <DescriptionForm formik={formik} />
             </Dialog>
-          </ContractCard>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <ContractCard
-            containerStyles={{
-              mt: !isMobile ? '1em' : 0,
-              pt: 2,
-              px: 2,
-              height: '100%',
-              [theme.breakpoints.up('md')]: {
-                minHeight: '13rem',
-              },
-              '& .MuiCardHeader-root': {
-                ...headerStyles,
-                py: 0,
-              },
-            }}
-            header={
-              <Box sx={headerStyles}>
-                <Typography variant="subtitle1" mr="0.5em">
-                  {t('Payment Terms')}
-                </Typography>
-              </Box>
-            }
-            headerActionIcon={<EditIcon />}
-            headerAction={() => setOpenContractPaymentTermsDialog(true)}>
-            {contractDetails?.paymentTerm?.term ? (
-              <Typography variant="body2">
-                {contractDetails.paymentTerm.term}
-              </Typography>
-            ) : (
-              <EmptySection
-                label="No payment terms applied"
-                illustration="clipboard"
-                size="tiny"
-                containerStyle={{
-                  height: '100%',
-                }}
-              />
-            )}
-
-            <ContractPaymentTermInput
-              title={t('New payment term')}
-              open={openContractPaymentTermSelectDialog}
-              onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
-              defaultPaymentTerm={paymentTermToEdit}
-              setPaymentToEdit={setPaymentTermToEdit}
-            />
-
-            <ContractPaymentTerm
-              title={t('Payment Terms')}
-              open={openContractPaymentTermsDialog}
-              onCancel={() => setOpenContractPaymentTermsDialog(false)}
-              onSave={handleContractPaymentTermsModal}
-              defaultPayment={contractDetails?.paymentTerm?.term}
-              onClickNewPaymentTerm={() =>
-                setOpenContractPaymentTermSelectDialog(true)
-              }
-              setPaymentToEdit={setPaymentTermToEdit}
-            />
           </ContractCard>
         </Grid>
       </Grid>

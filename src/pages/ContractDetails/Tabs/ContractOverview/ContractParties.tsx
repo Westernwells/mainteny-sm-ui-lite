@@ -66,7 +66,12 @@ export const ContractParties = ({
           </Typography>
         </Box>
       </Grid>
-      <Grid item xs={2} alignSelf="center">
+      <Grid
+        item
+        xs={2}
+        alignSelf="center"
+        display="flex"
+        justifyContent="center">
         <PartiesChipStatus
           color={chipStyles?.chipColor! || 'primary'}
           length={chipStyles?.chipLength || 'auto'}
