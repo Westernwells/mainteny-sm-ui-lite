@@ -141,6 +141,11 @@ export interface ServiceOrder {
   serviceTime: number;
 }
 
+export interface ServiceOrderTimeSlot {
+  startTime: string;
+  minutes?: number;
+}
+
 export interface ServiceOrderAdditionalInfo {
   appointmentConfirmed: boolean;
   appointmentNotificationDueDate?: string;
@@ -155,6 +160,20 @@ export interface ServiceOrderAdditionalInfo {
   purchaseOrderNumber?: string;
   callerInfo?: CallerInfo;
   paymentStatus?: ServiceOrderPaymentStatus;
+  workTimeInfo?: {
+    timeSlots: ServiceOrderTimeSlot[];
+    percentageSurcharge?: number;
+    billableMinutes?: number;
+    startTime: string;
+    endTime: string;
+  };
+  travelTimeInfo?: {
+    timeSlots: ServiceOrderTimeSlot[];
+    percentageSurcharge?: number;
+    billableMinutes?: number;
+    startTime: string;
+    endTime: string;
+  };
   candidateTechnician?: ServiceOrderCandidateTechnician;
 }
 
@@ -296,6 +315,11 @@ export interface UpdateJobSchedule {
   type: JobScheduleType;
 }
 
+export interface ServiceOrderReportTimeRecord {
+  timeSlots: ServiceOrderTimeSlot[];
+  percentageSurcharge?: number;
+}
+
 export interface CompleteServiceOrder {
   externalId?: string;
   description?: string;
@@ -309,6 +333,8 @@ export interface CompleteServiceOrder {
   travelEndTime?: string;
   onlyShowTotalTime?: boolean;
   articles?: ServiceOrderArticleRecord[];
+  workTimeRecord?: ServiceOrderReportTimeRecord;
+  travelTimeRecord?: ServiceOrderReportTimeRecord;
 }
 
 export interface CheckListAnswerRecord {
