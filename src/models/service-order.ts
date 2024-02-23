@@ -1,4 +1,3 @@
-import {ServiceCompany, ServiceCompanyView} from './service-company';
 import {
   AttachmentResource,
   Elevator,
@@ -13,9 +12,13 @@ import {
   Meta,
   Order,
   PdfGenerationStatus,
-  AmountRecord,
+  Address,
 } from './misc';
-import {Technician, TechnicianSimpleView} from './technician';
+import {
+  Technician,
+  TechnicianAdditionalInfo,
+  TechnicianSimpleView,
+} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
 import {ArticleRecord, ArticleView, ServiceOrderArticleRecord} from './article';
@@ -144,12 +147,25 @@ export interface ServiceOrderAdditionalInfo {
   purchaseOrderNumber?: string;
   callerInfo?: CallerInfo;
   paymentStatus?: ServiceOrderPaymentStatus;
+  candidateTechnician?: ServiceOrderCandidateTechnician;
 }
 
 export interface ServiceOrderConfirmationInfo {
   sentDate: string;
   pdfGenerationStatus?: PdfGenerationStatus;
   pdfPath?: string;
+}
+
+export interface ServiceOrderCandidateTechnician {
+  additionalInfo: TechnicianAdditionalInfo;
+  address?: Address;
+  externalId: string;
+  id: string;
+  isOnline: boolean;
+  meta: Meta;
+  number: string;
+  tea: string;
+  userAccount: UserAccount;
 }
 
 export interface ServiceOrderView {
@@ -409,8 +425,8 @@ export interface RedispatchParams {
 }
 
 export interface UpdateServiceOrderScheduleBody {
-  endTime: string;
-  startTime: string;
+  endTime?: string;
+  startTime?: string;
   technicianIds: string[];
   type: JobScheduleType;
 }

@@ -104,24 +104,30 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const [formValid, setFormValid] = useState(false);
 
   useEffect(() => {
+    if (!form.technicianId) {
+      return setFormValid(false);
+    }
+
+    if (!switchActive && form.technicianId) {
+      return setFormValid(true);
+    }
+
     if (
       switchActive &&
       form?.startTime &&
       form.endTime &&
-      form.date &&
+      form.startDate &&
+      form.endDate &&
       form.technicianId
     ) {
       setFormValid(true);
     } else {
       setFormValid(false);
     }
-
-    if (!switchActive) {
-      setFormValid(true);
-    }
   }, [form, switchActive]);
 
   const reschedule = () => {
+    console.log('form', form);
     if (form.technicianId) {
       rescheduleServiceOrder({
         technicianId: form.technicianId,
@@ -132,18 +138,25 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   };
 
   const schedule = () => {
-    const orderStartTime = toRestDateTime(
-      setDateTime(form?.date!, formatDate(form.startTime as Date, 'HH:mm')!),
-    );
-    const orderEndTime = toRestDateTime(
-      setDateTime(form?.date!, formatDate(form.endTime as Date, 'HH:mm')!),
-    );
+    let orderStartTime = null;
+    let orderEndTime = null;
+    if (switchActive) {
+      orderStartTime = toRestDateTime(
+        setDateTime(
+          form?.startDate!,
+          formatDate(form.startTime as Date, 'HH:mm')!,
+        ),
+      );
+      orderEndTime = toRestDateTime(
+        setDateTime(form?.endDate!, formatDate(form.endTime as Date, 'HH:mm')!),
+      );
+    }
 
     if (form.technicianId) {
       scheduleServiceOrder({
         body: {
-          endTime: orderEndTime,
-          startTime: orderStartTime,
+          ...(orderEndTime && {endTime: orderEndTime}),
+          ...(orderStartTime && {startTime: orderStartTime}),
           technicianIds: [form.technicianId],
           type: JobScheduleType.FIXED,
         },
@@ -171,15 +184,15 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
       ? t('Reschedule Job')
       : t('Schedule Job');
 
+  const notPending = [
+    ServiceOrderStatus.INIT,
+    ServiceOrderStatus.READY_TO_SCHEDULE,
+    ServiceOrderStatus.SCHEDULING,
+    ServiceOrderStatus.EXPIRED,
+  ].includes(serviceOrderDetails.status);
+
   const orderAction = () => {
-    if (
-      [
-        ServiceOrderStatus.INIT,
-        ServiceOrderStatus.READY_TO_SCHEDULE,
-        ServiceOrderStatus.SCHEDULING,
-        ServiceOrderStatus.EXPIRED,
-      ].includes(serviceOrderDetails.status)
-    ) {
+    if (notPending) {
       return [
         {
           label: t('Cancel Job'),
@@ -329,16 +342,10 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
 
       <ScheduleDialog
         disableSaveBtn={!formValid}
-        showSwitch={
-          serviceOrderDetails.status === ServiceOrderStatus.SCHEDULED ||
-          serviceOrderDetails.status === ServiceOrderStatus.IN_PROGRESS
-        }
-        getSwitchState={
-          serviceOrderDetails.status === ServiceOrderStatus.SCHEDULED ||
-          serviceOrderDetails.status === ServiceOrderStatus.IN_PROGRESS
-            ? (value) => setSwitchActive(value)
-            : () => setSwitchActive(true)
-        }
+        showSwitch
+        validateDate={switchActive}
+        switchState={!notPending}
+        getSwitchState={(value) => setSwitchActive(value)}
         title={renderDialogTitle()}
         getFormValues={(value) => setForm(value)}
         getFormErrors={(errors) => setFormErrors(errors)}
