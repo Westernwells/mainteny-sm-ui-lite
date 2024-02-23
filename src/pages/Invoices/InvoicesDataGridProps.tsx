@@ -65,7 +65,7 @@ export const columns: GridColDef[] = [
     field: InvoiceOrderField.EXTERNAL_ID,
     headerName: 'number',
     align: 'left',
-    flex: 0.5,
+    flex: 1,
     sortable: true,
   }),
   getColumnProps({
@@ -90,8 +90,8 @@ export const columns: GridColDef[] = [
     sortable: true,
   }),
   getColumnProps({
-    // TODO: Add proper sorting for job number after backend implementation
-    field: 'jobNumber',
+    field: InvoiceOrderField.SERVICE_ORDER_EXTERNAL_ID,
+    sortable: true,
     headerName: 'job number',
     align: 'left',
     flex: 0.75,
@@ -143,8 +143,8 @@ export const columns: GridColDef[] = [
     flex: 0.5,
   }),
   getColumnProps({
-    // TODO: Add sorting for status after backend implementation
-    field: 'status',
+    field: InvoiceOrderField.STATUS,
+    sortable: true,
     headerName: 'status',
     align: 'center',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
@@ -186,7 +186,8 @@ export const makeRows = (
           : '-',
         [InvoiceOrderField.EXTERNAL_ID]:
           item.externalId !== '' ? item.externalId : 'Unassigned',
-        jobNumber: item.serviceOrder?.number,
+        [InvoiceOrderField.SERVICE_ORDER_EXTERNAL_ID]:
+          item.serviceOrder?.number,
         [InvoiceOrderField.CUSTOMER_NAME]: item.propertyOwner.name,
         [InvoiceOrderField.TYPE]: InvoiceTypeMap[item.type],
         [InvoiceOrderField.SERVICE_ORDER_TYPE]: item.serviceOrder?.type,
@@ -199,7 +200,7 @@ export const makeRows = (
             currency: item.totalAmount.currency,
           },
         )}`,
-        status: item.status,
+        [InvoiceOrderField.STATUS]: item.status,
         actions: {
           pdfPath: item.additionalInfo.pdfPath,
           serviceCompanyId,

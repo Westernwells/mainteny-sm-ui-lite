@@ -28,6 +28,7 @@ export enum QuotationOrderField {
   ELEVATOR_ADDRESS = 'ELEVATOR_ADDRESS',
   TOTAL_NET_AMOUNT = 'TOTAL_NET_AMOUNT',
   COMMENT_COUNT = 'COMMENT_COUNT',
+  STATUS = 'STATUS',
 }
 
 export type QuotationAdditionalInfo = {

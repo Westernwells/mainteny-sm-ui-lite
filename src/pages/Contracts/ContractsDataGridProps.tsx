@@ -50,8 +50,8 @@ export const columns: GridColDef[] = [
     sortable: true,
   }),
   getColumnProps({
-    // TODO: Add sorting when backend will be ready for this field
-    field: 'name',
+    field: ContractOrderField.NAME,
+    sortable: true,
     headerName: 'contract name',
     align: 'left',
     headerAlign: 'left',
@@ -114,8 +114,7 @@ export const makeRows = (
         [ContractOrderField.EXPIRY_TIME]: item.end
           ? formatDate(toDate(item.end))
           : '-',
-        type: item.type,
-        name: item.name,
+        [ContractOrderField.NAME]: item.name,
         [ContractOrderField.NET_PRICE]:
           `${formatCurrency(
             (item.additionalInfo?.price?.netAmount ?? 0) /

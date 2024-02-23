@@ -118,6 +118,7 @@ export enum InvoiceOrderField {
   SERVICE_ORDER_TYPE = 'SERVICE_ORDER_TYPE',
   TOTAL_NET_AMOUNT = 'TOTAL_NET_AMOUNT',
   COMMENT_COUNT = 'COMMENT_COUNT',
+  STATUS = 'STATUS',
 }
 
 export interface InvoiceOverdueNoticeAdditionalInfo {

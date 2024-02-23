@@ -110,8 +110,8 @@ export const columns: GridColDef[] = [
     ),
   },
   {
-    // TODO: Add sorting to status column when backend supports it
-    field: 'status',
+    field: QuotationOrderField.STATUS,
+    sortable: true,
     align: 'center',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
@@ -123,7 +123,6 @@ export const columns: GridColDef[] = [
       />
     ),
     flex: 0.5,
-    sortable: false,
     headerAlign: 'center',
     renderHeader: () => (
       <Typography variant="subtitle2" color="textSecondary">
@@ -169,7 +168,7 @@ export const makeRows = (
         currency: item.totalAmount.currency,
       },
     )}`,
-    status: item.status,
+    [QuotationOrderField.STATUS]: item.status,
     quotation: item,
     navigateTo: `details/${item.id}`,
   }));

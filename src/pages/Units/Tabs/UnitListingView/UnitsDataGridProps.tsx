@@ -39,7 +39,7 @@ export const columns: GridColDef[] = [
         </>
       );
     },
-    flex: 0.75,
+    flex: 1,
   }),
   getColumnProps({
     field: ElevatorOrderField.MODEL,

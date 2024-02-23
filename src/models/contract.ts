@@ -22,6 +22,7 @@ export enum ContractOrderField {
   END_DATE = 'END_DATE',
   STATUS = 'STATUS',
   NET_PRICE = 'NET_PRICE',
+  NAME = 'NAME',
 }
 
 export enum ContractTypes {
