@@ -2064,5 +2064,11 @@
   "Choose a payment type for the upfront invoice from Lump-Sum or Percentage. You can’t change your selection later for the subsequent invoices.": "Izaberite vrstu plaćanja za fakturu unapred iz paušalnog iznosa ili procenta. Ne možete kasnije da promenite svoj izbor za naredne fakture.",
   "New Company": "Nova kompanija",
   "Companies": "Kompanije",
-  "Asia/Tbilisi": "Azija/Tbilisi"
+  "Asia/Tbilisi": "Azija/Tbilisi",
+  "\nStart time": "Početno vreme",
+  "Work time": "Radno vreme",
+  "Add Work": "Dodaj posao",
+  "Add Travel": "Dodajte putovanje",
+  "Surcharge": "Doplata",
+  "Billable hours:": "Naplativi sati:"
 }
