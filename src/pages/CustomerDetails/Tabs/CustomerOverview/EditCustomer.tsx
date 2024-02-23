@@ -2,8 +2,6 @@ import {Formik, useFormik} from 'formik';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useCustomer, useQueryCustomers} from 'hooks/reactQuery/useCustomers';
 import {phoneNumberDigitsOnly} from 'utils/customer-utils';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {useEffect, useState} from 'react';
 import {createEmptyResource} from 'utils/paging-utils';
 import * as Yup from 'yup';
@@ -101,14 +99,6 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
   const handleSubmit = async (values: CustomerEditForm) => {
     updateCustomer(values, customer.id, () => {
       onClose();
-    });
-
-    Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_EDIT_CLICK, {
-      pageName: 'Customers',
-      creationTime: new Date(),
-      save: 1,
-      cancel: 0,
-      source: 'Basic Information',
     });
   };
 

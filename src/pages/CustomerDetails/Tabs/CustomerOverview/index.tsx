@@ -29,8 +29,6 @@ import {formatPhoneNumber} from 'utils/customer-utils';
 import EmployeeAvatar from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EmployeeAvatar';
 import {formatDate, getDateObject} from 'utils/datetime';
 import {LanguageContext} from 'context/LanguageProvider';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {UnitsWidget} from './UnitsWidget';
 import {ContractsWidget} from './ContractsWidget';
 import {ContactsWidget} from './ContactsWidget';
@@ -178,15 +176,6 @@ export const CustomerOverviewTab = ({
     }
   }, [customer]);
 
-  useEffect(() => {
-    Mixpanel.identifyAndTrack(
-      mixpanelEvents.CUSTOMER_UNITDETAILS_OVERVIEW_VIEW,
-      {
-        pageName: 'Customers',
-      },
-    );
-  }, []);
-
   const renderBasicDetails = () => (
     <InfoCard
       header={
@@ -238,13 +227,6 @@ export const CustomerOverviewTab = ({
           openDialog={openDialog}
           onClose={() => {
             setOpenDialog(false);
-            Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_EDIT_CLICK, {
-              pageName: 'Customers',
-              creationTime: new Date(),
-              save: 0,
-              cancel: 1,
-              source: 'Basic Information',
-            });
           }}
         />
       )}

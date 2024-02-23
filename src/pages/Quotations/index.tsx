@@ -17,8 +17,6 @@ import {Widget} from 'components/Widget';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {convertToMacro, convertToText, objectKeyByValue} from 'utils/utils';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
 import {useCurrentCurrency} from 'utils/currency';
@@ -101,7 +99,6 @@ export const Quotations = () => {
     totalQuotationsRef.current || quotationsResource.total;
 
   const navigateToNewQuotation = () => {
-    Mixpanel.identifyAndTrack(mixpanelEvents.NEW_QUOTATION_BUTTON_CLICKED);
     navigate('new');
   };
 

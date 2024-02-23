@@ -12,8 +12,6 @@ import Tooltip from '@mui/material/Tooltip';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
 import {useNavigate} from 'react-router-dom';
 import _ from 'lodash';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {ArticleOrderField, ArticleType, ArticleView} from 'models/article';
 import {formatCurrency} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
@@ -173,7 +171,6 @@ export const ArticleListDataGrid = () => {
   totalArticlesRef.current = totalArticlesRef.current || articleResource.total;
 
   const navigateToNewArticle = () => {
-    Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ARTICLE_BUTTON_CLICKED);
     navigate('/articles/new');
   };
 

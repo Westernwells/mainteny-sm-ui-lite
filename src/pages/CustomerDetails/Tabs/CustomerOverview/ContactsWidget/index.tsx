@@ -23,8 +23,6 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmptySection} from 'components/EmptySection';
 import {convertToMacro, convertToText} from 'utils/utils';
 import {Confirm} from 'components/Confirm';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import {InfoBanner} from 'components/InfoBanner';
@@ -254,13 +252,6 @@ export const ContactsWidget = ({customerId}: Props) => {
         },
       },
     });
-    Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_ADD_CLICK, {
-      pageName: 'Customers',
-      creationTime: new Date(),
-      save: 1,
-      cancel: 0,
-      source: 'Contact Person',
-    });
     setOpenDialog(false);
   };
 
@@ -365,13 +356,6 @@ export const ContactsWidget = ({customerId}: Props) => {
         disableSaveBtn={!!Object.keys(formik.errors).length}
         onCancel={() => {
           if (typeAction !== 'edit') {
-            Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_ADD_CLICK, {
-              pageName: 'Customers',
-              creationTime: new Date(),
-              save: 0,
-              cancel: 1,
-              source: 'Contact Person',
-            });
             setOpenDialog(false);
           }
 

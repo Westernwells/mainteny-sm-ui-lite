@@ -30,10 +30,7 @@ import {
   UpdateQuotation,
 } from 'models/quotation';
 import {Comment} from 'models/comment';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {languageContextMap} from 'utils/utils';
-import {getTotalFromArticles, getTotalWithVatFromArticles} from 'utils/invoice';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useUserSession} from './useUserSession';
 
@@ -178,18 +175,12 @@ export const useCreateQuotation = () => {
   const navigate = useNavigate();
 
   return useMutation(({data}: {data: CreateQuotation}) => postQuotation(data), {
-    onSuccess: (data, variables) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries([qk.fetchQuotations]);
       queryClient.invalidateQueries([qk.quotationById]);
       queryClient.invalidateQueries([qk.fetchQuotationActivities]);
       enqueueSnackbar(`Quotation created successfully`, {
         variant: 'success',
-      });
-      Mixpanel.identifyAndTrack(mixpanelEvents.NEW_QUOTATION_CREATED, {
-        quotationId: data.value,
-        elevatorId: variables.data.elevatorId,
-        amountWithoutVat: getTotalFromArticles(variables.data.items),
-        amountWithVat: getTotalWithVatFromArticles(variables.data.items),
       });
       navigate(`/quotations/details/${data.value}`);
     },

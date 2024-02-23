@@ -4,8 +4,6 @@ import {Tabs} from 'components/Tab';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import {useNavigate} from 'react-router-dom';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {useQueryState} from 'hooks/useQueryState';
 import {ServiceOrderScheduleTab} from './Tabs/ServiceOrderScheduleTab';
 import {ServiceOrderList} from './Tabs/ServiceOrderList.tsx';
@@ -30,7 +28,6 @@ export const ServiceOrders = () => {
   const navigate = useNavigate();
 
   const track = (cb: () => void) => {
-    Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ORDER_BUTTON_CLICKED);
     cb();
   };
 

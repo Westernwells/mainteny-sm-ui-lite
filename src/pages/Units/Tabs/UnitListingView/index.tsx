@@ -13,8 +13,6 @@ import {Order, OrderByParams} from 'models/misc';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
 import {useNavigate} from 'react-router-dom';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {FlexContainer} from 'components/FlexContainer';
 import Box from '@mui/material/Box';
 import {useSearchValues} from 'hooks/useSearchValues';
@@ -124,7 +122,6 @@ export const UnitListingView = () => {
         showActionBtn
         btnLabel="Add Unit"
         btnAction={() => {
-          Mixpanel.identifyAndTrack(mixpanelEvents.NEW_UNIT_BUTTON_CLICKED);
           navigate('/units/new');
         }}
         containerStyle={{
