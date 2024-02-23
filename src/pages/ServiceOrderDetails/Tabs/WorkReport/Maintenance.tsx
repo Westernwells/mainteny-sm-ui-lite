@@ -1,15 +1,22 @@
 import {FormikProps} from 'formik';
-import {FormHelperText, Typography} from '@mui/material';
+import {TextField, Typography} from '@mui/material';
 import Box from '@mui/material/Box';
 import {CompleteServiceOrder, ServiceOrderView} from 'models/service-order';
 import {useTranslation} from 'react-i18next';
 import {Construction, DirectionsCar} from '@mui/icons-material';
 import {FormLabel} from 'components/form/FormLabel';
-import {DatePicker} from 'components/DatePicker';
-import {TimePicker} from 'components/TimePicker';
-import {FormInput} from 'components/form/FormInput';
 import {FormCheckbox} from 'components/form/FormCheckbox';
-import {addDateToTime, addTimeToDate} from 'utils/utils';
+import useTheme from '@mui/material/styles/useTheme';
+
+import {
+  calculateSlotTotalWithoutSurcharge,
+  calculateTotalBillableHours,
+} from 'utils/service-order-utils';
+import {convertMinutesToHoursAndMinutes} from 'utils/work-hours-utils';
+import {NumericFormat} from 'react-number-format';
+import {useContext, useMemo} from 'react';
+import {LanguageContext} from 'context/LanguageProvider';
+import ReportTimeEntries from './ReportTimeEntries';
 
 interface Props {
   serviceOrder: ServiceOrderView;
@@ -18,6 +25,36 @@ interface Props {
 export const Maintenance = ({serviceOrder, formik}: Props) => {
   const schedule = serviceOrder.schedules?.[serviceOrder.schedules.length - 1];
   const {t} = useTranslation();
+  const theme = useTheme();
+  const {language: selectedLng} = useContext(LanguageContext);
+
+  const totalBillableHours = calculateTotalBillableHours([
+    formik.values.workTimeRecord!,
+    formik.values.travelTimeRecord!,
+  ]);
+
+  const totalBillableHoursFormatted = convertMinutesToHoursAndMinutes(
+    totalBillableHours,
+    {hourUnit: t('h')},
+  );
+
+  const totalTravelFormatted = useMemo(() => {
+    const totalTravelWithoutSurcharge = calculateSlotTotalWithoutSurcharge(
+      formik.values.travelTimeRecord,
+    );
+    return convertMinutesToHoursAndMinutes(totalTravelWithoutSurcharge, {
+      hourUnit: t('h'),
+    });
+  }, [formik.values.travelTimeRecord]);
+
+  const totalWorkFormatted = useMemo(() => {
+    const totalWorkWithoutSurcharge = calculateSlotTotalWithoutSurcharge(
+      formik.values.workTimeRecord,
+    );
+    return convertMinutesToHoursAndMinutes(totalWorkWithoutSurcharge, {
+      hourUnit: t('h'),
+    });
+  }, [formik.values.workTimeRecord]);
 
   return (
     <Box mt="1em">
@@ -29,12 +66,27 @@ export const Maintenance = ({serviceOrder, formik}: Props) => {
           borderColor="grey.300"
           borderRadius="4px"
           p=".5em">
-          <Box px="1rem" pt=".5rem" pb="1.5rem" display="flex">
-            <Box display="flex" alignItems="center" gap={0.5} flex={1}>
+          <Box
+            px="1rem"
+            justifyContent="space-between"
+            pt=".5rem"
+            pb="1.5rem"
+            display="flex">
+            <Box
+              maxWidth={500}
+              display="flex"
+              alignItems="center"
+              gap={0.5}
+              flex={1}>
               <DirectionsCar sx={{color: 'action.active'}} />
               <Typography variant="caption">{t('Travel')}</Typography>
             </Box>
-            <Box display="flex" alignItems="center" gap={0.5} flex={1}>
+            <Box
+              maxWidth={500}
+              display="flex"
+              alignItems="center"
+              gap={0.5}
+              flex={1}>
               <Construction sx={{color: 'action.active'}} />
               <Typography variant="caption">{t('Work')}</Typography>
             </Box>
@@ -43,311 +95,132 @@ export const Maintenance = ({serviceOrder, formik}: Props) => {
             bgcolor="grey.50"
             boxShadow="0px 4px 15px 0px #90909033"
             p="1rem"
+            flexDirection="column"
             display="flex"
             flexWrap="wrap">
-            <Box display="flex" flexWrap="wrap" gap={1.2} flex={1}>
-              <Box display="flex" gap={1.2}>
-                <DatePicker
-                  defaultDate={
-                    formik.values.travelStartTime
-                      ? new Date(formik.values.travelStartTime)
-                      : null
-                  }
-                  containerStyles={{maxWidth: '11rem'}}
-                  getSelectedDate={(travelStartTime) => {
-                    if (travelStartTime) {
-                      formik.setValues({
-                        ...formik.values,
-                        travelStartTime: addDateToTime(
-                          formik.values.travelStartTime as string,
-                          travelStartTime,
-                        ),
-                      });
+            <Box
+              display="flex"
+              flex={1}
+              columnGap={2}
+              flexWrap="wrap"
+              justifyContent="space-between">
+              <ReportTimeEntries type="travel" formik={formik} />
+              <ReportTimeEntries type="work" formik={formik} />
+            </Box>
+            <Box
+              justifyContent="space-between"
+              mt={3}
+              columnGap={2}
+              display="flex"
+              flexWrap="wrap">
+              <Box maxWidth={500} flex={1}>
+                <Box mt={3} display="flex" alignItems="center">
+                  <Box width={150}>
+                    <Typography>{t('Travel time')}</Typography>
+                  </Box>
+                  <Box width={100}>
+                    <Typography>{totalTravelFormatted}</Typography>
+                  </Box>
+                  <NumericFormat
+                    value={formik.values.travelTimeRecord?.percentageSurcharge}
+                    customInput={TextField}
+                    suffix="%"
+                    label={t('Surcharge')}
+                    allowLeadingZeros={false}
+                    decimalScale={2}
+                    decimalSeparator={
+                      selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
                     }
-                  }}
-                  textFieldProps={{
-                    name: 'travelStartTime',
-                    label: 'Start Date',
-                    helperText:
-                      formik.errors.travelStartTime &&
-                      formik.touched.travelStartTime
-                        ? formik.errors.travelStartTime
-                        : '',
-                    error: !!(
-                      formik.touched.travelStartTime &&
-                      formik.errors.travelStartTime
-                    ),
-                    onBlur: formik.handleBlur,
-                  }}
-                />
-
-                <TimePicker
-                  defaultTime={
-                    formik.values.travelStartTime
-                      ? new Date(formik.values.travelStartTime)
-                      : null
-                  }
-                  containerStyles={{maxWidth: '8rem'}}
-                  getSelectedTime={(time) => {
-                    if (time && !Number.isNaN(time.getTime())) {
-                      formik.setValues({
-                        ...formik.values,
-                        travelStartTime: addTimeToDate(
-                          formik.values.travelStartTime as string,
-                          time,
-                        ),
-                      });
+                    thousandSeparator={
+                      selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
                     }
-                  }}
-                  textFieldProps={{
-                    name: 'travelStartTime',
-                    label: 'Start Time',
-                    helperText:
-                      formik.errors.travelStartTime &&
-                      formik.touched.travelStartTime
-                        ? formik.errors.travelStartTime
-                        : '',
-                    error: !!(
-                      formik.errors.travelStartTime &&
-                      formik.touched.travelStartTime
-                    ),
-                    onBlur: formik.handleBlur,
-                  }}
-                />
+                    sx={{
+                      width: 100,
+                      '& .MuiInputBase-root': {
+                        pr: 0,
+                      },
+                      '& .MuiOutlinedInput-input': {
+                        textAlign: 'right',
+                      },
+                    }}
+                    InputProps={{
+                      inputMode: 'numeric',
+                    }}
+                    onValueChange={(values) => {
+                      const {floatValue} = values;
+                      formik.setFieldValue(
+                        `travelTimeRecord.percentageSurcharge`,
+                        floatValue ?? 0,
+                      );
+                    }}
+                    size="small"
+                  />
+                </Box>
               </Box>
-
-              <Box display="flex" gap={1.2}>
-                <DatePicker
-                  defaultDate={
-                    formik.values.travelEndTime
-                      ? new Date(formik.values.travelEndTime)
-                      : null
-                  }
-                  containerStyles={{maxWidth: '11rem'}}
-                  getSelectedDate={(travelEndTime) => {
-                    if (travelEndTime) {
-                      formik.setValues({
-                        ...formik.values,
-                        travelEndTime: addDateToTime(
-                          formik.values.travelEndTime as string,
-                          travelEndTime,
-                        ),
-                      });
+              <Box maxWidth={500} flex={1}>
+                <Box mt={3} display="flex" alignItems="center">
+                  <Box width={150}>
+                    <Typography>{t('Work time')}:</Typography>
+                  </Box>
+                  <Box width={100}>
+                    <Typography>{totalWorkFormatted}</Typography>
+                  </Box>
+                  <NumericFormat
+                    value={formik.values.workTimeRecord?.percentageSurcharge}
+                    customInput={TextField}
+                    suffix="%"
+                    label={t('Surcharge')}
+                    allowLeadingZeros={false}
+                    decimalScale={2}
+                    decimalSeparator={
+                      selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
                     }
-                  }}
-                  textFieldProps={{
-                    name: 'travelEndTime',
-                    label: 'End Date',
-                    helperText:
-                      formik.errors.travelEndTime &&
-                      formik.touched.travelEndTime
-                        ? formik.errors.travelEndTime
-                        : '',
-                    error: !!(
-                      formik.touched.travelEndTime &&
-                      formik.errors.travelEndTime
-                    ),
-                    onBlur: formik.handleBlur,
-                  }}
-                />
-
-                <TimePicker
-                  defaultTime={
-                    formik.values.travelEndTime
-                      ? new Date(formik.values.travelEndTime)
-                      : null
-                  }
-                  containerStyles={{maxWidth: '8rem'}}
-                  getSelectedTime={(time) => {
-                    if (time && !Number.isNaN(time.getTime())) {
-                      formik.setValues({
-                        ...formik.values,
-                        travelEndTime: addTimeToDate(
-                          formik.values.travelEndTime as string,
-                          time,
-                        ),
-                      });
+                    thousandSeparator={
+                      selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
                     }
-                  }}
-                  textFieldProps={{
-                    name: 'travelEndTime',
-                    label: 'End Time',
-                    helperText:
-                      formik.errors.travelEndTime &&
-                      formik.touched.travelEndTime
-                        ? formik.errors.travelEndTime
-                        : '',
-                    error: !!(
-                      formik.errors.travelEndTime &&
-                      formik.touched.travelEndTime
-                    ),
-                    onBlur: formik.handleBlur,
-                  }}
-                />
+                    sx={{
+                      width: 100,
+                      '& .MuiInputBase-root': {
+                        pr: 0,
+                      },
+                      '& .MuiOutlinedInput-input': {
+                        textAlign: 'right',
+                      },
+                    }}
+                    InputProps={{
+                      inputMode: 'numeric',
+                    }}
+                    onValueChange={(values) => {
+                      const {floatValue} = values;
+                      formik.setFieldValue(
+                        `workTimeRecord.percentageSurcharge`,
+                        floatValue ?? 0,
+                      );
+                    }}
+                    size="small"
+                  />
+                </Box>
               </Box>
             </Box>
 
-            <Box display="flex" flexWrap="wrap" gap={1.2} flex={1}>
-              <Box display="flex" gap={1.2}>
-                <DatePicker
-                  defaultDate={
-                    formik.values.startTime
-                      ? new Date(formik.values.startTime)
-                      : null
-                  }
-                  containerStyles={{maxWidth: '11rem'}}
-                  getSelectedDate={(startTime) => {
-                    if (startTime) {
-                      formik.setValues({
-                        ...formik.values,
-                        startTime: addDateToTime(
-                          formik.values.startTime as string,
-                          startTime,
-                        ),
-                      });
-                    }
-                  }}
-                  textFieldProps={{
-                    name: 'startTime',
-                    label: 'Start Date',
-                    helperText:
-                      formik.errors.startTime && formik.touched.startTime
-                        ? formik.errors.startTime
-                        : '',
-                    error: !!(
-                      formik.touched.startTime && formik.errors.startTime
-                    ),
-                    onBlur: formik.handleBlur,
-                  }}
-                />
-
-                <TimePicker
-                  defaultTime={
-                    formik.values.startTime
-                      ? new Date(formik.values.startTime)
-                      : null
-                  }
-                  containerStyles={{maxWidth: '8rem'}}
-                  getSelectedTime={(time) => {
-                    if (time && !Number.isNaN(time.getTime())) {
-                      formik.setValues({
-                        ...formik.values,
-                        startTime: addTimeToDate(
-                          formik.values.startTime as string,
-                          time,
-                        ),
-                      });
-                    }
-                  }}
-                  textFieldProps={{
-                    name: 'startTime',
-                    label: 'Start Time',
-                    helperText:
-                      formik.errors.startTime && formik.touched.startTime
-                        ? formik.errors.startTime
-                        : '',
-                    error: !!(
-                      formik.errors.startTime && formik.touched.startTime
-                    ),
-                    onBlur: formik.handleBlur,
-                  }}
-                />
-              </Box>
-
-              <Box display="flex" gap={1.2}>
-                <DatePicker
-                  defaultDate={
-                    formik.values.endTime
-                      ? new Date(formik.values.endTime)
-                      : null
-                  }
-                  containerStyles={{maxWidth: '11rem'}}
-                  getSelectedDate={(endTime) => {
-                    if (endTime) {
-                      formik.setValues({
-                        ...formik.values,
-                        endTime: addDateToTime(
-                          formik.values.endTime as string,
-                          endTime,
-                        ),
-                      });
-                    }
-                  }}
-                  textFieldProps={{
-                    name: 'endTime',
-                    label: 'End Date',
-                    helperText:
-                      formik.errors.endTime && formik.touched.endTime
-                        ? formik.errors.endTime
-                        : '',
-                    error: !!(formik.touched.endTime && formik.errors.endTime),
-                    onBlur: formik.handleBlur,
-                  }}
-                />
-
-                <TimePicker
-                  defaultTime={
-                    formik.values.endTime
-                      ? new Date(formik.values.endTime)
-                      : null
-                  }
-                  containerStyles={{maxWidth: '8rem'}}
-                  getSelectedTime={(time) => {
-                    if (time && !Number.isNaN(time.getTime())) {
-                      formik.setValues({
-                        ...formik.values,
-                        endTime: addTimeToDate(
-                          formik.values.endTime as string,
-                          time,
-                        ),
-                      });
-                    }
-                  }}
-                  textFieldProps={{
-                    name: 'endTime',
-                    label: 'End Time',
-                    helperText:
-                      formik.errors.endTime && formik.touched.endTime
-                        ? formik.errors.endTime
-                        : '',
-                    error: !!(formik.errors.endTime && formik.touched.endTime),
-                    onBlur: formik.handleBlur,
-                  }}
-                />
-              </Box>
-            </Box>
             <Box
               display="flex"
               gap={5}
               alignItems="center"
               flexBasis="100%"
-              pt={4}
-              pb={1}>
-              <Typography fontWeight={700} flexShrink={0}>
-                {t('Total time')}
+              bgcolor={theme.palette.grey[700]}
+              borderRadius={1}
+              mb={2}
+              mt={3}
+              py={1}
+              px={2}>
+              <Typography color="white" fontWeight={700} flexShrink={0}>
+                {t('Billable hours')}:
               </Typography>
               <Box display="flex" flexDirection="column">
-                <FormInput
-                  props={{
-                    size: 'small',
-                    placeholder: 'e.g. 13:40',
-                    name: 'serviceTimeHM',
-                    error:
-                      !!formik.errors.serviceTimeHM &&
-                      formik.touched.serviceTimeHM,
-                    required: true,
-                    value: formik.values.serviceTimeHM,
-                    sx: {width: '6.25rem', input: {fontWeight: 700}},
-                    onChange: formik.handleChange,
-                    onBlur: formik.handleBlur,
-                  }}
-                />
-                {formik.touched.serviceTimeHM &&
-                  formik.errors.serviceTimeHM && (
-                    <FormHelperText error>
-                      {formik.errors.serviceTimeHM}
-                    </FormHelperText>
-                  )}
+                <Typography color="white" fontWeight={700} flexShrink={0}>
+                  {totalBillableHoursFormatted}
+                </Typography>
               </Box>
             </Box>
             <FormCheckbox

@@ -32,6 +32,7 @@ interface Props extends Partial<DatePickerProps<Date>> {
   dateFormat?: string;
   disableMask?: boolean;
   errorMessage?: string;
+  shouldDisableDate?: (tDate: Date) => boolean;
 }
 
 export const DatePicker = ({
@@ -47,6 +48,7 @@ export const DatePicker = ({
   required,
   dateFormat,
   errorMessage,
+  shouldDisableDate,
   ...props
 }: Props) => {
   const {t} = useTranslation();
@@ -250,6 +252,7 @@ export const DatePicker = ({
           onClose={() => setOpen(false)}
           showDaysOutsideCurrentMonth
           closeOnSelect={false}
+          shouldDisableDate={shouldDisableDate}
           slotProps={
             {
               actionBar: {
