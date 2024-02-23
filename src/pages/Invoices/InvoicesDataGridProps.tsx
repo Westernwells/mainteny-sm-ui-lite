@@ -62,10 +62,10 @@ export const getInvoiceStatusStyles = (
 
 export const columns: GridColDef[] = [
   getColumnProps({
-    field: InvoiceOrderField.NUMBER,
+    field: InvoiceOrderField.EXTERNAL_ID,
     headerName: 'number',
     align: 'left',
-    flex: 0.5,
+    flex: 1,
     sortable: true,
   }),
   getColumnProps({
@@ -90,23 +90,29 @@ export const columns: GridColDef[] = [
     sortable: true,
   }),
   getColumnProps({
-    field: 'jobNumber',
+    field: InvoiceOrderField.SERVICE_ORDER_EXTERNAL_ID,
+    sortable: true,
     headerName: 'job number',
     align: 'left',
     flex: 0.75,
   }),
   getColumnProps({
-    field: 'invoiceType',
+    field: InvoiceOrderField.TYPE,
+    sortable: true,
     headerName: 'invoice type',
   }),
   getColumnProps({
-    field: 'type',
+    field: InvoiceOrderField.SERVICE_ORDER_TYPE,
+    sortable: true,
     headerName: 'service type',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <Box display="flex" alignItems="flex-end" gap="0.5rem">
-        <ServiceOrderIcons serviceOrderType={params.row.type} size="small" />
+        <ServiceOrderIcons
+          serviceOrderType={params.row[InvoiceOrderField.SERVICE_ORDER_TYPE]}
+          size="small"
+        />
         <ServiceOrderTypeText
-          serviceOrderType={params.row.type}
+          serviceOrderType={params.row[InvoiceOrderField.SERVICE_ORDER_TYPE]}
           capitalizeText
           variant="body2"
         />
@@ -114,7 +120,8 @@ export const columns: GridColDef[] = [
     ),
   }),
   getColumnProps({
-    field: 'amount',
+    field: InvoiceOrderField.TOTAL_NET_AMOUNT,
+    sortable: true,
     headerName: 'total amount',
     renderHeader: (params: GridColumnHeaderParams) => {
       const {t} = useTranslation();
@@ -128,14 +135,16 @@ export const columns: GridColDef[] = [
     flex: 0.75,
   }),
   getColumnProps({
-    field: 'notes',
+    field: InvoiceOrderField.COMMENT_COUNT,
+    sortable: true,
     headerName: 'notes',
     align: 'center',
     renderCell: (params) => <NotesIndicator invoice={params.row.invoice} />,
     flex: 0.5,
   }),
   getColumnProps({
-    field: 'status',
+    field: InvoiceOrderField.STATUS,
+    sortable: true,
     headerName: 'status',
     align: 'center',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
@@ -175,13 +184,14 @@ export const makeRows = (
         [InvoiceOrderField.DUE_DATE]: item.dueDate
           ? formatDate(toDate(item.dueDate))
           : '-',
-        [InvoiceOrderField.NUMBER]:
+        [InvoiceOrderField.EXTERNAL_ID]:
           item.externalId !== '' ? item.externalId : 'Unassigned',
-        jobNumber: item.serviceOrder?.number,
+        [InvoiceOrderField.SERVICE_ORDER_EXTERNAL_ID]:
+          item.serviceOrder?.number,
         [InvoiceOrderField.CUSTOMER_NAME]: item.propertyOwner.name,
-        invoiceType: InvoiceTypeMap[item.type],
-        type: item.serviceOrder?.type,
-        amount: `${formatCurrency(
+        [InvoiceOrderField.TYPE]: InvoiceTypeMap[item.type],
+        [InvoiceOrderField.SERVICE_ORDER_TYPE]: item.serviceOrder?.type,
+        [InvoiceOrderField.TOTAL_NET_AMOUNT]: `${formatCurrency(
           item
             ? (item.totalAmount?.grossAmount ?? 0) /
                 10 ** item.totalAmount.fractionDigits!
@@ -190,7 +200,7 @@ export const makeRows = (
             currency: item.totalAmount.currency,
           },
         )}`,
-        status: item.status,
+        [InvoiceOrderField.STATUS]: item.status,
         actions: {
           pdfPath: item.additionalInfo.pdfPath,
           serviceCompanyId,

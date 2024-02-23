@@ -11,7 +11,8 @@ import {Actions} from './Actions';
 
 export const columns: GridColDef[] = [
   getColumnProps({
-    field: 'number',
+    field: PropertyOwnerOrderField.EXTERNAL_ID,
+    sortable: true,
     headerName: 'number',
     align: 'center',
     flex: 0.75,
@@ -34,25 +35,29 @@ export const columns: GridColDef[] = [
     sortable: true,
   }),
   getColumnProps({
-    field: 'address',
+    field: PropertyOwnerOrderField.BILLING_ADDRESS,
+    sortable: true,
     headerName: 'address',
     cellClassName: 'truncateText',
     flex: 1.5,
   }),
   getColumnProps({
-    field: 'phone',
+    field: PropertyOwnerOrderField.PHONE,
+    sortable: true,
     headerName: 'phone',
     flex: 0.75,
     align: 'center',
   }),
   getColumnProps({
-    field: 'units',
+    field: PropertyOwnerOrderField.NUMBER_OF_ELEVATOR,
+    sortable: true,
     headerName: 'no. of units',
     align: 'center',
     flex: 0.5,
   }),
   getColumnProps({
-    field: 'createdAt',
+    field: PropertyOwnerOrderField.CREATED_TIME,
+    sortable: true,
     headerName: 'CUSTOMER SINCE',
     align: 'center',
   }),
@@ -77,17 +82,18 @@ export const makeRows = (
   customers.map((item, index: number) => ({
     id: index,
     [PropertyOwnerOrderField.NAME]: item.name,
-    number: item.externalId,
-    address: item.billingAddress?.fullName,
-    units: item.unitNumber,
-    phone: item.contact.phone === '+' ? '-' : item.contact.phone,
+    [PropertyOwnerOrderField.EXTERNAL_ID]: item.externalId,
+    [PropertyOwnerOrderField.BILLING_ADDRESS]: item.billingAddress?.fullName,
+    [PropertyOwnerOrderField.NUMBER_OF_ELEVATOR]: item.unitNumber,
+    [PropertyOwnerOrderField.PHONE]:
+      item.contact.phone === '+' ? '-' : item.contact.phone,
     access: 'Invite',
     navigateTo: `details/${item.id}?tab=0`,
     actions: {
       toEmail: item.contact.email,
       propertyOwnerId: item.id,
     },
-    createdAt: formatDate(
+    [PropertyOwnerOrderField.CREATED_TIME]: formatDate(
       getDateObject(item.additionalInfo.registrationDate),
     ) as string,
   }));

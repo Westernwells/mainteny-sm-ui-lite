@@ -10,14 +10,16 @@ import {Actions} from './Actions';
 
 export const columns: GridColDef[] = [
   getColumnProps({
-    field: 'number',
+    field: ContractOrderField.EXTERNAL_ID,
+    sortable: true,
     headerName: 'number',
     align: 'left',
     headerAlign: 'left',
     flex: 1.25,
   }),
   getColumnProps({
-    field: 'customer',
+    field: ContractOrderField.PROPERTY_OWNER_NAME,
+    sortable: true,
     headerName: 'customer',
     cellClassName: 'truncateText',
     align: 'left',
@@ -25,13 +27,8 @@ export const columns: GridColDef[] = [
     flex: 1.5,
   }),
   getColumnProps({
-    field: 'name',
-    headerName: 'contract name',
-    align: 'left',
-    headerAlign: 'left',
-  }),
-  getColumnProps({
-    field: 'units',
+    field: ContractOrderField.NUMBER_OF_ELEVATOR,
+    sortable: true,
     headerName: 'no. of units',
     align: 'center',
     headerAlign: 'center',
@@ -53,14 +50,16 @@ export const columns: GridColDef[] = [
     sortable: true,
   }),
   getColumnProps({
-    field: 'type',
-    headerName: 'type',
+    field: ContractOrderField.NAME,
+    sortable: true,
+    headerName: 'contract name',
     align: 'left',
     headerAlign: 'left',
   }),
   getColumnProps({
-    field: 'status',
-    headerName: 'status',
+    field: ContractOrderField.STATUS,
+    sortable: true,
+    headerName: 'contract status',
     align: 'center',
     headerAlign: 'center',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
@@ -75,8 +74,9 @@ export const columns: GridColDef[] = [
     flex: 1,
   }),
   getColumnProps({
-    field: 'cost',
-    headerName: 'Price (excl. VAT)',
+    field: ContractOrderField.NET_PRICE,
+    sortable: true,
+    headerName: 'cost/year',
     align: 'right',
     headerAlign: 'right',
     flex: 1,
@@ -105,24 +105,23 @@ export const makeRows = (
   contracts
     ? contracts.map((item, index) => ({
         id: index,
-        number: item.externalId || '-',
-        customer: item.propertyOwner.name,
-        units: item.elevators.length,
+        [ContractOrderField.EXTERNAL_ID]: item.externalId || '-',
+        [ContractOrderField.PROPERTY_OWNER_NAME]: item.propertyOwner.name,
+        [ContractOrderField.NUMBER_OF_ELEVATOR]: item.elevators.length,
         [ContractOrderField.START_TIME]: item.start
           ? formatDate(toDate(item.start))
           : '-',
         [ContractOrderField.EXPIRY_TIME]: item.end
           ? formatDate(toDate(item.end))
           : '-',
-        type: item.type,
-        name: item.name,
-        cost:
+        [ContractOrderField.NAME]: item.name,
+        [ContractOrderField.NET_PRICE]:
           `${formatCurrency(
             (item.additionalInfo?.price?.netAmount ?? 0) /
               10 ** (item.additionalInfo?.price?.fractionDigits ?? 0),
             {currency: item.additionalInfo.price?.currency || currencyCode},
           )}` || '-',
-        status: item.status,
+        [ContractOrderField.STATUS]: item.status,
         actions: {
           url:
             item?.additionalInfo?.documents &&
