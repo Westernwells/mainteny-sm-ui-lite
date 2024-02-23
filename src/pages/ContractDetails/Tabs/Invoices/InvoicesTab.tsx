@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
@@ -9,9 +9,8 @@ import {
   InvoiceStatusView,
   InvoiceView,
 } from 'models/invoice';
-import {useElevatorInvoices, useInvoices} from 'hooks/reactQuery/useInvoice';
+import {useContractInvoices} from 'hooks/reactQuery/useInvoice';
 import {PageListingLayout} from 'components/PageListingLayout';
-import {getStartEndPrice} from 'utils/contract-utils';
 import {mapInvoiceStatus} from 'utils/invoice';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
@@ -33,7 +32,7 @@ import {columns, makeRows} from './InvoicesDataGridProps';
 
 const pageSize = 25;
 
-export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
+export const Invoices = ({contractId}: {contractId?: string}) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const {user} = useUserSession();
@@ -56,11 +55,6 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   const [pageCount, setPageCount] = useState(0);
   const textInput = useRef<HTMLInputElement>(null);
 
-  const [totalAmountFrom, totalAmountTo] = useMemo(
-    () => getStartEndPrice(cost),
-    [cost],
-  );
-
   const {data: xeroInfoData} = useCompanyXeroInfo(
     user?.userAccount.serviceCompany.id,
   );
@@ -69,63 +63,31 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   });
 
   const {
-    data: allInvoiceResource = createEmptyResource<InvoiceView>(10),
-    isLoading: isLoadingAllInvoiceResource,
-    isFetching: isFetchingAllInvoiceResource,
-    isFetched: isFetchedAllInvoiceResource,
-    isIdle: isIdleAllInvoiceResource,
-  } = useInvoices(
+    data: contractInvoiceResource = createEmptyResource<InvoiceView>(10),
+    isLoading: isLoadingContractInvoiceResource,
+    isFetching: isFetchingContractInvoiceResource,
+    isFetched: isFetchedContractInvoiceResource,
+    isIdle: isIdleContractInvoiceResource,
+  } = useContractInvoices(
+    contractId ?? '',
     {
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: search,
       status: status ? [status] : [],
-      ...(cost.length > 0 && {
-        totalAmountFrom,
-        totalAmountTo,
-      }),
       ...(sortOrder && {order: sortOrder}),
       ...(orderByField && {orderByField}),
     },
     {keepPreviousData: true},
   );
 
-  const {
-    data: elevatorInvoiceResource = createEmptyResource<InvoiceView>(10),
-    isLoading: isLoadingElevatorInvoiceResource,
-    isFetching: isFetchingElevatorInvoiceResource,
-    isFetched: isFetchedElevatorInvoiceResource,
-    isIdle: isIdleElevatorInvoiceResource,
-  } = useElevatorInvoices(
-    elevatorId ?? '',
-    {
-      pageIndex: page.pageIndex,
-      pageSize: page.pageSize,
-      query: search,
-      status: status ? [status] : [],
-      totalAmountFrom,
-      totalAmountTo,
-      ...(sortOrder && {order: sortOrder}),
-      ...(orderByField && {orderByField}),
-    },
-    {keepPreviousData: true},
-  );
-
-  const {invoiceResource, isLoading, isFetching, isFetched, isIdle} = elevatorId
-    ? {
-        invoiceResource: elevatorInvoiceResource,
-        isLoading: isLoadingElevatorInvoiceResource,
-        isFetching: isFetchingElevatorInvoiceResource,
-        isFetched: isFetchedElevatorInvoiceResource,
-        isIdle: isIdleElevatorInvoiceResource,
-      }
-    : {
-        invoiceResource: allInvoiceResource,
-        isLoading: isLoadingAllInvoiceResource,
-        isFetching: isFetchingAllInvoiceResource,
-        isFetched: isFetchedAllInvoiceResource,
-        isIdle: isIdleAllInvoiceResource,
-      };
+  const {invoiceResource, isLoading, isFetching, isFetched, isIdle} = {
+    invoiceResource: contractInvoiceResource,
+    isLoading: isLoadingContractInvoiceResource,
+    isFetching: isFetchingContractInvoiceResource,
+    isFetched: isFetchedContractInvoiceResource,
+    isIdle: isIdleContractInvoiceResource,
+  };
 
   totalInvoiceRef.current = totalInvoiceRef.current || invoiceResource.total;
 
@@ -191,7 +153,7 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   if (isFetched && !totalInvoiceRef.current) {
     return (
       <EmptySection
-        label="No invoices yet. Please click the button below to add."
+        label="No invoices yet."
         btnLabel="Add Invoice"
         containerStyle={{
           height: '100%',

@@ -77,7 +77,7 @@ export const ContractDetails = () => {
           />
         </TabsBody>
         <TabsBody value={tabValue} index={2}>
-          <InvoicesTab />
+          <InvoicesTab contractId={contractDetails?.id} />
         </TabsBody>
       </Tabs>
       <SelectModal

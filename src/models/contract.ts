@@ -130,6 +130,8 @@ export interface ContractView {
   paymentTerm?: ContractPaymentTermView;
   start: string;
   end: string;
+  startTime?: string;
+  endTime?: string;
 }
 export interface ContractSimpleView {
   id: string;
