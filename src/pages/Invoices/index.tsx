@@ -12,8 +12,6 @@ import {
 import {useElevatorInvoices, useInvoices} from 'hooks/reactQuery/useInvoice';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {useNavigate} from 'react-router-dom';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {
   costRangeConvertor as crConverter,
   getStartEndPrice,
@@ -169,7 +167,6 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   }, [invoiceResource, pageSize]);
 
   const navigateToNewInvoice = () => {
-    Mixpanel.identifyAndTrack(mixpanelEvents.NEW_INVOICE_BUTTON_CLICKED);
     navigate('/invoices/new');
   };
 

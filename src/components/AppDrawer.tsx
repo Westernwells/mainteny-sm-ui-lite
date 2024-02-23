@@ -42,8 +42,6 @@ import {ReactComponent as AccountingInvoiceMail} from 'assets/icons/accounting-i
 import {ReactComponent as BusinessContractApproveActive} from 'assets/icons/business-contract-approve-active.svg';
 import {ReactComponent as BusinessContractApprove} from 'assets/icons/business-contract-approve.svg';
 import Fade from '@mui/material/Fade';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {Role} from 'models/user';
 import {ClickAwayListener} from '@mui/material';
@@ -133,7 +131,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/');
-        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_HOME_CLICKED);
         navigate('/');
       },
     },
@@ -150,7 +147,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/orders');
-        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_ORDERS_CLICKED);
         navigate('/orders');
       },
     },
@@ -167,7 +163,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/units');
-        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_UNITS_CLICKED);
         navigate('/units');
       },
     },
@@ -184,7 +179,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/customers');
-        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_CUSTOMERS_CLICKED);
         navigate('/customers');
       },
     },
@@ -201,7 +195,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/contracts');
-        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_CONTRACTS_CLICKED);
         navigate('/contracts');
       },
     },
@@ -218,7 +211,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/quotations');
-        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_QUOTATIONS_CLICKED);
         navigate('/quotations');
       },
     },
@@ -235,7 +227,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/invoices');
-        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_INVOICES_CLICKED);
         navigate('/invoices');
       },
     },
@@ -252,7 +243,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/articles');
-        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_ARTICLES_CLICKED);
         navigate('/articles');
       },
     },
@@ -269,7 +259,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/employees');
-        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_EMPLOYEES_CLICKED);
         navigate('/employees');
       },
     },
@@ -302,7 +291,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/settings');
-        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_SETTINGS_CLICKED);
         navigate('/settings');
       },
     },
@@ -319,7 +307,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/admin/companies');
-        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_COMPANIES_CLICKED);
         navigate('/admin/companies');
       },
     },
@@ -336,7 +323,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
         setSelectedIndex(index);
         setSelectedPath('/admin/system-settings');
-        Mixpanel.identifyAndTrack(mixpanelEvents.MENU_SYSTEM_SETTINGS_CLICKED);
         navigate('/admin/system-settings');
       },
     },
@@ -385,7 +371,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             disableRipple
             onClick={() => {
               setSelectedPath('/');
-              Mixpanel.identifyAndTrack(mixpanelEvents.MENU_HOME_CLICKED);
               navigate('/');
             }}>
             <MaintenyLogoWhite width={118.43} height={24} />

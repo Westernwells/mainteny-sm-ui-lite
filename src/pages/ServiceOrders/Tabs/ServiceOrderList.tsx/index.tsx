@@ -1,6 +1,4 @@
 import Box from '@mui/material/Box';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {
@@ -219,7 +217,6 @@ export const ServiceOrderList = () => {
         showActionBtn
         btnLabel="Add Service Job"
         btnAction={() => {
-          Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ORDER_BUTTON_CLICKED);
           navigate('/orders/new?type=regular');
         }}
         containerStyle={{

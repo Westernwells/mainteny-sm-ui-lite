@@ -4,10 +4,7 @@ import {useTranslation} from 'react-i18next';
 import {PageLayout} from 'components/PageLayout';
 import ErrorBoundary from 'components/ErrorBoundary';
 import {axiosClient} from 'utils/axios-utils';
-import {onVisibilityChange} from 'utils/utils';
-import {useEffect, useState} from 'react';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
+import {useState} from 'react';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import Login from 'pages/Login';
 import ResetPassword from 'pages/ResetPassword';
@@ -67,16 +64,6 @@ export const Router = () => {
   const [currentPageTitle, setCurrentPageTitle] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
-
-  useEffect(() => {
-    onVisibilityChange((visible) => {
-      if (visible) {
-        Mixpanel.timeEvent(mixpanelEvents.ACTIVE_SESSION);
-      } else {
-        Mixpanel.identifyAndTrack(mixpanelEvents.ACTIVE_SESSION);
-      }
-    });
-  }, []);
 
   return (
     <ErrorBoundary navigate={navigate} location={location}>
