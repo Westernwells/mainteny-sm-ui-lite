@@ -36,10 +36,7 @@ import {
   InvoiceActivityView,
 } from 'models/invoice';
 import {Comment} from 'models/comment';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {languageContextMap} from 'utils/utils';
-import {getTotalFromArticles, getTotalWithVatFromArticles} from 'utils/invoice';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useUserSession} from './useUserSession';
 
@@ -248,21 +245,14 @@ export const useCreateInvoice = () => {
   const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(({data}: {data: CreateInvoice}) => postInvoice(data), {
-    onSuccess: (data, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries([qk.fetchInvoices]);
       queryClient.invalidateQueries([qk.invoiceById]);
       queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
       enqueueSnackbar(`Invoice created successfully`, {
         variant: 'success',
       });
-      Mixpanel.identifyAndTrack(mixpanelEvents.NEW_INVOICE_CREATED, {
-        invoiceId: data.value,
-        propertyOwnerId: variables.data.propertyOwnerId,
-        serviceOrderId: variables.data.serviceOrderId,
-        amountWithoutVat: getTotalFromArticles(variables.data.items),
-        amountWithVat: getTotalWithVatFromArticles(variables.data.items),
-        isPartialInvoice: variables.data.type === 'PARTIAL',
-      });
+
       // navigate(`/invoices/details/${data.value}`);
     },
     onError: (err) => {

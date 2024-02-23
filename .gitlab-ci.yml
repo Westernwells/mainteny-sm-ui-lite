@@ -125,7 +125,6 @@ tests:
     ENV: stage
     REACT_APP_BASE_URL: http://localhost:5173
     REACT_APP_API_URL: $REACT_APP_API_URL_STAGE
-    REACT_APP_MIXPANEL_TOKEN: $REACT_APP_MIXPANEL_TOKEN_STAGE
     REACT_APP_GOOGLE_MAPS_KEY: $REACT_APP_GOOGLE_MAPS_KEY_STAGE
   script:
     - yarn install --cache-folder .yarn-cache

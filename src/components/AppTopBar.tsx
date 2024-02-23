@@ -10,9 +10,7 @@ import {useContext, useEffect} from 'react';
 import {axiosClient} from 'utils/axios-utils';
 import {Role} from 'models/user';
 import {convertToText, languageMap} from 'utils/utils';
-import {Mixpanel} from 'mixpanel/mixpanel';
 import {useQueryClient} from 'react-query';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {Notifications} from 'pages/Notifications';
 import {LanguageContext} from 'context/LanguageProvider';
 import {Language} from 'models/misc';
@@ -157,7 +155,6 @@ export const AppTopBar = ({
                 {
                   label: t('Logout'),
                   action: () => {
-                    Mixpanel.identifyAndTrack(mixpanelEvents.LOGOUT);
                     signout();
                   },
                 },

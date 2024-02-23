@@ -2,8 +2,6 @@ import ViewListIcon from '@mui/icons-material/ViewList';
 import MapIcon from '@mui/icons-material/Map';
 
 import {useNavigate} from 'react-router-dom';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {useQueryState} from 'hooks/useQueryState';
 import {Tabs} from 'components/Tab';
 import {TabsBody} from 'components/TabsBody';
@@ -30,7 +28,6 @@ export const MyUnits = () => {
   });
 
   const onClickNewUnitBtn = () => {
-    Mixpanel.identifyAndTrack(mixpanelEvents.NEW_UNIT_BUTTON_CLICKED);
     navigate('new');
   };
 

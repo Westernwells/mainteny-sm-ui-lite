@@ -15,8 +15,6 @@ import {Order} from 'models/misc';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {padNumber} from 'utils/utils';
 import {useFormatDate} from 'hooks/useFormatDate';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {columns, makeRows} from './ContractsWidgetDataGridProps';
 
 interface Props {
@@ -97,10 +95,6 @@ export const ContractsWidget = ({
       containerStyles={{flexGrow: 1}}
       headerStyles={{mt: '0.5em'}}
       handleAction={() => {
-        Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_OVERVIEW_OPEN, {
-          pageName: 'Customers',
-          source: 'Contracts',
-        });
         openTab();
       }}
       headerActionIcon={<OpenInNew />}

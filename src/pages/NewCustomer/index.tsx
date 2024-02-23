@@ -13,8 +13,6 @@ import {
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {formatPhoneNumber} from 'utils/customer-utils';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {createEmptyResource} from 'utils/paging-utils';
 import {formatAddressFullname} from 'utils/utils';
@@ -305,12 +303,6 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
     const response = await createCustomer(body);
 
     if (response) {
-      Mixpanel.identifyAndTrack(mixpanelEvents.NEW_CUSTOMER_BUTTON_CLICKED, {
-        pageName: 'Customers',
-        submit: 1,
-        customerNumber: response.value,
-        creationDate: Date.now(),
-      });
       resetLocalStorage();
       navigate(`/customers/details/${response.value}?tab=0`, {replace: true});
     }
