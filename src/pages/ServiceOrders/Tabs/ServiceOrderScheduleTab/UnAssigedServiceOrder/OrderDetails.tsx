@@ -44,11 +44,20 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
   const [formValid, setFormValid] = useState(false);
 
   useEffect(() => {
+    if (!form.technicianId) {
+      return setFormValid(false);
+    }
+
+    if (!switchActive && form.technicianId) {
+      return setFormValid(true);
+    }
+
     if (
       switchActive &&
       form?.startTime &&
       form.endTime &&
-      form.date &&
+      form.startDate &&
+      form.endDate &&
       form.technicianId
     ) {
       setFormValid(true);
@@ -73,10 +82,13 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
 
   const schedule = () => {
     const orderStartTime = toRestDateTime(
-      setDateTime(form?.date!, formatDate(form.startTime as Date, 'HH:mm')!),
+      setDateTime(
+        form?.startDate!,
+        formatDate(form.startTime as Date, 'HH:mm')!,
+      ),
     );
     const orderEndTime = toRestDateTime(
-      setDateTime(form?.date!, formatDate(form.endTime as Date, 'HH:mm')!),
+      setDateTime(form?.endDate!, formatDate(form.endTime as Date, 'HH:mm')!),
     );
 
     if (form.technicianId) {
@@ -165,7 +177,6 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
           setSwitchActive(value)
         }
         title={t('Assign Technician')}
-        datePickerLabel="Schedule To"
         getFormValues={(value: SetStateAction<ScheduleForm>) => setForm(value)}
         getFormErrors={(
           errors: SetStateAction<FormikErrors<ScheduleForm> | undefined>,

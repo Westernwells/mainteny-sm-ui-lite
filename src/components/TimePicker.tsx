@@ -18,6 +18,7 @@ interface Props extends Partial<TimePickerProps<Date>> {
   getSelectedTime?: (state: Date | null) => void;
   containerStyles?: {[key: string]: any};
   textFieldProps?: TextFieldProps;
+  required?: boolean;
 }
 
 export const TimePicker = ({
@@ -27,6 +28,7 @@ export const TimePicker = ({
   textFieldProps,
   minTime,
   maxTime,
+  required = false,
   ...props
 }: Props) => {
   const {t} = useTranslation();
@@ -213,9 +215,15 @@ export const TimePicker = ({
                 ...textFieldProps,
                 label: t(`${textFieldProps?.label}`),
                 size: textFieldProps?.size || 'small',
-                sx: {width: '100%'},
+                sx: {
+                  '& .Mui-error': {
+                    lineHeight: 'unset',
+                  },
+                  width: '100%',
+                },
                 InputLabelProps: {
                   shrink: true,
+                  required,
                   onClick: handleOpen,
                 },
                 inputProps: {

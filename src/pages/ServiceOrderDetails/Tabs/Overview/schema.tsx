@@ -228,6 +228,8 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
                         `${item.technician.userAccount.firstName} ${item.technician.userAccount.lastName}`,
                     )
                     .join(', ')
+                : serviceOrderDetails.additionalInfo?.candidateTechnician
+                ? `${serviceOrderDetails.additionalInfo?.candidateTechnician.userAccount.firstName} ${serviceOrderDetails.additionalInfo?.candidateTechnician.userAccount.lastName}`
                 : '-'
             }
             iconBackground={theme.palette.info.outlinedHoverBg}

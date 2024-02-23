@@ -262,7 +262,12 @@ export const DatePicker = ({
                 sx: popperSx,
               },
               textField: {
-                sx: {width: '100%'},
+                sx: {
+                  '& .Mui-error': {
+                    lineHeight: 'unset',
+                  },
+                  width: '100%',
+                },
                 ...textFieldProps,
                 size: textFieldProps?.size || 'small',
                 label: t(`${textFieldProps?.label}`),
