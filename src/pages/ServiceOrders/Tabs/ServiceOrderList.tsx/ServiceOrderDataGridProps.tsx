@@ -58,42 +58,47 @@ export const getServiceOrderPaymentStatusStyles = (
 
 export const columns: GridColDef[] = [
   getColumnProps({
-    field: 'number',
+    field: ServiceOrderOrderField.EXTERNAL_ID,
+    sortable: true,
     headerName: 'number',
     flex: 0.5,
   }),
   getColumnProps({
-    field: 'customer',
+    field: ServiceOrderOrderField.PROPERTY_OWNER_NAME,
     headerName: 'customer',
     cellClassName: 'truncateText',
     flex: 1.5,
+    sortable: true,
   }),
   getColumnProps({
-    field: 'address',
+    field: ServiceOrderOrderField.ELEVATOR_ADDRESS,
+    sortable: true,
     headerName: 'address',
     cellClassName: 'truncateText',
     flex: 1.5,
   }),
   getColumnProps({
-    field: 'unit',
+    field: ServiceOrderOrderField.ELEVATOR_EXTERNAL_ID,
+    sortable: true,
     headerName: 'unit number',
-    align: 'right',
-    headerAlign: 'right',
+    align: 'center',
+    headerAlign: 'center',
     flex: 1,
   }),
   getColumnProps({
     field: ServiceOrderOrderField.DUE_DATE,
     headerName: 'due date',
     align: 'center',
-    flex: 0.75,
     sortable: true,
   }),
   getColumnProps({
-    field: 'technician',
+    field: ServiceOrderOrderField.TECHNICIAN_NAME,
     headerName: 'technician',
+    sortable: true,
   }),
   getColumnProps({
-    field: 'type',
+    field: ServiceOrderOrderField.JOB_TYPE,
+    sortable: true,
     headerName: 'job type',
     renderCell: (params: GridRenderCellParams<any, any, any>) => {
       const {t} = useTranslation();
@@ -108,7 +113,8 @@ export const columns: GridColDef[] = [
     },
   }),
   getColumnProps({
-    field: 'paymentStatus',
+    field: ServiceOrderOrderField.PAYMENT_STATUS,
+    sortable: true,
     headerName: 'payment status',
     align: 'center',
     renderCell: (params: GridRenderCellParams<any, any, any>) => {
@@ -123,7 +129,8 @@ export const columns: GridColDef[] = [
     },
   }),
   getColumnProps({
-    field: 'status',
+    field: ServiceOrderOrderField.JOB_STATUS,
+    sortable: true,
     headerName: 'job status',
     align: 'center',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
@@ -147,13 +154,17 @@ export const makeRows = (
     [ServiceOrderOrderField.DUE_DATE]: item.dueDate
       ? formatDate(toDate(item.dueDate))
       : '-',
-    number: item.number,
-    type: item.type,
+    [ServiceOrderOrderField.PROPERTY_OWNER_NAME]:
+      item.elevator.propertyOwner.name,
+    [ServiceOrderOrderField.EXTERNAL_ID]: item.number,
+    [ServiceOrderOrderField.JOB_TYPE]: item.type,
     customer: item.elevator.propertyOwner.name,
-    address: item.elevator.address.fullName || '-',
-    unit: item.elevator.externalId || '-',
+    [ServiceOrderOrderField.ELEVATOR_ADDRESS]:
+      item.elevator.address.fullName || '-',
+    [ServiceOrderOrderField.ELEVATOR_EXTERNAL_ID]:
+      item.elevator.externalId || '-',
     date: formatDate(item.dueDate),
-    technician: item.schedules.length
+    [ServiceOrderOrderField.TECHNICIAN_NAME]: item.schedules.length
       ? item.schedules
           .map(
             (x) =>
@@ -161,7 +172,7 @@ export const makeRows = (
           )
           .join(',')
       : '-',
-    status: item.status,
+    [ServiceOrderOrderField.JOB_STATUS]: item.status,
     navigateTo: `details/${item.id}`,
-    paymentStatus: item.additionalInfo.paymentStatus,
+    [ServiceOrderOrderField.PAYMENT_STATUS]: item.additionalInfo.paymentStatus,
   }));

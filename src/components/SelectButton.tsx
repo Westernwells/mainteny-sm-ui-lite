@@ -10,6 +10,7 @@ interface Props {
   onClick?: MouseEventHandler<HTMLButtonElement>;
   sxContainer?: SxProps<Theme>;
   buttonProps?: ButtonProps;
+  testId?: string;
 }
 
 export const SelectButton = ({
@@ -18,6 +19,7 @@ export const SelectButton = ({
   onClick,
   sxContainer,
   buttonProps,
+  testId,
 }: Props) => (
   <Box
     bgcolor="inputBackground.main"
@@ -43,6 +45,7 @@ export const SelectButton = ({
         onClick,
         ...buttonProps,
       }}
+      testId={testId}
     />
   </Box>
 );

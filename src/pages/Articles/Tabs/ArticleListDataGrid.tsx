@@ -36,17 +36,20 @@ export const columns: GridColDef[] = [
     sortable: true,
   }),
   getColumnProps({
-    field: 'externalId',
+    field: ArticleOrderField.EXTERNAL_ID,
+    sortable: true,
     headerName: 'Article ID',
   }),
   getColumnProps({
-    field: 'type',
+    field: ArticleOrderField.TYPE,
+    sortable: true,
     headerName: 'TYPE',
     cellClassName: 'truncateText',
     flex: 0.5,
   }),
   getColumnProps({
-    field: 'unit',
+    field: ArticleOrderField.UNIT,
+    sortable: true,
     headerName: 'UNIT',
     cellClassName: 'truncateText',
     flex: 0.5,
@@ -83,18 +86,21 @@ export const columns: GridColDef[] = [
     },
   }),
   getColumnProps({
-    field: 'sellingPrice',
+    field: ArticleOrderField.SELLING_NET_AMOUNT,
+    sortable: true,
     headerName: 'SELLING PRICE (EXCL. VAT)',
     cellClassName: 'truncateText',
     align: 'right',
   }),
   getColumnProps({
-    field: 'description',
+    field: ArticleOrderField.DESCRIPTION,
+    sortable: true,
     headerName: 'DESCRIPTION',
     cellClassName: 'truncateText',
   }),
   getColumnProps({
-    field: 'taxes',
+    field: ArticleOrderField.SELLING_PERCENTAGE_VAT,
+    sortable: true,
     headerName: 'TAXES (VAT)',
     cellClassName: 'truncateText',
     align: 'right',
@@ -108,18 +114,19 @@ export const ArticleListDataGrid = () => {
     _.map(articles, (item, index) => ({
       id: index,
       [ArticleOrderField.NAME]: item.name,
-      externalId: item.externalId ? item.externalId : '-',
-      type: `${t(stringToTitleCase(item.type))}`,
-      unit: item.unit,
-      sellingPrice: formatCurrency(
+      [ArticleOrderField.EXTERNAL_ID]: item.externalId ? item.externalId : '-',
+      [ArticleOrderField.TYPE]: `${t(stringToTitleCase(item.type))}`,
+      [ArticleOrderField.UNIT]: item.unit,
+      [ArticleOrderField.SELLING_NET_AMOUNT]: formatCurrency(
         (item.unitSellingAmount.netAmount ?? 0) /
           (10 ** item.unitSellingAmount.fractionDigits ?? 0),
         {
           currency: item.unitSellingAmount.currency,
         },
       ),
-      description: item.description,
-      taxes: item.unitSellingAmount.percentageVat
+      [ArticleOrderField.DESCRIPTION]: item.description,
+      [ArticleOrderField.SELLING_PERCENTAGE_VAT]: item.unitSellingAmount
+        .percentageVat
         ? `${item.unitSellingAmount.percentageVat}%`
         : '-',
       navigateTo: `details/${item.id}`,
@@ -155,7 +162,7 @@ export const ArticleListDataGrid = () => {
       query,
       type,
       order: sortOrder || Order.DESC,
-      orderBy: orderByField || ArticleOrderField.CREATED_DATE,
+      orderByField: orderByField || ArticleOrderField.CREATED_DATE,
     },
     {keepPreviousData: true},
     true,

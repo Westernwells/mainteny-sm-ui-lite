@@ -50,10 +50,10 @@ export const getQuotationStatusStyles = (
 
 export const columns: GridColDef[] = [
   {
-    field: 'number',
+    field: QuotationOrderField.EXTERNAL_ID,
+    sortable: true,
     align: 'left',
     flex: 0.5,
-    sortable: false,
     renderHeader: () => (
       <Typography variant="subtitle2" color="textSecondary">
         {T('NUMBER')}
@@ -68,11 +68,11 @@ export const columns: GridColDef[] = [
     sortable: true,
   },
   {
-    field: 'address',
+    field: QuotationOrderField.ELEVATOR_ADDRESS,
+    sortable: true,
     headerName: 'address',
     cellClassName: 'truncateText',
     flex: 1.5,
-    sortable: false,
     renderHeader: () => (
       <Typography variant="subtitle2" color="textSecondary">
         {T('ADDRESS')}
@@ -87,21 +87,21 @@ export const columns: GridColDef[] = [
     flex: 0.75,
   },
   {
-    field: QuotationOrderField.SALES_PRICE,
+    field: QuotationOrderField.TOTAL_NET_AMOUNT,
     headerName: 'Total amount (excl. VAT)',
     flex: 1,
     align: 'right',
     headerAlign: 'right',
   },
   {
-    field: 'notes',
+    field: QuotationOrderField.COMMENT_COUNT,
+    sortable: true,
     headerName: 'notes',
     align: 'center',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <NotesIndicator quotation={params.row.quotation} />
     ),
     flex: 0.5,
-    sortable: false,
     headerAlign: 'center',
     renderHeader: () => (
       <Typography variant="subtitle2" color="textSecondary">
@@ -110,7 +110,8 @@ export const columns: GridColDef[] = [
     ),
   },
   {
-    field: 'status',
+    field: QuotationOrderField.STATUS,
+    sortable: true,
     align: 'center',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
@@ -122,7 +123,6 @@ export const columns: GridColDef[] = [
       />
     ),
     flex: 0.5,
-    sortable: false,
     headerAlign: 'center',
     renderHeader: () => (
       <Typography variant="subtitle2" color="textSecondary">
@@ -155,11 +155,12 @@ export const makeRows = (
   quotations.data.map((item: QuotationView, index: number) => ({
     id: index,
     quotationId: item.id,
-    number: item.number,
+    [QuotationOrderField.EXTERNAL_ID]: item.number,
     [QuotationOrderField.CUSTOMER_NAME]: item.elevator.propertyOwner.name,
-    address: item.elevator.propertyOwner.billingAddress?.fullName ?? '-',
+    [QuotationOrderField.ELEVATOR_ADDRESS]:
+      item.elevator.propertyOwner.billingAddress?.fullName ?? '-',
     [QuotationOrderField.CREATED_DATE]: formatDate(item.meta.createdAt),
-    [QuotationOrderField.SALES_PRICE]: `${formatCurrency(
+    [QuotationOrderField.TOTAL_NET_AMOUNT]: `${formatCurrency(
       item
         ? item.totalAmount.netAmount / 10 ** item.totalAmount.fractionDigits!
         : 0,
@@ -167,7 +168,7 @@ export const makeRows = (
         currency: item.totalAmount.currency,
       },
     )}`,
-    status: item.status,
+    [QuotationOrderField.STATUS]: item.status,
     quotation: item,
     navigateTo: `details/${item.id}`,
   }));

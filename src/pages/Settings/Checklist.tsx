@@ -158,6 +158,20 @@ const isValidSubject = (subject: string) => !isStringEmpty(subject);
 const areOptionsValid = (options: ExtendedCheckListComponentOption[]) =>
   options.every((option) => !isStringEmpty(option.text));
 
+const titleNumber = (refetchedChecklist: CheckList[]) => {
+  let maxNumber = 0;
+  refetchedChecklist.forEach((c) => {
+    const match = RegExp(/\d+$/).exec(c.name);
+    const number = match ? parseInt(match[0], 10) : 0;
+    if (number > maxNumber) {
+      maxNumber = number;
+    }
+  });
+
+  maxNumber += 1;
+  return maxNumber;
+};
+
 export const Checklist = () => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -182,7 +196,7 @@ export const Checklist = () => {
 
   const initialValues = useMemo(
     () => ({
-      name: checklist?.name ?? '',
+      name: checklist?.name ?? checklistTitle,
       components: checklist?.name
         ? checkListComponentViewToExtendedCreateCheckListRecord(
             checklist.components,
@@ -252,25 +266,19 @@ export const Checklist = () => {
     // If a duplicate checklist is created with the same name we are doing workaround for it.
     // We add number to the title of the checklist +1.
     (async () => {
-      if (initialValues.name) {
+      if (initialValues.name !== checklistTitle) {
         return;
       }
 
       const {data: refetchedChecklists} = await refetchChecklists();
-
       if (!refetchedChecklists?.data.length) {
         form.setValue('name', checklistTitle);
         return;
       }
 
-      const filteredChecklists = refetchedChecklists.data.filter((c) =>
-        c.name.startsWith(checklistTitle),
-      );
-      if (filteredChecklists.length) {
-        form.setValue(
-          'name',
-          `${checklistTitle} ${filteredChecklists.length + 1}`,
-        );
+      let number = titleNumber(refetchedChecklists.data);
+      if (number) {
+        form.setValue('name', `${checklistTitle} ${number}`);
       }
     })();
     // focus on name input when page is loaded

@@ -1,0 +1,145 @@
+export default class QuotationPage {
+  static visit = () => {
+    cy.visit('/quotations', {
+      failOnStatusCode: false,
+    });
+  };
+
+  static navigateTo = (path: string) => {
+    cy.visit(`/quotations/${path}`, {
+      failOnStatusCode: false,
+    });
+  };
+
+  static openDialog = (dialogTitle: string) => {
+    cy.contains(dialogTitle);
+  };
+
+  static addNewCustomer = () => {
+    cy.contains('Add New Customer').click();
+    QuotationPage.openDialog('Add New Customer');
+    const outside = cy.get('#alert-dialog-title');
+
+    cy.get('input[name="name"]').clear();
+    outside.click();
+    cy.get('input[name="name"]')
+      .parent()
+      .siblings('p')
+      .should('have.text', 'Customer Name is required');
+    cy.contains('Next').should('be.disabled');
+
+    cy.get('input[name="name"]').type('Test Company');
+
+    cy.contains('Next').should('not.be.disabled');
+
+    cy.contains('Next').click();
+
+    cy.get('input[name="billingAddress.component.name"]').should(
+      'have.value',
+      'Test Company',
+    );
+    cy.contains('Next').click();
+    cy.contains('Submit').click();
+    cy.contains('Customer created successfully');
+
+    cy.get('input[name="propertyOwnerId"]').should(
+      'have.value',
+      'Test Company',
+    );
+  };
+
+  static addNewUnit = () => {
+    cy.contains('Add New Unit').click();
+    cy.contains('Next').should('be.disabled');
+
+    cy.get('div[data-colindex="1"]').eq(1).click();
+
+    cy.contains('Next').should('not.be.disabled');
+
+    cy.contains('Next').click();
+
+    cy.contains('Next').should('be.disabled');
+
+    const outside = cy.get('#alert-dialog-title');
+
+    cy.get('input[name="address.fullName"]').clear();
+    outside.click();
+    cy.get('input[name="address.fullName"]')
+      .parent()
+      .siblings('p')
+      .should('have.text', 'Address is required');
+
+    cy.get('input[name="address.fullName"]').type('33 kehinde');
+    cy.wait(300);
+    cy.wait('@addressURLApi', {timeout: 15000}).then(() => {
+      cy.contains('33 Kehinde Owolabi Street, Lagos, Nigeria').click();
+
+      cy.get('input[name="address.fullName"]').should(
+        'have.value',
+        '33 Kehinde Owolabi St, Egbeda, Lagos 102213, Lagos, Nigeria',
+      );
+
+      cy.get('input[name="address.component.city"]').should(
+        'have.value',
+        'Lagos',
+      );
+
+      cy.get('input[name="address.component.postalCode"]').should(
+        'have.value',
+        '102213',
+      );
+
+      cy.get('input[name="address.component.country"]').should(
+        'have.value',
+        'Nigeria',
+      );
+
+      cy.get('input[name="address.component.state"]').should(
+        'have.value',
+        'Lagos',
+      );
+    });
+
+    cy.contains('Next').should('not.be.disabled');
+    cy.contains('Next').click();
+
+    cy.get('input[name="category"]').clear();
+    cy.contains('Escalator').click();
+    cy.get('input[name="category"]').should('have.value', 'Escalator');
+    cy.contains('Next').should('not.be.disabled');
+    cy.contains('Next').click();
+
+    cy.get('input[name="technicianNumber"]').type((3).toString(), {
+      force: true,
+    });
+    cy.get('input[name="serviceTime"]').type((30).toString(), {force: true});
+    cy.get('input[name="lastVisitDate"]').click();
+    cy.get('input[name="lastVisitDate"]')
+      .parent()
+      .siblings('p')
+      .should('have.text', 'Last visit is required');
+
+    cy.get('.MuiPickersDay-today').then((todayButton) => {
+      const todayTimestamp = todayButton.attr('data-timestamp');
+      cy.get(`[data-timestamp="${todayTimestamp}"]`)
+        .next('button')
+        .click({force: true});
+    });
+
+    cy.contains('Next').should('not.be.disabled');
+
+    cy.contains('Next').click();
+
+    cy.contains('Next').click();
+    cy.contains('Next').click();
+
+    cy.contains('Create Unit').click();
+
+    cy.contains('Unit created successfully');
+    cy.contains('Kehinde Owolabi Street 33, 102213, Lagos, Lagos, Nigeria');
+  };
+
+  static saveQuotation = () => {
+    cy.get('button').contains('Save').click();
+  };
+}

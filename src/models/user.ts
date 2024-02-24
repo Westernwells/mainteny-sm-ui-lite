@@ -1,6 +1,5 @@
 import {ServiceCompany, ServiceCompanyView} from './service-company';
 import {AddressRecord, Meta, Contact, TimeWindowRecord} from './misc';
-import {TechnicianUserData} from './technician';
 import {ServiceOrderType} from './service-order';
 
 export enum UserAccountStatus {

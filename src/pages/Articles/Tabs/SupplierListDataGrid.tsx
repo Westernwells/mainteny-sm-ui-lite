@@ -19,30 +19,36 @@ import {OrderByParams} from 'models/misc';
 
 export const columns: GridColDef[] = [
   getColumnProps({
-    field: 'externalId',
+    field: SupplierOrderField.EXTERNAL_ID,
+    sortable: true,
     headerName: 'supplier id',
   }),
   getColumnProps({
-    field: 'name',
+    field: SupplierOrderField.NAME,
+    sortable: true,
     headerName: 'name',
   }),
   getColumnProps({
-    field: 'category',
+    field: SupplierOrderField.CATEGORY,
+    sortable: true,
     headerName: 'category',
   }),
   getColumnProps({
-    field: 'address',
+    field: SupplierOrderField.ADDRESS,
+    sortable: true,
     headerName: 'address',
     cellClassName: 'truncateText',
     flex: 1.5,
   }),
   getColumnProps({
-    field: 'phone',
+    field: SupplierOrderField.PHONE,
+    sortable: true,
     headerName: 'phone number',
     flex: 1.5,
   }),
   getColumnProps({
-    field: 'email',
+    field: SupplierOrderField.EMAIL,
+    sortable: true,
     headerName: 'email address',
     flex: 1.5,
   }),
@@ -69,12 +75,12 @@ export const makeRows = (
 ): GridRowsProp =>
   _.map(articleSuppliers, (item, index) => ({
     id: index,
-    externalId: item.externalId,
-    name: item.name,
-    category: item.category,
-    address: item.address?.fullName ?? '',
-    phone: item.contact.phone,
-    email: item.contact.email,
+    [SupplierOrderField.EXTERNAL_ID]: item.externalId,
+    [SupplierOrderField.NAME]: item.name,
+    [SupplierOrderField.CATEGORY]: item.category,
+    [SupplierOrderField.ADDRESS]: item.address?.fullName ?? '',
+    [SupplierOrderField.PHONE]: item.contact.phone,
+    [SupplierOrderField.EMAIL]: item.contact.email,
     navigateTo: `/articles/supplier/${item.id}`,
     item,
   }));
