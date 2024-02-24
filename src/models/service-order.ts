@@ -1,4 +1,3 @@
-import {ServiceCompany, ServiceCompanyView} from './service-company';
 import {
   AttachmentResource,
   Elevator,
@@ -13,9 +12,13 @@ import {
   Meta,
   Order,
   PdfGenerationStatus,
-  AmountRecord,
+  Address,
 } from './misc';
-import {Technician, TechnicianSimpleView} from './technician';
+import {
+  Technician,
+  TechnicianAdditionalInfo,
+  TechnicianSimpleView,
+} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
 import {ArticleRecord, ArticleView, ServiceOrderArticleRecord} from './article';
@@ -81,6 +84,14 @@ export enum ServiceOrderTypeKeys {
 export enum ServiceOrderOrderField {
   CREATED_TIME = 'CREATED_TIME',
   DUE_DATE = 'DUE_DATE',
+  EXTERNAL_ID = 'EXTERNAL_ID',
+  PROPERTY_OWNER_NAME = 'PROPERTY_OWNER_NAME',
+  ELEVATOR_ADDRESS = 'ELEVATOR_ADDRESS',
+  ELEVATOR_EXTERNAL_ID = 'ELEVATOR_EXTERNAL_ID',
+  TECHNICIAN_NAME = 'TECHNICIAN_NAME',
+  JOB_TYPE = 'JOB_TYPE',
+  PAYMENT_STATUS = 'PAYMENT_STATUS',
+  JOB_STATUS = 'JOB_STATUS',
 }
 
 export enum DispatchPlanStatus {
@@ -130,6 +141,11 @@ export interface ServiceOrder {
   serviceTime: number;
 }
 
+export interface ServiceOrderTimeSlot {
+  startTime: string;
+  minutes?: number;
+}
+
 export interface ServiceOrderAdditionalInfo {
   appointmentConfirmed: boolean;
   appointmentNotificationDueDate?: string;
@@ -144,12 +160,39 @@ export interface ServiceOrderAdditionalInfo {
   purchaseOrderNumber?: string;
   callerInfo?: CallerInfo;
   paymentStatus?: ServiceOrderPaymentStatus;
+  workTimeInfo?: {
+    timeSlots: ServiceOrderTimeSlot[];
+    percentageSurcharge?: number;
+    billableMinutes?: number;
+    startTime: string;
+    endTime: string;
+  };
+  travelTimeInfo?: {
+    timeSlots: ServiceOrderTimeSlot[];
+    percentageSurcharge?: number;
+    billableMinutes?: number;
+    startTime: string;
+    endTime: string;
+  };
+  candidateTechnician?: ServiceOrderCandidateTechnician;
 }
 
 export interface ServiceOrderConfirmationInfo {
   sentDate: string;
   pdfGenerationStatus?: PdfGenerationStatus;
   pdfPath?: string;
+}
+
+export interface ServiceOrderCandidateTechnician {
+  additionalInfo: TechnicianAdditionalInfo;
+  address?: Address;
+  externalId: string;
+  id: string;
+  isOnline: boolean;
+  meta: Meta;
+  number: string;
+  tea: string;
+  userAccount: UserAccount;
 }
 
 export interface ServiceOrderView {
@@ -272,6 +315,11 @@ export interface UpdateJobSchedule {
   type: JobScheduleType;
 }
 
+export interface ServiceOrderReportTimeRecord {
+  timeSlots: ServiceOrderTimeSlot[];
+  percentageSurcharge?: number;
+}
+
 export interface CompleteServiceOrder {
   externalId?: string;
   description?: string;
@@ -285,6 +333,8 @@ export interface CompleteServiceOrder {
   travelEndTime?: string;
   onlyShowTotalTime?: boolean;
   articles?: ServiceOrderArticleRecord[];
+  workTimeRecord?: ServiceOrderReportTimeRecord;
+  travelTimeRecord?: ServiceOrderReportTimeRecord;
 }
 
 export interface CheckListAnswerRecord {
@@ -409,8 +459,8 @@ export interface RedispatchParams {
 }
 
 export interface UpdateServiceOrderScheduleBody {
-  endTime: string;
-  startTime: string;
+  endTime?: string;
+  startTime?: string;
   technicianIds: string[];
   type: JobScheduleType;
 }

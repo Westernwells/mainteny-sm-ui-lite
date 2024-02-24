@@ -95,6 +95,12 @@ export const Contracts = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (textInput.current) {
+      textInput.current.value = search ?? '';
+    }
+  }, [search]);
+
   const costRangeConvertor = (selectedItems: string[]) => {
     const range = crConverter(selectedItems, currentCurrency.symbol);
     setCost(range);
@@ -146,7 +152,7 @@ export const Contracts = () => {
   }
 
   const renderFilterItems = () => (
-    <FilterFields onClear={clearValues}>
+    <FilterFields onClear={clearValues} clearText="Clear all">
       <PriceRangeDropdown cost={cost} costRangeConvertor={costRangeConvertor} />
       <MultipleSelectCheckmarks
         label="Status"
@@ -178,6 +184,7 @@ export const Contracts = () => {
           btnLabel="New Contract"
           btnOnClick={() => navigate('/contracts/new')}
           showActionBtn
+          width="28rem"
         />
       }>
       <DataGridLayout

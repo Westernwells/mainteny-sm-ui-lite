@@ -75,6 +75,7 @@ export const queryKeys = {
   fetchAutoNumberConfig: 'fetchAutoNumberConfig',
   fetchSyncStatusXero: 'fetchSyncStatusXero',
   fetchXeroIntegration: 'fetchXeroIntegration',
+  fetchXeroAuthUrl: 'fetchXeroAuthUrl',
   fetchServiceJobArticles: 'fetchServiceJobArticles',
   fetchEntitiesStates: 'fetchEntitiesStates',
 

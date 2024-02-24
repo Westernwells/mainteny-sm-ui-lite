@@ -10,6 +10,7 @@ interface Props {
   wrapperStyle?: {[key: string]: string | number};
   showFilter?: boolean;
   hideClear?: boolean;
+  clearText?: string;
   onClear?: () => void;
 }
 
@@ -19,6 +20,7 @@ export const FilterFields = ({
   wrapperStyle,
   hideClear,
   showFilter = true,
+  clearText,
   onClear,
 }: Props) => {
   const {t} = useTranslation();
@@ -33,8 +35,12 @@ export const FilterFields = ({
           component="div"
           onClick={() => onClear && onClear()}
           mt="0.5em"
-          sx={{cursor: 'pointer', color: theme.palette.info.main}}>
-          {t('Clear filter')}
+          sx={{
+            cursor: 'pointer',
+            color: theme.palette.text.primary,
+            fontWeight: '600',
+          }}>
+          {clearText ? t(clearText) : t('Clear filter')}
         </Typography>
       ) : null}
     </Box>

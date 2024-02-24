@@ -22,6 +22,7 @@ interface Props {
   labelStyle?: {[key: string]: any};
   iconContainerStyles?: SxProps;
   enabled?: boolean;
+  shouldTranslate?: boolean;
 }
 
 export const CardProps = ({
@@ -38,6 +39,7 @@ export const CardProps = ({
   labelStyle,
   iconContainerStyles = {},
   enabled,
+  shouldTranslate = true,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -120,7 +122,7 @@ export const CardProps = ({
               display: '-webkit-box',
               ...bodyStyle,
             }}>
-            {hasProtocol(bodyText) ? bodyText : t(bodyText)}
+            {hasProtocol(bodyText) || !shouldTranslate ? bodyText : t(bodyText)}
           </Typography>
         ) : (
           bodyText

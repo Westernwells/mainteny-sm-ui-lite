@@ -43,6 +43,7 @@ export const SettingsSchema = ({label, company}: Props) => {
             bodyText={company?.settings.dateFormat.toLowerCase() || '-'}
             iconBackground={theme.palette.info.outlinedHoverBg}
             iconMaxHeight="3em"
+            shouldTranslate={false}
             containerStyles={{mt: '0.5em'}}
           />
         );

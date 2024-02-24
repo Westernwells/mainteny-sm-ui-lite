@@ -35,6 +35,7 @@ import {
   calculateQuotationTotalAmountInclVats,
   getQuotationAggregatedItemsVats,
 } from 'pages/QuotationDetails/utils';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {Button} from './Button';
 import {SelectButton} from './SelectButton';
 import {FormSelect} from './form/FormSelect';
@@ -241,6 +242,7 @@ export const ArticleItemsTableQuotation = ({
 
     setItems(items);
   };
+  const {user} = useUserSession();
 
   return (
     <Box
@@ -328,6 +330,10 @@ export const ArticleItemsTableQuotation = ({
                             propertyOwnerId={propertyOwnerId}
                             handleSelectItem={handleSelectItem}
                             isHovered={isHovered}
+                            defaultPercentageVat={
+                              user?.userAccount.serviceCompany.settings
+                                .percentageVat
+                            }
                           />
                         </TableRow>
                       )}
@@ -522,6 +528,7 @@ export const ArticleItemsTableQuotation = ({
               text="Add Article"
               onClick={() => createEmptyItem()}
               sxContainer={{flexGrow: 1}}
+              testId="AddArticle"
             />
           </Box>
         )}

@@ -310,6 +310,7 @@ export enum Language {
   SR_RS = 'SR_RS',
   IT_IT = 'IT_IT',
   RU_RU = 'RU_RU',
+  DA_DK = 'DA_DK',
 }
 
 export interface Coord {

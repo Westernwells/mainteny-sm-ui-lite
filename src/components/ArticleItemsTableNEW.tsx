@@ -41,6 +41,7 @@ import {
 import {fixRounding, getUniqueId} from 'utils/utils';
 import {useTheme} from '@mui/material/styles';
 import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {Button} from './Button';
 import {SelectButton} from './SelectButton';
 import {ArticleItemRowNEW} from './ArticleItemRowNEW';
@@ -234,6 +235,7 @@ export const ArticleItemsTableNEW = ({
 
     setItems(items);
   };
+  const {user} = useUserSession();
 
   return (
     <Box
@@ -321,6 +323,10 @@ export const ArticleItemsTableNEW = ({
                             propertyOwnerId={propertyOwnerId}
                             handleSelectItem={handleSelectItem}
                             isHovered={isHovered}
+                            defaultPercentageVat={
+                              user?.userAccount.serviceCompany.settings
+                                .percentageVat
+                            }
                           />
                         </TableRow>
                       )}

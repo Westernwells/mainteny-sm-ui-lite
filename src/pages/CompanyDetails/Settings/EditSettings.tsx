@@ -30,6 +30,10 @@ export const languages = [
     label: 'Russian',
     value: 'ru-ru',
   },
+  {
+    label: 'Danish',
+    value: 'da-dk',
+  },
 ];
 
 export const timeFormats = [

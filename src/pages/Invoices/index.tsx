@@ -151,6 +151,12 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   }, []);
 
   useEffect(() => {
+    if (textInput.current) {
+      textInput.current.value = search ?? '';
+    }
+  }, [search]);
+
+  useEffect(() => {
     if (!isLoading) {
       setRows(
         makeRows(

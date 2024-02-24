@@ -61,6 +61,7 @@ interface Props {
   propertyOwnerId: string;
   handleSelectItem: (row: ArticleView, indexPosition: number) => void;
   isHovered?: boolean;
+  defaultPercentageVat?: number;
 }
 
 interface TableRowProps {
@@ -133,13 +134,6 @@ const validationSchema = Yup.object().shape({
   name: Yup.string().required('Article cannot be empty'),
   article: Yup.object().shape({
     type: Yup.string().required('Article type is required'),
-    unit: Yup.string()
-      .required('Select a unit')
-      .test(
-        'validUnit',
-        'Invalid unit',
-        (value) => MeasurementUnit[value as MeasurementUnit] !== undefined,
-      ),
   }),
 });
 
@@ -151,6 +145,7 @@ export const ArticleItemRowQuotation = ({
   propertyOwnerId,
   handleSelectItem,
   isHovered,
+  defaultPercentageVat,
 }: Props) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -161,7 +156,17 @@ export const ArticleItemRowQuotation = ({
   const {language: selectedLng} = useContext(LanguageContext);
 
   const formik = useFormik<QuotationItemRecord>({
-    initialValues: articleItem,
+    initialValues: {
+      ...articleItem,
+      quantity: articleItem.quantity !== 0 ? articleItem.quantity : 1,
+      unitAmount: {
+        ...articleItem.unitAmount,
+        percentageVat:
+          articleItem.unitAmount.percentageVat !== 0
+            ? articleItem.unitAmount.percentageVat
+            : defaultPercentageVat || 0,
+      },
+    },
     onSubmit: () => {},
     validationSchema,
   });
@@ -735,7 +740,6 @@ export const ArticleItemRowQuotation = ({
             placeholder: t('Select Unit'),
             name: 'article.unit',
             sx: {width: '100%'},
-            required: true,
             error: !!(
               formik.values.name !== '' && getIn(formik.errors, 'article.unit')
             ),
