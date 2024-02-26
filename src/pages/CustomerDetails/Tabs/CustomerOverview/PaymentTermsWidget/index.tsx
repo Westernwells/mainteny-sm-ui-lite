@@ -28,15 +28,7 @@ const PaymentTermsWidget: FC<Props> = ({customer}) => {
   >(undefined);
   const {updateCustomer, isLoading} = useCustomer();
 
-  const handleOpenSideDrawer = () => {
-    setShowSideDrawer(true);
-  };
-
-  const handleCloseSideDrawer = () => {
-    setShowSideDrawer(false);
-  };
-
-  const onSubmit = (paymentTermId: string) => {
+  const handlePaymentTermSubmit = (paymentTermId: string) => {
     if (customer) {
       const customerInfo: CustomerEditForm = {
         name: customer.name,
@@ -66,7 +58,7 @@ const PaymentTermsWidget: FC<Props> = ({customer}) => {
         paymentTermId,
       };
       updateCustomer({...customerInfo}, customer?.id, () => {
-        handleCloseSideDrawer();
+        setShowSideDrawer(false);
       });
     }
   };
@@ -84,7 +76,7 @@ const PaymentTermsWidget: FC<Props> = ({customer}) => {
         containerStyles={{flexGrow: 1}}
         headerStyles={{mt: '0.5em'}}
         headerActionIcon={<EditIcon />}
-        handleAction={handleOpenSideDrawer}
+        handleAction={() => setShowSideDrawer(true)}
         showHeaderBackground>
         {customer?.paymentTerm ? (
           <p>{customer.paymentTerm.term}</p>
@@ -101,7 +93,7 @@ const PaymentTermsWidget: FC<Props> = ({customer}) => {
         title={t('Payment Terms')}
         open={showSideDrawer}
         onCancel={() => setShowSideDrawer(false)}
-        onSave={onSubmit}
+        onSave={handlePaymentTermSubmit}
         defaultPayment={customer?.paymentTerm?.id}
         onClickNewPaymentTerm={() => setShowNewPaymentTermDrawer(true)}
         setPaymentToEdit={setPaymentTermToEdit}
