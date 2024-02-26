@@ -220,7 +220,6 @@ export const TimePicker = ({
                     lineHeight: 'unset',
                   },
                   width: '100%',
-                  ...(textFieldProps?.sx ?? {}),
                 },
                 InputLabelProps: {
                   shrink: true,
