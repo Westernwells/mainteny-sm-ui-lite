@@ -1,14 +1,12 @@
-import {addMinutes, differenceInMinutes} from 'date-fns';
-import _ from 'lodash';
+import {differenceInMinutes} from 'date-fns';
 import {
   ServiceOrderArticleView,
   ServiceOrderPaymentStatus,
-  ServiceOrderReportTimeRecord,
   ServiceOrderStatus,
   ServiceOrderType,
   ServiceOrderView,
 } from '../models/service-order';
-import {toDate, toRestDateTime} from './datetime';
+import {toDate} from './datetime';
 
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
   switch (status) {
@@ -223,75 +221,3 @@ export const articleViewToArticleRecord = (
     quantity: i.quantity,
     unitAmount: i.unitAmount,
   }));
-
-export const calculateTotalBillableHours = (
-  timeRecords: ServiceOrderReportTimeRecord[],
-) =>
-  timeRecords.reduce((totalBill, timeRecord) => {
-    const recordTotal = timeRecord.timeSlots.reduce(
-      (slotTotal, slot) => slotTotal + (slot.minutes ?? 0),
-      0,
-    );
-
-    const surcharges = Math.floor(
-      (recordTotal * (timeRecord.percentageSurcharge ?? 0)) / 100,
-    );
-
-    return totalBill + surcharges + recordTotal;
-  }, 0);
-
-export const calculateSlotTotalWithoutSurcharge = (
-  data?: ServiceOrderReportTimeRecord,
-) => {
-  if (!data?.timeSlots?.length) {
-    return 0;
-  }
-
-  const totalMinutesWithoutSurcharge = data.timeSlots.reduce(
-    (acc, item) => acc + (item.minutes ?? 0),
-    0,
-  );
-
-  return totalMinutesWithoutSurcharge;
-};
-
-export const convertTimeSlotDatesToRestDateTime = (
-  timeRecord?: ServiceOrderReportTimeRecord,
-): ServiceOrderReportTimeRecord => {
-  if (!timeRecord) {
-    return {
-      percentageSurcharge: 0,
-      timeSlots: [],
-    };
-  }
-
-  return {
-    ...timeRecord,
-    timeSlots: timeRecord?.timeSlots?.map((slot) => ({
-      ...slot,
-      startTime: toRestDateTime(new Date(slot.startTime)),
-    })),
-  };
-};
-
-export const calculateStartAndEndFromTimeRecord = (
-  timeRecord?: ServiceOrderReportTimeRecord,
-): {startTime?: string; endTime?: string} => {
-  if (!timeRecord || !timeRecord.timeSlots.length) {
-    return {startTime: undefined, endTime: undefined};
-  }
-
-  const sortedTimeRecords = _.sortBy(timeRecord.timeSlots, (obj) =>
-    new Date(obj.startTime).getTime(),
-  );
-  const firstRecord = sortedTimeRecords[0];
-  const lastRecord = sortedTimeRecords[sortedTimeRecords.length - 1];
-
-  return {
-    startTime: firstRecord.startTime,
-    endTime: addMinutes(
-      new Date(lastRecord.startTime!),
-      lastRecord.minutes ?? 0,
-    ).toISOString(),
-  };
-};

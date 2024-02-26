@@ -27,11 +27,9 @@ import {FormInput} from 'components/form/FormInput';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {
   articleViewToArticleRecord,
-  calculateTotalBillableHours,
-  convertTimeSlotDatesToRestDateTime,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
-import {convertDigitalMinsToHM} from 'utils/datetime';
+import {convertDigitalMinsToHM, convertHMToMins} from 'utils/datetime';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
@@ -84,14 +82,6 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
       travelEndTime: serviceOrder?.travelEndTime,
       serviceTimeHM: convertDigitalMinsToHM(report?.actualServiceTime ?? 0),
       onlyShowTotalTime: report?.additionalInfo?.onlyShowTotalTime ?? false,
-      workTimeRecord: {
-        percentageSurcharge: 0,
-        timeSlots: [],
-      },
-      travelTimeRecord: {
-        percentageSurcharge: 0,
-        timeSlots: [],
-      },
     },
     onSubmit: (values) => {
       completeServiceOrder({
@@ -99,16 +89,12 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
         body: {
           description: values.description,
           articles: articleViewToArticleRecord(articles),
-
-          serviceTime: calculateTotalBillableHours([values.workTimeRecord!]),
-          travelTime: calculateTotalBillableHours([values.travelTimeRecord!]),
+          startTime: values.startTime,
+          endTime: values.endTime,
+          travelStartTime: values.travelStartTime,
+          travelEndTime: values.travelEndTime,
+          serviceTime: convertHMToMins(values.serviceTimeHM) ?? 0,
           onlyShowTotalTime: values.onlyShowTotalTime,
-          workTimeRecord: convertTimeSlotDatesToRestDateTime(
-            values.workTimeRecord,
-          ),
-          travelTimeRecord: convertTimeSlotDatesToRestDateTime(
-            values.travelTimeRecord,
-          ),
         },
       });
     },
@@ -132,40 +118,10 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
           travelEndTime: serviceOrder?.travelEndTime,
           serviceTimeHM: convertDigitalMinsToHM(report?.actualServiceTime ?? 0),
           onlyShowTotalTime: report?.additionalInfo?.onlyShowTotalTime ?? false,
-          workTimeRecord: {
-            percentageSurcharge:
-              serviceOrder.additionalInfo.workTimeInfo?.percentageSurcharge ??
-              0,
-            timeSlots:
-              serviceOrder.additionalInfo.workTimeInfo?.timeSlots ?? [],
-          },
-          travelTimeRecord: {
-            percentageSurcharge:
-              serviceOrder.additionalInfo.travelTimeInfo?.percentageSurcharge ??
-              0,
-            timeSlots:
-              serviceOrder.additionalInfo.travelTimeInfo?.timeSlots ?? [],
-          },
         },
       });
     }
   }, [report]);
-
-  useEffect(() => {
-    formik.setFieldValue('workTimeRecord', {
-      percentageSurcharge:
-        serviceOrder.additionalInfo.workTimeInfo?.percentageSurcharge ?? 0,
-      timeSlots: serviceOrder.additionalInfo.workTimeInfo?.timeSlots ?? [],
-    });
-    formik.setFieldValue('travelTimeRecord', {
-      percentageSurcharge:
-        serviceOrder.additionalInfo.travelTimeInfo?.percentageSurcharge ?? 0,
-      timeSlots: serviceOrder.additionalInfo.travelTimeInfo?.timeSlots ?? [],
-    });
-  }, [
-    serviceOrder.additionalInfo.workTimeInfo,
-    serviceOrder.additionalInfo.travelTimeInfo,
-  ]);
 
   useEffect(() => {
     if (articles.length) {
