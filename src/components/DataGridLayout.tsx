@@ -67,10 +67,25 @@ export const getColumnProps = ({
   type = 'string',
   cellClassName = 'nowrap',
   variant = 'uppercase',
+  flex = 1,
+  align = 'left',
+  editable = false,
+  sortable = false,
   renderHeader = (params: GridColumnHeaderParams) => {
     const {t} = useTranslation();
     return (
-      <Typography variant="subtitle2" color="textSecondary">
+      <Typography
+        variant="subtitle2"
+        color="textSecondary"
+        sx={
+          align === 'right'
+            ? {
+                width: '100% !important',
+                display: 'flex',
+                justifyContent: 'flex-end',
+              }
+            : {}
+        }>
         {(params.colDef.headerName &&
           variant === 'titleCase' &&
           t(convertToText(params.colDef.headerName))) ||
@@ -91,10 +106,6 @@ export const getColumnProps = ({
       </Typography>
     );
   },
-  flex = 1,
-  align = 'left',
-  editable = false,
-  sortable = false,
   ...rest
 }: ColumnProps): GridColDef => ({
   field,
@@ -342,6 +353,9 @@ export const DataGridLayout = ({
               wordWrap: 'break-word',
               overflow: 'auto',
               width: 'fit-content',
+            },
+            '&: has(.MuiDataGrid-iconButtonContainer)': {
+              flexDirection: 'row',
             },
           },
           '& .MuiDataGrid-columnSeparator': {
