@@ -70,14 +70,12 @@ export const PageLayout = ({
 
   const outletContext: OpenContext | null = useOutletContext();
 
-  if (!outletContext || typeof outletContext.setOpen !== 'function') {
-    return null;
-  }
-
-  const {setOpen} = outletContext;
+  const setOpen = outletContext && outletContext.setOpen;
 
   const handleDrawerClose = () => {
-    setOpen(false);
+    if (setOpen) {
+      setOpen(false);
+    }
   };
 
   return (
