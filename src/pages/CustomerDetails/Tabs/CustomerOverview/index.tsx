@@ -264,7 +264,7 @@ export const CustomerOverviewTab = ({
           <ContactsWidget customerId={customerId || ''} />
         </Grid>
         <Grid item xs={12}>
-          <PaymentTermsWidget />
+          <PaymentTermsWidget customer={customer} />
         </Grid>
       </Grid>
     </TabContentContainer>
