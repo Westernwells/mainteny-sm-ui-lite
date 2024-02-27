@@ -16,4 +16,5 @@ export type CustomerEditForm = {
   secondaryPhoneNumber?: string;
   vatId: string;
   offsettingAccount: string;
+  paymentTermId?: string;
 };

@@ -33,6 +33,7 @@ import {UnitsWidget} from './UnitsWidget';
 import {ContractsWidget} from './ContractsWidget';
 import {ContactsWidget} from './ContactsWidget';
 import {EditCustomer} from './EditCustomer';
+import PaymentTermsWidget from './PaymentTermsWidget';
 
 interface Props {
   customerId?: string;
@@ -261,6 +262,9 @@ export const CustomerOverviewTab = ({
         </Grid>
         <Grid item xs={12}>
           <ContactsWidget customerId={customerId || ''} />
+        </Grid>
+        <Grid item xs={12}>
+          <PaymentTermsWidget customer={customer} />
         </Grid>
       </Grid>
     </TabContentContainer>
