@@ -13,7 +13,7 @@ import {mapLanguageToLocale} from 'utils/utils';
 import {ReactNode, useEffect, useRef, useState} from 'react';
 import {Box, InputLabelProps, SxProps, TextFieldProps} from '@mui/material';
 import {useTranslation} from 'react-i18next';
-import Calendar from '@mui/icons-material/Event';
+import CalendarToday from '@mui/icons-material/CalendarToday';
 import {parseISO} from 'date-fns';
 import DateRangeCustomToolbar from './DateRangeCustomToolbar';
 import DateRangeActionBar from './DateRangeActionBar';
@@ -175,7 +175,9 @@ const DatePickerRange = ({
                   label: t(`${textFieldProps?.label}`),
                   sx: {width: '100%', background: 'white'},
                   InputProps: {
-                    endAdornment: <Calendar />,
+                    endAdornment: (
+                      <CalendarToday sx={{color: 'action.active'}} />
+                    ),
                     onClick: () => handleOpen(open),
                     sx: {cursor: 'pointer'},
                   },

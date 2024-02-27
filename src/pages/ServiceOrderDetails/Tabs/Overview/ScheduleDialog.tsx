@@ -154,7 +154,7 @@ export const ScheduleDialog = ({
             height: {
               xs: 280,
               sm: 300,
-              md: switchActive ? 370 : 250,
+              md: 370,
             },
           },
         }}>
@@ -200,111 +200,107 @@ export const ScheduleDialog = ({
               </Box>
             ) : null}
 
-            {switchActive ? (
-              <>
-                <Box
-                  sx={{
-                    mt: '1.5em',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                  }}>
-                  <DatePicker
-                    required
-                    defaultDate={defaultStartDate}
-                    containerStyles={{mr: '1em'}}
-                    getSelectedDate={(startDate) => {
-                      formik.setValues({
-                        ...formik.values,
-                        startDate,
-                      });
-                    }}
-                    textFieldProps={{
-                      label: t(startDatePickerLabel),
-                      name: 'startDate',
-                      error: !!(
-                        formik.errors.startDate && formik.touched.startDate
-                      ),
-                      onBlur: formik.handleBlur,
-                    }}
-                  />
+            <Box
+              sx={{
+                mt: '1.5em',
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}>
+              <DatePicker
+                required
+                defaultDate={defaultStartDate}
+                containerStyles={{mr: '1em'}}
+                getSelectedDate={(startDate) => {
+                  formik.setValues({
+                    ...formik.values,
+                    startDate,
+                  });
+                }}
+                textFieldProps={{
+                  label: t(startDatePickerLabel),
+                  name: 'startDate',
+                  error: !!(
+                    formik.errors.startDate && formik.touched.startDate
+                  ),
+                  onBlur: formik.handleBlur,
+                }}
+                disabled={!switchActive}
+              />
 
-                  <TimePicker
-                    required
-                    defaultTime={defaultStartDate}
-                    getSelectedTime={(time) => {
-                      if (time && !Number.isNaN(time.getTime())) {
-                        const newStartTime = time;
-                        formik.setFieldValue('startTime', newStartTime);
+              <TimePicker
+                required
+                defaultTime={defaultStartDate}
+                getSelectedTime={(time) => {
+                  if (time && !Number.isNaN(time.getTime())) {
+                    const newStartTime = time;
+                    formik.setFieldValue('startTime', newStartTime);
 
-                        const {startDate, endDate} = formik.values;
-                        if (
-                          startDate &&
-                          endDate &&
-                          startDate.getTime() === endDate.getTime()
-                        ) {
-                          const newEndTime = new Date(newStartTime);
-                          formik.setFieldValue('endTime', newEndTime);
-                        }
-                      }
-                    }}
-                    textFieldProps={{
-                      label: 'Start Time',
-                      name: 'startTime',
-                      error: !!(
-                        formik.errors.startTime && formik.touched.startTime
-                      ),
-                      onBlur: formik.handleBlur,
-                    }}
-                  />
-                </Box>
-                <Box
-                  sx={{
-                    mt: '1.5em',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                  }}>
-                  <DatePicker
-                    required
-                    defaultDate={defaultStartDate}
-                    containerStyles={{mr: '1em'}}
-                    getSelectedDate={(endDate) => {
-                      formik.setValues({
-                        ...formik.values,
-                        endDate,
-                      });
-                    }}
-                    textFieldProps={{
-                      label: t(endDatePickerLabel),
-                      name: 'endDate',
-                      error: !!(
-                        formik.errors.endDate && formik.touched.endDate
-                      ),
-                      onBlur: formik.handleBlur,
-                    }}
-                  />
+                    const {startDate, endDate} = formik.values;
+                    if (
+                      startDate &&
+                      endDate &&
+                      startDate.getTime() === endDate.getTime()
+                    ) {
+                      const newEndTime = new Date(newStartTime);
+                      formik.setFieldValue('endTime', newEndTime);
+                    }
+                  }
+                }}
+                textFieldProps={{
+                  label: 'Start Time',
+                  name: 'startTime',
+                  error: !!(
+                    formik.errors.startTime && formik.touched.startTime
+                  ),
+                  onBlur: formik.handleBlur,
+                }}
+                disabled={!switchActive}
+              />
+            </Box>
+            <Box
+              sx={{
+                mt: '1.5em',
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}>
+              <DatePicker
+                required
+                defaultDate={defaultStartDate}
+                containerStyles={{mr: '1em'}}
+                getSelectedDate={(endDate) => {
+                  formik.setValues({
+                    ...formik.values,
+                    endDate,
+                  });
+                }}
+                textFieldProps={{
+                  label: t(endDatePickerLabel),
+                  name: 'endDate',
+                  error: !!(formik.errors.endDate && formik.touched.endDate),
+                  onBlur: formik.handleBlur,
+                }}
+                disabled={!switchActive}
+              />
 
-                  <TimePicker
-                    required
-                    minTime={formik.values.startTime as Date}
-                    defaultTime={formik.values.endTime || defaultEndDate}
-                    getSelectedTime={(time) => {
-                      formik.setValues({
-                        ...formik.values,
-                        endTime: time,
-                      });
-                    }}
-                    textFieldProps={{
-                      label: 'End Time',
-                      name: 'endTime',
-                      error: !!(
-                        formik.errors.endTime && formik.touched.endTime
-                      ),
-                      onBlur: formik.handleBlur,
-                    }}
-                  />
-                </Box>
-              </>
-            ) : null}
+              <TimePicker
+                required
+                minTime={formik.values.startTime as Date}
+                defaultTime={formik.values.endTime || defaultEndDate}
+                getSelectedTime={(time) => {
+                  formik.setValues({
+                    ...formik.values,
+                    endTime: time,
+                  });
+                }}
+                textFieldProps={{
+                  label: 'End Time',
+                  name: 'endTime',
+                  error: !!(formik.errors.endTime && formik.touched.endTime),
+                  onBlur: formik.handleBlur,
+                }}
+                disabled={!switchActive}
+              />
+            </Box>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
