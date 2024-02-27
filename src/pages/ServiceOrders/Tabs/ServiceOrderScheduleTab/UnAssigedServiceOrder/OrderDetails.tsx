@@ -137,14 +137,14 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
           <Typography
             variant="smallBtnText"
             color={serviceOrderTypeColor(serviceOrder.type)}
-            sx={{textTransform: 'uppercase', ml: '0.5em'}}>
+            sx={{textTransform: 'uppercase', ml: '0.5em', pt: 0.1}}>
             {t(serviceOrderTypeToString(serviceOrder.type))}
           </Typography>
         </Box>
         <Typography variant="caption">{dueDate}</Typography>
       </Box>
       <Typography
-        variant="body2"
+        variant="subtitle2"
         component="div"
         mt="0.5em"
         color="primary.dark">
