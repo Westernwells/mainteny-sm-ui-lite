@@ -7,7 +7,7 @@ import {ReactComponent as Invoices} from 'assets/icons/contract-invoices.svg';
 import {useContractDetails} from 'hooks/reactQuery/useContract';
 import {useParams} from 'react-router-dom';
 import {SelectModal} from 'components/SelectModal';
-import {UnitsTab} from './Tabs/UnitsTab';
+import {UnitsTab} from './Tabs/Unit/UnitsTab';
 import {ContractOverview} from './Tabs/ContractOverview';
 import {AddUnitsDataGrid} from './AddUnitsDataGrid';
 import CustomerNotes from '../CustomerDetails/Notes';
@@ -72,8 +72,9 @@ export const ContractDetails = () => {
         </TabsBody>
         <TabsBody value={tabValue} index={1}>
           <UnitsTab
-            elevators={contractDetails?.elevators || []}
+            contractId={contractDetails?.id}
             setOpenSelectUnitModal={setOpenSelectUnitModal}
+            elevatorsLength={contractDetails?.elevators?.length}
           />
         </TabsBody>
         <TabsBody value={tabValue} index={2}>

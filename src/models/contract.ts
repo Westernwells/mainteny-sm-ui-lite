@@ -1,7 +1,29 @@
 import {Client} from './client';
-import {Amount, Meta, Order, TimeWindowRecord, TimeWindowType} from './misc';
-import {Elevator, ElevatorSimpleView, ElevatorView} from './elevator';
-import {PropertyOwnerSimpleView} from './propertyManager';
+import {
+  Address,
+  Amount,
+  Meta,
+  Order,
+  TimeWindowRecord,
+  TimeWindowType,
+} from './misc';
+import {
+  Elevator,
+  ElevatorAdditionalInfo,
+  ElevatorAssignmentSimpleView,
+  ElevatorCategory,
+  ElevatorOrderField,
+  ElevatorProperty,
+  ElevatorSimpleView,
+  ElevatorStatus,
+  ElevatorTimeRuleView,
+  ElevatorView,
+} from './elevator';
+import {
+  PropertyContactPersonSimpleView,
+  PropertyOwnerSimpleView,
+  PropertyOwnerView,
+} from './propertyManager';
 import {FileResource} from './media';
 
 export enum ContractStatus {
@@ -9,6 +31,24 @@ export enum ContractStatus {
   VALID = 'VALID',
   EXPIRED = 'EXPIRED',
   EXPIRING = 'EXPIRING',
+}
+
+export enum TimeUnit {
+  BIWEEKLY = 'BIWEEKLY',
+  WEEKLY = 'WEEKLY',
+  MONTHLY = 'MONTHLY',
+  NONE = 'NONE',
+  ANNUALLY = 'ANNUALLY', // every 1 year
+  BIENNIALLY = 'BIENNIALLY', // every 2 year
+  TRIENNIALLY = 'TRIENNIALLY', // every 3 year
+  QUADRENNIALLY = 'QUADRENNIALLY', // every 4 year
+}
+
+export enum TimeUnitYearView {
+  ANNUALLY = 'Every 1 year',
+  BIENNIALLY = 'Every 2 year',
+  TRIENNIALLY = 'Every 3 year',
+  QUADRENNIALLY = 'Every 4 year',
 }
 
 export enum ContractOrderField {
@@ -150,6 +190,56 @@ export interface ContractSimpleView {
   externalId: string;
   meta: Meta;
   additionalInfo: ContractAdditionalInfo;
+}
+
+export interface ContractComponentElevator {
+  elevatorId: string;
+  invoiceJob: {
+    timeUnit: TimeUnit;
+    timeNumbers: number[];
+  };
+}
+
+export interface ContractComponentAdditionalInfoProps {
+  firstOrderDate: string;
+  orderGenerationJob: string;
+  elevators: ContractComponentElevator[];
+}
+
+export interface ContractComponentView {
+  additionalInfo: ContractComponentAdditionalInfoProps;
+}
+
+export interface ContractProps {
+  components: ContractComponentView[];
+}
+
+export interface ContractElevatorView {
+  id: string;
+  number: string;
+  model: string;
+  type: string;
+  externalId: string;
+  capacity: string;
+  category: ElevatorCategory;
+  technicianNumber: number;
+  contracts: ContractProps[];
+  availability: number;
+  address: Address;
+  propertyOwner: PropertyOwnerView;
+  propertyManager: PropertyContactPersonSimpleView;
+  properties: ElevatorProperty[];
+  lastVisitDate: string;
+  nextVisitDate: string;
+  serialNumber: string;
+  serviceTime: number;
+  status: ElevatorStatus;
+  labels: [];
+  additionalInfo: ElevatorAdditionalInfo;
+  assignments: ElevatorAssignmentSimpleView[];
+  search: string;
+  meta: Meta;
+  timeRules: ElevatorTimeRuleView[];
 }
 
 export interface CreateContractRecord {
@@ -312,4 +402,21 @@ export interface UpdateContractPaymentTermRecord {
 export interface UpdateContractPaymentTermView {
   term: string;
   id: string;
+}
+
+export interface ContractElevatorQueryParams {
+  lastVisitDateEnd: any;
+  lastVisitDateStart: any;
+  neLat?: number;
+  neLng?: number;
+  nextVisitDateEnd: any;
+  nextVisitDateStart: any;
+  order: Order;
+  orderBy: ElevatorOrderField;
+  pageIndex: number;
+  pageSize: number;
+  query: string;
+  swLat?: number;
+  swLng?: number;
+  requireAppointment: boolean;
 }

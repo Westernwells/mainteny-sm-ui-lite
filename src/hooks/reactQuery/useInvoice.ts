@@ -138,9 +138,9 @@ export const useContractInvoices = (
   options?: UseQueryOptions<any, any, any>,
 ) =>
   useQuery<Resource<InvoiceView>, RestError>(
-    [queryKeys.fetchElevatorInvoices, contractId, params],
+    [queryKeys.fetchContractInvoices, contractId, params],
     () => fetchContractInvoices(contractId, params),
-    {enabled: !!contractId, ...options},
+    {...options},
   );
 
 export const fetchInvoice = async (invoiceId: string) => {

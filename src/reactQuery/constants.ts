@@ -58,6 +58,8 @@ export const queryKeys = {
   queryTodos: 'queryTodos',
   fetchServiceOrderInvoices: 'fetchServiceOrderInvoices',
   fetchElevatorInvoices: 'fetchElevatorInvoices',
+  fetchContractInvoices: 'fetchContractInvoices',
+  fetchContractElevators: 'fetchContractElevators',
   fetchServiceOrderArticles: 'fetchServiceOrderArticles',
   queryAppointmentConfirmationRequiredOrders:
     'queryAppointmentConfirmationRequiredOrders',

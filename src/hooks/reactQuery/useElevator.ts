@@ -14,6 +14,15 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import {Mixpanel} from 'mixpanel/mixpanel';
 import {mixpanelEvents} from 'mixpanel/constants';
 import {
+  CacheTypes,
+  CacheTypesParams,
+  Page,
+  Resource,
+  RestError,
+  StringValue,
+} from 'models/misc';
+import {MaintainerView} from 'models/technician';
+import {
   CustomerElevatorParams,
   ElevatorComment,
   ElevatorCommentRecord,
@@ -21,16 +30,7 @@ import {
   ElevatorRequestBody,
   ElevatorView,
   QueryTodoParams,
-} from '../../models/elevator';
-import {
-  CacheTypes,
-  CacheTypesParams,
-  Page,
-  Resource,
-  RestError,
-  StringValue,
-} from '../../models/misc';
-import {MaintainerView} from '../../models/technician';
+} from 'models/elevator';
 import {useUserSession} from './useUserSession';
 
 export const fetchElevators = async (
@@ -123,7 +123,6 @@ export function useAllElevators(
 
 export const queryCustomerElevator = async (
   params: CustomerElevatorParams,
-
   id?: string,
 ) => {
   const response = await axiosClient.get<Resource<ElevatorView>>(
@@ -546,6 +545,13 @@ const deleteElevator = async (elevatorId: string) => {
   return response.data;
 };
 
+const deleteContractElevator = async (contractId: string) => {
+  const response = await axiosClient.delete<StringValue>(
+    `/api/contracts/${contractId}/elevetors`,
+  );
+  return response.data;
+};
+
 export const useDeleteElevator = (successMsg?: string) => {
   const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
@@ -564,4 +570,27 @@ export const useDeleteElevator = (successMsg?: string) => {
       showError(err);
     },
   });
+};
+
+export const useDeleteContractElevetor = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    (elevatorId: string) => deleteContractElevator(elevatorId),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+          queryClient.invalidateQueries(queryKeys.fetchContractElevators);
+          queryClient.invalidateQueries(queryKeys.queryUnitsByCustomer);
+        }
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
 };

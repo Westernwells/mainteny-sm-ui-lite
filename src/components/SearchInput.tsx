@@ -37,6 +37,7 @@ export const SearchInput = ({
 
   return (
     <TextField
+      id="my-input"
       size="small"
       sx={
         variant === 'outlined'
@@ -46,7 +47,6 @@ export const SearchInput = ({
               '& .MuiInputAdornment-root': {
                 marginRight: '-7px',
               },
-
               ...containerStyle,
             }
           : {

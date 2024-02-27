@@ -190,7 +190,9 @@ export const Invoices = ({contractId}: {contractId?: string}) => {
         </Typography>
       </Box>
       <DataGridLayout
+        isCellClickable={false}
         containerStyle={{margin: 'unset'}}
+        isEvenRowDifferentColor
         rows={rows || []}
         columns={columns}
         loading={isFetching}

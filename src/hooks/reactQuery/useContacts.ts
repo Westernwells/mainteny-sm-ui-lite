@@ -9,7 +9,25 @@ import {queryKeys} from 'reactQuery/constants';
 import {useSnackbar} from 'hooks/useSnackbar';
 
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
-import {Page, Resource, RestError, StringValue} from '../../models/misc';
+import {
+  ContractElevatorQueryParams,
+  ContractElevatorView,
+} from 'models/contract';
+import {Page, Resource, RestError, StringValue} from 'models/misc';
+
+const fetchContractElevators = async (
+  contractId: string,
+  params: Partial<ContractElevatorQueryParams>,
+): Promise<Resource<ContractElevatorView>> => {
+  const response = await axiosClient.get<Resource<ContractElevatorView>>(
+    `/api/contracts/${contractId}/elevators`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
 
 export const getContacts = async (page: Page, customerId: string) => {
   const response = await axiosClient.get<Resource<ContactsView>>(
@@ -154,3 +172,14 @@ export const useInviteContact = (successMsg?: string) => {
     },
   );
 };
+
+export const useContractElevators = (
+  contractId: string,
+  params: Partial<ContractElevatorQueryParams>,
+  options?: UseQueryOptions<any, any, any>,
+) =>
+  useQuery<Resource<ContractElevatorView>, RestError>(
+    [queryKeys.fetchContractElevators, contractId, params],
+    () => fetchContractElevators(contractId, params),
+    {...options},
+  );

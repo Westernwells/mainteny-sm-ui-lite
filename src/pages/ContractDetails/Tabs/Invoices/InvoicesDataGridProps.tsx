@@ -20,6 +20,7 @@ import {FormatDate} from 'models/misc';
 import {toDate} from 'utils/datetime';
 import {Actions} from './Actions';
 import {NotesIndicator} from './NotesIndicator';
+import {NavigateToInvoice} from './NavigateToDetails';
 
 export const getInvoiceStatusStyles = (
   status: string,
@@ -64,6 +65,7 @@ export const columns: GridColDef[] = [
     align: 'left',
     flex: 0.5,
     sortable: true,
+    renderCell: (params) => <NavigateToInvoice invoice={params.row.invoice} />,
   }),
   getColumnProps({
     field: InvoiceOrderField.CUSTOMER_NAME,
@@ -87,8 +89,9 @@ export const columns: GridColDef[] = [
     sortable: true,
   }),
   getColumnProps({
-    field: 'amount',
+    field: InvoiceOrderField.TOTAL_NET_AMOUNT,
     headerName: 'amount',
+    sortable: true,
     renderHeader: (params: GridColumnHeaderParams) => {
       const {t} = useTranslation();
       return (
@@ -108,9 +111,10 @@ export const columns: GridColDef[] = [
     flex: 0.5,
   }),
   getColumnProps({
-    field: 'status',
+    field: InvoiceOrderField.STATUS,
     headerName: 'status',
     align: 'center',
+    sortable: true,
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
       <StatusChip
         label={getInvoiceStatusStyles(params.value).label}
@@ -154,7 +158,7 @@ export const makeRows = (
         [InvoiceOrderField.CUSTOMER_NAME]: item.propertyOwner.name,
         invoiceType: InvoiceTypeMap[item.type],
         type: item.serviceOrder?.type,
-        amount: `${formatCurrency(
+        [InvoiceOrderField.TOTAL_NET_AMOUNT]: `${formatCurrency(
           item
             ? (item.totalAmount?.grossAmount ?? 0) /
                 10 ** item.totalAmount.fractionDigits!
@@ -163,7 +167,7 @@ export const makeRows = (
             currency: item.totalAmount.currency,
           },
         )}`,
-        status: item.status,
+        [InvoiceOrderField.STATUS]: item.status,
         actions: {
           pdfPath: item.additionalInfo.pdfPath,
           serviceCompanyId,

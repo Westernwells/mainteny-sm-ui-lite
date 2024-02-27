@@ -53,10 +53,9 @@ export const ContractBasic = ({
           icon={<InfoIcon fontSize="1.5rem" />}
           iconMaxHeight="3rem"
           bodyText={convertToText(name || '-')}
-          bodyStyle={{fontSize: '16px', fontWeight: '600'}}
+          bodyStyle={{fontWeight: '600'}}
           iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
           labelStyle={{
-            fontSize: '14px',
             textTransform: 'none',
           }}
         />
@@ -69,10 +68,9 @@ export const ContractBasic = ({
           icon={<CardTravelIcon />}
           iconMaxHeight="3rem"
           bodyText={convertToText(start?.replace(/-/g, '.') ?? '-')}
-          bodyStyle={{fontSize: '16px', fontWeight: '600'}}
+          bodyStyle={{fontWeight: '600'}}
           iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
           labelStyle={{
-            fontSize: '14px',
             textTransform: 'none',
           }}
         />
@@ -86,10 +84,9 @@ export const ContractBasic = ({
           containerStyles={{mr: '0.5em'}}
           iconMaxHeight="3rem"
           bodyText={`${costPerYear ? `${`${costPerYear}/${t('Year')}`}` : '-'}`}
-          bodyStyle={{fontSize: '16px', fontWeight: '600'}}
+          bodyStyle={{fontWeight: '600'}}
           iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
           labelStyle={{
-            fontSize: '14px',
             textTransform: 'none',
           }}
         />
@@ -103,10 +100,9 @@ export const ContractBasic = ({
           containerStyles={{mr: '0.5em'}}
           iconMaxHeight="3rem"
           bodyText={autoRenewal ? 'Yes' : 'No'}
-          bodyStyle={{fontSize: '16px', fontWeight: '600'}}
+          bodyStyle={{fontWeight: '600'}}
           iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
           labelStyle={{
-            fontSize: '14px',
             textTransform: 'none',
           }}
         />
@@ -120,10 +116,9 @@ export const ContractBasic = ({
           containerStyles={{mr: '0.5em'}}
           iconMaxHeight="3rem"
           bodyText={contractNumber ?? '-'}
-          bodyStyle={{fontSize: '16px', fontWeight: '600'}}
+          bodyStyle={{fontWeight: '600'}}
           iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
           labelStyle={{
-            fontSize: '14px',
             textTransform: 'none',
           }}
         />
@@ -136,10 +131,9 @@ export const ContractBasic = ({
           icon={<CardTravelIcon />}
           iconMaxHeight="3rem"
           bodyText={convertToText(end?.replace(/-/g, '.') ?? '-')}
-          bodyStyle={{fontSize: '16px', fontWeight: '600'}}
+          bodyStyle={{fontWeight: '600'}}
           iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
           labelStyle={{
-            fontSize: '14px',
             textTransform: 'none',
           }}
         />
@@ -155,10 +149,9 @@ export const ContractBasic = ({
               ? `${`${yearlyPriceAdjustment}%/${t('Year')}`}`
               : '-'
           }
-          bodyStyle={{fontSize: '16px', fontWeight: '600'}}
+          bodyStyle={{fontWeight: '600'}}
           iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
           labelStyle={{
-            fontSize: '14px',
             textTransform: 'none',
           }}
         />
@@ -177,10 +170,9 @@ export const ContractBasic = ({
               ? t('{{hours}} month', {hours: renewalPeriod})
               : '0'
           }
-          bodyStyle={{fontSize: '16px', fontWeight: '600'}}
+          bodyStyle={{fontWeight: '600'}}
           iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
           labelStyle={{
-            fontSize: '14px',
             textTransform: 'none',
           }}
         />
@@ -192,10 +184,9 @@ export const ContractBasic = ({
           bodyTextVariant="subtitle1"
           icon={<ElevetorIcon fontSize="1.5rem" />}
           bodyText={`${numberOfUnits}` || '-'}
-          bodyStyle={{fontSize: '16px', fontWeight: '600'}}
+          bodyStyle={{fontWeight: '600'}}
           iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
           labelStyle={{
-            fontSize: '14px',
             textTransform: 'none',
           }}
         />
@@ -207,10 +198,9 @@ export const ContractBasic = ({
           bodyTextVariant="subtitle1"
           icon={<MoneyOff />}
           bodyText={discount ? `${discount}` : '-'}
-          bodyStyle={{fontSize: '16px', fontWeight: '600'}}
+          bodyStyle={{fontWeight: '600'}}
           iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
           labelStyle={{
-            fontSize: '14px',
             textTransform: 'none',
           }}
         />
@@ -230,10 +220,9 @@ export const ContractBasic = ({
               ? t('{{hours}} month', {hours: noticePeriod})
               : !noticePeriod && '-'
           }
-          bodyStyle={{fontSize: '16px', fontWeight: '600'}}
+          bodyStyle={{fontWeight: '600'}}
           iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
           labelStyle={{
-            fontSize: '14px',
             textTransform: 'none',
           }}
         />

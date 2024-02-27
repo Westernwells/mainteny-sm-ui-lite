@@ -23,10 +23,8 @@ import {InfoCard} from 'components/InfoCard';
 import {Dialog} from 'components/Dialog';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
-import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
-import {Button} from 'components/Button';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import * as Yup from 'yup';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
 import {
   amountForView,
   amountRecordForBackend,
@@ -50,6 +48,7 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import IconButton from '@mui/material/IconButton';
 import CancelIcon from '@mui/icons-material/Cancel';
 import {UserSession} from 'models/session';
+import {olStyles} from 'styles';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
@@ -58,6 +57,7 @@ import {DescriptionForm} from './DescriptionForm';
 import {SectionTitle} from '../../../InvoiceDetails/SectionTitle';
 import {CancelContract} from './CancelContract';
 import {Parties} from './Parties';
+import {AttachDocument} from './AttachDocument';
 
 interface Props {
   contractDetails: ContractView;
@@ -254,34 +254,47 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     setCancelContract(false);
   };
 
+  const uploadedDocument = contractDetails?.additionalInfo?.documents;
+
   const onDocsPreview = async () => {
     const serviceCompanyId = user?.userAccount.serviceCompany.id;
     const uploadPath = `${serviceCompanyId}/contracts/${contractId}/documents`;
     await uploadFiles({files: documents, uploadPath});
-    const updatedContract = {
-      ...contractDetails,
-      ...contractDetails?.additionalInfo,
-      documents: [
-        ...documents.map((item) => ({
-          description: item.name.split('.')[0],
-          type: item.type,
-          uri: `${uploadPath}/${item.name}`,
-        })),
-      ],
-      startDate: contractDetails?.start,
-      endDate: contractDetails?.end,
-    };
+
+    const updatedDocuments = uploadedDocument?.length
+      ? [
+          ...uploadedDocument,
+          ...documents.map((item) => ({
+            description: item.name.split('.')[0],
+            type: item.type,
+            uri: `${uploadPath}/${item.name}`,
+          })),
+        ]
+      : [
+          ...documents.map((item) => ({
+            description: item.name.split('.')[0],
+            type: item.type,
+            uri: `${uploadPath}/${item.name}`,
+          })),
+        ];
+
     await updateContract({
-      body: updatedContract as Partial<ContractRequestBody>,
+      body: {
+        documents: updatedDocuments,
+      } as Partial<ContractRequestBody>,
       contractId: contractId!,
     });
     setOpenDocumentDialog(false);
   };
 
-  const onRemoveDoc = async () => {
+  const onRemoveDoc = async (id: string) => {
+    const documentsToSave = uploadedDocument?.length
+      ? uploadedDocument?.filter((d) => d.id !== id)
+      : [];
+
     await updateContract({
       body: {
-        documents: [],
+        documents: documentsToSave,
       } as Partial<ContractRequestBody>,
       contractId: contractId!,
     });
@@ -309,10 +322,12 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       display: 'flex',
       justifyContent: 'space-between',
       width: '100%',
-      paddingX: 1,
-      paddingY: 0.5,
-      backgroundColor: theme.palette.inputBackground.main,
       borderRadius: '4px',
+      paddingY: 0.5,
+      paddingX: 1,
+      fontWeight: '600',
+      gap: '10px',
+      alignItems: 'center',
     }),
     [],
   );
@@ -395,7 +410,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     </Menu>
   );
 
-  const uploadedDocument = contractDetails?.additionalInfo?.documents;
   return (
     <Box>
       <Grid
@@ -491,7 +505,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               <Typography
                 variant="subtitle1"
                 sx={{
-                  backgroundColor: theme.palette.inputBackground.main,
                   paddingY: 0.5,
                   paddingX: 1,
                   borderRadius: '4px',
@@ -526,124 +539,25 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
 
         <Parties contractDetails={contractDetails} user={user as UserSession} />
 
-        <Grid item xs={12} md={4}>
-          <ContractCard
-            containerStyles={{
-              mt: !isMobile ? '1em' : 0,
-              pt: 2,
-              px: 2,
-              height: 'calc(100% - 1em)',
-              '& .MuiCardHeader-root': {
-                ...headerStyles,
-                py: 0,
-              },
-            }}
-            header={
-              <Box sx={headerStyles}>
-                <Typography variant="subtitle1" mr="0.5em">
-                  {t('Document')}
-                </Typography>
-              </Box>
-            }
-            headerActionIcon={
-              <Typography color="#2196F3">{`+ ${t('Add')}`}</Typography>
-            }
-            headerAction={() => setOpenDocumentDialog(true)}>
-            {uploadedDocument && uploadedDocument[0] ? (
-              <Box
-                sx={{
-                  height: '9.688em',
-                  overflowY: 'auto',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  flexDirection: 'column',
-                }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mt: 2,
-                    cursor: 'pointer',
-                  }}>
-                  <Box
-                    sx={{
-                      border: '1px solid #8F9BB380',
-                      padding: '1em',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      borderRadius: '4px',
-                    }}
-                    onClick={() =>
-                      window.open(
-                        downloadUrls[
-                          contractDetails?.additionalInfo?.documents![0]?.uri
-                        ],
-                        '_blank',
-                      )
-                    }>
-                    <FileCopyIcon
-                      fontSize="large"
-                      htmlColor="rgba(15, 76, 100, 0.5)"
-                    />
-                  </Box>
-                  <Typography
-                    align="center"
-                    sx={{color: 'text.secondary', marginTop: '0.625em'}}>
-                    {uploadedDocument && uploadedDocument[0].description}
-                  </Typography>
-                  <Button
-                    buttonProps={{
-                      color: 'error',
-                      onClick: onRemoveDoc,
-                    }}>
-                    Remove
-                  </Button>
-                </Box>
-              </Box>
-            ) : (
-              <EmptySection
-                label="No documents attached. They will appear here once added!"
-                illustration="clipboard"
-                size="tiny"
-                containerStyle={{
-                  height: '100%',
-                }}
-              />
-            )}
-            <Dialog
-              title="Add Documents"
-              isSaving={false}
-              onCancel={() => setOpenDocumentDialog(false)}
-              onSave={() => onDocsPreview()}
-              disableSaveBtn={!documents.length}
-              dialogProps={{
-                maxWidth: 'md',
-                open: openDocumentDialog || false,
-              }}>
-              <MyDropZone
-                getAcceptedFiles={(dropedFiles) => {
-                  setDocuments(dropedFiles);
-                }}
-                acceptedFileTypes={[
-                  'application/pdf',
-                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                  'application/vnd.ms-excel',
-                  'text/tab-separated-values',
-                  'text/csv',
-                ]}
-                maxFiles={1}
-              />
-            </Dialog>
-          </ContractCard>
-        </Grid>
+        <AttachDocument
+          uploadedDocument={uploadedDocument}
+          setOpenDocumentDialog={setOpenDocumentDialog}
+          setDocuments={setDocuments}
+          downloadUrls={downloadUrls}
+          onRemoveDoc={onRemoveDoc}
+          onDocsPreview={onDocsPreview}
+          openDocumentDialog={openDocumentDialog}
+          documents={documents}
+          isUpdateLoading={isUpdateLoading}
+          contractId={contractId}
+          updateContract={updateContract as unknown as () => void}
+        />
 
         <Grid item xs={12} md={8}>
           <ContractCard
             containerStyles={{
+              ...olStyles.scrollbar,
+              overflowY: 'scroll',
               mt: !isMobile ? '1em' : 0,
               pt: 2,
               px: 2,

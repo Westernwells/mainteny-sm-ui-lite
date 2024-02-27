@@ -11,9 +11,9 @@ import {
   ElevatorAssignmentSimpleView,
   ElevatorOrderField,
   ElevatorView,
-} from '../../../../models/elevator';
+} from 'models/elevator';
+import {ContractStatus} from 'models/contract';
 import {Actions} from './Action';
-import {ContractStatus} from '../../../../models/contract';
 
 export const columns: GridColDef[] = [
   getColumnProps({

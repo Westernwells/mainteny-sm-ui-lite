@@ -25,6 +25,7 @@ const statusColor = {
   'eden.light': 'eden.light',
   'warning.dark': 'warning.dark',
   'info.light': 'text.secondary.light',
+  darkSuccess: 'success.darkSuccess',
 };
 interface Props {
   label: string | ReactNode;

@@ -1,4 +1,10 @@
-import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router';
 import printJS from 'print-js';
@@ -35,6 +41,7 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
 import {getInvoicePDFStatuses, validateDueDate} from 'utils/invoice-utils';
+import useTheme from '@mui/material/styles/useTheme';
 
 interface Props {
   invoice: InvoiceView;
@@ -64,6 +71,7 @@ export const Actions = ({
   downloadUrl,
   isInvoiceList = true,
 }: Props) => {
+  const theme = useTheme();
   const {t} = useTranslation();
   const {language: selectedLng} = useContext(LanguageContext);
   const navigate = useNavigate();
@@ -167,15 +175,6 @@ export const Actions = ({
         </Tooltip>
       );
     }
-    if (invoice.status === InvoiceStatus.NOT_PAID) {
-      return (
-        <Tooltip title={t('Payment')} placement="left" arrow>
-          <IconButton onClick={() => setIsDialogOpen(true)}>
-            <Payments fontSize="small" sx={{color: 'action.active'}} />
-          </IconButton>
-        </Tooltip>
-      );
-    }
     return (
       <Tooltip title={t('Preview')} placement="left" arrow>
         <IconButton onClick={() => navigate(`/invoices/details/${invoice.id}`)}>
@@ -208,6 +207,7 @@ export const Actions = ({
           icon: <Print />,
           onClick: () => setIsConfirmPrintDialogOpen(true),
         },
+        ...(isInvoicePDFGenerated ? [downloadItem] : []),
         {
           label: t('Edit'),
           icon: <Edit />,
@@ -222,7 +222,6 @@ export const Actions = ({
             setIsDeleteDialogOpen(true);
           },
         },
-        ...(isInvoicePDFGenerated ? [downloadItem] : []),
       );
     } else if (invoice.status === InvoiceStatus.NOT_PAID) {
       items.push(
@@ -254,11 +253,6 @@ export const Actions = ({
           onClick: () => {
             navigate(`/invoices/details/${invoice.id}`);
           },
-        },
-        {
-          label: t('Send Overdue Notice'),
-          icon: <SendIcon />,
-          onClick: () => navigate(`/invoices/${invoice.id}/overdue-notice`),
         },
         {
           label: t('Payment'),
@@ -304,16 +298,12 @@ export const Actions = ({
           onClick: () => setIsDialogOpen(true),
         },
         {
-          label: t('Send Overdue Notice'),
-          icon: <SendIcon />,
-          onClick: () => navigate(`/invoices/${invoice.id}/overdue-notice`),
-        },
-        {
           label: t('Create Credit note'),
           icon: <Payments />,
           onClick: () => setIsCreateCreditNoteDialogOpen(true),
         },
         ...(isInvoicePDFGenerated ? [downloadItem] : []),
+        cancelItem,
       );
     }
 
@@ -406,7 +396,7 @@ export const Actions = ({
           <Box key={`${item.label}-${index}`}>
             {(actions.length > 3 && actions.length - 3 < index) ||
             (actions.length <= 3 && actions.length - 1 === index) ? (
-              <Divider />
+              <Divider sx={{borderColor: theme.palette.grey[300]}} />
             ) : null}
             <MenuItem
               onClick={() => {

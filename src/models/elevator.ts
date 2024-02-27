@@ -6,18 +6,16 @@ import {
   Order,
   Priority,
   StringMap,
-  StringValue,
 } from './misc';
 import {Client} from './client';
 import {TechnicianSimpleView, TechnicianView} from './technician';
 import {FileResource, FileResourceRecord} from './media';
 import {ServiceCompanyTimeUnit} from './service-company';
-import {ServiceOrderOrderField, ServiceOrderView} from './service-order';
+import {ServiceOrderView} from './service-order';
 import {ContractSimpleView} from './contract';
 import {EmployeesSimpleView} from './employee';
 import {
   PropertyContactPersonSimpleView,
-  PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from './propertyManager';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
@@ -55,6 +53,13 @@ export enum ElevatorOrderField {
   CREATED_TIME = 'CREATED_TIME',
   LAST_VISIT_DATE = 'LAST_VISIT_DATE',
   NEXT_VISIT_DATE = 'NEXT_VISIT_DATE',
+  EXTERNAL_ID = 'EXTERNAL_ID',
+  MODEL = 'MODEL',
+  BUILDING_LOCATION = 'BUILDING_LOCATION',
+  PROPERTY_OWNER_NAME = 'PROPERTY_OWNER_NAME',
+  ADDRESS = 'ADDRESS',
+  ASSIGNED_TECHNICIAN_NAMES = 'ASSIGNED_TECHNICIAN_NAMES',
+  NUMBER_OF_CONTRACTS = 'NUMBER_OF_CONTRACTS',
 }
 
 export interface ElevatorQueryParams {
@@ -387,4 +392,14 @@ export interface ElevatorCommentRecord {
 export interface QueryTodoParams {
   pageIndex: number;
   pageSize: number;
+}
+
+export enum UnitAppointmentView {
+  YES = 'Yes',
+  NO = 'No',
+}
+
+export enum UnitAppointment {
+  YES = 'YES',
+  NO = 'NO',
 }
