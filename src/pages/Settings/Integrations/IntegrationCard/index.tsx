@@ -55,9 +55,9 @@ const IntegrationCard: FC<Props> = ({
           {icon}
           <Grid container direction="column">
             <Typography variant="h6" noWrap>
-              {title}
+              {t(title)}
             </Typography>
-            <Typography variant="body2">{description}</Typography>
+            <Typography variant="body2">{t(description)}</Typography>
           </Grid>
         </Grid>
         {!enabled ? (
