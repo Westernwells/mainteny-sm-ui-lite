@@ -108,7 +108,7 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
     <Box sx={{...containerStyles}} {...rest}>
       <PageCard
         containerStyles={{height: '100%'}}
-        contentContainerStyles={{height: '100%', mx: 0, px: 0, pt: '0.79em'}}
+        contentContainerStyles={{height: '90%', mx: 0, px: 0, pt: '0.79em'}}
         headerStyles={{m: 0}}
         headerLabel="Assign engineers"
         headerIcon={<Layout fontSize={24} />}>
