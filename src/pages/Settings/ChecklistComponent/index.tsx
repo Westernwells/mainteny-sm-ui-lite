@@ -465,6 +465,7 @@ export const TextComponent = ({
               fullWidth
               value={value}
               minRows={5}
+              maxRows={5}
               error={
                 !!(
                   get(
