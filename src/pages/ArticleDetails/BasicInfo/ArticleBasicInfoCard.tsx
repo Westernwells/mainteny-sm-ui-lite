@@ -249,8 +249,8 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       label: t('Purchase Price'),
       icon: <LocalOfferRoundedIcon sx={{color: theme.palette.info.dark}} />,
       body: formatCurrency(
-        article.unitPurchaseAmount.netAmount /
-          10 ** article.unitPurchaseAmount.fractionDigits!,
+        (article.unitPurchaseAmount?.netAmount ?? 0) /
+          10 ** (article.unitPurchaseAmount?.fractionDigits ?? 0),
       ),
     },
     {

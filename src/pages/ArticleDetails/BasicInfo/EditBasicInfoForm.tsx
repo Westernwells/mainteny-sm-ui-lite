@@ -222,6 +222,7 @@ export const EditBasicInfoForm = ({
         labelId="select-unit-label"
         label="Unit"
         options={createMeasurementOptions(selectedLng, MeasurementUnit.UE)}
+        resetOption={{label: t('Select Unit')}}
         selectProps={{
           id: 'select-unit',
           value: formik.values.unit,
