@@ -5,18 +5,17 @@ import Typography from '@mui/material/Typography';
 import LocationOn from '@mui/icons-material/LocationOn';
 import Tag from '@mui/icons-material/Tag';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
-import {
-  JobScheduleType,
-  ServiceOrderType,
-  ServiceOrderView,
-} from 'models/service-order';
+import {JobScheduleType, ServiceOrderView} from 'models/service-order';
 import {Button} from 'components/Button';
 import {useTranslation} from 'react-i18next';
 import {isEmpty} from 'lodash';
 import {FormikErrors} from 'formik';
 import {ScheduleForm} from 'pages/ServiceOrderDetails/models';
 import {ScheduleDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/ScheduleDialog';
-import {serviceOrderTypeToString} from 'utils/service-order-utils';
+import {
+  serviceOrderTypeColor,
+  serviceOrderTypeToString,
+} from 'utils/service-order-utils';
 import {
   useRedispatchServiceOrders,
   useUpdateServiceOrderSchedule,
@@ -137,11 +136,7 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
           />
           <Typography
             variant="smallBtnText"
-            color={
-              serviceOrder.type === ServiceOrderType.EMERGENCY
-                ? 'error'
-                : 'primary'
-            }
+            color={serviceOrderTypeColor(serviceOrder.type)}
             sx={{textTransform: 'uppercase', ml: '0.5em'}}>
             {t(serviceOrderTypeToString(serviceOrder.type))}
           </Typography>
