@@ -69,7 +69,7 @@ const XeroIntegration: FC = () => {
   };
 
   useEffect(() => {
-    if (!integration?.enabled) {
+    if (integration?.enabled === false) {
       if (code) {
         connectToXero(
           {code, redirectionUrl},
@@ -84,7 +84,7 @@ const XeroIntegration: FC = () => {
     } else {
       clearValues();
     }
-  }, [code, error, integration?.enabled, clearValues]);
+  }, [code, error, integration?.enabled]);
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
@@ -126,12 +126,16 @@ const XeroIntegration: FC = () => {
         onCancel={handleCloseDialog}
         onSave={handleSave}
         isLoading={isUpdating}
-        hasError={isErrorConnecting || Boolean(error)}
+        hasError={
+          (isErrorConnecting || Boolean(error)) && !integration?.enabled
+        }
         integration={integration}
       />
       <IntegrationCard
         enabled={integration?.enabled || false}
-        hasError={isErrorConnecting || Boolean(error)}
+        hasError={
+          (isErrorConnecting || Boolean(error)) && !integration?.enabled
+        }
         onConnect={handleOpenDialog}
         onDisconnect={() => setOpenDeleteConfirm(true)}
         {...integrationInfo}
