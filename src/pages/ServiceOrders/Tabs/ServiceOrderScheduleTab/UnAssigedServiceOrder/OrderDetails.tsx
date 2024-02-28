@@ -2,20 +2,20 @@ import {SetStateAction, useEffect, useMemo, useState} from 'react';
 import {isAfter} from 'date-fns';
 import Box, {BoxProps} from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import LocationOn from '@mui/icons-material/LocationOn';
+import Tag from '@mui/icons-material/Tag';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
-import {
-  JobScheduleType,
-  ServiceOrderType,
-  ServiceOrderView,
-} from 'models/service-order';
+import {JobScheduleType, ServiceOrderView} from 'models/service-order';
 import {Button} from 'components/Button';
-import Divider from '@mui/material/Divider';
 import {useTranslation} from 'react-i18next';
 import {isEmpty} from 'lodash';
 import {FormikErrors} from 'formik';
 import {ScheduleForm} from 'pages/ServiceOrderDetails/models';
 import {ScheduleDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/ScheduleDialog';
-import {serviceOrderTypeToString} from 'utils/service-order-utils';
+import {
+  serviceOrderTypeColor,
+  serviceOrderTypeToString,
+} from 'utils/service-order-utils';
 import {
   useRedispatchServiceOrders,
   useUpdateServiceOrderSchedule,
@@ -122,7 +122,7 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
   }, [serviceOrder.dueDate, i18n.language]);
 
   return (
-    <Box sx={{mt: '0.625em', px: '0.5em'}} {...rest}>
+    <Box sx={{py: 1.5, px: '1rem'}} {...rest}>
       <Box
         sx={{
           display: 'flex',
@@ -136,37 +136,45 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
           />
           <Typography
             variant="smallBtnText"
-            color={
-              serviceOrder.type === ServiceOrderType.EMERGENCY
-                ? 'error'
-                : 'primary'
-            }
-            sx={{textTransform: 'capitalize', ml: '0.5em'}}>
+            color={serviceOrderTypeColor(serviceOrder.type)}
+            sx={{textTransform: 'uppercase', ml: '0.5em', pt: 0.1}}>
             {t(serviceOrderTypeToString(serviceOrder.type))}
           </Typography>
         </Box>
         <Typography variant="caption">{dueDate}</Typography>
       </Box>
-      <Typography variant="body2" component="div" mt="0.5em">
+      <Typography
+        variant="subtitle2"
+        component="div"
+        mt="0.5em"
+        color="primary.dark">
         {serviceOrder.elevator.propertyOwner.name}
       </Typography>
-      <Typography
-        component="div"
-        variant="caption"
-        color="textSecondary"
-        mb="0.7em">
-        {serviceOrder.elevator.address.fullName}
-      </Typography>
+      <Box display="flex" alignItems="center" py={0.25} gap={0.5}>
+        <LocationOn fontSize="small" sx={{color: 'text.disabled'}} />
+        <Typography variant="caption" color="textSecondary" pt={0.5}>
+          {serviceOrder.elevator.address.fullName}
+        </Typography>
+      </Box>
+      <Box display="flex" alignItems="center" py={0.25} pb={1.5} gap={0.5}>
+        <Tag fontSize="small" sx={{color: 'text.disabled'}} />
+        <Typography variant="caption" color="textSecondary" pt={0.5}>
+          {serviceOrder.elevator.serialNumber || '-'}
+        </Typography>
+      </Box>
 
       <Button
-        label={t('Assign Technician')}
+        label={t('Assign Engineer')}
         style={{px: '0.5em'}}
         buttonProps={{
           onClick: () => setOpenDialog(true),
           size: 'medium',
           fullWidth: true,
           variant: 'outlined',
-          sx: {bgcolor: 'white'},
+          sx: {
+            bgcolor: 'transparent',
+            '&:hover': {bgcolor: 'primary.dark', color: 'white'},
+          },
         }}
       />
 
@@ -176,7 +184,7 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
         getSwitchState={(value: SetStateAction<boolean>) =>
           setSwitchActive(value)
         }
-        title={t('Assign Technician')}
+        title={t('Assign Engineer')}
         getFormValues={(value: SetStateAction<ScheduleForm>) => setForm(value)}
         getFormErrors={(
           errors: SetStateAction<FormikErrors<ScheduleForm> | undefined>,
@@ -195,8 +203,6 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
             : null
         }
       />
-
-      <Divider sx={{mt: '1.5em'}} />
     </Box>
   );
 };
