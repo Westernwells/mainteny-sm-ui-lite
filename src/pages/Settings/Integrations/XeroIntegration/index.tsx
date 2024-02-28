@@ -54,9 +54,13 @@ const XeroIntegration: FC = () => {
     isError: isErrorConnecting,
   } = useServiceCompanySettingXeroConnect(serviceCompanyId);
 
+  const hasConnectionError =
+    (isErrorConnecting || Boolean(error)) && !integration?.enabled;
+
   const handleSuccess = () => {
     enqueueSnackbar(t('New integration added!'), {variant: 'success'});
     queryClient.invalidateQueries(queryKeys.fetchXeroIntegration);
+    clearValues();
   };
 
   const handleError = (err: unknown) => {
@@ -69,7 +73,7 @@ const XeroIntegration: FC = () => {
   };
 
   useEffect(() => {
-    if (!integration?.enabled) {
+    if (integration && !integration?.enabled) {
       if (code) {
         connectToXero(
           {code, redirectionUrl},
@@ -81,10 +85,8 @@ const XeroIntegration: FC = () => {
       } else if (error) {
         showError(t('Connection failed'));
       }
-    } else {
-      clearValues();
     }
-  }, [code, error, integration?.enabled, clearValues]);
+  }, [code, error, integration?.enabled]);
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
@@ -126,12 +128,12 @@ const XeroIntegration: FC = () => {
         onCancel={handleCloseDialog}
         onSave={handleSave}
         isLoading={isUpdating}
-        hasError={isErrorConnecting || Boolean(error)}
+        hasError={hasConnectionError}
         integration={integration}
       />
       <IntegrationCard
         enabled={integration?.enabled || false}
-        hasError={isErrorConnecting || Boolean(error)}
+        hasError={hasConnectionError}
         onConnect={handleOpenDialog}
         onDisconnect={() => setOpenDeleteConfirm(true)}
         {...integrationInfo}
