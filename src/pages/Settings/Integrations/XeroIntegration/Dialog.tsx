@@ -42,7 +42,7 @@ const XeroDialog: FC<Props> = ({
     reset,
     formState: {errors},
   } = useForm<XeroIntegrationRecord>({
-    mode: 'onBlur',
+    mode: 'all',
     defaultValues: {
       clientId: '',
       tenantId: '',
