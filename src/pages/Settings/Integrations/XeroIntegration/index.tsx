@@ -73,7 +73,7 @@ const XeroIntegration: FC = () => {
   };
 
   useEffect(() => {
-    if (integration?.enabled === false) {
+    if (integration && !integration?.enabled) {
       if (code) {
         connectToXero(
           {code, redirectionUrl},
