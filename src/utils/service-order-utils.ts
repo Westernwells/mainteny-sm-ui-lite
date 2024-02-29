@@ -1,6 +1,5 @@
 import {addMinutes, differenceInMinutes} from 'date-fns';
 import _ from 'lodash';
-import {theme} from 'theme';
 import {amber, grey} from '@mui/material/colors';
 import {
   ServiceOrderArticleView,
@@ -10,6 +9,7 @@ import {
   ServiceOrderType,
   ServiceOrderView,
 } from '../models/service-order';
+import {theme} from '../theme';
 import {toDate, toRestDateTime} from './datetime';
 
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
