@@ -57,6 +57,7 @@ import {useServiceOrderCheckList} from 'hooks/reactQuery/useServiceOrder';
 import {CheckListComponentType} from 'models/checklist';
 import {ChecklistStatus} from 'models/service-order';
 import {validateDueDate, getInvoicePDFStatuses} from 'utils/invoice-utils';
+import {useDownloadFileWithCustomName} from 'hooks/reactQuery/useDownloadUrl';
 import {InvoiceActivities} from './InvoiceActivities';
 import {Notes} from './Notes';
 
@@ -78,6 +79,11 @@ export const ViewInvoice = ({
   const theme = useTheme();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
+  const {downloadFile} = useDownloadFileWithCustomName(
+    invoice.number,
+    downloadUrl,
+  );
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -290,10 +296,10 @@ export const ViewInvoice = ({
                     sx: {
                       background: 'transparent',
                     },
-                    onClick: () => window.open(`${downloadUrl}`, '_blank'),
+                    onClick: downloadFile,
                     disabled:
                       invoice!.additionalInfo.pdfGenerationStatus !==
-                      PdfGenerationStatus.DONE,
+                        PdfGenerationStatus.DONE || isLoadingDownloadUrl,
                     startIcon: <FileDownloadIcon />,
                   }}
                 />
