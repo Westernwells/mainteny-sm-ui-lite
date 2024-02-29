@@ -309,7 +309,6 @@ export const Checklist = () => {
 
   const addComponent = async (type: CheckListComponentType) => {
     arrayFields.append({
-      ...arrayFields,
       ...getComponentMock(type),
     });
 
