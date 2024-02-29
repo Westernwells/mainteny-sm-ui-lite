@@ -23,7 +23,7 @@ import InvoiceOverdueNotice from 'pages/InvoiceOverdueNotice';
 import Employees from 'pages/Employee';
 import EmployeeDetails from 'pages/EmployeeDetails';
 import Quotations from 'pages/Quotations';
-import DraftQuotation from 'pages/QuotationDetails/DraftQuotation';
+import NewQuotation from 'pages/QuotationDetails/NewQuotation';
 import QuotationDetails from 'pages/QuotationDetails';
 import EditQuotationPage from 'pages/EditQuotation';
 import Notifications from 'pages/Notifications';
@@ -414,7 +414,7 @@ export const Router = () => {
                   pageScrollable
                   backBtnLabel="New Quotation"
                   showBackAction>
-                  <DraftQuotation formType="new" />
+                  <NewQuotation />
                 </PageLayout>
               </>
             }
