@@ -1,3 +1,4 @@
+import {useCallback} from 'react';
 import {UseQueryResult, useQuery} from 'react-query';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
@@ -59,4 +60,50 @@ export const useDownloadUrl = (
       ...options,
     },
   );
+};
+
+/**
+ * `useDownloadFileWithCustomName` is a hook for downloading a file with a custom name.
+ *
+ * @param {string} fileName - The file name.
+ * @param {string} downloadUrl - The URL to download the file from.
+ * @param {string} [extension='pdf'] - The file extension (default is 'pdf').
+ *
+ * @returns {Function} A function that downloads the file and names it as `{fileName}_{YYMMDD}.{extension}`.
+ */
+export const useDownloadFileWithCustomName = (
+  fileName: string | undefined | number,
+  downloadUrl: string,
+  extension?: 'pdf',
+) => {
+  const fileExtension = extension || 'pdf';
+  let finalFileName = fileName || 'Unassigned';
+  const downloadFile = useCallback(async () => {
+    try {
+      const response = await fetch(downloadUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+
+      // Set the file name
+      const date = new Date();
+      const formattedDate = `${date.getFullYear().toString().substr(-2)}${(
+        date.getMonth() + 1
+      )
+        .toString()
+        .padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
+      finalFileName = fileName
+        ? `${fileName}_${formattedDate}.${fileExtension}`
+        : `Unassigned_${formattedDate}.${fileExtension}`;
+      link.download = finalFileName;
+
+      link.target = '_blank';
+      link.click();
+    } catch (error) {
+      console.error('Failed to download file:', error);
+    }
+  }, [fileName, downloadUrl]);
+
+  return {downloadFile, fileName: finalFileName};
 };

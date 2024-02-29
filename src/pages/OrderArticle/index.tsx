@@ -3,7 +3,6 @@ import {useTranslation} from 'react-i18next';
 import {useLocation} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
-import printJS from 'print-js';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import {SelectCombined} from 'components/SelectCombined';
@@ -18,7 +17,10 @@ import {
   useArticleOrder,
   useCreateArticleOrder,
 } from 'hooks/reactQuery/useArticle';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {
+  useDownloadFileWithCustomName,
+  useDownloadUrl,
+} from 'hooks/reactQuery/useDownloadUrl';
 import {
   ArticleOrderItemRecord,
   ArticleSupplierView,
@@ -61,7 +63,6 @@ export const OrderArticle = () => {
   const formatDate = useFormatDate();
   const {user} = useUserSession();
   const [orderId, setOrderId] = useState('');
-  const [isPrinted, setIsPrinted] = useState(false);
   const {data: articleOrder, refetch} = useArticleOrder(orderId);
   const {mutate: createArticleOrder} = useCreateArticleOrder(
     <Box display="flex" padding="0em" margin="0em" alignItems="center">
@@ -84,6 +85,11 @@ export const OrderArticle = () => {
   const isPDFGenerated =
     articleOrder?.additionalInfo?.pdfGenerationStatus ===
       PdfGenerationStatus.DONE && downloadUrl;
+
+  const {downloadFile} = useDownloadFileWithCustomName(
+    articleOrder?.number,
+    downloadUrl ? Object.values(downloadUrl)[0] : '',
+  );
 
   const initialValues: CreateArticleOrderRecord = {
     serviceCompanyId: user?.userAccount.serviceCompany.id ?? '',
@@ -118,16 +124,14 @@ export const OrderArticle = () => {
   }, [items]);
 
   useEffect(() => {
-    if (isPDFGenerated && downloadUrl && !isPrinted) {
-      printJS({
-        printable: Object.values(downloadUrl)[0],
-        type: 'pdf',
-        showModal: true,
-      });
-      formik.setSubmitting(false);
-      setIsPrinted(true);
-    }
-  }, [downloadUrl, isPDFGenerated, isPrinted]);
+    (async () => {
+      if (isPDFGenerated && downloadUrl && formik.isSubmitting) {
+        await downloadFile();
+        formik.setSubmitting(false);
+        waitForSeconds(0.1);
+      }
+    })();
+  }, [downloadUrl, isPDFGenerated, !formik.isSubmitting, orderId]);
 
   useEffect(() => {
     if (articleFromLocation) {
@@ -161,7 +165,7 @@ export const OrderArticle = () => {
 
   useEffect(() => {
     if (
-      articleOrder?.additionalInfo.pdfGenerationStatus !==
+      articleOrder?.additionalInfo?.pdfGenerationStatus !==
       PdfGenerationStatus.RUNNING
     ) {
       closeSnackbar();

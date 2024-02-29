@@ -28,7 +28,10 @@ import {
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import {ChecklistStatus, ServiceOrderView} from 'models/service-order';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {
+  useDownloadFileWithCustomName,
+  useDownloadUrl,
+} from 'hooks/reactQuery/useDownloadUrl';
 import {PdfGenerationStatus} from 'models/misc';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {CheckListComponentType} from 'models/checklist';
@@ -69,6 +72,14 @@ export const CheckList = ({serviceOrder}: Props) => {
     isPdfGenerated && serviceOrder!.additionalInfo.checkListInfo
       ? [serviceOrder!.additionalInfo.checkListInfo?.pdfPath]
       : [],
+  );
+
+  const pdfPathToDownload = isPdfGenerated
+    ? serviceOrder!.additionalInfo.checkListInfo!.pdfPath
+    : '';
+  const {downloadFile} = useDownloadFileWithCustomName(
+    serviceOrder?.number,
+    pdfDownloadUrl[pdfPathToDownload],
   );
 
   const {data: signatureDownloadUrls = {}} = useDownloadUrl(
@@ -340,12 +351,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                   variant: 'outlined',
                   size: 'medium',
                   disabled: !isPdfGenerated,
-                  onClick: () => {
-                    const url = isPdfGenerated
-                      ? serviceOrder!.additionalInfo.checkListInfo!.pdfPath
-                      : '';
-                    window.open(pdfDownloadUrl[url], '_blank');
-                  },
+                  onClick: downloadFile,
                   sx: {
                     background: 'transparent',
                   },
