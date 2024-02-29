@@ -498,7 +498,10 @@ export const DraftQuotation = ({formType, quotation}: Props) => {
 
       formik.setFieldValue('notes', quotation?.additionalInfo?.notes ?? '');
 
-      formik.setFieldValue('externalId', quotation?.externalId ?? '');
+      formik.setFieldValue(
+        'externalId',
+        formType === 'edit' ? quotation?.externalId || '' : '',
+      );
       formik.setFieldValue(
         'sentDate',
         quotation.additionalInfo.sentDate
