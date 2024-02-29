@@ -52,9 +52,17 @@ export const useQueryChecklists = (
 const createChecklist = async (
   body: CreateCheckListRecord,
 ): Promise<StringValue> => {
-  const response = await axiosClient.post<StringValue>('/api/checkLists', {
-    ...body,
-  });
+  const response = await axiosClient.post<StringValue>(
+    '/api/checkLists/upload',
+    {
+      record: JSON.stringify(body),
+    },
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    },
+  );
   return response.data;
 };
 
@@ -79,9 +87,17 @@ const updateChecklist = async (
   id: string,
   checklist: UpdateCheckListRecord,
 ) => {
-  await axiosClient.put<StringValue>(`/api/checkLists/${id}`, {
-    ...checklist,
-  });
+  await axiosClient.put<StringValue>(
+    `/api/checkLists/${id}/upload`,
+    {
+      record: JSON.stringify(checklist),
+    },
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    },
+  );
 };
 
 export const useUpdateChecklist = (successMsg?: string) => {
