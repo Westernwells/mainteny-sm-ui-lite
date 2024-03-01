@@ -55,6 +55,13 @@ export interface PropertyOwnerView {
   externalId: string;
   serviceCompany: ServiceCompanySimpleView;
   contactPersons: CompanyContact;
+  paymentTerm?: {
+    additionalInfo: string;
+    id: string;
+    meta: Meta;
+    serviceCompanyId: string;
+    term: string;
+  };
 }
 
 export interface PropertyOwnerSimpleView {

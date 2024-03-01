@@ -42,6 +42,7 @@ import {useSnackbar} from 'notistack';
 import PathImage from 'assets/images/Path.svg';
 import {convertToMacro} from 'utils/utils';
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
+import {useDownloadFileWithCustomName} from 'hooks/reactQuery/useDownloadUrl';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -65,6 +66,10 @@ export const ViewQuotation = ({
   const theme = useTheme();
   const {user} = useUserSession();
   const navigate = useNavigate();
+  const {downloadFile} = useDownloadFileWithCustomName(
+    quotation.number,
+    downloadUrl,
+  );
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isRejectedDialogOpen, setIsRejectedDialogOpen] = useState(false);
@@ -237,10 +242,10 @@ export const ViewQuotation = ({
                     sx: {
                       background: 'transparent',
                     },
-                    onClick: () => window.open(`${downloadUrl}`, '_blank'),
+                    onClick: downloadFile,
                     disabled:
                       quotation!.additionalInfo.pdfGenerationStatus !==
-                      PdfGenerationStatus.DONE,
+                        PdfGenerationStatus.DONE || isLoadingDownloadUrl,
                     startIcon: <FileDownloadIcon />,
                   }}
                 />

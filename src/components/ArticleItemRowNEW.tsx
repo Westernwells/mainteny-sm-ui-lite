@@ -721,6 +721,7 @@ export const ArticleItemRowNEW = ({
         <FormSelect
           labelId={`select-unit-label-${index}`}
           label=""
+          resetOption={{label: t('Select Unit')}}
           options={createMeasurementOptions(selectedLng, MeasurementUnit.UE)}
           selectProps={{
             value: formik.values.article?.unit ?? '',

@@ -24,6 +24,10 @@ interface Props<T> {
   containerStyles?: {[key: string]: any};
   errorText?: string | false;
   onClickPaymentTerms?: () => void;
+  resetOption?: {
+    label: string;
+    value?: string | readonly string[] | number | undefined;
+  };
 }
 
 const ITEM_HEIGHT = 48;
@@ -48,6 +52,7 @@ export const FormSelect = ({
   selectProps,
   errorText = '',
   containerStyles,
+  resetOption,
   onClickPaymentTerms,
 }: Props<string | string[]>) => {
   const {t} = useTranslation();
@@ -95,6 +100,11 @@ export const FormSelect = ({
         sx={selectStyles}
         MenuProps={MenuProps}
         {...selectProps}>
+        {resetOption && (
+          <MenuItem value="" sx={{color: theme.palette.grey[500]}}>
+            {t(resetOption.label)}
+          </MenuItem>
+        )}
         {[
           options.map((option) => (
             <MenuItem

@@ -15,7 +15,6 @@ import {useParams} from 'react-router-dom';
 import {useFormik} from 'formik';
 import {
   ContractOrderField,
-  ContractPaymentTermView,
   ContractRequestBody,
   ContractStatus,
   ContractUpdateRequest,
@@ -50,8 +49,6 @@ import {StatusChip} from 'components/StatusChip';
 import {capitalize} from 'lodash';
 import {Order} from 'models/misc';
 import {createEmptyResource} from 'utils/paging-utils';
-import {ContractPaymentTermInput} from 'components/ContractPaymentTermInput';
-import {ContractPaymentTerm} from 'components/ContractPaymentTerm';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
@@ -91,16 +88,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
 
   const [documents, setDocuments] = useState<FileWithPreview[]>([]);
   const [openDescriptionDialog, setOpenDescriptionDialog] = useState(false);
-  const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
-    useState(false);
-  const [
-    openContractPaymentTermSelectDialog,
-    setOpenContractPaymentTermSelectDialog,
-  ] = useState(false);
-
-  const [paymentTermToEdit, setPaymentTermToEdit] = useState<
-    ContractPaymentTermView | undefined
-  >(undefined);
 
   const {mutateAsync: uploadFiles} = useUploadFiles(
     'Documents uploaded successfully',
@@ -280,18 +267,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
         contractId: contractId!,
       },
       {onSuccess: () => setOpenDescriptionDialog(false)},
-    );
-  };
-
-  const handleContractPaymentTermsModal = (paymentTermId: string) => {
-    updateContract(
-      {
-        body: {
-          paymentTermId,
-        } as Partial<ContractRequestBody>,
-        contractId: contractId!,
-      },
-      {onSuccess: () => setOpenContractPaymentTermsDialog(false)},
     );
   };
 
@@ -666,7 +641,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
           </ContractCard>
         </Grid>
 
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={12}>
           <ContractCard
             containerStyles={{
               mt: !isMobile ? '1em' : 0,
@@ -712,67 +687,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               }}>
               <DescriptionForm formik={formik} />
             </Dialog>
-          </ContractCard>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <ContractCard
-            containerStyles={{
-              mt: !isMobile ? '1em' : 0,
-              pt: 2,
-              px: 2,
-              height: '100%',
-              [theme.breakpoints.up('md')]: {
-                minHeight: '13rem',
-              },
-              '& .MuiCardHeader-root': {
-                ...headerStyles,
-                py: 0,
-              },
-            }}
-            header={
-              <Box sx={headerStyles}>
-                <Typography variant="subtitle1" mr="0.5em">
-                  {t('Payment Terms')}
-                </Typography>
-              </Box>
-            }
-            headerActionIcon={<EditIcon />}
-            headerAction={() => setOpenContractPaymentTermsDialog(true)}>
-            {contractDetails?.paymentTerm?.term ? (
-              <Typography variant="body2">
-                {contractDetails.paymentTerm.term}
-              </Typography>
-            ) : (
-              <EmptySection
-                label="No payment terms applied"
-                illustration="clipboard"
-                size="tiny"
-                containerStyle={{
-                  height: '100%',
-                }}
-              />
-            )}
-
-            <ContractPaymentTermInput
-              title={t('New payment term')}
-              open={openContractPaymentTermSelectDialog}
-              onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
-              defaultPaymentTerm={paymentTermToEdit}
-              setPaymentToEdit={setPaymentTermToEdit}
-            />
-
-            <ContractPaymentTerm
-              title={t('Payment Terms')}
-              open={openContractPaymentTermsDialog}
-              onCancel={() => setOpenContractPaymentTermsDialog(false)}
-              onSave={handleContractPaymentTermsModal}
-              defaultPayment={contractDetails?.paymentTerm?.term}
-              onClickNewPaymentTerm={() =>
-                setOpenContractPaymentTermSelectDialog(true)
-              }
-              setPaymentToEdit={setPaymentTermToEdit}
-            />
           </ContractCard>
         </Grid>
       </Grid>

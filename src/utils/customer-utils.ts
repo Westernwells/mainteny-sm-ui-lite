@@ -27,6 +27,7 @@ export const formatUpdateCustomer = (data: CustomerEditForm) => ({
     : '',
   vatId: data.vatId,
   offsettingAccount: data.offsettingAccount,
+  paymentTermId: data?.paymentTermId,
 });
 
 export const getFilterUnitNumber = (value: string, type: 'start' | 'end') => {

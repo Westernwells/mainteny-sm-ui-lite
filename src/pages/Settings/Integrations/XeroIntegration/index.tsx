@@ -12,6 +12,9 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import {Progress} from 'components/Progress';
 import {Confirm} from 'components/Confirm';
 import {useSearchValues} from 'hooks/useSearchValues';
+import {useQueryClient} from 'react-query';
+import {queryKeys} from 'reactQuery/constants';
+import {useTranslation} from 'react-i18next';
 import IntegrationCard from '../IntegrationCard';
 import {IIntegrationInfo} from '..';
 import XeroDialog from './Dialog';
@@ -25,12 +28,15 @@ const integrationInfo: IIntegrationInfo = {
 
 const XeroIntegration: FC = () => {
   const {user} = useUserSession();
+  const {t} = useTranslation();
   const serviceCompanyId = user!.userAccount.serviceCompany.id;
   const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
   const redirectionUrl = `${window.location.origin}/settings?tab=2`;
 
   const {
     values: {code, error},
+    clearValues,
   } = useSearchValues<{code: string; error: string}>();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -48,27 +54,39 @@ const XeroIntegration: FC = () => {
     isError: isErrorConnecting,
   } = useServiceCompanySettingXeroConnect(serviceCompanyId);
 
-  // Send code to server to connect integration, after redirection from Xero login page
-  useEffect(() => {
-    if (code) {
-      connectToXero(
-        {code, redirectionUrl},
-        {
-          onSuccess: () => {
-            enqueueSnackbar('New integration added!');
-          },
-          onError: (err: unknown) => {
-            console.log(err);
-            if (err instanceof Error) {
-              showError(err.message);
-            }
-          },
-        },
-      );
-    } else if (error) {
-      showError('Connection failed');
+  const hasConnectionError =
+    (isErrorConnecting || Boolean(error)) && !integration?.enabled;
+
+  const handleSuccess = () => {
+    enqueueSnackbar(t('New integration added!'), {variant: 'success'});
+    queryClient.invalidateQueries(queryKeys.fetchXeroIntegration);
+    clearValues();
+  };
+
+  const handleError = (err: unknown) => {
+    console.error(err);
+    if (err instanceof Error) {
+      showError(err.message);
+    } else {
+      showError(t('An error occurred during connection.'));
     }
-  }, [code, error]);
+  };
+
+  useEffect(() => {
+    if (integration && !integration?.enabled) {
+      if (code) {
+        connectToXero(
+          {code, redirectionUrl},
+          {
+            onSuccess: handleSuccess,
+            onError: handleError,
+          },
+        );
+      } else if (error) {
+        showError(t('Connection failed'));
+      }
+    }
+  }, [code, error, integration?.enabled]);
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
@@ -85,7 +103,6 @@ const XeroIntegration: FC = () => {
         onSuccess: (data) => {
           // Redirect to XERO login page
           const URL = data?.xeroAuthUrl;
-          // const URL = `https://login.xero.com/identity/connect/authorize?response_type=code&client_id=AB40A2886C4C44828C5173C5436A2629&redirect_uri=http://localhost:3000/settings?tab=2&scope=accounting.transactions+accounting.settings+accounting.contacts+offline_access&state=b7af889d-3a6a-4113-b6e1-b34acda8fcdb`;
           if (URL) {
             window.location.href = URL;
           }
@@ -111,12 +128,12 @@ const XeroIntegration: FC = () => {
         onCancel={handleCloseDialog}
         onSave={handleSave}
         isLoading={isUpdating}
-        hasError={isErrorConnecting || Boolean(error)}
+        hasError={hasConnectionError}
         integration={integration}
       />
       <IntegrationCard
         enabled={integration?.enabled || false}
-        hasError={isErrorConnecting || Boolean(error)}
+        hasError={hasConnectionError}
         onConnect={handleOpenDialog}
         onDisconnect={() => setOpenDeleteConfirm(true)}
         {...integrationInfo}
@@ -124,8 +141,15 @@ const XeroIntegration: FC = () => {
       <Confirm
         disableActions={isDisconnecting}
         open={openDeleteConfirm}
-        onConfirm={async () => {
-          await disconnectFromXero();
+        onConfirm={() => {
+          disconnectFromXero((() => {})(), {
+            onSuccess() {
+              enqueueSnackbar(t('Successfully disconnected from Xero!'), {
+                variant: 'success',
+              });
+              queryClient.invalidateQueries(queryKeys.fetchXeroIntegration);
+            },
+          });
           setOpenDeleteConfirm(false);
         }}
         onClose={() => setOpenDeleteConfirm(false)}

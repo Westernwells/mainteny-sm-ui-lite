@@ -733,6 +733,7 @@ export const ArticleItemRowQuotation = ({
             label: item,
             value: item,
           }))}
+          resetOption={{label: t('Select Unit')}}
           selectProps={{
             value: formik.values.article?.unit ?? '',
             onChange: formik.handleChange,

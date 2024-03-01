@@ -224,6 +224,7 @@ export const useCustomer = () => {
   const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   const {t} = useTranslation();
+  let isLoading = false;
 
   const updateCustomer = async (
     data: CustomerEditForm,
@@ -232,6 +233,7 @@ export const useCustomer = () => {
   ): Promise<void> => {
     const requestBody = formatUpdateCustomer(data);
     try {
+      isLoading = true;
       const {status} = await axiosClient.put(
         `/api/propertyOwners/${propertyOwnerId}`,
         requestBody,
@@ -254,11 +256,15 @@ export const useCustomer = () => {
     } catch (error: any) {
       console.error(error);
       showError(error);
+    } finally {
+      queryClient.invalidateQueries(queryKeys.queryCustomers);
+      isLoading = false;
     }
   };
 
   return {
     updateCustomer,
+    isLoading,
   };
 };
 

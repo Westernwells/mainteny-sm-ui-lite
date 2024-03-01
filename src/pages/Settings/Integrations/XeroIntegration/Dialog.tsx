@@ -42,7 +42,7 @@ const XeroDialog: FC<Props> = ({
     reset,
     formState: {errors},
   } = useForm<XeroIntegrationRecord>({
-    mode: 'onBlur',
+    mode: 'all',
     defaultValues: {
       clientId: '',
       tenantId: '',
@@ -100,7 +100,9 @@ const XeroDialog: FC<Props> = ({
       aria-describedby="alert-dialog-description"
       fullWidth
       maxWidth="sm">
-      <DialogTitle id="alert-dialog-title">Integration settings</DialogTitle>
+      <DialogTitle id="alert-dialog-title">
+        {t('Integration settings')}
+      </DialogTitle>
       <DialogContent>
         <Grid container direction="column" gap={3}>
           <Grid
@@ -132,7 +134,7 @@ const XeroDialog: FC<Props> = ({
                     ? 'Tenant ID is required'
                     : undefined,
                   ...register('tenantId', {
-                    required: 'Tenant ID is required',
+                    required: t('Tenant ID is required'),
                   }),
                 }}
               />
@@ -146,7 +148,7 @@ const XeroDialog: FC<Props> = ({
                     ? 'Client ID is required'
                     : undefined,
                   ...register('clientId', {
-                    required: 'Tenant ID is required',
+                    required: t('Client ID is required'),
                   }),
                 }}
               />
@@ -158,10 +160,10 @@ const XeroDialog: FC<Props> = ({
                   error: Boolean(errors.secret),
                   required: true,
                   helperText: errors.secret
-                    ? 'Client ID is required'
+                    ? 'Client secret is required'
                     : undefined,
                   ...register('secret', {
-                    required: 'Client secret is required',
+                    required: t('Client secret is required'),
                   }),
                 }}
               />
@@ -190,7 +192,7 @@ const XeroDialog: FC<Props> = ({
               !watchAllFields.clientId ||
               !watchAllFields.secret,
           }}>
-          <Typography variant="subtitle2">{t('Save')}</Typography>
+          <Typography variant="subtitle2">{t('Connect')}</Typography>
         </LoadingButton>
       </DialogActions>
     </Dialog>
