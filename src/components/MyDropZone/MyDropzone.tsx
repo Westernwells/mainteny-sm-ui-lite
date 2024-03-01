@@ -64,7 +64,7 @@ export const MyDropZone = ({
 
   const [cropper, setCropper] = useState<any>();
   const {getRootProps, getInputProps, open, fileRejections} = useDropzone({
-    maxSize: oneMbInByes * 5,
+    maxSize: oneMbInByes * 20,
     maxFiles,
     accept: acceptedFileTypes
       ? formatAcceptedFileType(acceptedFileTypes)
@@ -283,7 +283,7 @@ export const MyDropZone = ({
           </Typography>
         </Box>
         <Typography variant="caption">
-          {t(hint)} {t('(max. 5MB)')}
+          {t(hint)} {t('(max. 20MB)')}
         </Typography>
       </Box>
 
