@@ -31,7 +31,10 @@ import {
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {QuotationStatus, QuotationView} from 'models/quotation';
 import {PdfGenerationStatus} from 'models/misc';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {
+  useDownloadFileWithCustomName,
+  useDownloadUrl,
+} from 'hooks/reactQuery/useDownloadUrl';
 
 interface Props {
   quotation: QuotationView;
@@ -62,6 +65,11 @@ export const Actions = ({quotation}: Props) => {
 
   const {data: downloadUrls} = useDownloadUrl(
     pathToDownload ? [pathToDownload] : [],
+  );
+
+  const {downloadFile} = useDownloadFileWithCustomName(
+    quotation?.number,
+    downloadUrls?.[pathToDownload] || '',
   );
 
   const handleClick = (event: any) => {
@@ -191,7 +199,7 @@ export const Actions = ({quotation}: Props) => {
 
     if (url) {
       if (actionType === 'DOWNLOAD') {
-        window.open(url, '_blank');
+        downloadFile();
       }
 
       if (actionType === 'PRINT') {

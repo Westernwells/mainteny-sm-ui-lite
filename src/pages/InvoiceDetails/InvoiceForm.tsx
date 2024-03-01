@@ -404,6 +404,9 @@ export const InvoiceForm = ({
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
+    if (formType === 'new' && row.paymentTerm) {
+      formik.setFieldValue('paymentTerms', row.paymentTerm?.term || '');
+    }
     // If the chosen customer was already set as the property owner of the invoice
     if (row.id !== invoice?.propertyOwner.id) {
       const emptyAddressState = {fullName: null};

@@ -31,7 +31,10 @@ import {
   usePublishInvoice,
 } from 'hooks/reactQuery/useInvoice';
 import {InvoiceStatus, InvoiceView, InvoiceType} from 'models/invoice';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {
+  useDownloadFileWithCustomName,
+  useDownloadUrl,
+} from 'hooks/reactQuery/useDownloadUrl';
 import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
 import {getInvoicePDFStatuses, validateDueDate} from 'utils/invoice-utils';
@@ -93,9 +96,14 @@ export const Actions = ({
   const {isPDFsGenerated, isInvoicePDFGenerated} =
     getInvoicePDFStatuses(invoice);
 
+  const {downloadFile} = useDownloadFileWithCustomName(
+    invoice?.number,
+    downloadUrls?.[pdfPathToDownload] || '',
+  );
+
   useEffect(() => {
     if (downloadUrls?.[pdfPathToDownload]) {
-      window.open(downloadUrls?.[pdfPathToDownload], '_blank');
+      downloadFile();
       setPdfPathToDownload('');
     }
   }, [downloadUrls]);
