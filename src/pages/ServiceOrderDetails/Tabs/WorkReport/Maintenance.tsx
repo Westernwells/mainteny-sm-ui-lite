@@ -78,8 +78,8 @@ export const Maintenance = ({serviceOrder, formik}: Props) => {
               alignItems="center"
               gap={0.5}
               flex={1}>
-              <DirectionsCar sx={{color: 'action.active'}} />
-              <Typography variant="caption">{t('Travel')}</Typography>
+              <Construction sx={{color: 'action.active'}} />
+              <Typography variant="caption">{t('Work')}</Typography>
             </Box>
             <Box
               maxWidth={500}
@@ -87,8 +87,8 @@ export const Maintenance = ({serviceOrder, formik}: Props) => {
               alignItems="center"
               gap={0.5}
               flex={1}>
-              <Construction sx={{color: 'action.active'}} />
-              <Typography variant="caption">{t('Work')}</Typography>
+              <DirectionsCar sx={{color: 'action.active'}} />
+              <Typography variant="caption">{t('Travel')}</Typography>
             </Box>
           </Box>
           <Box
@@ -104,8 +104,8 @@ export const Maintenance = ({serviceOrder, formik}: Props) => {
               columnGap={2}
               flexWrap="wrap"
               justifyContent="space-between">
-              <ReportTimeEntries type="travel" formik={formik} />
               <ReportTimeEntries type="work" formik={formik} />
+              <ReportTimeEntries type="travel" formik={formik} />
             </Box>
             <Box
               justifyContent="space-between"
@@ -113,50 +113,6 @@ export const Maintenance = ({serviceOrder, formik}: Props) => {
               columnGap={2}
               display="flex"
               flexWrap="wrap">
-              <Box maxWidth={500} flex={1}>
-                <Box mt={3} display="flex" alignItems="center">
-                  <Box width={150}>
-                    <Typography>{t('Travel time')}</Typography>
-                  </Box>
-                  <Box width={100}>
-                    <Typography>{totalTravelFormatted}</Typography>
-                  </Box>
-                  <NumericFormat
-                    value={formik.values.travelTimeRecord?.percentageSurcharge}
-                    customInput={TextField}
-                    suffix="%"
-                    label={t('Surcharge')}
-                    allowLeadingZeros={false}
-                    decimalScale={2}
-                    decimalSeparator={
-                      selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-                    }
-                    thousandSeparator={
-                      selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-                    }
-                    sx={{
-                      width: 100,
-                      '& .MuiInputBase-root': {
-                        pr: 0,
-                      },
-                      '& .MuiOutlinedInput-input': {
-                        textAlign: 'right',
-                      },
-                    }}
-                    InputProps={{
-                      inputMode: 'numeric',
-                    }}
-                    onValueChange={(values) => {
-                      const {floatValue} = values;
-                      formik.setFieldValue(
-                        `travelTimeRecord.percentageSurcharge`,
-                        floatValue ?? 0,
-                      );
-                    }}
-                    size="small"
-                  />
-                </Box>
-              </Box>
               <Box maxWidth={500} flex={1}>
                 <Box mt={3} display="flex" alignItems="center">
                   <Box width={150}>
@@ -194,6 +150,50 @@ export const Maintenance = ({serviceOrder, formik}: Props) => {
                       const {floatValue} = values;
                       formik.setFieldValue(
                         `workTimeRecord.percentageSurcharge`,
+                        floatValue ?? 0,
+                      );
+                    }}
+                    size="small"
+                  />
+                </Box>
+              </Box>
+              <Box maxWidth={500} flex={1}>
+                <Box mt={3} display="flex" alignItems="center">
+                  <Box width={150}>
+                    <Typography>{t('Travel time')}</Typography>
+                  </Box>
+                  <Box width={100}>
+                    <Typography>{totalTravelFormatted}</Typography>
+                  </Box>
+                  <NumericFormat
+                    value={formik.values.travelTimeRecord?.percentageSurcharge}
+                    customInput={TextField}
+                    suffix="%"
+                    label={t('Surcharge')}
+                    allowLeadingZeros={false}
+                    decimalScale={2}
+                    decimalSeparator={
+                      selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
+                    }
+                    thousandSeparator={
+                      selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
+                    }
+                    sx={{
+                      width: 100,
+                      '& .MuiInputBase-root': {
+                        pr: 0,
+                      },
+                      '& .MuiOutlinedInput-input': {
+                        textAlign: 'right',
+                      },
+                    }}
+                    InputProps={{
+                      inputMode: 'numeric',
+                    }}
+                    onValueChange={(values) => {
+                      const {floatValue} = values;
+                      formik.setFieldValue(
+                        `travelTimeRecord.percentageSurcharge`,
                         floatValue ?? 0,
                       );
                     }}
