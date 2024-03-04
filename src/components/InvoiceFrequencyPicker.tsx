@@ -236,7 +236,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
           {formik.values.elevators
             .filter((elevator) => componentId === elevator.elevatorId)
             .map((elevator) => {
-              const timeNumbers = elevator.invoiceJob.timeNumbers || [];
+              const timeNumbers = elevator.invoiceJob?.timeNumbers || [];
               const selectedMonthsInfo = selectedMonths
                 .filter((item) => timeNumbers.includes(item.number))
                 .map((item) => item.month.slice(0, 3));

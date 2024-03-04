@@ -15,8 +15,10 @@ import {ReactComponent as CalendarTodayIcon} from 'assets/icons/CalendarToday.sv
 import {ReactComponent as UnionIcon} from 'assets/icons/UnionIcon.svg';
 import {formatDate} from 'utils/datetime';
 import {theme} from 'theme';
-import {FormikProps} from 'formik';
-import {ContractServiceForm} from 'models/contract';
+import {
+  ContractComponentView,
+  ContractServiceFormElevator,
+} from 'models/contract';
 import {
   calculateContractInvoicePriceTotal,
   calculateContractInvoiceRowPrice,
@@ -25,12 +27,13 @@ import {useTranslation} from 'react-i18next';
 import {getArticleTypeText} from 'utils/article-utils';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {getViewFrequency} from 'utils/elevator-utils';
+import {ArticleType} from 'models/article';
 
 type Props = {
-  formikContractServiceComponent: FormikProps<ContractServiceForm>;
+  service?: ContractComponentView;
 };
 
-const ServiceInformationReview = ({formikContractServiceComponent}: Props) => {
+const ServiceInformationReview = ({service}: Props) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
 
@@ -60,7 +63,7 @@ const ServiceInformationReview = ({formikContractServiceComponent}: Props) => {
           variant="h5"
           color={theme.palette.text.primary}
           sx={{paddingLeft: '0.5em'}}>
-          {formikContractServiceComponent.values.name}
+          {service?.name}
         </Typography>
       </Box>
 
@@ -72,10 +75,8 @@ const ServiceInformationReview = ({formikContractServiceComponent}: Props) => {
               First job creation
             </Typography>
             <Typography variant="h6" color={theme.palette.text.primary}>
-              {formikContractServiceComponent.values.firstOrderDate !== null
-                ? formatDate(
-                    formikContractServiceComponent.values.firstOrderDate,
-                  )
+              {service?.additionalInfo?.firstOrderDate !== null
+                ? formatDate(service?.additionalInfo?.firstOrderDate)
                 : '-'}
             </Typography>
           </Box>
@@ -88,10 +89,8 @@ const ServiceInformationReview = ({formikContractServiceComponent}: Props) => {
               First invoice
             </Typography>
             <Typography variant="h6" color={theme.palette.text.primary}>
-              {formikContractServiceComponent.values.firstInvoiceDate !== null
-                ? formatDate(
-                    formikContractServiceComponent.values.firstInvoiceDate,
-                  )
+              {service?.additionalInfo?.firstInvoiceDate !== null
+                ? formatDate(service?.additionalInfo?.firstInvoiceDate)
                 : '-'}
             </Typography>
           </Box>
@@ -105,7 +104,7 @@ const ServiceInformationReview = ({formikContractServiceComponent}: Props) => {
             </Typography>
             <Typography variant="h6" color={theme.palette.text.primary}>
               {getArticleTypeText(
-                formikContractServiceComponent.values.costType,
+                service?.additionalInfo?.costType as ArticleType,
               ) || '-'}
             </Typography>
           </Box>
@@ -131,113 +130,99 @@ const ServiceInformationReview = ({formikContractServiceComponent}: Props) => {
           </TableRow>
         </TableHead>
         <TableBody sx={{display: 'block'}}>
-          {formikContractServiceComponent.values.elevators?.map(
-            (item, index) => (
-              <TableRow
+          {service?.additionalInfo?.elevators?.map((item, index) => (
+            <TableRow
+              sx={{
+                width: '100%',
+                display: 'block',
+                cursor: 'pointer',
+                '&:hover': {
+                  background: '#F2F6F8',
+                },
+              }}
+              key={index}>
+              <TableCell
                 sx={{
-                  width: '100%',
-                  display: 'block',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    background: '#F2F6F8',
-                  },
-                }}
-                key={index}>
-                <TableCell
-                  sx={{
-                    width: '15%',
-                    display: 'inline-block',
-                    padding: '0.5em',
-                    borderBottom: 'none',
-                  }}>
-                  <Typography
-                    color={theme.palette.text.primary}
-                    variant="body2">
-                    {item.externalId || ''}
-                  </Typography>
-                </TableCell>
+                  width: '15%',
+                  display: 'inline-block',
+                  padding: '0.5em',
+                  borderBottom: 'none',
+                }}>
+                <Typography color={theme.palette.text.primary} variant="body2">
+                  {item.externalId || ''}
+                </Typography>
+              </TableCell>
 
-                <TableCell
-                  sx={{
-                    width: '12%',
-                    display: 'inline-block',
-                    borderBottom: 'none',
-                    padding: '0.5em 1em 0.5em 0em',
-                  }}>
-                  <Typography
-                    color={theme.palette.text.primary}
-                    variant="body2">
-                    {item.buildingLocation || '-'}
-                  </Typography>
-                </TableCell>
+              <TableCell
+                sx={{
+                  width: '12%',
+                  display: 'inline-block',
+                  borderBottom: 'none',
+                  padding: '0.5em 1em 0.5em 0em',
+                }}>
+                <Typography color={theme.palette.text.primary} variant="body2">
+                  {item.buildingLocation || '-'}
+                </Typography>
+              </TableCell>
 
-                <TableCell
-                  sx={{
-                    width: '25%',
-                    display: 'inline-block',
-                    borderBottom: 'none',
-                    padding: '0.5em 1em 0.5em 0em',
-                  }}>
-                  <Typography
-                    color={theme.palette.text.primary}
-                    variant="body2">
-                    {item.address || '-'}
-                  </Typography>
-                </TableCell>
+              <TableCell
+                sx={{
+                  width: '25%',
+                  display: 'inline-block',
+                  borderBottom: 'none',
+                  padding: '0.5em 1em 0.5em 0em',
+                }}>
+                <Typography color={theme.palette.text.primary} variant="body2">
+                  {item.address || '-'}
+                </Typography>
+              </TableCell>
 
-                <TableCell
-                  sx={{
-                    width: '15%',
-                    display: 'inline-block',
-                    textAlign: 'left',
-                    borderBottom: 'none',
-                    padding: '0em 1em 0em 0em',
-                  }}>
-                  <Typography
-                    color={theme.palette.text.primary}
-                    variant="body2">
-                    {getViewFrequency(item?.orderGenerationJob) || '-'}
-                  </Typography>
-                </TableCell>
+              <TableCell
+                sx={{
+                  width: '15%',
+                  display: 'inline-block',
+                  textAlign: 'left',
+                  borderBottom: 'none',
+                  padding: '0em 1em 0em 0em',
+                }}>
+                <Typography color={theme.palette.text.primary} variant="body2">
+                  {getViewFrequency(item?.orderGenerationJob) || '-'}
+                </Typography>
+              </TableCell>
 
-                <TableCell
-                  sx={{
-                    width: '15%',
-                    display: 'inline-block',
-                    textAlign: 'left',
-                    borderBottom: 'none',
-                    padding: '0em 1em 0em 0em',
-                  }}>
-                  <Typography
-                    color={theme.palette.text.primary}
-                    variant="body2">
-                    {getViewFrequency(item?.invoiceJob) || '-'}
-                  </Typography>
-                </TableCell>
+              <TableCell
+                sx={{
+                  width: '15%',
+                  display: 'inline-block',
+                  textAlign: 'left',
+                  borderBottom: 'none',
+                  padding: '0em 1em 0em 0em',
+                }}>
+                <Typography color={theme.palette.text.primary} variant="body2">
+                  {getViewFrequency(item?.invoiceJob) || '-'}
+                </Typography>
+              </TableCell>
 
-                <TableCell
-                  sx={{
-                    width: '18%',
-                    display: 'inline-block',
-                    textAlign: 'right',
-                    borderBottom: 'none',
-                    padding: '1em 0em 1em 1em',
-                  }}>
-                  <Typography
-                    color={theme.palette.text.primary}
-                    variant="body2">
-                    {formatCurrency(
-                      calculateContractInvoiceRowPrice(item) ??
-                        0 / 10 ** (currentCurrency.fractionDigits ?? 0),
-                      {
-                        currency: currentCurrency.code,
-                      },
-                    )}
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            ),
-          )}
+              <TableCell
+                sx={{
+                  width: '18%',
+                  display: 'inline-block',
+                  textAlign: 'right',
+                  borderBottom: 'none',
+                  padding: '1em 0em 1em 1em',
+                }}>
+                <Typography color={theme.palette.text.primary} variant="body2">
+                  {formatCurrency(
+                    calculateContractInvoiceRowPrice(item) ??
+                      0 / 10 ** (currentCurrency.fractionDigits ?? 0),
+                    {
+                      currency: currentCurrency.code,
+                    },
+                  )}
+                </Typography>
+              </TableCell>
+            </TableRow>
+          ))}
 
           <Divider
             sx={{width: '100%', borderColor: '#8F9BB380', padding: '0.2em'}}
@@ -274,7 +259,8 @@ const ServiceInformationReview = ({formikContractServiceComponent}: Props) => {
                 {' '}
                 {formatCurrency(
                   calculateContractInvoicePriceTotal(
-                    formikContractServiceComponent.values.elevators,
+                    service?.additionalInfo
+                      ?.elevators as ContractServiceFormElevator[],
                   ) ?? 0 / 10 ** (currentCurrency.fractionDigits ?? 0),
                   {
                     currency: currentCurrency.code,

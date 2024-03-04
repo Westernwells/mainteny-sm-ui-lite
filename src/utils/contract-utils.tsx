@@ -9,8 +9,10 @@ import {
   ContractComponentElevator,
   ContractComponentRecord,
   ContractComponentView,
+  ContractElevatorView,
   ContractServiceFormElevator,
   ContractStatus,
+  ContractTimeUnit,
   ContractTypes,
   ContractView,
   ExtendedContractComponentRecord,
@@ -147,7 +149,9 @@ export const calculateContractInvoicePriceTotal = (
     if (item?.invoiceJob?.timeNumbers) {
       const timeNumbersLength: number = item.invoiceJob.timeNumbers.length;
       const itemPrice: number = item.price;
-      const itemTotalPrice: number = timeNumbersLength * itemPrice;
+      const itemTotalPrice: number = timeNumbersLength
+        ? timeNumbersLength * itemPrice
+        : itemPrice;
 
       totalPrice += itemTotalPrice;
     }
@@ -176,7 +180,7 @@ export const calculateContractInvoiceRowPrice = (
     return elevatorRow.invoiceJob.timeNumbers.length * elevatorRow.price;
   }
 
-  return 0;
+  return elevatorRow.price;
 };
 
 export const calculateContractInvoicePriceGrandTotal = (
@@ -270,4 +274,59 @@ export const convertExtendedRecordsToContractComponentRecords = (
     };
 
     return contractComponentRecord;
+  });
+
+export const mergeElevators = (
+  elevatorsFromResource: ContractServiceFormElevator[],
+  elevatorsFromRow: ContractServiceFormElevator[],
+) => {
+  const elevatorMap = new Map();
+
+  elevatorsFromResource.forEach((elevator) => {
+    elevatorMap.set(elevator.elevatorId, {
+      ...elevator,
+      isChecked: false,
+    });
+  });
+
+  elevatorsFromRow.forEach((elevator) => {
+    elevatorMap.set(elevator.elevatorId, {
+      ...elevatorMap.get(elevator.elevatorId),
+      ...elevator,
+      isChecked: true,
+    });
+  });
+
+  return Array.from(elevatorMap.values());
+};
+
+export const parsElevatorRecourses = (
+  elevatorResource: ContractElevatorView[],
+) =>
+  elevatorResource?.map((elevator) => {
+    const {contracts, id} = elevator;
+    const foundElevator = contracts
+      ?.flatMap(
+        (contract) =>
+          contract?.components?.flatMap(
+            (component) => component?.additionalInfo?.elevators || [],
+          ) ?? [],
+      )
+      .find((e) => id === e.elevatorId);
+    return {
+      elevatorId: elevator.id,
+      invoiceJob: foundElevator?.invoiceJob || {
+        timeUnit: ContractTimeUnit.MONTHLY,
+        timeNumbers: [],
+      },
+      orderGenerationJob: foundElevator?.orderGenerationJob || {
+        timeUnit: ContractTimeUnit.MONTHLY,
+        timeNumbers: [],
+      },
+      price: foundElevator?.price || 0,
+      externalId: elevator?.externalId,
+      address: elevator.address.fullName || '-',
+      buildingLocation: elevator.additionalInfo.buildingLocation || '-',
+      isChecked: false,
+    };
   });

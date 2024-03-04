@@ -173,6 +173,7 @@ export const MutationService = ({
     );
 
     const {values} = formikContractServiceComponent;
+    const elevatorsToSave = values.elevators.filter((e) => e.isChecked);
 
     const componentsToSave = [
       ...componentsToMutate(updatedComponentsToSave),
@@ -188,7 +189,7 @@ export const MutationService = ({
         name: values.name,
         costPackage: values?.costPackage,
         costType: values?.costType,
-        elevators: values?.elevators,
+        elevators: elevatorsToSave,
       },
     ];
 
@@ -739,7 +740,7 @@ export const MutationService = ({
           </Typography>
         </Box>
 
-        {!isEditForm && renderClearSelectionsButton()}
+        {renderClearSelectionsButton()}
       </Box>
       <Box display="flex" alignItems="center">
         <Switch
@@ -830,41 +831,25 @@ export const MutationService = ({
                 },
               }}
               key={item.elevatorId}>
-              {!isEditForm ? (
-                <TableCell
-                  sx={{
-                    width: '20%',
-                    display: 'inline-block',
-                    padding: '0em 0.5em',
-                    borderBottom: 'none',
-                  }}>
-                  <FormCheckbox
-                    checked={item.isChecked || false}
-                    name={`isChecked-${index}`}
-                    handleChange={() =>
-                      handleCheckboxChange(item, !item.isChecked)
-                    }
-                    label={item.externalId}
-                    typographyProps={{
-                      variant: 'body2',
-                    }}
-                  />
-                </TableCell>
-              ) : (
-                <TableCell
-                  sx={{
-                    width: '20%',
-                    display: 'inline-block',
-                    padding: '0.5em',
-                    borderBottom: 'none',
-                  }}>
-                  <Typography
-                    color={theme.palette.text.primary}
-                    variant="body2">
-                    {item.externalId || '-'}
-                  </Typography>
-                </TableCell>
-              )}
+              <TableCell
+                sx={{
+                  width: '20%',
+                  display: 'inline-block',
+                  padding: '0em 0.5em',
+                  borderBottom: 'none',
+                }}>
+                <FormCheckbox
+                  checked={item.isChecked || false}
+                  name={`isChecked-${index}`}
+                  handleChange={() =>
+                    handleCheckboxChange(item, !item.isChecked)
+                  }
+                  label={item.externalId}
+                  typographyProps={{
+                    variant: 'body2',
+                  }}
+                />
+              </TableCell>
 
               <TableCell
                 sx={{

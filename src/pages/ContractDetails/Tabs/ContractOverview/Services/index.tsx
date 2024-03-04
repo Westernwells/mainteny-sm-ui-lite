@@ -9,8 +9,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import {TableCellProps, useMediaQuery} from '@mui/material';
 import {
   ContractComponentView,
+  ContractElevatorView,
   ContractServiceForm,
-  ContractTimeUnit,
+  ContractServiceFormElevator,
   ContractView,
 } from 'models/contract';
 import {EmptySection} from 'components/EmptySection';
@@ -35,6 +36,7 @@ import {
   calculateContractInvoicePriceTotal,
   componentsToMutate,
   calculateContractInvoicePriceGrandTotal,
+  parsElevatorRecourses,
 } from 'utils/contract-utils';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
@@ -161,41 +163,29 @@ export const Services: FC<Props> = ({contractDetails}) => {
   const setAddFormData = () => {
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
-      elevators: elevatorResource?.data?.map((elevator) => {
-        const {contracts, id} = elevator;
-        const foundElevator = contracts
-          ?.flatMap(
-            (contract) =>
-              contract?.components?.flatMap(
-                (component) => component?.additionalInfo?.elevators || [],
-              ) ?? [],
-          )
-          .find((e) => id === e.elevatorId);
-
-        return {
-          elevatorId: elevator.id,
-          invoiceJob: foundElevator?.invoiceJob || {
-            timeUnit: ContractTimeUnit.MONTHLY,
-            timeNumbers: [],
-          },
-          orderGenerationJob: foundElevator?.orderGenerationJob || {
-            timeUnit: ContractTimeUnit.MONTHLY,
-            timeNumbers: [],
-          },
-          price: foundElevator?.price || 0,
-          externalId: elevator?.externalId,
-          address: elevator.address.fullName || '-',
-          buildingLocation: elevator.additionalInfo.buildingLocation || '-',
-        };
-      }),
+      elevators: parsElevatorRecourses(
+        (elevatorResource?.data as ContractElevatorView[]) || [],
+      ),
     });
   };
 
-  useEffect(() => {
-    setAddFormData();
-  }, [elevatorResource.data.length]);
-
   const setEditFormData = (row: ContractComponentView) => {
+    const infoMap = (row.additionalInfo?.elevators || []).reduce(
+      (map, elevator) => {
+        map[elevator.elevatorId] = elevator;
+        return map;
+      },
+      {} as Record<string, ContractServiceFormElevator>,
+    );
+
+    const allItems = parsElevatorRecourses(
+      (elevatorResource.data as ContractElevatorView[]) || [],
+    ).map((elevator) => ({
+      ...elevator,
+      ...(infoMap[elevator.elevatorId] || {}),
+      isChecked: Boolean(infoMap[elevator.elevatorId]),
+    }));
+
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
       id: row.id,
@@ -206,16 +196,26 @@ export const Services: FC<Props> = ({contractDetails}) => {
       costType: row?.additionalInfo?.costType,
       costPackage: row?.additionalInfo?.costPackage,
       isAutomaticJobCycle: !!row?.additionalInfo?.firstOrderDate,
-      elevators:
-        row.additionalInfo?.elevators?.map((item) => ({
-          elevatorId: item.elevatorId,
-          invoiceJob: item.invoiceJob,
-          orderGenerationJob: item.orderGenerationJob,
-          price: item.price,
-          externalId: item?.externalId,
-        })) || [],
+      elevators: allItems.length
+        ? allItems
+        : row.additionalInfo?.elevators?.map((item) => ({
+            elevatorId: item.elevatorId,
+            invoiceJob: item.invoiceJob,
+            orderGenerationJob: item.orderGenerationJob,
+            price: item.price,
+            externalId: item?.externalId,
+            isChecked: true,
+          })) || [],
     });
   };
+
+  useEffect(() => {
+    if (isEditForm) {
+      setEditFormData(currentService as ContractComponentView);
+    } else {
+      setAddFormData();
+    }
+  }, [elevatorResource.data.length]);
 
   return (
     <Grid item xs={12} md={8}>
@@ -555,9 +555,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
         }
         saveButtonVariant="outlined"
         showCancelButton={false}>
-        <ServiceInformationReview
-          formikContractServiceComponent={formikContractServiceComponent}
-        />
+        <ServiceInformationReview service={currentService} />
       </Dialog>
     </Grid>
   );
