@@ -125,7 +125,7 @@ export const Invoices = ({contractId}: {contractId?: string}) => {
   const renderFilterItems = () => (
     <FilterFields
       onClear={clearValues}
-      text="Clear all"
+      clearText="Clear all"
       textStyles={{color: theme.palette.primary.dark, fontWeight: 600}}
       wrapperStyle={{flex: 1, gap: 1.5}}
       containerStyle={{width: '13%', gap: 1.5}}>
