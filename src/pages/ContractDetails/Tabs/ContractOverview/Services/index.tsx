@@ -185,6 +185,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
           price: foundElevator?.price || 0,
           externalId: elevator?.externalId,
           address: elevator.address.fullName || '-',
+          buildingLocation: elevator.additionalInfo.buildingLocation || '-',
         };
       }),
     });
