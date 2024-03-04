@@ -5,7 +5,7 @@ import EngineeringOutlinedIcon from '@mui/icons-material/EngineeringOutlined';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import ListIcon from '@mui/icons-material/ListAlt';
-import Delete from '@mui/icons-material/Delete';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import {Invoices} from 'pages/Invoices';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
@@ -13,10 +13,14 @@ import {Confirm} from 'components/Confirm';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useTranslation} from 'react-i18next';
 import {useDeleteElevator} from 'hooks/reactQuery/useElevator';
+import {theme} from 'theme';
+import Box from '@mui/material/Box';
+import {Button} from '@mui/material';
 import {OverviewTab} from './Tabs/OverviewTab';
 import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
 import {TodosTab} from './Tabs/TodosTab';
 import {PerformanceTab} from './Tabs/PerformanceTab';
+import UnitNotes from './Notes';
 
 interface Props {
   getCurrentPageTitle?: (title: string) => void;
@@ -67,12 +71,16 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
         tabItems={tabItems}
         currentIndex={value}
         showActionBtn
-        btnLabel="Delete Unit"
+        hideDivider
+        btnLabel="Create Job"
         onChange={(index) => setValue(index)}
-        actionBtnVariant="outlined"
         disableBtnAction={isDeleting}
-        actionButtonIcon={<Delete color="primary" />}
-        btnOnClick={() => setOpenDeleteConfirm(true)}>
+        // TODO: Add onClick event to the button
+        btnOnClick={() => console.log('Create Job')}
+        containerStyles={{
+          marginBottom: theme.spacing(8),
+          '& > div:first-child': {marginBottom: theme.spacing(2)},
+        }}>
         <TabsBody value={value} index={0}>
           <OverviewTab getUnitName={(name) => setUnitName(name)} />
         </TabsBody>
@@ -92,6 +100,33 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
         <TabsBody value={value} index={4}>
           <TodosTab />
         </TabsBody>
+        <Box
+          sx={{
+            position: 'fixed',
+            left: `calc(${theme.spacing(7)} - 1px)`,
+            [theme.breakpoints.up('sm')]: {
+              left: `calc(${theme.spacing(9)} - 1px)`,
+            },
+            right: 0,
+            bottom: 0,
+            background: theme.palette.background.paper,
+            boxShadow: theme.shadows[3],
+            display: 'flex',
+            justifyContent: 'space-between',
+            padding: '0.6rem 2rem',
+          }}>
+          <Button
+            disabled={isDeleting}
+            onClick={() => setOpenDeleteConfirm(true)}
+            startIcon={
+              <DeleteOutlineIcon style={{color: theme.palette.error.main}} />
+            }
+            color="error">
+            {t('Delete Unit')}
+          </Button>
+          {/* TODO: Add Notes in Unit Details */}
+          <UnitNotes customerId="" />
+        </Box>
       </Tabs>
       <Confirm
         disableActions={isDeleting}
