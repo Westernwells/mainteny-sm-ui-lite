@@ -56,6 +56,7 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
     pageIndex: page.pageIndex,
     query: search,
     order,
+    candidateTechnicianAssigned: false,
   });
 
   useEffect(() => {

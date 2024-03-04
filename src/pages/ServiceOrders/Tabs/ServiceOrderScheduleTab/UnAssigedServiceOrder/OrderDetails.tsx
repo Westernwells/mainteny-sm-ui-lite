@@ -5,7 +5,11 @@ import Typography from '@mui/material/Typography';
 import LocationOn from '@mui/icons-material/LocationOn';
 import Tag from '@mui/icons-material/Tag';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
-import {JobScheduleType, ServiceOrderView} from 'models/service-order';
+import {
+  JobScheduleType,
+  ServiceOrderStatus,
+  ServiceOrderView,
+} from 'models/service-order';
 import {Button} from 'components/Button';
 import {useTranslation} from 'react-i18next';
 import {isEmpty} from 'lodash';
@@ -38,7 +42,7 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
     useRedispatchServiceOrders(successMessage);
   const {mutate: scheduleServiceOrder} =
     useUpdateServiceOrderSchedule(successMessage);
-  const [switchActive, setSwitchActive] = useState(true);
+  const [switchActive, setSwitchActive] = useState(false);
   const [form, setForm] = useState<ScheduleForm>({} as ScheduleForm);
   const [formError, setFormErrors] = useState<FormikErrors<ScheduleForm>>();
   const [formValid, setFormValid] = useState(false);
@@ -81,21 +85,26 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
   };
 
   const schedule = () => {
-    const orderStartTime = toRestDateTime(
-      setDateTime(
-        form?.startDate!,
-        formatDate(form.startTime as Date, 'HH:mm')!,
-      ),
-    );
-    const orderEndTime = toRestDateTime(
-      setDateTime(form?.endDate!, formatDate(form.endTime as Date, 'HH:mm')!),
-    );
+    let orderStartTime = null;
+    let orderEndTime = null;
+    if (switchActive) {
+      orderStartTime = toRestDateTime(
+        setDateTime(
+          form?.startDate!,
+          formatDate(form.startTime as Date, 'HH:mm')!,
+        ),
+      );
+
+      orderEndTime = toRestDateTime(
+        setDateTime(form?.endDate!, formatDate(form.endTime as Date, 'HH:mm')!),
+      );
+    }
 
     if (form.technicianId) {
       scheduleServiceOrder({
         body: {
-          endTime: orderEndTime,
-          startTime: orderStartTime,
+          ...(orderEndTime && {endTime: orderEndTime}),
+          ...(orderStartTime && {startTime: orderStartTime}),
           technicianIds: [form.technicianId],
           type: JobScheduleType.FIXED,
         },
@@ -105,8 +114,15 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
     }
   };
 
-  const handleSave = () =>
-    switchActive && isEmpty(formError) ? schedule() : reschedule();
+  const handleSave = () => {
+    if (
+      serviceOrder.status === ServiceOrderStatus.SCHEDULED ||
+      serviceOrder.status === ServiceOrderStatus.IN_PROGRESS
+    ) {
+      return switchActive && isEmpty(formError) ? schedule() : reschedule();
+    }
+    return schedule();
+  };
 
   const dueDate = useMemo(() => {
     const dueDateObj = new Date(serviceOrder.dueDate);
@@ -181,6 +197,8 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
       <ScheduleDialog
         disableSaveBtn={!formValid}
         showSwitch
+        validateDate={switchActive}
+        switchState={switchActive}
         getSwitchState={(value: SetStateAction<boolean>) =>
           setSwitchActive(value)
         }
