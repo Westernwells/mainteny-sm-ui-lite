@@ -627,6 +627,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   setDocuments(dropedFiles);
                 }}
                 acceptedFileTypes={[
+                  'image/*',
                   'application/pdf',
                   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
