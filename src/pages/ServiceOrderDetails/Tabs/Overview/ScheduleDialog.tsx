@@ -68,7 +68,7 @@ export const ScheduleDialog = ({
   const {t} = useTranslation();
   const [query, setQuery] = useState<string>('');
   const [queryView, setQueryView] = useState('');
-  const [switchActive, setSwitchActive] = useState(true);
+  const [switchActive, setSwitchActive] = useState(false);
 
   const formik = useFormik<ScheduleForm>({
     initialValues: {
