@@ -114,10 +114,11 @@ export const AttachDocument: FC<Props> = ({
             display: 'flex',
             flexDirection: 'column',
           },
+          pt: 'unset',
         }}
         bodyContainerStyle={{
           [theme.breakpoints.up('md')]: {
-            height: '12em',
+            height: '9em',
             overflowY: 'hidden',
             overflowX: 'hidden',
 
@@ -145,7 +146,11 @@ export const AttachDocument: FC<Props> = ({
                 alignItems="center"
                 gap="7px"
                 sx={{fontWeight: 600}}>
-                <DocumentIcon width="1.5em" height="1.5em" />
+                <DocumentIcon
+                  width="1.5em"
+                  height="1.5em"
+                  sx={{color: theme.palette.text.secondary}}
+                />
                 {uploadedDocument?.length
                   ? t('Attached Documents')
                   : t('Documents')}
@@ -230,39 +235,85 @@ export const AttachDocument: FC<Props> = ({
                 </Box>
 
                 {editingFileId === document.id ? (
-                  <Box sx={{display: 'flex'}}>
-                    <FormInput
-                      props={{
-                        value: fileName,
-                        size: 'small',
-                        sx: {ml: '0.1rem'},
-                        type: 'text',
-                        onChange: (e) => setFileName(e.target.value),
-                      }}
-                    />
-                    <IconButton
-                      onClick={() => onSaveFileName(document.id)}
-                      edge="start"
-                      sx={{ml: '0.1rem'}}>
-                      <CheckCircleRounded
-                        sx={{
-                          color: theme.palette.primary.main,
-                          fontSize: '1.2rem',
-                        }}
-                      />
-                    </IconButton>
+                  <Grid container spacing={2} justifyContent="center">
+                    <Grid item xs={5} justifyContent="center" display="flex">
+                      <Box display="flex" alignItems="center" maxWidth="160px">
+                        <Box display="flex" flexDirection="column">
+                          <FormInput
+                            props={{
+                              value: fileName,
+                              size: 'small',
+                              sx: {ml: '0.1rem'},
+                              type: 'text',
+                              onChange: (e) => setFileName(e.target.value),
+                            }}
+                          />
+                        </Box>
+                      </Box>
+                    </Grid>
 
-                    <IconButton
-                      onClick={() => handleFileNameChange()}
-                      edge="start">
-                      <CancelIcon
-                        sx={{
-                          color: theme.palette.primary.main,
-                          fontSize: '1.2rem',
-                        }}
-                      />
-                    </IconButton>
-                  </Box>
+                    <Grid item xs={5} alignSelf="center">
+                      <Box display="flex" alignItems="center">
+                        {document?.type.startsWith('image/') ? (
+                          <ImageIcon
+                            sx={{
+                              backgroundColor: theme.palette.info.main,
+                              color: theme.palette.primary.contrastText,
+                              borderRadius: 1,
+                              width: 17,
+                              height: 17,
+                            }}
+                          />
+                        ) : (
+                          <DriveFileIcon />
+                        )}
+
+                        <Typography
+                          variant="body1"
+                          pl={1}
+                          sx={{
+                            wordBreak: 'break-word',
+                            overflowWrap: 'anywhere',
+                            color: document?.type.startsWith('image/')
+                              ? theme.palette.info.main
+                              : theme.palette.success.darkSuccess,
+                          }}>
+                          {document?.type.startsWith('image/')
+                            ? t('Image')
+                            : t('Document')}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={2}
+                      alignSelf="center"
+                      display="flex"
+                      justifyContent="center">
+                      <IconButton
+                        onClick={() => onSaveFileName(document.id)}
+                        edge="start"
+                        sx={{ml: '0.1rem'}}>
+                        <CheckCircleRounded
+                          sx={{
+                            color: theme.palette.primary.main,
+                            fontSize: '1.2rem',
+                          }}
+                        />
+                      </IconButton>
+
+                      <IconButton
+                        onClick={() => handleFileNameChange()}
+                        edge="start">
+                        <CancelIcon
+                          sx={{
+                            color: theme.palette.primary.main,
+                            fontSize: '1.2rem',
+                          }}
+                        />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
                 ) : (
                   <Grid container sx={{marginBottom: 2}}>
                     <Grid item xs={5}>

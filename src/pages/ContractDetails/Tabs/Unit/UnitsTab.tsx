@@ -136,7 +136,7 @@ export const UnitsTab: FC<Props> = ({
   }, [elevatorsLength]);
 
   useEffect(() => {
-    if (!isLoading) {
+    if (elevatorResponse.data.length) {
       setRows(
         makeRows(
           {
@@ -148,10 +148,14 @@ export const UnitsTab: FC<Props> = ({
             ),
           },
           formatDate,
+          contractId,
         ),
       );
+    } else {
+      setRows([]);
     }
-  }, [elevatorResponse.data.length]);
+  }, [isFetching]);
+
   useEffect(() => {
     if (elevatorResponse.total > 0 && elevatorResponse.data.length === 0) {
       setPage({
@@ -335,7 +339,7 @@ export const UnitsTab: FC<Props> = ({
         containerStyle={{margin: 'unset'}}
         rows={rows || []}
         isEvenRowDifferentColor
-        columns={columns}
+        columns={columns(contractId)}
         loading={isFetching}
         scrollToTop={search}
         pageSize={page.pageSize}

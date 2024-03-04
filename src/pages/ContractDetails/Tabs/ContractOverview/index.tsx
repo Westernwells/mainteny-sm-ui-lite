@@ -10,7 +10,6 @@ import {
 } from 'hooks/reactQuery/useContract';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
-import {useMediaQuery} from '@mui/material';
 import {useParams} from 'react-router-dom';
 import {useFormik} from 'formik';
 import {
@@ -22,7 +21,6 @@ import {
 import {InfoCard} from 'components/InfoCard';
 import {Dialog} from 'components/Dialog';
 import {Progress} from 'components/Progress';
-import {EmptySection} from 'components/EmptySection';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import * as Yup from 'yup';
 import {
@@ -48,16 +46,16 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import IconButton from '@mui/material/IconButton';
 import CancelIcon from '@mui/icons-material/Cancel';
 import {UserSession} from 'models/session';
-import {olStyles} from 'styles';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
 import EditContractForm from './EditContractForm';
-import {DescriptionForm} from './DescriptionForm';
 import {SectionTitle} from '../../../InvoiceDetails/SectionTitle';
 import {CancelContract} from './CancelContract';
 import {Parties} from './Parties';
 import {AttachDocument} from './AttachDocument';
+import {Services} from './Services';
+import InvoiceSetup from './InvoiceSetup';
 
 interface Props {
   contractDetails: ContractView;
@@ -85,7 +83,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const {mutateAsync: updateContract, isLoading: isUpdateLoading} =
     useUpdateContract('Contract updated');
   const {user} = useUserSession();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [openContractDialog, setOpenContractDialog] = useState(false);
   const [openDocumentDialog, setOpenDocumentDialog] = useState(false);
@@ -96,11 +93,10 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   );
 
   const [documents, setDocuments] = useState<FileWithPreview[]>([]);
-  const [openDescriptionDialog, setOpenDescriptionDialog] = useState(false);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const {mutateAsync: uploadFiles} = useUploadFiles(
+  const {mutateAsync: uploadFiles, isLoading: isUploadLoading} = useUploadFiles(
     'Documents uploaded successfully',
   );
 
@@ -299,38 +295,10 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       contractId: contractId!,
     });
   };
-
-  const handleSaveDescription = () => {
-    updateContract(
-      {
-        body: {
-          description: formik.values.description,
-        } as Partial<ContractRequestBody>,
-        contractId: contractId!,
-      },
-      {onSuccess: () => setOpenDescriptionDialog(false)},
-    );
-  };
-
   const handleCancel = () => {
     formik.resetForm();
     setOpenContractDialog(false);
   };
-
-  const headerStyles = useMemo(
-    () => ({
-      display: 'flex',
-      justifyContent: 'space-between',
-      width: '100%',
-      borderRadius: '4px',
-      paddingY: 0.5,
-      paddingX: 1,
-      fontWeight: '600',
-      gap: '10px',
-      alignItems: 'center',
-    }),
-    [],
-  );
 
   const actions = useMemo(() => {
     const items = [];
@@ -548,61 +516,17 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
           onDocsPreview={onDocsPreview}
           openDocumentDialog={openDocumentDialog}
           documents={documents}
-          isUpdateLoading={isUpdateLoading}
+          isUpdateLoading={isUpdateLoading || isUploadLoading}
           contractId={contractId}
           updateContract={updateContract as unknown as () => void}
         />
 
-        <Grid item xs={12} md={8}>
-          <ContractCard
-            containerStyles={{
-              ...olStyles.scrollbar,
-              overflowY: 'scroll',
-              mt: !isMobile ? '1em' : 0,
-              pt: 2,
-              px: 2,
-              height: '100%',
-              '& .MuiCardHeader-root': {
-                ...headerStyles,
-                py: 0,
-              },
-            }}
-            header={
-              <Box sx={headerStyles}>
-                <Typography variant="subtitle1" mr="0.5em">
-                  {t('Description')}
-                </Typography>
-              </Box>
-            }
-            headerActionIcon={<EditIcon />}
-            headerAction={() => setOpenDescriptionDialog(true)}>
-            {contractDetails.description ? (
-              <Typography variant="body2">
-                {contractDetails.description}
-              </Typography>
-            ) : (
-              <EmptySection
-                label="No description added."
-                illustration="clipboard"
-                size="tiny"
-                containerStyle={{
-                  height: '100%',
-                }}
-              />
-            )}
-            <Dialog
-              title="Edit Description"
-              onCancel={() => setOpenDescriptionDialog(false)}
-              disableSaveBtn={!!Object.keys(formik.errors).length}
-              onSave={handleSaveDescription}
-              dialogProps={{
-                maxWidth: 'sm',
-                open: openDescriptionDialog,
-              }}>
-              <DescriptionForm formik={formik} />
-            </Dialog>
-          </ContractCard>
-        </Grid>
+        <Services contractDetails={contractDetails} />
+        <InvoiceSetup
+          contractId={contractId}
+          updateContract={updateContract as unknown as () => void}
+          components={contractDetails.components}
+        />
       </Grid>
     </Box>
   );

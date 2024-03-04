@@ -5,8 +5,10 @@ import {
 } from 'models/elevator';
 import {PriorityTechnicianFormModel} from 'models/unitForm';
 import {
+  ContractComponentElevator,
   ContractElevatorView,
-  TimeUnit,
+  JobTimeUnit,
+  ContractTimeUnit,
   TimeUnitYearView,
 } from 'models/contract';
 
@@ -47,8 +49,7 @@ export const convertTechnicianArrayToWeights = (
     .map((item) => ({...item, priority: Number(item.priority)}))
     .reduce((result, item) => {
       const key = `${item.technicianId}`;
-      const value = item.priority;
-      result[key] = value;
+      result[key] = item.priority;
       return result;
     }, {} as {} as {[key: string]: string | number});
 
@@ -65,12 +66,11 @@ export const mapAppointment = (unitAppointment: UnitAppointmentView) => {
 
 export const getFrequency = (elevator: ContractElevatorView) => {
   const {contracts, id} = elevator;
-
   const foundElevator = contracts
     ?.flatMap(
       (contract) =>
         contract?.components?.flatMap(
-          (component) => component.additionalInfo.elevators ?? [],
+          (component) => component?.additionalInfo?.elevators || [],
         ) ?? [],
     )
     .find((e) => id === e.elevatorId);
@@ -78,24 +78,27 @@ export const getFrequency = (elevator: ContractElevatorView) => {
   if (foundElevator) {
     const {invoiceJob} = foundElevator;
     switch (invoiceJob.timeUnit) {
-      case TimeUnit.WEEKLY:
-      case TimeUnit.BIWEEKLY:
-        return invoiceJob.timeNumbers
-          .map((day) => weekDays[day - 1])
-          .join(', ');
-      case TimeUnit.MONTHLY:
-        return invoiceJob.timeNumbers
-          .map((month) => monthNames[month - 1])
-          .join(', ');
-      case TimeUnit.ANNUALLY:
+      case ContractTimeUnit.WEEKLY:
+        return TimeUnitYearView.WEEKLY;
+      case ContractTimeUnit.BIWEEKLY:
+        return TimeUnitYearView.BIWEEKLY;
+      case ContractTimeUnit.MONTHLY:
+        return (
+          invoiceJob?.timeNumbers &&
+          Array.from(invoiceJob?.timeNumbers)
+            .sort((a, b) => a - b)
+            .map((month) => monthNames[month - 1])
+            .join(', ')
+        );
+      case ContractTimeUnit.ANNUALLY:
         return TimeUnitYearView.ANNUALLY;
-      case TimeUnit.BIENNIALLY:
+      case ContractTimeUnit.BIENNIALLY:
         return TimeUnitYearView.BIENNIALLY;
-      case TimeUnit.TRIENNIALLY:
+      case ContractTimeUnit.TRIENNIALLY:
         return TimeUnitYearView.TRIENNIALLY;
-      case TimeUnit.QUADRENNIALLY:
-        return TimeUnitYearView.QUADRENNIALLY;
-      case TimeUnit.NONE:
+      case ContractTimeUnit.QUADRIENNIALLY:
+        return TimeUnitYearView.QUADRIENNIALLY;
+      case ContractTimeUnit.NONE:
         return '-';
       default:
         return '-';
@@ -103,4 +106,64 @@ export const getFrequency = (elevator: ContractElevatorView) => {
   }
 
   return '-';
+};
+
+export const getListViewFrequency = (
+  elevators: ContractComponentElevator[],
+  key: 'orderGenerationJob' | 'invoiceJob',
+): string => {
+  const frequencySet = new Set<string>();
+  const monthlyUnits = new Set<number>();
+
+  elevators.forEach((elevator) => {
+    const {timeUnit} = elevator[key];
+    switch (timeUnit) {
+      case ContractTimeUnit.MONTHLY:
+        elevator[key]?.timeNumbers?.forEach((month) => monthlyUnits.add(month));
+        break;
+      case ContractTimeUnit.WEEKLY:
+      case ContractTimeUnit.BIWEEKLY:
+      case ContractTimeUnit.ANNUALLY:
+      case ContractTimeUnit.BIENNIALLY:
+      case ContractTimeUnit.TRIENNIALLY:
+      case ContractTimeUnit.QUADRIENNIALLY:
+        frequencySet.add(TimeUnitYearView[timeUnit]);
+        break;
+      default:
+        return '-';
+    }
+  });
+
+  Array.from(monthlyUnits)
+    .sort((a, b) => a - b)
+    .forEach((unit) => frequencySet.add(monthNames[unit - 1]));
+
+  return frequencySet.size ? Array.from(frequencySet).join(', ') : '-';
+};
+
+export const getViewFrequency = (job: JobTimeUnit): string => {
+  const frequencySet = new Set<string>();
+  const monthlyUnits = new Set<number>();
+
+  switch (job.timeUnit) {
+    case ContractTimeUnit.MONTHLY:
+      job?.timeNumbers?.forEach((month) => monthlyUnits.add(month));
+      break;
+    case ContractTimeUnit.WEEKLY:
+    case ContractTimeUnit.BIWEEKLY:
+    case ContractTimeUnit.ANNUALLY:
+    case ContractTimeUnit.BIENNIALLY:
+    case ContractTimeUnit.TRIENNIALLY:
+    case ContractTimeUnit.QUADRIENNIALLY:
+      frequencySet.add(TimeUnitYearView[job.timeUnit]);
+      break;
+    default:
+      return '-';
+  }
+
+  Array.from(monthlyUnits)
+    .sort((a, b) => a - b)
+    .forEach((unit) => frequencySet.add(monthNames[unit - 1]));
+
+  return frequencySet.size ? Array.from(frequencySet).join(', ') : '-';
 };

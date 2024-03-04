@@ -545,13 +545,6 @@ const deleteElevator = async (elevatorId: string) => {
   return response.data;
 };
 
-const deleteContractElevator = async (contractId: string) => {
-  const response = await axiosClient.delete<StringValue>(
-    `/api/contracts/${contractId}/elevetors`,
-  );
-  return response.data;
-};
-
 export const useDeleteElevator = (successMsg?: string) => {
   const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
@@ -570,27 +563,4 @@ export const useDeleteElevator = (successMsg?: string) => {
       showError(err);
     },
   });
-};
-
-export const useDeleteContractElevetor = (successMsg?: string) => {
-  const {enqueueSnackbar, showError} = useSnackbar();
-  const queryClient = useQueryClient();
-  return useMutation(
-    (elevatorId: string) => deleteContractElevator(elevatorId),
-    {
-      onSuccess: () => {
-        if (successMsg) {
-          enqueueSnackbar(successMsg, {
-            variant: 'success',
-          });
-          queryClient.invalidateQueries(queryKeys.fetchContractElevators);
-          queryClient.invalidateQueries(queryKeys.queryUnitsByCustomer);
-        }
-      },
-      onError: (err: any) => {
-        console.log(err);
-        showError(err);
-      },
-    },
-  );
 };

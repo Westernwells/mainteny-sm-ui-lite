@@ -10,7 +10,6 @@ import {useNavigate} from 'react-router';
 import printJS from 'print-js';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-import MUITooltip, {TooltipProps} from '@mui/material/Tooltip';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -42,29 +41,13 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
 import {getInvoicePDFStatuses, validateDueDate} from 'utils/invoice-utils';
 import useTheme from '@mui/material/styles/useTheme';
+import {Tooltip} from '../utils/utils';
 
 interface Props {
   invoice: InvoiceView;
   downloadUrl: string;
   isInvoiceList?: boolean;
 }
-
-const Tooltip = ({children, ...props}: TooltipProps) => (
-  <MUITooltip
-    PopperProps={{
-      modifiers: [
-        {
-          name: 'offset',
-          options: {
-            offset: [0, -10],
-          },
-        },
-      ],
-    }}
-    {...props}>
-    {children}
-  </MUITooltip>
-);
 
 export const Actions = ({
   invoice,

@@ -20,7 +20,7 @@ import {FormatDate} from 'models/misc';
 import {toDate} from 'utils/datetime';
 import {Actions} from './Actions';
 import {NotesIndicator} from './NotesIndicator';
-import {NavigateToInvoice} from './NavigateToDetails';
+import {NavigateToDetails} from '../utils/utils';
 
 export const getInvoiceStatusStyles = (
   status: string,
@@ -65,7 +65,9 @@ export const columns: GridColDef[] = [
     align: 'left',
     flex: 0.5,
     sortable: true,
-    renderCell: (params) => <NavigateToInvoice invoice={params.row.invoice} />,
+    renderCell: (params) => (
+      <NavigateToDetails model={params.row.invoice} modelPath="invoices" />
+    ),
   }),
   getColumnProps({
     field: InvoiceOrderField.CUSTOMER_NAME,

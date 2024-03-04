@@ -7,19 +7,25 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import React, {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
+import {ButtonProps} from '@mui/material/Button';
 import {Button} from './Button';
+import {olStyles} from '../styles';
 
 interface Props {
   title: string | JSX.Element;
   children: ReactNode;
   onSave?: () => void;
   onCancel: () => void;
+  showCancelButton?: boolean;
   disableSaveBtn?: boolean;
   dialogProps: DialogProps;
   isSaving?: boolean;
   saveBtnType?: 'button' | 'submit' | 'reset';
   leftButton?: React.ReactNode;
   saveButtonText?: string;
+  saveButtonContainerProps?: ButtonProps;
+  saveButtonVariant?: ButtonProps['variant'];
+  saveButtonProps?: ButtonProps;
 }
 
 export const Dialog = ({
@@ -30,8 +36,12 @@ export const Dialog = ({
   disableSaveBtn,
   dialogProps,
   saveBtnType,
+  saveButtonContainerProps,
   isSaving = false,
   leftButton,
+  saveButtonVariant = 'contained',
+  saveButtonProps,
+
   saveButtonText = 'Save',
 }: Props) => {
   const {t} = useTranslation();
@@ -52,7 +62,12 @@ export const Dialog = ({
         {typeof title === 'string' ? t(title) : title}
       </DialogTitle>
 
-      <DialogContent sx={{margin: '1em 0em 0em 0em'}}>
+      <DialogContent
+        sx={{
+          margin: '1em 0em 0em 0em',
+          ...olStyles.scrollbar,
+          overflowY: 'scroll',
+        }}>
         <DialogContentText
           id="alert-dialog-description"
           component="div"
@@ -62,24 +77,25 @@ export const Dialog = ({
       </DialogContent>
       <DialogActions
         sx={{
-          padding: '1.5em 24px 1.5em 0px',
+          padding: '1.5em 24px 1.5em 1.5em',
           display: 'flex',
           justifyContent: 'space-between',
           background: 'white',
         }}>
         {leftButton}
-        <Box sx={{marginLeft: 'auto'}}>
+        <Box sx={{marginLeft: 'auto', ...saveButtonContainerProps}}>
           <Button buttonProps={{onClick: onCancel, size: 'large'}}>
             <Typography variant="subtitle2">{t('Cancel')}</Typography>
           </Button>
           <Button
             buttonProps={{
               size: 'large',
-              variant: 'contained',
+              variant: saveButtonVariant,
               onClick: onSave,
               autoFocus: true,
               disabled: disableSaveBtn || isSaving,
               type: saveBtnType,
+              ...saveButtonProps,
             }}>
             <Typography variant="subtitle2">
               {isSaving ? `${t('Saving')}...` : t(saveButtonText)}

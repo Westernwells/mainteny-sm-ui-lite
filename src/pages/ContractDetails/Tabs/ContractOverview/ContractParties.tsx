@@ -46,7 +46,9 @@ export const ContractParties = ({
       <Grid item xs={5}>
         <Box display="flex" alignItems="center">
           <Box display="flex" flexDirection="column">
-            <Typography variant="subtitle1" sx={{display: 'block'}}>
+            <Typography
+              variant="subtitle1"
+              sx={{display: 'block', fontWeight: '600'}}>
               {name || ''}
             </Typography>
             <Typography variant="body2" sx={{display: 'block'}}>
@@ -58,7 +60,7 @@ export const ContractParties = ({
 
       <Grid item xs={5} alignSelf="center">
         <Box>
-          <Typography variant="body2" color="textSecondary">
+          <Typography variant="body2" fontWeight={600}>
             {address || ''}
           </Typography>
           <Typography variant="body2" color="textSecondary">

@@ -11,6 +11,7 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
   ContractElevatorQueryParams,
+  ContractElevatorUpdate,
   ContractElevatorView,
 } from 'models/contract';
 import {Page, Resource, RestError, StringValue} from 'models/misc';
@@ -183,3 +184,44 @@ export const useContractElevators = (
     () => fetchContractElevators(contractId, params),
     {...options},
   );
+
+const updateContractElevator = async (
+  body: ContractElevatorUpdate,
+  contractId: string,
+  elevatorId: string,
+) => {
+  await axiosClient.put<StringValue>(
+    `/api/contracts/${contractId}/elevators/${elevatorId}`,
+    {
+      ...body,
+    },
+  );
+};
+
+export const useUpdateContractElevator = (successMsg: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({
+      body,
+      elevatorId,
+      contractId,
+    }: {
+      body: ContractElevatorUpdate;
+      elevatorId: string;
+      contractId: string;
+    }) => updateContractElevator(body, contractId, elevatorId),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+        queryClient.invalidateQueries(queryKeys.fetchContractElevators);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};

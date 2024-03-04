@@ -49,20 +49,6 @@ export const ContractDetails = () => {
         onChange={(index) => setTabValue(index)}
         showMenuActionBtn
         hideDivider
-        // btnLabel="Download Contract"
-        // btnOnClick={() => {
-        //   if (downloadUrl && Object.values(downloadUrl).length) {
-        //     const uploadUrl = Object.values(downloadUrl)[0];
-        //     fetch(uploadUrl).then((response) =>
-        //       response.blob().then((file) => {
-        //         const link = document.createElement('a');
-        //         link.href = URL.createObjectURL(file);
-        //         link.setAttribute('download', fileName);
-        //         link.click();
-        //       }),
-        //     );
-        //   }
-        // }}
         secondaryBtn={renderButtons()}>
         <TabsBody value={tabValue} index={0}>
           <ContractOverview

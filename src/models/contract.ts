@@ -25,6 +25,7 @@ import {
   PropertyOwnerView,
 } from './propertyManager';
 import {FileResource} from './media';
+import {ArticleType, CostPackage} from './article';
 
 export enum ContractStatus {
   PENDING = 'PENDING',
@@ -33,22 +34,13 @@ export enum ContractStatus {
   EXPIRING = 'EXPIRING',
 }
 
-export enum TimeUnit {
-  BIWEEKLY = 'BIWEEKLY',
-  WEEKLY = 'WEEKLY',
-  MONTHLY = 'MONTHLY',
-  NONE = 'NONE',
-  ANNUALLY = 'ANNUALLY', // every 1 year
-  BIENNIALLY = 'BIENNIALLY', // every 2 year
-  TRIENNIALLY = 'TRIENNIALLY', // every 3 year
-  QUADRENNIALLY = 'QUADRENNIALLY', // every 4 year
-}
-
 export enum TimeUnitYearView {
-  ANNUALLY = 'Every 1 year',
+  ANNUALLY = 'Every year',
   BIENNIALLY = 'Every 2 year',
   TRIENNIALLY = 'Every 3 year',
-  QUADRENNIALLY = 'Every 4 year',
+  QUADRIENNIALLY = 'Every 4 year',
+  WEEKLY = 'Weekly',
+  BIWEEKLY = 'Every 2 weeks',
 }
 
 export enum ContractOrderField {
@@ -150,6 +142,7 @@ export interface ContractElevatorSimpleView {
 }
 
 export interface ContractView {
+  components: ContractComponentView[];
   additionalInfo: ContractAdditionalInfo;
   id: string;
   propertyOwner: PropertyOwnerSimpleView;
@@ -190,28 +183,51 @@ export interface ContractSimpleView {
   externalId: string;
   meta: Meta;
   additionalInfo: ContractAdditionalInfo;
+  components?: ContractComponentView[];
+}
+
+export interface JobTimeUnit {
+  timeUnit: ContractTimeUnit;
+  timeNumbers?: number[];
 }
 
 export interface ContractComponentElevator {
   elevatorId: string;
-  invoiceJob: {
-    timeUnit: TimeUnit;
-    timeNumbers: number[];
-  };
+  invoiceJob: JobTimeUnit;
+  orderGenerationJob: JobTimeUnit;
+  price: number;
 }
 
 export interface ContractComponentAdditionalInfoProps {
-  firstOrderDate: string;
+  firstOrderDate: Date | null;
+  firstInvoiceDate: Date | null;
   orderGenerationJob: string;
-  elevators: ContractComponentElevator[];
+  elevators: ContractServiceFormElevator[];
+  costType: ArticleType;
+  costPackage: CostPackage;
+  yearlyPrice?: number;
 }
 
 export interface ContractComponentView {
   additionalInfo: ContractComponentAdditionalInfoProps;
+  id: string;
+  name: string;
+  group: string;
 }
 
 export interface ContractProps {
   components: ContractComponentView[];
+  id: string;
+  removalDate: string;
+}
+
+export interface UpdateContractComponents {
+  firstInvoiceDate?: Date | null;
+  firstOrderDate?: Date | null;
+  group: string;
+  name: string;
+  elevators: ContractComponentElevator[];
+  costPackage?: CostPackage;
 }
 
 export interface ContractElevatorView {
@@ -419,4 +435,71 @@ export interface ContractElevatorQueryParams {
   swLat?: number;
   swLng?: number;
   requireAppointment: boolean;
+}
+
+export interface ContractElevatorUpdate {
+  removalDate: string | null;
+}
+
+export interface ContractServiceForm {
+  id?: string;
+  name: string;
+  group?: string;
+  firstInvoiceDate?: Date | null;
+  firstOrderDate?: Date | null;
+  costType: ArticleType;
+  costPackage: CostPackage;
+  elevators: ContractServiceFormElevator[];
+  isAutomaticJobCycle?: boolean;
+  yearlyPrice?: number;
+}
+
+export interface ContractServiceFormElevator {
+  elevatorId: string;
+  invoiceJob: JobTimeUnit;
+  orderGenerationJob: JobTimeUnit;
+  price: number;
+  buildingLocation?: string;
+  address?: string;
+  externalId?: string;
+  isChecked?: boolean;
+  yearlyPrice?: number;
+}
+
+export enum ContractTimeUnit {
+  NONE = 'NONE',
+  WEEKLY = 'WEEKLY',
+  BIWEEKLY = 'BIWEEKLY',
+  MONTHLY = 'MONTHLY',
+  ANNUALLY = 'ANNUALLY',
+  BIENNIALLY = 'BIENNIALLY',
+  TRIENNIALLY = 'TRIENNIALLY',
+  QUADRIENNIALLY = 'QUADRIENNIALLY',
+}
+
+export interface ExtendedContractComponentRecord {
+  groupNumber?: number;
+  invoiceGroup?: number;
+  isChecked?: boolean;
+  id?: string;
+  name: string;
+  group: string;
+  elevators: ContractComponentElevator[];
+  firstInvoiceDate: Date | null;
+  firstOrderDate: Date | null;
+  costType: ArticleType;
+  costPackage: CostPackage;
+  isAutomaticJobCycle: boolean;
+}
+
+export interface ContractComponentRecord {
+  id?: string;
+  name: string;
+  group: string;
+  elevators: ContractComponentElevator[];
+  firstInvoiceDate: string;
+  firstOrderDate: string;
+  costType: ArticleType;
+  costPackage: CostPackage;
+  yearlyPrice?: number;
 }
