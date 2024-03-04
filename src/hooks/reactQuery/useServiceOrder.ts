@@ -21,8 +21,6 @@ import {queryKeys} from 'reactQuery/constants';
 import {ServiceCompanyTimeUnit} from 'models/service-company';
 import {toDate, toRestDate} from 'utils/datetime';
 import {useSnackbar} from 'hooks/useSnackbar';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {CheckList} from 'models/checklist';
 import {LanguageContext} from 'context/LanguageProvider';
 import {languageContextMap} from 'utils/utils';
@@ -244,7 +242,7 @@ export const queryDueServiceOrders = async (
 };
 
 export function useDueServiceOrders(
-  params: ServiceOrderQueryParams,
+  params: ServiceOrderQueryParams & {candidateTechnicianAssigned?: boolean},
   options?: UseQueryOptions<any, any, any>,
 ) {
   const {user} = useUserSession();
@@ -569,6 +567,7 @@ export const useRedispatchServiceOrders = (successMsg: string) => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
         queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
+        queryClient.invalidateQueries([queryKeys.queryDueServiceOrders]);
         enqueueSnackbar(successMsg, {
           variant: 'success',
         });
@@ -608,6 +607,7 @@ export const useUpdateServiceOrderSchedule = (successMsg: string) => {
           variant: 'success',
         });
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        queryClient.invalidateQueries([queryKeys.queryDueServiceOrders]);
       },
       onError: (err) => {
         console.log(err);
@@ -662,13 +662,9 @@ export const useAssignmentBasedOrder = (successMsg: string) => {
   return useMutation(
     (body: AssignmentBasedOrderBody) => createAssignmentBasedOrder(body),
     {
-      onSuccess: (data, variables) => {
+      onSuccess: () => {
         enqueueSnackbar(successMsg, {
           variant: 'success',
-        });
-        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ORDER_CREATED, {
-          elevatorId: variables.elevatorId,
-          serviceOrderId: data.data.value,
         });
       },
       onError: (err) => {
@@ -692,13 +688,9 @@ export const useCreateScheduledServiceOrder = (successMsg: string) => {
     (body: CreateScheduledServiceOrderBody) =>
       createScheduledServiceOrder(body),
     {
-      onSuccess: (data, variables) => {
+      onSuccess: () => {
         enqueueSnackbar(successMsg, {
           variant: 'success',
-        });
-        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ORDER_CREATED, {
-          elevatorId: variables.elevatorId,
-          serviceOrderId: data.data.value,
         });
       },
       onError: (err) => {
@@ -722,13 +714,9 @@ export const useCreateNonScheduledServiceOrder = (successMsg: string) => {
     (body: CreateNonScheduledServiceOrderBody) =>
       createNonScheduledServiceOrder(body),
     {
-      onSuccess: (data, variables) => {
+      onSuccess: () => {
         enqueueSnackbar(successMsg, {
           variant: 'success',
-        });
-        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_ORDER_CREATED, {
-          elevatorId: variables.elevatorId,
-          serviceOrderId: data.data.value,
         });
       },
       onError: (err) => {

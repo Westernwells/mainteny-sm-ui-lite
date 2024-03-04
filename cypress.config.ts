@@ -1,7 +1,9 @@
-import {defineConfig} from 'cypress';
+import { defineConfig } from 'cypress';
 import coverage from '@cypress/code-coverage/task';
+import cypressSplit from 'cypress-split'
 
-require('dotenv').config({path: '.env.stage'});
+
+require('dotenv').config({ path: '.env.stage' });
 
 export default defineConfig({
   e2e: {
@@ -9,6 +11,7 @@ export default defineConfig({
     chromeWebSecurity: false,
     setupNodeEvents(on, config) {
       coverage(on, config);
+      cypressSplit(on, config);
       return config;
     },
   },

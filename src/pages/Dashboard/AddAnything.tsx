@@ -27,8 +27,6 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 
 interface Props extends ButtonProps {
   label?: string;
@@ -59,7 +57,6 @@ export const MenuBtn = ({
   const open = Boolean(anchorEl);
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
-    Mixpanel.identifyAndTrack(mixpanelEvents.ADD_ANYTHING_BUTTON_CLICKED);
     setAnchorEl(event.currentTarget);
   };
 
@@ -147,7 +144,6 @@ export const AddAnything = () => {
   const navigate = useNavigate();
 
   const track = (cb: () => void) => {
-    Mixpanel.identifyAndTrack(mixpanelEvents.ADD_ANYTHING_ITEM_CLICKED);
     cb();
   };
 

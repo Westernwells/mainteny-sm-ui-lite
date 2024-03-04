@@ -210,12 +210,17 @@ export const InvoiceForm = ({
 
   const {
     data: creditNoteArticlesResource = createEmptyResource<ArticleView>(1),
-    isFetching: isFetchingCreditNoteArticles,
-  } = useArticles({
-    pageIndex: 0,
-    pageSize: 1,
-    query: '[internallabel:credit_note]',
-  });
+    isLoading: isLoadingCreditNoteArticles,
+  } = useArticles(
+    {
+      pageIndex: 0,
+      pageSize: 1,
+      query: '[internallabel:credit_note]',
+    },
+    {
+      refetchOnWindowFocus: false,
+    },
+  );
 
   const {mutateAsync: updateInvoiceAsync, isLoading: isUpdating} =
     useUpdateInvoice();
@@ -399,6 +404,9 @@ export const InvoiceForm = ({
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
+    if (formType === 'new' && row.paymentTerm) {
+      formik.setFieldValue('paymentTerms', row.paymentTerm?.term || '');
+    }
     // If the chosen customer was already set as the property owner of the invoice
     if (row.id !== invoice?.propertyOwner.id) {
       const emptyAddressState = {fullName: null};
@@ -517,7 +525,7 @@ export const InvoiceForm = ({
         );
       }
     }
-  }, [invoice, isFetchingCreditNoteArticles]);
+  }, [invoice, isLoadingCreditNoteArticles]);
 
   // Set initial values of Invoice Edit Form
   useEffect(() => {
@@ -618,7 +626,9 @@ export const InvoiceForm = ({
   useEffect(() => {
     if (serviceOrder) {
       const serviceOrderCustomer = serviceOrder.elevator.propertyOwner;
-
+      if (!formik.values.description && serviceOrder.report?.description) {
+        formik.setFieldValue('description', serviceOrder.report.description);
+      }
       formik.setFieldValue(
         'propertyOwnerId',
         serviceOrder.elevator.propertyOwner.id,
@@ -724,8 +734,8 @@ export const InvoiceForm = ({
   const hasArticleError = () =>
     formik.values.items.some(
       (item) =>
-        !item.article?.unit ||
-        !MeasurementUnit[item.article?.unit as MeasurementUnit] ||
+        (item.article?.unit &&
+          !MeasurementUnit[item.article?.unit as MeasurementUnit]) ||
         !item.name,
     );
 

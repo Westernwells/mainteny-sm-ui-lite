@@ -12,6 +12,7 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {ServiceOrderView} from 'models/service-order';
 import {InfoCard} from 'components/InfoCard';
 import {useTranslation} from 'react-i18next';
+import {useEffect} from 'react';
 import {OrderInfoCard} from './OrderInfoCard';
 import {Quotation} from './Quotations';
 import {Invoices} from './Invoices';
@@ -32,10 +33,17 @@ export const Overview = ({serviceOrder}: Props) => {
   const {t} = useTranslation();
 
   const formatDate = useFormatDate();
-  const {data: serviceOrderActivities = []} = useServiceOrderActivities(
-    serviceOrder.id,
-  );
+  const {data: serviceOrderActivities = [], refetch} =
+    useServiceOrderActivities(serviceOrder.id);
+
   const {data: serviceOrderArticles} = useServiceOrderArticles(serviceOrder.id);
+
+  useEffect(() => {
+    if (serviceOrder.id) {
+      refetch();
+    }
+  }, [serviceOrder]);
+
   return (
     <Grid
       container

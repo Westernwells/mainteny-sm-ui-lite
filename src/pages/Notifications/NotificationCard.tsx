@@ -72,11 +72,20 @@ export const NotificationCard = ({
   );
 
   useEffect(() => {
+    if (!form.technicianId) {
+      return setFormValid(false);
+    }
+
+    if (!switchActive && form.technicianId) {
+      return setFormValid(true);
+    }
+
     if (
       switchActive &&
       form?.startTime &&
       form.endTime &&
-      form.date &&
+      form.startDate &&
+      form.endDate &&
       form.technicianId
     ) {
       setFormValid(true);
@@ -111,11 +120,11 @@ export const NotificationCard = ({
 
   const schedule = () => {
     const orderStartTime = setDateTime(
-      form?.date!,
+      form?.startDate!,
       formatDateUtil(form.startTime as Date, 'HH:mm')!,
     ).toISOString();
     const orderEndTime = setDateTime(
-      form?.date!,
+      form?.endDate!,
       formatDateUtil(form.endTime as Date, 'HH:mm')!,
     ).toISOString();
 
@@ -298,7 +307,6 @@ export const NotificationCard = ({
               setSwitchActive(value)
             }
             title={t('Assign Technician')}
-            datePickerLabel="Schedule To"
             getFormValues={(value: SetStateAction<ScheduleForm>) =>
               setForm(value)
             }

@@ -11,8 +11,8 @@ interface Props {
   textStyles?: {[key: string]: string | number};
   showFilter?: boolean;
   hideClear?: boolean;
+  clearText?: string;
   onClear?: () => void;
-  text?: string;
 }
 
 export const FilterFields = ({
@@ -22,7 +22,7 @@ export const FilterFields = ({
   textStyles,
   hideClear,
   showFilter = true,
-  text = 'Clear filter',
+  clearText,
   onClear,
 }: Props) => {
   const {t} = useTranslation();
@@ -39,10 +39,11 @@ export const FilterFields = ({
           mt="0.5em"
           sx={{
             cursor: 'pointer',
-            color: theme.palette.info.main,
+            color: theme.palette.text.primary,
+            fontWeight: '600',
             ...textStyles,
           }}>
-          {t(text)}
+          {clearText ? t(clearText) : t('Clear filter')}
         </Typography>
       ) : null}
     </Box>

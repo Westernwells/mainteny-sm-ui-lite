@@ -2,8 +2,6 @@ import {useEffect, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {Box} from '@mui/material';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {EmptySection} from 'components/EmptySection';
@@ -103,12 +101,6 @@ export const Customer = () => {
     setPageCount(Math.ceil(customerResource.total / page.pageSize));
   }, [customerResource, page.pageSize]);
 
-  useEffect(() => {
-    Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_VIEW, {
-      pageName: 'Customers',
-    });
-  }, []);
-
   const handleNumberOfUnitsChange = (value: string[]) => {
     setNumberOfUnits(value);
   };
@@ -137,13 +129,6 @@ export const Customer = () => {
           }}
           initialSelectedItems={numberOfUnits}
           getSelectedValue={(item) => {
-            Mixpanel.identifyAndTrack(mixpanelEvents.CUSTOMERS_FILTER_CLICK, {
-              pageName: 'Customers',
-              noOfUnits: item,
-              time: 0,
-              searchBar: 0,
-              source: 'List View',
-            });
             handleNumberOfUnitsChange(item);
           }}
           multiple={false}

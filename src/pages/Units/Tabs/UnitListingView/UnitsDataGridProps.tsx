@@ -17,7 +17,8 @@ import {Actions} from './Action';
 
 export const columns: GridColDef[] = [
   getColumnProps({
-    field: 'number',
+    field: ElevatorOrderField.EXTERNAL_ID,
+    sortable: true,
     headerName: 'number',
     align: 'left',
     renderCell: (params: GridRenderCellParams<any, any, any>) => {
@@ -38,52 +39,58 @@ export const columns: GridColDef[] = [
         </>
       );
     },
-    flex: 0.75,
+    flex: 1,
   }),
   getColumnProps({
-    field: 'model',
+    field: ElevatorOrderField.MODEL,
+    sortable: true,
     headerName: 'model',
     cellClassName: 'truncateText',
     flex: 1,
   }),
   getColumnProps({
-    field: 'building',
+    field: ElevatorOrderField.BUILDING_LOCATION,
+    sortable: true,
     headerName: 'building',
     cellClassName: 'truncateText',
     flex: 1,
   }),
   getColumnProps({
-    field: 'customer',
+    field: ElevatorOrderField.PROPERTY_OWNER_NAME,
+    sortable: true,
     headerName: 'customer',
     cellClassName: 'truncateText',
     flex: 1,
   }),
   getColumnProps({
-    field: 'address',
+    field: ElevatorOrderField.ADDRESS,
+    sortable: true,
     headerName: 'address',
     cellClassName: 'truncateText',
     flex: 1.5,
   }),
   getColumnProps({
-    field: 'LAST_VISIT_DATE',
+    field: ElevatorOrderField.LAST_VISIT_DATE,
     headerName: 'last visit',
     align: 'center',
-    flex: 0,
+    flex: 0.75,
     sortable: true,
   }),
   getColumnProps({
-    field: 'NEXT_VISIT_DATE',
+    field: ElevatorOrderField.NEXT_VISIT_DATE,
     headerName: 'next visit',
-    flex: 0,
+    flex: 0.75,
     sortable: true,
   }),
   getColumnProps({
-    field: 'priorityTechnician',
+    field: ElevatorOrderField.ASSIGNED_TECHNICIAN_NAMES,
+    sortable: true,
     headerName: 'priority technician',
     cellClassName: 'truncateText',
   }),
   getColumnProps({
-    field: 'activeContracts',
+    field: ElevatorOrderField.NUMBER_OF_CONTRACTS,
+    sortable: true,
     headerName: 'active contracts',
     align: 'center',
     headerAlign: 'center',
@@ -95,8 +102,14 @@ export const columns: GridColDef[] = [
         gap={3}
         width={120}>
         <StatusChip
-          label={params.row.activeContracts ? 'Yes' : 'No'}
-          color={params.row.activeContracts ? 'success' : 'info'}
+          label={
+            params.row?.[ElevatorOrderField.NUMBER_OF_CONTRACTS] ? 'Yes' : 'No'
+          }
+          color={
+            params.row?.[ElevatorOrderField.NUMBER_OF_CONTRACTS]
+              ? 'success'
+              : 'info'
+          }
           variant="filled"
           size="small"
           maxChars={3}
@@ -136,23 +149,24 @@ export const makeRows = (
 ): GridRowsProp =>
   elevators.map((elevator: ElevatorView) => ({
     id: elevator.id,
-    number: elevator.externalId,
-    model: elevator.model,
-    building: elevator.additionalInfo.buildingLocation,
+    [ElevatorOrderField.EXTERNAL_ID]: elevator.number,
+    [ElevatorOrderField.MODEL]: elevator.model,
+    [ElevatorOrderField.BUILDING_LOCATION]:
+      elevator.additionalInfo.buildingLocation,
     actions: elevator.id,
-    customer: elevator.propertyOwner.name,
+    [ElevatorOrderField.PROPERTY_OWNER_NAME]: elevator.propertyOwner.name,
     [ElevatorOrderField.LAST_VISIT_DATE]: elevator.lastVisitDate
       ? formatDate(toDate(elevator.lastVisitDate))
       : '-',
     [ElevatorOrderField.NEXT_VISIT_DATE]: elevator.nextVisitDate
       ? formatDate(toDate(elevator.nextVisitDate))
       : '-',
-    address: elevator.address.fullName,
+    [ElevatorOrderField.ADDRESS]: elevator.address.fullName,
     headerText: elevator.address.fullName,
-    priorityTechnician: elevator.assignments.length
+    [ElevatorOrderField.ASSIGNED_TECHNICIAN_NAMES]: elevator.assignments.length
       ? getPriorityTechnician(elevator.assignments)
       : '-',
-    activeContracts:
+    [ElevatorOrderField.NUMBER_OF_CONTRACTS]:
       !!elevator.contracts.length &&
       elevator.contracts.some(
         (it) =>

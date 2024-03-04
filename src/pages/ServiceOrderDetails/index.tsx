@@ -11,7 +11,10 @@ import {
   usePostServiceOrderConfirmationPublish,
   useServiceOrderDetails,
 } from 'hooks/reactQuery/useServiceOrder';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {
+  useDownloadFileWithCustomName,
+  useDownloadUrl,
+} from 'hooks/reactQuery/useDownloadUrl';
 import {useParams, useSearchParams} from 'react-router-dom';
 import {formatSearchParams} from 'utils/utils';
 import {Box, Typography} from '@mui/material';
@@ -69,6 +72,11 @@ export const ServiceOrderDetails = () => {
     refetchOnWindowFocus: false,
   });
 
+  const {downloadFile} = useDownloadFileWithCustomName(
+    serviceOrder?.number,
+    fileDownloadURLs[filePathToDownload],
+  );
+
   const {mutateAsync: postServiceOrderConfirmationPublish} =
     usePostServiceOrderConfirmationPublish();
 
@@ -117,15 +125,6 @@ export const ServiceOrderDetails = () => {
       });
     } catch (e) {
       showError(e);
-    }
-  };
-
-  const downloadFile = () => {
-    const url = fileDownloadURLs[filePathToDownload];
-
-    if (url) {
-      setFilePathToDownload('');
-      window.open(url, '_blank');
     }
   };
 

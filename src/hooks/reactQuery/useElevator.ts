@@ -11,8 +11,7 @@ import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {queryKeys} from 'reactQuery/constants';
 import {useParams} from 'react-router-dom';
 import {useSnackbar} from 'hooks/useSnackbar';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
+
 import {
   CacheTypes,
   CacheTypesParams,
@@ -407,17 +406,13 @@ export const useAddElevator = (successMsg?: string) => {
   return useMutation(
     (body: Partial<ElevatorRequestBody>) => addElevator(body),
     {
-      onSuccess: (data, variables) => {
+      onSuccess: () => {
         if (successMsg) {
           enqueueSnackbar(successMsg, {
             variant: 'success',
           });
         }
         queryClient.invalidateQueries(queryKeys.elevatorById);
-        Mixpanel.identifyAndTrack(mixpanelEvents.NEW_UNIT_CREATED, {
-          elevatorId: data.value,
-          propertyOwnerId: variables.propertyOwnerId,
-        });
       },
       onError: (err: any) => {
         console.log(err);

@@ -3,8 +3,6 @@ import {Location, NavigateFunction} from 'react-router-dom';
 import {Helmet} from 'react-helmet';
 import {Typography} from '@mui/material';
 import Box from '@mui/material/Box';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {ReactComponent as UnexpectedErrorIllustration} from 'assets/illustrations/UnexpectedError.svg';
 import {Button} from 'components/Button';
 import {PageLayout} from './PageLayout';
@@ -41,10 +39,6 @@ class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    Mixpanel.identifyAndTrack(mixpanelEvents.CATCH_ALL_ERROR_PAGE_SHOWN, {
-      error,
-      errorInfo,
-    });
     console.error('Uncaught error:', error, errorInfo);
   }
 

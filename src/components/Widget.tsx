@@ -22,6 +22,7 @@ interface Props {
   filterItems?: ReactNode;
   refInput?: RefObject<HTMLInputElement>;
   searchInputVariant?: 'standard' | 'filled' | 'outlined' | undefined;
+  width?: string;
 }
 
 export const Widget = ({
@@ -38,6 +39,7 @@ export const Widget = ({
   filterItems,
   refInput,
   searchInputVariant,
+  width,
 }: Props) => {
   const {t} = useTranslation();
   return (
@@ -55,6 +57,7 @@ export const Widget = ({
             defaultValue={defaultSearchValue}
             refInput={refInput}
             variant={searchInputVariant}
+            width={width}
           />
         </Box>
       ) : null}

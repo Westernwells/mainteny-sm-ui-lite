@@ -29,7 +29,7 @@ export const CustomerAutoComplete = ({
 
   const {data: customerResource = createEmptyResource(10)} = useQueryCustomers({
     pageIndex: 0,
-    pageSize: 6,
+    pageSize: 20,
     query: query ? encodeURIComponent(query) : '',
   });
 
@@ -85,6 +85,7 @@ export const CustomerAutoComplete = ({
       id="combo-box-demo"
       sx={{minHeight: 0}}
       options={customerResource.data}
+      filterOptions={(options) => options}
       isOptionEqualToValue={(option, value) => {
         const optionId = option && option.id;
         const valueId = value && value.id;

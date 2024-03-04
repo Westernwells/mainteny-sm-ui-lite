@@ -15,13 +15,8 @@ variables:
   image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
   dependencies:
     - lint-project
-    - tests
-  cache:
-    - key:
-        files:
-          - yarn.lock
-      paths:
-        - .yarn-cache/
+    - e2e-tests
+    - component-tests
   script:
     - node -v
     - export NODE_OPTIONS='--max-old-space-size=4096'
@@ -95,15 +90,22 @@ variables:
     - if: "$CI_MERGE_REQUEST_ID"
       when: never
 
+cache:
+  - &global_cache_node_mods
+    key:
+      files:
+        - yarn.lock
+    paths:
+      - node_modules/
+    policy: pull # prevent subsequent jobs from modifying cache
+
 lint-project:
   stage: lint
   image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
   cache:
-    - key:
-        files:
-          - yarn.lock
-      paths:
-        - .yarn-cache/
+    - <<: *global_cache_node_mods
+      when: on_success
+      policy: pull-push
   script:
     - yarn install --frozen-lockfile --cache-folder .yarn-cache
     - yarn check-all
@@ -111,26 +113,56 @@ lint-project:
     - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
     - when: never
 
-
-tests:
+component-tests:
   stage: test
   image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
-  cache:
-    - key:
-        files:
-          - yarn.lock
-      paths:
-        - .yarn-cache/
   variables:
     ENV: stage
     REACT_APP_BASE_URL: http://localhost:5173
     REACT_APP_API_URL: $REACT_APP_API_URL_STAGE
-    REACT_APP_MIXPANEL_TOKEN: $REACT_APP_MIXPANEL_TOKEN_STAGE
     REACT_APP_GOOGLE_MAPS_KEY: $REACT_APP_GOOGLE_MAPS_KEY_STAGE
+    npm_config_cache: "$CI_PROJECT_DIR/.npm"
+    CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
+  rules:
+    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
+    - when: never
   script:
-    - yarn install --cache-folder .yarn-cache
+    - yarn install --frozen-lockfile --cache-folder .yarn-cache
     - yarn start & # Start the application in the background
-    - yarn cypress:run # Run Cypress tests
+    - yarn cypress:install # Install Cypress binary
+    - yarn cypress:component --reporter junit --reporter-options "mochaFile=results/component-[hash].xml,toConsole=true,testCaseSwitchClassnameAndName=true,testsuitesTitle=true,suiteTitleSeparatedBy='.'" # Run Cypress tests
+  artifacts:
+    when: always
+    paths:
+      - results/component-*.xml
+    reports:
+      junit: results/component-*.xml
+
+e2e-tests:
+  stage: test
+  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
+  parallel: 6
+  variables:
+    ENV: stage
+    REACT_APP_BASE_URL: http://localhost:5173
+    REACT_APP_API_URL: $REACT_APP_API_URL_STAGE
+    REACT_APP_GOOGLE_MAPS_KEY: $REACT_APP_GOOGLE_MAPS_KEY_STAGE
+    npm_config_cache: "$CI_PROJECT_DIR/.npm"
+    CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
+  rules:
+    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
+    - when: never
+  script:
+    - yarn install --frozen-lockfile --cache-folder .yarn-cache
+    - yarn start & # Start the application in the background
+    - yarn cypress:install # Install Cypress binary
+    - yarn cypress:split-e2e --reporter junit --reporter-options "mochaFile=results/e2e-[hash].xml,toConsole=true,testCaseSwitchClassnameAndName=true,testsuitesTitle=true,suiteTitleSeparatedBy='.'" # Run Cypress tests
+  artifacts:
+    when: always
+    paths:
+      - results/e2e-*.xml
+    reports:
+      junit: results/e2e-*.xml
 
 build-feature-branch:
   <<: *build-template

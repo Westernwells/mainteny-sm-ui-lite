@@ -55,6 +55,13 @@ export interface PropertyOwnerView {
   externalId: string;
   serviceCompany: ServiceCompanySimpleView;
   contactPersons: CompanyContact;
+  paymentTerm?: {
+    additionalInfo: string;
+    id: string;
+    meta: Meta;
+    serviceCompanyId: string;
+    term: string;
+  };
 }
 
 export interface PropertyOwnerSimpleView {
@@ -83,6 +90,12 @@ export enum PropertyOwnerOrderField {
   CREATED_TIME = 'CREATED_TIME',
   NAME = 'NAME',
   XERO_LAST_SYNC_TIME = 'XERO_LAST_SYNC_TIME',
+  EXTERNAL_ID = 'EXTERNAL_ID',
+  BILLING_ADDRESS = 'BILLING_ADDRESS',
+  PHONE = 'PHONE',
+  NUMBER_OF_ELEVATOR = 'NUMBER_OF_ELEVATOR',
+  REGISTRATION_DATE = 'REGISTRATION_DATE',
+  XERO_LAST_SYNC_TIME_DESC = 'XERO_LAST_SYNC_TIME_DESC',
 }
 
 export interface QueryPropertyOwnersParams {

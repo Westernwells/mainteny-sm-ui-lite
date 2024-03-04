@@ -6,8 +6,6 @@ import {useLocation} from 'react-router-dom';
 import queryString from 'query-string';
 import * as Yup from 'yup';
 import {useAuth} from 'hooks/useAuth';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {AuthLayout} from 'components/AuthLayout';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import {SUCCESS_COLOR} from 'theme';
@@ -33,7 +31,6 @@ export const Login = () => {
     },
     onSubmit: (values) => {
       localStorage.setItem('email', values.email);
-      Mixpanel.identifyAndTrack(mixpanelEvents.LOGIN);
       signin(values.email, values.password);
     },
     validationSchema,

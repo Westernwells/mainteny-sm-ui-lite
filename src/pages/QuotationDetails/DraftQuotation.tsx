@@ -261,6 +261,9 @@ export const DraftQuotation = ({formType, quotation}: Props) => {
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
+    if (formType === 'new' && row.paymentTerm) {
+      formik.setFieldValue('paymentTerms', row.paymentTerm?.term || '');
+    }
     const quotationCustomer = quotation?.elevator.propertyOwner;
     if (row.id !== quotationCustomer?.id) {
       const emptyAddressState = {fullName: null};
@@ -398,8 +401,8 @@ export const DraftQuotation = ({formType, quotation}: Props) => {
   const hasArticleError = () =>
     formik.values.items.some(
       (item) =>
-        !item.article?.unit ||
-        !MeasurementUnit[item.article?.unit as MeasurementUnit] ||
+        (item.article?.unit &&
+          !MeasurementUnit[item.article?.unit as MeasurementUnit]) ||
         !item.name,
     );
 

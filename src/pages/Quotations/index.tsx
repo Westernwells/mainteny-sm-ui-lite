@@ -6,7 +6,6 @@ import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
 import {useQuotations} from 'hooks/reactQuery/useQuotation';
 import {
-  QueryQuotationParams,
   QuotationOrderField,
   QuotationStatus,
   QuotationStatusView,
@@ -18,8 +17,6 @@ import {Widget} from 'components/Widget';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {convertToMacro, convertToText, objectKeyByValue} from 'utils/utils';
-import {Mixpanel} from 'mixpanel/mixpanel';
-import {mixpanelEvents} from 'mixpanel/constants';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
 import {useCurrentCurrency} from 'utils/currency';
@@ -29,7 +26,7 @@ import {
 } from 'utils/contract-utils';
 import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
 import {useTranslation} from 'react-i18next';
-import {OrderByParams} from 'models/misc';
+import {Order, OrderByParams} from 'models/misc';
 import DatePickerRange from 'components/DatePickerRange';
 import {DateRange} from '@mui/x-date-pickers-pro';
 import {useSearchValues} from 'hooks/useSearchValues';
@@ -70,38 +67,38 @@ export const Quotations = () => {
     DateRange<Date | null>
   >('dateRange', {defaultValue: [null, null]});
 
-  const queryParam: QueryQuotationParams = {
-    pageIndex: page.pageIndex,
-    pageSize: page.pageSize,
-    query: search,
-    status,
-    ...(cost.length > 0 && {
-      salesPriceStart,
-      salesPriceEnd,
-    }),
-    ...(selectedDateRange &&
-      selectedDateRange[0] !== null &&
-      selectedDateRange[1] !== null && {
-        createdDateStart: selectedDateRange[0],
-        createdDateEnd: selectedDateRange[1],
-      }),
-    ...(sortOrder && {order: sortOrder}),
-    ...(orderByField && {orderByField}),
-  };
-
   const {
     data: quotationsResource = createEmptyResource<QuotationView>(pageSize),
     isLoading,
     isFetching,
     isFetched,
     isIdle,
-  } = useQuotations(queryParam, {keepPreviousData: true});
+  } = useQuotations(
+    {
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+      query: search,
+      status,
+      ...(cost.length > 0 && {
+        salesPriceStart,
+        salesPriceEnd,
+      }),
+      ...(selectedDateRange &&
+        selectedDateRange[0] !== null &&
+        selectedDateRange[1] !== null && {
+          createdDateStart: selectedDateRange[0],
+          createdDateEnd: selectedDateRange[1],
+        }),
+      order: sortOrder || Order.DESC,
+      orderByField: orderByField || QuotationOrderField.CREATED_DATE,
+    },
+    {keepPreviousData: true},
+  );
 
   totalQuotationsRef.current =
     totalQuotationsRef.current || quotationsResource.total;
 
   const navigateToNewQuotation = () => {
-    Mixpanel.identifyAndTrack(mixpanelEvents.NEW_QUOTATION_BUTTON_CLICKED);
     navigate('new');
   };
 
