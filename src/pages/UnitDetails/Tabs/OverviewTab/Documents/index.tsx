@@ -279,6 +279,7 @@ export const Documents = ({elevator, propertyOwnerId}: Props) => {
         }}>
         <MyDropZone
           acceptedFileTypes={[
+            'image/*',
             'application/pdf',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

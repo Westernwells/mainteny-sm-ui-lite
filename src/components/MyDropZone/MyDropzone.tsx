@@ -206,7 +206,7 @@ export const MyDropZone = ({
               color="error"
               key={index}>
               {error.code === 'file-too-large'
-                ? t('File is larger than 5mb')
+                ? t('File is larger than 20mb')
                 : t(error.message)}
             </Typography>
           ))}
