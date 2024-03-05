@@ -8,8 +8,11 @@ import {Box, Switch, Typography, Divider, IconButton} from '@mui/material';
 import {theme} from 'theme';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {FormikProps} from 'formik';
-import {ContractServiceForm, ContractTimeUnit} from 'models/contract';
-import {getListViewFrequency} from 'utils/elevator-utils';
+import {
+  ContractServiceForm,
+  ContractTimeUnit,
+  getListViewFrequency,
+} from 'models/contract';
 import {useTranslation} from 'react-i18next';
 import {Button} from './Button';
 

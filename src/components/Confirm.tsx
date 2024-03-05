@@ -16,6 +16,8 @@ interface Props {
   title?: string;
   content?: string | any[];
   secondContent?: string | any[];
+  confirmBtnLabel?: string;
+  closeBtnLabel?: string;
   helperText?: string;
   disableActions?: boolean;
 }
@@ -27,6 +29,8 @@ export const Confirm = ({
   title,
   content,
   secondContent,
+  closeBtnLabel,
+  confirmBtnLabel,
   helperText,
   disableActions = false,
 }: Props) => {
@@ -70,7 +74,7 @@ export const Confirm = ({
             onClick: onClose,
           }}>
           <Typography variant="subtitle2" color="text.secondary">
-            {t('No')}
+            {closeBtnLabel ? t(closeBtnLabel) : t('No')}
           </Typography>
         </Button>
 
@@ -90,7 +94,7 @@ export const Confirm = ({
             },
           }}>
           <Typography data-test-id="remove" variant="subtitle2">
-            {t('Yes')}
+            {confirmBtnLabel ? t(confirmBtnLabel) : t('Yes')}
           </Typography>
         </Button>
       </DialogActions>

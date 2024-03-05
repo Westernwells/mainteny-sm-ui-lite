@@ -742,7 +742,7 @@
   "Profile.jpeg": "Profil.jpeg",
   "Image added": "Bild hinzugefügt",
   "File format not supported": "Dateiformat wird nicht unterstützt",
-  "Image size is larger than 20 MB": "Bildgröße ist größer als 20 MB",
+  "Image size is larger than 5 MB": "Bildgröße ist größer als 5 MB",
   "Drag to reposition picture": "Ziehen, um das Bild neu zu positionieren",
   "JPG, PNG or BMP only": "Nur JPG, PNG oder BMP",
   "Change Picture": "Bild ändern",

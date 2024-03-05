@@ -295,6 +295,8 @@ export interface CustomerElevatorParams {
   pageIndex: number;
   pageSize: number;
   query: string;
+  orderBy?: ElevatorOrderField;
+  order?: Order;
 }
 
 export interface ElevatorDataGrid {

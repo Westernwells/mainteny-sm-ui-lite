@@ -311,16 +311,17 @@ export const DataGridLayout = ({
           borderLeft: 'none',
           borderRight: 'none',
           borderTop: 'none',
-          borderBottom: '2px solid',
-          borderColor: 'background.default',
           '& > div:nth-of-type(3)': {
             display: 'flex',
             flexDirection: 'column',
+            position: 'sticky',
           },
           '& .MuiDataGrid-virtualScroller': {
             msOverflowStyle: 'none',
             scrollbarWidth: 'none',
-
+            '& .Mui-selected': {
+              background: '#ebfcff',
+            },
             '&::-webkit-scrollbar': {
               display: 'none',
             },

@@ -24,9 +24,9 @@ interface Props {
   saveBtnType?: 'button' | 'submit' | 'reset';
   leftButton?: React.ReactNode;
   saveButtonText?: string;
-  saveButtonContainerProps?: ButtonProps;
   saveButtonVariant?: ButtonProps['variant'];
   saveButtonProps?: ButtonProps;
+  saveButtonContainerProps?: ButtonProps;
 }
 
 export const Dialog = ({
@@ -34,15 +34,16 @@ export const Dialog = ({
   children,
   onSave = () => {},
   onCancel = () => {},
+  showCancelButton = true,
   disableSaveBtn,
   dialogProps,
   saveBtnType,
   saveButtonContainerProps,
   isSaving = false,
   leftButton,
+  saveButtonText = 'Save',
   saveButtonVariant = 'contained',
   saveButtonProps,
-  saveButtonText = 'Save',
 }: Props) => {
   const {t} = useTranslation();
   return (
@@ -69,7 +70,8 @@ export const Dialog = ({
 
       <DialogContent
         sx={{
-          margin: '1em 0em 0em 0em',
+          margin: '0em',
+          scrollbarWidth: 'none',
           ...olStyles.scrollbar,
           overflowY: 'scroll',
         }}>
@@ -86,12 +88,19 @@ export const Dialog = ({
           display: 'flex',
           justifyContent: 'space-between',
           background: 'white',
+          marginLeft: '1em',
         }}>
         {leftButton}
         <Box sx={{marginLeft: 'auto', ...saveButtonContainerProps}}>
-          <Button buttonProps={{onClick: onCancel, size: 'large'}}>
-            <Typography variant="subtitle2">{t('Cancel')}</Typography>
-          </Button>
+          {showCancelButton && (
+            <Button
+              buttonProps={{
+                size: 'large',
+                onClick: onCancel,
+              }}>
+              <Typography variant="subtitle2">{t('Cancel')}</Typography>
+            </Button>
+          )}
           <Button
             buttonProps={{
               size: 'large',

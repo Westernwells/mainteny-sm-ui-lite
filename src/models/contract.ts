@@ -1,5 +1,6 @@
 import {Client} from './client';
 import {
+  AmountRecord,
   Address,
   Amount,
   Meta,
@@ -26,6 +27,7 @@ import {
 } from './propertyManager';
 import {FileResource} from './media';
 import {ArticleType, CostPackage} from './article';
+import {toRestDate} from 'utils/datetime';
 
 export enum ContractStatus {
   PENDING = 'PENDING',
@@ -194,11 +196,6 @@ export interface ContractSimpleView {
   components?: ContractComponentView[];
 }
 
-export interface JobTimeUnit {
-  timeUnit: ContractTimeUnit;
-  timeNumbers?: number[];
-}
-
 export interface ContractComponentElevator {
   elevatorId: string;
   invoiceJob: JobTimeUnit;
@@ -214,13 +211,6 @@ export interface ContractComponentAdditionalInfoProps {
   costType: ArticleType;
   costPackage: CostPackage;
   yearlyPrice?: number;
-}
-
-export interface ContractComponentView {
-  additionalInfo: ContractComponentAdditionalInfoProps;
-  id: string;
-  name: string;
-  group: string;
 }
 
 export interface ContractProps {
@@ -269,12 +259,12 @@ export interface ContractElevatorView {
 export interface CreateContractRecord {
   propertyOwnerId: string;
   serviceCompanyId: string;
-  type: string;
+  type: ContractTypes;
   elevators: string[];
   visitsNumber: number;
   sla: number;
   spendingLimit: number;
-  price: number;
+  price: AmountRecord;
   currency: string;
   startDate: string;
   endDate: string;
@@ -355,12 +345,19 @@ export interface ContractRequestBody {
 }
 
 export interface ContractBasicInfoFormModel {
-  propertyOwnerId: string;
   startDate: Date | null;
   endDate: Date | null;
   name: string;
   externalId: string;
   description: string;
+}
+
+export interface ContractCustomizeContractFormModel {
+  renewalTerms: number;
+  noticePeriodInMonth?: number;
+  spendingLimit: number;
+  annualPriceAdjustmentPercentage?: number;
+  autoRenewalCancelled?: boolean;
 }
 
 export interface ContractTermsFormModal {
@@ -474,17 +471,6 @@ export interface ContractServiceFormElevator {
   yearlyPrice?: number;
 }
 
-export enum ContractTimeUnit {
-  NONE = 'NONE',
-  WEEKLY = 'WEEKLY',
-  BIWEEKLY = 'BIWEEKLY',
-  MONTHLY = 'MONTHLY',
-  ANNUALLY = 'ANNUALLY',
-  BIENNIALLY = 'BIENNIALLY',
-  TRIENNIALLY = 'TRIENNIALLY',
-  QUADRIENNIALLY = 'QUADRIENNIALLY',
-}
-
 export interface ExtendedContractComponentRecord {
   groupNumber?: number;
   invoiceGroup?: number;
@@ -511,3 +497,315 @@ export interface ContractComponentRecord {
   costPackage: CostPackage;
   yearlyPrice?: number;
 }
+
+export interface ContractComponentView {
+  id: string;
+  name: string;
+  group?: string;
+  additionalInfo: ContractComponentAdditionalInfo;
+  elevators: ContractComponentElevator[];
+  isAutomaticJobCycle?: boolean;
+}
+
+export interface ContractComponentAdditionalInfo {
+  costType: ArticleType;
+  firstInvoiceDate?: Date | null;
+  firstOrderDate?: Date | null;
+  costPackage?: CostPackage;
+}
+
+export interface ContractServiceForm {
+  id?: string;
+  name: string;
+  group?: string;
+  firstInvoiceDate?: Date | null;
+  firstOrderDate?: Date | null;
+  costType: ArticleType;
+  costPackage: CostPackage;
+  elevators: ContractServiceFormElevator[];
+  isAutomaticJobCycle?: boolean;
+  isChecked?: boolean;
+}
+
+export interface ContractServiceFormElevator {
+  elevatorId: string;
+  invoiceJob: JobTimeUnit;
+  orderGenerationJob: JobTimeUnit;
+  price: number;
+  buildingLocation?: string;
+  address?: string;
+  externalId?: string;
+  isSelected?: boolean;
+  isChecked?: boolean;
+  yearlyPrice?: number;
+}
+
+export enum ContractTimeUnit {
+  NONE = 'NONE',
+  WEEKLY = 'WEEKLY',
+  BIWEEKLY = 'BIWEEKLY',
+  MONTHLY = 'MONTHLY',
+  ANNUALLY = 'ANNUALLY',
+  BIENNIALLY = 'BIENNIALLY',
+  TRIENNIALLY = 'TRIENNIALLY',
+  QUADRENNIALLY = 'QUADRENNIALLY',
+}
+
+export enum YearlyContractTimeUnit {
+  ANNUALLY = 'ANNUALLY',
+  BIENNIALLY = 'Every 2 years',
+  TRIENNIALLY = 'Every 3 years',
+  QUADRIENNIALLY = 'Every 4 years',
+}
+
+export interface ContractComponentRecord {
+  id?: string;
+  name: string;
+  group: string;
+  elevators: ContractComponentElevator[];
+  firstInvoiceDate: string;
+  firstOrderDate: string;
+  costType: ArticleType;
+  costPackage: CostPackage;
+}
+
+export interface ContractComponentElevator {
+  elevatorId: string;
+  invoiceJob: JobTimeUnit;
+  orderGenerationJob: JobTimeUnit;
+  price: number;
+  isSelected?: boolean;
+}
+
+export interface ExtendedContractComponentRecord {
+  groupNumber?: number;
+  invoiceGroup?: number;
+  isChecked?: boolean;
+  id?: string;
+  name: string;
+  group: string;
+  elevators: ContractComponentElevator[];
+  firstInvoiceDate: Date | null;
+  firstOrderDate: Date | null;
+  costType: ArticleType;
+  costPackage: CostPackage;
+  isAutomaticJobCycle: boolean;
+}
+
+export interface JobTimeUnit {
+  timeUnit: ContractTimeUnit;
+  timeNumbers: number[];
+}
+
+export const monthsAbbreviations = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+export const convertExtendedRecordsToContractComponentRecords = (
+  extendedContractRecords: ExtendedContractComponentRecord[],
+): ContractComponentRecord[] => {
+  return extendedContractRecords.map((extendedContractRecord) => {
+    const {
+      name,
+      elevators,
+      firstInvoiceDate,
+      firstOrderDate,
+      costType,
+      costPackage,
+      groupNumber,
+    } = extendedContractRecord;
+
+    const convertedElevators: ContractComponentElevator[] = elevators
+      .filter((elevatorItem) => elevatorItem.isSelected)
+      .map((elevator: ContractComponentElevator) => {
+        const {elevatorId, invoiceJob, orderGenerationJob, price} = elevator;
+        return {elevatorId, invoiceJob, orderGenerationJob, price};
+      });
+
+    const contractComponentRecord: ContractComponentRecord = {
+      name,
+      group: groupNumber !== null ? String(groupNumber) : '',
+      elevators: convertedElevators,
+      firstInvoiceDate: firstInvoiceDate ? toRestDate(firstInvoiceDate) : '',
+      firstOrderDate: firstOrderDate ? toRestDate(firstOrderDate) : '',
+      costType,
+      costPackage,
+    };
+
+    return contractComponentRecord;
+  });
+};
+
+export const getUniqueInvoiceJobTimeNumbers = (
+  inputArray: ContractServiceFormElevator[] | ContractComponentElevator[],
+) => {
+  let uniqueTimeNumbers = new Set<number>();
+
+  inputArray.forEach((item) => {
+    item.invoiceJob.timeNumbers?.forEach((number) => {
+      uniqueTimeNumbers.add(number);
+    });
+  });
+
+  const sortedNumbers = Array.from(uniqueTimeNumbers).sort((a, b) => a - b);
+
+  return sortedNumbers;
+};
+
+export const getUniqueOrderGenerationTimeNumbers = (
+  inputArray: ContractServiceFormElevator[] | ContractComponentElevator[],
+) => {
+  let uniqueTimeNumbers = new Set<number>();
+
+  inputArray.forEach((item) => {
+    item.orderGenerationJob.timeNumbers?.forEach((number) => {
+      uniqueTimeNumbers.add(number);
+    });
+  });
+
+  const sortedNumbers = Array.from(uniqueTimeNumbers).sort((a, b) => a - b);
+
+  return sortedNumbers;
+};
+
+export const calculateContractInvoicePriceTotal = (
+  array: ContractComponentElevator[] | ContractComponentElevator[],
+) => {
+  let totalPrice: number = 0;
+
+  array.forEach((item: ContractComponentElevator) => {
+    if (item.invoiceJob && item.invoiceJob.timeNumbers) {
+      const timeNumbersLength: number = item.invoiceJob.timeNumbers.length;
+      const itemPrice: number = item.price;
+      const itemTotalPrice: number = timeNumbersLength * itemPrice;
+
+      totalPrice += itemTotalPrice;
+    }
+  });
+
+  return totalPrice;
+};
+
+export const calculateContractInvoicePriceGrandTotal = (
+  parentArray: ExtendedContractComponentRecord[],
+): number => {
+  let grandTotal: number = 0;
+
+  parentArray.forEach((parentObject) => {
+    if (parentObject.elevators && Array.isArray(parentObject.elevators)) {
+      const elevatorsTotal = calculateContractInvoicePriceTotal(
+        parentObject.elevators.filter((elevator) => elevator.isSelected),
+      );
+      grandTotal += elevatorsTotal;
+    }
+  });
+
+  return grandTotal;
+};
+
+export const calculateContractInvoiceRowPrice = (
+  elevatorRow: ContractServiceFormElevator,
+) => {
+  if (elevatorRow.invoiceJob && elevatorRow.invoiceJob.timeNumbers) {
+    return elevatorRow.invoiceJob.timeNumbers?.length * elevatorRow.price;
+  }
+};
+
+export const monthNames = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+export enum ContractTimeUnitYearView {
+  ANNUALLY = 'Every year',
+  BIENNIALLY = 'Every 2 years',
+  TRIENNIALLY = 'Every 3 years',
+  QUADRENNIALLY = 'Every 4 years',
+  WEEKLY = 'Weekly',
+  BIWEEKLY = 'Every 2 weeks',
+}
+
+export const getListViewFrequency = (
+  elevators: ContractComponentElevator[] | ContractServiceFormElevator[],
+  key: 'orderGenerationJob' | 'invoiceJob',
+): string => {
+  const frequencySet = new Set<string>();
+  const monthlyUnits = new Set<number>();
+
+  elevators.forEach((elevator) => {
+    const {timeUnit} = elevator[key];
+    switch (timeUnit) {
+      case ContractTimeUnit.MONTHLY:
+        elevator[key].timeNumbers.forEach((month) => monthlyUnits.add(month));
+        break;
+      case ContractTimeUnit.WEEKLY:
+      case ContractTimeUnit.BIWEEKLY:
+      case ContractTimeUnit.ANNUALLY:
+      case ContractTimeUnit.BIENNIALLY:
+      case ContractTimeUnit.TRIENNIALLY:
+      case ContractTimeUnit.QUADRENNIALLY:
+        frequencySet.add(ContractTimeUnitYearView[timeUnit]);
+        break;
+      default:
+        return '-';
+    }
+  });
+
+  Array.from(monthlyUnits)
+    .sort((a, b) => a - b)
+    .forEach((unit) => frequencySet.add(monthNames[unit - 1]));
+
+  return frequencySet.size ? Array.from(frequencySet).join(', ') : '-';
+};
+
+export const getSingleItemViewFrequency = (
+  elevator: ContractComponentElevator | ContractServiceFormElevator,
+  key: 'orderGenerationJob' | 'invoiceJob',
+): string => {
+  const frequencySet = new Set<string>();
+  const monthlyUnits = new Set<number>();
+
+  const {timeUnit} = elevator[key];
+  switch (timeUnit) {
+    case ContractTimeUnit.MONTHLY:
+      elevator[key].timeNumbers.forEach((month) => monthlyUnits.add(month));
+      break;
+    case ContractTimeUnit.WEEKLY:
+    case ContractTimeUnit.BIWEEKLY:
+    case ContractTimeUnit.ANNUALLY:
+    case ContractTimeUnit.BIENNIALLY:
+    case ContractTimeUnit.TRIENNIALLY:
+    case ContractTimeUnit.QUADRENNIALLY:
+      frequencySet.add(ContractTimeUnitYearView[timeUnit]);
+      break;
+    default:
+      return '-';
+  }
+
+  Array.from(monthlyUnits)
+    .sort((a, b) => a - b)
+    .forEach((unit) => frequencySet.add(monthNames[unit - 1]));
+
+  return frequencySet.size ? Array.from(frequencySet).join(', ') : '-';
+};

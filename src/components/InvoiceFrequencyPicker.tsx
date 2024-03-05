@@ -12,8 +12,11 @@ import {
   IconButton,
   SelectChangeEvent,
 } from '@mui/material';
-import {ContractServiceForm, ContractTimeUnit} from 'models/contract';
-import {getListViewFrequency} from 'utils/elevator-utils';
+import {
+  ContractServiceForm,
+  ContractTimeUnit,
+  getListViewFrequency,
+} from 'models/contract';
 import {theme} from 'theme';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {FormikProps} from 'formik';
@@ -75,7 +78,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
         timeUnit = ContractTimeUnit.TRIENNIALLY;
         break;
       case 'every4Years':
-        timeUnit = ContractTimeUnit.QUADRIENNIALLY;
+        timeUnit = ContractTimeUnit.QUADRENNIALLY;
         break;
       default:
         break;
@@ -128,7 +131,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
           afterJobCompletion = false;
           selectedCaseFrequency = 'every3Years';
           break;
-        case ContractTimeUnit.QUADRIENNIALLY:
+        case ContractTimeUnit.QUADRENNIALLY:
           yearlyFrequency = true;
           afterJobCompletion = false;
           selectedCaseFrequency = 'every4Years';
@@ -164,7 +167,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
         : isYearlyFrequency && selectedFrequency === 'every3Years'
         ? ContractTimeUnit.TRIENNIALLY
         : isYearlyFrequency && selectedFrequency === 'every4Years'
-        ? ContractTimeUnit.QUADRIENNIALLY
+        ? ContractTimeUnit.QUADRENNIALLY
         : isAfterJobCompletion
         ? ContractTimeUnit.NONE
         : ContractTimeUnit.MONTHLY;
