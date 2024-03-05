@@ -126,7 +126,7 @@ export const ContractBasic = ({
 
       <Grid item xs={6} sm={4} md={3}>
         <CardProps
-          label="Contract End"
+          label="Contract ends"
           bodyTextVariant="subtitle1"
           icon={<CardTravelIcon />}
           iconMaxHeight="3rem"
