@@ -245,6 +245,7 @@ export const convertExtendedRecordsToContractComponentRecords = (
       costType,
       costPackage,
       groupNumber,
+      group,
     } = extendedContractRecord;
 
     const convertedElevators: ContractComponentElevator[] = elevators.map(
@@ -262,7 +263,7 @@ export const convertExtendedRecordsToContractComponentRecords = (
 
     const contractComponentRecord: ContractComponentRecord = {
       name,
-      group: groupNumber !== null ? String(groupNumber) : '',
+      group: groupNumber !== null ? String(groupNumber) : group,
       elevators: convertedElevators,
       firstInvoiceDate: convertFirstInvoiceDateToDate
         ? toRestDate(convertFirstInvoiceDateToDate)
