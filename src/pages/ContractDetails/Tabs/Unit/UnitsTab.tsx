@@ -183,7 +183,7 @@ export const UnitsTab: FC<Props> = ({
         clearValues();
         setResetDatePicker(true);
       }}
-      text="Clear all"
+      clearText="Clear all"
       textStyles={{color: theme.palette.primary.dark, fontWeight: 600}}
       wrapperStyle={{flex: 1, gap: 0.5}}
       containerStyle={{width: '50%', gap: 1}}>
