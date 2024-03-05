@@ -146,7 +146,7 @@ export const calculateContractInvoicePriceTotal = (
 ) => {
   let totalPrice: number = 0;
 
-  array.forEach((item: ContractComponentElevator) => {
+  array?.forEach((item: ContractComponentElevator) => {
     if (item?.invoiceJob?.timeNumbers) {
       const timeNumbersLength: number = item.invoiceJob.timeNumbers.length;
       const itemPrice: number = item.price;
@@ -207,7 +207,7 @@ export const getUniqueInvoiceJobTimeNumbers = (
 ) => {
   const uniqueTimeNumbers = new Set<number>();
 
-  inputArray.forEach((item) => {
+  inputArray?.forEach((item) => {
     item.invoiceJob.timeNumbers?.forEach((number) => {
       uniqueTimeNumbers.add(number);
     });
@@ -325,4 +325,31 @@ export const mergeElevators = (
     ...(infoMap[elevator.elevatorId] || {}),
     isChecked: Boolean(infoMap[elevator.elevatorId]),
   }));
+};
+
+export const getElevatorDataByElevator = (
+  elevatorResource: ContractElevatorView[] | ElevatorView[],
+  elevatorsFromRow: ContractComponentView,
+) => {
+  const infoMap = (elevatorsFromRow.additionalInfo?.elevators || []).reduce(
+    (map, elevator) => {
+      map[elevator.elevatorId] = elevator;
+      return map;
+    },
+    {} as Record<string, ContractServiceFormElevator>,
+  );
+
+  return parsElevatorRecourses(elevatorResource || []).reduce(
+    (acc, elevator) => {
+      if (infoMap[elevator.elevatorId]) {
+        acc.push({
+          ...elevator,
+          ...infoMap[elevator.elevatorId],
+          isChecked: Boolean(infoMap[elevator.elevatorId]),
+        });
+      }
+      return acc;
+    },
+    [] as ContractServiceFormElevator[],
+  );
 };

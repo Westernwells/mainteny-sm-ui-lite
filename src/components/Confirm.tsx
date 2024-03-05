@@ -4,6 +4,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import {IconButton} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import {Button} from './Button';
 
@@ -35,8 +37,17 @@ export const Confirm = ({
       onClose={onClose}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description">
-      <DialogTitle id="alert-dialog-title">
+      <DialogTitle
+        id="alert-dialog-title"
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
         {typeof title === 'string' ? t(title) : title}
+        <IconButton onClick={onClose}>
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
       <DialogContent>
         <DialogContentText

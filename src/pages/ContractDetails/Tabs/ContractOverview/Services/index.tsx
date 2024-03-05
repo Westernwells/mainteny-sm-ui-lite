@@ -323,11 +323,11 @@ export const Services: FC<Props> = ({contractDetails}) => {
                     }}>
                     <StatusChip
                       label={
-                        getAutoJobStatus(row.additionalInfo.firstInvoiceDate)
+                        getAutoJobStatus(row.additionalInfo.firstOrderDate)
                           .label
                       }
                       color={
-                        getAutoJobStatus(row.additionalInfo.firstInvoiceDate)
+                        getAutoJobStatus(row.additionalInfo.firstOrderDate)
                           .color
                       }
                       maxChars={8}
@@ -528,7 +528,10 @@ export const Services: FC<Props> = ({contractDetails}) => {
         }
         saveButtonVariant="outlined"
         showCancelButton={false}>
-        <ServiceInformationReview service={currentService} />
+        <ServiceInformationReview
+          service={currentService}
+          elevators={elevatorResource.data}
+        />
       </Dialog>
     </Grid>
   );

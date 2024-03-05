@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Popover from '@mui/material/Popover';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -46,19 +46,8 @@ const monthsData: MonthData[] = [
 ];
 
 const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
-  const initialSelectedMonths: MonthData[] = monthsData.map((month) => ({
-    ...month,
-    isSelected: formik.values.elevators
-      .filter((elevator) => componentId === elevator.elevatorId)
-      .some((elevator) =>
-        elevator.invoiceJob.timeNumbers?.includes(month.number),
-      ),
-  }));
-
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [selectedMonths, setSelectedMonths] = useState<MonthData[]>(
-    initialSelectedMonths,
-  );
+  const [selectedMonths, setSelectedMonths] = useState<MonthData[]>(monthsData);
 
   const [isAfterJobCompletion, setAfterJobCompletion] = useState(false);
   const [isYearlyFrequency, setYearlyFrequency] = useState(false);
@@ -95,13 +84,13 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
   const handleAfterJobCompletionToggle = () => {
     setAfterJobCompletion((prev) => !prev);
     setYearlyFrequency(false);
-    setSelectedMonths(initialSelectedMonths);
+    setSelectedMonths(monthsData);
   };
 
   const handleYearlyFrequencyToggle = () => {
     setYearlyFrequency((prev) => !prev);
     setAfterJobCompletion(false);
-    setSelectedMonths(initialSelectedMonths);
+    setSelectedMonths(monthsData);
   };
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -156,7 +145,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
     setAnchorEl(null);
     setAfterJobCompletion(false);
     setYearlyFrequency(false);
-    setSelectedMonths(initialSelectedMonths);
+    setSelectedMonths(monthsData);
   };
 
   const handleSave = () => {
@@ -177,22 +166,41 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
         ? ContractTimeUnit.NONE
         : ContractTimeUnit.MONTHLY;
 
-    const updatedElevators = formik.values.elevators.map((elevator) => {
-      if (componentId === elevator.elevatorId) {
-        return {
-          ...elevator,
-          invoiceJob: {
-            ...elevator.invoiceJob,
-            timeNumbers:
-              isYearlyFrequency || isAfterJobCompletion ? [] : formattedNumbers,
-            timeUnit,
-          },
-        };
-      }
-      return elevator;
-    });
+    if (
+      formik.values.elevators.findIndex(
+        (elevator) => elevator.elevatorId === componentId,
+      ) === 0
+    ) {
+      const updatedElevators = formik.values.elevators.map((elevator) => ({
+        ...elevator,
+        invoiceJob: {
+          ...elevator.invoiceJob,
+          timeNumbers: formattedNumbers,
+          timeUnit,
+        },
+      }));
 
-    formik.setFieldValue('elevators', updatedElevators);
+      updatedElevators.slice(1).forEach((_, index) => {
+        updatedElevators[index + 1].invoiceJob.timeNumbers = formattedNumbers;
+      });
+      formik.setFieldValue('elevators', updatedElevators);
+    } else {
+      const updatedElevators = formik.values.elevators.map((elevator) => {
+        if (componentId === elevator.elevatorId) {
+          return {
+            ...elevator,
+            invoiceJob: {
+              ...elevator.invoiceJob,
+              timeNumbers: formattedNumbers,
+              timeUnit,
+            },
+          };
+        }
+        return elevator;
+      });
+      formik.setFieldValue('elevators', updatedElevators);
+    }
+
     handleClose();
   };
 
@@ -210,20 +218,34 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
   const open = Boolean(anchorEl);
   const id = open ? 'invoice-frequency-popover' : undefined;
 
+  useEffect(() => {
+    setSelectedMonths(
+      monthsData.map((month) => ({
+        ...month,
+        isSelected: formik.values.elevators
+          .filter((elevator) => componentId === elevator.elevatorId)
+          .some((elevator) =>
+            elevator.invoiceJob.timeNumbers?.includes(month.number),
+          ),
+      })),
+    );
+  }, [open]);
+
   return (
     <div>
-      <Button
-        label=""
-        buttonProps={{
-          onClick: handleOpen,
-          size: 'small',
-          style: {
-            width: '100%',
-            textAlign: 'left',
-            justifyContent: 'space-between',
-            paddingLeft: '0.5em',
-            border: '1px solid #c4c4c4',
-          },
+      <Box
+        onClick={handleOpen}
+        style={{
+          width: '100%',
+          textAlign: 'left',
+          justifyContent: 'space-between',
+          paddingLeft: '0.5em',
+          border: '1px solid #c4c4c4',
+          cursor: 'pointer',
+          display: 'flex',
+          borderRadius: '4px',
+          paddingTop: '0.1em',
+          paddingBottom: '0.1em',
         }}>
         <Typography
           noWrap
@@ -232,11 +254,12 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             textAlign: 'left',
+            paddingTop: '0.2em',
           }}>
           {formik.values.elevators
             .filter((elevator) => componentId === elevator.elevatorId)
             .map((elevator) => {
-              const timeNumbers = elevator.invoiceJob?.timeNumbers || [];
+              const timeNumbers = elevator.invoiceJob.timeNumbers || [];
               const selectedMonthsInfo = selectedMonths
                 .filter((item) => timeNumbers.includes(item.number))
                 .map((item) => item.month.slice(0, 3));
@@ -247,7 +270,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
         <IconButton size="small" onClick={handleOpen}>
           <ArrowDropDownIcon />
         </IconButton>
-      </Button>
+      </Box>
 
       <Popover
         id={id}
@@ -256,7 +279,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
         onClose={() => {
           setAfterJobCompletion(false);
           setYearlyFrequency(false);
-          setSelectedMonths(initialSelectedMonths);
+          setSelectedMonths(monthsData);
           handleClose();
         }}
         anchorOrigin={{
@@ -267,7 +290,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
           vertical: 'top',
           horizontal: 'left',
         }}>
-        <Box sx={{py: 2, px: 4}}>
+        <Box sx={{pt: 2, pb: 0, px: 4}}>
           <Box display="flex" alignItems="center">
             <Switch
               checked={isAfterJobCompletion}
@@ -312,7 +335,9 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
             }}>
             <List sx={{flex: 1}}>
               {selectedMonths.slice(0, 6).map((item) => (
-                <ListItem key={item.month} sx={{padding: '0em'}}>
+                <ListItem
+                  key={item.month}
+                  sx={{padding: '0em', height: '28px'}}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -328,7 +353,9 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
             </List>
             <List sx={{flex: 1}}>
               {selectedMonths.slice(6).map((item) => (
-                <ListItem key={item.month} sx={{padding: '0em'}}>
+                <ListItem
+                  key={item.month}
+                  sx={{padding: '0em', height: '28px'}}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -410,7 +437,13 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
         </Box>
 
         <Box
-          sx={{py: 2, px: 4, display: 'flex', justifyContent: 'space-between'}}>
+          sx={{
+            pt: 1,
+            px: 4,
+            pb: 2,
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}>
           <Button
             label="Cancel"
             buttonProps={{

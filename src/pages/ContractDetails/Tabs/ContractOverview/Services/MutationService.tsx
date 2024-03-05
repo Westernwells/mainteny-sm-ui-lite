@@ -336,9 +336,11 @@ export const MutationService = ({
         maxWidth: 'lg',
       }}
       disableSaveBtn={
-        !!Object.keys(formikContractServiceComponent.errors).length
+        !!Object.keys(formikContractServiceComponent.errors).length ||
+        (formikContractServiceComponent.values.isAutomaticJobCycle &&
+          !formikContractServiceComponent.values.firstOrderDate)
       }
-      saveButtonText={t('Save')}
+      saveButtonText={isEditForm ? t('Save') : t('Add Service')}
       isSaving={loading}
       onSave={() => {
         if (isEditForm) {
@@ -836,7 +838,7 @@ export const MutationService = ({
                   background: '#F2F6F8',
                 },
               }}
-              key={item.elevatorId}>
+              key={`${item.elevatorId}-${index}`}>
               <TableCell
                 sx={{
                   width: '20%',

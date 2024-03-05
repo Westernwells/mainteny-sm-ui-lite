@@ -7,7 +7,8 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import React, {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ButtonProps} from '@mui/material/Button';
+import {ButtonProps, IconButton} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import {Button} from './Button';
 import {olStyles} from '../styles';
 
@@ -41,7 +42,6 @@ export const Dialog = ({
   leftButton,
   saveButtonVariant = 'contained',
   saveButtonProps,
-
   saveButtonText = 'Save',
 }: Props) => {
   const {t} = useTranslation();
@@ -58,8 +58,13 @@ export const Dialog = ({
         sx={{
           background: 'white',
           padding: '1em 1.5em',
+          display: 'flex',
+          justifyContent: 'space-between',
         }}>
         {typeof title === 'string' ? t(title) : title}
+        <IconButton onClick={onCancel}>
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
 
       <DialogContent

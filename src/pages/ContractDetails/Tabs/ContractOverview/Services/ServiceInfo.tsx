@@ -17,25 +17,34 @@ import {formatDate} from 'utils/datetime';
 import {theme} from 'theme';
 import {
   ContractComponentView,
+  ContractElevatorView,
   ContractServiceFormElevator,
 } from 'models/contract';
 import {
   calculateContractInvoicePriceTotal,
   calculateContractInvoiceRowPrice,
+  getElevatorDataByElevator,
 } from 'utils/contract-utils';
 import {useTranslation} from 'react-i18next';
 import {getArticleTypeText} from 'utils/article-utils';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {getViewFrequency} from 'utils/elevator-utils';
 import {ArticleType} from 'models/article';
+import {ElevatorView} from 'models/elevator';
 
 type Props = {
   service?: ContractComponentView;
+  elevators: ContractElevatorView[] | ElevatorView[];
 };
 
-const ServiceInformationReview = ({service}: Props) => {
+const ServiceInformationReview = ({service, elevators}: Props) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
+
+  const elevatorsData = getElevatorDataByElevator(
+    elevators,
+    service as ContractComponentView,
+  );
 
   const columns: {
     name: string;
@@ -130,7 +139,7 @@ const ServiceInformationReview = ({service}: Props) => {
           </TableRow>
         </TableHead>
         <TableBody sx={{display: 'block'}}>
-          {service?.additionalInfo?.elevators?.map((item, index) => (
+          {elevatorsData?.map((item, index) => (
             <TableRow
               sx={{
                 width: '100%',

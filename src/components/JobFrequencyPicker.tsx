@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import Popover from '@mui/material/Popover';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -32,17 +32,8 @@ type Props = {
 };
 
 const JobFrequencyPicker = ({componentId, formik}: Props) => {
-  const initialSelectedMonths = monthsData.map((month) => ({
-    ...month,
-    isSelected: formik.values.elevators
-      .filter((elevator) => componentId === elevator.elevatorId)
-      .some((elevator) =>
-        elevator.orderGenerationJob.timeNumbers?.includes(month.number),
-      ),
-  }));
-
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedMonths, setSelectedMonths] = useState(initialSelectedMonths);
+  const [selectedMonths, setSelectedMonths] = useState(monthsData);
 
   const [isWeeklyFrequency, setIsWeeklyFrequency] = useState(false);
   const [isBiweeklyFrequency, setIsBiweeklyFrequency] = useState(false);
@@ -64,8 +55,8 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
       (elevatorItem) => elevatorItem.elevatorId === componentId,
     );
 
-    let weeklyFrequency = false;
-    let biWeeklyFrequency = false;
+    let weeklyFrequency: boolean = false;
+    let biWeeklyFrequency: boolean = false;
 
     if (elevator) {
       switch (elevator.orderGenerationJob.timeUnit) {
@@ -91,7 +82,7 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
     setAnchorEl(null);
     setIsWeeklyFrequency(false);
     setIsBiweeklyFrequency(false);
-    setSelectedMonths(initialSelectedMonths);
+    setSelectedMonths(monthsData);
   };
 
   const handleSave = () => {
@@ -105,21 +96,47 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
       ? ContractTimeUnit.BIWEEKLY
       : ContractTimeUnit.MONTHLY;
 
-    const updatedElevators = formik.values.elevators.map((elevator) => {
-      if (componentId === elevator.elevatorId) {
-        return {
-          ...elevator,
-          orderGenerationJob: {
-            ...elevator.orderGenerationJob,
-            timeNumbers:
-              isWeeklyFrequency || isBiweeklyFrequency ? [] : formattedNumbers,
-            timeUnit,
-          },
-        };
-      }
-      return elevator;
-    });
-    formik.setFieldValue('elevators', updatedElevators);
+    if (
+      formik.values.elevators.findIndex(
+        (elevator) => elevator.elevatorId === componentId,
+      ) === 0
+    ) {
+      const updatedElevators = formik.values.elevators.map((elevator) => ({
+        ...elevator,
+        orderGenerationJob: {
+          ...elevator.orderGenerationJob,
+          timeNumbers:
+            isWeeklyFrequency || isBiweeklyFrequency ? [] : formattedNumbers,
+          timeUnit,
+        },
+      }));
+
+      updatedElevators.slice(1).forEach((_, index) => {
+        updatedElevators[index + 1].orderGenerationJob.timeNumbers =
+          formattedNumbers;
+      });
+
+      formik.setFieldValue('elevators', updatedElevators);
+    } else {
+      const updatedElevators = formik.values.elevators.map((elevator) => {
+        if (componentId === elevator.elevatorId) {
+          return {
+            ...elevator,
+            orderGenerationJob: {
+              ...elevator.orderGenerationJob,
+              timeNumbers:
+                isWeeklyFrequency || isBiweeklyFrequency
+                  ? []
+                  : formattedNumbers,
+              timeUnit,
+            },
+          };
+        }
+        return elevator;
+      });
+      formik.setFieldValue('elevators', updatedElevators);
+    }
+
     handleClose();
   };
 
@@ -137,20 +154,34 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
   const open = Boolean(anchorEl);
   const id = open ? 'job-frequency-popover' : undefined;
 
+  useEffect(() => {
+    setSelectedMonths(
+      monthsData.map((month) => ({
+        ...month,
+        isSelected: formik.values.elevators
+          .filter((elevator) => componentId === elevator.elevatorId)
+          .some((elevator) =>
+            elevator.orderGenerationJob.timeNumbers?.includes(month.number),
+          ),
+      })),
+    );
+  }, [open]);
+
   return (
     <div>
-      <Button
-        label=""
-        buttonProps={{
-          onClick: handleOpen,
-          size: 'small',
-          style: {
-            width: '100%',
-            textAlign: 'left',
-            justifyContent: 'space-between',
-            paddingLeft: '0.5em',
-            border: '1px solid #c4c4c4',
-          },
+      <Box
+        onClick={handleOpen}
+        style={{
+          width: '100%',
+          textAlign: 'left',
+          justifyContent: 'space-between',
+          paddingLeft: '0.5em',
+          border: '1px solid #c4c4c4',
+          cursor: 'pointer',
+          display: 'flex',
+          borderRadius: '4px',
+          paddingTop: '0.1em',
+          paddingBottom: '0.1em',
         }}>
         <Typography
           noWrap
@@ -159,6 +190,7 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             textAlign: 'left',
+            paddingTop: '0.2em',
           }}>
           {formik.values.elevators
             .filter((elevator) => componentId === elevator.elevatorId)
@@ -174,7 +206,7 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
         <IconButton size="small" onClick={handleOpen}>
           <ArrowDropDownIcon />
         </IconButton>
-      </Button>
+      </Box>
 
       <Popover
         id={id}
@@ -189,7 +221,7 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
           vertical: 'top',
           horizontal: 'left',
         }}>
-        <Box sx={{py: 2, px: 4}}>
+        <Box sx={{pt: 2, pb: 0, px: 4}}>
           <Box
             sx={{
               display: 'flex',
@@ -198,7 +230,9 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
             }}>
             <List sx={{flex: 1}}>
               {selectedMonths.slice(0, 6).map((item) => (
-                <ListItem key={item.month} sx={{padding: '0em'}}>
+                <ListItem
+                  key={item.month}
+                  sx={{padding: '0em', height: '28px'}}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -214,7 +248,9 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
             </List>
             <List sx={{flex: 1}}>
               {selectedMonths.slice(6).map((item) => (
-                <ListItem key={item.month} sx={{padding: '0em'}}>
+                <ListItem
+                  key={item.month}
+                  sx={{padding: '0em', height: '28px'}}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -236,7 +272,7 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
             maxWidth="300px"
             position="relative"
             textAlign="center"
-            py={1.5}>
+            py={1}>
             <Divider sx={{width: '50%', borderColor: '#8F9BB380'}} />
             <Typography
               variant="body1"
@@ -283,7 +319,13 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
         </Box>
 
         <Box
-          sx={{py: 2, px: 4, display: 'flex', justifyContent: 'space-between'}}>
+          sx={{
+            pt: 1,
+            px: 4,
+            pb: 2,
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}>
           <Button
             label="Cancel"
             buttonProps={{
