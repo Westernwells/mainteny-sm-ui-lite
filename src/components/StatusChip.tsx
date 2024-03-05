@@ -13,6 +13,7 @@ const statusColor = {
   default: 'warning.main',
   primary: 'primary.main',
   'primary.mainLight': 'primary.mainLight',
+  'primary.light': 'primary.light',
   'primary.main': 'primary.main',
   secondary: 'secondary.main',
   error: 'error.main',
