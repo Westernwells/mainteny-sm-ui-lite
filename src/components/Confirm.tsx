@@ -5,6 +5,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
+import {IconButton} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import {Button} from './Button';
 
 interface Props {
@@ -14,6 +16,8 @@ interface Props {
   title?: string;
   content?: string | any[];
   secondContent?: string | any[];
+  confirmBtnLabel?: string;
+  closeBtnLabel?: string;
   helperText?: string;
   disableActions?: boolean;
 }
@@ -25,6 +29,8 @@ export const Confirm = ({
   title,
   content,
   secondContent,
+  closeBtnLabel,
+  confirmBtnLabel,
   helperText,
   disableActions = false,
 }: Props) => {
@@ -35,8 +41,17 @@ export const Confirm = ({
       onClose={onClose}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description">
-      <DialogTitle id="alert-dialog-title">
+      <DialogTitle
+        id="alert-dialog-title"
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
         {typeof title === 'string' ? t(title) : title}
+        <IconButton onClick={onClose}>
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
       <DialogContent>
         <DialogContentText
@@ -59,7 +74,7 @@ export const Confirm = ({
             onClick: onClose,
           }}>
           <Typography variant="subtitle2" color="text.secondary">
-            {t('No')}
+            {closeBtnLabel ? t(closeBtnLabel) : t('No')}
           </Typography>
         </Button>
 
@@ -79,7 +94,7 @@ export const Confirm = ({
             },
           }}>
           <Typography data-test-id="remove" variant="subtitle2">
-            {t('Yes')}
+            {confirmBtnLabel ? t(confirmBtnLabel) : t('Yes')}
           </Typography>
         </Button>
       </DialogActions>

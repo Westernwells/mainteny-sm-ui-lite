@@ -1,18 +1,25 @@
 import {GridRowsProp} from '@mui/x-data-grid';
-import {useTranslation} from 'react-i18next';
-import {Box, Typography} from '@mui/material';
+import {Box} from '@mui/material';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {getCenter} from 'geolib';
 import {useQueryCustomerElevator} from 'hooks/reactQuery/useElevator';
-import {ElevatorByAddr, ElevatorView} from 'models/elevator';
-import {Resource} from 'models/misc';
+import {
+  ElevatorByAddr,
+  ElevatorOrderField,
+  ElevatorView,
+} from 'models/elevator';
+import {Order, OrderByParams, Resource} from 'models/misc';
 import {DataGridElevatorView} from 'pages/Units/Models';
-import React, {FC, useCallback, useEffect, useRef, useState} from 'react';
+import {FC, useCallback, useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import * as _ from 'lodash';
 import {FormikProps} from 'formik';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {SearchInput} from 'components/SearchInput';
+import {Button} from 'components/Button';
+import {T} from 'utils/i18n-utils';
+import CloseIcon from '@mui/icons-material/Close';
+import {useSearchValues} from 'hooks/useSearchValues';
 import {columns, makeRows} from './NewContractUnitsGridProps';
 
 interface Props {
@@ -23,7 +30,6 @@ interface Props {
 const pageInfo = makePage(0, 10);
 
 const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
-  const {t} = useTranslation();
   const formatDate = useFormatDate();
   const fallback = useRef({
     elevatorByAddress: {} as ElevatorByAddr,
@@ -38,6 +44,8 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
     elevatorByAddress: ElevatorByAddr;
     centerCoord: Location;
   }>(fallback as any);
+  const {values} = useSearchValues<OrderByParams<ElevatorOrderField>>();
+  const {sortOrder, orderByField} = values;
 
   const {
     data: elevatorResponse = createEmptyResource<ElevatorView>(10),
@@ -48,6 +56,8 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
       query: search,
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
+      orderBy: orderByField || ElevatorOrderField.CREATED_TIME,
+      order: sortOrder || Order.DESC,
     },
     {status: []},
     customerId,
@@ -66,6 +76,7 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
   const flatenn = (elevators: {[key: string]: ElevatorView[]}) => {
     let prevAdddressId = '';
     const flatArray: DataGridElevatorView[] = [];
+
     Object.keys(elevators).forEach((key) => {
       elevators[key].forEach((elevator) => {
         const {address} = elevator;
@@ -138,18 +149,50 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
     setSearch(val);
   };
 
+  const clearElevators = () => {
+    formik.setFieldValue('elevators', []);
+  };
+
+  const renderClearSelectionsButton = () => {
+    const numberOfUnits = formik.values.elevators.length;
+
+    if (numberOfUnits === 0) {
+      return null;
+    }
+
+    return (
+      <Button
+        buttonProps={{
+          variant: 'outlined',
+          size: 'medium',
+          sx: {
+            background: 'transparent',
+            marginLeft: '1.5em',
+          },
+          endIcon: <CloseIcon />,
+          onClick: () => clearElevators(),
+        }}>
+        {T('{{numberOfUnits}} {{unitLabel}}', {
+          numberOfUnits,
+          unitLabel: numberOfUnits === 1 ? 'Unit Selected' : 'Units Selected',
+        })}
+      </Button>
+    );
+  };
+
   return (
-    <>
-      <Box display="flex" justifyContent="space-between">
-        <Typography variant="h6" component="div">
-          {t('Select units')}
-        </Typography>
-        <SearchInput
-          placeholder="Search"
-          onValueChanged={(val) => handleChangeSearch(val)}
-        />
-      </Box>
+    <Box sx={{height: '56vh'}}>
+      <SearchInput
+        placeholder="Search"
+        onValueChanged={(val) => handleChangeSearch(val)}
+        variant="outlined"
+      />
+
+      {renderClearSelectionsButton()}
+
       <DataGridLayout
+        height="100%"
+        fullHeight={false}
         onRowClick={(row) => setElevators(row.id as string)}
         selectionModel={formik.values.elevators}
         disableSelectionOnClick={false}
@@ -167,7 +210,7 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
         pageCount={pageCount}
         totalRows={elevatorResponse.total}
       />
-    </>
+    </Box>
   );
 };
 

@@ -240,11 +240,7 @@ export const MyDropZone = ({
   };
 
   return (
-    <Box
-      className="container"
-      component="section"
-      width="100%"
-      maxWidth="100rem">
+    <Box className="container" component="section" width="100%">
       <Box
         component="div"
         {...getRootProps({className: 'dropzone'})}

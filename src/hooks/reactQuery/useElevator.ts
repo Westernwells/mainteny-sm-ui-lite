@@ -91,6 +91,28 @@ export const useElevatorById = (elevatorId?: string) => {
   );
 };
 
+export const useMultipleElevators = (elevatorIds?: string[]) => {
+  const {showError} = useSnackbar();
+
+  const fetchElevatorById = async (id: string) => {
+    try {
+      const data = await fetchElevator(id);
+      return {data};
+    } catch (error) {
+      showError(error);
+      throw error;
+    }
+  };
+
+  return useQuery(
+    ['multipleElevators', elevatorIds],
+    () => Promise.all(elevatorIds!.map(fetchElevatorById)),
+    {
+      enabled: !!elevatorIds && elevatorIds.length > 0,
+    },
+  );
+};
+
 export const useElevatorMaintainers = (elevatorId?: string) =>
   useQuery(
     [queryKeys.maintainerByElevatorId, elevatorId],
