@@ -33,6 +33,7 @@ import {
   ContractServiceForm,
   ContractComponentView,
   ContractServiceFormElevator,
+  UpdateContractComponents,
 } from 'models/contract';
 import {
   calculateContractInvoicePriceTotal,
@@ -168,6 +169,10 @@ export const MutationService = ({
   }, [formikContractServiceComponent.values.costType]);
 
   const updateServiceMutation = () => {
+    const index = components.findIndex(
+      (c) => c.id === formikContractServiceComponent.values?.id,
+    );
+
     const updatedComponentsToSave = components.filter(
       (c) => c.id !== formikContractServiceComponent.values?.id,
     );
@@ -175,26 +180,27 @@ export const MutationService = ({
     const {values} = formikContractServiceComponent;
     const elevatorsToSave = values.elevators.filter((e) => e.isChecked);
 
-    const componentsToSave = [
-      ...componentsToMutate(updatedComponentsToSave),
-      {
-        firstInvoiceDate: values.firstInvoiceDate
-          ? formatDate(values.firstInvoiceDate, 'yyyy-MM-dd')
+    const existingData = componentsToMutate(updatedComponentsToSave);
+
+    const itemToMutate = {
+      firstInvoiceDate: values.firstInvoiceDate
+        ? formatDate(values.firstInvoiceDate, 'yyyy-MM-dd')
+        : null,
+      firstOrderDate:
+        values.firstOrderDate && values?.isAutomaticJobCycle
+          ? formatDate(values.firstOrderDate, 'yyyy-MM-dd')
           : null,
-        firstOrderDate:
-          values.firstOrderDate && values?.isAutomaticJobCycle
-            ? formatDate(values.firstOrderDate, 'yyyy-MM-dd')
-            : null,
-        group: values?.group,
-        name: values.name,
-        costPackage: values?.costPackage,
-        costType: values?.costType,
-        elevators: elevatorsToSave,
-      },
-    ];
+      group: values?.group,
+      name: values.name,
+      costPackage: values?.costPackage,
+      costType: values?.costType,
+      elevators: elevatorsToSave,
+    } as UpdateContractComponents;
+
+    existingData.splice(index, 0, itemToMutate);
 
     updateContract({
-      body: {components: componentsToSave},
+      body: {components: existingData},
       contractId,
     });
   };
@@ -208,7 +214,6 @@ export const MutationService = ({
     const elevatorsToSave = values.elevators.filter((e) => e.isChecked);
 
     const componentsToSave = [
-      ...componentsToMutate(updatedComponentsToSave),
       {
         firstInvoiceDate: values.firstInvoiceDate
           ? formatDate(values.firstInvoiceDate, 'yyyy-MM-dd')
@@ -223,6 +228,7 @@ export const MutationService = ({
         costType: values?.costType,
         elevators: elevatorsToSave || [],
       },
+      ...componentsToMutate(updatedComponentsToSave),
     ];
 
     updateContract({

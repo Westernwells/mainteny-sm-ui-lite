@@ -19,6 +19,7 @@ import {
   UpdateContractComponents,
 } from 'models/contract';
 import {toDate, toRestDate} from 'utils/datetime';
+import {ElevatorView} from 'models/elevator';
 
 export const costRangeConvertor = (
   selectedItems: string[],
@@ -164,7 +165,7 @@ export const componentsToMutate = (
   components: ContractComponentView[],
 ): UpdateContractComponents[] =>
   components?.map((c) => ({
-    firstInvoiceDate: c.additionalInfo?.firstOrderDate,
+    firstInvoiceDate: c.additionalInfo?.firstInvoiceDate,
     firstOrderDate: c.additionalInfo?.firstOrderDate,
     group: c?.group,
     name: c.name,
@@ -276,32 +277,8 @@ export const convertExtendedRecordsToContractComponentRecords = (
     return contractComponentRecord;
   });
 
-export const mergeElevators = (
-  elevatorsFromResource: ContractServiceFormElevator[],
-  elevatorsFromRow: ContractServiceFormElevator[],
-) => {
-  const elevatorMap = new Map();
-
-  elevatorsFromResource.forEach((elevator) => {
-    elevatorMap.set(elevator.elevatorId, {
-      ...elevator,
-      isChecked: false,
-    });
-  });
-
-  elevatorsFromRow.forEach((elevator) => {
-    elevatorMap.set(elevator.elevatorId, {
-      ...elevatorMap.get(elevator.elevatorId),
-      ...elevator,
-      isChecked: true,
-    });
-  });
-
-  return Array.from(elevatorMap.values());
-};
-
 export const parsElevatorRecourses = (
-  elevatorResource: ContractElevatorView[],
+  elevatorResource: ContractElevatorView[] | ElevatorView[],
 ) =>
   elevatorResource?.map((elevator) => {
     const {contracts, id} = elevator;
@@ -324,9 +301,28 @@ export const parsElevatorRecourses = (
         timeNumbers: [],
       },
       price: foundElevator?.price || 0,
-      externalId: elevator?.externalId,
+      externalId: elevator?.externalId || 'Unassigned',
       address: elevator.address.fullName || '-',
       buildingLocation: elevator.additionalInfo.buildingLocation || '-',
       isChecked: false,
     };
   });
+
+export const mergeElevators = (
+  elevatorResource: ContractElevatorView[] | ElevatorView[],
+  elevatorsFromRow: ContractComponentView,
+) => {
+  const infoMap = (elevatorsFromRow.additionalInfo?.elevators || []).reduce(
+    (map, elevator) => {
+      map[elevator.elevatorId] = elevator;
+      return map;
+    },
+    {} as Record<string, ContractServiceFormElevator>,
+  );
+
+  return parsElevatorRecourses(elevatorResource || []).map((elevator) => ({
+    ...elevator,
+    ...(infoMap[elevator.elevatorId] || {}),
+    isChecked: Boolean(infoMap[elevator.elevatorId]),
+  }));
+};

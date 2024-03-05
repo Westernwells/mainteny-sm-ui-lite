@@ -149,7 +149,7 @@ const ServiceInformationReview = ({service}: Props) => {
                   borderBottom: 'none',
                 }}>
                 <Typography color={theme.palette.text.primary} variant="body2">
-                  {item.externalId || ''}
+                  {item.externalId || 'Unassigned'}
                 </Typography>
               </TableCell>
 

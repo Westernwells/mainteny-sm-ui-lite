@@ -9,9 +9,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import {TableCellProps, useMediaQuery} from '@mui/material';
 import {
   ContractComponentView,
-  ContractElevatorView,
   ContractServiceForm,
-  ContractServiceFormElevator,
   ContractView,
 } from 'models/contract';
 import {EmptySection} from 'components/EmptySection';
@@ -37,6 +35,7 @@ import {
   componentsToMutate,
   calculateContractInvoicePriceGrandTotal,
   parsElevatorRecourses,
+  mergeElevators,
 } from 'utils/contract-utils';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
@@ -163,29 +162,12 @@ export const Services: FC<Props> = ({contractDetails}) => {
   const setAddFormData = () => {
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
-      elevators: parsElevatorRecourses(
-        (elevatorResource?.data as ContractElevatorView[]) || [],
-      ),
+      elevators: parsElevatorRecourses(elevatorResource?.data || []),
     });
   };
 
   const setEditFormData = (row: ContractComponentView) => {
-    const infoMap = (row.additionalInfo?.elevators || []).reduce(
-      (map, elevator) => {
-        map[elevator.elevatorId] = elevator;
-        return map;
-      },
-      {} as Record<string, ContractServiceFormElevator>,
-    );
-
-    const allItems = parsElevatorRecourses(
-      (elevatorResource.data as ContractElevatorView[]) || [],
-    ).map((elevator) => ({
-      ...elevator,
-      ...(infoMap[elevator.elevatorId] || {}),
-      isChecked: Boolean(infoMap[elevator.elevatorId]),
-    }));
-
+    const allItems = mergeElevators(elevatorResource?.data || [], row);
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
       id: row.id,
@@ -196,16 +178,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
       costType: row?.additionalInfo?.costType,
       costPackage: row?.additionalInfo?.costPackage,
       isAutomaticJobCycle: !!row?.additionalInfo?.firstOrderDate,
-      elevators: allItems.length
-        ? allItems
-        : row.additionalInfo?.elevators?.map((item) => ({
-            elevatorId: item.elevatorId,
-            invoiceJob: item.invoiceJob,
-            orderGenerationJob: item.orderGenerationJob,
-            price: item.price,
-            externalId: item?.externalId,
-            isChecked: true,
-          })) || [],
+      elevators: allItems,
     });
   };
 
