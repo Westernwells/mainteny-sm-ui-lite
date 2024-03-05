@@ -9,6 +9,8 @@ import {theme} from 'theme';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {FormikProps} from 'formik';
 import {ContractServiceForm, ContractTimeUnit} from 'models/contract';
+import {getListViewFrequency} from 'utils/elevator-utils';
+import {useTranslation} from 'react-i18next';
 import {Button} from './Button';
 
 const monthsData = [
@@ -32,6 +34,7 @@ type Props = {
 };
 
 const JobFrequencyPicker = ({componentId, formik}: Props) => {
+  const {t} = useTranslation();
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedMonths, setSelectedMonths] = useState(monthsData);
 
@@ -192,16 +195,12 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
             textAlign: 'left',
             paddingTop: '0.2em',
           }}>
-          {formik.values.elevators
-            .filter((elevator) => componentId === elevator.elevatorId)
-            .map((elevator) => {
-              const timeNumbers = elevator.orderGenerationJob.timeNumbers || [];
-              const selectedMonthsInfo = selectedMonths
-                .filter((item) => timeNumbers.includes(item.number))
-                .map((item) => item.month.slice(0, 3));
-
-              return selectedMonthsInfo.join(', ');
-            })}
+          {getListViewFrequency(
+            formik.values.elevators.filter(
+              (elevator) => componentId === elevator.elevatorId,
+            ),
+            'orderGenerationJob',
+          )}
         </Typography>
         <IconButton size="small" onClick={handleOpen}>
           <ArrowDropDownIcon />
@@ -286,7 +285,7 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
                 transform: 'translate(-50%, -50%)',
                 color: '#8F9BB3',
               }}>
-              OR
+              {t('OR')}
             </Typography>
             <Divider sx={{width: '50%', borderColor: '#8F9BB380'}} />
           </Box>
@@ -300,7 +299,7 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
               <Typography
                 variant="body1"
                 sx={{color: 'text.primary', padding: '1em 0em'}}>
-                Weekly
+                {t('Weekly')}
               </Typography>
             </Box>
 
@@ -312,7 +311,7 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
               <Typography
                 variant="body1"
                 sx={{color: 'text.primary', padding: '1em 0em'}}>
-                Bi-weekly
+                {t('Bi-weekly')}
               </Typography>
             </Box>
           </Box>

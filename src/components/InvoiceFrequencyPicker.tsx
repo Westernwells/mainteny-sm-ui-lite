@@ -13,9 +13,11 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 import {ContractServiceForm, ContractTimeUnit} from 'models/contract';
+import {getListViewFrequency} from 'utils/elevator-utils';
 import {theme} from 'theme';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {FormikProps} from 'formik';
+import {useTranslation} from 'react-i18next';
 import {FormSelect} from './form/FormSelect';
 import {Button} from './Button';
 
@@ -46,6 +48,7 @@ const monthsData: MonthData[] = [
 ];
 
 const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
+  const {t} = useTranslation();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [selectedMonths, setSelectedMonths] = useState<MonthData[]>(monthsData);
 
@@ -256,16 +259,12 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
             textAlign: 'left',
             paddingTop: '0.2em',
           }}>
-          {formik.values.elevators
-            .filter((elevator) => componentId === elevator.elevatorId)
-            .map((elevator) => {
-              const timeNumbers = elevator.invoiceJob.timeNumbers || [];
-              const selectedMonthsInfo = selectedMonths
-                .filter((item) => timeNumbers.includes(item.number))
-                .map((item) => item.month.slice(0, 3));
-
-              return selectedMonthsInfo.join(', ');
-            })}
+          {getListViewFrequency(
+            formik.values.elevators.filter(
+              (elevator) => componentId === elevator.elevatorId,
+            ),
+            'invoiceJob',
+          )}
         </Typography>
         <IconButton size="small" onClick={handleOpen}>
           <ArrowDropDownIcon />
@@ -299,7 +298,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
             <Typography
               variant="body1"
               sx={{color: 'text.primary', padding: '1em 0em'}}>
-              After job completion
+              {t('After job completion')}
             </Typography>
           </Box>
           <Box
@@ -323,7 +322,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
                 transform: 'translate(-50%, -50%)',
                 color: '#8F9BB3',
               }}>
-              OR
+              {t('OR')}
             </Typography>
             <Divider sx={{width: '50%', borderColor: '#8F9BB380'}} />
           </Box>
@@ -391,7 +390,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
                 transform: 'translate(-50%, -50%)',
                 color: '#8F9BB3',
               }}>
-              OR
+              {t('OR')}
             </Typography>
             <Divider sx={{width: '50%', borderColor: '#8F9BB380'}} />
           </Box>
@@ -404,7 +403,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
               <Typography
                 variant="body1"
                 sx={{color: 'text.primary', padding: '1em 0em'}}>
-                Pick yearly frequency
+                {t('Pick yearly frequency')}
               </Typography>
             </Box>
 
