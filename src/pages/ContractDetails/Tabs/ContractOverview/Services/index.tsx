@@ -40,7 +40,7 @@ import {
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import {Dialog} from 'components/Dialog';
-import {ArticleType} from 'models/article';
+import {ArticleType, CostPackage} from 'models/article';
 import {useUuid} from 'hooks/reactQuery/useUuid';
 import {createEmptyResource} from 'utils/paging-utils';
 import {ElevatorView} from 'models/elevator';
@@ -176,7 +176,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
       firstInvoiceDate: row?.additionalInfo?.firstInvoiceDate,
       firstOrderDate: row?.additionalInfo?.firstOrderDate,
       costType: row?.additionalInfo?.costType,
-      costPackage: row?.additionalInfo?.costPackage,
+      costPackage: row?.additionalInfo?.costPackage as CostPackage,
       isAutomaticJobCycle: !!row?.additionalInfo?.firstOrderDate,
       elevators: allItems,
     });
@@ -191,15 +191,12 @@ export const Services: FC<Props> = ({contractDetails}) => {
   }, [elevatorResource.data.length]);
 
   return (
-    <Grid item xs={12} md={8}>
+    <Grid item xs={12} md={8} sx={{padding: 'unset'}}>
       <ContractCard
-        bodyContainerStyle={{
-          paddingBottom: '0px !important',
-        }}
         containerStyles={{
           ...olStyles.scrollbar,
           overflowY: 'scroll',
-          mt: !isMobile ? '1em' : 0,
+          mt: !isMobile ? '0em' : 0,
           py: 2,
           px: 2,
           height: '100%',
@@ -323,12 +320,14 @@ export const Services: FC<Props> = ({contractDetails}) => {
                     }}>
                     <StatusChip
                       label={
-                        getAutoJobStatus(row.additionalInfo.firstOrderDate)
-                          .label
+                        getAutoJobStatus(
+                          row.additionalInfo.firstOrderDate as Date,
+                        ).label
                       }
                       color={
-                        getAutoJobStatus(row.additionalInfo.firstOrderDate)
-                          .color
+                        getAutoJobStatus(
+                          row.additionalInfo.firstOrderDate as Date,
+                        ).color
                       }
                       maxChars={8}
                       variant="outlined"
@@ -346,8 +345,8 @@ export const Services: FC<Props> = ({contractDetails}) => {
                       color={theme.palette.text.primary}
                       variant="body2">
                       {getListViewFrequency(
-                        row.additionalInfo.elevators,
                         'orderGenerationJob',
+                        row.additionalInfo.elevators,
                       )}
                     </Typography>
                   </TableCell>
@@ -363,8 +362,8 @@ export const Services: FC<Props> = ({contractDetails}) => {
                       color={theme.palette.text.primary}
                       variant="body2">
                       {getListViewFrequency(
-                        row.additionalInfo.elevators,
                         'invoiceJob',
+                        row.additionalInfo.elevators,
                       )}
                     </Typography>
                   </TableCell>

@@ -142,7 +142,7 @@ export const getContractStatusStyles = (
 };
 
 export const calculateContractInvoicePriceTotal = (
-  array: ContractComponentElevator[],
+  array?: ContractComponentElevator[],
 ) => {
   let totalPrice: number = 0;
 
@@ -172,7 +172,7 @@ export const componentsToMutate = (
     costPackage: c.additionalInfo?.costPackage,
     costType: c.additionalInfo?.costType,
     elevators: c.additionalInfo?.elevators,
-  }));
+  })) as UpdateContractComponents[];
 
 export const calculateContractInvoiceRowPrice = (
   elevatorRow: ContractServiceFormElevator,

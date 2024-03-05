@@ -64,14 +64,14 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
       components: components?.map((c) => ({
         id: c.id,
         name: c.name,
-        group: c.group,
+        group: c.group as string,
         elevators: c.additionalInfo.elevators,
         firstInvoiceDate: c.additionalInfo.firstInvoiceDate,
         firstOrderDate: c.additionalInfo.firstOrderDate,
         costType: c.additionalInfo.costType,
         costPackage: c.additionalInfo.costPackage,
         isAutomaticJobCycle: false,
-      })),
+      })) as ExtendedContractComponentRecord[],
     },
     onSubmit: () => {},
     validateOnMount: true,
@@ -310,13 +310,10 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
   return (
     <Grid item xs={12} md={8}>
       <ContractCard
-        bodyContainerStyle={{
-          paddingBottom: '0px !important',
-        }}
         containerStyles={{
           ...olStyles.scrollbar,
           overflowY: 'scroll',
-          mt: !isMobile ? '1em' : 0,
+          mt: !isMobile ? '0em' : 0,
           py: 2,
           px: 2,
           height: '100%',

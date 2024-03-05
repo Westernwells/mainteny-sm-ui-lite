@@ -96,8 +96,8 @@ export const getFrequency = (elevator: ContractElevatorView) => {
         return TimeUnitYearView.BIENNIALLY;
       case ContractTimeUnit.TRIENNIALLY:
         return TimeUnitYearView.TRIENNIALLY;
-      case ContractTimeUnit.QUADRIENNIALLY:
-        return TimeUnitYearView.QUADRIENNIALLY;
+      case ContractTimeUnit.QUADRENNIALLY:
+        return TimeUnitYearView.QUADRENNIALLY;
       case ContractTimeUnit.NONE:
         return '-';
       default:
@@ -109,13 +109,13 @@ export const getFrequency = (elevator: ContractElevatorView) => {
 };
 
 export const getListViewFrequency = (
-  elevators: ContractComponentElevator[],
   key: 'orderGenerationJob' | 'invoiceJob',
+  elevators?: ContractComponentElevator[],
 ): string => {
   const frequencySet = new Set<string>();
   const monthlyUnits = new Set<number>();
 
-  elevators.forEach((elevator) => {
+  elevators?.forEach((elevator) => {
     const {timeUnit} = elevator[key];
     switch (timeUnit) {
       case ContractTimeUnit.MONTHLY:
@@ -126,7 +126,7 @@ export const getListViewFrequency = (
       case ContractTimeUnit.ANNUALLY:
       case ContractTimeUnit.BIENNIALLY:
       case ContractTimeUnit.TRIENNIALLY:
-      case ContractTimeUnit.QUADRIENNIALLY:
+      case ContractTimeUnit.QUADRENNIALLY:
         frequencySet.add(TimeUnitYearView[timeUnit]);
         break;
       default:
@@ -154,7 +154,7 @@ export const getViewFrequency = (job: JobTimeUnit): string => {
     case ContractTimeUnit.ANNUALLY:
     case ContractTimeUnit.BIENNIALLY:
     case ContractTimeUnit.TRIENNIALLY:
-    case ContractTimeUnit.QUADRIENNIALLY:
+    case ContractTimeUnit.QUADRENNIALLY:
       frequencySet.add(TimeUnitYearView[job.timeUnit]);
       break;
     default:

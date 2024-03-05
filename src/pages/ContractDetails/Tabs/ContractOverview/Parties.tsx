@@ -6,6 +6,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import {ContractView} from 'models/contract';
 import {ReactComponent as BriefcaseGray} from 'assets/icons/briefcase-gray.svg';
 import {UserSession} from 'models/session';
+import {olStyles} from 'styles';
 import {SectionTitle} from '../../../InvoiceDetails/SectionTitle';
 import {ContractCard} from './ContractCard';
 import {ContractParties} from './ContractParties';
@@ -23,11 +24,14 @@ export const Parties: FC<Props> = ({contractDetails, user}) => {
     <Grid item xs={12} md={8}>
       <ContractCard
         containerStyles={{
-          mt: '1em',
+          ...olStyles.scrollbar,
+          overflowY: 'scroll',
+          py: 2,
+          px: 2,
+          height: '100%',
           '& .MuiCardHeader-root': {
-            pb: 0,
+            py: 0,
           },
-          height: 'calc(100% - 1em)',
         }}
         header={
           <Box>

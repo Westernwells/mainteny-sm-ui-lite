@@ -40,7 +40,7 @@ export enum TimeUnitYearView {
   ANNUALLY = 'Every year',
   BIENNIALLY = 'Every 2 year',
   TRIENNIALLY = 'Every 3 year',
-  QUADRIENNIALLY = 'Every 4 year',
+  QUADRENNIALLY = 'Every 4 year',
   WEEKLY = 'Weekly',
   BIWEEKLY = 'Every 2 weeks',
 }
@@ -194,13 +194,6 @@ export interface ContractSimpleView {
   meta: Meta;
   additionalInfo: ContractAdditionalInfo;
   components?: ContractComponentView[];
-}
-
-export interface ContractComponentElevator {
-  elevatorId: string;
-  invoiceJob: JobTimeUnit;
-  orderGenerationJob: JobTimeUnit;
-  price: number;
 }
 
 export interface ContractComponentAdditionalInfoProps {
@@ -512,6 +505,7 @@ export interface ContractComponentAdditionalInfo {
   firstInvoiceDate?: Date | null;
   firstOrderDate?: Date | null;
   costPackage?: CostPackage;
+  elevators?: ContractComponentElevator[];
 }
 
 export interface ContractServiceForm {
@@ -575,21 +569,6 @@ export interface ContractComponentElevator {
   orderGenerationJob: JobTimeUnit;
   price: number;
   isSelected?: boolean;
-}
-
-export interface ExtendedContractComponentRecord {
-  groupNumber?: number;
-  invoiceGroup?: number;
-  isChecked?: boolean;
-  id?: string;
-  name: string;
-  group: string;
-  elevators: ContractComponentElevator[];
-  firstInvoiceDate: Date | null;
-  firstOrderDate: Date | null;
-  costType: ArticleType;
-  costPackage: CostPackage;
-  isAutomaticJobCycle: boolean;
 }
 
 export interface JobTimeUnit {
@@ -680,7 +659,7 @@ export const getUniqueOrderGenerationTimeNumbers = (
 };
 
 export const calculateContractInvoicePriceTotal = (
-  array: ContractComponentElevator[] | ContractComponentElevator[],
+  array: ContractComponentElevator[],
 ) => {
   let totalPrice: number = 0;
 
