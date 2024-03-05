@@ -27,6 +27,13 @@ export const columns: GridColDef[] = [
     flex: 1.5,
   }),
   getColumnProps({
+    field: ContractOrderField.NAME,
+    sortable: true,
+    headerName: 'contract name',
+    align: 'left',
+    headerAlign: 'left',
+  }),
+  getColumnProps({
     field: ContractOrderField.NUMBER_OF_ELEVATOR,
     sortable: true,
     headerName: 'no. of units',
@@ -50,16 +57,9 @@ export const columns: GridColDef[] = [
     sortable: true,
   }),
   getColumnProps({
-    field: ContractOrderField.NAME,
-    sortable: true,
-    headerName: 'contract name',
-    align: 'left',
-    headerAlign: 'left',
-  }),
-  getColumnProps({
     field: ContractOrderField.STATUS,
     sortable: true,
-    headerName: 'contract status',
+    headerName: 'status',
     align: 'center',
     headerAlign: 'center',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
@@ -76,7 +76,7 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: ContractOrderField.NET_PRICE,
     sortable: true,
-    headerName: 'cost/year',
+    headerName: 'PRICE (excl. VAT)',
     align: 'right',
     headerAlign: 'right',
     flex: 1,

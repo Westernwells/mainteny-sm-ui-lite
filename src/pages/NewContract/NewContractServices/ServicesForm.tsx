@@ -1,0 +1,880 @@
+import React, {useContext, useEffect, useState} from 'react';
+import {
+  Box,
+  Grid,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  Popover,
+  Tooltip,
+  FormControl,
+  RadioGroup,
+  TextField,
+  TableCellProps,
+  Table,
+} from '@mui/material';
+import InvoiceFrequencyPicker from 'components/InvoiceFrequencyPicker';
+import JobFrequencyPicker from 'components/JobFrequencyPicker';
+import {ReactComponent as BasicInfoIcon} from 'assets/icons/BasicInfoIcon.svg';
+import {ReactComponent as LiftIcon} from 'assets/icons/LiftIcon.svg';
+import {DatePicker} from 'components/DatePicker';
+import {FormInput} from 'components/form/FormInput';
+import {
+  ContractServiceForm,
+  calculateContractInvoicePriceTotal,
+} from 'models/contract';
+import {Switch} from 'components/Switch';
+import {FormikProps, getIn} from 'formik';
+import {ArticleType} from 'models/article';
+import {Button} from 'components/Button';
+import {getArticleTypeText} from 'utils/article-utils';
+import {FormRadio} from 'components/form/FormRadio';
+import CloseIcon from '@mui/icons-material/Close';
+import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
+import {ReactComponent as MaterialIcon} from 'assets/icons/MaterialIcon.svg';
+import {ReactComponent as LaborIcon} from 'assets/icons/LaborIcon.svg';
+import {NumericFormat} from 'react-number-format';
+import {formatCurrency, useCurrentCurrency} from 'utils/currency';
+import ExpandIcon from '@mui/icons-material/Expand';
+import {theme} from 'theme';
+import {LanguageContext} from 'context/LanguageProvider';
+import {useTranslation} from 'react-i18next';
+import {FormCheckbox} from 'components/form/FormCheckbox';
+
+const articleTypes = [
+  {
+    value: ArticleType.LABOR,
+    label: 'Labor',
+  },
+  {
+    value: ArticleType.MATERIAL,
+    label: 'Material',
+  },
+  {
+    value: ArticleType.PACKAGE,
+    label: 'Package',
+    isPackage: true,
+  },
+];
+
+type Props = {
+  formikContractServiceComponent: FormikProps<ContractServiceForm>;
+  isDialogOpen: boolean;
+};
+
+const ServicesForm = ({
+  formikContractServiceComponent,
+  isDialogOpen,
+}: Props) => {
+  const {t} = useTranslation();
+
+  const {language: selectedLng} = useContext(LanguageContext);
+  const currentCurrency = useCurrentCurrency();
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const [showAll, setShowAll] = useState(false);
+  const [visibleItems, setVisibleItems] = useState(2);
+
+  const handleClick = (event: any) => {
+    setAnchorEl(event.currentTarget);
+    event.currentTarget.focus();
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleToggleUnits = () => {
+    if (showAll) {
+      setVisibleItems(2);
+      setShowAll(false);
+    } else {
+      setVisibleItems(
+        formikContractServiceComponent.values.elevators?.length || 0,
+      );
+      setShowAll(true);
+    }
+  };
+
+  const visibleElevators =
+    formikContractServiceComponent.values.elevators?.slice(0, visibleItems) ||
+    [];
+
+  const columns: {
+    name: string;
+    align?: TableCellProps['align'];
+    width?: TableCellProps['width'];
+  }[] = [
+    {name: 'Serial Number', align: 'left', width: '20%'},
+    {name: 'Building', width: '10%'},
+    {
+      name: 'Unit Address',
+      width: formikContractServiceComponent.values.isAutomaticJobCycle
+        ? '22%'
+        : '37%',
+    },
+    {name: 'Job frequency', align: 'left', width: '15%'},
+    {name: 'Invoice frequency', align: 'left', width: '15%'},
+    {name: 'Invoice Price (EXCL. VAT)', align: 'right', width: '18%'},
+  ];
+
+  useEffect(() => {
+    setShowAll(false);
+    setVisibleItems(2);
+  }, [isDialogOpen]);
+
+  const handleCheckboxChange = (itemIndex: number, isChecked: boolean) => {
+    const updatedElevators = [
+      ...formikContractServiceComponent.values.elevators,
+    ];
+
+    formikContractServiceComponent.setFieldValue(
+      'elevators',
+      updatedElevators.map((item, index) => {
+        if (index === itemIndex) {
+          return {...item, isSelected: !isChecked};
+        }
+        return item;
+      }),
+    );
+  };
+
+  return (
+    <>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: '0em 0em 1em 0em',
+          marginTop: '-1em',
+        }}>
+        <BasicInfoIcon fontSize="2rem" />
+        <Typography
+          variant="h5"
+          color={theme.palette.text.primary}
+          sx={{paddingLeft: '0.5em'}}>
+          Basic
+        </Typography>
+      </Box>
+
+      <Grid container spacing={2}>
+        <Grid item xs={7}>
+          <FormInput
+            props={{
+              label: 'Service Name',
+              name: 'name',
+              value: formikContractServiceComponent.values.name,
+              onChange: formikContractServiceComponent.handleChange,
+              onBlur: formikContractServiceComponent.handleBlur,
+              required: true,
+              helperText:
+                formikContractServiceComponent.touched.name &&
+                formikContractServiceComponent.errors.name,
+              error:
+                !!formikContractServiceComponent.errors.name &&
+                formikContractServiceComponent.touched.name,
+            }}
+          />
+        </Grid>
+        <Grid item xs={2}>
+          <>
+            <Tooltip
+              title={t(
+                getArticleTypeText(
+                  formikContractServiceComponent.values.costType!,
+                ),
+              )}
+              arrow
+              placement="top">
+              <Box
+                onClick={handleClick}
+                sx={{
+                  width: '100%',
+                  borderRadius: '4px',
+                  height: 0,
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  display: 'flex',
+                  alignItems: 'center',
+                  background: '#00D1FF0A',
+                  padding: '1.2em 1.4em',
+                  border: '1px solid #E4E9F2',
+                }}
+                tabIndex={0}>
+                {formikContractServiceComponent.values.costType ===
+                ArticleType.PACKAGE ? (
+                  <PackageIcon fontSize="2rem" />
+                ) : formikContractServiceComponent.values.costType ===
+                  ArticleType.MATERIAL ? (
+                  <MaterialIcon fontSize="2rem" />
+                ) : (
+                  <LaborIcon fontSize="2rem" />
+                )}
+                <Typography variant="body1" fontSize="1.2rem" pl={2}>
+                  {getArticleTypeText(
+                    formikContractServiceComponent.values.costType!,
+                  )}
+                </Typography>
+              </Box>
+            </Tooltip>
+            <Popover
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              sx={{
+                '& .MuiPaper-root': {
+                  width: '350px',
+                  minHeight: '250px',
+                  pt: 1,
+                  pb: 2,
+                  px: 3,
+                },
+              }}>
+              <>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}>
+                  <Typography
+                    sx={{
+                      py: 2,
+                      textTransform: 'uppercase',
+                      color: 'text.secondary',
+                    }}>
+                    {t('Article Type')}
+                  </Typography>
+
+                  <Button
+                    buttonProps={{
+                      onClick: handleClose,
+                      sx: {
+                        mx: 0,
+                        mr: -2,
+                        p: 1,
+                        minWidth: 0,
+                      },
+                    }}>
+                    <CloseIcon />
+                  </Button>
+                </Box>
+
+                <FormControl>
+                  <RadioGroup name="radio-buttons-group">
+                    {articleTypes.map((articleType) => (
+                      <Box key={articleType.value}>
+                        <FormRadio
+                          value={articleType.value}
+                          checked={
+                            formikContractServiceComponent.values.costType ===
+                            articleType.value
+                          }
+                          handleChange={(e) => {
+                            formikContractServiceComponent.setFieldValue(
+                              'costType',
+                              e.target.value,
+                            );
+                          }}
+                          label={
+                            <Typography
+                              variant="h6"
+                              component="span"
+                              fontSize="1.125rem"
+                              fontWeight={400}
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                              }}>
+                              {t(articleType.label)}
+                            </Typography>
+                          }
+                          radioProps={{
+                            sx: {color: theme.palette.text.secondary},
+                          }}
+                        />
+                        {formikContractServiceComponent.values.costType ===
+                          articleType.value &&
+                          articleType.isPackage && (
+                            <Box
+                              display="flex"
+                              justifyContent="space-between"
+                              pt="1.8rem">
+                              <Box>
+                                <NumericFormat
+                                  value={
+                                    formikContractServiceComponent.values
+                                      .costPackage?.laborPercentage
+                                  }
+                                  customInput={TextField}
+                                  suffix="%"
+                                  allowLeadingZeros={false}
+                                  decimalScale={2}
+                                  decimalSeparator={
+                                    selectedLng === 'DE' || selectedLng === 'SR'
+                                      ? ','
+                                      : '.'
+                                  }
+                                  thousandSeparator={
+                                    selectedLng === 'DE' || selectedLng === 'SR'
+                                      ? '.'
+                                      : ','
+                                  }
+                                  sx={{
+                                    width: '100%',
+                                    bgcolor: 'white',
+                                    '& .MuiInputBase-root': {
+                                      pr: 0,
+                                    },
+                                    '& .MuiOutlinedInput-input': {
+                                      textAlign: 'right',
+                                      background: '#FFFFFF',
+                                    },
+                                  }}
+                                  isAllowed={(values) => {
+                                    const {floatValue} = values;
+                                    if (!floatValue) {
+                                      return true;
+                                    }
+
+                                    if (floatValue < 0) {
+                                      return false;
+                                    }
+
+                                    const maxValue = 100;
+
+                                    return floatValue <= maxValue;
+                                  }}
+                                  InputProps={{
+                                    name: 'costPackage.laborPercentage',
+                                    placeholder: t(`e.g. 50%`),
+                                    id: `costPackage.laborPercentage`,
+                                    inputMode: 'numeric',
+                                    error: !!getIn(
+                                      formikContractServiceComponent.errors,
+                                      'costPackage.laborPercentage',
+                                    ),
+                                    onBlur:
+                                      formikContractServiceComponent.handleBlur,
+                                    disabled:
+                                      formikContractServiceComponent.values
+                                        .costType !== ArticleType.PACKAGE,
+                                  }}
+                                  InputLabelProps={{
+                                    shrink: true,
+                                  }}
+                                  label={t('Labor')}
+                                  onValueChange={(values) => {
+                                    formikContractServiceComponent.setFieldValue(
+                                      'costPackage.laborPercentage',
+                                      Number(values.value),
+                                    );
+                                  }}
+                                  size="small"
+                                />
+                              </Box>
+
+                              <Box sx={{ml: '1em'}}>
+                                <NumericFormat
+                                  value={
+                                    formikContractServiceComponent.values
+                                      .costType === ArticleType.PACKAGE
+                                      ? 100 -
+                                        Number(
+                                          formikContractServiceComponent.values
+                                            .costPackage?.laborPercentage,
+                                        )
+                                      : 0
+                                  }
+                                  customInput={TextField}
+                                  suffix="%"
+                                  allowLeadingZeros={false}
+                                  decimalScale={2}
+                                  decimalSeparator={
+                                    selectedLng === 'DE' || selectedLng === 'SR'
+                                      ? ','
+                                      : '.'
+                                  }
+                                  thousandSeparator={
+                                    selectedLng === 'DE' || selectedLng === 'SR'
+                                      ? '.'
+                                      : ','
+                                  }
+                                  sx={{
+                                    width: '100%',
+                                    bgcolor: 'white',
+                                    '& .MuiInputBase-root': {
+                                      pr: 0,
+                                    },
+                                    '& .MuiOutlinedInput-input': {
+                                      textAlign: 'right',
+                                      background: '#FFFFFF',
+                                    },
+                                  }}
+                                  isAllowed={(values) => {
+                                    const {floatValue} = values;
+                                    if (!floatValue) {
+                                      return true;
+                                    }
+
+                                    if (floatValue < 0) {
+                                      return false;
+                                    }
+
+                                    const maxValue = 100;
+
+                                    return floatValue <= maxValue;
+                                  }}
+                                  InputProps={{
+                                    name: 'costPackage.materialPercentage',
+                                    placeholder: t(`e.g. 20%`),
+                                    id: `costPackage.materialPercentage`,
+                                    inputMode: 'numeric',
+                                    disabled: true,
+                                    required: false,
+                                    error: !!getIn(
+                                      formikContractServiceComponent.errors,
+                                      'costPackage.materialPercentage',
+                                    ),
+                                    onBlur:
+                                      formikContractServiceComponent.handleBlur,
+                                  }}
+                                  InputLabelProps={{
+                                    shrink: true,
+                                  }}
+                                  label={t('Material')}
+                                  onValueChange={(values) => {
+                                    formikContractServiceComponent.setFieldValue(
+                                      'costPackage.materialPercentage',
+                                      Number(values.value),
+                                    );
+                                  }}
+                                  size="small"
+                                />
+                              </Box>
+                            </Box>
+                          )}
+                      </Box>
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+
+                <Box
+                  sx={{
+                    pt: 3,
+                    pb: 1,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}>
+                  <Button
+                    label={t('Cancel')}
+                    buttonProps={{
+                      onClick: handleClose,
+                    }}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {t('Cancel')}
+                    </Typography>
+                  </Button>
+
+                  <Button
+                    label={t('Save')}
+                    buttonProps={{
+                      onClick: () => {
+                        handleClose();
+                      },
+                      autoFocus: true,
+                      variant: 'contained',
+                    }}>
+                    <Typography variant="subtitle2">Save</Typography>
+                  </Button>
+                </Box>
+              </>
+            </Popover>
+          </>
+        </Grid>
+        <Grid item xs={3}>
+          <DatePicker
+            defaultDate={formikContractServiceComponent.values.firstInvoiceDate}
+            getSelectedDate={(newValue) => {
+              if (newValue)
+                formikContractServiceComponent.setFieldValue(
+                  'firstInvoiceDate',
+                  newValue,
+                );
+            }}
+            textFieldProps={{
+              label: 'First Invoice Date',
+            }}
+          />
+        </Grid>
+      </Grid>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: '1em 0em 0.5em 0em',
+        }}>
+        <LiftIcon fontSize="2rem" />
+        <Typography
+          variant="h5"
+          color={theme.palette.text.primary}
+          sx={{paddingLeft: '0.5em'}}>
+          {t('Unit Settings')}
+        </Typography>
+      </Box>
+      <Typography variant="body2" color={theme.palette.text.secondary}>
+        {t(
+          'Select units for which this contract item assigned to the customer will apply.',
+        )}
+      </Typography>
+      <Box display="flex" alignItems="center">
+        <Switch
+          value={formikContractServiceComponent.values.isAutomaticJobCycle}
+          onChanged={(value) =>
+            formikContractServiceComponent.setFieldValue(
+              'isAutomaticJobCycle',
+              value,
+            )
+          }
+        />
+        <Typography
+          variant="body1"
+          sx={{color: 'text.primary', padding: '0.75em 0em'}}>
+          {t('Automatic job cycle')}
+        </Typography>
+      </Box>
+
+      {!formikContractServiceComponent.values.isAutomaticJobCycle && (
+        <Typography
+          variant="body1"
+          sx={{color: 'text.primary', padding: '0.5em 0em 1em 0em'}}>
+          {t(
+            'With this setting there will be no jobs created from this service',
+          )}
+        </Typography>
+      )}
+
+      {formikContractServiceComponent.values.isAutomaticJobCycle && (
+        <Grid container spacing={2}>
+          <Grid item xs={3}>
+            <DatePicker
+              defaultDate={formikContractServiceComponent.values.firstOrderDate}
+              getSelectedDate={(newValue) => {
+                if (newValue)
+                  formikContractServiceComponent.setFieldValue(
+                    'firstOrderDate',
+                    newValue,
+                  );
+              }}
+              textFieldProps={{
+                label: 'First job creation date',
+                required:
+                  !!formikContractServiceComponent.values.isAutomaticJobCycle,
+              }}
+            />
+          </Grid>
+        </Grid>
+      )}
+
+      <TableContainer>
+        <Table>
+          <TableHead
+            sx={{display: 'block', borderBottom: '1px solid #8F9BB380'}}>
+            <TableRow sx={{display: 'block'}}>
+              {columns.map(
+                (column) =>
+                  (column.name !== 'Job frequency' ||
+                    formikContractServiceComponent.values
+                      .isAutomaticJobCycle) && (
+                    <TableCell
+                      key={column.name}
+                      align={column.align || 'left'}
+                      sx={{display: 'inline-block', padding: '1em 0em'}}
+                      width={column.width}>
+                      <Typography
+                        variant="subtitle2"
+                        color={theme.palette.text.secondary}>
+                        {t(column.name).toUpperCase()}
+                      </Typography>
+                    </TableCell>
+                  ),
+              )}
+            </TableRow>
+          </TableHead>
+          <TableBody
+            sx={{
+              display: 'block',
+            }}>
+            {visibleElevators?.map((item, index) => (
+              <TableRow
+                sx={{
+                  width: '100%',
+                  display: 'block',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    background: '#F2F6F8',
+                  },
+                }}
+                key={`${item.elevatorId}-${index}`}>
+                <TableCell
+                  sx={{
+                    width: '20%',
+                    display: 'inline-block',
+                    padding: '0.5em',
+                    borderBottom: 'none',
+                  }}>
+                  <FormCheckbox
+                    checked={item.isSelected}
+                    name={`isChecked-${index}`}
+                    handleChange={() =>
+                      handleCheckboxChange(index, item.isSelected!)
+                    }
+                    label={item.externalId || '-'}
+                    typographyProps={{
+                      color: theme.palette.text.primary,
+                      fontWeight: '400',
+                      variant: 'body2',
+                    }}
+                  />
+                </TableCell>
+
+                <TableCell
+                  sx={{
+                    width: '10%',
+                    display: 'inline-block',
+                    borderBottom: 'none',
+                    padding: '0.5em 0em',
+                  }}>
+                  <Typography
+                    color={theme.palette.text.primary}
+                    variant="body2">
+                    {item.buildingLocation || '-'}
+                  </Typography>
+                </TableCell>
+
+                <TableCell
+                  sx={{
+                    width: formikContractServiceComponent.values
+                      .isAutomaticJobCycle
+                      ? '22%'
+                      : '37%',
+                    display: 'inline-block',
+                    borderBottom: 'none',
+                    padding: '0.5em 0.5em 0.5em 0em',
+                  }}>
+                  <Typography
+                    color={theme.palette.text.primary}
+                    variant="body2">
+                    {item.address || '-'}
+                  </Typography>
+                </TableCell>
+
+                {formikContractServiceComponent.values.isAutomaticJobCycle && (
+                  <TableCell
+                    sx={{
+                      width: '15%',
+                      display: 'inline-block',
+                      textAlign: 'right',
+                      borderBottom: 'none',
+                      padding: '0em 1.5em 0em 0em',
+                    }}>
+                    <JobFrequencyPicker
+                      formik={formikContractServiceComponent}
+                      componentId={item.elevatorId}
+                    />
+                  </TableCell>
+                )}
+
+                <TableCell
+                  sx={{
+                    width: '15%',
+                    display: 'inline-block',
+                    textAlign: 'right',
+                    borderBottom: 'none',
+                    padding: '0em 1.5em 0em 0em',
+                  }}>
+                  <InvoiceFrequencyPicker
+                    formik={formikContractServiceComponent}
+                    componentId={item.elevatorId}
+                  />
+                </TableCell>
+
+                <TableCell
+                  sx={{
+                    width: '18%',
+                    display: 'inline-block',
+                    textAlign: 'right',
+                    borderBottom: 'none',
+                    padding: '0.7em 0.4em 0.5em 0em',
+                  }}>
+                  <NumericFormat
+                    value={
+                      formikContractServiceComponent.values.elevators[index]
+                        .price
+                    }
+                    customInput={TextField}
+                    prefix={currentCurrency.symbol}
+                    allowLeadingZeros={false}
+                    decimalScale={2}
+                    decimalSeparator={
+                      selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
+                    }
+                    thousandSeparator={
+                      selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
+                    }
+                    sx={{
+                      width: '100%',
+                      bgcolor: 'white',
+                      '& .MuiInputBase-root': {
+                        pr: 0,
+                      },
+                      '& .MuiOutlinedInput-input': {
+                        textAlign: 'right',
+                        background: '#FFFFFF',
+                      },
+                    }}
+                    isAllowed={(values) => {
+                      const {floatValue} = values;
+                      if (!floatValue) {
+                        return true;
+                      }
+
+                      if (floatValue < 0) {
+                        return false;
+                      }
+
+                      const maxValue = 1000000000000;
+
+                      return floatValue <= maxValue;
+                    }}
+                    InputProps={{
+                      name: 'price',
+                      id: `price`,
+                      inputMode: 'numeric',
+                      error: !!getIn(
+                        formikContractServiceComponent.errors,
+                        `elevators[${index}].price`,
+                      ),
+                      onBlur: formikContractServiceComponent.handleBlur,
+                    }}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    label={t('Invoice Price(EXCL. VAT)')}
+                    onValueChange={(values) => {
+                      formikContractServiceComponent.setFieldValue(
+                        `elevators[${index}].price`,
+                        Number(values.value),
+                      );
+                    }}
+                    size="small"
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TableContainer>
+        <Table>
+          <TableBody sx={{display: 'block'}}>
+            <TableRow
+              sx={{
+                width: '100%',
+                display: 'block',
+                padding: '0.5em 0em',
+                borderBottom: '1px solid #8F9BB380',
+              }}>
+              {formikContractServiceComponent.values.elevators &&
+                formikContractServiceComponent.values.elevators.length > 2 && (
+                  <TableCell
+                    sx={{
+                      width: '62%',
+                      display: 'inline-block',
+                      padding: '0em',
+                      marginTop: '-1em',
+                    }}>
+                    <Button
+                      label={
+                        showAll
+                          ? 'Hide Units'
+                          : `Show ${
+                              formikContractServiceComponent.values.elevators
+                                .length - 2
+                            } more units`
+                      }
+                      buttonProps={{
+                        variant: 'text',
+                        size: 'large',
+                        sx: {color: '#0092B2', letterSpacing: '0.02em'},
+                        startIcon: <ExpandIcon fill="#0092B2" />,
+                        onClick: handleToggleUnits,
+                      }}
+                    />
+                  </TableCell>
+                )}
+            </TableRow>
+
+            <TableRow
+              sx={{
+                width: '100%',
+                display: 'block',
+                padding: '0.5em 0em',
+              }}>
+              <TableCell sx={{width: '62%', display: 'inline-block'}} />
+
+              <TableCell
+                sx={{
+                  display: 'inline-block',
+                  borderBottom: 'none',
+                  width: '25%',
+                  textAlign: 'left',
+                }}>
+                <Typography variant="h6">
+                  {t('Total service price (excl. VAT)')}
+                </Typography>
+              </TableCell>
+
+              <TableCell
+                sx={{
+                  display: 'inline-block',
+                  textAlign: 'right',
+                  borderBottom: 'none',
+                  padding: '0em',
+                  width: '13%',
+                }}>
+                <Typography variant="h6">
+                  {formatCurrency(
+                    calculateContractInvoicePriceTotal(
+                      formikContractServiceComponent.values.elevators.filter(
+                        (elevator) => elevator.isSelected,
+                      ),
+                    ) ?? 0 / 10 ** (currentCurrency.fractionDigits ?? 0),
+                    {
+                      currency: currentCurrency.code,
+                    },
+                  )}
+                </Typography>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
+  );
+};
+
+export default ServicesForm;
