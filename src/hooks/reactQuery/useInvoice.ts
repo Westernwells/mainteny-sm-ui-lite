@@ -56,6 +56,20 @@ export const fetchInvoices = async (
   return response.data;
 };
 
+const fetchContractInvoices = async (
+  contractId: string,
+  params: QueryInvoiceParams,
+): Promise<Resource<InvoiceView>> => {
+  const response = await axiosClient.get<Resource<InvoiceView>>(
+    `/api/contracts/${contractId}/invoices`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
 export const filterByAmount = (
   invoicesRes: Resource<InvoiceView>,
   amount: InvoiceFilters['amount'],
@@ -114,6 +128,17 @@ export function useInvoices(params: QueryInvoiceParams, options?: any) {
     },
   );
 }
+
+export const useContractInvoices = (
+  contractId: string,
+  params: QueryInvoiceParams,
+  options?: UseQueryOptions<any, any, any>,
+) =>
+  useQuery<Resource<InvoiceView>, RestError>(
+    [queryKeys.fetchContractInvoices, contractId, params],
+    () => fetchContractInvoices(contractId, params),
+    {...options},
+  );
 
 export const fetchInvoice = async (invoiceId: string) => {
   const response = await axiosClient.get<InvoiceView>(

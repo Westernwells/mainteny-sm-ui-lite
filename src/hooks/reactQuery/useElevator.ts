@@ -13,6 +13,15 @@ import {useParams} from 'react-router-dom';
 import {useSnackbar} from 'hooks/useSnackbar';
 
 import {
+  CacheTypes,
+  CacheTypesParams,
+  Page,
+  Resource,
+  RestError,
+  StringValue,
+} from 'models/misc';
+import {MaintainerView} from 'models/technician';
+import {
   CustomerElevatorParams,
   ElevatorComment,
   ElevatorCommentRecord,
@@ -20,16 +29,7 @@ import {
   ElevatorRequestBody,
   ElevatorView,
   QueryTodoParams,
-} from '../../models/elevator';
-import {
-  CacheTypes,
-  CacheTypesParams,
-  Page,
-  Resource,
-  RestError,
-  StringValue,
-} from '../../models/misc';
-import {MaintainerView} from '../../models/technician';
+} from 'models/elevator';
 import {useUserSession} from './useUserSession';
 
 export const fetchElevators = async (
@@ -144,7 +144,6 @@ export function useAllElevators(
 
 export const queryCustomerElevator = async (
   params: CustomerElevatorParams,
-
   id?: string,
 ) => {
   const response = await axiosClient.get<Resource<ElevatorView>>(

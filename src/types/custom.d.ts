@@ -31,6 +31,7 @@ declare module '@mui/material/styles' {
     containedHoverBackground?: string;
     infoAlert?: string;
     mainLight?: string;
+    darkSuccess?: string;
   }
   interface PaletteColor extends CustomPalleteColor {}
   interface SimplePaletteColorOptions extends CustomPalleteColor {}

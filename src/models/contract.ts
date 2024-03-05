@@ -1,15 +1,31 @@
 import {Client} from './client';
 import {
-  Amount,
   AmountRecord,
+  Address,
+  Amount,
   Meta,
   Order,
   TimeWindowRecord,
   TimeWindowType,
 } from './misc';
-import {Elevator, ElevatorSimpleView, ElevatorView} from './elevator';
-import {PropertyOwnerSimpleView} from './propertyManager';
-import {FileResource, FileResourceRecord} from './media';
+import {
+  Elevator,
+  ElevatorAdditionalInfo,
+  ElevatorAssignmentSimpleView,
+  ElevatorCategory,
+  ElevatorOrderField,
+  ElevatorProperty,
+  ElevatorSimpleView,
+  ElevatorStatus,
+  ElevatorTimeRuleView,
+  ElevatorView,
+} from './elevator';
+import {
+  PropertyContactPersonSimpleView,
+  PropertyOwnerSimpleView,
+  PropertyOwnerView,
+} from './propertyManager';
+import {FileResource} from './media';
 import {ArticleType, CostPackage} from './article';
 import {toRestDate} from 'utils/datetime';
 
@@ -18,6 +34,15 @@ export enum ContractStatus {
   VALID = 'VALID',
   EXPIRED = 'EXPIRED',
   EXPIRING = 'EXPIRING',
+}
+
+export enum TimeUnitYearView {
+  ANNUALLY = 'Every year',
+  BIENNIALLY = 'Every 2 year',
+  TRIENNIALLY = 'Every 3 year',
+  QUADRENNIALLY = 'Every 4 year',
+  WEEKLY = 'Weekly',
+  BIWEEKLY = 'Every 2 weeks',
 }
 
 export enum ContractOrderField {
@@ -127,6 +152,7 @@ export interface ContractElevatorSimpleView {
 }
 
 export interface ContractView {
+  components: ContractComponentView[];
   additionalInfo: ContractAdditionalInfo;
   id: string;
   propertyOwner: PropertyOwnerSimpleView;
@@ -147,6 +173,8 @@ export interface ContractView {
   paymentTerm?: ContractPaymentTermView;
   start: string;
   end: string;
+  startTime?: string;
+  endTime?: string;
 }
 export interface ContractSimpleView {
   id: string;
@@ -165,6 +193,60 @@ export interface ContractSimpleView {
   externalId: string;
   meta: Meta;
   additionalInfo: ContractAdditionalInfo;
+  components?: ContractComponentView[];
+}
+
+export interface ContractComponentAdditionalInfoProps {
+  firstOrderDate: Date | null;
+  firstInvoiceDate: Date | null;
+  orderGenerationJob: string;
+  elevators: ContractServiceFormElevator[];
+  costType: ArticleType;
+  costPackage: CostPackage;
+  yearlyPrice?: number;
+}
+
+export interface ContractProps {
+  components: ContractComponentView[];
+  id: string;
+  removalDate: string;
+}
+
+export interface UpdateContractComponents {
+  firstInvoiceDate?: Date | null;
+  firstOrderDate?: Date | null;
+  group: string;
+  name: string;
+  elevators: ContractComponentElevator[];
+  costPackage?: CostPackage;
+}
+
+export interface ContractElevatorView {
+  id: string;
+  number: string;
+  model: string;
+  type: string;
+  externalId: string;
+  capacity: string;
+  category: ElevatorCategory;
+  technicianNumber: number;
+  contracts: ContractProps[];
+  availability: number;
+  address: Address;
+  propertyOwner: PropertyOwnerView;
+  propertyManager: PropertyContactPersonSimpleView;
+  properties: ElevatorProperty[];
+  lastVisitDate: string;
+  nextVisitDate: string;
+  serialNumber: string;
+  serviceTime: number;
+  status: ElevatorStatus;
+  labels: [];
+  additionalInfo: ElevatorAdditionalInfo;
+  assignments: ElevatorAssignmentSimpleView[];
+  search: string;
+  meta: Meta;
+  timeRules: ElevatorTimeRuleView[];
 }
 
 export interface CreateContractRecord {
@@ -311,6 +393,7 @@ export interface ContractUpdateRequest {
   autoRenewalCancelled: boolean;
   description?: string;
   paymentTermId?: string;
+  numberOfUnits?: number;
 }
 
 export interface ContractPaymentTermView {
@@ -335,6 +418,79 @@ export interface UpdateContractPaymentTermView {
   id: string;
 }
 
+export interface ContractElevatorQueryParams {
+  lastVisitDateEnd: any;
+  lastVisitDateStart: any;
+  neLat?: number;
+  neLng?: number;
+  nextVisitDateEnd: any;
+  nextVisitDateStart: any;
+  order: Order;
+  orderBy: ElevatorOrderField;
+  pageIndex: number;
+  pageSize: number;
+  query: string;
+  swLat?: number;
+  swLng?: number;
+  requireAppointment: boolean;
+}
+
+export interface ContractElevatorUpdate {
+  removalDate: string | null;
+}
+
+export interface ContractServiceForm {
+  id?: string;
+  name: string;
+  group?: string;
+  firstInvoiceDate?: Date | null;
+  firstOrderDate?: Date | null;
+  costType: ArticleType;
+  costPackage: CostPackage;
+  elevators: ContractServiceFormElevator[];
+  isAutomaticJobCycle?: boolean;
+  yearlyPrice?: number;
+}
+
+export interface ContractServiceFormElevator {
+  elevatorId: string;
+  invoiceJob: JobTimeUnit;
+  orderGenerationJob: JobTimeUnit;
+  price: number;
+  buildingLocation?: string;
+  address?: string;
+  externalId?: string;
+  isChecked?: boolean;
+  yearlyPrice?: number;
+}
+
+export interface ExtendedContractComponentRecord {
+  groupNumber?: number;
+  invoiceGroup?: number;
+  isChecked?: boolean;
+  id?: string;
+  name: string;
+  group: string;
+  elevators: ContractComponentElevator[];
+  firstInvoiceDate: Date | null;
+  firstOrderDate: Date | null;
+  costType: ArticleType;
+  costPackage: CostPackage;
+  isAutomaticJobCycle: boolean;
+}
+
+export interface ContractComponentRecord {
+  id?: string;
+  name: string;
+  group: string;
+  elevators: ContractComponentElevator[];
+  firstInvoiceDate: string;
+  firstOrderDate: string;
+  costType: ArticleType;
+  costPackage: CostPackage;
+  yearlyPrice?: number;
+}
+
 export interface ContractComponentView {
   id: string;
   name: string;
@@ -349,6 +505,7 @@ export interface ContractComponentAdditionalInfo {
   firstInvoiceDate?: Date | null;
   firstOrderDate?: Date | null;
   costPackage?: CostPackage;
+  elevators?: ContractComponentElevator[];
 }
 
 export interface ContractServiceForm {
@@ -373,6 +530,8 @@ export interface ContractServiceFormElevator {
   address?: string;
   externalId?: string;
   isSelected?: boolean;
+  isChecked?: boolean;
+  yearlyPrice?: number;
 }
 
 export enum ContractTimeUnit {
@@ -410,21 +569,6 @@ export interface ContractComponentElevator {
   orderGenerationJob: JobTimeUnit;
   price: number;
   isSelected?: boolean;
-}
-
-export interface ExtendedContractComponentRecord {
-  groupNumber?: number;
-  invoiceGroup?: number;
-  isChecked?: boolean;
-  id?: string;
-  name: string;
-  group: string;
-  elevators: ContractComponentElevator[];
-  firstInvoiceDate: Date | null;
-  firstOrderDate: Date | null;
-  costType: ArticleType;
-  costPackage: CostPackage;
-  isAutomaticJobCycle: boolean;
 }
 
 export interface JobTimeUnit {
@@ -515,7 +659,7 @@ export const getUniqueOrderGenerationTimeNumbers = (
 };
 
 export const calculateContractInvoicePriceTotal = (
-  array: ContractComponentElevator[] | ContractComponentElevator[],
+  array: ContractComponentElevator[],
 ) => {
   let totalPrice: number = 0;
 

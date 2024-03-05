@@ -1,124 +1,168 @@
-import useTheme from '@mui/material/styles/useTheme';
 import {CardProps} from 'components/CardProps';
-import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
 import CardTravelIcon from '@mui/icons-material/CardTravel';
-import TodayIcon from '@mui/icons-material/Today';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek';
-import WysiwygIcon from '@mui/icons-material/Wysiwyg';
-import TopicIcon from '@mui/icons-material/Topic';
 import {Grid} from '@mui/material';
 import {convertToText} from 'utils/utils';
 import {useTranslation} from 'react-i18next';
-import CalendarToday from '@mui/icons-material/CalendarToday';
 import TrendingUp from '@mui/icons-material/TrendingUp';
-import DateRange from '@mui/icons-material/DateRange';
 import MoneyOff from '@mui/icons-material/MoneyOff';
-import {FirstMaintenance} from 'models/contract';
-import {useFormatDate} from 'hooks/useFormatDate';
-import {toDate} from 'utils/datetime';
+import {ReactComponent as InfoIcon} from 'assets/icons/Info.svg';
+import {ReactComponent as AutorenewIcon} from 'assets/icons/Autorenew.svg';
+import {ReactComponent as NumberIcon} from 'assets/icons/number.svg';
+import {ReactComponent as ElevetorIcon} from 'assets/icons/Elevator.svg';
+import {ReactComponent as BellIcon} from 'assets/icons/bell.svg';
+import useTheme from '@mui/material/styles/useTheme';
 
 interface Props {
   name?: string;
-  type?: string;
-  numberOfVisits?: number;
   costPerYear?: string | number;
-  spendingLimit?: string;
   renewalPeriod?: number;
-  invoiceCycle?: string;
   numberOfUnits?: number;
-  paymentDue?: number;
   yearlyPriceAdjustment?: number;
-  noticePreiod?: number;
+  noticePeriod?: number;
   discount?: string[];
-  firstMaintenance?: FirstMaintenance;
-  firstInvoiceDate?: string;
+  start?: string;
+  end?: string;
+  contractNumber?: string;
+  autoRenewal?: boolean;
 }
 
 export const ContractBasic = ({
   costPerYear,
   name,
-  spendingLimit,
-  invoiceCycle,
   numberOfUnits,
-  numberOfVisits,
   renewalPeriod,
-  paymentDue,
   yearlyPriceAdjustment,
-  noticePreiod,
+  noticePeriod,
   discount,
-  type,
-  firstMaintenance,
-  firstInvoiceDate,
+  start,
+  end,
+  autoRenewal,
+  contractNumber,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
-  const formatDate = useFormatDate();
 
   return (
     <Grid container rowGap={2}>
-      <Grid item xs={4}>
+      <Grid item xs={6} sm={4} md={3}>
         <CardProps
-          label="CONTRACT NAME"
+          label="Contract Name"
           bodyTextVariant="subtitle1"
-          icon={<CardTravelIcon color="info" />}
-          iconBackground={theme.palette.info.outlinedHoverBg}
+          icon={<InfoIcon fontSize="1.5rem" />}
           iconMaxHeight="3rem"
           bodyText={convertToText(name || '-')}
+          bodyStyle={{fontWeight: '600'}}
+          iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
+          labelStyle={{
+            textTransform: 'none',
+          }}
         />
       </Grid>
 
-      <Grid item xs={4}>
+      <Grid item xs={6} sm={4} md={3}>
         <CardProps
-          label="CONTRACT TYPE"
+          label="Contract Start"
           bodyTextVariant="subtitle1"
-          icon={<CardTravelIcon color="info" />}
-          iconBackground={theme.palette.info.outlinedHoverBg}
+          icon={<CardTravelIcon />}
           iconMaxHeight="3rem"
-          bodyText={convertToText(type || '-')}
+          bodyText={convertToText(start?.replace(/-/g, '.') || '-')}
+          bodyStyle={{fontWeight: '600'}}
+          iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
+          labelStyle={{
+            textTransform: 'none',
+          }}
         />
       </Grid>
-      <Grid item xs={4}>
+
+      <Grid item xs={6} sm={4} md={3}>
         <CardProps
-          label="NUMBER OF VISITS"
+          label="Contract Value"
           bodyTextVariant="subtitle1"
-          icon={<TodayIcon color="info" />}
+          icon={<AttachMoneyIcon />}
           containerStyles={{mr: '0.5em'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
           iconMaxHeight="3rem"
-          bodyText={`${numberOfVisits}` || '-'}
+          bodyText={`${costPerYear ? `${`${costPerYear}/${t('Year')}`}` : '-'}`}
+          bodyStyle={{fontWeight: '600'}}
+          iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
+          labelStyle={{
+            textTransform: 'none',
+          }}
         />
       </Grid>
-      <Grid item xs={4}>
+
+      <Grid item xs={6} sm={4} md={3}>
         <CardProps
-          label="PRICE/YEAR (Excl VAT)"
+          label="Auto-renewal"
           bodyTextVariant="subtitle1"
-          icon={<AttachMoneyIcon color="info" />}
+          icon={<AutorenewIcon fontSize="1.5rem" />}
           containerStyles={{mr: '0.5em'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
           iconMaxHeight="3rem"
-          bodyText={`${costPerYear}` || '-'}
+          bodyText={autoRenewal ? 'Yes' : 'No'}
+          bodyStyle={{fontWeight: '600'}}
+          iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
+          labelStyle={{
+            textTransform: 'none',
+          }}
         />
       </Grid>
-      <Grid item xs={4}>
+
+      <Grid item xs={6} sm={4} md={3}>
         <CardProps
-          label="SPENDING LIMIT"
+          label="Contract Number"
           bodyTextVariant="subtitle1"
-          icon={<MonetizationOnOutlinedIcon color="info" />}
+          icon={<NumberIcon fontSize="1.5rem" />}
           containerStyles={{mr: '0.5em'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
           iconMaxHeight="3rem"
-          bodyText={spendingLimit || '-'}
+          bodyText={contractNumber || '-'}
+          bodyStyle={{fontWeight: '600'}}
+          iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
+          labelStyle={{
+            textTransform: 'none',
+          }}
         />
       </Grid>
-      <Grid item xs={4}>
+
+      <Grid item xs={6} sm={4} md={3}>
         <CardProps
-          label="RENEWAL PERIOD"
+          label="Contract ends"
           bodyTextVariant="subtitle1"
-          icon={<CalendarViewWeekIcon color="info" />}
-          containerStyles={{mr: '0.5em'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
+          icon={<CardTravelIcon />}
           iconMaxHeight="3rem"
+          bodyText={convertToText(end?.replace(/-/g, '.') || '-')}
+          bodyStyle={{fontWeight: '600'}}
+          iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
+          labelStyle={{
+            textTransform: 'none',
+          }}
+        />
+      </Grid>
+
+      <Grid item xs={6} sm={4} md={3}>
+        <CardProps
+          label="Price Adjustment"
+          bodyTextVariant="subtitle1"
+          icon={<TrendingUp />}
+          bodyText={
+            yearlyPriceAdjustment
+              ? `${`${yearlyPriceAdjustment}%/${t('Year')}`}`
+              : '-'
+          }
+          bodyStyle={{fontWeight: '600'}}
+          iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
+          labelStyle={{
+            textTransform: 'none',
+          }}
+        />
+      </Grid>
+
+      <Grid item xs={6} sm={4} md={3}>
+        <CardProps
+          label="Renewal period"
+          bodyTextVariant="subtitle1"
+          icon={<CalendarViewWeekIcon />}
+          containerStyles={{mr: '0.5em'}}
           bodyText={
             renewalPeriod && renewalPeriod > 1
               ? t('{{time}} months', {time: renewalPeriod})
@@ -126,121 +170,61 @@ export const ContractBasic = ({
               ? t('{{hours}} month', {hours: renewalPeriod})
               : '0'
           }
+          bodyStyle={{fontWeight: '600'}}
+          iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
+          labelStyle={{
+            textTransform: 'none',
+          }}
         />
       </Grid>
-      <Grid item xs={4}>
+
+      <Grid item xs={6} sm={4} md={6}>
         <CardProps
-          label="INVOICE CYCLE"
+          label="Number of units"
           bodyTextVariant="subtitle1"
-          icon={<WysiwygIcon color="info" />}
-          containerStyles={{mr: '0.5em'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
-          iconMaxHeight="3rem"
-          bodyText={typeof invoiceCycle === 'string' ? t(invoiceCycle) : '-'}
-        />
-      </Grid>
-      <Grid item xs={4}>
-        <CardProps
-          label="NUMBER OF UNITS"
-          bodyTextVariant="subtitle1"
-          icon={<TopicIcon color="info" />}
-          containerStyles={{mr: '0.5em'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
-          iconMaxHeight="3rem"
+          icon={<ElevetorIcon fontSize="1.5rem" />}
           bodyText={`${numberOfUnits}` || '-'}
+          bodyStyle={{fontWeight: '600'}}
+          iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
+          labelStyle={{
+            textTransform: 'none',
+          }}
         />
       </Grid>
 
-      <Grid item xs={4}>
+      <Grid item xs={6} sm={4} md={3}>
         <CardProps
-          label="PAYMENT DUE"
+          label="Invoice Discount"
           bodyTextVariant="subtitle1"
-          icon={<CalendarToday color="info" />}
-          containerStyles={{mr: '0.5em'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
-          iconMaxHeight="3rem"
-          bodyText={
-            paymentDue && paymentDue > 1
-              ? t('{{time}} days', {time: paymentDue})
-              : paymentDue && paymentDue === 1
-              ? t('{{time}} day', {time: paymentDue})
-              : !paymentDue && '-'
-          }
-        />
-      </Grid>
-
-      <Grid item xs={4}>
-        <CardProps
-          label="YEARLY PRICE ADJUSTMENT"
-          bodyTextVariant="subtitle1"
-          icon={<TrendingUp color="info" />}
-          containerStyles={{mr: '0.5em'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
-          iconMaxHeight="3rem"
-          bodyText={yearlyPriceAdjustment ? `${yearlyPriceAdjustment}%` : '-'}
-        />
-      </Grid>
-
-      <Grid item xs={4}>
-        <CardProps
-          label="NOTICE PERIOD"
-          bodyTextVariant="subtitle1"
-          icon={<DateRange color="info" />}
-          containerStyles={{mr: '0.5em'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
-          iconMaxHeight="3rem"
-          bodyText={
-            noticePreiod && noticePreiod > 1
-              ? t('{{time}} months', {time: noticePreiod})
-              : noticePreiod && noticePreiod === 1
-              ? t('{{hours}} month', {hours: noticePreiod})
-              : !noticePreiod && '-'
-          }
-        />
-      </Grid>
-
-      <Grid item xs={4}>
-        <CardProps
-          label="DISCOUNT"
-          bodyTextVariant="subtitle1"
-          icon={<MoneyOff color="info" />}
-          containerStyles={{mr: '0.5em'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
-          iconMaxHeight="3rem"
+          icon={<MoneyOff />}
           bodyText={discount ? `${discount}` : '-'}
+          bodyStyle={{fontWeight: '600'}}
+          iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
+          labelStyle={{
+            textTransform: 'none',
+          }}
         />
       </Grid>
 
-      <Grid item xs={4}>
+      <Grid item xs={6} sm={4} md={3}>
         <CardProps
-          label="FIRST MAINTENANCE VISIT"
+          label="Notice period"
           bodyTextVariant="subtitle1"
-          icon={<CalendarToday color="info" />}
+          icon={<BellIcon />}
           containerStyles={{mr: '0.5em'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
           iconMaxHeight="3rem"
           bodyText={
-            firstMaintenance
-              ? `${formatDate(
-                  new Date(firstMaintenance.year, firstMaintenance.month - 1),
-                  'MMM yyyy',
-                )}`
-              : '-'
+            noticePeriod && noticePeriod > 1
+              ? t('{{time}} months', {time: noticePeriod})
+              : noticePeriod && noticePeriod === 1
+              ? t('{{hours}} month', {hours: noticePeriod})
+              : !noticePeriod && '-'
           }
-        />
-      </Grid>
-
-      <Grid item xs={4}>
-        <CardProps
-          label="FIRST INVOICE"
-          bodyTextVariant="subtitle1"
-          icon={<CalendarToday color="info" />}
-          containerStyles={{mr: '0.5em'}}
-          iconBackground={theme.palette.info.outlinedHoverBg}
-          iconMaxHeight="3rem"
-          bodyText={
-            firstInvoiceDate ? `${formatDate(toDate(firstInvoiceDate))}` : '-'
-          }
+          bodyStyle={{fontWeight: '600'}}
+          iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
+          labelStyle={{
+            textTransform: 'none',
+          }}
         />
       </Grid>
     </Grid>

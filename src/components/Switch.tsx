@@ -37,6 +37,10 @@ export const Switch = ({label = '', value, getValue, onChanged}: Props) => {
     }
   }, [checked]);
 
+  useEffect(() => {
+    setChecked(value as boolean);
+  }, [value]);
+
   return (
     <FormGroup>
       <FormControlLabel

@@ -1,4 +1,4 @@
-import {FC, useEffect, useMemo, useState} from 'react';
+import React, {FC, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -10,24 +10,19 @@ import {
 } from 'hooks/reactQuery/useContract';
 import useTheme from '@mui/material/styles/useTheme';
 import EditIcon from '@mui/icons-material/Edit';
-import {PopperProps, useMediaQuery} from '@mui/material';
 import {useParams} from 'react-router-dom';
 import {useFormik} from 'formik';
 import {
   ContractOrderField,
   ContractRequestBody,
-  ContractStatus,
   ContractUpdateRequest,
   ContractView,
 } from 'models/contract';
 import {InfoCard} from 'components/InfoCard';
 import {Dialog} from 'components/Dialog';
 import {Progress} from 'components/Progress';
-import {EmptySection} from 'components/EmptySection';
-import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
-import {Button} from 'components/Button';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import * as Yup from 'yup';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
 import {
   amountForView,
   amountRecordForBackend,
@@ -37,24 +32,30 @@ import {
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {
-  calculateRenewDays,
-  contractTypeMap,
-  invoiceCycle,
-} from 'utils/contract-utils';
-import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
-import Tooltip from '@mui/material/Tooltip';
-import {formatDate, isDateInPast} from 'utils/datetime';
-import {StatusChip} from 'components/StatusChip';
-import {capitalize} from 'lodash';
+import {calculateRenewDays} from 'utils/contract-utils';
+import {ReactComponent as BusinessContractApprove} from 'assets/icons/business-contract-approve-gray.svg';
+import {ReactComponent as TimeIcon} from 'assets/icons/time.svg';
 import {Order} from 'models/misc';
 import {createEmptyResource} from 'utils/paging-utils';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Divider from '@mui/material/Divider';
+import Menu from '@mui/material/Menu';
+import MoreIcon from '@mui/icons-material/MoreVert';
+import IconButton from '@mui/material/IconButton';
+import CancelIcon from '@mui/icons-material/Cancel';
+import {UserSession} from 'models/session';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
 import EditContractForm from './EditContractForm';
-import {ContractParties} from './ContractParties';
-import {DescriptionForm} from './DescriptionForm';
+import {SectionTitle} from '../../../InvoiceDetails/SectionTitle';
+import {CancelContract} from './CancelContract';
+import {Parties} from './Parties';
+import {AttachDocument} from './AttachDocument';
+import {Services} from './Services';
+import InvoiceSetup from './InvoiceSetup';
 
 interface Props {
   contractDetails: ContractView;
@@ -79,18 +80,25 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const currency = contractDetails?.currency ?? currentCurrency.code;
   const {id: contractId} = useParams();
   const theme = useTheme();
-  const {mutateAsync: updateContract} = useUpdateContract('Contract updated');
+  const {mutateAsync: updateContract, isLoading: isUpdateLoading} =
+    useUpdateContract('Contract updated');
   const {user} = useUserSession();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [openContractDialog, setOpenContractDialog] = useState(false);
   const [openDocumentDialog, setOpenDocumentDialog] = useState(false);
 
-  const [documents, setDocuments] = useState<FileWithPreview[]>([]);
-  const [openDescriptionDialog, setOpenDescriptionDialog] = useState(false);
+  const [openCancelContract, setCancelContract] = useState(false);
+  const [cancellationDate, setCancellationDate] = useState(
+    contractDetails?.end || '',
+  );
 
-  const {mutateAsync: uploadFiles, isLoading: isFileUploadLoading} =
-    useUploadFiles('Documents uploaded successfully');
+  const [documents, setDocuments] = useState<FileWithPreview[]>([]);
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const {mutateAsync: uploadFiles, isLoading: isUploadLoading} = useUploadFiles(
+    'Documents uploaded successfully',
+  );
 
   const {data: downloadUrls = {}} = useDownloadUrl(
     contractDetails?.additionalInfo?.documents
@@ -158,6 +166,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       endDate: contractDetails?.end ?? '',
       autoRenewalCancelled:
         contractDetails?.additionalInfo.autoRenewalCancelled ?? false,
+      numberOfUnits: contractDetails?.elevators?.length,
     },
     onSubmit: () => {},
     enableReinitialize: true,
@@ -172,20 +181,24 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     setUpdatedValue(formik.values.externalId!);
   }, [formik]);
 
+  useEffect(() => {
+    if (contractDetails?.end) {
+      setCancellationDate(contractDetails?.end);
+    }
+  }, [contractDetails?.end]);
+
   const onContractSave = async () => {
     const contractNameType =
       user?.userAccount?.serviceCompany?.settings?.contractNameTypes.find(
         (item) => item.name === formik.values.name,
       );
-    const isContractRenewable =
-      !formik.values.renewalTerms && isDateInPast(formik.values.endDate);
 
     const updatedContract = {
       ...contractDetails?.additionalInfo,
       type: contractNameType?.type || '',
       name: formik.values?.name || '',
       renewalTerms: formik.values.renewalTerms ? formik.values.renewalTerms : 0,
-      renewalDate: isContractRenewable
+      renewalDate: formik.values.autoRenewalCancelled
         ? null
         : contractDetails?.additionalInfo.renewalDate,
       price: {
@@ -214,7 +227,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       paymentTermId: formik.values.paymentTermId,
       description: formik.values.description,
       externalId: formik.values.externalId,
-      autoRenewalCancelled: isContractRenewable,
+      autoRenewalCancelled: formik.values.autoRenewalCancelled,
     };
 
     await updateContract({
@@ -224,75 +237,86 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     setOpenContractDialog(false);
   };
 
+  const onCancelContract = async () => {
+    const updatedContract = {
+      autoRenewalCancelled: true,
+      endDate: cancellationDate,
+    };
+
+    await updateContract({
+      body: updatedContract as any,
+      contractId: contractId!,
+    });
+    setCancelContract(false);
+  };
+
+  const uploadedDocument = contractDetails?.additionalInfo?.documents;
+
   const onDocsPreview = async () => {
     const serviceCompanyId = user?.userAccount.serviceCompany.id;
     const uploadPath = `${serviceCompanyId}/contracts/${contractId}/documents`;
     await uploadFiles({files: documents, uploadPath});
-    const updatedContract = {
-      ...contractDetails,
-      ...contractDetails?.additionalInfo,
-      documents: [
-        ...documents.map((item) => ({
-          description: item.name.split('.')[0],
-          type: item.type,
-          uri: `${uploadPath}/${item.name}`,
-        })),
-      ],
-      startDate: contractDetails?.start,
-      endDate: contractDetails?.end,
-    };
+
+    const updatedDocuments = uploadedDocument?.length
+      ? [
+          ...uploadedDocument,
+          ...documents.map((item) => ({
+            description: item.name.split('.')[0],
+            type: item.type,
+            uri: `${uploadPath}/${item.name}`,
+          })),
+        ]
+      : [
+          ...documents.map((item) => ({
+            description: item.name.split('.')[0],
+            type: item.type,
+            uri: `${uploadPath}/${item.name}`,
+          })),
+        ];
+
     await updateContract({
-      body: updatedContract as Partial<ContractRequestBody>,
+      body: {
+        documents: updatedDocuments,
+      } as Partial<ContractRequestBody>,
       contractId: contractId!,
     });
     setOpenDocumentDialog(false);
   };
 
-  const onRemoveDoc = async () => {
+  const onRemoveDoc = async (id: string) => {
+    const documentsToSave = uploadedDocument?.length
+      ? uploadedDocument?.filter((d) => d.id !== id)
+      : [];
+
     await updateContract({
       body: {
-        documents: [],
+        documents: documentsToSave,
       } as Partial<ContractRequestBody>,
       contractId: contractId!,
     });
   };
-
-  const handleSaveDescription = () => {
-    updateContract(
-      {
-        body: {
-          description: formik.values.description,
-        } as Partial<ContractRequestBody>,
-        contractId: contractId!,
-      },
-      {onSuccess: () => setOpenDescriptionDialog(false)},
-    );
-  };
-
-  const handleAutoRenewal = () => {
-    formik.setFieldValue(
-      'autoRenewalCancelled',
-      !formik.values.autoRenewalCancelled,
-    );
-  };
-
   const handleCancel = () => {
     formik.resetForm();
     setOpenContractDialog(false);
   };
 
-  const headerStyles = useMemo(
-    () => ({
-      display: 'flex',
-      justifyContent: 'space-between',
-      width: '100%',
-      paddingX: 1,
-      paddingY: 0.5,
-      backgroundColor: theme.palette.inputBackground.main,
-      borderRadius: '4px',
-    }),
-    [],
-  );
+  const actions = useMemo(() => {
+    const items = [];
+
+    items.push({
+      label: t('Edit'),
+      icon: <EditIcon />,
+      onClick: () => setOpenContractDialog(true),
+    });
+
+    items.push({
+      label: t('Cancel contract'),
+      icon: <CancelIcon />,
+      onClick: () => setCancelContract(true),
+    });
+
+    return items;
+  }, []);
 
   const unUsedContractDays =
     (!isLoading && calculateRenewDays(contractDetails)) || 0;
@@ -301,7 +325,59 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
     return <Progress />;
   }
 
-  const uploadedDocument = contractDetails?.additionalInfo?.documents;
+  const handleClick = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const renderMenu = () => (
+    <Menu
+      id="actions-menu"
+      anchorEl={anchorEl}
+      open={open}
+      onClose={handleClose}
+      MenuListProps={{
+        'aria-labelledby': 'actions-button',
+      }}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      transformOrigin={{
+        vertical: 'bottom',
+        horizontal: 'right',
+      }}>
+      {actions.map((item, index) => (
+        <Box key={`${item.label}-${index}`}>
+          <MenuItem
+            onClick={() => {
+              item.onClick();
+              handleClose();
+            }}
+            sx={{py: '0.5rem'}}>
+            <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItemText>
+              <Typography variant="body2">{item.label}</Typography>
+            </ListItemText>
+          </MenuItem>
+          {index === 0 && actions.length > 0 && (
+            <Divider
+              sx={{
+                flexBasis: '100%',
+                border: `0.5px solid ${theme.palette.action.disabledBackground}`,
+                mt: '-0.5em',
+                mb: '1em',
+              }}
+            />
+          )}
+        </Box>
+      ))}
+    </Menu>
+  );
+
   return (
     <Box>
       <Grid
@@ -313,39 +389,24 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
         <Grid item xs={12} md={8}>
           <InfoCard
             minHeight="12rem"
-            headerStyles={headerStyles}
-            bodyContainerStyle={{}}
-            handleAction={() => setOpenContractDialog(true)}
             header={
-              <Box sx={{display: 'flex', alignItems: 'center'}}>
-                <Typography variant="subtitle1">
-                  {contractDetails?.externalId}
-                </Typography>
-
-                <StatusChip
-                  color={
-                    contractDetails?.status === ContractStatus.VALID
-                      ? 'success'
-                      : contractDetails?.status === ContractStatus.EXPIRING
-                      ? 'warning'
-                      : 'error'
-                  }
-                  label={
-                    contractDetails?.status === ContractStatus.PENDING ||
-                    contractDetails?.status === ContractStatus.EXPIRED
-                      ? 'Inactive'
-                      : contractDetails?.status === ContractStatus.VALID
-                      ? 'Active'
-                      : capitalize(contractDetails?.status!)
-                  }
-                  style={{ml: '2em'}}
-                />
-              </Box>
+              <SectionTitle
+                Icon={BusinessContractApprove}
+                title="Basic Information"
+                containerSx={{backgroundColor: 'unset'}}
+              />
             }
-            headerActionIcon={<EditIcon />}>
+            headerActionIcon={
+              <>
+                <IconButton onClick={handleClick}>
+                  <MoreIcon fontSize="small" sx={{color: 'action.active'}} />
+                </IconButton>
+                {renderMenu()}
+              </>
+            }>
             {/** TODO: Pass down the full contract instead of long props */}
             <ContractBasic
-              numberOfVisits={contractDetails?.visitsNumber}
+              autoRenewal={contractDetails?.additionalInfo.autoRenewalCancelled}
               costPerYear={
                 formatCurrency(
                   (contractDetails?.additionalInfo?.price?.netAmount || 0) /
@@ -355,25 +416,13 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   {currency: contractDetails.additionalInfo.price?.currency},
                 ) || '-'
               }
-              spendingLimit={formatCurrency(
-                contractDetails ? contractDetails?.spendingLimit : 0,
-                {currency: contractDetails.additionalInfo.price?.currency},
-              )}
               renewalPeriod={contractDetails?.additionalInfo?.renewalTerms}
-              invoiceCycle={
-                contractDetails?.additionalInfo?.invoiceCycle !== undefined &&
-                contractDetails?.additionalInfo?.invoiceCycle >= 0
-                  ? invoiceCycle[contractDetails?.additionalInfo?.invoiceCycle]
-                  : ''
-              }
               numberOfUnits={contractDetails?.elevators?.length}
-              type={contractTypeMap[contractDetails?.type]}
               name={contractDetails?.name}
-              paymentDue={contractDetails?.additionalInfo?.invoiceDueDays}
               yearlyPriceAdjustment={
                 contractDetails?.additionalInfo?.annualPriceAdjustmentPercentage
               }
-              noticePreiod={
+              noticePeriod={
                 contractDetails?.additionalInfo?.noticePeriodInMonth
               }
               discount={contractDetails?.additionalInfo?.discounts?.map(
@@ -383,57 +432,22 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                     days: item.days,
                   })}`,
               )}
-              firstMaintenance={contractDetails.additionalInfo.firstMaintenance}
-              firstInvoiceDate={contractDetails.additionalInfo.firstInvoiceDate}
+              start={contractDetails.start}
+              end={contractDetails.end}
+              contractNumber={contractDetails.externalId}
             />
             <Dialog
               title="Edit Contract"
+              isSaving={isUpdateLoading}
               onCancel={handleCancel}
               disableSaveBtn={
                 !!Object.keys(formik.errors).length || !formik.dirty
               }
-              onSave={() => onContractSave()}
-              dialogProps={{open: openContractDialog || false}}
-              leftButton={
-                <Tooltip
-                  title={
-                    !formik.values.autoRenewalCancelled
-                      ? t('This contract is ending on {{endDate}}', {
-                          endDate: formatDate(formik.values.endDate),
-                        })
-                      : ''
-                  }
-                  placement="top-end"
-                  arrow
-                  PopperProps={
-                    {
-                      sx: {
-                        marginRight: '-4.6em !important',
-                      },
-                    } as Partial<PopperProps> | undefined
-                  }>
-                  <span>
-                    <Button
-                      buttonProps={{
-                        onClick: handleAutoRenewal,
-                        size: 'large',
-                        sx: {marginLeft: '1em'},
-                        color: !formik.values.autoRenewalCancelled
-                          ? 'error'
-                          : 'primary',
-                        endIcon: !formik.values.autoRenewalCancelled && (
-                          <ReportProblemOutlinedIcon />
-                        ),
-                      }}>
-                      <Typography variant="subtitle2">
-                        {!formik.values.autoRenewalCancelled
-                          ? t('End Contract')
-                          : t('Resume Contract')}
-                      </Typography>
-                    </Button>
-                  </span>
-                </Tooltip>
-              }>
+              dialogProps={{
+                maxWidth: 'md',
+                open: openContractDialog || false,
+              }}
+              onSave={() => onContractSave()}>
               {!isLoading && (
                 <EditContractForm
                   formik={formik}
@@ -442,6 +456,14 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 />
               )}
             </Dialog>
+            <CancelContract
+              isLoading={isUpdateLoading}
+              onCancelContract={onCancelContract}
+              setCancelContract={setCancelContract}
+              openCancelContract={openCancelContract}
+              setCancellationDate={setCancellationDate}
+              endDate={cancellationDate}
+            />
           </InfoCard>
         </Grid>
         <Grid item xs={12} md={4}>
@@ -451,26 +473,28 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               <Typography
                 variant="subtitle1"
                 sx={{
-                  backgroundColor: theme.palette.inputBackground.main,
                   paddingY: 0.5,
                   paddingX: 1,
                   borderRadius: '4px',
+                  fontWeight: '600',
+                  display: 'flex',
+                  gap: '10px',
+                  alignItems: 'center',
                 }}>
-                {t('Contract Timeline')}
+                <TimeIcon width="1.5em" height="1.5em" />
+                {t('History')}
               </Typography>
             }>
             {unUsedContractDays > 0 && unUsedContractDays <= 30 ? (
               <Alert
-                variant="filled"
-                severity="warning"
-                sx={{
-                  mb: '1em',
-                  background: theme.palette.warning.outlinedHoverBg,
-                  color: theme.palette.warning.main,
-                }}>
-                {t('Contract renews in {{unUsedContractDays}} days!', {
-                  unUsedContractDays,
-                })}
+                severity="info"
+                sx={{mt: '1em', mb: '1em', py: '0.6em', alignItems: 'center'}}>
+                <Typography>
+                  {t('Contract renews in {{unUsedContractDays}} days!', {
+                    unUsedContractDays,
+                  })}
+                  <br />
+                </Typography>
               </Alert>
             ) : null}
 
@@ -481,217 +505,28 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
           </ContractCard>
         </Grid>
 
-        <Grid item xs={12} md={8}>
-          <ContractCard
-            containerStyles={{
-              mt: '1em',
-              '& .MuiCardHeader-root': {
-                pb: 0,
-              },
-              height: 'calc(100% - 1em)',
-            }}
-            header={
-              <Box sx={headerStyles}>
-                <Typography variant="subtitle1" mr="0.5em">
-                  {t('Parties')}
-                </Typography>
-              </Box>
-            }>
-            <ContractParties
-              name={user?.userAccount.serviceCompany.name}
-              occupation="Service Company"
-              address={
-                user?.userAccount.serviceCompany.postalAddress?.fullName ?? ''
-              }
-              phoneNumber={user?.userAccount.serviceCompany.contact.phone}
-              partyType="CONTRACTOR"
-              chipStyles={{
-                chipMaxChars: 15,
-                chipColor: 'warning',
-              }}
-            />
-            <ContractParties
-              name={contractDetails?.propertyOwner.name}
-              occupation="Property Owner"
-              address={
-                contractDetails?.propertyOwner.billingAddress?.fullName ?? ''
-              }
-              phoneNumber={contractDetails?.propertyOwner.contact.phone}
-              partyType="CUSTOMER"
-              chipStyles={{
-                chipColor: 'primary',
-              }}
-            />
-          </ContractCard>
-        </Grid>
+        <Parties contractDetails={contractDetails} user={user as UserSession} />
 
-        <Grid item xs={12} md={4}>
-          <ContractCard
-            containerStyles={{
-              mt: !isMobile ? '1em' : 0,
-              pt: 2,
-              px: 2,
-              height: 'calc(100% - 1em)',
-              '& .MuiCardHeader-root': {
-                ...headerStyles,
-                py: 0,
-              },
-            }}
-            header={
-              <Box sx={headerStyles}>
-                <Typography variant="subtitle1" mr="0.5em">
-                  {t('Document')}
-                </Typography>
-              </Box>
-            }
-            headerActionIcon={
-              <Typography color="#2196F3">{`+ ${t('Add')}`}</Typography>
-            }
-            headerAction={() => setOpenDocumentDialog(true)}>
-            {uploadedDocument && uploadedDocument[0] ? (
-              <Box
-                sx={{
-                  height: '9.688em',
-                  overflowY: 'auto',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  flexDirection: 'column',
-                }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mt: 2,
-                    cursor: 'pointer',
-                  }}>
-                  <Box
-                    sx={{
-                      border: '1px solid #8F9BB380',
-                      padding: '1em',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      borderRadius: '4px',
-                    }}
-                    onClick={() =>
-                      window.open(
-                        downloadUrls[
-                          contractDetails?.additionalInfo?.documents![0]?.uri
-                        ],
-                        '_blank',
-                      )
-                    }>
-                    <FileCopyIcon
-                      fontSize="large"
-                      htmlColor="rgba(15, 76, 100, 0.5)"
-                    />
-                  </Box>
-                  <Typography
-                    align="center"
-                    sx={{color: 'text.secondary', marginTop: '0.625em'}}>
-                    {uploadedDocument && uploadedDocument[0].description}
-                  </Typography>
-                  <Button
-                    buttonProps={{
-                      color: 'error',
-                      onClick: onRemoveDoc,
-                    }}>
-                    Remove
-                  </Button>
-                </Box>
-              </Box>
-            ) : (
-              <EmptySection
-                label="No documents attached. They will appear here once added!"
-                illustration="clipboard"
-                size="tiny"
-                containerStyle={{
-                  height: '100%',
-                }}
-              />
-            )}
-            <Dialog
-              title="Add Documents"
-              isSaving={isFileUploadLoading}
-              onCancel={() => setOpenDocumentDialog(false)}
-              onSave={() => onDocsPreview()}
-              disableSaveBtn={!documents.length}
-              dialogProps={{
-                maxWidth: 'md',
-                open: openDocumentDialog || false,
-              }}>
-              <MyDropZone
-                getAcceptedFiles={(dropedFiles) => {
-                  setDocuments(dropedFiles);
-                }}
-                acceptedFileTypes={[
-                  'image/*',
-                  'application/pdf',
-                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                  'application/vnd.ms-excel',
-                  'text/tab-separated-values',
-                  'text/csv',
-                ]}
-                maxFiles={1}
-                getRejectedFileWithErrors={(file) => {
-                  console.log(file);
-                }}
-              />
-            </Dialog>
-          </ContractCard>
-        </Grid>
+        <AttachDocument
+          uploadedDocument={uploadedDocument}
+          setOpenDocumentDialog={setOpenDocumentDialog}
+          setDocuments={setDocuments}
+          downloadUrls={downloadUrls}
+          onRemoveDoc={onRemoveDoc}
+          onDocsPreview={onDocsPreview}
+          openDocumentDialog={openDocumentDialog}
+          documents={documents}
+          isUpdateLoading={isUpdateLoading || isUploadLoading}
+          contractId={contractId}
+          updateContract={updateContract as unknown as () => void}
+        />
 
-        <Grid item xs={12} md={12}>
-          <ContractCard
-            containerStyles={{
-              mt: !isMobile ? '1em' : 0,
-              pt: 2,
-              px: 2,
-              height: '100%',
-              '& .MuiCardHeader-root': {
-                ...headerStyles,
-                py: 0,
-              },
-            }}
-            header={
-              <Box sx={headerStyles}>
-                <Typography variant="subtitle1" mr="0.5em">
-                  {t('Description')}
-                </Typography>
-              </Box>
-            }
-            headerActionIcon={<EditIcon />}
-            headerAction={() => setOpenDescriptionDialog(true)}>
-            {contractDetails.description ? (
-              <Typography variant="body2">
-                {contractDetails.description}
-              </Typography>
-            ) : (
-              <EmptySection
-                label="No description added."
-                illustration="clipboard"
-                size="tiny"
-                containerStyle={{
-                  height: '100%',
-                }}
-              />
-            )}
-            <Dialog
-              title="Edit Description"
-              onCancel={() => setOpenDescriptionDialog(false)}
-              disableSaveBtn={!!Object.keys(formik.errors).length}
-              onSave={handleSaveDescription}
-              dialogProps={{
-                maxWidth: 'sm',
-                open: openDescriptionDialog,
-              }}>
-              <DescriptionForm formik={formik} />
-            </Dialog>
-          </ContractCard>
-        </Grid>
+        <Services contractDetails={contractDetails} />
+        <InvoiceSetup
+          contractId={contractId}
+          updateContract={updateContract as unknown as () => void}
+          components={contractDetails.components}
+        />
       </Grid>
     </Box>
   );

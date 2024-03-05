@@ -4,9 +4,9 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import Typography from '@mui/material/Typography';
 import {IconButton} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import Typography from '@mui/material/Typography';
 import {Button} from './Button';
 
 interface Props {

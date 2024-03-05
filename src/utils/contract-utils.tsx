@@ -5,8 +5,21 @@ import {
   startOfDay,
   subMonths,
 } from 'date-fns';
-import {ContractStatus, ContractTypes, ContractView} from 'models/contract';
-import {toDate} from 'utils/datetime';
+import {
+  ContractComponentElevator,
+  ContractComponentRecord,
+  ContractComponentView,
+  ContractElevatorView,
+  ContractServiceFormElevator,
+  ContractStatus,
+  ContractTimeUnit,
+  ContractTypes,
+  ContractView,
+  ExtendedContractComponentRecord,
+  UpdateContractComponents,
+} from 'models/contract';
+import {toDate, toRestDate} from 'utils/datetime';
+import {ElevatorView} from 'models/elevator';
 
 export const costRangeConvertor = (
   selectedItems: string[],
@@ -126,4 +139,218 @@ export const getContractStatusStyles = (
     default:
       return {label: '-', color: 'default'};
   }
+};
+
+export const calculateContractInvoicePriceTotal = (
+  array?: ContractComponentElevator[],
+) => {
+  let totalPrice: number = 0;
+
+  array?.forEach((item: ContractComponentElevator) => {
+    if (item?.invoiceJob?.timeNumbers) {
+      const timeNumbersLength: number = item.invoiceJob.timeNumbers.length;
+      const itemPrice: number = item.price;
+      const itemTotalPrice: number = timeNumbersLength
+        ? timeNumbersLength * itemPrice
+        : itemPrice;
+
+      totalPrice += itemTotalPrice;
+    }
+  });
+
+  return totalPrice;
+};
+
+export const componentsToMutate = (
+  components: ContractComponentView[],
+): UpdateContractComponents[] =>
+  components?.map((c) => ({
+    firstInvoiceDate: c.additionalInfo?.firstInvoiceDate,
+    firstOrderDate: c.additionalInfo?.firstOrderDate,
+    group: c?.group,
+    name: c.name,
+    costPackage: c.additionalInfo?.costPackage,
+    costType: c.additionalInfo?.costType,
+    elevators: c.additionalInfo?.elevators,
+  })) as UpdateContractComponents[];
+
+export const calculateContractInvoiceRowPrice = (
+  elevatorRow: ContractServiceFormElevator,
+) => {
+  if (elevatorRow?.invoiceJob?.timeNumbers?.length) {
+    return elevatorRow.invoiceJob.timeNumbers.length * elevatorRow.price;
+  }
+
+  return elevatorRow.price;
+};
+
+export const calculateContractInvoicePriceGrandTotal = (
+  parentArray: ContractComponentView[],
+): number => {
+  let grandTotal: number = 0;
+  parentArray.forEach((parentObject) => {
+    if (
+      parentObject.additionalInfo.elevators &&
+      Array.isArray(parentObject.additionalInfo.elevators)
+    ) {
+      const elevatorsTotal = calculateContractInvoicePriceTotal(
+        parentObject.additionalInfo?.elevators,
+      );
+      grandTotal += elevatorsTotal;
+    }
+  });
+  return grandTotal;
+};
+
+export const getUniqueInvoiceJobTimeNumbers = (
+  inputArray: ContractServiceFormElevator[] | ContractComponentElevator[],
+) => {
+  const uniqueTimeNumbers = new Set<number>();
+
+  inputArray?.forEach((item) => {
+    item.invoiceJob.timeNumbers?.forEach((number) => {
+      uniqueTimeNumbers.add(number);
+    });
+  });
+
+  return Array.from(uniqueTimeNumbers).sort((a, b) => a - b);
+};
+
+export const calculateContractInvoicePriceGrandTotalForm = (
+  parentArray: ExtendedContractComponentRecord[],
+): number => {
+  let grandTotal: number = 0;
+
+  parentArray.forEach((parentObject) => {
+    if (parentObject.elevators && Array.isArray(parentObject.elevators)) {
+      const elevatorsTotal = calculateContractInvoicePriceTotal(
+        parentObject.elevators,
+      );
+      grandTotal += elevatorsTotal;
+    }
+  });
+
+  return grandTotal;
+};
+
+export const convertExtendedRecordsToContractComponentRecords = (
+  extendedContractRecords: ExtendedContractComponentRecord[],
+): ContractComponentRecord[] =>
+  extendedContractRecords.map((extendedContractRecord) => {
+    const {
+      name,
+      elevators,
+      firstInvoiceDate,
+      firstOrderDate,
+      costType,
+      costPackage,
+      groupNumber,
+      group,
+    } = extendedContractRecord;
+
+    const convertedElevators: ContractComponentElevator[] = elevators.map(
+      (elevator: ContractComponentElevator) => {
+        const {elevatorId, invoiceJob, orderGenerationJob, price} = elevator;
+        return {elevatorId, invoiceJob, orderGenerationJob, price};
+      },
+    );
+    const convertFirstInvoiceDateToDate = firstInvoiceDate
+      ? new Date(firstInvoiceDate)
+      : '';
+    const convertFirstOrderDateToDate = firstOrderDate
+      ? new Date(firstOrderDate)
+      : '';
+
+    const contractComponentRecord: ContractComponentRecord = {
+      name,
+      group: groupNumber !== null ? String(groupNumber) : group,
+      elevators: convertedElevators,
+      firstInvoiceDate: convertFirstInvoiceDateToDate
+        ? toRestDate(convertFirstInvoiceDateToDate)
+        : '',
+      firstOrderDate: convertFirstOrderDateToDate
+        ? toRestDate(convertFirstOrderDateToDate)
+        : '',
+      costType,
+      costPackage,
+    };
+
+    return contractComponentRecord;
+  });
+
+export const parsElevatorRecourses = (
+  elevatorResource: ContractElevatorView[] | ElevatorView[],
+) =>
+  elevatorResource?.map((elevator) => {
+    const {contracts, id} = elevator;
+    const foundElevator = contracts
+      ?.flatMap(
+        (contract) =>
+          contract?.components?.flatMap(
+            (component) => component?.additionalInfo?.elevators || [],
+          ) ?? [],
+      )
+      .find((e) => id === e.elevatorId);
+    return {
+      elevatorId: elevator.id,
+      invoiceJob: foundElevator?.invoiceJob || {
+        timeUnit: ContractTimeUnit.MONTHLY,
+        timeNumbers: [],
+      },
+      orderGenerationJob: foundElevator?.orderGenerationJob || {
+        timeUnit: ContractTimeUnit.MONTHLY,
+        timeNumbers: [],
+      },
+      price: foundElevator?.price || 0,
+      externalId: elevator?.externalId || 'Unassigned',
+      address: elevator.address.fullName || '-',
+      buildingLocation: elevator.additionalInfo.buildingLocation || '-',
+      isChecked: false,
+    };
+  });
+
+export const mergeElevators = (
+  elevatorResource: ContractElevatorView[] | ElevatorView[],
+  elevatorsFromRow: ContractComponentView,
+) => {
+  const infoMap = (elevatorsFromRow.additionalInfo?.elevators || []).reduce(
+    (map, elevator) => {
+      map[elevator.elevatorId] = elevator;
+      return map;
+    },
+    {} as Record<string, ContractServiceFormElevator>,
+  );
+
+  return parsElevatorRecourses(elevatorResource || []).map((elevator) => ({
+    ...elevator,
+    ...(infoMap[elevator.elevatorId] || {}),
+    isChecked: Boolean(infoMap[elevator.elevatorId]),
+  }));
+};
+
+export const getElevatorDataByElevator = (
+  elevatorResource: ContractElevatorView[] | ElevatorView[],
+  elevatorsFromRow: ContractComponentView,
+) => {
+  const infoMap = (elevatorsFromRow.additionalInfo?.elevators || []).reduce(
+    (map, elevator) => {
+      map[elevator.elevatorId] = elevator;
+      return map;
+    },
+    {} as Record<string, ContractServiceFormElevator>,
+  );
+
+  return parsElevatorRecourses(elevatorResource || []).reduce(
+    (acc, elevator) => {
+      if (infoMap[elevator.elevatorId]) {
+        acc.push({
+          ...elevator,
+          ...infoMap[elevator.elevatorId],
+          isChecked: Boolean(infoMap[elevator.elevatorId]),
+        });
+      }
+      return acc;
+    },
+    [] as ContractServiceFormElevator[],
+  );
 };

@@ -12,7 +12,7 @@ import {useFormik} from 'formik';
 import {ContractSimpleView} from 'models/contract';
 import {Priority} from 'models/misc';
 import {useFormatDate} from 'hooks/useFormatDate';
-import {ServiceFormModel} from '../../../../../models/unitForm';
+import {ServiceFormModel} from 'models/unitForm';
 import {ServiceSchema} from './ServiceSchema';
 import {EditServiceForm} from './EditServiceForm';
 

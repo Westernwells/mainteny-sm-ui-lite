@@ -6,18 +6,16 @@ import {
   Order,
   Priority,
   StringMap,
-  StringValue,
 } from './misc';
 import {Client} from './client';
 import {TechnicianSimpleView, TechnicianView} from './technician';
 import {FileResource, FileResourceRecord} from './media';
 import {ServiceCompanyTimeUnit} from './service-company';
-import {ServiceOrderOrderField, ServiceOrderView} from './service-order';
+import {ServiceOrderView} from './service-order';
 import {ContractSimpleView} from './contract';
 import {EmployeesSimpleView} from './employee';
 import {
   PropertyContactPersonSimpleView,
-  PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from './propertyManager';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
@@ -396,4 +394,14 @@ export interface ElevatorCommentRecord {
 export interface QueryTodoParams {
   pageIndex: number;
   pageSize: number;
+}
+
+export enum UnitAppointmentView {
+  YES = 'Yes',
+  NO = 'No',
+}
+
+export enum UnitAppointment {
+  YES = 'YES',
+  NO = 'NO',
 }

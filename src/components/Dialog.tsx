@@ -10,6 +10,7 @@ import {useTranslation} from 'react-i18next';
 import {ButtonProps, IconButton} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import {Button} from './Button';
+import {olStyles} from '../styles';
 
 interface Props {
   title: string | JSX.Element;
@@ -25,6 +26,7 @@ interface Props {
   saveButtonText?: string;
   saveButtonVariant?: ButtonProps['variant'];
   saveButtonProps?: ButtonProps;
+  saveButtonContainerProps?: ButtonProps;
 }
 
 export const Dialog = ({
@@ -36,6 +38,7 @@ export const Dialog = ({
   disableSaveBtn,
   dialogProps,
   saveBtnType,
+  saveButtonContainerProps,
   isSaving = false,
   leftButton,
   saveButtonText = 'Save',
@@ -65,7 +68,13 @@ export const Dialog = ({
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{margin: '0em', scrollbarWidth: 'none'}}>
+      <DialogContent
+        sx={{
+          margin: '0em',
+          scrollbarWidth: 'none',
+          ...olStyles.scrollbar,
+          overflowY: 'scroll',
+        }}>
         <DialogContentText
           id="alert-dialog-description"
           component="div"
@@ -75,14 +84,14 @@ export const Dialog = ({
       </DialogContent>
       <DialogActions
         sx={{
-          padding: '1.5em 24px 1.5em 0px',
+          padding: '1.5em 24px 1.5em 1.5em',
           display: 'flex',
           justifyContent: 'space-between',
           background: 'white',
           marginLeft: '1em',
         }}>
         {leftButton}
-        <Box sx={{marginLeft: 'auto'}}>
+        <Box sx={{marginLeft: 'auto', ...saveButtonContainerProps}}>
           {showCancelButton && (
             <Button
               buttonProps={{
