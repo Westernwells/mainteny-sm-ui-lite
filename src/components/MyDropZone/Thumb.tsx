@@ -5,9 +5,10 @@ import useTheme from '@mui/material/styles/useTheme';
 import IconButton from '@mui/material/IconButton';
 import CancelIcon from '@mui/icons-material/Cancel';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import {CheckCircleRounded} from '@mui/icons-material';
-import EditIcon from '@mui/icons-material/Edit';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import Grid from '@mui/material/Grid';
 import {FormInput} from '../form/FormInput';
 import {FileWithPreview} from './MyDropzone';
 
@@ -42,72 +43,87 @@ export const Thumb = ({
 }: Props) => {
   const theme = useTheme();
   return (
-    <Box sx={{display: 'flex', py: '0.5rem'}}>
-      {file.type.split('/')[0] === 'image' ? (
-        <img alt="" width={36} height={46} src={file.preview} />
-      ) : (
-        <FileCopyIcon
-          sx={{fontSize: '3rem', color: theme.palette.text.secondary}}
-        />
-      )}
-
-      <Box
-        sx={{
-          mx: '1em',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-        }}>
-        {isEditingFileName && file.name === currentEditingFileName ? (
-          <Box sx={{display: 'flex'}}>
-            <FormInput
-              props={{
-                value: newFileName,
-                size: 'small',
-                fullWidth: true,
-                type: 'text',
-                onChange: onNameChange,
-              }}
-            />
-            <IconButton
-              onClick={onSaveFileName}
-              edge="start"
-              sx={{mt: '0.7em', ml: '0.2em'}}>
-              <CheckCircleRounded
-                sx={{mt: '-0.8em', color: theme.palette.primary.main}}
-              />
-            </IconButton>
-
-            <IconButton
-              onClick={onCancelEdit}
-              edge="start"
-              sx={{mt: '0.7em', ml: '0.1em'}}>
-              <CancelIcon
-                sx={{mt: '-0.8em', color: theme.palette.primary.main}}
-              />
-            </IconButton>
-          </Box>
+    <Box
+      sx={{
+        display: 'flex',
+        py: '0.5rem',
+        justifyContent: 'space-between',
+      }}>
+      <Grid container wrap="nowrap">
+        {file.type.split('/')[0] === 'image' ? (
+          <img alt="" width={36} height={46} src={file.preview} />
         ) : (
-          <Typography variant="body2">{file.name}</Typography>
+          <FileCopyIcon
+            sx={{fontSize: '3rem', color: theme.palette.text.secondary}}
+          />
         )}
 
-        <Typography variant="caption" color="text.secondary">
-          {file.size >= oneMbInByes
-            ? `${(file.size / oneMbInByes).toFixed(2)} MB`
-            : `${(file.size / onKbinBytes).toFixed(2)} KB`}
-        </Typography>
-      </Box>
+        <Box
+          sx={{
+            mx: '1em',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            width: '50%',
+          }}>
+          {isEditingFileName && file.name === currentEditingFileName ? (
+            <Box sx={{display: 'flex'}}>
+              <FormInput
+                props={{
+                  value: newFileName,
+                  size: 'small',
+                  fullWidth: true,
+                  type: 'text',
+                  onChange: onNameChange,
+                }}
+              />
+            </Box>
+          ) : (
+            <Typography variant="body2">{file.name}</Typography>
+          )}
 
-      {!isEditingFileName ? (
-        <>
-          <IconButton onClick={onEditClick} edge="start">
-            <EditIcon sx={{mt: '-1.2rem', fontSize: '1rem'}} />
-          </IconButton>
-          <IconButton onClick={onDeleteFile} edge="start" sx={{ml: 'auto'}}>
-            <DeleteIcon sx={{ml: '1em'}} />
-          </IconButton>
-        </>
-      ) : null}
+          <Typography variant="caption" color="text.secondary">
+            {file.size >= oneMbInByes
+              ? `${(file.size / oneMbInByes).toFixed(2)} MB`
+              : `${(file.size / onKbinBytes).toFixed(2)} KB`}
+          </Typography>
+        </Box>
+      </Grid>
+
+      <Grid container wrap="nowrap" width="fit-content">
+        {isEditingFileName && file.name === currentEditingFileName ? (
+          <>
+            <IconButton onClick={onSaveFileName} sx={{height: 'fit-content'}}>
+              <CheckCircleRounded sx={{color: theme.palette.primary.main}} />
+            </IconButton>
+
+            <IconButton onClick={onCancelEdit} sx={{height: 'fit-content'}}>
+              <CancelIcon sx={{color: theme.palette.primary.main}} />
+            </IconButton>
+          </>
+        ) : (
+          <>
+            <IconButton onClick={onEditClick} sx={{height: 'fit-content'}}>
+              <EditOutlinedIcon
+                sx={{
+                  color: '#8F9BB380',
+                  width: '1.5rem',
+                  height: '1.5rem',
+                }}
+              />
+            </IconButton>
+            <IconButton onClick={onDeleteFile} sx={{height: 'fit-content'}}>
+              <DeleteOutlineIcon
+                sx={{
+                  color: '#8F9BB380',
+                  width: '1.5rem',
+                  height: '1.5rem',
+                }}
+              />
+            </IconButton>
+          </>
+        )}
+      </Grid>
     </Box>
   );
 };
