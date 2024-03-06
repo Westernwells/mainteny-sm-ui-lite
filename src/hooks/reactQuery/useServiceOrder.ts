@@ -56,6 +56,7 @@ import {
   ElevatorsByAddress,
   ElevatorView,
 } from 'models/elevator';
+import {useTranslation} from 'react-i18next';
 import {useUserSession} from './useUserSession';
 
 const filterByNextVisit = (
@@ -457,6 +458,7 @@ const cancelServiceOrders = async (serviceOrderId: string) => {
 
 export const useCancelServiceOrders = () => {
   const queryClient = useQueryClient();
+  const {t} = useTranslation();
   const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (serviceOrderId: string) => cancelServiceOrders(serviceOrderId),
@@ -464,7 +466,7 @@ export const useCancelServiceOrders = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        enqueueSnackbar('Service job has been cancelled', {
+        enqueueSnackbar(t('Service job has been cancelled'), {
           variant: 'success',
         });
       },
@@ -523,6 +525,7 @@ const unschedulerServiceOrder = async (serviceOrderId: string) => {
 
 export const useUnscheduleServiceOrders = () => {
   const queryClient = useQueryClient();
+  const {t} = useTranslation();
   const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (serviceOrderId: string) => unschedulerServiceOrder(serviceOrderId),
@@ -530,7 +533,7 @@ export const useUnscheduleServiceOrders = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        enqueueSnackbar('Service job has been unscheduled', {
+        enqueueSnackbar(t('Service job has been unscheduled'), {
           variant: 'success',
         });
       },

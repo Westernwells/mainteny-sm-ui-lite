@@ -88,7 +88,7 @@ export interface ArticleView {
   subCategory: string;
   type: ArticleType;
   unit: string;
-  unitPurchaseAmount: Amount;
+  unitPurchaseAmount?: Amount;
   unitSellingAmount: Amount;
   suppliers: ArticleSupplierItemView[];
   costPackage?: CostPackage;

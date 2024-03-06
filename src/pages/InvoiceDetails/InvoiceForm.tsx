@@ -450,7 +450,9 @@ export const InvoiceForm = ({
   const generateSubject = () => {
     if (invoiceType === InvoiceType.CREDIT_NOTE) {
       if (!serviceOrder) {
-        return t('Credit Note');
+        return t('Credit note for {{invoiceNumber}}', {
+          invoiceNumber: invoice?.number || '',
+        });
       }
 
       return t('{{jobType}} - Credit note for {{invoiceNumber}}', {
