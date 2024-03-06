@@ -351,3 +351,18 @@ export const hasProtocol = (url: string) => {
 
 export const isNumber = (value: string | number) =>
   !Number.isNaN(Number(value));
+
+export const convertToHourAndMinutes = (timeInMinutes?: number) => {
+  if (timeInMinutes === undefined || Number.isNaN(timeInMinutes)) {
+    return '-';
+  }
+
+  const hours = Math.floor(timeInMinutes / 60);
+  const remainingMinutes = timeInMinutes % 60;
+
+  const formattedHours = (hours < 10 ? '0' : '') + hours;
+  const formattedMinutes =
+    (remainingMinutes < 10 ? '0' : '') + remainingMinutes;
+
+  return `${formattedHours}:${formattedMinutes}h`;
+};

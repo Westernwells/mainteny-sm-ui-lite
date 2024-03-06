@@ -5,6 +5,19 @@ interface WorkHoursMeta extends Meta {
   deleted: boolean;
 }
 
+export interface SecondTimeItem {
+  startTime: string;
+  endTime: string;
+  duration: number;
+  durationUnit: string;
+}
+
+export interface WorkHoursItemAdditionalInfo {
+  secondTime: SecondTimeItem;
+  baseTime: number;
+  billableTime: number;
+}
+
 export interface WorkHoursItem {
   data: any;
   description: string;
@@ -18,6 +31,7 @@ export interface WorkHoursItem {
   startTime: string;
   type: WorkHoursType;
   user: UserAccountSimpleView;
+  additionalInfo: WorkHoursItemAdditionalInfo;
 }
 
 export enum WorkHoursType {

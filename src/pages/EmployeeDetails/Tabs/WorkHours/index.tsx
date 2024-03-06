@@ -74,6 +74,9 @@ const WorkHoursTab = ({employeeId}: Props) => {
           }}
           textFieldProps={{
             label: t('Start Date'),
+            sx: {
+              background: 'white',
+            },
           }}
         />
         <Typography sx={{margin: '0 16px', color: '#8F9BB3', fontSize: '14px'}}>
@@ -88,6 +91,9 @@ const WorkHoursTab = ({employeeId}: Props) => {
           }}
           textFieldProps={{
             label: t('End Date'),
+            sx: {
+              background: 'white',
+            },
           }}
         />
       </FilterFields>
