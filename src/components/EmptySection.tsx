@@ -12,6 +12,7 @@ import {ReactComponent as SupplierIllustration} from 'assets/illustrations/Suppl
 import {ReactComponent as MobileUsabilityTesting} from 'assets/illustrations/MobileUsabilityTesting.svg';
 import {ReactComponent as UXAnalytics} from 'assets/illustrations/UXAnalytics.svg';
 import {ReactComponent as NotePadIcon} from 'assets/icons/NotePadIcon.svg';
+import {ReactComponent as AttachmentLargeIcon} from 'assets/icons/AttachmentLargeIcon.svg';
 import {Button} from './Button';
 
 interface Props extends BoxProps {
@@ -29,7 +30,8 @@ interface Props extends BoxProps {
     | 'supplier'
     | 'checklist'
     | 'articles'
-    | 'emptyChecklistComponents';
+    | 'emptyChecklistComponents'
+    | 'file-attachment';
   showActionBtn?: boolean;
   btnLabel?: string;
   btnAction?: () => void;
@@ -68,6 +70,8 @@ export const EmptySection = ({
         return (
           <AttachmentIllustration style={{width: '100%', height: '100%'}} />
         );
+      case 'file-attachment':
+        return <AttachmentLargeIcon style={{width: '100%', height: '100%'}} />;
       case 'clipboard':
         return (
           <ClipboardIllustration style={{width: '100%', height: '100%'}} />
@@ -122,7 +126,7 @@ export const EmptySection = ({
             startIcon: actionButtonIcon || <AddIcon />,
             endIcon: actionButtonEndIcon || null,
             style: {
-              backgroundColor: theme.palette.primary.mainLight,
+              backgroundColor: theme.palette.primary.main,
             },
           }}>
           {t(btnLabel)}

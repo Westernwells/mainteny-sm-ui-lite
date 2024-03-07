@@ -79,6 +79,7 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
 
   return (
     <AttachmentsCard
+      zoneButtonText="Upload attachment"
       onSaveFileName={onSaveFileName}
       onDeleteFile={onDeletePicture}
       onSaveUploadedFiles={onSave}
