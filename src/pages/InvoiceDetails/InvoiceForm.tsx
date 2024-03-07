@@ -93,7 +93,6 @@ import {ReactComponent as PinIllustration} from 'assets/illustrations/invoice/pi
 import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/invoice/task-list-pen.svg';
 import {StatusChip} from 'components/StatusChip';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
-import {MeasurementUnit} from 'models/articleForm';
 import {ContractPaymentTermView} from 'models/contract';
 import {ArticleView} from 'models/article';
 import {articleViewToInvoiceItemRecord, formatInvoiceRecord} from './utils';
@@ -739,20 +738,11 @@ export const InvoiceForm = ({
     return items;
   }, [downloadUrl, formik.values.dueDate]);
 
-  const hasArticleError = () =>
-    formik.values.items.some(
-      (item) =>
-        (item.article?.unit &&
-          !MeasurementUnit[item.article?.unit as MeasurementUnit]) ||
-        !item.name,
-    );
-
   const isValid = () => {
     const valid =
       formik.values.subject &&
       formik.values.type.length &&
       formik.values.items.length &&
-      !hasArticleError() &&
       !!customer &&
       Object.keys(formik.errors).length === 0;
 
