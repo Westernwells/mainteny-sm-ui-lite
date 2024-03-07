@@ -30,7 +30,6 @@ const validationSchema = Yup.object().shape({
     .nullable()
     .min(1, "Can't be less than 1")
     .required('Quantity is required'),
-  unit: Yup.string().nullable().required('Unit is required'),
   type: Yup.string().nullable().required('Type is required'),
 });
 
@@ -172,7 +171,6 @@ export const EditArticleForm = ({
           placeholder: t('Select Unit'),
           name: 'unit',
         }}
-        required
       />
 
       <SelectArticleType
