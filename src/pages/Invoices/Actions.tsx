@@ -323,6 +323,28 @@ export const Actions = ({
         },
         ...(isInvoicePDFGenerated ? [downloadItem] : []),
       );
+    } else if (invoice.status === InvoiceStatus.CREDITED) {
+      items.push(
+        {
+          label: t('Preview'),
+          icon: <RemoveRedEye />,
+          onClick: () => {
+            navigate(`/invoices/details/${invoice.id}`);
+          },
+        },
+        {
+          label: t('Payment'),
+          icon: <Payments />,
+          onClick: () => setIsDialogOpen(true),
+        },
+        {
+          label: t('Print'),
+          icon: <Print />,
+          onClick: () => setIsConfirmPrintDialogOpen(true),
+        },
+        ...(isInvoicePDFGenerated ? [downloadItem] : []),
+        cancelItem,
+      );
     }
 
     if (invoice.sentDate && invoice.status !== InvoiceStatus.DRAFT) {

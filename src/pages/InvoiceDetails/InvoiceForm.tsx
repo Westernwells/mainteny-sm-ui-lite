@@ -352,10 +352,16 @@ export const InvoiceForm = ({
     }
 
     return createNewInvoice({
-      data: formatInvoiceRecord({
-        ...values,
-        dueDate,
-      }) as CreateInvoice,
+      data: {
+        ...(formatInvoiceRecord({
+          ...values,
+          dueDate,
+        }) as CreateInvoice),
+        refInvoiceId:
+          formType === 'new' && invoiceType === InvoiceType.CREDIT_NOTE
+            ? invoice?.id
+            : undefined,
+      },
     });
   }
 
@@ -897,21 +903,23 @@ export const InvoiceForm = ({
     : 'Choose a payment type for the upfront invoice from Lump-Sum or Percentage. You can’t change your selection later for the subsequent invoices.';
   return (
     <Box>
-      {invoice && (
-        <Box
-          display="flex"
-          alignItems="flex-end"
-          mb={3}
-          mt={1}
-          justifyContent="space-between">
-          <StatusChip
-            label={getInvoiceStatusStyles(invoice?.status ?? '').label}
-            color={getInvoiceStatusStyles(invoice?.status ?? '').color}
-            size="small"
-            variant="filled"
-          />
-        </Box>
-      )}
+      {invoice &&
+        formType !== 'new' &&
+        invoiceType !== InvoiceType.CREDIT_NOTE && (
+          <Box
+            display="flex"
+            alignItems="flex-end"
+            mb={3}
+            mt={1}
+            justifyContent="space-between">
+            <StatusChip
+              label={getInvoiceStatusStyles(invoice?.status ?? '').label}
+              color={getInvoiceStatusStyles(invoice?.status ?? '').color}
+              size="small"
+              variant="filled"
+            />
+          </Box>
+        )}
       <Grid
         container
         columnGap={3}
