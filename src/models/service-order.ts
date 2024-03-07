@@ -175,6 +175,8 @@ export interface ServiceOrderAdditionalInfo {
     endTime: string;
   };
   candidateTechnician?: ServiceOrderCandidateTechnician;
+  documents?: FileResource[];
+  pictures?: FileResource[];
 }
 
 export interface ServiceOrderConfirmationInfo {
@@ -306,6 +308,8 @@ export interface UpdateServiceOrderBody {
   priority: Priority;
   quotationId: string;
   checkListId: string;
+  documents: FileResourceRecord[];
+  pictures: FileResourceRecord[];
 }
 
 export interface UpdateJobSchedule {

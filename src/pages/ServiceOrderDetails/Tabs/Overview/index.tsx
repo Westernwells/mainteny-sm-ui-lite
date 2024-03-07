@@ -18,6 +18,7 @@ import {Quotation} from './Quotations';
 import {Invoices} from './Invoices';
 import {Articles} from './Articles';
 import {Description} from './Description';
+import {Attachment} from './Attachment';
 
 interface Props {
   serviceOrder: ServiceOrderView;
@@ -95,6 +96,9 @@ export const Overview = ({serviceOrder}: Props) => {
               content={serviceOrder?.description}
               serviceOrderId={serviceOrder?.id}
             />
+          </Box>
+          <Box mt="1em" flexGrow={1}>
+            <Attachment order={serviceOrder} />
           </Box>
         </Box>
       </Grid>
