@@ -166,6 +166,7 @@ export interface InvoiceView {
   overdueNotices: InvoiceOverdueNoticeSimpleView[];
   commentCount?: number;
   payments: InvoicePaymentView[];
+  refInvoiceId?: string;
 }
 
 export interface InvoicePaymentAdditionalInfo {
@@ -374,6 +375,7 @@ export interface CreateInvoice {
   deliveryStartDate?: string;
   deliveryEndDate?: string;
   showArticleSection?: boolean;
+  refInvoiceId?: string;
 }
 
 export interface UpdateInvoice {
