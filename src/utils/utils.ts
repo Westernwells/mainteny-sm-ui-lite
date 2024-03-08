@@ -237,6 +237,10 @@ export const formatAddressFullname = (
     ? address?.component?.country
     : '';
 
+  const fullName = [name, address1, address2, zip, city, state, country]
+    .filter((x) => x !== '')
+    .join(', ');
+
   return {
     ...address,
     component: {
@@ -248,12 +252,7 @@ export const formatAddressFullname = (
       state,
       country,
     },
-    fullName:
-      address.fullName === null
-        ? null
-        : [name, address1, address2, zip, city, state, country]
-            .filter((x) => x !== '')
-            .join(', '),
+    fullName,
   };
 };
 

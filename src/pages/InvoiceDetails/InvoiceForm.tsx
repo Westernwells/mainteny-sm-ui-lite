@@ -1044,6 +1044,7 @@ export const InvoiceForm = ({
                     }
                     addressType="billingAddress"
                     formik={formik}
+                    customerName={customer?.name}
                   />
                 </Grid>
                 <Grid item xs={6} pl={2}>
@@ -1065,6 +1066,7 @@ export const InvoiceForm = ({
                     }
                     addressType="beneficiaryAddress"
                     formik={formik}
+                    customerName={customer?.name}
                   />
                 </Grid>
 
@@ -1115,6 +1117,7 @@ export const InvoiceForm = ({
                     }
                     addressType="alternativeAddress"
                     formik={formik}
+                    customerName={customer?.name}
                   />
                 </Grid>
               </>
