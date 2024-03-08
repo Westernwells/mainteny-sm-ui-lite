@@ -66,6 +66,11 @@ export enum ActivityMessageType {
   SERVICE_ORDER_TIME_EDITED = 'SERVICE_ORDER_TIME_EDITED',
 }
 
+export enum ServiceCompanyType {
+  PROPERTY_OWNER_PAYMENT_TERM = 'PROPERTY_OWNER_PAYMENT_TERM',
+  CONTRACT_NAME = 'CONTRACT_NAME',
+}
+
 export interface ServiceCompanyView {
   id: string;
   name: string;
@@ -104,6 +109,14 @@ export interface ServiceCompanyActivityParams {
   pageSize: number;
   query?: string;
   type?: ActivityMessageType[];
+}
+
+export interface ServiceCompanyTerms {
+  serviceCompanyId: string;
+  pageIndex: number;
+  pageSize: number;
+  query?: string;
+  type?: ServiceCompanyType[];
 }
 
 export interface ServiceCompanySummary {

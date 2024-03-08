@@ -185,8 +185,7 @@ export const UnitsTab: FC<Props> = ({
       }}
       clearText="Clear all"
       textStyles={{color: theme.palette.primary.dark, fontWeight: 600}}
-      wrapperStyle={{flex: 1, gap: 0.5}}
-      containerStyle={{width: '50%', gap: 1}}>
+      wrapperStyle={{width: '90%'}}>
       <DatePicker
         defaultDate={lastVisitStart}
         containerStyles={{mr: '1em'}}
@@ -272,8 +271,8 @@ export const UnitsTab: FC<Props> = ({
         initialSelectedItems={
           requireAppointment && [UnitAppointment[requireAppointment]]
         }
-        formControlStyles={{width: '10rem'}}
-        containerStyles={{flex: 1}}
+        containerStyles={{width: '30%'}}
+        formControlStyles={{width: '90%'}}
         disableClearBtn
       />
     </FilterFields>

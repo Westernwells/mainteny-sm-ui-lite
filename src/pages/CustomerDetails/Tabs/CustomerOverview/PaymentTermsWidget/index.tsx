@@ -5,12 +5,12 @@ import Typography from '@mui/material/Typography';
 import {EmptySection} from 'components/EmptySection';
 import {InfoCard} from 'components/InfoCard';
 import {useTranslation} from 'react-i18next';
-import {ContractPaymentTermView} from 'models/contract';
+import {ContractTermView} from 'models/contract';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useCustomer} from 'hooks/reactQuery/useCustomers';
 import {phoneNumberDigitsOnly} from 'utils/customer-utils';
-import {ContractPaymentTermInput as NewPaymentTerm} from 'components/ContractPaymentTermInput';
-import {ContractPaymentTerm} from 'components/ContractPaymentTerm';
+import {ContractTermInput as NewPaymentTerm} from 'components/ContractTermInput';
+import {ContractTerm} from 'components/ContractTerm';
 import {Loading} from 'components/Loading';
 import {CustomerEditForm} from '../EditCustomerForm/model';
 
@@ -24,7 +24,7 @@ const PaymentTermsWidget: FC<Props> = ({customer}) => {
   const [showNewPaymentTermDrawer, setShowNewPaymentTermDrawer] =
     useState(false);
   const [paymentTermToEdit, setPaymentTermToEdit] = useState<
-    ContractPaymentTermView | undefined
+    ContractTermView | undefined
   >(undefined);
   const {updateCustomer, isLoading} = useCustomer();
 
@@ -89,21 +89,21 @@ const PaymentTermsWidget: FC<Props> = ({customer}) => {
           />
         )}
       </InfoCard>
-      <ContractPaymentTerm
+      <ContractTerm
         title={t('Payment Terms')}
         open={showSideDrawer}
         onCancel={() => setShowSideDrawer(false)}
         onSave={handlePaymentTermSubmit}
-        defaultPayment={customer?.paymentTerm?.id}
-        onClickNewPaymentTerm={() => setShowNewPaymentTermDrawer(true)}
-        setPaymentToEdit={setPaymentTermToEdit}
+        defaultValue={customer?.paymentTerm?.id}
+        onClick={() => setShowNewPaymentTermDrawer(true)}
+        setEdit={setPaymentTermToEdit}
       />
       <NewPaymentTerm
         title={t('New payment term')}
         open={showNewPaymentTermDrawer}
         onCancel={() => setShowNewPaymentTermDrawer(false)}
-        defaultPaymentTerm={paymentTermToEdit}
-        setPaymentToEdit={setPaymentTermToEdit}
+        defaultTerm={paymentTermToEdit}
+        setEdit={setPaymentTermToEdit}
       />
     </>
   );

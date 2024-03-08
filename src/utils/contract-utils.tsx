@@ -354,3 +354,23 @@ export const getElevatorDataByElevator = (
     [] as ContractServiceFormElevator[],
   );
 };
+
+export const calculateFormContractInvoicePriceTotal = (
+  array?: ContractComponentElevator[],
+) => {
+  let totalPrice: number = 0;
+
+  array?.forEach((item: ContractComponentElevator) => {
+    if (item?.isChecked && item?.invoiceJob?.timeNumbers) {
+      const timeNumbersLength: number = item.invoiceJob.timeNumbers.length;
+      const itemPrice: number = item.price;
+      const itemTotalPrice: number = timeNumbersLength
+        ? timeNumbersLength * itemPrice
+        : itemPrice;
+
+      totalPrice += itemTotalPrice;
+    }
+  });
+
+  return totalPrice;
+};

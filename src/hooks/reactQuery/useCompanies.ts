@@ -20,6 +20,7 @@ import {
   ServiceCompanyUpdateBody,
   SystemSettingsUpdateBody,
   XeroIntegration,
+  ServiceCompanyType,
 } from 'models/service-company';
 import {
   useInfiniteQuery,
@@ -31,7 +32,7 @@ import {
 } from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
 import {ServiceOrder} from 'models/service-order';
-import {ContractPaymentTermView} from 'models/contract';
+import {ContractTermView} from 'models/contract';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {useUserSession} from './useUserSession';
 
@@ -268,49 +269,6 @@ export const useCompanySummary = (
     },
   );
 
-export const queryContractPaymentTerms = async (
-  serviceCompanyId: string,
-  page: Page,
-  query: string,
-) => {
-  const response = await axiosClient.get<Resource<ContractPaymentTermView>>(
-    `/api/serviceCompanies/${serviceCompanyId}/contractPaymentTerms`,
-    {
-      params: {
-        query,
-        ...page,
-      },
-      paramsSerializer,
-    },
-  );
-  return response.data;
-};
-
-export const useQueryContractPaymentTerms = ({
-  page,
-  query,
-  options,
-}: {
-  page: Page;
-  query: string;
-  options?: UseQueryOptions<any, any, any>;
-}) => {
-  const {user} = useUserSession();
-  return useQuery<Resource<ContractPaymentTermView>, RestError>(
-    [queryKeys.queryContractPaymentTerms, page, query],
-    () =>
-      queryContractPaymentTerms(
-        user!.userAccount.serviceCompany.id,
-        page,
-        query,
-      ),
-    {
-      enabled: !!user,
-      ...options,
-    },
-  );
-};
-
 export const getCompanyAutoNumberConfig = async (companyId: string) => {
   const response = await axiosClient.get<AutoNumberConfig>(
     `/api/serviceCompanies/${companyId}/settings/autoNumber`,
@@ -414,6 +372,54 @@ export const useCompanyXeroInfo = (companyId?: string) => {
         console.log(err);
         showError(err);
       },
+    },
+  );
+};
+
+export const queryContractTerms = async (
+  serviceCompanyId: string,
+  page: Page,
+  query: string,
+  type: ServiceCompanyType,
+) => {
+  const response = await axiosClient.get<Resource<ContractTermView>>(
+    `/api/serviceCompanies/${serviceCompanyId}/terms`,
+    {
+      params: {
+        query,
+        type,
+        ...page,
+      },
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useContractTerms = ({
+  page,
+  query,
+  type,
+  options,
+}: {
+  page: Page;
+  query: string;
+  type: ServiceCompanyType;
+  options?: UseQueryOptions<any, any, any>;
+}) => {
+  const {user} = useUserSession();
+  return useQuery<Resource<ContractTermView>, RestError>(
+    [queryKeys.queryContractTerms, page, query],
+    () =>
+      queryContractTerms(
+        user!.userAccount.serviceCompany.id,
+        page,
+        query,
+        type,
+      ),
+    {
+      enabled: !!user,
+      ...options,
     },
   );
 };

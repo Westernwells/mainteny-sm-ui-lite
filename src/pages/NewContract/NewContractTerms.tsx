@@ -4,7 +4,7 @@ import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
 import {
-  ContractPaymentTermView,
+  ContractTermView,
   ContractTermsFormModal,
   ContractTypes,
 } from 'models/contract';
@@ -13,19 +13,21 @@ import {useCurrentCurrency} from 'utils/currency';
 import {invoiceCycle} from 'utils/contract-utils';
 import {DatePicker} from 'components/DatePicker';
 import {format, getMonth, getYear} from 'date-fns';
-import {useQueryContractPaymentTerms} from 'hooks/reactQuery/useCompanies';
+import {useContractTerms} from 'hooks/reactQuery/useCompanies';
 import {createEmptyResource} from 'utils/paging-utils';
-import {ContractPaymentTerm} from 'components/ContractPaymentTerm';
-import {ContractPaymentTermInput} from 'components/ContractPaymentTermInput';
+import {ContractTerm} from 'components/ContractTerm';
+import {ContractTermInput} from 'components/ContractTermInput';
+import {ServiceCompanyType} from 'models/service-company';
 
 interface Props {
   formik: FormikProps<ContractTermsFormModal>;
   contractTypePass: ContractTypes;
+  type: ServiceCompanyType;
 }
 
 const pageSize = 50;
 
-const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
+const NewContractTerms: FC<Props> = ({formik, contractTypePass, type}) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
@@ -37,15 +39,16 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
   ] = useState(false);
 
   const [paymentTermToEdit, setPaymentTermToEdit] = useState<
-    ContractPaymentTermView | undefined
+    ContractTermView | undefined
   >(undefined);
   const {data: contractPaymentTerms = createEmptyResource(pageSize)} =
-    useQueryContractPaymentTerms({
+    useContractTerms({
       page: {
         pageIndex: 0,
         pageSize,
       },
       query: '',
+      type,
     });
 
   const handleContractPaymentTermsModal = (paymentTermId: string) => {
@@ -418,24 +421,22 @@ const NewContractTerms: FC<Props> = ({formik, contractTypePass}) => {
         )}
       </Grid>
 
-      <ContractPaymentTermInput
+      <ContractTermInput
         title={t('New payment term')}
         open={openContractPaymentTermSelectDialog}
         onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
-        defaultPaymentTerm={paymentTermToEdit}
-        setPaymentToEdit={setPaymentTermToEdit}
+        defaultTerm={paymentTermToEdit}
+        setEdit={setPaymentTermToEdit}
       />
 
-      <ContractPaymentTerm
+      <ContractTerm
         title={t('Payment Terms')}
         open={openContractPaymentTermsDialog}
         onCancel={() => setOpenContractPaymentTermsDialog(false)}
         onSave={handleContractPaymentTermsModal}
-        defaultPayment={undefined}
-        onClickNewPaymentTerm={() =>
-          setOpenContractPaymentTermSelectDialog(true)
-        }
-        setPaymentToEdit={setPaymentTermToEdit}
+        defaultValue={undefined}
+        onClick={() => setOpenContractPaymentTermSelectDialog(true)}
+        setEdit={setPaymentTermToEdit}
       />
     </Grid>
   );

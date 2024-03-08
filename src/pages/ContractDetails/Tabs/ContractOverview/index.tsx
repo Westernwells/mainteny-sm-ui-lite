@@ -15,6 +15,7 @@ import {useFormik} from 'formik';
 import {
   ContractOrderField,
   ContractRequestBody,
+  ContractTypes,
   ContractUpdateRequest,
   ContractView,
 } from 'models/contract';
@@ -120,8 +121,8 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
       },
       {keepPreviousData: true},
     );
-
   const validationSchema = Yup.object().shape({
+    name: Yup.string().required('Contract name is required'),
     renewalTerms: Yup.number()
       .min(0, 'Renewal period must be between 0-12 months')
       .max(12, 'Renewal period must be between 0-12 months'),
@@ -188,14 +189,9 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   }, [contractDetails?.end]);
 
   const onContractSave = async () => {
-    const contractNameType =
-      user?.userAccount?.serviceCompany?.settings?.contractNameTypes.find(
-        (item) => item.name === formik.values.name,
-      );
-
     const updatedContract = {
       ...contractDetails?.additionalInfo,
-      type: contractNameType?.type || '',
+      type: ContractTypes.SERVICE,
       name: formik.values?.name || '',
       renewalTerms: formik.values.renewalTerms ? formik.values.renewalTerms : 0,
       renewalDate: formik.values.autoRenewalCancelled
@@ -409,10 +405,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               autoRenewal={contractDetails?.additionalInfo.autoRenewalCancelled}
               costPerYear={
                 formatCurrency(
-                  (contractDetails?.additionalInfo?.price?.netAmount || 0) /
-                    10 **
-                      (contractDetails?.additionalInfo?.price
-                        ?.fractionDigits! || 0),
+                  contractDetails?.additionalInfo?.totalYearlyPrice || 0,
                   {currency: contractDetails.additionalInfo.price?.currency},
                 ) || '-'
               }
@@ -425,13 +418,6 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               noticePeriod={
                 contractDetails?.additionalInfo?.noticePeriodInMonth
               }
-              discount={contractDetails?.additionalInfo?.discounts?.map(
-                (item) =>
-                  `${t('{{discountPercentage}}% when paid in {{days}} days', {
-                    discountPercentage: item.discountPercentage,
-                    days: item.days,
-                  })}`,
-              )}
               start={contractDetails.start}
               end={contractDetails.end}
               contractNumber={contractDetails.externalId}
@@ -440,9 +426,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               title="Edit Contract"
               isSaving={isUpdateLoading}
               onCancel={handleCancel}
-              disableSaveBtn={
-                !!Object.keys(formik.errors).length || !formik.dirty
-              }
+              disableSaveBtn={!!Object.keys(formik.errors).length}
               dialogProps={{
                 maxWidth: 'md',
                 open: openContractDialog || false,
