@@ -16,6 +16,7 @@ export enum ArticleType {
   LABOR = 'LABOR',
   MATERIAL = 'MATERIAL',
   PACKAGE = 'PACKAGE',
+  OTHER = 'OTHER',
 }
 
 export enum ArticleOrderField {

@@ -36,6 +36,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
 import {ReactComponent as MaterialIcon} from 'assets/icons/MaterialIcon.svg';
 import {ReactComponent as LaborIcon} from 'assets/icons/LaborIcon.svg';
+import {ReactComponent as OtherIcon} from 'assets/icons/OtherIcon.svg';
 import {NumericFormat} from 'react-number-format';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import ExpandIcon from '@mui/icons-material/Expand';
@@ -58,6 +59,10 @@ const articleTypes = [
     label: 'Package',
     isPackage: true,
   },
+  {
+    value: ArticleType.OTHER,
+    label: 'Other',
+  },
 ];
 
 type Props = {
@@ -78,7 +83,7 @@ const ServicesForm = ({
   const open = Boolean(anchorEl);
 
   const [showAll, setShowAll] = useState(false);
-  const [visibleItems, setVisibleItems] = useState(2);
+  const [visibleItems, setVisibleItems] = useState(5);
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -91,7 +96,7 @@ const ServicesForm = ({
 
   const handleToggleUnits = () => {
     if (showAll) {
-      setVisibleItems(2);
+      setVisibleItems(5);
       setShowAll(false);
     } else {
       setVisibleItems(
@@ -125,7 +130,7 @@ const ServicesForm = ({
 
   useEffect(() => {
     setShowAll(false);
-    setVisibleItems(2);
+    setVisibleItems(5);
   }, [isDialogOpen]);
 
   const handleCheckboxChange = (itemIndex: number, isChecked: boolean) => {
@@ -158,7 +163,7 @@ const ServicesForm = ({
           variant="h5"
           color={theme.palette.text.primary}
           sx={{paddingLeft: '0.5em'}}>
-          Basic
+          {t('Basic')}
         </Typography>
       </Box>
 
@@ -212,8 +217,11 @@ const ServicesForm = ({
                 ) : formikContractServiceComponent.values.costType ===
                   ArticleType.MATERIAL ? (
                   <MaterialIcon fontSize="2rem" />
-                ) : (
+                ) : formikContractServiceComponent.values.costType ===
+                  ArticleType.LABOR ? (
                   <LaborIcon fontSize="2rem" />
+                ) : (
+                  <OtherIcon fontSize="2rem" />
                 )}
                 <Typography variant="body1" fontSize="1.2rem" pl={2}>
                   {getArticleTypeText(
@@ -276,7 +284,7 @@ const ServicesForm = ({
                 <FormControl>
                   <RadioGroup name="radio-buttons-group">
                     {articleTypes.map((articleType) => (
-                      <Box key={articleType.value}>
+                      <Box key={articleType.value} sx={{pt: 0.5}}>
                         <FormRadio
                           value={articleType.value}
                           checked={
@@ -536,9 +544,7 @@ const ServicesForm = ({
         </Typography>
       </Box>
       <Typography variant="body2" color={theme.palette.text.secondary}>
-        {t(
-          'Select units for which this contract item assigned to the customer will apply.',
-        )}
+        {t('Select units for which this contract service will apply.')}
       </Typography>
       <Box display="flex" alignItems="center">
         <Switch
@@ -768,17 +774,32 @@ const ServicesForm = ({
                         formikContractServiceComponent.errors,
                         `elevators[${index}].price`,
                       ),
-                      onBlur: formikContractServiceComponent.handleBlur,
                     }}
                     InputLabelProps={{
                       shrink: true,
                     }}
                     label={t('Invoice Price(EXCL. VAT)')}
                     onValueChange={(values) => {
+                      const newPrice = Number(values.value);
+
                       formikContractServiceComponent.setFieldValue(
                         `elevators[${index}].price`,
-                        Number(values.value),
+                        newPrice,
                       );
+
+                      if (index === 0) {
+                        const updatedElevators =
+                          formikContractServiceComponent.values.elevators.map(
+                            (elevator, i) =>
+                              i === 0
+                                ? elevator
+                                : {...elevator, price: newPrice},
+                          );
+                        formikContractServiceComponent.setFieldValue(
+                          'elevators',
+                          updatedElevators,
+                        );
+                      }
                     }}
                     size="small"
                   />
@@ -799,7 +820,7 @@ const ServicesForm = ({
                 borderBottom: '1px solid #8F9BB380',
               }}>
               {formikContractServiceComponent.values.elevators &&
-                formikContractServiceComponent.values.elevators.length > 2 && (
+                formikContractServiceComponent.values.elevators.length > 5 && (
                   <TableCell
                     sx={{
                       width: '62%',
@@ -813,7 +834,7 @@ const ServicesForm = ({
                           ? 'Hide Units'
                           : `Show ${
                               formikContractServiceComponent.values.elevators
-                                .length - 2
+                                .length - 5
                             } more units`
                       }
                       buttonProps={{

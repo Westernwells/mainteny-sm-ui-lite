@@ -51,6 +51,7 @@ import {useTranslation} from 'react-i18next';
 import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
 import {ReactComponent as MaterialIcon} from 'assets/icons/MaterialIcon.svg';
 import {ReactComponent as LaborIcon} from 'assets/icons/LaborIcon.svg';
+import {ReactComponent as OtherIcon} from 'assets/icons/OtherIcon.svg';
 import {NumericFormat} from 'react-number-format';
 import {LanguageContext} from 'context/LanguageProvider';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
@@ -75,6 +76,10 @@ const articleTypes = [
     value: ArticleType.PACKAGE,
     label: 'Package',
     isPackage: true,
+  },
+  {
+    value: ArticleType.OTHER,
+    label: 'Other',
   },
 ];
 
@@ -416,8 +421,11 @@ export const MutationService = ({
                 ) : formikContractServiceComponent.values.costType ===
                   ArticleType.MATERIAL ? (
                   <MaterialIcon fontSize="2rem" />
-                ) : (
+                ) : formikContractServiceComponent.values.costType ===
+                  ArticleType.LABOR ? (
                   <LaborIcon fontSize="2rem" />
+                ) : (
+                  <OtherIcon />
                 )}
                 <Typography variant="body1" fontSize="1.2rem" pl={2}>
                   {getArticleTypeText(
