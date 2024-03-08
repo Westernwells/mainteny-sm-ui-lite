@@ -356,6 +356,7 @@ export interface ElevatorRequestBody {
   manufacturer: string;
   model: string;
   externalId: string;
+  number: string;
   numberOfStops: number;
   parking: string;
   pictures: FileResourceRecord[];
