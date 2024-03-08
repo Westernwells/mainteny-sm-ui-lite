@@ -30,6 +30,7 @@ export interface UnitDetailsFormModel {
   serialNumber?: string;
   unitCapacity?: string;
   spendingLimit?: number;
+  number?: string;
 }
 
 export interface ServiceFormModel {

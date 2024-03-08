@@ -80,7 +80,8 @@ export const UnitDetails = ({
     initialValues: {
       category: convertToText(elevator.category),
       manufacturer: elevator.additionalInfo.manufacturer,
-      externalId: elevator.externalId,
+      externalId: elevator.number,
+      number: elevator.number,
       numberOfStops: elevator.additionalInfo.numberOfStops,
       cabinType: elevator.additionalInfo.cabinType,
       emergencyPhoneProvider: elevator.additionalInfo.emergencyPhoneProvider,
@@ -123,6 +124,7 @@ export const UnitDetails = ({
           : '',
         manufacturer: formik.values.manufacturer,
         externalId: formik.values.externalId || '',
+        number: formik.values.number || '',
         numberOfStops: formik.values.numberOfStops,
         cabinType: formik.values.cabinType,
         emergencyPhoneProvider: formik.values.emergencyPhoneProvider,
@@ -148,7 +150,8 @@ export const UnitDetails = ({
       serialNumber: elevator.serialNumber,
       unitCapacity: elevator.capacity,
       yearBuilt: elevator.additionalInfo.builtYear,
-      externalId: elevator.externalId,
+      externalId: elevator.number,
+      number: elevator.number,
     });
   }, [openDialog]);
 
