@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {useCallback, useEffect} from 'react';
 import {FormikProps} from 'formik';
 import Grid from '@mui/material/Grid';
 
@@ -10,9 +10,11 @@ import {InvoiceFormData} from 'models/invoice';
 export const EditCustomerForm = ({
   formik,
   address,
+  customerName,
 }: {
   formik: FormikProps<InvoiceFormData>;
   address: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress';
+  customerName?: string;
 }) => {
   const {values, handleChange, handleBlur} = formik;
   const value = values[address];
@@ -21,6 +23,13 @@ export const EditCustomerForm = ({
     (country?: string) => getStatesByCountry(country ?? ''),
     [value?.component?.country],
   );
+
+  // populate name field with customer name by default if not set
+  useEffect(() => {
+    if (!value?.component?.name && customerName) {
+      formik.setFieldValue(`${address}.component.name`, customerName);
+    }
+  }, []);
 
   const defaultProps = {
     onChange: handleChange,
