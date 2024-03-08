@@ -6,6 +6,7 @@ import {useServiceOrderDetails} from 'hooks/reactQuery/useServiceOrder';
 import {useInvoiceDetail} from 'hooks/reactQuery/useInvoice';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {InvoiceType} from 'models/invoice';
+import {ServiceCompanyType} from 'models/service-company';
 import {InvoiceForm} from './InvoiceForm';
 
 export const NewInvoice = () => {
@@ -48,6 +49,7 @@ export const NewInvoice = () => {
     <InvoiceForm
       serviceOrderResource={serviceOrderDetails}
       invoice={invoice}
+      serviceCompanyType={ServiceCompanyType.PROPERTY_OWNER_PAYMENT_TERM}
       invoiceType={invoiceType as InvoiceType}
       customer={customer}
     />

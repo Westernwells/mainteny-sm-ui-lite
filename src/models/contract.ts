@@ -28,6 +28,7 @@ import {
 import {FileResource} from './media';
 import {ArticleType, CostPackage} from './article';
 import {toRestDate} from 'utils/datetime';
+import {ServiceCompanyType} from './service-company';
 
 export enum ContractStatus {
   PENDING = 'PENDING',
@@ -62,6 +63,24 @@ export enum ContractOrderField {
 export enum ContractTypes {
   SERVICE = 'SERVICE',
   NON_SERVICE = 'NON_SERVICE',
+}
+
+export enum ContractTimeUnit {
+  NONE = 'NONE',
+  WEEKLY = 'WEEKLY',
+  BIWEEKLY = 'BIWEEKLY',
+  MONTHLY = 'MONTHLY',
+  ANNUALLY = 'ANNUALLY',
+  BIENNIALLY = 'BIENNIALLY',
+  TRIENNIALLY = 'TRIENNIALLY',
+  QUADRENNIALLY = 'QUADRENNIALLY',
+}
+
+export enum YearlyContractTimeUnit {
+  ANNUALLY = 'ANNUALLY',
+  BIENNIALLY = 'Every 2 years',
+  TRIENNIALLY = 'Every 3 years',
+  QUADRIENNIALLY = 'Every 4 years',
 }
 
 export interface ContractNameTypes {
@@ -113,13 +132,6 @@ export interface QueryContractParams {
   paymentTermId?: string;
 }
 
-export enum InvoiceCyle {
-  YEARLY = 'YEARLY',
-  HALF_YEARLY = 'HALF_YEARLY',
-  QUARTERLY = 'QUARTERLY',
-  AFTER_EACH_VISIT = 'AFTER_EACH_VISIT',
-}
-
 export interface ContractDiscount {
   days: number;
   discountPercentage: number;
@@ -143,6 +155,7 @@ export interface ContractAdditionalInfo {
   firstInvoiceDate: string;
   autoRenewalCancelled: boolean;
   renewalDate: string;
+  totalYearlyPrice?: number;
 }
 
 export interface ContractElevatorSimpleView {
@@ -170,7 +183,7 @@ export interface ContractView {
   status: ContractStatus;
   search: string;
   meta: Meta;
-  paymentTerm?: ContractPaymentTermView;
+  paymentTerm?: ContractTermView;
   start: string;
   end: string;
   startTime?: string;
@@ -396,9 +409,10 @@ export interface ContractUpdateRequest {
   numberOfUnits?: number;
 }
 
-export interface ContractPaymentTermView {
+export interface ContractTermView {
   id: string;
   serviceCompanyId: string;
+  type?: ServiceCompanyType;
   term: string;
   additionalInfo: string;
   meta: Meta;
@@ -407,13 +421,15 @@ export interface ContractPaymentTermView {
 export interface NewContractPaymentTermBody {
   serviceCompanyId: string;
   term: string;
+  type: ServiceCompanyType;
 }
 
-export interface UpdateContractPaymentTermRecord {
+export interface UpdateContractTermRecord {
   term: string;
+  type: ServiceCompanyType;
 }
 
-export interface UpdateContractPaymentTermView {
+export interface UpdateContractTermView {
   term: string;
   id: string;
 }
@@ -534,24 +550,6 @@ export interface ContractServiceFormElevator {
   yearlyPrice?: number;
 }
 
-export enum ContractTimeUnit {
-  NONE = 'NONE',
-  WEEKLY = 'WEEKLY',
-  BIWEEKLY = 'BIWEEKLY',
-  MONTHLY = 'MONTHLY',
-  ANNUALLY = 'ANNUALLY',
-  BIENNIALLY = 'BIENNIALLY',
-  TRIENNIALLY = 'TRIENNIALLY',
-  QUADRENNIALLY = 'QUADRENNIALLY',
-}
-
-export enum YearlyContractTimeUnit {
-  ANNUALLY = 'ANNUALLY',
-  BIENNIALLY = 'Every 2 years',
-  TRIENNIALLY = 'Every 3 years',
-  QUADRIENNIALLY = 'Every 4 years',
-}
-
 export interface ContractComponentRecord {
   id?: string;
   name: string;
@@ -564,6 +562,7 @@ export interface ContractComponentRecord {
 }
 
 export interface ContractComponentElevator {
+  isChecked?: boolean;
   elevatorId: string;
   invoiceJob: JobTimeUnit;
   orderGenerationJob: JobTimeUnit;

@@ -43,9 +43,10 @@ import {Dialog} from 'components/Dialog';
 import {ArticleType, CostPackage} from 'models/article';
 import {useUuid} from 'hooks/reactQuery/useUuid';
 import {createEmptyResource} from 'utils/paging-utils';
-import {ElevatorView} from 'models/elevator';
+import {ElevatorOrderField, ElevatorView} from 'models/elevator';
 import {useContractElevators} from 'hooks/reactQuery/useContacts';
 import {useQueryState} from 'hooks/useQueryState';
+import {Order} from 'models/misc';
 import {ContractCard} from '../ContractCard';
 import {SectionTitle} from '../../../../InvoiceDetails/SectionTitle';
 import ServiceInformationReview from './ServiceInfo';
@@ -153,6 +154,8 @@ export const Services: FC<Props> = ({contractDetails}) => {
       contractDetails?.id ?? '',
       {
         query: search,
+        orderBy: ElevatorOrderField.CREATED_TIME,
+        order: Order.DESC,
         pageIndex: 0,
         pageSize: 500,
       },
@@ -189,6 +192,12 @@ export const Services: FC<Props> = ({contractDetails}) => {
       setAddFormData();
     }
   }, [elevatorResource.data.length]);
+
+  const openViewDialog = (row: ContractComponentView) => {
+    setCurrentService(row);
+    setEditFormData(row);
+    setIsReviewDialogOpen(true);
+  };
 
   return (
     <Grid item xs={12} md={8} sx={{padding: 'unset'}}>
@@ -263,11 +272,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
                   }}
                   key={row.id}>
                   <TableCell
-                    onClick={() => {
-                      setCurrentService(row);
-                      setEditFormData(row);
-                      setIsReviewDialogOpen(true);
-                    }}
+                    onClick={() => openViewDialog(row)}
                     sx={{
                       width: '10%',
                       display: 'inline-block',
@@ -281,6 +286,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
                     </Typography>
                   </TableCell>
                   <TableCell
+                    onClick={() => openViewDialog(row)}
                     sx={{
                       width: '5%',
                       borderBottom: 'none',
@@ -295,6 +301,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
                     </Typography>
                   </TableCell>
                   <TableCell
+                    onClick={() => openViewDialog(row)}
                     sx={{
                       width: '10%',
                       display: 'inline-block',
@@ -311,6 +318,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
                     </Typography>
                   </TableCell>
                   <TableCell
+                    onClick={() => openViewDialog(row)}
                     sx={{
                       width: '15%',
                       display: 'inline-block',
@@ -334,6 +342,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
                     />
                   </TableCell>
                   <TableCell
+                    onClick={() => openViewDialog(row)}
                     sx={{
                       width: '20%',
                       display: 'inline-block',
@@ -351,6 +360,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
                     </Typography>
                   </TableCell>
                   <TableCell
+                    onClick={() => openViewDialog(row)}
                     sx={{
                       width: '20%',
                       display: 'inline-block',
@@ -368,6 +378,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
                     </Typography>
                   </TableCell>
                   <TableCell
+                    onClick={() => openViewDialog(row)}
                     sx={{
                       width: '10%',
                       display: 'inline-block',
@@ -434,7 +445,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
                     width: '40%',
                   }}>
                   <Typography variant="h6" align="right">
-                    Total contract value per year (excl. VAT)
+                    {t('Total contract value per year (excl. VAT)')}
                   </Typography>
                 </TableCell>
                 <TableCell

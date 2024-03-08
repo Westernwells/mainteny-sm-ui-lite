@@ -6,13 +6,13 @@ import {Grid} from '@mui/material';
 import {convertToText} from 'utils/utils';
 import {useTranslation} from 'react-i18next';
 import TrendingUp from '@mui/icons-material/TrendingUp';
-import MoneyOff from '@mui/icons-material/MoneyOff';
 import {ReactComponent as InfoIcon} from 'assets/icons/Info.svg';
 import {ReactComponent as AutorenewIcon} from 'assets/icons/Autorenew.svg';
 import {ReactComponent as NumberIcon} from 'assets/icons/number.svg';
 import {ReactComponent as ElevetorIcon} from 'assets/icons/Elevator.svg';
 import {ReactComponent as BellIcon} from 'assets/icons/bell.svg';
 import useTheme from '@mui/material/styles/useTheme';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   name?: string;
@@ -21,7 +21,6 @@ interface Props {
   numberOfUnits?: number;
   yearlyPriceAdjustment?: number;
   noticePeriod?: number;
-  discount?: string[];
   start?: string;
   end?: string;
   contractNumber?: string;
@@ -35,7 +34,6 @@ export const ContractBasic = ({
   renewalPeriod,
   yearlyPriceAdjustment,
   noticePeriod,
-  discount,
   start,
   end,
   autoRenewal,
@@ -43,6 +41,7 @@ export const ContractBasic = ({
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
+  const formatDate = useFormatDate();
 
   return (
     <Grid container rowGap={2}>
@@ -67,7 +66,7 @@ export const ContractBasic = ({
           bodyTextVariant="subtitle1"
           icon={<CardTravelIcon />}
           iconMaxHeight="3rem"
-          bodyText={convertToText(start?.replace(/-/g, '.') || '-')}
+          bodyText={formatDate(start) || '-'}
           bodyStyle={{fontWeight: '600'}}
           iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
           labelStyle={{
@@ -130,7 +129,7 @@ export const ContractBasic = ({
           bodyTextVariant="subtitle1"
           icon={<CardTravelIcon />}
           iconMaxHeight="3rem"
-          bodyText={convertToText(end?.replace(/-/g, '.') || '-')}
+          bodyText={formatDate(end) || '-'}
           bodyStyle={{fontWeight: '600'}}
           iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
           labelStyle={{
@@ -192,19 +191,7 @@ export const ContractBasic = ({
         />
       </Grid>
 
-      <Grid item xs={6} sm={4} md={3}>
-        <CardProps
-          label="Invoice Discount"
-          bodyTextVariant="subtitle1"
-          icon={<MoneyOff />}
-          bodyText={discount ? `${discount}` : '-'}
-          bodyStyle={{fontWeight: '600'}}
-          iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
-          labelStyle={{
-            textTransform: 'none',
-          }}
-        />
-      </Grid>
+      <Grid item xs={6} sm={4} md={3} />
 
       <Grid item xs={6} sm={4} md={3}>
         <CardProps

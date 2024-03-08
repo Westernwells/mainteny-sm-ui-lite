@@ -36,7 +36,7 @@ import {
   UpdateContractComponents,
 } from 'models/contract';
 import {
-  calculateContractInvoicePriceTotal,
+  calculateFormContractInvoicePriceTotal,
   componentsToMutate,
 } from 'utils/contract-utils';
 import {theme} from 'theme';
@@ -1073,7 +1073,7 @@ export const MutationService = ({
               }}>
               <Typography variant="h6">
                 {formatCurrency(
-                  calculateContractInvoicePriceTotal(
+                  calculateFormContractInvoicePriceTotal(
                     formikContractServiceComponent.values.elevators,
                   ) ?? 0 / 10 ** (currentCurrency.fractionDigits ?? 0),
                   {
