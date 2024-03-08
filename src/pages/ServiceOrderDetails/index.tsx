@@ -73,7 +73,7 @@ export const ServiceOrderDetails = () => {
   });
 
   const {downloadFile} = useDownloadFileWithCustomName(
-    serviceOrder?.number,
+    tabValue === 1 ? serviceOrder?.report?.number : serviceOrder?.number,
     fileDownloadURLs[filePathToDownload],
   );
 
