@@ -32,10 +32,10 @@ import {
   applyGlobalDiscountOnQuotationItems,
   applyPerItemDiscountOnQuotationItems,
   applyQuotationDiscount,
-  calculateQuotationTotalAmountInclVats,
   getQuotationAggregatedItemsVats,
 } from 'pages/QuotationDetails/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {calculateSameVatTotals} from 'utils/calculate-total';
 import {Button} from './Button';
 import {SelectButton} from './SelectButton';
 import {FormSelect} from './form/FormSelect';
@@ -97,21 +97,6 @@ export const ArticleItemsTableQuotation = ({
         ]
       : getQuotationAggregatedItemsVats(itemsAfterGlobalDiscount)
     : [];
-
-  const totalAmountInclVats = calculateQuotationTotalAmountInclVats({
-    subtotalExclVatAfterDiscount,
-    percentageVats,
-  });
-
-  const totalAmountInclVatsFormatted = formatCurrency(
-    fixRounding(totalAmountInclVats, 2),
-    {
-      currency: currentCurrency.code,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      roundingMode: 'floor',
-    },
-  );
 
   const {language: selectedLng} = useContext(LanguageContext);
 
@@ -243,6 +228,8 @@ export const ArticleItemsTableQuotation = ({
     setItems(items);
   };
   const {user} = useUserSession();
+
+  const {total, totalVAT} = calculateSameVatTotals(itemsAfterGlobalDiscount);
 
   return (
     <Box
@@ -487,11 +474,8 @@ export const ArticleItemsTableQuotation = ({
                       {t('VAT')} {percentageVats[0].percentageVat}%
                     </Typography>
                     <Typography color="primary.dark">
-                      {formatCurrency(fixRounding(percentageVats[0].vat, 2), {
+                      {formatCurrency(totalVAT, {
                         currency: currentCurrency.code,
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                        roundingMode: 'floor',
                       })}
                     </Typography>
                   </>
@@ -516,7 +500,9 @@ export const ArticleItemsTableQuotation = ({
                   {t('Total amount (incl. VAT)')}
                 </Typography>
                 <Typography color="primary.dark">
-                  {totalAmountInclVatsFormatted}
+                  {formatCurrency(total, {
+                    currency: currentCurrency.code,
+                  })}
                 </Typography>
               </Box>
             </Box>
