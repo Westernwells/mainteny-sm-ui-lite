@@ -357,8 +357,10 @@ export const convertToHourAndMinutes = (timeInMinutes?: number) => {
     return '-';
   }
 
-  const hours = Math.floor(timeInMinutes / 60);
-  const remainingMinutes = timeInMinutes % 60;
+  const roundedTimeInMinutes = Math.round(timeInMinutes * 100) / 100;
+
+  const hours = Math.floor(roundedTimeInMinutes / 60);
+  const remainingMinutes = Math.round(roundedTimeInMinutes % 60);
 
   const formattedHours = (hours < 10 ? '0' : '') + hours;
   const formattedMinutes =

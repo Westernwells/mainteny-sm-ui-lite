@@ -7,13 +7,11 @@ import {
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 import {Box} from '@mui/material';
-
 import {WorkHourIcons} from 'components/WorkHourIcons';
 import {WorkHourTypeText} from 'components/WorkHourTypeText';
 import {WorkHoursItem} from 'models/workHours';
 import {FormatDate, Resource} from 'models/misc';
 import {useTranslation} from 'react-i18next';
-import {DateDuration, DateDurationOptions} from 'hooks/useFormatDuration';
 import {convertToHourAndMinutes} from 'utils/utils';
 
 const defaultProps = {
@@ -151,14 +149,15 @@ const getOrderNumber = (data: any) => {
   return serviceNumber || '-';
 };
 
+const getOrderId = (data: any) => {
+  const parsedData = JSON.parse(data);
+  const orderId = parsedData?.id;
+  return orderId || '';
+};
+
 export const makeRows = (
   workHours: Resource<WorkHoursItem>,
   formatDate: FormatDate = () => '',
-  formatDateDuration: (
-    input: DateDuration,
-    dateFormat?: string,
-    options?: DateDurationOptions,
-  ) => any = () => '',
 ): GridRowModel<{[key: string]: any}[]> =>
   workHours.data.length
     ? workHours.data.map((item: WorkHoursItem) => ({
@@ -167,12 +166,7 @@ export const makeRows = (
         billableHours: convertToHourAndMinutes(
           item.additionalInfo.billableTime,
         ),
-        duration: formatDateDuration({
-          [item.durationUnit.toLowerCase()]:
-            item.durationUnit === 'DAYS' && item.duration === 0
-              ? 1
-              : item.duration,
-        }),
+        duration: convertToHourAndMinutes(item.duration),
         startTime: `${formatDate(item.startTime, 'HH:mm')}`,
         address: getAddress(item.data) || '-',
         orderNumber: (
@@ -195,6 +189,7 @@ export const makeRows = (
             </Box>
           </Box>
         ),
+        orderId: getOrderId(item.data),
       }))
     : [];
 
