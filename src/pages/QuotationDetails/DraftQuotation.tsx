@@ -885,6 +885,8 @@ export const DraftQuotation = ({formType, quotation}: Props) => {
                 name: 'notes',
                 value: formik.values.notes,
                 onChange: formik.handleChange,
+                minRows: 2,
+                multiline: true,
               }}
             />
 
