@@ -35,7 +35,7 @@ import {ArticleType, ArticleView} from 'models/article';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {LanguageContext} from 'context/LanguageProvider';
 import {
-  calculateTotalAmountInclVats,
+  calculateSameVatTotals,
   calculateTotalWithPerItemDiscount,
 } from 'utils/calculate-total';
 import {fixRounding, getUniqueId} from 'utils/utils';
@@ -101,21 +101,6 @@ export const ArticleItemsTableNEW = ({
         ]
       : getAggregatedItemsVats(itemsAfterGlobalDiscount)
     : [];
-
-  const totalAmountInclVats = calculateTotalAmountInclVats({
-    subtotalExclVatAfterDiscount,
-    percentageVats,
-  });
-
-  const totalAmountInclVatsFormatted = formatCurrency(
-    fixRounding(totalAmountInclVats, 2),
-    {
-      currency: currentCurrency.code,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      roundingMode: 'floor',
-    },
-  );
 
   const {language: selectedLng} = useContext(LanguageContext);
 
@@ -236,6 +221,8 @@ export const ArticleItemsTableNEW = ({
     setItems(items);
   };
   const {user} = useUserSession();
+
+  const {total, totalVAT} = calculateSameVatTotals(itemsAfterGlobalDiscount);
 
   return (
     <Box
@@ -480,11 +467,8 @@ export const ArticleItemsTableNEW = ({
                       {t('VAT')} {percentageVats[0].percentageVat}%
                     </Typography>
                     <Typography color="primary.dark">
-                      {formatCurrency(fixRounding(percentageVats[0].vat, 2), {
+                      {formatCurrency(totalVAT, {
                         currency: currentCurrency.code,
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                        roundingMode: 'floor',
                       })}
                     </Typography>
                   </>
@@ -509,7 +493,9 @@ export const ArticleItemsTableNEW = ({
                   {t('Total amount (incl. VAT)')}
                 </Typography>
                 <Typography color="primary.dark">
-                  {totalAmountInclVatsFormatted}
+                  {formatCurrency(total, {
+                    currency: currentCurrency.code,
+                  })}
                 </Typography>
               </Box>
             </Box>
