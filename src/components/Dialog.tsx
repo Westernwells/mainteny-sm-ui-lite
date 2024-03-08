@@ -10,7 +10,6 @@ import {useTranslation} from 'react-i18next';
 import {ButtonProps, IconButton} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import {Button} from './Button';
-import {olStyles} from '../styles';
 
 interface Props {
   title: string | JSX.Element;
@@ -61,6 +60,7 @@ export const Dialog = ({
           padding: '1em 1.5em',
           display: 'flex',
           justifyContent: 'space-between',
+          alignItems: 'center',
         }}>
         {typeof title === 'string' ? t(title) : title}
         <IconButton onClick={onCancel}>
@@ -68,13 +68,7 @@ export const Dialog = ({
         </IconButton>
       </DialogTitle>
 
-      <DialogContent
-        sx={{
-          margin: '0em',
-          scrollbarWidth: 'none',
-          ...olStyles.scrollbar,
-          overflowY: 'scroll',
-        }}>
+      <DialogContent sx={{margin: '1em 0em 0em 1em'}}>
         <DialogContentText
           id="alert-dialog-description"
           component="div"

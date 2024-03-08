@@ -311,7 +311,11 @@ const NewContract = () => {
           <FlexContainer containerStyle={{mt: '1em'}}>
             <PageCard
               headerLabel="Add Services"
-              containerStyles={{maxHeight: '75vh', overflowY: 'auto'}}
+              containerStyles={{
+                maxHeight: '75vh',
+                overflowY: 'auto',
+                minHeight: '75vh',
+              }}
               contentContainerStyles={{height: '100%', textAlign: 'left'}}>
               <NewContractServices
                 elevatorUnits={formikUnits.values.elevators}
@@ -326,7 +330,11 @@ const NewContract = () => {
           <FlexContainer containerStyle={{mt: '1em'}}>
             <PageCard
               headerLabel="Customize Contract"
-              containerStyles={{maxHeight: '74vh', overflowY: 'auto'}}
+              containerStyles={{
+                maxHeight: '74vh',
+                overflowY: 'auto',
+                minHeight: '75vh',
+              }}
               contentContainerStyles={{height: '100%'}}>
               <NewCustomizeContract
                 formik={formikCustomizeContract}

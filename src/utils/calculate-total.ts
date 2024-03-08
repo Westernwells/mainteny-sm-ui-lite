@@ -4,7 +4,6 @@ import {
   applyPerItemDiscountOnItems,
   getAggregatedItemsVats,
 } from 'pages/InvoiceDetails/utils';
-import {ArticleType} from 'models/article';
 import {
   DiscountType,
   InvoiceFormData,
@@ -61,36 +60,6 @@ export const calculateTotalAmountInclVats = ({
   });
 
   return totalAmountInclVats;
-};
-
-export const calculateCostPackage = (arr: InvoiceItemRecord[]) => {
-  let laborCost = 0;
-  let materialCost = 0;
-
-  arr.forEach((item) => {
-    if (item.article?.type !== ArticleType.PACKAGE) {
-      const cost =
-        (item.quantity * (item.unitAmount?.netAmount ?? 0)) /
-        10 ** Currencies[item.unitAmount.currency];
-      if (item.article?.type === ArticleType.LABOR) {
-        laborCost += cost;
-      } else {
-        materialCost += cost;
-      }
-    } else {
-      laborCost +=
-        (item.quantity * (item.article?.costPackage?.labor?.value ?? 0)) /
-        10 ** (item.article?.costPackage?.labor?.fractionDigits ?? 0);
-      materialCost +=
-        (item.quantity * (item.article?.costPackage?.material?.value ?? 0)) /
-        10 ** (item.article?.costPackage?.material?.fractionDigits ?? 0);
-    }
-  });
-
-  return {
-    laborCost,
-    materialCost,
-  };
 };
 
 export const calculateInvoiceTotal = (arr: InvoiceView[]) => {

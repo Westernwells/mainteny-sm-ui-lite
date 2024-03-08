@@ -39,6 +39,12 @@ export const articleTypes = [
       "With the 'Package' choice, you can combine work (labor) and items (materials).",
     isPackage: true,
   },
+  {
+    value: ArticleType.OTHER,
+    label: 'Other',
+    title: 'Anything else that doesn’t fit the previous types description',
+    subTitle: '',
+  },
 ];
 
 export const SelectArticleType = ({
@@ -87,7 +93,7 @@ export const SelectArticleType = ({
             key={articleType.label}
             component="label"
             sx={{
-              width: '32.3%',
+              width: '24%',
               px: '1.5rem',
               py: '1rem',
               cursor: 'pointer',

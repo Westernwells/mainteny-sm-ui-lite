@@ -102,7 +102,7 @@ const NewCustomizeContract = ({formik, formikContractComponents}: Props) => {
                   return false;
                 }
 
-                const maxValue = 12;
+                const maxValue = 1000000000;
 
                 return floatValue <= maxValue;
               }}
@@ -168,7 +168,7 @@ const NewCustomizeContract = ({formik, formikContractComponents}: Props) => {
                 return false;
               }
 
-              const maxValue = 12;
+              const maxValue = 1000000000;
 
               return floatValue <= maxValue;
             }}
