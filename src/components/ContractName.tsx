@@ -2,7 +2,11 @@ import {FC, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import InputAdornment from '@mui/material/InputAdornment';
 import {FormInput} from 'components/form/FormInput';
-import {ContractTermView, ContractUpdateRequest} from 'models/contract';
+import {
+  ContractBasicInfoFormModel,
+  ContractTermView,
+  ContractUpdateRequest,
+} from 'models/contract';
 import {ServiceCompanyType} from 'models/service-company';
 import {FormikProps} from 'formik';
 import {IconButton} from '@mui/material';
@@ -13,7 +17,7 @@ import {ContractTermInput as NewContractName} from 'components/ContractTermInput
 import {createEmptyResource} from 'utils/paging-utils';
 
 interface Props {
-  formik: FormikProps<ContractUpdateRequest>;
+  formik: FormikProps<ContractBasicInfoFormModel | ContractUpdateRequest>;
 }
 
 const ContractName: FC<Props> = ({formik}) => {

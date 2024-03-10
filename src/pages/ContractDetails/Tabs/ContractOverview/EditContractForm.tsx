@@ -3,7 +3,10 @@ import {useTranslation} from 'react-i18next';
 import InputAdornment from '@mui/material/InputAdornment';
 import Grid from '@mui/material/Grid';
 import {FormInput} from 'components/form/FormInput';
-import {ContractUpdateRequest} from 'models/contract';
+import {
+  ContractBasicInfoFormModel,
+  ContractUpdateRequest,
+} from 'models/contract';
 import {ServiceCompanyNumberType} from 'models/service-company';
 import {FormikProps} from 'formik';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -75,7 +78,13 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
       </Grid>
 
       <Grid item md={3}>
-        <ContractName formik={formik} />
+        <ContractName
+          formik={
+            formik as FormikProps<
+              ContractBasicInfoFormModel | ContractUpdateRequest
+            >
+          }
+        />
       </Grid>
 
       <Grid item md={3}>
