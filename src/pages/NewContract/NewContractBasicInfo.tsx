@@ -10,9 +10,13 @@ import {
   useCompanyAutoNumberConfig,
   useCompanyNextNumber,
 } from 'hooks/reactQuery/useCompanies';
-import {ContractBasicInfoFormModel} from 'models/contract';
+import {
+  ContractBasicInfoFormModel,
+  ContractUpdateRequest,
+} from 'models/contract';
 import {ServiceCompanyNumberType} from 'models/service-company';
 import {ComboBox} from 'components/ComboBox';
+import ContractName from 'components/ContractName';
 
 interface Props {
   formik: FormikProps<ContractBasicInfoFormModel>;
@@ -50,18 +54,12 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => {
   return (
     <Grid container spacing={4}>
       <Grid item xs={4}>
-        <FormInput
-          props={{
-            label: 'Contract Name',
-            name: 'name',
-            value: formik.values.name,
-            onChange: formik.handleChange,
-            onBlur: formik.handleBlur,
-            multiline: true,
-            required: true,
-            helperText: formik.touched.name && formik.errors.name,
-            error: !!formik.errors.name && formik.touched.name,
-          }}
+        <ContractName
+          formik={
+            formik as FormikProps<
+              ContractBasicInfoFormModel | ContractUpdateRequest
+            >
+          }
         />
       </Grid>
       <Grid item xs={4}>
