@@ -113,6 +113,14 @@ export interface ElevatorAdditionalInfo {
   qrCode: FileResourceRecord;
   elevatorPhone: ElevatorPhone;
   customerAppointment: CustomerAppointment;
+  drive: string;
+  speed: string;
+  controller: string;
+  iotDevice: string;
+  cageWeight: string;
+  counterWeight: string;
+  hoistingHeight: string;
+  shaftHeight: string;
 }
 
 export interface ElevatorMaintainerRecord {
@@ -376,6 +384,14 @@ export interface ElevatorRequestBody {
   timeRule: Partial<ElevatorTimeRuleRecord>;
   customerAppointment: CustomerAppointment;
   technicianWeights: {[key: string]: string | number};
+  drive: string;
+  speed: string;
+  controller: string;
+  iotDevice: string;
+  cageWeight: string;
+  counterWeight: string;
+  hoistingHeight: string;
+  shaftHeight: string;
 }
 
 export interface ElevatorComment {

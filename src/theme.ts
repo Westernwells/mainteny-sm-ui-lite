@@ -18,6 +18,7 @@ export const theme = createTheme({
       outlinedHoverBg: 'rgba(0, 209, 255, 0.08)',
       containedHoverBackground:
         'linear-gradient(0deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), #00D1FF',
+      mainLight: '#8F9BB380',
     },
     text: {
       primary: '#222B45',

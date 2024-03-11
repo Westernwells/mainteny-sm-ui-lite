@@ -6,6 +6,7 @@ import PaymentsIcon from '@mui/icons-material/Payments';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import ListIcon from '@mui/icons-material/ListAlt';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import SettingsIcon from '@mui/icons-material/Settings';
 import {Invoices} from 'pages/Invoices';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
@@ -21,6 +22,7 @@ import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
 import {TodosTab} from './Tabs/TodosTab';
 import {PerformanceTab} from './Tabs/PerformanceTab';
 import UnitNotes from './Notes';
+import TechnicalDataTab from './Tabs/TechnicalDataTab';
 
 interface Props {
   getCurrentPageTitle?: (title: string) => void;
@@ -30,6 +32,10 @@ const tabItems = [
   {
     label: 'Overview',
     icon: <ManageSearchIcon />,
+  },
+  {
+    label: 'Technical data',
+    icon: <SettingsIcon />,
   },
   {
     label: 'Service Jobs',
@@ -49,8 +55,17 @@ const tabItems = [
   },
 ];
 
+enum TabIndex {
+  OVERVIEW = 0,
+  TECHNICAL_DATA = 1,
+  SERVICE_HISTORY = 2,
+  INVOICE_HISTORY = 3,
+  PERFORMANCE = 4,
+  TODOS = 5,
+}
+
 export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState<TabIndex>(TabIndex.OVERVIEW);
   const {id: elevatorId} = useParams();
   const {t} = useTranslation();
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
@@ -81,23 +96,27 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
           marginBottom: theme.spacing(8),
           '& > div:first-child': {marginBottom: theme.spacing(2)},
         }}>
-        <TabsBody value={value} index={0}>
+        <TabsBody value={value} index={TabIndex.OVERVIEW}>
           <OverviewTab getUnitName={(name) => setUnitName(name)} />
         </TabsBody>
 
-        <TabsBody value={value} index={1}>
+        <TabsBody value={value} index={TabIndex.TECHNICAL_DATA}>
+          <TechnicalDataTab />
+        </TabsBody>
+
+        <TabsBody value={value} index={TabIndex.SERVICE_HISTORY}>
           <ServiceHistoryTab />
         </TabsBody>
 
-        <TabsBody value={value} index={2}>
+        <TabsBody value={value} index={TabIndex.INVOICE_HISTORY}>
           <Invoices elevatorId={elevatorId} />
         </TabsBody>
 
-        <TabsBody value={value} index={3}>
+        <TabsBody value={value} index={TabIndex.PERFORMANCE}>
           <PerformanceTab />
         </TabsBody>
 
-        <TabsBody value={value} index={4}>
+        <TabsBody value={value} index={TabIndex.TODOS}>
           <TodosTab />
         </TabsBody>
         <Box

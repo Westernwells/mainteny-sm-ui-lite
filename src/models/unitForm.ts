@@ -33,6 +33,31 @@ export interface UnitDetailsFormModel {
   number?: string;
 }
 
+export interface TechnicalDataFormModel {
+  numberOfStops?: number;
+  drive?: string;
+  capacity?: string;
+  speed?: string;
+  controller?: string;
+  iotDevice?: string;
+  cabinType?: string;
+  cageWeight?: string;
+  counterWeight?: string;
+  hoistingHeight?: string;
+  shaftHeight?: string;
+}
+
+export interface AutoDialerFormModel {
+  emergencyPhoneProvider?: string;
+  systemId?: string;
+  phoneConnection?: string;
+  phoneNumber?: string;
+  simCardNumber?: string;
+  simPin?: string;
+  callCenter?: string;
+  placeOfInstallation?: string;
+}
+
 export interface ServiceFormModel {
   lastVisitDate?: Date;
   lastInspectionDate?: Date;
