@@ -169,11 +169,16 @@ const AttachmentsCard = ({
                       onSort={setSortOrder}>
                       {t('TYPE')}
                     </CustomSortLabel>
+                    <Divider
+                      sx={{
+                        width: '300%',
+                        marginLeft: '-150%',
+                        borderColor: '#8F9BB380',
+                      }}
+                    />
                   </TableCell>
                 </TableRow>
-                <Divider sx={{width: '200%', borderColor: '#8F9BB380'}} />
               </TableHead>
-
               <TableBody>
                 {sortedFiles?.map((file) => (
                   <TableRow key={file.id}>
