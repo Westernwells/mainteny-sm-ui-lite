@@ -143,8 +143,7 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
             color="error">
             {t('Delete Unit')}
           </Button>
-          {/* TODO: Add Notes in Unit Details */}
-          <UnitNotes customerId="" />
+          <UnitNotes elevatorId={elevatorId!} />
         </Box>
       </Tabs>
       <Confirm

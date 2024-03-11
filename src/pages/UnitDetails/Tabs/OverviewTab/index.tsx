@@ -12,7 +12,6 @@ import {AppointmentPreference} from './AppointmentPreference';
 import {EmergencyPhone} from './EmergencyPhone';
 import {UnitContracts} from './UnitContracts';
 import {PriorityTechnician} from './PriorityTechnician';
-import {Notes} from './Notes';
 import {Pictures} from './Pictures';
 
 interface Props {
@@ -174,19 +173,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
         <Grid
           item
           xs={12}
-          md={6}
-          sx={{
-            [theme.breakpoints.up('md')]: {
-              height: '100%',
-            },
-          }}>
-          <Notes elevatorId={elevator?.id} />
-        </Grid>
-
-        <Grid
-          item
-          xs={12}
-          md={6}
+          md={12}
           sx={{
             [theme.breakpoints.up('md')]: {
               height: '100%',
