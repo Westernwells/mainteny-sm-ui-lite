@@ -40,6 +40,7 @@ const serviceOrderStatusMap = {
   Completed: ServiceOrderStatus.COMPLETED,
   Cancelled: ServiceOrderStatus.CANCELLED,
   Expired: ServiceOrderStatus.EXPIRED,
+  Overdue: ServiceOrderStatus.OVERDUE,
 };
 type serviceOrderStatusMapKey = keyof typeof serviceOrderStatusMap;
 
@@ -163,7 +164,7 @@ export const ServiceOrderList = () => {
           ServiceOrderStatus.IN_PROGRESS,
           ServiceOrderStatus.COMPLETED,
           ServiceOrderStatus.CANCELLED,
-          ServiceOrderStatus.EXPIRED,
+          ServiceOrderStatus.OVERDUE,
         ].map((item) => serviceOrderStatusToString(item))}
         getSelectedValue={(item) =>
           setSelectedOrderStatus(
