@@ -51,6 +51,7 @@ export interface EmployeesSimpleView {
   meta: Meta;
   userAccount: UserAccountView;
   online: boolean;
+  externalId: string;
 }
 
 export interface BasicEmployeeFormModel {

@@ -342,9 +342,8 @@ export const DataGridLayout = ({
             borderBottom: '2px solid',
             borderColor: 'background.default',
             ...(isWidget && {
-              border: `1px solid ${theme.palette.text.disabled}`,
-              borderRadius: '4px',
-              padding: '0.5em 0em',
+              borderBottom: `1px solid`,
+              borderColor: `${theme.palette.text.disabled}`,
             }),
           },
           '& .MuiDataGrid-columnHeaderTitleContainer': {
