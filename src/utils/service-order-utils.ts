@@ -22,7 +22,7 @@ export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
       return 'warning.light';
     case ServiceOrderStatus.CANCELLED:
       return 'action.active';
-    case ServiceOrderStatus.EXPIRED:
+    case ServiceOrderStatus.OVERDUE:
       return 'error';
     case ServiceOrderStatus.COMPLETED:
       return 'success';
@@ -43,8 +43,8 @@ export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
       return 'Ongoing';
     case ServiceOrderStatus.CANCELLED:
       return 'Cancelled';
-    case ServiceOrderStatus.EXPIRED:
-      return 'Expired';
+    case ServiceOrderStatus.OVERDUE:
+      return 'Overdue';
     case ServiceOrderStatus.COMPLETED:
       return 'Completed';
     default:
@@ -64,8 +64,8 @@ export const serviceOrderStatusToEnum = (status: string) => {
       return ServiceOrderStatus.IN_PROGRESS;
     case 'Cancelled':
       return ServiceOrderStatus.CANCELLED;
-    case 'Expired':
-      return ServiceOrderStatus.EXPIRED;
+    case 'Overdue':
+      return ServiceOrderStatus.OVERDUE;
     case 'Completed':
       return ServiceOrderStatus.COMPLETED;
     default:
