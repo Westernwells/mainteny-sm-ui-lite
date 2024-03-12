@@ -85,7 +85,7 @@ export const ServiceOrderStatusText = ({
             </Typography>
           </Box>
         );
-      case ServiceOrderStatus.EXPIRED:
+      case ServiceOrderStatus.OVERDUE:
         return (
           <Box display="flex">
             {showLeftAdornment ? (
@@ -101,7 +101,7 @@ export const ServiceOrderStatusText = ({
               />
             ) : null}
             <Typography variant="chip" {...rest}>
-              Expired
+              Overdue
             </Typography>
           </Box>
         );
