@@ -6,7 +6,7 @@ import {ContractStatus, ContractSimpleView} from 'models/contract';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import {Progress} from 'components/Progress';
 import {Location} from './Location';
-import {UnitDetails} from './UnitDetails';
+import General from './General';
 import {Service} from './Service';
 import {AppointmentPreference} from './AppointmentPreference';
 import {EmergencyPhone} from './EmergencyPhone';
@@ -49,7 +49,13 @@ export const OverviewTab = ({getUnitName}: Props) => {
   return (
     <>
       <Grid container spacing={2}>
-        <Grid item md={5} sm={12}>
+        <Grid item md={6} sm={12}>
+          <General
+            elevator={elevator!}
+            propertyOwnerId={elevator?.propertyOwner.id}
+          />
+        </Grid>
+        <Grid item md={6} sm={12}>
           <Location
             propertyOwnerId={elevator?.propertyOwner.id}
             containerStyles={{
@@ -59,18 +65,6 @@ export const OverviewTab = ({getUnitName}: Props) => {
               },
             }}
             elevator={elevator!}
-          />
-        </Grid>
-        <Grid item md={7} sm={12}>
-          <UnitDetails
-            containerStyles={{
-              [theme.breakpoints.up('md')]: {
-                minHeight: '35rem',
-                height: '100%',
-              },
-            }}
-            elevator={elevator!}
-            propertyOwnerId={elevator?.propertyOwner.id}
           />
         </Grid>
       </Grid>
