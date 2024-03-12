@@ -685,11 +685,10 @@ export const calculateContractInvoicePriceTotal = (
           timeLength = item.orderGenerationJob.timeNumbers
             ? item.orderGenerationJob.timeNumbers.length
             : 0;
-        } else if (
-          orderTimeUnit === ContractTimeUnit.WEEKLY ||
-          orderTimeUnit === ContractTimeUnit.BIWEEKLY
-        ) {
-          timeLength = 1;
+        } else if (orderTimeUnit === ContractTimeUnit.WEEKLY) {
+          timeLength = 50;
+        } else if (orderTimeUnit === ContractTimeUnit.BIWEEKLY) {
+          timeLength = 25;
         } else if (orderTimeUnit === ContractTimeUnit.NONE) {
           timeLength = 0;
         }
