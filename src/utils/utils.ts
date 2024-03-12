@@ -187,6 +187,8 @@ export const languageContextMap: {[key: string]: Language} = {
   DE: Language.DE_DE,
   SR: Language.SR_RS,
   RU: Language.RU_RU,
+  IT: Language.IT_IT,
+  DA: Language.DA_DK,
 };
 
 export const companyLanguageContextMap: {[key: string]: string} = {
