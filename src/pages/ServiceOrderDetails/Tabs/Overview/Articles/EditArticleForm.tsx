@@ -85,11 +85,7 @@ export const EditArticleForm = ({
   }, [formik]);
 
   return (
-    <Box
-      display="flex"
-      flexWrap="wrap"
-      component="form"
-      justifyContent="space-between">
+    <Box display="flex" flexWrap="wrap" component="form">
       <FormInput
         containerStyles={{...containerStyles, width: '50%', pr: '1rem'}}
         props={{
