@@ -1,6 +1,6 @@
 import {AddressRecord} from 'models/misc';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
-import {FileResourceRecord} from './media';
+import {ElevatorStatus} from './elevator';
 
 export interface AttachmentFormModel {
   documents?: FileWithPreview[];
@@ -31,6 +31,18 @@ export interface UnitDetailsFormModel {
   unitCapacity?: string;
   spendingLimit?: number;
   number?: string;
+}
+
+export interface GeneralFormModel {
+  category?: string;
+  manufacturer?: string;
+  externalId?: string;
+  yearBuilt?: number;
+  model?: string;
+  serialNumber?: string;
+  spendingLimit?: number;
+  number?: string;
+  status?: ElevatorStatus;
 }
 
 export interface TechnicalDataFormModel {

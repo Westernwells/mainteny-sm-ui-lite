@@ -5,7 +5,8 @@ import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';
 import useTheme from '@mui/material/styles/useTheme';
 import {useTranslation} from 'react-i18next';
-import {CardActions} from '@mui/material';
+import CardActions from '@mui/material/CardActions';
+import Grid from '@mui/material/Grid';
 
 export interface Props {
   bodyContainerStyle?: {[key: string]: any};
@@ -15,6 +16,7 @@ export interface Props {
   header?: string | ReactNode;
   footer?: string | ReactNode;
   headerActionIcon?: JSX.Element;
+  headerIcon?: JSX.Element;
   children: ReactNode;
   showHeaderBackground?: boolean;
   disabledHeader?: boolean;
@@ -25,6 +27,7 @@ export interface Props {
 export const InfoCard = ({
   bodyContainerStyle,
   headerActionIcon,
+  headerIcon,
   minHeight,
   containerStyles,
   header,
@@ -66,7 +69,12 @@ export const InfoCard = ({
               </IconButton>
             ) : null
           }
-          title={typeof header === 'string' ? t(header) : header || undefined}
+          title={
+            <Grid container gap={headerIcon && '0.5rem'} alignItems="center">
+              {headerIcon || null}
+              {typeof header === 'string' ? t(header) : header || undefined}
+            </Grid>
+          }
         />
       )}
       <CardContent
