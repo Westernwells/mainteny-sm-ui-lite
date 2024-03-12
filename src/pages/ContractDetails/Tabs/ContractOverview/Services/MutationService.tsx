@@ -986,10 +986,25 @@ export const MutationService = ({
                   }}
                   label={t('Invoice Price(EXCL. VAT)')}
                   onValueChange={(values) => {
+                    const newPrice = Number(values.value);
+
                     formikContractServiceComponent.setFieldValue(
                       `elevators[${index}].price`,
-                      Number(values.value),
+                      newPrice,
                     );
+                    if (index === 0) {
+                      const updatedElevators =
+                        formikContractServiceComponent.values.elevators.map(
+                          (elevator: ContractServiceFormElevator) => ({
+                            ...elevator,
+                            price: newPrice,
+                          }),
+                        );
+                      formikContractServiceComponent.setFieldValue(
+                        'elevators',
+                        updatedElevators,
+                      );
+                    }
                   }}
                   size="small"
                 />

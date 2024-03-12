@@ -17,6 +17,7 @@ import {
   ContractView,
   ExtendedContractComponentRecord,
   UpdateContractComponents,
+  calculateContractInvoicePriceTotal,
 } from 'models/contract';
 import {toDate, toRestDate} from 'utils/datetime';
 import {ElevatorView} from 'models/elevator';
@@ -141,26 +142,6 @@ export const getContractStatusStyles = (
   }
 };
 
-export const calculateContractInvoicePriceTotal = (
-  array?: ContractComponentElevator[],
-) => {
-  let totalPrice: number = 0;
-
-  array?.forEach((item: ContractComponentElevator) => {
-    if (item?.invoiceJob?.timeNumbers) {
-      const timeNumbersLength: number = item.invoiceJob.timeNumbers.length;
-      const itemPrice: number = item.price;
-      const itemTotalPrice: number = timeNumbersLength
-        ? timeNumbersLength * itemPrice
-        : itemPrice;
-
-      totalPrice += itemTotalPrice;
-    }
-  });
-
-  return totalPrice;
-};
-
 export const componentsToMutate = (
   components: ContractComponentView[],
 ): UpdateContractComponents[] =>
@@ -245,7 +226,6 @@ export const convertExtendedRecordsToContractComponentRecords = (
       costType,
       costPackage,
       groupNumber,
-      group,
     } = extendedContractRecord;
 
     const convertedElevators: ContractComponentElevator[] = elevators.map(
@@ -263,7 +243,7 @@ export const convertExtendedRecordsToContractComponentRecords = (
 
     const contractComponentRecord: ContractComponentRecord = {
       name,
-      group: groupNumber !== null ? String(groupNumber) : group,
+      group: groupNumber !== null ? String(groupNumber) : '',
       elevators: convertedElevators,
       firstInvoiceDate: convertFirstInvoiceDateToDate
         ? toRestDate(convertFirstInvoiceDateToDate)
