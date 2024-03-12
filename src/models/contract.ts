@@ -663,11 +663,42 @@ export const calculateContractInvoicePriceTotal = (
   let totalPrice: number = 0;
 
   array.forEach((item: ContractComponentElevator) => {
-    if (item.invoiceJob && item.invoiceJob.timeNumbers) {
-      const timeNumbersLength: number = item.invoiceJob.timeNumbers.length;
-      const itemPrice: number = item.price;
-      const itemTotalPrice: number = timeNumbersLength * itemPrice;
+    let timeLength: number = 0;
 
+    if (item.invoiceJob) {
+      const invoiceTimeUnit: string = item.invoiceJob.timeUnit;
+      const orderTimeUnit: string = item.orderGenerationJob.timeUnit;
+
+      if (invoiceTimeUnit === ContractTimeUnit.MONTHLY) {
+        timeLength = item.invoiceJob.timeNumbers
+          ? item.invoiceJob.timeNumbers.length
+          : 0;
+      } else if (
+        invoiceTimeUnit === ContractTimeUnit.ANNUALLY ||
+        invoiceTimeUnit === ContractTimeUnit.BIENNIALLY ||
+        invoiceTimeUnit === ContractTimeUnit.TRIENNIALLY ||
+        invoiceTimeUnit === ContractTimeUnit.QUADRENNIALLY
+      ) {
+        timeLength = 1;
+      } else if (invoiceTimeUnit === ContractTimeUnit.NONE) {
+        if (orderTimeUnit === ContractTimeUnit.MONTHLY) {
+          timeLength = item.orderGenerationJob.timeNumbers
+            ? item.orderGenerationJob.timeNumbers.length
+            : 0;
+        } else if (
+          orderTimeUnit === ContractTimeUnit.WEEKLY ||
+          orderTimeUnit === ContractTimeUnit.BIWEEKLY
+        ) {
+          timeLength = 1;
+        } else if (orderTimeUnit === ContractTimeUnit.NONE) {
+          timeLength = 0;
+        }
+      }
+    }
+
+    if (timeLength > 0) {
+      const itemPrice: number = item.price;
+      const itemTotalPrice: number = timeLength * itemPrice;
       totalPrice += itemTotalPrice;
     }
   });
