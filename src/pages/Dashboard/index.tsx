@@ -254,7 +254,8 @@ export const Dashboard = () => {
               <TopCard
                 title="Overdue"
                 value={`${
-                  fullSummary?.serviceOrderSummary.numberOfOverDueOrders ?? '0'
+                  quarterlySummary?.serviceOrderSummary.numberOfOverDueOrders ??
+                  '0'
                 }`}
                 icon={ReportProblemOutlined}
                 iconColor={theme.palette.error.main}

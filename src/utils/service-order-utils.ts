@@ -41,8 +41,6 @@ export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
       return 'Cancelled';
     case ServiceOrderStatus.EXPIRED:
       return 'Expired';
-    case ServiceOrderStatus.OVERDUE:
-      return 'Overdue';
     case ServiceOrderStatus.COMPLETED:
       return 'Completed';
     default:
