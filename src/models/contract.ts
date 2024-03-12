@@ -722,6 +722,7 @@ export enum ContractTimeUnitYearView {
   QUADRENNIALLY = 'Every 4 years',
   WEEKLY = 'Weekly',
   BIWEEKLY = 'Every 2 weeks',
+  NONE = 'After job',
 }
 
 export const getListViewFrequency = (
@@ -736,6 +737,11 @@ export const getListViewFrequency = (
     switch (timeUnit) {
       case ContractTimeUnit.MONTHLY:
         elevator[key].timeNumbers.forEach((month) => monthlyUnits.add(month));
+        break;
+      case ContractTimeUnit.NONE:
+        if (key === 'invoiceJob') {
+          frequencySet.add(ContractTimeUnitYearView[timeUnit]);
+        }
         break;
       case ContractTimeUnit.WEEKLY:
       case ContractTimeUnit.BIWEEKLY:

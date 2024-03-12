@@ -117,7 +117,7 @@ export const MutationService = ({
   const open = Boolean(anchorEl);
 
   const [showAll, setShowAll] = useState(false);
-  const [visibleItems, setVisibleItems] = useState(2);
+  const [visibleItems, setVisibleItems] = useState(5);
 
   const handleCancel = () => {
     setIsDialogOpen(false);
@@ -135,7 +135,7 @@ export const MutationService = ({
 
   const handleToggleUnits = () => {
     if (showAll) {
-      setVisibleItems(2);
+      setVisibleItems(5);
       setShowAll(false);
     } else {
       setVisibleItems(
@@ -147,7 +147,7 @@ export const MutationService = ({
 
   useEffect(() => {
     setShowAll(false);
-    setVisibleItems(2);
+    setVisibleItems(5);
   }, [isDialogOpen]);
 
   const visibleElevators =
@@ -1025,7 +1025,9 @@ export const MutationService = ({
                   label={
                     showAll
                       ? 'Hide Units'
-                      : `Show ${lengthOfElevators - 2} more units`
+                      : `Show ${
+                          lengthOfElevators - 5 < 0 ? 0 : lengthOfElevators - 5
+                        } more units`
                   }
                   buttonProps={{
                     variant: 'text',
