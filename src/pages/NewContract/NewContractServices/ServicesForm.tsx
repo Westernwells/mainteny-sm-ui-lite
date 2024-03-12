@@ -790,10 +790,7 @@ const ServicesForm = ({
                       if (index === 0) {
                         const updatedElevators =
                           formikContractServiceComponent.values.elevators.map(
-                            (elevator, i) =>
-                              i === 0
-                                ? elevator
-                                : {...elevator, price: newPrice},
+                            (elevator) => ({...elevator, price: newPrice}),
                           );
                         formikContractServiceComponent.setFieldValue(
                           'elevators',
