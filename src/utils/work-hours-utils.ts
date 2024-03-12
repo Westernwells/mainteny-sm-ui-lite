@@ -97,3 +97,31 @@ export const getEmployeeStatus = (status: EmployeeStatus) => {
       return 'Working';
   }
 };
+
+export const convertMinutesToHoursAndMinutes = (
+  minutes: number,
+  {hourUnit = 'h'}: {hourUnit?: string} = {},
+) => {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  const hoursPadded = hours.toString().padStart(2, '0');
+  const minsPadded = mins.toString().padStart(2, '0');
+
+  return `${hoursPadded}:${minsPadded} ${hourUnit}`;
+};
+
+export const convertHoursAndMinutesToMinutes = (timeString: string): number => {
+  // Regular expression to match the "hh:mm" format
+  const timeRegex = /^(\d{1,2}):(\d{2})$/;
+
+  // Check if the input string matches the expected format
+  if (!timeRegex.test(timeString)) {
+    return 0; // Return 0 if the format is not valid
+  }
+
+  // Extract hours and minutes from the input string
+  const [, hours, minutes] = timeString.match(timeRegex) as RegExpMatchArray;
+
+  // Convert hours and minutes to total minutes
+  return parseInt(hours, 10) * 60 + parseInt(minutes, 10);
+};
