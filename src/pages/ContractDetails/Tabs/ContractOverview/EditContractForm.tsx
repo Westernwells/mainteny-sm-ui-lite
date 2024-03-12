@@ -227,7 +227,6 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
             error: !!(formik.touched.endDate && formik.errors.endDate),
             sx: {width: '100%'},
             onBlur: formik.handleBlur,
-            disabled: !formik.values.autoRenewalCancelled,
           }}
         />
       </Grid>
@@ -296,12 +295,16 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
         <FormInput
           props={{
             placeholder: 'Enter notice period',
-            label: 'Notice Period (in days)',
+            label: 'Notice Period (in months)',
             name: 'noticePeriodInMonth',
             type: 'number',
             value: Number(formik.values.noticePeriodInMonth).toString(),
             onBlur: formik.handleBlur,
             onChange: formik.handleChange,
+            inputProps: {
+              min: 0,
+              max: 12,
+            },
             error: !!formik.errors.noticePeriodInMonth,
           }}
         />
