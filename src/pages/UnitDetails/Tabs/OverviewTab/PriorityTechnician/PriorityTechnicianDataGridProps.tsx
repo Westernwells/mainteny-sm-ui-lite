@@ -6,34 +6,34 @@ import {
   GridRowsProp,
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import Box from '@mui/material/Box';
 import {ElevatorAssignmentSimpleView} from 'models/elevator';
-import {Tooltip} from 'components/Tooltip';
-import {Info} from '@mui/icons-material';
 import {useTranslation} from 'react-i18next';
-import {convertToText} from 'utils/utils';
+import {theme} from 'theme';
 
-const defaultProps = {
+const defaultProps = (isLink: boolean) => ({
   editable: false,
   sortable: false,
   renderHeader: (params: GridColumnHeaderParams) => {
     const {t} = useTranslation();
     return (
       <Typography variant="subtitle2" color="textSecondary">
-        {typeof params.colDef.headerName === 'string'
-          ? convertToText(t(params.colDef.headerName))
-          : params.colDef.headerName}
+        {typeof params.colDef.headerName === 'string' &&
+          t(params.colDef.headerName)}
       </Typography>
     );
   },
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" mx="0.5em">
+    <Typography
+      variant="body2"
+      mx="0.5em"
+      sx={{color: isLink ? theme.palette.primary.light : 'inherit'}}>
       {params.value}
     </Typography>
   ),
-};
+});
 const defaultAlignment: {
   flex: number;
   headerAlign: GridAlignment;
@@ -50,10 +50,18 @@ export const columns = (
 ): GridColDef[] => [
   {
     field: 'name',
-    headerName: 'NAME',
+    headerName: 'SERVICE NAME',
     type: 'string',
     ...defaultAlignment,
-    ...defaultProps,
+    ...defaultProps(true),
+    flex: 2,
+  },
+  {
+    field: 'number',
+    headerName: 'ENGINEER ID',
+    type: 'string',
+    ...defaultAlignment,
+    ...defaultProps(false),
     flex: 2,
   },
   {
@@ -61,7 +69,7 @@ export const columns = (
     headerName: 'ADDRESS',
     type: 'string',
     ...defaultAlignment,
-    ...defaultProps,
+    ...defaultProps(false),
     flex: 2,
   },
   {
@@ -69,71 +77,30 @@ export const columns = (
     headerName: 'PRIORITY',
     type: 'number',
     ...defaultAlignment,
-    ...defaultProps,
-    renderHeader: (params: GridColumnHeaderParams) => {
-      const {t} = useTranslation();
-      return (
-        <Box display="flex" alignItems="center">
-          <Typography variant="subtitle2" color="textSecondary">
-            {typeof params.colDef.headerName === 'string'
-              ? convertToText(t(params.colDef.headerName))
-              : params.colDef.headerName}
-          </Typography>
-          <Tooltip
-            title={
-              <Box>
-                <Typography
-                  sx={{color: 'primary.main', fontSize: '14px', mb: '0.5em'}}>
-                  {t('Priority')}
-                </Typography>
-                <Typography
-                  sx={{
-                    color: 'text.primary',
-                    fontSize: '12px',
-                    lineHeight: '166%',
-                  }}>
-                  {t('Higher the number here, higher is the priority')}
-                </Typography>
-              </Box>
-            }
-            placement="bottom-end"
-            componentsProps={{
-              tooltip: {
-                sx: {
-                  bgcolor: 'white',
-                  color: 'black',
-                  boxShadow: '0px 3.59389px 8.08625px rgba(0, 0, 0, 0.1);',
-                },
-              },
-            }}
-            arrow={false}>
-            <Info
-              sx={{
-                ml: '0.1em',
-                width: '1.04rem',
-                height: '1.04rem',
-                color: 'action.active',
-              }}
-            />
-          </Tooltip>
-        </Box>
-      );
-    },
+    ...defaultProps(false),
+    align: 'right',
+    headerAlign: 'right',
   },
   {
     field: 'actions',
-    headerName: 'Actions',
+    headerName: '',
     ...defaultAlignment,
-    ...defaultProps,
+    ...defaultProps(false),
+    align: 'right',
+    headerAlign: 'right',
     renderCell: (params) => (
       <Box sx={{display: 'flex'}}>
         <Box
           onClick={() => getEditableTechnician(params.value)}
           sx={{mr: '1em'}}>
-          <EditIcon sx={{color: 'text.secondary'}} />
+          <EditOutlinedIcon
+            style={{color: theme.palette.secondary.mainLight}}
+          />
         </Box>
         <Box onClick={() => getDeletableTechnician(params.value)}>
-          <DeleteIcon sx={{color: 'text.secondary'}} />
+          <DeleteOutlinedIcon
+            style={{color: theme.palette.secondary.mainLight}}
+          />
         </Box>
       </Box>
     ),
@@ -151,6 +118,7 @@ export const makeRows = (
     )
     .map((maintainer) => ({
       id: maintainer.technician.id,
+      number: maintainer.technician.externalId,
       name: `${maintainer.technician.userAccount.firstName} ${maintainer.technician.userAccount.lastName}`,
       address: maintainer.technician.address.fullName,
       priority: maintainer.weight,
