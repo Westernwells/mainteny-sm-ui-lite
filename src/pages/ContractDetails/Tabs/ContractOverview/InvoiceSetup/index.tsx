@@ -21,11 +21,11 @@ import {theme} from 'theme';
 import {useFormik} from 'formik';
 import {
   calculateContractInvoicePriceGrandTotalForm,
-  calculateContractInvoicePriceTotal,
   convertExtendedRecordsToContractComponentRecords,
   getUniqueInvoiceJobTimeNumbers,
 } from 'utils/contract-utils';
 import {
+  calculateContractInvoicePriceTotal,
   ContractComponentView,
   ExtendedContractComponentRecord,
 } from 'models/contract';
@@ -515,7 +515,7 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
                               variant="body2">
                               {formatCurrency(
                                 calculateContractInvoicePriceTotal(
-                                  item.elevators,
+                                  item.elevators || [],
                                 ) ??
                                   0 /
                                     10 ** (currentCurrency.fractionDigits ?? 0),

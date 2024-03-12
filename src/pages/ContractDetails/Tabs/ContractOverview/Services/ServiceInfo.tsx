@@ -19,9 +19,9 @@ import {
   ContractComponentView,
   ContractElevatorView,
   ContractServiceFormElevator,
+  calculateContractInvoicePriceTotal,
 } from 'models/contract';
 import {
-  calculateContractInvoicePriceTotal,
   calculateContractInvoiceRowPrice,
   getElevatorDataByElevator,
 } from 'utils/contract-utils';
@@ -268,8 +268,8 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
                 {' '}
                 {formatCurrency(
                   calculateContractInvoicePriceTotal(
-                    service?.additionalInfo
-                      ?.elevators as ContractServiceFormElevator[],
+                    service?.additionalInfo?.elevators ||
+                      ([] as ContractServiceFormElevator[]),
                   ) ?? 0 / 10 ** (currentCurrency.fractionDigits ?? 0),
                   {
                     currency: currentCurrency.code,
