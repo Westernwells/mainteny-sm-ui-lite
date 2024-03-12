@@ -135,7 +135,7 @@ export const AttachDocument: FC<Props> = ({
         }}
         showHeaderBackground={false}
         header={
-          <Box>
+          <Box sx={{width: '100%'}}>
             <Typography
               variant="subtitle1"
               display="flex"
