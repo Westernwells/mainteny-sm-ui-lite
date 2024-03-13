@@ -405,7 +405,8 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
               autoRenewal={contractDetails?.additionalInfo.autoRenewalCancelled}
               costPerYear={
                 formatCurrency(
-                  contractDetails?.additionalInfo?.totalYearlyPrice || 0,
+                  (contractDetails?.additionalInfo?.totalYearlyPrice || 0) /
+                    10 ** currentCurrency.fractionDigits,
                   {currency: contractDetails.additionalInfo.price?.currency},
                 ) || '-'
               }

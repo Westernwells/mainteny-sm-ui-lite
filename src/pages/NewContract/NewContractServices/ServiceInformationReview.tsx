@@ -228,8 +228,8 @@ const ServiceInformationReview = ({formikContractServiceComponent}: Props) => {
                     color={theme.palette.text.primary}
                     variant="body2">
                     {formatCurrency(
-                      calculateContractInvoiceRowPrice(item) ??
-                        0 / 10 ** (currentCurrency.fractionDigits ?? 0),
+                      (calculateContractInvoiceRowPrice(item) || 0) /
+                        10 ** (currentCurrency.fractionDigits ?? 0),
                       {
                         currency: currentCurrency.code,
                       },
@@ -275,7 +275,8 @@ const ServiceInformationReview = ({formikContractServiceComponent}: Props) => {
                 {formatCurrency(
                   calculateContractInvoicePriceTotal(
                     formikContractServiceComponent.values.elevators,
-                  ) ?? 0 / 10 ** (currentCurrency.fractionDigits ?? 0),
+                  ) /
+                    10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
                   {
                     currency: currentCurrency.code,
                   },
