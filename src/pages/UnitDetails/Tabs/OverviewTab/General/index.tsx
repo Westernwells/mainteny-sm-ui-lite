@@ -73,7 +73,6 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
         category: data.category ? convertToMacro(data.category) : '',
         manufacturer: data.manufacturer,
         externalId: data.externalId || '',
-        number: data.externalId || '',
         model: data.model || '',
         serialNumber: data.serialNumber,
         builtYear: data.yearBuilt,
