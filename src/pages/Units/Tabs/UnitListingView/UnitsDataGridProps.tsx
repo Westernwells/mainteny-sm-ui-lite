@@ -149,7 +149,7 @@ export const makeRows = (
 ): GridRowsProp =>
   elevators.map((elevator: ElevatorView) => ({
     id: elevator.id,
-    [ElevatorOrderField.EXTERNAL_ID]: elevator.number,
+    [ElevatorOrderField.EXTERNAL_ID]: elevator.externalId,
     [ElevatorOrderField.MODEL]: elevator.model,
     [ElevatorOrderField.BUILDING_LOCATION]:
       elevator.additionalInfo.buildingLocation,
