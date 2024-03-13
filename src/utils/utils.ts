@@ -187,6 +187,8 @@ export const languageContextMap: {[key: string]: Language} = {
   DE: Language.DE_DE,
   SR: Language.SR_RS,
   RU: Language.RU_RU,
+  IT: Language.IT_IT,
+  DA: Language.DA_DK,
 };
 
 export const companyLanguageContextMap: {[key: string]: string} = {
@@ -237,6 +239,10 @@ export const formatAddressFullname = (
     ? address?.component?.country
     : '';
 
+  const fullName = [name, address1, address2, zip, city, state, country]
+    .filter((x) => x !== '')
+    .join(', ');
+
   return {
     ...address,
     component: {
@@ -248,12 +254,7 @@ export const formatAddressFullname = (
       state,
       country,
     },
-    fullName:
-      address.fullName === null
-        ? null
-        : [name, address1, address2, zip, city, state, country]
-            .filter((x) => x !== '')
-            .join(', '),
+    fullName,
   };
 };
 

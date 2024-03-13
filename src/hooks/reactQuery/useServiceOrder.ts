@@ -56,7 +56,6 @@ import {
   ElevatorsByAddress,
   ElevatorView,
 } from 'models/elevator';
-import {useTranslation} from 'react-i18next';
 import {useUserSession} from './useUserSession';
 
 const filterByNextVisit = (
@@ -458,7 +457,6 @@ const cancelServiceOrders = async (serviceOrderId: string) => {
 
 export const useCancelServiceOrders = () => {
   const queryClient = useQueryClient();
-  const {t} = useTranslation();
   const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (serviceOrderId: string) => cancelServiceOrders(serviceOrderId),
@@ -466,7 +464,7 @@ export const useCancelServiceOrders = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        enqueueSnackbar(t('Service job has been cancelled'), {
+        enqueueSnackbar('Service job has been cancelled', {
           variant: 'success',
         });
       },
@@ -525,7 +523,6 @@ const unschedulerServiceOrder = async (serviceOrderId: string) => {
 
 export const useUnscheduleServiceOrders = () => {
   const queryClient = useQueryClient();
-  const {t} = useTranslation();
   const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     (serviceOrderId: string) => unschedulerServiceOrder(serviceOrderId),
@@ -533,7 +530,7 @@ export const useUnscheduleServiceOrders = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        enqueueSnackbar(t('Service job has been unscheduled'), {
+        enqueueSnackbar('Service job has been unscheduled', {
           variant: 'success',
         });
       },
@@ -803,6 +800,7 @@ const confirmAppointment = async (serviceOrderId: string) =>
 export const useConfirmAppointment = () => {
   const queryClient = useQueryClient();
   const {enqueueSnackbar, showError} = useSnackbar();
+
   return useMutation(
     (serviceOrderId: string) => confirmAppointment(serviceOrderId),
     {
@@ -834,6 +832,7 @@ export const postPublishChecklist = async (
 
 export const usePublishChecklist = () => {
   const {enqueueSnackbar, showError} = useSnackbar();
+
   return useMutation(
     ({id, body}: {id: string; body: SimpleEmailRecord}) =>
       postPublishChecklist(id, body),
@@ -995,7 +994,7 @@ export const useNewUpdateServiceOrderArticles = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.fetchServiceJobArticles]);
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
-        enqueueSnackbar(`Service Job updated successfully!`, {
+        enqueueSnackbar(`Service Job updated successfully.`, {
           variant: 'success',
         });
       },
