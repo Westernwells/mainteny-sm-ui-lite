@@ -457,11 +457,6 @@ export interface ServiceOrderActivityView {
   creator: UserAccountSimpleView;
 }
 
-export interface RedispatchParams {
-  technicianId: string;
-  serviceOrderId: string;
-}
-
 export interface UpdateServiceOrderScheduleBody {
   endTime?: string;
   startTime?: string;

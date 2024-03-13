@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -8,19 +8,10 @@ import Grid from '@mui/material/Grid';
 import {Confirm} from 'components/Confirm';
 import {
   useCancelServiceOrders,
-  useUpdateServiceOrderSchedule,
-  useRedispatchServiceOrders,
   useUnscheduleServiceOrders,
 } from 'hooks/reactQuery/useServiceOrder';
-import {
-  JobScheduleType,
-  ServiceOrderStatus,
-  ServiceOrderView,
-} from 'models/service-order';
+import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
-import {setDateTime, toRestDateTime} from 'utils/datetime';
-import {ScheduleForm} from 'pages/ServiceOrderDetails/models';
-import {FormikErrors} from 'formik';
 import {StatusChip} from 'components/StatusChip';
 import {
   getServiceOrderStatusColor,
@@ -28,7 +19,6 @@ import {
 } from 'utils/service-order-utils';
 import {MenuBtn} from 'components/MenuBtn';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
-import {useFormatDate} from 'hooks/useFormatDate';
 import {useTheme} from '@mui/material';
 import {ScheduleDialog} from './ScheduleDialog';
 import {MarkCompletedDialog} from './MarkCompletedDialog';
@@ -85,97 +75,12 @@ const OrderInfoItem = ({
 
 export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const {t} = useTranslation();
-  const formatDate = useFormatDate();
   const {mutate: cancelServiceOrder} = useCancelServiceOrders();
   const {mutate: unscheduleServiceOrder} = useUnscheduleServiceOrders();
-  const {mutate: rescheduleServiceOrder} = useRedispatchServiceOrders(
-    'Service job rescheduled successfully',
-  );
-  const {mutate: scheduleServiceOrder} = useUpdateServiceOrderSchedule(
-    'Service job scheduled successfully',
-  );
   const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
   const [openUnscheduleConfirm, setOpenUnscheduleConfirm] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [openMarkCompletedDialog, setOpenMarkCompletedDialog] = useState(false);
-  const [switchActive, setSwitchActive] = useState(true);
-  const [form, setForm] = useState<ScheduleForm>({} as ScheduleForm);
-  const [formError, setFormErrors] = useState<FormikErrors<ScheduleForm>>({});
-  const [formValid, setFormValid] = useState(false);
-
-  useEffect(() => {
-    if (!form.technicianId) {
-      return setFormValid(false);
-    }
-
-    if (!switchActive && form.technicianId) {
-      return setFormValid(true);
-    }
-
-    if (
-      switchActive &&
-      form?.startTime &&
-      form.endTime &&
-      form.startDate &&
-      form.endDate &&
-      form.technicianId
-    ) {
-      setFormValid(true);
-    } else {
-      setFormValid(false);
-    }
-  }, [form, switchActive]);
-
-  const reschedule = () => {
-    if (form.technicianId) {
-      rescheduleServiceOrder({
-        technicianId: form.technicianId,
-        serviceOrderId: serviceOrderDetails.id,
-      });
-      setOpenDialog(false);
-    }
-  };
-
-  const schedule = () => {
-    let orderStartTime = null;
-    let orderEndTime = null;
-    if (switchActive) {
-      orderStartTime = toRestDateTime(
-        setDateTime(
-          form?.startDate!,
-          formatDate(form.startTime as Date, 'HH:mm')!,
-        ),
-      );
-      orderEndTime = toRestDateTime(
-        setDateTime(form?.endDate!, formatDate(form.endTime as Date, 'HH:mm')!),
-      );
-    }
-
-    if (form.technicianId) {
-      scheduleServiceOrder({
-        body: {
-          ...(orderEndTime && {endTime: orderEndTime}),
-          ...(orderStartTime && {startTime: orderStartTime}),
-          technicianIds: [form.technicianId],
-          type: JobScheduleType.FIXED,
-        },
-        serviceOrderId: serviceOrderDetails.id,
-      });
-      setOpenDialog(false);
-    }
-  };
-
-  const handleSave = () => {
-    if (
-      serviceOrderDetails.status === ServiceOrderStatus.SCHEDULED ||
-      serviceOrderDetails.status === ServiceOrderStatus.IN_PROGRESS
-    ) {
-      return switchActive && !Object.keys(formError).length
-        ? schedule()
-        : reschedule();
-    }
-    return schedule();
-  };
 
   const renderDialogTitle = () =>
     serviceOrderDetails.status === ServiceOrderStatus.SCHEDULED ||
@@ -341,20 +246,13 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
       />
 
       <ScheduleDialog
-        disableSaveBtn={!formValid}
-        showSwitch
-        validateDate={switchActive}
-        switchState={!notPending}
-        getSwitchState={(value) => setSwitchActive(value)}
+        serviceOrderId={serviceOrderDetails.id}
         title={renderDialogTitle()}
-        getFormValues={(value) => setForm(value)}
-        getFormErrors={(errors) => setFormErrors(errors)}
         open={openDialog}
-        onSave={handleSave}
-        onCancel={() => setOpenDialog(false)}
-        defaultTechnician={
+        onClose={() => setOpenDialog(false)}
+        defaultTechnicians={
           serviceOrderDetails.schedules.length
-            ? serviceOrderDetails.schedules[0].technician
+            ? serviceOrderDetails.schedules.map((s) => s.technician)
             : null
         }
         defaultStartDate={

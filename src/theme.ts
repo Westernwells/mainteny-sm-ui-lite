@@ -415,6 +415,22 @@ export const theme = createTheme({
         },
       },
     },
+    MuiAutocomplete: {
+      styleOverrides: {
+        tag: {
+          backgroundColor: '#0F4C64',
+          color: '#F5FDFE',
+          '& .MuiChip-deleteIcon': {
+            color: 'white',
+          },
+        },
+        option: {
+          '&[aria-selected="true"]': {
+            backgroundColor: '#000034',
+          },
+        },
+      },
+    },
   },
 });
 export const SUCCESS_COLOR = '#2A7961';
