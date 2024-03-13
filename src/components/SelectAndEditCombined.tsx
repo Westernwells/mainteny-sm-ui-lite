@@ -27,6 +27,7 @@ interface Props {
   addressType: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress';
   formik: FormikProps<InvoiceFormData>;
   address?: AddressRecord;
+  customerName?: string;
 }
 
 export const SelectAndEditCombined = ({
@@ -40,6 +41,7 @@ export const SelectAndEditCombined = ({
   addressType,
   formik,
   address,
+  customerName,
 }: Props) => {
   const {t} = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -147,19 +149,15 @@ export const SelectAndEditCombined = ({
         title={modalHeader}
         onCancel={onCloseDialog}
         onSave={onSaveAddress}
-        disableSaveBtn={
-          addressType === 'billingAddress'
-            ? !formik.values?.[addressType]?.component?.street ||
-              !formik.values?.[addressType]?.component?.city ||
-              !formik.values?.[addressType]?.component?.country ||
-              !formik.values?.[addressType]?.component?.postalCode
-            : !formik.values?.[addressType]?.component?.name
-        }
         dialogProps={{
           maxWidth: 'md',
           open: isModalOpen || false,
         }}>
-        <EditCustomerForm formik={formik} address={addressType} />
+        <EditCustomerForm
+          formik={formik}
+          address={addressType}
+          customerName={customerName}
+        />
       </Dialog>
     </Box>
   );
