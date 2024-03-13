@@ -419,8 +419,8 @@ const InvoiceSetup = ({formikContractComponents}: Props) => {
                     sx={{color: theme.palette.text.primary, fontWeight: '600'}}
                     variant="body2">
                     {formatCurrency(
-                      calculateContractInvoicePriceGrandTotal(group.services) ??
-                        0 / 10 ** (currentCurrency.fractionDigits ?? 0),
+                      calculateContractInvoicePriceGrandTotal(group.services) /
+                        10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
                       {
                         currency: currentCurrency.code,
                       },
@@ -554,10 +554,10 @@ const InvoiceSetup = ({formikContractComponents}: Props) => {
                                         (elevatorItem) =>
                                           elevatorItem.isSelected,
                                       ),
-                                    ) ??
-                                      0 /
-                                        10 **
-                                          (currentCurrency.fractionDigits ?? 0),
+                                    ) /
+                                      10 **
+                                        (currentCurrency.fractionDigits ?? 0) ??
+                                      0,
                                     {
                                       currency: currentCurrency.code,
                                     },
@@ -704,8 +704,9 @@ const InvoiceSetup = ({formikContractComponents}: Props) => {
                                 item.elevators.filter(
                                   (elevator) => elevator.isSelected,
                                 ),
-                              ) ??
-                                0 / 10 ** (currentCurrency.fractionDigits ?? 0),
+                              ) /
+                                10 ** (currentCurrency.fractionDigits ?? 0) ??
+                                0,
                               {
                                 currency: currentCurrency.code,
                               },

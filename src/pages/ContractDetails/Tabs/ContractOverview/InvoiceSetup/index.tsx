@@ -416,7 +416,8 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
                         {formatCurrency(
                           calculateContractInvoicePriceGrandTotalForm(
                             group.services,
-                          ) ?? 0 / 10 ** (currentCurrency.fractionDigits ?? 0),
+                          ) /
+                            10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
                           {
                             currency: currentCurrency.code,
                           },
@@ -516,9 +517,9 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
                               {formatCurrency(
                                 calculateContractInvoicePriceTotal(
                                   item.elevators || [],
-                                ) ??
-                                  0 /
-                                    10 ** (currentCurrency.fractionDigits ?? 0),
+                                ) /
+                                  10 ** (currentCurrency.fractionDigits ?? 0) ??
+                                  0,
                                 {
                                   currency: currentCurrency.code,
                                 },
@@ -616,8 +617,8 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
                           alignItems: 'center',
                         }}>
                         {formatCurrency(
-                          calculateContractInvoicePriceTotal(item.elevators) ??
-                            0 / 10 ** (currentCurrency.fractionDigits ?? 0),
+                          calculateContractInvoicePriceTotal(item.elevators) /
+                            10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
                           {
                             currency: currentCurrency.code,
                           },

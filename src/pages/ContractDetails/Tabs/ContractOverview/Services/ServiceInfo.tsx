@@ -222,8 +222,8 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
                 }}>
                 <Typography color={theme.palette.text.primary} variant="body2">
                   {formatCurrency(
-                    calculateContractInvoiceRowPrice(item) ??
-                      0 / 10 ** (currentCurrency.fractionDigits ?? 0),
+                    calculateContractInvoiceRowPrice(item) /
+                      10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
                     {
                       currency: currentCurrency.code,
                     },
@@ -270,7 +270,8 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
                   calculateContractInvoicePriceTotal(
                     service?.additionalInfo
                       ?.elevators as ContractServiceFormElevator[],
-                  ) ?? 0 / 10 ** (currentCurrency.fractionDigits ?? 0),
+                  ) /
+                    10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
                   {
                     currency: currentCurrency.code,
                   },

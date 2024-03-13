@@ -624,71 +624,92 @@ const ServicesForm = ({
             sx={{
               display: 'block',
             }}>
-            {visibleElevators?.map((item, index) => (
-              <TableRow
-                sx={{
-                  width: '100%',
-                  display: 'block',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    background: '#F2F6F8',
-                  },
-                }}
-                key={`${item.elevatorId}-${index}`}>
-                <TableCell
-                  sx={{
-                    width: '20%',
-                    display: 'inline-block',
-                    padding: '0.5em',
-                    borderBottom: 'none',
-                  }}>
-                  <FormCheckbox
-                    checked={item.isSelected}
-                    name={`isChecked-${index}`}
-                    handleChange={() =>
-                      handleCheckboxChange(index, item.isSelected!)
-                    }
-                    label={item.externalId || '-'}
-                    typographyProps={{
-                      color: theme.palette.text.primary,
-                      fontWeight: '400',
-                      variant: 'body2',
-                    }}
-                  />
-                </TableCell>
+            {visibleElevators?.map((item, index) => {
+              const price =
+                formikContractServiceComponent.values.elevators[index].price /
+                10 ** currentCurrency.fractionDigits;
 
-                <TableCell
+              return (
+                <TableRow
                   sx={{
-                    width: '10%',
-                    display: 'inline-block',
-                    borderBottom: 'none',
-                    padding: '0.5em 0em',
-                  }}>
-                  <Typography
-                    color={theme.palette.text.primary}
-                    variant="body2">
-                    {item.buildingLocation || '-'}
-                  </Typography>
-                </TableCell>
+                    width: '100%',
+                    display: 'block',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      background: '#F2F6F8',
+                    },
+                  }}
+                  key={`${item.elevatorId}-${index}`}>
+                  <TableCell
+                    sx={{
+                      width: '20%',
+                      display: 'inline-block',
+                      padding: '0.5em',
+                      borderBottom: 'none',
+                    }}>
+                    <FormCheckbox
+                      checked={item.isSelected}
+                      name={`isChecked-${index}`}
+                      handleChange={() =>
+                        handleCheckboxChange(index, item.isSelected!)
+                      }
+                      label={item.externalId || '-'}
+                      typographyProps={{
+                        color: theme.palette.text.primary,
+                        fontWeight: '400',
+                        variant: 'body2',
+                      }}
+                    />
+                  </TableCell>
 
-                <TableCell
-                  sx={{
-                    width: formikContractServiceComponent.values
-                      .isAutomaticJobCycle
-                      ? '22%'
-                      : '37%',
-                    display: 'inline-block',
-                    borderBottom: 'none',
-                    padding: '0.5em 0.5em 0.5em 0em',
-                  }}>
-                  <Typography
-                    color={theme.palette.text.primary}
-                    variant="body2">
-                    {item.address || '-'}
-                  </Typography>
-                </TableCell>
+                  <TableCell
+                    sx={{
+                      width: '10%',
+                      display: 'inline-block',
+                      borderBottom: 'none',
+                      padding: '0.5em 0em',
+                    }}>
+                    <Typography
+                      color={theme.palette.text.primary}
+                      variant="body2">
+                      {item.buildingLocation || '-'}
+                    </Typography>
+                  </TableCell>
 
-                {formikContractServiceComponent.values.isAutomaticJobCycle && (
+                  <TableCell
+                    sx={{
+                      width: formikContractServiceComponent.values
+                        .isAutomaticJobCycle
+                        ? '22%'
+                        : '37%',
+                      display: 'inline-block',
+                      borderBottom: 'none',
+                      padding: '0.5em 0.5em 0.5em 0em',
+                    }}>
+                    <Typography
+                      color={theme.palette.text.primary}
+                      variant="body2">
+                      {item.address || '-'}
+                    </Typography>
+                  </TableCell>
+
+                  {formikContractServiceComponent.values
+                    .isAutomaticJobCycle && (
+                    <TableCell
+                      sx={{
+                        width: '15%',
+                        display: 'inline-block',
+                        textAlign: 'right',
+                        borderBottom: 'none',
+                        padding: '0em 1.5em 0em 0em',
+                      }}>
+                      <JobFrequencyPicker
+                        formik={formikContractServiceComponent}
+                        componentId={item.elevatorId}
+                      />
+                    </TableCell>
+                  )}
+
                   <TableCell
                     sx={{
                       width: '15%',
@@ -697,112 +718,108 @@ const ServicesForm = ({
                       borderBottom: 'none',
                       padding: '0em 1.5em 0em 0em',
                     }}>
-                    <JobFrequencyPicker
+                    <InvoiceFrequencyPicker
                       formik={formikContractServiceComponent}
                       componentId={item.elevatorId}
                     />
                   </TableCell>
-                )}
 
-                <TableCell
-                  sx={{
-                    width: '15%',
-                    display: 'inline-block',
-                    textAlign: 'right',
-                    borderBottom: 'none',
-                    padding: '0em 1.5em 0em 0em',
-                  }}>
-                  <InvoiceFrequencyPicker
-                    formik={formikContractServiceComponent}
-                    componentId={item.elevatorId}
-                  />
-                </TableCell>
-
-                <TableCell
-                  sx={{
-                    width: '18%',
-                    display: 'inline-block',
-                    textAlign: 'right',
-                    borderBottom: 'none',
-                    padding: '0.7em 0.4em 0.5em 0em',
-                  }}>
-                  <NumericFormat
-                    value={
-                      formikContractServiceComponent.values.elevators[index]
-                        .price
-                    }
-                    customInput={TextField}
-                    prefix={currentCurrency.symbol}
-                    allowLeadingZeros={false}
-                    decimalScale={2}
-                    decimalSeparator={
-                      selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-                    }
-                    thousandSeparator={
-                      selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-                    }
+                  <TableCell
                     sx={{
-                      width: '100%',
-                      bgcolor: 'white',
-                      '& .MuiInputBase-root': {
-                        pr: 0,
-                      },
-                      '& .MuiOutlinedInput-input': {
-                        textAlign: 'right',
-                        background: '#FFFFFF',
-                      },
-                    }}
-                    isAllowed={(values) => {
-                      const {floatValue} = values;
-                      if (!floatValue) {
-                        return true;
+                      width: '18%',
+                      display: 'inline-block',
+                      textAlign: 'right',
+                      borderBottom: 'none',
+                      padding: '0.7em 0.4em 0.5em 0em',
+                    }}>
+                    <NumericFormat
+                      value={price}
+                      customInput={TextField}
+                      prefix={currentCurrency.symbol}
+                      allowLeadingZeros={false}
+                      decimalScale={2}
+                      decimalSeparator={
+                        selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
                       }
-
-                      if (floatValue < 0) {
-                        return false;
+                      thousandSeparator={
+                        selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
                       }
+                      sx={{
+                        width: '100%',
+                        bgcolor: 'white',
+                        '& .MuiInputBase-root': {
+                          pr: 0,
+                        },
+                        '& .MuiOutlinedInput-input': {
+                          textAlign: 'right',
+                          background: '#FFFFFF',
+                        },
+                      }}
+                      isAllowed={(values) => {
+                        const {floatValue} = values;
+                        if (!floatValue) {
+                          return true;
+                        }
 
-                      const maxValue = 1000000000000;
+                        if (floatValue < 0) {
+                          return false;
+                        }
 
-                      return floatValue <= maxValue;
-                    }}
-                    InputProps={{
-                      name: 'price',
-                      id: `price`,
-                      inputMode: 'numeric',
-                      error: !!getIn(
-                        formikContractServiceComponent.errors,
-                        `elevators[${index}].price`,
-                      ),
-                    }}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    label={t('Invoice Price(EXCL. VAT)')}
-                    onValueChange={(values) => {
-                      const newPrice = Number(values.value);
+                        const maxValue = 1000000000000;
 
-                      formikContractServiceComponent.setFieldValue(
-                        `elevators[${index}].price`,
-                        newPrice,
-                      );
+                        return floatValue <= maxValue;
+                      }}
+                      InputProps={{
+                        name: 'price',
+                        id: `price`,
+                        inputMode: 'numeric',
+                        error: !!getIn(
+                          formikContractServiceComponent.errors,
+                          `elevators[${index}].price`,
+                        ),
+                      }}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      label={t('Invoice Price(EXCL. VAT)')}
+                      onValueChange={(values) => {
+                        const {floatValue} = values;
+                        if (floatValue) {
+                          const newPrice = floatValue;
 
-                      if (index === 0) {
-                        const updatedElevators =
-                          formikContractServiceComponent.values.elevators.map(
-                            (elevator) => ({...elevator, price: newPrice}),
-                          );
-                        formikContractServiceComponent.setFieldValue(
-                          'elevators',
-                          updatedElevators,
-                        );
-                      }
-                    }}
-                    size="small"
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
+                          if (index === 0) {
+                            formikContractServiceComponent.setFieldValue(
+                              `elevators[${index}].price`,
+                              newPrice * 10 ** currentCurrency.fractionDigits,
+                            );
+
+                            const updatedElevators =
+                              formikContractServiceComponent.values.elevators.map(
+                                (elevator) => ({
+                                  ...elevator,
+                                  price:
+                                    newPrice *
+                                    10 ** currentCurrency.fractionDigits,
+                                }),
+                              );
+                            formikContractServiceComponent.setFieldValue(
+                              'elevators',
+                              updatedElevators,
+                            );
+                          } else {
+                            formikContractServiceComponent.setFieldValue(
+                              `elevators[${index}].price`,
+                              newPrice * 10 ** currentCurrency.fractionDigits,
+                            );
+                          }
+                        }
+                      }}
+                      size="small"
+                    />
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
@@ -880,7 +897,8 @@ const ServicesForm = ({
                       formikContractServiceComponent.values.elevators.filter(
                         (elevator) => elevator.isSelected,
                       ),
-                    ) ?? 0 / 10 ** (currentCurrency.fractionDigits ?? 0),
+                    ) /
+                      10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
                     {
                       currency: currentCurrency.code,
                     },

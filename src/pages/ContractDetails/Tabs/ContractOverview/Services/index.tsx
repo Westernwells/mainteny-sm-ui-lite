@@ -392,7 +392,8 @@ export const Services: FC<Props> = ({contractDetails}) => {
                       {formatCurrency(
                         calculateContractInvoicePriceTotal(
                           row.additionalInfo.elevators || [],
-                        ) ?? 0 / 10 ** (currentCurrency.fractionDigits ?? 0),
+                        ) /
+                          10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
                         {
                           currency: currentCurrency.code,
                         },
@@ -460,7 +461,8 @@ export const Services: FC<Props> = ({contractDetails}) => {
                     {formatCurrency(
                       calculateContractInvoicePriceGrandTotal(
                         contractDetails.components,
-                      ) ?? 0 / 10 ** (currentCurrency.fractionDigits ?? 0),
+                      ) /
+                        10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
                       {
                         currency: currentCurrency.code,
                       },
