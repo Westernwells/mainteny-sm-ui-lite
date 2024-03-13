@@ -33,6 +33,7 @@ import {ReactComponent as DriveFileIcon} from 'assets/icons/DriveFileIcon.svg';
 import ImageIcon from '@mui/icons-material/Image';
 import Divider from '@mui/material/Divider';
 import CustomSortLabel, {sortByName} from 'components/CustomSortLabel';
+import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   files: FileResource[];
@@ -58,6 +59,7 @@ const AttachmentsCard = ({
   isMinHeight = true,
 }: Props) => {
   const {t} = useTranslation();
+  const formatDate = useFormatDate();
   const [openDialog, setOpenDialog] = useState(false);
   const [openPreview, setOpenPreview] = useState(false);
   const [editingFileId, setEditingFileId] = useState('');
@@ -181,15 +183,20 @@ const AttachmentsCard = ({
               </TableHead>
               <TableBody>
                 {sortedFiles?.map((file) => (
-                  <TableRow key={file.id}>
+                  <TableRow
+                    key={file.id}
+                    sx={{
+                      cursor: 'pointer',
+                      '&:hover': {background: theme.palette.grey[100]},
+                    }}
+                    onClick={() => handlePreviewFile(file)}>
                     <TableCell
                       align="left"
                       width="55%"
-                      sx={{paddingLeft: 0, paddingRight: 0}}>
+                      sx={{paddingLeft: 0, paddingRight: 0, padding: 0.5}}>
                       {/* Preview */}
                       <Grid container wrap="nowrap" alignItems="center">
                         <Grid
-                          onClick={() => handlePreviewFile(file)}
                           border={`1px solid ${theme.palette.text.disabled}`}
                           borderRadius={1}
                           sx={{
@@ -229,20 +236,36 @@ const AttachmentsCard = ({
                               size: 'small',
                               sx: {ml: '0.1rem', mr: '0.5rem'},
                               type: 'text',
-                              onChange: (e) => setFileName(e.target.value),
+                              onClick: (e) => e.stopPropagation(),
+                              onChange: (e) => {
+                                e.stopPropagation();
+                                setFileName(e.target.value);
+                              },
                             }}
                           />
                         ) : (
-                          <Typography
-                            variant="body1"
-                            pl={2}
-                            pr={1.75}
-                            sx={{
-                              wordBreak: 'break-word',
-                              overflowWrap: 'anywhere',
-                            }}>
-                            {file.description}
-                          </Typography>
+                          <Grid container direction="column">
+                            <Typography
+                              variant="body1"
+                              pl={1}
+                              sx={{
+                                wordBreak: 'break-word',
+                                overflowWrap: 'anywhere',
+                              }}>
+                              {file.description}
+                            </Typography>
+                            <Typography
+                              variant="helperText"
+                              pl={1}
+                              sx={{
+                                color: theme.palette.text.secondary,
+                              }}>
+                              {formatDate(
+                                new Date(file.createdAt),
+                                'dd.MM.yyyy',
+                              )}
+                            </Typography>
+                          </Grid>
                         )}
                       </Grid>
                     </TableCell>
@@ -251,7 +274,7 @@ const AttachmentsCard = ({
                     <TableCell
                       align="right"
                       width="45%"
-                      sx={{paddingLeft: 0, paddingRight: 0}}>
+                      sx={{paddingLeft: 0, paddingRight: 0, padding: 0.5}}>
                       <Grid
                         container
                         wrap="nowrap"
@@ -296,7 +319,10 @@ const AttachmentsCard = ({
                             width="fit-content"
                             gap="1rem">
                             <IconButton
-                              onClick={() => handleSaveFileName(file.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSaveFileName(file.id);
+                              }}
                               edge="start"
                               sx={{ml: '0.1rem', padding: '4px'}}>
                               <CheckCircleRounded
@@ -308,7 +334,10 @@ const AttachmentsCard = ({
                             </IconButton>
 
                             <IconButton
-                              onClick={() => handleFileNameChange()}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleFileNameChange();
+                              }}
                               edge="start"
                               sx={{padding: '4px'}}>
                               <CancelIcon
@@ -326,7 +355,10 @@ const AttachmentsCard = ({
                             alignItems="center"
                             width="fit-content">
                             <IconButton
-                              onClick={() => handleFileNameChange(file.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleFileNameChange(file.id);
+                              }}
                               edge="start">
                               <EditOutlinedIcon
                                 style={{
@@ -339,7 +371,10 @@ const AttachmentsCard = ({
 
                             <IconButton
                               size="small"
-                              onClick={() => onDeleteFile(file.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onDeleteFile(file.id);
+                              }}
                               sx={{ml: 'auto'}}>
                               <DeleteOutlineIcon
                                 sx={{
@@ -396,18 +431,20 @@ const AttachmentsCard = ({
       }
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground={false}
+      headerIcon={
+        <AttachFileIcon
+          style={{
+            transform: 'rotate(45deg)',
+            color: theme.palette.text.secondary,
+            width: '2rem',
+            height: '2rem',
+          }}
+        />
+      }
       header={
-        <Grid container wrap="nowrap" gap={0.5}>
-          <AttachFileIcon
-            style={{
-              transform: 'rotate(45deg)',
-              color: theme.palette.text.secondary,
-            }}
-          />
-          <Typography variant="subtitle1" fontWeight={600}>
-            {t('Attachments')}
-          </Typography>
-        </Grid>
+        <Typography variant="h5" fontWeight={600}>
+          {t('Attachments')}
+        </Typography>
       }>
       {renderContent()}
       <Dialog
