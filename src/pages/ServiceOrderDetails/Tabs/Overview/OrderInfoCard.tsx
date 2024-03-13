@@ -127,7 +127,6 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   }, [form, switchActive]);
 
   const reschedule = () => {
-    console.log('form', form);
     if (form.technicianId) {
       rescheduleServiceOrder({
         technicianId: form.technicianId,
@@ -188,7 +187,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
     ServiceOrderStatus.INIT,
     ServiceOrderStatus.READY_TO_SCHEDULE,
     ServiceOrderStatus.SCHEDULING,
-    ServiceOrderStatus.EXPIRED,
+    ServiceOrderStatus.OVERDUE,
   ].includes(serviceOrderDetails.status);
 
   const orderAction = () => {
@@ -259,6 +258,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
+            width: '100%',
           }}>
           <Box sx={{display: 'flex', height: '100%', alignItems: 'center'}}>
             <Box sx={{alignSelf: 'center'}}>

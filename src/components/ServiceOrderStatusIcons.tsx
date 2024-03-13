@@ -32,7 +32,7 @@ export const ServiceOrderStatusIcons = ({serviceOrderStatus, style}: Props) => {
           sx={{mt: '0.3em', height: '0.833rem', width: '0.833rem', ...style}}
         />
       );
-    case ServiceOrderStatus.EXPIRED:
+    case ServiceOrderStatus.OVERDUE:
       return (
         <WarningAmberIcon
           color="warning"
