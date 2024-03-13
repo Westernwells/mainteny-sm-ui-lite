@@ -126,7 +126,7 @@ export const CardProps = ({
               variant={bodyTextVariant || 'body2'}
               sx={{
                 fontSize: '0.9rem',
-                fontWeight: '600',
+                fontWeight: '300',
                 WebkitLineClamp: '2',
                 WebkitBoxOrient: 'vertical',
                 textOverflow: 'ellipsis',
