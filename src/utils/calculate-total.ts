@@ -158,7 +158,9 @@ export const calculateSameVatTotals = (items: InvoiceItemRecord[]) => {
 
   items.forEach((item) => {
     const unitNetAmount =
-      item.unitAmount.netAmount / 10 ** Currencies[item.unitAmount.currency];
+      (item.unitAmount.netAmount / 10 ** Currencies[item.unitAmount.currency]) *
+      item.quantity;
+
     const vatPercentage = item.unitAmount.percentageVat;
 
     const itemTotal = fixRounding(
