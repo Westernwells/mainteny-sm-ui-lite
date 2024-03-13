@@ -83,10 +83,18 @@ const DatePickerRange = ({
 
   useEffect(() => {
     if (defaultDate) {
-      setValue([
-        parseISO(String(defaultDate[0])),
-        parseISO(String(defaultDate[1])),
-      ]);
+      const [start, end] = defaultDate;
+      const startDate = start
+        ? start instanceof Date
+          ? start
+          : parseISO(String(start))
+        : null;
+      const endDate = end
+        ? end instanceof Date
+          ? end
+          : parseISO(String(end))
+        : null;
+      setValue([startDate, endDate]);
     }
   }, [defaultDate]);
 

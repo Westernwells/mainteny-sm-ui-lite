@@ -44,9 +44,7 @@ export const TimePicker = ({
   };
 
   useEffect(() => {
-    if (defaultTime) {
-      setValue(defaultTime);
-    }
+    setValue(defaultTime || null);
   }, [defaultTime?.getHours(), defaultTime?.getMinutes()]);
 
   useEffect(() => {

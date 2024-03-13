@@ -271,6 +271,7 @@ export type StoreSlice<T extends object, E extends object = T> = (
 export interface MenuBtnProps {
   label: string;
   action: (event: MouseEvent<HTMLLIElement>) => void;
+  icon?: JSX.Element;
 }
 
 export enum CacheTypes {

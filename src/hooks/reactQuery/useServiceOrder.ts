@@ -28,7 +28,6 @@ import {ServiceOrderArticleRecord} from 'models/article';
 import {
   AssignmentBasedOrderBody,
   UpdateServiceOrderScheduleBody,
-  RedispatchParams,
   ServiceOrderActivityView,
   ServiceOrderOrderField,
   ServiceOrderQueryParams,
@@ -531,44 +530,6 @@ export const useUnscheduleServiceOrders = () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
         enqueueSnackbar('Service job has been unscheduled', {
-          variant: 'success',
-        });
-      },
-      onError: (err) => {
-        console.log(err);
-        showError(err);
-      },
-    },
-  );
-};
-
-const redispatchServiceOrders = async (
-  technicianId: string,
-  serviceOrderId: string,
-) => {
-  await axiosClient.post<StringValue>(
-    `/api/dispatch/technicians/${technicianId}/serviceOrders/redispatch`,
-    {},
-    {
-      params: {serviceOrderId},
-      paramsSerializer,
-    },
-  );
-};
-
-export const useRedispatchServiceOrders = (successMsg: string) => {
-  const queryClient = useQueryClient();
-  const {enqueueSnackbar, showError} = useSnackbar();
-  return useMutation(
-    ({technicianId, serviceOrderId}: RedispatchParams) =>
-      redispatchServiceOrders(technicianId, serviceOrderId),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
-        queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
-        queryClient.invalidateQueries([queryKeys.queryDueServiceOrders]);
-        enqueueSnackbar(successMsg, {
           variant: 'success',
         });
       },
