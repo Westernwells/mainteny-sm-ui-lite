@@ -72,23 +72,8 @@ export const OverviewTab = ({getUnitName}: Props) => {
             maxHeight: '27.5rem',
           },
         }}>
-        <Grid
-          item
-          xs={12}
-          md={4}
-          sx={{
-            [theme.breakpoints.up('md')]: {
-              height: '100%',
-            },
-          }}>
+        <Grid item xs={12} md={4}>
           <Service
-            containerStyles={{
-              [theme.breakpoints.up('md')]: {
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-              },
-            }}
             elevator={elevator!}
             validContract={validContract}
             propertyOwnerId={elevator?.propertyOwner.id}

@@ -1,9 +1,8 @@
 import {useTranslation} from 'react-i18next';
 import {CardProps} from 'components/CardProps';
-import PermContactCalendarIcon from '@mui/icons-material/PermContactCalendar';
-import CachedIcon from '@mui/icons-material/Cached';
+import TimelapseIcon from '@mui/icons-material/Timelapse';
+import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import PeopleIcon from '@mui/icons-material/People';
 import FlagIcon from '@mui/icons-material/Flag';
 import useTheme from '@mui/material/styles/useTheme';
@@ -27,54 +26,23 @@ export const ServiceSchema = ({label, elevator, visitNumber}: Props) => {
         return (
           <CardProps
             icon={
-              <PermContactCalendarIcon sx={{color: theme.palette.info.dark}} />
+              <CalendarTodayIcon sx={{color: theme.palette.primary.light}} />
             }
-            label="LAST VISIT"
+            label="Last visit"
             bodyText={
               elevator.lastVisitDate
                 ? formatDate(new Date(elevator.lastVisitDate))
                 : '-'
             }
-            iconBackground={theme.palette.info.outlinedHoverBg}
-            containerStyles={{mt: '0.5em'}}
-            iconMaxHeight="3em"
-          />
-        );
-      case 'lastInspection':
-        return (
-          <CardProps
-            icon={<CachedIcon sx={{color: theme.palette.info.dark}} />}
-            label="LAST INSPECTION"
-            bodyText={
-              elevator.additionalInfo.lastInspectionDate
-                ? formatDate(
-                    new Date(elevator.additionalInfo.lastInspectionDate),
-                  )
-                : '-'
-            }
-            iconBackground={theme.palette.info.outlinedHoverBg}
-            containerStyles={{mt: '0.5em'}}
-            iconMaxHeight="3em"
-          />
-        );
-      case 'visitsPerYear':
-        return (
-          <CardProps
-            icon={<CalendarTodayIcon sx={{color: theme.palette.info.dark}} />}
-            label="REQUIRED VISITS/YEAR"
-            bodyText={visitNumber || ''}
-            iconBackground={theme.palette.info.outlinedHoverBg}
-            containerStyles={{mt: '0.5em'}}
+            containerStyles={{alignItems: 'center'}}
             iconMaxHeight="3em"
           />
         );
       case 'requiredTime':
         return (
           <CardProps
-            icon={
-              <AccessTimeFilledIcon sx={{color: theme.palette.info.dark}} />
-            }
-            label="REQUIRED TIME"
+            icon={<TimelapseIcon sx={{color: theme.palette.primary.light}} />}
+            label="Required time"
             bodyText={
               elevator.serviceTime > 60
                 ? convertMinsToHM(elevator.serviceTime)
@@ -82,31 +50,60 @@ export const ServiceSchema = ({label, elevator, visitNumber}: Props) => {
                 ? `${elevator.serviceTime}m`
                 : '-'
             }
-            iconBackground={theme.palette.info.outlinedHoverBg}
-            containerStyles={{mt: '0.5em'}}
+            containerStyles={{alignItems: 'center'}}
+            iconMaxHeight="3em"
+          />
+        );
+      case 'lastInspection':
+        return (
+          <CardProps
+            icon={
+              <CalendarTodayIcon sx={{color: theme.palette.primary.light}} />
+            }
+            label="Last inspection"
+            bodyText={
+              elevator.additionalInfo.lastInspectionDate
+                ? formatDate(
+                    new Date(elevator.additionalInfo.lastInspectionDate),
+                  )
+                : '-'
+            }
+            containerStyles={{alignItems: 'center'}}
             iconMaxHeight="3em"
           />
         );
       case 'numOfTechnicians':
         return (
           <CardProps
-            icon={<PeopleIcon sx={{color: theme.palette.info.dark}} />}
-            label="REQUIRED NO. OF TECHNICIANS"
+            icon={<PeopleIcon sx={{color: theme.palette.primary.light}} />}
+            label="No. of technicians"
             bodyText={elevator.technicianNumber}
-            iconBackground={theme.palette.info.outlinedHoverBg}
-            containerStyles={{mt: '0.5em'}}
+            containerStyles={{alignItems: 'center'}}
             iconMaxHeight="3em"
           />
         );
-
       case 'unitPriority':
         return (
           <CardProps
-            icon={<FlagIcon sx={{color: theme.palette.info.dark}} />}
-            label="UNIT PRIORITY"
+            icon={<FlagIcon sx={{color: theme.palette.primary.light}} />}
+            label="Priority"
             bodyText={t(elevator.additionalInfo.priority)}
-            iconBackground={theme.palette.info.outlinedHoverBg}
-            containerStyles={{mt: '0.5em'}}
+            containerStyles={{alignItems: 'center'}}
+            iconMaxHeight="3em"
+          />
+        );
+      case 'visitsPerYear':
+        return (
+          <CardProps
+            icon={
+              <ReplayCircleFilledIcon
+                sx={{color: theme.palette.primary.light}}
+              />
+            }
+            label="Inspection cycle"
+            // TODO: Update after backend implementation
+            bodyText={visitNumber || '-'}
+            containerStyles={{alignItems: 'center'}}
             iconMaxHeight="3em"
           />
         );

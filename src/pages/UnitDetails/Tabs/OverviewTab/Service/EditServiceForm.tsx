@@ -4,6 +4,7 @@ import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
 import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
+import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import {Priority} from 'models/misc';
 import {ServiceFormModel} from 'models/unitForm';
 import {useTranslation} from 'react-i18next';
@@ -15,8 +16,8 @@ interface Props {
 export const EditServiceForm = ({formik}: Props) => {
   const {t} = useTranslation();
   return (
-    <Grid container spacing={2} sx={{mt: '0.5em'}} component="form">
-      <Grid item sm={12}>
+    <Grid container spacing={2} component="form">
+      <Grid item sm={12} md={6}>
         <DatePicker
           defaultDate={formik.values.lastVisitDate}
           getSelectedDate={(date) =>
@@ -37,7 +38,7 @@ export const EditServiceForm = ({formik}: Props) => {
         />
       </Grid>
 
-      <Grid item sm={12}>
+      <Grid item sm={12} md={6}>
         <DatePicker
           defaultDate={formik.values.lastInspectionDate}
           getSelectedDate={(date) =>
@@ -60,7 +61,7 @@ export const EditServiceForm = ({formik}: Props) => {
         />
       </Grid>
 
-      <Grid item sm={12}>
+      <Grid item sm={12} md={6}>
         <FormInput
           props={{
             label: 'Required Time',
@@ -77,17 +78,19 @@ export const EditServiceForm = ({formik}: Props) => {
             inputProps: {min: 0},
             InputProps: {
               endAdornment: (
-                <InputAdornment position="end">{t('minutes')}</InputAdornment>
+                <InputAdornment position="end">
+                  <TimerOutlinedIcon />
+                </InputAdornment>
               ),
             },
           }}
         />
       </Grid>
 
-      <Grid item sm={12}>
+      <Grid item sm={12} md={6}>
         <FormInput
           props={{
-            label: 'No. of Technicians',
+            label: 'No. of Engineers',
             name: 'technicianNumber',
             value: formik.values.technicianNumber,
             helperText:
@@ -105,7 +108,7 @@ export const EditServiceForm = ({formik}: Props) => {
         />
       </Grid>
 
-      <Grid item sm={12}>
+      <Grid item sm={12} md={6}>
         <FormSelect
           labelId="prioritySelect-label"
           label="Priority"
@@ -121,6 +124,8 @@ export const EditServiceForm = ({formik}: Props) => {
           }}
         />
       </Grid>
+
+      {/* TODO: Add Inspection cycle select input after backend will be ready */}
     </Grid>
   );
 };
