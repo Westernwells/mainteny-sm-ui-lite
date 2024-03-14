@@ -18,9 +18,9 @@ interface Props {
   bodyText?: string | JSX.Element | ReactNode;
   unitText?: string;
   iconMaxHeight?: string | number;
-  containerStyles?: {[key: string]: any};
-  bodyStyle?: {[key: string]: any};
-  labelStyle?: {[key: string]: any};
+  containerStyles?: SxProps;
+  bodyStyle?: SxProps;
+  labelStyle?: SxProps;
   iconContainerStyles?: SxProps;
   enabled?: boolean;
   shouldTranslate?: boolean;
@@ -133,6 +133,7 @@ export const CardProps = ({
                 whiteSpace: 'wrap',
                 display: '-webkit-box',
                 wordBreak: 'break-all',
+                overflow: 'hidden',
                 ...bodyStyle,
               }}>
               {hasProtocol(bodyText) || !shouldTranslate

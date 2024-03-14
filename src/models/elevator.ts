@@ -121,6 +121,10 @@ export interface ElevatorAdditionalInfo {
   counterWeight: string;
   hoistingHeight: string;
   shaftHeight: string;
+  spendingLimit: string;
+  distance: string;
+  travelTime: string;
+  travelFee: string;
 }
 
 export interface ElevatorMaintainerRecord {
@@ -391,6 +395,10 @@ export interface ElevatorRequestBody {
   counterWeight: string;
   hoistingHeight: string;
   shaftHeight: string;
+  // TODO: check functionality after backend implementation
+  distance: string;
+  travelTime: string;
+  travelFee: string;
 }
 
 export interface ElevatorComment {
