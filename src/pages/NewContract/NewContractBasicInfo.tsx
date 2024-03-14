@@ -109,7 +109,9 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => {
       <Grid item xs={4}>
         <DatePicker
           getSelectedDate={(newValue) => {
-            if (newValue) formik.setFieldValue('startDate', newValue);
+            if (newValue) {
+              if (newValue) formik.setFieldValue('startDate', newValue);
+            }
           }}
           textFieldProps={{
             name: 'startDate',
@@ -143,12 +145,7 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => {
             error: !!(formik.touched.endDate && formik.errors.endDate),
           }}
           defaultDate={formik.values.endDate}
-          minDate={
-            new Date(
-              new Date(formik.values.startDate! || Date.now()).getTime() +
-                86400000,
-            )
-          }
+          minDate={formik.values.startDate!}
         />
       </Grid>
       <Box width="100%" />
