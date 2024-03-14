@@ -18,7 +18,7 @@ export const EditLocationForm = ({formik}: Props) => {
   );
 
   return (
-    <Grid container sx={{mt: '0.5em'}} component="form" spacing={2}>
+    <Grid container component="form" spacing={2}>
       <Grid item xs={12}>
         <AddressAutoComplete
           initialValue={formik.values.address?.fullName || ''}
@@ -52,37 +52,11 @@ export const EditLocationForm = ({formik}: Props) => {
       <Grid item xs={12} sm={6}>
         <FormInput
           props={{
-            size: 'small',
-            placeholder: '',
-            label: 'Street',
-            name: 'address.component.street',
             required: true,
-            value: formik.values.address?.component?.street ?? '',
-            onChange: formik.handleChange,
-          }}
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <FormInput
-          props={{
-            size: 'small',
-            placeholder: '',
-            label: 'Street 2',
-            name: 'address.component.street2',
-            required: false,
-            value: formik.values.address?.component?.street2 ?? '',
-            onChange: formik.handleChange,
-          }}
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <FormInput
-          props={{
             size: 'small',
             placeholder: '',
             label: 'City',
             name: 'address.component.city',
-
             value: formik.values.address?.component?.city ?? '',
             onChange: formik.handleChange,
           }}
@@ -102,21 +76,7 @@ export const EditLocationForm = ({formik}: Props) => {
           }}
         />
       </Grid>
-      <Grid item xs={12}>
-        <FormSelect
-          labelId="address.component.country"
-          label="Country"
-          options={countriesOptions}
-          selectProps={{
-            id: 'address.component.country',
-            name: 'address.component.country',
-            value: formik.values.address?.component?.country ?? '',
-            multiple: false,
-            onChange: formik.handleChange,
-          }}
-        />
-      </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} md={6}>
         <FormSelect
           labelId="address.component.state"
           label="State/Province/Region"
@@ -125,6 +85,21 @@ export const EditLocationForm = ({formik}: Props) => {
             id: 'address.component.state',
             name: 'address.component.state',
             value: formik.values.address?.component?.state ?? '',
+            multiple: false,
+            onChange: formik.handleChange,
+          }}
+        />
+      </Grid>
+      <Grid item xs={12} md={6}>
+        <FormSelect
+          required
+          labelId="address.component.country"
+          label="Country"
+          options={countriesOptions}
+          selectProps={{
+            id: 'address.component.country',
+            name: 'address.component.country',
+            value: formik.values.address?.component?.country ?? '',
             multiple: false,
             onChange: formik.handleChange,
           }}
@@ -179,8 +154,45 @@ export const EditLocationForm = ({formik}: Props) => {
             name: 'keyLocation',
             value: formik.values.keyLocation,
             onChange: formik.handleChange,
-            multiline: true,
-            rows: 4,
+          }}
+        />
+      </Grid>
+      <Grid item xs={12} md={4}>
+        <FormInput
+          props={{
+            type: 'number',
+            size: 'small',
+            placeholder: 'e.g. 5',
+            label: 'Distance (km)',
+            name: 'distance',
+            value: formik.values.distance,
+            onChange: formik.handleChange,
+          }}
+        />
+      </Grid>
+      <Grid item xs={12} md={4}>
+        <FormInput
+          props={{
+            type: 'number',
+            size: 'small',
+            placeholder: 'e.g. 10 min',
+            label: 'Travel time (min)',
+            name: 'travelTime',
+            value: formik.values.travelTime,
+            onChange: formik.handleChange,
+          }}
+        />
+      </Grid>
+      <Grid item xs={12} md={4}>
+        <FormInput
+          props={{
+            type: 'number',
+            size: 'small',
+            placeholder: 'e.g. 10€',
+            label: 'Travel fee',
+            name: 'travelFee',
+            value: formik.values.travelFee,
+            onChange: formik.handleChange,
           }}
         />
       </Grid>

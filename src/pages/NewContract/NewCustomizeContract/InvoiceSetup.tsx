@@ -67,7 +67,7 @@ const InvoiceSetup = ({formikContractComponents}: Props) => {
     {name: 'Service Name', align: 'left', width: '30%'},
     {name: 'Job Frequency', width: '25%'},
     {name: 'Invoice Cycle', width: '25%'},
-    {name: 'Invoice Price (EXCL. VAT)', align: 'left', width: '20%'},
+    {name: 'Invoice Price (Excl. VAT)', align: 'left', width: '20%'},
   ];
 
   const handleGroupChange = (event: any) => {

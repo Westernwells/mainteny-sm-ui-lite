@@ -14,7 +14,8 @@ import {ReactComponent as PinInformationIcon} from 'assets/icons/PinInformationI
 import {useForm} from 'react-hook-form';
 import Chip from '@mui/material/Chip';
 import capitalize from 'lodash/capitalize';
-import {UnitDetailsSchema} from './GeneralSchema';
+import {getCurrencySymbol, useCurrentCurrency} from 'utils/currency';
+import {GeneralSchema} from './GeneralSchema';
 import {EditUnitDetailsForm} from './GeneralForm';
 
 interface Props {
@@ -26,6 +27,8 @@ interface Props {
 const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
+  const currentCurrency = useCurrentCurrency();
+
   const [openDialog, setOpenDialog] = useState(false);
   const {mutateAsync: updateElevator} = useUpdateElevator(
     'Unit details updated successfully',
@@ -120,7 +123,11 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
       <Grid container spacing={2}>
         {labels.map((label) => (
           <Grid key={label} item xs={12} sm={4} md={4}>
-            <UnitDetailsSchema label={label} elevator={elevator} />
+            <GeneralSchema
+              label={label}
+              elevator={elevator}
+              currency={getCurrencySymbol[currentCurrency.code]}
+            />
           </Grid>
         ))}
       </Grid>

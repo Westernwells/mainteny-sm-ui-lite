@@ -13,16 +13,10 @@ import {useTranslation} from 'react-i18next';
 interface Props {
   label: string;
   elevator: ElevatorView;
-  spendingLimit?: number;
-  currency?: string;
+  currency: string;
 }
 
-export const UnitDetailsSchema = ({
-  label,
-  elevator,
-  spendingLimit,
-  currency,
-}: Props) => {
+export const GeneralSchema = ({label, elevator, currency}: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
 
@@ -85,7 +79,9 @@ export const UnitDetailsSchema = ({
           <CardProps
             icon={<AttachMoneyIcon sx={{color: theme.palette.primary.light}} />}
             label="Spending limit"
-            bodyText={spendingLimit ? `${spendingLimit} ${currency}` : '-'}
+            unitText={currency}
+            // TODO: confirm after backend changes
+            bodyText={elevator.additionalInfo.spendingLimit || '-'}
             iconMaxHeight="3em"
             containerStyles={{alignItems: 'center'}}
           />

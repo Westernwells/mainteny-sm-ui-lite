@@ -125,7 +125,7 @@ const ServicesForm = ({
     },
     {name: 'Job frequency', align: 'left', width: '15%'},
     {name: 'Invoice frequency', align: 'left', width: '15%'},
-    {name: 'Invoice Price (EXCL. VAT)', align: 'right', width: '18%'},
+    {name: 'Invoice Price (Excl. VAT)', align: 'right', width: '18%'},
   ];
 
   useEffect(() => {
@@ -506,7 +506,7 @@ const ServicesForm = ({
                       autoFocus: true,
                       variant: 'contained',
                     }}>
-                    <Typography variant="subtitle2">Save</Typography>
+                    <Typography variant="subtitle2">{t('Save')}</Typography>
                   </Button>
                 </Box>
               </>
@@ -524,7 +524,7 @@ const ServicesForm = ({
                 );
             }}
             textFieldProps={{
-              label: 'First Invoice Date',
+              label: t('First Invoice Date'),
             }}
           />
         </Grid>
@@ -781,7 +781,7 @@ const ServicesForm = ({
                       InputLabelProps={{
                         shrink: true,
                       }}
-                      label={t('Invoice Price(EXCL. VAT)')}
+                      label={t('Invoice Price(Excl. VAT)')}
                       onValueChange={(values) => {
                         const {floatValue} = values;
                         if (floatValue) {

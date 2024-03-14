@@ -58,12 +58,6 @@ export const OverviewTab = ({getUnitName}: Props) => {
         <Grid item md={6} sm={12}>
           <Location
             propertyOwnerId={elevator?.propertyOwner.id}
-            containerStyles={{
-              [theme.breakpoints.up('md')]: {
-                minHeight: '35rem',
-                height: '100%',
-              },
-            }}
             elevator={elevator!}
           />
         </Grid>

@@ -263,7 +263,7 @@ export const MutationService = ({
     },
     {name: 'Job frequency', align: 'left', width: '15%'},
     {name: 'Invoice frequency', align: 'left', width: '15%'},
-    {name: 'Invoice Price (EXCL. VAT)', align: 'right', width: '18%'},
+    {name: 'Invoice Price (Excl. VAT)', align: 'right', width: '18%'},
   ];
 
   const clearElevators = () => {
@@ -728,7 +728,7 @@ export const MutationService = ({
                 );
             }}
             textFieldProps={{
-              label: 'First Invoice Date',
+              label: t('First Invoice Date'),
             }}
           />
         </Grid>
@@ -802,7 +802,7 @@ export const MutationService = ({
                   );
               }}
               textFieldProps={{
-                label: 'First job creation date',
+                label: t('First job creation date'),
               }}
             />
           </Grid>
@@ -990,7 +990,7 @@ export const MutationService = ({
                     InputLabelProps={{
                       shrink: true,
                     }}
-                    label={t('Invoice Price(EXCL. VAT)')}
+                    label={t('Invoice Price(Excl. VAT)')}
                     onValueChange={(values) => {
                       const {floatValue} = values;
 
