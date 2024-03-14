@@ -22,14 +22,13 @@ import {useFormik} from 'formik';
 import {
   calculateContractInvoicePriceGrandTotalForm,
   convertExtendedRecordsToContractComponentRecords,
-  getUniqueInvoiceJobTimeNumbers,
 } from 'utils/contract-utils';
 import {
   calculateContractInvoicePriceTotal,
   ContractComponentView,
   ExtendedContractComponentRecord,
 } from 'models/contract';
-import {monthNames} from 'utils/elevator-utils';
+import {getListViewFrequency} from 'utils/elevator-utils';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 import {Button} from 'components/Button';
 import {CallSplit, CallMerge} from '@mui/icons-material';
@@ -38,6 +37,7 @@ import {FormSelect} from 'components/form/FormSelect';
 import Grid from '@mui/material/Grid';
 import {olStyles} from 'styles';
 import {EmptySection} from 'components/EmptySection';
+import {isEqual} from 'lodash';
 import {SectionTitle} from '../../../../InvoiceDetails/SectionTitle';
 import {ContractCard} from '../ContractCard';
 
@@ -57,11 +57,9 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
   const currentCurrency = useCurrentCurrency();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const formikContractComponents = useFormik<{
-    components: ExtendedContractComponentRecord[];
-  }>({
-    initialValues: {
-      components: components?.map((c) => ({
+  const initialData = useMemo(
+    () =>
+      components?.map((c) => ({
         id: c.id,
         name: c.name,
         group: c.group as string,
@@ -72,11 +70,20 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
         costPackage: c.additionalInfo.costPackage,
         isAutomaticJobCycle: false,
       })) as ExtendedContractComponentRecord[],
+    [components],
+  );
+
+  const formikContractComponents = useFormik<{
+    components: ExtendedContractComponentRecord[];
+  }>({
+    initialValues: {
+      components: initialData,
     },
     onSubmit: () => {},
     validateOnMount: true,
   });
 
+  const [hasCollapsed, setHasCollapsed] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState('');
   const [activeServiceId, setActiveServiceId] = useState('');
   const [activeGroupNumber, setActiveGroupNumber] = useState(0);
@@ -168,9 +175,9 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
 
     const updatedComponents = formikContractComponents.values.components.map(
       (item) =>
-        servicesToDisband.includes(item)
-          ? item
-          : {...item, groupNumber: null, isChecked: false},
+        servicesToDisband.find((s) => s.id === item.id)
+          ? {...item, groupNumber: null, isChecked: false}
+          : item,
     );
     formikContractComponents.setFieldValue('components', updatedComponents);
 
@@ -185,6 +192,7 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
   };
 
   const handleCollapseToggle = (groupNumber: number) => {
+    setHasCollapsed(true);
     setCollapsedGroups((prevCollapsed) =>
       prevCollapsed.includes(groupNumber)
         ? prevCollapsed.filter((num) => num !== groupNumber)
@@ -208,14 +216,14 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
     setUngroupedItems(ungrouped);
   }, [invoiceGroups, formikContractComponents.values.components]);
 
-  useEffect(() => {
+  const getGroupsData = (values: ExtendedContractComponentRecord[]) => {
     const newGroupNumber = invoiceGroups.length
       ? invoiceGroups[invoiceGroups.length - 1].groupNumber + 1
       : 1;
 
     const map = new Map();
 
-    formikContractComponents.values.components?.forEach((item) => {
+    values.forEach((item) => {
       if (item.group) {
         const key = item.group;
         if (!map.has(key)) {
@@ -226,26 +234,34 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
       }
     });
     const groupedData = Array.from(map.values());
-
-    groupedData?.forEach((grouped) => {
-      setInvoiceGroups((prevGroups) => [
-        ...prevGroups,
-        {groupNumber: newGroupNumber, services: grouped},
-      ]);
-    });
-    setCollapsedGroups((prevCollapsed) => [...prevCollapsed, newGroupNumber]);
-  }, []);
+    const invoiceGroupNumbers = groupedData.map((grouped) => ({
+      groupNumber: +grouped[0].group || newGroupNumber,
+      services: grouped,
+    }));
+    const collapseGroups = groupedData.map(
+      (grouped) => +grouped[0].group || newGroupNumber,
+    );
+    return [invoiceGroupNumbers, collapseGroups];
+  };
 
   useEffect(() => {
-    const resetComponents = formikContractComponents.values.components.map(
-      (item) => ({
-        ...item,
-        groupNumber: null,
-        isChecked: false,
-      }),
+    if (!isEqual(formikContractComponents.values, initialData)) {
+      formikContractComponents.setFieldValue('components', initialData);
+    }
+    const [invoiceGroupNumbers, collapseGroups] = getGroupsData(
+      initialData || [],
     );
-    formikContractComponents.setFieldValue('components', resetComponents);
-  }, []);
+    setInvoiceGroups(invoiceGroupNumbers as InvoiceGroup[]);
+    setCollapsedGroups((oldCollapseGroups) => {
+      oldCollapseGroups = oldCollapseGroups || [];
+      if (!hasCollapsed) {
+        return collapseGroups as number[];
+      }
+      return collapseGroups.filter((groupN) =>
+        oldCollapseGroups.includes(groupN as number),
+      ) as number[];
+    });
+  }, [initialData]);
 
   const handleInvoicingTogether = () => {
     const updatedComponents = formikContractComponents.values.components.map(
@@ -477,11 +493,10 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
                             <Typography
                               color={theme.palette.text.primary}
                               variant="body2">
-                              {getUniqueInvoiceJobTimeNumbers(item.elevators)
-                                .map(
-                                  (monthNumber) => monthNames[monthNumber - 1],
-                                )
-                                .join(', ') || '-'}
+                              {getListViewFrequency(
+                                'orderGenerationJob',
+                                item.elevators,
+                              )}
                             </Typography>
                           </TableCell>
 
@@ -495,11 +510,10 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
                             <Typography
                               color={theme.palette.text.primary}
                               variant="body2">
-                              {getUniqueInvoiceJobTimeNumbers(item.elevators)
-                                .map(
-                                  (monthNumber) => monthNames[monthNumber - 1],
-                                )
-                                .join(', ') || '-'}
+                              {getListViewFrequency(
+                                'invoiceJob',
+                                item.elevators,
+                              )}
                             </Typography>
                           </TableCell>
 
@@ -578,9 +592,10 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
                       <Typography
                         color={theme.palette.text.primary}
                         variant="body2">
-                        {getUniqueInvoiceJobTimeNumbers(item.elevators)
-                          .map((monthNumber) => monthNames[monthNumber - 1])
-                          .join(', ') || '-'}
+                        {getListViewFrequency(
+                          'orderGenerationJob',
+                          item.elevators,
+                        )}
                       </Typography>
                     </TableCell>
 
@@ -594,9 +609,7 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
                       <Typography
                         color={theme.palette.text.primary}
                         variant="body2">
-                        {getUniqueInvoiceJobTimeNumbers(item.elevators)
-                          .map((monthNumber) => monthNames[monthNumber - 1])
-                          .join(', ') || '-'}
+                        {getListViewFrequency('invoiceJob', item.elevators)}
                       </Typography>
                     </TableCell>
 

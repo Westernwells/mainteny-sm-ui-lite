@@ -30,6 +30,21 @@ import {ArticleType, CostPackage} from './article';
 import {toRestDate} from 'utils/datetime';
 import {ServiceCompanyType} from './service-company';
 
+export interface QueryContractCommentsParams {
+  pageIndex: number;
+  pageSize: number;
+}
+
+export interface CreateContractComment {
+  content: string;
+  subject: string;
+}
+
+export interface UpdateContractComment {
+  content: string;
+  subject: string;
+}
+
 export enum ContractStatus {
   PENDING = 'PENDING',
   VALID = 'VALID',
