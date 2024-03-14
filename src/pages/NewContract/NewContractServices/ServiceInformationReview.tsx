@@ -44,7 +44,7 @@ const ServiceInformationReview = ({formikContractServiceComponent}: Props) => {
     {name: 'Unit Address', width: '25%'},
     {name: 'Job frequency', align: 'left', width: '15%'},
     {name: 'Invoice frequency', align: 'left', width: '15%'},
-    {name: 'Invoice Price (EXCL. VAT)', align: 'right', width: '18%'},
+    {name: 'Invoice Price (Excl. VAT)', align: 'right', width: '18%'},
   ];
 
   return (
