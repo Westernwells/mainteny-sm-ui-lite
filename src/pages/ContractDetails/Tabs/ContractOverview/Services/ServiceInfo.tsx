@@ -56,7 +56,7 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
     {name: 'Unit Address', width: '25%'},
     {name: 'Job frequency', align: 'left', width: '15%'},
     {name: 'Invoice frequency', align: 'left', width: '15%'},
-    {name: 'Invoice Price (EXCL. VAT)', align: 'right', width: '18%'},
+    {name: 'Invoice Price (Excl. VAT)', align: 'right', width: '18%'},
   ];
 
   return (
@@ -81,7 +81,7 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
           <CalendarTodayIcon fontSize="1.6rem" />
           <Box sx={{paddingLeft: '1em'}}>
             <Typography variant="body1" color={theme.palette.text.secondary}>
-              First job creation
+              {t('First job creation date')}
             </Typography>
             <Typography variant="h6" color={theme.palette.text.primary}>
               {service?.additionalInfo?.firstOrderDate !== null
