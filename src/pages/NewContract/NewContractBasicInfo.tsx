@@ -108,19 +108,19 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => {
       <Box width="100%" />
       <Grid item xs={4}>
         <DatePicker
-          getSelectedDate={(val) => formik.setFieldValue('startDate', val)}
+          getSelectedDate={(newValue) => {
+            if (newValue) formik.setFieldValue('startDate', newValue);
+          }}
           textFieldProps={{
             name: 'startDate',
             id: 'startDate',
             label: 'Contract Start Date',
-            onChange: formik.handleChange,
             required: true,
             helperText:
               formik.errors.startDate && formik.touched.startDate
                 ? formik.errors.startDate
                 : '',
             error: !!(formik.touched.startDate && formik.errors.startDate),
-            onBlur: formik.handleBlur,
           }}
           defaultDate={formik.values.startDate}
           maxDate={formik.values.endDate!}
@@ -128,19 +128,19 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => {
       </Grid>
       <Grid item xs={4}>
         <DatePicker
-          getSelectedDate={(val) => formik.setFieldValue('endDate', val)}
+          getSelectedDate={(newValue) => {
+            if (newValue) formik.setFieldValue('endDate', newValue);
+          }}
           textFieldProps={{
             name: 'endDate',
             id: 'endDate',
             label: 'Contract End Date',
-            onChange: formik.handleChange,
             required: true,
             helperText:
               formik.errors.endDate && formik.touched.endDate
                 ? formik.errors.endDate
                 : '',
             error: !!(formik.touched.endDate && formik.errors.endDate),
-            onBlur: formik.handleBlur,
           }}
           defaultDate={formik.values.endDate}
           minDate={
