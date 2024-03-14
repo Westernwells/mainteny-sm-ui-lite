@@ -157,13 +157,7 @@ export const componentsToMutate = (
 
 export const calculateContractInvoiceRowPrice = (
   elevatorRow: ContractServiceFormElevator,
-) => {
-  if (elevatorRow?.invoiceJob?.timeNumbers?.length) {
-    return elevatorRow.invoiceJob.timeNumbers.length * elevatorRow.price;
-  }
-
-  return elevatorRow.price;
-};
+) => elevatorRow.price;
 
 export const calculateContractInvoicePriceGrandTotal = (
   parentArray: ContractComponentView[],
@@ -181,20 +175,6 @@ export const calculateContractInvoicePriceGrandTotal = (
     }
   });
   return grandTotal;
-};
-
-export const getUniqueInvoiceJobTimeNumbers = (
-  inputArray: ContractServiceFormElevator[] | ContractComponentElevator[],
-) => {
-  const uniqueTimeNumbers = new Set<number>();
-
-  inputArray?.forEach((item) => {
-    item.invoiceJob.timeNumbers?.forEach((number) => {
-      uniqueTimeNumbers.add(number);
-    });
-  });
-
-  return Array.from(uniqueTimeNumbers).sort((a, b) => a - b);
 };
 
 export const calculateContractInvoicePriceGrandTotalForm = (
@@ -241,9 +221,13 @@ export const convertExtendedRecordsToContractComponentRecords = (
       ? new Date(firstOrderDate)
       : '';
 
+    const group =
+      groupNumber !== null
+        ? String(groupNumber || '') || String(extendedContractRecord?.group)
+        : '';
     const contractComponentRecord: ContractComponentRecord = {
       name,
-      group: groupNumber !== null ? String(groupNumber) : '',
+      group,
       elevators: convertedElevators,
       firstInvoiceDate: convertFirstInvoiceDateToDate
         ? toRestDate(convertFirstInvoiceDateToDate)

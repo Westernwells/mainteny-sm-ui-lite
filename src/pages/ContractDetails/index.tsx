@@ -10,8 +10,8 @@ import {SelectModal} from 'components/SelectModal';
 import {UnitsTab} from './Tabs/Unit/UnitsTab';
 import {ContractOverview} from './Tabs/ContractOverview';
 import {AddUnitsDataGrid} from './AddUnitsDataGrid';
-import CustomerNotes from '../CustomerDetails/Notes';
 import InvoicesTab from './Tabs/Invoices/InvoicesTab';
+import {Notes} from './Notes';
 
 const tabItems = [
   {
@@ -36,7 +36,7 @@ export const ContractDetails = () => {
 
   const renderButtons = () => {
     if (contractDetails?.propertyOwner?.id) {
-      return <CustomerNotes customerId={contractDetails?.propertyOwner?.id} />;
+      return <Notes contract={contractDetails!} />;
     }
     return null;
   };
