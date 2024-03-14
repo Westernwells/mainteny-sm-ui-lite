@@ -2046,5 +2046,7 @@
   "Add Work": "Arbeitszeit hinzufügen",
   "Add Travel": "Fahrtzeit hinzufügen",
   "Surcharge": "Aufpreis",
-  "Billable hours:": "Abrechenbare Stunden"
+  "Billable hours:": "Abrechenbare Stunden:",
+  "Travel time": "Fahrtzeit",
+  "Start time": "Startzeit"
 }
