@@ -109,9 +109,7 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => {
       <Grid item xs={4}>
         <DatePicker
           getSelectedDate={(newValue) => {
-            if (newValue) {
-              if (newValue) formik.setFieldValue('startDate', newValue);
-            }
+            if (newValue) formik.setFieldValue('startDate', newValue);
           }}
           textFieldProps={{
             name: 'startDate',
