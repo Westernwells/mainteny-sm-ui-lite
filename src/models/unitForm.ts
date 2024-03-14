@@ -12,6 +12,10 @@ export interface LocationFormModel {
   propertySegment?: string;
   keyLocation?: string;
   parking?: string;
+  // TODO: check functionality after backend implementation
+  distance?: string;
+  travelTime?: string;
+  travelFee?: string;
 }
 
 export interface UnitDetailsFormModel {
