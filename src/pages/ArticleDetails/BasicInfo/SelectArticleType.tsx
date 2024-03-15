@@ -20,22 +20,16 @@ export const articleTypes = [
     value: ArticleType.LABOR,
     label: 'Labor',
     title: 'Labor Expenses / Service Fees / Work Costs',
-    subTitle:
-      'This category covers the costs associated with the services provided. It includes the labor hours, expertise, and any other service-related expenses incurred to fulfill the job.',
   },
   {
     value: ArticleType.MATERIAL,
     label: 'Material',
     title: 'Material Charges / Parts & Goods / Supply Costs',
-    subTitle:
-      'This category refers to the costs of all materials, parts, or goods used in the provision of the service. It includes items such as replacement parts, raw materials, or any other tangible items used or delivered.',
   },
   {
     value: ArticleType.PACKAGE,
     label: 'Package',
     title: 'Mix of Labor and Material',
-    subTitle:
-      "With the 'Package' choice, you can combine work (labor) and items (materials).",
     isPackage: true,
   },
 ];
@@ -126,7 +120,6 @@ export const SelectArticleType = ({
             <Typography variant="body1" fontWeight={700}>
               {t(articleType.title)}
             </Typography>
-            <Typography variant="body1">{t(articleType.subTitle)}</Typography>
             {articleType.isPackage && (
               <Box display="flex" justifyContent="space-between" pt="1.8rem">
                 <Box>

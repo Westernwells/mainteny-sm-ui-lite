@@ -242,7 +242,7 @@ export const queryDueServiceOrders = async (
 };
 
 export function useDueServiceOrders(
-  params: ServiceOrderQueryParams,
+  params: ServiceOrderQueryParams & {candidateTechnicianAssigned?: boolean},
   options?: UseQueryOptions<any, any, any>,
 ) {
   const {user} = useUserSession();
@@ -567,6 +567,7 @@ export const useRedispatchServiceOrders = (successMsg: string) => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
         queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
+        queryClient.invalidateQueries([queryKeys.queryDueServiceOrders]);
         enqueueSnackbar(successMsg, {
           variant: 'success',
         });
@@ -606,6 +607,7 @@ export const useUpdateServiceOrderSchedule = (successMsg: string) => {
           variant: 'success',
         });
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        queryClient.invalidateQueries([queryKeys.queryDueServiceOrders]);
       },
       onError: (err) => {
         console.log(err);

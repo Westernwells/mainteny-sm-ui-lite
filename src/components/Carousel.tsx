@@ -6,9 +6,10 @@ import MobileStepper from '@mui/material/MobileStepper';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Close from '@mui/icons-material/Close';
+import {useTranslation} from 'react-i18next';
 
 export const Carousel = ({
   images,
@@ -22,6 +23,7 @@ export const Carousel = ({
   setActiveStep: Dispatch<SetStateAction<number>>;
 }) => {
   const theme = useTheme();
+  const {t} = useTranslation();
   const maxSteps = images.length;
 
   const handleNext = () => {
@@ -44,13 +46,14 @@ export const Carousel = ({
           zIndex: 10,
           width: '100%',
           top: 0,
-          px: 4,
-          py: 3,
+          px: 3,
+          py: 2,
           background:
             'linear-gradient(180deg, #000000 0%, rgba(0, 0, 0, 0) 100%)',
           color: 'white',
           display: 'flex',
           justifyContent: 'space-between',
+          alignItems: 'center',
         }}>
         <Typography variant="h5">{images[activeStep].label}</Typography>
         <IconButton
@@ -66,7 +69,7 @@ export const Carousel = ({
         index={activeStep}
         onChangeIndex={handleStepChange}
         enableMouseEvents
-        containerStyle={{alignItems: 'center'}}>
+        containerStyle={{alignItems: 'start'}}>
         {images.map((step, index) => (
           <div key={`${step.label} - ${index}`}>
             {Math.abs(activeStep - index) <= 2 ? (
@@ -99,12 +102,14 @@ export const Carousel = ({
             color="inherit"
             onClick={handleBack}
             disableRipple
-            disabled={activeStep === 0}>
+            disabled={activeStep === 0}
+            sx={{mr: 3, display: 'flex', gap: 1}}>
             {theme.direction === 'rtl' ? (
-              <KeyboardArrowRight />
+              <ArrowForwardIcon />
             ) : (
-              <KeyboardArrowLeft />
+              <ArrowBackIcon />
             )}
+            {t('Back')}
           </Button>
         }
         nextButton={
@@ -113,11 +118,13 @@ export const Carousel = ({
             color="inherit"
             onClick={handleNext}
             disableRipple
-            disabled={activeStep === maxSteps - 1}>
+            disabled={activeStep === maxSteps - 1}
+            sx={{ml: 3, display: 'flex', gap: 1}}>
+            {t('Next')}
             {theme.direction === 'rtl' ? (
-              <KeyboardArrowLeft />
+              <ArrowBackIcon />
             ) : (
-              <KeyboardArrowRight />
+              <ArrowForwardIcon />
             )}
           </Button>
         }

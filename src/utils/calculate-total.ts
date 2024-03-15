@@ -16,6 +16,8 @@ import {ServiceOrderArticleView} from 'models/service-order';
 import {Currencies, formatCurrency} from './currency';
 import {fixRounding} from './utils';
 
+const PERCENTAGE_FACTOR = 100;
+
 export const calculateTotal = (arr: InvoiceItemRecord[]) => {
   const sum = 0;
 
@@ -161,7 +163,8 @@ export const calculateArticleTotalWithVatFormatted = (
             percentageVat: itemsAfterGlobalDiscount[0].unitAmount.percentageVat,
             vat:
               subtotalExclVatAfterDiscount *
-              (itemsAfterGlobalDiscount[0].unitAmount.percentageVat / 100),
+              (itemsAfterGlobalDiscount[0].unitAmount.percentageVat /
+                PERCENTAGE_FACTOR),
           },
         ]
       : getAggregatedItemsVats(itemsAfterGlobalDiscount)
@@ -178,4 +181,32 @@ export const calculateArticleTotalWithVatFormatted = (
     maximumFractionDigits: 2,
     roundingMode: 'floor',
   });
+};
+
+export const calculateSameVatTotals = (items: InvoiceItemRecord[]) => {
+  let total = 0;
+  let totalVAT = 0;
+
+  items.forEach((item) => {
+    const unitNetAmount =
+      (item.unitAmount.netAmount / 10 ** Currencies[item.unitAmount.currency]) *
+      item.quantity;
+
+    const vatPercentage = item.unitAmount.percentageVat;
+
+    const itemTotal = fixRounding(
+      unitNetAmount * (1 + vatPercentage / PERCENTAGE_FACTOR),
+      2,
+    );
+
+    total += itemTotal;
+
+    const vatAmount = fixRounding(
+      (vatPercentage / PERCENTAGE_FACTOR) * unitNetAmount,
+      2,
+    );
+    totalVAT += vatAmount;
+  });
+
+  return {total, totalVAT};
 };
