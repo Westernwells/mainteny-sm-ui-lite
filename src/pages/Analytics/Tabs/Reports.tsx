@@ -209,6 +209,10 @@ export const Reports = () => {
           label: FormatType.SAGE50,
           value: FormatType.SAGE50,
         },
+        {
+          label: FormatType.DF2,
+          value: FormatType.DF2,
+        },
       ];
     }
     return [
