@@ -6,19 +6,52 @@ import Grid from '@mui/material/Grid';
 import {useCallback} from 'react';
 import {countriesOptions, getStatesByCountry} from 'utils/countries';
 import {FormSelect} from 'components/form/FormSelect';
+import {CustomerAutoComplete} from 'components/CustomerAutocomplete';
+import {useTranslation} from 'react-i18next';
+import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 
 interface Props {
   formik: FormikProps<LocationFormModel>;
 }
 
 export const EditLocationForm = ({formik}: Props) => {
+  const {t} = useTranslation();
   const statesByCountry = useCallback(
     (country?: string) => getStatesByCountry(country ?? ''),
     [formik.values.address?.component?.country],
   );
 
+  const {data: initialCustomer} = useGetCustomer(formik.values.propertyOwnerId);
+
   return (
     <Grid container component="form" spacing={2}>
+      <Grid item xs={12}>
+        <CustomerAutoComplete
+          getCustomer={(value) => {
+            formik.setValues({
+              ...formik.values,
+              propertyOwnerId: value ? value.id : '',
+            });
+            if (value) {
+              formik.setFieldValue('propertyOwnerId', value.id);
+            }
+          }}
+          initialValue={initialCustomer || null}
+          textFieldProps={{
+            required: true,
+            error: !!(
+              formik.errors.propertyOwnerId && formik.touched.propertyOwnerId
+            ),
+            helperText:
+              formik.errors.propertyOwnerId && formik.touched.propertyOwnerId
+                ? t(formik.errors.propertyOwnerId)
+                : '',
+            label: t('Customer Name'),
+            name: 'propertyOwnerId',
+            onBlur: formik.handleBlur,
+          }}
+        />
+      </Grid>
       <Grid item xs={12}>
         <AddressAutoComplete
           initialValue={formik.values.address?.fullName || ''}

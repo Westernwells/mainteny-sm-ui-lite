@@ -25,6 +25,11 @@ interface Props {
 }
 
 const validationSchema = Yup.object().shape({
+  propertyOwnerId: Yup.string()
+    .nullable()
+    .required(
+      "Please select an existing customer. To add a new one, go to the 'Customers' section",
+    ),
   address: Yup.object()
     .nullable()
     .shape({
@@ -60,6 +65,7 @@ export const Location = ({
       propertySegment: elevator.additionalInfo.propertySegment,
       keyLocation: elevator.additionalInfo.keyLocation,
       parking: elevator.additionalInfo.parking,
+      propertyOwnerId,
       // TODO: check functionality after backend implementation
       distance: elevator.additionalInfo?.distance,
       travelTime: elevator.additionalInfo?.travelTime,
@@ -85,7 +91,7 @@ export const Location = ({
 
     await updateElevator({
       body: {
-        propertyOwnerId,
+        propertyOwnerId: formik.values.propertyOwnerId,
         address: formatAddressFullname(formik.values.address) as
           | AddressRecord
           | undefined,
@@ -127,7 +133,7 @@ export const Location = ({
         onCancel={() => {
           setOpenDialog(false);
         }}
-        disableSaveBtn={!!Object.keys(formik.errors).length}
+        disableSaveBtn={!!Object.keys(formik.errors).length || !formik.dirty}
         onSave={() => onSave()}
         dialogProps={{
           maxWidth: 'sm',
