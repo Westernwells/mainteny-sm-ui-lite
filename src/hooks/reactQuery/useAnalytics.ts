@@ -15,10 +15,13 @@ import {RestError} from 'models/misc';
 import {useUserSession} from './useUserSession';
 import {useCompanyXeroInfo} from './useCompanies';
 
-export const download = (blob: Blob, filename: string, ext?:string) => {
+export const download = (blob: Blob, filename: string, ext?: string) => {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.setAttribute('download', `${filename}_${toRestDateTime(new Date())}${ext ?? ''}`);
+  a.setAttribute(
+    'download',
+    `${filename}_${toRestDateTime(new Date())}${ext ?? ''}`,
+  );
   a.click();
 };
 
