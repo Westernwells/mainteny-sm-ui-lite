@@ -12,6 +12,7 @@ export interface LocationFormModel {
   propertySegment?: string;
   keyLocation?: string;
   parking?: string;
+  propertyOwnerId?: string;
   // TODO: check functionality after backend implementation
   distance?: string;
   travelTime?: string;

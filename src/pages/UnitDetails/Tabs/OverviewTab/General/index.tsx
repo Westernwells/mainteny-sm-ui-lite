@@ -66,7 +66,7 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
 
   useEffect(() => {
     reset(getDefaultValues(elevator));
-  }, []);
+  }, [elevator]);
 
   const onSubmit = async (data: GeneralFormModel) => {
     setOpenDialog(false);

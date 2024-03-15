@@ -67,6 +67,7 @@ export const CardProps = ({
           justifyContent: 'center',
           mr: '0.8em',
           maxHeight: iconMaxHeight || 'default',
+          marginRight: 0,
           ...iconContainerStyles,
         }}>
         {icon}
