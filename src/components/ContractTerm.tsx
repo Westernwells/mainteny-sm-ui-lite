@@ -203,8 +203,10 @@ export const ContractTerm = ({
   }, []);
 
   useEffect(() => {
-    setToggleItems(contractTerms?.data);
-  }, [contractTerms]);
+    if (contractTerms?.data) {
+      setToggleItems(contractTerms.data);
+    }
+  }, [contractTerms.data.length]);
 
   const renderContent = () => {
     if (!isContract && isShow) {

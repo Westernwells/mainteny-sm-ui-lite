@@ -116,11 +116,8 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => {
             id: 'startDate',
             label: 'Contract Start Date',
             required: true,
-            helperText:
-              formik.errors.startDate && formik.touched.startDate
-                ? formik.errors.startDate
-                : '',
-            error: !!(formik.touched.startDate && formik.errors.startDate),
+            helperText: formik.errors.startDate ? formik.errors.startDate : '',
+            error: !!formik.errors.startDate,
           }}
           defaultDate={formik.values.startDate}
           maxDate={formik.values.endDate!}
@@ -136,19 +133,11 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => {
             id: 'endDate',
             label: 'Contract End Date',
             required: true,
-            helperText:
-              formik.errors.endDate && formik.touched.endDate
-                ? formik.errors.endDate
-                : '',
-            error: !!(formik.touched.endDate && formik.errors.endDate),
+            helperText: formik.errors.endDate ? formik.errors.endDate : '',
+            error: !!formik.errors.endDate,
           }}
           defaultDate={formik.values.endDate}
-          minDate={
-            new Date(
-              new Date(formik.values.startDate! || Date.now()).getTime() +
-                86400000,
-            )
-          }
+          minDate={formik.values.startDate!}
         />
       </Grid>
       <Box width="100%" />
