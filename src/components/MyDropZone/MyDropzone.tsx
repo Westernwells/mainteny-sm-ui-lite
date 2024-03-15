@@ -7,7 +7,7 @@ import {FileWithPath, useDropzone, FileRejection} from 'react-dropzone';
 import useTheme from '@mui/material/styles/useTheme';
 import {Cropper} from 'react-cropper';
 import 'styles/cropper.css';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import {ReactComponent as CloudUploadIcon} from 'assets/icons/CloudUploadIcon.svg';
 
 import {Dialog} from 'components/Dialog';
 import {Button} from '../Button';
@@ -64,7 +64,7 @@ export const MyDropZone = ({
 
   const [cropper, setCropper] = useState<any>();
   const {getRootProps, getInputProps, open, fileRejections} = useDropzone({
-    maxSize: oneMbInByes * 5,
+    maxSize: oneMbInByes * 20,
     maxFiles,
     accept: acceptedFileTypes
       ? formatAcceptedFileType(acceptedFileTypes)
@@ -124,7 +124,7 @@ export const MyDropZone = ({
     if (isCropped && files.length > 0) {
       setOpenDialog(true);
     }
-    if (files.length > 0 && !isCropped) {
+    if (files.length >= 0 && !isCropped) {
       handleCropped();
     }
   }, [files, fileRejections]);
@@ -206,7 +206,7 @@ export const MyDropZone = ({
               color="error"
               key={index}>
               {error.code === 'file-too-large'
-                ? t('File is larger than 5mb')
+                ? t('File is larger than 20mb')
                 : t(error.message)}
             </Typography>
           ))}
@@ -250,9 +250,9 @@ export const MyDropZone = ({
         {...getRootProps({className: 'dropzone'})}
         sx={{
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
+          gap: '1rem',
           backgroundColor: theme.palette.inputBackground.main,
           border: `2px dashed rgba(143, 155, 179, 0.5)`,
           p: '2rem',
@@ -261,30 +261,30 @@ export const MyDropZone = ({
           borderRadius: '4px',
         }}>
         <input {...getInputProps()} />
-        <CloudUploadIcon
-          htmlColor={theme.palette.action.disabled}
-          sx={{width: 50, height: 50}}
-        />
-        <Box sx={{display: 'flex', alignItems: 'center'}}>
-          <Button
-            label={t('Select file to upload')}
-            style={{
-              textTransform: 'inherit',
-              color: theme.palette.primary.main,
-            }}
-            buttonProps={{
-              variant: 'text',
-              size: 'medium',
-              onClick: open,
-            }}
-          />
-          <Typography variant="body2" component="div">
-            {t('or drag and drop')}
+        <CloudUploadIcon style={{width: '2rem', height: '2rem'}} />
+        <Box sx={{display: 'flex', flexDirection: 'column'}}>
+          <Box sx={{display: 'flex', alignItems: 'center'}}>
+            <Button
+              label={t('Select File To Upload')}
+              style={{
+                textTransform: 'inherit',
+                color: theme.palette.primary.light,
+                marginLeft: '-0.5rem',
+              }}
+              buttonProps={{
+                variant: 'text',
+                size: 'medium',
+                onClick: open,
+              }}
+            />
+            <Typography variant="body2" component="div" fontWeight={600}>
+              {t('or drag and drop')}
+            </Typography>
+          </Box>
+          <Typography variant="caption">
+            {t(hint)} {t('(max. 20MB)')}
           </Typography>
         </Box>
-        <Typography variant="caption">
-          {t(hint)} {t('(max. 5MB)')}
-        </Typography>
       </Box>
 
       {!isCropped && (

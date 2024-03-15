@@ -22,7 +22,8 @@ export const getInvoiceStatusStyles = (
     | 'success'
     | 'action.active'
     | 'warning'
-    | 'warning.dark';
+    | 'warning.dark'
+    | 'primary.light';
 } => {
   switch (status) {
     case InvoiceStatus.PAID:
@@ -37,6 +38,8 @@ export const getInvoiceStatusStyles = (
       return {label: 'Cancelled', color: 'warning.dark'};
     case InvoiceStatus.PARTIALLY_PAID:
       return {label: 'Partially Paid', color: 'warning'};
+    case InvoiceStatus.CREDITED:
+      return {label: 'Credited', color: 'primary.light'};
     default:
       return {label: '-', color: 'default'};
   }

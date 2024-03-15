@@ -1,5 +1,6 @@
 import {addMinutes, differenceInMinutes} from 'date-fns';
 import _ from 'lodash';
+import {amber, grey} from '@mui/material/colors';
 import {
   ServiceOrderArticleView,
   ServiceOrderPaymentStatus,
@@ -9,6 +10,7 @@ import {
   ServiceOrderView,
 } from '../models/service-order';
 import {toDate, toRestDateTime} from './datetime';
+import {theme} from '../theme';
 
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
   switch (status) {
@@ -294,4 +296,21 @@ export const calculateStartAndEndFromTimeRecord = (
       lastRecord.minutes ?? 0,
     ).toISOString(),
   };
+};
+
+export const serviceOrderTypeColor = (type?: ServiceOrderType) => {
+  switch (type) {
+    case ServiceOrderType.REPAIR:
+      return amber[800];
+    case ServiceOrderType.REGULAR:
+      return theme.palette.secondary.main;
+    case ServiceOrderType.EMERGENCY:
+      return theme.palette.error.main;
+    case ServiceOrderType.CALLOUT:
+      return grey[800];
+    case ServiceOrderType.NEW_INSTALLATION:
+      return theme.palette.secondary.dark;
+    default:
+      return theme.palette.primary.main;
+  }
 };

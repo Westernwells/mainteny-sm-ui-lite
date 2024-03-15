@@ -80,7 +80,7 @@ export const UnitDetails = ({
     initialValues: {
       category: convertToText(elevator.category),
       manufacturer: elevator.additionalInfo.manufacturer,
-      externalId: elevator.externalId,
+      externalId: elevator.number,
       numberOfStops: elevator.additionalInfo.numberOfStops,
       cabinType: elevator.additionalInfo.cabinType,
       emergencyPhoneProvider: elevator.additionalInfo.emergencyPhoneProvider,
@@ -148,7 +148,7 @@ export const UnitDetails = ({
       serialNumber: elevator.serialNumber,
       unitCapacity: elevator.capacity,
       yearBuilt: elevator.additionalInfo.builtYear,
-      externalId: elevator.externalId,
+      externalId: elevator.number,
     });
   }, [openDialog]);
 

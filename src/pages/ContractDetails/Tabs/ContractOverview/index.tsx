@@ -89,9 +89,8 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
   const [documents, setDocuments] = useState<FileWithPreview[]>([]);
   const [openDescriptionDialog, setOpenDescriptionDialog] = useState(false);
 
-  const {mutateAsync: uploadFiles} = useUploadFiles(
-    'Documents uploaded successfully',
-  );
+  const {mutateAsync: uploadFiles, isLoading: isFileUploadLoading} =
+    useUploadFiles('Documents uploaded successfully');
 
   const {data: downloadUrls = {}} = useDownloadUrl(
     contractDetails?.additionalInfo?.documents
@@ -615,7 +614,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
             )}
             <Dialog
               title="Add Documents"
-              isSaving={false}
+              isSaving={isFileUploadLoading}
               onCancel={() => setOpenDocumentDialog(false)}
               onSave={() => onDocsPreview()}
               disableSaveBtn={!documents.length}
@@ -628,6 +627,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   setDocuments(dropedFiles);
                 }}
                 acceptedFileTypes={[
+                  'image/*',
                   'application/pdf',
                   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -636,6 +636,9 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                   'text/csv',
                 ]}
                 maxFiles={1}
+                getRejectedFileWithErrors={(file) => {
+                  console.log(file);
+                }}
               />
             </Dialog>
           </ContractCard>

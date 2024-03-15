@@ -13,10 +13,10 @@ import {WorkHoursItem} from 'models/workHours';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {calculateTotalTime} from 'utils/work-hours-utils';
 import {endOfDay, startOfDay} from 'date-fns';
-import {useFormatDuration} from 'hooks/useFormatDuration';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
 import {getLastWeek} from 'utils/datetime';
+import {useNavigate} from 'react-router';
 import {columns, makeRows} from './WorkHoursDataGrid';
 
 interface Props {
@@ -26,7 +26,6 @@ interface Props {
 const WorkHoursTab = ({employeeId}: Props) => {
   const {t} = useTranslation();
   const formatDate = useFormatDate();
-  const formatDuration = useFormatDuration();
   const [startDate, setStartDate] = useState<Date>(getLastWeek());
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [search, setSearch] = useQueryState('searchWorkHours');
@@ -35,13 +34,14 @@ const WorkHoursTab = ({employeeId}: Props) => {
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(makePage(0, 10));
   const textInput = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   const {data: workHours = createEmptyResource<WorkHoursItem>(10)} =
     useWorkHours(search, page, startDate, endDate, employeeId || '');
 
   useEffect(() => {
     if (workHours.data) {
-      setRows(makeRows(workHours, formatDate, formatDuration));
+      setRows(makeRows(workHours, formatDate));
       setTotalTime(calculateTotalTime(workHours.data));
     } else {
       setRows([]);
@@ -74,6 +74,9 @@ const WorkHoursTab = ({employeeId}: Props) => {
           }}
           textFieldProps={{
             label: t('Start Date'),
+            sx: {
+              background: 'white',
+            },
           }}
         />
         <Typography sx={{margin: '0 16px', color: '#8F9BB3', fontSize: '14px'}}>
@@ -88,6 +91,9 @@ const WorkHoursTab = ({employeeId}: Props) => {
           }}
           textFieldProps={{
             label: t('End Date'),
+            sx: {
+              background: 'white',
+            },
           }}
         />
       </FilterFields>
@@ -123,6 +129,12 @@ const WorkHoursTab = ({employeeId}: Props) => {
         isCellClickable={false}
         pageCount={pageCount}
         totalRows={workHours.total}
+        onRowClick={(row) => {
+          const {orderId} = row.row;
+          if (orderId !== '') {
+            navigate(`/orders/details/${orderId}`);
+          }
+        }}
       />
     </TabContentContainer>
   );

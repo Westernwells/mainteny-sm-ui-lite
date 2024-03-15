@@ -14,7 +14,6 @@ import {UnitContracts} from './UnitContracts';
 import {PriorityTechnician} from './PriorityTechnician';
 import {Notes} from './Notes';
 import {Pictures} from './Pictures';
-import {Documents} from './Documents';
 
 interface Props {
   getUnitName?: (value: string) => void;
@@ -175,7 +174,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
         <Grid
           item
           xs={12}
-          md={4}
+          md={6}
           sx={{
             [theme.breakpoints.up('md')]: {
               height: '100%',
@@ -187,28 +186,13 @@ export const OverviewTab = ({getUnitName}: Props) => {
         <Grid
           item
           xs={12}
-          md={4}
+          md={6}
           sx={{
             [theme.breakpoints.up('md')]: {
               height: '100%',
             },
           }}>
           <Pictures
-            elevator={elevator!}
-            propertyOwnerId={elevator?.propertyOwner.id}
-          />
-        </Grid>
-
-        <Grid
-          item
-          xs={12}
-          md={4}
-          sx={{
-            [theme.breakpoints.up('md')]: {
-              height: '100%',
-            },
-          }}>
-          <Documents
             elevator={elevator!}
             propertyOwnerId={elevator?.propertyOwner.id}
           />

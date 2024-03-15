@@ -145,6 +145,21 @@ export const columns: GridColDef[] = [
   }),
 ];
 
+const getTechnicianFullName = (item: ServiceOrderView) => {
+  if (item.schedules.length) {
+    return item.schedules
+      .map(
+        (x) =>
+          `${x.technician.userAccount.firstName} ${x.technician.userAccount.lastName}`,
+      )
+      .join(',');
+  }
+  if (item?.additionalInfo?.candidateTechnician) {
+    return `${item?.additionalInfo?.candidateTechnician?.userAccount.firstName} ${item?.additionalInfo?.candidateTechnician?.userAccount.lastName}`;
+  }
+  return '-';
+};
+
 export const makeRows = (
   serviceOrders: ServiceOrderView[],
   formatDate: FormatDate = () => '',
@@ -164,14 +179,7 @@ export const makeRows = (
     [ServiceOrderOrderField.ELEVATOR_EXTERNAL_ID]:
       item.elevator.externalId || '-',
     date: formatDate(item.dueDate),
-    [ServiceOrderOrderField.TECHNICIAN_NAME]: item.schedules.length
-      ? item.schedules
-          .map(
-            (x) =>
-              `${x.technician.userAccount.firstName} ${x.technician.userAccount.lastName}`,
-          )
-          .join(',')
-      : '-',
+    [ServiceOrderOrderField.TECHNICIAN_NAME]: getTechnicianFullName(item),
     [ServiceOrderOrderField.JOB_STATUS]: item.status,
     navigateTo: `details/${item.id}`,
     [ServiceOrderOrderField.PAYMENT_STATUS]: item.additionalInfo.paymentStatus,
