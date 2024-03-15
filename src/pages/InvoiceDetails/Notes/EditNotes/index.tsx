@@ -32,6 +32,7 @@ export const Notes = ({invoice}: Props) => {
     useInfiniteInvoiceComments,
     invoice.id,
   );
+
   const totalCustomerNotes = useTotalNotesData(
     useInfiniteCustomerNotes,
     invoice?.propertyOwner?.id,
